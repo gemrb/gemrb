@@ -91,6 +91,7 @@ Scriptable::Scriptable(ScriptableType type)
 	AdjustedTicks = 0;
 	ScriptTicks = 0;
 	IdleTicks = 0;
+	AuraTicks = 100;
 	TriggerCountdown = 0;
 	Dialog[0] = 0;
 
@@ -298,12 +299,18 @@ void Scriptable::Update()
 {
 	Ticks++;
 	AdjustedTicks++;
+	AuraTicks++;
+
+	Actor *act = NULL;
+	if (Type == ST_ACTOR) {
+		act = (Actor *) this;
+	}
 
 	if (UnselectableTimer) {
 		UnselectableTimer--;
 		if (!UnselectableTimer) {
-			if (Type == ST_ACTOR) {
-				((Actor *) this)->SetCircleSize();
+			if (act) {
+				act->SetCircleSize();
 			}
 		}
 	}
@@ -1340,6 +1347,29 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			return false;
 	}
 	return true;
+}
+
+bool Scriptable::AuraPolluted()
+{
+	// aura pollution happens automatically
+	// aura cleansing the usual and magical way
+	if (AuraTicks >= core->Time.attack_round_size) {
+		AuraTicks = -1;
+		return false;
+	} else if (Ticks == 1 && AuraTicks != 1 && Type == ST_ACTOR) {
+		Actor *act = (Actor *) this;
+		if (act->GetStat(IE_AURACLEANSING)) {
+			AuraTicks = -1;
+			displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
+			return false;
+		}
+	}
+
+	if (AuraTicks > 0) {
+		// sorry, you'll have to recover first
+		return true;
+	}
+	return false;
 }
 
 bool Scriptable::TimerActive(ieDword ID)

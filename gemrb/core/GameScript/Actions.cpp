@@ -2569,14 +2569,14 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
-	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_DEPLETE);
+	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_DEPLETE|SC_AURA_CHECK);
 }
 
 //spell is depleted, casting time is calculated, interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_DEPLETE);
+	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_DEPLETE|SC_AURA_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
@@ -2584,7 +2584,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 {
-	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK);
+	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_AURA_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
@@ -2592,7 +2592,7 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, SC_RANGE_CHECK);
+	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_AURA_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)

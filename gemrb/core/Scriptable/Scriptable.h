@@ -245,6 +245,8 @@ public:
 	ieDword ScriptTicks;
 	// The number of times since UpdateActions() tried to do anything.
 	ieDword IdleTicks;
+	// The number of ticks since the last spellcast
+	ieDword AuraTicks;
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown;
 
@@ -357,6 +359,7 @@ public:
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
 	virtual char* GetName(int /*which*/) const { return NULL; }
+	bool AuraPolluted();
 private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant);

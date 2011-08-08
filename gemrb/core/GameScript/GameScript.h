@@ -105,6 +105,7 @@ class GameScript;
 #define SC_DEPLETE      4
 #define SC_SETLEVEL     8
 #define SC_INSTANT      16
+#define SC_AURA_CHECK   32
 
 //trigger flags stored in triggers in .bcs files
 #define NEGATE_TRIGGER 1

@@ -2316,6 +2316,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
+	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted()) {
+		return;
+	}
+
 	// use the passed level instead of the caster's casting level
 	if (flags&SC_SETLEVEL) {
 		if (parameters->string0Parameter[0]) {
@@ -2409,6 +2413,10 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 			printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
 			Sender->SetSpellResRef(spellres);
 		}
+	}
+
+	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted()) {
+		return;
 	}
 
 	// use the passed level instead of the caster's casting level
