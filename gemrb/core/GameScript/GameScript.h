@@ -99,6 +99,13 @@ class GameScript;
 #define AC_NO_SOUND   1
 #define AC_RUNNING    2
 
+//spelll core flags
+#define SC_NO_DEAD      1
+#define SC_RANGE_CHECK  2
+#define SC_DEPLETE      4
+#define SC_SETLEVEL     8
+#define SC_INSTANT      16
+
 //trigger flags stored in triggers in .bcs files
 #define NEGATE_TRIGGER 1
 

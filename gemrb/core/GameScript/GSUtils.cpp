@@ -2304,3 +2304,168 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	return polygons[index];
 }
 
+// shared spellcasting action code for casting on scriptables
+void SpellCore(Scriptable *Sender, Action *parameters, int flags)
+{
+	ieResRef spellres;
+	int level = 0;
+
+	//resolve spellname
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!", YELLOW, parameters->actionID);
+			Sender->SetSpellResRef(spellres);
+		}
+	}
+
+	// use the passed level instead of the caster's casting level
+	if (flags&SC_SETLEVEL) {
+		if (parameters->string0Parameter[0]) {
+			level = parameters->int0Parameter;
+		} else {
+			level = parameters->int1Parameter;
+		}
+	}
+
+	if (!(flags&SC_INSTANT)) {
+		if (Sender->CurrentActionState) {
+			if (Sender->LastTarget) {
+				//if target was set, fire spell
+				Sender->CastSpellEnd(level);
+			} else if(!Sender->LastTargetPos.isempty()) {
+				//the target was converted to a point
+				Sender->CastSpellPointEnd(level);
+			} else {
+				printMessage("GameScript", "SpellCore: Action (%d) lost target somewhere!", LIGHT_RED, parameters->actionID);
+			}
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
+
+	//parse target
+	int seeflag = 0;
+	unsigned int dist = GetSpellDistance(spellres, Sender);
+	if ((flags&SC_NO_DEAD) && dist != 0xffffffff) {
+		seeflag = GA_NO_DEAD;
+	}
+
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	if(Sender->Type==ST_ACTOR) {
+		Actor *act = (Actor *) Sender;
+
+		//move near to target
+		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
+			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
+				MoveNearerTo(Sender, tar, dist);
+				return;
+			}
+		}
+
+		//face target
+		if (tar != Sender) {
+			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
+		}
+
+		//stop doing anything else
+		act->SetModal(MS_NONE);
+	}
+	Sender->CurrentActionState = 1;
+	int duration = Sender->CastSpell( spellres, tar, flags&SC_DEPLETE, flags&SC_INSTANT );
+
+	if (flags&SC_INSTANT) {
+		if (tar->Type==ST_ACTOR) {
+			Sender->CastSpellEnd(level);
+		} else {
+			Sender->CastSpellPointEnd(level);
+		}
+		Sender->ReleaseCurrentAction();
+	} else {
+		if (duration != -1) Sender->SetWait(duration);
+
+		//if target was set, feed action back
+		if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
+			Sender->ReleaseCurrentAction();
+		}
+	}
+}
+
+
+// shared spellcasting action code for casting on the ground
+void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
+{
+	ieResRef spellres;
+	int level = 0;
+
+	//resolve spellname
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", YELLOW, parameters->actionID);
+			Sender->SetSpellResRef(spellres);
+		}
+	}
+
+	// use the passed level instead of the caster's casting level
+	if (flags&SC_SETLEVEL) {
+		if (parameters->string0Parameter[0]) {
+			level = parameters->int0Parameter;
+		} else {
+			level = parameters->int1Parameter;
+		}
+	}
+
+	if (!(flags&SC_INSTANT)) {
+		if (Sender->CurrentActionState) {
+			if(!Sender->LastTargetPos.isempty()) {
+				//if target was set, fire spell
+				Sender->CastSpellPointEnd(level);
+			} else {
+				printMessage("GameScript", "SpellPointCore: Action (%d) lost target somewhere!", LIGHT_RED, parameters->actionID);
+			}
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
+
+	if(Sender->Type==ST_ACTOR) {
+		unsigned int dist = GetSpellDistance(spellres, Sender);
+
+		Actor *act = (Actor *) Sender;
+		//move near to target
+		if ((flags&SC_RANGE_CHECK) && (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, parameters->pointParameter))) {
+			MoveNearerTo(Sender,parameters->pointParameter, dist, 0);
+			return;
+		}
+
+		//face target
+		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
+		//stop doing anything else
+		act->SetModal(MS_NONE);
+	}
+
+	Sender->CurrentActionState = 1;
+	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT  );
+
+	if (flags&SC_INSTANT) {
+		Sender->CastSpellPointEnd(level);
+		Sender->ReleaseCurrentAction();
+	} else {
+		if (duration != -1) Sender->SetWait(duration);
+
+		//if target was set, feed action back
+		if (Sender->LastTargetPos.isempty()) {
+			Sender->ReleaseCurrentAction();
+		}
+	}
+}

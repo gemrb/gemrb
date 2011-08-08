@@ -131,6 +131,8 @@ GEM_EXPORT unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Se
 unsigned int GetItemDistance(const ieResRef itemres, int header);
 void SetupWishCore(Scriptable *Sender, int column, int picks);
 void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag);
+void SpellCore(Scriptable *Sender, Action *parameters, int flags);
+void SpellPointCore(Scriptable *Sender, Action *parameters, int flags);
 Gem_Polygon *GetPolygon2DA(ieDword index);
 
 inline int Bones(ieDword value)

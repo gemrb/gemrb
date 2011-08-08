@@ -2569,236 +2569,32 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ForceSpell lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	if (Sender->CurrentActionState) {
-		if (Sender->LastTarget) {
-			//if target was set, fire spell
-			Sender->CastSpellEnd(0);
-		} else if(!Sender->LastTargetPos.isempty()) {
-			//the target was converted to a point
-			Sender->CastSpellPointEnd(0);
-		} else {
-			printMessage("GameScript", "Spell lost target somewhere!", LIGHT_RED);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//parse target
-	int seeflag;
-	unsigned int dist = GetSpellDistance(spellres, Sender);
-	if (dist == 0xffffffff) {
-		seeflag = 0;
-	} else {
-		seeflag = GA_NO_DEAD;
-	}
-
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	if(Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-
-		//move near to target
-		if (dist != 0xffffffff) {
-			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
-				MoveNearerTo(Sender,tar,dist);
-				return;
-			}
-		}
-
-		//face target
-		if (tar != Sender) {
-			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
-		}
-
-		//stop doing anything else
-		act->SetModal(MS_NONE);
-	}
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpell( spellres, tar, true );
-	if (duration != -1) Sender->SetWait(duration);
-
-	//if target was set, feed action back
-	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
-		Sender->ReleaseCurrentAction();
-	}
+	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_DEPLETE);
 }
 
 //spell is depleted, casting time is calculated, interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ForceSpell lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	if (Sender->CurrentActionState) {
-		if(!Sender->LastTargetPos.isempty()) {
-			//if target was set, fire spell
-			Sender->CastSpellPointEnd(0);
-		} else {
-			printMessage("GameScript", "SpellPoint lost target somewhere!", LIGHT_RED);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	if(Sender->Type==ST_ACTOR) {
-		unsigned int dist = GetSpellDistance(spellres, Sender);
-
-		Actor *act = (Actor *) Sender;
-		//move near to target
-		if (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, parameters->pointParameter)) {
-			MoveNearerTo(Sender,parameters->pointParameter,dist, 0);
-			return;
-		}
-
-		//face target
-		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
-		//stop doing anything else
-		act->SetModal(MS_NONE);
-	}
-
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
-	if (duration != -1) Sender->SetWait(duration);
-
-	//if target was set, feed action back
-	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
-		Sender->ReleaseCurrentAction();
-	}
+	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_DEPLETE);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
+//FIXME: add SC_NO_DEAD|SC_RANGE_CHECK?
 void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "SpellNoDec lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	if (Sender->CurrentActionState) {
-		if (Sender->LastTarget) {
-			//if target was set, fire spell
-			Sender->CastSpellEnd(0);
-		} else if(!Sender->LastTargetPos.isempty()) {
-			//the target was converted to a point
-			Sender->CastSpellPointEnd(0);
-		} else {
-			printMessage("GameScript", "SpellNoDec lost target somewhere!", LIGHT_RED);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//parse target
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//face target
-	if (Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-		if (tar != Sender) {
-			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
-		}
-
-		//stop doing anything else
-		act->SetModal(MS_NONE);
-	}
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpell( spellres, tar, false );
-	if (duration != -1) Sender->SetWait(duration);
-
-	//if target was set, feed action back
-	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
-		Sender->ReleaseCurrentAction();
-	}
+	SpellCore(Sender, parameters, 0);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
+//FIXME: add SC_RANGE_CHECK?
 void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "SpellPointNoDec lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	if (Sender->CurrentActionState) {
-		if(!Sender->LastTargetPos.isempty()) {
-			//if target was set, fire spell
-			Sender->CastSpellPointEnd(0);
-		} else {
-			printMessage("GameScript", "SpellPointNoDec lost target somewhere!", LIGHT_RED);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//face target
-	if (Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
-
-		//stop doing anything else
-		act->SetModal(MS_NONE);
-	}
-
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
-	if (duration != -1) Sender->SetWait(duration);
-
-	//if target was set, feed action back
-	if (Sender->LastTargetPos.isempty()) {
-		Sender->ReleaseCurrentAction();
-	}
+	SpellPointCore(Sender, parameters, 0);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
@@ -2806,58 +2602,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ForceSpell lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	if (Sender->CurrentActionState) {
-		if (Sender->LastTarget) {
-			//if target was set, fire spell
-			Sender->CastSpellEnd(0);
-		} else if(!Sender->LastTargetPos.isempty()) {
-			//the target was converted to a point
-			Sender->CastSpellPointEnd(0);
-		} else {
-			printMessage("GameScript", "ForceSpell lost target somewhere!", LIGHT_RED);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//parse target
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//face target
-	if (Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-		if (tar != Sender) {
-			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
-		}
-
-		//stop doing anything else
-		act->SetModal(MS_NONE);
-	}
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpell (spellres, tar, false);
-	if (duration != -1) Sender->SetWait(duration);
-
-	//if target was set, feed action back
-	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
-		Sender->ReleaseCurrentAction();
-	}
+	SpellCore(Sender, parameters, 0);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
@@ -2865,91 +2610,15 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ForceSpellPoint lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	if (Sender->CurrentActionState) {
-		if(!Sender->LastTargetPos.isempty()) {
-			//if target was set, fire spell
-			Sender->CastSpellPointEnd(0);
-		} else {
-			printMessage("GameScript", "ForceSpellPoint lost target somewhere!", LIGHT_RED);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//face target
-	if (Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
-
-		//stop doing anything else
-		act->SetModal(MS_NONE);
-	}
-
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
-	if (duration != -1) Sender->SetWait(duration);
-
-	//if target was set, feed action back
-	if (Sender->LastTargetPos.isempty()) {
-		Sender->ReleaseCurrentAction();
-	}
+	SpellPointCore(Sender, parameters, 0);
 }
 
 //ForceSpell with zero casting time
 //zero casting time, no depletion, not interruptable
 //FIXME The caster must meet the level requirements as set in the spell file
-//FIXME The spell level is taken as parameter2 in some cases (FIXED)
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-	int level;
-
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ReallyForceSpell lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		if (tar != Sender) {
-			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
-		}
-		actor->SetStance (IE_ANI_CONJURE);
-	}
-	Sender->CastSpell (spellres, tar, false, true);
-	if (parameters->string0Parameter[0]) {
-		level = parameters->int0Parameter;
-	} else {
-		level = parameters->int1Parameter;
-	}
-	if (tar->Type==ST_ACTOR) {
-		Sender->CastSpellEnd(level);
-	} else {
-		Sender->CastSpellPointEnd(level);
-	}
-	Sender->ReleaseCurrentAction();
+	SpellCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
 }
 
 //ForceSpellPoint with zero casting time
@@ -2958,75 +2627,14 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-	int level;
-
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ForceSpellPoint lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	//Sender->LastTargetPos=parameters->pointParameter;
-	if (Sender->Type == ST_ACTOR) {
-		if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-			Sender->ReleaseCurrentAction();
-			return;
-		}
-		Actor *actor = (Actor *) Sender;
-		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
-		actor->SetStance (IE_ANI_CONJURE);
-	}
-	Sender->CastSpellPoint (spellres, parameters->pointParameter, false, true);
-	if (parameters->string0Parameter[0]) {
-		level = parameters->int0Parameter;
-	} else {
-		level = parameters->int1Parameter;
-	}
-	Sender->CastSpellPointEnd(level);
-	Sender->ReleaseCurrentAction();
+	SpellPointCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
 }
 
 // this differs from ReallyForceSpell that this one allows dead Sender casting
 // zero casting time, no depletion
 void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-	int level;
-
-	if (!ResolveSpellName( spellres, parameters) ) {
-		Sender->ReleaseCurrentAction();
-		return;
-	} else {
-		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "ForceSpellDead lost spell somewhere!", YELLOW);
-			Sender->SetSpellResRef(spellres);
-		}
-	}
-
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Sender->LastTargetPos=parameters->pointParameter;
-
-	Sender->CastSpell (spellres, tar, false, true);
-	if (parameters->string0Parameter[0]) {
-		level = parameters->int0Parameter;
-	} else {
-		level = parameters->int1Parameter;
-	}
-	if (tar->Type==ST_ACTOR) {
-		Sender->CastSpellEnd(level);
-	} else {
-		Sender->CastSpellPointEnd(level);
-	}
-	Sender->ReleaseCurrentAction();
+	SpellCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
