@@ -1823,13 +1823,6 @@ bool GameScript::Update(bool *continuing, bool *done)
 	if (!script)
 		return false;
 
-	//ieDword thisTime = core->GetGame()->Ticks;
-	//if (( thisTime - lastRunTime ) < scriptRunDelay) {
-	//	return false;
-	//}
-
-	//lastRunTime = thisTime;
-
 	if(!(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
 		return false;
 	}

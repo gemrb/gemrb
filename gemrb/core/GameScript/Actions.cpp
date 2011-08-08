@@ -4703,12 +4703,7 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	/*if (!parameters->objects[1]) {
-		GameControl *gc = core->GetGameControl();
-		tar = gc->GetTarget();
-	} else {*/
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
-	/*}*/
+	tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4741,12 +4736,7 @@ void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	/*if (!parameters->objects[1]) {
-		GameControl *gc = core->GetGameControl();
-		tar = gc->GetTarget();
-	} else {*/
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
-	/*}*/
+	tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4769,12 +4759,7 @@ void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	/*if (!parameters->objects[1]) {
-		GameControl *gc = core->GetGameControl();
-		tar = gc->GetTarget();
-	} else {*/
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
-	/*}*/
+	tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4797,12 +4782,7 @@ void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	/*if (!parameters->objects[1]) {
-		GameControl *gc = core->GetGameControl();
-		tar = gc->GetTarget();
-	} else {*/
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
-	/*}*/
+	tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;

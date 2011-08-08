@@ -1159,7 +1159,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	int DamageBonus, CriticalBonus;
 	int speed, style;
 
-	//bool leftorright = (bool) ((attacksperround-attackcount)&1);
 	bool leftorright = false;
 	Actor *tar = NULL;
 	if (target->Type==ST_ACTOR) {
@@ -1189,7 +1188,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			if (actor->InParty) {
 				//pick from all 5 possible verbal constants
 				actor->VerbalConstant(VB_ATTACK, 5);
-				//DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			}
 			//display attack message
 			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
@@ -1338,7 +1336,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	if (actionflags[newAction->actionID]&AF_DIRECT) {
 		Object *tmp = new Object();
 		tmp->objectFields[0] = -1;
-		//tmp->objectFields[1] = core->GetGameControl()->targetID;
 		newAction->objects[objectCount++] = tmp;
 	}
 	//Here is the Action; Now we need to evaluate the parameters, if any

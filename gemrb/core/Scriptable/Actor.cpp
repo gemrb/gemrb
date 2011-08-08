@@ -2717,7 +2717,6 @@ void Actor::VerbalConstant(int start, int count) const
 		count--;
 	}
 	if(count>=0) {
-		//DisplayStringCore((Scriptable *const) this, start+count, DS_CONSOLE|DS_CONST );
 		DisplayStringCore((Scriptable *const) this, vc, DS_CONSOLE );
 	}
 }
