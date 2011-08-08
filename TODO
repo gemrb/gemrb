@@ -1,5 +1,4 @@
 Scripts:
-1. (DONE?) ToB specific actions/triggers, like pocketplane (so ToB will work)
 2. (PARTLY) Properly detect the play mode (sp/mp, normal/extended)
 
 Strings:
@@ -12,7 +11,6 @@ Combat:
 simulate all games, without any hardcoded parts
 
 Items:
-1. (DONE-almost) Break items, count charges
 2. (PARTLY) Implement switching weapon abilities
 3. (DONE-almost) Implement item usage (similar to spells)
 
@@ -28,9 +26,6 @@ Area:
 2. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
 3. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
 4. (DONE-almost) fix overlaid tiles - bug #1623839
-
-Store:
-1.  Store caching (especially bags)
 
 Animation:
 1. (PARTLY) fix char animation sequences
@@ -53,8 +48,8 @@ Game GUI:
 2. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
 3. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
    it correctly too.
-4. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
-5. (DONE-almost) Level up code, this should be written mostly in GuiScript!!!
+4. (PARTLY) Fix unwanted screen shake (especially when on bottom of area on actor selection)
+5. (DONE-almost) Level up code, missing for pst wierdness and iwd2
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
