@@ -2311,7 +2311,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!", YELLOW, parameters->actionID);
+			printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2334,7 +2334,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 				//the target was converted to a point
 				Sender->CastSpellPointEnd(level);
 			} else {
-				printMessage("GameScript", "SpellCore: Action (%d) lost target somewhere!", LIGHT_RED, parameters->actionID);
+				printMessage("GameScript", "SpellCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
 			}
 			Sender->ReleaseCurrentAction();
 			return;
@@ -2406,7 +2406,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", YELLOW, parameters->actionID);
+			printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2426,7 +2426,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 				//if target was set, fire spell
 				Sender->CastSpellPointEnd(level);
 			} else {
-				printMessage("GameScript", "SpellPointCore: Action (%d) lost target somewhere!", LIGHT_RED, parameters->actionID);
+				printMessage("GameScript", "SpellPointCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
 			}
 			Sender->ReleaseCurrentAction();
 			return;
