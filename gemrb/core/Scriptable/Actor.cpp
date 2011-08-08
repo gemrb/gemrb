@@ -4935,7 +4935,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
-	if (!roundTime || (gameTime-roundTime > core->Time.round_size)) {
+	if (!roundTime || (gameTime-roundTime > 100)) { // the original didn't use a normal round (90)
 		// TODO: do we need cleverness for secondround here?
 		InitRound(gameTime);
 	}
