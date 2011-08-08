@@ -2632,6 +2632,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 // zero casting time, no depletion
 void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 {
+	// the difference from ReallyForceSpell is handled by the lack of AF_ALIVE being set
 	SpellCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
 }
 

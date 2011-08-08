@@ -740,10 +740,10 @@ static const ActionLink actionnames[] = {
 	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING|AF_ALIVE},
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING|AF_ALIVE},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
-	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING},
+	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
 	{"reallyforcespelldead", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"reallyforcespelllevel", GameScript::ReallyForceSpell, AF_BLOCKING},//this is the same action
-	{"reallyforcespellpoint", GameScript::ReallyForceSpellPoint, AF_BLOCKING},
+	{"reallyforcespellpoint", GameScript::ReallyForceSpellPoint, AF_BLOCKING|AF_ALIVE},
 	{"recoil", GameScript::Recoil, AF_ALIVE},
 	{"regainpaladinhood", GameScript::RegainPaladinHood, 0},
 	{"regainrangerhood", GameScript::RegainRangerHood, 0},
