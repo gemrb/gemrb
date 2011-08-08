@@ -132,6 +132,7 @@ struct TimeStruct {
 	unsigned int turn_sec;
 	unsigned int round_size; // in ticks
 	unsigned int rounds_per_turn;
+	unsigned int attack_round_size;
 };
 
 struct SpellDescType {
