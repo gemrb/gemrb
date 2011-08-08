@@ -3284,7 +3284,7 @@ int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 
 int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
+	return Sender->MatchTriggerWithObject(trigger_hitby, parameters->objectParameter, parameters->int0Parameter);
 }
 
 int GameScript::Heard(Scriptable* Sender, Trigger* parameters)

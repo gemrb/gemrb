@@ -1198,9 +1198,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 	//action performed
-	if(target->Type == ST_ACTOR) {
-		actor->SetTarget( target );
-	}
+	actor->SetTarget( target );
+
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
 		(PersonalDistance(Sender, target) > wi.range) ||
 		(!Sender->GetCurrentArea()->IsVisible(Sender->Pos, target->Pos))) {
@@ -1223,6 +1222,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
+	Sender->LastTarget = target->GetGlobalID();
 	actor->PerformAttack(core->GetGame()->GameTime);
 }
 

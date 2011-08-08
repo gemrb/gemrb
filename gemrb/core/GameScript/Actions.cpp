@@ -2575,6 +2575,11 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ForceSpell lost spell somewhere!", YELLOW);
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	if (Sender->CurrentActionState) {
@@ -2645,6 +2650,11 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ForceSpell lost spell somewhere!", YELLOW);
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	if (Sender->CurrentActionState) {
@@ -2697,6 +2707,7 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "SpellNoDec lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2755,6 +2766,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "SpellPointNoDec lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2802,6 +2814,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ForceSpell lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2859,6 +2872,7 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ForceSpellPoint lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2907,6 +2921,7 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ReallyForceSpell lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2951,6 +2966,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ForceSpellPoint lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2987,6 +3003,7 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
+			printMessage("GameScript", "ForceSpellDead lost spell somewhere!", YELLOW);
 			Sender->SetSpellResRef(spellres);
 		}
 	}

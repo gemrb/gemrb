@@ -4583,11 +4583,6 @@ void Actor::AttackedBy( Actor *attacker)
 
 void Actor::SetTarget( Scriptable *target)
 {
-	if (target->Type==ST_ACTOR) {
-		Actor *tar = (Actor *) target;
-		LastTarget = tar->GetGlobalID();
-		tar->AttackedBy(this);
-	}
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
 }
 
@@ -4988,6 +4983,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		printMessage("Actor", "Attack without valid target!\n", LIGHT_RED);
 		return;
 	}
+
+	target->AttackedBy(this);
 
 	print("Performattack for %s, target is: %s\n", ShortName, target->ShortName);
 

@@ -403,7 +403,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	if (changed)
-		ClearTriggers();
+		InitTriggers();
 
 	if (Type == ST_ACTOR) {
 		//TODO: add stuff here about idle actions
@@ -614,44 +614,8 @@ ieDword Scriptable::GetInternalFlag()
 
 void Scriptable::InitTriggers()
 {
-	//tolist.clear();
-	//bittriggers = 0;
 	triggers.clear();
 }
-
-void Scriptable::ClearTriggers()
-{
-	/*for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
-		*(*m) = 0;
-	}
-	if (!bittriggers) {
-		return;
-	}
-	if (bittriggers & BT_DIE) {
-		InternalFlags &= ~IF_JUSTDIED;
-	}
-	if (bittriggers & BT_ONCREATION) {
-		InternalFlags &= ~IF_ONCREATION;
-	}
-	if (bittriggers & BT_BECAMEVISIBLE) {
-		InternalFlags &= ~IF_BECAMEVISIBLE;
-	}
-	if (bittriggers & BT_PARTYRESTED) {
-		InternalFlags &= ~IF_PARTYRESTED;
-	}
-	if (bittriggers & BT_WASINDIALOG) {
-		InternalFlags &= ~IF_WASINDIALOG;
-	}
-	if (bittriggers & BT_PARTYRESTED) {
-		InternalFlags &= ~IF_PARTYRESTED;
-	}*/
-	InitTriggers();
-}
-
-/*void Scriptable::SetBitTrigger(ieDword bittrigger)
-{
-	bittriggers |= bittrigger;
-}*/
 
 void Scriptable::AddTrigger(TriggerEntry trigger)
 {
@@ -1142,9 +1106,10 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 		return -1;
 	}
 
-	if (!SpellResRef[0]) {
+	//why was this checked, it disables casting of a spell if the previous was aborted
+	//if (!SpellResRef[0]) {
 		SetSpellResRef(SpellRef);
-	}
+	//}
 
 	LastTargetPos = target->Pos;
 	if (target->Type==ST_ACTOR) {
