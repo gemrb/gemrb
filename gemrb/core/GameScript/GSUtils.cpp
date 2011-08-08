@@ -1162,10 +1162,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	//bool leftorright = (bool) ((attacksperround-attackcount)&1);
 	bool leftorright = false;
 	Actor *tar = NULL;
-	ieDword targetID = 0;
 	if (target->Type==ST_ACTOR) {
 		tar = (Actor *) target;
-		targetID = tar->GetGlobalID();
 	}
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
@@ -1186,7 +1184,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		wi.range += 10;
 	}
 	if (!(flags&AC_NO_SOUND) ) {
-		if (actor->LastTarget != targetID) {
+		if (!Sender->CurrentActionTicks) {
 			//play attack sound for party members
 			if (actor->InParty) {
 				//pick from all 5 possible verbal constants
