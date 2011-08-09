@@ -1377,7 +1377,18 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
 	if (core->ResolveRandomItem(TmpItem)) {
-		AddSlotItem( TmpItem, SlotID );
+		int ret = AddSlotItem( TmpItem, SlotID );
+		if (ret != ASI_SUCCESS) {
+			// put the remainder on the ground
+			Map *area = core->GetGame()->GetCurrentArea();
+			if (area) {
+				// create or reuse the existing pile
+				area->AddItemToLocation(Owner->Pos, TmpItem);
+			} else {
+				printMessage("Inventory", "AddSlotItemRes: argh, no area and the inventory is full, bailing out!\n", LIGHT_RED);
+				delete TmpItem;
+			}
+		}
 	} else {
 		delete TmpItem;
 	}
