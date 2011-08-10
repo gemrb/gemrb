@@ -1351,6 +1351,10 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 
 bool Scriptable::AuraPolluted()
 {
+	if (Type != ST_ACTOR) {
+		return false;
+	}
+
 	// aura pollution happens automatically
 	// aura cleansing the usual and magical way
 	if (AuraTicks >= core->Time.attack_round_size) {
