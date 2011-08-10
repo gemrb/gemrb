@@ -1487,7 +1487,11 @@ int Interface::Init()
 		char path[_MAX_PATH];
 
 		PathJoin( path, CachePath, NULL);
-		gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY);
+		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
+			print( "The cache path couldn't be registered, please check! " );
+			printStatus( "ERROR", LIGHT_RED );
+			return GEM_ERROR;
+		}
 
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
@@ -1785,7 +1789,7 @@ int Interface::Init()
 	}
 	game = NULL;
 	calendar = NULL;
-        keymap = NULL;
+	keymap = NULL;
 
 	timer = new GlobalTimer();
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
