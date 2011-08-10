@@ -1,13 +1,19 @@
-GemRB git (b9a8b4e):
+GemRB git (755c731276e):
   New features:
     - 
+    - aura pollution and cleansing
+    - fatigue
 
   Improved features:
+    - 
+    - hitpoint gain, thieving skill boni
+    - combat, spellcasting
     - PST inventory
     - various PST spells
     - bugfixes
 
   Applied patches:
+    manpage typo fixes from c-korn #3377098
 
 GemRB V0.6.5 (2011-07-24):
   New features:
