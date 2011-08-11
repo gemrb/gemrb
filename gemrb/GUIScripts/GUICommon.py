@@ -384,7 +384,11 @@ def CannotLearnSlotSpell ():
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 		return LSR_STAT
 
-	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
+	if GameIsPST():
+		import GUIINV
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+	else:
+		slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 

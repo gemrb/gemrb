@@ -696,7 +696,10 @@ def ReadItemWindow ():
 			OpenErrorWindow (strref)
 		return
 
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	if GUICommon.GameIsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+	else:
+		slot_item = GemRB.GetSlotItem (pc, slot)
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	if spell:
