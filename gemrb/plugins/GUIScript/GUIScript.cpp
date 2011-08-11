@@ -1570,7 +1570,7 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 	int ret;
 	int Function = 0;
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str, &function)) {
+	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &str, &function)) {
 		return AttributeError( GemRB_Control_SetTooltip__doc );
 	}
 	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
@@ -1583,7 +1583,7 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 	WindowIndex = PyInt_AsLong( wi );
 	ControlIndex = PyInt_AsLong( ci );
 	if (function) {
-		if (PyObject_TypeCheck(function, &PyInt_Type) ) {
+		if (!PyObject_TypeCheck(function, &PyInt_Type) ) {
 			return AttributeError( GemRB_Control_SetTooltip__doc );
 		}
 		Function = PyInt_AsLong( function);
