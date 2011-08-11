@@ -122,10 +122,10 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			module = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryField("Default","GROUP");
+			print("Adding key %s with function %s::%s\n", value, module, function);
 		}
 		fun = new Function(module, function, atoi(group));
 		keymap.SetAt(value, fun);
-		print("Adding key %s with function %s::%s\n", value, module, function);
 	}
 	delete config;
 	return true;
