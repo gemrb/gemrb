@@ -10693,7 +10693,8 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		if (error) {
-			printMessage("GUIScript", "Missing function:%s\n", LIGHT_RED, FunctionName);
+			printMessage("GUIScript", "Missing function: %s\n", LIGHT_RED, FunctionName);
+			textcolor(WHITE);
 		}
 		Py_DECREF(module);
 		return false;
