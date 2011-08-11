@@ -3077,6 +3077,7 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 	}
 
 	if (Function) {
+		win->FunctionBar = true;
 		evntmgr->SetFunctionBar(win);
 		ctrl->SetFunctionNumber(Function-1);
 	}
@@ -3137,6 +3138,9 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 		case WINDOW_FRONT:
 			if (win->Visible==WINDOW_VISIBLE) {
 				evntmgr->AddWindow( win );
+				if (win->FunctionBar) {
+					evntmgr->SetFunctionBar( win );
+				}
 			}
 			win->Invalidate();
 			SetOnTop( WindowIndex );

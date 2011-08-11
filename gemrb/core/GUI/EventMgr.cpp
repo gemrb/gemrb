@@ -120,7 +120,6 @@ void EventMgr::Clear()
 
 /** Remove a Window from the array */
 void EventMgr::DelWindow(Window *win)
-//unsigned short WindowID, const char *WindowPack)
 {
 	if (last_win_focused == win) {
 		last_win_focused = NULL;
@@ -138,6 +137,7 @@ void EventMgr::DelWindow(Window *win)
 	if (windows.size() == 0) {
 		return;
 	}
+
 	int pos = -1;
 	std::vector< Window*>::iterator m;
 	for (m = windows.begin(); m != windows.end(); ++m) {
@@ -151,7 +151,7 @@ void EventMgr::DelWindow(Window *win)
 					return;
 				}
 			}
-			printMessage("EventManager","Couldn't find window",YELLOW);
+			printMessage("EventManager","Couldn't delete window!",YELLOW);
 		}
 	}
 }
@@ -384,9 +384,11 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 		}
 	}
 
-	//if there was no default button set, then the current focus will get it
+	//if there was no default button set, then the current focus will get it (except function keys)
 	if (!ctrl) {
-		ctrl = last_win_focused->GetFocus();
+		if (Key<GEM_FUNCTION1 || Key > GEM_FUNCTION16) {
+			ctrl = last_win_focused->GetFocus();
+		}
 	}
 	//if one is under focus, use the default scroll focus
 	if (!ctrl) {

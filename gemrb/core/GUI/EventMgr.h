@@ -135,10 +135,7 @@ public:
 	void SetRKDelay(unsigned long t);
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
-	void SetFunctionBar(Window *win) {
-	        function_bar = win;
-	}
-
+	void inline SetFunctionBar(Window *win) { function_bar = win; }
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;
 private:

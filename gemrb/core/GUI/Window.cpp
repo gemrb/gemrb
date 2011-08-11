@@ -53,6 +53,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	DefaultControl[0] = -1;
 	DefaultControl[1] = -1;
 	ScrollControl = -1;
+	FunctionBar = false;
 }
 
 Window::~Window()
@@ -155,11 +156,14 @@ void Window::SetFrame()
 
 Control* Window::GetFunctionControl(int x)
 {
+	if (!FunctionBar) {
+		return NULL;
+	}
+
 	std::vector< Control*>::const_iterator m;
 
 	for (m = Controls.begin(); m != Controls.end(); m++) {
 		Control *ctrl = *m;
-print("%d\n", ctrl->GetFunctionNumber() );
 		if ( ctrl->GetFunctionNumber() == x ) return ctrl;
 	}
 	return NULL;

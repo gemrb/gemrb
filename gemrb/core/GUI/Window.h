@@ -133,6 +133,7 @@ public: //Public attributes
 	int Cursor;
 	int DefaultControl[2]; //default enter and cancel
 	int ScrollControl;
+	bool FunctionBar;
 private: // Private attributes
 	/** BackGround Image. No BackGround if this variable is NULL. */
 	Sprite2D* BackGround;
