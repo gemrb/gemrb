@@ -938,5 +938,9 @@ def ceildiv (n, d):
 	else:
 		return (n+d-1)/d
 
+# a placeholder for unimplemented and hardcoded key actions
+def ResolveKey():
+	return
+
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)
