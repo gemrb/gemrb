@@ -1861,9 +1861,9 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		StartY = py;
 		SelectionRect.w = 0;
 		SelectionRect.h = 0;
-#ifdef TOUCHSCREEN
-		touched=true;
-#endif
+		if (touchScrollAreasEnabled) {
+			touched=true;
+		}
 	}
 }
 
