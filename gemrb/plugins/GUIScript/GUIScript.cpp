@@ -7851,6 +7851,7 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 		if (!quiet) {
 			if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
 				displaymsg->DisplayConstantString(STR_PAUSED, DMC_RED);
+				gc->SetDisplayText(STR_PAUSED, 0); // time 0 = removed instantly on unpause (for pst)
 			} else {
 				displaymsg->DisplayConstantString(STR_UNPAUSED, DMC_RED);
 			}
