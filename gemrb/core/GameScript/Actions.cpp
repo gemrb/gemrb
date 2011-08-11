@@ -2603,12 +2603,22 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	SpellCore(Sender, parameters, 0);
 }
 
+void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
+{
+	SpellCore(Sender, parameters, SC_RANGE_CHECK);
+}
+
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, not interruptable
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
 	SpellPointCore(Sender, parameters, 0);
+}
+
+void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
+{
+	SpellPointCore(Sender, parameters, SC_RANGE_CHECK);
 }
 
 //ForceSpell with zero casting time
