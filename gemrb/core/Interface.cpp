@@ -28,6 +28,7 @@
 #include "globals.h"
 #include "strrefs.h"
 #include "win32def.h"
+#include "ie_cursors.h"
 
 #include "ActorMgr.h"
 #include "AmbientMgr.h"
@@ -3061,7 +3062,7 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 
 /** Set the Tooltip text of a Control */
 int Interface::SetTooltip(unsigned short WindowIndex,
-		unsigned short ControlIndex, const char* string)
+		unsigned short ControlIndex, const char* string, int Function)
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -3073,6 +3074,11 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 	Control* ctrl = win->GetControl( ControlIndex );
 	if (ctrl == NULL) {
 		return -1;
+	}
+
+	if (Function) {
+		evntmgr->SetFunctionBar(win);
+		ctrl->SetFunctionNumber(Function-1);
 	}
 	return ctrl->SetTooltip( string );
 }

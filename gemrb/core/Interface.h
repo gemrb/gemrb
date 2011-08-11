@@ -436,7 +436,7 @@ public:
 	/** Adjust the scrolling of the control (if applicable) */
 	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
 	/** Set the Tooltip text of a Control */
-	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
+	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string, int Function = 0);
 	/** sets tooltip to be displayed */
 	void DisplayTooltip(int x, int y, Control* ctrl);
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */

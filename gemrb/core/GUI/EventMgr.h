@@ -50,7 +50,8 @@ class Window;
 #define GEM_PGUP		0x8d
 #define GEM_PGDOWN		0x8e
 #define GEM_GRAB		0x8f
-
+#define GEM_FUNCTION1           0x90     //don't use anything between these two and keep a round number
+#define GEM_FUNCTION16          0x9f
 
 #define GEM_MOD_SHIFT           1
 #define GEM_MOD_CTRL            2
@@ -85,6 +86,16 @@ private:
 	unsigned short dc_x, dc_y;
 	unsigned long dc_time, dc_delay;
 	unsigned long rk_delay, rk_flags;
+
+	/** Function bar window containing function key buttons */
+	Window* function_bar;
+	/** Last Window focused */
+	Window* last_win_focused;
+	/** Last Window mouse event focused */
+	Window* last_win_mousefocused;
+	/** Last Window under Mouse Pointer*/
+	Window* last_win_over;
+	/** Sets a Window on the Top of the Window Queue */
 public:
 	EventMgr(void);
 	~EventMgr(void);
@@ -124,17 +135,13 @@ public:
 	void SetRKDelay(unsigned long t);
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
+	void SetFunctionBar(Window *win) {
+	        function_bar = win;
+	}
 
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;
 private:
-	/** Last Window focused */
-	Window* last_win_focused;
-	/** Last Window mouse event focused */
-	Window* last_win_mousefocused;
-	/** Last Window under Mouse Pointer*/
-	Window* last_win_over;
-	/** Sets a Window on the Top of the Window Queue */
 	void SetDefaultFocus(Window *win);
 	void SetOnTop(int Index);
 	bool ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime);

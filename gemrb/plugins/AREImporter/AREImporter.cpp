@@ -22,6 +22,7 @@
 
 #include "win32def.h"
 #include "strrefs.h"
+#include "ie_cursors.h"
 
 #include "ActorMgr.h"
 #include "Ambient.h"
@@ -38,7 +39,6 @@
 #include "TileMapMgr.h"
 #include "Video.h"
 #include "GameScript/GameScript.h"
-#include "GUI/Window.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"

@@ -358,6 +358,22 @@ int SDLVideoDriver::PollEvents() {
 				case SDLK_SCROLLOCK:
 					key = GEM_GRAB;
 					break;
+				case SDLK_F1:
+				case SDLK_F2:
+				case SDLK_F3:
+				case SDLK_F4:
+				case SDLK_F5:
+				case SDLK_F6:
+				case SDLK_F7:
+				case SDLK_F8:
+				case SDLK_F9:
+				case SDLK_F10:
+				case SDLK_F11:
+				case SDLK_F12:
+					//assuming they come sequentially,
+					//also, there is no need to ever produce more than 12
+					key = GEM_FUNCTION1+event.key.keysym.sym-SDLK_F1;
+					break;
 				default:
 					break;
 				}

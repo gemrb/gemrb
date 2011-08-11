@@ -109,6 +109,8 @@ public: // Public attributes
 	Window* Owner;
 	/** Attached Scroll Bar Pointer*/
 	Control* sb;
+	/** Associated function key index, 0 based, -1 is unassigned */
+	ieDword FunctionNumber;
 public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(EventHandler handler);
@@ -149,6 +151,10 @@ public: //Events
 	void SetAnimPicture(Sprite2D* Picture);
 	/** Sets the Scroll Bar Pointer */
 	int SetScrollBar(Control* ptr);
+
+	/** Assigned function key */
+	void SetFunctionNumber(int x) { FunctionNumber = x; }
+	int GetFunctionNumber() { return FunctionNumber; }
 };
 
 #endif

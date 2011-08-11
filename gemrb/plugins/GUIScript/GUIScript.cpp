@@ -222,24 +222,23 @@ inline Control *GetControl( int wi, int ci, int ct)
 }
 
 //sets tooltip with Fx key prepended
-static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
+static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
 {
 	if (txt) {
 		if (txt[0]) {
 			char *txt2 = (char *) malloc(strlen(txt)+10);
-			if (Function) {
-				sprintf(txt2,"F%d - %s",Function,txt);
-			} else {
-				sprintf(txt2,"F%d - %s",ControlIndex+1,txt);
+			if (!Function) {
+				Function = ControlIndex+1;
 			}
+			sprintf(txt2,"F%d - %s",Function,txt);
 			core->FreeString(txt);
-			core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2);
+			int ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2, Function);
 			free (txt2);
-			return;
+			return ret;
 		}
 		core->FreeString(txt);
 	}
-	core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "");
+	return core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "", -1);
 }
 
 static void ReadItemSounds()
@@ -1559,17 +1558,19 @@ static PyObject* GemRB_TextArea_Scroll(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
-"SetTooltip(WindowIndex, ControlIndex, String|Strref) => int\n\n"
-"Sets control's tooltip." );
+"SetTooltip(WindowIndex, ControlIndex, String|Strref[, Function]) => int\n\n"
+"Sets control's tooltip. The optional function number will set the function key linkage as well." );
 
 static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str;
+	PyObject* function = NULL;
 	long WindowIndex, ControlIndex, StrRef;
 	char* string;
 	int ret;
+	int Function = 0;
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
+	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str, &function)) {
 		return AttributeError( GemRB_Control_SetTooltip__doc );
 	}
 	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
@@ -1581,12 +1582,22 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 
 	WindowIndex = PyInt_AsLong( wi );
 	ControlIndex = PyInt_AsLong( ci );
+	if (function) {
+		if (PyObject_TypeCheck(function, &PyInt_Type) ) {
+			return AttributeError( GemRB_Control_SetTooltip__doc );
+		}
+		Function = PyInt_AsLong( function);
+	}
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
 		string = PyString_AsString( str );
 		if (string == NULL) {
 			return RuntimeError("Null string received");
 		}
-		ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string );
+		if (Function) {
+			ret = SetFunctionTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string, Function);
+		} else {
+			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string );
+		}
 		if (ret == -1) {
 			return RuntimeError("Cannot set tooltip");
 		}
@@ -1596,8 +1607,13 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
 		} else {
 			char* str = core->GetString( StrRef );
-			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str );
-			core->FreeString( str );
+
+			if (Function) {
+				ret = SetFunctionTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str, Function );
+			} else {
+				ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str );
+				core->FreeString( str );
+			}
 		}
 		if (ret == -1) {
 			return RuntimeError("Cannot set tooltip");

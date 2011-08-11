@@ -32,6 +32,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+#include "ie_cursors.h"
+
 Window::Window(unsigned short WindowID, unsigned short XPos,
 	unsigned short YPos, unsigned short Width, unsigned short Height)
 {
@@ -149,6 +151,18 @@ void Window::SetFrame()
 		Flags|=WF_FRAME;
 	}
 	Invalidate();
+}
+
+Control* Window::GetFunctionControl(int x)
+{
+	std::vector< Control*>::const_iterator m;
+
+	for (m = Controls.begin(); m != Controls.end(); m++) {
+		Control *ctrl = *m;
+print("%d\n", ctrl->GetFunctionNumber() );
+		if ( ctrl->GetFunctionNumber() == x ) return ctrl;
+	}
+	return NULL;
 }
 
 /** Returns the Control at X,Y Coordinates */

@@ -19,8 +19,9 @@
 
 #include "Scriptable/InfoPoint.h"
 
-#include "strrefs.h"
 #include "win32def.h"
+#include "strrefs.h"
+#include "ie_cursors.h"
 
 #include "Audio.h"
 #include "DisplayMessage.h"
@@ -36,7 +37,6 @@
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
-#include "GUI/Window.h"
 
 #include <cassert>
 #include <cmath>

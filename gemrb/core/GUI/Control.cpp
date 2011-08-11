@@ -54,6 +54,7 @@ Control::Control()
 	animation = NULL;
 	AnimPicture = NULL;
 	ControlType = IE_GUI_INVALID;
+	FunctionNumber = -1;
 }
 
 Control::~Control()

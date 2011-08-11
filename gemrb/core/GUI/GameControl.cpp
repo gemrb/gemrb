@@ -41,6 +41,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "damages.h"
+#include "ie_cursors.h"
 #include "opcode_params.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/EventMgr.h"

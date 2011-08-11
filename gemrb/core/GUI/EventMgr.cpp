@@ -23,6 +23,7 @@
 #include "GUI/GameControl.h"
 
 #include "win32def.h"
+#include "ie_cursors.h"
 
 #include "Interface.h"
 #include "Video.h"
@@ -30,7 +31,10 @@
 
 EventMgr::EventMgr(void)
 {
-	last_win_focused = NULL;
+	// Function bar window (for function keys)
+	function_bar = NULL;
+	// Last window focused for keyboard events
+	last_win_focused = NULL;	
 	// Last window focused for mouse events (eg, with a click). Used to determine MouseUp events
 	last_win_mousefocused = NULL;
 	// Last window we were over. Used to determine MouseEnter and MouseLeave events
@@ -111,6 +115,7 @@ void EventMgr::Clear()
 	last_win_focused = NULL;
 	last_win_mousefocused = NULL;
 	last_win_over = NULL;
+	function_bar = NULL;
 }
 
 /** Remove a Window from the array */
@@ -125,6 +130,9 @@ void EventMgr::DelWindow(Window *win)
 	}
 	if (last_win_over == win) {
 		last_win_over = NULL;
+	}
+	if (function_bar == win) {
+		function_bar = NULL;
 	}
 
 	if (windows.size() == 0) {
@@ -368,6 +376,12 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 	//the default cancel control will get only GEM_ESCAPE
 	else if (Key == GEM_ESCAPE) {
 		ctrl = last_win_focused->GetDefaultControl(1);
+	} else if (Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
+		if (function_bar) {
+			ctrl = function_bar->GetFunctionControl(Key-GEM_FUNCTION1);
+		} else {
+			ctrl = last_win_focused->GetFunctionControl(Key-GEM_FUNCTION1);
+		}
 	}
 
 	//if there was no default button set, then the current focus will get it
@@ -390,6 +404,12 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 				break;
 			//buttons will receive only GEM_RETURN
 			case IE_GUI_BUTTON:
+				if (Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
+					//fake mouse button
+					ctrl->OnMouseDown(0,0,GEM_MB_ACTION,0);
+					ctrl->OnMouseUp(0,0,GEM_MB_ACTION,0);
+					return;
+				}
 				if (Key != GEM_RETURN && Key!=GEM_ESCAPE) {
 					return;
 				}
