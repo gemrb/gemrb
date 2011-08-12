@@ -710,12 +710,15 @@ def IsMultiClassed (actor, verbose):
 	ClassNames = CommonTables.Classes.GetRowName(ClassIndex).split("_")
 
 	# loop through each class and test it as a mask
-	# TODO: make 16 dynamic? -- allows for custom classes (not just kits)
-	for i in range (1, 16):
+	ClassCount = CommonTables.Classes.GetRowCount()
+	for i in range (1, ClassCount):
 		if IsMulti&Mask: # it's part of this class
 			#we need to place the classes in the array based on their order in the name,
 			#NOT the order they are detected in
 			CurrentName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, i));
+			if CurrentName == "*":
+				# we read too far, as the upper range limit is greater than the number of "single" classes
+				break
 			for j in range(len(ClassNames)):
 				if ClassNames[j] == CurrentName:
 					Classes[j] = i # mask is (i-1)^2 where i is class id
@@ -724,6 +727,7 @@ def IsMultiClassed (actor, verbose):
 
 	# in case we couldn't figure out to which classes the multi belonged
 	if NumClasses < 2:
+		print "ERROR: couldn't figure out the individual classes of multiclass", ClassNames
 		return (0,-1,-1,-1)
 
 	# return the tuple
