@@ -3630,8 +3630,9 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_PlaySound__doc,
-"PlaySound(SoundResource, xpos, ypos, type)\n\n"
-"Plays a Sound." );
+"PlaySound(SoundResource[, xpos, ypos, type])\n"
+"PlaySound(DefSoundIndex)\n\n"
+"Plays a Sound identified by resource reference or defsound.2da index.\n" );
 
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
@@ -3639,12 +3640,18 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	int xpos = 0;
 	int ypos = 0;
 	unsigned int flags = 1; //GEM_SND_RELATIVE
+	int index;
 
-	if (!PyArg_ParseTuple( args, "z|iii", &ResRef, &xpos, &ypos, &flags )) {
-		return AttributeError( GemRB_PlaySound__doc );
+	if (PyArg_ParseTuple( args, "i", &index) ) {
+		core->PlaySound(index);
+	} else {
+		PyErr_Clear(); //clearing the exception
+		if (!PyArg_ParseTuple( args, "z|iii", &ResRef, &xpos, &ypos, &flags )) {
+			return AttributeError( GemRB_PlaySound__doc );
+		}
+
+		core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
 	}
-
-	core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
 
 	Py_INCREF( Py_None );
 	return Py_None;
