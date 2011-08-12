@@ -28,6 +28,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
+from ie_sounds import *
 
 StoreWindow = None
 MessageWindow = None
@@ -749,6 +750,7 @@ def SellPressed ():
 			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL)
 
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()+SellSum)
+	GemRB.PlaySound(DEF_SOLD)
 	UpdateStoreShoppingWindow ()
 	return
 

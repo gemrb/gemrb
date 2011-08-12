@@ -255,8 +255,7 @@ def GroupControls ():
 		Button.SetVarAssoc ("Formation", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
-		str = GemRB.GetString (4935)
-		Button.SetTooltip ("F%d - %s"%(8+i,str) )
+		Button.SetTooltip (4935, 8+i)
 	return
 
 def OpenActionsWindowControls (Window):
