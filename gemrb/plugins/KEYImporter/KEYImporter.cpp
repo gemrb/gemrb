@@ -143,6 +143,8 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		printStatus( "ERROR", LIGHT_RED );
 		printMessage( "KEYImporter", "Cannot open Chitin.key\n", LIGHT_RED );
 		textcolor( WHITE );
+		print("This means you set the GamePath config variable incorrectly.\n");
+		print("It must point to the directory that holds a readable Chitin.key\n");
 		return false;
 	}
 	printStatus( "OK", LIGHT_GREEN );
