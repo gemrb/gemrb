@@ -6392,6 +6392,9 @@ void Actor::Rest(int hours)
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
 	}
+	Game *game = core->GetGame();
+	nextBored = game->GameTime + core->Roll(1,30,bored_time);
+	nextComment = game->GameTime + core->Roll(5,1000,bored_time/2);
 }
 
 //returns the actual slot from the quickslot
