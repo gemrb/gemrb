@@ -41,17 +41,6 @@ def OnLoad():
 
 	j=0
 	for i in range(1,ClassCount):
-		if CommonTables.Classes.GetValue(i-1,4)==0:
-			continue
-		if j>11:
-			Button = ClassWindow.GetControl(j+7)
-		else:
-			Button = ClassWindow.GetControl(j+2)
-		Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-		j = j + 1
-	j=0
-	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
 		if CommonTables.Classes.GetValue(i-1,4)==0:
@@ -60,11 +49,14 @@ def OnLoad():
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
+		Button.SetState(IE_GUI_BUTTON_ENABLED)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 		t = CommonTables.Classes.GetValue(i-1, 0)
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
+			Button.SetState(IE_GUI_BUTTON_DISABLED)
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClassPress)
