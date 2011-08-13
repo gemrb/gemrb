@@ -7260,6 +7260,7 @@ void Actor::UseExit(ieDword exitID) {
 // luck does not affect critical hit chances:
 // if critical is set, it will return 1/sides on a critical, otherwise it can never
 // return a critical miss when luck is positive and can return a false critical hit
+// Callees with LR_CRITICAL should check if the result matches 1 or size*dice.
 int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent) const
 {
 	assert(this != opponent);
@@ -7316,9 +7317,15 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent
 
 	// ensure we can still return a critical failure/success
 	if (critical && dice == misses) return 1;
-	if (critical && dice == hits) return size;
+	if (critical && dice == hits) return size*dice;
 
-	return result + add;
+	// hack for critical mode, so overbearing luck does not cause a critical hit
+	// FIXME: decouple the result from the critical info
+	if (critical && result+add >= size*dice) {
+		return size*dice - 1;
+	} else {
+		return result + add;
+	}
 }
 
 static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
