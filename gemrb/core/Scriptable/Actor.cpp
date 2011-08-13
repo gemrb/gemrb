@@ -5050,7 +5050,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("Next: %d ", nextattack);
 	}
 
-	int roll = LuckyRoll(1, ATTACKROLL, 0);
+	int roll = LuckyRoll(1, ATTACKROLL, LR_CRITICAL);
 	if (roll==1) {
 		//critical failure
 		printBracket("Critical Miss", RED);
