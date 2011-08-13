@@ -985,7 +985,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 */
 
 	//not resistable (no saves either?)
-	if(!fx->Resistance || fx->Resistance == FX_NO_RESIST_CAN_DISPEL) {
+	if(fx->Resistance != FX_CAN_RESIST_CAN_DISPEL) {
 		return false;
 	}
 
@@ -1004,11 +1004,10 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if( (signed) fx->random_value < (signed) val) {
-		if ((selective_mr && (fx->Resistance&FX_CAN_RESIST)) || !selective_mr) {
-			displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
-			print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
-			return true;
-		}
+		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
+		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
+		print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
+		return true;
 	}
 
 	//saving throws
