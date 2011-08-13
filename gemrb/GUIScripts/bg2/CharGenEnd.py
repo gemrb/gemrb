@@ -191,6 +191,9 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
 			SlotType = GemRB.GetSlotType (targetslot, MyChar)
 			i = 1
 			item = GemRB.GetItem (item_resref)
+			if not item:
+				print "Error: could not find item", item_resref, "that is listed in 25stweap.2da"
+				continue
 
 			if inventory_exclusion & item['Exclusion']:
 				# oops, too many magic items to equip, so just dump it to the inventory
