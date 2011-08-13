@@ -215,7 +215,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 				ProfsRate = TmpRate
 				FastestProf = i-1
 	else:
-		ProfsRate = ProfsTable.GetValue (Class-1, 1)
+		ProfsRate = ProfsTable.GetValue (ClassName, "RATE")
 
 	#figure out how many prof points we have
 	if sum (level1) == 0: #character is being generated (either chargen or dual)
