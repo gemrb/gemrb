@@ -45,10 +45,11 @@ def OnLoad():
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
 		if CommonTables.Classes.GetValue(i-1,4)==0:
 			continue
-		if j>11:
-			Button = ClassWindow.GetControl(j+7)
-		else:
-			Button = ClassWindow.GetControl(j+2)
+		if j>9:
+			# FIXME: add a scrollbar, this has only 10 buttons
+			print "ARRRRG, more choices than spaces"
+			continue
+		Button = ClassWindow.GetControl(j+2)
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
