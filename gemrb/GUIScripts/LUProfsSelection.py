@@ -203,9 +203,6 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = CommonTables.Classes.FindValue (5, Class)
 	ClassName = CommonTables.Classes.GetRowName (ClassName)
-	if ClassName == "SORCERER":
-		ClassName = "MAGE"
-	ClassNameSave = ClassName
 
 	#find the class with the greatest prof potential
 	FastestProf = 0
@@ -229,6 +226,11 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 
 	#setup prof vars for passing between functions
 	ProfsTable = GemRB.LoadTable ("weapprof")
+
+	# weapprof has no sorcerer entry
+	if ClassName == "SORCERER":
+		ClassName = "MAGE"
+	ClassNameSave = ClassName
 
 	# if we have the classweapons table, use it
 	if ClassWeaponsTable:
