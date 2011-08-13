@@ -46,5 +46,11 @@
 #define DS_LIGHTNING1        22
 #define DS_LIGHTNING2        23
 #define DS_LIGHTNING3        24
+#define DS_SOLD              25
+#define DS_STOLEN            26
+#define DS_DRUNK             27
+#define DS_DONATE1           28
+#define DS_DONATE2           29
+#define DS_IDENTIFY          30
 
 #endif //! IE_SOUNDS_H

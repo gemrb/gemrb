@@ -102,7 +102,8 @@ def OpenInventoryWindow ():
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
 		Button.SetVarAssoc ("GroundItemButton", i)
-		Button.SetSprites ("STONSLOT",0,0,2,4,3)
+		#This IS different from BG2
+		Button.SetSprites ("STONSLOT",0,0,1,2,3)
 		Button.SetFont ("NUMBER")
 		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
 		Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
@@ -156,6 +157,7 @@ def OpenInventoryWindow ():
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			#keeping 1 in the original place, because it is how
 			#the gui resource has it, but setting the other cycles
+			#This IS different from BG2
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 			Button.SetFont ("NUMBER")
 			Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)

@@ -787,6 +787,7 @@ def IdentifyUseSpell ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	GemRB.PlaySound(DEF_IDENTIFY)
 	OpenItemInfoWindow()
 	return
 
@@ -803,6 +804,7 @@ def IdentifyUseScroll ():
 		ItemInfoWindow.Unload ()
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	GemRB.PlaySound(DEF_IDENTIFY)
 	OpenItemInfoWindow()
 	return
 
