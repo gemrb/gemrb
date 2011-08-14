@@ -3116,7 +3116,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	}
 
 	int resisted = 0;
-	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
+	ModifyDamage (hitter, damage, resisted, damagetype, NULL, false);
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
@@ -5101,7 +5101,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("\n");
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, true);
+		target->ModifyDamage (this, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		ResetState();
 
@@ -5135,7 +5135,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	print("\n");
-	ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, false);
+	target->ModifyDamage (this, damage, resisted, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
 	ResetState();
 }
@@ -5161,7 +5161,8 @@ int Actor::WeaponDamageBonus(WeaponInfo *wi)
 	return 0;
 }
 
-void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
+/*Always call this on the suffering actor */
+void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
 	Actor *attacker = NULL;
 
@@ -5169,18 +5170,18 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		attacker = (Actor *) hitter;
 	}
 
-	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
+	int mirrorimages = Modified[IE_MIRRORIMAGES];
 	if (mirrorimages) {
 		if (LuckyRoll(1,mirrorimages+1,0) != 1) {
-			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
-			target->Modified[IE_MIRRORIMAGES]--;
+			fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
+			Modified[IE_MIRRORIMAGES]--;
 			damage = 0;
 			return;
 		}
 	}
 
 	//guardian mantle for PST
-	if (attacker && (target->Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
+	if (attacker && (Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
 		//if the hitter doesn't make the spell save, the mantle works and the damage is 0
 		if (!attacker->GetSavingThrow(0,-4) ) {
 			damage = 0;
@@ -5191,26 +5192,26 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 	// only check stone skins if damage type is physical or magical
 	// DAMAGE_CRUSHING is 0, so we can't AND with it to check for its presence
 	if (!(damagetype & ~(DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC))) {
-		int stoneskins = target->Modified[IE_STONESKINS];
+		int stoneskins = Modified[IE_STONESKINS];
 		if (stoneskins) {
 			//pst style damage soaking from cloak of warding
-			damage = target->fxqueue.DecreaseParam3OfEffect(fx_cloak_ref, damage, 0);
+			damage = fxqueue.DecreaseParam3OfEffect(fx_cloak_ref, damage, 0);
 			if (!damage) {
 				return;
 			}
 
-			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
-			target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
+			fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
+			fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
 
-			target->Modified[IE_STONESKINS]--;
+			Modified[IE_STONESKINS]--;
 			damage = 0;
 			return;
 		}
 
-		stoneskins = target->GetSafeStat(IE_STONESKINSGOLEM);
+		stoneskins = GetSafeStat(IE_STONESKINSGOLEM);
 		if (stoneskins) {
-			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
-			target->Modified[IE_STONESKINSGOLEM]--;
+			fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
+			Modified[IE_STONESKINSGOLEM]--;
 			damage = 0;
 			return;
 		}
@@ -5227,8 +5228,8 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		if (multiplier>1) {
 			ieDword always = attacker->Modified[IE_ALWAYSBACKSTAB];
 			if ((attacker->Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
-				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
-					if (target->Modified[IE_DISABLEBACKSTAB]) {
+				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !attacker->IsBehind(this)) || (always&0x5) ) {
+					if (Modified[IE_DISABLEBACKSTAB]) {
 						// The backstab seems to have failed
 						displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 					} else {
@@ -5246,7 +5247,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		}
 		damage += attacker->WeaponDamageBonus(wi);
 
-		if (target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags) ) {
+		if (fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags) ) {
 			damage = 0;
 			resisted = DR_IMMUNE;
 		}
@@ -5260,7 +5261,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 			print("Unhandled damagetype:%d\n", damagetype);
 		} else if (it->second.resist_stat) {
 			// damage type with a resistance stat
-			resisted = (int) (damage * (signed)target->GetSafeStat(it->second.resist_stat)/100.0);
+			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
 				int bonus = attacker->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
@@ -5270,7 +5271,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 				}
 			}
 			damage -= resisted;
-			print("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetSafeStat(it->second.resist_stat), damagetype);
+			print("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// TODO: PST and BG1 may actually heal on negative damage
 			if (damage <= 0) resisted = DR_IMMUNE;
 		}
@@ -5283,14 +5284,14 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 	}
 
 	//critical protection a la PST
-	if (pstflags && (target->Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
+	if (pstflags && (Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
 		critical = 0;
 	}
 
 	if (critical) {
-		if (target->inventory.ProvidesCriticalAversion()) {
+		if (inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
-			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
+			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, this);
 		} else {
 			//a critical surely raises the morale?
 			//only if it is successful
