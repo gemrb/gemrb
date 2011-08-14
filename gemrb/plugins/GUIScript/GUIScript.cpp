@@ -9684,16 +9684,21 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
 	int tohit=20;
-	ieDword Flags=0;
-	int DamageBonus=0, CriticalBonus=0;
-	int speed, style=0;
+	int DamageBonus=0;
+	int CriticalBonus=0;
+	int speed=0;
+	int style=0;
 
 	PyObject* dict = PyDict_New();
-	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style, NULL)) {
+	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, NULL)) {
 		//TODO: handle error, so tohit will still be set correctly?
 	}
+	PyDict_SetItemString(dict, "Slot", PyInt_FromLong (wi.slot));
+	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (wi.wflags));
+	PyDict_SetItemString(dict, "Enchantment", PyInt_FromLong (wi.enchantment));
+	PyDict_SetItemString(dict, "Range", PyInt_FromLong (wi.range));
+	PyDict_SetItemString(dict, "Proficiency", PyInt_FromLong (wi.prof));
 	PyDict_SetItemString(dict, "ToHit", PyInt_FromLong (tohit));
-	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (Flags));
 	PyDict_SetItemString(dict, "DamageBonus", PyInt_FromLong (DamageBonus));
 	PyDict_SetItemString(dict, "Speed", PyInt_FromLong (speed));
 	PyDict_SetItemString(dict, "CriticalBonus", PyInt_FromLong (CriticalBonus));

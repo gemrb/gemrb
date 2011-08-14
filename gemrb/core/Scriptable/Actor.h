@@ -222,6 +222,7 @@ struct WeaponInfo {
 	ieDword itemflags;
 	ieDword prof;
 	bool backstabbing;
+	ieDword wflags;
 };
 
 extern void ReleaseMemoryActor();
@@ -492,6 +493,8 @@ public:
 	void GetHit();
 	/* called when actor starts to cast a spell*/
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete);
+	/* check if the actor should be just knocked out by a lethal hit */
+	bool AttackIsStunning(int damagetype) const;
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE);
 	/* displays the damage taken and other details (depends on the game type) */
@@ -570,9 +573,11 @@ public:
 	int GetDefense(int DamageType, Actor *attacker) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
-		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
+ 	/* calculates strength (dexterity) based damage adjustment */
+	int WeaponDamageBonus(WeaponInfo *wi);
 	/* ensures we can deal damage to a target */
 	void ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
 	/* applies modal spell etc, if needed */

@@ -1155,7 +1155,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
 	int tohit;
-	ieDword Flags;
 	int DamageBonus, CriticalBonus;
 	int speed, style;
 
@@ -1170,7 +1169,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style, tar)) {
+	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, tar)) {
 		actor->SetStance(IE_ANI_READY);
 		Sender->ReleaseCurrentAction();
 		return;

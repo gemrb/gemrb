@@ -3070,6 +3070,21 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 	return false;
 }
 
+bool Actor::AttackIsStunning(int damagetype) const {
+	//stunning damagetype
+	if (damagetype & DAMAGE_STUNNING) {
+		return true;
+	}
+
+	//cheese to avoid one shotting newbie player
+/* FIXME: decode exact conditions
+	if ( InParty && (Modified[IE_MAXHITPOINTS]<20) && (damage>Modified[IE_MAXHITPOINTS]) ) {
+		return true;
+	}
+*/
+	return false;
+}
+
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
 
 //returns actual damage
@@ -3113,8 +3128,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
 		// common fists do normal damage, but cause sleeping for a round instead of death
-		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
-			NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
+		if (Modified[IE_MINHITPOINTS]<=0 && AttackIsStunning(damagetype) ) {
 			// stack unconsciousness carefully to avoid replaying the stance changing
 			Effect *sleep = fxqueue.HasEffectWithParamPair(fx_sleep_ref, 0, 0);
 			if (sleep) {
@@ -3125,39 +3139,34 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 				core->ApplyEffect(fx, this, this);
 				delete fx;
 			}
-		} else {
-			if (damage) {
-				GetHit();
-			}
-			NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+			//reduce damage to keep 1 hp
+			damage = Modified[IE_HITPOINTS]-1;
 		}
-	} else {
-		if (damage) {
-			GetHit();
+	}
+
+	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+
+	// also apply reputation damage if we hurt (but not killed) an innocent
+	if (Modified[IE_CLASS] == CLASS_INNOCENT) {
+		Actor *act=NULL;
+		if (!hitter) {
+			// TODO: check this
+			hitter = area->GetActorByGlobalID(LastHitter);
 		}
-		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 
-		// also apply reputation damage if we hurt (but not killed) an innocent
-		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
-			Actor *act=NULL;
-			if (!hitter) {
-				// TODO: check this
-				hitter = area->GetActorByGlobalID(LastHitter);
+		if (hitter) {
+			if (hitter->Type==ST_ACTOR) {
+				act = (Actor *) hitter;
 			}
+		}
 
-			if (hitter) {
-				if (hitter->Type==ST_ACTOR) {
-					act = (Actor *) hitter;
-				}
-			}
-
-			if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
-				core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
-			}
+		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
+			core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
 		}
 	}
 
 	if (damage > 0) {
+		GetHit();
 		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter)); // FIXME: lastdamager? LastHitter is not set for spell damage
 	}
 
@@ -4659,7 +4668,7 @@ void Actor::InitRound(ieDword gameTime)
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = -GetStat(IE_PHYSICALSPEED);
@@ -4676,10 +4685,10 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	DamageBonus = hittingheader->DamageBonus;
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
-		Flags = WEAPON_MELEE;
+		wi.wflags = WEAPON_MELEE;
 		break;
 	case ITEM_AT_PROJECTILE: //throwing weapon
-		Flags = WEAPON_RANGED;
+		wi.wflags = WEAPON_RANGED;
 		break;
 	case ITEM_AT_BOW:
 		rangedheader = GetRangedWeapon(wi);
@@ -4690,7 +4699,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			//set some trigger?
 			return false;
 		}
-		Flags = WEAPON_RANGED;
+		wi.wflags = WEAPON_RANGED;
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
 		THAC0Bonus += rangedheader->THAC0Bonus;
@@ -4698,11 +4707,11 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		break;
 	default:
 		//item is unsuitable for fight
-		//SetStance(IE_ANI_READY);
+		wi.wflags = 0;
 		return false;
 	}//melee or ranged
 	//this flag is set by the bow in case of projectile launcher.
-	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
 
 	// get our dual wielding modifier
 	if (dualwielding) {
@@ -4712,8 +4721,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			DamageBonus += GetStat(IE_DAMAGEBONUSRIGHT);
 		}
 	}
+	DamageBonus += GetStat(IE_DAMAGEBONUS);
 	leftorright = leftorright && dualwielding;
-	if (leftorright) Flags|=WEAPON_LEFTHAND;
+	if (leftorright) wi.wflags|=WEAPON_LEFTHAND;
 
 	//add in proficiency bonuses
 	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;
@@ -4742,7 +4752,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
 		THAC0Bonus += wsdualwield[stars][leftorright?1:0];
-	} else if (wi.itemflags&(IE_INV_ITEM_TWOHANDED) && (Flags&WEAPON_MELEE) && wstwohanded) {
+	} else if (wi.itemflags&(IE_INV_ITEM_TWOHANDED) && (wi.wflags&WEAPON_MELEE) && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
@@ -4751,7 +4761,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		DamageBonus += wstwohanded[stars][0];
 		CriticalBonus = wstwohanded[stars][1];
 		speed += wstwohanded[stars][2];
-	} else if (Flags&WEAPON_MELEE) {
+	} else if (wi.wflags&WEAPON_MELEE) {
 		int slot;
 		CREItem *weapon = inventory.GetUsedWeapon(true, slot);
 		if(wssingle && weapon == NULL) {
@@ -4776,7 +4786,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
 
 	//second parameter is left or right hand flag
-	tohit = GetToHit(THAC0Bonus, Flags, target);
+	tohit = GetToHit(THAC0Bonus, wi.wflags, target);
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
@@ -4995,12 +5005,12 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
 	int tohit;
-	ieDword Flags;
+	//ieDword Flags;
 	int DamageBonus, CriticalBonus;
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style, target)) {
+	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
 	}
 
@@ -5057,7 +5067,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("\n");
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
-		if (Flags&WEAPON_RANGED) {//no need for this with melee weapon!
+		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 			//break sword
@@ -5092,7 +5102,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, true);
-		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
+		UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		ResetState();
 
 		return;
@@ -5115,7 +5125,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (!success) {
 		//hit failed
-		if (Flags&WEAPON_RANGED) {//Launch the projectile anyway
+		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
 		ResetState();
@@ -5126,7 +5136,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	printBracket("Hit", GREEN);
 	print("\n");
 	ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, false);
-	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
+	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
 	ResetState();
 }
 
@@ -5136,8 +5146,29 @@ static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_aegis_ref = { "Aegis", -1 };
 static EffectRef fx_cloak_ref = { "Overlay", -1 };
 
+int Actor::WeaponDamageBonus(WeaponInfo *wi)
+{
+	if (wi->wflags&WEAPON_USESTRENGTH) {
+		if (core->HasFeature(GF_3ED_RULES) && (wi->itemflags&IE_INV_ITEM_TWOHANDED)) {
+			// 150% bonus for twohandlers
+			return 150 * core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA)) / 100;
+		} else {
+			return core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		}
+	}
+
+	//TODO: implement IWD specific damage bonuses
+	return 0;
+}
+
 void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
+	Actor *attacker = NULL;
+
+	if (hitter && hitter->Type==ST_ACTOR) {
+		attacker = (Actor *) hitter;
+	}
+
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
 	if (mirrorimages) {
 		if (LuckyRoll(1,mirrorimages+1,0) != 1) {
@@ -5149,8 +5180,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 	}
 
 	//guardian mantle for PST
-	if (hitter && (hitter->Type==ST_ACTOR) && (target->Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
-		Actor *attacker = (Actor *) hitter;
+	if (attacker && (target->Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
 		//if the hitter doesn't make the spell save, the mantle works and the damage is 0
 		if (!attacker->GetSavingThrow(0,-4) ) {
 			damage = 0;
@@ -5177,7 +5207,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 			return;
 		}
 
-		stoneskins = target->Modified[IE_STONESKINSGOLEM];
+		stoneskins = target->GetSafeStat(IE_STONESKINSGOLEM);
 		if (stoneskins) {
 			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
 			target->Modified[IE_STONESKINSGOLEM]--;
@@ -5186,18 +5216,26 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		}
 	}
 
-	if (wi) {
-		if (BaseStats[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
-			if (Modified[IE_STATE_ID] & state_invisible || Modified[IE_ALWAYSBACKSTAB]) {
-				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) ) {
+	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
+	//ToBEx compatibility in the ALWAYSBACKSTAB field:
+	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
+	//1 Ignore invisible requirement and positioning requirement
+	//2 Ignore invisible requirement only
+	//4 Ignore positioning requirement only
+	if (wi && attacker) {
+		int multiplier=attacker->BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
+		if (multiplier>1) {
+			ieDword always = attacker->Modified[IE_ALWAYSBACKSTAB];
+			if ((attacker->Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
+				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
 					if (target->Modified[IE_DISABLEBACKSTAB]) {
 						// The backstab seems to have failed
 						displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 					} else {
 						if (wi->backstabbing) {
-							damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
+							damage *= multiplier;
 							// display a simple message instead of hardcoding multiplier names
-							displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+							displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
 						} else {
 							// weapon is unsuitable for backstab
 							displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
@@ -5206,36 +5244,26 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 				}
 			}
 		}
+		damage += attacker->WeaponDamageBonus(wi);
 
-		// add strength bonus; backstab does not affect it
-		// TODO: should actually check WEAPON_USESTRENGTH, since a sling in bg2 has it
-		if (GetAttackStyle() != WEAPON_RANGED) {
-			if (core->HasFeature(GF_3ED_RULES) && wi->itemflags&IE_INV_ITEM_TWOHANDED) {
-				// 150% bonus for twohandlers
-				damage += 150 * core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA)) / 100;
-			} else {
-				damage += core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
-			}
+		if (target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags) ) {
+			damage = 0;
+			resisted = DR_IMMUNE;
 		}
 	}
 
-	if (wi && target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
-		damage = 0;
-		resisted = DR_IMMUNE; // mark immunity for GetCombatDetails
-	} else {
+	if (damage>0) {
 		// check damage type immunity / resistance / susceptibility
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it == core->DamageInfoMap.end()) {
 			print("Unhandled damagetype:%d\n", damagetype);
-		} else if (it->second.resist_stat == 0) {
-			// damage type without a resistance stat
-		} else {
-			damage += (signed)target->GetStat(IE_DAMAGEBONUS);
+		} else if (it->second.resist_stat) {
+			// damage type with a resistance stat
 			resisted = (int) (damage * (signed)target->GetSafeStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
-			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && hitter && hitter->Type == ST_ACTOR) {
-				int bonus = ((Actor *)hitter)->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
+			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
+				int bonus = attacker->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
 					print("Bonus damage of %d (%+d%%), neto: %d\n", int (damage * bonus / 100.0), bonus, -resisted);
@@ -5243,19 +5271,19 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 			}
 			damage -= resisted;
 			print("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetSafeStat(it->second.resist_stat), damagetype);
+			// TODO: PST and BG1 may actually heal on negative damage
 			if (damage <= 0) resisted = DR_IMMUNE;
 		}
 	}
 
-	//check casting failure
-	if (damage<0) damage = 0;
-	if (!damage) {
+	if (damage<=0) {
+		damage = 0;
 		DisplayStringCore(this, VB_TIMMUNE, DS_CONSOLE|DS_CONST );
 		return;
 	}
 
 	//critical protection a la PST
-	if (pstflags && (Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
+	if (pstflags && (target->Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
 		critical = 0;
 	}
 
@@ -5271,7 +5299,6 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 			core->timer->SetScreenShake(16,16,8);
 		}
 	}
-	return;
 }
 
 void Actor::UpdateActorState(ieDword gameTime) {
