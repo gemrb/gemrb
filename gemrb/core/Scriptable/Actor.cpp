@@ -4179,6 +4179,11 @@ int Actor::GetHpAdjustment(int multiplier)
 {
 	int val;
 
+	// only player classes get this bonus
+	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] > (ieDword)classcount) {
+		return 0;
+	}
+
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
 		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
@@ -4207,11 +4212,10 @@ void Actor::InitStatsOnLoad()
 	}
 	inventory.CalculateWeight();
 	CreateDerivedStats();
-	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] <= (ieDword)classcount) {
-		Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
-		ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
-		BaseStats[IE_HITPOINTS]=hp;
-	}
+	Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
+	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
+	BaseStats[IE_HITPOINTS]=hp;
+
 	SetupFist();
 	//initial setup of modified stats
 	memcpy(Modified,BaseStats, sizeof(Modified));

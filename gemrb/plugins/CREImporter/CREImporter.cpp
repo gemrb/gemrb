@@ -2123,7 +2123,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteDword( &actor->BaseStats[IE_STATE_ID]);
 	tmpWord = actor->BaseStats[IE_HITPOINTS];
 	//decrease the hp back to the one without constitution bonus
-	//this is probably still not perfect
+	// (but only player classes can have it)
 	tmpWord = (ieWord) (tmpWord - actor->GetHpAdjustment(actor->GetXPLevel(false)));
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
