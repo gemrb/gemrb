@@ -2310,7 +2310,9 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
+			if (Sender->CurrentActionTicks) {
+				printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
+			}
 			Sender->SetSpellResRef(spellres);
 		}
 	}
@@ -2409,7 +2411,9 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	} else {
 		if (!Sender->SpellResRef[0]) {
-			printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
+			if (Sender->CurrentActionTicks) {
+				printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
+			}
 			Sender->SetSpellResRef(spellres);
 		}
 	}
