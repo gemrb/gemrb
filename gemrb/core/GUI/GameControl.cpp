@@ -776,7 +776,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						target = overDoor;
 					}
 					if (target) {
-						src->CastSpell( TestSpell, target, false );
+						src->SetSpellResRef(TestSpell);
+						src->CastSpell(target, false);
 						if (src->LastTarget) {
 							src->CastSpellEnd(0);
 						} else {

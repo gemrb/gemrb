@@ -348,8 +348,8 @@ public:
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
 	/* actor/scriptable casts spell */
-	int CastSpellPoint( ieResRef &SpellRef, const Point &Target, bool deplete, bool instant = false );
-	int CastSpell( ieResRef &SpellRef, Scriptable* Target, bool deplete, bool instant = false );
+	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false );
+	int CastSpell( Scriptable* Target, bool deplete, bool instant = false );
 	/* spellcasting finished */
 	void CastSpellPointEnd(int level);
 	void CastSpellEnd(int level);

@@ -433,7 +433,8 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			strnuprcpy(fx->Resource,"rdead",8);
 			break;
 	}
-	Owner->CastSpell(fx->Resource, target, false);
+	Owner->SetSpellResRef(fx->Resource);
+	Owner->CastSpell(target, false);
 	Owner->CastSpellEnd(fx->CasterLevel);
 	return FX_NOT_APPLIED;
 }

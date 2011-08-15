@@ -3991,7 +3991,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 		Owner->SetSpellResRef(fx->Resource);
 		//cast spell on target
-		Owner->CastSpell(fx->Resource, target, false);
+		Owner->CastSpell(target, false);
 		//actually finish casting (if this is not good enough, use an action???)
 		Owner->CastSpellEnd(fx->Parameter1);
 		Owner->SetSpellResRef(OldSpellResRef);
@@ -4021,7 +4021,7 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Owner->SetSpellResRef(fx->Resource);
 	Point p(fx->PosX, fx->PosY);
-	Owner->CastSpellPoint(fx->Resource, p, false);
+	Owner->CastSpellPoint(p, false);
 	//actually finish casting (if this is not good enough, use an action???)
 	Owner->CastSpellPointEnd(fx->Parameter1);
 	Owner->SetSpellResRef(OldSpellResRef);
@@ -5912,7 +5912,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Owner->SetSpellResRef(fx->Resource);
-	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
+	Owner->CastSpellPoint(target->Pos, false);
 	Owner->CastSpellPointEnd(0);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;

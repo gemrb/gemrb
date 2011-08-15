@@ -2309,7 +2309,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		if (!Sender->SpellResRef[0]) {
+		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
 			if (Sender->CurrentActionTicks) {
 				printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
 			}
@@ -2379,7 +2379,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		act->SetModal(MS_NONE);
 	}
 	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpell( spellres, tar, flags&SC_DEPLETE, flags&SC_INSTANT );
+	int duration = Sender->CastSpell( tar, flags&SC_DEPLETE, flags&SC_INSTANT );
 
 	if (flags&SC_INSTANT) {
 		if (tar->Type==ST_ACTOR) {
@@ -2410,7 +2410,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		if (!Sender->SpellResRef[0]) {
+		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
 			if (Sender->CurrentActionTicks) {
 				printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
 			}
@@ -2461,7 +2461,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT  );
+	int duration = Sender->CastSpellPoint( parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT  );
 
 	if (flags&SC_INSTANT) {
 		Sender->CastSpellPointEnd(level);

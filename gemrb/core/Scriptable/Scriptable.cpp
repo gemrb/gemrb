@@ -1055,28 +1055,24 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool deplete, bool instant )
+int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellRef,deplete) ) {
+		if (actor->HandleCastingStance(SpellResRef, deplete) ) {
 			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
 	}
-	if(deplete && !CanCast(SpellRef)) {
+	if(deplete && !CanCast(SpellResRef)) {
 		SpellResRef[0] = 0;
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
 		}
 		return -1;
-	}
-
-	if (!SpellResRef[0]) {
-		SetSpellResRef(SpellRef);
 	}
 
 	LastTargetPos = target;
@@ -1090,14 +1086,14 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete, bool instant )
+int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellRef,deplete) ) {
+		if (actor->HandleCastingStance(SpellResRef, deplete) ) {
 			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
@@ -1106,18 +1102,13 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 	// FIXME: fishy
 	if (!target) target = this;
 
-	if(deplete && !CanCast(SpellRef)) {
+	if(deplete && !CanCast(SpellResRef)) {
 		SpellResRef[0] = 0;
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
 		}
 		return -1;
 	}
-
-	//why was this checked, it disables casting of a spell if the previous was aborted
-	//if (!SpellResRef[0]) {
-		SetSpellResRef(SpellRef);
-	//}
 
 	LastTargetPos = target->Pos;
 	if (target->Type==ST_ACTOR) {
@@ -1290,14 +1281,16 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			} else if (target) {
 				targetpos = target->Pos;
 			}
+			// SpellResRef still contains the original spell and we need to keep it that way
+			// as any of the rerolls could result in a "spell cast normally" (non-surge)
 			for (i=0; i<count; i++) {
 				if (target) {
-					caster->CastSpell(SpellResRef, target, false, true);
+					caster->CastSpell(target, false, true);
 					strncpy(newspl, SpellResRef, 8);
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellEnd(level);
 				} else {
-					caster->CastSpellPoint(SpellResRef, targetpos, false, true);
+					caster->CastSpellPoint(targetpos, false, true);
 					strncpy(newspl, SpellResRef, 8);
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellPointEnd(level);
