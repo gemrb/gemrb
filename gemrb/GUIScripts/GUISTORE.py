@@ -1067,7 +1067,7 @@ def StealPressed ():
 	#if skill>random(100)+difficulty - success
 	if GUICommon.CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
-		GemRB.PlaySount(DEF_STOLEN)
+		GemRB.PlaySound(DEF_STOLEN)
 		UpdateStoreStealWindow ()
 	else:
 		GemRB.StealFailed ()
