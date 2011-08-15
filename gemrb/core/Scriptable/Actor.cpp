@@ -5157,7 +5157,6 @@ int Actor::WeaponDamageBonus(WeaponInfo *wi)
 		}
 	}
 
-	//TODO: implement IWD specific damage bonuses
 	return 0;
 }
 
