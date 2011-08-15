@@ -1059,8 +1059,9 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
+	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellRef,deplete) ) {
 			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
@@ -1068,8 +1069,7 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 	}
 	if(deplete && !CanCast(SpellRef)) {
 		SpellResRef[0] = 0;
-		if (Type == ST_ACTOR) {
-			Actor *actor = (Actor *) this;
+		if (actor) {
 			actor->SetStance(IE_ANI_READY);
 		}
 		return -1;
@@ -1094,8 +1094,9 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
+	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellRef,deplete) ) {
 			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
@@ -1107,8 +1108,7 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 
 	if(deplete && !CanCast(SpellRef)) {
 		SpellResRef[0] = 0;
-		if (Type == ST_ACTOR) {
-			Actor *actor = (Actor *) this;
+		if (actor) {
 			actor->SetStance(IE_ANI_READY);
 		}
 		return -1;
