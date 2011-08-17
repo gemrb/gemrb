@@ -1507,8 +1507,10 @@ int Interface::Init()
 		PathJoin( path, GamePath, GameOverridePath, NULL);
 		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
+		//GAME sounds are intentionally not cached, in IWD there are directory structures,
+		//that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
 		PathJoin( path, GamePath, GameSoundsPath, NULL);
-		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, GamePath, GameScriptsPath, NULL);
 		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
