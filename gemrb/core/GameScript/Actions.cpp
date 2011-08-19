@@ -2773,7 +2773,10 @@ void GameScript::TakePartyGold(Scriptable* Sender, Action* parameters)
 	core->GetGame()->AddGold((ieDword) -(int) gold);
 	if (Sender->Type == ST_ACTOR) {
 		Actor* act = ( Actor* ) Sender;
-		act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)+gold);
+		//fixes PST limlim shop, partymembers don't receive the taken gold
+		if (!act->InParty) {
+			act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)+gold);
+		}
 	}
 }
 
