@@ -27,7 +27,7 @@
 
 #include <vector>
 
-#define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
+#define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _+*#%&|()=!?]"
 
 class GEM_EXPORT SaveGameIterator {
 private:

@@ -179,6 +179,7 @@ def ConfirmedSaveGame():
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
+	Slotname = Slotname.replace ("/", "|") # can't have path separators in the name
 	#FIXME: make this work
 	#LoadScreen.StartLoadScreen()
 	if ConfirmWindow:
