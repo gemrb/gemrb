@@ -916,9 +916,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			memset(Scripts,0,sizeof(Scripts));
 
 			str->ReadResRef( Scripts[SCR_OVERRIDE] );
+			str->ReadResRef( Scripts[SCR_GENERAL] );
 			str->ReadResRef( Scripts[SCR_CLASS] );
 			str->ReadResRef( Scripts[SCR_RACE] );
-			str->ReadResRef( Scripts[SCR_GENERAL] );
 			str->ReadResRef( Scripts[SCR_DEFAULT] );
 			str->ReadResRef( Scripts[SCR_SPECIFICS] );
 			str->ReadResRef( CreResRef );
@@ -1852,9 +1852,9 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		stream->WriteDword( &ac->TalkCount);
 		stream->WriteResRef( ac->GetDialog());
 		PutScript(stream, ac, SCR_OVERRIDE);
+		PutScript(stream, ac, SCR_GENERAL);
 		PutScript(stream, ac, SCR_CLASS);
 		PutScript(stream, ac, SCR_RACE);
-		PutScript(stream, ac, SCR_GENERAL);
 		PutScript(stream, ac, SCR_DEFAULT);
 		PutScript(stream, ac, SCR_SPECIFICS);
 		//creature reference is empty because we are embedding it
