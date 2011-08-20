@@ -20,10 +20,26 @@
 import GemRB
 import GUICommon
 
+import os
+
 StartWindow = 0
+
+def EndTest():
+	GemRB.QuitGame()
+	GemRB.Quit()
+	print "Game test completed"
 
 def OnLoad():
 	global StartWindow, skip_videos
+
+	# check if we're just running the game-entering test
+	if os.getenv('GEMRB_TEST', "0") != "0":
+		import threading
+		print "\nStarting game test"
+		GemRB.LoadGame(None)
+		GemRB.EnterGame()
+		# with delayed execution, more of the game files get loaded
+		threading.Timer(1, EndTest).start() # the 1s varies!
 
 	GemRB.EnableCheatKeys(1)
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
