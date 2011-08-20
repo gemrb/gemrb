@@ -2317,7 +2317,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
-	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted()) {
+	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted() && !Sender->CurrentActionState) {
 		return;
 	}
 
@@ -2418,7 +2418,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
-	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted()) {
+	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted() && !Sender->CurrentActionState) {
 		return;
 	}
 
