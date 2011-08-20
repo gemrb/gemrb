@@ -1146,9 +1146,14 @@ int Scriptable::SpellCast(bool instant)
 	if (actor) {
 		// The mental speed effect can shorten or lengthen the casting time.
 		casting_time -= (int)actor->Modified[IE_MENTALSPEED];
-		if (casting_time < 0) casting_time = 0;
+		// maybe also add a random lucky roll as for weapon speed / initiative
+		if (casting_time < 0) {
+			casting_time = 0;
+		} else if (casting_time > 10) {
+			casting_time = 10;
+		}
 	}
-	// this is a guess which seems approximately right so far
+	// this is a guess which seems approximately right so far (same as in the bg2 manual, except that it may be a combat round instead)
 	int duration = (casting_time*core->Time.round_size) / 10;
 	if (instant) {
 		duration = 0;
