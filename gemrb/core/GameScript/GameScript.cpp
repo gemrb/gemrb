@@ -2009,7 +2009,10 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			printMessage("GameScript","Invalid script action ID!",LIGHT_RED);
 		} else {
 			if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
-				aC->int0Parameter = scriptlevel;
+				//can't set this here, because the same script may be loaded
+				//into different slots. Overwriting it with an invalid value
+				//just to find bugs faster
+				aC->int0Parameter = -1;
 			}
 		}
 		rE->actions.push_back( aC );

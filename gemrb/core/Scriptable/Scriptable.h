@@ -257,6 +257,7 @@ public:
 	ieStrRef DialogName;
 
 	GameScript* Scripts[MAX_SCRIPTS];
+	int scriptlevel;
 
 	// Variables for overhead text.
 	char* overHeadText;

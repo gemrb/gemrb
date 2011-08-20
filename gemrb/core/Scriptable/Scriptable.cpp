@@ -400,8 +400,8 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	bool continuing = false, done = false;
-	for (int i = 0;i<scriptCount;i++) {
-		GameScript *Script = Scripts[i];
+	for (scriptlevel = 0;scriptlevel<scriptCount;scriptlevel++) {
+		GameScript *Script = Scripts[scriptlevel];
 		if (Script) {
 			changed |= Script->Update(&continuing, &done);
 		}
@@ -428,6 +428,9 @@ void Scriptable::AddAction(Action* aC)
 
 	InternalFlags|=IF_ACTIVE;
 	aC->IncRef();
+	if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
+		aC->int0Parameter = scriptlevel;
+	}
 
 	// attempt to handle 'instant' actions, from instant.ids, which run immediately
 	// when added if the action queue is empty, even on actors which are Held/etc
