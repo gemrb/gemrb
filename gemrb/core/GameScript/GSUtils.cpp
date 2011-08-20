@@ -2298,6 +2298,19 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	return polygons[index];
 }
 
+inline static bool InterruptSpellcasting(Scriptable* Sender) {
+	if (Sender->InterruptCasting) {
+		if (Sender->Type == ST_ACTOR && ((Actor *)Sender)->InParty) {
+			displaymsg->DisplayConstantString(STR_SPELLDISRUPT, DMC_WHITE, Sender);
+		} else {
+			displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
+		}
+		DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
+		return true;
+	}
+	return false;
+}
+
 // shared spellcasting action code for casting on scriptables
 void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {

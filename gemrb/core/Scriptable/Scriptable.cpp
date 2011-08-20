@@ -113,6 +113,7 @@ Scriptable::Scriptable(ScriptableType type)
 	SpellResRef[0] = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
+	InterruptCasting = false;
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
@@ -319,6 +320,8 @@ void Scriptable::Update()
 	TickScripting();
 
 	ProcessActions();
+
+	InterruptCasting = false;
 }
 
 void Scriptable::TickScripting()

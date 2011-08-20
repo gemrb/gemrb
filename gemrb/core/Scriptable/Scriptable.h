@@ -292,6 +292,7 @@ public:
 	Point LastTargetPos;
 	int SpellHeader;
 	ieResRef SpellResRef;
+	bool InterruptCasting;
 public:
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(void) const

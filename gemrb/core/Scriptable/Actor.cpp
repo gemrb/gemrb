@@ -3056,6 +3056,7 @@ void Actor::GetHit()
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
 	}
+	InterruptCasting = true;
 }
 
 bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)

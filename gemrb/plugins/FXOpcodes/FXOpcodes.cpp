@@ -1856,6 +1856,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		target->AddPortraitIcon(PI_SLEEP);
 	}
+	target->InterruptCasting = true;
 	return FX_PERMANENT;
 }
 

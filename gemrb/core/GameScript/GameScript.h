@@ -75,6 +75,7 @@ class GameScript;
 #define VB_TIMMUNE   67
 #define VB_INVENTORY 68
 #define VB_PP_SUCC   69
+#define VB_SPELL_DISRUPTED 71
 #define VB_BIO       74
 
 //diffmode (iwd2)
