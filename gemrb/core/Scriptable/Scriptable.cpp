@@ -999,6 +999,11 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		return 0;
 	}
 
+	if (spl->Flags&SF_NOT_INDOORS && !(area->AreaType&AT_OUTDOOR)) {
+		displaymsg->DisplayConstantStringName(STR_INDOOR_FAIL, DMC_WHITE, this);
+		return 0;
+	}
+
 	// various individual checks
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
