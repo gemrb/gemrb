@@ -1,11 +1,11 @@
 ******************* FORUM ***************************
 GemRB 0.9.0 released!
 
-The [url=http://gemrb.sf.net]GemRB[/url] team is proud to announce a new (minor) release.
+The [url=http://gemrb.org]GemRB[/url] team is proud to announce a new (minor) release.
 
 (short description of major changes)
 
-Currently only the sources are available. You can get them [url=http://sourceforge.net/project/showfiles.php?group_id=10122]here[/url].
+Currently only the sources and some packages are available. You can get them from [url=http://gemrb.org/wiki/doku.php?id=download]here[/url].
 
 Full changelog digest:
 [code]
@@ -15,7 +15,9 @@ NEWS entry
 ******************* MODDING RING ********************
 For the modding news blurb, just skip the changelog digest and put a link
 to the main forum post. Also add a general intro, since this is syndicated:
-[url=http://gemrb.sf.net]GemRB[/url] is a portable open-source implementation of Bioware's Infinity Engine. It was written to support pseudo-3D role playing games based on the Dungeons & Dragons ruleset (Baldur's Gate and Icewind Dale series, Planescape: Torment).
+[url=http://gemrb.org]GemRB[/url] is a portable open-source implementation of Bioware's Infinity Engine. It was written to support pseudo-3D role playing games based on the Dungeons & Dragons ruleset (Baldur's Gate and Icewind Dale series, Planescape: Torment).
+
+For the details, try GemRB yourself or check the [url=]linked changelog[/url] for some highlights.
 
 ******************* SOURCEFORGE *********************
 For SF, just remove all of the BBCode.
@@ -29,4 +31,4 @@ and insert a shortened NEWS summary (3-10 items)
 ******************** LGDB ******************
 http://www.lgdb.org/game/gemrb
 Visit the project page and submit an update (version, changelog). Choose
-"edit cuurent" on the top and scroll through the form to get to the relevant part.
+"edit current" on the top and scroll through the form to get to the relevant part.
