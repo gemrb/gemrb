@@ -11,23 +11,22 @@ somewhere on your harddisk, or you can try to use the data from the
 Dragonlance Total Conversion project - see the link below.
 
 The original game data has to be installed on a windows
-partition and mounted to your Linux/Unix filesystem, installed on
-windows and then copied to your filesystem, installed with WINE or 
-extracted manually from the CDs using the tool `unshield'.
+partition and mounted or copied to your (Linux/Unix) filesystem, installed
+with WINE or extracted manually from the CDs using the tool `unshield'.
 
 What little documentation exists is mostly in gemrb/docs/en/ and
-subdirectories, the gemrb.6 man page and this file.
+subdirectories, the gemrb.6 man page, this file and the website.
 
 Supported platforms
 -------------------
 Supported (i.e. we got reports about successfully running GemRB) systems:
 Linux x86, x86-64, ppc
 FreeBSD x86
-MS Windows (98, XP or Vista)
+MS Windows
 various Macintosh systems (even pre x86) also should work ...
-some smart phones (Symbian, Android)
+some smart phones (Symbian, Android, other Linux-based, Ios)
 some consoles (OpenPandora, Dingoo)
-some exotic OSes (ReactOS, SyllableOS, Haiku)
+some exotic OSes (ReactOS, SyllableOS, Haiku, AmigaOS)
 
 Requirements
 ------------
@@ -36,7 +35,7 @@ See the INSTALL file.
 Contacts
 --------
 Our homepage:
-http://gemrb.sourceforge.net
+http://gemrb.org
 
 Our project at sourceforge.net:
 http://sourceforge.net/projects/gemrb
