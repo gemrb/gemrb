@@ -33,10 +33,10 @@ def readAndGetMaxLength(f):
 
   max = i = 0
   for line in f:
-	lines.append(line.rstrip())
-	if len(lines[i]) > max:
-	  max = len(lines[i])
-	i = i + 1
+    lines.append(line.rstrip())
+    if len(lines[i]) > max:
+      max = len(lines[i])
+    i = i + 1
   return max
 
 def appendCol(f, max):
@@ -46,33 +46,33 @@ def appendCol(f, max):
   f.truncate()
   i = 0
   for cell in data:
-	if cell == "$":
-	  f.write(lines[i] + "\n")
-	  i = i + 1
-	  continue
-	padding = max - len(lines[i]) + 2 # 2 spaces as field separator
-	f.write(lines[i] + " "*padding + cell + "\n")
-	i = i + 1
+    if cell == "$":
+      f.write(lines[i] + "\n")
+      i = i + 1
+      continue
+    padding = max - len(lines[i]) + 2 # 2 spaces as field separator
+    f.write(lines[i] + " "*padding + cell + "\n")
+    i = i + 1
 
 def CheckCountsMismatch(mode):
   global data, lines
 
   if mode == "APPEND_COL":
-	msg = "rows"
-	rc = 13
-	count = len(lines)
+    msg = "rows"
+    rc = 13
+    count = len(lines)
   elif mode == "APPEND":
-	msg = "columns"
-	rc = 14
-	count = len(lines[3].split()) # skip the 2da header
+    msg = "columns"
+    rc = 14
+    count = len(lines[3].split()) # skip the 2da header
   else:
-	return
+    return
 
   mismatch = count - len(data)
   if mismatch:
-	print "Error: you need to specify the data for all the %s!" % msg
-	print "Table has %d, while you provided %d!" % (count, len(data))
-	sys.exit(rc)
+    print ("Error: you need to specify the data for all the %s!" % msg)
+    print ("Table has %d, while you provided %d!" % (count, len(data)))
+    sys.exit(rc)
 
 
 #TODO: be fancy and align the columns correctly
@@ -81,7 +81,7 @@ def appendRow(f):
 
   f.seek(0, 2) # seek to the end
   for cell in data:
-	f.write("%s  " % cell)
+    f.write("%s  " % cell)
   # remove the extraneus ending padding
   f.seek(f.tell()-2)
   f.truncate()
@@ -106,9 +106,9 @@ with open(filename, 'r+b') as f:
   max = readAndGetMaxLength(f)
   CheckCountsMismatch(mode)
   if mode == "APPEND_COL":
-	appendCol(f, max)
+    appendCol(f, max)
   elif mode == "APPEND":
-	appendRow(f)
+    appendRow(f)
 
 # tests
 # python2 extend2da.py gemrb/override/bg1/classes.2da APPEND_COL "$ $ BOGOSITY 0 0 0 00 0 0 0 0 0 0 0 0 0 0 2 3 4 7"
