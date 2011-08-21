@@ -2600,12 +2600,12 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
-	SpellCore(Sender, parameters, 0);
+	SpellCore(Sender, parameters, SC_NOINTERRUPT);
 }
 
 void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 {
-	SpellCore(Sender, parameters, SC_RANGE_CHECK);
+	SpellCore(Sender, parameters, SC_NOINTERRUPT|SC_RANGE_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
@@ -2613,12 +2613,12 @@ void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, 0);
+	SpellPointCore(Sender, parameters, SC_NOINTERRUPT);
 }
 
 void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, SC_RANGE_CHECK);
+	SpellPointCore(Sender, parameters, SC_NOINTERRUPT|SC_RANGE_CHECK);
 }
 
 //ForceSpell with zero casting time
@@ -2626,7 +2626,7 @@ void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
-	SpellCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
+	SpellCore(Sender, parameters, SC_NOINTERRUPT|SC_SETLEVEL|SC_INSTANT);
 }
 
 //ForceSpellPoint with zero casting time
@@ -2635,7 +2635,7 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
+	SpellPointCore(Sender, parameters, SC_NOINTERRUPT|SC_SETLEVEL|SC_INSTANT);
 }
 
 // this differs from ReallyForceSpell that this one allows dead Sender casting
@@ -2643,7 +2643,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 {
 	// the difference from ReallyForceSpell is handled by the lack of AF_ALIVE being set
-	SpellCore(Sender, parameters, SC_SETLEVEL|SC_INSTANT);
+	SpellCore(Sender, parameters, SC_NOINTERRUPT|SC_SETLEVEL|SC_INSTANT);
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)

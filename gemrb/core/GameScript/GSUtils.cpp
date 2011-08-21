@@ -2394,12 +2394,12 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->CurrentActionState = duration;
 			parameters->int2Parameter = 0;
 		}
-		if (InterruptSpellcasting(Sender)) {
+		if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 			Sender->ReleaseCurrentAction();
 		}
 		return;
 	}
-	if (InterruptSpellcasting(Sender)) {
+	if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2483,12 +2483,12 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->CurrentActionState = duration;
 			parameters->int2Parameter = 0;
 		}
-		if (InterruptSpellcasting(Sender)) {
+		if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 			Sender->ReleaseCurrentAction();
 		}
 		return;
 	}
-	if (InterruptSpellcasting(Sender)) {
+	if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
