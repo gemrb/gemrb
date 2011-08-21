@@ -20,12 +20,12 @@
 import sys
 
 def usage(msg):
-  print "Error:", msg
-  print "Usage:", sys.argv[0], 'filename APPEND|APPEND_COL "$|value1  [$|value2] ... [$|valueN]"'
-  print "Passing $ will result in an empty cell. Use it for the first two entries when appending columns, so you don't break the 2da signature or default value"
-  print
-  print "Example:"
-  print "python2 extend2da.py gemrb/override/bg1/classes.2da APPEND 'HACKER 1 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0'"
+  print("Error:", msg)
+  print("Usage:", sys.argv[0], 'filename APPEND|APPEND_COL "$|value1  [$|value2] ... [$|valueN]"')
+  print("Passing $ will result in an empty cell. Use it for the first two entries when appending columns, so you don't break the 2da signature or default value")
+  print()
+  print("Example:")
+  print("python extend2da.py gemrb/override/bg1/classes.2da APPEND 'HACKER 1 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0'")
 
 # get the longest row for comparison, while caching the reads
 def readAndGetMaxLength(f):
@@ -47,11 +47,12 @@ def appendCol(f, max):
   i = 0
   for cell in data:
     if cell == "$":
-      f.write(lines[i] + "\n")
+      f.write(lines[i] + b"\n")
       i = i + 1
       continue
     padding = max - len(lines[i]) + 2 # 2 spaces as field separator
-    f.write(lines[i] + " "*padding + cell + "\n")
+    f.write(lines[i] + (" "*padding + cell + "\n").encode('ascii'))
+
     i = i + 1
 
 def CheckCountsMismatch(mode):
@@ -81,11 +82,11 @@ def appendRow(f):
 
   f.seek(0, 2) # seek to the end
   for cell in data:
-    f.write("%s  " % cell)
+    f.write(("%s  " % cell).encode('ascii'))
   # remove the extraneus ending padding
   f.seek(f.tell()-2)
   f.truncate()
-  f.write("\n")
+  f.write(b"\n")
 
 ################# MAIN ####################################
 if len(sys.argv) < 4:
