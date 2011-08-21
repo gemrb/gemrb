@@ -1,0 +1,15 @@
+
+Prototype: GemRB.QueryText(WindowIndex, ControlIndex)
+
+Metaclass Prototype:
+
+Description:  Returns the Text of a TextEdit control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+
+Return value: string
+
+See also:
+

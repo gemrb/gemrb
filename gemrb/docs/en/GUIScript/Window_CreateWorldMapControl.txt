@@ -1,0 +1,21 @@
+
+Prototype: GemRB.CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font])
+
+Metaclass Prototype:
+
+Description:  Creates and adds a new WorldMap control to a Window.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+x - 
+y - 
+w - 
+h - 
+direction - 
+font - (optional) 
+
+Return value:
+
+See also:
+

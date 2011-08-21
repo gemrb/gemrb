@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SaveGame.GetPreview()
+
+Metaclass Prototype:
+
+Description:  Returns preview of the saved game.
+
+Parameters: 
+
+Return value: string/int
+
+See also:
+

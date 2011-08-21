@@ -1,0 +1,14 @@
+
+Prototype: GemRB.SetPlayerSound(Slot)
+
+Metaclass Prototype:
+
+Description:  Gets the player character's sound set.
+
+Parameters: 
+Slot - 
+
+Return value:
+
+See also:
+

@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GameGetFirstSelectedActor()
+
+Metaclass Prototype:
+
+Description:  Returns the global ID of the first selected actor or 0 if none.
+
+Parameters: 
+
+Return value: int
+
+See also:
+

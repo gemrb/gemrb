@@ -1,0 +1,21 @@
+
+Prototype: GemRB.CreateTextEdit(WindowIndex, ControlID, x, y, w, h, font, text)
+
+Metaclass Prototype:
+
+Description:  Creates and adds a new TextEdit to a Window.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+x - 
+y - 
+w - 
+h - 
+font - 
+text - 
+
+Return value:
+
+See also:
+

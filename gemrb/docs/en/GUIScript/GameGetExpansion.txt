@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GameGetExpansion()
+
+Metaclass Prototype:
+
+Description:  Gets the expansion mode.
+
+Parameters: 
+
+Return value: int
+
+See also:
+

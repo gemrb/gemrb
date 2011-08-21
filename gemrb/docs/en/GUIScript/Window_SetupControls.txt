@@ -1,0 +1,18 @@
+
+Prototype: GemRB.SetupControls(WindowIndex, dict, slot[, Start, global])nnAutomagically sets up the controls of the action window for a PC indexed by slot.n
+
+Metaclass Prototype:
+
+Description:  If global is set, the actor will be looked up by its global ID instead of party slot.
+
+Parameters: 
+WindowIndex - 
+dict - 
+slot - 
+Start - 
+global - (optional) 
+
+Return value:
+
+See also:
+

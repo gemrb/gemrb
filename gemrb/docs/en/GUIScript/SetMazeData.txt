@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetMazeData(type, value)nnSets a field in the maze header.
+
+Metaclass Prototype:
+
+Description:  The type could be: ME_0, ME_WALLS, ME_TRAP or ME_16.
+
+Parameters: 
+type - 
+value - 
+
+Return value:
+
+See also:
+

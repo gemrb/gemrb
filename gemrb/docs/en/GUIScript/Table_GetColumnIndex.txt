@@ -1,0 +1,15 @@
+
+Prototype: GemRB.GetTableColumnIndex(TableIndex, ColumnName)
+
+Metaclass Prototype:
+
+Description:  Returns the Index of a Column in a 2DA Table.
+
+Parameters: 
+TableIndex - 
+ColumnName - 
+
+Return value: Column
+
+See also:
+

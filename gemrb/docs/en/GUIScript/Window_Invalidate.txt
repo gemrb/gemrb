@@ -1,0 +1,14 @@
+
+Prototype: GemRB.InvalidateWindow(WindowIndex)
+
+Metaclass Prototype:
+
+Description:  Invalidates the given Window.
+
+Parameters: 
+WindowIndex - 
+
+Return value:
+
+See also:
+

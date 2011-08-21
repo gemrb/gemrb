@@ -1,0 +1,19 @@
+
+Prototype: GemRB.CreateButton(WindowIndex, ControlID, x, y, w, h)
+
+Metaclass Prototype:
+
+Description:  Creates and adds a new Button to a Window.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+x - 
+y - 
+w - 
+h - 
+
+Return value: ControlIndex
+
+See also:
+

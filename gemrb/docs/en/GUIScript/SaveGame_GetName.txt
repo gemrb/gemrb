@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SaveGame.GetName()
+
+Metaclass Prototype:
+
+Description:  Returns name of the saved game.
+
+Parameters: 
+
+Return value: string/int
+
+See also:
+

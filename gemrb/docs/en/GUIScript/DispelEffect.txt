@@ -1,0 +1,16 @@
+
+Prototype: GemRB.DispelEffect(PartyID, EffectName, Parameter2)
+
+Metaclass Prototype:
+
+Description:  Removes all effects from target whose opcode and second parameter matches the arguments.
+
+Parameters: 
+PartyID - 
+EffectName - 
+Parameter2 - 
+
+Return value:
+
+See also:
+

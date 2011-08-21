@@ -1,0 +1,19 @@
+
+Prototype: GemRB.SetWorldMapTextColor(WindowIndex, ControlIndex, which, red, green, blue)nnSets the label colors of a WorldMap Control. WHICH selects color affected
+
+Metaclass Prototype:
+
+Description:  and is one of IE_GUI_WMAP_COLOR_(BACKGROUND|NORMAL|SELECTED|NOTVISITED).
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+which - 
+red - 
+green - 
+blue - 
+
+Return value:
+
+See also:
+

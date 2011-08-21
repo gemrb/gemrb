@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetDefaultScrollBar(WindowIndex, ControlIndex)
+
+Metaclass Prototype:
+
+Description:  Sets the ScrollBar control as default.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+
+Return value:
+
+See also:
+

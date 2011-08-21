@@ -1,0 +1,22 @@
+
+Prototype: GemRB.CreateMapControl(WindowIndex, ControlID, x, y, w, h, [LabelID, FlagResRef[, Flag2ResRef]])nnCreates and adds a new Area Map Control to a Window.nNote
+
+Metaclass Prototype:
+
+Description:  LabelID is an ID, not an index. : If there are two flags given, they will be considered a BMP.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+x - 
+y - 
+w - 
+h - 
+LabelID - 
+FlagResRef - 
+Flag2ResRef - (optional) 
+
+Return value:
+
+See also:
+

@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetWindowPicture(WindowIndex, MosResRef)
+
+Metaclass Prototype:
+
+Description:  Changes the background of a Window.
+
+Parameters: 
+WindowIndex - 
+MosResRef - 
+
+Return value:
+
+See also:
+

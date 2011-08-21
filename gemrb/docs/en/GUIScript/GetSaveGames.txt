@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GetSaveGameCount()
+
+Metaclass Prototype:
+
+Description:  Returns the list of saved games.
+
+Parameters: 
+
+Return value: int
+
+See also:
+

@@ -1,0 +1,15 @@
+
+Prototype: GemRB.DeleteControl(WindowIndex, ControlID)
+
+Metaclass Prototype:
+
+Description:  Deletes a control from a Window.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+
+Return value:
+
+See also:
+

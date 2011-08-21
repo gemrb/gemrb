@@ -1,0 +1,15 @@
+
+Prototype: GemRB.GetTableRowName(TableIndex, RowIndex)
+
+Metaclass Prototype:
+
+Description:  Returns the Name of a Row in a 2DA Table.
+
+Parameters: 
+TableIndex - 
+RowIndex - 
+
+Return value: string
+
+See also:
+

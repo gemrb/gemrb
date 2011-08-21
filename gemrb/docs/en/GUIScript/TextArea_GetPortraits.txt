@@ -1,0 +1,16 @@
+
+Prototype: GemRB.GetPortraits(WindowIndex, ControlIndex, SmallOrLarge)
+
+Metaclass Prototype:
+
+Description:  Reads in the contents of the portraits subfolder.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+SmallOrLarge - 
+
+Return value: int
+
+See also:
+

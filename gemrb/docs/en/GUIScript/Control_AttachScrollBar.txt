@@ -1,0 +1,16 @@
+
+Prototype: GemRB.AttachScrollBar(WindowIndex, ControlIndex, ScrollBarControlIndex)
+
+Metaclass Prototype:
+
+Description:  Attaches a ScrollBar to another control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+ScrollBarControlIndex - 
+
+Return value:
+
+See also:
+

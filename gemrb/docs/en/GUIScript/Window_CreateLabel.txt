@@ -1,0 +1,22 @@
+
+Prototype: GemRB.CreateLabel(WindowIndex, ControlID, x, y, w, h, font, text, align)
+
+Metaclass Prototype:
+
+Description:  Creates and adds a new Label to a Window.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+x - 
+y - 
+w - 
+h - 
+font - 
+text - 
+align - 
+
+Return value:
+
+See also:
+

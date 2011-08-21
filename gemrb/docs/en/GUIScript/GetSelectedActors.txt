@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GetSelectedActors()
+
+Metaclass Prototype:
+
+Description:  Returns the global ids of selected actors in a tuple.
+
+Parameters: 
+
+Return value: int
+
+See also:
+

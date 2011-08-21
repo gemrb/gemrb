@@ -1,0 +1,16 @@
+
+Prototype: GemRB.RewindTA(Win, Ctrl, Ticks)
+
+Metaclass Prototype:
+
+Description:  Sets up a TextArea for scrolling. Ticks is the delay between the steps in scrolling.
+
+Parameters: 
+Win - 
+Ctrl - 
+Ticks - 
+
+Return value:
+
+See also:
+

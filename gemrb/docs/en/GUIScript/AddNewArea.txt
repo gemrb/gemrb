@@ -1,0 +1,14 @@
+
+Prototype: GemRB.AddNewArea(_2daresref)
+
+Metaclass Prototype:
+
+Description:  Adds the extension areas to the game.
+
+Parameters: 
+_2daresref - 
+
+Return value:
+
+See also:
+

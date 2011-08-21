@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetButtonState(WindowIndex, ControlIndex, State)
+
+Metaclass Prototype:
+
+Description:  Sets the state of a Button Control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+State - 
+
+Return value:
+
+See also:
+

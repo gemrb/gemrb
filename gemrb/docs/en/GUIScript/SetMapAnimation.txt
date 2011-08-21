@@ -1,0 +1,19 @@
+
+Prototype: GemRB.SetMapAnimation(X, Y, BAMresref[, flags, cycle, height])
+
+Metaclass Prototype:
+
+Description:  Creates an area animation.
+
+Parameters: 
+X - 
+Y - 
+BAMresref - 
+flags - 
+cycle - 
+height - (optional) 
+
+Return value:
+
+See also:
+

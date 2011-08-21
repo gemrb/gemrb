@@ -1,0 +1,18 @@
+
+Prototype: GemRB.SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend])
+
+Metaclass Prototype:
+
+Description:  Sets the animation of a Control (usually a Button) from a BAM file. Optionally an animation cycle could be set too.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+BAMResRef - 
+Cycle - 
+Blend - (optional) 
+
+Return value:
+
+See also:
+

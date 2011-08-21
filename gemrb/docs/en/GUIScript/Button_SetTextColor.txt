@@ -1,0 +1,19 @@
+
+Prototype: GemRB.SetButtonTextColor(WindowIndex, ControlIndex, red, green, blue[, invert=false])
+
+Metaclass Prototype:
+
+Description:  Sets the Text Color of a Button Control. Invert is used for fonts with swapped background and text colors.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+red - 
+green - 
+blue - 
+invert=false - (optional) 
+
+Return value:
+
+See also:
+

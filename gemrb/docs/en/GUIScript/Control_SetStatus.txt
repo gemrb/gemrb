@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetControlStatus(WindowIndex, ControlIndex, Status)
+
+Metaclass Prototype:
+
+Description:  Sets the status of a Control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+Status - 
+
+Return value:
+
+See also:
+

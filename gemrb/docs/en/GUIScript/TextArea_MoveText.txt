@@ -1,0 +1,17 @@
+
+Prototype: GemRB.MoveTAText(srcWin, srcCtrl, dstWin, dstCtrl)
+
+Metaclass Prototype:
+
+Description:  Copies a TextArea content to another.
+
+Parameters: 
+srcWin - 
+srcCtrl - 
+dstWin - 
+dstCtrl - 
+
+Return value:
+
+See also:
+

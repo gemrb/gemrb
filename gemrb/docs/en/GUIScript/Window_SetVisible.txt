@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetVisible(WindowIndex, Visible)
+
+Metaclass Prototype:
+
+Description:  Sets the Visibility Flag of a Window.
+
+Parameters: 
+WindowIndex - 
+Visible - 
+
+Return value: bool
+
+See also:
+

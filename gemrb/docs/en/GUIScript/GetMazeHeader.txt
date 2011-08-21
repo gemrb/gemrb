@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GetMazeHeader()
+
+Metaclass Prototype:
+
+Description:  Returns the Maze header of Planescape Torment savegames.
+
+Parameters: 
+
+Return value: dict
+
+See also:
+

@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SaveGame.GetPortrait(int index)
+
+Metaclass Prototype:
+
+Description:  Returns portrait of the saved game.
+
+Parameters: 
+int - 
+index - 
+
+Return value: string/int
+
+See also:
+

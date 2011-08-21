@@ -1,0 +1,17 @@
+
+Prototype: GemRB.GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString, type)
+
+Metaclass Prototype:
+
+Description:  otherwise 0 means string, 1 means integer, 2 means stat symbol translation.
+
+Parameters: 
+TableIndex - 
+RowIndex/RowString - 
+ColIndex/ColString - 
+type - 
+
+Return value: valuennReturns a field of a 2DA Table. If Type is omitted the return type is the autodetected, 
+
+See also:
+

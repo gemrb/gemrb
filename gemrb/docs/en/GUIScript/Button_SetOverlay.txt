@@ -1,0 +1,19 @@
+
+Prototype: GemRB.SetButtonOverlay(WindowIndex, ControlIndex, Current, Max, r,g,b,a, r,g,b,a)
+
+Metaclass Prototype:
+
+Description:  Sets up a portrait button for hitpoint overlay
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+Current - 
+Max - 
+rgba - 
+rgba - 
+
+Return value:
+
+See also:
+

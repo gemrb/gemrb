@@ -1,0 +1,17 @@
+
+Prototype: GemRB.SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)
+
+Metaclass Prototype:
+
+Description:  Sets the name of the Variable associated with a control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+VariableName - 
+LongValue - 
+
+Return value:
+
+See also:
+

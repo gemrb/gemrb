@@ -1,0 +1,14 @@
+
+Prototype: GemRB.GetGamePortraitPreview(PCSlotCount)
+
+Metaclass Prototype:
+
+Description:  Gets a current game PC portrait.
+
+Parameters: 
+PCSlotCount - 
+
+Return value:
+
+See also:
+

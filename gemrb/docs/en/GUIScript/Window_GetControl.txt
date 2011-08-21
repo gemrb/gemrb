@@ -1,0 +1,15 @@
+
+Prototype: GemRB.GetControlObject(WindowID, ControlID)
+
+Metaclass Prototype:
+
+Description:  Returns a control as an object.
+
+Parameters: 
+WindowID - 
+ControlID - 
+
+Return value: GControl, ornWindow.GetControl(ControlID) 
+
+See also:
+

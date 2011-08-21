@@ -1,0 +1,17 @@
+
+Prototype: GemRB.FindTableValue(TableIndex, ColumnIndex, Value[, StartRow])
+
+Metaclass Prototype:
+
+Description:  Returns the first rowcount of a field of a 2DA Table.
+
+Parameters: 
+TableIndex - 
+ColumnIndex - 
+Value - 
+StartRow - (optional) 
+
+Return value: Row
+
+See also:
+

@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetButtonFont(WindowIndex, ControlIndex, FontResRef)
+
+Metaclass Prototype:
+
+Description:  Sets font used for drawing button label.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+FontResRef - 
+
+Return value:
+
+See also:
+

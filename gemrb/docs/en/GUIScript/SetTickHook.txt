@@ -1,0 +1,13 @@
+
+Prototype: GemRB.Set callback to be called every main loop iteration.
+
+Metaclass Prototype:
+
+Description:  This is useful for things like running a twisted reactor.
+
+Parameters: 
+
+Return value:
+
+See also:
+

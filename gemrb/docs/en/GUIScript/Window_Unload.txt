@@ -1,0 +1,14 @@
+
+Prototype: GemRB.UnloadWindow(WindowIndex)
+
+Metaclass Prototype:
+
+Description:  Unloads a previously Loaded Window.
+
+Parameters: 
+WindowIndex - 
+
+Return value:
+
+See also:
+

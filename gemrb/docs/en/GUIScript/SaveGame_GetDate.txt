@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SaveGame.GetDate()
+
+Metaclass Prototype:
+
+Description:  Returns date of the saved game.
+
+Parameters: 
+
+Return value: string/int
+
+See also:
+

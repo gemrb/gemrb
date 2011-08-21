@@ -1,0 +1,15 @@
+
+Prototype: GemRB.ShowModal(WindowIndex, [Shadow=MODAL_SHADOW_NONE])nnShow a Window on Screen setting the Modal Status. If Shadow is MODAL_SHADOW_GRAY, other windows are grayed.
+
+Metaclass Prototype:
+
+Description:  If Shadow is MODAL_SHADOW_BLACK, they are blacked out.
+
+Parameters: 
+WindowIndex - 
+[Shadow=MODAL_SHADOW_NONE - (optional) 
+
+Return value:
+
+See also:
+

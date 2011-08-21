@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GetGamePreview()
+
+Metaclass Prototype:
+
+Description:  Gets current game area preview.
+
+Parameters: 
+
+Return value:
+
+See also:
+

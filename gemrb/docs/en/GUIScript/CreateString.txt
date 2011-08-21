@@ -1,0 +1,14 @@
+
+Prototype: GemRB.CreateString( Text )->StrRef
+
+Metaclass Prototype:
+
+Description:  Creates a custom string.
+
+Parameters: 
+Text - 
+
+Return value:
+
+See also:
+

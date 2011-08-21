@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetMazeEntry(entry, type, value)nnSets a field in a maze entry. The entry index shouldn't exceed the maximum possible maze size (64).
+
+Metaclass Prototype:
+
+Description:  The type could be: ME_ACCESSED, ME_WALLS, ME_TRAP or ME_SPECIAL.
+
+Parameters: 
+entry - 
+type - 
+value - 
+
+Return value:
+
+See also:
+

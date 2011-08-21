@@ -1,0 +1,17 @@
+
+Prototype: GemRB.SetTextAreaFlags(WindowIndex, ControlIndex, Flags, Operation)
+
+Metaclass Prototype:
+
+Description:  Sets the Display Flags of a TextArea. Flags are: IE_GUI_TA_SELECTABLE, IE_GUI_TA_AUTOSCROLL, IE_GUI_TA_SMOOTHSCROLL. Operation defaults to OP_SET.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+Flags - 
+Operation - 
+
+Return value:
+
+See also:
+

@@ -1,0 +1,14 @@
+
+Prototype: GemRB.GetSpellCastOn(pc)
+
+Metaclass Prototype:
+
+Description:  Returns the last spell cast on a partymember.
+
+Parameters: 
+pc - 
+
+Return value: resref
+
+See also:
+

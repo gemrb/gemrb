@@ -1,0 +1,17 @@
+
+Prototype: GemRB.SetControlSize(WindowIndex, ControlIndex, Width, Height)
+
+Metaclass Prototype:
+
+Description:  Resizes a Control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+Width - 
+Height - 
+
+Return value:
+
+See also:
+

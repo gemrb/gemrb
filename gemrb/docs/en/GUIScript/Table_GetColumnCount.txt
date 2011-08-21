@@ -1,0 +1,15 @@
+
+Prototype: GemRB.GetTableColumnCount(TableIndex[, Row])
+
+Metaclass Prototype:
+
+Description:  Returns the number of columns in the given row of a 2DA Table. Row may be omitted.
+
+Parameters: 
+TableIndex - 
+Row - (optional) 
+
+Return value: ColumnCount
+
+See also:
+

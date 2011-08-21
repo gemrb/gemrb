@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetText(WindowIndex, ControlIndex, String|Strref)
+
+Metaclass Prototype:
+
+Description:  Sets the Text of a control in a Window.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+String|Strref - 
+
+Return value: int
+
+See also:
+

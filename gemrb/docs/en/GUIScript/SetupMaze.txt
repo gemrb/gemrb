@@ -1,0 +1,14 @@
+
+Prototype: GemRB.SetupMaze(x,y)nnInitializes a maze of XxY size.
+
+Metaclass Prototype:
+
+Description:  The dimensions shouldn't exceed the maximum possible maze size (8x8).
+
+Parameters: 
+xy - 
+
+Return value:
+
+See also:
+

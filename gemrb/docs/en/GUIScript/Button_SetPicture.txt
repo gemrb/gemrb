@@ -1,0 +1,17 @@
+
+Prototype: GemRB.SetButtonPicture(WindowIndex, ControlIndex, PictureResRef, DefaultResRef)
+
+Metaclass Prototype:
+
+Description:  Sets the Picture of a Button Control from a BMP file. You can also supply a default picture.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+PictureResRef - 
+DefaultResRef - 
+
+Return value:
+
+See also:
+

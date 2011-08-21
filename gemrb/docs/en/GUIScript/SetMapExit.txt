@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetMapExit(ExitName[, NewArea, NewEntrance])nnModifies the target of an exit in the current area. If no destination is given,
+
+Metaclass Prototype:
+
+Description:  then the exit will be disabled.
+
+Parameters: 
+ExitName - 
+NewArea - 
+NewEntrance - (optional) 
+
+Return value:
+
+See also:
+

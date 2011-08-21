@@ -1,0 +1,18 @@
+
+Prototype: GemRB.SetLabelTextColor(WindowIndex, ControlIndex, red, green, blue)
+
+Metaclass Prototype:
+
+Description:  Sets the Text Color of a Label Control.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+red - 
+green - 
+blue - 
+
+Return value:
+
+See also:
+

@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetMapRegion(TrapName[, trapscript])
+
+Metaclass Prototype:
+
+Description:  Enables or disables an infopoint in the current area.
+
+Parameters: 
+TrapName - 
+trapscript - (optional) 
+
+Return value:
+
+See also:
+

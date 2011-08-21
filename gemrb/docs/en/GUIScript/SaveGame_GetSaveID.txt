@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SaveGame.GetSaveID()
+
+Metaclass Prototype:
+
+Description:  Returns ID of the saved game.
+
+Parameters: 
+
+Return value: string/int
+
+See also:
+

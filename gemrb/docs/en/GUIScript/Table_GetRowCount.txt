@@ -1,0 +1,14 @@
+
+Prototype: GemRB.GetTableRowCount(TableIndex)
+
+Metaclass Prototype:
+
+Description:  Returns the number of rows in a 2DA Table.
+
+Parameters: 
+TableIndex - 
+
+Return value: RowCount
+
+See also:
+

@@ -1,0 +1,16 @@
+
+Prototype: GemRB.GetDestinationArea(WindowIndex, ControlID[, RndEncounter])
+
+Metaclass Prototype:
+
+Description:  If the random encounter flag is set, the random encounters will be evaluated too.
+
+Parameters: 
+WindowIndex - 
+ControlID - 
+RndEncounter - (optional) 
+
+Return value: WorldMap entrynnReturns the last area pointed on the worldmap.n 
+
+See also:
+

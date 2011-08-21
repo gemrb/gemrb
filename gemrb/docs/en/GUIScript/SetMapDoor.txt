@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetMapDoor(DoorName, State)
+
+Metaclass Prototype:
+
+Description:  Modifies a door's open state in the current area.
+
+Parameters: 
+DoorName - 
+State - 
+
+Return value:
+
+See also:
+

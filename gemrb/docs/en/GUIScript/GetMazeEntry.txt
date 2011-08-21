@@ -1,0 +1,14 @@
+
+Prototype: GemRB.GetMazeEntry(entry)
+
+Metaclass Prototype:
+
+Description:  Returns a Maze entry from Planescape Torment savegames. Entry must be 0-63.
+
+Parameters: 
+entry - 
+
+Return value: dict
+
+See also:
+

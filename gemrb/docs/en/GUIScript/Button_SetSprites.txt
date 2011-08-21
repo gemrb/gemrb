@@ -1,0 +1,21 @@
+
+Prototype: GemRB.SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)
+
+Metaclass Prototype:
+
+Description:  Sets a Button Sprites Images.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+ResRef - 
+Cycle - 
+UnpressedFrame - 
+PressedFrame - 
+SelectedFrame - 
+DisabledFrame - 
+
+Return value:
+
+See also:
+

@@ -1,0 +1,19 @@
+
+Prototype: GemRB.SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)
+
+Metaclass Prototype:
+
+Description:  Sets the Picture of a Button Control from a BAM file. If col1 is >= 0, changes palette picture's palette to one specified by col1. Since it uses 12 colors palette, it has issues in PST.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+BAMResRef - 
+CycleIndex - 
+FrameIndex - 
+col1 - 
+
+Return value:
+
+See also:
+

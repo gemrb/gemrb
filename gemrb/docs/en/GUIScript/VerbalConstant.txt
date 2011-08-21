@@ -1,0 +1,15 @@
+
+Prototype: GemRB.VerbalConstant(PartyID, str)
+
+Metaclass Prototype:
+
+Description:  Plays a Character's SoundSet entry.
+
+Parameters: 
+PartyID - 
+str - 
+
+Return value:
+
+See also:
+

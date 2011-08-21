@@ -1,0 +1,18 @@
+
+Prototype: GemRB.SetActionIcon(Window, Button, Dict, ActionIndex[, Function])
+
+Metaclass Prototype:
+
+Description:  Sets up an action button. The ActionIndex should be less than 34.
+
+Parameters: 
+Window - 
+Button - 
+Dict - 
+ActionIndex - 
+Function - (optional) 
+
+Return value:
+
+See also:
+

@@ -1,0 +1,14 @@
+
+Prototype: GemRB.UnloadSymbol(SymbolIndex)
+
+Metaclass Prototype:
+
+Description:  Unloads an IDS Symbol Table.
+
+Parameters: 
+SymbolIndex - 
+
+Return value:
+
+See also:
+

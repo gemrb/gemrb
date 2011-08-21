@@ -1,0 +1,15 @@
+
+Prototype: GemRB.Internal module for GemRB metaclasses.
+
+This module is only for implementing GUIClass.py.
+
+Metaclass Prototype:
+
+Description:  It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp
+
+Parameters: 
+
+Return value:
+
+See also:
+

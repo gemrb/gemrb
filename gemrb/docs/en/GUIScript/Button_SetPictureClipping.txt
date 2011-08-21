@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetButtonPictureClipping(Window, Button, ClippingPercent)
+
+Metaclass Prototype:
+
+Description:  Sets percent (0-1.0) of width to which button picture will be clipped.
+
+Parameters: 
+Window - 
+Button - 
+ClippingPercent - 
+
+Return value:
+
+See also:
+

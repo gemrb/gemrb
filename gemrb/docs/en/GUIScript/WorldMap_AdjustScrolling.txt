@@ -1,0 +1,17 @@
+
+Prototype: GemRB.AdjustScrolling(WindowIndex, ControlIndex, x, y)
+
+Metaclass Prototype:
+
+Description:  Sets the scrolling offset of a WorldMapControl.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+x - 
+y - 
+
+Return value:
+
+See also:
+

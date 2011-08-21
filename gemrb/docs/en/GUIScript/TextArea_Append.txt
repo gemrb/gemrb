@@ -1,0 +1,19 @@
+
+Prototype: GemRB.TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row[, Flag]])
+
+Metaclass Prototype:
+
+Description:  If Flag is given, then it will use that value as a GetString flag.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+String|Strref - 
+ - 
+Row - 
+Flag - (optional) 
+
+Return value: intnnAppends the Text to the TextArea Control in the Window. If Row is given then it will insert the text after that row. 
+
+See also:
+

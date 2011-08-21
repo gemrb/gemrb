@@ -1,0 +1,14 @@
+
+Prototype: GemRB.FindStoreItem(resref)nnReturns the amount of the specified items in the open store.
+
+Metaclass Prototype:
+
+Description:  0 is also returned for an infinite ammount.
+
+Parameters: 
+resref - 
+
+Return value:
+
+See also:
+

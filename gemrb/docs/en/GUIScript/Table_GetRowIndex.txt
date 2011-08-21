@@ -1,0 +1,15 @@
+
+Prototype: GemRB.GetTableRowIndex(TableIndex, RowName)
+
+Metaclass Prototype:
+
+Description:  Returns the Index of a Row in a 2DA Table.
+
+Parameters: 
+TableIndex - 
+RowName - 
+
+Return value: Row
+
+See also:
+

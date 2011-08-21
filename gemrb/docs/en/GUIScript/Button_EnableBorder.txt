@@ -1,0 +1,17 @@
+
+Prototype: GemRB.EnableButtonBorder(WindowIndex, ControlIndex, BorderIndex, enabled)
+
+Metaclass Prototype:
+
+Description:  Enable or disable specified border/frame.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+BorderIndex - 
+enabled - 
+
+Return value:
+
+See also:
+

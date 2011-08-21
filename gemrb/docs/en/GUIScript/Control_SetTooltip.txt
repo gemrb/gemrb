@@ -1,0 +1,17 @@
+
+Prototype: GemRB.SetTooltip(WindowIndex, ControlIndex, String|Strref[, Function])
+
+Metaclass Prototype:
+
+Description:  Sets control's tooltip. The optional function number will set the function key linkage as well.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+String|Strref - 
+Function - (optional) 
+
+Return value: int
+
+See also:
+

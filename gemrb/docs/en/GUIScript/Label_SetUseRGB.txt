@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetLabelUseRGB(WindowIndex, ControlIndex, status)
+
+Metaclass Prototype:
+
+Description:  Tells a Label to use the RGB colors with the text.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+status - 
+
+Return value:
+
+See also:
+

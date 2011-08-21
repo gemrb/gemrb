@@ -1,0 +1,20 @@
+
+Prototype: GemRB.SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function, ITM2ResRef])nnSets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon,n
+
+Metaclass Prototype:
+
+Description:  4/5 - Weapon icons, 6 and above - Extended header icons.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+ITMResRef - 
+type - 
+tooltip - 
+Function - 
+ITM2ResRef - (optional) 
+
+Return value:
+
+See also:
+

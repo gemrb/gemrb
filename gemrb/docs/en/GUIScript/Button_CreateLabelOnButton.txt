@@ -1,0 +1,18 @@
+
+Prototype: GemRB.CreateLabelOnButton(WindowIndex, ControlIndex, NewControlID, font, align)
+
+Metaclass Prototype:
+
+Description:  Creates a label on top of a button, copying the button's size and position.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+NewControlID - 
+font - 
+align - 
+
+Return value:
+
+See also:
+

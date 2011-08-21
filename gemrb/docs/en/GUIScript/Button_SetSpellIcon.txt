@@ -1,0 +1,19 @@
+
+Prototype: GemRB.SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type, tooltip, function])
+
+Metaclass Prototype:
+
+Description:  Sets Spell icon image on a button. Type is the icon's type.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+SPLResRef - 
+type - 
+tooltip - 
+function - (optional) 
+
+Return value:
+
+See also:
+
