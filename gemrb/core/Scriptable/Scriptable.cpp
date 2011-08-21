@@ -1066,7 +1066,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant )
+int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant, bool nointerrupt )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -1078,7 +1078,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant 
 			return -1;
 		}
 	}
-	if(deplete && !CanCast(SpellResRef)) {
+	if(!nointerrupt && !CanCast(SpellResRef)) {
 		SpellResRef[0] = 0;
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
@@ -1097,7 +1097,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant 
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant )
+int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool nointerrupt )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -1113,7 +1113,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant )
 	// FIXME: fishy
 	if (!target) target = this;
 
-	if(deplete && !CanCast(SpellResRef)) {
+	if(!nointerrupt && !CanCast(SpellResRef)) {
 		SpellResRef[0] = 0;
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);

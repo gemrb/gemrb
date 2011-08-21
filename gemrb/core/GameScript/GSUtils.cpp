@@ -2383,7 +2383,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if (!parameters->int2Parameter) {
 		duration = Sender->CurrentActionState--;
 	} else {
-		duration = Sender->CastSpell( tar, flags&SC_DEPLETE, flags&SC_INSTANT );
+		duration = Sender->CastSpell( tar, flags&SC_DEPLETE, flags&SC_INSTANT, flags&SC_NOINTERRUPT );
 	}
 	if (duration == -1) {
 		// some kind of error
@@ -2472,7 +2472,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	if (!parameters->int2Parameter) {
 		duration = Sender->CurrentActionState--;
 	} else {
-		duration = Sender->CastSpellPoint( parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT );
+		duration = Sender->CastSpellPoint( parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT, flags&SC_NOINTERRUPT );
 	}
 	if (duration == -1) {
 		// some kind of error
