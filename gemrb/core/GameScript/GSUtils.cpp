@@ -2329,8 +2329,11 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->SetSpellResRef(spellres);
 		}
 	}
+	if (!Sender->CurrentActionTicks) {
+		parameters->int2Parameter = 1;
+	}
 
-	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted() && !Sender->CurrentActionState) {
+	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
 
@@ -2340,22 +2343,6 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			level = parameters->int0Parameter;
 		} else {
 			level = parameters->int1Parameter;
-		}
-	}
-
-	if (!(flags&SC_INSTANT)) {
-		if (Sender->CurrentActionState) {
-			if (Sender->LastTarget) {
-				//if target was set, fire spell
-				Sender->CastSpellEnd(level);
-			} else if(!Sender->LastTargetPos.isempty()) {
-				//the target was converted to a point
-				Sender->CastSpellPointEnd(level);
-			} else {
-				printMessage("GameScript", "SpellCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
-			}
-			Sender->ReleaseCurrentAction();
-			return;
 		}
 	}
 
@@ -2391,24 +2378,42 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		//stop doing anything else
 		act->SetModal(MS_NONE);
 	}
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpell( tar, flags&SC_DEPLETE, flags&SC_INSTANT );
 
-	if (flags&SC_INSTANT) {
-		if (tar->Type==ST_ACTOR) {
-			Sender->CastSpellEnd(level);
-		} else {
-			Sender->CastSpellPointEnd(level);
-		}
-		Sender->ReleaseCurrentAction();
+	int duration;
+	if (!parameters->int2Parameter) {
+		duration = Sender->CurrentActionState--;
 	} else {
-		if (duration != -1) Sender->SetWait(duration);
-
-		//if target was set, feed action back
-		if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
+		duration = Sender->CastSpell( tar, flags&SC_DEPLETE, flags&SC_INSTANT );
+	}
+	if (duration == -1) {
+		// some kind of error
+		Sender->ReleaseCurrentAction();
+		return;
+	} else if (duration > 0) {
+		if (parameters->int2Parameter) {
+			Sender->CurrentActionState = duration;
+			parameters->int2Parameter = 0;
+		}
+		if (InterruptSpellcasting(Sender)) {
 			Sender->ReleaseCurrentAction();
 		}
+		return;
 	}
+	if (InterruptSpellcasting(Sender)) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	if (Sender->LastTarget) {
+		//if target was set, fire spell
+		Sender->CastSpellEnd(level);
+	} else if(!Sender->LastTargetPos.isempty()) {
+		//the target was converted to a point
+		Sender->CastSpellPointEnd(level);
+	} else {
+		printMessage("GameScript", "SpellCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
+	}
+	Sender->ReleaseCurrentAction();
 }
 
 
@@ -2430,8 +2435,11 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->SetSpellResRef(spellres);
 		}
 	}
+	if (!Sender->CurrentActionTicks) {
+		parameters->int2Parameter = 1;
+	}
 
-	if ((flags&SC_AURA_CHECK) && Sender->AuraPolluted() && !Sender->CurrentActionState) {
+	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
 
@@ -2441,19 +2449,6 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 			level = parameters->int0Parameter;
 		} else {
 			level = parameters->int1Parameter;
-		}
-	}
-
-	if (!(flags&SC_INSTANT)) {
-		if (Sender->CurrentActionState) {
-			if(!Sender->LastTargetPos.isempty()) {
-				//if target was set, fire spell
-				Sender->CastSpellPointEnd(level);
-			} else {
-				printMessage("GameScript", "SpellPointCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
-			}
-			Sender->ReleaseCurrentAction();
-			return;
 		}
 	}
 
@@ -2473,18 +2468,36 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		act->SetModal(MS_NONE);
 	}
 
-	Sender->CurrentActionState = 1;
-	int duration = Sender->CastSpellPoint( parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT  );
-
-	if (flags&SC_INSTANT) {
-		Sender->CastSpellPointEnd(level);
-		Sender->ReleaseCurrentAction();
+	int duration;
+	if (!parameters->int2Parameter) {
+		duration = Sender->CurrentActionState--;
 	} else {
-		if (duration != -1) Sender->SetWait(duration);
-
-		//if target was set, feed action back
-		if (Sender->LastTargetPos.isempty()) {
+		duration = Sender->CastSpellPoint( parameters->pointParameter, flags&SC_DEPLETE, flags&SC_INSTANT );
+	}
+	if (duration == -1) {
+		// some kind of error
+		Sender->ReleaseCurrentAction();
+		return;
+	} else if (duration > 0) {
+		if (parameters->int2Parameter) {
+			Sender->CurrentActionState = duration;
+			parameters->int2Parameter = 0;
+		}
+		if (InterruptSpellcasting(Sender)) {
 			Sender->ReleaseCurrentAction();
 		}
+		return;
 	}
+	if (InterruptSpellcasting(Sender)) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	if(!Sender->LastTargetPos.isempty()) {
+		//if target was set, fire spell
+		Sender->CastSpellPointEnd(level);
+	} else {
+		printMessage("GameScript", "SpellPointCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
+	}
+	Sender->ReleaseCurrentAction();
 }
