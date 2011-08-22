@@ -52,5 +52,6 @@
 #define DS_DONATE1           28
 #define DS_DONATE2           29
 #define DS_IDENTIFY          30
+#define DS_GOTXP             31
 
 #endif //! IE_SOUNDS_H

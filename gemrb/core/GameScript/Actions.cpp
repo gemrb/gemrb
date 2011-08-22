@@ -2798,6 +2798,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 		displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword)xp);
 	}
 	actor->AddExperience(xp);
+	core->PlaySound(DS_GOTXP);
 }
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
@@ -2826,11 +2827,13 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		//give xp everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
 	}
+	core->PlaySound(DS_GOTXP);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE);
+	core->PlaySound(DS_GOTXP);
 }
 
 //this needs moncrate.2da, but otherwise independent from GF_CHALLENGERATING
@@ -2843,6 +2846,7 @@ void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters
 {
 	ieDword xp = CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
+	core->PlaySound(DS_GOTXP);
 }
 
 void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
