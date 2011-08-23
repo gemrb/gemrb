@@ -2308,6 +2308,26 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 		DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
 		return true;
 	}
+
+	// abort casting on invisible or dead targets
+	// not all spells should be interrupted on death - some for chunking, some for raising the dead
+	if (Sender->LastTarget) {
+		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastTarget);
+		if (target) {
+			if (target->GetStat(IE_STATE_ID) & (STATE_DEAD|STATE_INVISIBLE) & ~(STATE_PETRIFIED|STATE_FROZEN)) {
+				return true;
+			} else {
+				Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				if (!spl) return false;
+				SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
+				if (seh && seh->Target != TARGET_DEAD) {
+					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+					return true;
+				}
+				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+			}
+		}
+	}
 	return false;
 }
 
