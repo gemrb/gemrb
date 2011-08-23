@@ -23,6 +23,7 @@
 
 #include "strrefs.h"
 #include "defsounds.h"
+#include "ie_feats.h"
 
 #include "Audio.h"
 #include "CharAnimations.h"
@@ -2299,14 +2300,35 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 }
 
 inline static bool InterruptSpellcasting(Scriptable* Sender) {
+	// ouch, we got hit
 	if (Sender->InterruptCasting) {
-		if (Sender->Type == ST_ACTOR && ((Actor *)Sender)->InParty) {
-			displaymsg->DisplayConstantString(STR_SPELLDISRUPT, DMC_WHITE, Sender);
-		} else {
-			displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
+		if (Sender->Type != ST_ACTOR) return false;
+		Actor *caster = (Actor *) Sender;
+		int roll = 0;
+
+		// iwd2 does an extra concentration check first:
+		// d20 + Concentration Skill Level + Constitution bonus (+4 Combat casting feat) >= 15 + spell level
+		if (core->HasFeature(GF_3ED_RULES)) {
+			roll = core->Roll(1, 20, 0); // TODO: check if the original does a lucky roll
+			roll += caster->GetStat(IE_CONCENTRATION);
+			roll += caster->GetAbilityBonus(IE_CON);
+			if (caster->HasFeat(FEAT_COMBAT_CASTING)) {
+				roll += 4;
+			}
+			Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+			if (!spl) return false;
+			roll -= spl->SpellLevel;
+			gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 		}
-		DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
-		return true;
+		if (roll < 15) {
+			if (caster->InParty) {
+				displaymsg->DisplayConstantString(STR_SPELLDISRUPT, DMC_WHITE, Sender);
+			} else {
+				displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
+			}
+			DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
+			return true;
+		}
 	}
 
 	// abort casting on invisible or dead targets
