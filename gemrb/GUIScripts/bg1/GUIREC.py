@@ -23,21 +23,26 @@
 import GemRB
 import GUICommon
 import CommonTables
-from GUIDefines import *
-from ie_stats import *
-from ie_restype import *
 import LUCommon
 import LevelUp
 import GUIWORLD
-import GUICG19
 import DualClass
+from GUIDefines import *
+from ie_stats import *
+from ie_restype import *
 ###################################################
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
+PortraitWindow = None
 OptionsWindow = None
 CustomizeWindow = None
+SubCustomizeWindow = None
+SubSubCustomizeWindow = None
+OldPortraitWindow = None
 OldOptionsWindow = None
+ExportWindow = None
+KitInfoWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 PortraitsTable = None
@@ -46,8 +51,6 @@ ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
-PortraitWindow = None
-OldPortraitWindow = None
 OldVoiceSet = None
 
 # the available sounds
@@ -59,8 +62,9 @@ SoundIndex = 0
 ###################################################
 def OpenRecordsWindow ():
 	import GUICommonWindows
-	global RecordsWindow, OptionsWindow
-	global OldOptionsWindow, PortraitWindow, OldPortraitWindow
+
+	global RecordsWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
@@ -71,15 +75,16 @@ def OpenRecordsWindow ():
 			OptionsWindow.Unload ()
 		if PortraitWindow:
 			PortraitWindow.Unload ()
+
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.UpdatePortraitWindow ()
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		GUICommonWindows.UpdatePortraitWindow ()
-		OldPortraitWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
@@ -93,9 +98,11 @@ def OpenRecordsWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
+	if GUICommon.GameIsBG2():
+		GUICommonWindows.MarkMenuButton (OptionsWindow)
+	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
-	OptionsWindow.SetFrame ()
 
 	# dual class
 	Button = Window.GetControl (0)
@@ -127,10 +134,11 @@ def OpenRecordsWindow ():
 	Button.SetText (13956)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenExportWindow)
 
-## 	# kit info
-## 	Button = Window.GetControl (52)
-## 	Button.SetText (61265)
-## 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitInfoWindow)
+	# kit info
+	if GUICommon.GameIsBG2():
+		Button = Window.GetControl (52)
+		Button.SetText (61265)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
@@ -155,6 +163,13 @@ def UpdateRecordsWindow ():
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
+
+	#update mage school
+	GemRB.SetVar ("MAGESCHOOL", 0)
+	Kit = GUICommon.GetKitIndex (pc)
+	if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
+		MageTable = GemRB.LoadTable ("magesch")
+		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
 
 	# exportable
 	Button = Window.GetControl (36)
@@ -185,7 +200,10 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (2)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
+	if GUICommon.GameIsBG2():
+		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
+	else:
+		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
 
 	# armorclass
 	Label = Window.GetControl (0x10000028)
@@ -205,7 +223,6 @@ def UpdateRecordsWindow ():
 	Label.SetTooltip (17378)
 
 	# stats
-
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 	cstr = GetStatColor (pc, IE_STR)
@@ -255,8 +272,7 @@ def UpdateRecordsWindow ():
 	Label.SetText (ClassTitle)
 
 	# race
-	text = CommonTables.Races.GetValue (CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) ,
- 0)
+	text = CommonTables.Races.GetValue (CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) , 0)
 
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
@@ -306,6 +322,16 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
+
+	# everyone but bg1 has it somewhere
+	if GUICommon.GameIsBG2():
+		str_None = GemRB.GetString (61560)
+	elif GUICommon.GameIsBG1():
+		str_None = -1
+	elif GUICommon.GameIsPST():
+		str_None = GemRB.GetString (41275)
+	else:
+		str_None = GemRB.GetString (17093)
 
 	stats = []
 	# class levels
@@ -377,6 +403,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[0], Class) )
 			stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append (None)
+
 		# the first class (shown second)
 		if Dual[0] == 1:
 			ClassTitle = GemRB.GetString (CommonTables.KitList.GetValue (Dual[1], 2))
@@ -429,12 +456,19 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				stats.append ( (tmp,c,'a') )
 			stats.append (None)
 
-	stats.append (None)
-
 	#proficiencies
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(GemRB.GetCombatDetails(pc, 0)["ToHit"])+")", '0') )
+	# look ma, I can use both hands
+	if GUICommon.GameIsBG2():
+		stats.append ( (61932, GS (IE_TOHIT), '0') )
+		if (GemRB.IsDualWielding(pc)):
+			stats.append ( (56911, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
+			stats.append ( (56910, GemRB.GetCombatDetails(pc, 1)["ToHit"], '0') )
+		else:
+			stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
+	else:
+		stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(GemRB.GetCombatDetails(pc, 0)["ToHit"])+")", '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr (188)
@@ -442,7 +476,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
-	stats.append ( (19224, GS (IE_RESISTMAGIC), '') )
+	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
+		stats.append ( (19224, GS (IE_RESISTMAGIC), '') )
 
 	# party's reputation
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
@@ -459,9 +494,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			HatedRace = HateTable.GetValue (Racist, 0)
 			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 
-	#stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
-	#stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
-	#stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
+	# these skills were new in bg2
+	if GUICommon.GameIsBG2():
+		stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
+		stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
+		stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
 
@@ -493,22 +530,29 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append (9466)
 	table = GemRB.LoadTable ("weapprof")
 	RowCount = table.GetRowCount ()
-	for i in range (RowCount):
+	# the first 7 profs are foobared (bg1 style)
+	if GUICommon.GameIsBG2():
+		offset = 8
+	else:
+		offset = 0
+	for i in range (offset, RowCount):
 		text = table.GetValue (i, 1)
-		stat = table.GetValue (i, 0) + IE_PROFICIENCYBASTARDSWORD
+		stat = table.GetValue (i, 0)
+		if not offset:
+			stat = stat + IE_PROFICIENCYBASTARDSWORD
 		stats.append ( (text, GS (stat)&0x07, '+') )
 	stats.append (None)
 
 	# 11766 AC Bonuses
 	stats.append (11766)
 	# 11770 AC vs. Crushing
-	stats.append ((11770, GS (IE_ACCRUSHINGMOD), ''))
+	stats.append ((11770, GS (IE_ACCRUSHINGMOD), 'p'))
 	# 11767 AC vs. Missile
-	stats.append ((11767, GS (IE_ACMISSILEMOD), ''))
+	stats.append ((11767, GS (IE_ACMISSILEMOD), 'p'))
 	# 11769 AC vs. Piercing
-	stats.append ((11769, GS (IE_ACPIERCINGMOD), ''))
+	stats.append ((11769, GS (IE_ACPIERCINGMOD), 'p'))
 	# 11768 AC vs. Slashing
-	stats.append ((11768, GS (IE_ACSLASHINGMOD), ''))
+	stats.append ((11768, GS (IE_ACSLASHINGMOD), 'p'))
 	stats.append (None)
 
 	# 10315 Ability bonuses
@@ -516,9 +560,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	value = GemRB.GetPlayerStat (pc, IE_STR)
 	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 	# 10332 to hit
-	stats.append ( (10332, GemRB.GetAbilityBonus (IE_STR,0,value,ex), '0') )
+	stats.append ( (10332, GemRB.GetAbilityBonus (IE_STR,0,value,ex), 'p') )
 	# 10336 damage
-	stats.append ( (10336, GemRB.GetAbilityBonus (IE_STR,1,value,ex), '0') )
+	stats.append ( (10336, GemRB.GetAbilityBonus (IE_STR,1,value,ex), 'p') )
 	# 10337 open doors (bend bars lift gates)
 	stats.append ( (10337, GemRB.GetAbilityBonus (IE_STR,2,value,ex), '0') )
 	# 10338 weight allowance
@@ -526,9 +570,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 10339 AC
 	stats.append ( (10339, GA (IE_DEX,2), '0') )
 	# 10340 Missile adjustment
-	stats.append ( (10340, GA (IE_DEX,1), '0') )
+	stats.append ( (10340, GA (IE_DEX,1), 'p') )
 	# 10341 Reaction adjustment
-	stats.append ( (10341, GA (IE_DEX,0), '0') )
+	stats.append ( (10341, GA (IE_DEX,0), 'p') )
 	# 10342 CON HP Bonus/Level
 	# dual-classed chars get no bonus while the primary class is inactive
 	# and the new class' bonus afterwards
@@ -553,7 +597,52 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
 			if base:
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
-				stats.append ( (GemRB.GetString (10345), count-base, 'b') )
+				stats.append ( (GemRB.GetString (10345), count-base, 'r') )
+		stats.append (None)
+
+	# only bg2 displayed all the resistances and had weapon styles
+	if GUICommon.GameIsBG2():
+		# 32204 Resistances
+		stats.append (32204)
+		# 32213 Normal Fire
+		stats.append ((32213, GS (IE_RESISTFIRE), '%'))
+		# 32222 Magic Fire
+		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
+		# 32214 Normal Cold
+		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
+		# 32223 Magic Cold
+		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+		# 32220 Electricity
+		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
+		# 32221 Acid
+		stats.append ((32221, GS (IE_RESISTACID), '%'))
+		# Magic
+		stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
+		# Magic Damage
+		stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+		# Missile
+		stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
+		# Slashing
+		stats.append ((11768, GS (IE_RESISTSLASHING), '%'))
+		# Piercing
+		stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
+		# Crushing
+		stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
+		# Poison
+		stats.append ((14017, GS (IE_RESISTPOISON), '%'))
+		stats.append (None)
+
+		# Weapon Style bonuses
+		stats.append (32131)
+		wstyle = GemRB.GetCombatDetails (pc, 0)["Style"] # equipped weapon style + 1000 * proficiency level
+		profcount = wstyle / 1000
+		if profcount:
+			wstyletables = { IE_PROFICIENCY2WEAPON:"wstwowpn", IE_PROFICIENCY2HANDED:"wstwohnd", IE_PROFICIENCYSINGLEWEAPON:"wssingle", IE_PROFICIENCYSWORDANDSHIELD:"wsshield" }
+			bonusrefs = { "THAC0BONUSRIGHT":56911, "THAC0BONUSLEFT":56910, "DAMAGEBONUS":10336, "CRITICALHITBONUS":32140, "PHYSICALSPEED":32141, "AC":10339, "ACVSMISSLE":10340 }
+			WStyleTable = GemRB.LoadTable (wstyletables[wstyle%1000])
+			for col in range(WStyleTable.GetColumnCount()):
+				value = WStyleTable.GetValue (profcount, col)
+				stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
 		stats.append (None)
 
 	res = []
@@ -570,13 +659,19 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' +' + str (val) )
 				else:
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
-			elif type == 's': #both base and (modified) stat, but only if they differ
-				base = str (GB (val))
-				stat = str (GS (val))
-				if base == stat:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ': ' + base)
+			elif type == 'r': #a plus prefix if positive, strref is an already resolved string
+				if val > 0:
+					res.append ("[capital=0]" + strref + ' +' + str (val) )
 				else:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ': ' + base + " (" + stat + ")")
+					res.append ("[capital=0]" + strref + ' ' + str (val) )
+			elif type == 's': #both base and (modified) stat, but only if they differ
+				base = GB (val)
+				stat = GS (val)
+				base_str = "[capital=0]" + GemRB.GetString (strref) + ': ' + str(stat)
+				if base == stat:
+					res.append (base_str)
+				else:
+					res.append (base_str + " (" + str(stat-base) + ")")
 			elif type == 'x': #x character before value
 				res.append ("[capital=0]"+GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
@@ -594,11 +689,12 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			lines = 1
 		except:
 			if s != None:
-				res.append ( GemRB.GetString (s) )
+				res.append ("[capital=0]"+ GemRB.GetString (s) )
 				lines = 0
 			else:
-				if lines:
-					res.append ("")
+				if not lines and str_None != -1:
+					res.append (str_None)
+				res.append ("")
 				lines = 0
 
 	return "\n".join (res)
@@ -608,14 +704,14 @@ def GetReputation (repvalue):
 	if repvalue>20:
 		repvalue=20
 	txt = GemRB.GetString (table.GetValue (repvalue, 0) )
-	return txt+"("+str (repvalue)+")"
+	return txt+" ("+str (repvalue)+")"
 
 def OpenInformationWindow ():
 	global InformationWindow
 
 	if InformationWindow != None:
-		if BiographyWindow: OpenBiographyWindow ()
-
+		CloseBiographyWindow ()
+		CloseInformationWindow ()
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (4)
@@ -658,7 +754,7 @@ def OpenInformationWindow ():
 	Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
-	#   (script updates???). In each case, there are 60 seconds
+	#   (script updates). In each case, there are 60 seconds
 	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
 	# Hence currentTime (and joinTime after div by 15) has
 	#   7200 secs a day (60 * 5 * 24)
@@ -669,7 +765,11 @@ def OpenInformationWindow ():
 	days = party_time / 7200
 	hours = (party_time % 7200) / 300
 
-	GemRB.SetToken ('GAMEDAYS', str (days))
+	# it is true, they changed the token
+	if GUICommon.GameIsBG2():
+		GemRB.SetToken ('GAMEDAY', str (days))
+	else:
+		GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 	Label = Window.GetControl (0x10000006)
 	#actually it is 16043 <DURATION>, but duration is translated to
@@ -741,6 +841,7 @@ def CloseInformationWindow ():
 	if InformationWindow:
 		InformationWindow.Unload ()
 	InformationWindow = None
+
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	RecordsWindow.SetVisible (WINDOW_VISIBLE)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
@@ -750,10 +851,10 @@ def OpenBiographyWindow ():
 	global BiographyWindow
 
 	if BiographyWindow != None:
+		CloseBiographyWindow ()
 		return
 
 	BiographyWindow = Window = GemRB.LoadWindow (12)
-	GemRB.SetVar ("FloatWindow", BiographyWindow.ID)
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -773,7 +874,10 @@ def CloseBiographyWindow ():
 	if BiographyWindow:
 		BiographyWindow.Unload ()
 	BiographyWindow = None
-	InformationWindow.SetVisible (WINDOW_VISIBLE)
+	if GUICommon.GameIsBG2():
+		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		InformationWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenExportWindow ():
@@ -808,6 +912,8 @@ def ExportDonePress():
 	if ExportWindow:
 		ExportWindow.Unload()
 	#save file under name from EditControl
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SaveCharacter (pc, ExportFileName)
 	return
 
 def ExportCancelPress():
@@ -816,11 +922,67 @@ def ExportCancelPress():
 	return
 
 def ExportEditChanged():
+	global ExportFileName
+
 	ExportFileName = NameField.QueryText ()
 	if ExportFileName == "":
 		ExportDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+	return
+
+def OpenKitInfoWindow ():
+	global KitInfoWindow
+
+	KitInfoWindow = GemRB.LoadWindow (24)
+
+	#back button (setting first, to be less error prone)
+	DoneButton = KitInfoWindow.GetControl (2)
+	DoneButton.SetText (11973)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitDonePress)
+
+	#kit or class description
+	TextArea = KitInfoWindow.GetControl (0)
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassIndex = CommonTables.Classes.FindValue (5, Class)
+	Multi = CommonTables.Classes.GetValue (ClassIndex, 4)
+	Dual = GUICommon.IsDualClassed (pc, 1)
+
+	if Multi and Dual[0] == 0: # true multi class
+		text = CommonTables.Classes.GetValue (ClassIndex, 1)
+		TextArea.SetText (text)
+		KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
+		return
+
+	KitIndex = GUICommon.GetKitIndex (pc)
+
+	if Dual[0]: # dual class
+		# first (previous) kit or class of the dual class
+		if Dual[0] == 1:
+			text = CommonTables.KitList.GetValue (Dual[1], 3)
+		elif Dual[0] == 2:
+			text = CommonTables.Classes.GetValue (Dual[1], 1)
+
+		TextArea.SetText (text)
+		TextArea.Append ("\n\n")
+		text = CommonTables.Classes.GetValue (Dual[2], 1)
+
+	else: # ordinary class or kit
+		if KitIndex:
+			text = CommonTables.KitList.GetValue (KitIndex, 3)
+		else:
+			text = CommonTables.Classes.GetValue (ClassIndex, 1)
+
+	TextArea.Append (text)
+
+	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def KitDonePress():
+	if KitInfoWindow:
+		KitInfoWindow.Unload()
 	return
 
 def OpenCustomizeWindow ():
@@ -857,10 +1019,12 @@ def OpenCustomizeWindow ():
 	ScriptButton.SetText (17111)
 
 	#This button exists only in bg2/iwd, theoretically we could create it here
-	#BiographyButton = CustomizeWindow.GetControl (9)
-	#BiographyButton.SetText (18003)
-	#if not Exportable:
-	#	BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
+	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD1():
+		BiographyButton = CustomizeWindow.GetControl (9)
+		BiographyButton.SetText (18003)
+		BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyEditWindow)
+		if not Exportable:
+			BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	TextArea = CustomizeWindow.GetControl (5)
 	TextArea.SetText (11327)
@@ -877,7 +1041,6 @@ def OpenCustomizeWindow ():
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
 	ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenColorWindow)
 	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenScriptWindow)
-	#BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyEditWindow)
 	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeDonePress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeCancelPress)
 
@@ -886,12 +1049,10 @@ def OpenCustomizeWindow ():
 
 def CustomizeDonePress ():
 	CloseCustomizeWindow ()
-	UpdateRecordsWindow ()
 	return
 
 def CustomizeCancelPress ():
 	CloseCustomizeWindow ()
-	UpdateRecordsWindow ()
 	return
 
 def CloseCustomizeWindow ():
@@ -900,6 +1061,7 @@ def CloseCustomizeWindow ():
 	if CustomizeWindow:
 		CustomizeWindow.Unload ()
 		CustomizeWindow = None
+		UpdateRecordsWindow ()
 	return
 
 def OpenPortraitSelectWindow ():
@@ -949,7 +1111,11 @@ def OpenPortraitSelectWindow ():
 def PortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Name = PortraitsTable.GetRowName (LastPortrait)
-	GemRB.FillPlayerInfo (pc, Name + "L", Name + "S")
+	# eh, different sizes
+	if GUICommon.GameIsBG2():
+		GemRB.FillPlayerInfo (pc, Name + "M", Name + "S")
+	else:
+		GemRB.FillPlayerInfo (pc, Name + "L", Name + "S")
 	CloseSubCustomizeWindow ()
 	return
 
@@ -980,7 +1146,10 @@ def PortraitLeftPress():
 	return
 
 def UpdatePortrait ():
-	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"G"
+	if GUICommon.GameIsBG2():
+		PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
+	else:
+		PortraitName = PortraitsTable.GetRowName (LastPortrait)+"G"
 	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 	return
 
