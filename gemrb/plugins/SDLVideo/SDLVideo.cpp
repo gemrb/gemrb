@@ -39,6 +39,9 @@
 #include <cstdio>
 
 #ifdef TARGET_OS_IPHONE
+extern "C" {
+    #include "SDL_sysvideo.h"
+}
 #include "SDL_uikitkeyboard.h"
 #endif
 #ifdef ANDROID
