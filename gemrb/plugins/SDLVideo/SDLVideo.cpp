@@ -265,7 +265,6 @@ int SDLVideoDriver::PollEvents() {
 	bool ConsolePopped = core->ConsolePopped;
 	unsigned long time = lastTime;
 	unsigned char key = 0;
-	int x,y;
 
 	while ( SDL_PollEvent(&event) ) {
 		int modstate = GetModState(event.key.keysym.mod);
@@ -449,7 +448,7 @@ int SDLVideoDriver::PollEvents() {
 #endif
 		}
 	}
-
+	int x, y;
 	if (Evnt && !DisableMouse && lastevent && time>lastmousetime && SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT)) {
 		lastmousetime=time+Evnt->GetRKDelay();
 		if (!ConsolePopped)
