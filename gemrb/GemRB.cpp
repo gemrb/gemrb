@@ -39,6 +39,10 @@
 
 #ifdef ANDROID
 #include <SDL/SDL.h>
+// if/when android moves to SDL 1.3 remove these special functions.
+// SDL 1.3 fires window events for these conditions that are handled in SDLVideo.cpp.
+// see SDL_WINDOWEVENT_MINIMIZED and SDL_WINDOWEVENT_RESTORED
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
 #include "audio.h"
 
 // pause audio playing if app goes in background
@@ -51,7 +55,7 @@ static void appPutToForeground()
 {
   core->GetAudioDrv()->Resume();
 }
-
+#endif
 #endif
 
 int main(int argc, char* argv[])
@@ -81,7 +85,9 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 #ifdef ANDROID
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
     SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
+#endif
 #endif
 	core->Main();
 	delete( core );
