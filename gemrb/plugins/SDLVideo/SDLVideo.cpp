@@ -559,6 +559,30 @@ int SDLVideoDriver::PollEvents() {
         // use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			numFingers = event.mgesture.numFingers;
 			break;
+		/* not user input events */
+		case SDL_WINDOWEVENT://SDL 1.2
+			switch (event.window.event) {
+				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
+					core->GetAudioDrv()->Pause();//this is for ANDROID mostly
+					break;
+				case SDL_WINDOWEVENT_RESTORED://SDL 1.3
+					/*
+						reset all static variables as if no events have happened yet
+                        restoring from "minimized state" should be a clean slate.
+					*/
+					numFingers = 0;
+					touchHoldTime = 0;
+					touchHold = false;
+					lastevent = false;
+					ignoreNextMouseUp = false;
+					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
+					break;
+				case SDL_WINDOWEVENT_RESIZED://SDL 1.2
+                // this event exists in SDL 1.2, but this handler is only getting ompiled under 1.3+
+					printMessage("SDLVideo", "Window resized so your window surface is now invalid.\n", LIGHT_RED);
+					break;
+			}
+			break;
 		default:
 			//this is to catch unhandled SDL 1.3 events for development
 			printMessage( "SDLVideo", "Unrecognized SDL event type.\n", LIGHT_RED );
