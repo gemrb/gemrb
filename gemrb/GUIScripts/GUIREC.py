@@ -54,9 +54,14 @@ SelectedTextArea = None
 OldVoiceSet = None
 
 # the available sounds
-SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
-				'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
-				'3', '4', '5', '6', '7', '8', '9']
+if GUICommon.GameIsIWD1():
+	SoundSequence = [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', \
+		'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', \
+		'25', '26', '27', '28', '29', '30', '31']
+else:
+	SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
+		'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
+		'3', '4', '5', '6', '7', '8', '9']
 SoundIndex = 0
 
 ###################################################
@@ -200,7 +205,7 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (2)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD1():
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
 	else:
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
@@ -495,7 +500,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 
 	# these skills were new in bg2
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD1():
 		stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
 		stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
 		stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
@@ -536,9 +541,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else:
 		offset = 0
 	for i in range (offset, RowCount):
-		text = table.GetValue (i, 1)
+		# iwd displays capitalised strings
+		# FIXME: ignore it and do the capitalisation manually, so it works for everyone
+		if GUICommon.GameIsIWD1():
+			text = table.GetValue (i, 3)
+		else:
+			text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
-		if not offset:
+		if not offset and not GUICommon.GameIsIWD1(): # TODO: fishy, recheck
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
 		stats.append ( (text, GS (stat)&0x07, '+') )
 	stats.append (None)
@@ -600,38 +610,42 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				stats.append ( (GemRB.GetString (10345), count-base, 'r') )
 		stats.append (None)
 
-	# only bg2 displayed all the resistances and had weapon styles
-	if GUICommon.GameIsBG2():
-		# 32204 Resistances
+	# only bg2 displayed all the resistances, but it is useful information
+	# Resistances
+	if GUICommon.GameIsIWD1():
+		stats.append (15544)
+	else:
 		stats.append (32204)
-		# 32213 Normal Fire
-		stats.append ((32213, GS (IE_RESISTFIRE), '%'))
-		# 32222 Magic Fire
-		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
-		# 32214 Normal Cold
-		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
-		# 32223 Magic Cold
-		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
-		# 32220 Electricity
-		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
-		# 32221 Acid
-		stats.append ((32221, GS (IE_RESISTACID), '%'))
-		# Magic
+	# 32213 Normal Fire
+	stats.append ((32213, GS (IE_RESISTFIRE), '%'))
+	# 32222 Magic Fire
+	stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
+	# 32214 Normal Cold
+	stats.append ((32214, GS (IE_RESISTCOLD), '%'))
+	# 32223 Magic Cold
+	stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+	# 32220 Electricity
+	stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
+	# 32221 Acid
+	stats.append ((32221, GS (IE_RESISTACID), '%'))
+	if GUICommon.GameIsBG2():
+		# Magic (others show it higher up)
 		stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
-		# Magic Damage
-		stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
-		# Missile
-		stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
-		# Slashing
-		stats.append ((11768, GS (IE_RESISTSLASHING), '%'))
-		# Piercing
-		stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
-		# Crushing
-		stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
-		# Poison
-		stats.append ((14017, GS (IE_RESISTPOISON), '%'))
-		stats.append (None)
+	# Magic Damage
+	stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+	# Missile
+	stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
+	# Slashing
+	stats.append ((11768, GS (IE_RESISTSLASHING), '%'))
+	# Piercing
+	stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
+	# Crushing
+	stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
+	# Poison
+	stats.append ((14017, GS (IE_RESISTPOISON), '%'))
+	stats.append (None)
 
+	if GUICommon.GameIsBG2():
 		# Weapon Style bonuses
 		stats.append (32131)
 		wstyle = GemRB.GetCombatDetails (pc, 0)["Style"] # equipped weapon style + 1000 * proficiency level
@@ -874,7 +888,8 @@ def CloseBiographyWindow ():
 	if BiographyWindow:
 		BiographyWindow.Unload ()
 	BiographyWindow = None
-	if GUICommon.GameIsBG2():
+	# TODO: check if bg1 wouldn't benefit from modality too
+	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD1():
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 	else:
 		InformationWindow.SetVisible (WINDOW_VISIBLE)
@@ -1307,14 +1322,20 @@ def PlaySoundPressed():
 	global CharSoundWindow, SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText ()
+	if GUICommon.GameIsIWD1():
+		pc = GemRB.GameGetSelectedPCSingle ()
+		GemRB.SetPlayerSound (pc, CharSound)
+		VoiceSet = GemRB.GetPlayerSound (pc, 1)
+	else:
+		VoiceSet = CharSound
 	tmp = SoundIndex
-	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
+	while (not GemRB.HasResource (VoiceSet + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 		if SoundIndex == tmp:
 			break
 	else:
 		NextSound()
-	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 5)
+	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], 0, 0, 5)
 	return
 
 def NextSound():
@@ -1548,7 +1569,11 @@ def OpenBiographyEditWindow ():
 	if BioStrRef != 33347:
 		Changed = 1
 
-	SubCustomizeWindow = GemRB.LoadWindow (23)
+	# TODO: check if this is really needed
+	if GUICommon.GameIsIWD1():
+		SubCustomizeWindow = GemRB.LoadWindow (51)
+	else:
+		SubCustomizeWindow = GemRB.LoadWindow (23)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
 	ClearButton.SetText (34881)
