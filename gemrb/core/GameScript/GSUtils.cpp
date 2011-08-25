@@ -2300,10 +2300,11 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 }
 
 inline static bool InterruptSpellcasting(Scriptable* Sender) {
+	if (Sender->Type != ST_ACTOR) return false;
+	Actor *caster = (Actor *) Sender;
+
 	// ouch, we got hit
 	if (Sender->InterruptCasting) {
-		if (Sender->Type != ST_ACTOR) return false;
-		Actor *caster = (Actor *) Sender;
 		int roll = 0;
 
 		// iwd2 does an extra concentration check first:
@@ -2344,6 +2345,9 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 				SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
 				if (seh && seh->Target != TARGET_DEAD) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+					if (caster->InParty) {
+						core->Autopause(AP_NOTARGET);
+					}
 					return true;
 				}
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
