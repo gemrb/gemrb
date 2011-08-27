@@ -20,7 +20,11 @@
 import GemRB
 import GUICommon
 
-import os
+try:
+	import os
+except ImportError:
+	print "No os module, skipping test"
+	os = None
 
 StartWindow = 0
 
@@ -33,7 +37,7 @@ def OnLoad():
 	global StartWindow, skip_videos
 
 	# check if we're just running the game-entering test
-	if os.getenv('GEMRB_TEST', "0") != "0":
+	if os and os.getenv('GEMRB_TEST', "0") != "0":
 		import threading
 		print "\nStarting game test"
 		GemRB.LoadGame(None)
