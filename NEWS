@@ -1,19 +1,23 @@
-GemRB git (755c731276e):
+GemRB git (a91895bd3a7):
   New features:
     - 
-    - aura pollution and cleansing
+    - backstab on condition (like in ToBEx)
+    - aura pollution and cleansing, casting interruption
     - fatigue
 
   Improved features:
     - 
+    - effects, triggers, actions
+    - keyboard shortcuts (F1-F12), touchscreen ui
     - hitpoint gain, thieving skill boni
     - combat, spellcasting
-    - PST inventory
-    - various PST spells
+    - PST inventory, PST spells
     - bugfixes
 
   Applied patches:
     manpage typo fixes from c-korn #3377098
+    pst spell learning fix from Viktor Novotný
+    touchscreen fix from Beholder
 
 GemRB V0.6.5 (2011-07-24):
   New features:
