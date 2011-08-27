@@ -1080,8 +1080,7 @@ def CloseCustomizeWindow ():
 	return
 
 def OpenPortraitSelectWindow ():
-	global SubCustomizeWindow
-	global PortraitButton
+	global SubCustomizeWindow, PortraitPictureButton
 	global Gender, LastPortrait
 
 	SubCustomizeWindow = GemRB.LoadWindow (18)
@@ -1090,30 +1089,34 @@ def OpenPortraitSelectWindow ():
 	PortraitName = GemRB.GetPlayerPortrait (pc, 0)
 	LastPortrait = PortraitsTable.GetRowIndex (PortraitName[0:len(PortraitName)-1])
 
-	PortraitButton = SubCustomizeWindow.GetControl (0)
-	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
+	PortraitPictureButton = SubCustomizeWindow.GetControl (0)
+	PortraitPictureButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	PortraitPictureButton.SetState (IE_GUI_BUTTON_LOCKED)
 
-	LeftButton = SubCustomizeWindow.GetControl (1)
-	RightButton = SubCustomizeWindow.GetControl (2)
+	PortraitLeftButton = SubCustomizeWindow.GetControl (1)
+	PortraitLeftButton.SetState (IE_GUI_BUTTON_ENABLED)
+	PortraitLeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitLeftPress)
 
-	DoneButton = SubCustomizeWindow.GetControl (3)
-	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	PortraitRightButton = SubCustomizeWindow.GetControl (2)
+	PortraitRightButton.SetState (IE_GUI_BUTTON_ENABLED)
+	PortraitRightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitRightPress)
 
-	CancelButton = SubCustomizeWindow.GetControl (4)
-	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	PortraitDoneButton = SubCustomizeWindow.GetControl (3)
+	PortraitDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+	PortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitDonePress)
+	PortraitDoneButton.SetText (11973)
+	PortraitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	CustomPortraitButton = SubCustomizeWindow.GetControl (5)
-	CustomPortraitButton.SetText (17545)
+	PortraitCancelButton = SubCustomizeWindow.GetControl (4)
+	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
+	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	PortraitCancelButton.SetText (13727)
+	PortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitLeftPress)
-	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitRightPress)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitDonePress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
-	CustomPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenCustomPortraitWindow)
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	PortraitCustomButton = SubCustomizeWindow.GetControl (5)
+	PortraitCustomButton.SetState (IE_GUI_BUTTON_ENABLED)
+	PortraitCustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenCustomPortraitWindow)
+	PortraitCustomButton.SetText (17545)
 
 	while True:
 		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
@@ -1121,6 +1124,7 @@ def OpenPortraitSelectWindow ():
 			break
 		LastPortrait = LastPortrait + 1
 
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def PortraitDonePress ():
@@ -1165,7 +1169,7 @@ def UpdatePortrait ():
 		PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
 	else:
 		PortraitName = PortraitsTable.GetRowName (LastPortrait)+"G"
-	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
+	PortraitPictureButton.SetPicture (PortraitName, "NOPORTLG")
 	return
 
 def OpenCustomPortraitWindow ():
@@ -1175,20 +1179,23 @@ def OpenCustomPortraitWindow ():
 
 	SubSubCustomizeWindow = GemRB.LoadWindow (19)
 
-	SmallPortraitButton = SubSubCustomizeWindow.GetControl (1)
-	SmallPortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	CustomPortraitDoneButton = SubSubCustomizeWindow.GetControl (10)
+	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+	CustomPortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPortraitDonePress)
+	CustomPortraitDoneButton.SetText (11973)
+	CustomPortraitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	LargePortraitButton = SubSubCustomizeWindow.GetControl (0)
-	LargePortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	CustomPortraitCancelButton = SubSubCustomizeWindow.GetControl (11)
+	CustomPortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
+	CustomPortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubSubCustomizeWindow)
+	CustomPortraitCancelButton.SetText (13727)
+	CustomPortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	DoneButton = SubSubCustomizeWindow.GetControl (10)
-	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-
-	CancelButton = SubSubCustomizeWindow.GetControl (11)
-	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	if not GUICommon.GameIsIWD1():
+		SmallPortraitButton = SubSubCustomizeWindow.GetControl (1)
+		SmallPortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+		LargePortraitButton = SubSubCustomizeWindow.GetControl (0)
+		LargePortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
 	# Portrait List Large
 	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
@@ -1203,9 +1210,6 @@ def OpenCustomPortraitWindow ():
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, SmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
-
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPortraitDonePress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubSubCustomizeWindow)
 
 	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1348,7 +1352,7 @@ def NextSound():
 def OpenColorWindow ():
 	global SubCustomizeWindow
 	global PortraitWindow
-	global PortraitButton
+	global PaperdollButton
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 
@@ -1359,9 +1363,9 @@ def OpenColorWindow ():
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	SubCustomizeWindow = GemRB.LoadWindow (21)
 
-	PortraitButton = SubCustomizeWindow.GetControl (0)
-	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
+	PaperdollButton = SubCustomizeWindow.GetControl (0)
+	PaperdollButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	PaperdollButton.SetState (IE_GUI_BUTTON_LOCKED)
 
 	HairButton = SubCustomizeWindow.GetControl (3)
 	SkinButton = SubCustomizeWindow.GetControl (4)
@@ -1405,7 +1409,7 @@ def UpdatePaperDoll ():
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	HairButton.SetBAM ("COLGRAD", 0, 0, HairColor&0xff)
-	PortraitButton.SetPLT (GUICommon.GetActorPaperDoll (pc),
+	PaperdollButton.SetPLT (GUICommon.GetActorPaperDoll (pc),
 		Color1, MinorColor, MajorColor, SkinColor, Color5, Color6, HairColor, 0, 0)
 	return
 
@@ -1635,6 +1639,8 @@ def CloseSubCustomizeWindow ():
 	if SubCustomizeWindow:
 		SubCustomizeWindow.Unload ()
 		SubCustomizeWindow = None
+
+	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CloseSubSubCustomizeWindow ():
