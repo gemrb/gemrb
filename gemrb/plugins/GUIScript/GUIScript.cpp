@@ -7574,7 +7574,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	memset(&anim,0,sizeof(anim));
 
 	if (!PyArg_ParseTuple( args, "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height)) {
-		return AttributeError( GemRB_CreateItem__doc );
+		return AttributeError( GemRB_SetMapAnimation__doc );
 	}
 
 	GET_GAME();
