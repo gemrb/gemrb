@@ -177,12 +177,19 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 		Learnable.append (SpellName)
 	return Learnable
 
+# there is no separate druid spell table in the originals
+#FIXME: try to do this in a non-hard way?
+def GetPriestSpellTable(tablename):
+	if not GemRB.HasResource (tablename, RES_2DA):
+		if tablename == "MXSPLDRU":
+			return "MXSPLPRS"
+	return tablename
+
 def SetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
-	#FIXME: try to do this in a non-hard way?
-	if not GemRB.HasResource (TableName, RES_2DA):
-		if TableName == "MXSPLDRU":
-			SetupSpellLevels (pc, "MXSPLPRS", Type, Level)
+	tmp = GetPriestSpellTable(TableName)
+	if tmp != TableName:
+		SetupSpellLevels (pc, tmp, Type, Level)
 		return
 
 	Table = GemRB.LoadTable (TableName)
@@ -200,10 +207,9 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 
 def UnsetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
-	#FIXME: try to do this in a non-hard way?
-	if not GemRB.HasResource (TableName, RES_2DA):
-		if TableName == "MXSPLDRU":
-			UnsetupSpellLevels (pc, "MXSPLPRS", Type, Level)
+	tmp = GetPriestSpellTable(TableName)
+	if tmp != TableName:
+		UnsetupSpellLevels (pc, tmp, Type, Level)
 		return
 
 	Table = GemRB.LoadTable (TableName)
