@@ -23,7 +23,7 @@
 ###################################################
 
 import GemRB
-
+import GUICommon
 ###################################################
 
 PortraitCount = 0
@@ -46,8 +46,11 @@ def Init (PortraitGender):
 def Set (PortraitName):
 	global PortraitCount
 
-	# removes l or s character at the end
-	PortraitName = PortraitName.rstrip ("[ls]")
+	# removes the size marking character at the end
+	if GUICommon.GameIsBG2():
+		PortraitName = PortraitName.rstrip ("[ms]")
+	else:
+		PortraitName = PortraitName.rstrip ("[ls]")
 	
 	# capitalize PortraitName
 	PortraitName = PortraitName.upper ()

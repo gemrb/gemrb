@@ -26,7 +26,6 @@ from ie_restype import RES_CHU, RES_2DA, RES_WMP, RES_ARE
 from ie_spells import LS_MEMO, LSR_KNOWN, LSR_LEVEL, LSR_STAT
 from GUIDefines import *
 from ie_stats import *
-from ie_action import ACT_QSLOT1, ACT_QSLOT2, ACT_QSLOT3, ACT_QSLOT4, ACT_QSLOT5
 from ie_slots import SLOT_ALL
 
 OtherWindowFn = None
@@ -177,12 +176,19 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 		Learnable.append (SpellName)
 	return Learnable
 
+# there is no separate druid spell table in the originals
+#FIXME: try to do this in a non-hard way?
+def GetPriestSpellTable(tablename):
+	if not GemRB.HasResource (tablename, RES_2DA):
+		if tablename == "MXSPLDRU":
+			return "MXSPLPRS"
+	return tablename
+
 def SetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
-	#FIXME: try to do this in a non-hard way?
-	if not GemRB.HasResource (TableName, RES_2DA):
-		if TableName == "MXSPLDRU":
-			SetupSpellLevels (pc, "MXSPLPRS", Type, Level)
+	tmp = GetPriestSpellTable(TableName)
+	if tmp != TableName:
+		SetupSpellLevels (pc, tmp, Type, Level)
 		return
 
 	Table = GemRB.LoadTable (TableName)
@@ -200,10 +206,9 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 
 def UnsetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
-	#FIXME: try to do this in a non-hard way?
-	if not GemRB.HasResource (TableName, RES_2DA):
-		if TableName == "MXSPLDRU":
-			UnsetupSpellLevels (pc, "MXSPLPRS", Type, Level)
+	tmp = GetPriestSpellTable(TableName)
+	if tmp != TableName:
+		UnsetupSpellLevels (pc, tmp, Type, Level)
 		return
 
 	Table = GemRB.LoadTable (TableName)
@@ -827,8 +832,11 @@ def CanDualClass(actor):
 		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 0)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 
-	# a lookup table for the DualClassTable columns
-	classes = [ "FIGHTER", "CLERIC", "MAGE", "THIEF", "DRUID", "RANGER" ]
+	# create a lookup table for the DualClassTable columns
+	classes = []
+	for col in range(DualClassTable.GetColumnCount()):
+		classes.append(DualClassTable.GetColumnName(col))
+
 	matches = []
 	Sum = 0
 	for col in range (0, DualClassTable.GetColumnCount ()):

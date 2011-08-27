@@ -24,7 +24,7 @@
 
 import GemRB
 from GUIDefines import *
-from ie_stats import IE_MAXHITPOINTS, IE_STATE_ID, IE_HITPOINTS, STATE_DEAD
+from ie_stats import IE_STATE_ID, STATE_DEAD
 from ie_modal import *
 from ie_action import *
 import GUICommon
