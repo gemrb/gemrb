@@ -726,7 +726,7 @@ public:
 	void UseExit(ieDword exitID);
 	//int GetReaction() const;
 	/* Similar to Roll, but takes luck into account */
-	int LuckyRoll(int dice, int size, int add, ieDword flags=1, Actor* opponent=NULL) const;
+	int LuckyRoll(int dice, int size, int add, ieDword flags=LR_CRITICAL, Actor* opponent=NULL) const;
 	/* removes normal invisibility (type 0) */
 	void CureInvisibility();
 	/* removes sanctuary */
