@@ -827,8 +827,11 @@ def CanDualClass(actor):
 		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 0)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 
-	# a lookup table for the DualClassTable columns
-	classes = [ "FIGHTER", "CLERIC", "MAGE", "THIEF", "DRUID", "RANGER" ]
+	# create a lookup table for the DualClassTable columns
+	classes = []
+	for col in range(DualClassTable.GetColumnCount()):
+		classes.append(DualClassTable.GetColumnName(col))
+
 	matches = []
 	Sum = 0
 	for col in range (0, DualClassTable.GetColumnCount ()):
