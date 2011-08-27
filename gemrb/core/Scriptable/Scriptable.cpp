@@ -852,54 +852,28 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		// caster - Casts spellname : target OR
 		// caster - spellname : target (repeating spells)
 		Scriptable *target = NULL;
-		char tmp[100];
-		const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-		const char* spell = core->GetString(spl->SpellName);
 		if (tgt) {
 			target = area->GetActorByGlobalID(tgt);
 			if (!target) {
 				target=core->GetGame()->GetActorByGlobalID(tgt);
 			}
 		}
+		char* spell = core->GetString(spl->SpellName);
 		if (stricmp(spell, "")) {
+			char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			char *tmp;
 			if (target) {
-				snprintf(tmp, sizeof(tmp), "%s %s : %s", msg, spell, target->GetName(-1));
+				tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+4);
+				sprintf(tmp, "%s %s : %s", msg, spell, target->GetName(-1));
 			} else {
-				snprintf(tmp, sizeof(tmp), "%s : %s", spell, GetName(-1));
+				tmp = (char *) malloc(strlen(msg)+strlen(spell)+4);
+				sprintf(tmp, "%s : %s", spell, GetName(-1));
 			}
 			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
+			core->FreeString(msg);
+			free(tmp);
 		}
-/*
-		if (tgt) {
-			if (target && (Type==ST_ACTOR) ) {
-				target->AddTrigger(TriggerEntry(trigger_spellcastonme, caster->GetGlobalID(), spellnum));
-				target->LastSpellOnMe = spellnum;
-				// don't cure invisibility if this is a self targetting invisibility spell
-				// like shadow door
-				//can't check GetEffectBlock, since it doesn't construct the queue for selftargetting spells
-				bool invis = false;
-				unsigned int opcode = EffectQueue::ResolveEffect(fx_set_invisible_state_ref);
-				SPLExtHeader *seh = spl->GetExtHeader(SpellHeader);
-				if (seh) {
-					for (unsigned int i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i].Opcode == opcode) {
-							invis = true;
-							break;
-						}
-					}
-				}
-				if (invis && seh && seh->Target == TARGET_SELF) {
-					//pass
-				} else {
-					caster->CureInvisibility();
-				}
-				// sanctuary ends with all hostile actions or when the caster targets someone else
-				if (target != this || spl->Flags & SF_HOSTILE) {
-					caster->CureSanctuary();
-				}
-			}
-		}
-*/
+		core->FreeString(spell);
 	}
 	core->Autopause(AP_SPELLCAST);
 
@@ -1196,11 +1170,18 @@ int Scriptable::SpellCast(bool instant)
 // 1. the spell is cast normally (score of 100 or more)
 // 2. one or more wild surges happen and something else is cast
 // 2.1. this can loop, since some surges cause rerolls
+static EffectRef fx_chaosshield_ref = { "ChaosShieldModifier", -1 };
+
 int Scriptable::CheckWildSurge()
 {
-	if (Type != ST_ACTOR || core->HasFeature(GF_3ED_RULES)) {
+	//no need to check for 3rd ed rules, because surgemod or forcesurge need to be nonzero to get a surge
+	if (Type != ST_ACTOR) {
 		return 1;
 	}
+	if (core->InCutSceneMode()) {
+		return 1;
+	}
+
 	Actor *caster = (Actor *) this;
 
 	int roll = core->Roll(1, 100, 0);
@@ -1209,14 +1190,28 @@ int Scriptable::CheckWildSurge()
 		memcpy(OldSpellResRef, SpellResRef, sizeof(OldSpellResRef));
 		Spell *spl = gamedata->GetSpell( OldSpellResRef ); // this was checked before we got here
 		// ignore non-magic "spells"
-		if (!(spl->Flags&SF_HLA)) {
+		if (!(spl->Flags&(SF_HLA|SF_TRIGGER) )) {
 			int check = roll + caster->GetCasterLevel(spl->SpellType) + caster->Modified[IE_SURGEMOD];
+			if (caster->Modified[IE_CHAOSSHIELD]) {
+				//avert the surge and decrease the chaos shield counter
+				//FIXME: if 0 is also good, use that
+				check = 100;
+				caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
+				displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,DMC_LIGHTGREY,caster);
+			}
+
 			// hundred or more means a normal cast
-			if (check < 100) {
+			//FIXME: what happens if check is 0
+			if (check && (check < 100) ) {
 				// display feedback: Wild Surge: bla bla
-				char text[200];
-				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
-				displaymsg->DisplayStringName(text, DMC_WHITE, this);
+				char *s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+				char *s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+				char *s3 = (char *) malloc(strlen(s1)+strlen(s2)+2);
+				sprintf(s3, "%s %s", s1, s2);
+				core->FreeString(s1);
+				core->FreeString(s2);
+				displaymsg->DisplayStringName(s3, DMC_WHITE, this);
+				free(s3);
 
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;
