@@ -39,7 +39,6 @@ import GUIINV
 import GUIOPT
 import GUIPR
 import GUIREC
-import Maze
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1

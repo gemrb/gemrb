@@ -27,7 +27,6 @@ from GUIDefines import *
 from ie_restype import *
 import GUICommon
 import GUICommonWindows
-import GUIClasses
 import MessageWindow
 import CommonWindow
 

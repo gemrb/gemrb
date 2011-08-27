@@ -26,8 +26,6 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
-from GUIClasses import GWindow
-import GUICommonWindows
 import MessageWindow
 import CommonWindow
 

@@ -24,7 +24,6 @@
 ###################################################
 
 import GemRB
-import GUIClasses
 import GUICommon
 import GUICommonWindows
 import CommonWindow

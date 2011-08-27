@@ -37,7 +37,6 @@ import GUISPL
 import GUIREC
 import LUCommon
 import InventoryCommon
-import LoadScreen
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
