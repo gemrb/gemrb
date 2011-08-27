@@ -5092,8 +5092,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	int resisted = 0;
 
 	if (hittingheader->DiceThrown<256) {
-		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, LR_DAMAGELUCK);
-		damage += DamageBonus;
+		if (Modified[IE_LUCK] > Modified[IE_DAMAGELUCK]) {
+			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, 0);
+		} else {
+			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
+		}
 		print("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	} else {
 		print("| No Damage");
