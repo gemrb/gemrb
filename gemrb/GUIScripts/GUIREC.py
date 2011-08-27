@@ -48,7 +48,6 @@ ExportWindow = None
 KitInfoWindow = None
 ExportDoneButton = None
 ExportFileName = ""
-PortraitsTable = None
 ScriptsTable = None
 ColorTable = None
 ColorIndex = None
@@ -1011,7 +1010,7 @@ def KitDonePress():
 
 def OpenCustomizeWindow ():
 	global CustomizeWindow
-	global PortraitsTable, ScriptsTable, ColorTable
+	global ScriptsTable, ColorTable
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
@@ -1019,7 +1018,6 @@ def OpenCustomizeWindow ():
 	else:
 		Exportable = 0
 
-	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
 	ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	CustomizeWindow = GemRB.LoadWindow (17)
