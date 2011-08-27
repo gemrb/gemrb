@@ -23,7 +23,8 @@
 import GemRB
 import GUICommon
 import CommonTables
-import GUICommonWindows
+if GUICommon.GameIsIWD1(): #TODO: check if bg2 is now fine with this too, maybe there are no ordering issues left
+	import GUICommonWindows
 import LUCommon
 import LevelUp
 import GUIWORLD
@@ -67,8 +68,16 @@ else:
 		'3', '4', '5', '6', '7', '8', '9']
 SoundIndex = 0
 
+if GUICommon.GameIsBG2():
+	PortraitNameSuffix = "L"
+else:
+	PortraitNameSuffix = "G"
+
 ###################################################
 def OpenRecordsWindow ():
+	if not GUICommon.GameIsIWD1():
+		import GUICommonWindows
+
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -1123,26 +1132,30 @@ def OpenPortraitSelectWindow ():
 	# initialize and set portrait
 	Portrait.Init (PcGender)
 	Portrait.Set (PcPortrait)
-	PortraitPictureButton.SetPicture (Portrait.Name () + "G")
+	PortraitPictureButton.SetPicture (Portrait.Name () + PortraitNameSuffix, "NOPORTLG")
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def PortraitDonePress ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	# eh, different sizes
+	if GUICommon.GameIsBG2():
+		GemRB.FillPlayerInfo (pc, Portrait.Name () + "M", Portrait.Name () + "S")
+	else:
+		GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
+	CloseSubCustomizeWindow ()
 	return
 
 def PortraitLeftPress ():
 	global PortraitPictureButton
 
-	PortraitPictureButton.SetPicture (Portrait.Previous () + "G")
+	PortraitPictureButton.SetPicture (Portrait.Previous () + PortraitNameSuffix, "NOPORTLG")
 
 def PortraitRightPress ():
 	global PortraitPictureButton
 
-	PortraitPictureButton.SetPicture (Portrait.Next () + "G" )
-
-def PortraitDonePress ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
-	CloseSubCustomizeWindow ()
-	return
+	PortraitPictureButton.SetPicture (Portrait.Next () + PortraitNameSuffix, "NOPORTLG")
 
 def OpenCustomPortraitWindow ():
 	global SubSubCustomizeWindow

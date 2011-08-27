@@ -23,10 +23,13 @@
 import GemRB
 import GUICommon
 import CommonTables
+if GUICommon.GameIsIWD1(): #TODO: check if bg2 is now fine with this too, maybe there are no ordering issues left
+	import GUICommonWindows
 import LUCommon
 import LevelUp
 import GUIWORLD
 import DualClass
+import Portrait
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
@@ -64,9 +67,15 @@ else:
 		'3', '4', '5', '6', '7', '8', '9']
 SoundIndex = 0
 
+if GUICommon.GameIsBG2():
+	PortraitNameSuffix = "L"
+else:
+	PortraitNameSuffix = "G"
+
 ###################################################
 def OpenRecordsWindow ():
-	import GUICommonWindows
+	if not GUICommon.GameIsIWD1():
+		import GUICommonWindows
 
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
@@ -1081,13 +1090,8 @@ def CloseCustomizeWindow ():
 
 def OpenPortraitSelectWindow ():
 	global SubCustomizeWindow, PortraitPictureButton
-	global Gender, LastPortrait
 
 	SubCustomizeWindow = GemRB.LoadWindow (18)
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Gender = GemRB.GetPlayerStat (pc, IE_SEX, 1)
-	PortraitName = GemRB.GetPlayerPortrait (pc, 0)
-	LastPortrait = PortraitsTable.GetRowIndex (PortraitName[0:len(PortraitName)-1])
 
 	PortraitPictureButton = SubCustomizeWindow.GetControl (0)
 	PortraitPictureButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -1118,59 +1122,38 @@ def OpenPortraitSelectWindow ():
 	PortraitCustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenCustomPortraitWindow)
 	PortraitCustomButton.SetText (17545)
 
-	while True:
-		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			UpdatePortrait ()
-			break
-		LastPortrait = LastPortrait + 1
+	# get players gender and portrait
+	Pc = GemRB.GameGetSelectedPCSingle ()
+	PcGender = GemRB.GetPlayerStat (Pc, IE_SEX)
+	PcPortrait = GemRB.GetPlayerPortrait(Pc,0)
+
+	# initialize and set portrait
+	Portrait.Init (PcGender)
+	Portrait.Set (PcPortrait)
+	PortraitPictureButton.SetPicture (Portrait.Name () + PortraitNameSuffix, "NOPORTLG")
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def PortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Name = PortraitsTable.GetRowName (LastPortrait)
 	# eh, different sizes
 	if GUICommon.GameIsBG2():
-		GemRB.FillPlayerInfo (pc, Name + "M", Name + "S")
+		GemRB.FillPlayerInfo (pc, Portrait.Name () + "M", Portrait.Name () + "S")
 	else:
-		GemRB.FillPlayerInfo (pc, Name + "L", Name + "S")
+		GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
 	CloseSubCustomizeWindow ()
 	return
 
-def PortraitRightPress():
-	global LastPortrait
+def PortraitLeftPress ():
+	global PortraitPictureButton
 
-	while True:
-		LastPortrait = LastPortrait + 1
-		if LastPortrait >= PortraitsTable.GetRowCount ():
-			LastPortrait = 0
-		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			UpdatePortrait ()
-			return
+	PortraitPictureButton.SetPicture (Portrait.Previous () + PortraitNameSuffix, "NOPORTLG")
 
-	return
+def PortraitRightPress ():
+	global PortraitPictureButton
 
-def PortraitLeftPress():
-	global LastPortrait
-
-	while True:
-		LastPortrait = LastPortrait - 1
-		if LastPortrait < 0:
-			LastPortrait = PortraitsTable.GetRowCount ()-1
-		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			UpdatePortrait ()
-			return
-
-	return
-
-def UpdatePortrait ():
-	if GUICommon.GameIsBG2():
-		PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
-	else:
-		PortraitName = PortraitsTable.GetRowName (LastPortrait)+"G"
-	PortraitPictureButton.SetPicture (PortraitName, "NOPORTLG")
-	return
+	PortraitPictureButton.SetPicture (Portrait.Next () + PortraitNameSuffix, "NOPORTLG")
 
 def OpenCustomPortraitWindow ():
 	global SubSubCustomizeWindow
