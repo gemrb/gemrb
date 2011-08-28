@@ -5013,7 +5013,7 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-	game->RestParty(REST_NOAREA|REST_NOMOVE|REST_NOCRITTER, parameters->int0Parameter, parameters->int1Parameter);
+	game->RestParty(REST_NOAREA|REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5043,9 +5043,10 @@ void GameScript::RestNoSpells(Scriptable* Sender, Action* /*parameters*/)
 	actor->fxqueue.RemoveExpiredEffects(0xffffffff);
 }
 
-//this is most likely advances time
+//this most likely advances time and heals whole party
 void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
 {
+/*
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
@@ -5053,6 +5054,9 @@ void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
 	actor->Heal(1);
 	//not sure if this should remove timed effects
 	//more like execute them hour by hour :>
+*/
+	game->RestParty(REST_NOSCATTER, 0, 0);
+	Sender->ReleaseCurrentAction();
 }
 
 //iwd2
