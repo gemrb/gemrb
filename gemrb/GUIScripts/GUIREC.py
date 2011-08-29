@@ -73,7 +73,7 @@ else:
 
 ###################################################
 def OpenRecordsWindow ():
-	if not GUICommon.GameIsIWD1():
+	if GUICommon.GameIsIWD1():
 		import GUICommonWindows
 
 	global RecordsWindow, OptionsWindow, PortraitWindow
