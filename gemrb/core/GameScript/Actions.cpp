@@ -5055,7 +5055,7 @@ void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
 	//not sure if this should remove timed effects
 	//more like execute them hour by hour :>
 */
-	game->RestParty(REST_NOSCATTER, 0, 0);
+	core->GetGame()->RestParty(REST_NOSCATTER, 0, 0);
 	Sender->ReleaseCurrentAction();
 }
 
