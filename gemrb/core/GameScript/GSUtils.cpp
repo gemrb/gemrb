@@ -2350,6 +2350,7 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 						if (caster->InParty) {
 							core->Autopause(AP_NOTARGET);
 						}
+						caster->SetStance(IE_ANI_READY);
 						return true;
 					}
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
