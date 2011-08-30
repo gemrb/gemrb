@@ -23,8 +23,6 @@
 import GemRB
 import GUICommon
 import CommonTables
-if GUICommon.GameIsIWD1(): #TODO: check if bg2 is now fine with this too, maybe there are no ordering issues left
-	import GUICommonWindows
 import LUCommon
 import LevelUp
 import GUIWORLD
@@ -73,8 +71,7 @@ else:
 
 ###################################################
 def OpenRecordsWindow ():
-	if GUICommon.GameIsIWD1():
-		import GUICommonWindows
+	import GUICommonWindows
 
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
