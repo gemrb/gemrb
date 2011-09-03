@@ -2338,7 +2338,7 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastTarget);
 		if (target) {
 			ieDword state = target->GetStat(IE_STATE_ID);
-			if (state & STATE_INVISIBLE) {
+			if ((state & STATE_INVISIBLE) && !caster->Modified[IE_SEEINVISIBLE]) {
 				return true;
 			} else if (state & STATE_DEAD) {
 				if (state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
