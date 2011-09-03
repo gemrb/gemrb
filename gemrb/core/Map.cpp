@@ -339,6 +339,7 @@ Map::Map(void)
 	MasterArea = core->GetGame()->MasterArea(scriptName);
 	Background = NULL;
 	BgDuration = 0;
+	LastGoCloser = 0;
 }
 
 Map::~Map(void)
@@ -476,9 +477,6 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 
 		//perform autosave
 		core->GetSaveGameIterator()->CreateSaveGame(0, false);
-/*
-		core->GetGameControl()->AutoSave();
-*/
 	}
 	Map* map = game->GetMap(area, false);
 	if (!map) {
@@ -568,7 +566,10 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	int EveryOne = ip->CheckTravel(actor);
 	switch(EveryOne) {
 	case CT_GO_CLOSER:
-		displaymsg->DisplayConstantString(STR_WHOLEPARTY, DMC_WHITE); //white
+		if (LastGoCloser<game->Ticks) {
+			displaymsg->DisplayConstantString(STR_WHOLEPARTY, DMC_WHITE); //white
+			LastGoCloser = game->Ticks+6000;
+		}
 		if (game->EveryoneStopped()) {
 			ip->Flags&=~TRAP_RESET; //exit triggered
 		}

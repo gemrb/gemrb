@@ -249,6 +249,7 @@ public:
 	ieResRef Dream[2];
 	Sprite2D *Background;
 	ieDword BgDuration;
+	ieDword LastGoCloser;
 
 private:
 	ieStrRef trackString;

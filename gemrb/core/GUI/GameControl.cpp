@@ -1794,8 +1794,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-			// exit usage is handled by caller for now
-			// actor->UseExit(trap->GetGlobalID());
+			//clear the go closer flag
+			trap->GetCurrentArea()->LastGoCloser = 0;
 			return false;
 		case ST_TRIGGER:
 			//the importer shouldn't load the script
