@@ -896,7 +896,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 		if (!actor->Immobile()) {
 			no_more_steps = actor->DoStep( speed, time );
 			if (actor->BlocksSearchMap()) {
-				BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+				BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 			}
 		}
 	}
@@ -914,7 +914,7 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	int i=0;
 	while(nearActors[i]!=NULL) {
 		if(nearActors[i]!=actor && nearActors[i]->BlocksSearchMap())
-			BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+			BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		++i;
 	}
 	free(nearActors);
@@ -2122,7 +2122,7 @@ bool Map::CanFree()
 {
 	size_t i=actors.size();
 	while (i--) {
-		if (actors[i]->InParty) {
+		if (actors[i]->IsPartyMember()) {
 			return false;
 		}
 

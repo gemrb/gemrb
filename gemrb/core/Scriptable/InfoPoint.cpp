@@ -72,15 +72,16 @@ void InfoPoint::SetEnter(const char *resref)
 int InfoPoint::CheckTravel(Actor *actor)
 {
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
-	if (!actor->InParty && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
-	if (actor->InParty && (Flags&TRAVEL_PARTY) ) {
+	bool pm = actor->IsPartyMember();
+	if (!pm && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
+	if (pm && (Flags&TRAVEL_PARTY) ) {
 		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;
 		}
 		return CT_GO_CLOSER;
 	}
-	if(actor->IsSelected() ) {
-		if(core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) ) {
+	if (actor->IsSelected() ) {
+		if (core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) ) {
 			return CT_MOVE_SELECTED;
 		}
 		return CT_SELECTED;
