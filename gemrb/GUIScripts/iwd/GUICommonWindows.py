@@ -547,7 +547,8 @@ def SpellPressed ():
 		#if spell has no target, return
 		#otherwise continue with casting
 		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type, 1)
-		if Target == 5:
+		#sabotage the immediate casting of self targeting spells
+		if Target == 5 or Target == 7:
 			Type = -1
 			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 

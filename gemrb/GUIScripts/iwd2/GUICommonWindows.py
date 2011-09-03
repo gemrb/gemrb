@@ -118,20 +118,20 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	return
 
 def AIPress ():
-        """Toggles the party AI."""
+	"""Toggles the party AI."""
 
-        Button = PortraitWindow.GetControl (6)
-        AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
+	Button = PortraitWindow.GetControl (6)
+	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
-        if AI:
-                GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
-                Button.SetTooltip (15918)
-                GemRB.SetVar ("AI", 0)
-        else:
-                GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
-                Button.SetTooltip (15917)
-                GemRB.SetVar ("AI", GS_PARTYAI)
-        return
+	if AI:
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
+		Button.SetTooltip (15918)
+		GemRB.SetVar ("AI", 0)
+	else:
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
+		Button.SetTooltip (15917)
+		GemRB.SetVar ("AI", GS_PARTYAI)
+	return
 
 def EmptyControls ():
 	global PortraitWindow
@@ -395,8 +395,26 @@ def SpellPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
+	slot = GemRB.GetVar ("QSpell")
+	if slot>=0:
+		#setup quickspell slot
+		#if spell has no target, return
+		#otherwise continue with casting
+		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type, 1)
+		# sabotage the immediate casting of self targeting spells
+		if Target == 5 or Target == 7:
+			Type = -1
+			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
+
+	if Type==-1:
+		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell, 1)
-	GemRB.SetVar ("ActionLevel", 0)
+	if GemRB.GetVar ("Type")!=-1:
+		GemRB.SetVar ("ActionLevel", 0)
+		#init spell list
+		GemRB.SpellCast (pc, -1, 0, 1)
+	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
 
