@@ -7596,3 +7596,9 @@ int Actor::GetSkillBonus(unsigned int col) const
 	}
 	return bonus;
 }
+
+bool Actor::IsPartyMember() const
+{
+	if (Modified[IE_EA]<=EA_FAMILIAR) return true;
+	return InParty;
+}

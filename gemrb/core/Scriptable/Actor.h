@@ -754,5 +754,7 @@ public:
 	int GetClassMask() const;
 	/* computes the thieving skill bonus from race and dexterity */
 	int GetSkillBonus(unsigned int col) const;
+	/* returns true for party members (and familiars) */
+	bool IsPartyMember() const;
 };
 #endif
