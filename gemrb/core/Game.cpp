@@ -98,6 +98,33 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		}
 	}
 
+	//loading npc starting levels
+	ieResRef tn;
+	if (Expansion == 5) { // tob is special
+		strncpy(tn, "npclvl25", sizeof(ieResRef));
+	} else {
+		strncpy(tn, "npclevel", sizeof(ieResRef));
+	}
+	if (table.load(tn)) {
+		int cols = table->GetColumnCount();
+		int rows = table->GetRowCount();
+		int i, j;
+		npclevels.reserve(cols*rows);
+		for (i = 0; i < rows; i++) {
+			npclevels.push_back (std::vector<const char *>());
+			for(j = -1; j < cols; j++) {
+				char *ref = new char[9];
+				if (j == -1) {
+					strncpy(ref, table->GetRowName(i), sizeof(ieResRef));
+					npclevels[i].push_back (ref);
+				} else {
+					strncpy(ref, table->QueryField(i, j), sizeof(ieResRef));
+					npclevels[i].push_back (ref);
+				}
+			}
+		}
+	}
+
 	interval = 1000/AI_UPDATE_TIME;
 	hasInfra = false;
 	familiarBlock = false;
@@ -149,6 +176,11 @@ Game::~Game(void)
 	i=planepositions.size();
 	while(i--) {
 		free (planepositions[i]);
+	}
+
+	i = npclevels.size();
+	while (i--) {
+		npclevels[i].clear();
 	}
 }
 
@@ -790,7 +822,9 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 	for (i = 0; i < NPCs.size(); i++) {
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
-			newMap->AddActor( NPCs[i] );
+			if (!CheckForReplacementActor(i)) {
+				newMap->AddActor( NPCs[i] );
+			} // when it happens, it will be handled by the loop limit reevaluation
 		}
 	}
 	if (hide) {
@@ -802,6 +836,38 @@ failedload:
 		core->UnhideGCWindow();
 	core->LoadProgress(100);
 	return -1;
+}
+
+// check if the actor is in npclevel.2da and replace accordingly
+bool Game::CheckForReplacementActor(int i) {
+	Actor* act = NPCs[i];
+	ieDword level = GetPartyLevel(false) / GetPartySize(false);
+	if (! npclevels.empty() && !(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
+		ieResRef newcre = "****"; // default table value
+		std::vector<std::vector<const char *> >::iterator it;
+		for (it = npclevels.begin(); it != npclevels.end(); it++) {
+			if (!stricmp((*it)[0], act->GetScriptName())) {
+				strncpy(newcre, (*it)[level-2], sizeof(ieResRef));
+				break;
+			}
+		}
+
+		if (stricmp(newcre, "****")) {
+			int pos = gamedata->LoadCreature(newcre, 0, false, act->version);
+			if (pos < 0) {
+				error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!\n");
+			} else {
+				Actor *newact = GetNPC(pos);
+				if (!newact) {
+					error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
+				} else {
+					DelNPC(InStore(act));
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 int Game::AddNPC(Actor* npc)

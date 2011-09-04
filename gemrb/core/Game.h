@@ -239,6 +239,7 @@ private:
 	std::vector< GAMLocationEntry*> savedpositions;
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector< char*> mastarea;
+	std::vector<std::vector< const char*> > npclevels;
 	CRRow *crtable;
 	ieResRef restmovies[8];
 	ieResRef daymovies[8];
@@ -357,6 +358,8 @@ public:
 	Actor* GetNPC(unsigned int Index);
 	void SwapPCs(unsigned int Index1, unsigned int Index2);
 	bool IsDay();
+	/** checks if the actor should be replaced via npclevel.2da and then does it */
+	bool CheckForReplacementActor(int i);
 
 	//journal entries
 	/** Deletes one or all journal entries if strref is -1 */
