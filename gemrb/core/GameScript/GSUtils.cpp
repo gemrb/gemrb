@@ -2338,9 +2338,7 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastTarget);
 		if (target) {
 			ieDword state = target->GetStat(IE_STATE_ID);
-			if ((state & STATE_INVISIBLE) && !caster->Modified[IE_SEEINVISIBLE]) {
-				return true;
-			} else if (state & STATE_DEAD) {
+			if (state & STATE_DEAD) {
 				if (state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
 					Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 					if (!spl) return false;
@@ -2396,6 +2394,11 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
+	Actor *act = NULL;
+	if (Sender->Type==ST_ACTOR) {
+		act = (Actor *) Sender;
+	}
+
 	//parse target
 	int seeflag = 0;
 	unsigned int dist = GetSpellDistance(spellres, Sender);
@@ -2406,12 +2409,13 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
+		if (act) {
+			act->SetStance(IE_ANI_READY);
+		}
 		return;
 	}
 
-	if(Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-
+	if (act) {
 		//move near to target
 		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
 			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
