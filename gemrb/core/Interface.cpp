@@ -616,6 +616,13 @@ void Interface::HandleEvents()
 		gc->UpdateTargetMode();
 		return;
 	}
+
+	if (EventFlag&EF_TEXTSCREEN) {
+		EventFlag&=~EF_TEXTSCREEN;
+		video->SetMouseEnabled(true);
+		guiscript->RunFunction( "TextScreen", "StartTextScreen" );
+		return;
+	}
 }
 
 /* handle main loop events that might destroy or create windows

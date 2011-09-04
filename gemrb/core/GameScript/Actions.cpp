@@ -3476,19 +3476,16 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	}
 }
 
-void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
+void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
 	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter, sizeof(ieResRef)-1);
-	core->GetGUIScriptEngine()->RunFunction( "TextScreen", "StartTextScreen" );
-	core->GetVideoDriver()->SetMouseEnabled(true);
-	Sender->SetWait(1);
-	Sender->ReleaseCurrentAction(); // should this be blocking?
+	core->SetEventFlag(EF_TEXTSCREEN);
 }
 
 void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 {
-	TextScreen(Sender, parameters); // textscreen will release blocking for us
 	core->GetGame()->IncrementChapter();
+	TextScreen(Sender, parameters);
 }
 
 void GameScript::SetCriticalPathObject(Scriptable* Sender, Action* parameters)

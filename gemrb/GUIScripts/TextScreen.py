@@ -50,7 +50,7 @@ def StartTextScreen ():
 			TableName = "CHPTXT"+str(Chapter)
 		ID = 62
 	else:
-		ID = (GemRB.GetGameVar("CHAPTER") + 1) & 0x7fffffff
+		ID = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
 		Chapter = ID + 1
 
 	#iwd2/bg2 has no separate music

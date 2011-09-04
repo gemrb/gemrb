@@ -647,7 +647,7 @@ static const ActionLink actionnames[] = {
 	{"incinternal", GameScript::IncInternal, 0}, //pst
 	{"incrementinternal", GameScript::IncInternal, 0},//iwd
 	{"incmoraleai", GameScript::IncMoraleAI, 0},
-	{"incrementchapter", GameScript::IncrementChapter, AF_BLOCKING},
+	{"incrementchapter", GameScript::IncrementChapter, 0},
 	{"incrementextraproficiency", GameScript::IncrementExtraProficiency, 0},
 	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce", GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
@@ -924,7 +924,7 @@ static const ActionLink actionnames[] = {
 	{"takepartyitemnum", GameScript::TakePartyItemNum, 0},
 	{"takepartyitemrange", GameScript::TakePartyItemRange, 0},
 	{"teleportparty", GameScript::TeleportParty, 0},
-	{"textscreen", GameScript::TextScreen, AF_BLOCKING},
+	{"textscreen", GameScript::TextScreen, 0},
 	{"timedmovetopoint", GameScript::TimedMoveToPoint,AF_BLOCKING|AF_ALIVE},
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
 	{"transformitem", GameScript::TransformItem, 0},
