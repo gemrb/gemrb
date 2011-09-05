@@ -1363,6 +1363,10 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	overContainer = area->TMap->GetContainer( p );
 
 	if (!DrawSelectionRect) {
+		if (FormationRotation) {
+			nextCursor = IE_CURSOR_USE;
+			goto end_function;
+		}
 		if (overDoor) {
 			nextCursor = GetCursorOverDoor(overDoor);
 		}
