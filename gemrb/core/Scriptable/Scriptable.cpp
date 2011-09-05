@@ -2036,7 +2036,7 @@ void Movable::ClearPath()
 	if (StanceID==IE_ANI_WALK || StanceID==IE_ANI_RUN) {
 		StanceID = IE_ANI_AWAKE;
 	}
-	InternalFlags&=~IF_NORECTICLE;
+	InternalFlags&=~IF_NORETICLE;
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;

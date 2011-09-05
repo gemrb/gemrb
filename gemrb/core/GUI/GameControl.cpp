@@ -267,7 +267,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	}
 
 	actor->AddAction( action );
-	// force action so that we get target recticles immediately
+	// force action so that we get target reticles immediately
 	// FIXME
 	actor->ProcessActions();
 }
@@ -348,7 +348,7 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 
 void GameControl::DrawTargetReticle(Point p, int size, bool animate)
 {
-	// recticles are never drawn in cutscenes
+	// reticles are never drawn in cutscenes
 	if (GetScreenFlags()&SF_CUTSCENE)
 		return;
 

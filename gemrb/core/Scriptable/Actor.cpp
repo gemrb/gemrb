@@ -5863,7 +5863,7 @@ void Actor::Draw(const Region &screen)
 			// all
 			drawcircle = markerfeedback >= 6;
 		}
-		drawtarget = (Selected && !(InternalFlags&IF_NORECTICLE) && markerfeedback >= 4 && GetPathLength());
+		drawtarget = (Selected && !(InternalFlags&IF_NORETICLE) && markerfeedback >= 4 && GetPathLength());
 	}
 	if (drawcircle) {
 		DrawCircle(vp);

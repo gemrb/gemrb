@@ -85,12 +85,12 @@ class SpriteCover;
 #define IF_JUSTDIED   2     //Died() will return true
 #define IF_FROMGAME   4     //this is an NPC or PC
 #define IF_REALLYDIED 8     //real death happened, actor will be set to dead
-#define IF_NORECTICLE 16    //draw recticle (target mark)
+#define IF_NORETICLE  16    //draw reticle (target mark)
 #define IF_NOINT      32    //cannot interrupt the actions of this actor (save is not possible!)
 #define IF_CLEANUP    64    //actor died chunky death, or other total destruction
 #define IF_RUNNING    128   //actor is running
 //these bits could be set by a WalkTo
-#define IF_RUNFLAGS   (IF_RUNNING|IF_NORECTICLE|IF_NOINT)
+#define IF_RUNFLAGS   (IF_RUNNING|IF_NORETICLE|IF_NOINT)
 //#define IF_BECAMEVISIBLE 0x100//actor just became visible (trigger event)
 #define IF_INITIALIZED   0x200
 #define IF_USEDSAVE      0x400  //actor needed saving throws
