@@ -1711,6 +1711,8 @@ Movable::~Movable(void)
 int Movable::GetPathLength()
 {
 	PathNode *node = GetNextStep(0);
+	if (!node) return 0;
+
 	int i = 0;
 	while (node->Next) {
 		i++;
