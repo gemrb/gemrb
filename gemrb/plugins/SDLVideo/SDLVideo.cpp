@@ -50,9 +50,6 @@ extern "C" {
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 //touch gestures
-#define N_FING_SCROLL 2
-#define N_FING_KBOARD 3
-#define N_FING_INFO N_FING_SCROLL
 #define MIN_GESTURE_DELTA_PIXELS 10
 #define TOUCH_RC_NUM_TICKS 500
 //---
@@ -65,6 +62,11 @@ SDL_SetPalette( surface, flags, colors, fcolor, ncolors )
 
 SDLVideoDriver::SDLVideoDriver(void)
 {
+#if SDL_VERSION_ATLEAST(1,3,0)
+	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
+	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
+	assert( core->NumFingScroll != core->NumFingKboard );
+#endif
 	CursorIndex = 0;
 	Cursor[0] = NULL;
 	Cursor[1] = NULL;
@@ -505,7 +507,7 @@ int SDLVideoDriver::PollEvents() {
         //For swipes. gestures needing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 			touchHold = false;
 			if (Evnt) {
-				if (numFingers == N_FING_SCROLL || Evnt->GetMouseFocusedControlType() == IE_GUI_TEXTAREA) {//any # of fingers will scroll a text area
+				if (numFingers == core->NumFingScroll || Evnt->GetMouseFocusedControlType() == IE_GUI_TEXTAREA) { //any # of fingers will scroll a text area
 					if (Evnt->GetMouseFocusedControlType() != IE_GUI_TEXTAREA) {
 						// if focus is IE_GUI_TEXTAREA we need mouseup to clear scrollbar flags so this scrolling doesnt break after interactind with the slider
 						ignoreNextMouseUp = true;
@@ -518,7 +520,7 @@ int SDLVideoDriver::PollEvents() {
                     int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
 
 					Evnt->MouseWheelScroll( scrollX, scrollY );
-				}else if (numFingers == N_FING_KBOARD ) {
+				} else if (numFingers == core->NumFingKboard ) {
                     ignoreNextMouseUp = true;
                     if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
                         ShowSoftKeyboard();
@@ -538,7 +540,7 @@ int SDLVideoDriver::PollEvents() {
 
 				touchHoldTime = SDL_GetTicks();
 				touchHold = true;
-			}else if (Evnt && numFingers == N_FING_INFO) {
+			} else if (Evnt && numFingers == core->NumFingInfo) {
 				Evnt->OnSpecialKeyPress( GEM_TAB );
 				Evnt->OnSpecialKeyPress( GEM_ALT );
 			}
@@ -547,7 +549,7 @@ int SDLVideoDriver::PollEvents() {
 		case SDL_FINGERUP://SDL 1.3+
 			touchHold = false;//even if there are still fingers in contact
 			if (numFingers) numFingers--;
-			if (Evnt && numFingers < 2) {
+			if (Evnt && numFingers != core->NumFingInfo) {
 				Evnt->KeyRelease( GEM_ALT, 0 );
 			}
 			break;

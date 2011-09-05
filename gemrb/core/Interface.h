@@ -756,6 +756,7 @@ public:
 	unsigned int FogOfWar;
 	bool CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	bool TouchScrollAreas, UseSoftKeyboard;
+	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	bool GUIEnhancements;
 	bool KeepCache;
 	bool MultipleQuickSaves;

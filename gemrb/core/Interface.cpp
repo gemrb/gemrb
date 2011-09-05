@@ -192,6 +192,9 @@ Interface::Interface(int iargc, char* iargv[])
 	DrawFPS = false;
 	TouchScrollAreas = false;
 	KeepCache = false;
+	NumFingInfo = 2;
+	NumFingKboard = 3;
+	NumFingScroll = 2;
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
 	FullScreen = 0;
@@ -2290,6 +2293,9 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("Width", Width = );
 		CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
 		CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
+		CONFIG_INT("NumFingScroll", NumFingScroll = );
+		CONFIG_INT("NumFingKboard", NumFingKboard = );
+		CONFIG_INT("NumFingInfo", NumFingInfo = );
 #undef CONFIG_INT
 #define CONFIG_STRING(str, var) \
 		} else if (stricmp(name, str) == 0) { \
