@@ -41,7 +41,7 @@
 
 #ifdef TARGET_OS_IPHONE
 extern "C" {
-    #include "SDL_sysvideo.h"
+	#include "SDL_sysvideo.h"
 }
 #include "SDL_uikitkeyboard.h"
 #endif
@@ -276,8 +276,8 @@ int SDLVideoDriver::PollEvents() {
 	unsigned long time = lastTime;
 	unsigned char key = 0;
 
-    static bool ignoreNextMouseUp = false;
-    static Uint16 numFingers = 0;
+	static bool ignoreNextMouseUp = false;
+	static Uint16 numFingers = 0;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	/* multitouch gesture support */
 
@@ -291,7 +291,7 @@ int SDLVideoDriver::PollEvents() {
 	if(state){
 		xScaleFactor = state->xres / disp->w;
 		yScaleFactor = state->yres / disp->h;
-    }
+	}
 
 	static bool touchHold = false;
 	static Uint32 touchHoldTime = 0;
@@ -299,11 +299,11 @@ int SDLVideoDriver::PollEvents() {
 	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0};
 
 	if (touchHold && (SDL_GetTicks() - touchHoldTime) >= TOUCH_RC_NUM_TICKS) {
-        SDL_Event evtDown;
-        evtDown.type = SDL_MOUSEBUTTONDOWN;
-        evtDown.button = rightMouseDownEvent;
+		SDL_Event evtDown;
+		evtDown.type = SDL_MOUSEBUTTONDOWN;
+		evtDown.button = rightMouseDownEvent;
 
-        SDL_PushEvent(&evtDown);
+		SDL_PushEvent(&evtDown);
 
 		GameControl* gc = core->GetGameControl();
 		if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
@@ -451,11 +451,11 @@ int SDLVideoDriver::PollEvents() {
 					Evnt->KeyPress( key, modstate);
 			}
 			break;
-            //!!!!!!!!!!!!
-            // !!!: currently SDL brodcasts both mouse and touch events on touch
-                //  there is no API to prevent the mouse events so I have hacked the mouse events.
-                //  watch future SDL 1.3 releases to see if/when disabling mouse events from the touchscreen is available
-            //!!!!!!!!!!!!
+			//!!!!!!!!!!!!
+			// !!!: currently SDL brodcasts both mouse and touch events on touch
+				//  there is no API to prevent the mouse events so I have hacked the mouse events.
+				//  watch future SDL 1.3 releases to see if/when disabling mouse events from the touchscreen is available
+			//!!!!!!!!!!!!
 		case SDL_MOUSEMOTION:
 			if (numFingers > 1) break;
 			lastevent = false;
@@ -513,7 +513,7 @@ int SDLVideoDriver::PollEvents() {
 			Evnt->MouseWheelScroll( scrollX, scrollY );
 			break;
 		case SDL_FINGERMOTION://SDL 1.3+
-        //For swipes. gestures needing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
+		//For swipes. gestures needing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 			touchHold = false;
 			if (Evnt) {
 				if (numFingers == core->NumFingScroll || Evnt->GetMouseFocusedControlType() == IE_GUI_TEXTAREA) { //any # of fingers will scroll a text area
@@ -526,17 +526,17 @@ int SDLVideoDriver::PollEvents() {
 					}
 					//invert the coordinates such that dragging down scrolls up etc.
 					int scrollX = (event.tfinger.dx / xScaleFactor) * -1;
-                    int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
+					int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
 
 					Evnt->MouseWheelScroll( scrollX, scrollY );
 				} else if (numFingers == core->NumFingKboard ) {
-                    ignoreNextMouseUp = true;
-                    if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
-                        ShowSoftKeyboard();
-                    } else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
-                        HideSoftKeyboard();
-                    }
-                }
+					ignoreNextMouseUp = true;
+					if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
+						ShowSoftKeyboard();
+					} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+						HideSoftKeyboard();
+					}
+				}
 			}
 			break;
 		case SDL_FINGERDOWN://SDL 1.3+
@@ -569,7 +569,7 @@ int SDLVideoDriver::PollEvents() {
 			break;
 		//multitouch gestures
 		case SDL_MULTIGESTURE://SDL 1.3+
-        // use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
+		// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			numFingers = event.mgesture.numFingers;
 			/*
 			 // perhapps formation rotation should be implemented here as a rotate gesture.
@@ -587,7 +587,7 @@ int SDLVideoDriver::PollEvents() {
 				case SDL_WINDOWEVENT_RESTORED://SDL 1.3
 					/*
 						reset all static variables as if no events have happened yet
-                        restoring from "minimized state" should be a clean slate.
+						restoring from "minimized state" should be a clean slate.
 					*/
 					numFingers = 0;
 					touchHoldTime = 0;
@@ -597,7 +597,7 @@ int SDLVideoDriver::PollEvents() {
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;
 				case SDL_WINDOWEVENT_RESIZED://SDL 1.2
-                // this event exists in SDL 1.2, but this handler is only getting ompiled under 1.3+
+				// this event exists in SDL 1.2, but this handler is only getting ompiled under 1.3+
 					printMessage("SDLVideo", "Window resized so your window surface is now invalid.\n", LIGHT_RED);
 					break;
 			}
