@@ -53,6 +53,7 @@ extern "C" {
 #define N_FING_SCROLL 2
 #define N_FING_KBOARD 3
 #define N_FING_INFO N_FING_SCROLL
+#define MIN_GESTURE_DELTA_PIXELS 10
 #define TOUCH_RC_NUM_TICKS 500
 //---
 #define GEM_SetPalette(surface, flags, colors, fcolor, ncolors)\
@@ -288,17 +289,13 @@ int SDLVideoDriver::PollEvents() {
 		xScaleFactor = state->xres / disp->w;
 		yScaleFactor = state->yres / disp->h;
     }
-	/*
-	 everything else in this TOUCHSCREEN block is for pseudo right click.
-	 touch and hold for half a second to send right click event.
-	 */
+
 	static bool touchHold = false;
 	static Uint32 touchHoldTime = 0;
 	static SDL_MouseButtonEvent rightMouseDownEvent = {SDL_MOUSEBUTTONDOWN, 0, SDL_BUTTON_RIGHT, SDL_PRESSED, 0, 0, 0, 0};
 	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0};
 
 	if (touchHold && (SDL_GetTicks() - touchHoldTime) >= TOUCH_RC_NUM_TICKS) {
-		Evnt->MouseIdle(0);
         SDL_Event evtDown;
         evtDown.type = SDL_MOUSEBUTTONDOWN;
         evtDown.button = rightMouseDownEvent;
@@ -523,9 +520,9 @@ int SDLVideoDriver::PollEvents() {
 					Evnt->MouseWheelScroll( scrollX, scrollY );
 				}else if (numFingers == N_FING_KBOARD ) {
                     ignoreNextMouseUp = true;
-                    if((event.tfinger.dy / yScaleFactor) * -1 >= 10){
+                    if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
                         ShowSoftKeyboard();
-                    }else if((event.tfinger.dy / yScaleFactor) * -1 <= -10){
+                    } else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
                         HideSoftKeyboard();
                     }
                 }
@@ -1782,10 +1779,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	SDL_UnlockSurface(backBuf);
 
 }
-
-
-
-
 
 void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
 {
