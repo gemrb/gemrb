@@ -116,6 +116,7 @@ GameControl::GameControl(void)
 	distance = 0;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
+	FormationRotation = false;
 	overDoor = NULL;
 	overContainer = NULL;
 	overInfoPoint = NULL;
@@ -193,12 +194,9 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 	return formations[formation][pos];
 }
 
-//Moves an actor to a new position, keeping the current formation
 //WARNING: don't pass p as a reference because it gets modified
-void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p)
+Point GameControl::GetFormationPoint(Map *map, unsigned int pos, Point src, Point p)
 {
-	Map* map = actor->GetCurrentArea() ;
-
 	int formation=core->GetGame()->GetFormation();
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 
@@ -236,7 +234,7 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 		p.x*=16;
 		p.y*=12;
 	}
-	CreateMovement(actor, p);
+	return p;
 }
 
 void GameControl::Center(unsigned short x, unsigned short y)
@@ -553,6 +551,27 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (DrawSelectionRect) {
 		CalculateSelection( p );
 		video->DrawRect( SelectionRect, green, false, true );
+	}
+
+	// draw reticles
+	if (FormationRotation) {
+		FormationApplicationPoint.x = lastMouseX;
+		FormationApplicationPoint.y = lastMouseY;
+		core->GetVideoDriver()->ConvertToGame( FormationApplicationPoint.x, FormationApplicationPoint.y );
+
+		Actor *actor;
+		int max = game->GetPartySize(false);
+		// we only care about PCs and not summons for this. the summons will be included in
+		// the final mouse up event.
+
+		for(int idx = 1; idx<=max; idx++) {
+			actor = game->FindPC(idx);
+			if(actor->IsSelected()) {
+				// transform the formation point
+				p = GetFormationPoint(actor->GetCurrentArea(), idx - 1, FormationApplicationPoint, FormationPivotPoint);
+				DrawTargetReticle(p, 4, false);
+			}
+		}
 	}
 
 	// Show wallpolygons
@@ -1881,6 +1900,10 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 
 	short px=x;
 	short py=y;
+
+	core->GetVideoDriver()->ConvertToGame( px, py );
+	FormationRotation = false;
+
 	DoubleClick = false;
 	switch(Button)
 	{
@@ -1890,10 +1913,18 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	case GEM_MB_SCRLDOWN:
 		OnSpecialKeyPress(GEM_DOWN);
 		break;
+	case GEM_MB_MENU: //right click.
+		if (target_mode == TARGET_MODE_NONE) {
+			DrawSelectionRect = false;
+			MouseIsDown = false;
+			FormationRotation = true;
+			FormationPivotPoint.x = px;
+			FormationPivotPoint.y = py;
+		}
+		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
 		DoubleClick = true;
 	case GEM_MB_ACTION:
-		core->GetVideoDriver()->ConvertToGame( px, py );
 		MouseIsDown = true;
 		SelectionRect.x = px;
 		SelectionRect.y = py;
@@ -1985,12 +2016,18 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		core->GetDictionary()->SetAt( "MenuX", x );
 		core->GetDictionary()->SetAt( "MenuY", y );
 		core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow" );
-		return;
+		if (!FormationRotation) {
+			return;
+		}
+		FormationRotation = false;
+		int x,y;
+		//This hack is to refresh the mouse cursor
+		core->GetVideoDriver()->GetMousePos(x,y);
+		//calling into the videodriver to set the mouseposition won't work
+		core->GetEventMgr()->MouseMove(x,y);
 	}
 
-	if (Button != GEM_MB_ACTION) {
-		return;
-	}
+	if (Button > GEM_MB_MENU) return;
 
 	if (!game->selected.size()) {
 		//TODO: this is a hack, we need some restructuring here
@@ -2010,29 +2047,30 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		pc = game->selected[0];
 	}
 	if (!actor) {
-		//add a check if you don't want some random monster handle doors and such
-		if (overDoor) {
-			HandleDoor(overDoor, pc);
-			return;
-		}
-		if (overContainer) {
-			HandleContainer(overContainer, pc);
-			return;
-		}
-		if (overInfoPoint) {
-			if (overInfoPoint->Type==ST_TRAVEL) {
-				int i = game->selected.size();
-				ieDword exitID = overInfoPoint->GetGlobalID();
-				while(i--) {
-					game->selected[i]->UseExit(exitID);
-				}
-			}
-			if (HandleActiveRegion(overInfoPoint, pc, p)) {
-				core->SetEventFlag(EF_RESETTARGET);
+		if (Button == GEM_MB_ACTION) {
+			//add a check if you don't want some random monster handle doors and such
+			if (overDoor) {
+				HandleDoor(overDoor, pc);
 				return;
 			}
+			if (overContainer) {
+				HandleContainer(overContainer, pc);
+				return;
+			}
+			if (overInfoPoint) {
+				if (overInfoPoint->Type==ST_TRAVEL) {
+					int i = game->selected.size();
+					ieDword exitID = overInfoPoint->GetGlobalID();
+					while(i--) {
+						game->selected[i]->UseExit(exitID);
+					}
+				}
+				if (HandleActiveRegion(overInfoPoint, pc, p)) {
+					core->SetEventFlag(EF_RESETTARGET);
+					return;
+				}
+			}
 		}
-
 		//just a single actor, no formation
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
@@ -2066,6 +2104,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				party.push_back(act);
 			}
 		}
+		//summons etc
 		for (i = 0; i < game->selected.size(); i++) {
 			Actor *act = game->selected[i];
 			if (!act->InParty) {
@@ -2074,12 +2113,24 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 
 		//party formation movement
-		Point src = party[0]->Pos;
+		Point src;
+		//p = FormationPivotPoint;
+		if (Button == GEM_MB_MENU) {
+			p = FormationPivotPoint;
+			src = FormationApplicationPoint;
+		} else {
+			src = party[0]->Pos;
+		}
+		Point move;
+
 		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
 			actor->ClearPath();
 			actor->ClearActions();
-			MoveToPointFormation(actor, i, src, p);
+
+			Map* map = actor->GetCurrentArea();
+			move = GetFormationPoint(map, i, src, p);
+			CreateMovement(actor, move);
 		}
 		if (DoubleClick) Center(x,y);
 

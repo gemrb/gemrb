@@ -109,9 +109,12 @@ private:
 	ieDword distance;  //tracking distance
 	std::vector< Actor*> highlighted;
 	bool DrawSelectionRect;
+	bool FormationRotation;
 	bool MouseIsDown;
 	bool DoubleClick;
 	Region SelectionRect;
+	Point FormationPivotPoint;
+	Point FormationApplicationPoint;
 	short StartX, StartY;
 	// following variables used for touch scroll areas
 	bool touchScrollAreasEnabled; // true, if scroll areas enabled
@@ -231,7 +234,7 @@ public:
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
 	Point GetFormationOffset(ieDword formation, ieDword pos);
-	void MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p);
+	Point GetFormationPoint(Map *map, unsigned int pos, Point src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p);
 	/** Displays a string over an object */
