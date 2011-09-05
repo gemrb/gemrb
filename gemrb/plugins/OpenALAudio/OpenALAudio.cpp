@@ -549,6 +549,8 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 		MusicPlaying = false;
 	}
 
+	checkALError("Uncaught AL error.", "WARNING"); // clear any previous errors
+
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
 		if (checkALError("Unable to create music buffers", "ERROR")) {
@@ -630,6 +632,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	}
 	if (stream == -1) return -1;
 
+	checkALError("Uncaught AL error.", "WARNING"); // clear any previous errors
 	ALuint source;
 	alGenSources(1, &source);
 	if (checkALError("Unable to create new source", "ERROR")) {
