@@ -25,13 +25,13 @@
 #include "AnimationFactory.h"
 #include "Audio.h"
 #include "Game.h" // for GetGlobalTint
-#include "GameControl.h" // for TargetMode (contextual information for touch inputs)
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "Polygon.h"
 #include "SpriteCover.h"
 #include "GUI/Console.h"
+#include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
