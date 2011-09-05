@@ -157,7 +157,7 @@ GUIEnhancements = 1
 #                                                   #
 #  These are the paths where the Game you want to   #
 #  play is installed.                               #
-#  Enter the full path to the directory.             #
+#  Enter the full path to the directory.            #
 #####################################################
 
 GamePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
@@ -192,9 +192,7 @@ CachePath=./Cache/
 #SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 
 ###### HERE BE DRAGONS #############################
-###### HERE BE DRAGONS #############################
-###### HERE BE DRAGONS #############################
-# You shouldn't need to change anything below this point.
+# You shouldn't need to change any paths below this point.
 
 #####################################################
 #  GemRB Path [String]                              #
