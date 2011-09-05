@@ -1444,8 +1444,6 @@ void Selectable::SetBBox(const Region &newBBox)
 	BBox = newBBox;
 }
 
-static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
-
 void Selectable::DrawCircle(const Region &vp)
 {
 	/* BG2 colours ground circles as follows:
@@ -2048,46 +2046,6 @@ void Movable::ClearPath()
 	path = NULL;
 	step = NULL;
 	//don't call ReleaseCurrentAction
-}
-
-void Movable::DrawTargetPoint(const Region &vp)
-{
-	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
-		return;
-
-	// recticles are never drawn in cutscenes
-	if ((core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE))
-		return;
-
-	// generates "step" from sequence 3 2 1 0 1 2 3 4
-	// updated each 1/15 sec
-	unsigned long step;
-	step = GetTickCount();
-	step = tp_steps [(step >> 6) & 7];
-
-	step = step + 1;
-	int csize = (size - 1) * 4;
-	if (csize < 4) csize = 3;
-
-	/* segments should not go outside selection radius */
-	unsigned short xradius = (csize * 4) - 5;
-	unsigned short yradius = (csize * 3) - 5;
-	ieWord xcentre = (ieWord) (Destination.x - vp.x);
-	ieWord ycentre = (ieWord) (Destination.y - vp.y);
-
-	// TODO: 0.5 and 0.7 are pretty much random values
-	// right segment
-	core->GetVideoDriver()->DrawEllipseSegment( xcentre + step, ycentre, xradius,
-		yradius, selectedColor, -0.5, 0.5 );
-	// top segment
-	core->GetVideoDriver()->DrawEllipseSegment( xcentre, ycentre - step, xradius,
-		yradius, selectedColor, -0.7 - M_PI_2, 0.7 - M_PI_2 );
-	// left segment
-	core->GetVideoDriver()->DrawEllipseSegment( xcentre - step, ycentre, xradius,
-		yradius, selectedColor, -0.5 - M_PI, 0.5 - M_PI );
-	// bottom segment
-	core->GetVideoDriver()->DrawEllipseSegment( xcentre, ycentre + step, xradius,
-		yradius, selectedColor, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
 }
 
 /**********************

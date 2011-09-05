@@ -5863,13 +5863,13 @@ void Actor::Draw(const Region &screen)
 			// all
 			drawcircle = markerfeedback >= 6;
 		}
-		drawtarget = Selected && markerfeedback >= 4;
+		drawtarget = (Selected && !(InternalFlags&IF_NORECTICLE) && markerfeedback >= 4 && GetPathLength());
 	}
 	if (drawcircle) {
 		DrawCircle(vp);
 	}
 	if (drawtarget) {
-		DrawTargetPoint(vp);
+		gc->DrawTargetReticle(Destination, (size - 1) * 4, true);
 	}
 
 	unsigned char StanceID = GetStance();

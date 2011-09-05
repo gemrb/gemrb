@@ -510,7 +510,6 @@ public:
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void ClearPath();
-	void DrawTargetPoint(const Region &vp);
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
 	virtual bool BlocksSearchMap() const = 0;

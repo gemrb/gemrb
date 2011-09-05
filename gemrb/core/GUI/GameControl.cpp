@@ -348,6 +348,45 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	}
 }
 
+void GameControl::DrawTargetReticle(Point p, int size, bool animate)
+{
+	// recticles are never drawn in cutscenes
+	if (GetScreenFlags()&SF_CUTSCENE)
+		return;
+
+	unsigned short step = 0;
+	if (animate) {
+		// generates "step" from sequence 3 2 1 0 1 2 3 4
+		// updated each 1/15 sec
+		++step = tp_steps [(GetTickCount() >> 6) & 7];
+	} else {
+		step = 3;
+	}
+	if (size < 3) size = 3;
+
+	/* segments should not go outside selection radius */
+	unsigned short xradius = (size * 4) - 5;
+	unsigned short yradius = (size * 3) - 5;
+
+	Color color = {//green
+		0x00, 0xff, 0x00, 0xff
+	};
+	Region viewport = core->GetVideoDriver()->GetViewport();
+	// TODO: 0.5 and 0.7 are pretty much random values
+	// right segment
+	core->GetVideoDriver()->DrawEllipseSegment( p.x + step - viewport.x, p.y - viewport.y, xradius,
+								yradius, color, -0.5, 0.5 );
+	// top segment
+	core->GetVideoDriver()->DrawEllipseSegment( p.x - viewport.x, p.y - step - viewport.y, xradius,
+								yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2 );
+	// left segment
+	core->GetVideoDriver()->DrawEllipseSegment( p.x - step - viewport.x, p.y - viewport.y, xradius,
+								yradius, color, -0.5 - M_PI, 0.5 - M_PI );
+	// bottom segment
+	core->GetVideoDriver()->DrawEllipseSegment( p.x - viewport.x, p.y + step - viewport.y, xradius,
+								yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
+}
+
 /** Draws the Control on the Output Display */
 void GameControl::Draw(unsigned short x, unsigned short y)
 {
