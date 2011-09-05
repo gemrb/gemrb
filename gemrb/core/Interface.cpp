@@ -191,6 +191,7 @@ Interface::Interface(int iargc, char* iargv[])
 	SkipIntroVideos = false;
 	DrawFPS = false;
 	TouchScrollAreas = false;
+	UseSoftKeyboard = false;
 	KeepCache = false;
 	NumFingInfo = 2;
 	NumFingKboard = 3;
