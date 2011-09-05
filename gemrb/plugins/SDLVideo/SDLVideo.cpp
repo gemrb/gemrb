@@ -25,6 +25,7 @@
 #include "AnimationFactory.h"
 #include "Audio.h"
 #include "Game.h" // for GetGlobalTint
+#include "GameControl.h" // for TargetMode (contextual information for touch inputs)
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
@@ -304,14 +305,22 @@ int SDLVideoDriver::PollEvents() {
 
         SDL_PushEvent(&evtDown);
 
-        SDL_Event evtUp;
-        evtUp.type = SDL_MOUSEBUTTONUP;
-        evtUp.button = rightMouseUpEvent;
-
-        SDL_PushEvent(&evtUp);
-
+		GameControl* gc = core->GetGameControl();
+		if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
+			// formation rotation
+			touchHold = false;
+			formationRotation = true;
+		} else {
+			SDL_Event evtUp;
+			evtUp.type = SDL_MOUSEBUTTONUP;
+			evtUp.button = rightMouseUpEvent;
+			SDL_PushEvent(&evtUp);
+		}
 		ignoreNextMouseUp = true;
 		touchHoldTime = 0;
+	}
+	if (formationRotation) {
+		ignoreNextMouseUp = true;
 	}
 
 	while ( SDL_PollEvent(&event) ) {
@@ -549,6 +558,11 @@ int SDLVideoDriver::PollEvents() {
 		case SDL_FINGERUP://SDL 1.3+
 			touchHold = false;//even if there are still fingers in contact
 			if (numFingers) numFingers--;
+			if (formationRotation) {
+				Evnt->MouseUp( event.tfinger.x, event.tfinger.y, 1 << ( SDL_BUTTON_RIGHT - 1 ), GetModState(SDL_GetModState()) );
+				formationRotation = false;
+				ignoreNextMouseUp = false;
+			}
 			if (Evnt && numFingers != core->NumFingInfo) {
 				Evnt->KeyRelease( GEM_ALT, 0 );
 			}
@@ -557,6 +571,11 @@ int SDLVideoDriver::PollEvents() {
 		case SDL_MULTIGESTURE://SDL 1.3+
         // use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			numFingers = event.mgesture.numFingers;
+			/*
+			 // perhapps formation rotation should be implemented here as a rotate gesture.
+			if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && numFingers == 2) {
+			}
+			*/
 			break;
 		/* not user input events */
 		case SDL_WINDOWEVENT://SDL 1.2
