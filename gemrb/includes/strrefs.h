@@ -83,10 +83,10 @@
 #define STR_AP_ENEMY        50
 #define STR_AP_TRAP         51
 #define STR_AP_SPELLCAST    52
-#define STR_AP_RESERVED1    53
-#define STR_AP_RESERVED2    54
-#define STR_AP_RESERVED3    55
-#define STR_AP_RESERVED4    56
+#define STR_AP_GENERIC      53
+#define STR_AP_RESERVED1    54
+#define STR_AP_RESERVED2    55
+#define STR_AP_RESERVED3    56
 #define STR_CHARMED         57
 #define STR_DIRECHARMED     58
 #define STR_CONTROLLED      59

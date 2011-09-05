@@ -5303,7 +5303,7 @@ int Interface::Autopause(ieDword flag)
 	ieDword autopause_flags = 0;
 
 	vars->Lookup("Auto Pause State", autopause_flags);
-	if (autopause_flags & (1<<flag)) {
+	if ((autopause_flags & (1<<flag))) {
 		displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 		return 1;
