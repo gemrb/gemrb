@@ -940,6 +940,28 @@ def SetupDamageInfo (pc, Button):
 
 	return ratio_str
 
+def SetCurrentDateTokens (stat):
+	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
+	#   (script updates). In each case, there are 60 seconds
+	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
+	# Hence currentTime (and joinTime after div by 15) has
+	#   7200 secs a day (60 * 5 * 24)
+	currentTime = GemRB.GetGameTime ()
+	joinTime = stat['JoinDate'] - stat['AwayTime']
+
+	party_time = currentTime - (joinTime / 15)
+	days = party_time / 7200
+	hours = (party_time % 7200) / 300
+
+	# it is true, they changed the token
+	if GameIsBG2():
+		GemRB.SetToken ('GAMEDAY', str (days))
+	else:
+		GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('HOUR', str (hours))
+
+	return (days, hours)
+
 # return ceil(n/d)
 # 
 def ceildiv (n, d):

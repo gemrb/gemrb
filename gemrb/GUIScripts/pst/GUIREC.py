@@ -747,22 +747,8 @@ def OpenInformationWindow ():
 	else:
 		Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
-	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
-	#   (script updates???). In each case, there are 60 seconds
-	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
-	# Hence currentTime (and joinTime after div by 15) has
-	#   7200 secs a day (60 * 5 * 24)
-	currentTime = GemRB.GetGameTime()
-	joinTime = stat['JoinDate'] - stat['AwayTime']
-
-	party_time = currentTime - (joinTime / 15) 
-	days = party_time / 7200
-	hours = (party_time % 7200) / 300
-
-	GemRB.SetToken ('GAMEDAYS', str (days))
-	GemRB.SetToken ('HOUR', str (hours))
-	
 	Label = Window.GetControl (0x10000003)
+	GUICommon.SetCurrentDateTokens (stat)
 	Label.SetText (41277)
 
 	Label = Window.GetControl (0x10000004)
