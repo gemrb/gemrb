@@ -310,31 +310,21 @@ def OnRecordsButtonLeave ():
 	return
 
 def OnRecordsHelpFaction ():
-	Window = RecordsWindow
 	Help = GemRB.GetString (20106) + "\n\n" + faction_help
-	TextArea = Window.GetControl (0)
-	TextArea.SetText (Help)
+	OnRecordsHelpStat (-1, 0, Help)
 	return
 
 def OnRecordsHelpArmorClass ():
-	Window = RecordsWindow
-	Help = GemRB.GetString (18493)
-	TextArea = Window.GetControl (0)
-	TextArea.SetText (Help)
+	OnRecordsHelpStat (-1, 0, 18493)
 	return
 
 def OnRecordsHelpHitPoints ():
-	Window = RecordsWindow
-	Help = GemRB.GetString (18494)
-	TextArea = Window.GetControl (0)
-	TextArea.SetText (Help)
+	OnRecordsHelpStat (-1, 0, 18494)
 	return
 
 def OnRecordsHelpAlignment ():
-	Window = RecordsWindow
 	Help = GemRB.GetString (20105) + "\n\n" + alignment_help
-	TextArea = Window.GetControl (0)
-	TextArea.SetText (Help)
+	OnRecordsHelpStat (-1, 0, Help)
 	return
 
 #Bio:
@@ -347,10 +337,14 @@ def OnRecordsHelpAlignment ():
 # 39428 nordom
 # 39429 vhailor
 
-def OnRecordsHelpStrength ():
-	Window = RecordsWindow
-	TextArea = Window.GetControl (0)
+def OnRecordsHelpStat (row, col, strref, bon1=0, bon2=0):
+	TextArea = RecordsWindow.GetControl (0)
+	TextArea.SetText (strref)
+	if row != -1:
+		TextArea.Append ("\n\n" + GemRB.StatComment (StatTable.GetValue(str(row),col), bon1, bon2) )
+	return
 
+def OnRecordsHelpStrength ():
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -365,15 +359,11 @@ def OnRecordsHelpStrength ():
 		y=0
 	if e>60:
 		s=19
-	TextArea.SetText(18489)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(s,0),x,y) )
 
+	OnRecordsHelpStat (s, "STR", 18489, x, y)
 	return
 
 def OnRecordsHelpDexterity ():
-	Window = RecordsWindow
-	TextArea = Window.GetControl (0)
-
 	# Loading table of modifications
 	Table = GemRB.LoadTable("dexmod")
 
@@ -386,42 +376,28 @@ def OnRecordsHelpDexterity ():
 	# Getting the dexterity description
 	x = -Table.GetValue(Dex,2)
 
-	TextArea.SetText(18487)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Dex,3),x,0) )
+	OnRecordsHelpStat (Dex, "DEX", 18487, x)
 	return
 
 def OnRecordsHelpIntelligence ():
-	Window = RecordsWindow
-	TextArea = Window.GetControl (0)
-
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# Getting the character's intelligence
 	Int = GemRB.GetPlayerStat (pc, IE_INT)
-
-	TextArea.SetText(18488)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Int,1),0,0) )
+	OnRecordsHelpStat (Int, "INT", 18488)
 	return
 
 def OnRecordsHelpWisdom ():
-	Window = RecordsWindow
-	TextArea = Window.GetControl (0)
-
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# Getting the character's wisdom
 	Wis = GemRB.GetPlayerStat (pc, IE_WIS)
-
-	TextArea.SetText(18490)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Wis,2),0,0) )
+	OnRecordsHelpStat (Wis, "WIS", 18490)
 	return
 
 def OnRecordsHelpConstitution ():
-	Window = RecordsWindow
-	TextArea = Window.GetControl (0)
-
 	# Loading table of modifications
 	Table = GemRB.LoadTable("hpconbon")
 
@@ -434,22 +410,16 @@ def OnRecordsHelpConstitution ():
 	# Getting the constitution description
 	x = Table.GetValue(Con-1,1)
 
-	TextArea.SetText(18491)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Con,4),x,0) )
+	OnRecordsHelpStat (Con, "CON", 18491, x)
 	return
 
 def OnRecordsHelpCharisma ():
-	Window = RecordsWindow
-	TextArea = Window.GetControl (0)
-
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# Getting the character's charisma
 	Cha = GemRB.GetPlayerStat (pc, IE_CHR)
-
-	TextArea.SetText(1903)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Cha,5),0,0) )
+	OnRecordsHelpStat (Cha, "CHR", 1903)
 	return
 
 def GetCharacterHeader (pc):
