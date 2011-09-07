@@ -747,13 +747,13 @@ def OpenInformationWindow ():
 
 	TotalPartyExp = 0
 	ChapterPartyExp = 0
-	TotalCount = 0
+	TotalPartyKills = 0
 	ChapterCount = 0
 	for i in range (1, GemRB.GetPartySize () + 1):
 		stat = GemRB.GetPCStats(i)
 		TotalPartyExp = TotalPartyExp + stat['KillsTotalXP']
 		ChapterPartyExp = ChapterPartyExp + stat['KillsChapterXP']
-		TotalCount = TotalCount + stat['KillsTotalCount']
+		TotalPartyKills = TotalPartyKills + stat['KillsTotalCount']
 		ChapterCount = ChapterCount + stat['KillsChapterCount']
 
 	# These are used to get the stats
@@ -806,19 +806,19 @@ def OpenInformationWindow ():
 	else:
 		Label.SetText ("0%")
 
-	#total xp
+	# total kills
 	Label = Window.GetControl (0x10000014)
-	if TotalCount != 0:
-		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)
-		Label.SetText (str (PartyExp) + '%')
+	if TotalPartyKills != 0:
+		PartyKills = int ((stat['KillsTotalCount'] * 100) / TotalPartyKills)
+		Label.SetText (str (PartyKills) + '%')
 	else:
 		Label.SetText ("0%")
 
-	# chapter xp
+	# chapter kills
 	Label = Window.GetControl (0x10000010)
 	if ChapterCount != 0:
-		PartyExp = int ((stat['KillsChapterCount'] * 100) / ChapterCount)
-		Label.SetText (str (PartyExp) + '%')
+		PartyKills = int ((stat['KillsChapterCount'] * 100) / ChapterCount)
+		Label.SetText (str (PartyKills) + '%')
 	else:
 		Label.SetText ("0%")
 

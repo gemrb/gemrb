@@ -303,10 +303,7 @@ def UpdateRecordsWindow ():
 
 # puts default info to textarea (overview of PC's bonuses, saves, etc.
 def OnRecordsButtonLeave ():
-	Window = RecordsWindow
-	# help, info textarea
-	Text = Window.GetControl (0)
-	Text.SetText (stats_overview)
+	OnRecordsHelpStat (-1, 0, stats_overview)
 	return
 
 def OnRecordsHelpFaction ():
@@ -716,30 +713,35 @@ def OpenInformationWindow ():
 	InformationWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", InformationWindow.ID)
 
+	# Biography
+	Button = Window.GetControl (1)
+	Button.SetText (4247)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
+
+	# Done
+	Button = Window.GetControl (0)
+	Button.SetText (1403)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TotalPartyExp = 0
 	TotalPartyKills = 0
 	for i in range (1, GemRB.GetPartySize() + 1):
 		stat = GemRB.GetPCStats(i)
-		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
-		TotalPartyKills = TotalPartyKills + stat['KillsChapterCount']
+		TotalPartyExp = TotalPartyExp + stat['KillsTotalXP']
+		TotalPartyKills = TotalPartyKills + stat['KillsTotalCount']
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	stat = GemRB.GetPCStats (pc)
 
 	Label = Window.GetControl (0x10000001)
 	Label.SetText (GemRB.GetPlayerName (pc, 1))
 
-
 	# class
-	text = CommonTables.Classes.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
-
+	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	Label = Window.GetControl (0x1000000A)
-	Label.SetText (text)
-
-
+	Label.SetText (ClassTitle)
 
 	Label = Window.GetControl (0x10000002)
 	if stat['BestKilledName'] == -1:
@@ -759,17 +761,17 @@ def OpenInformationWindow ():
 
 	Label = Window.GetControl (0x10000006)
 	if TotalPartyExp != 0:
-		PartyExp = int ((stat['KillsChapterXP'] * 100) / TotalPartyExp)
+		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
 		Label.SetText (str (PartyExp) + '%')
 	else:
 		Label.SetText ("0%")
 
 	Label = Window.GetControl (0x10000007)
 	if TotalPartyKills != 0:
-		PartyKills = int ((stat['KillsChapterCount'] * 100) / TotalPartyKills)
+		PartyKills = int ((stat['KillsTotalCount'] * 100) / TotalPartyKills)
 		Label.SetText (str (PartyKills) + '%')
 	else:
-		Label.SetText ('0%')
+		Label.SetText ("0%")
 
 	Label = Window.GetControl (0x10000008)
 	Label.SetText (str (stat['KillsTotalXP']))
@@ -802,22 +804,8 @@ def OpenInformationWindow ():
 	Label = Window.GetControl (0x10000012)
 	Label.SetTextColor (255, 255, 255)
 
-
-
-	# Biography
-	Button = Window.GetControl (1)
-	Button.SetText (4247)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
-
-	# Done
-	Button = Window.GetControl (0)
-	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
 
 
 def OpenBiographyWindow ():
