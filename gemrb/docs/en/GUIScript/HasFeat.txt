@@ -1,0 +1,14 @@
+Prototype: GemRB.HasFeat(Slot, feat)
+
+Metaclass Prototype:
+
+Description:  Returns 1 if the player in Slot has the passed feat id (from ie_feats.py).
+
+Parameters: 
+Slot - player party index
+feat - feat index from ie_feats.py
+
+Return value: 1 if the pc has it, 0 otherwise
+
+See also:
+CheckFeatCondition

@@ -7979,6 +7979,26 @@ endofquest:
 	}
 }
 
+PyDoc_STRVAR( GemRB_HasFeat__doc,
+"HasFeat(Slot, feat)\n\n"
+"Returns 1 if the player in Slot has the passed feat id (from ie_feats.py)." );
+
+static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, featindex;
+
+	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &featindex )) {
+		return AttributeError( GemRB_HasFeat__doc );
+	}
+	GET_GAME();
+
+	Actor *actor = game->FindPC(PlayerSlot);
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+	return PyInt_FromLong( actor->HasFeat(featindex) );
+}
+
 PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
 "GetAbilityBonus(stat, column, value[, ex])\n\n"
 "Returns an ability bonus value based on various .2da files.");
@@ -10203,6 +10223,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(GetVar, METH_VARARGS),
 	METHOD(HardEndPL, METH_NOARGS),
+	METHOD(HasFeat, METH_VARARGS),
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),
