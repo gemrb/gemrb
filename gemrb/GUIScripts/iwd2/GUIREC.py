@@ -29,6 +29,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
+from ie_feats import FEAT_WEAPON_FINESSE
 
 SelectWindow = 0
 Topic = None
@@ -210,6 +211,7 @@ Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
 IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
 IE_LEVELSORCEROR, IE_LEVEL2]
 
+# screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
 def DisplayGeneral (pc):
 	Window = RecordsWindow
 
@@ -375,6 +377,7 @@ def DisplayGeneral (pc):
 #FIXME: display only nonzero values except for casting failure
 #TODO: +/- prefix
 #TODO: check if there are any other entries
+# screenshots at http:// lparchive.org/Icewind-Dale-2/Update%206/
 def DisplayWeapons (pc):
 	Window = RecordsWindow
 
@@ -390,34 +393,46 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append ("[/color]\n")
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
+	numOfAttacks = GS (IE_NUMBEROFATTACKS)//2
 
 	# Main Hand
-	#TODO: display all the attack values (+15/+10/+5)
-	current = combatdet["ToHit"]
-	RecordsTextArea.Append (delimited_txt (734, ":", str (current), 0))
+	# display all the (successive) attack values (+15/+10/+5)
+	total = combatdet["ToHit"]
+	tmpstr = str(total)
+	for i in range(1, numOfAttacks):
+		tmpstr = tmpstr  + "/" + str(total-i*5)
+	RecordsTextArea.Append (delimited_txt (734, ":", tmpstr, 0))
 	# Base
 	RecordsTextArea.Append ("  ", -1) # indentation
 	RecordsTextArea.Append (delimited_txt (31353, ":", str (GS(IE_TOHIT)), 0))
-	# Weapon
+	total = total - GS(IE_TOHIT)
+	# Weapon bonus
 	RecordsTextArea.Append ("  ", -1)
 	RecordsTextArea.Append (delimited_txt (32560 , ":", str (0), 0))
-	# Proficiency
+	# Proficiency bonus
 	RecordsTextArea.Append ("  ", -1)
 	RecordsTextArea.Append (delimited_txt (32561, ":", str (0), 0))
 	# Armor Penalty
 	RecordsTextArea.Append ("  ", -1)
 	RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
-	#TODO: check if there's also a @39822 = ~Shield Penalty~
-
-	# Abilities
-	#FIXME: this is different for ranged weapons (dex) or if weapon finese is chosen (dex or str)
+	# Shield Penalty (if you don't have the shield proficiency feat; maybe more)
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (39822 , ":", str (0), 0))
+	# Ability  bonus
+	#FIXME: this is different for ranged weapons (dex only)
 	strbon = GA(IE_STR)
+	dexbon = GA(IE_DEX)
+	# weapon finesse uses the best of both
+	if GemRB.HasFeat(pc, FEAT_WEAPON_FINESSE):
+		if dexbon > strbon:
+			strbon = dexbon
 	if strbon:
 		RecordsTextArea.Append ("  ", -1)
 		RecordsTextArea.Append (delimited_txt (33547, ":", str (strbon), 0))
+	total = total - strbon
 	# Others
 	RecordsTextArea.Append ("  ", -1)
-	RecordsTextArea.Append (delimited_txt (33548, ":", str (current - GS(IE_TOHIT) - strbon)))
+	RecordsTextArea.Append (delimited_txt (33548, ":", str (total))) # just the remnants of "total"
 	RecordsTextArea.Append ("\n")
 
 	# Off Hand
@@ -429,7 +444,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Number of Attacks
-	RecordsTextArea.Append (delimited_txt (9458, ":", str (GS (IE_NUMBEROFATTACKS)/2)))
+	RecordsTextArea.Append (delimited_txt (9458, ":", str (numOfAttacks)))
 	RecordsTextArea.Append ("\n")
 
 	###################
