@@ -1921,9 +1921,11 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		if (target_mode == TARGET_MODE_NONE) {
 			DrawSelectionRect = false;
 			MouseIsDown = false;
-			FormationRotation = true;
-			FormationPivotPoint.x = px;
-			FormationPivotPoint.y = py;
+			if (core->GetGame()->selected.size() > 1) {
+				FormationRotation = true;
+				FormationPivotPoint.x = px;
+				FormationPivotPoint.y = py;
+			}
 		}
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
