@@ -2709,21 +2709,34 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
 	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
-	//the area the user will fall on
+	//evaluate the area the user will fall on in a random encounter
 	if (encounter && eval) {
-		int i=rand()%5;
-
 		displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 
 		if(wal->EncounterChance>=100) {
 			wal->EncounterChance-=100;
 		}
-		for(int j=0;j<5;j++) {
-			if (wal->EncounterAreaResRef[(i+j)%5][0]) {
-				PyDict_SetItemString(dict, "Destination", PyString_FromString (wal->EncounterAreaResRef[(i+j)%5]) );
-				PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
-				// do we need to change Direction here?
-				break;
+
+		//bounty encounter
+		ieResRef tmpresref;
+
+		memcpy(tmpresref, wmc->Area->AreaName, sizeof(ieResRef) );
+		if (core->GetGame()->RandomEncounter(tmpresref)) {
+			PyDict_SetItemString(dict, "Destination", PyString_FromString (tmpresref) );
+			PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+		} else {
+			//regular random encounter, find a valid encounter area
+			int i=rand()%5;
+
+			for(int j=0;j<5;j++) {
+				const char *area = wal->EncounterAreaResRef[(i+j)%5];
+
+				if (area[0]) {
+					PyDict_SetItemString(dict, "Destination", PyString_FromString (area) );
+					PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+					// do we need to change Direction here?
+					break;
+				}
 			}
 		}
 	}

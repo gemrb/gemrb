@@ -130,6 +130,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	familiarBlock = false;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
+	bntchnc = NULL;
+	bntrows = -1;
 }
 
 Game::~Game(void)
@@ -1825,7 +1827,33 @@ ieByte *Game::AllocateMazeData()
 	return mazedata;
 }
 
-bool Game::IsTimestopActive()
+bool Game::IsTimestopActive() const
 {
 	return timestop_end > GameTime;
+}
+
+bool Game::RandomEncounter(ieResRef &BaseArea)
+{
+	displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
+
+	if (bntrows<0) {
+		AutoTable table;
+
+	        if (table.load("bntychnc")) {
+			bntrows = table->GetRowCount();
+			bntchnc = (int *) calloc(sizeof(int),bntrows);
+			for(int i = 0; i<bntrows; i++) {
+				bntchnc[i] = atoi(table->QueryField(i, 0));
+			}
+		} else {
+			bntrows = 0;
+		}
+	}
+
+	int rep = Reputation/10;
+	if (rep>=bntrows) return false;
+	if (core->Roll(1, 100, 0)>bntchnc[rep]) return false;
+	//TODO: unhardcode this
+	memcpy(BaseArea+4,"10",3);
+	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
 }

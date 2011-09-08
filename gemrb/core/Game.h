@@ -240,6 +240,8 @@ private:
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector< char*> mastarea;
 	std::vector<std::vector< const char*> > npclevels;
+	int *bntchnc;
+	int bntrows;
 	CRRow *crtable;
 	ieResRef restmovies[8];
 	ieResRef daymovies[8];
@@ -475,7 +477,9 @@ public:
 	/** Allocates maze data */
 	ieByte *AllocateMazeData();
 	/** Checks if any timestop effects are active */
-	bool IsTimestopActive();
+	bool IsTimestopActive() const;
+	/** Checks the bounty encounters (used in bg1) */
+	bool RandomEncounter(ieResRef &BaseArea);
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
