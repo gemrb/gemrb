@@ -5841,7 +5841,7 @@ void Actor::Draw(const Region &screen)
 	if (gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		drawcircle = true;
 	}
-	bool drawtarget = drawcircle;
+	bool drawtarget = false;
 	// we always show circle/target on pause
 	if (drawcircle && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
@@ -5863,13 +5863,13 @@ void Actor::Draw(const Region &screen)
 			// all
 			drawcircle = markerfeedback >= 6;
 		}
-		drawtarget = (Selected && !(InternalFlags&IF_NORETICLE) && markerfeedback >= 4 && GetPathLength());
 	}
 	if (drawcircle) {
 		DrawCircle(vp);
+		drawtarget = (Selected && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && GetPathLength());
 	}
 	if (drawtarget) {
-		gc->DrawTargetReticle(Destination, (size - 1) * 4, true);
+		gc->DrawTargetReticle(Destination, (size - 1) * 4, true); //we could set this to !paused if we wanted to only animate when not paused
 	}
 
 	unsigned char StanceID = GetStance();
