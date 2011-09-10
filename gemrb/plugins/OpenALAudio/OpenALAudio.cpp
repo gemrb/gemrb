@@ -241,9 +241,8 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		alcCloseDevice (device);
 	}
 	alutContext = NULL;
-	SDL_mutexP(musicMutex);
-	SDL_KillThread(musicThread);
-	SDL_mutexV(musicMutex);
+	stayAlive = false;
+	SDL_WaitThread(musicThread, NULL);
 
 	SDL_DestroyMutex(musicMutex);
 	musicMutex = NULL;
