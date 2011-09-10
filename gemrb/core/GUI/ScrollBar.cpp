@@ -244,7 +244,7 @@ void ScrollBar::OnMouseWheelScroll(short /*x*/, short y){
 /** Mouse Over Event */
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
-	if (( State & SLIDER_GRAB ) != 0) {
+	if (( State & SLIDER_GRAB ) != 0 && y > Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height) {
 		SetPosForY(y - (Frames[IE_GUI_SCROLLBAR_SLIDER]->Height / 2));
 	}
 }
