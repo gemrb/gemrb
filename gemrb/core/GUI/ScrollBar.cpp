@@ -31,7 +31,7 @@
 ScrollBar::ScrollBar(void)
 {
 	Pos = 0;
-	Value = 10;// ???: not sure why we magically set this to 10.
+	Value = 0;
 	State = 0;
 	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
@@ -55,7 +55,8 @@ ScrollBar::~ScrollBar(void)
 void ScrollBar::SetPos(ieDword NewPos)
 {
 	if (Value && NewPos >= Value) NewPos = Value - 1;
-	
+	else if (NewPos > Value) NewPos = Value;
+
 	if (( State & SLIDER_GRAB ) == 0){
 		// set the slider to the exact y for NewPos. in SetPosForY(y) it is set to any arbitrary position that may lie between 2 values.
 		// if the slider is grabbed dont set position! otherwise you will get a flicker as it bounces between exact positioning and arbitrary
@@ -71,8 +72,7 @@ void ScrollBar::SetPos(ieDword NewPos)
 	Changed = true;
 	Pos = (ieWord) NewPos;
 	if (ta) {
-		TextArea* t = ( TextArea* ) ta;
-		t->SetRow( Pos );
+		(( TextArea* )ta)->SetRow( Pos );
 	}
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Pos );
