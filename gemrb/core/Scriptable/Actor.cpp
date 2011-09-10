@@ -205,7 +205,7 @@ ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static ieDword TranslucentShadows = 0;
-static int ProjectileSize = 0;  //the size of the projectile immunity bitfield (dwords)
+static int ProjectileSize = 0; //the size of the projectile immunity bitfield (dwords)
 
 static const char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
@@ -6246,7 +6246,11 @@ void Actor::SetSoundFolder(const char *soundset)
 		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
 		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
 		char file[_MAX_PATH];
-		if (FileGlob(file, filepath, "?????01")) {
+
+		//TODO: this could be simpler with *
+		if (FileGlob(file, filepath, "??????01")) {
+			file[6] = '\0';
+                } else if (FileGlob(file, filepath, "?????01")) {
 			file[5] = '\0';
 		} else if (FileGlob(file, filepath, "????01")) {
 			file[4] = '\0';
@@ -6701,7 +6705,7 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 		AttackStance = IE_ANI_ATTACK_SLASH; //That's it!!
 		return;
 	}
-	AttackStance =  IE_ANI_ATTACK;
+	AttackStance = IE_ANI_ATTACK;
 }
 
 void Actor::SetUsedShield(const char* AnimationType, int wt)
