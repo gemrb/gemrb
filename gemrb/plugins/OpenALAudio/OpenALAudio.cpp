@@ -87,8 +87,19 @@ void AudioStream::ClearProcessedBuffers()
 		checkALError("Failed to unqueue buffers", "WARNING");
 
 		if (delete_buffers) {
+#ifdef __APPLE__ // mac os x and iOS
+			/* FIXME: hackish
+				somebody with more knowledge than me could perhapps figure out
+				why Apple's implementation of alSourceUnqueueBuffers seems to delay (threading thing?)
+				and possible how better to deal with this.
+			*/
+			do{
+				alDeleteBuffers(processed, b);
+			}while(alGetError() != AL_NO_ERROR);
+#else
 			alDeleteBuffers(processed, b);
 			checkALError("Failed to delete buffers", "WARNING");
+#endif
 		}
 
 		delete[] b;
