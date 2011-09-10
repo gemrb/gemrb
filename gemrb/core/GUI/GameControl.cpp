@@ -563,12 +563,12 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		int max = game->GetPartySize(false);
 		// we only care about PCs and not summons for this. the summons will be included in
 		// the final mouse up event.
-
+		int formationPos = 0;
 		for(int idx = 1; idx<=max; idx++) {
 			actor = game->FindPC(idx);
 			if(actor->IsSelected()) {
 				// transform the formation point
-				p = GetFormationPoint(actor->GetCurrentArea(), idx - 1, FormationApplicationPoint, FormationPivotPoint);
+				p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, FormationPivotPoint);
 				DrawTargetReticle(p, 4, false);
 			}
 		}
