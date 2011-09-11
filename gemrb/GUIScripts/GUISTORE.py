@@ -61,6 +61,7 @@ if GUICommon.GameIsIWD2():
 else:
 	ItemButtonCount = 4
 RepModTable = None
+SpellTable = None
 PreviousPC = 0
 BarteringPC = 0
 
@@ -131,7 +132,8 @@ def OpenStoreWindow ():
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
 	global store_funcs
-	global Inventory, RepModTable, BarteringPC
+	global SpellTable, RepModTable
+	global Inventory, BarteringPC
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
@@ -141,6 +143,7 @@ def OpenStoreWindow ():
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	RepModTable = GemRB.LoadTable ("repmodst")
+	SpellTable = GemRB.LoadTable ("storespl", 1)
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
@@ -1396,6 +1399,13 @@ def BuyHeal ():
 	GemRB.GameSetPartyGold (gold-Cure['Price'])
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.ApplySpell (pc, Cure['CureResRef'], pc)
+	if SpellTable:
+		sound = SpellTable.GetValue(Cure['CureResRef'], "SOUND")
+	else:
+		#if there is no table, simply use the spell's own completion sound
+		Spell = GemRB.GetSpell(Cure['CureResRef'])
+		sound = Spell['Completion']
+	GemRB.PlaySound (sound)
 	UpdateStoreHealWindow ()
 	return
 
