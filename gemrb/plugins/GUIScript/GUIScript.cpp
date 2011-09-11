@@ -6678,6 +6678,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->PrimaryType));
 	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SecondaryType));
 	PyDict_SetItemString(dict, "SpellLevel", PyInt_FromLong (spell->SpellLevel));
+	PyDict_SetItemString(dict, "Completion", PyString_FromResRef (spell->CompletionSound));
 	PyDict_SetItemString(dict, "SpellTargetType", PyInt_FromLong (spell->GetExtHeader(0)->Target));
 	gamedata->FreeSpell( spell, ResRef, false );
 	return dict;
