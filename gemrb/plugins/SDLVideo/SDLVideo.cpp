@@ -279,6 +279,7 @@ int SDLVideoDriver::PollEvents() {
 	static bool ignoreNextMouseUp = false;
 	static Uint16 numFingers = 0;
 #if SDL_VERSION_ATLEAST(1,3,0)
+	static bool formationRotation = false;
 	/* multitouch gesture support */
 
 	/*
