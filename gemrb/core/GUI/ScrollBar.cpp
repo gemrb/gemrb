@@ -91,9 +91,9 @@ void ScrollBar::SetPosForY(unsigned short y)
 		if (y < YMin) y = YMin;
 		else if (y > YMax) y = YMax;
 		
-		double step = YMax / ( double ) ( Value <= 1 ? 1 : Value - 1 );
+		double step = (YMax / Value)-1;
 		if (step) {
-			unsigned short NewPos = y / step;
+			unsigned short NewPos = (y / step)-1;
 			// SetPos will call core->RedrawAll()
 			if (Pos != NewPos) {
 				// will move the slider to an exact position for NewPos
