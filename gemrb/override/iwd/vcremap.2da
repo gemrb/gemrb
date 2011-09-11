@@ -1,4 +1,32 @@
 2DA V1.0
 *
-	ORIGINAL	NEW
-BIO	74		63
+           ORIGINAL   NEW        
+BCRY       9          3          
+2          10         4          
+3          11         5          
+4          12         6          
+5          13         7          
+LEAD       6          8          
+TIRE       7          10         
+BORE       8          13         
+DMG        20         14         
+SEL        26         16         
+2          27         17         
+3          28         18         
+4          29         19         
+5          30         20         
+6          31         21         
+ACT        32         23         
+2          33         24         
+3          34         25         
+4          35         26         
+5          36         27         
+6          37         28         
+7          38         29         
+RARE1      63         30         
+RARE2      64         31         
+HIT        18         34         
+DYING      19         37         
+REACT      53         39         
+2          54         40         
+BIO        74         63         
