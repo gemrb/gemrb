@@ -16,6 +16,8 @@ The fields of the dictionary are the following:
 "SpellSchool"         - the spell's school (primary type)
 "SpellType"           - the type of text that appears on spell dispelling
 "SpellLevel"          - the spell's level
+"Completion"          - the spell's completion sound
+"SpellTargetType"     - the spell's target type
 
 See also: GetItem, SetSpellIcon, spell_structure(IESDP)
 

@@ -1,0 +1,6 @@
+Description: This table contains the spell casting sound of temple spells (different from their completion sound).
+
+Columns - 
+SOUND - the spell casting sound 
+
+Rows - one for each spell
