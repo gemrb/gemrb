@@ -6157,7 +6157,7 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
 			return;
 		}
 		//icewind style
-		snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, index);
+		snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
 		return;
 	}
 
