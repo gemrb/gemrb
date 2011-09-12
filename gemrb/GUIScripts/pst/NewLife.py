@@ -208,8 +208,9 @@ def OnLoad():
 	Label.SetText(254)
 	
 	PhotoButton = NewLifeWindow.GetControl(35)
-	PhotoButton.SetState(IE_GUI_BUTTON_DISABLED)
+	PhotoButton.SetState(IE_GUI_BUTTON_LOCKED)
 	PhotoButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	PhotoButton.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, OverPhoto)
 	PhotoButton.SetPicture("STPNOC")
 	
 	AcceptButton = NewLifeWindow.GetControl(0)
@@ -504,3 +505,6 @@ def IncreasePress():
 	UpdateLabels()
 	return
 
+def OverPhoto():
+	global TextArea
+	TextArea.SetText(18495)
