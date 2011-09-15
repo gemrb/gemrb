@@ -62,6 +62,8 @@ class GEM_EXPORT ScrollBar : public Control {
 public:
 	ScrollBar(void);
 	~ScrollBar(void);
+	/** safe method to get the height of a frame */
+	int GetFrameHeight(int frame) const;
 	/**sets position, updates associated stuff */
 	void SetPos(ieDword NewPos);
 	void SetPosForY(unsigned short y);
