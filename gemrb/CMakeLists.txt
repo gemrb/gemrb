@@ -8,6 +8,8 @@ IF(APPLE)
 	)
 
 	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE CocoaWrapper.m GemRB.cpp )
+	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
+	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader ${BUNDLE_LOADER}")
 ELSE(APPLE)
 	ADD_EXECUTABLE(gemrb GemRB.cpp )
 ENDIF(APPLE)

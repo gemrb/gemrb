@@ -266,11 +266,25 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in
 
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
+	CMAKE_PARSE_ARGUMENTS(GEMRB_PLUGIN "COCOA" "" "" ${ARGN})
+	if (GEMRB_PLUGIN_COCOA)
+		#this is an Apple thing
+		if (APPLE)
+			SET_SOURCE_FILES_PROPERTIES(
+				CocoaWrapper.m
+				PROPERTIES LANGUAGE C
+			)
+			message(STATUS "Will link ${plugin_name} plugin to: ${BUNDLE_LOADER}")
+			#SET (CMAKE_C_FLAGS "${MAC_C_FLAGS} -bundle_loader ${BUNDLE_LOADER}")
+			SET (GEMRB_PLUGIN_UNPARSED_ARGUMENTS ${GEMRB_PLUGIN_UNPARSED_ARGUMENTS} CocoaWrapper.m)
+		endif (APPLE)
+	endif (GEMRB_PLUGIN_COCOA)
+
 	if (STATIC_LINK)
-		ADD_LIBRARY(${plugin_name} STATIC ${ARGN})
+		ADD_LIBRARY(${plugin_name} STATIC ${GEMRB_PLUGIN_UNPARSED_ARGUMENTS})
 		set(plugins "${plugins};${plugin_name}" PARENT_SCOPE)
 	else (STATIC_LINK)
-		ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
+		ADD_LIBRARY(${plugin_name} MODULE ${GEMRB_PLUGIN_UNPARSED_ARGUMENTS})
 		if (NOT UNSAFE_PLUGIN)
 			TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core ${CMAKE_THREAD_LIBS_INIT})
 		endif (NOT UNSAFE_PLUGIN)
