@@ -31,10 +31,14 @@
 #include <unistd.h>
 #endif
 
-//this supposed to convince SDL to work on OS/X
-//WARNING: commenting this out will cause SDL 1.2.x to crash
-#ifdef __APPLE_CC__ // we need startup SDL here
-#include <SDL.h>
+#ifdef __APPLE__ // MAC OS X and iOS
+// We want to wrap GemRB witin a cocoa environment
+// this will declare GemRBs main function as GemRB_main
+// and our cocoa main function will call GemRB_main
+// our cocoa wrapper is in CocoaWrapper.m
+// the plugins (ex SDLViedo) can extend this wrapper using obj-c categories.
+extern "C" int GemRB_main(int argc, char *argv[]);
+#define main GemRB_main
 #endif
 
 #ifdef ANDROID
