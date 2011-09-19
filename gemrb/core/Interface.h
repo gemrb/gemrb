@@ -218,6 +218,7 @@ public:
 #define AP_ENEMY         7
 #define AP_TRAP          8
 #define AP_SPELLCAST     9
+#define AP_GENERIC       10  //needed for Android stuff
 
 /** ea relations (derivated from 2 actor's EA value) */
 #define EAR_FRIEND  0
