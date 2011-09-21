@@ -248,6 +248,9 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		return;
 	}
 	if (y >= SliderYPos && y < SliderYPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
+		/*
+		 TODO: factor in where we grab the slider and offset it when dragging.
+		 */
 		State |= SLIDER_GRAB;
 		return;
 	}
@@ -280,6 +283,9 @@ void ScrollBar::OnMouseWheelScroll(short /*x*/, short y)
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
 	if (( State & SLIDER_GRAB ) != 0 && y > GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED)) {
+		/*
+		 TODO: factor in where we grab the slider and offset it when dragging.
+		 */
 		SetPosForY(y - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED));
 	}
 }
