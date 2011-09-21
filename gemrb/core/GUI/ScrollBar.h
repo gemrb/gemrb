@@ -65,7 +65,7 @@ public:
 	/** safe method to get the height of a frame */
 	int GetFrameHeight(int frame) const;
 	/**sets position, updates associated stuff */
-	void SetPos(ieDword NewPos);
+	void SetPos(ieDword NewPos, bool redraw = true);
 	void SetPosForY(unsigned short y);
 	void ScrollUp();
 	void ScrollDown();

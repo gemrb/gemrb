@@ -59,7 +59,7 @@ int ScrollBar::GetFrameHeight(int frame) const
 
 /** Sets a new position, relays the change to an associated textarea and calls
 	any existing GUI OnChange callback */
-void ScrollBar::SetPos(ieDword NewPos)
+void ScrollBar::SetPos(ieDword NewPos, bool redraw)
 {
 	if (!Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]) return;
 
@@ -88,7 +88,7 @@ void ScrollBar::SetPos(ieDword NewPos)
 		core->GetDictionary()->SetAt( VarName, Pos );
 	}
 	RunEventHandler( ScrollBarOnChange );
-	core->RedrawAll();
+	if(redraw) core->RedrawAll();
 }
 
 /** Sets the Pos for a given y coordinate (control coordinates) */
