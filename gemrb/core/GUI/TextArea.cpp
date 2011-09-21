@@ -789,6 +789,17 @@ void TextArea::CalcRowCount()
 	}
 	bar->SetMax( (ieWord) tr );
 }
+
+/** Mousewheel scroll */
+/** This method is key to touchscreen scrolling */
+void TextArea::OnMouseWheelScroll(short /*x*/, short y)
+{
+	unsigned long fauxY = TextYPos;
+	if ((long)fauxY + y <= 0) fauxY = 0;
+	else fauxY += y;
+	ScrollToY(fauxY, this);
+}
+
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
