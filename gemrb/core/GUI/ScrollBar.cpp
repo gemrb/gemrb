@@ -33,6 +33,7 @@ ScrollBar::ScrollBar(void)
 	Pos = 0;
 	Value = 0;
 	State = 0;
+	stepPx = 0;
 	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
 	for(int i=0;i<SB_RES_COUNT;i++) {
@@ -137,6 +138,11 @@ void ScrollBar::ScrollDown()
 	SetPos( Pos + 1 );
 }
 
+double ScrollBar::GetStep()
+{
+	return stepPx;
+}
+
 /** Draws the ScrollBar control */
 void ScrollBar::Draw(unsigned short x, unsigned short y)
 {
@@ -201,6 +207,15 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 		core->GetVideoDriver()->FreeSprite(Frames[type]);
 	}
 	Frames[type] = img;
+	//recalculate step
+	if(Value){
+		stepPx = (double)((double)(Height
+							   - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
+							   - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
+							   - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED)) / (double)(Value));
+	}else{
+		stepPx = 0;
+	}
 	Changed = true;
 }
 
@@ -270,8 +285,16 @@ void ScrollBar::SetMax(unsigned short Max)
 	Value = Max;
 	if (Max == 0) {
 		SetPos( 0 );
-	} else if (Pos >= Max) {
-		SetPos( Max - 1 );
+		stepPx = 0;
+	} else {
+		//recalculate step
+		stepPx = (double)((double)(Height
+								   - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
+								   - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
+								   - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED)) / (double)(Value));
+		if (Pos >= Max) {
+			SetPos( Max - 1 );
+		}
 	}
 }
 

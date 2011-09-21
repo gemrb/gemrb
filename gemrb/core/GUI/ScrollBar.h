@@ -69,6 +69,7 @@ public:
 	void SetPosForY(unsigned short y);
 	void ScrollUp();
 	void ScrollDown();
+	double GetStep();
 	/**redraws scrollbar if associated with VarName */
 	void RedrawScrollBar(const char* VarName, int Sum);
 	/**/
@@ -79,6 +80,8 @@ private: //Private attributes
 	unsigned short SliderYPos;
 	/** Item Index */
 	unsigned short Pos;
+	/** slider y delta between steps */
+	double stepPx;
 	/** Scroll Bar Status */
 	unsigned short State;
 public:
