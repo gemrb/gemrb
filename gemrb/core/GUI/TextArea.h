@@ -92,6 +92,8 @@ public:
 	void PadMinRow();
 	/** Sets up scrolling, tck is the scrolling speed */
 	void SetupScroll(unsigned long tck);
+	/** Per Pixel scrolling */
+	void ScrollToY(unsigned long y, Control* sender);
 	/** Sets the Fonts */
 	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */
@@ -129,6 +131,7 @@ private: // Private attributes
 	int keeplines;
 	/** vertical offset for smooth scrolling */
 	int smooth;
+	unsigned long TextYPos;
 	/** timer for scrolling */
 	unsigned long starttime;
 	/** timer ticks for scrolling (speed) */
