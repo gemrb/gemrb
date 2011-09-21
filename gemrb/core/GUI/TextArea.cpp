@@ -43,6 +43,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
 	keeplines = 100;
 	rows = 0;
+	smooth = 0;
 	TextYPos = 0;
 	startrow = 0;
 	minrow = 0;
