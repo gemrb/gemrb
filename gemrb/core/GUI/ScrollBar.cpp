@@ -251,6 +251,9 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		State |= SLIDER_GRAB;
 		return;
 	}
+	// if we made it this far we will jump the nib y and "grab" it
+	// this way we only need to click once to jump+scroll
+	State |= SLIDER_GRAB;
 	SetPosForY(y - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED));
 }
 
