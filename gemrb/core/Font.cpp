@@ -148,7 +148,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	if (!pal) {
 		pal = palette;
 	}
-	if (startrow) enablecap=false;
 
 	if (initials==this) {
 		enablecap=false;
@@ -159,6 +158,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
 	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
+
+	if (startrow) enablecap=false;
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		for (size_t i = 0; i < len; i++) {
