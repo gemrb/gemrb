@@ -662,6 +662,10 @@ int TextArea::GetTopIndex()
 	return startrow;
 }
 
+int TextArea::GetRowHeight()
+{
+	return ftext->maxHeight;
+}
 /** Set Starting Row */
 void TextArea::SetRow(int row)
 {

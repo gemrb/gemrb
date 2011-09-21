@@ -102,6 +102,8 @@ public:
 	int GetVisibleRowCount();
 	/** Returns Starting Row */
 	int GetTopIndex();
+	/** Returns total height of the text */
+	int GetRowHeight();
 	/** Set Starting Row */
 	void SetRow(int row);
 	/** Sets preserved lines */
