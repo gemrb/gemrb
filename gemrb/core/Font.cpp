@@ -124,13 +124,24 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 {
 	bool enablecap=false;
 	int capital = 0;
+	int initials_rows = 0;
+	int last_initial_row = 0;
+	int initials_x = 0;
+	int initials_row = 0;
+	unsigned char currCap = 0;
+
 	if (initials)
 	{
 		capital=1;
 		enablecap=true;
+		initials_rows = ((initials->maxHeight - 1) / maxHeight) - (startrow - 1);
+
+		if (startrow > 0 && initials_rows > 0) { // we need to look back to get the cap
+			currCap = string[0] - 1;
+			last_initial_row = (startrow - 1);
+			initials_rows--;
+		}
 	}
-	int initials_rows = 0;
-	int initials_x = 0;
 
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette *pal = hicolor;
@@ -210,7 +221,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				continue;
 			}
 
-			
 			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
@@ -225,7 +235,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				sprBuffer->SetPalette( pal );
 				continue;
 			}
-			
 			if (stricmp( "p", tag ) == 0) {
 				psx = x;
 				continue;
@@ -260,13 +269,23 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
 		if (initials && capital && enablecap) {
+			currCap = currChar;
 			x = initials->PrintInitial( x, y, rgn, currChar );
 			initials_x = x;
 
 			//how many more lines to be indented (one was already indented)
 			initials_rows = (initials->maxHeight-1)/maxHeight;
+			initials_row = row;
+			last_initial_row = initials_row;
+
 			enablecap = false;
 			continue;
+		}else if(currCap && row > last_initial_row && (row - initials_row) <= ((initials->maxHeight-1)/maxHeight)){
+			// means this row doesnt have a cap, but a preceeding one did and its overlapping this row
+			x = initials->PrintInitial( x, y - (maxHeight * (row - initials_row)), rgn, currCap );
+			initials_x = x;
+			x += psx;
+			last_initial_row++;
 		}
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
 			x + rgn.x, y + rgn.y - yPos[currChar], true, &rgn );
