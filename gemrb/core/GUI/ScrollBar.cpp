@@ -108,7 +108,10 @@ void ScrollBar::SetPosForY(unsigned short y)
 				SetPos( NewPos, false );
 			}
 			if (ta) {
-				//placeholder for textarea per-pixel scrolling
+				// we must "scale" the pixels the slider moves
+				TextArea* t = (TextArea*) ta;
+				unsigned int taY = y * (t->GetRowHeight() / stepPx);
+				t->ScrollToY(taY, this);
 			}
 			SliderYPos = (y + GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED) - 0);
 			core->RedrawAll();
