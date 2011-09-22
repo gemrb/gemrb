@@ -128,6 +128,7 @@ public:
 
 	// allow targetting allies, enemies and/or neutrals (bitmask)
 	int target_types;
+	unsigned short lastMouseX, lastMouseY;
 private:
 	// currently selected targetting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
@@ -136,7 +137,6 @@ private:
 	short moveX, moveY;
 	int numScrollCursor;
 	bool scrolling;
-	unsigned short lastMouseX, lastMouseY;
 	int DebugFlags;
 	Point pfs;
 	PathNode* drawPath;
