@@ -291,6 +291,7 @@ public:
 	int WMLevelMod;
 
 	int LastDamageType;
+	int LastDamage;
 	Point FollowOffset;//follow lastfollowed at this offset
 	Point HomeLocation;//spawnpoint, return here after rest
 
@@ -333,8 +334,8 @@ private:
 	Projectile* attackProjectile ;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
-				 SpriteCover*& sc, Animation** anims,
-				 unsigned char Face, const Color& tint);
+				SpriteCover*& sc, Animation** anims,
+				unsigned char Face, const Color& tint);
 
 	/** fixes the palette */
 	void SetupColors();
@@ -543,7 +544,7 @@ public:
 	/* returns the ranged weapon header associated with the currently equipped projectile */
 	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
-	 if range is nonzero, then which is valid */
+	if range is nonzero, then which is valid */
 	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
@@ -576,7 +577,7 @@ public:
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
- 	/* calculates strength (dexterity) based damage adjustment */
+	/* calculates strength (dexterity) based damage adjustment */
 	int WeaponDamageBonus(WeaponInfo *wi);
 	/* adjusts damage dealt to this actor  */
 	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);

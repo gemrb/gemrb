@@ -357,7 +357,7 @@ Actor::Actor()
 	ShortStrRef = (ieStrRef) -1;
 
 	PCStats = NULL;
-	//LastDamage = 0;
+	LastDamage = 0;
 	LastDamageType = 0;
 	LastExit = 0;
 	attackcount = 0;
@@ -3168,10 +3168,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	if (damage > 0) {
 		GetHit();
-		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter)); // FIXME: lastdamager? LastHitter is not set for spell damage
+		//fixme: implement applytrigger, copy int0 into LastDamage there
+		LastDamage = damage;
+		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
+		AddTrigger(TriggerEntry(trigger_hitby, LastHitter)); // FIXME: lastdamager? LastHitter is not set for spell damage
 	}
 
-	//LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) BaseStats[IE_HITPOINTS];
 	int damagelevel = 0; //FIXME: this level is never used
@@ -6250,7 +6252,7 @@ void Actor::SetSoundFolder(const char *soundset)
 		//TODO: this could be simpler with *
 		if (FileGlob(file, filepath, "??????01")) {
 			file[6] = '\0';
-                } else if (FileGlob(file, filepath, "?????01")) {
+		} else if (FileGlob(file, filepath, "?????01")) {
 			file[5] = '\0';
 		} else if (FileGlob(file, filepath, "????01")) {
 			file[4] = '\0';

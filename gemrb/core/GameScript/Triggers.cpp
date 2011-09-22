@@ -1801,14 +1801,14 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 }
 
 //these triggers work on the current damage (not the last damage)
-/* they are identical to HPLost
+//actually, they use lastdamage
 int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+	int damage = actor->LastDamage;
 	if (damage==(int) parameters->int0Parameter) {
 		return 1;
 	}
@@ -1821,7 +1821,7 @@ int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+	int damage = actor->LastDamage;
 	if (damage>(int) parameters->int0Parameter) {
 		return 1;
 	}
@@ -1834,13 +1834,12 @@ int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+	int damage = actor->LastDamage;
 	if (damage<(int) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
 }
-*/
 
 int GameScript::HPLost(Scriptable* Sender, Trigger* parameters)
 {

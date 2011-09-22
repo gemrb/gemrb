@@ -95,9 +95,9 @@ static const TriggerLink triggernames[] = {
 	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
 	{"creaturehidden", GameScript::CreatureHidden, 0},//this is the engine level hiding feature, not the skill
 	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
-	{"damagetaken", GameScript::HPLost, 0},
-	{"damagetakengt", GameScript::HPLostGT, 0},
-	{"damagetakenlt", GameScript::HPLostLT, 0},
+	{"damagetaken", GameScript::DamageTaken, 0},
+	{"damagetakengt", GameScript::DamageTakenGT, 0},
+	{"damagetakenlt", GameScript::DamageTakenLT, 0},
 	{"dead", GameScript::Dead, 0},
 	{"delay", GameScript::Delay, 0},
 	{"detect", GameScript::Detect, 0}, //so far i see no difference
@@ -2115,7 +2115,7 @@ int Trigger::Evaluate(Scriptable* Sender)
 				triggerID, tmpstr );
 	}
 	int ret = func( Sender, this );
-	if (flags & NEGATE_TRIGGER) {
+	if (flags & TF_NEGATE) {
 		return !ret;
 	}
 	return ret;
@@ -2278,7 +2278,7 @@ Trigger* GenerateTrigger(char* String)
 	int negate = 0;
 	if (*String == '!') {
 		String++;
-		negate = 1;
+		negate = TF_NEGATE;
 	}
 	int len = strlench(String,'(')+1; //including (
 	int i = triggersTable->FindString(String, len);
