@@ -57,7 +57,8 @@ public:
 	int OpenArchive(const char* filename);
 	DataStream* GetStream(unsigned long Resource, unsigned long Type);
 private:
-	static bool DecompressBIF(DataStream* compressed, const char* path);
+	static DataStream* DecompressBIF(DataStream* compressed, const char* path);
+	static DataStream* DecompressBIFC(DataStream* compressed, const char* path);
 	void ReadBIF(void);
 };
 

@@ -220,7 +220,7 @@ program found at
 Path to the data files for the game's particular CDs or any other data sources.
 
 .TP
-.BR GameOnCD =(0|1)
+.BR SlowBIFs =(0|1)
 defaults to
 .IR 0 .
 
