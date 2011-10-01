@@ -63,7 +63,7 @@ void ScrollBar::SetPos(ieDword NewPos, bool redraw)
 {
 	if (!Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]) return;
 
-	if (Value && NewPos > Value) NewPos = Value;
+	if (NewPos > Value) NewPos = Value;
 
 	if (( State & SLIDER_GRAB ) == 0){
 		// set the slider to the exact y for NewPos. in SetPosForY(y) it is set to any arbitrary position that may lie between 2 values.
