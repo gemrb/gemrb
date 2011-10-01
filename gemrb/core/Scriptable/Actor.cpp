@@ -3148,7 +3148,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
-	if (Modified[IE_CLASS] == CLASS_INNOCENT) {
+	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
 		Actor *act=NULL;
 		if (!hitter) {
 			// TODO: check this
@@ -3805,7 +3805,7 @@ void Actor::Die(Scriptable *killer)
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
 
-		if (!InParty && act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
+		if (!InParty && act && act->GetStat(IE_EA) <= EA_CONTROLLABLE && !core->InCutSceneMode()) {
 			// adjust reputation if the corpse was:
 			// an innocent, a member of the Flaming Fist or something evil
 			int repmod = 0;
