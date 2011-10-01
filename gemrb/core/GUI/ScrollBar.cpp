@@ -250,6 +250,10 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		ScrollDown();
 		return;
 	}
+	// check that stepPx is set if value is set
+	if (Value && !stepPx) {
+		SetMax(Value);
+	}
 	if (y >= SliderYPos && y < SliderYPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
 		/*
 		 TODO: factor in where we grab the slider and offset it when dragging.
