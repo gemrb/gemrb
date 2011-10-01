@@ -1,16 +1,18 @@
-GemRB git (a91895bd3a7):
+GemRB V0.6.6 (2011-10-03):
   New features:
-    - 
-    - backstab on condition (like in ToBEx)
     - aura pollution and cleansing, casting interruption
+    - formation rotation
+    - bounty encounters
+    - npclevel.2da support
+    - initial mac bundle support
     - fatigue
+    - backstab on condition (like in ToBEx)
 
   Improved features:
-    - 
     - effects, triggers, actions
-    - keyboard shortcuts (F1-F12), touchscreen ui
+    - keyboard shortcuts (F1-F12), touchscreen ui, scrolling
     - hitpoint gain, thieving skill boni
-    - combat, spellcasting
+    - combat, spellcasting, iwd sounds
     - PST inventory, PST spells
     - bugfixes
 
