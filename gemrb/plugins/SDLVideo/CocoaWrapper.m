@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003-2006 The GemRB Project
+ * Copyright (C) 2003-2011 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  */
 #import <SDL.h>
 #import "CocoaWrapper.h"
-#ifdef TARGET_OS_MAC
+#if TARGET_OS_MAC >= 1
 @interface CocoaWrapper (SDLTerminate)
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
 @end
