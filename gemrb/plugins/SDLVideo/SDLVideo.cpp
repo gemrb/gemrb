@@ -517,7 +517,8 @@ int SDLVideoDriver::PollEvents() {
 		//For swipes. gestures needing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 			touchHold = false;
 			if (Evnt) {
-				if (numFingers == core->NumFingScroll || Evnt->GetMouseFocusedControlType() == IE_GUI_TEXTAREA) { //any # of fingers will scroll a text area
+				if (numFingers == core->NumFingScroll || (numFingers != core->NumFingKboard && Evnt->GetMouseFocusedControlType() == IE_GUI_TEXTAREA)) {
+					//any # of fingers != NumFingKBoard will scroll a text area
 					if (Evnt->GetMouseFocusedControlType() != IE_GUI_TEXTAREA) {
 						// if focus is IE_GUI_TEXTAREA we need mouseup to clear scrollbar flags so this scrolling doesnt break after interactind with the slider
 						ignoreNextMouseUp = true;
