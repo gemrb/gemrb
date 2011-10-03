@@ -204,6 +204,7 @@ ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 	ACT_QSLOT3, ACT_INNATE};
 static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
+static int IWDSound = false;
 static ieDword TranslucentShadows = 0;
 static int ProjectileSize = 0; //the size of the projectile immunity bitfield (dwords)
 
@@ -1437,6 +1438,7 @@ static void InitActorTables()
 	ReverseToHit = core->HasFeature(GF_REVERSE_TOHIT);
 	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
+	IWDSound = core->HasFeature(GF_SOUNDS_INI);
 
 	//this table lists various level based xp bonuses
 	AutoTable tm("xpbonus");
@@ -6115,6 +6117,8 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
 }
 
+//Get the monster sound from a global .ini file.
+//It is ResData.ini in PST and Sounds.ini in IWD/HoW
 void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 {
 	const char *resource = "";
@@ -6127,15 +6131,19 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 
 	switch(index) {
 		case VB_ATTACK:
-			resource = core->GetResDataINI()->GetKeyAsString(section, "at1sound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att1":"at1sound","");
 			break;
 		case VB_DAMAGE:
-			resource = core->GetResDataINI()->GetKeyAsString(section, "hitsound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"damage":"hitsound","");
 			break;
 		case VB_DIE:
-			resource = core->GetResDataINI()->GetKeyAsString(section, "dfbsound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"death":"dfbsound","");
 			break;
 		case VB_SELECT:
+			//this isn't in PST, apparently
+			if (IWDSound) {
+				resource = core->GetResDataINI()->GetKeyAsString(section, "selected","");
+			}
 			break;
 	}
 	int count = CountElements(resource,',');
