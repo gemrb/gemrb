@@ -602,6 +602,7 @@ void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
 
 void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 {
+	checkALError("Uncaught AL error.", "WARNING"); // clear any previous errors
 	ALfloat listen[3];
 	alGetListenerfv( AL_POSITION, listen );
 	if (checkALError("Unable to get listener pos", "ERROR")) return;
