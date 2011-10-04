@@ -32,12 +32,10 @@
 
 void vprint(const char *message, va_list ap)
 {
-#if (!defined(WIN32) || defined(__MINGW32__))
-# ifdef ANDROID
+#ifdef ANDROID
 	__android_log_vprint(ANDROID_LOG_INFO, "printf:", message, ap);
-# else
+#elif (!defined(WIN32)) || defined(WIN32_USE_STDIO)
 	vprintf(message, ap);
-# endif
 #else
 	// Don't try to be smart.
 	// Assume this is long enough. If not, message will be truncated.
@@ -58,7 +56,7 @@ void print(const char *message, ...)
 }
 
 #ifndef NOCOLOR
-#ifdef WIN32
+#if defined(WIN32)
 static int colors[] = {
 	0,
 	FOREGROUND_RED,
@@ -104,12 +102,10 @@ void textcolor(log_color c)
 {
 #ifdef NOCOLOR
 	if (c) while (0) ;
-#else
-#ifdef WIN32
+#elif defined(WIN32)
 	SetConsoleTextAttribute(hConsole, colors[c]);
 #else
 	print("%s", colors[c]);
-#endif
 #endif
 }
 
