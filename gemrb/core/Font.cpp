@@ -130,6 +130,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int initials_row = 0;
 	unsigned char currCap = 0;
 	size_t len = strlen( ( char* ) string );
+	int num_empty_rows = 0;
 
 	if (initials)
 	{
@@ -137,11 +138,12 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		enablecap=true;
 		initials_rows = ((initials->maxHeight - 1) / maxHeight) - (startrow - 1);
 
-		if (startrow > 0 && initials_rows > 0) { // we need to look back to get the cap
-			size_t i = 0;
-			do{
-				currCap = string[i++] - 1;
-			}while(isspace(currCap) && i < len);
+		currCap = string[0] - 1;
+		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
+			while(isspace(currCap) && num_empty_rows < (int)len){//we cant cap whitespace so keep looking
+				currCap = string[++num_empty_rows] - 1;
+				// WARNING: this assumes all preceeding whitespace is an empty line
+			}
 			last_initial_row = (startrow - 1);
 			initials_rows--;
 		}
@@ -285,9 +287,13 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 			enablecap = false;
 			continue;
-		}else if(currCap && row > last_initial_row && (row - initials_row) <= ((initials->maxHeight-1)/maxHeight)){
+		}else if(initials && currCap && row > last_initial_row && (row - num_empty_rows - initials_row) <= ((initials->maxHeight-1)/maxHeight)){
 			// means this row doesnt have a cap, but a preceeding one did and its overlapping this row
-			x = initials->PrintInitial( x, y - (maxHeight * (row - initials_row)), rgn, currCap );
+			int initY = y;
+			if (!num_empty_rows) {// num_empty_rows is for scrolling text areas
+				initY = (y - (maxHeight * (row - initials_row)));
+			}
+			x = initials->PrintInitial( x, initY, rgn, currCap );
 			initials_x = x;
 			x += psx;
 			last_initial_row++;
