@@ -1748,10 +1748,11 @@ int Interface::Init()
 		printStatus( "NOT FOUND", YELLOW );
 	}
 
-	if (HasFeature( GF_RESDATA_INI )) {
+	int resdata = HasFeature( GF_RESDATA_INI );
+	if (resdata || HasFeature(GF_SOUNDS_INI) ) {
 		printMessage( "Core", "Loading resource data File...", WHITE );
 		INIresdata = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		DataStream* ds = gamedata->GetResource("resdata", IE_INI_CLASS_ID);
+		DataStream* ds = gamedata->GetResource(resdata? "resdata":"sounds", IE_INI_CLASS_ID);
 		if (!INIresdata->Open(ds)) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
@@ -2525,6 +2526,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ForceAreaScript",    //59GF_FORCE_AREA_SCRIPT
 		"AreaOverride",       //60GF_AREA_OVERRIDE
 		"NoNewVariables",     //61GF_NO_NEW_VARIABLES
+		"HasSoundsIni",       //62GF_SOUNDS_INI
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

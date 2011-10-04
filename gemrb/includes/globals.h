@@ -34,7 +34,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.6.5-git"
+#define VERSION_GEMRB "0.6.6-git"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
@@ -144,8 +144,9 @@
 #define  GF_FORCE_AREA_SCRIPT           59 //how and iwd2 (maybe iwd1)
 #define  GF_AREA_OVERRIDE               60 //pst maze and other hardcode
 #define  GF_NO_NEW_VARIABLES            61 //pst
+#define  GF_SOUNDS_INI                  62 //iwd/how/iwd2
 //update this or bad things can happen
-#define GF_COUNT 62
+#define GF_COUNT 63
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
