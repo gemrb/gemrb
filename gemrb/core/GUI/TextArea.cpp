@@ -43,7 +43,6 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
 	keeplines = 100;
 	rows = 0;
-	smooth = 0;
 	TextYPos = 0;
 	startrow = 0;
 	minrow = 0;
@@ -133,13 +132,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		thisTime = GetTickCount();
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
-			smooth--;
-			while (smooth<=0) {
-				smooth+=ftext->maxHeight;
-				if (startrow<rows) {
-					startrow++;
-				}
-			}
+
+			TextYPos++;// can't use ScrollToY
+			if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
 
 			/** Forcing redraw of whole screen before drawing text*/
 			Owner->Invalidate();
@@ -160,12 +155,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	size_t linesize = lines.size();
 	if (linesize == 0) {
 		return;
-	}
-
-	//smooth vertical scrolling up
-	if (Flags & IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		clip.y+=smooth;
-		clip.h-=smooth;
 	}
 
 	//if textarea is 'selectable' it actually means, it is a listbox
@@ -970,14 +959,16 @@ void TextArea::Clear()
 //TEXTAREA_OUTOFTEXT callback is called automatically
 void TextArea::SetupScroll(unsigned long tck)
 {
+	/*
+	tck=number of ticks in which it takes to scroll 1 line
+	*/
 	SetPreservedRow(0);
-	smooth = ftext->maxHeight;
 	startrow = 0;
 	ticks = tck;
 	//clearing the textarea
 	Clear();
-	unsigned int i = (unsigned int) (Height/smooth);
-	while (i--) {
+	unsigned int i = (unsigned int) (Height/ftext->maxHeight);
+	while (i--) { //push empty lines so that the text starts out of view.
 		char *str = (char *) malloc(1);
 		str[0]=0;
 		lines.push_back(str);

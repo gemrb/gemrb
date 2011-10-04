@@ -129,8 +129,6 @@ private: // Private attributes
 	int minrow;
 	/** lines to be kept even if scrolled out */
 	int keeplines;
-	/** vertical offset for smooth scrolling */
-	int smooth;
 	unsigned long TextYPos;
 	/** timer for scrolling */
 	unsigned long starttime;
