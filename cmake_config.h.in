@@ -12,3 +12,4 @@
 #cmakedefine NOCOLOR ${NOCOLOR}
 #cmakedefine HAVE_MALLOC_H 1
 #cmakedefine HAVE_UNISTD_H 1
+#cmakedefine WIN32_USE_STDIO 1
