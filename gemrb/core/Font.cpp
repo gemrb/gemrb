@@ -129,6 +129,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int initials_x = 0;
 	int initials_row = 0;
 	unsigned char currCap = 0;
+	size_t len = strlen( ( char* ) string );
 
 	if (initials)
 	{
@@ -137,7 +138,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		initials_rows = ((initials->maxHeight - 1) / maxHeight) - (startrow - 1);
 
 		if (startrow > 0 && initials_rows > 0) { // we need to look back to get the cap
-			currCap = string[0] - 1;
+			size_t i = 0;
+			do{
+				currCap = string[i++] - 1;
+			}while(isspace(currCap) && i < len);
 			last_initial_row = (startrow - 1);
 			initials_rows--;
 		}
@@ -154,7 +158,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	}
 
 	sprBuffer->SetPalette( pal );
-	size_t len = strlen( ( char* ) string );
+
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
 	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
