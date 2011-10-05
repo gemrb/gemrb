@@ -27,17 +27,16 @@
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D()
+Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels)
+	: Width(Width), Height(Height), Bpp(Bpp), vptr(vptr), pixels(pixels)
 {
 	BAM = false;
-	vptr = NULL;
-	pixels = NULL;
 	XPos = 0;
 	YPos = 0;
 	RefCount = 1;
 }
 
-Sprite2D::~Sprite2D(void)
+Sprite2D::~Sprite2D()
 {
 }
 

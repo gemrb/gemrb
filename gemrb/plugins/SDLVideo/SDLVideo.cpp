@@ -758,25 +758,18 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	Sprite2D* spr = new Sprite2D();
 	void* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
 				rMask, gMask, bMask, aMask );
-	spr->vptr = p;
-	spr->pixels = pixels;
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			index );
 	}
-	spr->Width = w;
-	spr->Height = h;
-	spr->Bpp = bpp;
-	return spr;
+	return new Sprite2D(w, h, bpp, p, pixels);
 }
 
 Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	void* palette, bool cK, int index)
 {
-	Sprite2D* spr = new Sprite2D();
 	void* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, 8, w, 0, 0, 0, 0 );
 	int colorcount;
 	if (bpp == 8) {
@@ -785,15 +778,10 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 		colorcount = 16;
 	}
 	GEM_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette, 0, colorcount );
-	spr->vptr = p;
-	spr->pixels = pixels;
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY, index );
 	}
-	spr->Width = w;
-	spr->Height = h;
-	spr->Bpp = bpp;
-	return spr;
+	return new Sprite2D(w, h, bpp, p, pixels);
 }
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
@@ -801,10 +789,7 @@ Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 					 AnimationFactory* datasrc,
 					 Palette* palette, int transindex)
 {
-	Sprite2D* spr = new Sprite2D();
-	spr->BAM = true;
 	Sprite2D_BAM_Internal* data = new Sprite2D_BAM_Internal;
-	spr->vptr = data;
 
 	palette->IncRef();
 	data->pal = palette;
@@ -815,11 +800,8 @@ Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 	data->source = datasrc;
 	datasrc->IncDataRefCount();
 
-	spr->pixels = (const void*)pixeldata;
-	spr->Width = w;
-	spr->Height = h;
-	spr->Bpp = 8; // FIXME!!!!
-
+	Sprite2D* spr = new Sprite2D(w, h, 8 /* FIXME!!!! */, data, pixeldata);
+	spr->BAM = true;
 	return spr;
 }
 
