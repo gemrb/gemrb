@@ -758,7 +758,7 @@ bool Actor::ApplyKit(bool remove)
 	}
 	//single class
 	ieDword cls = GetStat(IE_CLASS);
-	if (cls<(ieDword) classcount) {
+	if (cls>=(ieDword) classcount) {
 		return false;
 	}
 	max = GetClassLevel(levelslotsbg[cls]);
@@ -2366,7 +2366,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
-	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] <= (ieDword)classcount)
+	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] < (ieDword)classcount)
 		RefreshPCStats();
 
 	for (i=0;i<MAX_STATS;i++) {
@@ -3505,33 +3505,32 @@ ieDword Actor::GetXPLevel(int modified) const
 		stats = BaseStats;
 	}
 
-	float classcount = 0;
+	int clscount = 0;
 	float average = 0;
 	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		// iwd2
 		for (int i=0; i < 11; i++) {
-			if (stats[levelslotsiwd2[i]] > 0) classcount++;
+			if (stats[levelslotsiwd2[i]] > 0) clscount++;
 		}
-		average = stats[IE_CLASSLEVELSUM] / classcount + 0.5;
-	}
-	else {
+		average = stats[IE_CLASSLEVELSUM] / (float) clscount + 0.5;
+	} else {
 		int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
 		average = levels[0];
-		classcount = 1;
+		clscount = 1;
 		if (IsDualClassed()) {
 			// dualclassed
 			if (levels[1] > 0) {
-				classcount++;
+				clscount++;
 				average += levels[1];
 			}
 		}
 		else if (IsMultiClassed()) {
-				//classcount is the number of on bits in the MULTI field
-				classcount = bitcount (multiclass);
-				for (int i=1; i<classcount; i++)
+				//clscount is the number of on bits in the MULTI field
+				clscount = bitcount (multiclass);
+				for (int i=1; i<clscount; i++)
 					average += levels[i];
 		} //else single classed
-		average = average / classcount + 0.5;
+		average = average / (float) clscount + 0.5;
 	}
 	return ieDword(average);
 }
@@ -4185,7 +4184,7 @@ int Actor::GetHpAdjustment(int multiplier)
 	int val;
 
 	// only player classes get this bonus
-	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] > (ieDword)classcount) {
+	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
 		return 0;
 	}
 
@@ -4746,7 +4745,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// add non-proficiency penalty, which is missing from the table
 	if (stars == 0) {
 		ieDword clss = BaseStats[IE_CLASS];
-		if (clss <= (ieDword) classcount) {
+		//Is it a PC class?
+		if (clss < (ieDword) classcount) {
 			THAC0Bonus -= defaultprof[clss];
 		} else {
 			//it is not clear what is the penalty for non player classes
