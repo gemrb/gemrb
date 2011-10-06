@@ -24,9 +24,11 @@
 
 import GemRB
 from GUIDefines import *
-from ie_restype import *
+#from ie_restype import *
+from ie_stats import *
 import GUICommon
 import GUICommonWindows
+import GUIClasses
 import MessageWindow
 import CommonWindow
 
@@ -103,7 +105,7 @@ def OpenEndMessageWindow ():
 	ContinueWindow.SetVisible(WINDOW_VISIBLE)
 	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
 	Button = ContinueWindow.GetControl (0)
-	Button.SetText (9371)	
+	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
@@ -147,14 +149,19 @@ def UpdateReformWindow ():
 
 	for i in range (PARTY_SIZE+1):
 		Button = Window.GetControl (i)
-		Button.EnableBorder (FRAME_PC_SELECTED, select == i+2 )
-		#+2 because protagonist is skipped
-		pic = GemRB.GetPlayerPortrait (i+2,1)
-		if not pic:
+		if i+1 not in removable_pcs:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			continue
 
+	for i in removable_pcs:
+		Button = Window.GetControl (removable_pcs.index(i))
+		Button.EnableBorder (FRAME_PC_SELECTED, select == i )
+		pic = GemRB.GetPlayerPortrait (i, 1)
+		if not pic:
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
+			continue
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		Button.SetPicture (pic, "NOPORTSM")
@@ -169,7 +176,7 @@ def RemovePlayer ():
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
-	ReformPartyWindow = Window = GemRB.LoadWindow (25)
+	ReformPartyWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#are you sure
@@ -187,6 +194,12 @@ def RemovePlayer ():
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerCancel)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	GemRB.SetVar ("OtherWindow", Window.ID)
+	GemRB.SetVar ("ActionsWindow", -1)
+	if hideflag:
+		GemRB.UnhideGUI ()
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+
 
 def RemovePlayerConfirm ():
 	global ReformPartyWindow
@@ -217,7 +230,8 @@ def RemovePlayerCancel ():
 	return
 
 def OpenReformPartyWindow ():
-	global ReformPartyWindow
+	global ReformPartyWindow, OldActionsWindow, OldMessageWindow
+	global removable_pcs
 
 	GemRB.SetVar ("Selected", 0)
 	hideflag = GemRB.HideGUI ()
@@ -225,19 +239,30 @@ def OpenReformPartyWindow ():
 	if ReformPartyWindow:
 		if ReformPartyWindow:
 			ReformPartyWindow.Unload ()
-		ReformPartyWindow = None
 
+		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
+		GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
 		GemRB.SetVar ("OtherWindow", -1)
-		#GemRB.LoadWindowPack ("GUIREC")
+
+		OldActionsWindow = None
+		OldMessageWindow = None
+		ReformPartyWindow = None
 		if hideflag:
 			GemRB.UnhideGUI ()
 		#re-enabling party size control
 		GemRB.GameSetPartySize (PARTY_SIZE)
+		GUICommonWindows.UpdatePortraitWindow()
 		return
 
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window.ID)
+
+	# skip exportable party members (usually only the protagonist)
+	removable_pcs = []
+	for i in range (1, GemRB.GetPartySize()+1):
+		if not GemRB.GetPlayerStat (i, IE_MC_FLAGS)&MC_EXPORTABLE:
+			removable_pcs.append(i)
 
 	#PC portraits
 	for j in range (PARTY_SIZE+1):
@@ -245,9 +270,8 @@ def OpenReformPartyWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
-		#protagonist is skipped
-		index = j + 2
-		Button.SetVarAssoc ("Selected", index)
+		if j < len(removable_pcs):
+			Button.SetVarAssoc ("Selected", removable_pcs[j])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateReformWindow)
 
 	# Remove
@@ -259,7 +283,19 @@ def OpenReformPartyWindow ():
 	Button = Window.GetControl (8)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
+
+	OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
+	OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
 	GemRB.SetVar ("ActionsWindow", -1)
+	GemRB.SetVar ("MessageWindow", -1)
+
+	# if nobody can be removed, just close the window
+	if not removable_pcs:
+		OpenReformPartyWindow ()
+		if hideflag:
+			GemRB.UnhideGUI ()
+		return
+
 	UpdateReformWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
