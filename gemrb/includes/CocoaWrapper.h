@@ -26,7 +26,10 @@ extern int SDL_main(int argc, char *argv[]);
 #elif TARGET_OS_MAC
 #import <Cocoa/Cocoa.h>
 __attribute__ ((visibility("default")))
-@interface CocoaWrapper : NSObject <NSApplicationDelegate>
+@interface CocoaWrapper : NSObject
+#if __MAC_OS_X_VERSION_MIN_REQUIRED > 1050
+<NSApplicationDelegate>
+#endif
 {
 }
 // Override these application delegate methods in plugin categories
