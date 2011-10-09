@@ -608,17 +608,19 @@ def ExportEditChanged():
 	return
 
 def CloseSubCustomizeWindow ():
-	global SubCustomizeWindow
+	global SubCustomizeWindow, CustomizeWindow
 
 	if SubCustomizeWindow:
 		SubCustomizeWindow.Unload ()
 		SubCustomizeWindow = None
+	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CloseSubSubCustomizeWindow ():
-	global SubSubCustomizeWindow
+	global SubSubCustomizeWindow, SubCustomizeWindow
 
 	if SubSubCustomizeWindow:
 		SubSubCustomizeWindow.Unload ()
 		SubSubCustomizeWindow = None
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
