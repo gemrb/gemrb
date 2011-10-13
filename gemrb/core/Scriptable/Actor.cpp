@@ -4801,6 +4801,10 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
 		CriticalBonus++;
 	}
+	//iwd2 increased critical hit chance
+	if (core->HasFeature(GF_3ED_RULES) && HasFeat(FEAT_IMPROVED_CRITICAL)) {
+		CriticalBonus--;
+	}
 	return true;
 }
 
