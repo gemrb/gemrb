@@ -5307,7 +5307,10 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			//a critical surely raises the morale?
 			//only if it is successful
 			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-			damage <<=1; //critical damage is always double?
+			// TODO: critical damage is always double, except for iwd2 where it is arbitrary (the number after the threat range)
+			// the manual states that many weapons x3, so we need to check if it is hardcoded or find
+			// the fields used for both the threat range and the multiplier
+			damage <<=1;
 			core->timer->SetScreenShake(16,16,8);
 		}
 	}
