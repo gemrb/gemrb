@@ -4799,7 +4799,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
-		CriticalBonus++;
+		CriticalBonus--;
 	}
 	//iwd2 increased critical hit chance
 	if (core->HasFeature(GF_3ED_RULES) && HasFeat(FEAT_IMPROVED_CRITICAL)) {
@@ -5111,7 +5111,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		damage = 0;
 	}
 
-	if (roll >= (ATTACKROLL - (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus)) {
+	if (roll >= (ATTACKROLL - (int) GetStat(IE_CRITICALHITBONUS) + CriticalBonus)) {
 		//critical success
 		printBracket("Critical Hit", GREEN);
 		print("\n");
