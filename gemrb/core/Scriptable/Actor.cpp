@@ -5073,7 +5073,24 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("Next: %d ", nextattack);
 	}
 
-	int roll = LuckyRoll(1, ATTACKROLL, LR_CRITICAL);
+	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
+	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
+	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
+	if (core->HasFeature(GF_3ED_RULES)) {
+		int ThreatRangeMin = ATTACKROLL; // FIXME: this is just the default
+		if (header && (header->RechargeFlags&IE_ITEM_KEEN)) {
+			ThreatRangeMin--; // FIXME: should really double the threat range
+		}
+		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus); // TODO: move to GetCombatDetails
+		criticalroll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
+		if (criticalroll < ThreatRangeMin) {
+			// make it an ordinary hit
+			criticalroll = 1;
+		} else {
+			// make sure it will be a critical hit
+			criticalroll = ATTACKROLL;
+		}
+	}
 	if (roll==1) {
 		//critical failure
 		printBracket("Critical Miss", RED);
@@ -5111,7 +5128,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		damage = 0;
 	}
 
-	if (roll >= (ATTACKROLL - (int) GetStat(IE_CRITICALHITBONUS) + CriticalBonus)) {
+	if (criticalroll >= ATTACKROLL) {
 		//critical success
 		printBracket("Critical Hit", GREEN);
 		print("\n");
