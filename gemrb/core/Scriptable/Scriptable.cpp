@@ -689,7 +689,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 	//PST has a weird effect, called Enoll Eva's duplication
 	//it creates every projectile of the affected actor twice
-	int duplicate = 1;
+	int projectileCount = 1;
 	if (Type == ST_ACTOR) {
 		caster = (Actor *) this;
 		caster->CureInvisibility();
@@ -697,10 +697,10 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			caster->CureSanctuary();
 		}
 
-		//FIXME: 1 duplicate is no duplicate, right?
-		duplicate = caster->wildSurgeMods.num_castings;
-		if (!duplicate) {
-			duplicate = 1;
+		// check if a wild surge ordered us to replicate the projectile
+		projectileCount = caster->wildSurgeMods.num_castings;
+		if (!projectileCount) {
+			projectileCount = 1;
 		}
 	}
 
@@ -708,11 +708,11 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
 			//seriously, wild surges and EE in the same game?
 			//anyway, it would be too many duplications
-			duplicate = 2;
+			projectileCount = 2;
 		}
 	}
 
-	while(duplicate --) {
+	while(projectileCount --) {
 		Projectile *pro = NULL;
 		// jump through hoops to skip applying selftargetting spells to the caster
 		// if we'll be changing the target
