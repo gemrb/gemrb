@@ -31,6 +31,8 @@
 #include "ProjectileServer.h"
 #include "Scriptable/Actor.h"
 
+static int pstflags = false;
+
 SPLExtHeader::SPLExtHeader(void)
 {
 	features = NULL;
@@ -45,6 +47,7 @@ Spell::Spell(void)
 {
 	ext_headers = NULL;
 	casting_features = NULL;
+	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 }
 
 Spell::~Spell(void)
@@ -132,7 +135,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		} else {
 			features = ext_headers[block_index].features;
 			count = ext_headers[block_index].FeatureCount;
-			if (!(ext_headers[block_index].Hostile&4)) {
+			if (pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
 		}
