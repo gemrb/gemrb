@@ -1082,8 +1082,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 		}
 	}
 
-	// FIXME: fishy
-	if (!target) target = this;
+	assert(target);
 
 	if(!nointerrupt && !CanCast(SpellResRef)) {
 		SpellResRef[0] = 0;
