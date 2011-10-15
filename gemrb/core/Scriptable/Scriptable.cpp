@@ -1192,15 +1192,13 @@ int Scriptable::CheckWildSurge()
 			int check = roll + caster->GetCasterLevel(spl->SpellType) + caster->Modified[IE_SURGEMOD];
 			if (caster->Modified[IE_CHAOSSHIELD]) {
 				//avert the surge and decrease the chaos shield counter
-				//FIXME: if 0 is also good, use that
-				check = 100;
+				check = 0;
 				caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
 				displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,DMC_LIGHTGREY,caster);
 			}
 
-			// hundred or more means a normal cast
-			//FIXME: what happens if check is 0
-			if (check && (check < 100) ) {
+			// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
+			if ((check > 0) && (check < 100) ) {
 				// display feedback: Wild Surge: bla bla
 				char *s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
 				char *s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
