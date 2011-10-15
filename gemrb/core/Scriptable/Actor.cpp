@@ -3383,6 +3383,7 @@ void Actor::DebugDump()
 	print( "Dialog:     %.8s\n", Dialog );
 	print( "Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
 	print( "Script name:%.32s    Current action: %d\n", scriptName, CurrentAction ? CurrentAction->actionID : -1);
+	print( "Int. Flags: 0x%x ", InternalFlags);
 	print( "TalkCount:  %d   ", TalkCount );
 	print( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	print( "Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
@@ -5762,7 +5763,7 @@ bool Actor::ShouldDrawCircle()
 
 	int State = Modified[IE_STATE_ID];
 
-	if (State&STATE_DEAD || InternalFlags&IF_JUSTDIED) {
+	if ((State&STATE_DEAD) || (InternalFlags&IF_REALLYDIED)) {
 		return false;
 	}
 
