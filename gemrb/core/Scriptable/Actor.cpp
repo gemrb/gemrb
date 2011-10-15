@@ -2983,8 +2983,6 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 
 	Action *action;
 	char Tmp[40];
-	//FIXME: GenerateActionDirect should work on any scriptable
-	//they just need global ID
 	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {
 		panicmode = PANIC_RANDOMWALK;
 	}
@@ -2992,7 +2990,7 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 	switch(panicmode) {
 	case PANIC_RUNAWAY:
 		strncpy(Tmp,"RunAwayFromNoInterrupt([-1])", sizeof(Tmp) );
-		action = GenerateActionDirect(Tmp, (Actor *) attacker);
+		action = GenerateActionDirect(Tmp, attacker);
 		break;
 	case PANIC_RANDOMWALK:
 		strncpy(Tmp,"RandomWalk()", sizeof(Tmp) );
