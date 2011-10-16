@@ -46,5 +46,6 @@ Item_Slot_2           GUICommonWindows ActionQItem2Pressed               0
 Item_Slot_3           GUICommonWindows ActionQItem3Pressed               0
 Item_Slot_4           GUICommonWindows ActionQItem4Pressed               0
 Item_Slot_5           GUICommonWindows ActionQItem5Pressed               0
+Attack                FloatMenuWindow  FloatMenuSelectWeapons            0
 Default               GUICommon        ResolveKey                        0
 

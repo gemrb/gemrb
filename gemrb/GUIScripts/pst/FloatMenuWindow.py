@@ -454,7 +454,8 @@ def FloatMenuSelectWeapons ():
 	float_menu_selected = None
 	# FIXME: Force attack mode
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
-	UpdateFloatMenuWindow ()
+	if FloatMenuWindow:
+		UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectItems ():
