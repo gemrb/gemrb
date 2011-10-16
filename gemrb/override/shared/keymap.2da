@@ -46,6 +46,24 @@ Item_Slot_2           GUICommonWindows ActionQItem2Pressed               0
 Item_Slot_3           GUICommonWindows ActionQItem3Pressed               0
 Item_Slot_4           GUICommonWindows ActionQItem4Pressed               0
 Item_Slot_5           GUICommonWindows ActionQItem5Pressed               0
+# pst has quick weapons and items under different names
+Quick_Weapon_Slot1    GUICommonWindows ActionQWeapon1Pressed             0
+Quick_Weapon_Slot2    GUICommonWindows ActionQWeapon2Pressed             0
+Quick_Weapon_Slot3    GUICommonWindows ActionQWeapon3Pressed             0
+Quick_Weapon_Slot4    GUICommonWindows ActionQWeapon4Pressed             0
+Quick_Item_Slot1      GUICommonWindows ActionQItem1Pressed               0
+Quick_Item_Slot2      GUICommonWindows ActionQItem2Pressed               0
+Quick_Item_Slot3      GUICommonWindows ActionQItem3Pressed               0
+Quick_Item_Slot4      GUICommonWindows ActionQItem4Pressed               0
+Quick_Item_Slot5      GUICommonWindows ActionQItem5Pressed               0
+Action_Menu           FloatMenuWindow  OpenFloatMenuWindow               0
+Action_Menu_-_Previous FloatMenuWindow FloatMenuSelectPreviousPC         0
+Action_Menu_-_Next    FloatMenuWindow  FloatMenuSelectNextPC             0
 Attack                FloatMenuWindow  FloatMenuSelectWeapons            0
+# these are duplicates and require the window to be set up first
+#Use_Item              FloatMenuWindow  FloatMenuSelectItems              0
+#Cast_Spell            FloatMenuWindow  FloatMenuSelectSpells             0
+#Dialog                FloatMenuWindow  FloatMenuSelectDialog             0
+Special_Abilities      FloatMenuWindow  FloatMenuSelectAbilities          0
 Default               GUICommon        ResolveKey                        0
 
