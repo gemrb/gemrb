@@ -129,7 +129,7 @@ GameControl::GameControl(void)
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
-	EnableRunning = true; //make this a game flag if you wish
+	AlwaysRun = false; //make this a game flag if you wish
 	ieDword tmp=0;
 
 	ResetTargetMode();
@@ -252,14 +252,15 @@ void GameControl::Center(unsigned short x, unsigned short y)
 void GameControl::CreateMovement(Actor *actor, const Point &p)
 {
 	char Tmp[256];
+	static bool CanRun = true;
 
 	Action *action = NULL;
-	if (DoubleClick && EnableRunning) {
+	if (CanRun && (DoubleClick || AlwaysRun)) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 		action = GenerateAction( Tmp );
 		//if it didn't work don't insist
 		if (!action)
-			EnableRunning = false;
+			CanRun = false;
 	}
 	if (!action) {
 		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
@@ -2925,3 +2926,7 @@ void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), 0), time);
 }
 
+void GameControl::ToggleAlwaysRun()
+{
+	AlwaysRun = !AlwaysRun;
+}

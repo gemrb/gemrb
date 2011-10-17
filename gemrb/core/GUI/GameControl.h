@@ -145,7 +145,7 @@ private:
 	int DialogueFlags;
 	char *DisplayText;
 	unsigned int DisplayTextTime;
-	bool EnableRunning;
+	bool AlwaysRun;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -255,6 +255,7 @@ public:
 	/** Page is the spell type + spell level info */
 	void SetupCasting(ieResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
 	bool SetEvent(int eventType, EventHandler handler);
+	void ToggleAlwaysRun();
 };
 
 #endif

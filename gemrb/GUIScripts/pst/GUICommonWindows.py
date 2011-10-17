@@ -604,3 +604,6 @@ def EmptyControls ():
 
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
+
+def ToggleAlwaysRun():
+	GemRB.GameControlToggleAlwaysRun()

@@ -3137,6 +3137,21 @@ static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /
 	return PyInt_FromLong(gc->GetTargetMode());
 }
 
+PyDoc_STRVAR( GemRB_GameControlToggleAlwaysRun__doc,
+"GameControlToggleAlwaysRun()\n\n"
+"Toggles using running instead of walking by default" );
+
+static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject* /*args*/)
+{
+
+	GET_GAMECONTROL();
+
+	gc->ToggleAlwaysRun();
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Button_SetFlags__doc,
 "SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
 "Sets the Display Flags of a Button." );
@@ -10178,6 +10193,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(FillPlayerInfo, METH_VARARGS),
 	METHOD(FindStoreItem, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
+	METHOD(GameControlToggleAlwaysRun, METH_NOARGS),
 	METHOD(GameControlSetLastActor, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),

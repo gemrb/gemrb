@@ -65,5 +65,6 @@ Attack                FloatMenuWindow  FloatMenuSelectWeapons            0
 #Cast_Spell            FloatMenuWindow  FloatMenuSelectSpells             0
 #Dialog                FloatMenuWindow  FloatMenuSelectDialog             0
 Special_Abilities      FloatMenuWindow  FloatMenuSelectAbilities          0
+Toggle_Always_Run     GUICommonWindows ToggleAlwaysRun                   0
 Default               GUICommon        ResolveKey                        0
 
