@@ -790,8 +790,7 @@ void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
-		//TODO: current attacker should be passed instead of NULL
-		actor->Panic(NULL, core->Roll(1,3,0) );
+		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
 	}
 	//for new colour
 	actor->SetCircleSize();
