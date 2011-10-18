@@ -8462,7 +8462,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 //print("%s %d %d %s\n", spell->spellname, spell->type, type, (disabled_spellcasting&type) ? "disabled":"enabled" );
 		if (core->CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&type) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
-			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
+			btn->EnableBorder(1, false);
 			PyObject *Function = PyDict_GetItemString(dict, "UpdateActionsWindow");
 			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonCallback(Function)); //noop
 		} else {
@@ -8781,6 +8781,7 @@ jump_label:
 		}
 		btn->SetState(state);
 		//you have to set this overlay up
+		//FIXME: is this really state==IE_GUI_BUTTON_DISABLED ??? That means active border for a disabled button
 		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
 	}
 	Py_INCREF( Py_None );
