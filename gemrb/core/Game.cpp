@@ -824,9 +824,8 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 	for (i = 0; i < NPCs.size(); i++) {
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
-			if (!CheckForReplacementActor(i)) {
-				newMap->AddActor( NPCs[i] );
-			} // when it happens, it will be handled by the loop limit reevaluation
+			(void)CheckForReplacementActor(i);
+			newMap->AddActor( NPCs[i] );
 		}
 	}
 	if (hide) {
@@ -863,6 +862,7 @@ bool Game::CheckForReplacementActor(int i) {
 				if (!newact) {
 					error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
 				} else {
+					newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
 					DelNPC(InStore(act));
 					return true;
 				}
