@@ -335,7 +335,7 @@ void Scriptable::TickScripting()
 		actorState = ((Actor *)this)->Modified[IE_STATE_ID];
 
 	// Dead actors only get one chance to run a new script.
-	if ((actorState & STATE_DEAD) && !(InternalFlags & IF_JUSTDIED))
+	if ( (InternalFlags& (IF_REALLYDIED|IF_JUSTDIED))==IF_REALLYDIED)
 		return;
 
 	ScriptTicks++;
