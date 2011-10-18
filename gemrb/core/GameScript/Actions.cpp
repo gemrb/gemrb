@@ -4324,8 +4324,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		//noticed attempt
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL, DMC_WHITE);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
-			tar->AddTrigger(TriggerEntry(trigger_attackedby, snd->GetGlobalID()));
-			tar->LastAttacker = snd->GetGlobalID(); // FIXME
+			scr->AttackedBy(snd);
 		} else {
 			//pickpocket failed trigger
 			tar->AddTrigger(TriggerEntry(trigger_pickpocketfailed, snd->GetGlobalID()));

@@ -9635,8 +9635,10 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	}
 
 	//not sure if this is ok
-	//owner->LastAttacker = attacker->GetID();
 	//owner->LastDisarmFailed = attacker->GetGlobalID();
+	if (core->HasFeature(GF_STEAL_IS_ATTACK)) {
+		owner->AttackedBy(attacker);
+	}
 	owner->AddTrigger(TriggerEntry(trigger_stealfailed, attacker->GetGlobalID()));
 	Py_INCREF( Py_None );
 	return Py_None;

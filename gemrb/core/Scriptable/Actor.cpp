@@ -2293,6 +2293,8 @@ void Actor::DisablePortraitIcon(ieByte icon)
 	}
 }
 
+static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
+
 /** call this after load, to apply effects */
 void Actor::RefreshEffects(EffectQueue *fx)
 {
@@ -2362,6 +2364,26 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
 		m->flags |= TEF_PROCESSED_EFFECTS;
+		if (m->triggerID == trigger_attackedby) {
+			Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
+			if (attacker) {
+				int revertToEA = 0;
+				if (Modified[IE_EA] == EA_CHARMED && attacker->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+					revertToEA = EA_ENEMY;
+				} else if (Modified[IE_EA] == EA_CHARMEDPC && attacker->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+					revertToEA = EA_PC;
+				}
+				if (revertToEA) {
+					// remove only the plain charm effect
+					Effect *charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1);
+					if (!charmfx) charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1001);
+					if (charmfx) {
+						SetStat(IE_EA, revertToEA, 1);
+						fxqueue.RemoveEffect(charmfx);
+					}
+				}
+			}
+		}
 	}
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
@@ -4592,7 +4614,10 @@ int Actor::GetAttackStyle() const
 void Actor::AttackedBy( Actor *attacker)
 {
 	AddTrigger(TriggerEntry(trigger_attackedby, attacker->GetGlobalID()));
-	LastAttacker = attacker->GetGlobalID();
+	if (attacker->GetStat(IE_EA) != EA_PC && Modified[IE_EA] != EA_PC) {
+		LastAttacker = attacker->GetGlobalID();
+	}
+	core->Autopause(AP_ATTACKED);
 }
 
 void Actor::SetTarget( Scriptable *target)
