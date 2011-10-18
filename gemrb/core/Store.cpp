@@ -249,6 +249,7 @@ void Store::AddItem(CREItem *item)
 			if (item->MaxStackAmount) {
 				// Stacked, so increase usages.
 				ieDword newAmount = 1;
+				if (!temp->Usages[0]) temp->Usages[0] = 1;
 				if (item->Usages[0] != temp->Usages[0] && item->Usages[0] > 0) {
 					// Stack sizes differ!
 					// For now, we do what bg2 does and just round up.
