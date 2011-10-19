@@ -111,7 +111,7 @@ void AudioStream::ClearIfStopped()
 {
 	if (free || locked) return;
 
-	if (!alIsSource(Source)) return;
+	if (!Source || !alIsSource(Source)) return;
 
 	ALint state;
 	alGetSourcei( Source, AL_SOURCE_STATE, &state );
@@ -133,7 +133,7 @@ void AudioStream::ClearIfStopped()
 
 void AudioStream::ForceClear()
 {
-	if (!alIsSource(Source)) return;
+	if (!Source || !alIsSource(Source)) return;
 
 	alSourceStop(Source);
 	checkALError("Failed to stop source", "WARNING");
@@ -319,7 +319,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	unsigned int time_length;
 
 	if(ResRef == NULL) {
-		if((flags & GEM_SND_SPEECH) && alIsSource(speech.Source)) {
+		if((flags & GEM_SND_SPEECH) && (speech.Source && alIsSource(speech.Source))) {
 			//So we want him to be quiet...
 			alSourceStop( speech.Source );
 			checkALError("Unable to stop speech", "WARNING");
@@ -350,12 +350,12 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	if (flags & GEM_SND_SPEECH) {
 		//speech has a single channel, if a new speech started
 		//we stop the previous one
-		if(!speech.free && alIsSource(speech.Source)) {
+		if(!speech.free && (speech.Source && alIsSource(speech.Source))) {
 			alSourceStop( speech.Source );
 			checkALError("Unable to stop speech", "WARNING");
 			speech.ClearProcessedBuffers();
 		}
-		if(!alIsSource(speech.Source)) {
+		if(!speech.Source || !alIsSource(speech.Source)) {
 			alGenSources( 1, &speech.Source );
 			if (checkALError("Error creating source for speech", "ERROR")) {
 				return Holder<SoundHandle>();
@@ -448,7 +448,7 @@ void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 	if (flags & GEM_SND_VOL_MUSIC) {
 		SDL_mutexP( musicMutex );
 		core->GetDictionary()->Lookup("Volume Music", volume);
-		if (alIsSource(MusicSource))
+		if (MusicSource && alIsSource(MusicSource))
 			alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
 		SDL_mutexV(musicMutex);
 	}
@@ -468,7 +468,7 @@ void OpenALAudioDriver::ResetMusics()
 {
 	MusicPlaying = false;
 	SDL_mutexP( musicMutex );
-	if (alIsSource(MusicSource)) {
+	if (MusicSource && alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
 		checkALError("Unable to stop music source", "WARNING");
 		alDeleteSources(1, &MusicSource );
@@ -499,7 +499,7 @@ bool OpenALAudioDriver::Play()
 bool OpenALAudioDriver::Stop()
 {
 	SDL_mutexP( musicMutex );
-	if (!alIsSource( MusicSource )) {
+	if (!MusicSource || !alIsSource( MusicSource )) {
 		SDL_mutexV( musicMutex );
 		return false;
 	}
@@ -516,7 +516,7 @@ bool OpenALAudioDriver::Stop()
 bool OpenALAudioDriver::Pause()
 {
 	SDL_mutexP( musicMutex );
-	if (!alIsSource( MusicSource )) {
+	if (!MusicSource || !alIsSource( MusicSource )) {
 		SDL_mutexV( musicMutex );
 		return false;
 	}
@@ -537,7 +537,7 @@ bool OpenALAudioDriver::Resume()
 	al_android_resume_playback(); //call AudioTrack.play() from JNI
 #endif
 	SDL_mutexP( musicMutex );
-	if (!alIsSource( MusicSource )) {
+	if (!MusicSource || !alIsSource( MusicSource )) {
 		SDL_mutexV( musicMutex );
 		return false;
 	}
@@ -558,8 +558,6 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 	if (!MusicReader) {
 		MusicPlaying = false;
 	}
-
-	checkALError("Uncaught AL error.", "WARNING"); // clear any previous errors
 
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
@@ -602,7 +600,6 @@ void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
 
 void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 {
-	checkALError("Uncaught AL error.", "WARNING"); // clear any previous errors
 	ALfloat listen[3];
 	alGetListenerfv( AL_POSITION, listen );
 	if (checkALError("Unable to get listener pos", "ERROR")) return;
@@ -624,7 +621,6 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 	alSourceStop(Source);
 	checkALError("Unable to stop source", "WARNING");
 	streams[stream].ClearIfStopped();
-
 	return true;
 }
 
@@ -643,7 +639,6 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	}
 	if (stream == -1) return -1;
 
-	checkALError("Uncaught AL error.", "WARNING"); // clear any previous errors
 	ALuint source;
 	alGenSources(1, &source);
 	if (checkALError("Unable to create new source", "ERROR")) {
@@ -818,7 +813,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 								driver->MusicReader->get_samplerate() );
 						}
 						alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
-						if (alIsSource( driver->MusicSource )) {
+						if (driver->MusicSource && alIsSource( driver->MusicSource )) {
 							alSourcePlay( driver->MusicSource );
 							checkALError("Error playing music source", "ERROR");
 						}
@@ -827,7 +822,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					break;
 				case AL_STOPPED:
 					printMessage("OpenAL", "WARNING: Buffer Underrun. AutoRestarting Stream Playback\n", WHITE );
-					if (alIsSource( driver->MusicSource )) {
+					if (driver->MusicSource && alIsSource( driver->MusicSource )) {
 						alSourcePlay( driver->MusicSource );
 						checkALError("Error playing music source", "ERROR");
 					}
