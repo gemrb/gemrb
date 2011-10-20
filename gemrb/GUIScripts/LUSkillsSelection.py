@@ -378,7 +378,7 @@ def SkillsSave (pc):
 		SkillName = SkillsTable.GetRowName (i+2)
 		SkillID = SkillsTable.GetValue (SkillName, "ID")
 		SkillValue = GemRB.GetVar ("Skill "+str(i)) - GemRB.GetVar("SkillDisplayMod "+str(i))
-		if SkillValue >= 0:
+		if SkillValue > 0:
 			GemRB.SetPlayerStat (pc, SkillID, SkillValue)
 
 def SkillsNullify ():
