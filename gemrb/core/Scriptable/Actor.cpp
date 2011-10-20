@@ -3718,12 +3718,12 @@ void Actor::Resurrect()
 	ClearActions();
 	ClearPath();
 	SetStance(IE_ANI_EMERGE);
+	Game *game = core->GetGame();
 	//readjust death variable on resurrection
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
 		ieVariable DeathVar;
 
 		snprintf(DeathVar,sizeof(ieVariable),"%s_DEAD",scriptName);
-		Game *game=core->GetGame();
 		ieDword value=0;
 
 		game->kaputz->Lookup(DeathVar, value);
@@ -3731,6 +3731,8 @@ void Actor::Resurrect()
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
 	}
+	nextBored = game->GameTime + core->Roll(1,30,bored_time);
+	nextComment = game->GameTime + core->Roll(5,1000,bored_time/2);
 	//clear effects?
 }
 
