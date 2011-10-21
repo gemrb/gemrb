@@ -8614,7 +8614,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 				type = (1<<IE_SPELL_TYPE_INNATE)-1;
 			}
 			//returns true if there are ANY spells to cast
-			if (!actor->spellbook.GetSpellInfoSize(type)) {
+			if (!actor->spellbook.GetSpellInfoSize(type) || !actor->GetAnyActiveCasterLevel()) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -8648,7 +8648,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_TURN:
-			if (actor->GetStat(IE_TURNUNDEADLEVEL)<1) {
+			if (actor->GetStat(IE_TURNUNDEADLEVEL)<1 || !actor->GetClericLevel()) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_TURNUNDEAD) {
@@ -8657,13 +8657,26 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_STEALTH:
-			if (modalstate==MS_STEALTH) {
-				state = IE_GUI_BUTTON_SELECTED;
+			if (!actor->GetThiefLevel() && !actor->GetMonkLevel() && !actor->GetRangerLevel()) {
+				state = IE_GUI_BUTTON_DISABLED;
+			} else {
+				if (modalstate==MS_STEALTH) {
+					state = IE_GUI_BUTTON_SELECTED;
+				}
 			}
 			break;
 		case ACT_SEARCH:
-			if (modalstate==MS_DETECTTRAPS) {
-				state = IE_GUI_BUTTON_SELECTED;
+			if (!actor->GetThiefLevel() && !actor->GetMonkLevel()) {
+				state = IE_GUI_BUTTON_DISABLED;
+			} else {
+				if (modalstate==MS_DETECTTRAPS) {
+					state = IE_GUI_BUTTON_SELECTED;
+				}
+			}
+			break;
+		case ACT_THIEVING:
+			if (!actor->GetThiefLevel() && !actor->GetBardLevel()) {
+				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
 		case ACT_WEAPON1:

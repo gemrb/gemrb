@@ -3558,7 +3558,7 @@ ieDword Actor::GetXPLevel(int modified) const
 // returns the guessed caster level by passed spell type
 // FIXME: add iwd2 support (should be more precise, as there are more class types)
 // FIXME: add more logic for cross-type kits (like avengers)?
-ieDword Actor::GetBaseCasterLevel(int spelltype) const
+ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
 	int level = 0;
 
@@ -3577,7 +3577,7 @@ ieDword Actor::GetBaseCasterLevel(int spelltype) const
 		break;
 	}
 	// if nothing was found, use the average level
-	if (!level) level = GetXPLevel(true);
+	if (!level && !flags) level = GetXPLevel(true);
 
 	return level;
 }
@@ -3622,6 +3622,12 @@ ieDword Actor::GetCasterLevel(int spelltype)
 {
 	int level = GetBaseCasterLevel(spelltype);
 	return level + CastingLevelBonus(level, spelltype);
+}
+
+// this works properly with disabled dualclassed actors, since it ends up in GetClassLevel
+ieDword Actor::GetAnyActiveCasterLevel() const
+{
+	return GetBaseCasterLevel(IE_SPL_PRIEST, 1) + GetBaseCasterLevel(IE_SPL_WIZARD, 1);
 }
 
 /** maybe this would be more useful if we calculate with the strength too

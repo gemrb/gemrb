@@ -439,7 +439,8 @@ public:
 	ieDword GetXPLevel(int modified) const;
 	/** Guesses the (base) casting level */
 	ieDword GetCasterLevel(int spelltype);
-	ieDword GetBaseCasterLevel(int spelltype) const;
+	ieDword GetBaseCasterLevel(int spelltype, int flags=0) const;
+	ieDword GetAnyActiveCasterLevel() const;
 	/** Returns the wild mage casting level modifier */
 	int GetWildMod(int level);
 	/** Returns any casting level modifier */
