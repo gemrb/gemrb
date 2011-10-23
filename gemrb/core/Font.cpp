@@ -599,8 +599,8 @@ Palette* Font::GetPalette() const
 
 void Font::SetPalette(Palette* pal)
 {
+	if (pal) pal->IncRef();
 	if (palette) palette->Release();
-	pal->IncRef();
 	palette = pal;
 }
 
