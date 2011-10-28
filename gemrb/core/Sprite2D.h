@@ -61,12 +61,12 @@ class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
 public:
-	int XPos, YPos, Width, Height, Bpp;
+	int XPos, YPos, Width, Height, Bpp, Pitch;
 	/** Pointer to the Driver Video Structure */
 	void* vptr;
 	bool BAM;
 	const void* pixels;
-	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
+	Sprite2D(int Width, int Height, int Bpp, int Pitch, void* vptr, const void* pixels);
 	~Sprite2D();
 	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
 	Palette *GetPalette() const;

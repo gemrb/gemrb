@@ -27,8 +27,8 @@
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels)
-	: Width(Width), Height(Height), Bpp(Bpp), vptr(vptr), pixels(pixels)
+Sprite2D::Sprite2D(int Width, int Height, int Bpp, int Pitch, void* vptr, const void* pixels)
+	: Width(Width), Height(Height), Bpp(Bpp), Pitch(Pitch), vptr(vptr), pixels(pixels)
 {
 	BAM = false;
 	XPos = 0;
