@@ -758,7 +758,7 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	void* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
+	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
 				rMask, gMask, bMask, aMask );
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
@@ -770,7 +770,7 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	void* palette, bool cK, int index)
 {
-	void* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, 8, w, 0, 0, 0, 0 );
+	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, 8, w, 0, 0, 0, 0 );
 	int colorcount;
 	if (bpp == 8) {
 		colorcount = 256;
