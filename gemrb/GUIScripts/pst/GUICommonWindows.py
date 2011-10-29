@@ -114,8 +114,9 @@ def SetupMenuWindowControls (Window):
 
 	# AI
 	Button = Window.GetControl (4)
-	Button.SetTooltip (41631) # or 41646 Activate ...
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.OpenFloatMenuWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
+	AIPress()
+	AIPress() # toggle it twice to update
 
 	# (Un)Lock view on character
 	Button = Window.GetControl (0)
@@ -132,7 +133,15 @@ def OnLockViewPress ():
 	print "OnLockViewPress"
 
 def AIPress ():
-	print "AIPress"
+	Button = OptionsWindow.GetControl (4)
+	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
+
+	if AI:
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
+		Button.SetTooltip (41646)
+	else:
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
+		Button.SetTooltip (41631)
 
 def TxtePress ():
 	print "TxtePress"
