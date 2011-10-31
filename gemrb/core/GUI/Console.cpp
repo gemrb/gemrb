@@ -67,7 +67,7 @@ void Console::Draw(unsigned short x, unsigned short y)
 	Color black = {
 		0x00, 0x00, 0x00, 0xff
 	};
-	Region r( x + XPos, y + YPos, Width, Height );
+	Region r( (short)x + XPos, (short)y + YPos, Width, Height );
 	core->GetVideoDriver()->DrawRect( r, black );
 	font->Print( r, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL,

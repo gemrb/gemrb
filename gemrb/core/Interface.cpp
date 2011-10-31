@@ -3521,7 +3521,7 @@ void Interface::PopupConsole()
 /** Draws the Console */
 void Interface::DrawConsole()
 {
-	console->Draw( 0, 0 );
+	console->Draw( 0, (Height * -1) + console->Height);
 }
 
 /** Get the Sound Manager */
