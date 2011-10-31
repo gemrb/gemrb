@@ -19,6 +19,10 @@
  */
 #import "CocoaWrapper.h"
 
+//TODO: add an interface to the GemRB core
+
+//TODO: subclass NSApplication
+
 #if TARGET_OS_IPHONE > 0
 // use the SDL 1.3 build in wrapper for iOS
 //extern int SDL_main(int argc, char *argv[]);
