@@ -538,6 +538,7 @@ int SDLVideoDriver::PollEvents() {
 						if(softKeyboardShowing) core->PopupConsole();
 						else ShowSoftKeyboard();
 					} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+						if(ConsolePopped) core->PopupConsole();
 						HideSoftKeyboard();
 					}
 				}
@@ -650,6 +651,7 @@ void SDLVideoDriver::HideSoftKeyboard()
 		SDL_ANDROID_SetScreenKeyboardShown(0);
 #endif
 		softKeyboardShowing = false;
+		if(core->ConsolePopped) core->PopupConsole();
 	}
 }
 
