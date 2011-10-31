@@ -128,8 +128,19 @@ def SetupMenuWindowControls (Window):
 
 
 def OnLockViewPress ():
-	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_OR)
-	print "OnLockViewPress"
+	Button = OptionsWindow.GetControl (0)
+	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_XOR)
+
+	# no way to get the screen flags
+	if OnLockViewPress.counter % 2:
+		# unlock
+		Button.SetTooltip (41648)
+	else:
+		# lock
+		Button.SetTooltip (41647)
+	OnLockViewPress.counter += 1
+
+OnLockViewPress.counter = 1
 
 def AIPress (toggle=1):
 	Button = OptionsWindow.GetControl (4)
