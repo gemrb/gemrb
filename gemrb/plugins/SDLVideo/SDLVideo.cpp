@@ -534,7 +534,9 @@ int SDLVideoDriver::PollEvents() {
 				} else if (numFingers == core->NumFingKboard ) {
 					ignoreNextMouseUp = true;
 					if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
-						ShowSoftKeyboard();
+						// if the keyboard is already up interpret this gesture as console pop
+						if(softKeyboardShowing) core->PopupConsole();
+						else ShowSoftKeyboard();
 					} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 						HideSoftKeyboard();
 					}
