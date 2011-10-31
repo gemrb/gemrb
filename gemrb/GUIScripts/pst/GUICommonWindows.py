@@ -115,8 +115,7 @@ def SetupMenuWindowControls (Window):
 	# AI
 	Button = Window.GetControl (4)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
-	AIPress()
-	AIPress() # toggle it twice to update
+	AIPress(toggle=0)
 
 	# (Un)Lock view on character
 	Button = Window.GetControl (0)
@@ -132,16 +131,19 @@ def OnLockViewPress ():
 	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_OR)
 	print "OnLockViewPress"
 
-def AIPress ():
+def AIPress (toggle=1):
 	Button = OptionsWindow.GetControl (4)
+
+	if toggle:
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_XOR)
 	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
 	if AI:
-		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
-		Button.SetTooltip (41646)
-	else:
-		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
+		# disactivate
 		Button.SetTooltip (41631)
+	else:
+		# activate
+		Button.SetTooltip (41646)
 
 def TxtePress ():
 	print "TxtePress"
