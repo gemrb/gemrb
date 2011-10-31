@@ -25,9 +25,11 @@
 
 #if TARGET_OS_IPHONE > 0
 // use the SDL 1.3 build in wrapper for iOS
-//extern int SDL_main(int argc, char *argv[]);
+#include <Python.h>
 int SDL_main (int argc, char **argv)
 {
+	//do all the special plugin initializations here
+	Py_NoSiteFlag = 1;
     return GemRB_main(argc, argv);
 }
 #elif TARGET_OS_MAC
