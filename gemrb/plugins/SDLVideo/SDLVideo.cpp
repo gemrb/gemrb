@@ -647,6 +647,7 @@ void SDLVideoDriver::HideSoftKeyboard()
 #ifdef ANDROID
 		SDL_ANDROID_SetScreenKeyboardShown(0);
 #endif
+		softKeyboardShowing = false;
 	}
 }
 
@@ -662,6 +663,7 @@ void SDLVideoDriver::ShowSoftKeyboard()
 #ifdef ANDROID
 		SDL_ANDROID_SetScreenKeyboardShown(1);
 #endif
+		softKeyboardShowing = true;
 	}
 }
 

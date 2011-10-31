@@ -33,6 +33,7 @@ const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
 {
+	softKeyboardShowing = false;
 	Evnt = NULL;
 
 	// Initialize gamma correction tables

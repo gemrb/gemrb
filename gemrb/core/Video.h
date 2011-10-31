@@ -240,6 +240,7 @@ protected:
 	Region Viewport;
 	int width,height,bpp;
 	bool fullscreen;
+	bool softKeyboardShowing;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
