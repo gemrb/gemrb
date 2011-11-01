@@ -1229,10 +1229,12 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* ctrltuple = PyTuple_New(2);
-	int py_index = 0;//use index variable to supress false positive clang warning about indexing past end of array.
-	PyTuple_SET_ITEM(ctrltuple, py_index, PyInt_FromLong(WindowIndex));
-	PyTuple_SET_ITEM(ctrltuple, ++py_index, PyInt_FromLong(ctrlindex));
-
+//supress false positive clang warning about indexing past end of array.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
+	PyTuple_SET_ITEM(ctrltuple, 0, PyInt_FromLong(WindowIndex));
+	PyTuple_SET_ITEM(ctrltuple, 1, PyInt_FromLong(ctrlindex));
+#pragma clang diagnostic pop
 	PyObject* ret = 0;
 	Control *ctrl = GetControl(WindowIndex, ctrlindex, -1);
 	if (!ctrl) {
