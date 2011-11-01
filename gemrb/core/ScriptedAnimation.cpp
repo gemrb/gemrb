@@ -429,7 +429,7 @@ void ScriptedAnimation::SetPhase(int arg)
 void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
 {
 	if (arg>=P_ONSET && arg<=P_RELEASE) {
-		memcpy(sounds[arg],sound,sizeof(sound));
+		memcpy(sounds[arg],sound,sizeof(ieResRef));
 	}
 	//no need to call the twin
 }

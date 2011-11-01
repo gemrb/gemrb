@@ -135,7 +135,7 @@ public:
 	/* sets up a delay in the beginning of the vvc */
 	void SetDelay(ieDword delay);
 	/* sets default duration if it wasn't set yet */
-	void SetDefaultDuration(unsigned int duration);
+	void SetDefaultDuration(ieDword duration);
 	/* sets up the direction of the vvc */
 	void SetOrientation(int orientation);
 	/* transforms vvc to blended */

@@ -1989,7 +1989,7 @@ void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	actor->SetStance( parameters->int0Parameter );
-	int delay = parameters->int1Parameter || 1;
+	int delay = parameters->int1Parameter;
 	actor->SetWait( delay );
 }
 
