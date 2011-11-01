@@ -1120,6 +1120,9 @@ void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 	actor->BaseStats[IE_FATIGUE] = newValue;
 	// compensate for the change and modify luck
 	luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
+	// the default value isn't 0, but the maximum penalty and we need to ignore
+	// it due to the constitution bonus possibly putting the value out of range
+	if (luckMod < -80) luckMod = 0;
 	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
 
 	// reuse the luck mod to determine when the actor is tired
@@ -6473,11 +6476,17 @@ int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
 //replenishes spells, cures fatigue
 void Actor::Rest(int hours)
 {
+	// this is stored in reversed order (negative malus, positive bonus)
+	int fatigueBonus = - core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
 	if (hours) {
 		//do remove effects
 		int remaining = hours*10;
 		//removes hours*10 fatigue points
-		NewStat (IE_FATIGUE, -remaining, MOD_ADDITIVE);
+		if (remaining < (signed)Modified[IE_FATIGUE]) {
+			NewStat (IE_FATIGUE, -remaining, MOD_ADDITIVE);
+		} else {
+			NewStat (IE_FATIGUE, fatigueBonus, MOD_ABSOLUTE);
+		}
 		NewStat (IE_INTOXICATION, -remaining, MOD_ADDITIVE);
 		//restore hours*10 spell levels
 		//rememorization starts with the lower spell levels?
@@ -6491,7 +6500,7 @@ void Actor::Rest(int hours)
 			}
 		}
 	} else {
-		SetBase (IE_FATIGUE, - core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]));
+		SetBase (IE_FATIGUE, fatigueBonus);
 		SetBase (IE_INTOXICATION, 0);
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
