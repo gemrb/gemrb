@@ -91,7 +91,8 @@ def LocationPressed ():
 	return
 
 def RestPress ():
-	GemRB.RestParty(0,0,0)
+	# FIXME: check "rest until healed", it's an option in some games
+	GemRB.RestParty(0, 0, 8)
 	return
 
 def SelectFormation ():
