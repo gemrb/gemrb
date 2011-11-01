@@ -1515,7 +1515,7 @@ void Game::RestParty(int checks, int dream, int hp)
 			return;
 		}
 		//area encounters
-		if(area->Rest( leader->Pos, 8, (GameTime/AI_UPDATE_TIME)%7200/3600) ) {
+		if(area->Rest( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600) ) {
 			return;
 		}
 	}
@@ -1531,7 +1531,7 @@ void Game::RestParty(int checks, int dream, int hp)
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
 		//removes fatigue, recharges spells
-		tar->Rest(0);
+		tar->Rest(hours);
 		tar->PartyRested();
 	}
 
