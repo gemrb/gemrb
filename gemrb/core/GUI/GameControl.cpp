@@ -412,6 +412,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	}
 
 	Region viewport = video->GetViewport();
+	// handle keeping the actor in the spotlight, but only when unpaused
+	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
+		Actor *star = core->GetFirstSelectedActor();
+		moveX = star->Pos.x - viewport.x - viewport.w/2;
+		moveY = star->Pos.y - viewport.y - viewport.h/2;
+	}
+
 	if (moveX || moveY) {
 		viewport.x += moveX;
 		viewport.y += moveY;
