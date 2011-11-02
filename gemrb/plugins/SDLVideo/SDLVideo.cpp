@@ -531,16 +531,16 @@ int SDLVideoDriver::PollEvents() {
 					int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
 
 					Evnt->MouseWheelScroll( scrollX, scrollY );
-				} else if (numFingers == core->NumFingKboard ) {
-					ignoreNextMouseUp = true;
+				} else if (numFingers == core->NumFingKboard) {
 					if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
 						// if the keyboard is already up interpret this gesture as console pop
-						if(softKeyboardShowing) core->PopupConsole();
+						if(softKeyboardShowing && !ConsolePopped && !ignoreNextMouseUp) core->PopupConsole();
 						else ShowSoftKeyboard();
 					} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 						if(ConsolePopped) core->PopupConsole();
 						HideSoftKeyboard();
 					}
+					ignoreNextMouseUp = true;
 				}
 			}
 			break;
