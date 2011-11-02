@@ -3228,10 +3228,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	if (InParty) {
 		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
-			core->Autopause(AP_WOUNDED);
+			core->Autopause(AP_WOUNDED, this);
 		}
 		if (damage>0) {
-			core->Autopause(AP_HIT);
+			core->Autopause(AP_HIT, this);
 			core->SetEventFlag(EF_PORTRAIT);
 		}
 	}
@@ -3810,7 +3810,7 @@ void Actor::Die(Scriptable *killer)
 
 	if (InParty) {
 		game->PartyMemberDied(this);
-		core->Autopause(AP_DEAD);
+		core->Autopause(AP_DEAD, this);
 	} else {
 		if (act) {
 			if (act->InParty) {
@@ -4628,7 +4628,7 @@ void Actor::AttackedBy( Actor *attacker)
 	if (attacker->GetStat(IE_EA) != EA_PC && Modified[IE_EA] != EA_PC) {
 		LastAttacker = attacker->GetGlobalID();
 	}
-	core->Autopause(AP_ATTACKED);
+	core->Autopause(AP_ATTACKED, this);
 }
 
 void Actor::SetTarget( Scriptable *target)
@@ -4643,7 +4643,7 @@ void Actor::StopAttack()
 	secondround = 0;
 	//InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
-		core->Autopause(AP_NOTARGET);
+		core->Autopause(AP_NOTARGET, this);
 	}
 }
 
@@ -4705,7 +4705,7 @@ void Actor::InitRound(ieDword gameTime)
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
-		core->Autopause(AP_ENDROUND);
+		core->Autopause(AP_ENDROUND, this);
 	}
 }
 

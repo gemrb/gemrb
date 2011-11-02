@@ -654,7 +654,7 @@ public:
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const char *folder);
 	/** receives an autopause reason, returns 1 if pause was triggered by this call, -1 if it was already triggered */
-	int Autopause(ieDword reason);
+	int Autopause(ieDword flag, Scriptable *target);
 	/** registers engine opcodes */
 	void RegisterOpcodes(int count, const EffectDesc *opcodes);
 	/** reads a list of resrefs into an array, returns array size */

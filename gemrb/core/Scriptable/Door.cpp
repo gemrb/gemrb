@@ -319,7 +319,7 @@ void Highlightable::SetTrapDetected(int x)
 		return;
 	TrapDetected = x;
 	if(TrapDetected) {
-		core->Autopause(AP_TRAP);
+		core->Autopause(AP_TRAP, this);
 	}
 }
 

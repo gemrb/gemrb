@@ -2346,7 +2346,7 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 					if (seh && seh->Target != TARGET_DEAD) {
 						gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 						if (caster->InParty) {
-							core->Autopause(AP_NOTARGET);
+							core->Autopause(AP_NOTARGET, caster);
 						}
 						caster->SetStance(IE_ANI_READY);
 						return true;

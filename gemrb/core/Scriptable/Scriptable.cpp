@@ -873,7 +873,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		}
 		core->FreeString(spell);
 	}
-	core->Autopause(AP_SPELLCAST);
+	core->Autopause(AP_SPELLCAST, this);
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }

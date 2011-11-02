@@ -5291,7 +5291,7 @@ int Interface::GetReputationMod(int column) const
 // -1 if pause is already active
 // 0 if pause was not allowed
 // 1 if autopause happened
-int Interface::Autopause(ieDword flag)
+int Interface::Autopause(ieDword flag, Scriptable* target)
 {
 	GameControl *gc = GetGameControl();
 	if (!gc) {
@@ -5304,11 +5304,22 @@ int Interface::Autopause(ieDword flag)
 		return -1;
 	}
 	ieDword autopause_flags = 0;
+	ieDword autopause_center = 0;
 
 	vars->Lookup("Auto Pause State", autopause_flags);
+	vars->Lookup("Auto Pause Center", autopause_center);
 	if ((autopause_flags & (1<<flag))) {
 		displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		if (autopause_center && target) {
+			Video *video = core->GetVideoDriver();
+			Point screenPos = target->Pos;
+			video->ConvertToScreen(screenPos.x, screenPos.y);
+			gc->Center(screenPos.x, screenPos.y);
+			if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
+				core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
+			}
+		}
 		return 1;
 	}
 	return 0;

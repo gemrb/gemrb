@@ -586,7 +586,7 @@ int SDLVideoDriver::PollEvents() {
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
 					core->GetAudioDrv()->Pause();//this is for ANDROID mostly
-					core->Autopause(AP_GENERIC);
+					core->Autopause(AP_GENERIC, NULL);
 					break;
 				case SDL_WINDOWEVENT_RESTORED://SDL 1.3
 					/*
