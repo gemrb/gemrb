@@ -873,7 +873,10 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		}
 		core->FreeString(spell);
 	}
-	core->Autopause(AP_SPELLCAST, this);
+	// only trigger the autopause when in combat or buffing gets very annoying
+	if (core->GetGame()->CombatCounter) {
+		core->Autopause(AP_SPELLCAST, this);
+	}
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }
