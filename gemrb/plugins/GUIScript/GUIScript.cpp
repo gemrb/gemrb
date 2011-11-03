@@ -859,6 +859,34 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Window_GetPos__doc,
+"window.GetPos()\n\n"
+"Returns tuple (x,y) of window position." );
+
+static PyObject* GemRB_Window_GetPos(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex;
+
+	if (!PyArg_ParseTuple( args, "i", &WindowIndex)) {
+		return AttributeError( GemRB_Window_GetPos__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!\n");
+	}
+
+	PyObject* pos = PyTuple_New(2);
+//supress false positive clang warning about indexing past end of array.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
+	PyTuple_SET_ITEM(pos, 0, PyInt_FromLong(win->XPos));
+	PyTuple_SET_ITEM(pos, 1, PyInt_FromLong(win->YPos));
+#pragma clang diagnostic pop
+
+	return pos;
+}
+
 PyDoc_STRVAR( GemRB_LoadTable__doc,
 "LoadTable(2DAResRef, [ignore_error=0]) => GTable\n\n"
 "Loads a 2DA Table." );
@@ -2934,6 +2962,34 @@ static PyObject* GemRB_Control_SetPos(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_Control_GetPos__doc,
+"control.GetPos()\n\n"
+"Returns tuple (x,y) of control position." );
+
+static PyObject* GemRB_Control_GetPos(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
+		return AttributeError( GemRB_Control_GetPos__doc );
+	}
+
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl) {
+		return NULL;
+	}
+
+	PyObject* pos = PyTuple_New(2);
+//supress false positive clang warning about indexing past end of array.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
+	PyTuple_SET_ITEM(pos, 0, PyInt_FromLong(ctrl->XPos));
+	PyTuple_SET_ITEM(pos, 1, PyInt_FromLong(ctrl->YPos));
+#pragma clang diagnostic pop
+
+	return pos;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetSize__doc,
@@ -10394,6 +10450,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
 	METHOD(Control_AttachScrollBar, METH_VARARGS),
+	METHOD(Control_GetPos, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
@@ -10446,6 +10503,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_CreateWorldMapControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
+	METHOD(Window_GetPos, METH_VARARGS),
 	METHOD(Window_HasControl, METH_VARARGS),
 	METHOD(Window_Invalidate, METH_VARARGS),
 	METHOD(Window_SetFrame, METH_VARARGS),
