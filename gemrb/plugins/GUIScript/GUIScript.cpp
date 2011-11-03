@@ -6759,6 +6759,30 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 }
 
 
+PyDoc_STRVAR( GemRB_CheckSpecialSpell__doc,
+			  "CheckSpecialSpell(GlobalID, SpellResRef)=>int\n\n"
+			  "Checks if the specified spell is special. Returns 0 for normal ones." );
+
+static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
+{
+	int globalID;
+	ieResRef SpellResRef;
+
+	if (!PyArg_ParseTuple( args, "is", &globalID, &SpellResRef)) {
+		return AttributeError( GemRB_CheckSpecialSpell__doc );
+	}
+	GET_GAME();
+
+	Actor* actor = game->GetActorByGlobalID( globalID );
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+
+	int ret = core->CheckSpecialSpell( SpellResRef, actor );
+	return PyInt_FromLong( ret );
+}
+
+
 PyDoc_STRVAR( GemRB_LearnSpell__doc,
 "LearnSpell(PartyID, SpellResRef[, Flags])=>int\n\n"
 "Learns specified spell. Returns 0 on success." );
@@ -10243,6 +10267,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ChangeItemFlag, METH_VARARGS),
 	METHOD(ChangeStoreItem, METH_VARARGS),
 	METHOD(CheckFeatCondition, METH_VARARGS),
+	METHOD(CheckSpecialSpell, METH_VARARGS),
 	METHOD(CheckVar, METH_VARARGS),
 	METHOD(ClearActions, METH_VARARGS),
 	METHOD(CountEffects, METH_VARARGS),
