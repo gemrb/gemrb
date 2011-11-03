@@ -140,16 +140,17 @@
         accessoryView = [[UIView alloc] initWithFrame:accessFrame];
         accessoryView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
 		CGFloat xSpacing = 20.0;
+		CGFloat width = 120.0;
 		CGFloat xPos = xSpacing;
 		//ctrl key
-        SDL_UIKit_ModifierKeyButton *ctrlButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, 120.0, 40.0)];
+        SDL_UIKit_ModifierKeyButton *ctrlButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, width, 40.0)];
 		ctrlButton.modifierKey = KMOD_LCTRL;
         [ctrlButton setTitle: @"Ctrl" forState:UIControlStateNormal];
         [accessoryView addSubview:ctrlButton];
 		[ctrlButton release];
 		//alt key
-		xPos += xSpacing;
-		SDL_UIKit_ModifierKeyButton *altButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, 120.0, 40.0)];
+		xPos += xSpacing + width;
+		SDL_UIKit_ModifierKeyButton *altButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, width, 40.0)];
 		altButton.modifierKey = KMOD_LALT;
         [altButton setTitle: @"Alt" forState:UIControlStateNormal];
         [accessoryView addSubview:altButton];
