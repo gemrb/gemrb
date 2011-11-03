@@ -155,6 +155,20 @@
         [altButton setTitle: @"Alt" forState:UIControlStateNormal];
         [accessoryView addSubview:altButton];
 		[altButton release];
+		//pgUp key
+		xPos += xSpacing + width;
+		SDL_UIKit_KeyButton *pgKey = [[SDL_UIKit_KeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, width, 40.0)];
+		pgKey.keyCode = SDL_SCANCODE_PAGEUP;
+        [pgKey setTitle: @"PgUp" forState:UIControlStateNormal];
+        [accessoryView addSubview:pgKey];
+		[pgKey release];
+		//pgDown key
+		xPos += xSpacing + width;
+		pgKey = [[SDL_UIKit_KeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, width, 40.0)];
+		pgKey.keyCode = SDL_SCANCODE_PAGEDOWN;
+        [pgKey setTitle: @"PgDown" forState:UIControlStateNormal];
+        [accessoryView addSubview:pgKey];
+		[pgKey release];
 	}
     return accessoryView;
 }
