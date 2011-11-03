@@ -843,13 +843,13 @@ int Interface::CheckSpecialSpell(ieResRef resref, Actor *actor)
 
 	//the identify spell is always disabled on the menu
 	if (sp&SP_IDENTIFY) {
-		return 1;
+		return SP_IDENTIFY;
 	}
 
 	//if actor is silenced, and spell cannot be cast in silence, disable it
 	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
 		if (!(sp&SP_SILENCE)) {
-			return 1;
+			return SP_SILENCE;
 		}
 	}
 
