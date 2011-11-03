@@ -2535,7 +2535,13 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET( STATE_BLIND );
 		//the feat normally exists only in IWD2, but won't hurt
 		if (!target->GetFeat(FEAT_BLIND_FIGHT)) {
-			STAT_SUB (IE_TOHIT, 10); // all other tohit stats are treated as bonuses
+			if (core->HasFeature(GF_REVERSE_TOHIT)) {
+				STAT_ADD (IE_TOHIT, 10);  // all other tohit stats are treated as bonuses
+			} else {
+				STAT_SUB (IE_ARMORCLASS, 2);
+				// TODO: 50% inherent miss chance (full concealment), no dexterity bonus to AC (flatfooted)
+				STAT_SUB (IE_TOHIT, 5);
+			}
 		}
 	}
 	return FX_APPLIED;
