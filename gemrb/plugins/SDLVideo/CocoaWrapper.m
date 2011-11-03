@@ -91,15 +91,28 @@
 		CGRect accessFrame = CGRectMake(0.0, 0.0, [UIScreen mainScreen].bounds.size.width, 77.0);
         accessoryView = [[UIView alloc] initWithFrame:accessFrame];
         accessoryView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
-        SDL_UIKit_ModifierKeyButton *ctrlButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(20.0, 20.0, 120.0, 40.0)];
+		CGFloat xSpacing = 20.0;
+		CGFloat xPos = xSpacing;
+		//ctrl key
+        SDL_UIKit_ModifierKeyButton *ctrlButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, 120.0, 40.0)];
 		ctrlButton.modifierKey = KMOD_LCTRL;
         [ctrlButton setTitle: @"Ctrl" forState:UIControlStateNormal];
         [accessoryView addSubview:ctrlButton];
 		[ctrlButton release];
+		//alt key
+		xPos += xSpacing;
+		SDL_UIKit_ModifierKeyButton *altButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, 120.0, 40.0)];
+		altButton.modifierKey = KMOD_LALT;
+        [altButton setTitle: @"Alt" forState:UIControlStateNormal];
+        [accessoryView addSubview:altButton];
+		[altButton release];
 	}
     return accessoryView;
 }
 @end
+/*
+Mac OS X wrapper
+*/
 #elif TARGET_OS_MAC
 @interface CocoaWrapper (SDLTerminate)
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
