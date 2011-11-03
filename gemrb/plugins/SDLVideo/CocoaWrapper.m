@@ -27,7 +27,34 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-@interface SDL_UIKit_ModifierKeyButton : UIButton {
+#include "SDL_uikitkeyboard.h"
+
+#pragma mark UIKit button subclasses
+@interface GEM_UIKit_RoundedButton : UIButton
+{}
+@end
+
+@implementation GEM_UIKit_RoundedButton
+
+- (id)initWithFrame:(CGRect)frame
+{
+	self = [super initWithFrame:frame];
+	if (self) {
+		//custom drawing
+		self.backgroundColor = [UIColor colorWithRed:0.196 green:0.3098 blue:0.52 alpha:1.0];
+		self.titleLabel.textColor = [UIColor grayColor];
+		self.titleLabel.font = [UIFont systemFontOfSize:24];
+		self.layer.cornerRadius = 10;
+		self.layer.borderWidth = 2;
+		self.layer.borderColor = [UIColor grayColor].CGColor;
+		self.clipsToBounds = YES;
+	}
+	return self;
+}
+
+@end
+
+@interface SDL_UIKit_ModifierKeyButton : GEM_UIKit_RoundedButton {
 @private
     SDLMod _modifierKey;
 }
@@ -38,23 +65,12 @@
 
 @implementation SDL_UIKit_ModifierKeyButton
 @synthesize _modifierKey;
-#pragma mark Parent Method Overrides
 
 - (id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
 	if (self) {
 		_modifierKey = KMOD_NONE;
-
-		//custom drawing
-		self.backgroundColor = [UIColor colorWithRed:0.196 green:0.3098 blue:0.52 alpha:1.0];
-		self.titleLabel.textColor = [UIColor grayColor];
-		self.titleLabel.font = [UIFont systemFontOfSize:24];
-		self.layer.cornerRadius = 10;
-		self.layer.borderWidth = 2;
-		self.layer.borderColor = [UIColor grayColor].CGColor;
-		self.clipsToBounds = YES;
-
 		[self addTarget:self action:@selector(toggleModifier) forControlEvents:UIControlEventTouchDown];
 	}
 	return self;
@@ -78,6 +94,38 @@
 
 @end
 
+@interface SDL_UIKit_KeyButton : GEM_UIKit_RoundedButton {
+@private
+    SDL_Scancode _keyCode;
+}
+@property(nonatomic, assign, getter = keyCode, setter = setKeyCode:) SDL_Scancode _keyCode;
+
+- (void)sendKey;
+@end
+
+@implementation SDL_UIKit_KeyButton
+@synthesize _keyCode;
+
+- (id)initWithFrame:(CGRect)frame
+{
+	self = [super initWithFrame:frame];
+	if (self) {
+		_keyCode = SDL_SCANCODE_UNKNOWN;
+		[self addTarget:self action:@selector(sendKey) forControlEvents:UIControlEventTouchDown];
+	}
+	return self;
+}
+
+- (void)sendKey
+{
+	//send both press and release
+	SDL_SendKeyboardKey(SDL_PRESSED, _keyCode);
+	SDL_SendKeyboardKey(SDL_RELEASED, _keyCode);
+}
+
+@end
+
+#pragma mark end button subclasses
 // need a custom accessory view for the keybaord (for ctrl key modifier)
 @interface UITextField (KeyboardAccesory)
 -(UIView *)inputAccessoryView;// override UIKit and force our own
