@@ -6690,18 +6690,25 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpell__doc,
 "GetMemorizedSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
-"Returns dict with specified memorized spell from PC's spellbook." );
+"Returns dict with specified memorized spell from PC's spellbook."
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, SpellType, Level, Index;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &Index, &global )) {
 		return AttributeError( GemRB_GetMemorizedSpell__doc );
 	}
 	GET_GAME();
 
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}

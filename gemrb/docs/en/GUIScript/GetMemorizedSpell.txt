@@ -1,5 +1,5 @@
 
-Prototype: GemRB.GetMemorizedSpell(PartyID, SpellType, Level, Index)
+Prototype: GemRB.GetMemorizedSpell(PartyID, SpellType, Level, Index[, global])
 
 Description: Returns dict with specified memorized spell from PC's spellbook.
 
@@ -8,6 +8,7 @@ PartyID   - the PC's position in the party
 SpellType - 0 - priest, 1 - wizard, 2 - innate
 Level     - the memorized spell's level
 Index     - the memorized spell's index
+global    - if set, use PartyID as globalID of global actor
 
 Return value: dictionary
 The fields of the dictionary are the following:
