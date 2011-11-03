@@ -6899,14 +6899,14 @@ static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
-"MemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
+"MemorizeSpell(PartyID, SpellType, Level, Index[, enabled])=>bool\n\n"
 "Memorizes specified known spell. Returns 1 on success." );
 
 static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level, Index;
+	int PartyID, SpellType, Level, Index, enabled=0;
 
-	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &Index, &enabled )) {
 		return AttributeError( GemRB_MemorizeSpell__doc );
 	}
 	GET_GAME();
@@ -6921,8 +6921,8 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	bool enabled = false;
-	if (SpellType == IE_SPELL_TYPE_INNATE) enabled = true;
+	// auto-refresh innates (memorisation defaults to depleted)
+	if (SpellType == IE_SPELL_TYPE_INNATE) enabled = 1;
 
 	return PyInt_FromLong( actor->spellbook.MemorizeSpell( ks, enabled ) );
 }
