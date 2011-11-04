@@ -56,7 +56,7 @@
 
 @interface SDL_UIKit_ModifierKeyButton : GEM_UIKit_RoundedButton {
 @private
-    SDLMod _modifierKey;
+    SDL_Keymod _modifierKey;
 }
 @property(nonatomic, assign, getter = modifierKey, setter = setModifierKey:) SDLMod _modifierKey;
 
@@ -144,14 +144,14 @@
 		CGFloat xPos = xSpacing;
 		//ctrl key
         SDL_UIKit_ModifierKeyButton *ctrlButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, width, 40.0)];
-		ctrlButton.modifierKey = KMOD_LCTRL;
+		ctrlButton.modifierKey = KMOD_CTRL;
         [ctrlButton setTitle: @"Ctrl" forState:UIControlStateNormal];
         [accessoryView addSubview:ctrlButton];
 		[ctrlButton release];
 		//alt key
 		xPos += xSpacing + width;
 		SDL_UIKit_ModifierKeyButton *altButton = [[SDL_UIKit_ModifierKeyButton alloc] initWithFrame:CGRectMake(xPos, 20.0, width, 40.0)];
-		altButton.modifierKey = KMOD_LALT;
+		altButton.modifierKey = KMOD_ALT;
         [altButton setTitle: @"Alt" forState:UIControlStateNormal];
         [accessoryView addSubview:altButton];
 		[altButton release];
