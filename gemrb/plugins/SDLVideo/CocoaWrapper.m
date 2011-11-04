@@ -134,6 +134,31 @@
 
 #pragma mark end button subclasses
 // need a custom accessory view for the keybaord (for ctrl key modifier)
+@interface SDL_UIKIT_KBoardAccessoryView : UIView
+{}
+- (void)willMoveToWindow:(UIWindow *)newWindow;
+@end
+
+@implementation SDL_UIKIT_KBoardAccessoryView
+
+- (id) initWithFrame:(CGRect)frame
+{
+	self = [super initWithFrame:frame];
+	if (self){
+		self.backgroundColor = [UIColor colorWithRed:138.0/255.0 green:139.0/255.0 blue:147.0/255.0 alpha:1.0];
+	}
+	return self;
+}
+
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+	// newWindow is the window with the soft keybord
+	[super willMoveToWindow:newWindow];
+	newWindow.alpha = 0.60;
+}
+
+@end
+
 @interface UITextField (KeyboardAccesory)
 -(UIView *)inputAccessoryView;// override UIKit and force our own
 @end
@@ -141,11 +166,11 @@
 @implementation UITextField (KeyboardAccesory)
 - (UIView *)inputAccessoryView
 {
-	static UIView* accessoryView = nil;
+	static SDL_UIKIT_KBoardAccessoryView* accessoryView = nil;
 	if (!accessoryView){
 		CGRect accessFrame = CGRectMake(0.0, 0.0, [UIScreen mainScreen].bounds.size.width, 77.0);
-        accessoryView = [[UIView alloc] initWithFrame:accessFrame];
-        accessoryView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
+        accessoryView = [[SDL_UIKIT_KBoardAccessoryView alloc] initWithFrame:accessFrame];
+
 		CGFloat xSpacing = 20.0;
 		CGFloat width = 120.0;
 		CGFloat xPos = xSpacing;
