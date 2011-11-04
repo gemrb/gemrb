@@ -71,6 +71,7 @@
 	self = [super initWithFrame:frame];
 	if (self) {
 		_modifierKey = KMOD_NONE;
+		[self setSelected:NO];
 		[self addTarget:self action:@selector(toggleModifier) forControlEvents:UIControlEventTouchDown];
 	}
 	return self;
@@ -85,6 +86,7 @@
 {
 	if (selected) SDL_SetModState(SDL_GetModState() | _modifierKey);
 	else SDL_SetModState(SDL_GetModState() & ~_modifierKey);
+	[super setSelected:selected];
 }
 
 - (void)toggleModifier
