@@ -6491,12 +6491,15 @@ void Actor::Rest(int hours)
 		//restore hours*10 spell levels
 		//rememorization starts with the lower spell levels?
 		inventory.ChargeAllItems (remaining);
-		for (int level = 1; level<16; level++) {
-			if (level<remaining) {
-				break;
-			}
-			while (remaining>0) {
-				remaining -= RestoreSpellLevel(level,0);
+		int level = 1;
+		int memorizedSpell = 0;
+		while (remaining > 0 && level < 16)
+		{
+			memorizedSpell = RestoreSpellLevel(level, 0);
+			remaining -= memorizedSpell;
+			if (memorizedSpell == 0)
+			{
+				level += 1;
 			}
 		}
 	} else {
