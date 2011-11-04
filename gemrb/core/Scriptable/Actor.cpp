@@ -6495,7 +6495,7 @@ void Actor::Rest(int hours)
 		int memorizedSpell = 0;
 		while (remaining > 0 && level < 16)
 		{
-			memorizedSpell = RestoreSpellLevel(level, 0);
+			memorizedSpell = RestoreSpellLevel(level, -1);
 			remaining -= memorizedSpell;
 			if (memorizedSpell == 0)
 			{
