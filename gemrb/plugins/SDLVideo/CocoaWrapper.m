@@ -42,7 +42,7 @@
 	if (self) {
 		//custom drawing
 		self.backgroundColor = [UIColor colorWithRed:0.196 green:0.3098 blue:0.52 alpha:1.0];
-		self.titleLabel.textColor = [UIColor grayColor];
+		self.titleLabel.textColor = [UIColor darkTextColor];
 		self.titleLabel.font = [UIFont systemFontOfSize:24];
 		self.layer.cornerRadius = 10;
 		self.layer.borderWidth = 2;
@@ -84,9 +84,14 @@
 
 - (void)setSelected:(BOOL)selected
 {
-	if (selected) SDL_SetModState(SDL_GetModState() | _modifierKey);
-	else SDL_SetModState(SDL_GetModState() & ~_modifierKey);
 	[super setSelected:selected];
+	if (selected){
+		SDL_SetModState(SDL_GetModState() | _modifierKey);
+		self.backgroundColor = [UIColor colorWithRed:0.196 green:0.3098 blue:0.52 alpha:1.0];
+	}else{
+		SDL_SetModState(SDL_GetModState() & ~_modifierKey);
+		self.backgroundColor = [UIColor colorWithRed:0.196 green:0.3098 blue:0.52 alpha:0.25];
+	}
 }
 
 - (void)toggleModifier
