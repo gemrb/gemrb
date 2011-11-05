@@ -926,7 +926,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 	return count;
 }
 
-bool Spellbook::FindSpellInfo(SpellExtHeader *array, ieResRef spellname)
+int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname)
 {
 	memset(array, 0, sizeof(SpellExtHeader) );
 	if (spellinfo.size() == 0) {
@@ -935,9 +935,9 @@ bool Spellbook::FindSpellInfo(SpellExtHeader *array, ieResRef spellname)
 	for (unsigned int i = 0; i<spellinfo.size(); i++) {
 		if (strnicmp(spellinfo[i]->spellname, spellname, sizeof(ieResRef) ) ) continue;
 		memcpy(array, spellinfo[i], sizeof(SpellExtHeader));
-		return true;
+		return i+1;
 	}
-	return false;
+	return 0;
 }
 
 SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ieResRef spellname)

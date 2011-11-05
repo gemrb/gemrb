@@ -6803,6 +6803,32 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_GetSpelldataIndex__doc,
+			 "GetSpelldataIndex(globalID, spellResRef)=>int\n\n"
+			 "Returns the index of the spell in the spellbook's spelldata structure."
+);
+
+static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
+{
+	unsigned int globalID;
+	const char *spellResRef;
+
+	if (!PyArg_ParseTuple( args, "is", &globalID, &spellResRef)) {
+		return AttributeError( GemRB_GetSpelldataIndex__doc );
+	}
+
+	GET_GAME();
+
+	Actor* actor = game->GetActorByGlobalID( globalID );
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+
+	SpellExtHeader spelldata;
+	int ret = actor->spellbook.FindSpellInfo(&spelldata, spellResRef);
+	return PyInt_FromLong( ret-1 );
+}
+
 
 PyDoc_STRVAR( GemRB_LearnSpell__doc,
 "LearnSpell(PartyID, SpellResRef[, Flags])=>int\n\n"
@@ -10386,6 +10412,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetStoreCure, METH_VARARGS),
 	METHOD(GetStoreItem, METH_VARARGS),
 	METHOD(GetSpell, METH_VARARGS),
+	METHOD(GetSpelldataIndex, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),
 	METHOD(GetSlots, METH_VARARGS),
 	METHOD(GetSystemVariable, METH_VARARGS),
