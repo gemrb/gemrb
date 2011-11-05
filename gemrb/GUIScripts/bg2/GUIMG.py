@@ -121,9 +121,6 @@ def SetupMageWindow ():
 		Button = Window.GetControl (56 + i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshMageLevel)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-
-	for i in range (9):
-		Button = Window.GetControl (56 + i)
 		Button.SetVarAssoc ("MageSpellLevel", i)
 
 	# Setup memorized spells buttons
