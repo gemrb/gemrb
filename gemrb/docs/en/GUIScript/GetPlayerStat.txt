@@ -1,11 +1,12 @@
 
-Prototype: GemRB.GetPlayerStat(Slot, ID[, Base])
+Prototype: GemRB.GetPlayerStat(Slot, ID[, Base, global])
 
 Description: Queries a stat of the player character. The stats are listed in ie_stats.py.
 
 Parameters: Slot - actor index in game structure
             ID   - Stat index
             Base - if set to 1, the function will return the base instead of the modified (current) value
+            global - if set, use Slot as globalID of global actor
 
 Return value: numeric
 

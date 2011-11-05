@@ -1,5 +1,5 @@
 
-Prototype: GemRB.SetPlayerStat(Slot, ID, Value[, PCF])
+Prototype: GemRB.SetPlayerStat(Slot, ID, Value[, PCF, global])
 
 Description: Sets a player character's base stat. The stats are listed in ie_stats.py.
 
@@ -7,6 +7,7 @@ Parameters: Slot  - actor index in game structure
             ID    - Stat index
             Value - New stat value
             PCF   - Set to 0 if you don't want the stat's post-change function to be ran
+            global - if set, use Slot as globalID of global actor
 
 Return value: N/A
 

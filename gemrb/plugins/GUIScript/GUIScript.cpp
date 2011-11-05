@@ -5217,46 +5217,58 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
-"GetPlayerStat(Slot, ID[, BaseStat]) => int\n\n"
+"GetPlayerStat(Slot, ID[, BaseStat, global]) => int\n\n"
 "Queries a stat." );
 
 static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, StatID, StatValue, BaseStat;
+	int PlayerSlot, StatID, StatValue, BaseStat, global=0;
 
 	BaseStat = 0;
-	if (!PyArg_ParseTuple( args, "ii|i", &PlayerSlot, &StatID, &BaseStat )) {
+	if (!PyArg_ParseTuple( args, "ii|ii", &PlayerSlot, &StatID, &BaseStat, &global )) {
 		return AttributeError( GemRB_GetPlayerStat__doc );
 	}
 	GET_GAME();
 
-	Actor* MyActor = game->FindPC( PlayerSlot );
-	if (!MyActor) {
-		return RuntimeError("Cannot find actor!\n");
+	Actor* MyActor;
+	if (global) {
+		MyActor = game->GetActorByGlobalID( PlayerSlot );
+	} else {
+		MyActor = game->FindPC( PlayerSlot );
 	}
+	if (!MyActor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+
 	//returning the modified stat if BaseStat was 0 (default)
 	StatValue = GetCreatureStat( MyActor, StatID, !BaseStat );
 	return PyInt_FromLong( StatValue );
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
-"SetPlayerStat(Slot, ID, Value[, pcf])\n\n"
+"SetPlayerStat(Slot, ID, Value[, pcf, global])\n\n"
 "Changes a stat." );
 
 static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, StatID, StatValue;
-	int pcf = 1;
+	int pcf = 1, global=0;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &PlayerSlot, &StatID, &StatValue, &pcf )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &PlayerSlot, &StatID, &StatValue, &pcf, &global )) {
 		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
 	GET_GAME();
 
-	Actor* MyActor = game->FindPC( PlayerSlot );
-	if (!MyActor) {
-		return RuntimeError("Cannot find actor!\n");
+	Actor* MyActor;
+	if (global) {
+		MyActor = game->GetActorByGlobalID( PlayerSlot );
+	} else {
+		MyActor = game->FindPC( PlayerSlot );
 	}
+	if (!MyActor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+
 	//Setting the creature's base stat
 	SetCreatureStat( MyActor, StatID, StatValue, pcf);
 	Py_INCREF( Py_None );
