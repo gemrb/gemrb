@@ -6787,7 +6787,7 @@ PyDoc_STRVAR( GemRB_CheckSpecialSpell__doc,
 static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	ieResRef SpellResRef;
+	const char *SpellResRef;
 
 	if (!PyArg_ParseTuple( args, "is", &globalID, &SpellResRef)) {
 		return AttributeError( GemRB_CheckSpecialSpell__doc );

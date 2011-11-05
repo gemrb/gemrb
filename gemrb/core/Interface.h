@@ -689,8 +689,8 @@ public:
 	void StripLine(char * string, size_t size);
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
-	int CheckSpecialSpell(ieResRef resref, Actor *actor);
-	int GetSpecialSpell(ieResRef resref);
+	int CheckSpecialSpell(const ieResRef resref, Actor *actor);
+	int GetSpecialSpell(const ieResRef resref);
 	int GetSpecialSpellsCount() { return SpecialSpellsCount; }
 	SpellDescType *GetSpecialSpells() { return SpecialSpells; }
 private:

@@ -826,7 +826,7 @@ bool Interface::ReadSpecialSpells()
 	return result;
 }
 
-int Interface::GetSpecialSpell(ieResRef resref)
+int Interface::GetSpecialSpell(const ieResRef resref)
 {
 	for (int i=0;i<SpecialSpellsCount;i++) {
 		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
@@ -837,7 +837,7 @@ int Interface::GetSpecialSpell(ieResRef resref)
 }
 
 //disable spells based on some circumstances
-int Interface::CheckSpecialSpell(ieResRef resref, Actor *actor)
+int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
 {
 	int sp = GetSpecialSpell(resref);
 
