@@ -6478,7 +6478,7 @@ void Actor::Rest(int hours)
 {
 	// this is stored in reversed order (negative malus, positive bonus)
 	int fatigueBonus = - core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
-	if (hours) {
+	if (hours < 8) {
 		//do remove effects
 		int remaining = hours*10;
 		//removes hours*10 fatigue points
