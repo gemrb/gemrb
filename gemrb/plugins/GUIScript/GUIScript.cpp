@@ -6606,19 +6606,26 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
-"GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of known spells of given type and level in PC's spellbook." );
+"GetKnownSpellsCount(PartyID, SpellType, Level[, global])=>int\n\n"
+"Returns number of known spells of given type and level in PC's spellbook."
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, SpellType, Level;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii", &PartyID, &SpellType, &Level )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &SpellType, &Level, &global )) {
 		return AttributeError( GemRB_GetKnownSpellsCount__doc );
 	}
 	GET_GAME();
 
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
@@ -6627,8 +6634,9 @@ static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
-"GetKnownSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
-"Returns dict with specified known spell from PC's spellbook." );
+"GetKnownSpell(PartyID, SpellType, Level, Index[, global])=>dict\n\n"
+"Returns dict with specified known spell from PC's spellbook."
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 {
