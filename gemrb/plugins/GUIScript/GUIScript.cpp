@@ -197,6 +197,17 @@ inline PyObject* AttributeError(const char* doc_string)
 		return RuntimeError("Can't find GameControl!"); \
 	}
 
+#define GET_ACTOR_GLOBAL() \
+	Actor* actor; \
+	if (global) { \
+		actor = game->GetActorByGlobalID( globalID ); \
+	} else { \
+		actor = game->FindPC( globalID ); \
+	} \
+	if (!actor) { \
+		return RuntimeError( "Actor not found!\n" ); \
+	}
+
 inline Control *GetControl( int wi, int ci, int ct)
 {
 	char errorbuffer[256];
@@ -5222,26 +5233,17 @@ PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 
 static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, StatID, StatValue, BaseStat, global=0;
+	int globalID, StatID, StatValue, BaseStat, global=0;
 
 	BaseStat = 0;
-	if (!PyArg_ParseTuple( args, "ii|ii", &PlayerSlot, &StatID, &BaseStat, &global )) {
+	if (!PyArg_ParseTuple( args, "ii|ii", &globalID, &StatID, &BaseStat, &global )) {
 		return AttributeError( GemRB_GetPlayerStat__doc );
 	}
 	GET_GAME();
-
-	Actor* MyActor;
-	if (global) {
-		MyActor = game->GetActorByGlobalID( PlayerSlot );
-	} else {
-		MyActor = game->FindPC( PlayerSlot );
-	}
-	if (!MyActor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	//returning the modified stat if BaseStat was 0 (default)
-	StatValue = GetCreatureStat( MyActor, StatID, !BaseStat );
+	StatValue = GetCreatureStat( actor, StatID, !BaseStat );
 	return PyInt_FromLong( StatValue );
 }
 
@@ -5251,26 +5253,17 @@ PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
 
 static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, StatID, StatValue;
+	int globalID, StatID, StatValue;
 	int pcf = 1, global=0;
 
-	if (!PyArg_ParseTuple( args, "iii|ii", &PlayerSlot, &StatID, &StatValue, &pcf, &global )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &globalID, &StatID, &StatValue, &pcf, &global )) {
 		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
 	GET_GAME();
-
-	Actor* MyActor;
-	if (global) {
-		MyActor = game->GetActorByGlobalID( PlayerSlot );
-	} else {
-		MyActor = game->FindPC( PlayerSlot );
-	}
-	if (!MyActor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	//Setting the creature's base stat
-	SetCreatureStat( MyActor, StatID, StatValue, pcf);
+	SetCreatureStat( actor, StatID, StatValue, pcf);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6612,23 +6605,14 @@ PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
 
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level;
+	int globalID, SpellType, Level;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &SpellType, &Level, &global )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &globalID, &SpellType, &Level, &global )) {
 		return AttributeError( GemRB_GetKnownSpellsCount__doc );
 	}
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	return PyInt_FromLong(actor->spellbook.GetKnownSpellsCount( SpellType, Level ) );
 }
@@ -6640,22 +6624,13 @@ PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
 
 static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level, Index, global = 0;
+	int globalID, SpellType, Level, Index, global = 0;
 
-	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &Index, &global )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &globalID, &SpellType, &Level, &Index, &global )) {
 		return AttributeError( GemRB_GetKnownSpell__doc );
 	}
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
 	if (! ks) {
@@ -6678,24 +6653,15 @@ PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
 
 static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level = -1;
+	int globalID, SpellType, Level = -1;
 	int global = 0;
 	bool castable;
 
-	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &castable, &global )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &globalID, &SpellType, &Level, &castable, &global )) {
 		return AttributeError( GemRB_GetMemorizedSpellsCount__doc );
 	}
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	if (Level<0) {
 		if (castable) {
@@ -6715,23 +6681,14 @@ PyDoc_STRVAR( GemRB_GetMemorizedSpell__doc,
 
 static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level, Index;
+	int globalID, SpellType, Level, Index;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &Index, &global )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &globalID, &SpellType, &Level, &Index, &global )) {
 		return AttributeError( GemRB_GetMemorizedSpell__doc );
 	}
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
 	if (! ms) {
@@ -7040,29 +6997,20 @@ PyDoc_STRVAR( GemRB_GetSlotItem__doc,
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, Slot;
+	int globalID, Slot;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Slot, &global)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &globalID, &Slot, &global)) {
 		return AttributeError( GemRB_GetSlotItem__doc );
 	}
 	CREItem *si;
 	int header = -1;
 
-	if (PartyID==0) {
+	if (globalID==0) {
 		si = core->GetDraggedItem();
 	} else {
 		GET_GAME();
-
-		Actor* actor;
-		if (global) {
-			actor = game->GetActorByGlobalID( PartyID );
-		} else {
-			actor = game->FindPC( PartyID );
-		}
-		if (!actor) {
-			return RuntimeError( "Actor not found!\n" );
-		}
+		GET_ACTOR_GLOBAL();
 
 		Slot = core->QuerySlot(Slot);
 		header = actor->PCStats->GetHeaderForSlot(Slot);
@@ -8407,27 +8355,18 @@ PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,
 
 static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 {
-	int wi, slot;
+	int wi, globalID;
 	int Start = 0;
 	int Offset = 0; //control offset (iwd2 has the action buttons starting at 6)
 	int global = 0;
 	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iOi|iii", &wi, &dict, &slot, &Start, &Offset, &global )) {
+	if (!PyArg_ParseTuple( args, "iOi|iii", &wi, &dict, &globalID, &Start, &Offset, &global )) {
 		return AttributeError( GemRB_Window_SetupEquipmentIcons__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( slot );
-	} else {
-		actor = game->FindPC( slot );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	//-2 because of the left/right scroll icons
 	if (!ItemArray) {
@@ -8526,27 +8465,18 @@ static int sections[]={2,4,8,16,16};
 
 static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 {
-	int wi, slot, Type;
+	int wi, globalID, Type;
 	int Start = 0;
 	int Offset = 0;
 	int global = 0;
 	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iOii|iii", &wi, &dict, &slot, &Type, &Start, &Offset, &global )) {
+	if (!PyArg_ParseTuple( args, "iOii|iii", &wi, &dict, &globalID, &Type, &Start, &Offset, &global )) {
 		return AttributeError( GemRB_Window_SetupSpellIcons__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( slot );
-	} else {
-		actor = game->FindPC( slot );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	//-2 because of the left/right scroll icons
 	if (!SpellArray) {
@@ -8668,12 +8598,12 @@ PyDoc_STRVAR( GemRB_Window_SetupControls__doc,
 
 static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 {
-	int wi, slot;
+	int wi, globalID;
 	int Start = 0;
 	int global = 0;
 	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iOi|ii", &wi, &dict, &slot, &Start, &global )) {
+	if (!PyArg_ParseTuple( args, "iOi|ii", &wi, &dict, &globalID, &Start, &global )) {
 		return AttributeError( GemRB_Window_SetupControls__doc );
 	}
 
@@ -8683,12 +8613,8 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 
 	Actor* actor = NULL;
 
-	if (slot) {
-		if (global) {
-			actor = game->GetActorByGlobalID( slot );
-		} else {
-			actor = game->FindPC( slot );
-		}
+	if (globalID) {
+		GET_ACTOR_GLOBAL();
 	} else {
 		if (game->selected.size()==1) {
 			actor = game->selected[0];
@@ -8945,23 +8871,15 @@ PyDoc_STRVAR( GemRB_ClearActions__doc,
 
 static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 {
-	int slot;
+	int globalID;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "i|i", &slot, &global )) {
+	if (!PyArg_ParseTuple( args, "i|i", &globalID, &global )) {
 		return AttributeError( GemRB_ClearActions__doc );
 	}
 	GET_GAME();
+	GET_ACTOR_GLOBAL();
 
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( slot );
-	} else {
-		actor = game->FindPC( slot );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
 	if (actor->GetInternalFlag()&IF_NOINT) {
 		printMessage( "GuiScript","Cannot break action!\n", GREEN);
 		Py_INCREF( Py_None );
@@ -9008,24 +8926,15 @@ PyDoc_STRVAR( GemRB_SetupQuickSpell__doc,
 static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 {
 	SpellExtHeader spelldata;
-	int PartyID, which, slot, type;
+	int globalID, which, slot, type;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &slot, &which, &type, &global )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &globalID, &slot, &which, &type, &global )) {
 		return AttributeError( GemRB_SetupQuickSpell__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	if (!actor->PCStats) {
 		//no quick slots for this actor, is this an error?
@@ -9055,24 +8964,15 @@ PyDoc_STRVAR( GemRB_SetupQuickSlot__doc,
 
 static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, which, slot, headerindex = 0;
+	int globalID, which, slot, headerindex = 0;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|ii", &PartyID, &which, &slot, &headerindex, &global )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &globalID, &which, &slot, &headerindex, &global )) {
 		return AttributeError( GemRB_SetupQuickSlot__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	slot = core->QuerySlot(slot);
 	actor->SetupQuickSlot(which, slot, headerindex);
@@ -9089,25 +8989,16 @@ PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int slot;
-	int PartyID;
+	int globalID;
 	int ability = -1;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "ii|ii", &PartyID, &slot, &ability, &global)) {
+	if (!PyArg_ParseTuple( args, "ii|ii", &globalID, &slot, &ability, &global)) {
 		return AttributeError( GemRB_SetEquippedQuickSlot__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	int ret = actor->SetEquippedQuickSlot(slot, ability);
 	return PyInt_FromLong( ret );
@@ -9120,25 +9011,16 @@ PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
 
 static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID;
+	int globalID;
 	int NoTrans = 0;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "i|ii", &PartyID, &NoTrans, &global)) {
+	if (!PyArg_ParseTuple( args, "i|ii", &globalID, &NoTrans, &global)) {
 		return AttributeError( GemRB_GetEquippedQuickSlot__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	int ret = actor->inventory.GetEquippedSlot();
 	/*int effect = core->QuerySlotEffects(ret);
@@ -9197,25 +9079,17 @@ PyDoc_STRVAR( GemRB_SetModalState__doc,
 
 static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 {
-	int slot;
+	int globalID;
 	int state;
 	int global = 0;
 	const char *spell=NULL;
 
-	if (!PyArg_ParseTuple( args, "ii|is", &slot, &state, &global, &spell )) {
+	if (!PyArg_ParseTuple( args, "ii|is", &globalID, &state, &global, &spell )) {
 		return AttributeError( GemRB_SetModalState__doc );
 	}
 	GET_GAME();
+	GET_ACTOR_GLOBAL();
 
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( slot );
-	} else {
-		actor = game->FindPC( slot );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
 	actor->SetModal( (ieDword) state, 0);
 	actor->SetModalSpell(state, spell);
 
@@ -9232,26 +9106,17 @@ PyDoc_STRVAR( GemRB_SpellCast__doc,
 
 static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 {
-	unsigned int slot;
+	unsigned int globalID;
 	int type;
 	unsigned int spell;
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &slot, &type, &spell, &global )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &globalID, &type, &spell, &global )) {
 		return AttributeError( GemRB_SpellCast__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( slot );
-	} else {
-		actor = game->FindPC( slot );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	//don't cast anything, just reinit the spell list
 	if (type==-1) {
@@ -9372,29 +9237,21 @@ PyDoc_STRVAR( GemRB_UseItem__doc,
 
 static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID;
+	int globalID;
 	int slot;
 	int header;
 	int forcetarget=-1; //some crappy scrolls don't target self correctly!
 	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|ii", &PartyID, &slot, &header, &forcetarget, &global )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &globalID, &slot, &header, &forcetarget, &global )) {
 		return AttributeError( GemRB_UseItem__doc );
 	}
 
 	GET_GAME();
 
 	GET_GAMECONTROL();
+	GET_ACTOR_GLOBAL();
 
-	Actor* actor;
-	if (global) {
-		actor = game->GetActorByGlobalID( PartyID );
-	} else {
-		actor = game->FindPC( PartyID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
 	ItemExtHeader itemdata;
 	int flags = 0;
 
