@@ -887,7 +887,7 @@ static PyObject* GemRB_Window_GetPos(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	return Py_BuildValue("(ii)", (int)win->Xpos, (int)win->YPos);
+	return Py_BuildValue("(ii)", (int)win->XPos, (int)win->YPos);
 }
 
 PyDoc_STRVAR( GemRB_LoadTable__doc,
@@ -2978,7 +2978,7 @@ static PyObject* GemRB_Control_GetPos(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue("(ii)", (int)ctrl->Xpos, (int)ctrl->YPos);
+	return Py_BuildValue("(ii)", (int)ctrl->XPos, (int)ctrl->YPos);
 }
 
 PyDoc_STRVAR( GemRB_Control_SetSize__doc,
