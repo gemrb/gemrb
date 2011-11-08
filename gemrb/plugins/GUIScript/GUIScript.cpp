@@ -887,15 +887,7 @@ static PyObject* GemRB_Window_GetPos(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	PyObject* pos = PyTuple_New(2);
-//supress false positive clang warning about indexing past end of array.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warray-bounds"
-	PyTuple_SET_ITEM(pos, 0, PyInt_FromLong(win->XPos));
-	PyTuple_SET_ITEM(pos, 1, PyInt_FromLong(win->YPos));
-#pragma clang diagnostic pop
-
-	return pos;
+	return Py_BuildValue("(ii)", (int)win->Xpos, (int)win->YPos);
 }
 
 PyDoc_STRVAR( GemRB_LoadTable__doc,
@@ -1267,13 +1259,6 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Control is not found" );
 	}
 
-	PyObject* ctrltuple = PyTuple_New(2);
-//supress false positive clang warning about indexing past end of array.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warray-bounds"
-	PyTuple_SET_ITEM(ctrltuple, 0, PyInt_FromLong(WindowIndex));
-	PyTuple_SET_ITEM(ctrltuple, 1, PyInt_FromLong(ctrlindex));
-#pragma clang diagnostic pop
 	PyObject* ret = 0;
 	Control *ctrl = GetControl(WindowIndex, ctrlindex, -1);
 	if (!ctrl) {
@@ -1302,6 +1287,7 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 	default:
 		break;
 	}
+	PyObject* ctrltuple = Py_BuildValue("(ii)", WindowIndex, ctrlindex);
 	ret = gs->ConstructObject(type, ctrltuple);
 	Py_DECREF(ctrltuple);
 
@@ -2992,15 +2978,7 @@ static PyObject* GemRB_Control_GetPos(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	PyObject* pos = PyTuple_New(2);
-//supress false positive clang warning about indexing past end of array.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warray-bounds"
-	PyTuple_SET_ITEM(pos, 0, PyInt_FromLong(ctrl->XPos));
-	PyTuple_SET_ITEM(pos, 1, PyInt_FromLong(ctrl->YPos));
-#pragma clang diagnostic pop
-
-	return pos;
+	return Py_BuildValue("(ii)", (int)ctrl->Xpos, (int)ctrl->YPos);
 }
 
 PyDoc_STRVAR( GemRB_Control_SetSize__doc,
