@@ -1,9 +1,13 @@
-GemRB git (cc50371):
+GemRB git (c431e8859):
   New features:
     - 
+    - arbitrarily sortable casting list
+    - always center, always run for pst
 
   Improved features:
     - 
+    - resting
+    - drop caps, keybindings, action bar, ios input
     - bugfixes
 
   Applied patches:
