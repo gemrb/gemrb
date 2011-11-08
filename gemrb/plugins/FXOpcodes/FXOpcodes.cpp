@@ -5065,10 +5065,8 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Spellbook *sb = &target->spellbook;
 	if(fx->Parameter2) {
 		//all known spells, no need to memorize
-		if (!fx->Parameter1) {
-			fx->Parameter1=1<<IE_SPELL_TYPE_WIZARD;
-		}
-		sb->SetCustomSpellInfo(NULL, fx->Source, fx->Parameter1);
+		// the details are all handled by the Spellbook guiscript
+		core->GetDictionary()->SetAt("ActionLevel", 5);
 	} else {
 		//all spells listed in 2da
 		ieResRef *data = NULL;
@@ -5076,10 +5074,11 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		int count = core->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->Source, count);
 		core->FreeResRefTable(data, count);
+		core->GetDictionary()->SetAt("ActionLevel", 2);
 	}
-	core->GetDictionary()->SetAt("Type",-1);
+	// force a redraw of the action bar
 	//this is required, because not all of these opcodes are firing right at casting
-	core->GetDictionary()->SetAt("ActionLevel", 2);
+	core->GetDictionary()->SetAt("Type",-1);
 	core->SetEventFlag(EF_ACTION);
 	return FX_NOT_APPLIED;
 }

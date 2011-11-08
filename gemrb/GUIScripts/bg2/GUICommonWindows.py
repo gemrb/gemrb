@@ -31,6 +31,7 @@ import GUICommon
 import CommonTables
 import LUCommon
 import InventoryCommon
+import Spellbook
 
 # needed for all the Open*Window callbacks in the OptionsWindow
 import GUIJRNL
@@ -363,15 +364,18 @@ def UpdateActionsWindow ():
 		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex, 0, 1)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex, 0, 1)
+		#ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex, 0, 1)
+		Spellbook.SetupSpellIcons(ActionsWindow, 3, TopIndex, 0)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
 		ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex, 0, 1)
+		#Spellbook.SetupSpellIcons(ActionsWindow, 4, TopIndex, 0)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	elif level == 5: #all known mage spells
 		GemRB.SetVar ("Type", -1)
-		ActionsWindow.SetupSpellIcons(globals(), pc, -1, TopIndex, 0, 1)
+		#ActionsWindow.SetupSpellIcons(globals(), pc, -1, TopIndex, 0, 1)
+		Spellbook.SetupSpellIcons(ActionsWindow, -1, TopIndex, 0)
 	return
 
 def ActionQWeaponPressed (which):
@@ -435,6 +439,10 @@ def ActionQSpell2RightPressed ():
 def ActionQSpell3RightPressed ():
 	ActionQSpellRightPressed(2)
 
+# can't pass the globals dictionary from another module
+def SetActionIconWorkaround(Button, action, function):
+	Button.SetActionIcon (globals(), action, function)
+
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():
 	"""Scrolls the actions window left.
@@ -461,8 +469,13 @@ def ActionRightPressed ():
 	Type = GemRB.GetVar ("Type")
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
-	if Type&128:
-		Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1, 1, 1)
+	if Type&128 or GemRB.GetVar ("ActionLevel") == 5:
+		#Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1, 1)
+		tmpType = Type&127
+		if tmpType == 3:
+			Max = len(Spellbook.GetKnownSpells (pc, 0) + Spellbook.GetKnownSpells (pc, 1))
+		else:
+			Max = len(Spellbook.GetKnownSpells (pc, tmpType))
 	else:
 		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1, 1)
 	TopIndex += 10

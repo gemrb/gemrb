@@ -23,11 +23,11 @@ from ie_restype import RES_2DA
 # these two are only used in SetEncumbranceLabels, but that is called very often
 StrMod = StrModEx = None
 Classes = KitList = ClassSkills = Races = NextLevel = None
-Pdolls = None
+Pdolls = SpellDisplay = None
 
 def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
-	global Pdolls, StrModEx, StrMod
+	global Pdolls, StrModEx, StrMod, SpellDisplay
 
 	print # so the following output isn't appended to an existing line
 	if not Classes:
@@ -45,3 +45,5 @@ def Load():
 	if not StrMod:
 		StrMod = GemRB.LoadTable ("strmod")
 		StrModEx = GemRB.LoadTable ("strmodex")
+	if not SpellDisplay:
+		SpellDisplay = GemRB.LoadTable ("spldisp")
