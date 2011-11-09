@@ -1590,16 +1590,26 @@ int GameScript::DisarmFailed(Scriptable* Sender, Trigger* parameters)
 	return Sender->MatchTriggerWithObject(trigger_disarmfailed, parameters->objectParameter);
 }
 
-//opened for doors/containers (using lastEntered)
+//opened for doors/containers
 int GameScript::Opened(Scriptable* Sender, Trigger* parameters)
 {
 	return Sender->MatchTriggerWithObject(trigger_opened, parameters->objectParameter);
 }
 
-//closed for doors (using lastTrigger)
+int GameScript::HarmlessOpened(Scriptable* Sender, Trigger* parameters)
+{
+	return Sender->MatchTriggerWithObject(trigger_harmlessopened, parameters->objectParameter);
+}
+
+//closed for doors
 int GameScript::Closed(Scriptable* Sender, Trigger* parameters)
 {
 	return Sender->MatchTriggerWithObject(trigger_closed, parameters->objectParameter);
+}
+
+int GameScript::HarmlessClosed(Scriptable* Sender, Trigger* parameters)
+{
+	return Sender->MatchTriggerWithObject(trigger_harmlessclosed, parameters->objectParameter);
 }
 
 //unlocked for doors/containers (using lastUnlocked)

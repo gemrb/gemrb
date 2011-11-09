@@ -739,7 +739,9 @@ public: //Script Functions
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
+	static int HarmlessClosed(Scriptable* Sender, Trigger* parameters);
 	static int HarmlessEntered(Scriptable* Sender, Trigger* parameters);
+	static int HarmlessOpened(Scriptable* Sender, Trigger* parameters);
 	static int HasBounceEffects(Scriptable* Sender, Trigger* parameters);
 	static int HasImmunityEffects(Scriptable* Sender, Trigger* parameters);
 	static int HasInnateAbility(Scriptable* Sender, Trigger* parameters);
