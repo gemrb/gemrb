@@ -366,10 +366,7 @@ def OpenItemInfoWindow ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 
-	#auto identify when lore is high enough
-	if item["LoreToID"]<=GemRB.GetPlayerStat (pc, IE_LORE):
-		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+	if TryAutoIdentification(pc, item, slot, slot_item, True):
 		GUIINV.UpdateInventoryWindow ()
 
 	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
@@ -378,6 +375,14 @@ def OpenItemInfoWindow ():
 		value = 3
 	DisplayItem (slot_item["ItemResRef"], value)
 	return
+
+#auto identify when lore is high enough
+def TryAutoIdentification(pc, item, slot, slot_item, enabled=0):
+	if enabled and item["LoreToID"]<=GemRB.GetPlayerStat (pc, IE_LORE):
+		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		return True
+	return False
 
 def OpenGroundItemInfoWindow ():
 	global ItemInfoWindow
@@ -498,6 +503,12 @@ def UpdateSlot (pc, slot):
 
 	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+
+	# characters should auto-identify any item they recieve
+	if slot_item:
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		TryAutoIdentification(pc, item, slot+1, slot_item, GemRB.GetVar("GUIEnhancements")&GE_TRY_IDENTIFY_ON_TRANSFER)
+
 	GUICommon.UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
 
 	if slot_item:
