@@ -246,3 +246,22 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	}
 	return (unsigned int) seh->Range;
 }
+
+static EffectRef fx_damage_ref = { "Damage", -1 };
+// checks if any of the extended headers contains fx_damage
+bool Spell::ContainsDamageOpcode() const
+{
+	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
+	for (int h=0; h< ExtHeaderCount; h++) {
+		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
+			Effect *fx = ext_headers[h].features+i;
+			if (fx->Opcode == damage_opcode) {
+				return true;
+			}
+		}
+		if (Flags & SF_SIMPLIFIED_DURATION) { // iwd2 has only one header
+			break;
+		}
+	}
+	return false;
+}
