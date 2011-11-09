@@ -9,6 +9,7 @@ Makefile.in
 .deps
 .libs
 .dirstamp
+.DS_Store
 
 /aclocal.m4
 /admin/config.guess
