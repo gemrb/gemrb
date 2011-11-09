@@ -758,7 +758,7 @@ public:
 	bool CaseSensitive, SlowBIFs, SkipIntroVideos, DrawFPS;
 	bool TouchScrollAreas, UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
-	bool GUIEnhancements;
+	int GUIEnhancements;
 	bool KeepCache;
 	bool MultipleQuickSaves;
 	Variables *plugin_flags;

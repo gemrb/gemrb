@@ -34,7 +34,7 @@ KitTable = 0
 Init = 0
 MyChar = 0
 KitSelected = 0 #store clicked kit on redraw as number within RowCount
-EnhanceGUI = GemRB.GetVar("GUIEnhancements") #extra kit button and scroll bar toggle
+EnhanceGUI = GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS #extra kit button and scroll bar toggle
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton

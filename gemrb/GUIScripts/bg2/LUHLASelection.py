@@ -43,7 +43,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	global EnhanceGUI
 
 	#enhance GUI?
-	if (GemRB.GetVar("GUIEnhancements")):
+	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS):
 		EnhanceGUI = 1
 
 	# save our variables 
