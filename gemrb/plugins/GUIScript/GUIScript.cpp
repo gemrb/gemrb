@@ -8592,7 +8592,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	Actor* actor = NULL;
 
 	if (globalID) {
-		GET_ACTOR_GLOBAL();
+		if (global) {
+			actor = game->GetActorByGlobalID( globalID );
+		} else {
+			actor = game->FindPC( globalID );
+		}
 	} else {
 		if (game->selected.size()==1) {
 			actor = game->selected[0];
