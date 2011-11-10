@@ -199,7 +199,7 @@ inline PyObject* AttributeError(const char* doc_string)
 
 #define GET_ACTOR_GLOBAL() \
 	Actor* actor; \
-	if (global) { \
+	if (globalID > 1000) { \
 		actor = game->GetActorByGlobalID( globalID ); \
 	} else { \
 		actor = game->FindPC( globalID ); \
