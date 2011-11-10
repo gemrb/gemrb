@@ -926,16 +926,22 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 	return count;
 }
 
-int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname)
+int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, unsigned int type)
 {
 	memset(array, 0, sizeof(SpellExtHeader) );
 	if (spellinfo.size() == 0) {
 		GenerateSpellInfo();
 	}
+	int offset = 0;
 	for (unsigned int i = 0; i<spellinfo.size(); i++) {
+		// take the offset into account, since we need per-type indices
+		if (spellinfo[i]->type != type) {
+			offset++;
+			continue;
+		}
 		if (strnicmp(spellinfo[i]->spellname, spellname, sizeof(ieResRef) ) ) continue;
 		memcpy(array, spellinfo[i], sizeof(SpellExtHeader));
-		return i+1;
+		return i-offset+1;
 	}
 	return 0;
 }

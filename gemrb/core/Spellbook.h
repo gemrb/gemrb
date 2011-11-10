@@ -244,7 +244,7 @@ public:
 	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);
 
 	/** find the first spell matching resref (returns index+1) */
-	int FindSpellInfo(SpellExtHeader *array, const ieResRef spellname);
+	int FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, unsigned int type);
 
 	/** Dumps spellbook to stdout for debugging */
 	void dump();

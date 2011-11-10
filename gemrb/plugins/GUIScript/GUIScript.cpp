@@ -6747,7 +6747,7 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSpelldataIndex__doc,
-			 "GetSpelldataIndex(globalID, spellResRef)=>int\n\n"
+			 "GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
 			 "Returns the index of the spell in the spellbook's spelldata structure."
 );
 
@@ -6755,8 +6755,9 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 {
 	unsigned int globalID;
 	const char *spellResRef;
+	int type;
 
-	if (!PyArg_ParseTuple( args, "is", &globalID, &spellResRef)) {
+	if (!PyArg_ParseTuple( args, "isi", &globalID, &spellResRef, &type)) {
 		return AttributeError( GemRB_GetSpelldataIndex__doc );
 	}
 
@@ -6768,7 +6769,7 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 	}
 
 	SpellExtHeader spelldata;
-	int ret = actor->spellbook.FindSpellInfo(&spelldata, spellResRef);
+	int ret = actor->spellbook.FindSpellInfo(&spelldata, spellResRef, type);
 	return PyInt_FromLong( ret-1 );
 }
 
@@ -9117,8 +9118,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
-		//quick spell type is available in actor->PCStats->QuickSpellClasses, if needed
-		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell]);
+		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellClass[spell]);
 	} else {
 		ieDword ActionLevel = 0;
 		core->GetDictionary()->Lookup("ActionLevel", ActionLevel);
