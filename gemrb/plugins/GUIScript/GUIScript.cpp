@@ -9396,6 +9396,33 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_ChargeSpells__doc,
+			  "ChargeSpells(globalID|pc)\n\n"
+			  "Recharges the actor's spells.");
+static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
+{
+	int ActorID;
+
+	if (!PyArg_ParseTuple( args, "i", &ActorID)) {
+		return AttributeError( GemRB_ChargeSpells__doc );
+	}
+	GET_GAME();
+
+	Actor* actor;
+	if (ActorID > 1000) {
+		actor = game->GetActorByGlobalID( ActorID );
+	} else {
+		actor = game->FindPC( ActorID );
+	}
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+	actor->spellbook.ChargeAllSpells();
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_HasSpecialItem__doc,
 "HasSpecialItem(pc, itemtype, useup) => bool\n\n"
 "Checks if a team member has an item, optionally uses it.");
@@ -10167,6 +10194,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ChangeContainerItem, METH_VARARGS),
 	METHOD(ChangeItemFlag, METH_VARARGS),
 	METHOD(ChangeStoreItem, METH_VARARGS),
+	METHOD(ChargeSpells, METH_VARARGS),
 	METHOD(CheckFeatCondition, METH_VARARGS),
 	METHOD(CheckSpecialSpell, METH_VARARGS),
 	METHOD(CheckVar, METH_VARARGS),
