@@ -1824,6 +1824,24 @@ void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_spee
 			( ( ( Pos.y - ( ( desty * 12 ) + 6 ) ) * ( time_diff ) ) / walk_speed );
 }
 
+unsigned char Movable::GetNextFace()
+{
+	//slow turning
+	if (timeStartStep==core->GetGame()->Ticks) {
+		return Orientation;
+	}
+	if (Orientation != NewOrientation) {
+		if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
+			Orientation++;
+		} else {
+			Orientation--;
+		}
+		Orientation = Orientation&(MAX_ORIENT-1);
+	}
+
+	return Orientation;
+}
+
 // returns whether we made all pending steps (so, false if we must be called again this tick)
 // we can't just do them all here because the caller might have to update searchmap etc
 bool Movable::DoStep(unsigned int walk_speed, ieDword time)
@@ -1846,7 +1864,7 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 		step = step->Next;
 		timeStartStep = timeStartStep + walk_speed;
 	}
-	SetOrientation (step->orient, false);
+	SetOrientation (step->orient, true);
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 		StanceID = IE_ANI_RUN;
