@@ -1,5 +1,5 @@
 
-Prototype: GemRB.SetupEquipmentIcons(WindowIndex, dict, slot[, Start, Offset, global])nnAutomagically sets up the controls of the equipment list window for a PC indexed by globalID.nStart is the beginning of the visible part of the item list.nOffset is the ID of the first usable button.n
+Prototype: GemRB.SetupEquipmentIcons(WindowIndex, dict, slot[, Start, Offset])nnAutomagically sets up the controls of the equipment list window for a PC indexed by globalID.nStart is the beginning of the visible part of the item list.nOffset is the ID of the first usable button.n
 
 Metaclass Prototype:
 
@@ -11,7 +11,6 @@ dict -
 slot - 
 Start - 
 Offset - 
-global - (optional) 
 
 Return value:
 

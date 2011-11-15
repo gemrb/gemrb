@@ -225,15 +225,15 @@ def UpdateActionsWindow ():
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
-		PortraitWindow.SetupControls (globals(), pc, 6, 1)
+		PortraitWindow.SetupControls (globals(), pc, 6)
 	elif level == 1:
-		PortraitWindow.SetupEquipmentIcons (globals(), pc, TopIndex, 6, 1)
+		PortraitWindow.SetupEquipmentIcons (globals(), pc, TopIndex, 6)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		PortraitWindow.SetupSpellIcons (globals(), pc, 3, TopIndex, 6, 1)
+		PortraitWindow.SetupSpellIcons (globals(), pc, 3, TopIndex, 6)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		PortraitWindow.SetupSpellIcons (globals(), pc, 4, TopIndex, 6, 1)
+		PortraitWindow.SetupSpellIcons (globals(), pc, 4, TopIndex, 6)
 	return
 
 def ActionQWeaponPressed (which):
@@ -241,14 +241,14 @@ def ActionQWeaponPressed (which):
 	global PortraitWindow
 
 	pc = GemRB.GameGetFirstSelectedActor ()
-	qs = GemRB.GetEquippedQuickSlot (pc, 1, 1)
+	qs = GemRB.GetEquippedQuickSlot (pc, 1)
 
 	#38 is the magic slot
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK, GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
-		GemRB.SetEquippedQuickSlot (pc, which, -1, 1)
+		GemRB.SetEquippedQuickSlot (pc, which, -1)
 
 	PortraitWindow.SetupControls (globals(), pc, 6)
 	UpdateActionsWindow ()
@@ -307,7 +307,7 @@ def ActionRightPressed ():
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_BATTLESONG, 1)
+	GemRB.SetModalState (pc, MS_BATTLESONG)
 	GemRB.PlaySound ("act_01")
 	UpdateActionsWindow ()
 	return
@@ -315,14 +315,14 @@ def ActionBardSongPressed ():
 def ActionSearchPressed ():
 	"""Toggles detect traps."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_DETECTTRAPS, 1)
+	GemRB.SetModalState (pc, MS_DETECTTRAPS)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
 	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_STEALTH, 1)
+	GemRB.SetModalState (pc, MS_STEALTH)
 	GemRB.PlaySound ("act_07")
 	UpdateActionsWindow ()
 	return
@@ -330,7 +330,7 @@ def ActionStealthPressed ():
 def ActionTurnPressed ():
 	"""Toggles turn undead."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_TURNUNDEAD, 1)
+	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	GemRB.PlaySound ("act_06")
 	UpdateActionsWindow ()
 	return
@@ -352,7 +352,7 @@ def ActionQItemPressed (action):
 	"""Uses the given quick item."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	#quick slot
-	GemRB.UseItem (pc, -2, action, -1, 1)
+	GemRB.UseItem (pc, -2, action, -1)
 	return
 
 def ActionQItem1Pressed ():
@@ -400,7 +400,7 @@ def SpellPressed ():
 		#setup quickspell slot
 		#if spell has no target, return
 		#otherwise continue with casting
-		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type, 1)
+		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type)
 		# sabotage the immediate casting of self targeting spells
 		if Target == 5 or Target == 7:
 			Type = -1
@@ -409,11 +409,11 @@ def SpellPressed ():
 	if Type==-1:
 		GemRB.SetVar ("ActionLevel", 0)
 		GemRB.SetVar("Type", 0)
-	GemRB.SpellCast (pc, Type, Spell, 1)
+	GemRB.SpellCast (pc, Type, Spell)
 	if GemRB.GetVar ("Type")!=-1:
 		GemRB.SetVar ("ActionLevel", 0)
 		#init spell list
-		GemRB.SpellCast (pc, -1, 0, 1)
+		GemRB.SpellCast (pc, -1, 0)
 	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
@@ -424,7 +424,7 @@ def EquipmentPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Item = GemRB.GetVar ("Equipment")
 	#equipment index
-	GemRB.UseItem (pc, -1, Item, -1, 1)
+	GemRB.UseItem (pc, -1, Item, -1)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
@@ -723,7 +723,7 @@ def PortraitButtonOnMouseLeave ():
 
 def ActionStopPressed ():
 	for i in GemRB.GetSelectedActors():
-		GemRB.ClearActions (i, 1)
+		GemRB.ClearActions (i)
 	return
 
 def ActionTalkPressed ():

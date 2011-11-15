@@ -360,7 +360,7 @@ def UpdateSlot (pc, i):
 
 def DefaultWeapon ():
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetEquippedQuickSlot (pc, 1000, -1, 1)
+	GemRB.SetEquippedQuickSlot (pc, 1000, -1)
 	UpdateInventoryWindow ()
 	return
 

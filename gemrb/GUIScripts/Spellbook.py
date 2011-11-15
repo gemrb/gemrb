@@ -41,9 +41,9 @@ def GetUsableMemorizedSpells(actor, BookType):
 	memorizedSpells = []
 	spellResRefs = []
 	for level in range (9):
-		spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False, 1)
+		spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False)
 		for i in range (spellCount):
-			Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i, 1)
+			Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i)
 			if not Spell0["Flags"]:
 				# depleted, so skip
 				continue
@@ -77,9 +77,9 @@ def GetKnownSpells(actor, BookType, noDweomer=1):
 	knownSpells = []
 	spellResRefs = []
 	for level in range (9):
-		spellCount = GemRB.GetKnownSpellsCount (actor, BookType, level, 1)
+		spellCount = GemRB.GetKnownSpellsCount (actor, BookType, level)
 		for i in range (spellCount):
-			Spell0 = GemRB.GetKnownSpell (actor, BookType, level, i, 1)
+			Spell0 = GemRB.GetKnownSpell (actor, BookType, level, i)
 			if Spell0["SpellResRef"] in spellResRefs:
 				continue
 			if noDweomer and Spell0["SpellResRef"].upper() == "SPWI124":
@@ -163,7 +163,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 
 	# disable all spells if fx_disable_spellcasting was run with the same type
 	# but only if there are any spells of that type to disable
-	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0, 1)
+	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
 
 	#order is: mage, cleric, innate, class, song, (defaults to 1, item)
 	spellSections = [2, 4, 8, 16, 16]

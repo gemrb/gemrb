@@ -192,7 +192,7 @@ def EmptyControls ():
 	if Selected==1:
 		pc = GemRB.GameGetFirstSelectedActor ()
 		#init spell list
-		GemRB.SpellCast (pc, -1, 0, 1)
+		GemRB.SpellCast (pc, -1, 0)
 
 	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
@@ -287,14 +287,14 @@ def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
 	ability = GemRB.GetVar ("Ability")
-	GemRB.SetupQuickSlot (pc, 0, slot, ability, 1)
+	GemRB.SetupQuickSlot (pc, 0, slot, ability)
 	GemRB.SetVar ("ActionLevel", 0)
 	return
 
 def SetupItemAbilities(pc, slot):
 	Window = ActionsWindow
 
-	slot_item = GemRB.GetSlotItem(pc, slot, 1)
+	slot_item = GemRB.GetSlotItem(pc, slot)
 	if not slot_item:
 		# empty quickslot
 		return
@@ -359,22 +359,22 @@ def UpdateActionsWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
 		#this is based on class
-		ActionsWindow.SetupControls (globals(), pc, 0, 1)
+		ActionsWindow.SetupControls (globals(), pc, 0)
 	elif level == 1:
-		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex, 0, 1)
+		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex, 0)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		#ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex, 0, 1)
+		#ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex, 0)
 		Spellbook.SetupSpellIcons(ActionsWindow, 3, TopIndex, 0)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		#ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex, 0, 1)
+		#ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex, 0)
 		Spellbook.SetupSpellIcons(ActionsWindow, 4, TopIndex, 0)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	elif level == 5: #all known mage spells
 		GemRB.SetVar ("Type", -1)
-		#ActionsWindow.SetupSpellIcons(globals(), pc, -1, TopIndex, 0, 1)
+		#ActionsWindow.SetupSpellIcons(globals(), pc, -1, TopIndex, 0)
 		Spellbook.SetupSpellIcons(ActionsWindow, -1, TopIndex, 0)
 	return
 
@@ -382,16 +382,16 @@ def ActionQWeaponPressed (which):
 	"""Selects the given quickslot weapon if possible."""
 
 	pc = GemRB.GameGetFirstSelectedActor ()
-	qs = GemRB.GetEquippedQuickSlot (pc, 1, 1)
+	qs = GemRB.GetEquippedQuickSlot (pc, 1)
 
 	#38 is the magic slot
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK, GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
-		GemRB.SetEquippedQuickSlot (pc, which, -1, 1)
+		GemRB.SetEquippedQuickSlot (pc, which, -1)
 
-	ActionsWindow.SetupControls (globals(), pc, 0, 1)
+	ActionsWindow.SetupControls (globals(), pc, 0)
 	UpdateActionsWindow ()
 	return
 
@@ -410,7 +410,7 @@ def ActionQWeapon4Pressed ():
 def ActionQSpellPressed (which):
 	pc = GemRB.GameGetFirstSelectedActor ()
 
-	GemRB.SpellCast (pc, -2, which, 1)
+	GemRB.SpellCast (pc, -2, which)
 	UpdateActionsWindow ()
 	return
 
@@ -470,14 +470,14 @@ def ActionRightPressed ():
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
 	if Type&128 or GemRB.GetVar ("ActionLevel") == 5:
-		#Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1, 1)
+		#Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1)
 		tmpType = Type&127
 		if tmpType == 3:
 			Max = len(Spellbook.GetKnownSpells (pc, 0) + Spellbook.GetKnownSpells (pc, 1))
 		else:
 			Max = len(Spellbook.GetKnownSpells (pc, tmpType))
 	else:
-		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1, 1)
+		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
@@ -508,7 +508,7 @@ def ActionBardSongPressed ():
 	##FIXME: check if the actor can actually switch to this state
 	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_BATTLESONG, 1)
+	GemRB.SetModalState (pc, MS_BATTLESONG)
 	GemRB.PlaySound ("act_01")
 	UpdateActionsWindow ()
 	return
@@ -519,14 +519,14 @@ def ActionSearchPressed ():
 	##FIXME: check if the actor can actually switch to this state
 	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_DETECTTRAPS, 1)
+	GemRB.SetModalState (pc, MS_DETECTTRAPS)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
 	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_STEALTH, 1)
+	GemRB.SetModalState (pc, MS_STEALTH)
 	GemRB.PlaySound ("act_07")
 	UpdateActionsWindow ()
 	return
@@ -534,7 +534,7 @@ def ActionStealthPressed ():
 def ActionTurnPressed ():
 	"""Toggles turn undead."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_TURNUNDEAD, 1)
+	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	GemRB.PlaySound ("act_06")
 	UpdateActionsWindow ()
 	return
@@ -557,7 +557,7 @@ def ActionQItemPressed (action):
 	"""Uses the given quick item."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	#quick slot
-	GemRB.UseItem (pc, -2, action, -1, 1)
+	GemRB.UseItem (pc, -2, action, -1)
 	return
 
 def ActionQItem1Pressed ():
@@ -636,7 +636,7 @@ def SpellPressed ():
 		#setup quickspell slot
 		#if spell has no target, return
 		#otherwise continue with casting
-		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type, 1)
+		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type)
 		#sabotage the immediate casting of self targeting spells
 		if Target == 5 or Target == 7:
 			Type = -1
@@ -645,11 +645,11 @@ def SpellPressed ():
 	if Type==-1:
 		GemRB.SetVar ("ActionLevel", 0)
 		GemRB.SetVar("Type", 0)
-	GemRB.SpellCast (pc, Type, Spell, 1)
+	GemRB.SpellCast (pc, Type, Spell)
 	if GemRB.GetVar ("Type")!=-1:
 		GemRB.SetVar ("ActionLevel", 0)
 		#init spell list
-		GemRB.SpellCast (pc, -1, 0, 1)
+		GemRB.SpellCast (pc, -1, 0)
 	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
@@ -660,7 +660,7 @@ def EquipmentPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Item = GemRB.GetVar ("Equipment")
 	#equipment index
-	GemRB.UseItem (pc, -1, Item, -1, 1)
+	GemRB.UseItem (pc, -1, Item, -1)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
@@ -947,7 +947,7 @@ def PortraitButtonOnMouseLeave ():
 
 def ActionStopPressed ():
 	for i in GemRB.GetSelectedActors():
-		GemRB.ClearActions (i, 1)
+		GemRB.ClearActions (i)
 	return
 
 def ActionTalkPressed ():
