@@ -481,9 +481,9 @@ def SetCharacterDescription():
 	if CharGenState > 5:
 		ClassName = CommonTables.Classes.GetRowName (Class)
 		Row = CommonTables.Classes.GetValue (Class, 5)
-		IsRanger = CommonTables.ClassSkills.GetValue (Row, 0)
-		IsArcane = CommonTables.ClassSkills.GetValue (Row, 1)
-		IsMage = CommonTables.ClassSkills.GetValue (Row, 2)
+		DruidSpell = CommonTables.ClassSkills.GetValue (Row, 0)
+		PriestSpell = CommonTables.ClassSkills.GetValue (Row, 1)
+		MageSpell = CommonTables.ClassSkills.GetValue (Row, 2)
 		IsBard = CommonTables.ClassSkills.GetValue (Row, 4)
 		IsThief = CommonTables.ClassSkills.GetValue (Row, 5)
 
@@ -496,7 +496,7 @@ def SetCharacterDescription():
 				TextArea.Append (": " )
 				TextArea.Append (str(GemRB.GetPlayerStat (MyChar, StatID)) )
 				TextArea.Append ("%" )
-		elif IsRanger!="*":
+		elif DruidSpell!="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (8442, -1)
 			for i in range (4):
@@ -537,7 +537,7 @@ def SetCharacterDescription():
 					TextArea.Append ("+")
 					j = j + 1
 
-		if IsMage !="*":
+		if MageSpell !="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (11027, -1)
 			TextArea.Append (": " )
@@ -553,14 +553,14 @@ def SetCharacterDescription():
 						TextArea.Append (" +")
 					TextArea.Append (" ")
 
-		if IsArcane!="*":
+		if PriestSpell!="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (11028, -1)
 			TextArea.Append (": " )
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			if IsArcane == "MXSPLPRS" or IsArcane == "MXSPLPAL":
+			if PriestSpell == "MXSPLPRS" or PriestSpell == "MXSPLPAL":
 				ClassFlag = 0x4000
-			elif IsArcane == "MXSPLDRU" or IsArcane == "MXSPLRAN":
+			elif PriestSpell == "MXSPLDRU" or PriestSpell == "MXSPLRAN":
 				ClassFlag = 0x8000
 			else:
 				ClassFlag = 0
@@ -1544,9 +1544,9 @@ def SkillsPress():
 	Level = 1
 	SpellLevel = 1
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	IsRanger = CommonTables.ClassSkills.GetValue (Class, 0)
-	IsArcane = CommonTables.ClassSkills.GetValue (Class, 1)
-	IsMage = CommonTables.ClassSkills.GetValue (Class, 2)
+	DruidSpell = CommonTables.ClassSkills.GetValue (Class, 0)
+	PriestSpell = CommonTables.ClassSkills.GetValue (Class, 1)
+	MageSpell = CommonTables.ClassSkills.GetValue (Class, 2)
 	IsBard = CommonTables.ClassSkills.GetValue (Class, 4)
 	IsThief = CommonTables.ClassSkills.GetValue (Class, 5)
 
@@ -1554,7 +1554,7 @@ def SkillsPress():
 		GemRB.SetVar ("HatedRace", 0)
 		if IsThief!="*":
 			SkillsSelect()
-		elif IsRanger!="*":
+		elif DruidSpell!="*":
 			Skill = GemRB.LoadTable("SKILLRNG").GetValue(str(Level), "STEALTH")
 			GemRB.SetPlayerStat (MyChar, IE_STEALTH, Skill)
 			RacialEnemySelect()
@@ -1569,27 +1569,27 @@ def SkillsPress():
 		ProficienciesSelect()
 
 	if SkillsState == 2:
-		if IsMage!="*":
-			MageSpellsSelect(IsMage, Level, SpellLevel)
+		if MageSpell!="*":
+			MageSpellsSelect(MageSpell, Level, SpellLevel)
 		else:
 			SkillsState = 3
 
 	if SkillsState == 3:
-		if IsMage!="*":
-			MageSpellsMemorize(IsMage, Level, SpellLevel)
+		if MageSpell!="*":
+			MageSpellsMemorize(MageSpell, Level, SpellLevel)
 		else:
 			SkillsState = 4
 
 	if SkillsState == 4:
-		if IsArcane=="MXSPLPRS" or IsArcane =="MXSPLPAL":
+		if PriestSpell=="MXSPLPRS" or PriestSpell =="MXSPLPAL":
 			ClassFlag = 0x4000
-			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
-		elif IsRanger=="MXSPLDRU" or IsRanger =="MXSPLRAN":
+			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
+		elif DruidSpell=="MXSPLDRU" or DruidSpell =="MXSPLRAN":
 			#no separate spell progression
-			if IsRanger == "MXSPLDRU":
-				IsRanger = "MXSPLPRS"
+			if DruidSpell == "MXSPLDRU":
+				DruidSpell = "MXSPLPRS"
 			ClassFlag = 0x8000
-			PriestSpellsMemorize(IsRanger, Level, SpellLevel)
+			PriestSpellsMemorize(DruidSpell, Level, SpellLevel)
 		else:
 			SkillsState = 5
 
