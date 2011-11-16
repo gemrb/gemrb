@@ -351,8 +351,13 @@ def AcceptPress():
 		#todo: set up ALL spell levels not just level 1
 		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		Learnable = GUICommon.GetLearnablePriestSpells (ClassFlag, t, 1)
+		PriestMemorized = GemRB.GetVar ("PriestMemorized")
+		j = 1
+		while (PriestMemorized != 1<<(j-1)):
+			j = j + 1
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
+		GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_PRIEST, 0, j, 1)
 
 	# ranger tracking is a hardcoded innate
 	if GUICommon.HasHOW():
