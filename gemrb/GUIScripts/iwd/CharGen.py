@@ -334,6 +334,9 @@ def AcceptPress():
 
 	#priest spells
 	TableName = CommonTables.ClassSkills.GetValue (Class, 1, 0)
+	# druids and rangers have a column of their own
+	if TableName == "*":
+		TableName = CommonTables.ClassSkills.GetValue (Class, 0, 0)
 	if TableName != "*":
 		if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
 			ClassFlag = 0x8000
