@@ -364,17 +364,14 @@ def UpdateActionsWindow ():
 		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex, 0)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		#ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex, 0)
 		Spellbook.SetupSpellIcons(ActionsWindow, 3, TopIndex, 0)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		#ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex, 0)
 		Spellbook.SetupSpellIcons(ActionsWindow, 4, TopIndex, 0)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	elif level == 5: #all known mage spells
 		GemRB.SetVar ("Type", -1)
-		#ActionsWindow.SetupSpellIcons(globals(), pc, -1, TopIndex, 0)
 		Spellbook.SetupSpellIcons(ActionsWindow, -1, TopIndex, 0)
 	return
 

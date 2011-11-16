@@ -111,7 +111,6 @@ def SortUsableSpells(memorizedSpells):
 
 	return memorizedSpells
 
-# FIXME: some innates are broken (all values 0 when cast): happened in dweomer when used index was out of range - same here?
 # Start is used as an offset in the spell list to show "pages" > 1
 # Offset is a control ID offset here for iwd2 purposes
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
