@@ -1584,12 +1584,12 @@ def SkillsPress():
 		if IsArcane=="MXSPLPRS" or IsArcane =="MXSPLPAL":
 			ClassFlag = 0x4000
 			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
-		elif IsArcane=="MXSPLDRU" or IsArcane =="MXSPLRAN":
+		elif IsRanger=="MXSPLDRU" or IsRanger =="MXSPLRAN":
 			#no separate spell progression
-			if IsArcane == "MXSPLDRU":
-				IsArcane = "MXSPLPRS"
+			if IsRanger == "MXSPLDRU":
+				IsRanger = "MXSPLPRS"
 			ClassFlag = 0x8000
-			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
+			PriestSpellsMemorize(IsRanger, Level, SpellLevel)
 		else:
 			SkillsState = 5
 
