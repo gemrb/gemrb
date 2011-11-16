@@ -553,6 +553,8 @@ def SetCharacterDescription():
 						TextArea.Append (" +")
 					TextArea.Append (" ")
 
+		if PriestSpell == "*":
+			PriestSpell = DruidSpell
 		if PriestSpell!="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (11028, -1)
