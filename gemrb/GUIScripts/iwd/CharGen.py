@@ -326,7 +326,7 @@ def AcceptPress():
 		for i in range (len(Learnable) ):
 			if SpellBook & j:
 				if MemoBook & j:
-					memorize = 8
+					memorize = LS_MEMO
 				else:
 					memorize = 0
 				GemRB.LearnSpell (MyChar, Learnable[i], memorize)
