@@ -353,7 +353,7 @@ def AcceptPress():
 		Learnable = GUICommon.GetLearnablePriestSpells (ClassFlag, t, 1)
 		PriestMemorized = GemRB.GetVar ("PriestMemorized")
 		j = 1
-		while (PriestMemorized != 1<<(j-1)):
+		while (PriestMemorized and PriestMemorized != 1<<(j-1)):
 			j = j + 1
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
