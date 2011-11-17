@@ -149,6 +149,7 @@ SoundIndex = 0
 VerbalConstants = None
 HasStrExtra = 0
 MyChar = 0
+ImportedChar = 0
 
 def OnLoad():
 	global CharGenWindow, CharGenState, TextArea, PortraitButton, AcceptButton
@@ -156,7 +157,7 @@ def OnLoad():
 	global AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 	global KitTable, ProficienciesTable, AlignmentTable, RacialEnemyTable
 	global AbilitiesTable, SkillsTable, PortraitsTable
-	global MyChar
+	global MyChar, ImportedChar
 
 	KitTable = GemRB.LoadTable ("magesch")
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
@@ -170,6 +171,7 @@ def OnLoad():
 	CharGenWindow.SetFrame ()
 	CharGenState = 0
 	MyChar = GemRB.GetVar ("Slot")
+	ImportedChar = 0
 
 	GenderButton = CharGenWindow.GetControl (0)
 	GenderButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -406,7 +408,9 @@ def AcceptPress():
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetToken ("CHARNAME","")
-	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (Class, 3) )
+	# don't reset imported char's xp back to start
+	if not ImportedChar:
+		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (Class, 3) )
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
@@ -2709,7 +2713,7 @@ def ImportPress():
 
 def ImportDonePress():
 	global CharGenWindow, ImportWindow, CharImportList
-	global CharGenState, SkillsState, Portrait
+	global CharGenState, SkillsState, Portrait, ImportedChar
 
 	# Import the character from the chosen name
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
@@ -2721,6 +2725,7 @@ def ImportDonePress():
 	PortraitButton.SetPicture (PortraitName)
 	Portrait = -1
 
+	ImportedChar = 1
 	CharGenState = 7
 	SkillsState = 5
 	SetCharacterDescription ()
