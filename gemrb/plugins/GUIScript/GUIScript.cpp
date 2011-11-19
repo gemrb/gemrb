@@ -9086,8 +9086,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		core->GetDictionary()->Lookup("ActionLevel", ActionLevel);
 		if (ActionLevel == 5) {
 			// get the right spell, since the lookup below only checks the memorized list
-			ieResRef ignoreSpell = "spwi124"; // Nahal's reckless dweomer that got us here
-			actor->spellbook.SetCustomSpellInfo(NULL, ignoreSpell, type);
+			actor->spellbook.SetCustomSpellInfo(NULL, NULL, type);
 		}
 		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 	}

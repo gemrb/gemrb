@@ -853,6 +853,11 @@ int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
 		}
 	}
 
+	// disable spells causing surges to be cast while in a surge (prevents nesting)
+	if (sp&SP_SURGE) {
+		return SP_SURGE;
+	}
+
 	return 0;
 }
 

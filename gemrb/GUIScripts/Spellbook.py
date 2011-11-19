@@ -23,6 +23,7 @@ import CommonTables
 from GUIDefines import *
 from ie_stats import IE_CASTING
 from ie_action import ACT_LEFT, ACT_RIGHT
+from ie_spells import SP_IDENTIFY, SP_SURGE
 
 #################################################################
 # this is in the operator module of the standard python lib
@@ -73,7 +74,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 
 	return memorizedSpells2
 
-def GetKnownSpells(actor, BookType, noDweomer=1):
+def GetKnownSpells(actor, BookType):
 	knownSpells = []
 	spellResRefs = []
 	for level in range (9):
@@ -81,9 +82,6 @@ def GetKnownSpells(actor, BookType, noDweomer=1):
 		for i in range (spellCount):
 			Spell0 = GemRB.GetKnownSpell (actor, BookType, level, i)
 			if Spell0["SpellResRef"] in spellResRefs:
-				continue
-			if noDweomer and Spell0["SpellResRef"].upper() == "SPWI124":
-				# skip Nahal's reckless dweomer, so it can't be nested
 				continue
 			spellResRefs.append (Spell0["SpellResRef"])
 			Spell = GemRB.GetSpell(Spell0["SpellResRef"])
@@ -163,6 +161,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	# disable all spells if fx_disable_spellcasting was run with the same type
 	# but only if there are any spells of that type to disable
 	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
+	actionLevel = GemRB.GetVar ("ActionLevel")
 
 	#order is: mage, cleric, innate, class, song, (defaults to 1, item)
 	spellSections = [2, 4, 8, 16, 16]
@@ -190,8 +189,10 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetVarAssoc ("Spell", Spell['SpellIndex'])
 
 		# disable spells that should be cast from the inventory or can't be cast while silenced or ...
-		# see splspec.2da for all the reasons
-		if GemRB.CheckSpecialSpell(actor, Spell['SpellResRef']) or (disabled_spellcasting&spellType):
+		# see splspec.2da for all the reasons; silence is handled elsewhere
+		specialSpell = GemRB.CheckSpecialSpell(actor, Spell['SpellResRef'])
+		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == 5)
+		if specialSpell or (disabled_spellcasting&spellType):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.EnableBorder(1, 0)
 			#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.UpdateActionsWindow) # noop if it worked or not :)

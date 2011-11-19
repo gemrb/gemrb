@@ -141,6 +141,7 @@ struct SpellDescType {
 };
 #define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
 #define SP_SILENCE   2      //any spell that can be cast in silence
+#define SP_SURGE     4      //any spell that cannot be cast during a wild surge
 
 struct SurgeSpell {
 	ieResRef spell;
