@@ -56,68 +56,91 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
 
 	OptionsWindow = Window
+	# FIXME: add "(key)" to tooltips!
+
 	# Return to Game
 	Button = Window.GetControl (0)
 	Button.SetTooltip (16313)
 	Button.SetVarAssoc ("SelectedWindow", 0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	if GUICommon.GameIsBG1():
+		# enabled BAM isn't present in .chu, defining it here
+		Button.SetSprites ("GUILSOP", 0,16,17,28,16)
 
 	# Map
 	Button = Window.GetControl (1)
 	Button.SetTooltip (16310)
 	Button.SetVarAssoc ("SelectedWindow", 1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
 
 	# Journal
 	Button = Window.GetControl (2)
 	Button.SetTooltip (16308)
 	Button.SetVarAssoc ("SelectedWindow", 2)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
 
 	# Inventory
 	Button = Window.GetControl (3)
 	Button.SetTooltip (16307)
 	Button.SetVarAssoc ("SelectedWindow", 3)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
 
 	# Records
 	Button = Window.GetControl (4)
 	Button.SetTooltip (16306)
 	Button.SetVarAssoc ("SelectedWindow", 4)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
 
 	# Mage
 	Button = Window.GetControl (5)
 	Button.SetTooltip (16309)
 	Button.SetVarAssoc ("SelectedWindow", 5)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 
 	# Priest
 	Button = Window.GetControl (6)
 	Button.SetTooltip (14930)
 	Button.SetVarAssoc ("SelectedWindow", 6)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIPR.OpenPriestWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,10,11,25,10)
 
 	# Options
 	Button = Window.GetControl (7)
 	Button.SetTooltip (16311)
 	Button.SetVarAssoc ("SelectedWindow", 7)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 
-	# Multi player team setup?
+	# Party mgmt
 	Button = Window.GetControl (8)
-	Button.SetTooltip (13902)
+	Button.SetTooltip (16312)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
 
+	# pause button
 	if Gears:
 		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		Button = Window.GetControl (9)
-		Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
+		if GUICommon.GameIsBG2():
+			Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
+			Label.SetAnimation ("CPEN")
 
-		Label.SetAnimation ("CPEN")
 		Button.SetAnimation ("CGEAR")
-		Button.SetBAM ("CDIAL", 0, 0)
+		if GUICommon.GameIsBG2():
+			Button.SetBAM ("CDIAL", 0, 0)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
@@ -133,6 +156,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 		Button.SetTooltip (11942)
 
+	MarkMenuButton (Window)
+
 	if PortraitWindow:
 		UpdatePortraitWindow ()
 	return
@@ -144,8 +169,12 @@ def MarkMenuButton (WindowIndex):
 		Button = WindowIndex.GetControl (button)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
-	if Pressed: # don't draw the selection when returning to the game
-		Pressed.SetState (IE_GUI_BUTTON_SELECTED)
+	if Pressed:
+		Button = Pressed
+	else: # highlight return to game
+		Button = WindowIndex.GetControl (0)
+	Button.SetState (IE_GUI_BUTTON_SELECTED)
+
 	return
 
 def OptionsPress ():
@@ -232,13 +261,16 @@ def GroupControls ():
 	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	Button = Window.GetControl (0)
-	Button.SetActionIcon (globals(), 7)
+	if GUICommon.GameIsBG2(): # no guard icon
+		Button.SetActionIcon (globals(), -1)
+	else:
+		Button.SetActionIcon (globals(), 14)
 	Button = Window.GetControl (1)
-	Button.SetActionIcon (globals(), 15)
+	Button.SetActionIcon (globals(), 7)
 	Button = Window.GetControl (2)
-	Button.SetActionIcon (globals(), 21)
+	Button.SetActionIcon (globals(), 15)
 	Button = Window.GetControl (3)
-	Button.SetActionIcon (globals(), -1)
+	Button.SetActionIcon (globals(), 21)
 	Button = Window.GetControl (4)
 	Button.SetActionIcon (globals(), -1)
 	Button = Window.GetControl (5)
@@ -341,6 +373,8 @@ def UpdateActionsWindow ():
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = ActionsWindow.GetControl (i)
+		if not GUICommon.GameIsBG2():
+			Button.SetBorder (0,6,6,4,4,0,254,0,255)
 		Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
@@ -704,7 +738,7 @@ def OpenPortraitWindow (needcontrols):
 		# AI
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
-		Button.SetSprites ("GUIBTACT", 0, 48, 47, 46, 49)
+		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
 		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
 
 		GemRB.SetVar ("AI", GSFlags)
@@ -720,6 +754,12 @@ def OpenPortraitWindow (needcontrols):
 		Button = Window.GetControl (7)
 		Button.SetTooltip (10485)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+	else:
+		# Rest
+		if Window.HasControl(6):
+			Button = Window.GetControl (6)
+			Button.SetTooltip (11942)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
@@ -791,16 +831,23 @@ def UpdatePortraitWindow ():
 			states = "\n" + states
 		states = "\n" + states
 
+		# character - 1 == bam cycle
 		# blank space
-		flag = blank = chr(238)
+		if GUICommon.GameIsBG2():
+			flag = blank = chr(238)
+			talk = 154
+			store = 155
+		else:
+			flag = blank = chr(33)
+			talk = store = 37
 
 		# shopping icon
 		if pc==portid+1:
 			if GemRB.GetStore()!=None:
-				flag = chr(155)
+				flag = chr(store)
 		# talk icon
 		if GemRB.GameGetSelectedPCSingle(1)==portid+1:
-			flag = chr(154)
+			flag = chr(talk)
 
 		if LUCommon.CanLevelUp (portid+1):
 			states = flag+blank+chr(255) + states
