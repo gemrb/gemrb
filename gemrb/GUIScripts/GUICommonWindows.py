@@ -133,6 +133,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	if Gears:
 		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
+		if GUICommon.HasHOW(): # how doesn't have this in the right place
+			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
+			Window.CreateButton (9, 6, pos, 64, 71)
 		Button = Window.GetControl (9)
 		if GUICommon.GameIsBG2():
 			Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
@@ -283,7 +286,11 @@ def GroupControls ():
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		idx = GemRB.GameGetFormation (i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
-		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+		# kill the previous sprites or they show through
+		if GUICommon.GameIsIWD1():
+			Button.SetSprites ("GUIBTBUT",0,i*2,i*2+1,i*2+24,i*2+25)
+		else:
+			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
@@ -373,7 +380,7 @@ def UpdateActionsWindow ():
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = ActionsWindow.GetControl (i)
-		if not GUICommon.GameIsBG2():
+		if GUICommon.GameIsBG1():
 			Button.SetBorder (0,6,6,4,4,0,254,0,255)
 		Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
 		Button.SetFont ("NUMBER")
@@ -727,13 +734,34 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindow (1)
+	#take care, this window is different in how/iwd
+	if GUICommon.HasHOW() and needcontrols:
+		PortraitWindow = Window = GemRB.LoadWindow (26)
+	else:
+		PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	if needcontrols:
 		# 1280 and higher don't have this control
 		if Window.HasControl (8):
 			Button=Window.GetControl (8)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
+			if GUICommon.GameIsIWD():
+				# Rest (iwd)
+				Button.SetTooltip (11942)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+			else:
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
+		else:
+			if GUICommon.HasHOW():
+				# Rest (how)
+				pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
+				Window.CreateButton (8, 6, pos, 55, 37)
+				Button = Window.GetControl (8)
+				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
+				Button.SetTooltip (11942)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+
+				pos = pos - 37
+				Window.CreateButton (6, 6, pos, 27, 36)
 
 		# AI
 		Button = Window.GetControl (6)
@@ -751,7 +779,12 @@ def OpenPortraitWindow (needcontrols):
 			Button.SetTooltip (15918)
 
 		#Select All
-		Button = Window.GetControl (7)
+		if GUICommon.HasHOW():
+			Window.CreateButton (7, 33, pos, 27, 36)
+			Button = Window.GetControl (7)
+			Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
+		else:
+			Button = Window.GetControl (7)
 		Button.SetTooltip (10485)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 	else:
@@ -778,6 +811,10 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
+
+		if GUICommon.GameIsIWD1():
+			# overlay a label, so we can display the hp with the correct font
+			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT)
 
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -819,7 +856,7 @@ def UpdatePortraitWindow ():
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		GUICommon.SetupDamageInfo (portid+1, Button)
+		ratio_str = GUICommon.SetupDamageInfo (portid+1, Button)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (portid+1)
@@ -838,21 +875,28 @@ def UpdatePortraitWindow ():
 			talk = 154
 			store = 155
 		else:
+			# iwd is missing all of these, including the blank (didn't display a talking icon though)
+			# TODO: add another string tag to make glyphs 100% transparent?
 			flag = blank = chr(33)
 			talk = store = 37
 
-		# shopping icon
-		if pc==portid+1:
-			if GemRB.GetStore()!=None:
-				flag = chr(store)
-		# talk icon
-		if GemRB.GameGetSelectedPCSingle(1)==portid+1:
-			flag = chr(talk)
+		if not GUICommon.GameIsIWD1():
+			# shopping icon
+			if pc==portid+1:
+				if GemRB.GetStore()!=None:
+					flag = chr(store)
+			# talk icon
+			if GemRB.GameGetSelectedPCSingle(1)==portid+1:
+				flag = chr(talk)
 
 		if LUCommon.CanLevelUp (portid+1):
 			states = flag+blank+chr(255) + states
 		else:
-			states = flag+blank+blank + states
+			if GUICommon.GameIsIWD1():
+				HPLabel = Window.GetControl (100+portid)
+				HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
+			else:
+				states = flag+blank+blank + states
 		Button.SetText(states)
 	return
 
