@@ -33,6 +33,7 @@ TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short p
 	max = maxLength;
 	FontPosX = px;
 	FontPosY = py;
+	Alignment = IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT;
 	Buffer = ( unsigned char * ) malloc( max + 1 );
 	font = NULL;
 	Cursor = NULL;
@@ -57,6 +58,12 @@ TextEdit::~TextEdit(void)
 	video->FreeSprite( Cursor );
 }
 
+void TextEdit::SetAlignment(unsigned char Alignment)
+{
+    this->Alignment = Alignment;
+    Changed = true;
+}
+
 /** Draws the Control on the Output Display */
 void TextEdit::Draw(unsigned short x, unsigned short y)
 {
@@ -74,11 +81,11 @@ void TextEdit::Draw(unsigned short x, unsigned short y)
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
 		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
-				palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP,
+				palette, Alignment,
 				true, NULL, Cursor, CurPos );
 	} else {
 		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
-				palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, true );
+				palette, Alignment, true );
 	}
 }
 
