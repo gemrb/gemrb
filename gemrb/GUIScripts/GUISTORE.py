@@ -1252,7 +1252,12 @@ def UpdateStoreDonateWindow ():
 
 	UpdateStoreCommon (Window, 0x10000007, 0, 0x10000008)
 	Field = Window.GetControl (5)
-	donation = int("0"+Field.QueryText ())
+	donation = "0"+Field.QueryText ()
+	if donation.isdigit():
+		donation = int(donation)
+	else:
+		Field.SetText (str(0) )
+		donation = 0
 	gold = GemRB.GameGetPartyGold ()
 	if donation>gold:
 		donation = gold
