@@ -1831,8 +1831,11 @@ static PyObject* GemRB_Control_SetStatus(PyObject * /*self*/, PyObject* args)
 	}
 
 	int ret = core->SetControlStatus( WindowIndex, ControlIndex, status );
-	if (ret == -1) {
-		return NULL;
+	switch (ret) {
+	case -1:
+		return RuntimeError( "Control is not found." );
+	case -2:
+		return RuntimeError( "Control type is not matching." );
 	}
 
 	Py_INCREF( Py_None );
