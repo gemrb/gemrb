@@ -134,7 +134,8 @@ int BIFImporter::OpenArchive(const char* path)
 			stream = DecompressBIFC(file, cachePath);
 			delete file;
 		} else if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-			stream = CacheStream(file);
+			file->Seek(0, GEM_STREAM_START);
+			stream = file;
 		} else {
 			delete file;
 			return GEM_ERROR;

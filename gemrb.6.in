@@ -220,11 +220,6 @@ program found at
 Path to the data files for the game's particular CDs or any other data sources.
 
 .TP
-.BR SlowBIFs =(0|1)
-defaults to
-.IR 0 .
-
-.TP
 .BR CachePath =PATH
 User-writable directory where the engine caches uncompressed and temporary
 files. Defaults to a subdirectory of the current directory.

@@ -22,6 +22,5 @@
 #include "System/DataStream.h"
 
 GEM_EXPORT DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length = 0, bool overwrite = false);
-GEM_EXPORT DataStream* CacheStream(DataStream* src);
 
 #endif

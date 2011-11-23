@@ -51,36 +51,3 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	}
 	return FileStream::OpenFile(path);
 }
-
-DataStream* CacheStream(DataStream* src)
-{
-	src->Seek(0, GEM_STREAM_START);
-	if (!core->SlowBIFs)
-		return src;
-
-	char cachedfile[_MAX_PATH];
-	PathJoin(cachedfile, core->CachePath, src->filename, NULL);
-
-	if (!file_exists(cachedfile)) {    // File was not found in cache
-		FileStream dest;
-		if (!dest.Create(cachedfile)) {
-			error("Cache", "CachedFile failed to write to cached file '%s' (from '%s')\n", cachedfile, src->originalfile);
-		}
-
-		size_t blockSize = 1024 * 1000;
-		char buff[1024 * 1000];
-		do {
-			if (blockSize > src->Remains())
-				blockSize = src->Remains();
-			size_t len = src->Read(buff, blockSize);
-			size_t c = dest.Write(buff, len);
-			if (c != len) {
-				error("Cache", "CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, src->originalfile);
-			}
-		} while (src->Remains());
-	}
-
-	delete src;
-
-	return FileStream::OpenFile(cachedfile);
-}
