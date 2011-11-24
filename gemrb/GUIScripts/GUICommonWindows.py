@@ -512,6 +512,9 @@ def UpdateActionsWindow ():
 		Spellbook.SetupSpellIcons(Window, -1, TopIndex, ActionBarControlOffset)
 	elif level == 6: # iwd2 skills
 		print "IWD2 skill selection is not implemented yet, ignoring!\n\n"
+	elif level == 7: # quickspells, but with innates too
+		GemRB.SetVar ("Type", 7)
+		Spellbook.SetupSpellIcons(Window, 7, TopIndex, ActionBarControlOffset)
 	return
 
 def ActionQWeaponPressed (which):
@@ -565,7 +568,7 @@ def ActionQSpell3Pressed ():
 def ActionQSpellRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 2)
+	GemRB.SetVar ("ActionLevel", 7)
 	UpdateActionsWindow ()
 	return
 

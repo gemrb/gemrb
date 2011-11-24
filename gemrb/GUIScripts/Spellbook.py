@@ -124,11 +124,15 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# Nahal's reckless dweomer can use any known spell
 		allSpells = GetKnownSpells (actor, IE_SPELL_TYPE_WIZARD)
 	else:
-		if BookType == 3:
-			allSpells = GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_PRIEST) + GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_WIZARD)
-		elif BookType == 4:
-			allSpells = GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_INNATE)
-		else:
+		allSpells = []
+		if BookType & (1<<IE_SPELL_TYPE_PRIEST): #1
+			allSpells = GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_PRIEST)
+		if BookType & (1<<IE_SPELL_TYPE_WIZARD): #2
+			allSpells += GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_WIZARD)
+		if BookType & (1<<IE_SPELL_TYPE_INNATE): #4
+			allSpells += GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_INNATE)
+
+		if not len(allSpells):
 			raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
 			return
 
