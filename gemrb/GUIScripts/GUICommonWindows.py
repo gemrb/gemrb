@@ -612,7 +612,7 @@ def ActionRightPressed ():
 		#Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1)
 		tmpType = Type&127
 		if tmpType == 3:
-			Max = len(Spellbook.GetKnownSpells (pc, 0) + Spellbook.GetKnownSpells (pc, 1))
+			Max = len(Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_PRIEST) + Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_WIZARD))
 		else:
 			Max = len(Spellbook.GetKnownSpells (pc, tmpType))
 	else:
