@@ -149,9 +149,9 @@ static const TriggerLink triggernames[] = {
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
-	{"harmlessclosed", GameScript::Closed, 0}, //pst, not sure
-	{"harmlessentered", GameScript::HarmlessEntered, 0}, //???
-	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
+	{"harmlessclosed", GameScript::HarmlessClosed, 0}, //pst
+	{"harmlessentered", GameScript::HarmlessEntered, 0}, //pst
+	{"harmlessopened", GameScript::HarmlessOpened, 0}, //pst
 	{"hasbounceeffects", GameScript::HasBounceEffects, 0},
 	{"hasimmunityeffects", GameScript::HasImmunityEffects, 0},
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same

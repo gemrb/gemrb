@@ -23,6 +23,7 @@ import CommonTables
 from GUIDefines import *
 from ie_stats import IE_CASTING
 from ie_action import ACT_LEFT, ACT_RIGHT
+from ie_spells import SP_IDENTIFY, SP_SURGE
 
 #################################################################
 # this is in the operator module of the standard python lib
@@ -41,9 +42,9 @@ def GetUsableMemorizedSpells(actor, BookType):
 	memorizedSpells = []
 	spellResRefs = []
 	for level in range (9):
-		spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False, 1)
+		spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False)
 		for i in range (spellCount):
-			Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i, 1)
+			Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i)
 			if not Spell0["Flags"]:
 				# depleted, so skip
 				continue
@@ -54,7 +55,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			spellResRefs.append (Spell0["SpellResRef"])
 			Spell = GemRB.GetSpell(Spell0["SpellResRef"])
 			Spell['BookType'] = BookType # just another sorting key
-			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"]) # crucial!
+			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
 				print "Error, memorized spell not found!", Spell["SpellResRef"]
 			memorizedSpells.append (Spell)
@@ -73,17 +74,14 @@ def GetUsableMemorizedSpells(actor, BookType):
 
 	return memorizedSpells2
 
-def GetKnownSpells(actor, BookType, noDweomer=1):
+def GetKnownSpells(actor, BookType):
 	knownSpells = []
 	spellResRefs = []
 	for level in range (9):
-		spellCount = GemRB.GetKnownSpellsCount (actor, BookType, level, 1)
+		spellCount = GemRB.GetKnownSpellsCount (actor, BookType, level)
 		for i in range (spellCount):
-			Spell0 = GemRB.GetKnownSpell (actor, BookType, level, i, 1)
+			Spell0 = GemRB.GetKnownSpell (actor, BookType, level, i)
 			if Spell0["SpellResRef"] in spellResRefs:
-				continue
-			if noDweomer and Spell0["SpellResRef"].upper() == "SPWI124":
-				# skip Nahal's reckless dweomer, so it can't be nested
 				continue
 			spellResRefs.append (Spell0["SpellResRef"])
 			Spell = GemRB.GetSpell(Spell0["SpellResRef"])
@@ -111,7 +109,6 @@ def SortUsableSpells(memorizedSpells):
 
 	return memorizedSpells
 
-# FIXME: some innates are broken (all values 0 when cast): happened in dweomer when used index was out of range - same here?
 # Start is used as an offset in the spell list to show "pages" > 1
 # Offset is a control ID offset here for iwd2 purposes
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
@@ -163,7 +160,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 
 	# disable all spells if fx_disable_spellcasting was run with the same type
 	# but only if there are any spells of that type to disable
-	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0, 1)
+	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
+	actionLevel = GemRB.GetVar ("ActionLevel")
 
 	#order is: mage, cleric, innate, class, song, (defaults to 1, item)
 	spellSections = [2, 4, 8, 16, 16]
@@ -191,8 +189,10 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetVarAssoc ("Spell", Spell['SpellIndex'])
 
 		# disable spells that should be cast from the inventory or can't be cast while silenced or ...
-		# see splspec.2da for all the reasons
-		if GemRB.CheckSpecialSpell(actor, Spell['SpellResRef']) or (disabled_spellcasting&spellType):
+		# see splspec.2da for all the reasons; silence is handled elsewhere
+		specialSpell = GemRB.CheckSpecialSpell(actor, Spell['SpellResRef'])
+		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == 5)
+		if specialSpell or (disabled_spellcasting&spellType):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.EnableBorder(1, 0)
 			#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.UpdateActionsWindow) # noop if it worked or not :)

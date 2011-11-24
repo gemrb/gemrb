@@ -18,17 +18,16 @@
 #
 
 
-# GUIW.py - scripts to control some windows from GUIWORLD winpack
+# GUIW.py - scripts to control some windows from the GUIWORLD winpack
 # except of Actions, Portrait, Options and Dialog windows
 #################################################################
 
 import GemRB
-from GUIDefines import *
-#from ie_restype import *
-from ie_stats import *
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+from GUIDefines import *
+from ie_stats import *
 import MessageWindow
 import CommonWindow
 
@@ -39,6 +38,8 @@ ContinueWindow = None
 ReformPartyWindow = None
 OldActionsWindow = None
 OldMessageWindow = None
+
+removable_pcs = []
 
 def DialogStarted ():
 	global ContinueWindow, OldActionsWindow
@@ -176,7 +177,7 @@ def RemovePlayer ():
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
-	ReformPartyWindow = Window = GemRB.LoadWindow (0)
+	ReformPartyWindow = Window = GemRB.LoadWindow (25)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#are you sure
@@ -194,38 +195,29 @@ def RemovePlayer ():
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerCancel)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GemRB.SetVar ("ActionsWindow", -1)
 	if hideflag:
 		GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
+	return
 
 def RemovePlayerConfirm ():
-	global ReformPartyWindow
-
-	hideflag = GemRB.HideGUI ()
-	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
-	GemRB.SetVar ("OtherWindow", -1)
-	#removing selected player
-	ReformPartyWindow = None
-	if hideflag:
-		GemRB.UnhideGUI ()
-	GemRB.LeaveParty (GemRB.GetVar("Selected") )
+	slot = GemRB.GetVar ("Selected")
+	if GUICommon.GameIsBG2():
+		GemRB.LeaveParty (slot, 2)
+	elif GUICommon.GameIsBG1():
+		GemRB.LeaveParty (slot, 1)
+	else:
+		GemRB.LeaveParty (slot)
 	OpenReformPartyWindow ()
 	return
 
 def RemovePlayerCancel ():
-	global ReformPartyWindow
-
-	hideflag = GemRB.HideGUI ()
-	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
-	GemRB.SetVar ("OtherWindow", -1)
-	ReformPartyWindow = None
-	if hideflag:
-		GemRB.UnhideGUI ()
+	#Once for getting rid of the confirmation window
+	OpenReformPartyWindow ()
+	#and once for reopening the reform party window
 	OpenReformPartyWindow ()
 	return
 
@@ -237,9 +229,7 @@ def OpenReformPartyWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
-		if ReformPartyWindow:
-			ReformPartyWindow.Unload ()
-
+		ReformPartyWindow.Unload ()
 		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 		GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
 		GemRB.SetVar ("OtherWindow", -1)
@@ -303,13 +293,17 @@ def OpenReformPartyWindow ():
 	return
 
 def DeathWindow ():
-	#no death movie, but music is changed
-	GemRB.LoadMusicPL ("Theme.mus",1)
+	if GUICommon.GameIsIWD1():
+		#no death movie, but music is changed
+		GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return
 
 def DeathWindowEnd ():
+	#playing death movie before continuing
+	if not GUICommon.GameIsIWD1():
+		GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,1)
 
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())

@@ -470,23 +470,12 @@ public:
 		return step;
 	}
 
+	unsigned char GetNextFace();
+
 	inline unsigned char GetOrientation() const {
 		return Orientation;
 	}
 
-	inline unsigned char GetNextFace() {
-		//slow turning
-		if (Orientation != NewOrientation) {
-			if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
-				Orientation++;
-			} else {
-				Orientation--;
-			}
-			Orientation = Orientation&(MAX_ORIENT-1);
-		}
-
-		return Orientation;
-	}
 	inline unsigned char GetStance() const {
 		return StanceID;
 	}

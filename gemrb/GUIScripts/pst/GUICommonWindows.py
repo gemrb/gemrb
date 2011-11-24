@@ -427,7 +427,7 @@ def PortraitButtonHPOnPress ():
 
 def StopAllOnPress ():
 	for i in GemRB.GetSelectedActors():
-		GemRB.ClearActions (i, 1)
+		GemRB.ClearActions (i)
 	return
 
 # Run by Game class when selection was changed

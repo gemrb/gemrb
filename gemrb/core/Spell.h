@@ -169,6 +169,7 @@ public:
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(Scriptable *self, int headerindex, int level, const Point &pos) const;
 	unsigned int GetCastingDistance(Scriptable *Sender) const;
+	bool ContainsDamageOpcode() const;
 };
 
 #endif  // ! SPELL_H

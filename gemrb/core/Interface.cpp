@@ -852,6 +852,11 @@ int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
 		}
 	}
 
+	// disable spells causing surges to be cast while in a surge (prevents nesting)
+	if (sp&SP_SURGE) {
+		return SP_SURGE;
+	}
+
 	return 0;
 }
 
@@ -3182,9 +3187,14 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 	if (Status&IE_GUI_CONTROL_FOCUSED) {
 		evntmgr->SetFocused( win, ctrl);
 	}
-	if (ctrl->ControlType != ((Status >> 24) & 0xff) ) {
+
+	//check if the status parameter was intended to use with this control
+	//Focus will sadly break this at the moment, because it is common for all control types
+	int check = (Status >> 24) & 0xff;
+	if ( (check!=0x7f) && (ctrl->ControlType != check) ) {
 		return -2;
 	}
+
 	switch (ctrl->ControlType) {
 		case IE_GUI_BUTTON:
 			//Button

@@ -89,8 +89,10 @@ for various tweaks hardcoded in the GemRB engine.
 Arbitrary name of the game. It will be displayed in the window's title bar.
 
 .TP
-.BR GUIEnhancements =(0|1)
-Set this to 1 to enable a few GUI enhancements, mostly in BG2. Disabled by default.
+.BR GUIEnhancements =INT
+The value is a bitfield. Setit to 1 to enable a few GUI enhancements, mostly in BG2. 
+Set to 2 or 3 to try to autoidentify items on transfer (if the character has enough lore). 
+Disabled by default.
 
 .TP
 .BR EndianSwitch =(0|1)

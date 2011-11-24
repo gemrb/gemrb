@@ -15,3 +15,8 @@ LSR_FAILED  = 3  #failed stat roll
 LSR_STAT    = 4  #insufficient stat (can't learn the spell due to low stat)
 LSR_LEVEL   = 5  #insufficient level (low mage, etc level)
 LSR_FULL    = 6  #can't learn more spells of this level (due to level)
+
+# CheckSpecialSpell return values (see Interface.h)
+SP_IDENTIFY = 1  # any spell that cannot be cast from the menu
+SP_SILENCE  = 2  # any spell that can be cast in silence
+SP_SURGE    = 4  # any spell that cannot be cast during a wild surge

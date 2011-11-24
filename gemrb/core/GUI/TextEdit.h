@@ -68,11 +68,14 @@ public:
 	const char* QueryText();
 	/** Sets the buffer length */
 	void SetBufferLength(ieWord buflen);
+	/** Sets the alignment */
+	void SetAlignment(unsigned char Alignment);
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
 	/** Text Font */
 	Font* font;
+	unsigned char Alignment;
 	/** Background */
 	Sprite2D* Back;
 	/** Max Edit Text Length */

@@ -254,6 +254,8 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 	if (Open) {
 		if (Trapped) {
 			AddTrigger(TriggerEntry(trigger_opened, ID));
+		} else {
+			AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
 		}
 
 		// in PS:T, opening a door does not unlock it
@@ -261,7 +263,11 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 			SetDoorLocked(false,playsound);
 		}
 	} else {
-		AddTrigger(TriggerEntry(trigger_closed, ID));
+		if (Trapped) {
+			AddTrigger(TriggerEntry(trigger_closed, ID));
+		} else {
+			AddTrigger(TriggerEntry(trigger_harmlessclosed, ID));
+		}
 	}
 	ToggleTiles(Open, playsound);
 	//synchronising other data with the door state

@@ -64,7 +64,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	global KitMask, EnhanceGUI, Memorization
 
 	#enhance GUI?
-	if (GemRB.GetVar("GUIEnhancements")):
+	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS):
 		EnhanceGUI = 1
 
 	# save our pc
