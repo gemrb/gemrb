@@ -8903,7 +8903,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 
 	actor->spellbook.GetSpellInfo(&spelldata, type, which, 1);
 	if (!spelldata.spellname[0]) {
-		return RuntimeError( "Invalid parameter!\n" );
+		return RuntimeError( "Invalid parameter! Spell not found!\n" );
 	}
 
 	memcpy(actor->PCStats->QuickSpells[slot], spelldata.spellname, sizeof(ieResRef) );
