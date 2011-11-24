@@ -776,6 +776,9 @@ def SpellPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
+	if Type != -1:
+		Type = Spell // 1000
+	Spell = Spell % 1000
 	slot = GemRB.GetVar ("QSpell")
 	if slot>=0:
 		#setup quickspell slot

@@ -38,6 +38,7 @@ def itemgetter(*items):
             return tuple(obj[item] for item in items)
     return g
 #################################################################
+# routines for the actionbar spell access code
 
 def GetUsableMemorizedSpells(actor, BookType):
 	memorizedSpells = []
@@ -59,6 +60,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
 				print "Error, memorized spell not found!", Spell["SpellResRef"]
+			Spell['SpellIndex'] += 1000 * 1<<BookType
 			memorizedSpells.append (Spell)
 
 	if not len(memorizedSpells):
@@ -88,7 +90,7 @@ def GetKnownSpells(actor, BookType):
 			Spell = GemRB.GetSpell(Spell0["SpellResRef"])
 			Spell['BookType'] = BookType # just another sorting key
 			Spell['MemoCount'] = 0
-			Spell['SpellIndex'] = -1 # this gets assigned properly later
+			Spell['SpellIndex'] = 1000 * 1<<BookType # this gets assigned properly later
 			knownSpells.append (Spell)
 
 	return knownSpells
@@ -185,7 +187,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		else:
 			spellType = spellSections[spellType]
 		if BookType == -1:
-			Button.SetVarAssoc ("Spell", i+Start)
+			Button.SetVarAssoc ("Spell", Spell['SpellIndex']+i+Start)
 		else:
 			Button.SetVarAssoc ("Spell", Spell['SpellIndex'])
 
@@ -224,7 +226,9 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetTooltip ("")
 
+#################################################################
 # routines used during character generation and levelup
+#################################################################
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99
