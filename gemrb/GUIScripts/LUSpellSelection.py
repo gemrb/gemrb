@@ -18,10 +18,11 @@
 #
 
 import GemRB
+import GUICommon
+import Spellbook
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_BAM
-import GUICommon
 
 # storage variables
 pc = 0
@@ -160,13 +161,13 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 			SpellsSelectPointsLeft[i] += 1
 
 		# get all the spells of the given level
-		Spells[i] = GUICommon.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+		Spells[i] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
 
 		# dump all the spells we already know
 		NumDeleted = 0
 		for j in range (len (Spells[i])):
 			CurrentIndex = j - NumDeleted # this ensure we don't go out of range
-			if GUICommon.HasSpell (pc, IE_SPELL_TYPE_WIZARD, i, Spells[i][CurrentIndex][0]) >= 0:
+			if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, i, Spells[i][CurrentIndex][0]) >= 0:
 				del Spells[i][CurrentIndex]
 				NumDeleted += 1
 
@@ -294,7 +295,7 @@ def ShowKnownSpells ():
 	"""Shows the viewable 24 spells."""
 
 	j = RowIndex()
-	Spells[SpellLevel] = GUICommon.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), SpellLevel+1)
+	Spells[SpellLevel] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), SpellLevel+1)
 
 	# reset the title
 	#17224 for priest spells
@@ -361,7 +362,7 @@ def MemorizePress ():
 
 		# select the spell and change the done state if need be
 		SpellsSelectPointsLeft[SpellLevel] = SpellsSelectPointsLeft[SpellLevel] - 1
-		MemoBook[i] = GUICommon.HasSpell(pc, IE_SPELL_TYPE_WIZARD, SpellLevel, Spells[SpellLevel][i][0]) + 1 # so all values are above 0 
+		MemoBook[i] = Spellbook.HasSpell(pc, IE_SPELL_TYPE_WIZARD, SpellLevel, Spells[SpellLevel][i][0]) + 1 # so all values are above 0 
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
 			DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 
@@ -515,7 +516,7 @@ def SpellsCancelPress ():
 	This is only callable within character generation."""
 
 	# remove all learned spells
-	GUICommon.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1, 9, 1)
+	Spellbook.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1, 9, 1)
 
 	if GUICommon.GameIsBG2():
 		# unload teh window and go back

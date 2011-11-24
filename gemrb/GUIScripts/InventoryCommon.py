@@ -19,6 +19,7 @@
 
 import GemRB
 import GUICommon
+import Spellbook
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -697,7 +698,7 @@ def ReadItemWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	ret = GUICommon.CannotLearnSlotSpell()
+	ret = Spellbook.CannotLearnSlotSpell()
 
 	if ret:
 		# couldn't find any strrefs for the other undhandled values (stat, level)
@@ -741,7 +742,7 @@ def DelayedReadItemWindow ():
 	global level, spell_ref
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GUICommon.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref):
+	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref):
 		strref = 10830
 	else:
 		ret = LSR_FAILED

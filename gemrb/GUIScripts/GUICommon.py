@@ -22,8 +22,8 @@
 import GemRB
 import GUIClasses
 import CommonTables
-from ie_restype import RES_CHU, RES_2DA, RES_WMP, RES_ARE
-from ie_spells import LS_MEMO, LSR_KNOWN, LSR_LEVEL, LSR_STAT
+from ie_restype import RES_CHU, RES_WMP, RES_ARE
+from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import SLOT_ALL
@@ -123,105 +123,6 @@ def GearsClicked ():
 	#GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC (),44,249990)
 	GemRB.GamePause (2, 0)
 
-def GetMageSpells (Kit, Alignment, Level):
-	MageSpells = []
-	SpellType = 99
-	Table = GemRB.LoadTable ("aligns")
-	v = Table.FindValue (3, Alignment)
-	Usability = Kit | Table.GetValue(v, 5)
-
-	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("MAGE", str(Level), 1) ):
-		SpellName = "SPWI%d%02d"%(Level,i+1)
-		ms = GemRB.GetSpell (SpellName, 1)
-		if ms == None:
-			continue
-
-		if Usability & ms['SpellExclusion']:
-			SpellType = 0
-		else:
-			SpellType = 1
-			if Kit & (1 << ms['SpellSchool']+5): # of matching specialist school
-				SpellType = 2
-			# Wild mage spells are of normal schools, so we have to find them
-			# separately. Generalists can learn any spell but the wild ones, so
-			# we check if the mage is wild and if a generalist wouldn't be able
-			# to learn the spell.
-			if Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
-				SpellType = 2
-		MageSpells.append ([SpellName, SpellType])
-
-	return MageSpells
-
-def GetLearnableMageSpells (Kit, Alignment, Level):
-	Learnable = []
-
-	for Spell in GetMageSpells (Kit, Alignment, Level):
-		if Spell[1]: 
-			Learnable.append (Spell[0])
-	return Learnable
-
-def GetLearnablePriestSpells (Class, Alignment, Level):
-	Learnable =[]
-
-	Table=GemRB.LoadTable("aligns")
-	v = Table.FindValue(3, Alignment)
-	#usability is the bitset we look for
-	Usability=Table.GetValue(v, 5)
-
-	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), 1) ):
-		SpellName = "SPPR%d%02d"%(Level,i+1)
-		ms = GemRB.GetSpell(SpellName, 1)
-		if ms == None:
-			continue
-		if Class & ms['SpellDivine']:
-			continue
-		if Usability & ms['SpellExclusion']:
-			continue
-		Learnable.append (SpellName)
-	return Learnable
-
-# there is no separate druid spell table in the originals
-#FIXME: try to do this in a non-hard way?
-def GetPriestSpellTable(tablename):
-	if not GemRB.HasResource (tablename, RES_2DA):
-		if tablename == "MXSPLDRU":
-			return "MXSPLPRS"
-	return tablename
-
-def SetupSpellLevels (pc, TableName, Type, Level):
-	#don't die on a missing reference
-	tmp = GetPriestSpellTable(TableName)
-	if tmp != TableName:
-		SetupSpellLevels (pc, tmp, Type, Level)
-		return
-
-	Table = GemRB.LoadTable (TableName)
-	for i in range(Table.GetColumnCount ()):
-		# do a string lookup since some tables don't have entries for all levels
-		value = Table.GetValue (str(Level), str(i+1), 1)
-		# specialist mages get an extra spell if they already know that level
-		# FIXME: get a general routine to find specialists
-		school = GemRB.GetVar("MAGESCHOOL")
-		if Type == IE_SPELL_TYPE_WIZARD and school != 0:
-			if value > 0:
-				value += 1
-		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
-	return
-
-def UnsetupSpellLevels (pc, TableName, Type, Level):
-	#don't die on a missing reference
-	tmp = GetPriestSpellTable(TableName)
-	if tmp != TableName:
-		UnsetupSpellLevels (pc, tmp, Type, Level)
-		return
-
-	Table = GemRB.LoadTable (TableName)
-	for i in range(Table.GetColumnCount ()):
-		GemRB.SetMemorizableSpellsCount (pc, 0, Type, i)
-	return
-
 def SetColorStat (Actor, Stat, Value):
 	t = Value & 0xFF
 	t |= t << 8
@@ -292,20 +193,10 @@ def SetGamedaysAndHourToken ():
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 
-# Returns -1 if not found; otherwise, the index of the spell
-def HasSpell (Actor, SpellType, Level, Ref):
-	# loop through each spell in the spell level and check for a matching ref
-	for i in range (GemRB.GetKnownSpellsCount (Actor, SpellType, Level)):
-		Spell = GemRB.GetKnownSpell(Actor, SpellType, Level, i)
-		if Spell["SpellResRef"].upper() == Ref.upper(): # ensure case is the same
-			return i
-
-	# not found
-	return -1
-
 # Adds class/kit abilities
 def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 	TmpTable = GemRB.LoadTable (table)
+	import Spellbook
 
 	# gotta stay positive
 	if Level-LevelDiff < 0:
@@ -339,7 +230,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 				if ab[:2] == "AP":
 					GemRB.ApplySpell (pc, ab[3:])
 				elif ab[:2] == "GA":
-					SpellIndex = HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
+					SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
 					if SpellIndex == -1:
 						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
 					else:
@@ -355,6 +246,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
 	TmpTable = GemRB.LoadTable (table)
+	import Spellbook
 
 	# gotta stay positive
 	if Level < 0:
@@ -370,7 +262,7 @@ def RemoveClassAbilities (pc, table, Level):
 			ab = TmpTable.GetValue (i, j, 0)
 			if ab and ab != "****":
 				# get the index
-				SpellIndex = HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
+				SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
 
 				# seems all SPINs act like GA_*
 				if ab[:4] == "SPIN":
@@ -387,32 +279,6 @@ def RemoveClassAbilities (pc, table, Level):
 						GemRB.RemoveSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 				else:
 					print "ERROR, unknown class ability (type): ", ab
-
-def CannotLearnSlotSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# disqualify sorcerors immediately
-	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
-		return LSR_STAT
-
-	if GameIsPST():
-		import GUIINV
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-	else:
-		slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
-	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
-	spell = GemRB.GetSpell (spell_ref)
-
-	# maybe she already knows this spell
-	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1, spell_ref) != -1:
-		return LSR_KNOWN
-
-	# level check (needs enough intelligence for this level of spell)
-	dumbness = GemRB.GetPlayerStat (pc, IE_INT)
-	if spell['SpellLevel'] > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
-		return LSR_LEVEL
-
-	return 0
 
 def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	Button.SetFont ("NUMBER")
@@ -467,24 +333,6 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 
-	return
-
-def LearnPriestSpells (pc, level, mask):
-	"""Learns all the priest spells through the given spell level.
-
-	Mask distinguishes clerical and druidic spells."""
-	if level > 7: # make sure we don't have too high a level
-		level = 7
-
-	# go through each level
-	alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
-	for i in range (level):
-		learnable = GetLearnablePriestSpells (mask, alignment, i+1)
-
-		for spell in learnable:
-			# if the spell isn't learned, learn it
-			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
-				GemRB.LearnSpell (pc, spell)
 	return
 
 # PST uses a button, IWD2 two types, the rest are the same with two labels
@@ -743,78 +591,6 @@ def IsMultiClassed (actor, verbose):
 
 	# return the tuple
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
-
-def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
-	"""Removes all known spells of a given type between two spell levels.
-
-	If noslots is true, all memorization counts are set to 0.
-	Kit is used to identify the priest spell mask of the spells to be removed;
-	this is only used when removing spells in a dualclass."""
-
-	# choose the correct limit based upon class type
-	if type == IE_SPELL_TYPE_WIZARD:
-		limit = 9
-	elif type == IE_SPELL_TYPE_PRIEST:
-		limit = 7
-
-		# make sure that we get the original kit, if we have one
-		if kit:
-			originalkit = GetKitIndex (pc)
-
-			if originalkit: # kitted; find the class value
-				originalkit = CommonTables.KitList.GetValue (originalkit, 7)
-			else: # just get the class value
-				originalkit = GemRB.GetPlayerStat (pc, IE_CLASS)
-
-			# this is is specifically for dual-classes and will not work to remove only one
-			# spell type from a ranger/cleric multi-class
-			if CommonTables.ClassSkills.GetValue (originalkit, 0, 0) != "*": # knows druid spells
-				originalkit = 0x8000
-			elif CommonTables.ClassSkills.GetValue (originalkit, 1, 0) != "*": # knows cleric spells
-				originalkit = 0x4000
-			else: # don't know any other spells
-				originalkit = 0
-
-			# don't know how this would happen, but better to be safe
-			if originalkit == kit:
-				originalkit = 0
-	elif type == IE_SPELL_TYPE_INNATE:
-		limit = 1
-	else: # can't do anything if an improper spell type is sent
-		return 0
-
-	# make sure we're within parameters
-	if level1 < 1 or level2 > limit or level1 > level2:
-		return 0
-
-	# remove all spells for each level
-	for level in range (level1-1, level2):
-		# we need the count because we remove each spell in reverse order
-		count = GemRB.GetKnownSpellsCount (pc, type, level)
-		mod = count-1
-
-		for spell in range (count):
-			# see if we need to check for kit
-			if type == IE_SPELL_TYPE_PRIEST and kit:
-				# get the spell's ref data
-				ref = GemRB.GetKnownSpell (pc, type, level, mod-spell)
-				ref = GemRB.GetSpell (ref['SpellResRef'], 1)
-
-				# we have to look at the originalkit as well specifically for ranger/cleric dual-classes
-				# we wouldn't want to remove all cleric spells and druid spells if we lost our cleric class
-				# only the cleric ones
-				if kit&ref['SpellDivine'] or (originalkit and not originalkit&ref['SpellDivine']):
-					continue
-
-			# remove the spell
-			GemRB.RemoveSpell (pc, type, level, mod-spell)
-
-		# remove memorization counts if desired
-		if noslots:
-			GemRB.SetMemorizableSpellsCount (pc, 0, type, level)
-
-	# return success
-	return 1
 
 def CanDualClass(actor):
 	# human

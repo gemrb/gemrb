@@ -19,6 +19,7 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 import GUICommon
+import Spellbook
 import CommonTables
 import CharGenCommon
 import LUSkillsSelection
@@ -48,8 +49,8 @@ def OnLoad():
 	print "CharGen6 output:"
 
 	#remove all known spells and nullify the memorizable counts
-	GUICommon.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
-	GUICommon.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
 	# learn divine spells if appropriate
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
@@ -87,12 +88,12 @@ def OnLoad():
 					break
 
 		#set our memorizable counts
-		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, Levels[index])
+		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, Levels[index])
 
 		#learn all our priest spells up to the level we can learn
 		for level in range (8):
 			if GemRB.GetMemorizableSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level, 0) <= 0:
-				GUICommon.LearnPriestSpells (MyChar, level, ClassFlag)
+				Spellbook.LearnPriestSpells (MyChar, level, ClassFlag)
 				break
 	CharGenCommon.DisplayOverview (6)
 	return

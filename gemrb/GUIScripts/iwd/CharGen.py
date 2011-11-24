@@ -27,6 +27,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
 import GUICommon
+import Spellbook
 import CommonTables
 import LUSkillsSelection
 
@@ -320,8 +321,8 @@ def AcceptPress():
 	TableName = CommonTables.ClassSkills.GetValue (Class, 2, 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
-		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = GUICommon.GetLearnableMageSpells (KitIndex, t, 1)
+		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
+		Learnable = Spellbook.GetLearnableMageSpells (KitIndex, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1
@@ -351,8 +352,8 @@ def AcceptPress():
 		else:
 			ClassFlag = 0
 		#todo: set up ALL spell levels not just level 1
-		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		Learnable = GUICommon.GetLearnablePriestSpells (ClassFlag, t, 1)
+		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+		Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, t, 1)
 		PriestMemorized = GemRB.GetVar ("PriestMemorized")
 		j = 1
 		while (PriestMemorized and PriestMemorized != 1<<(j-1)):
@@ -551,7 +552,7 @@ def SetCharacterDescription():
 			TextArea.Append (11027, -1)
 			TextArea.Append (": " )
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			Learnable = GUICommon.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), t,1)
+			Learnable = Spellbook.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), t,1)
 			MageSpellBook = GemRB.GetVar ("MageSpellBook")
 			MageMemorized = GemRB.GetVar ("MageMemorized")
 			for i in range (len(Learnable)):
@@ -576,7 +577,7 @@ def SetCharacterDescription():
 			else:
 				ClassFlag = 0
 
-			Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, 1)
+			Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, 1)
 			PriestMemorized = GemRB.GetVar ("PriestMemorized")
 			for i in range (len(Learnable)):
 				if (1 << i) & PriestMemorized:
@@ -1963,7 +1964,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	#kit (school), alignment, level
 	k = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	Learnable = GUICommon.GetLearnableMageSpells(k, t, SpellLevel)
+	Learnable = Spellbook.GetLearnableMageSpells(k, t, SpellLevel)
 	GemRB.SetVar ("MageSpellBook", 0)
 	GemRB.SetVar ("SpellMask", 0)
 
@@ -2202,7 +2203,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	PriestMemorizeWindow = GemRB.LoadWindow (17)
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
-	Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
+	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
 	MaxSpellsPriestTable = GemRB.LoadTable (SpellTable)
 	GemRB.SetVar ("PriestMemorized", 0)

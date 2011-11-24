@@ -23,6 +23,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 import GUICommon
+import Spellbook
 import CommonTables
 import LUSpellSelection
 import LUCommon
@@ -463,7 +464,7 @@ def GetLevelUpNews():
 			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
 			# make a pally kit with LoH
-			if (GUICommon.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
+			if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 				LOHTable = GemRB.LoadTable ("layhands")
 				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
@@ -614,9 +615,9 @@ def LevelUpDonePress():
 					else: # cleric spells
 						ClassFlag = 0x4000
 
-					Learnable = GUICommon.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+					Learnable = Spellbook.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
 					for k in range(len(Learnable)): # loop through all the learnable spells
-						if GUICommon.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
+						if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
 							GemRB.LearnSpell(pc, Learnable[k])
 
 	# hlas
@@ -732,9 +733,9 @@ def ReactivateBaseClass ():
 			#	they will now only get druid spells up to the level they could cast
 			#	this should probably be noted somewhere (ranger/cleric multis still function the same,
 			#	but that could be remedied if desired)
-			Learnable = GUICommon.GetLearnablePriestSpells(ClassMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+			Learnable = Spellbook.GetLearnablePriestSpells(ClassMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
 			for k in range (len (Learnable)): # loop through all the learnable spells
-				if GUICommon.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
+				if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
 					GemRB.LearnSpell(pc, Learnable[k])
 
 	# setup class bonuses for this class

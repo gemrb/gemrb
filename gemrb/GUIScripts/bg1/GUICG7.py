@@ -22,6 +22,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import Spellbook
 import CommonTables
 import LUSpellSelection
 
@@ -47,7 +48,7 @@ def OnLoad():
 			if CommonTables.ClassSkills.GetValue (IsMulti[i], 2, 0) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
-	GUICommon.SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)
+	Spellbook.SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)
 	LUSpellSelection.OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1,False)
 
 	return
