@@ -55,7 +55,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			spellResRefs.append (Spell0["SpellResRef"])
 			Spell = GemRB.GetSpell(Spell0["SpellResRef"])
 			Spell['BookType'] = BookType # just another sorting key
-			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], BookType) # crucial!
+			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
 				print "Error, memorized spell not found!", Spell["SpellResRef"]
 			memorizedSpells.append (Spell)

@@ -935,7 +935,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, un
 	int offset = 0;
 	for (unsigned int i = 0; i<spellinfo.size(); i++) {
 		// take the offset into account, since we need per-type indices
-		if (!(spellinfo[i]->type & type)) {
+		if (!(1<<(spellinfo[i]->type) & type)) {
 			offset++;
 			continue;
 		}
