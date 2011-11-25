@@ -463,8 +463,10 @@ int SDLVideoDriver::PollEvents() {
 			MouseMovement(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			// ???: We may need a check to exclude mousewheel buttons on SDL 1.3+
-			// otherwise we may get a double scroll.
+			// exclude mousewheel buttons on SDL 1.3+ otherwise we get a double scroll due to SDL_MOUSEWHEEL.
+#if SDL_VERSION_ATLEAST(1,3,0)
+			if (event.button.button == SDL_BUTTON_WHEELDOWN || event.button.button == SDL_BUTTON_WHEELUP) break;
+#endif
 			if ((DisableMouse & MOUSE_DISABLED) || !Evnt)
 				break;
 			ignoreNextMouseUp = false;
