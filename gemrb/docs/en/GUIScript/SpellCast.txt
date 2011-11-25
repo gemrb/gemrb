@@ -10,4 +10,4 @@ Spell             - the spell's index in the list
 
 Return value: N/A
 
-See also: SetupSpellIcons
+See also: UseItem

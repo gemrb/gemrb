@@ -14,4 +14,4 @@ Start             - start the equipment list from this value
 
 Return value: N/A
 
-See also: SetupSpellIcons, SetupControls, UseItem
+See also: SetupControls, UseItem

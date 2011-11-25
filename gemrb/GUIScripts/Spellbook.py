@@ -112,7 +112,11 @@ def SortUsableSpells(memorizedSpells):
 
 	return memorizedSpells
 
-# Start is used as an offset in the spell list to show "pages" > 1
+# Sets up all the (12) action buttons for a player character with different spell or innate icons.
+# It also sets up the scroll buttons left and right if needed.
+# If Start is supplied, it will skip the first few items (used when scrolling through the list)
+# BookType is a spellbook type bitfield (1-mage, 2-priest, 4-innate)
+# FIXME: iwd2 has even more types
 # Offset is a control ID offset here for iwd2 purposes
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actor = GemRB.GameGetFirstSelectedActor ()

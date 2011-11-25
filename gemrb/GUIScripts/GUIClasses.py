@@ -58,7 +58,6 @@ class GWindow:
     'HasControl': _GemRB.Window_HasControl,
     'DeleteControl': _GemRB.Window_DeleteControl,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
-    'SetupSpellIcons': _GemRB.Window_SetupSpellIcons,
     'SetupControls': _GemRB.Window_SetupControls,
     'SetVisible': _GemRB.Window_SetVisible,
     'ShowModal': _GemRB.Window_ShowModal,

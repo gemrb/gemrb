@@ -11,4 +11,4 @@ Slot              - the player character's index in the party
 
 Return value: N/A
 
-See also: SetActionIcon, SetDefaultActions, SetupEquipmentIcons, SetupSpellIcons
+See also: SetActionIcon, SetDefaultActions, SetupEquipmentIcons
