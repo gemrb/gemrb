@@ -3422,7 +3422,11 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//definitely a bug
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
 
+	ieDword value = target->GetStat(IE_MOVEMENTRATE);
 	STAT_MOD(IE_MOVEMENTRATE);
+	if (value < target->GetStat(IE_MOVEMENTRATE)) {
+		target->AddPortraitIcon(PI_HASTED);
+	}
 	return FX_APPLIED;
 }
 

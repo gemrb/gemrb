@@ -24,6 +24,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
+from ie_sounds import DEF_IDENTIFY
 
 OverSlot = None
 UsedSlot = None
