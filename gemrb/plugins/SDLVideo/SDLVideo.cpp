@@ -508,9 +508,9 @@ int SDLVideoDriver::PollEvents() {
 #if SDL_VERSION_ATLEAST(1,3,0)
 		case SDL_MOUSEWHEEL://SDL 1.3+
 			short scrollX;
-			scrollX= event.wheel.x;
+			scrollX= event.wheel.x * -1;
 			short scrollY;
-			scrollY= event.wheel.y;
+			scrollY= event.wheel.y * -1;
 			Evnt->MouseWheelScroll( scrollX, scrollY );
 			break;
 		case SDL_FINGERMOTION://SDL 1.3+
