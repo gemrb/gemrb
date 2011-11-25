@@ -3,6 +3,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
+import Spellbook
 import CommonTables
 import LUCommon
 import LUProfsSelection
@@ -148,7 +149,7 @@ def unsetMageSpells():
 	print("unsetMageSpells")
 	MyChar = GemRB.GetVar ("Slot")
 
-	GUICommon.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1, 5, 1)
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1, 5, 1)
 
 def guardMageSpells():
 	MyChar = GemRB.GetVar ("Slot")
@@ -301,18 +302,18 @@ def setDivineSpells():
 
 def learnDivine(MyChar,ClassFlag,TableName,AllignID):
 	#print ("CGG setDivineSpells: CP2",MyChar,ClassFlag,TableName,AllignID )
-	GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-	Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, AllignID, 1)
+	Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, AllignID, 1)
 	for i in range(len(Learnable) ):
 		#print ("CGG setDivineSpells: CP3",Learnable[i])
-		if -1 == GUICommon.HasSpell(MyChar,IE_SPELL_TYPE_PRIEST,1,Learnable[i]):
+		if -1 == Spellbook.HasSpell(MyChar,IE_SPELL_TYPE_PRIEST,1,Learnable[i]):
 			#print ("CGG setDivineSpells: CP4",Learnable[i])
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 
 def unsetDivineSpells():
 	print("unsetDivineSpells")
 	MyChar = GemRB.GetVar ("Slot")
-	GUICommon.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1, 1, 1)
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1, 1, 1)
 
 def getDivineSpells(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")

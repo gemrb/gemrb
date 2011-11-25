@@ -37,6 +37,12 @@ OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 
+def OpenInventoryWindowClick ():
+	tmp = GemRB.GetVar ("PressedPortrait")
+	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
+	OpenInventoryWindow ()
+	return
+
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow

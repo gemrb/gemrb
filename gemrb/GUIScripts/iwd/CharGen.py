@@ -27,6 +27,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
 import GUICommon
+import Spellbook
 import CommonTables
 import LUSkillsSelection
 
@@ -149,6 +150,7 @@ SoundIndex = 0
 VerbalConstants = None
 HasStrExtra = 0
 MyChar = 0
+ImportedChar = 0
 
 def OnLoad():
 	global CharGenWindow, CharGenState, TextArea, PortraitButton, AcceptButton
@@ -156,7 +158,7 @@ def OnLoad():
 	global AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 	global KitTable, ProficienciesTable, AlignmentTable, RacialEnemyTable
 	global AbilitiesTable, SkillsTable, PortraitsTable
-	global MyChar
+	global MyChar, ImportedChar
 
 	KitTable = GemRB.LoadTable ("magesch")
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
@@ -170,6 +172,7 @@ def OnLoad():
 	CharGenWindow.SetFrame ()
 	CharGenState = 0
 	MyChar = GemRB.GetVar ("Slot")
+	ImportedChar = 0
 
 	GenderButton = CharGenWindow.GetControl (0)
 	GenderButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -318,15 +321,15 @@ def AcceptPress():
 	TableName = CommonTables.ClassSkills.GetValue (Class, 2, 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
-		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = GUICommon.GetLearnableMageSpells (KitIndex, t, 1)
+		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
+		Learnable = Spellbook.GetLearnableMageSpells (KitIndex, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1
 		for i in range (len(Learnable) ):
 			if SpellBook & j:
 				if MemoBook & j:
-					memorize = 8
+					memorize = LS_MEMO
 				else:
 					memorize = 0
 				GemRB.LearnSpell (MyChar, Learnable[i], memorize)
@@ -334,6 +337,9 @@ def AcceptPress():
 
 	#priest spells
 	TableName = CommonTables.ClassSkills.GetValue (Class, 1, 0)
+	# druids and rangers have a column of their own
+	if TableName == "*":
+		TableName = CommonTables.ClassSkills.GetValue (Class, 0, 0)
 	if TableName != "*":
 		if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
 			ClassFlag = 0x8000
@@ -346,10 +352,15 @@ def AcceptPress():
 		else:
 			ClassFlag = 0
 		#todo: set up ALL spell levels not just level 1
-		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		Learnable = GUICommon.GetLearnablePriestSpells (ClassFlag, t, 1)
+		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+		Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, t, 1)
+		PriestMemorized = GemRB.GetVar ("PriestMemorized")
+		j = 1
+		while (PriestMemorized and PriestMemorized != 1<<(j-1)):
+			j = j + 1
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
+		GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_PRIEST, 0, j, 1)
 
 	# ranger tracking is a hardcoded innate
 	if GUICommon.HasHOW():
@@ -398,7 +409,9 @@ def AcceptPress():
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetToken ("CHARNAME","")
-	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (Class, 3) )
+	# don't reset imported char's xp back to start
+	if not ImportedChar:
+		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (Class, 3) )
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
@@ -478,9 +491,9 @@ def SetCharacterDescription():
 	if CharGenState > 5:
 		ClassName = CommonTables.Classes.GetRowName (Class)
 		Row = CommonTables.Classes.GetValue (Class, 5)
-		IsRanger = CommonTables.ClassSkills.GetValue (Row, 0)
-		IsArcane = CommonTables.ClassSkills.GetValue (Row, 1)
-		IsMage = CommonTables.ClassSkills.GetValue (Row, 2)
+		DruidSpell = CommonTables.ClassSkills.GetValue (Row, 0)
+		PriestSpell = CommonTables.ClassSkills.GetValue (Row, 1)
+		MageSpell = CommonTables.ClassSkills.GetValue (Row, 2)
 		IsBard = CommonTables.ClassSkills.GetValue (Row, 4)
 		IsThief = CommonTables.ClassSkills.GetValue (Row, 5)
 
@@ -493,7 +506,7 @@ def SetCharacterDescription():
 				TextArea.Append (": " )
 				TextArea.Append (str(GemRB.GetPlayerStat (MyChar, StatID)) )
 				TextArea.Append ("%" )
-		elif IsRanger!="*":
+		elif DruidSpell!="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (8442, -1)
 			for i in range (4):
@@ -534,12 +547,12 @@ def SetCharacterDescription():
 					TextArea.Append ("+")
 					j = j + 1
 
-		if IsMage !="*":
+		if MageSpell !="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (11027, -1)
 			TextArea.Append (": " )
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			Learnable = GUICommon.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), t,1)
+			Learnable = Spellbook.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), t,1)
 			MageSpellBook = GemRB.GetVar ("MageSpellBook")
 			MageMemorized = GemRB.GetVar ("MageMemorized")
 			for i in range (len(Learnable)):
@@ -550,19 +563,21 @@ def SetCharacterDescription():
 						TextArea.Append (" +")
 					TextArea.Append (" ")
 
-		if IsArcane!="*":
+		if PriestSpell == "*":
+			PriestSpell = DruidSpell
+		if PriestSpell!="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (11028, -1)
 			TextArea.Append (": " )
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			if IsArcane == "MXSPLPRS" or IsArcane == "MXSPLPAL":
+			if PriestSpell == "MXSPLPRS" or PriestSpell == "MXSPLPAL":
 				ClassFlag = 0x4000
-			elif IsArcane == "MXSPLDRU" or IsArcane == "MXSPLRAN":
+			elif PriestSpell == "MXSPLDRU" or PriestSpell == "MXSPLRAN":
 				ClassFlag = 0x8000
 			else:
 				ClassFlag = 0
 
-			Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, 1)
+			Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, 1)
 			PriestMemorized = GemRB.GetVar ("PriestMemorized")
 			for i in range (len(Learnable)):
 				if (1 << i) & PriestMemorized:
@@ -1541,9 +1556,9 @@ def SkillsPress():
 	Level = 1
 	SpellLevel = 1
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	IsRanger = CommonTables.ClassSkills.GetValue (Class, 0)
-	IsArcane = CommonTables.ClassSkills.GetValue (Class, 1)
-	IsMage = CommonTables.ClassSkills.GetValue (Class, 2)
+	DruidSpell = CommonTables.ClassSkills.GetValue (Class, 0)
+	PriestSpell = CommonTables.ClassSkills.GetValue (Class, 1)
+	MageSpell = CommonTables.ClassSkills.GetValue (Class, 2)
 	IsBard = CommonTables.ClassSkills.GetValue (Class, 4)
 	IsThief = CommonTables.ClassSkills.GetValue (Class, 5)
 
@@ -1551,7 +1566,7 @@ def SkillsPress():
 		GemRB.SetVar ("HatedRace", 0)
 		if IsThief!="*":
 			SkillsSelect()
-		elif IsRanger!="*":
+		elif DruidSpell!="*":
 			Skill = GemRB.LoadTable("SKILLRNG").GetValue(str(Level), "STEALTH")
 			GemRB.SetPlayerStat (MyChar, IE_STEALTH, Skill)
 			RacialEnemySelect()
@@ -1566,27 +1581,27 @@ def SkillsPress():
 		ProficienciesSelect()
 
 	if SkillsState == 2:
-		if IsMage!="*":
-			MageSpellsSelect(IsMage, Level, SpellLevel)
+		if MageSpell!="*":
+			MageSpellsSelect(MageSpell, Level, SpellLevel)
 		else:
 			SkillsState = 3
 
 	if SkillsState == 3:
-		if IsMage!="*":
-			MageSpellsMemorize(IsMage, Level, SpellLevel)
+		if MageSpell!="*":
+			MageSpellsMemorize(MageSpell, Level, SpellLevel)
 		else:
 			SkillsState = 4
 
 	if SkillsState == 4:
-		if IsArcane=="MXSPLPRS" or IsArcane =="MXSPLPAL":
+		if PriestSpell=="MXSPLPRS" or PriestSpell =="MXSPLPAL":
 			ClassFlag = 0x4000
-			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
-		elif IsArcane=="MXSPLDRU" or IsArcane =="MXSPLRAN":
+			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
+		elif DruidSpell=="MXSPLDRU" or DruidSpell =="MXSPLRAN":
 			#no separate spell progression
-			if IsArcane == "MXSPLDRU":
-				IsArcane = "MXSPLPRS"
+			if DruidSpell == "MXSPLDRU":
+				DruidSpell = "MXSPLPRS"
 			ClassFlag = 0x8000
-			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
+			PriestSpellsMemorize(DruidSpell, Level, SpellLevel)
 		else:
 			SkillsState = 5
 
@@ -1949,7 +1964,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	#kit (school), alignment, level
 	k = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	Learnable = GUICommon.GetLearnableMageSpells(k, t, SpellLevel)
+	Learnable = Spellbook.GetLearnableMageSpells(k, t, SpellLevel)
 	GemRB.SetVar ("MageSpellBook", 0)
 	GemRB.SetVar ("SpellMask", 0)
 
@@ -2188,7 +2203,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	PriestMemorizeWindow = GemRB.LoadWindow (17)
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
-	Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
+	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
 	MaxSpellsPriestTable = GemRB.LoadTable (SpellTable)
 	GemRB.SetVar ("PriestMemorized", 0)
@@ -2699,7 +2714,7 @@ def ImportPress():
 
 def ImportDonePress():
 	global CharGenWindow, ImportWindow, CharImportList
-	global CharGenState, SkillsState, Portrait
+	global CharGenState, SkillsState, Portrait, ImportedChar
 
 	# Import the character from the chosen name
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
@@ -2711,6 +2726,7 @@ def ImportDonePress():
 	PortraitButton.SetPicture (PortraitName)
 	Portrait = -1
 
+	ImportedChar = 1
 	CharGenState = 7
 	SkillsState = 5
 	SetCharacterDescription ()

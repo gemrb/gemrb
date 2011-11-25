@@ -1,5 +1,5 @@
 
-Prototype: GemRB.GetPlayerStat(Slot, ID[, Base, global])
+Prototype: GemRB.GetPlayerStat(Slot, ID[, Base])
 
 Description: Queries a stat of the player character. The stats are listed in ie_stats.py.
 

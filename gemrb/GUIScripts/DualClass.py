@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 import GUICommon
+import Spellbook
 import CommonTables
 import LUSpellSelection
 import LUProfsSelection
@@ -165,7 +166,7 @@ def DCMainDonePress ():
 	if not NewMageSpells:
 		for i in range (9):
 			GemRB.SetMemorizableSpellsCount (pc, 0, IE_SPELL_TYPE_WIZARD, i)
-	GUICommon.RemoveKnownSpells (pc, IE_SPELL_TYPE_PRIEST, 1,7, 1)
+	Spellbook.RemoveKnownSpells (pc, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
 	# apply our class abilities
 	ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
@@ -174,7 +175,7 @@ def DCMainDonePress ():
 
 	# learn our new priest spells
 	if NewPriestMask:
-		GUICommon.LearnPriestSpells (pc, 1, NewPriestMask)
+		Spellbook.LearnPriestSpells (pc, 1, NewPriestMask)
 		GemRB.SetMemorizableSpellsCount (pc, 1, IE_SPELL_TYPE_PRIEST, 0)
 
 	# save our thief skills if we have them
@@ -245,7 +246,7 @@ def DCMainBackPress ():
 
 		# un-learn our spells and skills
 		if NewMageSpells:
-			GUICommon.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1,1, 1)
+			Spellbook.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1,1, 1)
 
 		LUSkillsSelection.SkillsNullify ()
 		NewPriestMask = 0

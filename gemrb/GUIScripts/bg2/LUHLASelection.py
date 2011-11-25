@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import Spellbook
 import CommonTables
 
 # HLA selection
@@ -124,7 +125,7 @@ def HLADonePress ():
 			GemRB.ApplySpell(pc, HLARef[3:])
 		elif HLARef[:2] == "GA":
 			# make sure it isn't already learned
-			SpellIndex = GUICommon.HasSpell (pc, HLAType, HLALevel, HLARef[3:])
+			SpellIndex = Spellbook.HasSpell (pc, HLAType, HLALevel, HLARef[3:])
 			if SpellIndex < 0: # gotta learn it
 				GemRB.LearnSpell (pc, HLARef[3:], 8)
 			else: # memorize it again

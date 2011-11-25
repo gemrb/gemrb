@@ -7256,7 +7256,7 @@ Actor *Actor::CopySelf(bool mislead) const
 
 	area->AddActor(newActor);
 	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );
-	newActor->SetOrientation(GetOrientation(),0);
+	newActor->SetOrientation(GetOrientation(), false);
 	newActor->SetStance( IE_ANI_READY );
 
 	//and apply them

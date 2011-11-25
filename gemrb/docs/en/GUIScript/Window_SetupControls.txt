@@ -1,5 +1,5 @@
 
-Prototype: GemRB.SetupControls(WindowIndex, dict, slot[, Start, global])nnAutomagically sets up the controls of the action window for a PC indexed by slot.n
+Prototype: GemRB.SetupControls(WindowIndex, dict, slot[, Start])nnAutomagically sets up the controls of the action window for a PC indexed by slot.n
 
 Metaclass Prototype:
 
@@ -10,7 +10,6 @@ WindowIndex -
 dict - 
 slot - 
 Start - 
-global - (optional) 
 
 Return value:
 

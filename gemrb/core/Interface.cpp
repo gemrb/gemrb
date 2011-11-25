@@ -187,7 +187,6 @@ Interface::Interface(int iargc, char* iargv[])
 #else
 	CaseSensitive = false;
 #endif
-	SlowBIFs = false;
 	SkipIntroVideos = false;
 	DrawFPS = false;
 	TouchScrollAreas = false;
@@ -851,6 +850,11 @@ int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
 		if (!(sp&SP_SILENCE)) {
 			return SP_SILENCE;
 		}
+	}
+
+	// disable spells causing surges to be cast while in a surge (prevents nesting)
+	if (sp&SP_SURGE) {
+		return SP_SURGE;
 	}
 
 	return 0;
@@ -2283,7 +2287,6 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("FullScreen", FullScreen = );
 		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
 		CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
-		CONFIG_INT("SlowBIFs", SlowBIFs = );
 		CONFIG_INT("Height", Height = );
 		CONFIG_INT("KeepCache", KeepCache = );
 		CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
@@ -3184,9 +3187,14 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 	if (Status&IE_GUI_CONTROL_FOCUSED) {
 		evntmgr->SetFocused( win, ctrl);
 	}
-	if (ctrl->ControlType != ((Status >> 24) & 0xff) ) {
+
+	//check if the status parameter was intended to use with this control
+	//Focus will sadly break this at the moment, because it is common for all control types
+	int check = (Status >> 24) & 0xff;
+	if ( (check!=0x7f) && (ctrl->ControlType != check) ) {
 		return -2;
 	}
+
 	switch (ctrl->ControlType) {
 		case IE_GUI_BUTTON:
 			//Button

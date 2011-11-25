@@ -1,18 +1,17 @@
 
-Prototype: GemRB.SetupQuickSpell(PartyID, spellslot, spellindex, type[, global])
+Prototype: GemRB.SetupQuickSpell(PartyID, spellslot, spellindex, type)
 
 Metaclass Prototype:
 
-Description:  It also returns the target type of the selected spell.
+Description: Set up a quick spell slot. It also returns the target type of the selected spell.
 
 Parameters: 
 PartyID - 
 spellslot - 
 spellindex - 
 type - 
-global - (optional) 
 
-Return value: intnnSet up a quick spell slot of a PC.nnIf global is set, the actor will be looked up by its global ID instead of party slot. 
+Return value: int
 
 See also:
 

@@ -22,6 +22,7 @@
 ###################################################
 import GemRB
 import GUICommon
+import Spellbook
 import CommonTables
 import LUCommon
 import LevelUp
@@ -489,7 +490,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	#this hack only displays LOH if we know the spell
 	#TODO: the core should just not set LOH if the paladin can't learn it
-	if (GUICommon.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
+	if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 		stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
 
 	#script
