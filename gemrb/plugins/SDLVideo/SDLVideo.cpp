@@ -775,7 +775,7 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			index );
 	}
-	return new Sprite2D(w, h, bpp, p->pitch, p, pixels);
+	return new Sprite2D(w, h, bpp, p, pixels);
 }
 
 Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
@@ -792,7 +792,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY, index );
 	}
-	return new Sprite2D(w, h, bpp, p->pitch, p, pixels);
+	return new Sprite2D(w, h, bpp, p, pixels);
 }
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
@@ -811,7 +811,7 @@ Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 	data->source = datasrc;
 	datasrc->IncDataRefCount();
 
-	Sprite2D* spr = new Sprite2D(w, h, 8 /* FIXME!!!! */, w, data, pixeldata);
+	Sprite2D* spr = new Sprite2D(w, h, 8 /* FIXME!!!! */, data, pixeldata);
 	spr->BAM = true;
 	return spr;
 }
