@@ -39,7 +39,7 @@
 #include <cassert>
 #include <cstdio>
 
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
 extern "C" {
 	#include "SDL_sysvideo.h"
 	#include "SDL_uikitkeyboard.h"
@@ -393,7 +393,7 @@ int SDLVideoDriver::PollEvents() {
 					key = GEM_RIGHT;
 					break;
 				case SDLK_DELETE:
-#ifndef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE < 1
 					//iOS currently doesnt have a backspace so we use delete. 
 					//This change should be future proof in the event apple changes the delete key to a backspace.
 					key = GEM_DELETE;
@@ -647,9 +647,8 @@ This method is intended for devices with no physical keyboard or with an optiona
 */
 void SDLVideoDriver::HideSoftKeyboard()
 {
-
 	if(core->UseSoftKeyboard){
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
 		SDL_iPhoneKeyboardHide(SDL_GetFocusWindow());
 #endif
 #ifdef ANDROID
@@ -666,7 +665,7 @@ This method is intended for devices with no physical keyboard or with an optiona
 void SDLVideoDriver::ShowSoftKeyboard()
 {
 	if(core->UseSoftKeyboard){
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
 		SDL_iPhoneKeyboardShow(SDL_GetFocusWindow());
 #endif
 #ifdef ANDROID
