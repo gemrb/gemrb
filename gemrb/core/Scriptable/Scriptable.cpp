@@ -437,7 +437,8 @@ void Scriptable::AddAction(Action* aC)
 
 	// attempt to handle 'instant' actions, from instant.ids, which run immediately
 	// when added if the action queue is empty, even on actors which are Held/etc
-	if (!CurrentAction && !GetNextAction()) {
+	// FIXME: area check hack until fuzzie fixes scripts here
+	if (!CurrentAction && !GetNextAction() && area) {
 		if (actionflags[aC->actionID] & AF_INSTANT) {
 			CurrentAction = aC;
 			GameScript::ExecuteAction( this, CurrentAction );
