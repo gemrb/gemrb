@@ -1148,7 +1148,7 @@ int Scriptable::SpellCast(bool instant)
 		//cfb
 		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
 		fxqueue->SetOwner(actor);
-		if (!actor->Modified[IE_AVATARREMOVAL]) {
+		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
 			spl->AddCastingGlow(fxqueue, duration, actor->Modified[IE_SEX]);
 		}
 		fxqueue->AddAllEffects(actor, actor->Pos);
