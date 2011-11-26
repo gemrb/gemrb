@@ -74,7 +74,7 @@ public:
 	void MouseMovement(int x, int y);
 	void MoveMouse(unsigned int x, unsigned int y);
 	void ClickMouse(unsigned int button);
-	void MouseClickEvent(Uint8 type, Uint8 button);
+	void MouseClickEvent(SDL_EventType type, Uint8 button);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);

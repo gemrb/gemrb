@@ -2630,7 +2630,7 @@ void SDLVideoDriver::ClickMouse(unsigned int button)
 	}
 }
 
-void SDLVideoDriver::MouseClickEvent(Uint8 type, Uint8 button)
+void SDLVideoDriver::MouseClickEvent(SDL_EventType type, Uint8 button)
 {
 	SDL_Event *event = new SDL_Event();
 	event->type = type;
