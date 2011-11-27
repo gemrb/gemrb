@@ -197,6 +197,7 @@ Interface::Interface(int iargc, char* iargv[])
 	NumFingScroll = 2;
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
+	Bpp = 32;
 	FullScreen = 0;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
