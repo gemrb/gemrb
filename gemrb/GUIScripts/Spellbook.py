@@ -354,6 +354,7 @@ def CannotLearnSlotSpell ():
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 		return LSR_STAT
 
+	import GUICommon
 	if GUICommon.GameIsPST():
 		import GUIINV
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
