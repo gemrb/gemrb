@@ -841,9 +841,13 @@ failedload:
 
 // check if the actor is in npclevel.2da and replace accordingly
 bool Game::CheckForReplacementActor(int i) {
+	if (core->InCutSceneMode() || npclevels.empty()) {
+		return false;
+	}
+
 	Actor* act = NPCs[i];
 	ieDword level = GetPartyLevel(false) / GetPartySize(false);
-	if (! npclevels.empty() && !(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
+	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<const char *> >::iterator it;
 		for (it = npclevels.begin(); it != npclevels.end(); it++) {
