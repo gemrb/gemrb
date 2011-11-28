@@ -143,8 +143,7 @@ GameControl::GameControl(void)
 		scrollAreasWidth = 5;
 	}
 
-	core->GetDictionary()->Lookup("Center",tmp);
-	if (tmp) {
+	if (core->GetDictionary()->Lookup("Center",tmp)) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
 	} else {
 		ScreenFlags = SF_CENTERONACTOR;
