@@ -88,6 +88,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		}
 	}
 	print( "\n" );
+	out.Close(); // This is necesary, since windows won't open the file otherwise.
 	return FileStream::OpenFile(path);
 }
 

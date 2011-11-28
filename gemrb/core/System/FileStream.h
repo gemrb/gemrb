@@ -56,6 +56,8 @@ public:
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
+
+	void Close();
 public:
 	/** Opens the specifed file.
 	 *
@@ -64,7 +66,6 @@ public:
 	static FileStream* OpenFile(const char* filename);
 private:
 	void FindLength();
-	void Close();
 };
 
 #endif  // ! FILESTREAM_H
