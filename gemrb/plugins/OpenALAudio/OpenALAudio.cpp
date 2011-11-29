@@ -186,7 +186,12 @@ bool OpenALAudioDriver::Init(void)
 		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
 
 	stayAlive = true;
+#if	SDL_VERSION_ATLEAST(1, 3, 0)
+	/* as of changeset 3a041d215edc SDL_CreateThread has a 'name' parameter */
+	musicThread = SDL_CreateThread( MusicManager, "OpenALAudio", this );
+#else
 	musicThread = SDL_CreateThread( MusicManager, this );
+#endif
 
 	ambim = new AmbientMgrAL;
 	speech.free = true;
