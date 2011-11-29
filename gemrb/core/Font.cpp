@@ -60,24 +60,24 @@ inline size_t mystrlen(const char* string)
 Font::Font(int w, int h, Palette* pal)
 	: glyphCount(256), glyphInfo(glyphCount)
 {
+	palette = NULL;
 	lastX = 0;
 	count = 0;
 	FirstChar = 0;
 	sprBuffer = 0;
 
+	SetPalette(pal);
+
 	width = w;
 	height = h;
 	tmpPixels = (unsigned char*)malloc(width*height);
 
-	pal->IncRef();
-	palette = pal;
 	maxHeight = h;
 }
 
 Font::~Font(void)
 {
 	Video *video = core->GetVideoDriver();
-	gamedata->FreePalette( palette );
 	video->FreeSprite( sprBuffer );
 }
 

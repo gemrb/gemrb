@@ -69,8 +69,8 @@ private:
 	int glyphCount;
 
 	Palette* palette;
-	Sprite2D* sprBuffer;
 	unsigned char FirstChar;
+	Sprite2D* sprBuffer;//A sprite with all printable ASCII characters printed horizontally acending.
 
 	// For the temporary bitmap
 	unsigned char* tmpPixels;
@@ -91,6 +91,10 @@ public:
 	/** Call this after adding all characters */
 	void FinalizeSprite(bool cK, int index);
 
+	Palette* GetPalette() const;
+	void SetPalette(Palette* pal);
+
+	// Printing methods
 	void Print(Region cliprgn, Region rgn, const unsigned char* string,
 		Palette* color, unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
@@ -104,8 +108,6 @@ public:
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false) const;
 
-	Palette* GetPalette() const;
-	void SetPalette(Palette* pal);
 	/** Returns width of the string rendered in this font in pixels */
 	int CalcStringWidth(const char* string, bool NoColor = false) const;
 	void SetupString(char* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
