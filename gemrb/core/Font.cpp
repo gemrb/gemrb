@@ -65,6 +65,8 @@ Font::Font(int w, int h, Palette* pal)
 	count = 0;
 	FirstChar = 0;
 	sprBuffer = 0;
+	resRefs = NULL;
+	numResRefs = 0;
 
 	SetPalette(pal);
 
@@ -79,6 +81,9 @@ Font::~Font(void)
 {
 	Video *video = core->GetVideoDriver();
 	video->FreeSprite( sprBuffer );
+	SetPalette(NULL);
+
+	free(resRefs);
 }
 
 /*
@@ -88,6 +93,27 @@ Font::~Font(void)
 const Font::GlyphInfo &Font::getInfo(ieWord chr) const
 {
 	return glyphInfo[chr - 1];
+}
+
+bool Font::AddResRef(const ieResRef resref)
+{
+	if (resref) {
+		resRefs = (ieResRef*)realloc(resRefs, sizeof(ieResRef) * ++numResRefs);
+		strnlwrcpy( resRefs[numResRefs - 1], resref, sizeof(ieResRef)-1);
+		return true;
+	}
+	return false;
+}
+
+bool Font::MatchesResRef(const ieResRef resref)
+{
+	for (int i=0; i < numResRefs; i++)
+	{
+		if (strnicmp( resref, resRefs[i], sizeof(ieResRef)-1) == 0){
+			return true;
+		}
+	}
+	return false;
 }
 
 void Font::FinalizeSprite(bool cK, int index)

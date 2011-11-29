@@ -68,6 +68,9 @@ private:
 	int count;
 	int glyphCount;
 
+	ieResRef* resRefs;
+	int numResRefs;
+
 	Palette* palette;
 	unsigned char FirstChar;
 	Sprite2D* sprBuffer;//A sprite with all printable ASCII characters printed horizontally acending.
@@ -77,8 +80,6 @@ private:
 	unsigned int width, height;
 	std::vector<GlyphInfo> glyphInfo;
 public:
-	/** ResRef of the Font image */
-	ieResRef ResRef;
 	int maxHeight;
 public:
 	Font(int w, int h, Palette* palette);
@@ -86,6 +87,9 @@ public:
 
 	//allow reading but not setting glyphs
 	const GlyphInfo& getInfo (ieWord chr) const;
+
+	bool AddResRef(const ieResRef resref);
+	bool MatchesResRef(const ieResRef resref);
 
 	void AddChar(unsigned char* spr, int w, int h, short xPos, short yPos);
 	/** Call this after adding all characters */

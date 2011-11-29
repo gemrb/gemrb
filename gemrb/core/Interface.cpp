@@ -1353,7 +1353,7 @@ int Interface::LoadSprites()
 			if (!fnt) {
 				continue;
 			}
-			strnlwrcpy( fnt->ResRef, ResRef, 8 );
+			fnt->AddResRef(ResRef);
 			if (needpalette) {
 
 				Color fore = {0xff, 0xff, 0xff, 0};
@@ -2723,7 +2723,7 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 Font* Interface::GetFont(const char *ResRef) const
 {
 	for (unsigned int i = 0; i < fonts.size(); i++) {
-		if (strnicmp( fonts[i]->ResRef, ResRef, 8 ) == 0) {
+		if (fonts[i]->MatchesResRef(ResRef)) {
 			return fonts[i];
 		}
 	}
