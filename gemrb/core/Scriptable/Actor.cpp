@@ -3740,8 +3740,7 @@ void Actor::Resurrect()
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
 	}
-	nextBored = game->GameTime + core->Roll(1,30,bored_time);
-	nextComment = game->GameTime + core->Roll(5,1000,bored_time/2);
+	ResetCommentTime();
 	//clear effects?
 }
 
@@ -5614,6 +5613,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 		return;
 	}
 	SetRunFlags(flags);
+	ResetCommentTime();
 	// is this true???
 	if (Des.x==-2 && Des.y==-2) {
 		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
@@ -6508,9 +6508,7 @@ void Actor::Rest(int hours)
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
 	}
-	Game *game = core->GetGame();
-	nextBored = game->GameTime + core->Roll(1,30,bored_time);
-	nextComment = game->GameTime + core->Roll(5,1000,bored_time/2);
+	ResetCommentTime();
 }
 
 //returns the actual slot from the quickslot
@@ -6594,6 +6592,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
+	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
@@ -6630,6 +6629,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
+	ResetCommentTime();
 	if (pro) {
 		//ieDword is unsigned!!
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
@@ -7482,6 +7482,7 @@ void Actor::ResetState()
 	CureInvisibility();
 	CureSanctuary();
 	SetModal(MS_NONE);
+	ResetCommentTime();
 }
 
 // doesn't check the range, but only that the azimuth and the target
@@ -7682,4 +7683,11 @@ bool Actor::IsPartyMember() const
 {
 	if (Modified[IE_EA]<=EA_FAMILIAR) return true;
 	return InParty>0;
+}
+
+void Actor::ResetCommentTime()
+{
+	Game *game = core->GetGame();
+	nextBored = game->GameTime + core->Roll(1, 30, bored_time);
+	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 }

@@ -758,5 +758,7 @@ public:
 	int GetSkillBonus(unsigned int col) const;
 	/* returns true for party members (and familiars) */
 	bool IsPartyMember() const;
+	/* resets the bored and area comment timers */
+	void ResetCommentTime();
 };
 #endif

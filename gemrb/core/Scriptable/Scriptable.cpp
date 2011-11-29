@@ -1159,6 +1159,7 @@ int Scriptable::SpellCast(bool instant)
 			// we have to remove it manually
 			actor->fxqueue.RemoveAllEffectsWithParam(fx_force_surge_modifier_ref, 1);
 		}
+		actor->ResetCommentTime();
 	}
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
