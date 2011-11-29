@@ -1,0 +1,16 @@
+Axioms of Style
+
+1. When in doubt, follow the style of the existing function or file.
+1.1. When creating a new file, follow the style of existing files, pe. Game.h/.cpp.
+1.1.1. Do not forget to include the license header.
+2. Code indentation is done with single tabulators.
+3. Try to avoid creating very long lines. There is no set maximum.
+4. Sort includes by type (project, system) and alphabetically.
+
+
+Where to start
+If you don't know what to work on, check out the included TODO file, the FIXMEs 
+and TODOs spread throughout the code, the more detailed todo on our wiki at
+http://gemrb.org/wiki/doku.php?id=todo or ask either on the forums or IRC.
+Alternatively, just start playing one of the games and see what annoys you, 
+then start fixing it.
