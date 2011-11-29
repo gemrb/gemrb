@@ -2981,7 +2981,7 @@ void Actor::IdleActions(bool nonidle)
 			nextBored=time+core->Roll(1,30,bored_time);
 		}
 	} else {
-		if (nextBored<time) {
+		if (nextBored<time && !InMove()) {
 			nextBored = time+core->Roll(1,30,bored_time/10);
 			VerbalConstant(VB_BORED, 1);
 		}
