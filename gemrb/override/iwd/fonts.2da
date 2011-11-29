@@ -1,19 +1,22 @@
 2DA V1.0
 NORMAL
-	RESREF		NEED_PALETTE	FIRST_CHAR
-0	NORMAL		1		0
-1	INFOFONT	1		0
-2	NUMBER		0		47
-3	INITIALS	0		0
-4	NUMBER2		0		47
-5	NUMBER3		0		47
-6	NUMFONT		1		0
-7	REALMS		0		0
-8	REALMS2		1		0
-9	STONEBIG	0		0
-10	STONESM2	0		0
-11	STONESM3	0		0
-12	STONESML	0		0
-13	TOOLFONT	1		0
-14	STATES  	0		0
-15	STATES2 	0		0
+	RESREF		NEED_PALETTE	FIRST_CHAR	LAST_CHAR	FONT_NAME	PT_SIZE		STYLE	COLOR
+0	NORMAL		1				33			255			NORMAL		14			0		0xffffffff
+1	INFOFONT	1				33			255			INFOFONT	14			0		0xffffffff
+2	NUMBER		0				48			57			NUMBER		14			0		0xffffffff
+3	INITIALS	0				33			255			INITIALS	14			0		0xffffffff
+4	NUMBER2		0				48			57			NUMBER2		14			0		0xffffffff
+5	NUMBER3		0				48			57			NUMBER3		14			0		0xffffffff
+6	NUMFONT		1				33			255			NUMFONT		14			0		0xffffffff
+7	REALMS		0				33			255			REALMS		14			0		0xffffffff
+8	REALMS2		1				33			255			REALMS2		14			0		0xffffffff
+9	STONEBIG	0				33			255			STONEBIG	14			0		0xffffffff
+10	STONESM2	0				33			255			STONESM2	14			0		0xffffffff
+11	STONESM3	0				33			255			STONESM3	14			0		0xffffffff
+12	STONESML	0				33			255			STONESML	14			0		0xffffffff
+13	TOOLFONT	1				33			255			TOOLFONT	14			0		0xffffffff
+# state "fonts" are the status icons. You probably don't want to edit these.
+14	STATES  	0				1			255			STATES		14			0		0xffffffff
+15	STATES2 	0				1			255			STATES2		14			0		0xffffffff
+
+# Customization How To: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
