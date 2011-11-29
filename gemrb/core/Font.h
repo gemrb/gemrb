@@ -59,26 +59,34 @@ struct StringList {
  */
 
 class GEM_EXPORT Font {
+public:
+	struct GlyphInfo {
+		short xPos, yPos; // tracks glyph adjustment
+		Region size;
+	};
 private:
 	int count;
+	int glyphCount;
+
 	Palette* palette;
 	Sprite2D* sprBuffer;
 	unsigned char FirstChar;
 
-	short xPos[256];
-	short yPos[256];
-
 	// For the temporary bitmap
 	unsigned char* tmpPixels;
 	unsigned int width, height;
+	std::vector<GlyphInfo> glyphInfo;
 public:
 	/** ResRef of the Font image */
 	ieResRef ResRef;
 	int maxHeight;
-	Region size[256];
 public:
 	Font(int w, int h, Palette* palette);
 	~Font(void);
+
+	//allow reading but not setting glyphs
+	const GlyphInfo& getInfo (ieWord chr) const;
+
 	void AddChar(unsigned char* spr, int w, int h, short xPos, short yPos);
 	/** Call this after adding all characters */
 	void FinalizeSprite(bool cK, int index);
