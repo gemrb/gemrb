@@ -1,1 +1,1 @@
-ADD_GEMRB_PLUGIN (BAMImporter BAMImporter.cpp)
+ADD_GEMRB_PLUGIN (BAMImporter BAMImporter.cpp BAMFontManager)

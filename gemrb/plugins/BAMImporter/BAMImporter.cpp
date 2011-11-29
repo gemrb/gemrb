@@ -360,8 +360,11 @@ Sprite2D* BAMImporter::GetPalette()
 	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
 }
 
+#include "BAMFontManager.h"
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
+PLUGIN_IE_RESOURCE(BAMFontManager, "bam", (ieWord)IE_BAM_CLASS_ID)
 PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImporter)
 END_PLUGIN()
