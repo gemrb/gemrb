@@ -28,6 +28,7 @@ libgemrb_core_la_SOURCES = \
 	Factory.cpp \
 	FactoryObject.cpp \
 	Font.cpp \
+	FontManager.cpp \
 	GUI/Button.cpp \
 	GUI/Console.cpp \
 	GUI/Control.cpp \

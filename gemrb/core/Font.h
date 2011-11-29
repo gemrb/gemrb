@@ -32,6 +32,13 @@
 
 #include <vector>
 
+enum FontStyle {
+	NORMAL = 0x00,
+	BOLD = 0x01,
+	ITALIC = 0x02,
+	UNDERLINE = 0x04
+};
+
 class Palette;
 class Sprite2D;
 

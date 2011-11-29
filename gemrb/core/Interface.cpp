@@ -43,6 +43,7 @@
 #include "EffectMgr.h"
 #include "EffectQueue.h"
 #include "Factory.h"
+#include "FontManager.h"
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"

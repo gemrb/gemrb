@@ -28,6 +28,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	FactoryObject.cpp
 	FileCache.cpp
 	Font.cpp
+	FontManager.cpp
 	Game.cpp
 	GameData.cpp
 	GlobalTimer.cpp
