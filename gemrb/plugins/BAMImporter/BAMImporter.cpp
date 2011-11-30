@@ -279,12 +279,6 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 }
 
 /** This function will load the Animation as a Font */
-Font* BAMImporter::GetFont(ieWord FirstChar)
-{
-	return GetFont(FirstChar, 255);
-}
-
-/** This function will load the Animation as a Font */
 Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 {
 	printMessage( "BAMImporter", "Constructing BAM font:", WHITE );

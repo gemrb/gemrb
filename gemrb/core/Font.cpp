@@ -74,6 +74,10 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 	numResRefs = 0;
 	maxHeight = 0;
 
+	ptSize = 0;
+	name[0] = '\0';
+	style = NORMAL;
+
 	SetPalette(pal);
 
 	int w = 0;

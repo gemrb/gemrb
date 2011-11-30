@@ -1332,34 +1332,44 @@ int Interface::LoadSprites()
 		printStatus( "ERROR", LIGHT_RED );
 		print( "Cannot find fonts.2da.\nTermination in Progress...\n" );
 		return GEM_ERROR;
-	} else {
-		PluginHolder<AnimationMgr> bamint(IE_BAM_CLASS_ID);
-		if (!bamint) {
-			printStatus( "ERROR", LIGHT_RED );
-			print( "No BAM Importer Available.\nTermination in Progress...\n" );
-			return GEM_ERROR;
+	}
+
+	int count = tab->GetRowCount();
+	for (int row = 0; row < count; row++) {
+		const char* ResRef = tab->QueryField(row, 0);
+		int needpalette = atoi(tab->QueryField(row, 1));
+		int first_char = atoi(tab->QueryField(row, 2));
+		int last_char = atoi(tab->QueryField(row, 3));
+
+		const char* font_name;
+		unsigned short font_size = 0;
+		FontStyle font_style = NORMAL;
+
+		font_name = ResRef;
+		// Do search for existing font here
+		Font* fnt = NULL;
+		for (size_t j = 0; j < fonts.size(); j++) {
+			if (stricmp(fonts[j]->name, font_name) == 0
+					&& fonts[j]->GetCharacterCount() == (last_char - first_char + 1)
+					&& fonts[j]->ptSize == font_size
+					&& fonts[j]->style == font_style) {
+				fnt = fonts[j];
+				fnt->AddResRef(ResRef);
+				break;
+			}
 		}
-		DataStream* str = NULL;
 
-		int count = tab->GetRowCount();
-		for (int i = 0; i < count; i++) {
-			const char* ResRef = tab->QueryField( i, 0 );
-			int needpalette = atoi( tab->QueryField( i, 1 ) );
-			int first_char = atoi( tab->QueryField( i, 2 ) );
-			str = gamedata->GetResource( ResRef, IE_BAM_CLASS_ID );
-			if (!bamint->Open(str)) {
-				continue;
-			}
-			Font* fnt = bamint->GetFont(first_char);
-			if (!fnt) {
-				continue;
-			}
-			fnt->AddResRef(ResRef);
+		if (fnt) {
+			print("Found existing font for %s", ResRef);
+			printStatus("OK", LIGHT_GREEN);
+			// what about palette etc?
+			continue;
+		} else {
+			Palette* pal = NULL;
 			if (needpalette) {
-
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
-				if (!strnicmp( TooltipFont, ResRef, 8) ) {
+				if (!strnicmp(TooltipFont, ResRef, sizeof(ieResRef)-1)) {
 					if (TooltipColor.a==0xff) {
 						fore = TooltipColor;
 					} else {
@@ -1367,35 +1377,48 @@ int Interface::LoadSprites()
 						back = TooltipColor;
 					}
 				}
-				Palette* pal = CreatePalette( fore, back );
+				pal = CreatePalette(fore, back);
 				pal->CreateShadedAlphaChannel();
-				fnt->SetPalette(pal);
-				gamedata->FreePalette( pal );
 			}
-			fonts.push_back( fnt );
+			ResourceHolder<FontManager> fntMgr(font_name);
+			if (fntMgr) fnt = fntMgr->GetFont(first_char, last_char, font_size, font_style, pal);
+			gamedata->FreePalette(pal);
 		}
 
-		if (fonts.size() == 0) {
-			printMessage( "Core", "No default font loaded! ", WHITE );
-			printStatus( "ERROR", LIGHT_RED );
-			return GEM_ERROR;
+		if (!fnt) {
+			print("Unable to load font resource:%s ", ResRef);
+			printStatus("WARNING", YELLOW);
+			continue;
 		}
-		if (GetFont( ButtonFont ) == NULL) {
-			printMessage("Core", "ButtonFont not loaded: %s ", WHITE,
-				ButtonFont);
-			printStatus( "WARNING", YELLOW );
-		}
-		if (GetFont( MovieFont ) == NULL) {
-			printMessage("Core", "MovieFont not loaded: %s ", WHITE,
-				MovieFont);
-			printStatus( "WARNING", YELLOW );
-		}
-		if (GetFont( TooltipFont ) == NULL) {
-			printMessage("Core", "TooltipFont not loaded: %s ", WHITE,
-				TooltipFont);
-			printStatus( "WARNING", YELLOW );
-		}
+
+		fnt->AddResRef(ResRef);
+		strnlwrcpy( fnt->name, font_name, sizeof(fnt->name)-1);
+
+		fonts.push_back(fnt);
 	}
+
+	if (fonts.size() == 0) {
+		printMessage( "Core", "No default font loaded! ", WHITE );
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+
+	if (GetFont( ButtonFont ) == NULL) {
+		printMessage("Core", "ButtonFont not loaded: %s ", WHITE,
+					 ButtonFont);
+		printStatus( "WARNING", YELLOW );
+	}
+	if (GetFont( MovieFont ) == NULL) {
+		printMessage("Core", "MovieFont not loaded: %s ", WHITE,
+					 MovieFont);
+		printStatus( "WARNING", YELLOW );
+	}
+	if (GetFont( TooltipFont ) == NULL) {
+		printMessage("Core", "TooltipFont not loaded: %s ", WHITE,
+					 TooltipFont);
+		printStatus( "WARNING", YELLOW );
+	}
+
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 

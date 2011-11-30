@@ -88,6 +88,10 @@ private:
 	std::vector<GlyphInfo> glyphInfo;
 	GlyphInfo whiteSpace[3];//an empty region for non existing chars + space + tab
 public:
+	char name[20];
+	FontStyle style;	  // for informational purposes only
+	unsigned short ptSize;// for informational purposes only
+
 	int maxHeight;
 public:
 	Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);

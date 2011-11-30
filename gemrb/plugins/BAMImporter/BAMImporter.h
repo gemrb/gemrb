@@ -61,8 +61,6 @@ public:
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
 		unsigned char mode = IE_NORMAL);
 	/** This function will load the Animation as a Font */
-	Font* GetFont(ieWord FirstChar);
-	/** This function will load the Animation as a Font */
 	Font* GetFont(ieWord FirstChar, ieWord LastChar);
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
