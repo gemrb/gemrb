@@ -33,8 +33,6 @@
 
 #include <cassert>
 
-unsigned int lastX = 0;
-
 #define PARAGRAPH_START_X 5;
 
 static const Color black = {0, 0, 0, 0};
@@ -57,24 +55,87 @@ inline size_t mystrlen(const char* string)
 	return count;
 }
 
-Font::Font(int w, int h, Palette* pal)
-	: glyphCount(256), glyphInfo(glyphCount)
+/*
+glyphs should be all characters we are interested in printing with the font save whitespace
+Font takes responsibility for glyphs so we must free them once done
+*/
+Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
+	: glyphCount(lastChar - firstChar + 1), glyphInfo(glyphCount), whiteSpace()
 {
+	assert(glyphs);
+	assert(pal);
+	assert(firstChar <= lastChar);
+
+	FirstChar = firstChar;
+	LastChar = lastChar;
+
 	palette = NULL;
-	lastX = 0;
-	count = 0;
-	FirstChar = 0;
-	sprBuffer = 0;
 	resRefs = NULL;
 	numResRefs = 0;
+	maxHeight = 0;
 
 	SetPalette(pal);
 
-	width = w;
-	height = h;
-	tmpPixels = (unsigned char*)malloc(width*height);
+	int w = 0;
+	glyphCount = lastChar - firstChar + 1;
 
-	maxHeight = h;
+	unsigned int lastX = 0;
+	Sprite2D* currGlyph = NULL;
+	ieWord i;
+	for (i = 0; i < glyphCount; i++) { // printable characters range perhaps minus whitespace (whitespace handled later)
+		currGlyph = glyphs[i];
+		if (!currGlyph) { // not printble
+			glyphInfo[i].size.x = 0;
+			glyphInfo[i].size.y = 0;
+			glyphInfo[i].size.w = 0;
+			glyphInfo[i].size.h = 0;
+			glyphInfo[i].xPos = 0;
+			glyphInfo[i].yPos = 0;
+			continue;
+		}
+
+		w += currGlyph->Width;
+		if (currGlyph->Height > maxHeight) maxHeight = currGlyph->Height;
+
+		glyphInfo[i].size.x = lastX;
+		glyphInfo[i].size.y = 0;
+		glyphInfo[i].size.w = currGlyph->Width;
+		glyphInfo[i].size.h = currGlyph->Height;
+		glyphInfo[i].xPos = currGlyph->XPos;
+		glyphInfo[i].yPos = currGlyph->YPos;
+		lastX += currGlyph->Width;
+	}
+
+	// we dont really need a whitespace sprite since its blank we just need its size
+	if (FirstChar > ' ') whiteSpace[1].size = Region(0, 0, (int)(maxHeight * 0.25), 0);// standard space width is 1/4 ptSize
+	if (FirstChar > '\t') whiteSpace[2].size = Region(0, 0, (whiteSpace[1].size.w * 4), 0);// standard tab width is 4 spaces???
+
+	Video* video = core->GetVideoDriver();
+
+	//cast to uchar because uchar is 1 byte and we can do pointer arithmatic with it.
+	unsigned char* tmpPixels = (unsigned char*)malloc(w * maxHeight);
+
+	lastX = 0;
+	for (i = 0; i < glyphCount; i++) { //printable characters range perhapps minus whitespace (whitespace handled later)
+		currGlyph = glyphs[i];
+		if (!currGlyph) continue;
+
+		assert(currGlyph->Bpp == 8);
+		// copy the pixels into the buffer
+		// this is assuming the width will be the pitch
+		unsigned char * dstPtr = (unsigned char*)tmpPixels + lastX;
+		unsigned char * srcPtr = (unsigned char*)currGlyph->pixels;
+		for (int glyphY = 0; glyphY < currGlyph->Height; glyphY++) {
+			memcpy( dstPtr, srcPtr, currGlyph->Width);
+			srcPtr += currGlyph->Width;
+			dstPtr += w;
+		}
+		lastX += currGlyph->Width;
+
+		video->FreeSprite(currGlyph);
+	}
+
+	sprBuffer = core->GetVideoDriver()->CreateSprite8(w, maxHeight, 8, (void*)tmpPixels, pal->col, true, 0);
 }
 
 Font::~Font(void)
@@ -92,7 +153,13 @@ Font::~Font(void)
  */
 const Font::GlyphInfo &Font::getInfo(ieWord chr) const
 {
-	return glyphInfo[chr - 1];
+	if (chr >= FirstChar && chr <= LastChar) {
+		return glyphInfo[chr - FirstChar];
+	}
+	if (chr == ' ') return whiteSpace[1];
+	if (chr == '\t') return  whiteSpace[2];
+	//otherwise return an empty region
+	return whiteSpace[0];
 }
 
 bool Font::AddResRef(const ieResRef resref)
@@ -114,41 +181,6 @@ bool Font::MatchesResRef(const ieResRef resref)
 		}
 	}
 	return false;
-}
-
-void Font::FinalizeSprite(bool cK, int index)
-{
-	sprBuffer = core->GetVideoDriver()->CreateSprite8( width, height, 8, tmpPixels, palette ? palette->col : 0, cK, index );
-	tmpPixels = 0;
-}
-
-void Font::AddChar(unsigned char* spr, int w, int h, short xPos, short yPos)
-{
-	if (!spr) {
-		glyphInfo[count].size.x = 0;
-		glyphInfo[count].size.y = 0;
-		glyphInfo[count].size.w = 0;
-		glyphInfo[count].size.h = 0;
-		glyphInfo[count].xPos = 0;
-		glyphInfo[count].yPos = 0;
-		count++;
-		return;
-	}
-	unsigned char * currPtr = tmpPixels + lastX;
-	unsigned char * srcPtr = ( unsigned char * ) spr;
-	for (int y = 0; y < h; y++) {
-		memcpy( currPtr, srcPtr, w );
-		srcPtr += w;
-		currPtr += width;
-	}
-	glyphInfo[count].size.x = lastX;
-	glyphInfo[count].size.y = 0;
-	glyphInfo[count].size.w = w;
-	glyphInfo[count].size.h = h;
-	glyphInfo[count].xPos = xPos;
-	glyphInfo[count].yPos = yPos;
-	count++;
-	lastX += w;
 }
 
 void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
@@ -207,7 +239,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				ystep = height;
 		}
 	} else {
-		ystep = getInfo(1).size.h;
+		ystep = maxHeight;
 	}
 	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;
@@ -332,7 +364,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			last_initial_row++;
 		}
 		video->BlitSpriteRegion( sprBuffer, getInfo(currChar).size,
-			x + rgn.x, y + rgn.y - getInfo(currChar).xPos, true, &rgn );
+			x + rgn.x, y + rgn.y - getInfo(currChar).yPos, true, &rgn );
 		if (cursor && ( i == curpos )) {
 			video->BlitSprite( cursor, x + rgn.x,
 				y + rgn.y, true, &rgn );
@@ -391,7 +423,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		
 		for (size_t i = 0; i < len; i++) {
 			if (tmp[i] == 0) continue;
-			int height = getInfo(tmp[i]-1).yPos;
+			int height = getInfo(tmp[i]).yPos;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -602,7 +634,7 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 		}
 
 		if (string[pos] && string[pos] != ' ') {
-			string[pos] = ( unsigned char ) (string[pos] - FirstChar);
+			string[pos] = ( unsigned char ) (string[pos]);
 		}
 
 		wx += getInfo(string[pos]).size.w;
@@ -637,7 +669,3 @@ void Font::SetPalette(Palette* pal)
 	palette = pal;
 }
 
-void Font::SetFirstChar( unsigned char first)
-{
-	FirstChar = first;
-}

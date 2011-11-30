@@ -65,35 +65,33 @@ public:
 		Region size;
 	};
 private:
-	int count;
 	int glyphCount;
 
 	ieResRef* resRefs;
 	int numResRefs;
 
 	Palette* palette;
-	unsigned char FirstChar;
 	Sprite2D* sprBuffer;//A sprite with all printable ASCII characters printed horizontally acending.
 
-	// For the temporary bitmap
-	unsigned char* tmpPixels;
-	unsigned int width, height;
+	/** Sets ASCII code of the first character in the font.
+	 * (it allows remapping numeric fonts from \000 to '0') */
+	ieWord FirstChar;
+	ieWord LastChar;
+
 	std::vector<GlyphInfo> glyphInfo;
+	GlyphInfo whiteSpace[3];//an empty region for non existing chars + space + tab
 public:
 	int maxHeight;
 public:
-	Font(int w, int h, Palette* palette);
+	Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
 	~Font(void);
 
 	//allow reading but not setting glyphs
 	const GlyphInfo& getInfo (ieWord chr) const;
+	int GetCharacterCount(){ return glyphCount; };
 
 	bool AddResRef(const ieResRef resref);
 	bool MatchesResRef(const ieResRef resref);
-
-	void AddChar(unsigned char* spr, int w, int h, short xPos, short yPos);
-	/** Call this after adding all characters */
-	void FinalizeSprite(bool cK, int index);
 
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
@@ -115,9 +113,6 @@ public:
 	/** Returns width of the string rendered in this font in pixels */
 	int CalcStringWidth(const char* string, bool NoColor = false) const;
 	void SetupString(char* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
-	/** Sets ASCII code of the first character in the font.
-	 * (it allows remapping numeric fonts from \000 to '0') */
-	void SetFirstChar(unsigned char first);
 
 private:
 	int PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const;

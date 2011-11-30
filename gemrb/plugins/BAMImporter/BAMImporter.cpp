@@ -279,44 +279,55 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 }
 
 /** This function will load the Animation as a Font */
-Font* BAMImporter::GetFont()
+Font* BAMImporter::GetFont(ieWord FirstChar)
 {
-	unsigned int i;
+	return GetFont(FirstChar, 255);
+}
 
-	int w = 0, h = 0;
-	unsigned int Count;
+/** This function will load the Animation as a Font */
+Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
+{
+	printMessage( "BAMImporter", "Constructing BAM font:", WHITE );
 
+	unsigned int i = 0, glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;
 	ieWord *FLT = CacheFLT(Count);
-
 	// Numeric fonts have all frames in single cycle
 	if (CyclesCount > 1) {
 		Count = CyclesCount;
-	} else {
-		Count = FramesCount;
-	}
-
-	for (i = 0; i < Count; i++) {
-		unsigned int index;
-		if (CyclesCount > 1) {
-			index = FLT[cycles[i].FirstFrame];
-			if (index >= FramesCount)
-				continue;
-		} else {
-			index = i;
+		glyphCount = (LastChar - FirstChar + 1);
+		if (Count < glyphCount){
+			LastChar = LastChar - (glyphCount - Count);
+			glyphCount = Count;
 		}
-
-		w = w + frames[index].Width;
-		if (frames[index].Height > h)
-			h = frames[index].Height;
+		i = (FirstChar) ? FirstChar - 1 : FirstChar;
+		limit = (FirstChar) ? LastChar - 1 : LastChar;
+		glyphIndexOffset = i;
+	} else { //numeric font
+		Count = FramesCount;
+		glyphCount = Count;
+		//ignore passed FirstChar & LastChar
+		if (Count == 11) {
+			//numeric font
+			FirstChar = '0';
+			LastChar = '9';
+		}else{
+			//something else. dont know what.
+			FirstChar = 0;
+			LastChar = Count - 1;
+		}
+		limit = glyphCount - 1;
 	}
+	assert(glyphCount);
+	Sprite2D** glyphs = (Sprite2D**)malloc( (glyphCount) * sizeof(Sprite2D*) );
 
-	Font* fnt = new Font( w, h, palette );
-	for (i = 0; i < Count; i++) {
+	print(" %i characters...\n", glyphCount);
+
+	for (; i <= limit; i++) {
 		unsigned int index;
 		if (CyclesCount > 1) {
 			index = FLT[cycles[i].FirstFrame];
 			if (index >= FramesCount) {
-				fnt->AddChar( NULL, 0, 0, 0, 0 );
+				glyphs[i - glyphIndexOffset] = NULL;
 				continue;
 			}
 		} else {
@@ -325,19 +336,16 @@ Font* BAMImporter::GetFont()
 
 		unsigned char* pixels = (unsigned char*)GetFramePixels( index );
 		if( !pixels) {
-			fnt->AddChar( NULL, 0, 0, 0, 0 );
+			glyphs[i - glyphIndexOffset] = NULL;
 			continue;
 		}
-		fnt->AddChar( pixels, frames[index].Width,
-				frames[index].Height,
-				frames[index].XPos,
-				frames[index].YPos );
-		free( pixels );
+		glyphs[i - glyphIndexOffset] = core->GetVideoDriver()->CreateSprite8(frames[index].Width, frames[index].Height, 8, pixels, palette->col, true, 0);
+		glyphs[i - glyphIndexOffset]->YPos = frames[index].YPos;
+		glyphs[i - glyphIndexOffset]->XPos = frames[index].XPos;
 	}
 	free( FLT );
-
-	fnt->FinalizeSprite( true, 0 );
-
+	Font* fnt = new Font(glyphs, FirstChar, LastChar, palette);
+	free(glyphs);
 	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.

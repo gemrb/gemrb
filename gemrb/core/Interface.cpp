@@ -1349,7 +1349,7 @@ int Interface::LoadSprites()
 			if (!bamint->Open(str)) {
 				continue;
 			}
-			Font* fnt = bamint->GetFont();
+			Font* fnt = bamint->GetFont(first_char);
 			if (!fnt) {
 				continue;
 			}
@@ -1371,7 +1371,6 @@ int Interface::LoadSprites()
 				fnt->SetPalette(pal);
 				gamedata->FreePalette( pal );
 			}
-			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
 
