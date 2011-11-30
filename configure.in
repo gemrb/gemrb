@@ -282,6 +282,7 @@ gemrb/plugins/SPLImporter/Makefile
 gemrb/plugins/STOImporter/Makefile 
 gemrb/plugins/TISImporter/Makefile 
 gemrb/plugins/TLKImporter/Makefile 
+gemrb/plugins/TTFImporter/Makefile
 gemrb/plugins/WEDImporter/Makefile 
 gemrb/plugins/WMPImporter/Makefile 
 gemrb/plugins/ZLibManager/Makefile

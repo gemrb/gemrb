@@ -1348,12 +1348,12 @@ int Interface::LoadSprites()
 		font_name = ResRef;
 		// Do search for existing font here
 		Font* fnt = NULL;
-		for (size_t j = 0; j < fonts.size(); j++) {
-			if (stricmp(fonts[j]->name, font_name) == 0
-					&& fonts[j]->GetCharacterCount() == (last_char - first_char + 1)
-					&& fonts[j]->ptSize == font_size
-					&& fonts[j]->style == font_style) {
-				fnt = fonts[j];
+		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
+			if (stricmp(fonts[fntIdx]->name, font_name) == 0
+					&& fonts[fntIdx]->GetCharacterCount() == (last_char - first_char + 1)
+					&& fonts[fntIdx]->ptSize == font_size
+					&& fonts[fntIdx]->style == font_style) {
+				fnt = fonts[fntIdx];
 				fnt->AddResRef(ResRef);
 				break;
 			}

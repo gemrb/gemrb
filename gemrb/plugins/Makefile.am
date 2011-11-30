@@ -36,6 +36,7 @@ SUBDIRS = \
 	STOImporter \
 	TISImporter \
 	TLKImporter \
+	TTFImporter
 	WAVReader \
 	WEDImporter \
 	WMPImporter \
