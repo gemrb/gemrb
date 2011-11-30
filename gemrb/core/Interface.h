@@ -741,6 +741,7 @@ public:
 	char UserDir[_MAX_PATH];
 	int argc;
 	char **argv;
+	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];
 	char GameType[_MAX_PATH];
 	char GemRBPath[_MAX_PATH];

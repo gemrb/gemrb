@@ -227,6 +227,16 @@ CachePath=./Cache/
 #PluginsPath=@PLUGIN_DIR@
 
 #####################################################
+#  Custom Font Path [String]           		    #
+#                                                   #
+#  This is the path where GemRB looks for non-BAM   #
+#  fonts (ex TTF)                                   #
+#                                                   #
+#####################################################
+
+#CustomFontPath=
+
+#####################################################
 #  Game Data Path [String]                          #
 #                                                   #
 #  This is the subdirectory under GamePath where    #

@@ -207,6 +207,7 @@ Interface::Interface(int iargc, char* iargv[])
 	CachePath[0] = 0;
 	GemRBOverridePath[0] = 0;
 	GameName[0] = 0;
+	CustomFontPath[0] = 0;
 
 	strncpy( GameOverridePath, "override", sizeof(GameOverridePath) );
 	strncpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
@@ -1345,7 +1346,14 @@ int Interface::LoadSprites()
 		unsigned short font_size = 0;
 		FontStyle font_style = NORMAL;
 
-		font_name = ResRef;
+		if (CustomFontPath[0]) {
+			font_name = tab->QueryField( row, 4 );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
+			font_size = atoi( tab->QueryField( row, 5 ) );// not available in BAM fonts.
+			font_style = (FontStyle)atoi( tab->QueryField( row, 6 ) );// not available in BAM fonts.
+		}else{
+			font_name = ResRef;
+		}
+
 		// Do search for existing font here
 		Font* fnt = NULL;
 		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
@@ -1603,6 +1611,9 @@ int Interface::Init()
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	}
+
+	// Purposely add the font directory last since we will only ever need it at engine load time.
+	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
 	if (!LoadGemRBINI()) {
@@ -2334,6 +2345,7 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy(var, value, sizeof(var))
 		CONFIG_STRING("GameCharactersPath", GameCharactersPath);
 		CONFIG_STRING("GameDataPath", GameDataPath);
+		CONFIG_STRING("CustomFontPath", CustomFontPath);
 		CONFIG_STRING("GameName", GameName);
 		CONFIG_STRING("GameOverridePath", GameOverridePath);
 		CONFIG_STRING("GamePortraitsPath", GamePortraitsPath);
