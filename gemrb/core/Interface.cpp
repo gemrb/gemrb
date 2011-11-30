@@ -1374,9 +1374,18 @@ int Interface::LoadSprites()
 			continue;
 		} else {
 			Palette* pal = NULL;
-			if (needpalette) {
+			if (needpalette || (CustomFontPath[0] && strnicmp( font_name, ResRef, sizeof(ieResRef)-1) != 0 )) {//non-BAM fonts
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
+				if (CustomFontPath[0]) {
+					const char* colorString = tab->QueryField( i, 7 );
+					unsigned long combinedColor = strtoul(colorString, NULL, 16);
+					ieByte* color = (ieByte*)&combinedColor;
+					fore.r = *color++;
+					fore.g = *color++;
+					fore.b = *color++;
+					fore.a = *color++;
+				}
 				if (!strnicmp(TooltipFont, ResRef, sizeof(ieResRef)-1)) {
 					if (TooltipColor.a==0xff) {
 						fore = TooltipColor;
