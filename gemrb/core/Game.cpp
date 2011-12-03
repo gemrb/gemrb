@@ -1505,7 +1505,6 @@ void Game::RestParty(int checks, int dream, int hp)
 	}
 
 	//rest check, if PartyRested should be set, area should return true
-	//area should advance gametime too (so partial rest is possible)
 	int hours = 8;
 	if (!(checks&REST_NOAREA) ) {
 		//you cannot rest here
@@ -1520,11 +1519,13 @@ void Game::RestParty(int checks, int dream, int hp)
 			return;
 		}
 		//area encounters
+		// also advances gametime (so partial rest is possible)
 		if(area->Rest( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600) ) {
 			return;
 		}
+	} else {
+		AdvanceTime(hours*300*AI_UPDATE_TIME);
 	}
-	AdvanceTime(2400*AI_UPDATE_TIME);
 
 	int i = GetPartySize(true); // party size, only alive
 

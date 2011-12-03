@@ -2996,6 +2996,7 @@ least one creature is summoned, regardless the difficulty cap.
 bool Map::Rest(const Point &pos, int hours, int day)
 {
 	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
+		core->GetGame()->AdvanceTime(hours*300*AI_UPDATE_TIME);
 		return false;
 	}
 
@@ -3008,7 +3009,10 @@ bool Map::Rest(const Point &pos, int hours, int day)
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
 			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
-			if (!creature) continue;
+			if (!creature) {
+				core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);
+				continue;
+			}
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
 
@@ -3020,6 +3024,8 @@ bool Map::Rest(const Point &pos, int hours, int day)
 			}
 			return true;
 		}
+		// advance the time in hourly steps, so an interruption is timed properly
+		core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);
 	}
 	return false;
 }
