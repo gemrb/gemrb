@@ -2993,11 +2993,11 @@ current) is compared against (party level * rest header difficulty). If it's
 greater, the spawning is aborted. If all the other conditions are true, at
 least one creature is summoned, regardless the difficulty cap.
 */
-bool Map::Rest(const Point &pos, int hours, int day)
+int Map::Rest(const Point &pos, int hours, int day)
 {
 	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
 		core->GetGame()->AdvanceTime(hours*300*AI_UPDATE_TIME);
-		return false;
+		return 0;
 	}
 
 	//based on ingame timer
@@ -3022,12 +3022,12 @@ bool Map::Rest(const Point &pos, int hours, int day)
 				spawnamount -= cpl;
 				spawncount++;
 			}
-			return true;
+			return hours-i;
 		}
 		// advance the time in hourly steps, so an interruption is timed properly
 		core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);
 	}
-	return false;
+	return 0;
 }
 
 //--------explored bitmap-----------

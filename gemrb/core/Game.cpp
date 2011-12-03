@@ -1506,6 +1506,7 @@ void Game::RestParty(int checks, int dream, int hp)
 
 	//rest check, if PartyRested should be set, area should return true
 	int hours = 8;
+	int hoursLeft = 0;
 	if (!(checks&REST_NOAREA) ) {
 		//you cannot rest here
 		if (area->AreaFlags&1) {
@@ -1520,8 +1521,21 @@ void Game::RestParty(int checks, int dream, int hp)
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
-		if(area->Rest( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600) ) {
-			return;
+		hoursLeft = area->Rest( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600);
+		if (hoursLeft) {
+			// partial rest only, so adjust the parameters for the loop below
+			if (hp) {
+				hp = hp * (hours - hoursLeft) / hours;
+				// 0 means full heal, so we need to cancel it if we rounded to 0
+				if (!hp) {
+					hp = 1;
+				}
+			}
+			hours -= hoursLeft;
+			// the interruption occured before any resting could be done, so just bail out
+			if (!hours) {
+				return;
+			}
 		}
 	} else {
 		AdvanceTime(hours*300*AI_UPDATE_TIME);
@@ -1538,7 +1552,14 @@ void Game::RestParty(int checks, int dream, int hp)
 		tar->Heal(hp);
 		//removes fatigue, recharges spells
 		tar->Rest(hours);
-		tar->PartyRested();
+		if (hoursLeft) {
+			tar->PartyRested();
+		}
+	}
+
+	// abort the partial rest; we got what we wanted
+	if (hoursLeft) {
+		return;
 	}
 
 	//movie and cutscene dreams
