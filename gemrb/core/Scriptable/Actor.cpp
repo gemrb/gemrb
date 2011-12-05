@@ -2561,7 +2561,7 @@ void Actor::RefreshPCStats() {
 				}
 			} else {
 				// unproficient user - force defaultattacks
-				SetStat(IE_NUMBEROFATTACKS, defaultattacks, 0);
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks);
 			}
 		}
 	}
