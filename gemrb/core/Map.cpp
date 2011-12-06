@@ -2149,7 +2149,7 @@ void Map::DebugDump(bool show_actors) const
 		}
 		print( " %.8s", poi );
 	}
-	print( "Area Global ID:  %d\n", GetGlobalID());
+	print( "\nArea Global ID:  %d\n", GetGlobalID());
 	print( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
 	print( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
 	print( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
