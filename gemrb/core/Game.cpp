@@ -782,7 +782,7 @@ int Game::DelMap(unsigned int index, int forced)
 /* Loads an area */
 int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
-	unsigned int i;
+	unsigned int i, last;
 	Map *newMap;
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
@@ -822,9 +822,16 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 			newMap->AddActor( PCs[i] );
 		}
 	}
+	// count the number of replaced actors, so we don't need to recheck them
+	// if their max level is still lower than ours, each check would also result in a substitution
+	last = NPCs.size()-1;
 	for (i = 0; i < NPCs.size(); i++) {
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
-			(void)CheckForReplacementActor(i);
+			if (i < last && CheckForReplacementActor(i)) {
+				i--;
+				last--;
+				continue;
+			}
 			newMap->AddActor( NPCs[i] );
 		}
 	}
