@@ -2518,10 +2518,11 @@ void Actor::RefreshHP() {
 void Actor::RefreshPCStats() {
 	RefreshHP();
 
+	Game *game = core->GetGame();
 	//morale recovery every xth AI cycle
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec) {
-		if (!(core->GetGame()->GameTime%mrec)) {
+		if (!(game->GameTime%mrec)) {
 			NewBase(IE_MORALE,1,MOD_ADDITIVE);
 		}
 	}
@@ -2584,7 +2585,7 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
 
 	// add fatigue every 4 hours
-	if (!(core->GetGame()->GameTime % 18000)) {
+	if (!(game->GameTime % 18000)) {
 		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
 	}
 	if (core->ResolveStatBonus(this, "fatigue")) {
@@ -2595,7 +2596,7 @@ void Actor::RefreshPCStats() {
 
 	// regenerate actors with high enough constitution
 	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
-	if (rate && !(core->GetGame()->GameTime % (rate*AI_UPDATE_TIME))) {
+	if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
 		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 	}
 
