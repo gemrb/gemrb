@@ -865,7 +865,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+5);
 				sprintf(tmp, "%s %s : %s", msg, spell, target->GetName(-1));
 			} else {
-				tmp = (char *) malloc(strlen(msg)+strlen(spell)+4);
+				tmp = (char *) malloc(strlen(spell)+strlen(GetName(-1))+4);
 				sprintf(tmp, "%s : %s", spell, GetName(-1));
 			}
 			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
