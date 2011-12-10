@@ -39,6 +39,9 @@ static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
 IE_SEX, IE_ALIGNMENT };
 
+//high detail level by default
+static ieDword detail_level = 2;
+
 IniSpawn::IniSpawn(Map *owner)
 {
 	map = owner;
@@ -51,6 +54,7 @@ IniSpawn::IniSpawn(Map *owner)
 	eventspawns = NULL;
 	eventcount = 0;
 	last_spawndate = 0;
+	core->GetDictionary()->Lookup("Detail Level", detail_level);
 }
 
 IniSpawn::~IniSpawn()
@@ -150,29 +154,50 @@ int IniSpawn::GetDiffMode(const char *keyword)
 }
 
 //unimplemented tags:
-// check_crowd
+//*check_crowd
 // good_mod, law_mod, lady_mod, murder_mod
 // control_var
 // spec_area
 // death_faction
 // death_team
 // check_by_view_port
-// do_not_spawn
+//*do_not_spawn
 // time_of_day
 // hold_selected_point_key
 // inc_spawn_point_index
-// find_safest_point
+//*find_safest_point
 // exit
 // spawn_time_of_day
 // PST only
 // auto_buddy
-// detail_level
+//*detail_level
 void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter)
 {
 	const char *s;
 	int ps;
 	
 	memset(&critter,0,sizeof(critter));
+
+	if (inifile->GetKeyAsBool(crittername,"do_not_spawn",false)) {
+		//if the do not spawn flag is true, ignore this entry
+		return;
+	}
+
+	s = inifile->GetKeyAsString(crittername,"detail_level",NULL);
+	if (s) {
+		ieDword level;
+
+		switch(s[0]) {
+			case 'h': case 'H': level = 2; break;
+			case 'm': case 'M': level = 1; break;
+			default: level = 0; break;
+		}
+		//If the detail level is lower than this creature's detail level,
+		//skip this entry, creature_count is 0, so it will be ignored at evaluation of the spawn
+		if (level>detail_level) {
+			return;
+		}
+	}
 
 	//all specvars are using global, but sometimes it is explicitly given
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
