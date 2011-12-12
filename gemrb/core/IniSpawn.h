@@ -51,6 +51,13 @@ class Map;
 #define CF_SAFESTPOINT 128
 #define CF_NO_DIFF_MASK 28
 #define CF_CHECK_NAME 256
+#define CF_GOOD 512
+#define CF_LAW 1024
+#define CF_LADY 2048
+#define CF_MURDER 4096
+#define CF_FACTION 8192
+#define CF_TEAM 16384
+
 //spec ids flags
 #define AI_EA		0
 #define AI_FACTION	1
@@ -93,6 +100,8 @@ struct CritterEntry {
 	int Flags;                //CF_IGNORENOSEE, CF_DEATHVAR, etc
 	int TotalQuantity;        //total number
 	int SpawnCount;           //create quantity
+	ieDword TimeOfDay;        //spawn time of day (defaults to anytime)
+	ieByte DeathCounters[4];  //4 bytes
 };
 
 /**
@@ -148,14 +157,15 @@ private:
 	SpawnEntry *eventspawns;
 
 	void ReadCreature(DataFileMgr *inifile,
-		const char *crittername, CritterEntry &critter);
+		const char *crittername, CritterEntry &critter) const;
 	void ReadSpawnEntry(DataFileMgr *inifile,
-		const char *entryname, SpawnEntry &entry);
+		const char *entryname, SpawnEntry &entry) const;
 	//spawns a single creature
-	void SpawnCreature(CritterEntry &critter);
+	void SpawnCreature(CritterEntry &critter) const;
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
-	int GetDiffMode(const char *keyword);
+	int GetDiffMode(const char *keyword) const;
+	bool Schedule(ieDword appearance, ieDword gametime) const;
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ieResRef area, Point &pos, ieDword state);

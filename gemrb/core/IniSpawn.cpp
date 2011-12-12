@@ -140,7 +140,7 @@ static inline void GetElements(const char *s, ieVariable *storage, int count)
 // BINARY_MORE 10          //left has more bits than right
 // BINARY_LESS 11          //left has less bits than right
 
-int IniSpawn::GetDiffMode(const char *keyword)
+int IniSpawn::GetDiffMode(const char *keyword) const
 {
 	if (!keyword) return NO_OPERATION; //-1
 	if (keyword[0]==0) return NO_OPERATION; //-1
@@ -153,30 +153,32 @@ int IniSpawn::GetDiffMode(const char *keyword)
 	return NO_OPERATION;
 }
 
-//unimplemented tags:
+//unimplemented tags (* marks partially implemented):
 //*check_crowd
-// good_mod, law_mod, lady_mod, murder_mod
+//*good_mod, law_mod, lady_mod, murder_mod
 // control_var
 // spec_area
-// death_faction
-// death_team
+//*death_faction
+//*death_team
 // check_by_view_port
 //*do_not_spawn
-// time_of_day
+//*time_of_day
 // hold_selected_point_key
 // inc_spawn_point_index
 //*find_safest_point
 // exit
 // spawn_time_of_day
 // PST only
-// auto_buddy
+//*auto_buddy
 //*detail_level
-void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter)
+void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
 {
 	const char *s;
 	int ps;
 	
 	memset(&critter,0,sizeof(critter));
+
+	critter.TimeOfDay = (ieDword) inifile->GetKeyAsInt(crittername,"time_of_day", 0xffffffff);
 
 	if (inifile->GetKeyAsBool(crittername,"do_not_spawn",false)) {
 		//if the do not spawn flag is true, ignore this entry
@@ -427,6 +429,32 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (inifile->GetKeyAsBool(crittername,"death_scriptname",false)) {
 		critter.Flags|=CF_DEATHVAR;
 	}
+	if (inifile->GetKeyAsBool(crittername,"death_faction",false)) {
+		critter.Flags|=CF_FACTION;
+	}
+	if (inifile->GetKeyAsBool(crittername,"death_team",false)) {
+		critter.Flags|=CF_TEAM;
+	}
+	ps = inifile->GetKeyAsInt(crittername,"mod_good",0);
+	if (ps) {
+		critter.Flags|=CF_GOOD;
+		critter.DeathCounters[DC_GOOD] = ps;
+	}
+	ps = inifile->GetKeyAsBool(crittername,"mod_law",0);
+	if (ps) {
+		critter.Flags|=CF_LAW;
+		critter.DeathCounters[DC_LAW] = ps;
+	}
+	ps = inifile->GetKeyAsBool(crittername,"mod_lady",0);
+	if (ps) {
+		critter.Flags|=CF_LADY;
+		critter.DeathCounters[DC_LADY] = ps;
+	}
+	ps = inifile->GetKeyAsBool(crittername,"mod_murder",0);
+	if (ps) {
+		critter.Flags|=CF_MURDER;
+		critter.DeathCounters[DC_MURDER] = ps;
+	}
 	//don't spawn when spawnpoint is visible
 	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
 		critter.Flags|=CF_IGNORECANSEE;
@@ -455,7 +483,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	}
 }
 
-void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, SpawnEntry &entry)
+void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
 {
 	const char *s;
 	
@@ -475,7 +503,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 }
 
 /* set by action */
-void IniSpawn::SetNamelessDeath(const ieResRef area, Point &pos, ieDword state)
+void IniSpawn::SetNamelessDeath(const ieResRef area, Point &pos, ieDword state) 
 {
 	strnuprcpy(NamelessSpawnArea, area, 8);
 	NamelessSpawnPoint = pos;
@@ -578,7 +606,7 @@ void IniSpawn::RespawnNameless()
 	}
 }
 
-void IniSpawn::SpawnCreature(CritterEntry &critter)
+void IniSpawn::SpawnCreature(CritterEntry &critter) const
 {
 	if (!critter.creaturecount) {
 		return;
@@ -676,6 +704,32 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	if (critter.ScriptName[0]) {
 		cre->SetScriptName(critter.ScriptName);
 	}
+	if (critter.Flags&CF_DEATHVAR) {
+		cre->AppearanceFlags|=APP_DEATHVAR;
+	}
+	if (critter.Flags&CF_FACTION) {
+		cre->AppearanceFlags|=APP_FACTION;
+	}
+	if (critter.Flags&CF_TEAM) {
+		cre->AppearanceFlags|=APP_TEAM;
+	}
+	if (critter.Flags&CF_GOOD) {
+		cre->DeathCounters[DC_GOOD] = critter.DeathCounters[DC_GOOD];
+		cre->AppearanceFlags|=APP_GOOD;
+	}
+	if (critter.Flags&CF_LAW) {
+		cre->DeathCounters[DC_LAW] = critter.DeathCounters[DC_LAW];
+		cre->AppearanceFlags|=APP_LAW;
+	}
+	if (critter.Flags&CF_LADY) {
+		cre->DeathCounters[DC_LADY] = critter.DeathCounters[DC_LADY];
+		cre->AppearanceFlags|=APP_LADY;
+	}
+	if (critter.Flags&CF_MURDER) {
+		cre->DeathCounters[DC_MURDER] = critter.DeathCounters[DC_MURDER];
+		cre->AppearanceFlags|=APP_MURDER;
+	}
+
 	if (critter.OverrideScript[0]) {
 		cre->SetScript(critter.OverrideScript, SCR_OVERRIDE);
 	}
@@ -702,6 +756,15 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	}
 }
 
+bool IniSpawn::Schedule(ieDword appearance, ieDword gametime) const
+{
+        ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
+        if (appearance & bit) {
+                return true;
+        }
+	return false;
+}
+
 void IniSpawn::SpawnGroup(SpawnEntry &event)
 {
 	if (!event.critters) {
@@ -717,6 +780,9 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 	
 	for(int i=0;i<event.crittercount;i++) {
 		CritterEntry* critter = event.critters+i;
+		if (!Schedule(critter->TimeOfDay, last_spawndate) ) {
+			continue;
+		}
 		for(int j=0;j<critter->SpawnCount;j++) {
 			SpawnCreature(*critter);
 		}
@@ -740,3 +806,4 @@ void IniSpawn::CheckSpawn()
 		SpawnGroup(eventspawns[i]);
 	}
 }
+
