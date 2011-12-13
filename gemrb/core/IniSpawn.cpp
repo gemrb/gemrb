@@ -39,9 +39,6 @@ static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
 IE_SEX, IE_ALIGNMENT };
 
-//high detail level by default
-static ieDword detail_level = 2;
-
 IniSpawn::IniSpawn(Map *owner)
 {
 	map = owner;
@@ -54,6 +51,8 @@ IniSpawn::IniSpawn(Map *owner)
 	eventspawns = NULL;
 	eventcount = 0;
 	last_spawndate = 0;
+	//high detail level by default
+	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
 }
 
@@ -61,6 +60,17 @@ IniSpawn::~IniSpawn()
 {
 	if (eventspawns) {
 		delete[] eventspawns;
+		eventspawns = NULL;
+	}
+
+	if (Locals) {
+		delete[] Locals;
+		Locals = NULL;
+	}
+
+	if (NamelessVar) {
+		delete[] NamelessVar;
+		NamelessVar = NULL;
 	}
 }
 
@@ -166,8 +176,8 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 // hold_selected_point_key
 // inc_spawn_point_index
 //*find_safest_point
-// exit
 // spawn_time_of_day
+// exit - similar to enter[spawn], this is a spawn branch type (on exiting an area?)
 // PST only
 //*auto_buddy
 //*detail_level
@@ -435,26 +445,30 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (inifile->GetKeyAsBool(crittername,"death_team",false)) {
 		critter.Flags|=CF_TEAM;
 	}
-	ps = inifile->GetKeyAsInt(crittername,"mod_good",0);
+	ps = inifile->GetKeyAsInt(crittername,"good_mod",0);
 	if (ps) {
 		critter.Flags|=CF_GOOD;
 		critter.DeathCounters[DC_GOOD] = ps;
 	}
-	ps = inifile->GetKeyAsBool(crittername,"mod_law",0);
+	ps = inifile->GetKeyAsInt(crittername,"law_mod",0);
 	if (ps) {
 		critter.Flags|=CF_LAW;
 		critter.DeathCounters[DC_LAW] = ps;
 	}
-	ps = inifile->GetKeyAsBool(crittername,"mod_lady",0);
+	ps = inifile->GetKeyAsInt(crittername,"lady_mod",0);
 	if (ps) {
 		critter.Flags|=CF_LADY;
 		critter.DeathCounters[DC_LADY] = ps;
 	}
-	ps = inifile->GetKeyAsBool(crittername,"mod_murder",0);
+	ps = inifile->GetKeyAsInt(crittername,"murder_mod",0);
 	if (ps) {
 		critter.Flags|=CF_MURDER;
 		critter.DeathCounters[DC_MURDER] = ps;
 	}
+	if(inifile->GetKeyAsBool(crittername,"auto_buddy", false)) {
+		critter.Flags|=CF_BUDDY;
+	}
+
 	//don't spawn when spawnpoint is visible
 	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
 		critter.Flags|=CF_IGNORECANSEE;
@@ -558,6 +572,12 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	if (s) {
 		ReadSpawnEntry(inifile.get(), s, enterspawn);
 	}
+
+	s = inifile->GetKeyAsString("spawn_main","exit",NULL);
+	if (s) {
+		ReadSpawnEntry(inifile.get(), s, exitspawn);
+	}
+
 	s = inifile->GetKeyAsString("spawn_main","events",NULL);
 	if (s) {
 		eventcount = CountElements(s,',');
@@ -704,30 +724,41 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 	if (critter.ScriptName[0]) {
 		cre->SetScriptName(critter.ScriptName);
 	}
+	//increases death variable
 	if (critter.Flags&CF_DEATHVAR) {
 		cre->AppearanceFlags|=APP_DEATHVAR;
 	}
+	//increases faction specific variable
 	if (critter.Flags&CF_FACTION) {
 		cre->AppearanceFlags|=APP_FACTION;
 	}
+	//increases team specific variable
 	if (critter.Flags&CF_TEAM) {
 		cre->AppearanceFlags|=APP_TEAM;
 	}
+	//increases good variable
 	if (critter.Flags&CF_GOOD) {
 		cre->DeathCounters[DC_GOOD] = critter.DeathCounters[DC_GOOD];
 		cre->AppearanceFlags|=APP_GOOD;
 	}
+	//increases law variable
 	if (critter.Flags&CF_LAW) {
 		cre->DeathCounters[DC_LAW] = critter.DeathCounters[DC_LAW];
 		cre->AppearanceFlags|=APP_LAW;
 	}
+	//increases lady variable
 	if (critter.Flags&CF_LADY) {
 		cre->DeathCounters[DC_LADY] = critter.DeathCounters[DC_LADY];
 		cre->AppearanceFlags|=APP_LADY;
 	}
+	//increases murder variable
 	if (critter.Flags&CF_MURDER) {
 		cre->DeathCounters[DC_MURDER] = critter.DeathCounters[DC_MURDER];
 		cre->AppearanceFlags|=APP_MURDER;
+	}
+	//triggers help from same group
+	if (critter.Flags&CF_BUDDY) {
+		cre->AppearanceFlags|=APP_BUDDY;
 	}
 
 	if (critter.OverrideScript[0]) {
@@ -797,6 +828,12 @@ void IniSpawn::InitialSpawn()
 	for (int i=0;i<localscount;i++) {
 		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
 	}
+}
+
+//FIXME:call this at the right time (this feature is not explored yet, and unused in original dataset)
+void IniSpawn::ExitSpawn()
+{
+	SpawnGroup(exitspawn);
 }
 
 //checks if a respawn event occurred

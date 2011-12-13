@@ -57,6 +57,7 @@ class Map;
 #define CF_MURDER 4096
 #define CF_FACTION 8192
 #define CF_TEAM 16384
+#define CF_BUDDY 0x8000
 
 //spec ids flags
 #define AI_EA		0
@@ -152,9 +153,11 @@ private:
 	Point NamelessSpawnPoint;
 	int NamelessState;
 	SpawnEntry enterspawn;
+	SpawnEntry exitspawn;
 	int last_spawndate;
 	int eventcount;
 	SpawnEntry *eventspawns;
+	ieDword detail_level;
 
 	void ReadCreature(DataFileMgr *inifile,
 		const char *crittername, CritterEntry &critter) const;
@@ -172,6 +175,7 @@ public:
 	void InitSpawn(const ieResRef DefaultArea);
 	void RespawnNameless();
 	void InitialSpawn();
+	void ExitSpawn();
 	void CheckSpawn();
 };
 
