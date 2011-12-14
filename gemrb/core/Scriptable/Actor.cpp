@@ -3398,10 +3398,12 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 void Actor::DumpMaxValues()
 {
 	int symbol = core->LoadSymbol( "stats" );
-	SymbolMgr *sym = core->GetSymbol( symbol );
+	if (symbol !=-1) {
+		SymbolMgr *sym = core->GetSymbol( symbol );
 
-	for(int i=0;i<MAX_STATS;i++) {
-		print("%d (%s) %d\n", i, sym->GetValue(i), maximum_values[i]);
+		for(int i=0;i<MAX_STATS;i++) {
+			print("%d (%s) %d\n", i, sym->GetValue(i), maximum_values[i]);
+		}
 	}
 }
 #endif
@@ -3766,6 +3768,16 @@ static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
 static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
 static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 
+const char *GetVarName(const char *table, int value)
+{
+	int symbol = core->LoadSymbol( table );
+	if (symbol!=-1) {
+		Holder<SymbolMgr> sym = core->GetSymbol( symbol );
+		return sym->GetValue( value );
+	}
+	return NULL;
+}
+
 void Actor::Die(Scriptable *killer)
 {
 	int i,j;
@@ -3897,6 +3909,24 @@ void Actor::Die(Scriptable *killer)
 			game->locals->SetAt(KillVar, 1, nocreate);
 		}
 	}
+
+	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_FACTION) ) {
+		value = 0;
+		const char *varname = GetVarName("faction", BaseStats[IE_FACTION]);
+		if (varname && varname[0]) {
+			game->kaputz->Lookup(varname, value);
+			game->kaputz->SetAt(varname, value+1, nocreate);
+		}
+	}
+	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_TEAM) ) {
+		value = 0;
+		const char *varname = GetVarName("team", BaseStats[IE_TEAM]);
+		if (varname && varname[0]) {
+			game->kaputz->Lookup(varname, value);
+			game->kaputz->SetAt(varname, value+1, nocreate);
+		}
+	}
+
 	if (IncKillVar[0]) {
 		value = 0;
 		game->locals->Lookup(IncKillVar, value);

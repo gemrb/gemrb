@@ -163,7 +163,7 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	return NO_OPERATION;
 }
 
-//unimplemented tags (* marks partially implemented):
+//unimplemented tags (* marks partially implemented, # marks not working in original either):
 //*check_crowd
 //*good_mod, law_mod, lady_mod, murder_mod
 // control_var
@@ -176,7 +176,7 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 // hold_selected_point_key
 // inc_spawn_point_index
 //*find_safest_point
-// spawn_time_of_day
+//#spawn_time_of_day
 // exit - similar to enter[spawn], this is a spawn branch type (on exiting an area?)
 // PST only
 //*auto_buddy
