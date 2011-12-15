@@ -484,9 +484,9 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	if (!ae)
 		return;
 	//we are here, so we visited and it is visible too (i guess)
-	print("Updated Area visibility: %s (visited, and visible)\n", AreaName);
+	print("Updated Area visibility: %s (visited, accessible and visible)\n", AreaName);
 
-	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE, BM_OR);
+	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BM_OR);
 	if (direction<0 || direction>3)
 		return;
 	i=ae->AreaLinksCount[direction];
