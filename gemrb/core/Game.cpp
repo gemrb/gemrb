@@ -858,7 +858,7 @@ bool Game::CheckForReplacementActor(int i) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<const char *> >::iterator it;
 		for (it = npclevels.begin(); it != npclevels.end(); it++) {
-			if (!stricmp((*it)[0], act->GetScriptName())) {
+			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
 				strncpy(newcre, (*it)[level-2], sizeof(ieResRef));
 				break;
 			}
