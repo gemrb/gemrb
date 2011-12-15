@@ -7414,6 +7414,8 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags|=IF_USEEXIT;
 	} else {
 		InternalFlags&=~IF_USEEXIT;
+		UsedExit = LastExit;
+		memcpy(LastArea, Area, 8);
 	}
 	LastExit = exitID;
 }

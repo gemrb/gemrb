@@ -1,0 +1,128 @@
+IF
+  !Faction(Protagonist,ANARCHIST)
+  Global("JOIN_ANARCHISTS","GLOBAL",1)
+THEN
+  RESPONSE #100
+    ChangeFaction(Protagonist,ANARCHIST)
+END
+
+IF
+  !Faction(Protagonist,SENSATE)
+  Global("JOIN_SENSATES","GLOBAL",1)
+  !Global("JOIN_ANARCHISTS","GLOBAL",1)
+THEN
+  RESPONSE #100
+    ChangeFaction(Protagonist,SENSATE)
+END
+
+IF
+  !Faction(Protagonist,DUSTMEN)
+  Global("JOIN_DUSTMEN","GLOBAL",1)
+  !Global("JOIN_ANARCHISTS","GLOBAL",1)
+THEN
+  RESPONSE #100
+    ChangeFaction(Protagonist,DUSTMEN)
+END
+
+IF
+  !Faction(Protagonist,GODSMAN)
+  Global("JOIN_GODSMEN","GLOBAL",6)
+  !Global("JOIN_ANARCHISTS","GLOBAL",1)
+THEN
+  RESPONSE #100
+    ChangeFaction(Protagonist,GODSMAN)
+END
+
+IF
+  !Faction(Protagonist,XAOSITECT)
+  Global("JOIN_CHAOSMEN","GLOBAL",1)
+  !Global("JOIN_ANARCHISTS","GLOBAL",1)
+THEN
+  RESPONSE #100
+    ChangeFaction(Protagonist,XAOSITECT)
+END
+
+IF
+  Global("game_over","GLOBAL",1)
+THEN
+  RESPONSE #100
+    SetGlobal("game_over","GLOBAL",0)
+    QuitGame(0,0,44963)
+END
+
+IF
+  Global("game_over","GLOBAL",2)
+THEN
+  RESPONSE #100
+    SetGlobal("game_over","GLOBAL",0)
+    QuitGame(0,0,48153)
+END
+
+IF
+  Global("game_over","GLOBAL",3)
+THEN
+  RESPONSE #100
+    SetGlobal("game_over","GLOBAL",0)
+    QuitGame(0,0,48154)
+END
+
+IF
+  Global("game_over","GLOBAL",4)
+THEN
+  RESPONSE #100
+    SetGlobal("game_over","GLOBAL",0)
+    QuitGame(0,0,48155)
+END
+
+IF
+  Global("game_over","GLOBAL",5)
+THEN
+  RESPONSE #100
+    SetGlobal("game_over","GLOBAL",0)
+    QuitGame(0,0,41656)
+END
+
+IF
+  Global("game_over","GLOBAL",6)
+THEN
+  RESPONSE #100
+    SetGlobal("game_over","GLOBAL",0)
+    QuitGame(0,0,67295)
+END
+
+IF
+  Global("AR0200_Visited","GLOBAL",1)
+  Global("Played_Shadow_Movie","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("Played_Shadow_Movie","GLOBAL",1)
+    StartMovie("SS_MSLAB")
+END
+
+IF
+  Global("AR0206_Visited","GLOBAL",1)
+  Global("Played_Shadow_Movie","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("Played_Shadow_Movie","GLOBAL",1)
+    StartMovie("SS_MSLAB")
+END
+
+IF
+  Global("AR0200_Visited","GLOBAL",1)
+  Global("Played_Sigil_Movie","GLOBAL",0)
+THEN
+  RESPONSE #100
+    SetGlobal("Played_Sigil_Movie","GLOBAL",1)
+    StartMovie("SIGIL")
+END
+
+if
+ UsedExit("sigil", Protagonist)
+ GlobalGT("lady","GLOBAL",49)
+ Global("ar1900_visited","GLOBAL",0)
+then
+response #100
+//KickEveryone()
+//MoveToArea("ar1900", Protagonist)
+end

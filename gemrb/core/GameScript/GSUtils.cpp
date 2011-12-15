@@ -51,6 +51,7 @@
 //these tables will get freed by Core
 Holder<SymbolMgr> triggersTable;
 Holder<SymbolMgr> actionsTable;
+Holder<SymbolMgr> overrideTriggersTable;
 Holder<SymbolMgr> overrideActionsTable;
 Holder<SymbolMgr> objectsTable;
 TriggerFunction triggers[MAX_TRIGGERS];

@@ -1,0 +1,20 @@
+2DA V1.0
+0
+	AREA		REGION
+1    AR0100    to0101
+2    AR0100    to0200
+3    AR0100    to0300
+4    AR0101    to0100
+5    AR0200    to0100
+6    AR0200    to0301
+7    AR0200    to0400
+8    AR0300    to0100
+9    AR0300    to0301
+a    AR0300    to0400
+b    AR0301    to0200
+c    AR0301    to0300
+d    AR0400    to0200
+e    AR0400    to0300
+f    AR0500    to0600
+g    AR0500    to0405
+h    AR0600    to0500

@@ -282,6 +282,8 @@ public:
 	int PathTries; //the # of previous tries to pick up a new walkpath
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
+	ieDword UsedExit;
+	ieResRef LastArea;
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];

@@ -37,6 +37,7 @@
 
 extern Holder<SymbolMgr> triggersTable;
 extern Holder<SymbolMgr> actionsTable;
+extern Holder<SymbolMgr> overrideTriggersTable;
 extern Holder<SymbolMgr> overrideActionsTable;
 extern Holder<SymbolMgr> objectsTable;
 extern TriggerFunction triggers[MAX_TRIGGERS];
