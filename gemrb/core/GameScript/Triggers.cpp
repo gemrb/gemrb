@@ -4051,7 +4051,7 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(ip->GetScriptName(), exit, 8) ) {
+		if (strnicmp(ip->GetScriptName(), exit, 32) ) {
 			continue;
 		}
 		return 1;

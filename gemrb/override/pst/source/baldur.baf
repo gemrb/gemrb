@@ -46,7 +46,7 @@ IF
   Global("game_over","GLOBAL",1)
 THEN
   RESPONSE #100
-    SetGlobal("game_over","GLOBAL",0)
+    GlobalSet("game_over","GLOBAL",0)
     QuitGame(0,0,44963)
 END
 
@@ -54,7 +54,7 @@ IF
   Global("game_over","GLOBAL",2)
 THEN
   RESPONSE #100
-    SetGlobal("game_over","GLOBAL",0)
+    GlobalSet("game_over","GLOBAL",0)
     QuitGame(0,0,48153)
 END
 
@@ -62,7 +62,7 @@ IF
   Global("game_over","GLOBAL",3)
 THEN
   RESPONSE #100
-    SetGlobal("game_over","GLOBAL",0)
+    GlobalSet("game_over","GLOBAL",0)
     QuitGame(0,0,48154)
 END
 
@@ -70,7 +70,7 @@ IF
   Global("game_over","GLOBAL",4)
 THEN
   RESPONSE #100
-    SetGlobal("game_over","GLOBAL",0)
+    GlobalSet("game_over","GLOBAL",0)
     QuitGame(0,0,48155)
 END
 
@@ -78,7 +78,7 @@ IF
   Global("game_over","GLOBAL",5)
 THEN
   RESPONSE #100
-    SetGlobal("game_over","GLOBAL",0)
+    GlobalSet("game_over","GLOBAL",0)
     QuitGame(0,0,41656)
 END
 
@@ -86,7 +86,7 @@ IF
   Global("game_over","GLOBAL",6)
 THEN
   RESPONSE #100
-    SetGlobal("game_over","GLOBAL",0)
+    GlobalSet("game_over","GLOBAL",0)
     QuitGame(0,0,67295)
 END
 
@@ -95,7 +95,7 @@ IF
   Global("Played_Shadow_Movie","GLOBAL",0)
 THEN
   RESPONSE #100
-    SetGlobal("Played_Shadow_Movie","GLOBAL",1)
+    GlobalSet("Played_Shadow_Movie","GLOBAL",1)
     StartMovie("SS_MSLAB")
 END
 
@@ -104,7 +104,7 @@ IF
   Global("Played_Shadow_Movie","GLOBAL",0)
 THEN
   RESPONSE #100
-    SetGlobal("Played_Shadow_Movie","GLOBAL",1)
+    GlobalSet("Played_Shadow_Movie","GLOBAL",1)
     StartMovie("SS_MSLAB")
 END
 
@@ -113,16 +113,23 @@ IF
   Global("Played_Sigil_Movie","GLOBAL",0)
 THEN
   RESPONSE #100
-    SetGlobal("Played_Sigil_Movie","GLOBAL",1)
+    GlobalSet("Played_Sigil_Movie","GLOBAL",1)
     StartMovie("SIGIL")
 END
 
-if
- UsedExit("sigil", Protagonist)
- GlobalGT("lady","GLOBAL",49)
- Global("ar1900_visited","GLOBAL",0)
-then
-response #100
-//KickEveryone()
-//MoveToArea("ar1900", Protagonist)
-end
+IF
+  GlobalGT("lady","GLOBAL",49)
+  Global("ar1900_visited","GLOBAL",0)
+  UsedExit("sigil",Protagonist)
+THEN
+  RESPONSE #100
+    ActionOverride(Player6,LeaveParty())
+    ActionOverride(Player5,LeaveParty())
+    ActionOverride(Player4,LeaveParty())
+    ActionOverride(Player3,LeaveParty())
+    ActionOverride(Player2,LeaveParty())
+    //should be the position of mazeentr in ar1900
+    TeleportParty("ar1900",[2559.1895],0)
+END
+
+
