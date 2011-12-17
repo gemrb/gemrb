@@ -858,7 +858,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			}
 		}
 		char* spell = core->GetString(spl->SpellName);
-		if (stricmp(spell, "")) {
+		if (stricmp(spell, "") && Type == ST_ACTOR) {
 			char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 			char *tmp;
 			if (target) {
