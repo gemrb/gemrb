@@ -121,8 +121,10 @@ IF
   GlobalGT("lady","GLOBAL",49)
   Global("ar1900_visited","GLOBAL",0)
   UsedExit("sigil",Protagonist)
+  !CreatureInArea("ar1900")
 THEN
   RESPONSE #100
+    ClearAllActions()
     ActionOverride(Player6,LeaveParty())
     ActionOverride(Player5,LeaveParty())
     ActionOverride(Player4,LeaveParty())
@@ -130,6 +132,26 @@ THEN
     ActionOverride(Player2,LeaveParty())
     //should be the position of mazeentr in ar1900
     TeleportParty("ar1900",[2559.1895],0)
+END
+
+IF
+  Global("sabotage","GLOBAL",5)
+  CreatureInArea("ar0512")
+  UsedExit("foundry",[PC])
+THEN
+  RESPONSE #100
+    ClearAllActions()
+    TeleportParty("ar0513",[1078.892],0)
+END
+
+IF
+  Global("sabotage","GLOBAL",7)
+  CreatureInArea("ar0512")
+  UsedExit("foundry",[PC])
+THEN
+  RESPONSE #100
+    ClearAllActions()
+    TeleportParty("ar0513",[1078.892],0)
 END
 
 
