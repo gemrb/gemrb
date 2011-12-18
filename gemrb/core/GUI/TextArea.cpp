@@ -265,7 +265,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		ftext->PrintFromLine( sr, clip,
 			( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
-		yl = ftext->getInfo(1).size.h * (lrows[i]-sr);
+		yl = ftext->maxHeight * (lrows[i]-sr);
 		clip.y+=yl;
 		clip.h-=yl;
 		break;
@@ -280,7 +280,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = palette;
 		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, true );
-		yl = ftext->getInfo(1).size.h * lrows[i];
+		yl = ftext->maxHeight * lrows[i];
 		clip.y+=yl;
 		clip.h-=yl;
 

@@ -432,7 +432,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 				ystep = height;
 		}
 	} else {
-		ystep = getInfo(1).size.h;
+		ystep = maxHeight;
 	}
 	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;

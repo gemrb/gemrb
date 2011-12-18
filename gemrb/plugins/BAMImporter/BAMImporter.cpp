@@ -305,9 +305,7 @@ Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 			FirstChar = '0';
 			LastChar = '9';
 		}else{
-			//something else. dont know what.
-			FirstChar = 0;
-			LastChar = Count - 1;
+			error("BAMImporter", "Tried to create a font from incompatible BAM:%s", str->filename);
 		}
 		limit = glyphCount - 1;
 	}

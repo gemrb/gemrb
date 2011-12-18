@@ -14,9 +14,8 @@ NORMAL
 10	STONESM2	0				33			255			STONESM2	14			1		0xffffffff
 11	TOOLTIP		1				33			255			TOOLTIP		14			0		0xffffffff
 12	STONSML		0				33			255			STONSML		14			1		0xffffffff
-13	GAMETEXT	0				0			0			GAMETEXT	14			0		0xffffffff
 # state "fonts" are the status icons. You probably don't want to edit these.
-14	STATES  	0				1			255			STATES		14			0		0xffffffff
-15	STATES2 	0				1			255			STATES2		14			0		0xffffffff
+13	STATES  	0				1			255			STATES		14			0		0xffffffff
+14	STATES2 	0				1			255			STATES2		14			0		0xffffffff
 
 # Customization How To: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
