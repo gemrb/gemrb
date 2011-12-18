@@ -2086,14 +2086,48 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 	AddVVCell(sca);
 }
 
+//Returns the personal critical damage type in a binary compatible form (PST)
+//TODO: may want to preload the crits table to avoid spam in the log
+int Actor::GetCriticalType() const
+{
+	long ret = 0;
+	AutoTable tm("crits");
+	if (!tm) return 0;
+	//the ID of this PC (first 2 rows are empty)
+	int row = BaseStats[IE_SPECIFIC];
+	//defaults to 0
+	valid_number(tm->QueryField(row, 1), ret);
+	return (int) ret;
+}
+
+//Plays personal critical damage animation for PST PC's melee attacks
+void Actor::PlayCritDamageAnimation(int type)
+{
+	AutoTable tm("crits");
+	if (!tm) return;
+	//the ID's are in column 1, selected by specifics by GetCriticalType
+	int row = tm->FindTableValue (1, type);
+	if (row>=0) {
+		//the animations are listed in column 0
+		AddAnimation(tm->QueryField(row, 0), -1, 0, AA_PLAYONCE);
+	}
+}
+
 void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	int i;
 
 	print("Damage animation type: %d\n", type);
 
-	switch(type) {
-		case 0: case 1: case 2: case 3: //blood
+	switch(type&255) {
+		case 0:
+			//PST specific personal criticals
+			if (type&0xff00) {
+				PlayCritDamageAnimation(type>>8);
+				break;
+			}
+			//fall through
+		case 1: case 2: case 3: //blood
 			i = anims->GetBloodColor();
 			if (!i) i = d_gradient[type];
 			if(hit) {
@@ -3129,7 +3163,7 @@ bool Actor::AttackIsStunning(int damagetype) const {
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
 
 //returns actual damage
-int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
+int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical)
 {
 	//won't get any more hurt
 	if (InternalFlags & IF_REALLYDIED) {
@@ -3236,7 +3270,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		PlayDamageAnimation(DL_DISINTEGRATE+damagelevel);
 	} else {
 		if (chp<-10) {
-			PlayDamageAnimation(DL_CRITICAL);
+			PlayDamageAnimation(critical<<8);
 		} else {
 			PlayDamageAnimation(DL_BLOOD+damagelevel);
 		}
@@ -6686,6 +6720,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
 			AttackEffect->Parameter3 = 1;
+			AttackEffect->IsVariable = GetCriticalType();
 			pro->GetEffects()->AddEffect(AttackEffect, true);
 			if (ranged)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);

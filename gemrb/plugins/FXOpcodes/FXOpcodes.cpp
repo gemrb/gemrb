@@ -1255,7 +1255,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	target->Damage(fx->Parameter1, damagetype, caster, modtype);
+	target->Damage(fx->Parameter1, damagetype, caster, modtype, fx->IsVariable);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
@@ -4422,6 +4422,7 @@ int fx_damage_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_damage_animation (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	//Parameter1 is a gemrb extension
+	//Parameter2's high byte has effect on critical damage animations (PST compatibility hack)
 	target->PlayDamageAnimation(fx->Parameter2, !fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
