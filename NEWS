@@ -1,14 +1,16 @@
-GemRB git (c431e8859):
+GemRB git (49da55199a):
   New features:
     - 
+    - custom TTF fonts support
+    - more pst spawn ini flags, individual critical hit animations
     - arbitrarily sortable casting list
     - always center, always run for pst
 
   Improved features:
     - 
-    - resting
-    - drop caps, keybindings, action bar, ios input
-    - bugfixes
+    - resting, comment timing
+    - drop caps, keybindings, action bar, sdl 1.3 input
+    - bugfixes, cleanups
 
   Applied patches:
 
