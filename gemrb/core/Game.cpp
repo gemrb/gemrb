@@ -1798,17 +1798,19 @@ void Game::StartRainOrSnow(bool conditional, int w)
 
 void Game::SetExpansion(ieDword value)
 {
-	if (Expansion>=value) {
-		return;
+	if (value) {
+		if (Expansion>=value) {
+			return;
+		}
+		Expansion = value;
 	}
-	Expansion = value;
 
-	switch(Expansion) {
+	core->SetEventFlag(EF_EXPANSION);
+	switch(value) {
 	default:
-		core->SetEventFlag(EF_EXPANSION);
 		break;
 	//TODO: move this hardcoded hack to the scripts
-	case 5:
+	case 0:
 		core->GetDictionary()->SetAt( "PlayMode", 2 );
 
 		int i = GetPartySize(false);

@@ -111,8 +111,8 @@ def OnLoad():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	if GUICommon.GameIsTOB():
-		# add the starting inventory for tob
-		GiveEquipment(MyChar, ClassName, KitIndex)
+		# will also add the starting inventory for tob
+		GemRB.GameSetExpansion (4)
 		# no torture, let's refresh all the spells, at least for sorcerers
 		# TODO: autopick memorisations for mages? Did they have a memorisation choice step like in bg1?
 		GemRB.ChargeSpells (MyChar)

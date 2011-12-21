@@ -566,9 +566,6 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
 
-	if (!parameters->int0Parameter) {
-		parameters->int0Parameter = 5;
-	}
 	game->SetExpansion(parameters->int0Parameter);
 	Sender->ReleaseCurrentAction();
 }

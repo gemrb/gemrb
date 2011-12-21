@@ -189,7 +189,18 @@ def FixProtagonist( idx):
 	ClassIndex = CommonTables.Classes.FindValue (5, Class)
 	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
 	KitIndex = GUICommon.GetKitIndex (idx)
-	GiveEquipment(idx, ClassName, KitIndex)
+	# only give a few items for transitions from soa
+	if GemRB.GetVar("oldgame"):
+		# give the Amulet of Seldarine to the pc's first empty inventory slot
+		invslot = GemRB.GetSlots (idx, -1, -1)[0]
+		GemRB.CreateItem(idx, "AMUL27", invslot, 1, 0, 0)
+		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+		# TODO: give bag19/bag19a (.../19e?) based on the experience
+		invslot = GemRB.GetSlots (idx, -1, -1)[0]
+		GemRB.CreateItem(idx, "BAG19A", invslot, 1, 0, 0)
+		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	else:
+		GiveEquipment(idx, ClassName, KitIndex)
 	return
 
 #upgrade savegame to next version
@@ -202,7 +213,7 @@ def GameExpansion():
 	if not GUICommon.HasTOB():
 		return
 
-	if GemRB.GetVar("oldgame"):
+	if version < 5 and not GemRB.GetVar("PlayMode") and GemRB.GetVar("oldgame"):
 		#upgrade SoA to ToB/SoA
 		if GemRB.GameSetExpansion(4):
 			GemRB.AddNewArea("xnewarea")
