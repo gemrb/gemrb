@@ -199,6 +199,14 @@ def FixProtagonist( idx):
 		invslot = GemRB.GetSlots (idx, -1, -1)[0]
 		GemRB.CreateItem(idx, "BAG19A", invslot, 1, 0, 0)
 		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+
+		# adjust the XP to the minimum if it is lower and set a difficulty variable to the difference
+		xp = GemRB.GetPlayerStat(idx, IE_XP)
+		# FIXME: not fair for disabled dual-classes (should take the inactive level xp into account)
+		xp2 = CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2")
+		if xp2 > xp:
+			GemRB.SetPlayerStat(idx, IE_XP, xp2)
+			GemRB.SetGlobal("XPGIVEN","GLOBAL", xp2-xp)
 	else:
 		GiveEquipment(idx, ClassName, KitIndex)
 	return
