@@ -51,6 +51,7 @@
 //these tables will get freed by Core
 Holder<SymbolMgr> triggersTable;
 Holder<SymbolMgr> actionsTable;
+Holder<SymbolMgr> overrideTriggersTable;
 Holder<SymbolMgr> overrideActionsTable;
 Holder<SymbolMgr> objectsTable;
 TriggerFunction triggers[MAX_TRIGGERS];
@@ -965,7 +966,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
-	if (target->GetInternalFlag()&IF_NOINT && (target->GetCurrentAction() || target->GetNextAction())) {
+	// HACK: skip the check for StartDialog, since it makes no sense (breaks transition to hell)
+	Action *curact = target->GetCurrentAction();
+	if (target->GetInternalFlag()&IF_NOINT && ((curact && curact->actionID != 137) || \
+	(!curact && target->GetNextAction()))) {
 		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
 		displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		Sender->ReleaseCurrentAction();

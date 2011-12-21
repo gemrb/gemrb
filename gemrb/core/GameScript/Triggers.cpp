@@ -30,6 +30,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Polygon.h"
+#include "TableMgr.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
 #include "math.h" //needs for acos
@@ -354,8 +355,8 @@ int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)
 }
 
 /* checks if targeted actor is in the specified region
-   GemRB allows different regions, referenced by int0Parameter
-   The polygons are stored in island<nn>.2da files */
+ GemRB allows different regions, referenced by int0Parameter
+ The polygons are stored in island<nn>.2da files */
 int GameScript::OnIsland(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1130,7 +1131,7 @@ int GameScript::Acquired(Scriptable * Sender, Trigger* parameters)
 }
 
 /** this trigger accepts a numeric parameter, this number is the same as inventory flags
-    like: 1 - identified, 2 - unstealable, 4 - stolen, 8 - undroppable, etc. */
+ like: 1 - identified, 2 - unstealable, 4 - stolen, 8 - undroppable, etc. */
 /** this is a GemRB extension */
 int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 {
@@ -4007,4 +4008,53 @@ int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
 int GameScript::TurnedBy(Scriptable* Sender, Trigger* parameters)
 {
 	return Sender->MatchTriggerWithObject(trigger_turnedby, parameters->objectParameter);
+}
+
+//This is used for pst portals
+//usage: UsedExit(Protagonist, "sigil")
+//where sigil.2da contains all the exits that should trigger the teleport
+int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	if (!actor) {
+		return 0;
+	}
+
+	if (actor->GetInternalFlag()&IF_USEEXIT) {
+		return 0;
+	}
+
+	Map *ca = core->GetGame()->GetMap(actor->LastArea, false);
+
+	if (!ca) {
+		return 0;
+	}
+
+	InfoPoint *ip = ca->GetInfoPointByGlobalID(actor->UsedExit);
+	if (!ip || ip->Type!=ST_TRAVEL) {
+		return 0;
+	}
+
+	AutoTable tm(parameters->string0Parameter);
+	if (!tm) {
+		return 0;
+	}
+
+	int count = tm->GetRowCount();
+	for (int i=0;i<count;i++) {
+		const char *area = tm->QueryField( i, 0 );
+		if (strnicmp(actor->LastArea, area, 8) ) {
+			continue;
+		}
+		const char *exit = tm->QueryField( i, 1 );
+		if (strnicmp(ip->GetScriptName(), exit, 32) ) {
+			continue;
+		}
+		return 1;
+	}
+	return 0;
 }

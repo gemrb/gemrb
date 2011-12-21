@@ -16,3 +16,6 @@ def cc(cre, px=-1, py=-1):
 
 def ci(item, slot=-1, c0=1, c1=0, c2=0):
 	GemRB.CreateItem(GemRB.GameGetFirstSelectedPC(), item, slot, c0, c1, c2)
+
+def cv(var, context="GLOBAL"):
+	GemRB.CheckVar(var, context)

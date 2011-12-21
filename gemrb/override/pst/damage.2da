@@ -8,9 +8,9 @@ LARGE	BLOODL		*               47
 FIRES   FIRIMP		SPBURN          19
 FIREM	FIRIMP		SPBURN          19
 FIREL	FIRIMP		SPBURN          19
-SPARKS	SPSHKIMP	SPSPARKS        -1
-SPARKM	SPSHKIMP	SPSPARKS        -1
-SPARKL	SPSHKIMP	SPSPARKS        -1
-ICES	FIRIMP		*               71
-ICEM	FIRIMP		*               71
-ICEL	FIRIMP		*               71
+SPARKS	DMGSPARK	*        -1
+SPARKM	DMGSPARK	*        -1
+SPARKL	DMGSPARK	*        -1
+ICES	D005DICE		*               -1
+ICEM	D005DICE		*               -1
+ICEL	D005DICE		*               -1

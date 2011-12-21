@@ -21,7 +21,7 @@
 import GemRB
 import CommonTables
 from GUIDefines import *
-from ie_stats import IE_CASTING
+from ie_stats import *
 from ie_action import ACT_LEFT, ACT_RIGHT
 from ie_spells import SP_IDENTIFY, SP_SURGE, LSR_KNOWN, LSR_LEVEL, LSR_STAT
 from ie_restype import RES_2DA
@@ -354,7 +354,8 @@ def CannotLearnSlotSpell ():
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 		return LSR_STAT
 
-	if GameIsPST():
+	import GUICommon
+	if GUICommon.GameIsPST():
 		import GUIINV
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
 	else:

@@ -2086,14 +2086,48 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 	AddVVCell(sca);
 }
 
+//Returns the personal critical damage type in a binary compatible form (PST)
+//TODO: may want to preload the crits table to avoid spam in the log
+int Actor::GetCriticalType() const
+{
+	long ret = 0;
+	AutoTable tm("crits");
+	if (!tm) return 0;
+	//the ID of this PC (first 2 rows are empty)
+	int row = BaseStats[IE_SPECIFIC];
+	//defaults to 0
+	valid_number(tm->QueryField(row, 1), ret);
+	return (int) ret;
+}
+
+//Plays personal critical damage animation for PST PC's melee attacks
+void Actor::PlayCritDamageAnimation(int type)
+{
+	AutoTable tm("crits");
+	if (!tm) return;
+	//the ID's are in column 1, selected by specifics by GetCriticalType
+	int row = tm->FindTableValue (1, type);
+	if (row>=0) {
+		//the animations are listed in column 0
+		AddAnimation(tm->QueryField(row, 0), -1, 0, AA_PLAYONCE);
+	}
+}
+
 void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	int i;
 
 	print("Damage animation type: %d\n", type);
 
-	switch(type) {
-		case 0: case 1: case 2: case 3: //blood
+	switch(type&255) {
+		case 0:
+			//PST specific personal criticals
+			if (type&0xff00) {
+				PlayCritDamageAnimation(type>>8);
+				break;
+			}
+			//fall through
+		case 1: case 2: case 3: //blood
 			i = anims->GetBloodColor();
 			if (!i) i = d_gradient[type];
 			if(hit) {
@@ -2518,10 +2552,11 @@ void Actor::RefreshHP() {
 void Actor::RefreshPCStats() {
 	RefreshHP();
 
+	Game *game = core->GetGame();
 	//morale recovery every xth AI cycle
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec) {
-		if (!(core->GetGame()->GameTime%mrec)) {
+		if (!(game->GameTime%mrec)) {
 			NewBase(IE_MORALE,1,MOD_ADDITIVE);
 		}
 	}
@@ -2554,14 +2589,28 @@ void Actor::RefreshPCStats() {
 			//wspattack appears to only effect warriors
 			int defaultattacks = 2 + 2*dualwielding;
 			if (stars) {
+				// In bg2 the proficiency and warrior level bonus is added after effects, so also ranged weapons are affected,
+				// since their rate of fire (apr) is set using an effect with a flat modifier.
+				// SetBase will compensate only for the difference between the current two stats, not considering the default
+				// example: actor with a bow gets 4 due to the equipping effect, while the wspatck bonus is 0-3
+				// the adjustment results in a base of 2-5 (2+[0-3]) and the modified stat degrades to 4+(4-[2-5]) = 8-[2-5] = 3-6
+				// instead of 4+[0-3] = 4-7
+				// For a master ranger at level 14, the difference ends up as 2 (1 apr).
+				// FIXME: but this isn't universally true or improved haste couldn't double the total apr! For the above case, we're half apr off.
 				if (tmplevel) {
-					SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
+					int mod = Modified[IE_NUMBEROFATTACKS] - BaseStats[IE_NUMBEROFATTACKS];
+					BaseStats[IE_NUMBEROFATTACKS] = defaultattacks+wspattack[stars][tmplevel];
+					if (GetAttackStyle() == WEAPON_RANGED) { // FIXME: should actually check if a set-apr opcode variant was used
+						Modified[IE_NUMBEROFATTACKS] += wspattack[stars][tmplevel]; // no default
+					} else {
+						Modified[IE_NUMBEROFATTACKS] = BaseStats[IE_NUMBEROFATTACKS] + mod;
+					}
 				} else {
-					SetBase(IE_NUMBEROFATTACKS, defaultattacks);
+					SetBase(IE_NUMBEROFATTACKS, defaultattacks); // TODO: check if this shouldn't get +wspattack[stars][0]
 				}
 			} else {
 				// unproficient user - force defaultattacks
-				SetStat(IE_NUMBEROFATTACKS, defaultattacks, 0);
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks);
 			}
 		}
 	}
@@ -2570,7 +2619,8 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
 
 	// add fatigue every 4 hours
-	if (!(core->GetGame()->GameTime % 18000)) {
+	// but make sure we're in the game already or players will start tired due to getting called with equipping effects before
+	if (game->GameTime && !(game->GameTime % 18000)) {
 		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
 	}
 	if (core->ResolveStatBonus(this, "fatigue")) {
@@ -2581,7 +2631,7 @@ void Actor::RefreshPCStats() {
 
 	// regenerate actors with high enough constitution
 	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
-	if (rate && !(core->GetGame()->GameTime % (rate*AI_UPDATE_TIME))) {
+	if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
 		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 	}
 
@@ -2981,7 +3031,7 @@ void Actor::IdleActions(bool nonidle)
 			nextBored=time+core->Roll(1,30,bored_time);
 		}
 	} else {
-		if (nextBored<time) {
+		if (nextBored<time && !InMove()) {
 			nextBored = time+core->Roll(1,30,bored_time/10);
 			VerbalConstant(VB_BORED, 1);
 		}
@@ -3113,7 +3163,7 @@ bool Actor::AttackIsStunning(int damagetype) const {
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
 
 //returns actual damage
-int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
+int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical)
 {
 	//won't get any more hurt
 	if (InternalFlags & IF_REALLYDIED) {
@@ -3220,7 +3270,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		PlayDamageAnimation(DL_DISINTEGRATE+damagelevel);
 	} else {
 		if (chp<-10) {
-			PlayDamageAnimation(DL_CRITICAL);
+			PlayDamageAnimation(critical<<8);
 		} else {
 			PlayDamageAnimation(DL_BLOOD+damagelevel);
 		}
@@ -3382,10 +3432,12 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 void Actor::DumpMaxValues()
 {
 	int symbol = core->LoadSymbol( "stats" );
-	SymbolMgr *sym = core->GetSymbol( symbol );
+	if (symbol !=-1) {
+		SymbolMgr *sym = core->GetSymbol( symbol );
 
-	for(int i=0;i<MAX_STATS;i++) {
-		print("%d (%s) %d\n", i, sym->GetValue(i), maximum_values[i]);
+		for(int i=0;i<MAX_STATS;i++) {
+			print("%d (%s) %d\n", i, sym->GetValue(i), maximum_values[i]);
+		}
 	}
 }
 #endif
@@ -3740,8 +3792,7 @@ void Actor::Resurrect()
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
 	}
-	nextBored = game->GameTime + core->Roll(1,30,bored_time);
-	nextComment = game->GameTime + core->Roll(5,1000,bored_time/2);
+	ResetCommentTime();
 	//clear effects?
 }
 
@@ -3750,6 +3801,16 @@ static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
 static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
 static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
 static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
+
+const char *GetVarName(const char *table, int value)
+{
+	int symbol = core->LoadSymbol( table );
+	if (symbol!=-1) {
+		Holder<SymbolMgr> sym = core->GetSymbol( symbol );
+		return sym->GetValue( value );
+	}
+	return NULL;
+}
 
 void Actor::Die(Scriptable *killer)
 {
@@ -3882,6 +3943,24 @@ void Actor::Die(Scriptable *killer)
 			game->locals->SetAt(KillVar, 1, nocreate);
 		}
 	}
+
+	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_FACTION) ) {
+		value = 0;
+		const char *varname = GetVarName("faction", BaseStats[IE_FACTION]);
+		if (varname && varname[0]) {
+			game->kaputz->Lookup(varname, value);
+			game->kaputz->SetAt(varname, value+1, nocreate);
+		}
+	}
+	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_TEAM) ) {
+		value = 0;
+		const char *varname = GetVarName("team", BaseStats[IE_TEAM]);
+		if (varname && varname[0]) {
+			game->kaputz->Lookup(varname, value);
+			game->kaputz->SetAt(varname, value+1, nocreate);
+		}
+	}
+
 	if (IncKillVar[0]) {
 		value = 0;
 		game->locals->Lookup(IncKillVar, value);
@@ -5614,6 +5693,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 		return;
 	}
 	SetRunFlags(flags);
+	ResetCommentTime();
 	// is this true???
 	if (Des.x==-2 && Des.y==-2) {
 		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
@@ -6508,9 +6588,7 @@ void Actor::Rest(int hours)
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
 	}
-	Game *game = core->GetGame();
-	nextBored = game->GameTime + core->Roll(1,30,bored_time);
-	nextComment = game->GameTime + core->Roll(5,1000,bored_time/2);
+	ResetCommentTime();
 }
 
 //returns the actual slot from the quickslot
@@ -6594,6 +6672,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
+	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
@@ -6630,6 +6709,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
+	ResetCommentTime();
 	if (pro) {
 		//ieDword is unsigned!!
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
@@ -6640,6 +6720,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
 			AttackEffect->Parameter3 = 1;
+			AttackEffect->IsVariable = GetCriticalType();
 			pro->GetEffects()->AddEffect(AttackEffect, true);
 			if (ranged)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
@@ -7368,6 +7449,8 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags|=IF_USEEXIT;
 	} else {
 		InternalFlags&=~IF_USEEXIT;
+		UsedExit = LastExit;
+		memcpy(LastArea, Area, 8);
 	}
 	LastExit = exitID;
 }
@@ -7482,6 +7565,7 @@ void Actor::ResetState()
 	CureInvisibility();
 	CureSanctuary();
 	SetModal(MS_NONE);
+	ResetCommentTime();
 }
 
 // doesn't check the range, but only that the azimuth and the target
@@ -7682,4 +7766,11 @@ bool Actor::IsPartyMember() const
 {
 	if (Modified[IE_EA]<=EA_FAMILIAR) return true;
 	return InParty>0;
+}
+
+void Actor::ResetCommentTime()
+{
+	Game *game = core->GetGame();
+	nextBored = game->GameTime + core->Roll(1, 30, bored_time);
+	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 }

@@ -198,6 +198,7 @@ Interface::Interface(int iargc, char* iargv[])
 	NumFingScroll = 2;
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
+	Bpp = 32;
 	FullScreen = 0;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
@@ -3932,7 +3933,7 @@ void Interface::SetCutSceneMode(bool active)
 bool Interface::InCutSceneMode() const
 {
 	GameControl *gc = GetGameControl();
-	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&SF_DISABLEMOUSE) ) {
+	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&(SF_DISABLEMOUSE|SF_CUTSCENE))) {
 		return true;
 	}
 	return false;

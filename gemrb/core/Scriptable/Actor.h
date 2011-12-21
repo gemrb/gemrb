@@ -282,6 +282,8 @@ public:
 	int PathTries; //the # of previous tries to pick up a new walkpath
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
+	ieDword UsedExit;
+	ieResRef LastArea;
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];
@@ -498,7 +500,7 @@ public:
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
 	/* deals damage to this actor */
-	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE);
+	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0);
 	/* displays the damage taken and other details (depends on the game type) */
 	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter);
 	/* play a random footstep sound */
@@ -643,6 +645,8 @@ public:
 	void AddAnimation(const ieResRef resource, int gradient, int height, int flags);
 	/* plays damage animation, if hit is not set, then plays only the splash part */
 	void PlayDamageAnimation(int x, bool hit=true);
+	void PlayCritDamageAnimation(int x);
+	int GetCriticalType() const;
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
 	/* rememorizes spells, cures fatigue, etc */
@@ -758,5 +762,7 @@ public:
 	int GetSkillBonus(unsigned int col) const;
 	/* returns true for party members (and familiars) */
 	bool IsPartyMember() const;
+	/* resets the bored and area comment timers */
+	void ResetCommentTime();
 };
 #endif

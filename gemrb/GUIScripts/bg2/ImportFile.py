@@ -72,5 +72,5 @@ def DonePress():
 def CancelPress():
 	if ImportWindow:
 		ImportWindow.Unload()
-	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
+	GemRB.SetNextScript("CharGen")
 	return 

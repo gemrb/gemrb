@@ -65,7 +65,12 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 	}
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 
+#if	SDL_VERSION_ATLEAST(1, 3, 0)
+	/* as of changeset 3a041d215edc SDL_CreateThread has a 'name' parameter */
+	player = SDL_CreateThread(&play, "AmbientMgrAL", (void *) this);
+#else
 	player = SDL_CreateThread(&play, (void *) this);
+#endif
 }
 
 void AmbientMgrAL::activate(const std::string &name)

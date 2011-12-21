@@ -964,8 +964,6 @@ void CREImporter::GetActorPST(Actor *act)
 
 	str->Read( &tmpByte, 1 );
 
-	//str->ReadWord( &act->AppearanceFlags1 );
-	//str->ReadWord( &act->AppearanceFlags2 );
 	str->ReadDword( &act->AppearanceFlags );
 
 	for (i = 0; i < 7; i++) {
@@ -2509,8 +2507,6 @@ int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
 	stream->Write( filling,3); //unknown
 	tmpByte=actor->BaseStats[IE_COLORCOUNT];
 	stream->Write( &tmpByte, 1);
-	//stream->WriteWord( &actor->AppearanceFlags1);
-	//stream->WriteWord( &actor->AppearanceFlags2);
 	stream->WriteDword( &actor->AppearanceFlags);
 
 	for (i=0;i<7;i++) {

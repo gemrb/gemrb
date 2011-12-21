@@ -2149,7 +2149,7 @@ void Map::DebugDump(bool show_actors) const
 		}
 		print( " %.8s", poi );
 	}
-	print( "Area Global ID:  %d\n", GetGlobalID());
+	print( "\nArea Global ID:  %d\n", GetGlobalID());
 	print( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
 	print( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
 	print( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
@@ -2993,10 +2993,11 @@ current) is compared against (party level * rest header difficulty). If it's
 greater, the spawning is aborted. If all the other conditions are true, at
 least one creature is summoned, regardless the difficulty cap.
 */
-bool Map::Rest(const Point &pos, int hours, int day)
+int Map::Rest(const Point &pos, int hours, int day)
 {
 	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
-		return false;
+		core->GetGame()->AdvanceTime(hours*300*AI_UPDATE_TIME);
+		return 0;
 	}
 
 	//based on ingame timer
@@ -3008,7 +3009,10 @@ bool Map::Rest(const Point &pos, int hours, int day)
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
 			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
-			if (!creature) continue;
+			if (!creature) {
+				core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);
+				continue;
+			}
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
 
@@ -3018,10 +3022,12 @@ bool Map::Rest(const Point &pos, int hours, int day)
 				spawnamount -= cpl;
 				spawncount++;
 			}
-			return true;
+			return hours-i;
 		}
+		// advance the time in hourly steps, so an interruption is timed properly
+		core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);
 	}
-	return false;
+	return 0;
 }
 
 //--------explored bitmap-----------

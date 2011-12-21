@@ -158,7 +158,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 		GUICommon.SetGamedaysAndHourToken()
-		Button.SetTooltip(16041)
+		Button.SetTooltip(GemRB.GetString (16041))
 		rb = 11
 	else:
 		rb = 9
@@ -404,7 +404,7 @@ def OpenActionsWindowControls (Window):
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 	GUICommon.SetGamedaysAndHourToken()
-	Button.SetTooltip(16041)
+	Button.SetTooltip(GemRB.GetString (16041))
 	UpdateActionsWindow ()
 	return
 
@@ -464,6 +464,14 @@ def UpdateActionsWindow ():
 		if GemRB.GetVar ("OtherWindow") != -1:
 			return
 	else:
+		GUICommon.SetGamedaysAndHourToken()
+		if OptionsWindow and OptionsWindow.HasControl (9):
+			Button = OptionsWindow.GetControl (9)
+			Button.SetTooltip (GemRB.GetString (16041)) # refetch the string, since the tokens changed
+		elif ActionsWindow and ActionsWindow.HasControl (62):
+			Button = ActionsWindow.GetControl (62)
+			Button.SetTooltip (GemRB.GetString (16041))
+
 		if GemRB.GetVar ("OtherWindow") == -1:
 			if PortraitWindow:
 				PortraitWindow.Invalidate ()

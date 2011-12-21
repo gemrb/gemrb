@@ -143,6 +143,7 @@ GameControl::GameControl(void)
 		scrollAreasWidth = 5;
 	}
 
+	tmp=0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
@@ -2028,6 +2029,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
 			return;
 		}
+		// reset the action bar
+		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
+		core->SetEventFlag(EF_ACTION);
 		core->GetDictionary()->SetAt( "MenuX", x );
 		core->GetDictionary()->SetAt( "MenuY", y );
 		core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow" );

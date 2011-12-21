@@ -190,6 +190,7 @@ def SetGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()
 	days = currentTime / 7200
 	hours = (currentTime % 7200) / 300
+	GemRB.SetToken ('GAMEDAY', str (days))
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 
