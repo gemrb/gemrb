@@ -207,9 +207,32 @@ def FixProtagonist( idx):
 		if xp2 > xp:
 			GemRB.SetPlayerStat(idx, IE_XP, xp2)
 			GemRB.SetGlobal("XPGIVEN","GLOBAL", xp2-xp)
+
+		FixFamiliar()
+		FixInnates()
 	else:
 		GiveEquipment(idx, ClassName, KitIndex)
 	return
+
+# TODO: replace the familiar with the improved version
+def FixFamiliar():
+	# famcat->famcat25
+	# famdust->famdus25
+	# famfair->famfai25
+	# famfer->famfer25
+	# famimp->famimp25
+	# fampsd->fampsd25
+	# famquas->famqua25
+	# famrab->famrab25
+	# resummon the familiar? Make sure the marker effect is there, so death would incur the constitution penalty
+	pass
+
+# TODO: replace bhaal powers with the improved versions (cross-check with chargen; powers are removed during soa)
+def FixInnates():
+	# removes the spells: SPIN101, SPIN102, SPIN103, SPIN104, SPIN105, SPIN106, SPIN822
+	# adds the spell: SPIN822 (slayer change), check if this is needed (two uses), since we add it during chargen
+	#adds the spell: SPIN200, SPIN201, SPIN103, SPIN202, SPIN203, SPIN106
+	pass
 
 #upgrade savegame to next version
 def GameExpansion():
