@@ -263,9 +263,13 @@ def GameExpansion():
 	GemRB.SetGlobal("HADJONDREAM1","GLOBAL", 1)
 	GemRB.SetGlobal("HADJONDREAM2","GLOBAL", 1)
 	idx = GemRB.GetPartySize()
+	PDialogTable = GemRB.LoadTable ("pdialog")
 	
 	while idx:
 		name = GemRB.GetPlayerName(idx, 2) #scripting name
+		# change the override script to the new one
+		newScript = PDialogTable.GetValue ("25OVERRIDE_SCRIPT_FILE", name.upper())
+		SetPlayerScript (idx, newScript, 0) # 0 is SCR_OVERRIDE, the override script slot
 		if name == "yoshimo":
 			RemoveYoshimo(idx)
 		elif name == "imoen":
