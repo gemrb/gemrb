@@ -1559,9 +1559,8 @@ void Game::RestParty(int checks, int dream, int hp)
 		tar->Heal(hp);
 		//removes fatigue, recharges spells
 		tar->Rest(hours);
-		if (hoursLeft) {
+		if (!hoursLeft)
 			tar->PartyRested();
-		}
 	}
 
 	// abort the partial rest; we got what we wanted
