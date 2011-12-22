@@ -106,7 +106,7 @@ unsigned int Animation::GetCurrentFrame() const
 
 Sprite2D* Animation::LastFrame(void)
 {
-	if (!Flags&A_ANI_ACTIVE) {
+	if (!(Flags&A_ANI_ACTIVE)) {
 		print("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
@@ -125,7 +125,7 @@ Sprite2D* Animation::LastFrame(void)
 
 Sprite2D* Animation::NextFrame(void)
 {
-	if (!Flags&A_ANI_ACTIVE) {
+	if (!(Flags&A_ANI_ACTIVE)) {
 		print("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
@@ -179,7 +179,7 @@ Sprite2D* Animation::NextFrame(void)
 
 Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
 {
-	if (!Flags&A_ANI_ACTIVE) {
+	if (!(Flags&A_ANI_ACTIVE)) {
 		print("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
