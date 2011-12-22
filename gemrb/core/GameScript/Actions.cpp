@@ -577,12 +577,14 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
+			GAMLocationEntry *gle;
 			if (game->GetPlaneLocationCount() <= (unsigned int)i) {
-				// what are we meant to do here?
-				print("argh, couldn't restore party member %d!", i + 1);
-				continue;
+				// no location, meaning the actor joined the party after the save
+				// reuse the last valid location
+				gle = game->GetPlaneLocationEntry(game->GetPlaneLocationCount()-1);
+			} else {
+				gle = game->GetPlaneLocationEntry(i);
 			}
-			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
 			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
 		}
 	}
@@ -1327,12 +1329,14 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
+			GAMLocationEntry *gle;
 			if (game->GetSavedLocationCount() <= (unsigned int)i) {
-				// what are we meant to do here?
-				print("argh, couldn't restore party member %d!", i + 1);
-				continue;
+				// no location, meaning the actor joined the party after the save
+				// reuse the last valid location
+				gle = game->GetSavedLocationEntry(game->GetSavedLocationCount()-1);
+			} else {
+				gle = game->GetSavedLocationEntry(i);
 			}
-			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
 		}
 	}
