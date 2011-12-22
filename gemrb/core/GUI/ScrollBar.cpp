@@ -57,6 +57,18 @@ int ScrollBar::GetFrameHeight(int frame) const
 	return Frames[frame]->Height;
 }
 
+void ScrollBar::CalculateStep()
+{
+	if (Value){
+		stepPx = (double)((double)(Height
+							   - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
+							   - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
+							   - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED)) / (double)(Value));
+	}else{
+		stepPx = 0.0;
+	}
+}
+
 /** Sets a new position, relays the change to an associated textarea and calls
 	any existing GUI OnChange callback */
 void ScrollBar::SetPos(ieDword NewPos, bool redraw)
@@ -145,6 +157,7 @@ void ScrollBar::ScrollDown()
 
 double ScrollBar::GetStep()
 {
+	CalculateStep();
 	return stepPx;
 }
 
@@ -212,15 +225,6 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 		core->GetVideoDriver()->FreeSprite(Frames[type]);
 	}
 	Frames[type] = img;
-	//recalculate step
-	if(Value){
-		stepPx = (double)((double)(Height
-							   - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
-							   - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
-							   - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED)) / (double)(Value));
-	}else{
-		stepPx = 0;
-	}
 	Changed = true;
 }
 
@@ -250,10 +254,7 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		ScrollDown();
 		return;
 	}
-	// check that stepPx is set if value is set
-	if (Value && !stepPx) {
-		SetMax(Value);
-	}
+	CalculateStep();
 	if (y >= SliderYPos && y < SliderYPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
 		/*
 		 TODO: factor in where we grab the slider and offset it when dragging.
@@ -303,16 +304,8 @@ void ScrollBar::SetMax(unsigned short Max)
 	Value = Max;
 	if (Max == 0) {
 		SetPos( 0 );
-		stepPx = 0;
-	} else {
-		//recalculate step
-		stepPx = (double)((double)(Height
-								   - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
-								   - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
-								   - GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED)) / (double)(Value));
-		if (Pos >= Max) {
-			SetPos( Max - 1 );
-		}
+	} else if (Pos >= Max){
+		SetPos( Max - 1 );
 	}
 }
 
