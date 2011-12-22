@@ -1444,6 +1444,9 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
+	if (Sender->GetCurrentArea() != scr->GetCurrentArea()) {
+		return 0;
+	}
 	int distance = SquaredMapDistance(Sender, scr);
 	return DiffCore(distance, (parameters->int0Parameter+1)*(parameters->int0Parameter+1), parameters->int1Parameter);
 }
