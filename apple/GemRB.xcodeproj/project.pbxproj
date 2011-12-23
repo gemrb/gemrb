@@ -177,6 +177,12 @@
 		A276B54913A28D5D00D41A8A /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A27E831313A035C600B41410 /* 2DAImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */; };
+		A288621B14A54FE2009AC280 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621714A54FE2009AC280 /* libFreetype2.a */; };
+		A288621C14A54FE2009AC280 /* libPython.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621814A54FE2009AC280 /* libPython.a */; };
+		A288621D14A54FE2009AC280 /* libSDL_ttf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621914A54FE2009AC280 /* libSDL_ttf.a */; };
+		A288621E14A54FE2009AC280 /* libSDL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621A14A54FE2009AC280 /* libSDL.a */; };
+		A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621F14A54FFD009AC280 /* libarchive.dylib */; };
+		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
 		A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
@@ -1087,12 +1093,17 @@
 		A27B8782139F0A7D0002DC13 /* WMPImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMPImporter.h; sourceTree = "<group>"; };
 		A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZLibManager.cpp; sourceTree = "<group>"; };
 		A27B8787139F0A7D0002DC13 /* ZLibManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZLibManager.h; sourceTree = "<group>"; };
-		A27B87B5139F0E120002DC13 /* plugins.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plugins.pch; path = ../../apple/osx/plugins.pch; sourceTree = "<group>"; };
 		A27E830A13A0358200B41410 /* 2DAImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = 2DAImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2830A0F13A05A64000A63FE /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2830A3913A05B5F000A63FE /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2830A3F13A05B81000A63FE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A2830ABA13A0624D000A63FE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ios/Info.plist; sourceTree = "<group>"; };
+		A288621714A54FE2009AC280 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libFreetype2.a; sourceTree = DEVELOPER_DIR; };
+		A288621814A54FE2009AC280 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libPython.a; sourceTree = DEVELOPER_DIR; };
+		A288621914A54FE2009AC280 /* libSDL_ttf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL_ttf.a; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libSDL_ttf.a; sourceTree = DEVELOPER_DIR; };
+		A288621A14A54FE2009AC280 /* libSDL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL.a; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libSDL.a; sourceTree = DEVELOPER_DIR; };
+		A288621F14A54FFD009AC280 /* libarchive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarchive.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libarchive.dylib; sourceTree = DEVELOPER_DIR; };
+		A288622114A5501F009AC280 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
 		A28D2498143BEA4200A27897 /* FontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontManager.cpp; sourceTree = "<group>"; };
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
@@ -1747,6 +1758,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A288622214A5501F009AC280 /* libz.dylib in Frameworks */,
+				A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */,
+				A288621B14A54FE2009AC280 /* libFreetype2.a in Frameworks */,
+				A288621C14A54FE2009AC280 /* libPython.a in Frameworks */,
+				A288621D14A54FE2009AC280 /* libSDL_ttf.a in Frameworks */,
+				A288621E14A54FE2009AC280 /* libSDL.a in Frameworks */,
 				A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */,
 				A2EC8065146056900033754A /* AudioToolbox.framework in Frameworks */,
 				A2EC8063146056490033754A /* QuartzCore.framework in Frameworks */,
@@ -2470,7 +2487,6 @@
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
 			isa = PBXGroup;
 			children = (
-				A27B87B5139F0E120002DC13 /* plugins.pch */,
 				A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */,
 				A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */,
 				A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */,
@@ -2777,6 +2793,10 @@
 		A2E7985B14845AFB00B15DF4 /* iOS static libs */ = {
 			isa = PBXGroup;
 			children = (
+				A288621714A54FE2009AC280 /* libFreetype2.a */,
+				A288621A14A54FE2009AC280 /* libSDL.a */,
+				A288621914A54FE2009AC280 /* libSDL_ttf.a */,
+				A288621814A54FE2009AC280 /* libPython.a */,
 			);
 			name = "iOS static libs";
 			sourceTree = "<group>";
@@ -2784,6 +2804,8 @@
 		A2E7985C14845B3F00B15DF4 /* dylibs */ = {
 			isa = PBXGroup;
 			children = (
+				A288621F14A54FFD009AC280 /* libarchive.dylib */,
+				A288622114A5501F009AC280 /* libz.dylib */,
 				A273DC7B14856755000DA299 /* libz.dylib */,
 			);
 			name = dylibs;
@@ -6513,17 +6535,16 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				HEADER_SEARCH_PATHS = (
 					./,
-					ios/Python/Include,
-					ios/SDL/include,
 					../gemrb/includes,
+					"${SDK_DIR}/usr/include/python",
+					"${SDK_DIR}/usr/include/SDL",
+					"${SDK_DIR}/usr/include/SDL_ttf",
 				);
 				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/ios/SDL\"",
-					"\"$(SRCROOT)/ios/Python\"",
-					"\"$(SRCROOT)/ios\"",
+					$SDK_DIR/usr/lib,
 				);
 				OTHER_CFLAGS = (
 					"-DTARGET_OS_IPHONE",
@@ -6539,7 +6560,7 @@
 				SDKROOT = iphoneos;
 				"SDKROOT[arch=*]" = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "./ ../gemrb/includes/ ../gemrb/core/";
+				USER_HEADER_SEARCH_PATHS = "../gemrb/includes/ ../gemrb/core/";
 				VALID_ARCHS = armv7;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -6562,17 +6583,16 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				HEADER_SEARCH_PATHS = (
 					./,
-					ios/Python/Include,
-					ios/SDL/include,
 					../gemrb/includes,
+					"${SDK_DIR}/usr/include/python",
+					"${SDK_DIR}/usr/include/SDL",
+					"${SDK_DIR}/usr/include/SDL_ttf",
 				);
 				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/ios/SDL\"",
-					"\"$(SRCROOT)/ios/Python\"",
-					"\"$(SRCROOT)/ios\"",
+					$SDK_DIR/usr/lib,
 				);
 				OTHER_CFLAGS = (
 					"-isystem",
@@ -6588,7 +6608,7 @@
 				SDKROOT = iphoneos;
 				"SDKROOT[arch=*]" = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "./ ../gemrb/includes/ ../gemrb/core/";
+				USER_HEADER_SEARCH_PATHS = "../gemrb/includes/ ../gemrb/core/";
 				VALID_ARCHS = armv7;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
