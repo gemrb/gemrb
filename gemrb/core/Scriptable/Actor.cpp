@@ -5185,6 +5185,12 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("Left: %d | ", attackcount);
 		print("Next: %d ", nextattack);
 	}
+	if (BaseStats[IE_SEX] == SEX_ILLUSION) { // illusions can't hit
+		ResetState();
+		printBracket("Missed", LIGHT_RED);
+		print("\n");
+		return;
+	}
 
 	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
 	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
