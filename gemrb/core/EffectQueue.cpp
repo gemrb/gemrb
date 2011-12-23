@@ -995,7 +995,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//don't resist self
 	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
-	if (fx->Target==FX_TARGET_SELF) {
+	if (fx->CasterID == actor->GetGlobalID()) {
 		if (selective_mr) {
 			return false;
 		}
