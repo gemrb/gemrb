@@ -176,21 +176,21 @@ static void setupWindowMenu(void)
     return TRUE;
 }
 
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *) __unused sender
 {
     //override this method using plugin categories.
     NSLog(@"Application preparing for termination...");
     return NSTerminateNow;
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification
+- (void)applicationWillTerminate:(NSNotification *) __unused aNotification
 {
     //override this method using plugin categories.
     NSLog(@"Application terminate");
 }
 
 /* Called when the internal event loop has just started running */
-- (void) applicationDidFinishLaunching: (NSNotification *) note
+- (void) applicationDidFinishLaunching: (NSNotification *) __unused note
 {
     int status;
     
