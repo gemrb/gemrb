@@ -5052,6 +5052,7 @@ int Actor::GetDefense(int DamageType, Actor *attacker) const
 	return defense;
 }
 
+static EffectRef fx_puppetmarker_ref = { "PuppetMarker", -1 };
 
 void Actor::PerformAttack(ieDword gameTime)
 {
@@ -5185,7 +5186,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("Left: %d | ", attackcount);
 		print("Next: %d ", nextattack);
 	}
-	if (BaseStats[IE_SEX] == SEX_ILLUSION) { // illusions can't hit
+	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
 		printBracket("Missed", LIGHT_RED);
 		print("\n");
