@@ -38,7 +38,11 @@ int SDL_main (int argc, char **argv)
 	GEM_ConfController* confControl = [[GEM_ConfController alloc] init];
 	NSArray* nibObjects = nil;
 	// now load the config selector nib and display the list modally
-	nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfViewController-ipad" owner:confControl options:nil];
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfViewController-ipad" owner:confControl options:nil];
+	} else {
+		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfViewController-iphone" owner:confControl options:nil];
+	}
 
 	[nibObjects retain];
 	win.rootViewController = confControl.rootVC;
