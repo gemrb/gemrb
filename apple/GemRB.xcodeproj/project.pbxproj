@@ -303,6 +303,7 @@
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
 		A2A3A7E714A5130F00F705CF /* GEM_ConfController-ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2A3A7E314A5130F00F705CF /* GEM_ConfController-ipad.xib */; };
 		A2A3A7E814A5130F00F705CF /* GEM_ConfController-iphone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2A3A7E414A5130F00F705CF /* GEM_ConfController-iphone.xib */; };
+		A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7EE14A51B1800F705CF /* GEM_SDL_Keyboard.m */; };
 		A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
@@ -1105,6 +1106,7 @@
 		A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_ConfController.m; sourceTree = "<group>"; };
 		A2A3A7E314A5130F00F705CF /* GEM_ConfController-ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "GEM_ConfController-ipad.xib"; sourceTree = "<group>"; };
 		A2A3A7E414A5130F00F705CF /* GEM_ConfController-iphone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "GEM_ConfController-iphone.xib"; sourceTree = "<group>"; };
+		A2A3A7EE14A51B1800F705CF /* GEM_SDL_Keyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_SDL_Keyboard.m; sourceTree = "<group>"; };
 		A2A6A459146893CC000F1688 /* TTFFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TTFFontManager.cpp; sourceTree = "<group>"; };
 		A2A6A45A146893CC000F1688 /* TTFFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTFFontManager.h; sourceTree = "<group>"; };
 		A2AAF36713A1507100AE8402 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
@@ -2412,6 +2414,7 @@
 		A2A3A7DE14A5130F00F705CF /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				A2A3A7EE14A51B1800F705CF /* GEM_SDL_Keyboard.m */,
 				A2A3A7DF14A5130F00F705CF /* CocoaMain.m */,
 				A2A3A7E014A5130F00F705CF /* GEM_ConfController.h */,
 				A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */,
@@ -4376,6 +4379,7 @@
 				A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */,
 				A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */,
 				A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */,
+				A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
