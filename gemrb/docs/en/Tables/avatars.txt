@@ -20,11 +20,11 @@ Columns: AT_1 - first armour level animation prefix
 1 - The whole animation is in one file. Scheme is: [NAME][G1]. There are 16 orientations.
 2 - The whole animation is in four files. Scheme is: [NAME][G1-2][/E].
 3 - The whole animation is in two files. Scheme is: [NAME][G1][/E].
-4 - Many files (simular to 0), but all with G. Scheme is: [NAME][G][1-2][1-6].
-5 - ?
+4 - Many files (similar to 0), but all with G. Scheme is: [NAME][G][1-2][1-6].
+5 - Six files contain the whole animation. Scheme is:[NAME][G1-3][/E] (example: MOGR)
 6 - BG2 style animation. Scheme is:[NAME][ACTIONCODE][/E]. The G1 code contains many sequences. (5 orientations).
 7 - Bird animations, one file, only movement with orientations.
-8 - Six files contain the whole animation. Scheme is:[NAME][G1-3][/E]
+8 - Six files contain the whole animation. Scheme is:[NAME][G1-3][/E]. The sequences are different from 5. (example: MCAR)
 9 - IWD style animation. Scheme is:[NAME][ACTIONTYPE][/E]. The main difference from 6 is that instead of G1, it has separate bams for many actions. (9 orientations).
 10 - The whole animation is in two files [NAME][G1][/E]. Used for some low res static BG1 animations like the horse and cow. It lacks the walking animations of type 3.
 11 - large 2x2 animations (wyvern and balor)
