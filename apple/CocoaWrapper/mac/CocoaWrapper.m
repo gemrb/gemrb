@@ -17,22 +17,9 @@
  *
  *
  */
+
 #import "CocoaWrapper.h"
 
-//TODO: add an interface to the GemRB core
-
-//TODO: subclass NSApplication
-
-#if TARGET_OS_IPHONE > 0
-// use the SDL 1.3 build in wrapper for iOS
-#include <Python.h>
-int SDL_main (int argc, char **argv)
-{
-	//do all the special plugin initializations here
-	Py_NoSiteFlag = 1;
-    return GemRB_main(argc, argv);
-}
-#elif TARGET_OS_MAC
 #include <sys/param.h> /* for MAXPATHLEN */
 #include <unistd.h>
 #include <stdio.h>
@@ -156,7 +143,7 @@ static void setupWindowMenu(void)
  *
  * This message is ignored once the app's mainline has been called.
  */
-- (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
+- (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *)filename
 {
     const char *temparg;
     size_t arglen;
@@ -226,12 +213,12 @@ static void setupWindowMenu(void)
     unsigned int bufferSize;
     unsigned int selfLen = [self length];
     unsigned int aStringLen = [aString length];
-    unichar *buffer;
+    uint16_t *buffer;
     NSRange localRange;
     NSString *result;
     
     bufferSize = selfLen + aStringLen - aRange.length;
-    buffer = (unichar *)NSAllocateMemoryPages(bufferSize*sizeof(unichar));
+    buffer = (uint16_t *)NSAllocateMemoryPages(bufferSize*sizeof(uint16_t));
     
     /* Get first part into buffer */
     localRange.location = 0;
@@ -313,4 +300,3 @@ int main (int argc, char **argv)
     
     return 0;
 }
-#endif

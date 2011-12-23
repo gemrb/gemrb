@@ -18,26 +18,36 @@
  *
  */
 
-/*
- !!!:
- Because this file is shared between the CocoaWrapper object and plugins extending it we need to keep it
- in the gemrb/includes directory.
-*/
-
-#import <Cocoa/Cocoa.h>
+#include <Python.h>
 
 #import "exports.h"
 
 extern int GemRB_main(int argc, char *argv[]);
-
 GEM_EXPORT
-@interface CocoaWrapper : NSObject
-#if __MAC_OS_X_VERSION_MIN_REQUIRED > 1050
-<NSApplicationDelegate>
-#endif
+extern int SDL_main(int argc, char *argv[]);
+
+// use the SDL 1.3 build in wrapper for iOS
+int SDL_main (int argc, char **argv)
 {
+	//do all the special plugin initializations here
+	Py_NoSiteFlag = 1;
+
+	int ret = GemRB_main(argc, argv);
+	if (ret != 0) {
+		// TODO: inject into error() function instead and rewrite the core to always use error instead of returning.
+		
+		// put up a message letting the user know something failed.
+		UIAlertView *alert = 
+        [[UIAlertView alloc] initWithTitle: @"Engine Initialization Failure."
+								   message: @"Check the log for causes."
+								  delegate: nil
+						 cancelButtonTitle: @"OK"
+						 otherButtonTitles: nil];
+		[alert show];
+		while (alert.visible) {
+			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+		}
+		[alert release];
+	}
+    return ret;
 }
-// Override these application delegate methods in plugin categories
-- (void)applicationWillTerminate:(NSNotification *)aNotification;
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
-@end
