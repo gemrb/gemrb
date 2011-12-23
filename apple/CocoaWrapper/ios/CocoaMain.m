@@ -21,6 +21,7 @@
 #include <Python.h>
 
 #import "exports.h"
+#import "GEM_ConfController.h"
 
 extern int GemRB_main(int argc, char *argv[]);
 GEM_EXPORT
@@ -32,10 +33,41 @@ int SDL_main (int argc, char **argv)
 	//do all the special plugin initializations here
 	Py_NoSiteFlag = 1;
 
+	UIWindow* win = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+	win.backgroundColor = [UIColor blackColor];
+	GEM_ConfController* confControl = [[GEM_ConfController alloc] init];
+	NSArray* nibObjects = nil;
+	// now load the config selector nib and display the list modally
+	nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfViewController-ipad" owner:confControl options:nil];
+
+	[nibObjects retain];
+	win.rootViewController = confControl.rootVC;
+	win.screen = [UIScreen mainScreen];
+	[win makeKeyAndVisible];
+	[confControl runModal]; //doesnt return until the user pushes 'Play'
+	const char* configPath = [[confControl selectedConfigPath] cStringUsingEncoding:NSASCIIStringEncoding];
+	if (configPath != NULL) {
+		NSLog(@"Using config file:%s", configPath);
+		//manipulate argc & argv to have gemrb passed the argument for the config file to use.
+		argc += 2;
+		argv = realloc(argv, sizeof(char*) * argc);
+		argv[argc - 2] = "-c";
+
+		//hope that this cstrig doesnt get deallocated until we are done with it...
+		//the Docs say it will be deallocated when the NSAutoreleasePool is drained which happens at the end of every run loop
+		argv[argc - 1] = (char*)configPath;
+	}else{
+		//popup a message???
+	}
+	[win resignKeyWindow];
+	win.rootViewController = nil;
+
+	[win release];
+	[nibObjects release];
 	int ret = GemRB_main(argc, argv);
 	if (ret != 0) {
 		// TODO: inject into error() function instead and rewrite the core to always use error instead of returning.
-		
+
 		// put up a message letting the user know something failed.
 		UIAlertView *alert = 
         [[UIAlertView alloc] initWithTitle: @"Engine Initialization Failure."
