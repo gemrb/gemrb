@@ -631,7 +631,8 @@ def ActionRightPressed ():
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
-			TopIndex = Max-10
+			if TopIndex > Max:
+				TopIndex = Max - 10
 		else:
 			TopIndex = 0
 	GemRB.SetVar ("TopIndex", TopIndex)

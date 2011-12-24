@@ -227,7 +227,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		Button = Window.GetControl (Offset+buttonCount)
 		GUICommonWindows.SetActionIconWorkaround (Button, ACT_RIGHT, buttonCount)
 		Button.SetText ("")
-		if len(memorizedSpells) - Start > 12:
+		if len(memorizedSpells) - Start > 10:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
