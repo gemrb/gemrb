@@ -4822,11 +4822,9 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = AREImporter;
-				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
 			};
 			name = Debug;
@@ -4837,16 +4835,13 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = AREImporter;
-				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
 				ZERO_LINK = NO;
 			};
@@ -4864,7 +4859,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL_ttf.framework/Headers,
 					/Library/Frameworks/SDL.framework/Headers,
@@ -4884,12 +4878,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL_ttf.framework/Headers,
 					/Library/Frameworks/SDL.framework/Headers,
@@ -4915,7 +4907,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BIFImporter;
@@ -4929,12 +4920,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BIFImporter;
@@ -4955,7 +4944,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BIKPlayer;
@@ -4969,12 +4957,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BIKPlayer;
@@ -4995,7 +4981,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BMPImporter;
@@ -5009,12 +4994,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BMPImporter;
@@ -5035,7 +5018,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BMPWriter;
@@ -5049,12 +5031,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BMPWriter;
@@ -5075,7 +5055,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = CHUImporter;
@@ -5089,12 +5068,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = CHUImporter;
@@ -5115,7 +5092,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = CREImporter;
@@ -5129,12 +5105,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = CREImporter;
@@ -5155,7 +5129,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = DirectoryImporter;
@@ -5169,12 +5142,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = DirectoryImporter;
@@ -5195,7 +5166,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = DLGImporter;
@@ -5209,12 +5179,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = DLGImporter;
@@ -5235,7 +5203,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = EFFImporter;
@@ -5249,12 +5216,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = EFFImporter;
@@ -5275,7 +5240,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = FXOpcodes;
@@ -5289,12 +5253,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = FXOpcodes;
@@ -5315,7 +5277,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = GAMImporter;
@@ -5329,12 +5290,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = GAMImporter;
@@ -5355,7 +5314,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/System/Library/Frameworks/Python.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
@@ -5373,12 +5331,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/System/Library/Frameworks/Python.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
@@ -5403,7 +5359,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = IDSImporter;
@@ -5417,12 +5372,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = IDSImporter;
@@ -5443,7 +5396,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = INIImporter;
@@ -5457,12 +5409,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = INIImporter;
@@ -5483,7 +5433,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = ITMImporter;
@@ -5497,12 +5446,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = ITMImporter;
@@ -5523,7 +5470,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = IWDOpcodes;
@@ -5537,12 +5483,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = IWDOpcodes;
@@ -5563,7 +5507,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = KEYImporter;
@@ -5577,12 +5520,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = KEYImporter;
@@ -5603,7 +5544,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = MOSImporter;
@@ -5617,12 +5557,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = MOSImporter;
@@ -5643,7 +5581,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = MUSImporter;
@@ -5657,12 +5594,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = MUSImporter;
@@ -5683,7 +5618,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = MVEPlayer;
@@ -5697,12 +5631,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = MVEPlayer;
@@ -5723,7 +5655,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = NullSound;
@@ -5737,12 +5668,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = NullSound;
@@ -5763,7 +5692,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = OGGReader;
@@ -5777,12 +5705,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = OGGReader;
@@ -5807,7 +5733,6 @@
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				"GCC_VERSION[arch=x86_64]" = "";
 				HEADER_SEARCH_PATHS = /Library/Frameworks/SDL.framework/Headers;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
@@ -5823,7 +5748,6 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
@@ -5832,12 +5756,10 @@
 					"$(FRAMEWORK_SEARCH_PATHS)",
 					/Library/Frameworks/,
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				"GCC_VERSION[arch=x86_64]" = "";
 				HEADER_SEARCH_PATHS = /Library/Frameworks/SDL.framework/Headers;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_CFLAGS = "";
 				PRODUCT_NAME = OpenALAudio;
 				USER_HEADER_SEARCH_PATHS = "./ ../gemrb/ ../gemrb/core/";
 				ZERO_LINK = NO;
@@ -5856,7 +5778,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PLTImporter;
@@ -5870,12 +5791,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PLTImporter;
@@ -5896,7 +5815,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PNGImporter;
@@ -5910,12 +5828,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PNGImporter;
@@ -5936,7 +5852,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PROImporter;
@@ -5950,12 +5865,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PROImporter;
@@ -5976,7 +5889,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PSTOpcodes;
@@ -5990,12 +5902,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = PSTOpcodes;
@@ -6016,7 +5926,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
@@ -6034,12 +5943,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
@@ -6065,21 +5972,15 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_CFLAGS = (
-					"-isystem",
-					./,
-				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -6089,27 +5990,20 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				BUNDLE_LOADER = "/Users/brada/Library/Developer/Xcode/DerivedData/GemRB-gjmmnczugayburckvrfrsukvyxvk/Build/Products/Debug/GemRB.app/Contents/MacOS/GemRB";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_CFLAGS = (
-					"-isystem",
-					./,
-				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
@@ -6125,7 +6019,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = SPLImporter;
@@ -6139,12 +6032,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = SPLImporter;
@@ -6165,7 +6056,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TISImporter;
@@ -6179,12 +6069,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TISImporter;
@@ -6205,7 +6093,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TLKImporter;
@@ -6219,12 +6106,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TLKImporter;
@@ -6245,7 +6130,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = WAVReader;
@@ -6259,12 +6143,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = WAVReader;
@@ -6285,7 +6167,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = WEDImporter;
@@ -6299,12 +6180,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = WEDImporter;
@@ -6325,7 +6204,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = WMPImporter;
@@ -6339,12 +6217,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = WMPImporter;
@@ -6365,7 +6241,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = ZLibManager;
@@ -6379,12 +6254,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = ZLibManager;
@@ -6405,7 +6278,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = STOImporter;
@@ -6419,12 +6291,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = STOImporter;
@@ -6445,13 +6315,10 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = 2DAImporter;
-				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -6461,18 +6328,14 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = 2DAImporter;
-				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
-				VALID_ARCHS = "i386 x86_64";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -6489,11 +6352,9 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BAMImporter;
-				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
 			};
 			name = Debug;
@@ -6504,16 +6365,13 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = BAMImporter;
-				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
 				ZERO_LINK = NO;
 			};
@@ -6625,7 +6483,6 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
 				HEADER_SEARCH_PATHS = (
 					../gemrb/core,
@@ -6635,8 +6492,6 @@
 				);
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = gemrb_core;
-				SDKROOT = macosx;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -6645,10 +6500,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EXECUTABLE_PREFIX = lib;
 				GCC_MODEL_TUNING = G5;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
 				HEADER_SEARCH_PATHS = (
 					../gemrb/core,
@@ -6658,8 +6511,6 @@
 				);
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = gemrb_core;
-				SDKROOT = macosx;
-				VALID_ARCHS = "i386 x86_64";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -6676,7 +6527,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = SAVImporter;
@@ -6690,12 +6540,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = SAVImporter;
@@ -6716,7 +6564,6 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = ACMReader;
@@ -6730,12 +6577,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = ACMReader;
@@ -6834,6 +6679,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS)",
 					/Library/Frameworks/,
@@ -6875,6 +6721,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS)",
 					/Library/Frameworks/,
