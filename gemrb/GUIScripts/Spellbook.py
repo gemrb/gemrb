@@ -211,7 +211,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.SpellPressed)
 
-		if Spell['SpellbookIcon']:
+		if Spell['SpellResRef']:
 			Button.SetSprites ("guibtbut", 0, 0,1,2,3)
 			Button.SetSpellIcon (Spell['SpellResRef'], 1)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
