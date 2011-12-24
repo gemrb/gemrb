@@ -6665,6 +6665,10 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
+	// HACK: disable use when stunned (remove if stunned/petrified/etc actors stop running scripts)
+	if (Immobile()) {
+		return false;
+	}
 
 	ieResRef tmpresref;
 	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
@@ -6696,6 +6700,10 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 {
 	if (target->Type!=ST_ACTOR) {
 		return UseItemPoint(slot, header, target->Pos, flags);
+	}
+	// HACK: disable use when stunned (remove if stunned/petrified/etc actors stop running scripts)
+	if (Immobile()) {
+		return false;
 	}
 
 	Actor *tar = (Actor *) target;
