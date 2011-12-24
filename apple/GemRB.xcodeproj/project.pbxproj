@@ -183,6 +183,7 @@
 		A288621E14A54FE2009AC280 /* libSDL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621A14A54FE2009AC280 /* libSDL.a */; };
 		A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621F14A54FFD009AC280 /* libarchive.dylib */; };
 		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
+		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
 		A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
@@ -4402,6 +4403,7 @@
 				A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */,
 				A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */,
 				A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */,
+				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
