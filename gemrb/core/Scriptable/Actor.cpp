@@ -4797,7 +4797,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const
 {
 	tohit = GetStat(IE_TOHIT);
-	speed = -GetStat(IE_PHYSICALSPEED);
+	speed = -(int)GetStat(IE_PHYSICALSPEED);
 	ieDword dualwielding = IsDualWielding();
 	header = GetWeapon(wi, leftorright && dualwielding);
 	if (!header) {
