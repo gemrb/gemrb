@@ -3682,7 +3682,12 @@ ieDword Actor::GetCasterLevel(int spelltype)
 // this works properly with disabled dualclassed actors, since it ends up in GetClassLevel
 ieDword Actor::GetAnyActiveCasterLevel() const
 {
-	return GetBaseCasterLevel(IE_SPL_PRIEST, 1) + GetBaseCasterLevel(IE_SPL_WIZARD, 1);
+	int strict = 1;
+	// only player classes will have levels in the correct slots
+	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
+		strict = 0;
+	}
+	return GetBaseCasterLevel(IE_SPL_PRIEST, strict) + GetBaseCasterLevel(IE_SPL_WIZARD, strict);
 }
 
 /** maybe this would be more useful if we calculate with the strength too
