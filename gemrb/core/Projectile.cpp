@@ -536,7 +536,8 @@ bool Projectile::FailedIDS(Actor *target) const
 
 void Projectile::Payload()
 {
-	Actor *target, *Owner;
+	Actor *target;
+	Scriptable *Owner;
 
 	if(Shake) {
 		core->timer->SetScreenShake( Shake, Shake, Shake);
@@ -567,10 +568,19 @@ void Projectile::Payload()
 		}
 	}
 	Actor *source = area->GetActorByGlobalID(Caster);
+	InfoPoint *source2 = area->GetInfoPointByGlobalID(Caster);
+	Container *source3 = area->GetContainerByGlobalID(Caster);
+	Door *source4 = area->GetDoorByGlobalID(Caster);
 	if (source) {
 		Owner = source;
+	} else if (source2) {
+		Owner = (Scriptable *) source2;
+	} else if (source3) {
+		Owner = (Scriptable *) source3;
+	} else if (source4) {
+		Owner = (Scriptable *) source4;
 	} else {
-		Owner = target;
+		error("Projectile::Payload", "Unknown source type!\n");
 	}
 
 	if (target) {
