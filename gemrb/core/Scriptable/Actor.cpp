@@ -3191,7 +3191,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	int resisted = 0;
-	ModifyDamage (hitter, damage, resisted, damagetype, NULL, false);
+	ModifyDamage (hitter, damage, resisted, damagetype, NULL, critical);
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
@@ -5234,7 +5234,6 @@ void Actor::PerformAttack(ieDword gameTime)
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
 	int damage = 0;
-	int resisted = 0;
 
 	if (hittingheader->DiceThrown<256) {
 		if (Modified[IE_LUCK] > Modified[IE_DAMAGELUCK]) {
@@ -5242,9 +5241,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
 		}
-		print("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	} else {
-		print("| No Damage");
 		damage = 0;
 	}
 
@@ -5254,8 +5251,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("\n");
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		target->ModifyDamage (this, damage, resisted, weapon_damagetype[damagetype], &wi, true);
-		UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
+		UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, UI_CRITICAL, damage);
 		ResetState();
 
 		return;
@@ -5288,7 +5284,6 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	print("\n");
-	target->ModifyDamage (this, damage, resisted, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
 	ResetState();
 }
@@ -6727,7 +6722,11 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
 			AttackEffect->Parameter3 = 1;
-			AttackEffect->IsVariable = GetCriticalType();
+			if (pstflags) {
+				AttackEffect->IsVariable = GetCriticalType();
+			} else {
+				AttackEffect->IsVariable = flags&UI_CRITICAL;
+			}
 			pro->GetEffects()->AddEffect(AttackEffect, true);
 			if (ranged)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
