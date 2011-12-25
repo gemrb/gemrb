@@ -4378,7 +4378,7 @@ bool Actor::ValidTarget(int ga_flags) const
 		break;
 	case GA_TALK:
 		//can't talk to dead
-		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
+		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN^STATE_SLEEP)) return false;
 		//can't talk to hostile
 		if (Modified[IE_EA]>=EA_EVILCUTOFF) return false;
 		break;

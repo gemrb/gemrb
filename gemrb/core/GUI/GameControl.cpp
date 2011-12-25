@@ -1409,7 +1409,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 				nextCursor = IE_CURSOR_TALK;
 				//don't let the pc to talk to frozen/stoned creatures
 				ieDword state = lastActor->GetStat(IE_STATE_ID);
-				if (state & STATE_CANTMOVE) {
+				if (state & (STATE_CANTMOVE^STATE_SLEEP)) {
 					nextCursor |= IE_CURSOR_GRAY;
 				}
 			} else {
@@ -1426,7 +1426,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			} else {
 				//don't let the pc to talk to frozen/stoned creatures
 				ieDword state = lastActor->GetStat(IE_STATE_ID);
-				if (state & STATE_CANTMOVE) {
+				if (state & (STATE_CANTMOVE^STATE_SLEEP)) {
 					nextCursor |= IE_CURSOR_GRAY;
 				}
 			}
