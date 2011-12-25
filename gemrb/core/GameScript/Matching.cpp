@@ -417,8 +417,11 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
 	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
-	int count = tgts->Count();
-	delete tgts;
+	int count = 0; // silly fallback to avoid potential crashes
+	if (tgts) {
+		count = tgts->Count();
+		delete tgts;
+	}
 	return count;
 }
 
