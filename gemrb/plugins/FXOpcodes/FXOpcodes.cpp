@@ -2511,53 +2511,53 @@ int fx_sex_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_ids_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_ids_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	boolean permanent = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
+	bool permanent = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
 	switch (fx->Parameter2) {
 	case 0:
 		if (permanent) {
-			BASE_STAT_SET(IE_EA, fx->Parameter1);
+			BASE_SET(IE_EA, fx->Parameter1);
 		} else {
 			STAT_SET(IE_EA, fx->Parameter1);
 		}
 		break;
 	case 1:
 		if (permanent) {
-			BASE_STAT_SET(IE_GENERAL, fx->Parameter1);
+			BASE_SET(IE_GENERAL, fx->Parameter1);
 		} else {
 			STAT_SET(IE_GENERAL, fx->Parameter1);
 		}
 		break;
 	case 2:
 		if (permanent) {
-			BASE_STAT_SET(IE_RACE, fx->Parameter1);
+			BASE_SET(IE_RACE, fx->Parameter1);
 		} else {
 			STAT_SET(IE_RACE, fx->Parameter1);
 		}
 		break;
 	case 3:
 		if (permanent) {
-			BASE_STAT_SET(IE_CLASS, fx->Parameter1);
+			BASE_SET(IE_CLASS, fx->Parameter1);
 		} else {
 			STAT_SET(IE_CLASS, fx->Parameter1);
 		}
 		break;
 	case 4:
 		if (permanent) {
-			BASE_STAT_SET(IE_SPECIFIC, fx->Parameter1);
+			BASE_SET(IE_SPECIFIC, fx->Parameter1);
 		} else {
 			STAT_SET(IE_SPECIFIC, fx->Parameter1);
 		}
 		break;
 	case 5:
 		if (permanent) {
-			BASE_STAT_SET(IE_SEX, fx->Parameter1);
+			BASE_SET(IE_SEX, fx->Parameter1);
 		} else {
 			STAT_SET(IE_SPECIFIC, fx->Parameter1);
 		}
 		break;
 	case 6:
 		if (permanent) {
-			BASE_STAT_SET(IE_ALIGNMENT, fx->Parameter1);
+			BASE_SET(IE_ALIGNMENT, fx->Parameter1);
 		} else {
 			STAT_SET(IE_ALIGNMENT, fx->Parameter1);
 		}
@@ -2818,7 +2818,7 @@ int fx_magical_fire_resistance_modifier (Scriptable* /*Owner*/, Actor* target, E
 	if (0) print( "fx_magical_fire_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_STAT_MOD( IE_RESISTMAGICFIRE );
+		BASE_MOD( IE_RESISTMAGICFIRE );
 	} else {
 		STAT_MOD( IE_RESISTMAGICFIRE );
 	}
@@ -2831,7 +2831,7 @@ int fx_magical_cold_resistance_modifier (Scriptable* /*Owner*/, Actor* target, E
 	if (0) print( "fx_magical_cold_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_STAT_MOD( IE_RESISTMAGICCOLD );
+		BASE_MOD( IE_RESISTMAGICCOLD );
 	} else {
 		STAT_MOD( IE_RESISTMAGICCOLD );
 	}
@@ -2857,7 +2857,7 @@ int fx_crushing_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effec
 	if (0) print( "fx_crushing_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_STAT_MOD( IE_RESISTCRUSHING );
+		BASE_MOD( IE_RESISTCRUSHING );
 	} else {
 		STAT_MOD( IE_RESISTCRUSHING );
 	}
@@ -2961,7 +2961,7 @@ int fx_tracking_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_tracking_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_STAT_MOD( IE_TRACKING );
+		BASE_MOD( IE_TRACKING );
 	} else {
 		STAT_MOD( IE_TRACKING );
 	}
@@ -2984,7 +2984,7 @@ int fx_strength_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx
 	if (0) print( "fx_strength_bonus_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_STAT_MOD( IE_STREXTRA );
+		BASE_MOD( IE_STREXTRA );
 	} else {
 		STAT_MOD( IE_STREXTRA );
 	}
@@ -3139,9 +3139,9 @@ int fx_morale_break_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_morale_break_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_STAT_MOD(IE_MORALEBREAK);
+		BASE_MOD(IE_MORALEBREAK);
 	} else {
-	     STAT_MOD(IE_MORALEBREAK);
+		STAT_MOD(IE_MORALEBREAK);
 	}
 	return FX_PERMANENT; //permanent morale break doesn't stick
 }
