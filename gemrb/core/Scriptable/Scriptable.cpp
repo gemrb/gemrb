@@ -914,6 +914,11 @@ void Scriptable::CastSpellPointEnd(int level)
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
+	// no need to distinguish between them, since the spell IDs are type dependant and there is no overlap
+	ieDword spellID = ResolveSpellNumber(SpellResRef);
+	AddTrigger(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
+	AddTrigger(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
+	AddTrigger(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
 
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
@@ -955,6 +960,17 @@ void Scriptable::CastSpellEnd(int level)
 
 	//if the projectile doesn't need to follow the target, then use the target position
 	CreateProjectile(SpellResRef, LastTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
+	// no need to distinguish between them, since the spell IDs are type dependant and there is no overlap
+	ieDword spellID = ResolveSpellNumber(SpellResRef);
+	AddTrigger(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
+	AddTrigger(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
+	AddTrigger(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
+	Actor *target = area->GetActorByGlobalID(LastTarget);
+	if (target) {
+		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
+	}
+
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
 	LastTarget = 0;
