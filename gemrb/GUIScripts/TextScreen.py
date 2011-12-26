@@ -25,11 +25,20 @@ import GUICommon
 TextScreen = None
 TextArea = None
 Row = 1
-Position = 1
+Position = 0
 Chapter = 0
 TableName = None
 BGTICKS = 300 # TODO: verify for suitability
 Ticks = IWDTICKS = 200 # TODO: verify for suitability in iwd1
+
+def FindTextRow (Table):
+	global Row
+
+	#this is still not the full implementation, but the original engine never used this stuff
+	Row = Table.GetRowIndex("DEFAULT")
+	if Table.GetValue (Row, 1)== -1:
+		Row = Table.GetRowIndex("GOOD_REPUTATION")
+	return
 
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter, TableName, Row, Ticks
@@ -77,17 +86,20 @@ def StartTextScreen ():
 	Table = GemRB.LoadTable (TableName)
 	if GUICommon.GameIsBG1():
 		#these suckers couldn't use a fix row
-		Row = Table.GetRowIndex("DEFAULT")
+		FindTextRow (Table)
 		Value = Table.GetValue (Row, 0)
 	elif GUICommon.GameIsBG2():
 		LoadPic = Table.GetValue (-1, -1)
 		if LoadPic != "":
 			TextScreen.SetPicture (LoadPic)
-		# TODO: verify
-		Value = 0
+		FindTextRow (Table)
+		Value = Table.GetValue (Row, 0)
 	else:
-		Value = Table.GetValue (Chapter, 0)
-	if Value:
+		FindTextRow (Table)
+		Value = Table.GetValue (Row, 0)
+
+	#don't display the fake -1 string (No caption in toscst.2da)
+	if Value>0:
 		Label=TextScreen.GetControl (0x10000000)
 		Label.SetText (Value)
 
@@ -115,22 +127,15 @@ def FeedScroll ():
 	global TextArea, Position
 
 	Table = GemRB.LoadTable (TableName)
-	if GUICommon.GameIsBG2():
-		#this is a rather primitive selection but works for the games
-		Value = Table.GetValue (0, 1)
-		if Value == "REPUTATION":
-			line = 2
-		else:
-			line = 1
-		Value = Table.GetValue (line, 1)
-	elif GUICommon.GameIsBG1():
-		Value = Table.GetValue (Row, Position)
-		if Value == 'NONE':
-			Position = 1
-		else:
-			Position = Position + 1
+	Count = Table.GetColumnCount (Row)
+
+	if Position>=Count-1:
+		Position = 0
+		return
 	else:
-		Value = Table.GetValue (Chapter, 1)
+		Position = Position + 1
+
+	Value = Table.GetValue (Row, Position)
 
 	TextArea.Append (Value, -1, 6)
 	return
@@ -150,7 +155,7 @@ def EndTextScreen ():
 def ReplayTextScreen ():
 	global TextArea, Position
 
-	Position = 1
+	Position = 0
 	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, FeedScroll)
 	TextArea.Rewind (Ticks)
 	return
