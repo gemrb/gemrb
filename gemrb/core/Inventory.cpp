@@ -276,6 +276,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
+print("Added equipping effects of slot: %d\n", index);
 	Owner->RefreshEffects(eqfx);
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
@@ -287,6 +288,7 @@ void Inventory::AddSlotEffects(ieDword index)
 //is stored in them
 void Inventory::RemoveSlotEffects(ieDword index)
 {
+print("Removed equipping effects of slot: %d\n", index);
 	Owner->fxqueue.RemoveEquippingEffects(index);
 	Owner->RefreshEffects(NULL);
 	//call gui for possible paperdoll animation changes
@@ -978,7 +980,13 @@ bool Inventory::EquipItem(unsigned int slot)
 			if (slot != IW_NO_EQUIPPED) {
 				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot+SLOT_MELEE, EquippedHeader);
 			}
-			effect = 0; // SetEquippedSlot will already call AddSlotEffects
+			//don't clear effect in case of a launcher, we need to find it and add its effects too
+			//slot is 'negative' for launchers
+			if ((int) slot>=0) {
+				effect = 0; // SetEquippedSlot will already call AddSlotEffects
+			} else {
+				effect = SLOT_EFFECT_MISSILE;
+			}
 			UpdateWeaponAnimation();
 		}
 		break;
