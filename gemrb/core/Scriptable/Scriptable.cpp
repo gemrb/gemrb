@@ -1488,7 +1488,7 @@ void Selectable::DrawCircle(const Region &vp)
 		//if it is too fast, increase the 6 to 7
 		unsigned long step;
 		step = GetTickCount();
-		step = tp_steps [(step >> 6) & 7];
+		step = tp_steps [(step >> 7) & 7]*2;
 		mix.a = overColor.a;
 		mix.r = (overColor.r*step+selectedColor.r*(8-step))/8;
 		mix.g = (overColor.g*step+selectedColor.g*(8-step))/8;
