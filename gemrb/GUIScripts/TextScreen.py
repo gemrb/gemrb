@@ -74,6 +74,8 @@ def StartTextScreen ():
 		TableName = "chapters"
 	elif GUICommon.GameIsBG1() and TableName[:6] == "chptxt":
 		GemRB.LoadMusicPL ("chapter.mus")
+	else:
+		GemRB.HardEndPL ()
 
 	TextScreen = GemRB.LoadWindow (ID)
 	TextScreen.SetFrame ()
@@ -126,6 +128,11 @@ def FeedScroll ():
 
 	Table = GemRB.LoadTable (TableName)
 	Count = Table.GetColumnCount (Row)
+
+	#hack for messy chapters.2da in IWD
+	#note: iwd doesn't use TextScreen, only IncrementChapter
+	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+		Count = 2
 
 	if Position>=Count-1:
 		Position = 0
