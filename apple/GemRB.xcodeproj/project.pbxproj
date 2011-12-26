@@ -70,6 +70,9 @@
 		A226F44A13A11ABE009CE75E /* WEDImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B877C139F0A7D0002DC13 /* WEDImporter.cpp */; };
 		A226F44B13A11AC3009CE75E /* WMPImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8781139F0A7D0002DC13 /* WMPImporter.cpp */; };
 		A226F44C13A11AC8009CE75E /* ZLibManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */; };
+		A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */; };
+		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
+		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
@@ -930,6 +933,9 @@
 		A208210A14191A03002CD244 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
+		A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ios/Icon.png; sourceTree = "<group>"; };
+		A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon@2x.png"; sourceTree = "<group>"; };
+		A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon-72.png"; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
@@ -2418,6 +2424,9 @@
 		A29BF91C13A04B3900C812DD /* Resources-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */,
+				A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */,
+				A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */,
 				A2830ABA13A0624D000A63FE /* Info.plist */,
 			);
 			name = "Resources-iOS";
@@ -3674,6 +3683,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A29BF86313A042B600C812DD /* Build configuration list for PBXNativeTarget "GemRB iOS" */;
 			buildPhases = (
+				A22DCCDD14A8F78C0067D6D1 /* ShellScript */,
 				A29BF85813A0427900C812DD /* Resources */,
 				A29BF85913A0427900C812DD /* Sources */,
 				A29BF85A13A0427900C812DD /* Frameworks */,
@@ -3830,12 +3840,29 @@
 			files = (
 				A2A3A7E714A5130F00F705CF /* GEM_ConfController-ipad.xib in Resources */,
 				A2A3A7E814A5130F00F705CF /* GEM_ConfController-iphone.xib in Resources */,
+				A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */,
+				A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */,
+				A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A22DCCDD14A8F78C0067D6D1 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../artwork/gemrb.icns",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "f=${SRCROOT}\nin=${SRCROOT}/../artwork/gemrb.icns\npng512=${f}/ios/iTunesArtwork\n\nsips --resampleWidth 512 \"${in}\" --out \"${png512}\"\nin=${png512}\necho $in\nsips --setProperty format png --resampleWidth 57 \"${in}\" --out \"${f}/ios/Icon.png\"\nsips --setProperty format png --resampleWidth 114 \"${in}\" --out \"${f}/ios/Icon@2x.png\"\nsips --setProperty format png --resampleWidth 29 \"${in}\" --out \"${f}/ios/Icon-Small.png\"\nsips --setProperty format png --resampleWidth 58 \"${in}\" --out \"${f}/ios/Icon-Small@2x.png\"\nsips --setProperty format png --resampleWidth 50 \"${in}\" --out \"${f}/ios/Icon-Small-50.png\"\nsips --setProperty format png --resampleWidth 72 \"${in}\" --out \"${f}/ios/Icon-72.png\"";
+		};
 		A249187F141079510038B170 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
