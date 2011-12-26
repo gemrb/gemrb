@@ -87,19 +87,17 @@ def StartTextScreen ():
 	if GUICommon.GameIsBG1():
 		#these suckers couldn't use a fix row
 		FindTextRow (Table)
-		Value = Table.GetValue (Row, 0)
 	elif GUICommon.GameIsBG2():
 		LoadPic = Table.GetValue (-1, -1)
 		if LoadPic != "":
 			TextScreen.SetPicture (LoadPic)
 		FindTextRow (Table)
-		Value = Table.GetValue (Row, 0)
 	else:
-		FindTextRow (Table)
-		Value = Table.GetValue (Row, 0)
+		Row = Chapter
 
+	Value = Table.GetValue (Row, 0)
 	#don't display the fake -1 string (No caption in toscst.2da)
-	if Value>0:
+	if Value!="NONE" and Value>0:
 		Label=TextScreen.GetControl (0x10000000)
 		Label.SetText (Value)
 
