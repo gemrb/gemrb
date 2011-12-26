@@ -146,7 +146,7 @@
 0x7702    MGHL      MGHL       MGHL       MGHL       2          2          RE         *
 0x7703    MGHL      MGHL       MGHL       MGHL       2          2          GA         *
 0x7704    MSHD      MSHD       MSHD       MSHD       4          2          1          *
-0x7800    MGIB      MGIB       MGIB       MGIB       2          2          1          *
+0x7800    MGIB      MGIB       MGIB       MGIB       14         2          1          *
 0x7900    MSLI      MSLI       MSLI       MSLI       3          3          GR         *
 0x7901    MSLI      MSLI       MSLI       MSLI       3          3          OL         *
 0x7902    MSLI      MSLI       MSLI       MSLI       3          3          MU         *
