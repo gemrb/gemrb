@@ -126,7 +126,8 @@ def MissionPack():
 		StartWindow.Unload()
 	if QuitWindow:
 		QuitWindow.Unload()
-	GemRB.SetVar("PlayMode",3) #use mpsave for saved games
+	GemRB.SetVar("PlayMode",1)
+	GemRB.SetVar("SaveDir",1) #use mpsave for saved games
 	GemRB.SetNextScript("GUILOAD")
 	return
 
