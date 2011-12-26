@@ -99,7 +99,7 @@ def StartTextScreen ():
 
 	Value = Table.GetValue (Row, 0)
 	#don't display the fake -1 string (No caption in toscst.2da)
-	if Value!="NONE" and Value>0:
+	if Value!="NONE" and Value>0 and TextScreen.HasControl(0x10000000):
 		Label=TextScreen.GetControl (0x10000000)
 		Label.SetText (Value)
 
