@@ -3000,7 +3000,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword gameTime = core->GetGame()->GameTime;
 
 	if (fx->FirstApply) {
-		//ensure our first call gets through
+		//ensure we prepare Parameter3 now
 	} else {
 		//we can have multiple calls at the same gameTime, so we
 		//just go to gameTime+1 to ensure one call
@@ -3032,9 +3032,11 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	}
 
-	//This should take care of the change of the modified stat
-	//So there is no need to do anything else here other than increasing
-	//the base current hp
+	if (fx->FirstApply) {
+		//don't add hp in the first occasion, so it cannot be used for cheat heals
+		return FX_APPLIED;
+	}
+
 	target->NewBase(IE_HITPOINTS, damage, MOD_ADDITIVE);
 	return FX_APPLIED;
 }
