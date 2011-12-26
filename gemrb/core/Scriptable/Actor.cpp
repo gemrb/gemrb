@@ -5550,6 +5550,12 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 	if (index>6) {
 		return;
 	}
+
+	//Don't modify the modified stats if the colors were locked (for this ai cycle)
+	if (anims->lockPalette) {
+		return;
+	}
+
 	if (shift == 15) {
 		// put gradient in all four bytes of value
 		value = gradient;

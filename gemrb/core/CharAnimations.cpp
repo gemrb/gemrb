@@ -295,6 +295,8 @@ void CharAnimations::CheckColorMod()
 		  }
 		}
 	}
+	//this is set by sanctuary and stoneskin (override global colors)
+	lockPalette = false;
 }
 
 void CharAnimations::SetupColors(PaletteType type)

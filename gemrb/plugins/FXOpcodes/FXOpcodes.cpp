@@ -419,7 +419,7 @@ int fx_golem_stoneskin_modifier (Scriptable* Owner, Actor* target, Effect* fx);/
 int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
-int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e   ChangeWeather
+int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e ChangeWeather
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
@@ -786,13 +786,19 @@ void RegisterCoreOpcodes()
 }
 
 
-static inline void SetGradient(Actor *target, ieDword gradient)
+#define STONE_GRADIENT 14
+#define ICE_GRADIENT 71
+
+static inline void SetGradient(Actor *target,const ieDword *gradients)
 {
-	gradient |= (gradient <<16);
-	gradient |= (gradient <<8);
 	for(int i=0;i<7;i++) {
+		int gradient = gradients[i];
+		gradient |= (gradient <<16);
+		gradient |= (gradient <<8);
+
 		STAT_SET(IE_COLORS+i, gradient);
 	}
+	target->SetLockedPalette(gradients);
 }
 
 static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
@@ -2604,7 +2610,7 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//the feat normally exists only in IWD2, but won't hurt
 		if (!target->GetFeat(FEAT_BLIND_FIGHT)) {
 			if (core->HasFeature(GF_REVERSE_TOHIT)) {
-				STAT_ADD (IE_TOHIT, 10);  // all other tohit stats are treated as bonuses
+				STAT_ADD (IE_TOHIT, 10); // all other tohit stats are treated as bonuses
 			} else {
 				STAT_SUB (IE_ARMORCLASS, 2);
 				// TODO: 50% inherent miss chance (full concealment), no dexterity bonus to AC (flatfooted)
@@ -4312,7 +4318,6 @@ int fx_play_movie (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x99 Overlay:Sanctuary
-#define ICE_GRADIENT 71
 
 static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
 
@@ -5346,6 +5351,8 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	return fx_set_unconscious_state(Owner,target,fx);
 }
 
+static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
+
 // 0xda StoneSkinModifier
 int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -5366,7 +5373,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//gradient for iron skins?
 	} else {
 		target->SetSpellState(SS_STONESKIN);
-		SetGradient(target, 14);
+		SetGradient(target, fullstone);
 	}
 	STAT_SET(IE_STONESKINS, fx->Parameter1);
 	target->AddPortraitIcon(PI_STONESKIN);
@@ -6927,7 +6934,7 @@ int fx_golem_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 	}
 
 	STAT_SET(IE_STONESKINSGOLEM, fx->Parameter1);
-	SetGradient(target, 14);
+	SetGradient(target, fullstone);
 	return FX_APPLIED;
 }
 
