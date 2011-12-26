@@ -3874,7 +3874,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#xcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION";
+			shellScript = "xcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION\n";
 		};
 		A2D4C61613A978520086BCC4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5994,7 +5994,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				BUNDLE_LOADER = "/Users/brada/Library/Developer/Xcode/DerivedData/GemRB-gjmmnczugayburckvrfrsukvyxvk/Build/Products/Debug/GemRB.app/Contents/MacOS/GemRB";
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
@@ -6019,7 +6019,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				BUNDLE_LOADER = "/Users/brada/Library/Developer/Xcode/DerivedData/GemRB-gjmmnczugayburckvrfrsukvyxvk/Build/Products/Debug/GemRB.app/Contents/MacOS/GemRB";
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
