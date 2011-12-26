@@ -528,7 +528,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
-	if ( RunEventHandler( MouseOverButton )) {
+	if ( RunEventHandler( MouseOverButton )<0) {
 		//event handler destructed this object
 		return;
 	}

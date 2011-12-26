@@ -102,6 +102,9 @@ void Control::SetText(const char* /*string*/)
 {
 }
 
+//return -1 if there is an error
+//return 1 if there is no handler (not an error)
+//return 0 if the handler ran as intended
 int Control::RunEventHandler(EventHandler handler)
 {
 	if (InHandler) {
@@ -116,7 +119,9 @@ int Control::RunEventHandler(EventHandler handler)
 		unsigned short WID = wnd->WindowID;
 		unsigned short ID = (unsigned short) ControlID;
 		InHandler = true;
+		//TODO: detect caller errors, trap them???
 		handler->call();
+		InHandler = false;
 		if (!core->IsValidWindow(WID,wnd) ) {
 			printMessage ("Control","Owner window destructed!\n", LIGHT_RED);
 			return -1;
@@ -125,9 +130,9 @@ int Control::RunEventHandler(EventHandler handler)
 			printMessage ("Control","Control destructed!\n", LIGHT_RED);
 			return -1;
 		}
-		InHandler = false;
+		return 0;
 	}
-	return 0;
+	return 1;
 }
 
 /** Key Press Event */
