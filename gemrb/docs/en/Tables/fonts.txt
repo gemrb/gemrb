@@ -1,13 +1,23 @@
 Description: This table lists fonts. Only fonts listed here could be used as a font resource.
 
+Note: the font system is described in depth on the wiki: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
+
 Columns: RESREF  - the .bam ResRef of the font
    NEED_PALETTE  - if the font has no own palette, set this to 1
-     FIRST_CHAR  - usually 0, it contains the first printable character of the font.
+     FIRST_CHAR  - usually 33 (33 = ! in ASCII), it contains the first printable character of the font as an ASCII value.
+      LAST_CHAR  - the last printable character of the font as an (extended) ASCII value.
+
+Note: the following columns are used primarily for non-BAM fonts.
+
+      FONT_NAME  - used to map a non-BAM font to a BAM ResRef.
+        PT_SIZE  - the pt size of the font.
+          STYLE  - a numeric value representing: normal, bold, italic, underline.
+          COLOR  - RGBA hexadecimal representation to use for coloring the font.
 
 Rows: <rowcount> - make sure the 9. font is a 'normal' font. Used for floating texts. (this is a hacked legacy feature, it may go away).
 
 Example (BG2):
-        RESREF          NEED_PALETTE    FIRST_CHAR
-0       NORMAL          1               0
-1       NUMBER          0               47
-2       INITIALS        0               0
+        RESREF          NEED_PALETTE    FIRST_CHAR    LAST_CHAR    FONT_NAME    PT_SIZE    STYLE    COLOR
+0       NORMAL          1               33            255          NORMAL       14         0        0xffffffff
+1       NUMBER          0               48            57           NUMBER       14         0        0xffffffff
+2       INITIALS        0               33            255          myFont       18         1        0x999999ff
