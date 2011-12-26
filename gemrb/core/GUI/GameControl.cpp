@@ -2741,7 +2741,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	//center on first selected actor
 	Video *video = core->GetVideoDriver();
 	Region vp = video->GetViewport();
-	if (ScreenFlags&SF_CENTERONACTOR) {
+	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
 		core->timer->SetMoveViewPort( pc->Pos.x, pc->Pos.y, 0, true );
 		video->MoveViewportTo( pc->Pos.x-vp.w/2, pc->Pos.y-vp.h/2 );
 		ScreenFlags&=~SF_CENTERONACTOR;
