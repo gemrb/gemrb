@@ -93,7 +93,7 @@ void Control::DisplayTooltip()
 		core->DisplayTooltip( 0, 0, NULL );
 }
 
-void Control::ResetEventHandler(EventHandler handler)
+void Control::ResetEventHandler(EventHandler &handler)
 {
 	handler = NULL;
 }

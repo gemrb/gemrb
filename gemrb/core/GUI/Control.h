@@ -113,7 +113,7 @@ public: // Public attributes
 	ieDword FunctionNumber;
 public: //Events
 	/** Reset/init event handler */
-	void ResetEventHandler(EventHandler handler);
+	void ResetEventHandler(EventHandler &handler);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
