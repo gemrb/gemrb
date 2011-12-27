@@ -142,12 +142,21 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 	}
 
 	if (oC->objectName[0]) {
-		//We want the object by its name... (doors/triggers don't play here!)
-		Actor* aC = map->GetActor( oC->objectName, ga_flags );
+		//We want the object by its name...
+		Scriptable* aC = map->GetActor( oC->objectName, ga_flags );
 
 		/*if (!aC && (ga_flags&GA_GLOBAL) ) {
 			aC = FindActorNearby(oC->objectName, map, ga_flags );
 		}*/
+		if (!aC) {
+			aC = map->GetTileMap()->GetInfoPoint(oC->objectName);
+		}
+		if (!aC) {
+			aC = map->GetTileMap()->GetDoor(oC->objectName);
+		}
+		if (!aC) {
+			aC = map->GetTileMap()->GetContainer(oC->objectName);
+		}
 
 		//return here because object name/IDS targeting are mutually exclusive
 		return ReturnScriptableAsTarget(aC);
