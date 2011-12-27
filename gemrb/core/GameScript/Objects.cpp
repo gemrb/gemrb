@@ -136,9 +136,13 @@ Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters, int ga_
 
 Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters, int ga_flags)
 {
+	Scriptable *target = parameters->GetTarget(0, -1);
 	parameters->Clear();
-	if (Sender->LastTrigger) {
-		Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
+	if (target) {
+		target = Sender->GetCurrentArea()->GetActorByGlobalID(target->LastTrigger);
+		parameters->AddTarget(target, 0, ga_flags);
+	} else if (Sender->LastTrigger) {
+		target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
 		parameters->AddTarget(target, 0, ga_flags);
 	}
 	return parameters;
