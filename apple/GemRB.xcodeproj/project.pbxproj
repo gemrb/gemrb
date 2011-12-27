@@ -3892,7 +3892,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ios/GemRB.cfg $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg\ncp ios/GemRB.cfg.newinstall $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/override\n\n#make ipa\n#purge payload of everything\nrm -r ios/Payload\nmkdir ios/Payload\ncp -r $BUILT_PRODUCTS_DIR/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB.ipa iTunesArtWork iTunesMetadata.plist Payload";
+			shellScript = "cp ios/GemRB.cfg $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg\ncp ios/GemRB.cfg.newinstall $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/override\n\n#make ipa\n#purge payload of everything\nrm -r ios/Payload\nmkdir ios/Payload\n#we could simply copy from the directory to payload but i like having a symlink available\nln -s \"$BUILT_PRODUCTS_DIR\" ios/build\ncp -r ios/build/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB.ipa iTunesArtWork iTunesMetadata.plist Payload";
 		};
 /* End PBXShellScriptBuildPhase section */
 
