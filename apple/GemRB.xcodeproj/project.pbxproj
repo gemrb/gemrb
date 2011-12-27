@@ -3874,7 +3874,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "xcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION\n";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a tared dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION\n\n#we could simply copy from the directory to payload but i like having a symlink available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build";
 		};
 		A2D4C61613A978520086BCC4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
