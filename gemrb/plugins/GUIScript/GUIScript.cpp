@@ -2264,6 +2264,42 @@ static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_TextEdit_SetBackground__doc,
+"SetBackground(WindowIndex, ControlIndex, ResRef)\n\n"
+"Sets the background MOS for a TextEdit control.");
+
+static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	char *ResRef;
+
+	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,&ResRef) ) {
+		return AttributeError( GemRB_TextEdit_SetBackground__doc );
+	}
+	TextEdit* te = ( TextEdit* ) GetControl(WindowIndex, ControlIndex, IE_GUI_EDIT);
+	if (!te) {
+		return NULL;
+	}
+
+	if (ResRef[0]) {
+		ResourceHolder<ImageMgr> im(ResRef);
+		if (im == NULL) {
+			return RuntimeError("Picture resource not found!\n");
+		}
+
+		Sprite2D* Picture = im->GetSprite2D();
+		if (Picture == NULL) {
+			return RuntimeError("Failed to acquire the picture!\n");
+		}
+		te->SetBackGround(Picture);
+	} else {
+		te->SetBackGround(NULL);
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_ScrollBar_SetSprites__doc,
 "SetScrollBarSprites(WindowIndex, ControlIndex, ResRef, Cycle, UpUnpressedFrame, UpPressedFrame, DownUnpressedFrame, DownPressedFrame, TroughFrame, SliderFrame)\n\n"
 "Sets a ScrollBar Sprites Images." );
@@ -10267,6 +10303,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_SelectText, METH_VARARGS),
 	METHOD(TextArea_SetHistory, METH_VARARGS),
 	METHOD(TextEdit_ConvertEdit, METH_VARARGS),
+	METHOD(TextEdit_SetBackground, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(Window_CreateButton, METH_VARARGS),
 	METHOD(Window_CreateLabel, METH_VARARGS),

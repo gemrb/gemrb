@@ -2575,6 +2575,7 @@ def BiographyPress():
 
 	BiographyField = BiographyWindow.GetControl (4)
 	BiographyField.SetText (19423)
+	BiographyField.SetBackground("")
 
 	BiographyClearButton = BiographyWindow.GetControl (5)
 	BiographyClearButton.SetState (IE_GUI_BUTTON_ENABLED)

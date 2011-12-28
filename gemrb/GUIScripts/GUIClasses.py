@@ -138,7 +138,8 @@ class GTextArea(GControl):
 class GTextEdit(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetBufferLength': _GemRB.TextEdit_SetBufferLength
+    'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
+    'SetBackground': _GemRB.TextEdit_SetBackground
   }
   def ConvertEdit(self, ScrollBarID):
     newID = _GemRB.TextEdit_ConvertEdit(self.WinID, self.ID, ScrollBarID)

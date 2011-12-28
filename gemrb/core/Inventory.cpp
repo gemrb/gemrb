@@ -276,7 +276,6 @@ void Inventory::AddSlotEffects(ieDword index)
 	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
-print("Added equipping effects of slot: %d\n", index);
 	Owner->RefreshEffects(eqfx);
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
@@ -288,7 +287,6 @@ print("Added equipping effects of slot: %d\n", index);
 //is stored in them
 void Inventory::RemoveSlotEffects(ieDword index)
 {
-print("Removed equipping effects of slot: %d\n", index);
 	Owner->fxqueue.RemoveEquippingEffects(index);
 	Owner->RefreshEffects(NULL);
 	//call gui for possible paperdoll animation changes
