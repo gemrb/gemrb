@@ -969,6 +969,7 @@ void Scriptable::CastSpellEnd(int level)
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
+		target->LastSpellOnMe = spellID;
 	}
 
 	SpellHeader = -1;
