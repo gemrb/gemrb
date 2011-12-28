@@ -619,7 +619,8 @@ def ContingencyOk ():
 	else:
 		GemRB.ApplyEffect (pc, "CastSpellOnCondition", 0, GemRB.GetVar ("ContCond"), Spell1, Spell2, Spell3, Source)
 	#set the innate
-	GemRB.LearnSpell (pc, Source+"d", LS_MEMO)
+	if GemRB.LearnSpell (pc, Source+"d", LS_MEMO):
+		print "EEEEK! Failed to learn sequencer/contingency!\n\n"
 	OtherWindow.Unload()
 	return
 
