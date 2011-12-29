@@ -2025,8 +2025,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	if (!FormationRotation) actor = area->GetActor( p, GA_DEFAULT /*| GA_NO_DEAD */| GA_NO_HIDDEN | target_types);
 	if (Button == GEM_MB_MENU) {
 		if (actor) {
-			//from GSUtils
-			DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+			//play select sound on right click on actor
+			actor->SelectActor();
 			return;
 		}
 		// reset the action bar
@@ -2164,7 +2164,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 	//we got an actor past this point
 	if (target_mode == TARGET_MODE_NONE) {
-		DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+		//play select sound
+		actor->SelectActor();
 	}
 
 	PerformActionOn(actor);
