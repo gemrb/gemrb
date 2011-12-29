@@ -1,9 +1,11 @@
 2DA V1.0
 *
 	ORIGINAL	NEW          COMMENT
-RESP1	59		58      no second hostile response
-RESP2     60        58      no third hostile response
-DLG1      61        59      hostile dialog shifts
-DLG2      62        60      default dialog shifts
-
-
+SELR1     63            35      rare selects (in bg1 there are 4 in bg2 there are 2)
+SELR2     64            36
+SELR3     65            37
+SELR4     66            38
+RESP1	  59            58      no second hostile response
+RESP2     60            58      no third hostile response
+DLG1      61            59      hostile dialog shifts
+DLG2      62            60      default dialog shifts
