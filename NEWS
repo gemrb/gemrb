@@ -1,18 +1,15 @@
-GemRB git (49da55199a):
+GemRB V0.7.0 (2011-12-30):
   New features:
-    - 
+    - one can play through the whole Baldur's Gate saga
     - custom TTF fonts support
-    - more pst spawn ini flags, individual critical hit animations
     - arbitrarily sortable casting list
-    - always center, always run for pst
+    - ios configuration interface, xcode project
+    - more pst spawn ini flags, individual critical hit animations
 
   Improved features:
-    - 
-    - resting, comment timing
-    - drop caps, keybindings, action bar, sdl 1.3 input
+    - resting, comment timing, actions
+    - drop caps, keybindings, sdl 1.3 input
     - bugfixes, cleanups
-
-  Applied patches:
 
 GemRB V0.6.6 (2011-10-03):
   New features:
