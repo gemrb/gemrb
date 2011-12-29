@@ -115,7 +115,7 @@ static ieDword sel_snd_freq = 0;
 static ieDword cmd_snd_freq = 0;
 static ieDword bored_time = 3000;
 //the chance to issue one of the rare select verbal constants
-#define RARE_SELECT_CHANCE 1
+#define RARE_SELECT_CHANCE 5
 
 //item usability array
 struct ItemUseType {
@@ -2968,7 +2968,7 @@ void Actor::SelectActor() const
 		default:;
 	}
 
-	//drop the rare selection comment 1% of the time
+	//drop the rare selection comment 5% of the time
 	if (core->Roll(1,100,0) <= RARE_SELECT_CHANCE) {
 		VerbalConstant(VB_SELECT_RARE,2);
 	} else {
