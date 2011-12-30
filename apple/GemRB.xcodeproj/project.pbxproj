@@ -6,6 +6,22 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		A2F8708C14AE439000F9CC1F /* ReleasePackage */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = A2F8708D14AE439000F9CC1F /* Build configuration list for PBXAggregateTarget "ReleasePackage" */;
+			buildPhases = (
+				A2F8709214AE448500F9CC1F /* ShellScript */,
+			);
+			dependencies = (
+				A2F8709414AE4A8F00F9CC1F /* PBXTargetDependency */,
+				A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */,
+			);
+			name = ReleasePackage;
+			productName = ReleasePackage;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -906,6 +922,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = A2E66337139E875400310FC8;
 			remoteInfo = libgemrb_core.dylib;
+		};
+		A2F8709014AE43BB00F9CC1F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
+			remoteInfo = "GemRB OS X";
+		};
+		A2F8709314AE4A8F00F9CC1F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A29BF85B13A0427900C812DD;
+			remoteInfo = "GemRB iOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -3820,6 +3850,7 @@
 				A276B4AE13A28AEE00D41A8A /* ZLibManager */,
 				A2F0505013ABB80B0023B7EB /* SAVImporter */,
 				A269030F142BEE2F003E8BCC /* TTFImporter */,
+				A2F8708C14AE439000F9CC1F /* ReleasePackage */,
 			);
 		};
 /* End PBXProject section */
@@ -3893,6 +3924,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n\ncp ios/GemRB.cfg $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg\ncp ios/GemRB.cfg.newinstall $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/override\n\n#make ipa\n#purge payload of everything\nrm -r ios/Payload\nmkdir ios/Payload\n#we could simply copy from the directory to payload but i like having a symlink available\nln -s \"$BUILT_PRODUCTS_DIR\" ios/build\ncp -r ios/build/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB.ipa iTunesArtWork iTunesMetadata.plist Payload";
+		};
+		A2F8709214AE448500F9CC1F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out Install\\ GemRB.pkg";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4826,6 +4870,16 @@
 			isa = PBXTargetDependency;
 			target = A2E66337139E875400310FC8 /* gemrb_core */;
 			targetProxy = A2E6633B139E876900310FC8 /* PBXContainerItemProxy */;
+		};
+		A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D1107260486CEB800E47090 /* GemRB OS X */;
+			targetProxy = A2F8709014AE43BB00F9CC1F /* PBXContainerItemProxy */;
+		};
+		A2F8709414AE4A8F00F9CC1F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A29BF85B13A0427900C812DD /* GemRB iOS */;
+			targetProxy = A2F8709314AE4A8F00F9CC1F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -6583,6 +6637,20 @@
 			};
 			name = Release;
 		};
+		A2F8708E14AE439000F9CC1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A2F8708F14AE439000F9CC1F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		A2FCD5FC13A0366100271997 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -7183,6 +7251,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		A2F8708D14AE439000F9CC1F /* Build configuration list for PBXAggregateTarget "ReleasePackage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2F8708E14AE439000F9CC1F /* Debug */,
+				A2F8708F14AE439000F9CC1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		A2FCD60213A0366F00271997 /* Build configuration list for PBXNativeTarget "ACMReader" */ = {
 			isa = XCConfigurationList;
