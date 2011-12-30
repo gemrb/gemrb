@@ -116,6 +116,10 @@ static ieDword cmd_snd_freq = 0;
 static ieDword bored_time = 3000;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
+//these are the max number of select sounds -- the size of the pool to choose from
+#define NUM_RARE_SELECT_SOUNDS 2 //in bg and pst it is actually 4 TODO: check
+#define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
+#define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
 
 //item usability array
 struct ItemUseType {
@@ -2785,15 +2789,24 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 
 void Actor::VerbalConstant(int start, int count) const
 {
-	ieStrRef vc;
-
-	count=rand()%count;
-
-	while(count>=0 && (!(vc = GetVerbalConstant(start+count)) || (vc==(ieStrRef) -1)) ) {
-		count--;
-	}
-	if(count>=0) {
-		DisplayStringCore((Scriptable *const) this, vc, DS_CONSOLE );
+	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
+	if (PCStats && PCStats->SoundSet[0]){
+		ieResRef soundref;
+		ResolveStringConstant(soundref, start+count-1);
+		while (count > 0 && !gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
+			count--;
+			ResolveStringConstant(soundref, start+count-1);
+		}
+		if (count > 0){
+			DisplayStringCore((Scriptable *const) this, start + rand()%count, DS_CONSOLE|DS_CONST);
+		}
+	} else { //If we are anyone else we have to check there is a corresponding strref
+		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
+			count--;
+		}
+		if(count > 0) {
+			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+rand()%count), DS_CONSOLE );
+		}
 	}
 }
 
@@ -2964,15 +2977,21 @@ void Actor::SelectActor() const
 		case 0:
 			return;
 		case 1:
-			if (core->Roll(1,100,0)>25) return;
+			if (core->Roll(1,100,0) > 25) return;
 		default:;
 	}
 
 	//drop the rare selection comment 5% of the time
-	if (core->Roll(1,100,0) <= RARE_SELECT_CHANCE) {
-		VerbalConstant(VB_SELECT_RARE,2);
+	if (InParty && core->Roll(1,100,0) <= RARE_SELECT_CHANCE){
+		//rare select on main character for BG1 won't work atm
+		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS);
 	} else {
-		VerbalConstant(VB_SELECT,6);
+		//checks if we are main character to limit select sounds
+		if (PCStats && PCStats->SoundSet[0]) {
+			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS);
+		} else {
+			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS);
+		}
 	}
 }
 
