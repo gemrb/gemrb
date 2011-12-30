@@ -3385,11 +3385,9 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		}
 	}
 
-	//PST hit sounds
+	//Play hit sounds, for pst, resdata contains the armor level
 	DataFileMgr *resdata = core->GetResDataINI();
-	if (resdata) {
-		PlayHitSound(resdata, damagetype, false);
-	}
+	PlayHitSound(resdata, damagetype, false);
 }
 
 void Actor::PlayWalkSound()
@@ -3416,33 +3414,52 @@ void Actor::PlayWalkSound()
 	nextWalk = thisTime + len;
 }
 
-//Play PST specific hit sounds (HIT_0<dtype><armor>)
+//Play hit sounds (HIT_0<dtype><armor>)
 void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 {
 	int type;
+	bool levels = true;
 
 	switch(damagetype) {
-		case DAMAGE_SLASHING: type = 1; break; //slashing
-		case DAMAGE_PIERCING: type = 2; break; //piercing
+		case DAMAGE_PIERCING: type = 1; break; //piercing
+		case DAMAGE_SLASHING: type = 2; break; //slashing
 		case DAMAGE_CRUSHING: type = 3; break; //crushing
 		case DAMAGE_MISSILE: type = 4; break;  //missile
+		case DAMAGE_ELECTRICITY: type = 5; levels = false; break; //electricity
+		case DAMAGE_COLD: type = 6; levels = false; break;     //cold
+		case DAMAGE_MAGIC: type = 7; levels = false; break;
+		case DAMAGE_STUNNING: type = -3; break;
 		default: return;                       //other
 	}
 
 	ieResRef Sound;
-	char section[12];
-	unsigned int animid=BaseStats[IE_ANIMATION_ID];
-	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
-		animid&=0xff;
+	int armor = 0;
+
+	if (resdata) {
+		char section[12];
+		unsigned int animid=BaseStats[IE_ANIMATION_ID];
+		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+			animid&=0xff;
+		}
+
+		snprintf(section,10,"%d", animid);
+
+		armor = resdata->GetKeyAsInt(section, "armor",0);
+		if (armor<0 || armor>35) return;
+	} else {
+		//hack for stun (always first armortype)
+		if (type<0) {
+			type = -type;
+		} else {
+			armor = Modified[IE_ARMOR_TYPE];
+		}
 	}
 
-	snprintf(section,10,"%d", animid);
-
-	int armor = resdata->GetKeyAsInt(section, "armor",0);
-	if (armor<0 || armor>35) return;
-
-	snprintf(Sound,8,"HIT_0%d%c%c",type, armor+'A', suffix?'1':0);
-
+	if (levels) {
+		snprintf(Sound,8,"HIT_0%d%c%c",type, armor+'A', suffix?'1':0);
+	} else {
+		snprintf(Sound,8,"HIT_0%d%c",type, suffix?'1':0);
+	}
 	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
 }
 
