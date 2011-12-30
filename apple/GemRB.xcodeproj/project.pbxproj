@@ -3874,7 +3874,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a tared dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION\n\n#we could simply copy from the directory to payload but i like having a symlink available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a tared dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION\n\n#i like having a symlink to the build directory available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"";
 		};
 		A2D4C61613A978520086BCC4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3892,7 +3892,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ios/GemRB.cfg $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg\ncp ios/GemRB.cfg.newinstall $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/override\n\n#make ipa\n#purge payload of everything\nrm -r ios/Payload\nmkdir ios/Payload\n#we could simply copy from the directory to payload but i like having a symlink available\nln -s \"$BUILT_PRODUCTS_DIR\" ios/build\ncp -r ios/build/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB.ipa iTunesArtWork iTunesMetadata.plist Payload";
+			shellScript = "#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n\ncp ios/GemRB.cfg $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg\ncp ios/GemRB.cfg.newinstall $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/override\n\n#make ipa\n#purge payload of everything\nrm -r ios/Payload\nmkdir ios/Payload\n#we could simply copy from the directory to payload but i like having a symlink available\nln -s \"$BUILT_PRODUCTS_DIR\" ios/build\ncp -r ios/build/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB.ipa iTunesArtWork iTunesMetadata.plist Payload";
 		};
 /* End PBXShellScriptBuildPhase section */
 
