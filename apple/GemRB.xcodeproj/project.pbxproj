@@ -3905,7 +3905,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a tared dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION\n\n#i like having a symlink to the build directory available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=$SYMROOT\n\n#i like having a symlink to the build directory available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"";
 		};
 		A2D4C61613A978520086BCC4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5983,7 +5983,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
@@ -6561,9 +6561,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
-				EXPORTED_SYMBOLS_FILE = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks,
 					/System/Library/Frameworks,
@@ -6574,8 +6572,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				"GCC_VERSION[arch=i386]" = "";
-				"GCC_VERSION[arch=x86_64]" = "";
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -6586,13 +6582,12 @@
 					./,
 				);
 				INFOPLIST_FILE = osx/Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = GemRB;
 				SDKROOT = "";
 				"SDKROOT[arch=x86_64]" = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = app;
 			};
@@ -6602,9 +6597,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
-				EXPORTED_SYMBOLS_FILE = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
 					/System/Library/Frameworks,
 					"$(FRAMEWORK_SEARCH_PATHS)",
@@ -6613,9 +6607,7 @@
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				"GCC_VERSION[arch=i386]" = "";
-				"GCC_VERSION[arch=x86_64]" = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -6626,13 +6618,12 @@
 					./,
 				);
 				INFOPLIST_FILE = osx/Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = GemRB;
 				SDKROOT = "";
 				"SDKROOT[arch=x86_64]" = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = app;
 			};
