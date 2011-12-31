@@ -32,6 +32,8 @@ int SDL_main (int argc, char **argv)
 {
 	//do all the special plugin initializations here
 	Py_NoSiteFlag = 1;
+	//this mostly just supresses a benign console error
+	setenv("PYTHONHOME", "GUIScripts", 0);
 
 	UIWindow* win = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 	win.backgroundColor = [UIColor blackColor];
