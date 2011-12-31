@@ -48,7 +48,7 @@
 		<string>itunes-games</string>
 	</dict>
 	<key>releaseDate</key>
-	<string>2011-12-23T08:00:00Z</string>
+	<string></string>
 	<key>s</key>
 	<integer>143441</integer>
 	<key>softwareIcon57x57URL</key>
@@ -62,7 +62,7 @@
 	<key>softwareVersionBundleId</key>
 	<string>net.sourceforgepany.GemRB</string>
 	<key>softwareVersionExternalIdentifier</key>
-	<integer>66</integer>
+	<integer>0</integer>
 	<key>softwareVersionExternalIdentifiers</key>
 	<array>
 		<integer>1466803</integer>
