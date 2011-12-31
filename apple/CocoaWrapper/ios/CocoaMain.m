@@ -58,9 +58,6 @@ int SDL_main (int argc, char **argv)
 		argc += 2;
 		argv = realloc(argv, sizeof(char*) * argc);
 		argv[argc - 2] = "-c";
-
-		//hope that this cstrig doesnt get deallocated until we are done with it...
-		//the Docs say it will be deallocated when the NSAutoreleasePool is drained which happens at the end of every run loop
 		argv[argc - 1] = (char*)configPath;
 	}else{
 		//popup a message???
@@ -70,6 +67,7 @@ int SDL_main (int argc, char **argv)
 
 	[win release];
 	[nibObjects release];
+	// pass control to GemRB
 	int ret = GemRB_main(argc, argv);
 	if (ret != 0) {
 		// TODO: inject into error() function instead and rewrite the core to always use error instead of returning.
@@ -87,5 +85,7 @@ int SDL_main (int argc, char **argv)
 		}
 		[alert release];
 	}
-    return ret;
+	// FIXME: temporary hack to terminate because an update to libSDL makes returning fall into an infinate loop
+	exit(ret);
+    //return ret;
 }
