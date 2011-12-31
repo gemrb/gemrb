@@ -6368,6 +6368,7 @@
 					"$(inherited)",
 					$SDK_DIR/usr/lib,
 				);
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-DTARGET_OS_IPHONE",
 					"-isystem",
@@ -6415,6 +6416,7 @@
 					"$(inherited)",
 					$SDK_DIR/usr/lib,
 				);
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-isystem",
 					./ios/SDL/Include/,
