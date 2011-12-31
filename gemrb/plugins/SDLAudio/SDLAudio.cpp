@@ -63,7 +63,7 @@ bool SDLAudio::Init(void)
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 8192) < 0) {
 		return false;
 	}
-	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
+	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
 
 	channel_data.resize(Mix_AllocateChannels(-1));
 	for (unsigned int i = 0; i < channel_data.size(); i++) {
