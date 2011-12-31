@@ -2182,10 +2182,11 @@ bool Interface::LoadConfig(void)
 	char* s = getenv( "HOME" );
 	if (s) {
 		strcpy( UserDir, s );
-		strcat( UserDir, "/."PACKAGE"/" );
 #if TARGET_OS_IPHONE
 		//we are in both a sandbox and a bundle
 		strcat( UserDir, "/"PACKAGE".app/");
+#else
+		strcat( UserDir, "/."PACKAGE"/" );
 #endif
 	} else {
 		strcpy( UserDir, "./" );
