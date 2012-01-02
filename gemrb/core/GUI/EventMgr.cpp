@@ -315,7 +315,7 @@ void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 {
 	if (last_win_mousefocused) {
 		Control *ctrl;
-		ctrl = last_win_mousefocused->GetFocus();
+		ctrl = last_win_mousefocused->GetMouseFocus();
 		if (ctrl) {
 			ctrl->OnMouseWheelScroll( x, y);
 		}
@@ -477,7 +477,7 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 
 int EventMgr::GetMouseFocusedControlType() {
 	if (last_win_mousefocused) {
-		Control *ctrl = last_win_mousefocused->GetFocus();
+		Control *ctrl = last_win_mousefocused->GetMouseFocus();
 		if (ctrl) {
 			return ctrl->ControlType;
 		}
