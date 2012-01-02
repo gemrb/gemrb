@@ -893,7 +893,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 	return dropped;
 }
 
-CREItem *Inventory::GetSlotItem(unsigned int slot) const
+CREItem *Inventory::GetSlotItem(ieDword slot) const
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
@@ -911,7 +911,7 @@ ieDword Inventory::GetItemFlag(unsigned int slot) const
 	return item->Flags;
 }
 
-bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
+bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op)
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {
@@ -929,7 +929,7 @@ bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
 
 //this is the low level equipping
 //all checks have been made previously
-bool Inventory::EquipItem(unsigned int slot)
+bool Inventory::EquipItem(ieDword slot)
 {
 	ITMExtHeader *header;
 
@@ -1034,7 +1034,7 @@ bool Inventory::EquipItem(unsigned int slot)
 
 //the removecurse flag will check if it is possible to move the item to the inventory
 //after a remove curse spell
-bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
+bool Inventory::UnEquipItem(ieDword slot, bool removecurse)
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {
@@ -1090,7 +1090,7 @@ int Inventory::FindRangedWeapon() const
 	return FindSlotRangedWeapon(Equipped+SLOT_MELEE);
 }
 
-int Inventory::FindSlotRangedWeapon(unsigned int slot) const
+int Inventory::FindSlotRangedWeapon(ieDword slot) const
 {
 	if ((int)slot >= SLOT_MELEE) return SLOT_FIST;
 	CREItem *Slot;
