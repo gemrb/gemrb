@@ -3937,7 +3937,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "VERSION=`git describe --tags --dirty=-patched`\n/Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out osx/GemRB-osx-$VERSION.pkg";
+			shellScript = "VERSION=`git describe --tags`\n/Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out osx/GemRB-osx-$VERSION.pkg";
 		};
 /* End PBXShellScriptBuildPhase section */
 
