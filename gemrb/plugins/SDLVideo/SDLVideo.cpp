@@ -604,6 +604,13 @@ int SDLVideoDriver::PollEvents() {
 					touchHold = false;
 					lastevent = false;
 					ignoreNextMouseUp = false;
+#if TARGET_OS_IPHONE
+					// FIXME: this is essentially a hack.
+					// I believe there to be a bug in SDL 1.3 that is causeing the surface to be invalidated on a restore event for iOS
+					SDL_Window* window;
+					window = SDL_GetFocusWindow();
+					window->surface_valid = SDL_TRUE;//private attribute!!!
+#endif
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;
 				case SDL_WINDOWEVENT_RESIZED://SDL 1.2
