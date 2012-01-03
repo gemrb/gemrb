@@ -610,6 +610,12 @@ int SDLVideoDriver::PollEvents() {
 					SDL_Window* window;
 					window = SDL_GetFocusWindow();
 					window->surface_valid = SDL_TRUE;//private attribute!!!
+
+					// FIXME:
+					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
+					// even using Apple examples of how to properly suspend an OpenAL context and resume on iOS are falling flat
+					// it could be this bug affects only the simulator.
+					sleep(1);
 #endif
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;

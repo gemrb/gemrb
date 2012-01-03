@@ -806,6 +806,8 @@ int OpenALAudioDriver::MusicManager(void* arg)
 				default:
 					printMessage("OpenAL", "WARNING: Unhandled Music state", WHITE );
 					printStatus("ERROR", YELLOW);
+				//no break
+				case AL_PAUSED:
 					driver->MusicPlaying = false;
 					return -1;
 				case AL_INITIAL:
