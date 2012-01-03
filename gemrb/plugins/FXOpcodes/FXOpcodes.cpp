@@ -4838,11 +4838,73 @@ static EffectRef fx_familiar_constitution_loss_ref = { "FamiliarBond", -1 };
 static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 };
 static EffectRef fx_maximum_hp_modifier_ref = { "MaximumHPModifier", -1 };
 
+//returns the familiar if there was no error
+Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resource)
+{
+	//summon familiar
+	Actor *fam = gamedata->GetCreature(resource);
+	if (!fam) {
+		return NULL;
+	}
+	fam->SetBase(IE_EA, EA_FAMILIAR);
+
+	//when upgrading, there is no need for the script to be triggered again, so this isn't a problem
+	if (Owner) {
+		fam->LastSummoner = Owner->GetGlobalID();
+	}
+
+	Map *map = target->GetCurrentArea();
+	map->AddActor(fam);
+	Point p(fx->PosX, fx->PosY);
+	fam->SetPosition(p, true, 0);
+	fam->RefreshEffects(NULL);
+	//Make the familiar an NPC (MoveGlobal needs this)
+	Game *game = core->GetGame();
+	game->AddNPC(fam);
+
+	//Add some essential effects
+	Effect *newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS)/2, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, fam, fam);
+	delete newfx;
+
+	//the familiar marker needs to be set to 2 in case of ToB
+	ieDword fm = 0;
+	if (game->Expansion==5) {
+		fm = 2;
+	}
+	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, fm, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, fam, fam);
+	delete newfx;
+
+	//maximum hp bonus of half the familiar's hp, there is no hp new bonus upgrade when upgrading familiar
+	//this is a bug even in the original engine, so I don't care
+	if (Owner) {
+		newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS)/2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
+		core->ApplyEffect(newfx, (Actor *) Owner, Owner);
+		delete newfx;
+	}
+
+	if (fx->Resource2[0]) {
+		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
+		if (vvc) {
+			//This is the final position of the summoned creature
+			//not the original target point
+			vvc->XPos=fam->Pos.x;
+			vvc->YPos=fam->Pos.y;
+			//force vvc to play only once
+			vvc->PlayOnce();
+			map->AddVVCell( vvc );
+		}
+	}
+
+	return fam;
+}
+
 int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_find_familiar (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 
-	if (!target) {
+	if (!target || !Owner) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -4865,7 +4927,6 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-
 	if (fx->Parameter2!=FAMILIAR_RESOURCE) {
 		ieDword alignment;
 
@@ -4878,54 +4939,17 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		if (alignment>8) {
 			return FX_NOT_APPLIED;
 		}
-		memcpy(fx->Resource, core->GetGame()->Familiars[alignment],sizeof(ieResRef) );
+		Game *game = core->GetGame();
+
+		memcpy(fx->Resource, game->Familiars[alignment],sizeof(ieResRef) );
+		//ToB familiars
+		if (game->Expansion==5) {
+			strncat(fx->Resource,"25",8);
+		}
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
 
-	//summon familiar with fx->Resource
-	Actor *fam = gamedata->GetCreature(fx->Resource);
-	if (!fam) {
-		return FX_NOT_APPLIED;
-	}
-	fam->SetBase(IE_EA, EA_FAMILIAR);
-	fam->LastSummoner = Owner->GetGlobalID();
-
-	Map *map = target->GetCurrentArea();
-	map->AddActor(fam);
-	Point p(fx->PosX, fx->PosY);
-	fam->SetPosition(p, true, 0);
-	fam->RefreshEffects(NULL);
-
-	if (fx->Resource2[0]) {
-		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
-		if (vvc) {
-			//This is the final position of the summoned creature
-			//not the original target point
-			vvc->XPos=fam->Pos.x;
-			vvc->YPos=fam->Pos.y;
-			//force vvc to play only once
-			vvc->PlayOnce();
-			map->AddVVCell( vvc );
-		}
-	}
-
-	//Make the familiar an NPC (MoveGlobal needs this)
-	core->GetGame()->AddNPC(fam);
-
-	//Add some essential effects
-	Effect *newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS)/2, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
-
-	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
-
-	//maximum hp bonus of half the familiar's hp
-	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS)/2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, (Actor *) Owner, Owner);
-	delete newfx;
-
+	GetFamiliar(Owner, target, fx, fx->Resource);
 	return FX_NOT_APPLIED;
 }
 
@@ -4983,11 +5007,38 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_familiar_marker (%2d)\n", fx->Opcode );
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	Game *game = core->GetGame();
+
+	//upgrade familiar to ToB version
+	if ((fx->Parameter1!=2) && (game->Expansion == 5) ) {
+		ieResRef resource;
+
+		memset(resource,0,sizeof(resource));
+		memcpy(resource,target->GetScriptName(),6);
+		strncat(resource,"25",8);
+		//set this field, so the upgrade is triggered only once
+		fx->Parameter1 = 2;
+
+		//the NULL here is probably fine when upgrading, Owner (Original summoner) is not needed.
+		Actor *fam = GetFamiliar(NULL, target, fx, resource);
+
+		if (fam) {
+			//upgrade successful
+			//TODO: copy stuff from old familiar if needed
+			target->DestroySelf();
+			return FX_NOT_APPLIED;
+		}
+	}
+
 	if (! (STAT_GET(IE_STATE_ID)&STATE_NOSAVE)) {
-		core->GetGame()->familiarBlock=true;
+		game->familiarBlock=true;
 		return FX_APPLIED;
 	}
-	core->GetGame()->familiarBlock=false;
+	game->familiarBlock=false;
 	return FX_NOT_APPLIED;
 }
 
