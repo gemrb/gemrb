@@ -14,8 +14,10 @@
 				A2F8709214AE448500F9CC1F /* ShellScript */,
 			);
 			dependencies = (
-				A2F8709414AE4A8F00F9CC1F /* PBXTargetDependency */,
 				A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */,
+				A2A1417914B4E907003FE672 /* PBXTargetDependency */,
+				A2A1417714B4E901003FE672 /* PBXTargetDependency */,
+				A2F8709414AE4A8F00F9CC1F /* PBXTargetDependency */,
 			);
 			name = ReleasePackage;
 			productName = ReleasePackage;
@@ -762,13 +764,6 @@
 			remoteGlobalIDString = A276B44E13A28A0000D41A8A;
 			remoteInfo = MVEPlayer;
 		};
-		A2375BD013AAF58E00E7EF9B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A276B45413A28A0E00D41A8A;
-			remoteInfo = NullSound;
-		};
 		A2375BD213AAF58E00E7EF9B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -859,6 +854,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = A2F0505013ABB80B0023B7EB;
 			remoteInfo = SAVImporter;
+		};
+		A2A1417614B4E901003FE672 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A276B45413A28A0E00D41A8A;
+			remoteInfo = NullSound;
+		};
+		A2A1417814B4E907003FE672 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A276B46C13A28A5000D41A8A;
+			remoteInfo = PNGImporter;
 		};
 		A2C48CEA14A3FEF600575FE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3027,7 +3036,6 @@
 				A2375BCB13AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BCD13AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BCF13AAF58E00E7EF9B /* PBXTargetDependency */,
-				A2375BD113AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BD313AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BD513AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BD713AAF58E00E7EF9B /* PBXTargetDependency */,
@@ -4757,11 +4765,6 @@
 			target = A276B44E13A28A0000D41A8A /* MVEPlayer */;
 			targetProxy = A2375BCE13AAF58E00E7EF9B /* PBXContainerItemProxy */;
 		};
-		A2375BD113AAF58E00E7EF9B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A276B45413A28A0E00D41A8A /* NullSound */;
-			targetProxy = A2375BD013AAF58E00E7EF9B /* PBXContainerItemProxy */;
-		};
 		A2375BD313AAF58E00E7EF9B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A276B46013A28A3100D41A8A /* OpenALAudio */;
@@ -4826,6 +4829,16 @@
 			isa = PBXTargetDependency;
 			target = A2F0505013ABB80B0023B7EB /* SAVImporter */;
 			targetProxy = A23EBFFB1419A81500CC049E /* PBXContainerItemProxy */;
+		};
+		A2A1417714B4E901003FE672 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A276B45413A28A0E00D41A8A /* NullSound */;
+			targetProxy = A2A1417614B4E901003FE672 /* PBXContainerItemProxy */;
+		};
+		A2A1417914B4E907003FE672 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
+			targetProxy = A2A1417814B4E907003FE672 /* PBXContainerItemProxy */;
 		};
 		A2C48CEB14A3FEF600575FE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -5814,15 +5827,21 @@
 		A276B46E13A28A5000D41A8A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS)",
+					../gemrb/includes,
+					/usr/X11/include,
+				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = /usr/X11/lib;
 				MACH_O_TYPE = mh_bundle;
+				OTHER_LDFLAGS = "-lpng";
 				PRODUCT_NAME = PNGImporter;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
 			};
@@ -5831,14 +5850,20 @@
 		A276B46F13A28A5000D41A8A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS)",
+					../gemrb/includes,
+					/usr/X11/include,
+				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = /usr/X11/lib;
 				MACH_O_TYPE = mh_bundle;
+				OTHER_LDFLAGS = "-lpng";
 				PRODUCT_NAME = PNGImporter;
 				USER_HEADER_SEARCH_PATHS = ../gemrb/core;
 				ZERO_LINK = NO;
