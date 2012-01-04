@@ -5243,12 +5243,20 @@ int fx_freedom (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_maze (%2d)\n", fx->Opcode );
-	if (!fx->Parameter2 && fx->FirstApply) {
-		//get the maze dice number (column 3)
-		int stat = target->GetSafeStat(IE_INT);
-		int size = core->GetIntelligenceBonus(3, stat);
-		int dice = core->GetIntelligenceBonus(4, stat);
-		fx->Duration = core->GetGame()->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
+	Game *game = core->GetGame();
+	if (fx->Parameter2) {
+		//this version of maze works only in combat
+		if (!fx->FirstApply && !game->CombatCounter) {
+			return FX_NOT_APPLIED;
+		}
+	} else {
+		if (fx->FirstApply) {
+			//get the maze dice number (column 3)
+			int stat = target->GetSafeStat(IE_INT);
+			int size = core->GetIntelligenceBonus(3, stat);
+			int dice = core->GetIntelligenceBonus(4, stat);
+			fx->Duration = game->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
+		}
 	}
 	target->SetMCFlag(MC_HIDDEN, BM_OR);
 	target->AddPortraitIcon(PI_MAZE);
