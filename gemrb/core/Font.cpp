@@ -207,7 +207,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		enablecap=true;
 		initials_rows = ((initials->maxHeight - 1) / maxHeight) - (startrow - 1);
 
-		currCap = string[0] - 1;
+		currCap = string[0];
 		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
 			while(isspace(currCap) && num_empty_rows < (int)len){//we cant cap whitespace so keep looking
 				currCap = string[++num_empty_rows] - 1;
