@@ -41,9 +41,9 @@ int SDL_main (int argc, char **argv)
 	NSArray* nibObjects = nil;
 	// now load the config selector nib and display the list modally
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfViewController-ipad" owner:confControl options:nil];
+		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfController-ipad" owner:confControl options:nil];
 	} else {
-		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfViewController-iphone" owner:confControl options:nil];
+		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfController-iphone" owner:confControl options:nil];
 	}
 
 	[nibObjects retain];
