@@ -214,7 +214,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				// WARNING: this assumes all preceeding whitespace is an empty line
 			}
 			last_initial_row = (startrow - 1);
-			initials_rows--;
+			initials_rows = initials_rows + num_empty_rows - 1;
 		}
 	}
 
@@ -351,6 +351,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 			//how many more lines to be indented (one was already indented)
 			initials_rows = (initials->maxHeight-1)/maxHeight;
+			initials_rows += num_empty_rows;
 			initials_row = row;
 			last_initial_row = initials_row;
 
