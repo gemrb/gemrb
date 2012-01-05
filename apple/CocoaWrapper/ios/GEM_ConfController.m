@@ -273,24 +273,31 @@
 		NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [zipPath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
 		NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 		
-		[newConfig appendString:[NSString stringWithFormat:@"\nGameType = %@", [zipPath pathExtension]]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nGamePath = %@/", installPath]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nCD1 = %@/CD1/", installPath]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nCD2 = %@/CD2/", installPath]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nCD3 = %@/CD3/", installPath]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nCD4 = %@/CD4/", installPath]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nCD5 = %@/CD5/", installPath]];
-		[newConfig appendString:[NSString stringWithFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]]];
-		
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-			[newConfig appendString:@"\nWidth = 1024"];
-			[newConfig appendString:@"\nHeight = 768"];
-		}else{
-			[newConfig appendString:@"\nWidth = 800"];
-			[newConfig appendString:@"\nHeight = 600"];
-		}
+		if (newConfig) {
+			[newConfig appendString:[NSString stringWithFormat:@"\nGameType = %@", [zipPath pathExtension]]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nGamePath = %@/", installPath]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nCD1 = %@/CD1/", installPath]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nCD2 = %@/CD2/", installPath]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nCD3 = %@/CD3/", installPath]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nCD4 = %@/CD4/", installPath]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nCD5 = %@/CD5/", installPath]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]]];
 
-		[newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+				[newConfig appendString:@"\nWidth = 1024"];
+				[newConfig appendString:@"\nHeight = 768"];
+			}else{
+				[newConfig appendString:@"\nWidth = 800"];
+				[newConfig appendString:@"\nHeight = 600"];
+			}
+
+			NSError* err = nil;
+			if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
+				NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
+			}
+		}else{
+			NSLog(@"Unable to open %@/GemRB.cfg.newinstall", cwd);
+		}
 	}
 	[pv removeFromSuperview];
 	[pv release];
