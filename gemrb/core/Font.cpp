@@ -365,8 +365,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			}
 			x = initials->PrintInitial( x, initY, rgn, currCap );
 			initials_x = x;
-			x += psx;
 			last_initial_row++;
+			if (num_empty_rows) continue;
+			else x += psx;
 		}
 		video->BlitSpriteRegion( sprBuffer, getInfo(currChar).size,
 			x + rgn.x, y + rgn.y - getInfo(currChar).yPos, true, &rgn );
