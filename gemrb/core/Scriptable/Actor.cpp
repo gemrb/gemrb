@@ -113,6 +113,7 @@ static ieResRef DefaultFist = {"FIST"};
 static int VCMap[VCONST_COUNT];
 static ieDword sel_snd_freq = 0;
 static ieDword cmd_snd_freq = 0;
+static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
@@ -1425,6 +1426,7 @@ static void InitActorTables()
 {
 	int i, j;
 
+	core->GetDictionary()->Lookup("Critical Hit Screen Shake", crit_hit_scr_shake);
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
@@ -5488,7 +5490,10 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			// the manual states that many weapons x3, so we need to check if it is hardcoded or find
 			// the fields used for both the threat range and the multiplier
 			damage <<=1;
-			core->timer->SetScreenShake(16,16,8);
+			// check if critical hit needs a screenshake
+			if (crit_hit_scr_shake && (InParty || attacker->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
+				core->timer->SetScreenShake(16,16,8);
+			}
 		}
 	}
 }
