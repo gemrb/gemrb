@@ -93,6 +93,7 @@ static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
+static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
 static int *skillstats = NULL;
 static int *skillabils = NULL;
@@ -1291,6 +1292,10 @@ void Actor::ReleaseMemory()
 			free(dualswap);
 			dualswap=NULL;
 		}
+		if (multi) {
+			free(multi);
+			multi=NULL;
+		}
 		if (maxLevelForHpRoll) {
 			free(maxLevelForHpRoll);
 			maxLevelForHpRoll=NULL;
@@ -1716,6 +1721,7 @@ static void InitActorTables()
 		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
 		levelslots = (int **) calloc(classcount, sizeof(int*));
 		dualswap = (int *) calloc(classcount, sizeof(int));
+		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
 		for (i=0; i<classcount; i++) {
 			//make sure we have a valid classid, then decrement
@@ -1740,7 +1746,9 @@ static void InitActorTables()
 			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
 
 			//single classes only worry about IE_LEVEL
-			ieDword tmpclass = atoi(tm->QueryField(i, 4));
+			long tmpclass = 0; //atoi(tm->QueryField(i, 4));
+			valid_number( tm->QueryField(i, 4), tmpclass);
+			multi[tmpindex] = (ieDword) tmpclass;
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
 				if (classis>=0) {
@@ -1823,6 +1831,7 @@ static void InitActorTables()
 					numfound++;
 				}
 			}
+
 			if (classnames) {
 				for (ieDword j=0; j<tmpbits; j++) {
 					if (classnames[j]) {
@@ -1832,8 +1841,10 @@ static void InitActorTables()
 				free(classnames);
 				classnames = NULL;
 			}
+
 			print("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
-			print("DS: %d\n", dualswap[tmpindex]);
+			print("DS: %d ", dualswap[tmpindex]);
+			print("MULTI: %d\n", multi[tmpindex]);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
 		*however, the access code should ensure this never happens
@@ -7336,17 +7347,11 @@ void Actor::CreateDerivedStatsIWD2()
 //and similar derived stats that change with level
 void Actor::CreateDerivedStats()
 {
-	//we have to calculate multiclass for further code
-	AutoTable tm("classes");
-	if (tm) {
-		// currently we need only the MULTI value
-		char tmpmulti[8];
-		long tmp;
-		strcpy(tmpmulti, tm->QueryField(tm->FindTableValue(5, BaseStats[IE_CLASS]), 4));
-		if (!valid_number(tmpmulti, tmp))
-			multiclass = 0;
-		else
-			multiclass = (ieDword)tmp;
+	ieDword cls = BaseStats[IE_CLASS]-1;
+	if (cls>=(ieDword) classcount) {
+		multiclass = 0;
+	} else {
+		multiclass = multi[cls];
 	}
 
 	if (core->HasFeature(GF_3ED_RULES)) {
