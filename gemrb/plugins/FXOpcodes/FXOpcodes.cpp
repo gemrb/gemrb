@@ -818,6 +818,11 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 	}
 }
 
+static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
+{
+	core->GetAudioDrv()->Play(fx->Resource[0]?fx->Resource:defsound, target->Pos.x, target->Pos.y);
+}
+
 //whoseeswho:
 #define ENEMY_SEES_ORIGIN 1
 #define ORIGIN_SEES_ENEMY 2
@@ -5072,6 +5077,11 @@ int fx_bounce_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_spellevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1<1) {
+		PlayRemoveEffect("EFF_E02", target, fx);
+		return FX_NOT_APPLIED;
+	}
+
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_LEVEL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE);
 	return FX_APPLIED;
@@ -5081,6 +5091,10 @@ int fx_bounce_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_protection_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_protection_spelllevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1<1) {
+		PlayRemoveEffect("EFF_E02", target, fx);
+		return FX_NOT_APPLIED;
+	}
 	STAT_BIT_OR( IE_IMMUNITY, IMM_LEVEL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
@@ -5133,9 +5147,16 @@ int fx_resist_spell (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 }
 
 // ??? Protection:SpellDec
+// This is a fictional opcode, it isn't implemented in the original engine
 int fx_resist_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 {
 	if (0) print( "fx_resist_spell_dec (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
+
+	if (fx->Parameter1<1) {
+		PlayRemoveEffect("EFF_E02", target, fx);
+		return FX_NOT_APPLIED;
+	}
+
 	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE_DEC);
 		return FX_APPLIED;
@@ -5153,9 +5174,14 @@ int fx_bounce_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // ??? Bounce:SpellDec
+// This is a fictional opcode, it isn't implemented in the original engine
 int fx_bounce_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_spell (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1<1) {
+		PlayRemoveEffect("EFF_E02", target, fx);
+		return FX_NOT_APPLIED;
+	}
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_RESOURCE_DEC );
 	return FX_APPLIED;
 }
@@ -5258,6 +5284,7 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			fx->Duration = game->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
 		}
 	}
+
 	target->SetMCFlag(MC_HIDDEN, BM_OR);
 	target->AddPortraitIcon(PI_MAZE);
 	return FX_APPLIED;
@@ -5417,6 +5444,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 	if (!fx->Parameter1) {
+		PlayRemoveEffect("EFF_E02",target, fx);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5480,11 +5508,14 @@ int fx_teleport_field (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_protection_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_protection_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (fx->Parameter1) {
-		STAT_BIT_OR( IE_IMMUNITY, IMM_SCHOOL_DEC );
-		return FX_APPLIED;
+	if (fx->Parameter1<1) {
+		//The original doesn't have anything here
+		PlayRemoveEffect(NULL, target, fx);
+		return FX_NOT_APPLIED;
 	}
-	return FX_NOT_APPLIED;
+
+	STAT_BIT_OR( IE_IMMUNITY, IMM_SCHOOL_DEC );
+	return FX_APPLIED;
 }
 
 //0xe0 Cure:LevelDrain
@@ -5521,17 +5552,24 @@ int fx_reveal_magic (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_protection_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_protection_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (fx->Parameter1) {
-		STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE_DEC );
-		return FX_APPLIED;
+	if (fx->Parameter1<1) {
+		//The original doesn't have anything here
+		PlayRemoveEffect(NULL, target, fx);
+		return FX_NOT_APPLIED;
 	}
-	return FX_NOT_APPLIED;
+	STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE_DEC );
+	return FX_APPLIED;
 }
 
 //0xe3 Bounce:SchoolDecrement
 int fx_bounce_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1<1) {
+		//The original doesn't have anything here
+		PlayRemoveEffect(NULL, target, fx);
+		return FX_NOT_APPLIED;
+	}
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SCHOOL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
@@ -5541,6 +5579,11 @@ int fx_bounce_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1<1) {
+		//The original doesn't have anything here
+		PlayRemoveEffect(NULL, target, fx);
+		return FX_NOT_APPLIED;
+	}
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SECTYPE_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
@@ -5768,6 +5811,9 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_create_contingency (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	//this effect terminates in cutscene mode
+	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
+
 	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->Source)) {
 		displaymsg->DisplayConstantStringName(STR_CONTDUP, DMC_WHITE, target);
 		return FX_NOT_APPLIED;
@@ -5784,26 +5830,49 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-#define WB_AWAY 0
-#define WB_TOWARDS 1
-#define WB_FIXDIR 2
-#define WB_OWNDIR 3
-#define WB_AWAYOWNDIR 4
+#define WB_AWAY 2
+#define WB_TOWARDS 4
+#define WB_FIXDIR 5
+#define WB_OWNDIR 6
+#define WB_AWAYOWNDIR 7
+
+static int coords[16][2]={ {0,12},{-4,9},{-8,6},{-12,3},{-16,0},{-12,-3},{-8,-6},{-4,-9},
+{0,-12},{4,-9},{8,-6},{12,-3},{16,0},{12,3},{8,6},{4,9},};
 
 // 0xeb WingBuffet
-int fx_wing_buffet (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) print( "fx_wing_buffet (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//create movement in actor
+	if (0) print( "fx_wing_buffet (%2d): Mode: %d, Strength: %d\n", fx->Opcode, fx->Parameter2, fx->Parameter1 );
 
+	//creature immunity is based on creature size (though the original is rather cheesy)
+	if (target->GetAnims()->GetCircleSize()>5) {
+		return FX_NOT_APPLIED;
+	}
+	if (!target->GetCurrentArea()) {
+		//no area, no movement
+		return FX_APPLIED;
+	}
+
+	Game *game = core->GetGame();
+
+	if (fx->FirstApply) {
+		fx->Parameter4=game->GameTime;
+		return FX_APPLIED;
+	}
+
+	int ticks = game->GameTime-fx->Parameter4;
+	if (!ticks)
+		return FX_APPLIED;
+
+	//create movement in actor
 	ieDword dir;
 	switch(fx->Parameter2) {
 		case WB_AWAY:
 		default:
-			dir = GetOrient(Owner->Pos, target->Pos);
+			dir = GetOrient(target->Pos, GetCasterObject()->Pos);
 			break;
 		case WB_TOWARDS:
-			dir = GetOrient(target->Pos, Owner->Pos);
+			dir = GetOrient(GetCasterObject()->Pos, target->Pos);
 			break;
 		case WB_FIXDIR:
 			dir = fx->Parameter3;
@@ -5815,10 +5884,19 @@ int fx_wing_buffet (Scriptable* Owner, Actor* target, Effect* fx)
 			dir = target->GetOrientation()^8;
 			break;
 	}
-	//could be GL_REBOUND too :)
-	//add effect to alter target's stance
-	target->MoveLine( fx->Parameter1, GL_NORMAL, dir );
-	return FX_NOT_APPLIED;
+	Point newpos=target->Pos;
+
+	newpos.x += coords[dir][0]*(signed) fx->Parameter1*ticks/16;///AI_UPDATE_TIME;
+	newpos.y += coords[dir][1]*(signed) fx->Parameter1*ticks/12;///AI_UPDATE_TIME;
+
+	//change is minimal, lets try later
+	if (newpos.x==target->Pos.x && newpos.y==target->Pos.y)
+		return FX_APPLIED;
+
+	target->SetPosition(newpos, true, 0);
+
+	fx->Parameter4=game->GameTime;
+	return FX_APPLIED;
 }
 
 // 0xec ProjectImage
@@ -6365,8 +6443,32 @@ int fx_explore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) print( "fx_screenshake (%2d): Strength: %d\n", fx->Opcode, fx->Parameter1 );
-	core->timer->SetScreenShake( fx->Parameter1, fx->Parameter1, fx->Parameter1);
-	return FX_APPLIED;
+	unsigned long count;
+
+	if (fx->TimingMode!=FX_PERMANENT) {
+		count = fx->Duration-core->GetGame()->GameTime;
+	} else {
+		count = core->Time.round_size;
+	}
+	int x,y;
+
+	switch(fx->Parameter2) {
+	case 0: default:
+		x=fx->Parameter1;
+		y=fx->Parameter1;
+		break;
+	case 1:
+		x=fx->Parameter1;
+		y=-fx->Parameter1;
+		break;
+	case 2:
+		//gemrb addition
+		x=(short) (fx->Parameter1&0xffff);
+		y=(short) (fx->Parameter1>>16);
+		break;
+	}
+	core->timer->SetScreenShake( x, y, count);
+	return FX_NOT_APPLIED;
 }
 
 // 0x10e Cure:CasterHold
@@ -6985,6 +7087,7 @@ int fx_golem_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 {
 	if (0) print( "fx_golem_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 	if (!fx->Parameter1) {
+		PlayRemoveEffect("EFF_E02",target, fx);
 		return FX_NOT_APPLIED;
 	}
 	//dead actors lose this effect

@@ -3593,15 +3593,23 @@ void Actor::SetPosition(const Point &position, int jump, int radius)
 {
 	PathTries = 0;
 	ClearPath();
-	Point p;
+	Point p, q;
 	p.x = position.x/16;
 	p.y = position.y/12;
+	q = p;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
-		GetCurrentArea()->AdjustPosition( p, radius );
+		Map *map = GetCurrentArea();
+		//clear searchmap so we won't block ourselves
+		map->ClearSearchMapFor(this);
+		map->AdjustPosition( p, radius );
 	}
-	p.x = p.x * 16 + 8;
-	p.y = p.y * 12 + 6;
-	MoveTo( p );
+	if (p==q) {
+		MoveTo( position );
+	} else {
+		p.x = p.x * 16 + 8;
+		p.y = p.y * 12 + 6;
+		MoveTo( p );
+	}
 }
 
 /* this is returning the level of the character for xp calculations
@@ -5492,7 +5500,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			damage <<=1;
 			// check if critical hit needs a screenshake
 			if (crit_hit_scr_shake && (InParty || attacker->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
-				core->timer->SetScreenShake(16,16,8);
+				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
 			}
 		}
 	}

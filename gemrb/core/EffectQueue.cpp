@@ -792,13 +792,19 @@ static EffectRef fx_secondary_type_bounce_dec_ref = { "Bounce:SecondaryTypeDec",
 static EffectRef fx_spelltrap = { "SpellTrap", -1 };
 
 //this is for whole spell immunity/bounce
-static inline void DecreaseEffect(Effect *efx)
+static inline int DecreaseEffect(Effect *efx)
 {
-	efx->Parameter1--;
+  if (efx->Parameter1) {
+		efx->Parameter1--;
+    return true;
+  }
+  return false;
+  /* now we let the effect terminate itself, so it can do things on removal
 	if( (int) efx->Parameter1<1) {
 		//don't remove effects directly!!!
 		efx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
+  */
 }
 
 //lower decreasing immunities/bounces
@@ -819,7 +825,7 @@ static int check_type(Actor* actor, Effect* fx)
 	}
 */
 	//spell level immunity
-	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
+	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, 0, fx->Power) ) {
 		return 0;
 	}
 
@@ -853,26 +859,26 @@ static int check_type(Actor* actor, Effect* fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, fx->Power, 0);
+	efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, 0, fx->Power);
 	if( efx ) {
-		DecreaseEffect(efx);
-		return 0;
+		if (DecreaseEffect(efx))
+			return 0;
 	}
 
 	//decrementing spell immunity
 	if( fx->Source[0]) {
 		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
 		if( efx) {
-			DecreaseEffect(efx);
-			return 0;
+			if (DecreaseEffect(efx))
+				return 0;
 		}
 	}
 	//decrementing primary type immunity (school)
 	if( fx->PrimaryType) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx->PrimaryType);
 		if( efx) {
-			DecreaseEffect(efx);
-			return 0;
+			if (DecreaseEffect(efx))
+				return 0;
 		}
 	}
 
@@ -880,8 +886,8 @@ static int check_type(Actor* actor, Effect* fx)
 	if( fx->SecondaryType) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx->SecondaryType);
 		if( efx) {
-			DecreaseEffect(efx);
-			return 0;
+			if (DecreaseEffect(efx))
+				return 0;
 		}
 	}
 
@@ -903,7 +909,7 @@ static int check_type(Actor* actor, Effect* fx)
 	}
 
 	//bounce checks
-	if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, fx->Power, 0) ) {
+	if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx->Power) ) {
 		return 0;
 	}
 
@@ -926,34 +932,34 @@ static int check_type(Actor* actor, Effect* fx)
 
 	//level decrementing bounce check
 	if( (bounce&BNC_LEVEL_DEC)) {
-		efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, fx->Power, 0);
+		efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
 		if( efx) {
-			DecreaseEffect(efx);
-			return -1;
+			if (DecreaseEffect(efx))
+				return -1;
 		}
 	}
 
 	if( fx->Source[0] && (bounce&BNC_RESOURCE_DEC)) {
 		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
 		if( efx) {
-			DecreaseEffect(efx);
-			return -1;
+			if (DecreaseEffect(efx))
+				return -1;
 		}
 	}
 
 	if( fx->PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
 		efx=actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx->PrimaryType);
 		if( efx) {
-			DecreaseEffect(efx);
-			return -1;
+			if (DecreaseEffect(efx))
+				return -1;
 		}
 	}
 
 	if( fx->SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
 		efx=actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx->SecondaryType);
 		if( efx) {
-			DecreaseEffect(efx);
-			return -1;
+			if (DecreaseEffect(efx))
+				return -1;
 		}
 	}
 

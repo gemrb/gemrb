@@ -134,8 +134,14 @@ void GlobalTimer::DoStep(int count)
 			shakeCounter=0;
 		}
 		if (shakeCounter) {
-			x += (rand()%shakeX) - (shakeX>>1);
-			y += (rand()%shakeY) - (shakeY>>1);
+			//x += (rand()%shakeX) - (shakeX>>1);
+			//y += (rand()%shakeY) - (shakeY>>1);
+			if (shakeX) {
+				x += rand()%shakeX;
+			}
+			if (shakeY) {
+				y += rand()%shakeY;
+			}
 		}
 	}
 	video->MoveViewportTo(x,y);
@@ -331,7 +337,7 @@ void GlobalTimer::ClearAnimations()
 	first_animation = (unsigned int) animations.size();
 }
 
-void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY,
+void GlobalTimer::SetScreenShake(int shakeX, int shakeY,
 	unsigned long Count)
 {
 	this->shakeX = shakeX;

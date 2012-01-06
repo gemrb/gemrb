@@ -1813,8 +1813,6 @@ void Movable::SetAttackMoveChances(ieWord *amc)
 	AttackMovements[2]=amc[2];
 }
 
-
-
 //this could be used for WingBuffet as well
 void Movable::MoveLine(int steps, int Pass, ieDword orient)
 {
