@@ -91,6 +91,7 @@
 		A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */; };
 		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
+		A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */ = {isa = PBXBuildFile; fileRef = A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
@@ -975,6 +976,7 @@
 		A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ios/Icon.png; sourceTree = "<group>"; };
 		A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon@2x.png"; sourceTree = "<group>"; };
 		A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon-72.png"; sourceTree = "<group>"; };
+		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
@@ -2467,6 +2469,7 @@
 				A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */,
 				A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */,
 				A2830ABA13A0624D000A63FE /* Info.plist */,
+				A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */,
 			);
 			name = "Resources-iOS";
 			sourceTree = "<group>";
@@ -3877,6 +3880,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */,
 				A2A3A7E714A5130F00F705CF /* GEM_ConfController-ipad.xib in Resources */,
 				A2A3A7E814A5130F00F705CF /* GEM_ConfController-iphone.xib in Resources */,
 				A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */,
