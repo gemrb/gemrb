@@ -1499,6 +1499,8 @@ void InitializeIEScript()
 		j = overrideTriggersTable->GetSize();
 		while (j--) {
 			i = overrideTriggersTable->GetValueIndex( j );
+			bool was_condition = (i & 0x4000);
+			i &= 0x3fff;
 			if (i >= MAX_TRIGGERS) {
 				printMessage("GameScript", "trigger %d (%s) is too high, ignoring\n", RED,
 					i, overrideTriggersTable->GetStringIndex( j ) );
@@ -1515,6 +1517,8 @@ void InitializeIEScript()
 			}
 			triggers[i] = poi->Function;
 			triggerflags[i] = poi->Flags;
+			if (was_condition)
+				triggerflags[i] |= TF_CONDITION;
 		}
 	}
 
