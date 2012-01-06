@@ -263,10 +263,28 @@
 	[fm changeCurrentDirectoryPath:cwd];
 	
 	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [zipPath pathExtension]];
-	[fm createDirectoryAtPath:savePath withIntermediateDirectories:YES attributes:nil error:nil];
+	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", installPath];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [zipPath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
-	
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/save/", installPath] toPath:savePath error:nil];
+
+	NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
+	for (NSString* saveName in saves) {
+		NSString* fullSavePath = [NSString stringWithFormat:@"%@/save/%@", savePath, saveName];
+		[fm removeItemAtPath:fullSavePath error:nil];
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
+		NSLog(@"Moving save '%@' to %@", saveName, fullSavePath);
+	}
+
+	oldSavePath = [NSString stringWithFormat:@"%@/mpsave/", installPath];
+	saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
+
+	for (NSString* saveName in saves) {
+		NSString* fullSavePath = [NSString stringWithFormat:@"%@/mpsave/%@", savePath, saveName];
+		[fm removeItemAtPath:fullSavePath error:nil];
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
+		NSLog(@"Moving mpsave '%@' to %@", saveName, fullSavePath);
+	}
 
 	NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [zipPath pathExtension]];
 	if (![fm fileExistsAtPath:newCfgPath]){
@@ -282,6 +300,7 @@
 			[newConfig appendString:[NSString stringWithFormat:@"\nCD4 = %@/CD4/", installPath]];
 			[newConfig appendString:[NSString stringWithFormat:@"\nCD5 = %@/CD5/", installPath]];
 			[newConfig appendString:[NSString stringWithFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]]];
+			[newConfig appendString:[NSString stringWithFormat:@"\nSavePath = %@/", savePath]];
 
 			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 				[newConfig appendString:@"\nWidth = 1024"];
