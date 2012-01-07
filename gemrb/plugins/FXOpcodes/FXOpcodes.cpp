@@ -6665,7 +6665,7 @@ int fx_renable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//removes the disable button effect
 	if (0) print( "fx_renable_button (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	target->fxqueue.RemoveAllEffectsWithParam( fx_disable_button_ref, fx->Parameter2 );
+	target->fxqueue.RemoveAllEffectsWithParamAndResource( fx_disable_button_ref, fx->Parameter2, fx->Resource );
 	return FX_NOT_APPLIED;
 }
 

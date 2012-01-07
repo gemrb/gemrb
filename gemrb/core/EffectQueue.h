@@ -216,6 +216,8 @@ public:
 
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode) const;
+
+	/* directly removes effects with specified opcode and resource (used by IWD) */
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource) const;
 
 	/* removes any effects (delayed or not) which were using projectile */
@@ -236,6 +238,7 @@ public:
 	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const;
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const;
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const;
+	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ieResRef resource) const;
 	void RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword flags, ieDword match) const;
 
 	/* returns true if the timing method supports simplified duration */
@@ -302,6 +305,7 @@ private:
 	static Effect *CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
 	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const;
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const;
+	void RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ieResRef resource) const;
 	Effect *HasOpcode(ieDword opcode) const;
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;

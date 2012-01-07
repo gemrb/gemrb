@@ -1297,6 +1297,7 @@ void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef re
 	}
 }
 
+//this will modify effect reference
 void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const
 {
 	ResolveEffectRef(effect_reference);
@@ -1328,6 +1329,13 @@ void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) c
 	}
 }
 
+//this will modify effect reference
+void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const
+{
+	ResolveEffectRef(effect_reference);
+	RemoveAllDetrimentalEffects(effect_reference.opcode, current);
+}
+
 //Removes all effects with a matching param2
 //param2 is usually an effect's subclass (quality) while param1 is more like quantity.
 //So opcode+param2 usually pinpoints an effect better when not all effects of a given
@@ -1342,6 +1350,36 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) cons
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
+}
+
+//this will modify effect reference
+void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const
+{
+	ResolveEffectRef(effect_reference);
+	RemoveAllEffectsWithParam(effect_reference.opcode, param2);
+}
+
+//Removes all effects with a matching resource field
+void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ieResRef resource) const
+{
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		MATCH_PARAM2();
+		if(resource[0]) {
+			MATCH_RESOURCE();
+		}
+
+		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+//this will modify effect reference
+void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ieResRef resource) const
+{
+	ResolveEffectRef(effect_reference);
+	RemoveAllEffectsWithParamAndResource(effect_reference.opcode, param2, resource);
 }
 
 //this function is called by FakeEffectExpiryCheck
@@ -1377,20 +1415,6 @@ void EffectQueue::RemoveAllNonPermanentEffects() const
 			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
-}
-
-//this will modify effect reference
-
-void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const
-{
-	ResolveEffectRef(effect_reference);
-	RemoveAllDetrimentalEffects(effect_reference.opcode, current);
-}
-
-void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const
-{
-	ResolveEffectRef(effect_reference);
-	RemoveAllEffectsWithParam(effect_reference.opcode, param2);
 }
 
 //remove certain levels of effects, possibly matching school/secondary type
@@ -1466,6 +1490,7 @@ Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
 	return NULL;
 }
 
+//this will modify effect reference
 Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
@@ -1495,6 +1520,7 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 	return NULL;
 }
 
+//this will modify effect reference
 Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
