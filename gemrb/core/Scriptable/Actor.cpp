@@ -5662,8 +5662,8 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 	}
 	//00xx0yyy-->000xxyyy
 	if (location&0xffffffc8) return; //invalid location
-	if (phase && ca->ColorMods[location].locked) return;
 	location = (location &7) | ((location>>1)&0x18);
+	if (phase && ca->ColorMods[location].locked) return;
 	ca->ColorMods[location].type = type;
 	ca->ColorMods[location].speed = speed;
 	ca->ColorMods[location].rgb.r = r;
