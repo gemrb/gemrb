@@ -109,9 +109,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int cols = table->GetColumnCount();
 		int rows = table->GetRowCount();
 		int i, j;
-		npclevels.reserve(cols*rows);
+		npclevels.reserve(rows);
 		for (i = 0; i < rows; i++) {
-			npclevels.push_back (std::vector<const char *>());
+			npclevels.push_back (std::vector<const char *>(cols+1));
 			for(j = -1; j < cols; j++) {
 				char *ref = new char[9];
 				if (j == -1) {
