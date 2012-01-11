@@ -184,9 +184,8 @@ Game::~Game(void)
 	while (i--) {
 		size_t j = npclevels[i].size();
 		while(j--) {
-			delete npclevels[i][j];
+			delete [] npclevels[i][j];
 		}
-		npclevels[i].clear();
 	}
 }
 
