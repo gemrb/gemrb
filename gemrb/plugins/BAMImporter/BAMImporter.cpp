@@ -131,8 +131,8 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 }
 
 Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-				   bool BAMsprite, const unsigned char* data,
-				   AnimationFactory* datasrc)
+			bool BAMsprite, const unsigned char* data,
+			AnimationFactory* datasrc)
 {
 	Sprite2D* spr = 0;
 
@@ -299,12 +299,7 @@ Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 	} else { //numeric font
 		Count = FramesCount;
 		glyphCount = Count;
-		//ignore passed FirstChar & LastChar
-		if (Count == 11) {
-			//numeric font
-			FirstChar = '0';
-			LastChar = '9';
-		}else{
+		if (FirstChar+Count != (unsigned int) LastChar+1) {
 			error("BAMImporter", "Tried to create a font from incompatible BAM:%s", str->filename);
 		}
 		limit = glyphCount - 1;
