@@ -784,10 +784,12 @@ void TextArea::CalcRowCount()
 /** This method is key to touchscreen scrolling */
 void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 {
-	unsigned long fauxY = TextYPos;
-	if ((long)fauxY + y <= 0) fauxY = 0;
-	else fauxY += y;
-	ScrollToY(fauxY, this);
+	if (!(IE_GUI_TEXTAREA_SMOOTHSCROLL & Flags)){
+		unsigned long fauxY = TextYPos;
+		if ((long)fauxY + y <= 0) fauxY = 0;
+		else fauxY += y;
+		ScrollToY(fauxY, this);
+	}
 }
 
 /** Mouse Over Event */
