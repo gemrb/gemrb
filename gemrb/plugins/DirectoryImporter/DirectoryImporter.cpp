@@ -133,7 +133,7 @@ void CachedDirectoryImporter::Refresh()
 		const char *name = it.GetName();
 		strnlwrcpy(buf, name, _MAX_PATH, false);
 		if (cache.set(buf, name)) {
-			printMessage("CachedDirectoryImporter", "Duplicate '%s' files in '%s' directory", LIGHT_RED, buf, path);
+			printMessage("CachedDirectoryImporter", "Duplicate '%s' files in '%s' directory\n", LIGHT_RED, buf, path);
 		}
 	} while (++it);
 }
