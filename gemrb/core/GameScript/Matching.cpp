@@ -148,14 +148,17 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		/*if (!aC && (ga_flags&GA_GLOBAL) ) {
 			aC = FindActorNearby(oC->objectName, map, ga_flags );
 		}*/
-		if (!aC) {
-			aC = map->GetTileMap()->GetInfoPoint(oC->objectName);
-		}
+
+		//This order is the same as in GetActorObject
+		//TODO:merge them
 		if (!aC) {
 			aC = map->GetTileMap()->GetDoor(oC->objectName);
 		}
 		if (!aC) {
 			aC = map->GetTileMap()->GetContainer(oC->objectName);
+		}
+		if (!aC) {
+			aC = map->GetTileMap()->GetInfoPoint(oC->objectName);
 		}
 
 		//return here because object name/IDS targeting are mutually exclusive
