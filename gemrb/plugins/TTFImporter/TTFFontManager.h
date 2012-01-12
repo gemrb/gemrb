@@ -49,8 +49,8 @@ Public methods
 
 	bool Open(DataStream* stream);
 
-	Font* GetFont(uint16_t FirstChar,
-				  uint16_t LastChar,
+	Font* GetFont(ieWord FirstChar,
+				  ieWord LastChar,
 				  unsigned short ptSize,
 				  FontStyle style, Palette* pal = NULL);
 };

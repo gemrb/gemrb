@@ -55,8 +55,8 @@ bool TTFFontManager::Open(DataStream* stream)
 	return false;
 }
 
-Font* TTFFontManager::GetFont(uint16_t FirstChar,
-							  uint16_t LastChar,
+Font* TTFFontManager::GetFont(ieWord FirstChar,
+							  ieWord LastChar,
 							  unsigned short ptSize,
 							  FontStyle style, Palette* pal)
 {
