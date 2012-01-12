@@ -64,7 +64,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	tmp.g = 152;
 	tmp.b = 102;
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
-	InternalFlags = 1;
+	InternalFlags = TA_INITIALS;
 	//Drop Capitals means initials on!
 	core->GetDictionary()->Lookup("Drop Capitals", InternalFlags);
 	if (InternalFlags) {
