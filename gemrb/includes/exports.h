@@ -72,6 +72,8 @@
 #	if _MSC_VER < 7000
 #		pragma warning(disable:4786)
 #	endif
+//	disables warnings about posix functions
+#	define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
 
 /// Make sure we don't like to static libraries
