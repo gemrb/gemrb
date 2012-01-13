@@ -34,9 +34,6 @@ private:
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
 	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
-	Sprite2D* Cursor[3];
-	SDL_Rect CursorPos;
-	unsigned short CursorIndex;
 	Color fadeColor;
 	unsigned long lastTime;
 	unsigned long lastMouseTime;

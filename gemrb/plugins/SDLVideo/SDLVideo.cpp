@@ -68,12 +68,6 @@ SDLVideoDriver::SDLVideoDriver(void)
 	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
 	assert( core->NumFingScroll != core->NumFingKboard );
 #endif
-	CursorIndex = 0;
-	Cursor[0] = NULL;
-	Cursor[1] = NULL;
-	Cursor[2] = NULL;
-	CursorPos.x = 0;
-	CursorPos.y = 0;
 	DisableMouse = 0;
 	xCorr = 0;
 	yCorr = 0;
@@ -475,8 +469,8 @@ int SDLVideoDriver::PollEvents() {
 			if (lastmousetime != (unsigned long) ~0) {
 				lastmousetime += lastmousetime+time;
 			}
-			if (CursorIndex != 2)
-				CursorIndex = 1;
+			if (CursorIndex != VID_CUR_DRAG)
+				CursorIndex = VID_CUR_DOWN;
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
 			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
 			if (!ConsolePopped)
@@ -494,7 +488,7 @@ int SDLVideoDriver::PollEvents() {
 				break;
 			ignoreNextMouseUp = true;
 			if (CursorIndex != 2)
-				CursorIndex = 0;
+				CursorIndex = VID_CUR_UP;
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
 			if (!ConsolePopped)
@@ -1807,34 +1801,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 	SDL_UnlockSurface(backBuf);
 
-}
-
-void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
-{
-	if (up) {
-		Cursor[0] = up;
-	} else {
-		Cursor[0] = NULL;
-	}
-	if (down) {
-		Cursor[1] = down;
-	} else {
-		Cursor[1] = NULL;
-	}
-	return;
-}
-
-// Drag cursor is shown instead of all other cursors
-void SDLVideoDriver::SetDragCursor(Sprite2D* drag)
-{
-	FreeSprite(Cursor[2]);
-	if (drag) {
-		Cursor[2] = drag;
-		CursorIndex = 2;
-	} else {
-		CursorIndex = 0;
-		Cursor[2] = NULL;
-	}
 }
 
 Sprite2D* SDLVideoDriver::GetScreenshot( Region r )

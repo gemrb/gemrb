@@ -1326,7 +1326,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			moveX = 0;
 			moveY = 0;
 			scrolling = false;
-			video->SetDragCursor(NULL);
+			video->SetCursor(NULL, VID_CUR_DRAG);
 		}
 	}
 
@@ -1535,7 +1535,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 			scrolling = false;
 		}
 
-		core->GetVideoDriver()->SetDragCursor(NULL);
+		core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
 	}
 }
 
@@ -1546,21 +1546,21 @@ void GameControl::UpdateScrolling() {
 	Video* video = core->GetVideoDriver();
 
 	if (moveX == mousescrollspd && moveY == 0) { // right
-		video->SetDragCursor(core->GetScrollCursorSprite(0,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(0,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == mousescrollspd && moveY == -mousescrollspd) { // upper right
-		video->SetDragCursor(core->GetScrollCursorSprite(1,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(1,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == 0 && moveY == -mousescrollspd) { // up
-		video->SetDragCursor(core->GetScrollCursorSprite(2,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(2,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == -mousescrollspd && moveY == -mousescrollspd) { // upper left
-		video->SetDragCursor(core->GetScrollCursorSprite(3,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(3,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == -mousescrollspd && moveY == 0) { // left
-		video->SetDragCursor(core->GetScrollCursorSprite(4,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(4,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == -mousescrollspd && moveY == mousescrollspd) { // bottom left
-		video->SetDragCursor(core->GetScrollCursorSprite(5,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(5,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == 0 && moveY == mousescrollspd) { // bottom
-		video->SetDragCursor(core->GetScrollCursorSprite(6,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(6,numScrollCursor), VID_CUR_DRAG);
 	} else if (moveX == mousescrollspd && moveY == mousescrollspd) { // bottom right
-		video->SetDragCursor(core->GetScrollCursorSprite(7,numScrollCursor));
+		video->SetCursor(core->GetScrollCursorSprite(7,numScrollCursor), VID_CUR_DRAG);
 	}
 
 	numScrollCursor = (numScrollCursor+1) % 15;
@@ -1981,7 +1981,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			moveY = 0;
 			scrolling=false;
 			Video* video = core->GetVideoDriver();
-			video->SetDragCursor(NULL);
+			video->SetCursor(NULL, VID_CUR_DRAG);
 			if (DrawSelectionRect) {
 				Actor** ab;
 				unsigned int count = area->GetActorInRect( ab, SelectionRect,true );

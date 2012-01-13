@@ -223,7 +223,8 @@ void EventMgr::RefreshCursor(int idx)
 		video->SetMouseGrayed(false);
 	}
 	idx &= IE_CURSOR_MASK;
-	video->SetCursor( core->Cursors[idx], core->Cursors[idx ^ 1] );
+	video->SetCursor( core->Cursors[idx], VID_CUR_UP );
+	video->SetCursor( core->Cursors[idx ^ 1], VID_CUR_DOWN );
 }
 
 bool EventMgr::ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime)

@@ -34,6 +34,13 @@ const TypeID Video::ID = { "Video" };
 Video::Video(void)
 {
 	softKeyboardShowing = false;
+
+	CursorIndex = VID_CUR_UP;
+	Cursor[0] = NULL;
+	Cursor[1] = NULL;
+	Cursor[2] = NULL;
+	CursorPos.x = 0;
+	CursorPos.y = 0;
 	Evnt = NULL;
 
 	// Initialize gamma correction tables
@@ -57,6 +64,13 @@ void Video::SetEventMgr(EventMgr* evnt)
 {
 	//if 'evnt' is NULL then no Event Manager will be used
 	Evnt = evnt;
+}
+
+void Video::SetCursor(Sprite2D* cur, enum CursorIndex curIdx)
+{
+	if(cur) cur->acquire();
+	if(Cursor[curIdx]) FreeSprite(Cursor[curIdx]);
+	Cursor[curIdx] = cur;
 }
 
 /** Mouse is invisible and cannot interact */

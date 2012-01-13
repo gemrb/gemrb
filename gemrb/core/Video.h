@@ -64,6 +64,12 @@ enum TileBlitFlags {
 	TILE_SEPIA = 4
 };
 
+enum CursorIndex {
+	VID_CUR_UP = 0,
+	VID_CUR_DOWN = 1,
+	VID_CUR_DRAG = 2
+};
+
 //disable mouse flags
 #define MOUSE_DISABLED  1
 #define MOUSE_GRAYED    2
@@ -131,11 +137,6 @@ public:
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,
 		const Region* clip = NULL, bool anchor = false) = 0;
-	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
-	/** Sets a temporary cursor when dragging an Item from Inventory.
-	  * VideoDriver will call FreeSprite on it.
-	  */
-	virtual void SetDragCursor(Sprite2D* drag) = 0;
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
@@ -222,6 +223,8 @@ public:
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
 	bool GetFullscreenMode() const;
+	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
+	void SetCursor(Sprite2D* cur, enum CursorIndex curIdx);
 
 	/** Scales down a sprite by a ratio */
 	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );
@@ -240,6 +243,9 @@ protected:
 	Region Viewport;
 	int width,height,bpp;
 	bool fullscreen;
+	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
+	CursorIndex CursorIndex;
+	Region CursorPos;
 	bool softKeyboardShowing;
 
 	unsigned char Gamma10toGamma22[256];

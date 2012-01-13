@@ -440,7 +440,7 @@ Interface::~Interface(void)
 			gamedata->FreePalette(InfoTextPalette);
 		}
 
-		video->SetDragCursor(NULL);
+		video->SetCursor(NULL, VID_CUR_DRAG);
 	}
 
 	delete evntmgr;
@@ -1223,7 +1223,8 @@ int Interface::LoadSprites()
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
-	video->SetCursor( Cursors[0], Cursors[1] );
+	video->SetCursor( Cursors[0], VID_CUR_UP );
+	video->SetCursor( Cursors[1], VID_CUR_DOWN );
 	printStatus( "OK", LIGHT_GREEN );
 
 	// Load fog-of-war bitmaps
@@ -4582,7 +4583,7 @@ void Interface::LoadProgress(int percent)
 void Interface::ReleaseDraggedItem()
 {
 	DraggedItem=NULL; //shouldn't free this
-	video->SetDragCursor (NULL);
+	video->SetCursor (NULL, VID_CUR_DRAG);
 }
 
 void Interface::DragItem(CREItem *item, const ieResRef Picture)
@@ -4600,7 +4601,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 		if (item) {
 			DraggedCursor = gamedata->GetBAMSprite( Picture, 0, 0 );
 		}
-		video->SetDragCursor (DraggedCursor);
+		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
 	}
 }
 
@@ -4611,9 +4612,9 @@ void Interface::SetDraggedPortrait(int dp, int idx)
 	if (dp) {
 		//hmm this might work?
 		Cursors[idx]->acquire();
-		video->SetDragCursor(Cursors[idx]);
+		video->SetCursor(Cursors[idx], VID_CUR_DRAG);
 	} else {
-		video->SetDragCursor(NULL);
+		video->SetCursor(NULL, VID_CUR_DRAG);
 	}
 }
 
