@@ -235,25 +235,25 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 		backBuf = temp;
 	}
+	if (!(MouseFlags & MOUSE_NO_TOOLTIPS)) {
+		//handle tooltips
+		unsigned int delay = core->TooltipDelay;
+		// The multiplication by 10 is there since the last, disabling slider position is the eleventh
+		if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
+			time = GetTickCount();
+			/** Display tooltip if mouse is idle */
+			if (( time - lastMouseTime ) > delay) {
+				if (Evnt)
+					Evnt->MouseIdle( time - lastMouseTime );
+			}
 
-	//handle tooltips
-	unsigned int delay = core->TooltipDelay;
-	// The multiplication by 10 is there since the last, disabling slider position is the eleventh
-	if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
-		time = GetTickCount();
-		/** Display tooltip if mouse is idle */
-		if (( time - lastMouseTime ) > delay) {
-			if (Evnt)
-				Evnt->MouseIdle( time - lastMouseTime );
+			/** This causes the tooltip to be rendered directly to display */
+			SDL_Surface* tmp = backBuf;
+			backBuf = disp; // FIXME: UGLY HACK!
+			core->DrawTooltip();
+			backBuf = tmp;
 		}
-
-		/** This causes the tooltip to be rendered directly to display */
-		SDL_Surface* tmp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		core->DrawTooltip();
-		backBuf = tmp;
 	}
-
 	SDL_Flip( disp );
 
 	return ret;
