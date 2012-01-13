@@ -41,7 +41,11 @@ Video::Video(void)
 	Cursor[2] = NULL;
 	CursorPos.x = 0;
 	CursorPos.y = 0;
+
 	Evnt = NULL;
+	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
+	// we care only about 2 bits at the moment so mask out the remainder
+	MouseFlags = ((core->MouseFeedback & 0x3) << 2);
 
 	// Initialize gamma correction tables
 	for (int i = 0; i < 256; i++) {
@@ -68,7 +72,11 @@ void Video::SetEventMgr(EventMgr* evnt)
 
 void Video::SetCursor(Sprite2D* cur, enum CursorIndex curIdx)
 {
-	if(cur) cur->acquire();
+	CursorIndex = VID_CUR_UP;
+	if(cur){
+		cur->acquire();
+		if (curIdx == VID_CUR_DRAG) CursorIndex = VID_CUR_DRAG;
+	}
 	if(Cursor[curIdx]) FreeSprite(Cursor[curIdx]);
 	Cursor[curIdx] = cur;
 }
@@ -76,16 +84,20 @@ void Video::SetCursor(Sprite2D* cur, enum CursorIndex curIdx)
 /** Mouse is invisible and cannot interact */
 void Video::SetMouseEnabled(int enabled)
 {
-	DisableMouse = enabled^MOUSE_DISABLED;
+	if (enabled) {
+		MouseFlags &= ~MOUSE_DISABLED;
+	} else {
+		MouseFlags |= MOUSE_DISABLED;
+	}
 }
 
 /** Mouse cursor is grayed and doesn't click (but visible and movable) */
 void Video::SetMouseGrayed(bool grayed)
 {
 	if (grayed) {
-		DisableMouse |= MOUSE_GRAYED;
+		MouseFlags |= MOUSE_GRAYED;
 	} else {
-		DisableMouse &= ~MOUSE_GRAYED;
+		MouseFlags &= ~MOUSE_GRAYED;
 	}
 }
 

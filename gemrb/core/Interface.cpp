@@ -196,6 +196,7 @@ Interface::Interface(int iargc, char* iargv[])
 	NumFingInfo = 2;
 	NumFingKboard = 3;
 	NumFingScroll = 2;
+	MouseFeedback = 0;
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
 	Bpp = 32;
@@ -2351,6 +2352,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("NumFingScroll", NumFingScroll = );
 		CONFIG_INT("NumFingKboard", NumFingKboard = );
 		CONFIG_INT("NumFingInfo", NumFingInfo = );
+		CONFIG_INT("MouseFeedback", MouseFeedback = );
 #undef CONFIG_INT
 #define CONFIG_STRING(str, var) \
 		} else if (stricmp(name, str) == 0) { \

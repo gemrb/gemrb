@@ -760,6 +760,7 @@ public:
 	bool CaseSensitive, SkipIntroVideos, DrawFPS;
 	bool TouchScrollAreas, UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
+	int MouseFeedback;
 	int GUIEnhancements;
 	bool KeepCache;
 	bool MultipleQuickSaves;

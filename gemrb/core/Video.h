@@ -71,8 +71,11 @@ enum CursorIndex {
 };
 
 //disable mouse flags
-#define MOUSE_DISABLED  1
-#define MOUSE_GRAYED    2
+const int MOUSE_GRAYED		= 1;
+const int MOUSE_DISABLED	= 2;
+//used (primarily with touchscreens) to control graphical feedback related to the mouse
+const int MOUSE_HIDDEN		= 4; // show cursor
+const int MOUSE_NO_TOOLTIPS	= 8; // show tooltips
 
 // !!! Keep this synchronized with GUIDefines.py !!!
 // used for calculating the tooltip delay limit and the real tooltip delay
@@ -237,7 +240,7 @@ public:
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y);
 protected:
-	int DisableMouse;
+	int MouseFlags;
 	short xCorr, yCorr;
 	EventMgr* Evnt;
 	Region Viewport;

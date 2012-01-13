@@ -68,7 +68,6 @@ SDLVideoDriver::SDLVideoDriver(void)
 	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
 	assert( core->NumFingScroll != core->NumFingKboard );
 #endif
-	DisableMouse = 0;
 	xCorr = 0;
 	yCorr = 0;
 	lastTime = 0;
@@ -225,10 +224,10 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
 
-	if (Cursor[CursorIndex] && !(DisableMouse&MOUSE_DISABLED)) {
+	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		SDL_Surface* temp = backBuf;
 		backBuf = disp; // FIXME: UGLY HACK!
-		if (DisableMouse&MOUSE_GRAYED) {
+		if (MouseFlags&MOUSE_GRAYED) {
 			//used for greyscale blitting, fadeColor is unused
 			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
 		} else {
@@ -461,7 +460,7 @@ int SDLVideoDriver::PollEvents() {
 #if SDL_VERSION_ATLEAST(1,3,0)
 			if (event.button.button == SDL_BUTTON_WHEELDOWN || event.button.button == SDL_BUTTON_WHEELUP) break;
 #endif
-			if ((DisableMouse & MOUSE_DISABLED) || !Evnt)
+			if ((MouseFlags & MOUSE_DISABLED) || !Evnt)
 				break;
 			ignoreNextMouseUp = false;
 			lastevent = true;
@@ -484,7 +483,7 @@ int SDLVideoDriver::PollEvents() {
 			if (event.button.button == SDL_BUTTON_WHEELDOWN || event.button.button == SDL_BUTTON_WHEELUP) break;
 #endif
 			lastevent = false;
-			if ((DisableMouse & MOUSE_DISABLED) || !Evnt || ignoreNextMouseUp)
+			if ((MouseFlags & MOUSE_DISABLED) || !Evnt || ignoreNextMouseUp)
 				break;
 			ignoreNextMouseUp = true;
 			if (CursorIndex != 2)
@@ -627,7 +626,9 @@ int SDLVideoDriver::PollEvents() {
 		}
 	}
 	int x, y;
-	if (Evnt && !DisableMouse && lastevent && time>lastmousetime && SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT)) {
+	if (Evnt && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
+			 && lastevent && time>lastmousetime
+			 && SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT)) {
 		lastmousetime=time+Evnt->GetRKDelay();
 		if (!ConsolePopped)
 			Evnt->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
@@ -2585,7 +2586,7 @@ void SDLVideoDriver::GetMousePos(int &x, int &y)
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
 	lastMouseTime = GetTickCount();
-	if (DisableMouse&MOUSE_DISABLED)
+	if (MouseFlags&MOUSE_DISABLED)
 		return;
 	CursorPos.x = x; // - mouseAdjustX[CursorIndex];
 	CursorPos.y = y; // - mouseAdjustY[CursorIndex];

@@ -280,6 +280,23 @@ CachePath=./Cache/
 #TouchScrollAreas=1
 
 #####################################################
+#  MouseFeedback		                    #
+#  Bitfield with reserved bits for disabling        #
+#  the mouse. Those bits cannot be set via config   #
+#                                                   #
+#  Show mouse+tooltips = 0			    #
+#  Hide mouse 	       = 1			    #
+#  Hide tooltips       = 2			    #
+#  Hide mouse+tooltips = 3			    #  
+#####################################################
+
+# For a strictly touchscreen device we recommend
+# Changing this to 3.
+
+# default is 0
+#MouseFeedback=0
+
+#####################################################
 #  Touch Gesture Input Parameters                   #
 #  Requires SDL 1.3 or later			    #
 #  All "NumFing" settings must be > 1 and < 5       #
