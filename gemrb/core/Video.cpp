@@ -70,7 +70,7 @@ void Video::SetEventMgr(EventMgr* evnt)
 	Evnt = evnt;
 }
 
-void Video::SetCursor(Sprite2D* cur, enum CursorIndex curIdx)
+void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
 {
 	CursorIndex = VID_CUR_UP;
 	if(cur){

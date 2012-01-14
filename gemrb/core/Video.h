@@ -64,7 +64,7 @@ enum TileBlitFlags {
 	TILE_SEPIA = 4
 };
 
-enum CursorIndex {
+enum CursorType {
 	VID_CUR_UP = 0,
 	VID_CUR_DOWN = 1,
 	VID_CUR_DRAG = 2
@@ -227,7 +227,7 @@ public:
 	void SetMouseGrayed(bool grayed);
 	bool GetFullscreenMode() const;
 	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
-	void SetCursor(Sprite2D* cur, enum CursorIndex curIdx);
+	void SetCursor(Sprite2D* cur, enum CursorType curIdx);
 
 	/** Scales down a sprite by a ratio */
 	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );
@@ -247,7 +247,7 @@ protected:
 	int width,height,bpp;
 	bool fullscreen;
 	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
-	CursorIndex CursorIndex;
+	CursorType CursorIndex;
 	Region CursorPos;
 	bool softKeyboardShowing;
 
