@@ -239,7 +239,7 @@ private:
 	std::vector< GAMLocationEntry*> savedpositions;
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector< char*> mastarea;
-	std::vector<std::vector< const char*> > npclevels;
+	std::vector<std::vector<char *> > npclevels;
 	int *bntchnc;
 	int bntrows;
 	CRRow *crtable;
