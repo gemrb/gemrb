@@ -1147,6 +1147,7 @@ bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 		item->Usages[2]=(ieWord) c;
 	}
 	item->Flags=0;
+	item->Expired=0;
 	return true;
 }
 
