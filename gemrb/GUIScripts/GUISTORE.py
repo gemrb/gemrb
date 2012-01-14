@@ -1212,10 +1212,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 	# get the base from the item
 	price = Item['Price']
 
-	# FIXME: actually, the price for wands depends on their charge
-	# how ...
-	if Item['MaxStackAmount']>1:
-		price = price * Slot['Usages0']
+	if Item['MaxCharge']>0:
+		price = price * Slot['Usages0'] / Item['MaxCharge']
 
 	# modifier from store properties (in percent)
 	if mode == "buy":

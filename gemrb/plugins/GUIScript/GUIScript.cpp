@@ -6291,9 +6291,8 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	//calculate depreciation too
 	//store->DepreciationRate, mount
 
-	if (item->MaxStackAmount) {
-		price *= si->Usages[0];
-	}
+	price *= si->Usages[0];
+
 	//is this correct?
 	if (price<1) {
 		price = 1;
@@ -7198,6 +7197,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
 	PyDict_SetItemString(dict, "Exclusion", PyInt_FromLong(item->ItemExcl));
 	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
+	PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(0) );
 
 	int ehc = item->ExtHeaderCount;
 
@@ -7205,6 +7205,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	for(int i=0;i<ehc;i++) {
 		int tip = core->GetItemTooltip(ResRef, i, 1);
 		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(tip));
+		ITMExtHeader *eh = item->ext_headers+i;
+		PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(eh->Charges) );
 	}
 
 	PyDict_SetItemString(dict, "Tooltips", tooltiptuple);
