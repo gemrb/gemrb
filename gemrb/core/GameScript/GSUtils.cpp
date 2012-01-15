@@ -74,11 +74,13 @@ ieResRef *ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int InDebug = 0;
-int happiness[3][20];
 int RandomNumValue;
 // reaction modifiers (by reputation and charisma)
-int rmodrep[20];
-int rmodchr[25];
+#define MAX_REP_COLUMN 20
+#define MAX_CHR_COLUMN 25
+int rmodrep[MAX_REP_COLUMN];
+int rmodchr[MAX_CHR_COLUMN];
+int happiness[3][MAX_REP_COLUMN];
 Gem_Polygon **polygons;
 
 void InitScriptTables()
@@ -88,7 +90,7 @@ void InitScriptTables()
 	AutoTable tab("happy");
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
-			for (int reputation=0;reputation<20;reputation++) {
+			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
 				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
 			}
 		}
@@ -98,7 +100,7 @@ void InitScriptTables()
 	//initializing the reaction mod. reputation table
 	AutoTable rmr("rmodrep");
 	if (rmr) {
-		for (int reputation=0; reputation<20; reputation++) {
+		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
 			rmodrep[reputation] = strtol(rmr->QueryField(0, reputation), NULL, 0);
 		}
 	}
@@ -106,7 +108,7 @@ void InitScriptTables()
 	//initializing the reaction mod. charisma table
 	AutoTable rmc("rmodchr");
 	if (rmc) {
-		for (int charisma=0; charisma<25; charisma++) {
+		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
 			rmodchr[charisma] = strtol(rmc->QueryField(0, charisma), NULL, 0);
 		}
 	}
@@ -115,12 +117,19 @@ void InitScriptTables()
 int GetReaction(Actor *target, Scriptable *Sender)
 {
 	int chr, rep, reaction;
+
 	chr = target->GetStat(IE_CHR)-1;
 	if (target->GetStat(IE_EA) == EA_PC) {
-		rep = core->GetGame()->Reputation/10;
+		rep = core->GetGame()->Reputation/10-1;
 	} else {
-		rep = target->GetStat(IE_REPUTATION);
+		//FIXME: shouldn't this be divided by 10?
+		rep = target->GetStat(IE_REPUTATION)-1;
 	}
+	if (rep<0) rep = 0;
+	else if (rep>=MAX_REP_COLUMN) rep=MAX_REP_COLUMN-1;
+	if (chr<0) chr = 0;
+	else if (chr>=MAX_CHR_COLUMN) chr=MAX_CHR_COLUMN-1;
+
 	reaction = 10 + rmodrep[rep] + rmodchr[chr];
 
 	// add -4 penalty when dealing with racial enemies
