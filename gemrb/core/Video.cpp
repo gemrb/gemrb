@@ -73,11 +73,17 @@ void Video::SetEventMgr(EventMgr* evnt)
 void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
 {
 	if (cur) {
+		//cur will be assigned in the end, increase refcount
 		cur->acquire();
+		//setting a dragged sprite cursor, it will 'stick' until cleared
 		if (curIdx == VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DRAG;
-	} else if (curIdx == VID_CUR_DRAG)
-		CursorIndex = VID_CUR_UP;
+	} else {
+		//clearing the dragged sprite cursor, replace it with the normal cursor
+		if (curIdx == VID_CUR_DRAG)
+			CursorIndex = VID_CUR_UP;
+	}
+	//decrease refcount of the previous cursor
 	if (Cursor[curIdx])
 		FreeSprite(Cursor[curIdx]);
 	Cursor[curIdx] = cur;
