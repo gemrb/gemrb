@@ -696,7 +696,7 @@ void SDLVideoDriver::InitSpriteCover(SpriteCover* sc, int flags)
 void SDLVideoDriver::DestroySpriteCover(SpriteCover* sc)
 {
 	delete[] sc->pixels;
-	sc->pixels = 0;
+	sc->pixels = NULL;
 }
 
 
@@ -853,7 +853,7 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 {
 	if (!sprite) return NULL;
-	Sprite2D* dest = 0;
+	Sprite2D* dest = NULL;
 
 	if (!sprite->BAM) {
 		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
@@ -1106,7 +1106,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	const Uint8* data = (Uint8*) (( SDL_Surface * ) spr->vptr)->pixels;
 	const SDL_Color* pal = (( SDL_Surface * ) spr->vptr)->format->palette->colors;
 
-	const Uint8* mask_data = 0;
+	const Uint8* mask_data = NULL;
 	Uint32 ck = 0;
 	if (mask) {
 		mask_data = (Uint8*) (( SDL_Surface * ) mask->vptr)->pixels;
@@ -1332,7 +1332,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	if (!spr->vptr) return;
 
 	// WARNING: this pointer is only valid with BAM sprites
-	Sprite2D_BAM_Internal* data = 0;
+	Sprite2D_BAM_Internal* data = NULL;
 
 	if (!spr->BAM) {
 		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
@@ -2463,11 +2463,9 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool Mirr
 	if (!sprite || !sprite->vptr)
 		return NULL;
 
-	Sprite2D* dest = 0;
-
+	Sprite2D* dest = DuplicateSprite(sprite);
 
 	if (!sprite->BAM) {
-		dest = DuplicateSprite(sprite);
 		for (int x = 0; x < dest->Width; x++) {
 			unsigned char * dst = ( unsigned char * ) dest->pixels + x;
 			unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
@@ -2480,12 +2478,11 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool Mirr
 			}
 		}
 	} else {
-		dest = DuplicateSprite(sprite);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_ver = !destdata->flip_ver;
 	}
 
-	dest->XPos = dest->XPos;
+	dest->XPos = sprite->XPos;
 	if (MirrorAnchor)
 		dest->YPos = sprite->Height - sprite->YPos;
 	else
@@ -2501,10 +2498,9 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(const Sprite2D* sprite, bool Mi
 	if (!sprite || !sprite->vptr)
 		return NULL;
 
-	Sprite2D* dest = 0;
+	Sprite2D* dest = DuplicateSprite(sprite);
 
 	if (!sprite->BAM) {
-		dest = DuplicateSprite(sprite);
 		for (int y = 0; y < dest->Height; y++) {
 			unsigned char * dst = (unsigned char *) dest->pixels + ( y * dest->Width );
 			unsigned char * src = dst + dest->Width - 1;
@@ -2515,7 +2511,6 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(const Sprite2D* sprite, bool Mi
 			}
 		}
 	} else {
-		dest = DuplicateSprite(sprite);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_hor = !destdata->flip_hor;
 	}
