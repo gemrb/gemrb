@@ -486,7 +486,7 @@ int SDLVideoDriver::PollEvents() {
 			if ((MouseFlags & MOUSE_DISABLED) || !Evnt || ignoreNextMouseUp)
 				break;
 			ignoreNextMouseUp = true;
-			if (CursorIndex != 2)
+			if (CursorIndex != VID_CUR_DRAG)
 				CursorIndex = VID_CUR_UP;
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;

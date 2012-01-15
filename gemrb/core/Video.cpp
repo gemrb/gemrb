@@ -72,12 +72,14 @@ void Video::SetEventMgr(EventMgr* evnt)
 
 void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
 {
-	CursorIndex = VID_CUR_UP;
-	if(cur){
+	if (cur) {
 		cur->acquire();
-		if (curIdx == VID_CUR_DRAG) CursorIndex = VID_CUR_DRAG;
-	}
-	if(Cursor[curIdx]) FreeSprite(Cursor[curIdx]);
+		if (curIdx == VID_CUR_DRAG)
+			CursorIndex = VID_CUR_DRAG;
+	} else if (curIdx == VID_CUR_DRAG)
+		CursorIndex = VID_CUR_UP;
+	if (Cursor[curIdx])
+		FreeSprite(Cursor[curIdx]);
 	Cursor[curIdx] = cur;
 }
 
