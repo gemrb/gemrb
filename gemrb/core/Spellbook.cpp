@@ -926,6 +926,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 	return count;
 }
 
+//type = 0 means any type
 int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, unsigned int type)
 {
 	memset(array, 0, sizeof(SpellExtHeader) );
@@ -935,7 +936,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, un
 	int offset = 0;
 	for (unsigned int i = 0; i<spellinfo.size(); i++) {
 		// take the offset into account, since we need per-type indices
-		if (!(1<<(spellinfo[i]->type) & type)) {
+		if (type && !(1<<(spellinfo[i]->type) & type)) {
 			offset++;
 			continue;
 		}
