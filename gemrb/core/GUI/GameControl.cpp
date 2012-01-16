@@ -1540,28 +1540,25 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 }
 
 void GameControl::UpdateScrolling() {
-	if (!scrolling) return;
+	// mouse scroll speed is checked because scrolling is not always done by the mouse (ie cutscenes/keyboard/etc)
+	if (!scrolling || !core->GetMouseScrollSpeed() || (moveX == 0 && moveY == 0)) return;
 
-	int mousescrollspd = core->GetMouseScrollSpeed(); // TODO: why check against this value and not +/-?
-	Video* video = core->GetVideoDriver();
-
-	if (moveX == mousescrollspd && moveY == 0) { // right
-		video->SetCursor(core->GetScrollCursorSprite(0,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == mousescrollspd && moveY == -mousescrollspd) { // upper right
-		video->SetCursor(core->GetScrollCursorSprite(1,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == 0 && moveY == -mousescrollspd) { // up
-		video->SetCursor(core->GetScrollCursorSprite(2,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == -mousescrollspd && moveY == -mousescrollspd) { // upper left
-		video->SetCursor(core->GetScrollCursorSprite(3,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == -mousescrollspd && moveY == 0) { // left
-		video->SetCursor(core->GetScrollCursorSprite(4,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == -mousescrollspd && moveY == mousescrollspd) { // bottom left
-		video->SetCursor(core->GetScrollCursorSprite(5,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == 0 && moveY == mousescrollspd) { // bottom
-		video->SetCursor(core->GetScrollCursorSprite(6,numScrollCursor), VID_CUR_DRAG);
-	} else if (moveX == mousescrollspd && moveY == mousescrollspd) { // bottom right
-		video->SetCursor(core->GetScrollCursorSprite(7,numScrollCursor), VID_CUR_DRAG);
+	int cursorFrame = 0; // right
+	if (moveY < 0) {
+		cursorFrame = 2; // up
+		if (moveX > 0) cursorFrame--; // +right
+		else if (moveX < 0) cursorFrame++; // +left
+	} else if (moveY > 0) {
+		cursorFrame = 6; // down
+		if (moveX > 0) cursorFrame++; // +right
+		else if (moveX < 0) cursorFrame--; // +left
+	} else if (moveX < 0) {
+		cursorFrame = 4; // left
 	}
+
+	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
+	core->GetVideoDriver()->SetCursor(cursor, VID_CUR_DRAG);
+	cursor->release();
 
 	numScrollCursor = (numScrollCursor+1) % 15;
 }
