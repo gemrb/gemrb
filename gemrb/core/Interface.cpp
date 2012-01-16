@@ -4604,6 +4604,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 			DraggedCursor = gamedata->GetBAMSprite( Picture, 0, 0 );
 		}
 		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
+		if (DraggedCursor) DraggedCursor->release();
 	}
 }
 
@@ -4612,8 +4613,6 @@ void Interface::SetDraggedPortrait(int dp, int idx)
 	if (idx<0) idx=14;
 	DraggedPortrait = dp;
 	if (dp) {
-		//hmm this might work?
-		Cursors[idx]->acquire();
 		video->SetCursor(Cursors[idx], VID_CUR_DRAG);
 	} else {
 		video->SetCursor(NULL, VID_CUR_DRAG);
