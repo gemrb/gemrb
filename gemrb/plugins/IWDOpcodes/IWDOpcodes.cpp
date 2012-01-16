@@ -411,8 +411,8 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		return;
 	}
 	for( int i=0;i<spellrescnt;i++) {
-		ieDword tmp = core->TranslateStat(tab->QueryField(i,0) );
-		spellres[i].stat = (ieWord) tmp;
+		ieDword stat = core->TranslateStat(tab->QueryField(i,0) );
+		spellres[i].stat = (ieWord) stat;
 
 		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
 		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
@@ -639,6 +639,7 @@ int fx_draw_upon_holy_might (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0xda IronSkins (iwd2)
 //This is about damage reduction, not full stoneskin like in bg2
+//this effect has no level check in original, but I think, it is a bug
 int fx_ironskins (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword tmp;
@@ -3235,12 +3236,41 @@ int fx_globe_invulnerability (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //451 LowerResistance
+//the original effect has two unwanted quirks
+//1. strength is always caster level * 2
+//2. non cumulative, which causes stronger effects canceled out
 int fx_lower_resistance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_lower_resistance (%2d)\n", fx->Opcode);
-	if (target->SetSpellState( SS_LOWERRESIST)) return FX_APPLIED;
+	int modifier;
 
-	STAT_SUB(IE_RESISTMAGIC, 15);
+	switch(fx->Parameter2) {
+	case 0: default:
+		//original IWD2 style
+		if (target->SetSpellState( SS_LOWERRESIST)) return FX_APPLIED;
+		modifier = fx->CasterLevel * 2;
+		if (modifier>50) modifier = 50;
+		break;
+	case 1:
+		//like IWD2, but stronger effects are not canceled out
+		target->SetSpellState( SS_LOWERRESIST);
+		modifier = fx->CasterLevel * 2;
+		if (modifier>50) modifier = 50;
+		break;
+	case 2:
+		//GemRB style, non cumulative
+		if (target->SetSpellState( SS_LOWERRESIST)) return FX_APPLIED;
+		modifier = fx->Parameter1;
+		break;
+	case 3:
+		//GemRB style, cumulative
+		target->SetSpellState( SS_LOWERRESIST);
+		modifier = fx->Parameter1;
+		break;
+	}
+	//FIXME: the original never goes below zero, but i think it is prone to bugs that way
+	//it is easier to handle this by simply not printing negative values
+	STAT_SUB(IE_RESISTMAGIC, modifier);
 	return FX_APPLIED;
 }
 
@@ -3371,4 +3401,3 @@ GEMRB_PLUGIN(0x4F172B2, "Effect opcodes for the icewind branch of the games")
 PLUGIN_INITIALIZER(RegisterIWDOpcodes)
 PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()
-
