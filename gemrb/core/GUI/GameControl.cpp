@@ -1533,9 +1533,10 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 			scrolling = true;
 		} else if (scrolling) {
 			scrolling = false;
+			// only clear the drag cursor when changing scrolling to false!
+			// clearing on every move kills drag operations such as dragging portraits
+			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
 		}
-
-		core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
 	}
 }
 
