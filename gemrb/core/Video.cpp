@@ -36,9 +36,9 @@ Video::Video(void)
 	softKeyboardShowing = false;
 
 	CursorIndex = VID_CUR_UP;
-	Cursor[0] = NULL;
-	Cursor[1] = NULL;
-	Cursor[2] = NULL;
+	Cursor[VID_CUR_UP] = NULL;
+	Cursor[VID_CUR_DOWN] = NULL;
+	Cursor[VID_CUR_DRAG] = NULL;
 	CursorPos.x = 0;
 	CursorPos.y = 0;
 

@@ -92,7 +92,7 @@ SDLVideoDriver::~SDLVideoDriver(void)
 	// This sprite needs to have been freed earlier, because
 	// all AnimationFactories and Sprites have already been
 	// destructed before the video driver is freed.
-	assert(Cursor[2] == NULL);
+	assert(Cursor[VID_CUR_DRAG] == NULL);
 }
 
 int SDLVideoDriver::Init(void)
