@@ -442,6 +442,8 @@ Interface::~Interface(void)
 		}
 
 		video->SetCursor(NULL, VID_CUR_DRAG);
+		video->SetCursor(NULL, VID_CUR_UP);
+		video->SetCursor(NULL, VID_CUR_DOWN);
 	}
 
 	delete evntmgr;
