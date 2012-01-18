@@ -6727,13 +6727,14 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SpellType));
 	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong ((signed) spell->SpellName));
 	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong ((signed) spell->SpellDesc));
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
 	PyDict_SetItemString(dict, "SpellExclusion", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->PrimaryType));
-	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SecondaryType));
+	PyDict_SetItemString(dict, "SpellSecondary", PyInt_FromLong (spell->SecondaryType));
 	PyDict_SetItemString(dict, "SpellLevel", PyInt_FromLong (spell->SpellLevel));
 	PyDict_SetItemString(dict, "Completion", PyString_FromResRef (spell->CompletionSound));
 	PyDict_SetItemString(dict, "SpellTargetType", PyInt_FromLong (spell->GetExtHeader(0)->Target));
