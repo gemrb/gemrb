@@ -131,6 +131,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	disp = SDL_SetVideoMode( w, h, bpp, flags );
 	if (disp == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
+		print("%s\n", SDL_GetError());
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
