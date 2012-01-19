@@ -1073,16 +1073,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	switch (Key) {
 //FIXME: move these to guiscript
 		case 'h': //hard pause
-			if (DialogueFlags & DF_FREEZE_SCRIPTS) break;
-			//fallthrough
+			core->SetPause(PAUSE_ON);
+			break;
 		case ' ': //soft pause
-			DialogueFlags ^= DF_FREEZE_SCRIPTS;
-			if (DialogueFlags&DF_FREEZE_SCRIPTS) {
-				displaymsg->DisplayConstantString(STR_PAUSED, DMC_RED);
-				SetDisplayText(STR_PAUSED, 0); // time 0 = removed instantly on unpause
-			} else {
-				displaymsg->DisplayConstantString(STR_UNPAUSED, DMC_RED);
-			}
+			core->TogglePause();
 			break;
 		case GEM_ALT: //alt key (shows containers)
 #ifdef ANDROID
