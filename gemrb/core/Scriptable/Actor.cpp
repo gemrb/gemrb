@@ -137,6 +137,13 @@ static const char *skillcolumns[12]={
 	"LAYHANDS", "TURNLEVEL", "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
 };
 
+struct ArmorFailure {
+	ieWord itemtype;
+	ieWord penalty;
+};
+
+static ArmorFailure *armorfail = NULL;
+static int armcount = -1;
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static ieDword pstflags = false;
@@ -323,6 +330,11 @@ void ReleaseMemoryActor()
 		fistres = NULL;
 		delete [] fistresclass;
 		fistresclass = NULL;
+	}
+
+	if (armorfail) {
+		delete [] armorfail;
+		armorfail = NULL;
 	}
 
 	if (itemuse) {
@@ -1651,6 +1663,16 @@ static void InitActorTables()
 		}
 	}
 
+	tm.load("armfail");
+	if (tm) {
+		armcount = tm->GetRowCount();
+		armorfail = new ArmorFailure[armcount];
+		for (i = 0; i < armcount; i++) {
+			armorfail[i].itemtype = (ieWord) atoi( tm->QueryField(i,0) );
+			armorfail[i].penalty = (ieWord) atoi( tm->QueryField(i,1) );
+		}
+	}
+
 	tm.load("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
@@ -2101,6 +2123,29 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 		sca->SetPalette(gradient, 4);
 	}
 	AddVVCell(sca);
+}
+
+ieDword Actor::GetSpellFailure(bool arcana) const
+{
+	ieDword base = arcana?Modified[IE_SPELLFAILUREMAGE]:Modified[IE_SPELLFAILUREPRIEST];
+	if (HasSpellState(SS_DOMINATION)) base += 100;
+	if (HasSpellState(SS_BLINK)) base += 20;
+	//FIXME: IWD2 has this as 20, other games as 50
+	if (HasSpellState(SS_DEAF)) base += 20;
+	if (!arcana) return base;
+
+	ieDword armor = 0;
+	ieWord armtype = inventory.GetArmorItemType();
+	for (int i = 0;i<armcount; i++) {
+		if (armorfail[i].itemtype == armtype) {
+			armor = armorfail[i].penalty;
+			ieDword feat = GetFeat(FEAT_ARMORED_ARCANA)*5;
+			if (armor<feat) armor = 0;
+			else armor -= feat;
+			break;
+		}
+	}
+	return base+armor;
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
@@ -6625,7 +6670,6 @@ int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
 	}
 	return 0;
 }
-
 //replenishes spells, cures fatigue
 void Actor::Rest(int hours)
 {

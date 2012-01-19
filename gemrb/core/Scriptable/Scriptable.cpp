@@ -1031,12 +1031,12 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		switch(spl->SpellType)
 		{
 		case IE_SPL_PRIEST:
-			if (actor->Modified[IE_SPELLFAILUREPRIEST] >= roll) {
+			if (actor->GetSpellFailure(false) >= roll) {
 				failed = true;
 			}
 			break;
 		case IE_SPL_WIZARD:
-			if (actor->Modified[IE_SPELLFAILUREMAGE] >= roll) {
+			if (actor->GetSpellFailure(true) >= roll) {
 				failed = true;
 			}
 			break;

@@ -1,4 +1,4 @@
-/* GemRB - Infinity Engine Emulator
+ri
  * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
@@ -647,6 +647,9 @@ public:
 	/* plays damage animation, if hit is not set, then plays only the splash part */
 	void PlayDamageAnimation(int x, bool hit=true);
 	void PlayCritDamageAnimation(int x);
+	/* returns mage or cleric spell casting failure, iwd2 compatible */
+	ieDword GetSpellFailure(bool arcana) const;
+	/* PST specific criticals */
 	int GetCriticalType() const;
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
