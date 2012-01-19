@@ -585,8 +585,11 @@ int SDLVideoDriver::PollEvents() {
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
+					// We pause the game and audio when the window is minimized.
+					// on iOS/Android this happens when leaving the application or when play is interrupted (ex phone call)
+					// if win/mac/linux has a problem with this behavior we can work something out.
 					core->GetAudioDrv()->Pause();//this is for ANDROID mostly
-					core->Autopause(AP_GENERIC, NULL);
+					core->SetPause(PAUSE_ON);
 					break;
 				case SDL_WINDOWEVENT_RESTORED://SDL 1.3
 					/*
