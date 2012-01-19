@@ -49,6 +49,7 @@ static Trigger *Enemy = NULL;
 #define PI_NAUSEA       43
 #define PI_HOPELESSNESS 44
 #define PI_STONESKIN    46
+#define PI_TENSER       55
 #define PI_RIGHTEOUS    67
 #define PI_ELEMENTS     76
 #define PI_FAITHARMOR   84
@@ -1397,11 +1398,22 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0x107 ControlUndead (like charm?)
+//This is the IWD2 charm effect
+//0x107 ControlUndead (like charm)
 //425 ControlUndead2
 int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_control_undead (%2d): General: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//blood rage berserking gives immunity to charm (in iwd2)
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
+	//protection from evil gives immunity to charm (in iwd2)
+	if (target->HasSpellState(SS_PROTFROMEVIL)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
@@ -1427,15 +1439,18 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		case 2: //controlled by cleric
 			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
+			target->SetSpellState(SS_DOMINATION);
 			break;
 		case 3: //controlled by cleric (hostile after charm)
 			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
 			target->SetBase(IE_EA, EA_ENEMY);
+			target->SetSpellState(SS_DOMINATION);
 			break;
 		case 4: //turn undead
 			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			target->SetStat(IE_MORALE, 0, 0);
+			target->SetSpellState(SS_DOMINATION);
 			break;
 		}
 	}
@@ -3058,11 +3073,24 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_tenser_transformation (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_TENSER)) return FX_APPLIED;
+
+	if (fx->FirstApply) {
+		fx->Parameter3=core->Roll(fx->CasterLevel, 6, 0);
+		fx->Parameter4=core->Roll(2,4,0);
+		fx->Parameter5=core->Roll(2,4,0);
+		BASE_ADD( IE_HITPOINTS, fx->Parameter3);
+	}
+
 	STAT_SUB(IE_ARMORCLASS, 2);
+	STAT_ADD(IE_MAXHITPOINTS, fx->Parameter3);
+	STAT_ADD(IE_STR, fx->Parameter4);
+	STAT_ADD(IE_CON, fx->Parameter5);
 
 	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_TENSER);
 		target->SetGradient(0x3e);
 	}
+
 	return FX_APPLIED;
 }
 
