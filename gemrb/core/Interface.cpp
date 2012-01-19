@@ -4274,6 +4274,8 @@ bool Interface::InitItemTypes()
 			case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
 				//head (for averting critical hit)
 			case SLOT_EFFECT_HEAD: Inventory::SetHeadSlot(i); break;
+				//armor slot
+			case SLOT_EFFECT_ITEM: Inventory::SetArmorSlot(i); break;
 			default:;
 			}
 		}

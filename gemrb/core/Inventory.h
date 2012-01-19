@@ -301,6 +301,8 @@ public:
 	void SetSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
 	/** Adds item to slot*/
 	void AddSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	/** returns the itemtype of the item in the armor slot, mostly used in IWD2 */
+	ieWord GetArmorItemType() const;
 	/** breaks the item (weapon) in slot */
 	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
@@ -325,6 +327,7 @@ public:
 	int MergeItems(int slot, CREItem *item);
 	//setting important constants
 	static void Init(int mb);
+	static void SetArmorSlot(int arg);
 	static void SetHeadSlot(int arg);
 	static void SetFistSlot(int arg);
 	static void SetMagicSlot(int arg);
@@ -333,6 +336,7 @@ public:
 	static void SetQuickSlot(int arg);
 	static void SetInventorySlot(int arg);
 	static void SetShieldSlot(int arg);
+	static int GetArmorSlot();
 	static int GetHeadSlot();
 	static int GetFistSlot();
 	static int GetMagicSlot();
