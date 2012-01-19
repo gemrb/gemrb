@@ -1122,6 +1122,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
+		target->SetSpellState(SS_DOMINATION);
 		break;
 	case 5: //thrall (typo comes from original engine doc)
 		if (fx->FirstApply) {
@@ -2699,30 +2700,47 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		break;
 	case RPD_STR: //strength
-		STAT_ADD(IE_STR, fx->Parameter1);
+		STAT_SUB(IE_STR, fx->Parameter1);
 		break;
 	case RPD_DEX: //dex
-		STAT_ADD(IE_DEX, fx->Parameter1);
+		STAT_SUB(IE_DEX, fx->Parameter1);
 		break;
 	case RPD_CON: //con
-		STAT_ADD(IE_CON, fx->Parameter1);
+		STAT_SUB(IE_CON, fx->Parameter1);
 		break;
 	case RPD_INT: //int
-		STAT_ADD(IE_INT, fx->Parameter1);
+		STAT_SUB(IE_INT, fx->Parameter1);
 		break;
 	case RPD_WIS: //wis
-		STAT_ADD(IE_WIS, fx->Parameter1);
+		STAT_SUB(IE_WIS, fx->Parameter1);
 		break;
 	case RPD_CHA: //cha
-		STAT_ADD(IE_CHR, fx->Parameter1);
+		STAT_SUB(IE_CHR, fx->Parameter1);
 		break;
+	case RPD_CONTAGION: //contagion (iwd2) - an aggregate of STR,DEX,CHR,SLOW diseases
+		STAT_SUB(IE_STR, 2);
+		STAT_SUB(IE_DEX, 2);
+		STAT_SUB(IE_CHR, 2);
+		//falling through
 	case RPD_SLOW: //slow
+		//TODO: in iwd2
+		//-2 AC, BaB, reflex, damage
+		//-1 attack#
+		//speed halved
+		//in bg2
+		//TBD
+		target->AddPortraitIcon(PI_SLOWED);
 		break;
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
+		target->SetSpellState(SS_MOLDTOUCH);
 		damage = 1;
 		break;
 	case RPD_MOLD2:
+		break;
+	case RPD_PEST:     //cloud of pestilence (iwd2)
+		break;
+	case RPD_DOLOR:     //dolorous decay (iwd2)
 		break;
 	default:
 		damage = 1;
@@ -2734,6 +2752,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (damage) {
 		target->Damage(damage, DAMAGE_POISON, caster);
 	}
+
 	return FX_APPLIED;
 }
 
@@ -2748,23 +2767,13 @@ int fx_cure_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x50 State:Deafness
-// gemrb extension: modifiable amount
-// none of the engines care about stacking
 int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_set_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	//gemrb fix
+	//adopted IWD2 method, spellfailure will be handled internally based on the spell state
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
 
-	if (!fx->Parameter1) {
-		fx->Parameter1 = 50;
-	}
-	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
-	if (!fx->Parameter2) {
-		fx->Parameter1 = 50;
-	}
-	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
 	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_DEAFNESS);
@@ -6762,7 +6771,7 @@ int fx_missile_damage_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx
 // 0x11f NoCircleState
 int fx_no_circle_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) print( "fx_missile_damage_modifier (%2d)\n", fx->Opcode);
+	if (0) print( "fx_no_circle_state (%2d)\n", fx->Opcode);
 	STAT_SET( IE_NOCIRCLE, 1 );
 	return FX_APPLIED;
 }
