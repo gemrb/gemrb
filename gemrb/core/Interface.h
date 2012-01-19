@@ -272,6 +272,11 @@ enum PluginFlagsType {
 	PLF_DELAY
 };
 
+enum PauseSetting {
+	PAUSE_OFF = 0,
+	PAUSE_ON = 1
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -654,8 +659,12 @@ public:
 	int WriteWorldMap(const char *folder);
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const char *folder);
-	/** receives an autopause reason, returns 1 if pause was triggered by this call, -1 if it was already triggered */
-	int Autopause(ieDword flag, Scriptable *target);
+	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
+	PauseSetting TogglePause();
+	/** returns true the passed pause setting was applied. false otherwise. */
+	bool SetPause(PauseSetting pause, bool quiet = false);
+	/** receives an autopause reason, returns true if autopause was accepted and successful */
+	bool Autopause(ieDword flag, Scriptable *target);
 	/** registers engine opcodes */
 	void RegisterOpcodes(int count, const EffectDesc *opcodes);
 	/** reads a list of resrefs into an array, returns array size */

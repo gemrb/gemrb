@@ -5349,42 +5349,59 @@ int Interface::GetReputationMod(int column) const
 	return reputationmod[reputation][column];
 }
 
-// -3, -2 if request is illegal or in cutscene
-// -1 if pause is already active
-// 0 if pause was not allowed
-// 1 if autopause happened
-int Interface::Autopause(ieDword flag, Scriptable* target)
+PauseSetting Interface::TogglePause()
 {
 	GameControl *gc = GetGameControl();
-	if (!gc) {
-		return -3;
-	}
-	if (InCutSceneMode()) {
-		return -2;
-	}
-	if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
-		return -1;
-	}
-	ieDword autopause_flags = 0;
-	ieDword autopause_center = 0;
+	PauseSetting pause = (PauseSetting)(~gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
+	if (SetPause(pause)) return pause;
+	return (PauseSetting)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
+}
 
-	vars->Lookup("Auto Pause State", autopause_flags);
-	vars->Lookup("Auto Pause Center", autopause_center);
-	if ((autopause_flags & (1<<flag))) {
-		displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
-		if (autopause_center && target) {
-			Video *video = core->GetVideoDriver();
-			Point screenPos = target->Pos;
-			video->ConvertToScreen(screenPos.x, screenPos.y);
-			gc->Center(screenPos.x, screenPos.y);
-			if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
-				core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
-			}
+bool Interface::SetPause(PauseSetting pause, bool quiet)
+{
+	GameControl *gc = GetGameControl();
+	if (gc && !InCutSceneMode()
+		   && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
+		int strref;
+		if (pause) {
+			strref = STR_PAUSED;
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		} else {
+			strref = STR_UNPAUSED;
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
 		}
-		return 1;
+		if (!quiet) {
+			if (pause) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)
+			displaymsg->DisplayConstantString(strref, DMC_RED);
+		}
+		return true;
 	}
-	return 0;
+	return false;
+}
+
+bool Interface::Autopause(ieDword flag, Scriptable* target)
+{
+	ieDword autopause_flags = 0;
+	vars->Lookup("Auto Pause State", autopause_flags);
+
+	if ((autopause_flags & (1<<flag))) {
+		if (SetPause(PAUSE_ON, true)) {
+			displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
+
+			ieDword autopause_center = 0;
+			vars->Lookup("Auto Pause Center", autopause_center);
+			if (autopause_center && target) {
+				Point screenPos = target->Pos;
+				core->GetVideoDriver()->ConvertToScreen(screenPos.x, screenPos.y);
+				GetGameControl()->Center(screenPos.x, screenPos.y);
+				if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
+					core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
+				}
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)

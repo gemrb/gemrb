@@ -7959,27 +7959,11 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &pause, &quiet)) {
 		return AttributeError( GemRB_GamePause__doc );
 	}
-
-	GameControl *gc = core->GetGameControl();
-	if (gc) {
-		//this will trigger when pause is not 0 or 1
-		if ((unsigned int) pause > 1) {
-			pause = ~gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
-		}
-
-		if (pause) {
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
-		} else {
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
-		}
-		if (!quiet) {
-			if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
-				displaymsg->DisplayConstantString(STR_PAUSED, DMC_RED);
-				gc->SetDisplayText(STR_PAUSED, 0); // time 0 = removed instantly on unpause (for pst)
-			} else {
-				displaymsg->DisplayConstantString(STR_UNPAUSED, DMC_RED);
-			}
-		}
+	//this will trigger when pause is not 0 or 1
+	if ((unsigned int) pause > 1) {
+		core->TogglePause();
+	} else {
+		core->SetPause((PauseSetting)pause, (bool)quiet);
 	}
 
 	Py_INCREF( Py_None );
