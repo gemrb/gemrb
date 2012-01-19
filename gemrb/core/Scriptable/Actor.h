@@ -1,4 +1,4 @@
-ri
+/*
  * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
