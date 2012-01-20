@@ -332,6 +332,7 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 		}
 		StatID&=15;
 		ps->ExtraSettings[StatID] = StatValue;
+		actor->ApplyExtraSettings();
 		return 1;
 	}
 
@@ -6746,8 +6747,8 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CheckSpecialSpell__doc,
-			  "CheckSpecialSpell(GlobalID, SpellResRef)=>int\n\n"
-			  "Checks if the specified spell is special. Returns 0 for normal ones." );
+"CheckSpecialSpell(GlobalID, SpellResRef)=>int\n\n"
+"Checks if the specified spell is special. Returns 0 for normal ones." );
 
 static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6769,8 +6770,8 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSpelldataIndex__doc,
-			 "GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
-			 "Returns the index of the spell in the spellbook's spelldata structure."
+"GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
+"Returns the index of the spell in the spellbook's spelldata structure."
 );
 
 static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
@@ -9262,8 +9263,8 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChargeSpells__doc,
-			  "ChargeSpells(globalID|pc)\n\n"
-			  "Recharges the actor's spells.");
+"ChargeSpells(globalID|pc)\n\n"
+"Recharges the actor's spells.");
 static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;

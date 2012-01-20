@@ -69,6 +69,8 @@
 
 #define MAX_ACT_COUNT 34 //update this
 
+#define ES_COUNT 16  //number of iwd2 persistent feat preset values (original iwd2 had only 5)
+
 #define GUIBT_COUNT (MAX_QSLOTS + 3)
 
 class GEM_EXPORT PCStatsStruct {
@@ -88,7 +90,7 @@ public:
 	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES];
 	ieResRef  SoundSet;
 	char      SoundFolder[SOUNDFOLDERSIZE];
-	ieDword   ExtraSettings[16];           //iwd2 - expertise, hamstring, arterial strike, etc
+	ieDword   ExtraSettings[ES_COUNT];     //iwd2 - expertise, hamstring, arterial strike, etc
 	ieResRef  QuickSpells[MAX_QSLOTS];     //iwd2 uses 9, others use only 3
 	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT]; //iwd2 uses 8, others use only 4
 	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT];

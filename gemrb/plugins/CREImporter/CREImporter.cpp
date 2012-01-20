@@ -534,7 +534,13 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 		}
 		stream->Write( act->PCStats->SoundFolder, 32);
 		stream->Write( act->PCStats->SoundSet, 8);
-		for (i=0;i<32;i++) {
+		for (i=0;i<ES_COUNT;i++) {
+			tmpDword = act->PCStats->ExtraSettings[i];
+			stream->WriteDword( &tmpDword);
+		}
+		//Reserved
+		tmpDword = 0;
+		for (i=0;i<16;i++) {
 			stream->WriteDword( &tmpDword);
 		}
 		break;
@@ -548,6 +554,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	ieVariable name;
 	char Signature[8];
 	ieDword offset, size;
+	ieDword tmpDword;
 	ieWord tmpWord;
 	ieByte tmpByte;
 
@@ -586,7 +593,39 @@ void CREImporter::ReadChrHeader(Actor *act)
 		str->ReadWord (&tmpWord);
 		act->PCStats->QuickItemHeaders[i]=tmpWord;
 	}
+
 	//here comes the version specific read
+	switch (CREVersion) {
+	case IE_CRE_V2_2:
+		//gemrb format doesn't save these redundantly
+		for (i=0;i<QSPCount;i++) {
+			if (act->PCStats->QuickSpellClass[i]==0xff) {
+				str->ReadResRef (act->PCStats->QuickSpells[i]);
+			}
+		}
+		for (i=0;i<QSPCount;i++) {
+			if (act->PCStats->QuickSpellClass[i]==0xfe) {
+				str->ReadResRef (act->PCStats->QuickSpells[i]);
+			}
+		}
+		//fallthrough
+	case IE_CRE_GEMRB:
+		for (i=0;i<QSPCount;i++) {
+			str->ReadDword( &tmpDword);
+			act->PCStats->QSlots[i] = (ieByte) tmpDword;
+		}
+		str->Seek(26, GEM_CURRENT_POS);
+		str->Read( act->PCStats->SoundFolder, 32);
+		str->Read( act->PCStats->SoundSet, 8);
+		for (i=0;i<ES_COUNT;i++) {
+			str->ReadDword( &act->PCStats->ExtraSettings[i] );
+		}
+		//Reserved
+		str->Seek(64, GEM_CURRENT_POS);
+		break;
+	default:
+		break;
+	}
 }
 
 bool CREImporter::SeekCreHeader(char *Signature)

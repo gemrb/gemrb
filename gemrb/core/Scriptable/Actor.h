@@ -1,4 +1,4 @@
-/*
+/* GemRB - Infinity Engine Emulator
  * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
@@ -249,6 +249,7 @@ public:
 	ieResRef ModalSpell;             //apply this spell once per round
 	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
+	ieResRef BackstabResRef;         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
 	ieResRef SmallPortrait;
@@ -704,6 +705,8 @@ public:
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
 	void AddProjectileImmunity(ieDword projectile);
+	/* reapply modal feat spells */
+	void ApplyExtraSettings();
 	/* Set up all the missing stats on load time, chargen, or after level up */
 	void CreateDerivedStats();
 	/* Checks if the actor is multiclassed (excluding dualclassed actors)) */

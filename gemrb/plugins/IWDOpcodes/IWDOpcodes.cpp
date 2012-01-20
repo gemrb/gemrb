@@ -82,6 +82,13 @@ static Trigger *Enemy = NULL;
 #define PI_BLINK        130
 #define PI_EMPTYBODY    145
 
+//These settings are saved in the V2.2 chr struct in IWD2
+#define ES_EXPERTISE    3
+#define ES_POWERATTACK  4
+#define ES_ARTERIAL     5
+#define ES_HAMSTRING    6
+#define ES_RAPIDSHOT    7
+
 static int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* Owner, Actor* target, Effect* fx);//0
 static int fx_damage_bonus_modifier (Scriptable* Owner, Actor* target, Effect* fx);//49
 static int fx_draw_upon_holy_might (Scriptable* Owner, Actor* target, Effect* fx);//84 (iwd2)
@@ -191,7 +198,7 @@ static int fx_protection_from_elements (Scriptable* Owner, Actor* target, Effect
 static int fx_aegis (Scriptable* Owner, Actor* target, Effect* fx); //426
 static int fx_executioner_eyes (Scriptable* Owner, Actor* target, Effect* fx); //427
 //428 DeathMagic (same as 0xd)
-//429
+static int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect *fx);//429 EffectsOnStruck (similar to 0xe8)
 static int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx); //430
 static int fx_energy_drain (Scriptable* Owner, Actor* target, Effect* fx); //431
 static int fx_tortoise_shell (Scriptable* Owner, Actor* target, Effect* fx); //432
@@ -314,6 +321,7 @@ static EffectDesc effectnames[] = {
 	{ "ControlUndead2", fx_control_undead, 0, -1 }, //425
 	{ "Aegis", fx_aegis, 0, -1 }, //426
 	{ "ExecutionerEyes", fx_executioner_eyes, 0, -1 }, //427
+	{ "EffectsOnStruck", fx_effects_on_struck, 0, -1 }, //429
 	{ "ProjectileUseEffectList", fx_projectile_use_effect_list, 0, -1 }, //430
 	{ "EnergyDrain", fx_energy_drain, 0, -1 }, //431
 	{ "TortoiseShell", fx_tortoise_shell, 0, -1 }, //432
@@ -563,7 +571,7 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Ef
 		HandleBonus(target, IE_ARMORCLASS, fx->Parameter1, fx->TimingMode);
 		break;
 	case 1: //armor
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
 				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
 			}
@@ -835,7 +843,7 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	ieResRef areahit;
 
 	if (fx->Parameter2>=IWD_MSC) {
-		fx->Parameter2=0;
+		fx->Parameter2 = 0;
 	}
 	core->GetResRefFrom2DA(iwd_monster_2da[fx->Parameter2], monster, hit, areahit);
 
@@ -896,7 +904,7 @@ int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
 	ieResRef areahit;
 
 	if (fx->Parameter2>=IWD_AD) {
-		fx->Parameter2=0;
+		fx->Parameter2 = 0;
 	}
 	core->GetResRefFrom2DA(animate_dead_2da[fx->Parameter2], monster, hit, areahit);
 
@@ -965,7 +973,7 @@ int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 	ieResRef areahit;
 
 	if (fx->Parameter2>=IWD_SM2) {
-		fx->Parameter2=0;
+		fx->Parameter2 = 0;
 	}
 	core->GetResRefFrom2DA(summon_monster_2da[fx->Parameter2], monster, hit, areahit);
 
@@ -1045,7 +1053,7 @@ int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 	ieResRef areahit;
 
 	if (fx->Parameter2>=IWD_SSM) {
-		fx->Parameter2=0;
+		fx->Parameter2 = 0;
 	}
 	core->GetResRefFrom2DA(summon_shadow_monster_2da[fx->Parameter2], monster, hit, areahit);
 
@@ -2294,7 +2302,7 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 					an->sequence^=value;
 					break;
 			}
-			an->frame=0;
+			an->frame = 0;
 			an->InitAnimation();
 		}
 	}
@@ -2681,7 +2689,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//bit 1 repeat or only once
 	if (fx->Parameter2&AE_REPEAT) {
-		 return FX_APPLIED;
+		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2857,7 +2865,26 @@ int fx_executioner_eyes (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //428 Death3 (also a death effect)
 
-//429 WhenStruckUseEffectList
+//429 EffectsOnStruck (a much simpler version of CastSpellOnCondition)
+int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	Map *map = target->GetCurrentArea();
+	if (!map) return FX_APPLIED;
+
+	Actor *actor = map->GetActorByGlobalID(target->LastHitter);
+	if (!actor) {
+		return FX_APPLIED;
+	}
+
+	const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
+	if (entry!=NULL) {
+		ieDword dist = GetSpellDistance(fx->Resource, target);
+		if (!dist) return FX_APPLIED;
+		if (PersonalDistance(target, actor) > dist) return FX_APPLIED;
+		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);
+	}
+	return FX_APPLIED;
+}
 
 //430 ProjectileUseEffectList
 int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
@@ -2920,12 +2947,18 @@ int fx_energy_drain (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //432 TortoiseShell
 int fx_tortoise_shell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) print( "fx_tortoise_shell (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	if (0) print( "fx_tortoise_shell (%2d) Hits: %d\n", fx->Opcode, fx->Parameter1);
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (target->SetSpellState( SS_TORTOISE)) return FX_NOT_APPLIED;
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_TORTOISE);
 		target->SetOverlay(OV_TORTOISE);
 	}
+	target->SetSpellState(SS_HELD);
+	STATE_SET(STATE_HELPLESS);
 	return FX_APPLIED;
 }
 
@@ -2940,7 +2973,7 @@ int fx_blink (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword Trans = fx->Parameter4;
 	if (fx->Parameter3) {
 		if (Trans>=240) {
-			fx->Parameter3=0;
+			fx->Parameter3 = 0;
 		} else {
 			Trans+=16;
 		}
@@ -3003,10 +3036,13 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 //436 DamageReduction
 int fx_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) print( "fx_damage_reduction (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
-	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
-	STAT_SET(IE_RESISTCRUSHING, fx->Parameter2*5);
-	STAT_SET(IE_RESISTPIERCING, fx->Parameter2*5);
+	if (0) print( "fx_damage_reduction (%2d) Hits: %d  Strength: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	if (!fx->Parameter1) return FX_NOT_APPLIED;
+	//TODO: didn't set the pluses stored in Parameter2
+	STAT_SET(IE_RESISTSLASHING, fx->Parameter1);
+	STAT_SET(IE_RESISTCRUSHING, fx->Parameter1);
+	STAT_SET(IE_RESISTPIERCING, fx->Parameter1);
 	return FX_APPLIED;
 }
 
@@ -3063,8 +3099,9 @@ int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_missile_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_missile_damage_reduction (%2d) Amount:%d\n", fx->Opcode, fx->Parameter1);
+	if (!fx->Parameter1) fx->Parameter1=10;
 	STAT_SET(IE_RESISTMISSILE, fx->Parameter1);
-	//TODO: didn't set the pluses
+	//TODO: didn't set the pluses stored in Parameter2
 	return FX_APPLIED;
 }
 
@@ -3081,7 +3118,8 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		BASE_ADD( IE_HITPOINTS, fx->Parameter3);
 	}
 
-	STAT_SUB(IE_ARMORCLASS, 2);
+	STAT_ADD(IE_ARMORCLASS, 4); //FIXME: this is a bonus
+	STAT_ADD(IE_SAVEFORTITUDE, 5); //FIXME: this is a bonus
 	STAT_ADD(IE_MAXHITPOINTS, fx->Parameter3);
 	STAT_ADD(IE_STR, fx->Parameter4);
 	STAT_ADD(IE_CON, fx->Parameter5);
@@ -3323,104 +3361,147 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //453 PowerAttack
-static EffectRef fx_expertise_ref = { "Expertise", -1 };
-
 int fx_power_attack (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_power_attack (%2d)\n", fx->Opcode);
 
-	if (fx->FirstApply) {
-		if (target->HasSpellState(SS_EXPERTISE)) {
-			//stopped using feat: Expertise
-			target->fxqueue.RemoveAllEffects(fx_expertise_ref);
+	if (!target->HasFeat(FEAT_POWER_ATTACK)) return FX_NOT_APPLIED;
+	if (!target->PCStats) return FX_NOT_APPLIED;
+
+	ieDword x=target->PCStats->ExtraSettings[ES_POWERATTACK];
+	if (x) {
+		if (target->SetSpellState(SS_POWERATTACK+x)) return FX_NOT_APPLIED;
+		if (fx->FirstApply) {
+			//disable mutually exclusive feats
+			target->PCStats->ExtraSettings[ES_EXPERTISE] = 0;
+
+			//set new modal feat
+			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_POWERATTACK, target);
 		}
 	}
-	unsigned int x;
-	x = target->GetFeat(FEAT_POWER_ATTACK);
-	if (x>5) x=5;
-	for(unsigned int i = 0;i<5;i++) {
-		if (i<x) {
-			target->SetSpellState( SS_POWERATTACK);
-		} else {
-			//FIXME: doubt we need UnSetSpellState
-			//target->UnSetSpellState(SS_POWERATTACK+x);
-		}
-	}
-	return FX_APPLIED;
+
+	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, DMC_WHITE, STR_POWERATTACK, target);
+	return FX_NOT_APPLIED;
 }
 
 //454 Expertise
-static EffectRef fx_powerattack_ref = { "PowerAttack", -1 };
-
 int fx_expertise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 //expertise feat:
 //convert positive base attack bonus into AC (dodge bonus)
 //up to feat_expertise count (player's choice)
 	if (0) print( "fx_expertise (%2d)\n", fx->Opcode);
-	if (fx->FirstApply) {
-		if (target->HasSpellState(SS_POWERATTACK)) {
-			target->fxqueue.RemoveAllEffects(fx_powerattack_ref);
-		}
-	}
-	unsigned int x;
 
-	x = target->GetFeat(FEAT_EXPERTISE);
-	if (x>5) x=5;
-	for(unsigned int i = 0;i<5;i++) {
-		if (i<x) {
-			target->SetSpellState(SS_EXPERTISE+x);
-		} else {
-			//FIXME: doubt we need UnSetSpellState
-			//target->UnSetSpellState(SS_EXPERTISE+x);
+	if (!target->HasFeat(FEAT_EXPERTISE)) return FX_NOT_APPLIED;
+	if (!target->PCStats) return FX_NOT_APPLIED;
+
+	ieDword x=target->PCStats->ExtraSettings[ES_EXPERTISE];
+	if (x) {
+		if (target->SetSpellState(SS_EXPERTISE+x)) return FX_NOT_APPLIED;
+		if (fx->FirstApply) {
+			//disable mutually exclusive feats
+			target->PCStats->ExtraSettings[ES_POWERATTACK] = 0;
+
+			//set new modal feat
+			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_EXPERTISE, target);
 		}
 	}
-	return FX_APPLIED;
+
+	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, DMC_WHITE, STR_EXPERTISE, target);
+	return FX_NOT_APPLIED;
 }
 
 //455 ArterialStrike
-static EffectRef fx_hamstring_ref = { "HamString", -1 };
-
+//apply arterial strike spell on backstab, this is by default the same as in iwd2
 int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_arterial_strike (%2d)\n", fx->Opcode);
-	if (fx->FirstApply) {
-		if (target->HasSpellState(SS_HAMSTRING)) {
-			target->fxqueue.RemoveAllEffects(fx_hamstring_ref);
+	//arterial strike doesn't work for npcs?
+	if (!target->HasFeat(FEAT_ARTERIAL_STRIKE)) return FX_NOT_APPLIED;
+	if (!target->PCStats) return FX_NOT_APPLIED;
+
+	if (target->PCStats->ExtraSettings[ES_ARTERIAL]) {
+		if (target->SetSpellState( SS_ARTERIAL)) return FX_NOT_APPLIED; //don't apply it twice
+
+		if (fx->FirstApply) {
+			if (!fx->Resource[0]) {
+				strnuprcpy(fx->Resource, "artstr", sizeof(ieResRef)-1);
+			}
+			//disable mutually exclusive feats
+			target->PCStats->ExtraSettings[ES_HAMSTRING] = 0;
+
+			//set new modal feat
+			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_ARTERIAL, target);
 		}
-	}
-	if (target->SetSpellState( SS_ARTERIAL)) {
-		//TODO:display using feat arterial strike
+		if (target->BackstabResRef[0]=='*') {
+			memcpy(target->BackstabResRef, fx->Resource, sizeof(ieResRef));
+		}
 		return FX_APPLIED;
 	}
-	return FX_APPLIED;
+
+	//stop arterial
+	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, DMC_WHITE, STR_ARTERIAL, target);
+	return FX_NOT_APPLIED;
 }
 
 //456 HamString
-static EffectRef fx_arterialstrike_ref = { "ArterialStrike", -1 };
-
+//apply hamstring spell on backstab, this is by default the same as in iwd2
 int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_hamstring (%2d)\n", fx->Opcode);
-	if (fx->FirstApply) {
-		if (target->HasSpellState(SS_ARTERIAL)) {
-			target->fxqueue.RemoveAllEffects(fx_arterialstrike_ref);
+	//hamstring doesn't work for npcs?
+	if (!target->HasFeat(FEAT_HAMSTRING)) return FX_NOT_APPLIED;
+	if (!target->PCStats) return FX_NOT_APPLIED;
+
+	if (target->PCStats->ExtraSettings[ES_HAMSTRING]) {
+		if (target->SetSpellState( SS_HAMSTRING)) return FX_NOT_APPLIED; //don't apply it twice
+
+		if (fx->FirstApply) {
+			if (!fx->Resource[0]) {
+				strnuprcpy(fx->Resource, "hamstr", sizeof(ieResRef)-1);
+			}
+			//disable mutually exclusive feats
+			target->PCStats->ExtraSettings[ES_ARTERIAL] = 0;
+
+			//set new modal feat
+			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_HAMSTRING, target);
 		}
-	}
-	if (target->SetSpellState( SS_HAMSTRING)) {
-		//TODO:display using feat hamstring
+		if (target->BackstabResRef[0]=='*') {
+			memcpy(target->BackstabResRef, fx->Resource, sizeof(ieResRef));
+		}
 		return FX_APPLIED;
 	}
-	return FX_APPLIED;
+
+	//stop hamstring
+	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, DMC_WHITE, STR_HAMSTRING, target);
+	return FX_NOT_APPLIED;
 }
 
 //457 RapidShot
 int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_rapid_shot (%2d)\n", fx->Opcode);
-	if (target->SetSpellState( SS_RAPIDSHOT)) return FX_APPLIED;
-	//TODO:
-	return FX_APPLIED;
+	//rapid shot doesn't work for npcs?
+	if (!target->HasFeat(FEAT_RAPID_SHOT)) return FX_NOT_APPLIED;
+	if (!target->PCStats) return FX_NOT_APPLIED;
+
+	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {
+		if (target->SetSpellState( SS_RAPIDSHOT)) return FX_NOT_APPLIED; //don't apply it twice
+
+		if (fx->FirstApply) {
+			//disable mutually exclusive feats
+			//none i know of
+
+			//set new modal feat
+			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_RAPIDSHOT, target);
+		}
+
+		return FX_APPLIED;
+	}
+
+	//stop rapidshot
+	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, DMC_WHITE, STR_RAPIDSHOT, target);
+	return FX_NOT_APPLIED;
 }
 
 #include "plugindef.h"

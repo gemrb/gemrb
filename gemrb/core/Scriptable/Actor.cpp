@@ -142,6 +142,7 @@ struct ArmorFailure {
 	ieWord penalty;
 };
 
+static ieResRef featspells[ES_COUNT];
 static ArmorFailure *armorfail = NULL;
 static int armcount = -1;
 static ItemUseType *itemuse = NULL;
@@ -440,6 +441,7 @@ Actor::Actor()
 	//set it to a neutral value
 	ModalSpell[0] = '*';
 	LingeringModalSpell[0] = '*';
+	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
@@ -1660,6 +1662,13 @@ static void InitActorTables()
 			for (int j=0;j<GUIBT_COUNT;j++) {
 				OtherGUIButtons[i].buttons[j]=(ieByte) atoi( tm->QueryField(i,j+1) );
 			}
+		}
+	}
+
+	tm.load("mdfeats");
+	if (tm) {
+		for (i=0; i<ES_COUNT; i++) {
+			strnuprcpy(featspells[i], tm->QueryField(i,0), sizeof(ieResRef)-1 );
 		}
 	}
 
@@ -4439,7 +4448,21 @@ void Actor::InitStatsOnLoad()
 
 	SetupFist();
 	//initial setup of modified stats
-	memcpy(Modified,BaseStats, sizeof(Modified));
+	memcpy(Modified, BaseStats, sizeof(Modified));
+	//apply persistent feat spells
+	ApplyExtraSettings();
+}
+
+void Actor::ApplyExtraSettings()
+{
+	if (!PCStats) return;
+	for (int i=0;i<ES_COUNT;i++) {
+		if (featspells[i] && featspells[i][0]!='*') {
+			if (PCStats->ExtraSettings[i]) {
+				core->ApplySpell(featspells[i], this, this, PCStats->ExtraSettings[i]);
+			}
+		}
+	}
 }
 
 void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
@@ -5505,6 +5528,14 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			damage = 0;
 			resisted = DR_IMMUNE;
 		}
+
+		//special effects on hit for arterial strike and hamstring
+		if (damage>0 && BackstabResRef[0]!='*') {
+			core->ApplySpell(BackstabResRef, this, attacker, multiplier);
+			//do we need this?
+			BackstabResRef[0]='*';
+		}
+		//
 	}
 
 	if (damage>0) {
