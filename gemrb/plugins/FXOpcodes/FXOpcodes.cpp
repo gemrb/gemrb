@@ -3333,8 +3333,7 @@ int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target) {
 		map = target->GetCurrentArea();
-	}
-	else {
+	} else {
 		map = core->GetGame()->GetCurrentArea();
 	}
 	if (!map) {
@@ -4553,7 +4552,11 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Actor *actor = target;
 
 	if (fx->Resource[0]) {
-		actor = map->GetActorByResource(fx->Resource);
+		if (map) {
+			actor = map->GetActorByResource(fx->Resource);
+		} else {
+			actor = NULL;
+		}
 	}
 
 	if (actor) {
@@ -4868,6 +4871,8 @@ Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resour
 	}
 
 	Map *map = target->GetCurrentArea();
+	if (!map) return NULL;
+
 	map->AddActor(fam);
 	Point p(fx->PosX, fx->PosY);
 	fam->SetPosition(p, true, 0);
@@ -5665,6 +5670,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	// get the actor to cast spells at
 	Actor *actor = NULL;
 	Map *map = target->GetCurrentArea();
+	if (!map) return FX_APPLIED;
+
 	switch (fx->Parameter1) {
 	case 0:
 		// Myself
