@@ -3247,6 +3247,24 @@ bool Actor::AttackIsStunning(int damagetype) const {
 }
 
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
+static EffectRef fx_cleave_ref = { "Cleave", -1 };
+
+void Actor::CheckCleave()
+{
+	int cleave = GetFeat(FEAT_CLEAVE);
+	//feat level 1 only enables one cleave per round
+	if ((cleave==1) && fxqueue.HasEffect(fx_cleave_ref)  ) {
+		cleave = 0;
+	}
+	if(cleave) {
+		Effect * fx = EffectQueue::CreateEffect(fx_cleave_ref, attackcount, 0, FX_DURATION_INSTANT_LIMITED);
+		if (fx) {
+			fx->Duration = core->Time.round_sec;
+			core->ApplyEffect(fx, this, this);
+			delete fx;
+		}
+	}
+}
 
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical)
@@ -3306,27 +3324,32 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+	Actor *act=NULL;
+	if (!hitter) {
+		// TODO: check this
+		hitter = area->GetActorByGlobalID(LastHitter);
+	}
+
+	if (hitter) {
+		if (hitter->Type==ST_ACTOR) {
+			act = (Actor *) hitter;
+		}
+	}
+
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
-		Actor *act=NULL;
-		if (!hitter) {
-			// TODO: check this
-			hitter = area->GetActorByGlobalID(LastHitter);
-		}
-
-		if (hitter) {
-			if (hitter->Type==ST_ACTOR) {
-				act = (Actor *) hitter;
-			}
-		}
-
 		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
 			core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
 		}
 	}
 
+	int chp = (signed) BaseStats[IE_HITPOINTS];
 	if (damage > 0) {
+		//if this kills us, check if attacker could cleave
+		if (act && (damage>chp)) {
+			act->CheckCleave();
+		}
 		GetHit();
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
@@ -3335,7 +3358,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	InternalFlags|=IF_ACTIVE;
-	int chp = (signed) BaseStats[IE_HITPOINTS];
 	int damagelevel = 0; //FIXME: this level is never used
 	if (damage<10) {
 		damagelevel = 1;

@@ -198,7 +198,7 @@ static int fx_protection_from_elements (Scriptable* Owner, Actor* target, Effect
 static int fx_aegis (Scriptable* Owner, Actor* target, Effect* fx); //426
 static int fx_executioner_eyes (Scriptable* Owner, Actor* target, Effect* fx); //427
 //428 DeathMagic (same as 0xd)
-static int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect *fx);//429 EffectsOnStruck (similar to 0xe8)
+static int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect *fx);//429 (similar to 0xe8)
 static int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx); //430
 static int fx_energy_drain (Scriptable* Owner, Actor* target, Effect* fx); //431
 static int fx_tortoise_shell (Scriptable* Owner, Actor* target, Effect* fx); //432
@@ -211,7 +211,7 @@ static int fx_heroic_inspiration (Scriptable* Owner, Actor* target, Effect* fx);
 //static int fx_prevent_ai_slowdown (Scriptable* Owner, Actor* target, Effect* fx); //439
 static int fx_barbarian_rage (Scriptable* Owner, Actor* target, Effect* fx); //440
 //441 MovementRateModifier4
-//442 unknown
+static int fx_cleave (Scriptable* Owner, Actor* target, Effect* fx); //442
 static int fx_missile_damage_reduction (Scriptable* Owner, Actor* target, Effect* fx); //443
 static int fx_tenser_transformation (Scriptable* Owner, Actor* target, Effect* fx); //444
 //static int fx_445 (Scriptable* Owner, Actor* target, Effect* fx); //445 unused
@@ -333,6 +333,7 @@ static EffectDesc effectnames[] = {
 	{ "HeroicInspiration", fx_heroic_inspiration, 0, -1 },//438
 	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0, -1 }, //439 same as bg2
 	{ "BarbarianRage", fx_barbarian_rage, 0, -1 }, //440
+	{ "Cleave", fx_cleave, 0, -1 }, //442
 	{ "MissileDamageReduction", fx_missile_damage_reduction, 0, -1 }, //443
 	{ "TensersTransformation", fx_tenser_transformation, 0, -1 }, //444
 	{ "SmiteEvil", fx_smite_evil, 0, -1 }, //446
@@ -3093,7 +3094,33 @@ int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //441 MovementRateModifier4 (same as others)
 
-//442 Unknown (needs research)
+//442 Cleave
+int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_cleave (%2d) Amount:%d\n", fx->Opcode, fx->Parameter1);
+	//just remain dormant after first apply for the remaining duration (possibly disabling more cleaves)
+	if (!fx->FirstApply) return FX_APPLIED;
+	Map *map = target->GetCurrentArea();
+	if (!map) return FX_NOT_APPLIED;
+
+	//reset attackcount to a previous number and hack the current opponent to another enemy nearby
+	//SeeCore returns the closest living enemy
+	//FIXME:the previous opponent must be dead by now, or this code won't work
+	if (SeeCore(target, Enemy, false) ) {
+		Actor *enemy = map->GetActorByGlobalID(target->LastSeen);
+		//50 is more like our current weapon range
+		if (enemy && (PersonalDistance(enemy, target)<50) && target->LastSeen!=target->LastTarget) {
+			displaymsg->DisplayConstantStringNameValue(STR_CLEAVE, DMC_WHITE, target, fx->Parameter1);
+			target->attackcount=fx->Parameter1;
+			target->SetTarget(enemy);
+			target->LastTarget=target->LastSeen;
+			//linger around for more
+			return FX_APPLIED;
+		}
+	}
+	//no opponent found, nothing to do
+	return FX_NOT_APPLIED;
+}
 
 //443 MissileDamageReduction
 int fx_missile_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)

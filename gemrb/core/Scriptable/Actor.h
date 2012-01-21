@@ -315,6 +315,8 @@ public:
 	ieDword lastInit;
 	bool no_more_steps;
 	int speed;
+	//how many attacks left in this round, must be public for cleave opcode
+	int attackcount;
 
 	PolymorphCache *polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods;
@@ -323,8 +325,6 @@ private:
 	CharAnimations* anims;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
-	//how many attacks in this round
-	int attackcount;
 	//true every second round of attack
 	bool secondround;
 	int attacksperround;
@@ -501,6 +501,8 @@ public:
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete);
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
+	/* check and perform a cleave movement */
+	void CheckCleave();
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0);
 	/* displays the damage taken and other details (depends on the game type) */
