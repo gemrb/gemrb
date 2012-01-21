@@ -66,6 +66,8 @@ public:
 	void DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const;
 	/** displays a string constant in the textarea, starting with speaker's name */
 	void DisplayConstantStringName(int stridx, unsigned int color, const Scriptable *speaker) const;
+	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
+	void DisplayConstantStringNameValue(int stridx, unsigned int color, const Scriptable *speaker, int value) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
 	void DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
