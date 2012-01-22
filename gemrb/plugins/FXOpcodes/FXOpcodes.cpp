@@ -1575,18 +1575,18 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword Trans = fx->Parameter4;
 	if (fx->Parameter3) {
 		if (Trans>=240) {
-			fx->Parameter3=0;
+			fx->Parameter3 = 0;
 		} else {
 			Trans+=16;
 		}
 	} else {
 		if (Trans<=32) {
-			fx->Parameter3=1;
+			fx->Parameter3 = 1;
 		} else {
 			Trans-=16;
 		}
 	}
-	fx->Parameter4=Trans;
+	fx->Parameter4 = Trans;
 	STAT_SET( IE_TRANSLUCENT, Trans);
 	//FIXME: probably FX_PERMANENT, but TRANSLUCENT has no saved base stat
 	return FX_APPLIED;
@@ -3218,13 +3218,27 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 // 0x6f Item:CreateMagic
-
 static EffectRef fx_remove_item_ref = { "Item:Remove", -1 };
 
 int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	//charge count is incorrect
-	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
+	//charge count is the same for all slots by default
+	if (!fx->Parameter3) fx->Parameter3 = fx->Parameter1;
+	if (!fx->Parameter4) fx->Parameter4 = fx->Parameter1;
+	int slot = target->inventory.GetMagicSlot();
+	target->inventory.SetSlotItemRes(fx->Resource, slot, fx->Parameter1, fx->Parameter3, fx->Parameter4);
+	//IWD doesn't let you create two handed weapons (actually only decastave) if shield slot is filled
+	//modders can still force two handed weapons with Parameter2
+	if (!fx->Parameter2) {
+		if (target->inventory.GetItemFlag(slot)&IE_ITEM_TWO_HANDED) {
+			if (target->inventory.HasItemInSlot("",target->inventory.GetShieldSlot())) {
+				target->inventory.RemoveItem(slot);
+				displaymsg->DisplayConstantStringNameString(STR_SPELL_FAILED, DMC_WHITE, STR_OFFHAND_USED, target);
+				return FX_NOT_APPLIED;
+			}
+		}
+	}
+
 	//equip the weapon
 	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
@@ -5884,7 +5898,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Game *game = core->GetGame();
 
 	if (fx->FirstApply) {
-		fx->Parameter4=game->GameTime;
+		fx->Parameter4 = game->GameTime;
 		return FX_APPLIED;
 	}
 
@@ -5923,7 +5937,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	target->SetPosition(newpos, true, 0);
 
-	fx->Parameter4=game->GameTime;
+	fx->Parameter4 = game->GameTime;
 	return FX_APPLIED;
 }
 
@@ -6346,7 +6360,7 @@ int fx_spelltrap(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (fx->Parameter3) {
 		target->RestoreSpellLevel(fx->Parameter3, 0);
-		fx->Parameter3=0;
+		fx->Parameter3 = 0;
 	}
 	if (fx->Parameter1<=0) {
 		//gone down to zero
