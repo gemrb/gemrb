@@ -1273,9 +1273,21 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x0d Death
+static EffectRef fx_death_ward_ref = { "DeathWard", -1 };
+static EffectRef fx_death_magic_ref = { "Death2", -1 };
+
 int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//if the opcode of this effect is associated with Death2 (iwd2's death magic opcode) and
+	//there is an active death ward effect, ignore this opcode
+	if (target->fxqueue.HasEffect(fx_death_ward_ref) ) {
+		//find the opcode for death magic (should be 420 in original IWD2)
+		EffectQueue::ResolveEffect(fx_death_magic_ref);
+		if (fx->Opcode==(ieDword) fx_death_magic_ref.opcode) return FX_NOT_APPLIED;
+	}
+
 	ieDword damagetype = 0;
 	switch (fx->Parameter2) {
 	case 1:

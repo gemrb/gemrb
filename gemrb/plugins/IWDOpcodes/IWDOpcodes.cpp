@@ -2450,6 +2450,7 @@ int fx_holy_power (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_HOLYPOWER);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0x80, 0x80, 0x80);
 	}
+	STAT_ADD(IE_DAMAGEBONUS, 4);
 	return FX_APPLIED;
 }
 
@@ -2533,7 +2534,6 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 //i put them there because the first bit is sanctuary
 int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	//
 	if (0) print( "fx_visual_effect_iwd2 (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
 	unsigned int type = fx->Parameter2;
 	if (type<32) {
@@ -2555,10 +2555,22 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case OV_SEVENEYES:
 			target->SetOverlay(OV_SEVENEYES2);
-		// some more
+			break;
+		case OV_LATH1:
+			target->SetOverlay(OV_LATH2);
+			break;
+		case OV_GLATH1:
+			target->SetOverlay(OV_GLATH2);
+			break;
+		case OV_FIRESHIELD1:
+			target->SetOverlay(OV_FIRESHIELD2);
+			break;
+		case OV_ICESHIELD1:
+			target->SetOverlay(OV_ICESHIELD2);
+			break;
 		}
+		//the sanctuary stat is handled in SetOverlay
 		target->SetOverlay(type);
-		//STAT_BIT_OR(IE_SANCTUARY, 1<<type);
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
