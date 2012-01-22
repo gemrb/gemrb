@@ -3274,6 +3274,8 @@ void Actor::CheckCleave()
 	}
 }
 
+static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
+
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical)
 {
@@ -3285,10 +3287,23 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
 	LastDamageType|=damagetype;
+	Actor *act=NULL;
+	if (!hitter) {
+		// TODO: check this
+		hitter = area->GetActorByGlobalID(LastHitter);
+	}
+
+	if (hitter) {
+		if (hitter->Type==ST_ACTOR) {
+			act = (Actor *) hitter;
+		}
+	}
 
 	switch(modtype)
 	{
 	case MOD_ADDITIVE:
+		//bonus against creature should only affect additive damages or spells like harm would be deadly
+		damage += act->fxqueue.BonusAgainstCreature(fx_damage_vs_creature_ref, this);
 		break;
 	case MOD_ABSOLUTE:
 		damage = GetBase(IE_HITPOINTS) - damage;
@@ -3303,6 +3318,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	int resisted = 0;
+
 	ModifyDamage (hitter, damage, resisted, damagetype, NULL, critical);
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
@@ -3332,18 +3348,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
-	Actor *act=NULL;
-	if (!hitter) {
-		// TODO: check this
-		hitter = area->GetActorByGlobalID(LastHitter);
-	}
-
-	if (hitter) {
-		if (hitter->Type==ST_ACTOR) {
-			act = (Actor *) hitter;
-		}
-	}
-
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
@@ -4480,6 +4484,7 @@ void Actor::InitStatsOnLoad()
 	//initial setup of modified stats
 	memcpy(Modified, BaseStats, sizeof(Modified));
 	//apply feats
+	ApplyFeats();
 	//apply persistent feat spells
 	ApplyExtraSettings();
 }
