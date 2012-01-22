@@ -4479,8 +4479,25 @@ void Actor::InitStatsOnLoad()
 	SetupFist();
 	//initial setup of modified stats
 	memcpy(Modified, BaseStats, sizeof(Modified));
+	//apply feats
 	//apply persistent feat spells
 	ApplyExtraSettings();
+}
+
+//most feats are simulated via spells (feat<xx>)
+void Actor::ApplyFeats()
+{
+	ieResRef feat;
+
+	for(int i=0;i<MAX_FEATS;i++) {
+		int level = GetFeat(i);
+		snprintf(feat, sizeof(ieResRef), "FEAT%02x", i);
+		if (level) {
+			if (gamedata->Exists(feat, IE_SPL_CLASS_ID, true)) {
+				core->ApplySpell(feat, this, this, level);
+			}
+		}
+	}
 }
 
 void Actor::ApplyExtraSettings()
@@ -7022,6 +7039,18 @@ void Actor::SetFeat(unsigned int feat, int mode)
 			BaseStats[IE_FEATS1+idx]^=mask;
 			break;
 	}
+}
+
+void Actor::SetFeatValue(unsigned int feat, int value)
+{
+	if (value) {
+		SetFeat(feat, BM_OR);
+		if (featstats[feat]) SetBase(featstats[feat], value);
+	} else {
+		SetFeat(feat, BM_NAND);
+		if (featstats[feat]) SetBase(featstats[feat], 0);
+	}
+	ApplyFeats();
 }
 
 void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int wt)

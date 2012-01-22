@@ -501,6 +501,8 @@ public:
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete);
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
+	/* check if the actor is silenced - for casting purposes */
+	bool CheckSilenced();
 	/* check and perform a cleave movement */
 	void CheckCleave();
 	/* deals damage to this actor */
@@ -682,6 +684,7 @@ public:
 	int GetSkill(unsigned int skill) const;
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
+	void SetFeatValue(unsigned int feat, int value);
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
@@ -707,6 +710,8 @@ public:
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
 	void AddProjectileImmunity(ieDword projectile);
+	/* Apply feats */
+	void ApplyFeats();
 	/* reapply modal feat spells */
 	void ApplyExtraSettings();
 	/* Set up all the missing stats on load time, chargen, or after level up */

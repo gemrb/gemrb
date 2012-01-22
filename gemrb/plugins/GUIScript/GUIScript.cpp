@@ -8117,6 +8117,28 @@ static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( actor->HasFeat(featindex) );
 }
 
+PyDoc_STRVAR( GemRB_SetFeat__doc,
+"SetFeat(Slot, feat)\n\n"
+"Sets a feat value, handles both the boolean and the numeric fields." );
+
+static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, featindex, value;
+
+	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &featindex, &value )) {
+		return AttributeError( GemRB_SetFeat__doc );
+	}
+	GET_GAME();
+
+	Actor *actor = game->FindPC(PlayerSlot);
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+	actor->SetFeatValue(featindex, value);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
 "GetAbilityBonus(stat, column, value[, ex])\n\n"
 "Returns an ability bonus value based on various .2da files.");
@@ -10196,6 +10218,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
+	METHOD(SetFeat, METH_VARARGS),
 	METHOD(SetFullScreen, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
 	METHOD(SetGlobal, METH_VARARGS),
