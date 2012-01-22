@@ -194,9 +194,9 @@
 #define SS_ENFEEBLEMENT 123
 #define SS_SEVENEYES    124
 //#define SS_SOULEATER    125
-
 #define SS_LOWERRESIST  140
 #define SS_LUCK         141
+#define SS_VOCALIZE     157
 //tested for this, splstate is wrong or this entry has two uses
 #define SS_DAYBLINDNESS 178
 #define SS_REBUKED      179

@@ -3246,6 +3246,14 @@ bool Actor::AttackIsStunning(int damagetype) const {
 	return false;
 }
 
+bool Actor::CheckSilenced()
+{
+	if (!(Modified[IE_STATE_ID] & STATE_SILENCED)) return false;
+	if (HasFeat(FEAT_SUBVOCAL_CASTING)) return false;
+	if (HasSpellState(SS_VOCALIZE)) return false;
+	return true;
+}
+
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
 static EffectRef fx_cleave_ref = { "Cleave", -1 };
 
