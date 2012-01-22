@@ -20,6 +20,7 @@
 
 #include "EffectQueue.h"
 
+#include "overlays.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
@@ -1993,7 +1994,13 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		//check level resistances
 		//check specific spell immunity
 		//check school/sectype immunity
-		return check_type(target, fx);
+		int ret = check_type(target, fx);
+		if (ret<0) {
+			if (target->Modified[IE_SANCTUARY]&(1<<OV_BOUNCE) ) {
+				target->Modified[IE_SANCTUARY]|=(1<<OV_BOUNCE2);
+			}
+		}
+		return ret;
 	}
 	return 0;
 }
