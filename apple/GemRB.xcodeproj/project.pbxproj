@@ -6482,7 +6482,7 @@
 					/Library/Frameworks/SDL.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = "@rpath";
 				PRODUCT_NAME = gemrb_core;
 			};
 			name = Debug;
@@ -6501,7 +6501,7 @@
 					/Library/Frameworks/SDL.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = "@rpath";
 				PRODUCT_NAME = gemrb_core;
 				ZERO_LINK = NO;
 			};
@@ -6688,6 +6688,7 @@
 					../gemrb/includes,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
@@ -6732,6 +6733,7 @@
 					../gemrb/includes,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
