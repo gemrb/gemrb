@@ -7486,11 +7486,15 @@ void Actor::CreateDerivedStatsIWD2()
 //and similar derived stats that change with level
 void Actor::CreateDerivedStats()
 {
-	ieDword cls = BaseStats[IE_CLASS]-1;
-	if (cls>=(ieDword) classcount) {
+	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		multiclass = 0;
 	} else {
-		multiclass = multi[cls];
+		ieDword cls = BaseStats[IE_CLASS]-1;
+		if (cls>=(ieDword) classcount) {
+			multiclass = 0;
+		} else {
+			multiclass = multi[cls];
+		}
 	}
 
 	if (core->HasFeature(GF_3ED_RULES)) {
