@@ -212,7 +212,7 @@
 		NSLog(@"error opening archive (%i):%s", r, archive_error_string(a));
 		return NO;
 	}
-	NSString* installPath = nil;
+
 	NSString* installName = nil;
 	BOOL archiveHasRootDir = YES;
 	unsigned long long progressSize = 0;
@@ -269,6 +269,7 @@
 
 	if (r == ARCHIVE_FATAL) return NO;
 
+	installName = [installName lastPathComponent];
 	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
 	// delete anything at gamePath. our install overwrites existing data.
 	[fm removeItemAtPath:gamePath error:nil];
@@ -282,13 +283,10 @@
 		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 	}
 
-	installName = [installName stringByReplacingOccurrencesOfString:@"/" withString:@""];
-	installPath = [gamePath stringByAppendingString:installName];
-
 	[fm changeCurrentDirectoryPath:cwd];
 
 	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [archivePath pathExtension]];
-	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", installPath];
+	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", gamePath];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
@@ -301,7 +299,7 @@
 		NSLog(@"Moving save '%@' to %@", saveName, fullSavePath);
 	}
 
-	oldSavePath = [NSString stringWithFormat:@"%@/mpsave/", installPath];
+	oldSavePath = [NSString stringWithFormat:@"%@/mpsave/", gamePath];
 	saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
 
 	for (NSString* saveName in saves) {
@@ -313,7 +311,7 @@
 
 	NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [archivePath pathExtension]];
 
-	NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
+	NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], gamePath, [[UIDevice currentDevice] userInterfaceIdiom]);
 	NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 	if ([fm fileExistsAtPath:newCfgPath]) {
 		if (configIndexPath) {
@@ -326,13 +324,13 @@
 	}
 	if (newConfig) {
 		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nGamePath = %@/", installPath];
+		[newConfig appendFormat:@"\nGamePath = %@", gamePath];
 		for (int i=1; i <= 6; i++){ //6 is the max number of CDs
-			NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", installPath, i];
+			NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", gamePath, i];
 			BOOL isDir = NO;
 			[fm fileExistsAtPath:cdPath isDirectory:&isDir];
 			if (isDir) {
-				[newConfig appendFormat:@"\nCD%i = %@/", i, cdPath];
+				[newConfig appendFormat:@"\nCD%i = %@", i, cdPath];
 			}
 		}
 		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
