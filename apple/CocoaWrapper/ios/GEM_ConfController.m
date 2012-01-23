@@ -22,11 +22,9 @@
 #include <archive.h>
 #include <archive_entry.h>
 
-//#if TARGET_IPHONE_SIMULATOR == 0
 #include <sys/stat.h> 
 #include <stdio.h> 
 #include <fcntl.h>
-//#endif
 
 @implementation GEM_NavController
 
@@ -72,7 +70,7 @@
 		editorButton.enabled = NO;
 
 		UIBarButtonItem* debugBtn = [[UIBarButtonItem alloc] initWithTitle:@"Debug" style:UIBarButtonItemStyleBordered target:self action:@selector(toggleDebug:)];
-		
+
 		UIBarButtonItem* savesBtn = [[UIBarButtonItem alloc] initWithTitle:@"Saves" style:UIBarButtonItemStyleBordered target:self action:@selector(showSaves:)];
 
 		UIBarButtonItem* space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -103,7 +101,6 @@
 	}else{
 		NSLog(@"Beginning GemRB debug log.");
 	}
-
 }
 
 - (void)reloadTableData
@@ -111,19 +108,19 @@
 	if (configFiles) [configFiles release];
 	if (installFiles) [installFiles release];
 	if (logFiles) [logFiles release];
-	
+
 	NSFileManager *manager = [NSFileManager defaultManager];
 	NSArray* files = [manager contentsOfDirectoryAtPath:docDir error:nil];
-	
+
 	configFiles = [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.cfg'"]];
 	NSArray *installExtensions = [NSArray arrayWithObjects:@"bg1", @"bg2", @"tob", @"iwd", @"how", @"iwd2", @"pst", nil];
 	installFiles = [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"pathExtension IN %@", installExtensions]];
 	logFiles = [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.log'"]];
-	
+
 	[configFiles retain];
 	[installFiles retain];
 	[logFiles retain];
-	
+
 	[controlTable reloadData];
 }
 
@@ -137,7 +134,7 @@
 	[configFiles release];
 	[installFiles release];
 	[logFiles release];
-	
+
 	[toolBarItems release];
 }
 
@@ -168,28 +165,28 @@
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	NSString* zipPath = [installFiles objectAtIndex:indexPath.row];
 	NSString* srcPath = [NSString stringWithFormat:@"%@/%@", docDir, zipPath];
-	
+
 	NSFileManager* fm = [NSFileManager defaultManager];
-	
+
 	NSError* error = nil;
 	unsigned long long totalBytes = [[fm attributesOfItemAtPath:srcPath error:&error] fileSize];
-	
+
 	if (error) NSLog(@"FM error for %@:\n%@", srcPath, [error localizedDescription]);
-	
+
 	UITableViewCell* selectedCell = [controlTable cellForRowAtIndexPath:indexPath];
-	
+
 	UIProgressView* pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
 	UIView* contentView = selectedCell.contentView;
 	CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
 	pv.frame = frame;
 	[contentView addSubview:pv];
-	
+
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
 	NSString* libDir = [[paths objectAtIndex:0] copy];
-	
+
 	NSString* dstPath = [NSString stringWithFormat:@"%@/%@/", libDir, [zipPath pathExtension]];
 	NSLog(@"installing %@ to %@...", srcPath, dstPath);
-	
+
 	[fm createDirectoryAtPath:dstPath withIntermediateDirectories:YES attributes:nil error:nil];
 	NSString* cwd = [fm currentDirectoryPath];
 	[fm changeCurrentDirectoryPath:dstPath];
@@ -203,7 +200,7 @@
 	archive_write_disk_set_options(ext, 0);
 	archive_write_disk_set_standard_lookup(ext);
 	struct archive_entry *entry;
-	
+
 	int do_extract = 1;
 	//warning super bad code can cause memory leak.
 	// !!! cleanup and do right
@@ -256,12 +253,12 @@
 	}
 	archive_read_close(a);
 	archive_read_finish(a);
-	
+
 	installName = [installName stringByReplacingOccurrencesOfString:@"/" withString:@""];
 	installPath = [dstPath stringByAppendingString:installName];
-	
+
 	[fm changeCurrentDirectoryPath:cwd];
-	
+
 	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [zipPath pathExtension]];
 	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", installPath];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
@@ -290,7 +287,7 @@
 	if (![fm fileExistsAtPath:newCfgPath]){
 		NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [zipPath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
 		NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
-		
+
 		if (newConfig) {
 			[newConfig appendString:[NSString stringWithFormat:@"\nGameType = %@", [zipPath pathExtension]]];
 			[newConfig appendString:[NSString stringWithFormat:@"\nGamePath = %@/", installPath]];
@@ -323,7 +320,6 @@
 #if TARGET_IPHONE_SIMULATOR == 0
 	[fm removeItemAtPath:srcPath error:nil];
 #endif
-	
 	[self reloadTableData];
 	[pool release];
 	return YES;
@@ -334,7 +330,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	static NSString *CellIdentifier = @"Cell";
-	
+
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
@@ -354,7 +350,6 @@
 			cell.textLabel.text = [logFiles objectAtIndex:indexPath.row];
 			break;
 	}
-	
 	return cell;
 }
 
