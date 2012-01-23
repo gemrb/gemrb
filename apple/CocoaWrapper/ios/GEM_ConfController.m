@@ -268,6 +268,8 @@
 	if (r == ARCHIVE_FATAL) return NO;
 
 	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+	// delete anything at gamePath. our install overwrites existing data.
+	[fm removeItemAtPath:gamePath error:nil];
 	if (archiveHasRootDir) {
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@/", dstPath, installName]
 					toPath:gamePath error:nil];
@@ -308,43 +310,46 @@
 	}
 
 	NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [archivePath pathExtension]];
-	if (![fm fileExistsAtPath:newCfgPath]){
-		NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
-		NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 
-		if (newConfig) {
-			[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-			[newConfig appendFormat:@"\nGamePath = %@/", installPath];
-			for (int i=1; i <= 6; i++){ //6 is the max number of CDs
-				NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", installPath, i];
-				BOOL isDir = NO;
-				[fm fileExistsAtPath:cdPath isDirectory:&isDir];
-				if (isDir) {
-					[newConfig appendFormat:@"\nCD%i = %@/", i, cdPath];
-				}
-			}
-			[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
-			[newConfig appendFormat:@"\nSavePath = %@/", savePath];
-
-			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-				[newConfig appendString:@"\nWidth = 1024"];
-				[newConfig appendString:@"\nHeight = 768"];
-			}else{
-				[newConfig appendString:@"\nWidth = 800"];
-				[newConfig appendString:@"\nHeight = 600"];
-			}
-
-			// MouseFeedback = 3 hides cursor and tooltips
-			[newConfig appendString:@"\nMouseFeedback = 3"];
-
-			NSError* err = nil;
-			if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
-				NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
-			}
-		}else{
-			NSLog(@"Unable to open %@/GemRB.cfg.newinstall", cwd);
-		}
+	NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
+	NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
+	if ([fm fileExistsAtPath:newCfgPath]) {
+		// new data overwrites old data therefore new config should do the same.
+		[fm removeItemAtPath:newCfgPath error:nil];
 	}
+	if (newConfig) {
+		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
+		[newConfig appendFormat:@"\nGamePath = %@/", installPath];
+		for (int i=1; i <= 6; i++){ //6 is the max number of CDs
+			NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", installPath, i];
+			BOOL isDir = NO;
+			[fm fileExistsAtPath:cdPath isDirectory:&isDir];
+			if (isDir) {
+				[newConfig appendFormat:@"\nCD%i = %@/", i, cdPath];
+			}
+		}
+		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
+		[newConfig appendFormat:@"\nSavePath = %@/", savePath];
+
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			[newConfig appendString:@"\nWidth = 1024"];
+			[newConfig appendString:@"\nHeight = 768"];
+		}else{
+			[newConfig appendString:@"\nWidth = 800"];
+			[newConfig appendString:@"\nHeight = 600"];
+		}
+
+		// MouseFeedback = 3 hides cursor and tooltips
+		[newConfig appendString:@"\nMouseFeedback = 3"];
+
+		NSError* err = nil;
+		if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
+			NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
+		}
+	}else{
+		NSLog(@"Unable to open %@/GemRB.cfg.newinstall", cwd);
+	}
+
 	[pv removeFromSuperview];
 	[pv release];
 #if TARGET_IPHONE_SIMULATOR == 0
