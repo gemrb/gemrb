@@ -187,6 +187,22 @@ void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, c
 	core->FreeString(text);
 }
 
+//Treats the constant string as a numeric format string, otherwise like the previous method
+void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int color, const Scriptable *speaker, int value) const
+{
+	if (stridx<0) return;
+	if(!speaker) return;
+
+	char* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	//allow for a number
+	int bufflen = strlen(text)+6;
+	char* newtext = ( char* ) malloc( bufflen );
+	snprintf( newtext, bufflen, text, value );
+	core->FreeString(text);
+	DisplayStringName(newtext, color, speaker);
+	free(newtext);
+}
+
 // String format is
 // <charname> - blah blah <someoneelse>
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const

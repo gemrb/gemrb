@@ -120,6 +120,15 @@ def SetClass():
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	KitIndex = GemRB.GetVar ("Class Kit")
+	MageSchool = GemRB.GetVar ("MAGESCHOOL")
+	#multiclassed gnomes 
+	if MageSchool and not KitIndex:
+		SchoolTable = GemRB.LoadTable ("magesch")
+		KitIndex = CommonTables.KitList.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
+		KitValue = (0x4000 + KitIndex)
+		GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
+
 	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class))
 	# protect against barbarians; this stat will be overwritten later
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, ClassIndex)

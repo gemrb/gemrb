@@ -249,6 +249,7 @@ public:
 	ieResRef ModalSpell;             //apply this spell once per round
 	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
+	ieResRef BackstabResRef;         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
 	ieResRef SmallPortrait;
@@ -314,6 +315,8 @@ public:
 	ieDword lastInit;
 	bool no_more_steps;
 	int speed;
+	//how many attacks left in this round, must be public for cleave opcode
+	int attackcount;
 
 	PolymorphCache *polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods;
@@ -322,8 +325,6 @@ private:
 	CharAnimations* anims;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
-	//how many attacks in this round
-	int attackcount;
 	//true every second round of attack
 	bool secondround;
 	int attacksperround;
@@ -500,6 +501,10 @@ public:
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete);
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
+	/* check if the actor is silenced - for casting purposes */
+	bool CheckSilenced();
+	/* check and perform a cleave movement */
+	void CheckCleave();
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0);
 	/* displays the damage taken and other details (depends on the game type) */
@@ -647,6 +652,9 @@ public:
 	/* plays damage animation, if hit is not set, then plays only the splash part */
 	void PlayDamageAnimation(int x, bool hit=true);
 	void PlayCritDamageAnimation(int x);
+	/* returns mage or cleric spell casting failure, iwd2 compatible */
+	ieDword GetSpellFailure(bool arcana) const;
+	/* PST specific criticals */
 	int GetCriticalType() const;
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
@@ -676,6 +684,7 @@ public:
 	int GetSkill(unsigned int skill) const;
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
+	void SetFeatValue(unsigned int feat, int value);
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
@@ -701,6 +710,10 @@ public:
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
 	void AddProjectileImmunity(ieDword projectile);
+	/* Apply feats */
+	void ApplyFeats();
+	/* reapply modal feat spells */
+	void ApplyExtraSettings();
 	/* Set up all the missing stats on load time, chargen, or after level up */
 	void CreateDerivedStats();
 	/* Checks if the actor is multiclassed (excluding dualclassed actors)) */

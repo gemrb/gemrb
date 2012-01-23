@@ -50,6 +50,7 @@ static int LAST_QUICK = -1;
 static int SLOT_INV = -1;
 static int LAST_INV = -1;
 static int SLOT_LEFT = -1;
+static int SLOT_ARMOR = -1;
 
 //IWD2 style slots
 static bool IWD2 = false;
@@ -81,6 +82,7 @@ void Inventory::Init(int mb)
 	SLOT_QUICK=-1;
 	LAST_QUICK=-1;
 	SLOT_LEFT=-1;
+	SLOT_ARMOR=-1;
 	//TODO: set this correctly
 	IWD2 = false;
 	MagicBit = mb;
@@ -1170,6 +1172,13 @@ void Inventory::SetInventorySlot(int arg)
 	LAST_INV=arg;
 }
 
+void Inventory::SetArmorSlot(int arg)
+{
+	if (SLOT_ARMOR==-1) {
+		SLOT_ARMOR=arg;
+	}
+}
+
 //multiple shield slots are allowed
 //but in this case they should be interspersed with melee slots
 void Inventory::SetShieldSlot(int arg)
@@ -1210,6 +1219,11 @@ int Inventory::GetQuickSlot()
 int Inventory::GetInventorySlot()
 {
 	return SLOT_INV;
+}
+
+int Inventory::GetArmorSlot()
+{
+	return SLOT_ARMOR;
 }
 
 //if shield slot is empty, call again for fist slot!
@@ -1421,6 +1435,18 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 		KillSlot( SlotID );
 	}
 	CalculateWeight();
+}
+
+ieWord Inventory::GetArmorItemType() const
+{
+	ieWord ret;
+	CREItem *Slot;
+
+	const Item *itm = GetItemPointer(GetArmorSlot(), Slot);
+	if (!itm) return 0xffff;
+	ret = itm->ItemType;
+	gamedata->FreeItem( itm, Slot->ItemResRef, true );
+	return ret;
 }
 
 void Inventory::BreakItemSlot(ieDword slot)

@@ -8,12 +8,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 #
 #character generation (GUICG 0)
@@ -34,7 +34,7 @@ def OnLoad():
 	if CharOverview.CharGenWindow:
 		CharOverview.PersistButtons['Next'].SetState(IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
 	return
-	
+
 def SetRaceAbilities(MyChar, racetitle):
 	ability = GemRB.LoadTable ("racespab")
 	resource = ability.GetValue (racetitle, "SPECIAL_ABILITIES_FILE")
@@ -107,11 +107,11 @@ def BioPress():
 	Button = Window.GetControl (1)
 	Button.SetText (11962)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BioDonePress)
-	
+
 	Button = Window.GetControl (2)
 	Button.SetText (36788)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BioCancelPress)
-	
+
 	EditControl = Window.GetControl (4)
 	BioData = GemRB.GetToken("BIO")
 	if BioData == "":
@@ -152,7 +152,7 @@ def NextPress():
 	c = TmpTable.GetValue (Class, 2) #adjustment
 	d = TmpTable.GetValue (Class, 3) #external multiplier
 	e = TmpTable.GetValue (Class, 4) #level bonus rate
-	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL) 
+	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL)
 	if t>1:
 		e=e*(t-1)
 	else:
@@ -201,18 +201,22 @@ def NextPress():
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
 
 	#setting feats
+	TmpTable = GemRB.LoadTable ("featreq")
+	FeatCount = TmpTable.GetRowCount ()
+	for i in range (FeatCount):
+		GemRB.SetFeat (MyChar, i, GemRB.GetVar ("Feat "+str(i) ) )
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
-	GemRB.FillPlayerInfo(MyChar, LargePortrait, SmallPortrait) 
- 	GemRB.SetNextScript ("SPPartyFormation")
+	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+	GemRB.SetNextScript ("SPPartyFormation")
 
 	TmpTable = GemRB.LoadTable ("strtxp")
 
 	#starting xp is race dependent
 	xp = TmpTable.GetValue (racename, "VALUE")
-	GemRB.SetPlayerStat (MyChar, IE_XP, xp ) 
+	GemRB.SetPlayerStat (MyChar, IE_XP, xp )
 
 	return
 

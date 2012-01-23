@@ -1011,7 +1011,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		// only a handful of spells don't have a verbal component -
 		// the original hardcoded vocalize and a few more
 		// we (also) ignore nonmagic spells
-		if (actor->Modified[IE_STATE_ID] & STATE_SILENCED) {
+		if (actor->CheckSilenced()) {
 			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
 				printMessage("Scriptable", "Tried to cast while silenced!\n", YELLOW);
 				return 0;
@@ -1031,12 +1031,12 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		switch(spl->SpellType)
 		{
 		case IE_SPL_PRIEST:
-			if (actor->Modified[IE_SPELLFAILUREPRIEST] >= roll) {
+			if (actor->GetSpellFailure(false) >= roll) {
 				failed = true;
 			}
 			break;
 		case IE_SPL_WIZARD:
-			if (actor->Modified[IE_SPELLFAILUREMAGE] >= roll) {
+			if (actor->GetSpellFailure(true) >= roll) {
 				failed = true;
 			}
 			break;

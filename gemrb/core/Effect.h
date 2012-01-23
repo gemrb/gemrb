@@ -108,6 +108,8 @@ struct Effect {
 	ieDword MaxAffectedLevel;
 	ieDword Parameter3;
 	ieDword Parameter4;
+	ieDword Parameter5;
+	ieDword Parameter6;
 	ieDword PosX, PosY;
 	ieDword SourceType; //1-item, 2-spell
 	ieResRef Source;

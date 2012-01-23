@@ -150,7 +150,8 @@ Effect* EFFImporter::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->Resistance );
 	str->ReadDword( &fx->Parameter3 );
 	str->ReadDword( &fx->Parameter4 );
-	str->Seek( 8, GEM_CURRENT_POS );
+	str->ReadDword( &fx->Parameter5 );
+	str->ReadDword( &fx->Parameter6 );
 	str->ReadResRef( fx->Resource2 );
 	str->ReadResRef( fx->Resource3 );	
 	str->ReadDword( &fx->PosX);
@@ -213,7 +214,8 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteDword( &fx->Resistance );
 	stream->WriteDword( &fx->Parameter3 );
 	stream->WriteDword( &fx->Parameter4 );
-	stream->Write( filling,8 );
+	stream->WriteDword( &fx->Parameter5 );
+	stream->WriteDword( &fx->Parameter6 );
 	if (fx->IsVariable) {
 		stream->Write( filling,16 );
 	} else {

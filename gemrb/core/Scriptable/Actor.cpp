@@ -137,6 +137,14 @@ static const char *skillcolumns[12]={
 	"LAYHANDS", "TURNLEVEL", "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
 };
 
+struct ArmorFailure {
+	ieWord itemtype;
+	ieWord penalty;
+};
+
+static ieResRef featspells[ES_COUNT];
+static ArmorFailure *armorfail = NULL;
+static int armcount = -1;
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static ieDword pstflags = false;
@@ -325,6 +333,11 @@ void ReleaseMemoryActor()
 		fistresclass = NULL;
 	}
 
+	if (armorfail) {
+		delete [] armorfail;
+		armorfail = NULL;
+	}
+
 	if (itemuse) {
 		delete [] itemuse;
 		itemuse = NULL;
@@ -428,6 +441,7 @@ Actor::Actor()
 	//set it to a neutral value
 	ModalSpell[0] = '*';
 	LingeringModalSpell[0] = '*';
+	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
@@ -1651,6 +1665,23 @@ static void InitActorTables()
 		}
 	}
 
+	tm.load("mdfeats");
+	if (tm) {
+		for (i=0; i<ES_COUNT; i++) {
+			strnuprcpy(featspells[i], tm->QueryField(i,0), sizeof(ieResRef)-1 );
+		}
+	}
+
+	tm.load("armfail");
+	if (tm) {
+		armcount = tm->GetRowCount();
+		armorfail = new ArmorFailure[armcount];
+		for (i = 0; i < armcount; i++) {
+			armorfail[i].itemtype = (ieWord) atoi( tm->QueryField(i,0) );
+			armorfail[i].penalty = (ieWord) atoi( tm->QueryField(i,1) );
+		}
+	}
+
 	tm.load("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
@@ -2101,6 +2132,29 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 		sca->SetPalette(gradient, 4);
 	}
 	AddVVCell(sca);
+}
+
+ieDword Actor::GetSpellFailure(bool arcana) const
+{
+	ieDword base = arcana?Modified[IE_SPELLFAILUREMAGE]:Modified[IE_SPELLFAILUREPRIEST];
+	if (HasSpellState(SS_DOMINATION)) base += 100;
+	if (HasSpellState(SS_BLINK)) base += 20;
+	//FIXME: IWD2 has this as 20, other games as 50
+	if (HasSpellState(SS_DEAF)) base += 20;
+	if (!arcana) return base;
+
+	ieDword armor = 0;
+	ieWord armtype = inventory.GetArmorItemType();
+	for (int i = 0;i<armcount; i++) {
+		if (armorfail[i].itemtype == armtype) {
+			armor = armorfail[i].penalty;
+			ieDword feat = GetFeat(FEAT_ARMORED_ARCANA)*5;
+			if (armor<feat) armor = 0;
+			else armor -= feat;
+			break;
+		}
+	}
+	return base+armor;
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
@@ -3192,7 +3246,35 @@ bool Actor::AttackIsStunning(int damagetype) const {
 	return false;
 }
 
+bool Actor::CheckSilenced()
+{
+	if (!(Modified[IE_STATE_ID] & STATE_SILENCED)) return false;
+	if (HasFeat(FEAT_SUBVOCAL_CASTING)) return false;
+	if (HasSpellState(SS_VOCALIZE)) return false;
+	return true;
+}
+
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
+static EffectRef fx_cleave_ref = { "Cleave", -1 };
+
+void Actor::CheckCleave()
+{
+	int cleave = GetFeat(FEAT_CLEAVE);
+	//feat level 1 only enables one cleave per round
+	if ((cleave==1) && fxqueue.HasEffect(fx_cleave_ref)  ) {
+		cleave = 0;
+	}
+	if(cleave) {
+		Effect * fx = EffectQueue::CreateEffect(fx_cleave_ref, attackcount, 0, FX_DURATION_INSTANT_LIMITED);
+		if (fx) {
+			fx->Duration = core->Time.round_sec;
+			core->ApplyEffect(fx, this, this);
+			delete fx;
+		}
+	}
+}
+
+static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical)
@@ -3205,10 +3287,23 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
 	LastDamageType|=damagetype;
+	Actor *act=NULL;
+	if (!hitter) {
+		// TODO: check this
+		hitter = area->GetActorByGlobalID(LastHitter);
+	}
+
+	if (hitter) {
+		if (hitter->Type==ST_ACTOR) {
+			act = (Actor *) hitter;
+		}
+	}
 
 	switch(modtype)
 	{
 	case MOD_ADDITIVE:
+		//bonus against creature should only affect additive damages or spells like harm would be deadly
+		damage += act->fxqueue.BonusAgainstCreature(fx_damage_vs_creature_ref, this);
 		break;
 	case MOD_ABSOLUTE:
 		damage = GetBase(IE_HITPOINTS) - damage;
@@ -3223,6 +3318,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	int resisted = 0;
+
 	ModifyDamage (hitter, damage, resisted, damagetype, NULL, critical);
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
@@ -3255,24 +3351,17 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
-		Actor *act=NULL;
-		if (!hitter) {
-			// TODO: check this
-			hitter = area->GetActorByGlobalID(LastHitter);
-		}
-
-		if (hitter) {
-			if (hitter->Type==ST_ACTOR) {
-				act = (Actor *) hitter;
-			}
-		}
-
 		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
 			core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
 		}
 	}
 
+	int chp = (signed) BaseStats[IE_HITPOINTS];
 	if (damage > 0) {
+		//if this kills us, check if attacker could cleave
+		if (act && (damage>chp)) {
+			act->CheckCleave();
+		}
 		GetHit();
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
@@ -3281,7 +3370,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	InternalFlags|=IF_ACTIVE;
-	int chp = (signed) BaseStats[IE_HITPOINTS];
 	int damagelevel = 0; //FIXME: this level is never used
 	if (damage<10) {
 		damagelevel = 1;
@@ -4394,7 +4482,39 @@ void Actor::InitStatsOnLoad()
 
 	SetupFist();
 	//initial setup of modified stats
-	memcpy(Modified,BaseStats, sizeof(Modified));
+	memcpy(Modified, BaseStats, sizeof(Modified));
+	//apply feats
+	ApplyFeats();
+	//apply persistent feat spells
+	ApplyExtraSettings();
+}
+
+//most feats are simulated via spells (feat<xx>)
+void Actor::ApplyFeats()
+{
+	ieResRef feat;
+
+	for(int i=0;i<MAX_FEATS;i++) {
+		int level = GetFeat(i);
+		snprintf(feat, sizeof(ieResRef), "FEAT%02x", i);
+		if (level) {
+			if (gamedata->Exists(feat, IE_SPL_CLASS_ID, true)) {
+				core->ApplySpell(feat, this, this, level);
+			}
+		}
+	}
+}
+
+void Actor::ApplyExtraSettings()
+{
+	if (!PCStats) return;
+	for (int i=0;i<ES_COUNT;i++) {
+		if (featspells[i] && featspells[i][0]!='*') {
+			if (PCStats->ExtraSettings[i]) {
+				core->ApplySpell(featspells[i], this, this, PCStats->ExtraSettings[i]);
+			}
+		}
+	}
 }
 
 void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
@@ -5460,6 +5580,14 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			damage = 0;
 			resisted = DR_IMMUNE;
 		}
+
+		//special effects on hit for arterial strike and hamstring
+		if (damage>0 && BackstabResRef[0]!='*') {
+			core->ApplySpell(BackstabResRef, this, attacker, multiplier);
+			//do we need this?
+			BackstabResRef[0]='*';
+		}
+		//
 	}
 
 	if (damage>0) {
@@ -6625,7 +6753,6 @@ int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
 	}
 	return 0;
 }
-
 //replenishes spells, cures fatigue
 void Actor::Rest(int hours)
 {
@@ -6917,6 +7044,18 @@ void Actor::SetFeat(unsigned int feat, int mode)
 			BaseStats[IE_FEATS1+idx]^=mask;
 			break;
 	}
+}
+
+void Actor::SetFeatValue(unsigned int feat, int value)
+{
+	if (value) {
+		SetFeat(feat, BM_OR);
+		if (featstats[feat]) SetBase(featstats[feat], value);
+	} else {
+		SetFeat(feat, BM_NAND);
+		if (featstats[feat]) SetBase(featstats[feat], 0);
+	}
+	ApplyFeats();
 }
 
 void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int wt)
@@ -7347,11 +7486,15 @@ void Actor::CreateDerivedStatsIWD2()
 //and similar derived stats that change with level
 void Actor::CreateDerivedStats()
 {
-	ieDword cls = BaseStats[IE_CLASS]-1;
-	if (cls>=(ieDword) classcount) {
+	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		multiclass = 0;
 	} else {
-		multiclass = multi[cls];
+		ieDword cls = BaseStats[IE_CLASS]-1;
+		if (cls>=(ieDword) classcount) {
+			multiclass = 0;
+		} else {
+			multiclass = multi[cls];
+		}
 	}
 
 	if (core->HasFeature(GF_3ED_RULES)) {

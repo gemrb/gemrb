@@ -1122,6 +1122,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
+		target->SetSpellState(SS_DOMINATION);
 		break;
 	case 5: //thrall (typo comes from original engine doc)
 		if (fx->FirstApply) {
@@ -1272,9 +1273,21 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x0d Death
+static EffectRef fx_death_ward_ref = { "DeathWard", -1 };
+static EffectRef fx_death_magic_ref = { "Death2", -1 };
+
 int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//if the opcode of this effect is associated with Death2 (iwd2's death magic opcode) and
+	//there is an active death ward effect, ignore this opcode
+	if (target->fxqueue.HasEffect(fx_death_ward_ref) ) {
+		//find the opcode for death magic (should be 420 in original IWD2)
+		EffectQueue::ResolveEffect(fx_death_magic_ref);
+		if (fx->Opcode==(ieDword) fx_death_magic_ref.opcode) return FX_NOT_APPLIED;
+	}
+
 	ieDword damagetype = 0;
 	switch (fx->Parameter2) {
 	case 1:
@@ -1562,18 +1575,18 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword Trans = fx->Parameter4;
 	if (fx->Parameter3) {
 		if (Trans>=240) {
-			fx->Parameter3=0;
+			fx->Parameter3 = 0;
 		} else {
 			Trans+=16;
 		}
 	} else {
 		if (Trans<=32) {
-			fx->Parameter3=1;
+			fx->Parameter3 = 1;
 		} else {
 			Trans-=16;
 		}
 	}
-	fx->Parameter4=Trans;
+	fx->Parameter4 = Trans;
 	STAT_SET( IE_TRANSLUCENT, Trans);
 	//FIXME: probably FX_PERMANENT, but TRANSLUCENT has no saved base stat
 	return FX_APPLIED;
@@ -2699,30 +2712,47 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		break;
 	case RPD_STR: //strength
-		STAT_ADD(IE_STR, fx->Parameter1);
+		STAT_SUB(IE_STR, fx->Parameter1);
 		break;
 	case RPD_DEX: //dex
-		STAT_ADD(IE_DEX, fx->Parameter1);
+		STAT_SUB(IE_DEX, fx->Parameter1);
 		break;
 	case RPD_CON: //con
-		STAT_ADD(IE_CON, fx->Parameter1);
+		STAT_SUB(IE_CON, fx->Parameter1);
 		break;
 	case RPD_INT: //int
-		STAT_ADD(IE_INT, fx->Parameter1);
+		STAT_SUB(IE_INT, fx->Parameter1);
 		break;
 	case RPD_WIS: //wis
-		STAT_ADD(IE_WIS, fx->Parameter1);
+		STAT_SUB(IE_WIS, fx->Parameter1);
 		break;
 	case RPD_CHA: //cha
-		STAT_ADD(IE_CHR, fx->Parameter1);
+		STAT_SUB(IE_CHR, fx->Parameter1);
 		break;
+	case RPD_CONTAGION: //contagion (iwd2) - an aggregate of STR,DEX,CHR,SLOW diseases
+		STAT_SUB(IE_STR, 2);
+		STAT_SUB(IE_DEX, 2);
+		STAT_SUB(IE_CHR, 2);
+		//falling through
 	case RPD_SLOW: //slow
+		//TODO: in iwd2
+		//-2 AC, BaB, reflex, damage
+		//-1 attack#
+		//speed halved
+		//in bg2
+		//TBD
+		target->AddPortraitIcon(PI_SLOWED);
 		break;
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
+		target->SetSpellState(SS_MOLDTOUCH);
 		damage = 1;
 		break;
 	case RPD_MOLD2:
+		break;
+	case RPD_PEST:     //cloud of pestilence (iwd2)
+		break;
+	case RPD_DOLOR:     //dolorous decay (iwd2)
 		break;
 	default:
 		damage = 1;
@@ -2734,6 +2764,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (damage) {
 		target->Damage(damage, DAMAGE_POISON, caster);
 	}
+
 	return FX_APPLIED;
 }
 
@@ -2748,23 +2779,13 @@ int fx_cure_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x50 State:Deafness
-// gemrb extension: modifiable amount
-// none of the engines care about stacking
 int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_set_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	//gemrb fix
+	//adopted IWD2 method, spellfailure will be handled internally based on the spell state
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
 
-	if (!fx->Parameter1) {
-		fx->Parameter1 = 50;
-	}
-	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
-	if (!fx->Parameter2) {
-		fx->Parameter1 = 50;
-	}
-	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
 	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_DEAFNESS);
@@ -3197,13 +3218,27 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 // 0x6f Item:CreateMagic
-
 static EffectRef fx_remove_item_ref = { "Item:Remove", -1 };
 
 int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	//charge count is incorrect
-	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
+	//charge count is the same for all slots by default
+	if (!fx->Parameter3) fx->Parameter3 = fx->Parameter1;
+	if (!fx->Parameter4) fx->Parameter4 = fx->Parameter1;
+	int slot = target->inventory.GetMagicSlot();
+	target->inventory.SetSlotItemRes(fx->Resource, slot, fx->Parameter1, fx->Parameter3, fx->Parameter4);
+	//IWD doesn't let you create two handed weapons (actually only decastave) if shield slot is filled
+	//modders can still force two handed weapons with Parameter2
+	if (!fx->Parameter2) {
+		if (target->inventory.GetItemFlag(slot)&IE_ITEM_TWO_HANDED) {
+			if (target->inventory.HasItemInSlot("",target->inventory.GetShieldSlot())) {
+				target->inventory.RemoveItem(slot);
+				displaymsg->DisplayConstantStringNameString(STR_SPELL_FAILED, DMC_WHITE, STR_OFFHAND_USED, target);
+				return FX_NOT_APPLIED;
+			}
+		}
+	}
+
 	//equip the weapon
 	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
@@ -3324,8 +3359,7 @@ int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target) {
 		map = target->GetCurrentArea();
-	}
-	else {
+	} else {
 		map = core->GetGame()->GetCurrentArea();
 	}
 	if (!map) {
@@ -4544,7 +4578,11 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Actor *actor = target;
 
 	if (fx->Resource[0]) {
-		actor = map->GetActorByResource(fx->Resource);
+		if (map) {
+			actor = map->GetActorByResource(fx->Resource);
+		} else {
+			actor = NULL;
+		}
 	}
 
 	if (actor) {
@@ -4859,6 +4897,8 @@ Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resour
 	}
 
 	Map *map = target->GetCurrentArea();
+	if (!map) return NULL;
+
 	map->AddActor(fam);
 	Point p(fx->PosX, fx->PosY);
 	fam->SetPosition(p, true, 0);
@@ -5656,6 +5696,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	// get the actor to cast spells at
 	Actor *actor = NULL;
 	Map *map = target->GetCurrentArea();
+	if (!map) return FX_APPLIED;
+
 	switch (fx->Parameter1) {
 	case 0:
 		// Myself
@@ -5856,7 +5898,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Game *game = core->GetGame();
 
 	if (fx->FirstApply) {
-		fx->Parameter4=game->GameTime;
+		fx->Parameter4 = game->GameTime;
 		return FX_APPLIED;
 	}
 
@@ -5895,7 +5937,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	target->SetPosition(newpos, true, 0);
 
-	fx->Parameter4=game->GameTime;
+	fx->Parameter4 = game->GameTime;
 	return FX_APPLIED;
 }
 
@@ -6318,7 +6360,7 @@ int fx_spelltrap(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (fx->Parameter3) {
 		target->RestoreSpellLevel(fx->Parameter3, 0);
-		fx->Parameter3=0;
+		fx->Parameter3 = 0;
 	}
 	if (fx->Parameter1<=0) {
 		//gone down to zero
@@ -6762,7 +6804,7 @@ int fx_missile_damage_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx
 // 0x11f NoCircleState
 int fx_no_circle_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) print( "fx_missile_damage_modifier (%2d)\n", fx->Opcode);
+	if (0) print( "fx_no_circle_state (%2d)\n", fx->Opcode);
 	STAT_SET( IE_NOCIRCLE, 1 );
 	return FX_APPLIED;
 }

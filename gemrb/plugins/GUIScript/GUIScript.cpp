@@ -332,6 +332,7 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 		}
 		StatID&=15;
 		ps->ExtraSettings[StatID] = StatValue;
+		actor->ApplyExtraSettings();
 		return 1;
 	}
 
@@ -6746,8 +6747,8 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CheckSpecialSpell__doc,
-			  "CheckSpecialSpell(GlobalID, SpellResRef)=>int\n\n"
-			  "Checks if the specified spell is special. Returns 0 for normal ones." );
+"CheckSpecialSpell(GlobalID, SpellResRef)=>int\n\n"
+"Checks if the specified spell is special. Returns 0 for normal ones." );
 
 static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6769,8 +6770,8 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSpelldataIndex__doc,
-			 "GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
-			 "Returns the index of the spell in the spellbook's spelldata structure."
+"GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
+"Returns the index of the spell in the spellbook's spelldata structure."
 );
 
 static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
@@ -8100,6 +8101,28 @@ static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( actor->HasFeat(featindex) );
 }
 
+PyDoc_STRVAR( GemRB_SetFeat__doc,
+"SetFeat(Slot, feat)\n\n"
+"Sets a feat value, handles both the boolean and the numeric fields." );
+
+static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, featindex, value;
+
+	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &featindex, &value )) {
+		return AttributeError( GemRB_SetFeat__doc );
+	}
+	GET_GAME();
+
+	Actor *actor = game->FindPC(PlayerSlot);
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+	actor->SetFeatValue(featindex, value);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
 "GetAbilityBonus(stat, column, value[, ex])\n\n"
 "Returns an ability bonus value based on various .2da files.");
@@ -9246,8 +9269,8 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChargeSpells__doc,
-			  "ChargeSpells(globalID|pc)\n\n"
-			  "Recharges the actor's spells.");
+"ChargeSpells(globalID|pc)\n\n"
+"Recharges the actor's spells.");
 static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
@@ -10179,6 +10202,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
+	METHOD(SetFeat, METH_VARARGS),
 	METHOD(SetFullScreen, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
 	METHOD(SetGlobal, METH_VARARGS),
