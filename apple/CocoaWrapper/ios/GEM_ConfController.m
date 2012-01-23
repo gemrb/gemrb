@@ -251,14 +251,15 @@
 				if (status != ARCHIVE_OK) //need to set a return value
 					break;
 				progressSize += size;
+				pv.progress = (float)((double)progressSize / (double)totalBytes);
+				[self performSelectorOnMainThread:@selector(updateProgressView:) withObject:pv waitUntilDone:NO];
+
 				status = archive_write_data_block(ext, buff, size, offset);
 				if (status != ARCHIVE_OK) {
 					NSLog(@"%s", archive_error_string(a));
 					break;
 				}
 			}
-			pv.progress = (float)((double)progressSize / (double)totalBytes);
-			[self performSelectorOnMainThread:@selector(updateProgressView:) withObject:pv waitUntilDone:NO];
 		}
 	}
 	archive_read_close(a);
