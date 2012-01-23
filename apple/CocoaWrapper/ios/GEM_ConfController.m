@@ -336,12 +336,17 @@
 		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
 		[newConfig appendFormat:@"\nSavePath = %@/", savePath];
 
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-			[newConfig appendString:@"\nWidth = 1024"];
-			[newConfig appendString:@"\nHeight = 768"];
-		}else{
-			[newConfig appendString:@"\nWidth = 800"];
-			[newConfig appendString:@"\nHeight = 600"];
+		if ([[archivePath pathExtension] caseInsensitiveCompare:@"BG1"] != NSOrderedSame) {
+			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+				[newConfig appendString:@"\nWidth = 1024"];
+				[newConfig appendString:@"\nHeight = 768"];
+			}else{
+				[newConfig appendString:@"\nWidth = 800"];
+				[newConfig appendString:@"\nHeight = 600"];
+			}
+		} else {
+			[newConfig appendString:@"\nWidth = 640"];
+			[newConfig appendString:@"\nHeight = 480"];
 		}
 
 		// MouseFeedback = 3 hides cursor and tooltips
