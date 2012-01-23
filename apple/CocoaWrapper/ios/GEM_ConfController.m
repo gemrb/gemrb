@@ -291,11 +291,14 @@
 		if (newConfig) {
 			[newConfig appendString:[NSString stringWithFormat:@"\nGameType = %@", [zipPath pathExtension]]];
 			[newConfig appendString:[NSString stringWithFormat:@"\nGamePath = %@/", installPath]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nCD1 = %@/CD1/", installPath]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nCD2 = %@/CD2/", installPath]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nCD3 = %@/CD3/", installPath]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nCD4 = %@/CD4/", installPath]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nCD5 = %@/CD5/", installPath]];
+			for (int i=1; i <= 6; i++){ //6 is the max number of CDs
+				NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", installPath, i];
+				BOOL isDir = NO;
+				[fm fileExistsAtPath:cdPath isDirectory:&isDir];
+				if (isDir) {
+					[newConfig appendString:[NSString stringWithFormat:@"\nCD%i = %@/", i, cdPath]];
+				}
+			}
 			[newConfig appendString:[NSString stringWithFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]]];
 			[newConfig appendString:[NSString stringWithFormat:@"\nSavePath = %@/", savePath]];
 
