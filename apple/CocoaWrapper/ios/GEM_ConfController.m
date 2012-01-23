@@ -218,6 +218,7 @@
 	unsigned long long progressSize = 0;
 	for (;;) {
 		r = archive_read_next_header(a, &entry);
+		if (r == ARCHIVE_EOF) break;
 		NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
 		// Mac OS X has an annoying thing where it embeds crap in the archive. skip it.
 		if ([tmp rangeOfString:@"__MACOSX/"].location != NSNotFound) continue;
@@ -231,8 +232,7 @@
 			archiveHasRootDir = NO;
 		}
 		NSLog(@"unarchiving %s", archive_entry_pathname(entry));
-		if (r == ARCHIVE_EOF)
-			break;
+
 		if (r != ARCHIVE_OK) {
 			NSLog(@"error reading archive (%i):%s", r, archive_error_string(a));
 			break;
