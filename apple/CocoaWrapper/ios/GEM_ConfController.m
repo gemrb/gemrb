@@ -46,6 +46,7 @@
 @synthesize controlTable;
 @synthesize rootVC;
 @synthesize editorVC;
+@synthesize playButton;
 
 - (id)init
 {
@@ -400,6 +401,7 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	editor.editable = NO;
 	editorButton.enabled = NO;
+	playButton.enabled = NO;
 	switch (indexPath.section) {
 		case 0:
 			if ([configFiles count] == 0) return;
@@ -413,6 +415,7 @@
 			self.editor.text = [NSString stringWithContentsOfFile:[self selectedConfigPath] encoding:NSUTF8StringEncoding error:nil];
 			editor.editable = YES;
 			editorButton.enabled = YES;
+			playButton.enabled = YES;
 			if (editorVC != nil){
 				editorVC.navigationItem.rightBarButtonItem = editorButton;
 				[editorVC setTitle: [configFiles objectAtIndex:configIndexPath.row]];

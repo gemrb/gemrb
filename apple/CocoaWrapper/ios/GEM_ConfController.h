@@ -47,12 +47,14 @@
 	UIViewController* editorVC;
 	
 	UIBarButtonItem* editorButton;
+	UIBarButtonItem* playButton;
 }
 @property (nonatomic, retain) IBOutlet UITableView* controlTable;
 @property (nonatomic, retain) NSIndexPath* configIndexPath;
 @property (nonatomic, retain) IBOutlet UITextView* editor;
 @property (nonatomic, retain) IBOutlet UIViewController* rootVC;
 @property (nonatomic, retain) IBOutlet UIViewController* editorVC;
+@property (nonatomic, retain) IBOutlet UIBarButtonItem* playButton;
 
 - (void)reloadTableData;
 - (void)runModal;

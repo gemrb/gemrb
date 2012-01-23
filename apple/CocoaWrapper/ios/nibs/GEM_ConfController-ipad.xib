@@ -188,6 +188,7 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 							<reference key="IBUINavigationBar"/>
 							<string key="IBUITitle">GemRB</string>
 							<object class="IBUIBarButtonItem" key="IBUIRightBarButtonItem" id="327708032">
+								<bool key="IBUIEnabled">NO</bool>
 								<string key="IBUITitle">Play</string>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 								<int key="IBUIStyle">2</int>
@@ -232,6 +233,14 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 						<reference key="destination" ref="18413225"/>
 					</object>
 					<int key="connectionID">54</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">playButton</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="327708032"/>
+					</object>
+					<int key="connectionID">74</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -368,7 +377,7 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">73</int>
+			<int key="maxID">74</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -393,6 +402,7 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 						<string key="controlTable">UITableView</string>
 						<string key="editor">UITextView</string>
 						<string key="editorVC">UIViewController</string>
+						<string key="playButton">UIBarButtonItem</string>
 						<string key="rootVC">UIViewController</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -407,6 +417,10 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 						<object class="IBToOneOutletInfo" key="editorVC">
 							<string key="name">editorVC</string>
 							<string key="candidateClassName">UIViewController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="playButton">
+							<string key="name">playButton</string>
+							<string key="candidateClassName">UIBarButtonItem</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="rootVC">
 							<string key="name">rootVC</string>
