@@ -172,7 +172,10 @@
 	NSError* error = nil;
 	unsigned long long totalBytes = [[fm attributesOfItemAtPath:srcPath error:&error] fileSize];
 
-	if (error) NSLog(@"FM error for %@:\n%@", srcPath, [error localizedDescription]);
+	if (error) {
+		NSLog(@"FM error for %@:\n%@", srcPath, [error localizedDescription]);
+		return NO;
+	}
 
 	UITableViewCell* selectedCell = [controlTable cellForRowAtIndexPath:indexPath];
 
@@ -254,6 +257,8 @@
 	}
 	archive_read_close(a);
 	archive_read_finish(a);
+
+	if (r == ARCHIVE_FATAL) return NO;
 
 	installName = [installName stringByReplacingOccurrencesOfString:@"/" withString:@""];
 	installPath = [dstPath stringByAppendingString:installName];
