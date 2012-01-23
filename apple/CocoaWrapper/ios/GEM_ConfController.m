@@ -289,18 +289,18 @@
 		NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 
 		if (newConfig) {
-			[newConfig appendString:[NSString stringWithFormat:@"\nGameType = %@", [zipPath pathExtension]]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nGamePath = %@/", installPath]];
+			[newConfig appendFormat:@"\nGameType = %@", [zipPath pathExtension]];
+			[newConfig appendFormat:@"\nGamePath = %@/", installPath];
 			for (int i=1; i <= 6; i++){ //6 is the max number of CDs
 				NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", installPath, i];
 				BOOL isDir = NO;
 				[fm fileExistsAtPath:cdPath isDirectory:&isDir];
 				if (isDir) {
-					[newConfig appendString:[NSString stringWithFormat:@"\nCD%i = %@/", i, cdPath]];
+					[newConfig appendFormat:@"\nCD%i = %@/", i, cdPath];
 				}
 			}
-			[newConfig appendString:[NSString stringWithFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]]];
-			[newConfig appendString:[NSString stringWithFormat:@"\nSavePath = %@/", savePath]];
+			[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]];
+			[newConfig appendFormat:@"\nSavePath = %@/", savePath];
 
 			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 				[newConfig appendString:@"\nWidth = 1024"];
