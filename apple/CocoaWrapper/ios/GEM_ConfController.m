@@ -163,8 +163,8 @@
 - (BOOL)installGame:(NSIndexPath*)indexPath
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	NSString* zipPath = [installFiles objectAtIndex:indexPath.row];
-	NSString* srcPath = [NSString stringWithFormat:@"%@/%@", docDir, zipPath];
+	NSString* archivePath = [installFiles objectAtIndex:indexPath.row];
+	NSString* srcPath = [NSString stringWithFormat:@"%@/%@", docDir, archivePath];
 
 	NSFileManager* fm = [NSFileManager defaultManager];
 
@@ -184,7 +184,7 @@
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
 	NSString* libDir = [[paths objectAtIndex:0] copy];
 
-	NSString* dstPath = [NSString stringWithFormat:@"%@/%@/", libDir, [zipPath pathExtension]];
+	NSString* dstPath = [NSString stringWithFormat:@"%@/%@/", libDir, [archivePath pathExtension]];
 	NSLog(@"installing %@ to %@...", srcPath, dstPath);
 
 	[fm createDirectoryAtPath:dstPath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -192,10 +192,10 @@
 	[fm changeCurrentDirectoryPath:dstPath];
 
 	struct archive *a;
-	const char* archivePath = [srcPath cStringUsingEncoding:NSASCIIStringEncoding];
+	const char* archiveAbsPath = [srcPath cStringUsingEncoding:NSASCIIStringEncoding];
 	a = archive_read_new();
-	archive_read_support_format_zip(a);
-	
+	archive_read_support_format_all(a);
+
 	struct archive *ext = archive_write_disk_new();
 	archive_write_disk_set_options(ext, 0);
 	archive_write_disk_set_standard_lookup(ext);
@@ -205,8 +205,8 @@
 	//warning super bad code can cause memory leak.
 	// !!! cleanup and do right
 	int r;
-	if ((r = archive_read_open_file(a, archivePath, 10240))) {
-		NSLog(@"error opening ZIP (%i):%s", r, archive_error_string(a));
+	if ((r = archive_read_open_file(a, archiveAbsPath, 10240))) {
+		NSLog(@"error opening archive (%i):%s", r, archive_error_string(a));
 		return NO;
 	}
 	NSString* installPath = nil;
@@ -218,7 +218,7 @@
 		if (r == ARCHIVE_EOF)
 			break;
 		if (r != ARCHIVE_OK) {
-			NSLog(@"error reading ZIP (%i):%s", r, archive_error_string(a));
+			NSLog(@"error reading archive (%i):%s", r, archive_error_string(a));
 			break;
 		}
 
@@ -259,11 +259,11 @@
 
 	[fm changeCurrentDirectoryPath:cwd];
 
-	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [zipPath pathExtension]];
+	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [archivePath pathExtension]];
 	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", installPath];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [zipPath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
 	NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
 	for (NSString* saveName in saves) {
@@ -283,13 +283,13 @@
 		NSLog(@"Moving mpsave '%@' to %@", saveName, fullSavePath);
 	}
 
-	NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [zipPath pathExtension]];
+	NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [archivePath pathExtension]];
 	if (![fm fileExistsAtPath:newCfgPath]){
-		NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [zipPath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
+		NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
 		NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 
 		if (newConfig) {
-			[newConfig appendFormat:@"\nGameType = %@", [zipPath pathExtension]];
+			[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
 			[newConfig appendFormat:@"\nGamePath = %@/", installPath];
 			for (int i=1; i <= 6; i++){ //6 is the max number of CDs
 				NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", installPath, i];
@@ -299,7 +299,7 @@
 					[newConfig appendFormat:@"\nCD%i = %@/", i, cdPath];
 				}
 			}
-			[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [zipPath pathExtension]];
+			[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
 			[newConfig appendFormat:@"\nSavePath = %@/", savePath];
 
 			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
