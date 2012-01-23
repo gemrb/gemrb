@@ -188,7 +188,7 @@
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
 	NSString* libDir = [[paths objectAtIndex:0] copy];
 
-	NSString* dstPath = [NSString stringWithFormat:@"%@/%@/", libDir, [archivePath pathExtension]];
+	NSString* dstPath = [NSString stringWithFormat:@"%@/%@/tmp/", libDir, [archivePath pathExtension]];
 	NSLog(@"installing %@ to %@...", srcPath, dstPath);
 
 	[fm createDirectoryAtPath:dstPath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -205,7 +205,6 @@
 	archive_write_disk_set_standard_lookup(ext);
 	struct archive_entry *entry;
 
-	int do_extract = 1;
 	//warning super bad code can cause memory leak.
 	// !!! cleanup and do right
 	int r;
@@ -215,10 +214,21 @@
 	}
 	NSString* installPath = nil;
 	NSString* installName = nil;
+	BOOL archiveHasRootDir = YES;
 	unsigned long long progressSize = 0;
 	for (;;) {
 		r = archive_read_next_header(a, &entry);
-		if (!installName) installName = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
+		if (!installName) {
+			NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
+			if ([tmp rangeOfString:@"/"].location != NSNotFound) {
+				installName = tmp;
+			} else {
+				archiveHasRootDir = NO;
+			}
+		} else if ([[NSString stringWithFormat:@"%s", archive_entry_pathname(entry)] rangeOfString:installName].location != 0) {
+			archiveHasRootDir = NO;
+		}
+		NSLog(@"unarchiving %s", archive_entry_pathname(entry));
 		if (r == ARCHIVE_EOF)
 			break;
 		if (r != ARCHIVE_OK) {
@@ -226,33 +236,29 @@
 			break;
 		}
 
-		if (do_extract) {
-			//NSLog(@"%s", archive_entry_pathname(entry));
-			r = archive_write_header(ext, entry);
-			if (r != ARCHIVE_OK)
-				NSLog(@"%s", archive_error_string(a));
-			else{				
-				int status;
-				const void *buff;
-				size_t size;
-				off_t offset;
-				
-				for (;;) {
-					status = archive_read_data_block(a, &buff, &size, &offset);
-					if (status == ARCHIVE_EOF) break;
-					if (status != ARCHIVE_OK) //need to set a return value
-						break;
-					progressSize += size;
-					status = archive_write_data_block(ext, buff, size, offset);
-					if (status != ARCHIVE_OK) {
-						NSLog(@"%s", archive_error_string(a));
-						break;
-					}
+		r = archive_write_header(ext, entry);
+		if (r != ARCHIVE_OK)
+			NSLog(@"%s", archive_error_string(a));
+		else {
+			int status;
+			const void *buff;
+			size_t size;
+			off_t offset;
+
+			for (;;) {
+				status = archive_read_data_block(a, &buff, &size, &offset);
+				if (status == ARCHIVE_EOF) break;
+				if (status != ARCHIVE_OK) //need to set a return value
+					break;
+				progressSize += size;
+				status = archive_write_data_block(ext, buff, size, offset);
+				if (status != ARCHIVE_OK) {
+					NSLog(@"%s", archive_error_string(a));
+					break;
 				}
-				pv.progress = (float)((double)progressSize / (double)totalBytes);
-				
-				[self performSelectorOnMainThread:@selector(updateProgressView:) withObject:pv waitUntilDone:NO];
 			}
+			pv.progress = (float)((double)progressSize / (double)totalBytes);
+			[self performSelectorOnMainThread:@selector(updateProgressView:) withObject:pv waitUntilDone:NO];
 		}
 	}
 	archive_read_close(a);
@@ -260,8 +266,19 @@
 
 	if (r == ARCHIVE_FATAL) return NO;
 
+	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+	if (archiveHasRootDir) {
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@/", dstPath, installName]
+					toPath:gamePath error:nil];
+		[fm removeItemAtPath:dstPath error:nil];
+	} else {
+		// simply rename the tmp dir to archivePath
+		installName = [archivePath stringByDeletingPathExtension];
+		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
+	}
+
 	installName = [installName stringByReplacingOccurrencesOfString:@"/" withString:@""];
-	installPath = [dstPath stringByAppendingString:installName];
+	installPath = [gamePath stringByAppendingString:installName];
 
 	[fm changeCurrentDirectoryPath:cwd];
 
