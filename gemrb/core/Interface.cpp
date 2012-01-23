@@ -2443,7 +2443,13 @@ bool Interface::LoadConfig(const char* filename)
 	}
 
 	if (!GUIScriptsPath[0]) {
+#if TARGET_OS_MAC
+		// GUI scripts will ALWAYS be in the app bundle if not specified in the config
+		// the build process always copys them to the Recources diectory
+		strcpy( GUIScriptsPath, "../Resources/");
+#else
 		strcpy( GUIScriptsPath, GemRBPath );
+#endif
 	} else {
 		ResolveFilePath( GUIScriptsPath );
 	}
