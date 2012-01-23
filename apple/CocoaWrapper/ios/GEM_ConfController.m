@@ -218,14 +218,16 @@
 	unsigned long long progressSize = 0;
 	for (;;) {
 		r = archive_read_next_header(a, &entry);
+		NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
+		// Mac OS X has an annoying thing where it embeds crap in the archive. skip it.
+		if ([tmp rangeOfString:@"__MACOSX/"].location != NSNotFound) continue;
 		if (!installName) {
-			NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
 			if ([tmp rangeOfString:@"/"].location != NSNotFound) {
 				installName = tmp;
 			} else {
 				archiveHasRootDir = NO;
 			}
-		} else if ([[NSString stringWithFormat:@"%s", archive_entry_pathname(entry)] rangeOfString:installName].location != 0) {
+		} else if ([tmp rangeOfString:installName].location != 0) {
 			archiveHasRootDir = NO;
 		}
 		NSLog(@"unarchiving %s", archive_entry_pathname(entry));
