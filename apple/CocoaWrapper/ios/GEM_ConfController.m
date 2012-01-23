@@ -26,6 +26,12 @@
 #include <stdio.h> 
 #include <fcntl.h>
 
+enum ConfigTableSection {
+	TABLE_SEC_CONFIG = 0,
+	TABLE_SEC_INSTALL = 1,
+	TABLE_SEC_LOG = 2
+	};
+
 @implementation GEM_NavController
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation) interfaceOrientation
@@ -381,17 +387,17 @@
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
 	switch (indexPath.section) {
-		case 0:
+		case TABLE_SEC_CONFIG:
 			cell.textLabel.text = [configFiles count] ? 
 								  [configFiles objectAtIndex:indexPath.row] :
 								  @"No config files found.";
 			break;
-		case 1:
+		case TABLE_SEC_INSTALL:
 			cell.textLabel.text = [installFiles count] ?
 								  [installFiles objectAtIndex:indexPath.row] :
 								  @"No game files found";
 			break;
-		case 2:
+		case TABLE_SEC_LOG:
 			cell.textLabel.text = [logFiles objectAtIndex:indexPath.row];
 			break;
 	}
@@ -408,11 +414,11 @@
 {
 	switch(section)
 	{
-		case 0:
+		case TABLE_SEC_CONFIG:
 			return [configFiles count] ?: 1;
-		case 1:
+		case TABLE_SEC_INSTALL:
 			return [installFiles count] ?: 1;
-		case 2:
+		case TABLE_SEC_LOG:
 			return [logFiles count];
 	}
 	return 0;
@@ -422,11 +428,11 @@
 {
 	switch(section)
 	{
-		case 0:
+		case TABLE_SEC_CONFIG:
 			return @"Select a configuration file.";
-		case 1:
+		case TABLE_SEC_INSTALL:
 			return @"Install a game.";
-		case 2:
+		case TABLE_SEC_LOG:
 			if ([logFiles count])
 				return @"View a debug run log.";
 	}
@@ -436,7 +442,7 @@
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	switch (indexPath.section) {
-		case 0:
+		case TABLE_SEC_CONFIG:
 			[tableView cellForRowAtIndexPath:configIndexPath].accessoryType = UITableViewCellAccessoryNone;
 			playButton.enabled = NO;
 			editorButton.enabled = NO;
@@ -452,7 +458,7 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	[self tableView:tableView didDeselectRowAtIndexPath:indexPath];
 	switch (indexPath.section) {
-		case 0:
+		case TABLE_SEC_CONFIG:
 			if ([configFiles count] == 0) return;
 
 			selectedCell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -470,11 +476,11 @@
 			}
 			
 			break;
-		case 1:
+		case TABLE_SEC_INSTALL:
 			if ([installFiles count] == 0) return;
 			[self performSelectorInBackground:@selector(installGame:) withObject:indexPath];
 			break;
-		case 2:
+		case TABLE_SEC_LOG:
 			self.editor.text = [NSString stringWithContentsOfFile:[docDir stringByAppendingFormat:@"/%@", [logFiles objectAtIndex:indexPath.row]] encoding:NSUTF8StringEncoding error:nil];
 			if (editorVC != nil){
 				editorVC.navigationItem.rightBarButtonItem = editorButton;
@@ -491,7 +497,7 @@
 	
 	NSFileManager* fm = [NSFileManager defaultManager];
 	switch (indexPath.section) {
-		case 0:
+		case TABLE_SEC_CONFIG:
 			// check if the config file we are deleting is currently selected and deselect it
 			if (tableView.indexPathForSelectedRow.row == indexPath.row) {
 				[tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -499,10 +505,10 @@
 			}
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@", docDir, [configFiles objectAtIndex:indexPath.row]] error:nil];
 			break;
-		case 1:
+		case TABLE_SEC_INSTALL:
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@", docDir, [installFiles objectAtIndex:indexPath.row]] error:nil];
 			break;
-		case 2:
+		case TABLE_SEC_LOG:
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@", docDir, [logFiles objectAtIndex:indexPath.row]] error:nil];
 			break;
 	}
@@ -512,11 +518,11 @@
 - (BOOL)tableView:(UITableView *) __unused tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	switch (indexPath.section) {
-		case 0:
+		case TABLE_SEC_CONFIG:
 			return (BOOL)[configFiles count];
-		case 1:
+		case TABLE_SEC_INSTALL:
 			return (BOOL)[installFiles count];
-		case 2:
+		case TABLE_SEC_LOG:
 			return (BOOL)[logFiles count];
 	}
 	return NO;
