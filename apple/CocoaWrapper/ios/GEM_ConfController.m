@@ -314,6 +314,11 @@
 	NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], installPath, [[UIDevice currentDevice] userInterfaceIdiom]);
 	NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 	if ([fm fileExistsAtPath:newCfgPath]) {
+		if (configIndexPath) {
+			// TODO: we should deselect the selected config if it is being overwritten
+			// problem is we cannot update GUI classes from threads other than main
+			// for now we will live with the side effect of having to reselect the config to update the editor
+		}
 		// new data overwrites old data therefore new config should do the same.
 		[fm removeItemAtPath:newCfgPath error:nil];
 	}
@@ -475,13 +480,18 @@
 	}
 }
 
-- (void)tableView:(UITableView *) __unused tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *) tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (editingStyle == UITableViewCellEditingStyleInsert) return;
 	
 	NSFileManager* fm = [NSFileManager defaultManager];
 	switch (indexPath.section) {
 		case 0:
+			// check if the config file we are deleting is currently selected and deselect it
+			if (tableView.indexPathForSelectedRow.row == indexPath.row) {
+				[tableView deselectRowAtIndexPath:indexPath animated:YES];
+				[self tableView:tableView didDeselectRowAtIndexPath:indexPath];
+			}
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@", docDir, [configFiles objectAtIndex:indexPath.row]] error:nil];
 			break;
 		case 1:
