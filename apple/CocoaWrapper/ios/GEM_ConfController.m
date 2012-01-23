@@ -423,19 +423,28 @@
 	return nil;
 }
 
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	switch (indexPath.section) {
+		case 0:
+			[tableView cellForRowAtIndexPath:configIndexPath].accessoryType = UITableViewCellAccessoryNone;
+			playButton.enabled = NO;
+			editorButton.enabled = NO;
+			editor.editable = NO;
+			editor.text = @"";
+			break;
+	}
+}
+
 - (void)tableView:(UITableView *) tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	UITableViewCell* selectedCell = [tableView cellForRowAtIndexPath:indexPath];
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
-	editor.editable = NO;
-	editorButton.enabled = NO;
-	playButton.enabled = NO;
+	[self tableView:tableView didDeselectRowAtIndexPath:indexPath];
 	switch (indexPath.section) {
 		case 0:
 			if ([configFiles count] == 0) return;
-			if (configIndexPath) {
-				[tableView cellForRowAtIndexPath:configIndexPath].accessoryType = UITableViewCellAccessoryNone;
-			}
+
 			selectedCell.accessoryType = UITableViewCellAccessoryCheckmark;
 			selectedCell.highlighted = NO;
 
