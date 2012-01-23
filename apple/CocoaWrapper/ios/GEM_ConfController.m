@@ -310,6 +310,9 @@
 				[newConfig appendString:@"\nHeight = 600"];
 			}
 
+			// MouseFeedback = 3 hides cursor and tooltips
+			[newConfig appendString:@"\nMouseFeedback = 3"];
+
 			NSError* err = nil;
 			if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
 				NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
