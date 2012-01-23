@@ -49,6 +49,8 @@ if (NOT LAYOUT)
 		set(LAYOUT "home")
 	elseif (APPLE)
 		set(LAYOUT "library")
+		# favor mac frameworks over unix libraries
+		set(CMAKE_FIND_FRAMEWORK FIRST)
 	else (APPLE)
 		set(LAYOUT "fhs")
 	endif (WIN32)
