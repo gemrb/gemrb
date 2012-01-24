@@ -5360,6 +5360,7 @@ int Interface::GetReputationMod(int column) const
 PauseSetting Interface::TogglePause()
 {
 	GameControl *gc = GetGameControl();
+	if (!gc) return PAUSE_OFF;
 	PauseSetting pause = (PauseSetting)(~gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
 	if (SetPause(pause)) return pause;
 	return (PauseSetting)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
