@@ -1,9 +1,12 @@
-GemRB git (82a9d0c):
+GemRB git (b0a9000):
   New features:
     - 
+    - many iwd2 feats
 
   Improved features:
     - 
+    - (iwd2) effects
+    - cocoa wrapper, cursor handling
     - bugfixes
 
   Applied patches:
