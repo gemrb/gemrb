@@ -5494,6 +5494,9 @@ ieDword Interface::TranslateStat(const char *stat_name)
 
 	int symbol = LoadSymbol( "stats" );
 	Holder<SymbolMgr> sym = GetSymbol( symbol );
+	if (!sym) {
+		error("Core", "Cannot load statistic name mappings.\n");
+	}
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
 		printMessage("Core", "Cannot translate symbol: %s\n", YELLOW, stat_name);
