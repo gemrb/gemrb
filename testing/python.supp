@@ -91,3 +91,16 @@
    obj:/lib/ld-2.7.so
 }
 
+{
+   Suppress_libX11_1
+   Memcheck:Leak
+   ...
+   fun:XSetLocaleModifiers
+}
+
+{
+   Suppress_libX11_2
+   Memcheck:Leak
+   ...
+   fun:XCreateIC
+}
