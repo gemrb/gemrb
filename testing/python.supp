@@ -40,6 +40,32 @@
    fun:PyObject_Realloc
 }
 
+{
+   Suppress_Python_initposix
+   Memcheck:Leak
+   ...
+   fun:_PyObject_GC_Malloc
+   ...
+   fun:initposix
+}
+
+{
+   Suppress_Python_initzipimport
+   Memcheck:Leak
+   ...
+   fun:_PyObject_GC_Malloc
+   ...
+   fun:initzipimport
+}
+
+{
+   Suppress_Python_PyInitializeEx
+   Memcheck:Leak
+   ...
+   fun:_PyObject_GC_Malloc
+   ...
+   fun:Py_InitializeEx
+}
 
 {
    Suppress_SDL1
