@@ -2435,7 +2435,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 /** Send a Quit Signal to the Event Queue */
 bool SDLVideoDriver::Quit()
 {
-	SDL_Event evnt;
+	SDL_Event evnt = {};
 	evnt.type = SDL_QUIT;
 	if (SDL_PushEvent( &evnt ) == -1) {
 		return false;
