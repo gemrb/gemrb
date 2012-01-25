@@ -87,7 +87,7 @@ def GetWindowPack():
 
 def LocationPressed ():
 	AreaInfo = GemRB.GetAreaInfo()
-	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) );
+	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
 	return
 
 def RestPress ():
@@ -575,7 +575,7 @@ def IsMultiClassed (actor, verbose):
 		if IsMulti&Mask: # it's part of this class
 			#we need to place the classes in the array based on their order in the name,
 			#NOT the order they are detected in
-			CurrentName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, i));
+			CurrentName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, i))
 			if CurrentName == "*":
 				# we read too far, as the upper range limit is greater than the number of "single" classes
 				break

@@ -59,7 +59,7 @@ def Set (PortraitName):
 	for i in range(0, PortraitsTable.GetRowCount ()):
 		if PortraitName == PortraitsTable.GetRowName (i).upper ():
 			PortraitCount = i
-			break;
+			break
 
 	return
 
