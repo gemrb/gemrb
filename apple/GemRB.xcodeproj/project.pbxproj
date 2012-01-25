@@ -6402,11 +6402,12 @@
 				OTHER_CFLAGS = (
 					"-DTARGET_OS_IPHONE",
 					"-isystem",
-					./ios/Python/Include/,
-					"-isystem",
-					./ios/SDL/Include/,
+					./,
 					"-DSTATIC_LINK",
-					"$(OTHER_CFLAGS)",
+					"-DHAVE_CONFIG_H",
+					"-D_DEBUG",
+					"-W",
+					"-Wextra",
 				);
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
@@ -6449,12 +6450,12 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-isystem",
-					./ios/SDL/Include/,
-					"-isystem",
-					./ios/Python/Include/,
+					./,
 					"-DSTATIC_LINK",
-					"$(OTHER_CFLAGS)",
+					"-DHAVE_CONFIG_H",
 					"-DTARGET_OS_IPHONE",
+					"-W",
+					"-Wextra",
 				);
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
