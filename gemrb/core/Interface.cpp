@@ -2434,7 +2434,8 @@ bool Interface::LoadConfig(const char* filename)
 
 	if (!PluginsPath[0]) {
 #ifdef PLUGINDIR
-		strcpy( PluginsPath, PLUGINDIR );
+		// temporarily use ResolveFilePAth here. the mac distribution is using ~ for PLUGINDIR
+		ResolveFilePath( strcpy( PluginsPath, PLUGINDIR ));
 #else
 		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
 #endif
