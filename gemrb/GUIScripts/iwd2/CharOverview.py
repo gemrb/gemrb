@@ -40,7 +40,7 @@ GlobalStep = 0
 
 ### Utility functions
 def AddText(strref, row = False):
-	if row: return TextAreaControl.Append(strref, row);
+	if row: return TextAreaControl.Append(strref, row)
 	return TextAreaControl.Append(strref)
 ### End utility functions
 
@@ -170,8 +170,8 @@ def UpdateOverview(CurrentStep):
 		AddText('[/color]')
 		
 		ClassColumn = Tables[1].GetValue(GemRB.GetVar('Class') - 1, 3, 1) # Finds base class row id
-		if ClassColumn < 1: ClassColumn = GemRB.GetVar('Class') - 1; # If 0 then already a base class so need actual row
-		else: ClassColumn -= 1; # 'CLASS' column in classes.2da is out by 1 for some reason
+		if ClassColumn < 1: ClassColumn = GemRB.GetVar('Class') - 1 # If 0 then already a base class so need actual row
+		else: ClassColumn -= 1 # 'CLASS' column in classes.2da is out by 1 for some reason
 		ClassColumn += 4 # There are 4 columns before the classes in skills.2da
 		# At the moment only cleric kits get skill bonuses but their column names in skills.2da don't match up
 		# to their kit names. All classes aren't covered in skills.2da either which is why I have to resort
@@ -290,15 +290,17 @@ def BackPress():
 		StartOverWindow.Unload()
 	
 	# Need to clear relevant variables
-	if GlobalStep == 2: GemRB.SetVar('Gender', 0);
-	elif GlobalStep == 3: GemRB.SetVar('Race', 0);
-	elif GlobalStep == 4: GemRB.SetVar('Class', 0);
-	elif GlobalStep == 5: GemRB.SetVar('Alignment', 0);
+	if GlobalStep == 2: GemRB.SetVar('Gender', 0)
+	elif GlobalStep == 3: GemRB.SetVar('Race', 0)
+	elif GlobalStep == 4: GemRB.SetVar('Class', 0)
+	elif GlobalStep == 5: GemRB.SetVar('Alignment', 0)
 	elif GlobalStep == 6:
-		for i in range(0, 6): GemRB.SetVar('Ability ' + str(i), 0);
+		for i in range(0, 7):
+			GemRB.SetVar('Ability ' + str(i), 0)
+
 	elif GlobalStep == 9: GemRB.SetToken('CHARNAME', '')
 	
 	ScrName = 'CharGen' + str(GlobalStep - 1)
-	if GlobalStep == 2: ScrName = 'CharGen';
+	if GlobalStep == 2: ScrName = 'CharGen'
 	GemRB.SetNextScript(ScrName)
 	return
