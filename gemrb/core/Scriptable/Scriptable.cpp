@@ -387,7 +387,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (!CurrentActionInterruptable) {
 		// sanity check
 		if (!CurrentAction && !GetNextAction())
-			abort();
+			error("Scriptable", "No current action and no next action.\n");
 		return;
 	}
 

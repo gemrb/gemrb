@@ -158,7 +158,7 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 {
 	//if index is too large, we break
 	if (x>area_entries.size()) {
-		abort();
+		error("WorldMap", "Trying to set invalid entry (%d/%d)\n", x, (int)area_entries.size());
 	}
 	//altering an existing entry
 	if (x<area_entries.size()) {
@@ -208,7 +208,7 @@ void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
 
 	//if index is too large, we break
 	if (x>area_links.size()) {
-		abort();
+		error("WorldMap", "Trying to set invalid link (%d/%d)", x, (int)area_links.size());
 	}
 	//altering an existing link
 	if (x<area_links.size()) {

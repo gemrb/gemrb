@@ -1182,7 +1182,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			case FX_ABORT:
 				break;
 			default:
-				abort();
+				error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
 		}
 	} else {
 		//effect not found, it is going to be discarded

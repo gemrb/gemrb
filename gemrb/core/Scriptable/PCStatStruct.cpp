@@ -20,7 +20,6 @@
 
 #include "Scriptable/PCStatStruct.h"
 
-#include "globals.h" //for abort()
 #include "win32def.h"
 
 #include <cstring>
@@ -162,7 +161,7 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 	case ACT_QSLOT3: idx = 2; break;
 	case ACT_QSLOT4: idx = 3; break;
 	case ACT_QSLOT5: idx = 4; break;
-	default: abort();
+	default: error("Core", "Unknown Quicslot accesed '%d'.\n", which);
 	}
 	slot=QuickItemSlots[idx];
 	headerindex=QuickItemHeaders[idx];

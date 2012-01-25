@@ -362,9 +362,8 @@ void GameData::FreeSpell(Spell *spl, const ieResRef name, bool free)
 
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
-		printMessage("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n", LIGHT_RED,
+		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n",
 			name, spl->Name);
-		abort();
 	}
 	if (res) return;
 	if (free) delete spl;

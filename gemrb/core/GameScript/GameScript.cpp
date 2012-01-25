@@ -2296,7 +2296,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		if (aC->GetRef()!=1) {
 			print("Immediate action got queued!\n");
 			PrintAction(actionID);
-			abort();
+			error("GameScript", "aborting...\n");
 		}
 		return;
 	}

@@ -1185,7 +1185,7 @@ void Map::DrawMap(Region screen)
 			spark = GetNextSpark(spaidx);
 			break;
 		default:
-			abort();
+			error("Map", "Trying to draw unknown animation type.\n");
 		}
 	}
 

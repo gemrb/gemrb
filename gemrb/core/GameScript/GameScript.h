@@ -120,8 +120,7 @@ class GameScript;
 #define GSASSERT(f,c) \
 	if(!(f))  \
 	{  \
-		print("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
-		abort(); \
+		error("GSASSERT", "Assertion failed: %s [0x%08lX] Line %d\n",#f, c, __LINE__); \
 	}
 
 typedef std::vector<ieDword> SrcVector;
@@ -368,9 +367,8 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
-			print( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
+			error("GameScript", "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
+				__LINE__);
 		}
 		RefCount--;
 		if (!RefCount) {
@@ -383,9 +381,8 @@ public:
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		if (RefCount >= 65536) {
-			print( "Refcount increased to: %d in action %d\n", RefCount,
-				actionID );
-			abort();
+			error("GameScript", "Refcount increased to: %d in action %d\n", RefCount,
+				actionID);
 		}
 	}
 };
