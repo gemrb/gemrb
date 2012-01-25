@@ -6691,6 +6691,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
+					"-DTARGET_OS_MAC=1",
 					"-DHAVE_CONFIG_H",
 					"-g",
 					"-D_DEBUG",
@@ -6736,6 +6737,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
+					"-DTARGET_OS_MAC=1",
 					"-DHAVE_CONFIG_H",
 					"-isystem",
 					./,
