@@ -122,7 +122,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 #if SDL_VERSION_ATLEAST(1,3,0)
-		//This is needed to remove the status bar on Android/iOS. 
+		//This is needed to remove the status bar on Android/iOS.
 		//since we are in fullscreen this has no effect outside Android/iOS
 		flags |= SDL_WINDOW_BORDERLESS;
 #endif
@@ -277,9 +277,9 @@ int SDLVideoDriver::PollEvents() {
 	/* multitouch gesture support */
 
 	/*
-	 the digitizer could have a higher resolution then the screen.
-	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
-	 */
+	the digitizer could have a higher resolution then the screen.
+	we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
+	*/
 	SDL_Touch *state = SDL_GetTouch(event.tfinger.touchId);
 	float xScaleFactor = 1.0;
 	float yScaleFactor = 1.0;
@@ -294,7 +294,8 @@ int SDLVideoDriver::PollEvents() {
 	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0};
 
 	if (touchHold && (SDL_GetTicks() - touchHoldTime) >= TOUCH_RC_NUM_TICKS) {
-		SDL_Event evtDown;
+		SDL_Event evtDown = SDL_Event();
+
 		evtDown.type = SDL_MOUSEBUTTONDOWN;
 		evtDown.button = rightMouseDownEvent;
 
@@ -306,7 +307,8 @@ int SDLVideoDriver::PollEvents() {
 			touchHold = false;
 			formationRotation = true;
 		} else {
-			SDL_Event evtUp;
+			SDL_Event evtUp = SDL_Event();
+
 			evtUp.type = SDL_MOUSEBUTTONUP;
 			evtUp.button = rightMouseUpEvent;
 			SDL_PushEvent(&evtUp);
@@ -388,7 +390,7 @@ int SDLVideoDriver::PollEvents() {
 					break;
 				case SDLK_DELETE:
 #if TARGET_OS_IPHONE < 1
-					//iOS currently doesnt have a backspace so we use delete. 
+					//iOS currently doesnt have a backspace so we use delete.
 					//This change should be future proof in the event apple changes the delete key to a backspace.
 					key = GEM_DELETE;
 					break;
@@ -495,7 +497,7 @@ int SDLVideoDriver::PollEvents() {
 				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
-		 case SDL_ACTIVEEVENT:
+		case SDL_ACTIVEEVENT:
 			if (ConsolePopped) {
 				break;
 			}
@@ -576,7 +578,7 @@ int SDLVideoDriver::PollEvents() {
 		// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			numFingers = event.mgesture.numFingers;
 			/*
-			 // perhapps formation rotation should be implemented here as a rotate gesture.
+			// perhaps formation rotation should be implemented here as a rotate gesture.
 			if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && numFingers == 2) {
 			}
 			*/
@@ -631,8 +633,8 @@ int SDLVideoDriver::PollEvents() {
 	}
 	int x, y;
 	if (Evnt && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
-			 && lastevent && time>lastmousetime
-			 && SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT)) {
+			&& lastevent && time>lastmousetime
+			&& SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT)) {
 		lastmousetime=time+Evnt->GetRKDelay();
 		if (!ConsolePopped)
 			Evnt->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
@@ -707,8 +709,7 @@ void SDLVideoDriver::DestroySpriteCover(SpriteCover* sc)
 // flags: 0 - never dither (full cover)
 //	1 - dither if polygon wants it
 //	2 - always dither
-void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
-											 Wall_Polygon* poly)
+void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly)
 {
 
 	// possible TODO: change the cover to use a set of intervals per line?
@@ -720,7 +721,7 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 
 	std::list<Trapezoid>::iterator iter;
 	for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
-		 ++iter)
+		++iter)
 	{
 		int y_top = iter->y1 - yoff; // inclusive
 		int y_bot = iter->y2 - yoff; // exclusive
@@ -807,9 +808,9 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 }
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
-					 const unsigned char* pixeldata,
-					 AnimationFactory* datasrc,
-					 Palette* palette, int transindex)
+				const unsigned char* pixeldata,
+				AnimationFactory* datasrc,
+				Palette* palette, int transindex)
 {
 	Sprite2D_BAM_Internal* data = new Sprite2D_BAM_Internal;
 
@@ -866,7 +867,7 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 		SDL_LockSurface( tmp );
 		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
 		dest = CreateSprite8(sprite->Width, sprite->Height, 8,
-							 newpixels, tmp->format->palette->colors, true, 0);
+						newpixels, tmp->format->palette->colors, true, 0);
 		SDL_UnlockSurface( tmp );
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*) sprite->vptr;
@@ -2363,7 +2364,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 		SDL_LockSurface(backBuf);
 		std::list<Trapezoid>::iterator iter;
 		for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
-			 ++iter)
+			++iter)
 		{
 			int y_top = iter->y1 - Viewport.y; // inclusive
 			int y_bot = iter->y2 - Viewport.y; // exclusive
@@ -2435,9 +2436,10 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 /** Send a Quit Signal to the Event Queue */
 bool SDLVideoDriver::Quit()
 {
-	SDL_Event evnt = {};
-	evnt.type = SDL_QUIT;
-	if (SDL_PushEvent( &evnt ) == -1) {
+	SDL_Event evtQuit = SDL_Event();
+
+	evtQuit.type = SDL_QUIT;
+	if (SDL_PushEvent( &evtQuit ) == -1) {
 		return false;
 	}
 	return true;
@@ -2611,14 +2613,15 @@ void SDLVideoDriver::ClickMouse(unsigned int button)
 
 void SDLVideoDriver::MouseClickEvent(SDL_EventType type, Uint8 button)
 {
-	SDL_Event *event = new SDL_Event();
-	event->type = type;
-	event->button.type = type;
-	event->button.button = button;
-	event->button.state = (type==SDL_MOUSEBUTTONDOWN)?SDL_PRESSED:SDL_RELEASED;
-	event->button.x = CursorPos.x;
-	event->button.y = CursorPos.y;
-	SDL_PushEvent(event);
+	SDL_Event evtClick = SDL_Event();
+
+	evtClick.type = type;
+	evtClick.button.type = type;
+	evtClick.button.button = button;
+	evtClick.button.state = (type==SDL_MOUSEBUTTONDOWN)?SDL_PRESSED:SDL_RELEASED;
+	evtClick.button.x = CursorPos.x;
+	evtClick.button.y = CursorPos.y;
+	SDL_PushEvent(&evtClick);
 }
 
 void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
@@ -2731,7 +2734,7 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	//Maybe we don't need this?
 	//SDL_Flip( disp );
 }
-	
+
 int SDLVideoDriver::PollMovieEvents()
 {
 	SDL_Event event;
@@ -2780,7 +2783,7 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		// FIXME: ugly hack!
 		SDL_Surface* temp = backBuf;
 		backBuf = disp;
-		
+
 		//FYI: that 0 is pitch black
 		//SDL_FillRect(disp, &subtitleregion_sdl, 0);
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
