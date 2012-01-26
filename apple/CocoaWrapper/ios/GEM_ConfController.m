@@ -334,7 +334,12 @@ enum ConfigTableSection {
 		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
 		[newConfig appendFormat:@"\nSavePath = %@/", savePath];
 
-		if ([[archivePath pathExtension] caseInsensitiveCompare:@"BG1"] != NSOrderedSame) {
+		NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
+		if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
+			// PST & BG1 & IWD are 640x480 without mod
+			[newConfig appendString:@"\nWidth = 640"];
+			[newConfig appendString:@"\nHeight = 480"];
+		} else {
 			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 				[newConfig appendString:@"\nWidth = 1024"];
 				[newConfig appendString:@"\nHeight = 768"];
@@ -342,9 +347,6 @@ enum ConfigTableSection {
 				[newConfig appendString:@"\nWidth = 800"];
 				[newConfig appendString:@"\nHeight = 600"];
 			}
-		} else {
-			[newConfig appendString:@"\nWidth = 640"];
-			[newConfig appendString:@"\nHeight = 480"];
 		}
 
 		// MouseFeedback = 3 hides cursor and tooltips
