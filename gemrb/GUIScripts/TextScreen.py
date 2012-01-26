@@ -116,7 +116,8 @@ def StartTextScreen ():
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
-	TextScreen.SetVisible (WINDOW_VISIBLE)
+	#TextScreen.SetVisible (WINDOW_VISIBLE)
+	TextScreen.ShowModal(MODAL_SHADOW_BLACK)
 
 	TextArea.Rewind (Ticks)
 	GemRB.DisplayString (17556, 0xff0000) #Paused for chapter text
