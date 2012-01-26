@@ -2630,7 +2630,7 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
 		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
 	}
-	if (SDL_LockSurface( disp )) {
+	if (SDL_LockSurface( disp ) == 0) {
 		memset( disp->pixels, 0,
 			disp->w * disp->h * disp->format->BytesPerPixel );
 		SDL_UnlockSurface( disp );
