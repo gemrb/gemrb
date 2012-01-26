@@ -160,17 +160,7 @@ def NextPress():
 	t = GemRB.Roll(a,b,c)*d+e
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, t)
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
-	TmpTable = GemRB.LoadTable ("ability")
-	AbilityCount = TmpTable.GetRowCount ()
-	for i in range (AbilityCount):
-		StatID=TmpTable.GetValue (i,4)
-		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
 
-#	TmpTable=GemRB.LoadTable ("weapprof")
-#	ProfCount = TmpTable.GetRowCount ()
-#	for i in range(ProfCount):
-#		StatID=TmpTable.GetValue (i, 0)
-#		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
 	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
@@ -179,18 +169,6 @@ def NextPress():
 	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
 	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
-	Str=GemRB.GetVar ("Ability 1")
-	GemRB.SetPlayerStat (MyChar, IE_STR, Str)
-	if Str==18:
-		GemRB.SetPlayerStat (MyChar,IE_STREXTRA,GemRB.GetVar ("StrExtra"))
-	else:
-		GemRB.SetPlayerStat (MyChar, IE_STREXTRA,0)
-
-	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability 2"))
-	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability 3"))
-	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability 4"))
-	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability 5"))
-	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability 6"))
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 
 	#setting skills

@@ -103,7 +103,7 @@ def OpenCustomizeWindow ():
 	CustomizeDoneButton.SetText (11973)
 	CustomizeDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 
-	CancelButton = CustomizeWindow.GetControl (8);
+	CancelButton = CustomizeWindow.GetControl (8)
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 

@@ -1,9 +1,9 @@
 2DA V1.0
 -1
              NAME_REF   DESC_REF   CAP_REF   STAT_ID
-STRENGTH     11975      9582       1145      36
-DEXTERITY    11977      9584       1151      40
-CONSTITUTION 11978      9583       1178      41
-INTELLIGENCE 11979      9585       1179      38
-WISDOM       11980      9586       1180      39
-CHARISMA     11981      9587       1181      42
+STRENGTH     11975      9582       1145      STR
+DEXTERITY    11977      9584       1151      DEX
+CONSTITUTION 11978      9583       1178      CON
+INTELLIGENCE 11979      9585       1179      INT
+WISDOM       11980      9586       1180      WIS
+CHARISMA     11981      9587       1181      CHR

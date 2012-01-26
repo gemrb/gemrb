@@ -597,18 +597,15 @@ def DisplaySkills (pc):
 	FeatName = GemRB.LoadTable ("feats")
 	rows = FeatTable.GetRowCount ()
 	#feats
-	featbits = [GemRB.GetPlayerStat (pc, IE_FEATS1), GemRB.GetPlayerStat (pc, IE_FEATS2), GemRB.GetPlayerStat (pc, IE_FEATS3)]
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
 	RecordsTextArea.Append (36361)
 	RecordsTextArea.Append ("[/color]\n")
 
 	feats = []
 	for i in range(rows):
-		featidx = i/32
-		pos = 1<<(i%32)
-		if featbits[featidx]&pos:
+		if GemRB.HasFeat(pc, i):
 			feat = FeatName.GetValue (i, 1)
-			stat = FeatTable.GetValue (i, 9, 2)
+			stat = FeatTable.GetValue (i, 0, 2)
 			if stat:
 				multi = GemRB.GetPlayerStat (pc, stat)
 				feats.append (GemRB.GetString(feat) + ": " + str(multi) + "\n")
