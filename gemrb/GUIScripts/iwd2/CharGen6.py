@@ -29,7 +29,6 @@ def OnLoad():
 	for i in range (AbilityCount):
 		StatID=TmpTable.GetValue (i,3,2)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
-		print "StatID:", StatID, " ", GemRB.GetPlayerStat(MyChar, StatID)
 
 	CharOverview.UpdateOverview(6)
 	return

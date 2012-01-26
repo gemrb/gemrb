@@ -7962,8 +7962,10 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	}
 	//this will trigger when pause is not 0 or 1
 	if ((unsigned int) pause > 1) {
+print("Toggle: %d\n", pause);
 		core->TogglePause();
 	} else {
+print("pausing :%d, quiet: %d\n", pause, quiet);
 		core->SetPause((PauseSetting)pause, (bool)quiet);
 	}
 

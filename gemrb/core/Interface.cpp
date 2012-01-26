@@ -5370,8 +5370,11 @@ PauseSetting Interface::TogglePause()
 bool Interface::SetPause(PauseSetting pause, bool quiet)
 {
 	GameControl *gc = GetGameControl();
-	if (gc && !InCutSceneMode()
-		   && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
+
+	//don't allow soft pause in cutscenes and dialog
+	if (!quiet && InCutSceneMode()) gc = NULL;
+
+	if (gc && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
 		int strref;
 		if (pause) {
 			strref = STR_PAUSED;
