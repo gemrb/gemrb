@@ -21,7 +21,8 @@
 #include <Python.h>
 
 #import "exports.h"
-#import "GEM_ConfController.h"
+
+#import "GEM_AppDelegate.h"
 
 extern int GemRB_main(int argc, char *argv[]);
 GEM_EXPORT
@@ -35,38 +36,21 @@ int SDL_main (int argc, char **argv)
 	//this mostly just supresses a benign console error
 	setenv("PYTHONHOME", "GUIScripts", 0);
 
-	UIWindow* win = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-	win.backgroundColor = [UIColor blackColor];
-	GEM_ConfController* confControl = [[GEM_ConfController alloc] init];
-	NSArray* nibObjects = nil;
-	// now load the config selector nib and display the list modally
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfController-ipad" owner:confControl options:nil];
-	} else {
-		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfController-iphone" owner:confControl options:nil];
-	}
+	GEM_AppDelegate* appDelegate = (GEM_AppDelegate*)[[UIApplication sharedApplication] delegate];
 
-	[nibObjects retain];
-	win.rootViewController = confControl.rootVC;
-	win.screen = [UIScreen mainScreen];
-	[win makeKeyAndVisible];
-	[confControl runModal]; //doesnt return until the user pushes 'Play'
-	const char* configPath = [[confControl selectedConfigPath] cStringUsingEncoding:NSASCIIStringEncoding];
-	if (configPath != NULL) {
-		NSLog(@"Using config file:%s", configPath);
+	NSString* configPath = [appDelegate runSetup]; //doesnt return until the user pushes 'Play'
+	const char* configCstrPath = [configPath cStringUsingEncoding:NSASCIIStringEncoding];
+	if (configCstrPath != NULL) {
+		NSLog(@"Using config file:%s", configCstrPath);
 		//manipulate argc & argv to have gemrb passed the argument for the config file to use.
 		argc += 2;
 		argv = realloc(argv, sizeof(char*) * argc);
 		argv[argc - 2] = "-c";
-		argv[argc - 1] = (char*)configPath;
+		argv[argc - 1] = (char*)configCstrPath;
 	}else{
 		//popup a message???
 	}
-	[win resignKeyWindow];
-	win.rootViewController = nil;
 
-	[win release];
-	[nibObjects release];
 	// pass control to GemRB
 	int ret = GemRB_main(argc, argv);
 	if (ret != 0) {

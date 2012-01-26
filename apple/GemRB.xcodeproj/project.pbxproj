@@ -345,6 +345,7 @@
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505314D0C12300D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505414D0C17500D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
+		A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */; };
 		A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */; };
 		A2E66350139E882900310FC8 /* Ambient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */; };
@@ -1442,6 +1443,8 @@
 		A2D4C52E13A978110086BCC4 /* StringMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringMap.h; sourceTree = "<group>"; };
 		A2D4C52F13A978110086BCC4 /* strrefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strrefs.h; sourceTree = "<group>"; };
 		A2D4C53013A978110086BCC4 /* win32def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32def.h; sourceTree = "<group>"; };
+		A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_AppDelegate.h; sourceTree = "<group>"; };
+		A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_AppDelegate.m; sourceTree = "<group>"; };
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2EC8058145F9E6E0033754A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805A1460556B0033754A /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
@@ -2487,6 +2490,8 @@
 				A2A3A7E014A5130F00F705CF /* GEM_ConfController.h */,
 				A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */,
 				A2A3A7E214A5130F00F705CF /* nibs */,
+				A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */,
+				A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */,
 			);
 			name = ios;
 			path = CocoaWrapper/ios;
@@ -4488,6 +4493,7 @@
 				A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */,
 				A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */,
 				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
+				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
