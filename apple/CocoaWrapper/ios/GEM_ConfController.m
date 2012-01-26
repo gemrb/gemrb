@@ -330,14 +330,7 @@ enum ConfigTableSection {
 	if (newConfig) {
 		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
 		[newConfig appendFormat:@"\nGamePath = %@", gamePath];
-		for (int i=1; i <= 6; i++){ //6 is the max number of CDs
-			NSString* cdPath = [NSString stringWithFormat:@"%@/CD%i/", gamePath, i];
-			BOOL isDir = NO;
-			[fm fileExistsAtPath:cdPath isDirectory:&isDir];
-			if (isDir) {
-				[newConfig appendFormat:@"\nCD%i = %@", i, cdPath];
-			}
-		}
+		// No need for CD paths
 		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
 		[newConfig appendFormat:@"\nSavePath = %@/", savePath];
 
