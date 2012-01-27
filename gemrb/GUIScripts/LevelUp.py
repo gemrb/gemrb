@@ -714,7 +714,7 @@ def ReactivateBaseClass ():
 			SpellTable = GemRB.LoadTable (SpellTables[1])
 			ClassMask = 0x4000
 		else: # druidic spells
-			if not GameRB.HasResource(SpellTables[0], RES_2DA):
+			if not GemRB.HasResource(SpellTables[0], RES_2DA):
 				SpellTables[0] = "MXSPLPRS"
 			SpellTable = GemRB.LoadTable (SpellTables[0])
 			ClassMask = 0x8000
