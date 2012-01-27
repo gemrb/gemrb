@@ -165,6 +165,15 @@ static int fx_jackalwere_gaze (Scriptable* Owner, Actor* target, Effect* fx); //
 //0x129 HideInShadows (same as bg2)
 static int fx_use_magic_device_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12a
 
+//iwd2 related, gemrb specific effects (IE. unhardcoded hacks)
+static int fx_animal_empathy_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12b
+static int fx_bluff_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12c
+static int fx_concentration_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12d
+static int fx_diplomacy_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12e
+static int fx_intimidate_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12f
+static int fx_search_modifier (Scriptable* Owner, Actor* target, Effect* fx);//130
+static int fx_spellcraft_modifier (Scriptable* Owner, Actor* target, Effect* fx);//131
+
 //iwd related, gemrb specific effects (IE. unhardcoded hacks)
 static int fx_alter_animation (Scriptable* Owner, Actor *target, Effect* fx); //399
 
@@ -214,7 +223,7 @@ static int fx_barbarian_rage (Scriptable* Owner, Actor* target, Effect* fx); //4
 static int fx_cleave (Scriptable* Owner, Actor* target, Effect* fx); //442
 static int fx_missile_damage_reduction (Scriptable* Owner, Actor* target, Effect* fx); //443
 static int fx_tenser_transformation (Scriptable* Owner, Actor* target, Effect* fx); //444
-//static int fx_445 (Scriptable* Owner, Actor* target, Effect* fx); //445 unused
+static int fx_slippery_mind (Scriptable* Owner, Actor* target, Effect* fx); //445
 static int fx_smite_evil (Scriptable* Owner, Actor* target, Effect* fx); //446
 static int fx_restoration (Scriptable* Owner, Actor* target, Effect* fx); //447
 static int fx_alicorn_lance (Scriptable* Owner, Actor* target, Effect* fx); //448
@@ -292,6 +301,14 @@ static EffectDesc effectnames[] = {
 	{ "HarpyWail", fx_harpy_wail, 0, -1 }, //126
 	{ "JackalWereGaze", fx_jackalwere_gaze, 0, -1 }, //127
 	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, 0, -1 }, //12a
+	//unhardcoded hacks for IWD2
+	{ "AnimalEmpathyModifier",  fx_animal_empathy_modifier, 0, -1 },//12b
+	{ "BluffModifier", fx_bluff_modifier, 0, -1 },//12c
+	{ "ConcentrationModifier", fx_concentration_modifier, 0, -1 },//12d
+	{ "DiplomacyModifier", fx_diplomacy_modifier, 0, -1 },//12e
+	{ "IntimidateModifier", fx_intimidate_modifier, 0, -1 },//12f
+	{ "SearchModifier", fx_search_modifier, 0, -1 },//130
+	{ "SpellcraftModifier", fx_spellcraft_modifier, 0, -1 },//131
 	//unhardcoded hacks for IWD
 	{ "AlterAnimation", fx_alter_animation, EFFECT_NO_ACTOR, -1 }, //399
 	//iwd2 effects
@@ -336,6 +353,7 @@ static EffectDesc effectnames[] = {
 	{ "Cleave", fx_cleave, 0, -1 }, //442
 	{ "MissileDamageReduction", fx_missile_damage_reduction, 0, -1 }, //443
 	{ "TensersTransformation", fx_tenser_transformation, 0, -1 }, //444
+	{ "SlipperyMind", fx_slippery_mind, 0, -1 }, //445
 	{ "SmiteEvil", fx_smite_evil, 0, -1 }, //446
 	{ "Restoration", fx_restoration, 0, -1 }, //447
 	{ "AlicornLance", fx_alicorn_lance, 0, -1 }, //448
@@ -2045,6 +2063,10 @@ int fx_set_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2<11) {
 		EXTSTATE_SET(0x40000<<fx->Parameter2);
 	}
+	//maximized attacks active
+	if (fx->Parameter2==SS_KAI) {
+	  target->Modified[IE_DAMAGELUCK]=255;
+	}
 	return FX_APPLIED;
 }
 
@@ -2268,9 +2290,10 @@ int fx_use_magic_device_modifier (Scriptable* /*Owner*/, Actor* target, Effect* 
 //Create alternate cycles for the altered area object
 //Create a spell hit animation (optionally)
 //Create the effect which will contain the spell hit projectile and the cycle change command
+//0x18f AlterAnimation
 int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
-	if (0) print( "fx_alter_animation (%2d)\n", fx->Opcode);
+	if (0) print( "fx_alter_animation (%2d) Parameter: %d  Projectile: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	Map *map = Owner->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
@@ -2293,6 +2316,9 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 				case BM_SET:
 					an->sequence=value;
 					break;
+				case BM_AND:
+					an->sequence&=value;
+					break;
 				case BM_OR:
 					an->sequence|=value;
 					break;
@@ -2309,6 +2335,64 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
+
+//0x12b AnimalEmpathy (gemrb extension for iwd2)
+int fx_animal_empathy_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_animal_empathy_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_ANIMALS );
+	return FX_APPLIED;
+}
+
+//0x12c Bluff (gemrb extension for iwd2)
+int fx_bluff_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_bluff_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_BLUFF );
+	return FX_APPLIED;
+}
+
+//0x12d Concentration (gemrb extension for iwd2)
+int fx_concentration_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_concentration_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_CONCENTRATION );
+	return FX_APPLIED;
+}
+
+//0x12e Diplomacy (gemrb extension for iwd2)
+int fx_diplomacy_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_diplomacy_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_DIPLOMACY );
+	return FX_APPLIED;
+}
+
+//0x12f Intimidate (gemrb extension for iwd2)
+int fx_intimidate_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_intimidate_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_INTIMIDATE );
+	return FX_APPLIED;
+}
+
+//0x130 Search (gemrb extension for iwd2)
+int fx_search_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_search_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SEARCH );
+	return FX_APPLIED;
+}
+
+//0x131 Spellcraft (gemrb extension for iwd2)
+int fx_spellcraft_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_spellcraft_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SPELLCRAFT );
+	return FX_APPLIED;
+}
+
+//0x132 DamageLuck (gemrb extension for iwd2, implemented in base opcodes)
 
 //IWD2 effects
 
@@ -2504,6 +2588,17 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 	//prot from evil deflects it
 	if (target->fxqueue.HasEffect(fx_protection_from_evil_ref)) return FX_NOT_APPLIED;
 
+	//check for slippery mind feat success
+	Game *game = core->GetGame();
+	if (fx->FirstApply && target->HasFeat(FEAT_SLIPPERY_MIND)) {
+	  fx->Parameter3 = 1;
+	  fx->Parameter4 = game->GameTime+core->Time.round_size;
+	}
+
+	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
+	  fx->Parameter3 = 0;
+	  if (target->GetSavingThrow(IE_SAVEVSSPELL,0) ) return FX_NOT_APPLIED;
+	}
 	if (0) print( "fx_control (%2d)\n", fx->Opcode);
 	bool enemyally = true;
 	if (Owner->Type==ST_ACTOR) {
@@ -2516,8 +2611,7 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 		displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
 		break;
 	case 1:
-		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target)
-;
+		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
 		break;
 	default:
 		displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
@@ -3171,7 +3265,14 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//445 Unknown (empty function in iwd2)
+//445 SlipperyMind (the original removed charm when the effect itself was about to be removed)
+static EffectRef fx_charm_ref = { "Charm", -1 };
+
+int fx_slippery_mind (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	target->fxqueue.RemoveAllEffects(fx_charm_ref);
+	return FX_NOT_APPLIED;
+}
 
 //446 SmiteEvil
 int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
