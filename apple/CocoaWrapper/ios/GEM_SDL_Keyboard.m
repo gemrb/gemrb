@@ -22,7 +22,7 @@
 #import <SDL.h>
 #import <UIKit/UIKit.h>
 
-#include "SDL_uikitkeyboard.h"
+#include <SDL/SDL_keyboard_c.h>
 
 #pragma mark UIKit button subclasses
 @interface GEM_UIKit_RoundedButton : UIButton

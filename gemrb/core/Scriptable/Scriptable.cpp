@@ -97,6 +97,9 @@ Scriptable::Scriptable(ScriptableType type)
 	Dialog[0] = 0;
 
 	globalID = ++globalActorCounter;
+	if (globalActorCounter == 0) {
+		error("Scriptable", "GlobalID overflowed, quitting due to too many actors.");
+	}
 
 	WaitCounter = 0;
 	if (Type == ST_ACTOR) {

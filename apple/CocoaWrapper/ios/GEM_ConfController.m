@@ -53,6 +53,7 @@ enum ConfigTableSection {
 @synthesize rootVC;
 @synthesize editorVC;
 @synthesize playButton;
+@synthesize delegate;
 
 - (id)init
 {
@@ -60,8 +61,6 @@ enum ConfigTableSection {
     if (self) {
 		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
 		docDir = [[paths objectAtIndex:0] copy]; 
-
-		finished = NO;
 
 		configFiles = nil;
 		installFiles = nil;
@@ -145,20 +144,9 @@ enum ConfigTableSection {
 	[toolBarItems release];
 }
 
-- (void)runModal
+- (void)navigationController:(UINavigationController *) __unused navigationController willShowViewController:(UIViewController *) __unused viewController animated:(BOOL) __unused animated
 {
 	rootVC.topViewController.toolbarItems = toolBarItems;
-	while (!finished) {
-		// for some reason the runloop magically returns
-		// after scrolling a scroll view
-		// so we need to restart it
-		CFRunLoopRun();
-	}
-}
-
-- (void)updateProgressView:(UIProgressView*)pv
-{
-	[pv setNeedsDisplay];
 }
 
 - (NSString*)selectedConfigPath
@@ -188,7 +176,9 @@ enum ConfigTableSection {
 	UIProgressView* pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
 	UIView* contentView = selectedCell.contentView;
 	CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
-	pv.frame = frame;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		pv.frame = frame;
+	});
 	[contentView addSubview:pv];
 
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
@@ -237,7 +227,6 @@ enum ConfigTableSection {
 		} else if ([tmp rangeOfString:installName].location != 0) {
 			archiveHasRootDir = NO;
 		}
-		NSLog(@"unarchiving %s", archive_entry_pathname(entry));
 
 		if (r != ARCHIVE_OK) {
 			NSLog(@"error reading archive (%i):%s", r, archive_error_string(a));
@@ -265,8 +254,10 @@ enum ConfigTableSection {
 					break;
 				}
 			}
-			pv.progress = (float)((double)progressSize / (double)totalBytes);
-			[self performSelectorOnMainThread:@selector(updateProgressView:) withObject:pv waitUntilDone:NO];
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+				pv.progress = (float)((double)progressSize / (double)totalBytes);
+			});
 		}
 	}
 	archive_read_close(a);
@@ -437,6 +428,7 @@ enum ConfigTableSection {
 {
 	switch (indexPath.section) {
 		case TABLE_SEC_CONFIG:
+			[editor resignFirstResponder];
 			[tableView cellForRowAtIndexPath:configIndexPath].accessoryType = UITableViewCellAccessoryNone;
 			playButton.enabled = NO;
 			editorButton.enabled = NO;
@@ -460,6 +452,10 @@ enum ConfigTableSection {
 
 			self.configIndexPath = indexPath;
 			self.editor.text = [NSString stringWithContentsOfFile:[self selectedConfigPath] encoding:NSUTF8StringEncoding error:nil];
+			if (![editor becomeFirstResponder]){
+				NSLog(@"cannot set first responder");
+			}
+
 			editor.editable = YES;
 			editorButton.enabled = YES;
 			playButton.enabled = YES;
@@ -531,8 +527,7 @@ enum ConfigTableSection {
 
 - (IBAction)launchGEM:(id) __unused sender
 {
-	finished = YES;
-	CFRunLoopStop(CFRunLoopGetCurrent());
+	[[self delegate] setupComplete:[self selectedConfigPath]];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView

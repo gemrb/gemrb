@@ -20,15 +20,18 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol GEM_ConfControllerDelegate
+- (void)setupComplete:(NSString*)configPath;
+@end
+
 @interface GEM_NavController : UINavigationController {
 @private
 }
 @end
 
-@interface GEM_ConfController : NSObject
+@interface GEM_ConfController : NSObject <UINavigationControllerDelegate>
 {
 	@private
-	BOOL finished;
 	
 	NSString* docDir;
 	NSArray* configFiles;
@@ -52,12 +55,12 @@
 @property (nonatomic, retain) IBOutlet UITableView* controlTable;
 @property (nonatomic, retain) NSIndexPath* configIndexPath;
 @property (nonatomic, retain) IBOutlet UITextView* editor;
-@property (nonatomic, retain) IBOutlet UIViewController* rootVC;
+@property (nonatomic, retain) IBOutlet UINavigationController* rootVC;
 @property (nonatomic, retain) IBOutlet UIViewController* editorVC;
 @property (nonatomic, retain) IBOutlet UIBarButtonItem* playButton;
+@property (nonatomic, retain) id delegate;
 
 - (void)reloadTableData;
-- (void)runModal;
 - (NSString*)selectedConfigPath;
 - (BOOL)installGame:(NSIndexPath*)indexPath;
 
@@ -70,4 +73,6 @@
 
 - (IBAction)saveConfig:(id)sender;
 - (IBAction)launchGEM:(id)sender;
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated;
 @end
