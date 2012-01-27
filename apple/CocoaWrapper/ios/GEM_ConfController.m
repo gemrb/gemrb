@@ -237,7 +237,6 @@ enum ConfigTableSection {
 		} else if ([tmp rangeOfString:installName].location != 0) {
 			archiveHasRootDir = NO;
 		}
-		NSLog(@"unarchiving %s", archive_entry_pathname(entry));
 
 		if (r != ARCHIVE_OK) {
 			NSLog(@"error reading archive (%i):%s", r, archive_error_string(a));
