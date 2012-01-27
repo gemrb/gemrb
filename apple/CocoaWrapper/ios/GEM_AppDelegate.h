@@ -28,16 +28,15 @@
 + (NSString *)getAppDelegateClassName; //override this SDL method so an instance of our subclass is used
 @end
 
-@interface GEM_AppDelegate : SDLUIKitDelegate
+@interface GEM_AppDelegate : SDLUIKitDelegate <GEM_ConfControllerDelegate>
 {
 	GEM_ConfController* confControl;
 
 	UIWindow* configWin;
 	NSArray* nibObjects;
 }
-@property(readonly) GEM_ConfController* confController;
+@property(readonly) GEM_ConfController* confControl;
 
-// runs the wrapper and returns the sresulting config path
-- (NSString*)runSetup;
+- (void)runGemRB:(NSString*)configPath;
 
 @end

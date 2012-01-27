@@ -53,6 +53,7 @@ enum ConfigTableSection {
 @synthesize rootVC;
 @synthesize editorVC;
 @synthesize playButton;
+@synthesize delegate;
 
 - (id)init
 {
@@ -60,8 +61,6 @@ enum ConfigTableSection {
     if (self) {
 		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
 		docDir = [[paths objectAtIndex:0] copy]; 
-
-		finished = NO;
 
 		configFiles = nil;
 		installFiles = nil;
@@ -145,15 +144,9 @@ enum ConfigTableSection {
 	[toolBarItems release];
 }
 
-- (void)runModal
+- (void)navigationController:(UINavigationController *) __unused navigationController willShowViewController:(UIViewController *) __unused viewController animated:(BOOL) __unused animated
 {
 	rootVC.topViewController.toolbarItems = toolBarItems;
-	while (!finished) {
-		// for some reason the runloop magically returns
-		// after scrolling a scroll view
-		// so we need to restart it
-		CFRunLoopRun();
-	}
 }
 
 - (NSString*)selectedConfigPath
@@ -435,6 +428,7 @@ enum ConfigTableSection {
 {
 	switch (indexPath.section) {
 		case TABLE_SEC_CONFIG:
+			[editor resignFirstResponder];
 			[tableView cellForRowAtIndexPath:configIndexPath].accessoryType = UITableViewCellAccessoryNone;
 			playButton.enabled = NO;
 			editorButton.enabled = NO;
@@ -458,6 +452,10 @@ enum ConfigTableSection {
 
 			self.configIndexPath = indexPath;
 			self.editor.text = [NSString stringWithContentsOfFile:[self selectedConfigPath] encoding:NSUTF8StringEncoding error:nil];
+			if (![editor becomeFirstResponder]){
+				NSLog(@"cannot set first responder");
+			}
+
 			editor.editable = YES;
 			editorButton.enabled = YES;
 			playButton.enabled = YES;
@@ -529,8 +527,7 @@ enum ConfigTableSection {
 
 - (IBAction)launchGEM:(id) __unused sender
 {
-	finished = YES;
-	CFRunLoopStop(CFRunLoopGetCurrent());
+	[[self delegate] setupComplete:[self selectedConfigPath]];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView

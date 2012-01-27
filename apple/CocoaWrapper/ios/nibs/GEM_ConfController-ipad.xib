@@ -131,7 +131,7 @@
 									<bool key="IBUIClipsSubviews">YES</bool>
 									<bool key="IBUIMultipleTouchEnabled">YES</bool>
 									<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-									<bool key="IBUIBounces">NO</bool>
+									<bool key="IBUIAlwaysBounceVertical">YES</bool>
 									<bool key="IBUIEditable">NO</bool>
 									<object class="NSMutableString" key="IBUIText">
 										<bytes key="NS.bytes">V2VsY29tZSB0byBHZW1SQiBmb3IgaU9TLgoKSG93IHRvIGxvYWQgZ2FtZXM6CnNpbXBseSB6aXAgeW91
@@ -403,7 +403,7 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 						<string key="editor">UITextView</string>
 						<string key="editorVC">UIViewController</string>
 						<string key="playButton">UIBarButtonItem</string>
-						<string key="rootVC">UIViewController</string>
+						<string key="rootVC">UINavigationController</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<object class="IBToOneOutletInfo" key="controlTable">
@@ -424,7 +424,7 @@ aW5nIHRvIHVzZSBpdCBXSUxMIHJlc3VsdCBpbiBhIGNyYXNoIQ</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="rootVC">
 							<string key="name">rootVC</string>
-							<string key="candidateClassName">UIViewController</string>
+							<string key="candidateClassName">UINavigationController</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">

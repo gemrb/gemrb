@@ -20,6 +20,10 @@
 
 #import "GEM_AppDelegate.h"
 
+#import "exports.h"
+extern int GemRB_main(int argc, char *argv[]);
+GEM_EXPORT
+
 @implementation SDLUIKitDelegate (GemDelegate)
 + (NSString *)getAppDelegateClassName
 {
@@ -29,7 +33,7 @@
 @end
 
 @implementation GEM_AppDelegate
-@synthesize confController;
+@synthesize confControl;
 
 // we MUST setup out wrapper interface here or iOS 5 will bitch about root view controller not being set
 // and our interface will be the wrong orientation and distorted
@@ -39,6 +43,7 @@
 	configWin = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 	configWin.backgroundColor = [UIColor blackColor];
 	confControl = [[GEM_ConfController alloc] init];
+	confControl.delegate = self;
 	nibObjects = nil;
 	// now load the config selector nib and display the list modally
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -46,6 +51,8 @@
 	} else {
 		nibObjects = [[NSBundle mainBundle] loadNibNamed:@"GEM_ConfController-iphone" owner:confControl options:nil];
 	}
+
+	confControl.rootVC.delegate = confControl;
 
 	[nibObjects retain];
 	configWin.rootViewController = confControl.rootVC;
@@ -55,17 +62,57 @@
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
-- (NSString*)runSetup
+- (void)setupComplete:(NSString*)configPath
 {
-	[confControl runModal];
+	[self runGemRB:configPath];
+}
 
-	[configWin resignKeyWindow];
-	configWin.rootViewController = nil;
+- (void)runGemRB:(NSString*)configPath
+{
+	int ret = 0;
+	if (configPath) {
+		NSLog(@"Using config file:%@", configPath);
+		// get argv
+		// manipulate argc & argv to have gemrb passed the argument for the config file to use.
+		NSMutableArray* procArguments = [[[NSProcessInfo processInfo] arguments] mutableCopy];
+		[procArguments addObject:@"-c"];
+		[procArguments addObject:configPath];
 
-	[configWin release];
-	[nibObjects release];
+		int argc = [procArguments count];
+		char** argv = malloc(argc * sizeof(char*));
 
-	return [confControl selectedConfigPath];
+		int i = 0;
+		for (NSString* arg in procArguments) {
+			argv[i++] = (char*)[arg cStringUsingEncoding:NSASCIIStringEncoding];
+		}
+
+		[configWin resignKeyWindow];
+		configWin.rootViewController = nil;
+
+		[configWin release];
+		[nibObjects release];
+
+		// pass control to GemRB
+		[procArguments release];
+		ret = GemRB_main(argc, argv);
+		free(argv);
+	}
+	if (ret != 0) {
+		// put up a message letting the user know something failed.
+		UIAlertView *alert =
+		[[UIAlertView alloc] initWithTitle: @"Engine Initialization Failure."
+								   message: @"Check the log for causes."
+								  delegate: nil
+						 cancelButtonTitle: @"OK"
+						 otherButtonTitles: nil];
+		[alert show];
+		while (alert.visible) {
+			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+		}
+		[alert release];
+	}
+	// We must exit since the application runloop never returns.
+	exit(ret);
 }
 
 @end

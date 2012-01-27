@@ -20,56 +20,31 @@
 
 #include <Python.h>
 
-#import "exports.h"
-
 #import "GEM_AppDelegate.h"
 
-extern int GemRB_main(int argc, char *argv[]);
-GEM_EXPORT
 extern int SDL_main(int argc, char *argv[]);
 
 // use the SDL 1.3 build in wrapper for iOS
-int SDL_main (int argc, char **argv)
+int SDL_main (int __unused argc, char __unused **argv)
 {
+	/*
+	 Consideration: we are currently getting argv and argc from cocoa process info and not using the ones passed here (they of course ought to be the same)
+	*/
+
+
+	/*
+	 Beware!: This relies on haveing a certain revision of SDL 1.3 or later.
+	 Early revisions of 1.3 would call exit() when this method returns instad of leaving the runloop running for us.
+	 GemRB used to hack its own runloop to workaround the issue, but that caused problems with the config editor
+	 Now that SDL no longer exits and we are creating our own app delegate we can safely use this wrapper without hacks.
+
+	 Also note this function never returns. exit is called after GemRB_main returns in the app delegate.
+	*/
+
 	//do all the special plugin initializations here
 	Py_NoSiteFlag = 1;
 	//this mostly just supresses a benign console error
 	setenv("PYTHONHOME", "GUIScripts", 0);
 
-	GEM_AppDelegate* appDelegate = (GEM_AppDelegate*)[[UIApplication sharedApplication] delegate];
-
-	NSString* configPath = [appDelegate runSetup]; //doesnt return until the user pushes 'Play'
-	const char* configCstrPath = [configPath cStringUsingEncoding:NSASCIIStringEncoding];
-	if (configCstrPath != NULL) {
-		NSLog(@"Using config file:%s", configCstrPath);
-		//manipulate argc & argv to have gemrb passed the argument for the config file to use.
-		argc += 2;
-		argv = realloc(argv, sizeof(char*) * argc);
-		argv[argc - 2] = "-c";
-		argv[argc - 1] = (char*)configCstrPath;
-	}else{
-		//popup a message???
-	}
-
-	// pass control to GemRB
-	int ret = GemRB_main(argc, argv);
-	if (ret != 0) {
-		// TODO: inject into error() function instead and rewrite the core to always use error instead of returning.
-
-		// put up a message letting the user know something failed.
-		UIAlertView *alert = 
-        [[UIAlertView alloc] initWithTitle: @"Engine Initialization Failure."
-								   message: @"Check the log for causes."
-								  delegate: nil
-						 cancelButtonTitle: @"OK"
-						 otherButtonTitles: nil];
-		[alert show];
-		while (alert.visible) {
-			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-		}
-		[alert release];
-	}
-	// FIXME: temporary hack to terminate because an update to libSDL makes returning fall into an infinate loop
-	exit(ret);
-    //return ret;
+	return 0; //never actually returns.
 }
