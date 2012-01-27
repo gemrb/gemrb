@@ -156,11 +156,6 @@ enum ConfigTableSection {
 	}
 }
 
-- (void)updateProgressView:(UIProgressView*)pv
-{
-	[pv setNeedsDisplay];
-}
-
 - (NSString*)selectedConfigPath
 {
 	if (!configIndexPath) return nil; 
@@ -188,7 +183,9 @@ enum ConfigTableSection {
 	UIProgressView* pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
 	UIView* contentView = selectedCell.contentView;
 	CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
-	pv.frame = frame;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		pv.frame = frame;
+	});
 	[contentView addSubview:pv];
 
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
@@ -264,8 +261,10 @@ enum ConfigTableSection {
 					break;
 				}
 			}
-			pv.progress = (float)((double)progressSize / (double)totalBytes);
-			[self performSelectorOnMainThread:@selector(updateProgressView:) withObject:pv waitUntilDone:NO];
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+				pv.progress = (float)((double)progressSize / (double)totalBytes);
+			});
 		}
 	}
 	archive_read_close(a);
