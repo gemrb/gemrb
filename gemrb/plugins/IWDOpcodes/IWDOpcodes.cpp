@@ -3270,6 +3270,7 @@ static EffectRef fx_charm_ref = { "Charm", -1 };
 
 int fx_slippery_mind (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+	if (0) print( "fx_slippery_mind (%2d)\n", fx->Opcode);
 	target->fxqueue.RemoveAllEffects(fx_charm_ref);
 	return FX_NOT_APPLIED;
 }
