@@ -6301,7 +6301,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 }
 
 //addfeat will be able to remove feats too
-//(the second int parameter is a bitmode)
+//(the second int parameter is a value to add to the feat)
 void GameScript::AddFeat(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -6309,7 +6309,13 @@ void GameScript::AddFeat(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *)tar;
-	actor->SetFeat(parameters->int0Parameter, parameters->int1Parameter);
+	//value to add to the feat
+	int value = parameters->int1Parameter;
+	//default is increase by 1
+	if (!value) value = 1;
+	value += actor->GetFeat(parameters->int0Parameter);
+	//SetFeatValue will handle edges
+	actor->SetFeatValue(parameters->int0Parameter, value);
 }
 
 void GameScript::MatchHP(Scriptable* Sender, Action* parameters)

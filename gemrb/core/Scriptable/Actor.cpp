@@ -185,6 +185,8 @@ static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8,
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
 };
+static ieByte featmax[MAX_FEATS]={0
+};
 
 //holds the wspecial table for weapon prof bonuses
 #define WSPECIAL_COLS 3
@@ -1726,17 +1728,20 @@ static void InitActorTables()
 
 	tm.load("featreq");
 	if (tm) {
-		unsigned int tmp;
+		unsigned int stat, max;
 
 		for(i=0;i<MAX_FEATS;i++) {
 			//we need the MULTIPLE column only
 			//it stores the FEAT_* stat index, and could be taken multiple
 			//times
-			tmp = core->TranslateStat(tm->QueryField(i,0));
-			if (tmp>=MAX_STATS) {
+			stat = core->TranslateStat(tm->QueryField(i,0));
+			if (stat>=MAX_STATS) {
 				printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
 			}
-			featstats[i] = (ieByte) tmp;
+	    max = atoi(tm->QueryField(i,1));
+	    if (stat && max<1) max=1;
+			featstats[i] = (ieByte) stat;
+	    featmax[i] = (ieByte) max;
 		}
 	}
 
@@ -7048,6 +7053,14 @@ void Actor::SetFeat(unsigned int feat, int mode)
 
 void Actor::SetFeatValue(unsigned int feat, int value)
 {
+	if (feat>=MAX_FEATS) {
+	  return;
+	}
+
+	//handle maximum and minimum values
+	if (value<0) value = 0;
+	else if (value>featmax[feat]) value = featmax[feat];
+
 	if (value) {
 		SetFeat(feat, BM_OR);
 		if (featstats[feat]) SetBase(featstats[feat], value);
