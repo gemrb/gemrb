@@ -80,6 +80,9 @@ static Trigger *Enemy = NULL;
 #define PI_TORTOISE     125
 
 #define PI_BLINK        130
+
+#define PI_HEROIC       138
+
 #define PI_EMPTYBODY    145
 
 //These settings are saved in the V2.2 chr struct in IWD2
@@ -173,6 +176,7 @@ static int fx_diplomacy_modifier (Scriptable* Owner, Actor* target, Effect* fx);
 static int fx_intimidate_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12f
 static int fx_search_modifier (Scriptable* Owner, Actor* target, Effect* fx);//130
 static int fx_spellcraft_modifier (Scriptable* Owner, Actor* target, Effect* fx);//131
+//0x132 CriticalHitModifier (same as bg2, needed for improved criticals)
 
 //iwd related, gemrb specific effects (IE. unhardcoded hacks)
 static int fx_alter_animation (Scriptable* Owner, Actor *target, Effect* fx); //399
@@ -2065,7 +2069,7 @@ int fx_set_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//maximized attacks active
 	if (fx->Parameter2==SS_KAI) {
-	  target->Modified[IE_DAMAGELUCK]=255;
+		target->Modified[IE_DAMAGELUCK]=255;
 	}
 	return FX_APPLIED;
 }
@@ -2591,13 +2595,13 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 	//check for slippery mind feat success
 	Game *game = core->GetGame();
 	if (fx->FirstApply && target->HasFeat(FEAT_SLIPPERY_MIND)) {
-	  fx->Parameter3 = 1;
-	  fx->Parameter4 = game->GameTime+core->Time.round_size;
+		fx->Parameter3 = 1;
+		fx->Parameter4 = game->GameTime+core->Time.round_size;
 	}
 
 	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
-	  fx->Parameter3 = 0;
-	  if (target->GetSavingThrow(IE_SAVEVSSPELL,0) ) return FX_NOT_APPLIED;
+		fx->Parameter3 = 0;
+		if (target->GetSavingThrow(IE_SAVEVSSPELL,0) ) return FX_NOT_APPLIED;
 	}
 	if (0) print( "fx_control (%2d)\n", fx->Opcode);
 	bool enemyally = true;
@@ -3158,6 +3162,16 @@ int fx_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_disguise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_disguise (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
+	if (fx->Parameter1) {
+		//
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+			BASE_SET(IE_ANIMATION_ID, fx->Parameter1);
+		} else {
+			STAT_SET(IE_ANIMATION_ID, fx->Parameter1);
+		}
+		return FX_PERMANENT;
+	}
+
 	ieDword anim = BASE_GET(IE_ANIMATION_ID);
 	if (anim>=0x6000 || anim<=0x6fff) {
 		STAT_SET(IE_ANIMATION_ID, anim&0x600f);
@@ -3177,6 +3191,12 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_heroic_inspiration (%2d)\n", fx->Opcode);
 
+	if (target->GetSafeStat(IE_HITPOINTS)*2>=target->GetSafeStat(IE_MAXHITPOINTS)) return FX_APPLIED;
+
+	target->AddPortraitIcon(PI_HEROIC);
+	//+1 bab and damage
+	STAT_ADD( IE_DAMAGEBONUS, 1);
+	STAT_ADD( IE_HITBONUS, 1);
 	//+1 to all saves
 	STAT_ADD( IE_SAVEFORTITUDE, 1);
 	STAT_ADD( IE_SAVEREFLEX, 1);
