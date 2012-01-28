@@ -224,6 +224,7 @@ struct WeaponInfo {
 	ieDword prof;
 	bool backstabbing;
 	ieDword wflags;
+	int critmulti; //critical hit multiplier (usually 2)
 };
 
 extern void ReleaseMemoryActor();
