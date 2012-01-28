@@ -17,12 +17,6 @@
 # Enable all gui enhancements ? [Boolean]
 GUIEnhancements = 1
 
-# CustomFontPath. [String]
-# Path to the directory containing the fonts you wish to use.
-# Edit fonts.2da to map your font to the IE ResRefs
-
-#CustomFontPath = ../Library/Fonts/
-
 #####################################################
 #  Debug                                            #
 #####################################################
@@ -51,21 +45,21 @@ UseSoftKeyboard=1
 #TouchScrollAreas=1
 
 #####################################################
-#  Mouse Feedback		                    #
-#  Hide mouse+tooltips = 0			    #
-#  Show mouse 	       = 1			    #
-#  Show tooltips       = 2			    #
-#  Show mouse+tooltips = 3			    #
-#  !!! DO NOT set this higher than 3 !!!	    #
+#  MouseFeedback		                    #
+#  Bitfield with reserved bits for disabling        #
+#  the mouse. Those bits cannot be set via config   #
+#                                                   #
+#  Show mouse+tooltips = 0			    #
+#  Hide mouse 	       = 1			    #
+#  Hide tooltips       = 2			    #
+#  Hide mouse+tooltips = 3			    #
 #####################################################
 
 # For a strictly touchscreen device we recommend
-# Changing this to 0.
-# Touch input (requires SDL 1.3+) will automatically 
-# toggle cursor visibility on finger up/down,
-# effectively overriding the cursor visibility setting
+# Changing this to 3.
 
-MouseFeedback=0
+# default is 0
+MouseFeedback=3
 
 #####################################################
 #  Touch Gesture Input Parameters                   #
