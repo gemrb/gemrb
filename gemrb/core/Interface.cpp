@@ -158,6 +158,7 @@ Interface::Interface(int iargc, char* iargv[])
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
+	itemtypedata = NULL;
 
 	ModalWindow = NULL;
 	tooltip_x = 0;
@@ -379,6 +380,7 @@ Interface::~Interface(void)
 
 	free( slottypes );
 	free( slotmatrix );
+	free( itemtypedata );
 
 	delete sgiterator;
 
@@ -4195,9 +4197,15 @@ GameControl *Interface::GetGameControl() const
 
 bool Interface::InitItemTypes()
 {
+	int i;
+
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
+	if (itemtypedata) {
+		free(itemtypedata);
+	}
+
 	AutoTable it("itemtype");
 	ItemTypes = 0;
 	if (it) {
@@ -4211,7 +4219,7 @@ bool Interface::InitItemTypes()
 		}
 		//make sure unsigned int is 32 bits
 		slotmatrix = (ieDword *) malloc(ItemTypes * sizeof(ieDword) );
-		for (int i=0;i<ItemTypes;i++) {
+		for (i=0;i<ItemTypes;i++) {
 			unsigned int value = 0;
 			unsigned int k = 1;
 			for (int j=0;j<InvSlotTypes;j++) {
@@ -4222,6 +4230,26 @@ bool Interface::InitItemTypes()
 			}
 			//we let any items in the inventory
 			slotmatrix[i] = (ieDword) value | SLOT_INVENTORY;
+		}
+	}
+
+	//itemtype data stores armor failure and critical damage multipliers
+	itemtypedata = (ieDword *) calloc(ItemTypes, sizeof(ieDword) );
+
+	//default values in case itemdata is missing (it is needed only for iwd2)
+	for (i=0;i<ItemTypes;i++) {
+		if (slotmatrix[i] & SLOT_WEAPON) {
+		  itemtypedata[i]=2;
+		}
+	}
+	AutoTable af("itemdata");
+	if (af) {
+		int armcount = af->GetRowCount();
+		for (i = 0; i < armcount; i++) {
+			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
+		  if (itemtype<ItemTypes) {
+				itemtypedata[itemtype] = (ieWord) atoi( af->QueryField(i,1) );
+		  }
 		}
 	}
 
@@ -4356,6 +4384,24 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 		return "";
 	}
 	return slottypes[idx].slotresref;
+}
+
+int Interface::GetArmorFailure(unsigned int itemtype) const
+{
+	if (itemtype>=(unsigned int) ItemTypes) {
+		return 0;
+	}
+	if (slotmatrix[itemtype]&SLOT_WEAPON) return 0;
+	return itemtypedata[itemtype];
+}
+
+int Interface::GetCriticalMultiplier(unsigned int itemtype) const
+{
+	if (itemtype>=(unsigned int) ItemTypes) {
+		return 0;
+	}
+	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype];
+	return 0;
 }
 
 // checks the itemtype vs. slottype, and also checks the usability flags

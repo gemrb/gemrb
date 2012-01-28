@@ -137,14 +137,7 @@ static const char *skillcolumns[12]={
 	"LAYHANDS", "TURNLEVEL", "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
 };
 
-struct ArmorFailure {
-	ieWord itemtype;
-	ieWord penalty;
-};
-
 static ieResRef featspells[ES_COUNT];
-static ArmorFailure *armorfail = NULL;
-static int armcount = -1;
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static ieDword pstflags = false;
@@ -184,6 +177,8 @@ static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8,
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
+};
+static ieByte featmax[MAX_FEATS]={0
 };
 
 //holds the wspecial table for weapon prof bonuses
@@ -331,11 +326,6 @@ void ReleaseMemoryActor()
 		fistres = NULL;
 		delete [] fistresclass;
 		fistresclass = NULL;
-	}
-
-	if (armorfail) {
-		delete [] armorfail;
-		armorfail = NULL;
 	}
 
 	if (itemuse) {
@@ -1672,16 +1662,6 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("armfail");
-	if (tm) {
-		armcount = tm->GetRowCount();
-		armorfail = new ArmorFailure[armcount];
-		for (i = 0; i < armcount; i++) {
-			armorfail[i].itemtype = (ieWord) atoi( tm->QueryField(i,0) );
-			armorfail[i].penalty = (ieWord) atoi( tm->QueryField(i,1) );
-		}
-	}
-
 	tm.load("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
@@ -1726,17 +1706,21 @@ static void InitActorTables()
 
 	tm.load("featreq");
 	if (tm) {
-		unsigned int tmp;
+		unsigned int stat, max;
 
 		for(i=0;i<MAX_FEATS;i++) {
-			//we need the MULTIPLE column only
-			//it stores the FEAT_* stat index, and could be taken multiple
-			//times
-			tmp = core->TranslateStat(tm->QueryField(i,0));
-			if (tmp>=MAX_STATS) {
+			//we need the MULTIPLE and MAX_LEVEL columns
+			//MULTIPLE: the FEAT_* stat index
+			//MAX_LEVEL: how many times it could be taken
+			stat = core->TranslateStat(tm->QueryField(i,0));
+			if (stat>=MAX_STATS) {
 				printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
 			}
-			featstats[i] = (ieByte) tmp;
+			max = atoi(tm->QueryField(i,1));
+			//boolean feats can only be taken once, the code requires featmax for them too
+			if (stat && (max<1)) max=1;
+			featstats[i] = (ieByte) stat;
+			featmax[i] = (ieByte) max;
 		}
 	}
 
@@ -2143,17 +2127,14 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	if (HasSpellState(SS_DEAF)) base += 20;
 	if (!arcana) return base;
 
-	ieDword armor = 0;
 	ieWord armtype = inventory.GetArmorItemType();
-	for (int i = 0;i<armcount; i++) {
-		if (armorfail[i].itemtype == armtype) {
-			armor = armorfail[i].penalty;
-			ieDword feat = GetFeat(FEAT_ARMORED_ARCANA)*5;
-			if (armor<feat) armor = 0;
-			else armor -= feat;
-			break;
-		}
+	ieDword armor = core->GetArmorFailure(armtype);
+	if (armor) {
+		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA)*5;
+		if (armor<feat) armor = 0;
+		else armor -= feat;
 	}
+
 	return base+armor;
 }
 
@@ -3545,8 +3526,12 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 
 		snprintf(section,10,"%d", animid);
 
-		armor = resdata->GetKeyAsInt(section, "armor",0);
 		if (armor<0 || armor>35) return;
+		if (type<0) {
+			type = -type;
+		} else {
+			armor = resdata->GetKeyAsInt(section, "armor",0);
+		}
 	} else {
 		//hack for stun (always first armortype)
 		if (type<0) {
@@ -3557,9 +3542,9 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 	}
 
 	if (levels) {
-		snprintf(Sound,8,"HIT_0%d%c%c",type, armor+'A', suffix?'1':0);
+		snprintf(Sound,9,"HIT_0%d%c%c",type, armor+'A', suffix?'1':0);
 	} else {
-		snprintf(Sound,8,"HIT_0%d%c",type, suffix?'1':0);
+		snprintf(Sound,9,"HIT_0%d%c",type, suffix?'1':0);
 	}
 	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
 }
@@ -3660,6 +3645,11 @@ void Actor::SetMap(Map *map)
 	//This hack is to delay the equipping effects until the actor has
 	//an area (and the game object is also existing)
 	if (effinit) {
+		//apply feats
+		ApplyFeats();
+		//apply persistent feat spells
+		ApplyExtraSettings();
+
 		int SlotCount = inventory.GetSlotCount();
 		for (int Slot = 0; Slot<SlotCount;Slot++) {
 			int slottype = core->QuerySlotEffects( Slot );
@@ -4483,10 +4473,6 @@ void Actor::InitStatsOnLoad()
 	SetupFist();
 	//initial setup of modified stats
 	memcpy(Modified, BaseStats, sizeof(Modified));
-	//apply feats
-	ApplyFeats();
-	//apply persistent feat spells
-	ApplyExtraSettings();
 }
 
 //most feats are simulated via spells (feat<xx>)
@@ -4669,6 +4655,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	wi.enchantment = item->Enchantment;
 	wi.itemflags = wield->Flags;
 	wi.prof = item->WeaProf;
+	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);
 
 	//select first weapon header
 	ITMExtHeader *which;
@@ -4986,6 +4973,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	ITMExtHeader *rangedheader = NULL;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
 	DamageBonus = hittingheader->DamageBonus;
+
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
 		wi.wflags = WEAPON_MELEE;
@@ -5096,10 +5084,12 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
 		CriticalBonus--;
 	}
+	/* now this is handled internally
 	//iwd2 increased critical hit chance
 	if (core->HasFeature(GF_3ED_RULES) && HasFeat(FEAT_IMPROVED_CRITICAL)) {
 		CriticalBonus--;
 	}
+	*/
 	return true;
 }
 
@@ -5377,11 +5367,12 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
 	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
-	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
+	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) + CriticalBonus;
 	if (core->HasFeature(GF_3ED_RULES)) {
 		int ThreatRangeMin = ATTACKROLL; // FIXME: this is just the default
 		if (header && (header->RechargeFlags&IE_ITEM_KEEN)) {
-			ThreatRangeMin--; // FIXME: should really double the threat range
+			//this is correct, the threat range is only increased by one in the original engine
+			ThreatRangeMin--; 
 		}
 		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus); // TODO: move to GetCombatDetails
 		criticalroll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
@@ -5490,6 +5481,8 @@ int Actor::WeaponDamageBonus(WeaponInfo *wi)
 	return 0;
 }
 
+static ieResRef cripstr={"cripstr"};
+
 /*Always call this on the suffering actor */
 void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
@@ -5586,6 +5579,9 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			core->ApplySpell(BackstabResRef, this, attacker, multiplier);
 			//do we need this?
 			BackstabResRef[0]='*';
+			if (attacker->HasFeat(FEAT_CRIPPLING_STRIKE) ) {
+			  core->ApplySpell(cripstr, this, attacker, multiplier);
+			}
 		}
 		//
 	}
@@ -5633,10 +5629,9 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			//a critical surely raises the morale?
 			//only if it is successful
 			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-			// TODO: critical damage is always double, except for iwd2 where it is arbitrary (the number after the threat range)
-			// the manual states that many weapons x3, so we need to check if it is hardcoded or find
-			// the fields used for both the threat range and the multiplier
-			damage <<=1;
+			//multiply the damage with the critical multiplier
+			damage *= wi->critmulti;
+			//damage <<=1;
 			// check if critical hit needs a screenshake
 			if (crit_hit_scr_shake && (InParty || attacker->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
 				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
@@ -7048,6 +7043,14 @@ void Actor::SetFeat(unsigned int feat, int mode)
 
 void Actor::SetFeatValue(unsigned int feat, int value)
 {
+	if (feat>=MAX_FEATS) {
+		return;
+	}
+
+	//handle maximum and minimum values
+	if (value<0) value = 0;
+	else if (value>featmax[feat]) value = featmax[feat];
+
 	if (value) {
 		SetFeat(feat, BM_OR);
 		if (featstats[feat]) SetBase(featstats[feat], value);
