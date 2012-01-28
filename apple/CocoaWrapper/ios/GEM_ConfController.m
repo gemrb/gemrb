@@ -262,6 +262,7 @@ enum ConfigTableSection {
 	}
 	archive_read_close(a);
 	archive_read_finish(a);
+	[fm changeCurrentDirectoryPath:cwd];
 
 	if (r == ARCHIVE_FATAL) return NO;
 
@@ -279,7 +280,6 @@ enum ConfigTableSection {
 		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 	}
 
-	[fm changeCurrentDirectoryPath:cwd];
 
 	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [archivePath pathExtension]];
 	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", gamePath];
