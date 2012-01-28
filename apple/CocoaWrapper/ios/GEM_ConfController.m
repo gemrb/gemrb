@@ -310,9 +310,11 @@ enum ConfigTableSection {
 	NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 	if ([fm fileExistsAtPath:newCfgPath]) {
 		if (configIndexPath) {
-			// TODO: we should deselect the selected config if it is being overwritten
-			// problem is we cannot update GUI classes from threads other than main
-			// for now we will live with the side effect of having to reselect the config to update the editor
+			// close the config file before overwriting it.
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[controlTable deselectRowAtIndexPath:configIndexPath animated:YES];
+				[self tableView:controlTable didDeselectRowAtIndexPath:configIndexPath];
+			});
 		}
 		// new data overwrites old data therefore new config should do the same.
 		[fm removeItemAtPath:newCfgPath error:nil];
