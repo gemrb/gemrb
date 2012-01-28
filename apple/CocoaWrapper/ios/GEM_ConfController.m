@@ -267,7 +267,7 @@ enum ConfigTableSection {
 	if (r == ARCHIVE_FATAL) return NO;
 
 	installName = [installName lastPathComponent];
-	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+	NSString* gamePath = [NSString stringWithFormat:@"%@%@/%@/", libDir, [archivePath pathExtension], installName];
 	// delete anything at gamePath. our install overwrites existing data.
 	[fm removeItemAtPath:gamePath error:nil];
 	if (archiveHasRootDir) {
@@ -280,12 +280,11 @@ enum ConfigTableSection {
 		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 	}
 
-
-	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [archivePath pathExtension]];
-	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", gamePath];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
+	NSString* savePath = [NSString stringWithFormat:@"%@saves/%@", libDir, [archivePath pathExtension]];
+	NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
 	NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
 	for (NSString* saveName in saves) {
@@ -320,10 +319,12 @@ enum ConfigTableSection {
 	}
 	if (newConfig) {
 		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nGamePath = %@", gamePath];
+		[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library/"]];
 		// No need for CD paths
-		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nSavePath = %@/", savePath];
+		[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
+		[newConfig appendFormat:@"\nSavePath = %@/", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library/"]];
+
+		[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
 
 		NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
 		if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
@@ -339,9 +340,6 @@ enum ConfigTableSection {
 				[newConfig appendString:@"\nHeight = 600"];
 			}
 		}
-
-		// MouseFeedback = 3 hides cursor and tooltips
-		[newConfig appendString:@"\nMouseFeedback = 3"];
 
 		NSError* err = nil;
 		if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
