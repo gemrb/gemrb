@@ -10,3 +10,9 @@ FULLPLATE	65        35
 HIDE		66        20
 ROBE		67        0
 SCALE	68        25
+ARROW     5         3
+BOW       15        3
+HAMMER    21        3
+AXE       25        3
+SPEAR     29        3
+POLEARM   30        3
