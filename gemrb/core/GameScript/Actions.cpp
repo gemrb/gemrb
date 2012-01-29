@@ -4555,7 +4555,10 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 	} else {
 		damager=damagee;
 	}
-	damagee->Damage(damagee->GetBase(IE_HITPOINTS)*parameters->int0Parameter/100, parameters->int1Parameter, damager);
+	//this, if the percent is calculated from the current hp
+	damagee->Damage((parameters->int0Parameter*damagee->Modified[IE_HITPOINTS])/100, parameters->int1Parameter, damager);
+	//this, if the percent is calculated from the max hp
+	//damagee->Damage(parameters->int0Parameter, parameters->int1Parameter, damager, MOD_PERCENT);
 }
 
 void GameScript::Damage(Scriptable* Sender, Action* parameters)
@@ -4572,7 +4575,7 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	} else {
 		damager=damagee;
 	}
-	int damage = damagee->LuckyRoll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15, LR_DAMAGELUCK, damager);
+	int damage = damager->LuckyRoll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15, LR_DAMAGELUCK, damagee);
 	int type=MOD_ADDITIVE;
 	switch(parameters->int0Parameter) {
 	case 2: //raise
@@ -4585,7 +4588,8 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 		type=MOD_PERCENT;
 		break;
 	}
-	damagee->Damage( damage, type, damager );
+	//damagetype seems to be always 0
+	damagee->Damage( damage, 0, damager, type);
 }
 /*
 void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
