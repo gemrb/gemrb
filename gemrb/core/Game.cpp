@@ -116,10 +116,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 				char *ref = new char[9];
 				if (j == -1) {
 					strncpy(ref, table->GetRowName(i), sizeof(ieResRef));
-					npclevels[i].push_back (ref);
+					npclevels[i][j+1] = ref;
 				} else {
 					strncpy(ref, table->QueryField(i, j), sizeof(ieResRef));
-					npclevels[i].push_back (ref);
+					npclevels[i][j+1] = ref;
 				}
 			}
 		}
