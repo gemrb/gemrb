@@ -1521,7 +1521,7 @@ int Interface::Init()
 #ifdef _DEBUG
 	FileStreamPtrCount = 0;
 #endif
-	printMessage( "Core", "GemRB Core Initialization...\n", WHITE );
+	printMessage( "Core", "GemRB Core Initialization...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Video Driver...", WHITE );
 	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
