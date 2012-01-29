@@ -52,9 +52,10 @@ bool p2DAImporter::Open(DataStream* str)
 	while (*strp == ' ')
 		strp++;
 	if (strncmp( strp, "2DA V1.0", 8 ) != 0) {
-		printMessage("2DAImporter", "Bad signature!\n",YELLOW );
-// we don't care about this, so exptable.2da of iwd2 won't cause a bigger problem
-//		return false;
+		printMessage("2DAImporter", "Bad signature (%s)! Ignoring...\n",YELLOW, str->filename );
+		// we don't care about this, so exptable.2da of iwd2 won't cause a bigger problem
+		// also, certain creatures are described by 2da's without signature.
+		// return false;
 	}
 	Signature[0] = 0;
 	str->ReadLine( Signature, sizeof(Signature) );
