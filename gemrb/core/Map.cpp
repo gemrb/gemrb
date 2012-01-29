@@ -684,6 +684,8 @@ void Map::UpdateScripts()
 			actor->no_more_steps = true;
 			continue;
 		}
+
+		//FIXME:we need a better timestop hack, actors shouldn't abort moving after a timestop expired
 		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] == 0) {
 			actor->no_more_steps = true;
 			actor->ClearPath(); //HACK: prevents jumping when timestop ends
@@ -693,6 +695,8 @@ void Map::UpdateScripts()
 		//Avenger moved this here from ApplyAllEffects (this one modifies the effect queue)
 		//.. but then fuzzie moved this here from UpdateActorState, because otherwise
 		//immobile actors (see check below) never become mobile again!
+		//Avenger again: maybe this should be before the timestop check above
+		//definitely try to move it up if you experience freezes after timestop
 		actor->fxqueue.Cleanup();
 
 		//if the actor is immobile, don't run the scripts
@@ -700,9 +704,13 @@ void Map::UpdateScripts()
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			if (/*actor->Immobile() ||*/ actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
 				actor->no_more_steps = true;
+				//FIXME:obviously we miss the ClearPath hack here (but we need a better one)
 				continue;
 			}
 		}
+
+		//FIXME: we need a better immobile hack, the actors used to retain their target
+		//and resume moving after the hold effect stopped
 		actor->no_more_steps = false;
 		if (actor->Immobile()) {
 			actor->ClearPath(); //HACK: prevents jumping when effect ends
