@@ -1410,7 +1410,7 @@ int Interface::LoadSprites()
 		}
 
 		if (!fnt) {
-			print("Unable to load font resource:%s ", ResRef);
+			printMessage("Core", "Unable to load font resource: %s ", WHITE, ResRef);
 			printStatus("WARNING", YELLOW);
 			continue;
 		}

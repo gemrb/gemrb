@@ -281,7 +281,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 /** This function will load the Animation as a Font */
 Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 {
-	printMessage( "BAMImporter", "Constructing BAM font:", WHITE );
+	printMessage("BAMImporter", "Constructing BAM font %s: ", WHITE, str->filename);
 
 	unsigned int i = 0, glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;
 	ieWord *FLT = CacheFLT(Count);
@@ -300,7 +300,8 @@ Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 		Count = FramesCount;
 		glyphCount = Count;
 		if (FirstChar+Count != (unsigned int) LastChar+1) {
-			printMessage("BAMImporter", "Tried to create a font from incompatible BAM:%s, FirstChar=%d LastChar=%d Count=%d", WHITE, str->filename, FirstChar, LastChar, Count);
+			print("inconsistent font: FirstChar=%d LastChar=%d Count=%d ", FirstChar, LastChar, Count);
+			printStatus("ERROR", RED);
 			return NULL;
 		}
 		limit = glyphCount - 1;
