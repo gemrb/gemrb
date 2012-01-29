@@ -105,7 +105,7 @@ enum ConfigTableSection {
 	{
 		[@"Unable to redirect log output! Check the system log." writeToFile:logFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	}else{
-		NSLog(@"Beginning GemRB debug log.");
+		NSLog(@"Beginning GemRB %@ debug log.", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]);
 	}
 }
 
