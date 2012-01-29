@@ -6,6 +6,8 @@ Tools you will need to build GemRB:
   - make
   - g++
 
+NOTE: g++ 4.3 is known to miscompile gemrb.
+
 Libraries:
   - ZLib
   - Python 2.3 or better, compiled with shared libraries
