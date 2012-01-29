@@ -19,6 +19,9 @@
  */
 
 #import "GEM_ConfController.h"
+
+#import <SDL/SDL_hints.h>
+
 #include <archive.h>
 #include <archive_entry.h>
 
@@ -37,6 +40,11 @@ enum ConfigTableSection {
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation) interfaceOrientation
 {
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		// Don't ask me why, but these need to be reversed to revent the screen from being upsidedown.
+		if (interfaceOrientation == UIDeviceOrientationLandscapeLeft)
+			SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight", SDL_HINT_OVERRIDE);
+		else if (interfaceOrientation == UIDeviceOrientationLandscapeRight)
+			SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft", SDL_HINT_OVERRIDE);
 		return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 	}else{
 		return UIInterfaceOrientationIsPortrait(interfaceOrientation);

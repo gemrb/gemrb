@@ -119,6 +119,13 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	fullscreen=fs;
 	printMessage( "SDLVideo", "Creating display\n", WHITE );
 	ieDword flags = SDL_SWSURFACE;
+#if TARGET_OS_IPHONE
+	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
+	// it also for some unknown reason is required for retina displays
+	flags |= SDL_WINDOW_RESIZABLE;
+	// this hint is set in the wrapper for iPad at a higher priority. set it here for iPhone
+	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight", SDL_HINT_DEFAULT);
+#endif
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 #if SDL_VERSION_ATLEAST(1,3,0)
