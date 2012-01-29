@@ -1276,7 +1276,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 static EffectRef fx_death_ward_ref = { "DeathWard", -1 };
 static EffectRef fx_death_magic_ref = { "Death2", -1 };
 
-int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -1330,9 +1330,9 @@ int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 	//these two bits are turned off on death
 	BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
 
-	target->Damage(0, damagetype, Owner);
+	Scriptable *killer = GetCasterObject();
+	target->Damage(0, damagetype, killer);
 	//death has damage type too
-	Scriptable *killer = core->GetGame()->GetGlobalActorByGlobalID(fx->CasterID);
 	target->Die(killer);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
@@ -1684,6 +1684,16 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp = 1; // hit points per second
 		damage = fx->Parameter1;
 		break;
+	case RPD_SNAKE: //iwd2 snakebite (a poison causing paralysis)
+		STAT_SET(IE_HELD, 1);
+		target->AddPortraitIcon(PI_HELD);
+		target->SetSpellState(SS_HELD);
+		STATE_SET(STATE_HELPLESS);
+		break;
+	case RPD_7:
+		break;
+	case RPD_ENVENOM:
+		break;
 	default:
 		tmp = 1;
 		damage = 1;
@@ -1697,7 +1707,6 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	Scriptable *caster = GetCasterObject();
-
 	//percent
 	target->Damage(damage, DAMAGE_POISON, caster);
 	return FX_APPLIED;
@@ -2175,6 +2184,7 @@ int fx_animation_id_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//return FX_NOT_APPLIED;
 		//intentionally passing through (perma change removes previous changes)
 	case 2: //permanent animation id change
+		//FIXME: Why no PCF here? (Avenger)
 		target->SetBaseNoPCF(IE_ANIMATION_ID, fx->Parameter1);
 		return FX_NOT_APPLIED;
 	}
@@ -2760,7 +2770,6 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//percent
 	Scriptable *caster = GetCasterObject();
-
 	if (damage) {
 		target->Damage(damage, DAMAGE_POISON, caster);
 	}
