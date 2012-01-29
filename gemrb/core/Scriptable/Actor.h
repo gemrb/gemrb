@@ -588,9 +588,11 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* calculates strength (dexterity) based damage adjustment */
-	int WeaponDamageBonus(WeaponInfo *wi);
-	/* adjusts damage dealt to this actor  */
-	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
+	int WeaponDamageBonus(const WeaponInfo &wi) const;
+	/* handles critical, backstab, etc. damage modifications */
+	void ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage, int &critical);
+	/* adjusts damage dealt to this actor, handles mirror images  */
+	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype);
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
 	/* returns the hp adjustment based on constitution */

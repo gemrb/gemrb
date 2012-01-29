@@ -3300,7 +3300,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	int resisted = 0;
 
-	ModifyDamage (hitter, damage, resisted, damagetype, NULL, critical);
+	ModifyDamage (hitter, damage, resisted, damagetype);
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
@@ -5387,7 +5387,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS, NULL);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
@@ -5405,16 +5405,15 @@ void Actor::PerformAttack(ieDword gameTime)
 	int damage = 0;
 
 	if (hittingheader->DiceThrown<256) {
-		if (Modified[IE_LUCK] > Modified[IE_DAMAGELUCK]) {
-			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, 0);
-		} else {
-			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
-		}
+		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
 	} else {
 		damage = 0;
 	}
 
-	if (criticalroll >= ATTACKROLL) {
+	int critical = criticalroll>=ATTACKROLL;
+	ModifyWeaponDamage(wi, target, damage, critical);
+
+	if (critical) {
 		//critical success
 		printBracket("Critical Hit", GREEN);
 		print("\n");
@@ -5463,10 +5462,10 @@ static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_aegis_ref = { "Aegis", -1 };
 static EffectRef fx_cloak_ref = { "Overlay", -1 };
 
-int Actor::WeaponDamageBonus(WeaponInfo *wi)
+int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 {
-	if (wi->wflags&WEAPON_USESTRENGTH) {
-		if (core->HasFeature(GF_3ED_RULES) && (wi->itemflags&IE_INV_ITEM_TWOHANDED)) {
+	if (wi.wflags&WEAPON_USESTRENGTH) {
+		if (core->HasFeature(GF_3ED_RULES) && (wi.itemflags&IE_INV_ITEM_TWOHANDED)) {
 			// 150% bonus for twohandlers
 			return 150 * core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA)) / 100;
 		} else {
@@ -5480,7 +5479,7 @@ int Actor::WeaponDamageBonus(WeaponInfo *wi)
 static ieResRef cripstr={"cripstr"};
 
 /*Always call this on the suffering actor */
-void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype)
 {
 	Actor *attacker = NULL;
 
@@ -5535,53 +5534,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		}
 	}
 
-	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
-	//ToBEx compatibility in the ALWAYSBACKSTAB field:
-	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
-	//1 Ignore invisible requirement and positioning requirement
-	//2 Ignore invisible requirement only
-	//4 Ignore positioning requirement only
-	if (wi && attacker) {
-		int multiplier=attacker->BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
-		if (multiplier>1) {
-			ieDword always = attacker->Modified[IE_ALWAYSBACKSTAB];
-			if ((attacker->Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
-				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !attacker->IsBehind(this)) || (always&0x5) ) {
-					if (Modified[IE_DISABLEBACKSTAB]) {
-						// The backstab seems to have failed
-						displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-					} else {
-						if (wi->backstabbing) {
-							damage *= multiplier;
-							// display a simple message instead of hardcoding multiplier names
-							displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
-						} else {
-							// weapon is unsuitable for backstab
-							displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-						}
-					}
-				}
-			}
-		}
-		damage += attacker->WeaponDamageBonus(wi);
-
-		if (fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags) ) {
-			damage = 0;
-			resisted = DR_IMMUNE;
-		}
-
-		//special effects on hit for arterial strike and hamstring
-		if (damage>0 && BackstabResRef[0]!='*') {
-			core->ApplySpell(BackstabResRef, this, attacker, multiplier);
-			//do we need this?
-			BackstabResRef[0]='*';
-			if (attacker->HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-			  core->ApplySpell(cripstr, this, attacker, multiplier);
-			}
-		}
-		//
-	}
-
 	if (damage>0) {
 		// check damage type immunity / resistance / susceptibility
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
@@ -5593,7 +5545,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
-				int bonus = attacker->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
+				int bonus = fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
 					print("Bonus damage of %d (%+d%%), neto: %d\n", int (damage * bonus / 100.0), bonus, -resisted);
@@ -5607,32 +5559,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 
 	if (damage<=0) {
-		damage = 0;
 		DisplayStringCore(this, VB_TIMMUNE, DS_CONSOLE|DS_CONST );
-		return;
-	}
-
-	//critical protection a la PST
-	if (pstflags && (Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
-		critical = 0;
-	}
-
-	if (critical) {
-		if (inventory.ProvidesCriticalAversion()) {
-			//critical hit is averted by helmet
-			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, this);
-		} else {
-			//a critical surely raises the morale?
-			//only if it is successful
-			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-			//multiply the damage with the critical multiplier
-			damage *= wi->critmulti;
-			//damage <<=1;
-			// check if critical hit needs a screenshake
-			if (crit_hit_scr_shake && (InParty || attacker->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
-				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
-			}
-		}
 	}
 }
 
@@ -6880,6 +6807,76 @@ static EffectRef fx_damage_ref = { "Damage", -1 };
 static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
 static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
 
+void Actor::ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage, int &critical)
+{
+	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
+	//ToBEx compatibility in the ALWAYSBACKSTAB field:
+	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
+	//1 Ignore invisible requirement and positioning requirement
+	//2 Ignore invisible requirement only
+	//4 Ignore positioning requirement only
+	int multiplier=BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
+	if (multiplier>1) {
+		ieDword always = Modified[IE_ALWAYSBACKSTAB];
+		if ((Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
+			if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
+				if (target->Modified[IE_DISABLEBACKSTAB]) {
+					// The backstab seems to have failed
+					displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+				} else {
+					if (wi.backstabbing) {
+						damage *= multiplier;
+						// display a simple message instead of hardcoding multiplier names
+						displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
+					} else {
+						// weapon is unsuitable for backstab
+						displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+					}
+				}
+			}
+		}
+	}
+	damage += WeaponDamageBonus(wi);
+
+	if (target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags) ) {
+		damage = 0;
+		critical = 0;
+		return;
+	}
+		//special effects on hit for arterial strike and hamstring
+	if (damage>0 && BackstabResRef[0]!='*') {
+		core->ApplySpell(BackstabResRef, target, this, multiplier);
+		//do we need this?
+		BackstabResRef[0]='*';
+		if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
+			core->ApplySpell(cripstr, target, this, multiplier);
+		}
+	}
+
+	//critical protection a la PST
+	if (pstflags && (target->Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
+		critical = 0;
+	}
+
+	if (critical) {
+		if (inventory.ProvidesCriticalAversion()) {
+			//critical hit is averted by helmet
+			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
+		} else {
+			//a critical surely raises the morale?
+			//only if it is successful
+			target->NewBase(IE_MORALE, 1, MOD_ADDITIVE);
+			//multiply the damage with the critical multiplier
+			damage *= wi.critmulti;
+			//damage <<=1;
+			// check if critical hit needs a screenshake
+			if (crit_hit_scr_shake && (InParty || target->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
+				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
+			}
+		}
+	}
+}
+
 bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
 {
 	if (target->Type!=ST_ACTOR) {
@@ -7685,18 +7682,22 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent
 {
 	assert(this != opponent);
 
-	ieDword stat;
+	int luck;
+
+	luck = (signed) GetSafeStat(IE_LUCK);
+
+	//damageluck is additive with regular luck (used for maximized damage, righteous magic)
 	if (flags&LR_DAMAGELUCK) {
-		stat = IE_DAMAGELUCK;
-	} else {
-		stat = IE_LUCK;
+		luck += (signed) GetSafeStat(IE_DAMAGELUCK);
 	}
 
-	int luck = (signed) GetSafeStat(stat);
+	//it is always the opponent's luck that decrease damage (or anything)
+	if (opponent) luck -= opponent->GetSafeStat(IE_LUCK);
+
 	if (flags&LR_NEGATIVE) {
 		luck = -luck;
 	}
-	if (opponent) luck -= (signed) opponent->GetStat(stat);
+
 	if (dice < 1 || size < 1) {
 		return add + luck;
 	}
