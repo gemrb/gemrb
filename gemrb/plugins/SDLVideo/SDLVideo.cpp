@@ -290,8 +290,8 @@ int SDLVideoDriver::PollEvents() {
 
 	static bool touchHold = false;
 	static Uint32 touchHoldTime = 0;
-	static SDL_MouseButtonEvent rightMouseDownEvent = {SDL_MOUSEBUTTONDOWN, 0, SDL_BUTTON_RIGHT, SDL_PRESSED, 0, 0, 0, 0, 0};
-	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0, 0};
+	static SDL_MouseButtonEvent rightMouseDownEvent = {SDL_MOUSEBUTTONDOWN, 0, 0, SDL_BUTTON_RIGHT, SDL_PRESSED, 0, 0, 0, 0};
+	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0};
 
 	if (touchHold && (SDL_GetTicks() - touchHoldTime) >= TOUCH_RC_NUM_TICKS) {
 		SDL_Event evtDown = SDL_Event();
@@ -565,7 +565,7 @@ int SDLVideoDriver::PollEvents() {
 			touchHold = false;//even if there are still fingers in contact
 			if (numFingers) numFingers--;
 			if (formationRotation) {
-				Evnt->MouseUp( event.tfinger.x, event.tfinger.y, 1 << ( SDL_BUTTON_RIGHT - 1 ), GetModState(SDL_GetModState()) );
+				Evnt->MouseUp( event.tfinger.x, event.tfinger.y, GEM_MB_MENU, GetModState(SDL_GetModState()) );
 				formationRotation = false;
 				ignoreNextMouseUp = false;
 			}
