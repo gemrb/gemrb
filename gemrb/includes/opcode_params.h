@@ -34,6 +34,10 @@
 //only poison
 #define RPD_ROUNDS  4
 #define RPD_TURNS   5
+//iwd2 specific poison types
+#define RPD_SNAKE   6
+#define RPD_7       7
+#define RPD_ENVENOM 8
 //only disease
 #define RPD_STR 4
 #define RPD_DEX 5
