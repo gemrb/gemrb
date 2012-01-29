@@ -19,6 +19,9 @@
  */
 
 #import "GEM_ConfController.h"
+
+#import <SDL/SDL_hints.h>
+
 #include <archive.h>
 #include <archive_entry.h>
 
@@ -37,6 +40,11 @@ enum ConfigTableSection {
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation) interfaceOrientation
 {
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		// Don't ask me why, but these need to be reversed to revent the screen from being upsidedown.
+		if (interfaceOrientation == UIDeviceOrientationLandscapeLeft)
+			SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight", SDL_HINT_OVERRIDE);
+		else if (interfaceOrientation == UIDeviceOrientationLandscapeRight)
+			SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft", SDL_HINT_OVERRIDE);
 		return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 	}else{
 		return UIInterfaceOrientationIsPortrait(interfaceOrientation);
@@ -105,7 +113,7 @@ enum ConfigTableSection {
 	{
 		[@"Unable to redirect log output! Check the system log." writeToFile:logFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	}else{
-		NSLog(@"Beginning GemRB debug log.");
+		NSLog(@"Beginning GemRB %@ debug log.", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]);
 	}
 }
 
@@ -262,11 +270,12 @@ enum ConfigTableSection {
 	}
 	archive_read_close(a);
 	archive_read_finish(a);
+	[fm changeCurrentDirectoryPath:cwd];
 
 	if (r == ARCHIVE_FATAL) return NO;
 
 	installName = [installName lastPathComponent];
-	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+	NSString* gamePath = [NSString stringWithFormat:@"%@%@/%@/", libDir, [archivePath pathExtension], installName];
 	// delete anything at gamePath. our install overwrites existing data.
 	[fm removeItemAtPath:gamePath error:nil];
 	if (archiveHasRootDir) {
@@ -279,13 +288,11 @@ enum ConfigTableSection {
 		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 	}
 
-	[fm changeCurrentDirectoryPath:cwd];
-
-	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@", libDir, [archivePath pathExtension]];
-	NSString* oldSavePath = [NSString stringWithFormat:@"%@/save/", gamePath];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
+	NSString* savePath = [NSString stringWithFormat:@"%@saves/%@", libDir, [archivePath pathExtension]];
+	NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
 	NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
 	for (NSString* saveName in saves) {
@@ -311,19 +318,23 @@ enum ConfigTableSection {
 	NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
 	if ([fm fileExistsAtPath:newCfgPath]) {
 		if (configIndexPath) {
-			// TODO: we should deselect the selected config if it is being overwritten
-			// problem is we cannot update GUI classes from threads other than main
-			// for now we will live with the side effect of having to reselect the config to update the editor
+			// close the config file before overwriting it.
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[controlTable deselectRowAtIndexPath:configIndexPath animated:YES];
+				[self tableView:controlTable didDeselectRowAtIndexPath:configIndexPath];
+			});
 		}
 		// new data overwrites old data therefore new config should do the same.
 		[fm removeItemAtPath:newCfgPath error:nil];
 	}
 	if (newConfig) {
 		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nGamePath = %@", gamePath];
+		[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library/"]];
 		// No need for CD paths
-		[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nSavePath = %@/", savePath];
+		[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
+		[newConfig appendFormat:@"\nSavePath = %@/", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library/"]];
+
+		[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
 
 		NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
 		if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
@@ -339,9 +350,6 @@ enum ConfigTableSection {
 				[newConfig appendString:@"\nHeight = 600"];
 			}
 		}
-
-		// MouseFeedback = 3 hides cursor and tooltips
-		[newConfig appendString:@"\nMouseFeedback = 3"];
 
 		NSError* err = nil;
 		if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){

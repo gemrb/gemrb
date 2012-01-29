@@ -119,6 +119,13 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	fullscreen=fs;
 	printMessage( "SDLVideo", "Creating display\n", WHITE );
 	ieDword flags = SDL_SWSURFACE;
+#if TARGET_OS_IPHONE
+	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
+	// it also for some unknown reason is required for retina displays
+	flags |= SDL_WINDOW_RESIZABLE;
+	// this hint is set in the wrapper for iPad at a higher priority. set it here for iPhone
+	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight", SDL_HINT_DEFAULT);
+#endif
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -290,8 +297,8 @@ int SDLVideoDriver::PollEvents() {
 
 	static bool touchHold = false;
 	static Uint32 touchHoldTime = 0;
-	static SDL_MouseButtonEvent rightMouseDownEvent = {SDL_MOUSEBUTTONDOWN, 0, SDL_BUTTON_RIGHT, SDL_PRESSED, 0, 0, 0, 0, 0};
-	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0, 0};
+	static SDL_MouseButtonEvent rightMouseDownEvent = {SDL_MOUSEBUTTONDOWN, 0, 0, SDL_BUTTON_RIGHT, SDL_PRESSED, 0, 0, 0, 0};
+	static SDL_MouseButtonEvent rightMouseUpEvent = {SDL_MOUSEBUTTONUP, 0, 0, SDL_BUTTON_RIGHT, SDL_RELEASED, 0, 0, 0, 0};
 
 	if (touchHold && (SDL_GetTicks() - touchHoldTime) >= TOUCH_RC_NUM_TICKS) {
 		SDL_Event evtDown = SDL_Event();
@@ -565,7 +572,7 @@ int SDLVideoDriver::PollEvents() {
 			touchHold = false;//even if there are still fingers in contact
 			if (numFingers) numFingers--;
 			if (formationRotation) {
-				Evnt->MouseUp( event.tfinger.x, event.tfinger.y, 1 << ( SDL_BUTTON_RIGHT - 1 ), GetModState(SDL_GetModState()) );
+				Evnt->MouseUp( event.tfinger.x, event.tfinger.y, GEM_MB_MENU, GetModState(SDL_GetModState()) );
 				formationRotation = false;
 				ignoreNextMouseUp = false;
 			}

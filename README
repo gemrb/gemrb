@@ -28,6 +28,8 @@ some smart phones (Symbian, Android, other Linux-based, Ios)
 some consoles (OpenPandora, Dingoo)
 some exotic OSes (ReactOS, SyllableOS, Haiku, AmigaOS)
 
+g++ 4.3 is known to miscompile gemrb.
+
 Requirements
 ------------
 See the INSTALL file.
