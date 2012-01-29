@@ -5387,7 +5387,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS, NULL);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
