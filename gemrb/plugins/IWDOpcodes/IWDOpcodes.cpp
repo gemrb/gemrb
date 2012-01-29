@@ -373,6 +373,31 @@ static EffectDesc effectnames[] = {
 	{ NULL, NULL, 0, 0 },
 };
 
+//effect refs used in this module
+static EffectRef fx_charm_ref = { "Charm", -1 }; //5
+static EffectRef fx_cha_ref = { "CharismaModifier", -1 }; //0x6
+static EffectRef fx_con_ref = { "ConstitutionModifier", -1 }; //0xa
+static EffectRef fx_damage_opcode_ref = { "Damage", -1 }; //0xc
+static EffectRef fx_death_ref = { "Death", -1 }; //0xd
+static EffectRef fx_dex_ref = { "DexterityModifier", -1 }; //0xf
+static EffectRef fx_int_ref = { "IntelligenceModifier", -1 }; //0x13
+static EffectRef fx_poison_ref = { "Poison", -1 }; //0x19
+static EffectRef fx_unconscious_state_ref = { "State:Helpless", -1 }; //0x27
+static EffectRef fx_str_ref = { "StrengthModifier", -1 }; //0x2c
+static EffectRef fx_wis_ref = { "WisdomModifier", -1 }; //0x31
+static EffectRef fx_state_blind_ref = { "State:Blind", -1 }; //0x4a
+static EffectRef fx_disease_ref = { "State:Diseased", -1 }; //0x4e
+static EffectRef fx_confusion_ref = { "State:Confused", -1 }; //0x80
+static EffectRef fx_bless_ref = { "BlessNonCumulative", -1 }; //0x82
+static EffectRef fx_fear_ref = { "State:Panic", -1 }; //0xa1
+static EffectRef fx_hold_creature_ref = { "State:Hold", -1 }; //0xaf
+static EffectRef fx_resist_spell_ref = { "Protection:Spell2", -1 }; //0xce (IWD2)
+static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 }; //0xe9
+static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
+static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
+static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
+
+
 struct IWDIDSEntry {
 	ieDword value;
 	ieWord stat;
@@ -534,11 +559,14 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 
 //iwd got a hardcoded 'fireshield' system
 //this effect applies damage on ALL nearby actors, except the center
-static EffectRef fx_damage_opcode_ref = { "Damage", -1 };
+//also in IWD2, a dragon with this aura
+//would probably not hurt anyone, because it is not using personaldistance
+//but a short range area projectile
 
 static void ApplyDamageNearby(Scriptable* Owner, Actor* target, Effect *fx, ieDword damagetype)
 {
 	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype,FX_DURATION_INSTANT_PERMANENT);
+	newfx->Target = FX_TARGET_PRESET;
 	newfx->Power = fx->Power;
 	newfx->DiceThrown = fx->DiceThrown;
 	newfx->DiceSides = fx->DiceSides;
@@ -548,6 +576,7 @@ static void ApplyDamageNearby(Scriptable* Owner, Actor* target, Effect *fx, ieDw
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
+		//not sure if this is needed
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
 			//this function deletes newfx (not anymore)
@@ -809,12 +838,11 @@ int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0xef SlowPoison
 //gemrb extension: can slow bleeding wounds (like bandage)
-static EffectRef fx_poison_ref = { "Poison", -1 };
-static EffectRef fx_wound_ref = { "BleedingWounds", -1 };
 
 int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword my_opcode;
+
 	if (fx->Parameter2) my_opcode = EffectQueue::ResolveEffect(fx_wound_ref);
 	else my_opcode = EffectQueue::ResolveEffect(fx_poison_ref);
 	if (0) print( "fx_slow_poison (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
@@ -1132,7 +1160,6 @@ int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 //0xfb LichTouch (how)
 //0xfb State:Hold4 (iwd2)
-static EffectRef fx_hold_creature_ref = { "State:Hold", -1 };
 
 int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1153,7 +1180,6 @@ int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0xfc BlindingOrb (how)
-static EffectRef fx_state_blind_ref = { "State:Blind", -1 };
 
 int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1193,7 +1219,7 @@ int fx_remove_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->fxqueue.RemoveAllEffects(fx->Resource, FX_DURATION_INSTANT_LIMITED);
 			break;
 		default:
-		target->fxqueue.RemoveAllEffects(fx->Resource);
+			target->fxqueue.RemoveAllEffects(fx->Resource);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -1203,7 +1229,9 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_salamander_aura (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//inflicts damage calculated by dice values+parameter1
-	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
+	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice,
+	//Param2 = 2/3 are gemrb specific, i couldn't resist
+	//doesn't affect targets with 100% resistance, but could affect self
 
 	//if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
@@ -1212,26 +1240,54 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing
 	ieDword time = core->GetGame()->GameTime;
-	if ((fx->Parameter4==time) || (time%6) ) {
+	if ((fx->Parameter4==time) || (time%core->Time.round_sec) ) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
 
-	ieDword damage = DAMAGE_FIRE;
-
-	if (fx->Parameter2==1) {
+	ieDword damage, mystat;
+	switch(fx->Parameter2) {
+	case 0:default:
+		damage = DAMAGE_FIRE;
+		mystat = IE_RESISTFIRE;
+		break;
+	case 1:
 		damage = DAMAGE_COLD;
+		mystat = IE_RESISTCOLD;
+		break;
+	case 2:
+		damage = DAMAGE_ELECTRICITY;
+		mystat = IE_RESISTELECTRICITY;
+		break;
+	case 3:
+		damage = DAMAGE_ACID;
+		mystat = IE_RESISTACID;
+		break;
 	}
 
-	ApplyDamageNearby(Owner, target, fx, damage);
+	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage, FX_DURATION_INSTANT_PERMANENT);
+	newfx->Target = FX_TARGET_PRESET;
+	newfx->Power = fx->Power;
+	newfx->DiceThrown = fx->DiceThrown;
+	newfx->DiceSides = fx->DiceSides;
+	memcpy(newfx->Resource, fx->Resource,sizeof(newfx->Resource) );
+
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (PersonalDistance(target, victim)>20) continue;
+		if (victim->GetSafeStat(mystat)>=100) continue;
+		//apply the damage opcode
+		core->ApplyEffect(newfx, victim, Owner);
+	}
+	delete newfx;
 	return FX_APPLIED;
 }
 
 //0x100 UmberHulkGaze (causes confusion)
 //it is a specially hacked effect to ignore certain races
 //from the confusion effect
-static EffectRef fx_confusion_ref = { "State:Confused", -1 };
-static EffectRef fx_immunity_resource_ref = { "Protection:Spell", -1 };
 
 int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1251,7 +1307,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx1->Duration = fx->Parameter1;
 
-	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
+	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell_ref, 0, 0);
 	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx2->Duration = fx->Parameter1;
 	memcpy(newfx2->Resource, fx->Source, sizeof(newfx2->Resource) );
@@ -1291,7 +1347,6 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0x101 ZombieLordAura (causes Panic) unused in all games
-static EffectRef fx_fear_ref = { "State:Panic", -1 };
 
 int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1311,7 +1366,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx1->Duration = fx->Parameter1;
 
-	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
+	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell_ref, 0, 0);
 	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx2->Duration = fx->Parameter1;
 	memcpy(newfx2->Resource, fx->Source, sizeof(newfx2->Resource) );
@@ -1526,9 +1581,6 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 
 //0x109 CloakOfFear (HoW/IWD2)
 //if the resource is not specified, it will work like in HoW
-
-static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 };
-
 int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_cloak_of_fear (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
@@ -1695,10 +1747,6 @@ int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-
-static EffectRef fx_str_ref = { "StrengthModifier", -1 };
-static EffectRef fx_con_ref = { "ConstitutionModifier", -1 };
-static EffectRef fx_dex_ref = { "DexterityModifier", -1 };
 
 //0x115 SoulEater
 int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
@@ -1938,7 +1986,7 @@ int fx_vitriolic_sphere (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	//also damage people nearby?
-//	ApplyDamageNearby(Owner, target, fx, DAMAGE_ACID);
+	ApplyDamageNearby(Owner, target, fx, DAMAGE_ACID);
 	return FX_APPLIED;
 }
 
@@ -1993,8 +2041,6 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0x11c MaceOfDisruption
 //death with chance based on race and level
-static EffectRef fx_death_ref = { "Death", -1 };
-static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 };
 
 int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -2086,7 +2132,7 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xce (same place as in bg2, but different)
+//0xce (same place as in bg2, but different targeting)
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 {
 	//check iwd ids targeting
@@ -2101,8 +2147,6 @@ int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 	//this has effect only on first apply, it will stop applying the spell
 	return FX_ABORT;
 }
-
-static EffectRef fx_resist_spell_ref = { "Protection:Spell2", -1 };
 
 //0x122 Protection:Spell3 ??? IWD ids targeting
 // this is a variant of resist spell, used in iwd2
@@ -2469,7 +2513,6 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //404 Nausea
-static EffectRef fx_unconscious_state_ref = { "State:Helpless", -1 };
 
 int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -2584,8 +2627,6 @@ int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //412 Control2
-
-static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 };
 
 int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -3286,7 +3327,6 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //445 SlipperyMind (the original removed charm when the effect itself was about to be removed)
-static EffectRef fx_charm_ref = { "Charm", -1 };
 
 int fx_slippery_mind (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3304,12 +3344,6 @@ int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //447 Restoration
-
-static EffectRef fx_disease_ref = { "Disease", -1 };
-static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
-static EffectRef fx_wis_ref = { "WisdomModifier", -1 };
-static EffectRef fx_cha_ref = { "CharismaModifier", -1 };
-
 int fx_restoration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_restoration (%2d)\n", fx->Opcode);
@@ -3502,7 +3536,6 @@ int fx_lower_resistance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //452 Bane
-static EffectRef fx_bless_ref = { "Bless", -1 };
 
 int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
