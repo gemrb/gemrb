@@ -209,7 +209,8 @@
 #define STR_EXPERTISE 176
 #define STR_POWERATTACK 177
 #define STR_CLEAVE 178
+#define STR_HELD 179
 
-#define STRREF_COUNT 179
+#define STRREF_COUNT 180
 
 #endif //! IE_STRINGS_H

@@ -1689,6 +1689,9 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_HELD);
 		target->SetSpellState(SS_HELD);
 		STATE_SET(STATE_HELPLESS);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_HELD, DMC_WHITE, target);
+		}
 		break;
 	case RPD_7:
 		break;
