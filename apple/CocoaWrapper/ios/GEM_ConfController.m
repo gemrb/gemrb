@@ -275,7 +275,7 @@ enum ConfigTableSection {
 	if (r == ARCHIVE_FATAL) return NO;
 
 	installName = [installName lastPathComponent];
-	NSString* gamePath = [NSString stringWithFormat:@"%@%@/%@/", libDir, [archivePath pathExtension], installName];
+	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
 	// delete anything at gamePath. our install overwrites existing data.
 	[fm removeItemAtPath:gamePath error:nil];
 	if (archiveHasRootDir) {
@@ -288,15 +288,16 @@ enum ConfigTableSection {
 		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 	}
 
-	NSString* savePath = [NSString stringWithFormat:@"%@saves/%@", libDir, [archivePath pathExtension]];
+	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@/", libDir, [archivePath pathExtension]];
 	NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
+	NSLog(@"moving %@ to %@", oldSavePath, savePath);
 	NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
 	for (NSString* saveName in saves) {
-		NSString* fullSavePath = [NSString stringWithFormat:@"%@/save/%@", savePath, saveName];
+		NSString* fullSavePath = [NSString stringWithFormat:@"%@save/%@", savePath, saveName];
 		[fm removeItemAtPath:fullSavePath error:nil];
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
 		NSLog(@"Moving save '%@' to %@", saveName, fullSavePath);
@@ -306,7 +307,7 @@ enum ConfigTableSection {
 	saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
 
 	for (NSString* saveName in saves) {
-		NSString* fullSavePath = [NSString stringWithFormat:@"%@/mpsave/%@", savePath, saveName];
+		NSString* fullSavePath = [NSString stringWithFormat:@"%@mpsave/%@", savePath, saveName];
 		[fm removeItemAtPath:fullSavePath error:nil];
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
 		NSLog(@"Moving mpsave '%@' to %@", saveName, fullSavePath);
@@ -329,10 +330,10 @@ enum ConfigTableSection {
 	}
 	if (newConfig) {
 		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library/"]];
+		[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
 		// No need for CD paths
 		[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nSavePath = %@/", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library/"]];
+		[newConfig appendFormat:@"\nSavePath = %@", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
 
 		[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
 
