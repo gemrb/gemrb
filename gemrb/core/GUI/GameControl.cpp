@@ -1493,6 +1493,10 @@ end_function:
 }
 
 /** Global Mouse Move Event */
+#if TARGET_OS_IPHONE
+// iOS will never have a mouse.
+void GameControl::OnGlobalMouseMove(unsigned short /*x*/, unsigned short /*y*/) {}
+#else
 void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
@@ -1533,6 +1537,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 		}
 	}
 }
+#endif
 
 void GameControl::UpdateScrolling() {
 	// mouse scroll speed is checked because scrolling is not always done by the mouse (ie cutscenes/keyboard/etc)
