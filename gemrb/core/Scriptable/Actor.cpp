@@ -4429,7 +4429,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 }
 
 //if dual stuff needs to be handled on load too, improve this method with it
-int Actor::GetHpAdjustment(int multiplier)
+int Actor::GetHpAdjustment(int multiplier) const
 {
 	int val;
 
@@ -5084,12 +5084,6 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
 		CriticalBonus--;
 	}
-	/* now this is handled internally
-	//iwd2 increased critical hit chance
-	if (core->HasFeature(GF_3ED_RULES) && HasFeat(FEAT_IMPROVED_CRITICAL)) {
-		CriticalBonus--;
-	}
-	*/
 	return true;
 }
 
@@ -5366,13 +5360,15 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
+	// CriticalBonus is negative, it is added to the minimum roll needed for a critical hit
+	// IE_CRITICALHITBONUS is positive, it is subtracted
 	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
-	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) + CriticalBonus;
+	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
 	if (core->HasFeature(GF_3ED_RULES)) {
 		int ThreatRangeMin = ATTACKROLL; // FIXME: this is just the default
 		if (header && (header->RechargeFlags&IE_ITEM_KEEN)) {
 			//this is correct, the threat range is only increased by one in the original engine
-			ThreatRangeMin--; 
+			ThreatRangeMin--;
 		}
 		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus); // TODO: move to GetCombatDetails
 		criticalroll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);

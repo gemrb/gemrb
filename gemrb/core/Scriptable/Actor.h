@@ -594,7 +594,7 @@ public:
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
 	/* returns the hp adjustment based on constitution */
-	int GetHpAdjustment(int multiplier);
+	int GetHpAdjustment(int multiplier) const;
 	/* does all the housekeeping after loading the actor from file */
 	void InitStatsOnLoad();
 	/* sets a colour gradient stat, handles location */
