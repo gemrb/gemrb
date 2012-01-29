@@ -300,7 +300,8 @@ Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 		Count = FramesCount;
 		glyphCount = Count;
 		if (FirstChar+Count != (unsigned int) LastChar+1) {
-			error("BAMImporter", "Tried to create a font from incompatible BAM:%s", str->filename);
+			print("BAMImporter", "Tried to create a font from incompatible BAM:%s, FirstChar=%i LastChar=%i Count=%i", str->filename, FirstChar, LastChar, Count);
+			return NULL;
 		}
 		limit = glyphCount - 1;
 	}
