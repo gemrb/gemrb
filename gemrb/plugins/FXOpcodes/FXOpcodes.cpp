@@ -1662,7 +1662,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	STATE_SET( STATE_POISONED );
 
-	ieDword damage;
+	ieDword damage = 0;
 	int tmp = fx->Parameter1;
 
 	HandlePercentageDamage(fx, target);
