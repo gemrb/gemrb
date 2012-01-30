@@ -521,7 +521,7 @@ bool Projectile::FailedIDS(Actor *target) const
 				//handle attack type here, weapon depends on it too?
 				int tohit = caster->GetToHit(0, WEAPON_FIST, target);
 				//damage type, should be generic?
-				int defense = target->GetDefense(0, caster);
+				int defense = target->GetDefense(0, 0, caster);
 				if(target->IsReverseToHit()) {
 					fail = roll + defense < tohit;
 				} else {

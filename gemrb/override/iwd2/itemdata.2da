@@ -1,18 +1,18 @@
 2DA V1.0
 0
-		ITEMTYPE  PENALTY
-LEATHER	60        10
-STUDDED	61        15
-CHAIN	62        30
-SPLINT	63		40
-HALFPLATE	64        40
-FULLPLATE	65        35
-HIDE		66        20
-ROBE		67        0
-SCALE	68        25
-ARROW     5         3
-BOW       15        3
-HAMMER    21        3
-AXE       25        3
-SPEAR     29        3
-POLEARM   30        3
+           ITEMTYPE   PENALTY
+LEATHER    60         2
+STUDDED    61         3
+CHAIN      62         6
+SPLINT     63         8
+HALFPLATE  64         8
+FULLPLATE  65         7
+HIDE       66         6
+ROBE       67         0
+SCALE      68         5
+ARROW      5          3
+BOW        15         3
+HAMMER     21         3
+AXE        25         3
+SPEAR      29         3
+POLEARM    30         3

@@ -581,7 +581,7 @@ public:
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags, Actor *target) const;
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType, Actor *attacker) const;
+	int GetDefense(int DamageType, ieDword wflags, Actor *attacker) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
@@ -590,7 +590,7 @@ public:
 	/* calculates strength (dexterity) based damage adjustment */
 	int WeaponDamageBonus(const WeaponInfo &wi) const;
 	/* handles critical, backstab, etc. damage modifications */
-	void ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage, int &critical);
+	void ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical);
 	/* adjusts damage dealt to this actor, handles mirror images  */
 	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype);
 	/* applies modal spell etc, if needed */
@@ -657,6 +657,8 @@ public:
 	void PlayCritDamageAnimation(int x);
 	/* returns mage or cleric spell casting failure, iwd2 compatible */
 	ieDword GetSpellFailure(bool arcana) const;
+	/* returns the dexterity AC adjusted by armor, iwd2 compatible */
+	int GetDexterityAC() const;
 	/* PST specific criticals */
 	int GetCriticalType() const;
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */

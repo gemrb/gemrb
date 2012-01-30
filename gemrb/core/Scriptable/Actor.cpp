@@ -2141,6 +2141,52 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	return base+armor*5;
 }
 
+//dexterity AC (the lesser the better), do another negation for 3ED rules
+int Actor::GetDexterityAC() const
+{
+	int dexbonus;
+
+	if (core->HasFeature(GF_3ED_RULES)) {
+		dexbonus = GetAbilityBonus(GetStat(IE_DEX));
+	} else {
+		dexbonus = core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	}
+
+	if (dexbonus) {
+		ieWord armtype = inventory.GetArmorItemType();
+		int armor = (int) core->GetArmorFailure(armtype);
+
+		if (armor) {
+			armor = 8-armor;
+			if (dexbonus>armor) {
+				dexbonus = armor;
+			}
+		}
+
+		//blindness negates the dexbonus
+		if ((GetStat(IE_STATE_ID)&STATE_BLIND) && !HasFeat(FEAT_BLIND_FIGHT)) {
+			dexbonus = 0;
+		}
+	}
+
+	//and the monk wisdom bonus
+	if (core->HasFeature(GF_3ED_RULES)) {
+		//if the monk has a shield equipped, no bonus
+		int itemtype = inventory.GetShieldItemType();
+		//items with critical range are weapons, not shields, so they are ok
+		//empty hand is also ok
+		if (GetStat(IE_LEVELMONK) && (itemtype==0xffff || core->GetArmorFailure(itemtype))) {
+			//too many variables, recycling
+			itemtype = GetAbilityBonus(GetStat(IE_WIS));
+			//add the bonus only if it is a bonus (the dexbonus is negative)
+			if (itemtype>0) {
+				dexbonus += itemtype;
+			}
+		}
+	}
+	return dexbonus;
+}
+
 //Returns the personal critical damage type in a binary compatible form (PST)
 //TODO: may want to preload the crits table to avoid spam in the log
 int Actor::GetCriticalType() const
@@ -5035,7 +5081,14 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if ((signed)stars > wspecial_max) {
 		stars = wspecial_max;
 	}
-	THAC0Bonus += wspecial[stars][0];
+
+	if (wi.wflags&WEAPON_BYPASS) {
+		//FIXME:this type of weapon ignores all armor, -4 is for balance?
+		//or i just got lost a negation somewhere
+		THAC0Bonus -= 4;
+	} else {
+		THAC0Bonus += wspecial[stars][0];
+	}
 	DamageBonus += wspecial[stars][1];
 	speed += wspecial[stars][2];
 	// add non-proficiency penalty, which is missing from the table
@@ -5171,7 +5224,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
 
-int Actor::GetDefense(int DamageType, Actor *attacker) const
+int Actor::GetDefense(int DamageType,  ieDword wflags, Actor *attacker) const
 {
 	//specific damage type bonus.
 	int defense = 0;
@@ -5194,6 +5247,7 @@ int Actor::GetDefense(int DamageType, Actor *attacker) const
 	default :
 		break;
 	}
+
 
 	//check for s/s and single weapon ac bonuses
 	if (!IsDualWielding() && wssingle && wsswordshield) {
@@ -5218,13 +5272,17 @@ int Actor::GetDefense(int DamageType, Actor *attacker) const
 		}
 	}
 
-	if (ReverseToHit) {
-		defense = GetStat(IE_ARMORCLASS)-defense;
-	} else {
-		defense += GetStat(IE_ARMORCLASS);
+
+	if (! (wflags&WEAPON_BYPASS)) {
+		if (ReverseToHit) {
+			defense = GetStat(IE_ARMORCLASS)-defense;
+		} else {
+			defense += GetStat(IE_ARMORCLASS);
+		}
 	}
 	//Dexterity bonus is stored negative in 2da files.
-	defense += core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	defense += GetDexterityAC();
+
 	if (attacker) {
 		defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
 	}
@@ -5423,34 +5481,22 @@ void Actor::PerformAttack(ieDword gameTime)
 		damage = 0;
 	}
 
-	int critical = criticalroll>=ATTACKROLL;
-	ModifyWeaponDamage(wi, target, damage, critical);
+	bool critical = criticalroll>=ATTACKROLL;
+	bool success = critical;
 
-	if (critical) {
-		//critical success
-		printBracket("Critical Hit", GREEN);
-		print("\n");
-		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
-		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, UI_CRITICAL, damage);
-		ResetState();
+	if (!critical) {
+		//get target's defense against attack
+		int defense = target->GetDefense(damagetype, wi.wflags, this);
 
-		return;
-	}
-
-
-	//get target's defense against attack
-	int defense = target->GetDefense(damagetype, this);
-
-	bool success;
-	if(ReverseToHit) {
-		success = roll + defense > tohit;
-	} else {
-		success = tohit + roll > defense;
-	}
-	// autohit immobile enemies (true for atleast stun, sleep, timestop)
-	if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
-		success = true;
+		if(ReverseToHit) {
+			success = roll + defense > tohit;
+		} else {
+			success = tohit + roll > defense;
+		}
+		// autohit immobile enemies (true for atleast stun, sleep, timestop)
+		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
+			success = true;
+		}
 	}
 
 	if (!success) {
@@ -5463,9 +5509,21 @@ void Actor::PerformAttack(ieDword gameTime)
 		print("\n");
 		return;
 	}
-	printBracket("Hit", GREEN);
-	print("\n");
-	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, 0, damage);
+
+	ModifyWeaponDamage(wi, target, damage, critical);
+
+	if (critical) {
+		//critical success
+		printBracket("Critical Hit", GREEN);
+		print("\n");
+		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
+		VerbalConstant(VB_CRITHIT, 1);
+	} else {
+		//normal success
+		printBracket("Hit", GREEN);
+		print("\n");
+	}
+	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, critical?UI_CRITICAL:0, damage);
 	ResetState();
 }
 
@@ -6821,7 +6879,7 @@ static EffectRef fx_damage_ref = { "Damage", -1 };
 static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
 static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
 
-void Actor::ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage, int &critical)
+void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical)
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
 	//ToBEx compatibility in the ALWAYSBACKSTAB field:
@@ -6837,6 +6895,7 @@ void Actor::ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage,
 				if (target->Modified[IE_DISABLEBACKSTAB]) {
 					// The backstab seems to have failed
 					displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+					wi.backstabbing = false;
 				} else {
 					if (wi.backstabbing) {
 						damage *= multiplier;
@@ -6845,6 +6904,7 @@ void Actor::ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage,
 					} else {
 						// weapon is unsuitable for backstab
 						displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+						wi.backstabbing = false;
 					}
 				}
 			}
@@ -6853,12 +6913,14 @@ void Actor::ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage,
 	damage += WeaponDamageBonus(wi);
 
 	if (target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags) ) {
+		//'my weapon has no effect'
 		damage = 0;
-		critical = 0;
+		critical = false;
 		return;
 	}
+
 		//special effects on hit for arterial strike and hamstring
-	if (damage>0 && BackstabResRef[0]!='*') {
+	if (damage>0 && wi.backstabbing && BackstabResRef[0]!='*') {
 		core->ApplySpell(BackstabResRef, target, this, multiplier);
 		//do we need this?
 		BackstabResRef[0]='*';
@@ -6869,17 +6931,19 @@ void Actor::ModifyWeaponDamage(const WeaponInfo &wi, Actor *target, int &damage,
 
 	//critical protection a la PST
 	if (pstflags && (target->Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
-		critical = 0;
+		critical = false;
 	}
 
 	if (critical) {
 		if (inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
 			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
+			critical = false;
 		} else {
 			//a critical surely raises the morale?
-			//only if it is successful
-			target->NewBase(IE_MORALE, 1, MOD_ADDITIVE);
+			//only if it is successful it raises the morale of the attacker
+			VerbalConstant(VB_CRITHIT, 1);
+			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
 			//damage <<=1;
