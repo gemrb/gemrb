@@ -1436,6 +1436,18 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	CalculateWeight();
 }
 
+ieWord Inventory::GetShieldItemType() const
+{
+	ieWord ret;
+	CREItem *Slot;
+
+	const Item *itm = GetItemPointer(GetShieldSlot(), Slot);
+	if (!itm) return 0xffff;
+	ret = itm->ItemType;
+	gamedata->FreeItem( itm, Slot->ItemResRef, true );
+	return ret;
+}
+
 ieWord Inventory::GetArmorItemType() const
 {
 	ieWord ret;
