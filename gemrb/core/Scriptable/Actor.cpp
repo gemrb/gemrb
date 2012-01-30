@@ -301,6 +301,8 @@ static int CheckAbilities=false;
 #define WEAPON_STYLEMASK   15
 #define WEAPON_LEFTHAND    16
 #define WEAPON_USESTRENGTH 32
+#define WEAPON_BYPASS      0x10000
+#define WEAPON_KEEN        0x20000
 
 /* counts the on bits in a number */
 ieDword bitcount (ieDword n)
@@ -2130,12 +2132,12 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	ieWord armtype = inventory.GetArmorItemType();
 	ieDword armor = core->GetArmorFailure(armtype);
 	if (armor) {
-		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA)*5;
+		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA);
 		if (armor<feat) armor = 0;
 		else armor -= feat;
 	}
 
-	return base+armor;
+	return base+armor*5;
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
@@ -2619,6 +2621,10 @@ void Actor::RefreshPCStats() {
 	ieDword stars;
 	int dualwielding = IsDualWielding();
 	stars = GetProficiency(wi.prof)&PROFS_MASK;
+
+	//tenser's transformation makes the actor have at least proficient in any weapon
+	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
+
 	if (header) {
 		if (stars >= (unsigned)wspattack_rows) {
 			stars = wspattack_rows-1;
@@ -5003,6 +5009,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}//melee or ranged
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
+	//also copy these flags
+	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_IGNORESHIELD);
 
 	// get our dual wielding modifier
 	if (dualwielding) {
@@ -5018,6 +5026,10 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	//add in proficiency bonuses
 	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;
+
+	//tenser's transformation makes the actor proficient in any weapons
+	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
+
 	//hit/damage/speed bonuses from wspecial
 	if ((signed)stars > wspecial_max) {
 		stars = wspecial_max;
