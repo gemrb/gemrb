@@ -1139,7 +1139,7 @@ void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 
 	// reuse the luck mod to determine when the actor is tired
 	if (luckMod) {
-		DisplayStringCore(actor, VB_TIRED, DS_CONSOLE|DS_CONST);
+		actor->VerbalConstant(VB_TIRED, 1);
 	}
 }
 
@@ -2131,6 +2131,7 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 
 	ieWord armtype = inventory.GetArmorItemType();
 	ieDword armor = core->GetArmorFailure(armtype);
+
 	if (armor) {
 		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA);
 		if (armor<feat) armor = 0;
@@ -2875,10 +2876,10 @@ void Actor::ReactToDeath(const char * deadname)
 	const char *value = tm->QueryField (scriptName, deadname);
 	switch (value[0]) {
 	case '0':
-		DisplayStringCore(this, VB_REACT, DS_CONSOLE|DS_CONST );
+		VerbalConstant(VB_REACT, 1);
 		break;
 	case '1':
-		DisplayStringCore(this, VB_REACT_S, DS_CONSOLE|DS_CONST );
+		VerbalConstant(VB_REACT_S, 1);
 		break;
 	default:
 		{
@@ -3126,7 +3127,7 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
-	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
+	VerbalConstant(VB_PANIC, 1 );
 
 	Action *action;
 	char Tmp[40];
@@ -3182,9 +3183,9 @@ void Actor::DialogInterrupt()
 
 	/* this part is unsure */
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
-		DisplayStringCore(this, VB_HOSTILE, DS_CONSOLE|DS_CONST );
+		VerbalConstant(VB_HOSTILE, 1 );
 	} else {
-		DisplayStringCore(this, VB_DIALOG, DS_CONSOLE|DS_CONST );
+		VerbalConstant(VB_DIALOG, 1 );
 	}
 }
 
@@ -3195,7 +3196,7 @@ void Actor::GetHit()
 	if (!Immobile()) {
 		SetStance( IE_ANI_DAMAGE );
 	}
-	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
+	VerbalConstant(VB_DAMAGE, 1 );
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
 		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
 			return;
@@ -3971,7 +3972,7 @@ void Actor::Die(Scriptable *killer)
 	game->SelectActor(this, false, SELECT_NORMAL);
 
 	displaymsg->DisplayConstantStringName(STR_DEATH, DMC_WHITE, this);
-	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
+	VerbalConstant(VB_DIE, 1 );
 
 	// remove poison, hold, casterhold, stun and its icon
 	Effect *newfx;
@@ -4991,7 +4992,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		rangedheader = GetRangedWeapon(wi);
 		if (!rangedheader) {
 			//display out of ammo verbal constant if there is any???
-			//DisplayStringCore(this, VB_OUTOFAMMO, DS_CONSOLE|DS_CONST );
+			//VerbalConstant(VB_OUTOFAMMO, 1 );
 			//SetStance(IE_ANI_READY);
 			//set some trigger?
 			return false;
@@ -5397,7 +5398,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printBracket("Critical Miss", RED);
 		print("\n");
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
-		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
+		VerbalConstant(VB_CRITMISS, 1);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
@@ -5571,7 +5572,8 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 
 	if (damage<=0) {
-		DisplayStringCore(this, VB_TIMMUNE, DS_CONSOLE|DS_CONST );
+		VerbalConstant(VB_TIMMUNE, 1);
+		core->Autopause(AP_UNUSABLE, this);
 	}
 }
 
