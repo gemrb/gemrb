@@ -219,6 +219,10 @@ Item* ITMImporter::GetItem(Item *s)
 	return s;
 }
 
+//unfortunately, i couldn't avoid this hack, unless adding another array
+#define IT_DAGGER     0x10
+#define IT_SHORTSWORD 0x13
+
 void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 {
 	ieByte tmpByte;
@@ -249,6 +253,10 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	str->ReadWord( &eh->Charges );
 	str->ReadWord( &eh->ChargeDepletion );
 	str->ReadDword( &eh->RechargeFlags );
+
+	//hack for default weapon finesse
+	if (s->ItemType==IT_DAGGER || s->ItemType==IT_SHORTSWORD) eh->RechargeFlags^=IE_ITEM_USEDEXTERITY;
+
 	str->ReadWord( &eh->ProjectileAnimation );
 	//for some odd reasons 0 and 1 are the same
 	if (eh->ProjectileAnimation) {

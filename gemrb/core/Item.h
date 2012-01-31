@@ -51,14 +51,16 @@ class Projectile;
 #define IE_ITEM_CONVERSABLE  0x00000800
 #define IE_ITEM_PULSATING    0x00001000
 #define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
-
-//modder extensions
+//tobex modder extensions, please note, these are not copied into the local slot bits
 #define IE_ITEM_NO_DISPEL    0x01000000 //disables destruction by dispelling
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
+#define IE_ITEM_NO_INVIS     0x04000000 //don't target invisible
+
 
 //Extended header recharge flags
 #define IE_ITEM_USESTRENGTH  1          //weapon
 #define IE_ITEM_BREAKABLE    2          //weapon
+#define IE_ITEM_USEDEXTERITY 4          //gemrb weapon (move this if tobex implements it elsewhere)
 #define IE_ITEM_HOSTILE      0x400      //equipment
 #define IE_ITEM_RECHARGE     0x800      //equipment
 #define IE_ITEM_IGNORESHIELD 0x10000    //weapon
