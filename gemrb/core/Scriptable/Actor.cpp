@@ -140,8 +140,9 @@ static const char *skillcolumns[12]={
 static ieResRef featspells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
-static ieDword pstflags = false;
+static bool pstflags = false;
 static bool nocreate = false;
+static bool third = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 
@@ -301,6 +302,7 @@ static int CheckAbilities=false;
 #define WEAPON_STYLEMASK   15
 #define WEAPON_LEFTHAND    16
 #define WEAPON_USESTRENGTH 32
+#define WEAPON_FINESSE     64
 #define WEAPON_BYPASS      0x10000
 #define WEAPON_KEEN        0x20000
 
@@ -1443,6 +1445,8 @@ static void InitActorTables()
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 	nocreate = !!core->HasFeature(GF_NO_NEW_VARIABLES);
+	third = !!core->HasFeature(GF_3ED_RULES);
+
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
 	} else {
@@ -2146,8 +2150,8 @@ int Actor::GetDexterityAC() const
 {
 	int dexbonus;
 
-	if (core->HasFeature(GF_3ED_RULES)) {
-		dexbonus = GetAbilityBonus(GetStat(IE_DEX));
+	if (third) {
+		dexbonus = GetAbilityBonus(IE_DEX);
 	} else {
 		dexbonus = core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
 	}
@@ -2170,14 +2174,14 @@ int Actor::GetDexterityAC() const
 	}
 
 	//and the monk wisdom bonus
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (third) {
 		//if the monk has a shield equipped, no bonus
 		int itemtype = inventory.GetShieldItemType();
 		//items with critical range are weapons, not shields, so they are ok
 		//empty hand is also ok
 		if (GetStat(IE_LEVELMONK) && (itemtype==0xffff || core->GetArmorFailure(itemtype))) {
 			//too many variables, recycling
-			itemtype = GetAbilityBonus(GetStat(IE_WIS));
+			itemtype = GetAbilityBonus(IE_WIS);
 			//add the bonus only if it is a bonus (the dexbonus is negative)
 			if (itemtype>0) {
 				dexbonus += itemtype;
@@ -4741,7 +4745,6 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	}
 	wi.range = which->Range+1;
 	return which;
-	//return which->Range+1;
 }
 
 void Actor::GetNextStance()
@@ -5054,8 +5057,11 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		wi.wflags = 0;
 		return false;
 	}//melee or ranged
+	//TODO easier copying of recharge flags into wflags
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
+	// this flag is set in dagger/shortsword by the loader
+	if (header->RechargeFlags&IE_ITEM_USEDEXTERITY) wi.wflags|=WEAPON_FINESSE;
 	//also copy these flags
 	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_IGNORESHIELD);
 
@@ -5163,6 +5169,7 @@ int Actor::MeleePenalty() const
 int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 {
 	int tohit = bonus;
+	int strbonus = 0;
 
 	//get our dual wielding modifier
 	if (IsDualWielding()) {
@@ -5173,10 +5180,29 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 		}
 	}
 
+	//add strength bonus if we need
+	if (Flags&WEAPON_USESTRENGTH) {
+		if (third) {
+		  strbonus = GetAbilityBonus(IE_STR );
+		} else {
+			strbonus = core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		}
+	}
+
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
 			tohit += GetStat(IE_MELEETOHIT);
+		  if ((Flags&WEAPON_FINESSE) && HasFeat(FEAT_WEAPON_FINESSE) ) {
+		    int dexbonus;
+		    if (third) {
+		      dexbonus = GetAbilityBonus(IE_DEX );
+		    } else {
+		      //FIXME check with ToBEx if they want a new column for this
+				  dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+		    }
+		    if (dexbonus>strbonus) strbonus = dexbonus;
+		  }
 			break;
 		case WEAPON_FIST:
 			tohit += GetStat(IE_FISTHIT);
@@ -5184,14 +5210,14 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 		case WEAPON_RANGED:
 			tohit += GetStat(IE_MISSILEHITBONUS);
 			//add dexterity bonus
-			tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+		  if (third) {
+		    tohit += GetAbilityBonus(IE_DEX );
+		  } else {
+				tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+		  }
 			break;
 	}
-
-	//add strength bonus if we need
-	if (Flags&WEAPON_USESTRENGTH) {
-		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
-	}
+	tohit += strbonus;
 
 	if (target) {
 		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
@@ -5435,7 +5461,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	// IE_CRITICALHITBONUS is positive, it is subtracted
 	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
 	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (third) {
 		int ThreatRangeMin = ATTACKROLL; // FIXME: this is just the default
 		if (header && (header->RechargeFlags&IE_ITEM_KEEN)) {
 			//this is correct, the threat range is only increased by one in the original engine
@@ -5536,12 +5562,13 @@ static EffectRef fx_cloak_ref = { "Overlay", -1 };
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 {
 	if (wi.wflags&WEAPON_USESTRENGTH) {
-		if (core->HasFeature(GF_3ED_RULES) && (wi.itemflags&IE_INV_ITEM_TWOHANDED)) {
-			// 150% bonus for twohandlers
-			return 150 * core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA)) / 100;
-		} else {
-			return core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		if (third) {
+		  int bonus = GetAbilityBonus(IE_STR);
+		  // 150% bonus for twohanders
+		  if (wi.itemflags&IE_INV_ITEM_TWOHANDED) bonus+=bonus/2;
+		  return bonus;
 		}
+		return core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
 	}
 
 	return 0;
@@ -5816,6 +5843,7 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp)
 {
 	if (core->HasFeature(GF_WISDOM_BONUS)) {
+		//TODO find out the 3ED variant
 		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
 	}
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);

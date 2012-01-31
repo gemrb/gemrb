@@ -1873,7 +1873,7 @@ bool Inventory::ProvidesCriticalAversion()
 		//to get to it (TODO convince ToBEx to move this bit into the accessible range?) - low 24 bits
 		ieDword flag = itm->Flags;
 		gamedata->FreeItem( itm, item->ItemResRef, false );
-		if (!(flags&IE_ITEM_TOGGLE_CRITS) != (i==SLOT_HEAD) ) return true;
+		if ( !(flag&IE_ITEM_TOGGLE_CRITS) != ((int) i==SLOT_HEAD) ) return true;
 	}
 	return false;
 }
