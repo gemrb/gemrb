@@ -291,8 +291,9 @@ int SDLVideoDriver::PollEvents() {
 	float xScaleFactor = 1.0;
 	float yScaleFactor = 1.0;
 	if(state){
-		xScaleFactor = state->xres / disp->w;
-		yScaleFactor = state->yres / disp->h;
+		SDL_Window* window = SDL_GetFocusWindow();
+		xScaleFactor = state->xres / window->w;
+		yScaleFactor = state->yres / window->h;
 	}
 
 	static bool touchHold = false;
