@@ -1,0 +1,12 @@
+2DA V1.0
+0
+            STAT             SLOT1      SLOT2
+NONE        *                2          4
+ABJURER     *                2          4
+CONJURER    *                2          4
+DIVINER     *                2          4
+ENCHANTER   FEAT_ENCHANTMENT 2          4
+ILLUSIONIST *                2          4
+EVOKER      FEAT_EVOCATION   2          4
+NECROMANCER FEAT_NECROMANCY  2          4
+TRANSMUTER  FEAT_TRANSMUTE   2          4
