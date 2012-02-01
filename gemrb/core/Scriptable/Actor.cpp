@@ -5183,7 +5183,7 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 	//add strength bonus if we need
 	if (Flags&WEAPON_USESTRENGTH) {
 		if (third) {
-		  strbonus = GetAbilityBonus(IE_STR );
+			strbonus = GetAbilityBonus(IE_STR );
 		} else {
 			strbonus = core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
 		}
@@ -5193,16 +5193,16 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
 			tohit += GetStat(IE_MELEETOHIT);
-		  if ((Flags&WEAPON_FINESSE) && HasFeat(FEAT_WEAPON_FINESSE) ) {
-		    int dexbonus;
-		    if (third) {
-		      dexbonus = GetAbilityBonus(IE_DEX );
-		    } else {
-		      //FIXME check with ToBEx if they want a new column for this
-				  dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
-		    }
-		    if (dexbonus>strbonus) strbonus = dexbonus;
-		  }
+			if ((Flags&WEAPON_FINESSE) && HasFeat(FEAT_WEAPON_FINESSE) ) {
+				int dexbonus;
+				if (third) {
+					dexbonus = GetAbilityBonus(IE_DEX );
+				} else {
+					//FIXME check with ToBEx if they want a new column for this
+					dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+				}
+				if (dexbonus>strbonus) strbonus = dexbonus;
+			}
 			break;
 		case WEAPON_FIST:
 			tohit += GetStat(IE_FISTHIT);
@@ -5210,11 +5210,11 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 		case WEAPON_RANGED:
 			tohit += GetStat(IE_MISSILEHITBONUS);
 			//add dexterity bonus
-		  if (third) {
-		    tohit += GetAbilityBonus(IE_DEX );
-		  } else {
+			if (third) {
+				tohit += GetAbilityBonus(IE_DEX );
+			} else {
 				tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
-		  }
+			}
 			break;
 	}
 	tohit += strbonus;
@@ -5563,10 +5563,10 @@ int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 {
 	if (wi.wflags&WEAPON_USESTRENGTH) {
 		if (third) {
-		  int bonus = GetAbilityBonus(IE_STR);
-		  // 150% bonus for twohanders
-		  if (wi.itemflags&IE_INV_ITEM_TWOHANDED) bonus+=bonus/2;
-		  return bonus;
+			int bonus = GetAbilityBonus(IE_STR);
+			// 150% bonus for twohanders
+			if (wi.itemflags&IE_INV_ITEM_TWOHANDED) bonus+=bonus/2;
+			return bonus;
 		}
 		return core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
 	}
