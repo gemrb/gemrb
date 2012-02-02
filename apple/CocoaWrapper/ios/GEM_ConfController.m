@@ -535,7 +535,14 @@ enum ConfigTableSection {
 
 - (IBAction)launchGEM:(id) __unused sender
 {
-	[[self delegate] setupComplete:[self selectedConfigPath]];
+	/*
+	 Ensure a few things about starting GemRB:
+	 1. ensure GemRB_main is called from the main thread.
+	 2. ensure we won't return here since this will be deallocated
+	 3. ensure we have dropped back to the main runloop so autoreleased objects are disposed of
+	 bonus: the call stack is significantly reduced this way
+	*/
+	[[self delegate] performSelectorOnMainThread:@selector(setupComplete:) withObject:[self selectedConfigPath] waitUntilDone:NO];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView
