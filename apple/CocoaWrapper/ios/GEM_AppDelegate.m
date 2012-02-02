@@ -92,6 +92,8 @@ GEM_EXPORT
 		[configWin release];
 		[nibObjects release];
 
+		[confControl release];
+
 		// pass control to GemRB
 		[procArguments release];
 		ret = GemRB_main(argc, argv);
