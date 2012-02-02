@@ -140,7 +140,6 @@ enum ConfigTableSection {
 
 - (void)dealloc
 {	
-	[self launchGEM:nil];
 	[super dealloc];
 	[docDir release];
 	[editorButton release];

@@ -37,6 +37,7 @@
 }
 @property(readonly) GEM_ConfController* confControl;
 
+- (void)setupWrapper;
 - (void)runGemRB:(NSString*)configPath;
 
 @end

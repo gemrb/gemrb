@@ -40,6 +40,13 @@ GEM_EXPORT
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Normally you would call super implemetation first, but don't!
+	[self setupWrapper];
+
+    return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
+
+- (void)setupWrapper
+{
 	configWin = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 	configWin.backgroundColor = [UIColor blackColor];
 	confControl = [[GEM_ConfController alloc] init];
@@ -58,8 +65,6 @@ GEM_EXPORT
 	configWin.rootViewController = confControl.rootVC;
 	configWin.screen = [UIScreen mainScreen];
 	[configWin makeKeyAndVisible];
-
-    return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
 - (void)setupComplete:(NSString*)configPath
@@ -112,9 +117,12 @@ GEM_EXPORT
 			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 		}
 		[alert release];
+		// reload the wrapper interface so we can try again instead of dying
+		[self setupWrapper];
+	} else {
+		// We must exit since the application runloop never returns.
+		exit(ret);
 	}
-	// We must exit since the application runloop never returns.
-	exit(ret);
 }
 
 @end
