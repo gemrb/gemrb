@@ -21,14 +21,13 @@ ENDIF(APPLE)
 # we need to add gemrb target before processing plugins or COCOA plugins don't work right.
 
 ADD_SUBDIRECTORY( plugins )
-ADD_SUBDIRECTORY( override )
 ADD_SUBDIRECTORY( docs )
 ADD_SUBDIRECTORY( tests )
 IF (APPLE)
 	# GUIScripts ALWAYS get copied to the App bundle
 	SET( DATA_DIR ${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources/ )
-	message(STATUS "  GUIscripts dir: ${DATA_DIR}")
 ENDIF(APPLE)
+ADD_SUBDIRECTORY( override )
 ADD_SUBDIRECTORY( GUIScripts )
 
 SET_TARGET_PROPERTIES(gemrb PROPERTIES INSTALL_RPATH ${LIB_DIR})

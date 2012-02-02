@@ -2440,7 +2440,13 @@ bool Interface::LoadConfig(const char* filename)
 	ResolveFilePath(GemRBPath);
 
 	if (!GemRBOverridePath[0]) {
+#if TARGET_OS_MAC
+		// override will ALWAYS be in the app bundle if not specified in the config
+		// the build process always copys them to the Recources diectory
+		strcpy( GemRBOverridePath, ""PACKAGE".app/Contents/Resources/");
+#else
 		strcpy( GemRBOverridePath, GemRBPath );
+#endif
 	} else {
 		ResolveFilePath(GemRBOverridePath);
 	}
