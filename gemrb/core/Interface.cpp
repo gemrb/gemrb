@@ -1504,6 +1504,15 @@ int Interface::Init()
 	}
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	PluginMgr *plugin = PluginMgr::Get();
+#if TARGET_OS_MAC
+	// search the bundle plugins first
+	// since bundle plugins are loaded first dyld will give them precedence
+	// if duplicates are found in the PluginsPath
+	char bundlePluginsPath[_MAX_PATH];
+	strncpy(bundlePluginsPath, ""PACKAGE".app/Contents/Plugins/", _MAX_PATH);
+	ResolveFilePath(bundlePluginsPath);
+	LoadPlugins(bundlePluginsPath);
+#endif
 	LoadPlugins(PluginsPath);
 	if (plugin && plugin->GetPluginCount()) {
 		printMessage( "Core", "Plugin Loading Complete...", WHITE );
