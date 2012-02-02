@@ -1641,7 +1641,9 @@ int Interface::Init()
 	if (!IgnoreOriginalINI) {
 		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
-		LoadINI( ini_path );
+		if (!LoadINI(ini_path)) {
+			printMessage("Core", "Ignoring error loading '%s'.\n", YELLOW, INIConfig);
+		}
 	}
 
 	int i;
