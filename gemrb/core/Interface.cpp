@@ -3888,36 +3888,78 @@ int Interface::GetCharacters(TextArea* ta)
 
 bool Interface::LoadINI(const char* filename)
 {
-	FileStream* config = FileStream::OpenFile(filename);
-	if (config == NULL) {
+	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
+
+	FileStream* iniStream = FileStream::OpenFile(filename);
+	if (!iniStream)
+		return false;
+
+	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	if (!ini->Open(iniStream))
+		return false;
+
+	// now extract only the values we care about with defaults
+	// whitelist of values we can push directly into vars
+	// one map for each ini section we are interested in
+	static const struct INIWhiteListEntry {
+		const char* INITag;
+		const char* INIKey;
+		int defaultValue;
+	} whitelist[] = {
+		// Program Options
+		{"Program Options", "Full Screen", FullScreen},
+		{"Program Options", "BitsPerPixel", Bpp},
+		{"Program Options", "3D Acceleration", 0},
+		{"Program Options", "Translucent Shadows", 0},
+		{"Program Options", "Display Subtitles", 0},		// identical to Display Movie Subtitles
+		{"Program Options", "Display Movie Subtitles", 0},	// identical to Display Subtitles
+		// Game Options - Audio
+		{"Program Options", "Volume Ambients", 100},
+		{"Program Options", "Volume Movie", 100},
+		{"Program Options", "Volume Music", 100},
+		{"Program Options", "Volume SFX", 100},
+		{"Program Options", "Volume Voices", 100},
+		// Debug
+		{"Program Options", "Debug Mode", 0},				// not used. should be implemented. (for logging especially)
+		// Game Options
+		{"Game Options", "Difficulty Level", 0},
+		{"Game Options", "Mouse Scroll Speed", 0},
+		{"Game Options", "GUI Feedback Levels", 0},
+		{"Game Options", "Locator Feedback Level", 0},
+		{"Game Options", "Bored Timeout", 0},
+		{"Game Options", "Always Dithers", 0},
+		{"Game Options", "Keyboard Scroll Speed", 0},		// not used. should be implemented.
+		{"Game Options", "Command Sounds Frequency", 0},
+		{"Game Options", "Selection Sounds Frequency", 0},
+		{"Game Options", "Infravision", 0},					// not used. should be implemented.
+		{"Game Options", "Weather", 1},						// not used. should be implemented.
+		{"Game Options", "Auto Pause State", AP_ENEMY|AP_DEAD|AP_ENEMY},
+		{"Game Options", "Auto Pause Center", 1},
+		{"Game Options", "HP Over Head", 0},				// not used. should be implemented.
+		{"Game Options", "Hotkeys On Tooltips", 1},			// not used. should be implemented.
+	};
+
+	// iterate our whitelist and load the ini values into vars
+	const size_t listSize = sizeof(whitelist) / sizeof(whitelist[0]);
+	for (size_t i = 0; i < listSize; i++) {
+		INIWhiteListEntry entry = whitelist[i];
+		vars->SetAt(entry.INIKey, ini->GetKeyAsInt(entry.INITag, entry.INIKey, entry.defaultValue));
 	}
-	char name[65], value[_MAX_PATH + 3];
-	while (config->Remains()) {
-		char line[_MAX_PATH];
 
-		if (config->ReadLine(line, _MAX_PATH) == -1)
-			break;
+	// handle a few special cases
+	if (!ini->GetKeyAsInt("Config", "Sound", 1))
+		AudioDriverName = "null";
 
-		if ((line[0] == '#') ||
-			( line[0] == '[' ) ||
-			( line[0] == '\r' ) ||
-			( line[0] == '\n' ) ||
-			( line[0] == ';' )) {
-			continue;
-		}
-
-		name[0] = 0;
-		value[0] = 0;
-
-		//the * element is not counted
-		if (sscanf( line, "%[^=]=%[^\r\n]", name, value )!=2)
-			continue;
-		if (( value[0] >= '0' ) && ( value[0] <= '9' )) {
-			vars->SetAt( name, atoi( value ) );
+	if (!Width || !Height) {
+		Height = ini->GetKeyAsInt("Config", "ConfigHeight", Height);
+		int tmpWidth = ini->GetKeyAsInt("Config", "ConfigWidth", 0);
+		if (!tmpWidth) {
+			// Resolution is stored as width only. assume 4|3 ratio.
+			Width = ini->GetKeyAsInt("Program Options", "Resolution", Width);
+			Height = 0.75 * Width;
 		}
 	}
-	delete config;
 	return true;
 }
 
