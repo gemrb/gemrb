@@ -1481,12 +1481,27 @@ int Interface::Init()
 	}
 	lists->SetType( GEM_VARIABLES_POINTER );
 
+	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
+	vars = new Variables();
+	if (!vars) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+	vars->SetType( GEM_VARIABLES_INT );
+	vars->ParseKey(true);
+
+	vars->SetAt( "Volume Ambients", 100 );
+	vars->SetAt( "Volume Movie", 100 );
+	vars->SetAt( "Volume Music", 100 );
+	vars->SetAt( "Volume SFX", 100 );
+	vars->SetAt( "Volume Voices", 100 );
+	printStatus( "OK", LIGHT_GREEN );
+
 	if (!LoadConfig()) {
 		printMessage( "Core", "Could not load config file ", YELLOW);
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
-
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	PluginMgr *plugin = PluginMgr::Get();
 #if TARGET_OS_MAC
@@ -1509,6 +1524,30 @@ int Interface::Init()
 	}
 	plugin->RunInitializers();
 
+	time_t t;
+	t = time( NULL );
+	srand( ( unsigned int ) t );
+#ifdef _DEBUG
+	FileStreamPtrCount = 0;
+#endif
+	printMessage( "Core", "GemRB Core Initialization...", WHITE );
+	printStatus( "OK", LIGHT_GREEN );
+	printMessage( "Core", "Initializing Video Driver...", WHITE );
+	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
+	if (!video) {
+		printStatus( "ERROR", LIGHT_RED );
+		print( "No Video Driver Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
+	if (video->Init() == GEM_ERROR) {
+		printStatus( "ERROR", LIGHT_RED );
+		print( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
+	Color defcolor={255,255,255,200};
+	SetInfoTextColor(defcolor);
+	printStatus( "OK", LIGHT_GREEN );
+
 	{
 		printMessage( "Core", "Initializing Search Path...", WHITE );
 		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
@@ -1518,6 +1557,7 @@ int Interface::Init()
 		}
 
 		char path[_MAX_PATH];
+
 		PathJoin( path, CachePath, NULL);
 		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
 			print( "The cache path couldn't be registered, please check! " );
@@ -1551,77 +1591,20 @@ int Interface::Init()
 
 		PathJoin( path, GamePath, GameDataPath, NULL);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-	}
 
-	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
-	vars = new Variables();
-	if (!vars) {
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
-	}
-	vars->SetType( GEM_VARIABLES_INT );
-	vars->ParseKey(true);
-
-	printMessage( "Core", "Reading Game Options...\n", WHITE );
-	if (!LoadGemRBINI()) {
-		print( "Cannot Load INI\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
-
-	//loading baldur.ini
-	if (!IgnoreOriginalINI) {
-		char ini_path[_MAX_PATH];
-		PathJoin( ini_path, GamePath, INIConfig, NULL );
-		if (!LoadINI(ini_path)) {
-			print( "Cannot Load INI\nTermination in Progress...\n" );
-			return GEM_ERROR;
+		//IWD2 movies are on the CD but not in the BIF
+		char *description = strdup("CD1/data");
+		for (i = 0; i < MAX_CD; i++) {
+			for (size_t j=0;j<CD[i].size();j++) {
+				description[2]='1'+i;				
+				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
+				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
+			}
 		}
-	} else {
-		vars->SetAt( "Volume Ambients", 100 );
-		vars->SetAt( "Volume Movie", 100 );
-		vars->SetAt( "Volume Music", 100 );
-		vars->SetAt( "Volume SFX", 100 );
-		vars->SetAt( "Volume Voices", 100 );
-	}
-	printStatus( "OK", LIGHT_GREEN );
+		free(description);
 
-	//IWD2 movies are on the CD but not in the BIF
-	char *description = strdup("CD1/data");
-	char path[_MAX_PATH];
-	for (size_t i = 0; i < MAX_CD; i++) {
-		for (size_t j=0;j<CD[i].size();j++) {
-			description[2]='1'+i;
-			PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
-			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
-		}
+		printStatus( "OK", LIGHT_GREEN );
 	}
-	free(description);
-
-	printStatus( "OK", LIGHT_GREEN );
-
-	time_t t;
-	t = time( NULL );
-	srand( ( unsigned int ) t );
-#ifdef _DEBUG
-	FileStreamPtrCount = 0;
-#endif
-	printMessage( "Core", "GemRB Core Initialization...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Video Driver...", WHITE );
-	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
-	if (!video) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "No Video Driver Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
-	if (video->Init() == GEM_ERROR) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
-	Color defcolor={255,255,255,200};
-	SetInfoTextColor(defcolor);
-	printStatus( "OK", LIGHT_GREEN );
 
 	{
 		printMessage( "Core", "Initializing KEY Importer...", WHITE );
@@ -1656,6 +1639,21 @@ int Interface::Init()
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
 	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
+
+	printMessage( "Core", "Reading Game Options...\n", WHITE );
+	if (!LoadGemRBINI()) {
+		print( "Cannot Load INI\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
+
+	//loading baldur.ini
+	if (!IgnoreOriginalINI) {
+		char ini_path[_MAX_PATH];
+		PathJoin( ini_path, GamePath, INIConfig, NULL );
+		if (!LoadINI(ini_path)) {
+			printMessage("Core", "Ignoring error loading '%s'.\n", YELLOW, INIConfig);
+		}
+	}
 
 	int i;
 	for (i = 0; i < 8; i++) {
