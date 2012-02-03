@@ -4177,6 +4177,8 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 cleanup:
 	// Something went wrong, so try to clean after itself
 
+	error("Core", "Unable to load game.");
+
 	delete new_game;
 	delete new_worldmap;
 
