@@ -140,7 +140,9 @@ enum ConfigTableSection {
 
 - (void)dealloc
 {	
-	[super dealloc];
+	// cancel any pending requests to install game data
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+
 	[docDir release];
 	[editorButton release];
 
@@ -149,6 +151,8 @@ enum ConfigTableSection {
 	[logFiles release];
 
 	[toolBarItems release];
+
+	[super dealloc];
 }
 
 - (void)navigationController:(UINavigationController *) __unused navigationController willShowViewController:(UIViewController *) __unused viewController animated:(BOOL) __unused animated
