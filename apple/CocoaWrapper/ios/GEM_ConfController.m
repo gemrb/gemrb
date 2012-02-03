@@ -501,6 +501,10 @@ enum ConfigTableSection {
 				[tableView deselectRowAtIndexPath:indexPath animated:YES];
 				[self tableView:tableView didDeselectRowAtIndexPath:indexPath];
 			}
+			if (configIndexPath.row == indexPath.row) {
+				[controlTable deselectRowAtIndexPath:configIndexPath animated:YES];
+				[self tableView:controlTable didDeselectRowAtIndexPath:configIndexPath];
+			}
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@", docDir, [configFiles objectAtIndex:indexPath.row]] error:nil];
 			break;
 		case TABLE_SEC_INSTALL:
