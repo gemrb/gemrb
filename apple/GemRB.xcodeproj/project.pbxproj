@@ -362,6 +362,7 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
+		A2A07DEC14DB9E120026400C /* WMPImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4A913A28AE100D41A8A /* WMPImporter.so */; };
 		A2A3A7D914A505FD00F705CF /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.m */; };
 		A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7DF14A5130F00F705CF /* CocoaMain.m */; };
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
@@ -1006,6 +1007,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A2A07DEC14DB9E120026400C /* WMPImporter.so in CopyFiles */,
 				A2B8199114DB4170006F0ABE /* BMPWriter.so in CopyFiles */,
 				A2B8199014DB4167006F0ABE /* BMPImporter.so in CopyFiles */,
 				A231459F14DB274800837841 /* OpenALAudio.so in CopyFiles */,
