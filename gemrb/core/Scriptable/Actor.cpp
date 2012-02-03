@@ -3341,7 +3341,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	{
 	case MOD_ADDITIVE:
 		//bonus against creature should only affect additive damages or spells like harm would be deadly
-		damage += act->fxqueue.BonusAgainstCreature(fx_damage_vs_creature_ref, this);
+		if (damage) {
+			damage += act->fxqueue.BonusAgainstCreature(fx_damage_vs_creature_ref, this);
+		}
 		break;
 	case MOD_ABSOLUTE:
 		damage = GetBase(IE_HITPOINTS) - damage;
