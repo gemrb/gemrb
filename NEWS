@@ -1,12 +1,13 @@
-GemRB git (b0a9000):
+GemRB git (601e49a):
   New features:
     - 
+    - iwd2 armor penalty and critical hit multiplier
     - many iwd2 feats
 
   Improved features:
     - 
-    - (iwd2) effects
-    - cocoa wrapper, cursor handling
+    - (iwd2) effects, combat
+    - cocoa wrapper and mac build, cursor handling
     - bugfixes
 
   Applied patches:
