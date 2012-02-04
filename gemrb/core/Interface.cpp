@@ -1490,11 +1490,6 @@ int Interface::Init()
 	vars->SetType( GEM_VARIABLES_INT );
 	vars->ParseKey(true);
 
-	vars->SetAt( "Volume Ambients", 100 );
-	vars->SetAt( "Volume Movie", 100 );
-	vars->SetAt( "Volume Music", 100 );
-	vars->SetAt( "Volume SFX", 100 );
-	vars->SetAt( "Volume Voices", 100 );
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (!LoadConfig()) {
@@ -1653,6 +1648,12 @@ int Interface::Init()
 		if (!LoadINI(ini_path)) {
 			printMessage("Core", "Ignoring error loading '%s'.\n", YELLOW, INIConfig);
 		}
+	} else {
+		vars->SetAt( "Volume Ambients", 100 );
+		vars->SetAt( "Volume Movie", 100 );
+		vars->SetAt( "Volume Music", 100 );
+		vars->SetAt( "Volume SFX", 100 );
+		vars->SetAt( "Volume Voices", 100 );
 	}
 
 	int i;
