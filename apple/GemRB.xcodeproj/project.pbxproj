@@ -14,9 +14,10 @@
 				A2F8709214AE448500F9CC1F /* ShellScript */,
 			);
 			dependencies = (
-				A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */,
+				A2AF8FCB14DDCEA8005CAC5D /* PBXTargetDependency */,
+				A2AF8FC914DDCE9D005CAC5D /* PBXTargetDependency */,
 				A2A1417914B4E907003FE672 /* PBXTargetDependency */,
-				A2A1417714B4E901003FE672 /* PBXTargetDependency */,
+				A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */,
 				A2F8709414AE4A8F00F9CC1F /* PBXTargetDependency */,
 			);
 			name = ReleasePackage;
@@ -117,7 +118,6 @@
 		A23145A014DB274800837841 /* PLTImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46713A28A3F00D41A8A /* PLTImporter.so */; };
 		A23145A114DB274800837841 /* PROImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B47313A28A5D00D41A8A /* PROImporter.so */; };
 		A23145A214DB274800837841 /* PSTOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B47913A28A7600D41A8A /* PSTOpcodes.so */; };
-		A23145A314DB274800837841 /* SDLVideo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B48513A28A9000D41A8A /* SDLVideo.so */; };
 		A23145A414DB274800837841 /* SPLImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B48B13A28A9E00D41A8A /* SPLImporter.so */; };
 		A23145A514DB274800837841 /* TISImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49113A28AA900D41A8A /* TISImporter.so */; };
 		A23145A614DB274800837841 /* TLKImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49713A28AB800D41A8A /* TLKImporter.so */; };
@@ -372,10 +372,13 @@
 		A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
+		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
+		A2AF8FCE14DDCED0005CAC5D /* NullSound.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B45513A28A0E00D41A8A /* NullSound.so */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A2B8199014DB4167006F0ABE /* BMPImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3D713A286BC00D41A8A /* BMPImporter.so */; };
 		A2B8199114DB4170006F0ABE /* BMPWriter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3DD13A286CD00D41A8A /* BMPWriter.so */; };
+		A2BDBAB114DDE4E2001113A4 /* SDLVideo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B48513A28A9000D41A8A /* SDLVideo.so */; };
 		A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C66D9C13A2953D00C0AA8E /* Python.framework */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2D0504F14D0AFCA00D8CD77 /* libgemrb_core.dylib in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -629,13 +632,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A202FC13149EAFE2000D6D68 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A269030F142BEE2F003E8BCC;
-			remoteInfo = TTFImporter;
-		};
 		A2375BA013AAF58E00E7EF9B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -895,19 +891,33 @@
 			remoteGlobalIDString = A2F0505013ABB80B0023B7EB;
 			remoteInfo = SAVImporter;
 		};
-		A2A1417614B4E901003FE672 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A276B45413A28A0E00D41A8A;
-			remoteInfo = NullSound;
-		};
 		A2A1417814B4E907003FE672 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A276B46C13A28A5000D41A8A;
 			remoteInfo = PNGImporter;
+		};
+		A2AF8FC814DDCE9D005CAC5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A276B45A13A28A1C00D41A8A;
+			remoteInfo = OGGReader;
+		};
+		A2AF8FCA14DDCEA8005CAC5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A269030F142BEE2F003E8BCC;
+			remoteInfo = TTFImporter;
+		};
+		A2AF8FCC14DDCEBD005CAC5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A276B45413A28A0E00D41A8A;
+			remoteInfo = NullSound;
 		};
 		A2C48CEA14A3FEF600575FE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1007,6 +1017,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A2BDBAB114DDE4E2001113A4 /* SDLVideo.so in CopyFiles */,
+				A2AF8FCE14DDCED0005CAC5D /* NullSound.so in CopyFiles */,
 				A2A07DEC14DB9E120026400C /* WMPImporter.so in CopyFiles */,
 				A2B8199114DB4170006F0ABE /* BMPWriter.so in CopyFiles */,
 				A2B8199014DB4167006F0ABE /* BMPImporter.so in CopyFiles */,
@@ -1014,7 +1026,6 @@
 				A23145A014DB274800837841 /* PLTImporter.so in CopyFiles */,
 				A23145A114DB274800837841 /* PROImporter.so in CopyFiles */,
 				A23145A214DB274800837841 /* PSTOpcodes.so in CopyFiles */,
-				A23145A314DB274800837841 /* SDLVideo.so in CopyFiles */,
 				A23145A414DB274800837841 /* SPLImporter.so in CopyFiles */,
 				A23145A514DB274800837841 /* TISImporter.so in CopyFiles */,
 				A23145A614DB274800837841 /* TLKImporter.so in CopyFiles */,
@@ -1257,6 +1268,7 @@
 		A2AAF36713A1507100AE8402 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2AAF38D13A150D700AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AAF39313A150F900AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = ../../../../../Library/Frameworks/Vorbis.framework; sourceTree = "<group>"; };
 		A2BD81A313960965007E9C63 /* defsounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defsounds.h; sourceTree = "<group>"; };
 		A2BD81A413960965007E9C63 /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errors.h; sourceTree = "<group>"; };
 		A2BD81A513960965007E9C63 /* exports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exports.h; sourceTree = "<group>"; };
@@ -1745,6 +1757,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */,
 				A276B53A13A28D2300D41A8A /* libgemrb_core.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2021,6 +2034,7 @@
 		29B97314FDCFA39411CA2CEA /* GemRB_OSX */ = {
 			isa = PBXGroup;
 			children = (
+				A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */,
 				A2FE553A13982BA6006AB962 /* config.h */,
 				A2D4C51D13A978110086BCC4 /* includes */,
 				A27B8697139F0A7D0002DC13 /* plugins */,
@@ -3099,8 +3113,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
 				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
-				A202FC14149EAFE2000D6D68 /* PBXTargetDependency */,
 				A23EBFFC1419A81500CC049E /* PBXTargetDependency */,
 				A2375BA113AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BA313AAF58E00E7EF9B /* PBXTargetDependency */,
@@ -4732,11 +4746,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A202FC14149EAFE2000D6D68 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A269030F142BEE2F003E8BCC /* TTFImporter */;
-			targetProxy = A202FC13149EAFE2000D6D68 /* PBXContainerItemProxy */;
-		};
 		A2375BA113AAF58E00E7EF9B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A27E830913A0358200B41410 /* 2DAImporter */;
@@ -4922,15 +4931,25 @@
 			target = A2F0505013ABB80B0023B7EB /* SAVImporter */;
 			targetProxy = A23EBFFB1419A81500CC049E /* PBXContainerItemProxy */;
 		};
-		A2A1417714B4E901003FE672 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A276B45413A28A0E00D41A8A /* NullSound */;
-			targetProxy = A2A1417614B4E901003FE672 /* PBXContainerItemProxy */;
-		};
 		A2A1417914B4E907003FE672 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
 			targetProxy = A2A1417814B4E907003FE672 /* PBXContainerItemProxy */;
+		};
+		A2AF8FC914DDCE9D005CAC5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A276B45A13A28A1C00D41A8A /* OGGReader */;
+			targetProxy = A2AF8FC814DDCE9D005CAC5D /* PBXContainerItemProxy */;
+		};
+		A2AF8FCB14DDCEA8005CAC5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A269030F142BEE2F003E8BCC /* TTFImporter */;
+			targetProxy = A2AF8FCA14DDCEA8005CAC5D /* PBXContainerItemProxy */;
+		};
+		A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A276B45413A28A0E00D41A8A /* NullSound */;
+			targetProxy = A2AF8FCC14DDCEBD005CAC5D /* PBXContainerItemProxy */;
 		};
 		A2C48CEB14A3FEF600575FE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
