@@ -7964,7 +7964,7 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	if ((unsigned int) pause > 1) {
 		core->TogglePause();
 	} else {
-		core->SetPause((PauseSetting)pause, (bool)quiet);
+		core->SetPause((PauseSetting)pause, quiet);
 	}
 
 	Py_INCREF( Py_None );

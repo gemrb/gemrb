@@ -5474,12 +5474,12 @@ PauseSetting Interface::TogglePause()
 	return (PauseSetting)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
 }
 
-bool Interface::SetPause(PauseSetting pause, bool quiet)
+bool Interface::SetPause(PauseSetting pause, int flags)
 {
 	GameControl *gc = GetGameControl();
 
 	//don't allow soft pause in cutscenes and dialog
-	if (!quiet && InCutSceneMode()) gc = NULL;
+	if (!(flags&PF_FORCED) && InCutSceneMode()) gc = NULL;
 
 	if (gc && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
 		int strref;
@@ -5490,7 +5490,7 @@ bool Interface::SetPause(PauseSetting pause, bool quiet)
 			strref = STR_UNPAUSED;
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
 		}
-		if (!quiet) {
+		if (!(flags&PF_QUIET) ) {
 			if (pause) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)
 			displaymsg->DisplayConstantString(strref, DMC_RED);
 		}
@@ -5505,7 +5505,7 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 	vars->Lookup("Auto Pause State", autopause_flags);
 
 	if ((autopause_flags & (1<<flag))) {
-		if (SetPause(PAUSE_ON, true)) {
+		if (SetPause(PAUSE_ON, PF_QUIET)) {
 			displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
 
 			ieDword autopause_center = 0;

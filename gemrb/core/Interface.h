@@ -221,6 +221,10 @@ public:
 #define AP_SPELLCAST     9
 #define AP_GENERIC       10  //needed for Android stuff
 
+//pause flags
+#define PF_QUIET  1        //no feedback
+#define PF_FORCED 2        //pause even in cutscene/dialog
+
 /** ea relations (derivated from 2 actor's EA value) */
 #define EAR_FRIEND  0
 #define EAR_NEUTRAL 1
@@ -665,7 +669,7 @@ public:
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
 	PauseSetting TogglePause();
 	/** returns true the passed pause setting was applied. false otherwise. */
-	bool SetPause(PauseSetting pause, bool quiet = false);
+	bool SetPause(PauseSetting pause, int flags = 0);
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
 	bool Autopause(ieDword flag, Scriptable *target);
 	/** registers engine opcodes */
