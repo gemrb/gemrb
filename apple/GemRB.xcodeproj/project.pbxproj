@@ -981,6 +981,27 @@
 			remoteGlobalIDString = A2E66337139E875400310FC8;
 			remoteInfo = libgemrb_core.dylib;
 		};
+		A2E9967B14DE128E0052BABE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2E66337139E875400310FC8;
+			remoteInfo = gemrb_core;
+		};
+		A2E9967D14DE12970052BABE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2E66337139E875400310FC8;
+			remoteInfo = gemrb_core;
+		};
+		A2E9967F14DE12A90052BABE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2E66337139E875400310FC8;
+			remoteInfo = gemrb_core;
+		};
 		A2F8709014AE43BB00F9CC1F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -3184,6 +3205,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2E9967C14DE128E0052BABE /* PBXTargetDependency */,
 			);
 			name = TTFImporter;
 			productName = SAVImporter;
@@ -3539,6 +3561,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2E9967E14DE12970052BABE /* PBXTargetDependency */,
 			);
 			name = OGGReader;
 			productName = OGGReader;
@@ -3587,6 +3610,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2E9968014DE12A90052BABE /* PBXTargetDependency */,
 			);
 			name = PNGImporter;
 			productName = PNGImporter;
@@ -4993,6 +5017,21 @@
 			isa = PBXTargetDependency;
 			target = A2E66337139E875400310FC8 /* gemrb_core */;
 			targetProxy = A2E6633B139E876900310FC8 /* PBXContainerItemProxy */;
+		};
+		A2E9967C14DE128E0052BABE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E66337139E875400310FC8 /* gemrb_core */;
+			targetProxy = A2E9967B14DE128E0052BABE /* PBXContainerItemProxy */;
+		};
+		A2E9967E14DE12970052BABE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E66337139E875400310FC8 /* gemrb_core */;
+			targetProxy = A2E9967D14DE12970052BABE /* PBXContainerItemProxy */;
+		};
+		A2E9968014DE12A90052BABE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E66337139E875400310FC8 /* gemrb_core */;
+			targetProxy = A2E9967F14DE12A90052BABE /* PBXContainerItemProxy */;
 		};
 		A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
