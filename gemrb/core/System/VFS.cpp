@@ -361,6 +361,31 @@ void ExtractFileFromPath(char *file, const char *full_path)
 		strcpy(file, full_path);
 }
 
+bool MakeDirectories(const char* path)
+{
+	char TempFilePath[_MAX_PATH] = "";
+	char Tokenized[_MAX_PATH];
+	strcpy(Tokenized, path);
+
+	char* Token = strtok(Tokenized, &PathDelimiter);
+	while(Token != NULL) {
+		if(TempFilePath[0] == 0) {
+			if(path[0] == PathDelimiter) {
+				TempFilePath[0] = PathDelimiter;
+				TempFilePath[1] = 0;
+			}
+			strcat(TempFilePath, Token);
+		} else
+			PathJoin(TempFilePath, TempFilePath, Token, NULL);
+
+		if(!MakeDirectory(TempFilePath))
+			return false;
+
+		Token = strtok(NULL, &PathDelimiter);
+	}
+	return true;
+}
+
 bool MakeDirectory(const char* path)
 {
 #ifdef WIN32

@@ -111,6 +111,7 @@ GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
 
 GEM_EXPORT char* PathAppend (char* target, const char* name);
 
+GEM_EXPORT bool MakeDirectories(const char* path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
 class GEM_EXPORT DirectoryIterator {

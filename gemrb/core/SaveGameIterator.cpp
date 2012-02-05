@@ -279,7 +279,7 @@ bool SaveGameIterator::RescanSaveGames()
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
 	if (!dir) {
-		if (!MakeDirectory(Path)) {
+		if (!MakeDirectories(Path)) {
 			Log(ERROR, "SaveGameIterator", "Unable to create save game directory '%s'", Path);
 			return false;
 		}
