@@ -92,40 +92,6 @@
 		A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */; };
 		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
-		A231458914DB270F00837841 /* 2DAImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A27E830A13A0358200B41410 /* 2DAImporter.so */; };
-		A231458A14DB270F00837841 /* ACMReader.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2FCD5FB13A0366100271997 /* ACMReader.so */; };
-		A231458B14DB270F00837841 /* AREImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2462F1113A036B1002D1F02 /* AREImporter.so */; };
-		A231458C14DB270F00837841 /* BAMImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A29BF7B213A0380F00C812DD /* BAMImporter.so */; };
-		A231458D14DB270F00837841 /* BIFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3CA13A2867900D41A8A /* BIFImporter.so */; };
-		A231458E14DB270F00837841 /* BIKPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3D113A286A800D41A8A /* BIKPlayer.so */; };
-		A231458F14DB270F00837841 /* CHUImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3E313A286DE00D41A8A /* CHUImporter.so */; };
-		A231459014DB270F00837841 /* CREImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3E913A286EC00D41A8A /* CREImporter.so */; };
-		A231459114DB270F00837841 /* DirectoryImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3EF13A286FB00D41A8A /* DirectoryImporter.so */; };
-		A231459214DB270F00837841 /* DLGImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3F513A2871300D41A8A /* DLGImporter.so */; };
-		A231459314DB270F00837841 /* EFFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3FB13A2872500D41A8A /* EFFImporter.so */; };
-		A231459414DB270F00837841 /* FXOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B40113A2873700D41A8A /* FXOpcodes.so */; };
-		A231459514DB270F00837841 /* GAMImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B40713A2874700D41A8A /* GAMImporter.so */; };
-		A231459614DB270F00837841 /* GUIScript.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B40D13A2875400D41A8A /* GUIScript.so */; };
-		A231459714DB270F00837841 /* IDSImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B41313A2876300D41A8A /* IDSImporter.so */; };
-		A231459814DB270F00837841 /* INIImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B41913A2877100D41A8A /* INIImporter.so */; };
-		A231459914DB270F00837841 /* ITMImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B41F13A2878400D41A8A /* ITMImporter.so */; };
-		A231459A14DB270F00837841 /* IWDOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B42513A2879900D41A8A /* IWDOpcodes.so */; };
-		A231459B14DB270F00837841 /* KEYImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B42B13A287AB00D41A8A /* KEYImporter.so */; };
-		A231459C14DB270F00837841 /* MOSImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B43113A287BD00D41A8A /* MOSImporter.so */; };
-		A231459D14DB270F00837841 /* MUSImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B44913A289E000D41A8A /* MUSImporter.so */; };
-		A231459E14DB270F00837841 /* MVEPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B44F13A28A0000D41A8A /* MVEPlayer.so */; };
-		A231459F14DB274800837841 /* OpenALAudio.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46113A28A3100D41A8A /* OpenALAudio.so */; };
-		A23145A014DB274800837841 /* PLTImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46713A28A3F00D41A8A /* PLTImporter.so */; };
-		A23145A114DB274800837841 /* PROImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B47313A28A5D00D41A8A /* PROImporter.so */; };
-		A23145A214DB274800837841 /* PSTOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B47913A28A7600D41A8A /* PSTOpcodes.so */; };
-		A23145A414DB274800837841 /* SPLImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B48B13A28A9E00D41A8A /* SPLImporter.so */; };
-		A23145A514DB274800837841 /* TISImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49113A28AA900D41A8A /* TISImporter.so */; };
-		A23145A614DB274800837841 /* TLKImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49713A28AB800D41A8A /* TLKImporter.so */; };
-		A23145A714DB274800837841 /* WAVReader.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49D13A28AC800D41A8A /* WAVReader.so */; };
-		A23145A814DB274800837841 /* WEDImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4A313A28AD300D41A8A /* WEDImporter.so */; };
-		A23145A914DB274800837841 /* ZLibManager.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4AF13A28AEE00D41A8A /* ZLibManager.so */; };
-		A23145AA14DB274800837841 /* STOImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4F413A28C0400D41A8A /* STOImporter.so */; };
-		A23145AB14DB274800837841 /* SAVImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F0505113ABB80B0023B7EB /* SAVImporter.so */; };
 		A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */ = {isa = PBXBuildFile; fileRef = A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
@@ -362,7 +328,6 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
-		A2A07DEC14DB9E120026400C /* WMPImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4A913A28AE100D41A8A /* WMPImporter.so */; };
 		A2A3A7D914A505FD00F705CF /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.m */; };
 		A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7DF14A5130F00F705CF /* CocoaMain.m */; };
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
@@ -373,12 +338,8 @@
 		A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
-		A2AF8FCE14DDCED0005CAC5D /* NullSound.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B45513A28A0E00D41A8A /* NullSound.so */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
-		A2B8199014DB4167006F0ABE /* BMPImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3D713A286BC00D41A8A /* BMPImporter.so */; };
-		A2B8199114DB4170006F0ABE /* BMPWriter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3DD13A286CD00D41A8A /* BMPWriter.so */; };
-		A2BDBAB114DDE4E2001113A4 /* SDLVideo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B48513A28A9000D41A8A /* SDLVideo.so */; };
 		A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C66D9C13A2953D00C0AA8E /* Python.framework */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2D0504F14D0AFCA00D8CD77 /* libgemrb_core.dylib in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -620,6 +581,44 @@
 		A2E66439139E886700310FC8 /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
 		A2E66448139E8CAA00310FC8 /* ie_types.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BD81A913960965007E9C63 /* ie_types.h */; };
 		A2E66486139E907000310FC8 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A27E830A13A0358200B41410 /* 2DAImporter.so */; };
+		A2E9965414DE05590052BABE /* ACMReader.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2FCD5FB13A0366100271997 /* ACMReader.so */; };
+		A2E9965514DE05590052BABE /* AREImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2462F1113A036B1002D1F02 /* AREImporter.so */; };
+		A2E9965614DE05590052BABE /* BAMImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A29BF7B213A0380F00C812DD /* BAMImporter.so */; };
+		A2E9965714DE05590052BABE /* BIFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3CA13A2867900D41A8A /* BIFImporter.so */; };
+		A2E9965814DE05590052BABE /* BIKPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3D113A286A800D41A8A /* BIKPlayer.so */; };
+		A2E9965914DE05590052BABE /* BMPImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3D713A286BC00D41A8A /* BMPImporter.so */; };
+		A2E9965A14DE05590052BABE /* BMPWriter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3DD13A286CD00D41A8A /* BMPWriter.so */; };
+		A2E9965B14DE05590052BABE /* CHUImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3E313A286DE00D41A8A /* CHUImporter.so */; };
+		A2E9965C14DE05590052BABE /* CREImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3E913A286EC00D41A8A /* CREImporter.so */; };
+		A2E9965D14DE05590052BABE /* DirectoryImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3EF13A286FB00D41A8A /* DirectoryImporter.so */; };
+		A2E9965E14DE05590052BABE /* DLGImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3F513A2871300D41A8A /* DLGImporter.so */; };
+		A2E9965F14DE05590052BABE /* EFFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B3FB13A2872500D41A8A /* EFFImporter.so */; };
+		A2E9966014DE05590052BABE /* FXOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B40113A2873700D41A8A /* FXOpcodes.so */; };
+		A2E9966114DE05590052BABE /* GAMImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B40713A2874700D41A8A /* GAMImporter.so */; };
+		A2E9966214DE05590052BABE /* GUIScript.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B40D13A2875400D41A8A /* GUIScript.so */; };
+		A2E9966314DE05590052BABE /* IDSImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B41313A2876300D41A8A /* IDSImporter.so */; };
+		A2E9966414DE05590052BABE /* INIImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B41913A2877100D41A8A /* INIImporter.so */; };
+		A2E9966514DE05590052BABE /* ITMImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B41F13A2878400D41A8A /* ITMImporter.so */; };
+		A2E9966614DE05590052BABE /* IWDOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B42513A2879900D41A8A /* IWDOpcodes.so */; };
+		A2E9966714DE05590052BABE /* KEYImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B42B13A287AB00D41A8A /* KEYImporter.so */; };
+		A2E9966814DE05590052BABE /* MOSImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B43113A287BD00D41A8A /* MOSImporter.so */; };
+		A2E9966914DE05590052BABE /* MUSImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B44913A289E000D41A8A /* MUSImporter.so */; };
+		A2E9966A14DE05590052BABE /* MVEPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B44F13A28A0000D41A8A /* MVEPlayer.so */; };
+		A2E9966B14DE05590052BABE /* NullSound.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B45513A28A0E00D41A8A /* NullSound.so */; };
+		A2E9966C14DE05590052BABE /* OpenALAudio.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46113A28A3100D41A8A /* OpenALAudio.so */; };
+		A2E9966D14DE05590052BABE /* PLTImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46713A28A3F00D41A8A /* PLTImporter.so */; };
+		A2E9966E14DE05590052BABE /* PROImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B47313A28A5D00D41A8A /* PROImporter.so */; };
+		A2E9966F14DE05590052BABE /* PSTOpcodes.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B47913A28A7600D41A8A /* PSTOpcodes.so */; };
+		A2E9967214DE05590052BABE /* SPLImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B48B13A28A9E00D41A8A /* SPLImporter.so */; };
+		A2E9967314DE05590052BABE /* TISImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49113A28AA900D41A8A /* TISImporter.so */; };
+		A2E9967414DE05590052BABE /* TLKImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49713A28AB800D41A8A /* TLKImporter.so */; };
+		A2E9967514DE05590052BABE /* WAVReader.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B49D13A28AC800D41A8A /* WAVReader.so */; };
+		A2E9967614DE05590052BABE /* WEDImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4A313A28AD300D41A8A /* WEDImporter.so */; };
+		A2E9967714DE05590052BABE /* WMPImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4A913A28AE100D41A8A /* WMPImporter.so */; };
+		A2E9967814DE05590052BABE /* ZLibManager.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4AF13A28AEE00D41A8A /* ZLibManager.so */; };
+		A2E9967914DE05590052BABE /* STOImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4F413A28C0400D41A8A /* STOImporter.so */; };
+		A2E9967A14DE05590052BABE /* SAVImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F0505113ABB80B0023B7EB /* SAVImporter.so */; };
 		A2EC8059145F9E6E0033754A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8058145F9E6E0033754A /* Foundation.framework */; };
 		A2EC805B1460556B0033754A /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC805A1460556B0033754A /* OpenAL.framework */; };
 		A2EC805D1460559C0033754A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC805C1460559C0033754A /* CoreAudio.framework */; };
@@ -1011,51 +1010,50 @@
 			name = "Copy Frameworks into .app bundle";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A231458814DB26CC00837841 /* CopyFiles */ = {
+		A2E9965214DE051F0052BABE /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				A2BDBAB114DDE4E2001113A4 /* SDLVideo.so in CopyFiles */,
-				A2AF8FCE14DDCED0005CAC5D /* NullSound.so in CopyFiles */,
-				A2A07DEC14DB9E120026400C /* WMPImporter.so in CopyFiles */,
-				A2B8199114DB4170006F0ABE /* BMPWriter.so in CopyFiles */,
-				A2B8199014DB4167006F0ABE /* BMPImporter.so in CopyFiles */,
-				A231459F14DB274800837841 /* OpenALAudio.so in CopyFiles */,
-				A23145A014DB274800837841 /* PLTImporter.so in CopyFiles */,
-				A23145A114DB274800837841 /* PROImporter.so in CopyFiles */,
-				A23145A214DB274800837841 /* PSTOpcodes.so in CopyFiles */,
-				A23145A414DB274800837841 /* SPLImporter.so in CopyFiles */,
-				A23145A514DB274800837841 /* TISImporter.so in CopyFiles */,
-				A23145A614DB274800837841 /* TLKImporter.so in CopyFiles */,
-				A23145A714DB274800837841 /* WAVReader.so in CopyFiles */,
-				A23145A814DB274800837841 /* WEDImporter.so in CopyFiles */,
-				A23145A914DB274800837841 /* ZLibManager.so in CopyFiles */,
-				A23145AA14DB274800837841 /* STOImporter.so in CopyFiles */,
-				A23145AB14DB274800837841 /* SAVImporter.so in CopyFiles */,
-				A231458914DB270F00837841 /* 2DAImporter.so in CopyFiles */,
-				A231458A14DB270F00837841 /* ACMReader.so in CopyFiles */,
-				A231458B14DB270F00837841 /* AREImporter.so in CopyFiles */,
-				A231458C14DB270F00837841 /* BAMImporter.so in CopyFiles */,
-				A231458D14DB270F00837841 /* BIFImporter.so in CopyFiles */,
-				A231458E14DB270F00837841 /* BIKPlayer.so in CopyFiles */,
-				A231458F14DB270F00837841 /* CHUImporter.so in CopyFiles */,
-				A231459014DB270F00837841 /* CREImporter.so in CopyFiles */,
-				A231459114DB270F00837841 /* DirectoryImporter.so in CopyFiles */,
-				A231459214DB270F00837841 /* DLGImporter.so in CopyFiles */,
-				A231459314DB270F00837841 /* EFFImporter.so in CopyFiles */,
-				A231459414DB270F00837841 /* FXOpcodes.so in CopyFiles */,
-				A231459514DB270F00837841 /* GAMImporter.so in CopyFiles */,
-				A231459614DB270F00837841 /* GUIScript.so in CopyFiles */,
-				A231459714DB270F00837841 /* IDSImporter.so in CopyFiles */,
-				A231459814DB270F00837841 /* INIImporter.so in CopyFiles */,
-				A231459914DB270F00837841 /* ITMImporter.so in CopyFiles */,
-				A231459A14DB270F00837841 /* IWDOpcodes.so in CopyFiles */,
-				A231459B14DB270F00837841 /* KEYImporter.so in CopyFiles */,
-				A231459C14DB270F00837841 /* MOSImporter.so in CopyFiles */,
-				A231459D14DB270F00837841 /* MUSImporter.so in CopyFiles */,
-				A231459E14DB270F00837841 /* MVEPlayer.so in CopyFiles */,
+				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
+				A2E9965414DE05590052BABE /* ACMReader.so in CopyFiles */,
+				A2E9965514DE05590052BABE /* AREImporter.so in CopyFiles */,
+				A2E9965614DE05590052BABE /* BAMImporter.so in CopyFiles */,
+				A2E9965714DE05590052BABE /* BIFImporter.so in CopyFiles */,
+				A2E9965814DE05590052BABE /* BIKPlayer.so in CopyFiles */,
+				A2E9965914DE05590052BABE /* BMPImporter.so in CopyFiles */,
+				A2E9965A14DE05590052BABE /* BMPWriter.so in CopyFiles */,
+				A2E9965B14DE05590052BABE /* CHUImporter.so in CopyFiles */,
+				A2E9965C14DE05590052BABE /* CREImporter.so in CopyFiles */,
+				A2E9965D14DE05590052BABE /* DirectoryImporter.so in CopyFiles */,
+				A2E9965E14DE05590052BABE /* DLGImporter.so in CopyFiles */,
+				A2E9965F14DE05590052BABE /* EFFImporter.so in CopyFiles */,
+				A2E9966014DE05590052BABE /* FXOpcodes.so in CopyFiles */,
+				A2E9966114DE05590052BABE /* GAMImporter.so in CopyFiles */,
+				A2E9966214DE05590052BABE /* GUIScript.so in CopyFiles */,
+				A2E9966314DE05590052BABE /* IDSImporter.so in CopyFiles */,
+				A2E9966414DE05590052BABE /* INIImporter.so in CopyFiles */,
+				A2E9966514DE05590052BABE /* ITMImporter.so in CopyFiles */,
+				A2E9966614DE05590052BABE /* IWDOpcodes.so in CopyFiles */,
+				A2E9966714DE05590052BABE /* KEYImporter.so in CopyFiles */,
+				A2E9966814DE05590052BABE /* MOSImporter.so in CopyFiles */,
+				A2E9966914DE05590052BABE /* MUSImporter.so in CopyFiles */,
+				A2E9966A14DE05590052BABE /* MVEPlayer.so in CopyFiles */,
+				A2E9966B14DE05590052BABE /* NullSound.so in CopyFiles */,
+				A2E9966C14DE05590052BABE /* OpenALAudio.so in CopyFiles */,
+				A2E9966D14DE05590052BABE /* PLTImporter.so in CopyFiles */,
+				A2E9966E14DE05590052BABE /* PROImporter.so in CopyFiles */,
+				A2E9966F14DE05590052BABE /* PSTOpcodes.so in CopyFiles */,
+				A2E9967214DE05590052BABE /* SPLImporter.so in CopyFiles */,
+				A2E9967314DE05590052BABE /* TISImporter.so in CopyFiles */,
+				A2E9967414DE05590052BABE /* TLKImporter.so in CopyFiles */,
+				A2E9967514DE05590052BABE /* WAVReader.so in CopyFiles */,
+				A2E9967614DE05590052BABE /* WEDImporter.so in CopyFiles */,
+				A2E9967714DE05590052BABE /* WMPImporter.so in CopyFiles */,
+				A2E9967814DE05590052BABE /* ZLibManager.so in CopyFiles */,
+				A2E9967914DE05590052BABE /* STOImporter.so in CopyFiles */,
+				A2E9967A14DE05590052BABE /* SAVImporter.so in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3107,8 +3105,8 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				002F39FD09D0883400EBEB88 /* Copy Frameworks into .app bundle */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+				A2E9965214DE051F0052BABE /* CopyFiles */,
 				A249187F141079510038B170 /* ShellScript */,
-				A231458814DB26CC00837841 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -4018,7 +4016,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=$SYMROOT\n\n#i like having a symlink to the build directory available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build\n\n#copy GUIScripts to bundle\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/override\n#clear the cmake files and make files\nfind $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs rm\nfind $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs rm\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=$SYMROOT\ncp $BUILT_PRODUCTS_DIR/SDLVideo.so $BUILT_PRODUCTS_DIR/\"$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#i like having a symlink to the build directory available\nln -s \"$BUILT_PRODUCTS_DIR\" osx/build\n\n#copy GUIScripts to bundle\ncp -r ../gemrb/GUIScripts/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../gemrb/override/ $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/override\n#clear the cmake files and make files\nfind $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs rm\nfind $BUILT_PRODUCTS_DIR/\"$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs rm\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"";
 		};
 		A2D4C61613A978520086BCC4 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
