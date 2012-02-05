@@ -715,7 +715,7 @@ private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
 	bool LoadGemRBINI();
-	bool LoadINI(const char * filename);
+	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
 	bool ReadItemTable(const ieResRef item, const char *Prefix);

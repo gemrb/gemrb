@@ -1490,11 +1490,6 @@ int Interface::Init()
 	vars->SetType( GEM_VARIABLES_INT );
 	vars->ParseKey(true);
 
-	vars->SetAt( "Volume Ambients", 100 );
-	vars->SetAt( "Volume Movie", 100 );
-	vars->SetAt( "Volume Music", 100 );
-	vars->SetAt( "Volume SFX", 100 );
-	vars->SetAt( "Volume Voices", 100 );
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (!LoadConfig()) {
@@ -1646,13 +1641,12 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 
-	//loading baldur.ini
+	char ini_path[_MAX_PATH] = { '\0' };
 	if (!IgnoreOriginalINI) {
-		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
-		if (!LoadINI(ini_path)) {
-			printMessage("Core", "Ignoring error loading '%s'.\n", YELLOW, INIConfig);
-		}
+	}
+	if (!InitializeVarsWithINI(ini_path)) {
+		printMessage("Core", "Unable to set dictionary default values!", YELLOW);
 	}
 
 	int i;
@@ -3903,18 +3897,18 @@ int Interface::GetCharacters(TextArea* ta)
 	return count;
 }
 
-bool Interface::LoadINI(const char* filename)
+bool Interface::InitializeVarsWithINI(const char* iniFileName)
 {
 	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
 
-	FileStream* iniStream = FileStream::OpenFile(filename);
-	if (!iniStream)
-		return false;
-
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
-	if (!ini->Open(iniStream))
-		return false;
+	FileStream* iniStream = FileStream::OpenFile(iniFileName);
+	// if filename is not set we assume we are creating defaults without an INI
+	if (iniFileName[0] && !ini->Open(iniStream)) {
+		printMessage("Core", "Unable to read defaults from %s\nUsing GemRB default values.", WHITE, iniFileName);
+		printStatus( "WARNING", YELLOW );
+	}
 
 	// now extract only the values we care about with defaults
 	// whitelist of values we can push directly into vars
