@@ -2338,6 +2338,7 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp(name, str) == 0) { \
 			var ( atoi(value) )
 		CONFIG_INT("Bpp", Bpp = );
+			vars->SetAt("BitsPerPixel", Bpp); //put into vars so that reading from game.ini wont overwrite our value
 		CONFIG_INT("CaseSensitive", CaseSensitive = );
 		CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
 		CONFIG_INT("DrawFPS", DrawFPS = );
@@ -2345,6 +2346,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
 		CONFIG_INT("FogOfWar", FogOfWar = );
 		CONFIG_INT("FullScreen", FullScreen = );
+			vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite our value
 		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
 		CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
 		CONFIG_INT("Height", Height = );
@@ -3952,10 +3954,12 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	};
 
 	// iterate our whitelist and load the ini values into vars
+	ieDword nothing;
 	const size_t listSize = sizeof(whitelist) / sizeof(whitelist[0]);
 	for (size_t i = 0; i < listSize; i++) {
 		INIWhiteListEntry entry = whitelist[i];
-		vars->SetAt(entry.INIKey, ini->GetKeyAsInt(entry.INITag, entry.INIKey, entry.defaultValue));
+		if (!vars->Lookup(entry.INIKey, nothing)) //skip any existing enties. GemRB.cfg has priority
+			vars->SetAt(entry.INIKey, ini->GetKeyAsInt(entry.INITag, entry.INIKey, entry.defaultValue));
 	}
 
 	// handle a few special cases
