@@ -435,7 +435,7 @@ public:
 	void SetTrapDetected(int x);
 	void TryDisarm(Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire
-	void DetectTrap(int skill);
+	void DetectTrap(int skill, ieDword actorID);
 	//returns true if trap is visible, only_detected must be true
 	//if you want to see discovered traps, false is for cheats
 	bool VisibleTrap(int only_detected) const;

@@ -809,21 +809,16 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'f': //toggle full screen mode
 				core->GetVideoDriver()->ToggleFullscreenMode();
 				break;
-			case 'd': //disarm a trap
+			case 'd': //detect a trap or door
 				if (overInfoPoint) {
-					overInfoPoint->DetectTrap(256);
+					overInfoPoint->DetectTrap(256, lastActorID);
 				}
 				if (overContainer) {
-					if (overContainer->Trapped &&
-						!( overContainer->TrapDetected )) {
-						overContainer->TrapDetected = 1;
-					}
+					overContainer->DetectTrap(256, lastActorID);
 				}
 				if (overDoor) {
-					if (overDoor->Trapped &&
-						!( overDoor->TrapDetected )) {
-						overDoor->TrapDetected = 1;
-					}
+					overDoor->TryDetectSecret(256, lastActorID);
+					overDoor->DetectTrap(256, lastActorID);
 				}
 				break;
 			case 'l': //play an animation (vvc/bam) over an actor

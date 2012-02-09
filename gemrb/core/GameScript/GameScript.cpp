@@ -101,6 +101,7 @@ static const TriggerLink triggernames[] = {
 	{"dead", GameScript::Dead, 0},
 	{"delay", GameScript::Delay, 0},
 	{"detect", GameScript::Detect, 0}, //so far i see no difference
+	{"detected", GameScript::Detected, 0}, //trap or secret door detected
 	{"die", GameScript::Die, 0},
 	{"died", GameScript::Died, 0},
 	{"difficulty", GameScript::Difficulty, 0},

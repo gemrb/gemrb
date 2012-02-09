@@ -1685,13 +1685,14 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
 //skill is the all around modified trap detection skill
 //a trapdetectiondifficulty of 100 means impossible detection short of a spell
-void Highlightable::DetectTrap(int skill)
+void Highlightable::DetectTrap(int skill, ieDword actorID)
 {
 	if (!CanDetectTrap()) return;
 	if (!Scripts[0]) return;
 	if ((skill>=100) && (skill!=256) ) skill = 100;
 	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
 		SetTrapDetected(1); //probably could be set to the player #?
+		AddTrigger(TriggerEntry(trigger_detected, actorID));
 	}
 }
 

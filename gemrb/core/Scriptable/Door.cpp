@@ -285,13 +285,14 @@ bool Door::TryUnlock(Actor *actor) {
 	return Highlightable::TryUnlock(actor, removekey);
 }
 
-void Door::TryDetectSecret(int skill)
+void Door::TryDetectSecret(int skill, ieDword actorID)
 {
 	if (Type != ST_DOOR) return;
 	if (Visible()) return;
 	if (skill > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
 		core->PlaySound(DS_FOUNDSECRET);
+		AddTrigger(TriggerEntry(trigger_detected, actorID));
 	}
 }
 

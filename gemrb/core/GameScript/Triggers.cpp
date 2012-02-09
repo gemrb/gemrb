@@ -3251,6 +3251,11 @@ int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
 	return Sender->MatchTriggerWithObject(trigger_heard, parameters->objectParameter, parameters->int0Parameter);
 }
 
+int GameScript::Detected(Scriptable* Sender, Trigger* parameters)
+{
+	return Sender->MatchTriggerWithObject(trigger_detected, parameters->objectParameter, parameters->int0Parameter);
+}
+
 int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {

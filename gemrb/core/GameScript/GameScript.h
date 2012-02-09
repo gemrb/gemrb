@@ -691,6 +691,7 @@ public: //Script Functions
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Delay(Scriptable* Sender, Trigger* parameters);
 	static int Detect(Scriptable* Sender, Trigger* parameters);
+	static int Detected(Scriptable* Sender, Trigger* parameters);
 	static int Die(Scriptable* Sender, Trigger* parameters);
 	static int Died(Scriptable* Sender, Trigger* parameters);
 	static int Difficulty(Scriptable* Sender, Trigger* parameters);

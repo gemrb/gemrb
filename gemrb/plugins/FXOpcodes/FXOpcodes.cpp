@@ -1746,8 +1746,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_ENVENOM:
 		Effect *newfx;
 		newfx = EffectQueue::CreateEffectCopy(fx, fx_constitution_modifier_ref, fx->Parameter1, 0);
-		newfx->Duration = AI_UPDATE_TIME;
-		core->ApplyEffect(newfx, target, caster);
+		core->ApplyEffect(newfx, target, caster);  
 		delete newfx;
 		damage = 0;
 		tmp = 1;
@@ -4278,6 +4277,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_find_traps (%2d)\n", fx->Opcode );
 	//reveal trapped containers, doors, triggers that are in the visible range
+	ieDword id = target->GetGlobalID();
 	ieDword range = target->GetStat(IE_VISUALRANGE)*10;
 	ieDword skill;
 	bool detecttraps = true;
@@ -4311,11 +4311,11 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (!door)
 			break;
 		if (Distance(door->Pos, target->Pos)<range) {
-			if (detecttraps) {
+			door->TryDetectSecret(skill, id);
+			if (detecttraps && door->Visible()) {
 			//when was door trap noticed
-				door->DetectTrap(skill);
+				door->DetectTrap(skill, id);
 			}
-			door->TryDetectSecret(skill);
 		}
 	}
 
@@ -4330,7 +4330,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		if (Distance(container->Pos, target->Pos)<range) {
 			//when was door trap noticed
-			container->DetectTrap(skill);
+			container->DetectTrap(skill, id);
 		}
 	}
 
@@ -4342,7 +4342,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		if (Distance(trap->Pos, target->Pos)<range) {
 			//when was door trap noticed
-			trap->DetectTrap(skill);
+			trap->DetectTrap(skill, id);
 		}
 	}
 
