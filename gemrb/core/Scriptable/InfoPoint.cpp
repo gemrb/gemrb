@@ -58,6 +58,7 @@ InfoPoint::InfoPoint(void)
 	TrapDetected = 0;
 	TrapLaunch.empty();
 	if (!inited) {
+		inited = true;
 		//TRAP_USEPOINT may have three values
 		//0     - PST - no such flag
 		//0x200 - IWD2 - it has no TRAP_NONPC flag, the usepoint flag takes it over
