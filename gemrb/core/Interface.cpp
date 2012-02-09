@@ -1591,7 +1591,7 @@ int Interface::Init()
 		char *description = strdup("CD1/data");
 		for (i = 0; i < MAX_CD; i++) {
 			for (size_t j=0;j<CD[i].size();j++) {
-				description[2]='1'+i;				
+				description[2]='1'+i;
 				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
 				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 			}
@@ -2607,6 +2607,8 @@ static const char *game_flags[GF_COUNT+1]={
 		"AreaOverride",       //60GF_AREA_OVERRIDE
 		"NoNewVariables",     //61GF_NO_NEW_VARIABLES
 		"HasSoundsIni",       //62GF_SOUNDS_INI
+		"HasNoNPCFlag",       //63GF_USEPOINT_400
+		"HasUsePointFlag",    //64GF_USEPOINT_200
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -4298,7 +4300,7 @@ bool Interface::InitItemTypes()
 	//default values in case itemdata is missing (it is needed only for iwd2)
 	for (i=0;i<ItemTypes;i++) {
 		if (slotmatrix[i] & SLOT_WEAPON) {
-		  itemtypedata[i]=2;
+			itemtypedata[i]=2;
 		}
 	}
 	AutoTable af("itemdata");
@@ -4306,9 +4308,9 @@ bool Interface::InitItemTypes()
 		int armcount = af->GetRowCount();
 		for (i = 0; i < armcount; i++) {
 			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
-		  if (itemtype<ItemTypes) {
+			if (itemtype<ItemTypes) {
 				itemtypedata[itemtype] = (ieWord) atoi( af->QueryField(i,1) );
-		  }
+			}
 		}
 	}
 

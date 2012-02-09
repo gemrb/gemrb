@@ -756,7 +756,7 @@ void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 			position = ((Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			if (((InfoPoint *) scr)->Flags & TRAP_USEPOINT) {
+			if (((InfoPoint *) scr)->GetUsePoint() ) {
 				position=((InfoPoint *) scr)->UsePoint;
 				break;
 			}
@@ -783,7 +783,7 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 			position = ((Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			if (((InfoPoint *) scr)->Flags & TRAP_USEPOINT) {
+			if (((InfoPoint *) scr)->GetUsePoint()) {
 				position=((InfoPoint *) scr)->UsePoint;
 				break;
 			}
@@ -1100,7 +1100,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Point dest = target->Pos;
-	if (target->Type == ST_TRIGGER && ((InfoPoint *)target)->Flags&TRAP_USEPOINT) {
+	if (target->Type == ST_TRIGGER && ((InfoPoint *)target)->GetUsePoint()) {
 		dest = ((InfoPoint *)target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {

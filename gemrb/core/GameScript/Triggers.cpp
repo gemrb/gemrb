@@ -25,6 +25,7 @@
 
 #include "win32def.h"
 
+#include "AmbientMgr.h"
 #include "Calendar.h"
 #include "DialogHandler.h"
 #include "Game.h"
@@ -327,19 +328,37 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 }
 
 //returns true if the trap or infopoint is active
+//returns true if the actor is active
+//returns true if the sound source is active
+//returns true if container is active
 int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr || (scr->Type!=ST_PROXIMITY && scr->Type!=ST_TRIGGER && scr->Type!=ST_TRAVEL) ) {
+	if (!scr) {
+		AmbientMgr * ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+		if (ambientmgr->isActive(parameters->objectParameter->objectName) ) {
+			return 1;
+		}
 		return 0;
 	}
 
-	InfoPoint *ip = (InfoPoint *) scr;
+	switch(scr->Type) {
+		default:
+			return 0;
+		case ST_ACTOR:
+			if( ((Actor *) scr)->Schedule(core->GetGame()->GameTime, true)) return 1;
+			return 0;
+		case ST_CONTAINER:
+			if ( ((Container *) scr)->Flags&CONT_DISABLED) return 0;
+			return 1;
 
-	if (ip->Flags&(TRAP_DEACTIVATED|INFO_DOOR) ) {
-		return 0;
+		case ST_PROXIMITY: case ST_TRIGGER: case ST_TRAVEL:
+			if ( ((InfoPoint *) scr)->Flags&(TRAP_DEACTIVATED|INFO_DOOR) ) {
+				return 0;
+			}
+			return 1;
 	}
-	return 1;
+	return 0;
 }
 
 int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)

@@ -1885,7 +1885,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 					}
 				}
 			}
-			if (trap->Flags&TRAP_USEPOINT) {
+			if (trap->GetUsePoint() ) {
 				char Tmp[256];
 				sprintf(Tmp, "TriggerWalkTo(\"%s\")", trap->GetScriptName());
 				actor->AddAction(GenerateAction(Tmp));

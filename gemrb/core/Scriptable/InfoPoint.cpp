@@ -43,6 +43,10 @@
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
+//crazy programmers couldn't decide which bit marks the alternative point
+static ieDword TRAP_USEPOINT = _TRAP_USEPOINT;
+static bool inited = false;
+
 InfoPoint::InfoPoint(void)
 	: Highlightable( ST_TRIGGER )
 {
@@ -53,6 +57,15 @@ InfoPoint::InfoPoint(void)
 	TrapRemovalDiff = 0;
 	TrapDetected = 0;
 	TrapLaunch.empty();
+	if (!inited) {
+		//TRAP_USEPOINT may have three values
+		//0     - PST - no such flag
+		//0x200 - IWD2 - it has no TRAP_NONPC flag, the usepoint flag takes it over
+		//0x400 - all other engines (some don't use it)
+		if (core->HasFeature(GF_USEPOINT_400)) TRAP_USEPOINT = _TRAP_USEPOINT;
+		else if (core->HasFeature(GF_USEPOINT_200)) TRAP_USEPOINT = _TRAVEL_NONPC;
+		else TRAP_USEPOINT = 0;
+	}
 }
 
 InfoPoint::~InfoPoint(void)
@@ -66,6 +79,10 @@ void InfoPoint::SetEnter(const char *resref)
 	}
 }
 
+ieDword InfoPoint::GetUsePoint() const {
+	return Flags&TRAP_USEPOINT;
+}
+
 //checks if the actor may use this travel trigger
 //bit 1 : can use
 //bit 2 : whole team
@@ -73,7 +90,12 @@ int InfoPoint::CheckTravel(Actor *actor)
 {
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
 	bool pm = actor->IsPartyMember();
-	if (!pm && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
+
+	//this flag does not exist in IWD2, we cannot use it if the infopoint flag took it over
+	if (TRAP_USEPOINT!=_TRAVEL_NONPC) {
+		if (!pm && (Flags&_TRAVEL_NONPC) ) return CT_CANTMOVE;
+	}
+
 	if (pm && (Flags&TRAVEL_PARTY) ) {
 		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;

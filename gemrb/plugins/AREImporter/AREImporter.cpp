@@ -493,7 +493,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->UsePoint.x = PosX;
 		ip->UsePoint.y = PosY;
 		//FIXME: PST doesn't use this field
-		if (ip->Flags&TRAP_USEPOINT) {
+		if (ip->GetUsePoint()) {
 			ip->Pos = ip->UsePoint;
 		} else {
 			ip->Pos.x = bbox.x + ( bbox.w / 2 );

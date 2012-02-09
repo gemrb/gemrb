@@ -145,8 +145,10 @@
 #define  GF_AREA_OVERRIDE               60 //pst maze and other hardcode
 #define  GF_NO_NEW_VARIABLES            61 //pst
 #define  GF_SOUNDS_INI                  62 //iwd/how/iwd2
+#define  GF_USEPOINT_400                63 //all except pst and iwd2
+#define  GF_USEPOINT_200                64 //iwd2
 //update this or bad things can happen
-#define GF_COUNT 63
+#define GF_COUNT 65
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

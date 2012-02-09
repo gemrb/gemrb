@@ -72,12 +72,12 @@ class SpriteCover;
 #define TRAVEL_PARTY    4
 #define TRAP_DETECTABLE 8
 //#define TRAP_16	 16
-#define TRAP_LOWMEM	 32 //special treatment when low on memory ?
+#define TRAP_TUTORIAL	 32 //active only when in tutorial mode
 #define TRAP_NPC	64
 //#define TRAP_128	128
 #define TRAP_DEACTIVATED  256
-#define TRAVEL_NONPC      512
-#define TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
+#define _TRAVEL_NONPC      512
+#define _TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
 #define INFO_DOOR	 2048 //info trigger blocked by door
 
 //internal actor flags

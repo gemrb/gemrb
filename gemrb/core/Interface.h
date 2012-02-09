@@ -320,8 +320,6 @@ private:
 	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures[(GF_COUNT+31)/32];
-	//ieDword GameFeatures; //the first 32 bits
-	//ieDword GameFeatures2;//the second 32 bits
 	ieResRef ButtonFont;
 	ieResRef CursorBam;
 	ieResRef ScrollCursorBam;

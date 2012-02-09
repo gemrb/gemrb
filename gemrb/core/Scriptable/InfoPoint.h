@@ -23,20 +23,6 @@
 
 #include "Scriptable.h"
 
-//trigger flags
-#define TRAP_INVISIBLE  1
-#define TRAP_RESET      2
-#define TRAVEL_PARTY    4
-#define TRAP_DETECTABLE 8
-//#define TRAP_16	 16
-#define TRAP_LOWMEM	 32 //special treatment when low on memory ?
-#define TRAP_NPC	64
-//#define TRAP_128	128
-#define TRAP_DEACTIVATED  256
-#define TRAVEL_NONPC      512
-#define TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
-#define INFO_DOOR	 2048 //info trigger blocked by door
-
 class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
@@ -46,6 +32,8 @@ public:
 	bool TriggerTrap(int skill, ieDword ID);
 	//call this to check if an actor entered the trigger zone
 	bool Entered(Actor *actor);
+  //returns true if
+  ieDword GetUsePoint() const;
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void DebugDump() const;
