@@ -1744,9 +1744,12 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp = fx->Parameter3;
 		break;
 	case RPD_ENVENOM:
+		//call the constitution effect like it was this one (don't add it to the effect queue)
+		//can't simply convert this effect to the constitution effect, because a poison effect
+		//could be removed and there is a portrait icon
 		Effect *newfx;
 		newfx = EffectQueue::CreateEffectCopy(fx, fx_constitution_modifier_ref, fx->Parameter1, 0);
-		core->ApplyEffect(newfx, target, caster);  
+		target->fxqueue.ApplyEffect(target, newfx, fx->FirstApply, 0);
 		delete newfx;
 		damage = 0;
 		tmp = 1;
