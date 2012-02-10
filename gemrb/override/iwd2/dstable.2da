@@ -1,3 +1,6 @@
 2DA V1.0
 *
-FILE       STAT
+FILE		STAT	CHECKCOL	READCOL
+dsclass		CLASS	0			1
+dsrace		RACE	0			1
+

@@ -5576,7 +5576,8 @@ int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 	return 0;
 }
 
-static ieResRef cripstr={"cripstr"};
+static ieResRef resref_cripstr={"cripstr"};
+static ieResRef resref_dirty={"dirty"};
 
 /*Always call this on the suffering actor */
 void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype)
@@ -6949,13 +6950,13 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		return;
 	}
 
-		//special effects on hit for arterial strike and hamstring
+	//special effects on hit for arterial strike and hamstring
 	if (damage>0 && wi.backstabbing && BackstabResRef[0]!='*') {
 		core->ApplySpell(BackstabResRef, target, this, multiplier);
 		//do we need this?
 		BackstabResRef[0]='*';
 		if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-			core->ApplySpell(cripstr, target, this, multiplier);
+			core->ApplySpell(resref_cripstr, target, this, multiplier);
 		}
 	}
 
@@ -6976,10 +6977,15 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
-			//damage <<=1;
+
 			// check if critical hit needs a screenshake
 			if (crit_hit_scr_shake && (InParty || target->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
 				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
+			}
+
+			//apply the dirty fighting spell
+			if (HasFeat(FEAT_DIRTY_FIGHTING) ) {
+				core->ApplySpell(resref_dirty, target, this, multiplier);
 			}
 		}
 	}
@@ -7601,7 +7607,7 @@ void Actor::CreateDerivedStats()
 		}
 	}
 
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (third) {
 		CreateDerivedStatsIWD2();
 	} else {
 		CreateDerivedStatsBG();
@@ -7921,7 +7927,7 @@ bool Actor::IsRacialEnemy(Actor* target) const
 {
 	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
 		return true;
-	} else if (core->HasFeature(GF_3ED_RULES)) {
+	} else if (third) {
 		// iwd2 supports multiple racial enemies gained through level progression
 		for (unsigned int i=0; i<7; i++) {
 			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
