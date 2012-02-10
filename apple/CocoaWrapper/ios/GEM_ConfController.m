@@ -196,11 +196,8 @@ enum ConfigTableSection {
 	NSString* libDir = [[paths objectAtIndex:0] copy];
 
 	NSString* dstPath = [NSString stringWithFormat:@"%@/%@/tmp/", libDir, [archivePath pathExtension]];
-	NSLog(@"installing %@ to %@...", srcPath, dstPath);
-
 	[fm createDirectoryAtPath:dstPath withIntermediateDirectories:YES attributes:nil error:nil];
-	NSString* cwd = [fm currentDirectoryPath];
-	[fm changeCurrentDirectoryPath:dstPath];
+	NSLog(@"installing %@ to %@...", srcPath, dstPath);
 
 	struct archive *a;
 	const char* archiveAbsPath = [srcPath cStringUsingEncoding:NSASCIIStringEncoding];
@@ -227,6 +224,7 @@ enum ConfigTableSection {
 		r = archive_read_next_header(a, &entry);
 		if (r == ARCHIVE_EOF) break;
 		NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
+		archive_entry_set_pathname(entry, [[dstPath stringByAppendingString:tmp] cStringUsingEncoding:NSASCIIStringEncoding]);
 		// Mac OS X has an annoying thing where it embeds crap in the archive. skip it.
 		if ([tmp rangeOfString:@"__MACOSX/"].location != NSNotFound) continue;
 		if (!installName) {
@@ -273,7 +271,6 @@ enum ConfigTableSection {
 	}
 	archive_read_close(a);
 	archive_read_finish(a);
-	[fm changeCurrentDirectoryPath:cwd];
 
 	if (r == ARCHIVE_FATAL) return NO;
 
@@ -360,7 +357,7 @@ enum ConfigTableSection {
 			NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
 		}
 	}else{
-		NSLog(@"Unable to open %@/GemRB.cfg.newinstall", cwd);
+		NSLog(@"Unable to open GemRB.cfg.newinstall");
 	}
 
 	[pv removeFromSuperview];
