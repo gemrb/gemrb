@@ -378,10 +378,16 @@ void Door::TryPickLock(Actor *actor)
 
 void Door::TryBashLock(Actor *actor)
 {
-	//Get the strength bonus agains lock difficulty
-	int str = actor->GetStat(IE_STR);
-	int strEx = actor->GetStat(IE_STREXTRA);
-	unsigned int bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+	//Get the strength bonus against lock difficulty
+	int bonus;
+
+	if (core->HasFeature(GF_3ED_RULES)) {
+		bonus = actor->GetAbilityBonus(IE_STR);
+	} else {
+		int str = actor->GetStat(IE_STR);
+		int strEx = actor->GetStat(IE_STREXTRA);
+		bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+	}
 	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
 	if(roll < LockDifficulty || LockDifficulty == 100) {
@@ -391,7 +397,7 @@ void Door::TryBashLock(Actor *actor)
 
 	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, DMC_LIGHTGREY, actor);
 	SetDoorLocked(false, true);
-	//Is this really useful ?
+	//This is ok, bashdoor also sends the unlocked trigger
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 }

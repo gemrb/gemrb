@@ -7601,7 +7601,7 @@ void Actor::CreateDerivedStats()
 		}
 	}
 
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (third) {
 		CreateDerivedStatsIWD2();
 	} else {
 		CreateDerivedStatsBG();
@@ -7921,7 +7921,7 @@ bool Actor::IsRacialEnemy(Actor* target) const
 {
 	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
 		return true;
-	} else if (core->HasFeature(GF_3ED_RULES)) {
+	} else if (third) {
 		// iwd2 supports multiple racial enemies gained through level progression
 		for (unsigned int i=0; i<7; i++) {
 			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
