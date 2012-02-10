@@ -686,6 +686,7 @@ public:
 		previously customized or set buttons. */
 	void InitButtons(ieDword cls, bool forced);
 	int GetAbilityBonus(unsigned int ability) const;
+	int GetSkillStat(unsigned int skill) const;
 	int GetSkill(unsigned int skill) const;
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);

@@ -81,6 +81,7 @@ static Trigger *Enemy = NULL;
 
 #define PI_BLINK        130
 
+#define PI_DAYBLINDNESS 137
 #define PI_HEROIC       138
 
 #define PI_EMPTYBODY    145
@@ -3162,18 +3163,34 @@ int fx_persistent_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //435 DayBlindness
+//for this effect to work, apply it repeatedly on targets
 int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_day_blindness (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
+	Map *map = target->GetCurrentArea();
+	if (!map) return FX_NOT_APPLIED;
+
+	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
+		return FX_NOT_APPLIED;
+	}
+	//drop the effect when day came
+	if (!core->GetGame()->IsDay()) return FX_NOT_APPLIED;
+
+	//don't let it work twice
 	if (target->SetSpellState(SS_DAYBLINDNESS)) return FX_NOT_APPLIED;
+
 	// medium hack (better than original)
 	// the original used explicit race/subrace values
 	ieDword penalty;
 
 	if (check_iwd_targeting(Owner, target, 0, 82)) penalty = 2; //dark elf
 	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
-	else penalty = 0;
+	else return FX_NOT_APPLIED;
 
+	target->AddPortraitIcon(PI_DAYBLINDNESS);
+
+	//FIXME: this could be STAT_SUB
+	//saving throw penalty
 	STAT_ADD(IE_SAVEFORTITUDE, penalty);
 	STAT_ADD(IE_SAVEREFLEX, penalty);
 	STAT_ADD(IE_SAVEWILL, penalty);
@@ -3181,7 +3198,12 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	STAT_ADD(IE_SAVEVSBREATH, penalty);
 	STAT_ADD(IE_SAVEVSSPELL, penalty);
 
-	//TODO: implement the rest
+	//decrease all skills by 1
+	for(int i=0;i<32;i++) {
+		int stat = target->GetSkillStat(i);
+		if (stat<0) break;
+		STAT_SUB(stat, 1);
+	}
 	return FX_APPLIED;
 }
 

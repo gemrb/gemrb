@@ -5671,6 +5671,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 	}
 
 	//IWD2 has no autodetect, you actually should 'search'
+	//actually, iwd2 has autosearch, also, this is useful for dayblindness
 	if (InParty && core->HasFeature(GF_AUTOSEARCH_HIDDEN) ) {
 		core->ApplySpell("detect", this, this, 0);
 	}
@@ -7432,6 +7433,12 @@ bool Actor::HasSpellState(unsigned int spellstate) const
 int Actor::GetAbilityBonus(unsigned int ability) const
 {
 	return GetStat(ability)/2-5;
+}
+
+int Actor::GetSkillStat(unsigned int skill) const
+{
+	if (skill>=(unsigned int) skillcount) return -1;
+	return skillstats[skill];
 }
 
 int Actor::GetSkill(unsigned int skill) const
