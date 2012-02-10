@@ -486,18 +486,20 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 /** Special Key Press */
 void MapControl::OnSpecialKeyPress(unsigned char Key)
 {
+	ieDword keyScrollSpd = 64;
+	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
 	switch (Key) {
 		case GEM_LEFT:
-			ScrollX -= 64;
+			ScrollX -= keyScrollSpd;
 			break;
 		case GEM_UP:
-			ScrollY -= 64;
+			ScrollY -= keyScrollSpd;
 			break;
 		case GEM_RIGHT:
-			ScrollX += 64;
+			ScrollX += keyScrollSpd;
 			break;
 		case GEM_DOWN:
-			ScrollY += 64;
+			ScrollY += keyScrollSpd;
 			break;
 		case GEM_ALT:
 			print( "ALT pressed\n" );

@@ -348,18 +348,20 @@ void WorldMapControl::OnMouseWheelScroll(short x, short y)
 /** Special Key Press */
 void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 {
+	ieDword keyScrollSpd = 64;
+	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
 	switch (Key) {
 		case GEM_LEFT:
-			OnMouseWheelScroll(-64, 0);
+			OnMouseWheelScroll(keyScrollSpd * -1, 0);
 			break;
 		case GEM_UP:
-			OnMouseWheelScroll(0, -64);
+			OnMouseWheelScroll(0, keyScrollSpd * -1);
 			break;
 		case GEM_RIGHT:
-			OnMouseWheelScroll(64, 0);
+			OnMouseWheelScroll(keyScrollSpd, 0);
 			break;
 		case GEM_DOWN:
-			OnMouseWheelScroll(0, 64);
+			OnMouseWheelScroll(0, keyScrollSpd);
 			break;
 		case GEM_ALT:
 			print( "ALT pressed\n" );
