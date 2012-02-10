@@ -1492,11 +1492,30 @@ int Interface::Init()
 
 	printStatus( "OK", LIGHT_GREEN );
 
-	if (!LoadConfig()) {
-		printMessage( "Core", "Could not load config file ", YELLOW);
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+	const char* argConfigPath = NULL;
+	const char* argGamePath = NULL;
+	for (int i=1; i < (argc - 1); i++) {
+		print("processing arg:%s\n", argv[i]);
+		if (strcmp("-c", argv[i]) == 0) { // config path
+			argConfigPath = argv[++i];
+			continue;
+		}
+		if (strcmp("-g", argv[i]) == 0) { // GamePath
+			argGamePath = argv[++i];
+			continue;
+		}
+		printMessage("Core", "Unknown argument:%s\n", YELLOW, argv[i]);
 	}
+	print("-c=%s, -g=%s\n", argConfigPath, argGamePath);
+
+	if ((argConfigPath && !LoadConfig(argConfigPath)) || !LoadConfig()) {
+		printMessage( "Core", "Could not load config file ", YELLOW);
+		printStatus( "WARNING", LIGHT_RED );
+	}
+	if (argGamePath) {
+		strncpy(GamePath, argGamePath, sizeof(GamePath));
+	}
+
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	PluginMgr *plugin = PluginMgr::Get();
 #if TARGET_OS_MAC
@@ -2215,16 +2234,6 @@ bool Interface::LoadConfig(void)
 	strcpy( name, s );
 	//if (!name[0])		// FIXME: could this happen?
 	//	strcpy (name, PACKAGE); // ugly hack
-
-	// If we were called as $0 -c <filename>, load config from filename
-	if (argc > 2 && ! strcmp("-c", argv[1])) {
-		if (LoadConfig( argv[2] )) {
-			return true;
-		} else {
-			// Explicitly specified cfg file HAS to be present
-			return false;
-		}
-	}
 
 	// FIXME: temporary hack, to be deleted??
 	if (LoadConfig( "GemRB.cfg" )) {
