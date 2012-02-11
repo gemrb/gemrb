@@ -1042,6 +1042,7 @@ def UpdatePortraitWindow ():
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (portid+1)
+
 		states = ""
 		for col in range(len(effects)):
 			states = effects[col:col+1] + states
@@ -1052,10 +1053,12 @@ def UpdatePortraitWindow ():
 
 		# character - 1 == bam cycle
 		# blank space
-		if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
+		if GUICommon.GameIsBG2():
 			flag = blank = chr(238)
 			talk = 154
 			store = 155
+		elif GUICommon.GameIsIWD2():
+			talk = store = flag = blank = ""
 		else:
 			# iwd is missing all of these, including the blank (didn't display a talking icon though)
 			# TODO: add another string tag to make glyphs 100% transparent?
