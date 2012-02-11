@@ -93,10 +93,6 @@
 
 GEM_EXPORT Interface* core;
 
-#ifdef WIN32
-GEM_EXPORT HANDLE hConsole;
-#endif
-
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static const char dialogtlk[] = "dialog.tlk\0";
 
@@ -117,9 +113,7 @@ Interface::Interface(int iargc, char* iargv[])
 {
 	argc = iargc;
 	argv = iargv;
-#ifdef WIN32
-	hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
-#endif
+
 	textcolor( LIGHT_WHITE );
 	print( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
 

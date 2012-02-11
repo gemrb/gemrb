@@ -2,6 +2,8 @@ ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
 IF (ANDROID)
 	set (PLATFORM_SRC System/Logger/Android.cpp)
+ELSEIF (WIN32)
+	set (PLATFORM_SRC System/Logger/Win32Console.cpp)
 ELSE ()
 	set (PLATFORM_SRC)
 ENDIF ()

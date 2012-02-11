@@ -29,9 +29,7 @@
 #include "exports.h"
 #include "win32def.h"
 
-#if defined(WIN32)
-extern GEM_EXPORT HANDLE hConsole;
-#else //WIN32
+#ifndef WIN32
 # include <config.h>
 # include <cstdio>
 # include <cstdlib>

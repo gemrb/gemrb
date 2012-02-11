@@ -22,11 +22,6 @@
 
 #include <cstdio>
 
-#ifdef WIN32
-# define ADV_TEXT
-# include <conio.h>
-#endif
-
 Logger::Logger()
 {}
 
@@ -35,39 +30,10 @@ Logger::~Logger()
 
 void Logger::vprint(const char *message, va_list ap)
 {
-#if (!defined(WIN32)) || defined(WIN32_USE_STDIO)
 	vprintf(message, ap);
-#else
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	char buff[_MAX_PATH];
-	vsnprintf(buff, _MAX_PATH, message, ap);
-	cprintf("%s", buff);
-#endif
 }
 
 #ifndef NOCOLOR
-#if defined(WIN32)
-static int colors[] = {
-	0,
-	FOREGROUND_RED,
-	FOREGROUND_GREEN,
-	FOREGROUND_GREEN | FOREGROUND_RED,
-	FOREGROUND_BLUE,
-	FOREGROUND_RED | FOREGROUND_BLUE,
-	FOREGROUND_BLUE | FOREGROUND_GREEN,
-	FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED,
-	(RED | FOREGROUND_INTENSITY),
-	(GREEN | FOREGROUND_INTENSITY),
-	(GREEN | RED | FOREGROUND_INTENSITY),
-	(BLUE | FOREGROUND_INTENSITY),
-	(MAGENTA | FOREGROUND_INTENSITY),
-	(CYAN | FOREGROUND_INTENSITY),
-	(WHITE | FOREGROUND_INTENSITY),
-	WHITE
-};
-#else
 static const char* colors[] = {
 	"\033[0m",
 	"\033[0m\033[30;40m",
@@ -87,15 +53,12 @@ static const char* colors[] = {
 	"\033[1m\033[37;40m"
 };
 #endif
-#endif
 
 
 void Logger::textcolor(log_color c)
 {
 #ifdef NOCOLOR
 	if (c) while (0) ;
-#elif defined(WIN32)
-	SetConsoleTextAttribute(hConsole, colors[c]);
 #else
 	print("%s", colors[c]);
 #endif
@@ -140,6 +103,11 @@ Logger* createStdioLogger()
 
 #include "System/Logger/Android.h"
 Logger* (*createDefaultLogger)() = createAndroidLogger;
+
+#elif defined(WIN32) && !defined(WIN32_USE_STDIO)
+
+#include "System/Logger/Win32Console.h"
+Logger* (*createDefaultLogger)() = createStdioLogger;
 
 #else
 
