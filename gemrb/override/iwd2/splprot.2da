@@ -87,10 +87,10 @@
 83         SUBRACE    0x20001    5          subrace/not_drow 
 84         SUBRACE    0x40002    1          subrace/gray_dwarf 
 85         SUBRACE    0x40002    5          subrace/not_gray_dwarf 
-86         0x107      1          *          daytime    
-87         0x107      0          *          not_daytime 
-88         0x106      1          9          outdoor    
-89         0x106      1          8          not_outdoor 
+86         0x107      0          0          daytime
+87         0x107      1          3          not_daytime
+88         0x106      1          8          outdoor
+89         0x106      1          9          not_outdoor
 90         RACE       190        1          race/keg   
 91         RACE       190        5          race/not_keg 
 92         RACE       *          *          outsider   
