@@ -22,10 +22,6 @@
 
 #include <cstdio>
 
-#ifdef ANDROID
-#include <android/log.h>
-#endif
-
 #ifdef WIN32
 # define ADV_TEXT
 # include <conio.h>
@@ -39,9 +35,7 @@ Logger::~Logger()
 
 void Logger::vprint(const char *message, va_list ap)
 {
-#ifdef ANDROID
-	__android_log_vprint(ANDROID_LOG_INFO, "printf:", message, ap);
-#elif (!defined(WIN32)) || defined(WIN32_USE_STDIO)
+#if (!defined(WIN32)) || defined(WIN32_USE_STDIO)
 	vprintf(message, ap);
 #else
 	// Don't try to be smart.
@@ -107,7 +101,6 @@ void Logger::textcolor(log_color c)
 #endif
 }
 
-#ifndef ANDROID
 void Logger::printBracket(const char* status, log_color color)
 {
 	textcolor(WHITE);
@@ -133,28 +126,23 @@ void Logger::vprintMessage(const char* owner, const char* message, log_color col
 	vprint(message, ap);
 }
 
-#else /* !ANDROID */
-void Logger::printBracket(const char* status, log_color color)
-{
-}
-
-void Logger::printStatus(const char* status, log_color color)
-{
-	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status);
-}
-
-void Logger::vprintMessage(const char* owner, const char* message, log_color color, va_list ap)
-{
-	// FIXME: We drop owner on the floor.
-	va_list ap;
-	va_start(ap, message);
-	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
-	va_end(ap);
-}
-
-#endif
-
 void Logger::destroy()
 {
 	delete this;
 }
+
+Logger* createStdioLogger()
+{
+	return new Logger();
+}
+
+#ifdef ANDROID
+
+#include "System/Logger/Android.h"
+Logger* (*createDefaultLogger)() = createAndroidLogger;
+
+#else
+
+Logger* (*createDefaultLogger)() = createStdioLogger;
+
+#endif

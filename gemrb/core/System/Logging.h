@@ -29,12 +29,7 @@
 #include "exports.h"
 #include "win32def.h"
 
-#if defined(ANDROID)
-# include <android/log.h>
-// FIXME: Are these include necesary?
-# include <cstdio>
-# include <cstdlib>
-#elif defined(WIN32)
+#if defined(WIN32)
 extern GEM_EXPORT HANDLE hConsole;
 #else //WIN32
 # include <config.h>

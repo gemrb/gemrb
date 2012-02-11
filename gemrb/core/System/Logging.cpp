@@ -32,7 +32,7 @@ void ShutdownLogging()
 
 void InitializeLogging()
 {
-	theLogger = new Logger();
+	theLogger = createDefaultLogger();
 }
 
 void print(const char *message, ...)

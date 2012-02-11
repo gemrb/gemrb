@@ -16,33 +16,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-/**
- * @file Logger.h
- * Logging targets
- * @author The GemRB Project
- */
+#ifndef LOGGER_ANDROID_H
+#define LOGGER_ANDROID_H
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#include "System/Logger.h"
 
-#include "System/Logging.h" // for log_color
-
-#include <cstdarg>
-
-class GEM_EXPORT Logger {
+class GEM_EXPORT AndroidLogger : public Logger {
 public:
-	Logger();
-	virtual ~Logger();
+	AndroidLogger();
+	virtual ~AndroidLogger();
 
-	virtual void vprint(const char* message, va_list ap);
-	virtual void textcolor(log_color);
-	virtual void printBracket(const char *status, log_color color);
-	virtual void printStatus(const char* status, log_color color);
-	virtual void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
-
-	virtual void destroy();
+	void vprint(const char* message, va_list ap);
+	void textcolor(log_color);
+	void printBracket(const char *status, log_color color);
+	void printStatus(const char* status, log_color color);
+	void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
 };
 
-extern Logger* (*createDefaultLogger)();
+Logger* createAndroidLogger();
 
 #endif

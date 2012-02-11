@@ -1,5 +1,11 @@
 ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
+IF (ANDROID)
+	set (PLATFORM_SRC System/Logger/Android.cpp)
+ELSE ()
+	set (PLATFORM_SRC)
+ENDIF ()
+
 FILE(GLOB gemrb_core_LIB_SRCS
 	ActorMgr.cpp
 	Ambient.cpp
@@ -122,6 +128,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/SlicedStream.cpp
 	System/String.cpp
 	System/VFS.cpp
+	${PLATFORM_SRC}
 	)
 
 if (STATIC_LINK)
