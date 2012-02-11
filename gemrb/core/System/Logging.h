@@ -61,6 +61,8 @@ enum log_color {
 	LIGHT_WHITE
 };
 
+GEM_EXPORT void InitializeLogging();
+GEM_EXPORT void ShutdownLogging();
 
 GEM_EXPORT void print(const char* message, ...)
 #if defined(__GNUC__)

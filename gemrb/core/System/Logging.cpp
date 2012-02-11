@@ -22,48 +22,73 @@
 
 #include <cstdarg>
 
-Logger theLogger;
+static Logger *theLogger = NULL;
+
+void ShutdownLogging()
+{
+	theLogger->destroy();
+	theLogger = NULL;
+}
+
+void InitializeLogging()
+{
+	theLogger = new Logger();
+}
 
 void print(const char *message, ...)
 {
+	if (!theLogger)
+		return;
 	va_list ap;
 
 	va_start(ap, message);
-	theLogger.vprint(message, ap);
+	theLogger->vprint(message, ap);
 	va_end(ap);
 }
 
 void textcolor(log_color c)
 {
-	theLogger.textcolor(c);
+	if (!theLogger)
+		return;
+	theLogger->textcolor(c);
 }
 
 void printBracket(const char* status, log_color color)
 {
-	theLogger.printBracket(status, color);
+	if (!theLogger)
+		return;
+	theLogger->printBracket(status, color);
 }
 
 void printStatus(const char* status, log_color color)
 {
-	theLogger.printStatus(status, color);
+	if (!theLogger)
+		return;
+	theLogger->printStatus(status, color);
 }
 
 void printMessage(const char* owner, const char* message, log_color color, ...)
 {
+	if (!theLogger)
+		return;
 	va_list ap;
 
 	va_start(ap, color);
-	theLogger.vprintMessage(owner, message, color, ap);
+	theLogger->vprintMessage(owner, message, color, ap);
 	va_end(ap);
 }
 
 void error(const char* owner, const char* message, ...)
 {
-	va_list ap;
+	if (theLogger) {
+		va_list ap;
 
-	va_start(ap, message);
-	theLogger.vprintMessage(owner, message, LIGHT_RED, ap);
-	va_end(ap);
+		va_start(ap, message);
+		theLogger->vprintMessage(owner, message, LIGHT_RED, ap);
+		va_end(ap);
+	}
+
+	ShutdownLogging();
 
 	exit(1);
 }

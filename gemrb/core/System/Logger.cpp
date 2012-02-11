@@ -153,3 +153,8 @@ void Logger::vprintMessage(const char* owner, const char* message, log_color col
 }
 
 #endif
+
+void Logger::destroy()
+{
+	delete this;
+}
