@@ -282,11 +282,11 @@ def DisplayGeneral (pc):
 	if len(effects):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (32052)
-		RecordsTextArea.Append ("[/color][capital=2]")
+		RecordsTextArea.Append ("[/color]")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
-			tmp = StateTable.GetValue (ord(c)-66, 0)
-			RecordsTextArea.Append (c+" ", -1)
+			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
+			RecordsTextArea.Append ("[capital=2]"+c+" ", -1)
 			RecordsTextArea.Append (tmp)
 
 	#race

@@ -438,7 +438,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		effects = GemRB.GetPlayerStates (pc)
 		if len (effects):
 			for c in effects:
-				tmp = StateTable.GetValue (ord(c)-66, 0)
+				tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
 				stats.append ( (tmp,c,'a') )
 			stats.append (None)
 
