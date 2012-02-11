@@ -22,7 +22,8 @@
 
 #include <cstdio>
 
-StdioLogger::StdioLogger()
+StdioLogger::StdioLogger(bool useColor)
+	: useColor(useColor)
 {}
 
 StdioLogger::~StdioLogger()
@@ -33,7 +34,6 @@ void StdioLogger::vprint(const char *message, va_list ap)
 	vprintf(message, ap);
 }
 
-#ifndef NOCOLOR
 static const char* colors[] = {
 	"\033[0m",
 	"\033[0m\033[30;40m",
@@ -52,16 +52,14 @@ static const char* colors[] = {
 	"\033[1m\033[36;40m",
 	"\033[1m\033[37;40m"
 };
-#endif
 
 
 void StdioLogger::textcolor(log_color c)
 {
-#ifdef NOCOLOR
-	if (c) while (0) ;
-#else
-	print("%s", colors[c]);
-#endif
+	// Shold this be in an ansi-term subclass?
+	// Probably not worth the bother
+	if (useColor)
+		print("%s", colors[c]);
 }
 
 void StdioLogger::printBracket(const char* status, log_color color)
@@ -91,5 +89,9 @@ void StdioLogger::vprintMessage(const char* owner, const char* message, log_colo
 
 Logger* createStdioLogger()
 {
-	return new StdioLogger();
+#ifndef NOCOLOR
+	return new StdioLogger(true);
+#else
+	return new StdioLogger(false);
+#endif
 }

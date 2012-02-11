@@ -29,7 +29,8 @@
 # define cprintf _cprintf
 #endif
 
-Win32ConsoleLogger::Win32ConsoleLogger()
+Win32ConsoleLogger::Win32ConsoleLogger(bool useColor)
+	: StdioLogger(useColor)
 {
 	hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
 }
@@ -68,10 +69,11 @@ static int colors[] = {
 
 void Win32ConsoleLogger::textcolor(log_color c)
 {
-	SetConsoleTextAttribute(hConsole, colors[c]);
+	if (useColor)
+		SetConsoleTextAttribute(hConsole, colors[c]);
 }
 
 Logger* createWin32ConsoleLogger()
 {
-	return new Win32ConsoleLogger();
+	return new Win32ConsoleLogger(true);
 }

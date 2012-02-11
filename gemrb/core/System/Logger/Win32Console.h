@@ -26,7 +26,7 @@
 
 class GEM_EXPORT Win32ConsoleLogger : public StdioLogger {
 public:
-	Win32ConsoleLogger();
+	Win32ConsoleLogger(bool useColor);
 	virtual ~Win32ConsoleLogger();
 
 	void vprint(const char* message, va_list ap);

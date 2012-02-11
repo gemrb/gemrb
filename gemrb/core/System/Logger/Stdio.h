@@ -23,7 +23,7 @@
 
 class GEM_EXPORT StdioLogger : public Logger {
 public:
-	StdioLogger();
+	StdioLogger(bool useColor);
 	virtual ~StdioLogger();
 
 	void vprint(const char* message, va_list ap);
@@ -31,6 +31,9 @@ public:
 	void printBracket(const char *status, log_color color);
 	void printStatus(const char* status, log_color color);
 	void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
+
+protected:
+	bool useColor;
 };
 
 Logger* createStdioLogger();
