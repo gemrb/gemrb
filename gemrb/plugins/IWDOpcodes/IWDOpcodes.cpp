@@ -503,6 +503,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 
 	ieDword idx = spellres[type].stat;
 	ieDword val = spellres[type].value;
+	ieDword rel = spellres[type].relation;
 	//if IDS value is 'anything' then the supplied value is in Parameter1
 	if (val==0xffffffff) {
 		val = value;
@@ -511,16 +512,19 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 	case STI_INVALID:
 		return 0;
 	case STI_EA:
-		return DiffCore(EARelation(Owner, target), val, spellres[type].relation);
+		return DiffCore(EARelation(Owner, target), val, rel);
 	case STI_DAYTIME:
-		return (core->GetGame()->GameTime%7200/3600) != val;
+		{
+			ieDword timeofday = core->GetGame()->GameTime%7200/3600;
+			return timeofday>= val && timeofday<= rel;
+		}
 	case STI_AREATYPE:
-		return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, spellres[type].relation);
+		return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
 	case STI_MORAL_ALIGNMENT:
 		if(Owner && Owner->Type==ST_ACTOR) {
-			return DiffCore( ((Actor *) Owner)->GetStat(IE_ALIGNMENT)&AL_GE_MASK,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, spellres[type].relation);
+			return DiffCore( ((Actor *) Owner)->GetStat(IE_ALIGNMENT)&AL_GE_MASK,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, rel);
 		} else {
-			return DiffCore(AL_TRUE_NEUTRAL,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, spellres[type].relation);
+			return DiffCore(AL_TRUE_NEUTRAL,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, rel);
 		}
 	case STI_TWO_ROWS:
 		//used in checks where any of two matches are ok (golem or undead etc)
@@ -543,7 +547,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		}
 		return 1;
 	case STI_CIRCLESIZE:
-		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, spellres[type].relation);
+		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
 	case STI_EVASION:
 		if (target->GetThiefLevel() < 7 ) {
 			return 0;
@@ -554,7 +558,14 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		}
 		return 0;
 	default:
-		return DiffCore(STAT_GET(idx), val, spellres[type].relation);
+		{
+			//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
+			ieDword stat = STAT_GET(idx);
+			if (idx==IE_SUBRACE) {
+				stat |= STAT_GET(IE_RACE)<<16;
+			}
+			return DiffCore(stat, val, rel);
+		}
 	}
 }
 
@@ -3172,24 +3183,33 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_day_blindness (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
 	Map *map = target->GetCurrentArea();
-	if (!map) return FX_NOT_APPLIED;
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
 
-	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
+	print ("Try Apply DayBlindness\n");
+	//extended night IS needed, even though IWD2's extended night isn't the same as in BG2 (no separate tileset)
+	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == AT_EXTENDED_NIGHT) {
 		return FX_NOT_APPLIED;
 	}
 	//drop the effect when day came
-	if (!core->GetGame()->IsDay()) return FX_NOT_APPLIED;
+	if (!core->GetGame()->IsDay()) {
+		return FX_NOT_APPLIED;
+	}
 
 	//don't let it work twice
-	if (target->SetSpellState(SS_DAYBLINDNESS)) return FX_NOT_APPLIED;
+	if (target->SetSpellState(SS_DAYBLINDNESS)) {
+		return FX_NOT_APPLIED;
+	}
 
 	// medium hack (better than original)
 	// the original used explicit race/subrace values
 	ieDword penalty;
 
+	//the original engine let the effect stay on non affected races, doing the same so the spell state sticks
 	if (check_iwd_targeting(Owner, target, 0, 82)) penalty = 2; //dark elf
 	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
-	else return FX_NOT_APPLIED;
+	else return FX_APPLIED;
 
 	target->AddPortraitIcon(PI_DAYBLINDNESS);
 
