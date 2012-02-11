@@ -27,6 +27,7 @@ from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import SLOT_ALL
+from ie_feats import FEAT_STRONG_BACK
 
 OtherWindowFn = None
 NextWindowFn = None
@@ -346,6 +347,8 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 
 	# encumbrance
 	max_encumb = CommonTables.StrMod.GetValue (sstr, 3) + CommonTables.StrModEx.GetValue (ext_str, 3)
+	if GemRB.HasFeat (pc, FEAT_STRONG_BACK):
+		max_encumb += max_encumb/2
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Control = Window.GetControl (ControlID)
