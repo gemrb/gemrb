@@ -1,6 +1,6 @@
 GemRB git (601e49a):
   New features:
-    - 
+    - encumbrance penalties in movement
     - iwd2 armor penalty and critical hit multiplier
     - many iwd2 feats
 
