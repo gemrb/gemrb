@@ -78,14 +78,16 @@ int main(int argc, char* argv[])
 	#endif
 	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
 #endif
-
 	Interface::SanityCheck(VERSION_GEMRB);
+	InitializeLogging();
+
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
 		delete( core );
 		print("Press enter to continue...");
 		textcolor(DEFAULT);
 		getc(stdin);
+		ShutdownLogging();
 		return -1;
 	}
 #ifdef ANDROID
@@ -96,5 +98,6 @@ int main(int argc, char* argv[])
 	core->Main();
 	delete( core );
 	textcolor(DEFAULT);
+	ShutdownLogging();
 	return 0;
 }

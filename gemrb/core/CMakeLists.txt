@@ -1,5 +1,13 @@
 ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
+IF (ANDROID)
+	set (PLATFORM_SRC System/Logger/Android.cpp)
+ELSEIF (WIN32)
+	set (PLATFORM_SRC System/Logger/Win32Console.cpp)
+ELSE ()
+	set (PLATFORM_SRC)
+ENDIF ()
+
 FILE(GLOB gemrb_core_LIB_SRCS
 	ActorMgr.cpp
 	Ambient.cpp
@@ -117,10 +125,13 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/DataStream.cpp
 	System/FileStream.cpp
 	System/MemoryStream.cpp
+	System/Logger.cpp
+	System/Logger/Stdio.cpp
 	System/Logging.cpp
 	System/SlicedStream.cpp
 	System/String.cpp
 	System/VFS.cpp
+	${PLATFORM_SRC}
 	)
 
 if (STATIC_LINK)
