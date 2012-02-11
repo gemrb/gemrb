@@ -18,166 +18,52 @@
 
 #include "System/Logging.h"
 
-#include <cstdio>
+#include "System/Logger.h"
+
 #include <cstdarg>
 
-#ifdef ANDROID
-#include <android/log.h>
-#endif
-
-#ifdef WIN32
-# define ADV_TEXT
-# include <conio.h>
-#endif
-
-void vprint(const char *message, va_list ap)
-{
-#ifdef ANDROID
-	__android_log_vprint(ANDROID_LOG_INFO, "printf:", message, ap);
-#elif (!defined(WIN32)) || defined(WIN32_USE_STDIO)
-	vprintf(message, ap);
-#else
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	char buff[_MAX_PATH];
-	vsnprintf(buff, _MAX_PATH, message, ap);
-	cprintf("%s", buff);
-#endif
-}
+Logger theLogger;
 
 void print(const char *message, ...)
 {
 	va_list ap;
 
 	va_start(ap, message);
-	vprint(message, ap);
+	theLogger.vprint(message, ap);
 	va_end(ap);
 }
-
-#ifndef NOCOLOR
-#if defined(WIN32)
-static int colors[] = {
-	0,
-	FOREGROUND_RED,
-	FOREGROUND_GREEN,
-	FOREGROUND_GREEN | FOREGROUND_RED,
-	FOREGROUND_BLUE,
-	FOREGROUND_RED | FOREGROUND_BLUE,
-	FOREGROUND_BLUE | FOREGROUND_GREEN,
-	FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED,
-	(RED | FOREGROUND_INTENSITY),
-	(GREEN | FOREGROUND_INTENSITY),
-	(GREEN | RED | FOREGROUND_INTENSITY),
-	(BLUE | FOREGROUND_INTENSITY),
-	(MAGENTA | FOREGROUND_INTENSITY),
-	(CYAN | FOREGROUND_INTENSITY),
-	(WHITE | FOREGROUND_INTENSITY),
-	WHITE
-};
-#else
-static const char* colors[] = {
-	"\033[0m",
-	"\033[0m\033[30;40m",
-	"\033[0m\033[31;40m",
-	"\033[0m\033[32;40m",
-	"\033[0m\033[33;40m",
-	"\033[0m\033[34;40m",
-	"\033[0m\033[35;40m",
-	"\033[0m\033[36;40m",
-	"\033[0m\033[37;40m",
-	"\033[1m\033[31;40m",
-	"\033[1m\033[32;40m",
-	"\033[1m\033[33;40m",
-	"\033[1m\033[34;40m",
-	"\033[1m\033[35;40m",
-	"\033[1m\033[36;40m",
-	"\033[1m\033[37;40m"
-};
-#endif
-#endif
-
 
 void textcolor(log_color c)
 {
-#ifdef NOCOLOR
-	if (c) while (0) ;
-#elif defined(WIN32)
-	SetConsoleTextAttribute(hConsole, colors[c]);
-#else
-	print("%s", colors[c]);
-#endif
+	theLogger.textcolor(c);
 }
 
-#ifndef ANDROID
 void printBracket(const char* status, log_color color)
 {
-	textcolor(WHITE);
-	print("[");
-	textcolor(color);
-	print("%s", status);
-	textcolor(WHITE);
-	print("]");
+	theLogger.printBracket(status, color);
 }
 
 void printStatus(const char* status, log_color color)
 {
-	printBracket(status, color);
-	print("\n");
+	theLogger.printStatus(status, color);
 }
 
 void printMessage(const char* owner, const char* message, log_color color, ...)
 {
-	printBracket(owner, LIGHT_WHITE);
-	print(": ");
-	textcolor(color);
 	va_list ap;
 
 	va_start(ap, color);
-	vprint(message, ap);
+	theLogger.vprintMessage(owner, message, color, ap);
 	va_end(ap);
 }
 
 void error(const char* owner, const char* message, ...)
 {
-	// FIXME: Merge with printMessage?
-	printBracket(owner, LIGHT_WHITE);
-	print(": ");
-	textcolor(LIGHT_RED);
 	va_list ap;
 
 	va_start(ap, message);
-	vprint(message, ap);
+	theLogger.vprintMessage(owner, message, LIGHT_RED, ap);
 	va_end(ap);
 
 	exit(1);
 }
-#else /* !ANDROID */
-void printBracket(const char* status, log_color color)
-{
-}
-
-void printStatus(const char* status, log_color color)
-{
-	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status);
-}
-
-void printMessage(const char* owner, const char* message, log_color color, ...)
-{
-	// FIXME: We drop owner on the floor.
-	va_list ap;
-	va_start(ap, message);
-	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
-	va_end(ap);
-}
-
-void error(const char* owner, const char* message, ...)
-{
-	// FIXME: We drop owner on the floor.
-	va_list ap;
-	va_start(ap, message);
-	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
-	va_end(ap);
-	exit(1);
-};
-#endif
