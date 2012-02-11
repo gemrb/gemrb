@@ -40,7 +40,7 @@ struct SpellFocus {
 static int pstflags = false;
 static int inited = false;
 SpellFocus *spellfocus = NULL;
-int schoolcount = -1;
+int schoolcount = 0;
 
 static void InitSpellTables()
 {
