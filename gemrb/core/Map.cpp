@@ -745,11 +745,7 @@ void Map::UpdateScripts()
 
 		actor->UpdateActorState(game->GameTime);
 
-		actor->inventory.CalculateWeight();
-		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
-
-		//TODO:calculate actor speed!
-		int speed = (int) actor->GetStat(IE_MOVEMENTRATE);
+		int speed = actor->CalculateSpeed(false);
 		if (speed) {
 			speed = 1500/speed;
 		}

@@ -466,8 +466,8 @@ public:
 	}
 	void SetName(const char* ptr, unsigned char type);
 	void SetName(int strref, unsigned char type);
-	/* returns carried weight atm, could calculate with strength*/
-	int GetEncumbrance();
+	/* calculates speed, encumbrance etc */
+	int CalculateSpeed(bool feedback);
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
 	/* receives undead turning message */

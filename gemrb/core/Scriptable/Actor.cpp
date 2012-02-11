@@ -3884,11 +3884,35 @@ ieDword Actor::GetAnyActiveCasterLevel() const
 	return GetBaseCasterLevel(IE_SPL_PRIEST, strict) + GetBaseCasterLevel(IE_SPL_WIZARD, strict);
 }
 
-/** maybe this would be more useful if we calculate with the strength too
-*/
-int Actor::GetEncumbrance()
+int Actor::CalculateSpeed(bool feedback)
 {
-	return inventory.GetWeight();
+	int speed = GetStat(IE_MOVEMENTRATE);
+	inventory.CalculateWeight();
+	int encumbrance = inventory.GetWeight();
+	SetStat(IE_ENCUMBRANCE, encumbrance, false);
+	int maxweight;
+	//if (third) {
+	//	//LOL this won't get us far
+	//	maxweight = GetAbilityBonus(IE_STR);
+	//} else {
+		maxweight = core->GetStrengthBonus(3,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+	//}
+	if (HasFeat(FEAT_STRONG_BACK)) maxweight += maxweight/2;
+
+	if(encumbrance<=maxweight) {
+		return speed;
+	}
+	if(encumbrance<=maxweight*2) {
+		if (feedback) {
+			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
+			//print slow speed
+		}
+		return speed/2;
+	}
+	if (feedback) {
+		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
+	}
+	return 0;
 }
 
 //bg2 and iwd1

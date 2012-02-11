@@ -255,6 +255,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	char Tmp[256];
 	static bool CanRun = true;
 
+	actor->CalculateSpeed(true);
 	Action *action = NULL;
 	if (CanRun && (DoubleClick || AlwaysRun)) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
