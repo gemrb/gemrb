@@ -3187,7 +3187,6 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	print ("Try Apply DayBlindness\n");
 	//extended night IS needed, even though IWD2's extended night isn't the same as in BG2 (no separate tileset)
 	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == AT_EXTENDED_NIGHT) {
 		return FX_NOT_APPLIED;

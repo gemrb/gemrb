@@ -31,7 +31,42 @@
 #include "ProjectileServer.h"
 #include "Scriptable/Actor.h"
 
+struct SpellFocus {
+	ieDword stat;
+	ieDword val1;
+	ieDword val2;
+};
+
 static int pstflags = false;
+static int inited = false;
+SpellFocus *spellfocus = NULL;
+int schoolcount = -1;
+
+static void InitSpellTables()
+{
+	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
+	AutoTable tm("splfocus");
+	if (tm) {
+		schoolcount = tm->GetRowCount();
+
+		spellfocus = new SpellFocus [schoolcount];
+		for(int i = 0; i<schoolcount; i++) {
+			ieDword stat = core->TranslateStat(tm->QueryField(i, 0));
+			ieDword val1 = atoi(tm->QueryField(i, 1));
+			ieDword val2 = atoi(tm->QueryField(i, 2));
+			spellfocus[i].stat = stat;
+			spellfocus[i].val1 = val1;
+			spellfocus[i].val2 = val2;
+		}
+	}
+}
+
+
+void ReleaseMemorySpell()
+{
+	inited = false;
+	delete [] spellfocus;
+}
 
 SPLExtHeader::SPLExtHeader(void)
 {
@@ -47,7 +82,10 @@ Spell::Spell(void)
 {
 	ext_headers = NULL;
 	casting_features = NULL;
-	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
+	if (!inited) {
+		inited = true;
+		InitSpellTables();
+	}
 }
 
 Spell::~Spell(void)
@@ -83,11 +121,11 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 	char g, t;
 	Effect *fx;
 	ieResRef Resource;
-	
+
 	int cgsound = CastingSound;
 	if (cgsound>=0 && duration > 1) {
 		//bg2 style
-		if(cgsound&0x100) {    
+		if(cgsound&0x100) {
 			switch(gender) {
 			default: g = 'm'; break;
 			case SEX_FEMALE: g = 'f'; break;
@@ -95,11 +133,11 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 			}
 		} else {
 			//how style
-			
+
 			switch(gender) {
 			default: g = 'm'; break;
 			case SEX_FEMALE: g = 'f'; break;
-			}         
+			}
 		}
 		if (SpellType==IE_SPL_PRIEST) {
 			t = 'p';
@@ -176,6 +214,19 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
 			} else if (caster->Modified[IE_SPELLDURATIONMODPRIEST] && SpellType == IE_SPL_PRIEST) {
 				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODPRIEST]) / 100;
+			}
+
+			//evaluate spell focus feats
+			//TODO: the usual problem: which saving throw is better? Easy fix in the data file.
+			if (fx->PrimaryType<(ieDword) schoolcount) {
+				ieDword stat = spellfocus[fx->PrimaryType].stat;
+				if (stat>0) {
+					switch (caster->Modified[stat]) {
+						case 0: break;
+						case 1: fx->SavingThrowBonus += spellfocus[fx->PrimaryType].val1; break;
+						default: fx->SavingThrowBonus += spellfocus[fx->PrimaryType].val2; break;
+					}
+				}
 			}
 		}
 
