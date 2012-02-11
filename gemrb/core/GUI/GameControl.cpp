@@ -253,11 +253,12 @@ void GameControl::Center(unsigned short x, unsigned short y)
 void GameControl::CreateMovement(Actor *actor, const Point &p)
 {
 	char Tmp[256];
+	Action *action = NULL;
 	static bool CanRun = true;
 
-	actor->CalculateSpeed(true);
-	Action *action = NULL;
-	if (CanRun && (DoubleClick || AlwaysRun)) {
+	//try running (in PST) only if not encumbered
+	ieDword speed = actor->CalculateSpeed(true);
+	if ( (speed==actor->GetStat(IE_MOVEMENTRATE)) && CanRun && (DoubleClick || AlwaysRun)) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 		action = GenerateAction( Tmp );
 		//if it didn't work don't insist
