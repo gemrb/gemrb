@@ -126,6 +126,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/FileStream.cpp
 	System/MemoryStream.cpp
 	System/Logger.cpp
+	System/Logger/Stdio.cpp
 	System/Logging.cpp
 	System/SlicedStream.cpp
 	System/String.cpp

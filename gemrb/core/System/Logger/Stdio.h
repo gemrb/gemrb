@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2011 The GemRB Project
+ * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,36 +16,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger.h"
+#ifndef LOGGER_STDIO_H
+#define LOGGER_STDIO_H
 
-#include "System/Logging.h"
+#include "System/Logger.h" // for log_color
 
-#include <cstdio>
+class GEM_EXPORT StdioLogger : public Logger {
+public:
+	StdioLogger();
+	virtual ~StdioLogger();
 
-Logger::Logger()
-{}
+	void vprint(const char* message, va_list ap);
+	void textcolor(log_color);
+	void printBracket(const char *status, log_color color);
+	void printStatus(const char* status, log_color color);
+	void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
+};
 
-Logger::~Logger()
-{}
-
-void Logger::destroy()
-{
-	delete this;
-}
-
-#ifdef ANDROID
-
-#include "System/Logger/Android.h"
-Logger* (*createDefaultLogger)() = createAndroidLogger;
-
-#elif defined(WIN32) && !defined(WIN32_USE_STDIO)
-
-#include "System/Logger/Win32Console.h"
-Logger* (*createDefaultLogger)() = createStdioLogger;
-
-#else
-
-#include "System/Logger/Stdio.h"
-Logger* (*createDefaultLogger)() = createStdioLogger;
+Logger* createStdioLogger();
 
 #endif

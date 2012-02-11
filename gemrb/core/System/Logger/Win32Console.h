@@ -20,11 +20,11 @@
 #ifndef LOGGER_WIN32_H
 #define LOGGER_WIN32_H
 
-#include "System/Logger.h"
+#include "System/Logger/Stdio.h"
 
 #include <cstdarg>
 
-class GEM_EXPORT Win32ConsoleLogger : public Logger {
+class GEM_EXPORT Win32ConsoleLogger : public StdioLogger {
 public:
 	Win32ConsoleLogger();
 	virtual ~Win32ConsoleLogger();

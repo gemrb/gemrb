@@ -34,11 +34,11 @@ public:
 	Logger();
 	virtual ~Logger();
 
-	virtual void vprint(const char* message, va_list ap);
-	virtual void textcolor(log_color);
-	virtual void printBracket(const char *status, log_color color);
-	virtual void printStatus(const char* status, log_color color);
-	virtual void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
+	virtual void vprint(const char* message, va_list ap) = 0;
+	virtual void textcolor(log_color) = 0;
+	virtual void printBracket(const char *status, log_color color) = 0;
+	virtual void printStatus(const char* status, log_color color) = 0;
+	virtual void vprintMessage(const char* owner, const char* message, log_color color, va_list ap) = 0;
 
 	virtual void destroy();
 };
