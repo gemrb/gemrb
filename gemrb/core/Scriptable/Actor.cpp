@@ -4520,6 +4520,11 @@ int Actor::GetHpAdjustment(int multiplier) const
 	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
 		return 0;
 	}
+	// some p&p mods make the hpconbon much more strict, screwing low hp npcs like Prism
+	if (BaseStats[IE_EA] >= EA_NOTGOOD || BaseStats[IE_EA] < EA_NOTNEUTRAL) {
+		return 0;
+	}
+
 
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
