@@ -5383,7 +5383,7 @@ int Interface::GetDexterityBonus(int column, int value) const
 {
 	//no dexmod in iwd2 and only one type of modifier
 	if (HasFeature(GF_3ED_RULES)) {
-		return (value-10)/2;
+		return value/2-5;
 	}
 
 	//reaction, missile, ac
@@ -5397,7 +5397,7 @@ int Interface::GetConstitutionBonus(int column, int value) const
 {
 	//no conmod in iwd2
 	if (HasFeature(GF_3ED_RULES)) {
-		return (value-10)/2;
+		return value/2-5;
 	}
 
 	//normal, warrior, minimum, regen hp, regen fatigue
@@ -5431,7 +5431,7 @@ int Interface::GetWisdomBonus(int column, int value) const
 {
 	//no wismod in iwd2
 	if (HasFeature(GF_3ED_RULES)) {
-		return (value-10)/2;
+		return value/2-5;
 	}
 
 	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
