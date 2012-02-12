@@ -5209,6 +5209,28 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 		} else {
 			tohit += GetStat(IE_HITBONUSRIGHT);
 		}
+		if (third) {
+			// FIXME: externalise
+			// penalites and boni for both hands:
+			// -6 main, -10 off with no adjustments
+			//  0 main, +4 off with ambidexterity
+			// +2 main, +2 off with two weapon fighting
+			// +2 main, +2 off with a simple weapons in the off hand
+			if (HasFeat(FEAT_TWO_WEAPON_FIGHTING)) {
+				tohit += 2;
+			}
+			/*if (wi.prof == simple weapon prof) {
+				tohit += 2;
+			}*/
+			if (Flags&WEAPON_LEFTHAND) {
+				tohit -= 6;
+			} else {
+				tohit -= 10;
+				if (HasFeat(FEAT_AMBIDEXTERITY)) {
+					tohit += 4;
+				}
+			}
+		}
 	}
 
 	//add strength bonus if we need
