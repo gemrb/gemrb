@@ -3156,7 +3156,9 @@ void Actor::IdleActions(bool nonidle)
 		}
 	} else {
 		if (nextBored<time && !InMove()) {
-			nextBored = time+core->Roll(1,30,bored_time/10);
+			int x = bored_time / 10;
+			if (x<10) x = 10;
+			nextBored = time+core->Roll(1,30,x);
 			VerbalConstant(VB_BORED, 1);
 		}
 	}
@@ -8165,6 +8167,10 @@ bool Actor::IsPartyMember() const
 void Actor::ResetCommentTime()
 {
 	Game *game = core->GetGame();
-	nextBored = game->GameTime + core->Roll(1, 30, bored_time);
+	if (bored_time) {
+		nextBored = game->GameTime + core->Roll(1, 30, bored_time);
+	} else {
+		nextBored = 0;
+	}
 	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 }
