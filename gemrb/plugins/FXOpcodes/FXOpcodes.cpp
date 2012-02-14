@@ -787,6 +787,7 @@ static EffectRef fx_set_blind_state_ref = { "State:Blind", -1 }; //0x4a
 static EffectRef fx_set_feebleminded_state_ref = { "State:Feeblemind", -1 }; //0x4c
 static EffectRef fx_diseased_state_ref = { "State:Diseased", -1 }; //0x4e
 static EffectRef fx_deaf_state_ref = { "State:Deafness", -1 }; //0x50
+static EffectRef fx_fatigue_ref = { "FatigueModifier", -1 }; //0x5d
 static EffectRef fx_intoxication_ref = { "IntoxicationModifier", -1 }; //0x5e
 static EffectRef fx_hold_creature_no_icon_ref = { "State:HoldNoIcon", -1 }; //0x6d
 static EffectRef fx_remove_item_ref = { "Item:Remove", -1 }; //0x70
@@ -7157,6 +7158,7 @@ int fx_magical_rest (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_magical_rest (%2d)\n", fx->Opcode );
 	//instant, full rest
 	target->Rest(0);
+	target->fxqueue.RemoveAllEffects(fx_fatigue_ref);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FATIGUE);
 	return FX_NOT_APPLIED;
 }

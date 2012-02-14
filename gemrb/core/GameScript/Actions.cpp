@@ -5033,8 +5033,10 @@ void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
-//doesn't advance game time, just refreshes spells of target
+//doesn't advance game time, just removes fatigue & refreshes spells of target
 //this is a non-blocking action
+static EffectRef fx_fatigue_ref = { "FatigueModifier", -1 };
+
 void GameScript::Rest(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -5042,35 +5044,24 @@ void GameScript::Rest(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->spellbook.ChargeAllSpells();
-	//check if this should be a full heal
-	actor->Heal(0);
-	actor->fxqueue.RemoveExpiredEffects(0xffffffff);
+	actor->fxqueue.RemoveAllEffects(fx_fatigue_ref);
+	actor->SetBase(IE_FATIGUE,0);
 }
 
-//doesn't advance game time (unsure), just refreshes spells of target
+//doesn't advance game time, just removes fatigue
 void GameScript::RestNoSpells(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	//check if this should be a full heal
-	actor->Heal(0);
-	actor->fxqueue.RemoveExpiredEffects(0xffffffff);
+	actor->fxqueue.RemoveAllEffects(fx_fatigue_ref);
+	actor->SetBase(IE_FATIGUE,0);
 }
 
 //this most likely advances time and heals whole party
 void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
 {
-/*
-	if (Sender->Type!=ST_ACTOR) {
-		return;
-	}
-	Actor *actor = (Actor *) Sender;
-	actor->Heal(1);
-	//not sure if this should remove timed effects
-	//more like execute them hour by hour :>
-*/
 	core->GetGame()->RestParty(REST_NOSCATTER, 0, 0);
 	Sender->ReleaseCurrentAction();
 }
