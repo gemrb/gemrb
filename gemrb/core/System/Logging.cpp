@@ -21,70 +21,79 @@
 #include "System/Logger.h"
 
 #include <cstdarg>
+#include <vector>
 
-static Logger *theLogger = NULL;
+static std::vector<Logger*> theLogger;
 
 void ShutdownLogging()
 {
-	theLogger->destroy();
-	theLogger = NULL;
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->destroy();
+	}
+	theLogger.clear();
 }
 
 void InitializeLogging()
 {
-	theLogger = createDefaultLogger();
+	AddLogger(createDefaultLogger());
+}
+
+void AddLogger(Logger* logger)
+{
+	if (logger)
+		theLogger.push_back(logger);
 }
 
 void print(const char *message, ...)
 {
-	if (!theLogger)
-		return;
-	va_list ap;
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		va_list ap;
 
-	va_start(ap, message);
-	theLogger->vprint(message, ap);
-	va_end(ap);
+		va_start(ap, message);
+		theLogger[i]->vprint(message, ap);
+		va_end(ap);
+	}
 }
 
 void textcolor(log_color c)
 {
-	if (!theLogger)
-		return;
-	theLogger->textcolor(c);
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->textcolor(c);
+	}
 }
 
 void printBracket(const char* status, log_color color)
 {
-	if (!theLogger)
-		return;
-	theLogger->printBracket(status, color);
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->printBracket(status, color);
+	}
 }
 
 void printStatus(const char* status, log_color color)
 {
-	if (!theLogger)
-		return;
-	theLogger->printStatus(status, color);
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->printStatus(status, color);
+	}
 }
 
 void printMessage(const char* owner, const char* message, log_color color, ...)
 {
-	if (!theLogger)
-		return;
-	va_list ap;
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		va_list ap;
 
-	va_start(ap, color);
-	theLogger->vprintMessage(owner, message, color, ap);
-	va_end(ap);
+		va_start(ap, color);
+		theLogger[i]->vprintMessage(owner, message, color, ap);
+		va_end(ap);
+	}
 }
 
 void error(const char* owner, const char* message, ...)
 {
-	if (theLogger) {
+	for (size_t i = 0; i < theLogger.size(); ++i) {
 		va_list ap;
 
 		va_start(ap, message);
-		theLogger->vprintMessage(owner, message, LIGHT_RED, ap);
+		theLogger[i]->vprintMessage(owner, message, LIGHT_RED, ap);
 		va_end(ap);
 	}
 

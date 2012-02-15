@@ -48,7 +48,10 @@ enum log_color {
 	LIGHT_WHITE
 };
 
+class Logger;
+
 GEM_EXPORT void InitializeLogging();
+GEM_EXPORT void AddLogger(Logger*);
 GEM_EXPORT void ShutdownLogging();
 
 #if defined(__GNUC__)
