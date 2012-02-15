@@ -337,6 +337,9 @@
 		A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
+		A2ABDF6714EB37BB004BCB7D /* Apple.h in Headers */ = {isa = PBXBuildFile; fileRef = A2ABDF6514EB37BB004BCB7D /* Apple.h */; };
+		A2ABDF6814EB37BB004BCB7D /* Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ABDF6614EB37BB004BCB7D /* Apple.mm */; };
+		A2ABDF6914EB37BB004BCB7D /* Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ABDF6614EB37BB004BCB7D /* Apple.mm */; };
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
@@ -347,6 +350,9 @@
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505314D0C12300D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505414D0C17500D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
+		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
+		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
+		A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */; };
 		A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */; };
@@ -1304,6 +1310,9 @@
 		A2BD81B113960965007E9C63 /* RGBAColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RGBAColor.h; sourceTree = "<group>"; };
 		A2BD81B213960965007E9C63 /* SClassID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SClassID.h; sourceTree = "<group>"; };
 		A2BD81B313960965007E9C63 /* strrefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strrefs.h; sourceTree = "<group>"; };
+		A2ABDF6514EB37BB004BCB7D /* Apple.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = Apple.h; sourceTree = "<group>"; };
+		A2ABDF6614EB37BB004BCB7D /* Apple.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Apple.mm; sourceTree = "<group>"; };
+		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		A2BD82721396B886007E9C63 /* GemRB.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = GemRB.cpp; path = ../gemrb/GemRB.cpp; sourceTree = SOURCE_ROOT; };
 		A2BD83111396FD5F007E9C63 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		A2BD831D1396FE16007E9C63 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
@@ -1559,6 +1568,8 @@
 		A2D4C52E13A978110086BCC4 /* StringMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringMap.h; sourceTree = "<group>"; };
 		A2D4C52F13A978110086BCC4 /* strrefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strrefs.h; sourceTree = "<group>"; };
 		A2D4C53013A978110086BCC4 /* win32def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32def.h; sourceTree = "<group>"; };
+		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
+		A2DE329814EB071200117503 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_AppDelegate.h; sourceTree = "<group>"; };
 		A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_AppDelegate.m; sourceTree = "<group>"; };
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2873,7 +2884,6 @@
 				A2BF9FDC1395FF62006ADC12 /* EventMgr.h */,
 				A2BF9FDE1395FF62006ADC12 /* GameControl.h */,
 				A2BF9FDD1395FF62006ADC12 /* GameControl.cpp */,
-				A265ECEA13A8669700C6DF12 /* Logging.cpp */,
 				A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */,
 				A265ECEC13A8669700C6DF12 /* String.cpp */,
 				A265ECD813A8661600C6DF12 /* FileCache.cpp */,
@@ -2924,6 +2934,10 @@
 		A2BFA0571395FF62006ADC12 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				A2DE329B14EB078200117503 /* Logger */,
+				A265ECEA13A8669700C6DF12 /* Logging.cpp */,
+				A2DE329714EB071200117503 /* Logger.cpp */,
+				A2DE329814EB071200117503 /* Logger.h */,
 				A2BFA05C1395FF62006ADC12 /* DataStream.cpp */,
 				A2BFA05D1395FF62006ADC12 /* DataStream.h */,
 				A2BFA05E1395FF62006ADC12 /* FileStream.cpp */,
@@ -2963,6 +2977,15 @@
 			name = includes;
 			path = ../gemrb/includes;
 			sourceTree = SOURCE_ROOT;
+		};
+		A2DE329B14EB078200117503 /* Logger */ = {
+			isa = PBXGroup;
+			children = (
+				A2ABDF6514EB37BB004BCB7D /* Apple.h */,
+				A2ABDF6614EB37BB004BCB7D /* Apple.mm */,
+			);
+			path = Logger;
+			sourceTree = "<group>";
 		};
 		A2E7985B14845AFB00B15DF4 /* iOS static libs */ = {
 			isa = PBXGroup;
@@ -3112,6 +3135,8 @@
 				A2E66433139E886700310FC8 /* GameScript.h in Headers */,
 				A2E66435139E886700310FC8 /* GSUtils.h in Headers */,
 				A2E66437139E886700310FC8 /* Matching.h in Headers */,
+				A2DE329A14EB071200117503 /* Logger.h in Headers */,
+				A2ABDF6714EB37BB004BCB7D /* Apple.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4616,6 +4641,8 @@
 				A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */,
 				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
 				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */,
+				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
+				A2ABDF6914EB37BB004BCB7D /* Apple.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4744,6 +4771,8 @@
 				A265ECE013A8661600C6DF12 /* FileCache.cpp in Sources */,
 				A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */,
 				A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */,
+				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
+				A2ABDF6814EB37BB004BCB7D /* Apple.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
