@@ -51,25 +51,26 @@ enum log_color {
 GEM_EXPORT void InitializeLogging();
 GEM_EXPORT void ShutdownLogging();
 
-GEM_EXPORT void print(const char* message, ...)
 #if defined(__GNUC__)
-    __attribute__ ((format(printf, 1, 2)))
+# define PRINTF_FORMAT(x, y) \
+    __attribute__ ((format(printf, x, y)))
+#else
+# define PRINT_FORMAT(x, y)
 #endif
-	;
+
+GEM_EXPORT void print(const char* message, ...)
+	PRINTF_FORMAT(1, 2);
+
 GEM_EXPORT void textcolor(log_color);
 GEM_EXPORT void printBracket(const char *status, log_color color);
 GEM_EXPORT void printStatus(const char* status, log_color color);
 GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color, ...)
-#if defined(__GNUC__)
-    __attribute__ ((format(printf, 2, 4)))
-#endif
-	;
+	PRINTF_FORMAT(2, 4);
 
 GEM_EXPORT void error(const char* owner, const char* message, ...)
-#if defined(__GNUC__)
-	__attribute__ ((format(printf, 2, 3), noreturn))
-#endif
-	;
+	PRINTF_FORMAT(2, 3);
+
+#undef PRINTF_FORMAT
 
 // poison printf
 #if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))
