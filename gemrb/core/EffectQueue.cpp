@@ -654,7 +654,7 @@ all_party:
 
 	case FX_TARGET_UNKNOWN:
 	default:
-		print( "Unknown FX target type: %d\n", fx->Target);
+		printMessage("EffectQueue", "Unknown FX target type: %d\n", LIGHT_WHITE, fx->Target);
 		flg = FX_ABORT;
 		break;
 	}
@@ -976,11 +976,11 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//opcode immunity
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		print ("immune to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
+		printMessage("EffectQueue", "immune to effect: %s\n", LIGHT_WHITE, (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		print ("immune2 to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
+		printMessage("EffectQueue", "immune2 to effect: %s\n", LIGHT_WHITE, (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1013,7 +1013,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	if( (signed) fx->random_value < (signed) val) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
-		print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
+		printMessage("EffectQueue", "effect resisted: %s\n", LIGHT_WHITE, (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1031,7 +1031,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if( fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
 		} else {
-			print ("%s saved against effect: %s\n", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
+			printMessage("EffectQueue", "%s saved against effect: %s\n", LIGHT_WHITE, actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
 	}
@@ -1140,7 +1140,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	if( fx->Opcode<MAX_EFFECTS) {
 		fn = Opcodes[fx->Opcode].Function;
 		if (!(target || (Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR))) {
-			print("targetless opcode without EFFECT_NO_ACTOR: %d, skipping\n", fx->Opcode);
+			printMessage("EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping\n", LIGHT_WHITE, fx->Opcode);
 			return FX_NOT_APPLIED;
 		}
 	}

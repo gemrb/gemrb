@@ -2118,7 +2118,7 @@ void Map::RemoveActor(Actor* actor)
 			return;
 		}
 	}
-	printMessage("Map","RemoveActor: actor not found?",YELLOW);
+	printMessage("Map", "RemoveActor: actor not found?\n", YELLOW);
 }
 
 //returns true if none of the partymembers are on the map

@@ -1632,7 +1632,7 @@ int Interface::Init()
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
 	if (!LoadGemRBINI()) {
-		print( "Cannot Load INI\nTermination in Progress...\n" );
+		printMessage("Core", "Cannot Load INI\nTermination in Progress...\n", RED);
 		return GEM_ERROR;
 	}
 
@@ -1641,7 +1641,7 @@ int Interface::Init()
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
-		printMessage("Core", "Unable to set dictionary default values!", YELLOW);
+		printMessage("Core", "Unable to set dictionary default values!\n", YELLOW);
 	}
 
 	int i;
@@ -2621,7 +2621,7 @@ bool Interface::LoadGemRBINI()
 
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
-		print( "[Core]: No INI Importer Available.\n" );
+		printMessage("Core", "No INI Importer Available.\n", LIGHT_RED);
 		return false;
 	}
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
@@ -3288,12 +3288,12 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 {
 	if (WindowIndex >= windows.size()) {
-		printMessage( "Core", "Window not found", LIGHT_RED );
+		printMessage("Core", "Window not found\n", LIGHT_RED);
 		return -1;
 	}
 	Window* win = windows[WindowIndex];
 	if (win == NULL) {
-		printMessage( "Core", "Window already freed", LIGHT_RED );
+		printMessage("Core", "Window already freed\n", LIGHT_RED);
 		return -1;
 	}
 	win->Visible = WINDOW_FRONT;
@@ -3552,7 +3552,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	}
 	Window* win = windows[WindowIndex];
 	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
-		printMessage( "Core", "Window deleted again", LIGHT_RED );
+		printMessage("Core", "Window deleted again\n", LIGHT_RED);
 		return -1;
 	}
 	if (win == ModalWindow) {

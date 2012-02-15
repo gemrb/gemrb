@@ -28,8 +28,7 @@
 bool checkALError(const char* msg, const char* status) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
-		printMessage("OpenAL", "%s", WHITE, msg);
-		print (": 0x%x ", error);
+		printMessage("OpenAL", "%s: 0x%x ", WHITE, msg, error);
 		printStatus(status, YELLOW);
 		return true;
 	}
@@ -182,7 +181,7 @@ bool OpenALAudioDriver::Init(void)
 	int sources = CountAvailableSources(MAX_STREAMS+1);
 	num_streams = sources - 1;
 
-	printMessage( "OpenAL", "Allocated %d streams.%s", WHITE,
+	printMessage( "OpenAL", "Allocated %d streams.%s\n", WHITE,
 		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
 
 	stayAlive = true;

@@ -931,7 +931,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				area->MoveVisibleGroundPiles(p);
 				break;
 			case 'x': // shows coordinates on the map
-				print( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
+				printMessage("GameControl", "Position: %s [%d.%d]\n", LIGHT_WHITE, area->GetScriptName(), p.x, p.y );
 				break;
 			case 'g'://shows loaded areas and other game information
 				game->DebugDump();
@@ -1047,22 +1047,22 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case '4': //show all traps and infopoints
 				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
-				print("Show traps and infopoints %s\n", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
+				printMessage("GameControl", "Show traps and infopoints %s\n", LIGHT_WHITE, DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
 			case '6': //show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
-				print("Show lightmap %s\n", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
+				printMessage("GameControl", "Show lightmap %s\n", LIGHT_WHITE, DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7': //toggles fog of war
 				core->FogOfWar ^= FOG_DRAWFOG;
-				print("Show Fog-Of-War: %s\n", core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
+				printMessage("GameControl", "Show Fog-Of-War: %s\n", LIGHT_WHITE, core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
 				break;
 			case '8': //show searchmap over area
 				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
-				print("Show searchmap %s\n", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
+				printMessage("GameControl", "Show searchmap %s\n", LIGHT_WHITE, core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
 				break;
 			default:
-				print( "KeyRelease:%d - %d\n", Key, Mod );
+				printMessage("GameControl", "KeyRelease:%d - %d\n", LIGHT_WHITE, Key, Mod );
 				break;
 		}
 		return; //return from cheatkeys

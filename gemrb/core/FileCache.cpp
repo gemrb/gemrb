@@ -27,7 +27,7 @@
 DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length, bool overwrite)
 {
 	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
-		print( "No Compression Manager Available.\nCannot Load Compressed File.\n" );
+		printMessage("FileCache", "No Compression Manager Available. Cannot Load Compressed File.\n", RED);
 		return NULL;
 	}
 

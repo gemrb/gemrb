@@ -461,7 +461,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		print("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
+		printMessage("Actions", "Script error: No Trigger Named \"%s\"\n", YELLOW, parameters->objects[1]->objectName);
 		return;
 	}
 	InfoPoint *trigger = (InfoPoint *) ip;
@@ -1548,7 +1548,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		printMessage("Actions", "DisplayStringHead/FloatMessage got no target, assuming Sender!\n", YELLOW);
 	}
 
 	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD|DS_SPEECH );
@@ -1581,7 +1581,7 @@ void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		printMessage("GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!\n", LIGHT_RED);
 	}
 
 	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
@@ -1592,12 +1592,12 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		printMessage("GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!\n", LIGHT_RED);
 	}
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
 	if (!rndstr) {
-		printMessage("GameScript","Cannot display resource!",LIGHT_RED);
+		printMessage("GameScript", "Cannot display resource!\n", LIGHT_RED);
 		return;
 	}
 	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
@@ -1609,12 +1609,12 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		printMessage("GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!\n", LIGHT_RED);
 	}
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
 	if (!rndstr) {
-		printMessage("GameScript","Cannot display resource!",LIGHT_RED);
+		printMessage("GameScript", "Cannot display resource!\n", LIGHT_RED);
 		return;
 	}
 	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
@@ -1795,20 +1795,20 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 //optional integer parameter (isSpeech)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
-	print( "PlaySound(%s)\n", parameters->string0Parameter );
+	printMessage("Actions", "PlaySound(%s)\n", LIGHT_WHITE, parameters->string0Parameter);
 	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
 				Sender->Pos.y, parameters->int0Parameter ? GEM_SND_SPEECH : 0 );
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
-	print( "PlaySound(%s)\n", parameters->string0Parameter );
+	printMessage("Actions", "PlaySound(%s)\n", LIGHT_WHITE, parameters->string0Parameter );
 	core->GetAudioDrv()->Play( parameters->string0Parameter, parameters->pointParameter.x, parameters->pointParameter.y );
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
-	print( "PlaySound(%s)\n", parameters->string0Parameter );
+	printMessage("Actions", "PlaySound(%s)\n", LIGHT_WHITE, parameters->string0Parameter );
 	core->GetAudioDrv()->Play( parameters->string0Parameter, 0, 0);
 }
 
@@ -1947,7 +1947,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		print( "Script error: No Animation Named \"%s\"\n",
+		printMessage("Actions", "Script error: No Animation Named \"%s\"\n", YELLOW,
 			parameters->objects[1]->objectName );
 		return;
 	}
@@ -1958,7 +1958,7 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		print( "Script error: No Animation Named \"%s\"\n",
+		printMessage("Actions","Script error: No Animation Named \"%s\"\n", YELLOW,
 			parameters->objects[1]->objectName );
 		return;
 	}
@@ -1969,7 +1969,7 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		print( "Script error: No Animation Named \"%s\"\n",
+		printMessage("Actions", "Script error: No Animation Named \"%s\"\n", YELLOW,
 			parameters->objects[1]->objectName );
 		return;
 	}
@@ -2159,7 +2159,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	}
 	//travel direction passed to guiscript
 	int direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
-	print("Travel direction returned: %d\n", direction);
+	printMessage("Actions", "Travel direction returned: %d\n", LIGHT_WHITE, direction);
 	if (direction==-1) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2816,7 +2816,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
 	}
 	if (!xptable) {
-		printMessage("GameScript","Can't perform ADDXP2DA",LIGHT_RED);
+		printMessage("GameScript", "Can't perform ADDXP2DA\n", LIGHT_RED);
 		return;
 	}
 	const char * xpvalue = xptable->QueryField( parameters->string0Parameter, "0" ); //level is unused
@@ -3590,7 +3590,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
 	InDebug=parameters->int0Parameter;
-	printMessage("GameScript","%s",YELLOW,parameters->string0Parameter);
+	printMessage("GameScript", "DEBUG: %s\n", YELLOW, parameters->string0Parameter);
 }
 
 void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
@@ -3834,7 +3834,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		gc->dialoghandler->speakerID = tar->GetGlobalID();
 	} else {
-		printMessage("GameScript","Can't set gabber!",YELLOW);
+		printMessage("GameScript", "Can't set gabber!\n", YELLOW);
 	}
 }
 
@@ -5298,7 +5298,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 	Actor *actor = (Actor *)Sender;
 	Container *container = core->GetCurrentContainer();
 	if (!container) {
-		printMessage("GameScript","No container selected!", YELLOW);
+		printMessage("GameScript", "No container selected!\n", YELLOW);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -5595,7 +5595,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
 	if (InDebug&ID_ACTIONS) {
-		print("EscapeArea/EscapeAreaMove\n");
+		printMessage("Actions", "EscapeArea/EscapeAreaMove\n", LIGHT_WHITE);
 	}
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -5623,7 +5623,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 {
 	if (InDebug&ID_ACTIONS) {
-		print("EscapeAreaNoSee\n");
+		printMessage("Actions", "EscapeAreaNoSee\n", LIGHT_WHITE);
 	}
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -5954,7 +5954,7 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		print("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
+		printMessage("Actions", "Script error: No Trigger Named \"%s\"\n", YELLOW, parameters->objects[1]->objectName);
 		return;
 	}
 	// FIXME: what does this do? clear triggers?
@@ -6886,8 +6886,8 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 
 	AutoTable tm(parameters->string0Parameter);
 	if (!tm) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find %s.2da.\n", parameters->string0Parameter);
+		printMessage("Actions", "Cannot find %s.2da.", LIGHT_RED, parameters->string0Parameter);
+		printStatus("ERROR", LIGHT_RED);
 		return;
 	}
 

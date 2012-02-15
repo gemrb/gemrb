@@ -2047,7 +2047,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		strlwr(aC->string1Parameter);
 		if (aC->actionID>=MAX_ACTIONS) {
 			aC->actionID=0;
-			printMessage("GameScript","Invalid script action ID!",LIGHT_RED);
+			printMessage("GameScript", "Invalid script action ID!\n", LIGHT_RED);
 		} else {
 			if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
 				//can't set this here, because the same script may be loaded
@@ -2145,14 +2145,12 @@ int Trigger::Evaluate(Scriptable* Sender)
 	}
 	if (!func) {
 		triggers[triggerID] = GameScript::False;
-		printMessage("GameScript"," ",YELLOW);
-		print("Unhandled trigger code: 0x%04x %s\n",
+		printMessage("GameScript", "Unhandled trigger code: 0x%04x %s\n", YELLOW,
 			triggerID, tmpstr );
 		return 0;
 	}
 	if (InDebug&ID_TRIGGERS) {
-		printMessage("GameScript"," ",YELLOW);
-		print( "Executing trigger code: 0x%04x %s\n",
+		printMessage("GameScript", "Executing trigger code: 0x%04x %s\n", YELLOW,
 				triggerID, tmpstr );
 	}
 	int ret = func( Sender, this );

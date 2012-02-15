@@ -865,7 +865,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			autoSwitchOnEnd = true;
 			break;
 		default:
-			print ("Invalid Stance: %d\n", StanceID);
+			printMessage("CharAnimation", "Invalid Stance: %d\n", LIGHT_WHITE, StanceID);
 			break;
 	}
 	Animation** anims = Anims[StanceID][Orient];

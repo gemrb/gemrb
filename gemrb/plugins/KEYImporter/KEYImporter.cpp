@@ -145,9 +145,8 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	f->ReadDword( &ResCount );
 	f->ReadDword( &BifOffset );
 	f->ReadDword( &ResOffset );
-	printMessage( "KEYImporter", " ", WHITE );
-	print( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
-		BifOffset );
+	printMessage("KEYImporter", "BIF Files Count: %d (Starting at %d Bytes)\n", WHITE,
+			BifCount, BifOffset );
 	printMessage("KEYImporter", "RES Count: %d (Starting at %d Bytes)\n", WHITE,
 		ResCount, ResOffset);
 	f->Seek( BifOffset, GEM_STREAM_START );

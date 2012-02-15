@@ -290,7 +290,7 @@ void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	switch (Key) {
 		case '\t':
 			//not GEM_TAB
-			print( "TAB released\n" );
+			printMessage("MapControl", "TAB released\n", LIGHT_WHITE);
 			return;
 		case 'f':
 			if (Mod & GEM_MOD_CTRL)
@@ -502,10 +502,10 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 			ScrollY += keyScrollSpd;
 			break;
 		case GEM_ALT:
-			print( "ALT pressed\n" );
+			printMessage("MapControl", "ALT pressed\n", LIGHT_WHITE);
 			break;
 		case GEM_TAB:
-			print( "TAB pressed\n" );
+			printMessage("MapControl", "TAB pressed\n", LIGHT_WHITE);
 			break;
 		default:
 			break;

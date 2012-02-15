@@ -153,8 +153,7 @@ void KeyMap::ResolveKey(int key, int group)
 		return;
 	}
 
-	printMessage("KeyMap", " ", WHITE);
-	print("RunFunction(%s::%s)\n",fun->module, fun->function);
+	printMessage("KeyMap", "RunFunction(%s::%s)\n", WHITE, fun->module, fun->function);
 	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
 }
 

@@ -278,7 +278,7 @@ bool SaveGameIterator::RescanSaveGames()
 	// create the save game directory at first access
 	if (!dir) {
 		if (!MakeDirectory(Path)) {
-			printMessage("SaveGameIterator", "Unable to create save game directory '%s'", RED, Path);
+			printMessage("SaveGameIterator", "Unable to create save game directory '%s'\n", RED, Path);
 			return false;
 		}
 		dir.Rewind();
@@ -526,7 +526,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 
 	//if the path exists in different case, don't make it again
 	if (!MakeDirectory(Path)) {
-		printMessage("SaveGameIterator", "Unable to create save game directory '%s'", RED, Path);
+		printMessage("SaveGameIterator", "Unable to create save game directory '%s'\n", RED, Path);
 		return false;
 	}
 	//keep the first part we already determined existing
@@ -537,7 +537,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	if (!MakeDirectory(Path)) {
-		printMessage("SaveGameIterator", "Unable to create save game directory '%s'", RED, Path);
+		printMessage("SaveGameIterator", "Unable to create save game directory '%s'\n", RED, Path);
 		return false;
 	}
 	return true;

@@ -1720,7 +1720,7 @@ static void InitActorTables()
 			//MAX_LEVEL: how many times it could be taken
 			stat = core->TranslateStat(tm->QueryField(i,0));
 			if (stat>=MAX_STATS) {
-				printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
+				printMessage("Actor", "Invalid stat value in featreq.2da\n", YELLOW);
 			}
 			max = atoi(tm->QueryField(i,1));
 			//boolean feats can only be taken once, the code requires featmax for them too
@@ -1736,7 +1736,7 @@ static void InitActorTables()
 	if (tm && !core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
-		print("Examining classes.2da\n");
+		printMessage("Actor", "Examining classes.2da\n", LIGHT_WHITE);
 
 		//when searching the levelslots, you must search for
 		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
@@ -5480,7 +5480,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	// FIXME: use proper weapon range
 	if((PersonalDistance(this, target) > wi.range*10) || (GetCurrentArea()!=target->GetCurrentArea() ) ) {
 		// this is a temporary double-check, remove when bugfixed
-		printMessage("Actor", "Attack action didn't bring us close enough!", LIGHT_RED);
+		printMessage("Actor", "Attack action didn't bring us close enough!\n", LIGHT_RED);
 		return;
 	}
 

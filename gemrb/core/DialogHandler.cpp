@@ -184,21 +184,21 @@ void DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
-		printMessage("GameControl","Dialog aborted???",LIGHT_RED);
+		printMessage("GameControl", "Dialog aborted???\n", LIGHT_RED);
 		EndDialog();
 		return;
 	}
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
-		printMessage("GameControl","Speaker gone???",LIGHT_RED);
+		printMessage("GameControl", "Speaker gone???\n", LIGHT_RED);
 		EndDialog();
 		return;
 	}
 
 	Scriptable *target = GetTarget();
 	if (!target) {
-		printMessage("GameControl","Target gone???",LIGHT_RED);
+		printMessage("GameControl", "Target gone???\n", LIGHT_RED);
 		EndDialog();
 		return;
 	}

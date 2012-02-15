@@ -363,7 +363,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	memset(&sb,0,sizeof(sb));
 	Sound[0]=0;
-	print( "Displaying string on: %s\n", Sender->GetScriptName() );
+	printMessage("GameScript", "Displaying string on: %s\n", LIGHT_WHITE, Sender->GetScriptName() );
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
 			printMessage("GameScript","Verbal constant not supported for non actors!\n", LIGHT_RED);
@@ -661,7 +661,7 @@ static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 	if (effect[0]) {
 		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(effect, false);
 		if (!vvc) {
-			printMessage("GameScript","Failed to create effect.",LIGHT_RED);
+			printMessage("GameScript", "Failed to create effect.\n", LIGHT_RED);
 			return NULL;
 		}
 		if (iterations) {
@@ -850,8 +850,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (scr->Type==ST_ACTOR) {
 		speaker = (Actor *) scr;
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
-			printMessage("GameScript"," ",LIGHT_RED);
-			print("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
+			printMessage("GameScript", "Speaker is dead, cannot start dialogue. Speaker and target are:\n", LIGHT_RED);
 			speaker->DebugDump();
 			target->DebugDump();
 			Sender->ReleaseCurrentAction();
@@ -897,7 +896,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
-		printMessage( "GameScript","Dialog cannot be initiated because there is no GameControl.", YELLOW );
+		printMessage( "GameScript", "Dialog cannot be initiated because there is no GameControl.\n", YELLOW );
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -909,7 +908,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 		//check if we could manage to break it, not all dialogs are breakable!
 		if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-			printMessage( "GameScript","Dialog cannot be initiated because there is already one.", YELLOW );
+			printMessage( "GameScript", "Dialog cannot be initiated because there is already one.\n", YELLOW );
 			Sender->ReleaseCurrentAction();
 			return;
 		}

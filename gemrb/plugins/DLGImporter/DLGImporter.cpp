@@ -168,8 +168,7 @@ static Condition* GetCondition(char* string)
 	for (size_t i = 0; i < count; ++i) {
 		Trigger *trigger = GenerateTrigger(lines[i]);
 		if (!trigger) {
-			printMessage( "DLGImporter", "Can't compile trigger: " ,YELLOW);
-			print("%s\n", lines[i]);
+			printMessage("DLGImporter", "Can't compile trigger: %s\n" , YELLOW, lines[i]);
 		} else {
 			condition->triggers.push_back(trigger);
 		}
@@ -241,8 +240,7 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 	for (size_t i = 0; i < count; ++i) {
 		Action *action = GenerateAction(lines[i]);
 		if (!action) {
-			printMessage( "DLGImporter", "Can't compile action: " ,YELLOW);
-			print("%s\n", lines[i]);
+			printMessage("DLGImporter", "Can't compile action: %s\n" , YELLOW, lines[i]);
 		} else {
 			action->IncRef();
 			actions.push_back(action);

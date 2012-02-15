@@ -1112,7 +1112,7 @@ int Game::GetXPFromCR(int cr)
 		if (cr>=MAX_CRLEVEL) {
 			cr=MAX_CRLEVEL-1;
 		}
-		print("Challenge Rating: %d, party level: %d ", cr, level);
+		printMessage("Game", "Challenge Rating: %d, party level: %d\n", LIGHT_WHITE, cr, level);
 		return crtable[level][cr];
 	}
 	printMessage("Game","Cannot find moncrate.2da!\n", LIGHT_RED);
@@ -1188,7 +1188,7 @@ bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
-			print("Actor %s is not near!\n", PCs[i]->LongName);
+			printMessage("Game", "Actor %s is not near!\n", LIGHT_WHITE, PCs[i]->LongName);
 			return false;
 		}
 	}

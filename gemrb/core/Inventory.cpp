@@ -732,7 +732,7 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source) const
 {
 	if (!target) {
 		//this isn't always ok, please check!
-		printMessage("Inventory","Null item encountered by ItemsAreCompatible()",YELLOW);
+		printMessage("Inventory", "Null item encountered by ItemsAreCompatible()\n", YELLOW);
 		return true;
 	}
 
