@@ -29,12 +29,6 @@
 #include "exports.h"
 #include "win32def.h"
 
-#ifndef WIN32
-# include <config.h>
-# include <cstdio>
-# include <cstdlib>
-#endif
-
 enum log_color {
 	DEFAULT,
 	BLACK,
