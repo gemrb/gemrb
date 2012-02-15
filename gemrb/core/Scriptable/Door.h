@@ -21,7 +21,7 @@
 #ifndef DOOR_H
 #define DOOR_H
 
-#include "Scriptable.h"
+#include "Scriptable/Scriptable.h"
 
 class TileOverlay;
 

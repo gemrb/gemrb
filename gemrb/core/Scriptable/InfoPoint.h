@@ -21,7 +21,7 @@
 #ifndef INFOPOINT_H
 #define INFOPOINT_H
 
-#include "Scriptable.h"
+#include "Scriptable/Scriptable.h"
 
 class GEM_EXPORT InfoPoint : public Highlightable {
 public:

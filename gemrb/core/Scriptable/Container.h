@@ -22,7 +22,7 @@
 #define CONTAINER_H
 
 #include "Inventory.h"
-#include "Scriptable.h"
+#include "Scriptable/Scriptable.h"
 
 //container flags
 #define CONT_LOCKED      1
