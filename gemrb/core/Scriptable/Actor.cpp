@@ -4518,23 +4518,21 @@ int Actor::GetHpAdjustment(int multiplier) const
 {
 	int val;
 
-	// only player classes get this bonus
-	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
-		return 0;
-	}
-	// some p&p mods make the hpconbon much more strict, screwing low hp npcs like Prism
-	if (BaseStats[IE_EA] >= EA_NOTGOOD || BaseStats[IE_EA] < EA_NOTNEUTRAL) {
-		return 0;
-	}
-
-
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
 		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
 		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
-	return val * multiplier;
+
+	// ensure the change does not kill the actor
+	if (BaseStats[IE_HITPOINTS] + val*multiplier <= 0) {
+		// leave them with 1hp/level worth of hp
+		// note: we return the adjustment and the actual setting of hp happens later
+		return multiplier - BaseStats[IE_HITPOINTS];
+	} else {
+		return val * multiplier;
+	}
 }
 
 void Actor::InitStatsOnLoad()
