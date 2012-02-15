@@ -16,26 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef LOGGER_STDIO_H
-#define LOGGER_STDIO_H
+#ifndef LOGGER_APPLE_H
+#define LOGGER_APPLE_H
 
-#include "System/Logger.h" // for log_color
+#include "System/Logger/Stdio.h"
 
-class GEM_EXPORT AppleLogger : public Logger {
+class GEM_EXPORT AppleLogger : public StdioLogger {
 public:
 	AppleLogger();
 	virtual ~AppleLogger();
 
-	void vprint(const char* message, va_list ap);
 	void textcolor(log_color);
-	void printBracket(const char *status, log_color color);
-	void printStatus(const char* status, log_color color);
-	void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
-
-protected:
-	bool useColor;
 };
 
-Logger* createStdioLogger();
+Logger* createAppleLogger();
 
 #endif

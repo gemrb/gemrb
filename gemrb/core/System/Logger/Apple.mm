@@ -29,45 +29,16 @@ TODO: currently this is a clone of Stdio logger without color.
 */
 
 AppleLogger::AppleLogger()
+	: StdioLogger(false)
 {}
 
 AppleLogger::~AppleLogger()
 {}
 
-void AppleLogger::vprint(const char *message, va_list ap)
-{
-	vprintf(message, ap);
-}
-
 void AppleLogger::textcolor(log_color /*c*/)
 {}
 
-void AppleLogger::printBracket(const char* status, log_color color)
-{
-	textcolor(WHITE);
-	print("[");
-	textcolor(color);
-	print("%s", status);
-	textcolor(WHITE);
-	print("]");
-}
-
-void AppleLogger::printStatus(const char* status, log_color color)
-{
-	printBracket(status, color);
-	print("\n");
-}
-
-void AppleLogger::vprintMessage(const char* owner, const char* message, log_color color, va_list ap)
-{
-	printBracket(owner, LIGHT_WHITE);
-	print(": ");
-	textcolor(color);
-
-	vprint(message, ap);
-}
-
-Logger* createStdioLogger()
+Logger* createAppleLogger()
 {
 	return new AppleLogger();
 }

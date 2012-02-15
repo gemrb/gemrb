@@ -208,6 +208,10 @@
 		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
 		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
+		A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */ = {isa = PBXBuildFile; fileRef = A298DD1B14EB61C100F59F56 /* Stdio.h */; };
+		A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
+		A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
+		A298DD2414EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
 		A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A29BF85213A0420300C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -1278,6 +1282,8 @@
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
 		A28D24A3143C24E500A27897 /* BAMFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMFontManager.h; sourceTree = "<group>"; };
+		A298DD1B14EB61C100F59F56 /* Stdio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stdio.h; sourceTree = "<group>"; };
+		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A3A7D814A505FD00F705CF /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CocoaWrapper.m; path = CocoaWrapper/mac/CocoaWrapper.m; sourceTree = "<group>"; };
@@ -2938,6 +2944,8 @@
 			children = (
 				A2ABDF6514EB37BB004BCB7D /* Apple.h */,
 				A2ABDF6614EB37BB004BCB7D /* Apple.mm */,
+				A298DD2114EB61D300F59F56 /* Stdio.cpp */,
+				A298DD1B14EB61C100F59F56 /* Stdio.h */,
 			);
 			path = Logger;
 			sourceTree = "<group>";
@@ -3091,6 +3099,7 @@
 				A2E66437139E886700310FC8 /* Matching.h in Headers */,
 				A2DE329A14EB071200117503 /* Logger.h in Headers */,
 				A2ABDF6714EB37BB004BCB7D /* Apple.h in Headers */,
+				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4597,6 +4606,7 @@
 				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */,
 				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
 				A2ABDF6914EB37BB004BCB7D /* Apple.mm in Sources */,
+				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4727,6 +4737,7 @@
 				A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */,
 				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
 				A2ABDF6814EB37BB004BCB7D /* Apple.mm in Sources */,
+				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6420,6 +6431,7 @@
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				USER_HEADER_SEARCH_PATHS = "./ ../gemrb/ ../gemrb/core/ ../gemrb/includes/";
+				USE_HEADERMAP = NO;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
@@ -6465,6 +6477,7 @@
 				SDKROOT = "";
 				"SDKROOT[arch=*]" = "";
 				USER_HEADER_SEARCH_PATHS = "./ ../gemrb/ ../gemrb/core/ ../gemrb/includes/";
+				USE_HEADERMAP = NO;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
