@@ -78,8 +78,9 @@ GEM_EXPORT void printStatus(const char* status, log_color color);
 GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color, ...)
 	PRINTF_FORMAT(2, 4);
 
+NORETURN
 GEM_EXPORT void error(const char* owner, const char* message, ...)
-	PRINTF_FORMAT(2, 3) NORETURN;
+	PRINTF_FORMAT(2, 3);
 
 #undef PRINTF_FORMAT
 #undef NORETURN
