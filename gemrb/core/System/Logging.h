@@ -58,6 +58,14 @@ GEM_EXPORT void ShutdownLogging();
 # define PRINT_FORMAT(x, y)
 #endif
 
+#if defined(__GNUC__)
+# define NORETURN __attribute__ ((noreturn))
+#elif defined(_MSC_VER)
+# define NORETURN __declspec(noreturn)
+#else
+# define NORETURN
+#endif
+
 GEM_EXPORT void print(const char* message, ...)
 	PRINTF_FORMAT(1, 2);
 
@@ -68,9 +76,10 @@ GEM_EXPORT void printMessage(const char* owner, const char* message, log_color c
 	PRINTF_FORMAT(2, 4);
 
 GEM_EXPORT void error(const char* owner, const char* message, ...)
-	PRINTF_FORMAT(2, 3);
+	PRINTF_FORMAT(2, 3) NORETURN;
 
 #undef PRINTF_FORMAT
+#undef NORETURN
 
 // poison printf
 #if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))
