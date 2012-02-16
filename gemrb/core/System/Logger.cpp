@@ -38,11 +38,6 @@ void Logger::destroy()
 #include "System/Logger/Android.h"
 Logger* (*createDefaultLogger)() = createAndroidLogger;
 
-#elif defined (__APPLE__)
-
-#include "System/Logger/Apple.h"
-Logger* (*createDefaultLogger)() = createAppleLogger;
-
 #elif defined(WIN32) && !defined(WIN32_USE_STDIO)
 
 #include "System/Logger/Win32Console.h"
