@@ -46,7 +46,7 @@ Logger* (*createDefaultLogger)() = createAppleLogger;
 #elif defined(WIN32) && !defined(WIN32_USE_STDIO)
 
 #include "System/Logger/Win32Console.h"
-Logger* (*createDefaultLogger)() = createStdioLogger;
+Logger* (*createDefaultLogger)() = createWin32ConsoleLogger;
 
 #else
 
