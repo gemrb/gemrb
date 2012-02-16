@@ -51,8 +51,7 @@ public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
 	int Init(void);
-	int CreateDisplay(int width, int height, int bpp, bool fullscreen);
-	void SetDisplayTitle(char* title, char* icon);
+	int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title);
 	bool SetFullscreenMode(bool set);
 	int SwapBuffers(void);
 	int PollEvents();

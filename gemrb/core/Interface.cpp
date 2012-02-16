@@ -1118,8 +1118,7 @@ void Interface::Main()
 	ieDword speed = 10;
 
 	vars->Lookup("Full Screen", FullScreen);
-	video->CreateDisplay( Width, Height, Bpp, FullScreen);
-	video->SetDisplayTitle( GameName, GameType );
+	video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName);
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	vars->Lookup("Mouse Scroll Speed", speed);

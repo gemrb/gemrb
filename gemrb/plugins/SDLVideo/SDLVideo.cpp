@@ -113,7 +113,7 @@ int SDLVideoDriver::Init(void)
 	return GEM_OK;
 }
 
-int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
+int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* title)
 {
 	bpp=b;
 	fullscreen=fs;
@@ -136,6 +136,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	}
 	printMessage( "SDLVideo", "SDL_SetVideoMode...", WHITE );
 	disp = SDL_SetVideoMode( w, h, bpp, flags );
+	SDL_WM_SetCaption( title, 0 );
 	if (disp == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		print("%s\n", SDL_GetError());
@@ -171,11 +172,6 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 	return GEM_OK;
-}
-
-void SDLVideoDriver::SetDisplayTitle(char* title, char* icon)
-{
-	SDL_WM_SetCaption( title, icon );
 }
 
 bool SDLVideoDriver::SetFullscreenMode(bool set)

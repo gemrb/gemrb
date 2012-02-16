@@ -93,9 +93,7 @@ public:
 	Video(void);
 	virtual ~Video(void);
 	virtual int Init(void) = 0;
-	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen) = 0;
-	/** Sets window title of GemRB window */
-	virtual void SetDisplayTitle(char* title, char* icon) = 0;
+	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode. */
 	bool ToggleFullscreenMode();
 	virtual bool SetFullscreenMode(bool set) = 0;
