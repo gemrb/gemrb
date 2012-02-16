@@ -53,7 +53,7 @@
 @private
     SDL_Keymod _modifierKey;
 }
-@property(nonatomic, assign, getter = modifierKey, setter = setModifierKey:) SDLMod _modifierKey;
+@property(nonatomic, assign, getter = modifierKey, setter = setModifierKey:) SDL_Keymod _modifierKey;
 
 - (void)toggleModifier;
 @end
