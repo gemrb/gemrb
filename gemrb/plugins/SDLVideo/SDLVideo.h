@@ -34,14 +34,10 @@ private:
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
 	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
-	Color fadeColor;
 	unsigned long lastTime;
 	unsigned long lastMouseTime;
 	SDL_Event event; /* Event structure */
-	//subtitle specific variables
-	Font *subtitlefont;
-	Palette *subtitlepal;
-	Region subtitleregion;
+
 	SDL_Rect subtitleregion_sdl;  //we probably have the same stuff, twice
 	char *subtitletext;
 	ieDword subtitlestrref;
@@ -149,7 +145,6 @@ public:
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
 	void InitMovieScreen(int &w, int &h, bool yuv=false);
-	void SetMovieFont(Font *stfont, Palette *pal);
 	void showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,

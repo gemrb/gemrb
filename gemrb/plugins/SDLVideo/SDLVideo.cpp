@@ -106,10 +106,6 @@ int SDLVideoDriver::Init(void)
 	SDL_EnableUNICODE( 1 );
 	SDL_EnableKeyRepeat( 500, 50 );
 	SDL_ShowCursor( SDL_DISABLE );
-	fadeColor.a=0; //fadePercent
-	fadeColor.r=0;
-	fadeColor.b=0;
-	fadeColor.g=0;
 	return GEM_OK;
 }
 
@@ -2766,12 +2762,6 @@ int SDLVideoDriver::PollMovieEvents()
 	}
 
 	return 0;
-}
-
-void SDLVideoDriver::SetMovieFont(Font *stfont, Palette *pal)
-{
-	subtitlefont = stfont;
-	subtitlepal = pal;
 }
 
 void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)

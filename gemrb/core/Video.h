@@ -89,6 +89,25 @@ const int MOUSE_NO_TOOLTIPS	= 8; // show tooltips
 class GEM_EXPORT Video : public Plugin {
 public:
 	static const TypeID ID;
+protected:
+	int MouseFlags;
+	short xCorr, yCorr;
+	EventMgr* Evnt;
+	Region Viewport;
+	int width,height,bpp;
+	bool fullscreen;
+	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
+	CursorType CursorIndex;
+	Region CursorPos;
+	bool softKeyboardShowing;
+
+	unsigned char Gamma10toGamma22[256];
+	unsigned char Gamma22toGamma10[256];
+	//subtitle specific variables
+	Font *subtitlefont;
+	Palette *subtitlepal;
+	Region subtitleregion;
+	Color fadeColor;
 public:
 	Video(void);
 	virtual ~Video(void);
@@ -202,7 +221,7 @@ public:
 	/** initializes the screen for movie */
 	virtual void InitMovieScreen(int &w, int &h, bool yuv=false) = 0;
 	/** sets the font and color of the movie subtitles */
-	virtual void SetMovieFont(Font *stfont, Palette *pal) = 0;
+	void SetMovieFont(Font *stfont, Palette *pal);
 	/** draws a movie frame */
 	virtual void showFrame(unsigned char* buf, unsigned int bufw,
 		unsigned int bufh, unsigned int sx, unsigned int sy,
@@ -218,8 +237,6 @@ public:
 	/** handles events during movie */
 	virtual int PollMovieEvents() = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
-public:
-	/** Event Manager Pointer */
 
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
@@ -237,20 +254,6 @@ public:
 	Region GetViewport(void) const;
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y);
-protected:
-	int MouseFlags;
-	short xCorr, yCorr;
-	EventMgr* Evnt;
-	Region Viewport;
-	int width,height,bpp;
-	bool fullscreen;
-	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
-	CursorType CursorIndex;
-	Region CursorPos;
-	bool softKeyboardShowing;
-
-	unsigned char Gamma10toGamma22[256];
-	unsigned char Gamma22toGamma10[256];
 };
 
 #endif

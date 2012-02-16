@@ -42,6 +42,11 @@ Video::Video(void)
 	CursorPos.x = 0;
 	CursorPos.y = 0;
 
+	fadeColor.a = 0; //fadePercent
+	fadeColor.r = 0;
+	fadeColor.g = 0;
+	fadeColor.b = 0;
+
 	Evnt = NULL;
 	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
 	// we care only about 2 bits at the moment so mask out the remainder
@@ -243,6 +248,12 @@ Region Video::GetViewport() const
 	return Viewport;
 }
 
+void Video::SetMovieFont(Font *stfont, Palette *pal)
+{
+	subtitlefont = stfont;
+	subtitlepal = pal;
+}
+
 void Video::SetViewport(int x, int y, unsigned int w, unsigned int h)
 {
 	if (x>width)
@@ -268,4 +279,3 @@ void Video::MoveViewportTo(int x, int y)
 		Viewport.y = y;
 	}
 }
-
