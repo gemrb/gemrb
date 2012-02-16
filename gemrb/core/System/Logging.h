@@ -55,7 +55,7 @@ GEM_EXPORT void ShutdownLogging();
 # define PRINTF_FORMAT(x, y) \
     __attribute__ ((format(printf, x, y)))
 #else
-# define PRINT_FORMAT(x, y)
+# define PRINTF_FORMAT(x, y)
 #endif
 
 #if defined(__GNUC__)
