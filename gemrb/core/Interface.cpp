@@ -2491,6 +2491,8 @@ bool Interface::LoadConfig(const char* filename)
 
 			PathJoin(name, GamePath, cd, NULL);
 			CD[i].push_back(name);
+			PathJoin(name, GamePath, GameDataPath, cd, NULL);
+			CD[i].push_back(name);
 		} else {
 			size_t cnt = CD[i].size();
 			while(cnt--) {
