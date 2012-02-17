@@ -2644,6 +2644,9 @@ void Actor::RefreshHP() {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
 
+	//toughness feat bonus (could be unhardcoded as a max hp bonus based on level if you want)
+	bonus += Modified[IE_FEAT_TOUGHNESS]*3;
+
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
 	Modified[IE_MAXHITPOINTS]+=bonus;
