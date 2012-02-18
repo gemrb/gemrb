@@ -62,7 +62,6 @@ public:
 
 	void GetMousePos(int &x, int &y);
 	void MouseMovement(int x, int y);
-	void MoveMouse(unsigned int x, unsigned int y);
 	void ClickMouse(unsigned int button);
 	void MouseClickEvent(SDL_EventType type, Uint8 button);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,

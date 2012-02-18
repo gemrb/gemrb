@@ -230,6 +230,12 @@ int SDL12VideoDriver::SwapBuffers(void)
 	return ret;
 }
 
+/* no idea how elaborate this should be*/
+void SDL12VideoDriver::MoveMouse(unsigned int x, unsigned int y)
+{
+	SDL_WarpMouse(x,y);
+}
+
 void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 								  unsigned int /*bufw*/, unsigned int bufh,
 								  unsigned int w, unsigned int h,

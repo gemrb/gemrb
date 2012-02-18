@@ -221,6 +221,12 @@ int SDL20VideoDriver::SwapBuffers(void)
 }
 
 
+/* no idea how elaborate this should be*/
+void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
+{
+	SDL_WarpMouseInWindow(window, x, y);
+}
+
 // Private methods
 
 bool SDL20VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)

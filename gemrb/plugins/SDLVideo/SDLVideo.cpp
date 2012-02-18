@@ -2477,12 +2477,6 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 		Evnt->MouseMove(x, y);
 }
 
-/* no idea how elaborate this should be*/
-void SDLVideoDriver::MoveMouse(unsigned int x, unsigned int y)
-{
-	SDL_WarpMouse(x,y);
-}
-
 void SDLVideoDriver::ClickMouse(unsigned int button)
 {
 	MouseClickEvent(SDL_MOUSEBUTTONDOWN, (Uint8) button);

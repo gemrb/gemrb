@@ -44,6 +44,7 @@ public:
 					  unsigned int w, unsigned int h,
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
+	void MoveMouse(unsigned int x, unsigned int y);
 
 private:
 	bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors);
