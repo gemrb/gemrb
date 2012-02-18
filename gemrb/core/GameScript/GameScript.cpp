@@ -1278,16 +1278,16 @@ static void CleanupIEScript()
 	ObjectIDSTableNames = NULL;
 }
 
-void printFunction(Holder<SymbolMgr> table, int index)
+void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
 
 	int len = strchr(str,'(')-str;
 	if (len<0) {
-		print("%d %s\n", value, str);
+		buffer.appendFormatted("%d %s\n", value, str);
 	} else {
-		print("%d %.*s\n", value, len, str);
+		buffer.appendFormatted("%d %.*s\n", value, len, str);
 	}
 }
 
@@ -1378,14 +1378,18 @@ void InitializeIEScript()
 
 		if (triggers[i]) {
 			if (poi && triggers[i]!=poi->Function) {
-				printMessage("GameScript", "%s is in collision with ", YELLOW,
+				StringBuffer buffer;
+				buffer.appendFormatted("%s is in collision with ",
 					triggersTable->GetStringIndex( j ) );
-				printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
+				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
+				Log(WARNING, "GameScript", buffer);
 			} else {
 				if (InDebug&ID_TRIGGERS) {
-					printMessage("GameScript", "%s is a synonym of ", WHITE,
+					StringBuffer buffer;
+					buffer.appendFormatted("%s is a synonym of ",
 						triggersTable->GetStringIndex( j ) );
-					printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
+					printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
+					Log(DEBUG, "GameScript", buffer);
 				}
 			}
 			continue; //we already found an alternative
@@ -1426,8 +1430,10 @@ void InitializeIEScript()
 			continue;
 		}
 
-		printMessage("GameScript","Couldn't assign function to trigger: ", YELLOW);
-		printFunction(triggersTable,j);
+		StringBuffer buffer;
+		buffer.append("Couldn't assign function to trigger: ");
+		printFunction(buffer, triggersTable, j);
+		Log(WARNING, "GameScript", buffer);
 	}
 
 	j = actionsTable->GetSize();
@@ -1441,16 +1447,18 @@ void InitializeIEScript()
 		const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ));
 		if (actions[i]) {
 			if (poi && actions[i]!=poi->Function) {
-				printMessage("GameScript", "%s is in collision with ", YELLOW,
+				StringBuffer buffer;
+				buffer.appendFormatted("%s is in collision with ",
 					actionsTable->GetStringIndex( j ) );
-				printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
-//->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
+				Log(WARNING, "GameScript", buffer);
 			} else {
 				if (InDebug&ID_ACTIONS) {
-					printMessage("GameScript", "%s is a synonym of ", WHITE,
+					StringBuffer buffer;
+					buffer.appendFormatted("%s is a synonym of ",
 						actionsTable->GetStringIndex( j ) );
-					printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex( j )));
-//actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+					printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
+					Log(DEBUG, "GameScript", buffer);
 				}
 			}
 			continue; //we already found an alternative
@@ -1483,10 +1491,11 @@ void InitializeIEScript()
 				continue;
 			}
 			if (actions[i]) {
-				printMessage("GameScript", "%s overrides existing action ", WHITE,
+				StringBuffer buffer;
+				buffer.appendFormatted("%s overrides existing action ",
 					overrideActionsTable->GetStringIndex( j ) );
-				printFunction( actionsTable, actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )));
-				//printFunction( actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
+				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
+				Log(MESSAGE, "GameScript", buffer);
 			}
 			actions[i] = poi->Function;
 			actionflags[i] = poi->Flags;
@@ -1513,9 +1522,11 @@ void InitializeIEScript()
 				continue;
 			}
 			if (triggers[i]) {
-				printMessage("GameScript", "%s overrides existing trigger ", WHITE,
+				StringBuffer buffer;
+				buffer.appendFormatted("%s overrides existing trigger ",
 					overrideTriggersTable->GetStringIndex( j ) );
-				printFunction( triggersTable, triggersTable->FindValue(overrideTriggersTable->GetValueIndex( j )));
+				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
+				Log(MESSAGE, "GameScript", buffer);
 			}
 			triggers[i] = poi->Function;
 			triggerflags[i] = poi->Flags;
@@ -1545,9 +1556,10 @@ void InitializeIEScript()
 			}
 			continue;
 		}
-		printMessage("GameScript","Couldn't assign function to action: ", YELLOW);
-		printFunction(actionsTable,j);
-		//printFunction(actionsTable->GetStringIndex(j) );
+		StringBuffer buffer;
+		buffer.append("Couldn't assign function to action: ");
+		printFunction(buffer, actionsTable, j);
+		Log(WARNING, "GameScript", buffer);
 	}
 
 	j = objectsTable->GetSize();
@@ -1561,15 +1573,17 @@ void InitializeIEScript()
 		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ));
 		if (objects[i]) {
 			if (poi && objects[i]!=poi->Function) {
-				printMessage("GameScript", "%s is in collision with ", YELLOW,
+				StringBuffer buffer;
+				buffer.appendFormatted("%s is in collision with ",
 					objectsTable->GetStringIndex( j ) );
-				printFunction(objectsTable,objectsTable->FindValue(objectsTable->GetValueIndex( j )));
-				//printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				printFunction(buffer, objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex(j)));
+				Log(WARNING, "GameScript", buffer);
 			} else {
-				printMessage("GameScript", "%s is a synonym of ", WHITE,
+				StringBuffer buffer;
+				buffer.appendFormatted("%s is a synonym of ",
 					objectsTable->GetStringIndex( j ) );
-				printFunction(objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex( j )));
-				//printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				printFunction(buffer, objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex(j)));
+				Log(DEBUG, "GameScript", buffer);
 			}
 			continue;
 		}
@@ -1600,9 +1614,10 @@ void InitializeIEScript()
 			}
 			continue;
 		}
-		printMessage("GameScript","Couldn't assign function to object: ", YELLOW);
-		printFunction(objectsTable,j);
-		//printFunction(objectsTable->GetStringIndex(j) );
+		StringBuffer buffer;
+		buffer.append("Couldn't assign function to object: ");
+		printFunction(buffer, objectsTable, j);
+		Log(WARNING, "GameScript", buffer);
 	}
 
 	int instantTableIndex = core->LoadSymbol("instant");
@@ -2221,9 +2236,9 @@ int Response::Execute(Scriptable* Sender)
 	return ret;
 }
 
-void PrintAction(int actionID)
+void PrintAction(StringBuffer& buffer, int actionID)
 {
-	print("Action: %d %s\n", actionID , actionsTable->GetValue(actionID) );
+	buffer.appendFormatted("Action: %d %s\n", actionID, actionsTable->GetValue(actionID));
 }
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
@@ -2261,9 +2276,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		return;
 	}
 	if (InDebug&ID_ACTIONS) {
-		printMessage("GameScript"," ",YELLOW);
-		PrintAction(actionID);
-		print("Sender: %s\n",Sender->GetScriptName() );
+		StringBuffer buffer;
+		PrintAction(buffer, actionID);
+		buffer.appendFormatted("Sender: %s\n", Sender->GetScriptName());
+		Log(WARNING, "GameScript", buffer);
 	}
 	ActionFunction func = actions[actionID];
 	if (func) {
@@ -2282,11 +2298,11 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		func( Sender, aC );
 	} else {
 		actions[actionID] = NoActionAtAll;
-		printMessage("GameScript", "Unknown ", YELLOW);
-		textcolor(YELLOW);
-		PrintAction(actionID);
+		StringBuffer buffer;
+		buffer.append("Unknown ");
+		PrintAction(buffer, actionID);
+		Log(WARNING, "GameScript", buffer);
 		Sender->ReleaseCurrentAction();
-		textcolor(WHITE);
 		return;
 	}
 
@@ -2294,8 +2310,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	if (actionflags[actionID] & AF_IMMEDIATE) {
 		//this action never entered the action queue, therefore shouldn't be freed
 		if (aC->GetRef()!=1) {
-			print("Immediate action got queued!\n");
-			PrintAction(actionID);
+			StringBuffer buffer;
+			buffer.append("Immediate action got queued!\n");
+			PrintAction(buffer, actionID);
+			Log(ERROR, "GameScript", buffer);
 			error("GameScript", "aborting...\n");
 		}
 		return;
