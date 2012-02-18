@@ -955,8 +955,19 @@ inline void HandlePercentageDamage(Effect *fx, Actor *target) {
 int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_ac_vs_damage_type_modifier (%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2, (int) fx->DiceSides, (int) fx->DiceThrown );
-	//check level was pulled outside as a common functionality
-	//CHECK_LEVEL();
+
+	if (fx->IsVariable) {
+		//has a second weapon or shield, cannot deflect arrows
+		int slot = target->inventory.GetShieldSlot();
+		if (slot>0 && target->inventory.GetItem(slot) ) return FX_APPLIED;
+
+		//has a twohanded weapon equipped
+		slot = target->inventory.GetWeaponSlot();
+		if (slot>0) {
+			CREItem *item = target->inventory.GetItem(slot);
+			if (item->Flags&IE_INV_ITEM_TWOHANDED) return FX_APPLIED;
+		}
+	}
 
 	// it is a bitmask
 	int type = fx->Parameter2;
