@@ -44,6 +44,7 @@ public:
 					  unsigned int w, unsigned int h,
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
+	bool SetFullscreenMode(bool set);
 	void MoveMouse(unsigned int x, unsigned int y);
 
 	bool ToggleGrabInput();

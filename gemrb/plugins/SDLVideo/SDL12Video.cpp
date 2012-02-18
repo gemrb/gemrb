@@ -180,6 +180,21 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_Flip( disp );
 	SDL_FreeSurface( sprite );
 }
+
+bool SDL12VideoDriver::SetFullscreenMode(bool set)
+{
+	if (fullscreen != set) {
+		fullscreen=set;
+		SDL_WM_ToggleFullScreen( disp );
+		//readjust mouse to original position
+		MoveMouse(CursorPos.x, CursorPos.y);
+		//synchronise internal variable
+		core->GetDictionary()->SetAt( "Full Screen", (ieDword) fullscreen );
+		return true;
+	}
+	return false;
+}
+
 int SDL12VideoDriver::SwapBuffers(void)
 {
 	int ret = SDLVideoDriver::SwapBuffers();

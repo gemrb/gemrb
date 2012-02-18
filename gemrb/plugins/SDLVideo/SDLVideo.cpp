@@ -89,20 +89,6 @@ int SDLVideoDriver::Init(void)
 	return GEM_OK;
 }
 
-bool SDLVideoDriver::SetFullscreenMode(bool set)
-{
-	if (fullscreen != set) {
-		fullscreen=set;
-		SDL_WM_ToggleFullScreen( disp );
-		//readjust mouse to original position
-		MoveMouse(CursorPos.x, CursorPos.y);
-		//synchronise internal variable
-		core->GetDictionary()->SetAt( "Full Screen", (ieDword) fullscreen );
-		return true;
-	}
-	return false;
-}
-
 inline int GetModState(int modstate)
 {
 	int value = 0;

@@ -45,11 +45,11 @@ public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
 	int Init(void);
-	bool SetFullscreenMode(bool set);
 	int PollEvents();
 
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
 	virtual int SwapBuffers(void);
+	virtual bool SetFullscreenMode(bool set)=0;
 
 	virtual bool ToggleGrabInput()=0;
 	short GetWidth() { return ( disp ? disp->w : 0 ); }

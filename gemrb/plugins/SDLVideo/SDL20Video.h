@@ -45,6 +45,7 @@ public:
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
 
+	bool SetFullscreenMode(bool set);
 	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();

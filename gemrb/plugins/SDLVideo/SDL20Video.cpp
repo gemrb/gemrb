@@ -260,6 +260,11 @@ void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
 	SDL_WarpMouseInWindow(window, x, y);
 }
 
+bool SDL20VideoDriver::SetFullscreenMode(bool set)
+{
+	return (SDL_SetWindowFullscreen(window, (SDL_bool)set) == 0);
+}
+
 bool SDL20VideoDriver::ToggleGrabInput()
 {
 	bool isGrabbed = SDL_GetWindowGrab(window);
