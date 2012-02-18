@@ -220,6 +220,19 @@ int SDL20VideoDriver::SwapBuffers(void)
 	return ret;
 }
 
+
+// Private methods
+
+bool SDL20VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)
+{
+	return (SDL_SetPaletteColors((surface)->format->palette, colors, 0, ncolors) == 0);
+}
+
+bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
+{
+	return (SDL_SetSurfaceAlphaMod(surface, alpha) == 0);
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")

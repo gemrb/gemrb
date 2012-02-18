@@ -264,6 +264,19 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
 }
+
+// Private methods
+
+bool SDL12VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)
+{
+	return (bool)SDL_SetPalette( surface, SDL_LOGPAL, colors, 0, ncolors );
+}
+
+bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
+{
+	return (SDL_SetAlpha( surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha ) == 0);
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")

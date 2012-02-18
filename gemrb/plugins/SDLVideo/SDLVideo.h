@@ -156,6 +156,8 @@ public:
 
 protected:
 	void DrawMovieSubtitle(ieDword strRef);
+	virtual bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)=0;
+	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 
 public:
 	long GetPixel(void *data, unsigned short x, unsigned short y);

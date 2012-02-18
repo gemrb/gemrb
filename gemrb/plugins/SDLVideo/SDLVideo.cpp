@@ -56,11 +56,6 @@ extern "C" {
 #define MIN_GESTURE_DELTA_PIXELS 10
 #define TOUCH_RC_NUM_TICKS 500
 //---
-#define GEM_SetPalette(surface, flags, colors, fcolor, ncolors)\
-SDL_SetPaletteColors((surface)->format->palette, colors, fcolor, ncolors)
-#else
-#define GEM_SetPalette(surface, flags, colors, fcolor, ncolors)\
-SDL_SetPalette( surface, flags, colors, fcolor, ncolors )
 #endif
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -687,7 +682,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	} else {
 		colorcount = 16;
 	}
-	GEM_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette, 0, colorcount );
+	SetSurfacePalette( ( SDL_Surface * ) p, ( SDL_Color * ) palette, colorcount );
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY, index );
 	}
@@ -1719,7 +1714,7 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 void SDLVideoDriver::SetPalette(void *data, Palette* pal)
 {
 	SDL_Surface* sur = ( SDL_Surface* ) data;
-	GEM_SetPalette(sur, SDL_LOGPAL, ( SDL_Color * ) pal->col, 0, 256);
+	SetSurfacePalette(sur, ( SDL_Color * ) pal->col, 256);
 }
 
 void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
@@ -1730,7 +1725,7 @@ void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 		{
 			return;
 		}
-		SDL_Surface* ns = SDL_DisplayFormatAlpha( ss );
+		SDL_Surface* ns = SDL_ConvertSurface( ss, disp->format, 0);
 		if (ns == NULL) {
 			return;
 		}
@@ -1759,8 +1754,8 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 			c.r = color.r;
 			c.b = color.b;
 			c.g = color.g;
-			GEM_SetPalette( rectsurf, SDL_LOGPAL, &c, 0, 1 );
-			SDL_SetAlpha( rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, color.a );
+			SetSurfacePalette( rectsurf, &c, 1 );
+			SetSurfaceAlpha(rectsurf, color.a);
 			SDL_BlitSurface( rectsurf, NULL, backBuf, &drect );
 			SDL_FreeSurface( rectsurf );
 		}
@@ -1795,8 +1790,8 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 		c.r = color.r;
 		c.b = color.b;
 		c.g = color.g;
-		GEM_SetPalette( rectsurf, SDL_LOGPAL, &c, 0, 1 );
-		SDL_SetAlpha( rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, color.a );
+		SetSurfacePalette( rectsurf, &c, 1 );
+		SetSurfaceAlpha(rectsurf, color.a);
 		SDL_BlitSurface( rectsurf, NULL, surf, &drect );
 		SDL_FreeSurface( rectsurf );
 	}

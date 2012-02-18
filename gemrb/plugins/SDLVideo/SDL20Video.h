@@ -45,6 +45,9 @@ public:
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
 
+private:
+	bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors);
+	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 };
 
 #endif
