@@ -45,6 +45,8 @@ public:
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
 
+	void ShowSoftKeyboard();
+	void HideSoftKeyboard();
 	void MoveMouse(unsigned int x, unsigned int y);
 private:
 	bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors);

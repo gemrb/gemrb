@@ -221,6 +221,39 @@ int SDL20VideoDriver::SwapBuffers(void)
 }
 
 
+/*
+ This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
+ */
+void SDL20VideoDriver::HideSoftKeyboard()
+{
+	if(core->UseSoftKeyboard){
+#if TARGET_OS_IPHONE
+		SDL_iPhoneKeyboardHide(window);
+#endif
+#ifdef ANDROID
+		SDL_ANDROID_SetScreenKeyboardShown(0);
+#endif
+		softKeyboardShowing = false;
+		if(core->ConsolePopped) core->PopupConsole();
+	}
+}
+
+/*
+ This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
+ */
+void SDL20VideoDriver::ShowSoftKeyboard()
+{
+	if(core->UseSoftKeyboard){
+#if TARGET_OS_IPHONE
+		SDL_iPhoneKeyboardShow(SDL_GetFocusWindow());
+#endif
+#ifdef ANDROID
+		SDL_ANDROID_SetScreenKeyboardShown(1);
+#endif
+		softKeyboardShowing = true;
+	}
+}
+
 /* no idea how elaborate this should be*/
 void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
 {

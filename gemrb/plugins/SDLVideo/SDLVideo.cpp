@@ -39,16 +39,6 @@
 #include <cassert>
 #include <cstdio>
 
-#if TARGET_OS_IPHONE
-extern "C" {
-	#include "SDL_sysvideo.h"
-	#include <SDL/uikit/SDL_uikitkeyboard.h>
-}
-#endif
-#ifdef ANDROID
-#include "SDL_screenkeyboard.h"
-#endif
-
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
@@ -537,40 +527,6 @@ bool SDLVideoDriver::ToggleGrabInput()
 		return false;
 	}
 }
-
-/*
-This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
-*/
-void SDLVideoDriver::HideSoftKeyboard()
-{
-	if(core->UseSoftKeyboard){
-#if TARGET_OS_IPHONE
-		SDL_iPhoneKeyboardHide(SDL_GetFocusWindow());
-#endif
-#ifdef ANDROID
-		SDL_ANDROID_SetScreenKeyboardShown(0);
-#endif
-		softKeyboardShowing = false;
-		if(core->ConsolePopped) core->PopupConsole();
-	}
-}
-
-/*
-This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
-*/
-void SDLVideoDriver::ShowSoftKeyboard()
-{
-	if(core->UseSoftKeyboard){
-#if TARGET_OS_IPHONE
-		SDL_iPhoneKeyboardShow(SDL_GetFocusWindow());
-#endif
-#ifdef ANDROID
-		SDL_ANDROID_SetScreenKeyboardShown(1);
-#endif
-		softKeyboardShowing = true;
-	}
-}
-
 void SDLVideoDriver::InitSpriteCover(SpriteCover* sc, int flags)
 {
 	int i;

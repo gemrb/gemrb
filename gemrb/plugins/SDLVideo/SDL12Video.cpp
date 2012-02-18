@@ -271,6 +271,16 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		DrawMovieSubtitle( titleref );
 }
 
+void SDL12VideoDriver::ShowSoftKeyboard()
+{
+	printMessage("SDL 1.2 Video", "SDL 1.2 doesn't support a software keyboard", YELLOW);
+}
+
+void SDL12VideoDriver::HideSoftKeyboard()
+{
+	printMessage("SDL 1.2 Video", "SDL 1.2 doesn't support a software keyboard", YELLOW);
+}
+
 // Private methods
 
 bool SDL12VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)
