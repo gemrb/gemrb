@@ -208,10 +208,17 @@
 		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
 		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
+		A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
+		A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
+		A298DD0B14EB4E8C00F59F56 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
+		A298DD0C14EB4E8C00F59F56 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
+		A298DD0D14EB4E8C00F59F56 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */; };
+		A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; };
+		A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; };
 		A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */ = {isa = PBXBuildFile; fileRef = A298DD1B14EB61C100F59F56 /* Stdio.h */; };
 		A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
 		A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
-		A298DD2414EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
 		A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A29BF85213A0420300C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -1282,6 +1289,11 @@
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
 		A28D24A3143C24E500A27897 /* BAMFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMFontManager.h; sourceTree = "<group>"; };
+		A298DD1114EB4E8C00F59F56 /* SDL2Video.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SDL2Video.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL12Video.cpp; sourceTree = "<group>"; };
+		A298DD1414EB4EDE00F59F56 /* SDL12Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL12Video.h; sourceTree = "<group>"; };
+		A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL20Video.cpp; sourceTree = "<group>"; };
+		A298DD1814EB4EEB00F59F56 /* SDL20Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL20Video.h; sourceTree = "<group>"; };
 		A298DD1B14EB61C100F59F56 /* Stdio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stdio.h; sourceTree = "<group>"; };
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1912,6 +1924,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A298DD0A14EB4E8C00F59F56 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A298DD0B14EB4E8C00F59F56 /* SDL.framework in Frameworks */,
+				A298DD0C14EB4E8C00F59F56 /* Cocoa.framework in Frameworks */,
+				A298DD0D14EB4E8C00F59F56 /* libgemrb_core.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A29BF7B013A0380F00C812DD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2044,6 +2066,7 @@
 				A276B4AF13A28AEE00D41A8A /* ZLibManager.so */,
 				A276B4F413A28C0400D41A8A /* STOImporter.so */,
 				A2F0505113ABB80B0023B7EB /* SAVImporter.so */,
+				A298DD1114EB4E8C00F59F56 /* SDL2Video.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2495,6 +2518,10 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
+				A298DD1814EB4EEB00F59F56 /* SDL20Video.h */,
+				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
+				A298DD1414EB4EDE00F59F56 /* SDL12Video.h */,
 				A249187B141075A60038B170 /* CocoaWrapper.m */,
 				A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */,
 				A27B875B139F0A7D0002DC13 /* SDLVideo.h */,
@@ -3814,6 +3841,22 @@
 			productReference = A27E830A13A0358200B41410 /* 2DAImporter.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		A298DD0614EB4E8C00F59F56 /* SDL2Video */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A298DD0E14EB4E8C00F59F56 /* Build configuration list for PBXNativeTarget "SDL2Video" */;
+			buildPhases = (
+				A298DD0714EB4E8C00F59F56 /* Sources */,
+				A298DD0A14EB4E8C00F59F56 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SDL2Video;
+			productName = SDLVideo;
+			productReference = A298DD1114EB4E8C00F59F56 /* SDL2Video.so */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		A29BF7B113A0380F00C812DD /* BAMImporter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A29BF7B913A0381D00C812DD /* Build configuration list for PBXNativeTarget "BAMImporter" */;
@@ -3962,6 +4005,7 @@
 				A276B47813A28A7600D41A8A /* PSTOpcodes */,
 				A276B47E13A28A8500D41A8A /* SDLAudio */,
 				A276B48413A28A9000D41A8A /* SDLVideo */,
+				A298DD0614EB4E8C00F59F56 /* SDL2Video */,
 				A276B48A13A28A9E00D41A8A /* SPLImporter */,
 				A276B4F313A28C0400D41A8A /* STOImporter */,
 				A276B49013A28AA800D41A8A /* TISImporter */,
@@ -4333,6 +4377,7 @@
 			files = (
 				A22693791422934E004468E8 /* CocoaWrapper.m in Sources */,
 				A276B4EF13A28BE100D41A8A /* SDLVideo.cpp in Sources */,
+				A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4406,6 +4451,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				A27E831313A035C600B41410 /* 2DAImporter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A298DD0714EB4E8C00F59F56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */,
+				A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */,
+				A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4606,6 +4661,7 @@
 				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */,
 				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
 				A2ABDF6914EB37BB004BCB7D /* Apple.mm in Sources */,
+				A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6151,6 +6207,46 @@
 			};
 			name = Release;
 		};
+		A298DD0F14EB4E8C00F59F56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/SDL.framework/Headers,
+					"$(HEADER_SEARCH_PATHS)",
+				);
+				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = SDL2Video;
+				UNEXPORTED_SYMBOLS_FILE = "";
+			};
+			name = Debug;
+		};
+		A298DD1014EB4E8C00F59F56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/SDL.framework/Headers,
+					"$(HEADER_SEARCH_PATHS)",
+				);
+				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = SDL2Video;
+				UNEXPORTED_SYMBOLS_FILE = "";
+			};
+			name = Release;
+		};
 		A29BF7B313A0380F00C812DD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -6361,9 +6457,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = GemRB;
-				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -6378,9 +6472,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = GemRB;
-				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -6841,6 +6933,15 @@
 			buildConfigurations = (
 				A27E830B13A0358300B41410 /* Debug */,
 				A27E830C13A0358300B41410 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A298DD0E14EB4E8C00F59F56 /* Build configuration list for PBXNativeTarget "SDL2Video" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A298DD0F14EB4E8C00F59F56 /* Debug */,
+				A298DD1014EB4E8C00F59F56 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

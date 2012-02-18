@@ -29,7 +29,7 @@
 #include <SDL.h>
 
 class SDLVideoDriver : public Video {
-private:
+protected:
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
@@ -45,13 +45,13 @@ private:
 	SDL_Overlay *overlay;
 public:
 	SDLVideoDriver(void);
-	~SDLVideoDriver(void);
+	virtual ~SDLVideoDriver(void);
 	int Init(void);
-	int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title);
 	bool SetFullscreenMode(bool set);
-	int SwapBuffers(void);
 	int PollEvents();
 	bool ToggleGrabInput();
+	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
+	virtual int SwapBuffers(void);
 	short GetWidth() { return ( disp ? disp->w : 0 ); }
 	short GetHeight() { return ( disp ? disp->h : 0 ); }
 
@@ -156,7 +156,7 @@ public:
 		ieDword titleref);
 	int PollMovieEvents();
 
-private:
+protected:
 	void DrawMovieSubtitle(ieDword strRef);
 
 public:

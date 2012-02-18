@@ -50,6 +50,8 @@ extern "C" {
 #endif
 
 #if SDL_VERSION_ATLEAST(1,3,0)
+#define SDL_SRCCOLORKEY SDL_TRUE
+#define SDL_SRCALPHA 0
 //touch gestures
 #define MIN_GESTURE_DELTA_PIXELS 10
 #define TOUCH_RC_NUM_TICKS 500
@@ -63,11 +65,6 @@ SDL_SetPalette( surface, flags, colors, fcolor, ncolors )
 
 SDLVideoDriver::SDLVideoDriver(void)
 {
-#if SDL_VERSION_ATLEAST(1,3,0)
-	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
-	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
-	assert( core->NumFingScroll != core->NumFingKboard );
-#endif
 	xCorr = 0;
 	yCorr = 0;
 	lastTime = 0;
@@ -103,70 +100,9 @@ int SDLVideoDriver::Init(void)
 		return GEM_ERROR;
 	}
 	//print("[OK]\n");
-	SDL_EnableUNICODE( 1 );
-	SDL_EnableKeyRepeat( 500, 50 );
 	SDL_ShowCursor( SDL_DISABLE );
 	return GEM_OK;
-}
 
-int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* title)
-{
-	bpp=b;
-	fullscreen=fs;
-	printMessage( "SDLVideo", "Creating display\n", WHITE );
-	ieDword flags = SDL_SWSURFACE;
-#if TARGET_OS_IPHONE
-	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
-	// it also for some unknown reason is required for retina displays
-	flags |= SDL_WINDOW_RESIZABLE;
-	// this hint is set in the wrapper for iPad at a higher priority. set it here for iPhone
-	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight", SDL_HINT_DEFAULT);
-#endif
-	if (fullscreen) {
-		flags |= SDL_FULLSCREEN;
-#if SDL_VERSION_ATLEAST(1,3,0)
-		//This is needed to remove the status bar on Android/iOS.
-		//since we are in fullscreen this has no effect outside Android/iOS
-		flags |= SDL_WINDOW_BORDERLESS;
-#endif
-	}
-	printMessage( "SDLVideo", "SDL_SetVideoMode...", WHITE );
-	disp = SDL_SetVideoMode( w, h, bpp, flags );
-	SDL_WM_SetCaption( title, 0 );
-	if (disp == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
-		print("%s\n", SDL_GetError());
-		return GEM_ERROR;
-	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Checking for HardWare Acceleration...", WHITE );
-	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
-	if (!vi) {
-		printStatus( "ERROR", LIGHT_RED );
-	}
-	printStatus( "OK", LIGHT_GREEN );
-	Viewport.x = Viewport.y = 0;
-	width = disp->w;
-	height = disp->h;
-	Viewport.w = width;
-	Viewport.h = height;
-	printMessage( "SDLVideo", "Creating Main Surface...", WHITE );
-	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, width, height,
-						bpp, 0, 0, 0, 0 );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Creating Back Buffer...", WHITE );
-	backBuf = SDL_DisplayFormat( tmp );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Creating Extra Buffer...", WHITE );
-	extra = SDL_DisplayFormat( tmp );
-	printStatus( "OK", LIGHT_GREEN );
-	SDL_LockSurface( extra );
-	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
-	SDL_FillRect( extra, NULL, val );
-	SDL_UnlockSurface( extra );
-	SDL_FreeSurface( tmp );
-	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
 	return GEM_OK;
 }
 
@@ -195,7 +131,6 @@ inline int GetModState(int modstate)
 
 int SDLVideoDriver::SwapBuffers(void)
 {
-	int ret = GEM_OK;
 	unsigned long time;
 	time = GetTickCount();
 	if (( time - lastTime ) < 33) {
@@ -210,53 +145,7 @@ int SDLVideoDriver::SwapBuffers(void)
 		core->DrawConsole();
 	}
 
-	ret = PollEvents();
-
-	SDL_BlitSurface( backBuf, NULL, disp, NULL );
-	if (fadeColor.a) {
-		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
-		SDL_Rect src = {
-			0, 0, Viewport.w, Viewport.h
-		};
-		SDL_Rect dst = {
-			xCorr, yCorr, 0, 0
-		};
-		SDL_BlitSurface( extra, &src, disp, &dst );
-	}
-
-	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
-		SDL_Surface* temp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		if (MouseFlags&MOUSE_GRAYED) {
-			//used for greyscale blitting, fadeColor is unused
-			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
-		} else {
-			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
-		}
-		backBuf = temp;
-	}
-	if (!(MouseFlags & MOUSE_NO_TOOLTIPS)) {
-		//handle tooltips
-		unsigned int delay = core->TooltipDelay;
-		// The multiplication by 10 is there since the last, disabling slider position is the eleventh
-		if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
-			time = GetTickCount();
-			/** Display tooltip if mouse is idle */
-			if (( time - lastMouseTime ) > delay) {
-				if (Evnt)
-					Evnt->MouseIdle( time - lastMouseTime );
-			}
-
-			/** This causes the tooltip to be rendered directly to display */
-			SDL_Surface* tmp = backBuf;
-			backBuf = disp; // FIXME: UGLY HACK!
-			core->DrawTooltip();
-			backBuf = tmp;
-		}
-	}
-	SDL_Flip( disp );
-
-	return ret;
+	return PollEvents();
 }
 
 int SDLVideoDriver::PollEvents() {
@@ -2791,9 +2680,3 @@ void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
 	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
 }
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
-PLUGIN_DRIVER(SDLVideoDriver, "sdl")
-END_PLUGIN()
