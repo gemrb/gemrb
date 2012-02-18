@@ -57,7 +57,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword( &unCompBifSize );
-	print( "\nDecompressing file: [..........]" );
+	//print( "\nDecompressing file: [..........]" );
 	fflush(stdout);
 	FileStream out;
 	if (!out.Create(path)) {
@@ -76,6 +76,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		finalsize = out.GetPos();
 		if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 			laststep++;
+			/*
 			print( "\b\b\b\b\b\b\b\b\b\b\b" );
 			int l;
 
@@ -85,9 +86,10 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 				print( "." );
 			print( "]" );
 			fflush(stdout);
+			*/
 		}
 	}
-	print( "\n" );
+	//print( "\n" );
 	out.Close(); // This is necesary, since windows won't open the file otherwise.
 	return FileStream::OpenFile(path);
 }
