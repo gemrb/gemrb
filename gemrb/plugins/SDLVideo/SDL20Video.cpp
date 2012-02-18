@@ -121,6 +121,82 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	return GEM_OK;
 }
 
+void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
+{
+	w = window->w;
+	h = window->h;
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+
+	if (videoPlayer) SDL_DestroyTexture(videoPlayer);
+	if (yuv) {
+		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
+	} else {
+		//videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_INDEX8, SDL_TEXTUREACCESS_STREAMING, w, h);
+		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB555, SDL_TEXTUREACCESS_STREAMING, w, h);
+	}
+
+	//setting the subtitle region to the bottom 1/4th of the screen
+	subtitleregion.w = w;
+	subtitleregion.h = h/4;
+	subtitleregion.x = 0;
+	subtitleregion.y = h-h/4;
+	//same for SDL
+	subtitleregion_sdl.w = w;
+	subtitleregion_sdl.h = h/4;
+	subtitleregion_sdl.x = 0;
+	subtitleregion_sdl.y = h-h/4;
+}
+
+void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
+							   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+							   unsigned int h, unsigned int dstx, unsigned int dsty,
+							   int g_truecolor, unsigned char *pal, ieDword titleref)
+{
+	assert( bufw == w && bufh == h );
+
+	SDL_Rect srcRect = {sx, sy, w, h};
+	SDL_Rect destRect = {dstx, dsty, w, h};
+
+	if (g_truecolor) {
+		// TODO: use SDL_LockTexture instead (its faster i guess)
+		SDL_UpdateTexture(videoPlayer, &destRect, buf, bufw);
+		SDL_RenderCopy(renderer, videoPlayer, &srcRect, &destRect);
+	} else {
+		SDL_Surface* sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0, 0, 0, 0 ); //SDL_PIXELFORMAT_INDEX8
+
+		for (int i = 0; i < 256; i++) {
+			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].unused = 0;
+		}
+		// I'm sure there is a better way to do this
+		// however, SDL doesnt support 8bit paletted textures
+		SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, sprite);
+		SDL_RenderCopy(renderer, tex, &srcRect, &destRect);
+		SDL_FreeSurface( sprite );
+		SDL_DestroyTexture(tex);
+	}
+
+	SDL_RenderFillRect(renderer, &subtitleregion_sdl);
+
+	if (titleref>0)
+		DrawMovieSubtitle( titleref );
+
+	SDL_RenderPresent(renderer);
+}
+
+void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int */*strides*/,
+				  unsigned int bufw, unsigned int bufh,
+				  unsigned int w, unsigned int h,
+				  unsigned int dstx, unsigned int dsty,
+				  ieDword titleref)
+{
+	showFrame(*buf, bufw, bufh, 0, 0, w, h, dstx, dsty, true, NULL, titleref);
+}
+
 int SDL20VideoDriver::SwapBuffers(void)
 {
 	int ret = SDLVideoDriver::SwapBuffers();

@@ -25,7 +25,8 @@
 
 class SDL12VideoDriver : public SDLVideoDriver {
 private:
-
+	/* yuv overlay for bink movie */
+	SDL_Overlay *overlay;
 public:
 	SDL12VideoDriver(void);
 	~SDL12VideoDriver(void);
@@ -33,8 +34,18 @@ public:
 	int Init(void);
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 	int SwapBuffers(void);
-private:
+	void InitMovieScreen(int &w, int &h, bool yuv);
+	void showFrame(unsigned char* buf, unsigned int bufw,
+				   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+				   unsigned int h, unsigned int dstx, unsigned int dsty,
+				   int g_truecolor, unsigned char *pal, ieDword titleref);
+	void showYUVFrame(unsigned char** buf, unsigned int *strides,
+					  unsigned int bufw, unsigned int bufh,
+					  unsigned int w, unsigned int h,
+					  unsigned int dstx, unsigned int dsty,
+					  ieDword titleref);
 
+private:
 };
 
 #endif

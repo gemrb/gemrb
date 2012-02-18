@@ -73,7 +73,6 @@ SDLVideoDriver::SDLVideoDriver(void)
 	extra=NULL;
 	subtitlestrref = 0;
 	subtitletext = NULL;
-	overlay = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -82,7 +81,6 @@ SDLVideoDriver::~SDLVideoDriver(void)
 
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
-	if (overlay) SDL_FreeYUVOverlay(overlay);
 
 	SDL_Quit();
 
@@ -2511,117 +2509,6 @@ void SDLVideoDriver::MouseClickEvent(SDL_EventType type, Uint8 button)
 	evtClick.button.x = CursorPos.x;
 	evtClick.button.y = CursorPos.y;
 	SDL_PushEvent(&evtClick);
-}
-
-void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
-{
-	if (yuv) {
-		if (overlay) {
-			SDL_FreeYUVOverlay(overlay);
-		}
-		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
-		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
-	}
-	if (SDL_LockSurface( disp ) == 0) {
-		memset( disp->pixels, 0,
-			disp->w * disp->h * disp->format->BytesPerPixel );
-		SDL_UnlockSurface( disp );
-		SDL_Flip( disp );
-		w = disp->w;
-		h = disp->h;
-	} else {
-		print("Couldn't lock surface: %s\n", SDL_GetError());
-	}
-	//setting the subtitle region to the bottom 1/4th of the screen
-	subtitleregion.w = w;
-	subtitleregion.h = h/4;
-	subtitleregion.x = 0;
-	subtitleregion.y = h-h/4;
-
-	//same for SDL
-	subtitleregion_sdl.w = w;
-	subtitleregion_sdl.h = h/4;
-	subtitleregion_sdl.x = 0;
-	subtitleregion_sdl.y = h-h/4;
-}
-
-void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
-	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-	unsigned int h, unsigned int dstx, unsigned int dsty,
-	int g_truecolor, unsigned char *pal, ieDword titleref)
-{
-	int i;
-	SDL_Surface* sprite;
-	SDL_Rect srcRect, destRect;
-
-	assert( bufw == w && bufh == h );
-
-	if (g_truecolor) {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
-					0x7C00, 0x03E0, 0x001F, 0 );
-	} else {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0, 0, 0, 0 );
-
-		for (i = 0; i < 256; i++) {
-			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].unused = 0;
-		}
-	}
-
-	srcRect.x = sx;
-	srcRect.y = sy;
-	srcRect.w = w;
-	srcRect.h = h;
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-
-	SDL_FillRect(disp, &subtitleregion_sdl, 0);
-	SDL_BlitSurface( sprite, &srcRect, disp, &destRect );
-	if (titleref>0)
-		DrawMovieSubtitle( titleref );
-	SDL_Flip( disp );
-	SDL_FreeSurface( sprite );
-}
-
-void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-	unsigned int /*bufw*/, unsigned int bufh,
-	unsigned int w, unsigned int h,
-	unsigned int dstx, unsigned int dsty,
-	ieDword titleref) {
-	SDL_Rect destRect;
-
-	assert( /* bufw == w && */ bufh == h );
-
-	SDL_LockYUVOverlay(overlay);
-	for (unsigned int plane = 0; plane < 3; plane++) {
-		unsigned char *data = buf[plane];
-		unsigned int size = overlay->pitches[plane];
-		if (strides[plane] < size) {
-			size = strides[plane];
-		}
-		unsigned int srcoffset = 0, destoffset = 0;
-		for (unsigned int i = 0; i < ((plane == 0) ? bufh : (bufh / 2)); i++) {
-			memcpy(overlay->pixels[plane] + destoffset,
-				data + srcoffset, size);
-			srcoffset += strides[plane];
-			destoffset += overlay->pitches[plane];
-		}
-	}
-	SDL_UnlockYUVOverlay(overlay);
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-	SDL_FillRect(disp, &subtitleregion_sdl, 0);
-	SDL_DisplayYUVOverlay(overlay, &destRect);
-	if (titleref>0)
-		DrawMovieSubtitle( titleref );
-	//Maybe we don't need this?
-	//SDL_Flip( disp );
 }
 
 int SDLVideoDriver::PollMovieEvents()
