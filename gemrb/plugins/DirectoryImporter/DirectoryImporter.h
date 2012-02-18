@@ -60,4 +60,10 @@ public:
 };
 
 
+/** Used as a placeholder before the real directory is known */
+class MissingDirectoryImporter : public DirectoryImporter {
+public:
+	bool Open(const char *dir, const char *desc);
+};
+
 #endif

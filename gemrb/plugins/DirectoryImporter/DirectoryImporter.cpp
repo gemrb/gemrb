@@ -183,9 +183,19 @@ DataStream* CachedDirectoryImporter::GetResource(const char* resname, const Reso
 	return FileStream::OpenFile(buf);
 }
 
+
+bool MissingDirectoryImporter::Open(const char *dir, const char *desc)
+{
+	free(description);
+	description = strdup(desc);
+	strcpy(path, dir);
+	return true;
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xAB4534, "Directory Importer")
 PLUGIN_CLASS(PLUGIN_RESOURCE_DIRECTORY, DirectoryImporter)
 PLUGIN_CLASS(PLUGIN_RESOURCE_CACHEDDIRECTORY, CachedDirectoryImporter)
+PLUGIN_CLASS(PLUGIN_RESOURCE_MISSINGDIRECTORY, MissingDirectoryImporter)
 END_PLUGIN()

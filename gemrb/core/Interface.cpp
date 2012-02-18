@@ -1526,7 +1526,10 @@ int Interface::Init()
 		}
 
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		if (!strcmp( GameType, "auto" ))
+			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_MISSINGDIRECTORY);
+		else
+			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		size_t i;
 		for (i = 0; i < ModPath.size(); ++i)
