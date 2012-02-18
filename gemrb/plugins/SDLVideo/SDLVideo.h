@@ -162,7 +162,7 @@ protected:
 
 public:
 	long GetPixel(void *data, unsigned short x, unsigned short y);
-	void SetGamma(int brightness, int contrast);
+	void SetGamma(int brightness, int contrast)=0;
 	void SetMouseScrollSpeed(int speed);
 };
 

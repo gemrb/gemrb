@@ -260,6 +260,11 @@ void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
 	SDL_WarpMouseInWindow(window, x, y);
 }
 
+void SDL20VideoDriver::SetGamma(int /*brightness*/, int /*contrast*/)
+{
+
+}
+
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
 	return (SDL_SetWindowFullscreen(window, (SDL_bool)set) == 0);

@@ -2478,10 +2478,3 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		backBuf = temp;
 	}
 }
-// sets brightness and contrast
-// FIXME:SetGammaRamp doesn't seem to work
-// WARNING: SDL 1.2.13 crashes in SetGamma on Windows (it was fixed in SDL's #3533 Revision)
-void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
-{
-	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
-}

@@ -181,6 +181,14 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_FreeSurface( sprite );
 }
 
+// sets brightness and contrast
+// FIXME:SetGammaRamp doesn't seem to work
+// WARNING: SDL 1.2.13 crashes in SetGamma on Windows (it was fixed in SDL's #3533 Revision)
+void SDL12VideoDriver::SetGamma(int brightness, int /*contrast*/)
+{
+	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
+}
+
 bool SDL12VideoDriver::SetFullscreenMode(bool set)
 {
 	if (fullscreen != set) {

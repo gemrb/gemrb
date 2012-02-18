@@ -46,6 +46,7 @@ public:
 					  ieDword titleref);
 
 	bool SetFullscreenMode(bool set);
+	void SetGamma(int brightness, int contrast);
 	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
