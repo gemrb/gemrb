@@ -28,17 +28,15 @@ public:
 
 	void log(log_level, const char* owner, const char* message, log_color color);
 
+	virtual void destroy();
 protected:
 	virtual void print(const char*);
-	void vprint(const char* message, va_list ap);
+	bool useColor;
+private:
 	void textcolor(log_color);
 	void printBracket(const char *status, log_color color);
 	void printStatus(const char* status, log_color color);
-	void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
 
-	virtual void destroy();
-protected:
-	bool useColor;
 };
 
 Logger* createStdioLogger();

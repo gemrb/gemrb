@@ -34,11 +34,6 @@ void StdioLogger::print(const char* message)
 	fprintf(stdout, "%s", message);
 }
 
-void StdioLogger::vprint(const char *message, va_list ap)
-{
-	vprintf(message, ap);
-}
-
 static const char* colors[] = {
 	"\033[0m",
 	"\033[0m\033[30;40m",
@@ -110,15 +105,6 @@ void StdioLogger::log(log_level level, const char* owner, const char* message, l
 	textcolor(color);
 	print(message);
 	print("\n");
-}
-
-void StdioLogger::vprintMessage(const char* owner, const char* message, log_color color, va_list ap)
-{
-	printBracket(owner, LIGHT_WHITE);
-	print(": ");
-	textcolor(color);
-
-	vprint(message, ap);
 }
 
 void StdioLogger::destroy()

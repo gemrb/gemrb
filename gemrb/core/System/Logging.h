@@ -85,12 +85,6 @@ GEM_EXPORT void ShutdownLogging();
 GEM_EXPORT void print(const char* message, ...)
 	PRINTF_FORMAT(1, 2);
 
-GEM_EXPORT void textcolor(log_color);
-GEM_EXPORT void printBracket(const char *status, log_color color);
-GEM_EXPORT void printStatus(const char* status, log_color color);
-GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color, ...)
-	PRINTF_FORMAT(2, 4);
-
 /// Log an error, and exit.
 NORETURN
 GEM_EXPORT void error(const char* owner, const char* message, ...)

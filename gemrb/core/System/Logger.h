@@ -27,21 +27,12 @@
 
 #include "System/Logging.h" // for log_color
 
-#include <cstdarg>
-
 class GEM_EXPORT Logger {
 public:
 	Logger();
 	virtual ~Logger();
 
 	virtual void log(log_level, const char* owner, const char* message, log_color color) = 0;
-
-	// Deprecated functions
-	virtual void vprint(const char* message, va_list ap) = 0;
-	virtual void textcolor(log_color) = 0;
-	virtual void printBracket(const char *status, log_color color) = 0;
-	virtual void printStatus(const char* status, log_color color) = 0;
-	virtual void vprintMessage(const char* owner, const char* message, log_color color, va_list ap) = 0;
 
 	virtual void destroy();
 };

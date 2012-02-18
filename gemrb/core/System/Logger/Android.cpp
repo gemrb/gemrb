@@ -31,33 +31,6 @@ void AndroidLogger::log(log_level level, const char* owner, const char* message,
 	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
 }
 
-void AndroidLogger::vprint(const char *message, va_list ap)
-{
-	__android_log_vprint(ANDROID_LOG_INFO, "GemRB/print:", message, ap);
-}
-
-void AndroidLogger::textcolor(log_color c)
-{
-}
-
-void AndroidLogger::printBracket(const char* status, log_color color)
-{
-}
-
-void AndroidLogger::printStatus(const char* status, log_color color)
-{
-	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status);
-}
-
-void AndroidLogger::vprintMessage(const char* owner, const char* message, log_color color, va_list ap)
-{
-	// FIXME: We drop owner on the floor.
-	va_list ap;
-	va_start(ap, message);
-	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
-	va_end(ap);
-}
-
 void createAndroidLogger()
 {
 	return new AndroidLogger();

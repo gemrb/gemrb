@@ -81,38 +81,6 @@ void print(const char *message, ...)
 	va_end(ap);
 }
 
-void textcolor(log_color c)
-{
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		theLogger[i]->textcolor(c);
-	}
-}
-
-void printBracket(const char* status, log_color color)
-{
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		theLogger[i]->printBracket(status, color);
-	}
-}
-
-void printStatus(const char* status, log_color color)
-{
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		theLogger[i]->printStatus(status, color);
-	}
-}
-
-void printMessage(const char* owner, const char* message, log_color color, ...)
-{
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		va_list ap;
-
-		va_start(ap, color);
-		theLogger[i]->vprintMessage(owner, message, color, ap);
-		va_end(ap);
-	}
-}
-
 void error(const char* owner, const char* message, ...)
 {
 	va_list ap;

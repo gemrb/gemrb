@@ -43,16 +43,6 @@ void Win32ConsoleLogger::print(const char *message)
 	cprintf("%s", message);
 }
 
-void Win32ConsoleLogger::vprint(const char *message, va_list ap)
-{
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	char buff[_MAX_PATH];
-	vsnprintf(buff, _MAX_PATH, message, ap);
-	cprintf("%s", buff);
-}
-
 static int colors[] = {
 	0,
 	FOREGROUND_RED,
