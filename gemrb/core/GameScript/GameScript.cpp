@@ -1146,7 +1146,7 @@ static const IDSLink* FindIdentifier(const char* idsname)
 		}
 	}
 	
-	printMessage("GameScript", "Couldn't assign ids target: %.*s\n", YELLOW,
+	Log(WARNING, "GameScript", "Couldn't assign ids target: %.*s",
 		len, idsname );
 	return NULL;
 }
@@ -1371,7 +1371,7 @@ void InitializeIEScript()
 		bool was_condition = (i & 0x4000);
 		i &= 0x3fff;
 		if (i >= MAX_TRIGGERS) {
-			printMessage("GameScript", "trigger %d (%s) is too high, ignoring\n", RED,
+			Log(ERROR, "GameScript", "trigger %d (%s) is too high, ignoring",
 				i, triggersTable->GetStringIndex( j ) );
 			continue;
 		}
@@ -1421,7 +1421,7 @@ void InitializeIEScript()
 			for (i = 0; triggernames[i].Name; i++) {
 				if (f == triggernames[i].Function) {
 					if (InDebug&ID_TRIGGERS) {
-						printMessage("GameScript", "%s is a synonym of %s\n", WHITE,
+						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
 							triggersTable->GetStringIndex( j ), triggernames[i].Name );
 						break;
 					}
@@ -1440,7 +1440,7 @@ void InitializeIEScript()
 	while (j--) {
 		i = actionsTable->GetValueIndex( j );
 		if (i >= MAX_ACTIONS) {
-			printMessage("GameScript", "action %d (%s) is too high, ignoring\n", RED,
+			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
 				i, actionsTable->GetStringIndex( j ) );
 			continue;
 		}
@@ -1482,7 +1482,7 @@ void InitializeIEScript()
 		while (j--) {
 			i = overrideActionsTable->GetValueIndex( j );
 			if (i >= MAX_ACTIONS) {
-				printMessage("GameScript", "action %d (%s) is too high, ignoring\n", RED,
+				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
 					i, overrideActionsTable->GetStringIndex( j ) );
 				continue;
 			}
@@ -1513,7 +1513,7 @@ void InitializeIEScript()
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
 			if (i >= MAX_TRIGGERS) {
-				printMessage("GameScript", "trigger %d (%s) is too high, ignoring\n", RED,
+				Log(ERROR, "GameScript", "trigger %d (%s) is too high, ignoring",
 					i, overrideTriggersTable->GetStringIndex( j ) );
 				continue;
 			}
@@ -1548,7 +1548,7 @@ void InitializeIEScript()
 			for (i = 0; actionnames[i].Name; i++) {
 				if (f == actionnames[i].Function) {
 					if (InDebug&ID_ACTIONS) {
-						printMessage("GameScript", "%s is a synonym of %s\n", WHITE,
+						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
 							actionsTable->GetStringIndex( j ), actionnames[i].Name );
 						break;
 					}
@@ -1566,7 +1566,7 @@ void InitializeIEScript()
 	while (j--) {
 		i = objectsTable->GetValueIndex( j );
 		if (i >= MAX_OBJECTS) {
-			printMessage("GameScript", "object %d (%s) is too high, ignoring\n", RED,
+			Log(ERROR, "GameScript", "object %d (%s) is too high, ignoring",
 				i, objectsTable->GetStringIndex( j ) );
 			continue;
 		}
@@ -1607,7 +1607,7 @@ void InitializeIEScript()
 		if (f) {
 			for (i = 0; objectnames[i].Name; i++) {
 				if (f == objectnames[i].Function) {
-					printMessage("GameScript", "%s is a synonym of %s\n", WHITE,
+					Log(MESSAGE, "GameScript", "%s is a synonym of %s",
 						objectsTable->GetStringIndex( j ), objectnames[i].Name );
 					break;
 				}
@@ -1632,12 +1632,12 @@ void InitializeIEScript()
 	while (j--) {
 		i = instantTable->GetValueIndex( j );
 		if (i >= MAX_ACTIONS) {
-			printMessage("GameScript", "instant action %d (%s) is too high, ignoring\n", RED,
+			Log(ERROR, "GameScript", "instant action %d (%s) is too high, ignoring",
 				i, instantTable->GetStringIndex( j ) );
 			continue;
 		}
 		if (!actions[i]) {
-			printMessage("GameScript", "instant action %d (%s) doesn't exist, ignoring\n", YELLOW,
+			Log(WARNING, "GameScript", "instant action %d (%s) doesn't exist, ignoring",
 				i, instantTable->GetStringIndex( j ) );
 			continue;
 		}
@@ -1647,7 +1647,7 @@ void InitializeIEScript()
 	int savedTriggersIndex = core->LoadSymbol("svtriobj");
 	if (savedTriggersIndex < 0) {
 		// leaving this as not strictly necessary, for now
-		printMessage("GameScript", "Couldn't find saved trigger symbols!\n", YELLOW);
+		Log(WARNING, "GameScript", "Couldn't find saved trigger symbols!");
 	} else {
 		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
@@ -1658,12 +1658,12 @@ void InitializeIEScript()
 			i = savedTriggersTable->GetValueIndex( j );
 			i &= 0x3fff;
 			if (i >= MAX_ACTIONS) {
-				printMessage("GameScript", "saved trigger %d (%s) is too high, ignoring\n", RED,
+				Log(ERROR, "GameScript", "saved trigger %d (%s) is too high, ignoring",
 					i, savedTriggersTable->GetStringIndex( j ) );
 				continue;
 			}
 			if (!triggers[i]) {
-				printMessage("GameScript", "saved trigger %d (%s) doesn't exist, ignoring\n", YELLOW,
+				Log(WARNING, "GameScript", "saved trigger %d (%s) doesn't exist, ignoring",
 					i, savedTriggersTable->GetStringIndex( j ) );
 				continue;
 			}
@@ -1691,7 +1691,7 @@ GameScript::~GameScript(void)
 		//set 3. parameter to true if you want instant free
 		//and possible death
 		if (InDebug&ID_REFERENCE) {
-			print("One instance of %s is dropped from %d.\n", Name, BcsCache.RefCount(Name) );
+			Log(DEBUG, "GameScript", "One instance of %s is dropped from %d.", Name, BcsCache.RefCount(Name) );
 		}
 		int res = BcsCache.DecRef(script, Name, true);
 
@@ -1699,7 +1699,7 @@ GameScript::~GameScript(void)
 			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name);
 		}
 		if (!res) {
-			//print("Freeing script %s because its refcount has reached 0.\n", Name);
+			//print("Freeing script %s because its refcount has reached 0.", Name);
 			script->Release();
 		}
 		script = NULL;
@@ -1715,7 +1715,7 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
 	if ( newScript ) {
 		if (InDebug&ID_REFERENCE) {
-			print("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
+			Log(DEBUG, "GameScript", "Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
 		}
 		return newScript;
 	}
@@ -1726,14 +1726,14 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 	}
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "SC", 2 ) != 0) {
-		printMessage( "GameScript","Not a Compiled Script file\n", YELLOW );
+		Log(WARNING, "GameScript", "Not a Compiled Script file");
 		delete( stream );
 		return NULL;
 	}
 	newScript = new Script( );
 	BcsCache.SetAt( ResRef, (void *) newScript );
 	if (InDebug&ID_REFERENCE) {
-		print("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
+		Log(DEBUG, "GameScript", "Caching %s for the %d. time", ResRef, BcsCache.RefCount(ResRef) );
 	}
 
 	while (true) {
@@ -1809,7 +1809,7 @@ static Object* DecodeObject(const char* line)
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
 	}
 	if (*line != 'O' || *(line + 1) != 'B') {
-		printMessage("GameScript", "Got confused parsing object line: %s\n", YELLOW, origline);
+		Log(WARNING, "GameScript", "Got confused parsing object line: %s", origline);
 	}
 	//let the object realize it has no future (in case of null objects)
 	if (oB->isNull()) {
@@ -1983,7 +1983,7 @@ void GameScript::EvaluateAllBlocks()
 					// TODO: this will break blocking instants, if there are any
 					target->ReleaseCurrentAction();
 				} else if ((InDebug&ID_CUTSCENE) || !action->objects[1]) {
-					printMessage("GameScript","Failed to find CutSceneID target!\n",YELLOW);
+					Log(WARNING, "GameScript", "Failed to find CutSceneID target!");
 					if (action->objects[1]) {
 						action->objects[1]->dump();
 					}
@@ -2063,7 +2063,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		strlwr(aC->string1Parameter);
 		if (aC->actionID>=MAX_ACTIONS) {
 			aC->actionID=0;
-			printMessage("GameScript", "Invalid script action ID!\n", LIGHT_RED);
+			Log(ERROR, "GameScript", "Invalid script action ID!");
 		} else {
 			if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
 				//can't set this here, because the same script may be loaded
@@ -2124,7 +2124,7 @@ bool Condition::Evaluate(Scriptable* Sender)
 		if (result > 1) {
 			//we started an Or() block
 			if (ORcount) {
-				printMessage( "GameScript","Unfinished OR block encountered!\n",YELLOW );
+				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
 			}
 			ORcount = result;
 			subresult = false;
@@ -2142,7 +2142,7 @@ bool Condition::Evaluate(Scriptable* Sender)
 		}
 	}
 	if (ORcount) {
-		printMessage( "GameScript","Unfinished OR block encountered!\n",YELLOW );
+		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
 	}
 	return 1;
 }
@@ -2151,7 +2151,7 @@ bool Condition::Evaluate(Scriptable* Sender)
 int Trigger::Evaluate(Scriptable* Sender)
 {
 	if (!this) {
-		printMessage( "GameScript","Trigger evaluation fails due to NULL trigger.\n",LIGHT_RED );
+		Log(ERROR, "GameScript", "Trigger evaluation fails due to NULL trigger.");
 		return 0;
 	}
 	TriggerFunction func = triggers[triggerID];
@@ -2161,12 +2161,12 @@ int Trigger::Evaluate(Scriptable* Sender)
 	}
 	if (!func) {
 		triggers[triggerID] = GameScript::False;
-		printMessage("GameScript", "Unhandled trigger code: 0x%04x %s\n", YELLOW,
+		Log(WARNING, "GameScript", "Unhandled trigger code: 0x%04x %s",
 			triggerID, tmpstr );
 		return 0;
 	}
 	if (InDebug&ID_TRIGGERS) {
-		printMessage("GameScript", "Executing trigger code: 0x%04x %s\n", YELLOW,
+		Log(WARNING, "GameScript", "Executing trigger code: 0x%04x %s",
 				triggerID, tmpstr );
 	}
 	int ret = func( Sender, this );
@@ -2253,7 +2253,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 		if (scr) {
 			if (InDebug&ID_ACTIONS) {
-				printMessage("GameScript", "Sender: %s-->override: %s\n", YELLOW,
+				Log(WARNING, "GameScript", "Sender: %s-->override: %s",
 					Sender->GetScriptName(), scr->GetScriptName() );
 			}
 			scr->ReleaseCurrentAction();
@@ -2268,7 +2268,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				scr->CurrentActionInterruptable = false;
 			}
 		} else {
-			printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
+			Log(ERROR, "GameScript", "Actionoverride failed for object: ");
 			aC->objects[0]->dump();
 		}
 
@@ -2289,7 +2289,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			Sender->Activate();
 			if (actionflags[actionID]&AF_ALIVE) {
 				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					printMessage("GameScript", "Aborted action due to death\n", YELLOW);
+					Log(WARNING, "GameScript", "Aborted action due to death");
 					Sender->ReleaseCurrentAction();
 					return;
 				}
@@ -2331,7 +2331,7 @@ Trigger* GenerateTrigger(char* String)
 {
 	strlwr( String );
 	if (InDebug&ID_TRIGGERS) {
-		printMessage("GameScript", "Compiling:%s\n", YELLOW, String);
+		Log(WARNING, "GameScript", "Compiling:%s", String);
 	}
 	int negate = 0;
 	if (*String == '!') {
@@ -2341,14 +2341,14 @@ Trigger* GenerateTrigger(char* String)
 	int len = strlench(String,'(')+1; //including (
 	int i = triggersTable->FindString(String, len);
 	if (i<0) {
-		printMessage("GameScript", "Invalid scripting trigger: %s\n", LIGHT_RED, String);
+		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
 		return NULL;
 	}
 	char *src = String+len;
 	char *str = triggersTable->GetStringIndex( i )+len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
-		printMessage("GameScript", "Malformed scripting trigger: %s\n", LIGHT_RED, String);
+		Log(ERROR, "GameScript", "Malformed scripting trigger: %s", String);
 		return NULL;
 	}
 	return trigger;
@@ -2358,7 +2358,7 @@ Action* GenerateAction(char* String)
 {
 	strlwr( String );
 	if (InDebug&ID_ACTIONS) {
-		printMessage("GameScript", "Compiling:%s\n", YELLOW, String);
+		Log(WARNING, "GameScript", "Compiling:%s", String);
 	}
 	int len = strlench(String,'(')+1; //including (
 	char *src = String+len;
@@ -2375,7 +2375,7 @@ Action* GenerateAction(char* String)
 	if (i<0) {
 		i = actionsTable->FindString(String, len);
 		if (i < 0) {
-			printMessage("GameScript", "Invalid scripting action: %s\n", LIGHT_RED, String);
+			Log(ERROR, "GameScript", "Invalid scripting action: %s", String);
 			return NULL;
 		}
 		str = actionsTable->GetStringIndex( i )+len;
@@ -2383,7 +2383,7 @@ Action* GenerateAction(char* String)
 	}
 	Action *action = GenerateActionCore( src, str, actionID);
 	if (!action) {
-		printMessage("GameScript", "Malformed scripting action: %s\n", LIGHT_RED, String);
+		Log(ERROR, "GameScript", "Malformed scripting action: %s", String);
 		return NULL;
 	}
 	return action;

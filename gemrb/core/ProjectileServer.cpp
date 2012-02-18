@@ -219,7 +219,7 @@ unsigned int ProjectileServer::PrepareSymbols(Holder<SymbolMgr> projlist) {
 		unsigned int value = projlist->GetValueIndex(rows);
 		if (value>MAX_PROJ_IDX) {
 			//value = MAX_PROJ_IDX;
-			printMessage("ProjectileServer","Too high projectilenumber\n", YELLOW);
+			Log(WARNING, "ProjectileServer", "Too high projectilenumber");
 			continue; // ignore
 		}
 		if (value>(unsigned int) count) {
@@ -294,7 +294,7 @@ int ProjectileServer::GetExplosionFlags(unsigned int idx)
 {
 	if (explosioncount==-1) {
 		if (InitExplosion()<0) {
-			printMessage("ProjectileServer","Problem with explosions\n", RED);
+			Log(ERROR, "ProjectileServer", "Problem with explosions");
 			explosioncount=0;
 		}
 	}
@@ -309,7 +309,7 @@ ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
 {
 	if (explosioncount==-1) {
 		if (InitExplosion()<0) {
-			printMessage("ProjectileServer","Problem with explosions\n", RED);
+			Log(ERROR, "ProjectileServer", "Problem with explosions");
 			explosioncount=0;
 		}
 	}

@@ -240,7 +240,7 @@ void Inventory::CalculateWeight() const
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
-				printMessage("Inventory", "Invalid item: %s!\n", LIGHT_RED,
+				Log(ERROR, "Inventory", "Invalid item: %s!",
 					slot->ItemResRef);
 				slot->Weight = 0;
 			}
@@ -260,7 +260,7 @@ void Inventory::AddSlotEffects(ieDword index)
 
 	const Item *itm = GetItemPointer(index, slot);
 	if (!itm) {
-		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
+		Log(ERROR, "Inventory", "Invalid item equipped...");
 		return;
 	}
 	ItemExcl|=itm->ItemExcl;
@@ -733,7 +733,7 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source) const
 {
 	if (!target) {
 		//this isn't always ok, please check!
-		printMessage("Inventory", "Null item encountered by ItemsAreCompatible()\n", YELLOW);
+		Log(WARNING, "Inventory", "Null item encountered by ItemsAreCompatible()");
 		return true;
 	}
 
@@ -950,7 +950,7 @@ bool Inventory::EquipItem(ieDword slot)
 	int effect = core->QuerySlotEffects( slot );
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
-		print("Invalid item Equipped: %s Slot: %d\n", item->ItemResRef, slot);
+		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef, slot);
 		return false;
 	}
 	switch (effect) {
@@ -1405,7 +1405,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 				// create or reuse the existing pile
 				area->AddItemToLocation(Owner->Pos, TmpItem);
 			} else {
-				printMessage("Inventory", "AddSlotItemRes: argh, no area and the inventory is full, bailing out!\n", LIGHT_RED);
+				Log(ERROR, "Inventory", "AddSlotItemRes: argh, no area and the inventory is full, bailing out!");
 				delete TmpItem;
 			}
 		}
@@ -1844,7 +1844,7 @@ unsigned int Inventory::FindStealableItem()
 	slot = core->Roll(1, Slots.size(),-1);
 	inc = slot&1?1:-1;
 
-	print("Start Slot: %d, increment: %d\n", slot, inc);
+	print("Start Slot: %d, increment: %d", slot, inc);
 	//as the unsigned value underflows, it will be greater than Slots.size()
 	for(;slot<Slots.size(); slot+=inc) {
 		CREItem *item = Slots[slot];

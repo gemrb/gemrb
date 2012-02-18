@@ -72,7 +72,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		printMessage("GameControl", "Cannot start dialog: %s\n", LIGHT_RED, dlgref);
+		Log(ERROR, "GameControl", "Cannot start dialog: %s", dlgref);
 		return false;
 	}
 
@@ -184,21 +184,21 @@ void DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
-		printMessage("GameControl", "Dialog aborted???\n", LIGHT_RED);
+		Log(ERROR, "GameControl", "Dialog aborted???");
 		EndDialog();
 		return;
 	}
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
-		printMessage("GameControl", "Speaker gone???\n", LIGHT_RED);
+		Log(ERROR, "GameControl", "Speaker gone???");
 		EndDialog();
 		return;
 	}
 
 	Scriptable *target = GetTarget();
 	if (!target) {
-		printMessage("GameControl", "Target gone???\n", LIGHT_RED);
+		Log(ERROR, "GameControl", "Target gone???");
 		EndDialog();
 		return;
 	}
@@ -346,7 +346,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			}
 			target = tgt;
 			if (!target) {
-				printMessage("Dialog","Can't redirect dialog\n",YELLOW);
+				Log(WARNING, "Dialog", "Can't redirect dialog");
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
@@ -375,7 +375,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		}
 		ds = dlg->GetState( si );
 		if (!ds) {
-			printMessage("Dialog","Can't find next dialog\n",YELLOW);
+			Log(WARNING, "Dialog", "Can't find next dialog");
 			ta->SetMinRow( false );
 			EndDialog();
 			return;
@@ -433,7 +433,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	}
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
-		printMessage("Dialog", "There were no valid dialog options!\n", YELLOW);
+		Log(WARNING, "Dialog", "There were no valid dialog options!");
 		core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 	}
 end_of_choose:

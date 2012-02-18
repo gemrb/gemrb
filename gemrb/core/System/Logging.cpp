@@ -75,13 +75,10 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 
 void print(const char *message, ...)
 {
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		va_list ap;
-
-		va_start(ap, message);
-		theLogger[i]->vprint(message, ap);
-		va_end(ap);
-	}
+	va_list ap;
+	va_start(ap, message);
+	vLog(MESSAGE, "Unknown", message, WHITE, ap);
+	va_end(ap);
 }
 
 void textcolor(log_color c)

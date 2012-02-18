@@ -151,7 +151,7 @@ void EventMgr::DelWindow(Window *win)
 					return;
 				}
 			}
-			printMessage("EventManager", "Couldn't delete window!\n", YELLOW);
+			Log(WARNING, "EventManager", "Couldn't delete window!");
 		}
 	}
 }

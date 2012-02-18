@@ -69,7 +69,7 @@ public:
 		else
 			PyErr_Clear();
 		if (!PyCObject_Check(obj) || PyCObject_GetDesc(obj) != const_cast<TypeID*>(&T::ID)) {
-			printMessage("GUIScript","Bad CObject extracted.\n",LIGHT_RED);
+			Log(ERROR, "GUIScript", "Bad CObject extracted.");
 			Py_XDECREF(id);
 			return;
 		}
@@ -90,7 +90,7 @@ private:
 	static void PyRelease(void *obj, void *desc)
 	{
 		if (desc != const_cast<TypeID*>(&T::ID)) {
-			printMessage("GUIScript","Bad CObject deleted.\n",LIGHT_RED);
+			Log(ERROR, "GUIScript", "Bad CObject deleted.");
 			return;
 		}
 		static_cast<T*>(obj)->release();

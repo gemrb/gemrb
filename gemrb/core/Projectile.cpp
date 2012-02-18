@@ -580,7 +580,7 @@ void Projectile::Payload()
 	} else if (source4) {
 		Owner = (Scriptable *) source4;
 	} else {
-		print("Projectile::Payload: Caster not found, using target!\n");
+		Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
 		Owner = target;
 	}
 

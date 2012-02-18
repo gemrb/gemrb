@@ -65,7 +65,7 @@ bool WEDImporter::Open(DataStream* stream)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "WED V1.3", 8 ) != 0) {
-		printMessage("WEDImporter", "This file is not a valid WED File\n", LIGHT_RED);
+		Log(ERROR, "WEDImporter", "This file is not a valid WED File");
 		return false;
 	}
 	str->ReadDword( &OverlaysCount );
@@ -209,7 +209,7 @@ void WEDImporter::GetDoorPolygonCount(ieWord count, ieDword offset)
 	ieDword basecount = offset-PolygonsOffset;
 	if (basecount%WED_POLYGON_SIZE) {
 		basecount+=WED_POLYGON_SIZE;
-		printMessage("WEDImporter", "Found broken door polygon header!\n", YELLOW);
+		Log(WARNING, "WEDImporter", "Found broken door polygon header!");
 	}
 	ieDword polycount = basecount/WED_POLYGON_SIZE+count-WallPolygonsCount;
 	if (polycount>DoorPolygonsCount) {
@@ -244,7 +244,7 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	//The door has no representation in the WED file
 	if (i == DoorsCount) {
 		*count = 0;
-		printMessage("WEDImporter", "Found door without WED entry!\n", LIGHT_RED);
+		Log(ERROR, "WEDImporter", "Found door without WED entry!");
 		return NULL;
 	}
 

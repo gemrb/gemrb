@@ -429,7 +429,7 @@ void HashMap<Key, Value, Hash>::dumpStats(const char* description)
 		_tableSize * sizeof(Entry *) +
 		_blocks.size() * sizeof(Entry) * _blockSize;
 
-	printMessage("HashMap", "stats for %s:\n"
+	Log(DEBUG, "HashMap", "stats for %s:\n"
 			"size\t\t%u\n"
 			"allocs\t\t%u\n"
 			"accesses\t%u\n"
@@ -443,7 +443,7 @@ void HashMap<Key, Value, Hash>::dumpStats(const char* description)
 			">8 buckets\t%u\n"
 			"largest bucket\t%u\n"
 			"memsize\t\t%ukb\n",
-			DEFAULT, description,
+			description,
 			_tableSize, _debug.allocs, _debug.accesses,
 			entries, collisions, empty, eq1, eq2, gt2,
 			gt4, gt8, largest, bytes / 1024);

@@ -60,7 +60,7 @@ Control::Control()
 Control::~Control()
 {
 	if (InHandler) {
-		printMessage("Control","Destroying control inside event handler, crash may occur!\n", LIGHT_RED);
+		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
 	}
 	core->DisplayTooltip( 0, 0, NULL );
 	free (Tooltip);
@@ -108,7 +108,7 @@ void Control::SetText(const char* /*string*/)
 int Control::RunEventHandler(EventHandler handler)
 {
 	if (InHandler) {
-		printMessage("Control","Nested event handlers are not supported!\n", YELLOW);
+		Log(WARNING, "Control", "Nested event handlers are not supported!");
 		return -1;
 	}
 	if (handler) {
@@ -123,11 +123,11 @@ int Control::RunEventHandler(EventHandler handler)
 		handler->call();
 		InHandler = false;
 		if (!core->IsValidWindow(WID,wnd) ) {
-			printMessage ("Control","Owner window destructed!\n", LIGHT_RED);
+			Log(ERROR, "Control", "Owner window destructed!");
 			return -1;
 		}
 		if (!wnd->IsValidControl(ID,this) ) {
-			printMessage ("Control","Control destructed!\n", LIGHT_RED);
+			Log(ERROR, "Control", "Control destructed!");
 			return -1;
 		}
 		return 0;
@@ -138,31 +138,31 @@ int Control::RunEventHandler(EventHandler handler)
 /** Key Press Event */
 void Control::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
 {
-	//print("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key);
+	//print("OnKeyPress: CtrlID = 0x%08X, Key = %c(0x%02hX)",(unsigned int) ControlID, Key, Key);
 }
 
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/)
 {
-	//print( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key );
+	//print("OnKeyRelease: CtrlID = 0x%08X, Key = %c(0x%02hX)",(unsigned int) ControlID, Key, Key);
 }
 
 /** Mouse Enter Event */
 void Control::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 {
-	//print("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+	//print("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd",(unsigned int) ControlID, x, y);
 }
 
 /** Mouse Leave Event */
 void Control::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-	//print("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+	//print("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd",(unsigned int) ControlID, x, y);
 }
 
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
 {
-	//print("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+	//print("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd",(unsigned int) ControlID, x, y);
 }
 
 /** Mouse Button Down */
@@ -181,7 +181,7 @@ void Control::OnMouseDown(unsigned short x, unsigned short y,
 void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
-	//print("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
+	//print("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd",(unsigned int) ControlID, x, y, Button, Mod);
 }
 
 /** Mouse scroll wheel */
@@ -258,7 +258,7 @@ int Control::SetScrollBar(Control* ptr)
 {
 	if (ptr && (ptr->ControlType!=IE_GUI_SCROLLBAR)) {
 		ptr = NULL;
-		printMessage("Control","Attached control is not a ScrollBar!\n",YELLOW);
+		Log(WARNING, "Control", "Attached control is not a ScrollBar!");
 		return -1;
 	}
 	sb = ptr;

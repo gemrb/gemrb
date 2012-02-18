@@ -354,7 +354,7 @@ public:
 		for (size_t c = 0; c < actions.size(); c++) {
 			if (actions[c]) {
 				if (actions[c]->GetRef()>2) {
-					print("Residue action %d with refcount %d\n", actions[c]->actionID, actions[c]->GetRef());
+					print("Residue action %d with refcount %d", actions[c]->actionID, actions[c]->GetRef());
 				}
 				actions[c]->Release();
 				actions[c] = NULL;

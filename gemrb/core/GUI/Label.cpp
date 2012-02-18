@@ -120,7 +120,7 @@ void Label::SetAlignment(unsigned char Alignment)
 void Label::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
-	//print( "Label::OnMouseUp\n" );
+	//print("Label::OnMouseUp");
 	if (( x <= Width ) && ( y <= Height )) {
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );

@@ -64,7 +64,7 @@ bool BMPImporter::Open(DataStream* stream)
 
 	str->Read( Signature, 2 );
 	if (strncmp( Signature, "BM", 2 ) != 0) {
-		printMessage( "BMPImporter","Not a valid BMP File.\n",LIGHT_RED);
+		Log(ERROR, "BMPImporter", "Not a valid BMP File.");
 		return false;
 	}
 	str->ReadDword( &FileSize );
@@ -76,7 +76,7 @@ bool BMPImporter::Open(DataStream* stream)
 	str->ReadDword( &Size );
 	//some IE palettes are of a different format (OS/2 BMP)!
 	if (Size < 24) {
-		printMessage( "BMPImporter","OS/2 Bitmap, not supported.\n", LIGHT_RED);
+		Log(ERROR, "BMPImporter", "OS/2 Bitmap, not supported.");
 		return false;
 	}
 	str->ReadDword( &Width );
@@ -93,7 +93,7 @@ bool BMPImporter::Open(DataStream* stream)
 	//str->ReadDword(&ColorsUsed );
 	//str->ReadDword(&ColorsImportant );
 	if (Compression != 0) {
-		printMessage("BMPImporter", "Compressed %d-bits Image, not supported.\n", LIGHT_RED, BitCount);
+		Log(ERROR, "BMPImporter", "Compressed %d-bits Image, not supported.", BitCount);
 		return false;
 	}
 	//COLORTABLE
@@ -135,7 +135,7 @@ bool BMPImporter::Open(DataStream* stream)
 			PaddedRowLength = ( Width >> 1 );
 			break;
 		default:
-			printMessage("BMPImporter", "BitCount %d is not supported.\n", LIGHT_RED, BitCount);
+			Log(ERROR, "BMPImporter", "BitCount %d is not supported.", BitCount);
 			return false;
 	}
 	//if(BitCount!=4)
@@ -272,8 +272,7 @@ Bitmap* BMPImporter::GetBitmap()
 		}
 		break;
 	case 24:
-		printMessage("BMPImporter", "Don't know how to handle 24bit bitmap from %s...", WHITE, str->filename);
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "BMPImporter", "Don't know how to handle 24bit bitmap from %s...", str->filename);
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
 				data->SetAt(x,y,p[3*(y*Width + x)]);

@@ -208,7 +208,7 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 				// into override/ dir?
 				if (i + ( *p ) + 1 > pixelcount) {
 					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
-					print ("Broken frame %d\n", findex);
+					print("Broken frame %d", findex);
 				} else {
 					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
 				}
@@ -281,7 +281,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 /** This function will load the Animation as a Font */
 Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 {
-	printMessage("BAMImporter", "Constructing BAM font %s: ", WHITE, str->filename);
+	Log(MESSAGE, "BAMImporter", "Constructing BAM font %s.", str->filename);
 
 	unsigned int i = 0, glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;
 	ieWord *FLT = CacheFLT(Count);
@@ -300,16 +300,14 @@ Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 		Count = FramesCount;
 		glyphCount = Count;
 		if (FirstChar+Count != (unsigned int) LastChar+1) {
-			print("inconsistent font: FirstChar=%d LastChar=%d Count=%d ", FirstChar, LastChar, Count);
-			printStatus("ERROR", RED);
+			Log(ERROR, "BAMImporter", "inconsistent font %s: FirstChar=%d LastChar=%d Count=%d",
+					str->filename, FirstChar, LastChar, Count);
 			return NULL;
 		}
 		limit = glyphCount - 1;
 	}
 	assert(glyphCount);
 	Sprite2D** glyphs = (Sprite2D**)malloc( (glyphCount) * sizeof(Sprite2D*) );
-
-	print(" %i characters...\n", glyphCount);
 
 	for (; i <= limit; i++) {
 		unsigned int index;

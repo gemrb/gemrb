@@ -97,7 +97,7 @@ void TextEdit::SetFont(Font* f)
 		Changed = true;
 		return;
 	}
-	printMessage("TextEdit","Invalid font set!\n", LIGHT_RED);
+	Log(ERROR, "TextEdit", "Invalid font set!");
 }
 
 Font *TextEdit::GetFont() { return font; }

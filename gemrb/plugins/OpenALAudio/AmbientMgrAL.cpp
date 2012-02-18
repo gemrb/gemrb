@@ -274,7 +274,7 @@ int AmbientMgrAL::AmbientSource::enqueue()
 	if (soundrefs.empty()) return -1;
 	if (stream < 0) return -1;
 	int index = rand() % soundrefs.size();
-	//print("Playing ambient %p, %s, %d/%ld on stream %d\n", (void*)this, soundrefs[index], index, soundrefs.size(), stream);
+	//print("Playing ambient %p, %s, %d/%ld on stream %d",(void*)this, soundrefs[index], index, soundrefs.size(), stream);
 	return core->GetAudioDrv()->QueueAmbient(stream, soundrefs[index]);
 }
 

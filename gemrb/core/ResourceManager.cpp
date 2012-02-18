@@ -40,7 +40,7 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 {
 	PluginHolder<ResourceSource> source(type);
 	if (!source->Open(path, description)) {
-		printMessage("ResourceManager","Invalid path given: %s (%s)\n", YELLOW, path, description);
+		Log(WARNING, "ResourceManager", "Invalid path given: %s (%s)", path, description);
 		return false;
 	}
 
@@ -76,9 +76,8 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) co
 		}
 	}
 	if (!silent) {
-		printMessage("ResourceManager", "Searching for %s.%s...", WHITE,
+		Log(WARNING, "ResourceManager", "'%s.%s' not found...",
 			ResRef, core->TypeExt(type));
-		printStatus( "NOT FOUND", YELLOW );
 	}
 	return false;
 }

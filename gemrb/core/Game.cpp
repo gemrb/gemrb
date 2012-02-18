@@ -741,7 +741,7 @@ int Game::DelMap(unsigned int index, int forced)
 
 
 	if (!map) { //this shouldn't happen, i guess
-		printMessage("Game","Erased NULL Map\n",YELLOW);
+		Log(WARNING, "Game", "Erased NULL Map");
 		Maps.erase( Maps.begin()+index);
 		if (MapIndex>(int) index) {
 			MapIndex--;
@@ -1113,10 +1113,10 @@ int Game::GetXPFromCR(int cr)
 		if (cr>=MAX_CRLEVEL) {
 			cr=MAX_CRLEVEL-1;
 		}
-		printMessage("Game", "Challenge Rating: %d, party level: %d\n", LIGHT_WHITE, cr, level);
+		Log(MESSAGE, "Game", "Challenge Rating: %d, party level: %d", cr, level);
 		return crtable[level][cr];
 	}
-	printMessage("Game","Cannot find moncrate.2da!\n", LIGHT_RED);
+	Log(ERROR, "Game", "Cannot find moncrate.2da!");
 	return 0;
 }
 
@@ -1189,7 +1189,7 @@ bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
-			printMessage("Game", "Actor %s is not near!\n", LIGHT_WHITE, PCs[i]->LongName);
+			Log(MESSAGE, "Game", "Actor %s is not near!", PCs[i]->LongName);
 			return false;
 		}
 	}
@@ -1292,7 +1292,6 @@ void Game::AdvanceTime(ieDword add)
 		int areatype = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
 		ieResRef *res;
 
-		printMessage("Game","Switching DayLight\n",GREEN);
 		if (IsDay()) {
 			res=&nightmovies[areatype];
 		} else {
@@ -1833,7 +1832,7 @@ void Game::dump() const
 	for(idx=0;idx<Maps.size();idx++) {
 		Map *map = Maps[idx];
 
-		print("%s\n",map->GetScriptName());
+		print("%s", map->GetScriptName());
 	}
 	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
 	buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());

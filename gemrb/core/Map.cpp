@@ -481,7 +481,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	}
 	Map* map = game->GetMap(area, false);
 	if (!map) {
-		printMessage("Map", "Invalid map: %s\n", LIGHT_RED, area);
+		Log(ERROR, "Map", "Invalid map: %s", area);
 		command[0]=0;
 		return;
 	}
@@ -508,7 +508,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 			Y = map->TMap->YCellCount * 32;
 		} else {
 			// crashes in original engine
-			printMessage("Map", "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid\n", YELLOW,
+			Log(WARNING, "Map", "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid",
 				entrance, direction);
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 64;
@@ -762,7 +762,7 @@ void Map::UpdateScripts()
 				} else if (avatar->WalkScale) {
 					speed = avatar->WalkScale;
 				} else {
-					//print("no walkscale for anim %d!\n", actor->BaseStats[IE_ANIMATION_ID]);
+					//print("no walkscale for anim %d!", actor->BaseStats[IE_ANIMATION_ID]);
 				}
 			}
 		}
@@ -2119,7 +2119,7 @@ void Map::RemoveActor(Actor* actor)
 			return;
 		}
 	}
-	printMessage("Map", "RemoveActor: actor not found?\n", YELLOW);
+	Log(WARNING, "Map", "RemoveActor: actor not found?");
 }
 
 //returns true if none of the partymembers are on the map
@@ -2351,7 +2351,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 
 		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
 		if (Cost > PathLen) {
-			//print("Path not found!\n");
+			//print("Path not found!");
 			break;
 		}
 		SetupNode( x - 1, y - 1, size, Cost );
@@ -2694,12 +2694,12 @@ PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int M
 
 		if (pos == pos2) {
 			//We've found _a_ path
-			//print("GOAL!!!\n");
+			//print("GOAL!!!");
 			break;
 		}
 		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
 		if (Cost > 65500) {
-			//print("Path not found!\n");
+			//print("Path not found!");
 			break;
 		}
 		SetupNode( x - 1, y - 1, size, Cost );
@@ -2853,7 +2853,7 @@ int Map::WhichEdge(const Point &s)
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
 	if (!(GetBlocked( sX, sY )&PATH_MAP_TRAVEL)) {
-		printMessage("Map", "This isn't a travel region [%d.%d]?\n", YELLOW,
+		Log(WARNING, "Map", "This isn't a travel region [%d.%d]?",
 			sX, sY);
 		return -1;
 	}
@@ -3537,7 +3537,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	if (!anim)
 		anim = af->GetCycle( 0 );
 	if (!anim) {
-		print("Cannot load animation: %s\n", BAM);
+		print("Cannot load animation: %s", BAM);
 		return NULL;
 	}
 	//this will make the animation stop when the game is stopped
@@ -3559,7 +3559,7 @@ void AreaAnimation::InitAnimation()
 	AnimationFactory* af = ( AnimationFactory* )
 		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
 	if (!af) {
-		print("Cannot load animation: %s\n", BAM);
+		print("Cannot load animation: %s", BAM);
 		return;
 	}
 
@@ -3690,7 +3690,7 @@ bool Map::ChangeMap(bool day_or_night)
 	//using the ARE class for this because ChangeMap is similar to LoadMap
 	//it loads the lightmap and the minimap too, besides swapping the tileset
 	if (!mM->ChangeMap(this, day_or_night) && !day_or_night) {
-		printMessage("Map", "Invalid night lightmap, falling back to day lightmap.\n", YELLOW);
+		Log(WARNING, "Map", "Invalid night lightmap, falling back to day lightmap.");
 		mM->ChangeMap(this, 1);
 		DayNight = day_or_night;
 	}

@@ -931,7 +931,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				area->MoveVisibleGroundPiles(p);
 				break;
 			case 'x': // shows coordinates on the map
-				printMessage("GameControl", "Position: %s [%d.%d]\n", LIGHT_WHITE, area->GetScriptName(), p.x, p.y );
+				Log(MESSAGE, "GameControl", "Position: %s [%d.%d]", area->GetScriptName(), p.x, p.y );
 				break;
 			case 'g'://shows loaded areas and other game information
 				game->dump();
@@ -1047,22 +1047,22 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case '4': //show all traps and infopoints
 				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
-				printMessage("GameControl", "Show traps and infopoints %s\n", LIGHT_WHITE, DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
+				Log(MESSAGE, "GameControl", "Show traps and infopoints %s", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
 			case '6': //show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
-				printMessage("GameControl", "Show lightmap %s\n", LIGHT_WHITE, DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
+				Log(MESSAGE, "GameControl", "Show lightmap %s", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7': //toggles fog of war
 				core->FogOfWar ^= FOG_DRAWFOG;
-				printMessage("GameControl", "Show Fog-Of-War: %s\n", LIGHT_WHITE, core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
+				Log(MESSAGE, "GameControl", "Show Fog-Of-War: %s", core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
 				break;
 			case '8': //show searchmap over area
 				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
-				printMessage("GameControl", "Show searchmap %s\n", LIGHT_WHITE, core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
+				Log(MESSAGE, "GameControl", "Show searchmap %s", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
 				break;
 			default:
-				printMessage("GameControl", "KeyRelease:%d - %d\n", LIGHT_WHITE, Key, Mod );
+				Log(MESSAGE, "GameControl", "KeyRelease:%d - %d", Key, Mod );
 				break;
 		}
 		return; //return from cheatkeys
@@ -2481,7 +2481,7 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 				}
 				return;
 			}
-			printMessage("GameControl", "Invalid Window Index: %s:%u\n", LIGHT_RED,
+			Log(ERROR, "GameControl", "Invalid Window Index: %s:%u",
 				WindowName, index);
 		}
 	}
@@ -2534,7 +2534,7 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 				}
 				return;
 			}
-			printMessage("GameControl", "Invalid Window Index %s:%u\n", LIGHT_RED,
+			Log(ERROR, "GameControl", "Invalid Window Index %s:%u",
 				WindowName, index);
 		}
 	}
@@ -2581,7 +2581,7 @@ void GameControl::ResizeDel(Window* win, int type)
 	switch (type) {
 	case 0: //Left
 		if (LeftCount!=1) {
-			printMessage("GameControl","More than one left window!\n",LIGHT_RED);
+			Log(ERROR, "GameControl", "More than one left window!");
 		}
 		LeftCount--;
 		if (!LeftCount) {
@@ -2593,7 +2593,7 @@ void GameControl::ResizeDel(Window* win, int type)
 
 	case 1: //Bottom
 		if (BottomCount!=1) {
-			printMessage("GameControl","More than one bottom window!\n",LIGHT_RED);
+			Log(ERROR, "GameControl", "More than one bottom window!");
 		}
 		BottomCount--;
 		if (!BottomCount) {
@@ -2604,7 +2604,7 @@ void GameControl::ResizeDel(Window* win, int type)
 
 	case 2: //Right
 		if (RightCount!=1) {
-			printMessage("GameControl","More than one right window!\n",LIGHT_RED);
+			Log(ERROR, "GameControl", "More than one right window!");
 		}
 		RightCount--;
 		if (!RightCount) {
@@ -2615,7 +2615,7 @@ void GameControl::ResizeDel(Window* win, int type)
 
 	case 3: //Top
 		if (TopCount!=1) {
-			printMessage("GameControl","More than one top window!\n",LIGHT_RED);
+			Log(ERROR, "GameControl", "More than one top window!");
 		}
 		TopCount--;
 		if (!TopCount) {

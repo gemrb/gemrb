@@ -99,10 +99,10 @@ int SDLVideoDriver::Init(void)
 {
 	//print("[SDLVideoDriver]: Init...");
 	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
-		//print("[ERROR]\n");
+		//print("[ERROR]");
 		return GEM_ERROR;
 	}
-	//print("[OK]\n");
+	//print("[OK]");
 	SDL_EnableUNICODE( 1 );
 	SDL_EnableKeyRepeat( 500, 50 );
 	SDL_ShowCursor( SDL_DISABLE );
@@ -117,7 +117,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 {
 	bpp=b;
 	fullscreen=fs;
-	printMessage( "SDLVideo", "Creating display\n", WHITE );
+	Log(MESSAGE, "SDLVideo", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
 #if TARGET_OS_IPHONE
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
@@ -134,42 +134,34 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 		flags |= SDL_WINDOW_BORDERLESS;
 #endif
 	}
-	printMessage( "SDLVideo", "SDL_SetVideoMode...", WHITE );
 	disp = SDL_SetVideoMode( w, h, bpp, flags );
 	if (disp == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
-		print("%s\n", SDL_GetError());
+		Log(ERROR, "SDLVideo", "Failed to set video mode: %s.", SDL_GetError());
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Checking for HardWare Acceleration...", WHITE );
+	Log(MESSAGE, "SDLVideo", "Checking for HardWare Acceleration...");
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
 	if (!vi) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(WARNING, "SDLVideo", "Failed to get video info.");
 	}
-	printStatus( "OK", LIGHT_GREEN );
 	Viewport.x = Viewport.y = 0;
 	width = disp->w;
 	height = disp->h;
 	Viewport.w = width;
 	Viewport.h = height;
-	printMessage( "SDLVideo", "Creating Main Surface...", WHITE );
+	Log(MESSAGE, "SDLVideo", "Creating Main Surface...");
 	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, width, height,
 						bpp, 0, 0, 0, 0 );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Creating Back Buffer...", WHITE );
+	Log(MESSAGE, "SDLVideo", "Creating Back Buffer...");
 	backBuf = SDL_DisplayFormat( tmp );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Creating Extra Buffer...", WHITE );
+	Log(MESSAGE, "SDLVideo", "Creating Extra Buffer...");
 	extra = SDL_DisplayFormat( tmp );
-	printStatus( "OK", LIGHT_GREEN );
 	SDL_LockSurface( extra );
 	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
 	SDL_FillRect( extra, NULL, val );
 	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
-	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
+	Log(MESSAGE, "SDLVideo", "CreateDisplay...");
 	return GEM_OK;
 }
 
@@ -628,14 +620,14 @@ int SDLVideoDriver::PollEvents() {
 					break;
 				case SDL_WINDOWEVENT_RESIZED://SDL 1.2
 				// this event exists in SDL 1.2, but this handler is only getting ompiled under 1.3+
-					printMessage("SDLVideo", "Window resized so your window surface is now invalid.\n", LIGHT_RED);
+					Log(ERROR, "SDLVideo", "Window resized so your window surface is now invalid.");
 					break;
 			}
 			break;
 		default:
 			//this is to catch unhandled SDL 1.3 events for development
-			printMessage( "SDLVideo", "Unrecognized SDL event type.\n", LIGHT_RED );
-			print("event type:%x\n", event.type);
+			Log(ERROR, "SDLVideo", "Unrecognized SDL event type.");
+			print("event type:%x", event.type);
 #endif
 		}
 	}
@@ -1080,7 +1072,7 @@ void SDLVideoDriver::BlitSpriteRegion(const Sprite2D* spr, const Region& size, i
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
 	if (spr->BAM) {
-		printMessage( "SDLVideo", "Tile blit not supported for this sprite\n", LIGHT_RED );
+		Log(ERROR, "SDLVideo", "Tile blit not supported for this sprite");
 		return;
 	}
 
@@ -1351,7 +1343,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
 		if (surf->format->BytesPerPixel != 4) {
 			// TODO...
-			printMessage( "SDLVideo", "BlitGameSprite not supported for this sprite\n", LIGHT_RED );
+			Log(ERROR, "SDLVideo", "BlitGameSprite not supported for this sprite");
 			BlitSprite(spr, x, y, false, clip);
 			return;
 		}
@@ -1605,7 +1597,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// tinted
 		// covered
 
-//		print("Unoptimized blit: %04X\n", flags);
+//		print("Unoptimized blit: %04X", flags);
 
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
@@ -1735,7 +1727,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// transshadow  (impossible with 32bpp)
 		// palettealpha (always set)
 
-//		print("Unoptimized blit: %04X\n", flags);
+//		print("Unoptimized blit: %04X", flags);
 
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS)) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
@@ -1897,7 +1889,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite)
 {
 	if (sprite->BAM) {
-		printMessage( "SDLVideo", "DrawRectSprite not supported for this sprite\n", LIGHT_RED );
+		Log(ERROR, "SDLVideo", "DrawRectSprite not supported for this sprite");
 		return;
 	}
 
@@ -1961,7 +1953,7 @@ inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel)
 
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
-	//print("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
+	//print("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
 	if (clipped) {
 		x += xCorr;
 		y += yCorr;
@@ -2649,7 +2641,7 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 		w = disp->w;
 		h = disp->h;
 	} else {
-		print("Couldn't lock surface: %s\n", SDL_GetError());
+		print("Couldn't lock surface: %s", SDL_GetError());
 	}
 	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;

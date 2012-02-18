@@ -161,7 +161,7 @@ int GameData::LoadTable(const ieResRef ResRef, bool silent)
 		tables[ind].refcount++;
 		return ind;
 	}
-	//print("(%s) Table not found... Loading from file\n", ResRef);
+	//print("(%s) Table not found... Loading from file", ResRef);
 	DataStream* str = GetResource( ResRef, IE_2DA_CLASS_ID, silent );
 	if (!str) {
 		return -1;
@@ -484,8 +484,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 		return NULL;
 	}
 	default:
-		print( "\n" );
-		printMessage("KEYImporter", "%s files are not supported.\n", WHITE,
+		Log(MESSAGE, "KEYImporter", "%s files are not supported.",
 			core->TypeExt(type));
 		return NULL;
 	}

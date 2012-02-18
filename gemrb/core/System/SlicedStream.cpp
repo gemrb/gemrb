@@ -100,7 +100,7 @@ int SlicedStream::Seek(int newpos, int type)
 	str->Seek(startpos + Pos /*+ (Encrypted ? 2 : 0)*/, GEM_STREAM_START);
 	//we went past the buffer
 	if (Pos>size) {
-		print("[Streams]: Invalid seek position: %ld (limit: %ld)\n",Pos, size);
+		print("[Streams]: Invalid seek position: %ld(limit: %ld)", Pos, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;

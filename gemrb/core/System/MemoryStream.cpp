@@ -91,7 +91,7 @@ int MemoryStream::Seek(int newpos, int type)
 	}
 	//we went past the buffer
 	if (Pos>size) {
-		print("[Streams]: Invalid seek position: %ld (limit: %ld)\n", Pos, size);
+		print("[Streams]: Invalid seek position: %ld(limit: %ld)", Pos, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;

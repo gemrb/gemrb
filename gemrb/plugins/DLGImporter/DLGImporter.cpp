@@ -47,8 +47,7 @@ bool DLGImporter::Open(DataStream* stream)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strnicmp( Signature, "DLG V1.0", 8 ) != 0) {
-		printMessage( "DLGImporter", "Not a valid DLG File...", WHITE );
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "DLGImporter", "Not a valid DLG File...");
 		Version = 0;
 		return false;
 	}
@@ -168,7 +167,7 @@ static Condition* GetCondition(char* string)
 	for (size_t i = 0; i < count; ++i) {
 		Trigger *trigger = GenerateTrigger(lines[i]);
 		if (!trigger) {
-			printMessage("DLGImporter", "Can't compile trigger: %s\n" , YELLOW, lines[i]);
+			Log(WARNING, "DLGImporter", "Can't compile trigger: %s", lines[i]);
 		} else {
 			condition->triggers.push_back(trigger);
 		}
@@ -240,7 +239,7 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 	for (size_t i = 0; i < count; ++i) {
 		Action *action = GenerateAction(lines[i]);
 		if (!action) {
-			printMessage("DLGImporter", "Can't compile action: %s\n" , YELLOW, lines[i]);
+			Log(WARNING, "DLGImporter", "Can't compile action: %s", lines[i]);
 		} else {
 			action->IncRef();
 			actions.push_back(action);

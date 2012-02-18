@@ -60,20 +60,17 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 							  unsigned short ptSize,
 							  FontStyle style, Palette* pal)
 {
-	printMessage( "TTF", "Constructing TTF font.", WHITE );
-	print("Creating font of size %i with %i characters...", ptSize, LastChar - FirstChar);
+	Log(MESSAGE, "TTF", "Constructing TTF font.");
+	Log(MESSAGE, "TTF", "Creating font of size %i with %i characters...", ptSize, LastChar - FirstChar);
 
 	TTF_Font* ttf = TTF_OpenFont(FontPath, ptSize);
 
 	if (!ttf){
-		printMessage( "TTF", "Unable to initialize font: ", WHITE );
-		print("%s; TTFError:%s.", FontPath, TTF_GetError());
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "TTF", "Unable to initialize font: %s, TTFError: %s.", FontPath, TTF_GetError());
 		return NULL;
 	}
 	if (!ptSize) {
-		printMessage( "TTF", "Unable to initialize font with size 0.", WHITE );
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "TTF", "Unable to initialize font with size 0.");
 		return NULL;
 	}
 
@@ -118,7 +115,6 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 	font->ptSize = ptSize;
 	font->style = style;
 	free(glyphs);
-	printStatus( "OK", LIGHT_GREEN );
 	return font;
 }
 

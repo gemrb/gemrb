@@ -65,7 +65,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
         FileStream* config = FileStream::OpenFile( tINIkeymap );
 
 	if (config == NULL) {
-		printMessage("KeyMap","There is no '%s' file...\n", YELLOW, inifile);
+		Log(WARNING, "KeyMap", "There is no '%s' file...", inifile);
 		return false;
 	}
 	char name[KEYLENGTH+1], value[_MAX_PATH + 3];
@@ -106,7 +106,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		void *tmp;
 
 		if (l<0 || l>1 || keymap.Lookup(value, tmp) ) {
-			print("Ignoring key %s\n", value);
+			print("Ignoring key %s", value);
 			continue;
 		}
 
@@ -122,7 +122,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			module = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryField("Default","GROUP");
-			print("Adding key %s with function %s::%s\n", value, module, function);
+			print("Adding key %s with function %s::%s", value, module, function);
 		}
 		fun = new Function(module, function, atoi(group));
 		keymap.SetAt(value, fun);
@@ -142,7 +142,7 @@ void KeyMap::ResolveKey(int key, int group)
 	keystr[0]=(char) key;
 	keystr[1]=0;
 
-	print("Looking up key: %c (%s) \n", key, keystr);
+	print("Looking up key: %c(%s) ", key, keystr);
 
 	if (!keymap.Lookup(keystr, tmp) ) {
 		return;
@@ -153,7 +153,7 @@ void KeyMap::ResolveKey(int key, int group)
 		return;
 	}
 
-	printMessage("KeyMap", "RunFunction(%s::%s)\n", WHITE, fun->module, fun->function);
+	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->module, fun->function);
 	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
 }
 

@@ -259,7 +259,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
-		printMessage("GameScript","Store cannot be opened!\n", LIGHT_RED);
+		Log(ERROR, "GameScript", "Store cannot be opened!");
 		return false;
 	}
 
@@ -364,15 +364,15 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	memset(&sb,0,sizeof(sb));
 	Sound[0]=0;
-	printMessage("GameScript", "Displaying string on: %s\n", LIGHT_WHITE, Sender->GetScriptName() );
+	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
-			printMessage("GameScript","Verbal constant not supported for non actors!\n", LIGHT_RED);
+			Log(ERROR, "GameScript", "Verbal constant not supported for non actors!");
 			return;
 		}
 		Actor* actor = ( Actor* ) Sender;
 		if ((ieDword) Strref>=VCONST_COUNT) {
-			printMessage("GameScript","Invalid verbal constant!\n", LIGHT_RED);
+			Log(ERROR, "GameScript", "Invalid verbal constant!");
 			return;
 		}
 
@@ -595,7 +595,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (!ab) {
-		printMessage("GameScript", "Failed to create creature! (missing creature file %s?)\n", LIGHT_RED,
+		Log(ERROR, "GameScript", "Failed to create creature! (missing creature file %s?)",
 			parameters->string0Parameter);
 		// maybe this should abort()?
 		return;
@@ -662,7 +662,7 @@ static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 	if (effect[0]) {
 		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(effect, false);
 		if (!vvc) {
-			printMessage("GameScript", "Failed to create effect.\n", LIGHT_RED);
+			Log(ERROR, "GameScript", "Failed to create effect.");
 			return NULL;
 		}
 		if (iterations) {
@@ -721,7 +721,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		//MoveNearerTo will return 0, if the actor is in move
 		//it will return 1 (the fourth parameter) if the target is unreachable
 		if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
-			if (!Sender->InMove()) print("At least it said so...\n");
+			if(!Sender->InMove()) print("At least it said so...");
 			return;
 		}
 	}
@@ -733,12 +733,12 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		// last parameter is 'face', which should be passed from relevant action parameter..
 		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", area, enter.x, enter.y, 0 );
 	}
-	printMessage("GSUtils", "Executing %s in EscapeAreaCore\n", WHITE, Tmp);
+	Log(MESSAGE, "GSUtils", "Executing %s in EscapeAreaCore", Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
 	//between the arrival and the final escape, there should be a wait time
 	//that wait time could be handled here
 	if (wait) {
-		print("But wait a bit... (%d)\n", wait);
+		print("But wait a bit...(%d)", wait);
 		Sender->SetWait(wait);
 	}
 	Sender->ReleaseCurrentAction();
@@ -801,7 +801,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	int seeflag = GA_NO_DEAD;
 
 	if (InDebug&ID_VARIABLES) {
-		print("BeginDialog core\n");
+		Log(MESSAGE, "GSUtils", "BeginDialog core");
 	}
 	if (Flags & BD_OWN) {
 		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
@@ -811,14 +811,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		scr = Sender;
 	}
 	if (!scr) {
-		printMessage("GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.\n", LIGHT_RED,
+		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.",
 			Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	if (!tar || tar->Type!=ST_ACTOR) {
-		printMessage("GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).\n", LIGHT_RED,
+		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).",
 			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->dump();
@@ -840,7 +840,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	speaker = NULL;
 	target = (Actor *) tar;
 	if ((Flags & BD_CHECKDIST) && !CanSee(scr, target, false, seeflag) ) {
-		printMessage("GameScript", "CanSee returned false! Speaker (%s, type %d) and target are:\n", LIGHT_RED,
+		Log(ERROR, "GameScript", "CanSee returned false! Speaker (%s, type %d) and target are:",
 			scr->GetScriptName(), scr->Type);
 		if (scr->Type == ST_ACTOR) {
 			((Actor *) scr)->dump();
@@ -901,7 +901,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
-		printMessage( "GameScript", "Dialog cannot be initiated because there is no GameControl.\n", YELLOW );
+		Log(WARNING, "GameScript", "Dialog cannot be initiated because there is no GameControl.");
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -913,7 +913,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 		//check if we could manage to break it, not all dialogs are breakable!
 		if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-			printMessage( "GameScript", "Dialog cannot be initiated because there is already one.\n", YELLOW );
+			Log(WARNING, "GameScript", "Dialog cannot be initiated because there is already one.");
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -945,7 +945,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_INTERACT: //using the source for the dialog
 			Game *game = core->GetGame();
 			if (game->BanterBlockFlag || game->BanterBlockTime) {
-				printMessage("GameScript","Banterblock disabled interaction.\n",GREEN);
+				Log(MESSAGE, "GameScript", "Banterblock disabled interaction.");
 				Sender->ReleaseCurrentAction();
 				return;
 			}
@@ -1048,7 +1048,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
 {
-	printMessage("GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", WHITE,
+	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d",
 		actor->GetName(0), area,position.x,position.y, face);
 	Map* map2;
 	Game* game = core->GetGame();
@@ -1261,7 +1261,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	if (!valHook) {
 		//FIXME:missing ids file!!!
 		if (InDebug&ID_TRIGGERS) {
-			printMessage("GameScript", "Missing IDS file %s for symbol %s!\n", LIGHT_RED,
+			Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!",
 				idsname, symbol);
 		}
 		return -1;
@@ -1359,11 +1359,11 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	//Here is the Action; Now we need to evaluate the parameters, if any
 	if (*str!=')') while (*str) {
 		if (*(str+1)!=':') {
-			print("Warning, parser was sidetracked: %s\n",str);
+			Log(WARNING, "GSUtils", "parser was sidetracked: %s", str);
 		}
 		switch (*str) {
 			default:
-				print("Invalid type: %s\n",str);
+				Log(WARNING, "GSUtils", "Invalid type: %s", str);
 				//str++;
 				delete newAction;
 				return NULL;
@@ -1456,7 +1456,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 
 			case 'o': //Object
 				if (objectCount==3) {
-					print("Invalid object count!\n");
+					Log(ERROR, "GSUtils", "Invalid object count!");
 					//abort();
 					delete newAction;
 					return NULL;
@@ -1510,7 +1510,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				if (mergestrings) {
 					str++;
 					if (*str!='s') {
-						print("Invalid mergestrings:%s\n",str);
+						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
 						//abort();
 						delete newAction;
 						return NULL;
@@ -1554,7 +1554,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 void GoNear(Scriptable *Sender, const Point &p)
 {
 	if (Sender->GetCurrentAction()) {
-		printMessage("GameScript","Target busy???\n",LIGHT_RED);
+		Log(ERROR, "GameScript", "Target busy???");
 		return;
 	}
 	char Tmp[256];
@@ -1569,7 +1569,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 	Map *myarea, *hisarea;
 
 	if (Sender->Type != ST_ACTOR) {
-		printMessage("GameScript","MoveNearerTo only works with actors\n",LIGHT_RED);
+		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1580,7 +1580,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
 		if (!target) {
-			printMessage("GameScript", "MoveNearerTo failed to find an exit\n", YELLOW);
+			Log(WARNING, "GameScript", "MoveNearerTo failed to find an exit");
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -1610,7 +1610,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_release)
 {
 	if (Sender->Type != ST_ACTOR) {
-		printMessage("GameScript","MoveNearerTo only works with actors\n",LIGHT_RED);
+		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
 		Sender->ReleaseCurrentAction();
 		return 0;
 	}
@@ -1727,11 +1727,11 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 	//Here is the Trigger; Now we need to evaluate the parameters
 	if (*str!=')') while (*str) {
 		if (*(str+1)!=':') {
-			print("Warning, parser was sidetracked: %s\n",str);
+			Log(WARNING, "GSUtils", "parser was sidetracked: %s",str);
 		}
 		switch (*str) {
 			default:
-				print("Invalid type: %s\n",str);
+				Log(ERROR, "GSUtils", "Invalid type: %s", str);
 				//str++;
 				delete newTrigger;
 				return NULL;
@@ -1827,7 +1827,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				if (mergestrings) {
 					str++;
 					if (*str!='s') {
-						print("Invalid mergestrings:%s\n",str);
+						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
 						//abort();
 						delete newTrigger;
 						return NULL;
@@ -1874,7 +1874,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 	char newVarName[8+33];
 
 	if (InDebug&ID_VARIABLES) {
-		print( "Setting variable(\"%s%s\", %d)\n", Context,
+		Log(DEBUG, "GSUtils", "Setting variable(\"%s%s\", %d)", Context,
 			VarName, value );
 	}
 
@@ -1900,7 +1900,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 			map->locals->SetAt( VarName, value, NoCreate);
 		}
 		else if (InDebug&ID_VARIABLES) {
-			printMessage("GameScript", "Invalid variable %s %s in setvariable\n", YELLOW,
+			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
 				Context, VarName);
 		}
 	}
@@ -1921,7 +1921,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 	}
 
 	if (InDebug&ID_VARIABLES) {
-		print( "Setting variable(\"%s\", %d)\n", VarName, value );
+		Log(DEBUG, "GSUtils", "Setting variable(\"%s\", %d)", VarName, value );
 	}
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
@@ -1944,7 +1944,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 			map->locals->SetAt( poi, value, NoCreate);
 		}
 		else if (InDebug&ID_VARIABLES) {
-			printMessage("GameScript", "Invalid variable %s in setvariable\n", YELLOW,
+			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
 				VarName);
 		}
 	}
@@ -1970,14 +1970,14 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s: %d\n",VarName, value);
+			print("CheckVariable %s: %d", VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s: %d\n",VarName, value);
+			print("CheckVariable %s: %d", VarName, value);
 		}
 		return value;
 	}
@@ -1985,7 +1985,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
 		game->kaputz->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s: %d\n",VarName, value);
+			print("CheckVariable %s: %d", VarName, value);
 		}
 		return value;
 	}
@@ -1998,7 +1998,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 				*valid=false;
 			}
 			if (InDebug&ID_VARIABLES) {
-				printMessage("GameScript", "Invalid variable %s in checkvariable\n", YELLOW,
+				Log(WARNING, "GameScript", "Invalid variable %s in checkvariable",
 					VarName);
 			}
 		}
@@ -2006,7 +2006,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 		game->locals->Lookup( poi, value );
 	}
 	if (InDebug&ID_VARIABLES) {
-		print("CheckVariable %s: %d\n",VarName, value);
+		print("CheckVariable %s: %d", VarName, value);
 	}
 	return value;
 }
@@ -2021,14 +2021,14 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s%s: %d\n",Context, VarName, value);
+			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s%s: %d\n",Context, VarName, value);
+			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
 		return value;
 	}
@@ -2036,7 +2036,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
 		game->kaputz->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s%s: %d\n",Context, VarName, value);
+			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
 		return value;
 	}
@@ -2049,7 +2049,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 				*valid=false;
 			}
 			if (InDebug&ID_VARIABLES) {
-				printMessage("GameScript", "Invalid variable %s %s in checkvariable\n", YELLOW,
+				Log(WARNING, "GameScript", "Invalid variable %s %s in checkvariable",
 					Context, VarName);
 			}
 		}
@@ -2057,7 +2057,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		game->locals->Lookup( VarName, value );
 	}
 	if (InDebug&ID_VARIABLES) {
-		print("CheckVariable %s%s: %d\n",Context, VarName, value);
+		print("CheckVariable %s%s: %d", Context, VarName, value);
 	}
 	return value;
 }
@@ -2166,7 +2166,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 
 	Spell* spl = gamedata->GetSpell( spellres );
 	if (!spl) {
-		printMessage("GameScript", "Spell couldn't be found:%.8s.\n", LIGHT_RED, spellres);
+		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellres);
 		return 0;
 	}
 	dist = spl->GetCastingDistance(Sender);
@@ -2188,7 +2188,7 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 
 	Item* itm = gamedata->GetItem( itemres );
 	if (!itm) {
-		printMessage("GameScript", "Item couldn't be found:%.8s.\n", LIGHT_RED, itemres);
+		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres);
 		return 0;
 	}
 	dist=itm->GetCastingDistance(header);
@@ -2215,8 +2215,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 
 	AutoTable tm("wish");
 	if (!tm) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find wish.2da.\n");
+		Log(ERROR, "GameScript", "Cannot find wish.2da.");
 		return;
 	}
 
@@ -2267,7 +2266,7 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
 	}
 	if (!anim) {
-		print( "Script error: No Animation Named \"%s\" or \"%s\"\n",
+		Log(ERROR, "GSUtils", "No Animation Named \"%s\" or \"%s\"",
 			parameters->string0Parameter,parameters->objects[1]->objectName );
 		return;
 	}
@@ -2397,7 +2396,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
 			if (Sender->CurrentActionTicks) {
-				printMessage("GameScript", "SpellCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
+				Log(WARNING, "GameScript", "SpellCore: Action (%d) lost spell somewhere!", parameters->actionID);
 			}
 			Sender->SetSpellResRef(spellres);
 		}
@@ -2490,7 +2489,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		//the target was converted to a point
 		Sender->CastSpellPointEnd(level);
 	} else {
-		printMessage("GameScript", "SpellCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
+		Log(ERROR, "GameScript", "SpellCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
 }
@@ -2509,7 +2508,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
 			if (Sender->CurrentActionTicks) {
-				printMessage("GameScript", "SpellPointCore: Action (%d) lost spell somewhere!\n", YELLOW, parameters->actionID);
+				Log(WARNING, "GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", parameters->actionID);
 			}
 			Sender->SetSpellResRef(spellres);
 		}
@@ -2576,7 +2575,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		//if target was set, fire spell
 		Sender->CastSpellPointEnd(level);
 	} else {
-		printMessage("GameScript", "SpellPointCore: Action (%d) lost target somewhere!\n", LIGHT_RED, parameters->actionID);
+		Log(ERROR, "GameScript", "SpellPointCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
 }
