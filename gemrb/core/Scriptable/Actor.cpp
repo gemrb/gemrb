@@ -5501,20 +5501,21 @@ void Actor::PerformAttack(ieDword gameTime)
 	nextattack += (core->Time.round_size/attacksperround);
 	lastattack = gameTime;
 
+	StringBuffer buffer;
 	//debug messages
 	if (leftorright && IsDualWielding()) {
-		printMessage("Attack","(Off) ", YELLOW);
+		buffer.append("(Off) ");
 	} else {
-		printMessage("Attack","(Main) ", GREEN);
+		buffer.append("(Main) ");
 	}
 	if (attacksperround) {
-		print("Left: %d | ", attackcount);
-		print("Next: %d ", nextattack);
+		buffer.appendFormatted("Left: %d | ", attackcount);
+		buffer.appendFormatted("Next: %d ", nextattack);
 	}
 	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
-		printBracket("Missed", LIGHT_RED);
-		print("\n");
+		buffer.append("[Missed]");
+		Log(COMBAT, "Attack", buffer);
 		return;
 	}
 
@@ -5541,8 +5542,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	if (roll==1) {
 		//critical failure
-		printBracket("Critical Miss", RED);
-		print("\n");
+		buffer.append("[Critical Miss]");
+		Log(COMBAT, "Attack", buffer);
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		VerbalConstant(VB_CRITMISS, 1);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
@@ -5593,8 +5594,8 @@ void Actor::PerformAttack(ieDword gameTime)
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
 		ResetState();
-		printBracket("Missed", LIGHT_RED);
-		print("\n");
+		buffer.append("[Missed]");
+		Log(COMBAT, "Attack", buffer);
 		return;
 	}
 
@@ -5602,14 +5603,14 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (critical) {
 		//critical success
-		printBracket("Critical Hit", GREEN);
-		print("\n");
+		buffer.append("[Critical Hit]");
+		Log(COMBAT, "Attack", buffer);
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
 		VerbalConstant(VB_CRITHIT, 1);
 	} else {
 		//normal success
-		printBracket("Hit", GREEN);
-		print("\n");
+		buffer.append("[Hit]");
+		Log(COMBAT, "Attack", buffer);
 	}
 	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, critical?UI_CRITICAL:0, damage);
 	ResetState();
@@ -5745,7 +5746,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StopAttack();
 		} else {
-			printMessage("Attack","(Leaving attack)", GREEN);
+			Log(COMBAT, "Attack", "(Leaving attack)");
 		}
 
 		lastattack = 0;
