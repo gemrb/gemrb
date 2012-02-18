@@ -484,13 +484,13 @@ def DisableAnimatedWindows ():
 	GemRB.SetVar ("ActionsWindow", -1)
 	OptionsWindow = GUIClasses.GWindow( GemRB.GetVar ("OptionsWindow") )
 	GemRB.SetVar ("OptionsWindow", -1)
-	GemRB.GamePause (1,1)
+	GemRB.GamePause (1,3)
 
 def EnableAnimatedWindows ():
 	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-	GemRB.GamePause (0,1)
+	GemRB.GamePause (0,3)
 
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 	if Slot != None:

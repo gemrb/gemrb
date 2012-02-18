@@ -145,7 +145,7 @@ def DeathWindow():
 	return
 
 def DeathWindowEnd ():
-	GemRB.GamePause (1,1)
+	GemRB.GamePause (1,3)
 
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	Window = GemRB.LoadWindow (17)
