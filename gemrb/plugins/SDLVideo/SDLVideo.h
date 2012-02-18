@@ -47,9 +47,11 @@ public:
 	int Init(void);
 	bool SetFullscreenMode(bool set);
 	int PollEvents();
-	bool ToggleGrabInput();
+
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
 	virtual int SwapBuffers(void);
+
+	virtual bool ToggleGrabInput()=0;
 	short GetWidth() { return ( disp ? disp->w : 0 ); }
 	short GetHeight() { return ( disp ? disp->h : 0 ); }
 

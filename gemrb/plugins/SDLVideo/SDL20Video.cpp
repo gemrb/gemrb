@@ -260,6 +260,13 @@ void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
 	SDL_WarpMouseInWindow(window, x, y);
 }
 
+bool SDL20VideoDriver::ToggleGrabInput()
+{
+	bool isGrabbed = SDL_GetWindowGrab(window);
+	SDL_SetWindowGrab(window, (SDL_bool)!isGrabbed);
+	return (isGrabbed != SDL_GetWindowGrab(window));
+}
+
 // Private methods
 
 bool SDL20VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)

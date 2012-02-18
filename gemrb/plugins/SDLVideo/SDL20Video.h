@@ -45,6 +45,7 @@ public:
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
 
+	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
 	void MoveMouse(unsigned int x, unsigned int y);

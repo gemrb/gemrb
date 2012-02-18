@@ -514,19 +514,6 @@ int SDLVideoDriver::PollEvents() {
 
 	return ret;
 }
-
-bool SDLVideoDriver::ToggleGrabInput()
-{
-	if (SDL_GRAB_OFF == SDL_WM_GrabInput( SDL_GRAB_QUERY )) {
-		SDL_WM_GrabInput( SDL_GRAB_ON );
-		return true;
-	}
-	else {
-		SDL_WM_GrabInput( SDL_GRAB_OFF );
-		MoveMouse(CursorPos.x, CursorPos.y);
-		return false;
-	}
-}
 void SDLVideoDriver::InitSpriteCover(SpriteCover* sc, int flags)
 {
 	int i;

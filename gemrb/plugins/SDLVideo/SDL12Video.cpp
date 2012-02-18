@@ -230,6 +230,19 @@ int SDL12VideoDriver::SwapBuffers(void)
 	return ret;
 }
 
+bool SDL12VideoDriver::ToggleGrabInput()
+{
+	if (SDL_GRAB_OFF == SDL_WM_GrabInput( SDL_GRAB_QUERY )) {
+		SDL_WM_GrabInput( SDL_GRAB_ON );
+		return true;
+	}
+	else {
+		SDL_WM_GrabInput( SDL_GRAB_OFF );
+		MoveMouse(CursorPos.x, CursorPos.y);
+		return false;
+	}
+}
+
 /* no idea how elaborate this should be*/
 void SDL12VideoDriver::MoveMouse(unsigned int x, unsigned int y)
 {
