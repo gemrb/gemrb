@@ -84,8 +84,7 @@ int main(int argc, char* argv[])
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
 		delete( core );
-		print("Press enter to continue...");
-		textcolor(DEFAULT);
+		Log(MESSAGE, "Main", "Press enter to continue...");
 		getc(stdin);
 		ShutdownLogging();
 		return -1;
@@ -97,7 +96,6 @@ int main(int argc, char* argv[])
 #endif
 	core->Main();
 	delete( core );
-	textcolor(DEFAULT);
 	ShutdownLogging();
 	return 0;
 }

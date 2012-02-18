@@ -36,6 +36,7 @@ protected:
 	void printStatus(const char* status, log_color color);
 	void vprintMessage(const char* owner, const char* message, log_color color, va_list ap);
 
+	virtual void destroy();
 protected:
 	bool useColor;
 };

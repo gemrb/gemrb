@@ -121,6 +121,11 @@ void StdioLogger::vprintMessage(const char* owner, const char* message, log_colo
 	vprint(message, ap);
 }
 
+void StdioLogger::destroy()
+{
+	textcolor(DEFAULT);
+}
+
 Logger* createStdioLogger()
 {
 #ifndef NOCOLOR
