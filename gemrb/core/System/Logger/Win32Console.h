@@ -29,6 +29,7 @@ public:
 	Win32ConsoleLogger(bool useColor);
 	virtual ~Win32ConsoleLogger();
 
+	void print(const char* message);
 	void vprint(const char* message, va_list ap);
 	void textcolor(log_color);
 

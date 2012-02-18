@@ -26,6 +26,10 @@ public:
 	StdioLogger(bool useColor);
 	virtual ~StdioLogger();
 
+	void log(log_level, const char* owner, const char* message, log_color color);
+
+protected:
+	virtual void print(const char*);
 	void vprint(const char* message, va_list ap);
 	void textcolor(log_color);
 	void printBracket(const char *status, log_color color);

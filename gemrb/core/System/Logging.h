@@ -48,7 +48,20 @@ enum log_color {
 	LIGHT_WHITE
 };
 
+#ifdef WIN32
+# undef ERROR
+#endif
+enum log_level {
+	FATAL,
+	ERROR,
+	WARNING,
+	MESSAGE,
+	COMBAT,
+	DEBUG
+};
+
 class Logger;
+class StringBuffer;
 
 GEM_EXPORT void InitializeLogging();
 GEM_EXPORT void AddLogger(Logger*);
@@ -78,16 +91,22 @@ GEM_EXPORT void printStatus(const char* status, log_color color);
 GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color, ...)
 	PRINTF_FORMAT(2, 4);
 
+/// Log an error, and exit.
 NORETURN
 GEM_EXPORT void error(const char* owner, const char* message, ...)
 	PRINTF_FORMAT(2, 3);
+
+GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
+	PRINTF_FORMAT(3, 4);
+
+GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
 
 #undef PRINTF_FORMAT
 #undef NORETURN
 
 // poison printf
 #if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))
-extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use print instead.")));
+extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use Log instead.")));
 #elif __GNUC__ >= 4
 extern "C" int printf(const char* message, ...) __attribute__ ((deprecated));
 #endif

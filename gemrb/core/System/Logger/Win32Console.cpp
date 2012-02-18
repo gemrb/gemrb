@@ -38,6 +38,11 @@ Win32ConsoleLogger::Win32ConsoleLogger(bool useColor)
 Win32ConsoleLogger::~Win32ConsoleLogger()
 {}
 
+void Win32ConsoleLogger::print(const char *message)
+{
+	cprintf("%s", message);
+}
+
 void Win32ConsoleLogger::vprint(const char *message, va_list ap)
 {
 	// Don't try to be smart.

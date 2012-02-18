@@ -33,6 +33,15 @@ void Logger::destroy()
 	delete this;
 }
 
+const char* log_level_text[] = {
+	"FATAL",
+	"ERROR",
+	"WARNING",
+	"", // MESSAGE
+	"COMBAT",
+	"DEBUG"
+};
+
 #ifdef ANDROID
 
 #include "System/Logger/Android.h"

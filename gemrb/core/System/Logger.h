@@ -34,6 +34,9 @@ public:
 	Logger();
 	virtual ~Logger();
 
+	virtual void log(log_level, const char* owner, const char* message, log_color color) = 0;
+
+	// Deprecated functions
 	virtual void vprint(const char* message, va_list ap) = 0;
 	virtual void textcolor(log_color) = 0;
 	virtual void printBracket(const char *status, log_color color) = 0;
@@ -42,6 +45,8 @@ public:
 
 	virtual void destroy();
 };
+
+extern const char* log_level_text[];
 
 extern Logger* (*createDefaultLogger)();
 
