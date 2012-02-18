@@ -279,7 +279,7 @@ public:
 	static void ReleaseMemory();
 
 	/** prints useful information on console */
-	void DebugDump(bool show_actors=0) const;
+	void dump(bool show_actors=0) const;
 	TileMap *GetTileMap() { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);

@@ -26,6 +26,7 @@
 #include "Spell.h"
 #include "TableMgr.h"
 #include "Scriptable/Actor.h"
+#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -1054,31 +1055,38 @@ void Spellbook::GenerateSpellInfo()
 	}
 }
 
-void Spellbook::dump()
+void Spellbook::dump() const
+{
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "Spellbook", buffer);
+}
+
+void Spellbook::dump(StringBuffer& buffer) const
 {
 	unsigned int k;
 
-	print( "SPELLBOOK:\n" );
+	buffer.append( "SPELLBOOK:\n" );
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 
 			if (sm->known_spells.size())
-				print( " Known spells:\n" );
+				buffer.append( " Known spells:\n" );
 			for (k = 0; k < sm->known_spells.size(); k++) {
 				CREKnownSpell* spl = sm->known_spells[k];
 				if (!spl) continue;
 
-				print ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
+				buffer.appendFormatted ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
 			}
 
 			if (sm->memorized_spells.size())
-				print( " Memorized spells:\n" );
+				buffer.append( " Memorized spells:\n" );
 			for (k = 0; k < sm->memorized_spells.size (); k++) {
 				CREMemorizedSpell* spl = sm->memorized_spells[k];
 				if (!spl) continue;
 
-				print ( " %2u: %8s %x\n", k, spl->SpellResRef, spl->Flags );
+				buffer.appendFormatted ( " %2u: %8s %x\n", k, spl->SpellResRef, spl->Flags );
 			}
 		}
 	}

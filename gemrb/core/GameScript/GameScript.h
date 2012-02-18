@@ -34,6 +34,8 @@
 class Action;
 class GameScript;
 
+class StringBuffer;
+
 //escapearea flags
 #define EA_DESTROY 1        //destroy actor at the exit (otherwise move to new place)
 #define EA_NOSEE   2        //no need to see the exit
@@ -178,27 +180,8 @@ public:
 private:
 	volatile unsigned long canary;
 public:
-	void Dump()
-	{
-		int i;
-
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if(objectName[0]) {
-			print("Object: %s\n",objectName);
-			return;
-		}
-		print("IDS Targeting: ");
-		for(i=0;i<MAX_OBJECT_FIELDS;i++) {
-			print("%d ",objectFields[i]);
-		}
-		print("\n");
-		print("Filters: ");
-		for(i=0;i<MAX_NESTING;i++) {
-			print("%d ",objectFilters[i]);
-		}
-		print("\n");
-	}
-
+	void dump() const;
+	void dump(StringBuffer&) const;
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
@@ -244,21 +227,8 @@ public:
 private:
 	volatile unsigned long canary;
 public:
-	void Dump()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		print ("Trigger: %d\n", triggerID);
-		print ("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
-		print ("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
-		print ("String0: %s\n", string0Parameter);
-		print ("String1: %s\n", string1Parameter);
-		if (objectParameter) {
-			objectParameter->Dump();
-		} else {
-			print("No object\n");
-		}
-		print("\n");
-	}
+	void dump() const;
+	void dump(StringBuffer&) const;
 
 	void Release()
 	{
@@ -344,24 +314,9 @@ public:
 	int GetRef() {
 		return RefCount;
 	}
-	void Dump()
-	{
-		int i;
 
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		print("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
-		print("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
-		for (i=0;i<3;i++) {
-			if (objects[i]) {
-				print( "%d. ",i+1);
-				objects[i]->Dump();
-			} else {
-				print( "%d. Object - NULL\n",i+1);
-			}
-		}
-
-		print("RefCount: %d\n", RefCount);
-	}
+	void dump() const;
+	void dump(StringBuffer&) const;
 
 	void Release()
 	{

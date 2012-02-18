@@ -39,6 +39,7 @@
 class Actor;
 class Map;
 class Scriptable;
+class StringBuffer;
 
 /** Maximum number of different Effect opcodes */
 #define MAX_EFFECTS 512
@@ -291,6 +292,7 @@ public:
 	void AffectAllInRange(Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump() const;
+	void dump(StringBuffer&) const;
 	//resolve effect
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(Actor *target, int table, ieDword value);

@@ -92,7 +92,7 @@ public:
 	bool TryUnlock(Actor *actor);
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible();
-	void DebugDump() const;
+	void dump() const;
 	int TrapResets() const { return Flags & DOOR_RESET; }
 	void SetNewOverlay(TileOverlay *Overlay);
 };

@@ -52,7 +52,7 @@ int GameScript::Reaction(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr || scr->Type != ST_ACTOR) {
-		parameters->Dump();
+		parameters->dump();
 		return 0;
 	}
 	int value = GetReaction(((Actor*) scr), Sender);
@@ -63,7 +63,7 @@ int GameScript::ReactionGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr || scr->Type != ST_ACTOR) {
-		parameters->Dump();
+		parameters->dump();
 		return 0;
 	}
 	int value = GetReaction(((Actor*) scr), Sender);
@@ -74,7 +74,7 @@ int GameScript::ReactionLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr || scr->Type != ST_ACTOR) {
-		parameters->Dump();
+		parameters->dump();
 		return 0;
 	}
 	int value = GetReaction(((Actor*) scr), Sender);

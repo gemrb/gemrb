@@ -30,6 +30,7 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "TableMgr.h"
+#include "System/StringBuffer.h"
 
 //debug flags
 // 1 - cache
@@ -1969,7 +1970,7 @@ void GameScript::EvaluateAllBlocks()
 				} else if ((InDebug&ID_CUTSCENE) || !action->objects[1]) {
 					printMessage("GameScript","Failed to find CutSceneID target!\n",YELLOW);
 					if (action->objects[1]) {
-						action->objects[1]->Dump();
+						action->objects[1]->dump();
 					}
 				}
 			}
@@ -2253,7 +2254,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			}
 		} else {
 			printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
-			aC->objects[0]->Dump();
+			aC->objects[0]->dump();
 		}
 
 		aC->Release();
@@ -2382,6 +2383,34 @@ Action* GenerateActionDirect(char *String, Scriptable *object)
 	return action;
 }
 
+void Object::dump() const
+{
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "GameScript", buffer);
+}
+
+void Object::dump(StringBuffer& buffer) const
+{
+	int i;
+
+	GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+	if(objectName[0]) {
+		buffer.appendFormatted("Object: %s\n",objectName);
+		return;
+	}
+	buffer.appendFormatted("IDS Targeting: ");
+	for(i=0;i<MAX_OBJECT_FIELDS;i++) {
+		buffer.appendFormatted("%d ",objectFields[i]);
+	}
+	buffer.append("\n");
+	buffer.append("Filters: ");
+	for(i=0;i<MAX_NESTING;i++) {
+		buffer.appendFormatted("%d ",objectFilters[i]);
+	}
+	buffer.append("\n");
+}
+
 /** Return true if object is null */
 bool Object::isNull()
 {
@@ -2399,3 +2428,51 @@ bool Object::isNull()
 	return true;
 }
 
+void Trigger::dump() const
+{
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "GameScript", buffer);
+}
+
+void Trigger::dump(StringBuffer& buffer) const
+{
+	GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+	buffer.appendFormatted("Trigger: %d\n", triggerID);
+	buffer.appendFormatted("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
+	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
+	buffer.appendFormatted("String0: %s\n", string0Parameter);
+	buffer.appendFormatted("String1: %s\n", string1Parameter);
+	if (objectParameter) {
+		objectParameter->dump(buffer);
+	} else {
+		buffer.appendFormatted("No object\n");
+	}
+	buffer.appendFormatted("\n");
+}
+
+void Action::dump() const
+{
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "GameScript", buffer);
+}
+
+void Action::dump(StringBuffer& buffer) const
+{
+	int i;
+
+	GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
+	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
+	for (i=0;i<3;i++) {
+		if (objects[i]) {
+			buffer.appendFormatted( "%d. ",i+1);
+			objects[i]->dump(buffer);
+		} else {
+			buffer.appendFormatted( "%d. Object - NULL\n",i+1);
+		}
+	}
+
+	buffer.appendFormatted("RefCount: %d\n", RefCount);
+}

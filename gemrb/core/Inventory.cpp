@@ -35,6 +35,7 @@
 #include "Map.h"
 #include "ScriptEngine.h"
 #include "Scriptable/Actor.h"
+#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -188,7 +189,7 @@ void Inventory::AddItem(CREItem *item)
 	//Changed=true;
 }
 
-void Inventory::CalculateWeight()
+void Inventory::CalculateWeight() const
 {
 	if (!Changed) {
 		return;
@@ -1478,9 +1479,16 @@ void Inventory::BreakItemSlot(ieDword slot)
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
 
-void Inventory::dump()
+void Inventory::dump() const
 {
-	print( "INVENTORY:\n" );
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "Inventory", buffer);
+}
+
+void Inventory::dump(StringBuffer& buffer) const
+{
+	buffer.append( "INVENTORY:\n" );
 	for (unsigned int i = 0; i < Slots.size(); i++) {
 		CREItem* itm = Slots[i];
 
@@ -1488,13 +1496,13 @@ void Inventory::dump()
 			continue;
 		}
 
-		print ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
+		buffer.appendFormatted( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
 	}
 
-	print( "Equipped: %d\n", Equipped );
+	buffer.appendFormatted( "Equipped: %d\n", Equipped );
 	Changed = true;
 	CalculateWeight();
-	print( "Total weight: %d\n", Weight );
+	buffer.appendFormatted( "Total weight: %d\n", Weight );
 }
 
 void Inventory::EquipBestWeapon(int flags)

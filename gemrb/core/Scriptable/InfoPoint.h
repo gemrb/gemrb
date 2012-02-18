@@ -36,7 +36,7 @@ public:
   ieDword GetUsePoint() const;
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
-	void DebugDump() const;
+	void dump() const;
 	int TrapResets() const { return Flags & TRAP_RESET; }
 	bool CanDetectTrap() const;
 	bool PossibleToSeeTrap() const;

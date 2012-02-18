@@ -38,6 +38,7 @@
 #include <vector>
 
 class Map;
+class StringBuffer;
 
 //AddSlotItem return values
 #define ASI_FAILED     0
@@ -192,9 +193,10 @@ private:
 	std::vector<CREItem*> Slots;
 	Actor* Owner;
 	int InventoryType;
-	int Changed;
+	/// Flag indicating whether weight needs to be recalculated
+	mutable int Changed;
 	/** Total weight of all items in Inventory */
-	int Weight;
+	mutable int Weight;
 
 	ieWordSigned Equipped;
 	ieWord EquippedHeader;
@@ -222,7 +224,7 @@ public:
 	/* flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags) const;
 
-	void CalculateWeight(void);
+	void CalculateWeight(void) const;
 	void SetInventoryType(int arg);
 	void SetOwner(Actor* act) { Owner = act; }
 
@@ -308,7 +310,9 @@ public:
 	/** breaks the item (weapon) in slot */
 	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
-	void dump();
+	void dump() const;
+	/// List all items in the Inventory to the given buffer */
+	void dump(StringBuffer&) const;
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */

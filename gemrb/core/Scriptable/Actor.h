@@ -40,6 +40,7 @@ class CharAnimations;
 class DataFileMgr;
 class Map;
 class ScriptedAnimation;
+class StringBuffer;
 struct PolymorphCache;
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
@@ -379,8 +380,9 @@ public:
 	/** sets game specific default data about action buttons */
 	static void SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot3);
 	/** prints useful information on console */
-	void DumpMaxValues();
-	void DebugDump();
+	void dump() const;
+	/** prints useful information to given buffer */
+	void dump(StringBuffer&) const;
 	/** fixes the feet circle */
 	void SetCircleSize();
 	/** places the actor on the map */

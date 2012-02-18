@@ -45,6 +45,7 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -820,14 +821,16 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		printMessage("GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).\n", LIGHT_RED,
 			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
-			((Actor *) Sender)->DebugDump();
+			((Actor *) Sender)->dump();
 		}
-		print ("Target object: ");
+		StringBuffer buffer;
+		buffer.append("Target object: ");
 		if (parameters->objects[1]) {
-			parameters->objects[1]->Dump();
+			parameters->objects[1]->dump(buffer);
 		} else {
-			print("<NULL>\n");
+			buffer.append("<NULL>\n");
 		}
+		Log(ERROR, "GameScript", buffer);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -840,9 +843,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		printMessage("GameScript", "CanSee returned false! Speaker (%s, type %d) and target are:\n", LIGHT_RED,
 			scr->GetScriptName(), scr->Type);
 		if (scr->Type == ST_ACTOR) {
-			((Actor *) scr)->DebugDump();
+			((Actor *) scr)->dump();
 		}
-		((Actor *) tar)->DebugDump();
+		((Actor *) tar)->dump();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -850,9 +853,11 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (scr->Type==ST_ACTOR) {
 		speaker = (Actor *) scr;
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
-			printMessage("GameScript", "Speaker is dead, cannot start dialogue. Speaker and target are:\n", LIGHT_RED);
-			speaker->DebugDump();
-			target->DebugDump();
+			StringBuffer buffer;
+			buffer.append("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
+			speaker->dump(buffer);
+			target->dump(buffer);
+			Log(ERROR, "GameScript", buffer);
 			Sender->ReleaseCurrentAction();
 			return;
 		}

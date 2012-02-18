@@ -39,6 +39,7 @@
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
+#include "System/StringBuffer.h"
 
 #define MAX_MAPS_LOADED 1
 
@@ -1823,26 +1824,28 @@ void Game::SetExpansion(ieDword value)
 	}
 }
 
-void Game::DebugDump()
+void Game::dump() const
 {
+	StringBuffer buffer;
 	size_t idx;
 
-	print("Currently loaded areas:\n");
+	buffer.append("Currently loaded areas:\n");
 	for(idx=0;idx<Maps.size();idx++) {
 		Map *map = Maps[idx];
 
 		print("%s\n",map->GetScriptName());
 	}
-	print("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
-	print("Global script: %s\n", Scripts[0]->GetName());
-	print("CombatCounter: %d\n", (int) CombatCounter);
+	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
+	buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
+	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
 
-	print("Party size: %d\n", (int) PCs.size());
+	buffer.appendFormatted("Party size: %d\n", (int) PCs.size());
 	for(idx=0;idx<PCs.size();idx++) {
 		Actor *actor = PCs[idx];
 
-		print("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
+		buffer.appendFormatted("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
 	}
+	Log(DEBUG, "Game", buffer);
 }
 
 Actor *Game::GetActorByGlobalID(ieDword globalID)

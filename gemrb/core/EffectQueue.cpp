@@ -32,6 +32,7 @@
 #include "Scriptable/Actor.h"
 #include "Spell.h"  //needs for the source flags bitfield
 #include "TableMgr.h"
+#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -1819,7 +1820,14 @@ bool EffectQueue::HasAnyDispellableEffect() const
 
 void EffectQueue::dump() const
 {
-	print( "EFFECT QUEUE:\n" );
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "EffectQueue", buffer);
+}
+
+void EffectQueue::dump(StringBuffer& buffer) const
+{
+	buffer.append("EFFECT QUEUE:\n");
 	int i = 0;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -1829,7 +1837,7 @@ void EffectQueue::dump() const
 			if( fx->Opcode < MAX_EFFECTS)
 				Name = (char*) Opcodes[fx->Opcode].Name;
 
-			print( " %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source );
+			buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source);
 		}
 	}
 }
