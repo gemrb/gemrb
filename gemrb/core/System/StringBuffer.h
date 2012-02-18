@@ -42,7 +42,7 @@ public:
 	virtual ~StringBuffer();
 
 	/// Append formatted string to buffer
-	void format(const char* message, ...)
+	void appendFormatted(const char* message, ...)
 		PRINTF_FORMAT(2, 3);
 	/// Append a string to buffer
 	void append(const char* message);

@@ -29,7 +29,7 @@ StringBuffer::StringBuffer()
 StringBuffer::~StringBuffer()
 {}
 
-void StringBuffer::format(const char* message, ...)
+void StringBuffer::appendFormatted(const char* message, ...)
 {
 	va_list ap;
 
