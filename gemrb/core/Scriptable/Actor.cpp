@@ -1753,16 +1753,18 @@ static void InitActorTables()
 				continue;
 			tmpindex--;
 
-			print("\tID: %d ", tmpindex);
+			StringBuffer buffer;
+			buffer.appendFormatted("\tID: %d ", tmpindex);
 			//only create the array if it isn't yet made
 			//i.e. barbarians would overwrite fighters in bg2
 			if (levelslots[tmpindex]) {
-				print ("Already Found!\n");
+				buffer.appendFormatted("Already Found!");
+				Log(DEBUG, "Actor", buffer);
 				continue;
 			}
 
 			const char* classname = tm->GetRowName(i);
-			print("Name: %s ", classname);
+			buffer.appendFormatted("Name: %s ", classname);
 			int classis = 0;
 			//default all levelslots to 0
 			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
@@ -1774,7 +1776,7 @@ static void InitActorTables()
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
 				if (classis>=0) {
-					print("Classis: %d ", classis);
+					buffer.appendFormatted("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
 					hptm.load(tm->QueryField(i, 6), true);
@@ -1783,10 +1785,11 @@ static void InitActorTables()
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
 						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 							tmphp++;
-						print("HPROLLMAXLVL: %d\n", tmphp);
+						buffer.appendFormatted("HPROLLMAXLVL: %d", tmphp);
 						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
 					}
 				}
+				Log(DEBUG, "Actor", buffer);
 				continue;
 			}
 
@@ -1823,7 +1826,7 @@ static void InitActorTables()
 								levelslots[tmpindex][classis] = tmplevel;
 							}
 						}
-						print("Classis: %d ", classis);
+						buffer.appendFormatted("Classis: %d ", classis);
 
 						//warrior take presedence
 						if (!foundwarrior) {
@@ -1864,9 +1867,10 @@ static void InitActorTables()
 				classnames = NULL;
 			}
 
-			print("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
-			print("DS: %d ", dualswap[tmpindex]);
-			print("MULTI: %d\n", multi[tmpindex]);
+			buffer.appendFormatted("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
+			buffer.appendFormatted("DS: %d ", dualswap[tmpindex]);
+			buffer.appendFormatted("MULTI: %d", multi[tmpindex]);
+			Log(DEBUG, "Actor", buffer);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
 		*however, the access code should ensure this never happens
