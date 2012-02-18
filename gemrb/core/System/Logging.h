@@ -51,13 +51,14 @@ enum log_color {
 #ifdef WIN32
 # undef ERROR
 #endif
+// !!! Keep this synchronized with GUIDefines !!!
 enum log_level {
-	FATAL,
-	ERROR,
-	WARNING,
-	MESSAGE,
-	COMBAT,
-	DEBUG
+	FATAL = 0,
+	ERROR = 1,
+	WARNING = 2,
+	MESSAGE = 3,
+	COMBAT = 4,
+	DEBUG = 6
 };
 
 class Logger;

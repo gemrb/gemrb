@@ -10037,6 +10037,25 @@ static PyObject* GemRB_GetAreaInfo(PyObject* /*self*/, PyObject* /*args*/)
 	return info;
 }
 
+PyDoc_STRVAR( GemRB_Log__doc,
+"GemRB.Log(log_level, owner, message)\n\n"
+"Log a message to GemRB's logging system.\n");
+
+static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
+{
+	log_level level;
+	char* owner;
+	char* message;
+
+	if (!PyArg_ParseTuple(args, "iss", &level, &owner, &message)) {
+		return NULL;
+	}
+
+	Log(level, owner, "%s", message);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
 	METHOD(AddGameTypeHint, METH_VARARGS),
@@ -10174,6 +10193,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
 	METHOD(LoadWindowFrame, METH_VARARGS),
+	METHOD(Log, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(ModifyEffect, METH_VARARGS),
 	METHOD(MoveToArea, METH_VARARGS),

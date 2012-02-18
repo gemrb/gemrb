@@ -294,3 +294,12 @@ GEMRB_VERSION = -1
 # GUIEnhancements bits
 GE_SCROLLBARS = 1
 GE_TRY_IDENTIFY_ON_TRANSFER = 2
+
+# Log Levels
+# !!! Keep this synchronized with System/Logging.h !!!
+LOG_FATAL = 0
+LOG_ERROR = 1
+LOG_WARNING = 2
+LOG_MESSAGE = 3
+LOG_COMBAT = 4
+LOG_DEBUG = 5
