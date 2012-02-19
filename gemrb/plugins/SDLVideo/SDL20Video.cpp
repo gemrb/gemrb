@@ -92,7 +92,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 {
 	bpp=b;
 	fullscreen=fs;
-	printMessage( "SDL20Video", "Creating display\n", WHITE );
+	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
@@ -112,29 +112,24 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	renderer = SDL_CreateRenderer(window, -1, 0);
 
 	if (renderer == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
-		print("couldnt create renderer:%s\n", SDL_GetError());
+		Log(ERROR, "SDL 2 Driver", "couldnt create renderer:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
 	Viewport.x = Viewport.y = 0;
 	width = window->w;
 	height = window->h;
 	Viewport.w = width;
 	Viewport.h = height;
-	print("%s\n", SDL_GetError());
-	printMessage( "SDLVideo", "Creating Main Surface...", WHITE );
+
+	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface...");
 	SDL_Surface* tmp = SDL_CreateRGBSurface( 0, width, height,
 											bpp, 0, 0, 0, 0 );
 
 	backBuf = SDL_ConvertSurfaceFormat(tmp, SDL_GetWindowPixelFormat(window), 0);
 	disp = backBuf;
 
-	printStatus( "OK", LIGHT_GREEN );
 	SDL_FreeSurface( tmp );
-	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
 	return GEM_OK;
 }
 
@@ -434,7 +429,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					break;
 				case SDL_WINDOWEVENT_RESIZED: //SDL 1.2
 					// this event exists in SDL 1.2, but this handler is only getting compiled under 1.3+
-					printMessage("SDLVideo", "Window resized so your window surface is now invalid.\n", LIGHT_RED);
+					Log(WARNING, "SDL 2 Driver",  "Window resized so your window surface is now invalid.");
 					break;
 			}
 			break;

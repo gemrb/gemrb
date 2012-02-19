@@ -348,14 +348,14 @@
 		A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
-		A2ABDF6714EB37BB004BCB7D /* Apple.h in Headers */ = {isa = PBXBuildFile; fileRef = A2ABDF6514EB37BB004BCB7D /* Apple.h */; };
-		A2ABDF6814EB37BB004BCB7D /* Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ABDF6614EB37BB004BCB7D /* Apple.mm */; };
-		A2ABDF6914EB37BB004BCB7D /* Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ABDF6614EB37BB004BCB7D /* Apple.mm */; };
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C66D9C13A2953D00C0AA8E /* Python.framework */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
+		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
+		A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
+		A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2C76D2914F196E900961680 /* StringBuffer.h */; };
 		A2D0504F14D0AFCA00D8CD77 /* libgemrb_core.dylib in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2D0505114D0B06C00D8CD77 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
@@ -1310,8 +1310,6 @@
 		A2AAF36713A1507100AE8402 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2AAF38D13A150D700AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AAF39313A150F900AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		A2ABDF6514EB37BB004BCB7D /* Apple.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = Apple.h; sourceTree = "<group>"; };
-		A2ABDF6614EB37BB004BCB7D /* Apple.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Apple.mm; sourceTree = "<group>"; };
 		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		A2BD82721396B886007E9C63 /* GemRB.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = GemRB.cpp; path = ../gemrb/GemRB.cpp; sourceTree = SOURCE_ROOT; };
 		A2BD83111396FD5F007E9C63 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
@@ -1548,6 +1546,8 @@
 		A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMapMgr.cpp; sourceTree = "<group>"; };
 		A2BFA07F1395FF62006ADC12 /* WorldMapMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMapMgr.h; sourceTree = "<group>"; };
 		A2C66D9C13A2953D00C0AA8E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
+		A2C76D2814F196E900961680 /* StringBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuffer.cpp; sourceTree = "<group>"; };
+		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
 		A2D0505014D0B06C00D8CD77 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
 		A2D4C51E13A978110086BCC4 /* defsounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defsounds.h; sourceTree = "<group>"; };
 		A2D4C51F13A978110086BCC4 /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errors.h; sourceTree = "<group>"; };
@@ -2932,6 +2932,8 @@
 				A265ECEA13A8669700C6DF12 /* Logging.cpp */,
 				A2BFA0601395FF62006ADC12 /* MemoryStream.cpp */,
 				A2BFA0611395FF62006ADC12 /* MemoryStream.h */,
+				A2C76D2814F196E900961680 /* StringBuffer.cpp */,
+				A2C76D2914F196E900961680 /* StringBuffer.h */,
 				A2BFA0641395FF62006ADC12 /* swab.c */,
 				A2BFA0651395FF62006ADC12 /* swab.h */,
 				A2BFA0661395FF62006ADC12 /* VFS.cpp */,
@@ -2969,8 +2971,6 @@
 		A2DE329B14EB078200117503 /* Logger */ = {
 			isa = PBXGroup;
 			children = (
-				A2ABDF6514EB37BB004BCB7D /* Apple.h */,
-				A2ABDF6614EB37BB004BCB7D /* Apple.mm */,
 				A298DD2114EB61D300F59F56 /* Stdio.cpp */,
 				A298DD1B14EB61C100F59F56 /* Stdio.h */,
 			);
@@ -3125,8 +3125,8 @@
 				A2E66435139E886700310FC8 /* GSUtils.h in Headers */,
 				A2E66437139E886700310FC8 /* Matching.h in Headers */,
 				A2DE329A14EB071200117503 /* Logger.h in Headers */,
-				A2ABDF6714EB37BB004BCB7D /* Apple.h in Headers */,
 				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
+				A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4660,9 +4660,9 @@
 				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
 				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */,
 				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
-				A2ABDF6914EB37BB004BCB7D /* Apple.mm in Sources */,
 				A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
+				A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4792,8 +4792,8 @@
 				A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */,
 				A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */,
 				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
-				A2ABDF6814EB37BB004BCB7D /* Apple.mm in Sources */,
 				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
+				A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

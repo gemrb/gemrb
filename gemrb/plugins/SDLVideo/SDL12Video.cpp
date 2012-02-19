@@ -63,48 +63,42 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 {
 	bpp=b;
 	fullscreen=fs;
-	printMessage( "SDLVideo", "Creating display\n", WHITE );
+	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	}
-	printMessage( "SDLVideo", "SDL_SetVideoMode...", WHITE );
+	Log(MESSAGE, "SDL 1.2 Driver", "SDL_SetVideoMode...");
 	disp = SDL_SetVideoMode( w, h, bpp, flags );
 	SDL_WM_SetCaption( title, 0 );
 	if (disp == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
-		print("%s\n", SDL_GetError());
+		Log(ERROR, "SDL 1.2 Driver", "%s", SDL_GetError());
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Checking for HardWare Acceleration...", WHITE );
+	Log(MESSAGE, "SDL 1.2 Driver", "Checking for HardWare Acceleration...");
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
 	if (!vi) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
-	printStatus( "OK", LIGHT_GREEN );
+
 	Viewport.x = Viewport.y = 0;
 	width = disp->w;
 	height = disp->h;
 	Viewport.w = width;
 	Viewport.h = height;
-	printMessage( "SDLVideo", "Creating Main Surface...", WHITE );
+	Log(MESSAGE, "SDL 1.2 Driver", "Creating Main Surface...");
 	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, width, height,
 						bpp, 0, 0, 0, 0 );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Creating Back Buffer...", WHITE );
+	Log(MESSAGE, "SDL 1.2 Driver", "Creating Back Buffer...");
 	backBuf = SDL_DisplayFormat( tmp );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "SDLVideo", "Creating Extra Buffer...", WHITE );
+	Log(MESSAGE, "SDL 1.2 Driver", "Creating Extra Buffer...");
 	extra = SDL_DisplayFormat( tmp );
-	printStatus( "OK", LIGHT_GREEN );
 	SDL_LockSurface( extra );
 	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
 	SDL_FillRect( extra, NULL, val );
 	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
-	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
+
 	return GEM_OK;
 }
 
@@ -327,12 +321,12 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 
 void SDL12VideoDriver::ShowSoftKeyboard()
 {
-	printMessage("SDL 1.2 Video", "SDL 1.2 doesn't support a software keyboard", YELLOW);
+	Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
 }
 
 void SDL12VideoDriver::HideSoftKeyboard()
 {
-	printMessage("SDL 1.2 Video", "SDL 1.2 doesn't support a software keyboard", YELLOW);
+	Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
 }
 
 // Private methods
