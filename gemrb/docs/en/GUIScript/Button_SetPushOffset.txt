@@ -1,0 +1,18 @@
+
+Prototype: GemRB.SetButtonPushOffset(WindowIndex, ControlIndex, x, y)
+
+Metaclass Prototype:
+
+Description:  Sets offset pictures and label move when the button is pressed.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+x - 
+y -
+
+Return value:
+
+See also:
+  Button_SetAnchor
+

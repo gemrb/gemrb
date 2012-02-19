@@ -1,0 +1,18 @@
+
+Prototype: GemRB.SetButtonAnchor(WindowIndex, ControlIndex, x, y)
+
+Metaclass Prototype:
+
+Description:  Sets explicit anchor point used for drawing button label.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+x - 
+y -
+
+Return value:
+
+See also:
+  Button_SetPushOffset
+

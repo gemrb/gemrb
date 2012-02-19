@@ -160,6 +160,8 @@ class GButton(GControl):
     'SetBorder': _GemRB.Button_SetBorder,
     'EnableBorder': _GemRB.Button_EnableBorder,
     'SetFont': _GemRB.Button_SetFont,
+    'SetAnchor': _GemRB.Button_SetAnchor,
+    'SetPushOffset': _GemRB.Button_SetPushOffset,
     'SetTextColor': _GemRB.Button_SetTextColor,
     'SetFlags': _GemRB.Button_SetFlags,
     'SetState': _GemRB.Button_SetState,
