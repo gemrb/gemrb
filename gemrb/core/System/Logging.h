@@ -29,25 +29,6 @@
 #include "exports.h"
 #include "win32def.h"
 
-enum log_color {
-	DEFAULT,
-	BLACK,
-	RED,
-	GREEN,
-	BROWN,
-	BLUE,
-	MAGENTA,
-	CYAN,
-	WHITE,
-	LIGHT_RED,
-	LIGHT_GREEN,
-	YELLOW,
-	LIGHT_BLUE,
-	LIGHT_MAGENTA,
-	LIGHT_CYAN,
-	LIGHT_WHITE
-};
-
 #ifdef WIN32
 # undef ERROR
 #endif

@@ -25,7 +25,28 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "System/Logging.h" // for log_color
+#include "exports.h"
+
+#include "System/Logging.h"
+
+enum log_color {
+	DEFAULT,
+	BLACK,
+	RED,
+	GREEN,
+	BROWN,
+	BLUE,
+	MAGENTA,
+	CYAN,
+	WHITE,
+	LIGHT_RED,
+	LIGHT_GREEN,
+	YELLOW,
+	LIGHT_BLUE,
+	LIGHT_MAGENTA,
+	LIGHT_CYAN,
+	LIGHT_WHITE
+};
 
 class GEM_EXPORT Logger {
 public:
