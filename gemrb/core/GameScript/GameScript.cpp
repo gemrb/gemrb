@@ -1285,9 +1285,9 @@ void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
 
 	int len = strchr(str,'(')-str;
 	if (len<0) {
-		buffer.appendFormatted("%d %s\n", value, str);
+		buffer.appendFormatted("%d %s", value, str);
 	} else {
-		buffer.appendFormatted("%d %.*s\n", value, len, str);
+		buffer.appendFormatted("%d %.*s", value, len, str);
 	}
 }
 
