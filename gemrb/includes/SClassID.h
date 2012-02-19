@@ -75,9 +75,12 @@ typedef unsigned long SClass_ID;
 #define IE_SCRIPT_CLASS_ID		0x000D0000
 #define IE_GUI_SCRIPT_CLASS_ID		0x000E0000
 
+// !!! Update the PLUGIN_BASE_VERSION, if the list below is reordered !!!
+// !!! or entries inserted in the middle.                             !!!
+const unsigned long PLUGIN_BASE_VERSION = 0x1000 * 0xABCE;
 typedef unsigned long PluginID;
 enum {
-	PLUGIN_OPCODES_CORE =		0xABCD0001,
+	PLUGIN_OPCODES_CORE = PLUGIN_BASE_VERSION+1,
 	PLUGIN_OPCODES_ICEWIND,
 	PLUGIN_OPCODES_TORMENT,
 	PLUGIN_RESOURCE_KEY,
