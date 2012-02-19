@@ -58,7 +58,7 @@ enum log_level {
 	WARNING = 2,
 	MESSAGE = 3,
 	COMBAT = 4,
-	DEBUG = 6
+	DEBUG = 5
 };
 
 class Logger;
