@@ -31,7 +31,7 @@ void AndroidLogger::log(log_level level, const char* owner, const char* message,
 	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
 }
 
-void createAndroidLogger()
+Logger* createAndroidLogger()
 {
 	return new AndroidLogger();
 }

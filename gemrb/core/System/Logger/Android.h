@@ -26,7 +26,7 @@ public:
 	AndroidLogger();
 	virtual ~AndroidLogger();
 
-	void log(log_level level, const char* owner, const char* message, log_color color)
+	void log(log_level level, const char* owner, const char* message, log_color color);
 };
 
 Logger* createAndroidLogger();

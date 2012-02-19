@@ -47,7 +47,7 @@ extern "C" int GemRB_main(int argc, char *argv[]);
 // SDL 1.3 fires window events for these conditions that are handled in SDLVideo.cpp.
 // see SDL_WINDOWEVENT_MINIMIZED and SDL_WINDOWEVENT_RESTORED
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
-#include "audio.h"
+#include "Audio.h"
 
 // pause audio playing if app goes in background
 static void appPutToBackground()
