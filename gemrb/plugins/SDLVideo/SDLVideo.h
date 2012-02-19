@@ -122,9 +122,9 @@ public:
 		const Color& color, bool clipped = true);
 	/** This function Draws a Polygon on the Screen */
 	void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);
-	inline void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
-	inline void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
-	inline void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
+	void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
+	void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
+	void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 	/** Send a Quit Signal to the Event Queue */
