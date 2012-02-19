@@ -471,7 +471,7 @@ public:
 	/** sets expansion mode */
 	void SetExpansion(ieDword value);
 	/** Dumps information about the object */
-	void DebugDump();
+	void dump() const;
 	/** Finds an actor by global ID */
 	Actor *GetActorByGlobalID(ieDword objectID);
 	/** Allocates maze data */

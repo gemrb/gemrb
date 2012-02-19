@@ -35,6 +35,7 @@
 #include "Map.h"
 #include "ScriptEngine.h"
 #include "Scriptable/Actor.h"
+#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -188,7 +189,7 @@ void Inventory::AddItem(CREItem *item)
 	//Changed=true;
 }
 
-void Inventory::CalculateWeight()
+void Inventory::CalculateWeight() const
 {
 	if (!Changed) {
 		return;
@@ -239,7 +240,7 @@ void Inventory::CalculateWeight()
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
-				printMessage("Inventory", "Invalid item: %s!\n", LIGHT_RED,
+				Log(ERROR, "Inventory", "Invalid item: %s!",
 					slot->ItemResRef);
 				slot->Weight = 0;
 			}
@@ -259,7 +260,7 @@ void Inventory::AddSlotEffects(ieDword index)
 
 	const Item *itm = GetItemPointer(index, slot);
 	if (!itm) {
-		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
+		Log(ERROR, "Inventory", "Invalid item equipped...");
 		return;
 	}
 	ItemExcl|=itm->ItemExcl;
@@ -732,7 +733,7 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source) const
 {
 	if (!target) {
 		//this isn't always ok, please check!
-		printMessage("Inventory","Null item encountered by ItemsAreCompatible()",YELLOW);
+		Log(WARNING, "Inventory", "Null item encountered by ItemsAreCompatible()");
 		return true;
 	}
 
@@ -949,7 +950,7 @@ bool Inventory::EquipItem(ieDword slot)
 	int effect = core->QuerySlotEffects( slot );
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
-		print("Invalid item Equipped: %s Slot: %d\n", item->ItemResRef, slot);
+		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef, slot);
 		return false;
 	}
 	switch (effect) {
@@ -1404,7 +1405,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 				// create or reuse the existing pile
 				area->AddItemToLocation(Owner->Pos, TmpItem);
 			} else {
-				printMessage("Inventory", "AddSlotItemRes: argh, no area and the inventory is full, bailing out!\n", LIGHT_RED);
+				Log(ERROR, "Inventory", "AddSlotItemRes: argh, no area and the inventory is full, bailing out!");
 				delete TmpItem;
 			}
 		}
@@ -1478,9 +1479,16 @@ void Inventory::BreakItemSlot(ieDword slot)
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
 
-void Inventory::dump()
+void Inventory::dump() const
 {
-	print( "INVENTORY:\n" );
+	StringBuffer buffer;
+	dump(buffer);
+	Log(DEBUG, "Inventory", buffer);
+}
+
+void Inventory::dump(StringBuffer& buffer) const
+{
+	buffer.append( "INVENTORY:\n" );
 	for (unsigned int i = 0; i < Slots.size(); i++) {
 		CREItem* itm = Slots[i];
 
@@ -1488,13 +1496,13 @@ void Inventory::dump()
 			continue;
 		}
 
-		print ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
+		buffer.appendFormatted( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
 	}
 
-	print( "Equipped: %d\n", Equipped );
+	buffer.appendFormatted( "Equipped: %d\n", Equipped );
 	Changed = true;
 	CalculateWeight();
-	print( "Total weight: %d\n", Weight );
+	buffer.appendFormatted( "Total weight: %d\n", Weight );
 }
 
 void Inventory::EquipBestWeapon(int flags)
@@ -1836,7 +1844,7 @@ unsigned int Inventory::FindStealableItem()
 	slot = core->Roll(1, Slots.size(),-1);
 	inc = slot&1?1:-1;
 
-	print("Start Slot: %d, increment: %d\n", slot, inc);
+	print("Start Slot: %d, increment: %d", slot, inc);
 	//as the unsigned value underflows, it will be greater than Slots.size()
 	for(;slot<Slots.size(); slot+=inc) {
 		CREItem *item = Slots[slot];

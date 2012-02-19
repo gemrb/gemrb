@@ -56,7 +56,7 @@ bool STOImporter::Open(DataStream* stream)
 		//GemRB's internal version with all known fields supported
 		version = 0;
 	} else {
-		print( "[STOImporter]: This file is not a valid STO File\n" );
+		print("[STOImporter]: This file is not a valid STO File");
 		return false;
 	}
 

@@ -52,7 +52,7 @@ int GameScript::Reaction(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr || scr->Type != ST_ACTOR) {
-		parameters->Dump();
+		parameters->dump();
 		return 0;
 	}
 	int value = GetReaction(((Actor*) scr), Sender);
@@ -63,7 +63,7 @@ int GameScript::ReactionGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr || scr->Type != ST_ACTOR) {
-		parameters->Dump();
+		parameters->dump();
 		return 0;
 	}
 	int value = GetReaction(((Actor*) scr), Sender);
@@ -74,7 +74,7 @@ int GameScript::ReactionLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr || scr->Type != ST_ACTOR) {
-		parameters->Dump();
+		parameters->dump();
 		return 0;
 	}
 	int value = GetReaction(((Actor*) scr), Sender);
@@ -2448,9 +2448,9 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
 		if (InDebug&ID_TRIGGERS) {
-			printMessage("GameScript", "Couldn't find door/container:%s\n", LIGHT_RED,
+			Log(ERROR, "GameScript", "Couldn't find door/container:%s",
 				parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-			print("Sender: %s\n", Sender->GetScriptName() );
+			print("Sender: %s", Sender->GetScriptName());
 		}
 		return 0;
 	}
@@ -2467,7 +2467,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		}
 		default:; //to remove a warning
 	}
-	printMessage("GameScript", "Not a door/container:%s\n", LIGHT_RED,
+	Log(ERROR, "GameScript", "Not a door/container:%s",
 		tar->GetScriptName());
 	return 0;
 }
@@ -2476,9 +2476,9 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printMessage("GameScript", "Couldn't find door/container:%s\n", LIGHT_RED,
+		Log(ERROR, "GameScript", "Couldn't find door/container:%s",
 			parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-		print("Sender: %s\n", Sender->GetScriptName() );
+		print("Sender: %s", Sender->GetScriptName());
 		return 0;
 	}
 	switch(tar->Type) {
@@ -2494,7 +2494,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	printMessage("GameScript", "Not a door/container:%s\n", LIGHT_RED,
+	Log(ERROR, "GameScript", "Not a door/container:%s",
 		tar->GetScriptName());
 	return 0;
 }

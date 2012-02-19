@@ -19,76 +19,91 @@
 #include "System/Logging.h"
 
 #include "System/Logger.h"
+#include "System/StringBuffer.h"
 
 #include <cstdarg>
+#include <vector>
 
-static Logger *theLogger = NULL;
+static std::vector<Logger*> theLogger;
 
 void ShutdownLogging()
 {
-	theLogger->destroy();
-	theLogger = NULL;
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->destroy();
+	}
+	theLogger.clear();
 }
 
 void InitializeLogging()
 {
-	theLogger = createDefaultLogger();
+	AddLogger(createDefaultLogger());
+}
+
+void AddLogger(Logger* logger)
+{
+	if (logger)
+		theLogger.push_back(logger);
+}
+
+static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
+{
+	if (theLogger.empty())
+		return;
+
+	// Copied from System/StringBuffer.cpp
+#if defined(_MSC_VER)
+	// Don't try to be smart.
+	// Assume this is long enough. If not, message will be truncated.
+	// MSVC6 has old vsnprintf that doesn't give length
+	const size_t len = 4095;
+#else
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+	const size_t len = vsnprintf(NULL, 0, message, ap_copy);
+	va_end(ap_copy);
+#endif
+
+#if defined(__GNUC__)
+	__extension__ // Variable-length arrays
+#endif
+	char buf[len+1];
+	vsnprintf(buf, len + 1, message, ap);
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->log(level, owner, buf, color);
+	}
 }
 
 void print(const char *message, ...)
 {
-	if (!theLogger)
-		return;
 	va_list ap;
-
 	va_start(ap, message);
-	theLogger->vprint(message, ap);
-	va_end(ap);
-}
-
-void textcolor(log_color c)
-{
-	if (!theLogger)
-		return;
-	theLogger->textcolor(c);
-}
-
-void printBracket(const char* status, log_color color)
-{
-	if (!theLogger)
-		return;
-	theLogger->printBracket(status, color);
-}
-
-void printStatus(const char* status, log_color color)
-{
-	if (!theLogger)
-		return;
-	theLogger->printStatus(status, color);
-}
-
-void printMessage(const char* owner, const char* message, log_color color, ...)
-{
-	if (!theLogger)
-		return;
-	va_list ap;
-
-	va_start(ap, color);
-	theLogger->vprintMessage(owner, message, color, ap);
+	vLog(MESSAGE, "Unknown", message, WHITE, ap);
 	va_end(ap);
 }
 
 void error(const char* owner, const char* message, ...)
 {
-	if (theLogger) {
-		va_list ap;
-
-		va_start(ap, message);
-		theLogger->vprintMessage(owner, message, LIGHT_RED, ap);
-		va_end(ap);
-	}
+	va_list ap;
+	va_start(ap, message);
+	vLog(FATAL, owner, message, LIGHT_RED, ap);
+	va_end(ap);
 
 	ShutdownLogging();
 
 	exit(1);
+}
+
+void Log(log_level level, const char* owner, const char* message, ...)
+{
+	va_list ap;
+	va_start(ap, message);
+	vLog(level, owner, message, WHITE, ap);
+	va_end(ap);
+}
+
+void Log(log_level level, const char* owner, StringBuffer const& buffer)
+{
+	for (size_t i = 0; i < theLogger.size(); ++i) {
+		theLogger[i]->log(level, owner, buffer.get().c_str(), WHITE);
+	}
 }

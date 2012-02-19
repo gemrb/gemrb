@@ -98,8 +98,7 @@ static void FindBIF(BIFEntry *entry)
 		}
 	}
 
-	printMessage("KEYImporter", "Cannot find %s...", WHITE, entry->name);
-	printStatus( "ERROR", LIGHT_RED );
+	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name);
 }
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
@@ -107,48 +106,41 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	free(description);
 	description = strdup(desc);
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
-		print( "[ERROR]\nAn Archive Plug-in is not Available\n" );
+		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;
 	}
 	unsigned int i;
 	// NOTE: Interface::Init has already resolved resfile.
-	printMessage("KEYImporter", "Opening %s...", WHITE, resfile);
+	Log(MESSAGE, "KEYImporter", "Opening %s...", resfile);
 	FileStream* f = FileStream::OpenFile(resfile);
 	if (!f) {
 		// Check for backslashes (false escape characters)
 		// this check probably belongs elsewhere (e.g. ResolveFilePath)
 		if (strstr( resfile, "\\ " )) {
-			print("%s", "\nEscaped space(s) detected in path!. Do not escape spaces in your GamePath! " );
+			Log(MESSAGE, "KEYImporter", "Escaped space(s) detected in path!. Do not escape spaces in your GamePath!");
 		}
-		printStatus( "ERROR", LIGHT_RED );
-		printMessage( "KEYImporter", "Cannot open Chitin.key\n", LIGHT_RED );
-		textcolor( WHITE );
-		print("This means you set the GamePath config variable incorrectly.\n");
-		print("It must point to the directory that holds a readable Chitin.key\n");
+		Log(ERROR, "KEYImporter", "Cannot open Chitin.key");
+		Log(ERROR, "KeyImporter", "This means you set the GamePath config variable incorrectly.");
+		Log(ERROR, "KeyImporter", "It must point to the directory that holds a readable Chitin.key");
 		return false;
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "KEYImporter", "Checking file type...", WHITE );
+	Log(MESSAGE, "KEYImporter", "Checking file type...");
 	char Signature[8];
 	f->Read( Signature, 8 );
 	if (strncmp( Signature, "KEY V1  ", 8 ) != 0) {
-		printStatus( "ERROR", LIGHT_RED );
-		printMessage( "KEYImporter", "File has an Invalid Signature.\n", LIGHT_RED );
-		textcolor( WHITE );
+		Log(ERROR, "KEYImporter", "File has an Invalid Signature.");
 		delete( f );
 		return false;
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "KEYImporter", "Reading Resources...\n", WHITE );
+	Log(MESSAGE, "KEYImporter", "Reading Resources...");
 	ieDword BifCount, ResCount, BifOffset, ResOffset;
 	f->ReadDword( &BifCount );
 	f->ReadDword( &ResCount );
 	f->ReadDword( &BifOffset );
 	f->ReadDword( &ResOffset );
-	printMessage( "KEYImporter", " ", WHITE );
-	print( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
-		BifOffset );
-	printMessage("KEYImporter", "RES Count: %d (Starting at %d Bytes)\n", WHITE,
+	Log(MESSAGE, "KEYImporter", "BIF Files Count: %d (Starting at %d Bytes)",
+			BifCount, BifOffset );
+	Log(MESSAGE, "KEYImporter", "RES Count: %d (Starting at %d Bytes)",
 		ResCount, ResOffset);
 	f->Seek( BifOffset, GEM_STREAM_START );
 
@@ -191,8 +183,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 			resources.set(key, ResLocator);
 	}
 
-	printMessage( "KEYImporter", "Resources Loaded...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
+	Log(MESSAGE, "KEYImporter", "Resources Loaded...");
 	delete( f );
 	return true;
 }
@@ -219,14 +210,14 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	unsigned int bifnum = ( *ResLocator & 0xFFF00000 ) >> 20;
 
 	if (!biffiles[bifnum].found) {
-		print( "Cannot find %s... Resource unavailable.\n",
+		print("Cannot find %s... Resource unavailable.",
 				biffiles[bifnum].name );
 		return NULL;
 	}
 
 	PluginHolder<IndexedArchive> ai(IE_BIF_CLASS_ID);
 	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
-		print("Cannot open archive %s\n", biffiles[bifnum].path );
+		print("Cannot open archive %s", biffiles[bifnum].path);
 		return NULL;
 	}
 

@@ -364,10 +364,10 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 			OnMouseWheelScroll(0, keyScrollSpd);
 			break;
 		case GEM_ALT:
-			print( "ALT pressed\n" );
+			Log(MESSAGE, "WorldMapControl", "ALT pressed");
 			break;
 		case GEM_TAB:
-			print( "TAB pressed\n" );
+			Log(MESSAGE, "WorldMapControl", "TAB pressed");
 			break;
 	}
 }

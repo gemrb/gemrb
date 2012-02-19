@@ -57,7 +57,7 @@ bool CHUImporter::Open(DataStream* stream)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "CHUIV1  ", 8 ) != 0) {
-		printMessage( "CHUImporter","Not a Valid CHU File\n",LIGHT_RED );
+		Log(ERROR, "CHUImporter", "Not a Valid CHU File");
 		return false;
 	}
 	str->ReadDword( &WindowCount );
@@ -104,7 +104,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 		}
 	}
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		printMessage( "CHUImporter","No BAM Importer Available, skipping controls\n",LIGHT_RED );
+		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
 		return win;
 	}
 	for (i = 0; i < ControlsCount; i++) {
@@ -177,7 +177,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					gamedata->GetFactoryResource( BAMFile,
 							IE_BAM_CLASS_ID, IE_NORMAL );
 				if (!bam ) {
-					printMessage( "CHUImporter","Cannot Load Button Images, skipping control\n",LIGHT_RED );
+					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
 					this will handle bad ResRefs */
 					win->AddControl( btn );
@@ -507,7 +507,7 @@ endalign:
 			break;
 
 			default:
-				printMessage( "CHUImporter","Control Not Supported\n",LIGHT_RED );
+				Log(ERROR, "CHUImporter", "Control Not Supported");
 		}
 	}
 	return win;

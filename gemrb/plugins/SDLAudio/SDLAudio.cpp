@@ -91,14 +91,14 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 			break;
 
 		// TODO: this shouldn't be in the callback (see also the openal thread)
-		printMessage("SDLAudio", "Playing Next Music\n", WHITE );
+		Log(MESSAGE, "SDLAudio", "Playing Next Music");
 		core->GetMusicMgr()->PlayNext();
 
 		stream = stream + cnt;
 		len = len - (cnt * 2);
 
 		if (!driver->MusicPlaying) {
-			printMessage( "SDLAudio", "No Other Music to play\n", WHITE );
+			Log(MESSAGE, "SDLAudio", "No Other Music to play");
 			memset(stream, 0, len);
 			Mix_HookMusic(NULL, NULL);
 			break;
@@ -138,7 +138,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 	// TODO: move this loading code somewhere central
 	ResourceHolder<SoundMgr> acm(ResRef);
 	if (!acm) {
-		print("failed acm load\n");
+		print("failed acm load");
 		return Holder<SoundHandle>();
 	}
 	int cnt = acm->get_length();
@@ -170,7 +170,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 	// make SDL_mixer chunk
 	Mix_Chunk *chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len*cvt.len_ratio);
 	if (!chunk) {
-		print("error loading chunk\n");
+		print("error loading chunk");
 		return Holder<SoundHandle>();
 	}
 
@@ -183,7 +183,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 	channel = Mix_PlayChannel(channel, chunk, 0);
 	if (channel < 0) {
 		SDL_mutexV(OurMutex);
-		print("error playing channel\n");
+		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
 
@@ -197,7 +197,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 
 int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
 {
-	print("SDLAudio setting new music\n");
+	print("SDLAudio setting new music");
 	MusicReader = newMusic;
 
 	// TODO
@@ -295,7 +295,7 @@ int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 	(void)gain;
 	(void)point;
 
-	print("SDLAudio allocating stream\n");
+	print("SDLAudio allocating stream");
 
 	// TODO: buggy
 	MusicPlaying = false;
@@ -316,7 +316,7 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 		return false;
 	}
 
-	print("SDLAudio releasing stream\n");
+	print("SDLAudio releasing stream");
 
 	(void)HardStop;
 
@@ -359,7 +359,7 @@ void SDLAudio::QueueBuffer(int stream, unsigned short bits,
 		SDL_AudioCVT cvt;
 		if (SDL_BuildAudioCVT(&cvt, (bits == 8 ? AUDIO_S8 : AUDIO_S16SYS), channels, samplerate,
 				audio_format, audio_channels, audio_rate) == 0) {
-			printMessage("SDLAudio", "Couldn't convert video stream!\ntrying to convert %d bits, %d channels, %d rate\n", RED,
+			Log(ERROR, "SDLAudio", "Couldn't convert video stream! trying to convert %d bits, %d channels, %d rate",
 				bits, channels, samplerate);
 			return;
 		}

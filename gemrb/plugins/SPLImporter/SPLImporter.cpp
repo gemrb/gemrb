@@ -40,8 +40,7 @@ static void Initializer()
 	cgcount = 0;
 	AutoTable tm("cgtable");
 	if (!tm) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find cgtable.2da.\n");
+		Log(ERROR, "SPLImporter", "Cannot find cgtable.2da.");
 		return;
 	}
 	cgcount = tm->GetRowCount();
@@ -101,7 +100,7 @@ bool SPLImporter::Open(DataStream* stream)
 	} else if (strncmp( Signature, "SPL V2.0", 8 ) == 0) {
 		version = 20;
 	} else {
-		print( "[SPLImporter]: This file is not a valid SPL File\n" );
+		print("[SPLImporter]: This file is not a valid SPL File");
 		return false;
 	}
 

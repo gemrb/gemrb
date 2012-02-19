@@ -75,13 +75,11 @@ int SDLVideoDriver::Init(void)
 {
 	//print("[SDLVideoDriver]: Init...");
 	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
-		//print("[ERROR]\n");
+		//print("[ERROR]");
 		return GEM_ERROR;
 	}
 	//print("[OK]\n");
 	SDL_ShowCursor( SDL_DISABLE );
-	return GEM_OK;
-
 	return GEM_OK;
 }
 
@@ -662,7 +660,7 @@ void SDLVideoDriver::BlitSpriteRegion(const Sprite2D* spr, const Region& size, i
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
 	if (spr->BAM) {
-		printMessage( "SDLVideo", "Tile blit not supported for this sprite\n", LIGHT_RED );
+		Log(ERROR, "SDLVideo", "Tile blit not supported for this sprite");
 		return;
 	}
 
@@ -933,7 +931,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
 		if (surf->format->BytesPerPixel != 4) {
 			// TODO...
-			printMessage( "SDLVideo", "BlitGameSprite not supported for this sprite\n", LIGHT_RED );
+			Log(ERROR, "SDLVideo", "BlitGameSprite not supported for this sprite");
 			BlitSprite(spr, x, y, false, clip);
 			return;
 		}
@@ -1187,7 +1185,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// tinted
 		// covered
 
-//		print("Unoptimized blit: %04X\n", flags);
+//		print("Unoptimized blit: %04X", flags);
 
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
@@ -1317,7 +1315,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// transshadow  (impossible with 32bpp)
 		// palettealpha (always set)
 
-//		print("Unoptimized blit: %04X\n", flags);
+//		print("Unoptimized blit: %04X", flags);
 
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS)) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
@@ -1479,7 +1477,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite)
 {
 	if (sprite->BAM) {
-		printMessage( "SDLVideo", "DrawRectSprite not supported for this sprite\n", LIGHT_RED );
+		Log(ERROR, "SDLVideo", "DrawRectSprite not supported for this sprite");
 		return;
 	}
 
@@ -1543,7 +1541,7 @@ inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel)
 
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
-	//print("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
+	//print("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
 	if (clipped) {
 		x += xCorr;
 		y += yCorr;

@@ -1,0 +1,10 @@
+2DA V1.0
+0
+			FLAG          AC
+HUMAN_AASIMAR  0x20000        0
+HUMAN_TIEFLING 0x20000        0
+ELF_DROW       0x20000        0
+DWARF          0x20000        0
+GNOME          0x20000        0
+GNOME_DEEP	0x220000       4
+HALFORC        0x20000        0

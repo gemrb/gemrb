@@ -1503,7 +1503,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 						}
 						break;
 					default:
-						print("Incorrect 16x16 block type!\n");
+						print("Incorrect 16x16 block type!");
 						return -1;
 					}
 					bx++;
@@ -1586,7 +1586,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 					c_bundle[BINK_SRC_COLORS].cur_ptr += 64;
 					break;
 				default:
-					print("Unknown block type!\n");
+					print("Unknown block type!");
 					return -1;
 				}
 			}

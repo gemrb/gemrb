@@ -22,14 +22,12 @@
 
 #include "System/Logger/Stdio.h"
 
-#include <cstdarg>
-
 class GEM_EXPORT Win32ConsoleLogger : public StdioLogger {
 public:
 	Win32ConsoleLogger(bool useColor);
 	virtual ~Win32ConsoleLogger();
 
-	void vprint(const char* message, va_list ap);
+	void print(const char* message);
 	void textcolor(log_color);
 
 private:

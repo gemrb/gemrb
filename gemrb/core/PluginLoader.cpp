@@ -82,7 +82,7 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #else
 #define FREE_PLUGIN( handle )  dlclose( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
-#define PRINT_DLERROR print( "%s\n", dlerror() )
+#define PRINT_DLERROR Log(MESSAGE, "PluginLoader", "Error: %s", dlerror() )
 #endif
 
 /** Return names of all *.so or *.dll files in the given directory */
@@ -127,7 +127,7 @@ void LoadPlugins(char* pluginpath)
 {
 	std::set<PluginID> libs;
 
-	printMessage("PluginMgr", "Loading Plugins from %s\n", WHITE, pluginpath);
+	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
 
 	char path[_MAX_PATH];
 	strcpy( path, pluginpath );
@@ -144,12 +144,6 @@ void LoadPlugins(char* pluginpath)
 		file_count--;
 
 		PathJoin( path, pluginpath, file, NULL );
-		printBracket( "PluginMgr", LIGHT_WHITE );
-		print( ": Loading: " );
-		textcolor( LIGHT_WHITE );
-		print( "%s", path );
-		textcolor( WHITE );
-		print( "..." );
 
 
 		ieDword flags = 0;
@@ -157,17 +151,14 @@ void LoadPlugins(char* pluginpath)
 
 		// module is sent to the back
 		if ((flags == PLF_DELAY) && (file_count >= 0)) {
-			printStatus( "DELAYING", YELLOW );
+			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", path);
 			files.push_back( file );
 			continue;
 		}
 
-		// We do not need the basename anymore now
-		free( file );
-
 		// module is skipped
 		if (flags == PLF_SKIP) {
-			printStatus( "SKIPPING", YELLOW );
+			Log(MESSAGE, "PluginLoader", "Loading \"%s\" skipped.", path);
 			continue;
 		}
 
@@ -183,8 +174,7 @@ void LoadPlugins(char* pluginpath)
 		void* hMod = dlopen( path, RTLD_NOW | RTLD_GLOBAL );
 #endif
 		if (hMod == NULL) {
-			printBracket( "ERROR", LIGHT_RED );
-			print( "\nCannot Load Module, Skipping...\n" );
+			Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", path);
 			PRINT_DLERROR;
 			continue;
 		}
@@ -199,14 +189,12 @@ void LoadPlugins(char* pluginpath)
 
 		//printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {
-			printStatus( "ERROR", LIGHT_RED );
-			print( "Invalid Plug-in, Skipping...\n" );
+			Log(ERROR, "PluginLoader", "Skipping invalid plugin \"%s\".", path);
 			FREE_PLUGIN( hMod );
 			continue;
 		}
 		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
-			printStatus( "ERROR", LIGHT_RED );
-			print( "Plug-in Version not valid, Skipping...\n" );
+			Log(ERROR, "PluginLoader", "Skpping plugin \"%s\" with version mistmatch.", path);
 			FREE_PLUGIN( hMod );
 			continue;
 		}
@@ -215,25 +203,22 @@ void LoadPlugins(char* pluginpath)
 
 		//printStatus( "OK", LIGHT_GREEN );
 		//printMessage( "PluginMgr", "Loading Exports for ", WHITE );
-		print( " " );
-		textcolor( LIGHT_WHITE );
-		print( "%s", desc.Description );
-		textcolor( WHITE );
-		print( "..." );
-		printStatus( "OK", LIGHT_GREEN );
 		if (libs.find(desc.ID) != libs.end()) {
-			printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );
-			printStatus( "SKIPPING", YELLOW );
+			Log(WARNING, "PluginLoader", "Plug-in \"%s\" already loaded!", path);
 			FREE_PLUGIN( hMod );
 			continue;
 		}
 		if (desc.Register != NULL) {
 			if (!desc.Register(PluginMgr::Get())) {
-				printMessage( "PluginMgr", "Plug-in Registration Failed! Perhaps a duplicate? ", WHITE );
-				printStatus( "SKIPPING", YELLOW );
+				Log(WARNING, "PluginLoader", "Plugin Registration Failed! Perhaps a duplicate?");
 				FREE_PLUGIN( hMod );
 			}
 		}
 		libs.insert(desc.ID);
+
+		Log(MESSAGE, "PluginLoader", "Loaded plugin \"%s\" (%s).", desc.Description, file);
+
+		// We do not need the basename anymore now
+		free( file );
 	}
 }

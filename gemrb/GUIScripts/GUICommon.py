@@ -720,7 +720,7 @@ def SetupDamageInfo (pc, Button):
 	if hp < 1 or (state & STATE_DEAD):
 		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
 	else:
-		Button.SetOverlay (ratio, 140,0,0,205, 128,0,0,200)
+		Button.SetOverlay (ratio, 60,0,0,195, 60,0,0,190)
 	ratio_str = "\n%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 
@@ -764,3 +764,22 @@ def ResolveKey():
 
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)
+
+class _stdioWrapper(object):
+	def __init__(self, log_level):
+		self.log_level = log_level
+		self.buffer = ""
+	def write(self, message):
+		self.buffer += str(message)
+		if self.buffer.endswith("\n"):
+			out = self.buffer.rstrip("\n")
+			if out:
+				GemRB.Log(self.log_level, "Python", out)
+			self.buffer = ""
+
+def _wrapStdio():
+	import sys
+	sys.stdout = _stdioWrapper(LOG_MESSAGE)
+	sys.stderr = _stdioWrapper(LOG_ERROR)
+
+_wrapStdio()

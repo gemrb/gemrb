@@ -29,57 +29,60 @@
 #include "exports.h"
 #include "win32def.h"
 
-#ifndef WIN32
-# include <config.h>
-# include <cstdio>
-# include <cstdlib>
+#ifdef WIN32
+# undef ERROR
 #endif
-
-enum log_color {
-	DEFAULT,
-	BLACK,
-	RED,
-	GREEN,
-	BROWN,
-	BLUE,
-	MAGENTA,
-	CYAN,
-	WHITE,
-	LIGHT_RED,
-	LIGHT_GREEN,
-	YELLOW,
-	LIGHT_BLUE,
-	LIGHT_MAGENTA,
-	LIGHT_CYAN,
-	LIGHT_WHITE
+// !!! Keep this synchronized with GUIDefines !!!
+enum log_level {
+	FATAL = 0,
+	ERROR = 1,
+	WARNING = 2,
+	MESSAGE = 3,
+	COMBAT = 4,
+	DEBUG = 5
 };
 
+class Logger;
+class StringBuffer;
+
 GEM_EXPORT void InitializeLogging();
+GEM_EXPORT void AddLogger(Logger*);
 GEM_EXPORT void ShutdownLogging();
 
-GEM_EXPORT void print(const char* message, ...)
 #if defined(__GNUC__)
-    __attribute__ ((format(printf, 1, 2)))
+# define PRINTF_FORMAT(x, y) \
+    __attribute__ ((format(printf, x, y)))
+#else
+# define PRINTF_FORMAT(x, y)
 #endif
-	;
-GEM_EXPORT void textcolor(log_color);
-GEM_EXPORT void printBracket(const char *status, log_color color);
-GEM_EXPORT void printStatus(const char* status, log_color color);
-GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color, ...)
-#if defined(__GNUC__)
-    __attribute__ ((format(printf, 2, 4)))
-#endif
-	;
 
-GEM_EXPORT void error(const char* owner, const char* message, ...)
 #if defined(__GNUC__)
-	__attribute__ ((format(printf, 2, 3), noreturn))
+# define NORETURN __attribute__ ((noreturn))
+#elif defined(_MSC_VER)
+# define NORETURN __declspec(noreturn)
+#else
+# define NORETURN
 #endif
-	;
+
+GEM_EXPORT void print(const char* message, ...)
+	PRINTF_FORMAT(1, 2);
+
+/// Log an error, and exit.
+NORETURN
+GEM_EXPORT void error(const char* owner, const char* message, ...)
+	PRINTF_FORMAT(2, 3);
+
+GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
+	PRINTF_FORMAT(3, 4);
+
+GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
+
+#undef PRINTF_FORMAT
+#undef NORETURN
 
 // poison printf
 #if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))
-extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use print instead.")));
+extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use Log instead.")));
 #elif __GNUC__ >= 4
 extern "C" int printf(const char* message, ...) __attribute__ ((deprecated));
 #endif

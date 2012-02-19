@@ -63,6 +63,17 @@ def SetRaceResistances(MyChar, racetitle):
 	GemRB.SetPlayerStat (MyChar, IE_RESISTCRUSHING, resistances.GetValue ( racetitle, "BLUDGEONING") )
 	GemRB.SetPlayerStat (MyChar, IE_RESISTPIERCING, resistances.GetValue ( racetitle, "PIERCING") )
 	GemRB.SetPlayerStat (MyChar, IE_RESISTMISSILE, resistances.GetValue ( racetitle, "MISSILE") )
+
+	resistances = GemRB.LoadTable ("raceflag")
+
+	#set infravision and nondetection
+	orig = GemRB.GetPlayerStat (MyChar, IE_STATE_ID, 0)
+	GemRB.SetPlayerStat (MyChar, IE_STATE_ID, orig | resistances.GetValue( racetitle, "FLAG") )
+
+	#set base AC
+	orig = GemRB.GetPlayerStat (MyChar, IE_ARMORCLASS, 0)
+	GemRB.SetPlayerStat (MyChar, IE_ARMORCLASS, orig + resistances.GetValue( racetitle, "AC") )
+
 	return
 
 def ClearPress():

@@ -44,6 +44,7 @@ OldOptionsWindow = None
 MoviesWindow = None
 KeysWindow = None
 HelpTextArea = None
+HelpTextArea2 = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
@@ -278,7 +279,7 @@ def CloseCharacterSoundsWindow ():
 
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
-	global SubSubOptionsWindow, HelpTextArea
+	global SubSubOptionsWindow, HelpTextArea2
 
 	if SubSubOptionsWindow:
 		if SubSubOptionsWindow:
@@ -287,7 +288,7 @@ def OpenCharacterSoundsWindow ():
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (12)
 
-	HelpTextArea = OptHelpText ('CharacterSounds', Window, 16, 18041)
+	HelpTextArea2 = OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	OptDone ('CharacterSounds', Window, 24)
 	OptCancel ('CharacterSounds', Window, 25)
@@ -305,19 +306,19 @@ def OpenCharacterSoundsWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def DisplayHelpSubtitles ():
-	HelpTextArea.SetText (18015)
+	HelpTextArea2.SetText (18015)
 
 def DisplayHelpAttackSounds ():
-	HelpTextArea.SetText (18013)
+	HelpTextArea2.SetText (18013)
 
 def DisplayHelpFootsteps ():
-	HelpTextArea.SetText (18014)
+	HelpTextArea2.SetText (18014)
 
 def DisplayHelpCommandSounds ():
-	HelpTextArea.SetText (18016)
+	HelpTextArea2.SetText (18016)
 
 def DisplayHelpSelectionSounds ():
-	HelpTextArea.SetText (11352)
+	HelpTextArea2.SetText (11352)
 
 ###################################################
 
@@ -406,7 +407,7 @@ def CloseFeedbackOptionsWindow ():
 
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
-	global SubSubOptionsWindow, HelpTextArea
+	global SubSubOptionsWindow, HelpTextArea2
 
 	if SubSubOptionsWindow:
 		if SubSubOptionsWindow:
@@ -415,7 +416,7 @@ def OpenFeedbackOptionsWindow ():
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (9)
 
-	HelpTextArea = OptHelpText ('FeedbackOptions', Window, 28, 18043)
+	HelpTextArea2 = OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
 	OptDone ('FeedbackOptions', Window, 26)
 	OptCancel ('FeedbackOptions', Window, 27)
@@ -434,28 +435,28 @@ def OpenFeedbackOptionsWindow ():
 	return
 
 def DisplayHelpMarkerFeedback ():
-	HelpTextArea.SetText (18024)
+	HelpTextArea2.SetText (18024)
 
 def DisplayHelpLocatorFeedback ():
-	HelpTextArea.SetText (18025)
+	HelpTextArea2.SetText (18025)
 
 def DisplayHelpToHitRolls ():
-	HelpTextArea.SetText (18026)
+	HelpTextArea2.SetText (18026)
 
 def DisplayHelpCombatInfo ():
-	HelpTextArea.SetText (18027)
+	HelpTextArea2.SetText (18027)
 
 def DisplayHelpActions ():
-	HelpTextArea.SetText (18028)
+	HelpTextArea2.SetText (18028)
 
 def DisplayHelpStates ():
-	HelpTextArea.SetText (18029)
+	HelpTextArea2.SetText (18029)
 
 def DisplayHelpSelection ():
-	HelpTextArea.SetText (18030)
+	HelpTextArea2.SetText (18030)
 
 def DisplayHelpMiscellaneous ():
-	HelpTextArea.SetText (18031)
+	HelpTextArea2.SetText (18031)
 
 ###################################################
 
@@ -469,7 +470,7 @@ def CloseAutopauseOptionsWindow ():
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
-	global SubSubOptionsWindow, HelpTextArea
+	global SubSubOptionsWindow, HelpTextArea2
 
 	if SubSubOptionsWindow:
 		if SubSubOptionsWindow:
@@ -478,7 +479,7 @@ def OpenAutopauseOptionsWindow ():
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (10)
 
-	HelpTextArea = OptHelpText ('AutopauseOptions', Window, 15, 18044)
+	HelpTextArea2 = OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
 	OptDone ('AutopauseOptions', Window, 11)
 	OptCancel ('AutopauseOptions', Window, 14)
@@ -501,37 +502,37 @@ def OpenAutopauseOptionsWindow ():
 	return
 
 def DisplayHelpCharacterHit ():
-	HelpTextArea.SetText (18032)
+	HelpTextArea2.SetText (18032)
 
 def DisplayHelpCharacterInjured ():
-	HelpTextArea.SetText (18033)
+	HelpTextArea2.SetText (18033)
 
 def DisplayHelpCharacterDead ():
-	HelpTextArea.SetText (18034)
+	HelpTextArea2.SetText (18034)
 
 def DisplayHelpCharacterAttacked ():
-	HelpTextArea.SetText (18035)
+	HelpTextArea2.SetText (18035)
 
 def DisplayHelpWeaponUnusable ():
-	HelpTextArea.SetText (18036)
+	HelpTextArea2.SetText (18036)
 
 def DisplayHelpTargetGone ():
-	HelpTextArea.SetText (18037)
+	HelpTextArea2.SetText (18037)
 
 def DisplayHelpEndOfRound ():
-	HelpTextArea.SetText (10640)
+	HelpTextArea2.SetText (10640)
 
 def DisplayHelpEnemySighted ():
-	HelpTextArea.SetText (23514)
+	HelpTextArea2.SetText (23514)
 
 def DisplayHelpSpellCast ():
-	HelpTextArea.SetText (58171)
+	HelpTextArea2.SetText (58171)
 
 def DisplayHelpTrapFound ():
-	HelpTextArea.SetText (31872)
+	HelpTextArea2.SetText (31872)
 
 def DisplayHelpCenterOnActor ():
-	HelpTextArea.SetText (10571)
+	HelpTextArea2.SetText (10571)
 
 ###################################################
 

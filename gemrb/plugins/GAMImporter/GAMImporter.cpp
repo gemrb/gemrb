@@ -93,7 +93,7 @@ bool GAMImporter::Open(DataStream* stream)
 			version=GAM_VER_BG;
 		}
 	} else {
-		printMessage( "GAMImporter","This file is not a valid GAM File\n", LIGHT_RED );
+		Log(ERROR, "GAMImporter", "This file is not a valid GAM File");
 		return false;
 	}
 
@@ -325,7 +325,7 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 		return;
 	}
 	if (b==0xffff) {
-		printMessage("GAMImporter", "Invalid Slot Enabler caught: %s!\n", LIGHT_RED, message);
+		Log(ERROR, "GAMImporter", "Invalid Slot Enabler caught: %s!", message);
 		b=0;
 	}
 }

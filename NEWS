@@ -1,11 +1,14 @@
-GemRB git (601e49a):
+GemRB git (7efafe09f):
   New features:
+    - 
+    - support for logging to file directly
     - encumbrance penalties in movement
     - iwd2 armor penalty and critical hit multiplier
-    - many iwd2 feats
+    - most iwd2 feats
 
   Improved features:
     - 
+    - config loading, logging
     - (iwd2) effects, combat
     - cocoa wrapper and mac build, cursor handling
     - bugfixes

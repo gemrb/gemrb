@@ -63,7 +63,7 @@ bool CTlkOverride::Init()
 	memset(Signature,0,8);
 	toh_str->Read( Signature, 4 );
 	if (strncmp( Signature, "TLK ", 4 ) != 0) {
-		printMessage("TLKImporter", "Not a valid TOH file.\n", LIGHT_RED);
+		Log(ERROR, "TLKImporter", "Not a valid TOH file.");
 		return false;
 	}
 	toh_str->Seek( 8, GEM_CURRENT_POS );
@@ -72,7 +72,7 @@ bool CTlkOverride::Init()
 	tot_str->ReadDword( &FreeOffset );
 	tot_str->Read(Signature,4);
 	if (strncmp( Signature, "\xff\xff\xff\xff",4) !=0) {
-		printMessage("TLKImporter", "Not a valid TOT file.\n", LIGHT_RED);
+		Log(ERROR, "TLKImporter", "Not a valid TOT file.");
 		return false;
 	}
 

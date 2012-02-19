@@ -25,6 +25,7 @@
 #include "Resource.h"
 #include "ResourceDesc.h"
 #include "ResourceSource.h"
+#include "System/StringBuffer.h"
 
 ResourceManager::ResourceManager()
 {
@@ -39,7 +40,7 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 {
 	PluginHolder<ResourceSource> source(type);
 	if (!source->Open(path, description)) {
-		printMessage("ResourceManager","Invalid path given: %s (%s)\n", YELLOW, path, description);
+		Log(WARNING, "ResourceManager", "Invalid path given: %s (%s)", path, description);
 		return false;
 	}
 
@@ -56,11 +57,11 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 	return true;
 }
 
-static void PrintPossibleFiles(const char* ResRef, const TypeID *type)
+static void PrintPossibleFiles(StringBuffer& buffer, const char* ResRef, const TypeID *type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
-		print("%s.%s ", ResRef, types[j].GetExt());
+		buffer.appendFormatted("%s.%s ", ResRef, types[j].GetExt());
 	}
 }
 
@@ -75,9 +76,8 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) co
 		}
 	}
 	if (!silent) {
-		printMessage("ResourceManager", "Searching for %s.%s...", WHITE,
+		Log(WARNING, "ResourceManager", "'%s.%s' not found...",
 			ResRef, core->TypeExt(type));
-		printStatus( "NOT FOUND", YELLOW );
 	}
 	return false;
 }
@@ -96,10 +96,11 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 		}
 	}
 	if (!silent) {
-		printMessage("ResourceManager", "Searching for %s... ", WHITE, ResRef);
-		print("Tried ");
-		PrintPossibleFiles(ResRef,type);
-		printStatus( "NOT FOUND", YELLOW );
+		StringBuffer buffer;
+		buffer.appendFormatted("Couldn't find '%s'... ", ResRef);
+		buffer.append("Tried ");
+		PrintPossibleFiles(buffer, ResRef,type);
+		Log(WARNING, "ResourceManager", buffer);
 	}
 	return false;
 }
@@ -108,21 +109,19 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 {
 	if (ResRef[0] == '\0')
 		return NULL;
-	if (!silent) {
-		printMessage("ResourceManager", "Searching for %s.%s...", WHITE,
-			ResRef, core->TypeExt(type));
-	}
 	for (size_t i = 0; i < searchPath.size(); i++) {
 		DataStream *ds = searchPath[i]->GetResource(ResRef, type);
 		if (ds) {
 			if (!silent) {
-				printStatus( searchPath[i]->GetDescription(), GREEN );
+				Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
+					ResRef, core->TypeExt(type), searchPath[i]->GetDescription());
 			}
 			return ds;
 		}
 	}
 	if (!silent) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "ResourceManager", "Couldn't find '%s.%s'.",
+			ResRef, core->TypeExt(type));
 	}
 	return NULL;
 }
@@ -132,7 +131,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 	if (ResRef[0] == '\0')
 		return NULL;
 	if (!silent) {
-		printMessage("ResourceManager", "Searching for %s... ", WHITE, ResRef);
+		Log(MESSAGE, "ResourceManager", "Searching for '%s'...", ResRef);
 	}
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
@@ -142,8 +141,8 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 				Resource *res = types[j].Create(str);
 				if (res) {
 					if (!silent) {
-						print( "%s.%s...", ResRef, types[j].GetExt() );
-						printStatus( searchPath[i]->GetDescription(), GREEN );
+						Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
+							ResRef, types[j].GetExt(), searchPath[i]->GetDescription());
 					}
 					return res;
 				}
@@ -151,9 +150,11 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 		}
 	}
 	if (!silent) {
-		print("Tried ");
-		PrintPossibleFiles(ResRef,type);
-		printStatus( "ERROR", LIGHT_RED );
+		StringBuffer buffer;
+		buffer.appendFormatted("Couldn't find '%s'... ", ResRef);
+		buffer.append("Tried ");
+		PrintPossibleFiles(buffer, ResRef,type);
+		Log(WARNING, "ResourceManager", buffer);
 	}
 	return NULL;
 }

@@ -43,7 +43,7 @@ def FindTextRow (Table):
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter, TableName, Row, Ticks
 
-	GemRB.GamePause (1, 1)
+	GemRB.GamePause (1, 3)
 	GemRB.DisplayString (17556, 0xff0000) #Paused for chapter text
 
 	if GUICommon.GameIsIWD2():
@@ -155,7 +155,7 @@ def EndTextScreen ():
 		GemRB.PlaySound(None, 0, 0, 4)
 	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
 	GemRB.UnhideGUI ()
-	GemRB.GamePause (0, 1)
+	GemRB.GamePause (0, 3)
 	return
 
 def ReplayTextScreen ():

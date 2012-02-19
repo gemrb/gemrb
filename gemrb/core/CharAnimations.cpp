@@ -514,9 +514,8 @@ void CharAnimations::InitAvatarsTable()
 			valid_number(blood->QueryField(i,1), (long &)rmin);
 			valid_number(blood->QueryField(i,2), (long &)rmax);
 			if (value>255 || rmin>0xffff || rmax>0xffff) {
-				printMessage("CharAnimations", "bloodclr entry: %02x %04x-%04x ", LIGHT_RED,
+				Log(ERROR, "CharAnimations", "Invalid, bloodclr entry: %02x %04x-%04x ",
 						(unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
-				printStatus("Invalid value!", LIGHT_RED);
 				continue;
 			}
 			for(int j=0;j<AvatarsCount;j++) {
@@ -612,7 +611,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		}
 	}
 	ResRef[0]=0;
-	printMessage("CharAnimations", "Invalid or nonexistent avatar entry:%04X\n", LIGHT_RED, AnimID);
+	Log(ERROR, "CharAnimations", "Invalid or nonexistent avatar entry:%04X", AnimID);
 }
 
 //we have to drop them when armourlevel changes
@@ -865,7 +864,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			autoSwitchOnEnd = true;
 			break;
 		default:
-			print ("Invalid Stance: %d\n", StanceID);
+			Log(MESSAGE, "CharAnimation", "Invalid Stance: %d", StanceID);
 			break;
 	}
 	Animation** anims = Anims[StanceID][Orient];
@@ -932,8 +931,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		if (!af) {
 			if (part < actorPartCount) {
-				printMessage("CharAnimations", "Couldn't create animationfactory: %s (%04x)\n",
-					LIGHT_RED, NewResRef, GetAnimationID());;
+				Log(ERROR, "CharAnimations", "Couldn't create animationfactory: %s (%04x)",
+						NewResRef, GetAnimationID());;
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;
@@ -950,7 +949,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		if (!a) {
 			if (part < actorPartCount) {
-				printMessage("CharAnimations", "Couldn't load animation: %s, cycle %d\n", LIGHT_RED,
+				Log(ERROR, "CharAnimations", "Couldn't load animation: %s, cycle %d",
 						 NewResRef, Cycle);
 				for (int i = 0; i < part; ++i)
 					delete anims[i];

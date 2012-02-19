@@ -103,7 +103,7 @@ void TLKImporter::OpenAux()
 	if (override) {
 		if (!override->Init()) {
 			CloseAux();
-			printMessage("TlkImporter","Cannot open tlk override!\n", LIGHT_RED);
+			Log(ERROR, "TlkImporter", "Cannot open tlk override!");
 		}
 	}
 }
@@ -118,7 +118,7 @@ bool TLKImporter::Open(DataStream* stream)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "TLK\x20V1\x20\x20", 8 ) != 0) {
-		printMessage( "TLKImporter","Not a valid TLK File.\n", LIGHT_RED );
+		Log(ERROR, "TLKImporter", "Not a valid TLK File.");
 		return false;
 	}
 	str->Seek( 2, GEM_CURRENT_POS );
@@ -364,7 +364,7 @@ bool TLKImporter::GetNewStringLength(char* string, int& Length)
 ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 {
 	if (!override) {
-		printMessage("TLKImporter", "Custom string is not supported by this game format.\n", LIGHT_RED);
+		Log(ERROR, "TLKImporter", "Custom string is not supported by this game format.");
 		return 0xffffffff;
 	}
 
@@ -372,7 +372,7 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 		return override->UpdateString(strref, newvalue);
 	}
 
-	printMessage("TLKImporter", "Cannot set custom string.\n", LIGHT_RED);
+	Log(ERROR, "TLKImporter", "Cannot set custom string.");
 	return 0xffffffff;
 }
 

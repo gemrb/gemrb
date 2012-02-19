@@ -204,7 +204,7 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 void Scriptable::SetScript(int index, GameScript* script)
 {
 	if (index >= MAX_SCRIPTS) {
-		printMessage("Scriptable","Invalid script index!\n",LIGHT_RED);
+		Log(ERROR, "Scriptable", "Invalid script index!");
 		return;
 	}
 	if (Scripts[index] ) {
@@ -428,7 +428,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		print( "[GameScript]: NULL action encountered for %s!\n",scriptName );
+		print("[GameScript]: NULL action encountered for %s!", scriptName);
 		return;
 	}
 
@@ -455,7 +455,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		print( "[GameScript]: NULL action encountered for %s!\n",scriptName );
+		print("[GameScript]: NULL action encountered for %s!", scriptName);
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
@@ -526,7 +526,7 @@ void Scriptable::ProcessActions()
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
 			if (! (CurrentActionTicks == 0 && CurrentActionState == 0)) {
-				print("Last action: %d\n", lastAction);
+				print("Last action: %d", lastAction);
 			}
 			assert(CurrentActionTicks == 0 && CurrentActionState == 0);
 			CurrentAction = PopNextAction();
@@ -989,7 +989,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 	Spell* spl = gamedata->GetSpell(SpellResRef);
 	if (!spl) {
 		SpellHeader = -1;
-		printMessage("Scriptable", "Spell not found, aborting cast!\n", LIGHT_RED);
+		Log(ERROR, "Scriptable", "Spell not found, aborting cast!");
 		return 0;
 	}
 
@@ -1016,7 +1016,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		// we (also) ignore nonmagic spells
 		if (actor->CheckSilenced()) {
 			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
-				printMessage("Scriptable", "Tried to cast while silenced!\n", YELLOW);
+				Log(WARNING, "Scriptable", "Tried to cast while silenced!");
 				return 0;
 			}
 		}
@@ -1070,7 +1070,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete) ) {
-			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
+			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
 			return -1;
 		}
 	}
@@ -1101,7 +1101,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete) ) {
-			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
+			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
 			return -1;
 		}
 	}
@@ -1367,7 +1367,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 		default:
 			SpellHeader = -1;
 			SpellResRef[0] = 0;
-			printMessage("Scriptable", "New spell not found, aborting cast mid-surge!\n", LIGHT_RED);
+			Log(ERROR, "Scriptable", "New spell not found, aborting cast mid-surge!");
 			caster->SetStance(IE_ANI_READY);
 			return false;
 	}
@@ -1428,7 +1428,7 @@ bool Scriptable::TimerExpired(ieDword ID)
 void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
 	if (ID>=MAX_TIMER) {
-		printMessage("Scriptable", "Timer id %d exceeded MAX_TIMER %d\n", RED,
+		Log(ERROR, "Scriptable", "Timer id %d exceeded MAX_TIMER %d",
 			ID, MAX_TIMER);
 		return;
 	}
@@ -1775,7 +1775,7 @@ void Movable::SetStance(unsigned int arg)
 	//don't modify stance from dead back to anything if the actor is dead
 	if ((StanceID==IE_ANI_TWITCH || StanceID==IE_ANI_DIE) && (arg!=IE_ANI_TWITCH) ) {
 		if (GetInternalFlag()&IF_REALLYDIED) {
-			printMessage("Movable","Stance overridden by death\n", YELLOW);
+			Log(WARNING, "Movable", "Stance overridden by death");
 			return;
 		}
 	}
@@ -1806,7 +1806,7 @@ void Movable::SetStance(unsigned int arg)
 
 	} else {
 		StanceID=IE_ANI_AWAKE; //
-		print("Tried to set invalid stance id (%u)\n", arg);
+		print("Tried to set invalid stance id(%u)", arg);
 	}
 }
 
@@ -1881,7 +1881,7 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 		step = path;
 		timeStartStep = time;
 	} else if (step->Next && (( time - timeStartStep ) >= walk_speed)) {
-		//print("[New Step] : Orientation = %d\n", step->orient);
+		//print("[New Step] : Orientation = %d", step->orient);
 		step = step->Next;
 		timeStartStep = timeStartStep + walk_speed;
 	}

@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2011 The GemRB Project
+ * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,29 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger/Apple.h"
+#ifndef LOGGER_FILE_H
+#define LOGGER_FILE_H
 
-#include "System/Logging.h"
+#include "System/Logger/Stdio.h"
 
-/*
-TODO: currently this is a clone of Stdio logger without color.
- I want to re write this to use Apple logging faculties so that
- Console.app can be used to see errors easily.
- 
- When the new Logging API is in place we can have fatal errors use GUI alerts.
-*/
+class DataStream;
 
-AppleLogger::AppleLogger()
-	: StdioLogger(false)
-{}
+class GEM_EXPORT FileLogger : public StdioLogger {
+public:
+	FileLogger(DataStream*);
+	virtual ~FileLogger();
 
-AppleLogger::~AppleLogger()
-{}
+	void vprint(const char* message, va_list ap);
 
-void AppleLogger::textcolor(log_color /*c*/)
-{}
+private:
+	DataStream* log_file;
+};
 
-Logger* createAppleLogger()
-{
-	return new AppleLogger();
-}
+Logger* createFileLogger(DataStream*);
+
+#endif

@@ -408,7 +408,6 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		}
 		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress) {
 			RunEventHandler( ButtonOnDoublePress );
-			printMessage("Button","Doubleclick detected\n",GREEN);
 		}
 		break;
 	case GEM_MB_SCRLUP:

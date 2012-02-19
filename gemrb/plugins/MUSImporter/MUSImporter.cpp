@@ -74,12 +74,11 @@ bool MUSImporter::OpenPlaylist(const char* name)
 	}
 	char path[_MAX_PATH];
 	PathJoin(path, core->GamePath, musicsubfolder, name, NULL);
-	printMessage("MUSImporter", "Loading %s...", WHITE, path);
+	Log(MESSAGE, "MUSImporter", "Loading %s...", path);
 	if (!str->Open(path)) {
-		printStatus("NOT FOUND", LIGHT_RED );
+		Log(ERROR, "MUSImporter", "Didn't find playlist '%s'.", path);
 		return false;
 	}
-	printStatus("FOUND", LIGHT_GREEN );
 	int c = str->ReadLine( PLName, 32 );
 	while (c > 0) {
 		if (( PLName[c - 1] == ' ' ) || ( PLName[c - 1] == '\t' ))
@@ -317,7 +316,7 @@ void MUSImporter::PlayMusic(char* name)
 	} else {
 		core->GetAudioDrv()->Stop();
 	}
-	print( "Playing: %s\n", FName );
+	print("Playing: %s", FName);
 }
 
 bool MUSImporter::CurrentPlayList(const char* name) {

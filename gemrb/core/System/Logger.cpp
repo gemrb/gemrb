@@ -33,20 +33,24 @@ void Logger::destroy()
 	delete this;
 }
 
+const char* log_level_text[] = {
+	"FATAL",
+	"ERROR",
+	"WARNING",
+	"", // MESSAGE
+	"COMBAT",
+	"DEBUG"
+};
+
 #ifdef ANDROID
 
 #include "System/Logger/Android.h"
 Logger* (*createDefaultLogger)() = createAndroidLogger;
 
-#elif defined (__APPLE__)
-
-#include "System/Logger/Apple.h"
-Logger* (*createDefaultLogger)() = createAppleLogger;
-
 #elif defined(WIN32) && !defined(WIN32_USE_STDIO)
 
 #include "System/Logger/Win32Console.h"
-Logger* (*createDefaultLogger)() = createStdioLogger;
+Logger* (*createDefaultLogger)() = createWin32ConsoleLogger;
 
 #else
 

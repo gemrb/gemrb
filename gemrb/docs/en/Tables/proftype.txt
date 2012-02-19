@@ -1,0 +1,6 @@
+Description: This table contains itemtype->weapon proficiency mapping.
+
+Columns - 
+PROFICIENCY - the weapon proficiency index (not a stat number).
+
+Rows - item types, make sure it is continuous from zero.

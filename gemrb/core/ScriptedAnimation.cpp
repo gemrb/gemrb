@@ -243,7 +243,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 	stream->Read( Signature, 8);
 	if (strncmp( Signature, "VVC V1.0", 8 ) != 0) {
-		print( "Not a valid VVC File\n" );
+		print("Not a valid VVC File");
 		delete stream;
 		return;
 	}
@@ -548,7 +548,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 
 	if (justCreated) {
 		if (Phase == P_NOTINITED) {
-			printMessage("ScriptedAnimation", "Not fully initialised VVC!\n", LIGHT_RED);
+			Log(ERROR, "ScriptedAnimation", "Not fully initialised VVC!");
 			return true;
 		}
 		unsigned long time;

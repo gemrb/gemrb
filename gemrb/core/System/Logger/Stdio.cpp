@@ -29,9 +29,9 @@ StdioLogger::StdioLogger(bool useColor)
 StdioLogger::~StdioLogger()
 {}
 
-void StdioLogger::vprint(const char *message, va_list ap)
+void StdioLogger::print(const char* message)
 {
-	vprintf(message, ap);
+	fprintf(stdout, "%s", message);
 }
 
 static const char* colors[] = {
@@ -59,7 +59,7 @@ void StdioLogger::textcolor(log_color c)
 	// Shold this be in an ansi-term subclass?
 	// Probably not worth the bother
 	if (useColor)
-		print("%s", colors[c]);
+		print(colors[c]);
 }
 
 void StdioLogger::printBracket(const char* status, log_color color)
@@ -67,7 +67,7 @@ void StdioLogger::printBracket(const char* status, log_color color)
 	textcolor(WHITE);
 	print("[");
 	textcolor(color);
-	print("%s", status);
+	print(status);
 	textcolor(WHITE);
 	print("]");
 }
@@ -78,13 +78,36 @@ void StdioLogger::printStatus(const char* status, log_color color)
 	print("\n");
 }
 
-void StdioLogger::vprintMessage(const char* owner, const char* message, log_color color, va_list ap)
-{
-	printBracket(owner, LIGHT_WHITE);
-	print(": ");
-	textcolor(color);
+static log_color log_level_color[] = {
+	LIGHT_RED,
+	LIGHT_RED,
+	YELLOW,
+	LIGHT_WHITE,
+	GREEN,
+	BLUE
+};
 
-	vprint(message, ap);
+void StdioLogger::log(log_level level, const char* owner, const char* message, log_color color)
+{
+	textcolor(LIGHT_WHITE);
+	print("[");
+	print(owner);
+	if (log_level_text[level][0]) {
+		print("/");
+		textcolor(log_level_color[level]);
+		print(log_level_text[level]);
+	}
+	textcolor(LIGHT_WHITE);
+	print("]: ");
+
+	textcolor(color);
+	print(message);
+	print("\n");
+}
+
+void StdioLogger::destroy()
+{
+	textcolor(DEFAULT);
 }
 
 Logger* createStdioLogger()

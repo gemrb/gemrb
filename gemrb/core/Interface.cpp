@@ -114,8 +114,7 @@ Interface::Interface(int iargc, char* iargv[])
 	argc = iargc;
 	argv = iargv;
 
-	textcolor( LIGHT_WHITE );
-	print( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
+	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 
 	// default to the correct endianswitch
 	ieWord endiantest = 1;
@@ -668,7 +667,7 @@ void Interface::HandleFlags()
 				gc->ChangeMap(actor, true);
 			}
 		} else {
-			printMessage("Core", "No game to enter...\n", LIGHT_RED);
+			Log(ERROR, "Core", "No game to enter...");
 			QuitFlag = QF_QUITGAME;
 		}
 	}
@@ -1179,8 +1178,7 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 	}
 	AutoTable tm(tablename);
 	if (!tm) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find %s.2da.\n",tablename );
+		Log(ERROR, "Core", "Cannot find %s.2da.", tablename);
 		return 0;
 	}
 	count = tm->GetRowCount();
@@ -1200,11 +1198,11 @@ int Interface::LoadSprites()
 	ieDword i;
 	int size;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
-		print( "No 2DA Importer Available.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "No 2DA Importer Available.");
 		return GEM_ERROR;
 	}
 
-	//loading cursors
+	Log(MESSAGE, "Core", "Loading Cursors...");
 	AnimationFactory* anim;
 	anim = (AnimationFactory*) gamedata->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
 	if (anim)
@@ -1215,23 +1213,22 @@ int Interface::LoadSprites()
 			Cursors[i] = anim->GetFrame( 0, (ieByte) i );
 		}
 	}
-	printMessage( "Core", "Loading Cursors...", WHITE );
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to load enough cursors (%d < %d).",
+				CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
 	video->SetCursor( Cursors[0], VID_CUR_UP );
 	video->SetCursor( Cursors[1], VID_CUR_DOWN );
-	printStatus( "OK", LIGHT_GREEN );
 
 	// Load fog-of-war bitmaps
 	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
-	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
+	Log(MESSAGE, "Core", "Loading Fog-Of-War bitmaps...");
 	if (!anim || anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to load Fog-of-War bitmaps.");
 		return GEM_ERROR;
 	}
 
@@ -1299,8 +1296,6 @@ int Interface::LoadSprites()
 		}
 	}
 
-	printStatus( "OK", LIGHT_GREEN );
-
 	// Load ground circle bitmaps (PST only)
 	//block required due to msvc6.0 incompatibility
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
@@ -1308,8 +1303,7 @@ int Interface::LoadSprites()
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
-				printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
-				printStatus( "ERROR", LIGHT_RED );
+				Log(ERROR, "Core", "Loading Ground circle bitmaps...");
 				return GEM_ERROR;
 			}
 
@@ -1325,14 +1319,12 @@ int Interface::LoadSprites()
 		}
 	}
 
-	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
+	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 
-	printMessage( "Core", "Loading Fonts...\n", WHITE );
+	Log(MESSAGE, "Core", "Loading Fonts...");
 	AutoTable tab("fonts");
 	if (!tab) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find fonts.2da.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "Cannot find fonts.2da.");
 		return GEM_ERROR;
 	}
 
@@ -1369,8 +1361,7 @@ int Interface::LoadSprites()
 		}
 
 		if (fnt) {
-			print("Found existing font for %s", ResRef);
-			printStatus("OK", LIGHT_GREEN);
+			Log(MESSAGE, "Core", "Found existing font for %s.", ResRef);
 			// what about palette etc?
 			continue;
 		} else {
@@ -1404,8 +1395,7 @@ int Interface::LoadSprites()
 		}
 
 		if (!fnt) {
-			printMessage("Core", "Unable to load font resource: %s ", WHITE, ResRef);
-			printStatus("WARNING", YELLOW);
+			Log(WARNING, "Core", "Unable to load font resource: %s", ResRef);
 			continue;
 		}
 
@@ -1416,35 +1406,30 @@ int Interface::LoadSprites()
 	}
 
 	if (fonts.size() == 0) {
-		printMessage( "Core", "No default font loaded! ", WHITE );
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "No default font loaded!");
 		return GEM_ERROR;
 	}
 
 	if (GetFont( ButtonFont ) == NULL) {
-		printMessage("Core", "ButtonFont not loaded: %s ", WHITE,
+		Log(WARNING, "Core", "ButtonFont not loaded: %s",
 					 ButtonFont);
-		printStatus( "WARNING", YELLOW );
 	}
 	if (GetFont( MovieFont ) == NULL) {
-		printMessage("Core", "MovieFont not loaded: %s ", WHITE,
+		Log(WARNING, "Core", "MovieFont not loaded: %s",
 					 MovieFont);
-		printStatus( "WARNING", YELLOW );
 	}
 	if (GetFont( TooltipFont ) == NULL) {
-		printMessage("Core", "TooltipFont not loaded: %s ", WHITE,
+		Log(WARNING, "Core", "TooltipFont not loaded: %s",
 					 TooltipFont);
-		printStatus( "WARNING", YELLOW );
 	}
 
-	printMessage( "Core", "Fonts Loaded...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
+	Log(MESSAGE, "Core", "Fonts Loaded...");
 
 	if (TooltipBackResRef[0]) {
 		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
-		printMessage( "Core", "Initializing Tooltips...", WHITE );
+		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (!anim) {
-			printStatus( "ERROR", LIGHT_RED );
+			Log(ERROR, "Core", "Failed to initialize tooltips.");
 			return GEM_ERROR;
 		}
 		TooltipBack = new Sprite2D * [3];
@@ -1453,7 +1438,6 @@ int Interface::LoadSprites()
 			TooltipBack[i]->XPos = 0;
 			TooltipBack[i]->YPos = 0;
 		}
-		printStatus( "OK", LIGHT_GREEN );
 	}
 
 	return GEM_OK;
@@ -1464,34 +1448,28 @@ int Interface::Init()
 	plugin_flags = new Variables();
 	plugin_flags->SetType( GEM_VARIABLES_INT );
 
-	printMessage( "Core", "Initializing the Event Manager...", WHITE );
+	Log(MESSAGE, "Core", "Initializing the Event Manager...");
 	evntmgr = new EventMgr();
 
-	printMessage( "Core", "Initializing Lists Dictionary...", WHITE );
 	lists = new Variables();
 	if (!lists) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to allocate Lists dictionary.");
 		return GEM_ERROR;
 	}
 	lists->SetType( GEM_VARIABLES_POINTER );
 
-	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
 	vars = new Variables();
 	if (!vars) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to allocate Variables dictionary");
 		return GEM_ERROR;
 	}
 	vars->SetType( GEM_VARIABLES_INT );
 	vars->ParseKey(true);
 
-	printStatus( "OK", LIGHT_GREEN );
-
 	if (!LoadConfig()) {
-		printMessage( "Core", "Could not load config file ", YELLOW);
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		Log(ERROR, "Core", "Could not load config file.");
 	}
-	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
+	Log(MESSAGE, "Core", "Starting Plugin Manager...");
 	PluginMgr *plugin = PluginMgr::Get();
 #if TARGET_OS_MAC
 	// search the bundle plugins first
@@ -1504,11 +1482,9 @@ int Interface::Init()
 #endif
 	LoadPlugins(PluginsPath);
 	if (plugin && plugin->GetPluginCount()) {
-		printMessage( "Core", "Plugin Loading Complete...", WHITE );
-		printStatus( "OK", LIGHT_GREEN );
+		Log(MESSAGE, "Core", "Plugin Loading Complete...");
 	} else {
-		printMessage( "Core", "Plugin Loading Failed, check path...", YELLOW);
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Plugin Loading Failed, check path...");
 		return GEM_ERROR;
 	}
 	plugin->RunInitializers();
@@ -1519,29 +1495,24 @@ int Interface::Init()
 #ifdef _DEBUG
 	FileStreamPtrCount = 0;
 #endif
-	printMessage( "Core", "GemRB Core Initialization...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Video Driver...", WHITE );
+	Log(MESSAGE, "Core", "GemRB Core Initialization...");
+	Log(MESSAGE, "Core", "Initializing Video Driver...");
 	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
 	if (!video) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "No Video Driver Available.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
 	}
 	if (video->Init() == GEM_ERROR) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
 	Color defcolor={255,255,255,200};
 	SetInfoTextColor(defcolor);
-	printStatus( "OK", LIGHT_GREEN );
 
 	{
-		printMessage( "Core", "Initializing Search Path...", WHITE );
+		Log(MESSAGE, "Core", "Initializing Search Path...");
 		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
-			print( "no DirectoryImporter! " );
-			printStatus( "ERROR", LIGHT_RED );
+			Log(ERROR, "Core", "no DirectoryImporter!");
 			return GEM_ERROR;
 		}
 
@@ -1549,13 +1520,15 @@ int Interface::Init()
 
 		PathJoin( path, CachePath, NULL);
 		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
-			print( "The cache path couldn't be registered, please check! " );
-			printStatus( "ERROR", LIGHT_RED );
+			Log(ERROR, "Core", "The cache path couldn't be registered, please check!");
 			return GEM_ERROR;
 		}
 
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		if (!strcmp( GameType, "auto" ))
+			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
+		else
+			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		size_t i;
 		for (i = 0; i < ModPath.size(); ++i)
@@ -1591,32 +1564,28 @@ int Interface::Init()
 			}
 		}
 		free(description);
-
-		printStatus( "OK", LIGHT_GREEN );
 	}
 
 	{
-		printMessage( "Core", "Initializing KEY Importer...", WHITE );
+		Log(MESSAGE, "Core", "Initializing KEY Importer...");
 		char ChitinPath[_MAX_PATH];
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
-			printStatus( "ERROR", LIGHT_RED );
+			Log(ERROR, "Core", "Failured to load \"chitin.key\"");
 			return GEM_ERROR;
 		}
-		printStatus( "OK", LIGHT_GREEN );
 	}
 
-	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
+	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Missing GUI Script Engine.");
 		return GEM_ERROR;
 	}
 	if (!guiscript->Init()) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to initialize GUI Script.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
 
 	{
@@ -1629,9 +1598,9 @@ int Interface::Init()
 	// Purposely add the font directory last since we will only ever need it at engine load time.
 	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
-	printMessage( "Core", "Reading Game Options...\n", WHITE );
+	Log(MESSAGE, "Core", "Reading Game Options...");
 	if (!LoadGemRBINI()) {
-		print( "Cannot Load INI\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "Cannot Load INI.");
 		return GEM_ERROR;
 	}
 
@@ -1640,7 +1609,7 @@ int Interface::Init()
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
-		printMessage("Core", "Unable to set dictionary default values!", YELLOW);
+		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
 
 	int i;
@@ -1651,35 +1620,30 @@ int Interface::Init()
 	}
 	GameNameResRef[i] = 0;
 
-	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
+	Log(MESSAGE, "Core", "Creating Projectile Server...");
 	projserv = new ProjectileServer();
 	if (!projserv->GetHighestProjectileNumber()) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "No projectiles are available...\n" );
+		Log(ERROR, "Core", "No projectiles are available...");
 	}
 
-	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
+	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "No TLK Importer Available.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "No TLK Importer Available.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
-	printMessage( "Core", "Loading Dialog.tlk file...", WHITE );
+	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
 	PathJoin( strpath, GamePath, dialogtlk, NULL );
 	FileStream* fs = FileStream::OpenFile(strpath);
 	if (!fs) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find Dialog.tlk.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "Cannot find Dialog.tlk.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 	strings->Open(fs);
 
 	{
-		printMessage( "Core", "Loading Palettes...\n", WHITE );
+		Log(MESSAGE, "Core", "Loading Palettes...");
 		ResourceHolder<ImageMgr> pal16im(Palette16);
 		if (pal16im)
 			pal16 = pal16im->GetImage();
@@ -1690,42 +1654,37 @@ int Interface::Init()
 		if (pal256im)
 			pal256 = pal256im->GetImage();
 		if (!pal16 || !pal32 || !pal256) {
-			printStatus( "ERROR", LIGHT_RED );
+			Log(ERROR, "Core", "No palletes found.");
 			return GEM_ERROR;
 		}
-		printMessage( "Core", "Palettes Loaded\n", WHITE );
+		Log(MESSAGE, "Core", "Palettes Loaded");
 	}
 
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "No BAM Importer Available.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "No BAM Importer Available.");
 		return GEM_ERROR;
 	}
 
-	printMessage( "Core", "Initializing stock sounds...\n", WHITE );
+	Log(MESSAGE, "Core", "Initializing stock sounds...");
 	DSCount = ReadResRefTable ("defsound", DefSound);
 	if (DSCount == 0) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find defsound.2da.\nTermination in Progress...\n" );
+		Log(ERROR, "Core", "Cannot find defsound.2da.");
 		return GEM_ERROR;
 	}
 
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Broadcasting Event Manager...", WHITE );
+	Log(MESSAGE, "Core", "Broadcasting Event Manager...");
 	video->SetEventMgr( evntmgr );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Window Manager...", WHITE );
+	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
 	if (windowmgr == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
 	int ret = LoadSprites();
 	if (ret) return ret;
 
-	printMessage( "Core", "Setting up the Console...", WHITE );
+	Log(MESSAGE, "Core", "Setting up the Console...");
 	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
 	console->XPos = 0;
@@ -1738,55 +1697,50 @@ int Interface::Init()
 
 	Sprite2D *tmpsprite = GetCursorSprite();
 	if (!tmpsprite) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to load cursor sprite.");
 		return GEM_ERROR;
 	}
 	console->SetCursor (tmpsprite);
-	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Starting up the Sound Driver...", WHITE );
+	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
 	if (AudioDriver == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
 	}
 	if (!AudioDriver->Init()) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to initialize sound driver.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Allocating SaveGameIterator...", WHITE );
+	Log(MESSAGE, "Core", "Allocating SaveGameIterator...");
 	sgiterator = new SaveGameIterator();
 	if (sgiterator == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to allocate SaveGameIterator.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
 	vars->SetAt( "TouchScrollAreas", (unsigned long)TouchScrollAreas );
 
-	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
+	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
 	tokens = new Variables();
 	if (!tokens) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to allocate Token dictionary.");
 		return GEM_ERROR;
 	}
 	tokens->SetType( GEM_VARIABLES_STRING );
-	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing Music Manager...", WHITE );
+	Log(MESSAGE, "Core", "Initializing Music Manager...");
 	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
 	if (!music) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to load Music Manager.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage("Core", "Loading music list...\n", WHITE );
+	Log(MESSAGE, "Core", "Loading music list...");
 	if (HasFeature( GF_HAS_SONGLIST )) {
 		ret = ReadMusicTable("songlist", 1);
 	} else {
@@ -1795,34 +1749,28 @@ int Interface::Init()
 		It should be: music.2da, first column is a .mus filename*/
 		ret = ReadMusicTable("music", 0);
 	}
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	} else {
-		printStatus( "NOT FOUND", YELLOW );
+	if (!ret) {
+		Log(WARNING, "Core", "Didn't find music list.");
 	}
 
 	int resdata = HasFeature( GF_RESDATA_INI );
 	if (resdata || HasFeature(GF_SOUNDS_INI) ) {
-		printMessage( "Core", "Loading resource data File...", WHITE );
+		Log(MESSAGE, "Core", "Loading resource data File...");
 		INIresdata = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		DataStream* ds = gamedata->GetResource(resdata? "resdata":"sounds", IE_INI_CLASS_ID);
 		if (!INIresdata->Open(ds)) {
-			printStatus( "ERROR", LIGHT_RED );
-		} else {
-			printStatus( "OK", LIGHT_GREEN );
+			Log(WARNING, "Core", "Failed to load resource data.");
 		}
 	}
 
 	if (HasFeature( GF_HAS_PARTY_INI )) {
-		printMessage( "Core", "Loading precreated teams setup...\n", WHITE );
+		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
 		FileStream* fs = FileStream::OpenFile( tINIparty );
 		if (!INIparty->Open(fs)) {
-			printStatus( "ERROR", LIGHT_RED );
-		} else {
-			printStatus( "OK", LIGHT_GREEN );
+			Log(WARNING, "Core", "Failed to load precreated teams.");
 		}
 	}
 
@@ -1831,156 +1779,127 @@ int Interface::Init()
 	}
 
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
-		printMessage( "Core", "Loading beasts definition File...\n", WHITE );
+		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
 		// FIXME: crashes if file does not open
 		FileStream* fs = FileStream::OpenFile( tINIbeasts );
 		if (!INIbeasts->Open(fs)) {
-			printStatus( "ERROR", LIGHT_RED );
-		} else {
-			printStatus( "OK", LIGHT_GREEN );
+			Log(WARNING, "Core", "Failed to load beast definitions.");
 		}
 
-		printMessage( "Core", "Loading quests definition File...\n", WHITE );
+		Log(MESSAGE, "Core", "Loading quests definition File...");
 		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
 		// FIXME: crashes if file does not open
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
 		if (!INIquests->Open(fs2)) {
-			printStatus( "ERROR", LIGHT_RED );
-		} else {
-			printStatus( "OK", LIGHT_GREEN );
+			Log(WARNING, "Core", "Failed to load quest definitions.");
 		}
 	}
 	game = NULL;
 	calendar = NULL;
 	keymap = NULL;
 
+	Log(MESSAGE, "Core", "Bringing up the Global Timer...");
 	timer = new GlobalTimer();
-	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	if (!timer) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to create global timer.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
+	Log(MESSAGE, "Core", "Initializing effects...");
 	ret = Init_EffectQueue();
-	printMessage( "Core", "Initializing effects...", WHITE );
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to initialize effects.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
+	Log(MESSAGE, "Core", "Initializing Inventory Management...");
 	ret = InitItemTypes();
-	printMessage( "Core", "Initializing Inventory Management...", WHITE );
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to initialize inventory.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
+	Log(MESSAGE, "Core", "Initializing string constants...");
 	displaymsg = new DisplayMessage();
-	printMessage( "Core", "Initializing string constants...", WHITE );
 	if (!displaymsg) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to initialize string constants.");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
+	Log(MESSAGE, "Core", "Initializing random treasure...");
 	ret = ReadRandomItems();
-	printMessage( "Core", "Initializing random treasure...", WHITE );
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
-		printStatus( "ERROR", LIGHT_RED );
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
 
+	Log(MESSAGE, "Core", "Initializing ability tables...");
 	ret = ReadAbilityTables();
-	printMessage( "Core", "Initializing ability tables...", WHITE );
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to initialize ability tables...");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
+	Log(MESSAGE, "Core", "Reading reputation mod table...");
 	ret = ReadReputationModTable();
-	printMessage( "Core", "Reading reputation mod table...", WHITE);
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	} else {
-		printStatus( "NOT FOUND", LIGHT_RED );
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to read reputation mod table.");
 	}
 
 	if ( gamedata->Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
+		Log(MESSAGE, "Core", "Initializing area aliases...");
 		ret = ReadAreaAliasTable( "WMAPLAY" );
-		printMessage( "Core", "Initializing area aliases...", WHITE );
-		if (ret) {
-			printStatus( "OK", LIGHT_GREEN );
-		}
-		else {
-			printStatus( "NOT FOUND", YELLOW );
+		if (!ret) {
+			Log(WARNING, "Core", "Failed to load area aliases...");
 		}
 	}
 
+	Log(MESSAGE, "Core", "Reading game time table...");
 	ret = ReadGameTimeTable();
-	printMessage( "Core", "Reading game time table...", WHITE);
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to read game time table...");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
+	Log(MESSAGE, "Core", "Reading special spells table...");
 	ret = ReadSpecialSpells();
-	printMessage( "Core", "Reading special spells table...", WHITE);
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	} else {
-		printStatus( "NOT FOUND", YELLOW );
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to load special spells.");
 	}
 
+	Log(MESSAGE, "Core", "Reading item tables...");
 	ret = ReadAuxItemTables();
-	printMessage( "Core", "Reading item tables...", WHITE);
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
+		Log(ERROR, "Core", "Failed to read item tables...");
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
 	ret = ReadDamageTypeTable();
-	printMessage( "Core", "Reading damage type table...", WHITE);
+	Log(MESSAGE, "Core", "Reading damage type table...");
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
-	} else {
-		printStatus( "OK", LIGHT_GREEN );
+		Log(WARNING, "Core", "Reading damage type table...");
 	}
 
+	Log(MESSAGE, "Core", "Reading modal states table...");
 	ret = ReadModalStates();
-	printMessage( "Core", "Reading modal states table...", WHITE);
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
-	} else {
-		printStatus( "OK", LIGHT_GREEN );
+		Log(ERROR, "Core", "Failed to modal states table...");
 	}
 
-	printMessage( "Core", "Reading game script tables...", WHITE);
+	Log(MESSAGE, "Core", "Reading game script tables...");
 	InitializeIEScript();
-	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing keymap tables...", WHITE);
+	Log(MESSAGE, "Core", "Initializing keymap tables...");
 	keymap = new KeyMap();
 	ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
 	if (!ret) {
-		printStatus( "ERROR", LIGHT_RED );
-	} else {
-		printStatus( "OK", LIGHT_GREEN );
+		Log(WARNING, "Core", "Failed to initialize keymaps.");
 	}
-	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
+	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
 	return GEM_OK;
 }
@@ -2274,12 +2193,10 @@ bool Interface::LoadConfig(const char* filename)
 {
 	size_t i;
 
-	printMessage("Config","Trying to open ", WHITE);
-	textcolor(LIGHT_WHITE);
-	print("%s ", filename);
+	Log(MESSAGE, "Config", "Trying to open \"%s\".", filename);
 	FileStream* config = FileStream::OpenFile(filename);
 	if (config == NULL) {
-		printStatus("NOT FOUND", YELLOW);
+		Log(ERROR, "Config", "Failed to open config file \"%s\".", filename);
 		return false;
 	}
 
@@ -2307,7 +2224,7 @@ bool Interface::LoadConfig(const char* filename)
 
 		value = strchr( name, '=' );
 		if (!value || value == name) {
-			print( "Invalid line %d\n", lineno );
+			Log(WARNING, "Config", "Invalid line %d", lineno);
 			continue;
 		}
 
@@ -2490,6 +2407,8 @@ bool Interface::LoadConfig(const char* filename)
 
 			PathJoin(name, GamePath, cd, NULL);
 			CD[i].push_back(name);
+			PathJoin(name, GamePath, GameDataPath, cd, NULL);
+			CD[i].push_back(name);
 		} else {
 			size_t cnt = CD[i].size();
 			while(cnt--) {
@@ -2520,16 +2439,14 @@ bool Interface::LoadConfig(const char* filename)
 		error("Core", "Unable to create cache directory '%s'", CachePath);
 	}
 
-	printStatus( "OK", LIGHT_GREEN );
-
 	// Missing GameType is a common users' error
 	if (!GameType[0]) {
-		printMessage("Config","GameType was not set in your config file.\n", LIGHT_RED);
+		Log(ERROR, "Config", "GameType was not set in your config file.");
 		return false;
 	}
 
 	if ( StupidityDetector( CachePath )) {
-		printMessage("Core", "Cache path %s doesn't exist, not a folder or contains alien files!\n", LIGHT_RED, CachePath );
+		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
 		return false;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
@@ -2611,22 +2528,18 @@ bool Interface::LoadGemRBINI()
 {
 	DataStream* inifile = gamedata->GetResource( "gemrb", IE_INI_CLASS_ID );
 	if (! inifile) {
-		printStatus( "ERROR", LIGHT_RED );
 		return false;
 	}
 
-	printMessage("Core", "Loading game type-specific GemRB setup...\n%s", WHITE,
+	Log(MESSAGE, "Core", "Loading game type-specific GemRB setup '%s'",
 		inifile->originalfile);
 
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "[Core]: No INI Importer Available.\n" );
+		Log(ERROR, "Core", "No INI Importer Available.");
 		return false;
 	}
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile);
-
-	printStatus( "OK", LIGHT_GREEN );
 
 	const char *s;
 
@@ -2737,7 +2650,7 @@ bool Interface::LoadGemRBINI()
 		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
 		//printMessage("Option", "", GREEN);
-		//print("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
+		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
 	}
 
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
@@ -2974,11 +2887,11 @@ bool Interface::LoadWindowPack(const char* name)
 {
 	DataStream* stream = gamedata->GetResource( name, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
-		printMessage("Interface", "Error: Cannot find %s.chu\n", LIGHT_RED, name );
+		Log(ERROR, "Interface", "Error: Cannot find %s.chu", name );
 		return false;
 	}
 	if (!GetWindowMgr()->Open(stream)) {
-		printMessage("Interface", "Error: Cannot Load %s.chu\n", LIGHT_RED, name );
+		Log(ERROR, "Interface", "Error: Cannot Load %s.chu", name );
 		return false;
 	}
 
@@ -3287,12 +3200,12 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 {
 	if (WindowIndex >= windows.size()) {
-		printMessage( "Core", "Window not found", LIGHT_RED );
+		Log(ERROR, "Core", "Window not found");
 		return -1;
 	}
 	Window* win = windows[WindowIndex];
 	if (win == NULL) {
-		printMessage( "Core", "Window already freed", LIGHT_RED );
+		Log(ERROR, "Core", "Window already freed");
 		return -1;
 	}
 	win->Visible = WINDOW_FRONT;
@@ -3551,7 +3464,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	}
 	Window* win = windows[WindowIndex];
 	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
-		printMessage( "Core", "Window deleted again", LIGHT_RED );
+		Log(ERROR, "Core", "Window deleted again");
 		return -1;
 	}
 	if (win == ModalWindow) {
@@ -3817,7 +3730,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 	if (!dir) {
 		return -1;
 	}
-	print( "Looking in %s\n", Path );
+	print("Looking in %s", Path);
 	do {
 		char *name = dir.GetName();
 		if (name[0] == '.')
@@ -3849,7 +3762,7 @@ int Interface::GetCharSounds(TextArea* ta)
 	if (!dir) {
 		return -1;
 	}
-	print( "Looking in %s\n", Path );
+	print("Looking in %s", Path);
 	do {
 		char *name = dir.GetName();
 		if (name[0] == '.')
@@ -3878,7 +3791,7 @@ int Interface::GetCharacters(TextArea* ta)
 	if (!dir) {
 		return -1;
 	}
-	print( "Looking in %s\n", Path );
+	print("Looking in %s", Path);
 	do {
 		char *name = dir.GetName();
 		if (name[0] == '.')
@@ -3904,8 +3817,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
 	// if filename is not set we assume we are creating defaults without an INI
 	if (iniFileName[0] && !ini->Open(iniStream)) {
-		printMessage("Core", "Unable to read defaults from %s\nUsing GemRB default values.", WHITE, iniFileName);
-		printStatus( "WARNING", YELLOW );
+		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
 	}
 
 	// now extract only the values we care about with defaults
@@ -4637,7 +4549,7 @@ bool Interface::StupidityDetector(const char* Pt)
 	strcpy( Path, Pt );
 	DirectoryIterator dir(Path);
 	if (!dir) {
-		print("\n**cannot open**\n");
+		print("\n**cannot open**");
 		return true;
 	}
 	do {
@@ -4649,11 +4561,11 @@ bool Interface::StupidityDetector(const char* Pt)
 				if (name[1] == '.' && name[2] == '\0')
 					continue;
 			}
-			print("\n**contains another dir**\n");
+			print("\n**contains another dir**");
 			return true; //a directory in there???
 		}
 		if (ProtectedExtension(name) ) {
-			print("\n**contains alien files**\n");
+			print("\n**contains alien files**");
 			return true; //an executable file in there???
 		}
 	} while (++dir);
@@ -4706,7 +4618,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	//we shouldn't have a valid DraggedItem at this point.
 	//Anyway, if there is still a dragged item, it will be destroyed.
 	if (DraggedItem) {
-		printMessage("Core","Forgot to call ReleaseDraggedItem when leaving inventory (item destroyed)!\n",YELLOW);
+		Log(WARNING, "Core", "Forgot to call ReleaseDraggedItem when leaving inventory (item destroyed)!");
 		delete DraggedItem;
 	}
 	DraggedItem = item;
@@ -4844,7 +4756,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
 			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
-				printMessage("Interface", "Nonexistent random item (bad table entry) detected: %s\n", LIGHT_RED, itm->ItemResRef);
+				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef);
 				return false;
 			}
 			return true;
@@ -4881,7 +4793,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		}
 		itm->Usages[0]=(ieWord) Roll(j,k,0);
 	}
-	printMessage("Interface", "Loop detected while generating random item:%s\n", LIGHT_RED,
+	Log(ERROR, "Interface", "Loop detected while generating random item:%s",
 		itm->ItemResRef);
 	return false;
 }
@@ -4998,7 +4910,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {
-		printMessage("Interface", "Cannot load dialog: %s\n", LIGHT_RED, dlgref);
+		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
 		return (ieStrRef) -1;
 	}
 	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
@@ -5190,12 +5102,12 @@ int Interface::SwapoutArea(Map *map)
 		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
-			printMessage("Core", "Area removed: %s\n", YELLOW,
+			Log(WARNING, "Core", "Area removed: %s",
 				map->GetScriptName());
 			RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 		}
 	} else {
-		printMessage("Core", "Area removed: %s\n", YELLOW,
+		Log(WARNING, "Core", "Area removed: %s",
 			map->GetScriptName());
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
@@ -5225,7 +5137,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 		int ret = gm->PutActor(&str, actor, true);
 		if (ret <0) {
-			printMessage("Core", "Character cannot be saved: %s\n", YELLOW, name);
+			Log(WARNING, "Core", "Character cannot be saved: %s", name);
 			return -1;
 		}
 	}
@@ -5259,11 +5171,11 @@ int Interface::WriteGame(const char *folder)
 		str.Create( folder, GameNameResRef, IE_GAM_CLASS_ID );
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
-			printMessage("Core", "Game cannot be saved: %s\n", YELLOW, folder);
+			Log(WARNING, "Core", "Game cannot be saved: %s", folder);
 			return -1;
 		}
 	} else {
-		printMessage("Core", "Internal error, game cannot be saved: %s\n", YELLOW, folder);
+		Log(WARNING, "Core", "Internal error, game cannot be saved: %s", folder);
 		return -1;
 	}
 	return 0;
@@ -5304,7 +5216,7 @@ int Interface::WriteWorldMap(const char *folder)
 		ret = wmm->PutWorldMap (&str1, &str2, worldmap);
 	}
 	if (ret <0) {
-		printMessage("Core", "Internal error, worldmap cannot be saved: %s\n", YELLOW, folder);
+		Log(WARNING, "Core", "Internal error, worldmap cannot be saved: %s", folder);
 		return -1;
 	}
 	return 0;
@@ -5604,7 +5516,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
-		printMessage("Core", "Cannot translate symbol: %s\n", YELLOW, stat_name);
+		Log(WARNING, "Core", "Cannot translate symbol: %s", stat_name);
 	}
 	return stat;
 }
@@ -5618,7 +5530,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 	int mastertable = gamedata->LoadTable( tablename );
 	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
 	if (!mtm) {
-		printMessage("Core", "Cannot resolve stat bonus.\n", RED);
+		Log(ERROR, "Core", "Cannot resolve stat bonus.");
 		return -1;
 	}
 	int count = mtm->GetRowCount();

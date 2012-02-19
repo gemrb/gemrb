@@ -40,8 +40,7 @@ static void Initializer()
 	profcount = 0;
 	AutoTable tm("proftype");
 	if (!tm) {
-		printStatus( "ERROR", LIGHT_RED );
-		print( "Cannot find proftype.2da.\n");
+		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
 		return;
 	}
 	profcount = tm->GetRowCount();
@@ -97,7 +96,7 @@ bool ITMImporter::Open(DataStream* stream)
 	} else if (strncmp( Signature, "ITM V2.0", 8 ) == 0) {
 		version = 20;
 	} else {
-		print( "[ITMImporter]: This file is not a valid ITM File\n" );
+		print("[ITMImporter]: This file is not a valid ITM File");
 		return false;
 	}
 
@@ -213,7 +212,7 @@ Item* ITMImporter::GetItem(Item *s)
 
 
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		print( "[ITMImporter]: No BAM Importer Available.\n" );
+		print("[ITMImporter]: No BAM Importer Available.");
 		return NULL;
 	}
 	return s;

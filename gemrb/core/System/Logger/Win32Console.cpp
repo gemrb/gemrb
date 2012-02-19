@@ -38,17 +38,13 @@ Win32ConsoleLogger::Win32ConsoleLogger(bool useColor)
 Win32ConsoleLogger::~Win32ConsoleLogger()
 {}
 
-void Win32ConsoleLogger::vprint(const char *message, va_list ap)
+void Win32ConsoleLogger::print(const char *message)
 {
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	char buff[_MAX_PATH];
-	vsnprintf(buff, _MAX_PATH, message, ap);
-	cprintf("%s", buff);
+	cprintf("%s", message);
 }
 
 static int colors[] = {
+	0,
 	0,
 	FOREGROUND_RED,
 	FOREGROUND_GREEN,
@@ -57,14 +53,14 @@ static int colors[] = {
 	FOREGROUND_RED | FOREGROUND_BLUE,
 	FOREGROUND_BLUE | FOREGROUND_GREEN,
 	FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED,
-	(RED | FOREGROUND_INTENSITY),
-	(GREEN | FOREGROUND_INTENSITY),
-	(GREEN | RED | FOREGROUND_INTENSITY),
-	(BLUE | FOREGROUND_INTENSITY),
-	(MAGENTA | FOREGROUND_INTENSITY),
-	(CYAN | FOREGROUND_INTENSITY),
-	(WHITE | FOREGROUND_INTENSITY),
-	WHITE
+	FOREGROUND_RED | FOREGROUND_INTENSITY,
+	FOREGROUND_GREEN | FOREGROUND_INTENSITY,
+	FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY,
+	FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+	FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+	FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+	FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY,
+	FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED,
 };
 
 void Win32ConsoleLogger::textcolor(log_color c)

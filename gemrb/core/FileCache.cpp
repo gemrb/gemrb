@@ -27,7 +27,7 @@
 DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length, bool overwrite)
 {
 	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
-		print( "No Compression Manager Available.\nCannot Load Compressed File.\n" );
+		Log(ERROR, "FileCache", "No Compression Manager Available. Cannot Load Compressed File.");
 		return NULL;
 	}
 
@@ -39,7 +39,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	if (overwrite || !file_exists(path)) {
 		FileStream out;
 		if (!out.Create(path)) {
-			printMessage("FileCache", "Cannot write %s.\n", RED, path);
+			Log(ERROR, "FileCache", "Cannot write %s.", path);
 			return NULL;
 		}
 

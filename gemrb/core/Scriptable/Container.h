@@ -22,7 +22,7 @@
 #define CONTAINER_H
 
 #include "Inventory.h"
-#include "Scriptable.h"
+#include "Scriptable/Scriptable.h"
 
 //container flags
 #define CONT_LOCKED      1
@@ -48,7 +48,7 @@ public:
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
-	void DebugDump() const;
+	void dump() const;
 	int TrapResets() const { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile

@@ -310,7 +310,7 @@ int FileStream::Seek(int newpos, int type)
 			return GEM_ERROR;
 	}
 	if (Pos>size) {
-		print("[Streams]: Invalid seek position %ld in file %s (limit: %ld)\n",Pos, filename, size);
+		print("[Streams]: Invalid seek position %ld in file %s(limit: %ld)", Pos, filename, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;

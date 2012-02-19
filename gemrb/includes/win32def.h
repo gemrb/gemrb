@@ -37,7 +37,7 @@
 # include <windows.h>
 
 #else //WIN32
-# ifndef ANDROID
+# ifdef HAVE_CONFIG_H
 #  include <config.h>
 # endif
 # include <cstdio>

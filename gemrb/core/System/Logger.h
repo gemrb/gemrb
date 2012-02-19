@@ -25,23 +25,40 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "System/Logging.h" // for log_color
+#include "exports.h"
 
-#include <cstdarg>
+#include "System/Logging.h"
+
+enum log_color {
+	DEFAULT,
+	BLACK,
+	RED,
+	GREEN,
+	BROWN,
+	BLUE,
+	MAGENTA,
+	CYAN,
+	WHITE,
+	LIGHT_RED,
+	LIGHT_GREEN,
+	YELLOW,
+	LIGHT_BLUE,
+	LIGHT_MAGENTA,
+	LIGHT_CYAN,
+	LIGHT_WHITE
+};
 
 class GEM_EXPORT Logger {
 public:
 	Logger();
 	virtual ~Logger();
 
-	virtual void vprint(const char* message, va_list ap) = 0;
-	virtual void textcolor(log_color) = 0;
-	virtual void printBracket(const char *status, log_color color) = 0;
-	virtual void printStatus(const char* status, log_color color) = 0;
-	virtual void vprintMessage(const char* owner, const char* message, log_color color, va_list ap) = 0;
+	virtual void log(log_level, const char* owner, const char* message, log_color color) = 0;
 
 	virtual void destroy();
 };
+
+extern const char* log_level_text[];
 
 extern Logger* (*createDefaultLogger)();
 
