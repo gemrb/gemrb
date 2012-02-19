@@ -28,7 +28,7 @@ public:
 	FileLogger(DataStream*);
 	virtual ~FileLogger();
 
-	void vprint(const char* message, va_list ap);
+	void print(const char* message);
 
 private:
 	DataStream* log_file;

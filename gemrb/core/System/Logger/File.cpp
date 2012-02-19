@@ -32,14 +32,9 @@ FileLogger::~FileLogger()
 	delete log_file;
 }
 
-void FileLogger::vprint(const char *message, va_list ap)
+void FileLogger::print(const char *message)
 {
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	char buff[_MAX_PATH];
-	vsnprintf(buff, _MAX_PATH, message, ap);
-	log_file->Write(buff, strlen(buff));
+	log_file->Write(message, strlen(message));
 }
 
 Logger* createFileLogger(DataStream* log_file)
