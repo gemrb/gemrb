@@ -91,10 +91,8 @@ void StdioLogger::log(log_level level, const char* owner, const char* message, l
 {
 	textcolor(LIGHT_WHITE);
 	print("[");
-	textcolor(WHITE);
 	print(owner);
 	if (log_level_text[level][0]) {
-		textcolor(LIGHT_WHITE);
 		print("/");
 		textcolor(log_level_color[level]);
 		print(log_level_text[level]);
