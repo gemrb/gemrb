@@ -237,9 +237,9 @@ int SDL12VideoDriver::SwapBuffers(void)
 		if (!core->ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
 			unsigned long time = GetTickCount();
 			/** Display tooltip if mouse is idle */
-			if (( time - lastMouseTime ) > delay) {
-				if (Evnt)
-					Evnt->MouseIdle( time - lastMouseTime );
+			if (( time - lastMouseMoveTime ) > delay) {
+				if (EvntManager)
+					EvntManager->MouseIdle( time - lastMouseMoveTime );
 			}
 
 			/** This causes the tooltip to be rendered directly to display */
@@ -305,6 +305,24 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	SDL_DisplayYUVOverlay(overlay, &destRect);
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
+}
+
+int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
+{
+	switch (event.type) {
+		case SDL_ACTIVEEVENT:
+			if (core->ConsolePopped) {
+				break;
+			}
+			if (event.active.state == SDL_APPMOUSEFOCUS) {
+				if (!event.active.gain)
+					EvntManager->OnSpecialKeyPress( GEM_MOUSEOUT );
+			}
+			break;
+		default:
+			return SDLVideoDriver::ProcessEvent(event);
+	}
+	return GEM_OK;
 }
 
 void SDL12VideoDriver::ShowSoftKeyboard()

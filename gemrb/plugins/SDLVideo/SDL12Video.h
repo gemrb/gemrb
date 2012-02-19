@@ -54,6 +54,8 @@ public:
 private:
 	bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors);
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
+
+	int ProcessEvent(const SDL_Event & event);
 };
 
 #endif

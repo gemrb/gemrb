@@ -23,20 +23,32 @@
 
 #include "Video.h"
 
+#include "GUI/EventMgr.h"
 #include "win32def.h"
 
 #include <vector>
 #include <SDL.h>
 
+inline int GetModState(int modstate)
+{
+	int value = 0;
+	if (modstate&KMOD_SHIFT) value |= GEM_MOD_SHIFT;
+	if (modstate&KMOD_CTRL) value |= GEM_MOD_CTRL;
+	if (modstate&KMOD_ALT) value |= GEM_MOD_ALT;
+	return value;
+}
+
 class SDLVideoDriver : public Video {
+protected: //will become private after we fix touch events in SDL20Video.cpp
+	SDL_Event lastEvent; /* Last event dequeued by PollEvents */
 protected:
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
 	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
 	unsigned long lastTime;
-	unsigned long lastMouseTime;
-	SDL_Event event; /* Event structure */
+	unsigned long lastMouseMoveTime;
+	unsigned long lastMouseDownTime;
 
 	SDL_Rect subtitleregion_sdl;  //we probably have the same stuff, twice
 	char *subtitletext;
@@ -45,11 +57,11 @@ public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
 	int Init(void);
-	int PollEvents();
+	virtual int PollEvents();
 
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
-	virtual int SwapBuffers(void);
 	virtual bool SetFullscreenMode(bool set)=0;
+	virtual int SwapBuffers(void);
 
 	virtual bool ToggleGrabInput()=0;
 	short GetWidth() { return ( disp ? disp->w : 0 ); }
@@ -159,6 +171,8 @@ protected:
 	void DrawMovieSubtitle(ieDword strRef);
 	virtual bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)=0;
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
+	/* used to process the lastEvent member populated by PollEvents or an arbitraty event from another source.*/
+	virtual int ProcessEvent(const SDL_Event & event);
 
 public:
 	long GetPixel(void *data, unsigned short x, unsigned short y);

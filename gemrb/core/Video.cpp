@@ -47,7 +47,7 @@ Video::Video(void)
 	fadeColor.g = 0;
 	fadeColor.b = 0;
 
-	Evnt = NULL;
+	EvntManager = NULL;
 	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
 	// we care only about 2 bits at the moment so mask out the remainder
 	MouseFlags = ((core->MouseFeedback & 0x3) << 2);
@@ -72,7 +72,7 @@ bool Video::ToggleFullscreenMode()
 void Video::SetEventMgr(EventMgr* evnt)
 {
 	//if 'evnt' is NULL then no Event Manager will be used
-	Evnt = evnt;
+	EvntManager = evnt;
 }
 
 void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)

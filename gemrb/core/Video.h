@@ -92,7 +92,7 @@ public:
 protected:
 	int MouseFlags;
 	short xCorr, yCorr;
-	EventMgr* Evnt;
+	EventMgr* EvntManager;
 	Region Viewport;
 	int width,height,bpp;
 	bool fullscreen;

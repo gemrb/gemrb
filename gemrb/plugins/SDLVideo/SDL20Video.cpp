@@ -54,6 +54,7 @@ extern "C" {
 #define TOUCH_RC_NUM_TICKS 500
 
 SDL20VideoDriver::SDL20VideoDriver(void)
+	: rightMouseDownEvent(), rightMouseUpEvent()
 {
 	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
 	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
@@ -62,6 +63,22 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	renderer = NULL;
 	window = NULL;
 	videoPlayer = NULL;
+
+	// touch input
+	ignoreNextMouseUp = false;
+	numFingers = 0;
+	formationRotation = false;
+
+	touchHold = false;
+	touchHoldTime = 0;
+
+	rightMouseDownEvent.type = SDL_MOUSEBUTTONDOWN;
+	rightMouseDownEvent.button = SDL_BUTTON_RIGHT;
+	rightMouseDownEvent.state = SDL_PRESSED;
+
+	rightMouseUpEvent.type = SDL_MOUSEBUTTONUP;
+	rightMouseUpEvent.button = SDL_BUTTON_RIGHT;
+	rightMouseUpEvent.state = SDL_RELEASED;
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -220,6 +237,212 @@ int SDL20VideoDriver::SwapBuffers(void)
 	return ret;
 }
 
+int SDL20VideoDriver::PollEvents()
+{
+	if (touchHold && (SDL_GetTicks() - touchHoldTime) >= TOUCH_RC_NUM_TICKS) {
+		SDL_Event evtDown = SDL_Event();
+
+		evtDown.type = SDL_MOUSEBUTTONDOWN;
+		evtDown.button = rightMouseDownEvent;
+
+		SDL_PushEvent(&evtDown);
+
+		GameControl* gc = core->GetGameControl();
+		if (EvntManager->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
+			// formation rotation
+			touchHold = false;
+			formationRotation = true;
+		} else {
+			SDL_Event evtUp = SDL_Event();
+			evtUp.type = SDL_MOUSEBUTTONUP;
+			evtUp.button = rightMouseUpEvent;
+			SDL_PushEvent(&evtUp);
+		}
+		ignoreNextMouseUp = true;
+		touchHoldTime = 0;
+	}
+	if (formationRotation) {
+		ignoreNextMouseUp = true;
+	}
+	return SDLVideoDriver::PollEvents();
+}
+
+
+int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
+{
+	/*
+	 the digitizer could have a higher resolution then the screen.
+	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
+	 */
+	SDL_Touch *state = SDL_GetTouch(lastEvent.tfinger.touchId);
+	float xScaleFactor = 1.0;
+	float yScaleFactor = 1.0;
+	if(state){
+		xScaleFactor = state->xres / window->w;
+		yScaleFactor = state->yres / window->h;
+	}
+
+	touchHoldTime = 0;
+
+	bool ConsolePopped = core->ConsolePopped;
+
+	switch (event.type) {
+		//!!!!!!!!!!!!
+		// !!!: currently SDL brodcasts both mouse and touch events on touch
+		//  there is no API to prevent the mouse events so I have hacked the mouse events.
+		//  watch future SDL 1.3 releases to see if/when disabling mouse events from the touchscreen is available
+		//!!!!!!!!!!!!
+		case SDL_MOUSEMOTION:
+			if (numFingers > 1) break;
+			MouseMovement(lastEvent.motion.x, lastEvent.motion.y);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			if ((MouseFlags & MOUSE_DISABLED) || !EvntManager)
+				break;
+			ignoreNextMouseUp = false;
+			lastMouseDownTime = EvntManager->GetRKDelay();
+			if (lastMouseDownTime != (unsigned long) ~0) {
+				lastMouseDownTime += lastMouseDownTime + lastTime;
+			}
+			if (CursorIndex != VID_CUR_DRAG)
+				CursorIndex = VID_CUR_DOWN;
+			CursorPos.x = lastEvent.button.x; // - mouseAdjustX[CursorIndex];
+			CursorPos.y = lastEvent.button.y; // - mouseAdjustY[CursorIndex];
+			if (!ConsolePopped)
+				EvntManager->MouseDown( lastEvent.button.x, lastEvent.button.y, 1 << ( lastEvent.button.button - 1 ), GetModState(SDL_GetModState()) );
+			break;
+		case SDL_MOUSEBUTTONUP:
+			if ((MouseFlags & MOUSE_DISABLED) || !EvntManager || ignoreNextMouseUp)
+				break;
+			ignoreNextMouseUp = true;
+			if (CursorIndex != VID_CUR_DRAG)
+				CursorIndex = VID_CUR_UP;
+			CursorPos.x = lastEvent.button.x;
+			CursorPos.y = lastEvent.button.y;
+			if (!ConsolePopped)
+				EvntManager->MouseUp( lastEvent.button.x, lastEvent.button.y, 1 << ( lastEvent.button.button - 1 ), GetModState(SDL_GetModState()) );
+			break;
+		case SDL_MOUSEWHEEL:
+			/*
+			 TODO: need a preference for inverting these
+			 */
+			short scrollX;
+			scrollX= event.wheel.x * -1;
+			short scrollY;
+			scrollY= event.wheel.y * -1;
+			EvntManager->MouseWheelScroll( scrollX, scrollY );
+			break;
+		case SDL_FINGERMOTION://SDL 1.3+
+			//For swipes. gestures needing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
+			touchHold = false;
+			if (EvntManager) {
+				if (numFingers == core->NumFingScroll || (numFingers != core->NumFingKboard && EvntManager->GetMouseFocusedControlType() == IE_GUI_TEXTAREA)) {
+					//any # of fingers != NumFingKBoard will scroll a text area
+					if (EvntManager->GetMouseFocusedControlType() != IE_GUI_TEXTAREA) {
+						// if focus is IE_GUI_TEXTAREA we need mouseup to clear scrollbar flags so this scrolling doesnt break after interactind with the slider
+						ignoreNextMouseUp = true;
+					}else {
+						// if we are scrolling a text area we dont want the keyboard in the way
+						HideSoftKeyboard();
+					}
+					//invert the coordinates such that dragging down scrolls up etc.
+					int scrollX = (lastEvent.tfinger.dx / xScaleFactor) * -1;
+					int scrollY = (lastEvent.tfinger.dy / yScaleFactor) * -1;
+
+					EvntManager->MouseWheelScroll( scrollX, scrollY );
+				} else if (numFingers == core->NumFingKboard) {
+					if ((lastEvent.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
+						// if the keyboard is already up interpret this gesture as console pop
+						if(softKeyboardShowing && !ConsolePopped && !ignoreNextMouseUp) core->PopupConsole();
+						else ShowSoftKeyboard();
+					} else if((lastEvent.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+						HideSoftKeyboard();
+					}
+					ignoreNextMouseUp = true;
+				}
+			}
+			break;
+		case SDL_FINGERDOWN://SDL 1.3+
+			touchHold = false;
+			if (++numFingers == 1) {
+				rightMouseDownEvent.x = lastEvent.tfinger.x / xScaleFactor;
+				rightMouseDownEvent.y = lastEvent.tfinger.y / yScaleFactor;
+				rightMouseUpEvent.x = lastEvent.tfinger.x / xScaleFactor;
+				rightMouseUpEvent.y = lastEvent.tfinger.y / yScaleFactor;
+
+				touchHoldTime = SDL_GetTicks();
+				touchHold = true;
+			} else if (EvntManager && numFingers == core->NumFingInfo) {
+				EvntManager->OnSpecialKeyPress( GEM_TAB );
+				EvntManager->OnSpecialKeyPress( GEM_ALT );
+			}
+			break;
+		case SDL_FINGERUP://SDL 1.3+
+			touchHold = false;//even if there are still fingers in contact
+			if (numFingers) numFingers--;
+			if (formationRotation) {
+				EvntManager->MouseUp( lastEvent.tfinger.x, lastEvent.tfinger.y, GEM_MB_MENU, GetModState(SDL_GetModState()) );
+				formationRotation = false;
+				ignoreNextMouseUp = false;
+			}
+			if (EvntManager && numFingers != core->NumFingInfo) {
+				EvntManager->KeyRelease( GEM_ALT, 0 );
+			}
+			break;
+			//multitouch gestures
+		case SDL_MULTIGESTURE://SDL 1.3+
+			// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
+			numFingers = lastEvent.mgesture.numFingers;
+			/*
+			 // perhaps formation rotation should be implemented here as a rotate gesture.
+			 if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && numFingers == 2) {
+			 }
+			 */
+			break;
+			/* not user input events */
+		case SDL_WINDOWEVENT://SDL 1.2
+			switch (lastEvent.window.event) {
+				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
+					// We pause the game and audio when the window is minimized.
+					// on iOS/Android this happens when leaving the application or when play is interrupted (ex phone call)
+					// if win/mac/linux has a problem with this behavior we can work something out.
+					core->GetAudioDrv()->Pause();//this is for ANDROID mostly
+					core->SetPause(PAUSE_ON);
+					break;
+				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
+					/*
+					 reset all static variables as if no events have happened yet
+					 restoring from "minimized state" should be a clean slate.
+					 */
+					numFingers = 0;
+					touchHoldTime = 0;
+					touchHold = false;
+					ignoreNextMouseUp = false;
+#if TARGET_OS_IPHONE
+					// FIXME: this is essentially a hack.
+					// I believe there to be a bug in SDL 1.3 that is causeing the surface to be invalidated on a restore event for iOS
+					SDL_Window* window;
+					window = SDL_GetFocusWindow();
+					window->surface_valid = SDL_TRUE;//private attribute!!!
+					// FIXME:
+					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
+					// even using Apple examples of how to properly suspend an OpenAL context and resume on iOS are falling flat
+					// it could be this bug affects only the simulator.
+					sleep(1);
+#endif
+					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
+					break;
+				case SDL_WINDOWEVENT_RESIZED: //SDL 1.2
+					// this event exists in SDL 1.2, but this handler is only getting compiled under 1.3+
+					printMessage("SDLVideo", "Window resized so your window surface is now invalid.\n", LIGHT_RED);
+					break;
+			}
+			break;
+		default:
+			return SDLVideoDriver::ProcessEvent(event);
+	}
+	return GEM_OK;
+}
 
 /*
  This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)

@@ -28,12 +28,25 @@ private:
 	SDL_Texture* videoPlayer;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+/*
+ Ivars for touch input.
+ Most of these are temporary until touch input is rewritten to be independant of mouse events.
+*/
+	bool ignoreNextMouseUp;
+	Uint16 numFingers;
+	bool formationRotation;
+	bool touchHold;
+	Uint32 touchHoldTime;
+	// fake mouse events
+	SDL_MouseButtonEvent rightMouseDownEvent;
+	SDL_MouseButtonEvent rightMouseUpEvent;
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
 
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 	int SwapBuffers(void);
+	int PollEvents();
 	void InitMovieScreen(int &w, int &h, bool yuv);
 	void showFrame(unsigned char* buf, unsigned int bufw,
 									unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
@@ -54,6 +67,8 @@ public:
 private:
 	bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors);
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
+
+	int ProcessEvent(const SDL_Event & event);
 };
 
 #endif
