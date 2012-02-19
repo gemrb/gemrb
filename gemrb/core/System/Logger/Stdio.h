@@ -31,9 +31,9 @@ public:
 	virtual void destroy();
 protected:
 	virtual void print(const char*);
+	virtual void textcolor(log_color);
 	bool useColor;
 private:
-	void textcolor(log_color);
 	void printBracket(const char *status, log_color color);
 	void printStatus(const char* status, log_color color);
 
