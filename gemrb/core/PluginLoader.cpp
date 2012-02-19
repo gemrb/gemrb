@@ -156,9 +156,6 @@ void LoadPlugins(char* pluginpath)
 			continue;
 		}
 
-		// We do not need the basename anymore now
-		free( file );
-
 		// module is skipped
 		if (flags == PLF_SKIP) {
 			Log(MESSAGE, "PluginLoader", "Loading \"%s\" skipped.", path);
@@ -219,6 +216,9 @@ void LoadPlugins(char* pluginpath)
 		}
 		libs.insert(desc.ID);
 
-		Log(MESSAGE, "PluginLoader", "Loaded plugin \"%s\" (%s).", desc.Description, path);
+		Log(MESSAGE, "PluginLoader", "Loaded plugin \"%s\" (%s).", desc.Description, file);
+
+		// We do not need the basename anymore now
+		free( file );
 	}
 }
