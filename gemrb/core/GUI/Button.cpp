@@ -68,6 +68,7 @@ Button::Button()
 	memset( borders, 0, sizeof( borders ));
 	starttime = 0;
 	Anchor.null();
+	PushOffset = Point(2, 2);
 }
 Button::~Button()
 {
@@ -202,8 +203,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	if (State == IE_GUI_BUTTON_PRESSED) {
 		//shift the writing/border a bit
-		x+= 2;
-		y+= 2;
+		x+= PushOffset.x;
+		y+= PushOffset.y;
 	}
 
 	// Button picture
@@ -738,4 +739,9 @@ void Button::SetHorizontalOverlay(double clip, const Color &src, const Color &de
 void Button::SetAnchor(ieWord x, ieWord y)
 {
 	Anchor = Point(x,y);
+}
+
+void Button::SetPushOffset(ieWord x, ieWord y)
+{
+	PushOffset = Point(x,y);
 }

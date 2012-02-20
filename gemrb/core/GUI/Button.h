@@ -184,7 +184,10 @@ public: // Public Events
 	void SetTextColor(const Color &fore, const Color &back);
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; }
+	/** Set explicit anchor point for text */
 	void SetAnchor(ieWord x, ieWord y);
+	/** Set offset pictures and label move when button is pressed */
+	void SetPushOffset(ieWord x, ieWord y);
 private: // Private attributes
 	char* Text;
 	bool hasText;
@@ -211,7 +214,10 @@ private: // Private attributes
 	/** HP Bar over portraits */
 	unsigned long starttime;
 	Color SourceRGB, DestRGB;
+	/** Explicit text anchor point if IE_GUI_BUTTON_ANCHOR is set */
 	Point Anchor;
+	/** Offset pictures and label move when the button is pressed. */
+	Point PushOffset;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 	bool IsPixelTransparent (unsigned short x, unsigned short y);

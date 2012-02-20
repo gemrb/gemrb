@@ -2510,6 +2510,52 @@ static PyObject* GemRB_Button_SetFont(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Button_SetAnchor__doc,
+"Button.SetAnchor(WindowIndex, ControlIndex, x, y)\n\n"
+"Sets explicit anchor used for drawing button label." );
+
+static PyObject* GemRB_Button_SetAnchor(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, x, y;
+
+	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &x, &y)) {
+		return AttributeError( GemRB_Button_SetAnchor__doc );
+	}
+
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	btn->SetAnchor(x, y);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_Button_SetPushOffset__doc,
+"Button.SetPushOffset(WindowIndex, ControlIndex, x, y)\n\n"
+"Sets pixel offset for drawing pictures and label when the button is pressed." );
+
+static PyObject* GemRB_Button_SetPushOffset(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, x, y;
+
+	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &x, &y)) {
+		return AttributeError( GemRB_Button_SetPushOffset__doc );
+	}
+
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	btn->SetPushOffset(x, y);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Button_SetTextColor__doc,
 "SetButtonTextColor(WindowIndex, ControlIndex, red, green, blue[, invert=false])\n\n"
 "Sets the Text Color of a Button Control. Invert is used for fonts with swapped background and text colors." );
@@ -10267,6 +10313,8 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetBorder, METH_VARARGS),
 	METHOD(Button_SetFlags, METH_VARARGS),
 	METHOD(Button_SetFont, METH_VARARGS),
+	METHOD(Button_SetAnchor, METH_VARARGS),
+	METHOD(Button_SetPushOffset, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
 	METHOD(Button_SetMOS, METH_VARARGS),
 	METHOD(Button_SetOverlay, METH_VARARGS),
