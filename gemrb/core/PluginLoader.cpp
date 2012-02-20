@@ -40,13 +40,23 @@
 #include <dlfcn.h>
 #endif
 
+#ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
+# include <assert.h>
+#endif
+
+namespace GemRB {
+
 #ifdef WIN32
 typedef HMODULE LibHandle;
 #else
 typedef void *LibHandle;
 #endif
 
+namespace GemRB {
+
 class PluginMgr;
+
+}
 
 struct PluginDesc {
 	LibHandle handle;
@@ -61,7 +71,6 @@ typedef PluginID (*ID_t)();
 typedef bool (* Register_t)(PluginMgr*);
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
-#include <assert.h>
 typedef void *(* voidvoid)(void);
 static inline voidvoid my_dlsym(void *handle, const char *symbol)
 {
@@ -221,4 +230,6 @@ void LoadPlugins(char* pluginpath)
 		// We do not need the basename anymore now
 		free( file );
 	}
+}
+
 }

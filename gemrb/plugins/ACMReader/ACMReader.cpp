@@ -20,6 +20,8 @@
 
 #include "general.h"
 
+using namespace GemRB;
+
 bool ACMReader::Open(DataStream* stream)
 {
 	str = stream;

@@ -28,6 +28,8 @@
 
 #include <cstring>
 
+namespace GemRB {
+
 Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 {
 	BackGround = NULL;
@@ -176,4 +178,6 @@ bool Progressbar::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
 }

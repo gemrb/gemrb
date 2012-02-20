@@ -25,6 +25,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+namespace GemRB {
+
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
 Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels)
@@ -147,4 +149,6 @@ void Sprite2D::release()
 {
 	Sprite2D *that = this;
 	core->GetVideoDriver()->FreeSprite(that);
+}
+
 }

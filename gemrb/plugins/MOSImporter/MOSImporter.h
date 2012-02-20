@@ -23,6 +23,8 @@
 
 #include "ImageMgr.h"
 
+namespace GemRB {
+
 class MOSImporter : public ImageMgr {
 private:
 	ieWord Width, Height, Cols, Rows;
@@ -35,5 +37,7 @@ public:
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
 };
+
+}
 
 #endif

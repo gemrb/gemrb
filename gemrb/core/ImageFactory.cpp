@@ -23,6 +23,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+namespace GemRB {
+
 ImageFactory::ImageFactory(const char* ResRef, Sprite2D* bitmap_)
 	: FactoryObject( ResRef, IE_BMP_CLASS_ID ), bitmap(bitmap_)
 {
@@ -40,3 +42,5 @@ Sprite2D* ImageFactory::GetSprite2D() const
 	return bitmap;
 }
 
+
+}

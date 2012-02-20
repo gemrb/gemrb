@@ -25,6 +25,8 @@
 
 #include "Interface.h"
 
+namespace GemRB {
+
 MemoryStream::MemoryStream(char *name, void* data, unsigned long size)
 	: data((char*)data)
 {
@@ -95,4 +97,6 @@ int MemoryStream::Seek(int newpos, int type)
 		return GEM_ERROR;
 	}
 	return GEM_OK;
+}
+
 }

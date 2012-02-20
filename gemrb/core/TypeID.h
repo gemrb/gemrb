@@ -21,9 +21,13 @@
 #ifndef TYPE_ID_H
 #define TYPE_ID_H
 
+namespace GemRB {
+
 class TypeID {
 public:
 	const char *description;
 };
+
+}
 
 #endif

@@ -28,6 +28,8 @@
 #include "ResourceDesc.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 KEYImporter::KEYImporter(void)
 {
 	description = NULL;

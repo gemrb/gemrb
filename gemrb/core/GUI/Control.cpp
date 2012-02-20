@@ -37,6 +37,8 @@
 #include <cstdio>
 #include <cstring>
 
+namespace GemRB {
+
 Control::Control()
 {
 	hasFocus = false;
@@ -265,4 +267,6 @@ int Control::SetScrollBar(Control* ptr)
 	Changed = true;
 	if (ptr) return 1;
 	return 0;
+}
+
 }

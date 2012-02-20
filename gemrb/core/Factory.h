@@ -27,6 +27,8 @@
 #include "AnimationFactory.h"
 #include "FactoryObject.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Factory {
 private:
 	std::vector< FactoryObject*> fobjects;
@@ -38,5 +40,7 @@ public:
 	FactoryObject* GetFactoryObject(int pos) const;
 	void FreeObjects(void);
 };
+
+}
 
 #endif

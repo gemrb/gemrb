@@ -23,6 +23,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class Actor;
 class DataStream;
 
@@ -38,5 +40,7 @@ public:
 	//saves file
 	virtual int PutActor(DataStream *stream, Actor *actor, bool chr=false) = 0;
 };
+
+}
 
 #endif

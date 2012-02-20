@@ -25,6 +25,8 @@
 
 #include "Projectile.h"
 
+namespace GemRB {
+
 class SymbolMgr;
 
 //the number of resrefs in areapro.2da (before the flags field)
@@ -93,4 +95,6 @@ private:
 };
 
 #endif // PROJSERVER_H
+}
+
 

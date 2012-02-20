@@ -20,10 +20,14 @@
 
 #include "SymbolMgr.h"
 
+namespace GemRB {
+
 SymbolMgr::SymbolMgr(void)
 {
 }
 
 SymbolMgr::~SymbolMgr(void)
 {
+}
+
 }

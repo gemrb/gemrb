@@ -30,6 +30,8 @@
 // CHECKME: how should we include png.h ? (And how should we check for it?)
 #include <png.h>
 
+using namespace GemRB;
+
 static void DataStream_png_read_data(png_structp png_ptr,
 		 png_bytep data, png_size_t length)
 {
@@ -38,7 +40,7 @@ static void DataStream_png_read_data(png_structp png_ptr,
 	str->Read(data, length);
 }
 
-struct PNGInternal {
+struct GemRB::PNGInternal {
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_infop end_info;

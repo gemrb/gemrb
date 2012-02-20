@@ -25,6 +25,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class GEM_EXPORT ArchiveImporter : public Plugin {
 public:
 	ArchiveImporter(void);
@@ -34,5 +36,7 @@ public:
 	virtual int DecompressSaveGame(DataStream *compressed) = 0;
 	virtual int AddToSaveGame(DataStream *str, DataStream *uncompressed) = 0;
 };
+
+}
 
 #endif

@@ -20,10 +20,14 @@
 
 #include "TileSetMgr.h"
 
+namespace GemRB {
+
 TileSetMgr::TileSetMgr(void)
 {
 }
 
 TileSetMgr::~TileSetMgr(void)
 {
+}
+
 }

@@ -32,6 +32,8 @@
 #include "TableMgr.h"
 #include "System/StringBuffer.h"
 
+namespace GemRB {
+
 //debug flags
 // 1 - cache
 // 2 - cutscene ID
@@ -2493,4 +2495,6 @@ void Action::dump(StringBuffer& buffer) const
 	}
 
 	buffer.appendFormatted("RefCount: %d\n", RefCount);
+}
+
 }

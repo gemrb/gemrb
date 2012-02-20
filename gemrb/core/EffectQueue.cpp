@@ -36,6 +36,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 static struct {
 	const char* Name;
 	EffectFunction Function;
@@ -2038,3 +2040,5 @@ void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int 
 	}
 }
 
+
+}

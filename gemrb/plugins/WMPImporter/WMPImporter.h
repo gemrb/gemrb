@@ -27,6 +27,8 @@
 
 #include "WorldMap.h"
 
+namespace GemRB {
+
 
 class WMPImporter : public WorldMapMgr {
 private:
@@ -56,5 +58,7 @@ private:
 	int PutAreas(DataStream *stream, WorldMap *wmap);
 };
 
+
+}
 
 #endif

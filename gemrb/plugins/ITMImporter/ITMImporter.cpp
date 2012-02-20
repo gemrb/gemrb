@@ -27,6 +27,8 @@
 #include "PluginMgr.h"
 #include "TableMgr.h" //needed for autotable
 
+using namespace GemRB;
+
 int *profs = NULL;
 int profcount = -1;
 

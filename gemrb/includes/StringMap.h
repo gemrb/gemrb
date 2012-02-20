@@ -28,6 +28,8 @@
 #include "System/String.h"
 #include "HashMap.h"
 
+namespace GemRB {
+
 // Use "StringMap" for mapping std::strings to std::strings.
 // This does not limit the length of either the keys nor values, but at the
 // cost of (re)allocs for each string.
@@ -123,5 +125,7 @@ struct HashKey<char[size]> {
 	}
 };
 #endif
+
+}
 
 #endif

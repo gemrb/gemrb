@@ -23,6 +23,8 @@
 
 #include "System/DataStream.h"
 
+using namespace GemRB;
+
 #define UNPACKER_BUFFER_SIZE 16384
 
 class CValueUnpacker {

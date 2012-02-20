@@ -32,6 +32,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class EffectMgr
  * Abstract loader for Effect objects
@@ -52,5 +54,7 @@ public:
 	/** Fills the stream with Effect v2 data loaded from the effect*/
 	virtual void PutEffectV2(DataStream *stream, const Effect *fx) = 0;
 };
+
+}
 
 #endif

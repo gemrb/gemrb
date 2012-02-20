@@ -23,6 +23,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Calendar {
 private:
 	int daysinyear;
@@ -36,5 +38,7 @@ public:
 	void GetMonthName(int dayandmonth) const;
 	int GetCalendarDay(int date) const;
 };
+
+}
 
 #endif

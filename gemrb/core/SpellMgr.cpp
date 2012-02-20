@@ -20,10 +20,14 @@
 
 #include "SpellMgr.h"
 
+namespace GemRB {
+
 SpellMgr::SpellMgr(void)
 {
 }
 
 SpellMgr::~SpellMgr(void)
 {
+}
+
 }

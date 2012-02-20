@@ -26,6 +26,8 @@
 #include "Resource.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * Base Class for sound plugins
  */
@@ -60,5 +62,7 @@ protected:
 	int channels;
 	int samplerate;
 };
+
+}
 
 #endif

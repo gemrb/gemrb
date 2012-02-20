@@ -27,6 +27,8 @@
 #include "FactoryObject.h"
 #include "Sprite2D.h"
 
+namespace GemRB {
+
 class GEM_EXPORT ImageFactory : public FactoryObject {
 private:
 	Sprite2D* bitmap;
@@ -36,5 +38,7 @@ public:
 
 	Sprite2D* GetSprite2D() const;
 };
+
+}
 
 #endif

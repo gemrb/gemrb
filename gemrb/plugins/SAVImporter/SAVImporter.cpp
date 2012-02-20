@@ -25,6 +25,8 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 
+using namespace GemRB;
+
 SAVImporter::SAVImporter()
 {
 }

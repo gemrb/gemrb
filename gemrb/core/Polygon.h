@@ -27,6 +27,8 @@
 
 #include <list>
 
+namespace GemRB {
+
 class GEM_EXPORT Trapezoid {
 public:
 	int y1, y2;
@@ -77,5 +79,7 @@ public:
 	ieDword wall_flag;
 	Point base0, base1;
 };
+
+}
 
 #endif

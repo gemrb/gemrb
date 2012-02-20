@@ -20,6 +20,8 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
+namespace GemRB {
+
 //searchmap conversion bits
 
 enum {
@@ -48,5 +50,7 @@ struct PathNode {
 	unsigned short y;
 	unsigned int orient;
 };
+
+}
 
 #endif

@@ -32,6 +32,8 @@
 #include "Plugin.h"
 #include "ScriptedAnimation.h"
 
+namespace GemRB {
+
 class AnimationFactory;
 class EventMgr;
 class Font;
@@ -255,5 +257,7 @@ public:
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y);
 };
+
+}
 
 #endif

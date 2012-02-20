@@ -36,6 +36,8 @@
 #include <cstdlib>
 #include <list>
 
+namespace GemRB {
+
 class Actor;
 class Map;
 class Scriptable;
@@ -319,5 +321,7 @@ private:
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
 };
+
+}
 
 #endif // ! EFFECTQUEUE_H

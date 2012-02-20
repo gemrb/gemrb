@@ -31,6 +31,8 @@
 #include "ProjectileServer.h"
 #include "Scriptable/Actor.h"
 
+namespace GemRB {
+
 struct SpellFocus {
 	ieDword stat;
 	ieDword val1;
@@ -315,4 +317,6 @@ bool Spell::ContainsDamageOpcode() const
 		}
 	}
 	return false;
+}
+
 }

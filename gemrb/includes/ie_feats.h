@@ -17,6 +17,9 @@
  *
  *
  */
+
+namespace GemRB {
+
 #define FEAT_AEGIS_OF_RIME		0
 #define FEAT_AMBIDEXTERITY		1
 #define FEAT_AQUA_MORTIS		2
@@ -92,3 +95,5 @@
 #define FEAT_WILDSHAPE_BOAR		72
 #define FEAT_WILDSHAPE_PANTHER		73
 #define FEAT_WILDSHAPE_SHAMBLER		74
+
+}

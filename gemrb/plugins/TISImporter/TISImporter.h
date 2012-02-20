@@ -23,6 +23,8 @@
 
 #include "TileSetMgr.h"
 
+namespace GemRB {
+
 class TISImporter : public TileSetMgr {
 private:
 	DataStream* str;
@@ -37,5 +39,7 @@ public:
 	Sprite2D* GetTile(int index);
 public:
 };
+
+}
 
 #endif

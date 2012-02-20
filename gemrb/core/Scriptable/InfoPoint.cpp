@@ -42,6 +42,8 @@
 #include <cassert>
 #include <cmath>
 
+namespace GemRB {
+
 #define YESNO(x) ( (x)?"Yes":"No")
 
 //crazy programmers couldn't decide which bit marks the alternative point
@@ -258,3 +260,5 @@ void InfoPoint::dump() const
 	Log(DEBUG, "InfoPoint", buffer);
 }
 
+
+}

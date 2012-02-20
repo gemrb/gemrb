@@ -36,6 +36,8 @@
 #include "GUI/TextEdit.h"
 #include "GUI/Window.h"
 
+using namespace GemRB;
+
 CHUImporter::CHUImporter()
 {
 	str = NULL;

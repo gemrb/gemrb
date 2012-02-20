@@ -32,6 +32,8 @@
 #include "Video.h" //for tints
 #include "Scriptable/Actor.h"
 
+using namespace GemRB;
+
 int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb

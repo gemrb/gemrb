@@ -27,6 +27,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class AnimationFactory;
 class Control;
 
@@ -49,5 +51,7 @@ public:
 	void SetPaletteGradients(ieDword *col);
 	void SetBlend(bool b);
 };
+
+}
 
 #endif

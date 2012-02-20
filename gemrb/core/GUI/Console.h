@@ -30,6 +30,8 @@
 #include "GUI/Control.h"
 #include "GUI/TextArea.h"
 
+namespace GemRB {
+
 class Palette;
 
 /**
@@ -90,5 +92,7 @@ private:
 	void HistoryForward();
 	void HistoryAdd(bool force);
 };
+
+}
 
 #endif

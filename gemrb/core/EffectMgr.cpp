@@ -20,10 +20,14 @@
 
 #include "EffectMgr.h"
 
+namespace GemRB {
+
 EffectMgr::EffectMgr(void)
 {
 }
 
 EffectMgr::~EffectMgr(void)
 {
+}
+
 }

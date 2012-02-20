@@ -20,10 +20,14 @@
 
 #include "ItemMgr.h"
 
+namespace GemRB {
+
 ItemMgr::ItemMgr(void)
 {
 }
 
 ItemMgr::~ItemMgr(void)
 {
+}
+
 }

@@ -34,6 +34,8 @@
 
 #include <cassert>
 
+using namespace GemRB;
+
 #define FAMILIAR_FILL_SIZE 324
 // if your compiler chokes on this, use -1 or 0xff whichever works for you
 #define UNINITIALIZED_CHAR '\xff'

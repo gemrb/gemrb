@@ -23,6 +23,8 @@
 #include <cassert>
 #include <ctype.h>
 
+namespace GemRB {
+
 // private inlines
 inline unsigned int Cache::MyHashKey(const char* key) const
 {
@@ -309,4 +311,6 @@ void Cache::Cleanup()
 		}
 		pAssoc=nextAssoc;
 	}
+}
+
 }

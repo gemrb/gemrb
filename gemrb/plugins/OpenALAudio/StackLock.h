@@ -20,6 +20,8 @@
 
 #include "SDL_mutex.h"
 
+namespace GemRB {
+
 // Copied from ScummVM, mutex.h
 
 /**
@@ -35,4 +37,6 @@ public:
 	StackLock(SDL_mutex* mutex, const char *mutexName = NULL);
 	~StackLock();
 };
+}
+
 

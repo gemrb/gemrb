@@ -27,6 +27,8 @@
 
 #include "System/Logging.h"
 
+namespace GemRB {
+
 // dumps stats upon destruction
 //#define HASHMAP_DEBUG
 
@@ -451,5 +453,7 @@ void HashMap<Key, Value, Hash>::dumpStats(const char* description)
 	memset(&_debug, 0, sizeof(_debug));
 }
 #endif
+
+}
 
 #endif

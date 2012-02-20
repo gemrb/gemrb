@@ -26,6 +26,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+using namespace GemRB;
+
 #define BMP_HEADER_SIZE  54
 
 static ieDword red_mask = 0x00ff0000;

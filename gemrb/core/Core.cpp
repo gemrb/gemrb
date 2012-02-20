@@ -46,6 +46,8 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 }
 #endif
 
+namespace GemRB {
+
 //// Globally used functions
 
 static const unsigned char orientations[25]={
@@ -209,4 +211,6 @@ int EARelation(Scriptable* Owner, Actor* target)
 	}
 
 	return EAR_NEUTRAL;
+}
+
 }

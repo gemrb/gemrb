@@ -20,10 +20,14 @@
 
 #include "ResourceSource.h"
 
+namespace GemRB {
+
 ResourceSource::ResourceSource(void)
 {
 }
 
 ResourceSource::~ResourceSource(void)
 {
+}
+
 }

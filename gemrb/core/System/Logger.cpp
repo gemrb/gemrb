@@ -22,6 +22,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 Logger::Logger()
 {}
 
@@ -42,19 +44,24 @@ const char* log_level_text[] = {
 	"DEBUG"
 };
 
+}
+
+using namespace GemRB;
+
 #ifdef ANDROID
 
 #include "System/Logger/Android.h"
-Logger* (*createDefaultLogger)() = createAndroidLogger;
+Logger* (*GemRB::createDefaultLogger)() = createAndroidLogger;
 
 #elif defined(WIN32) && !defined(WIN32_USE_STDIO)
 
 #include "System/Logger/Win32Console.h"
-Logger* (*createDefaultLogger)() = createWin32ConsoleLogger;
+Logger* (*GemRB::createDefaultLogger)() = createWin32ConsoleLogger;
 
 #else
 
 #include "System/Logger/Stdio.h"
-Logger* (*createDefaultLogger)() = createStdioLogger;
+Logger* (*GemRB::createDefaultLogger)() = createStdioLogger;
 
 #endif
+

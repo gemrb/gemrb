@@ -20,10 +20,14 @@
 
 #include "ScriptEngine.h"
 
+namespace GemRB {
+
 ScriptEngine::ScriptEngine(void)
 {
 }
 
 ScriptEngine::~ScriptEngine(void)
 {
+}
+
 }

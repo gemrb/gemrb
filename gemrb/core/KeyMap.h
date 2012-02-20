@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "Variables.h"
 
+namespace GemRB {
+
 class Variables;
 
 class GEM_EXPORT KeyMap {
@@ -44,5 +46,7 @@ public:
 
 	Function(const char *m, const char *f, int g);
 };
+
+}
 
 #endif

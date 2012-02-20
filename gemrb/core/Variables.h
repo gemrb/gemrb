@@ -29,6 +29,8 @@
 
 #include <cassert>
 
+namespace GemRB {
+
 #ifndef ReleaseFun
 typedef void (*ReleaseFun)(void *);
 #endif
@@ -125,5 +127,7 @@ protected:
 public:
 	~Variables();
 };
+
+}
 
 #endif

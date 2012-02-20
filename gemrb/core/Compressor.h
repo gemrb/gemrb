@@ -24,6 +24,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Compressor : public Plugin {
 public:
 	Compressor(void);
@@ -33,5 +35,7 @@ public:
 	/** compresses a datastream (memory or file) to another DataStream */
 	virtual int Compress(DataStream *dest, DataStream* source) const = 0;
 };
+
+}
 
 #endif

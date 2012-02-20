@@ -18,6 +18,8 @@
 
 #include "OGGReader.h"
 
+using namespace GemRB;
+
 static size_t ovfd_read(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
 	DataStream *vb = (DataStream *) datasource;

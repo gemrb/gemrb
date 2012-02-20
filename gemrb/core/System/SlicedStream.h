@@ -25,6 +25,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class GEM_EXPORT SlicedStream : public DataStream
 {
 private:
@@ -42,5 +44,7 @@ public:
 };
 
 GEM_EXPORT DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos = false);
+
+}
 
 #endif

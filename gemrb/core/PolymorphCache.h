@@ -21,6 +21,8 @@
 
 #include "ie_types.h"
 
+namespace GemRB {
+
 struct GEM_EXPORT PolymorphCache {
 	ieResRef Resource;
 	ieDword *stats;
@@ -30,5 +32,7 @@ struct GEM_EXPORT PolymorphCache {
 		delete[] stats;
 	}
 };
+
+}
 
 #endif

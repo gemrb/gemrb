@@ -28,6 +28,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class SymbolMgr
  * Abstract loader for symbol tables (.IDS files)
@@ -47,5 +49,7 @@ public:
 	virtual int FindString(char *str, int len) const = 0;
 	virtual int GetSize() const = 0;
 };
+
+}
 
 #endif  // ! SYMBOLMGR_H

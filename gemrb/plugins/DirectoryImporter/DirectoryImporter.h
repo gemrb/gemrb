@@ -22,6 +22,8 @@
 #include "ResourceSource.h"
 #include "StringMap.h"
 
+namespace GemRB {
+
 class Resource;
 class ResourceDesc;
 
@@ -59,5 +61,7 @@ public:
 	DataStream* GetResource(const char* resname, const ResourceDesc &type);
 };
 
+
+}
 
 #endif

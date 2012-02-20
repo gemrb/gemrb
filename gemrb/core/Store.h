@@ -34,6 +34,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 //bah!
 class CREItem;
 class Trigger;
@@ -174,5 +176,7 @@ private:
 	STOItem *FindItem(CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot) const;
 };
+
+}
 
 #endif // ! STORE_H

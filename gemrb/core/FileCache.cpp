@@ -24,6 +24,8 @@
 #include "System/FileStream.h"
 #include "System/VFS.h"
 
+namespace GemRB {
+
 DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length, bool overwrite)
 {
 	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
@@ -50,4 +52,6 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 		stream->Seek(length, GEM_CURRENT_POS);
 	}
 	return FileStream::OpenFile(path);
+}
+
 }

@@ -27,6 +27,8 @@
 #include "ResourceManager.h"
 #include "System/VFS.h"
 
+namespace GemRB {
+
 class ImageMgr;
 class Sprite2D;
 
@@ -82,5 +84,7 @@ private:
 	int SaveID;
 	ResourceManager manager;
 };
+
+}
 
 #endif

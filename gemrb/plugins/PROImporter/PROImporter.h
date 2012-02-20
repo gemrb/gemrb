@@ -27,6 +27,8 @@
 
 #include "Projectile.h"
 
+namespace GemRB {
+
 
 class PROImporter : public ProjectileMgr {
 private:
@@ -42,5 +44,7 @@ private:
 	void GetAreaExtension(ProjectileExtension *s);
 };
 
+
+}
 
 #endif

@@ -29,6 +29,8 @@
 #include "Sprite2D.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class ImageFactory;
 
 /**
@@ -64,5 +66,7 @@ public:
 	 */
 	ImageFactory* GetImageFactory(const char* ResRef);
 };
+
+}
 
 #endif

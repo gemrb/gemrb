@@ -32,6 +32,8 @@
 #include "ResourceSource.h"
 #endif
 
+namespace GemRB {
+
 #define RM_REPLACE_SAME_SOURCE 1
 
 class DataStream;
@@ -66,5 +68,7 @@ public:
 private:
 	std::vector<Holder<ResourceSource> > searchPath;
 };
+
+}
 
 #endif

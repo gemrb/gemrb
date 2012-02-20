@@ -25,6 +25,8 @@
 #define ADV_TEXT
 #include <conio.h>
 
+namespace GemRB {
+
 #ifdef __MINGW32__
 # define cprintf _cprintf
 #endif
@@ -72,4 +74,6 @@ void Win32ConsoleLogger::textcolor(log_color c)
 Logger* createWin32ConsoleLogger()
 {
 	return new Win32ConsoleLogger(true);
+}
+
 }

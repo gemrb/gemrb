@@ -24,6 +24,8 @@
 #include <cstdarg>
 #include <vector>
 
+namespace GemRB {
+
 static std::vector<Logger*> theLogger;
 
 void ShutdownLogging()
@@ -106,4 +108,6 @@ void Log(log_level level, const char* owner, StringBuffer const& buffer)
 	for (size_t i = 0; i < theLogger.size(); ++i) {
 		theLogger[i]->log(level, owner, buffer.get().c_str(), WHITE);
 	}
+}
+
 }

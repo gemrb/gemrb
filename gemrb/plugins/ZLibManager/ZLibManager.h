@@ -23,6 +23,8 @@
 
 #include "Compressor.h"
 
+namespace GemRB {
+
 class ZLibManager : public Compressor {
 public:
 	ZLibManager(void);
@@ -32,5 +34,7 @@ public:
 	// ZLib Compression
 	int Compress(DataStream* dest, DataStream* source) const;
 };
+
+}
 
 #endif

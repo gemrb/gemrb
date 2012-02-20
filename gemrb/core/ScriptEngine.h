@@ -23,6 +23,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class GEM_EXPORT ScriptEngine : public Plugin {
 public:
 	ScriptEngine(void);
@@ -36,5 +38,7 @@ public:
 	/** Exec a single String */
 	virtual void ExecString(const char* string) = 0;
 };
+
+}
 
 #endif

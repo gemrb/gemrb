@@ -30,6 +30,8 @@
 #include "Video.h"      /* needed only for paperdoll palettes */
 #include "GUI/Button.h"
 
+namespace GemRB {
+
 ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
 {
 	control = NULL;
@@ -153,4 +155,6 @@ void ControlAnimation::SetPaletteGradients(ieDword *col)
 void ControlAnimation::SetBlend(bool b)
 {
 	is_blended = b;
+}
+
 }

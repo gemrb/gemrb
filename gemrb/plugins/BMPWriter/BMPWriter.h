@@ -1,5 +1,7 @@
 #include "ImageWriter.h"
 
+namespace GemRB {
+
 class BMPWriter : public ImageWriter {
 public:
 	BMPWriter(void);
@@ -7,3 +9,5 @@ public:
 
 	void PutImage(DataStream *output, Sprite2D *sprite);
 };
+
+}

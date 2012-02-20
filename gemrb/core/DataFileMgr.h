@@ -31,6 +31,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class DataFileMgr
  * Abstract loader for .INI files
@@ -54,5 +56,7 @@ public:
 	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
 		const bool Default) const = 0;
 };
+
+}
 
 #endif

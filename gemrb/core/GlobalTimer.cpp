@@ -26,6 +26,8 @@
 #include "Video.h"
 #include "GUI/GameControl.h"
 
+namespace GemRB {
+
 GlobalTimer::GlobalTimer(void)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second
@@ -343,4 +345,6 @@ void GlobalTimer::SetScreenShake(int shakeX, int shakeY,
 	this->shakeX = shakeX;
 	this->shakeY = shakeY;
 	shakeCounter = Count+1;
+}
+
 }

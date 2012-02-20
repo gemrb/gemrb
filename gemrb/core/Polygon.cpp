@@ -27,6 +27,8 @@
 #include <cstring>
 #include <vector>
 
+namespace GemRB {
+
 Gem_Polygon::Gem_Polygon(Point* points, unsigned int cnt, Region *bbox)
 {
 	if (cnt) {
@@ -383,3 +385,5 @@ bool Wall_Polygon::PointCovered(int tx, int ty) const
 	return PointCovered(p);
 }
 
+
+}

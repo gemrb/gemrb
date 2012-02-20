@@ -20,10 +20,14 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 Plugin::Plugin(void)
 {
 }
 
 Plugin::~Plugin(void)
 {
+}
+
 }

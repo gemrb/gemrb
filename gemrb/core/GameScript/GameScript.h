@@ -31,6 +31,8 @@
 #include <cstdio>
 #include <vector>
 
+namespace GemRB {
+
 class Action;
 class GameScript;
 
@@ -1510,5 +1512,7 @@ Action* GenerateActionDirect(char* String, Scriptable *object);
 GEM_EXPORT Trigger* GenerateTrigger(char* String);
 
 void InitializeIEScript();
+
+}
 
 #endif

@@ -26,6 +26,8 @@
 #include "Palette.h"
 #include "SpriteCover.h"
 
+namespace GemRB {
+
 class Animation;
 class AnimationFactory;
 class DataStream;
@@ -154,5 +156,7 @@ private:
 	bool HandlePhase(Sprite2D *&frame);
 	void GetPaletteCopy();
 };
+
+}
 
 #endif

@@ -23,6 +23,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 FileLogger::FileLogger(DataStream* log_file)
 	: StdioLogger(false), log_file(log_file)
 {}
@@ -40,4 +42,6 @@ void FileLogger::print(const char *message)
 Logger* createFileLogger(DataStream* log_file)
 {
 	return new FileLogger(log_file);
+}
+
 }

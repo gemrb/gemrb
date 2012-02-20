@@ -30,6 +30,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 #define AV_PREFIX1      0
 #define AV_PREFIX2      1
 #define AV_PREFIX3      2
@@ -229,5 +231,7 @@ private:
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		char* ResRef, unsigned char& Cycle, EquipResRefData* equip);
 };
+
+}
 
 #endif

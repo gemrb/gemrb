@@ -20,6 +20,8 @@
 
 #include "MusicMgr.h"
 
+namespace GemRB {
+
 MusicMgr::MusicMgr()
 {
 }
@@ -30,4 +32,6 @@ MusicMgr::~MusicMgr()
 bool MusicMgr::Init()
 {
 	return true;
+}
+
 }

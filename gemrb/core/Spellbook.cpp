@@ -30,6 +30,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 static bool SBInitialized = false;
 static int NUM_BOOK_TYPES = 3;
 static bool IWD2Style = false;
@@ -1090,4 +1092,6 @@ void Spellbook::dump(StringBuffer& buffer) const
 			}
 		}
 	}
+}
+
 }

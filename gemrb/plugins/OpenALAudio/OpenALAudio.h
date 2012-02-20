@@ -60,6 +60,8 @@
 #define REFERENCE_DISTANCE 50
 #define ACM_BUFFERSIZE 8192
 
+namespace GemRB {
+
 class OpenALSoundHandle : public SoundHandle {
 protected:
 	struct AudioStream *parent;
@@ -144,5 +146,7 @@ private:
 	short* music_memory;
 	SDL_Thread* musicThread;
 };
+
+}
 
 #endif // OPENALAUDIO_H_INCLUDED

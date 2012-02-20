@@ -42,6 +42,8 @@
 #include <cassert>
 #include <cmath>
 
+namespace GemRB {
+
 #define YESNO(x) ( (x)?"Yes":"No")
 
 Container::Container(void)
@@ -296,3 +298,5 @@ bool Container::TryUnlock(Actor *actor) {
 	return Highlightable::TryUnlock(actor, false);
 }
 
+
+}

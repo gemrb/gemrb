@@ -24,6 +24,8 @@
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
 
+namespace GemRB {
+
 //container flags
 #define CONT_LOCKED      1
 #define CONT_RESET       8
@@ -67,5 +69,7 @@ public:
 	SpriteCover *groundiconcover;
 	//keyresref is stored in Highlightable
 };
+
+}
 
 #endif

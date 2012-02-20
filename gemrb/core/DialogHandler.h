@@ -25,6 +25,8 @@
 
 #include "Dialog.h"
 
+namespace GemRB {
+
 class GEM_EXPORT DialogHandler {
 public:
 	DialogHandler();
@@ -47,5 +49,7 @@ public:
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
 };
+
+}
 
 #endif

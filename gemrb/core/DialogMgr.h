@@ -25,6 +25,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT DialogMgr : public Plugin {
 public:
 	DialogMgr(void);
@@ -32,5 +34,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Dialog* GetDialog() const = 0;
 };
+
+}
 
 #endif

@@ -31,6 +31,8 @@
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
+namespace GemRB {
+
 #define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
 
@@ -427,4 +429,6 @@ void WorldMapControl::SetColor(int which, Color color)
 	}
 
 	Changed = true;
+}
+
 }

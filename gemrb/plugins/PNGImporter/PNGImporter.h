@@ -23,6 +23,8 @@
 
 #include "ImageMgr.h"
 
+namespace GemRB {
+
 struct PNGInternal;
 
 class PNGImporter : public ImageMgr {
@@ -41,5 +43,7 @@ public:
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
 };
+
+}
 
 #endif

@@ -45,6 +45,8 @@
 #include <cassert>
 #include <cmath>
 
+namespace GemRB {
+
 #define YESNO(x) ( (x)?"Yes":"No")
 
 // we start this at a non-zero value to make debugging easier
@@ -2128,3 +2130,5 @@ void TileObject::SetClosedTiles(unsigned short* Tiles, int cnt)
 	closedcount = cnt;
 }
 
+
+}

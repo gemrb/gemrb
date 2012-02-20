@@ -37,6 +37,8 @@
 
 #include <list>
 
+namespace GemRB {
+
 class Palette;
 
 // NOTE: keep these synchronized with GUIDefines.py!!!
@@ -223,5 +225,7 @@ private: // Private attributes
 	bool IsPixelTransparent (unsigned short x, unsigned short y);
 	void CloseUpColor();
 };
+
+}
 
 #endif

@@ -24,6 +24,8 @@
 
 #include "Interface.h"
 
+using namespace GemRB;
+
 EFFImporter::EFFImporter(void)
 {
 	str = NULL;

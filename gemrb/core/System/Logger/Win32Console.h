@@ -22,6 +22,8 @@
 
 #include "System/Logger/Stdio.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Win32ConsoleLogger : public StdioLogger {
 public:
 	Win32ConsoleLogger(bool useColor);
@@ -35,5 +37,7 @@ private:
 };
 
 Logger* createWin32ConsoleLogger();
+
+}
 
 #endif

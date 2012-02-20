@@ -29,6 +29,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class Sprite2D;
 
 class GEM_EXPORT Animation {
@@ -69,5 +71,7 @@ public:
 	/** add other animation's animarea to self */
 	void AddAnimArea(Animation* slave);
 };
+
+}
 
 #endif

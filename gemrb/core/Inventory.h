@@ -37,6 +37,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class Map;
 class StringBuffer;
 
@@ -359,5 +361,7 @@ private:
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(Item *it);
 };
+
+}
 
 #endif

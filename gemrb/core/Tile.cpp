@@ -20,6 +20,8 @@
 
 #include "Tile.h"
 
+namespace GemRB {
+
 Tile::Tile(Animation* anim, Animation* sec)
 {
 	tileIndex = 0;
@@ -39,4 +41,6 @@ Tile::~Tile(void)
 	if (anim[1]) {
 		delete( anim[1] );
 	}
+}
+
 }

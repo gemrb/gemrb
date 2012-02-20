@@ -24,6 +24,8 @@
 #include <cassert>
 #include <cstddef>
 
+namespace GemRB {
+
 template <class T>
 class Held {
 public:
@@ -81,6 +83,7 @@ public:
 	T* operator->() const { return ptr; }
 	bool operator!() const { return !ptr; }
 #include "operatorbool.h"
+
 	OPERATOR_BOOL(Holder<T>,T,ptr)
 	T* get() const { return ptr; }
 	void release() {
@@ -91,5 +94,7 @@ public:
 protected:
 	T *ptr;
 };
+
+}
 
 #endif

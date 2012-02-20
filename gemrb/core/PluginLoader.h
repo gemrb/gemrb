@@ -21,6 +21,8 @@
 #ifndef PLUGINLOADER_H
 #define PLUGINLOADER_H
 
+namespace GemRB {
+
 /**
  * Loads GemRB plugins from shared libraries or DLLs.
  *
@@ -28,5 +30,7 @@
  * and tries to load them one after another.
  */
 void LoadPlugins(char* pluginpath);
+
+}
 
 #endif

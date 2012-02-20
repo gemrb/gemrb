@@ -49,6 +49,8 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+namespace GemRB {
+
 //------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -6937,4 +6939,6 @@ void GameScript::SetNamelessDeath(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	sp->SetNamelessDeath(area, parameters->pointParameter, parameters->int1Parameter);
+}
+
 }

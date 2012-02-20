@@ -25,6 +25,8 @@
 #include "AmbientMgr.h"
 #include "SoundMgr.h"
 
+using namespace GemRB;
+
 NullSound::NullSound(void)
 {
 	XPos = 0;

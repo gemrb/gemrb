@@ -26,6 +26,8 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
+namespace GemRB {
+
 AnimationFactory::AnimationFactory(const char* ResRef)
 	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
 {
@@ -166,4 +168,6 @@ void AnimationFactory::DecDataRefCount()
 {
 	assert(datarefcount > 0);
 	--datarefcount;
+}
+
 }

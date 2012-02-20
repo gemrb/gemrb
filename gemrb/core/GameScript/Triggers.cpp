@@ -39,6 +39,8 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+namespace GemRB {
+
 //-------------------------------------------------------------
 // Trigger Functions
 //-------------------------------------------------------------
@@ -4084,4 +4086,6 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	return 0;
+}
+
 }

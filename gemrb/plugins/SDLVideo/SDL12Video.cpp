@@ -39,6 +39,8 @@
 #include <cassert>
 #include <cstdio>
 
+using namespace GemRB;
+
 SDL12VideoDriver::SDL12VideoDriver(void)
 {
 	overlay = NULL;

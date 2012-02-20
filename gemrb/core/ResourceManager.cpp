@@ -27,6 +27,8 @@
 #include "ResourceSource.h"
 #include "System/StringBuffer.h"
 
+namespace GemRB {
+
 ResourceManager::ResourceManager()
 {
 }
@@ -157,4 +159,6 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 		Log(WARNING, "ResourceManager", buffer);
 	}
 	return NULL;
+}
+
 }

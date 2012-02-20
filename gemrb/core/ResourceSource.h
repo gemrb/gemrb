@@ -27,6 +27,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class DataStream;
 class ResourceDesc;
 
@@ -43,5 +45,7 @@ public:
 protected:
 	char *description;
 };
+
+}
 
 #endif

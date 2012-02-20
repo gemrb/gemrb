@@ -18,6 +18,8 @@
  *
  */
 
+namespace {
+using namespace GemRB;
 
 struct TRTinter_NoTint {
 	void operator()(Uint8&, Uint8&, Uint8&) const { }
@@ -150,3 +152,4 @@ static void BlitTile_internal(SDL_Surface* target,
 	}
 }
 
+}

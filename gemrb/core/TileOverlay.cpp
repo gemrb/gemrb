@@ -25,6 +25,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+namespace GemRB {
+
 bool RedrawTile = false;
 
 TileOverlay::TileOverlay(int Width, int Height)
@@ -131,4 +133,6 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, in
 			}
 		}
 	}
+}
+
 }

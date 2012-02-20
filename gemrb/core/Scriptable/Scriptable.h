@@ -27,6 +27,8 @@
 
 #include <list>
 
+namespace GemRB {
+
 class Action;
 class Actor;
 class Container;
@@ -524,5 +526,7 @@ public:
 	unsigned short* closedtiles;
 	ieDword closedcount;
 };
+
+}
 
 #endif

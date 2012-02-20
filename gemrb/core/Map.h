@@ -18,8 +18,6 @@
  *
  */
 
-class Map;
-
 #ifndef MAP_H
 #define MAP_H
 
@@ -29,6 +27,8 @@ class Map;
 #include "Scriptable/Scriptable.h"
 
 #include <queue>
+
+namespace GemRB {
 
 class Actor;
 class Ambient;
@@ -502,5 +502,7 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radius);
 	void DrawPortal(InfoPoint *ip, int enable);
 };
+
+}
 
 #endif

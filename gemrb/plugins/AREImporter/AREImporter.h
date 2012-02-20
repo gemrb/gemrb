@@ -24,6 +24,9 @@
 #include "MapMgr.h"
 
 #include "Map.h" // proIterator
+
+namespace GemRB {
+
 class Animation;
 class AnimationFactory;
 class EffectQueue;
@@ -89,5 +92,7 @@ private:
 	int PutRestHeader(DataStream *stream, Map *map);
 	int PutSongHeader(DataStream *stream, Map *map);
 };
+
+}
 
 #endif

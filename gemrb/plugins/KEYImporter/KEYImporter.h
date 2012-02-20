@@ -30,6 +30,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class DataStream;
 class Resource;
 class ResourceDesc;
@@ -143,5 +145,7 @@ public:
 	DataStream* GetResource(const char* resname, SClass_ID type);
 	DataStream* GetResource(const char* resname, const ResourceDesc &type);
 };
+
+}
 
 #endif

@@ -25,6 +25,8 @@
 #include "ResourceDesc.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 DirectoryImporter::DirectoryImporter(void)
 {
 	description = NULL;

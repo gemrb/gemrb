@@ -25,6 +25,8 @@
 
 #include "Variables.h"
 
+namespace GemRB {
+
 struct VarEntry;
 
 class GEM_EXPORT LRUCache {
@@ -55,5 +57,7 @@ private:
 };
 
 
+
+}
 
 #endif

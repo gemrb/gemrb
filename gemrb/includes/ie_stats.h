@@ -30,6 +30,8 @@
 #ifndef IE_STATS_H
 #define IE_STATS_H
 
+namespace GemRB {
+
 //EA values
 #define EA_INANIMATE   		1
 #define EA_PC  			2
@@ -532,5 +534,7 @@
 #define IE_SPLSTATE_ID4          253
 #define IE_SPLSTATE_ID5          254
 #define IE_SPLSTATE_ID6          255
+
+}
 
 #endif  // ! IE_STATS_H

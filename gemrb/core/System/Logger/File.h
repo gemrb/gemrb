@@ -21,6 +21,8 @@
 
 #include "System/Logger/Stdio.h"
 
+namespace GemRB {
+
 class DataStream;
 
 class GEM_EXPORT FileLogger : public StdioLogger {
@@ -35,5 +37,7 @@ private:
 };
 
 Logger* createFileLogger(DataStream*);
+
+}
 
 #endif

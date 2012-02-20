@@ -46,6 +46,8 @@
 #include <set>
 #include <time.h>
 
+namespace GemRB {
+
 const TypeID SaveGame::ID = { "SaveGame" };
 
 /** Extract date from save game ds into Date. */
@@ -667,4 +669,6 @@ void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 
 	core->DelTree( game->GetPath(), false ); //remove all files from folder
 	rmdir( game->GetPath() );
+}
+
 }

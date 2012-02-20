@@ -28,6 +28,8 @@
 #include "Holder.h"
 #include "Interface.h"
 
+namespace GemRB {
+
 struct PythonCallback : public Callback {
 public:
 	PythonCallback(PyObject *Function);
@@ -107,6 +109,8 @@ PyObject* MakePyList(const Container &source)
 		PyList_SetItem(list, i, CObject<T>(source[i]));
 	}
 	return list;
+}
+
 }
 
 #endif

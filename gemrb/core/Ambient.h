@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+namespace GemRB {
+
 #define IE_AMBI_ENABLED 1
 #define IE_AMBI_POINT   2
 #define IE_AMBI_MAIN    4
@@ -73,5 +75,7 @@ public:
 	ieDword flags;
 
 };
+
+}
 
 #endif

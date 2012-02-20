@@ -32,6 +32,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 /**
  * @class TableMgr
  * Abstract loader for Table objects (.2DA files)
@@ -95,5 +97,7 @@ private:
 	unsigned int tableref;
 };
 
+
+}
 
 #endif  // ! TABLEMGR_H

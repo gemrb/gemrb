@@ -23,6 +23,8 @@
 
 #include "Holder.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Callback : public Held<Callback> {
 public:
 	virtual ~Callback();
@@ -31,5 +33,7 @@ public:
 };
 
 typedef Holder<Callback> EventHandler;
+
+}
 
 #endif

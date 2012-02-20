@@ -32,6 +32,7 @@
 # define strnicmp strncasecmp
 #endif
 
+namespace GemRB {
 /* this function will work with pl/cz special characters */
 
 extern unsigned char pl_uppercase[256];
@@ -40,10 +41,13 @@ extern unsigned char pl_lowercase[256];
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
+GEM_EXPORT int strlench(const char* string, char ch);
+
+}
+
 #ifndef HAVE_STRNLEN
 GEM_EXPORT int strnlen(const char* string, int maxlen);
 #endif
-GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNDUP
 GEM_EXPORT char* strndup(const char* s, size_t l);
 #endif

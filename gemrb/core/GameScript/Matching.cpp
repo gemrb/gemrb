@@ -30,6 +30,8 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+namespace GemRB {
+
 /* return a Targets object with a single scriptable inside */
 static inline Targets* ReturnScriptableAsTarget(Scriptable *sc)
 {
@@ -688,3 +690,5 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 	return XthNearestOf(parameters,count, ga_flags);
 }
 
+
+}

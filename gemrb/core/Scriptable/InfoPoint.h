@@ -23,6 +23,8 @@
 
 #include "Scriptable/Scriptable.h"
 
+namespace GemRB {
+
 class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
@@ -51,5 +53,7 @@ public:
 	Point UsePoint;
 	Point TalkPos;
 };
+
+}
 
 #endif

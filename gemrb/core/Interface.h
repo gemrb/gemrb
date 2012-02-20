@@ -49,6 +49,8 @@
 #include "WindowMgr.h"
 #endif
 
+namespace GemRB {
+
 class Actor;
 class Audio;
 class CREItem;
@@ -828,5 +830,7 @@ public:
 };
 
 extern GEM_EXPORT Interface * core;
+
+}
 
 #endif

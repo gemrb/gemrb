@@ -34,6 +34,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class Actor;
 class Spell;
 class StringBuffer;
@@ -252,5 +254,7 @@ public:
 	/// Dumps spellbook to given buffer
 	void dump(StringBuffer&) const;
 };
+
+}
 
 #endif

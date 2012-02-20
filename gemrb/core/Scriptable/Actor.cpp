@@ -57,6 +57,8 @@
 
 #include <cassert>
 
+namespace GemRB {
+
 //configurable?
 ieDword ref_lightness = 43;
 
@@ -8183,4 +8185,6 @@ void Actor::ResetCommentTime()
 		nextBored = 0;
 	}
 	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
+}
+
 }

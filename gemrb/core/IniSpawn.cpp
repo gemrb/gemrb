@@ -35,6 +35,8 @@
 #include "GameScript/Matching.h"
 #include "Scriptable/Actor.h"
 
+namespace GemRB {
+
 static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
 IE_SEX, IE_ALIGNMENT };
@@ -843,3 +845,5 @@ void IniSpawn::CheckSpawn()
 	}
 }
 
+
+}

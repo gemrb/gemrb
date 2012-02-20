@@ -33,6 +33,8 @@
 #include "exports.h"
 #include "globals.h"
 
+namespace GemRB {
+
 /**
  * @class FileStream
  * Reads and writes data from/to files on a filesystem
@@ -67,5 +69,7 @@ public:
 private:
 	void FindLength();
 };
+
+}
 
 #endif  // ! FILESTREAM_H

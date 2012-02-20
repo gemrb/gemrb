@@ -29,6 +29,8 @@
 #include <cstdlib>
 #include <cstring>
 
+namespace GemRB {
+
 // RAW file reader
 class RawPCMReader : public SoundMgr {
 protected:
@@ -55,5 +57,7 @@ public:
 	}
 	bool Open(DataStream* stream);
 };
+
+}
 
 #endif

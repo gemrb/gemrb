@@ -34,6 +34,8 @@
 #include "DataFileMgr.h"
 #include "Region.h"
 
+namespace GemRB {
+
 class Map;
 
 /**
@@ -178,5 +180,7 @@ public:
 	void ExitSpawn();
 	void CheckSpawn();
 };
+
+}
 
 #endif  // ! INISPAWN_H

@@ -25,6 +25,8 @@
 #include "ResourceDesc.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 NullSource::NullSource(void)
 {
 	description = NULL;

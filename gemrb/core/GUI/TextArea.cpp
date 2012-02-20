@@ -39,6 +39,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+namespace GemRB {
+
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
 	keeplines = 100;
@@ -1023,4 +1025,6 @@ void TextArea::SetFocus(bool focus)
 	if (hasFocus && Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
+}
+
 }

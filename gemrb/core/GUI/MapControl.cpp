@@ -32,6 +32,8 @@
 #include "GUI/Window.h"
 #include "Scriptable/Actor.h"
 
+namespace GemRB {
+
 #define MAP_NO_NOTES   0
 #define MAP_VIEW_NOTES 1
 #define MAP_SET_NOTE   2
@@ -540,4 +542,6 @@ bool MapControl::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
 }

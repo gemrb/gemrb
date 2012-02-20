@@ -22,10 +22,14 @@
 
 #include "globals.h"
 
+namespace GemRB {
+
 Compressor::Compressor(void)
 {
 }
 
 Compressor::~Compressor(void)
 {
+}
+
 }

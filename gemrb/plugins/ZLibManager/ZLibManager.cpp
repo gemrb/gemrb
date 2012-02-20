@@ -25,6 +25,8 @@
 
 #include <zlib.h>
 
+using namespace GemRB;
+
 
 ZLibManager::ZLibManager(void)
 {

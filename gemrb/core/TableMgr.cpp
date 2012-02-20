@@ -23,6 +23,8 @@
 #include "GameData.h"
 #include "Interface.h"
 
+namespace GemRB {
+
 TableMgr::TableMgr()
 {
 }
@@ -82,3 +84,5 @@ void AutoTable::release()
 	}
 }
 
+
+}

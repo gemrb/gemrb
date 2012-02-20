@@ -20,10 +20,14 @@
 
 #include "ActorMgr.h"
 
+namespace GemRB {
+
 ActorMgr::ActorMgr(void)
 {
 }
 
 ActorMgr::~ActorMgr(void)
 {
+}
+
 }

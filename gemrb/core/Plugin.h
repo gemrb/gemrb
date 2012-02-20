@@ -35,6 +35,8 @@
 
 #include <cstddef>
 
+namespace GemRB {
+
 /**
  * @class Plugin
  * Base class for all GemRB plugins
@@ -45,5 +47,7 @@ public:
 	Plugin(void);
 	virtual ~Plugin(void);
 };
+
+}
 
 #endif

@@ -33,6 +33,8 @@
 
 #include "Resource.h"
 
+namespace GemRB {
+
 /**
  * @class MoviePlayer
  * Abstract loader and player for videos
@@ -46,5 +48,7 @@ public:
 	virtual int Play() = 0;
 	virtual void CallBackAtFrames(ieDword cnt, ieDword *frames, ieDword *strrefs) = 0;
 };
+
+}
 
 #endif

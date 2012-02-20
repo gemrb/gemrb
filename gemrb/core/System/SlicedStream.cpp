@@ -27,6 +27,8 @@
 
 #include "Interface.h"
 
+namespace GemRB {
+
 SlicedStream::SlicedStream(DataStream* str, int startpos, int size)
 {
 	this->str = str->Clone();
@@ -123,4 +125,6 @@ DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long s
 		return mem;
 	} else
 		return new SlicedStream(str, startpos, size);
+}
+
 }

@@ -26,6 +26,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 #define IE_DLG_TR_TEXT     0x01
 #define IE_DLG_TR_TRIGGER  0x02
 #define IE_DLG_TR_ACTION   0x04
@@ -79,5 +81,7 @@ public:
 	ieDword* Order;
 	DialogState** initialStates;
 };
+
+}
 
 #endif

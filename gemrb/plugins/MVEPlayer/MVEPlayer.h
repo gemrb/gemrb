@@ -28,6 +28,8 @@
 
 #include "Interface.h"
 
+namespace GemRB {
+
 class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
 private:
@@ -53,5 +55,7 @@ public:
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();
 };
+
+}
 
 #endif

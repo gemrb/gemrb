@@ -24,6 +24,8 @@
 
 #include "Interface.h"
 
+namespace GemRB {
+
 #ifdef WIN32
 struct FileStream::File {
 private:
@@ -324,4 +326,6 @@ FileStream* FileStream::OpenFile(const char* filename)
 
 	delete fs;
 	return NULL;
+}
+
 }

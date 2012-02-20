@@ -22,6 +22,8 @@
 
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 Resource::Resource(void)
 {
 	str = NULL;
@@ -32,4 +34,6 @@ Resource::~Resource(void)
 	if (str) {
 		delete( str );
 	}
+}
+
 }

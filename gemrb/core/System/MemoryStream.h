@@ -25,6 +25,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class GEM_EXPORT MemoryStream : public DataStream
 {
 private:
@@ -38,5 +40,7 @@ public:
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
 };
+
+}
 
 #endif

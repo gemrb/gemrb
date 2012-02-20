@@ -25,6 +25,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+namespace GemRB {
+
 class DataStream;
 class Resource;
 class TypeID;
@@ -56,5 +58,7 @@ public:
 	ieWord GetKeyType() const;
 	Resource* Create(DataStream*) const;
 };
+
+}
 
 #endif

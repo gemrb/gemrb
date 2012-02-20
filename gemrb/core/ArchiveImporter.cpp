@@ -20,10 +20,14 @@
 
 #include "ArchiveImporter.h"
 
+namespace GemRB {
+
 ArchiveImporter::ArchiveImporter(void)
 {
 }
 
 ArchiveImporter::~ArchiveImporter(void)
 {
+}
+
 }

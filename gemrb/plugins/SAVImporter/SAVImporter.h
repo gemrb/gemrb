@@ -27,6 +27,8 @@
 
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class SAVImporter : public ArchiveImporter {
 public:
 	SAVImporter(void);
@@ -35,5 +37,7 @@ public:
 	int AddToSaveGame(DataStream *str, DataStream *uncompressed);
 	int CreateArchive(DataStream *compressed);
 };
+
+}
 
 #endif

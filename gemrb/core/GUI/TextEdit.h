@@ -34,6 +34,8 @@
 
 #include "Font.h"
 
+namespace GemRB {
+
 class Palette;
 
 // !!! Keep these synchronized with GUIDefines.py
@@ -101,5 +103,7 @@ public: //Events
 	EventHandler EditOnDone;
 	EventHandler EditOnCancel;
 };
+
+}
 
 #endif

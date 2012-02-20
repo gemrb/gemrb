@@ -102,6 +102,8 @@
 #include "exports.h"
 #include "PluginMgr.h"
 
+namespace GemRB {
+
 template <typename T>
 struct CreatePlugin {
 	static Plugin *func()
@@ -124,6 +126,8 @@ struct CreateResource {
 	}
 };
 
+}
+
 #ifndef STATIC_LINK
 
 #ifdef WIN32
@@ -143,6 +147,7 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 }
 
 #define GEMRB_PLUGIN(id, desc)					\
+	namespace { using namespace GemRB;			\
 	GEM_EXPORT_DLL PluginID GemRBPlugin_ID() {		\
 		return id;					\
 	}							\
@@ -172,12 +177,14 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 		/* mgr is not null (this makes mgr used) */
 #define END_PLUGIN()						\
 		return mgr!=0;					\
+	}							\
 	}
 
 #else /* STATIC_LINK */
 
 #define GEMRB_PLUGIN(id, desc)	\
-	namespace { bool doRegisterPlugin = (
+	namespace { using namespace GemRB;			\
+		bool doRegisterPlugin = (
 
 #define PLUGIN_CLASS(id, cls)					\
 		PluginMgr::Get()->RegisterPlugin(id, &CreatePlugin<cls>::func ),

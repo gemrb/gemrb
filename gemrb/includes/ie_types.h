@@ -32,6 +32,8 @@
 #include <config.h>
 #endif
 
+namespace GemRB {
+
 //we need this for Windows and Android
 #if defined (WIN32) || defined (ANDROID)
 #define SIZEOF_INT 4
@@ -66,5 +68,6 @@ typedef ieDword ieStrRef;
 typedef char ieResRef[9];
 typedef char ieVariable[33];
 
-#endif  //! IE_TYPES_H
+}
 
+#endif  //! IE_TYPES_H

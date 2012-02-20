@@ -31,6 +31,8 @@
 #include "WorldMap.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class WorldMapMgr
  * Abstract loader for WorldMap objects
@@ -46,5 +48,7 @@ public:
 	virtual int GetStoredFileSize(WorldMapArray *wmap, unsigned int index) = 0;
 	virtual int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap) = 0;
 };
+
+}
 
 #endif

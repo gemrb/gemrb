@@ -29,6 +29,8 @@
 #endif
 #endif
 
+namespace GemRB {
+
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
 
@@ -78,6 +80,17 @@ void strnspccpy(char* dest, const char *source, int count, bool upper)
 	}
 }
 
+/** Returns the length of string (up to a delimiter) */
+GEM_EXPORT int strlench(const char* string, char ch)
+{
+	int i;
+	for (i = 0; string[i] && string[i] != ch; i++)
+		;
+	return i;
+}
+
+} // namespace GemRB
+
 #ifndef HAVE_STRNLEN
 int strnlen(const char* string, int maxlen)
 {
@@ -93,15 +106,6 @@ int strnlen(const char* string, int maxlen)
 	return i;
 }
 #endif // ! HAVE_STRNLEN
-
-/** Returns the length of string (up to a delimiter) */
-GEM_EXPORT int strlench(const char* string, char ch)
-{
-	int i;
-	for (i = 0; string[i] && string[i] != ch; i++)
-		;
-	return i;
-}
 
 //// Compatibility functions
 #ifndef HAVE_STRNDUP

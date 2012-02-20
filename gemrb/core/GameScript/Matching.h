@@ -24,6 +24,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class TileMap;
 
 GEM_EXPORT Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags);
@@ -45,5 +47,7 @@ bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
 /* returns the number of actors matching the IDS targeting */
 int GetObjectCount(Scriptable* Sender, Object* oC);
 int GetObjectLevelCount(Scriptable* Sender, Object* oC);
+
+}
 
 #endif

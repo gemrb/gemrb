@@ -26,6 +26,8 @@
 #include "GameScript/GameScript.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 DLGImporter::DLGImporter(void)
 {
 	str = NULL;

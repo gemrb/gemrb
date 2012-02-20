@@ -26,6 +26,8 @@
 
 #include "Animation.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Tile {
 public:
 	Tile(Animation* anim, Animation* sec = NULL);
@@ -38,5 +40,7 @@ public:
 	Color NLightMap[16];
 	Animation* anim[2];
 };
+
+}
 
 #endif

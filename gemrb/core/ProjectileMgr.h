@@ -25,6 +25,8 @@
 #include "Projectile.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT ProjectileMgr : public Plugin {
 public:
 	ProjectileMgr(void);
@@ -32,5 +34,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Projectile* GetProjectile( Projectile *) = 0;
 };
+
+}
 
 #endif

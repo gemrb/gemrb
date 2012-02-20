@@ -35,6 +35,8 @@
 
 #include "Sprite2D.h"
 
+namespace GemRB {
+
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_SCROLLBAR_ON_CHANGE  0x07000000
 
@@ -108,5 +110,7 @@ public: // Public Events
 	/** OnChange Scripted Event Function Name */
 	EventHandler ScrollBarOnChange;
 };
+
+}
 
 #endif

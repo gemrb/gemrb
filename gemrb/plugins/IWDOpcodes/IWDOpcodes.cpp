@@ -35,6 +35,8 @@
 #include "Scriptable/Actor.h"
 #include "GameScript/GSUtils.h" //needs for displaystringcore
 
+using namespace GemRB;
+
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
 static bool enhanced_effects = false;

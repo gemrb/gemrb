@@ -31,6 +31,8 @@
 
 #include <cstddef>
 
+namespace GemRB {
+
 class DataStream;
 
 /**
@@ -53,5 +55,7 @@ public:
 	 */
 	virtual bool Open(DataStream* stream) = 0;
 };
+
+}
 
 #endif

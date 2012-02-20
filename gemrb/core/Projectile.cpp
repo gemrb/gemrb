@@ -38,6 +38,8 @@
 #include <cmath>
 #include <cstdlib>
 
+namespace GemRB {
+
 //to get gradient color
 //apparently pst doesn't have the small palette correctly
 #define PALSIZE 32
@@ -1785,3 +1787,5 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
+
+}

@@ -34,6 +34,8 @@
 
 #include "ie_cursors.h"
 
+namespace GemRB {
+
 Window::Window(unsigned short WindowID, unsigned short XPos,
 	unsigned short YPos, unsigned short Width, unsigned short Height)
 {
@@ -458,4 +460,6 @@ void Window::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 	lastOver->OnMouseOver( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+}
+
 }

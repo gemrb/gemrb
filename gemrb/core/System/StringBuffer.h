@@ -29,6 +29,8 @@
 
 #include <string>
 
+namespace GemRB {
+
 #if defined(__GNUC__)
 # define PRINTF_FORMAT(x, y) \
     __attribute__ ((format(printf, x, y)))
@@ -58,5 +60,7 @@ private:
 };
 
 #undef PRINTF_FORMAT
+
+}
 
 #endif

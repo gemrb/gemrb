@@ -23,6 +23,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class GEM_EXPORT SpriteCover {
 public:
 	unsigned char* pixels;
@@ -35,5 +37,7 @@ public:
 	bool Covers(int x, int y, int xpos, int ypos, int width, int height) const;
 };
 
+
+}
 
 #endif

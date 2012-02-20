@@ -25,6 +25,8 @@
 
 #include "TlkOverride.h"
 
+namespace GemRB {
+
 class TLKImporter : public StringMgr {
 private:
 	DataStream* str;
@@ -63,5 +65,7 @@ private:
 	char *Gabber();
 	char *CharName(int slot);
 };
+
+}
 
 #endif

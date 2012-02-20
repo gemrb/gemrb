@@ -28,6 +28,8 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
+namespace GemRB {
+
 Animation::Animation(int count)
 {
 	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));
@@ -258,4 +260,6 @@ void Animation::AddAnimArea(Animation* slave)
 	if (y+h > animArea.y+animArea.h) {
 		animArea.h = y+h-animArea.y;
 	}
+}
+
 }

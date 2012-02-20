@@ -23,6 +23,8 @@
 
 #include "SDLVideo.h"
 
+namespace GemRB {
+
 class SDL12VideoDriver : public SDLVideoDriver {
 private:
 	/* yuv overlay for bink movie */
@@ -57,5 +59,7 @@ private:
 
 	int ProcessEvent(const SDL_Event & event);
 };
+
+}
 
 #endif

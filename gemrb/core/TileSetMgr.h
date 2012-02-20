@@ -25,6 +25,8 @@
 #include "Tile.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT TileSetMgr : public Plugin {
 public:
 	TileSetMgr(void);
@@ -33,5 +35,7 @@ public:
 	virtual Tile* GetTile(unsigned short* indexes, int count,
 		unsigned short* secondary = NULL) = 0;
 };
+
+}
 
 #endif

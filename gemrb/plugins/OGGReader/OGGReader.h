@@ -30,6 +30,8 @@
 #endif
 #include <vorbis/vorbisfile.h>
 
+namespace GemRB {
+
 class OGGReader : public SoundMgr {
 private:
 	OggVorbis_File OggStream;
@@ -51,5 +53,7 @@ public:
 	bool Open(DataStream* stream);
 	int read_samples(short* buffer, int count);
 };
+
+}
 
 #endif

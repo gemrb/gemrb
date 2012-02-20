@@ -20,10 +20,14 @@
 
 #include "TileMapMgr.h"
 
+namespace GemRB {
+
 TileMapMgr::TileMapMgr(void)
 {
 }
 
 TileMapMgr::~TileMapMgr(void)
 {
+}
+
 }

@@ -25,6 +25,8 @@
 #include "win32def.h"
 #include "globals.h"
 
+using namespace GemRB;
+
 #define G_UNLIKELY(x) (x)
 #define GST_WARNING print
 #define GST_ERROR print

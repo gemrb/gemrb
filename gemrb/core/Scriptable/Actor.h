@@ -35,6 +35,8 @@
 #include <cstring>
 #include <vector>
 
+namespace GemRB {
+
 class Animation;
 class CharAnimations;
 class DataFileMgr;
@@ -43,11 +45,15 @@ class ScriptedAnimation;
 class StringBuffer;
 struct PolymorphCache;
 
+}
+
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #include "ie_stats.h"
 
 #include "Inventory.h"
 #include "Spellbook.h"
+
+namespace GemRB {
 
 #define MAX_STATS 256
 #define MAX_LEVEL 128
@@ -787,4 +793,6 @@ public:
 	/* resets the bored and area comment timers */
 	void ResetCommentTime();
 };
+}
+
 #endif
