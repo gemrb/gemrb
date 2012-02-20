@@ -209,7 +209,7 @@ def OpenFloatMenuWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.SetVarAssoc ('ItemButton', i)
 		Button.SetFont ('NUMBER')
-		#Button.SetPushOffset (0, 0)
+		Button.SetPushOffset (0, 0)
 
 	# BAMs:
 	# AMALLSTP - 41655
@@ -411,8 +411,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 	if weapons and i==4:
 		# FIXME: rather call UpdateFloatMenuGroupAction?
 		Button.SetActionIcon (globals(), ACT_DEFEND)
-		#Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		return
 		
 	#if slot_item and slottype:
@@ -430,8 +429,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 			Button.SetTooltip (item['ItemNameIdentified'])
 		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
-		#Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		#Button.SetVarAssoc ('ItemButton', i)
 		return
 
@@ -471,8 +469,7 @@ def UpdateFloatMenuSpell (pc, i):
 		Button.SetTooltip (spell['SpellName'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
 		#Button.SetVarAssoc ('ItemButton', i)
-		#Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		ClearSlot (i)
 
