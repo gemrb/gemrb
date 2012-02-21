@@ -30,7 +30,7 @@
 #include "Map.h"
 #include "SymbolMgr.h"
 #include "Scriptable/Actor.h"
-#include "Spell.h"  //needs for the source flags bitfield
+#include "Spell.h" //needs for the source flags bitfield
 #include "TableMgr.h"
 #include "System/StringBuffer.h"
 
@@ -796,17 +796,11 @@ static EffectRef fx_spelltrap = { "SpellTrap", -1 };
 //this is for whole spell immunity/bounce
 static inline int DecreaseEffect(Effect *efx)
 {
-  if (efx->Parameter1) {
+	if (efx->Parameter1) {
 		efx->Parameter1--;
-    return true;
-  }
-  return false;
-  /* now we let the effect terminate itself, so it can do things on removal
-	if( (int) efx->Parameter1<1) {
-		//don't remove effects directly!!!
-		efx->TimingMode = FX_DURATION_JUST_EXPIRED;
+	return true;
 	}
-  */
+	return false;
 }
 
 //lower decreasing immunities/bounces
@@ -1785,6 +1779,19 @@ Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ie
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithResource(effect_reference.opcode, resource);
+}
+
+//returns the first effect with source 'Removed'
+Effect *EffectQueue::HasSource(const ieResRef Removed) const
+{
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_LIVE_FX();
+		MATCH_SOURCE();
+
+		return (*f);
+	}
+	return NULL;
 }
 
 //used in contingency/sequencer code (cannot have the same contingency twice)

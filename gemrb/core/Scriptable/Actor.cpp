@@ -8109,12 +8109,20 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 {
 	ieResRef spellres;
 
-	//TODO: spell specific state checks
+	ResolveSpellName(spellres, spellnum);
+
+	//cheap substitute of the original hardcoded feature, returns true if already affected by the exact spell
+	//no (spell)state checks based on every effect in the spell
+	//FIXME: create a more compatible version  if needed
+	if (fxqueue.HasSource(spellres)) return true;
+	//return true if caster cannot cast
+	if (!caster->CanCast(spellres)) return true;
+
 	if (!range) return false;
 
-	ResolveSpellName(spellres, spellnum);
 	Spell *spl = gamedata->GetSpell(spellres);
 	int srange = spl->GetCastingDistance(caster);
+	gamedata->FreeSpell(spl, spellres, false);
 
 	return srange<range;
 }

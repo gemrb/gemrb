@@ -194,7 +194,7 @@ void LoadPlugins(char* pluginpath)
 			continue;
 		}
 		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
-			Log(ERROR, "PluginLoader", "Skpping plugin \"%s\" with version mistmatch.", path);
+			Log(ERROR, "PluginLoader", "Skipping plugin \"%s\" with version mistmatch.", path);
 			FREE_PLUGIN( hMod );
 			continue;
 		}
