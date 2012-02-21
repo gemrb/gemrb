@@ -8077,7 +8077,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
 		}
 
-		PyObject *pValue = gs->CallbackFunction(fname, param);
+		PyObject *pValue = gs->RunFunction(NULL, fname, param);
 
 		/* we created this parameter, now we don't need it*/
 		Py_DECREF( param );
@@ -10681,74 +10681,61 @@ bool GUIScript::LoadScript(const char* filename)
 }
 
 /* Similar to RunFunction, but with parameters, and doesn't necessarily fails */
-PyObject *GUIScript::CallbackFunction(const char* fname, PyObject* pArgs)
+PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
 {
 	if (!Py_IsInitialized()) {
 		return NULL;
-	}
-	if (pDict == NULL) {
-		return NULL;
-	}
-	PyObject *pFunc = PyDict_GetItemString( pDict, (char *) fname );
-	/* pFunc: Borrowed reference */
-	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
-		Log(ERROR, "GUIScript", "%s is not callable!", fname);
-		return NULL;
-	}
-	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
-	if (pValue == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-	}
-	return pValue;
-}
-
-bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bool error, int intparam)
-{
-	if (!Py_IsInitialized()) {
-		return false;
 	}
 
 	PyObject *module;
-	if (ModuleName) {
-		module = PyImport_ImportModule(const_cast<char*> (ModuleName) );
+	if (moduleName) {
+		module = PyImport_ImportModule(const_cast<char*>(moduleName));
 	} else {
 		module = pModule;
 		Py_XINCREF(module);
 	}
 	if (module == NULL) {
 		PyErr_Print();
-		return false;
+		return NULL;
 	}
 	PyObject *dict = PyModule_GetDict(module);
 
-	PyObject *pFunc = PyDict_GetItemString( dict, const_cast<char*>(FunctionName) );
+	PyObject *pFunc = PyDict_GetItemString(dict, const_cast<char*>(functionName));
 	/* pFunc: Borrowed reference */
-	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
-		if (error) {
-			Log(ERROR, "GUIScript", "Missing function: %s", FunctionName);
+	if (!pFunc || !PyCallable_Check(pFunc)) {
+		if (report_error) {
+			Log(ERROR, "GUIScript", "Missing function: %s", functionName);
 		}
 		Py_DECREF(module);
-		return false;
+		return NULL;
 	}
+	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
+	if (pValue == NULL) {
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+		}
+	}
+	Py_DECREF(module);
+	return pValue;
+}
+
+bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bool report_error, int intparam)
+{
 	PyObject *pArgs;
 	if (intparam == -1) {
 		pArgs = NULL;
 	} else {
 		pArgs = Py_BuildValue("(i)", intparam);
 	}
-	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
-	Py_XDECREF( pArgs );
+	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
+	Py_XDECREF(pArgs);
 	if (pValue == NULL) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
 		}
-		Py_DECREF(module);
 		return false;
 	}
-	Py_DECREF( pValue );
-	Py_DECREF(module);
+	Py_DECREF(pValue);
 	return true;
 }
 

@@ -58,7 +58,7 @@ public:
 	/** Exec a single String */
 	void ExecString(const char* string);
 	/** lets hope this one can be here without screwing up the general interface */
-	PyObject *CallbackFunction(const char* fname, PyObject* pArgs);
+	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 	PyObject* ConstructObject(const char* classname, int arg);
 	PyObject* ConstructObject(const char* classname, PyObject* pArgs);
 };
