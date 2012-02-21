@@ -10739,6 +10739,21 @@ bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bo
 	return true;
 }
 
+bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bool report_error, Point param)
+{
+	PyObject *pArgs = Py_BuildValue("(ii)", param.x, param.y);
+	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
+	Py_XDECREF(pArgs);
+	if (pValue == NULL) {
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+		}
+		return false;
+	}
+	Py_DECREF(pValue);
+	return true;
+}
+
 void GUIScript::ExecFile(const char* file)
 {
 	FileStream fs;

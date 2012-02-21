@@ -53,6 +53,7 @@ public:
 	bool LoadScript(const char* filename);
 	/** Run Function */
 	bool RunFunction(const char *module, const char* fname, bool report_error=true, int intparam=-1);
+	bool RunFunction(const char *module, const char* fname, bool report_error, Point param);
 	/** Exec a single File */
 	void ExecFile(const char* file);
 	/** Exec a single String */
