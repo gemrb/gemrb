@@ -100,6 +100,9 @@ def UpdateControlStatus ():
 		GemRB.SetVar ("OptionsWindow", -1)
 		MessageTA = GUIClasses.GTextArea(MessageWindow.ID, GemRB.GetVar ("MessageTextArea"))
 		MessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+		
+		Label = MessageWindow.GetControl (0x10000003)
+		Label.SetText (str (GemRB.GameGetPartyGold ()))
 	else:
 		GemRB.SetVar ("MessageWindow", -1)
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
