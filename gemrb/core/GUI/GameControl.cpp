@@ -1900,7 +1900,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+	unsigned short Mod)
 {
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
@@ -1921,7 +1921,12 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		OnSpecialKeyPress(GEM_DOWN);
 		break;
 	case GEM_MB_MENU: //right click.
-		if (target_mode == TARGET_MODE_NONE) {
+		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
+			core->GetDictionary()->SetAt( "MenuX", x );
+			core->GetDictionary()->SetAt( "MenuY", y );
+			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
+		}
+		else if (target_mode == TARGET_MODE_NONE) {
 			DrawSelectionRect = false;
 			MouseIsDown = false;
 			if (core->GetGame()->selected.size() > 1) {
@@ -1949,7 +1954,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+	unsigned short Mod)
 {
 	unsigned int i;
 	char Tmp[256];
@@ -2017,7 +2022,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	//hidden actors are not selectable by clicking on them
 	Actor* actor = NULL;
 	if (!FormationRotation) actor = area->GetActor( p, GA_DEFAULT /*| GA_NO_DEAD */| GA_NO_HIDDEN | target_types);
-	if (Button == GEM_MB_MENU) {
+	if (Button == GEM_MB_MENU && (!core->HasFeature(GF_HAS_FLOAT_MENU) || Mod)) {
 		if (actor) {
 			//play select sound on right click on actor
 			actor->SelectActor();
@@ -2026,9 +2031,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		// reset the action bar
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
 		core->SetEventFlag(EF_ACTION);
-		core->GetDictionary()->SetAt( "MenuX", x );
-		core->GetDictionary()->SetAt( "MenuY", y );
-		core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow" );
 		if (!FormationRotation) {
 			return;
 		}

@@ -2520,6 +2520,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasSoundsIni",       //62GF_SOUNDS_INI
 		"HasNoNPCFlag",       //63GF_USEPOINT_400
 		"HasUsePointFlag",    //64GF_USEPOINT_200
+		"HasFloatMenu",		  //65GF_HAS_FLOAT_MENU
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

@@ -100,10 +100,10 @@ def SelectFormation ():
 	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))
 	return
 
-def OpenFloatMenuWindow ():
+def OpenFloatMenuWindow (x, y):
 	if GameIsPST():
 		import FloatMenuWindow
-		FloatMenuWindow.OpenFloatMenuWindow()
+		FloatMenuWindow.OpenFloatMenuWindow(x, y)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 

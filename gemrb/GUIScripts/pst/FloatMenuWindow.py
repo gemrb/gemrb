@@ -99,7 +99,7 @@ def DoSingleAction ():
 		# FIXME: Or priest scroll ....
 		GUIMG.OpenMageWindow ()
 
-def OpenFloatMenuWindow ():
+def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
 	global float_menu_mode, float_menu_index, float_menu_selected
 
@@ -142,15 +142,13 @@ def OpenFloatMenuWindow ():
 	FloatMenuWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
-	x, y = GemRB.GetVar ("MenuX"), GemRB.GetVar ("MenuY")
-
 	# FIXME: keep the menu inside the viewport!!!
 	Window.SetPos (x, y, WINDOW_CENTER | WINDOW_BOUNDED)
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectNextPC)
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUICommon.OpenFloatMenuWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenFloatMenuWindow)
 
 	# Initiate Dialogue
 	Button = Window.GetControl (CID_DIALOG)
