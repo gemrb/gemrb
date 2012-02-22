@@ -52,7 +52,7 @@ SDL12VideoDriver::~SDL12VideoDriver(void)
 int SDL12VideoDriver::Init(void)
 {
 	int ret = SDLVideoDriver::Init();
-	if (ret) {
+	if (ret==GEM_OK) {
 		SDL_EnableUNICODE( 1 );
 		SDL_EnableKeyRepeat( 500, 50 );
 	}
