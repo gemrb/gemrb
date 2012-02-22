@@ -1922,8 +1922,6 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		break;
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
-			core->GetDictionary()->SetAt( "MenuX", x );
-			core->GetDictionary()->SetAt( "MenuY", y );
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
 		}
 		else if (target_mode == TARGET_MODE_NONE) {
