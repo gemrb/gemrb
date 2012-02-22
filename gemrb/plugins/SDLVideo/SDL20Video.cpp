@@ -214,8 +214,6 @@ int SDL20VideoDriver::SwapBuffers(void)
 	int ret = SDLVideoDriver::SwapBuffers();
 
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, backBuf);
-	SDL_SetRenderTarget(renderer, tex);
-	ret = PollEvents();
 
 	if (fadeColor.a) {
 		SDL_Rect dst = {
