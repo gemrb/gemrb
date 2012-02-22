@@ -449,6 +449,12 @@ void TextArea::UpdateControls()
 			SetRow(pos);
 		}
 	}
+	// This hack is to refresh the mouse cursor so that reply below cursor gets
+	//   highlighted during a dialog
+	int x,y;
+	core->GetVideoDriver()->GetMousePos(x,y);
+	core->GetEventMgr()->MouseMove(x,y);
+
 	core->RedrawAll();
 }
 
