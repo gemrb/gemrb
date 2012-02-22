@@ -321,12 +321,16 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 
 void SDL12VideoDriver::ShowSoftKeyboard()
 {
-	Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
+	if(core->UseSoftKeyboard){
+		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
+	}
 }
 
 void SDL12VideoDriver::HideSoftKeyboard()
 {
-	Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
+	if(core->UseSoftKeyboard){
+		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
+	}
 }
 
 // Private methods
