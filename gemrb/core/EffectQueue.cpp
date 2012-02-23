@@ -1636,6 +1636,8 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 			MATCH_PARAM1();
 		}
 		int val = (int) (*f)->Parameter3;
+		//we are really lucky with this, most of these boni are using +2 (including fiendslayer feat)
+		//it would be much more inconvenient if we had to use v2 effect files
 		if( !val) val = 2;
 		sum += val;
 	}
