@@ -3322,6 +3322,7 @@ void Actor::CheckCleave()
 	}
 }
 
+static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
 static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 
 //returns actual damage
@@ -5302,7 +5303,10 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 				tohit += 4;
 			}
 		}
+		tohit += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
+
 	}
+
 
 	if (ReverseToHit) {
 		tohit = (signed)GetStat(IE_TOHIT)-tohit;
