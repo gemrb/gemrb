@@ -392,7 +392,16 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			 }
 			 */
 			break;
-			/* not user input events */
+		/* not user input event */
+		case SDL_TEXTINPUT:
+			for (size_t i=0; i < strlen(lastEvent.text.text); i++) {
+				if (core->ConsolePopped)
+					core->console->OnKeyPress( lastEvent.text.text[i], GetModState(event.key.keysym.mod));
+				else
+					EvntManager->KeyPress( lastEvent.text.text[i], GetModState(event.key.keysym.mod));
+			}
+			break;
+		/* not user input events */
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (lastEvent.window.event) {
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
