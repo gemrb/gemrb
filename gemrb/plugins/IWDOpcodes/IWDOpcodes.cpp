@@ -3206,20 +3206,21 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword penalty;
 
 	//the original engine let the effect stay on non affected races, doing the same so the spell state sticks
-	if (check_iwd_targeting(Owner, target, 0, 82)) penalty = 2; //dark elf
+	if (check_iwd_targeting(Owner, target, 0, 82)) penalty = 1; //dark elf
 	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
 	else return FX_APPLIED;
 
 	target->AddPortraitIcon(PI_DAYBLINDNESS);
 
-	//FIXME: this could be STAT_SUB
-	//saving throw penalty
-	STAT_ADD(IE_SAVEFORTITUDE, penalty);
-	STAT_ADD(IE_SAVEREFLEX, penalty);
-	STAT_ADD(IE_SAVEWILL, penalty);
+	//saving throw penalty (bigger is better in iwd2)
+	STAT_SUB(IE_SAVEFORTITUDE, penalty);
+	STAT_SUB(IE_SAVEREFLEX, penalty);
+	STAT_SUB(IE_SAVEWILL, penalty);
 	//for compatibility reasons
-	STAT_ADD(IE_SAVEVSBREATH, penalty);
-	STAT_ADD(IE_SAVEVSSPELL, penalty);
+	STAT_SUB(IE_SAVEVSBREATH, penalty);
+	STAT_SUB(IE_SAVEVSSPELL, penalty);
+  //bigger is better in iwd2
+  STAT_SUB(IE_TOHIT, penalty);
 
 	//decrease all skills by 1
 	for(int i=0;i<32;i++) {
