@@ -144,6 +144,7 @@ static int usecount = -1;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
+static bool raresnd = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 
@@ -1447,6 +1448,7 @@ static void InitActorTables()
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 	nocreate = !!core->HasFeature(GF_NO_NEW_VARIABLES);
 	third = !!core->HasFeature(GF_3ED_RULES);
+	raresnd = !!core->HasFeature(GF_RARE_ACTION_VB);
 
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
@@ -2903,7 +2905,7 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 void Actor::VerbalConstant(int start, int count) const
 {
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
-	if (PCStats && PCStats->SoundSet[0]){
+	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
 		ResolveStringConstant(soundref, start+count-1);
 		while (count > 0 && !gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
@@ -3108,6 +3110,10 @@ void Actor::SelectActor() const
 	}
 }
 
+#define SEL_ACTION_COUNT_COMMON  3
+#define SEL_ACTION_COUNT_ALL     7
+
+//call this when a PC receives a command from GUI
 void Actor::CommandActor() const
 {
 	switch (cmd_snd_freq) {
@@ -3115,9 +3121,15 @@ void Actor::CommandActor() const
 			return;
 		case 1:
 			if (core->Roll(1,100,0)>25) return;
+		case 2:
+			//PST has 4 states and rare sounds
+			if (raresnd) {
+				if (core->Roll(1,100,0)>50) return;
+			}
 		default:;
 	}
-	VerbalConstant(VB_COMMAND,7);
+	//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
+	VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
 }
 
 //Generates an idle action (party banter, area comment, bored)

@@ -271,6 +271,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	}
 
 	actor->AddAction( action );
+	actor->CommandActor();
 	// force action so that we get target reticles immediately
 	// FIXME
 	actor->ProcessActions();
@@ -1569,6 +1570,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
+	source->CommandActor();
 }
 
 //generate action code for source actor to try to defend a target
@@ -1581,6 +1583,7 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	source->SetModal(MS_NONE);
 	strncpy(Tmp,"NIDSpecial4()",sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
+	source->CommandActor();
 }
 
 //generate action code for source actor to try to pick pockets of a target
@@ -1594,6 +1597,7 @@ void GameControl::TryToPick(Actor *source, Actor *tgt)
 	source->SetModal(MS_NONE);
 	strncpy(Tmp,"PickPockets([-1])", sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
+	source->CommandActor();
 }
 
 //generate action code for source actor to try to pick a lock/disable trap on a door
@@ -1610,6 +1614,7 @@ void GameControl::TryToPick(Actor *source, Door *tgt)
 		strncpy(Tmp, "PickLock([-1])", sizeof(Tmp) );
 	}
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
+	source->CommandActor();
 }
 
 //generate action code for source actor to try to pick a lock/disable trap on a container
@@ -1626,6 +1631,7 @@ void GameControl::TryToPick(Actor *source, Container *tgt)
 		strncpy(Tmp, "PickLock([-1])", sizeof(Tmp) );
 	}
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
+	source->CommandActor();
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
@@ -1640,6 +1646,7 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 	source->SetModal(MS_NONE);
 	strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
+	source->CommandActor();
 }
 
 //generate action code for source actor to use item/cast spell on a point
@@ -1762,6 +1769,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
+	source->CommandActor();
 }
 
 //generate action code for actor appropriate for the target mode when the target is a container
@@ -1788,6 +1796,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		actor->ClearActions();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
 		actor->AddAction(GenerateAction(Tmp));
+		actor->CommandActor();
 		return;
 	}
 
@@ -1801,6 +1810,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
 	core->SetCurrentContainer( actor, container);
 	actor->AddAction( GenerateAction( Tmp) );
+	actor->CommandActor();
 }
 
 //generate action code for actor appropriate for the target mode when the target is a door
@@ -1826,6 +1836,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		actor->ClearActions();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
 		actor->AddAction(GenerateAction(Tmp));
+		actor->CommandActor();
 		return;
 	}
 
@@ -1840,6 +1851,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
 	sprintf( Tmp, "NIDSpecial9()" );
 	actor->AddAction( GenerateAction( Tmp) );
+	actor->CommandActor();
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
@@ -1891,6 +1903,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 				char Tmp[256];
 				sprintf(Tmp, "TriggerWalkTo(\"%s\")", trap->GetScriptName());
 				actor->AddAction(GenerateAction(Tmp));
+				actor->CommandActor();
 				return true;
 			}
 			return true;
