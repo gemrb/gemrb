@@ -381,12 +381,130 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 }
 
+// non-RLE, palette
+template<typename PTYPE, bool COVER, bool XFLIP, typename Shadow, typename Tinter, typename Blender>
+static void BlitSprite_internal(SDL_Surface* target,
+            const Uint8* srcdata, const Color* col,
+            int tx, int ty,
+            int width, int /*height*/,
+            bool yflip,
+            Region clip,
+            Uint8 transindex,
+            const SpriteCover* cover,
+            const Sprite2D* spr, unsigned int flags,
+            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
+{
+	if (COVER)
+		assert(cover);
+	assert(spr);
+
+	int pitch = target->pitch / target->format->BytesPerPixel;
+	int coverx, covery;
+	if (COVER) {
+		coverx = cover->XPos - spr->XPos;
+		covery = cover->YPos - spr->YPos;
+	}
+
+	// We assume the clipping rectangle is the exact rectangle in which we will
+	// paint. This means clip rect <= sprite rect <= cover rect
+
+	assert(clip.w > 0 && clip.h > 0);
+	assert(clip.x >= tx);
+	assert(clip.y >= ty);
+	assert(clip.x + clip.w <= tx + spr->Width);
+	assert(clip.y + clip.h <= ty + spr->Height);
+
+	if (COVER) {
+		assert(tx >= tx - coverx);
+		assert(ty >= ty - coverx);
+		assert(tx + spr->Width <= tx - coverx + cover->Width);
+		assert(ty + spr->Height <= ty - covery + cover->Height);
+	}
+
+
+	PTYPE *line, *end;
+	Uint8 *coverpix;
+
+	if (!yflip) {
+		line = (PTYPE*)target->pixels + clip.y*pitch;
+		end = line + clip.h*pitch;
+		srcdata += (clip.y - ty)*spr->Width;
+		if (COVER)
+			coverpix = (Uint8*)cover->pixels + (clip.y - ty + covery)*cover->Width;
+	} else {
+		line = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
+		end = line - clip.h*pitch;
+		srcdata += (ty + spr->Height - (clip.y + clip.h))*spr->Width;
+		if (COVER)
+			coverpix = (Uint8*)cover->pixels + (clip.y - ty + clip.h + covery - 1)*cover->Width;
+	}
+
+	PTYPE *pix, *endpix;
+	if (!XFLIP) {
+		pix = line + clip.x;
+		endpix = pix + clip.w;
+		srcdata += clip.x - tx;
+		if (COVER)
+			coverpix += clip.x - tx + coverx;
+	} else {
+		pix = line + clip.x + clip.w - 1;
+		endpix = pix - clip.w;
+		srcdata += tx + spr->Width - (clip.x + clip.w);
+		if (COVER)
+			coverpix += clip.x - tx + clip.w + coverx - 1;
+	}
+
+	const int yfactor = yflip ? -1 : 1;
+	const int xfactor = XFLIP ? -1 : 1;
+
+	while (line != end) {
+		do {
+			Uint8 p = *srcdata++;
+			if (p != transindex) {
+				if (!COVER || !*coverpix) {
+					int extra_alpha = 0;
+					if (!shadow(*pix, p, extra_alpha, flags)) {
+						Uint8 r = col[p].r;
+						Uint8 g = col[p].g;
+						Uint8 b = col[p].b;
+						Uint8 a = col[p].a;
+						tint(r, g, b, a, flags);
+						blend(*pix, r, g, b, a >> extra_alpha);
+					}
+				}
+#ifdef HIGHLIGHTCOVER
+				else if (COVER) {
+					blend(*pix, 255, 255, 255, 255);
+				}
+#endif
+			}
+			if (!XFLIP) {
+				pix++;
+				if (COVER) coverpix++;
+			} else {
+				pix--;
+				if (COVER) coverpix--;
+			}
+		} while (pix != endpix);
+
+		// advance all pointers to the next line
+		pix += yfactor * (pitch - xfactor * clip.w);
+		endpix += yfactor * pitch;
+		line += yfactor * pitch;
+		srcdata += (width - clip.w);
+		if (COVER)
+			coverpix += yfactor * (cover->Width - xfactor * clip.w);
+	}
+
+}
+
+
 
 // call the BlitSpriteRLE_internal instantiation with the specified
 // COVER and XFLIP bools
 // TODO: Add PTYPE?
 template<typename PTYPE, typename Shadow, typename Tinter, typename Blender>
-static void BlitSpriteRLE_dispatch(bool COVER, bool XFLIP,
+static void BlitSpriteBAM_dispatch(bool COVER, bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
             int tx, int ty,
@@ -398,22 +516,46 @@ static void BlitSpriteRLE_dispatch(bool COVER, bool XFLIP,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE dummy = 0)
 {
+	assert(spr->BAM);
+	Sprite2D_BAM_Internal *data = (Sprite2D_BAM_Internal*)spr->vptr;
+	bool RLE = data->RLE;
+
 	if (!COVER && !XFLIP)
-		BlitSpriteRLE_internal<PTYPE, false, false, Shadow, Tinter, Blender>(target,
-		    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-		    shadow, tint, blend, dummy);
+		if (RLE)
+			BlitSpriteRLE_internal<PTYPE, false, false, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
+		else
+			BlitSprite_internal<PTYPE, false, false, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
 	else if (!COVER && XFLIP)
-		BlitSpriteRLE_internal<PTYPE, false, true, Shadow, Tinter, Blender>(target,
-		    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-		    shadow, tint, blend, dummy);
+		if (RLE)
+			BlitSpriteRLE_internal<PTYPE, false, true, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
+		else
+			BlitSprite_internal<PTYPE, false, true, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
 	else if (COVER && !XFLIP)
-		BlitSpriteRLE_internal<PTYPE, true, false, Shadow, Tinter, Blender>(target,
-		    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-		    shadow, tint, blend, dummy);
+		if (RLE)
+			BlitSpriteRLE_internal<PTYPE, true, false, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
+		else
+			BlitSprite_internal<PTYPE, true, false, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
 	else // if (COVER && XFLIP)
-		BlitSpriteRLE_internal<PTYPE, true, true, Shadow, Tinter, Blender>(target,
-		    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-		    shadow, tint, blend, dummy);
+		if (RLE)
+			BlitSpriteRLE_internal<PTYPE, true, true, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
+		else
+			BlitSprite_internal<PTYPE, true, true, Shadow, Tinter, Blender>(target,
+			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			    shadow, tint, blend, dummy);
 }
 
 
