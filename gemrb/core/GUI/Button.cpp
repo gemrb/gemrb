@@ -221,9 +221,23 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if (Flags & IE_GUI_BUTTON_HORIZONTAL) {
 			xOffs += x + XPos + Picture->XPos;
 			yOffs += y + YPos + Picture->YPos;
-			video->BlitSprite( Picture, xOffs, yOffs, true );
-			Region r = Region( xOffs, yOffs + (int) (Picture->Height * Clipping), Picture->Width, (int) (Picture->Height*(1.0 - Clipping)) );
-			video->DrawRect( r, SourceRGB, true );
+
+			// Clipping: 0 = overlay over full button, 1 = no overlay
+			int overlayHeight = Picture->Height * (1.0 - Clipping);
+			if (overlayHeight < 0)
+				overlayHeight = 0;
+			if (overlayHeight >= Picture->Height)
+				overlayHeight = Picture->Height;
+			int buttonHeight = Picture->Height - overlayHeight;
+
+			Region rb = Region(xOffs, yOffs, Picture->Width, buttonHeight);
+			Region ro = Region(xOffs, yOffs + buttonHeight, Picture->Width, overlayHeight);
+
+			video->BlitSprite( Picture, xOffs, yOffs, true, &rb );
+
+			// TODO: Add an option to add BLIT_GREY to the flags
+			video->BlitGameSprite( Picture, xOffs, yOffs, BLIT_TINTED, SourceRGB, 0, 0, &ro, true);
+
 			// do NOT uncomment this, you can't change Changed or invalidate things from
 			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
 			//CloseUpColor();
@@ -729,14 +743,21 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 	Changed = true;
 }
 
-void Button::SetHorizontalOverlay(double clip, const Color &src, const Color &dest)
+void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color &dest)
 {
 	if ((Clipping>clip) || !(Flags&IE_GUI_BUTTON_HORIZONTAL) ) {
 		Flags |= IE_GUI_BUTTON_HORIZONTAL;
+#if 0
+		// FIXME: This doesn't work while CloseUpColor isn't being called
+		// (see Draw)
 		SourceRGB=src;
 		DestRGB=dest;
 		starttime = GetTickCount();
 		starttime += 40;
+#else
+		SourceRGB = DestRGB = dest;
+		starttime = 0;
+#endif
 	}
 	Clipping = clip;
 	Changed = true;

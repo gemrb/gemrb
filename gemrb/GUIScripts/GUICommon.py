@@ -720,7 +720,7 @@ def SetupDamageInfo (pc, Button):
 	if hp < 1 or (state & STATE_DEAD):
 		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
 	else:
-		Button.SetOverlay (ratio, 60,0,0,195, 60,0,0,190)
+		Button.SetOverlay (ratio, 210,30,30,255, 120,30,30,255)
 	ratio_str = "\n%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 
