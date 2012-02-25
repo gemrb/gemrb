@@ -78,7 +78,13 @@ struct SRShadow_None {
 
 template<typename PTYPE>
 struct SRShadow_HalfTrans {
-	SRShadow_HalfTrans(PTYPE m, PTYPE s) : mask(m), shadowcol(s) { }
+	SRShadow_HalfTrans(const SDL_PixelFormat* format, const Color& col)
+	{
+		shadowcol = (PTYPE)SDL_MapRGBA(format, col.r/2, col.g/2, col.b/2, 0);
+		mask =   (0x7F >> format->Rloss) << format->Rshift
+				| (0x7F >> format->Gloss) << format->Gshift
+				| (0x7F >> format->Bloss) << format->Bshift;
+	}
 
 	bool operator()(PTYPE& pix, Uint8 p, int&, unsigned int) const
 	{
@@ -195,7 +201,59 @@ struct SRTinter_FlagsNoTint {
 	}
 };
 
-struct SRBlender_NoAlpha32 {
+
+template<typename PTYPE>
+struct SRBlender_NoAlpha {
+	void operator()(PTYPE& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const { assert(false); }
+};
+
+template<typename PTYPE>
+struct SRBlender_HalfAlpha {
+	void operator()(PTYPE& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const { assert(false); }
+};
+
+template<typename PTYPE>
+struct SRBlender_Alpha {
+	void operator()(PTYPE& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const { assert(false); }
+};
+
+// 16 bpp, 565
+template<>
+struct SRBlender_NoAlpha<Uint16> {
+	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+		pix = ((r >> 3) << 11) |
+		      ((g >> 2) <<  5) |
+		      ((b >> 3) <<  0);
+	}
+};
+
+template<>
+struct SRBlender_HalfAlpha<Uint16> {
+	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+		// 0x7BEF: the most significant bit of each component cleared
+		pix = ((pix >> 1) & 0x7BEF) +
+		      (((r << 15) | (g <<  7) | (b >>  1)) & 0x7BEF);
+	}
+};
+
+template<>
+struct SRBlender_Alpha<Uint16> {
+	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
+		unsigned int dr = 1 + a*(r >> 3) + (255-a)*((pix >> 11) & 0x1F);
+		unsigned int dg = 1 + a*(g >> 2) + (255-a)*((pix >>  5) & 0x3F);
+		unsigned int db = 1 + a*(b >> 3) + (255-a)*((pix >>  0) & 0x1F);
+		r = (dr + (dr>>8)) >> 8;
+		g = (dg + (dg>>8)) >> 8;
+		b = (db + (db>>8)) >> 8;
+		pix = (r << 11) |
+		      (g <<  5) |
+		      (b <<  0);
+	}
+};
+
+// 32 bpp, 888
+template<>
+struct SRBlender_NoAlpha<Uint32> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 		pix = (r << 16) |
 		      (g <<  8) |
@@ -203,15 +261,18 @@ struct SRBlender_NoAlpha32 {
 	}
 };
 
-struct SRBlender_HalfAlpha32 {
+template<>
+struct SRBlender_HalfAlpha<Uint32> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+		// 0x7F7F7F: the most significant bit of each component cleared
 		pix = ((pix >> 1) & 0x007F7F7F) +
 		      (((r << 15) | (g <<  7) | (b >>  1)) & 0x007F7F7F);
 	}
 };
 
 
-struct SRBlender_Alpha32 {
+template<>
+struct SRBlender_Alpha<Uint32> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
 		unsigned int dr = 1 + a*r + (255-a)*((pix >> 16) & 0xFF);
 		unsigned int dg = 1 + a*g + (255-a)*((pix >>  8) & 0xFF);

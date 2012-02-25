@@ -736,20 +736,42 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 
 		SDL_LockSurface(backBuf);
 
-		SRShadow_Regular<Uint32> shadow;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		if (data->pal->alpha) {
-			SRTinter_NoTint<true> tinter;
-			SRBlender_Alpha32 blender;
+			SRShadow_Regular<Uint32> shadow;
 
-			BlitSpriteBAM_dispatch<Uint32>(false, data->flip_hor,
-			    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			if (data->pal->alpha) {
+				SRTinter_NoTint<true> tinter;
+				SRBlender_Alpha<Uint32> blender;
+
+				BlitSpriteBAM_dispatch<Uint32>(false, data->flip_hor,
+				    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			} else {
+				SRTinter_NoTint<false> tinter;
+				SRBlender_NoAlpha<Uint32> blender;
+
+				BlitSpriteBAM_dispatch<Uint32>(false, data->flip_hor,
+				    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			}
+
 		} else {
-			SRTinter_NoTint<false> tinter;
-			SRBlender_NoAlpha32 blender;
 
-			BlitSpriteBAM_dispatch<Uint32>(false, data->flip_hor,
-			    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			SRShadow_Regular<Uint16> shadow;
+
+			if (data->pal->alpha) {
+				SRTinter_NoTint<true> tinter;
+				SRBlender_Alpha<Uint16> blender;
+
+				BlitSpriteBAM_dispatch<Uint16>(false, data->flip_hor,
+				    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			} else {
+				SRTinter_NoTint<false> tinter;
+				SRBlender_NoAlpha<Uint16> blender;
+
+				BlitSpriteBAM_dispatch<Uint16>(false, data->flip_hor,
+				    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			}
+
 		}
 
 		SDL_UnlockSurface(backBuf);
@@ -849,23 +871,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 
-	Uint32 shadowcol32 = 0;
-	// Uint16 shadowcol16 = 0;
-
-	// Premultiplied alpha for transshadow
-	if (flags & BLIT_TRANSSHADOW) {
-		shadowcol32 = SDL_MapRGBA(backBuf->format, palette->col[1].r/2,
-									palette->col[1].g/2, palette->col[1].b/2, 0);
-		// shadowcol16 = (Uint16)shadowcol32;
-	}
-
-#if 0
-	Uint32 mask32 = (backBuf->format->Rmask >> 1) & backBuf->format->Rmask;
-	mask32 |= (backBuf->format->Gmask >> 1) & backBuf->format->Gmask;
-	mask32 |= (backBuf->format->Bmask >> 1) & backBuf->format->Bmask;
-	Uint16 mask16 = (Uint16)mask32;
-#endif
-
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
@@ -874,43 +879,103 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 	if (spr->BAM && remflags == BLIT_TINTED) {
 
-		SRShadow_Regular<Uint32> shadow;
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha32 blender;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_Regular<Uint32> shadow;
+			SRTinter_Tint<false, false> tinter(tint);
+			SRBlender_NoAlpha<Uint32> blender;
+
+			BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		} else {
+
+			SRShadow_Regular<Uint16> shadow;
+			SRTinter_Tint<false, false> tinter(tint);
+			SRBlender_NoAlpha<Uint16> blender;
+
+			BlitSpriteBAM_dispatch<Uint16>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		}
 
 	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_TRANSSHADOW)) {
 
-		SRShadow_HalfTrans<Uint32> shadow(0x007F7F7F, shadowcol32);
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha32 blender;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_HalfTrans<Uint32> shadow(backBuf->format, palette->col[1]);
+			SRTinter_Tint<false, false> tinter(tint);
+			SRBlender_NoAlpha<Uint32> blender;
+
+			BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		} else {
+
+			SRShadow_HalfTrans<Uint16> shadow(backBuf->format, palette->col[1]);
+			SRTinter_Tint<false, false> tinter(tint);
+			SRBlender_NoAlpha<Uint16> blender;
+
+			BlitSpriteBAM_dispatch<Uint16>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		}
 
 	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_NOSHADOW)) {
 
-		SRShadow_None<Uint32> shadow;
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha32 blender;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_None<Uint32> shadow;
+			SRTinter_Tint<false, false> tinter(tint);
+			SRBlender_NoAlpha<Uint32> blender;
+
+			BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		} else {
+
+			SRShadow_None<Uint16> shadow;
+			SRTinter_Tint<false, false> tinter(tint);
+			SRBlender_NoAlpha<Uint16> blender;
+
+			BlitSpriteBAM_dispatch<Uint16>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		}
 
 	} else if (spr->BAM && remflags == BLIT_HALFTRANS) {
 
-		SRShadow_HalfTrans<Uint32> shadow(0x007F7F7F, shadowcol32);
-		SRTinter_NoTint<false> tinter;
-		SRBlender_NoAlpha32 blender;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_HalfTrans<Uint32> shadow(backBuf->format, palette->col[1]);
+			SRTinter_NoTint<false> tinter;
+			SRBlender_NoAlpha<Uint32> blender;
+
+			BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		} else {
+
+			SRShadow_HalfTrans<Uint16> shadow(backBuf->format, palette->col[1]);
+			SRTinter_NoTint<false> tinter;
+			SRBlender_NoAlpha<Uint16> blender;
+
+			BlitSpriteBAM_dispatch<Uint16>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		}
 
 	} else if (spr->BAM && remflags == 0) {
 
-		SRShadow_Regular<Uint32> shadow;
-		SRTinter_NoTint<false> tinter;
-		SRBlender_NoAlpha32 blender;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_Regular<Uint32> shadow;
+			SRTinter_NoTint<false> tinter;
+			SRBlender_NoAlpha<Uint32> blender;
+
+			BlitSpriteBAM_dispatch<Uint32>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		} else {
+
+			SRShadow_Regular<Uint16> shadow;
+			SRTinter_NoTint<false> tinter;
+			SRBlender_NoAlpha<Uint16> blender;
+
+			BlitSpriteBAM_dispatch<Uint16>(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+
+		}
 
 	} else if (spr->BAM) {
 		// handling the following effects with conditionals:
@@ -931,31 +996,66 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 		if (!(remflags & BLIT_TINTED)) tint.a = 255;
 
-		SRShadow_Flags<Uint32> shadow; // for halftrans, noshadow, transshadow
-		SRBlender_Alpha32 blender;
-		if (remflags & blit_PALETTEALPHA) {
-			if (remflags & BLIT_TINTED) {
-				SRTinter_Flags<true> tinter(tint);
+		if (backBuf->format->BytesPerPixel == 4) {
 
-				BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_Flags<Uint32> shadow; // for halftrans, noshadow, transshadow
+			SRBlender_Alpha<Uint32> blender;
+			if (remflags & blit_PALETTEALPHA) {
+				if (remflags & BLIT_TINTED) {
+					SRTinter_Flags<true> tinter(tint);
+
+					BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				} else {
+					SRTinter_FlagsNoTint<true> tinter;
+
+					BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				}
 			} else {
-				SRTinter_FlagsNoTint<true> tinter;
+				if (remflags & BLIT_TINTED) {
+					SRTinter_Flags<false> tinter(tint);
 
-				BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+					BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				} else {
+					SRTinter_FlagsNoTint<false> tinter;
+
+					BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				}
+
 			}
+
 		} else {
-			if (remflags & BLIT_TINTED) {
-				SRTinter_Flags<false> tinter(tint);
 
-				BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+			SRShadow_Flags<Uint16> shadow; // for halftrans, noshadow, transshadow
+			SRBlender_Alpha<Uint16> blender;
+			if (remflags & blit_PALETTEALPHA) {
+				if (remflags & BLIT_TINTED) {
+					SRTinter_Flags<true> tinter(tint);
+
+					BlitSpriteBAM_dispatch<Uint16>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				} else {
+					SRTinter_FlagsNoTint<true> tinter;
+
+					BlitSpriteBAM_dispatch<Uint16>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				}
 			} else {
-				SRTinter_FlagsNoTint<false> tinter;
+				if (remflags & BLIT_TINTED) {
+					SRTinter_Flags<false> tinter(tint);
 
-				BlitSpriteBAM_dispatch<Uint32>(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+					BlitSpriteBAM_dispatch<Uint16>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				} else {
+					SRTinter_FlagsNoTint<false> tinter;
+
+					BlitSpriteBAM_dispatch<Uint16>(cover, hflip,
+					    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				}
+
 			}
 
 		}
@@ -994,19 +1094,38 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		}
 
 		const Uint32 *data = (const Uint32*)spr->pixels;
+		if (backBuf->format->BytesPerPixel == 4) {
 
-		SRBlender_Alpha32 blender;
-		if (remflags & BLIT_TINTED) {
-			SRTinter_Flags<true> tinter(tint);
+			SRBlender_Alpha<Uint32> blender;
+			if (remflags & BLIT_TINTED) {
+				SRTinter_Flags<true> tinter(tint);
 
-			BlitSpriteRGB_dispatch<Uint32>(cover, hflip,
-			    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+				BlitSpriteRGB_dispatch<Uint32>(cover, hflip,
+				    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+			} else {
+				SRTinter_FlagsNoTint<true> tinter;
+
+				BlitSpriteRGB_dispatch<Uint32>(cover, hflip,
+				    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+			}
+
 		} else {
-			SRTinter_FlagsNoTint<true> tinter;
 
-			BlitSpriteRGB_dispatch<Uint32>(cover, hflip,
-			    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+			SRBlender_Alpha<Uint16> blender;
+			if (remflags & BLIT_TINTED) {
+				SRTinter_Flags<true> tinter(tint);
+
+				BlitSpriteRGB_dispatch<Uint16>(cover, hflip,
+				    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+			} else {
+				SRTinter_FlagsNoTint<true> tinter;
+
+				BlitSpriteRGB_dispatch<Uint16>(cover, hflip,
+				    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+			}
+
 		}
+
 	}
 
 	SDL_UnlockSurface(backBuf);
