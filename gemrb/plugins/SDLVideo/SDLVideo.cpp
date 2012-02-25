@@ -1053,7 +1053,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// noshadow
 		// transshadow
 		// grey
-		// red
+		// sepia
 		// glow (not yet)
 		// blended (not yet)
 
@@ -1068,7 +1068,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 #define CUSTOMBLENDING
 #define ALPHAADJUST(a) ((a)>>ia)
-#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g) /= 2; (b) /= 2; } } while(0)
+#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_SEPIA) { (g) /= 2; (b) /= 2; } } while(0)
 
 #define TINT_ALPHA
 
@@ -1179,7 +1179,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// handling the following effects with conditionals:
 		// halftrans
 		// grey
-		// red
+		// sepia
 		// glow (not yet)
 		// blended (not yet)
 
@@ -1199,7 +1199,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 #define PALETTE_ALPHA
 #define CUSTOMBLENDING
 #define ALPHAADJUST(a) ((a)>>ia)
-#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g) /= 2; (b) /= 2; } } while(0)
+#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_SEPIA) { (g) /= 2; (b) /= 2; } } while(0)
 
 #undef SRCDATA
 #define SRCDATA ((const Uint32*)spr->pixels)

@@ -673,7 +673,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 	}
 
 	if (Transparency & IE_VVC_SEPIA) {
-		flag |= BLIT_RED;
+		flag |= BLIT_SEPIA;
 	}
 
 	if (Transparency & BLIT_TINTED) {
