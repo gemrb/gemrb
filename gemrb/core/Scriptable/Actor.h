@@ -229,6 +229,7 @@ struct WeaponInfo {
 };
 
 extern void ReleaseMemoryActor();
+GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
 class GEM_EXPORT Actor : public Movable {
 public:

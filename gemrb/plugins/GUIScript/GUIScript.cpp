@@ -3913,6 +3913,8 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 
 	core->GetDictionary()->SetAt( Variable, (ieDword) value );
 
+	//this is a hack to update the settings deeper in the core
+	UpdateActorConfig();
 	Py_INCREF( Py_None );
 	return Py_None;
 }

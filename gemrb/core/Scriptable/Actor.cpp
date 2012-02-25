@@ -1437,14 +1437,19 @@ int IsClassFromName (const char* name)
 	return -1;
 }
 
-static void InitActorTables()
+GEM_EXPORT void UpdateActorConfig()
 {
-	int i, j;
-
 	core->GetDictionary()->Lookup("Critical Hit Screen Shake", crit_hit_scr_shake);
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
+}
+
+static void InitActorTables()
+{
+	int i, j;
+
+	UpdateActorConfig();
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 	nocreate = !!core->HasFeature(GF_NO_NEW_VARIABLES);
 	third = !!core->HasFeature(GF_3ED_RULES);
