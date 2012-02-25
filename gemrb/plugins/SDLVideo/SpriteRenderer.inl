@@ -169,6 +169,32 @@ struct SRTinter_Flags {
 	Color tint;
 };
 
+// Don't tint, but conditionally handle grey, sepia
+template<bool PALALPHA>
+struct SRTinter_FlagsNoTint {
+	SRTinter_FlagsNoTint() { }
+
+	void operator()(Uint8& r, Uint8& g, Uint8& b, Uint8& a, unsigned int flags) const {
+		if (flags & BLIT_GREY) {
+			r >>= 2;
+			g >>= 2;
+			b >>= 2;
+			Uint8 avg = r + g + b;
+			r = g = b = avg;
+		} else if (flags & BLIT_SEPIA) {
+			r >>= 2;
+			g >>= 2;
+			b >>= 2;
+			Uint8 avg = r + g + b;
+			r = avg + 21; // can't overflow, since a is at most 189
+			g = avg;
+			b = avg < 32 ? 0 : avg - 32;
+		}
+
+		if (!PALALPHA) a = 255;
+	}
+};
+
 struct SRBlender_NoAlpha32 {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 		pix = (r << 16) |
