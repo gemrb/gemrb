@@ -577,6 +577,8 @@ public:
 	void AttackedBy(Actor *actor);
 	/* sets target for immediate attack */
 	void SetTarget( Scriptable *actor);
+	/* returns the number of attacks (handles monk barehanded bonus) */
+	ieDword GetNumberOfAttacks() const;
 	/* starts combat round*/
 	void InitRound(ieDword gameTime);
 	/* returns melee penalty */
