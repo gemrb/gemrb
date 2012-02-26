@@ -5229,12 +5229,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		}
 
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
-		if (IsDualWielding()) {
-			switch (wi.prof) {
-				case 7: // dagger
-				case 11: // short sword
-					tohit += 2;
-			}
+		// it is limited to shortswords and daggers, which also have this flag set
+		if (IsDualWielding() && (wi.wflags&WEAPON_FINESSE)) {
+			tohit += 2;
 		}
 	}
 
