@@ -5171,7 +5171,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		}
 	}
 
-	if (IsDualWielding() && wsdualwield) {
+	if (dualwielding && wsdualwield) {
 		//add dual wielding penalty
 		stars = GetStat(IE_PROFICIENCY2WEAPON)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
@@ -5216,7 +5216,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (third) {
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
 		// it is limited to shortswords and daggers, which also have this flag set
-		if (IsDualWielding() && (wi.wflags&WEAPON_FINESSE)) {
+		if (dualwielding && (wi.wflags&WEAPON_FINESSE)) {
 			tohit += 2;
 		}
 	}
