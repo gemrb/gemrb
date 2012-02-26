@@ -28,19 +28,10 @@
 
 #define BMP_HEADER_SIZE  54
 
-static ieDword red_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword blue_mask = 0x000000ff;
-
 BMPImporter::BMPImporter(void)
 {
 	Palette = NULL;
 	pixels = NULL;
-	if (DataStream::IsEndianSwitch()) {
-		red_mask = 0x000000ff;
-		green_mask = 0x0000ff00;
-		blue_mask = 0x00ff0000;
-	}
 }
 
 BMPImporter::~BMPImporter(void)
@@ -147,33 +138,35 @@ bool BMPImporter::Open(DataStream* stream)
 	void* rpixels = malloc( PaddedRowLength* Height );
 	str->Read( rpixels, PaddedRowLength * Height );
 	if (BitCount == 32) {
-		//convert to 24 bits on the fly
-		int size = Width * Height * 3;
+		int size = Width * Height * 4;
 		pixels = malloc( size );
-		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += size;
+		unsigned int * dest = ( unsigned int * ) pixels;
+		dest += Width * Height;
 		unsigned char * src = ( unsigned char * ) rpixels;
 		for (int i = Height; i; i--) {
-			dest -= ( Width * 3 );
-			for (unsigned int j=0;j<Width;j++) {
-				dest[j*3]=src[j*4];
-				dest[j*3+1]=src[j*4+1];
-				dest[j*3+2]=src[j*4+2];
-			}
+			dest -= Width;
+			// BGRX
+			for (unsigned int j=0;j<Width;j++)
+				dest[j] = (0xFF << 24) | (src[j*4+0] << 16) |
+				          (src[j*4+1] << 8) | (src[j*4+2]);
 			src += PaddedRowLength;
 		}
-		BitCount = 24;
 	} else if (BitCount == 24) {
-		int size = Width * Height * 3;
+		//convert to 32 bits on the fly
+		int size = Width * Height * 4;
 		pixels = malloc( size );
-		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += size;
+		unsigned int * dest = ( unsigned int * ) pixels;
+		dest += Width * Height;
 		unsigned char * src = ( unsigned char * ) rpixels;
 		for (int i = Height; i; i--) {
-			dest -= ( Width * 3 );
-			memcpy( dest, src, Width * 3 );
+			dest -= Width;
+			// BGR
+			for (unsigned int j=0;j<Width;j++)
+				dest[j] = (0xFF << 24) | (src[j*3+0] << 16) |
+				          (src[j*3+1] << 8) | (src[j*3+2]);
 			src += PaddedRowLength;
 		}
+		BitCount = 32;
 	} else if (BitCount == 8) {
 		pixels = malloc( Width * Height );
 		unsigned char * dest = ( unsigned char * ) pixels;
@@ -227,10 +220,13 @@ void BMPImporter::Read4To8(void *rpixels)
 Sprite2D* BMPImporter::GetSprite2D()
 {
 	Sprite2D* spr = NULL;
-	if (BitCount == 24) {
-		void* p = malloc( Width * Height * 3 );
-		memcpy( p, pixels, Width * Height * 3 );
-		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 24,
+	if (BitCount == 32) {
+		const ieDword red_mask = 0x000000ff;
+		const ieDword green_mask = 0x0000ff00;
+		const ieDword blue_mask = 0x00ff0000;
+		void* p = malloc( Width * Height * 4 );
+		memcpy( p, pixels, Width * Height * 4 );
+		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
 			red_mask, green_mask, blue_mask, 0x00000000, p,
 			true, green_mask );
 	} else if (BitCount == 8) {
@@ -271,11 +267,11 @@ Bitmap* BMPImporter::GetBitmap()
 			}
 		}
 		break;
-	case 24:
-		Log(ERROR, "BMPImporter", "Don't know how to handle 24bit bitmap from %s...", str->filename);
+	case 32:
+		Log(ERROR, "BMPImporter", "Don't know how to handle 32bpp bitmap from %s...", str->filename);
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
-				data->SetAt(x,y,p[3*(y*Width + x)]);
+				data->SetAt(x,y,p[4*(y*Width + x)]);
 			}
 		}
 		break;
@@ -288,9 +284,9 @@ Image* BMPImporter::GetImage()
 {
 	Image *data = new Image(Width,Height);
 
-	unsigned char *p = ( unsigned char * ) pixels;
 	switch (BitCount) {
-	case 8:
+	case 8: {
+		unsigned char *p = ( unsigned char * ) pixels;
 		unsigned int y;
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
@@ -298,15 +294,20 @@ Image* BMPImporter::GetImage()
 			}
 		}
 		break;
-	case 24:
+	}
+	case 32: {
+		unsigned int *p = ( unsigned int * ) pixels;
+		unsigned int y;
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
-				unsigned idx = 3*(y*Width + x);
-				Color c = {p[idx+2], p[idx+1], p[idx+0], 0xFF};
+				unsigned int col = *p++;
+				Color c = { (unsigned char)col, (unsigned char)(col >> 8),
+				            (unsigned char)(col >> 16), 0xFF };
 				data->SetPixel(x,y,c);
 			}
 		}
 		break;
+	}
 	}
 
 	return data;

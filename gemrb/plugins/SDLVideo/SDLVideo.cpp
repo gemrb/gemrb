@@ -474,187 +474,64 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 	return dest;
 }
 
-
+// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
+// anchor is false. This is different from the other BlitSprite functions.
 void SDLVideoDriver::BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x,
 	int y, bool anchor, const Region* clip)
 {
 	if (!spr->vptr) return;
 
-	if (!spr->BAM) {
-		//TODO: Add the destination surface and rect to the Blit Pipeline
-		SDL_Rect drect;
-		SDL_Rect t = {
-			size.x, size.y, size.w, size.h
-		};
-		Region c;
-		if (clip) {
-			c = *clip;
-		} else {
-			c.x = 0;
-			c.y = 0;
-			c.w = backBuf->w;
-			c.h = backBuf->h;
-		}
-		if (anchor) {
-			drect.x = x;
-			drect.y = y;
-		} else {
-			drect.x = x - Viewport.x;
-			drect.y = y - Viewport.y;
-			if (clip) {
-				c.x -= Viewport.x;
-				c.y -= Viewport.y;
-			}
-		}
-		if (clip) {
-			if (drect.x + size.w <= c.x)
-				return;
-			if (drect.x >= c.x + c.w)
-				return;
+	// Adjust the clipping rect to match the region to blit, and then
+	// let BlitSprite handle the rest
 
-			if (drect.y + size.h <= c.y)
-				return;
-			if (drect.y >= c.y + c.h)
-				return;
 
-			if (drect.x < c.x) {
-				t.x += c.x - drect.x;
-				t.w -= c.x - drect.x;
-				drect.x = c.x;
-			}
-			if (drect.x + t.w > c.x + c.w) {
-				t.w = c.x + c.w - drect.x;
-			}
+	Region c;
 
-			if (drect.y < c.y) {
-				t.y += c.y - drect.y;
-				t.h -= c.y - drect.y;
-				drect.y = c.y;
-			}
-			if (drect.y + t.h > c.y + c.h) {
-				t.h = c.y + c.h - drect.y;
-			}
+	if (clip) {
+		c = *clip;
+		if (!anchor) {
+			c.x -= Viewport.x;
+			c.y -= Viewport.y;
 		}
-		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, &t, backBuf, &drect );
 	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-
-		const Uint8* rle = (const Uint8*)spr->pixels;
-		int tx, ty;
-		if (anchor) {
-			tx = x - spr->XPos;
-			ty = y - spr->YPos;
-		} else {
-			tx = x - spr->XPos - Viewport.x;
-			ty = y - spr->YPos - Viewport.y;
-		}
-		if (tx > backBuf->w) return;
-		if (tx+spr->Width <= 0) return;
-
-		SDL_LockSurface(backBuf);
-
-		int clipx, clipy, clipw, cliph;
-		if (clip) {
-			clipx = clip->x;
-			clipy = clip->y;
-			clipw = clip->w;
-			cliph = clip->h;
-		} else {
-			clipx = 0;
-			clipy = 0;
-			clipw = backBuf->w;
-			cliph = backBuf->h;
-		}
-
-		SDL_Rect cliprect;
-		SDL_GetClipRect(backBuf, &cliprect);
-		if (cliprect.x > clipx) {
-			clipw -= (cliprect.x - clipx);
-			clipx = cliprect.x;
-		}
-		if (cliprect.y > clipy) {
-			cliph -= (cliprect.y - clipy);
-			clipy = cliprect.y;
-		}
-		if (clipx+clipw > cliprect.x+cliprect.w) {
-			clipw = cliprect.x+cliprect.w-clipx;
-		}
-		if (clipy+cliph > cliprect.y+cliprect.h) {
-			cliph = cliprect.y+cliprect.h-clipy;
-		}
-
-		if (clipx < tx+size.x) {
-			clipw -= (tx+size.x - clipx);
-			clipx = tx+size.x;
-		}
-		if (clipy < ty+size.y) {
-			cliph -= (ty+size.y - clipy);
-			clipy = ty+size.y;
-		}
-		if (clipx+clipw > tx+size.x+size.w) {
-			clipw = tx+size.x+size.w-clipx;
-		}
-		if (clipy+cliph > ty+size.y+size.h) {
-			cliph = ty+size.y+size.h-clipy;
-		}
-
-#define ALREADYCLIPPED
-#define SPECIALPIXEL
-#define FLIP
-#define HFLIP_CONDITIONAL data->flip_hor
-#define VFLIP_CONDITIONAL data->flip_ver
-#define RLE data->RLE
-#define PAL data->pal
-#define SRCDATA rle
-#define USE_PALETTE
-#undef COVER
-#undef TINT
-
-		if (backBuf->format->BytesPerPixel == 4) {
-
-#undef BPP16
-			if (data->pal->alpha) {
-
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-
-			} else {
-
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-
-			}
-
-		} else {
-
-#define BPP16
-			if (data->pal->alpha) {
-
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-
-			} else {
-
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-
-			}
-
-		}
-
-#undef BPP16
-#undef ALREADYCLIPPED
-#undef SPECIALPIXEL
-#undef FLIP
-#undef HFLIP_CONDITIONAL
-#undef VFLIP_CONDITIONAL
-#undef RLE
-#undef PAL
-#undef SRCDATA
-#undef USE_PALETTE
-
-		SDL_UnlockSurface(backBuf);
+		c.x = 0;
+		c.y = 0;
+		c.w = backBuf->w;
+		c.h = backBuf->h;
 	}
+
+
+	Region dest;
+	dest.x = x - spr->XPos;
+	dest.y = y - spr->YPos;
+	if (!anchor) {
+		dest.x -= Viewport.x;
+		dest.y -= Viewport.y;
+	}
+
+	dest.w = size.w;
+	dest.h = size.h;
+
+	// c is the clipping rect, dest the unclipped destination rect
+	// We clip c to dest, and pass the resulting c to BlitSprite
+	if (dest.x > c.x) {
+		c.w -= (dest.x - c.x);
+		c.x = dest.x;
+	}
+	if (dest.y > c.y) {
+		c.h -= (dest.y - c.y);
+		c.y = dest.y;
+	}
+	if (c.x+c.w > dest.x+dest.w) {
+		c.w = dest.x+dest.w-c.x;
+	}
+	if (c.y+c.h > dest.y+dest.h) {
+		c.h = dest.y+dest.h-c.y;
+	}
+
+	if (c.w <= 0 || c.h <= 0) return;
+
+	BlitSprite(spr, x - size.x, y - size.y, anchor, &c);
 }
 
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
