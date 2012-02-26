@@ -4739,7 +4739,7 @@ int Actor::IsDualWielding() const
 	int slot;
 	//if the shield slot is a weapon, we're dual wielding
 	const CREItem *wield = inventory.GetUsedWeapon(true, slot);
-	if (!wield) {
+	if (!wield || slot == inventory.GetFistSlot()) {
 		return 0;
 	}
 
