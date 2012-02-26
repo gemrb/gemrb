@@ -124,6 +124,10 @@ def GearsClicked ():
 	#GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC (),44,249990)
 	GemRB.GamePause (2, 0)
 
+def GetAbilityBonus (Actor, Stat):
+	Ability = GemRB.GetPlayerStat (Actor, Stat)
+	return Ability//2-5
+
 def SetColorStat (Actor, Stat, Value):
 	t = Value & 0xFF
 	t |= t << 8
@@ -236,14 +240,18 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 					if SpellIndex == -1:
 						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
 					else:
-						# make room for one more memorization
-						max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_INNATE, 0, 0)
-						GemRB.SetMemorizableSpellsCount (pc, max_mem_cnt+1, IE_SPELL_TYPE_INNATE, 0)
-						# memorize another spell instance
 						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
+def MakeSpellCount (pc, spell, count):
+	have = GemRB.CountSpells (pc, spell)
+	if count<=have:
+		return
+	for i in range (count-have):
+		GemRB.LearnSpell (pc, spell, LS_MEMO)
+	return
+	
 # remove all class abilities up to the given level
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
@@ -720,7 +728,7 @@ def SetupDamageInfo (pc, Button):
 	if hp < 1 or (state & STATE_DEAD):
 		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
 	else:
-		Button.SetOverlay (ratio, 210,30,30,255, 120,30,30,255)
+		Button.SetOverlay (ratio, 160,0,0,200, 60,0,0,190)
 	ratio_str = "\n%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 

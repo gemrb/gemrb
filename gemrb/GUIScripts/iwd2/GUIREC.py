@@ -188,10 +188,6 @@ def GetFavoredClass (pc, code):
 
 	return code-1
 
-def GetAbilityBonus (pc, stat):
-	Ability = GemRB.GetPlayerStat (pc, stat)
-	return Ability//2-5
-
 #class is ignored
 def GetNextLevelExp (Level, Adjustment):
 	if Adjustment>5:

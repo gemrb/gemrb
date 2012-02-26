@@ -195,12 +195,41 @@ def NextPress():
 	ProfOffset = IE_PROFICIENCYBASTARDSWORD
 	for i in range (FeatCount):
 		GemRB.SetFeat (MyChar, i, GemRB.GetVar ("Feat "+str(i) ) )
-		# set proficiencies
-		# feats for exotic: bastard swords; martial weapons; simple weapons
-		if i == 18 or (i > 37 and i < 45) or (i > 52 and i < 58):
-			stars = GemRB.GetVar ("Feat "+str(i))
-			if stars:
-				GemRB.SetPlayerStat (MyChar, ProfOffset+i, stars)
+
+	#extra rage
+	level = GemRB.GetPlayerStat(MyChar, IE_LEVELBARBARIAN)
+	if level>0:
+		if level>=15:
+			RemoveSpell(MyChar, "SPIN236")
+			Spell = "SPIN260"
+		else:
+			RemoveSpell(MyChar, "SPIN260")
+			Spell = "SPIN236"
+		cnt = GemRB.GetVar ("Feat 20")+(level+3)/4
+		MakeSpellCount(MyChar, Spell, cnt)
+	else:
+		RemoveSpell(MyChar, "SPIN236")
+		RemoveSpell(MyChar, "SPIN260")
+	#extra shapeshifting
+	#MakeSpellCount(MyChar, "", cnt)
+	
+	#extra smiting
+	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
+	if level>1:
+		cnt = GemRB.GetVar ("Feat 22") + 1
+		MakeSpellCount(MyChar, "SPIN152", cnt)
+	else:
+		RemoveSpell(MyChar, "SPIN152")
+	
+	#extra turning
+	level = GemRB.GetPlayerStat(MyChar, IE_TURNUNDEADLEVEL)
+	if level>0:
+		cnt = GetAbilityBonus(MyChar, IE_CHR) + 3
+		if cnt<1: cnt = 1
+		cnt += GemRB.GetVar ("Feat 23")
+		MakeSpellCount(MyChar, "SPIN970", cnt)
+	else:
+		RemoveSpell(MyChar, "SPIN970")
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
@@ -216,3 +245,9 @@ def NextPress():
 
 	return
 
+def RemoveSpell(pc, SpellName):
+	SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellName)
+	while SpellIndex>=0:
+		GemRB.RemoveSpell(pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+		SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellName)
+	return
