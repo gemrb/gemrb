@@ -5234,7 +5234,6 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 				case 1: // xbow
 				case 2: // sling
 				case 4: // mace
-				case 5: // dart
 				case 7: // dagger
 				case 8: // staff
 				case 11: // short sword
