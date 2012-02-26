@@ -5160,7 +5160,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	DamageBonus += wspecial[stars][1];
 	speed += wspecial[stars][2];
 	// add non-proficiency penalty, which is missing from the table
-	if (stars == 0) {
+	if (stars == 0 && !third) {
 		ieDword clss = BaseStats[IE_CLASS];
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
@@ -5213,17 +5213,33 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THAC0Bonus, wi.wflags, target);
-	// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
-	if (third && IsDualWielding()) {
-		switch (wi.prof) {
-			case 1: // xbow
-			case 2: // sling
-			case 4: // mace
-			case 5: // dart
-			case 7: // dagger
-			case 8: // staff
-			case 11: // short sword
-				tohit += 2;
+	if (third) {
+		// "star" system: 1 - no penalty, 2 - +1 tohit, 3 - +2dmg
+		switch (stars) {
+			case 0:
+				tohit -= 4;
+				break;
+			case 1:
+				break;
+			case 2:
+				tohit += 1;
+				break;
+			case 3:
+				DamageBonus += 2;
+		}
+
+		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
+		if (IsDualWielding()) {
+			switch (wi.prof) {
+				case 1: // xbow
+				case 2: // sling
+				case 4: // mace
+				case 5: // dart
+				case 7: // dagger
+				case 8: // staff
+				case 11: // short sword
+					tohit += 2;
+			}
 		}
 	}
 
