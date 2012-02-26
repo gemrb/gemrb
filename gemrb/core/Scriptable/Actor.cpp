@@ -7609,6 +7609,7 @@ void Actor::AddProjectileImmunity(ieDword projectile)
 //2nd edition rules
 void Actor::CreateDerivedStatsBG()
 {
+	int i;
 	int turnundeadlevel = 0;
 	int classid = BaseStats[IE_CLASS];
 
@@ -7618,20 +7619,21 @@ void Actor::CreateDerivedStatsBG()
 	//recalculate all level based changes
 	pcf_level(this,0,0);
 
-	//even though the original didn't allow a cleric/paladin dual or multiclass
-	//we shouldn't restrict the possibility by using "else if" here
-	if (isclass[ISCLERIC]&(1<<classid)) {
-		turnundeadlevel += GetClericLevel()+1-turnlevels[classid];
-		if (turnundeadlevel<0) turnundeadlevel=0;
-	}
-	if (isclass[ISPALADIN]&(1<<classid)) {
-		turnundeadlevel += GetPaladinLevel()+1-turnlevels[classid];
-		if (turnundeadlevel<0) turnundeadlevel=0;
-	}
-
 	// barbarian immunity to backstab was hardcoded
 	if (GetBarbarianLevel()) {
 		BaseStats[IE_DISABLEBACKSTAB] = 1;
+	}
+
+	//turn undead level
+	for (i=0;i<ISCLASSES;i++) {
+		int tmp;
+
+		if (turnlevels[i+1]) {
+			tmp = BaseStats[levelslotsiwd2[i]]+1-turnlevels[i+1];
+			if (tmp<0) tmp=0;
+			//the levels don't add up (well, there is actually no chance we get both)
+			if (turnundeadlevel<tmp) turnundeadlevel = tmp;
+		}
 	}
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();
@@ -7678,32 +7680,38 @@ void Actor::CreateDerivedStatsIWD2()
 	int i;
 	int turnundeadlevel = 0;
 
+	// barbarian immunity to backstab was hardcoded
+	if (GetBarbarianLevel()) {
+		BaseStats[IE_DISABLEBACKSTAB] = 1;
+	}
+
+	//this is a bit too much hardcoded, backstab ability should be a class ability (like turn undead)
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
+		backstabdamagemultiplier += GetMonkLevel();
+		backstabdamagemultiplier += GetBardLevel();
 		AutoTable tm("backstab");
 		if (tm)	{
 			ieDword cols = tm->GetColumnCount();
-			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
+			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols-1;
 			backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
 		} else {
-			backstabdamagemultiplier = (BaseStats[IE_LEVELTHIEF]+1)/2;
+			backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
 		}
-		if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
+		if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
 	}
 
-	int layonhandsamount = (int) BaseStats[IE_LEVELPALADIN];
-	if (layonhandsamount) {
-		layonhandsamount *= BaseStats[IE_CHR]/2-5;
-		if (layonhandsamount<1) layonhandsamount = 1;
-	}
+	int layonhandsamount = GetPaladinLevel() * GetAbilityBonus(IE_CHR);
+	if (layonhandsamount<1) layonhandsamount = 1;
 
-	for (i=0;i<11;i++) {
+	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
 
 		if (turnlevels[i+1]) {
-			tmp = BaseStats[IE_LEVELBARBARIAN+i]+1-turnlevels[i+1];
+			tmp = BaseStats[levelslotsiwd2[i]]+1-turnlevels[i+1];
 			if (tmp<0) tmp=0;
-			if (tmp>turnundeadlevel) turnundeadlevel=tmp;
+			//the levels add up (checked)
+			turnundeadlevel+=tmp;
 		}
 	}
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
