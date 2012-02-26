@@ -134,17 +134,23 @@ void Button::CloseUpColor()
 	if (newtime<starttime) {
 		return;
 	}
-	SourceRGB.r = (SourceRGB.r + DestRGB.r) / 2;
-	SourceRGB.g = (SourceRGB.g + DestRGB.g) / 2;
-	SourceRGB.b = (SourceRGB.b + DestRGB.b) / 2;
-	SourceRGB.a = (SourceRGB.a + DestRGB.a) / 2;
-	if (SourceRGB.r == DestRGB.r &&
-		SourceRGB.g == DestRGB.g &&
-		SourceRGB.b == DestRGB.b &&
-		SourceRGB.a == DestRGB.a) {
+
+	Color nc;
+
+	nc.r = (SourceRGB.r + DestRGB.r) / 2;
+	nc.g = (SourceRGB.g + DestRGB.g) / 2;
+	nc.b = (SourceRGB.b + DestRGB.b) / 2;
+	nc.a = (SourceRGB.a + DestRGB.a) / 2;
+	if (SourceRGB.r == nc.r &&
+		SourceRGB.g == nc.g &&
+		SourceRGB.b == nc.b &&
+		SourceRGB.a == nc.a) {
+		SourceRGB = DestRGB;
 		starttime = 0;
 		return;
 	}
+
+	SourceRGB = nc;
 	starttime = newtime + 40;
 }
 
