@@ -176,6 +176,34 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 	return false;
 }
 
+int Spellbook::CountSpells(const char *resref, unsigned int type)
+{
+  int i, max;
+  int count = 0;
+
+  if (type==0xffffffff) {
+    i=0;
+    max = NUM_BOOK_TYPES;
+  } else {
+    i = type;
+    max = i+1;
+  }
+  
+	while(i < max) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
+		  CRESpellMemorization* sm = spells[i][j];
+		  for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
+			  CREKnownSpell* ks = sm->known_spells[k];
+				if (resref[0] && !stricmp(ks->SpellResRef, resref) ) {
+          count++;
+			  }
+		  }
+	  }
+    i++;
+  }
+	return count;
+}
+
 bool Spellbook::KnowSpell(int spellid)
 {
 	int type = spellid/1000;
@@ -190,7 +218,7 @@ bool Spellbook::KnowSpell(int spellid)
 
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		CRESpellMemorization* sm = spells[type][j];
-		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+		for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
 			CREKnownSpell* ks = sm->known_spells[k];
 			if (atoi(ks->SpellResRef+4)==spellid) {
 				return true;
@@ -206,7 +234,7 @@ bool Spellbook::KnowSpell(const char *resref)
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+			for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
 				CREKnownSpell* ks = sm->known_spells[k];
 				if (resref[0] && stricmp(ks->SpellResRef, resref) ) {
 					continue;

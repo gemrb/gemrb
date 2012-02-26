@@ -6641,6 +6641,24 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_CountSpells__doc,
+"CountSpells(PartyID, SpellType, Level)=>int\n\n"
+"Returns number of known spells of given type and level in PC's spellbook.");
+
+static PyObject* GemRB_CountSpells(PyObject * /*self*/, PyObject* args)
+{
+	int globalID, SpellType = -1;
+  char *SpellResRef;
+
+	if (!PyArg_ParseTuple( args, "is|i", &globalID, &SpellResRef, &SpellType)) {
+		return AttributeError( GemRB_CountSpells__doc );
+	}
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	return PyInt_FromLong(actor->spellbook.CountSpells( SpellResRef, SpellType) );
+}
+
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
 "GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
 "Returns number of known spells of given type and level in PC's spellbook.");
@@ -6735,7 +6753,6 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ms->SpellResRef));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ms->Flags));
-
 	return dict;
 }
 
@@ -10120,6 +10137,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CheckVar, METH_VARARGS),
 	METHOD(ClearActions, METH_VARARGS),
 	METHOD(CountEffects, METH_VARARGS),
+  METHOD(CountSpells, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),
 	METHOD(CreateItem, METH_VARARGS),
 	METHOD(CreateMovement, METH_VARARGS),
