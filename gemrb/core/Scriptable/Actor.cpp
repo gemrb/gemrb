@@ -5167,7 +5167,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			THAC0Bonus -= defaultprof[clss];
 		} else {
 			//it is not clear what is the penalty for non player classes
-			THAC0Bonus -= 4;
+			THAC0Bonus += 4;
 		}
 	}
 
