@@ -192,8 +192,15 @@ def NextPress():
 	#setting feats
 	TmpTable = GemRB.LoadTable ("featreq")
 	FeatCount = TmpTable.GetRowCount ()
+	ProfOffset = IE_PROFICIENCYBASTARDSWORD
 	for i in range (FeatCount):
 		GemRB.SetFeat (MyChar, i, GemRB.GetVar ("Feat "+str(i) ) )
+		# set proficiencies
+		# feats for exotic: bastard swords; martial weapons; simple weapons
+		if i == 18 or (i > 37 and i < 45) or (i > 52 and i < 58):
+			stars = GemRB.GetVar ("Feat "+str(i))
+			if stars:
+				GemRB.SetPlayerStat (MyChar, ProfOffset+i, stars)
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
