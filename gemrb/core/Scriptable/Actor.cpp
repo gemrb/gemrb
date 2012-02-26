@@ -747,7 +747,7 @@ static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 		int kitindex = kit&0xfff;
 		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
 		if (tm) {
-			return atoi(tm->QueryField(kitindex, 6) );
+			return strtol(tm->QueryField(kitindex, 6), NULL, 0 );
 		}
 	}
 	if (kit&KIT_BASECLASS) return 0;
