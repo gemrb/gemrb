@@ -1790,7 +1790,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 
 	if (twohanded) {
 		if (IWD2) {
-			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot&1) ) {
+			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot-SLOT_MELEE)&1) {
 				return STR_NOT_IN_OFFHAND;
 			}
 		} else {
