@@ -5214,20 +5214,6 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THAC0Bonus, wi.wflags, target);
 	if (third) {
-		// "star" system: 1 - no penalty, 2 - +1 tohit, 3 - +2dmg
-		switch (stars) {
-			case 0:
-				tohit -= 4;
-				break;
-			case 1:
-				break;
-			case 2:
-				tohit += 1;
-				break;
-			case 3:
-				DamageBonus += 2;
-		}
-
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
 		// it is limited to shortswords and daggers, which also have this flag set
 		if (IsDualWielding() && (wi.wflags&WEAPON_FINESSE)) {
