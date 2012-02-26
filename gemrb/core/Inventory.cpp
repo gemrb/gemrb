@@ -1777,7 +1777,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 		//see GetShieldSlot
 		int otherslot;
 		if (IWD2) {
-			otherslot = ++i;
+			otherslot = i+1;
 		} else {
 			otherslot = SLOT_LEFT;
 		}
