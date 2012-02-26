@@ -167,7 +167,10 @@ struct PolymorphCache;
 #define ISPALADIN   8
 #define ISRANGER    9
 #define ISSORCERER  10
-#define ISCLASSES   11
+#define ISCLASS12   11
+#define ISCLASS13   12
+
+#define ISCLASSES   13
 
 //appearance flags
 
@@ -359,7 +362,7 @@ private:
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsIWD2();
 	/* Gets the given ISCLASS level */
-	ieDword GetClassLevel (const ieDword id) const;
+	ieDword GetClassLevel (const ieDword isclass) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
 	/* returns the weapon proficiency stat of the actor */
@@ -781,6 +784,8 @@ public:
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range) const;
 	/* returns true if the lightmap under the actor is dark */
 	bool PCInDark() const;
+	/* function to get a class level used by scripting */
+	ieDword GetLevelInClass (const ieDword classid) const;
 	/* computes the actor's classmask (iwd2) */
 	int GetClassMask() const;
 	/* computes the thieving skill bonus from race and dexterity */

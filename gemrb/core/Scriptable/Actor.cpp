@@ -160,23 +160,26 @@ static int animcount = -1;
 static int fiststat = IE_CLASS;
 
 //conversion for 3rd ed
-static int isclass[11]={0,0,0,0,0,0,0,0,0,0,0};
+static int isclass[ISCLASSES]={0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-static const int mcwasflags[11] = {
+static const int mcwasflags[ISCLASSES] = {
 	MC_WAS_FIGHTER, MC_WAS_MAGE, MC_WAS_THIEF, 0, 0, MC_WAS_CLERIC,
-	MC_WAS_DRUID, 0, 0, MC_WAS_RANGER, 0};
-static const char *isclassnames[11] = {
+	MC_WAS_DRUID, 0, 0, MC_WAS_RANGER, 0, 0, 0};
+static const char *isclassnames[ISCLASSES] = {
 	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
-	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER" };
+	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "CLASS12", "CLASS13" };
 
+#define BGCLASSCNT 23
 //fighter is the default level here
 //fixme, make this externalized
-static const int levelslotsbg[21]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
-	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK};
-static const int levelslotsiwd2[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
-	IE_LEVELBARBARIAN,IE_LEVELBARD,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
-	IE_LEVELPALADIN,IE_LEVELRANGER,IE_LEVELSORCEROR};
-static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10};
+
+static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
+	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK,
+	ISCLASS12, ISCLASS13};
+static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
+	IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
+	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCEROR, IE_LEVELCLASS12, IE_LEVELCLASS13};
+static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
@@ -3817,7 +3820,7 @@ ieDword Actor::GetXPLevel(int modified) const
 	float average = 0;
 	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		// iwd2
-		for (int i=0; i < 11; i++) {
+		for (int i=0; i < ISCLASSES; i++) {
 			if (stats[levelslotsiwd2[i]] > 0) clscount++;
 		}
 		average = stats[IE_CLASSLEVELSUM] / (float) clscount + 0.5;
@@ -7793,16 +7796,37 @@ Actor *Actor::CopySelf(bool mislead) const
 	return newActor;
 }
 
-ieDword Actor::GetClassLevel(const ieDword id) const
+//high level function, used by scripting
+ieDword Actor::GetLevelInClass(ieDword classid) const
 {
-	if (id>=ISCLASSES)
+	if (version==22) {
+		//iwd2
+		for (int i=0;i<ISCLASSES;i++) {
+			if (classid==classesiwd2[i]) {
+				return GetClassLevel(i);
+			}
+		}
+		return 0;
+	}
+
+	if (classid>BGCLASSCNT) {
+		classid=0;
+	}
+	//other, levelslotsbg starts at 0 classid
+	return GetClassLevel(levelslotsbg[classid]);
+}
+
+//lowlevel internal function, isclass is NOT the class id, but an internal index
+ieDword Actor::GetClassLevel(const ieDword isclass) const
+{
+	if (isclass>=ISCLASSES)
 		return 0;
 
 	//return iwd2 value if appropriate
 	if (version==22)
-		return BaseStats[levelslotsiwd2[id]];
+		return BaseStats[levelslotsiwd2[isclass]];
 
-	//houston, we gots a problem!
+	//houston, we got a problem!
 	if (!levelslots || !dualswap)
 		return 0;
 
@@ -7812,12 +7836,12 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
-	if ( (id == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (GetKitUsability(BaseStats[IE_KIT]) == KIT_BARBARIAN) ) {
+	if ( (isclass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (GetKitUsability(BaseStats[IE_KIT]) == KIT_BARBARIAN) ) {
 		return BaseStats[IE_LEVEL];
 	}
 
 	//get the levelid (IE_LEVEL,*2,*3)
-	ieDword levelid = levelslots[classid][id];
+	ieDword levelid = levelslots[classid][isclass];
 	if (!levelid)
 		return 0;
 
@@ -7825,7 +7849,7 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 	if (IsDualClassed()) {
 		//if the old class is inactive, and it is the class
 		//being searched for, return 0
-		if (IsDualInactive() && ((Modified[IE_MC_FLAGS]&MC_WAS_ANY)==(ieDword)mcwasflags[id]))
+		if (IsDualInactive() && ((Modified[IE_MC_FLAGS]&MC_WAS_ANY)==(ieDword)mcwasflags[isclass]))
 			return 0;
 	}
 	return BaseStats[levelid];
