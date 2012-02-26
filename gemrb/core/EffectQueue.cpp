@@ -1630,7 +1630,7 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
 		if( (*f)->Parameter1) {
-			ieDword param1 = 0;
+			ieDword param1;
 			ieDword ids = (*f)->Parameter2;
 			switch(ids) {
 			case 0:
@@ -1643,15 +1643,16 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 			case 7:
 			case 8:
 				param1 = actor->GetStat(ids_stats[ids]);
+				MATCH_PARAM1();
 				break;
 			case 9:
 				//pseudo stat/classmask
-				param1 = actor->GetClassMask();
+				param1 = actor->GetClassMask() & (*f)->Parameter1;
+				if (!param1) continue;
 				break;
 			default:
 				break;
 			}
-			MATCH_PARAM1();
 		}
 		int val = (int) (*f)->Parameter3;
 		//we are really lucky with this, most of these boni are using +2 (including fiendslayer feat)
