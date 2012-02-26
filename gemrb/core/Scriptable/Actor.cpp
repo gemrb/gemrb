@@ -5213,6 +5213,19 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THAC0Bonus, wi.wflags, target);
+	// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
+	if (third && IsDualWielding()) {
+		switch (wi.prof) {
+			case 1: // xbow
+			case 2: // sling
+			case 4: // mace
+			case 5: // dart
+			case 7: // dagger
+			case 8: // staff
+			case 11: // short sword
+				tohit += 2;
+		}
+	}
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
@@ -5246,13 +5259,10 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 			// -6 main, -10 off with no adjustments
 			//  0 main, +4 off with ambidexterity
 			// +2 main, +2 off with two weapon fighting
-			// +2 main, +2 off with a simple weapons in the off hand
+			// +2 main, +2 off with a simple weapons in the off hand (handled in GetCombatDetails)
 			if (HasFeat(FEAT_TWO_WEAPON_FIGHTING)) {
 				tohit += 2;
 			}
-			/*if (wi.prof == simple weapon prof) {
-				tohit += 2;
-			}*/
 			if (Flags&WEAPON_LEFTHAND) {
 				tohit -= 6;
 			} else {
