@@ -7629,7 +7629,7 @@ void Actor::CreateDerivedStatsBG()
 		int tmp;
 
 		if (turnlevels[i+1]) {
-			tmp = BaseStats[levelslotsiwd2[i]]+1-turnlevels[i+1];
+			tmp = GetClassLevel(i)+1-turnlevels[i+1];
 			if (tmp<0) tmp=0;
 			//the levels don't add up (well, there is actually no chance we get both)
 			if (turnundeadlevel<tmp) turnundeadlevel = tmp;
@@ -7708,7 +7708,7 @@ void Actor::CreateDerivedStatsIWD2()
 		int tmp;
 
 		if (turnlevels[i+1]) {
-			tmp = BaseStats[levelslotsiwd2[i]]+1-turnlevels[i+1];
+			tmp = GetClassLevel(i)+1-turnlevels[i+1];
 			if (tmp<0) tmp=0;
 			//the levels add up (checked)
 			turnundeadlevel+=tmp;
