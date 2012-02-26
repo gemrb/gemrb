@@ -1618,8 +1618,10 @@ int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amo
 }
 
 //this function does IDS targeting for effects (extra damage/thac0 against creature)
-static const int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
+//faction/team may be useful for grouping creatures differently, without messing with existing general/specific values
+static const int ids_stats[9]={IE_FACTION, IE_TEAM, IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
 
+//0,1 and 9 are only in GemRB
 int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 {
 	int sum = 0;
@@ -1628,11 +1630,27 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
 		if( (*f)->Parameter1) {
+			ieDword param1 = 0;
 			ieDword ids = (*f)->Parameter2;
-			if( ids<2 || ids>8) {
-				ids=2;
+			switch(ids) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				param1 = actor->GetStat(ids_stats[ids]);
+				break;
+			case 9:
+				//pseudo stat/classmask
+				param1 = actor->GetClassMask();
+				break;
+			default:
+				break;
 			}
-			ieDword param1 = actor->GetStat(ids_stats[ids-2]);
 			MATCH_PARAM1();
 		}
 		int val = (int) (*f)->Parameter3;
