@@ -713,7 +713,10 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 
 #define BG2_KITMASK  0xffffc000
 #define KIT_BASECLASS 0x4000
+#define KIT_SWASHBUCKLER 0x100000
+#define KIT_BARBARIAN 0x40000000
 
+//TODO: make kitlist column 6 stored internally
 static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 {
 	int kitindex = 0;
@@ -722,9 +725,7 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 		kitindex = kit&0xfff;
 	}
 
-	// carefully looking for kit by the usability flag
-	// since the barbarian kit id clashes with the no-kit value
-	if (kitindex == 0 && kit != KIT_BASECLASS) {
+	if (kitindex == 0) {
 		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
 		if (tm) {
 			kitindex = tm->FindTableValue(6, kit);
@@ -735,6 +736,19 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 	}
 
 	return (ieDword)kitindex;
+}
+
+static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
+{
+	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
+		int kitindex = kit&0xfff;
+		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
+		if (tm) {
+			return atoi(tm->QueryField(kitindex, 6) );
+		}
+	}
+	if (kit&KIT_BASECLASS) return 0;
+	return kit;
 }
 
 //applies a kit on the character (only bg2)
@@ -7620,7 +7634,7 @@ void Actor::CreateDerivedStatsBG()
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
 		// HACK: swashbucklers can't backstab
-		if ((BaseStats[IE_KIT]&0xfff) == 12) {
+		if (GetKitUsability(BaseStats[IE_KIT])==KIT_SWASHBUCKLER) {
 			backstabdamagemultiplier = 1;
 		} else {
 			AutoTable tm("backstab");
@@ -7636,7 +7650,7 @@ void Actor::CreateDerivedStatsBG()
 			} else {
 				backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
 			}
-			if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
+			if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
 		}
 	}
 
@@ -7798,7 +7812,7 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
-	if (id == ISBARBARIAN && levelslots[classid][ISFIGHTER] && GetKitIndex(BaseStats[IE_KIT]) == 31) {
+	if ( (id == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (GetKitUsability(BaseStats[IE_KIT]) == KIT_BARBARIAN) ) {
 		return BaseStats[IE_LEVEL];
 	}
 
