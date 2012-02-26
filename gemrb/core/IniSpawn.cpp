@@ -164,14 +164,12 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 
 //unimplemented tags (* marks partially implemented, # marks not working in original either):
 //*check_crowd
-//*good_mod, law_mod, lady_mod, murder_mod
 // control_var
 // spec_area
 //*death_faction
 //*death_team
 // check_by_view_port
 //*do_not_spawn
-//*time_of_day
 // hold_selected_point_key
 // inc_spawn_point_index
 //*find_safest_point
@@ -187,7 +185,22 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	
 	memset(&critter,0,sizeof(critter));
 
+	//first assume it is a simple numeric value
 	critter.TimeOfDay = (ieDword) inifile->GetKeyAsInt(crittername,"time_of_day", 0xffffffff);
+
+	//at this point critter.TimeOfDay is usually 0xffffffff
+	s = inifile->GetKeyAsString(crittername,"time_of_day",NULL);
+	if (s && strlen(s)>=24) {
+		ieDword value = 0;
+		ieDword j = 1;
+		for(int i=0;i<24 && s[i];i++) {
+			if (s[i]=='0' || s[i]=='o') value |= j;
+			j<<=1;
+		}
+		//turn off individual bits marked by a 24 long string scheduling
+		//example: '0000xxxxxxxxxxxxxxxx00000000'
+		critter.TimeOfDay^=value;
+	}
 
 	if (inifile->GetKeyAsBool(crittername,"do_not_spawn",false)) {
 		//if the do not spawn flag is true, ignore this entry
@@ -788,10 +801,10 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 
 bool IniSpawn::Schedule(ieDword appearance, ieDword gametime) const
 {
-        ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
-        if (appearance & bit) {
-                return true;
-        }
+	ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
+	if (appearance & bit) {
+		return true;
+	}
 	return false;
 }
 
