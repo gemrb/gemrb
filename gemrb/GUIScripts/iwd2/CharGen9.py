@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_feats import *
 import GUICommon
 import CommonTables
 import CharOverview
@@ -214,6 +215,11 @@ def NextPress():
 	#MakeSpellCount(MyChar, "", cnt)
 
 	#feats giving a single innate ability
+	SetSpell(MyChar, "SPIN111", FEAT_WILDSHAPE_BOAR)
+	SetSpell(MyChar, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
+	SetSpell(MyChar, "SPIN231", FEAT_ENVENOM_WEAPON)
+	SetSpell(MyChar, "SPIN245", FEAT_WILDSHAPE_PANTHER)
+	SetSpell(MyChar, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
 	SetSpell(MyChar, "SPIN275", FEAT_POWER_ATTACK)
 	SetSpell(MyChar, "SPIN276", FEAT_EXPERTISE)
 	SetSpell(MyChar, "SPIN277", FEAT_ARTERIAL_STRIKE)

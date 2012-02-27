@@ -3219,8 +3219,8 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	//for compatibility reasons
 	STAT_SUB(IE_SAVEVSBREATH, penalty);
 	STAT_SUB(IE_SAVEVSSPELL, penalty);
-  //bigger is better in iwd2
-  STAT_SUB(IE_TOHIT, penalty);
+	//bigger is better in iwd2
+	STAT_SUB(IE_TOHIT, penalty);
 
 	//decrease all skills by 1
 	for(int i=0;i<32;i++) {
