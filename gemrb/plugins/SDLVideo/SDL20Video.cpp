@@ -267,7 +267,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	 the digitizer could have a higher resolution then the screen.
 	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
 	 */
-	SDL_Touch *state = SDL_GetTouch(lastEvent.tfinger.touchId);
+	SDL_Touch *state = SDL_GetTouch(event.tfinger.touchId);
 	float xScaleFactor = 1.0;
 	float yScaleFactor = 1.0;
 	if(state){
@@ -287,7 +287,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		//!!!!!!!!!!!!
 		case SDL_MOUSEMOTION:
 			if (numFingers > 1) break;
-			MouseMovement(lastEvent.motion.x, lastEvent.motion.y);
+			MouseMovement(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if ((MouseFlags & MOUSE_DISABLED) || !EvntManager)
@@ -299,10 +299,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			if (CursorIndex != VID_CUR_DRAG)
 				CursorIndex = VID_CUR_DOWN;
-			CursorPos.x = lastEvent.button.x; // - mouseAdjustX[CursorIndex];
-			CursorPos.y = lastEvent.button.y; // - mouseAdjustY[CursorIndex];
+			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
+			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
 			if (!ConsolePopped)
-				EvntManager->MouseDown( lastEvent.button.x, lastEvent.button.y, 1 << ( lastEvent.button.button - 1 ), GetModState(SDL_GetModState()) );
+				EvntManager->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 			break;
 		case SDL_MOUSEBUTTONUP:
 			if ((MouseFlags & MOUSE_DISABLED) || !EvntManager || ignoreNextMouseUp)
@@ -310,10 +310,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			ignoreNextMouseUp = true;
 			if (CursorIndex != VID_CUR_DRAG)
 				CursorIndex = VID_CUR_UP;
-			CursorPos.x = lastEvent.button.x;
-			CursorPos.y = lastEvent.button.y;
+			CursorPos.x = event.button.x;
+			CursorPos.y = event.button.y;
 			if (!ConsolePopped)
-				EvntManager->MouseUp( lastEvent.button.x, lastEvent.button.y, 1 << ( lastEvent.button.button - 1 ), GetModState(SDL_GetModState()) );
+				EvntManager->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 			break;
 		case SDL_MOUSEWHEEL:
 			/*
@@ -339,16 +339,16 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						HideSoftKeyboard();
 					}
 					//invert the coordinates such that dragging down scrolls up etc.
-					int scrollX = (lastEvent.tfinger.dx / xScaleFactor) * -1;
-					int scrollY = (lastEvent.tfinger.dy / yScaleFactor) * -1;
+					int scrollX = (event.tfinger.dx / xScaleFactor) * -1;
+					int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
 
 					EvntManager->MouseWheelScroll( scrollX, scrollY );
 				} else if (numFingers == core->NumFingKboard) {
-					if ((lastEvent.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
+					if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
 						// if the keyboard is already up interpret this gesture as console pop
 						if(softKeyboardShowing && !ConsolePopped && !ignoreNextMouseUp) core->PopupConsole();
 						else ShowSoftKeyboard();
-					} else if((lastEvent.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+					} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 						HideSoftKeyboard();
 					}
 					ignoreNextMouseUp = true;
@@ -358,10 +358,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERDOWN://SDL 1.3+
 			touchHold = false;
 			if (++numFingers == 1) {
-				rightMouseDownEvent.x = lastEvent.tfinger.x / xScaleFactor;
-				rightMouseDownEvent.y = lastEvent.tfinger.y / yScaleFactor;
-				rightMouseUpEvent.x = lastEvent.tfinger.x / xScaleFactor;
-				rightMouseUpEvent.y = lastEvent.tfinger.y / yScaleFactor;
+				rightMouseDownEvent.x = event.tfinger.x / xScaleFactor;
+				rightMouseDownEvent.y = event.tfinger.y / yScaleFactor;
+				rightMouseUpEvent.x = event.tfinger.x / xScaleFactor;
+				rightMouseUpEvent.y = event.tfinger.y / yScaleFactor;
 
 				touchHoldTime = SDL_GetTicks();
 				touchHold = true;
@@ -374,7 +374,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			touchHold = false;//even if there are still fingers in contact
 			if (numFingers) numFingers--;
 			if (formationRotation) {
-				EvntManager->MouseUp( lastEvent.tfinger.x, lastEvent.tfinger.y, GEM_MB_MENU, GetModState(SDL_GetModState()) );
+				EvntManager->MouseUp( event.tfinger.x, event.tfinger.y, GEM_MB_MENU, GetModState(SDL_GetModState()) );
 				formationRotation = false;
 				ignoreNextMouseUp = false;
 			}
@@ -385,7 +385,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			//multitouch gestures
 		case SDL_MULTIGESTURE://SDL 1.3+
 			// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
-			numFingers = lastEvent.mgesture.numFingers;
+			numFingers = event.mgesture.numFingers;
 			/*
 			 // perhaps formation rotation should be implemented here as a rotate gesture.
 			 if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && numFingers == 2) {
@@ -394,16 +394,16 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		/* not user input event */
 		case SDL_TEXTINPUT:
-			for (size_t i=0; i < strlen(lastEvent.text.text); i++) {
+			for (size_t i=0; i < strlen(event.text.text); i++) {
 				if (core->ConsolePopped)
-					core->console->OnKeyPress( lastEvent.text.text[i], GetModState(event.key.keysym.mod));
+					core->console->OnKeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
 				else
-					EvntManager->KeyPress( lastEvent.text.text[i], GetModState(event.key.keysym.mod));
+					EvntManager->KeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
 			}
 			break;
 		/* not user input events */
 		case SDL_WINDOWEVENT://SDL 1.2
-			switch (lastEvent.window.event) {
+			switch (event.window.event) {
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
 					// We pause the game and audio when the window is minimized.
 					// on iOS/Android this happens when leaving the application or when play is interrupted (ex phone call)
