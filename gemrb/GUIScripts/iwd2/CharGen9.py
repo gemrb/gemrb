@@ -212,7 +212,14 @@ def NextPress():
 		RemoveSpell(MyChar, "SPIN260")
 	#extra shapeshifting
 	#MakeSpellCount(MyChar, "", cnt)
-	
+
+	#feats giving a single innate ability
+	SetSpell(MyChar, "SPIN275", FEAT_POWER_ATTACK)
+	SetSpell(MyChar, "SPIN276", FEAT_EXPERTISE)
+	SetSpell(MyChar, "SPIN277", FEAT_ARTERIAL_STRIKE)
+	SetSpell(MyChar, "SPIN278", FEAT_HAMSTRING)
+	SetSpell(MyChar, "SPIN279", FEAT_RAPID_SHOT)
+
 	#extra smiting
 	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
 	if level>1:
@@ -230,6 +237,13 @@ def NextPress():
 		MakeSpellCount(MyChar, "SPIN970", cnt)
 	else:
 		RemoveSpell(MyChar, "SPIN970")
+
+	#stunning fist
+	if GemRB.GetVar ("Feat 67"):
+		cnt = GemRB.GetPlayerStat(MyChar, IE_CLASSLEVELSUM) / 4
+		MakeSpellCount(MyChar, "SPIN232", cnt)
+	else:
+		RemoveSpell(MyChar, "SPIN232")
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
@@ -250,4 +264,11 @@ def RemoveSpell(pc, SpellName):
 	while SpellIndex>=0:
 		GemRB.RemoveSpell(pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 		SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellName)
+	return
+
+def SetSpell(pc, SpellName, Feat)
+	if GemRB.GetVar ("Feat "+Feat):
+		MakeSpellCount(pc, SpellName, 1)
+	else:
+		RemoveSpell(pc, SpellName)
 	return
