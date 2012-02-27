@@ -4558,6 +4558,11 @@ int Actor::GetHpAdjustment(int multiplier) const
 {
 	int val;
 
+	// only player classes get this bonus
+	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
+		return 0;
+	}
+
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
 		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
