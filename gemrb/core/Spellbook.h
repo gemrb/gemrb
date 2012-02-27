@@ -165,7 +165,9 @@ public:
 	/** Check if the spell is memorised, optionally deplete it (casting) */
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
-	      /** Check if the spell is in the book */
+
+	int CountSpells(const char *resref, unsigned int type);
+	/** Check if the spell is in the book */
 	bool KnowSpell(const char *resref);
 	bool KnowSpell(int spellid);
 
