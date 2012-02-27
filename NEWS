@@ -1,4 +1,4 @@
-GemRB git (7efafe09f):
+GemRB git (a0c06224f8):
   New features:
     - 
     - support for logging to file directly
@@ -8,6 +8,7 @@ GemRB git (7efafe09f):
 
   Improved features:
     - 
+    - sdl renderer and an initial sdl2 port
     - config loading, logging
     - (iwd2) effects, combat
     - cocoa wrapper and mac build, cursor handling
