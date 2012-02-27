@@ -39,8 +39,6 @@ inline int GetModState(int modstate)
 }
 
 class SDLVideoDriver : public Video {
-protected: //will become private after we fix touch events in SDL20Video.cpp
-	SDL_Event lastEvent; /* Last event dequeued by PollEvents */
 protected:
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
@@ -171,7 +169,7 @@ protected:
 	void DrawMovieSubtitle(ieDword strRef);
 	virtual bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)=0;
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
-	/* used to process the lastEvent member populated by PollEvents or an arbitraty event from another source.*/
+	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
 
 public:

@@ -105,10 +105,11 @@ int SDLVideoDriver::SwapBuffers(void)
 int SDLVideoDriver::PollEvents()
 {
 	int ret = GEM_OK;
-	while ( ret == GEM_OK && SDL_PollEvent(&lastEvent) ) {
-		ret = ProcessEvent(lastEvent);
+	SDL_Event currentEvent;
+	while ( ret == GEM_OK && SDL_PollEvent(&currentEvent) ) {
+		ret = ProcessEvent(currentEvent);
 	}
-	bool eventWasMouseEvent = (lastEvent.type & (SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN));
+	bool eventWasMouseEvent = (currentEvent.type & (SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN));
 	int x, y;
 	if (ret == GEM_OK && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
 		&& eventWasMouseEvent && lastTime>lastMouseDownTime
