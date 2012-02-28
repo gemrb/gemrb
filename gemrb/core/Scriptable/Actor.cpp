@@ -168,17 +168,18 @@ static const int mcwasflags[ISCLASSES] = {
 static const char *isclassnames[ISCLASSES] = {
 	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
 	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "CLASS12", "CLASS13" };
+static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
+	IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
+	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCEROR, IE_LEVELCLASS12, IE_LEVELCLASS13};
 
 #define BGCLASSCNT 23
 //fighter is the default level here
 //fixme, make this externalized
-
+//this map could probably be auto-generated BG2 class ID -> ISCLASS
 static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
 	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK,
 	ISCLASS12, ISCLASS13};
-static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
-	IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
-	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCEROR, IE_LEVELCLASS12, IE_LEVELCLASS13};
+//this map could probably be auto-generated (isClass -> IWD2 class ID)
 static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
 
 //stat values are 0-255, so a byte is enough
@@ -4622,12 +4623,12 @@ void Actor::ApplyFeats()
 			}
 		}
 	}
-  //apply scripted feats
-  if (InParty) {
-    core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, InParty);
-  } else {
-    core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, GetGlobalID());
-  }
+	//apply scripted feats
+	if (InParty) {
+		core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, InParty);
+	} else {
+		core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, GetGlobalID());
+	}
 }
 
 void Actor::ApplyExtraSettings()
@@ -7635,8 +7636,8 @@ void Actor::CreateDerivedStatsBG()
 	}
 
 	//turn undead level
-	if (turnlevels[classid]) {  	
-  	int tmp = GetLevelInClass(classid)+1-turnlevels[classid];
+	if (turnlevels[classid]) {
+		int tmp = GetLevelInClass(classid)+1-turnlevels[classid];
 		if (tmp<0) tmp=0;
 		turnundeadlevel = tmp;
 	}
@@ -7712,13 +7713,14 @@ void Actor::CreateDerivedStatsIWD2()
 	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
 
-    if (classesiwd2[i]>=classcount) break;
-    int tl = turnlevels[classesiwd2[i]];
+		if (classesiwd2[i]>=(ieDword) classcount) continue;
+		int tl = turnlevels[classesiwd2[i]];
 		if (tl) {
 			tmp = GetClassLevel(i)+1-tl;
-			if (tmp<0) tmp=0;
-			//the levels add up (checked)
-			turnundeadlevel+=tmp;
+			if (tmp>0) {
+				//the levels add up (checked)
+				turnundeadlevel+=tmp;
+			}
 		}
 	}
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
