@@ -6625,7 +6625,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 		if (map1) {
 			map1->RemoveActor( actor );
 		}
-		map2->AddActor( actor );
+		map2->AddActor( actor, true );
 	}
 
 	Py_INCREF( Py_None );
@@ -6977,7 +6977,7 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (PyArg_ParseTuple( args, "is", &globalID, &SpellResRef) ) {
-		GET_ACTOR_GLOBAL();
+  	GET_ACTOR_GLOBAL();
 		int ret = actor->spellbook.KnowSpell(SpellResRef);
 		actor->spellbook.RemoveSpell(SpellResRef);
 		return PyInt_FromLong(ret);
@@ -6987,7 +6987,7 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_RemoveSpell__doc );
 	}
 
-	GET_ACTOR_GLOBAL();
+ 	GET_ACTOR_GLOBAL();
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
 	if (! ks) {
 		return RuntimeError( "Spell not known!" );

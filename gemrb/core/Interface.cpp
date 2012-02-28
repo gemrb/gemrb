@@ -2822,7 +2822,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		} else {
 			map = game->GetCurrentArea();
 		}
-		map->AddActor(ab);
+		map->AddActor(ab, true);
 		ab->SetPosition(position, true, 0);
 		ab->RefreshEffects(NULL);
 

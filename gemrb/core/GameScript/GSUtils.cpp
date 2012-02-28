@@ -638,7 +638,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	Map *map = Sender->GetCurrentArea();
-	map->AddActor( ab );
+	map->AddActor( ab, true );
 	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius );
 	ab->SetOrientation(parameters->int0Parameter, false );
 
@@ -699,7 +699,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	Actor *tar = gamedata->GetCreature(resref);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
-		map->AddActor( tar );
+		map->AddActor( tar, true );
 		Point pos = src->Pos;
 		tar->SetOrientation(src->GetOrientation(), false );
 		// make sure to copy the HP, to avoid things like magically-healing trolls
@@ -1061,7 +1061,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 			if (map1) {
 				map1->RemoveActor( actor );
 			}
-			map2->AddActor( actor );
+			map2->AddActor( actor, true );
 
 			// update the worldmap if needed
 			if (actor->InParty) {

@@ -725,7 +725,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 	}
 
 	SetVariable(map, critter.SpecVar, critter.SpecContext, specvar+(ieDword) critter.SpecVarInc);
-	map->AddActor(cre);
+	map->AddActor(cre, true);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
 			cre->SetBase(StatValues[x], critter.SetSpec[x]);

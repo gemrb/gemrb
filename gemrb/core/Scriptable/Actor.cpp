@@ -777,7 +777,7 @@ bool Actor::ApplyKit(bool remove)
 		ieDword msk = 1;
 		for(unsigned int i=1;(i<(unsigned int) classcount) && (msk<=multiclass);i++) {
 			if (multiclass & msk) {
-				max = GetClassLevel(levelslotsbg[i]);
+				max = GetLevelInClass(i);
 				// don't apply/remove the old kit clab if the kit is disabled
 				if (i==kitclass && !IsDualClassed()) {
 					ApplyClab(clab, max, remove);
@@ -794,7 +794,7 @@ bool Actor::ApplyKit(bool remove)
 	if (cls>=(ieDword) classcount) {
 		return false;
 	}
-	max = GetClassLevel(levelslotsbg[cls]);
+	max = GetLevelInClass(cls);
 	if (kitclass==cls) {
 		ApplyClab(clab, max, remove);
 	} else {
@@ -4622,6 +4622,12 @@ void Actor::ApplyFeats()
 			}
 		}
 	}
+  //apply scripted feats
+  if (InParty) {
+    core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, InParty);
+  } else {
+    core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, GetGlobalID());
+  }
 }
 
 void Actor::ApplyExtraSettings()
@@ -7614,7 +7620,6 @@ void Actor::AddProjectileImmunity(ieDword projectile)
 //2nd edition rules
 void Actor::CreateDerivedStatsBG()
 {
-	int i;
 	int turnundeadlevel = 0;
 	int classid = BaseStats[IE_CLASS];
 
@@ -7630,15 +7635,10 @@ void Actor::CreateDerivedStatsBG()
 	}
 
 	//turn undead level
-	for (i=0;i<ISCLASSES;i++) {
-		int tmp;
-
-		if (turnlevels[i+1]) {
-			tmp = GetClassLevel(i)+1-turnlevels[i+1];
-			if (tmp<0) tmp=0;
-			//the levels don't add up (well, there is actually no chance we get both)
-			if (turnundeadlevel<tmp) turnundeadlevel = tmp;
-		}
+	if (turnlevels[classid]) {  	
+  	int tmp = GetLevelInClass(classid)+1-turnlevels[classid];
+		if (tmp<0) tmp=0;
+		turnundeadlevel = tmp;
 	}
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();
@@ -7712,8 +7712,10 @@ void Actor::CreateDerivedStatsIWD2()
 	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
 
-		if (turnlevels[i+1]) {
-			tmp = GetClassLevel(i)+1-turnlevels[i+1];
+    if (classesiwd2[i]>=classcount) break;
+    int tl = turnlevels[classesiwd2[i]];
+		if (tl) {
+			tmp = GetClassLevel(i)+1-tl;
 			if (tmp<0) tmp=0;
 			//the levels add up (checked)
 			turnundeadlevel+=tmp;
@@ -7799,7 +7801,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	//copy the running effects
 	EffectQueue *newFXQueue = fxqueue.CopySelf();
 
-	area->AddActor(newActor);
+	area->AddActor(newActor, true);
 	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );
 	newActor->SetOrientation(GetOrientation(), false);
 	newActor->SetStance( IE_ANI_READY );

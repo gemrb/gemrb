@@ -948,7 +948,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab = actmgr->GetActor(0);
 			if(!ab)
 				continue;
-			map->AddActor(ab);
+			map->AddActor(ab, false);
 			ab->Pos.x = XPos;
 			ab->Pos.y = YPos;
 			ab->Destination.x = XDes;

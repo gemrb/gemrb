@@ -1363,12 +1363,20 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 	}
 }
 
-void Map::AddActor(Actor* actor)
+//call this once, after area was loaded
+void Map::InitActors()
 {
-	//setting the current area for the actor as this one
-	strnlwrcpy(actor->Area, scriptName, 8);
-	actor->SetMap(this);
-	actors.push_back( actor );
+  size_t i = actors.size();
+  while(i--) {
+    Actor* actor = actors[i];
+
+    actor->SetMap(this);
+    InitActor(actor);
+  }
+}
+
+void Map::InitActor(Actor *actor)
+{
 	//if a visible aggressive actor was put on the map, it is an autopause reason
 	//guess game is always loaded? if not, then we'll crash
 	ieDword gametime = core->GetGame()->GameTime;
@@ -1381,7 +1389,17 @@ void Map::AddActor(Actor* actor)
 		snprintf(key, sizeof(key),"%s_visited", scriptName);
 		core->GetGame()->locals->SetAt(key, 1);
 	}
+}
 
+void Map::AddActor(Actor* actor, bool init)
+{
+	//setting the current area for the actor as this one
+	strnlwrcpy(actor->Area, scriptName, 8);
+	actors.push_back( actor );
+  if (init) {
+	  actor->SetMap(this);
+    InitActor(actor);
+  }
 }
 
 bool Map::AnyPCSeesEnemy()
@@ -2931,7 +2949,7 @@ void Map::SpawnCreature(const Point &pos, const char *CreName, int radius)
 	if ( !Spawns.Lookup( CreName, lookup) ) {
 		creature = gamedata->GetCreature(CreName);
 		if ( creature ) {
-			AddActor(creature);
+			AddActor(creature, true);
 			creature->SetPosition( pos, true, radius );
 			creature->RefreshEffects(NULL);
 		}
@@ -2960,7 +2978,7 @@ void Map::SpawnCreature(const Point &pos, const char *CreName, int radius)
 	while ( count-- ) {
 		creature = gamedata->GetCreature(sg->ResRefs[count]);
 		if ( creature ) {
-			AddActor(creature);
+			AddActor(creature, true);
 			creature->SetPosition( pos, true, radius );
 			creature->RefreshEffects(NULL);
 		}

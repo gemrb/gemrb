@@ -786,7 +786,7 @@ int Game::DelMap(unsigned int index, int forced)
 /* Loads an area */
 int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
-	unsigned int i, last;
+	unsigned int i, last, ret;
 	Map *newMap;
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
@@ -821,9 +821,11 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	core->LoadProgress(100);
 
+	ret = AddMap( newMap );
+
 	for (i = 0; i < PCs.size(); i++) {
 		if (stricmp( PCs[i]->Area, ResRef ) == 0) {
-			newMap->AddActor( PCs[i] );
+			newMap->AddActor( PCs[i], false );
 		}
 	}
 	// count the number of replaced actors, so we don't need to recheck them
@@ -836,13 +838,15 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 				last--;
 				continue;
 			}
-			newMap->AddActor( NPCs[i] );
+			newMap->AddActor( NPCs[i], false );
 		}
 	}
 	if (hide) {
 		core->UnhideGCWindow();
 	}
-	return AddMap( newMap );
+	newMap->InitActors();
+
+	return ret;
 failedload:
 	if (hide) 
 		core->UnhideGCWindow();

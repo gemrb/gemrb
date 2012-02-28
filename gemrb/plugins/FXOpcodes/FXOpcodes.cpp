@@ -4937,7 +4937,7 @@ Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resour
 	Map *map = target->GetCurrentArea();
 	if (!map) return NULL;
 
-	map->AddActor(fam);
+	map->AddActor(fam, true);
 	Point p(fx->PosX, fx->PosY);
 	fam->SetPosition(p, true, 0);
 	fam->RefreshEffects(NULL);
