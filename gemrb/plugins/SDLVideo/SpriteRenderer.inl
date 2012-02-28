@@ -333,6 +333,18 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	}
 
 
+	// Clipping strategy:
+	// Because we can't jump to the right spot in the RLE data,
+	// we have to process the full sprite.
+	// We fast-forward through the bits outside of the clipping rectangle.
+
+	// This is done line-by-line.
+	// To avoid having to fast-forward, blit, fast-forward for each line,
+	// we consider the end of each line to be directly behind the clipping
+	// rectangle, so that we only do a single fast-forward loop followed by a
+	// blit loop.
+
+
 	PTYPE *clipstartpix, *clipendpix;
 	PTYPE *clipstartline;
 
