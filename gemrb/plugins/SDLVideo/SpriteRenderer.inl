@@ -343,7 +343,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	}
 
 
-	PTYPE *line, *end, *lineend, *linestart, *pix;
+	PTYPE *line, *end, *pix;
 	Uint8 *coverline, *coverpix;
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + ty*pitch;
@@ -357,15 +357,13 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 			coverline = (Uint8*)cover->pixels + (covery+height-1)*cover->Width;
 	}
 	if (!XFLIP) {
-		linestart = line + tx;
-		lineend = line + tx + width;
+		pix = line + tx;
 		clipstartpix = line + clip.x;
 		clipendpix = clipstartpix + clip.w;
 		if (COVER)
 			coverpix = coverline + coverx;
 	} else {
-		linestart = line + tx + width - 1;
-		lineend = line + tx - 1;
+		pix = line + tx + width - 1;
 		clipstartpix = line + clip.x + clip.w - 1;
 		clipendpix = clipstartpix - clip.w;
 		if (COVER)
@@ -374,8 +372,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 	// clipstartpix is the first pixel to draw
 	// clipendpix is one past the last pixel to draw (in either x direction)
-
-	pix = linestart;
 
 	const int yfactor = yflip ? -1 : 1;
 	const int xfactor = XFLIP ? -1 : 1;
@@ -463,8 +459,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 		line += yfactor * pitch;
 		pix += yfactor * (pitch - xfactor * width);
-		linestart += yfactor * pitch;
-		lineend += yfactor * pitch;
 		if (COVER)
 			coverpix += yfactor * (cover->Width - xfactor * width);
 		clipstartpix += yfactor * pitch;
