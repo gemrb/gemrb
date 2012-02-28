@@ -408,11 +408,10 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 		// Blit a line, if it's not vertically clipped
 
-		if ((!yflip && pix >= clipstartline) || (yflip && pix <= clipstartline+pitch))
+		if ((!yflip && pix >= clipstartline) || (yflip && pix < clipstartline+pitch))
 		{
 			while ( (!XFLIP && pix < clipendpix) || (XFLIP && pix > clipendpix) )
 			{
-				//fprintf(stderr, "PIX: %p\n", pix);
 				Uint8 p = *srcdata++;
 				if (p == transindex) {
 					int count = (int)(*srcdata++) + 1;
