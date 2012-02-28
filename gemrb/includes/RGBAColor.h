@@ -26,6 +26,10 @@ struct RevColor {
 
 struct Color {
 	unsigned char r,g,b,a;
-};
+}
+#ifdef __GNUC__
+	__attribute__((aligned(4)))
+#else
+	;
 
 #endif
