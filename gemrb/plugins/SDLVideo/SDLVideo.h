@@ -32,7 +32,7 @@
 typedef unsigned char
 #ifdef __GNUC__
 	__attribute__((aligned(4)))
-#else
+#endif
 	pixel;
 
 inline int GetModState(int modstate)
