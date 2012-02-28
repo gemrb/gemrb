@@ -458,9 +458,9 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		// pointers to the next line
 
 		line += yfactor * pitch;
-		pix += yfactor * (pitch - xfactor * width);
+		pix += yfactor * pitch - xfactor * width;
 		if (COVER)
-			coverpix += yfactor * (cover->Width - xfactor * width);
+			coverpix += yfactor * cover->Width - xfactor * width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
@@ -574,12 +574,12 @@ static void BlitSprite_internal(SDL_Surface* target,
 		} while (pix != endpix);
 
 		// advance all pointers to the next line
-		pix += yfactor * (pitch - xfactor * clip.w);
+		pix += yfactor * pitch - xfactor * clip.w;
 		endpix += yfactor * pitch;
 		line += yfactor * pitch;
 		srcdata += (width - clip.w);
 		if (COVER)
-			coverpix += yfactor * (cover->Width - xfactor * clip.w);
+			coverpix += yfactor * cover->Width - xfactor * clip.w;
 	}
 
 }
@@ -687,12 +687,12 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 		} while (pix != endpix);
 
 		// advance all pointers to the next line
-		pix += yfactor * (pitch - xfactor * clip.w);
+		pix += yfactor * pitch - xfactor * clip.w;
 		endpix += yfactor * pitch;
 		line += yfactor * pitch;
 		srcdata += (width - clip.w);
 		if (COVER)
-			coverpix += yfactor * (cover->Width - xfactor * clip.w);
+			coverpix += yfactor * cover->Width - xfactor * clip.w;
 	}
 
 }
