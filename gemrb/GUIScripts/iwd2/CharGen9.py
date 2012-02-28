@@ -20,10 +20,10 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from ie_feats import *
 import GUICommon
 import CommonTables
 import CharOverview
+import LUCommon
 
 BioWindow = 0
 EditControl = 0
@@ -164,7 +164,7 @@ def NextPress():
 	c = TmpTable.GetValue (Class, 2) #adjustment
 	d = TmpTable.GetValue (Class, 3) #external multiplier
 	e = TmpTable.GetValue (Class, 4) #level bonus rate
-	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL)
+	t = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)
 	if t>1:
 		e=e*(t-1)
 	else:
@@ -197,60 +197,6 @@ def NextPress():
 	for i in range (FeatCount):
 		GemRB.SetFeat (MyChar, i, GemRB.GetVar ("Feat "+str(i) ) )
 
-	#extra rage
-	level = GemRB.GetPlayerStat(MyChar, IE_LEVELBARBARIAN)
-	if level>0:
-		if level>=15:
-			RemoveSpell(MyChar, "SPIN236")
-			Spell = "SPIN260"
-		else:
-			RemoveSpell(MyChar, "SPIN260")
-			Spell = "SPIN236"
-		cnt = GemRB.GetVar ("Feat 20")+(level+3)/4
-		MakeSpellCount(MyChar, Spell, cnt)
-	else:
-		RemoveSpell(MyChar, "SPIN236")
-		RemoveSpell(MyChar, "SPIN260")
-	#extra shapeshifting
-	#MakeSpellCount(MyChar, "", cnt)
-
-	#feats giving a single innate ability
-	SetSpell(MyChar, "SPIN111", FEAT_WILDSHAPE_BOAR)
-	SetSpell(MyChar, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
-	SetSpell(MyChar, "SPIN231", FEAT_ENVENOM_WEAPON)
-	SetSpell(MyChar, "SPIN245", FEAT_WILDSHAPE_PANTHER)
-	SetSpell(MyChar, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
-	SetSpell(MyChar, "SPIN275", FEAT_POWER_ATTACK)
-	SetSpell(MyChar, "SPIN276", FEAT_EXPERTISE)
-	SetSpell(MyChar, "SPIN277", FEAT_ARTERIAL_STRIKE)
-	SetSpell(MyChar, "SPIN278", FEAT_HAMSTRING)
-	SetSpell(MyChar, "SPIN279", FEAT_RAPID_SHOT)
-
-	#extra smiting
-	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
-	if level>1:
-		cnt = GemRB.GetVar ("Feat 22") + 1
-		MakeSpellCount(MyChar, "SPIN152", cnt)
-	else:
-		RemoveSpell(MyChar, "SPIN152")
-	
-	#extra turning
-	level = GemRB.GetPlayerStat(MyChar, IE_TURNUNDEADLEVEL)
-	if level>0:
-		cnt = GetAbilityBonus(MyChar, IE_CHR) + 3
-		if cnt<1: cnt = 1
-		cnt += GemRB.GetVar ("Feat 23")
-		MakeSpellCount(MyChar, "SPIN970", cnt)
-	else:
-		RemoveSpell(MyChar, "SPIN970")
-
-	#stunning fist
-	if GemRB.GetVar ("Feat 67"):
-		cnt = GemRB.GetPlayerStat(MyChar, IE_CLASSLEVELSUM) / 4
-		MakeSpellCount(MyChar, "SPIN232", cnt)
-	else:
-		RemoveSpell(MyChar, "SPIN232")
-
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
@@ -263,18 +209,5 @@ def NextPress():
 	xp = TmpTable.GetValue (racename, "VALUE")
 	GemRB.SetPlayerStat (MyChar, IE_XP, xp )
 
-	return
-
-def RemoveSpell(pc, SpellName):
-	SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellName)
-	while SpellIndex>=0:
-		GemRB.RemoveSpell(pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
-		SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellName)
-	return
-
-def SetSpell(pc, SpellName, Feat)
-	if GemRB.GetVar ("Feat "+Feat):
-		MakeSpellCount(pc, SpellName, 1)
-	else:
-		RemoveSpell(pc, SpellName)
+	LUCommon.ApplyFeats(MyChar)
 	return

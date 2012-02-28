@@ -355,7 +355,7 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (10338,-1) #strength
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
 	RecordsTextArea.Append (": " + str(tmp) )
-	tmp = GetAbilityBonus(pc, IE_CON)
+	tmp = GUICommon.GetAbilityBonus(pc, IE_CON)
 	RecordsTextArea.Append (10342,-1)
 	RecordsTextArea.Append (": " + str(tmp) ) #con bonus
 
@@ -732,22 +732,22 @@ def UpdateRecordsWindow ():
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	dstr = sstr-GemRB.GetPlayerStat (pc, IE_STR,1)
-	bstr = GetAbilityBonus (pc, IE_STR)
+	bstr = GUICommon.GetAbilityBonus (pc, IE_STR)
 	sint = GemRB.GetPlayerStat (pc, IE_INT)
 	dint = sint-GemRB.GetPlayerStat (pc, IE_INT,1)
-	bint = GetAbilityBonus (pc, IE_INT)
+	bint = GUICommon.GetAbilityBonus (pc, IE_INT)
 	swis = GemRB.GetPlayerStat (pc, IE_WIS)
 	dwis = swis-GemRB.GetPlayerStat (pc, IE_WIS,1)
-	bwis = GetAbilityBonus (pc, IE_WIS)
+	bwis = GUICommon.GetAbilityBonus (pc, IE_WIS)
 	sdex = GemRB.GetPlayerStat (pc, IE_DEX)
 	ddex = sdex-GemRB.GetPlayerStat (pc, IE_DEX,1)
-	bdex = GetAbilityBonus (pc, IE_DEX)
+	bdex = GUICommon.GetAbilityBonus (pc, IE_DEX)
 	scon = GemRB.GetPlayerStat (pc, IE_CON)
 	dcon = scon-GemRB.GetPlayerStat (pc, IE_CON,1)
-	bcon = GetAbilityBonus (pc, IE_CON)
+	bcon = GUICommon.GetAbilityBonus (pc, IE_CON)
 	schr = GemRB.GetPlayerStat (pc, IE_CHR)
 	dchr = schr-GemRB.GetPlayerStat (pc, IE_CHR,1)
-	bchr = GetAbilityBonus (pc, IE_CHR)
+	bchr = GUICommon.GetAbilityBonus (pc, IE_CHR)
 
 	Label = Window.GetControl (0x1000002f)
 	Label.SetText (str(sstr))
