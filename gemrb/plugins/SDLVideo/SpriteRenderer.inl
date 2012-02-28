@@ -204,17 +204,17 @@ struct SRTinter_FlagsNoTint {
 
 template<typename PTYPE>
 struct SRBlender_NoAlpha {
-	void operator()(PTYPE& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const { assert(false); }
+	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8) const { assert(false); }
 };
 
 template<typename PTYPE>
 struct SRBlender_HalfAlpha {
-	void operator()(PTYPE& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const { assert(false); }
+	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8) const { assert(false); }
 };
 
 template<typename PTYPE>
 struct SRBlender_Alpha {
-	void operator()(PTYPE& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const { assert(false); }
+	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const { assert(false); }
 };
 
 // 16 bpp, 565
