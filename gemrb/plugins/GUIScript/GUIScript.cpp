@@ -6975,9 +6975,9 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	const char *SpellResRef;
 
 	GET_GAME();
-	GET_ACTOR_GLOBAL();
 
 	if (PyArg_ParseTuple( args, "is", &globalID, &SpellResRef) ) {
+		GET_ACTOR_GLOBAL();
 		int ret = actor->spellbook.KnowSpell(SpellResRef);
 		actor->spellbook.RemoveSpell(SpellResRef);
 		return PyInt_FromLong(ret);
@@ -6986,12 +6986,8 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iiii", &globalID, &SpellType, &Level, &Index )) {
 		return AttributeError( GemRB_RemoveSpell__doc );
 	}
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
+	GET_ACTOR_GLOBAL();
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
 	if (! ks) {
 		return RuntimeError( "Spell not known!" );
