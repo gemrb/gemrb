@@ -33,7 +33,7 @@ typedef unsigned char
 #ifdef __GNUC__
 	__attribute__((aligned(4)))
 #endif
-	pixel;
+	Pixel;
 
 inline int GetModState(int modstate)
 {

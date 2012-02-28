@@ -1239,7 +1239,7 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 	}
 }
 
-inline void ReadPixel(long &val, pixel* pixels , int BytesPerPixel) {
+inline void ReadPixel(long &val, Pixel* pixels , int BytesPerPixel) {
 	if (BytesPerPixel == 1) {
 		val = *pixels;
 	} else if (BytesPerPixel == 2) {
@@ -1255,7 +1255,7 @@ inline void ReadPixel(long &val, pixel* pixels , int BytesPerPixel) {
 	}
 }
 
-inline void WritePixel(const long val, pixel* pixels, int BytesPerPixel) {
+inline void WritePixel(const long val, Pixel* pixels, int BytesPerPixel) {
 	if (BytesPerPixel == 1) {
 		*pixels = (unsigned char)val;
 	} else if (BytesPerPixel == 2) {
@@ -1704,7 +1704,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			Point& c = poly->points[redge];
 			Point& d = poly->points[(redge+1)%(poly->count)];
 
-                       pixel* line = (pixel*)(backBuf->pixels) + (y_top+yCorr)*backBuf->pitch;
+                       Pixel* line = (Pixel*)(backBuf->pixels) + (y_top+yCorr)*backBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
 				int py = y + Viewport.y;
