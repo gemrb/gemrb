@@ -286,6 +286,9 @@ struct SRBlender_Alpha<Uint32> {
 	}
 };
 
+
+// MSVC6 requires all template arguments to a function to be reflected in the
+// argument list. We wrap them in the type of a dummy argument.
 template <bool b>
 class MSVCHack {};
 
@@ -300,7 +303,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             Uint8 transindex,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0)
+            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
 	if (COVER)
 		assert(cover);
@@ -481,7 +484,7 @@ static void BlitSprite_internal(SDL_Surface* target,
             Uint8 transindex,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0)
+            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
 	if (COVER)
 		assert(cover);
@@ -597,7 +600,7 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
             Region clip,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0)
+            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
 	if (COVER)
 		assert(cover);
@@ -716,7 +719,7 @@ static void BlitSpriteBAM_dispatch(bool COVER, bool XFLIP,
             Uint8 transindex,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE dummy = 0)
+            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	assert(spr->BAM);
 	Sprite2D_BAM_Internal *data = (Sprite2D_BAM_Internal*)spr->vptr;
@@ -726,38 +729,38 @@ static void BlitSpriteBAM_dispatch(bool COVER, bool XFLIP,
 		if (RLE)
 			BlitSpriteRLE_internal<PTYPE, false, false, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 		else
 			BlitSprite_internal<PTYPE, false, false, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 	else if (!COVER && XFLIP)
 		if (RLE)
 			BlitSpriteRLE_internal<PTYPE, false, true, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 		else
 			BlitSprite_internal<PTYPE, false, true, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 	else if (COVER && !XFLIP)
 		if (RLE)
 			BlitSpriteRLE_internal<PTYPE, true, false, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 		else
 			BlitSprite_internal<PTYPE, true, false, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 	else // if (COVER && XFLIP)
 		if (RLE)
 			BlitSpriteRLE_internal<PTYPE, true, true, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 		else
 			BlitSprite_internal<PTYPE, true, true, Shadow, Tinter, Blender>(target,
 			    srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			    shadow, tint, blend, dummy);
+			    shadow, tint, blend);
 }
 
 // call the BlitSpriteRGB_internal instantiation with the specified
@@ -773,24 +776,24 @@ static void BlitSpriteRGB_dispatch(bool COVER, bool XFLIP,
             const Region& clip,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Tinter& tint, const Blender& blend, PTYPE dummy = 0)
+            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	if (!COVER && !XFLIP)
 		BlitSpriteRGB_internal<PTYPE, false, false, Tinter, Blender>(target,
 		    srcdata, tx, ty, width, height, yflip, clip, cover, spr, flags,
-		    tint, blend, dummy);
+		    tint, blend);
 	else if (!COVER && XFLIP)
 		BlitSpriteRGB_internal<PTYPE, false, true, Tinter, Blender>(target,
 		    srcdata, tx, ty, width, height, yflip, clip, cover, spr, flags,
-		    tint, blend, dummy);
+		    tint, blend);
 	else if (COVER && !XFLIP)
 		BlitSpriteRGB_internal<PTYPE, true, false, Tinter, Blender>(target,
 		    srcdata, tx, ty, width, height, yflip, clip, cover, spr, flags,
-		    tint, blend, dummy);
+		    tint, blend);
 	else // if (COVER && XFLIP)
 		BlitSpriteRGB_internal<PTYPE, true, true, Tinter, Blender>(target,
 		    srcdata, tx, ty, width, height, yflip, clip, cover, spr, flags,
-		    tint, blend, dummy);
+		    tint, blend);
 }
 
 
