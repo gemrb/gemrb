@@ -54,12 +54,12 @@ bool NullSource::HasResource(const char*, const ResourceDesc&)
 
 DataStream* NullSource::GetResource(const char*, SClass_ID)
 {
-	return false;
+	return NULL;
 }
 
 DataStream* NullSource::GetResource(const char*, const ResourceDesc&)
 {
-	return false;
+	return NULL;
 }
 
 #include "plugindef.h"
