@@ -33,6 +33,8 @@
 
 #include "EffectQueue.h"
 
+namespace GemRB {
+
 class Projectile;
 
 //values for Spell usability Flags
@@ -174,5 +176,7 @@ public:
 	unsigned int GetCastingDistance(Scriptable *Sender) const;
 	bool ContainsDamageOpcode() const;
 };
+
+}
 
 #endif  // ! SPELL_H

@@ -27,6 +27,8 @@
 
 #include "Spell.h"
 
+namespace GemRB {
+
 
 class SPLImporter : public SpellMgr {
 private:
@@ -43,5 +45,7 @@ private:
 	void GetFeature(Spell *s, Effect *f);
 };
 
+
+}
 
 #endif

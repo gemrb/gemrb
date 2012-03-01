@@ -24,6 +24,8 @@
 #include "globals.h"
 #include "win32def.h"
 
+namespace GemRB {
+
 #define KEYSIZE 8
 
 #ifndef ReleaseFun
@@ -89,5 +91,7 @@ protected:
 public:
 	~Cache();
 };
+
+}
 
 #endif //CACHE_H

@@ -20,6 +20,8 @@
 
 #include "BAMFontManager.h"
 
+using namespace GemRB;
+
 BAMFontManager::~BAMFontManager(void)
 {
 	delete bamImp;

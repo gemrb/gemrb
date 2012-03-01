@@ -27,6 +27,8 @@
 #include "Plugin.h"
 #include "Holder.h"
 
+namespace GemRB {
+
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_LOOPING 2
 #define GEM_SND_SPEECH   IE_STR_SPEECH // 4
@@ -78,5 +80,7 @@ protected:
 	AmbientMgr* ambim;
 
 };
+
+}
 
 #endif // AUDIO_H_INCLUDED

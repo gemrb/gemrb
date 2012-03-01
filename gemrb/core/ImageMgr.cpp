@@ -26,6 +26,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+namespace GemRB {
+
 const TypeID ImageMgr::ID = { "ImageMgr" };
 
 ImageMgr::ImageMgr(void)
@@ -87,4 +89,6 @@ ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)
 {
 	ImageFactory* fact = new ImageFactory( ResRef, GetSprite2D() );
 	return fact;
+}
+
 }

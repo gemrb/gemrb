@@ -39,6 +39,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 static int SLOT_HEAD = -1;
 static int SLOT_MAGIC = -1;
 static int SLOT_FIST = -1;
@@ -1911,4 +1913,6 @@ int Inventory::MergeItems(int slot, CREItem *item)
 		return ASI_PARTIAL;
 	}
 	return ASI_FAILED;
+}
+
 }

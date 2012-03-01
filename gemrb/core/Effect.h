@@ -31,6 +31,8 @@
 
 #include "Region.h"
 
+namespace GemRB {
+
 class Actor;
 
 //local variables in creatures are stored in fake opcodes
@@ -136,5 +138,7 @@ public:
 
 // FIXME: what about area spells? They can have map & coordinates as target
 //void AddEffect(Effect* fx, Actor* self, Actor* pretarget);
+
+}
 
 #endif  // ! EFFECT_H

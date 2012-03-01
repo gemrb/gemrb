@@ -25,6 +25,10 @@
 
 #include <vector>
 
+struct SDL_mutex;
+
+namespace GemRB {
+
 struct BufferedData {
 	char *buf;
 	unsigned int size;
@@ -75,7 +79,9 @@ private:
 	unsigned short audio_format;
 	int audio_channels;
 
-	struct SDL_mutex* OurMutex;
+	SDL_mutex* OurMutex;
 };
+
+}
 
 #endif

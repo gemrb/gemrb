@@ -29,6 +29,8 @@
 
 #include <cmath>
 
+namespace GemRB {
+
 const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
@@ -278,4 +280,6 @@ void Video::MoveViewportTo(int x, int y)
 		Viewport.x = x;
 		Viewport.y = y;
 	}
+}
+
 }

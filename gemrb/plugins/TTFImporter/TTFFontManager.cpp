@@ -30,6 +30,8 @@
 #include "Video.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 /*
 TODO: ditch SDL_TTF and use FreeType directly
 */

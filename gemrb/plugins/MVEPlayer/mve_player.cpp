@@ -44,6 +44,8 @@ extern int ipvideo_decode_frame16 (const GstMveDemuxStream * s,
 extern void ipaudio_uncompress (short *buffer,
 	unsigned short buf_len, const unsigned char *data, unsigned char channels);
 
+namespace GemRB {
+
 /*
  * constructor: doesn't really do anything
  */
@@ -476,3 +478,4 @@ void MVEPlayer::segment_audio_data(bool silent) {
 	}
 }
 
+}

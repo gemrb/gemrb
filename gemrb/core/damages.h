@@ -21,6 +21,8 @@
 #ifndef DAMAGE_H
 #define DAMAGE_H
 
+namespace GemRB {
+
 //damage types
 #define DAMAGE_CRUSHING 0
 #define DAMAGE_ACID     1
@@ -50,5 +52,7 @@
 #define DL_COLD   11
 #define DL_ACID   14
 #define DL_DISINTEGRATE 17
+
+}
 
 #endif

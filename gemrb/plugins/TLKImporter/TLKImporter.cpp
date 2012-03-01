@@ -31,6 +31,8 @@
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 
+using namespace GemRB;
+
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
 struct gt_type

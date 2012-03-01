@@ -25,6 +25,8 @@
 
 #include "ActorMgr.h"
 
+namespace GemRB {
+
 #define GAM_VER_GEMRB  0 
 #define GAM_VER_BG  10   
 #define GAM_VER_IWD 11  
@@ -79,4 +81,6 @@ private:
 };
 
 #endif
+}
+
 

@@ -48,6 +48,8 @@
 #include <cassert>
 #include <cstdio>
 
+using namespace GemRB;
+
 static int g_truecolor;
 static ieDword *cbAtFrame = NULL;
 static ieDword *strRef = NULL;

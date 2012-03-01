@@ -24,6 +24,8 @@
 #include "FontManager.h"
 #include "BAMImporter.h"
 
+namespace GemRB {
+
 class BAMFontManager : public FontManager
 {
 private:
@@ -45,4 +47,7 @@ public:
 			unsigned short ptSize,
 			FontStyle style, Palette* pal = NULL);
 };
+
+}
+
 #endif

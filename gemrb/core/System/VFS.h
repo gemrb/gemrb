@@ -51,6 +51,8 @@
 #define R_OK 04
 #endif
 
+namespace GemRB {
+
 #ifdef WIN32
 
 #define ResolveFilePath(p)
@@ -140,5 +142,7 @@ private:
 	void* Entry;
 	const char *Path;
 };
+
+}
 
 #endif  // !VFS_H

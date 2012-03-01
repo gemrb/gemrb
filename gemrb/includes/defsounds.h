@@ -28,6 +28,8 @@
 #ifndef IE_SOUNDS_H
 #define IE_SOUNDS_H
 
+namespace GemRB {
+
 #define DS_OPEN              0
 #define DS_CLOSE             1
 #define DS_HOPEN             2
@@ -53,5 +55,7 @@
 #define DS_DONATE2           29
 #define DS_IDENTIFY          30
 #define DS_GOTXP             31
+
+}
 
 #endif //! IE_SOUNDS_H

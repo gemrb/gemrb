@@ -20,6 +20,8 @@
 
 #include <utility>
 
+using namespace GemRB;
+
 // WAVEFORMATEX structure (from MS SDK)
 struct cWAVEFORMATEX {
 	unsigned short wFormatTag;  	   /* format type */

@@ -23,6 +23,8 @@
 
 #include "SDLVideo.h"
 
+namespace GemRB {
+
 class SDL20VideoDriver : public SDLVideoDriver {
 private:
 	SDL_Texture* videoPlayer;
@@ -70,5 +72,7 @@ private:
 
 	int ProcessEvent(const SDL_Event & event);
 };
+
+}
 
 #endif

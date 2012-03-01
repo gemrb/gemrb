@@ -26,6 +26,8 @@
 
 #include "FontManager.h"
 
+namespace GemRB {
+
 class TTFFontManager : public FontManager {
 /*
 Private ivars
@@ -54,5 +56,7 @@ Public methods
 				  unsigned short ptSize,
 				  FontStyle style, Palette* pal = NULL);
 };
+
+}
 
 #endif

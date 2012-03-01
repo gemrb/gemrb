@@ -20,10 +20,14 @@
 
 #include "AnimationMgr.h"
 
+namespace GemRB {
+
 AnimationMgr::AnimationMgr(void)
 {
 }
 
 AnimationMgr::~AnimationMgr(void)
 {
+}
+
 }

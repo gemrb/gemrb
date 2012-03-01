@@ -25,6 +25,8 @@
 #include "ScriptEngine.h"
 #include "System/FileStream.h"
 
+namespace GemRB {
+
 #define KEYLENGTH 64
 
 Function::Function(const char *m, const char *f, int g)
@@ -157,3 +159,5 @@ void KeyMap::ResolveKey(int key, int group)
 	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
 }
 
+
+}

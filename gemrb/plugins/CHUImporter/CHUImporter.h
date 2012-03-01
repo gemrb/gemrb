@@ -25,6 +25,8 @@
 
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**CHU File Importer Class
   *@author GemRB Developement Team
   */
@@ -44,5 +46,7 @@ public:
 	/** This function loads all available windows from the 'stream' parameter. */
 	bool Open(DataStream* stream);
 };
+
+}
 
 #endif

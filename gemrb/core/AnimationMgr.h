@@ -27,6 +27,8 @@
 #include "AnimationFactory.h"
 #include "Plugin.h"
 
+namespace GemRB {
+
 class Font;
 
 class GEM_EXPORT AnimationMgr : public Plugin {
@@ -42,5 +44,7 @@ public:
 	virtual Sprite2D* GetPalette() = 0;
 	virtual int GetCycleCount() = 0;
 };
+
+}
 
 #endif

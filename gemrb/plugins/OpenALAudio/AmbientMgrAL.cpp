@@ -33,6 +33,8 @@
 
 #include <SDL.h>
 
+using namespace GemRB;
+
 // TODO: remove last dependencies on OpenAL, and then rename and move it?
 
 // legal nop if already reset

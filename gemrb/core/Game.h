@@ -25,7 +25,6 @@
  */
 
 
-class Game;
 
 #ifndef GAME_H
 #define GAME_H
@@ -39,6 +38,8 @@ class Game;
 #include "Variables.h"
 
 #include <vector>
+
+namespace GemRB {
 
 class Actor;
 class Map;
@@ -485,5 +486,7 @@ private:
 	ieResRef *GetDream(Map *area);
 	void PlayerDream();
 };
+
+}
 
 #endif  // ! GAME_H

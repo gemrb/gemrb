@@ -20,6 +20,8 @@
 
 #include "ResourceDesc.h"
 
+namespace GemRB {
+
 ResourceDesc::ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType)
 	: type(type), ext(ext), keyType(keyType), create(create)
 {
@@ -47,4 +49,6 @@ ieWord ResourceDesc::GetKeyType() const
 Resource* ResourceDesc::Create(DataStream *stream) const
 {
 	return create(stream);
+}
+
 }

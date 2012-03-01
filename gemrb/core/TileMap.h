@@ -26,6 +26,8 @@
 #include "Polygon.h"
 #include "TileOverlay.h"
 
+namespace GemRB {
+
 //special container types
 #define IE_CONTAINER_PILE   4
 
@@ -96,5 +98,7 @@ public:
 public:
 	int XCellCount, YCellCount;
 };
+
+}
 
 #endif

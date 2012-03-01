@@ -18,6 +18,8 @@
 
 #include "Bitmap.h"
 
+namespace GemRB {
+
 Bitmap::Bitmap(unsigned int w, unsigned int h)
 	: height(h), width(w), data(new unsigned char[height*width])
 {
@@ -26,4 +28,6 @@ Bitmap::Bitmap(unsigned int w, unsigned int h)
 Bitmap::~Bitmap()
 {
 	delete[] data;
+}
+
 }

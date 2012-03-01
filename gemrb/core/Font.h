@@ -32,6 +32,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 enum FontStyle {
 	NORMAL = 0x00,
 	BOLD = 0x01,
@@ -128,5 +130,7 @@ public:
 private:
 	int PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const;
 };
+
+}
 
 #endif

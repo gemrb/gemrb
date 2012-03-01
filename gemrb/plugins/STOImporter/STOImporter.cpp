@@ -27,6 +27,8 @@
 #include "Inventory.h"
 #include "GameScript/GameScript.h"
 
+using namespace GemRB;
+
 STOImporter::STOImporter(void)
 {
 	str = NULL;

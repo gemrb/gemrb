@@ -35,6 +35,8 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
+namespace GemRB {
+
 #define ILLEGAL 0         //
 #define ONE 1             //hold
 #define TWO 2             //onset + hold
@@ -785,4 +787,6 @@ ScriptedAnimation *ScriptedAnimation::DetachTwin()
 	}
 	twin=NULL;
 	return ret;
+}
+
 }

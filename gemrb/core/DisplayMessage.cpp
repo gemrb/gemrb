@@ -28,6 +28,8 @@
 #include "GUI/TextArea.h"
 #include "Scriptable/Actor.h"
 
+namespace GemRB {
+
 GEM_EXPORT DisplayMessage * displaymsg;
 
 static int strref_table[STRREF_COUNT];
@@ -253,4 +255,6 @@ void DisplayMessage::DisplayStringName(const char *text, unsigned int color, con
 		DisplayString( newstr );
 		free( newstr );
 	}
+}
+
 }

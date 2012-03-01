@@ -20,6 +20,8 @@
  
 #include "Ambient.h"
 
+namespace GemRB {
+
 Ambient::Ambient()
 {
 }
@@ -34,3 +36,5 @@ Ambient::~Ambient()
 
 void Ambient::setActive() { flags |= IE_AMBI_ENABLED; }
 void Ambient::setInactive() { flags &= ~IE_AMBI_ENABLED; }
+
+}

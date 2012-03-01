@@ -2,6 +2,8 @@
 #ifndef IE_CURSORS_H
 #define IE_CURSORS_H
 
+namespace GemRB {
+
 #define IE_CURSOR_INVALID -1
 #define IE_CURSOR_NORMAL  0
 #define IE_CURSOR_TAKE    2  //over pile type containers
@@ -34,5 +36,7 @@
 
 #define IE_CURSOR_MASK    127
 #define IE_CURSOR_GRAY    128
+
+}
 
 #endif // ! IE_CURSORS_H

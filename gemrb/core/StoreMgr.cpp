@@ -20,10 +20,14 @@
 
 #include "StoreMgr.h"
 
+namespace GemRB {
+
 StoreMgr::StoreMgr(void)
 {
 }
 
 StoreMgr::~StoreMgr(void)
 {
+}
+
 }

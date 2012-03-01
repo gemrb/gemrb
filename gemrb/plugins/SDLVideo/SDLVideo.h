@@ -35,6 +35,8 @@ typedef unsigned char
 #endif
 	Pixel;
 
+namespace GemRB {
+
 inline int GetModState(int modstate)
 {
 	int value = 0;
@@ -183,5 +185,7 @@ public:
 	void SetGamma(int brightness, int contrast)=0;
 	void SetMouseScrollSpeed(int speed);
 };
+
+}
 
 #endif

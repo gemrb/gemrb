@@ -24,6 +24,8 @@
 #include "ActorMgr.h"
 #include "Spellbook.h"
 
+namespace GemRB {
+
 class CREItem;
 struct Effect;
 
@@ -111,5 +113,7 @@ private:
 	int PutInventory(DataStream *stream, Actor *actor, unsigned int size);
 	int PutHeader(DataStream *stream, Actor *actor);
 };
+
+}
 
 #endif

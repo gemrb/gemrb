@@ -27,6 +27,8 @@
 
 #include <cstring>
 
+using namespace GemRB;
+
 IDSImporter::IDSImporter(void)
 {
 }

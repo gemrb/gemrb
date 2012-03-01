@@ -20,6 +20,8 @@
 
 #include "PythonHelpers.h"
 
+using namespace GemRB;
+
 static bool CallPython(PyObject *Function, PyObject *args = NULL)
 {
 	if (!Function) {

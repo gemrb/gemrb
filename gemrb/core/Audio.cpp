@@ -20,6 +20,8 @@
 
 #include "Audio.h"
 
+namespace GemRB {
+
 const TypeID Audio::ID = { "Audio" };
 
 Audio::Audio(void)
@@ -32,4 +34,6 @@ Audio::~Audio(void)
 
 SoundHandle::~SoundHandle()
 {
+}
+
 }

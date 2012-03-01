@@ -23,6 +23,8 @@
 
 #include "ResourceSource.h"
 
+namespace GemRB {
+
 class NullSource : public ResourceSource {
 public:
 	NullSource(void);
@@ -33,5 +35,7 @@ public:
 	virtual DataStream* GetResource(const char* resname, SClass_ID type);
 	virtual DataStream* GetResource(const char* resname, const ResourceDesc &type);
 };
+
+}
 
 #endif

@@ -27,6 +27,8 @@
 #include "Interface.h"
 #include "SoundMgr.h"
 
+using namespace GemRB;
+
 static char musicsubfolder[6] = "music";
 
 MUSImporter::MUSImporter()

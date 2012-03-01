@@ -21,6 +21,10 @@
 #ifndef MVE_PLAYER_H
 #define MVE_PLAYER_H
 
+struct _GstMveDemuxStream;
+
+namespace GemRB {
+
 class MVEPlayer {
 protected:
 	class MVEPlay *host;
@@ -36,7 +40,7 @@ protected:
 	long timer_last_usec;
 	unsigned int frame_wait;
 
-	struct _GstMveDemuxStream *video_data;
+	_GstMveDemuxStream *video_data;
 	unsigned short video_width;
 	unsigned short video_height;
 	unsigned short *video_back_buf;
@@ -89,5 +93,7 @@ public:
 	
 	bool is_truecolour() { return truecolour; }
 };
+
+}
 
 #endif

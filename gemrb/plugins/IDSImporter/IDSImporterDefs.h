@@ -18,6 +18,8 @@
  *
  */
 
+namespace GemRB {
+
 #define MAX_LINES 400
 #define MAX_VALUE_LENGTH 20
 #define MAX_TEXT_LENGTH 60 // maximum text length in case IDS file doesn't specify
@@ -29,3 +31,5 @@
 #define HEADER_BLANK 3
 #define HEADER_RECORD 4
 #define HEADER_ERROR -1
+
+}

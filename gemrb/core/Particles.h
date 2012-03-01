@@ -32,6 +32,8 @@
 
 #include "Region.h"
 
+namespace GemRB {
+
 class CharAnimations;
 class Scriptable;
 
@@ -133,5 +135,7 @@ private:
 	//2. the fragments ARE avatar animations in the original IE (for some unknown reason)
 	CharAnimations *fragments;
 };
+
+}
 
 #endif  // ! PARTICLES_H

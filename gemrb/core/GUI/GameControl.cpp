@@ -52,6 +52,8 @@
 
 #include <cmath>
 
+namespace GemRB {
+
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
@@ -2950,4 +2952,6 @@ void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 void GameControl::ToggleAlwaysRun()
 {
 	AlwaysRun = !AlwaysRun;
+}
+
 }

@@ -29,6 +29,8 @@
 #include "Game.h"
 #include "GUI/GameControl.h"
 
+namespace GemRB {
+
 //-------------------------------------------------------------
 // Object Functions
 //-------------------------------------------------------------
@@ -1165,4 +1167,6 @@ int GameScript::ID_Specific(Actor *actor, int parameter)
 {
 	int value = actor->GetStat(IE_SPECIFIC);
 	return parameter==value;
+}
+
 }

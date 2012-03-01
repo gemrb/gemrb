@@ -20,6 +20,8 @@
 
 #include "MoviePlayer.h"
 
+namespace GemRB {
+
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
 
 MoviePlayer::MoviePlayer(void)
@@ -28,4 +30,6 @@ MoviePlayer::MoviePlayer(void)
 
 MoviePlayer::~MoviePlayer(void)
 {
+}
+
 }

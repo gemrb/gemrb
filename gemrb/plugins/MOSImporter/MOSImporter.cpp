@@ -27,6 +27,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+using namespace GemRB;
+
 static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
 static ieDword blue_mask = 0x000000ff;

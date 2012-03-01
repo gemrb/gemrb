@@ -33,6 +33,8 @@
 
 #include "ScriptEngine.h"
 
+namespace GemRB {
+
 #define SV_BPP 0
 #define SV_WIDTH 1
 #define SV_HEIGHT 2
@@ -65,5 +67,7 @@ public:
 };
 
 extern GUIScript *gs;
+
+}
 
 #endif

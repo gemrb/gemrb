@@ -26,6 +26,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+using namespace GemRB;
+
 #define BMP_HEADER_SIZE  54
 
 BMPImporter::BMPImporter(void)

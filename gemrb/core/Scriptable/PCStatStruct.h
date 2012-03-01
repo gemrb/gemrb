@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+namespace GemRB {
+
 #define MAX_QUICKITEMSLOT   5   //pst has 5
 #define MAX_QUICKWEAPONSLOT 8   //iwd2 has 4x2
 #define MAX_QSLOTS          9   //iwd2 has 9
@@ -116,4 +118,6 @@ public:
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
 };
+}
+
 #endif

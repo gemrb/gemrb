@@ -23,6 +23,8 @@
 #include "Sprite2D.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class ImageFactory;
 
 /**
@@ -45,5 +47,7 @@ public:
 	 */
 	virtual Sprite2D* GetSprite2D(unsigned int type, ieDword paletteIndex[8]) = 0;
 };
+
+}
 
 #endif

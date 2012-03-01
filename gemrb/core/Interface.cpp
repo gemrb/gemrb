@@ -91,6 +91,8 @@
 #include <time.h>
 #include <vector>
 
+namespace GemRB {
+
 GEM_EXPORT Interface* core;
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
@@ -5614,4 +5616,6 @@ void Interface::SanityCheck(const char *ver) {
 	if (strcmp(ver, VERSION_GEMRB)) {
 		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
 	}
+}
+
 }

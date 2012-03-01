@@ -27,6 +27,8 @@
 #ifndef IE_OPCODE_PARAMS_H
 #define IE_OPCODE_PARAMS_H
 
+namespace GemRB {
+
 //regen/poison/disease types
 #define RPD_PERCENT 1
 #define RPD_POINTS  2
@@ -204,5 +206,7 @@
 //tested for this, splstate is wrong or this entry has two uses
 #define SS_DAYBLINDNESS 178
 #define SS_REBUKED      179
+
+}
 
 #endif //IE_OPCODE_PARAMS_H

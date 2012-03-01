@@ -28,6 +28,8 @@
 #include <cstring>
 #include <vector>
 
+namespace GemRB {
+
 typedef std::vector< char*> RowEntry;
 
 class p2DAImporter : public TableMgr {
@@ -165,5 +167,7 @@ public:
 		return -1;
 	}
 };
+
+}
 
 #endif

@@ -27,6 +27,8 @@
 #include <string>
 #include <vector>
 
+namespace GemRB {
+
 class Ambient;
 
 class GEM_EXPORT AmbientMgr {
@@ -44,5 +46,7 @@ protected:
 	std::vector<Ambient *> ambients;
 	bool active;
 };
+
+}
 
 #endif

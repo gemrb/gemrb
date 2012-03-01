@@ -32,6 +32,8 @@
 
 #include <cstdlib>
 
+namespace GemRB {
+
 #define DMC_WHITE 0xf0f0f0
 #define DMC_RED 0xff0000
 #define DMC_LIGHTGREY 0xd7d7be
@@ -79,5 +81,7 @@ public:
 };
 
 extern GEM_EXPORT DisplayMessage * displaymsg;
+
+}
 
 #endif

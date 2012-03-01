@@ -26,6 +26,8 @@
 #include "ProjectileMgr.h"
 #include "SymbolMgr.h"
 
+namespace GemRB {
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -322,4 +324,6 @@ ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
 	if (ret && *ret[0]=='*') ret = NULL;
 
 	return ret;
+}
+
 }

@@ -26,6 +26,8 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 
+using namespace GemRB;
+
 WMPImporter::WMPImporter(void)
 {
 	str1 = NULL;

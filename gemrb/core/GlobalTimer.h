@@ -27,6 +27,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class ControlAnimation;
 
 struct AnimationRef
@@ -73,5 +75,7 @@ public:
 	void ClearAnimations();
 	void UpdateAnimations();
 };
+
+}
 
 #endif

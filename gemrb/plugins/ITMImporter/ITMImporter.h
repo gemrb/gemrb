@@ -27,6 +27,8 @@
 
 #include "Item.h"
 
+namespace GemRB {
+
 #define ITM_VER_BG 10
 #define ITM_VER_PST 11
 #define ITM_VER_IWD2 20
@@ -46,5 +48,7 @@ private:
 	void GetFeature(Effect *f);
 };
 
+
+}
 
 #endif

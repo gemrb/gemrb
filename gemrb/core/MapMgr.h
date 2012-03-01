@@ -29,6 +29,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class DataStream;
 class Map;
 
@@ -48,5 +50,7 @@ public:
 	virtual int GetStoredFileSize(Map *map) = 0;
 	virtual int PutArea(DataStream* stream, Map *map) = 0;
 };
+
+}
 
 #endif

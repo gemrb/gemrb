@@ -23,6 +23,8 @@
 
 #include "ImageMgr.h"
 
+namespace GemRB {
+
 class BMPImporter : public ImageMgr {
 private:
 	//BITMAPINFOHEADER
@@ -53,5 +55,7 @@ private:
 	void Read8To8(void *rpixels);
 	void Read4To8(void *rpixels);
 };
+
+}
 
 #endif

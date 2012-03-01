@@ -25,6 +25,8 @@
 #include "TileMap.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT TileMapMgr : public Plugin {
 public:
 	TileMapMgr(void);
@@ -42,5 +44,7 @@ public:
 	//returns Wall + Door polygon counts
 	virtual ieDword GetPolygonsCount() = 0;
 };
+
+}
 
 #endif

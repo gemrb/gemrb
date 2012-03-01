@@ -29,6 +29,8 @@
 
 #include "System/Logging.h"
 
+namespace GemRB {
+
 enum log_color {
 	DEFAULT,
 	BLACK,
@@ -61,5 +63,7 @@ public:
 extern const char* log_level_text[];
 
 extern Logger* (*createDefaultLogger)();
+
+}
 
 #endif

@@ -20,6 +20,8 @@
 
 #include "SoundMgr.h"
 
+namespace GemRB {
+
 const TypeID SoundMgr::ID = { "SoundMgr" };
 
 SoundMgr::SoundMgr(void)
@@ -29,4 +31,6 @@ SoundMgr::SoundMgr(void)
 
 SoundMgr::~SoundMgr(void)
 {
+}
+
 }

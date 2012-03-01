@@ -20,10 +20,14 @@
 
 #include "StringMgr.h"
 
+namespace GemRB {
+
 StringMgr::StringMgr(void)
 {
 }
 
 StringMgr::~StringMgr(void)
 {
+}
+
 }

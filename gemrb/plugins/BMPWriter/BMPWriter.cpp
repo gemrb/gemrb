@@ -5,6 +5,8 @@
 
 #include <cstring>
 
+using namespace GemRB;
+
 #define BMP_HEADER_SIZE  54 //FIXME: duplicate
 
 #define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)

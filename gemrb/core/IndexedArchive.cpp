@@ -20,10 +20,14 @@
 
 #include "IndexedArchive.h"
 
+namespace GemRB {
+
 IndexedArchive::IndexedArchive(void)
 {
 }
 
 IndexedArchive::~IndexedArchive(void)
 {
+}
+
 }

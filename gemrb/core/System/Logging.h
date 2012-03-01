@@ -29,6 +29,8 @@
 #include "exports.h"
 #include "win32def.h"
 
+namespace GemRB {
+
 #ifdef WIN32
 # undef ERROR
 #endif
@@ -79,6 +81,8 @@ GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
 
 #undef PRINTF_FORMAT
 #undef NORETURN
+
+}
 
 // poison printf
 #if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))

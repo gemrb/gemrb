@@ -23,6 +23,8 @@
 #include "Interface.h" // for LoadInitialValues
 #include "System/FileStream.h" // for LoadInitialValues
 
+namespace GemRB {
+
 /////////////////////////////////////////////////////////////////////////////
 // private inlines 
 inline bool Variables::MyCopyKey(char*& dest, const char* key) const
@@ -503,4 +505,6 @@ void Variables::LoadInitialValues(const char* name)
 		strnspccpy(varname,buffer+8,32, true);
 		SetAt(varname, value);
 	}  
+}
+
 }

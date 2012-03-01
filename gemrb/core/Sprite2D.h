@@ -33,6 +33,8 @@
 #include "Palette.h"
 #include "TypeID.h"
 
+namespace GemRB {
+
 class AnimationFactory;
 
 /**
@@ -78,5 +80,7 @@ public:
 	void acquire() { ++RefCount; }
 	void release();
 };
+
+}
 
 #endif  // ! SPRITE2D_H

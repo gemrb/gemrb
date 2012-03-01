@@ -28,6 +28,8 @@
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
+namespace GemRB {
+
 TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
 {
 	max = maxLength;
@@ -246,4 +248,6 @@ bool TextEdit::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
 }

@@ -21,6 +21,8 @@
 
 #include "System/Logger.h" // for log_color
 
+namespace GemRB {
+
 class GEM_EXPORT StdioLogger : public Logger {
 public:
 	StdioLogger(bool useColor);
@@ -40,5 +42,7 @@ private:
 };
 
 Logger* createStdioLogger();
+
+}
 
 #endif

@@ -21,6 +21,8 @@
 
 #include "System/Logger.h"
 
+namespace GemRB {
+
 class GEM_EXPORT AndroidLogger : public Logger {
 public:
 	AndroidLogger();
@@ -30,5 +32,7 @@ public:
 };
 
 Logger* createAndroidLogger();
+
+}
 
 #endif

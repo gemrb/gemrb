@@ -28,6 +28,8 @@
 #include <cstring>
 #include <vector>
 
+namespace GemRB {
+
 struct INIPair {
 	char* Name, * Value;
 };
@@ -207,5 +209,7 @@ public:
 	bool GetKeyAsBool(const char* Tag, const char* Key, 
 		const bool Default) const;
 };
+
+}
 
 #endif

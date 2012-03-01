@@ -26,6 +26,8 @@
 
 #include <cassert>
 
+namespace GemRB {
+
 enum PaletteType {
 	PAL_MAIN,
 	PAL_WEAPON,
@@ -99,5 +101,7 @@ private:
 	unsigned int refcount;
 
 };
+
+}
 
 #endif

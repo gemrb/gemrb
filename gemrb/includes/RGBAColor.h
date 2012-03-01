@@ -20,6 +20,8 @@
 #ifndef RGBACOLOR_H
 #define RGBACOLOR_H
 
+namespace GemRB {
+
 struct RevColor {
 	unsigned char b,g,r,a;
 };
@@ -31,5 +33,7 @@ struct Color {
 	__attribute__((aligned(4)))
 #endif
 	;
+
+}
 
 #endif

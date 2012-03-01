@@ -36,6 +36,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 /** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1
 /** Area is visible on WorldMap only when party is in adjacent area */
@@ -201,5 +203,7 @@ public:
 	void SetCurrentMap(unsigned int index) { CurrentMap = index; }
 	unsigned int FindAndSetCurrentMap(const ieResRef area);
 };
+
+}
 
 #endif // ! WORLDMAP_H

@@ -23,6 +23,8 @@
 
 #include "TileMapMgr.h"
 
+namespace GemRB {
+
 struct Overlay {
 	ieWord  Width;
 	ieWord  Height;
@@ -61,5 +63,7 @@ public:
 	void SetupOpenDoor(unsigned int &index, unsigned int &count);
 	void SetupClosedDoor(unsigned int &index, unsigned int &count);
 };
+
+}
 
 #endif

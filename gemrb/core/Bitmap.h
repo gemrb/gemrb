@@ -21,6 +21,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class GEM_EXPORT Bitmap {
 public:
 	Bitmap(unsigned int height, unsigned int width);
@@ -51,5 +53,7 @@ private:
 	unsigned int height, width;
 	unsigned char *data;
 };
+
+}
 
 #endif

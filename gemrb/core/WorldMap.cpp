@@ -29,6 +29,8 @@
 
 #include <list>
 
+namespace GemRB {
+
 WMPAreaEntry::WMPAreaEntry()
 {
 	MapIcon = NULL;
@@ -586,4 +588,6 @@ WorldMap *WorldMapArray::NewWorldMap(unsigned int index)
 	}
 	all_maps[index] = new WorldMap();
 	return all_maps[index];
+}
+
 }

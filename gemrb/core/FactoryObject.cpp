@@ -22,6 +22,8 @@
 
 #include "win32def.h"
 
+namespace GemRB {
+
 FactoryObject::FactoryObject(const char* name, SClass_ID SuperClassID)
 {
 	strnlwrcpy( ResRef, name, 8 );
@@ -30,4 +32,6 @@ FactoryObject::FactoryObject(const char* name, SClass_ID SuperClassID)
 
 FactoryObject::~FactoryObject(void)
 {
+}
+
 }

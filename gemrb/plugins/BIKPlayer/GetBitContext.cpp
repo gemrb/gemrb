@@ -26,6 +26,7 @@
 
 #include <math.h>
 #include "GetBitContext.h"
+#include "System/Logging.h"
 
 //don't return more than 25 bits this way
 unsigned int GetBitContext::get_bits(int n) {
@@ -158,7 +159,7 @@ void GetBitContext::merge( uint8_t *dst, uint8_t *src, int size)
 
 void GetBitContext::debug(const char *prefix)
 {
-	print("%s: %d", prefix, index);
+	GemRB::print("%s: %d", prefix, index);
 }
 
 //VLC specific code from bitstream.c

@@ -23,6 +23,8 @@
  * @author The GemRB Project
  */
 
+namespace GemRB {
+
 #define OVERLAY_COUNT  32
 
 #define OV_SANCTUARY   0
@@ -58,3 +60,5 @@
 #define OV_ICESHIELD2  29
 #define OV_TORTOISE    30
 #define OV_DEATHARMOR  31
+
+}

@@ -34,6 +34,8 @@
 
 #include "Font.h"
 
+namespace GemRB {
+
 class Palette;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -79,5 +81,7 @@ private: // Private attributes
 	/** Alignment Variable */
 	unsigned char Alignment;
 };
+
+}
 
 #endif

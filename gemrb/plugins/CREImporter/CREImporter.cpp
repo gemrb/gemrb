@@ -32,6 +32,8 @@
 
 #include <cassert>
 
+using namespace GemRB;
+
 #define MAXCOLOR 12
 typedef unsigned char ColorSet[MAXCOLOR];
 

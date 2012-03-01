@@ -34,6 +34,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class Sprite2D;
 
 // Window Flags
@@ -153,5 +155,7 @@ private: // Private attributes
 public:
 	void release(void);
 };
+
+}
 
 #endif

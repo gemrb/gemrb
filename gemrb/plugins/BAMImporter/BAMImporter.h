@@ -26,6 +26,8 @@
 #include "RGBAColor.h"
 #include "globals.h"
 
+namespace GemRB {
+
 struct FrameEntry {
 	ieWord Width;
 	ieWord  Height;
@@ -85,5 +87,7 @@ public:
 		return CyclesCount;
 	}
 };
+
+}
 
 #endif

@@ -49,6 +49,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 //these tables will get freed by Core
 Holder<SymbolMgr> triggersTable;
 Holder<SymbolMgr> actionsTable;
@@ -2578,4 +2580,6 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		Log(ERROR, "GameScript", "SpellPointCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
+}
+
 }

@@ -29,6 +29,8 @@
 #include "Video.h"
 #include "GUI/Window.h"
 
+namespace GemRB {
+
 EventMgr::EventMgr(void)
 {
 	// Function bar window (for function keys)
@@ -484,4 +486,6 @@ int EventMgr::GetMouseFocusedControlType() {
 		}
 	}
 	return -1;
+}
+
 }

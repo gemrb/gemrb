@@ -22,6 +22,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 StdioLogger::StdioLogger(bool useColor)
 	: useColor(useColor)
 {}
@@ -117,4 +119,6 @@ Logger* createStdioLogger()
 #else
 	return new StdioLogger(false);
 #endif
+}
+
 }

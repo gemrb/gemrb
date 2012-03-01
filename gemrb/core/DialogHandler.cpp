@@ -34,6 +34,8 @@
 #include "GUI/GameControl.h"
 #include "GUI/TextArea.h"
 
+namespace GemRB {
+
 //translate section values (journal, solved, unsolved, user)
 static int sectionMap[4]={4,1,2,0};
 static const int bg2Sections[4]={4,1,2,0};
@@ -491,3 +493,5 @@ Actor *DialogHandler::GetSpeaker()
 	return GetActorByGlobalID(speakerID);
 }
 
+
+}

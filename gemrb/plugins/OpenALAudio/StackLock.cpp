@@ -22,6 +22,8 @@
 
 #include <cstdio>
 
+using namespace GemRB;
+
 // adapted from ScummVM's mutex.cpp
 
 StackLock::StackLock(SDL_mutex* mutex, const char *mutexName)

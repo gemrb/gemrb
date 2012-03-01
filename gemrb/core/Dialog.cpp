@@ -24,6 +24,8 @@
 
 #include "GameScript/GameScript.h"
 
+namespace GemRB {
+
 Dialog::Dialog(void)
 {
 	TopLevelCount = 0;
@@ -97,4 +99,6 @@ int Dialog::FindRandomState(Scriptable* target)
 		}
 	}
 	return -1;
+}
+
 }

@@ -32,6 +32,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class ItemMgr
  * Abstract loader for Item objects
@@ -44,5 +46,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Item* GetItem(Item *s) = 0;
 };
+
+}
 
 #endif

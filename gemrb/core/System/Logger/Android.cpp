@@ -20,6 +20,8 @@
 
 #include <android/log.h>
 
+namespace GemRB {
+
 AndroidLogger::AndroidLogger()
 {}
 
@@ -34,4 +36,6 @@ void AndroidLogger::log(log_level level, const char* owner, const char* message,
 Logger* createAndroidLogger()
 {
 	return new AndroidLogger();
+}
+
 }

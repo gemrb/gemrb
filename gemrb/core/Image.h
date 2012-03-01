@@ -22,6 +22,8 @@
 #include "RGBAColor.h"
 #include "exports.h"
 
+namespace GemRB {
+
 class Sprite2D;
 
 class GEM_EXPORT Image {
@@ -57,5 +59,7 @@ private:
 	unsigned int height, width;
 	Color *data;
 };
+
+}
 
 #endif

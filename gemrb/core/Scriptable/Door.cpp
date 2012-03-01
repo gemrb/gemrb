@@ -42,6 +42,8 @@
 #include <cassert>
 #include <cmath>
 
+namespace GemRB {
+
 #define YESNO(x) ( (x)?"Yes":"No")
 
 Door::Door(TileOverlay* Overlay)
@@ -426,3 +428,5 @@ void Door::dump() const
 	Log(DEBUG, "Door", buffer);
 }
 
+
+}

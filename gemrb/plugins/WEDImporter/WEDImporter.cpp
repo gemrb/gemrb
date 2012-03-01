@@ -35,6 +35,8 @@
 #include "PluginMgr.h"
 #include "TileSetMgr.h"
 
+using namespace GemRB;
+
 struct wed_polygon {
 	ieDword FirstVertex;
 	ieDword CountVertex;

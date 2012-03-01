@@ -24,6 +24,8 @@
 
 #include <cstring>
 
+namespace GemRB {
+
 PCStatsStruct::PCStatsStruct()
 {
 	BestKilledName = 0xffffffff;
@@ -181,4 +183,6 @@ int PCStatsStruct::GetHeaderForSlot(int slot)
 		if(QuickWeaponSlots[i]==slot) return (ieWordSigned) QuickWeaponHeaders[i];
 	}
 	return -1;
+}
+
 }

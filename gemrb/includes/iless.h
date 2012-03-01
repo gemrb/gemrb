@@ -21,11 +21,15 @@
 
 #include "win32def.h" //for stricmp
 
+namespace GemRB {
+
 struct iless {
 	bool operator () (const char *lhs, const char* rhs) const
 	{
 		return stricmp(lhs, rhs) < 0;
 	}
 };
+
+}
 
 #endif

@@ -28,6 +28,8 @@
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
+namespace GemRB {
+
 ScrollBar::ScrollBar(void)
 {
 	Pos = 0;
@@ -318,4 +320,6 @@ bool ScrollBar::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
 }

@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "globals.h"
 
+namespace GemRB {
+
 class GEM_EXPORT FactoryObject {
 public:
 	SClass_ID SuperClassID;
@@ -31,5 +33,7 @@ public:
 	FactoryObject(const char* ResRef, SClass_ID SuperClassID);
 	virtual ~FactoryObject(void);
 };
+
+}
 
 #endif

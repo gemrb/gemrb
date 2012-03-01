@@ -23,6 +23,8 @@
 
 #include "PalettedImageMgr.h"
 
+namespace GemRB {
+
 class PLTImporter : public PalettedImageMgr {
 private:
 	ieDword Width, Height;
@@ -33,5 +35,7 @@ public:
 	bool Open(DataStream* stream);
 	Sprite2D* GetSprite2D(unsigned int type, ieDword col[8]);
 };
+
+}
 
 #endif

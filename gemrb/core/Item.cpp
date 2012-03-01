@@ -29,6 +29,8 @@
 #include "Projectile.h"
 #include "ProjectileServer.h"
 
+namespace GemRB {
+
 ITMExtHeader::ITMExtHeader(void)
 {
 	features = NULL;
@@ -245,4 +247,6 @@ unsigned int Item::GetCastingDistance(int idx) const
 		return 0;
 	}
 	return (unsigned int) seh->Range;
+}
+
 }

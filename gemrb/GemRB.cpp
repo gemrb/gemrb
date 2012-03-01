@@ -78,6 +78,8 @@ int main(int argc, char* argv[])
 	#endif
 	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
 #endif
+	using namespace GemRB;
+
 	Interface::SanityCheck(VERSION_GEMRB);
 	InitializeLogging();
 

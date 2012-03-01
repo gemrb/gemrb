@@ -27,6 +27,8 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
+using namespace GemRB;
+
 TISImporter::TISImporter(void)
 {
 	str = NULL;

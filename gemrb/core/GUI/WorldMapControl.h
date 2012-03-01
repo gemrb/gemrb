@@ -34,6 +34,8 @@
 #include "Dialog.h"
 #include "Interface.h"
 
+namespace GemRB {
+
 class Palette;
 class WMPAreaEntry;
 class WorldMapControl;
@@ -112,5 +114,7 @@ private:
 	/** DisplayTooltip */
 	void DisplayTooltip();
 };
+
+}
 
 #endif

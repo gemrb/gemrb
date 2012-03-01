@@ -27,6 +27,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 #define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _+*#%&|()=!?]"
 
 class GEM_EXPORT SaveGameIterator {
@@ -47,5 +49,7 @@ private:
 	static Holder<SaveGame> BuildSaveGame(const char *slotname);
 	void PruneQuickSave(const char *folder);
 };
+
+}
 
 #endif

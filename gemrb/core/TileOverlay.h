@@ -27,6 +27,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 extern bool RedrawTile;
 
 class GEM_EXPORT TileOverlay {
@@ -42,5 +44,7 @@ public:
 	void Draw(Region viewport, std::vector< TileOverlay*> &overlays, int flags);
 	void BumpViewport(const Region &viewport, Region &vp);
 };
+
+}
 
 #endif

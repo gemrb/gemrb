@@ -41,6 +41,8 @@
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 
+namespace GemRB {
+
 #define MAX_MAPS_LOADED 1
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
@@ -1900,4 +1902,6 @@ bool Game::RandomEncounter(ieResRef &BaseArea)
 	//TODO: unhardcode this
 	memcpy(BaseArea+4,"10",3);
 	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
+}
+
 }

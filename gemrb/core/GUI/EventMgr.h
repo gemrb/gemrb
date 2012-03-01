@@ -32,6 +32,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 class Control;
 class Window;
 
@@ -144,5 +146,7 @@ private:
 	void SetOnTop(int Index);
 	bool ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime);
 };
+
+}
 
 #endif // ! EVENTMGR_H

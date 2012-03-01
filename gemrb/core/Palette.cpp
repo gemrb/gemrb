@@ -22,6 +22,8 @@
 
 #include "Interface.h"
 
+namespace GemRB {
+
 #define MINCOL 2
 #define MUL    2
 
@@ -250,4 +252,6 @@ void Palette::SetupGlobalRGBModification(const Palette* src,
 
 	for (i = 2; i < 256; ++i)
 		applyMod(src->col[i],col[i],mod);
+}
+
 }

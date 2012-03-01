@@ -32,6 +32,8 @@
 #include "Store.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class StoreMgr
  * Abstract loader for Store objects
@@ -46,5 +48,7 @@ public:
 
 	virtual bool PutStore(DataStream* stream, Store *s) = 0;
 };
+
+}
 
 #endif

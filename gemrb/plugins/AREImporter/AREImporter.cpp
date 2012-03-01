@@ -45,6 +45,8 @@
 #include "System/FileStream.h"
 #include "System/SlicedStream.h"
 
+using namespace GemRB;
+
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
 #define DEF_HOPEN  2

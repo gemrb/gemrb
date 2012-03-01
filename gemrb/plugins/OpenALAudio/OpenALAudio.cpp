@@ -25,6 +25,8 @@
 #include <cassert>
 #include <cstdio>
 
+using namespace GemRB;
+
 bool checkALError(const char* msg, log_level level) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {

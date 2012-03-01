@@ -33,6 +33,8 @@
 
 #include "EffectQueue.h"
 
+namespace GemRB {
+
 class Projectile;
 
 // Item Flags bits
@@ -266,5 +268,7 @@ public:
 	unsigned int GetCastingDistance(int header) const;
 private:
 };
+
+}
 
 #endif // ! ITEM_H

@@ -18,6 +18,8 @@
 
 #include "Callback.h"
 
+namespace GemRB {
+
 Callback::~Callback()
 {
 }
@@ -30,4 +32,6 @@ bool Callback::call()
 bool Callback::call(int)
 {
 	return true;
+}
+
 }

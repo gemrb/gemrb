@@ -23,6 +23,8 @@
 #include "Plugin.h"
 #include "ResourceDesc.h"
 
+namespace GemRB {
+
 PluginMgr *PluginMgr::Get()
 {
 	static PluginMgr mgr;
@@ -110,4 +112,6 @@ Plugin* PluginMgr::GetDriver(const TypeID* type, const char* name)
 	if (iter != map.end())
 		return iter->second();
 	return map.begin()->second();
+}
+
 }

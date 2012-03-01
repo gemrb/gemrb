@@ -21,6 +21,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+namespace GemRB {
+
 Image::Image(unsigned int w, unsigned int h)
 	: height(h), width(w), data(new Color[height*width])
 {
@@ -44,4 +46,6 @@ Sprite2D* Image::GetSprite2D()
 	memcpy(pixels, data, sizeof(Color)*height*width);
 	return core->GetVideoDriver()->CreateSprite(width, height, 32,
 			r.Mask, g.Mask, b.Mask, a.Mask, pixels);
+}
+
 }

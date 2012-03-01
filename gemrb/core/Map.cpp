@@ -58,6 +58,8 @@
 #include <cmath>
 #include <cassert>
 
+namespace GemRB {
+
 #define YESNO(x) ( (x)?"Yes":"No")
 
 // TODO: fix this hardcoded resource reference
@@ -3766,4 +3768,6 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
+}
+
 }

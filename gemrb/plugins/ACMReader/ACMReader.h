@@ -31,6 +31,8 @@
 #include <cstring>
 #include <cstdlib>
 
+namespace GemRB {
+
 // IP's ACM files
 class ACMReader : public SoundMgr {
 private:
@@ -69,5 +71,7 @@ public:
 	bool Open(DataStream* stream);
 	virtual int read_samples(short* buffer, int count);
 };
+
+}
 
 #endif

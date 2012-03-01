@@ -30,6 +30,8 @@
 #ifndef IE_STRINGS_H
 #define IE_STRINGS_H
 
+namespace GemRB {
+
 #define STR_SCATTERED      0
 #define STR_WHOLEPARTY     1
 #define STR_DOORLOCKED     2
@@ -214,5 +216,7 @@
 #define STR_CANTMOVE 181
 
 #define STRREF_COUNT 182
+
+}
 
 #endif //! IE_STRINGS_H

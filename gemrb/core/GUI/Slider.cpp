@@ -29,6 +29,8 @@
 
 #include <cmath>
 
+namespace GemRB {
+
 Slider::Slider(short KnobXPos, short KnobYPos, short KnobStep,
 	unsigned short KnobStepsCount, bool Clear)
 {
@@ -288,4 +290,6 @@ bool Slider::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
 }

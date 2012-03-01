@@ -63,7 +63,9 @@
 
 #include <cstdio>
 
-GUIScript *gs = NULL;
+using namespace GemRB;
+
+GUIScript *GemRB::gs = NULL;
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR

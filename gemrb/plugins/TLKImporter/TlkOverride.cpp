@@ -25,6 +25,8 @@
 #include <cstdio>
 #include <cassert>
 
+using namespace GemRB;
+
 CTlkOverride::CTlkOverride()
 {
 	tot_str=NULL;

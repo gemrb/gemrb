@@ -20,10 +20,14 @@
 
 #include "SaveGameMgr.h"
 
+namespace GemRB {
+
 SaveGameMgr::SaveGameMgr(void)
 {
 }
 
 SaveGameMgr::~SaveGameMgr(void)
 {
+}
+
 }

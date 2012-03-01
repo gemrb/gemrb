@@ -20,10 +20,14 @@
 
 #include "WorldMapMgr.h"
 
+namespace GemRB {
+
 WorldMapMgr::WorldMapMgr(void)
 {
 }
 
 WorldMapMgr::~WorldMapMgr(void)
 {
+}
+
 }

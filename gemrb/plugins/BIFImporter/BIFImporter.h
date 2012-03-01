@@ -27,6 +27,8 @@
 
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 struct FileEntry {
 	ieDword resLocator;
 	ieDword dataOffset;
@@ -61,5 +63,7 @@ private:
 	static DataStream* DecompressBIFC(DataStream* compressed, const char* path);
 	void ReadBIF(void);
 };
+
+}
 
 #endif

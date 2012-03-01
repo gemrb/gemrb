@@ -38,6 +38,8 @@
 #include "PathFinder.h"
 #include "Audio.h"
 
+namespace GemRB {
+
 //this is the height of the projectile when Spark Flag Fly = 1
 #define FLY_HEIGHT 50
 //this is supposed to move the projectile to the background
@@ -404,5 +406,6 @@ private:
 	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
 };
 
-#endif // PROJECTILE_H
+}
 
+#endif // PROJECTILE_H

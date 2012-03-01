@@ -41,6 +41,8 @@
 #include <map>
 #include <vector>
 
+namespace GemRB {
+
 class Plugin;
 class Resource;
 class TypeID;
@@ -149,5 +151,7 @@ public:
 	{
 	}
 };
+
+}
 
 #endif

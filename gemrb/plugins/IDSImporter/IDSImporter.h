@@ -25,6 +25,8 @@
 
 #include <vector>
 
+namespace GemRB {
+
 struct Pair {
 	int val;
 	char* str;
@@ -49,4 +51,6 @@ public:
 };
 
 #endif
+}
+
 

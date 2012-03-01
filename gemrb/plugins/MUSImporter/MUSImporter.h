@@ -28,6 +28,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 /**MUS PlayList Importer
   *@author GemRB Development Team
   */
@@ -75,5 +77,7 @@ public:
 	/** Returns whether given playlist is currently loaded */
 	bool CurrentPlayList(const char* name);
 };
+
+}
 
 #endif

@@ -41,6 +41,8 @@
 #include <alc.h>
 #endif
 
+namespace GemRB {
+
 class Ambient;
 
 class AmbientMgrAL : public AmbientMgr {
@@ -85,5 +87,7 @@ private:
 	SDL_Thread *player;
 	SDL_cond *cond;
 };
+
+}
 
 #endif /* AMBIENTMGRAL_H */

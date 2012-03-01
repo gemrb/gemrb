@@ -39,6 +39,8 @@
 #include "Video.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 BAMImporter::BAMImporter(void)
 {
 	str = NULL;

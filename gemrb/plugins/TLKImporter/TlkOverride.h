@@ -35,6 +35,8 @@
 typedef std::map<ieStrRef, char *> StringMapType;
 #endif
 
+namespace GemRB {
+
 #define STRREF_START  300000
 #define SEGMENT_SIZE  512
 #define TOH_HEADER_SIZE 20
@@ -80,4 +82,6 @@ public:
 };
 
 #endif //TLKOVERRIDE_H
+}
+
 

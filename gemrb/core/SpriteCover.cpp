@@ -23,6 +23,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+namespace GemRB {
+
 SpriteCover::SpriteCover()
 {
 	pixels = 0;
@@ -46,4 +48,6 @@ bool SpriteCover::Covers(int x, int y, int xpos, int ypos,
 	if (width-xpos > Width-XPos || height-ypos > Height-YPos) return false;
 
 	return true;
+}
+
 }

@@ -31,6 +31,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+namespace GemRB {
+
 /**
  * @class Point
  * Point in 2d-space: [x, y]
@@ -86,5 +88,7 @@ public:
 	bool InsideRegion(const Region& rgn) const;
 	void Normalize();
 };
+
+}
 
 #endif  // ! REGION_H

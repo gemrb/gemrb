@@ -29,6 +29,8 @@
 #include "Video.h"
 #include "GUI/EventMgr.h"
 
+namespace GemRB {
+
 Console::Console(void)
 {
 	Cursor = NULL;
@@ -226,4 +228,6 @@ void Console::SetFocus(bool focus)
 bool Console::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 {
 	return false;
+}
+
 }

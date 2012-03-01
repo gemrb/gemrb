@@ -37,6 +37,8 @@
 #include "TableMgr.h"
 #endif
 
+namespace GemRB {
+
 class Actor;
 struct Effect;
 class Factory;
@@ -134,5 +136,7 @@ public:
 	{
 	}
 };
+
+}
 
 #endif

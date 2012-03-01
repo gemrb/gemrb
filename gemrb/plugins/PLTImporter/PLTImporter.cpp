@@ -26,6 +26,8 @@
 #include "Interface.h"
 #include "Video.h"
 
+using namespace GemRB;
+
 static int pperm[8]={3,6,0,5,4,1,2,7};
 
 static ieDword red_mask = 0x00ff0000;

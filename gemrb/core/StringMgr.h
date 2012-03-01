@@ -31,6 +31,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @struct StringBlock
  * Text and its associated sound.
@@ -58,5 +60,7 @@ public:
 	virtual void FreeString(char *str) = 0;
 	virtual ieStrRef UpdateString(ieStrRef strref, const char *text) = 0;
 };
+
+}
 
 #endif  // ! STRINGMGR_H

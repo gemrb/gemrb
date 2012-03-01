@@ -28,6 +28,8 @@
 #include "AnimStructures.h"
 #include "FactoryObject.h"
 
+namespace GemRB {
+
 class GEM_EXPORT AnimationFactory : public FactoryObject {
 private:
 	std::vector< Sprite2D*> frames;
@@ -55,5 +57,7 @@ public:
 	void IncDataRefCount();
 	void DecDataRefCount();
 };
+
+}
 
 #endif

@@ -32,6 +32,8 @@
 #include <cassert>
 #include <cstdio>
 
+using namespace GemRB;
+
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
 

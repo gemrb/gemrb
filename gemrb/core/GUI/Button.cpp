@@ -35,6 +35,8 @@
 #include "Variables.h"
 #include "Video.h"
 
+namespace GemRB {
+
 Button::Button()
 {
 	Unpressed = Pressed = Selected = Disabled = NULL;
@@ -771,4 +773,6 @@ void Button::SetAnchor(ieWord x, ieWord y)
 void Button::SetPushOffset(ieWord x, ieWord y)
 {
 	PushOffset = Point(x,y);
+}
+
 }

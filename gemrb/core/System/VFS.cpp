@@ -49,6 +49,8 @@
 
 #ifdef WIN32
 
+using namespace GemRB;
+
 struct DIR {
 	char path[_MAX_PATH];
 	bool is_first;
@@ -102,6 +104,8 @@ static void closedir(DIR* dirp)
 
 #endif // WIN32
 
+
+namespace GemRB {
 
 /** Returns true if path is an existing directory */
 bool dir_exists(const char* path)
@@ -423,3 +427,5 @@ void DirectoryIterator::Rewind()
 		Entry = readdir(static_cast<DIR*>(Directory));
 }
 
+
+}

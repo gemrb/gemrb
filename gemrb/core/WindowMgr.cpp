@@ -20,9 +20,13 @@
 
 #include "WindowMgr.h"
 
+namespace GemRB {
+
 WindowMgr::WindowMgr()
 {
 }
 WindowMgr::~WindowMgr()
 {
+}
+
 }

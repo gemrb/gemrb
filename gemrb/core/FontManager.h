@@ -26,6 +26,8 @@
 #include "exports.h"
 #include "Font.h"
 
+namespace GemRB {
+
 class GEM_EXPORT FontManager : public Resource {
 private:
 	/*
@@ -52,4 +54,7 @@ public:
 			unsigned short ptSize,
 			FontStyle style, Palette* pal = NULL) = 0;
 };
+
+}
+
 #endif

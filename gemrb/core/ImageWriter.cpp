@@ -18,10 +18,14 @@
 
 #include "ImageWriter.h"
 
+namespace GemRB {
+
 ImageWriter::ImageWriter(void)
 {
 }
 
 ImageWriter::~ImageWriter(void)
 {
+}
+
 }

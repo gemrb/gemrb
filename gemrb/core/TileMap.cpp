@@ -27,6 +27,8 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+namespace GemRB {
+
 TileMap::TileMap(void)
 {
 	XCellCount = 0;
@@ -646,4 +648,6 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 Point TileMap::GetMapSize()
 {
 	return Point((short) (XCellCount*64), (short) (YCellCount*64));
+}
+
 }

@@ -22,6 +22,8 @@
 
 #include "Ambient.h"
 
+namespace GemRB {
+
 AmbientMgr::AmbientMgr()
 {
 }
@@ -59,4 +61,6 @@ bool AmbientMgr::isActive(const std::string &name) const
 		}
 	}
 	return false;
+}
+
 }

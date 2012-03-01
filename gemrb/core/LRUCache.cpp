@@ -23,6 +23,8 @@
 #include <cassert>
 #include <cstdio>
 
+namespace GemRB {
+
 struct VarEntry {
 	VarEntry* prev;
 	VarEntry* next;
@@ -216,4 +218,6 @@ void testLRUCache()
 	assert(p == &t[0]);
 
 	assert(!c.getLRU(1, k2, p));
+}
+
 }

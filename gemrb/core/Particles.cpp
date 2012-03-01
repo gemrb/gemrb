@@ -26,6 +26,8 @@
 #include "TableMgr.h"
 #include "Video.h"
 
+namespace GemRB {
+
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;
 
@@ -386,4 +388,6 @@ int Particles::Update()
 		phase = P_EMPTY;
 	}
 	return drawn;
+}
+
 }

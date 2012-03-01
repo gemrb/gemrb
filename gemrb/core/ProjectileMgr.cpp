@@ -20,10 +20,14 @@
 
 #include "ProjectileMgr.h"
 
+namespace GemRB {
+
 ProjectileMgr::ProjectileMgr(void)
 {
 }
 
 ProjectileMgr::~ProjectileMgr(void)
 {
+}
+
 }

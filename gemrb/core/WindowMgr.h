@@ -29,6 +29,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class DataStream;
 class Window;
 
@@ -49,5 +51,7 @@ public:
 	/** Returns the number of available windows */
 	virtual unsigned int GetWindowsCount() = 0;
 };
+
+}
 
 #endif

@@ -23,6 +23,8 @@
 
 #include "Scriptable/Scriptable.h"
 
+namespace GemRB {
+
 class TileOverlay;
 
 //door flags
@@ -96,5 +98,7 @@ public:
 	int TrapResets() const { return Flags & DOOR_RESET; }
 	void SetNewOverlay(TileOverlay *Overlay);
 };
+
+}
 
 #endif

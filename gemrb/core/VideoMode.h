@@ -23,6 +23,8 @@
 
 #include "exports.h"
 
+namespace GemRB {
+
 class GEM_EXPORT VideoMode {
 public:
 	VideoMode(void);
@@ -47,5 +49,7 @@ public:
 	bool operator==(const VideoMode& cpt) const;
 	VideoMode& operator=(const VideoMode& vm);
 };
+
+}
 
 #endif

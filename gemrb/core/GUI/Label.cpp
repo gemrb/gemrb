@@ -30,6 +30,8 @@
 #include "Video.h"
 #include "GUI/Window.h"
 
+namespace GemRB {
+
 Label::Label(Font* font)
 {
 	this->font = font;
@@ -150,4 +152,6 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 const char* Label::QueryText() const
 {
 	return ( const char * ) Buffer;
+}
+
 }

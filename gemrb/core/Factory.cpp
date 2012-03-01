@@ -24,6 +24,8 @@
 
 #include <cstring>
 
+namespace GemRB {
+
 Factory::Factory(void)
 {
 }
@@ -62,4 +64,6 @@ void Factory::FreeObjects(void)
 	for (unsigned int i = 0; i < fobjects.size(); i++) {
 		delete( fobjects[i] );
 	}
+}
+
 }

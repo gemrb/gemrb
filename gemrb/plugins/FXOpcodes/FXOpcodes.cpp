@@ -46,6 +46,8 @@
 #include "Scriptable/InfoPoint.h"
 #include "Scriptable/PCStatStruct.h" //fx_polymorph (action definitions)
 
+using namespace GemRB;
+
 //FIXME: find a way to handle portrait icons better
 #define PI_RIGID     2
 #define PI_CONFUSED  3

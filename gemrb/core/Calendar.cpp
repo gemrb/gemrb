@@ -26,6 +26,8 @@
 #include "TableMgr.h"
 #include "Variables.h"
 
+namespace GemRB {
+
 Calendar::Calendar(void)
 {
 	int i;
@@ -94,3 +96,4 @@ int Calendar::GetCalendarDay(int date) const
 	return dayandmonth+1;
 }
 
+}

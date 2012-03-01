@@ -28,6 +28,8 @@
 #ifndef SCLASS_ID_H
 #define SCLASS_ID_H
 
+namespace GemRB {
+
 /** Type of plugin ID numbers */
 typedef unsigned long SClass_ID;
 
@@ -90,5 +92,7 @@ enum {
 	PLUGIN_IMAGE_WRITER_BMP,
 	PLUGIN_COMPRESSION_ZLIB
 };
+
+}
 
 #endif

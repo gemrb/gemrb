@@ -31,6 +31,8 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
+using namespace GemRB;
+
 SDLAudio::SDLAudio(void)
 {
 	XPos = 0;

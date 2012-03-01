@@ -49,6 +49,8 @@ extern "C" {
 #include "SDL_screenkeyboard.h"
 #endif
 
+using namespace GemRB;
+
 //touch gestures
 #define MIN_GESTURE_DELTA_PIXELS 10
 #define TOUCH_RC_NUM_TICKS 500

@@ -23,8 +23,6 @@
  * Declares MapControl, widget for displaying current area map
  */
 
-class MapControl;
-
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
@@ -32,6 +30,8 @@ class MapControl;
 
 #include "exports.h"
 #include "Interface.h"
+
+namespace GemRB {
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_MAP_ON_PRESS     	0x09000000
@@ -104,5 +104,7 @@ private:
 	/** Move viewport */
 	void ViewHandle(unsigned short x, unsigned short y);
 };
+
+}
 
 #endif

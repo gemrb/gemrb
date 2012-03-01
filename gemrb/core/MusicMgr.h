@@ -23,6 +23,8 @@
 
 #include "Plugin.h"
 
+namespace GemRB {
+
 class GEM_EXPORT MusicMgr : public Plugin {
 public: 
 	MusicMgr();
@@ -45,5 +47,7 @@ public:
 	/** Returns whether given playlist is currently loaded */
 	virtual bool CurrentPlayList(const char* name) = 0;
 };
+
+}
 
 #endif

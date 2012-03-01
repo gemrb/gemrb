@@ -23,6 +23,8 @@
 #include "Sprite2D.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT ImageWriter : public Plugin {
 public:
 	ImageWriter(void);
@@ -31,5 +33,7 @@ public:
 	/** Writes an Sprite2D to a stream and frees the sprite. */
 	virtual void PutImage(DataStream *output, Sprite2D *sprite) = 0;
 };
+
+}
 
 #endif

@@ -20,10 +20,14 @@
 
 #include "DialogMgr.h"
 
+namespace GemRB {
+
 DialogMgr::DialogMgr(void)
 {
 }
 
 DialogMgr::~DialogMgr(void)
 {
+}
+
 }

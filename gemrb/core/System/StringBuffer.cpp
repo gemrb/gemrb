@@ -23,6 +23,8 @@
 #include <cstdio>
 #include <cstdarg>
 
+namespace GemRB {
+
 StringBuffer::StringBuffer()
 {}
 
@@ -69,4 +71,6 @@ void StringBuffer::append(std::string const& message)
 std::string const& StringBuffer::get() const
 {
 	return buffer;
+}
+
 }

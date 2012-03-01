@@ -29,6 +29,8 @@
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
 
+using namespace GemRB;
+
 BIFImporter::BIFImporter(void)
 {
 	stream = NULL;

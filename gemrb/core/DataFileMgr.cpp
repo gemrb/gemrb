@@ -20,10 +20,14 @@
 
 #include "DataFileMgr.h"
 
+namespace GemRB {
+
 DataFileMgr::DataFileMgr(void)
 {
 }
 
 DataFileMgr::~DataFileMgr(void)
 {
+}
+
 }

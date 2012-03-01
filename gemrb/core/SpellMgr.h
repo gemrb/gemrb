@@ -31,6 +31,8 @@
 #include "Spell.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 /**
  * @class SpellMgr
  * Abstract loader for Spell objects
@@ -43,5 +45,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Spell* GetSpell(Spell *spl, bool silent=false) = 0;
 };
+
+}
 
 #endif

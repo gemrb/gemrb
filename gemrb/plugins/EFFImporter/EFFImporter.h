@@ -27,6 +27,8 @@
 
 #include "Effect.h"
 
+namespace GemRB {
+
 class EFFImporter : public EffectMgr {
 private:
 	DataStream* str;
@@ -45,5 +47,7 @@ public:
 	void PutEffectV2(DataStream *stream, const Effect *fx); // used in the area and cre importer
 };
 
+
+}
 
 #endif

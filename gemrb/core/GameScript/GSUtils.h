@@ -28,6 +28,8 @@
 
 #include "Interface.h"
 
+namespace GemRB {
+
 //indebug flags
 #define ID_REFERENCE 1
 #define ID_CUTSCENE  2
@@ -139,6 +141,8 @@ Gem_Polygon *GetPolygon2DA(ieDword index);
 inline int Bones(ieDword value)
 {
 	return core->Roll((value&0xf000)>>12, (value&0xff0)>>8, value&15);
+}
+
 }
 
 #endif

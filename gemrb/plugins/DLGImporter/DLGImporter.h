@@ -25,6 +25,8 @@
 
 #include "globals.h"
 
+namespace GemRB {
+
 /*
 struct State {
 	ieStrRef StrRef;
@@ -80,5 +82,7 @@ private:
 	DialogTransition** GetTransitions(unsigned int firstIndex,
 		unsigned int count) const;
 };
+
+}
 
 #endif

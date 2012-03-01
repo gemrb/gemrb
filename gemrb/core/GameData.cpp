@@ -46,6 +46,8 @@
 
 #include <cstdio>
 
+namespace GemRB {
+
 static void ReleaseItem(void *poi)
 {
 	delete ((Item *) poi);
@@ -550,4 +552,6 @@ void GameData::SaveAllStores()
 	while (!stores.empty()) {
 		SaveStore(stores.begin()->second);
 	}
+}
+
 }

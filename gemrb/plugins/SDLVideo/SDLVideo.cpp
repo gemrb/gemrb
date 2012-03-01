@@ -42,6 +42,8 @@
 #include <cassert>
 #include <cstdio>
 
+using namespace GemRB;
+
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0

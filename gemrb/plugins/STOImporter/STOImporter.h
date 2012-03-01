@@ -27,6 +27,8 @@
 
 #include "Store.h"
 
+namespace GemRB {
+
 
 class STOImporter : public StoreMgr {
 private:
@@ -57,5 +59,7 @@ private:
 	void PutHeader(DataStream *stream, Store *store);
 };
 
+
+}
 
 #endif

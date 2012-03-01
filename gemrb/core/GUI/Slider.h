@@ -34,6 +34,8 @@
 
 #include "Sprite2D.h"
 
+namespace GemRB {
+
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_SLIDER_ON_CHANGE    0x02000000
 
@@ -100,5 +102,7 @@ public: // Public Events
 	/** OnChange Scripted Event Function Name */
 	EventHandler SliderOnChange;
 };
+
+}
 
 #endif

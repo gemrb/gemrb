@@ -35,6 +35,8 @@
 #include "Interface.h"
 #include "Map.h"
 
+namespace GemRB {
+
 class GameControl;
 class Window;
 class DialogHandler;
@@ -257,5 +259,7 @@ public:
 	bool SetEvent(int eventType, EventHandler handler);
 	void ToggleAlwaysRun();
 };
+
+}
 
 #endif

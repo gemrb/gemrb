@@ -23,6 +23,8 @@
 
 #include "Audio.h"
 
+namespace GemRB {
+
 class NullSound : public Audio {
 public:
 	NullSound(void);
@@ -51,5 +53,7 @@ public:
 private:
 	int XPos, YPos;
 };
+
+}
 
 #endif

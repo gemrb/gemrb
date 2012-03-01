@@ -20,10 +20,14 @@
 
 #include "MapMgr.h"
 
+namespace GemRB {
+
 MapMgr::MapMgr(void)
 {
 }
 
 MapMgr::~MapMgr(void)
 {
+}
+
 }

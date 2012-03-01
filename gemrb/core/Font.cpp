@@ -33,6 +33,8 @@
 
 #include <cassert>
 
+namespace GemRB {
+
 #define PARAGRAPH_START_X 5;
 
 static const Color black = {0, 0, 0, 0};
@@ -675,3 +677,5 @@ void Font::SetPalette(Palette* pal)
 	palette = pal;
 }
 
+
+}

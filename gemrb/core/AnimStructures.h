@@ -21,9 +21,13 @@
 #ifndef ANIMSTRUCTURES_H
 #define ANIMSTRUCTURES_H
 
+namespace GemRB {
+
 struct CycleEntry {
 	ieWord FramesCount;
 	ieWord FirstFrame;
 };
+
+}
 
 #endif

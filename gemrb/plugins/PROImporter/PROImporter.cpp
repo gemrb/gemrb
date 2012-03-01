@@ -25,6 +25,8 @@
 #include "EffectMgr.h"
 #include "Interface.h"
 
+using namespace GemRB;
+
 PROImporter::PROImporter(void)
 {
 	str = NULL;

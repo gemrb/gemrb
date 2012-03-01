@@ -31,6 +31,8 @@
 #include "Item.h"
 #include "GameScript/GameScript.h"
 
+namespace GemRB {
+
 Store::Store(void)
 {
 	HasTriggers = false;
@@ -301,4 +303,6 @@ ieDword Store::GetOwnerID() const
 void Store::SetOwnerID(ieDword owner)
 {
 	StoreOwnerID = owner;
+}
+
 }

@@ -50,6 +50,8 @@
 
 #include "Callback.h"
 
+namespace GemRB {
+
 class ControlAnimation;
 class Sprite2D;
 class Window;
@@ -156,5 +158,7 @@ public: //Events
 	void SetFunctionNumber(int x) { FunctionNumber = x; }
 	int GetFunctionNumber() { return FunctionNumber; }
 };
+
+}
 
 #endif

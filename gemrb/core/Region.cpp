@@ -20,6 +20,8 @@
 
 #include "Region.h"
 
+namespace GemRB {
+
 /*************** point ****************************/
 Point::Point(void)
 {
@@ -181,4 +183,6 @@ void Region::Normalize()
 	} else {
 		h -= y;
 	}
+}
+
 }

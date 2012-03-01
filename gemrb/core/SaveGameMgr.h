@@ -24,6 +24,8 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
+namespace GemRB {
+
 class GEM_EXPORT SaveGameMgr : public Plugin {
 public:
 	SaveGameMgr(void);
@@ -34,5 +36,7 @@ public:
 	virtual int GetStoredFileSize(Game *game) = 0;
 	virtual int PutGame(DataStream* stream, Game *game) = 0;
 };
+
+}
 
 #endif

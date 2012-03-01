@@ -58,8 +58,13 @@
 
 #include <cstdio>
 #include <cstdlib>
+#ifndef WIN32
+# include <sys/time.h>
+#endif
 
 #endif //GLOBALS_ONLY_DEFS
+
+namespace GemRB {
 
 //Global Variables
 
@@ -181,7 +186,6 @@ GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 
 #ifndef WIN32
-#include <sys/time.h>
 inline unsigned long GetTickCount()
 {
 	struct timeval tv;
@@ -215,5 +219,8 @@ inline bool valid_number(const char* string, long& val)
 //the maximum supported game CD count
 #define MAX_CD               6
 
+}
+
 #endif //! GLOBALS_H
+
 
