@@ -19,10 +19,9 @@
  */
 
 #import "GEM_AppDelegate.h"
+#import "Interface.h"
 
-#import "exports.h"
-extern int GemRB_main(int argc, char *argv[]);
-GEM_EXPORT
+using namespace GemRB;
 
 @implementation SDLUIKitDelegate (GemDelegate)
 + (NSString *)getAppDelegateClassName
@@ -40,6 +39,7 @@ GEM_EXPORT
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Normally you would call super implemetation first, but don't!
+	InitializeLogging();
 	[self setupWrapper];
 
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
@@ -74,7 +74,7 @@ GEM_EXPORT
 
 - (void)runGemRB:(NSString*)configPath
 {
-	int ret = 0;
+	int ret = GEM_OK;
 	if (configPath) {
 		NSLog(@"Using config file:%@", configPath);
 		// get argv
@@ -84,7 +84,7 @@ GEM_EXPORT
 		[procArguments addObject:configPath];
 
 		int argc = [procArguments count];
-		char** argv = malloc(argc * sizeof(char*));
+		char** argv = (char**)malloc(argc * sizeof(char*));
 
 		int i = 0;
 		for (NSString* arg in procArguments) {
@@ -96,15 +96,19 @@ GEM_EXPORT
 
 		[configWin release];
 		[nibObjects release];
-
 		[confControl release];
-
-		// pass control to GemRB
 		[procArguments release];
-		ret = GemRB_main(argc, argv);
+
+		core = new Interface( argc, argv );
 		free(argv);
+		if ((ret = core->Init()) == GEM_ERROR) {
+			delete( core );
+			Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core.");
+		}
+		// pass control to GemRB
+		core->Main();
 	}
-	if (ret != 0) {
+	if (ret != GEM_OK) {
 		// put up a message letting the user know something failed.
 		UIAlertView *alert =
 		[[UIAlertView alloc] initWithTitle: @"Engine Initialization Failure."
@@ -120,6 +124,8 @@ GEM_EXPORT
 		// reload the wrapper interface so we can try again instead of dying
 		[self setupWrapper];
 	} else {
+		delete( core );
+		ShutdownLogging();
 		// We must exit since the application runloop never returns.
 		exit(ret);
 	}

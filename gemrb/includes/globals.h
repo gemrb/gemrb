@@ -194,6 +194,8 @@ inline unsigned long GetTickCount()
 }
 #endif
 
+#if TARGET_OS_IPHONE < 1
+// MIN and MAX are already similarly defined by Cocoa
 inline int MIN(int a, int b)
 {
 	return (a > b ? b : a);
@@ -203,6 +205,7 @@ inline int MAX(int a, int b)
 {
 	return (a < b ? b : a);
 }
+#endif
 
 inline bool valid_number(const char* string, long& val)
 {

@@ -225,7 +225,6 @@
 		A29BF85513A0420A00C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A29BF85613A0420F00C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A29BF85713A0421200C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
-		A29BF86613A0431300C812DD /* GemRB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD82721396B886007E9C63 /* GemRB.cpp */; };
 		A29BF8A213A04A6F00C812DD /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A29BF8A313A04A6F00C812DD /* Ambient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */; };
 		A29BF8A413A04A6F00C812DD /* AmbientMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F911395FF61006ADC12 /* AmbientMgr.cpp */; };
@@ -364,7 +363,7 @@
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
 		A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
-		A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */; };
+		A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.mm */; };
 		A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */; };
 		A2E66350139E882900310FC8 /* Ambient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */; };
@@ -1570,7 +1569,7 @@
 		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		A2DE329814EB071200117503 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_AppDelegate.h; sourceTree = "<group>"; };
-		A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_AppDelegate.m; sourceTree = "<group>"; };
+		A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GEM_AppDelegate.mm; sourceTree = "<group>"; };
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2EC8058145F9E6E0033754A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805A1460556B0033754A /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
@@ -2629,7 +2628,7 @@
 			children = (
 				A2A3A7DF14A5130F00F705CF /* CocoaMain.m */,
 				A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */,
-				A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.m */,
+				A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.mm */,
 				A2A3A7E014A5130F00F705CF /* GEM_ConfController.h */,
 				A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */,
 				A2A3A7EE14A51B1800F705CF /* GEM_SDL_Keyboard.m */,
@@ -4477,7 +4476,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A29BF86613A0431300C812DD /* GemRB.cpp in Sources */,
 				A29BF8A213A04A6F00C812DD /* ActorMgr.cpp in Sources */,
 				A29BF8A313A04A6F00C812DD /* Ambient.cpp in Sources */,
 				A29BF8A413A04A6F00C812DD /* AmbientMgr.cpp in Sources */,
@@ -4658,7 +4656,7 @@
 				A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */,
 				A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */,
 				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
-				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.m in Sources */,
+				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.mm in Sources */,
 				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
 				A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
