@@ -104,31 +104,17 @@ using namespace GemRB;
 		free(argv);
 		if ((ret = core->Init()) == GEM_ERROR) {
 			delete( core );
-			Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core.");
+			Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Relaunching wraper.");
+			// reload the wrapper interface so we can try again instead of dying
+			[self setupWrapper];
+		} else {
+			// pass control to GemRB
+			core->Main();
+			delete( core );
+			ShutdownLogging();
+			// We must exit since the application runloop never returns.
+			exit(ret);
 		}
-		// pass control to GemRB
-		core->Main();
-	}
-	if (ret != GEM_OK) {
-		// put up a message letting the user know something failed.
-		UIAlertView *alert =
-		[[UIAlertView alloc] initWithTitle: @"Engine Initialization Failure."
-								   message: @"Check the log for causes."
-								  delegate: nil
-						 cancelButtonTitle: @"OK"
-						 otherButtonTitles: nil];
-		[alert show];
-		while (alert.visible) {
-			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-		}
-		[alert release];
-		// reload the wrapper interface so we can try again instead of dying
-		[self setupWrapper];
-	} else {
-		delete( core );
-		ShutdownLogging();
-		// We must exit since the application runloop never returns.
-		exit(ret);
 	}
 }
 
