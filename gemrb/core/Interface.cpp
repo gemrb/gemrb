@@ -1455,14 +1455,14 @@ int Interface::Init()
 
 	lists = new Variables();
 	if (!lists) {
-		Log(ERROR, "Core", "Failed to allocate Lists dictionary.");
+		Log(FATAL, "Core", "Failed to allocate Lists dictionary.");
 		return GEM_ERROR;
 	}
 	lists->SetType( GEM_VARIABLES_POINTER );
 
 	vars = new Variables();
 	if (!vars) {
-		Log(ERROR, "Core", "Failed to allocate Variables dictionary");
+		Log(FATAL, "Core", "Failed to allocate Variables dictionary");
 		return GEM_ERROR;
 	}
 	vars->SetType( GEM_VARIABLES_INT );
@@ -1486,7 +1486,7 @@ int Interface::Init()
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
 	} else {
-		Log(ERROR, "Core", "Plugin Loading Failed, check path...");
+		Log(FATAL, "Core", "Plugin Loading Failed, check path...");
 		return GEM_ERROR;
 	}
 	plugin->RunInitializers();
@@ -1501,11 +1501,11 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
 	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
 	if (!video) {
-		Log(ERROR, "Core", "No Video Driver Available.");
+		Log(FATAL, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
 	}
 	if (video->Init() == GEM_ERROR) {
-		Log(ERROR, "Core", "Cannot Initialize Video Driver.");
+		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
 	Color defcolor={255,255,255,200};
@@ -1514,7 +1514,7 @@ int Interface::Init()
 	{
 		Log(MESSAGE, "Core", "Initializing Search Path...");
 		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
-			Log(ERROR, "Core", "no DirectoryImporter!");
+			Log(FATAL, "Core", "no DirectoryImporter!");
 			return GEM_ERROR;
 		}
 
@@ -1522,7 +1522,7 @@ int Interface::Init()
 
 		PathJoin( path, CachePath, NULL);
 		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
-			Log(ERROR, "Core", "The cache path couldn't be registered, please check!");
+			Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
 			return GEM_ERROR;
 		}
 
@@ -1573,7 +1573,7 @@ int Interface::Init()
 		char ChitinPath[_MAX_PATH];
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
-			Log(ERROR, "Core", "Failured to load \"chitin.key\"");
+			Log(FATAL, "Core", "Failured to load \"chitin.key\"");
 			return GEM_ERROR;
 		}
 	}
@@ -1581,11 +1581,11 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == NULL) {
-		Log(ERROR, "Core", "Missing GUI Script Engine.");
+		Log(FATAL, "Core", "Missing GUI Script Engine.");
 		return GEM_ERROR;
 	}
 	if (!guiscript->Init()) {
-		Log(ERROR, "Core", "Failed to initialize GUI Script.");
+		Log(FATAL, "Core", "Failed to initialize GUI Script.");
 		return GEM_ERROR;
 	}
 	strcpy( NextScript, "Start" );
@@ -1602,7 +1602,7 @@ int Interface::Init()
 
 	Log(MESSAGE, "Core", "Reading Game Options...");
 	if (!LoadGemRBINI()) {
-		Log(ERROR, "Core", "Cannot Load INI.");
+		Log(FATAL, "Core", "Cannot Load INI.");
 		return GEM_ERROR;
 	}
 
@@ -1630,7 +1630,7 @@ int Interface::Init()
 
 	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
-		Log(ERROR, "Core", "No TLK Importer Available.");
+		Log(FATAL, "Core", "No TLK Importer Available.");
 		return GEM_ERROR;
 	}
 	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
@@ -1639,7 +1639,7 @@ int Interface::Init()
 	PathJoin( strpath, GamePath, dialogtlk, NULL );
 	FileStream* fs = FileStream::OpenFile(strpath);
 	if (!fs) {
-		Log(ERROR, "Core", "Cannot find Dialog.tlk.");
+		Log(FATAL, "Core", "Cannot find Dialog.tlk.");
 		return GEM_ERROR;
 	}
 	strings->Open(fs);
@@ -1663,14 +1663,14 @@ int Interface::Init()
 	}
 
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
-		Log(ERROR, "Core", "No BAM Importer Available.");
+		Log(FATAL, "Core", "No BAM Importer Available.");
 		return GEM_ERROR;
 	}
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
 	DSCount = ReadResRefTable ("defsound", DefSound);
 	if (DSCount == 0) {
-		Log(ERROR, "Core", "Cannot find defsound.2da.");
+		Log(FATAL, "Core", "Cannot find defsound.2da.");
 		return GEM_ERROR;
 	}
 
@@ -1679,7 +1679,7 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
 	if (windowmgr == NULL) {
-		Log(ERROR, "Core", "Failed to load Window Manager.");
+		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
 
@@ -1699,7 +1699,7 @@ int Interface::Init()
 
 	Sprite2D *tmpsprite = GetCursorSprite();
 	if (!tmpsprite) {
-		Log(ERROR, "Core", "Failed to load cursor sprite.");
+		Log(FATAL, "Core", "Failed to load cursor sprite.");
 		return GEM_ERROR;
 	}
 	console->SetCursor (tmpsprite);
@@ -1707,18 +1707,18 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
 	if (AudioDriver == NULL) {
-		Log(ERROR, "Core", "Failed to load sound driver.");
+		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
 	}
 	if (!AudioDriver->Init()) {
-		Log(ERROR, "Core", "Failed to initialize sound driver.");
+		Log(FATAL, "Core", "Failed to initialize sound driver.");
 		return GEM_ERROR;
 	}
 
 	Log(MESSAGE, "Core", "Allocating SaveGameIterator...");
 	sgiterator = new SaveGameIterator();
 	if (sgiterator == NULL) {
-		Log(ERROR, "Core", "Failed to allocate SaveGameIterator.");
+		Log(FATAL, "Core", "Failed to allocate SaveGameIterator.");
 		return GEM_ERROR;
 	}
 
@@ -1730,7 +1730,7 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
 	tokens = new Variables();
 	if (!tokens) {
-		Log(ERROR, "Core", "Failed to allocate Token dictionary.");
+		Log(FATAL, "Core", "Failed to allocate Token dictionary.");
 		return GEM_ERROR;
 	}
 	tokens->SetType( GEM_VARIABLES_STRING );
@@ -1738,7 +1738,7 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Initializing Music Manager...");
 	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
 	if (!music) {
-		Log(ERROR, "Core", "Failed to load Music Manager.");
+		Log(FATAL, "Core", "Failed to load Music Manager.");
 		return GEM_ERROR;
 	}
 
@@ -1808,28 +1808,28 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Bringing up the Global Timer...");
 	timer = new GlobalTimer();
 	if (!timer) {
-		Log(ERROR, "Core", "Failed to create global timer.");
+		Log(FATAL, "Core", "Failed to create global timer.");
 		return GEM_ERROR;
 	}
 
 	Log(MESSAGE, "Core", "Initializing effects...");
 	ret = Init_EffectQueue();
 	if (!ret) {
-		Log(ERROR, "Core", "Failed to initialize effects.");
+		Log(FATAL, "Core", "Failed to initialize effects.");
 		return GEM_ERROR;
 	}
 
 	Log(MESSAGE, "Core", "Initializing Inventory Management...");
 	ret = InitItemTypes();
 	if (!ret) {
-		Log(ERROR, "Core", "Failed to initialize inventory.");
+		Log(FATAL, "Core", "Failed to initialize inventory.");
 		return GEM_ERROR;
 	}
 
 	Log(MESSAGE, "Core", "Initializing string constants...");
 	displaymsg = new DisplayMessage();
 	if (!displaymsg) {
-		Log(ERROR, "Core", "Failed to initialize string constants.");
+		Log(FATAL, "Core", "Failed to initialize string constants.");
 		return GEM_ERROR;
 	}
 
@@ -1842,7 +1842,7 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Initializing ability tables...");
 	ret = ReadAbilityTables();
 	if (!ret) {
-		Log(ERROR, "Core", "Failed to initialize ability tables...");
+		Log(FATAL, "Core", "Failed to initialize ability tables...");
 		return GEM_ERROR;
 	}
 
@@ -1863,7 +1863,7 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Reading game time table...");
 	ret = ReadGameTimeTable();
 	if (!ret) {
-		Log(ERROR, "Core", "Failed to read game time table...");
+		Log(FATAL, "Core", "Failed to read game time table...");
 		return GEM_ERROR;
 	}
 
@@ -1876,7 +1876,7 @@ int Interface::Init()
 	Log(MESSAGE, "Core", "Reading item tables...");
 	ret = ReadAuxItemTables();
 	if (!ret) {
-		Log(ERROR, "Core", "Failed to read item tables...");
+		Log(FATAL, "Core", "Failed to read item tables...");
 		return GEM_ERROR;
 	}
 
