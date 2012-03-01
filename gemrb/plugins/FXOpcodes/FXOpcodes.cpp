@@ -4788,6 +4788,12 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	int ret;
 	if (target) {
+		if (fx->FirstApply && fx->IsVariable) {
+			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
+			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
+			target->fxqueue.AddEffect(myfx);
+			return FX_NOT_APPLIED;
+		}
 		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
 	} else {
 		EffectQueue fxqueue;
