@@ -18,6 +18,7 @@
  *
  */
 
+#import "AppleLogger.h"
 #import "GEM_AppDelegate.h"
 #import "Interface.h"
 
@@ -39,7 +40,7 @@ using namespace GemRB;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Normally you would call super implemetation first, but don't!
-	InitializeLogging();
+	AddLogger(createAppleLogger());
 	[self setupWrapper];
 
     return [super application:application didFinishLaunchingWithOptions:launchOptions];

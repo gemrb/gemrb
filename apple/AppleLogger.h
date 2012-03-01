@@ -16,32 +16,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef LOGGER_STDIO_H
-#define LOGGER_STDIO_H
+#ifndef LOGGER_APPLE_H
+#define LOGGER_APPLE_H
 
-#include "System/Logger.h" // for log_color
+#include "System/Logger/Stdio.h"
 
 namespace GemRB {
 
-class GEM_EXPORT StdioLogger : public Logger {
+class GEM_EXPORT AppleLogger : public StdioLogger {
 public:
-	StdioLogger(bool useColor);
-	virtual ~StdioLogger();
+	AppleLogger();
+	virtual ~AppleLogger();
 
-	virtual void log(log_level, const char* owner, const char* message, log_color color);
-
-	virtual void destroy();
-protected:
-	virtual void print(const char*);
-	virtual void textcolor(log_color);
-	bool useColor;
-private:
-	void printBracket(const char *status, log_color color);
-	void printStatus(const char* status, log_color color);
-
+	void textcolor(log_color);
+	void log(log_level level, const char* owner, const char* message, log_color color);
 };
 
-Logger* createStdioLogger();
+Logger* createAppleLogger();
 
 }
 
