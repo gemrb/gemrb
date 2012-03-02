@@ -39,5 +39,5 @@
 
 - (void)setupWrapper;
 - (void)runGemRB:(NSString*)configPath;
-
+- (void)toggleDebug:(id)sender;
 @end

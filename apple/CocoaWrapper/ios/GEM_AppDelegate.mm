@@ -20,7 +20,9 @@
 
 #import "AppleLogger.h"
 #import "GEM_AppDelegate.h"
+#import "System/FileStream.h"
 #import "Interface.h"
+#import "System/Logger/File.h"
 
 using namespace GemRB;
 
@@ -115,6 +117,24 @@ using namespace GemRB;
 			// We must exit since the application runloop never returns.
 			exit(ret);
 		}
+	}
+}
+
+- (void)toggleDebug:(id) __unused sender
+{
+	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+	NSString* docDir = [[paths objectAtIndex:0] copy];
+
+	NSString* logFile = [NSString stringWithFormat:@"%@/GemRB.log", docDir];
+	//OpenFile();
+	const char* cLogFile = [logFile cStringUsingEncoding:NSASCIIStringEncoding];
+	FileStream *fs = new FileStream();
+	if (fs->Create(cLogFile)) {
+		AddLogger(createFileLogger(fs));
+		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at %s", cLogFile);
+	} else {
+		delete fs;
+		Log(ERROR, "Cocoa Wrapper", "Unable to start log file at %s", cLogFile);
 	}
 }
 

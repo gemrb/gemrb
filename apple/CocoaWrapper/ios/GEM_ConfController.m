@@ -67,15 +67,13 @@ enum ConfigTableSection {
 {
     self = [super init];
     if (self) {
-		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
-		docDir = [[paths objectAtIndex:0] copy]; 
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+		docDir = [[paths objectAtIndex:0] copy];
 
 		configFiles = nil;
 		installFiles = nil;
 		logFiles = nil;
-
 		configIndexPath = nil;
-
 		rootVC = nil;
 		editorVC = nil;
 
@@ -102,19 +100,7 @@ enum ConfigTableSection {
 
 - (void)toggleDebug:(id) __unused sender
 {
-	//NSString* logFile = [NSString stringWithFormat:@"%@/GemRB.%i.log", docDir, ([logFiles count] % 5) +1];
-	NSString* logFile = [NSString stringWithFormat:@"%@/GemRB.log", docDir];
-	//first redirect stdout and stderror to a log file in Documents so we can read it
-	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-	int log_file = open([logFile fileSystemRepresentation], O_WRONLY | O_CREAT, mode);
-	
-	if (dup2(log_file, fileno(stderr)) != fileno(stderr) ||
-		dup2(log_file, fileno(stdout)) != fileno(stdout))
-	{
-		[@"Unable to redirect log output! Check the system log." writeToFile:logFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
-	}else{
-		NSLog(@"Beginning GemRB %@ debug log.", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]);
-	}
+	[delegate toggleDebug:sender];
 }
 
 - (void)reloadTableData
