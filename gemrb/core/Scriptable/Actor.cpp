@@ -1662,13 +1662,14 @@ static void InitActorTables()
 	}
 
 	tm.load("qslots");
-	GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
+	GUIBTDefaults = (ActionButtonRow *) calloc( classcount+1,sizeof(ActionButtonRow) );
 
-	for (i = 0; i < classcount; i++) {
+	//leave room for default row at 0
+	for (i = 0; i <= classcount; i++) {
 		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
-		if (tm) {
+		if (tm && i) {
 			for (int j=0;j<MAX_QSLOTS;j++) {
-				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i,j) );
+				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i-1,j) );
 			}
 		}
 	}
