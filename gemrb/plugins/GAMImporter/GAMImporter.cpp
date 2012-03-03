@@ -393,21 +393,19 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			//quick innates
 			//we spare some memory and time by storing them in the same place
 			//this may be slightly buggy because IWD2 doesn't clear the
-			//fields, but QuickSpellClass is set correctly, problem is
-			//that GemRB doesn't clear QuickSpellClass
+			//fields, but QuickSpellClass is set correctly
 			for (i = 0; i < MAX_QSLOTS; i++) {
 				str->Read( tmp, 8 );
-				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[0]==0)) {
+				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[i][0]==0)) {
 					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
 					//innates
 					pcInfo.QuickSpellClass[i]=0xff;
 				}
 			}
 			//recently discovered fields (bard songs)
-			//str->Seek( 72, GEM_CURRENT_POS);
 			for(i = 0; i<MAX_QSLOTS;i++) {
 				str->Read( tmp, 8 );
-				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[0]==0)) {
+				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[i][0]==0)) {
 					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
 					//bardsongs
 					pcInfo.QuickSpellClass[i]=0xfe;
