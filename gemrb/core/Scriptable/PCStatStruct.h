@@ -68,8 +68,21 @@ namespace GemRB {
 //gui navigation (scrolling button rows left or right)
 #define ACT_LEFT 32
 #define ACT_RIGHT 33
+#define ACT_BARD   40
+#define ACT_CLERIC   41
+#define ACT_DRUID   42
+#define ACT_PALADIN   43
+#define ACT_RANGER   44
+#define ACT_SORCERER   45
+#define ACT_WIZARD   46
+#define ACT_DOMAIN   47
 
-#define MAX_ACT_COUNT 34 //update this
+#define ACT_IWDQSPELL 50
+#define ACT_IWDQITEM  60
+#define ACT_IWDQSPEC  70
+#define ACT_IWDQSONG  80
+
+#define MAX_ACT_COUNT 100
 
 #define ES_COUNT 16  //number of iwd2 persistent feat preset values (original iwd2 had only 5)
 
