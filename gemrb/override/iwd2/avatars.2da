@@ -5,7 +5,8 @@
 0x0300     SPSMPUFF   SPSMPUFF   SPSMPUFF   SPSMPUFF   13         0          0          *
 0x0400     SKLH       SKLH       SKLH       SKLH       13         0          1          *
 0x0410     GLPHWRDH   GLPHWRDH   GLPHWRDH   GLPHWRDH   13         0          1          *
-0x1001     MWYV       MWYV       MWYV       MWYV       11         5          1          *
+0x1000     MWYV       MWYV       MWYV       MWYV       11         5          1          *
+0x1001     MWY2       MWY2       MWY2       MWY2       11         5          1          *
 0x1100     MTAN       MTAN       MTAN       MTAN       11         5          1          *
 0x1200     MDR1       MDR1       MDR1       MDR1       12         5          1          *
 0x1201     MDR2       MDR2       MDR2       MDR2       12         5          1          *
