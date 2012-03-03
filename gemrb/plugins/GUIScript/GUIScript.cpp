@@ -8635,7 +8635,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		if (action==100) {
 			action = -1;
 		} else {
-			action&=31;
+			if ( (action>=ACT_IWDQSPELL) && (action<=ACT_IWDQSPELL+9) ) action = ACT_IWDQSPELL;
+			else if ( (action>=ACT_IWDQITEM) && (action<=ACT_IWDQITEM+9) ) action = ACT_IWDQITEM;
+			else if ( (action>=ACT_IWDQSPEC) && (action<=ACT_IWDQSPEC+9) ) action = ACT_IWDQSPEC;
+			else if ( (action>=ACT_IWDQSONG) && (action<=ACT_IWDQSONG+9) ) action = ACT_IWDQSONG;
+			action%=100;
 		}
 		Button * btn = (Button *) GetControl(wi,ci,IE_GUI_BUTTON);
 		if (!btn) {
@@ -8782,14 +8786,39 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 				}
 			}
 		}
-			break;
+		break;
+		case ACT_IWDQSPELL:
+			SetButtonBAM(wi, ci, "stonspel",0,0,-1);
+			if (actor->version==22 && i>3) {
+				tmp = i-3;
+			} else {
+				tmp = 0;
+			}
+			goto jump_label2;
+		case ACT_IWDQSONG:
+			SetButtonBAM(wi, ci, "stonsong",0,0,-1);
+			if (actor->version==22 && i>3) {
+				tmp = i-3;
+			} else {
+				tmp = 0;
+			}
+			goto jump_label2;
+		case ACT_IWDQSPEC:
+			SetButtonBAM(wi, ci, "stonspec",0,0,-1);
+			if (actor->version==22 && i>3) {
+				tmp = i-3;
+			} else {
+				tmp = 0;
+			}
+			goto jump_label2;
 		case ACT_QSPELL1:
 		case ACT_QSPELL2:
 		case ACT_QSPELL3:
-		//fixme iwd2 has 9
-		{
 			SetButtonBAM(wi, ci, "stonspel",0,0,-1);
-			ieResRef *poi = &actor->PCStats->QuickSpells[action-ACT_QSPELL1];
+			tmp = action-ACT_QSPELL1;
+jump_label2:
+		{
+			ieResRef *poi = &actor->PCStats->QuickSpells[tmp];
 			if ((*poi)[0]) {
 				SetSpellIcon(wi, ci, *poi, 1, 1, i+1);
 				int mem = actor->spellbook.GetMemorizedSpellsCount(*poi, -1, true);
@@ -8799,7 +8828,12 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 				SetItemText(wi, ci, mem, true);
 			}
 		}
-			break;
+		break;
+		case ACT_IWDQITEM:
+			if (i>3) {
+				tmp = i-3;
+				goto jump_label;
+			}
 		case ACT_QSLOT1:
 			tmp=0;
 			goto jump_label;

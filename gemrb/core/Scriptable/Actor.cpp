@@ -384,7 +384,7 @@ Actor::Actor()
 	LastExit = 0;
 	attackcount = 0;
 	secondround = 0;
-	//AttackStance =  IE_ANI_ATTACK;
+	//AttackStance = IE_ANI_ATTACK;
 	attacksperround = 0;
 	nextattack = 0;
 	nextWalk = 0;
@@ -2007,7 +2007,7 @@ static void InitActorTables()
 		monkbon = (int **) calloc(monkbon_rows, sizeof(int *));
 		for (unsigned i=0; i<monkbon_rows; i++) {
 			monkbon[i] = (int *) calloc(monkbon_cols, sizeof(int));
-			for (unsigned  j=0; j<monkbon_cols; j++) {
+			for (unsigned j=0; j<monkbon_cols; j++) {
 				monkbon[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
@@ -3339,7 +3339,7 @@ void Actor::CheckCleave()
 {
 	int cleave = GetFeat(FEAT_CLEAVE);
 	//feat level 1 only enables one cleave per round
-	if ((cleave==1) && fxqueue.HasEffect(fx_cleave_ref)  ) {
+	if ((cleave==1) && fxqueue.HasEffect(fx_cleave_ref) ) {
 		cleave = 0;
 	}
 	if(cleave) {
@@ -6678,8 +6678,20 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 {
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		ieByte tmp = ar[i];
-		if (QslotTranslation) {
-			tmp=gemrb2iwd[tmp];
+		if (QslotTranslation && i>2) {
+			if (tmp>ACT_IWDQSONG) {//quick songs
+				tmp = 110+tmp%10;
+			} else if (tmp>ACT_IWDQSPEC) {//quick abilities
+				tmp = 90+tmp%10;
+			} else if (tmp>ACT_IWDQITEM) {//quick items
+				tmp = 80+tmp%10;
+			} else if (tmp>ACT_IWDQSPELL) {//quick spells
+				tmp = 70+tmp%10;
+			} else if (tmp>ACT_BARD) {//spellbooks
+				tmp = 50+tmp%10;
+			} else {
+				tmp=gemrb2iwd[tmp];
+			}
 		}
 		PCStats->QSlots[i]=tmp;
 	}
@@ -6696,12 +6708,16 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 		//the first three buttons are hardcoded in gemrb
 		//don't mess with them
 		if (QslotTranslation && i>2) {
-			if (tmp>=90) { //quick weapons
-				tmp=16+tmp%10;
+			if (tmp>=110) { //quick songs
+				tmp = ACT_IWDQSONG+tmp%10;
+			} else if (tmp>=90) { //quick abilities
+				tmp=ACT_IWDQSPEC+tmp%10;
 			} else if (tmp>=80) { //quick items
-				tmp=9+tmp%10;
+				tmp=ACT_IWDQITEM+tmp%10;
 			} else if (tmp>=70) { //quick spells
-				tmp=3+tmp%10;
+				tmp=ACT_IWDQSPELL+tmp%10;
+			} else if (tmp>=50) { //spellbooks
+				tmp=ACT_BARD+tmp%10;
 			} else {
 				tmp=iwd2gemrb[tmp];
 			}
