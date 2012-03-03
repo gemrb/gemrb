@@ -425,6 +425,7 @@ void CREImporter::SetupSlotCounts()
 void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 {
 	char Signature[8];
+	char filling[10];
 	ieVariable name;
 	ieDword tmpDword, CRESize;
 	ieWord tmpWord;
@@ -492,11 +493,12 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 	if (QSPCount==9) {
 		//NOTE: the gemrb internal format stores
 		//0xff or 0xfe in case of innates and bardsongs
-		//if IWD2 doesn't tolerate this, then this field
-		//should be sanitized for IWD2 (not for GemRB)
-		stream->Write( act->PCStats->QuickSpellClass,9);
-		tmpByte = 0;
-		stream->Write( &tmpByte, 1);
+		memset(filling,0,sizeof(filling));
+		memcpy(filling,act->PCStats->QuickSpellClass,MAX_QSLOTS);
+		for(i=0;i<MAX_QSLOTS;i++) {
+			if (filling[i]>=0xfe) filling[i]=0;
+		}
+		stream->Write( filling, 10);
 	}
 	for (i=0;i<QITCount;i++) {
 		tmpWord = act->PCStats->QuickItemSlots[i];
@@ -601,13 +603,17 @@ void CREImporter::ReadChrHeader(Actor *act)
 	case IE_CRE_V2_2:
 		//gemrb format doesn't save these redundantly
 		for (i=0;i<QSPCount;i++) {
-			if (act->PCStats->QuickSpellClass[i]==0xff) {
-				str->ReadResRef (act->PCStats->QuickSpells[i]);
+			str->ReadResRef(Signature);
+			if (Signature[0]) {
+				act->PCStats->QuickSpellClass[i]=0xff;
+				memcpy(act->PCStats->QuickSpells[i], Signature, sizeof(ieResRef));
 			}
 		}
 		for (i=0;i<QSPCount;i++) {
-			if (act->PCStats->QuickSpellClass[i]==0xfe) {
-				str->ReadResRef (act->PCStats->QuickSpells[i]);
+			str->ReadResRef(Signature);
+			if (Signature[0]) {
+				act->PCStats->QuickSpellClass[i]=0xfe;
+				memcpy(act->PCStats->QuickSpells[i], Signature, sizeof(ieResRef));
 			}
 		}
 		//fallthrough
