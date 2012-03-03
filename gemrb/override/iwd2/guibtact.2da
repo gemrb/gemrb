@@ -7,8 +7,8 @@ Cast        8          9         10         11         4688	guibtact
 QSpell1      0          1          24         25         4938	guibtbut
 QSpell2      2          3          26         27         4938	guibtbut
 QSpell3      4          5          28         29         4938	guibtbut
-Turn         0          0          0          0         0	guibtact
-Talk         0          0          0          0         0	guibtact
+Turn         4          5          6          7         0	guibtact
+Defend     0         1         2        3              15925	guibtact
 UseItem     16         17         18         19 	4978	guibtact
 QItem1      0          1          24         25         4937	guibtbut
 QItem4      2          3          26         27         4937	guibtbut

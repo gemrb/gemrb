@@ -353,16 +353,16 @@ def GroupControls ():
 
 	GemRB.SetVar ("ActionLevel", 0)
 	Button = Window.GetControl (ActionBarControlOffset)
-	if GUICommon.GameIsBG2(): # no guard icon
-		Button.SetActionIcon (globals(), -1)
+	if GUICommon.GameIsBG2():
+		Button.SetActionIcon (globals(), 7) # talk icon
 	else:
-		Button.SetActionIcon (globals(), 14)
+		Button.SetActionIcon (globals(), 14)#guard icon
 	Button = Window.GetControl (1+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 7)
-	Button = Window.GetControl (2+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), 15)
-	Button = Window.GetControl (3+ActionBarControlOffset)
+	Button = Window.GetControl (2+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), 21)
+	Button = Window.GetControl (3+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), -1)
 	Button = Window.GetControl (4+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1)
 	Button = Window.GetControl (5+ActionBarControlOffset)
