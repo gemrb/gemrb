@@ -6979,7 +6979,7 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (PyArg_ParseTuple( args, "is", &globalID, &SpellResRef) ) {
-  	GET_ACTOR_GLOBAL();
+		GET_ACTOR_GLOBAL();
 		int ret = actor->spellbook.KnowSpell(SpellResRef);
 		actor->spellbook.RemoveSpell(SpellResRef);
 		return PyInt_FromLong(ret);
@@ -8710,7 +8710,8 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_STEALTH:
-			if (!actor->GetThiefLevel() && !actor->GetMonkLevel() && !actor->GetRangerLevel()) {
+			//don't use level control for this, iwd2 allows everyone to sneak
+			if (!(actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) ) ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_STEALTH) {
@@ -8719,12 +8720,16 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_SEARCH:
+			//in IWD2 everyone can try to search, in bg2 only thieves get the icon
+			//so there is no problem, if you absolutely want to disable this button
+			//check the search skill
 			if (modalstate==MS_DETECTTRAPS) {
 				state = IE_GUI_BUTTON_SELECTED;
 			}
 			break;
 		case ACT_THIEVING:
-			if (!actor->GetThiefLevel() && !actor->GetBardLevel()) {
+			//don't use level control for this, iwd2 allows everyone to steal
+			if (!(actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) ) ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
