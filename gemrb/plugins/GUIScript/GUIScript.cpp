@@ -8719,12 +8719,8 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_SEARCH:
-			if (!actor->GetThiefLevel() && !actor->GetMonkLevel()) {
-				state = IE_GUI_BUTTON_DISABLED;
-			} else {
-				if (modalstate==MS_DETECTTRAPS) {
-					state = IE_GUI_BUTTON_SELECTED;
-				}
+			if (modalstate==MS_DETECTTRAPS) {
+				state = IE_GUI_BUTTON_SELECTED;
 			}
 			break;
 		case ACT_THIEVING:
