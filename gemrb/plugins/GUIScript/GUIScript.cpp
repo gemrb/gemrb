@@ -8701,7 +8701,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_TURN:
-			if (actor->GetStat(IE_TURNUNDEADLEVEL)<1 || !actor->GetClericLevel()) {
+			if (actor->GetStat(IE_TURNUNDEADLEVEL)<1) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_TURNUNDEAD) {
