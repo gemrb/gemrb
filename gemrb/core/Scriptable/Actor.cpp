@@ -6692,7 +6692,9 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 	InitButtons(GetStat(IE_CLASS), false);
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		ieByte tmp=PCStats->QSlots[i];
-		if (QslotTranslation) {
+		//the first three buttons are hardcoded in gemrb
+		//don't mess with them
+		if (QslotTranslation && i>2) {
 			if (tmp>=90) { //quick weapons
 				tmp=16+tmp%10;
 			} else if (tmp>=80) { //quick items
