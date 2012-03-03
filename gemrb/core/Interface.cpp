@@ -4953,7 +4953,7 @@ Actor *Interface::GetFirstSelectedPC(bool forced)
 	}
 
 	if (forced && !ret) {
-		return game->FindPC((unsigned int) 0);
+		return game->FindPC((unsigned int) 1);
 	}
 	return ret;
 }
