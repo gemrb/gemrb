@@ -429,18 +429,18 @@ def ApplyFeats(MyChar):
 			GemRB.RemoveSpell(MyChar, "SPIN260")
 			Spell = "SPIN236"
 		cnt = GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_RAGE)+(level+3)/4
-		MakeSpellCount(MyChar, Spell, cnt)
+		GUICommon.MakeSpellCount(MyChar, Spell, cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN236")
 		GemRB.RemoveSpell(MyChar, "SPIN260")
 	#extra shapeshifting
-	#MakeSpellCount(MyChar, "", cnt)
+	#GUICommon.MakeSpellCount(MyChar, "", cnt)
 
 	#extra smiting
 	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
 	if level>1:
 		cnt = GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_SMITING) + 1
-		MakeSpellCount(MyChar, "SPIN152", cnt)
+		GUICommon.MakeSpellCount(MyChar, "SPIN152", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN152")
 
@@ -450,21 +450,21 @@ def ApplyFeats(MyChar):
 		cnt = GUICommon.GetAbilityBonus(MyChar, IE_CHR) + 3
 		if cnt<1: cnt = 1
 		cnt += GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_TURNING)
-		MakeSpellCount(MyChar, "SPIN970", cnt)
+		GUICommon.MakeSpellCount(MyChar, "SPIN970", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN970")
 
 	#stunning fist
 	if GemRB.HasFeat (MyChar, FEAT_STUNNING_FIST):
 		cnt = GemRB.GetPlayerStat(MyChar, IE_CLASSLEVELSUM) / 4
-		MakeSpellCount(MyChar, "SPIN232", cnt)
+		GUICommon.MakeSpellCount(MyChar, "SPIN232", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN232")
 	return
 
 def SetSpell(pc, SpellName, Feat):
 	if GemRB.HasFeat (pc, Feat):
-		MakeSpellCount(pc, SpellName, 1)
+		GUICommon.MakeSpellCount(pc, SpellName, 1)
 	else:
 		GemRB.RemoveSpell(pc, SpellName)
 	return
