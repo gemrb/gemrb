@@ -52,6 +52,7 @@ FRAME_PC_TARGET   = 1
 PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
+CurrentWindow = None
 DraggedPortrait = None
 ActionBarControlOffset = 0
 
@@ -294,14 +295,6 @@ def AIPress ():
 	return
 
 def EmptyControls ():
-	global ActionsWindow
-	if GUICommon.GameIsIWD2():
-		global PortraitWindow
-		Window = PortraitWindow
-	else:
-		global ActionsWindow
-		Window = ActionsWindow
-
 	Selected = GemRB.GetSelectedSize()
 	if Selected==1:
 		pc = GemRB.GameGetFirstSelectedActor ()
@@ -310,7 +303,7 @@ def EmptyControls ():
 
 	GemRB.SetVar ("ActionLevel", 0)
 	for i in range (12):
-		Button = Window.GetControl (i+ActionBarControlOffset)
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetPicture ("")
 		Button.SetText ("")
@@ -325,15 +318,8 @@ def SelectFormationPreset ():
 
 def SetupFormation ():
 	"""Opens the formation selection section."""
-	if GUICommon.GameIsIWD2():
-		global PortraitWindow
-		Window = PortraitWindow
-	else:
-		global ActionsWindow
-		Window = ActionsWindow
-
 	for i in range (12):
-		Button = Window.GetControl (i+ActionBarControlOffset)
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
@@ -343,35 +329,27 @@ def SetupFormation ():
 
 def GroupControls ():
 	"""Sections that control group actions."""
-
-	if GUICommon.GameIsIWD2():
-		global PortraitWindow
-		Window = PortraitWindow
-	else:
-		global ActionsWindow
-		Window = ActionsWindow
-
 	GemRB.SetVar ("ActionLevel", 0)
-	Button = Window.GetControl (ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (ActionBarControlOffset)
 	if GUICommon.GameIsBG2():
-		Button.SetActionIcon (globals(), 7) # talk icon
+		Button.SetActionIcon (globals(), 7) #talk icon
 	else:
 		Button.SetActionIcon (globals(), 14)#guard icon
-	Button = Window.GetControl (1+ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (1+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), 15)
-	Button = Window.GetControl (2+ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (2+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), 21)
-	Button = Window.GetControl (3+ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (3+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1)
-	Button = Window.GetControl (4+ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (4+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1)
-	Button = Window.GetControl (5+ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (5+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1)
-	Button = Window.GetControl (6+ActionBarControlOffset)
+	Button = CurrentWindow.GetControl (6+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1)
 	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
 	for i in range (5):
-		Button = Window.GetControl (7+ActionBarControlOffset+i)
+		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		idx = GemRB.GameGetFormation (i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
@@ -417,8 +395,6 @@ def SelectItemAbility():
 	return
 
 def SetupItemAbilities(pc, slot):
-	Window = ActionsWindow
-
 	slot_item = GemRB.GetSlotItem(pc, slot)
 	if not slot_item:
 		# empty quickslot
@@ -427,7 +403,7 @@ def SetupItemAbilities(pc, slot):
 	Tips = item["Tooltips"]
 
 	for i in range (12):
-		Button = Window.GetControl (i)
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetPicture ("")
 		if i<len(Tips):
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
@@ -441,21 +417,34 @@ def SetupItemAbilities(pc, slot):
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	return
 
+def SetupBookSelection ():
+	for i in range (12):
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+		Button.SetActionIcon (globals(), 50+i)
+	return
+
+skillbar=(ACT_SEARCH, ACT_STEALTH, ACT_THIEVING, ACT_BARDSONG, ACT_TAMING, ACT_WILDERNESS, ACT_TURN, 100, 100, 100, 100, 100)
+
+def SetupSkillSelection ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
+	return
+
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
 
-	global ActionsWindow, PortraitWindow, OptionsWindow
+	global CurrentWindow, OptionsWindow, PortraitWindow
 	global level, TopIndex
 
 	if GUICommon.GameIsIWD2():
-		Window = PortraitWindow
+		CurrentWindow = PortraitWindow
 	else:
-		Window = ActionsWindow
+		CurrentWindow = ActionsWindow
 
-	if Window == -1:
+	if CurrentWindow == -1:
 		return
 
-	if Window == None:
+	if CurrentWindow == None:
 		return
 
 	#fully redraw the side panes to cover the actions window
@@ -481,14 +470,14 @@ def UpdateActionsWindow ():
 	Selected = GemRB.GetSelectedSize()
 
 	#setting up the disabled button overlay (using the second border slot)
-	if not GUICommon.GameIsIWD2():
-		for i in range (12):
-			Button = Window.GetControl (i)
-			if GUICommon.GameIsBG1():
-				Button.SetBorder (0,6,6,4,4,0,254,0,255)
-			Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
-			Button.SetFont ("NUMBER")
-			Button.SetText ("")
+	for i in range (12):
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+		if GUICommon.GameIsBG1():
+			Button.SetBorder (0,6,6,4,4,0,254,0,255)
+		Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+		Button.SetFont ("NUMBER")
+		Button.SetText ("")
+		Button.SetTooltip("")
 
 	if Selected == 0:
 		EmptyControls ()
@@ -504,25 +493,36 @@ def UpdateActionsWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
 		#this is based on class
-		Window.SetupControls (globals(), pc, ActionBarControlOffset)
+		CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
 	elif level == 1:
-		Window.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
+		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		Spellbook.SetupSpellIcons(Window, 3, TopIndex, ActionBarControlOffset)
+		Spellbook.SetupSpellIcons(CurrentWindow, 3, TopIndex, ActionBarControlOffset)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		Spellbook.SetupSpellIcons(Window, 4, TopIndex, ActionBarControlOffset)
+		Spellbook.SetupSpellIcons(CurrentWindow, 4, TopIndex, ActionBarControlOffset)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	elif level == 5: #all known mage spells
 		GemRB.SetVar ("Type", -1)
-		Spellbook.SetupSpellIcons(Window, -1, TopIndex, ActionBarControlOffset)
+		Spellbook.SetupSpellIcons(CurrentWindow, -1, TopIndex, ActionBarControlOffset)
 	elif level == 6: # iwd2 skills
-		print "IWD2 skill selection is not implemented yet, ignoring!\n\n"
+		SetupSkillSelection()
 	elif level == 7: # quickspells, but with innates too
-		GemRB.SetVar ("Type", 7)
-		Spellbook.SetupSpellIcons(Window, 7, TopIndex, ActionBarControlOffset)
+		GemRB.SetVar ("Type", 511)
+		Spellbook.SetupSpellIcons(CurrentWindow, 511, TopIndex, ActionBarControlOffset)
+	elif level == 8: # shapes selection
+		GemRB.SetVar ("Type", 1024)
+		Spellbook.SetupSpellIcons(CurrentWindow, 1024, TopIndex, ActionBarControlOffset)
+	elif level == 9: # songs selection
+		GemRB.SetVar ("Type", 5)
+		Spellbook.SetupSpellIcons(CurrentWindow, 512, TopIndex, ActionBarControlOffset)
+	elif level == 10: # spellbook selection
+		SetupBookSelection()
+	else:
+		print "Invalid action level:", level
+		GemRB.SetVar ("ActionLevel", 0)
 	return
 
 def ActionQWeaponPressed (which):
@@ -538,10 +538,7 @@ def ActionQWeaponPressed (which):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 		GemRB.SetEquippedQuickSlot (pc, which, -1)
 
-	if GUICommon.GameIsIWD2():
-		PortraitWindow.SetupControls (globals(), pc, ActionBarControlOffset)
-	else:
-		ActionsWindow.SetupControls (globals(), pc, ActionBarControlOffset)
+	CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
 	UpdateActionsWindow ()
 	return
 
@@ -653,6 +650,17 @@ def ActionRangePressed ():
 	GemRB.ExecuteString("EquipRanged()", pc)
 	return
 
+def ActionShapeChangePressed ():
+	GemRB.SetVar ("ActionLevel", 8)
+	UpdateActionsWindow ()
+	return
+
+def ActionBardSongRightPressed ():
+	"""Selects a bardsong."""
+	GemRB.SetVar ("ActionLevel", 9)
+	UpdateActionsWindow ()
+	return
+
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 
@@ -661,6 +669,7 @@ def ActionBardSongPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	GemRB.PlaySound ("act_01")
+	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
@@ -671,6 +680,7 @@ def ActionSearchPressed ():
 	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
@@ -679,6 +689,7 @@ def ActionStealthPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	GemRB.PlaySound ("act_07")
+	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
@@ -687,6 +698,17 @@ def ActionTurnPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	GemRB.PlaySound ("act_06")
+	GemRB.SetVar ("ActionLevel", 0)
+	UpdateActionsWindow ()
+	return
+
+def ActionTamingPressed ():
+	GemRB.SetVar ("ActionLevel", 0)
+	UpdateActionsWindow ()
+	return
+
+def ActionWildernessPressed ():
+	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
@@ -785,9 +807,15 @@ def SpellPressed ():
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 
-	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
+
+	if Type == 5:
+		#SelectBardSong(Spell)
+		ActionBardSongPressed()
+		return
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	if Type != -1:
 		Type = Spell // 1000
 	Spell = Spell % 1000

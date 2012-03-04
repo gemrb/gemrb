@@ -8587,8 +8587,9 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	int wi, globalID;
 	int Start = 0;
 	PyObject *dict;
+	PyObject *Tuple = NULL;
 
-	if (!PyArg_ParseTuple( args, "iOi|i", &wi, &dict, &globalID, &Start)) {
+	if (!PyArg_ParseTuple( args, "iOi|iO", &wi, &dict, &globalID, &Start, &Tuple)) {
 		return AttributeError( GemRB_Window_SetupControls__doc );
 	}
 
@@ -8615,7 +8616,23 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	}
 
 	ActionButtonRow myrow;
-	actor->GetActionButtonRow(myrow);
+	if (Tuple) {
+		if (!PyObject_TypeCheck( Tuple, &PyTuple_Type )) {
+			return AttributeError( GemRB_Window_SetupControls__doc );
+		}
+		if (PyTuple_Size(Tuple)!=GUIBT_COUNT) {
+			return AttributeError( GemRB_Window_SetupControls__doc );
+		}
+		for(int i=0;i<GUIBT_COUNT;i++) {
+			PyObject *x = PyTuple_GetItem(Tuple, i);
+			if (!PyObject_TypeCheck( x, &PyInt_Type )) {
+				return AttributeError( GemRB_Window_SetupControls__doc );
+			}
+			myrow[i] = PyInt_AsLong(x);
+		}
+	} else {
+		actor->GetActionButtonRow(myrow);
+	}
 	bool fistdrawn = true;
 	ieDword magicweapon = actor->inventory.GetMagicSlot();
 	if (!actor->inventory.HasItemInSlot("",magicweapon) ) {

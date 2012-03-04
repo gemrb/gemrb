@@ -129,20 +129,24 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		allSpells = GetKnownSpells (actor, IE_SPELL_TYPE_WIZARD)
 	else:
 		allSpells = []
+		for i in range(16):
+			if BookType & (1<<i):
+				allSpells += GetUsableMemorizedSpells (actor, i)
+		'''
 		if BookType & (1<<IE_SPELL_TYPE_PRIEST): #1
 			allSpells = GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_PRIEST)
 		if BookType & (1<<IE_SPELL_TYPE_WIZARD): #2
 			allSpells += GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_WIZARD)
 		if BookType & (1<<IE_SPELL_TYPE_INNATE): #4
 			allSpells += GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_INNATE)
-
+		'''
 		if not len(allSpells):
 			raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
 			return
 
 	if BookType == -1:
 		memorizedSpells = allSpells
-		# reset Type, so we can choose the surgy spell instead of just getting a redraw of the action bar
+		# reset Type, so we can choose the surge spell instead of just getting a redraw of the action bar
 		GemRB.SetVar("Type", 3)
 	else:
 		memorizedSpells = SortUsableSpells(allSpells)
