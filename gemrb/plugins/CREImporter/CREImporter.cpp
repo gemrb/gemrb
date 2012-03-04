@@ -429,7 +429,6 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 	ieVariable name;
 	ieDword tmpDword, CRESize;
 	ieWord tmpWord;
-	ieByte tmpByte;
 
 	CRESize = GetStoredFileSize (act);
 	switch (CREVersion) {
@@ -496,7 +495,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 		memset(filling,0,sizeof(filling));
 		memcpy(filling,act->PCStats->QuickSpellClass,MAX_QSLOTS);
 		for(i=0;i<MAX_QSLOTS;i++) {
-			if (filling[i]>=0xfe) filling[i]=0;
+			if ( (ieByte) filling[i]>=0xfe) filling[i]=0;
 		}
 		stream->Write( filling, 10);
 	}
