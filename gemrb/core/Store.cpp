@@ -116,7 +116,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		}
 
 		//check if store buys stolen items
-		if ((invflags&IE_INV_ITEM_STOLEN) && !(Type&IE_STORE_FENCE) ) {
+		if ((invflags&IE_INV_ITEM_STOLEN) && !(Flags&IE_STORE_FENCE) ) {
 			ret &= ~IE_STORE_SELL;
 		}
 	}
