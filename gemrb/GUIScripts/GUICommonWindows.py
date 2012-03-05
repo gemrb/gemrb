@@ -423,10 +423,11 @@ def SetupBookSelection ():
 		Button.SetActionIcon (globals(), 50+i)
 	return
 
-skillbar=(ACT_SEARCH, ACT_STEALTH, ACT_THIEVING, ACT_BARDSONG, ACT_TAMING, ACT_WILDERNESS, ACT_TURN, 100, 100, 100, 100, 100)
+#you can change this for custom skills, this is the original engine
+skillbar=(ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, 100, 100, 100, 100, 100, 100, 100)
 
 def SetupSkillSelection ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GameGetFirstSelectedActor ()
 	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
 	return
 
@@ -513,7 +514,7 @@ def UpdateActionsWindow ():
 		GemRB.SetVar ("Type", 511)
 		Spellbook.SetupSpellIcons(CurrentWindow, 511, TopIndex, ActionBarControlOffset)
 	elif level == 8: # shapes selection
-		GemRB.SetVar ("Type", 1024)
+		GemRB.SetVar ("Type", 4)
 		Spellbook.SetupSpellIcons(CurrentWindow, 1024, TopIndex, ActionBarControlOffset)
 	elif level == 9: # songs selection
 		GemRB.SetVar ("Type", 5)

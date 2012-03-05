@@ -8732,7 +8732,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_STEALTH:
 			//don't use level control for this, iwd2 allows everyone to sneak
-			if (!(actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) ) ) {
+			if ((actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) )<=0 ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_STEALTH) {
@@ -8750,7 +8750,12 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_THIEVING:
 			//don't use level control for this, iwd2 allows everyone to steal
-			if (!(actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) ) ) {
+			if ((actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) )<=0 ) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
+		case ACT_TAMING:
+			if (actor->GetStat(IE_ANIMALS)<=0 ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
