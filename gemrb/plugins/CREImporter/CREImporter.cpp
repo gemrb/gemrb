@@ -135,6 +135,7 @@ static int domcount=-1;
 static SpellEntry* maglist=NULL;
 static int magcount=-1;
 
+/* this is not used, but may be useful later
 int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 {
 	int i;
@@ -166,13 +167,16 @@ int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 		}
 		break;
 	case IE_IWD2_SPELL_DOMAIN:
-		return -1;
+		for(i=0;i<domcount;i++) {
+			if (domlist[i].Equals(name) ) return i;
+		}
+		break;
 	default:
 		return -1;
 	}
 	return -1;
 }
-
+*/
 //input: index, level, type, kit
 static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
 {
@@ -229,7 +233,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 
 	for(i=0;i<magcount;i++) {
 		if (maglist[i].Equals(*ret)) {
-			return maglist[i].FindSpell(level, kit);    
+			return maglist[i].FindSpell(level, kit);
 		}
 	}
 	return NULL;
@@ -452,7 +456,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 			tmpDword = 0x68; //headersize
 			TotSCEFF = 0;
 			break;
-		case IE_CRE_V2_2:  //iwd2
+		case IE_CRE_V2_2: //iwd2
 			memcpy(Signature, "CHR V2.2",8);
 			tmpDword = 0x21c; //headersize
 			TotSCEFF = 1;
