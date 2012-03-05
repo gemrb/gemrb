@@ -56,8 +56,10 @@ void Spellbook::InitializeSpellbook()
 		SBInitialized=true;
 		if (core->HasFeature(GF_HAS_SPELLLIST)) {
 			NUM_BOOK_TYPES=NUM_IWD2_SPELLTYPES; //iwd2 spell types
+			IWD2Style = true;
 		} else {
 			NUM_BOOK_TYPES=NUM_SPELLTYPES; //bg/pst/iwd1 spell types
+			IWD2Style = false;
 		}
 	}
 	return;
@@ -180,29 +182,29 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 
 int Spellbook::CountSpells(const char *resref, unsigned int type)
 {
-  int i, max;
-  int count = 0;
+	int i, max;
+	int count = 0;
 
-  if (type==0xffffffff) {
-    i=0;
-    max = NUM_BOOK_TYPES;
-  } else {
-    i = type;
-    max = i+1;
-  }
-  
+	if (type==0xffffffff) {
+		i=0;
+		max = NUM_BOOK_TYPES;
+	} else {
+		i = type;
+		max = i+1;
+	}
+
 	while(i < max) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
-		  CRESpellMemorization* sm = spells[i][j];
-		  for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-			  CREKnownSpell* ks = sm->known_spells[k];
+			CRESpellMemorization* sm = spells[i][j];
+			for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
+				CREKnownSpell* ks = sm->known_spells[k];
 				if (resref[0] && !stricmp(ks->SpellResRef, resref) ) {
-          count++;
-			  }
-		  }
-	  }
-    i++;
-  }
+					count++;
+				}
+			}
+		}
+		i++;
+	}
 	return count;
 }
 

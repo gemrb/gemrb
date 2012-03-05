@@ -5,7 +5,7 @@ UNUSED   *          *	       *           *         0       *         *          
 BARBARIAN           *          *           *         0       *         SKILLS     *        0		0
 BARD                *          *           MXSPLBRD  0       SKILLBRD  SKILLS     *        0		1
 CLERIC              *          MXSPLPRS    *         0       *         SKILLS     *        1		1
-DRUID               *          MXSPLDRU    *         0       *         SKILLS     *        0		1
+DRUID               *          MXSPLDRU    *         0       *         SKILLS     *        0		5
 FIGHTER             *          *           *         0       *         SKILLS     *        0		0
 MONK                *          *           *         0       *         SKILLS     *        0		0
 PALADIN             *          MXSPLPAL    *         0       *         SKILLS     LAYHANDS 5		1
