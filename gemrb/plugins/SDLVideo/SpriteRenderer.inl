@@ -72,6 +72,11 @@ static Region computeClipRect(SDL_Surface* target, const Region* clip,
 
 
 template<typename PTYPE>
+struct SRShadow_NOP {
+	bool operator()(PTYPE&, Uint8, int&, unsigned int) const { return false; }
+};
+
+template<typename PTYPE>
 struct SRShadow_None {
 	bool operator()(PTYPE&, Uint8 p, int&, unsigned int) const { return (p == 1); }
 };
@@ -486,7 +491,7 @@ static void BlitSprite_internal(SDL_Surface* target,
             int width, int /*height*/,
             bool yflip,
             Region clip,
-            Uint8 transindex,
+            int transindex,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
@@ -557,7 +562,7 @@ static void BlitSprite_internal(SDL_Surface* target,
 	while (line != end) {
 		do {
 			Uint8 p = *srcdata++;
-			if (p != transindex) {
+			if ((int)p != transindex) {
 				if (!COVER || !*coverpix) {
 					int extra_alpha = 0;
 					if (!shadow(*pix, p, extra_alpha, flags)) {
@@ -714,21 +719,25 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 // COVER, XFLIP, RLE bools
 // TODO: Add PTYPE?
 template<typename PTYPE, typename Shadow, typename Tinter, typename Blender>
-static void BlitSpriteBAM_dispatch(bool COVER, bool XFLIP,
+static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
             int tx, int ty,
             int width, int height,
             bool yflip,
             const Region& clip,
-            Uint8 transindex,
+            int transindex,
             const SpriteCover* cover,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
-	assert(spr->BAM);
-	Sprite2D_BAM_Internal *data = (Sprite2D_BAM_Internal*)spr->vptr;
-	bool RLE = data->RLE;
+	bool RLE = false;
+	if (spr->BAM) {
+		Sprite2D_BAM_Internal *data = (Sprite2D_BAM_Internal*)spr->vptr;
+		RLE = data->RLE;
+	} else {
+		// Not BAM -> not RLE.
+	}
 
 	if (!COVER && !XFLIP)
 		if (RLE)
