@@ -147,8 +147,7 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	if (yuv) {
 		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
 	} else {
-		//videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_INDEX8, SDL_TEXTUREACCESS_STREAMING, w, h);
-		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB555, SDL_TEXTUREACCESS_STREAMING, w, h);
+		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
 	}
 
 	//setting the subtitle region to the bottom 1/4th of the screen
@@ -173,28 +172,52 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_Rect srcRect = {sx, sy, w, h};
 	SDL_Rect destRect = {dstx, dsty, w, h};
 
-	if (g_truecolor) {
-		// TODO: use SDL_LockTexture instead (its faster i guess)
-		SDL_UpdateTexture(videoPlayer, &destRect, buf, bufw);
-		SDL_RenderCopy(renderer, videoPlayer, &srcRect, &destRect);
-	} else {
-		SDL_Surface* sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0, 0, 0, 0 ); //SDL_PIXELFORMAT_INDEX8
 
-		for (int i = 0; i < 256; i++) {
-			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].unused = 0;
+	Uint8 *src;
+	Uint32 *dst;
+	unsigned int row, col;
+	void *pixels;
+	int pitch;
+	SDL_Color* color;
+
+	SDL_LockTexture(videoPlayer, &destRect, &pixels, &pitch);
+	src = buf;
+	if (g_truecolor) {
+		for (row = 0; row < bufh; ++row) {
+			dst = (Uint32*)((Uint16*)pixels + row * pitch);
+			for (col = 0; col < bufw; ++col) {
+				color->r = ((*src & 0xF8) << 3) | ((*src & 0xF8) >> 2);
+				color->g = ((*src & 0x7E0) << 2) | ((*src & 0x7E0) >> 4);
+				color->b = ((*src & 0x1F) << 3) | ((*src & 0x1F) >> 2);
+				color->unused = 0;
+				// video player texture is of ARGB format. buf is RGB565
+				*dst++ = (0xFF000000|(color->r << 16)|(color->g << 8)|(color->b));
+				src++;
+			}
 		}
-		// I'm sure there is a better way to do this
-		// however, SDL doesnt support 8bit paletted textures
-		SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, sprite);
-		SDL_RenderCopy(renderer, tex, &srcRect, &destRect);
-		SDL_FreeSurface( sprite );
-		SDL_DestroyTexture(tex);
+	} else {
+		SDL_Palette* palette;
+		palette = SDL_AllocPalette(256);
+		for (int i = 0; i < 256; i++) {
+			palette->colors[i].r = ( *pal++ ) << 2;
+			palette->colors[i].g = ( *pal++ ) << 2;
+			palette->colors[i].b = ( *pal++ ) << 2;
+			palette->colors[i].unused = 0;
+		}
+		for (row = 0; row < bufh; ++row) {
+			dst = (Uint32*)((Uint8*)pixels + row * pitch);
+			for (col = 0; col < bufw; ++col) {
+				color = &palette->colors[*src++];
+				// video player texture is of ARGB format
+				*dst++ = (0xFF000000|(color->r << 16)|(color->g << 8)|(color->b));
+			}
+		}
+		SDL_FreePalette(palette);
 	}
+	SDL_UnlockTexture(videoPlayer);
 
 	SDL_RenderFillRect(renderer, &subtitleregion_sdl);
+	SDL_RenderCopy(renderer, videoPlayer, &srcRect, &destRect);
 
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
