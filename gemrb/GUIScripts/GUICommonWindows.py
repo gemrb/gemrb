@@ -423,11 +423,10 @@ def SetupBookSelection ():
 		Button.SetActionIcon (globals(), 50+i)
 	return
 
-#you can change this for custom skills, this is the original engine
-skillbar=(ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, 100, 100, 100, 100, 100, 100, 100)
+skillbar=(ACT_SEARCH, ACT_STEALTH, ACT_THIEVING, ACT_BARDSONG, ACT_TAMING, ACT_WILDERNESS, ACT_TURN, 100, 100, 100, 100, 100)
 
 def SetupSkillSelection ():
-	pc = GemRB.GameGetFirstSelectedActor ()
+	pc = GemRB.GameGetSelectedPCSingle ()
 	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
 	return
 
@@ -499,20 +498,10 @@ def UpdateActionsWindow ():
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		if GUICommon.GameIsIWD2():
-			#iwd2 spellbooks
-			type = 255
-		else:
-			type = 3
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+		Spellbook.SetupSpellIcons(CurrentWindow, 3, TopIndex, ActionBarControlOffset)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		if GUICommon.GameIsIWD2():
-			#iwd2 wildshapes are mixed in with normal innates, and the iwd2 innate slot is different
-			type = 256 + 1024
-		else:
-			type = 4
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+		Spellbook.SetupSpellIcons(CurrentWindow, 4, TopIndex, ActionBarControlOffset)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	elif level == 5: #all known mage spells
@@ -524,7 +513,7 @@ def UpdateActionsWindow ():
 		GemRB.SetVar ("Type", 511)
 		Spellbook.SetupSpellIcons(CurrentWindow, 511, TopIndex, ActionBarControlOffset)
 	elif level == 8: # shapes selection
-		GemRB.SetVar ("Type", 4)
+		GemRB.SetVar ("Type", 1024)
 		Spellbook.SetupSpellIcons(CurrentWindow, 1024, TopIndex, ActionBarControlOffset)
 	elif level == 9: # songs selection
 		GemRB.SetVar ("Type", 5)
@@ -1201,6 +1190,7 @@ def SelectionChanged ():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
+	
 	return
 
 def PortraitButtonOnMouseEnter ():

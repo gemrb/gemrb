@@ -6674,37 +6674,47 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_CountSpells__doc,
-"CountSpells(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of known spells of given type and level in PC's spellbook.");
+"CountSpells(PartyID, SpellName, SpellType, Flag)=>int\n\n"
+"Returns number of memorized spells of given name and type in PC's spellbook.\n"
+"If flag is set then spent spells are also count.");
 
 static PyObject* GemRB_CountSpells(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType = -1;
 	char *SpellResRef;
+	int Flag = 0;
 
-	if (!PyArg_ParseTuple( args, "is|i", &globalID, &SpellResRef, &SpellType)) {
+	if (!PyArg_ParseTuple( args, "is|ii", &globalID, &SpellResRef, &SpellType, &Flag)) {
 		return AttributeError( GemRB_CountSpells__doc );
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	return PyInt_FromLong(actor->spellbook.CountSpells( SpellResRef, SpellType) );
+	return PyInt_FromLong(actor->spellbook.CountSpells( SpellResRef, SpellType, Flag) );
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
 "GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of known spells of given type and level in PC's spellbook.");
+"Returns number of known spells of given type and level in PC's spellbook."
+"If level isn't given, it will return the number of all spells of the given type.");
 
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, SpellType, Level;
+	int globalID, SpellType, Level = -1;
 
-
-	if (!PyArg_ParseTuple( args, "iii", &globalID, &SpellType, &Level)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &globalID, &SpellType, &Level)) {
 		return AttributeError( GemRB_GetKnownSpellsCount__doc );
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
+
+	if (Level<0) {
+		int tmp = 0;
+		for(int i=0;i<9;i++) {
+			tmp += actor->spellbook.GetKnownSpellsCount( SpellType, i );
+		}
+		return PyInt_FromLong(tmp);
+	}
 
 	return PyInt_FromLong(actor->spellbook.GetKnownSpellsCount( SpellType, Level ) );
 }
@@ -8672,11 +8682,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		switch (action) {
 		case ACT_INNATE:
 			if (actor->spellbook.IsIWDSpellBook()) {
-				type = (1<<IE_IWD2_SPELL_INNATE) | (1<<IE_IWD2_SPELL_SHAPE);
+				type = IE_IWD2_SPELL_INNATE;
 			} else {
-				type = 1<<IE_SPELL_TYPE_INNATE;
+				type = IE_SPELL_TYPE_INNATE;
 			}
-			if (!actor->spellbook.GetSpellInfoSize(type)) {
+			if (!actor->spellbook.GetMemorizedSpellsCount(type, true)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -8732,7 +8742,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_STEALTH:
 			//don't use level control for this, iwd2 allows everyone to sneak
-			if ((actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) )<=0 ) {
+			if (!(actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) ) ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_STEALTH) {
@@ -8750,12 +8760,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_THIEVING:
 			//don't use level control for this, iwd2 allows everyone to steal
-			if ((actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) )<=0 ) {
-				state = IE_GUI_BUTTON_DISABLED;
-			}
-			break;
-		case ACT_TAMING:
-			if (actor->GetStat(IE_ANIMALS)<=0 ) {
+			if (!(actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) ) ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;

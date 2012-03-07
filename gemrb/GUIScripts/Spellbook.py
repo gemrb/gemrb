@@ -95,6 +95,49 @@ def GetKnownSpells(actor, BookType):
 
 	return knownSpells
 
+def GetKnownSpells(actor, BookType, level):
+	knownSpells = []
+	spellResRefs = []
+
+	spellCount = GemRB.GetKnownSpellsCount (actor, BookType, level)
+	for i in range (spellCount):
+		Spell0 = GemRB.GetKnownSpell (actor, BookType, level, i)
+		if Spell0["SpellResRef"] in spellResRefs:
+			continue
+		spellResRefs.append (Spell0["SpellResRef"])
+		Spell = GemRB.GetSpell(Spell0["SpellResRef"])
+		Spell['BookType'] = BookType # just another sorting key
+		knownSpells.append (Spell)
+
+	return knownSpells
+
+def index (list, value):
+	for i in range(len(list)):
+		if list[i]==value:
+			return i
+	return -1
+	
+def GetMemorizedSpells(actor, BookType, level):
+	memoSpells = []
+	spellResRefs = []
+
+	spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False)
+	for i in range (spellCount):
+		Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i)
+		pos = index(spellResRefs,Spell0["SpellResRef"])
+		if pos!=-1:
+			memoSpells[pos]['KnownCount']+=1
+			memoSpells[pos]['MemoCount']+=Spell0["Flags"]
+			continue
+
+		spellResRefs.append (Spell0["SpellResRef"])
+		Spell = GemRB.GetSpell(Spell0["SpellResRef"])
+		Spell['KnownCount'] = 1
+		Spell['MemoCount'] = Spell0["Flags"]
+		memoSpells.append (Spell)
+
+	return memoSpells
+
 def SortUsableSpells(memorizedSpells):
 	# sort it by using the spldisp.2da table
 	layout = CommonTables.SpellDisplay.GetValue ("USE_ROW", "ROWS")

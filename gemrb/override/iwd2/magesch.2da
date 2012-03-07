@@ -1,0 +1,12 @@
+2DA V1.0
+-1
+            NAME_REF   DESC_REF   CAP_REF    KIT        
+GENERALIST  18039      9563       9987       0x4000     
+ABJURER     597        9564       502        0x40       
+CONJURER    2179       9565       504        0x80       
+DIVINER     2846       9566       2012       0x100      
+ENCHANTER   2861       9567       2022       0x200      
+ILLUSIONIST 2862       9568       8421       0x400      
+INVOKER     3015       9569       12786      0x800      
+NECROMANCER 12744      9570       12787      0x1000     
+TRANSMUTER  12745      9571       12788      0x2000     

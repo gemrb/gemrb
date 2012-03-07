@@ -180,7 +180,8 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 	return false;
 }
 
-int Spellbook::CountSpells(const char *resref, unsigned int type)
+//returns count of memorized spells of a given name/type
+int Spellbook::CountSpells(const char *resref, unsigned int type, int flag)
 {
 	int i, max;
 	int count = 0;
@@ -196,10 +197,12 @@ int Spellbook::CountSpells(const char *resref, unsigned int type)
 	while(i < max) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
-			for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-				CREKnownSpell* ks = sm->known_spells[k];
-				if (resref[0] && !stricmp(ks->SpellResRef, resref) ) {
-					count++;
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+				CREMemorizedSpell* ms = sm->memorized_spells[k];
+				if (resref[0] && !stricmp(ms->SpellResRef, resref) ) {
+					if (flag || ms->Flags) {
+						count++;
+					}
 				}
 			}
 		}

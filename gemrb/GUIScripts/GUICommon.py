@@ -245,7 +245,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 					print "ERROR, unknown class ability (type): ", ab
 
 def MakeSpellCount (pc, spell, count):
-	have = GemRB.CountSpells (pc, spell)
+	have = GemRB.CountSpells (pc, spell, 1)
 	if count<=have:
 		return
 	for i in range (count-have):
