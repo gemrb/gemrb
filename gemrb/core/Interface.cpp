@@ -1573,7 +1573,7 @@ int Interface::Init()
 		char ChitinPath[_MAX_PATH];
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
-			Log(FATAL, "Core", "Failured to load \"chitin.key\"");
+			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
 			return GEM_ERROR;
 		}
 	}
