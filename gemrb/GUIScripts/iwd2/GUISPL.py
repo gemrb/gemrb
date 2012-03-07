@@ -18,7 +18,7 @@
 #
 
 
-# GUISPL.py - scripts to control priest spells windows from GUIPR winpack
+# GUISPL.py - scripts to control spells windows from GUISPL winpack
 
 ###################################################
 
@@ -140,7 +140,6 @@ def SelectedNewPlayer ():
 	return
 
 def UpdateSpellBookWindow ():
-	#global SpellBookMemorizedSpellList, PriestKnownSpellList
 	global SpellBookSpellLevel
 
 	Window = SpellBookWindow
@@ -169,8 +168,8 @@ def UpdateSpellBookWindow ():
 	#Label.SetText (GemRB.GetString(12137)+str(level+1) )
 
 	Name = GemRB.GetPlayerName (pc, 0)
-	#Label = Window.GetControl (0xffffffff)
-	#Label.SetText (Name)
+	Label = Window.GetControl (0xfffffff)
+	Label.SetText (Name)
 
 	Button = Window.GetControl (1)
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
@@ -185,49 +184,38 @@ def UpdateSpellBookWindow ():
 			ms = Spells[i]
 			spell = ms['SpellResRef']
 			Button.SetSpellIcon (spell)
-			#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
-			#spell = GemRB.GetSpell (ms['SpellResRef'])
 			Button.SetTooltip (ms['SpellName'])
-			#SpellBookMemorizedSpellList.append (ms['SpellResRef'])
 			Button.SetVarAssoc ("SpellButton", i)
-			#c0 = GemRB.CountSpells (pc, spell, type, 0)
-			#c1 = GemRB.CountSpells (pc, spell, type, 1)
-			
-			#tmp = str(c0)+"/"+str(c1)
-			tmp = str(ms['KnownCount'])+"/"+str(ms['MemoCount'])
+			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
 
 	Spells = Spellbook.GetKnownSpells (pc, type, level)
-	Spells = []
 	known_cnt = len (Spells)
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Label = Window.GetControl (0x10000025+i)
 		if i+SpellTopIndex < known_cnt:
-			#ks = GemRB.GetKnownSpell(pc, type, i+SpellTopIndex)
 			ks = Spells[i]
 			spell = ks['SpellResRef']
 			Button.SetSpellIcon (spell)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookMemorizeSpell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenSpellBookSpellInfoWindow)
-			#spell = GemRB.GetSpell (spell)
-			Button.SetTooltip (spell['SpellName'])
+			Label.SetText (ks['SpellName'])
 			Button.SetVarAssoc ("SpellButton", 100 + i)
 		else:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
+			Label.SetText ('')
 
 	#if actor is uncontrollable, make this grayed
 	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
@@ -269,7 +257,7 @@ def SpellBookNextPress ():
 def RefreshSpellBookLevel ():
 	global SpellBookSpellLevel
 
-	SpellBookSpellLevel = GemRB.GetVar ("PriestSpellLevel")
+	SpellBookSpellLevel = GemRB.GetVar ("SpellBookSpellLevel")
 	UpdateSpellBookWindow ()
 	return
 
@@ -328,16 +316,17 @@ def OnSpellBookMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
 	type = SelectedBook
-
+	Window = SpellBookWindow
+	
 	index = GemRB.GetVar ("SpellButton") - 100
 
 	if GemRB.MemorizeSpell (pc, type, level, index + TopIndex):
 		UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_24")
-		Button = PriestWindow.GetControl(index + 30)
+		Button = Window.GetControl(index + 30)
 		Button.SetAnimation ("FLASH")
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-		Button = PriestWindow.GetControl(mem_cnt + 5)
+		Button = Window.GetControl(mem_cnt + 5)
 		Button.SetAnimation ("FLASH")
 	return
 
@@ -422,13 +411,14 @@ def OnSpellBookUnmemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
 	type = SelectedBook
+	Window = SpellBookWindow
 
 	index = GemRB.GetVar ("SpellButton")
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_44")
-		Button = PriestWindow.GetControl(index + 6)
+		Button = Window.GetControl(index + 6)
 		Button.SetAnimation ("FLASH")
 	return
 
