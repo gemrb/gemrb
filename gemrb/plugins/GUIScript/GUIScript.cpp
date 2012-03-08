@@ -8682,11 +8682,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		switch (action) {
 		case ACT_INNATE:
 			if (actor->spellbook.IsIWDSpellBook()) {
-				type = IE_IWD2_SPELL_INNATE;
+				type = type = (1<<IE_IWD2_SPELL_INNATE) | (1<<IE_IWD2_SPELL_SHAPE);
 			} else {
-				type = IE_SPELL_TYPE_INNATE;
+				type = type = 1<<IE_SPELL_TYPE_INNATE;
 			}
-			if (!actor->spellbook.GetMemorizedSpellsCount(type, true)) {
+			if (!actor->spellbook.GetSpellInfoSize(type)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -8742,7 +8742,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_STEALTH:
 			//don't use level control for this, iwd2 allows everyone to sneak
-			if (!(actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) ) ) {
+			if ((actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) )<=0 ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_STEALTH) {
@@ -8759,8 +8759,12 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_THIEVING:
-			//don't use level control for this, iwd2 allows everyone to steal
-			if (!(actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) ) ) {
+			if ((actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) )<=0 ) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
+		case ACT_TAMING:
+			if (actor->GetStat(IE_ANIMALS)<=0 ) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
