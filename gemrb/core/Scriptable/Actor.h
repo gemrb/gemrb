@@ -794,6 +794,8 @@ public:
 	ieDword GetLevelInClass (const ieDword classid) const;
 	/* computes the actor's classmask (iwd2) */
 	int GetClassMask() const;
+	/* computes the actor's usable books (iwd2) */
+	int GetBookMask() const;
 	/* computes the thieving skill bonus from race and dexterity */
 	int GetSkillBonus(unsigned int col) const;
 	/* returns true for party members (and familiars) */

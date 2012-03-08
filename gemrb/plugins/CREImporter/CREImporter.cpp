@@ -57,8 +57,8 @@ static int shpcount=-1;
 
 struct LevelAndKit
 {
-	int level;
-	int kit;
+	unsigned int level;
+	unsigned int kit;
 };
 
 class SpellEntry
@@ -66,10 +66,11 @@ class SpellEntry
 public:
 	~SpellEntry();
 	SpellEntry();
-	const ieResRef *FindSpell(int level, int kit) const;
+	const ieResRef *FindSpell(unsigned int level, unsigned int kit) const;
+	const int FindSpell(unsigned int kit) const;
 	bool Equals(const char *spl) const;
 	void SetSpell(const char *spl);
-	void AddLevel(int level, int kit);
+	void AddLevel(unsigned int level, unsigned int kit);
 private:
 	ieResRef spell;
 	LevelAndKit *levels;
@@ -89,7 +90,7 @@ SpellEntry::~SpellEntry()
 	levels = NULL;
 }
 
-const ieResRef *SpellEntry::FindSpell(int level, int kit) const
+const ieResRef *SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
 {
 	int i = count;
 	while(i--) {
@@ -98,6 +99,17 @@ const ieResRef *SpellEntry::FindSpell(int level, int kit) const
 		}
 	}
 	return NULL;
+}
+
+const int SpellEntry::FindSpell(unsigned int kit) const
+{
+	int i = count;
+	while(i--) {
+		if (levels[i].kit==kit) {
+			return levels[i].level;
+		}
+	}
+	return 0;
 }
 
 bool SpellEntry::Equals(const char *spl) const
@@ -110,7 +122,7 @@ void SpellEntry::SetSpell(const char *spl)
 	strnlwrcpy(spell, spl, 8);
 }
 
-void SpellEntry::AddLevel(int level, int kit)
+void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 {
 	if(!level) {
 		return;
@@ -128,12 +140,89 @@ void SpellEntry::AddLevel(int level, int kit)
 	count++;
 }
 
+static int IsInnate(ieResRef name)
+{
+	for(int i=0;i<inncount;i++) {
+		if(!strnicmp(name, innlist[i], 8) ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static int IsSong(ieResRef name)
+{
+	for(int i=0;i<sngcount;i++) {
+		if(!strnicmp(name, snglist[i], 8) ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static int IsShape(ieResRef name)
+{
+	for(int i=0;i<shpcount;i++) {
+		if(!strnicmp(name, shplist[i], 8) ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 static SpellEntry* spllist=NULL;
 static int splcount=-1;
 static SpellEntry* domlist=NULL;
 static int domcount=-1;
 static SpellEntry* maglist=NULL;
 static int magcount=-1;
+
+static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
+{
+	for(int i=0;i<domcount;i++) {
+		if (domlist[i].Equals(name) ) {
+			level = domlist[i].FindSpell(kit);
+				return i;
+		}
+	}
+	return -1;
+}
+
+static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
+{
+	for(int i=0;i<magcount;i++) {
+		if (maglist[i].Equals(name) ) {
+			level = maglist[i].FindSpell(kit);
+				return i;
+		}
+	}
+	return -1;
+}
+
+static int SpellType(ieResRef name, unsigned short &level, unsigned int clsmsk)
+{
+	for (int i = 0;i<splcount;i++) {
+		if (spllist[i].Equals(name) ) {
+			for(int type=0;type<7;type++) {
+				if (clsmsk & i) {
+					level = spllist[i].FindSpell(type);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit)
+{
+	level = 0;
+	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
+	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
+	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
+	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
+	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
+	return SpellType(name, level, clsmsk);
+}
 
 /* this is not used, but may be useful later
 int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
@@ -1089,7 +1178,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	str->ReadWordSigned( &act->Equipped );
 	//the equipped slot's selected ability is stored here
 	str->ReadWord( &act->EquippedHeader );
-	
+
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating
 	for (i = 0;i<Inventory_Size;) {
@@ -1498,7 +1587,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 				strnlwrcpy(memory->SpellResRef,*tmp,8);
 				sm->memorized_spells.push_back(memory);
 			}
-			
+
 			while(totalcount--) {
 				CREMemorizedSpell *memory = new CREMemorizedSpell;
 				memory->Flags=0;
@@ -2650,7 +2739,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
 	stream->Write( &tmpByte, 1);
 	stream->Write( &actor->SetDeathVar, 1);
-	stream->Write( &actor->IncKillCount, 1);	
+	stream->Write( &actor->IncKillCount, 1);
 	stream->Write( &actor->UnknownField, 1); //unknown
 	for (i=0;i<5;i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];

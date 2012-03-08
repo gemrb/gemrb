@@ -20,8 +20,10 @@
 
 #include "Spellbook.h"
 
+#include "ActorMgr.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 #include "Projectile.h"
 #include "Spell.h"
 #include "TableMgr.h"
@@ -441,30 +443,30 @@ void Spellbook::SetBookType(int bt)
 //wildshapes are marked as innate, they need some hack to get stored
 //in the right group
 //the rest are stored as innate
-int Spellbook::GetSpellType(int spelltype)
-{
-	if (IWD2Style) return spelltype;
 
-	if (spelltype<6) {
-		return spelltypes[spelltype];
-	}
-	return IE_SPELL_TYPE_INNATE;
-}
-
-int Spellbook::LearnSpell(Spell *spell, int memo)
+int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
 	strncpy(spl->SpellResRef, spell->Name, 8);
-	spl->Type = (ieWord) GetSpellType(spell->SpellType);
-	if ( spl->Type == IE_SPELL_TYPE_INNATE) {
-		spl->Level = 0;
-	}
-	else {
-		spl->Level = (ieWord) (spell->SpellLevel-1);
-	}
+  spl->Level = 0;
+  if (IWD2Style) {
+    PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
+    spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
+    return spell->SpellLevel;
+  }
+
+  //not IWD2
+	if (spell->SpellType<6) {
+		spl->Type = spelltypes[spell->SpellType];
+    spl->Level = spell->SpellLevel-1;
+  } else {
+    spl->Type = IE_SPELL_TYPE_INNATE;
+  }
+
 	bool ret=AddKnownSpell(spl, memo);
 	if (!ret) {
 		delete spl;
+    return 0;
 	}
 	return spell->SpellLevel; // return only the spell level (xp is based on xpbonus)
 }

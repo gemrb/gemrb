@@ -183,6 +183,10 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 	ISCLASS12, ISCLASS13};
 //this map could probably be auto-generated (isClass -> IWD2 class ID)
 static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
+//this map could probably be auto-generated (isClass -> IWD2 book ID)
+static const unsigned int booksiwd2[ISCLASSES]={0, 1<<IE_IWD2_SPELL_WIZARD, 0, 0, 
+ 1<<IE_IWD2_SPELL_BARD, 1<<IE_IWD2_SPELL_CLERIC, 1<<IE_IWD2_SPELL_DRUID, 0,
+ 1<<IE_IWD2_SPELL_PALADIN, 1<<IE_IWD2_SPELL_RANGER, 1<<IE_IWD2_SPELL_SORCEROR, 0, 0};
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
@@ -4861,13 +4865,15 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		flags|=LS_MEMO;
 	}
 
+	ieDword kit = GetStat(IE_KIT);
+
 	if (flags & LS_STATS) {
 		// chance to learn roll
 		int roll = LuckyRoll(1, 100, 0);
 		// adjust the roll for specialist mages
 		// doesn't work in bg1, since its spells don't have PrimaryType set (0 is NONE)
-		if (GetKitIndex(BaseStats[IE_KIT]) && spell->PrimaryType) {
-			if ((signed)BaseStats[IE_KIT] == 1<<(spell->PrimaryType+5)) { // +5 since the kit values start at 0x40
+		if (GetKitIndex(kit) && spell->PrimaryType) {
+			if (kit == (unsigned) 1<<(spell->PrimaryType+5)) { // +5 since the kit values start at 0x40
 				roll += 15;
 			} else {
 				roll -= 15;
@@ -4879,7 +4885,8 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		}
 	}
 
-	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO);
+	int clsmsk = GetBookMask();
+	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, clsmsk, kit );
 	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
@@ -8252,6 +8259,18 @@ int Actor::GetClassMask() const
 	for (int i=0; i < ISCLASSES; i++) {
 		if (Modified[levelslotsiwd2[i]] > 0) {
 			classmask |= 1<<(classesiwd2[i]-1);
+		}
+	}
+
+	return classmask;
+}
+
+int Actor::GetBookMask() const
+{
+	int classmask = 0;
+	for (int i=0; i < ISCLASSES; i++) {
+		if (Modified[levelslotsiwd2[i]] > 0) {
+			classmask |= 1<<(booksiwd2[i]-1);
 		}
 	}
 

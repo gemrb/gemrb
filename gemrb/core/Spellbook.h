@@ -8,7 +8,7 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
@@ -99,10 +99,10 @@ struct CREMemorizedSpell {
 };
 
 struct CRESpellMemorization {
-	ieWord  Level;
-	ieWord  Number;
-	ieWord  Number2;
-	ieWord  Type;
+	ieWord Level;
+	ieWord Number;
+	ieWord Number2;
+	ieWord Type;
 
 	std::vector<CREKnownSpell*> known_spells;
 	std::vector<CREMemorizedSpell*> memorized_spells;
@@ -111,7 +111,7 @@ struct CRESpellMemorization {
 struct SpellExtHeader {
 	ieDword level;
 	ieDword count;
-	ieDword type;          //spelltype
+	ieDword type; //spelltype
 	ieDword headerindex;
 	ieDword slot;
 	//these come from the header
@@ -124,7 +124,7 @@ struct SpellExtHeader {
 	ieWord CastingTime;
 	//other data
 	ieResRef spellname;
-	ieDword strref;       //the spell's name
+	ieDword strref; //the spell's name
 };
 
 /**
@@ -195,10 +195,8 @@ public:
 
 	/** sets the book type */
 	void SetBookType(int clss);
-	/** returns the page number for the spelltype */
-	static int GetSpellType(int spelltype);
 	/** adds a spell to the book, returns experience if learned */
-	int LearnSpell(Spell *spell, int memo);
+	int LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type, bool real) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level, bool real) const;
