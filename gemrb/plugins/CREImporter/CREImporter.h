@@ -69,7 +69,7 @@ public:
 	bool Open(DataStream* stream);
 	Actor* GetActor(unsigned char is_in_party);
 
-	int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit);
+  int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const;
 	//returns saved size, updates internal offsets before save
 	int GetStoredFileSize(Actor *ac);
 	//saves file

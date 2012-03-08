@@ -67,7 +67,7 @@ public:
 	~SpellEntry();
 	SpellEntry();
 	const ieResRef *FindSpell(unsigned int level, unsigned int kit) const;
-	const int FindSpell(unsigned int kit) const;
+	int FindSpell(unsigned int kit) const;
 	bool Equals(const char *spl) const;
 	void SetSpell(const char *spl);
 	void AddLevel(unsigned int level, unsigned int kit);
@@ -101,7 +101,7 @@ const ieResRef *SpellEntry::FindSpell(unsigned int level, unsigned int kit) cons
 	return NULL;
 }
 
-const int SpellEntry::FindSpell(unsigned int kit) const
+int SpellEntry::FindSpell(unsigned int kit) const
 {
 	int i = count;
 	while(i--) {
@@ -213,7 +213,7 @@ static int SpellType(ieResRef name, unsigned short &level, unsigned int clsmsk)
 	return 0;
 }
 
-int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit)
+int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
 	level = 0;
 	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
