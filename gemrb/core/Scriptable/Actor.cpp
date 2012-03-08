@@ -382,6 +382,8 @@ Actor::Actor()
 	LongStrRef = (ieStrRef) -1;
 	ShortStrRef = (ieStrRef) -1;
 
+	playedCommandSound = false;
+
 	PCStats = NULL;
 	LastDamage = 0;
 	LastDamageType = 0;
@@ -3109,13 +3111,14 @@ bool Actor::GetPartyComment()
 }
 
 //call this only from gui selects
-void Actor::SelectActor() const
+void Actor::SelectActor()
 {
+	playedCommandSound = false;
 	switch (sel_snd_freq) {
 		case 0:
 			return;
 		case 1:
-			if (core->Roll(1,100,0) > 25) return;
+			if (core->Roll(1,100,0) > 20) return;
 		default:;
 	}
 
@@ -3137,13 +3140,14 @@ void Actor::SelectActor() const
 #define SEL_ACTION_COUNT_ALL     7
 
 //call this when a PC receives a command from GUI
-void Actor::CommandActor() const
+void Actor::CommandActor()
 {
 	switch (cmd_snd_freq) {
 		case 0:
 			return;
 		case 1:
-			if (core->Roll(1,100,0)>25) return;
+			if (playedCommandSound) return;
+			playedCommandSound = true;
 		case 2:
 			//PST has 4 states and rare sounds
 			if (raresnd) {

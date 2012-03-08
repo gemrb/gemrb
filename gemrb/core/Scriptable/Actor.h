@@ -337,6 +337,8 @@ private:
 	CharAnimations* anims;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
+	// true when command has been played after select
+	bool playedCommandSound;
 	//true every second round of attack
 	bool secondround;
 	int attacksperround;
@@ -485,9 +487,9 @@ public:
 	/* receives undead turning message */
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
-	void SelectActor() const;
+	void SelectActor();
 	/* call this when adding actions via gui */
-	void CommandActor() const;
+	void CommandActor();
 	/** handle panic and other involuntary actions that mess with scripting */
 	bool OverrideActions();
 	/** handle idle actions, that shouldn't mess with scripting */

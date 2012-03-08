@@ -496,12 +496,12 @@ def OpenCharacterSoundsWindow ():
 	OptCheckbox ('Subtitles', Window, 5, 20, 'Subtitles', 1)
 	OptCheckbox ('AttackSounds', Window, 6, 18, 'Attack Sounds', 1)
 	OptCheckbox ('Footsteps', Window, 7, 19, 'Footsteps', 1)
-	OptRadio ('CommandSounds', Window, 8, 21, 'Command Sounds Frequency', 1)
-	OptRadio ('CommandSounds', Window, 9, 21, 'Command Sounds Frequency', 2)
-	OptRadio ('CommandSounds', Window, 10, 21, 'Command Sounds Frequency', 3)
-	OptRadio ('SelectionSounds', Window, 58, 57, 'Selection Sounds Frequency', 1)
-	OptRadio ('SelectionSounds', Window, 59, 57, 'Selection Sounds Frequency', 2)
-	OptRadio ('SelectionSounds', Window, 60, 57, 'Selection Sounds Frequency', 3)
+	OptRadio ('CommandSounds', Window, 8, 21, 'Command Sounds Frequency', 2)
+	OptRadio ('CommandSounds', Window, 9, 21, 'Command Sounds Frequency', 1)
+	OptRadio ('CommandSounds', Window, 10, 21, 'Command Sounds Frequency', 0)
+	OptRadio ('SelectionSounds', Window, 58, 57, 'Selection Sounds Frequency', 2)
+	OptRadio ('SelectionSounds', Window, 59, 57, 'Selection Sounds Frequency', 1)
+	OptRadio ('SelectionSounds', Window, 60, 57, 'Selection Sounds Frequency', 0)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def DisplayHelpSubtitles ():
