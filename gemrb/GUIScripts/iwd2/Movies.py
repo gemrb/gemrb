@@ -37,7 +37,9 @@ def OnLoad():
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
 	for i in range(0, MoviesTable.GetRowCount() ):
 		t = MoviesTable.GetRowName(i)
-		if GemRB.GetVar(t)==1:
+		#temporarily out
+		#if GemRB.GetVar(t)==1:
+		if 1==1:
 			s = MoviesTable.GetValue(i, 0)
 			TextAreaControl.Append(s,-1)
 	TextAreaControl.SetVarAssoc("MovieIndex",0)
@@ -57,10 +59,12 @@ def PlayPress():
 	s = GemRB.GetVar("MovieIndex")
 	for i in range(0, MoviesTable.GetRowCount() ):
 		t = MoviesTable.GetRowName(i)
-		if GemRB.GetVar(t)==1:
+		#temporarily out too (change simultaneously with previous)
+		#if GemRB.GetVar(t)==1:
+		if 1==1:
 			if s==0:
 				s = MoviesTable.GetRowName(i)
-				GemRB.PlayMovie(s, 1)
+				GemRB.PlayMovie(s,0)
 				MovieWindow.Invalidate()
 				return
 			s = s - 1
