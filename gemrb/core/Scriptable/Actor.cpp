@@ -5072,7 +5072,7 @@ ieDword Actor::GetNumberOfAttacks() const
 {
 	int bonus = 0;
 
-	if (Equipped == IW_NO_EQUIPPED) {
+	if (monkbon != NULL && Equipped == IW_NO_EQUIPPED) {
 		unsigned int level = GetMonkLevel();
 		if (level>=monkbon_cols) level=monkbon_cols-1;
 		if (level>0) {
