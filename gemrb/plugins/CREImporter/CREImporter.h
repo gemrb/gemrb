@@ -69,7 +69,8 @@ public:
 	bool Open(DataStream* stream);
 	Actor* GetActor(unsigned char is_in_party);
 
-  int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const;
+	int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const;
+
 	//returns saved size, updates internal offsets before save
 	int GetStoredFileSize(Actor *ac);
 	//saves file
@@ -88,6 +89,7 @@ private:
 	void GetActorBG(Actor *actor);
 	void GetActorIWD1(Actor *actor);
 	void GetActorIWD2(Actor *actor);
+	ieDword GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, int level) const;
 	void GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count);
 	void ReadInventory(Actor*, unsigned int);
 	void ReadEffects(Actor* actor);
@@ -106,6 +108,7 @@ private:
 	int PutActorBG(DataStream *stream, Actor *actor);
 	int PutActorIWD1(DataStream *stream, Actor *actor);
 	int PutActorIWD2(DataStream *stream, Actor *actor);
+	int PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level);
 	int PutKnownSpells(DataStream *stream, Actor *actor);
 	int PutSpellPages(DataStream *stream, Actor *actor);
 	int PutMemorizedSpells(DataStream *stream, Actor *actor);

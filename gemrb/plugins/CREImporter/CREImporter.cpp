@@ -224,7 +224,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	return SpellType(name, level, clsmsk);
 }
 
-/* this is not used, but may be useful later
+//int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
 int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 {
 	int i;
@@ -261,11 +261,13 @@ int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 		}
 		break;
 	default:
-		return -1;
+		for(i=0;i<splcount;i++) {
+			if (spllist[i].Equals(name) ) return i;
+		}
 	}
 	return -1;
 }
-*/
+
 //input: index, level, type, kit
 static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
 {
@@ -1242,7 +1244,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				memorized_spells[k] = NULL;
 				continue;
 			}
-			print("[CREImporter]: Duplicate memorized spell(%d) in creature!", k);
+			Log(WARNING, "CREImporter", "Duplicate memorized spell(%d) in creature!", k);
 		}
 	}
 
@@ -2139,9 +2141,17 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	KnownSpellsOffset = headersize;
 
 	if (actor->version==IE_CRE_V2_2) { //iwd2
-		//adding spellbook header sizes
-		//class spells, domains, (shapes,songs,innates)
-		headersize += 7*9*8 + 9*8 + 3*8;
+		int type, level;
+
+		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
+			headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level)*16+8;
+		}
+		for(level=0;level<9;level++) {
+			headersize += GetIWD2SpellpageSize(actor, IE_IWD2_SPELL_DOMAIN, level)*16+8;
+		}
+		for (type=IE_IWD2_SPELL_INNATE;type<NUM_IWD2_SPELLTYPES;type++) {
+			headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, 0)*16+8;
+		}
 	} else {//others
 		//adding known spells
 		KnownSpellsCount = actor->spellbook.GetTotalKnownSpellsCount();
@@ -2923,6 +2933,39 @@ int CREImporter::PutVariables( DataStream *stream, Actor *actor)
 	return 0;
 }
 
+//Don't forget to add 8 for the totals/bonus fields
+ieDword CREImporter::GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, int level) const
+{
+	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
+	ieDword cnt = sm->known_spells.size();
+	return cnt;
+}
+
+int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level)
+{
+	ieDword ID, max, known;
+
+	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
+	for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
+		CREKnownSpell *ck = sm->known_spells[k];
+		ID = ResolveSpellName(ck->SpellResRef, level, type);
+		stream->WriteDword ( &ID);
+		max = actor->spellbook.CountSpells(ck->SpellResRef, type, 1);
+		known = actor->spellbook.CountSpells(ck->SpellResRef, type, 0);
+		stream->WriteDword ( &max);
+		stream->WriteDword ( &known);
+		//unknown field (always 0)
+		known = 0;
+		stream->WriteDword (&known);
+	}
+
+	max = sm->Number;
+	known = sm->Number2;
+	stream->WriteDword ( &max);
+	stream->WriteDword ( &known);
+	return 0;
+}
+
 /* this function expects GetStoredFileSize to be called before */
 int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 {
@@ -2978,30 +3021,35 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 		return ret;
 	}
 
-	//writing offsets
+	//writing offsets and counts
 	if (actor->version==IE_CRE_V2_2) {
-		int i;
+		int type, level;
 
 		//class spells
-		for (i=0;i<7*9;i++) {
+		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
+			tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level);
 			stream->WriteDword(&KnownSpellsOffset);
-			KnownSpellsOffset+=8;
+			KnownSpellsOffset+=tmpDword*16+8;
 		}
-		for (i=0;i<7*9;i++) {
+		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
+			tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level);
 			stream->WriteDword(&tmpDword);
 		}
 		//domain spells
-		for (i=0;i<9;i++) {
+		for (level=0;level<9;level++) {
+			tmpDword = GetIWD2SpellpageSize(actor, IE_IWD2_SPELL_DOMAIN, level);
 			stream->WriteDword(&KnownSpellsOffset);
-			KnownSpellsOffset+=8;
+			KnownSpellsOffset+=tmpDword*16+8;
 		}
-		for (i=0;i<9;i++) {
+		for (level=0;level<9;level++) {
+			tmpDword = GetIWD2SpellpageSize(actor, IE_IWD2_SPELL_DOMAIN, level);
 			stream->WriteDword(&tmpDword);
 		}
 		//innates, shapes, songs
-		for (i=0;i<3;i++) {
+		for (type=IE_IWD2_SPELL_INNATE;type<NUM_IWD2_SPELLTYPES;type++) {
+			tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, 0);
 			stream->WriteDword(&KnownSpellsOffset);
-			KnownSpellsOffset+=8;
+			KnownSpellsOffset+=tmpDword*16+8;
 			stream->WriteDword(&tmpDword);
 		}
 	} else {
@@ -3023,22 +3071,21 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 	//spells, spellbook etc
 
 	if (actor->version==IE_CRE_V2_2) {
-		int i;
+		int type, level;
 
-		//putting out book headers
-		for (i=0;i<7*9;i++) {
-			stream->WriteDword(&tmpDword);
-			stream->WriteDword(&tmpDword);
+		//writing out spell page headers
+		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
+			PutIWD2Spellpage(stream, actor, (ieIWD2SpellType) type, level);
 		}
-		//domain headers
-		for (i=0;i<9;i++) {
-			stream->WriteDword(&tmpDword);
-			stream->WriteDword(&tmpDword);
+
+		//writing out domain page headers
+		for (level=0;level<9;level++) {
+			PutIWD2Spellpage(stream, actor, IE_IWD2_SPELL_DOMAIN, level);
 		}
+
 		//innates, shapes, songs
-		for (i=0;i<3;i++) {
-			stream->WriteDword(&tmpDword);
-			stream->WriteDword(&tmpDword);
+		for (type = IE_IWD2_SPELL_INNATE; type<NUM_IWD2_SPELLTYPES; type ++) {
+			PutIWD2Spellpage(stream, actor, (ieIWD2SpellType) type, 0);
 		}
 	} else {
 		assert(stream->GetPos() == CREOffset+KnownSpellsOffset);
