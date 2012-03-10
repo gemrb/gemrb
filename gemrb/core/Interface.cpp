@@ -5310,8 +5310,11 @@ int Interface::GetDexterityBonus(int column, int value) const
 
 int Interface::GetConstitutionBonus(int column, int value) const
 {
-	//no conmod in iwd2
+	//no conmod in iwd2 and also no regenation bonus
 	if (HasFeature(GF_3ED_RULES)) {
+		if (column == STAT_CON_HP_REGEN) {
+			return 0;
+		}
 		return value/2-5;
 	}
 
