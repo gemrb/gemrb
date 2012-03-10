@@ -5206,7 +5206,10 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//or i just got lost a negation somewhere
 		THAC0Bonus -= 4;
 	} else {
-		THAC0Bonus += wspecial[stars][0];
+		// everyone is proficient with fists
+		if (Equipped != IW_NO_EQUIPPED) {
+			THAC0Bonus += wspecial[stars][0];
+		}
 	}
 	DamageBonus += wspecial[stars][1];
 	speed += wspecial[stars][2];
