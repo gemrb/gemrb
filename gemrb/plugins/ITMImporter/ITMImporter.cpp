@@ -48,7 +48,7 @@ static void Initializer()
 	profcount = tm->GetRowCount();
 	profs = (int *) calloc( profcount, sizeof(int) );
 	for (int i = 0; i < profcount; i++) {
-		profs[i] = atoi(tm->QueryField( i, 1 ) );
+		profs[i] = atoi(tm->QueryField( i, 0 ) );
 	}
 }
 
