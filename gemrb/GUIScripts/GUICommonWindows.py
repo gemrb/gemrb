@@ -1074,7 +1074,7 @@ def UpdatePortraitWindow ():
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		ratio_str = GUICommon.SetupDamageInfo (portid+1, Button)
+		ratio_str = GUICommon.SetupDamageInfo (portid+1, Button, Window)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (portid+1)

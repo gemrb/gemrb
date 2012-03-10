@@ -715,7 +715,7 @@ def IsWarrior (actor):
 
 	return IsWarrior
 
-def SetupDamageInfo (pc, Button):
+def SetupDamageInfo (pc, Button, Window):
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	hp_max = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	state = GemRB.GetPlayerStat (pc, IE_STATE_ID)
@@ -727,8 +727,33 @@ def SetupDamageInfo (pc, Button):
 
 	if hp < 1 or (state & STATE_DEAD):
 		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
+
+	if GemRB.GetVar("Old Portrait Health") or not GameIsIWD2():
+		# draw the blood overlay
+		if hp >= 1 and not (state & STATE_DEAD):
+			Button.SetOverlay (ratio, 160,0,0,200, 60,0,0,190)
 	else:
-		Button.SetOverlay (ratio, 160,0,0,200, 60,0,0,190)
+		# scale the hp bar under the portraits and recolor it
+		# GUIHITPT has 5 frames with different severity colors
+		# luckily their ids follow a nice pattern
+		hpBar = Window.GetControl (pc-1 + 50)
+		if ratio == 1:
+			# white
+			hpBar.SetBAM ("GUIHITPT", 0, 0)
+		elif ratio < 1 and ratio >= 0.75:
+			# green
+			hpBar.SetBAM ("GUIHITPT", 1, 0)
+		elif ratio < 0.75 and ratio >= 0.50:
+			# yellow
+			hpBar.SetBAM ("GUIHITPT", 2, 0)
+		elif ratio < 0.50 and ratio >= 0.25:
+			# orange
+			hpBar.SetBAM ("GUIHITPT", 3, 0)
+		else:
+			# red
+			hpBar.SetBAM ("GUIHITPT", 4, 0)
+		hpBar.SetPictureClipping (ratio)
+
 	ratio_str = "\n%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 
