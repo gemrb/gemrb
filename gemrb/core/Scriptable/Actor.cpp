@@ -871,7 +871,9 @@ void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	actor->InitButtons(newValue, true);
+	if (!core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+		actor->InitButtons(newValue, true);
+	}
 
 	int sorcerer=0;
 	if (newValue<(ieDword) classcount) {
