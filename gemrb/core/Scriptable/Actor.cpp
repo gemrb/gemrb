@@ -871,7 +871,7 @@ void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	actor->InitButtons(newValue, true);
+	actor->InitButtons(newValue, false);
 
 	int sorcerer=0;
 	if (newValue<(ieDword) classcount) {
