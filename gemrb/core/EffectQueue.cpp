@@ -49,6 +49,7 @@ static int initialized = 0;
 static EffectDesc *effectnames = NULL;
 static int effectnames_count = 0;
 static int pstflags = false;
+static bool iwd2fx = false;
 
 bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 {
@@ -207,6 +208,7 @@ bool Init_EffectQueue()
 		return true;
 	}
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
+	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 
 	memset( Opcodes, 0, sizeof( Opcodes ) );
 	for(i=0;i<MAX_EFFECTS;i++) {
@@ -1741,14 +1743,13 @@ int EffectQueue::DisabledSpellcasting(int types) const
 	}
 
 	unsigned int spelltype_mask = 0;
-	bool iwd2 = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 	ieDword opcode = fx_disable_spellcasting_ref.opcode;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
 
-		if (iwd2) {
+		if (iwd2fx) {
 			switch((*f)->Parameter2) {
 				case 0: // all
 					spelltype_mask |= 7;
