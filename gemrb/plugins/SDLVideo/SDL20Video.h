@@ -30,18 +30,6 @@ private:
 	SDL_Texture* videoPlayer;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
-/*
- Ivars for touch input.
- Most of these are temporary until touch input is rewritten to be independant of mouse events.
-*/
-	bool ignoreNextMouseUp;
-	Uint16 numFingers;
-	bool formationRotation;
-	bool touchHold;
-	Uint32 touchHoldTime;
-	// fake mouse events
-	SDL_MouseButtonEvent rightMouseDownEvent;
-	SDL_MouseButtonEvent rightMouseUpEvent;
 
 	// touch input vars
 	bool ignoreNextFingerUp;
