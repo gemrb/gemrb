@@ -420,16 +420,28 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			if (EvntManager && numFingers != core->NumFingInfo) {
 				EvntManager->KeyRelease( GEM_ALT, 0 );
+			break;
+		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
+			// purposely ignore processing first touch here. I think users ould find it annoying
+			// to attempt a gesture and accidently command a party movement etc
+			if (firstFingerDown.fingerId && numFingers == 2
+				&& EvntManager->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL) {
+				/* formation rotation gesture:
+				 first touch with a single finger to obtain the pivot
+				 then touch and drag with a second finger (while maintaining contact with first)
+				 to move the application point
+				 */
+				GameControl* gc = core->GetGameControl();
+				if (gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
+					ProcessFirstTouch(GEM_MB_MENU);
+					SDL_Finger* secondFinger = state->fingers[1];
+					gc->OnMouseOver(secondFinger->x + Viewport.x, secondFinger->y + Viewport.y);
+				}
+			} else {
+				ProcessFirstTouch(GEM_MB_ACTION);
 			}
 			break;
-			//multitouch gestures
-		case SDL_MULTIGESTURE://SDL 1.3+
-			// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
-			numFingers = event.mgesture.numFingers;
 			/*
-			 // perhaps formation rotation should be implemented here as a rotate gesture.
-			 if (Evnt->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL && numFingers == 2) {
-			 }
 			 */
 			break;
 		/* not user input event */
