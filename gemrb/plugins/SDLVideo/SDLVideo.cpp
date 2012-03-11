@@ -34,9 +34,7 @@
 #include "Polygon.h"
 #include "SpriteCover.h"
 #include "GUI/Console.h"
-#include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
 #include "GUI/Window.h"
-
 
 #include <cmath>
 #include <cassert>
