@@ -214,10 +214,10 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 	return NULL;
 }
 
-//some stores can recharge items
+//some stores can recharge items - in original engine apparently all stores
+//did this. In gemrb there is a flag.
 void Store::RechargeItem(CREItem *item)
 {
-//is there any flag which store can recharge?
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		return;
@@ -226,7 +226,12 @@ void Store::RechargeItem(CREItem *item)
 		item->Flags |= IE_INV_ITEM_IDENTIFIED;
 	}
 	//gemrb extension, some shops won't recharge items
-	if (!(Flags&IE_STORE_RECHARGE)) {
+	//containers' behaviour is inverted
+	//bag      0   1   0   1
+	//flag     0   0   1   1
+	//recharge 1   0   0   1
+	bool bag = (Type==STT_BG2CONT || Type==STT_IWD2CONT);
+	if (bag != !(Flags&IE_STORE_RECHARGE)) {
 		for (int i=0;i<CHARGE_COUNTERS;i++) {
 			ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
