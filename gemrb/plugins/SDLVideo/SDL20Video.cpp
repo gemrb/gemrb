@@ -81,6 +81,8 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	rightMouseUpEvent.type = SDL_MOUSEBUTTONUP;
 	rightMouseUpEvent.button = SDL_BUTTON_RIGHT;
 	rightMouseUpEvent.state = SDL_RELEASED;
+	ignoreNextFingerUp = false;
+	firstFingerDown = SDL_TouchFingerEvent();
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -288,6 +290,16 @@ int SDL20VideoDriver::PollEvents()
 	return SDLVideoDriver::PollEvents();
 }
 
+void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
+{
+	if (firstFingerDown.fingerId) {
+		// no need to scale these coordinates. they were scaled previously for us.
+		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
+								mouseButton, GetModState(SDL_GetModState()) );
+		firstFingerDown = SDL_TouchFingerEvent();
+		ignoreNextFingerUp = false;
+	}
+}
 
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {

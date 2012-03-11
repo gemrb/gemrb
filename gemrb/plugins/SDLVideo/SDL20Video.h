@@ -42,6 +42,10 @@ private:
 	// fake mouse events
 	SDL_MouseButtonEvent rightMouseDownEvent;
 	SDL_MouseButtonEvent rightMouseUpEvent;
+
+	// touch input vars
+	bool ignoreNextFingerUp;
+	SDL_TouchFingerEvent firstFingerDown;
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
@@ -71,6 +75,9 @@ private:
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);
+	// the first finger touch of a gesture is delayed until another touch event or until
+	// enough time passes for it to become a right click
+	void ProcessFirstTouch( int mouseButton );
 };
 
 }
