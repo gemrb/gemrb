@@ -20,6 +20,7 @@
 
 #include "EffectQueue.h"
 
+#include "ie_feats.h"
 #include "overlays.h"
 #include "strrefs.h"
 
@@ -1009,7 +1010,21 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
-	if( (signed) fx->random_value < (signed) val) {
+	bool resisted = false;
+	if (iwd2fx) {
+		// 3ed style check
+		// TODO: check if luck really affects it
+		ieDword check = fx->CasterLevel + actor->LuckyRoll(1, 20, 0);
+		// +2/+4 level bonus from the (greater) spell penetration feat
+		if (actor->HasFeat(FEAT_SPELL_PENETRATION)) {
+			check += 2 * actor->GetStat(IE_FEAT_SPELL_PENETRATION);
+		}
+		resisted = (signed) check < (signed) val;
+	} else {
+		// 2.5 style check
+		resisted = (signed) fx->random_value < (signed) val;
+	}
+	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
 		Log(MESSAGE, "EffectQueue", "effect resisted: %s", (char*) Opcodes[fx->Opcode].Name);
