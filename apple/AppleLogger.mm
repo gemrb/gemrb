@@ -18,6 +18,8 @@
 
 #if TARGET_OS_IPHONE
 #import <Uikit/UIAlertView.h>
+#elif TARGET_OS_MAC
+#import <Cocoa/Cocoa.h>
 #endif
 
 #include "AppleLogger.h"
@@ -43,10 +45,12 @@ void AppleLogger::log(log_level level, const char* owner, const char* message, l
 {
 	if (level == FATAL) {
 		// display a GUI alert for FATAL errors
+		NSString* alertTitle = [NSString stringWithFormat:@"Fatal Error in %s", owner];
+		NSString* alertMessage = [NSString stringWithCString:message encoding:NSASCIIStringEncoding];
 #if TARGET_OS_IPHONE
 		UIAlertView *alert =
-		[[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Fatal Error in %s", owner]
-								   message: [NSString stringWithCString:message encoding:NSASCIIStringEncoding]
+		[[UIAlertView alloc] initWithTitle: alertTitle
+								   message: alertMessage
 								  delegate: nil
 						 cancelButtonTitle: @"OK"
 						 otherButtonTitles: nil];
@@ -55,6 +59,8 @@ void AppleLogger::log(log_level level, const char* owner, const char* message, l
 			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 		}
 		[alert release];
+#elif TARGET_OS_MAC
+		NSRunAlertPanel(alertTitle, alertMessage, @"OK", nil, nil);
 #endif
 	}
 	StdioLogger::log(level, owner, message, color);
