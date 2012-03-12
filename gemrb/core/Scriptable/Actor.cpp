@@ -871,9 +871,9 @@ void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	if (!core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
-		actor->InitButtons(newValue, true);
-	}
+	//Call forced initbuttons in old style systems, and soft initbuttons
+	//in case of iwd2. Maybe we need a custom quickslots flag here.
+	actor->InitButtons(newValue, !core->HasFeature(GF_LEVELSLOT_PER_CLASS));
 
 	int sorcerer=0;
 	if (newValue<(ieDword) classcount) {
