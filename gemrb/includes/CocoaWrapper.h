@@ -23,21 +23,28 @@
  Because this file is shared between the CocoaWrapper object and plugins extending it we need to keep it
  in the gemrb/includes directory.
 */
+#if __cplusplus
+extern "C" {
+#define COCOA_EXPORT extern "C" __attribute__ ((visibility("default")))
+#else
+#define COCOA_EXPORT __attribute__ ((visibility("default")))
+#endif
 
 #import <Cocoa/Cocoa.h>
 
-#import "exports.h"
-
-extern int GemRB_main(int argc, char *argv[]);
-
-GEM_EXPORT
+COCOA_EXPORT
 @interface CocoaWrapper : NSObject
 #if __MAC_OS_X_VERSION_MIN_REQUIRED > 1050
 <NSApplicationDelegate>
 #endif
 {
+	// not adding any ivars
 }
 // Override these application delegate methods in plugin categories
 - (void)applicationWillTerminate:(NSNotification *)aNotification;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
 @end
+
+#if __cplusplus
+}   // Extern C
+#endif
