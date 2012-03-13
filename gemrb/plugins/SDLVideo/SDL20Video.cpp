@@ -26,7 +26,6 @@
 
 #if TARGET_OS_IPHONE
 extern "C" {
-	#include "SDL_sysvideo.h"
 	#include <SDL/uikit/SDL_uikitkeyboard.h>
 }
 #endif
@@ -91,8 +90,8 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	}
 
 	Viewport.x = Viewport.y = 0;
-	width = window->w;
-	height = window->h;
+	SDL_GetWindowSize(window, &width, &height);
+
 	Viewport.w = width;
 	Viewport.h = height;
 
@@ -109,8 +108,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 
 void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 {
-	w = window->w;
-	h = window->h;
+	SDL_GetWindowSize(window, &w, &h);
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
@@ -268,8 +266,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	int numFingers = 0;
 	if(state){
 		numFingers = state->num_fingers;
-		xScaleFactor = state->xres / window->w;
-		yScaleFactor = state->yres / window->h;
+		int w, h;
+		SDL_GetWindowSize(window, &w, &h);
+		xScaleFactor = state->xres / w;
+		yScaleFactor = state->yres / h;
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
@@ -464,7 +464,7 @@ void SDL20VideoDriver::ShowSoftKeyboard()
 {
 	if(core->UseSoftKeyboard){
 #if TARGET_OS_IPHONE
-		SDL_iPhoneKeyboardShow(SDL_GetFocusWindow());
+		SDL_iPhoneKeyboardShow(window);
 #endif
 #ifdef ANDROID
 		SDL_ANDROID_SetScreenKeyboardShown(1);
