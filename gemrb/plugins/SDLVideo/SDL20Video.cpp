@@ -230,8 +230,8 @@ int SDL20VideoDriver::SwapBuffers(void)
 
 int SDL20VideoDriver::PollEvents()
 {
-	if (firstFingerDown.timestamp
-		&& GetTickCount() - firstFingerDown.timestamp >= TOUCH_RC_NUM_TICKS) {
+	if (firstFigerDownTime
+		&& GetTickCount() - firstFigerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
 		int x = firstFingerDown.x;
 		int y = firstFingerDown.y;
@@ -330,7 +330,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
-				firstFingerDown.timestamp = GetTickCount();
+				firstFigerDownTime = GetTickCount();
 				firstFingerDown.x /= xScaleFactor;
 				firstFingerDown.y /= yScaleFactor;
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
