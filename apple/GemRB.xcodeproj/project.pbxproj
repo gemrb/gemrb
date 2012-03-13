@@ -97,7 +97,6 @@
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
-		A24E8BAD1405AAB200FD17D1 /* GemRB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD82721396B886007E9C63 /* GemRB.cpp */; };
 		A259F3F8142BFBCD00D49124 /* SDL_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A259F3F6142BFBCD00D49124 /* SDL_ttf.framework */; };
 		A265ECDC13A8661600C6DF12 /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD813A8661600C6DF12 /* FileCache.cpp */; };
 		A265ECDD13A8661600C6DF12 /* IndexedArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */; };
@@ -339,7 +338,7 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
-		A2A3A7D914A505FD00F705CF /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.m */; };
+		A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */; };
 		A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7DF14A5130F00F705CF /* CocoaMain.m */; };
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
 		A2A3A7E714A5130F00F705CF /* GEM_ConfController-ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2A3A7E314A5130F00F705CF /* GEM_ConfController-ipad.xib */; };
@@ -351,6 +350,7 @@
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
+		A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C66D9C13A2953D00C0AA8E /* Python.framework */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
@@ -1303,7 +1303,7 @@
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2A3A7D814A505FD00F705CF /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CocoaWrapper.m; path = CocoaWrapper/mac/CocoaWrapper.m; sourceTree = "<group>"; };
+		A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CocoaWrapper.mm; path = CocoaWrapper/mac/CocoaWrapper.mm; sourceTree = "<group>"; };
 		A2A3A7DF14A5130F00F705CF /* CocoaMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaMain.m; sourceTree = "<group>"; };
 		A2A3A7E014A5130F00F705CF /* GEM_ConfController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_ConfController.h; sourceTree = "<group>"; };
 		A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_ConfController.m; sourceTree = "<group>"; };
@@ -2628,7 +2628,7 @@
 			isa = PBXGroup;
 			children = (
 				A22693781422931B004468E8 /* CocoaWrapper.h */,
-				A2A3A7D814A505FD00F705CF /* CocoaWrapper.m */,
+				A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */,
 			);
 			name = mac;
 			sourceTree = "<group>";
@@ -4125,8 +4125,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A24E8BAD1405AAB200FD17D1 /* GemRB.cpp in Sources */,
-				A2A3A7D914A505FD00F705CF /* CocoaWrapper.m in Sources */,
+				A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */,
+				A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,17 +2,11 @@ ADD_SUBDIRECTORY( core )
 
 IF(APPLE)
 	SET_SOURCE_FILES_PROPERTIES(
-		CocoaWrapper.h
-		../apple/CocoaWrapper/mac/CocoaWrapper.m
-		PROPERTIES LANGUAGE C
-	)
-
-	SET_SOURCE_FILES_PROPERTIES(
 		../artwork/gemrb.icns
 		PROPERTIES MACOSX_PACKAGE_LOCATION Resources
 	)
 	SET(MACOSX_BUNDLE_ICON_FILE gemrb)
-	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.m GemRB.cpp ../artwork/gemrb.icns)
+	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm ../artwork/gemrb.icns)
 	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader ${BUNDLE_LOADER}")
 ELSE(APPLE)

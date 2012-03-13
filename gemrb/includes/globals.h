@@ -194,7 +194,7 @@ inline unsigned long GetTickCount()
 }
 #endif
 
-#if TARGET_OS_IPHONE < 1
+#ifndef __APPLE__
 // MIN and MAX are already similarly defined by Cocoa
 inline int MIN(int a, int b)
 {

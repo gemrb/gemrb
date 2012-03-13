@@ -20,12 +20,12 @@
 
 #import "CocoaWrapper.h"
 
-#include <sys/param.h> /* for MAXPATHLEN */
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#import "AppleLogger.h"
+#import "Interface.h"
+#import "System/FileStream.h"
+#import "System/Logger/File.h"
+
+using namespace GemRB;
 
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
  but the method still is there and works. To avoid warnings, we declare
@@ -64,38 +64,37 @@ static void setApplicationMenu(void)
     NSMenuItem *menuItem;
     NSString *title;
     NSString *appName;
-    
+
     appName = @"GemRB";
     appleMenu = [[NSMenu alloc] initWithTitle:@""];
-    
+
     /* Add menu items */
     title = [@"About " stringByAppendingString:appName];
     [appleMenu addItemWithTitle:title action:@selector(orderFrontStandardAboutPanel:) keyEquivalent:@""];
-    
+
     [appleMenu addItem:[NSMenuItem separatorItem]];
-    
+
     title = [@"Hide " stringByAppendingString:appName];
     [appleMenu addItemWithTitle:title action:@selector(hide:) keyEquivalent:@"h"];
-    
+
     menuItem = (NSMenuItem *)[appleMenu addItemWithTitle:@"Hide Others" action:@selector(hideOtherApplications:) keyEquivalent:@"h"];
     [menuItem setKeyEquivalentModifierMask:(NSAlternateKeyMask|NSCommandKeyMask)];
-    
+
     [appleMenu addItemWithTitle:@"Show All" action:@selector(unhideAllApplications:) keyEquivalent:@""];
-    
+
     [appleMenu addItem:[NSMenuItem separatorItem]];
-    
+
     title = [@"Quit " stringByAppendingString:appName];
     [appleMenu addItemWithTitle:title action:@selector(terminate:) keyEquivalent:@"q"];
-    
-    
+
     /* Put menu into the menubar */
     menuItem = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
     [menuItem setSubmenu:appleMenu];
     [[NSApp mainMenu] addItem:menuItem];
-    
+
     /* Tell the application object that this is now the application menu */
     [NSApp setAppleMenu:appleMenu];
-    
+
     /* Finally give up our references to the objects */
     [appleMenu release];
     [menuItem release];
@@ -107,22 +106,22 @@ static void setupWindowMenu(void)
     NSMenu      *windowMenu;
     NSMenuItem  *windowMenuItem;
     NSMenuItem  *menuItem;
-    
+
     windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
-    
+
     /* "Minimize" item */
     menuItem = [[NSMenuItem alloc] initWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
     [windowMenu addItem:menuItem];
     [menuItem release];
-    
+
     /* Put menu into the menubar */
     windowMenuItem = [[NSMenuItem alloc] initWithTitle:@"Window" action:nil keyEquivalent:@""];
     [windowMenuItem setSubmenu:windowMenu];
     [[NSApp mainMenu] addItem:windowMenuItem];
-    
+
     /* Tell the application object that this is now the window menu */
     [NSApp setWindowsMenu:windowMenu];
-    
+
     /* Finally give up our references to the objects */
     [windowMenu release];
     [windowMenuItem release];
@@ -149,19 +148,19 @@ static void setupWindowMenu(void)
     size_t arglen;
     char *arg;
     char **newargv;
-    
+
     if (!gFinderLaunch)  /* MacOS is passing command line args. */
         return FALSE;
-    
+
     if (gCalledAppMainline)  /* app has started, ignore this document. */
         return FALSE;
-    
+
     temparg = [filename UTF8String];
     arglen = strlen(temparg) + 1;
     arg = (char *) malloc(arglen);
     if (arg == NULL)
         return FALSE;
-    
+
     newargv = (char **) realloc(gArgv, sizeof (char *) * (gArgc + 2));
     if (newargv == NULL)
     {
@@ -169,7 +168,7 @@ static void setupWindowMenu(void)
         return FALSE;
     }
     gArgv = newargv;
-    
+
     strlcpy(arg, temparg, arglen);
     gArgv[gArgc++] = arg;
     gArgv[gArgc] = NULL;
@@ -193,16 +192,24 @@ static void setupWindowMenu(void)
 - (void) applicationDidFinishLaunching: (NSNotification *) __unused note
 {
     int status;
-    
+	AddLogger(createAppleLogger());
     /* Set the working directory to the .app's parent directory */
     [self setupWorkingDirectory:gFinderLaunch];
-    
+
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
-    status = GemRB_main (gArgc, gArgv);
-    
-    /* We're done, thank you for playing */
-    exit(status);
+	core = new Interface( gArgc, gArgv );
+	if ((status = core->Init()) == GEM_ERROR) {
+		delete( core );
+		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
+	} else {
+		// pass control to GemRB
+		core->Main();
+		delete( core );
+		ShutdownLogging();
+	}
+	// We must exit since the application runloop never returns.
+	exit(status);
 }
 @end
 
@@ -216,38 +223,35 @@ static void setupWindowMenu(void)
     uint16_t *buffer;
     NSRange localRange;
     NSString *result;
-    
+
     bufferSize = selfLen + aStringLen - aRange.length;
     buffer = (uint16_t *)NSAllocateMemoryPages(bufferSize*sizeof(uint16_t));
-    
+
     /* Get first part into buffer */
     localRange.location = 0;
     localRange.length = aRange.location;
     [self getCharacters:buffer range:localRange];
-    
+
     /* Get middle part into buffer */
     localRange.location = 0;
     localRange.length = aStringLen;
     [aString getCharacters:(buffer+aRange.location) range:localRange];
-    
+
     /* Get last part into buffer */
     localRange.location = aRange.location + aRange.length;
     localRange.length = selfLen - localRange.location;
     [self getCharacters:(buffer+aRange.location+aStringLen) range:localRange];
-    
+
     /* Build output string */
     result = [NSString stringWithCharacters:buffer length:bufferSize];
-    
+
     NSDeallocateMemoryPages(buffer, bufferSize);
-    
+
     return result;
 }
 
 @end
 
-#ifdef main
-#  undef main
-#endif
 /* Main entry point to executable - should *not* be GemRB_main! */
 int main (int argc, char **argv)
 {
@@ -267,10 +271,10 @@ int main (int argc, char **argv)
             gArgv[i] = argv[i];
         gFinderLaunch = NO;
     }
-    
+
     NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
     CocoaWrapper				*wrapper;
-	
+
     /* Ensure the application object is initialised */
     [NSApplication sharedApplication];
 /* Tell the dock about us
@@ -282,21 +286,21 @@ int main (int argc, char **argv)
                     [SDLApplication sharedApplication];
     }
 */
-	
+
     /* Set up the menubar */
     [NSApp setMainMenu:[[NSMenu alloc] init]];
     setApplicationMenu();
     setupWindowMenu();
-	
+
     /* Create SDLMain and make it the app delegate */
     wrapper = [[CocoaWrapper alloc] init];
     [NSApp setDelegate:wrapper];
-    
+
     /* Start the main event loop */
     [NSApp run];
-    
+
     [wrapper release];
     [pool release];
-    
+
     return 0;
 }
