@@ -418,11 +418,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					firstFingerDown = SDL_TouchFingerEvent();
 					// should we reset the lastMouseTime vars?
 #if TARGET_OS_IPHONE
-					// FIXME: this is essentially a hack.
-					// I believe there to be a bug in SDL 1.3 that is causeing the surface to be invalidated on a restore event for iOS
-					SDL_Window* window;
-					window = SDL_GetFocusWindow();
-					window->surface_valid = SDL_TRUE;//private attribute!!!
 					// FIXME:
 					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
 					// even using Apple examples of how to properly suspend an OpenAL context and resume on iOS are falling flat
