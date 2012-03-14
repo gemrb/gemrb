@@ -141,10 +141,6 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 
 	SDL_Rect srcRect = {sx, sy, w, h};
 	SDL_Rect destRect = {dstx, dsty, w, h};
-	// temporary hack. for some reason our view port is centered even when our "window" is not.
-	// on iOS it is currently impossible to not anchor the view to the top left of the display (SDL bug)
-	destRect.x = 0;
-	destRect.y = 0 ;
 
 	Uint8 *src;
 	Uint32 *dst;
@@ -153,7 +149,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	int pitch;
 	SDL_Color* color;
 
-	SDL_LockTexture(videoPlayer, &destRect, &pixels, &pitch);
+	SDL_LockTexture(videoPlayer, NULL, &pixels, &pitch);
 	src = buf;
 	if (g_truecolor) {
 		for (row = 0; row < bufh; ++row) {
