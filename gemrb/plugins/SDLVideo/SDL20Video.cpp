@@ -108,18 +108,20 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 
 void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 {
-	SDL_GetWindowSize(window, &w, &h);
-
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
+	int winW, winH;
+	SDL_GetWindowSize(window, &winW, &winH);
+
 	if (videoPlayer) SDL_DestroyTexture(videoPlayer);
 	if (yuv) {
-		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
+		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, w, h);
 	} else {
-		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, winW, winH);
 	}
-
+	w = winW;
+	h = winH;
 	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;
 	subtitleregion.h = h/4;
