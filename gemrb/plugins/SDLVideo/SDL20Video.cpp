@@ -196,13 +196,60 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_RenderPresent(renderer);
 }
 
-void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int */*strides*/,
-				  unsigned int bufw, unsigned int bufh,
+void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
+				  unsigned int /*bufw*/, unsigned int bufh,
 				  unsigned int w, unsigned int h,
 				  unsigned int dstx, unsigned int dsty,
-				  ieDword titleref)
+				  ieDword /*titleref*/)
 {
-	showFrame(*buf, bufw, bufh, 0, 0, w, h, dstx, dsty, true, NULL, titleref);
+	SDL_Rect destRect;
+	destRect.x = dstx;
+	destRect.y = dsty;
+	destRect.w = w;
+	destRect.h = h;
+
+	Uint8 *pixels;
+	int pitch;
+
+	SDL_LockTexture(videoPlayer, NULL, (void**)&pixels, &pitch);
+	pitch = w;
+	if((unsigned int)pitch == strides[0]) {
+		int size = pitch * bufh;
+		memcpy(pixels, buf[0], size);
+		memcpy(pixels + size, buf[2], size / 4);
+		memcpy(pixels + size * 5 / 4, buf[1], size / 4);
+	} else {
+		unsigned char *Y,*U,*V,*iY,*iU,*iV;
+		unsigned int i;
+		Y = pixels;
+		V = pixels + pitch * h;
+		U = pixels + pitch * h * 5 / 4;
+
+		iY = buf[0];
+		iU = buf[1];
+		iV = buf[2];
+
+		for (i = 0; i < (h/2); i++) {
+			memcpy(Y,iY,pitch);
+			iY += strides[0];
+			Y += pitch;
+
+			memcpy(Y,iY,pitch);
+			memcpy(U,iU,pitch / 2);
+			memcpy(V,iV,pitch / 2);
+
+			Y  += pitch;
+			U  += pitch / 2;
+			V  += pitch / 2;
+			iY += strides[0];
+			iU += strides[1];
+			iV += strides[2];
+		}
+	}
+
+	SDL_UnlockTexture(videoPlayer);
+	SDL_RenderCopy(renderer, videoPlayer, NULL, &destRect);
+	SDL_RenderPresent(renderer);
 }
 
 int SDL20VideoDriver::SwapBuffers(void)
