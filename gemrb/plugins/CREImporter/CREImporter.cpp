@@ -624,7 +624,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 		//fallthrough
 	case IE_CRE_GEMRB:
 		for (i=0;i<QSPCount;i++) {
-			tmpDword = act->PCStats->QSlots[i];
+			tmpDword = act->PCStats->QSlots[i+3];
 			stream->WriteDword( &tmpDword);
 		}
 		for (i=0;i<13;i++) {
@@ -714,7 +714,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	case IE_CRE_GEMRB:
 		for (i=0;i<QSPCount;i++) {
 			str->ReadDword( &tmpDword);
-			act->PCStats->QSlots[i] = (ieByte) tmpDword;
+			act->PCStats->QSlots[i+3] = (ieByte) tmpDword;
 		}
 		str->Seek(26, GEM_CURRENT_POS);
 		str->Read( act->PCStats->SoundFolder, 32);
