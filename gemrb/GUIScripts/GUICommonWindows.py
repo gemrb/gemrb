@@ -814,7 +814,7 @@ def ActionSkillsPressed ():
 	return
 
 def TypeSpellPressed (type):
-	GemRB.SetVar ("Type", type)
+	GemRB.SetVar ("Type", 1<<type)
 	GemRB.SetVar ("ActionLevel", 10)
 	UpdateActionsWindow ()
 	return

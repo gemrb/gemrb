@@ -29,14 +29,15 @@ from ie_restype import RES_2DA
 #################################################################
 # this is in the operator module of the standard python lib
 def itemgetter(*items):
-    if len(items) == 1:
-        item = items[0]
-        def g(obj):
-            return obj[item]
-    else:
-        def g(obj):
-            return tuple(obj[item] for item in items)
-    return g
+	if len(items) == 1:
+		item = items[0]
+		def g(obj):
+			return obj[item]
+	else:
+		def g(obj):
+			return tuple(obj[item] for item in items)
+	return g
+
 #################################################################
 # routines for the actionbar spell access code
 
@@ -116,7 +117,7 @@ def index (list, value):
 		if list[i]==value:
 			return i
 	return -1
-	
+
 def GetMemorizedSpells(actor, BookType, level):
 	memoSpells = []
 	spellResRefs = []
@@ -175,14 +176,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		for i in range(16):
 			if BookType & (1<<i):
 				allSpells += GetUsableMemorizedSpells (actor, i)
-		'''
-		if BookType & (1<<IE_SPELL_TYPE_PRIEST): #1
-			allSpells = GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_PRIEST)
-		if BookType & (1<<IE_SPELL_TYPE_WIZARD): #2
-			allSpells += GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_WIZARD)
-		if BookType & (1<<IE_SPELL_TYPE_INNATE): #4
-			allSpells += GetUsableMemorizedSpells (actor, IE_SPELL_TYPE_INNATE)
-		'''
 		if not len(allSpells):
 			raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
 			return
