@@ -619,11 +619,6 @@ def ActionLeftPressed ():
 	UpdateActionsWindow ()
 	return
 
-def SpellCount(type):
-	j = 1
-	for i in range(16):
-		if type&j:
-			count += GemRB.GetKnownSpellsCount(type, 0)
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
 	"""Scrolls the action window right.
