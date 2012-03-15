@@ -8509,7 +8509,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	}
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
-	if (Start) {
+	if (Start||more) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, Offset),dict, ACT_LEFT,0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
@@ -8702,6 +8702,27 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
+		case ACT_BARD:
+		case ACT_CLERIC:
+		case ACT_DRUID:
+		case ACT_PALADIN:
+		case ACT_RANGER:
+		case ACT_SORCERER:
+		case ACT_WIZARD:
+		case ACT_DOMAIN:
+			if (actor->spellbook.IsIWDSpellBook()) {
+				type = 1<<(action-ACT_BARD);
+			} else {
+				//only cleric or wizard switch exists in the bg engine
+				if (action==ACT_WIZARD) type = 1<<IE_SPELL_TYPE_WIZARD;
+				else type = 1<<IE_SPELL_TYPE_PRIEST;
+			}
+			//returns true if there is ANY shape
+			if (!actor->spellbook.GetSpellInfoSize(type)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
+		case ACT_WILDSHAPE:
 		case ACT_SHAPE:
 			if (actor->spellbook.IsIWDSpellBook()) {
 				type = 1<<IE_IWD2_SPELL_SHAPE;

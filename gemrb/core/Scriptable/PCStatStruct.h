@@ -76,6 +76,7 @@ namespace GemRB {
 #define ACT_SORCERER   45
 #define ACT_WIZARD   46
 #define ACT_DOMAIN   47
+#define ACT_WILDSHAPE 48
 
 #define ACT_IWDQSPELL 50
 #define ACT_IWDQITEM  60

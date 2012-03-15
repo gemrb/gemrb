@@ -497,18 +497,18 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == 2: #spells
-		GemRB.SetVar ("Type", 3)
 		if GUICommon.GameIsIWD2():
 			type = 255
 		else:
 			type = 3
+		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == 3: #innates
-		GemRB.SetVar ("Type", 4)
 		if GUICommon.GameIsIWD2():
 			type = 256 + 1024
 		else:
 			type = 4
+		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
@@ -518,16 +518,22 @@ def UpdateActionsWindow ():
 	elif level == 6: # iwd2 skills
 		SetupSkillSelection()
 	elif level == 7: # quickspells, but with innates too
-		GemRB.SetVar ("Type", 3)
-		Spellbook.SetupSpellIcons(CurrentWindow, 511, TopIndex, ActionBarControlOffset)
+		if GUICommon.GameIsIWD2():
+			type = 255 + 256 + 1024
+		else:
+			type = 7
+		GemRB.SetVar ("Type", type)
+		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == 8: # shapes selection
-		GemRB.SetVar ("Type", 4)
+		GemRB.SetVar ("Type", 1024)
 		Spellbook.SetupSpellIcons(CurrentWindow, 1024, TopIndex, ActionBarControlOffset)
 	elif level == 9: # songs selection
-		GemRB.SetVar ("Type", 5)
+		GemRB.SetVar ("Type", 512)
 		Spellbook.SetupSpellIcons(CurrentWindow, 512, TopIndex, ActionBarControlOffset)
 	elif level == 10: # spellbook selection
-		SetupBookSelection()
+		type = GemRB.GetVar ("Type")
+		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+		
 	else:
 		print "Invalid action level:", level
 		GemRB.SetVar ("ActionLevel", 0)
@@ -613,6 +619,11 @@ def ActionLeftPressed ():
 	UpdateActionsWindow ()
 	return
 
+def SpellCount(type):
+	j = 1
+	for i in range(16):
+		if type&j:
+			count += GemRB.GetKnownSpellsCount(type, 0)
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
 	"""Scrolls the action window right.
@@ -622,17 +633,14 @@ def ActionRightPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
+	print "Type:", Type
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
-	if Type&128 or GemRB.GetVar ("ActionLevel") == 5:
-		#Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1)
-		tmpType = Type&127
-		if tmpType == 3:
-			Max = len(Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_PRIEST) + Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_WIZARD))
-		else:
-			Max = len(Spellbook.GetKnownSpells (pc, tmpType))
+	if GemRB.GetVar ("ActionLevel") == 5:
+		Max = GemRB.GetKnownSpellsCount (pc, Type, -1)
 	else:
 		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
+	print "Max:",Max
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
@@ -810,6 +818,48 @@ def ActionSkillsPressed ():
 	UpdateActionsWindow ()
 	return
 
+def TypeSpellPressed (type):
+	GemRB.SetVar ("Type", type)
+	GemRB.SetVar ("ActionLevel", 10)
+	UpdateActionsWindow ()
+	return
+
+def ActionBardSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_BARD)
+	return
+
+def ActionClericSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_CLERIC)
+	return
+
+def ActionDruidSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_DRUID)
+	return
+
+def ActionPaladinSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_PALADIN)
+	return
+
+def ActionRangerSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_RANGER)
+	return
+
+def ActionSorcererSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_SORCEROR)
+	return
+
+def ActionWizardSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_WIZARD)
+	return
+
+def ActionDomainSpellPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_DOMAIN)
+	return
+
+def ActionWildShapesPressed ():
+	TypeSpellPressed(IE_IWD2_SPELL_SHAPE)
+	return
+
 def SpellPressed ():
 	"""Prepares a spell to be cast."""
 
@@ -818,7 +868,7 @@ def SpellPressed ():
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
 
-	if Type == 5:
+	if Type == 1024:
 		#SelectBardSong(Spell)
 		ActionBardSongPressed()
 		return
