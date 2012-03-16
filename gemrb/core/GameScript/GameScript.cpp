@@ -1363,10 +1363,10 @@ void InitializeIEScript()
 	memset( actionflags, 0, sizeof( actionflags ) );
 	memset( objects, 0, sizeof( objects ) );
 
-	int j;
+	int j, max;
 
-	j = triggersTable->GetSize();
-	while (j--) {
+	max = triggersTable->GetSize();
+	for (j=0;j<max;j++) {
 		i = triggersTable->GetValueIndex( j );
 		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
 
@@ -1438,8 +1438,8 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	j = actionsTable->GetSize();
-	while (j--) {
+	max = actionsTable->GetSize();
+	for (j=0;j<max;j++) {
 		i = actionsTable->GetValueIndex( j );
 		if (i >= MAX_ACTIONS) {
 			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1450,6 +1450,7 @@ void InitializeIEScript()
 		if (actions[i]) {
 			if (poi && actions[i]!=poi->Function) {
 				StringBuffer buffer;
+
 				buffer.appendFormatted("%s is in collision with ",
 					actionsTable->GetStringIndex( j ) );
 				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
@@ -1457,6 +1458,7 @@ void InitializeIEScript()
 			} else {
 				if (InDebug&ID_ACTIONS) {
 					StringBuffer buffer;
+
 					buffer.appendFormatted("%s is a synonym of ",
 						actionsTable->GetStringIndex( j ) );
 					printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
@@ -1480,8 +1482,8 @@ void InitializeIEScript()
 		 * we add/replace some actions from gemact.ids
 		 * right now you can't print or generate these actions!
 		 */
-		j = overrideActionsTable->GetSize();
-		while (j--) {
+		max = overrideActionsTable->GetSize();
+		for (j=0;j<max;j++) {
 			i = overrideActionsTable->GetValueIndex( j );
 			if (i >= MAX_ACTIONS) {
 				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1490,13 +1492,23 @@ void InitializeIEScript()
 			}
 			const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ));
 			if (!poi) {
+				StringBuffer buffer;
+
+				buffer.append("Couldn't assign function to override action: ");
+				printFunction(buffer, overrideActionsTable, j);
 				continue;
 			}
-			if (actions[i]) {
+			if (actions[i] && (actions[i]!=poi->Function || actionflags[i]!=poi->Flags) ) {
 				StringBuffer buffer;
+
 				buffer.appendFormatted("%s overrides existing action ",
 					overrideActionsTable->GetStringIndex( j ) );
-				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
+				int x = actionsTable->FindValue(i);
+				if (x>=0) {
+					printFunction(buffer, actionsTable, actionsTable->FindValue(i));
+				} else {
+					printFunction(buffer, overrideActionsTable, overrideActionsTable->FindValue(overrideActionsTable->GetValueIndex(j)));
+				}
 				Log(MESSAGE, "GameScript", buffer);
 			}
 			actions[i] = poi->Function;
@@ -1509,8 +1521,8 @@ void InitializeIEScript()
 		 * we add/replace some actions from gemtrig.ids
 		 * right now you can't print or generate these actions!
 		 */
-		j = overrideTriggersTable->GetSize();
-		while (j--) {
+		max = overrideTriggersTable->GetSize();
+		for (j=0;j<max;j++) {
 			i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
@@ -1521,13 +1533,26 @@ void InitializeIEScript()
 			}
 			const TriggerLink *poi = FindTrigger( overrideTriggersTable->GetStringIndex( j ));
 			if (!poi) {
+				StringBuffer buffer;
+
+				buffer.append("Couldn't assign function to override trigger: ");
+				printFunction(buffer, overrideTriggersTable, j);
 				continue;
 			}
-			if (triggers[i]) {
+			if (triggers[i] && ( (triggers[i]!=poi->Function) || (triggerflags[i]!=poi->Flags) ) ) {
 				StringBuffer buffer;
+
 				buffer.appendFormatted("%s overrides existing trigger ",
 					overrideTriggersTable->GetStringIndex( j ) );
-				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
+				int x = triggersTable->FindValue(i);
+				if (x<0) x = triggersTable->FindValue(i|0x4000);
+				if (x>=0) {
+					printFunction(buffer, triggersTable, x);
+				} else {
+					x = overrideTriggersTable->FindValue(i);
+					if (x<0 || x>=j) x = overrideTriggersTable->FindValue(i|0x4000);
+					printFunction(buffer, overrideTriggersTable, x);
+				}
 				Log(MESSAGE, "GameScript", buffer);
 			}
 			triggers[i] = poi->Function;
