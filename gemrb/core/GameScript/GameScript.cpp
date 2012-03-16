@@ -1539,7 +1539,8 @@ void InitializeIEScript()
 				printFunction(buffer, overrideTriggersTable, j);
 				continue;
 			}
-			if (triggers[i] && ( (triggers[i]!=poi->Function) || (triggerflags[i]!=poi->Flags) ) ) {
+			int tf = poi->Flags | (was_condition?TF_CONDITION:0);
+			if (triggers[i] && ( (triggers[i]!=poi->Function) || (triggerflags[i]!=tf) ) ) {
 				StringBuffer buffer;
 
 				buffer.appendFormatted("%s overrides existing trigger ",
@@ -1556,9 +1557,7 @@ void InitializeIEScript()
 				Log(MESSAGE, "GameScript", buffer);
 			}
 			triggers[i] = poi->Function;
-			triggerflags[i] = poi->Flags;
-			if (was_condition)
-				triggerflags[i] |= TF_CONDITION;
+			triggerflags[i] = tf;
 		}
 	}
 
