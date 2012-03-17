@@ -295,6 +295,16 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 		// no need to scale these coordinates. they were scaled previously for us.
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
 								mouseButton, GetModState(SDL_GetModState()) );
+
+		// do an actual mouse move first! this is important for things such as ground piles to work!
+		MouseMovement(firstFingerDown.x, firstFingerDown.y);
+
+		if (CursorIndex != VID_CUR_DRAG)
+			CursorIndex = VID_CUR_DOWN;
+		// move cursor to ensure any referencing of the cursor is accurate
+		CursorPos.x = firstFingerDown.x;
+		CursorPos.y = firstFingerDown.y;
+
 		firstFingerDown = SDL_TouchFingerEvent();
 		ignoreNextFingerUp = false;
 		firstFigerDownTime = 0;
@@ -393,10 +403,14 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				ProcessFirstTouch(GEM_MB_ACTION);
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					if (!ignoreNextFingerUp) {
+						if (CursorIndex != VID_CUR_DRAG)
+							CursorIndex = VID_CUR_UP;
+						// move cursor to ensure any referencing of the cursor is accurate
+						CursorPos.x = event.button.x;
+						CursorPos.y = event.button.y;
+
 						EvntManager->MouseUp( event.tfinger.x / xScaleFactor, event.tfinger.y / yScaleFactor,
 											 mouseButton, GetModState(SDL_GetModState()) );
-						// do mouse movement to ensure any cursor reflects the event location
-						MouseMovement(event.tfinger.x / xScaleFactor, event.tfinger.y / yScaleFactor);
 					}
 					ignoreNextFingerUp = false;
 				}
