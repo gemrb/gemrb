@@ -292,9 +292,10 @@ int SDL20VideoDriver::PollEvents()
 void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
 	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId) {
-		// no need to scale these coordinates. they were scaled previously for us.
-		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
-								mouseButton, GetModState(SDL_GetModState()) );
+		lastMouseDownTime = EvntManager->GetRKDelay();
+		if (lastMouseDownTime != (unsigned long) ~0) {
+			lastMouseDownTime += lastMouseDownTime + lastTime;
+		}
 
 		// do an actual mouse move first! this is important for things such as ground piles to work!
 		MouseMovement(firstFingerDown.x, firstFingerDown.y);
@@ -304,6 +305,10 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 		// move cursor to ensure any referencing of the cursor is accurate
 		CursorPos.x = firstFingerDown.x;
 		CursorPos.y = firstFingerDown.y;
+
+		// no need to scale these coordinates. they were scaled previously for us.
+		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
+								mouseButton, GetModState(SDL_GetModState()) );
 
 		firstFingerDown = SDL_TouchFingerEvent();
 		ignoreNextFingerUp = false;
@@ -372,19 +377,15 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 					HideSoftKeyboard();
 				}
-			} else if (numFingers == 1) {
+			} else if (numFingers == 1) { //click and drag
 				ProcessFirstTouch(GEM_MB_ACTION);
-				// standard mouse movement
 				ignoreNextFingerUp = false;
+				// standard mouse movement
 				MouseMovement(event.tfinger.x / xScaleFactor, event.tfinger.y / yScaleFactor);
 			}
 			break;
 		case SDL_FINGERDOWN:
 			if (numFingers == 1) {
-				lastMouseDownTime = EvntManager->GetRKDelay();
-				if (lastMouseDownTime != (unsigned long) ~0) {
-					lastMouseDownTime += lastMouseDownTime + lastTime;
-				}
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFigerDownTime = GetTickCount();
