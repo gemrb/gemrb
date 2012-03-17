@@ -291,7 +291,7 @@ int SDL20VideoDriver::PollEvents()
 
 void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
-	if (firstFingerDown.fingerId) {
+	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId) {
 		// no need to scale these coordinates. they were scaled previously for us.
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
 								mouseButton, GetModState(SDL_GetModState()) );
