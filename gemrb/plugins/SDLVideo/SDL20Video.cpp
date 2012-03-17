@@ -52,6 +52,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	// touch input
 	ignoreNextFingerUp = false;
 	firstFingerDown = SDL_TouchFingerEvent();
+	firstFigerDownTime = 0;
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -296,6 +297,7 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 								mouseButton, GetModState(SDL_GetModState()) );
 		firstFingerDown = SDL_TouchFingerEvent();
 		ignoreNextFingerUp = false;
+		firstFigerDownTime = 0;
 	}
 }
 
