@@ -1232,9 +1232,14 @@ int Inventory::GetArmorSlot()
 int Inventory::GetShieldSlot() const
 {
 	if (IWD2) {
+		//actually, in IWD2, the equipped slot never becomes IW_NO_EQUIPPED, it is always 0-3
+		//this is just a hack to prevent invalid shots from happening
+		if (Equipped == IW_NO_EQUIPPED) return SLOT_MELEE+1;
+
 		if (Equipped>=0 && Equipped<=3) {
 			return Equipped*2+SLOT_MELEE+1;
 		}
+		//still, what about magic weapons...
 		return -1;
 	}
 	return SLOT_LEFT;
@@ -1246,8 +1251,8 @@ int Inventory::GetEquippedSlot() const
 		return SLOT_FIST;
 	}
 	if (IWD2 && Equipped>=0) {
-		//i've absolutely NO idea what is this 4 (Avenger)
-		//Equipped should be 0-3 in iWD2, no???
+		//Equipped should never become IW_NO_EQUIPPED, this is just a hack to cover the bug
+		//about it still becoming invalid
 		if (Equipped >= 4) {
 			return SLOT_MELEE;
 		}
