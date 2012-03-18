@@ -164,6 +164,16 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 	return delay;
 }
 
+void AmbientMgrAL::UpdateVolume(unsigned short volume)
+{
+	SDL_mutexP( mutex );
+	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
+		(*it) -> SetVolume( volume );
+	}
+	SDL_mutexV( mutex );
+}
+
+
 AmbientMgrAL::AmbientSource::AmbientSource(const Ambient *a)
 : stream(-1), ambient(a), lastticks(0), enqueued(0), loaded(false)
 {
@@ -238,7 +248,11 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 
 	if (stream < 0) {
 		// we need to allocate a stream
-		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), ambient->getGain(), (ambient->getFlags() & IE_AMBI_POINT), true);
+		unsigned int v = 100;
+
+		core->GetDictionary()->Lookup("Volume Ambients", v);
+		v *= ambient->getGain();
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), v/100, (ambient->getFlags() & IE_AMBI_POINT), true);
 
 		if (stream == -1) {
 			// no streams available...
@@ -294,15 +308,6 @@ void AmbientMgrAL::AmbientSource::hardStop()
 		core->GetAudioDrv()->ReleaseStream(stream, true);
 		stream = -1;
 	}
-}
-
-void AmbientMgrAL::UpdateVolume(unsigned short volume)
-{
-	SDL_mutexP( mutex );
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		(*it) -> SetVolume( volume );
-	}
-	SDL_mutexV( mutex );
 }
 
 /* sets the overall volume (in percent)
