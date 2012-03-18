@@ -349,6 +349,8 @@ public:
 	static int GetFistSlot();
 	static int GetMagicSlot();
 	static int GetWeaponSlot();
+	static int GetWeaponQuickSlot(int weaponslot);
+	static int GetWeaponSlot(int quickslot);
 	static int GetRangedSlot();
 	static int GetQuickSlot();
 	static int GetInventorySlot();

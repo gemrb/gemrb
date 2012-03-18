@@ -417,6 +417,7 @@ void Inventory::KillSlot(unsigned int index)
 		return;
 	}
 	ItemExcl &= ~itm->ItemExcl;
+	int eqslot = GetEquippedSlot();
 
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
@@ -424,13 +425,13 @@ void Inventory::KillSlot(unsigned int index)
 			break;
 		case SLOT_EFFECT_MISSILE:
 			//getting a new projectile of the same type
-			if (Equipped + SLOT_MELEE == (int) index) {
+			if (eqslot == (int) index) {
 				if (Equipped < 0) {
 					//always get the projectile weapon header (this quiver was equipped)
 					ITMExtHeader *header = itm->GetWeaponHeader(true);
 					Equipped = FindRangedProjectile(header->ProjectileQualifier);
 					if (Equipped!=IW_NO_EQUIPPED) {
-						EquipItem(Equipped+SLOT_MELEE);
+						EquipItem(GetEquippedSlot());
 					} else {
 						EquipItem(SLOT_FIST);
 					}
@@ -440,7 +441,7 @@ void Inventory::KillSlot(unsigned int index)
 			break;
 		case SLOT_EFFECT_MELEE:
 			// reset Equipped if it was the removed item
-			if (Equipped+SLOT_MELEE == (int)index)
+			if (eqslot == (int)index)
 				Equipped = IW_NO_EQUIPPED;
 			else if (Equipped < 0) {
 				//always get the projectile weapon header (this is a bow, because Equipped is negative)
@@ -456,7 +457,7 @@ void Inventory::KillSlot(unsigned int index)
 							if (type == header->ProjectileQualifier) {
 								Equipped = FindRangedProjectile(header->ProjectileQualifier);
 								if (Equipped!=IW_NO_EQUIPPED) {
-									EquipItem(Equipped+SLOT_MELEE);
+									EquipItem(GetEquippedSlot());
 								} else {
 									EquipItem(SLOT_FIST);
 								}
@@ -963,8 +964,7 @@ bool Inventory::EquipItem(ieDword slot)
 		break;
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
-		slot -= SLOT_MELEE;
-		weaponslot = slot;
+		weaponslot = GetWeaponQuickSlot(slot);
 		EquippedHeader = 0;
 		header = itm->GetExtHeader(EquippedHeader);
 		if (header && header->AttackType == ITEM_AT_BOW) {
@@ -978,10 +978,10 @@ bool Inventory::EquipItem(ieDword slot)
 		}
 		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
-			SetEquippedSlot(slot, EquippedHeader);
 			if (slot != IW_NO_EQUIPPED) {
-				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot+SLOT_MELEE, EquippedHeader);
+				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, GetWeaponSlot(weaponslot), EquippedHeader);
 			}
+			SetEquippedSlot(weaponslot, EquippedHeader);
 			//don't clear effect in case of a launcher, we need to find it and add its effects too
 			//slot is 'negative' for launchers
 			if ((int) slot>=0) {
@@ -1091,7 +1091,7 @@ int Inventory::FindRangedProjectile(unsigned int type) const
 int Inventory::FindRangedWeapon() const
 {
 	if (Equipped>=0) return SLOT_FIST;
-	return FindSlotRangedWeapon(Equipped+SLOT_MELEE);
+	return FindSlotRangedWeapon(GetEquippedSlot());
 }
 
 int Inventory::FindSlotRangedWeapon(ieDword slot) const
@@ -1213,6 +1213,19 @@ int Inventory::GetWeaponSlot()
 	return SLOT_MELEE;
 }
 
+int Inventory::GetWeaponQuickSlot(int weaponslot)
+{
+	int slot = weaponslot-SLOT_MELEE;
+	if (IWD2 && (slot>=0 && slot<=7) ) slot/=2;
+	return slot;
+}
+
+int Inventory::GetWeaponSlot(int quickslot)
+{
+	if (IWD2 && (quickslot>=0 && quickslot<=3) ) quickslot*=2;
+	return quickslot+SLOT_MELEE;
+}
+
 int Inventory::GetQuickSlot()
 {
 	return SLOT_QUICK;
@@ -1273,14 +1286,17 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 	}
 
 	//if it is an illegal code, make it fist
-	if ((size_t) (slotcode+SLOT_MELEE)>Slots.size()) {
+	if ((size_t) (GetWeaponSlot(slotcode))>Slots.size()) {
 		slotcode=IW_NO_EQUIPPED;
 	}
 
+	int oldslot = GetEquippedSlot();
+	int newslot = GetWeaponSlot(slotcode);
+
 	//unequipping (fist slot will be used now)
-	if (slotcode == IW_NO_EQUIPPED || !HasItemInSlot("",slotcode+SLOT_MELEE)) {
+	if (slotcode == IW_NO_EQUIPPED || !HasItemInSlot("", newslot)) {
 		if (Equipped != IW_NO_EQUIPPED) {
-			RemoveSlotEffects( SLOT_MELEE+Equipped);
+			RemoveSlotEffects( oldslot);
 		}
 		Equipped = IW_NO_EQUIPPED;
 		//fist slot equipping effects
@@ -1291,18 +1307,18 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 
 	//equipping a weapon, but remove its effects first
 	if (Equipped != IW_NO_EQUIPPED) {
-		RemoveSlotEffects( SLOT_MELEE+Equipped);
+		RemoveSlotEffects( oldslot);
 	}
 
 	Equipped = slotcode;
-	int effects = core->QuerySlotEffects( SLOT_MELEE+Equipped );
+	int effects = core->QuerySlotEffects( newslot);
 	if (effects) {
-		CREItem* item = GetSlotItem(SLOT_MELEE+Equipped);
+		CREItem* item = GetSlotItem(newslot);
 		item->Flags|=IE_INV_ITEM_EQUIPPED;
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( SLOT_MELEE+Equipped);
+		AddSlotEffects(newslot);
 	}
 	UpdateWeaponAnimation();
 	return true;
@@ -1860,7 +1876,9 @@ unsigned int Inventory::FindStealableItem()
 		//bit 1 is stealable slot
 		if (!(core->QuerySlotFlags(slot)&1) ) continue;
 		//can't steal equipped weapon
-		if ((unsigned int) (Equipped+SLOT_MELEE) == core->QuerySlot(slot)) continue;
+		int realslot = core->QuerySlot(slot);
+		if (GetEquippedSlot() == realslot) continue;
+		if (GetShieldSlot() == realslot) continue;
 		//can't steal flagged items
 		if ((item->Flags & ITM_STEALING) != IE_INV_ITEM_MOVABLE) continue;
 		return slot;

@@ -533,7 +533,7 @@ def UpdateActionsWindow ():
 	elif level == 10: # spellbook selection
 		type = GemRB.GetVar ("Type")
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-		
+
 	else:
 		print "Invalid action level:", level
 		GemRB.SetVar ("ActionLevel", 0)
@@ -1243,7 +1243,7 @@ def SelectionChanged ():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
-	
+
 	return
 
 def PortraitButtonOnMouseEnter ():

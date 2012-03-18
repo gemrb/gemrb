@@ -169,10 +169,24 @@ def OpenInventoryWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
+	
+	for i in range (4):
+		Button = Window.GetControl (109+i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChangeWeaponPressed)
+		Button.SetVarAssoc("Equipped", i)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		#Why they mess up .chu's i don't know
+		Button.SetSprites("INVBUT3", i, 0, 1, 2, 3)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 
 	UpdateInventoryWindow ()
+	return
+
+def ChangeWeaponPressed ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Equipped = GemRB.GetVar ("Equipped")
+	GemRB.SetEquippedQuickSlot (pc, Equipped, -1)
 	return
 
 #complete update
@@ -186,6 +200,11 @@ def UpdateInventoryWindow ():
 	if Count<1:
 		Count=1
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	Equipped = GemRB.GetEquippedQuickSlot (pc, 1)
+	GemRB.SetVar ("Equipped", Equipped)
+	for i in range (4):
+		Button = Window.GetControl (109+i)
+		Button.SetVarAssoc("Equipped", i)
 	RefreshInventoryWindow ()
 	# populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]

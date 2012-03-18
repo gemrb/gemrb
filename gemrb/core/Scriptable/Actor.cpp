@@ -4521,12 +4521,17 @@ void Actor::ReinitQuickSlots()
 	//these are always present
 	CheckWeaponQuickSlot(0);
 	CheckWeaponQuickSlot(1);
+	if (version==22) {
+		CheckWeaponQuickSlot(2);
+		CheckWeaponQuickSlot(3);
+	} else {
 	//disabling quick weapon slots for certain classes
-	for(i=0;i<2;i++) {
-		int which = ACT_WEAPON3+i;
-		// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
-		if (PCStats->QSlots[i+3]!=which) {
-			SetupQuickSlot(which, 0xffff, 0xffff);
+		for(i=0;i<2;i++) {
+			int which = ACT_WEAPON3+i;
+			// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
+			if (PCStats->QSlots[i+3]!=which) {
+				SetupQuickSlot(which, 0xffff, 0xffff);
+			}
 		}
 	}
 }
@@ -5397,7 +5402,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
 
-int Actor::GetDefense(int DamageType,  ieDword wflags, Actor *attacker) const
+int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker) const
 {
 	//specific damage type bonus.
 	int defense = 0;
@@ -7027,7 +7032,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	else {
 		PCStats->QuickWeaponHeaders[slot]=header;
 	}
-	slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
+	slot = inventory.GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
 	Equipped = (ieWordSigned) slot;
 	EquippedHeader = (ieWord) header;
 	if (inventory.SetEquippedSlot(slot, header)) {
