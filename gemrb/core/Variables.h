@@ -106,6 +106,9 @@ public:
 
 	iterator GetNextAssoc(iterator rNextPosition, const char*& rKey,
 		ieDword& rValue) const;
+
+	// Debugging
+	void DebugDump();
 	// Implementation
 protected:
 	Variables::MyAssoc** m_pHashTable;

@@ -799,6 +799,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		}
 		return;
 	}
+	if (Mod & GEM_MOD_SHIFT) {
+		Key = toupper(Key);
+	}
+
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
 		if (!core->CheatEnabled()) {
@@ -929,6 +933,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( p, rand()%30, 1 );
+				break;
+			case 'V': //
+				core->GetDictionary()->DebugDump();
 				break;
 			case 'w': // consolidates found ground piles under the pointed pc
 				area->MoveVisibleGroundPiles(p);
