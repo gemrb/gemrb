@@ -1,6 +1,6 @@
 2DA V1.0
 guibtact
-1          2          3          4          TOOLTIP    RESREF
+            1          2          3          4          TOOLTIP    RESREF
 Stealth     28         29         30         31         4968       guibtact
 Thieving    24         25         26         27         4971       guibtact
 Cast        8          9          10         11         4688       guibtact
@@ -37,6 +37,7 @@ Left        48         49         50         51         -1         guibtact
 Right       52         53         54         55         -1         guibtact
 34          *          *          *          *          *          *
 35          *          *          *          *          *          *
+36          *          *          *          *          *          *
 37          *          *          *          *          *          *
 38          *          *          *          *          *          *
 39          *          *          *          *          *          *
