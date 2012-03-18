@@ -1366,3 +1366,7 @@ def OpenWaitForDiscWindow ():
 
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
+
+def HideInterface():
+	GemRB.GameSetScreenFlags (GS_HIDEGUI, OP_XOR)
+	return
