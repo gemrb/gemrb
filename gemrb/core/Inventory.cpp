@@ -963,28 +963,28 @@ bool Inventory::EquipItem(ieDword slot)
 		UpdateShieldAnimation(itm);
 		break;
 	case SLOT_EFFECT_MELEE:
-		//if weapon is ranged, then find quarrel for it and equip that
+		//if weapon is bow, then find quarrel for it and equip that
 		weaponslot = GetWeaponQuickSlot(slot);
 		EquippedHeader = 0;
 		header = itm->GetExtHeader(EquippedHeader);
-		if (header && header->AttackType == ITEM_AT_BOW) {
-			//find the ranged projectile associated with it.
-			slot = FindRangedProjectile(header->ProjectileQualifier);
-			EquippedHeader = itm->GetWeaponHeaderNumber(true);
-		} else if (header && header->AttackType == ITEM_AT_PROJECTILE) {
-			EquippedHeader = itm->GetWeaponHeaderNumber(true);
-		} else {
-			EquippedHeader = itm->GetWeaponHeaderNumber(false);
-		}
-		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
-			if (slot != IW_NO_EQUIPPED) {
-				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, GetWeaponSlot(weaponslot), EquippedHeader);
+			if (header->AttackType == ITEM_AT_BOW) {
+				//find the ranged projectile associated with it, this returns equipped code
+				Equipped = FindRangedProjectile(header->ProjectileQualifier);
+				//this is the real item slot of the quarrel
+				slot = Equipped + SLOT_MELEE;
+			} else {
+				//this is always 0-3
+				Equipped = weaponslot;
+				slot = GetWeaponSlot(weaponslot);
 			}
-			SetEquippedSlot(weaponslot, EquippedHeader);
+			if (Equipped != IW_NO_EQUIPPED) {
+				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, EquippedHeader);
+			}
+			SetEquippedSlot(Equipped, EquippedHeader);
 			//don't clear effect in case of a launcher, we need to find it and add its effects too
 			//slot is 'negative' for launchers
-			if ((int) slot>=0) {
+			if ((int) Equipped>=0) {
 				effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			} else {
 				effect = SLOT_EFFECT_MISSILE;
