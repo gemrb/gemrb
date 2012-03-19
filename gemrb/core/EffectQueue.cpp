@@ -61,6 +61,10 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	int a, stat;
 
 	switch (table) {
+	case 0:
+		stat = IE_FACTION; break;
+	case 1:
+		stat = IE_TEAM; break;
 	case 2: //EA
 		stat = IE_EA; break;
 	case 3: //GENERAL
@@ -95,6 +99,10 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 			}
 		}
 		return true;
+	case 9:
+		stat = target->GetClassMask();
+		if (value&stat) return true;
+		return false;
 	default:
 		return false;
 	}
