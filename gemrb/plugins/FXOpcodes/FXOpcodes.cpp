@@ -6928,18 +6928,34 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	Game *game;
 	ieResRef resref;
 
-	if(0) print("fx_cutscene2(%2d): Type: %d", fx->Opcode, fx->Parameter2);
+	if(0) print("fx_cutscene2(%2d): Locations: %d Resource: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
 	game = core->GetGame();
 	if (!game) return FX_NOT_APPLIED;
 
-	game->ClearPlaneLocations();
-	for (int i = 0; i < game->GetPartySize(false); i++) {
-		Actor* act = game->GetPC( i, false );
-		GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
-		if (act && gle) {
-			gle->Pos = act->Pos;
-			memcpy(gle->AreaResRef, act->Area, 9);
+	switch(fx->Parameter1) {
+	case 1:  //simple party locations
+		game->ClearSavedLocations();
+		for (int i = 0; i < game->GetPartySize(false); i++) {
+			Actor* act = game->GetPC( i, false );
+			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
+			if (act && gle) {
+				gle->Pos = act->Pos;
+				memcpy(gle->AreaResRef, act->Area, 9);
+			}
+		}
+		break;
+	case 2: //no store
+		break;
+	default://original plane locations
+		game->ClearPlaneLocations();
+		for (int i = 0; i < game->GetPartySize(false); i++) {
+			Actor* act = game->GetPC( i, false );
+			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
+			if (act && gle) {
+				gle->Pos = act->Pos;
+				memcpy(gle->AreaResRef, act->Area, 9);
+			}
 		}
 	}
 
