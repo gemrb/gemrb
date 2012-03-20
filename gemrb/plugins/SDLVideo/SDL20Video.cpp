@@ -90,9 +90,14 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		return GEM_ERROR;
 	}
 
-	Viewport.x = Viewport.y = 0;
+#if TARGET_OS_IPHONE
+	// on iOS the window is always the entire screen
+	// simulate a window by making the using passed in values for the backBuf size
+	width = w;
+	height = h;
+#else
 	SDL_GetWindowSize(window, &width, &height);
-
+#endif
 	Viewport.w = width;
 	Viewport.h = height;
 
@@ -267,7 +272,11 @@ int SDL20VideoDriver::SwapBuffers(void)
 		SDL_RenderFillRect(renderer, &dst);
 	}
 
-	SDL_RenderCopy(renderer, tex, NULL, NULL);
+	int w, h = 0;
+	SDL_GetWindowSize(window, &w, &h);
+	SDL_Rect dstRect = {0, 0, w, h};
+
+	SDL_RenderCopy(renderer, tex, NULL, &dstRect);
 
 	SDL_RenderPresent( renderer );
 	SDL_DestroyTexture(tex);
@@ -328,10 +337,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	int numFingers = 0;
 	if(state){
 		numFingers = state->num_fingers;
-		int w, h;
-		SDL_GetWindowSize(window, &w, &h);
-		xScaleFactor = state->xres / w;
-		yScaleFactor = state->yres / h;
+		//int w, h;
+		//SDL_GetWindowSize(window, &w, &h);
+		xScaleFactor = (state->xres / backBuf->w);
+		yScaleFactor = (state->yres / backBuf->h);
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
