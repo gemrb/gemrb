@@ -2940,14 +2940,14 @@ void Actor::VerbalConstant(int start, int count) const
 			ResolveStringConstant(soundref, start+count-1);
 		}
 		if (count > 0){
-			DisplayStringCore((Scriptable *const) this, start + rand()%count, DS_CONSOLE|DS_CONST);
+			DisplayStringCore((Scriptable *const) this, start + rand()%count, DS_CONSOLE|DS_CONST|DS_SPEECH);
 		}
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
 		}
 		if(count > 0) {
-			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+rand()%count), DS_CONSOLE );
+			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+rand()%count), DS_CONSOLE|DS_SPEECH);
 		}
 	}
 }
