@@ -22,6 +22,7 @@
 #include "strrefs.h"
 #include "win32def.h"
 
+#include "CharAnimations.h"
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "Effect.h"
@@ -898,6 +899,26 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 
+			case 'M':
+				if (!lastActor) {
+					lastActor = area->GetActor( p, GA_DEFAULT);
+				}
+				if (!lastActor) {
+					// ValidTarget never returns immobile targets, making debugging a nightmare
+					// so if we don't have an actor, we make really really sure by checking manually
+					unsigned int count = area->GetActorCount(true);
+					while (count--) {
+						Actor *actor = area->GetActor(count, true);
+						if (actor->IsOver(p)) {
+							actor->GetAnims()->DebugDump();
+						}
+					}
+				}
+				if (lastActor) {
+					lastActor->GetAnims()->DebugDump();
+					break;
+				}
+				break;
 			case 'm': //prints a debug dump (ctrl-m in the original game too)
 				if (!lastActor) {
 					lastActor = area->GetActor( p, GA_DEFAULT);

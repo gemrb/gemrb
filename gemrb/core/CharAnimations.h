@@ -104,6 +104,9 @@ namespace GemRB {
 #define IE_ANI_RANGED_XBOW		1
 #define IE_ANI_RANGED_THROW		2
 
+//special flags
+#define AV_NO_BODY_HEAT                 1
+
 struct AvatarStruct {
 	/* entries from avatars.2da */
 	unsigned int AnimID;
@@ -114,7 +117,8 @@ struct AvatarStruct {
 	char Size;
 
 	/* comes from bloodclr.2da */
-	char BloodColor;	
+	char BloodColor;
+	unsigned int Flags;
 	
 	/* resdata.ini entries */
 	unsigned int WalkScale; /* 1000 / walkscale */
@@ -182,10 +186,11 @@ public: //attribute functions
 	int GetAnimType() const;
 	int GetSize() const;
 	int GetBloodColor() const;
+	unsigned int GetFlags() const;
 	const ieResRef &GetWalkSound() const;
 	int GetWalkSoundCount() const;
 	void PulseRGBModifiers();
-
+	void DebugDump();
 private:
 	void DropAnims();
 	void InitAvatarsTable();
