@@ -6240,7 +6240,7 @@ void Actor::UpdateAnimations()
 	}
 }
 
-bool Actor::ShouldDrawCircle()
+bool Actor::ShouldDrawCircle() const
 {
 	if (Modified[IE_NOCIRCLE]) {
 		return false;
@@ -6263,6 +6263,13 @@ bool Actor::ShouldDrawCircle()
 		}
 	}
 
+	return true;
+}
+
+bool Actor::HasBodyHeat() const
+{
+	if (Modified[IE_STATE_ID]&(STATE_DEAD|STATE_FROZEN|STATE_PETRIFIED) ) return false;
+	if (GetAnims()->GetFlags()&AV_NO_BODY_HEAT) return false;
 	return true;
 }
 
@@ -6501,7 +6508,7 @@ void Actor::Draw(const Region &screen)
 		}
 
 		//infravision tint
-		if (!(State&(STATE_DEAD|STATE_FROZEN|STATE_PETRIFIED) ) &&
+		if ( HasBodyHeat() &&
 			(area->GetLightLevel(Pos)<128) &&
 			core->GetGame()->PartyHasInfravision()) {
 			tint.r=255;
