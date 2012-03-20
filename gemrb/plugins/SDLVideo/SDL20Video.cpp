@@ -275,6 +275,15 @@ int SDL20VideoDriver::SwapBuffers(void)
 	int w, h = 0;
 	SDL_GetWindowSize(window, &w, &h);
 	SDL_Rect dstRect = {0, 0, w, h};
+#if TARGET_OS_IPHONE
+	// our "window" is simulated
+	if (!fullscreen) {
+		dstRect.x = (w - backBuf->w) / 2;
+		dstRect.y = (h - backBuf->h) / 2;
+		dstRect.w = backBuf->w;
+		dstRect.h = backBuf->h;
+	}
+#endif
 
 	SDL_RenderCopy(renderer, tex, NULL, &dstRect);
 
