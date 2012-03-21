@@ -5445,7 +5445,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//not sticky
-	if  (fx->Parameter2 == 2 || !target) {
+	if (fx->Parameter2 == 2 || !target) {
 		sca->XPos = fx->PosX;
 		sca->YPos = fx->PosY;
 	} else {
@@ -6925,7 +6925,7 @@ int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //runs a predetermined script in cutscene mode
 int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-  int i;
+	int i;
 	Game *game;
 	ieResRef resref;
 
@@ -6935,7 +6935,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (!game) return FX_NOT_APPLIED;
 
 	switch(fx->Parameter1) {
-	case 1:  //simple party locations
+	case 1://simple party locations
 		game->ClearSavedLocations();
 		for (i = 0; i < game->GetPartySize(false); i++) {
 			Actor* act = game->GetPC( i, false );
