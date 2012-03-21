@@ -119,6 +119,7 @@ static ieDword sel_snd_freq = 0;
 static ieDword cmd_snd_freq = 0;
 static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
+static ieDword footsteps = 1;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
@@ -1472,6 +1473,7 @@ GEM_EXPORT void UpdateActorConfig()
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
+	core->GetDictionary()->Lookup("Footsteps", footsteps);
 }
 
 static void InitActorTables()
@@ -6227,10 +6229,11 @@ void Actor::UpdateAnimations()
 			anims[0]->SetPos(0);
 		}
 	} else {
+		//check if walk sounds need to be played
 		//dialog, pause game
 		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-			//stance
-			if (GetStance() == IE_ANI_WALK) {
+			//footsteps option set, stance
+			if (footsteps && (GetStance() == IE_ANI_WALK)) {
 				//frame reached 0
 				if (!anims[0]->GetCurrentFrame()) {
 					PlayWalkSound();
