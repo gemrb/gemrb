@@ -128,6 +128,12 @@ int CharAnimations::GetBloodColor() const
 	return AvatarTable[AvatarsRowNum].BloodColor;
 }
 
+unsigned int CharAnimations::GetFlags() const
+{
+	if(AvatarsRowNum==~0u) return 0;
+	return AvatarTable[AvatarsRowNum].Flags;
+}
+
 static ieResRef EmptySound={0};
 
 const ieResRef &CharAnimations::GetWalkSound() const
@@ -509,21 +515,24 @@ void CharAnimations::InitAvatarsTable()
 		int rows = blood->GetRowCount();
 		for(int i=0;i<rows;i++) {
 			unsigned long value = 0;
+			unsigned long flags = 0;
 			unsigned long rmin = 0;
 			unsigned long rmax = 0xffff;
 
 			valid_number(blood->QueryField(i,0), (long &)value);
 			valid_number(blood->QueryField(i,1), (long &)rmin);
 			valid_number(blood->QueryField(i,2), (long &)rmax);
+			valid_number(blood->QueryField(i,3), (long &)flags);
 			if (value>255 || rmin>0xffff || rmax>0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid, bloodclr entry: %02x %04x-%04x ",
+				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ",
 						(unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 				continue;
 			}
 			for(int j=0;j<AvatarsCount;j++) {
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
-				AvatarTable[j].BloodColor = value;
+				AvatarTable[j].BloodColor = (char) value;
+				AvatarTable[j].Flags = (unsigned int) flags;
 			}
 		}
 	}
@@ -2391,6 +2400,13 @@ void CharAnimations::PulseRGBModifiers()
 	}
 
 	lastModUpdate += inc*40;
+}
+
+void CharAnimations::DebugDump()
+{
+	Log (DEBUG, "CharAnimations", "Anim ID   : %04x", GetAnimationID() );
+	Log (DEBUG, "CharAnimations", "BloodColor: %d", GetBloodColor() );
+	Log (DEBUG, "CharAnimations", "Flags     : %04x", GetFlags() );
 }
 
 }

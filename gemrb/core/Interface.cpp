@@ -3857,7 +3857,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Keyboard Scroll Speed", 64},
 		{"Game Options", "Command Sounds Frequency", 0},
 		{"Game Options", "Selection Sounds Frequency", 0},
-		{"Game Options", "Infravision", 0},					// not used. should be implemented.
+		{"Game Options", "Infravision", 1},
 		{"Game Options", "Weather", 1},						// not used. should be implemented.
 		{"Game Options", "Auto Pause State", AP_ENEMY|AP_DEAD|AP_ENEMY},
 		{"Game Options", "Auto Pause Center", 1},

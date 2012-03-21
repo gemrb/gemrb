@@ -1648,7 +1648,10 @@ bool Game::TimeStoppedFor(const Actor* target)
 //recalculate the party's infravision state
 void Game::Infravision()
 {
+	ieDword tmp = 0;
 	hasInfra = false;
+	core->GetDictionary()->Lookup("infravision", tmp);
+	if (!tmp) return;
 	Map *map = GetCurrentArea();
 	if (!map) return;
 	for(size_t i=0;i<PCs.size();i++) {
