@@ -1609,6 +1609,7 @@ int Interface::Init()
 	char ini_path[_MAX_PATH] = { '\0' };
 	if (!IgnoreOriginalINI) {
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
+    Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
