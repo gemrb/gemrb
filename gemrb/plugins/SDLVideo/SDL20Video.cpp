@@ -284,7 +284,6 @@ int SDL20VideoDriver::SwapBuffers(void)
 		dstRect.h = backBuf->h;
 	}
 #endif
-
 	SDL_RenderCopy(renderer, tex, NULL, &dstRect);
 
 	SDL_RenderPresent( renderer );
@@ -341,15 +340,28 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
 	 */
 	SDL_Touch *state = SDL_GetTouch(event.tfinger.touchId);
-	float xScaleFactor = 1.0;
-	float yScaleFactor = 1.0;
+	float xScaleFactor, yScaleFactor = 1.0;
+	int xOffset, yOffset = 0;
 	int numFingers = 0;
 	if(state){
 		numFingers = state->num_fingers;
-		//int w, h;
-		//SDL_GetWindowSize(window, &w, &h);
-		xScaleFactor = (state->xres / backBuf->w);
-		yScaleFactor = (state->yres / backBuf->h);
+#if TARGET_OS_IPHONE
+		if (fullscreen) {
+			// simulated window adjustment
+			xScaleFactor = (state->xres / backBuf->w);
+			yScaleFactor = (state->yres / backBuf->h);
+		} else {
+#endif
+		int w, h;
+		SDL_GetWindowSize(window, &w, &h);
+		xScaleFactor = (state->xres / w);
+		yScaleFactor = (state->yres / h);
+#if TARGET_OS_IPHONE
+			// now we need to offset the x/y coordinates
+			xOffset = ((w - backBuf->w) / 2) * -1;
+			yOffset = ((h - backBuf->h) / 2) * -1;
+		}
+#endif
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
@@ -383,23 +395,23 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					ProcessFirstTouch(GEM_MB_ACTION);
 				}
 				// invert the coordinates such that dragging down scrolls up etc.
-				int scrollX = (event.tfinger.dx / xScaleFactor) * -1;
-				int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
+				int scrollX = ((event.tfinger.dx / xScaleFactor) + xOffset) * -1;
+				int scrollY = ((event.tfinger.dy / yScaleFactor) + yOffset) * -1;
 
 				EvntManager->MouseWheelScroll( scrollX, scrollY );
 			} else if (numFingers == core->NumFingKboard) {
-				if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
+				if (((event.tfinger.dy / yScaleFactor) + xOffset) * -1 >= MIN_GESTURE_DELTA_PIXELS){
 					// if the keyboard is already up interpret this gesture as console pop
 					if( softKeyboardShowing && !ConsolePopped ) core->PopupConsole();
 					else ShowSoftKeyboard();
-				} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+				} else if(((event.tfinger.dy / yScaleFactor) + xOffset) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 					HideSoftKeyboard();
 				}
 			} else if (numFingers == 1) { //click and drag
 				ProcessFirstTouch(GEM_MB_ACTION);
 				ignoreNextFingerUp = false;
 				// standard mouse movement
-				MouseMovement(event.tfinger.x / xScaleFactor, event.tfinger.y / yScaleFactor);
+				MouseMovement((event.tfinger.x / xScaleFactor) + xOffset, (event.tfinger.y / yScaleFactor) + yOffset);
 			}
 			break;
 		case SDL_FINGERDOWN:
@@ -408,7 +420,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				firstFingerDown = event.tfinger;
 				firstFigerDownTime = GetTickCount();
 				firstFingerDown.x /= xScaleFactor;
+				firstFingerDown.x += xOffset;
 				firstFingerDown.y /= yScaleFactor;
+				firstFingerDown.y += yOffset;
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
 				ProcessFirstTouch(GEM_MB_ACTION);
 				EvntManager->OnSpecialKeyPress( GEM_TAB );
@@ -428,7 +442,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						CursorPos.x = event.button.x;
 						CursorPos.y = event.button.y;
 
-						EvntManager->MouseUp( event.tfinger.x / xScaleFactor, event.tfinger.y / yScaleFactor,
+						EvntManager->MouseUp((event.tfinger.x / xScaleFactor) + xOffset,
+											 (event.tfinger.y / yScaleFactor) + yOffset,
 											 mouseButton, GetModState(SDL_GetModState()) );
 					}
 					ignoreNextFingerUp = false;
