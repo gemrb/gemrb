@@ -3854,7 +3854,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "GUI Feedback Levels", 0},
 		{"Game Options", "Locator Feedback Level", 0},
 		{"Game Options", "Bored Timeout", 0},
-		{"Game Options", "Always Dithers", 0},
+		{"Game Options", "Always Dither", 0},
 		{"Game Options", "Keyboard Scroll Speed", 64},
 		{"Game Options", "Command Sounds Frequency", 0},
 		{"Game Options", "Selection Sounds Frequency", 0},
@@ -3871,7 +3871,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	const size_t listSize = sizeof(whitelist) / sizeof(whitelist[0]);
 	for (size_t i = 0; i < listSize; i++) {
 		INIWhiteListEntry entry = whitelist[i];
-		if (!vars->Lookup(entry.INIKey, nothing)) //skip any existing enties. GemRB.cfg has priority
+		if (!vars->Lookup(entry.INIKey, nothing)) //skip any existing entries. GemRB.cfg has priority
 			vars->SetAt(entry.INIKey, ini->GetKeyAsInt(entry.INITag, entry.INIKey, entry.defaultValue));
 	}
 
