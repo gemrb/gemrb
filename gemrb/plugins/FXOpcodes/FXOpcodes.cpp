@@ -4847,17 +4847,39 @@ int fx_dontjump_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_move_to_area (%2d) %s", fx->Opcode, fx->Resource );
-	//delay effect until the target has finished the previous move to an area
-	//hopefully this fixes an evil bug
-	Map *map = target->GetCurrentArea();
-	if (!map || !map->HasActor(target)) {
-		//stay around for the next evaluation
-		return FX_APPLIED;
+
+	Game *game = core->GetGame();
+	//remove actor from current map, and set destination map
+	if (fx->FirstApply) {
+		//if current area is different from target area
+		if (strnicmp(game->CurrentArea, fx->Resource, 8) ) {
+			//make global
+			game->AddNPC( target );
+			//remove from current area
+			Map *map = target->GetCurrentArea();
+			if (map) {
+				map->RemoveActor( target );
+			}
+			//set the destination area
+			strnuprcpy(target->Area, fx->Resource, 8);
+			return FX_APPLIED;
+		}
 	}
-	Point p(fx->PosX,fx->PosY);
-	MoveBetweenAreasCore(target, fx->Resource, p, fx->Parameter2, true);
-	//this effect doesn't stick
-	return FX_NOT_APPLIED;
+
+	if (!strnicmp(game->CurrentArea, fx->Resource, 8) ) {
+		//UnMakeGlobal
+		int slot = core->GetGame()->InStore( target );
+		if (slot >= 0) {
+			game->DelNPC( slot );
+		}
+		//move to area
+		Point p(fx->PosX,fx->PosY);
+		MoveBetweenAreasCore(target, fx->Resource, p, fx->Parameter2, true);
+		//remove the effect now
+		return FX_NOT_APPLIED;
+	}
+	//stick around, waiting for the time
+	return FX_APPLIED;
 }
 
 // 0xbb Variable:StoreLocalVariable
