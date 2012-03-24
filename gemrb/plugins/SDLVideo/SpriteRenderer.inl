@@ -22,6 +22,25 @@
 //#define HIGHLIGHTCOVER
 
 
+
+// For pixel formats:
+// We hardcode a single pixel format per bit depth.
+// TODO: Make this platform-specific (OS X / iOS / ...?)
+
+const unsigned int RLOSS16 = 3;
+const unsigned int GLOSS16 = 2;
+const unsigned int BLOSS16 = 3;
+const unsigned int RSHIFT16 = 11;
+const unsigned int GSHIFT16 = 5;
+const unsigned int BSHIFT16 = 0;
+
+const unsigned int RSHIFT32 = 16;
+const unsigned int GSHIFT32 = 8;
+const unsigned int BSHIFT32 = 0;
+
+const Uint16 halfmask16 = ((0xFFU >> (RLOSS16+1)) << RSHIFT16) | ((0xFFU >> (GLOSS16+1)) << GSHIFT16) | ((0xFFU >> (BLOSS16+1)) << BSHIFT16);
+const Uint32 halfmask32 = ((0xFFU >> 1) << RSHIFT32) | ((0xFFU >> 1) << GSHIFT32) | ((0xFFU >> 1) << BSHIFT32);
+
 static Region computeClipRect(SDL_Surface* target, const Region* clip,
                               int tx, int ty, int width, int height)
 {
@@ -225,33 +244,33 @@ struct SRBlender {
 template<>
 struct SRBlender<Uint16, SRBlender_NoAlpha, SRFormat_Hard> {
 	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		pix = ((r >> 3) << 11) |
-		      ((g >> 2) <<  5) |
-		      ((b >> 3) <<  0);
+		pix = ((r >> RLOSS16) << RSHIFT16) |
+		      ((g >> GLOSS16) << GSHIFT16) |
+		      ((b >> BLOSS16) << BSHIFT16);
 	}
 };
 
 template<>
 struct SRBlender<Uint16, SRBlender_HalfAlpha, SRFormat_Hard> {
 	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		// 0x7BEF: the most significant bit of each component cleared
-		pix = ((pix >> 1) & 0x7BEF) +
-		      (((r << 15) | (g <<  7) | (b >>  1)) & 0x7BEF);
+		pix = ((pix >> 1) & halfmask16) +
+		      ((((r >> (RLOSS16+1)) << RSHIFT16) | ((g >> (GLOSS16+1)) << GSHIFT16) | ((b >> (BLOSS16+1)) << BSHIFT16)) & halfmask16);
 	}
 };
 
 template<>
 struct SRBlender<Uint16, SRBlender_Alpha, SRFormat_Hard> {
 	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-		unsigned int dr = 1 + a*(r >> 3) + (255-a)*((pix >> 11) & 0x1F);
-		unsigned int dg = 1 + a*(g >> 2) + (255-a)*((pix >>  5) & 0x3F);
-		unsigned int db = 1 + a*(b >> 3) + (255-a)*((pix >>  0) & 0x1F);
+		unsigned int dr = 1 + a*(r >> RLOSS16) + (255-a)*((pix >> RSHIFT16) & ((1 << (8-RLOSS16))-1));
+		unsigned int dg = 1 + a*(g >> GLOSS16) + (255-a)*((pix >> GSHIFT16) & ((1 << (8-GLOSS16))-1));
+		unsigned int db = 1 + a*(b >> BLOSS16) + (255-a)*((pix >> BSHIFT16) & ((1 << (8-BLOSS16))-1));
+
 		r = (dr + (dr>>8)) >> 8;
 		g = (dg + (dg>>8)) >> 8;
 		b = (db + (db>>8)) >> 8;
-		pix = (r << 11) |
-		      (g <<  5) |
-		      (b <<  0);
+		pix = (r << RSHIFT16) |
+		      (g << GSHIFT16) |
+		      (b << BSHIFT16);
 	}
 };
 
@@ -259,18 +278,17 @@ struct SRBlender<Uint16, SRBlender_Alpha, SRFormat_Hard> {
 template<>
 struct SRBlender<Uint32, SRBlender_NoAlpha, SRFormat_Hard> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		pix = (r << 16) |
-		      (g <<  8) |
-		      (b <<  0);
+		pix = (r << RSHIFT32) |
+		      (g << GSHIFT32) |
+		      (b << BSHIFT32);
 	}
 };
 
 template<>
 struct SRBlender<Uint32, SRBlender_HalfAlpha, SRFormat_Hard> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		// 0x7F7F7F: the most significant bit of each component cleared
-		pix = ((pix >> 1) & 0x007F7F7F) +
-		      (((r << 15) | (g <<  7) | (b >>  1)) & 0x007F7F7F);
+		pix = ((pix >> 1) & halfmask32) +
+		      ((((r << RSHIFT32) | (g << GSHIFT32) | (b << BSHIFT32)) >> 1) & halfmask32);
 	}
 };
 
@@ -278,15 +296,15 @@ struct SRBlender<Uint32, SRBlender_HalfAlpha, SRFormat_Hard> {
 template<>
 struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-		unsigned int dr = 1 + a*r + (255-a)*((pix >> 16) & 0xFF);
-		unsigned int dg = 1 + a*g + (255-a)*((pix >>  8) & 0xFF);
-		unsigned int db = 1 + a*b + (255-a)*((pix >>  0) & 0xFF);
+		unsigned int dr = 1 + a*r + (255-a)*((pix >> RSHIFT32) & 0xFF);
+		unsigned int dg = 1 + a*g + (255-a)*((pix >> GSHIFT32) & 0xFF);
+		unsigned int db = 1 + a*b + (255-a)*((pix >> BSHIFT32) & 0xFF);
 		r = (dr + (dr>>8)) >> 8;
 		g = (dg + (dg>>8)) >> 8;
 		b = (db + (db>>8)) >> 8;
-		pix = (r << 16) |
-		      (g <<  8) |
-		      (b <<  0);
+		pix = (r << RSHIFT32) |
+		      (g << GSHIFT32) |
+		      (b << BSHIFT32);
 	}
 };
 
