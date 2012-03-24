@@ -2933,6 +2933,11 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 
 void Actor::VerbalConstant(int start, int count) const
 {
+	if (start!=VB_DIE) {
+		//can't talk when dead
+		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return;
+	}
+
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
