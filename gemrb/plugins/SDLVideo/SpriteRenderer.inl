@@ -71,26 +71,26 @@ static Region computeClipRect(SDL_Surface* target, const Region* clip,
 }
 
 
-template<typename PTYPE>
 struct SRShadow_NOP {
+	template<typename PTYPE>
 	bool operator()(PTYPE&, Uint8, int&, unsigned int) const { return false; }
 };
 
-template<typename PTYPE>
 struct SRShadow_None {
+	template<typename PTYPE>
 	bool operator()(PTYPE&, Uint8 p, int&, unsigned int) const { return (p == 1); }
 };
 
-template<typename PTYPE>
 struct SRShadow_HalfTrans {
 	SRShadow_HalfTrans(const SDL_PixelFormat* format, const Color& col)
 	{
-		shadowcol = (PTYPE)SDL_MapRGBA(format, col.r/2, col.g/2, col.b/2, 0);
+		shadowcol = (Uint32)SDL_MapRGBA(format, col.r/2, col.g/2, col.b/2, 0);
 		mask =   (0x7F >> format->Rloss) << format->Rshift
 				| (0x7F >> format->Gloss) << format->Gshift
 				| (0x7F >> format->Bloss) << format->Bshift;
 	}
 
+	template<typename PTYPE>
 	bool operator()(PTYPE& pix, Uint8 p, int&, unsigned int) const
 	{
 		if (p == 1) {
@@ -100,18 +100,18 @@ struct SRShadow_HalfTrans {
 		return false;
 	}
 
-	PTYPE mask;
-	PTYPE shadowcol;
+	Uint32 mask;
+	Uint32 shadowcol;
 };
 
-template<typename PTYPE>
 struct SRShadow_Regular {
+	template<typename PTYPE>
 	bool operator()(PTYPE&, Uint8, int&, unsigned int) const { return false; }
 };
 
 // Conditionally handle halftrans,noshadow,transshadow
-template<typename PTYPE>
 struct SRShadow_Flags {
+	template<typename PTYPE>
 	bool operator()(PTYPE&, Uint8 p, int& a, unsigned int flags) const {
 		if ((flags & BLIT_HALFTRANS) || ((p == 1) && (flags & BLIT_TRANSSHADOW)))
 			a = 1;
@@ -207,24 +207,23 @@ struct SRTinter_FlagsNoTint {
 };
 
 
-template<typename PTYPE>
-struct SRBlender_NoAlpha {
-	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8) const { assert(false); }
-};
+struct SRBlender_NoAlpha { };
+struct SRBlender_HalfAlpha { };
+struct SRBlender_Alpha { };
 
-template<typename PTYPE>
-struct SRBlender_HalfAlpha {
-	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8) const { assert(false); }
-};
+struct SRFormat_Hard { };
+struct SRFormat_Soft { };
 
-template<typename PTYPE>
-struct SRBlender_Alpha {
+template<typename PTYPE, typename BLENDER, typename PIXELFORMAT>
+struct SRBlender {
 	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const { assert(false); }
 };
 
+
+
 // 16 bpp, 565
 template<>
-struct SRBlender_NoAlpha<Uint16> {
+struct SRBlender<Uint16, SRBlender_NoAlpha, SRFormat_Hard> {
 	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 		pix = ((r >> 3) << 11) |
 		      ((g >> 2) <<  5) |
@@ -233,7 +232,7 @@ struct SRBlender_NoAlpha<Uint16> {
 };
 
 template<>
-struct SRBlender_HalfAlpha<Uint16> {
+struct SRBlender<Uint16, SRBlender_HalfAlpha, SRFormat_Hard> {
 	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 		// 0x7BEF: the most significant bit of each component cleared
 		pix = ((pix >> 1) & 0x7BEF) +
@@ -242,7 +241,7 @@ struct SRBlender_HalfAlpha<Uint16> {
 };
 
 template<>
-struct SRBlender_Alpha<Uint16> {
+struct SRBlender<Uint16, SRBlender_Alpha, SRFormat_Hard> {
 	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
 		unsigned int dr = 1 + a*(r >> 3) + (255-a)*((pix >> 11) & 0x1F);
 		unsigned int dg = 1 + a*(g >> 2) + (255-a)*((pix >>  5) & 0x3F);
@@ -258,7 +257,7 @@ struct SRBlender_Alpha<Uint16> {
 
 // 32 bpp, 888
 template<>
-struct SRBlender_NoAlpha<Uint32> {
+struct SRBlender<Uint32, SRBlender_NoAlpha, SRFormat_Hard> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 		pix = (r << 16) |
 		      (g <<  8) |
@@ -267,7 +266,7 @@ struct SRBlender_NoAlpha<Uint32> {
 };
 
 template<>
-struct SRBlender_HalfAlpha<Uint32> {
+struct SRBlender<Uint32, SRBlender_HalfAlpha, SRFormat_Hard> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 		// 0x7F7F7F: the most significant bit of each component cleared
 		pix = ((pix >> 1) & 0x007F7F7F) +
@@ -277,7 +276,7 @@ struct SRBlender_HalfAlpha<Uint32> {
 
 
 template<>
-struct SRBlender_Alpha<Uint32> {
+struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
 		unsigned int dr = 1 + a*r + (255-a)*((pix >> 16) & 0xFF);
 		unsigned int dg = 1 + a*g + (255-a)*((pix >>  8) & 0xFF);
@@ -717,9 +716,8 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 
 // call the BlitSprite{RLE,}_internal instantiation with the specified
 // COVER, XFLIP, RLE bools
-// TODO: Add PTYPE?
 template<typename PTYPE, typename Shadow, typename Tinter, typename Blender>
-static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
+static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
             int tx, int ty,
@@ -777,11 +775,38 @@ static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
 			    shadow, tint, blend);
 }
 
+// call the BlitSpritePAL_dispatch2 instantiation with the right pixelformat
+// TODO: Hardcoded/non-hardcoded pixelformat
+template<typename Shadow, typename Tinter, typename Blender>
+static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
+            SDL_Surface* target,
+            const Uint8* srcdata, const Color* col,
+            int tx, int ty,
+            int width, int height,
+            bool yflip,
+            const Region& clip,
+            int transindex,
+            const SpriteCover* cover,
+            const Sprite2D* spr, unsigned int flags,
+            const Shadow& shadow, const Tinter& tint, const Blender& /*dummy*/)
+{
+	if (target->format->BytesPerPixel == 4) {
+		SRBlender<Uint32, Blender, SRFormat_Hard> blend;
+		BlitSpritePAL_dispatch2<Uint32>(COVER, XFLIP, target, srcdata, col, tx, ty,
+		                                width, height, yflip, clip, transindex,
+		                                cover, spr, flags, shadow, tint, blend);
+	} else {
+		SRBlender<Uint16, Blender, SRFormat_Hard> blend;
+		BlitSpritePAL_dispatch2<Uint16>(COVER, XFLIP, target, srcdata, col, tx, ty,
+		                                width, height, yflip, clip, transindex,
+		                                cover, spr, flags, shadow, tint, blend);
+	}
+}
+
 // call the BlitSpriteRGB_internal instantiation with the specified
 // COVER, XFLIP bools
-// TODO: Add PTYPE?
 template<typename PTYPE, typename Tinter, typename Blender>
-static void BlitSpriteRGB_dispatch(bool COVER, bool XFLIP,
+static void BlitSpriteRGB_dispatch2(bool COVER, bool XFLIP,
             SDL_Surface* target,
             const Uint32* srcdata,
             int tx, int ty,
@@ -810,4 +835,29 @@ static void BlitSpriteRGB_dispatch(bool COVER, bool XFLIP,
 		    tint, blend);
 }
 
-
+// call the BlitSpriteRGB_dispatch2 instantiation with the right pixelformat
+// TODO: Hardcoded/non-hardcoded pixelformat
+template<typename Tinter, typename Blender>
+static void BlitSpriteRGB_dispatch(bool COVER, bool XFLIP,
+            SDL_Surface* target,
+            const Uint32* srcdata,
+            int tx, int ty,
+            int width, int height,
+            bool yflip,
+            const Region& clip,
+            const SpriteCover* cover,
+            const Sprite2D* spr, unsigned int flags,
+            const Tinter& tint, const Blender& /*dummy*/)
+{
+	if (target->format->BytesPerPixel == 4) {
+		SRBlender<Uint32, Blender, SRFormat_Hard> blend;
+		BlitSpriteRGB_dispatch2<Uint32>(COVER, XFLIP, target, srcdata, tx, ty,
+		                                width, height, yflip, clip, cover, spr,
+		                                flags, tint, blend);
+	} else {
+		SRBlender<Uint16, Blender, SRFormat_Hard> blend;
+		BlitSpriteRGB_dispatch2<Uint16>(COVER, XFLIP, target, srcdata, tx, ty,
+		                                width, height, yflip, clip, cover, spr,
+		                                flags, tint, blend);
+	}
+}
