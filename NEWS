@@ -13,6 +13,7 @@ GemRB git (bd5b8cc1f6):
     - config loading, logging
     - (iwd2) effects, combat, action bar
     - cocoa wrapper and mac build, cursor handling, touch input
+    - infravision
     - bugfixes
 
   Applied patches:

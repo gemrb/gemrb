@@ -200,6 +200,10 @@ int DataStream::ReadLine(void* buf, unsigned int maxlen)
 		return -1;
 	}
 	unsigned int i = 0;
+	//TODO: fix this to handle any combination of \r and \n
+	//Windows: \r\n
+	//Old Mac: \r
+	//otherOS: \n
 	while (i < ( maxlen - 1 )) {
 		char ch;
 		Read(&ch, 1);
