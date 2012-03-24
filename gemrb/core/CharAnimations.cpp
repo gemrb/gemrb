@@ -523,7 +523,7 @@ void CharAnimations::InitAvatarsTable()
 			valid_number(blood->QueryField(i,1), (long &)rmin);
 			valid_number(blood->QueryField(i,2), (long &)rmax);
 			valid_number(blood->QueryField(i,3), (long &)flags);
-			if (value>255 || rmin>0xffff || rmax>0xffff) {
+			if (value>255 || rmin>rmax || rmax>0xffff) {
 				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ",
 						(unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 				continue;
@@ -544,7 +544,7 @@ void CharAnimations::InitAvatarsTable()
 			ieResRef value;
 			unsigned long rmin = 0;
 			unsigned long rmax = 0xffff;
-			unsigned int range = 0;
+			unsigned long range = 0;
 
 			strnuprcpy(value, walk->QueryField(i,0), 8);
 			valid_number(walk->QueryField(i,1), (long &)rmin);
@@ -554,11 +554,16 @@ void CharAnimations::InitAvatarsTable()
 				value[0]=0;
 				range = 0;
 			}
+			if (range>255 || rmin>rmax || rmax>0xffff) {
+				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ",
+						(unsigned int) range, (unsigned int) rmin, (unsigned int) rmax);
+				continue;
+			}
 			for(int j=0;j<AvatarsCount;j++) {
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
 				memcpy(AvatarTable[j].WalkSound, value, sizeof(ieResRef) );
-				AvatarTable[j].WalkSoundCount = range;
+				AvatarTable[j].WalkSoundCount = (unsigned int) range;
 			}
 		}
 	}
