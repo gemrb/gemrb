@@ -109,17 +109,17 @@ void GlobalTimer::DoStep(int count)
 	if ( (x != goal.x) || (y != goal.y)) {
 		if (speed) {
 			if (x<goal.x) {
-				x+=speed;
+				x+=speed*count;
 				if (x>goal.x) x=goal.x;
 			} else {
-				x-=speed;
+				x-=speed*count;
 				if (x<goal.x) x=goal.x;
 			}
 			if (y<goal.y) {
-				y+=speed;
+				y+=speed*count;
 				if (y>goal.y) y=goal.y;
 			} else {
-				y-=speed;
+				y-=speed*count;
 				if (y<goal.y) y=goal.y;
 			}
 		} else {
@@ -136,8 +136,6 @@ void GlobalTimer::DoStep(int count)
 			shakeCounter=0;
 		}
 		if (shakeCounter) {
-			//x += (rand()%shakeX) - (shakeX>>1);
-			//y += (rand()%shakeY) - (shakeY>>1);
 			if (shakeX) {
 				x += rand()%shakeX;
 			}
