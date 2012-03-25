@@ -1368,13 +1368,13 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 //call this once, after area was loaded
 void Map::InitActors()
 {
-  size_t i = actors.size();
-  while(i--) {
-    Actor* actor = actors[i];
+	size_t i = actors.size();
+	while(i--) {
+		Actor* actor = actors[i];
 
-    actor->SetMap(this);
-    InitActor(actor);
-  }
+		actor->SetMap(this);
+		InitActor(actor);
+	}
 }
 
 void Map::InitActor(Actor *actor)
@@ -1398,10 +1398,10 @@ void Map::AddActor(Actor* actor, bool init)
 	//setting the current area for the actor as this one
 	strnlwrcpy(actor->Area, scriptName, 8);
 	actors.push_back( actor );
-  if (init) {
-	  actor->SetMap(this);
-    InitActor(actor);
-  }
+	if (init) {
+		actor->SetMap(this);
+		InitActor(actor);
+	}
 }
 
 bool Map::AnyPCSeesEnemy()
