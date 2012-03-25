@@ -108,11 +108,15 @@ int SDLVideoDriver::SwapBuffers(void)
 
 int SDLVideoDriver::PollEvents()
 {
-	int ret = GEM_OK;
+	int ret;
 	SDL_Event currentEvent;
-	while ( ret == GEM_OK && SDL_PollEvent(&currentEvent) ) {
+
+	if (!SDL_PollEvent(&currentEvent) ) return GEM_OK;
+
+	do {
 		ret = ProcessEvent(currentEvent);
-	}
+	} while (ret !=GEM_ERROR && SDL_PollEvent(&currentEvent) );
+
 	bool eventWasMouseEvent = (currentEvent.type & (SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN));
 	int x, y;
 	if (ret == GEM_OK && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
@@ -122,7 +126,7 @@ int SDLVideoDriver::PollEvents()
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		if (!core->ConsolePopped)
 			EvntManager->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
-	}
+	} 
 	return ret;
 }
 
