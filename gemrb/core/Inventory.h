@@ -138,12 +138,13 @@ struct ItemExtHeader {
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
-	ieWord ProjectileType;
+	//This was commented out in ITMExtHeader
+	//ieWord ProjectileType;
 	ieWord Speed;
 	ieWord THAC0Bonus;
 	ieWord DiceSides;
 	ieWord DiceThrown;
-	ieWord DamageBonus;
+	ieWordSigned DamageBonus; //this must be signed!!!
 	ieWord DamageType;
 	ieWord FeatureCount;
 	ieWord FeatureOffset;
