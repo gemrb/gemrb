@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -62,9 +62,9 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		return false;
 	}
 
-        char tINIkeymap[_MAX_PATH];
-        PathJoin( tINIkeymap, core->GamePath, inifile, NULL );
-        FileStream* config = FileStream::OpenFile( tINIkeymap );
+	char tINIkeymap[_MAX_PATH];
+	PathJoin( tINIkeymap, core->GamePath, inifile, NULL );
+	FileStream* config = FileStream::OpenFile( tINIkeymap );
 
 	if (config == NULL) {
 		Log(WARNING, "KeyMap", "There is no '%s' file...", inifile);
@@ -95,10 +95,10 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 		strnlwrcpy(name,name,KEYLENGTH);
 		//remove trailing spaces (bg1 ini file contains them)
-                char *nameend = name + strlen( name ) - 1;
-                while (nameend >= name && strchr( " \t\r\n", *nameend )) {
-                        *nameend-- = '\0';
-                }
+		char *nameend = name + strlen( name ) - 1;
+		while (nameend >= name && strchr( " \t\r\n", *nameend )) {
+			*nameend-- = '\0';
+		}
 
 		//change internal spaces to underscore
 		for(int c=0;c<KEYLENGTH;c++) if (name[c]==' ') name[c]='_';

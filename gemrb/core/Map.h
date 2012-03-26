@@ -327,8 +327,8 @@ public:
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void ActorSpottedByPlayer(Actor *actor);
-  void InitActors();
-  void InitActor(Actor *actor);
+	void InitActors();
+	void InitActor(Actor *actor);
 	void AddActor(Actor* actor, bool init);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
