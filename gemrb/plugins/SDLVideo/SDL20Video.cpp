@@ -395,16 +395,16 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					ProcessFirstTouch(GEM_MB_ACTION);
 				}
 				// invert the coordinates such that dragging down scrolls up etc.
-				int scrollX = ((event.tfinger.dx / xScaleFactor) + xOffset) * -1;
-				int scrollY = ((event.tfinger.dy / yScaleFactor) + yOffset) * -1;
+				int scrollX = (event.tfinger.dx / xScaleFactor) * -1;
+				int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
 
 				EvntManager->MouseWheelScroll( scrollX, scrollY );
 			} else if (numFingers == core->NumFingKboard) {
-				if (((event.tfinger.dy / yScaleFactor) + xOffset) * -1 >= MIN_GESTURE_DELTA_PIXELS){
+				if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
 					// if the keyboard is already up interpret this gesture as console pop
 					if( softKeyboardShowing && !ConsolePopped ) core->PopupConsole();
 					else ShowSoftKeyboard();
-				} else if(((event.tfinger.dy / yScaleFactor) + xOffset) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+				} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 					HideSoftKeyboard();
 				}
 			} else if (numFingers == 1) { //click and drag
