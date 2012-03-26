@@ -52,7 +52,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	// touch input
 	ignoreNextFingerUp = false;
 	firstFingerDown = SDL_TouchFingerEvent();
-	firstFigerDownTime = 0;
+	firstFingerDownTime = 0;
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -293,8 +293,8 @@ int SDL20VideoDriver::SwapBuffers(void)
 
 int SDL20VideoDriver::PollEvents()
 {
-	if (firstFigerDownTime
-		&& GetTickCount() - firstFigerDownTime >= TOUCH_RC_NUM_TICKS) {
+	if (firstFingerDownTime
+		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
 		int x = firstFingerDown.x;
 		int y = firstFingerDown.y;
@@ -329,7 +329,7 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 
 		firstFingerDown = SDL_TouchFingerEvent();
 		ignoreNextFingerUp = false;
-		firstFigerDownTime = 0;
+		firstFingerDownTime = 0;
 	}
 }
 
@@ -418,7 +418,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			if (numFingers == 1) {
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
-				firstFigerDownTime = GetTickCount();
+				firstFingerDownTime = GetTickCount();
 				firstFingerDown.x /= xScaleFactor;
 				firstFingerDown.x += xOffset;
 				firstFingerDown.y /= yScaleFactor;

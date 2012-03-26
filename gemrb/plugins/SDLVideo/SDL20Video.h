@@ -34,7 +34,7 @@ private:
 	// touch input vars
 	bool ignoreNextFingerUp;
 	SDL_TouchFingerEvent firstFingerDown;
-	unsigned long firstFigerDownTime;
+	unsigned long firstFingerDownTime;
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
