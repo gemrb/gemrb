@@ -306,6 +306,7 @@ IDS
 0x130	SearchModifier
 0x131	SpellcraftModifier
 0x132	CriticalHitModifier
+0x133	TurnLevelModifier
 399	AlterAnimation
 400	Hopelessness
 401	ProtectionFromEvil
