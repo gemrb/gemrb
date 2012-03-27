@@ -67,7 +67,6 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
 
-	Viewport.x = Viewport.y = 0;
 	width = disp->w;
 	height = disp->h;
 	Viewport.w = width;
