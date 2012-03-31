@@ -16,3 +16,7 @@ HAMMER     21         3
 AXE        25         3
 SPEAR      29         3
 POLEARM    30         3
+BUCKLER    41         1
+SSHIELD    53         1
+MSHIELD    49         2
+LSHIELD    47         3

@@ -577,6 +577,7 @@ public:
 	ieDword QuerySlotEffects(unsigned int idx) const;
 	const char * QuerySlotResRef(unsigned int idx) const;
 	int GetArmorFailure(unsigned int itemtype) const;
+	int GetShieldPenalty(unsigned int itemtype) const;
 	int GetCriticalMultiplier(unsigned int itemtype) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, Item *item, Actor *actor=NULL, bool feedback=false, bool equipped=false) const;

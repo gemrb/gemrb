@@ -8381,10 +8381,17 @@ int Actor::GetArmorFailure() const
 	}
 
 	// ignore the penalty if we are proficient
-	if (GetFeat(FEAT_ARMOUR_PROFICIENCY) < weightClass) {
-		return -penalty;
+	if (GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
+		penalty = 0;
 	}
-	return 0;
+
+	// check also the shield penalty
+	armorType = inventory.GetShieldItemType();
+	if (!HasFeat(FEAT_SHIELD_PROF)) {
+		penalty += core->GetShieldPenalty(armorType);
+	}
+
+	return -penalty;
 }
 
 }

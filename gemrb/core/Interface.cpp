@@ -4365,6 +4365,15 @@ int Interface::GetArmorFailure(unsigned int itemtype) const
 	return itemtypedata[itemtype];
 }
 
+int Interface::GetShieldPenalty(unsigned int itemtype) const
+{
+	if (itemtype>=(unsigned int) ItemTypes) {
+		return 0;
+	}
+	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype];
+	return 0;
+}
+
 int Interface::GetCriticalMultiplier(unsigned int itemtype) const
 {
 	if (itemtype>=(unsigned int) ItemTypes) {
