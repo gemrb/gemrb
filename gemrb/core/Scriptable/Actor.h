@@ -805,6 +805,8 @@ public:
 	bool IsPartyMember() const;
 	/* resets the bored and area comment timers */
 	void ResetCommentTime();
+	/* returns the armor check penalty */
+	int GetArmorFailure() const;
 };
 }
 

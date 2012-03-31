@@ -2177,8 +2177,7 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	if (HasSpellState(SS_DEAF)) base += 20;
 	if (!arcana) return base;
 
-	ieWord armtype = inventory.GetArmorItemType();
-	ieDword armor = core->GetArmorFailure(armtype);
+	ieDword armor = -GetArmorFailure();
 
 	if (armor) {
 		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA);
@@ -2201,6 +2200,9 @@ int Actor::GetDexterityAC() const
 	}
 
 	if (dexbonus) {
+		// FIXME: the maximum dexterity bonus isn't stored(?),
+		// but can usually be calculated from 8-AC+enchantment (or 8-AC if you don't count that bonus in AC already)
+		// or from the armor penalty (works for light armors)
 		ieWord armtype = inventory.GetArmorItemType();
 		int armor = (int) core->GetArmorFailure(armtype);
 
@@ -5375,6 +5377,9 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 	}
 	tohit += strbonus;
 
+	// check if there is any armor unproficiency penalty
+	tohit += GetArmorFailure();
+
 	if (target) {
 		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
 		if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
@@ -8190,7 +8195,7 @@ inline void HideFailed(Actor* actor)
 }
 
 bool Actor::TryToHide() {
-	ieDword roll = LuckyRoll(1, 100, 0);
+	ieDword roll = LuckyRoll(1, 100, GetArmorFailure());
 	if (roll == 1) {
 		HideFailed(this);
 		return false;
@@ -8348,6 +8353,38 @@ void Actor::ResetCommentTime()
 		nextBored = 0;
 	}
 	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
+}
+
+// Returns the armor check penalty.
+// used for mapping the iwd2 armor feat to the equipped armor's weight class
+// the armor weight class is roughly deduced from the penalty as following:
+// 0,   none: none, robes
+// 1-3, light: leather, studded
+// 4-6, medium: hide, chain, scale
+// 7-,  heavy: splint, plate, full plate
+// the values are taken from our dehardcoded itemdata.2da
+// FIXME: the penalites are too high, the items use a different value!
+int Actor::GetArmorFailure() const
+{
+	if (!core->HasFeature(GF_3ED_RULES)) return 0;
+
+	ieWord armorType = inventory.GetArmorItemType();
+	int penalty = core->GetArmorFailure(armorType);
+	int weightClass = 0;
+
+	if (penalty >= 1 || penalty < 4) {
+		weightClass = 1;
+	} else if (penalty >= 4 || penalty < 7) {
+		weightClass = 2;
+	} else if (penalty >= 7) {
+		weightClass = 3;
+	}
+
+	// ignore the penalty if we are proficient
+	if (GetFeat(FEAT_ARMOUR_PROFICIENCY) < weightClass) {
+		return -penalty;
+	}
+	return 0;
 }
 
 }
