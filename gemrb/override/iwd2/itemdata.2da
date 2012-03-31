@@ -7,7 +7,7 @@ CHAIN      62         6
 SPLINT     63         8
 HALFPLATE  64         8
 FULLPLATE  65         7
-HIDE       66         6
+HIDE       66         4
 ROBE       67         0
 SCALE      68         5
 ARROW      5          3
