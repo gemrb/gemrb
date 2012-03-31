@@ -196,7 +196,7 @@ def UpdateSpellBookWindow ():
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
 
-	Spells = Spellbook.GetKnownSpells (pc, type, level)
+	Spells = Spellbook.GetKnownSpellsLevel (pc, type, level)
 	known_cnt = len (Spells)
 	for i in range (8):
 		Button = Window.GetControl (30 + i)

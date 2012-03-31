@@ -96,7 +96,7 @@ def GetKnownSpells(actor, BookType):
 
 	return knownSpells
 
-def GetKnownSpells(actor, BookType, level):
+def GetKnownSpellsLevel(actor, BookType, level):
 	knownSpells = []
 	spellResRefs = []
 
