@@ -632,7 +632,10 @@ def ActionRightPressed ():
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
 	if GemRB.GetVar ("ActionLevel") == 5:
-		Max = GemRB.GetKnownSpellsCount (pc, Type, -1)
+		if Type == 3:
+			Max = len(Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_PRIEST) + Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_WIZARD))
+		else:
+			Max = GemRB.GetKnownSpellsCount (pc, Type, -1) # this can handle only one type at a time
 	else:
 		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
 	print "Max:",Max
