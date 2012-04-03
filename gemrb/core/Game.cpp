@@ -825,6 +825,12 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	ret = AddMap( newMap );
 
+	//spawn creatures on a map already in the game
+	//this feature exists in all blackisle games but not in bioware games
+	if (core->HasFeature(GF_SPAWN_INI)) {
+		newMap->LoadIniSpawn();
+	}
+
 	for (i = 0; i < PCs.size(); i++) {
 		if (stricmp( PCs[i]->Area, ResRef ) == 0) {
 			newMap->AddActor( PCs[i], false );
@@ -850,8 +856,9 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	return ret;
 failedload:
-	if (hide) 
+	if (hide) {
 		core->UnhideGCWindow();
+	}
 	core->LoadProgress(100);
 	return -1;
 }
@@ -1888,7 +1895,7 @@ bool Game::RandomEncounter(ieResRef &BaseArea)
 	if (bntrows<0) {
 		AutoTable table;
 
-	        if (table.load("bntychnc")) {
+		if (table.load("bntychnc")) {
 			bntrows = table->GetRowCount();
 			bntchnc = (int *) calloc(sizeof(int),bntrows);
 			for(int i = 0; i<bntrows; i++) {

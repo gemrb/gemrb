@@ -1091,11 +1091,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	print("Loading automap notes");
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
-	//this feature exists in all blackisle games but not in bioware games
-	if (core->HasFeature(GF_SPAWN_INI)) {
-		map->LoadIniSpawn();
-	}
-
 	Point point;
 	ieDword color;
 	char *text;
@@ -1260,6 +1255,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		Door *door = tm->GetDoor(i);
 		door->SetDoorOpen(door->IsOpen(), false, 0);
 	}
+
 	return map;
 }
 
