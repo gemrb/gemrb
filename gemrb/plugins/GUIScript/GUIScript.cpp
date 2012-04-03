@@ -3767,13 +3767,6 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
-
 	if (str<0 || str>=VCONST_COUNT) {
 		return AttributeError( "SoundSet Entry is too large" );
 	}
@@ -4113,12 +4106,7 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	return PyInt_FromLong(core->WriteCharacter(name, actor) );
 }
 
@@ -4802,12 +4790,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	if (Which == 2) {
 		return PyString_FromString( actor->GetScriptName() );
 	}
@@ -4830,12 +4813,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	actor->SetName(Name, Which);
 	actor->SetMCFlag(MC_EXPORTABLE,BM_OR);
 	Py_INCREF( Py_None );
@@ -4873,12 +4851,6 @@ static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 
 	if (StringSlot>=VCONST_COUNT) {
 		return AttributeError( "StringSlot is out of range!\n" );
@@ -4904,12 +4876,7 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	actor->SetSoundFolder(Sound);
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -4930,12 +4897,7 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	actor->GetSoundFolder(Sound, flag);
 	return PyString_FromString(Sound);
 }
@@ -5286,12 +5248,7 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	if (Index>=VCONST_COUNT) {
 		return RuntimeError("String reference is too high!\n");
 	}
@@ -5355,12 +5312,7 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	const char *scr = actor->GetScript(Index);
 	if (scr[0]==0) {
 		scr="None";
@@ -5383,12 +5335,7 @@ static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	actor->SetScript(ScriptName, Index, true);
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5407,16 +5354,9 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_FillPlayerInfo__doc );
 	}
 	// here comes some code to transfer icon/name to the PC sheet
-	//
-	//
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	if (Portrait1) {
 		actor->SetPortrait( Portrait1, 1);
 	}
@@ -6050,12 +5990,6 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
@@ -6197,12 +6131,6 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
@@ -6908,12 +6836,6 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor* actor = game->FindPC( PartyID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 
 	int ret = actor->LearnSpell( Spell, Flags ); // returns 0 on success
 	if (!ret) core->SetEventFlag( EF_ACTION );
@@ -6936,12 +6858,7 @@ static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	work_ref.Name=EffectName;
 	work_ref.opcode=-1;
 	actor->fxqueue.RemoveAllEffectsWithParam(work_ref, Parameter2);
@@ -6965,12 +6882,7 @@ static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	actor->fxqueue.RemoveAllEffects(SpellResRef);
 
 	Py_INCREF( Py_None );
@@ -7023,12 +6935,6 @@ static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 	int ok;
 
 	Slot = core->QuerySlot(Slot);
@@ -7057,13 +6963,6 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
-
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
 	if (! ks) {
 		return RuntimeError( "Spell not found!" );
@@ -7089,13 +6988,6 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 
 	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
 	if (! ms) {
@@ -7158,12 +7050,7 @@ static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	if (actor->inventory.ChangeItemFlag(core->QuerySlot(Slot), Flags, Mode)) {
 		return PyInt_FromLong(1);
 	}
@@ -7231,12 +7118,6 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 	MaxCount = core->SlotTypes;
 	int i;
 	Count = 0;
@@ -7574,12 +7455,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	int res;
 
 	if (Slot==-2) {
@@ -7763,12 +7639,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
+
 	if (SlotID==-1) {
 		//This is already a slot ID we need later
 		SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
@@ -8216,12 +8087,6 @@ static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 	return PyInt_FromLong( actor->HasFeat(featindex) );
 }
 
@@ -8238,12 +8103,6 @@ static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 	actor->SetFeatValue(featindex, value);
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -8313,12 +8172,6 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor *actor = game->FindPC(globalID);
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
 
 	if (initDialog) {
 		if (initDialog == 2)
