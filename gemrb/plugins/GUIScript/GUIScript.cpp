@@ -5687,6 +5687,9 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	Container *container = NULL;
 	if (autoselect) { //autoselect works only with piles
 		Map *map = actor->GetCurrentArea();
+		if (!map) {
+			return RuntimeError("No current area!");
+		}
 		//GetContainer should create an empty container
 		container = map->GetPile(actor->Pos);
 	} else {
@@ -5722,6 +5725,9 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		GET_ACTOR_GLOBAL();
 
 		Map *map = actor->GetCurrentArea();
+		if (!map) {
+			return RuntimeError("No current area!");
+		}
 		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
 	} else {
 		container = core->GetCurrentContainer();
@@ -5779,14 +5785,17 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 
 	if (globalID) {
 		if (globalID > 1000) {
-		actor = game->GetActorByGlobalID( globalID );
-	} else {
-		actor = game->FindPC( globalID );
-	}
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+			actor = game->GetActorByGlobalID( globalID );
+		} else {
+			actor = game->FindPC( globalID );
+		}
+		if (!actor) {
+			return RuntimeError( "Actor not found!\n" );
+		}
 		Map *map = actor->GetCurrentArea();
+		if (!map) {
+			return RuntimeError("No current area!");
+		}
 		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
 	} else {
 		actor = core->GetFirstSelectedPC(false);
@@ -7386,9 +7395,12 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	CREItem* si;
 	if (Type) {
 		Map *map = actor->GetCurrentArea();
+		if (!map) {
+			return RuntimeError("No current area!");
+		}
 		Container *cc = map->GetPile(actor->Pos);
 		if (!cc) {
-			return RuntimeError( "No current container" );
+			return RuntimeError( "No current container!" );
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
@@ -7460,9 +7472,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	if (Slot==-2) {
 		Map *map = actor->GetCurrentArea();
+		if (!map) {
+			return RuntimeError("No current area!");
+		}
 		Container *cc = map->GetPile(actor->Pos);
 		if (!cc) {
-			return RuntimeError( "No current container" );
+			return RuntimeError( "No current container!" );
 		}
 		CREItem *si = core->GetDraggedItem();
 		res = cc->AddItem(si);
