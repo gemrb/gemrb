@@ -4235,16 +4235,26 @@ void Actor::Die(Scriptable *killer)
 
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_FACTION) ) {
 		value = 0;
-		const char *varname = GetVarName("faction", BaseStats[IE_FACTION]);
-		if (varname && varname[0]) {
+		const char *tmp = GetVarName("faction", BaseStats[IE_FACTION]);
+		if (tmp && tmp[0]) {
+			if (AppearanceFlags&APP_ADDKILL) {
+				snprintf(varname, 32, "KILL_%s", tmp);
+			} else {
+				snprintf(varname, 32, "%s", tmp);
+			}
 			game->kaputz->Lookup(varname, value);
 			game->kaputz->SetAt(varname, value+1, nocreate);
 		}
 	}
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_TEAM) ) {
 		value = 0;
-		const char *varname = GetVarName("team", BaseStats[IE_TEAM]);
-		if (varname && varname[0]) {
+		const char *tmp = GetVarName("team", BaseStats[IE_TEAM]);
+		if (tmp && tmp[0]) {
+			if (AppearanceFlags&APP_ADDKILL) {
+				snprintf(varname, 32, "KILL_%s", tmp);
+			} else {
+				snprintf(varname, 32, "%s", tmp);
+			}
 			game->kaputz->Lookup(varname, value);
 			game->kaputz->SetAt(varname, value+1, nocreate);
 		}
