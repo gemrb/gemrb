@@ -563,7 +563,7 @@ int Font::CalcStringWidth(const char* string, bool NoColor) const
 				i++;
 			}
 		}
-		ret += getInfo(string[i]).size.w;
+		ret += getInfo((unsigned char)string[i]).size.w;
 	}
 	return ( int ) ret;
 }
