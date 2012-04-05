@@ -3425,11 +3425,8 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-//this implementation returns only true if there is a bow wielded
-//but there is no ammo for it
-//if the implementation should sign 'no ranged attack possible'
-//then change some return values
-//in bg2/iwd2 it doesn't accept an object (the object parameter is gemrb ext.)
+//it is impossible to equip a bow without projectile (it will be fist)
+//So outofammo equals fist is equipped
 int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = Sender;
@@ -3440,45 +3437,32 @@ int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	WeaponInfo wi;
-	ITMExtHeader *header = actor->GetWeapon(wi, false);
-	//no bow wielded?
-	if (!header || header->AttackType!=ITEM_AT_BOW) {
-		return 0;
+
+	//if a bow is equipped, but out of ammo, the core system will swap to fist anyway
+	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
+		return 1;
 	}
-	//we either have a projectile (negative) or an empty bow (positive)
-	//so we should find a negative slot, positive slot means: OutOfAmmo
-	if (actor->inventory.GetEquipped()<0) {
-		return 0;
-	}
-	//out of ammo
-	return 1;
+
+	return 0;
 }
 
-//returns true if a weapon is equipped (with more than 0 range)
-//if a bow is equipped without projectile, it is useless!
-//please notice how similar is this to OutOfAmmo
+//returns true if a weapon is equipped and target is in range
+//if a bow is equipped without projectile, it is useless (but it will be a fist)!
 int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	WeaponInfo wi;
-	ITMExtHeader *header = actor->GetWeapon(wi, false);
-
-	//bows are not usable (because if they are loaded, the equipped
-	//weapon is the projectile)
-	if (!header || header->AttackType==ITEM_AT_BOW) {
-		return 0;
-	}
-	//only fist we have, it is not qualified as weapon?
+	//if a bow is equipped, but out of ammo, the core system will swap to fist anyway
 	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
 		return 0;
 	}
+
 	return 1;
 }
 
+//if the equipped slot is not a fist, this is true
 int GameScript::HasWeaponEquipped(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -3486,7 +3470,7 @@ int GameScript::HasWeaponEquipped(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (actor->inventory.GetEquippedSlot() == IW_NO_EQUIPPED) {
+	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
 		return 0;
 	}
 	return 1;
