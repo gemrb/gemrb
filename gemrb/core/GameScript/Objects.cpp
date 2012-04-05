@@ -1066,16 +1066,34 @@ inline bool idclass(Actor *actor, int parameter, bool iwd2) {
 		classes = all_bg_classes;
 	}
 
+	// FIXME: unhardcode this ugly mess
+	// in IWD2, mage_all = sorcerer or wizard
+	// fighter_all = fighter, paladin or ranger (but not monk)
+	// cleric_all = druid or cleric
+	// thief_all = thief
+	// bard_all = bard
+	// paladin_all = paladin
+	// druid_all = druid
+	// ranger_all = ranger
+
 	// we got one of the *_ALL values
 	if (parameter == classes[4]) {
 		// MAGE_ALL (also sorcerers)
 		value = actor->GetMageLevel() + actor->GetSorcererLevel();
 	} else if (parameter == classes[3]) {
 		// FIGHTER_ALL (also monks)
-		value = actor->GetFighterLevel() + actor->GetMonkLevel();
+		if (iwd2) {
+			value = actor->GetFighterLevel() + actor->GetPaladinLevel() + actor->GetRangerLevel();
+		} else {
+			value = actor->GetFighterLevel() + actor->GetMonkLevel();
+		}
 	} else if (parameter == classes[1]) {
 		// CLERIC_ALL
-		value = actor->GetClericLevel();
+		if (iwd2) {
+			value = actor->GetClericLevel() + actor->GetDruidLevel();
+		} else {
+			value = actor->GetClericLevel();
+		}
 	} else if (parameter == classes[7]) {
 		// THIEF_ALL
 		value = actor->GetThiefLevel();
