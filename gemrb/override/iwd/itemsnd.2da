@@ -1,6 +1,7 @@
 2DA V1.0
 *
            TAKE       DROP
+MISC       G_BOOK1    G_BOOK2
 AMULET     G_NECK1    G_NECK2
 ARMOR      G_CLOAK1   G_CLOAK2
 BELT       G_BELT1    G_BELT2
