@@ -152,11 +152,12 @@ namespace GemRB {
 #define  GF_SOUNDS_INI                  62 //iwd/how/iwd2
 #define  GF_USEPOINT_400                63 //all except pst and iwd2
 #define  GF_USEPOINT_200                64 //iwd2
-#define  GF_HAS_FLOAT_MENU		65 //pst
-#define  GF_RARE_ACTION_VB    66 //pst
+#define  GF_HAS_FLOAT_MENU              65 //pst
+#define  GF_RARE_ACTION_VB              66 //pst
+#define  GF_NO_UNDROPPABLE              67 //iwd,how
 
 //update this or bad things can happen
-#define GF_COUNT 67
+#define GF_COUNT 68
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
