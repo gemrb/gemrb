@@ -585,11 +585,11 @@ def OpenExportWindow ():
 	return
 
 def ExportDonePress():
-	if ExportWindow:
-		ExportWindow.Unload()
 	#save file under name from EditControl
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SaveCharacter (pc, NameField.QueryText ())
+	if ExportWindow:
+		ExportWindow.Unload()
 	return
 
 def ExportCancelPress():
