@@ -531,7 +531,10 @@ def OpenBiographyWindow ():
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	TextArea.SetText (GemRB.GetPlayerString (pc, 74) )
+	if GUICommon.GameIsIWD2():
+		TextArea.SetText (GemRB.GetPlayerString (pc, 63) )
+	else:
+		TextArea.SetText (GemRB.GetPlayerString (pc, 74) )
 
 	# Done
 	Button = Window.GetControl (2)
