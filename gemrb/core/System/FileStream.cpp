@@ -47,7 +47,7 @@ public:
 	bool OpenRO(const char *name) {
 		file = CreateFile(name,
 			GENERIC_READ,
-			FILE_SHARE_READ,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL,
 			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL, NULL);
