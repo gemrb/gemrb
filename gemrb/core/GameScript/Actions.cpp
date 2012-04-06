@@ -2530,8 +2530,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 			return; //don't open door
 		}
 
-		// should we be triggering the trap on close?
-		door->TriggerTrap(0, actor->GetGlobalID());
+		//trap scripts are triggered by SetDoorOpen
 		door->SetDoorOpen( !door->IsOpen(), true, actor->GetGlobalID() );
 	} else {
 		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
