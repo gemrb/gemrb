@@ -292,10 +292,8 @@ def OpenStoreShoppingWindow ():
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
 	if Inventory:
-		if GUICommon.GameIsIWD2():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 			Button.SetText (26287)
-		elif GUICommon.GameIsIWD1():
-			Button.SetText (26288)
 		elif GUICommon.GameIsBG2():
 			Button.SetText (51882)
 		else:
