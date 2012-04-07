@@ -531,7 +531,10 @@ def OpenBiographyWindow ():
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	TextArea.SetText (GemRB.GetPlayerString (pc, 74) )
+	if GUICommon.GameIsIWD2():
+		TextArea.SetText (GemRB.GetPlayerString (pc, 63) )
+	else:
+		TextArea.SetText (GemRB.GetPlayerString (pc, 74) )
 
 	# Done
 	Button = Window.GetControl (2)
@@ -585,11 +588,11 @@ def OpenExportWindow ():
 	return
 
 def ExportDonePress():
-	if ExportWindow:
-		ExportWindow.Unload()
 	#save file under name from EditControl
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SaveCharacter (pc, NameField.QueryText ())
+	if ExportWindow:
+		ExportWindow.Unload()
 	return
 
 def ExportCancelPress():
