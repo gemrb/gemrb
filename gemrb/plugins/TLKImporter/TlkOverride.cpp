@@ -72,11 +72,6 @@ bool CTlkOverride::Init()
 	toh_str->ReadDword( &AuxCount );
 
 	tot_str->ReadDword( &FreeOffset );
-	tot_str->Read(Signature,4);
-	if (strncmp( Signature, "\xff\xff\xff\xff",4) !=0) {
-		Log(ERROR, "TLKImporter", "Not a valid TOT file.");
-		return false;
-	}
 
 	return true;
 }
