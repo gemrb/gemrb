@@ -402,7 +402,7 @@ public:
 	/* get stored SpriteCover */
 	SpriteCover* GetSpriteCover() const { return cover; }
 	/* want dithered SpriteCover */
-	int WantDither();
+	int WantDither() const;
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {

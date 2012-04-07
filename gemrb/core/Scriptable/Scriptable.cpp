@@ -126,6 +126,7 @@ Scriptable::Scriptable(ScriptableType type)
 	AddTrigger(TriggerEntry(trigger_oncreation));
 
 	memset( script_timers,0, sizeof(script_timers));
+
 }
 
 Scriptable::~Scriptable(void)
@@ -1570,7 +1571,7 @@ void Selectable::SetCircle(int circlesize, const Color &color, Sprite2D* normal_
 }
 
 //used for creatures
-int Selectable::WantDither()
+int Selectable::WantDither() const
 {
 	//if dithering is disabled globally, don't do it
 	if (core->FogOfWar&FOG_DITHERSPRITES) {

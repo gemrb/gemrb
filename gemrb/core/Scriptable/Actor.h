@@ -663,6 +663,7 @@ public:
 	/* returns the vvc pointer to a hardcoded overlay */
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index) const;
+	int WantDither() const;
 	/* draw videocells */
 	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint);
 

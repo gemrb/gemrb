@@ -120,6 +120,7 @@ static ieDword cmd_snd_freq = 0;
 static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
+static ieDword always_dither = 1;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
@@ -1474,6 +1475,9 @@ GEM_EXPORT void UpdateActorConfig()
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
+	//FIXME: Drop all actors' SpriteCover.
+	//the actor will change dithering only after selected/moved (its spritecover was updated)
+	core->GetDictionary()->Lookup("Always Dither", always_dither);
 }
 
 static void InitActorTables()
@@ -6097,6 +6101,12 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	} else {
 		Movable::WalkTo(Des, MinDistance);
 	}
+}
+
+int Actor::WantDither() const
+{
+	if (always_dither) return 2;
+	return Selectable::WantDither();
 }
 
 //there is a similar function in Map for stationary vvcs
