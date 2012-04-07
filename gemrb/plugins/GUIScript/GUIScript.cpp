@@ -373,12 +373,12 @@ PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
-	ieByte r,g,b,a;
+	int r, g, b, a;
 
 	if (!PyArg_ParseTuple( args, "iii|i", &r, &g, &b, &a)) {
 		return AttributeError( GemRB_SetInfoTextColor__doc );
 	}
-	Color c = {r,g,b,a};
+	const Color c = {(ieByte) r,(ieByte) g,(ieByte) b,(ieByte) a};
 	core->SetInfoTextColor( c );
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2072,7 +2072,7 @@ PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
 static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	ieByte r, g, b;
+	int r, g, b;
 
 	if (!PyArg_ParseTuple( args, "iiiii", &WindowIndex, &ControlIndex, &r, &g,
 			&b )) {
@@ -2084,7 +2084,7 @@ static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Color fore = {r,g, b, 0}, back = {0, 0, 0, 0};
+	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0}, back = {0, 0, 0, 0};
 	lab->SetColor( fore, back );
 
 	Py_INCREF( Py_None );
@@ -2224,9 +2224,9 @@ PyDoc_STRVAR( GemRB_TextEdit_ConvertEdit__doc,
 static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	Color fore={255,255,255,0};
-	Color init={255,255,255,0};
-	Color back={0,0,0,0};
+	const Color fore={255,255,255,0};
+	const Color init={255,255,255,0};
+	const Color back={0,0,0,0};
 	int ScrollBarID=0;
 
 	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlIndex, &ScrollBarID)) {
@@ -2416,8 +2416,8 @@ static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	double Clipping;
-	ieByte r1,g1,b1,a1;
-	ieByte r2,g2,b2,a2;
+	int r1,g1,b1,a1;
+	int r2,g2,b2,a2;
 
 	if (!PyArg_ParseTuple( args, "iidiiiiiiii", &WindowIndex, &ControlIndex,
 		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
@@ -2429,8 +2429,8 @@ static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	const Color src = { r1, g1, b1, a1 };
-	const Color dest = { r2, g2, b2, a2 };
+	const Color src = { (ieByte) r1, (ieByte) g1, (ieByte) b1, (ieByte) a1 };
+	const Color dest = { (ieByte) r2, (ieByte) g2, (ieByte) b2, (ieByte) a2 };
 
 	if (Clipping<0.0) Clipping = 0.0;
 	else if (Clipping>1.0) Clipping = 1.0;
@@ -2447,7 +2447,7 @@ PyDoc_STRVAR( GemRB_Button_SetBorder__doc,
 static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, enabled = 0, filled = 0;
-	ieByte r, g, b, a;
+	int r, g, b, a;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiiiiii|ii", &WindowIndex, &ControlIndex,
 		&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled)) {
@@ -2459,7 +2459,7 @@ static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	const Color color = { r, g, b, a };
+	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a };
 	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, color, (bool)enabled, (bool)filled );
 
 	Py_INCREF( Py_None );
@@ -2568,7 +2568,7 @@ PyDoc_STRVAR( GemRB_Button_SetTextColor__doc,
 static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, swap = 0;
-	ieByte r, g, b;
+	int r, g, b;
 
 	if (!PyArg_ParseTuple( args, "iiiii|i", &WindowIndex, &ControlIndex, &r, &g, &b, &swap )) {
 		return AttributeError( GemRB_Button_SetTextColor__doc );
@@ -2579,7 +2579,7 @@ static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Color fore = {r,g, b, 0}, back = {0, 0, 0, 0};
+	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0}, back = {0, 0, 0, 0};
 
 	// FIXME: swap is a hack for fonts which apparently have swapped f & B
 	// colors. Maybe it depends on need_palette?
@@ -2916,7 +2916,7 @@ PyDoc_STRVAR( GemRB_WorldMap_SetTextColor__doc,
 static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, which;
-	ieByte r, g, b, a;
+	int r, g, b, a;
 
 	if (!PyArg_ParseTuple( args, "iiiiiii", &WindowIndex, &ControlIndex, &which, &r, &g, &b, &a )) {
 		return AttributeError( GemRB_WorldMap_SetTextColor__doc );
@@ -2927,7 +2927,7 @@ static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args
 		return NULL;
 	}
 
-	Color color = {r, g, b, a};
+	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a};
 	wmap->SetColor( which, color );
 
 	Py_INCREF( Py_None );
