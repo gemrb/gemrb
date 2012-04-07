@@ -26,6 +26,8 @@ import CharOverview
 import LUCommon
 
 BioWindow = 0
+BioData = 0
+BioStrRef = 0
 EditControl = 0
 AlignmentTable = 0
 PortraitName = ""
@@ -34,6 +36,7 @@ def OnLoad():
 	CharOverview.UpdateOverview(9)
 	if CharOverview.CharGenWindow:
 		CharOverview.PersistButtons['Next'].SetState(IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
+	RevertPress()
 	return
 
 def SetRaceAbilities(MyChar, racetitle):
@@ -85,11 +88,13 @@ def ClearPress():
 	return
 
 def RevertPress():
+	global BioStrRef
 	BioTable = GemRB.LoadTable ("bios")
 	Class = GemRB.GetVar ("BaseClass")
-	StrRef = BioTable.GetValue(Class,1)
-	GemRB.SetToken ("BIO", GemRB.GetString(StrRef) )
-	EditControl.SetText (GemRB.GetToken("BIO") )
+	BioStrRef = BioTable.GetValue(Class,1)
+	GemRB.SetToken ("BIO", GemRB.GetString(BioStrRef) )
+	if type (EditControl) != type (7350): # just some int
+		EditControl.SetText (GemRB.GetToken("BIO") )
 	return
 
 def BioCancelPress():
@@ -208,6 +213,13 @@ def NextPress():
 	#starting xp is race dependent
 	xp = TmpTable.GetValue (racename, "VALUE")
 	GemRB.SetPlayerStat (MyChar, IE_XP, xp )
+
+	BioData = GemRB.GetToken("BIO")
+	if BioData == GemRB.GetString (BioStrRef):
+		NewRef = BioStrRef
+	else:
+		NewRef = GemRB.CreateString (62015+MyChar, BioData)
+	GemRB.SetPlayerString (MyChar, 63, NewRef)
 
 	LUCommon.ApplyFeats(MyChar)
 	return
