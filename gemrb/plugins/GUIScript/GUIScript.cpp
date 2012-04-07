@@ -373,7 +373,7 @@ PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
-	int r,g,b,a;
+	ieByte r,g,b,a;
 
 	if (!PyArg_ParseTuple( args, "iii|i", &r, &g, &b, &a)) {
 		return AttributeError( GemRB_SetInfoTextColor__doc );
@@ -2071,7 +2071,8 @@ PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
 
 static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, r, g, b;
+	int WindowIndex, ControlIndex;
+	ieByte r, g, b;
 
 	if (!PyArg_ParseTuple( args, "iiiii", &WindowIndex, &ControlIndex, &r, &g,
 			&b )) {
@@ -2415,8 +2416,8 @@ static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	double Clipping;
-	int r1,g1,b1,a1;
-	int r2,g2,b2,a2;
+	ieByte r1,g1,b1,a1;
+	ieByte r2,g2,b2,a2;
 
 	if (!PyArg_ParseTuple( args, "iidiiiiiiii", &WindowIndex, &ControlIndex,
 		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
@@ -2445,7 +2446,8 @@ PyDoc_STRVAR( GemRB_Button_SetBorder__doc,
 
 static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, r, g, b, a, enabled = 0, filled = 0;
+	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, enabled = 0, filled = 0;
+	ieByte r, g, b, a;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiiiiii|ii", &WindowIndex, &ControlIndex,
 		&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled)) {
@@ -2565,7 +2567,8 @@ PyDoc_STRVAR( GemRB_Button_SetTextColor__doc,
 
 static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, r, g, b, swap = 0;
+	int WindowIndex, ControlIndex, swap = 0;
+	ieByte r, g, b;
 
 	if (!PyArg_ParseTuple( args, "iiiii|i", &WindowIndex, &ControlIndex, &r, &g, &b, &swap )) {
 		return AttributeError( GemRB_Button_SetTextColor__doc );
@@ -2912,7 +2915,8 @@ PyDoc_STRVAR( GemRB_WorldMap_SetTextColor__doc,
 
 static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, which, r, g, b, a;
+	int WindowIndex, ControlIndex, which;
+	ieByte r, g, b, a;
 
 	if (!PyArg_ParseTuple( args, "iiiiiii", &WindowIndex, &ControlIndex, &which, &r, &g, &b, &a )) {
 		return AttributeError( GemRB_WorldMap_SetTextColor__doc );

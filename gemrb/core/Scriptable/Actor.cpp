@@ -3849,7 +3849,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		}
 		average = stats[IE_CLASSLEVELSUM] / (float) clscount + 0.5;
 	} else {
-		int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
+		unsigned int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
 		average = levels[0];
 		clscount = 1;
 		if (IsDualClassed()) {

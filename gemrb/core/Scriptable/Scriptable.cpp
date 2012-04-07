@@ -262,7 +262,8 @@ void Scriptable::DrawOverheadText(const Region &screen)
 	} else {
 		time = (MAX_DELAY-time)/10;
 		if (time<256) {
-			const Color overHeadColor = {time,time,time,time};
+			ieByte time2 = time; // shut up narrowing warnings
+			const Color overHeadColor = {time2,time2,time2,time2};
 			palette = core->CreatePalette(overHeadColor, black);
 		}
 	}

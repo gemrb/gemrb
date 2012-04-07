@@ -6022,7 +6022,6 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	}
 
 	Scriptable *target = GetActorFromObject(Sender, parameters->objects[1]);
-	TileMap *tmap = Sender->GetCurrentArea()->TMap;
 	Door *door = NULL;
 	Container *container = NULL;
 	Point *pos;

@@ -3669,10 +3669,11 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 
 	//always draw the animation tinted because tint is also used for
 	//transparency
-	Color tint = {255,255,255,255-(ieByte) transparency};
+	ieByte inverseTransparency = 255-transparency;
+	Color tint = {255,255,255,inverseTransparency};
 	if ((Flags&A_ANI_NO_SHADOW)) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
-		tint.a = 255-(ieByte) transparency;
+		tint.a = inverseTransparency;
 	}
 	if (!(Flags&A_ANI_NO_WALL)) {
 		if (!covers) {
