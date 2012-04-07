@@ -548,7 +548,10 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 		if (parameters->string0Parameter[0]) {
 			CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
 		}
-		MoveBetweenAreasCore( (Actor *) Sender, map->GetScriptName(), tar->Pos, -1, true);
+		Actor *actor = (Actor *) Sender;
+		if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos) ) {
+			MoveBetweenAreasCore( actor, map->GetScriptName(), tar->Pos, -1, true);
+		}
 	}
 }
 
@@ -558,8 +561,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
-		MoveBetweenAreasCore( tar, parameters->string0Parameter,
-			parameters->pointParameter, -1, true);
+		MoveBetweenAreasCore( tar, parameters->string0Parameter, parameters->pointParameter, -1, true);
 	}
 }
 
@@ -601,22 +603,32 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
-		//if the actor isn't in the area, we don't care
+		//if the actor isn't in the source area, we don't care
 		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
 			continue;
 		}
+		//no need of CreateMovementEffect, party members are always moved immediately
 		MoveBetweenAreasCore( tar, parameters->string1Parameter,
 			parameters->pointParameter, -1, true);
 	}
 	i = game->GetNPCCount();
 	while (i--) {
 		Actor *tar = game->GetNPC(i);
-		//if the actor isn't in the area, we don't care
-		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
+		//if the actor isn't in the source area, we don't care
+		if (strnicmp(tar->Area, parameters->string0Parameter, 8) ) {
 			continue;
 		}
-		MoveBetweenAreasCore( tar, parameters->string1Parameter,
-			parameters->pointParameter, -1, true);
+		//if the actor is currently in a loaded area, remove it from there
+		Map *map = tar->GetCurrentArea();
+		if (map) {
+			map->RemoveActor(tar);
+		}
+		//update the target's area to the destination
+		strnuprcpy(tar->Area, parameters->string1Parameter, 8);
+		//if the destination area is currently loaded, move the actor there now
+		if (game->FindMap(tar->Area) ) {
+			MoveBetweenAreasCore( tar, parameters->string1Parameter, parameters->pointParameter, -1, true);
+		}
 	}
 }
 
@@ -627,8 +639,12 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
-		parameters->pointParameter, -1, true);
+	Actor *actor = (Actor *) tar;
+	//FIXME:CreateMovement UnMakes globals, probably this isn't what we want!!!
+	//maybe there is some flag that marks real global actors and temporary ones
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, -1, true);
+	}
 }
 
 //we also allow moving to door, container
@@ -645,8 +661,10 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 	const Map *map = to->GetCurrentArea();
 
 	if (map) {
-		MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(),
-			to->Pos, -1, true);
+		Actor *actor = (Actor *) tar;
+		if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos) ) {
+			MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(), to->Pos, -1, true);
+		}
 	}
 }
 
@@ -660,8 +678,11 @@ void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameter
 	if (!to) {
 		return;
 	}
-	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
-		to->Pos, -1, false);
+
+	Actor *actor = (Actor *) tar;
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos) ) {
+		MoveBetweenAreasCore( actor, parameters->string0Parameter, to->Pos, -1, false);
+	}
 }
 
 //don't use offset from Sender
@@ -2563,8 +2584,11 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string1Parameter, 0);
 	}
-	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
-		parameters->pointParameter, parameters->int0Parameter, true);
+
+	Actor *actor = (Actor *) Sender;
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+		MoveBetweenAreasCore(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	}
 }
 
 //spell is depleted, casting time is calculated, interruptible
@@ -2998,7 +3022,9 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	}
 }
 
 void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
@@ -3012,7 +3038,9 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	}
 }
 
 //this is a blocking action, because we have to move to the Entry
@@ -3048,7 +3076,9 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	}
 }
 
 //this is a blocking action, because we have to move to the Entry
@@ -5995,14 +6025,17 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	TileMap *tmap = Sender->GetCurrentArea()->TMap;
 	Door *door = NULL;
 	Container *container = NULL;
-	Point pos;
+	Point *pos;
 	if (target->Type == ST_DOOR) {
-		// FIXME: actually it chooses from two possible points
-		pos = target->Pos;
-		door = tmap->GetDoorByPosition(pos);
+		door = (Door *) target;
+		pos = door->toOpen;
+		Point *otherp = door->toOpen+1;
+		if (Distance(*pos, Sender)>Distance(*otherp, Sender)) {
+			pos=otherp;
+		}
 	} else if(target->Type == ST_CONTAINER) {
-		pos = target->Pos;
-		container = tmap->GetContainerByPosition(pos);
+		container = (Container *) target;
+		pos = &target->Pos;
 	} else {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6010,8 +6043,8 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 
 	// TODO: "sets a field in the door/container to 1"
 
-	if (SquaredPersonalDistance(pos, Sender) > MAX_OPERATING_DISTANCE*MAX_OPERATING_DISTANCE) {
-		MoveNearerTo(Sender, pos, MAX_OPERATING_DISTANCE, 0);
+	if (SquaredPersonalDistance(*pos, Sender) > MAX_OPERATING_DISTANCE*MAX_OPERATING_DISTANCE) {
+		MoveNearerTo(Sender, *pos, MAX_OPERATING_DISTANCE, 0);
 		return;
 	}
 
