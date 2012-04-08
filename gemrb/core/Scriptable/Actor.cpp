@@ -2556,6 +2556,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
 		m->flags |= TEF_PROCESSED_EFFECTS;
+
+		// snap out of charm if the charmer hurt us
 		if (m->triggerID == trigger_attackedby) {
 			Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
 			if (attacker) {

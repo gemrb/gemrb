@@ -6003,7 +6003,6 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	const char * resref = NULL;
 
 	if(0) print("fx_puppet_master(%2d): Value: %d, Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter2);
 
 	//copyself doesn't copy scripts, so the script clearing code is not needed
 	Actor *copy = target->CopySelf(fx->Parameter2 == 1);
