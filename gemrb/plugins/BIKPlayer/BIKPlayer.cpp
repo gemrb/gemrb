@@ -30,10 +30,6 @@
  * Copyright (c) 2009 Konstantin Shishkov
 */
 
-#if defined(__HAIKU__)
-#include <unistd.h>
-#endif
-
 #include "BIKPlayer.h"
 
 #include "rational.h"
@@ -47,6 +43,10 @@
 
 #include <cassert>
 #include <cstdio>
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 using namespace GemRB;
 

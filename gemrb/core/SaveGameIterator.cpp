@@ -38,7 +38,7 @@
 #include "Scriptable/Actor.h"
 #include "System/FileStream.h"
 
-#if defined(__HAIKU__)
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 

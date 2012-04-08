@@ -18,10 +18,6 @@
  *
  */
 
-#if defined(__HAIKU__)
-#include <unistd.h>
-#endif
-
 #ifdef ANDROID
 #include "swab.h"
 #endif
@@ -38,6 +34,10 @@
 #include "Sprite2D.h"
 #include "Video.h"
 #include "System/FileStream.h"
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 using namespace GemRB;
 

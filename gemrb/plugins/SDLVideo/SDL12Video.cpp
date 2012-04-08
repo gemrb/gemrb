@@ -190,7 +190,7 @@ int SDL12VideoDriver::SwapBuffers(void)
 	if (fadeColor.a) {
 		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
 		SDL_Rect src = {
-			0, 0, Viewport.w, Viewport.h
+			0, 0, (Uint16)Viewport.w, (Uint16)Viewport.h
 		};
 		SDL_Rect dst = {
 			xCorr, yCorr, 0, 0

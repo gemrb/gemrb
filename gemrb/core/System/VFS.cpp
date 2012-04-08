@@ -27,7 +27,7 @@
 
 #include "Interface.h"
 
-#if defined(__HAIKU__)
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 

@@ -1194,7 +1194,7 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 {
 	unsigned int Width = r.w ? r.w : disp->w;
 	unsigned int Height = r.h ? r.h : disp->h;
-	SDL_Rect src = {r.x, r.y, r.w, r.h};
+	SDL_Rect src = {(Sint16)r.x, (Sint16)r.y, (Uint16)r.w, (Uint16)r.h};
 
 
 	SDL_Surface* surf = SDL_CreateRGBSurface( SDL_SWSURFACE, Width, Height, 24,
@@ -1239,7 +1239,7 @@ void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
 {
 	SDL_Rect drect = {
-		rgn.x, rgn.y, rgn.w, rgn.h
+		(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h
 	};
 	if (fill) {
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
@@ -1276,7 +1276,7 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 
 	SDL_Surface* surf = ( SDL_Surface* ) sprite->vptr;
 	SDL_Rect drect = {
-		rgn.x, rgn.y, rgn.w, rgn.h
+		(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h
 	};
 	if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 		return;
