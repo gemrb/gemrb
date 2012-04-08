@@ -1322,6 +1322,28 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 	}
 }
 
+int Map::CountSummons(ieDword flags, ieDword sex)
+{
+	int count = 0;
+
+	ieDword gametime = core->GetGame()->GameTime;
+	size_t i = actors.size();
+	while (i--) {
+		Actor *actor = actors[i];
+
+		if (!actor->ValidTarget(flags) ) {
+			continue;
+		}
+		if (actor->Schedule(gametime, true) ) {
+			continue;
+		}
+		if (actor->GetStat(IE_SEX)==sex) {
+			count++;
+		}
+	}
+	return count;
+}
+
 bool Map::AnyEnemyNearPoint(const Point &p)
 {
 	ieDword gametime = core->GetGame()->GameTime;

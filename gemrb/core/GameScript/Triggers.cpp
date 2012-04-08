@@ -846,6 +846,37 @@ int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 	return Sender->MatchTrigger(trigger_oncreation);
 }
 
+int GameScript::SummoningLimit(Scriptable* Sender, Trigger* parameters)
+{
+	Map *map = Sender->GetCurrentArea();
+	if (!map) return 0;
+
+	int sl = map->CountSummons(GA_NO_DEAD, SEX_SUMMON);
+	if (sl == parameters->int0Parameter) return 1;
+	return 0;
+}
+
+int GameScript::SummoningLimitGT(Scriptable* Sender, Trigger* parameters)
+{
+	Map *map = Sender->GetCurrentArea();
+	if (!map) return 0;
+
+	int sl = map->CountSummons(GA_NO_DEAD, SEX_SUMMON);
+	if (sl > parameters->int0Parameter) return 1;
+	return 0;
+}
+
+int GameScript::SummoningLimitLT(Scriptable* Sender, Trigger* parameters)
+{
+	Map *map = Sender->GetCurrentArea();
+	if (!map) return 0;
+
+	int sl = map->CountSummons(GA_NO_DEAD, SEX_SUMMON);
+	if (sl < parameters->int0Parameter) return 1;
+	return 0;
+}
+
+
 int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
