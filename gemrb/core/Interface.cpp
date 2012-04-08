@@ -2775,7 +2775,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if (!tmp) {
 			return NULL;
 		}
-		ieDword sex = ab->GetStat(IE_SEX);
+		ieDword sex = tmp->GetStat(IE_SEX);
 		//TODO: make this external
 		int limit = 0;
 		switch (sex) {
