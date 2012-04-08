@@ -78,6 +78,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	if GUICommon.GameIsBG1():
 		# enabled BAM isn't present in .chu, defining it here
 		Button.SetSprites ("GUILSOP", 0,16,17,28,16)
+	if GUICommon.GameIsIWD1():
+		# disabled/selected frame isn't present in .chu, defining it here
+		Button.SetSprites ("GUILSOP", 0,16,17,16,16)
 
 	# Map
 	Button = Window.GetControl (1)
@@ -86,6 +89,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
 	Button = Window.GetControl (2)
@@ -94,6 +99,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
 	Button = Window.GetControl (3)
@@ -102,6 +109,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
 	Button = Window.GetControl (4)
@@ -110,6 +119,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,6,7,23,23)
 
 	# Mage
 	Button = Window.GetControl (5)
@@ -118,6 +129,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,8,9,24,8)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 	# Priest
 	Button = Window.GetControl (6)
@@ -126,6 +139,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIPR.OpenPriestWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,10,11,25,10)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
 	Button = Window.GetControl (7)
@@ -134,6 +149,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
 
 	# Party mgmt
 	Button = Window.GetControl (8)
@@ -253,6 +270,13 @@ def MarkMenuButton (WindowIndex):
 		Button = Pressed
 	else: # highlight return to game
 		Button = WindowIndex.GetControl (0)
+
+	# NOTE: Alternatively, comment out this block or add a feature check, so that 
+	#   clicking button the second time closes a window again, which might be preferred
+	if GUICommon.GameIsIWD1() and GemRB.GetVar ("SelectedWindow") != 0:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		return
+
 	Button.SetState (IE_GUI_BUTTON_SELECTED)
 
 	return
