@@ -2777,10 +2777,17 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		}
 		ieDword sex = ab->GetStat(IE_SEX);
 		//TODO: make this external
-		int limit = 5;
-		if (sex==SEX_BOTH) limit = 1;  //summoned deva
+		int limit = 0;
+		switch (sex) {
+		case SEX_SUMMON: case SEX_SUMMON_DEMON:
+			limit = 5;
+			break;
+		case SEX_BOTH:
+			limit = 1;
+			break;
+		}
 
-		if (eamod && map->CountSummons(GA_NO_DEAD, sex)>=limit) {
+		if (limit && eamod && map->CountSummons(GA_NO_DEAD, sex)>=limit) {
 			//summoning limit reached
 			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, DMC_WHITE);
 			delete tmp;
