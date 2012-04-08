@@ -768,7 +768,7 @@ static inline bool check_probability(Effect* fx)
 	//watch for this, probability1 is the high number
 	//probability2 is the low number
 	//random value is 0-99
-	if( fx->random_value<=fx->Probability2 || fx->random_value>fx->Probability1) {
+	if(fx->random_value<fx->Probability2 || fx->random_value>fx->Probability1) {
 		return false;
 	}
 	return true;
