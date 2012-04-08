@@ -2760,14 +2760,34 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 
 	//TODO:
 	//decrease the number of summoned creatures with the number of already summoned creatures here
-	//the summoned creatures have a special IE_SPECIFIC
+	//the summoned creatures have a special IE_SEX
+	Map *map;
+	if (target) {
+		map = target->GetCurrentArea();
+	} else if (Owner) {
+		map = Owner->GetCurrentArea();
+	} else {
+		map = game->GetCurrentArea();
+	}
 
-	while(cnt--) {
-		ab = gamedata->GetCreature(resource);
-		if (!ab) {
+	if (map) while(cnt--) {
+		Actor *tmp = gamedata->GetCreature(resource);
+		if (!tmp) {
 			return NULL;
 		}
+		ieDword sex = ab->GetStat(IE_SEX);
+		//TODO: make this external
+		int limit = 5;
+		if (sex==SEX_BOTH) limit = 1;  //summoned deva
 
+		if (eamod && map->CountSummons(GA_NO_DEAD, sex)>=limit) {
+			//summoning limit reached
+			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, DMC_WHITE);
+			delete tmp;
+			break;
+		}
+
+		ab = tmp;
 		if (Owner && Owner->Type==ST_ACTOR) {
 			ab->LastSummoner = Owner->GetGlobalID();
 		}
@@ -2818,14 +2838,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			ab->SetBase(IE_SEX, SEX_SUMMON);
 		}
 
-		Map *map;
-		if (target) {
-			map = target->GetCurrentArea();
-		} else if (Owner) {
-			map = Owner->GetCurrentArea();
-		} else {
-			map = game->GetCurrentArea();
-		}
 		map->AddActor(ab, true);
 		ab->SetPosition(position, true, 0);
 		ab->RefreshEffects(NULL);
