@@ -1073,8 +1073,11 @@ def OpenPortraitWindow (needcontrols=0):
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
 
 		if GUICommon.GameIsIWD1():
-			# overlay a label, so we can display the hp with the correct font
+			# overlay a label, so we can display the hp with the correct font. Regular button label
+			#   is used by effect icons
 			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT)
+			HPLabel = Window.GetControl (100+i)
+			HPLabel.SetUseRGB (True)
 
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -1122,7 +1125,7 @@ def UpdatePortraitWindow ():
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		ratio_str = GUICommon.SetupDamageInfo (portid+1, Button, Window)
+		ratio_str, color = GUICommon.SetupDamageInfo (portid+1, Button, Window)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (portid+1)
@@ -1164,6 +1167,7 @@ def UpdatePortraitWindow ():
 			if GUICommon.GameIsIWD1():
 				HPLabel = Window.GetControl (100+portid)
 				HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
+				HPLabel.SetTextColor (*color)
 			else:
 				states = flag+blank+blank + states
 		Button.SetText(states)

@@ -728,6 +728,22 @@ def SetupDamageInfo (pc, Button, Window):
 	if hp < 1 or (state & STATE_DEAD):
 		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
 
+	if ratio == 1:
+		band = 0
+		color = (255, 255, 255)  # white
+	elif ratio >= 0.75:
+		band = 1
+		color = (0, 255, 0)  # green
+	elif ratio >= 0.50:
+		band = 2
+		color = (255, 255, 0)  # yellow
+	elif ratio >= 0.25:
+		band = 3
+		color = (255, 128, 0)  # orange
+	else:
+		band = 4
+		color = (255, 0, 0)  # red
+
 	if GemRB.GetVar("Old Portrait Health") or not GameIsIWD2():
 		# draw the blood overlay
 		if hp >= 1 and not (state & STATE_DEAD):
@@ -737,27 +753,13 @@ def SetupDamageInfo (pc, Button, Window):
 		# GUIHITPT has 5 frames with different severity colors
 		# luckily their ids follow a nice pattern
 		hpBar = Window.GetControl (pc-1 + 50)
-		if ratio == 1:
-			# white
-			hpBar.SetBAM ("GUIHITPT", 0, 0)
-		elif ratio < 1 and ratio >= 0.75:
-			# green
-			hpBar.SetBAM ("GUIHITPT", 1, 0)
-		elif ratio < 0.75 and ratio >= 0.50:
-			# yellow
-			hpBar.SetBAM ("GUIHITPT", 2, 0)
-		elif ratio < 0.50 and ratio >= 0.25:
-			# orange
-			hpBar.SetBAM ("GUIHITPT", 3, 0)
-		else:
-			# red
-			hpBar.SetBAM ("GUIHITPT", 4, 0)
+		hpBar.SetBAM ("GUIHITPT", band, 0)
 		hpBar.SetPictureClipping (ratio)
 
 	ratio_str = "\n%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 
-	return ratio_str
+	return ratio_str, color
 
 def SetCurrentDateTokens (stat):
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
