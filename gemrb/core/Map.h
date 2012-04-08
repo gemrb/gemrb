@@ -330,6 +330,8 @@ public:
 	void InitActors();
 	void InitActor(Actor *actor);
 	void AddActor(Actor* actor, bool init);
+	//counts the summons already in the area
+	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
