@@ -2787,7 +2787,23 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			break;
 		}
 
-		if (limit && eamod && map->CountSummons(GA_NO_DEAD, sex)>=limit) {
+		//if summoner is an actor, filter out opponent summons
+		//this is done by clearing the filter when appropriate
+		//non actors and neutrals can summon as much as they want
+		ieDword flag = GA_NO_DEAD|GA_NO_ALLY|GA_NO_ENEMY;
+
+		if (Owner && Owner->Type==ST_ACTOR) {
+			tmp->LastSummoner = Owner->GetGlobalID();
+			Actor *owner = (Actor *) Owner;
+			ieDword ea = owner->GetStat(IE_EA);
+			if (ea<=EA_GOODCUTOFF) {
+				flag &= ~GA_NO_ALLY;
+			} else if (ea>=EA_EVILCUTOFF) {
+				flag &= ~GA_NO_ENEMY;
+			}
+		}
+
+		if (limit && sexmod && map->CountSummons(flag, sex)>=limit) {
 			//summoning limit reached
 			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, DMC_WHITE);
 			delete tmp;
@@ -2795,9 +2811,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		}
 
 		ab = tmp;
-		if (Owner && Owner->Type==ST_ACTOR) {
-			ab->LastSummoner = Owner->GetGlobalID();
-		}
 		//Always use Base stats for the recently summoned creature
 
 		int enemyally;
