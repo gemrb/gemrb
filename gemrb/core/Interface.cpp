@@ -2321,8 +2321,7 @@ bool Interface::LoadConfig(const char* filename)
 			plugin_flags->SetAt( value, PLF_DELAY );
 		} else {
 			for(i=0;i<MAX_CD;i++) {
-				char keyname[] = { 'C', 'D', '1', '\0' };
-				keyname[2] = '1'+i; // do it separately to make gcc happy about type narrowing
+				char keyname[] = { 'C', 'D', char('1'+i), '\0' };
 				if (stricmp(name, keyname) == 0) {
 					for(char *path = strtok(value, SPathListSeparator);
 							path;
@@ -2406,8 +2405,7 @@ bool Interface::LoadConfig(const char* filename)
 
 	for (i = 0; i < MAX_CD; ++i) {
 		if (!CD[i].size()) {
-			char cd[] = { 'C', 'D', '1', '\0' };
-			cd[2] = '1'+i; // do it separately to make gcc happy about type narrowing
+			char cd[] = { 'C', 'D', char('1'+i), '\0' };
 			char name[_MAX_PATH];
 
 			PathJoin(name, GamePath, cd, NULL);
