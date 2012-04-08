@@ -72,6 +72,7 @@ namespace GemRB {
 #define SEX_SUMMON    6
 #define SEX_ILLUSION  7 // bg2
 #define SEX_EXTRA     8 // bg2
+#define SEX_SUMMON_DEMON 9 //bg2
 #define SEX_EXTRA2    0xa // ToB
 #define SEX_MAXEXTRA  0x12 // ToB (extra10)
 
