@@ -1209,7 +1209,7 @@ static int maximum_values[MAX_STATS]={
 25,1,1,255,25,25,255,255,25,255,255,255,255,255,255,255,//5f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//6f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//7f
-255,255,255,255,255,255,255,100,100,100,255,5,5,255,1,1,//8f
+255,255,255,255,255,255,255,100,100,100,999999,5,5,999999,1,1,//8f
 1,25,25,30,1,1,1,25,0,100,100,1,255,255,255,255,//9f
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
 999999999,999999999,0,0,20,0,0,0,0,0,0,0,0,0,0,0,//bf
@@ -3313,6 +3313,18 @@ void Actor::GetHit()
 		SetStance( IE_ANI_DAMAGE );
 	}
 	VerbalConstant(VB_DAMAGE, 1 );
+	// dispel the projected image if there is any
+	if (BaseStats[IE_PUPPETMASTERTYPE] == 2) {
+		Actor *puppet = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETID]);
+		if (puppet) {
+			// now destroy it
+			puppet->DestroySelf();
+		} else {
+			Log(ERROR, "Actor", "Puppet lookup failed! Already gone?");
+		}
+		BaseStats[IE_PUPPETID] = 0;
+		BaseStats[IE_PUPPETMASTERTYPE] = 0;
+	}
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
 		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
 			return;

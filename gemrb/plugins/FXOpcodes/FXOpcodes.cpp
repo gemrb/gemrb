@@ -6065,10 +6065,22 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_puppet_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_puppet_marker(%2d): Value: %d, Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	//actually the Type is in parameter2 and the ID is in parameter1
-	//but for some reason the defines are in the opposite order
-	STAT_SET (IE_PUPPETTYPE, fx->Parameter1);  //cb4 - the ID of the controller
-	STAT_SET (IE_PUPPETID, fx->Parameter2);    //cb8 - the control type
+	Actor *master = core->GetGame()->GetActorByGlobalID(fx->Parameter1);
+	// selfdestruct if the master is gone
+	if (!master || master->Modified[IE_STATE_ID]&STATE_DEAD) {
+		target->DestroySelf();
+		return FX_NOT_APPLIED;
+	}
+	// ignore the last application before expiry, since this is the only place we can reset BaseStats properly
+	if (fx->Duration - core->GetGame()->GameTime > 1) {
+		master->SetBase(IE_PUPPETID, target->GetGlobalID());
+		master->SetBase(IE_PUPPETMASTERTYPE, fx->Parameter2);
+	} else {
+		master->SetBase(IE_PUPPETID, 0);
+		master->SetBase(IE_PUPPETMASTERTYPE, 0);
+	}
+	STAT_SET (IE_PUPPETTYPE, fx->Parameter2);
+	STAT_SET (IE_PUPPETMASTERID, fx->Parameter1);
 	return FX_APPLIED;
 }
 
