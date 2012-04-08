@@ -6003,7 +6003,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	const char * resref = NULL;
 
 	if(0) print("fx_puppet_master(%2d): Value: %d, Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
+	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter2);
 
 	//copyself doesn't copy scripts, so the script clearing code is not needed
 	Actor *copy = target->CopySelf(fx->Parameter2 == 1);
@@ -6054,8 +6054,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->ApplySpell(resref,copy,copy,0);
 	}
 
-	//FIXME: parameter1 is unsure, but something similar to what the original engine has there
-	newfx = EffectQueue::CreateEffectCopy(fx, fx_puppetmarker_ref, target->InParty-1, fx->Parameter2);
+	newfx = EffectQueue::CreateEffectCopy(fx, fx_puppetmarker_ref, fx->CasterID, fx->Parameter2);
 	if (newfx) {
 		core->ApplyEffect(newfx, copy, copy);
 		delete newfx;
