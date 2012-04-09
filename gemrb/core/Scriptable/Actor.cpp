@@ -3240,7 +3240,7 @@ void Actor::IdleActions(bool nonidle)
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
 	//party comments have a priority, but they happen half of the time, at most
 	if (nextComment<time) {
-		if (nextComment) {
+		if (nextComment && !Immobile()) {
 			if (!GetPartyComment()) {
 				GetAreaComment(map->AreaType);
 			}
@@ -3250,13 +3250,13 @@ void Actor::IdleActions(bool nonidle)
 	}
 
 	//drop the bored one liner is there was no action for some time
-	if(nonidle || !nextBored) {
+	if (nonidle || !nextBored || InMove() || Immobile()) {
 		//if not in party or bored timeout is disabled, don't bother to set the new time
 		if (InParty && bored_time) {
 			nextBored=time+core->Roll(1,30,bored_time);
 		}
 	} else {
-		if (nextBored<time && !InMove()) {
+		if (nextBored<time) {
 			int x = bored_time / 10;
 			if (x<10) x = 10;
 			nextBored = time+core->Roll(1,30,x);
