@@ -2498,18 +2498,23 @@ void Actor::CheckPuppet(Actor *puppet, ieDword type)
 	if (!puppet) return;
 	if (puppet->Modified[IE_STATE_ID]&STATE_DEAD) return;
 
-	Modified[IE_PUPPETMASTERTYPE] = type;
-	Modified[IE_PUPPETID] = puppet->GetGlobalID();
 	switch(type) {
 		case 1:
 			Modified[IE_STATE_ID]|=state_invisible;
 			break;
 		case 2:
+			if (InterruptCasting) {
+				// dispel the projected image if there is any
+				puppet->DestroySelf();
+				return;
+			}
 			Modified[IE_HELD]=1;
 			AddPortraitIcon(PI_PROJIMAGE);
 			Modified[IE_STATE_ID]|=STATE_HELPLESS;
 			break;
 	}
+	Modified[IE_PUPPETTYPE] = type;
+	Modified[IE_PUPPETID] = puppet->GetGlobalID();
 }
 
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
@@ -3345,18 +3350,7 @@ void Actor::GetHit()
 		SetStance( IE_ANI_DAMAGE );
 	}
 	VerbalConstant(VB_DAMAGE, 1 );
-	// dispel the projected image if there is any
-	if (BaseStats[IE_PUPPETMASTERTYPE] == 2) {
-		Actor *puppet = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETID]);
-		if (puppet) {
-			// now destroy it
-			puppet->DestroySelf();
-		} else {
-			Log(ERROR, "Actor", "Puppet lookup failed! Already gone?");
-		}
-		BaseStats[IE_PUPPETID] = 0;
-		BaseStats[IE_PUPPETMASTERTYPE] = 0;
-	}
+
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
 		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
 			return;

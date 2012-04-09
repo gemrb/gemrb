@@ -6071,11 +6071,11 @@ int fx_puppet_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->DestroySelf();
 		return FX_NOT_APPLIED;
 	}
-	STAT_SET (IE_PUPPETTYPE, fx->Parameter2);
+	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter2);
 	STAT_SET (IE_PUPPETMASTERID, fx->Parameter1);
 	//These will be seen in PrevStats after an update in Master
 	master->SetStat(IE_PUPPETID, target->GetGlobalID(), 0);
-	master->SetStat(IE_PUPPETMASTERTYPE, fx->Parameter2, 0);
+	master->SetStat(IE_PUPPETTYPE, fx->Parameter2, 0);
 	return FX_APPLIED;
 }
 
