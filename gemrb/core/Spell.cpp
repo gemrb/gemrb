@@ -128,13 +128,20 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 	if (cgsound>=0 && duration > 1) {
 		//bg2 style
 		if(cgsound&0x100) {
-			switch(gender) {
-			default: g = 'm'; break;
-			case SEX_FEMALE: g = 'f'; break;
-			case SEX_OTHER: case SEX_NEITHER: g = 's'; break;
+			//if duration is less than 3, use only the background sound
+			g = 's';
+			if (duration>3) {
+				switch(gender) {
+				//selection of these sounds is almost purely on whim
+				//though the sounds of devas/demons are probably better this way
+				//all other cases (mostly elementals/animals) don't have sound
+				//externalise if you don't mind another 2da
+				case SEX_MALE: case SEX_SUMMON_DEMON: g = 'm'; break;
+				case SEX_FEMALE: case SEX_BOTH: g = 'f'; break;
+				}
 			}
 		} else {
-			//how style
+			//how style, no pure background sound
 
 			switch(gender) {
 			default: g = 'm'; break;

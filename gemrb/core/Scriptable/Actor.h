@@ -406,6 +406,8 @@ public:
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims() const;
+	/** returns the gender of actor for cg sound - illusions are tricky */
+	ieDword GetCGGender();
 	/** some hardcoded effects in puppetmaster based on puppet type */
 	void CheckPuppet(Actor *puppet, ieDword type);
 	/** Re/Inits the Modified vector */

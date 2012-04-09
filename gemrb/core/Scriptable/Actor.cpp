@@ -2491,6 +2491,20 @@ void Actor::DisablePortraitIcon(ieByte icon)
 	}
 }
 
+//hack to get the proper casting sounds of copied images
+ieDword Actor::GetCGGender()
+{
+	ieDword gender = Modified[IE_SEX];
+	if (gender == SEX_ILLUSION) {
+		Actor *master = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETMASTERID]);
+		if (master) {
+			gender = master->Modified[IE_SEX];
+		}
+	}
+
+	return gender;
+}
+
 #define PI_PROJIMAGE  77
 
 void Actor::CheckPuppet(Actor *puppet, ieDword type)

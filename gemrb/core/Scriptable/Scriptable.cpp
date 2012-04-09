@@ -1173,7 +1173,8 @@ int Scriptable::SpellCast(bool instant)
 		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
 		fxqueue->SetOwner(actor);
 		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
-			spl->AddCastingGlow(fxqueue, duration, actor->Modified[IE_SEX]);
+			ieDword gender = actor->GetCGGender();
+			spl->AddCastingGlow(fxqueue, duration, gender);
 		}
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;
