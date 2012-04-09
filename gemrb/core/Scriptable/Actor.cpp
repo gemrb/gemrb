@@ -2491,6 +2491,27 @@ void Actor::DisablePortraitIcon(ieByte icon)
 	}
 }
 
+#define PI_PROJIMAGE  77
+
+void Actor::CheckPuppet(Actor *puppet, ieDword type)
+{
+	if (!puppet) return;
+	if (puppet->Modified[IE_STATE_ID]&STATE_DEAD) return;
+
+	Modified[IE_PUPPETTYPE] = puppet->GetGlobalID();
+	Modified[IE_PUPPETMASTERTYPE] = type;
+	switch(type) {
+		case 1:
+			Modified[IE_STATE_ID]|=state_invisible;
+			break;
+		case 2:
+			Modified[IE_HELD]=1;
+			AddPortraitIcon(PI_PROJIMAGE);
+			Modified[IE_STATE_ID]|=STATE_HELPLESS;
+			break;
+	}
+}
+
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 
 /** call this after load, to apply effects */
@@ -2557,6 +2578,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	fxqueue.ApplyAllEffects( this );
+
+	if (PrevStats[IE_PUPPETID]) {
+		CheckPuppet(core->GetGame()->GetActorByGlobalID(PrevStats[IE_PUPPETID]), PrevStats[IE_PUPPETTYPE]);
+	}
+
 	//move this further down if needed
 	PrevStats = NULL;
 

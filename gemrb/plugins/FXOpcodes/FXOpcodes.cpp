@@ -6071,14 +6071,7 @@ int fx_puppet_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->DestroySelf();
 		return FX_NOT_APPLIED;
 	}
-	// ignore the last application before expiry, since this is the only place we can reset BaseStats properly
-	if (fx->Duration - core->GetGame()->GameTime > 1) {
-		master->SetBase(IE_PUPPETID, target->GetGlobalID());
-		master->SetBase(IE_PUPPETMASTERTYPE, fx->Parameter2);
-	} else {
-		master->SetBase(IE_PUPPETID, 0);
-		master->SetBase(IE_PUPPETMASTERTYPE, 0);
-	}
+	master->SetStat(IE_PUPPETID, target->GetGlobalID(), 0);
 	STAT_SET (IE_PUPPETTYPE, fx->Parameter2);
 	STAT_SET (IE_PUPPETMASTERID, fx->Parameter1);
 	return FX_APPLIED;
