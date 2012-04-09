@@ -409,7 +409,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 def ApplyFeats(MyChar):
 
 	#don't mess with feats outside of IWD2
-	if not GemRB.GameIsIWD2():
+	if not GUICommon.GameIsIWD2():
 		return
 
 	#feats giving a single innate ability
