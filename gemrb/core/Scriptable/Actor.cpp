@@ -2498,8 +2498,8 @@ void Actor::CheckPuppet(Actor *puppet, ieDword type)
 	if (!puppet) return;
 	if (puppet->Modified[IE_STATE_ID]&STATE_DEAD) return;
 
-	Modified[IE_PUPPETTYPE] = puppet->GetGlobalID();
 	Modified[IE_PUPPETMASTERTYPE] = type;
+	Modified[IE_PUPPETID] = puppet->GetGlobalID();
 	switch(type) {
 		case 1:
 			Modified[IE_STATE_ID]|=state_invisible;
