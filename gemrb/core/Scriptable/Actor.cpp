@@ -2491,6 +2491,7 @@ void Actor::DisablePortraitIcon(ieByte icon)
 	}
 }
 
+
 //hack to get the proper casting sounds of copied images
 ieDword Actor::GetCGGender()
 {
@@ -8352,9 +8353,16 @@ bool Actor::TryToHide() {
 	return true;
 }
 
+//cannot target actor (used by GUI)
+bool Actor::Untargetable()
+{
+	return (GetSafeStat(IE_STATE_ID)&state_invisible) || HasSpellState(SS_SANCTUARY);
+}
+
+//it is futile to try to harm target (used by AI scripts)
 bool Actor::InvalidSpellTarget() const
 {
-	if (GetStat(IE_STATE_ID) & (STATE_DEAD)) return true;
+	if (GetSafeStat(IE_STATE_ID) & STATE_DEAD) return true;
 	if (HasSpellState(SS_SANCTUARY)) return true;
 	return false;
 }

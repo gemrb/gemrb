@@ -791,7 +791,9 @@ public:
 	bool TryToHide();
 	/* checks if the alignment matches one of the masking constants */
 	//bool MatchesAlignmentMask(ieDword mask);
-	/* returns true if this actor is untargetable */
+	/** untargetable by spells/attack due to invisibility or sanctuary */
+	bool Untargetable();
+	/* returns true if this it is futile to try to harm actor (dead/sanctuaried) */
 	bool InvalidSpellTarget() const;
 	/* returns true if the spell is useless to cast on target
 	or the spell's range is smaller than range */
