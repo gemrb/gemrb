@@ -1334,7 +1334,7 @@ int Map::CountSummons(ieDword flags, ieDword sex)
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
-		if (actor->Schedule(gametime, true) ) {
+		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (actor->GetStat(IE_SEX)==sex) {
@@ -1351,7 +1351,7 @@ bool Map::AnyEnemyNearPoint(const Point &p)
 	while (i--) {
 		Actor *actor = actors[i];
 
-		if (actor->Schedule(gametime, true) ) {
+		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
