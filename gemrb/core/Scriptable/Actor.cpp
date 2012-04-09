@@ -184,7 +184,8 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK,
 	ISCLASS12, ISCLASS13};
 //this map could probably be auto-generated (isClass -> IWD2 class ID)
-static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
+//autogenerating for non IWD2 now!!!
+static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const unsigned int booksiwd2[ISCLASSES]={0, 1<<IE_IWD2_SPELL_WIZARD, 0, 0, 
  1<<IE_IWD2_SPELL_BARD, 1<<IE_IWD2_SPELL_CLERIC, 1<<IE_IWD2_SPELL_DRUID, 0,
@@ -1788,6 +1789,8 @@ static void InitActorTables()
 		dualswap = (int *) calloc(classcount, sizeof(int));
 		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
+
+		memset(classesiwd2, 0 , sizeof(classesiwd2) );
 		for (i=0; i<classcount; i++) {
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
@@ -1819,6 +1822,9 @@ static void InitActorTables()
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
 				if (classis>=0) {
+					//store the original class ID as iwd2 compatible ISCLASS (internal class number)
+					classesiwd2[classis] = tmpindex+1;
+
 					buffer.appendFormatted("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
@@ -1871,7 +1877,7 @@ static void InitActorTables()
 						}
 						buffer.appendFormatted("Classis: %d ", classis);
 
-						//warrior take presedence
+						//warrior take precedence
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
@@ -3738,9 +3744,20 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	buffer.appendFormatted("Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	buffer.appendFormatted("Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
-	buffer.appendFormatted("Levels: %d/%d/%d (average %d)\n", Modified[IE_LEVEL], Modified[IE_LEVEL2], Modified[IE_LEVEL3], GetXPLevel(true) );
+
+	//this works for both level slot style
+	buffer.appendFormatted("Levels:\n");
+	for (i = 0;i<ISCLASSES;i++) {
+		int level = GetClassLevel(i);
+		if (level) {
+			buffer.appendFormatted("%s: %d    ", isclassnames[i], level);
+		}
+	}
+	buffer.appendFormatted("\nSummary: %d\n", GetXPLevel(true) );
+
 	buffer.appendFormatted("current HP:%d\n", BaseStats[IE_HITPOINTS] );
 	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s\n", Modified[IE_ANIMATION_ID], anims->ResRef );
+	buffer.appendFormatted("TURNUNDEADLEVEL: %d current: %d\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	buffer.appendFormatted("Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		for(i=0;i<Modified[IE_COLORCOUNT];i++) {
@@ -7732,11 +7749,19 @@ void Actor::CreateDerivedStatsBG()
 		BaseStats[IE_DISABLEBACKSTAB] = 1;
 	}
 
-	//turn undead level
-	if (turnlevels[classid]) {
-		int tmp = GetLevelInClass(classid)+1-turnlevels[classid];
-		if (tmp<0) tmp=0;
-		turnundeadlevel = tmp;
+	for (int i=0;i<ISCLASSES;i++) {
+		int tmp;
+
+		if (classesiwd2[i]>=(ieDword) classcount) continue;
+		int tl = turnlevels[classesiwd2[i]];
+		if (tl) {
+			tmp = GetClassLevel(i)+1-tl;
+			//adding up turn undead levels, but this is probably moot
+			//anyway, you will be able to create custom priest/paladin classes
+			if (tmp>0) {
+				turnundeadlevel+=tmp;
+			}
+		}
 	}
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();
