@@ -3975,6 +3975,23 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,0);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,2);
+
+	//fix the hiding puppet while mislead bug, by
+	if (target->GetSafeStat(IE_PUPPETTYPE)==1) {
+		//hack target to use the plain type
+		target->Modified[IE_PUPPETTYPE]=0;
+
+		//go after the original puppetmarker in the puppet too
+		Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
+		if (puppet) {
+			Effect *puppetmarker = puppet->fxqueue.HasEffect(fx_puppetmarker_ref);
+
+			//hack the puppet type to normal, where it doesn't grant invisibility
+			if (puppetmarker) {
+				puppetmarker->Parameter2 = 0;
+			}
+		}
+	}
 	return FX_NOT_APPLIED;
 }
 

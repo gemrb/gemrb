@@ -1057,7 +1057,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 
 	// always draw it for party members; the rest must not be invisible to have it;
 	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
-	if (hc_flags[idx] & HC_INVISIBLE && (!actor->InParty && actor->Modified[IE_STATE_ID] & STATE_INVISIBLE)) {
+	if (hc_flags[idx] & HC_INVISIBLE && (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible)) {
 		return;
 	}
 
@@ -2514,7 +2514,11 @@ void Actor::CheckPuppet(Actor *puppet, ieDword type)
 
 	switch(type) {
 		case 1:
-			Modified[IE_STATE_ID]|=state_invisible;
+			Modified[IE_STATE_ID] |= state_invisible;
+			//also set the improved invisibility flag where available
+			if (!pstflags) {
+				Modified[IE_STATE_ID]|=STATE_INVIS2;
+			}
 			break;
 		case 2:
 			if (InterruptCasting) {
@@ -4764,7 +4768,7 @@ bool Actor::ValidTarget(int ga_flags) const
 
 	if (ga_flags&GA_NO_HIDDEN) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
-		if (Modified[IE_EA]>EA_GOODCUTOFF && Modified[IE_STATE_ID]&state_invisible) {
+		if ((Modified[IE_EA]>EA_GOODCUTOFF) && (Modified[IE_STATE_ID] & state_invisible) ) {
 			return false;
 		}
 	}
@@ -5617,12 +5621,19 @@ void Actor::PerformAttack(ieDword gameTime)
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 
-	if (target && (target->GetStat(IE_STATE_ID)&(STATE_DEAD|state_invisible))) {
-		target = NULL;
+	//can't target invisible or dead opponent
+	if (target) {
+		ieDword flag = target->GetSafeStat(IE_STATE_ID);
+		if (!GetSafeStat(IE_SEEINVISIBLE) ) flag &= STATE_DEAD|state_invisible;
+		else flag &= STATE_DEAD;
+
+		if (flag) {
+			target = NULL;
+		}
 	}
 
 	if (!target) {
-		Log(ERROR, "Actor", "Attack without valid target!");
+		Log(WARNING, "Actor", "Attack without valid target!");
 		return;
 	}
 
