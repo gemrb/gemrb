@@ -407,6 +407,11 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	return
 
 def ApplyFeats(MyChar):
+
+	#don't mess with feats outside of IWD2
+	if not GemRB.GameIsIWD2():
+		return
+
 	#feats giving a single innate ability
 	SetSpell(MyChar, "SPIN111", FEAT_WILDSHAPE_BOAR)
 	SetSpell(MyChar, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
@@ -433,7 +438,8 @@ def ApplyFeats(MyChar):
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN236")
 		GemRB.RemoveSpell(MyChar, "SPIN260")
-	#extra shapeshifting
+
+	#TODO: extra shapeshifting
 	#GUICommon.MakeSpellCount(MyChar, "", cnt)
 
 	#extra smiting
