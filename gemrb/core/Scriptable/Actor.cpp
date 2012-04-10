@@ -2603,8 +2603,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	fxqueue.ApplyAllEffects( this );
 
-	if (PrevStats[IE_PUPPETID]) {
-		CheckPuppet(core->GetGame()->GetActorByGlobalID(PrevStats[IE_PUPPETID]), PrevStats[IE_PUPPETTYPE]);
+	if (previous[IE_PUPPETID]) {
+		CheckPuppet(core->GetGame()->GetActorByGlobalID(previous[IE_PUPPETID]), previous[IE_PUPPETTYPE]);
 	}
 
 	//move this further down if needed
