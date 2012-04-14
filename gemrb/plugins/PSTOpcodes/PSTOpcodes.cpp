@@ -435,9 +435,17 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			strnuprcpy(fx->Resource,"rdead",8);
 			break;
 	}
+
+	ieResRef OldSpellResRef;
+
+	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Owner->SetSpellResRef(fx->Resource);
+	//cast spell on target
 	Owner->CastSpell(target, false);
+	//actually finish casting (if this is not good enough, use an action???)
 	Owner->CastSpellEnd(fx->CasterLevel);
+	Owner->SetSpellResRef(OldSpellResRef);
+
 	return FX_NOT_APPLIED;
 }
 //0xc5 fx_multiple_vvc
