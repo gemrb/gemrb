@@ -6273,7 +6273,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 
 	unsigned int dist = GetItemDistance(itemres, header);
 
-	if (PersonalDistance(tar->Pos, Sender) > dist) {
+	if (PersonalDistance(Sender, tar) > dist) {
 		MoveNearerTo(Sender, tar, dist);
 		return;
 	}
