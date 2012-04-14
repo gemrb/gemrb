@@ -2603,8 +2603,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	fxqueue.ApplyAllEffects( this );
 
-	if (PrevStats[IE_PUPPETID]) {
-		CheckPuppet(core->GetGame()->GetActorByGlobalID(PrevStats[IE_PUPPETID]), PrevStats[IE_PUPPETTYPE]);
+	if (previous[IE_PUPPETID]) {
+		CheckPuppet(core->GetGame()->GetActorByGlobalID(previous[IE_PUPPETID]), previous[IE_PUPPETTYPE]);
 	}
 
 	//move this further down if needed
@@ -5130,7 +5130,9 @@ void Actor::AttackedBy( Actor *attacker)
 	if (attacker->GetStat(IE_EA) != EA_PC && Modified[IE_EA] != EA_PC) {
 		LastAttacker = attacker->GetGlobalID();
 	}
-	core->Autopause(AP_ATTACKED, this);
+	if (InParty) {
+		core->Autopause(AP_ATTACKED, this);
+	}
 }
 
 void Actor::SetTarget( Scriptable *target)
@@ -5914,8 +5916,10 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 
 	if (damage<=0) {
-		VerbalConstant(VB_TIMMUNE, 1);
-		core->Autopause(AP_UNUSABLE, this);
+		if (attacker && attacker->InParty) {
+			attacker->VerbalConstant(VB_TIMMUNE, 1);
+			core->Autopause(AP_UNUSABLE, this);
+		}
 	}
 }
 
