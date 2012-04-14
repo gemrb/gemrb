@@ -67,8 +67,9 @@ bool EFFImporter::Open(DataStream* stream, bool autoFree)
 // copy the info into the EFFV2 fields (separate), so it is clearer
 static inline void fixAffectedLevels(Effect *fx) {
 	if (fx->DiceSides > 0 || fx->DiceThrown > 0) {
-		fx->MinAffectedLevel = fx->DiceThrown;
-		fx->MaxAffectedLevel = fx->DiceSides;
+		//cloudkill needs these in this order
+		fx->MinAffectedLevel = fx->DiceSides;
+		fx->MaxAffectedLevel = fx->DiceThrown;
 	}
 }
 
