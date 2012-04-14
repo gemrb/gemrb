@@ -753,8 +753,14 @@ static inline bool check_level(Actor *target, Effect *fx)
 
 	ieDword level = (ieDword) target->GetXPLevel( true );
 	//return true if resisted
-	if (fx->MinAffectedLevel > 0 || fx->MaxAffectedLevel > 0) {
-		if (level < fx->MinAffectedLevel || level > fx->MaxAffectedLevel) {
+	if (fx->MinAffectedLevel > 0) {
+	if (level < fx->MinAffectedLevel) {
+		return true;
+		}
+	}
+
+	if (fx->MaxAffectedLevel > 0) {
+		if (level > fx->MaxAffectedLevel) {
 			return true;
 		}
 	}
