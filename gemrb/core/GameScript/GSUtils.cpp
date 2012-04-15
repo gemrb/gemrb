@@ -274,6 +274,26 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	return ret;
 }
 
+bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname)
+{
+	Store* store = gamedata->GetStore(storename);
+	if (!store) {
+		Log(ERROR, "GameScript", "Store cannot be opened!");
+		return false;
+	}
+
+	//RemoveItem doesn't use trigger, and hopefully this will always run on bags (with no triggers)
+	unsigned int idx = store->FindItem(itemname, false);
+	if (idx == (unsigned int) -1) return false;
+
+	STOItem *si = store->GetItem(idx, false);
+	memcpy( &item, si, sizeof( CREItem ) );
+	store->RemoveItem(idx);
+	//store changed, save it
+	gamedata->SaveStore(store);
+	return true;
+}
+
 //don't pass this point by reference, it is subject to change
 void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 {
@@ -348,6 +368,30 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 		}
 		gamedata->FreeItem(item, itemslot->ItemResRef);
 		if (ret) {
+			return true;
+		}
+	}
+	return false;
+}
+
+//finds and takes an item from a container in the given inventory
+bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname)
+{
+	int i=inventory->GetSlotCount();
+	while (i--) {
+		//maybe we could speed this up if we mark bag items with a flags bit
+		CREItem *itemslot = inventory->GetSlotItem(i);
+		if (!itemslot)
+			continue;
+		Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		if (!item)
+			continue;
+		bool ret = core->CanUseItemType(SLOT_BAG,item,NULL);
+		gamedata->FreeItem(item, itemslot->ItemResRef);
+		if (!ret)
+			continue;
+		//the store is the same as the item's name
+		if (StoreGetItemCore(itemslot2, itemslot->ItemResRef, itemname)) {
 			return true;
 		}
 	}
@@ -529,6 +573,17 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	}
 	CREItem *item;
 	myinv->RemoveItem(resref, flags, &item, count);
+
+	//there was no item in the inventory itself, try with containers in the inventory
+	if (!item) {
+		item = new CREItem();
+
+		if (!GetItemContainer(*item, myinv, resref)) {
+			delete item;
+			item = NULL;
+		}
+	}
+
 	if (!item) {
 		// nothing was removed
 		return MIC_NOITEM;
@@ -548,9 +603,10 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 			myinv = NULL;
 			break;
 	}
+	if (lostitem&&!gotitem) displaymsg->DisplayConstantString(STR_LOSTITEM, DMC_BG2XPGREEN);
+
 	if (!myinv) {
 		delete item;
-		if (lostitem) displaymsg->DisplayConstantString(STR_LOSTITEM, DMC_BG2XPGREEN);
 		return MIC_GOTITEM; // actually it was lost, not gained
 	}
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
@@ -559,7 +615,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		return MIC_FULL;
 	}
-	if (gotitem) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+	if (gotitem&&!lostitem) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 	return MIC_GOTITEM;
 }
 

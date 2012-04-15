@@ -152,9 +152,9 @@ STODrink *Store::GetDrink(unsigned int idx) const
 }
 
 //We need this weirdness for PST item lookup
-STOItem *Store::GetItem(unsigned int idx)
+STOItem *Store::GetItem(unsigned int idx, bool usetrigger)
 {
-	if (!HasTriggers) {
+	if (!HasTriggers || !usetrigger) {
 		if (idx>=items.size()) {
 			return NULL;
 		}
@@ -298,6 +298,18 @@ void Store::RemoveItem( unsigned int idx )
 	}
 	items.erase(items.begin()+idx);
 	ItemsCount--;
+}
+
+void Store::RemoveItem( STOItem *itm )
+{
+	size_t i = items.size();
+	while(i--) {
+		if (items[i]==itm) {
+			items.erase(items.begin()+i);
+			ItemsCount--;
+			break;
+		}
+	}
 }
 
 ieDword Store::GetOwnerID() const

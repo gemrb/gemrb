@@ -158,7 +158,7 @@ public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
 	STOCure *GetCure(unsigned int idx) const;
 	STODrink *GetDrink(unsigned int idx) const;
-	STOItem *GetItem(unsigned int idx);
+	STOItem *GetItem(unsigned int idx, bool usetrigger);
 	/** Evaluates item availability triggers */
 	int GetRealStockSize();
 	/** Recharges item */
@@ -166,6 +166,7 @@ public: //queries
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);
+	void RemoveItem( STOItem *itm);
 	/** Returns index of item */
 	unsigned int FindItem(const ieResRef item, bool usetrigger) const;
 	const char *GetOwner() const;
