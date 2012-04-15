@@ -6013,7 +6013,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	ieDword Flags;
 
 	if (type) {
-		STOItem* si = store->GetItem( Slot );
+		STOItem* si = store->GetItem( Slot, true );
 		if (!si) {
 			return PyInt_FromLong(0);
 		}
@@ -6076,7 +6076,7 @@ static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 	if (Slot == -1) {
 		return PyInt_FromLong(0);
 	}
-	STOItem* si = store->GetItem( Slot );
+	STOItem* si = store->GetItem( Slot, true );
 	if (!si) {
 		// shouldn't be possible, item vanished
 		return PyInt_FromLong(0);
@@ -6107,7 +6107,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
-	STOItem* si = store->GetItem( Slot );
+	STOItem* si = store->GetItem( Slot, true );
 	if (!si) {
 		return RuntimeError("Store item not found!");
 	}
@@ -6153,7 +6153,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	case IE_STORE_STEAL:
 	case IE_STORE_BUY:
 	{
-		STOItem* si = store->GetItem( Slot );
+		STOItem* si = store->GetItem( Slot, true );
 		if (!si) {
 			return RuntimeError("Store item not found!");
 		}
@@ -6190,7 +6190,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	case IE_STORE_SELECT|IE_STORE_BUY:
 	{
-		STOItem* si = store->GetItem( Slot );
+		STOItem* si = store->GetItem( Slot, true );
 		if (!si) {
 			return RuntimeError("Store item not found!");
 		}
@@ -6264,7 +6264,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 	PyObject* dict = PyDict_New();
-	STOItem *si=store->GetItem( index );
+	STOItem *si=store->GetItem( index, true );
 	if (!si) {
 		Log(WARNING, "GUIScript", "Item is not available???");
 		Py_INCREF( Py_None );
