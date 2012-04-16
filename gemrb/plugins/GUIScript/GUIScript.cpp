@@ -3239,7 +3239,7 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 
 PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
 "GameControlSetTargetMode(Mode, Types)\n\n"
-"Sets the targetting mode of the main game screen control (attack, cast spell,...) and type of target (ally, enemy and/or neutral; all by default)" );
+"Sets the targeting mode of the main game screen control (attack, cast spell,...) and type of target (ally, enemy and/or neutral; all by default)" );
 
 static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
 {
@@ -3262,7 +3262,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 
 PyDoc_STRVAR( GemRB_GameControlGetTargetMode__doc,
 "GameControlGetTargetMode() => Mode\n\n"
-"Returns the targetting mode of the main game screen control (attack, cast spell,...)." );
+"Returns the targeting mode of the main game screen control (attack, cast spell,...)." );
 
 static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /*args*/)
 {
