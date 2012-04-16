@@ -722,7 +722,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 	while(projectileCount --) {
 		Projectile *pro = NULL;
-		// jump through hoops to skip applying selftargetting spells to the caster
+		// jump through hoops to skip applying selftargeting spells to the caster
 		// if we'll be changing the target
 		int tct = 0;
 		if (caster) {
@@ -763,7 +763,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					break;
 				case WSTC_ADDTYPE:
 					// TODO: unhardcode to allow for mixing all the target types
-					// caster gets selftargetting fx when the projectile is fetched above
+					// caster gets selftargeting fx when the projectile is fetched above
 					seh = &spl->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
 						if (seh->features[i].Target == FX_TARGET_SELF) {
@@ -794,7 +794,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 						LastTargetPos = newact->Pos;
 					}
 
-					// make it also work for self-targetting spells:
+					// make it also work for self-targeting spells:
 					// change the payload or this was all in vain
 					seh = &spl->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
@@ -822,7 +822,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			// change the projectile
 			if (caster->wildSurgeMods.projectile_id) {
 				spl->ext_headers[SpellHeader].ProjectileAnimation = caster->wildSurgeMods.projectile_id;
-				// make it also work for self-targetting spells:
+				// make it also work for self-targeting spells:
 				// change the payload or this was all in vain
 				seh = &spl->ext_headers[SpellHeader];
 				for (i=0; i < seh->FeatureCount; i++) {

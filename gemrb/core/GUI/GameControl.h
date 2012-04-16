@@ -128,11 +128,11 @@ public:
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
 
-	// allow targetting allies, enemies and/or neutrals (bitmask)
+	// allow targeting allies, enemies and/or neutrals (bitmask)
 	int target_types;
 	unsigned short lastMouseX, lastMouseY;
 private:
-	// currently selected targetting type, such as talk, attack, cast, ...
+	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
 	int target_mode;
 	unsigned char lastCursor;
