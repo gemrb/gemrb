@@ -895,6 +895,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'j': //teleports the selected actors
 				for (i = 0; i < game->selected.size(); i++) {
 					Actor* actor = game->selected[i];
+					actor->ClearActions();
 					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
 				}
 				break;
