@@ -235,7 +235,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		}
 		ds = dlg->GetState( si );
 	} else {
-		if (ds->transitionsCount <= choose) {
+		if (!ds || ds->transitionsCount <= choose) {
 			return;
 		}
 
