@@ -215,10 +215,11 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	core->timer->SetMoveViewPort( target->Pos.x, target->Pos.y, 0, true );
 	video->MoveViewportTo( target->Pos.x-vp.w/2, target->Pos.y-vp.h/2 );
 
+	int si;
 	if (choose == (unsigned int) -1) {
 		//increasing talkcount after top level condition was determined
 
-		int si = dlg->FindFirstState( tgt );
+		si = dlg->FindFirstState( tgt );
 		if (si<0) {
 			EndDialog();
 			return;
@@ -233,7 +234,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				tgt->InteractCount++;
 			}
 		}
-		ds = dlg->GetState( si );
+		//ds = dlg->GetState( si );
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
 			return;
@@ -308,7 +309,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		core->SetCutSceneMode( false );
 
 		//displaying dialog for selected option
-		int si = tr->stateIndex;
+		si = tr->stateIndex;
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
@@ -375,14 +376,16 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				return;
 			}
 		}
-		ds = dlg->GetState( si );
-		if (!ds) {
-			Log(WARNING, "Dialog", "Can't find next dialog");
-			ta->SetMinRow( false );
-			EndDialog();
-			return;
-		}
 	}
+
+	ds = dlg->GetState( si );
+	if (!ds) {
+		Log(WARNING, "Dialog", "Can't find next dialog");
+		ta->SetMinRow( false );
+		EndDialog();
+		return;
+	}
+
 	//displaying npc text
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	//adding a gap between options and npc text
