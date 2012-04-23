@@ -876,7 +876,12 @@ bool Game::CheckForReplacementActor(int i) {
 		std::vector<std::vector<char *> >::iterator it;
 		for (it = npclevels.begin(); it != npclevels.end(); it++) {
 			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
-				strncpy(newcre, (*it)[level-2], sizeof(ieResRef));
+				// the tables have entries only up to level 24
+				ieDword safeLevel = npclevels[0].size() - 1;
+				if (level < safeLevel) {
+					safeLevel = level;
+				}
+				strncpy(newcre, (*it)[safeLevel-2], sizeof(ieResRef));
 				break;
 			}
 		}
