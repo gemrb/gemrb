@@ -674,15 +674,16 @@ def CanDualClass(actor):
 
 	# check new class' stat limitations - make sure there are any good class choices
 	TargetStatTable = GemRB.LoadTable ("abdcdsrq")
+	bad = 0
 	for match in matches:
 		ClassStatIndex = TargetStatTable.GetRowIndex (match)
 		for stat in range (6):
 			minimum = TargetStatTable.GetValue (ClassStatIndex, stat)
 			name = TargetStatTable.GetColumnName (stat)
 			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
-				matches.remove (match)
+				bad += 1
 				break
-	if len(matches) == 0:
+	if len(matches) == bad:
 		print "CannotDualClass: no good new class choices"
 		return 1
 
