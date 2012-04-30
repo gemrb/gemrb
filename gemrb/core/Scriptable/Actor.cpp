@@ -3844,6 +3844,10 @@ void Actor::SetMap(Map *map)
 	//This hack is to delay the equipping effects until the actor has
 	//an area (and the game object is also existing)
 	if (effinit) {
+		//already initialized, no need of updating stuff
+		if (InternalFlags & IF_GOTAREA) return;
+		InternalFlags |= IF_GOTAREA;
+
 		//apply feats
 		ApplyFeats();
 		//apply persistent feat spells

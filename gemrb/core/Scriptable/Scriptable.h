@@ -96,7 +96,7 @@ class SpriteCover;
 //#define IF_BECAMEVISIBLE 0x100//actor just became visible (trigger event)
 #define IF_INITIALIZED   0x200
 #define IF_USEDSAVE      0x400  //actor needed saving throws
-//#define IF_TARGETGONE    0x800  //actor's target is gone (trigger event)
+#define IF_GOTAREA    0x800     //actor already moved to an area
 #define IF_USEEXIT       0x1000 //
 #define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
 //#define IF_WASINDIALOG   0x4000 //actor just left dialog
