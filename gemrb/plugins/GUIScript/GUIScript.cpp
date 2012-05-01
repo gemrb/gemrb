@@ -10718,7 +10718,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 	/* pFunc: Borrowed reference */
 	if (!pFunc || !PyCallable_Check(pFunc)) {
 		if (report_error) {
-			Log(ERROR, "GUIScript", "Missing function: %s", functionName);
+			Log(ERROR, "GUIScript", "Missing function: %s from %s", functionName, moduleName);
 		}
 		Py_DECREF(module);
 		return NULL;
