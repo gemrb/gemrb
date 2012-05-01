@@ -627,10 +627,9 @@ def QuitGame ():
 	GemRB.SetNextScript ('Start')
 
 def SaveGame ():
+	GemRB.SetVar ("QuitAfterSave", 1)
 	OpenOptionsWindow ()
-	GemRB.QuitGame ()
-	GemRB.SetNextScript ('GUISAVE')
-
+	GUISAVE.OpenSaveWindow ()
 
 ###################################################
 
