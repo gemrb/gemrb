@@ -186,15 +186,19 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 						key = GEM_HOME;
 						break;
 					case SDLK_UP:
+					case SDLK_KP8:
 						key = GEM_UP;
 						break;
 					case SDLK_DOWN:
+					case SDLK_KP2:
 						key = GEM_DOWN;
 						break;
 					case SDLK_LEFT:
+					case SDLK_KP4:
 						key = GEM_LEFT;
 						break;
 					case SDLK_RIGHT:
+					case SDLK_KP6:
 						key = GEM_RIGHT;
 						break;
 					case SDLK_DELETE:
