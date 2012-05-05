@@ -645,8 +645,11 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 	ImmediateEvent();
 
 	assert(trigger.triggerID < MAX_TRIGGERS);
-	if (triggerflags[trigger.triggerID] & TF_SAVED)
+	if (triggerflags[trigger.triggerID] & TF_SAVED) {
+		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
+		//Log(WARNING, "Scriptable", "%s: Added LastTrigger: %d for trigger %d\n", scriptName, trigger.param1, trigger.triggerID);
 		LastTrigger = trigger.param1;
+	}
 }
 
 bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
@@ -889,20 +892,39 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }
 
+void Scriptable::SendTriggerToAll(TriggerEntry &entry)
+{
+	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+	int i=0;
+	while(nearActors[i]!=NULL) {
+		nearActors[i]->AddTrigger(entry);
+		++i;
+	}
+	free(nearActors);
+}
+
 void Scriptable::CastSpellPointEnd(int level)
 {
 	Actor *caster = NULL;
+	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	if (!spl) {
+		return;
+	}
+	int nSpellType = spl->SpellType;
+	gamedata->FreeSpell(spl, SpellResRef, false);
+
 	if (Type == ST_ACTOR) {
 		caster = ((Actor *) this);
 		caster->SetStance(IE_ANI_CONJURE);
 		if (level == 0) {
-			Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 			Actor *actor = NULL;
 			if (Type == ST_ACTOR) {
 				actor = (Actor *) this;
-				level = actor->GetCasterLevel(spl->SpellType);
+				level = actor->GetCasterLevel(nSpellType);
+			} else {
+				//default caster level is 1
+				level = 1;
 			}
-			gamedata->FreeSpell(spl, SpellResRef, false);
 		}
 	}
 
@@ -921,11 +943,20 @@ void Scriptable::CastSpellPointEnd(int level)
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
-	// no need to distinguish between them, since the spell IDs are type dependant and there is no overlap
+	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
+	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
-	AddTrigger(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
-	AddTrigger(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
-	AddTrigger(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+	switch (nSpellType) {
+	case 1:
+		SendTriggerToAll(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
+		break;
+	case 2:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
+		break;
+	default:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+		break;
+	}
 
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
@@ -939,17 +970,21 @@ void Scriptable::CastSpellPointEnd(int level)
 void Scriptable::CastSpellEnd(int level)
 {
 	Actor *caster = NULL;
+	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	if (!spl) {
+		return;
+	}
+	int nSpellType = spl->SpellType;
+	gamedata->FreeSpell(spl, SpellResRef, false);
 	if (Type == ST_ACTOR) {
 		caster = ((Actor *) this);
 		caster->SetStance(IE_ANI_CONJURE);
 		if (level == 0) {
-			Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 			Actor *actor = NULL;
 			if (Type == ST_ACTOR) {
 				actor = (Actor *) this;
-				level = actor->GetCasterLevel(spl->SpellType);
+				level = actor->GetCasterLevel(nSpellType);
 			}
-			gamedata->FreeSpell(spl, SpellResRef, false);
 		}
 	}
 
@@ -967,11 +1002,21 @@ void Scriptable::CastSpellEnd(int level)
 
 	//if the projectile doesn't need to follow the target, then use the target position
 	CreateProjectile(SpellResRef, LastTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
-	// no need to distinguish between them, since the spell IDs are type dependant and there is no overlap
+	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
+	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
-	AddTrigger(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
-	AddTrigger(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
-	AddTrigger(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+	switch (nSpellType) {
+	case 1:
+		SendTriggerToAll(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
+		break;
+	case 2:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
+		break;
+	default:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+		break;
+	}
+
 	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 	if (target) {
