@@ -8,4 +8,5 @@ IDS
 394 SetTrackString(I:StrRef, I:Flags, I:Difficulty)
 168 Interact(O:Object*)
 148 BashDoor(O:Object)
+112 UseContainer()
 93 LeaveAreaName(O:Target*)
