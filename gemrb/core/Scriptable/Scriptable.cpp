@@ -892,7 +892,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }
 
-void Scriptable::SendTriggerToAll(TriggerEntry &entry)
+void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
 	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
 	int i=0;
