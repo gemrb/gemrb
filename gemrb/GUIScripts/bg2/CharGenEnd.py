@@ -125,9 +125,6 @@ def OnLoad():
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
 	else:
-		#leaving multi player pregen
-		if CharGenWindow:
-			CharGenWindow.Unload ()
 		#when export is done, go to start
 		if GUICommon.HasTOB():
 			GemRB.SetToken ("NextScript","Start2")
