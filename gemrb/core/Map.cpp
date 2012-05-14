@@ -1380,7 +1380,7 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 		}
 	}
 
-	if (!(actor->GetInternalFlag()&IF_STOPATTACK)) {
+	if (!(actor->GetInternalFlag()&IF_STOPATTACK) && !core->GetGame()->AnyPCInCombat()) {
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
 			core->Autopause(AP_ENEMY, actor);
 		}
