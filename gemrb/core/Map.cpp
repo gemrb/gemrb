@@ -1354,12 +1354,16 @@ bool Map::AnyEnemyNearPoint(const Point &p)
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
+		if (actor->IsDead() ) {
+			continue;
+		}
 		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
 			continue;
 		}
 		if (actor->GetStat(IE_EA)<EA_EVILCUTOFF) {
 			continue;
 		}
+
 		return true;
 	}
 	return false;
