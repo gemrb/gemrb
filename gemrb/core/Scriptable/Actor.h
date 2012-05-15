@@ -380,6 +380,7 @@ private:
 	void RefreshHP();
 	bool ShouldHibernate();
 	void ApplyClassClab(int cls, bool remove);
+	bool IsDead() const;
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData();

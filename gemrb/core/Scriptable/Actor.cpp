@@ -5615,7 +5615,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
-	if (InternalFlags&IF_STOPATTACK) {
+	if (IsDead()) {
 		// this should be avoided by the AF_ALIVE check by all the calling actions
 		Log(ERROR, "Actor", "Attack by dead actor!");
 		return;
@@ -6356,6 +6356,11 @@ void Actor::UpdateAnimations()
 			}
 		}
 	}
+}
+
+bool Actor::IsDead() const
+{
+	return InternalFlags & IF_STOPATTACK;
 }
 
 bool Actor::ShouldDrawCircle() const
