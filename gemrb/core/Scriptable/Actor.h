@@ -380,7 +380,6 @@ private:
 	void RefreshHP();
 	bool ShouldHibernate();
 	void ApplyClassClab(int cls, bool remove);
-	bool IsDead() const;
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData();
@@ -815,6 +814,7 @@ public:
 	void ResetCommentTime();
 	/* returns the armor check penalty */
 	int GetArmorFailure() const;
+	bool IsDead() const;
 };
 }
 
