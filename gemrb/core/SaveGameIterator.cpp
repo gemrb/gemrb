@@ -511,12 +511,17 @@ static int CanSave()
 			displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 			return 6;
 		}
+
+                if (map->AnyEnemyNearPoint(actor->Pos)) {
+                        displaymsg->DisplayConstantString( STR_CANTSAVEMONS, DMC_BG2XPGREEN );
+                        return 7;
+                }
+
 	}
 
 	//TODO: can't save while AOE spells are in effect -> CANTSAVE
 	//TODO: can't save while IF_NOINT is set on any actor -> CANTSAVEDIALOG2 (dialog about to start)
 	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE
-	//TODO: can't save while enemies are visible? AnyPCSeesEnemy -> CANTSAVEMONS
 
 	return 0;
 }
