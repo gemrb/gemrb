@@ -460,6 +460,8 @@ Actor *Projectile::GetTarget()
 		}
 		effects->SetOwner(original);
 		return target;
+	} else {
+		Log(DEBUG, "Projectile", "GetTarget: Target not set or dummy, using caster!");
 	}
 	target = area->GetActorByGlobalID(Caster);
 	if (target) {
