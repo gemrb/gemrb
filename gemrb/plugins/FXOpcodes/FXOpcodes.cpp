@@ -5885,7 +5885,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			if (fx->Parameter2 == COND_GOTHIT) {
 				dist = GetSpellDistance(refs[i], target);
 				if (!dist) {
-					//TODO: display 36937
+					displaymsg->DisplayConstantStringName(STR_CONTFAIL, DMC_RED, target);
 					continue;
 				}
 				if (PersonalDistance(target, actor) > dist) {
