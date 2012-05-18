@@ -951,7 +951,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					overInfoPoint->dump();
 					break;
 				}
-				core->GetGame()->GetCurrentArea()->dump(Mod & GEM_MOD_SHIFT);
+				core->GetGame()->GetCurrentArea()->dump(false);
+				break;
+			case 'N': //prints a list of all the live actors in the area
+				core->GetGame()->GetCurrentArea()->dump(true);
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( p, rand()%30, 1 );
@@ -1030,41 +1033,39 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
-			case 'y': //kills actor or all enemies
-				if (Mod & GEM_MOD_SHIFT) {
-					// mwahaha!
+			case 'Y': // damages all enemies by 300 (resistances apply)
+				// mwahaha!
+				Effect *newfx;
+				newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
+				Actor *victim;
+				for (int i = area->GetActorCount(0)-1; i >= 0; i--) {
+					victim = area->GetActor(i, 0);
+					if (victim->Modified[IE_EA] == EA_ENEMY) {
+						core->ApplyEffect(newfx, victim, victim);
+					}
+				}
+				delete newfx;
+			case 'y': //kills actor
+				if (lastActor) {
+					//using action so the actor is killed
+					//correctly (synchronisation)
+					lastActor->ClearActions();
+					lastActor->ClearPath();
+
 					Effect *newfx;
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
-					Actor *victim;
-					for (int i = area->GetActorCount(0)-1; i >= 0; i--) {
-						victim = area->GetActor(i, 0);
-						if (victim->Modified[IE_EA] == EA_ENEMY) {
-							core->ApplyEffect(newfx, victim, victim);
-						}
+					core->ApplyEffect(newfx, lastActor, lastActor);
+					if (! (lastActor->GetInternalFlag() & IF_REALLYDIED)) {
+						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
+						core->ApplyEffect(newfx, lastActor, lastActor);
+						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
+						core->ApplyEffect(newfx, lastActor, lastActor);
 					}
 					delete newfx;
-				} else {
-					if (lastActor) {
-						//using action so the actor is killed
-						//correctly (synchronisation)
-						lastActor->ClearActions();
-						lastActor->ClearPath();
-
-						Effect *newfx;
-						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
-						core->ApplyEffect(newfx, lastActor, lastActor);
-						if (! (lastActor->GetInternalFlag() & IF_REALLYDIED)) {
-							newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
-							core->ApplyEffect(newfx, lastActor, lastActor);
-							newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
-							core->ApplyEffect(newfx, lastActor, lastActor);
-						}
-						delete newfx;
-					} else if (overContainer) {
-						overContainer->SetContainerLocked(0);
-					} else if (overDoor) {
-						overDoor->SetDoorLocked(0,0);
-					}
+				} else if (overContainer) {
+					overContainer->SetContainerLocked(0);
+				} else if (overDoor) {
+					overDoor->SetDoorLocked(0,0);
 				}
 				break;
 			case 'z': //shift through the avatar animations backward
