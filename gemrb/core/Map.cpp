@@ -3057,11 +3057,12 @@ int Map::Rest(const Point &pos, int hours, int day)
 
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
+	bool interrupt = rand()%100 < chance;
 	int spawncount = 1;
 	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
-		if ( rand()%100<chance ) {
+		if (interrupt) {
 			int idx = rand()%RestHeader.CreatureNum;
 			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
 			if (!creature) {
