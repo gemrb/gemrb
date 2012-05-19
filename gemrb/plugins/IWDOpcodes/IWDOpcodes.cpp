@@ -1256,7 +1256,7 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing
 	ieDword time = core->GetGame()->GameTime;
-	if ((fx->Parameter4==time) || (time%core->Time.round_sec) ) {
+	if ((fx->Parameter4==time) || (time%core->Time.round_size) ) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
