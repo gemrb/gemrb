@@ -5123,7 +5123,7 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	delete newfx;
 
 	//damage for half of the familiar's hitpoints
-	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING, FX_DURATION_INSTANT_PERMANENT);
+	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 	delete newfx;
 

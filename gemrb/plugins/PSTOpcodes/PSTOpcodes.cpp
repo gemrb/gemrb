@@ -524,7 +524,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 		if (actor && PersonalDistance(target, actor)<30 ) {
 			const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 			if (entry) {
-				Effect *newfx = EffectQueue::CreateEffect( fx_damage_opcode_ref, param1, param2, FX_DURATION_INSTANT_PERMANENT);
+				Effect *newfx = EffectQueue::CreateEffect( fx_damage_opcode_ref, param1, param2<<16, FX_DURATION_INSTANT_PERMANENT);
 				newfx->Target = FX_TARGET_PRESET;
 				newfx->Power = fx->Power;
 				memcpy(newfx->Source, fx->Source, sizeof(newfx->Source) );

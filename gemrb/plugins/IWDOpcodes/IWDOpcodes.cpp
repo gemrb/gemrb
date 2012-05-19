@@ -581,7 +581,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 
 static void ApplyDamageNearby(Scriptable* Owner, Actor* target, Effect *fx, ieDword damagetype)
 {
-	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype,FX_DURATION_INSTANT_PERMANENT);
+	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype<<16, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target = FX_TARGET_PRESET;
 	newfx->Power = fx->Power;
 	newfx->DiceThrown = fx->DiceThrown;
@@ -1281,7 +1281,7 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	}
 
-	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage, FX_DURATION_INSTANT_PERMANENT);
+	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage<<16, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target = FX_TARGET_PRESET;
 	newfx->Power = fx->Power;
 	newfx->DiceThrown = fx->DiceThrown;
