@@ -1840,14 +1840,14 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//inflicts damage calculated by dice values+parameter1
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
-	ieDword damage = DAMAGE_FIRE;
+	ieDword damagetype = DAMAGE_FIRE;
 
 	if (fx->Parameter2==1) {
-		damage = DAMAGE_COLD;
+		damagetype = DAMAGE_COLD;
 	}
 
-	target->Damage(fx->Parameter1, damage, Owner);
-	ApplyDamageNearby(Owner, target, fx, damage);
+	target->Damage(fx->Parameter1, damagetype, Owner);
+	ApplyDamageNearby(Owner, target, fx, damagetype);
 	return FX_APPLIED;
 }
 
