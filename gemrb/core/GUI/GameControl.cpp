@@ -1038,7 +1038,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				Effect *newfx;
 				newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 				Actor *victim;
-				for (int i = area->GetActorCount(0)-1; i >= 0; i--) {
+				i = area->GetActorCount(0);
+				while(i--) {
 					victim = area->GetActor(i, 0);
 					if (victim->Modified[IE_EA] == EA_ENEMY) {
 						core->ApplyEffect(newfx, victim, victim);
