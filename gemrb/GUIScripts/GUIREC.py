@@ -600,11 +600,16 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 32213 Normal Fire
 	stats.append ((32213, GS (IE_RESISTFIRE), '%'))
 	# 32222 Magic Fire
-	stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
 	# 32214 Normal Cold
-	stats.append ((32214, GS (IE_RESISTCOLD), '%'))
 	# 32223 Magic Cold
-	stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+	if GUICommon.GameIsBG2():
+		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
+		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
+		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+	else:
+		stats.append ((15579, GS (IE_RESISTMAGICFIRE), '%'))
+		stats.append ((15546, GS (IE_RESISTCOLD), '%'))
+		stats.append ((15580, GS (IE_RESISTMAGICCOLD), '%'))
 	# 32220 Electricity
 	stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
 	# 32221 Acid
@@ -613,7 +618,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		# Magic (others show it higher up)
 		stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
 	# Magic Damage
-	stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+	if GUICommon.GameIsIWD2():
+		stats.append ((40319, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+	else: # bg2
+		stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
 	# Missile
 	stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
 	# Slashing
