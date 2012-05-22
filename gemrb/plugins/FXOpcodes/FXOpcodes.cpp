@@ -5426,7 +5426,7 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		int count = core->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->Source, count);
 		core->FreeResRefTable(data, count);
-		core->GetDictionary()->SetAt("ActionLevel", 2);
+		core->GetDictionary()->SetAt("ActionLevel", 11);
 	}
 	// force a redraw of the action bar
 	//this is required, because not all of these opcodes are firing right at casting

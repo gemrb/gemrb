@@ -6833,6 +6833,38 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret-1 );
 }
 
+PyDoc_STRVAR( GemRB_GetSpelldata__doc,
+"GetSpelldata(globalID[, type])=>tuple\n\n"
+"Returns a tuple containing resrefs of the spells in the spellbook's spellinfo structure."
+);
+
+static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
+{
+	unsigned int globalID;
+	int type = 255;
+
+	if (!PyArg_ParseTuple( args, "i|i", &globalID, &type)) {
+		return AttributeError( GemRB_GetSpelldata__doc );
+	}
+
+	GET_GAME();
+
+	Actor* actor = game->GetActorByGlobalID( globalID );
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+
+	SpellExtHeader spelldata;
+	int i = 0;
+	int count = actor->spellbook.GetSpellInfoSize(type);
+	PyObject* spell_list = PyTuple_New(count);
+	for (i=0; i < count; i++) {
+		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
+		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellname) );
+	}
+	return spell_list;
+}
+
 
 PyDoc_STRVAR( GemRB_LearnSpell__doc,
 "LearnSpell(PartyID, SpellResRef[, Flags])=>int\n\n"
@@ -10226,6 +10258,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetStoreCure, METH_VARARGS),
 	METHOD(GetStoreItem, METH_VARARGS),
 	METHOD(GetSpell, METH_VARARGS),
+	METHOD(GetSpelldata, METH_VARARGS),
 	METHOD(GetSpelldataIndex, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),
 	METHOD(GetSlots, METH_VARARGS),

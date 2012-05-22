@@ -557,7 +557,13 @@ def UpdateActionsWindow ():
 	elif level == 10: # spellbook selection
 		type = GemRB.GetVar ("Type")
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-
+	elif level == 11: # spells from a 2da (fx_select_spell)
+		if GUICommon.GameIsIWD2():
+			type = 255
+		else:
+			type = 3
+		GemRB.SetVar ("Type", type)
+		Spellbook.SetupSpellIcons (CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	else:
 		print "Invalid action level:", level
 		GemRB.SetVar ("ActionLevel", 0)

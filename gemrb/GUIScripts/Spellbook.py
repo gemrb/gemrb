@@ -139,6 +139,22 @@ def GetMemorizedSpells(actor, BookType, level):
 
 	return memoSpells
 
+# direct access to the spellinfo struct
+# SpellIndex is the index of the spell in the struct, but we add a thousandfold of the spell type for later use in SpellPressed
+def GetSpellinfoSpells(actor, BookType):
+	memorizedSpells = []
+	spellResRefs = GemRB.GetSpelldata (actor)
+	i = 0
+	for resref in spellResRefs:
+		Spell = GemRB.GetSpell(resref)
+		Spell['BookType'] = BookType # just another sorting key
+		Spell['SpellIndex'] = i + 1000 * 255 # spoofing the type, so any table would work
+		Spell['MemoCount'] = 1
+		memorizedSpells.append (Spell)
+		i += 1
+
+	return memorizedSpells
+
 def SortUsableSpells(memorizedSpells):
 	# sort it by using the spldisp.2da table
 	layout = CommonTables.SpellDisplay.GetValue ("USE_ROW", "ROWS")
@@ -165,20 +181,23 @@ def SortUsableSpells(memorizedSpells):
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actor = GemRB.GameGetFirstSelectedActor ()
 
-	# construct the spellbook of usable (not depleted) memorized spells
-	# the getters expect the BookType as: 0 priest, 1 mage, 2 innate
-	#  we almost need bitfield support for cleric/mages and the like
-	if BookType == -1:
-		# Nahal's reckless dweomer can use any known spell
-		allSpells = GetKnownSpells (actor, IE_SPELL_TYPE_WIZARD)
+	# check if we're dealing with a temporary spellbook
+	if GemRB.GetVar("ActionLevel") == 11:
+		allSpells = GetSpellinfoSpells (actor, BookType)
 	else:
-		allSpells = []
-		for i in range(16):
-			if BookType & (1<<i):
-				allSpells += GetUsableMemorizedSpells (actor, i)
-		if not len(allSpells):
-			raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
-			return
+		# construct the spellbook of usable (not depleted) memorized spells
+		# the getters expect the BookType as: 0 priest, 1 mage, 2 innate
+		if BookType == -1:
+			# Nahal's reckless dweomer can use any known spell
+			allSpells = GetKnownSpells (actor, IE_SPELL_TYPE_WIZARD)
+		else:
+			allSpells = []
+			for i in range(16):
+				if BookType & (1<<i):
+					allSpells += GetUsableMemorizedSpells (actor, i)
+			if not len(allSpells):
+				raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
+				return
 
 	if BookType == -1:
 		memorizedSpells = allSpells
