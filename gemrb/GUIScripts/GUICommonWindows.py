@@ -888,6 +888,11 @@ def ActionWildShapesPressed ():
 	TypeSpellPressed(IE_IWD2_SPELL_SHAPE)
 	return
 
+# This is the endpoint for spellcasting, finally calling SpellCast. This always happens at least
+# twice though, the second time to reset the action bar (more if wild magic or subspell selection is involved).
+# Spell and Type (spellbook type) are set during the spell bar construction/use, which is in turn
+# affected by ActionLevel (see UpdateActionsWindow of this module).
+# Keep in mind, that the core resets Type and/or ActionLevel in the case of subspells (fx_select_spell).
 def SpellPressed ():
 	"""Prepares a spell to be cast."""
 

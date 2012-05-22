@@ -6808,7 +6808,7 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetSpelldataIndex__doc,
 "GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
-"Returns the index of the spell in the spellbook's spelldata structure."
+"Returns the index of the spell in the spellbook's spellinfo structure."
 );
 
 static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)

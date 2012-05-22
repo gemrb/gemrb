@@ -60,7 +60,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			Spell['BookType'] = BookType # just another sorting key
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
-				print "Error, memorized spell not found!", Spell["SpellResRef"]
+				print "Error, memorized spell not found!", Spell["SpellResRef"], 1<<BookType
 			Spell['SpellIndex'] += 1000 * 1<<BookType
 			memorizedSpells.append (Spell)
 
@@ -175,8 +175,7 @@ def SortUsableSpells(memorizedSpells):
 # Sets up all the (12) action buttons for a player character with different spell or innate icons.
 # It also sets up the scroll buttons left and right if needed.
 # If Start is supplied, it will skip the first few items (used when scrolling through the list)
-# BookType is a spellbook type bitfield (1-mage, 2-priest, 4-innate)
-# FIXME: iwd2 has even more types
+# BookType is a spellbook type bitfield (1-mage, 2-priest, 4-innate and others in iwd2)
 # Offset is a control ID offset here for iwd2 purposes
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actor = GemRB.GameGetFirstSelectedActor ()
