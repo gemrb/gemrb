@@ -1716,7 +1716,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->string0Parameter[0]) {
 		ieDword value;
-		ieVariable Variable;
+		ieVariable Variable = "";
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
 			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");
