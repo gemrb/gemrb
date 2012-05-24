@@ -2104,8 +2104,11 @@ static void InitActorTables()
 	if (tm) {
 		int skilldexNCols = tm->GetColumnCount();
 		int skilldexNRows = tm->GetRowCount();
+		skilldex.reserve(skilldexNRows);
+
 		for (i = 0; i < skilldexNRows; i++) {
 			skilldex.push_back (std::vector<int>());
+			skilldex[i].reserve(skilldexNCols+1);
 			for(j = -1; j < skilldexNCols; j++) {
 				if (j == -1) {
 					skilldex[i].push_back (atoi(tm->GetRowName(i)));
@@ -2120,15 +2123,18 @@ static void InitActorTables()
 	tm.load("skillrac");
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
-	Holder<SymbolMgr> race;
+	Holder<SymbolMgr> race = NULL;
 	if (racetable != -1) {
 		race = core->GetSymbol(racetable);
 	}
 	if (tm) {
 		int cols = tm->GetColumnCount();
 		int rows = tm->GetRowCount();
+		skillrac.reserve(rows);
+
 		for (i = 0; i < rows; i++) {
 			skillrac.push_back (std::vector<int>());
+			skillrac[i].reserve(cols+1);
 			for(j = -1; j < cols; j++) {
 				if (j == -1) {
 					// figure out the value from the race name
