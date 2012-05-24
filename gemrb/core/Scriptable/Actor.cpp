@@ -8437,6 +8437,7 @@ int Actor::GetBookMask() const
 }
 
 // returns the combined dexterity and racial bonus to specified thieving skill
+// column indices are 1-based, since 0 holds the rowname against which we do the lookup
 int Actor::GetSkillBonus(unsigned int col) const
 {
 	if (skilldex.empty()) return 0;
@@ -8444,20 +8445,27 @@ int Actor::GetSkillBonus(unsigned int col) const
 	// race
 	int lookup = Modified[IE_RACE];
 	int bonus = 0;
-	std::vector<std::vector<int> >::iterator it;
-	for (it = skillrac.begin(); it != skillrac.end(); it++) {
-		if ((*it)[0] == lookup) {
-			bonus = (*it)[col];
-			break;
+	std::vector<std::vector<int> >::iterator it = skillrac.begin();
+	// make sure we have a column, since the games have different amounts of thieving skills
+	if (col < (*it).size()) {
+		for ( ; it != skillrac.end(); it++) {
+			if ((*it)[0] == lookup) {
+				bonus = (*it)[col];
+				break;
+			}
 		}
 	}
 
 	// dexterity
 	lookup = Modified[IE_DEX];
-	for (it = skilldex.begin(); it != skilldex.end(); it++) {
-		if ((*it)[0] == lookup) {
-			bonus += (*it)[col];
-			break;
+	it = skilldex.begin();
+	// make sure we have a column, since the games have different amounts of thieving skills
+	if (col < (*it).size()) {
+		for ( ; it != skilldex.end(); it++) {
+			if ((*it)[0] == lookup) {
+				bonus += (*it)[col];
+				break;
+			}
 		}
 	}
 	return bonus;
