@@ -836,6 +836,13 @@ void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
 		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
+	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
+		// recover from panic, since morale has risen again
+		// but only if we have really just recovered, so panic from other
+		// sources isn't affected
+		if ((actor->Modified[IE_MORALE]-1 == actor->Modified[IE_MORALEBREAK]) || (actor->Modified[IE_MORALEBREAK] == 0) ) {
+			actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
+		}
 	}
 	//for new colour
 	actor->SetCircleSize();
