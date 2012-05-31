@@ -121,6 +121,7 @@ static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
 static ieDword always_dither = 1;
+static ieDword GameDifficulty = 3;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
@@ -1486,6 +1487,7 @@ GEM_EXPORT void UpdateActorConfig()
 	//FIXME: Drop all actors' SpriteCover.
 	//the actor will change dithering only after selected/moved (its spritecover was updated)
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
+	core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
 }
 
 static void InitActorTables()
@@ -5909,6 +5911,16 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 
 	if (damage>0) {
+		// adjust enemy damage according to difficulty settings:
+		// -50%, -25%, 0, 50%, 100%
+		if (Modified[IE_EA] < EA_GOODCUTOFF) {
+			int adjustmentPercent = (GameDifficulty - 3) * 25;
+			if (GameDifficulty > 3) {
+				adjustmentPercent *= 2;
+			}
+			damage += (damage * adjustmentPercent)/100;
+		}
+
 		// check damage type immunity / resistance / susceptibility
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
