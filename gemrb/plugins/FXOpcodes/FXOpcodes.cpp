@@ -3625,10 +3625,8 @@ int fx_knock (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	}
 	Point p(fx->PosX, fx->PosY);
 
-print("KNOCK Pos: %d.%d", fx->PosX, fx->PosY);
 	Door *door = map->TMap->GetDoorByPosition(p);
 	if (door) {
-print("Got a door");
 		if (door->LockDifficulty<100) {
 			door->SetDoorLocked(false, true);
 		}
@@ -3636,7 +3634,6 @@ print("Got a door");
 	}
 	Container *container = map->TMap->GetContainerByPosition(p);
 	if (container) {
-print("Got a container");
 		if(container->LockDifficulty<100) {
 			container->SetContainerLocked(false);
 		}
