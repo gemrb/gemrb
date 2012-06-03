@@ -2823,7 +2823,9 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	} else {
 		displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword)xp);
 	}
-	actor->AddExperience(xp);
+
+	//normally the second parameter is 0, but it may be handy to have control over that (See SX_* flags)
+	actor->AddExperience(xp, parameters->int1Parameter);
 	core->PlaySound(DS_GOTXP);
 }
 

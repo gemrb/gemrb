@@ -1169,7 +1169,7 @@ void Game::ShareXP(int xp, int flags)
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		PCs[i]->AddExperience(individual);
+		PCs[i]->AddExperience(individual, flags&SX_COMBAT);
 	}
 }
 

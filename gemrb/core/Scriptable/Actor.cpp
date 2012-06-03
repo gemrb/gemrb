@@ -81,7 +81,7 @@ static const Color magenta = {
 	0xff, 0x00, 0xff, 0xff
 };
 
-static int sharexp = SX_DIVIDE;
+static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
 static int extraslots = -1;
 static char **clericspelltables = NULL;
@@ -104,6 +104,11 @@ static int skillcount = -1;
 static int **afcomments = NULL;
 static int afcount = -1;
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
+//I keep the zero index the same as core rules (default setting)
+static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
+//XP adjustments on easy setting (need research on the amount)
+//Seems like bg1 halves xp, bg2 doesn't have any impact
+static int xpadjustments[6]={0, -50, 0, 0, 0, 0};
 
 static int FistRows = -1;
 static int *wmlevels[20];
@@ -121,7 +126,7 @@ static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
 static ieDword always_dither = 1;
-static ieDword GameDifficulty = 3;
+static ieDword GameDifficulty = DIFF_CORE;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
@@ -1487,7 +1492,17 @@ GEM_EXPORT void UpdateActorConfig()
 	//FIXME: Drop all actors' SpriteCover.
 	//the actor will change dithering only after selected/moved (its spritecover was updated)
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
-	core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
+
+	//Handle Game Difficulty and Nightmare Mode
+	GameDifficulty = 0;
+	core->GetDictionary()->Lookup("Nightmare Mode", GameDifficulty);
+	if (GameDifficulty) {
+		GameDifficulty = DIFF_NIGHTMARE;
+	} else {
+		GameDifficulty = 0;
+		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
+	}
+	if (GameDifficulty>DIFF_NIGHTMARE) GameDifficulty = DIFF_NIGHTMARE;
 }
 
 static void InitActorTables()
@@ -1506,10 +1521,11 @@ static void InitActorTables()
 		state_invisible=STATE_INVISIBLE;
 	}
 
+	//I'm not sure if xp is reduced or not in iwd2 on easy setting
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_CR;
 	} else {
-		sharexp=SX_DIVIDE;
+		sharexp=SX_DIVIDE|SX_COMBAT;
 	}
 	ReverseToHit = core->HasFeature(GF_REVERSE_TOHIT);
 	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
@@ -2157,6 +2173,17 @@ static void InitActorTables()
 					skillrac[i].push_back (atoi(tm->QueryField(i, j)));
 				}
 			}
+		}
+	}
+
+	//difficulty level based modifiers
+	tm.load("difflvls");
+	if (tm) {
+		memset(xpadjustments, 0, sizeof(xpadjustments) );
+		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
+		for (i=0; i<6; i++) {
+			dmgadjustments[i] = atoi(tm->QueryField(0, i) );
+			xpadjustments[i] = atoi(tm->QueryField(1, i) );
 		}
 	}
 }
@@ -3503,7 +3530,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
 	// instant chunky death if the actor is petrified or frozen
-	if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && GameDifficulty > 2) {
+	if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && GameDifficulty > DIFF_NORMAL) {
 		damage = 123456; // arbitrarily high for death; won't be displayed
 		LastDamageType |= DAMAGE_CHUNKING;
 	}
@@ -5912,12 +5939,9 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	if (damage>0) {
 		// adjust enemy damage according to difficulty settings:
-		// -50%, -25%, 0, 50%, 100%
+		// -50%, -25%, 0, 50%, 100%, 150%
 		if (Modified[IE_EA] < EA_GOODCUTOFF) {
-			int adjustmentPercent = (GameDifficulty - 3) * 25;
-			if (GameDifficulty > 3) {
-				adjustmentPercent *= 2;
-			}
+			int adjustmentPercent = dmgadjustments[GameDifficulty];
 			damage += (damage * adjustmentPercent)/100;
 		}
 
@@ -6131,11 +6155,14 @@ void Actor::Heal(int days)
 	}
 }
 
-void Actor::AddExperience(int exp)
+void Actor::AddExperience(int exp, int combat)
 {
 	if (core->HasFeature(GF_WISDOM_BONUS)) {
 		//TODO find out the 3ED variant
 		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
+	}
+	if (combat) {
+		exp += exp*xpadjustments[GameDifficulty]/100;
 	}
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
 }

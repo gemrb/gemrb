@@ -52,6 +52,7 @@ class TableMgr;
 //ShareXP flags
 #define SX_DIVIDE  1   //divide XP among team members
 #define SX_CR      2   //use challenge rating resolution
+#define SX_COMBAT  4   //combat xp, adjusted by difficulty
 
 //joinparty flags
 #define JP_JOIN     1  //refresh join time

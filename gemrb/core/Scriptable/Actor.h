@@ -97,6 +97,14 @@ namespace GemRB {
 #define PANIC_RUNAWAY    2
 #define PANIC_RANDOMWALK 3
 
+//Game Difficulty
+#define DIFF_DEFAULT       0
+#define DIFF_EASY          1
+#define DIFF_NORMAL        2
+#define DIFF_CORE          3
+#define DIFF_HARD          4
+#define DIFF_NIGHTMARE     5
+
 /** flags for GetActor */
 //default action
 #define GA_DEFAULT  0
@@ -580,7 +588,7 @@ public:
 	/* Heals actor by days */
 	void Heal(int days);
 	/* Receive experience (handle dual/multi class) */
-	void AddExperience(int exp);
+	void AddExperience(int exp, int combat);
 	/* Calculate experience bonus */
 	int CalculateExperience(int type, int level);
 	/* Sets the modal state after checks */
