@@ -46,6 +46,10 @@ using namespace GemRB;
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
 #define SDLK_SCROLLOCK SDLK_SCROLLLOCK
+#define SDLK_KP2 SDLK_KP_2
+#define SDLK_KP4 SDLK_KP_4
+#define SDLK_KP6 SDLK_KP_6
+#define SDLK_KP8 SDLK_KP_8
 #endif
 
 SDLVideoDriver::SDLVideoDriver(void)
