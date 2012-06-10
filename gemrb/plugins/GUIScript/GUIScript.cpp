@@ -7442,6 +7442,8 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
+		// make sure the encumbrance labels stay correct
+		actor->CalculateSpeed(false);
 		actor->ReinitQuickSlots();
 		core->SetEventFlag(EF_SELECTION);
 	}
@@ -7605,6 +7607,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
+			// make sure the encumbrance labels stay correct
+			actor->CalculateSpeed(false);
 			core->ReleaseDraggedItem ();
 		}
 		// res == ASI_PARTIAL
@@ -7629,6 +7633,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_SWAPPED;
 			//EquipItem (in AddSlotItem) already called RefreshEffects
 			actor->RefreshEffects(NULL);
+			// make sure the encumbrance labels stay correct
+			actor->CalculateSpeed(false);
 			actor->ReinitQuickSlots();
 			core->SetEventFlag(EF_SELECTION);
 		} else {
