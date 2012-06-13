@@ -3515,7 +3515,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		damage = GetBase(IE_HITPOINTS) - damage;
 		break;
 	case MOD_PERCENT:
-		damage = GetStat(IE_MAXHITPOINTS) * 100 / damage;
+		damage = GetStat(IE_MAXHITPOINTS) * damage / 100;
 		break;
 	default:
 		//this shouldn't happen
