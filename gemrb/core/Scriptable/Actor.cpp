@@ -6546,8 +6546,8 @@ void Actor::Draw(const Region &screen)
 		ieDword markerfeedback = 4;
 		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
 		if (Over) {
-			// picked creature
-			drawcircle = markerfeedback >= 1;
+			// picked creature, should always be true
+			drawcircle = true;
 		} else if (Selected) {
 			// selected creature
 			drawcircle = markerfeedback >= 2;
@@ -6556,10 +6556,10 @@ void Actor::Draw(const Region &screen)
 			drawcircle = markerfeedback >= 3;
 		} else if (Modified[IE_EA] >= EA_EVILCUTOFF) {
 			// hostile
-			drawcircle = markerfeedback >= 5;
+			drawcircle = markerfeedback >= 4;
 		} else {
 			// all
-			drawcircle = markerfeedback >= 6;
+			drawcircle = markerfeedback >= 5;
 		}
 	}
 	if (drawcircle) {

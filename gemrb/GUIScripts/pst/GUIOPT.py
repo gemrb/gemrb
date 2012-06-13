@@ -397,6 +397,7 @@ def OpenFeedbackOptionsWindow ():
 	
 	FeedbackOptionsWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("FloatWindow", FeedbackOptionsWindow.ID)
+	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
 
 	FeedbackHelpText = OptHelpText ('FeedbackOptions', Window, 9, 37410)
@@ -404,7 +405,7 @@ def OpenFeedbackOptionsWindow ():
 	OptDone ('FeedbackOptions', Window, 7)
 	OptCancel ('FeedbackOptions', Window, 8)
 
-	OptSlider ('FeedbackOptions', 'MarkerFeedback', Window, 1, 10, 37463, "GUI Feedback Level")
+	OptSlider ('FeedbackOptions', 'MarkerFeedback', Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
 	OptSlider ('FeedbackOptions', 'LocatorFeedback', Window, 2, 11, 37586, "Locator Feedback Level")
 	OptSlider ('FeedbackOptions', 'SelectionFeedbackLevel', Window, 20, 21, 54879, "Selection Sounds Frequency")
 	OptSlider ('FeedbackOptions', 'CommandFeedbackLevel', Window, 22, 23, 55012, "Command Sounds Frequency")
@@ -419,6 +420,9 @@ def OpenFeedbackOptionsWindow ():
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
+def UpdateMarkerFeedback ():
+	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
+
 def DisplayHelpMarkerFeedback ():
 	FeedbackHelpText.SetText (37411)
 

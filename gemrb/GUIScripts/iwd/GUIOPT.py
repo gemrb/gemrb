@@ -356,11 +356,12 @@ def OpenFeedbackOptionsWindow ():
 	GameOptionsWindow = Window = GemRB.LoadWindow (9)
 
 	HelpTextArea = OptHelpText ('FeedbackOptions', Window, 28, 18043)
+	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
 	OptDone ('FeedbackOptions', Window, 26)
 	OptCancel ('FeedbackOptions', Window, 27)
 
-	OptSlider ('MarkerFeedback', Window, 8, 'GUI Feedback Level', 1)
+	OptSlider ('MarkerFeedback', Window, 8, 'Circle Feedback', 1)
 	OptSlider ('LocatorFeedback', Window, 9, 'Locator Feedback Level', 1)
 
 	OptCheckbox ('ToHitRolls', Window, 10, 32, 'Rolls', 1)
@@ -374,6 +375,7 @@ def OpenFeedbackOptionsWindow ():
 	
 def DisplayHelpMarkerFeedback ():
 	HelpTextArea.SetText (18024)
+	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
 
 def DisplayHelpLocatorFeedback ():
 	HelpTextArea.SetText (18025)
