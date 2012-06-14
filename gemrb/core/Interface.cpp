@@ -3882,7 +3882,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		// Game Options
 		{"Game Options", "Difficulty Level", 0},
 		{"Game Options", "Mouse Scroll Speed", 0},
-		{"Game Options", "GUI Feedback Levels", 0},
+		{"Game Options", "GUI Feedback Level", 0},
 		{"Game Options", "Locator Feedback Level", 0},
 		{"Game Options", "Bored Timeout", 0},
 		{"Game Options", "Always Dither", 0},
