@@ -112,24 +112,21 @@ int SDLVideoDriver::SwapBuffers(void)
 
 int SDLVideoDriver::PollEvents()
 {
-	int ret;
+	int ret = GEM_OK;
 	SDL_Event currentEvent;
 
-	if (!SDL_PollEvent(&currentEvent) ) return GEM_OK;
-
-	do {
+	while (ret != GEM_ERROR && SDL_PollEvent(&currentEvent)) {
 		ret = ProcessEvent(currentEvent);
-	} while (ret !=GEM_ERROR && SDL_PollEvent(&currentEvent) );
+	}
 
-	bool eventWasMouseEvent = (currentEvent.type & (SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN));
 	int x, y;
 	if (ret == GEM_OK && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
-		&& eventWasMouseEvent && lastTime>lastMouseDownTime
+		&& lastTime>lastMouseDownTime
 		&& SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT))
 	{
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		if (!core->ConsolePopped)
-			EvntManager->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
+			EvntManager->MouseUp( x, y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );
 	} 
 	return ret;
 }
