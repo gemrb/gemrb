@@ -335,6 +335,7 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
+	Control* focusCtrl = NULL; //used for contextual touch events.
 	/*
 	 the digitizer could have a higher resolution then the screen.
 	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
@@ -344,6 +345,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	int xOffset, yOffset = 0;
 	int numFingers = 0;
 	if(state){
+		focusCtrl = EvntManager->GetMouseFocusedControl();
 		numFingers = state->num_fingers;
 #if TARGET_OS_IPHONE
 		if (fullscreen) {
@@ -385,9 +387,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			ignoreNextFingerUp = true;
-			if (numFingers == core->NumFingScroll || (numFingers != core->NumFingKboard && EvntManager->GetMouseFocusedControlType() == IE_GUI_TEXTAREA)) {
+
+			if (numFingers == core->NumFingScroll
+				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
 				//any # of fingers != NumFingKBoard will scroll a text area
-				if (EvntManager->GetMouseFocusedControlType() == IE_GUI_TEXTAREA) {
+				if (focusCtrl->ControlType == IE_GUI_TEXTAREA) {
 					// if we are scrolling a text area we dont want the keyboard in the way
 					HideSoftKeyboard();
 				} else {
@@ -459,7 +463,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			// purposely ignore processing first touch here. I think users ould find it annoying
 			// to attempt a gesture and accidently command a party movement etc
 			if (firstFingerDown.fingerId && numFingers == 2
-				&& EvntManager->GetMouseFocusedControlType() == IE_GUI_GAMECONTROL) {
+				&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
 				/* formation rotation gesture:
 				 first touch with a single finger to obtain the pivot
 				 then touch and drag with a second finger (while maintaining contact with first)
