@@ -823,7 +823,8 @@ PyDoc_STRVAR( GemRB_Window_SetPos__doc,
 
 static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, X, Y, Flags = WINDOW_TOPLEFT;
+	ieWordSigned WindowIndex, X, Y;
+	int Flags = WINDOW_TOPLEFT;
 
 	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &X, &Y, &Flags )) {
 		return AttributeError( GemRB_Window_SetPos__doc );
@@ -854,10 +855,9 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 	// Keep window within screen
 	// FIXME: keep it within gamecontrol
 	if (Flags & WINDOW_BOUNDED) {
-		// FIXME: grrrr, should be < 0!!!
-		if (X > 32767 || X < 0)
+		if (X < 0)
 			X = 0;
-		if (Y > 32767 || Y < 0)
+		if (Y < 0)
 			Y = 0;
 
 		if (X + win->Width >= core->Width)
