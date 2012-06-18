@@ -306,8 +306,7 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 	unsigned short Mod)
 {
 	MButtons &= ~Button;
-	if (last_win_mousefocused == NULL) return;
-	Control *last_ctrl_mousefocused = last_win_mousefocused->GetMouseFocus();
+	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
 	if (last_ctrl_mousefocused == NULL) return;
 	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->XPos - last_ctrl_mousefocused->XPos,
 		y - last_win_mousefocused->YPos - last_ctrl_mousefocused->YPos, Button, Mod );
@@ -316,12 +315,9 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 /** BroadCast Mouse ScrollWheel Event */
 void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 {
-	if (last_win_mousefocused) {
-		Control *ctrl;
-		ctrl = last_win_mousefocused->GetMouseFocus();
-		if (ctrl) {
-			ctrl->OnMouseWheelScroll( x, y);
-		}
+	Control *ctrl = GetMouseFocusedControl();
+	if (ctrl) {
+		ctrl->OnMouseWheelScroll( x, y);
 	}
 }
 
@@ -479,13 +475,18 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 }
 
 int EventMgr::GetMouseFocusedControlType() {
-	if (last_win_mousefocused) {
-		Control *ctrl = last_win_mousefocused->GetMouseFocus();
-		if (ctrl) {
-			return ctrl->ControlType;
-		}
+	Control *ctrl = GetMouseFocusedControl();
+	if (ctrl) {
+		return ctrl->ControlType;
 	}
 	return -1;
 }
 
+Control* EventMgr::GetMouseFocusedControl()
+{
+	if (last_win_mousefocused) {
+		return last_win_mousefocused->GetMouseFocus();
+	}
+	return NULL;
+}
 }
