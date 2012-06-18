@@ -275,9 +275,6 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 
 	actor->AddAction( action );
 	actor->CommandActor();
-	// force action so that we get target reticles immediately
-	// FIXME
-	actor->ProcessActions();
 }
 
 GameControl::~GameControl(void)
