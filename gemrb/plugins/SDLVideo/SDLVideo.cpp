@@ -33,6 +33,8 @@
 #include "Palette.h"
 #include "Polygon.h"
 #include "SpriteCover.h"
+
+#include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/Window.h"
 
@@ -125,8 +127,13 @@ int SDLVideoDriver::PollEvents()
 		&& SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT))
 	{
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
-		if (!core->ConsolePopped)
+		if (!core->ConsolePopped) {
 			EvntManager->MouseUp( x, y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );
+			Control* ctl = EvntManager->GetMouseFocusedControl();
+			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
+				// these are repeat events so the control should stay pressed
+				((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
+		}
 	} 
 	return ret;
 }
