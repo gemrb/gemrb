@@ -138,7 +138,6 @@ public:
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 	void inline SetFunctionBar(Window *win) { function_bar = win; }
-	int GetMouseFocusedControlType();
 	Control* GetMouseFocusedControl();
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;

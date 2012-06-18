@@ -474,14 +474,6 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 	return rk_flags;
 }
 
-int EventMgr::GetMouseFocusedControlType() {
-	Control *ctrl = GetMouseFocusedControl();
-	if (ctrl) {
-		return ctrl->ControlType;
-	}
-	return -1;
-}
-
 Control* EventMgr::GetMouseFocusedControl()
 {
 	if (last_win_mousefocused) {
