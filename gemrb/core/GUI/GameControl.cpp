@@ -72,11 +72,13 @@ static const Color magenta = {
 static const Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
-/*
+static const Color darkgreen = {
+    0x00, 0x78, 0x00, 0xff
+};
 static Color white = {
 	0xff, 0xff, 0xff, 0xff
 };
-*/
+
 static const Color black = {
 	0x00, 0x00, 0x00, 0xff
 };
@@ -351,7 +353,7 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	}
 }
 
-void GameControl::DrawTargetReticle(Point p, int size, bool animate)
+void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash, bool actorSelected)
 {
 	// reticles are never drawn in cutscenes
 	if (GetScreenFlags()&SF_CUTSCENE)
@@ -371,9 +373,15 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate)
 	unsigned short xradius = (size * 4) - 5;
 	unsigned short yradius = (size * 3) - 5;
 
-	Color color = {//green
-		0x00, 0xff, 0x00, 0xff
-	};
+	Color color = green;
+	if (flash) {
+		if (step % 3 == 0) {
+			color = white;
+		} else {
+			if (!actorSelected) color = darkgreen;
+		}
+	}
+
 	Region viewport = core->GetVideoDriver()->GetViewport();
 	// TODO: 0.5 and 0.7 are pretty much random values
 	// right segment

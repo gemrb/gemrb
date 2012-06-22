@@ -101,7 +101,7 @@ public:
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Draws the target reticle for Actor movement. */
-	void DrawTargetReticle(Point p, int size, bool animate);
+	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
 	/** Sets multiple quicksaves flag*/
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
