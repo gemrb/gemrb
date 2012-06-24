@@ -375,7 +375,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 
 	Color color = green;
 	if (flash) {
-		if (step % 3 == 0) {
+		if (step & 2) {
 			color = white;
 		} else {
 			if (!actorSelected) color = darkgreen;
