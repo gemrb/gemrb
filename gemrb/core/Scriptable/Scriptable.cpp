@@ -105,7 +105,7 @@ Scriptable::Scriptable(ScriptableType type)
 
 	WaitCounter = 0;
 	if (Type == ST_ACTOR) {
-		InternalFlags = IF_VISIBLE | IF_USEDSAVE;
+		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_USEDSAVE;
 	} else {
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_NOINT;
 	}
@@ -437,6 +437,7 @@ void Scriptable::AddAction(Action* aC)
 	}
 
 	InternalFlags|=IF_ACTIVE;
+	InternalFlags&=~IF_IDLE;
 	aC->IncRef();
 	if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
 		aC->int0Parameter = scriptlevel;
