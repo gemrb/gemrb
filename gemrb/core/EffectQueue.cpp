@@ -600,7 +600,9 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_PRESET:
-		fx->SetPosition(pretarget->Pos);
+		//fx->SetPosition(pretarget->Pos);
+		//knock needs this
+		fx->SetPosition(dest);
 
 		flg = ApplyEffect( pretarget, fx, 1 );
 		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
