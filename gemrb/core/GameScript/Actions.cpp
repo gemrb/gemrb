@@ -6716,13 +6716,39 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	SetVariable( Sender, variable, "GLOBAL", value );
 }
 
+//this action uses the sceffect.ids (which should be covered by our cgtable.2da)
+//The original engines solved cg by hardcoding either vvcs or sparkles
+//so either we include sparkles as possible CG or just simulate all of these with projectiles
+//in any case, this action just creates an opcode (0xeb) and plays sound
+static EffectRef fx_iwd_casting_glow_ref = { "CastingGlow2", -1 };
+
 void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* src = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!src) {
+	if (!src || src->Type!=ST_ACTOR) {
 		return;
 	}
-	//TODO: finish this
+
+	int sparkle = parameters->int0Parameter;
+
+	int opcode = EffectQueue::ResolveEffect(fx_iwd_casting_glow_ref);
+	Effect *fx = core->GetEffect(opcode);
+	if (!fx) {
+		//invalid effect name didn't resolve to opcode
+		return;
+	}
+
+	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
+				Sender->Pos.y, 0 );
+
+	fx->Probability1 = 100;
+	fx->Probability2 = 0;
+	fx->Parameter2 = parameters->int0Parameter; //animation type
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	fx->Duration = parameters->int1Parameter * 15;
+	//int2param isn't actually used in the original engine
+
+	core->ApplyEffect(fx, (Actor *) src, src);
 }
 
 //this action plays a vvc animation over target
@@ -6751,7 +6777,8 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
-	fx->Probability1=100;
+	fx->Probability1 = 100;
+	fx->Probability2 = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	core->ApplyEffect(fx, (Actor *) tar, src);
 }
@@ -6774,7 +6801,8 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
-	fx->Probability1=100;
+	fx->Probability1 = 100;
+	fx->Probability2 = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	fx->PosX=parameters->pointParameter.x;
 	fx->PosY=parameters->pointParameter.y;

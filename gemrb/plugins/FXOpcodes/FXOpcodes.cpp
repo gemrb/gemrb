@@ -781,6 +781,7 @@ static EffectRef fx_poisoned_state_ref = { "State:Poisoned", -1 }; //0x19
 static EffectRef fx_set_silenced_state_ref = { "State:Silenced", -1 }; //0x26
 static EffectRef fx_set_sleep_state_ref = { "State:Helpless", -1 }; //0x27
 static EffectRef fx_set_slow_state_ref = { "State:Slowed", -1 }; //0x28
+static EffectRef fx_sparkle_ref = { "Sparkle", -1 }; //0x29
 static EffectRef fx_set_stun_state_ref = { "State:Stun", -1 }; //0x2d
 static EffectRef fx_animation_id_modifier_ref = { "AnimationIDModifier", -1 }; //0x35
 static EffectRef fx_set_infravision_state_ref = { "State:Infravision", -1 }; //0x3f
@@ -4053,7 +4054,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 static const int ypos_by_direction[16]={10,10,10,0,-10,-10,-10,-10,-10,-10,-10,-10,0,10,10,10};
 static const int xpos_by_direction[16]={0,-10,-12,-14,-16,-14,-12,-10,0,10,12,14,16,14,12,10};
 
-int fx_casting_glow (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (cgcount<0) {
@@ -4085,7 +4086,16 @@ int fx_casting_glow (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			sca->SetDefaultDuration(10000);
 		}
 		map->AddVVCell(sca);
+	} else {
+		//simulate sparkle casting glows
+		Effect *newfx;
+
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_sparkle_ref, fx->Parameter2, 3);
+		core->ApplyEffect(newfx, target, Owner);
+
+		delete newfx;
 	}
+
 	return FX_NOT_APPLIED;
 }
 
