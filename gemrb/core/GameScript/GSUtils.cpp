@@ -328,6 +328,35 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 	Sender->ReleaseCurrentAction();
 }
 
+void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value)
+{
+	Scriptable* tar;
+
+	if (parameters->objects[1]) {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		if (!tar) {
+			//could be an animation
+			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName);
+			if (anim) {
+				//set animation's cycle to parameters->int0Parameter;
+				anim->sequence=value;
+				anim->frame=0;
+				//what else to be done???
+				anim->InitAnimation();
+			}
+			return;
+		}
+
+	} else {
+		tar = Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	actor->SetStance( value );
+}
+
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();
