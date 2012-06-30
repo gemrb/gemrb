@@ -6729,7 +6729,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	int sparkle = parameters->int0Parameter;
+	ieDword sparkle = parameters->int0Parameter;
 
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_casting_glow_ref);
 	Effect *fx = core->GetEffect(opcode);
@@ -6743,7 +6743,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 
 	fx->Probability1 = 100;
 	fx->Probability2 = 0;
-	fx->Parameter2 = parameters->int0Parameter; //animation type
+	fx->Parameter2 = sparkle; //animation type
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Duration = parameters->int1Parameter * 15;
 	//int2param isn't actually used in the original engine
