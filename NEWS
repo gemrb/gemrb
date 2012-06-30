@@ -1,9 +1,10 @@
-GemRB git (59b6fe96):
+GemRB git (7b8eecb65):
   New features:
     - 
     - almost all iwd2 feats
     - support for logging to file directly
     - encumbrance penalties in movement
+    - configurable xp/damage adjustments per difficulty level
     - iwd2 armor penalty and critical hit multiplier
     - beginnings of iwd2 spellbook support
 
@@ -11,7 +12,7 @@ GemRB git (59b6fe96):
     - 
     - sdl renderer and an initial sdl2 port
     - config loading, logging
-    - (iwd2) effects, combat, action bar
+    - (iwd2) effects, actions, combat, action bar
     - cocoa wrapper and mac build, cursor handling, touch input
     - infravision
     - bugfixes
