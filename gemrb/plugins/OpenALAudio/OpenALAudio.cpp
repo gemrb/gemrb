@@ -152,6 +152,23 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	ambim = NULL;
 }
 
+void OpenALAudioDriver::PrintDeviceList ()
+{
+	char *deviceList;
+
+	if (alcIsExtensionPresent(NULL, (ALchar*)"ALC_ENUMERATION_EXT") == AL_TRUE) { // try out enumeration extension
+		Log(MESSAGE, "OpenAL", "Usable audio output devices:");
+		deviceList = (char *)alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+
+		while(deviceList && *deviceList) {
+			Log(MESSAGE,"OpenAL", "Devices: %s", deviceList);
+			deviceList+=strlen(deviceList)+1;
+		}
+		return;
+	}
+	Log(MESSAGE, "OpenAL", "No device enumeration present.");
+}
+
 bool OpenALAudioDriver::Init(void)
 {
 	ALCdevice *device;
@@ -160,6 +177,7 @@ bool OpenALAudioDriver::Init(void)
 	device = alcOpenDevice (NULL);
 	if (device == NULL) {
 		showALCError("Failed to open device", ERROR, device);
+		PrintDeviceList();
 		return false;
 	}
 
