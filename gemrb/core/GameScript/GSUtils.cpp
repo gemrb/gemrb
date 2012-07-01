@@ -559,13 +559,6 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	if (!tar) {
 		return 0;
 	}
-
-	//Deactivated (hidden) creatures are not seen
-	//Check windspear quest (when garren leaves you alone with the kid)
-	if (! (tar->GetInternalFlag()&IF_VISIBLE)) {
-		return 0;
-	}
-
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
@@ -711,10 +704,11 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		case CC_OFFSCREEN:
 			{
 			Region vp = core->GetVideoDriver()->GetViewport();
-			radius=vp.w/2; //actually it must be further divided by the tile size, hmm 16?
-      pnt.x = vp.x+radius;
-      pnt.y = vp.y+vp.h/2;
-      break;
+			radius=vp.w/2;
+			//center of screen
+			pnt.x = vp.x+radius;
+			pnt.y = vp.y+vp.h/2;
+			break;
 			}
 			//falling through
 		case CC_OBJECT://use object + offset
@@ -736,6 +730,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	Map *map = Sender->GetCurrentArea();
 	map->AddActor( ab, true );
+	//radius adjusted to tile size
 	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius/16, radius/12 );
 	ab->SetOrientation(parameters->int0Parameter, false );
 
