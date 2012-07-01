@@ -704,7 +704,11 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		case CC_OFFSCREEN:
 			{
 			Region vp = core->GetVideoDriver()->GetViewport();
-			radius=vp.w/2; //actually it must be further divided by the tile size, hmm 16?
+			radius=vp.w/2;
+			//center of screen
+			pnt.x = vp.x+radius;
+			pnt.y = vp.y+vp.h/2;
+			break;
 			}
 			//falling through
 		case CC_OBJECT://use object + offset
@@ -726,7 +730,8 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	Map *map = Sender->GetCurrentArea();
 	map->AddActor( ab, true );
-	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius );
+	//radius adjusted to tile size
+	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius/16, radius/12 );
 	ab->SetOrientation(parameters->int0Parameter, false );
 
 	//if string1 is animation, then we can't use it for a DV too

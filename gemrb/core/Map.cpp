@@ -2270,27 +2270,27 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned 
 	InternalStack.push( ( x << 16 ) | y );
 }
 
-bool Map::AdjustPositionX(Point &goal, unsigned int radius)
+bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy)
 {
 	unsigned int minx = 0;
-	if ((unsigned int) goal.x > radius)
-		minx = goal.x - radius;
-	unsigned int maxx = goal.x + radius + 1;
+	if ((unsigned int) goal.x > radiusx)
+		minx = goal.x - radiusx;
+	unsigned int maxx = goal.x + radiusx + 1;
 	if (maxx > Width)
 		maxx = Width;
 
 	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
-		if ((unsigned int) goal.y >= radius) {
-			if (GetBlocked( scanx, goal.y - radius ) & PATH_MAP_PASSABLE) {
+		if ((unsigned int) goal.y >= radiusy) {
+			if (GetBlocked( scanx, goal.y - radiusy ) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) scanx;
-				goal.y = (ieWord) (goal.y - radius);
+				goal.y = (ieWord) (goal.y - radiusy);
 				return true;
 			}
 		}
-		if (goal.y + radius < Height) {
-			if (GetBlocked( scanx, goal.y + radius ) & PATH_MAP_PASSABLE) {
+		if (goal.y + radiusy < Height) {
+			if (GetBlocked( scanx, goal.y + radiusy ) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) scanx;
-				goal.y = (ieWord) (goal.y + radius);
+				goal.y = (ieWord) (goal.y + radiusy);
 				return true;
 			}
 		}
@@ -2298,25 +2298,25 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radius)
 	return false;
 }
 
-bool Map::AdjustPositionY(Point &goal, unsigned int radius)
+bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy)
 {
 	unsigned int miny = 0;
-	if ((unsigned int) goal.y > radius)
-		miny = goal.y - radius;
-	unsigned int maxy = goal.y + radius + 1;
+	if ((unsigned int) goal.y > radiusy)
+		miny = goal.y - radiusy;
+	unsigned int maxy = goal.y + radiusy + 1;
 	if (maxy > Height)
 		maxy = Height;
 	for (unsigned int scany = miny; scany < maxy; scany++) {
-		if ((unsigned int) goal.x >= radius) {
-			if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
-				goal.x = (ieWord) (goal.x - radius);
+		if ((unsigned int) goal.x >= radiusx) {
+			if (GetBlocked( goal.x - radiusx, scany ) & PATH_MAP_PASSABLE) {
+				goal.x = (ieWord) (goal.x - radiusx);
 				goal.y = (ieWord) scany;
 				return true;
 			}
 		}
-		if (goal.x + radius < Width) {
-			if (GetBlocked( goal.x + radius, scany ) & PATH_MAP_PASSABLE) {
-				goal.x = (ieWord) (goal.x + radius);
+		if (goal.x + radiusx < Width) {
+			if (GetBlocked( goal.x + radiusx, scany ) & PATH_MAP_PASSABLE) {
+				goal.x = (ieWord) (goal.x + radiusx);
 				goal.y = (ieWord) scany;
 				return true;
 			}
@@ -2325,12 +2325,8 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radius)
 	return false;
 }
 
-void Map::AdjustPosition(Point &goal, unsigned int radius)
+void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy)
 {
-	unsigned int maxr = Width;
-	if (maxr < Height) {
-		maxr = Height;
-	}
 	if ((unsigned int) goal.x > Width) {
 		goal.x = (ieWord) Width;
 	}
@@ -2338,22 +2334,28 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 		goal.y = (ieWord) Height;
 	}
 
-	for (; radius < maxr; radius++) {
+	while(radiusx<Width || radiusy<Height) {
 		//lets make it slightly random where the actor will appear
 		if (rand()&1) {
-			if (AdjustPositionX(goal, radius)) {
+			if (AdjustPositionX(goal, radiusx, radiusy)) {
 				return;
 			}
-			if (AdjustPositionY(goal, radius)) {
+			if (AdjustPositionY(goal, radiusy, radiusx)) {
 				return;
 			}
 		} else {
-			if (AdjustPositionY(goal, radius)) {
+			if (AdjustPositionY(goal, radiusx, radiusy)) {
 				return;
 			}
-			if (AdjustPositionX(goal, radius)) {
+			if (AdjustPositionX(goal, radiusx, radiusy)) {
 				return;
 			}
+		}
+		if (radiusx<Width) {
+			radiusx++;
+		}
+		if (radiusy<Height) {
+			radiusy++;
 		}
 	}
 }
@@ -2970,7 +2972,7 @@ void Map::LoadIniSpawn()
 	INISpawn->InitSpawn(WEDResRef);
 }
 
-void Map::SpawnCreature(const Point &pos, const char *CreName, int radius)
+void Map::SpawnCreature(const Point &pos, const char *CreName, int radiusx, int radiusy)
 {
 	SpawnGroup *sg=NULL;
 	Actor *creature;
@@ -2979,7 +2981,7 @@ void Map::SpawnCreature(const Point &pos, const char *CreName, int radius)
 		creature = gamedata->GetCreature(CreName);
 		if ( creature ) {
 			AddActor(creature, true);
-			creature->SetPosition( pos, true, radius );
+			creature->SetPosition( pos, true, radiusx, radiusy );
 			creature->RefreshEffects(NULL);
 		}
 		return;
@@ -3008,7 +3010,7 @@ void Map::SpawnCreature(const Point &pos, const char *CreName, int radius)
 		creature = gamedata->GetCreature(sg->ResRefs[count]);
 		if ( creature ) {
 			AddActor(creature, true);
-			creature->SetPosition( pos, true, radius );
+			creature->SetPosition( pos, true, radiusx, radiusy );
 			creature->RefreshEffects(NULL);
 		}
 	}

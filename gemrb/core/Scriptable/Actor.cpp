@@ -3923,7 +3923,7 @@ void Actor::SetMap(Map *map)
 	}
 }
 
-void Actor::SetPosition(const Point &position, int jump, int radius)
+void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy)
 {
 	PathTries = 0;
 	ClearPath();
@@ -3935,7 +3935,7 @@ void Actor::SetPosition(const Point &position, int jump, int radius)
 		Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
-		map->AdjustPosition( p, radius );
+		map->AdjustPosition( p, radiusx, radiusy );
 	}
 	if (p==q) {
 		MoveTo( position );

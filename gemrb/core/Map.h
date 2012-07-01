@@ -419,7 +419,7 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point &goal, unsigned int radius=0);
+	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int flags);
 	/* Returns true if there is no path to d */
@@ -457,7 +457,7 @@ public:
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */
 	int Rest(const Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
-	void SpawnCreature(const Point &pos, const char *CreName, int radius = 0);
+	void SpawnCreature(const Point &pos, const char *CreName, int radiusx = 0, int radiusy = 0);
 
 	//spawns
 	void LoadIniSpawn();
@@ -502,8 +502,8 @@ private:
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised */
-	bool AdjustPositionX(Point &goal, unsigned int radius);
-	bool AdjustPositionY(Point &goal, unsigned int radius);
+	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy);
+	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 };
 
