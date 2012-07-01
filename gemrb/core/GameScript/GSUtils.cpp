@@ -559,6 +559,13 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	if (!tar) {
 		return 0;
 	}
+
+	//Deactivated (hidden) creatures are not seen
+	//Check windspear quest (when garren leaves you alone with the kid)
+	if (! (tar->GetInternalFlag()&IF_VISIBLE)) {
+		return 0;
+	}
+
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
