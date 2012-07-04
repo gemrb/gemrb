@@ -25,7 +25,36 @@
 
 // For pixel formats:
 // We hardcode a single pixel format per bit depth.
-// TODO: Make this platform-specific (OS X / iOS / ...?)
+
+#ifdef TARGET_OS_MAC
+
+const unsigned int RLOSS16 = 3;
+const unsigned int GLOSS16 = 2;
+const unsigned int BLOSS16 = 3;
+const unsigned int RSHIFT16 = 11;
+const unsigned int GSHIFT16 = 5;
+const unsigned int BSHIFT16 = 0;
+
+const unsigned int RSHIFT32 = 8;
+const unsigned int GSHIFT32 = 16;
+const unsigned int BSHIFT32 = 24;
+
+#elif TARGET_OS_IPHONE
+
+// TODO: check these values. I am no longer able.
+
+const unsigned int RLOSS16 = 3;
+const unsigned int GLOSS16 = 2;
+const unsigned int BLOSS16 = 3;
+const unsigned int RSHIFT16 = 11;
+const unsigned int GSHIFT16 = 5;
+const unsigned int BSHIFT16 = 0;
+
+const unsigned int RSHIFT32 = 0;
+const unsigned int GSHIFT32 = 8;
+const unsigned int BSHIFT32 = 16;
+
+#else
 
 const unsigned int RLOSS16 = 3;
 const unsigned int GLOSS16 = 2;
@@ -37,6 +66,8 @@ const unsigned int BSHIFT16 = 0;
 const unsigned int RSHIFT32 = 16;
 const unsigned int GSHIFT32 = 8;
 const unsigned int BSHIFT32 = 0;
+
+#endif
 
 const Uint16 halfmask16 = ((0xFFU >> (RLOSS16+1)) << RSHIFT16) | ((0xFFU >> (GLOSS16+1)) << GSHIFT16) | ((0xFFU >> (BLOSS16+1)) << BSHIFT16);
 const Uint32 halfmask32 = ((0xFFU >> 1) << RSHIFT32) | ((0xFFU >> 1) << GSHIFT32) | ((0xFFU >> 1) << BSHIFT32);
