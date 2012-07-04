@@ -1,0 +1,20 @@
+GemRB for iOS
+------------
+
+Developing without a certificate
+--------------------------------
+You need to alter the iOS SSK if you wish to develop without an Apple developer certificate. Instructions for this procedure are here: http://iphonedevwiki.net/index.php/Xcode#Developing_without_Provisioning_Profile. This page has been archived in this directory as "Xcode - iPhone Development Wiki.html".
+
+Required 3rd party libraries
+----------------------------
+* SDL
+* SDL_ttf
+* freetype2
+* Python
+
+These libraries should be placed in a sub directory to this one directory called "lib".
+you will have to compile these yourself. Most have iOS versions available either officially or as special forks, but as of this writing I had to build Python myself which was a bit hair-pulling. 
+
+put the binaries compiled for ARM in "lib/iphoneos" and simulator libraries in "lib/iphonesimulator".
+
+the headers for these libraries should go in "lib/include"
