@@ -24,11 +24,6 @@
 #include "GUI/Console.h"
 #include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
 
-#if TARGET_OS_IPHONE
-extern "C" {
-	#include <SDL/uikit/SDL_uikitkeyboard.h>
-}
-#endif
 #ifdef ANDROID
 #include "SDL_screenkeyboard.h"
 #endif
