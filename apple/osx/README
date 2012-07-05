@@ -1,0 +1,17 @@
+GemRB for Mac
+------------
+
+Required 3rd party libraries
+----------------------------
+* SDL
+* Python - included with mac os. please don't try to use a non standard python.
+
+Optional 3rd party libraries
+----------------------------
+* SDL_ttf
+* freetype2
+* ogg/vorbis
+
+
+SDL and SDL_ttf should be build or downloaded as mac frameworks and NOT unix libraries.
+SDL dylib especially is known to be incompatible with GemRB for Mac OS X
