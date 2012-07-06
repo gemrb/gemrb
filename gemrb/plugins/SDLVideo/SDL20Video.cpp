@@ -218,7 +218,10 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	Uint8 *pixels;
 	int pitch;
 
-	SDL_LockTexture(videoPlayer, NULL, (void**)&pixels, &pitch);
+	if(!SDL_LockTexture(videoPlayer, NULL, (void**)&pixels, &pitch)) {
+		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
+		return;
+	}
 	pitch = w;
 	if((unsigned int)pitch == strides[0]) {
 		int size = pitch * bufh;
