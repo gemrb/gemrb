@@ -121,6 +121,9 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	} else {
 		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, winW, winH);
 	}
+	if (!videoPlayer) {
+		Log(ERROR, "SDL 2 Driver", "Unable to create texture for video playback: %s", SDL_GetError());
+	}
 	w = winW;
 	h = winH;
 	//setting the subtitle region to the bottom 1/4th of the screen
@@ -152,7 +155,10 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	int pitch;
 	SDL_Color color = {0, 0, 0, 0};
 
-	SDL_LockTexture(videoPlayer, NULL, &pixels, &pitch);
+	if(!SDL_LockTexture(videoPlayer, NULL, &pixels, &pitch)) {
+		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
+		return;
+	}
 	src = buf;
 	if (g_truecolor) {
 		for (row = 0; row < bufh; ++row) {
