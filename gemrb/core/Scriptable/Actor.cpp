@@ -3530,7 +3530,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
 	// instant chunky death if the actor is petrified or frozen
-	if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && GameDifficulty > DIFF_NORMAL) {
+	if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && (GameDifficulty > DIFF_NORMAL) ) {
 		damage = 123456; // arbitrarily high for death; won't be displayed
 		LastDamageType |= DAMAGE_CHUNKING;
 	}
@@ -3629,7 +3629,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	}
 
 	if (damage > 0 && resisted != DR_IMMUNE) {
-		Log(COMBAT, "Actor", "%d damage taken.\n", damage);
+		Log(COMBAT, "Actor", "%d %s damage taken.\n", damage, type_name);
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
@@ -4520,6 +4520,11 @@ bool Actor::CheckOnDeath()
 	// items seem to be dropped at the moment of death
 	// .. but this can't go in Die() because that is called
 	// from effects and dropping items might change effects!
+
+	//destroy normal items if difficulty level is high enough
+	if ((LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
+		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+	}
 	DropItem("",0);
 
 	//remove all effects that are not 'permanent after death' here
