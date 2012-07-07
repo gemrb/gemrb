@@ -120,14 +120,6 @@ class SpriteCover;
 #define CT_SELECTED       4 //not all selected actors are there
 #define CT_MOVE_SELECTED  5 //all selected can move
 
-//bits for binary trigger bitfield
-#define BT_DIE            1
-#define BT_ONCREATION     2
-#define BT_BECAMEVISIBLE  4
-#define BT_WASINDIALOG    8
-#define BT_PARTYRESTED    16
-#define BT_VACANT         32
-
 //xp bonus types (for xpbonus.2da)
 #define XP_LOCKPICK   0
 #define XP_DISARM     1
