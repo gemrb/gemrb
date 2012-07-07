@@ -32,7 +32,7 @@ class TileOverlay;
 #define DOOR_LOCKED      2
 #define DOOR_RESET       4   //reset trap
 #define DOOR_DETECTABLE  8   //trap detectable
-#define DOOR_16          16  //unknown
+#define DOOR_BROKEN      16  //door is broken (force opened)
 #define DOOR_32          32  //unknown
 #define DOOR_LINKED      64   //info trigger linked to this door
 #define DOOR_SECRET      128  //door is secret

@@ -400,6 +400,8 @@ void Door::TryBashLock(Actor *actor)
 
 	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, DMC_LIGHTGREY, actor);
 	SetDoorLocked(false, true);
+	Flags|=DOOR_BROKEN;
+
 	//This is ok, bashdoor also sends the unlocked trigger
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();

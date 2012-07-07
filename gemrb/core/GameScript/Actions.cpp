@@ -5975,6 +5975,8 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	Actor * actor = (Actor *) Sender;
+
 	Scriptable *target = GetActorFromObject(Sender, parameters->objects[1]);
 	Door *door = NULL;
 	Container *container = NULL;
@@ -6001,13 +6003,15 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	//bashing makes the actor visible
+	actor->CureInvisibility();
 	gc->SetTargetMode(TARGET_MODE_ATTACK); //for bashing doors too
 
 	// try to bash it
 	if (door) {
-		door->TryBashLock((Actor *) Sender);
+		door->TryBashLock(actor);
 	} else if (container) {
-		container->TryBashLock((Actor *) Sender);
+		container->TryBashLock(actor);
 	}
 
 	Sender->ReleaseCurrentAction();
