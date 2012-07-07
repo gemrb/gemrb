@@ -5942,10 +5942,8 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "Script error: No Trigger Named \"%s\"", parameters->objects[1]->objectName);
 		return;
 	}
-	// FIXME: what does this do? clear triggers?
-	/*ip->LastEntered = 0;
-	ip->LastTrigger = 0;
-	ip->LastTriggerObject = 0;*/
+
+	ip->InitTriggers();
 }
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
@@ -5962,7 +5960,8 @@ void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction(); // this is blocking, OpenDoor is not
 }
 
-//this will force bashing the door
+//this will force bashing the door, if bend bars check is successful,
+//it will unlock the door and sets the broken flag
 void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 {
 	GameControl *gc = core->GetGameControl();
@@ -5995,8 +5994,6 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-
-	// TODO: "sets a field in the door/container to 1"
 
 	if (SquaredPersonalDistance(*pos, Sender) > MAX_OPERATING_DISTANCE*MAX_OPERATING_DISTANCE) {
 		MoveNearerTo(Sender, *pos, MAX_OPERATING_DISTANCE, 0);

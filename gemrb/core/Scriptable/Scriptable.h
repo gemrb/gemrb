@@ -332,7 +332,6 @@ public:
 	//these functions handle clearing of triggers that resulted a
 	//true condition (whole triggerblock returned true)
 	void InitTriggers();
-	void ClearTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
 	bool MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param = 0);
