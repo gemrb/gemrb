@@ -1382,8 +1382,9 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
 		break;
-	case 512:
-
+	case 512: //disintegration
+		damagetype = DAMAGE_MAGIC;
+		break;
 	default:
 		damagetype = DAMAGE_ACID;
 	}

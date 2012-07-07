@@ -9,6 +9,12 @@ Makefile.in
 .deps
 .libs
 .dirstamp
+
+# Mac/Xcode junk
+DerivedData
+Payload
+apple/build
+apple/ios/lib
 .DS_Store
 xcuserdata
 *.pbxuser

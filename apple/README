@@ -1,0 +1,35 @@
+Introduction
+------------
+This Xcode project contains build targets for both Mac OS X, and an iOS universal application (supports both iPhone and iPad).
+
+Please report problems in documentation or the project to bradallred@me.com
+
+Words of Advice
+---------------
+
+1.
+When building GemRB plugins for OS X use the provided Xcode target template. (osx/xcode templates/GemRB Plugin.trgttmpl)
+
+I installed the template at /Developer/Library/Xcode/Target Templates/Application Plug-in, but there may be a place in application support for it as well.
+
+2.
+building python for iOS: There is a bug in either Python or GemRB that effects iOS. I have tried both 2.6 and 2.7 (latest stable or each) and at some level of compiler optimization higher than 0 will cause a crash when accessing the spellbooks. I haven't attempted to find the highest level of optimization achievable before the crash occurs and have just built Python sans optimization and performance isn't noticeably impacted.
+
+I'm sure there is a better location for adding python header files to the iOS SDK, but I have created a folder ios/Python where you can place the python headers Include folder and static lib and the project will find them there.
+
+Tip: it is handy to change the build path of your Python target to this directory so you don't have to manually copy each build (if you are changing Python source maybe to find the afore mentioned crash for instance)
+
+Notes
+-----
+
+see the iOS and osx folders for platform specific READMEs.
+
+TODO
+----
+(in no particular order)
+
+1. add external build scripts to build outside dependancies not included is OS X/iOS (SDL, Python)
+
+2. some minor build option cleanup
+
+3. use cake to generate the config.h and default config files.
