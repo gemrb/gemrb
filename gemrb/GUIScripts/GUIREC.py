@@ -728,6 +728,7 @@ def OpenInformationWindow ():
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseInformationWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TotalPartyExp = 0
 	ChapterPartyExp = 0

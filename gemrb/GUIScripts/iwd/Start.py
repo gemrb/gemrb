@@ -145,6 +145,7 @@ def ProtocolPress ():
 	DoneButton = ProtocolWindow.GetControl (6)
 	DoneButton.SetText (11973)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
+	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	
 	ProtocolWindow.ShowModal (1)
 	return
