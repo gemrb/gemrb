@@ -483,7 +483,7 @@ def OpenBiographyEditWindow ():
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	if GUICommon.GameIsIWD2():
+	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 		RevertButton = SubCustomizeWindow.GetControl (6)
 	else:
 		RevertButton = SubCustomizeWindow.GetControl (3)
