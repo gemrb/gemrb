@@ -32,10 +32,16 @@ ExportWindow = None
 NameField = ExportDoneButton = None
 ScriptsTable = None
 
+if GUICommon.GameIsBG2() or GUICommon.GameIsBG1():
+	BioStrRefSlot = 74
+else:
+	BioStrRefSlot = 63
+
 if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
 	PortraitNameSuffix = "L"
 else:
 	PortraitNameSuffix = "G"
+
 PortraitPictureButton = None
 PortraitList1 = PortraitList2 = RowCount1 = RowCount2 = None
 
@@ -457,7 +463,7 @@ def OpenBiographyEditWindow ():
 
 	Changed = 0
 	pc = GemRB.GameGetSelectedPCSingle ()
-	BioStrRef = GemRB.GetPlayerString (pc, 74)
+	BioStrRef = GemRB.GetPlayerString (pc, BioStrRefSlot)
 	if BioStrRef != 33347:
 		Changed = 1
 
@@ -516,7 +522,7 @@ def DoneBiographyWindow ():
 	#pc is 1 based
 	BioStrRef = 62015+pc
 	GemRB.CreateString (BioStrRef, TextArea.QueryText())
-	GemRB.SetPlayerString (pc, 74, BioStrRef)
+	GemRB.SetPlayerString (pc, BioStrRefSlot, BioStrRef)
 	CloseSubCustomizeWindow ()
 	return
 
@@ -531,10 +537,7 @@ def OpenBiographyWindow ():
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GUICommon.GameIsIWD2():
-		TextArea.SetText (GemRB.GetPlayerString (pc, 63) )
-	else:
-		TextArea.SetText (GemRB.GetPlayerString (pc, 74) )
+	TextArea.SetText (GemRB.GetPlayerString (pc, BioStrRefSlot) )
 
 	# Done
 	Button = Window.GetControl (2)
