@@ -442,7 +442,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &VertexCount );
 		str->ReadDword( &FirstVertex );
 		ieDword tmp2;
-		str->ReadDword( &tmp2 );
+		str->ReadDword( &tmp2 ); //named triggerValue in the IE source
 		str->ReadDword( &Cursor );
 		str->ReadResRef( Destination );
 		str->Read( Entrance, 32 );
@@ -565,11 +565,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//the vertex count is only 16 bits, there is a weird flag
 		//after it, which is usually 0, but sometimes set to 1
 		str->ReadWord( &vertCount );
-		str->ReadWord( &unknown );
-		//str->Read( Name, 32 );
+		str->ReadWord( &unknown );   //trigger range
+		//str->Read( Name, 32 );     //owner's scriptname
 		str->Seek( 32, GEM_CURRENT_POS);
 		str->ReadResRef( KeyResRef);
-		str->Seek( 4, GEM_CURRENT_POS);
+		str->Seek( 4, GEM_CURRENT_POS); //break difficulty
 		str->ReadDword( &OpenFail );
 
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
@@ -649,7 +649,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieStrRef OpenStrRef;
 		ieStrRef NameStrRef;
 		ieResRef Dialog;
-		ieDword Unknown54;
+		ieWord hp, ac;
 
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
@@ -679,7 +679,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &OpenImpededCount );
 		str->ReadWord( &ClosedImpededCount );
 		str->ReadDword( &ClosedFirstImpeded );
-		str->ReadDword( &Unknown54);
+		str->ReadWord( &hp); //TODO: store these
+		str->ReadWord( &ac); //hitpoints AND armorclass, according to IE dev info
 		ieResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
@@ -784,7 +785,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		door->cibcount = ClosedImpededCount;
 		door->SetMap(map);
 
-		door->Unknown54 = Unknown54;
+		door->hp = hp;
+		door->ac = ac;
 		door->TrapDetectionDiff = TrapDetect;
 		door->TrapRemovalDiff = TrapRemoval;
 		door->Trapped = Trapped;
@@ -1163,9 +1165,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieResRef TrapResRef;
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
-		ieWord X,Y;
+		ieWord X,Y,Z;
 		ieDword Ticks;
-		ieWord Unknown;
 		ieByte PartyID;
 		ieByte Owner;
 
@@ -1175,11 +1176,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword( &TrapEffOffset );
 		str->ReadWord( &TrapSize );
 		str->ReadWord( &ProID );
-		str->ReadDword( &Ticks );
+		str->ReadDword( &Ticks );  //actually, delaycount/repetitioncount
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
-		str->ReadWord( &Unknown );
-		str->Read( &PartyID,1 );
+		str->ReadWord( &Z );
+		str->Read( &PartyID,1 );  //according to dev info, this is 'targettype'
 		str->Read( &Owner,1 );
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
@@ -1215,16 +1216,29 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieVariable Name;
 		ieResRef ID;
 		ieDword Flags;
-		ieDword OpenIndex, OpenCount;
-		ieDword ClosedIndex, ClosedCount;
+		//these fields could be different size
+		//ieDword ClosedCount, OpenCount;
+		ieWord ClosedCount, OpenCount;
+		ieDword ClosedIndex, OpenIndex;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadResRef( ID );
 		str->ReadDword( &Flags );
+		//TODO check this structure again
+/*
 		str->ReadDword( &OpenIndex );
 		str->ReadDword( &OpenCount );
 		str->ReadDword( &ClosedIndex );
 		str->ReadDword( &ClosedCount );
+*/
+		//IE dev info says this:
+		str->ReadDword( &OpenIndex );
+		str->ReadWord( &OpenCount );
+		str->ReadWord( &ClosedCount );
+		str->ReadDword( &ClosedIndex );
+		//end of disputed section
+
+
 		str->Seek( 48, GEM_CURRENT_POS );
 		//absolutely no idea where these 'tile indices' are stored
 		//are they tileset tiles or impeded block tiles
@@ -1526,7 +1540,8 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
-		stream->WriteDword( &d->Unknown54);
+		stream->WriteWord( &d->hp);
+		stream->WriteWord( &d->ac);
 		stream->WriteResRef( d->OpenSound);
 		stream->WriteResRef( d->CloseSound);
 		stream->WriteDword( &d->Cursor);

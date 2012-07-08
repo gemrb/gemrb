@@ -33,7 +33,7 @@ class TileOverlay;
 #define DOOR_RESET       4   //reset trap
 #define DOOR_DETECTABLE  8   //trap detectable
 #define DOOR_BROKEN      16  //door is broken (force opened)
-#define DOOR_32          32  //unknown
+#define DOOR_CANTCLOSE   32  //from IE dev source
 #define DOOR_LINKED      64   //info trigger linked to this door
 #define DOOR_SECRET      128  //door is secret
 #define DOOR_FOUND       256  //secret door found
@@ -75,7 +75,7 @@ public:
 	ieDword LockDifficulty; //this is a dword?
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
-	ieDword  Unknown54;     //unused in tob
+	ieWord hp, ac;          //unused???, but learned from IE DEV info
 private:
 	void SetWallgroups(int count, int value);
 	void ImpedeBlocks(int count, Point *points, unsigned char value);
