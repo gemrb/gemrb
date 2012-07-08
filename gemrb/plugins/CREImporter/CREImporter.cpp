@@ -1032,12 +1032,14 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LUCK]=tmpByte;
+	//last byte is actually an undead level (according to IE dev info)
 	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
+	//scriptname of tracked creature (according to IE dev info)
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (i=0;i<100;i++) {
 		str->ReadDword( &act->StrRefs[i] );

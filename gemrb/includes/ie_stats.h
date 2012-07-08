@@ -193,8 +193,8 @@ namespace GemRB {
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800
-#define MC_HIDE_HP              0x1000 
-#define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over
+#define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
+#define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over, also 'limbo creature' according to IE dev info
 #define MC_BEENINPARTY          0x8000
 #define MC_HIDDEN               0x10000 //iwd
 
@@ -344,6 +344,7 @@ namespace GemRB {
 #define IE_PROFICIENCYSLING			107
 #define IE_PROFICIENCYBLACKJACK			108
 #define IE_PROFICIENCYGUN			109
+#define IE_UNDEADLEVEL                          109 //if i calculated correctly, this is the 21th byte in the profs array
 #define IE_PROFICIENCYMARTIALARTS		110
 #define IE_PROFICIENCY2HANDED		   	111 
 #define IE_PROFICIENCYSWORDANDSHIELD		112
@@ -529,6 +530,7 @@ namespace GemRB {
 #define IE_LEVELCLASS12          248
 #define IE_LEVELCLASS13          249
 // these are iwd2 spell states, iwd2 uses ~180, we have place for 192
+// TODO: consider dropping these (move them to class variable) if unused by guiscript
 #define IE_SPLSTATE_ID1          250
 #define IE_SPLSTATE_ID2          251
 #define IE_SPLSTATE_ID3          252
