@@ -630,19 +630,25 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	return true;
 }
 
-// Gets average party level, of onlyalive is true, then counts only living PCs
+// Gets average party level, if onlyalive is true, then counts only living PCs
 int Game::GetPartyLevel(bool onlyalive) const
 {
+	int amount = 0;
 	int count = 0;
+
 	for (unsigned int i = 0; i<PCs.size(); i++) {
 			if (onlyalive) {
 				if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 					continue;
 				}
 			}
-			count += PCs[i]->GetXPLevel(0);
+			amount += PCs[i]->GetXPLevel(0);
+			count++;
 	}
-	return count;
+
+	if (!count) return 0; //lol, this shouldn't happen
+
+	return amount/count;
 }
 
 // Returns map structure (ARE) if it is already loaded in memory
