@@ -2880,17 +2880,32 @@ int GameScript::PartyCountAliveGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::LevelParty(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GetPartyLevel(1)==parameters->int0Parameter;
+	int count = core->GetGame()->GetPartySize(1);
+
+	if (count) {
+		return core->GetGame()->GetPartyLevel(1)/count==parameters->int0Parameter;
+	}
+	return 0;
 }
 
 int GameScript::LevelPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
+	int count = core->GetGame()->GetPartySize(1);
+
+	if (count) {
+		return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
+	}
+	return 0;
 }
 
 int GameScript::LevelPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GetPartyLevel(1)>parameters->int0Parameter;
+	int count = core->GetGame()->GetPartySize(1);
+
+	if (count) {
+		return core->GetGame()->GetPartyLevel(1)>parameters->int0Parameter;
+	}
+	return 0;
 }
 
 int GameScript::PartyGold(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3632,7 +3647,7 @@ int GameScript::ChargeCount( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-// no idea if it checks only alive partymembers
+// no idea if it checks only alive partymembers or if it is average or not
 int GameScript::CheckPartyLevel( Scriptable* /*Sender*/, Trigger* parameters)
 {
 	if (core->GetGame()->GetPartyLevel(false)<parameters->int0Parameter) {
@@ -3644,7 +3659,13 @@ int GameScript::CheckPartyLevel( Scriptable* /*Sender*/, Trigger* parameters)
 // no idea if it checks only alive partymembers
 int GameScript::CheckPartyAverageLevel( Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int level = core->GetGame()->GetPartyLevel(false);
+	Game *game = core->GetGame();
+
+	int count = game->GetPartySize(false);
+	int level = game->GetPartyLevel(false);
+
+	if (count) level/=count;
+
 	switch (parameters->int1Parameter) {
 		case DM_EQUAL:
 			if (level ==parameters->int0Parameter) {

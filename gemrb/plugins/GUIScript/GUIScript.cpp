@@ -9447,6 +9447,8 @@ PyDoc_STRVAR( GemRB_HasSpecialSpell__doc,
 "Checks if a team member has a spell, optionally uses it.");
 
 //itemtype 1 - identify
+//         2 - can use in silence
+//         4 - cannot use in wildsurge
 static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, itemtype, useup;
