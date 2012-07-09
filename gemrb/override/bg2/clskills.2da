@@ -2,7 +2,7 @@
 *
                     DRUIDSPELL CLERICSPELL MAGESPELL  STARTXP    BARDSKILL  THIEFSKILL LAYHANDS   TURNLEVEL  BOOKTYPE   HATERACE   ABILITIES  NO_PROF    STARTXP2   RANGERSKILL SAVEBONUS
 UNUSED              *          *          *          *          *          *          *          0          0          *          *          *          *          *          *
-MAGE                *          *          MXSPLWIZ   89000      *          *          *          0          1          *          *          -4         2500000    *          0
+MAGE                *          *          MXSPLWIZ   89000      *          *          *          0          1          *          CLABMA01   -4         2500000    *          0
 FIGHTER             *          *          *          89000      *          *          *          0          0          *          CLABFI01   -2         2500000    *          0
 CLERIC              *          MXSPLPRS   *          89000      *          *          *          1          1          *          CLABPR01   -3         2500000    *          0
 THIEF               *          *          *          89000      *          SKILLS     *          0          0          *          CLABTH01   -3         2500000    *          0
