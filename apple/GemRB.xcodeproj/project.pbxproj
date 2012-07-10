@@ -338,6 +338,7 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
+		A2A26ADD15AA729800A8E25D /* VideoContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A26ADB15AA729800A8E25D /* VideoContext.cpp */; };
 		A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */; };
 		A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7DF14A5130F00F705CF /* CocoaMain.m */; };
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
@@ -350,6 +351,9 @@
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
+		A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
+		A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */; };
 		A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C66D9C13A2953D00C0AA8E /* Python.framework */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
@@ -909,6 +913,13 @@
 			remoteGlobalIDString = A2F0505013ABB80B0023B7EB;
 			remoteInfo = SAVImporter;
 		};
+		A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2BD124A15A7EDFE000FAB95;
+			remoteInfo = VLCPlayer;
+		};
 		A2A1417814B4E907003FE672 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -936,6 +947,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A276B45413A28A0E00D41A8A;
 			remoteInfo = NullSound;
+		};
+		A2BD124C15A7EDFE000FAB95 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2E66337139E875400310FC8;
+			remoteInfo = gemrb_core;
 		};
 		A2C48CEA14A3FEF600575FE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1056,6 +1074,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */,
 				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
 				A2E9965414DE05590052BABE /* ACMReader.so in CopyFiles */,
 				A2E9965514DE05590052BABE /* AREImporter.so in CopyFiles */,
@@ -1303,6 +1322,8 @@
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2A26ADB15AA729800A8E25D /* VideoContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VideoContext.cpp; path = ../VLCPlayer/VideoContext.cpp; sourceTree = "<group>"; };
+		A2A26ADC15AA729800A8E25D /* VideoContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoContext.h; path = ../VLCPlayer/VideoContext.h; sourceTree = "<group>"; };
 		A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CocoaWrapper.mm; path = CocoaWrapper/mac/CocoaWrapper.mm; sourceTree = "<group>"; };
 		A2A3A7DF14A5130F00F705CF /* CocoaMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaMain.m; sourceTree = "<group>"; };
 		A2A3A7E014A5130F00F705CF /* GEM_ConfController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_ConfController.h; sourceTree = "<group>"; };
@@ -1316,6 +1337,9 @@
 		A2AAF38D13A150D700AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AAF39313A150F900AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
+		A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = VLCPlayer.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VLCPlayer.cpp; path = ../VLCPlayer/VLCPlayer.cpp; sourceTree = "<group>"; };
+		A2BD125915A7EE61000FAB95 /* VLCPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCPlayer.h; path = ../VLCPlayer/VLCPlayer.h; sourceTree = "<group>"; };
 		A2BD82721396B886007E9C63 /* GemRB.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = GemRB.cpp; path = ../gemrb/GemRB.cpp; sourceTree = SOURCE_ROOT; };
 		A2BD83111396FD5F007E9C63 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		A2BD831D1396FE16007E9C63 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
@@ -1970,6 +1994,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2BD124F15A7EDFE000FAB95 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A2E66336139E875400310FC8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2074,6 +2106,7 @@
 				A276B4F413A28C0400D41A8A /* STOImporter.so */,
 				A2F0505113ABB80B0023B7EB /* SAVImporter.so */,
 				A298DD1114EB4E8C00F59F56 /* SDL2Video.so */,
+				A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2196,6 +2229,7 @@
 				A27B8768139F0A7D0002DC13 /* TISImporter */,
 				A27B876D139F0A7D0002DC13 /* TLKImporter */,
 				A2A6A457146893CC000F1688 /* TTFImporter */,
+				A2BD125715A7EE35000FAB95 /* VLCPlayer */,
 				A27B8774139F0A7D0002DC13 /* WAVReader */,
 				A27B8779139F0A7D0002DC13 /* WEDImporter */,
 				A27B877E139F0A7D0002DC13 /* WMPImporter */,
@@ -2664,6 +2698,18 @@
 				A2A6A45A146893CC000F1688 /* TTFFontManager.h */,
 			);
 			path = TTFImporter;
+			sourceTree = "<group>";
+		};
+		A2BD125715A7EE35000FAB95 /* VLCPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				A2A26ADB15AA729800A8E25D /* VideoContext.cpp */,
+				A2A26ADC15AA729800A8E25D /* VideoContext.h */,
+				A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */,
+				A2BD125915A7EE61000FAB95 /* VLCPlayer.h */,
+			);
+			name = VLCPlayer;
+			path = WAVReader;
 			sourceTree = "<group>";
 		};
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
@@ -3159,6 +3205,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */,
 				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
 				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
 				A23EBFFC1419A81500CC049E /* PBXTargetDependency */,
@@ -3905,6 +3952,24 @@
 			productReference = A29BF85C13A0427900C812DD /* GemRB.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A2BD124A15A7EDFE000FAB95 /* VLCPlayer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2BD125315A7EDFE000FAB95 /* Build configuration list for PBXNativeTarget "VLCPlayer" */;
+			buildPhases = (
+				A2BD124D15A7EDFE000FAB95 /* Sources */,
+				A2BD124F15A7EDFE000FAB95 /* Frameworks */,
+				A2BD125D15A8E32B000FAB95 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A2BD124B15A7EDFE000FAB95 /* PBXTargetDependency */,
+			);
+			name = VLCPlayer;
+			productName = SAVImporter;
+			productReference = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		A2E66337139E875400310FC8 /* gemrb_core */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A2E6633D139E87A400310FC8 /* Build configuration list for PBXNativeTarget "gemrb_core" */;
@@ -4022,6 +4087,7 @@
 				A276B4F313A28C0400D41A8A /* STOImporter */,
 				A276B49013A28AA800D41A8A /* TISImporter */,
 				A276B49613A28AB800D41A8A /* TLKImporter */,
+				A2BD124A15A7EDFE000FAB95 /* VLCPlayer */,
 				A276B49C13A28AC800D41A8A /* WAVReader */,
 				A276B4A213A28AD300D41A8A /* WEDImporter */,
 				A276B4A813A28AE100D41A8A /* WMPImporter */,
@@ -4679,6 +4745,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2BD124D15A7EDFE000FAB95 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */,
+				A2A26ADD15AA729800A8E25D /* VideoContext.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A2E66335139E875400310FC8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -5017,6 +5092,11 @@
 			target = A2F0505013ABB80B0023B7EB /* SAVImporter */;
 			targetProxy = A23EBFFB1419A81500CC049E /* PBXContainerItemProxy */;
 		};
+		A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2BD124A15A7EDFE000FAB95 /* VLCPlayer */;
+			targetProxy = A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */;
+		};
 		A2A1417914B4E907003FE672 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
@@ -5036,6 +5116,11 @@
 			isa = PBXTargetDependency;
 			target = A276B45413A28A0E00D41A8A /* NullSound */;
 			targetProxy = A2AF8FCC14DDCEBD005CAC5D /* PBXContainerItemProxy */;
+		};
+		A2BD124B15A7EDFE000FAB95 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E66337139E875400310FC8 /* gemrb_core */;
+			targetProxy = A2BD124C15A7EDFE000FAB95 /* PBXContainerItemProxy */;
 		};
 		A2C48CEB14A3FEF600575FE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -6370,6 +6455,54 @@
 			};
 			name = Release;
 		};
+		A2BD125415A7EDFE000FAB95 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					/Applications/VLC.app/Contents/MacOS/include,
+					"$(HEADER_SEARCH_PATHS)",
+					../gemrb/includes,
+				);
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LD_RUNPATH_SEARCH_PATHS = "\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\"";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\"",
+				);
+				MACH_O_TYPE = mh_bundle;
+				OTHER_LDFLAGS = "-lvlc";
+				PRODUCT_NAME = VLCPlayer;
+			};
+			name = Debug;
+		};
+		A2BD125515A7EDFE000FAB95 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					/Applications/VLC.app/Contents/MacOS/include,
+					"$(HEADER_SEARCH_PATHS)",
+					../gemrb/includes,
+				);
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LD_RUNPATH_SEARCH_PATHS = "\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\"";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\"",
+				);
+				MACH_O_TYPE = mh_bundle;
+				OTHER_LDFLAGS = "-lvlc";
+				PRODUCT_NAME = VLCPlayer;
+			};
+			name = Release;
+		};
 		A2E66339139E875500310FC8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -6980,6 +7113,15 @@
 			buildConfigurations = (
 				A29BF85E13A0427A00C812DD /* Debug */,
 				A29BF85F13A0427A00C812DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2BD125315A7EDFE000FAB95 /* Build configuration list for PBXNativeTarget "VLCPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2BD125415A7EDFE000FAB95 /* Debug */,
+				A2BD125515A7EDFE000FAB95 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

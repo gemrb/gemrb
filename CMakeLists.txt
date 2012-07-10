@@ -154,6 +154,8 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
 ENDIF()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+
 # Check for all the required and optional dependencies
 INCLUDE(FindPythonLibs)
 IF(PYTHONLIBS_FOUND)
@@ -199,6 +201,14 @@ IF(SDLMIXER_FOUND)
 ELSE()
 	MESSAGE(WARNING "Looking for SDL_mixer: not found!")
 	MESSAGE(WARNING "If you want to build the SDL_mixer plugin, install SDL_mixer first.")
+ENDIF()
+
+INCLUDE(FindVLC)
+IF(VLCMIXER_FOUND)
+	MESSAGE(STATUS "Looking for VLC: found")
+ELSE()
+	MESSAGE(WARNING "Looking for VLC: not found!")
+	MESSAGE(WARNING "If you want to build the VLC plugin, install VLC first.")
 ENDIF()
 
 INCLUDE(FindSDL_ttf)
