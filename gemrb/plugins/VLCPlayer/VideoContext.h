@@ -30,24 +30,24 @@ class VideoContext
 private:
 	pthread_mutex_t mutex;
 	void* planes[3];
-	
+
 	bool YUV;
 	unsigned width;
 	unsigned height;
 public:
 	VideoContext(unsigned w, unsigned h, bool yuv);
 	~VideoContext(void);
-	
+
 	int Lock();
 	int Unlock();
-	
+
 	void* GetPlane(unsigned idx = 0);
 	unsigned GetStride(unsigned idx = 0);
 	bool isYUV() { return YUV; };
 	unsigned Width() { return width; };
 	unsigned Height() { return height; };
 };
-	
+
 }
 
 #endif

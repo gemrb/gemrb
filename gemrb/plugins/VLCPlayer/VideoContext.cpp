@@ -29,7 +29,7 @@ VideoContext::VideoContext(unsigned w, unsigned h, bool yuv)
 	if(pthread_mutex_init(&mutex, NULL) != GEM_OK) {
 		Log(ERROR, "VLC Player", "Unable to create mutex!");
 	}
-	
+
 	int size = width * height;
 	if (YUV) {
 		planes[0] = new char[size];
@@ -77,6 +77,6 @@ unsigned VideoContext::GetStride(unsigned /*idx*/)
 {
 	// idx is a placeholder if we decide to use the native strides
 	// for now we are lazy and will make VLC convert all plane strides to width
-	
+
 	return width;
 }
