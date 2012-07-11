@@ -90,10 +90,22 @@ class TableMgr;
 #define WB_RAIN      1
 #define WB_SNOW      2
 #define WB_FOG       3
-#define WB_MASK      7
-#define WB_LIGHTNING 8
-#define WB_HASWEATHER 0x40
-#define WB_START      0x80
+#define WB_TYPEMASK  3
+#define WB_LIGHTRAIN 4
+#define WB_MEDIUMRAIN 8
+#define WB_HEAVYRAIN 12
+#define WB_RAINMASK  12
+#define WB_LIGHTWIND 0x10
+#define WB_MEDWIND   0x20
+#define WB_STRONGWING 0x30
+#define WB_WINDMASK  0x30
+
+#define WB_RARELIGHTNING 0x40
+#define WB_MEDLIGHTNING  0x80
+#define WB_HEAVYLIGHTNING 0xc0
+#define WB_LIGHTNINGMASK 0xc0
+#define WB_INCREASESTORM   0x100
+#define WB_HASWEATHER 0x200
 
 //Rest flags
 #define REST_NOAREA     1 //no area check
@@ -278,7 +290,7 @@ public:
 	ieDword PartyGold;
 	ieWord NpcInParty;
 	ieWord WeatherBits;
-	ieDword Unknown48; //still unknown
+	ieDword CurrentLink; //named currentLink in original engine (set to -1)
 	ieDword Reputation;
 	ieDword ControlStatus; // used in bg2, iwd (where you can switch panes off)
 	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame

@@ -3409,7 +3409,7 @@ int Map::GetWeather()
 {
 	if (Rain>=core->Roll(1,100,0) ) {
 		if (Lightning>=core->Roll(1,100,0) ) {
-			return WB_LIGHTNING|WB_RAIN;
+			return WB_RARELIGHTNING|WB_RAIN;
 		}
 		return WB_RAIN;
 	}

@@ -133,7 +133,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 	str->ReadDword( &newGame->PartyGold );
 	//npc count in party???
-	str->ReadWord( &newGame->NpcInParty );
+	str->ReadWord( &newGame->NpcInParty );  //in ToB this is named 'nPCAreaViewed'
 	str->ReadWord( &newGame->WeatherBits );
 	str->ReadDword( &PCOffset );
 	str->ReadDword( &PCCount );
@@ -146,14 +146,14 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	str->ReadDword( &GlobalOffset );
 	str->ReadDword( &GlobalCount );
 	str->ReadResRef( newGame->CurrentArea );
-	str->ReadDword( &newGame->Unknown48 );//this is still unknown
+	str->ReadDword( &newGame->CurrentLink );//in ToB this is named 'currentLink'
 	str->ReadDword( &JournalCount );
 	str->ReadDword( &JournalOffset );
 	switch (version) {
 		default:
 			MazeOffset = 0;
 			str->ReadDword( &newGame->Reputation );
-			str->ReadResRef( newGame->CurrentArea ); // FIXME: see above
+			str->ReadResRef( newGame->CurrentArea ); // FIXME: this is the 'master area'
 			memcpy(newGame->AnotherArea, newGame->CurrentArea, sizeof(ieResRef) );
 			str->ReadDword( &newGame->ControlStatus );
 			str->ReadDword( &newGame->Expansion );
@@ -833,7 +833,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 	stream->WriteDword( &GlobalOffset );
 	stream->WriteDword( &GlobalCount );
 	stream->WriteResRef( game->CurrentArea );
-	stream->WriteDword( &game->Unknown48 );
+	stream->WriteDword( &game->CurrentLink );
 	stream->WriteDword( &JournalCount );
 	stream->WriteDword( &JournalOffset );
 

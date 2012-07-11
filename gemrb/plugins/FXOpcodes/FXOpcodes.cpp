@@ -7263,7 +7263,7 @@ int fx_change_weather (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	print("fx_change_weather(%2d): P1: %d", fx->Opcode, fx->Parameter1);
 
-	core->GetGame()->StartRainOrSnow(false, fx->Parameter1 & WB_MASK);
+	core->GetGame()->StartRainOrSnow(false, fx->Parameter1 & WB_TYPEMASK);
 
 	return FX_NOT_APPLIED;
 }

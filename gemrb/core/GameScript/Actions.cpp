@@ -5363,7 +5363,7 @@ void GameScript::FixEngineRoom(Scriptable* Sender, Action* /*parameters*/)
 
 void GameScript::StartRainNow(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->GetGame()->StartRainOrSnow( false, WB_RAIN|WB_LIGHTNING);
+	core->GetGame()->StartRainOrSnow( false, WB_RAIN|WB_RARELIGHTNING);
 }
 
 void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
@@ -5374,7 +5374,7 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 			game->StartRainOrSnow( false, 0);
 			break;
 		case WB_RAIN:
-			game->StartRainOrSnow( true, WB_RAIN|WB_LIGHTNING);
+			game->StartRainOrSnow( true, WB_RAIN|WB_RARELIGHTNING);
 			break;
 		case WB_SNOW:
 			game->StartRainOrSnow( true, WB_SNOW);

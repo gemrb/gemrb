@@ -1770,12 +1770,10 @@ void Game::DrawWeather(const Region &screen, bool update)
 			weather->SetPhase(P_FADE);
 		}
 	}
-	//if (GameTime&1) {
-		int drawn = weather->Update();
-		if (drawn) {
-			WeatherBits &= ~WB_START;
-		}
-	//}
+	int drawn = weather->Update();
+	if (drawn) {
+		WeatherBits &= ~WB_INCREASESTORM;
+	}
 
 	if (WeatherBits&WB_HASWEATHER) {
 		return;
@@ -1792,8 +1790,8 @@ void Game::StartRainOrSnow(bool conditional, int w)
 	}
 	// whatever was responsible for calling this, we now have some set weather
 	WeatherBits = w | WB_HASWEATHER;
-	if (w & WB_LIGHTNING) {
-		if (WeatherBits&WB_START) {
+	if (w & WB_LIGHTNINGMASK) {
+		if (WeatherBits&WB_INCREASESTORM) {
 			//already raining
 			if (GameTime&1) {
 				core->PlaySound(DS_LIGHTNING1);
