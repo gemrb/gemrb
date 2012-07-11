@@ -154,6 +154,8 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
 ENDIF()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+
 # Check for all the required and optional dependencies
 INCLUDE(FindPythonLibs)
 IF(PYTHONLIBS_FOUND)
@@ -199,6 +201,14 @@ IF(SDLMIXER_FOUND)
 ELSE()
 	MESSAGE(WARNING "Looking for SDL_mixer: not found!")
 	MESSAGE(WARNING "If you want to build the SDL_mixer plugin, install SDL_mixer first.")
+ENDIF()
+
+INCLUDE(FindVLC)
+IF(VLCMIXER_FOUND)
+	MESSAGE(STATUS "Looking for VLC: found")
+ELSE()
+	MESSAGE(WARNING "Looking for VLC: not found!")
+	MESSAGE(WARNING "If you want to build the VLC plugin, install VLC first.")
 ENDIF()
 
 INCLUDE(FindSDL_ttf)
@@ -294,7 +304,7 @@ if (WIN32_USE_STDIO)
 	SET (NOCOLOR Yes)
 ENDIF()
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_config.h.in
 	${CMAKE_CURRENT_BINARY_DIR}/config.h ESCAPE_QUOTES)
 
 #Plugin addition macro
@@ -351,8 +361,8 @@ INSTALL( FILES admin/extend2da.py DESTINATION ${BIN_DIR}
 	PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 CONFIGURE_FILE(
-	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
 	IMMEDIATE @ONLY
 )
 
