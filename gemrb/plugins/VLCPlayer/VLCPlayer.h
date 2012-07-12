@@ -31,7 +31,7 @@ namespace GemRB {
 
 /*
  NOTE: using VLC player may result in poor video playback.
- VLC will convert video to match our supported formats (RGB565 and YV12)
+ VLC will convert video to match our supported formats (RGB555 and YV12)
  as well as scaleing. These operations are expensive and should be avoided
  by using a video properly sized and in a supported colorspace.
 

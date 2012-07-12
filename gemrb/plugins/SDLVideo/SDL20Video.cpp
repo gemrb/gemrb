@@ -148,7 +148,6 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_Rect srcRect = {sx, sy, w, h};
 	SDL_Rect destRect = {dstx, dsty, w, h};
 
-	Uint8 *src;
 	Uint32 *dst;
 	unsigned int row, col;
 	void *pixels;
@@ -159,21 +158,22 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
 		return;
 	}
-	src = buf;
 	if (g_truecolor) {
+		Uint16 *src = (Uint16*)buf;
 		for (row = 0; row < bufh; ++row) {
 			dst = (Uint32*)((Uint16*)pixels + row * pitch);
 			for (col = 0; col < bufw; ++col) {
-				color.r = ((*src & 0xF8) << 3) | ((*src & 0xF8) >> 2);
-				color.g = ((*src & 0x7E0) << 2) | ((*src & 0x7E0) >> 4);
-				color.b = ((*src & 0x1F) << 3) | ((*src & 0x1F) >> 2);
+				color.r = ((*src & 0x7C00) >> 7) | ((*src & 0x7C00) >> 12);
+				color.g = ((*src & 0x03E0) >> 2) | ((*src & 0x03E0) >> 8);
+				color.b = ((*src & 0x001F) << 3) | ((*src & 0x001F) >> 2);
 				color.unused = 0;
-				// video player texture is of ARGB format. buf is RGB565
+				// video player texture is of ARGB format. buf is RGB555
 				*dst++ = (0xFF000000|(color.r << 16)|(color.g << 8)|(color.b));
 				src++;
 			}
 		}
 	} else {
+		Uint8 *src = buf;
 		SDL_Palette* palette;
 		palette = SDL_AllocPalette(256);
 		for (int i = 0; i < 256; i++) {

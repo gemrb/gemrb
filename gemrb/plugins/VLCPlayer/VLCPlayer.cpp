@@ -159,9 +159,9 @@ unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned
 	 we will need to make sure the video is scaled down if it is larger than the window and we will
 	 need to convert the chroma to one of the 2 formats the video driver is coded for.
 	 
-	 currently the video drivers expect RGB565 or IYUV, but the SDL 2.0 driver can actually handle ARGB as well.
-	 infact the texture is natively ARGB8888, and we are converting RGB565 data to ARGB which means here we may be
-	 converting like this ARGB -> RGB565 -> ARGB which is quite dumb :)
+	 currently the video drivers expect RGB555 or IYUV, but the SDL 2.0 driver can actually handle ARGB as well.
+	 infact the texture is natively ARGB8888, and we are converting RGB555 data to ARGB which means here we may be
+	 converting like this ARGB -> RGB555 -> ARGB which is quite dumb :)
 	 
 	 TODO: figure out a way to support ARGB when using SDL 2
 	 */
