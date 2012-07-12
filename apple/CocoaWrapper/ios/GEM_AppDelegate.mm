@@ -67,7 +67,7 @@ using namespace GemRB;
 	[nibObjects retain];
 	configWin.rootViewController = confControl.rootVC;
 	configWin.screen = [UIScreen mainScreen];
-	[configWin makeKeyAndVisible];
+	[configWin makeKeyAndVisible]; // Note that this causes the window to be retained!
 }
 
 - (void)setupComplete:(NSString*)configPath
@@ -136,6 +136,18 @@ using namespace GemRB;
 		delete fs;
 		Log(ERROR, "Cocoa Wrapper", "Unable to start log file at %s", cLogFile);
 	}
+}
+
+- (void)dealloc
+{
+	// This is really just formallity.
+	// these objects would have been deallocated in runGemRB under normal circumstances
+
+	[configWin release];
+	[nibObjects release];
+	[confControl release];
+
+	[super dealloc];
 }
 
 @end
