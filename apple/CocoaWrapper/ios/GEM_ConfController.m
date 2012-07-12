@@ -20,7 +20,7 @@
 
 #import "GEM_ConfController.h"
 
-#import <SDL/SDL_hints.h>
+#import <SDL/SDL.h>
 
 #include <archive.h>
 #include <archive_entry.h>
@@ -533,6 +533,11 @@ enum ConfigTableSection {
 	 3. ensure we have dropped back to the main runloop so autoreleased objects are disposed of
 	 bonus: the call stack is significantly reduced this way
 	*/
+
+	// SDL disables the event pump after SDL_main returns because normally SDL_main houses the application event loop
+	// GemRB is diffrent and our wrapper interface makes that impossible.
+	SDL_iPhoneSetEventPump(SDL_TRUE);
+
 	[[self delegate] performSelectorOnMainThread:@selector(setupComplete:) withObject:[self selectedConfigPath] waitUntilDone:NO];
 }
 

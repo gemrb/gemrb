@@ -155,7 +155,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	int pitch;
 	SDL_Color color = {0, 0, 0, 0};
 
-	if(!SDL_LockTexture(videoPlayer, NULL, &pixels, &pitch)) {
+	if(SDL_LockTexture(videoPlayer, NULL, &pixels, &pitch) != GEM_OK) {
 		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
 		return;
 	}
@@ -218,7 +218,7 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	Uint8 *pixels;
 	int pitch;
 
-	if(!SDL_LockTexture(videoPlayer, NULL, (void**)&pixels, &pitch)) {
+	if(SDL_LockTexture(videoPlayer, NULL, (void**)&pixels, &pitch) != GEM_OK) {
 		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
 		return;
 	}
