@@ -24,7 +24,7 @@
 using namespace GemRB;
 
 VideoContext::VideoContext(unsigned w, unsigned h, bool yuv)
-: width(w), height(h), YUV(yuv)
+: YUV(yuv), width(w), height(h)
 {
 	if(pthread_mutex_init(&mutex, NULL) != GEM_OK) {
 		Log(ERROR, "VLC Player", "Unable to create mutex!");
