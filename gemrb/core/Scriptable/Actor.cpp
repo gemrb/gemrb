@@ -7323,7 +7323,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	}
 
 	if (critical) {
-		if (inventory.ProvidesCriticalAversion()) {
+		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
 			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
 			critical = false;
