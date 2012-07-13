@@ -51,7 +51,18 @@ FIND_LIBRARY(LIBVLCCORE_LIBRARY NAMES vlccore PATHS
 FIND_LIBRARY(LIBVLCCORE_LIBRARY NAMES vlccore)
 
 IF (LIBVLC_INCLUDE_DIR AND LIBVLC_LIBRARY AND LIBVLCCORE_LIBRARY)
-   SET(LIBVLC_FOUND TRUE)
+  # we require this function from 2.0
+  execute_process(
+    COMMAND grep -sq libvlc_video_set_format_callbacks "${LIBVLC_INCLUDE_DIR}/vlc/libvlc_media_player.h" "${LIBVLC_INCLUDE_DIR}/libvlc_media_player.h"
+    RESULT_VARIABLE LIBVLC_GOOD
+    OUTPUT_VARIABLE TM
+  )
+  #message("1111111: ${LIBVLC_LIBRARY} + ${LIBVLC_INCLUDE_DIR} : ${LIBVLC_GOOD} ~ ${TM}")
+  IF (LIBVLC_GOOD EQUAL 0)
+     SET(LIBVLC_FOUND TRUE)
+  ELSE (LIBVLC_GOOD EQUAL 0)
+     message ("The VLCPlayer plugin requires at least VLC 2.0.0 to build, skipping!")
+  ENDIF (LIBVLC_GOOD EQUAL 0)
 ENDIF (LIBVLC_INCLUDE_DIR AND LIBVLC_LIBRARY AND LIBVLCCORE_LIBRARY)
 
 IF (LIBVLC_FOUND)
