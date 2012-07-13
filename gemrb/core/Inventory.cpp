@@ -1906,7 +1906,9 @@ bool Inventory::ProvidesCriticalAversion()
 		//to get to it (TODO convince ToBEx to move this bit into the accessible range?) - low 24 bits
 		ieDword flag = itm->Flags;
 		gamedata->FreeItem( itm, item->ItemResRef, false );
-		if ( !(flag&IE_ITEM_TOGGLE_CRITS) != ((int) i==SLOT_HEAD) ) return true;
+		bool togglesCrits = (flag&IE_ITEM_TOGGLE_CRITS);
+		bool isHelmet = (i == SLOT_HEAD);
+		if (togglesCrits ^ isHelmet) return true;
 	}
 	return false;
 }
