@@ -1891,9 +1891,14 @@ unsigned int Inventory::FindStealableItem()
 // If an item with bit 25 set is equipped in a helmet slot, aversion is disabled
 bool Inventory::ProvidesCriticalAversion()
 {
-	for (size_t i = 0; i < Slots.size(); i++) {
+	int maxSlot = (int) Slots.size();
+	for (int i = 0; i < maxSlot; i++) {
 		CREItem *item = Slots[i];
-		if (!item || ! (item->Flags & IE_INV_ITEM_EQUIPPED)) {
+		if (!item || (i>=SLOT_INV) || (i<=LAST_INV)) { // ignore items in the backpack
+			continue;
+		}
+		// weapon, but not equipped
+		if (!((i == SLOT_ARMOR) || (i == SLOT_HEAD)) && !(item->Flags & IE_INV_ITEM_EQUIPPED)) {
 			continue;
 		}
 
