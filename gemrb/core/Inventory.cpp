@@ -1894,7 +1894,7 @@ bool Inventory::ProvidesCriticalAversion()
 	int maxSlot = (int) Slots.size();
 	for (int i = 0; i < maxSlot; i++) {
 		CREItem *item = Slots[i];
-		if (!item || (i>=SLOT_INV) || (i<=LAST_INV)) { // ignore items in the backpack
+		if (!item || ((i>=SLOT_INV) && (i<=LAST_INV))) { // ignore items in the backpack
 			continue;
 		}
 		// weapon, but not equipped
