@@ -1180,14 +1180,19 @@ void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 	int luckMod = core->ResolveStatBonus(actor, "fatigue", 1, oldValue);
 	actor->BaseStats[IE_FATIGUE] = newValue;
 	// compensate for the change and modify luck
-	luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
+	if ((int)newValue < 0) {
+		// need to just undo the bonus/malus from before
+		luckMod = - luckMod;
+	} else {
+		luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
+	}
 	// the default value isn't 0, but the maximum penalty and we need to ignore
 	// it due to the constitution bonus possibly putting the value out of range
 	if (luckMod < -80) luckMod = 0;
 	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
 
 	// reuse the luck mod to determine when the actor is tired
-	if (luckMod) {
+	if (luckMod < 0) {
 		actor->VerbalConstant(VB_TIRED, 1);
 	}
 }
