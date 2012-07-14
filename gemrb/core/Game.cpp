@@ -1552,7 +1552,7 @@ void Game::RestParty(int checks, int dream, int hp)
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
-		hoursLeft = area->Rest( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600);
+		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600);
 		if (hoursLeft) {
 			// partial rest only, so adjust the parameters for the loop below
 			if (hp) {

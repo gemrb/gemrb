@@ -455,7 +455,7 @@ public:
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */
-	int Rest(const Point &pos, int hours, int day);
+	int CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
 	void SpawnCreature(const Point &pos, const char *CreName, int radiusx = 0, int radiusy = 0);
 
