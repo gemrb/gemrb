@@ -169,6 +169,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		#also allows for thief kits
 		SkillsAssignable = 1
 		for i in range(SkillsTable.GetRowCount()-2):
+			# -2/+2 to compensate for the special first_level and rate rows
 			SkillName = SkillsTable.GetRowName (i+2)
 			if SkillsTable.GetValue (SkillName, SkillsKitName) != -1:
 				SkillsIndices.append(i)
@@ -188,6 +189,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		else:
 			#get the skill values
 			for i in range(SkillsTable.GetRowCount()-2):
+				# -2/+2 to compensate for the special first_level and rate rows
 				SkillName = SkillsTable.GetRowName (i+2)
 				SkillID = SkillsTable.GetValue (SkillName, "ID")
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID)
@@ -237,7 +239,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	if len(SkillsIndices) > SkillsNumButtons:
 		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, SkillScrollBarPress)
 		#decrease it with the number of controls on screen (list size) and two unrelated rows
-		ScrollBar.SetVarAssoc ("SkillsTopIndex", SkillsTable.GetRowCount()-SkillsNumButtons-1)
+		ScrollBar.SetVarAssoc ("SkillsTopIndex", SkillsTable.GetRowCount()-SkillsNumButtons-2)
 	else:
 		if len(SkillsIndices) and SkillsAssignable:
 			#autoscroll to the first valid skill; luckily all three monk ones are adjacent
