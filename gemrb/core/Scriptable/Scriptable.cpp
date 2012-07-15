@@ -904,7 +904,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 	free(nearActors);
 }
 
-void Scriptable::CastSpellPointEnd(int level)
+void Scriptable::CastSpellPointEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
@@ -916,7 +916,9 @@ void Scriptable::CastSpellPointEnd(int level)
 
 	if (Type == ST_ACTOR) {
 		caster = ((Actor *) this);
-		caster->SetStance(IE_ANI_CONJURE);
+		if (!no_stance) {
+			caster->SetStance(IE_ANI_CONJURE);
+		}
 		if (level == 0) {
 			Actor *actor = NULL;
 			if (Type == ST_ACTOR) {
@@ -1377,7 +1379,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 					caster->CastSpellPoint(targetpos, false, true);
 					strncpy(newspl, SpellResRef, 8);
 					caster->WMLevelMod = tmp3;
-					caster->CastSpellPointEnd(level);
+					caster->CastSpellPointEnd(level, 1);
 				}
 				// reset the ref, since CastSpell*End destroyed it
 				strncpy(SpellResRef, newspl, 8);
