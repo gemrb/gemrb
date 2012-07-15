@@ -2597,10 +2597,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	if (Sender->LastTarget) {
 		//if target was set, fire spell
-		Sender->CastSpellEnd(level);
+		Sender->CastSpellEnd(level, flags&SC_INSTANT);
 	} else if(!Sender->LastTargetPos.isempty()) {
 		//the target was converted to a point
-		Sender->CastSpellPointEnd(level);
+		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
 		Log(ERROR, "GameScript", "SpellCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
@@ -2686,7 +2686,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 	if(!Sender->LastTargetPos.isempty()) {
 		//if target was set, fire spell
-		Sender->CastSpellPointEnd(level);
+		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
 		Log(ERROR, "GameScript", "SpellPointCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
