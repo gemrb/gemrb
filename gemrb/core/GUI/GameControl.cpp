@@ -73,7 +73,7 @@ static const Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
 static const Color darkgreen = {
-    0x00, 0x78, 0x00, 0xff
+	0x00, 0x78, 0x00, 0xff
 };
 static Color white = {
 	0xff, 0xff, 0xff, 0xff
@@ -856,9 +856,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
 						if (src->LastTarget) {
-							src->CastSpellEnd(0);
+							src->CastSpellEnd(0, 0);
 						} else {
-							src->CastSpellPointEnd(0);
+							src->CastSpellPointEnd(0, 0);
 						}
 					}
 				}
