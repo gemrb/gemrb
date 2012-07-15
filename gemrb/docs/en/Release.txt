@@ -18,10 +18,11 @@ Preparing and testing GIT
 
 * Tag current GIT to version number e.g. v0.9.0
   i.e. in the gemrb root directory do
-    git tag -a -m "GemRB 0.9.0" v0.9.0
-    git push origin v0.9.0
+    ver=0.9.0
+    git tag -a -m "GemRB $ver" v$ver
+    git push origin v$ver
 * Update from GIT to the tagged version
-    git checkout v0.9.0
+    git checkout v$ver
 
 * After you're done, update the version with a -git suffix, so it will be
   easier to tell if people are running release builds or not
