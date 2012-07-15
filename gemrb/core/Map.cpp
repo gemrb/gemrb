@@ -705,7 +705,9 @@ void Map::UpdateScripts()
 		//if the actor is immobile, don't run the scripts
 		//FIXME: this is not universaly true, only some states have this effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
-			if (/*actor->Immobile() ||*/ actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
+			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
+			//if that isn't true either, remove this block completely
+			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
 				actor->no_more_steps = true;
 				//FIXME:obviously we miss the ClearPath hack here (but we need a better one)
 				continue;
@@ -1968,11 +1970,16 @@ void Map::GenerateQueues()
 			if ((stance == IE_ANI_TWITCH) && (internalFlag&IF_IDLE) ) {
 				priority = PR_DISPLAY; //display
 			} else {
-				priority = PR_SCRIPT; //run scripts and display
+				//if actor is unscheduled, don't run its scripts
+				if (actor->Schedule(gametime, false) ) {
+					priority = PR_SCRIPT; //run scripts and display
+				} else {
+					priority = PR_IGNORE; //don't run scripts for out of schedule actors
+				}
 			}
 		} else {
 			//dead actors are always visible on the map, but run no scripts
-			if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
+			if ((stance == IE_ANI_TWITCH) || (stance == IE_ANI_DIE) ) {
 				priority = PR_DISPLAY;
 			} else {
 				//isvisible flag is false (visibilitymap) here,
