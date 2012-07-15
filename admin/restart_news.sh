@@ -38,7 +38,5 @@ GemRB git ($rev):
     - 
     - bugfixes
 
-  Applied patches:
-
 LILARCOR
 mv NEWSNEWS NEWS
