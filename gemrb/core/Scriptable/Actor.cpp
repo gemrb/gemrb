@@ -4764,7 +4764,11 @@ void Actor::InitStatsOnLoad()
 		Deactivate();
 		InternalFlags|=IF_REALLYDIED;
 	} else {
-		SetStance( IE_ANI_AWAKE );
+		if (BaseStats[IE_STATE_ID] & STATE_SLEEP) {
+			SetStance( IE_ANI_SLEEP );
+		} else {
+			SetStance( IE_ANI_AWAKE );
+		}
 	}
 	inventory.CalculateWeight();
 	CreateDerivedStats();
