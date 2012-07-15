@@ -968,7 +968,7 @@ void Scriptable::CastSpellPointEnd(int level)
 	}
 }
 
-void Scriptable::CastSpellEnd(int level)
+void Scriptable::CastSpellEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
@@ -979,7 +979,9 @@ void Scriptable::CastSpellEnd(int level)
 	gamedata->FreeSpell(spl, SpellResRef, false);
 	if (Type == ST_ACTOR) {
 		caster = ((Actor *) this);
-		caster->SetStance(IE_ANI_CONJURE);
+		if (!no_stance) {
+			caster->SetStance(IE_ANI_CONJURE);
+		}
 		if (level == 0) {
 			Actor *actor = NULL;
 			if (Type == ST_ACTOR) {
@@ -1119,7 +1121,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef, deplete) ) {
+		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
 			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
 			return -1;
 		}
@@ -1150,7 +1152,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef, deplete) ) {
+		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
 			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
 			return -1;
 		}
@@ -1370,7 +1372,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 					caster->CastSpell(target, false, true);
 					strncpy(newspl, SpellResRef, 8);
 					caster->WMLevelMod = tmp3;
-					caster->CastSpellEnd(level);
+					caster->CastSpellEnd(level, 1);
 				} else {
 					caster->CastSpellPoint(targetpos, false, true);
 					strncpy(newspl, SpellResRef, 8);

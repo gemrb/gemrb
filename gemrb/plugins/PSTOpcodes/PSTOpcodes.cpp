@@ -441,9 +441,11 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Owner->SetSpellResRef(fx->Resource);
 	//cast spell on target
-	Owner->CastSpell(target, false);
+	//flags: deplete, instant, no interrupt
+	Owner->CastSpell(target, false, true, true);
 	//actually finish casting (if this is not good enough, use an action???)
-	Owner->CastSpellEnd(fx->CasterLevel);
+	//flag: instant - no casting animation
+	Owner->CastSpellEnd(fx->CasterLevel, 1);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;

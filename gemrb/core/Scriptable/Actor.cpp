@@ -1991,8 +1991,12 @@ static void InitActorTables()
 				tmp = atoi(tm->QueryField(i, j));
 				//negative values relate to x/2, so we adjust them
 				//positive values relate to x, so we must times by 2
-				if (tmp<0) tmp  = -2*tmp-1;
-				else       tmp *=  2;
+				if (tmp<0) {
+					tmp  = -2*tmp-1;
+				}
+				else {
+					tmp *=  2;
+				}
 				wspattack[i][j] = tmp;
 			}
 		}
@@ -3427,7 +3431,7 @@ void Actor::GetHit()
 	InterruptCasting = true;
 }
 
-bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
+bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant)
 {
 	if (deplete) {
 		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
@@ -3435,7 +3439,9 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 			return true;
 		}
 	}
-	SetStance(IE_ANI_CAST);
+	if (!instant) {
+		SetStance(IE_ANI_CAST);
+	}
 	return false;
 }
 

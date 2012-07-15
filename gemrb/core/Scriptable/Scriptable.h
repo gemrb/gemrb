@@ -348,7 +348,7 @@ public:
 	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );
 	/* spellcasting finished */
 	void CastSpellPointEnd(int level);
-	void CastSpellEnd(int level);
+	void CastSpellEnd(int level, int no_stance);
 	ieDword GetGlobalID() const { return globalID; }
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);

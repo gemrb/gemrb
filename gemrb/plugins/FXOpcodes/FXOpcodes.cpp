@@ -4243,28 +4243,18 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	if (fx->Parameter2) {
-		//apply spell on target
-		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
+	// save the current spell ref, so the rest of its effects can be applied afterwards
+	ieResRef OldSpellResRef;
+	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+	Owner->SetSpellResRef(fx->Resource);
+	//cast spell on target
+	//flags: deplete, instant, no interrupt
+	Owner->CastSpell(target, false, fx->Parameter2==1, true);
+	//actually finish casting (if this is not good enough, use an action???)
+	//flag: no casting animation
+	Owner->CastSpellEnd(fx->Parameter1, fx->Parameter2);
+	Owner->SetSpellResRef(OldSpellResRef);
 
-		// give feedback: Caster - spellname : target
-		char tmp[100];
-		Spell *spl = gamedata->GetSpell(fx->Resource);
-		if (spl) {
-			snprintf(tmp, sizeof(tmp), "%s : %s", core->GetString(spl->SpellName), target->GetName(-1));
-			displaymsg->DisplayStringName(tmp, DMC_WHITE, Owner);
-		}
-	} else {
-		// save the current spell ref, so the rest of its effects can be applied afterwards
-		ieResRef OldSpellResRef;
-		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-		Owner->SetSpellResRef(fx->Resource);
-		//cast spell on target
-		Owner->CastSpell(target, false);
-		//actually finish casting (if this is not good enough, use an action???)
-		Owner->CastSpellEnd(fx->Parameter1);
-		Owner->SetSpellResRef(OldSpellResRef);
-	}
 	return FX_NOT_APPLIED;
 }
 
