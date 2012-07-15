@@ -19,7 +19,14 @@
 #include "System/Logger/File.h"
 
 #include "System/DataStream.h"
+#include "System/FileStream.h"
 #include "System/Logging.h"
+
+#ifndef STATIC_LINK
+# define STATIC_LINK
+#endif
+#include "plugindef.h"
+#include "Interface.h"
 
 #include <cstdio>
 
@@ -44,4 +51,27 @@ Logger* createFileLogger(DataStream* log_file)
 	return new FileLogger(log_file);
 }
 
+static void addLogger()
+{
+	char log_path[_MAX_PATH];
+	FileStream* log_file = new FileStream();
+	PathJoin(log_path, core->GamePath, "GemRB.log", NULL);
+	if (log_file->Create(log_path)) {
+		AddLogger(createFileLogger(log_file));
+	} else {
+		PathJoin(log_path, core->CachePath, "GemRB.log", NULL);
+		if (log_file->Create(log_path)) {
+			AddLogger(createFileLogger(log_file));
+		} else if (log_file->Create("/tmp/GemRB.log")) {
+			AddLogger(createFileLogger(log_file));
+		} else {
+			Log (WARNING, "Logger", "Could not create a log file, skipping!");
+		}
+	}
 }
+
+}
+
+GEMRB_PLUGIN(unused, "tmp/file logger")
+PLUGIN_INITIALIZER(addLogger)
+END_PLUGIN()
