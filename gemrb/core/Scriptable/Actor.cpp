@@ -4834,16 +4834,7 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 	//scripts can still see this type of actor
 
 	if (ga_flags&GA_NO_HIDDEN) {
-		if (Modified[IE_AVATARREMOVAL]) return false;
-
-		bool seer = false;
-		if (checker->Type == ST_ACTOR) {
-			seer = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
-		}
-
-		if ((Modified[IE_EA]>EA_GOODCUTOFF) && (Modified[IE_STATE_ID] & state_invisible) && !seer) {
-			return false;
-		}
+		if (IsInvisibleTo(checker)) return false;
 	}
 
 	if (ga_flags&GA_NO_ALLY) {
@@ -8603,6 +8594,25 @@ int Actor::GetArmorFailure() const
 	}
 
 	return -penalty;
+}
+
+// checks whether the actor is visible to another scriptable
+// if flags is 1, it skips the EA check for STATE_INVISIBLE
+bool Actor::IsInvisibleTo(Scriptable *checker, int flags) const
+{
+	if (Modified[IE_AVATARREMOVAL]) return true;
+
+	bool seer = false;
+	if (checker && checker->Type == ST_ACTOR) {
+		seer = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
+	}
+	if (!seer && (Modified[IE_STATE_ID] & state_invisible)) {
+		if ((flags&1) || (Modified[IE_EA]>EA_GOODCUTOFF)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 }
