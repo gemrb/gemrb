@@ -4829,13 +4829,19 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 	core->SetEventFlag(EF_ACTION);
 }
 
-bool Actor::ValidTarget(int ga_flags) const
+bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 {
 	//scripts can still see this type of actor
 
 	if (ga_flags&GA_NO_HIDDEN) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
-		if ((Modified[IE_EA]>EA_GOODCUTOFF) && (Modified[IE_STATE_ID] & state_invisible) ) {
+
+		bool seer = false;
+		if (checker->Type == ST_ACTOR) {
+			seer = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
+		}
+
+		if ((Modified[IE_EA]>EA_GOODCUTOFF) && (Modified[IE_STATE_ID] & state_invisible) && !seer) {
 			return false;
 		}
 	}

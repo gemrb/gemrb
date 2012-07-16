@@ -512,7 +512,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 	if (target->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) target;
 
-		if (!tar->ValidTarget(seeflag)) {
+		if (!tar->ValidTarget(seeflag, Sender)) {
 			return 0;
 		}
 	}

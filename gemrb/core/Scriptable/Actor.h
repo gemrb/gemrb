@@ -425,7 +425,7 @@ public:
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier);
 	/** Returns true if the actor is targetable */
-	bool ValidTarget(int ga_flags) const;
+	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
 	/** Returns a Stat value */
 	ieDword GetStat(unsigned int StatIndex) const;
 	/** Returns a safe Stat value, one, that is not partially computed */
