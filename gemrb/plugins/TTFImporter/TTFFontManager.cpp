@@ -114,6 +114,7 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		else glyphs[i - FirstChar] = NULL;
 	}
 	Font* font = new Font(glyphs, FirstChar, LastChar, pal);
+	pal->Release();
 	font->ptSize = ptSize;
 	font->style = style;
 	free(glyphs);
