@@ -44,16 +44,6 @@ enum FontStyle {
 class Palette;
 class Sprite2D;
 
-struct StringList {
-	Sprite2D*** strings;
-	unsigned int* heights;
-	unsigned int* lengths;
-	int StringCount;
-	int starty;
-	int curx;
-	int cury;
-};
-
 #define IE_FONT_ALIGN_LEFT   0x00
 #define IE_FONT_ALIGN_CENTER 0x01
 #define IE_FONT_ALIGN_RIGHT  0x02
