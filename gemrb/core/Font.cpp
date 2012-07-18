@@ -83,7 +83,6 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 	SetPalette(pal);
 
 	int w = 0;
-	glyphCount = lastChar - firstChar + 1;
 
 	unsigned int lastX = 0;
 	Sprite2D* currGlyph = NULL;
