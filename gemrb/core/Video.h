@@ -147,7 +147,7 @@ public:
 	virtual Sprite2D* DuplicateSprite(const Sprite2D* spr) = 0;
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags) = 0;
 	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
-		const Region* clip = NULL) = 0;
+		const Region* clip = NULL, Palette* palette = NULL) = 0;
 
 	// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
 	// anchor is false. This is different from the other BlitSprite functions.

@@ -685,7 +685,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
-	const Region* clip)
+	const Region* clip, Palette* palette)
 {
 	if (!spr->vptr) return;
 
@@ -740,7 +740,15 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 			srect = &t;
 
 		}
-		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
+		if (palette) {
+			Palette* tmpPal = spr->GetPalette();
+			SetSurfacePalette(( SDL_Surface * )spr->vptr, (SDL_Color*)palette->col, 256);
+			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
+			SetSurfacePalette(( SDL_Surface * )spr->vptr, (SDL_Color*)tmpPal->col, 256);
+			tmpPal->Release();
+		} else {
+			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
+		}
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
@@ -753,20 +761,21 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 
 		SDL_LockSurface(backBuf);
 
+		Palette* pal = (palette) ? palette : data->pal;
 		SRShadow_Regular shadow;
 
-		if (data->pal->alpha) {
+		if (pal->alpha) {
 			SRTinter_NoTint<true> tinter;
 			SRBlender_Alpha blender;
 
 			BlitSpritePAL_dispatch(false, data->flip_hor,
-			    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
 		} else {
 			SRTinter_NoTint<false> tinter;
 			SRBlender_NoAlpha blender;
 
 			BlitSpritePAL_dispatch(false, data->flip_hor,
-			    backBuf, srcdata, data->pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
 		}
 
 		SDL_UnlockSurface(backBuf);
