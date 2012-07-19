@@ -280,62 +280,6 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 	return af;
 }
 
-/** This function will load the Animation as a Font */
-Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
-{
-	Log(MESSAGE, "BAMImporter", "Constructing BAM font %s.", str->filename);
-
-	unsigned int i = 0, glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;
-	ieWord *FLT = CacheFLT(Count);
-	// Numeric fonts have all frames in single cycle
-	if (CyclesCount > 1) {
-		Count = CyclesCount;
-		glyphCount = (LastChar - FirstChar + 1);
-		if (Count < glyphCount){
-			LastChar = LastChar - (glyphCount - Count);
-			glyphCount = Count;
-		}
-		i = (FirstChar) ? FirstChar - 1 : FirstChar;
-		limit = (FirstChar) ? LastChar - 1 : LastChar;
-		glyphIndexOffset = i;
-	} else { //numeric font
-		Count = FramesCount;
-		glyphCount = Count;
-		if (FirstChar+Count != (unsigned int) LastChar+1) {
-			Log(ERROR, "BAMImporter", "inconsistent font %s: FirstChar=%d LastChar=%d Count=%d",
-					str->filename, FirstChar, LastChar, Count);
-			return NULL;
-		}
-		limit = glyphCount - 1;
-	}
-	assert(glyphCount);
-	Sprite2D** glyphs = (Sprite2D**)malloc( (glyphCount) * sizeof(Sprite2D*) );
-
-	for (; i <= limit; i++) {
-		unsigned int index;
-		if (CyclesCount > 1) {
-			index = FLT[cycles[i].FirstFrame];
-			if (index >= FramesCount) {
-				glyphs[i - glyphIndexOffset] = NULL;
-				continue;
-			}
-		} else {
-			index = i;
-		}
-
-		unsigned char* pixels = (unsigned char*)GetFramePixels( index );
-		if( !pixels) {
-			glyphs[i - glyphIndexOffset] = NULL;
-			continue;
-		}
-		glyphs[i - glyphIndexOffset] = core->GetVideoDriver()->CreateSprite8(frames[index].Width, frames[index].Height, 8, pixels, palette->col, true, 0);
-		glyphs[i - glyphIndexOffset]->YPos = frames[index].YPos;
-		glyphs[i - glyphIndexOffset]->XPos = frames[index].XPos;
-	}
-	free( FLT );
-	Font* fnt = new Font(glyphs, FirstChar, LastChar, palette);
-	return fnt;
-}
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 If the Global Animation Palette is NULL, returns NULL. */
 Sprite2D* BAMImporter::GetPalette()
