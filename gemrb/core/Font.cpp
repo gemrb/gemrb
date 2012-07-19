@@ -165,6 +165,10 @@ const Font::GlyphInfo &Font::getInfo(ieWord chr) const
 	if (chr == '\t') return  whiteSpace[2];
 	//otherwise return an empty region
 	return whiteSpace[0];
+	if (chr == ' ') return whiteSpace[SPACE];
+	if (chr == '\t') return  whiteSpace[TAB];
+	//otherwise return an empty sprite
+	return whiteSpace[BLANK];
 }
 
 bool Font::AddResRef(const ieResRef resref)

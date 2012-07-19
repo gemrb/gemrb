@@ -41,6 +41,12 @@ enum FontStyle {
 	UNDERLINE = 0x04
 };
 
+enum WhiteSpace {
+	BLANK = 0,
+	SPACE = 1,
+	TAB = 2
+};
+
 class Palette;
 class Sprite2D;
 
