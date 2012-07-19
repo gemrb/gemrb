@@ -495,66 +495,6 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 	return dest;
 }
 
-// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
-// anchor is false. This is different from the other BlitSprite functions.
-void SDLVideoDriver::BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x,
-	int y, bool anchor, const Region* clip)
-{
-	if (!spr->vptr) return;
-
-	// Adjust the clipping rect to match the region to blit, and then
-	// let BlitSprite handle the rest
-
-
-	Region c;
-
-	if (clip) {
-		c = *clip;
-		if (!anchor) {
-			c.x -= Viewport.x;
-			c.y -= Viewport.y;
-		}
-	} else {
-		c.x = 0;
-		c.y = 0;
-		c.w = backBuf->w;
-		c.h = backBuf->h;
-	}
-
-
-	Region dest;
-	dest.x = x - spr->XPos;
-	dest.y = y - spr->YPos;
-	if (!anchor) {
-		dest.x -= Viewport.x;
-		dest.y -= Viewport.y;
-	}
-
-	dest.w = size.w;
-	dest.h = size.h;
-
-	// c is the clipping rect, dest the unclipped destination rect
-	// We clip c to dest, and pass the resulting c to BlitSprite
-	if (dest.x > c.x) {
-		c.w -= (dest.x - c.x);
-		c.x = dest.x;
-	}
-	if (dest.y > c.y) {
-		c.h -= (dest.y - c.y);
-		c.y = dest.y;
-	}
-	if (c.x+c.w > dest.x+dest.w) {
-		c.w = dest.x+dest.w-c.x;
-	}
-	if (c.y+c.h > dest.y+dest.h) {
-		c.h = dest.y+dest.h-c.y;
-	}
-
-	if (c.w <= 0 || c.h <= 0) return;
-
-	BlitSprite(spr, x - size.x, y - size.y, anchor, &c);
-}
-
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
 	if (spr->BAM) {

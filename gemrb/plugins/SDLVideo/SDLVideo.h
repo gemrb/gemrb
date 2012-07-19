@@ -98,8 +98,6 @@ public:
 	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
 	void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 					const Region* clip = NULL, Palette* palette = NULL);
-	void BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x, int y,
-		bool anchor = true, const Region* clip = NULL);
 	void BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,

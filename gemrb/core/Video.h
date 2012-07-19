@@ -149,10 +149,6 @@ public:
 	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 		const Region* clip = NULL, Palette* palette = NULL) = 0;
 
-	// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
-	// anchor is false. This is different from the other BlitSprite functions.
-	virtual void BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x, int y,
-		bool anchor = true, const Region* clip = NULL) = 0;
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
