@@ -395,7 +395,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			if (numFingers == core->NumFingScroll
 				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
 				//any # of fingers != NumFingKBoard will scroll a text area
-				if (focusCtrl->ControlType == IE_GUI_TEXTAREA) {
+				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
 					// if we are scrolling a text area we dont want the keyboard in the way
 					HideSoftKeyboard();
 				} else {
@@ -454,7 +454,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 											 (event.tfinger.y / yScaleFactor) + yOffset,
 											 mouseButton, GetModState(SDL_GetModState()) );
 					}
-					ignoreNextFingerUp = false;
 				}
 				if (numFingers != core->NumFingInfo) {
 					// FIXME: this is "releasing" the ALT key even when it hadn't been previously "pushed"
