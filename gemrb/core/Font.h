@@ -64,11 +64,6 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Font {
-public:
-	struct GlyphInfo {
-		short xPos, yPos; // tracks glyph adjustment
-		Region size;
-	};
 private:
 	int glyphCount;
 
@@ -76,15 +71,13 @@ private:
 	int numResRefs;
 
 	Palette* palette;
-	Sprite2D* sprBuffer;//A sprite with all printable ASCII characters printed horizontally acending.
+	Sprite2D** glyphs;
+	Sprite2D* whiteSpace[3];
 
 	/** Sets ASCII code of the first character in the font.
 	 * (it allows remapping numeric fonts from \000 to '0') */
 	ieWord FirstChar;
 	ieWord LastChar;
-
-	std::vector<GlyphInfo> glyphInfo;
-	GlyphInfo whiteSpace[3];//an empty region for non existing chars + space + tab
 public:
 	char name[20];
 	FontStyle style;	  // for informational purposes only
@@ -96,7 +89,8 @@ public:
 	~Font(void);
 
 	//allow reading but not setting glyphs
-	const GlyphInfo& getInfo (ieWord chr) const;
+	const Sprite2D* GetCharSprite(ieWord index) const;
+
 	int GetCharacterCount(){ return glyphCount; };
 
 	bool AddResRef(const ieResRef resref);

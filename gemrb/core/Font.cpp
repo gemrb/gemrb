@@ -37,6 +37,11 @@ namespace GemRB {
 
 #define PARAGRAPH_START_X 5;
 
+#define SET_BLIT_PALETTE( palette )\
+if (palette) ((Palette*)palette)->IncRef();\
+if (blitPalette) blitPalette->Release();\
+blitPalette = palette;
+
 static const Color black = {0, 0, 0, 0};
 
 inline size_t mystrlen(const char* string)
@@ -62,14 +67,11 @@ glyphs should be all characters we are interested in printing with the font save
 Font takes responsibility for glyphs so we must free them once done
 */
 Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
-	: glyphCount(lastChar - firstChar + 1), glyphInfo(glyphCount), whiteSpace()
+	: glyphCount(lastChar - firstChar + 1), glyphs(glyphs), FirstChar(firstChar), LastChar(lastChar)
 {
 	assert(glyphs);
 	assert(pal);
 	assert(firstChar <= lastChar);
-
-	FirstChar = firstChar;
-	LastChar = lastChar;
 
 	palette = NULL;
 	resRefs = NULL;
@@ -82,73 +84,28 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 
 	SetPalette(pal);
 
-	int w = 0;
-
-	unsigned int lastX = 0;
-	Sprite2D* currGlyph = NULL;
-	ieWord i;
-	for (i = 0; i < glyphCount; i++) { // printable characters range perhaps minus whitespace (whitespace handled later)
-		currGlyph = glyphs[i];
-		if (!currGlyph) { // not printble
-			glyphInfo[i].size.x = 0;
-			glyphInfo[i].size.y = 0;
-			glyphInfo[i].size.w = 0;
-			glyphInfo[i].size.h = 0;
-			glyphInfo[i].xPos = 0;
-			glyphInfo[i].yPos = 0;
-			continue;
-		}
-
-		w += currGlyph->Width;
-		if (currGlyph->Height > maxHeight) maxHeight = currGlyph->Height;
-
-		glyphInfo[i].size.x = lastX;
-		glyphInfo[i].size.y = 0;
-		glyphInfo[i].size.w = currGlyph->Width;
-		glyphInfo[i].size.h = currGlyph->Height;
-		glyphInfo[i].xPos = currGlyph->XPos;
-		glyphInfo[i].yPos = currGlyph->YPos;
-		lastX += currGlyph->Width;
+	for (int i = 0; i < glyphCount; i++)
+	{
+		glyphs[i]->XPos = 0;
+		glyphs[i]->SetPalette(palette);
+		if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
 	}
 
-	// we dont really need a whitespace sprite since its blank we just need its size
-	if (FirstChar > ' ') whiteSpace[1].size = Region(0, 0, (int)(maxHeight * 0.25), 0);// standard space width is 1/4 ptSize
-	if (FirstChar > '\t') whiteSpace[2].size = Region(0, 0, (whiteSpace[1].size.w * 4), 0);// standard tab width is 4 spaces???
-
-	Video* video = core->GetVideoDriver();
-
-	//cast to uchar because uchar is 1 byte and we can do pointer arithmatic with it.
-	unsigned char* tmpPixels = (unsigned char*)malloc(w * maxHeight);
-
-	lastX = 0;
-	for (i = 0; i < glyphCount; i++) { //printable characters range perhapps minus whitespace (whitespace handled later)
-		currGlyph = glyphs[i];
-		if (!currGlyph) continue;
-
-		assert(currGlyph->Bpp == 8);
-		// copy the pixels into the buffer
-		// this is assuming the width will be the pitch
-		unsigned char * dstPtr = (unsigned char*)tmpPixels + lastX;
-		unsigned char * srcPtr = (unsigned char*)currGlyph->pixels;
-		for (int glyphY = 0; glyphY < currGlyph->Height; glyphY++) {
-			memcpy( dstPtr, srcPtr, currGlyph->Width);
-			srcPtr += currGlyph->Width;
-			dstPtr += w;
-		}
-		lastX += currGlyph->Width;
-
-		video->FreeSprite(currGlyph);
-	}
-
-	sprBuffer = core->GetVideoDriver()->CreateSprite8(w, maxHeight, 8, (void*)tmpPixels, pal->col, true, 0);
+	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
+	// standard space width is 1/4 ptSize
+	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(maxHeight * 0.25), 0, 8, NULL, palette->col);
+	// standard tab width is 4 spaces???
+	whiteSpace[TAB] = core->GetVideoDriver()->CreateSprite8((whiteSpace[1]->Width * 4), 0, 8, NULL, palette->col);
 }
 
 Font::~Font(void)
 {
-	Video *video = core->GetVideoDriver();
-	video->FreeSprite( sprBuffer );
-	SetPalette(NULL);
-
+	for (int i = 0; i < glyphCount; i++)
+	{
+		core->GetVideoDriver()->FreeSprite(glyphs[i]);
+	}
+	palette->Release();
+	free(glyphs);
 	free(resRefs);
 }
 
@@ -156,15 +113,11 @@ Font::~Font(void)
  Return a region specefying the size of character 'chr'
  if 'chr' is not in the font then return empty region.
  */
-const Font::GlyphInfo &Font::getInfo(ieWord chr) const
+const Sprite2D* Font::GetCharSprite(ieWord chr) const
 {
 	if (chr >= FirstChar && chr <= LastChar) {
-		return glyphInfo[chr - FirstChar];
+		return glyphs[chr - FirstChar];
 	}
-	if (chr == ' ') return whiteSpace[1];
-	if (chr == '\t') return  whiteSpace[2];
-	//otherwise return an empty region
-	return whiteSpace[0];
 	if (chr == ' ') return whiteSpace[SPACE];
 	if (chr == '\t') return  whiteSpace[TAB];
 	//otherwise return an empty sprite
@@ -214,9 +167,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 		currCap = string[0];
 		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
-			while(isspace(currCap) && num_empty_rows < (int)len){//we cant cap whitespace so keep looking
+			while(isspace(currCap) && num_empty_rows < (int)len){//we cant cap whiteSpace so keep looking
 				currCap = string[++num_empty_rows];
-				// WARNING: this assumes all preceeding whitespace is an empty line
+				// WARNING: this assumes all preceeding whiteSpace is an empty line
 			}
 			last_initial_row = (startrow - 1);
 			initials_rows = initials_rows + num_empty_rows - 1;
@@ -229,11 +182,12 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		pal = palette;
 	}
 
+	Palette* blitPalette = NULL;
+	SET_BLIT_PALETTE(pal);
+
 	if (initials==this) {
 		enablecap=false;
 	}
-
-	sprBuffer->SetPalette( pal );
 
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
@@ -243,7 +197,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		for (size_t i = 0; i < len; i++) {
-			int height = getInfo(tmp[i]).yPos;
+			int height = GetCharSprite(tmp[i])->Height;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -279,6 +233,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	}
 
 	Video* video = core->GetVideoDriver();
+	const Sprite2D* currGlyph;
+	unsigned char currChar = '\0';
 	int row = 0;
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
@@ -308,12 +264,12 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 					continue;
 				const Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
-				sprBuffer->SetPalette( newPal );
+				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
-				sprBuffer->SetPalette( pal );
+				SET_BLIT_PALETTE(pal);
 				continue;
 			}
 			if (stricmp( "p", tag ) == 0) {
@@ -348,7 +304,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			}
 			continue;
 		}
-		unsigned char currChar = tmp[i];
+		currChar = tmp[i];
 		if (initials && capital && enablecap) {
 			currCap = currChar;
 			x = initials->PrintInitial( x, y, rgn, currChar );
@@ -374,18 +330,17 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			if (num_empty_rows) continue;
 			else x += psx;
 		}
-		video->BlitSpriteRegion( sprBuffer, getInfo(currChar).size,
-			x + rgn.x, y + rgn.y - getInfo(currChar).yPos, true, &rgn );
+		currGlyph = GetCharSprite(currChar);
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, blitPalette);
 		if (cursor && ( i == curpos )) {
-			video->BlitSprite( cursor, x + rgn.x,
-				y + rgn.y, true, &rgn );
+			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, true, &rgn );
 		}
-		x += getInfo(currChar).size.w;
+		x += currGlyph->Width;
 	}
 	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x + rgn.x,
-			y + rgn.y, true, &rgn );
+		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, true, &rgn );
 	}
+	SET_BLIT_PALETTE(NULL);
 	free( tmp );
 }
 
@@ -407,7 +362,6 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		capital=1;
 		enablecap=true;
 	}
-	(void)enablecap; //HACK: shut up unused-but-set warnings, until the var is reused
 
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette* pal = hicolor;
@@ -418,7 +372,9 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		initials = NULL;
 	}
 
-	sprBuffer->SetPalette( pal );
+	Palette* blitPalette = NULL;
+	SET_BLIT_PALETTE( pal );
+
 	size_t len = strlen( ( char* ) string );
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
@@ -434,7 +390,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		
 		for (size_t i = 0; i < len; i++) {
 			if (tmp[i] == 0) continue;
-			int height = getInfo(tmp[i]).yPos;
+			int height =GetCharSprite(i)->YPos;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -472,6 +428,9 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	} else if (Alignment & IE_FONT_ALIGN_TOP) {
 		y += 5;
 	}
+
+	unsigned char currChar = '\0';
+	const Sprite2D* currGlyph = NULL;
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
 			i++;
@@ -499,12 +458,12 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 					continue;
 				const Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
-				sprBuffer->SetPalette( newPal );
+				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
-				sprBuffer->SetPalette( pal );
+				SET_BLIT_PALETTE(pal);
 				continue;
 			}
 			if (stricmp( "p", tag ) == 0) {
@@ -529,31 +488,33 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			}
 			continue;
 		}
-		unsigned char currChar = tmp[i];
+		currChar = tmp[i];
+		currGlyph = GetCharSprite(currChar);
 		if (initials && capital) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
 			enablecap=false;
 			continue;
 		}
-		video->BlitSpriteRegion( sprBuffer, getInfo(currChar).size,
-			x + rgn.x, y + rgn.y - getInfo(currChar).yPos,
-			anchor, &cliprgn );
+
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette);
+
 		if (cursor && ( curpos == i ))
 			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
-		x += getInfo(currChar).size.w;
+		x += currGlyph->Width;
 	}
 	if (cursor && ( curpos == len )) {
 		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
 	}
+	SET_BLIT_PALETTE(NULL);
 	free( tmp );
 }
 
 int Font::PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const
 {
-	Video *video = core->GetVideoDriver();
-	video->BlitSpriteRegion( sprBuffer, getInfo(currChar).size,
-		x + rgn.x, y + rgn.y - getInfo(currChar).yPos, true, &rgn );
-	x += getInfo(currChar).size.w;
+	const Sprite2D* glyph = GetCharSprite(currChar);
+	core->GetVideoDriver()->BlitSprite(glyph, x + rgn.x, y + rgn.y, true, &rgn);
+
+	x += glyph->Width;
 	return x;
 }
 
@@ -566,7 +527,7 @@ int Font::CalcStringWidth(const char* string, bool NoColor) const
 				i++;
 			}
 		}
-		ret += getInfo((unsigned char)string[i]).size.w;
+		ret += GetCharSprite(string[i])->Width;
 	}
 	return ( int ) ret;
 }
@@ -648,9 +609,9 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 			string[pos] = ( unsigned char ) (string[pos]);
 		}
 
-		wx += getInfo(string[pos]).size.w;
+		wx += GetCharSprite(string[pos])->Width;
 		if (initials && enablecap) {
-			wx += initials->getInfo(string[pos]).size.w;
+			wx += GetCharSprite(string[pos])->Width;
 			enablecap=false;
 			initials_x = wx;
 			//how many more lines to be indented (one was already indented)
@@ -679,6 +640,5 @@ void Font::SetPalette(Palette* pal)
 	if (palette) palette->Release();
 	palette = pal;
 }
-
-
+#undef SET_BLIT_PALETTE
 }

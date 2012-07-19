@@ -334,7 +334,6 @@ Font* BAMImporter::GetFont(ieWord FirstChar, ieWord LastChar)
 	}
 	free( FLT );
 	Font* fnt = new Font(glyphs, FirstChar, LastChar, palette);
-	free(glyphs);
 	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.

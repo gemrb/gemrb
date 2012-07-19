@@ -31,7 +31,7 @@ namespace GemRB {
 class GEM_EXPORT FontManager : public Resource {
 private:
 	/*
-	 Public data members
+	 private data members
 	 */
 public:
 	/*
