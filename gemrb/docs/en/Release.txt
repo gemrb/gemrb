@@ -30,7 +30,7 @@ Preparing and testing GIT
 Source release
 ==============
 
-* on Unix/Linux: 
+* via cmake/autotools:
   make dist
 
 
@@ -51,8 +51,14 @@ Linux binary release
 Windows binary release
 ======================
 
-* FIXME: To be defined....
+If gembot is around on IRC, ask it to make a build for the tagged revision:
+  gembot: force build --revision=701453842c7cb5783 nmake-msvc++10 release build
+  gembot: watch nmake-msvc++10
 
+It will tell you where to see the report and on the last (upload) step,
+there will also be a link for the binary download. Rename it, upload
+it to the main sourceforge windows directory and mark it as default for
+the platform.
 
 Release and Announcements
 =========================
