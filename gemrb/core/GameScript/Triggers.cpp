@@ -2797,12 +2797,18 @@ int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 int GameScript::AreaType(Scriptable* Sender, Trigger* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
+	if (!map) {
+		return 1;
+	}
 	return (map->AreaType&parameters->int0Parameter)>0;
 }
 
 int GameScript::IsExtendedNight( Scriptable* Sender, Trigger* /*parameters*/)
 {
 	Map *map=Sender->GetCurrentArea();
+	if (!map) {
+		return 1;
+	}
 	if (map->AreaType&AT_EXTENDED_NIGHT) {
 		return 1;
 	}
@@ -2812,12 +2818,18 @@ int GameScript::IsExtendedNight( Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::AreaFlag(Scriptable* Sender, Trigger* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
+	if (!map) {
+		return 1;
+	}
 	return (map->AreaFlags&parameters->int0Parameter)>0;
 }
 
 int GameScript::AreaRestDisabled(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	Map *map=Sender->GetCurrentArea();
+	if (!map) {
+		return 1;
+	}
 	if (map->AreaFlags&2) {
 		return 1;
 	}
