@@ -919,13 +919,13 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 			caster->SetStance(IE_ANI_CONJURE);
 			caster->CureInvisibility();
 		}
-		if (level == 0) {
-			if (caster) {
-				level = caster->GetCasterLevel(nSpellType);
-			} else {
-				//default caster level is 1
-				level = 1;
-			}
+	}
+	if (level == 0) {
+		if (caster) {
+			level = caster->GetCasterLevel(nSpellType);
+		} else {
+			//default caster level is 1
+			level = 1;
 		}
 	}
 
@@ -983,8 +983,13 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 			caster->SetStance(IE_ANI_CONJURE);
 			caster->CureInvisibility();
 		}
-		if (level == 0) {
+	}
+	if (level == 0) {
+		if (caster) {
 			level = caster->GetCasterLevel(nSpellType);
+		} else {
+			//default caster level is 1
+			level = 1;
 		}
 	}
 
