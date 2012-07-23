@@ -355,13 +355,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Palette* hicolor, unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
-	bool enablecap=false;
-	int capital = 0;
-	if (initials)
-	{
-		capital=1;
-		enablecap=true;
-	}
+	int capital = (initials) ? 1 : 0;
 
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette* pal = hicolor;
@@ -446,9 +440,6 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 
 			if (strnicmp( tag, "capital=",8)==0) {
 				sscanf( tag, "capital=%d", &capital);
-				if (capital) {
-					enablecap=true;
-				}
 				continue;
 			}
 			
@@ -492,7 +483,6 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		currGlyph = GetCharSprite(currChar);
 		if (initials && capital) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
-			enablecap=false;
 			continue;
 		}
 
