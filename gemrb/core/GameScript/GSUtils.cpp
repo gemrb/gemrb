@@ -1325,7 +1325,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 	//action performed
-	actor->SetTarget( target );
+	actor->FaceTarget( target );
 
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
 		(PersonalDistance(Sender, target) > wi.range) ||

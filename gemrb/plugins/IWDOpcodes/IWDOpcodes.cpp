@@ -1941,7 +1941,7 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		//see the nearest enemy
 		if (SeeCore(target, Enemy, false)) {
-			target->SetTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
+			target->FaceTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
 			//this is highly unsure
 			//fx->Parameter1=1;
 		}
@@ -3337,7 +3337,7 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (enemy && (PersonalDistance(enemy, target)<50) && target->LastSeen!=target->LastTarget) {
 			displaymsg->DisplayConstantStringNameValue(STR_CLEAVE, DMC_WHITE, target, fx->Parameter1);
 			target->attackcount=fx->Parameter1;
-			target->SetTarget(enemy);
+			target->FaceTarget(enemy);
 			target->LastTarget=target->LastSeen;
 			//linger around for more
 			return FX_APPLIED;

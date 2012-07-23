@@ -599,8 +599,8 @@ public:
 	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */
 	void AttackedBy(Actor *actor);
-	/* sets target for immediate attack */
-	void SetTarget( Scriptable *actor);
+	/* reorients to face target (for immediate attack) */
+	void FaceTarget(Scriptable *actor);
 	/* returns the number of attacks (handles monk barehanded bonus) */
 	ieDword GetNumberOfAttacks() const;
 	/* starts combat round*/
