@@ -8598,7 +8598,7 @@ int Actor::GetArmorFailure() const
 
 // checks whether the actor is visible to another scriptable
 // if flags is 1, it skips the EA check for STATE_INVISIBLE
-bool Actor::IsInvisibleTo(Scriptable *checker, int flags) const
+bool Actor::IsInvisibleTo(Scriptable *checker) const
 {
 	if (Modified[IE_AVATARREMOVAL]) return true;
 
@@ -8607,9 +8607,7 @@ bool Actor::IsInvisibleTo(Scriptable *checker, int flags) const
 		seer = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
 	}
 	if (!seer && (Modified[IE_STATE_ID] & state_invisible)) {
-		if ((flags&1) || (Modified[IE_EA]>EA_GOODCUTOFF)) {
-			return true;
-		}
+		return true;
 	}
 
 	return false;

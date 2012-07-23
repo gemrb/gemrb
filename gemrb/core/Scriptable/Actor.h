@@ -823,7 +823,7 @@ public:
 	/* returns the armor check penalty */
 	int GetArmorFailure() const;
 	bool IsDead() const;
-	bool IsInvisibleTo(Scriptable *checker, int flags=0) const;
+	bool IsInvisibleTo(Scriptable *checker) const;
 };
 }
 

@@ -96,7 +96,7 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 		Actor *source = (Actor *)Sender;
 
 		// Detect() ignores invisibility completely
-		if (!ignoreinvis && source->IsInvisibleTo(target, 1)) {
+		if (!ignoreinvis && source->IsInvisibleTo(target)) {
 			return false;
 		}
 
