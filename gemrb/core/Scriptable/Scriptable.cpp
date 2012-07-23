@@ -920,10 +920,8 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 			caster->CureInvisibility();
 		}
 		if (level == 0) {
-			Actor *actor = NULL;
-			if (Type == ST_ACTOR) {
-				actor = (Actor *) this;
-				level = actor->GetCasterLevel(nSpellType);
+			if (caster) {
+				level = caster->GetCasterLevel(nSpellType);
 			} else {
 				//default caster level is 1
 				level = 1;
@@ -986,11 +984,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 			caster->CureInvisibility();
 		}
 		if (level == 0) {
-			Actor *actor = NULL;
-			if (Type == ST_ACTOR) {
-				actor = (Actor *) this;
-				level = actor->GetCasterLevel(nSpellType);
-			}
+			level = caster->GetCasterLevel(nSpellType);
 		}
 	}
 
