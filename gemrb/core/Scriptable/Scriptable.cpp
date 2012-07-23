@@ -704,7 +704,6 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	int projectileCount = 1;
 	if (Type == ST_ACTOR) {
 		caster = (Actor *) this;
-		caster->CureInvisibility();
 		if (spl->Flags&SF_HOSTILE) {
 			caster->CureSanctuary();
 		}
@@ -918,6 +917,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		caster = ((Actor *) this);
 		if (!no_stance) {
 			caster->SetStance(IE_ANI_CONJURE);
+			caster->CureInvisibility();
 		}
 		if (level == 0) {
 			Actor *actor = NULL;
@@ -983,6 +983,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		caster = ((Actor *) this);
 		if (!no_stance) {
 			caster->SetStance(IE_ANI_CONJURE);
+			caster->CureInvisibility();
 		}
 		if (level == 0) {
 			Actor *actor = NULL;
