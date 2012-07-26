@@ -32,19 +32,19 @@
 
 using namespace GemRB;
 
-/*
-TODO: ditch SDL_TTF and use FreeType directly
-*/
-
 TTFFontManager::~TTFFontManager(void)
 {
-	if (TTF_WasInit()) TTF_Quit();
+	FT_Done_FreeType( library );
 }
 
 TTFFontManager::TTFFontManager(void)
 {
 	FontPath[0] = 0;
-	if (!TTF_WasInit()) TTF_Init();
+	FT_Error error = FT_Init_FreeType( &library );
+	if ( error ) {
+		LogFTError(error);
+	}
+}
 }
 
 bool TTFFontManager::Open(DataStream* stream)

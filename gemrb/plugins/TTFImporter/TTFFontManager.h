@@ -21,6 +21,9 @@
 #ifndef GemRB_TTFFont_h
 #define GemRB_TTFFont_h
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -34,6 +37,7 @@ Private ivars
 */
 private:
 	char FontPath[_MAX_PATH];
+	FT_Library library;
 public:
 /*
 Public ivars
