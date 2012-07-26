@@ -46,6 +46,7 @@ private:
 /*
 Private methods
 */
+	void LogFTError(FT_Error errCode) const;
 public:
 /*
 Public methods

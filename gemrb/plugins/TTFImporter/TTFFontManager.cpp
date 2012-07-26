@@ -45,6 +45,30 @@ TTFFontManager::TTFFontManager(void)
 		LogFTError(error);
 	}
 }
+
+void TTFFontManager::LogFTError(FT_Error errCode) const
+{
+	static const struct
+	{
+		int          err_code;
+		const char*  err_msg;
+	} ft_errors[] = {
+#include <freetype/fterrors.h>
+	};
+	int i;
+	const char *err_msg;
+
+	err_msg = NULL;
+	for ( i=0; i < (int)((sizeof ft_errors)/(sizeof ft_errors[0])); ++i ) {
+		if ( errCode == ft_errors[i].err_code ) {
+			err_msg = ft_errors[i].err_msg;
+			break;
+		}
+	}
+	if ( !err_msg ) {
+		err_msg = "unknown FreeType error";
+	}
+	Log(ERROR, "TTF Manager", err_msg);
 }
 
 bool TTFFontManager::Open(DataStream* stream)
