@@ -760,14 +760,17 @@ void GameControl::SelectActor(int whom, int type)
 	}
 	if (type==1) {
 		game->SelectActor( actor, true, SELECT_NORMAL );
+		actor->SelectActor();
 		return;
 	}
 
 	bool was_selected = actor->IsSelected();
-	if (game->SelectActor( actor, true, SELECT_REPLACE ))
+	if (game->SelectActor( actor, true, SELECT_REPLACE )) {
 		if (was_selected || (ScreenFlags & SF_ALWAYSCENTER)) {
 			ScreenFlags |= SF_CENTERONACTOR;
 		}
+		actor->SelectActor();
+	}
 }
 
 //Effect for the ctrl-r cheatkey (resurrect)
