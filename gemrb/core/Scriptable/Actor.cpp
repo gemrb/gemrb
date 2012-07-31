@@ -3235,7 +3235,7 @@ bool Actor::GetPartyComment()
 }
 
 //call this only from gui selects
-void Actor::SelectActor()
+void Actor::PlaySelectionSound()
 {
 	playedCommandSound = false;
 	switch (sel_snd_freq) {

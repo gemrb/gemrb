@@ -500,7 +500,7 @@ public:
 	/* receives undead turning message */
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
-	void SelectActor();
+	void PlaySelectionSound();
 	/* call this when adding actions via gui */
 	void CommandActor();
 	/** handle panic and other involuntary actions that mess with scripting */

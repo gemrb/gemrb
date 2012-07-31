@@ -760,7 +760,7 @@ void GameControl::SelectActor(int whom, int type)
 	}
 	if (type==1) {
 		game->SelectActor( actor, true, SELECT_NORMAL );
-		actor->SelectActor();
+		actor->PlaySelectionSound();
 		return;
 	}
 
@@ -769,7 +769,7 @@ void GameControl::SelectActor(int whom, int type)
 		if (was_selected || (ScreenFlags & SF_ALWAYSCENTER)) {
 			ScreenFlags |= SF_CENTERONACTOR;
 		}
-		actor->SelectActor();
+		actor->PlaySelectionSound();
 	}
 }
 
@@ -2077,7 +2077,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	if (Button == GEM_MB_MENU && (!core->HasFeature(GF_HAS_FLOAT_MENU) || Mod)) {
 		if (actor) {
 			//play select sound on right click on actor
-			actor->SelectActor();
+			actor->PlaySelectionSound();
 			return;
 		}
 		// reset the action bar
@@ -2213,7 +2213,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	//we got an actor past this point
 	if (target_mode == TARGET_MODE_NONE) {
 		//play select sound
-		actor->SelectActor();
+		actor->PlaySelectionSound();
 	}
 
 	PerformActionOn(actor);

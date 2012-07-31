@@ -5071,7 +5071,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 
 	game->SelectActor( actor, (bool) Select, Flags );
 	if (actor && (bool) Select && !(Flags&SELECT_QUIET)) {
-		actor->SelectActor();
+		actor->PlaySelectionSound();
 	}
 
 	Py_INCREF( Py_None );
