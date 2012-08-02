@@ -1166,7 +1166,7 @@ void Interface::Main()
 		}
 		if (TickHook)
 			TickHook->call();
-	} while (video->SwapBuffers() == GEM_OK);
+	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 	gamedata->FreePalette( palette );
 }
 
@@ -3572,7 +3572,7 @@ void Interface::AskAndExit()
 
 void Interface::ExitGemRB()
 {
-	return video->Quit();
+	QuitFlag |= QF_KILL;
 }
 /** Returns the variables dictionary */
 Variables* Interface::GetDictionary() const

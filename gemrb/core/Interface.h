@@ -192,6 +192,7 @@ public:
 #define QF_CHANGESCRIPT  4
 #define QF_LOADGAME      8
 #define QF_ENTERGAME     16
+#define QF_KILL			32
 
 //events that are called out of drawwindow
 //they wait until the condition is right
