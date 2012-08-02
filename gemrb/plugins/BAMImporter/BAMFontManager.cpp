@@ -63,7 +63,7 @@ Font* BAMFontManager::GetFont(ieWord FirstChar,
 		Count = af->GetFrameCount();
 		glyphCount = Count;
 		if (FirstChar+Count != (unsigned int) LastChar+1) {
-			Log(ERROR, "BAMImporter", "inconsistent font %s: FirstChar=%d LastChar=%d Count=%d",
+			Log(ERROR, "BAMFontManager", "inconsistent font %s: FirstChar=%d LastChar=%d Count=%d",
 				str->filename, FirstChar, LastChar, Count);
 			return NULL;
 		}
