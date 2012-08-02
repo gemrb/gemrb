@@ -1389,7 +1389,6 @@ int Interface::LoadSprites()
 					}
 				}
 				pal = CreatePalette(fore, back);
-				pal->CreateShadedAlphaChannel();
 			}
 			ResourceHolder<FontManager> fntMgr(font_name);
 			if (fntMgr) fnt = fntMgr->GetFont(first_char, last_char, font_size, font_style, pal);
