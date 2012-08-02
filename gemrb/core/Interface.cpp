@@ -3559,7 +3559,7 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 	return sgiterator;
 }
 /** Sends a termination signal to the Video Driver */
-bool Interface::Quit(void)
+void Interface::ExitGemRB()
 {
 	return video->Quit();
 }

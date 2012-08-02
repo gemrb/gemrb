@@ -161,7 +161,7 @@ inline PyObject* RuntimeError(const char* msg)
 	Log(ERROR, "GUIScript", "Runtime Error:");
 	PyErr_SetString( PyExc_RuntimeError, msg );
 	if (QuitOnError) {
-		core->Quit();
+		core->ExitGemRB();
 	}
 	return NULL;
 }
@@ -176,7 +176,7 @@ inline PyObject* AttributeError(const char* doc_string)
 	Log(ERROR, "GUIScript", "Syntax Error:");
 	PyErr_SetString(PyExc_AttributeError, doc_string);
 	if (QuitOnError) {
-		core->Quit();
+		core->ExitGemRB();
 	}
 	return NULL;
 }
@@ -3830,10 +3830,7 @@ PyDoc_STRVAR( GemRB_Quit__doc,
 
 static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 {
-	bool ret = core->Quit();
-	if (!ret) {
-		return NULL;
-	}
+	core->ExitGemRB();
 
 	Py_INCREF( Py_None );
 	return Py_None;
