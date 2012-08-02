@@ -3558,7 +3558,18 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 {
 	return sgiterator;
 }
-/** Sends a termination signal to the Video Driver */
+
+void Interface::AskAndExit()
+{
+	if (game) {
+		SetPause(PAUSE_ON);
+		LoadWindowPack("GUIOPT");
+		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
+	} else {
+		ExitGemRB();
+	}
+}
+
 void Interface::ExitGemRB()
 {
 	return video->Quit();

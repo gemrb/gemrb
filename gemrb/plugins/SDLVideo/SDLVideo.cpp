@@ -150,8 +150,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	switch (event.type) {
 			/* Process the appropriate event type */
 		case SDL_QUIT:
-			/* Handle a QUIT event */
-			return GEM_ERROR;
+			/* Quit event originated from outside GemRB so ask the user if we should exit */
+			core->AskAndExit();
+			return GEM_OK;
 			break;
 		case SDL_KEYUP:
 			switch(event.key.keysym.sym) {

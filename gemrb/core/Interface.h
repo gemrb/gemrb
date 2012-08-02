@@ -788,7 +788,7 @@ public:
 	bool IsFreezed();
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(bool allow_delete = false);
-	/** Sends a termination signal to the Video Driver */
+	void AskAndExit();
 	void ExitGemRB(void);
 	/** CheatKey support */
 	inline void EnableCheatKeys(int Flag)
