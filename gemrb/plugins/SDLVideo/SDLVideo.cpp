@@ -1616,18 +1616,6 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 	return;
 }
 
-/** Send a Quit Signal to the Event Queue */
-bool SDLVideoDriver::Quit()
-{
-	SDL_Event evtQuit = SDL_Event();
-
-	evtQuit.type = SDL_QUIT;
-	if (SDL_PushEvent( &evtQuit ) == -1) {
-		return false;
-	}
-	return true;
-}
-
 Palette* SDLVideoDriver::GetPalette(void *vptr)
 {
 	SDL_Surface* s = ( SDL_Surface* ) vptr;

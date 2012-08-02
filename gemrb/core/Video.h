@@ -187,8 +187,6 @@ public:
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
-	/** Sends a Quit Signal to the Event Queue */
-	virtual bool Quit(void) = 0;
 	/** Gets the Palette of a surface */
 	virtual Palette* GetPalette(void* surface) = 0;
 	/** Flips sprite vertically, returns new sprite */
