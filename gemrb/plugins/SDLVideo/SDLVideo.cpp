@@ -1003,16 +1003,10 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	unsigned int Height = r.h ? r.h : disp->h;
 	SDL_Rect src = {(Sint16)r.x, (Sint16)r.y, (Uint16)r.w, (Uint16)r.h};
 
-
-	SDL_Surface* surf = SDL_CreateRGBSurface( SDL_SWSURFACE, Width, Height, 24,
-				0xFF0000, 0x00FF00, 0x0000FF, 0x000000 );
-	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, surf, NULL);
 	void* pixels = malloc( Width * Height * 3 );
-	for (unsigned int y = 0; y < Height; y++)
-		memcpy( (char*)pixels+(Width * y * 3), (char*)surf->pixels+(surf->pitch * y), Width * 3 );
-	//freeing up temporary surface as we copied its pixels
 	Sprite2D* screenshot = CreateSprite( Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels, false, 0 );
-	SDL_FreeSurface(surf);
+	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, (SDL_Surface*)screenshot->vptr, NULL);
+
 	return screenshot;
 }
 
