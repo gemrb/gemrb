@@ -318,16 +318,18 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 			enablecap = false;
 			continue;
-		}else if(initials && currCap && row > last_initial_row && (row - num_empty_rows - initials_row) <= ((initials->maxHeight-1)/maxHeight)){
+		} else if (initials && currCap
+				   && row > last_initial_row
+				   && (row - num_empty_rows - initials_row) <= ((initials->maxHeight-1)/maxHeight)){
 			// means this row doesnt have a cap, but a preceeding one did and its overlapping this row
 			int initY = y;
-			if (!num_empty_rows) {// num_empty_rows is for scrolling text areas
-				initY = (y - (maxHeight * (row - initials_row)));
+			if (!num_empty_rows || row > num_empty_rows) {// num_empty_rows is for scrolling text areas
+				initY = (y - (maxHeight * (row - initials_row - num_empty_rows)));
 			}
 			x = initials->PrintInitial( x, initY, rgn, currCap );
 			initials_x = x;
 			last_initial_row++;
-			if (num_empty_rows) continue;
+			if (num_empty_rows && row <= num_empty_rows) continue;
 			else x += psx;
 		}
 		currGlyph = GetCharSprite(currChar);
