@@ -601,14 +601,15 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 			string[pos] = ( unsigned char ) (string[pos]);
 		}
 
-		wx += GetCharSprite(string[pos])->Width;
 		if (initials && enablecap) {
-			wx += GetCharSprite(string[pos])->Width;
+			wx += initials->GetCharSprite(string[pos])->Width;
 			enablecap=false;
 			initials_x = wx;
 			//how many more lines to be indented (one was already indented)
 			initials_rows = (initials->maxHeight-1)/maxHeight;
 			continue;
+		} else {
+			wx += GetCharSprite(string[pos])->Width;
 		}
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
