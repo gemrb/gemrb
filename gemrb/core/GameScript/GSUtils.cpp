@@ -547,12 +547,12 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
 	//see dead
-	int flags;
+	int flags = GA_NO_HIDDEN;
 
 	if (parameters->int0Parameter) {
-		flags = GA_DETECT;
+		flags |= GA_DETECT;
 	} else {
-		flags = GA_NO_DEAD;
+		flags |= GA_NO_DEAD;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter, flags );
 	/* don't set LastSeen if this isn't an actor */
