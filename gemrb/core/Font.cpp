@@ -604,7 +604,7 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 		if (initials && enablecap) {
 			wx += initials->GetCharSprite(string[pos])->Width;
 			enablecap=false;
-			initials_x = wx;
+			initials_x = wx + psx;
 			//how many more lines to be indented (one was already indented)
 			initials_rows = (initials->maxHeight-1)/maxHeight;
 			continue;
