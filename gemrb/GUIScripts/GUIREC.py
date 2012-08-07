@@ -606,14 +606,24 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
 		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+	elif GUICommon.GameIsBG1():
+		stats.append ((14077, GS (IE_RESISTMAGICFIRE), '%'))
+		stats.append ((14014, GS (IE_RESISTCOLD), '%'))
+		stats.append ((14078, GS (IE_RESISTMAGICCOLD), '%'))
 	else:
 		stats.append ((15579, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((15546, GS (IE_RESISTCOLD), '%'))
 		stats.append ((15580, GS (IE_RESISTMAGICCOLD), '%'))
 	# 32220 Electricity
-	stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
+	if GUICommon.GameIsBG1():
+		stats.append ((14013, GS (IE_RESISTELECTRICITY), '%'))
+	else:
+		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
 	# 32221 Acid
-	stats.append ((32221, GS (IE_RESISTACID), '%'))
+	if GUICommon.GameIsBG1():
+		stats.append ((14015, GS (IE_RESISTACID), '%'))
+	else:
+		stats.append ((32221, GS (IE_RESISTACID), '%'))
 	if GUICommon.GameIsBG2():
 		# Magic (others show it higher up)
 		stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
