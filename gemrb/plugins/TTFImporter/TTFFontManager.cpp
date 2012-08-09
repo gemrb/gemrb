@@ -251,7 +251,7 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 	FT_GlyphSlot glyph;
 	FT_Glyph_Metrics* metrics;
 
-	int maxx, maxy, yoffset, advance;
+	int maxx, maxy, yoffset;
 	for (ch = FirstChar; ch <= LastChar; ch++) {
 		/* Load the glyph */
 		index = FT_Get_Char_Index( face, ch );
@@ -273,7 +273,6 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 			maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->width);
 			maxy = FT_FLOOR(metrics->horiBearingY);
 			yoffset = font.ascent - maxy;
-			advance = FT_CEIL(metrics->horiAdvance);
 		} else {
 			/* Get the bounding box for non-scalable format.
 			 * Again, freetype2 fills in many of the font metrics
@@ -284,7 +283,6 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 			maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->horiAdvance);
 			maxy = FT_FLOOR(metrics->horiBearingY);
 			yoffset = 0;
-			advance = FT_CEIL(metrics->horiAdvance);
 		}
 
 		/* Adjust for bold and italic text */
