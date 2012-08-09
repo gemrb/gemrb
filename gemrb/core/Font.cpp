@@ -84,14 +84,21 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 
 	SetPalette(pal);
 
+	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
+
 	for (int i = 0; i < glyphCount; i++)
 	{
-		glyphs[i]->XPos = 0;
-		glyphs[i]->SetPalette(palette);
-		if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
+		if (glyphs[i] != NULL) {
+			glyphs[i]->XPos = 0;
+			glyphs[i]->SetPalette(palette);
+			if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
+		} else {
+			// use our empty glyph for safety reasons
+			whiteSpace[BLANK]->acquire();
+			glyphs[i] = whiteSpace[BLANK];
+		}
 	}
 
-	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 	// standard space width is 1/4 ptSize
 	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(maxHeight * 0.25), 0, 8, NULL, palette->col);
 	// standard tab width is 4 spaces???
