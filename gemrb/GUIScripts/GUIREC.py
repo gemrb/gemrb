@@ -598,19 +598,21 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else:
 		stats.append (32204)
 	# 32213 Normal Fire
-	stats.append ((32213, GS (IE_RESISTFIRE), '%'))
 	# 32222 Magic Fire
 	# 32214 Normal Cold
 	# 32223 Magic Cold
 	if GUICommon.GameIsBG2():
+		stats.append ((32213, GS (IE_RESISTFIRE), '%'))
 		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
 		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
 	elif GUICommon.GameIsBG1():
+		stats.append ((14012, GS (IE_RESISTFIRE), '%'))
 		stats.append ((14077, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((14014, GS (IE_RESISTCOLD), '%'))
 		stats.append ((14078, GS (IE_RESISTMAGICCOLD), '%'))
 	else:
+		stats.append ((15545, GS (IE_RESISTFIRE), '%'))
 		stats.append ((15579, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((15546, GS (IE_RESISTCOLD), '%'))
 		stats.append ((15580, GS (IE_RESISTMAGICCOLD), '%'))
