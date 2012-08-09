@@ -53,6 +53,7 @@ class StringBuffer;
 #define DS_AREA    128
 
 //verbal constant (bg2), we have a lookup table (vcremap) for other games
+#define VB_INITIALMEET 0
 #define VB_PANIC     1
 #define VB_HAPPY     2
 #define VB_UNHAPPY   3
