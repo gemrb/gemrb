@@ -74,13 +74,17 @@ TTFFontManager::TTFFontManager(void)
 
 void TTFFontManager::LogFTError(FT_Error errCode) const
 {
+#undef __FTERRORS_H__
+#define FT_ERRORDEF( e, v, s )  { e, s },
+#define FT_ERROR_START_LIST     {
+#define FT_ERROR_END_LIST       { 0, 0 } };
+
 	static const struct
 	{
 		int          err_code;
 		const char*  err_msg;
-	} ft_errors[] = {
-#include <freetype/fterrors.h>
-	};
+	} ft_errors[] =
+		 #include FT_ERRORS_H
 	int i;
 	const char *err_msg;
 
