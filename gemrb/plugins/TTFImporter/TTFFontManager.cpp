@@ -32,6 +32,8 @@
 #include "Video.h"
 #include "System/FileStream.h"
 
+#define uint8_t unsigned char
+
 /* Handy routines for converting from fixed point */
 #define FT_FLOOR(X)	((X & -64) / 64)
 #define FT_CEIL(X)	(((X + 63) & -64) / 64)
