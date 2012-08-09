@@ -159,7 +159,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	size_t len = strlen( ( char* ) string );
 	int num_empty_rows = 0;
 
-	if (initials)
+	if (initials && initials != this)
 	{
 		capital=1;
 		enablecap=true;
@@ -184,10 +184,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 	Palette* blitPalette = NULL;
 	SET_BLIT_PALETTE(pal);
-
-	if (initials==this) {
-		enablecap=false;
-	}
 
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
