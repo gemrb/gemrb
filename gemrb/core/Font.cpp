@@ -84,14 +84,21 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 
 	SetPalette(pal);
 
+	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
+
 	for (int i = 0; i < glyphCount; i++)
 	{
-		glyphs[i]->XPos = 0;
-		glyphs[i]->SetPalette(palette);
-		if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
+		if (glyphs[i] != NULL) {
+			glyphs[i]->XPos = 0;
+			glyphs[i]->SetPalette(palette);
+			if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
+		} else {
+			// use our empty glyph for safety reasons
+			whiteSpace[BLANK]->acquire();
+			glyphs[i] = whiteSpace[BLANK];
+		}
 	}
 
-	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 	// standard space width is 1/4 ptSize
 	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(maxHeight * 0.25), 0, 8, NULL, palette->col);
 	// standard tab width is 4 spaces???
@@ -100,11 +107,15 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 
 Font::~Font(void)
 {
+	whiteSpace[BLANK]->release();
+	whiteSpace[SPACE]->release();
+	whiteSpace[TAB]->release();
+
 	for (int i = 0; i < glyphCount; i++)
 	{
 		core->GetVideoDriver()->FreeSprite(glyphs[i]);
 	}
-	palette->Release();
+	SetPalette(NULL);
 	free(glyphs);
 	free(resRefs);
 }
@@ -159,7 +170,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	size_t len = strlen( ( char* ) string );
 	int num_empty_rows = 0;
 
-	if (initials)
+	if (initials && initials != this)
 	{
 		capital=1;
 		enablecap=true;
@@ -184,10 +195,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 	Palette* blitPalette = NULL;
 	SET_BLIT_PALETTE(pal);
-
-	if (initials==this) {
-		enablecap=false;
-	}
 
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );

@@ -21,19 +21,36 @@
 #ifndef GemRB_TTFFont_h
 #define GemRB_TTFFont_h
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 #include "FontManager.h"
 
 namespace GemRB {
+
+struct TTF_Font {
+	FT_Face face;
+
+	int height;
+	int ascent;
+	int descent;
+
+	int glyph_overhang;
+	float glyph_italics;
+
+	int face_style;
+};
 
 class TTFFontManager : public FontManager {
 /*
 Private ivars
 */
 private:
-	char FontPath[_MAX_PATH];
+	FT_Library library;
+	FT_Stream ftStream;
+
+	TTF_Font font;
 public:
 /*
 Public ivars
@@ -42,6 +59,7 @@ private:
 /*
 Private methods
 */
+	void LogFTError(FT_Error errCode) const;
 public:
 /*
 Public methods
@@ -50,11 +68,18 @@ Public methods
 	TTFFontManager(void);
 
 	bool Open(DataStream* stream);
+	void Close();
 
 	Font* GetFont(ieWord FirstChar,
 				  ieWord LastChar,
 				  unsigned short ptSize,
 				  FontStyle style, Palette* pal = NULL);
+
+	// freetype "callbacks"
+	static unsigned long read( FT_Stream       stream,
+							  unsigned long   offset,
+							  unsigned char*  buffer,
+							  unsigned long   count );
 };
 
 }
