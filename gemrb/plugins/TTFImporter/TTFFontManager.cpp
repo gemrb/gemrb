@@ -18,6 +18,8 @@
  *
  */
 
+#include <math.h>
+
 #include "TTFFontManager.h"
 
 #include "win32def.h"
@@ -30,16 +32,40 @@
 #include "Video.h"
 #include "System/FileStream.h"
 
+/* Handy routines for converting from fixed point */
+#define FT_FLOOR(X)	((X & -64) / 64)
+#define FT_CEIL(X)	(((X + 63) & -64) / 64)
+
+/* Handle a style only if the font does not already handle it */
+#define TTF_HANDLE_STYLE_BOLD(font) ((style & BOLD) && \
+!(font.face_style & BOLD))
+#define TTF_HANDLE_STYLE_ITALIC(font) ((style & ITALIC) && \
+!(font.face_style & ITALIC))
+#define TTF_HANDLE_STYLE_UNDERLINE(font) (style & UNDERLINE)
+
 using namespace GemRB;
+
+unsigned long TTFFontManager::read(FT_Stream		  stream,
+								   unsigned long   offset,
+								   unsigned char*  buffer,
+								   unsigned long   count )
+{
+	DataStream* dstream = (DataStream*)stream->descriptor.pointer;
+	dstream->Seek(offset, GEM_STREAM_START);
+	return dstream->Read(buffer, count);
+}
 
 TTFFontManager::~TTFFontManager(void)
 {
-	FT_Done_FreeType( library );
+	Close();
+	if (library) {
+		FT_Done_FreeType( library );
+	}
 }
 
 TTFFontManager::TTFFontManager(void)
+: ftStream(NULL), font()
 {
-	FontPath[0] = 0;
 	FT_Error error = FT_Init_FreeType( &library );
 	if ( error ) {
 		LogFTError(error);
@@ -68,17 +94,67 @@ void TTFFontManager::LogFTError(FT_Error errCode) const
 	if ( !err_msg ) {
 		err_msg = "unknown FreeType error";
 	}
-	Log(ERROR, "TTF Manager", err_msg);
+	Log(ERROR, "TTF Manager", "%s", err_msg);
 }
 
 bool TTFFontManager::Open(DataStream* stream)
 {
+	Close();
 	if (stream) {
-		strncpy(FontPath, stream->originalfile, sizeof(FontPath));
-		// we don't actually need anything from the stream.
+		FT_Error error;
+		FT_CharMap found;
+
+		ftStream = (FT_Stream)calloc(sizeof(*ftStream), 1);
+		ftStream->read = read;
+		ftStream->descriptor.pointer = stream;
+		ftStream->pos = stream->GetPos();
+		ftStream->size = stream->Size();
+
+		FT_Open_Args args = FT_Open_Args();
+		args.flags = FT_OPEN_STREAM;
+		args.stream = ftStream;
+
+		font.face = NULL;
+		error = FT_Open_Face( library, &args, 0, &font.face );
+		if( error ) {
+			LogFTError(error);
+			Close();
+			return false;
+		}
+
+		/* Set charmap for loaded font */
+		found = 0;
+		FT_Face face = font.face;
+		for (int i = 0; i < face->num_charmaps; i++) {
+			FT_CharMap charmap = face->charmaps[i];
+			if ((charmap->platform_id == 3 && charmap->encoding_id == 1) /* Windows Unicode */
+				|| (charmap->platform_id == 3 && charmap->encoding_id == 0) /* Windows Symbol */
+				|| (charmap->platform_id == 2 && charmap->encoding_id == 1) /* ISO Unicode */
+				|| (charmap->platform_id == 0)) { /* Apple Unicode */
+				found = charmap;
+				break;
+			}
+		}
+		if ( found ) {
+			/* If this fails, continue using the default charmap */
+			FT_Set_Charmap(face, found);
+		}
+
 		return true;
 	}
 	return false;
+}
+
+void TTFFontManager::Close()
+{
+	if (font.face) {
+		FT_Done_Face(font.face);
+	}
+	if (ftStream) {
+		free(ftStream);
+		ftStream = NULL;
+	}
+	font = TTF_Font();
 }
 
 Font* TTFFontManager::GetFont(ieWord FirstChar,
@@ -89,18 +165,70 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 	Log(MESSAGE, "TTF", "Constructing TTF font.");
 	Log(MESSAGE, "TTF", "Creating font of size %i with %i characters...", ptSize, LastChar - FirstChar);
 
-	TTF_Font* ttf = TTF_OpenFont(FontPath, ptSize);
+	/* Make sure that our font face is scalable (global metrics) */
+	FT_Face face = font.face;
+	FT_Fixed scale;
+	FT_Error error;
+	if ( FT_IS_SCALABLE(face) ) {
+		/* Set the character size and use default DPI (72) */
+		error = FT_Set_Char_Size( font.face, 0, ptSize * 64, 0, 0 );
+		if( error ) {
+			LogFTError(error);
+			Close();
+			return NULL;
+		}
 
-	if (!ttf){
-		Log(ERROR, "TTF", "Unable to initialize font: %s, TTFError: %s.", FontPath, TTF_GetError());
-		return NULL;
-	}
-	if (!ptSize) {
-		Log(ERROR, "TTF", "Unable to initialize font with size 0.");
-		return NULL;
+		/* Get the scalable font metrics for this font */
+		scale = face->size->metrics.y_scale;
+		font.ascent = FT_CEIL(FT_MulFix(face->ascender, scale));
+		font.descent = FT_CEIL(FT_MulFix(face->descender, scale));
+		font.height  = font.ascent - font.descent + 1;
+		//font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
+		//font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
+		//font->underline_height = FT_FLOOR(FT_MulFix(face->underline_thickness, scale));
+	} else {
+		/* Non-scalable font case.  ptsize determines which family
+		 * or series of fonts to grab from the non-scalable format.
+		 * It is not the point size of the font.
+		 * */
+		if ( ptSize >= font.face->num_fixed_sizes )
+			ptSize = font.face->num_fixed_sizes - 1;
+		//font.font_size_family = ptsize;
+		error = FT_Set_Pixel_Sizes( face,
+								   face->available_sizes[ptSize].height,
+								   face->available_sizes[ptSize].width );
+		/* With non-scalale fonts, Freetype2 likes to fill many of the
+		 * font metrics with the value of 0.  The size of the
+		 * non-scalable fonts must be determined differently
+		 * or sometimes cannot be determined.
+		 * */
+		font.ascent = face->available_sizes[ptSize].height;
+		font.descent = 0;
+		font.height = face->available_sizes[ptSize].height;
+		//font->lineskip = FT_CEIL(font->ascent);
+		//font->underline_offset = FT_FLOOR(face->underline_position);
+		//font->underline_height = FT_FLOOR(face->underline_thickness);
 	}
 
-	TTF_SetFontStyle(ttf, style);
+	/*
+	if ( font->underline_height < 1 ) {
+		font->underline_height = 1;
+	}
+*/
+
+	/* Initialize the font face style */
+	font.face_style = NORMAL;
+	if ( font.face->style_flags & FT_STYLE_FLAG_BOLD ) {
+		font.face_style |= BOLD;
+	}
+	if ( font.face->style_flags & FT_STYLE_FLAG_ITALIC ) {
+		font.face_style |= ITALIC;
+	}
+
+	font.glyph_overhang = face->size->metrics.y_ppem / 10;
+	/* x offset = cos(((90.0-12)/360)*2*M_PI), or 12 degree angle */
+	font.glyph_italics = 0.207f;
+	font.glyph_italics *= font.height;
 
 	if (!pal) {
 		Color fore = {0xFF, 0xFF, 0xFF, 0}; //white
@@ -111,34 +239,98 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 
 	Sprite2D** glyphs = (Sprite2D**)malloc((LastChar - FirstChar + 1) * sizeof(Sprite2D*));
 
-	Uint16 i; // for double byte character suport
-	Uint16 chr[3];
-	chr[0] = UNICODE_BOM_NATIVE;
-	chr[2] = '\0';// is this needed?
+	// use ieWord for double byte character suport
+	ieWord index, ch;
 
-	for (i = FirstChar; i <= LastChar; i++) { //printable ASCII range minus space
-		chr[1] = i;
+	FT_GlyphSlot glyph;
+	FT_Glyph_Metrics* metrics;
 
-		SDL_Surface* glyph = TTF_RenderUNICODE_Shaded(ttf, chr, *(SDL_Color*)(&pal->front), *(SDL_Color*)(&pal->back));
-		if (glyph){
-			void* px = malloc(glyph->w * glyph->h);
-
-			//need to convert pitch to glyph width here. video driver assumes this.
-			unsigned char * dstPtr = (unsigned char*)px;
-			unsigned char * srcPtr = (unsigned char*)glyph->pixels;
-			for (int glyphY = 0; glyphY < glyph->h; glyphY++) {
-				memcpy( dstPtr, srcPtr, glyph->w);
-				srcPtr += glyph->pitch;
-				dstPtr += glyph->w;
-			}
-			glyphs[i - FirstChar] = core->GetVideoDriver()->CreateSprite8(glyph->w, glyph->h, 8, px, pal->col, true, 0);
-			glyphs[i - FirstChar]->XPos = 0;
-			glyphs[i - FirstChar]->YPos = 20; //FIXME: figure out why this is required and find true value
+	int maxx, maxy, yoffset, advance;
+	for (ch = FirstChar; ch <= LastChar; ch++) {
+		/* Load the glyph */
+		index = FT_Get_Char_Index( face, ch );
+		// maybe one day we will subclass Font such that we can be more dynamic and support kerning.
+		// until then load the glyphs as monospace.
+		error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
+		if( error ) {
+			LogFTError(error);
+			glyphs[ch - FirstChar] = NULL;
+			continue;
 		}
-		else glyphs[i - FirstChar] = NULL;
+
+		glyph = face->glyph;
+		metrics = &glyph->metrics;
+
+		/* Get the glyph metrics if desired */
+		if ( FT_IS_SCALABLE( face ) ) {
+			/* Get the bounding box */
+			maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->width);
+			maxy = FT_FLOOR(metrics->horiBearingY);
+			yoffset = font.ascent - maxy;
+			advance = FT_CEIL(metrics->horiAdvance);
+		} else {
+			/* Get the bounding box for non-scalable format.
+			 * Again, freetype2 fills in many of the font metrics
+			 * with the value of 0, so some of the values we
+			 * need must be calculated differently with certain
+			 * assumptions about non-scalable formats.
+			 * */
+			maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->horiAdvance);
+			maxy = FT_FLOOR(metrics->horiBearingY);
+			yoffset = 0;
+			advance = FT_CEIL(metrics->horiAdvance);
+		}
+
+		/* Adjust for bold and italic text */
+		if( TTF_HANDLE_STYLE_BOLD(font) ) {
+			maxx += font.glyph_overhang;
+		}
+		if( TTF_HANDLE_STYLE_ITALIC(font) ) {
+			maxx += (int)ceil(font.glyph_italics);
+		}
+
+		int sprWidth, sprHeight;
+		sprWidth = maxx;
+		sprHeight = font.ascent;
+
+		if (sprWidth == 0 || sprHeight == 0) {
+			glyphs[ch - FirstChar] = NULL;
+			continue;
+		}
+
+		FT_Bitmap* bitmap;
+		uint8_t* pixels = NULL;
+
+		/* Render the glyph */
+		error = FT_Render_Glyph( glyph, ft_render_mode_normal );
+		if( error ) {
+			LogFTError(error);
+			glyphs[ch - FirstChar] = NULL;
+			continue;
+		}
+
+		bitmap = &glyph->bitmap;
+		pixels = (uint8_t*)calloc(sprWidth, sprHeight);
+
+		/* Ensure the width of the pixmap is correct. On some cases,
+		 * freetype may report a larger pixmap than possible.*/
+		int width = glyph->bitmap.width;
+		if (width > sprWidth) {
+			width = sprWidth;
+		}
+
+		for( int row = 0; row < bitmap->rows; ++row ) {
+			memcpy(pixels+(row * sprWidth), bitmap->buffer+(row * bitmap->pitch), bitmap->pitch);
+		}
+
+		// TODO: do an underline if requested
+
+		glyphs[ch - FirstChar] = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, 8, pixels, pal->col, true, 0);
+		// FIXME: figure out why this 10 is required and find how to dynamically determine
+		// presumably this value should change with font size.
+		glyphs[ch - FirstChar]->YPos = 10 - yoffset;
 	}
 	Font* font = new Font(glyphs, FirstChar, LastChar, pal);
-	pal->Release();
 	font->ptSize = ptSize;
 	font->style = style;
 	return font;
