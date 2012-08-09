@@ -100,11 +100,15 @@ Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
 
 Font::~Font(void)
 {
+	whiteSpace[BLANK]->release();
+	whiteSpace[SPACE]->release();
+	whiteSpace[TAB]->release();
+
 	for (int i = 0; i < glyphCount; i++)
 	{
 		core->GetVideoDriver()->FreeSprite(glyphs[i]);
 	}
-	palette->Release();
+	SetPalette(NULL);
 	free(glyphs);
 	free(resRefs);
 }
