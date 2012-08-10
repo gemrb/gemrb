@@ -2685,7 +2685,10 @@ int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
 {
-	if (!strnicmp(Sender->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)) {
+	Map *area = Sender->GetCurrentArea();
+	if (!area) return 0;
+
+	if (!strnicmp(area->GetScriptName(), parameters->string0Parameter, 8)) {
 		return 1;
 	}
 	return 0;
