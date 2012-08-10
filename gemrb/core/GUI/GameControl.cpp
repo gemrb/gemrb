@@ -314,7 +314,7 @@ static const int arrow_orientations[16]={
 
 //Draws arrow markers along the edge of the game window
 //WARNING:don't use reference for point, because it is altered
-void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &viewport)
+void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color)
 {
 	Video* video = core->GetVideoDriver();
 
@@ -349,7 +349,7 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 		draw |= D_BOTTOM;
 	}
 	if (arrow_orientations[draw]>=0) {
-		video->BlitGameSprite( core->GetScrollCursorSprite(arrow_orientations[draw], 0), p.x+screen.x, p.y+screen.y, 0, black, NULL);
+		video->BlitGameSprite( core->GetScrollCursorSprite(arrow_orientations[draw], 0), p.x+screen.x, p.y+screen.y, 0, color, NULL);
 	}
 }
 
@@ -554,7 +554,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				Actor *target = monsters[i++];
 				if (target->InParty) continue;
 				if (target->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(screen, target->Pos, viewport);
+				DrawArrowMarker(screen, target->Pos, viewport, black);
 			}
 			delete monsters;
 		} else {

@@ -188,7 +188,7 @@ private:
 	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
-	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport);
+	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
 
 private:
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
