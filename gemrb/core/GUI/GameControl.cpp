@@ -349,7 +349,7 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 		draw |= D_BOTTOM;
 	}
 	if (arrow_orientations[draw]>=0) {
-		video->BlitGameSprite( core->GetScrollCursorSprite(arrow_orientations[draw], 0), p.x+screen.x, p.y+screen.y, 0, color, NULL);
+		video->BlitGameSprite( core->GetScrollCursorSprite(arrow_orientations[draw], 0), p.x+screen.x, p.y+screen.y, BLIT_TINTED, color, NULL);
 	}
 }
 
