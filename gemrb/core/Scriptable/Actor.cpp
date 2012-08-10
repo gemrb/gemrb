@@ -3408,7 +3408,11 @@ void Actor::DialogInterrupt()
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
 		VerbalConstant(VB_HOSTILE, 1 );
 	} else {
-		VerbalConstant(VB_DIALOG, 1 );
+		if (TalkCount) {
+			VerbalConstant(VB_DIALOG, 1);
+		} else {
+			VerbalConstant(VB_INITIALMEET, 1);
+		}
 	}
 }
 
