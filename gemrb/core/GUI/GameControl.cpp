@@ -562,6 +562,11 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 	}
 
+	if (lastActorID) {
+		Actor* actor = GetLastActor();
+		DrawArrowMarker(screen, actor->Pos, viewport, green);
+	}
+
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
 	Point p(lastMouseX, lastMouseY);
