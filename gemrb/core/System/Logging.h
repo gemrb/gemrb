@@ -49,6 +49,7 @@ class StringBuffer;
 
 GEM_EXPORT void InitializeLogging();
 GEM_EXPORT void AddLogger(Logger*);
+GEM_EXPORT void RemoveLogger(Logger*);
 GEM_EXPORT void ShutdownLogging();
 
 #if defined(__GNUC__)

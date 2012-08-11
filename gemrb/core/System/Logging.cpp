@@ -47,6 +47,22 @@ void AddLogger(Logger* logger)
 		theLogger.push_back(logger);
 }
 
+void RemoveLogger(Logger* logger)
+{
+	if (logger) {
+		std::vector<Logger*>::iterator itr = theLogger.begin();
+		while (itr != theLogger.end()) {
+			if (*itr == logger) {
+				itr = theLogger.erase(itr);
+			} else {
+				itr++;
+			}
+		}
+		logger->destroy();
+		logger = NULL;
+	}
+}
+
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
 {
 	if (theLogger.empty())
