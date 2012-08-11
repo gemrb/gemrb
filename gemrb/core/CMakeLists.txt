@@ -128,6 +128,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/StringBuffer.cpp
 	System/Logger.cpp
 	System/Logger/File.cpp
+	System/Logger/MessageWindowLogger.cpp
 	System/Logger/Stdio.cpp
 	System/Logging.cpp
 	System/SlicedStream.cpp
