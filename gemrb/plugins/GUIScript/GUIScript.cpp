@@ -59,6 +59,7 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "System/FileStream.h"
+#include "System/Logger/MessageWindowLogger.h"
 #include "System/VFS.h"
 
 #include <cstdio>
@@ -6530,6 +6531,26 @@ static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*arg
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
+			 "MessageWindowDebug(1/0)\n\n"
+			 "Enable/Disable debug messages in the MessageWindow." );
+
+static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
+{
+	int enable;
+	if (!PyArg_ParseTuple( args, "i", &enable )) {
+		return AttributeError( GemRB_MessageWindowDebug__doc );
+	}
+	if (enable && getMessageWindowLogger() == NULL) {
+		AddLogger(createMessageWindowLogger());
+	} else if (!enable && getMessageWindowLogger() != NULL) {
+		RemoveLogger(getMessageWindowLogger());
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetCurrentArea__doc,
 "GetCurrentArea()=>resref\n\n"
 "Returns current area's ResRef." );
@@ -10244,6 +10265,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizableSpellsCount, METH_VARARGS),
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
+	METHOD(MessageWindowDebug, METH_VARARGS),
 	METHOD(GetMessageWindowSize, METH_NOARGS),
 	METHOD(GetPartySize, METH_NOARGS),
 	METHOD(GetPCStats, METH_VARARGS),

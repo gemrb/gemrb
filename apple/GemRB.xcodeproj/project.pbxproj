@@ -97,6 +97,8 @@
 		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
+		A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
+		A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */; };
 		A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */ = {isa = PBXBuildFile; fileRef = A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
@@ -1142,6 +1144,8 @@
 		A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon-72.png"; sourceTree = "<group>"; };
 		A22EBDCC14FF18030029C9C1 /* AppleLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLogger.h; sourceTree = "<group>"; };
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
+		A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageWindowLogger.cpp; sourceTree = "<group>"; };
+		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3037,6 +3041,8 @@
 				A2CB5AC215000A0D00B5C154 /* File.h */,
 				A298DD2114EB61D300F59F56 /* Stdio.cpp */,
 				A298DD1B14EB61C100F59F56 /* Stdio.h */,
+				A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */,
+				A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */,
 			);
 			path = Logger;
 			sourceTree = "<group>";
@@ -3192,6 +3198,7 @@
 				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
 				A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */,
 				A2CB5AC515000A0D00B5C154 /* File.h in Headers */,
+				A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4904,6 +4911,7 @@
 				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */,
 				A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */,
+				A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
