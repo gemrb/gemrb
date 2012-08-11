@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT DisplayMessage * displaymsg;
+GEM_EXPORT DisplayMessage * displaymsg = NULL;
 
 static int strref_table[STRREF_COUNT];
 
