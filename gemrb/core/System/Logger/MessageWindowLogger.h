@@ -32,8 +32,8 @@ namespace GemRB {
 		void PrintStatus(bool);
 	};
 
-	Logger* createMessageWindowLogger();
-	Logger* getMessageWindowLogger();
+	GEM_EXPORT Logger* createMessageWindowLogger();
+	GEM_EXPORT Logger* getMessageWindowLogger();
 }
 
 #endif /* defined(__GemRB__MessageWindowLogger__) */
