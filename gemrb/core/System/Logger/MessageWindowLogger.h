@@ -28,10 +28,8 @@ namespace GemRB {
 		virtual ~MessageWindowLogger();
 
 		void log(log_level level, const char* owner, const char* message, log_color color);
-	protected:
-		void print(const char*);
 	private:
-		void printStatus(const char* status, log_color color);
+		void PrintStatus(bool);
 	};
 
 	Logger* createMessageWindowLogger();

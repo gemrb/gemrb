@@ -27,10 +27,13 @@ namespace GemRB {
 MessageWindowLogger* mwl = NULL;
 
 MessageWindowLogger::MessageWindowLogger()
-{}
+{
+	PrintStatus(true);
+}
 
 MessageWindowLogger::~MessageWindowLogger()
 {
+	PrintStatus(false);
 	assert(mwl == this);
 	mwl = NULL;
 }
@@ -58,7 +61,7 @@ void MessageWindowLogger::log(log_level level, const char* owner, const char* me
 				"[color=BFEFFF]",	// LIGHT_BLUE
 				"[color=FF00FF]",	// LIGHT_MAGENTA
 				"[color=B4CDCD]",	// LIGHT_CYAN
-				"[color=CDCDCD]"		// LIGHT_WHITE / GREY
+				"[color=CDCDCD]"		// LIGHT_WHITE
 			};
 			static log_color log_level_color[] = {
 				RED,
@@ -69,12 +72,27 @@ void MessageWindowLogger::log(log_level level, const char* owner, const char* me
 				BLUE
 			};
 
+			if (level < 0) {
+				// re-assign our internal message level to the real one
+				level = MESSAGE;
+			}
 			const char* fmt = "%s%s: [/color]%s%s[/color]";
 			char* msg = (char*)malloc(strlen(message) + strlen(owner) + 45);
 			sprintf(msg, fmt, colors[color], owner, colors[log_level_color[level]], message);
 			displaymsg->DisplayString(msg);
 			free(msg);
 		}
+	}
+}
+
+void MessageWindowLogger::PrintStatus(bool toggle)
+{
+	// log_level -1 is a special internal level.
+	// this way we can print messages sine we have to ignore standard logged messages
+	if (toggle) {
+		log( (log_level)-1, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
+	} else {
+		log( (log_level)-1, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
 	}
 }
 
