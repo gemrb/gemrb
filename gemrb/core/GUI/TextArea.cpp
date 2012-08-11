@@ -451,11 +451,17 @@ void TextArea::UpdateControls()
 			SetRow(pos);
 		}
 	}
-	// This hack is to refresh the mouse cursor so that reply below cursor gets
-	//   highlighted during a dialog
-	int x,y;
-	core->GetVideoDriver()->GetMousePos(x,y);
-	core->GetEventMgr()->MouseMove(x,y);
+
+	GameControl* gc = core->GetGameControl();
+	if (gc && gc->GetDialogueFlags()&DF_IN_DIALOG) {
+		// This hack is to refresh the mouse cursor so that reply below cursor gets
+		// highlighted during a dialog
+		// FIXME: we check DF_IN_DIALOG here to avoid recurssion in the MessageWindowLogger, but what happens when an error happens during dialog?
+		// I'm not super sure about how to avoid that. for now the logger will not log anything in dialog mode.
+		int x,y;
+		core->GetVideoDriver()->GetMousePos(x,y);
+		core->GetEventMgr()->MouseMove(x,y);
+	}
 
 	core->RedrawAll();
 }
