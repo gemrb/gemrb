@@ -198,7 +198,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 				GemRB.SetVar("SkillBase "+str(i), SkillValue)
 				# display the modified stat to avoid confusion (account for dex, race and effect boni)
 				GemRB.SetVar("SkillDisplayMod "+str(i), SkillValue-BaseSkillValue)
-				TotalSkillsAssignable += LUSKILLS_MAX-BaseSkillValue
+				TotalSkillsAssignable += LUSKILLS_MAX-SkillValue
 
 		#protect against having more skills than we can assign
 		if SkillPointsLeft > TotalSkillsAssignable:
