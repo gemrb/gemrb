@@ -392,8 +392,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		
 		for (size_t i = 0; i < len; i++) {
-			if (tmp[i] == 0) continue;
-			int height =GetCharSprite(i)->YPos;
+			int height = GetCharSprite(tmp[i])->Height;
 			if (ystep < height)
 				ystep = height;
 		}
