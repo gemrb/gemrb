@@ -255,7 +255,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		if ProfName > 0x1000000 or ProfName < 0:
 			ProfCount -= 1
 
-		#we only need the low 3 bits for profeciencies on levelup; otherwise
+		#we only need the low 3 bits for proficiencies on levelup; otherwise
 		#we just set them all to 0
 		currentprof = 0
 		if type == LUPROFS_TYPE_LEVELUP:
