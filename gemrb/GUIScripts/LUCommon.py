@@ -31,7 +31,9 @@ def GetNextLevelExp (Level, Class):
 	if Level < CommonTables.NextLevel.GetColumnCount (Row):
 		return str (CommonTables.NextLevel.GetValue (Row, Level) )
 
-	return 0
+	# we could display the current level's max, but likely nobody cares
+	# if you change it, check that all callers can handle it
+	return "0"
 
 def CanLevelUp(actor):
 	"""Returns true if the actor can level up."""
@@ -163,11 +165,12 @@ def GetNextLevelFromExp (XP, Class):
 	ClassIndex = CommonTables.Classes.FindValue (5, Class)
 	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
 	Row = CommonTables.NextLevel.GetRowIndex (ClassName)
-	for i in range(1, CommonTables.NextLevel.GetColumnCount()-1):
+	NLNumCols = CommonTables.NextLevel.GetColumnCount()
+	for i in range(1, NLNumCols):
 		if XP < CommonTables.NextLevel.GetValue (Row, i):
 			return i
 	# fix hacked characters that have more xp than the xp cap
-	return 40
+	return NLNumCols
 
 def SetupThaco (pc, Level=None):
 	"""Updates an actors THAC0 based upon level.
