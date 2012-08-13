@@ -219,10 +219,7 @@ def UpdateSpellBookWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-	if CantCast or GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
-		Window.SetVisible (WINDOW_GRAYED)
-	else:
-		Window.SetVisible (WINDOW_VISIBLE)
+	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)

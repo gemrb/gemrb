@@ -143,10 +143,7 @@ def UpdatePriestWindow ():
 			Icon.SetTooltip ('')
 	CantCast = CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1) == "*"
 	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-	if CantCast or GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
-		Window.SetVisible (WINDOW_GRAYED)
-	else:
-		Window.SetVisible (WINDOW_VISIBLE)
+	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 
 def PriestPrevLevelPress ():
