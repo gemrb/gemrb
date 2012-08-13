@@ -18,6 +18,12 @@ specific to GemRB and which are not intended to be usually changed by
 a user. More complicated configuration data (tables, etc.) are kept in
 their own files. User specific configuration is in other file (GemRB.cfg).
 
+Options that do not deal strictly with data availability and diversity
+may be freely changed. Some that may be interesting to users include:
+AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
+HasSpecificDamageBonus (mod required), HasWisdomBonusTable (mod required),
+KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack and TeamMovement.
+
 [FIXME: eventually, this file could be searched for in user's config directory too]
 
 This file's path can be 
