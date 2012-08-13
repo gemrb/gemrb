@@ -6975,6 +6975,7 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 		actor->spellbook.RemoveSpell(SpellResRef);
 		return PyInt_FromLong(ret);
 	}
+	PyErr_Clear(); //clear the type exception from above
 
 	if (!PyArg_ParseTuple( args, "iiii", &globalID, &SpellType, &Level, &Index )) {
 		return AttributeError( GemRB_RemoveSpell__doc );
