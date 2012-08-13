@@ -114,6 +114,9 @@ def OnDragItem ():
 					GemRB.LeaveStore()
 
 			GemRB.DropDraggedItem (pc, slot)
+			# drop item if it caused us to disable the inventory view (example: cursed berserking sword)
+			if GemRB.GetPlayerStat (pc, IE_STATE_ID) & (STATE_BERSERK) and GemRB.IsDraggingItem ():
+				GemRB.DropDraggedItem (pc, -3)
 
 	GUIINV.UpdateInventoryWindow ()
 	return
