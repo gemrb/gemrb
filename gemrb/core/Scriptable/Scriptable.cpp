@@ -51,6 +51,7 @@ namespace GemRB {
 
 // we start this at a non-zero value to make debugging easier
 static ieDword globalActorCounter = 10000;
+static bool startActive = core->HasFeature(GF_START_ACTIVE);
 
 /***********************
  *  Scriptable Class   *
@@ -105,7 +106,10 @@ Scriptable::Scriptable(ScriptableType type)
 
 	WaitCounter = 0;
 	if (Type == ST_ACTOR) {
-		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_USEDSAVE;
+		InternalFlags = IF_VISIBLE | IF_USEDSAVE;
+		if (startActive) {
+			InternalFlags |= IF_ACTIVE;
+		}
 	} else {
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_NOINT;
 	}
@@ -437,7 +441,9 @@ void Scriptable::AddAction(Action* aC)
 	}
 
 	InternalFlags|=IF_ACTIVE;
-	InternalFlags&=~IF_IDLE;
+	if (startActive) {
+		InternalFlags &= ~IF_IDLE;
+	}
 	aC->IncRef();
 	if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
 		aC->int0Parameter = scriptlevel;
