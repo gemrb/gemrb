@@ -89,8 +89,11 @@ static log_color log_level_color[] = {
 	BLUE
 };
 
-void StdioLogger::log(log_level level, const char* owner, const char* message, log_color color)
+void StdioLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
 {
+	if (level < FATAL) {
+		level = FATAL;
+	}
 	textcolor(LIGHT_WHITE);
 	print("[");
 	print(owner);

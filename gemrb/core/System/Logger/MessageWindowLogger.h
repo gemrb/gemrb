@@ -22,18 +22,19 @@
 
 namespace GemRB {
 
-	class GEM_EXPORT MessageWindowLogger : public Logger {
-	public:
-		MessageWindowLogger();
-		virtual ~MessageWindowLogger();
+class GEM_EXPORT MessageWindowLogger : public Logger {
+public:
+	MessageWindowLogger( log_level = WARNING ); // this logger has a diffrent default level than its base class.
+	virtual ~MessageWindowLogger();
+protected:
+	void LogInternal(log_level level, const char* owner, const char* message, log_color color);
+private:
+	void PrintStatus(bool);
+};
 
-		void log(log_level level, const char* owner, const char* message, log_color color);
-	private:
-		void PrintStatus(bool);
-	};
-
-	GEM_EXPORT Logger* createMessageWindowLogger();
-	GEM_EXPORT Logger* getMessageWindowLogger();
+// if create is true then getMessageWindowLogger will create and attach the message window logger
+// if it doesnt exist; otherwise simply returns a pointer to the logger.
+GEM_EXPORT Logger* getMessageWindowLogger( bool create = false);
 }
 
 #endif /* defined(__GemRB__MessageWindowLogger__) */

@@ -11,8 +11,8 @@ def sps(stat, value, pcf=1):
 def mta(area):
 	GemRB.MoveToArea(area)
 
-def debug(toggle):
-	GemRB.MessageWindowDebug(toggle)
+def debug(level):
+	GemRB.MessageWindowDebug(level)
 
 def cc(cre, px=-1, py=-1):
 	GemRB.CreateCreature(GemRB.GameGetFirstSelectedPC(), cre, px, py)

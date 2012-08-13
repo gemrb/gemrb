@@ -24,8 +24,10 @@
 
 namespace GemRB {
 
-Logger::Logger()
-{}
+Logger::Logger(log_level level)
+{
+	SetLogLevel(level);
+}
 
 Logger::~Logger()
 {}
@@ -33,6 +35,50 @@ Logger::~Logger()
 void Logger::destroy()
 {
 	delete this;
+}
+
+bool Logger::SetLogLevel(log_level level)
+{
+	if (level > INTERNAL) {
+		myLevel = level;
+		static const char* fmt = "Log Level set to %d";
+		char msg[25];
+		snprintf(msg, 25, fmt, level);
+		// careful to use our log function and not the global one to prevent this message form
+		// propagating to other loggers.
+		log(INTERNAL, "Logger", msg, DEFAULT);
+		return true;
+	} else {
+		// careful to use our log function and not the global one to prevent this message form
+		// propagating to other loggers.
+		log(INTERNAL, "Logger", "Log Level cannot be set below CRITICAL.", RED);
+	}
+	return false;
+}
+
+bool Logger::SetLogLevel(char* levelStr)
+{
+	if (strcasecmp(levelStr, "FATAL") == 0) {
+		return SetLogLevel(FATAL);
+	} else if (strcasecmp(levelStr, "ERROR") == 0) {
+		return SetLogLevel(ERROR);
+	} else if (strcasecmp(levelStr, "WARNING") == 0) {
+		return SetLogLevel(WARNING);
+	} else if (strcasecmp(levelStr, "MESSAGE") == 0) {
+		return SetLogLevel(MESSAGE);
+	} else if (strcasecmp(levelStr, "COMBAT") == 0) {
+		return SetLogLevel(COMBAT);
+	} else if (strcasecmp(levelStr, "DEBUG") == 0) {
+		return SetLogLevel(DEBUG);
+	}
+	return false;
+}
+
+void Logger::log(log_level level, const char* owner, const char* message, log_color color)
+{
+	if (level <= myLevel) {
+		LogInternal(level, owner, message, color);
+	}
 }
 
 const char* log_level_text[] = {

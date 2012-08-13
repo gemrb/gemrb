@@ -6532,19 +6532,22 @@ static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*arg
 }
 
 PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
-			 "MessageWindowDebug(1/0)\n\n"
-			 "Enable/Disable debug messages in the MessageWindow." );
+			 "MessageWindowDebug(log_level)\n\n"
+			 "Enable/Disable debug messages of log_level in the MessageWindow." );
 
 static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
 {
-	int enable;
-	if (!PyArg_ParseTuple( args, "i", &enable )) {
+	char* levelStr;
+	if (!PyArg_ParseTuple( args, "s", &levelStr )) {
 		return AttributeError( GemRB_MessageWindowDebug__doc );
 	}
-	if (enable && getMessageWindowLogger() == NULL) {
-		AddLogger(createMessageWindowLogger());
-	} else if (!enable && getMessageWindowLogger() != NULL) {
+
+	if (strcasecmp(levelStr, "none") == 0 || strcasecmp(levelStr, "off") == 0) {
 		RemoveLogger(getMessageWindowLogger());
+	} else if (isdigit(*levelStr)) {
+		getMessageWindowLogger(true)->SetLogLevel((log_level)(*levelStr - 48));
+	} else {
+		getMessageWindowLogger(true)->SetLogLevel(levelStr);
 	}
 
 	Py_INCREF( Py_None );

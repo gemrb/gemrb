@@ -27,11 +27,9 @@ class GEM_EXPORT StdioLogger : public Logger {
 public:
 	StdioLogger(bool useColor);
 	virtual ~StdioLogger();
-
-	virtual void log(log_level, const char* owner, const char* message, log_color color);
-
 	virtual void destroy();
 protected:
+	virtual void LogInternal(log_level, const char* owner, const char* message, log_color color);
 	virtual void print(const char*);
 	virtual void textcolor(log_color);
 	bool useColor;

@@ -51,13 +51,18 @@ enum log_color {
 };
 
 class GEM_EXPORT Logger {
+private:
+	log_level myLevel;
 public:
-	Logger();
+	Logger(log_level = DEBUG);
 	virtual ~Logger();
-
-	virtual void log(log_level, const char* owner, const char* message, log_color color) = 0;
-
 	virtual void destroy();
+
+	bool SetLogLevel(log_level);
+	bool SetLogLevel(char* lvlString); // convinience to translate english to a log_level
+	void log(log_level, const char* owner, const char* message, log_color color);
+protected:
+	virtual void LogInternal(log_level, const char*, const char*, log_color) {};
 };
 
 extern const char* log_level_text[];

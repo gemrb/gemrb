@@ -310,6 +310,7 @@ GE_TRY_IDENTIFY_ON_TRANSFER = 2
 
 # Log Levels
 # !!! Keep this synchronized with System/Logging.h !!!
+# no need for LOG_INTERNAL here since its internal to the logger class
 LOG_FATAL = 0
 LOG_ERROR = 1
 LOG_WARNING = 2

@@ -36,6 +36,7 @@ namespace GemRB {
 #endif
 // !!! Keep this synchronized with GUIDefines !!!
 enum log_level {
+	INTERNAL = -1, // special value that can only be used by the logger itself. these messages cannot be supressed
 	FATAL = 0,
 	ERROR = 1,
 	WARNING = 2,
