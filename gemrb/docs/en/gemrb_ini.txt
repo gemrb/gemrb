@@ -169,7 +169,7 @@ BiographyIsRes = <bool>
 Toggles whether to expect the biography extension as "res" or "bio".
 
 
-BreakableWeapons = 0|1
+BreakableWeapons = <bool>
 - - - - - - - - - - - -
 Determines if weapons can randomly break when used (1% chance in bg1).
 
@@ -191,17 +191,17 @@ Toggles whether Player1 is treated as a protagonist, talker, gabber in
 dialogs and interactions.
 
 
-CheckAbilities = 0|1
+CheckAbilities = <bool>
 - - - - - - - - - - -
 Determines if character abilities should matter in item usability checks.
 
 
-CutsceneAreascripts = 0|1
+CutsceneAreascripts = <bool>
 - - - - - - - - - -
 Determines whether area scripts should run during cutscenes or not.
 
 
-DeathOnZeroStat = 0|1
+DeathOnZeroStat = <bool>
 - - - - - - - - - - -
 Determines whether characters should die if any of their primary stats
 reaches zero.
@@ -281,7 +281,7 @@ Used for the PST float menu implementation. Not portable without extra
 guiscript work.
 
 
-HasHideInShadows = 0|1
+HasHideInShadows = <bool>
 - - - - - - - - - - - -
 Enable this if the characters also have the IE_HIDEINSHADOWS stat besides
 IE_STEALTH.
@@ -331,7 +331,7 @@ Determines whether the game stores some sounds in separate resource
 INI files and where they are ("sounds").
 
 
-HasSpecificDamageBonus = 0|1
+HasSpecificDamageBonus = <bool>
 - - - - - - - - - - - - - - -
 Determines if the game supports specific damage bonus like for example +10%
 extra cold damage.
@@ -439,7 +439,7 @@ Toggles whether the game displays text on the game area instead of the
 message window (pst).
 
 
-ProperBackstab = 0|1
+ProperBackstab = <bool>
 - - - - - - - - - - -
 Determines how many checks the backstabbing code does before treating an
 attack as a backstab.
@@ -456,7 +456,7 @@ Toggles whether to interpret state flags like PST. For example, the
 invisibility state flag is different there.
 
 
-RedrawTile = 0|1
+RedrawTile = <bool>
 - - - - - - - - -
 Force redraw of some overlay tiles??
 
@@ -471,7 +471,7 @@ ReverseDoor = <bool>
 If set to 1, doors will have a reversed open/closed state. PST quirk.
 
 
-ReverseToHit = 0|1
+ReverseToHit = <bool>
 - - - - - - - - - -
 Determines whether higher armor class is better (iwd2) or worse (the rest).
 
@@ -482,7 +482,7 @@ Toggles whether actors can save for half damage even when spells are not
 set up that way traditionally. Used in PST via the resource effect field.
 
 
-SelectiveMagicRes = 0|1
+SelectiveMagicRes = <bool>
 - - - - - - - - - - - -
 Determines whether the magic resistance applies to all effects, even the
 beneficial ones.
@@ -506,7 +506,7 @@ SpawnIni = <bool>
 Determines whether the game stores spawns in external INI files.
 
 
-SpellBookIconHack = 0|1
+SpellBookIconHack = <bool>
 - - - - - - - - - - - -
 Enables the spell book icon name hack needed for ToB.
 
@@ -516,12 +516,12 @@ StartActive = <bool>
 Toggles whether actors start active (script activated) or not.
 
 
-StealIsAttack = 0|1
+StealIsAttack = <bool>
 - - - - - - - - - -
 Determines whether a detected stealing attempt causes the shopkeep to turn hostile.
 
 
-StrrefSaveGame = 0|1
+StrrefSaveGame = <bool>
 - - - - - - - - - - -
 Determines whether the GameScript action SaveGame uses the int0 paramater
 to lookup a strref, or to look in savegame.2da for the save game name.
