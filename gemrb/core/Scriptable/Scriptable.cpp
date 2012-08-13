@@ -51,7 +51,7 @@ namespace GemRB {
 
 // we start this at a non-zero value to make debugging easier
 static ieDword globalActorCounter = 10000;
-static bool startActive = core->HasFeature(GF_START_ACTIVE);
+static bool startActive = false;
 
 /***********************
  *  Scriptable Class   *
@@ -130,7 +130,7 @@ Scriptable::Scriptable(ScriptableType type)
 	AddTrigger(TriggerEntry(trigger_oncreation));
 
 	memset( script_timers,0, sizeof(script_timers));
-
+	startActive = core->HasFeature(GF_START_ACTIVE);
 }
 
 Scriptable::~Scriptable(void)
