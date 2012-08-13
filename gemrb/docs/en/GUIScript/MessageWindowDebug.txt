@@ -5,7 +5,7 @@ Alias: debug(log_level)
 
 Description: Enable/Disable logging messages of "log_level" to the message window.
 
-Parameters: log_level - can be a numeric string representing levels or the level itself as a string. FATAL = 0, ERROR = 1, WARNING = 2, MESSAGE = 3, COMBAT = 4, DEBUG = 5. (see GUIDefines.py)
+Parameters: log_level - can be a numeric string representing levels or the level itself as a string. FATAL = 0, ERROR = 1, WARNING = 2, MESSAGE = 3, COMBAT = 4, DEBUG = 5 (see GUIDefines.py). Values of "none" or "off" will remove the logger.
 
 Return value: None
 
