@@ -46,12 +46,12 @@ bool Logger::SetLogLevel(log_level level)
 		snprintf(msg, 25, fmt, level);
 		// careful to use our log function and not the global one to prevent this message form
 		// propagating to other loggers.
-		log(INTERNAL, "Logger", msg, DEFAULT);
+		LogInternal(INTERNAL, "Logger", msg, DEFAULT);
 		return true;
 	} else {
 		// careful to use our log function and not the global one to prevent this message form
 		// propagating to other loggers.
-		log(INTERNAL, "Logger", "Log Level cannot be set below CRITICAL.", RED);
+		LogInternal(INTERNAL, "Logger", "Log Level cannot be set below CRITICAL.", RED);
 	}
 	return false;
 }
