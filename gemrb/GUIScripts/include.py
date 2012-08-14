@@ -1,5 +1,6 @@
 # this file is executed at gemrb startup, for the Console
 from ie_stats import *
+from GUIDefines import *
 
 # /handy/ shorthand forms
 def gps(stat, base=0):
@@ -12,7 +13,7 @@ def mta(area):
 	GemRB.MoveToArea(area)
 
 def debug(level):
-	GemRB.MessageWindowDebug(str(level))
+	GemRB.MessageWindowDebug(level)
 
 def cc(cre, px=-1, py=-1):
 	GemRB.CreateCreature(GemRB.GameGetFirstSelectedPC(), cre, px, py)

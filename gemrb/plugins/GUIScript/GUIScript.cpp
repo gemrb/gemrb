@@ -6537,17 +6537,16 @@ PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
 
 static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
 {
-	char* levelStr;
-	if (!PyArg_ParseTuple( args, "s", &levelStr )) {
+	int logLevel;
+	if (!PyArg_ParseTuple( args, "i", &logLevel )) {
 		return AttributeError( GemRB_MessageWindowDebug__doc );
 	}
 
-	if (strcasecmp(levelStr, "none") == 0 || strcasecmp(levelStr, "off") == 0) {
+	if (logLevel == -1) {
 		RemoveLogger(getMessageWindowLogger());
-	} else if (isdigit(*levelStr)) {
-		getMessageWindowLogger(true)->SetLogLevel((log_level)(*levelStr - 48));
 	} else {
-		getMessageWindowLogger(true)->SetLogLevel(levelStr);
+		// convert it to the internal representation
+		getMessageWindowLogger(true)->SetLogLevel((log_level)logLevel);
 	}
 
 	Py_INCREF( Py_None );
