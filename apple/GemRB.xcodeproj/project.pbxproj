@@ -369,6 +369,7 @@
 		A2D0505114D0B06C00D8CD77 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505414D0C17500D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
+		A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
 		A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
@@ -1609,6 +1610,8 @@
 		A2D4C52E13A978110086BCC4 /* StringMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringMap.h; sourceTree = "<group>"; };
 		A2D4C52F13A978110086BCC4 /* strrefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strrefs.h; sourceTree = "<group>"; };
 		A2D4C53013A978110086BCC4 /* win32def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32def.h; sourceTree = "<group>"; };
+		A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = SpriteRenderer.inl; sourceTree = "<group>"; };
+		A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = TileRenderer.inl; sourceTree = "<group>"; };
 		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		A2DE329814EB071200117503 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_AppDelegate.h; sourceTree = "<group>"; };
@@ -2572,6 +2575,8 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
+				A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */,
 				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
 				A298DD1814EB4EEB00F59F56 /* SDL20Video.h */,
 				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
@@ -4770,6 +4775,7 @@
 				A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */,
 				A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */,
 				A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */,
+				A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
