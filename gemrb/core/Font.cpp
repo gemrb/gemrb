@@ -357,10 +357,10 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
-	Print(rgn, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
+	Print(NULL, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
 }
 
-void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
+void Font::Print(Region* cliprgn, Region rgn, const unsigned char* string,
 	Palette* hicolor, unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
@@ -494,14 +494,14 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			continue;
 		}
 
-		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette);
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, cliprgn, blitPalette);
 
 		if (cursor && ( curpos == i ))
-			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
+			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, cliprgn );
 		x += currGlyph->Width;
 	}
 	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
+		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, cliprgn );
 	}
 	SET_BLIT_PALETTE(NULL);
 	free( tmp );

@@ -3459,7 +3459,7 @@ void Interface::DrawTooltip ()
 		strx+=TooltipMargin;
 	}
 	Region textr = Region( strx, y, strw, h );
-	fnt->Print( r2, textr, (ieByte *) tooltip_text, NULL,
+	fnt->Print( &r2, textr, (ieByte *) tooltip_text, NULL,
 		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
 }
 
