@@ -3446,10 +3446,9 @@ void Interface::DrawTooltip ()
 
 	int x = strx + ((strw - w) / 2);
 
-	// FIXME: take back[0] from center, not from left end
 	Region r2 = Region( x, y, w, h );
 	if (TooltipBack) {
-		video->BlitSprite( TooltipBack[0], x + TooltipMargin, y, true, &r2 );
+		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &r2 );
 		video->BlitSprite( TooltipBack[1], x, y, true );
 		video->BlitSprite( TooltipBack[2], x + w, y, true );
 	}
