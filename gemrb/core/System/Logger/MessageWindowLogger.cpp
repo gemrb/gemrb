@@ -77,7 +77,7 @@ void MessageWindowLogger::LogInternal(log_level level, const char* owner, const 
 			level = MESSAGE;
 		}
 		const char* fmt = "%s%s: [/color]%s%s[/color]";
-		char* msg = (char*)malloc(strlen(message) + strlen(owner) + 45);
+		char* msg = (char*)malloc(strlen(message) + strlen(owner) + strlen(fmt) + 28); // 28 is for sizeof(colors[x]) * 2
 		sprintf(msg, fmt, colors[color], owner, colors[log_level_color[level]], message);
 		displaymsg->DisplayString(msg);
 		free(msg);
