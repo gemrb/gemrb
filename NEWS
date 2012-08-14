@@ -1,9 +1,11 @@
-GemRB git (85bb2ad):
+GemRB git (0de48ce62):
   New features:
     - 
+    - gemrb output can now be shown in the ingame message window (debug(5))
 
   Improved features:
     - 
+    - actions, fonts
     - bugfixes
 
 GemRB V0.7.1 (2012-07-15):
