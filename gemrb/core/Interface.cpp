@@ -24,6 +24,7 @@
 
 #include "Interface.h"
 
+#include "defsounds.h" // for DS_TOOLTIP
 #include "exports.h"
 #include "globals.h"
 #include "strrefs.h"
@@ -3136,6 +3137,15 @@ void Interface::DisplayTooltip(int x, int y, Control *ctrl)
 	tooltip_x = x;
 	tooltip_y = y;
 	tooltip_currtextw = 0;
+	if (x && y && tooltip_ctrl != ctrl) {
+		// use a sound handle so we can stop previous unroll sounds
+		if (tooltip_sound) {
+			tooltip_sound->Stop();
+			tooltip_sound.release();
+		}
+		// exactly like PlaySound(DS_TOOLTIP) but storing the handle
+		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP]);
+	}
 	tooltip_ctrl = ctrl;
 }
 

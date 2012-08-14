@@ -29,6 +29,7 @@
 #include "SClassID.h"
 #include "exports.h"
 
+#include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
 #include "Cache.h"
 #include "Callback.h"
 #include "Holder.h"
@@ -38,7 +39,6 @@
 #include <vector>
 
 #ifdef _MSC_VER // No SFINAE
-#include "Audio.h"
 #include "DataFileMgr.h"
 #include "MusicMgr.h"
 #include "SaveGame.h"
@@ -346,6 +346,7 @@ private:
 	int tooltip_x;
 	int tooltip_y;
 	int tooltip_currtextw;
+	Holder<SoundHandle> tooltip_sound;
 	// the control owning the tooltip
 	Control* tooltip_ctrl;
 	// Currently dragged item or NULL
