@@ -12,7 +12,7 @@ def mta(area):
 	GemRB.MoveToArea(area)
 
 def debug(level):
-	GemRB.MessageWindowDebug(level)
+	GemRB.MessageWindowDebug(str(level))
 
 def cc(cre, px=-1, py=-1):
 	GemRB.CreateCreature(GemRB.GameGetFirstSelectedPC(), cre, px, py)
