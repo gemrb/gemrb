@@ -3425,13 +3425,16 @@ void Interface::DrawTooltip ()
 		h = TooltipBack[0]->Height;
 		w1 = TooltipBack[1]->Width;
 		w2 = TooltipBack[2]->Width;
-		w += TooltipMargin*2;
-		strw += TooltipMargin*2;
+		int margins = TooltipMargin*2;
+		w += margins;
+		strw += margins;
+		int strwmax = TooltipBack[0]->Width - margins;
 		//multiline in case of too much text
-		if (w>TooltipBack[0]->Width)
-			strw=w=TooltipBack[0]->Width;
-		else if (strw>TooltipBack[0]->Width)
-			strw=TooltipBack[0]->Width;
+		if (w > TooltipBack[0]->Width) {
+			w = TooltipBack[0]->Width;
+			strw = strwmax;
+		} else if (strw > strwmax)
+			strw = strwmax;
 	}
 
 	int strx = tooltip_x - strw / 2;
@@ -3454,8 +3457,9 @@ void Interface::DrawTooltip ()
 	}
 
 	if (TooltipBack) {
-		r2.x+=TooltipMargin;
-		strx+=TooltipMargin;
+		r2.x += TooltipBack[1]->Width;
+		r2.w -= TooltipBack[2]->Width;
+		strx += TooltipMargin;
 	}
 	Region textr = Region( strx, y, strw, h );
 	fnt->Print( &r2, textr, (ieByte *) tooltip_text, NULL,
