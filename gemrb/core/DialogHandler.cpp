@@ -177,10 +177,11 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
 	core->GetGame()->SetControlStatus(CS_DIALOG, BM_NAND);
-	if ( !core->InCutSceneMode() ) {
-		core->GetGameControl()->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_NAND);
+	GameControl* gc = core->GetGameControl();
+	if ( !(gc->GetScreenFlags()&SF_CUTSCENE)) {
+		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_NAND);
 	}
-	core->GetGameControl()->SetDialogueFlags(0, BM_SET);
+	gc->SetDialogueFlags(0, BM_SET);
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
