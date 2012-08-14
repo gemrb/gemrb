@@ -1555,6 +1555,10 @@ void Inventory::EquipBestWeapon(int flags)
 		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
+			//cannot change equipment when holding a cursed weapon
+			if (Slot->Flags & IE_INV_ITEM_CURSED) {
+				return;
+			}
 			//best ranged
 			int tmp = itm->GetDamagePotential(true, header);
 			if (tmp>damage) {
@@ -1570,6 +1574,10 @@ void Inventory::EquipBestWeapon(int flags)
 		for(i=SLOT_MELEE;i<=LAST_MELEE;i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
+			//cannot change equipment when holding a cursed weapon
+			if (Slot->Flags & IE_INV_ITEM_CURSED) {
+				return;
+			}
 			//best ranged
 			int tmp = itm->GetDamagePotential(true, header);
 			if (tmp>damage) {
@@ -1586,6 +1594,10 @@ void Inventory::EquipBestWeapon(int flags)
 		for(i=SLOT_MELEE;i<=LAST_MELEE;i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
+			//cannot change equipment when holding a cursed weapon
+			if (Slot->Flags & IE_INV_ITEM_CURSED) {
+				return;
+			}
 			//the Slot flag is enough for this
 			//though we need animation type/damagepotential anyway
 			if (Slot->Flags&IE_INV_ITEM_BOW) continue;

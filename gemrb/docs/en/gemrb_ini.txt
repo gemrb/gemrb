@@ -18,6 +18,12 @@ specific to GemRB and which are not intended to be usually changed by
 a user. More complicated configuration data (tables, etc.) are kept in
 their own files. User specific configuration is in other file (GemRB.cfg).
 
+Options that do not deal strictly with data availability and diversity
+may be freely changed. Some that may be interesting to users include:
+AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
+HasSpecificDamageBonus (mod required), HasWisdomBonusTable (mod required),
+KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack and TeamMovement.
+
 [FIXME: eventually, this file could be searched for in user's config directory too]
 
 This file's path can be 
@@ -129,11 +135,10 @@ Each pixel line in these files is for one base color. Pixels in the
 row then define the gradient of that color.
 
 
-IgnoreButtonFrames = <bool>
-- - - - - - - - - - - - - -
-If set to 1, buttons will ignore frame numbers as set in button CHU
-resource, and always use frames 0, 1, 2, 3 from their associated
-BAM. (PST, ...)
+3EdRules = <bool>
+- - - - - - - - -
+Toggles whether the game (data) is using the 3rd edition rules. Blindly
+toggling it will do no good!
 
 
 AllStringsTagged = <bool>
@@ -142,21 +147,130 @@ If set to 1, .tlk tokens are always resolved regardless of the token
 flag in dialog.tlk. Normally only BG2 has token flags (0), all other
 games have this option set to 1.
 
-HasDPLAYER = <bool>
-- - - - - - - - - - 
-If set to 1, then NPCs will get a default player script (DPLAYER2) set
-when they join the party. PST has no such feature. 
 
-HasPickSound = <bool>
+AreaVisitedVar = <bool>
+- - - - - - - - - - - -
+Toggles whether also AREANAME_visited variables are set when an actor
+enters an area. Used in the IWD scripts and worldmaps.
+
+
+AreaOverride = <bool>
 - - - - - - - - - - -
-If set to 1, items have a pick up sound resource reference instead of a
-description icon. PST has this option. (Mutually exclusive with the 
-HasDescIcon option).
+Toggles use of area customisation scripts. Used to implement the PST
+random modron mazes.
+
+
+AutomapINI = <bool>
+- - - - - - - - - -
+If set to 1, automap entries will be done PST style.
+
+
+AutoSearchHidden = <bool>
+- - - - - - - - - - - - -
+Toggles whether character automatically search for hidden doors.
+
+
+BiographyIsRes = <bool>
+- - - - - - - - - - - -
+Toggles whether to expect the biography extension as "res" or "bio".
+
+
+BreakableWeapons = <bool>
+- - - - - - - - - - - -
+Determines if weapons can randomly break when used (1% chance in bg1).
+
+
+CastingSounds = <bool>
+- - - - - - - - - - - -
+Toggles whether the game supports casting sounds.
+
+
+ChallengeRating = <bool>
+- - - - - - - - - - - - -
+Toggles whether the game supports challenge ratings. Affects experience
+gains.
+
+
+CharNameIsGabber = <bool>
+- - - - - - - - - - - - -
+Toggles whether Player1 is treated as a protagonist, talker, gabber in
+dialogs and interactions.
+
+
+CheckAbilities = <bool>
+- - - - - - - - - - -
+Determines if character abilities should matter in item usability checks.
+
+
+CutsceneAreascripts = <bool>
+- - - - - - - - - -
+Determines whether area scripts should run during cutscenes or not.
+
+
+DeathOnZeroStat = <bool>
+- - - - - - - - - - -
+Determines whether characters should die if any of their primary stats
+reaches zero.
+
+
+DialogueScrolls = <bool>
+- - - - - - - - - - - - -
+If set to 1, dialogue window behaves as in PS:T - i.e. talk between 
+Nameless One and others is appended into the window as it comes. If set to
+0 (default) each new pair of NPC's talk and Nameless One's replies is
+written from the start of the page, like in BG2.
+
+
+EnhancedCastingSounds = <bool>
+- - - - - - - - - - - - - - - -
+Toggles whether the game supports enhanced casting sounds (bg2).
+
+
+EnhancedEffects = <bool>
+- - - - - - - - - - - - -
+Toggles whether the game supports enhanced effects (iwd2). This has to
+do with the data (EFF version), so do not change it on a whim.
+
+
+FistStat = <number>
+- - - - - - - - -
+Which stat determines the fist weapon (defaults to IE_CLASS).
+
+
+ForceAreaScript = <bool>
+- - - - - - - - - - - - -
+Toggle always running area scripts, even in dialog.
+
+
+ForceStereo = <bool>
+- - - - - - - - - - -
+If set to 1, all acm files will be player as if they are stereo. 
+Some early .ACM files (PST, IWD1) were encoded with a faulty channel
+number, this option overrides the channel number.
+
+
+FlexibleWorldmap = <bool>
+- - - - - - - - - - - - -
+Toggles whether the game supports worldmap extensions.
+
+
+HasBeastsINI = <bool>
+- - - - - - - - - - -
+Whether original game data contains beasts.ini and quests.ini files
+with descriptions of monsters and quests (PST only).
+
 
 HasDescIcon = <bool>
 - - - - - - - - - - -
 If set to 1, items have a description icon, instead of a pick up sound.
 BG2 has this option. (Mutually exclusive with the HasPickSound option).
+
+
+HasDPLAYER = <bool>
+- - - - - - - - - - 
+If set to 1, then NPCs will get a default player script (DPLAYER2) set
+when they join the party. PST has no such feature. 
+
 
 HasEXPTABLE = <bool>
 - - - - - - - - - - -
@@ -166,10 +280,48 @@ will use xplist.2da table for a similar feature. AddXP2da and AddXPVar
 scripting actions use this option to determine which .2da file to use.
 XPList is bg2 specific, while exptable is an iwd2 feature.
 
-SoundFolders = <bool>
+
+HasFloatMenu = <bool>
 - - - - - - - - - - -
-If set to 1, then there are separate directories for each player
-character soundset. IWD2 specific.
+Used for the PST float menu implementation. Not portable without extra
+guiscript work.
+
+
+HasHideInShadows = <bool>
+- - - - - - - - - - - -
+Enable this if the characters also have the IE_HIDEINSHADOWS stat besides
+IE_STEALTH.
+
+
+HasKaputz = <bool>
+- - - - - - - - - -
+If set to 1, then death variables will be in a separate context.
+This is PST specific.
+
+
+HasNoNPCFlag = <bool>
+- - - - - - - - - - -
+Detail about how infopoints react when used (all except iwd2).
+
+
+HasPartyINI = <bool>
+- - - - - - - - - - -
+If set to 1, then there is a party.ini file describing pre-generated 
+parties. Normally only IWD2 has this option set.
+
+
+HasPickSound = <bool>
+- - - - - - - - - - -
+If set to 1, items have a pick up sound resource reference instead of a
+description icon. PST has this option. (Mutually exclusive with the 
+HasDescIcon option).
+
+
+HasResDataIni = <bool>
+- - - - - - - - - - - -
+Determines whether the game stores some sounds in separate resource
+INI files and where they are ("resdata").
+
 
 HasSongList = <bool>
 - - - - - - - - - - -
@@ -178,35 +330,103 @@ Otherwise the music files are listed in a music.2da file. Original
 BG1 and PST doesn't have either of these files (the list is hardcoded
 into the engine), GemRB supplies a music.2da file for them.
 
-UpperButtonText = <bool>
+
+HasSoundsIni = <bool>
+- - - - - - - - - - -
+Determines whether the game stores some sounds in separate resource
+INI files and where they are ("sounds").
+
+
+HasSpecificDamageBonus = <bool>
+- - - - - - - - - - - - - - -
+Determines if the game supports specific damage bonus like for example +10%
+extra cold damage.
+
+
+HasSpellList = <bool>
+- - - - - - - - - - -
+Toggles whether the game has separate spell lists. Used in iwd2 for the
+wider selection of spell books/types.
+
+
+HasUsePointFlag = <bool>
 - - - - - - - - - - - - -
-Set to 1 if button labels should be converted to upper-case (e.g. BG2)
+Detail about how infopoints react when used (iwd2).
+
+
+HasWisdomBonusTable = <bool>
+- - - - - - - - - - - - - - -
+Toggles whether the game has a wisxpbon.2da that dictates a bonus or malus
+to gained experience according to the actor's wisdom (pst).
+
+
+IgnoreButtonFrames = <bool>
+- - - - - - - - - - - - - -
+If set to 1, buttons will ignore frame numbers as set in button CHU
+resource, and always use frames 0, 1, 2, 3 from their associated
+BAM. (PST, ...)
+
+
+IWD2DeathVarFormat = <bool>
+- - - - - - - - - - - - - -
+Toggles whether the game uses the IWD2 death var format ("_DEAD%s").
+
+
+IWDMapDimensions = <bool>
+- - - - - - - - - - - - -
+If set to 1, then the minimap dimensions are using the IWD specific ratio.
+
+
+IWD2ScriptName = <bool>
+- - - - - - - - - - - -
+If set to 1, then areas always override the scripting name of the creature.
+Normally there is an area flag for this.
+
+
+JournalHasSections = <bool>
+- - - - - - - - - - - - - -
+Toggles whether the journal is split in multiple sections ala BG2.
+
+
+KnowWorld = <bool>
+- - - - - - - - - -
+Determines whether the worldmap is already fully explored at the start.
+All areas are marked as visited.
+
+
+LevelslotPerClass = <bool>
+- - - - - - - - - - - - - -
+Toggles whether the game expects separate stats for class levels. All but
+IWD2 have to share only 3.
 
 
 LowerLabelText = <bool>
 - - - - - - - - - - - -
 Set to 1 if label text should be converted to lower-case.
 
-HasPartyINI = <bool>
-- - - - - - - - - - -
-If set to 1, then there is a party.ini file describing pre-generated 
-parties. Normally only IWD2 has this option set.
 
-HasBeastsINI = <bool>
-- - - - - - - - - - -
-Whether original game data contains beasts.ini and quests.ini files
-with descriptions of monsters and quests (PST only).
+MagicBit = <bool>
+- - - - - - - - -
+Toggles whether the magic item bit is used for marking items as
+undroppable (iwd2 - yes).
 
-ForceStereo = <bool>
-- - - - - - - - - - -
-If set to 1, all acm files will be player as if they are stereo. 
-Some early .ACM files (PST, IWD1) were encoded with a faulty channel
-number, this option overrides the channel number.
 
-TeamMovement = <bool>
-- - - - - - - - - - -
-If set to 1, the team always moves to the protagonist (first player).
-This option is 1 for original PST.
+MaximumAbility = 25|40
+- - - - - - - - - - - -
+Determines the maximum value of character abilities. Setting it to absurd
+values might cause problems. Its value should be 40 for IWD2, 25 for all
+other games.
+
+
+NoDropCanMove = <bool>
+- - - - - - - - - - - -
+Toggles whether undroppable items can be moved around.
+
+
+NoNewVariables = <bool>
+- - - - - - - - - - - -
+Toggles whether the engine can create new variables in the Game structure.
+
 
 OneByteAnimationID = <bool>
 - - - - - - - - - - - - - -
@@ -218,9 +438,61 @@ are also controlled by this flag. One such example is the avatar icon
 size in the saved games. If set to 1, then the avatar portrait won't be 
 shrunk further. Otherwise the saved portrait bmp's will be shrunk 2:1.
 
-AutomapINI = <bool>
+
+OnScreenText = <bool>
+- - - - - - - - - - -
+Toggles whether the game displays text on the game area instead of the
+message window (pst).
+
+
+ProperBackstab = <bool>
+- - - - - - - - - - -
+Determines how many checks the backstabbing code does before treating an
+attack as a backstab.
+
+
+ProtagonistTalks = <bool>
+- - - - - - - - - - - - -
+If set to 1, only protagonist speaks with stranger for the whole party (PST).
+
+
+PSTStateFlags = <bool>
+- - - - - - - - - - - -
+Toggles whether to interpret state flags like PST. For example, the
+invisibility state flag is different there.
+
+
+RedrawTile = <bool>
+- - - - - - - - -
+Force redraw of some overlay tiles??
+
+
+RareActionSounds = <bool>
+- - - - - - - - - - - - -
+Toggles whether to use all the available verbal constants or not.
+
+
+ReverseDoor = <bool>
+- - - - - - - - - - -
+If set to 1, doors will have a reversed open/closed state. PST quirk.
+
+
+ReverseToHit = <bool>
 - - - - - - - - - -
-If set to 1, automap entries will be done PST style.
+Determines whether higher armor class is better (iwd2) or worse (the rest).
+
+
+SaveForHalfDamage = <bool>
+- - - - - - - - - - - - -
+Toggles whether actors can save for half damage even when spells are not
+set up that way traditionally. Used in PST via the resource effect field.
+
+
+SelectiveMagicRes = <bool>
+- - - - - - - - - - - -
+Determines whether the magic resistance applies to all effects, even the
+beneficial ones.
+
 
 SmallFog = <bool>
 - - - - - - - - - - -
@@ -228,95 +500,45 @@ Whether fog-of-war maintained in Map::ExploredBitmap is aligned with
 map boundary (SmallFog=1, like in PST) or the fog is half a tile
 larger in each of four cardinal directions (SmallFog=0, e.g. in BG2)
 
-ReverseDoor = <bool>
+
+SoundFolders = <bool>
 - - - - - - - - - - -
-If set to 1, doors will have a reversed open/closed state. PST quirk.
+If set to 1, then there are separate directories for each player
+character soundset. IWD2 specific.
 
-ProtagonistTalks = <bool>
-- - - - - - - - - - - - -
-If set to 1, only protagonist speaks with stranger for the whole party (PST).
 
-HasKaputz = <bool>
+SpawnIni = <bool>
+- - - - - - - - -
+Determines whether the game stores spawns in external INI files.
+
+
+SpellBookIconHack = <bool>
+- - - - - - - - - - - -
+Enables the spell book icon name hack needed for ToB.
+
+
+StartActive = <bool>
+- - - - - - - - - - -
+Toggles whether actors start active (script activated) or not.
+
+
+StealIsAttack = <bool>
 - - - - - - - - - -
-If set to 1, then death variables will be in a separate context.
-This is PST specific.
+Determines whether a detected stealing attempt causes the shopkeep to turn hostile.
 
-IWDMapDimensions = <bool>
-- - - - - - - - - - - - -
-If set to 1, then the minimap dimensions are using the IWD specific ratio.
 
-IWD2ScriptName = <bool>
-- - - - - - - - - - - -
-If set to 1, then areas always override the scripting name of the creature.
-Normally there is an area flag for this.
-
-DialogueScrolls = <bool>
-- - - - - - - - - - - - -
-If set to 1, dialogue window behaves as in PS:T - i.e. talk between 
-Nameless One and others is appended into the window as it comes. If set to
-0 (default) each new pair of NPC's talk and Nameless One's replies is
-written from the start of the page, like in BG2.
-
-MaximumAbility = 25|40
-- - - - - - - - - - - -
-Determines the maximum value of character abilities. Setting it to absurd
-values might cause problems. Its value should be 40 for IWD2, 25 for all
-other games.
-
-StrrefSaveGame = 0|1
+StrrefSaveGame = <bool>
 - - - - - - - - - - -
 Determines whether the GameScript action SaveGame uses the int0 paramater
 to lookup a strref, or to look in savegame.2da for the save game name.
 
-ReverseToHit = 0|1
-- - - - - - - - - -
-Determines whether higher armor class is better (iwd2) or worse (the rest).
 
-RedrawTile = 0|1
-- - - - - - - - -
-Force redraw of some overlay tiles??
-
-CheckAbilities = 0|1
+TeamMovement = <bool>
 - - - - - - - - - - -
-Determines if character abilities should matter in item usability checks.
+If set to 1, the team always moves to the protagonist (first player).
+This option is 1 for original PST.
 
-SpellBookIconHack = 0|1
-- - - - - - - - - - - -
-Enables the spell book icon name hack needed for ToB.
 
-DeathOnZeroStat = 0|1
-- - - - - - - - - - -
-Determines whether characters should die if any of their primary stats
-reaches zero.
-
-BreakableWeapons = 0|1
-- - - - - - - - - - - -
-Determines if weapons can randomly break when used (1% chance in bg1).
-
-SelectiveMagicRes = 0|1
-- - - - - - - - - - - -
-Determines whether the magic resistance applies to all effects, even the
-beneficial ones.
-
-HasHideInShadows = 0|1
-- - - - - - - - - - - -
-Enable this if the characters also have the IE_HIDEINSHADOWS stat besides
-IE_STEALTH.
-
-ProperBackstab = 0|1
-- - - - - - - - - - -
-Determines how many checks the backstabbing code does before treating an
-attack as a backstab.
-
-HasSpecificDamageBonus = 0|1
-- - - - - - - - - - - - - - -
-Determines if the game supports specific damage bonus like for example +10%
-extra cold damage.
-
-StealIsAttack = 0|1
-- - - - - - - - - -
-Determines whether a detected stealing attempt causes the shopkeep to turn hostile.
-
-CutsceneAreascripts = 0|1
-- - - - - - - - - -
-Determines whether area scripts should run during cutscenes or not.
+UpperButtonText = <bool>
+- - - - - - - - - - - - -
+Set to 1 if button labels should be converted to upper-case (e.g. BG2)

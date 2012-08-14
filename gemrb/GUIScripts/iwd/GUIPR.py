@@ -181,10 +181,7 @@ def UpdatePriestWindow ():
 		# also check the DRUIDSPELL column
 		DivineCaster = CommonTables.ClassSkills.GetValue (Class, 0)
 	CantCast = DivineCaster == "*" or GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-	if CantCast or GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
-		Window.SetVisible (WINDOW_GRAYED)
-	else:
-		Window.SetVisible (WINDOW_VISIBLE)
+	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 	return
 
 def PriestPrevLevelPress ():
