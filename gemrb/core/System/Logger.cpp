@@ -56,24 +56,6 @@ bool Logger::SetLogLevel(log_level level)
 	return false;
 }
 
-bool Logger::SetLogLevel(char* levelStr)
-{
-	if (strcasecmp(levelStr, "FATAL") == 0) {
-		return SetLogLevel(FATAL);
-	} else if (strcasecmp(levelStr, "ERROR") == 0) {
-		return SetLogLevel(ERROR);
-	} else if (strcasecmp(levelStr, "WARNING") == 0) {
-		return SetLogLevel(WARNING);
-	} else if (strcasecmp(levelStr, "MESSAGE") == 0) {
-		return SetLogLevel(MESSAGE);
-	} else if (strcasecmp(levelStr, "COMBAT") == 0) {
-		return SetLogLevel(COMBAT);
-	} else if (strcasecmp(levelStr, "DEBUG") == 0) {
-		return SetLogLevel(DEBUG);
-	}
-	return false;
-}
-
 void Logger::log(log_level level, const char* owner, const char* message, log_color color)
 {
 	if (level <= myLevel) {

@@ -59,7 +59,6 @@ public:
 	virtual void destroy();
 
 	bool SetLogLevel(log_level);
-	bool SetLogLevel(char* lvlString); // convinience to translate english to a log_level
 	void log(log_level, const char* owner, const char* message, log_color color);
 protected:
 	virtual void LogInternal(log_level, const char*, const char*, log_color) {};
