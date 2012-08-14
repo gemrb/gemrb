@@ -973,14 +973,12 @@ void TextArea::Clear()
 
 //setting up the textarea for smooth scrolling, the first
 //TEXTAREA_OUTOFTEXT callback is called automatically
-void TextArea::SetupScroll(unsigned long tck)
+void TextArea::SetupScroll()
 {
-	/*
-	tck=number of ticks in which it takes to scroll 1 line
-	*/
 	SetPreservedRow(0);
 	startrow = 0;
-	ticks = tck;
+	// ticks is the number of ticks it takes to scroll this font 1 px
+	ticks = 2000 / ftext->maxHeight; // 2000 is just a value based off the previous magic number.
 	//clearing the textarea
 	Clear();
 	unsigned int i = (unsigned int) (Height/ftext->maxHeight);

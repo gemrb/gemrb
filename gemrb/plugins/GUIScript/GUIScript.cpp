@@ -521,9 +521,9 @@ PyDoc_STRVAR( GemRB_TextArea_Rewind__doc,
 
 static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 {
-	int Win, Ctrl, Ticks;
+	int Win, Ctrl;
 
-	if (!PyArg_ParseTuple( args, "iii", &Win, &Ctrl, &Ticks)) {
+	if (!PyArg_ParseTuple( args, "ii", &Win, &Ctrl)) {
 		return AttributeError( GemRB_TextArea_Rewind__doc );
 	}
 
@@ -532,7 +532,7 @@ static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	ctrl->SetupScroll(Ticks);
+	ctrl->SetupScroll();
 	Py_INCREF( Py_None );
 	return Py_None;
 }

@@ -92,8 +92,8 @@ public:
 	}
 	/** adds empty lines so minrow will be the uppermost visible row */
 	void PadMinRow();
-	/** Sets up scrolling, tck is the scrolling speed */
-	void SetupScroll(unsigned long tck);
+	/** Sets up auto scrolling (chapter text) */
+	void SetupScroll();
 	/** Per Pixel scrolling */
 	void ScrollToY(unsigned long y, Control* sender);
 	/** Sets the Fonts */

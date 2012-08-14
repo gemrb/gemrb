@@ -28,8 +28,6 @@ Row = 1
 Position = 0
 Chapter = 0
 TableName = None
-BGTICKS = 300 # TODO: verify for suitability
-Ticks = IWDTICKS = 200 # TODO: verify for suitability in iwd1
 
 def FindTextRow (Table):
 	global Row
@@ -41,7 +39,7 @@ def FindTextRow (Table):
 	return
 
 def StartTextScreen ():
-	global TextScreen, TextArea, Chapter, TableName, Row, Ticks
+	global TextScreen, TextArea, Chapter, TableName, Row
 
 	GemRB.GamePause (1, 3)
 	GemRB.DisplayString (17556, 0xff0000) #Paused for chapter text
@@ -50,8 +48,6 @@ def StartTextScreen ():
 		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
 	else:
 		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
-		if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
-			Ticks = BGTICKS
 
 	LoadPic = TableName = GemRB.GetGameString (STR_LOADMOS)
 	#if there is no preset loadpic, try to determine it from the chapter
@@ -121,7 +117,7 @@ def StartTextScreen ():
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
 	TextScreen.SetVisible (WINDOW_VISIBLE)
 
-	TextArea.Rewind (Ticks)
+	TextArea.Rewind ()
 	return
 
 def FeedScroll ():
@@ -163,5 +159,5 @@ def ReplayTextScreen ():
 
 	Position = 0
 	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, FeedScroll)
-	TextArea.Rewind (Ticks)
+	TextArea.Rewind ()
 	return
