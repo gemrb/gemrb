@@ -3566,6 +3566,9 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 void Interface::AskAndExit()
 {
 	if (game) {
+		if (ConsolePopped) {
+			PopupConsole();
+		}
 		SetPause(PAUSE_ON);
 		LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
