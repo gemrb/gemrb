@@ -572,7 +572,11 @@ void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
-	return (SDL_SetWindowFullscreen(window, (SDL_bool)set) == 0);
+	if (SDL_SetWindowFullscreen(window, (SDL_bool)set) == GEM_OK) {
+		fullscreen = set;
+		return true;
+	}
+	return false;
 }
 
 bool SDL20VideoDriver::ToggleGrabInput()
