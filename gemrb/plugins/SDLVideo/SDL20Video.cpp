@@ -24,10 +24,6 @@
 #include "GUI/Console.h"
 #include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
 
-#ifdef ANDROID
-#include "SDL_screenkeyboard.h"
-#endif
-
 using namespace GemRB;
 
 //touch gestures
@@ -410,7 +406,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			} else if (numFingers == core->NumFingKboard) {
 				if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
 					// if the keyboard is already up interpret this gesture as console pop
-					if( softKeyboardShowing && !ConsolePopped ) core->PopupConsole();
+					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
 					else ShowSoftKeyboard();
 				} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
 					HideSoftKeyboard();
@@ -548,13 +544,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 void SDL20VideoDriver::HideSoftKeyboard()
 {
 	if(core->UseSoftKeyboard){
-#if TARGET_OS_IPHONE
-		SDL_iPhoneKeyboardHide(window);
-#endif
-#ifdef ANDROID
-		SDL_ANDROID_SetScreenKeyboardShown(0);
-#endif
-		softKeyboardShowing = false;
+		SDL_HideScreenKeyboard(window);
 		if(core->ConsolePopped) core->PopupConsole();
 	}
 }
@@ -565,13 +555,7 @@ void SDL20VideoDriver::HideSoftKeyboard()
 void SDL20VideoDriver::ShowSoftKeyboard()
 {
 	if(core->UseSoftKeyboard){
-#if TARGET_OS_IPHONE
-		SDL_iPhoneKeyboardShow(window);
-#endif
-#ifdef ANDROID
-		SDL_ANDROID_SetScreenKeyboardShown(1);
-#endif
-		softKeyboardShowing = true;
+		SDL_ShowScreenKeyboard(window);
 	}
 }
 

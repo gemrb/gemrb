@@ -101,7 +101,6 @@ protected:
 	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
 	CursorType CursorIndex;
 	Region CursorPos;
-	bool softKeyboardShowing;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];

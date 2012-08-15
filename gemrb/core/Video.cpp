@@ -36,8 +36,6 @@ const TypeID Video::ID = { "Video" };
 Video::Video(void)
 	: Viewport()
 {
-	softKeyboardShowing = false;
-
 	CursorIndex = VID_CUR_UP;
 	Cursor[VID_CUR_UP] = NULL;
 	Cursor[VID_CUR_DOWN] = NULL;
