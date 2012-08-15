@@ -273,7 +273,7 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	//don't allow dead, don't allow maze and similar effects
-	if (tar->ValidTarget(GA_NO_DEAD|GA_NO_HIDDEN)) {
+	if (tar->ValidTarget(GA_NO_DEAD) && tar->GetStat(IE_AVATARREMOVAL) == 0) {
 		return 1;
 	}
 	return 0;
