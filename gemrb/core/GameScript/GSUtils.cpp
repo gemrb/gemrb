@@ -1415,6 +1415,13 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 	SKIP_ARGUMENT();
 	object = new Object();
 	switch (*src) {
+	case ')':
+		// missing parameter
+		// (for example, StartDialogueNoSet() in aerie.d)
+		Log(WARNING, "GSUtils", "ParseObject expected an object when parsing dialog");
+		// replace with Myself
+		object->objectFilters[0] = 1;
+		break;
 	case '"':
 		//Scriptable Name
 		src++;
