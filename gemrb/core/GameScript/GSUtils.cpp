@@ -1076,10 +1076,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
-	// HACK: skip the check for StartDialog, since it makes no sense (breaks transition to hell)
 	Action *curact = target->GetCurrentAction();
-	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && ((curact && curact->actionID != 137) || \
-	  (!curact && target->GetNextAction()))) {
+	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
+	  (!curact && target->GetNextAction())) {
 		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
 		displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		Sender->ReleaseCurrentAction();
