@@ -1033,7 +1033,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			break;
 		case BD_SOURCE:
 		case BD_TARGET:
-			if (swap) Dialog = scr->GetDialog();
+			// Don't check for the target being non-interruptible if we swapped speakers
+			// or if the speaker is the target, otherwise do (and request feedback on failure).
+			if (swap || speaker==target) Dialog = scr->GetDialog();
 			else Dialog = target->GetDialog(GD_FEEDBACK);
 			break;
 		case BD_RESERVED:
@@ -1080,8 +1082,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// actually busy doing something, for the same reason
 	// HACK: skip the check for StartDialog, since it makes no sense (breaks transition to hell)
 	Action *curact = target->GetCurrentAction();
-	if (target->GetInternalFlag()&IF_NOINT && ((curact && curact->actionID != 137) || \
-	(!curact && target->GetNextAction()))) {
+	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && ((curact && curact->actionID != 137) || \
+	  (!curact && target->GetNextAction()))) {
 		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
 		displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		Sender->ReleaseCurrentAction();
