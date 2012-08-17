@@ -125,7 +125,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/DataStream.cpp
 	System/FileStream.cpp
 	System/MemoryStream.cpp
-	System/StringBuffer.cpp
 	System/Logger.cpp
 	System/Logger/File.cpp
 	System/Logger/MessageWindowLogger.cpp
