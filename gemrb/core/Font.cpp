@@ -204,7 +204,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		for (size_t i = 0; i < len; i++) {
-			int height = GetCharSprite(tmp[i])->Height;
+			int height = GetCharSprite((unsigned char)tmp[i])->Height;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -392,7 +392,7 @@ void Font::Print(Region* cliprgn, Region rgn, const unsigned char* string,
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		
 		for (size_t i = 0; i < len; i++) {
-			int height = GetCharSprite(tmp[i])->Height;
+			int height = GetCharSprite((unsigned char)tmp[i])->Height;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -525,7 +525,7 @@ int Font::CalcStringWidth(const char* string, bool NoColor) const
 				i++;
 			}
 		}
-		ret += GetCharSprite(string[i])->Width;
+		ret += GetCharSprite((unsigned char)string[i])->Width;
 	}
 	return ( int ) ret;
 }
@@ -608,14 +608,14 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 		}
 
 		if (initials && enablecap) {
-			wx += initials->GetCharSprite(string[pos])->Width;
+			wx += initials->GetCharSprite((unsigned char)string[pos])->Width;
 			enablecap=false;
 			initials_x = wx + psx;
 			//how many more lines to be indented (one was already indented)
 			initials_rows = (initials->maxHeight-1)/maxHeight;
 			continue;
 		} else {
-			wx += GetCharSprite(string[pos])->Width;
+			wx += GetCharSprite((unsigned char)string[pos])->Width;
 		}
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
