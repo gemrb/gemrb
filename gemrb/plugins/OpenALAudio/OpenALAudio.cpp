@@ -247,6 +247,9 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		return;
 	}
 
+	stayAlive = false;
+	SDL_WaitThread(musicThread, NULL);
+
 	for(int i =0; i<num_streams; i++) {
 		streams[i].ForceClear();
 	}
@@ -264,8 +267,6 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		alcCloseDevice (device);
 	}
 	alutContext = NULL;
-	stayAlive = false;
-	SDL_WaitThread(musicThread, NULL);
 
 	SDL_DestroyMutex(musicMutex);
 	musicMutex = NULL;
