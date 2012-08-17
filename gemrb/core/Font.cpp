@@ -357,7 +357,13 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
-	Print(rgn, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
+	Region cliprgn = rgn;
+	if (!anchor) {
+		Region Viewport = core->GetVideoDriver()->GetViewport();
+		cliprgn.x -= Viewport.x;
+		cliprgn.y -= Viewport.y;
+	}
+	Print(cliprgn, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
 }
 
 void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
