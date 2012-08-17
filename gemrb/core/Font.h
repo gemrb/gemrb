@@ -100,7 +100,7 @@ public:
 	void SetPalette(Palette* pal);
 
 	// Printing methods
-	void Print(Region* cliprgn, Region rgn, const unsigned char* string,
+	void Print(Region cliprgn, Region rgn, const unsigned char* string,
 		Palette* color, unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false) const;
