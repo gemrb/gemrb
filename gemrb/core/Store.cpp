@@ -104,6 +104,13 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 	if (!(invflags&IE_INV_ITEM_IDENTIFIED) ) {
 		ret |= IE_STORE_ID;
 	}
+
+	// can't buy/sell if store doesn't allow it at all
+	if (!(Flags&IE_STORE_SELL))
+		ret &= ~IE_STORE_SELL;
+	if (!(Flags&IE_STORE_BUY))
+		ret &= ~IE_STORE_BUY;
+
 	if (pc && (Type<STT_BG2CONT) ) {
 		//can't sell critical items
 		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
