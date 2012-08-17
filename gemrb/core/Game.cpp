@@ -527,7 +527,7 @@ void Game::SetHotKey(unsigned long Key)
 bool Game::SelectPCSingle(int index)
 {
 	Actor* actor = FindPC( index );
-	if (!actor || ! actor->ValidTarget( GA_NO_HIDDEN ))
+	if (!actor)
 		return false;
 
 	SelectedSingle = index;
