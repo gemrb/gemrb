@@ -174,16 +174,16 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	{
 		capital=1;
 		enablecap=true;
-		initials_rows = ((initials->maxHeight - 1) / maxHeight) - (startrow - 1);
-
+		//initials_rows = (int)ceil(initials->maxHeight / maxHeight);
+		initials_rows = 1 + ((initials->maxHeight - 1) / maxHeight); // ceiling
 		currCap = string[0];
 		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
 			while(isspace(currCap) && num_empty_rows < (int)len){//we cant cap whiteSpace so keep looking
 				currCap = string[++num_empty_rows];
 				// WARNING: this assumes all preceeding whiteSpace is an empty line
 			}
-			last_initial_row = (startrow - 1);
-			initials_rows = initials_rows + num_empty_rows - 1;
+			last_initial_row = startrow - 1; // always the row before current since this cannot be the first row
+			initials_rows = initials_rows - (startrow + 1) + num_empty_rows; // startrow + 1 because start row is 0 based, but initials_rows is 1 based
 		}
 	}
 
