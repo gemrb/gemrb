@@ -622,9 +622,9 @@ void Button::SetText(const char* string)
 	} else {
 		Text = strndup( string, 255 );
 		if (Flags&IE_GUI_BUTTON_LOWERCASE)
-			strlwr( Text );
+			strtolower( Text );
 		else if (Flags&IE_GUI_BUTTON_CAPS)
-			strupr( Text );
+			strtoupper( Text );
 		hasText = true;
 	}
 	Changed = true;

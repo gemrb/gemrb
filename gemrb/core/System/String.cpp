@@ -80,6 +80,28 @@ void strnspccpy(char* dest, const char *source, int count, bool upper)
 	}
 }
 
+/** Convert string to uppercase in-place using selected IE encoding */
+char* strtoupper(char* string)
+{
+	char* s;
+	if (string) {
+		for (s = string; *s; ++s)
+			*s = pl_uppercase[(unsigned char)*s];
+	}
+	return string;
+}
+
+/** Convert string to lowercase in-place using selected IE encoding */
+char* strtolower(char* string)
+{
+	char* s;
+	if (string) {
+		for (s = string; *s; ++s)
+			*s = pl_lowercase[(unsigned char)*s];
+	}
+	return string;
+}
+
 /** Returns the length of string (up to a delimiter) */
 GEM_EXPORT int strlench(const char* string, char ch)
 {

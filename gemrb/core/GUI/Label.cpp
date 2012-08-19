@@ -113,7 +113,7 @@ void Label::SetAlignment(unsigned char Alignment)
 	this->Alignment = Alignment;
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			strlwr( Buffer );
+			strtolower( Buffer );
 		}
 	}
 	Changed = true;
