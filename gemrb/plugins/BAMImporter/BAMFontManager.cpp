@@ -31,11 +31,17 @@ BAMFontManager::~BAMFontManager(void)
 
 BAMFontManager::BAMFontManager(void)
 {
+	isStateFont = false;
 	bamImp = new BAMImporter();
 }
 
 bool BAMFontManager::Open(DataStream* stream)
 {
+	char tmp[16]; // 16 is the fileneame length in DataStream
+	strncpy(tmp, stream->filename, 6); // only copy length of "STATES" characters so we can match "STATES2" or others too
+	if (strcasecmp(tmp, "STATES") == 0) {
+		isStateFont = true;
+	}
 	return bamImp->Open(stream);
 }
 
@@ -77,9 +83,8 @@ Font* BAMFontManager::GetFont(ieWord FirstChar,
 			glyphs[i - glyphIndexOffset] = af->GetFrame(0, i);
 
 			// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
-			// the only fonts with cycle count > 1 where cycle count and frame count are not equal are initials and states
-			// TODO: check if this is true across all game types and languages. checked with english BG1 and BG2.
-			if (CyclesCount != af->GetFrameCount()) {
+			// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
+			if (isStateFont) {
 				// since initials and state icons should all be the same size/position we can just take the position of the first one
 				glyphs[i - glyphIndexOffset]->YPos = glyphs[0]->YPos;
 			}

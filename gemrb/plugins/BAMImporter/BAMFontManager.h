@@ -31,6 +31,7 @@ class BAMFontManager : public FontManager
 private:
 	/** private data members */
 	BAMImporter* bamImp;
+	bool isStateFont;
 public:
 	/** public data members */
 private:
