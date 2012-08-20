@@ -75,6 +75,14 @@ Font* BAMFontManager::GetFont(ieWord FirstChar,
 	for (; i <= limit; i++) {
 		if (CyclesCount > 1) {
 			glyphs[i - glyphIndexOffset] = af->GetFrame(0, i);
+
+			// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
+			// the only fonts with cycle count > 1 where cycle count and frame count are not equal are initials and states
+			// TODO: check if this is true across all game types and languages. checked with english BG1 and BG2.
+			if (CyclesCount != af->GetFrameCount()) {
+				// since initials and state icons should all be the same size/position we can just take the position of the first one
+				glyphs[i - glyphIndexOffset]->YPos = glyphs[0]->YPos;
+			}
 		} else {
 			glyphs[i - glyphIndexOffset] = af->GetFrameWithoutCycle(i);
 		}
