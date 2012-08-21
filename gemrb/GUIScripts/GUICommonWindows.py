@@ -1114,8 +1114,14 @@ def OpenPortraitWindow (needcontrols=0):
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetUseRGB (True)
 
-		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
-		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+		# unlike other buttons, this one lacks extra frames for a selection effect
+		# so we create it and shift it to cover the grooves of the image
+		# except iwd2's second frame already has it incorporated (but we miscolor it)
+		if GUICommon.GameIsIWD2():
+			Button.SetBorder (FRAME_PC_SELECTED, 0, 0, 0, 0, 0, 255, 0, 255)
+		else:
+			Button.SetBorder (FRAME_PC_SELECTED, 4, 3, 4, 3, 0, 255, 0, 255)
+		Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
 
 	UpdatePortraitWindow ()
 	SelectionChanged ()
