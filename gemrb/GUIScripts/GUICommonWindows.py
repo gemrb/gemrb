@@ -1110,7 +1110,7 @@ def OpenPortraitWindow (needcontrols=0):
 		if GUICommon.GameIsIWD1():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
-			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT)
+			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT)
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetUseRGB (True)
 
