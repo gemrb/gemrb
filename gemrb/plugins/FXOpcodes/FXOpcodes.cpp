@@ -2282,23 +2282,27 @@ int fx_kill_creature_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x38 Alignment:Invert
-//switch good to evil and evil to good
-//also switch chaotic to lawful and vice versa
+//switch good to evil and evil to good (neutral unchanged)
+//also switch chaotic to lawful and vice versa (neutral unchanged)
 //gemrb extension: param2 actually controls which parts should be reversed
 // 0 - switch both (as original)
 // 1 - switch good and evil
 // 2 - switch lawful and chaotic
 
-static int al_switch_both[16]={0,0x33,0x32,0x31,0,0x23,0x22,0x21,0,0x13,0x12,0x11};
-static int al_switch_law[16]={0,0x31,0x32,0x33,0,0x21,0x22,0x23,0,0x11,0x12,0x13};
-static int al_switch_good[16]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x31};
+static int al_switch_both[12]={0,0x33,0x32,0x31,0,0x23,0x22,0x21,0,0x13,0x12,0x11};
+static int al_switch_law[12]={0,0x31,0x32,0x33,0,0x21,0x22,0x23,0,0x11,0x12,0x13};
+static int al_switch_good[12]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x31};
 int fx_alignment_invert (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_alignment_invert(%2d)", fx->Opcode);
 	register ieDword newalign = target->GetStat( IE_ALIGNMENT );
+	if (!newalign) {
+		// unset, so just do nothing;
+		return FX_APPLIED;
+	}
 	//compress the values. GNE is the first 2 bits originally
 	//LNC is the 4/5. bits.
-	newalign = (newalign & AL_GE_MASK) | ((newalign & AL_LC_MASK)>>2);
+	newalign = (newalign & AL_GE_MASK) | (((newalign & AL_LC_MASK)-0x10)>>2);
 	switch (fx->Parameter2) {
 	default:
 		newalign = al_switch_both[newalign];
