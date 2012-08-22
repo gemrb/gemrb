@@ -49,4 +49,4 @@ def Load():
 	if not SpellDisplay:
 		SpellDisplay = GemRB.LoadTable ("spldisp")
 	if not Aligns and GemRB.HasResource("aligns", RES_2DA):
-		Aligns = GemRB.CommonTables.Aligns
+		Aligns = GemRB.LoadTable ("aligns")
