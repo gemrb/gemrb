@@ -24,11 +24,9 @@ import CommonTables
 AlignmentWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-AlignmentTable = 0
 
 def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
-	global AlignmentTable
 	
 	Class = GemRB.GetVar("Class")-1
 	KitName = CommonTables.Classes.GetRowName(Class)
@@ -36,17 +34,16 @@ def OnLoad():
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindow(3)
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetText(AlignmentTable.GetValue(i,0) )
+		Button.SetText (CommonTables.Aligns.GetValue (i, 0))
 
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
-		if AlignmentOk.GetValue(KitName, AlignmentTable.GetValue(i, 4) ) != 0:
+		if AlignmentOk.GetValue (KitName, CommonTables.Aligns.GetValue (i, 4)) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
 			Button.SetVarAssoc("Alignment", i+1)
@@ -70,7 +67,7 @@ def OnLoad():
 
 def AlignmentPress():
 	Alignment = GemRB.GetVar("Alignment")-1
-	TextAreaControl.SetText(AlignmentTable.GetValue(Alignment,1) )
+	TextAreaControl.SetText (CommonTables.Aligns.GetValue (Alignment, 1))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 

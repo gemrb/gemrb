@@ -29,7 +29,6 @@ BioWindow = 0
 BioData = 0
 BioStrRef = 0
 EditControl = 0
-AlignmentTable = 0
 PortraitName = ""
 
 def OnLoad():
@@ -156,11 +155,10 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	#kit
 	GemRB.SetPlayerStat (MyChar, IE_KIT, GemRB.GetVar ("Class") )
-	AlignmentTable = GemRB.LoadTable ("aligns")
 	t=GemRB.GetVar ("Alignment")
-	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, AlignmentTable.GetValue (t, 3) )
+	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, CommonTables.Aligns.GetValue (t, 3))
 	TmpTable=GemRB.LoadTable ("repstart")
-	#t=AlignmentTable.FindValue (3,t)
+	#t=CommonTables.Aligns.FindValue (3,t)
 	t=TmpTable.GetValue (t,0)
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 	TmpTable=GemRB.LoadTable ("strtgold")

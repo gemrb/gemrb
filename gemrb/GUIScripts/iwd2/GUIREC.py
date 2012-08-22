@@ -238,7 +238,6 @@ def DisplayGeneral (pc):
 
 	#favoured class
 	RecordsTextArea.Append (40310,-1)
-	AlignTable = GemRB.LoadTable("aligns")
 
 	#get the subrace value
 	Value = GemRB.GetPlayerStat(pc,IE_RACE)
@@ -296,8 +295,8 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
 	RecordsTextArea.Append (1049)
 	RecordsTextArea.Append ("[/color]")
-	tmp = AlignTable.FindValue ( 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) )
-	Align = AlignTable.GetValue (tmp, 2)
+	tmp = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
+	Align = CommonTables.Aligns.GetValue (tmp, 2)
 	RecordsTextArea.Append (Align,-1)
 
 	#saving throws

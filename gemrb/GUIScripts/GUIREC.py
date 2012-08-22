@@ -263,12 +263,13 @@ def UpdateRecordsWindow ():
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
 
-	Table = GemRB.LoadTable ("aligns")
-
-	text = Table.GetValue (Table.FindValue ( 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
+	# alignment
+	text = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
+	text = CommonTables.Aligns.GetValue (text, 0)
 	Label = Window.GetControl (0x10000010)
 	Label.SetText (text)
 
+	# gender
 	Label = Window.GetControl (0x10000011)
 	if GemRB.GetPlayerStat (pc, IE_SEX) == 1:
 		Label.SetText (7198)

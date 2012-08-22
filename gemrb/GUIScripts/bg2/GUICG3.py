@@ -26,12 +26,11 @@ from GUIDefines import *
 AlignmentWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-AlignmentTable = 0
 MyChar = 0
 
 def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
-	global AlignmentTable, MyChar
+	global MyChar
 	
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex (MyChar)
@@ -46,18 +45,18 @@ def OnLoad():
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AlignmentTable = GemRB.LoadTable("aligns")
+	CommonTables.Aligns = CommonTables.Aligns
 	AlignmentWindow = GemRB.LoadWindow(3)
 
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetText(AlignmentTable.GetValue(i,0) )
+		Button.SetText (CommonTables.Aligns.GetValue (i,0))
 
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
-		if AlignmentOk.GetValue(KitName, AlignmentTable.GetValue(i, 4) ) != 0:
+		if AlignmentOk.GetValue(KitName, CommonTables.Aligns.GetValue (i, 4)) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
 			Button.SetVarAssoc("Alignment", i)
@@ -80,9 +79,9 @@ def OnLoad():
 
 def AlignmentPress():
 	Alignment = GemRB.GetVar("Alignment")
-	TextAreaControl.SetText(AlignmentTable.GetValue(Alignment,1) )
+	TextAreaControl.SetText (CommonTables.Aligns.GetValue (Alignment, 1))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	GemRB.SetVar("Alignment",AlignmentTable.GetValue(Alignment,3) )
+	GemRB.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment, 3))
 	return
 
 def BackPress():
@@ -100,12 +99,11 @@ def NextPress():
 	#       reputation
 	#       alignment abilities
 	Alignment = GemRB.GetVar ("Alignment")
-	AlignmentTable = GemRB.LoadTable ("aligns")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
 
 	# use the alignment to apply starting reputation
 	RepTable = GemRB.LoadTable ("repstart")
-	AlignmentAbbrev = AlignmentTable.FindValue (3, Alignment)
+	AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
 	Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
 

@@ -67,7 +67,6 @@ KitDoneButton = 0
 
 AlignmentButton = 0
 AlignmentWindow = 0
-AlignmentTable = 0
 AlignmentTextArea = 0
 AlignmentDoneButton = 0
 
@@ -156,13 +155,12 @@ def OnLoad():
 	global CharGenWindow, CharGenState, TextArea, PortraitButton, AcceptButton
 	global GenderButton, RaceButton, ClassButton, AlignmentButton
 	global AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
-	global KitTable, ProficienciesTable, AlignmentTable, RacialEnemyTable
+	global KitTable, ProficienciesTable, RacialEnemyTable
 	global AbilitiesTable, SkillsTable, PortraitsTable
 	global MyChar, ImportedChar
 
 	KitTable = GemRB.LoadTable ("magesch")
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
-	AlignmentTable = GemRB.LoadTable ("aligns")
 	RacialEnemyTable = GemRB.LoadTable ("haterace")
 	AbilitiesTable = GemRB.LoadTable ("ability")
 	SkillsTable = GemRB.LoadTable ("skills")
@@ -371,7 +369,7 @@ def AcceptPress():
 	LUSkillsSelection.SkillsSave (MyChar)
 
 	TmpTable = GemRB.LoadTable ("repstart")
-	t = AlignmentTable.FindValue (3, t)
+	t = CommonTables.Aligns.FindValue (3, t)
 	t = TmpTable.GetValue (t, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 	# set the party rep if this in the main char
@@ -474,8 +472,8 @@ def SetCharacterDescription():
 	if CharGenState > 3:
 		TextArea.Append (1049, -1)
 		TextArea.Append (": ")
-		Alignment = AlignmentTable.FindValue (3, GemRB.GetPlayerStat(MyChar, IE_ALIGNMENT) )
-		TextArea.Append (AlignmentTable.GetValue (Alignment, 2) )
+		Alignment = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat(MyChar, IE_ALIGNMENT))
+		TextArea.Append (CommonTables.Aligns.GetValue (Alignment, 2))
 	if CharGenState > 4:
 		strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 		TextArea.Append ("", -1)
@@ -1223,7 +1221,7 @@ def AlignmentPress():
 		else:
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AlignmentSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AlignmentSelectPress)
-		AlignmentSelectButton.SetText (AlignmentTable.GetValue (i, 0) )
+		AlignmentSelectButton.SetText (CommonTables.Aligns.GetValue (i, 0))
 		AlignmentSelectButton.SetVarAssoc ("Alignment", i + 1)
 
 	AlignmentTextArea = AlignmentWindow.GetControl (11)
@@ -1248,7 +1246,7 @@ def AlignmentSelectPress():
 	global AlignmentWindow, AlignmentTextArea, AlignmentDoneButton
 
 	Alignment = GemRB.GetVar ("Alignment") - 1
-	AlignmentTextArea.SetText (AlignmentTable.GetValue (Alignment, 1))
+	AlignmentTextArea.SetText (CommonTables.Aligns.GetValue (Alignment, 1))
 	AlignmentDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -1263,7 +1261,7 @@ def AlignmentDonePress():
 	AbilitiesButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AbilitiesButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	Alignment = AlignmentTable.GetValue (GemRB.GetVar ("Alignment")-1, 3)
+	Alignment = CommonTables.Aligns.GetValue (GemRB.GetVar ("Alignment")-1, 3)
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment )
 
 	CharGenState = 4
@@ -2202,7 +2200,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	PriestMemorizeWindow = GemRB.LoadWindow (17)
-	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
+	t = CommonTables.Aligns.GetValue (GemRB.GetVar ("Alignment")-1, 3)
 	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
 	MaxSpellsPriestTable = GemRB.LoadTable (SpellTable)

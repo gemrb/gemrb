@@ -383,10 +383,9 @@ def CanDualInto (index):
 
 	# make sure we aren't restricted by alignment
 	AlignmentTable = GemRB.LoadTable ("alignmnt")
-	AlignsTable = GemRB.LoadTable ("aligns")
 	Alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT) # our alignment
-	Alignment = AlignsTable.FindValue (3, Alignment)
-	Alignment = AlignsTable.GetValue (Alignment, 4) # convert the alignment
+	Alignment = CommonTables.Aligns.FindValue (3, Alignment)
+	Alignment = CommonTables.Aligns.GetValue (Alignment, 4) # convert the alignment
 	if not AlignmentTable.GetValue (DCClasses[index], Alignment, 1): # check it
 		return 0
 

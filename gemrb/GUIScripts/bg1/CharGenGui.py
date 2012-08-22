@@ -84,15 +84,13 @@ def unsetAlignment():
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT,0)
 	
 def getAlignment(area):
-	AlignmentTable = GemRB.LoadTable("aligns")
-	
 	MyChar = GemRB.GetVar ("Slot")
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
 	area.Append(1049, -1)
 	area.Append(": ")
-	AllignIndex = AlignmentTable.FindValue(3,AllignID)
-	AllignCap = AlignmentTable.GetValue(AllignIndex,2)
+	AllignIndex = CommonTables.Aligns.FindValue (3, AllignID)
+	AllignCap = CommonTables.Aligns.GetValue (AllignIndex, 2)
 	area.Append(AllignCap)
 	area.Append("\n")
 
@@ -342,7 +340,6 @@ def setAccept():
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
 	TmpTable=GemRB.LoadTable ("repstart")
-	AlignmentTable = GemRB.LoadTable ("aligns")
 	t = TmpTable.GetValue (AllignID,0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 

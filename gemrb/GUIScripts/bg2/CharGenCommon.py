@@ -124,7 +124,6 @@ def DisplayOverview(step):
 	###
 	# Stat overview
 	###
-	AlignmentTable = GemRB.LoadTable ("aligns")
 	AbilityTable = GemRB.LoadTable ("ability")
 
 	MyChar = GemRB.GetVar ("Slot")
@@ -163,8 +162,8 @@ def DisplayOverview(step):
 			TextAreaControl.Append (1049, -1)
 			TextAreaControl.Append (": ")
 			stat = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			v = AlignmentTable.FindValue (3, stat)
-			TextAreaControl.Append (AlignmentTable.GetValue (v,2))
+			v = CommonTables.Aligns.FindValue (3, stat)
+			TextAreaControl.Append (CommonTables.Aligns.GetValue (v,2))
 		elif part == 6:
 			TextAreaControl.Append ("\n")
 			ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)

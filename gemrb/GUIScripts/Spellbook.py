@@ -298,9 +298,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99
-	Table = GemRB.LoadTable ("aligns")
-	v = Table.FindValue (3, Alignment)
-	Usability = Kit | Table.GetValue(v, 5)
+	v = CommonTables.Aligns.FindValue (3, Alignment)
+	Usability = Kit | CommonTables.Aligns.GetValue(v, 5)
 
 	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue ("MAGE", str(Level), 1) ):
@@ -336,10 +335,9 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 def GetLearnablePriestSpells (Class, Alignment, Level):
 	Learnable =[]
 
-	Table=GemRB.LoadTable("aligns")
-	v = Table.FindValue(3, Alignment)
+	v = CommonTables.Aligns.FindValue(3, Alignment)
 	#usability is the bitset we look for
-	Usability=Table.GetValue(v, 5)
+	Usability = CommonTables.Aligns.GetValue(v, 5)
 
 	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), 1) ):

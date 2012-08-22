@@ -17,17 +17,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # the place for preloading the most commonly used tables
+# helps with code deduplication, reduced log spam and tiny lookup savings
 import GemRB
 from ie_restype import RES_2DA
 
 # these two are only used in SetEncumbranceLabels, but that is called very often
 StrMod = StrModEx = None
 Classes = KitList = ClassSkills = Races = NextLevel = None
-Pdolls = SpellDisplay = None
+Pdolls = SpellDisplay = Aligns = None
 
 def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
-	global Pdolls, StrModEx, StrMod, SpellDisplay
+	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
 
 	print # so the following output isn't appended to an existing line
 	if not Classes:
@@ -47,3 +48,5 @@ def Load():
 		StrModEx = GemRB.LoadTable ("strmodex")
 	if not SpellDisplay:
 		SpellDisplay = GemRB.LoadTable ("spldisp")
+	if not Aligns and GemRB.HasResource("aligns", RES_2DA):
+		Aligns = GemRB.CommonTables.Aligns

@@ -83,8 +83,7 @@ def OnLoad():
 
 	# apply starting (alignment dictated) abilities
 	# pc, table, new level, level diff, alignment
-	AlignmentTable = GemRB.LoadTable ("aligns")
-	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
+	AlignmentAbbrev = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 	GUICommon.AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
