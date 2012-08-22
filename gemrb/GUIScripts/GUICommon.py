@@ -296,11 +296,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	Button.SetBorder (1, 2,2,2,2, 32,32,255,0, 0,0)
 	Button.SetBorder (2, 0,0,0,0, 255,128,128,64, 0,1)
 	Button.SetText ("")
-	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_PICTURE, OP_OR)
-	if GameIsIWD1():
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-	else:
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
+	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	if Slot == None:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
