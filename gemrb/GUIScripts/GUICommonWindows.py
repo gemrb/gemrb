@@ -1091,7 +1091,10 @@ def OpenPortraitWindow (needcontrols=0):
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		Button.SetFont ("STATES2")
+		if GUICommon.GameIsIWD1():
+			Button.SetFont ("STATES")
+		else:
+			Button.SetFont ("STATES2")
 		Button.SetVarAssoc ("PressedPortrait", i+1)
 
 		if needcontrols or GUICommon.GameIsIWD2():
