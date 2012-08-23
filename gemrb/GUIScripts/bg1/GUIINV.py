@@ -163,7 +163,6 @@ def OpenInventoryWindow ():
 			Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
 			Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
 			Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
-			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)

@@ -166,7 +166,6 @@ def OpenInventoryWindow ():
 			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetFont ("NUMFONT")
-			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
 	
