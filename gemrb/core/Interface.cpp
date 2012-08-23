@@ -255,6 +255,7 @@ Interface::Interface(int iargc, char* iargv[])
 	update_scripts = false;
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
+	Encoding = "default";
 
 	gamedata = new GameData();
 }
@@ -1623,6 +1624,11 @@ int Interface::Init()
 	}
 	GameNameResRef[i] = 0;
 
+	Log(MESSAGE, "Core", "Reading Encoding Table...");
+	if (!LoadEncoding()) {
+		Log(ERROR, "Core", "Cannot Load Encoding.");
+	}
+
 	Log(MESSAGE, "Core", "Creating Projectile Server...");
 	projserv = new ProjectileServer();
 	if (!projserv->GetHighestProjectileNumber()) {
@@ -2297,6 +2303,7 @@ bool Interface::LoadConfig(const char* filename)
 			var = value
 		CONFIG_STRING("AudioDriver", AudioDriverName);
 		CONFIG_STRING("VideoDriver", VideoDriverName);
+		CONFIG_STRING("Encoding", Encoding);
 #undef CONFIG_STRING
 #define CONFIG_PATH(str, var) \
 		} else if (stricmp(name, str) == 0) { \
@@ -2630,6 +2637,40 @@ bool Interface::LoadGemRBINI()
 	if (s)
 		strcpy( Palette256, s );
 
+	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
+
+	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
+
+	for (int i=0;i<GF_COUNT;i++) {
+		if (!game_flags[i]) {
+			error("Core", "Fix the game flags!\n");
+		}
+		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
+		//printMessage("Option", "", GREEN);
+		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
+	}
+
+	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
+
+	return true;
+}
+
+/** Load the encoding table selected in gemrb.cfg */
+bool Interface::LoadEncoding()
+{
+	DataStream* inifile = gamedata->GetResource( Encoding.c_str(), IE_INI_CLASS_ID );
+	if (! inifile) {
+		return false;
+	}
+
+	Log(MESSAGE, "Core", "Loading encoding definition for %s: '%s'", Encoding.c_str(),
+		inifile->originalfile);
+
+	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	ini->Open(inifile);
+
+	const char *s;
+
 	unsigned int i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
 	if (i>99) i=99;
 	while(i--) {
@@ -2646,21 +2687,6 @@ bool Interface::LoadGemRBINI()
 			}
 		}
 	}
-
-	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
-
-	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
-
-	for (i=0;i<GF_COUNT;i++) {
-		if (!game_flags[i]) {
-			error("Core", "Fix the game flags!\n");
-		}
-		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
-		//printMessage("Option", "", GREEN);
-		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
-	}
-
-	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	return true;
 }

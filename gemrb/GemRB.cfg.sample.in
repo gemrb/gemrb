@@ -48,6 +48,13 @@ GameType=bg2
 GameName=Baldur's Gate 2
 
 #####################################################
+#  Encoding [default|polish|czech] Language used by #
+#  game data. Except of polish BG1, leave disabled. #
+#####################################################
+
+# Encoding=default
+
+#####################################################
 #  Video Parameters                                 #
 #####################################################
 #NOTE: SCREEN width and height can NOT be ARBITRARY without installing the

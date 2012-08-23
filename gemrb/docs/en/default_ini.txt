@@ -1,0 +1,50 @@
+ENCODING SPECIFICATION - DEFAULT.INI, POLISH.INI, CZECH.INI, ...
+****************************************************************
+
+GemRB needs information about encoding used in game data (specifically, in
+DIALOG.TLK and DIALOGF.TLK) to properly lowercase and uppercase strings,
+which is used in button labels. Encoding files define pairs of 
+uppercase code, lowercase code.
+
+Naming
+------
+
+default.ini is standard encoding for all western language-games.
+polish.ini is encoding used for polish version of BG1.
+czec.ini is effectively the same as default.ini.
+
+To use e.g. polish.ini encoding, specify "Encoding=polish" in GemRB.cfg.
+Default is default.ini.
+
+Format
+------
+
+File format is INI file. All information is now in [charset] section.
+Each uppercase-lowercase pair is specified as
+
+  LetterX = UUU,LLL
+
+where X is counter starting from 1, UUU is decimal code of the uppercase
+and LLL is decimal code for the lowercase. For example,
+
+  Letter9 = 195,227  # A~
+
+specifies A-with-tilde.
+
+Number of letter pairs is given by CharCount, e.g,
+
+  CharCount = 35
+
+
+Example
+-------
+
+[charset]
+CharCount = 35
+
+Letter1 = 138,154  # Sv
+Letter2 = 140,156  # OE
+...
+Letter35 = 222,254  # Thorn
+
+

@@ -78,15 +78,21 @@ parameters need to be changed. That is often enough, so do not fiddle with the o
 .SH General Parameters:
 
 .TP
-.BR GameType =(bg1|bg2|iwd|iwd2|how|pst)
+.BR GameType =(auto|bg1|bg2|iwd|iwd2|how|pst)
 Type of the game. The value is a name of subdirectory in override/ 
 and GUIScripts/ directories
 with game type-specific files and scripts. It is at present also used
-for various tweaks hardcoded in the GemRB engine.
+for various tweaks hardcoded in the GemRB engine. To autodetect the game
+type, use "auto".
 
 .TP
 .BR GameName =STRING
 Arbitrary name of the game. It will be displayed in the window's title bar.
+
+.TP
+.BR Encoding =(default|polish|czech)
+Specify language used in the game data. Except of polish version of BG1, it's
+safe to leave it commented out.
 
 .TP
 .BR GUIEnhancements =INT

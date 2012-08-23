@@ -367,6 +367,7 @@ private:
 	int SpecialSpellsCount;
 	SpellDescType *SpecialSpells;
 	KeyMap *keymap;
+	std::string Encoding;
 public:
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
@@ -718,6 +719,8 @@ private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
 	bool LoadGemRBINI();
+	/** Load the encoding table selected in gemrb.cfg */
+	bool LoadEncoding();
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
