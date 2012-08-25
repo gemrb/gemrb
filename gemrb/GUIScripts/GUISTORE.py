@@ -289,6 +289,8 @@ def OpenStoreShoppingWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
 
+	UnselectNoRedraw ()
+
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
 	if Inventory:
@@ -380,6 +382,8 @@ def OpenStoreIdentifyWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBar)
 
+	UnselectNoRedraw ()
+
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -423,6 +427,8 @@ def OpenStoreStealWindow ():
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
+
+	UnselectNoRedraw ()
 
 	# Steal
 	LeftButton = Button = Window.GetControl (1)
@@ -496,6 +502,8 @@ def OpenStoreHealWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreHealWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
 		#Button.AttachScrollBar (ScrollBar)
+
+	UnselectNoRedraw ()
 
 	# price tag
 	Label = Window.GetControl (0x10000003)
@@ -663,6 +671,22 @@ def UpdateStoreShoppingWindow ():
 
 	RedrawStoreShoppingWindow ()
 	return
+
+# Unselects all the selected buttons, so they are not preselected in other windows
+def UnselectNoRedraw ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	LeftCount = Store['StoreItemCount']
+	for i in range (LeftCount, 0, -1):
+		Flags = GemRB.IsValidStoreItem (pc, i-1, ITEM_STORE)&SHOP_SELECT
+		if Flags:
+			GemRB.ChangeStoreItem (pc, i-1, SHOP_BUY|SHOP_SELECT)
+
+	RightCount = len (inventory_slots)
+	for Slot in range (RightCount):
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC) & SHOP_SELECT
+		if Flags:
+			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL|SHOP_SELECT)
+			# same code for ID, so no repeat needed
 
 def SelectID ():
 	pc = GemRB.GameGetSelectedPCSingle ()
