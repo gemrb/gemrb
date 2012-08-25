@@ -273,7 +273,7 @@ def OpenStoreShoppingWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
@@ -286,7 +286,7 @@ def OpenStoreShoppingWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
 
 	# Buy
@@ -377,7 +377,7 @@ def OpenStoreIdentifyWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectID)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBar)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
@@ -421,7 +421,7 @@ def OpenStoreStealWindow ():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
 
 	# Steal
