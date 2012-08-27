@@ -41,14 +41,11 @@ SubOptionsWindow = None
 SubSubOptionsWindow = None
 GameOptionsWindow = None
 OldOptionsWindow = None
-MoviesWindow = None
-KeysWindow = None
 HelpTextArea = None
 HelpTextArea2 = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
-hideflag = None
 
 ###################################################
 def CloseOptionsWindow ():
@@ -81,7 +78,6 @@ def OpenOptionsWindow ():
 		CloseOptionsWindow()
 		return
 
-	#hideflag = GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 	GUICommonWindows.SetSelectionChangeHandler (None)
 

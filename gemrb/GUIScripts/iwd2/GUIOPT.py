@@ -29,16 +29,9 @@ from GUIDefines import *
 
 ###################################################
 GameOptionsWindow = None
-VideoOptionsWindow = None
-AudioOptionsWindow = None
-GameplayOptionsWindow = None
-FeedbackOptionsWindow = None
-AutopauseOptionsWindow = None
 LoadMsgWindow = None
-SaveMsgWindow = None
 QuitMsgWindow = None
 MovieWindow = None
-KeysWindow = None
 OptionsWindow = None
 PortraitWindow = None
 OldPortraitWindow = None
