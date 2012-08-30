@@ -1141,7 +1141,7 @@ void Interface::Main()
 	do {
 		//don't change script when quitting is pending
 
-		while (QuitFlag) {
+		while (QuitFlag && QuitFlag != QF_KILL) {
 			HandleFlags();
 		}
 		//eventflags are processed only when there is a game
