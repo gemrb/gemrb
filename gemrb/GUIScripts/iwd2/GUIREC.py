@@ -326,10 +326,10 @@ def DisplayGeneral (pc):
 	if HasClassFeatures(pc):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (40314)
-		RecordsTextArea.Append ("[/color]\n")
+		RecordsTextArea.Append ("[/color]")
 		tmp = GemRB.GetPlayerStat (pc, IE_TURNUNDEADLEVEL)
 		if tmp:
-			RecordsTextArea.Append (12146,-1)
+			RecordsTextArea.Append (12126,-1)
 			RecordsTextArea.Append (": "+str(tmp) )
 		tmp = GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER)
 		if tmp:
