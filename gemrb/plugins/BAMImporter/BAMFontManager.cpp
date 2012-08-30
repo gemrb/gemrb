@@ -39,7 +39,7 @@ bool BAMFontManager::Open(DataStream* stream)
 {
 	char tmp[16]; // 16 is the fileneame length in DataStream
 	strncpy(tmp, stream->filename, 6); // only copy length of "STATES" characters so we can match "STATES2" or others too
-	if (strcasecmp(tmp, "STATES") == 0) {
+	if (stricmp(tmp, "STATES") == 0) {
 		isStateFont = true;
 	}
 	return bamImp->Open(stream);
