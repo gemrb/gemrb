@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2012 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -35,9 +35,9 @@ import GUISAVE
 from GUIDefines import *
 
 ###################################################
-GameOptionsWindow = None
-PortraitWindow = None
-OldPortraitWindow = None
+GameOptionsWindow = None # not in PST
+PortraitWindow = None # not in BG1 or PST
+OldPortraitWindow = None #not in BG1 or PST
 OptionsWindow = None
 OldOptionsWindow = None
 HelpTextArea = None
