@@ -1216,7 +1216,7 @@ def AlignmentPress():
 
 	for i in range (9):
 		AlignmentSelectButton = AlignmentWindow.GetControl (i + 2)
-		if ClassAlignmentTable.GetValue (ClassName, AlignmentTable.GetValue(i, 4)) == 0:
+		if ClassAlignmentTable.GetValue (ClassName, CommonTables.Aligns.GetValue(i, 4)) == 0:
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
