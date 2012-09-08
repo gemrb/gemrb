@@ -624,7 +624,8 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCheckbox (DisplayHelpWeaponUnusable, Window, 5, 21, 'Auto Pause State', 16)
 	GUIOPTControls.OptCheckbox (DisplayHelpTargetGone, Window, 13, 22, 'Auto Pause State', 32)
 	GUIOPTControls.OptCheckbox (DisplayHelpEndOfRound, Window, 25, 24, 'Auto Pause State', 64)
-	GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 26, 27, 'Auto Pause State', 128)
+	if not GUICommon.GameIsIWD1():
+		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 26, 27, 'Auto Pause State', 128)
 	if GUICommon.GameIsBG2():
 		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 34, 30, 'Auto Pause State', 256)
 		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 31, 33, 'Auto Pause State', 512)
@@ -778,6 +779,7 @@ def OpenQuitMsgWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Do you wish to save the game ....
 	Text = Window.GetControl (3)
@@ -793,7 +795,7 @@ def CloseQuitMsgWindow ():
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if GUICommon.GameIsBG2():
+	if not GUICommon.GameIsBG1():
 		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
 		PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
