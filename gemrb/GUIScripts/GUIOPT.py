@@ -54,6 +54,14 @@ if GUICommon.GameIsBG1():
 else:
 	# just an alias to keep our logic from being plagued by too many GUICommon.GameIsBG1() checks
 	HelpTextArea2 = HelpTextArea
+
+if GUICommon.GameIsIWD2():
+	WIDTH = 800
+	HEIGHT = 600
+else:
+	WIDTH = 640
+	HEIGHT = 480
+
 ###################################################
 def CloseOptionsWindow ():
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
@@ -94,7 +102,7 @@ def OpenOptionsWindow ():
 	if GUICommon.GameIsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
-	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
+	GemRB.LoadWindowPack ("GUIOPT", WIDTH, HEIGHT)
 	GameOptionsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
 
@@ -440,6 +448,8 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptCheckbox (DisplayHelpWeather, Window, 47, 46, 'Weather', 1)
 	if GUICommon.GameIsBG2():
 		GUIOPTControls.OptCheckbox (DisplayHelpRestUntilHealed, Window, 50, 48, 'Heal Party on Rest', 1)
+	elif GUICommon.GameIsIWD2():
+		GUIOPTControls.OptCheckbox (DisplayHelpMaxHitpoints, Window, 50, 49, 'Maximum HP', 1)
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, Window, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, Window, 6, 17166)
@@ -482,6 +492,9 @@ def DisplayHelpWeather ():
 
 def DisplayHelpRestUntilHealed ():
 	HelpTextArea.SetText (2242)
+
+def DisplayHelpMaxHitpoints ():
+	HelpTextArea.SetText (15136)
 
 ###################################################
 
@@ -624,9 +637,11 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCheckbox (DisplayHelpWeaponUnusable, Window, 5, 21, 'Auto Pause State', 16)
 	GUIOPTControls.OptCheckbox (DisplayHelpTargetGone, Window, 13, 22, 'Auto Pause State', 32)
 	GUIOPTControls.OptCheckbox (DisplayHelpEndOfRound, Window, 25, 24, 'Auto Pause State', 64)
-	if not GUICommon.GameIsIWD1():
+	if GUICommon.GameIsIWD2():
+		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 30, 28, 'Auto Pause State', 128)
+	elif not GUICommon.GameIsIWD1():
 		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 26, 27, 'Auto Pause State', 128)
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
 		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 34, 30, 'Auto Pause State', 256)
 		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 31, 33, 'Auto Pause State', 512)
 		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 31, 33, 'Auto Pause Center', 1)
