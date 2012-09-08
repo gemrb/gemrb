@@ -37,6 +37,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import GUISAVE
+import GUIOPTControls
 from GUIDefines import *
 
 ###################################################
@@ -159,17 +160,17 @@ def OpenVideoOptionsWindow ():
 	GemRB.SetVar ("FloatWindow", VideoOptionsWindow.ID)
 
 
-	VideoHelpText = OptHelpText ('VideoOptions', Window, 9, 31052)
+	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', Window, 9, 31052)
 
-	OptDone ('VideoOptions', Window, 7)
-	OptCancel ('VideoOptions', Window, 8)
+	GUIOPTControls.OptDone (OpenVideoOptionsWindow, Window, 7)
+	GUIOPTControls.OptCancel (OpenVideoOptionsWindow, Window, 8)
 
-	OptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
-	OptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
+	PSTOptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
+	PSTOptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
 
-	OptCheckbox ('VideoOptions', 'SoftwareBlitting', Window, 6, 15, 30898, None) #TODO: SoftBlt
-	OptCheckbox ('VideoOptions', 'SoftwareMirroring', Window, 4, 13, 30896, None) #TODO: SoftMirrorBlt
-	OptCheckbox ('VideoOptions', 'SoftwareTransparency', Window, 5, 14, 30897, None) #TODO: SoftSrcKeyBlt
+	PSTOptCheckbox ('VideoOptions', 'SoftwareBlitting', Window, 6, 15, 30898, None) #TODO: SoftBlt
+	PSTOptCheckbox ('VideoOptions', 'SoftwareMirroring', Window, 4, 13, 30896, None) #TODO: SoftMirrorBlt
+	PSTOptCheckbox ('VideoOptions', 'SoftwareTransparency', Window, 5, 14, 30897, None) #TODO: SoftSrcKeyBlt
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -234,22 +235,20 @@ def OpenAudioOptionsWindow ():
 		saved_audio_options[v] = GemRB.GetVar (v)
 
 
-	AudioHelpText = OptHelpText ('AudioOptions', Window, 9, 31210)
+	AudioHelpText = GUIOPTControls.OptHelpText ('AudioOptions', Window, 9, 31210)
 
-	OptDone ('AudioOptions', Window, 7)
-	OptCancel ('AudioOptions', Window, 8)
+	GUIOPTControls.OptDone (OpenAudioOptionsWindow, Window, 7)
+	GUIOPTControls.OptCancel (OpenAudioOptionsWindow, Window, 8)
 
-
-	OptSlider ('AudioOptions', 'AmbientVolume', Window, 1, 10, 31460, "Volume Ambients", UpdateVolume)
-	OptSlider ('AudioOptions', 'SoundFXVolume', Window, 2, 11, 31466, "Volume SFX", UpdateVolume)
-	OptSlider ('AudioOptions', 'VoiceVolume', Window, 3, 12, 31467, "Volume Voices", UpdateVolume)
-	OptSlider ('AudioOptions', 'MusicVolume', Window, 4, 13, 31468, "Volume Music", UpdateVolume)
-	OptSlider ('AudioOptions', 'MovieVolume', Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
+	PSTOptSlider ('AudioOptions', 'AmbientVolume', Window, 1, 10, 31460, "Volume Ambients", UpdateVolume)
+	PSTOptSlider ('AudioOptions', 'SoundFXVolume', Window, 2, 11, 31466, "Volume SFX", UpdateVolume)
+	PSTOptSlider ('AudioOptions', 'VoiceVolume', Window, 3, 12, 31467, "Volume Voices", UpdateVolume)
+	PSTOptSlider ('AudioOptions', 'MusicVolume', Window, 4, 13, 31468, "Volume Music", UpdateVolume)
+	PSTOptSlider ('AudioOptions', 'MovieVolume', Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
 	
-	OptCheckbox ('AudioOptions', 'CreativeEAX', Window, 6, 15, 30900, "Environmental Audio")
-	OptCheckbox ('AudioOptions', 'SoundProcessing', Window, 16, 17, 63242, "Sound Processing")
-	OptCheckbox ('AudioOptions', 'MusicProcessing', Window, 18, 19, 63243, "Music Processing")
-
+	PSTOptCheckbox ('AudioOptions', 'CreativeEAX', Window, 6, 15, 30900, "Environmental Audio")
+	PSTOptCheckbox ('AudioOptions', 'SoundProcessing', Window, 16, 17, 63242, "Sound Processing")
+	PSTOptCheckbox ('AudioOptions', 'MusicProcessing', Window, 18, 19, 63243, "Music Processing")
 
 	#AudioOptionsWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
@@ -313,22 +312,22 @@ def OpenGameplayOptionsWindow ():
 	GemRB.SetVar ("FloatWindow", GameplayOptionsWindow.ID)
 	
 
-	GameplayHelpText = OptHelpText ('GameplayOptions', Window, 12, 31212)
+	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 12, 31212)
 
-	OptDone ('GameplayOptions', Window, 10)
-	OptCancel ('GameplayOptions', Window, 11)
+	GUIOPTControls.OptDone (OpenGameplayOptionsWindow, Window, 10)
+	GUIOPTControls.OptCancel (OpenGameplayOptionsWindow, Window, 11)
 
-	OptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
-	OptSlider ('GameplayOptions', 'MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
-	OptSlider ('GameplayOptions', 'KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed", UpdateKeyboardSpeed)
-	OptSlider ('GameplayOptions', 'Difficulty', Window, 4, 16, 31479, "Difficulty Level")
+	PSTOptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
+	PSTOptSlider ('GameplayOptions', 'MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
+	PSTOptSlider ('GameplayOptions', 'KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed", UpdateKeyboardSpeed)
+	PSTOptSlider ('GameplayOptions', 'Difficulty', Window, 4, 16, 31479, "Difficulty Level")
 
-	OptCheckbox ('GameplayOptions', 'DitherAlways', Window, 5, 17, 31217, "Always Dither")
-	OptCheckbox ('GameplayOptions', 'Gore', Window, 6, 18, 31218, "Gore???")
-	OptCheckbox ('GameplayOptions', 'AlwaysRun', Window, 22, 23, 62418, "Always Run")
+	PSTOptCheckbox ('GameplayOptions', 'DitherAlways', Window, 5, 17, 31217, "Always Dither")
+	PSTOptCheckbox ('GameplayOptions', 'Gore', Window, 6, 18, 31218, "Gore???")
+	PSTOptCheckbox ('GameplayOptions', 'AlwaysRun', Window, 22, 23, 62418, "Always Run")
 
-	OptButton ('GameplayOptions', 'FeedbackOptions', Window, 8, 20, 31478)
-	OptButton ('GameplayOptions', 'AutopauseOptions', Window, 9, 21, 31470)
+	PSTOptButton ('GameplayOptions', 'FeedbackOptions', Window, 8, 20, 31478)
+	PSTOptButton ('GameplayOptions', 'AutopauseOptions', Window, 9, 21, 31470)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -400,21 +399,21 @@ def OpenFeedbackOptionsWindow ():
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
 
-	FeedbackHelpText = OptHelpText ('FeedbackOptions', Window, 9, 37410)
+	FeedbackHelpText = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 9, 37410)
 
-	OptDone ('FeedbackOptions', Window, 7)
-	OptCancel ('FeedbackOptions', Window, 8)
+	GUIOPTControls.OptDone (OpenFeedbackOptionsWindow, Window, 7)
+	GUIOPTControls.OptCancel (OpenFeedbackOptionsWindow, Window, 8)
 
-	OptSlider ('FeedbackOptions', 'MarkerFeedback', Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
-	OptSlider ('FeedbackOptions', 'LocatorFeedback', Window, 2, 11, 37586, "Locator Feedback Level")
-	OptSlider ('FeedbackOptions', 'SelectionFeedbackLevel', Window, 20, 21, 54879, "Selection Sounds Frequency")
-	OptSlider ('FeedbackOptions', 'CommandFeedbackLevel', Window, 22, 23, 55012, "Command Sounds Frequency")
+	PSTOptSlider ('FeedbackOptions', 'MarkerFeedback', Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
+	PSTOptSlider ('FeedbackOptions', 'LocatorFeedback', Window, 2, 11, 37586, "Locator Feedback Level")
+	PSTOptSlider ('FeedbackOptions', 'SelectionFeedbackLevel', Window, 20, 21, 54879, "Selection Sounds Frequency")
+	PSTOptSlider ('FeedbackOptions', 'CommandFeedbackLevel', Window, 22, 23, 55012, "Command Sounds Frequency")
 
-	OptCheckbox ('FeedbackOptions', 'CharacterStates', Window, 6, 15, 37594, "")
-	OptCheckbox ('FeedbackOptions', 'MiscellaneousMessages', Window, 17, 19, 37596, "")
-	OptCheckbox ('FeedbackOptions', 'ToHitRolls', Window, 3, 12, 37588, "")
-	OptCheckbox ('FeedbackOptions', 'CombatInfo', Window, 4, 13, 37590, "")
-	OptCheckbox ('FeedbackOptions', 'SpellCasting', Window, 5, 14, 37592, "")
+	PSTOptCheckbox ('FeedbackOptions', 'CharacterStates', Window, 6, 15, 37594, "")
+	PSTOptCheckbox ('FeedbackOptions', 'MiscellaneousMessages', Window, 17, 19, 37596, "")
+	PSTOptCheckbox ('FeedbackOptions', 'ToHitRolls', Window, 3, 12, 37588, "")
+	PSTOptCheckbox ('FeedbackOptions', 'CombatInfo', Window, 4, 13, 37590, "")
+	PSTOptCheckbox ('FeedbackOptions', 'SpellCasting', Window, 5, 14, 37592, "")
 
 
 	GemRB.UnhideGUI ()
@@ -474,10 +473,10 @@ def OpenAutopauseOptionsWindow ():
 	GemRB.SetVar ("FloatWindow", AutopauseOptionsWindow.ID)
 
 
-	AutopauseHelpText = OptHelpText ('AutopauseOptions', Window, 1, 31214)
+	AutopauseHelpText = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 1, 31214)
 
-	OptDone ('AutopauseOptions', Window, 16)
-	OptCancel ('AutopauseOptions', Window, 17)
+	GUIOPTControls.OptDone (OpenAutopauseOptionsWindow, Window, 16)
+	GUIOPTControls.OptCancel (OpenAutopauseOptionsWindow, Window, 17)
 
 	# Set variable for each checkbox according to a particular bit of
 	#   AutoPauseState
@@ -491,13 +490,13 @@ def OpenAutopauseOptionsWindow ():
 	GemRB.SetVar("AutoPauseState_EndRound", (state & 0x40) != 0 )
 	
 
-	OptCheckbox ('AutopauseOptions', 'CharacterHit', Window, 2, 9, 37598, "AutoPauseState_Hit", OnAutoPauseClicked)
-	OptCheckbox ('AutopauseOptions', 'CharacterInjured', Window, 3, 10, 37681, "AutoPauseState_Wounded", OnAutoPauseClicked)
-	OptCheckbox ('AutopauseOptions', 'CharacterDead', Window, 4, 11, 37682, "AutoPauseState_Dead", OnAutoPauseClicked)
-	OptCheckbox ('AutopauseOptions', 'CharacterAttacked', Window, 5, 12, 37683, "AutoPauseState_Attacked", OnAutoPauseClicked)
-	OptCheckbox ('AutopauseOptions', 'WeaponUnusable', Window, 6, 13, 37684, "AutoPauseState_Unusable", OnAutoPauseClicked)
-	OptCheckbox ('AutopauseOptions', 'TargetGone', Window, 7, 14, 37685, "AutoPauseState_NoTarget", OnAutoPauseClicked)
-	OptCheckbox ('AutopauseOptions', 'EndOfRound', Window, 8, 15, 37686, "AutoPauseState_EndRound", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'CharacterHit', Window, 2, 9, 37598, "AutoPauseState_Hit", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'CharacterInjured', Window, 3, 10, 37681, "AutoPauseState_Wounded", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'CharacterDead', Window, 4, 11, 37682, "AutoPauseState_Dead", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'CharacterAttacked', Window, 5, 12, 37683, "AutoPauseState_Attacked", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'WeaponUnusable', Window, 6, 13, 37684, "AutoPauseState_Unusable", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'TargetGone', Window, 7, 14, 37685, "AutoPauseState_NoTarget", OnAutoPauseClicked)
+	PSTOptCheckbox ('AutopauseOptions', 'EndOfRound', Window, 8, 15, 37686, "AutoPauseState_EndRound", OnAutoPauseClicked)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -855,15 +854,11 @@ def OnCreditsPress ():
 # These controls are usually made from an active
 #   control (button, slider ...) and a label
 
-
-def OptSlider (winname, ctlname, window, slider_id, label_id, label_strref, assoc_var, fn = None, scale = 1):
+def PSTOptSlider (winname, ctlname, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
 	"""Standard slider for option windows"""
-	slider = window.GetControl (slider_id)
+	slider = GUIOPTControls.OptSlider (action, window, slider_id, variable, value)
 	#slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
 	#slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
-	if fn: slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, fn)
-
-	slider.SetVarAssoc (assoc_var, scale)
 	
 	label = window.GetControl (label_id)
 	label.SetText (label_strref)
@@ -875,16 +870,13 @@ def OptSlider (winname, ctlname, window, slider_id, label_id, label_strref, asso
 
 	return slider
 
-
-def OptCheckbox (winname, ctlname, window, button_id, label_id, label_strref, assoc_var = None, handler = None):
+def PSTOptCheckbox (winname, ctlname, window, button_id, label_id, label_strref, assoc_var = None, handler = None):
 	"""Standard checkbox for option windows"""
 
-	button = window.GetControl (button_id)
-	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
+	action = eval("DisplayHelp" + ctlname)
+	button = GUIOPTControls.OptCheckbox(action, window, button_id, label_id, assoc_var, 1)
 	button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
 	if assoc_var:
-		button.SetVarAssoc (assoc_var, 1)
 		if GemRB.GetVar (assoc_var):
 			button.SetState (IE_GUI_BUTTON_PRESSED)
 		else:
@@ -897,14 +889,12 @@ def OptCheckbox (winname, ctlname, window, button_id, label_id, label_strref, as
 
 	label = window.GetControl (label_id)
 	label.SetText (label_strref)
-	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	label.SetState (IE_GUI_BUTTON_LOCKED)
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
+	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, action)
 	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
 
 	return button
 
-def OptButton (winname, ctlname, window, button_id, label_id, label_strref):
+def PSTOptButton (winname, ctlname, window, button_id, label_id, label_strref):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %ctlname))
@@ -917,27 +907,6 @@ def OptButton (winname, ctlname, window, button_id, label_id, label_strref):
 	label.SetState (IE_GUI_BUTTON_LOCKED)
 	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
 	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
-
-def OptDone (winname, window, button_id):
-	"""Standard `Done' button for option windows"""
-	button = window.GetControl (button_id)
-	button.SetText (1403) # Done
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %winname))
-	button.SetVarAssoc ("Cancel", 0)
-
-def OptCancel (winname, window, button_id):
-	"""Standard `Cancel' button for option windows"""
-	button = window.GetControl (button_id)
-	button.SetText (4196) # Cancel
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %winname))
-	button.SetVarAssoc ("Cancel", 1)
-
-def OptHelpText (winname, window, text_id, text_strref):
-	"""Standard textarea with context help for option windows"""
-	text = window.GetControl (text_id)
-	text.SetText (text_strref)
-	return text
-
 
 ###################################################
 # End of file GUIOPT.py
