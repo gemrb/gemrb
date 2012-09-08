@@ -31,6 +31,7 @@
 ###################################################
 import GemRB
 import GUICommon
+import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
 from GUIDefines import *
@@ -46,9 +47,15 @@ HelpTextArea = None
 LoadMsgWindow = None
 QuitMsgWindow = None
 
+if GUICommon.GameIsBG1():
+	SubOptionsWindow = None
+	SubSubOptionsWindow = None
+	HelpTextArea2 = None
+else:
+	# just an alias to keep our logic from being plagued by too many GUICommon.GameIsBG1() checks
+	HelpTextArea2 = HelpTextArea
 ###################################################
 def CloseOptionsWindow ():
-	import GUICommonWindows
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -75,7 +82,7 @@ def CloseOptionsWindow ():
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window"""
-	import GUICommonWindows
+
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -83,21 +90,25 @@ def OpenOptionsWindow ():
 		CloseOptionsWindow()
 		return
 
-	hideflag = GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	if GUICommon.GameIsBG1():
+		GUICommonWindows.SetSelectionChangeHandler (None)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
 	GameOptionsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
-	#saving the original portrait window
-	if OldPortraitWindow == None:
+
+	if OldOptionsWindow == None:
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
-		GUICommonWindows.MarkMenuButton (OptionsWindow)
+		if GUICommon.GameIsBG2():
+			GUICommonWindows.MarkMenuButton (OptionsWindow)
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
 		OptionsWindow.SetFrame ()
-		OldPortraitWindow = GUICommonWindows.PortraitWindow
-		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+		if not GUICommon.GameIsBG1(): #not in PST/IWD2 either, but they have their own OpenOptionsWindow()
+			OptionsWindow.SetFrame ()
+			OldPortraitWindow = GUICommonWindows.PortraitWindow
+			PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# Return to Game
 	Button = Window.GetControl (11)
@@ -140,25 +151,41 @@ def OpenOptionsWindow ():
 
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	if not GUICommon.GameIsBG1():
+		PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 ###################################################
 
 def CloseVideoOptionsWindow ():
-	OpenOptionsWindow ()
-	OpenOptionsWindow ()
+	if GUICommon.GameIsBG1():
+		global SubOptionsWindow
+		if SubOptionsWindow:
+			SubOptionsWindow.Unload()
+		SubOptionsWindow = None
+	else:
+		# no idea why this is here twice
+		OpenOptionsWindow ()
+		OpenOptionsWindow ()
+
+	return
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global GameOptionsWindow, HelpTextArea
+	global HelpTextArea
+	Window = None
 
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
+	if GUICommon.GameIsBG1():
+		global SubOptionsWindow
+		Window = SubOptionsWindow
+	else:
+		global GameOptionsWindow
+		Window = GameOptionsWindow
 
-	GameOptionsWindow = Window = GemRB.LoadWindow (6)
+	if Window:
+		Window.Unload ()
+
+	Window = GemRB.LoadWindow (6)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', Window, 33, 18038)
 
@@ -179,7 +206,12 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptCheckbox (DisplayHelpSoftTransBlt, Window, 41, 46, 'SoftSrcKeyBlt' ,1)
 	GUIOPTControls.OptCheckbox (DisplayHelpSoftStandBlt, Window, 42, 48, 'SoftBltFast' ,1)
 
-	GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if GUICommon.GameIsBG1():
+		SubOptionsWindow = Window
+	else:
+		GameOptionsWindow = Window
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DisplayHelpFullScreen ():
@@ -209,24 +241,39 @@ def DisplayHelpSoftStandBlt ():
 def DisplayHelpTransShadow ():
 	HelpTextArea.SetText (20620)
 
-
 ###################################################
 
 def CloseAudioOptionsWindow ():
-	OpenOptionsWindow ()
-	OpenOptionsWindow ()
+	if GUICommon.GameIsBG1():
+		global SubOptionsWindow
+
+		if SubOptionsWindow:
+			SubOptionsWindow.Unload()
+		SubOptionsWindow = None
+	else:
+		# no idea why this is here twice
+		OpenOptionsWindow ()
+		OpenOptionsWindow ()
+	return
+
+###################################################
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global GameOptionsWindow, HelpTextArea
+	global HelpTextArea
 
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
+	Window = None
+	if GUICommon.GameIsBG1():
+		global SubOptionsWindow
+		Window = SubOptionsWindow
+	else:
+		global GameOptionsWindow
+		Window = GameOptionsWindow
 
-	GameOptionsWindow = Window = GemRB.LoadWindow (7)
+	if Window:
+		Window.Unload ()
 
+	Window = GemRB.LoadWindow (7)
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
 
 	GUIOPTControls.OptDone (CloseAudioOptionsWindow, Window, 24)
@@ -239,9 +286,15 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptSlider (DisplayHelpMusicVolume, Window, 4, 'Volume Music', 10)
 	GUIOPTControls.OptSlider (DisplayHelpMovieVolume, Window, 22, 'Volume Movie', 10)
 
-	GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	GUIOPTControls.OptCheckbox (DisplayHelpCreativeEAX, Window, 26, 28, 'Environmental Audio', 1)
 
+	if GUICommon.GameIsBG1():
+		SubOptionsWindow = Window
+	else:
+		GameOptionsWindow = Window
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
 
 def DisplayHelpAmbientVolume ():
 	HelpTextArea.SetText (18008)
@@ -266,26 +319,38 @@ def DisplayHelpCreativeEAX ():
 ###################################################
 
 def CloseCharacterSoundsWindow ():
-	global GameOptionsWindow
+	if GUICommon.GameIsBG1():
+		global SubSubOptionsWindow
+		if SubSubOptionsWindow:
+			SubSubOptionsWindow.Unload()
+		SubSubOptionsWindow = None
+	else:
+		global GameOptionsWindow
+		if GameOptionsWindow:
+			GameOptionsWindow.Unload()
+			GameOptionsWindow = None
+		OpenGameplayOptionsWindow ()
 
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-	GameOptionsWindow = None
-	OpenGameplayOptionsWindow ()
 	return
 
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
-	global GameOptionsWindow, HelpTextArea
 
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
+	global HelpTextArea2 # same as HelpTextArea if not BG1
+	Window = None
 
-	GameOptionsWindow = Window = GemRB.LoadWindow (12)
+	if GUICommon.GameIsBG1():
+		global SubSubOptionsWindow
+		Window = SubSubOptionsWindow
+	else:
+		global GameOptionsWindow
+		Window = GameOptionsWindow
 
-	HelpTextArea = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
+	if Window:
+		Window.Unload ()
+
+	Window = GemRB.LoadWindow (12)
+	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
 	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
@@ -302,38 +367,62 @@ def OpenCharacterSoundsWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
+	if GUICommon.GameIsBG1():
+		SubSubOptionsWindow = Window
+	else:
+		GameOptionsWindow = Window
+
 def DisplayHelpSubtitles ():
-	HelpTextArea.SetText (18015)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18015)
 
 def DisplayHelpAttackSounds ():
-	HelpTextArea.SetText (18013)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18013)
 
 def DisplayHelpFootsteps ():
-	HelpTextArea.SetText (18014)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18014)
 
 def DisplayHelpCommandSounds ():
-	HelpTextArea.SetText (18016)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18016)
 
 def DisplayHelpSelectionSounds ():
-	HelpTextArea.SetText (11352)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (11352)
 
 ###################################################
 
 def CloseGameplayOptionsWindow ():
-	OpenOptionsWindow ()
-	OpenOptionsWindow ()
+	if GUICommon.GameIsBG1():
+		global SubOptionsWindow
+
+		if SubOptionsWindow:
+			SubOptionsWindow.Unload()
+		SubOptionsWindow = None
+	else:
+		# no idea why this is here twice
+		OpenOptionsWindow ()
+		OpenOptionsWindow ()
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global GameOptionsWindow, HelpTextArea
+	global HelpTextArea
+	Window = None
+	if GUICommon.GameIsBG1():
+		global SubOptionsWindow
+		Window = SubOptionsWindow
+	else:
+		global GameOptionsWindow
+		Window = GameOptionsWindow
 
 	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
+		GameOptionsWindow.Unload ()
 		GameOptionsWindow = None
 
 	#gameplayoptions
-	GameOptionsWindow = Window = GemRB.LoadWindow (8)
+	Window = GemRB.LoadWindow (8)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 40, 18042)
 
@@ -357,7 +446,12 @@ def OpenGameplayOptionsWindow ():
 	if GUICommon.GameIsBG2():
 		GUIOPTControls.OptButton (OpenHotkeyOptionsWindow, Window, 51, 816)
 
-	GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if GUICommon.GameIsBG1():
+		SubOptionsWindow = Window
+	else:
+		GameOptionsWindow = Window
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DisplayHelpTooltipDelay ():
@@ -392,26 +486,39 @@ def DisplayHelpRestUntilHealed ():
 ###################################################
 
 def CloseFeedbackOptionsWindow ():
-	global GameOptionsWindow
+	if GUICommon.GameIsBG1():
+		global SubSubOptionsWindow
 
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-	GameOptionsWindow = None
-	OpenGameplayOptionsWindow ()
+		if SubSubOptionsWindow:
+			SubSubOptionsWindow.Unload ()
+		SubSubOptionsWindow = None
+	else:
+		global GameOptionsWindow
 
+		if GameOptionsWindow:
+			GameOptionsWindow.Unload ()
+			GameOptionsWindow = None
+		OpenGameplayOptionsWindow ()
+	return
 
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
-	global GameOptionsWindow, HelpTextArea
 
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
+	global HelpTextArea2
+	Window = None
+	if GUICommon.GameIsBG1():
+		global SubSubOptionsWindow
+		Window = SubSubOptionsWindow
+	else:
+		global GameOptionsWindow
+		Window = GameOptionsWindow
 
-	#feedback
-	GameOptionsWindow = Window = GemRB.LoadWindow (9)
-	HelpTextArea = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
+	if Window:
+		Window.Unload ()
+
+	Window = GemRB.LoadWindow (9)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2 = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
@@ -429,57 +536,83 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptCheckbox (DisplayHelpMiscellaneous, Window, 15, 37, 'Miscellaneous Text', 1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+	if GUICommon.GameIsBG1():
+		SubSubOptionsWindow = Window
+	else:
+		GameOptionsWindow = Window
+
 	return
 
 def DisplayHelpMarkerFeedback ():
-	HelpTextArea.SetText (18024)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18024)
 	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
 
 def DisplayHelpLocatorFeedback ():
-	HelpTextArea.SetText (18025)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18025)
 
 def DisplayHelpToHitRolls ():
-	HelpTextArea.SetText (18026)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18026)
 
 def DisplayHelpCombatInfo ():
-	HelpTextArea.SetText (18027)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18027)
 
 def DisplayHelpActions ():
-	HelpTextArea.SetText (18028)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18028)
 
 def DisplayHelpStates ():
-	HelpTextArea.SetText (18029)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18029)
 
 def DisplayHelpSelection ():
-	HelpTextArea.SetText (18030)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18030)
 
 def DisplayHelpMiscellaneous ():
-	HelpTextArea.SetText (18031)
+	# same as HelpTextArea if not BG1
+	HelpTextArea2.SetText (18031)
 
 ###################################################
 
 def CloseAutopauseOptionsWindow ():
-	global GameOptionsWindow
+	if GUICommon.GameIsBG1():
+		global SubSubOptionsWindow
 
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-	GameOptionsWindow = None
-	OpenGameplayOptionsWindow ()
+		if SubSubOptionsWindow:
+			SubSubOptionsWindow.Unload ()
+		SubSubOptionsWindow = None
+	else:
+		global GameOptionsWindow
+
+		if GameOptionsWindow:
+			GameOptionsWindow.Unload ()
+			GameOptionsWindow = None
+		OpenGameplayOptionsWindow ()
+
 	return
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
-	global GameOptionsWindow, HelpTextArea
 
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
+	global HelpTextArea2
+	Window = None
+	if GUICommon.GameIsBG1():
+		global SubSubOptionsWindow
+		Window = SubSubOptionsWindow
+	else:
+		global GameOptionsWindow
+		Window = GameOptionsWindow
 
-	GameOptionsWindow = Window = GemRB.LoadWindow (10)
+	if Window:
+		Window.Unload ()
 
-	HelpTextArea = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
-
+	Window = GemRB.LoadWindow (10)
+	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
 	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
 	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
@@ -496,42 +629,47 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 34, 30, 'Auto Pause State', 256)
 		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 31, 33, 'Auto Pause State', 512)
 		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 31, 33, 'Auto Pause Center', 1)
+	if GUICommon.GameIsBG1():
+		SubSubOptionsWindow = Window
+	else:
+		GameOptionsWindow = Window
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+# same as HelpTextArea if not BG1 in all the following functions
 def DisplayHelpCharacterHit ():
-	HelpTextArea.SetText (18032)
+	HelpTextArea2.SetText (18032)
 
 def DisplayHelpCharacterInjured ():
-	HelpTextArea.SetText (18033)
+	HelpTextArea2.SetText (18033)
 
 def DisplayHelpCharacterDead ():
-	HelpTextArea.SetText (18034)
+	HelpTextArea2.SetText (18034)
 
 def DisplayHelpCharacterAttacked ():
-	HelpTextArea.SetText (18035)
+	HelpTextArea2.SetText (18035)
 
 def DisplayHelpWeaponUnusable ():
-	HelpTextArea.SetText (18036)
+	HelpTextArea2.SetText (18036)
 
 def DisplayHelpTargetGone ():
-	HelpTextArea.SetText (18037)
+	HelpTextArea2.SetText (18037)
 
 def DisplayHelpEndOfRound ():
-	HelpTextArea.SetText (10640)
+	HelpTextArea2.SetText (10640)
 
 def DisplayHelpEnemySighted ():
-	HelpTextArea.SetText (23514)
+	HelpTextArea2.SetText (23514)
 
 def DisplayHelpSpellCast ():
-	HelpTextArea.SetText (58171)
+	HelpTextArea2.SetText (58171)
 
 def DisplayHelpTrapFound ():
-	HelpTextArea.SetText (31872)
+	HelpTextArea2.SetText (31872)
 
 def DisplayHelpCenterOnActor ():
-	HelpTextArea.SetText (10571)
+	HelpTextArea2.SetText (10571)
 
 ###################################################
 
@@ -574,9 +712,11 @@ def CloseLoadMsgWindow ():
 	if LoadMsgWindow:
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
+	if not GUICommon.GameIsBG1():
+		OptionsWindow.SetVisible (WINDOW_VISIBLE)
+		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+		PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def LoadGamePress ():
@@ -653,8 +793,9 @@ def CloseQuitMsgWindow ():
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	if GUICommon.GameIsBG2():
+		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+		PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 ###################################################
