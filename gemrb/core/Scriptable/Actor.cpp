@@ -3595,10 +3595,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
-	// instant chunky death if the actor is petrified or frozen
-	if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && (GameDifficulty > DIFF_NORMAL) ) {
-		damage = 123456; // arbitrarily high for death; won't be displayed
-		LastDamageType |= DAMAGE_CHUNKING;
+	if (damage>0) {
+		// instant chunky death if the actor is petrified or frozen
+		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && (GameDifficulty > DIFF_NORMAL) ) {
+			damage = 123456; // arbitrarily high for death; won't be displayed
+			LastDamageType |= DAMAGE_CHUNKING;
+		}
 	}
 
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
