@@ -789,7 +789,7 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cold_damage(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner);
+	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, fx->IsVariable, fx->SavingThrowType);
 	return FX_NOT_APPLIED;
 }
 
@@ -801,7 +801,7 @@ int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_chill_touch (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_chill_touch(%2d)", fx->Opcode);
-	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner);
+	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, fx->IsVariable, fx->SavingThrowType);
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
 		target->Panic(Owner, PANIC_RUNAWAY);
 	}
@@ -836,7 +836,7 @@ int fx_chill_touch_panic (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_crushing_damage(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	target->Damage(fx->Parameter1, DAMAGE_CRUSHING, Owner);
+	target->Damage(fx->Parameter1, DAMAGE_CRUSHING, Owner, fx->IsVariable, fx->SavingThrowType);
 	return FX_NOT_APPLIED;
 }
 
@@ -945,7 +945,7 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			return FX_NOT_APPLIED;
 	}
-	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner);
+	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner, fx->IsVariable, fx->SavingThrowType);
 	receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
 	return FX_NOT_APPLIED;
 }
@@ -1070,7 +1070,7 @@ int fx_burning_blood (Scriptable* Owner, Actor* target, Effect* fx)
 		damage = DAMAGE_COLD;
 	}
 
-	target->Damage(fx->Parameter1, damage, Owner);
+	target->Damage(fx->Parameter1, damage, Owner, fx->IsVariable, fx->SavingThrowType);
 	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_NOT_APPLIED;
 }
@@ -1101,7 +1101,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//this effect doesn't use Parameter1 to modify damage, it is a counter instead
-	target->Damage(DICE_ROLL(0), damage, Owner);
+	target->Damage(DICE_ROLL(0), damage, Owner, fx->IsVariable, fx->SavingThrowType);
 	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_APPLIED;
 }
@@ -1183,7 +1183,7 @@ int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
 		return FX_NOT_APPLIED;
 	}
-	target->Damage(DICE_ROLL(0), DAMAGE_COLD, Owner);
+	target->Damage(DICE_ROLL(0), DAMAGE_COLD, Owner, fx->IsVariable, fx->SavingThrowType );
 	///convert to hold creature
 	///shall we check for immunity vs. #175?
 	///if yes, then probably it is easier to apply the hold effect instead of converting to it
@@ -1208,10 +1208,10 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 	//check saving throw
 	bool st = target->GetSavingThrow(0,0); //spell
 	if (st) {
-		target->Damage(damage/2, DAMAGE_FIRE, Owner);
+		target->Damage(damage/2, DAMAGE_FIRE, Owner, fx->IsVariable, fx->SavingThrowType);
 		return FX_NOT_APPLIED;
 	}
-	target->Damage(damage, DAMAGE_FIRE, Owner);
+	target->Damage(damage, DAMAGE_FIRE, Owner, fx->IsVariable, fx->SavingThrowType);
 
 	//convert effect to a blind effect.
 	fx->Opcode = EffectQueue::ResolveEffect(fx_state_blind_ref);
@@ -1591,7 +1591,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//how style
-	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner);
+	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner, fx->IsVariable, fx->SavingThrowType);
 	return ret;
 }
 
@@ -1776,7 +1776,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		damage = core->Roll(3, 8, 0);
 	}
 
-	target->Damage(damage, DAMAGE_SOULEATER, Owner);
+	target->Damage(damage, DAMAGE_SOULEATER, Owner, fx->IsVariable, fx->SavingThrowType);
 	//the state is not set soon enough!
 	//if (STATE_GET(STATE_DEAD) ) {
 	if (target->GetInternalFlag() & IF_REALLYDIED) {
@@ -1846,7 +1846,7 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		damagetype = DAMAGE_COLD;
 	}
 
-	target->Damage(fx->Parameter1, damagetype, Owner);
+	target->Damage(fx->Parameter1, damagetype, Owner, fx->IsVariable, fx->SavingThrowType);
 	ApplyDamageNearby(Owner, target, fx, damagetype);
 	return FX_APPLIED;
 }
@@ -1996,7 +1996,7 @@ int fx_vitriolic_sphere (Scriptable* Owner, Actor* target, Effect* fx)
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	target->Damage(fx->Parameter1, DAMAGE_ACID, Owner);
+	target->Damage(fx->Parameter1, DAMAGE_ACID, Owner, fx->IsVariable, fx->SavingThrowType);
 	fx->DiceThrown-=2;
 	if ((signed) fx->DiceThrown<1) {
 		return FX_NOT_APPLIED;
@@ -2813,7 +2813,7 @@ seconds:
 		break;
 	}
 	//percent
-	target->Damage(damage, DAMAGE_POISON, Owner);
+	target->Damage(damage, DAMAGE_POISON, Owner, fx->IsVariable, fx->SavingThrowType);
 	target->AddPortraitIcon(PI_BLEEDING);
 	return FX_APPLIED;
 }
@@ -3520,7 +3520,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//how style
-	victim->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, target);
+	victim->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, target, fx->IsVariable, fx->SavingThrowType);
 	return ret;
 }
 

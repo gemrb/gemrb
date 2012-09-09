@@ -1329,7 +1329,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	target->Damage(fx->Parameter1, damagetype, caster, modtype, fx->IsVariable);
+	target->Damage(fx->Parameter1, damagetype, caster, modtype, fx->IsVariable, fx->SavingThrowType);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }

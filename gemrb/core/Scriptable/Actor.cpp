@@ -316,6 +316,44 @@ std::vector<std::vector<int> > skillrac;
 static int ReverseToHit=true;
 static int CheckAbilities=false;
 
+static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
+static EffectRef fx_cleave_ref = { "Cleave", -1 };
+static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
+static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
+static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
+static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
+static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
+//bg2 and iwd1
+static EffectRef control_creature_ref = { "ControlCreature", -1 };
+//iwd2
+static EffectRef control_undead_ref = { "ControlUndead2", -1 };
+static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
+static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
+static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
+static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
+static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
+static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
+static EffectRef fx_puppetmarker_ref = { "PuppetMarker", -1 };
+static EffectRef fx_stoneskin_ref = { "StoneSkinModifier", -1 };
+static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
+static EffectRef fx_aegis_ref = { "Aegis", -1 };
+static EffectRef fx_cloak_ref = { "Overlay", -1 };
+static EffectRef fx_damage_ref = { "Damage", -1 };
+static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
+static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
+static EffectRef fx_cant_use_item_ref = { "CantUseItem", -1 };
+static EffectRef fx_cant_use_item_type_ref = { "CantUseItemType", -1 };
+static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
+static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
+static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
+
+//used by iwd2
+static ieResRef resref_cripstr={"cripstr"};
+static ieResRef resref_dirty={"dirty"};
+
+static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
+	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
+
 //internal flags for calculating to hit
 #define WEAPON_FIST        0
 #define WEAPON_MELEE       1
@@ -2587,7 +2625,6 @@ void Actor::CheckPuppet(Actor *puppet, ieDword type)
 	Modified[IE_PUPPETID] = puppet->GetGlobalID();
 }
 
-static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 
 /** call this after load, to apply effects */
 void Actor::RefreshEffects(EffectQueue *fx)
@@ -3416,8 +3453,6 @@ void Actor::DialogInterrupt()
 	}
 }
 
-static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
-
 void Actor::GetHit()
 {
 	if (!Immobile()) {
@@ -3472,9 +3507,6 @@ bool Actor::CheckSilenced()
 	return true;
 }
 
-static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
-static EffectRef fx_cleave_ref = { "Cleave", -1 };
-
 void Actor::CheckCleave()
 {
 	int cleave = GetFeat(FEAT_CLEAVE);
@@ -3492,11 +3524,9 @@ void Actor::CheckCleave()
 	}
 }
 
-static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
-static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 
 //returns actual damage
-int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical)
+int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical, int saveflags)
 {
 	//won't get any more hurt
 	if (InternalFlags & IF_REALLYDIED) {
@@ -3540,8 +3570,29 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	int resisted = 0;
 
-	ModifyDamage (hitter, damage, resisted, damagetype);
+	if (!(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
+		int mirrorimages = Modified[IE_MIRRORIMAGES];
+		if (mirrorimages) {
+			if (LuckyRoll(1,mirrorimages+1,0) != 1) {
+				fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
+				Modified[IE_MIRRORIMAGES]--;
+				damage = 0;
+			}
+		}
+	}
 
+	if (!(saveflags&SF_IGNORE_DIFFICULTY)) {
+		// adjust enemy damage according to difficulty settings:
+		// -50%, -25%, 0, 50%, 100%, 150%
+		if (Modified[IE_EA] < EA_GOODCUTOFF) {
+			int adjustmentPercent = dmgadjustments[GameDifficulty];
+			damage += (damage * adjustmentPercent)/100;
+		}
+	}
+
+	if (damage) {
+		ModifyDamage (hitter, damage, resisted, damagetype);
+	}
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
 	// instant chunky death if the actor is petrified or frozen
@@ -4116,11 +4167,6 @@ int Actor::CalculateSpeed(bool feedback)
 	return 0;
 }
 
-//bg2 and iwd1
-static EffectRef control_creature_ref = { "ControlCreature", -1 };
-//iwd2
-static EffectRef control_undead_ref = { "ControlUndead2", -1 };
-
 //receive turning
 void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 {
@@ -4219,12 +4265,6 @@ void Actor::Resurrect()
 	ResetCommentTime();
 	//clear effects?
 }
-
-static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
-static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
-static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
-static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
-static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 
 const char *GetVarName(const char *table, int value)
 {
@@ -5563,10 +5603,6 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 	return tohit;
 }
 
-static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
-	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
-static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
-
 int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker) const
 {
 	//specific damage type bonus.
@@ -5631,8 +5667,6 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker) const
 	}
 	return defense;
 }
-
-static EffectRef fx_puppetmarker_ref = { "PuppetMarker", -1 };
 
 void Actor::PerformAttack(ieDword gameTime)
 {
@@ -5878,12 +5912,6 @@ void Actor::PerformAttack(ieDword gameTime)
 	ResetState();
 }
 
-static EffectRef fx_stoneskin_ref = { "StoneSkinModifier", -1 };
-static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
-static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
-static EffectRef fx_aegis_ref = { "Aegis", -1 };
-static EffectRef fx_cloak_ref = { "Overlay", -1 };
-
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 {
 	if (wi.wflags&WEAPON_USESTRENGTH) {
@@ -5899,9 +5927,6 @@ int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 	return 0;
 }
 
-static ieResRef resref_cripstr={"cripstr"};
-static ieResRef resref_dirty={"dirty"};
-
 /*Always call this on the suffering actor */
 void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype)
 {
@@ -5909,16 +5934,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	if (hitter && hitter->Type==ST_ACTOR) {
 		attacker = (Actor *) hitter;
-	}
-
-	int mirrorimages = Modified[IE_MIRRORIMAGES];
-	if (mirrorimages) {
-		if (LuckyRoll(1,mirrorimages+1,0) != 1) {
-			fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
-			Modified[IE_MIRRORIMAGES]--;
-			damage = 0;
-			return;
-		}
 	}
 
 	//guardian mantle for PST
@@ -5959,13 +5974,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 
 	if (damage>0) {
-		// adjust enemy damage according to difficulty settings:
-		// -50%, -25%, 0, 50%, 100%, 150%
-		if (Modified[IE_EA] < EA_GOODCUTOFF) {
-			int adjustmentPercent = dmgadjustments[GameDifficulty];
-			damage += (damage * adjustmentPercent)/100;
-		}
-
 		// check damage type immunity / resistance / susceptibility
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
@@ -7279,10 +7287,6 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	return false;
 }
 
-static EffectRef fx_damage_ref = { "Damage", -1 };
-static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
-static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
-
 void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical)
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
@@ -7692,9 +7696,6 @@ int Actor::CheckUsability(Item *item) const
 
 	return 0;
 }
-
-static EffectRef fx_cant_use_item_ref = { "CantUseItem", -1 };
-static EffectRef fx_cant_use_item_type_ref = { "CantUseItemType", -1 };
 
 //this one is the same, but returns strrefs based on effects
 ieStrRef Actor::Disabled(ieResRef name, ieDword type) const
@@ -8274,8 +8275,6 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent
 	}
 }
 
-static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
-
 // removes the (normal) invisibility state
 void Actor::CureInvisibility()
 {
@@ -8293,8 +8292,6 @@ void Actor::CureInvisibility()
 		}
 	}
 }
-
-static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
 
 // removes the sanctuary effect
 void Actor::CureSanctuary()
@@ -8373,8 +8370,6 @@ bool Actor::ModalSpellSkillCheck() {
 			return false;
 	}
 }
-
-static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
 
 inline void HideFailed(Actor* actor)
 {
