@@ -4833,6 +4833,10 @@ CREItem *Interface::ReadItem(DataStream *str, CREItem *itm)
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );
 	str->ReadDword( &itm->Flags );
+	//the stacked flag will be set by the engine if the item is indeed stacked
+	//this is to fix buggy saves so TakeItemNum works
+	//the equipped bit is also reset
+	itm->Flags&=~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
 	if (GF_NO_UNDROPPABLE) {
 		itm->Flags&=~IE_INV_ITEM_UNDROPPABLE;
 	}
