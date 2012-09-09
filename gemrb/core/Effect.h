@@ -73,6 +73,10 @@ class Actor;
 #define FX_NO_RESIST_CAN_DISPEL    3
 #define FX_CAN_DISPEL               1
 
+// Effect save flags (ToBEx)
+#define SF_BYPASS_MIRROR_IMAGE 0x1000000
+#define SF_IGNORE_DIFFICULTY   0x2000000
+
 /**
  * @class Effect
  * Structure holding information about single spell or spell-like effect.

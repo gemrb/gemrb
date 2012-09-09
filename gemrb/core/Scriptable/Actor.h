@@ -534,7 +534,7 @@ public:
 	/* check and perform a cleave movement */
 	void CheckCleave();
 	/* deals damage to this actor */
-	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0);
+	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0, int saveflags=0);
 	/* displays the damage taken and other details (depends on the game type) */
 	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter);
 	/* play a random footstep sound */
