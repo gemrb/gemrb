@@ -835,11 +835,7 @@ def LoadGamePress ():
 
 #save game AND quit
 def SaveGamePress ():
-	global QuitMsgWindow
-
-	if QuitMsgWindow:
-		QuitMsgWindow.Unload ()
-	QuitMsgWindow = None
+	CloseQuitMsgWindow()
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
 	OpenOptionsWindow()
@@ -847,11 +843,12 @@ def SaveGamePress ():
 	return
 
 def QuitGamePress ():
-	global QuitMsgWindow
+	if GemRB.GetVar("AskAndExit") == 1:
+		GemRB.Quit()
+		return
 
-	if QuitMsgWindow:
-		QuitMsgWindow.Unload ()
-	QuitMsgWindow = None
+	CloseQuitMsgWindow()
+
 	GemRB.QuitGame ()
 	OpenOptionsWindow()
 	GemRB.SetNextScript ("Start")
@@ -881,7 +878,7 @@ def OpenQuitMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelQuitMsgWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Do you wish to save the game ....
@@ -891,16 +888,23 @@ def OpenQuitMsgWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def CancelQuitMsgWindow ():
+	CloseQuitMsgWindow()
+
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	if not GUICommon.GameIsBG1():
+		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	return
+
 def CloseQuitMsgWindow ():
 	global QuitMsgWindow
 
 	if QuitMsgWindow:
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if not GUICommon.GameIsBG1():
-		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
+	GemRB.SetVar("AskAndExit", 0)
 	return
 
 ###################################################

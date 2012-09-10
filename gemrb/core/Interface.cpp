@@ -3601,11 +3601,16 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 
 void Interface::AskAndExit()
 {
-	if (game) {
+	// if askExit is 1 then we are trying to quit a second time and should instantly do so
+	ieDword askExit;
+	vars->Lookup("AskAndExit", askExit);
+	if (game && !askExit) {
 		if (ConsolePopped) {
 			PopupConsole();
 		}
 		SetPause(PAUSE_ON);
+		vars->SetAt("AskAndExit", 1);
+
 		LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
 	} else {
