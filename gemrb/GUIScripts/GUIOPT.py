@@ -46,6 +46,7 @@ HelpTextArea = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
+MovieWindow = None
 
 if GUICommon.GameIsBG1():
 	SubOptionsWindow = None
@@ -113,8 +114,9 @@ def OpenOptionsWindow ():
 			GUICommonWindows.MarkMenuButton (OptionsWindow)
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
 		OptionsWindow.SetFrame ()
-		if not GUICommon.GameIsBG1(): #not in PST/IWD2 either, but they have their own OpenOptionsWindow()
+		if not GUICommon.GameIsBG1(): #not in PST either, but it has its own OpenOptionsWindow()
 			OptionsWindow.SetFrame ()
+			#saving the original portrait window
 			OldPortraitWindow = GUICommonWindows.PortraitWindow
 			PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
@@ -122,6 +124,7 @@ def OpenOptionsWindow ():
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Quit Game
 	Button = Window.GetControl (10)
@@ -154,8 +157,19 @@ def OpenOptionsWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenGameplayOptionsWindow)
 
 	# game version, e.g. v1.1.0000
-	Label = Window.GetControl (0x1000000b)
-	Label.SetText (GEMRB_VERSION)
+	VersionLabel = Window.GetControl (0x1000000b)
+	VersionLabel.SetText (GEMRB_VERSION)
+
+	if GUICommon.GameIsIWD2():
+		# Keyboard shortcuts
+		KeyboardButton = Window.GetControl (13)
+		KeyboardButton.SetText (33468)
+		KeyboardButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenKeyboardWindow
+
+		# Movies
+		MoviesButton = Window.GetControl (14)
+		MoviesButton.SetText (15415)
+		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMovieWindow)
 
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -689,6 +703,60 @@ def DisplayHelpCenterOnActor ():
 
 ###################################################
 
+def CloseMovieWindow ():
+	if MovieWindow:
+		MovieWindow.Unload ()
+	return
+
+def MoviePlayPress():
+	s = GemRB.GetVar("MovieIndex")
+	for i in range(0, MoviesTable.GetRowCount() ):
+		t = MoviesTable.GetRowName(i)
+		if GemRB.GetVar(t)==1:
+			if s==0:
+				s = MoviesTable.GetRowName(i)
+				GemRB.PlayMovie(s, 1)
+				MovieWindow.Invalidate()
+				return
+			s = s - 1
+	return
+
+def MovieCreditsPress():
+	GemRB.PlayMovie("CREDITS")
+	MovieWindow.Invalidate()
+	return
+
+def OpenMovieWindow ():
+	global MovieWindow, TextAreaControl, MoviesTable
+
+	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
+	MovieWindow = Window = GemRB.LoadWindow(2)
+	Window.SetFrame ()
+	#reloading the guiopt windowpack
+	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
+	TextAreaControl = Window.GetControl(0)
+	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)
+	PlayButton = Window.GetControl(2)
+	CreditsButton = Window.GetControl(3)
+	DoneButton = Window.GetControl(4)
+	MoviesTable = GemRB.LoadTable("MOVIDESC")
+	for i in range(0, MoviesTable.GetRowCount() ):
+		t = MoviesTable.GetRowName(i)
+		if GemRB.GetVar(t)==1:
+			s = MoviesTable.GetValue(i, 0)
+			TextAreaControl.Append(s,-1)
+	TextAreaControl.SetVarAssoc("MovieIndex",0)
+	PlayButton.SetText(17318)
+	CreditsButton.SetText(15591)
+	DoneButton.SetText(11973)
+	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
+	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MovieCreditsPress)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseMovieWindow)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+###################################################
+
 def OpenSaveMsgWindow ():
 	GemRB.SetVar("QuitAfterSave",0)
 	GUISAVE.OpenSaveWindow ()
@@ -709,11 +777,13 @@ def OpenLoadMsgWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (15590)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLoadMsgWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)

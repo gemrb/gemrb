@@ -245,6 +245,63 @@ def DisplayHelpMovieVolume ():
 def DisplayHelpCreativeEAX ():
 	HelpTextArea.SetText (18022)
 
+###################################################
+
+def CloseCharacterSoundsWindow ():
+	global GameOptionsWindow
+
+	if GameOptionsWindow:
+		GameOptionsWindow.Unload ()
+	GameOptionsWindow = None
+	OpenGameplayOptionsWindow ()
+	return
+
+def OpenCharacterSoundsWindow ():
+	"""Open character sounds window"""
+	global GameOptionsWindow, HelpTextArea
+
+	if GameOptionsWindow:
+		if GameOptionsWindow:
+			GameOptionsWindow.Unload ()
+		GameOptionsWindow = None
+
+	GameOptionsWindow = Window = GemRB.LoadWindow (12)
+
+	HelpTextArea = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
+
+	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
+	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
+
+	GUIOPTControls.OptCheckbox (DisplayHelpSubtitles, Window, 5, 20, 'Subtitles', 1)
+	GUIOPTControls.OptCheckbox (DisplayHelpAttackSounds, Window, 6, 18, 'Attack Sounds', 1)
+	GUIOPTControls.OptCheckbox (DisplayHelpFootsteps, Window, 7, 19, 'Footsteps', 1)
+	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 2)
+	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 1)
+	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 10, 21, 'Command Sounds Frequency', 0)
+	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 58, 57, 'Selection Sounds Frequency', 2)
+	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 59, 57, 'Selection Sounds Frequency', 1)
+	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 60, 57, 'Selection Sounds Frequency', 0)
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+def DisplayHelpSubtitles ():
+	HelpTextArea.SetText (18015)
+
+def DisplayHelpAttackSounds ():
+	HelpTextArea.SetText (18013)
+
+def DisplayHelpFootsteps ():
+	HelpTextArea.SetText (18014)
+
+def DisplayHelpCommandSounds ():
+	HelpTextArea.SetText (18016)
+
+def DisplayHelpSelectionSounds ():
+	HelpTextArea.SetText (11352)
+
+def DisplayHelpMaxHitpoints ():
+	#TODO
+	return
 
 ###################################################
 
@@ -470,64 +527,6 @@ def DisplayHelpTrapFound ():
 
 def DisplayHelpCenterOnActor ():
 	HelpTextArea.SetText (10571)
-
-###################################################
-
-def CloseCharacterSoundsWindow ():
-	global GameOptionsWindow
-
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-	GameOptionsWindow = None
-	OpenGameplayOptionsWindow ()
-	return
-
-def OpenCharacterSoundsWindow ():
-	"""Open character sounds window"""
-	global GameOptionsWindow, HelpTextArea
-
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
-
-	GameOptionsWindow = Window = GemRB.LoadWindow (12)
-
-	HelpTextArea = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
-
-	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
-	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
-
-	GUIOPTControls.OptCheckbox (DisplayHelpSubtitles, Window, 5, 20, 'Subtitles', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpAttackSounds, Window, 6, 18, 'Attack Sounds', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpFootsteps, Window, 7, 19, 'Footsteps', 1)
-	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 2)
-	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 1)
-	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 10, 21, 'Command Sounds Frequency', 0)
-	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 58, 57, 'Selection Sounds Frequency', 2)
-	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 59, 57, 'Selection Sounds Frequency', 1)
-	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 60, 57, 'Selection Sounds Frequency', 0)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-def DisplayHelpSubtitles ():
-	HelpTextArea.SetText (18015)
-
-def DisplayHelpAttackSounds ():
-	HelpTextArea.SetText (18013)
-
-def DisplayHelpFootsteps ():
-	HelpTextArea.SetText (18014)
-
-def DisplayHelpCommandSounds ():
-	HelpTextArea.SetText (18016)
-
-def DisplayHelpSelectionSounds ():
-	HelpTextArea.SetText (11352)
-
-def DisplayHelpMaxHitpoints ():
-	#TODO
-	return
 
 ###################################################
 
