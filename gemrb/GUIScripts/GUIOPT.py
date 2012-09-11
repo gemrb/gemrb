@@ -245,11 +245,23 @@ def DisplayHelpBPP ():
 
 def DisplayHelpBrightness ():
 	HelpTextArea.SetText (17203)
-	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
+	SetGfxCorrection ()
 
 def DisplayHelpContrast ():
 	HelpTextArea.SetText (17204)
-	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
+	SetGfxCorrection ()
+
+# different games have different slider ranges, but the engine wants:
+# gamma: 0-5
+# brightness: 0-40
+def SetGfxCorrection ():
+	Brightness = GemRB.GetVar("Brightness Correction")
+	Gamma = GemRB.GetVar("Gamma Correction")
+	if GUICommon.GameIsIWD2(): # 10/11 ticks
+		Gamma /= 2
+	# TODO: check if pst really has them quintupled
+
+	GemRB.SetGamma (Brightness, Gamma)
 
 def DisplayHelpSoftMirrBlt ():
 	HelpTextArea.SetText (18004)
