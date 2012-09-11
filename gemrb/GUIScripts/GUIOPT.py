@@ -329,7 +329,7 @@ def CloseCharacterSoundsWindow ():
 		if GameOptionsWindow:
 			GameOptionsWindow.Unload()
 			GameOptionsWindow = None
-		OpenGameplayOptionsWindow ()
+		OpenAudioOptionsWindow ()
 
 	return
 
