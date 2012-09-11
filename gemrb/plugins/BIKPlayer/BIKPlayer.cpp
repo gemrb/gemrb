@@ -220,7 +220,8 @@ int BIKPlayer::Play()
 	frameCount = 0;
 	int ret = doPlay( );
 
-	EndAudio();
+	if (s_stream > -1)
+		EndAudio();
 	EndVideo();
 	av_freep((void **) &inbuff);
 	return ret;
@@ -288,7 +289,7 @@ bool BIKPlayer::next_frame()
 	ieDword audframesize;
 	str->ReadDword(&audframesize);
 	frame.size = str->Read( inbuff, frame.size - 4 );
-	if (DecodeAudioFrame(inbuff, audframesize)) {
+	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
 		//buggy frame, we stop immediately
 		//return false;
 	}
