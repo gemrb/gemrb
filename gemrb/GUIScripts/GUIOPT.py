@@ -652,13 +652,18 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCheckbox (DisplayHelpTargetGone, Window, 13, 22, 'Auto Pause State', 32)
 	GUIOPTControls.OptCheckbox (DisplayHelpEndOfRound, Window, 25, 24, 'Auto Pause State', 64)
 	if GUICommon.GameIsIWD2():
-		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 30, 28, 'Auto Pause State', 128)
+		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 30, 31, 'Auto Pause State', 128)
+		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 34, 30, 'Auto Pause State', 256)
+		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 33, 34, 'Auto Pause Center', 1)
+		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 26, 28, 'Auto Pause State', 512)
 	elif not GUICommon.GameIsIWD1():
 		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 26, 27, 'Auto Pause State', 128)
-	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
-		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 34, 30, 'Auto Pause State', 256)
-		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 31, 33, 'Auto Pause State', 512)
-		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 31, 33, 'Auto Pause Center', 1)
+	if GUICommon.GameIsBG2():
+		# TODO: recheck if the first and third are correctly mapped
+		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 31, 33, 'Auto Pause State', 256)
+		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 37, 36, 'Auto Pause Center', 1)
+		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 34, 30, 'Auto Pause State', 512)
+
 	if GUICommon.GameIsBG1():
 		SubSubOptionsWindow = Window
 	else:
