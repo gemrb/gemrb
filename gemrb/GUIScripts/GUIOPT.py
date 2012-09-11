@@ -54,14 +54,6 @@ if GUICommon.GameIsBG1():
 else:
 	# just an alias to keep our logic from being plagued by too many GUICommon.GameIsBG1() checks
 	HelpTextArea2 = HelpTextArea
-
-if GUICommon.GameIsIWD2():
-	WIDTH = 800
-	HEIGHT = 600
-else:
-	WIDTH = 640
-	HEIGHT = 480
-
 ###################################################
 def CloseOptionsWindow ():
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
@@ -102,7 +94,7 @@ def OpenOptionsWindow ():
 	if GUICommon.GameIsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
-	GemRB.LoadWindowPack ("GUIOPT", WIDTH, HEIGHT)
+	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
 	GameOptionsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
 
