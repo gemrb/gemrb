@@ -46,11 +46,10 @@ HelpTextArea = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
-MovieWindow = None
+SubOptionsWindow = None
+SubSubOptionsWindow = None
 
 if GUICommon.GameIsBG1():
-	SubOptionsWindow = None
-	SubSubOptionsWindow = None
 	HelpTextArea2 = None
 else:
 	# just an alias to keep our logic from being plagued by too many GUICommon.GameIsBG1() checks
@@ -598,11 +597,6 @@ def OpenAutopauseOptionsWindow ():
 
 ###################################################
 
-def CloseMovieWindow ():
-	if MovieWindow:
-		MovieWindow.Unload ()
-	return
-
 def MoviePlayPress():
 	s = GemRB.GetVar("MovieIndex")
 	for i in range(0, MoviesTable.GetRowCount() ):
@@ -611,21 +605,21 @@ def MoviePlayPress():
 			if s==0:
 				s = MoviesTable.GetRowName(i)
 				GemRB.PlayMovie(s, 1)
-				MovieWindow.Invalidate()
+				SubOptionsWindow.Invalidate()
 				return
 			s = s - 1
 	return
 
 def MovieCreditsPress():
 	GemRB.PlayMovie("CREDITS")
-	MovieWindow.Invalidate()
+	SubOptionsWindow.Invalidate()
 	return
 
 def OpenMovieWindow ():
-	global MovieWindow, TextAreaControl, MoviesTable
+	global SubOptionsWindow, TextAreaControl, MoviesTable
 
 	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
-	MovieWindow = Window = GemRB.LoadWindow(2)
+	SubOptionsWindow = Window = GemRB.LoadWindow(2)
 	Window.SetFrame ()
 	#reloading the guiopt windowpack
 	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
@@ -646,8 +640,28 @@ def OpenMovieWindow ():
 	DoneButton.SetText(11973)
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
 	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MovieCreditsPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseMovieWindow)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseSubOptionsWindow)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+###################################################
+
+def CloseSubOptionsWindow ():
+	global SubOptionsWindow, OptionsWindow
+
+	if SubOptionsWindow:
+		SubOptionsWindow.Unload ()
+		SubOptionsWindow = None
+	OptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def CloseSubSubOptionsWindow ():
+	global SubSubOptionsWindow, SubOptionsWindow
+
+	if SubSubOptionsWindow:
+		SubSubOptionsWindow.Unload ()
+		SubSubOptionsWindow = None
+	SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 ###################################################
