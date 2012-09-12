@@ -798,7 +798,7 @@ def OpenLoadMsgWindow ():
 
 	# Cancel
 	Button = Window.GetControl (1)
-	Button.SetText (13727)
+	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLoadMsgWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -880,7 +880,7 @@ def OpenQuitMsgWindow ():
 
 	# Cancel
 	Button = Window.GetControl (2)
-	Button.SetText (13727)
+	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
