@@ -3613,6 +3613,7 @@ void Interface::AskAndExit()
 
 		LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
+		Log(MESSAGE, "Info", "Press ctrl-c (or close the window) again to quit GemRB.\n");
 	} else {
 		ExitGemRB();
 	}
