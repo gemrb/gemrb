@@ -171,10 +171,8 @@ def OpenOptionsWindow ():
 		MoviesButton.SetText (15415)
 		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMovieWindow)
 
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_VISIBLE)
-	if not GUICommon.GameIsBG1():
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	RestoreWinVisibility ()
+
 	return
 
 ###################################################
@@ -536,6 +534,14 @@ def CloseSubSubOptionsWindow ():
 	SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def RestoreWinVisibility ():
+	if OptionsWindow:
+		OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	if GameOptionsWindow:
+		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+	if PortraitWindow:
+		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
 ###################################################
 
 def OpenSaveMsgWindow ():
@@ -580,10 +586,8 @@ def CloseLoadMsgWindow ():
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
 
-	if not GUICommon.GameIsBG1():
-		OptionsWindow.SetVisible (WINDOW_VISIBLE)
-		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	RestoreWinVisibility ()
+
 	return
 
 def LoadGamePress ():
@@ -656,12 +660,7 @@ def CancelQuitMsgWindow ():
 	CloseQuitMsgWindow()
 
 	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-	if OptionsWindow:
-		OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if GameOptionsWindow:
-		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if PortraitWindow:
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	RestoreWinVisibility ()
 
 	return
 
