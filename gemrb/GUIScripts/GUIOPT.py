@@ -769,10 +769,14 @@ def OpenQuitMsgWindow ():
 def CancelQuitMsgWindow ():
 	CloseQuitMsgWindow()
 
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if not GUICommon.GameIsBG1():
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+	if OptionsWindow:
+		OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	if GameOptionsWindow:
 		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+	if PortraitWindow:
 		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
 	return
 
 def CloseQuitMsgWindow ():
