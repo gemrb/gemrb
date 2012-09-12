@@ -522,7 +522,8 @@ def CloseSubOptionsWindow ():
 	if SubOptionsWindow:
 		SubOptionsWindow.Unload ()
 		SubOptionsWindow = None
-	GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if GameOptionsWindow:
+		GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CloseSubSubOptionsWindow ():
@@ -531,7 +532,8 @@ def CloseSubSubOptionsWindow ():
 	if SubSubOptionsWindow:
 		SubSubOptionsWindow.Unload ()
 		SubSubOptionsWindow = None
-	SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if SubOptionsWindow:
+		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def RestoreWinVisibility ():
