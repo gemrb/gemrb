@@ -107,6 +107,7 @@ def OpenOptionsWindow ():
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
 
 	if OldOptionsWindow == None:
+		# OptionsWindow is the leftmost menu bar window present in most of the games
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
 		if GUICommon.GameIsBG2():
@@ -647,12 +648,12 @@ def OpenMovieWindow ():
 ###################################################
 
 def CloseSubOptionsWindow ():
-	global SubOptionsWindow, OptionsWindow
+	global SubOptionsWindow, GameOptionsWindow
 
 	if SubOptionsWindow:
 		SubOptionsWindow.Unload ()
 		SubOptionsWindow = None
-	OptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+	GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CloseSubSubOptionsWindow ():
