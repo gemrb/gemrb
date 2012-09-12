@@ -393,31 +393,16 @@ def DisplayHelpSelectionSounds ():
 ###################################################
 
 def CloseGameplayOptionsWindow ():
-	if GUICommon.GameIsBG1():
-		global SubOptionsWindow
-
-		if SubOptionsWindow:
-			SubOptionsWindow.Unload()
-		SubOptionsWindow = None
-	else:
-		# no idea why this is here twice
-		OpenOptionsWindow ()
-		OpenOptionsWindow ()
+	# FIXME: don't need to do anything, since we save stuff immediately
+	# ergo canceling does not work
+	CloseSubOptionsWindow ()
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global HelpTextArea
-	Window = None
-	if GUICommon.GameIsBG1():
-		global SubOptionsWindow
-		Window = SubOptionsWindow
-	else:
-		global GameOptionsWindow
-		Window = GameOptionsWindow
+	global SubOptionsWindow, HelpTextArea
 
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
+	Window = SubOptionsWindow
+	CloseSubOptionsWindow ()
 
 	#gameplayoptions
 	Window = GemRB.LoadWindow (8)
@@ -446,11 +431,7 @@ def OpenGameplayOptionsWindow ():
 	if GUICommon.GameIsBG2():
 		GUIOPTControls.OptButton (OpenHotkeyOptionsWindow, Window, 51, 816)
 
-	if GUICommon.GameIsBG1():
-		SubOptionsWindow = Window
-	else:
-		GameOptionsWindow = Window
-
+	SubOptionsWindow = Window
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -465,35 +446,17 @@ def DisplayHelpMouseScrollingSpeed ():
 ###################################################
 
 def CloseFeedbackOptionsWindow ():
-	if GUICommon.GameIsBG1():
-		global SubSubOptionsWindow
-
-		if SubSubOptionsWindow:
-			SubSubOptionsWindow.Unload ()
-		SubSubOptionsWindow = None
-	else:
-		global GameOptionsWindow
-
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-			GameOptionsWindow = None
-		OpenGameplayOptionsWindow ()
-	return
+	# FIXME: don't need to do anything, since we save stuff immediately
+	# ergo canceling does not work
+	CloseSubSubOptionsWindow ()
 
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
 
-	global HelpTextArea2
-	Window = None
-	if GUICommon.GameIsBG1():
-		global SubSubOptionsWindow
-		Window = SubSubOptionsWindow
-	else:
-		global GameOptionsWindow
-		Window = GameOptionsWindow
+	global SubSubOptionsWindow, HelpTextArea2
 
-	if Window:
-		Window.Unload ()
+	Window = SubSubOptionsWindow
+	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (9)
 	# same as HelpTextArea if not BG1
@@ -516,10 +479,7 @@ def OpenFeedbackOptionsWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
-	if GUICommon.GameIsBG1():
-		SubSubOptionsWindow = Window
-	else:
-		GameOptionsWindow = Window
+	SubSubOptionsWindow = Window
 
 	return
 
@@ -531,36 +491,17 @@ def DisplayHelpMarkerFeedback ():
 ###################################################
 
 def CloseAutopauseOptionsWindow ():
-	if GUICommon.GameIsBG1():
-		global SubSubOptionsWindow
-
-		if SubSubOptionsWindow:
-			SubSubOptionsWindow.Unload ()
-		SubSubOptionsWindow = None
-	else:
-		global GameOptionsWindow
-
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-			GameOptionsWindow = None
-		OpenGameplayOptionsWindow ()
-
-	return
+	# FIXME: don't need to do anything, since we save stuff immediately
+	# ergo canceling does not work
+	CloseSubSubOptionsWindow ()
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
 
-	global HelpTextArea2
-	Window = None
-	if GUICommon.GameIsBG1():
-		global SubSubOptionsWindow
-		Window = SubSubOptionsWindow
-	else:
-		global GameOptionsWindow
-		Window = GameOptionsWindow
+	global SubSubOptionsWindow, HelpTextArea2
 
-	if Window:
-		Window.Unload ()
+	Window = SubSubOptionsWindow
+	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (10)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
@@ -588,10 +529,7 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 37, 36, 'Auto Pause Center', 1)
 		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
 
-	if GUICommon.GameIsBG1():
-		SubSubOptionsWindow = Window
-	else:
-		GameOptionsWindow = Window
+	SubSubOptionsWindow = Window
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
