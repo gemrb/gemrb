@@ -47,6 +47,14 @@ def OptSlider (action, window, slider_id, variable, value):
 	slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, action)
 	return slider
 
+def OptSliderNoCallback (strref, help_ta, window, slider_id, variable, value):
+	"""Standard slider for option windows, but without a custom callback"""
+	slider = window.GetControl (slider_id)
+	slider.SetVarAssoc (variable, value)
+	# create an anonymous callback, so we don't need to create a separate function for each string
+	slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, lambda s=strref, ta=help_ta: ta.SetText (s))
+	return slider
+
 def OptRadio (action, window, button_id, label_id, variable, value):
 	"""Standard radio button for option windows"""
 
@@ -67,13 +75,33 @@ def OptCheckbox (action, window, button_id, label_id, variable, value):
 	"""Standard checkbox for option windows"""
 
 	button = window.GetControl (button_id)
-	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	OptCheckboxCommon (window, button, label_id, variable, value)
+
 	if GUICommon.GameIsPST():
 		button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, action)
 	else:
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+
+	return button
+
+def OptCheckboxNoCallback (strref, help_ta, window, button_id, label_id, variable, value=1):
+	"""Standard checkbox for option windows, but without a custom callback"""
+
+	button = window.GetControl (button_id)
+	OptCheckboxCommon (window, button, label_id, variable, value)
+
+	# create an anonymous callback, so we don't need to create a separate function for each string
+	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda s=strref, ta=help_ta: ta.SetText (s))
+
+	return button
+
+def OptCheckboxCommon (window, button, label_id, variable, value=1):
+	"""Common checkbox routine calls"""
+
+	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	if variable:
 		button.SetVarAssoc (variable, value)
+
 	if GUICommon.GameIsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	elif GUICommon.GameIsIWD1():

@@ -223,10 +223,10 @@ def OpenVideoOptionsWindow ():
 
 	GUIOPTControls.OptCheckbox (DisplayHelpFullScreen, Window, 9, 38, 'Full Screen', 1)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpTransShadow, Window, 51, 50, 'Translucent Shadows', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpSoftMirrBlt, Window, 40, 44, 'SoftMirrorBlt' ,1)
-	GUIOPTControls.OptCheckbox (DisplayHelpSoftTransBlt, Window, 41, 46, 'SoftSrcKeyBlt' ,1)
-	GUIOPTControls.OptCheckbox (DisplayHelpSoftStandBlt, Window, 42, 48, 'SoftBltFast' ,1)
+	GUIOPTControls.OptCheckboxNoCallback (20620, HelpTextArea, Window, 51, 50, 'Translucent Shadows')
+	GUIOPTControls.OptCheckboxNoCallback (18004, HelpTextArea, Window, 40, 44, 'SoftMirrorBlt')
+	GUIOPTControls.OptCheckboxNoCallback (18006, HelpTextArea, Window, 41, 46, 'SoftSrcKeyBlt')
+	GUIOPTControls.OptCheckboxNoCallback (18007, HelpTextArea, Window, 42, 48, 'SoftBltFast')
 
 	if GUICommon.GameIsBG1():
 		SubOptionsWindow = Window
@@ -262,18 +262,6 @@ def SetGfxCorrection ():
 	# TODO: check if pst really has them quintupled
 
 	GemRB.SetGamma (Brightness, Gamma)
-
-def DisplayHelpSoftMirrBlt ():
-	HelpTextArea.SetText (18004)
-
-def DisplayHelpSoftTransBlt ():
-	HelpTextArea.SetText (18006)
-
-def DisplayHelpSoftStandBlt ():
-	HelpTextArea.SetText (18007)
-
-def DisplayHelpTransShadow ():
-	HelpTextArea.SetText (20620)
 
 ###################################################
 
@@ -315,12 +303,12 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptButton (OpenCharacterSoundsWindow, Window, 13, 17778)
 
 	GUIOPTControls.OptSlider (DisplayHelpAmbientVolume, Window, 1, 'Volume Ambients', 10)
-	GUIOPTControls.OptSlider (DisplayHelpSoundFXVolume, Window, 2, 'Volume SFX', 10)
-	GUIOPTControls.OptSlider (DisplayHelpVoiceVolume, Window, 3, 'Volume Voices', 10)
+	GUIOPTControls.OptSliderNoCallback (18009, HelpTextArea, Window, 2, 'Volume SFX', 10)
+	GUIOPTControls.OptSliderNoCallback (18010, HelpTextArea, Window, 3, 'Volume Voices', 10)
 	GUIOPTControls.OptSlider (DisplayHelpMusicVolume, Window, 4, 'Volume Music', 10)
-	GUIOPTControls.OptSlider (DisplayHelpMovieVolume, Window, 22, 'Volume Movie', 10)
+	GUIOPTControls.OptSliderNoCallback (18012, HelpTextArea, Window, 22, 'Volume Movie', 10)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpCreativeEAX, Window, 26, 28, 'Environmental Audio', 1)
+	GUIOPTControls.OptCheckboxNoCallback (18022, HelpTextArea, Window, 26, 28, 'Environmental Audio')
 
 	if GUICommon.GameIsBG1():
 		SubOptionsWindow = Window
@@ -334,21 +322,9 @@ def DisplayHelpAmbientVolume ():
 	HelpTextArea.SetText (18008)
 	GemRB.UpdateAmbientsVolume ()
 
-def DisplayHelpSoundFXVolume ():
-	HelpTextArea.SetText (18009)
-
-def DisplayHelpVoiceVolume ():
-	HelpTextArea.SetText (18010)
-
 def DisplayHelpMusicVolume ():
 	HelpTextArea.SetText (18011)
 	GemRB.UpdateMusicVolume ()
-
-def DisplayHelpMovieVolume ():
-	HelpTextArea.SetText (18012)
-
-def DisplayHelpCreativeEAX ():
-	HelpTextArea.SetText (18022)
 
 ###################################################
 
@@ -389,9 +365,9 @@ def OpenCharacterSoundsWindow ():
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
 	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpSubtitles, Window, 5, 20, 'Subtitles', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpAttackSounds, Window, 6, 18, 'Attack Sounds', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpFootsteps, Window, 7, 19, 'Footsteps', 1)
+	GUIOPTControls.OptCheckboxNoCallback (18015, HelpTextArea2, Window, 5, 20, 'Subtitles')
+	GUIOPTControls.OptCheckboxNoCallback (18013, HelpTextArea2, Window, 6, 18, 'Attack Sound')
+	GUIOPTControls.OptCheckboxNoCallback (18014, HelpTextArea2, Window, 7, 19, 'Footsteps')
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 2)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 1)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 10, 21, 'Command Sounds Frequency', 0)
@@ -405,18 +381,6 @@ def OpenCharacterSoundsWindow ():
 		SubSubOptionsWindow = Window
 	else:
 		GameOptionsWindow = Window
-
-def DisplayHelpSubtitles ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18015)
-
-def DisplayHelpAttackSounds ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18013)
-
-def DisplayHelpFootsteps ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18014)
 
 def DisplayHelpCommandSounds ():
 	# same as HelpTextArea if not BG1
@@ -465,17 +429,17 @@ def OpenGameplayOptionsWindow ():
 
 	GUIOPTControls.OptSlider (DisplayHelpTooltipDelay, Window, 1, 'Tooltips', TOOLTIP_DELAY_FACTOR)
 	GUIOPTControls.OptSlider (DisplayHelpMouseScrollingSpeed, Window, 2, 'Mouse Scroll Speed', 5)
-	GUIOPTControls.OptSlider (DisplayHelpKeyboardScrollingSpeed, Window, 3, 'Keyboard Scroll Speed', 5)
-	GUIOPTControls.OptSlider (DisplayHelpDifficulty, Window, 12, 'Difficulty Level', 0)
+	GUIOPTControls.OptSliderNoCallback (18019, HelpTextArea, Window, 3, 'Keyboard Scroll Speed', 5)
+	GUIOPTControls.OptSliderNoCallback (18020, HelpTextArea, Window, 12, 'Difficulty Level', 0)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpDitherAlways, Window, 14, 25, 'Always Dither', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpGore, Window, 19, 27, 'Gore', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpInfravision, Window, 42, 44, 'Infravision', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpWeather, Window, 47, 46, 'Weather', 1)
+	GUIOPTControls.OptCheckboxNoCallback (18021, HelpTextArea, Window, 14, 25, 'Always Dither')
+	GUIOPTControls.OptCheckboxNoCallback (18023, HelpTextArea, Window, 19, 27, 'Gore')
+	GUIOPTControls.OptCheckboxNoCallback (11797, HelpTextArea, Window, 42, 44, 'Infravision')
+	GUIOPTControls.OptCheckboxNoCallback (20619, HelpTextArea, Window, 47, 46, 'Weather')
 	if GUICommon.GameIsBG2():
-		GUIOPTControls.OptCheckbox (DisplayHelpRestUntilHealed, Window, 50, 48, 'Heal Party on Rest', 1)
+		GUIOPTControls.OptCheckboxNoCallback (2242, HelpTextArea, Window, 50, 48, 'Heal Party on Rest')
 	elif GUICommon.GameIsIWD2():
-		GUIOPTControls.OptCheckbox (DisplayHelpMaxHitpoints, Window, 50, 49, 'Maximum HP', 1)
+		GUIOPTControls.OptCheckboxNoCallback (15136, HelpTextArea, Window, 50, 49, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, Window, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, Window, 6, 17166)
@@ -497,30 +461,6 @@ def DisplayHelpTooltipDelay ():
 def DisplayHelpMouseScrollingSpeed ():
 	HelpTextArea.SetText (18018)
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
-
-def DisplayHelpKeyboardScrollingSpeed ():
-	HelpTextArea.SetText (18019)
-
-def DisplayHelpDifficulty ():
-	HelpTextArea.SetText (18020)
-
-def DisplayHelpDitherAlways ():
-	HelpTextArea.SetText (18021)
-
-def DisplayHelpGore ():
-	HelpTextArea.SetText (18023)
-
-def DisplayHelpInfravision ():
-	HelpTextArea.SetText (11797)
-
-def DisplayHelpWeather ():
-	HelpTextArea.SetText (20619)
-
-def DisplayHelpRestUntilHealed ():
-	HelpTextArea.SetText (2242)
-
-def DisplayHelpMaxHitpoints ():
-	HelpTextArea.SetText (15136)
 
 ###################################################
 
@@ -565,14 +505,14 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptCancel (CloseFeedbackOptionsWindow, Window, 27)
 
 	GUIOPTControls.OptSlider (DisplayHelpMarkerFeedback, Window, 8, 'Circle Feedback', 1)
-	GUIOPTControls.OptSlider (DisplayHelpLocatorFeedback, Window, 9, 'Locator Feedback Level', 1)
+	GUIOPTControls.OptSliderNoCallback (18025, HelpTextArea2, Window, 9, 'Locator Feedback Level', 1)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpToHitRolls, Window, 10, 32, 'Rolls', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpCombatInfo, Window, 11, 33, 'Combat Info', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpActions, Window, 12, 34, 'Actions', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpStates, Window, 13, 35, 'State Changes', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpSelection, Window, 14, 36, 'Selection Text', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpMiscellaneous, Window, 15, 37, 'Miscellaneous Text', 1)
+	GUIOPTControls.OptCheckboxNoCallback (18026, HelpTextArea2, Window, 10, 32, 'Rolls')
+	GUIOPTControls.OptCheckboxNoCallback (18027, HelpTextArea2, Window, 11, 33, 'Combat Info')
+	GUIOPTControls.OptCheckboxNoCallback (18028, HelpTextArea2, Window, 12, 34, 'Actions')
+	GUIOPTControls.OptCheckboxNoCallback (18029, HelpTextArea2, Window, 13, 35, 'State Changes')
+	GUIOPTControls.OptCheckboxNoCallback (18030, HelpTextArea2, Window, 14, 36, 'Selection Text')
+	GUIOPTControls.OptCheckboxNoCallback (18031, HelpTextArea2, Window, 15, 37, 'Miscellaneous Text')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
@@ -587,34 +527,6 @@ def DisplayHelpMarkerFeedback ():
 	# same as HelpTextArea if not BG1
 	HelpTextArea2.SetText (18024)
 	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
-
-def DisplayHelpLocatorFeedback ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18025)
-
-def DisplayHelpToHitRolls ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18026)
-
-def DisplayHelpCombatInfo ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18027)
-
-def DisplayHelpActions ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18028)
-
-def DisplayHelpStates ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18029)
-
-def DisplayHelpSelection ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18030)
-
-def DisplayHelpMiscellaneous ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18031)
 
 ###################################################
 
@@ -656,25 +568,25 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
 	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpCharacterHit, Window, 1, 17, 'Auto Pause State', 1)
-	GUIOPTControls.OptCheckbox (DisplayHelpCharacterInjured, Window, 2, 18, 'Auto Pause State', 2)
-	GUIOPTControls.OptCheckbox (DisplayHelpCharacterDead, Window, 3, 19, 'Auto Pause State', 4)
-	GUIOPTControls.OptCheckbox (DisplayHelpCharacterAttacked, Window, 4, 20, 'Auto Pause State', 8)
-	GUIOPTControls.OptCheckbox (DisplayHelpWeaponUnusable, Window, 5, 21, 'Auto Pause State', 16)
-	GUIOPTControls.OptCheckbox (DisplayHelpTargetGone, Window, 13, 22, 'Auto Pause State', 32)
-	GUIOPTControls.OptCheckbox (DisplayHelpEndOfRound, Window, 25, 24, 'Auto Pause State', 64)
+	GUIOPTControls.OptCheckboxNoCallback (18032, HelpTextArea2, Window, 1, 17, 'Auto Pause State', 1)
+	GUIOPTControls.OptCheckboxNoCallback (18033, HelpTextArea2, Window, 2, 18, 'Auto Pause State', 2)
+	GUIOPTControls.OptCheckboxNoCallback (18034, HelpTextArea2, Window, 3, 19, 'Auto Pause State', 4)
+	GUIOPTControls.OptCheckboxNoCallback (18035, HelpTextArea2, Window, 4, 20, 'Auto Pause State', 8)
+	GUIOPTControls.OptCheckboxNoCallback (18036, HelpTextArea2, Window, 5, 21, 'Auto Pause State', 16)
+	GUIOPTControls.OptCheckboxNoCallback (18037, HelpTextArea2, Window, 13, 22, 'Auto Pause State', 32)
+	GUIOPTControls.OptCheckboxNoCallback (10640, HelpTextArea2, Window, 25, 24, 'Auto Pause State', 64)
 	if GUICommon.GameIsIWD2():
-		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 30, 31, 'Auto Pause State', 128)
-		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 34, 30, 'Auto Pause State', 256)
-		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 33, 34, 'Auto Pause Center', 1)
-		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 26, 28, 'Auto Pause State', 512)
+		GUIOPTControls.OptCheckboxNoCallback (23514, HelpTextArea2, Window, 30, 31, 'Auto Pause State', 128)
+		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 256)
+		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 33, 34, 'Auto Pause Center', 1)
+		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 26, 28, 'Auto Pause State', 512)
 	elif not GUICommon.GameIsIWD1():
-		GUIOPTControls.OptCheckbox (DisplayHelpEnemySighted, Window, 26, 27, 'Auto Pause State', 128)
+		GUIOPTControls.OptCheckboxNoCallback (23514, HelpTextArea2, Window, 26, 27, 'Auto Pause State', 128)
 	if GUICommon.GameIsBG2():
 		# TODO: recheck if the first and third are correctly mapped
-		GUIOPTControls.OptCheckbox (DisplayHelpSpellCast, Window, 31, 33, 'Auto Pause State', 256)
-		GUIOPTControls.OptCheckbox (DisplayHelpCenterOnActor, Window, 37, 36, 'Auto Pause Center', 1)
-		GUIOPTControls.OptCheckbox (DisplayHelpTrapFound, Window, 34, 30, 'Auto Pause State', 512)
+		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 31, 33, 'Auto Pause State', 256)
+		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 37, 36, 'Auto Pause Center', 1)
+		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
 
 	if GUICommon.GameIsBG1():
 		SubSubOptionsWindow = Window
@@ -683,40 +595,6 @@ def OpenAutopauseOptionsWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
-
-# same as HelpTextArea if not BG1 in all the following functions
-def DisplayHelpCharacterHit ():
-	HelpTextArea2.SetText (18032)
-
-def DisplayHelpCharacterInjured ():
-	HelpTextArea2.SetText (18033)
-
-def DisplayHelpCharacterDead ():
-	HelpTextArea2.SetText (18034)
-
-def DisplayHelpCharacterAttacked ():
-	HelpTextArea2.SetText (18035)
-
-def DisplayHelpWeaponUnusable ():
-	HelpTextArea2.SetText (18036)
-
-def DisplayHelpTargetGone ():
-	HelpTextArea2.SetText (18037)
-
-def DisplayHelpEndOfRound ():
-	HelpTextArea2.SetText (10640)
-
-def DisplayHelpEnemySighted ():
-	HelpTextArea2.SetText (23514)
-
-def DisplayHelpSpellCast ():
-	HelpTextArea2.SetText (58171)
-
-def DisplayHelpTrapFound ():
-	HelpTextArea2.SetText (31872)
-
-def DisplayHelpCenterOnActor ():
-	HelpTextArea2.SetText (10571)
 
 ###################################################
 
