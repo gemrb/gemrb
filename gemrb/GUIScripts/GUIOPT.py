@@ -180,32 +180,14 @@ def OpenOptionsWindow ():
 ###################################################
 
 def CloseVideoOptionsWindow ():
-	if GUICommon.GameIsBG1():
-		global SubOptionsWindow
-		if SubOptionsWindow:
-			SubOptionsWindow.Unload()
-		SubOptionsWindow = None
-	else:
-		# no idea why this is here twice
-		OpenOptionsWindow ()
-		OpenOptionsWindow ()
-
-	return
+	CloseSubOptionsWindow ()
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global HelpTextArea
-	Window = None
+	global SubOptionsWindow, HelpTextArea
 
-	if GUICommon.GameIsBG1():
-		global SubOptionsWindow
-		Window = SubOptionsWindow
-	else:
-		global GameOptionsWindow
-		Window = GameOptionsWindow
-
-	if Window:
-		Window.Unload ()
+	Window = SubOptionsWindow
+	CloseSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (6)
 
@@ -228,10 +210,7 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptCheckboxNoCallback (18006, HelpTextArea, Window, 41, 46, 'SoftSrcKeyBlt')
 	GUIOPTControls.OptCheckboxNoCallback (18007, HelpTextArea, Window, 42, 48, 'SoftBltFast')
 
-	if GUICommon.GameIsBG1():
-		SubOptionsWindow = Window
-	else:
-		GameOptionsWindow = Window
+	SubOptionsWindow = Window
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -266,34 +245,14 @@ def SetGfxCorrection ():
 ###################################################
 
 def CloseAudioOptionsWindow ():
-	if GUICommon.GameIsBG1():
-		global SubOptionsWindow
-
-		if SubOptionsWindow:
-			SubOptionsWindow.Unload()
-		SubOptionsWindow = None
-	else:
-		# no idea why this is here twice
-		OpenOptionsWindow ()
-		OpenOptionsWindow ()
-	return
-
-###################################################
+	CloseSubOptionsWindow ()
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global HelpTextArea
+	global SubOptionsWindow, HelpTextArea
 
-	Window = None
-	if GUICommon.GameIsBG1():
-		global SubOptionsWindow
-		Window = SubOptionsWindow
-	else:
-		global GameOptionsWindow
-		Window = GameOptionsWindow
-
-	if Window:
-		Window.Unload ()
+	Window = SubOptionsWindow
+	CloseSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (7)
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
@@ -310,10 +269,7 @@ def OpenAudioOptionsWindow ():
 
 	GUIOPTControls.OptCheckboxNoCallback (18022, HelpTextArea, Window, 26, 28, 'Environmental Audio')
 
-	if GUICommon.GameIsBG1():
-		SubOptionsWindow = Window
-	else:
-		GameOptionsWindow = Window
+	SubOptionsWindow = Window
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -329,35 +285,15 @@ def DisplayHelpMusicVolume ():
 ###################################################
 
 def CloseCharacterSoundsWindow ():
-	if GUICommon.GameIsBG1():
-		global SubSubOptionsWindow
-		if SubSubOptionsWindow:
-			SubSubOptionsWindow.Unload()
-		SubSubOptionsWindow = None
-	else:
-		global GameOptionsWindow
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload()
-			GameOptionsWindow = None
-		OpenAudioOptionsWindow ()
-
-	return
+	CloseSubSubOptionsWindow ()
 
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
 
-	global HelpTextArea2 # same as HelpTextArea if not BG1
-	Window = None
+	global SubSubOptionsWindow, HelpTextArea2
 
-	if GUICommon.GameIsBG1():
-		global SubSubOptionsWindow
-		Window = SubSubOptionsWindow
-	else:
-		global GameOptionsWindow
-		Window = GameOptionsWindow
-
-	if Window:
-		Window.Unload ()
+	Window = SubSubOptionsWindow
+	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (12)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
@@ -377,10 +313,7 @@ def OpenCharacterSoundsWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
-	if GUICommon.GameIsBG1():
-		SubSubOptionsWindow = Window
-	else:
-		GameOptionsWindow = Window
+	SubSubOptionsWindow = Window
 
 def DisplayHelpCommandSounds ():
 	# same as HelpTextArea if not BG1
