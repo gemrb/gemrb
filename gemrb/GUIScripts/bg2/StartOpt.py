@@ -17,6 +17,7 @@
 #
 #
 import GemRB
+import GUIOPT
 
 OptionsWindow = 0
 
@@ -37,30 +38,12 @@ def OnLoad():
 	GameButton.SetText(17165)
 	GraphicButton.SetText(17162)
 	BackButton.SetText(10308)
-	SoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoundPress)
-	GameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GamePress)
-	GraphicButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GraphicPress)
+	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenAudioOptionsWindow )
+	GameButton.SetEvent( IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenGameplayOptionsWindow)
+	GraphicButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenVideoOptionsWindow)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	OptionsWindow.SetVisible(WINDOW_VISIBLE)
-	return
-	
-def SoundPress():
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("GUIOPT7")
-	return
-	
-def GamePress():
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("GUIOPT8")
-	return
-	
-def GraphicPress():
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("GUIOPT6")
 	return
 	
 def BackPress():
