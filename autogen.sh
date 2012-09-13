@@ -19,7 +19,7 @@ future versions! Please switch to using cmake instead.
 if [ "$1" = "" ]; then
   dest=$HOME/GemRB
 else
-  if [ "${1:0:1}" == "/" ]; then
+  if [ "${1:0:1}" = "/" ]; then
     dest=$1
   else
     dest=$PWD/$1
