@@ -330,22 +330,22 @@ MACRO(ADD_GEMRB_PLUGIN plugin_name)
 		endif (APPLE)
 	endif (${ARGV1} STREQUAL "COCOA")
 
-        if (STATIC_LINK)
-                ADD_LIBRARY(${plugin_name} STATIC ${PLUGIN_BUILD_FILES})
-                set(plugins "${plugins};${plugin_name}" PARENT_SCOPE)
-        else (STATIC_LINK)
-                ADD_LIBRARY(${plugin_name} MODULE ${PLUGIN_BUILD_FILES})
-                if (NOT UNSAFE_PLUGIN)
-                        TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core ${CMAKE_THREAD_LIBS_INIT})
-                endif (NOT UNSAFE_PLUGIN)
-				if (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
-					TARGET_LINK_LIBRARIES(${plugin_name} -shared-libgcc)
-				endif (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
-                INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
-        endif (STATIC_LINK)
-        SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
-                INSTALL_RPATH ${LIB_DIR}
-                LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/plugins)
+	if (STATIC_LINK)
+		ADD_LIBRARY(${plugin_name} STATIC ${PLUGIN_BUILD_FILES})
+		set(plugins "${plugins};${plugin_name}" PARENT_SCOPE)
+	else (STATIC_LINK)
+		ADD_LIBRARY(${plugin_name} MODULE ${PLUGIN_BUILD_FILES})
+		if (NOT UNSAFE_PLUGIN)
+			TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core ${CMAKE_THREAD_LIBS_INIT})
+		endif (NOT UNSAFE_PLUGIN)
+		if (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+			TARGET_LINK_LIBRARIES(${plugin_name} -shared-libgcc)
+		endif (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+		INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
+	endif (STATIC_LINK)
+	SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
+		INSTALL_RPATH ${LIB_DIR}
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/plugins)
 ENDMACRO(ADD_GEMRB_PLUGIN)
 
 #gemrb overrides macro
