@@ -6284,13 +6284,9 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
-/* we don't allow holes anymore
-		if (!vvc)
-			continue;
-*/
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither(), GetOrientation());
+		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither(), GetOrientation(), BBox.h);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);

@@ -632,7 +632,7 @@ retry:
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation)
+bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation, int height)
 {
 	if (FaceTarget) {
 		SetOrientation(orientation);
@@ -640,7 +640,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 
 	// not sure
 	if (twin) {
-		twin->Draw(screen, Pos, p_tint, area, dither, -1);
+		twin->Draw(screen, Pos, p_tint, area, dither, -1, height);
 	}
 
 	Video *video = core->GetVideoDriver();
@@ -688,6 +688,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 
 	int cx = Pos.x + XPos;
 	int cy = Pos.y - ZPos + YPos;
+  if (SequenceFlags&IE_VVC_HEIGHT) cy-=height;
 
 	if( SequenceFlags&IE_VVC_NOCOVER) {
 		if (cover) SetSpriteCover(NULL);
