@@ -1299,9 +1299,9 @@ void Projectile::SpawnFragment(Point &dest)
 {
 	Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 	if (pro) {
-		if (Extension->AFlags&PAF_SECONDARY) {
-				pro->SetEffectsCopy(effects);
-		}
+//		if (Extension->AFlags&PAF_SECONDARY) {
+//				pro->SetEffectsCopy(effects);
+//		}
 		pro->SetCaster(Caster, Level);
 		if (pro->ExtFlags&PEF_RANDOM) {
 			dest.x+=core->Roll(1,Extension->TileX, -Extension->TileX/2);
@@ -1380,7 +1380,8 @@ void Projectile::DrawExplosion(const Region &screen)
 	//warning: this projectile doesn't inherit any effects, so its payload function
 	//won't be doing anything (any effect of PAF_SECONDARY?)
 
-	if (Extension->FragProjIdx) {
+  //remove PAF_SECONDARY if it is buggy, but that will break the 'HOLD' projectile
+	if ((Extension->AFlags&PAF_SECONDARY) && Extension->FragProjIdx) {
 		if (apflags&APF_TILED) {
 			int i,j;
 			int radius = Extension->ExplosionRadius;
