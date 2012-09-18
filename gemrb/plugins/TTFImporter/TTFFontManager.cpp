@@ -330,9 +330,8 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		// TODO: do an underline if requested
 
 		glyphs[ch - FirstChar] = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, 8, pixels, pal->col, true, 0);
-		// FIXME: figure out why this 10 is required and find how to dynamically determine
-		// presumably this value should change with font size.
-		glyphs[ch - FirstChar]->YPos = 10 - yoffset;
+		// for some reason BAM fonts are all based of a YPos of 13
+		glyphs[ch - FirstChar]->YPos = 13 - yoffset;
 	}
 	Font* font = new Font(glyphs, FirstChar, LastChar, pal);
 	font->ptSize = ptSize;

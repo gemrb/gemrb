@@ -90,6 +90,7 @@ Font* BAMFontManager::GetFont(ieWord FirstChar,
 			}
 		} else {
 			glyphs[i - glyphIndexOffset] = af->GetFrameWithoutCycle(i);
+			glyphs[i - glyphIndexOffset]->YPos = 13 - glyphs[i - glyphIndexOffset]->Height;
 		}
 	}
 
