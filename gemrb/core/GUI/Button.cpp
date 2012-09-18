@@ -103,7 +103,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 			Unpressed = img;
 			break;
 
-		case IE_GUI_BUTTON_SECOND:
+		case IE_GUI_BUTTON_FAKEPRESSED:
 		case IE_GUI_BUTTON_PRESSED:
 			core->GetVideoDriver()->FreeSprite( Pressed );
 			Pressed = img;
@@ -115,7 +115,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 			break;
 
 		case IE_GUI_BUTTON_DISABLED:
-		case IE_GUI_BUTTON_THIRD:
+		case IE_GUI_BUTTON_FAKEDISABLED:
 			core->GetVideoDriver()->FreeSprite( Disabled );
 			Disabled = img;
 			break;
@@ -180,7 +180,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 				Image = Unpressed;
 				break;
 
-			case IE_GUI_BUTTON_SECOND:
+			case IE_GUI_BUTTON_FAKEPRESSED:
 			case IE_GUI_BUTTON_PRESSED:
 				Image = Pressed;
 				if (! Image)
@@ -194,7 +194,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 				break;
 
 			case IE_GUI_BUTTON_DISABLED:
-			case IE_GUI_BUTTON_THIRD:
+			case IE_GUI_BUTTON_FAKEDISABLED:
 				Image = Disabled;
 				if (! Image)
 					Image = Unpressed;

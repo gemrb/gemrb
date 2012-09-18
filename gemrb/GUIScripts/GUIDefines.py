@@ -112,9 +112,9 @@ IE_GUI_BUTTON_DISABLED   = 0x00000003
 # Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
 IE_GUI_BUTTON_LOCKED   = 0x00000004
 # Draws DISABLED bitmap, but it isn't disabled
-IE_GUI_BUTTON_THIRD    = 0x00000005
+IE_GUI_BUTTON_FAKEDISABLED    = 0x00000005
 # Draws PRESSED bitmap, but it isn't shifted
-IE_GUI_BUTTON_SECOND   = 0x00000006
+IE_GUI_BUTTON_FAKEPRESSED   = 0x00000006
 
 #edit field states
 IE_GUI_EDIT_NUMBER    =  0x030000001

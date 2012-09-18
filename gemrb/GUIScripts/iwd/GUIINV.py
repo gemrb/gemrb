@@ -274,7 +274,7 @@ def RefreshInventoryWindow ():
 	for i in range (5):
 		Button = Window.GetControl (i+68)
 		if GemRB.IsDraggingItem ()==1:
-			Button.SetState (IE_GUI_BUTTON_SECOND)
+			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)

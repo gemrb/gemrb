@@ -225,7 +225,7 @@ def RefreshInventoryWindow ():
 	for i in range (10):
 		Button = Window.GetControl (i+47)
 		if GemRB.IsDraggingItem ():
-			Button.SetState (IE_GUI_BUTTON_SECOND)
+			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)
@@ -349,10 +349,10 @@ def UpdateSlot (pc, i):
 		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
-			Button.SetState (IE_GUI_BUTTON_SECOND)
+			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 
 		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
-			Button.SetState (IE_GUI_BUTTON_THIRD)
+			Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 	return
 
 def DefaultWeapon ():
