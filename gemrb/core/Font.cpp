@@ -35,8 +35,6 @@
 
 namespace GemRB {
 
-#define PARAGRAPH_START_X 5;
-
 #define SET_BLIT_PALETTE( palette )\
 if (palette) ((Palette*)palette)->IncRef();\
 if (blitPalette) blitPalette->Release();\
@@ -187,7 +185,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		}
 	}
 
-	unsigned int psx = PARAGRAPH_START_X;
+	unsigned int psx = IE_FONT_PADDING;
 	Palette *pal = hicolor;
 	if (!pal) {
 		pal = palette;
@@ -217,7 +215,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
 		x = ( rgn.w - w) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
-		x = ( rgn.w - w );
+		x = ( rgn.w - w ) - IE_FONT_PADDING;
 	}
 	if (Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
@@ -228,15 +226,15 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		h = h * ystep;
 		y += ( rgn.h - h ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_BOTTOM) {
-		int h = 1;
+		int h = 0;
 		for (size_t i = 0; i <= len; i++) {
 			if (( tmp[i] == 0 ) || ( tmp[i] == '\n' ))
 				h++;
 		}
 		h = h * ystep;
-		y += ( rgn.h - h );
+		y += ( rgn.h - h ) - IE_FONT_PADDING;
 	} else if (Alignment & IE_FONT_ALIGN_TOP) {
-		y += 5;
+		y += IE_FONT_PADDING;
 	}
 
 	Video* video = core->GetVideoDriver();
@@ -284,7 +282,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				continue;
 			}
 			if (stricmp( "/p", tag ) == 0) {
-				psx = PARAGRAPH_START_X;
+				psx = IE_FONT_PADDING;
 			}
 			continue;
 		}
@@ -372,7 +370,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 {
 	int capital = (initials) ? 1 : 0;
 
-	unsigned int psx = PARAGRAPH_START_X;
+	unsigned int psx = IE_FONT_PADDING;
 	Palette* pal = hicolor;
 	if (!pal) {
 		pal = palette;
@@ -414,7 +412,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		x = ( rgn.w - w ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 		int w = CalcStringWidth( tmp, NoColor );
-		x = ( rgn.w - w );
+		x = ( rgn.w - w ) - IE_FONT_PADDING;
 	}
 
 	if (Alignment & IE_FONT_ALIGN_MIDDLE) {
@@ -426,15 +424,15 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		h = h * ystep;
 		y += ( rgn.h - h ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_BOTTOM) {
-		int h = 1;
+		int h = 0;
 		for (size_t i = 0; i <= len; i++) {
 			if (tmp[i] == 0)
 				h++;
 		}
 		h = h * ystep;
-		y += ( rgn.h - h );
+		y += ( rgn.h - h ) - IE_FONT_PADDING;
 	} else if (Alignment & IE_FONT_ALIGN_TOP) {
-		y += 5;
+		y += IE_FONT_PADDING;
 	}
 
 	unsigned char currChar = '\0';
@@ -476,7 +474,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 				continue;
 			}
 			if (stricmp( "/p", tag ) == 0) {
-				psx = PARAGRAPH_START_X;
+				psx = IE_FONT_PADDING;
 				continue;
 			}
 			continue;
@@ -539,7 +537,7 @@ int Font::CalcStringWidth(const char* string, bool NoColor) const
 void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *initials, bool enablecap) const
 {
 	size_t len = strlen( string );
-	unsigned int psx = PARAGRAPH_START_X;
+	unsigned int psx = IE_FONT_PADDING;
 	int lastpos = 0;
 	unsigned int x = psx, wx = 0;
 	bool endword = false;
@@ -603,7 +601,7 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 				continue;
 			}
 			if (stricmp( "/p", tag ) == 0) {
-				psx = PARAGRAPH_START_X;
+				psx = IE_FONT_PADDING;
 				continue;
 			}
 			continue;
