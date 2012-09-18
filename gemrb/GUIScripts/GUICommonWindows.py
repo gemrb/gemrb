@@ -1176,17 +1176,6 @@ def UpdatePortraitWindow ():
 		Button.SetPicture (pic, "NOPORTSM")
 		ratio_str, color = GUICommon.SetupDamageInfo (portid+1, Button, Window)
 
-		#add effects on the portrait
-		effects = GemRB.GetPlayerStates (portid+1)
-
-		states = ""
-		for col in range(len(effects)):
-			states = effects[col:col+1] + states
-			if col % 3 == 2: states = "\n" + states
-		for x in range(3 - (len(effects)/3)):
-			states = "\n" + states
-		states = "\n" + states
-
 		# character - 1 == bam cycle
 		# blank space
 		if GUICommon.GameIsBG2():
@@ -1216,6 +1205,23 @@ def UpdatePortraitWindow ():
 			HPLabel = Window.GetControl (100+portid)
 			HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
 			HPLabel.SetTextColor (*color)
+
+		#add effects on the portrait
+		effects = GemRB.GetPlayerStates (portid+1)
+
+		numCols = 4 if GUICommon.GameIsIWD2() else 3
+		numEffects = len(effects)
+
+		states = ""
+		# calculate the partial row
+		idx = numEffects % numCols
+		states = effects[0:idx] + "\n"
+
+		for x in range(idx, numEffects): # now do any rows that are full
+			states = states + effects[x]
+			if (x - idx) % numCols == numCols - 1:
+				states = states + "\n"
+
 		if flag <> blank:
 			FlagLabel = Window.GetControl(200 + portid)
 			FlagLabel.SetText(flag)
