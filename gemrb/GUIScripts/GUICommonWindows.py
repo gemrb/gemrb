@@ -1110,6 +1110,13 @@ def OpenPortraitWindow (needcontrols=0):
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
 
+		# label for status flags (dialog, store, level up)
+		if GUICommon.GameIsIWD1():
+			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP)
+		else:
+			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP)
+
+		Label = Window.GetControl(200 + i)
 		if GUICommon.GameIsIWD1():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
@@ -1206,14 +1213,14 @@ def UpdatePortraitWindow ():
 				flag = chr(talk)
 
 		if LUCommon.CanLevelUp (portid+1):
-			states = flag+blank+chr(255) + states
-		else:
-			if GUICommon.GameIsIWD1():
-				HPLabel = Window.GetControl (100+portid)
-				HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
-				HPLabel.SetTextColor (*color)
-			else:
-				states = flag+blank+blank + states
+			flag = flag + blank + chr(255)
+		elif GUICommon.GameIsIWD1():
+			HPLabel = Window.GetControl (100+portid)
+			HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
+			HPLabel.SetTextColor (*color)
+		if flag <> blank:
+			FlagLabel = Window.GetControl(200 + portid)
+			FlagLabel.SetText(flag)
 		Button.SetText(states)
 	return
 
