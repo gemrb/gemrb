@@ -1164,14 +1164,12 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		portraitFlags = IE_GUI_BUTTON_PICTURE| IE_GUI_BUTTON_HORIZONTAL| \
-			IE_GUI_BUTTON_ALIGN_LEFT| IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE
+		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | \
+						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		if GUICommon.GameIsIWD2():
-			portraitFlags |= IE_GUI_BUTTON_ALIGN_BOTTOM
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
-		else:
-			portraitFlags |= IE_GUI_BUTTON_ALIGN_TOP
+
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
