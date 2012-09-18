@@ -216,13 +216,14 @@ void Button::Draw(unsigned short x, unsigned short y)
 	}
 
 	// Button picture
+	int picXPos, picYPos;
 	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
-		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
+		picXPos = ( Width / 2 ) - ( Picture->Width / 2 ) + x + XPos;
+		picYPos = ( Height / 2 ) - ( Picture->Height / 2 ) + y + YPos;
 		if (Flags & IE_GUI_BUTTON_HORIZONTAL) {
-			xOffs += x + XPos + Picture->XPos;
-			yOffs += y + YPos + Picture->YPos;
+			picXPos += Picture->XPos;
+			picYPos += Picture->YPos;
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
 			int overlayHeight = Picture->Height * (1.0 - Clipping);
@@ -232,21 +233,21 @@ void Button::Draw(unsigned short x, unsigned short y)
 				overlayHeight = Picture->Height;
 			int buttonHeight = Picture->Height - overlayHeight;
 
-			Region rb = Region(xOffs, yOffs, Picture->Width, buttonHeight);
-			Region ro = Region(xOffs, yOffs + buttonHeight, Picture->Width, overlayHeight);
+			Region rb = Region(picXPos, picYPos, Picture->Width, buttonHeight);
+			Region ro = Region(picXPos, picYPos + buttonHeight, Picture->Width, overlayHeight);
 
-			video->BlitSprite( Picture, xOffs, yOffs, true, &rb );
+			video->BlitSprite( Picture, picXPos, picYPos, true, &rb );
 
 			// TODO: Add an option to add BLIT_GREY to the flags
-			video->BlitGameSprite( Picture, xOffs, yOffs, BLIT_TINTED, SourceRGB, 0, 0, &ro, true);
+			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, 0, &ro, true);
 
 			// do NOT uncomment this, you can't change Changed or invalidate things from
 			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
 			//CloseUpColor();
 		}
 		else {
-			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
-			video->BlitSprite( Picture, x + XPos + xOffs + Picture->XPos, y + YPos + yOffs + Picture->YPos, true, &r );
+			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
+			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, true, &r );
 		}
 	}
 
