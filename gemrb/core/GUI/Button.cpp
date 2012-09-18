@@ -315,9 +315,18 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if (! (Flags & IE_GUI_BUTTON_MULTILINE)) {
 			align |= IE_FONT_SINGLE_LINE;
 		}
-		font->Print( Region( x + XPos, y + YPos, Width - 2, Height - 2),
-			( unsigned char * ) Text, ppoi,
-			(ieByte) align, true );
+
+		Region r;
+		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+			// constrain the label (status icons) to the picture bounds
+			// we are subtracting IE_FONT_PADDING because Font indents 5px, but we dont want that here
+			r = Region(picXPos - IE_FONT_PADDING, picYPos + IE_FONT_PADDING,
+					   Picture->Width + IE_FONT_PADDING, Picture->Height);
+		} else {
+			r = Region( x + XPos, y + YPos, Width - 2, Height - 2);
+		}
+
+		font->Print( r, ( unsigned char * ) Text, ppoi, (ieByte) align, true );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
