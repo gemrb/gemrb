@@ -49,8 +49,8 @@ class Palette;
 // Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
 #define IE_GUI_BUTTON_LOCKED    4
 // Draws the disabled bitmap, but otherwise works like unpressed
-#define IE_GUI_BUTTON_THIRD     5
-#define IE_GUI_BUTTON_SECOND    6
+#define IE_GUI_BUTTON_FAKEDISABLED     5
+#define IE_GUI_BUTTON_FAKEPRESSED    6
 #define IE_GUI_BUTTON_LOCKED_PRESSED    7  //all the same as LOCKED
 
 #define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)

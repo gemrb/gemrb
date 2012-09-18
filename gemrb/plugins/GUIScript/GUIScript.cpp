@@ -8764,7 +8764,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 						if (gc->GetTargetMode() == TARGET_MODE_ATTACK) {
 							state = IE_GUI_BUTTON_SELECTED;
 						} else {
-							state = IE_GUI_BUTTON_THIRD;
+							state = IE_GUI_BUTTON_FAKEDISABLED;
 						}
 					} else {
 						btn->EnableBorder(0, false);

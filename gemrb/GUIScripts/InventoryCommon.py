@@ -226,7 +226,7 @@ def MouseLeaveGround ():
 	Button = Window.GetControl (i+offset)
 
 	if GemRB.IsDraggingItem ()==1:
-		Button.SetState (IE_GUI_BUTTON_SECOND)
+		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 	return
 
 def CloseItemInfoWindow ():
@@ -548,10 +548,10 @@ def UpdateSlot (pc, slot):
 		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
-			Button.SetState (IE_GUI_BUTTON_SECOND)
+			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 
 		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
-			Button.SetState (IE_GUI_BUTTON_THIRD)
+			Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
 	return
 

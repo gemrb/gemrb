@@ -414,7 +414,7 @@ def ShowSpells ():
 		else: # specialist (shouldn't get here)
 			# use the green border state for matching specialist spells
 			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
-			SpellButton.SetState (IE_GUI_BUTTON_THIRD)
+			SpellButton.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
 	# show which spells are selected
 	ShowSelectedSpells ()
@@ -483,7 +483,7 @@ def MarkButton (i, select):
 			type = IE_GUI_BUTTON_ENABLED
 		elif Spells[SpellLevel][i][1] == 2:
 			# specialist spell
-			type = IE_GUI_BUTTON_THIRD
+			type = IE_GUI_BUTTON_FAKEDISABLED
 		else: # can't learn
 			type = IE_GUI_BUTTON_LOCKED
 
