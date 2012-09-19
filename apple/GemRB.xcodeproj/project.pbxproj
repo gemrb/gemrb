@@ -14,9 +14,8 @@
 				A2F8709214AE448500F9CC1F /* ShellScript */,
 			);
 			dependencies = (
-				A2AF8FCB14DDCEA8005CAC5D /* PBXTargetDependency */,
-				A2AF8FC914DDCE9D005CAC5D /* PBXTargetDependency */,
-				A2A1417914B4E907003FE672 /* PBXTargetDependency */,
+				A295049116097F9D00BB22AA /* PBXTargetDependency */,
+				A295048716097E3700BB22AA /* PBXTargetDependency */,
 				A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */,
 				A2F8709414AE4A8F00F9CC1F /* PBXTargetDependency */,
 			);
@@ -91,7 +90,6 @@
 		A226F44C13A11AC8009CE75E /* ZLibManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */; };
 		A22B5D611583D816007B4AA4 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5D1583D816007B4AA4 /* libFreetype2.a */; };
 		A22B5D621583D816007B4AA4 /* libPython.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5E1583D816007B4AA4 /* libPython.a */; };
-		A22B5D631583D816007B4AA4 /* libSDL_ttf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5F1583D816007B4AA4 /* libSDL_ttf.a */; };
 		A22B5D641583D816007B4AA4 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D601583D816007B4AA4 /* libSDL2.a */; };
 		A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */; };
 		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
@@ -99,6 +97,7 @@
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */; };
+		A2374CA215F1486E002A1C8C /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2374CA115F1486E002A1C8C /* libbz2.dylib */; };
 		A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */ = {isa = PBXBuildFile; fileRef = A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
@@ -113,7 +112,6 @@
 		A265ECEF13A8669700C6DF12 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
-		A2690313142BEE2F003E8BCC /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A273DC7C14856756000DA299 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A273DC7B14856755000DA299 /* libz.dylib */; };
 		A276B4C513A28B0000D41A8A /* BIFImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86B2139F0A7D0002DC13 /* BIFImporter.cpp */; };
 		A276B4C613A28B0D00D41A8A /* BIKPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86B7139F0A7D0002DC13 /* BIKPlayer.cpp */; };
@@ -209,6 +207,10 @@
 		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
 		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
+		A29504701609721300BB22AA /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
+		A29504721609721300BB22AA /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AAC14615C1C2F500D27766 /* FreeType.framework */; };
+		A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A29504781609724F00BB22AA /* TTFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A29504771609721300BB22AA /* TTFImporter.so */; };
 		A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
 		A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
 		A298DD0B14EB4E8C00F59F56 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
@@ -347,8 +349,6 @@
 		A2A3A7E814A5130F00F705CF /* GEM_ConfController-iphone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2A3A7E414A5130F00F705CF /* GEM_ConfController-iphone.xib */; };
 		A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7EE14A51B1800F705CF /* GEM_SDL_Keyboard.m */; };
 		A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
-		A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
-		A2AAC14715C1C2F500D27766 /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AAC14615C1C2F500D27766 /* FreeType.framework */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
@@ -915,40 +915,40 @@
 			remoteGlobalIDString = A2F0505013ABB80B0023B7EB;
 			remoteInfo = SAVImporter;
 		};
-		A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */ = {
+		A295046E1609721300BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A2BD124A15A7EDFE000FAB95;
-			remoteInfo = VLCPlayer;
+			remoteGlobalIDString = A2E66337139E875400310FC8;
+			remoteInfo = gemrb_core;
 		};
-		A2A1417814B4E907003FE672 /* PBXContainerItemProxy */ = {
+		A29504791609725F00BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A276B46C13A28A5000D41A8A;
-			remoteInfo = PNGImporter;
-		};
-		A2A4392015D1B9DC009DA865 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A269030F142BEE2F003E8BCC;
+			remoteGlobalIDString = A295046C1609721300BB22AA;
 			remoteInfo = TTFImporter;
 		};
-		A2AF8FC814DDCE9D005CAC5D /* PBXContainerItemProxy */ = {
+		A295048616097E3700BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A276B45A13A28A1C00D41A8A;
 			remoteInfo = OGGReader;
 		};
-		A2AF8FCA14DDCEA8005CAC5D /* PBXContainerItemProxy */ = {
+		A295049016097F9D00BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A269030F142BEE2F003E8BCC;
-			remoteInfo = TTFImporter;
+			remoteGlobalIDString = A276B46C13A28A5000D41A8A;
+			remoteInfo = PNGImporter;
+		};
+		A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2BD124A15A7EDFE000FAB95;
+			remoteInfo = VLCPlayer;
 		};
 		A2AF8FCC14DDCEBD005CAC5D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1027,13 +1027,6 @@
 			remoteGlobalIDString = A2E66337139E875400310FC8;
 			remoteInfo = libgemrb_core.dylib;
 		};
-		A2E9967B14DE128E0052BABE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A2E66337139E875400310FC8;
-			remoteInfo = gemrb_core;
-		};
 		A2E9967D14DE12970052BABE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1083,6 +1076,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A29504781609724F00BB22AA /* TTFImporter.so in CopyFiles */,
 				A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */,
 				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
 				A2E9965414DE05590052BABE /* ACMReader.so in CopyFiles */,
@@ -1138,7 +1132,6 @@
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
-		A22B5D5F1583D816007B4AA4 /* libSDL_ttf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL_ttf.a; path = ios/lib/iphonesimulator/libSDL_ttf.a; sourceTree = "<group>"; };
 		A22B5D601583D816007B4AA4 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ios/lib/iphonesimulator/libSDL2.a; sourceTree = "<group>"; };
 		A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ios/Icon.png; sourceTree = "<group>"; };
 		A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon@2x.png"; sourceTree = "<group>"; };
@@ -1147,12 +1140,12 @@
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
 		A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageWindowLogger.cpp; sourceTree = "<group>"; };
 		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
+		A2374CA115F1486E002A1C8C /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk/usr/lib/libbz2.dylib; sourceTree = DEVELOPER_DIR; };
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		A259F3F6142BFBCD00D49124 /* SDL_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_ttf.framework; path = /Library/Frameworks/SDL_ttf.framework; sourceTree = "<absolute>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IndexedArchive.cpp; path = ../gemrb/core/IndexedArchive.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECDA13A8661600C6DF12 /* KeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KeyMap.cpp; path = ../gemrb/core/KeyMap.cpp; sourceTree = SOURCE_ROOT; };
@@ -1324,6 +1317,7 @@
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
 		A28D24A3143C24E500A27897 /* BAMFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMFontManager.h; sourceTree = "<group>"; };
+		A29504771609721300BB22AA /* TTFImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TTFImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A298DD1114EB4E8C00F59F56 /* SDL2Video.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SDL2Video.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL12Video.cpp; sourceTree = "<group>"; };
 		A298DD1414EB4EDE00F59F56 /* SDL12Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL12Video.h; sourceTree = "<group>"; };
@@ -1648,15 +1642,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A2690312142BEE2F003E8BCC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A2AAC14715C1C2F500D27766 /* FreeType.framework in Frameworks */,
-				A2690313142BEE2F003E8BCC /* libgemrb_core.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A276B3C813A2867900D41A8A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1968,6 +1953,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A29504711609721300BB22AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A29504721609721300BB22AA /* FreeType.framework in Frameworks */,
+				A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A298DD0A14EB4E8C00F59F56 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1990,6 +1984,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2374CA215F1486E002A1C8C /* libbz2.dylib in Frameworks */,
 				A288622214A5501F009AC280 /* libz.dylib in Frameworks */,
 				A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */,
 				A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */,
@@ -2002,7 +1997,6 @@
 				A239390B145F8677007895B3 /* UIKit.framework in Frameworks */,
 				A22B5D611583D816007B4AA4 /* libFreetype2.a in Frameworks */,
 				A22B5D621583D816007B4AA4 /* libPython.a in Frameworks */,
-				A22B5D631583D816007B4AA4 /* libSDL_ttf.a in Frameworks */,
 				A22B5D641583D816007B4AA4 /* libSDL2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2120,6 +2114,7 @@
 				A2F0505113ABB80B0023B7EB /* SAVImporter.so */,
 				A298DD1114EB4E8C00F59F56 /* SDL2Video.so */,
 				A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */,
+				A29504771609721300BB22AA /* TTFImporter.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2127,6 +2122,7 @@
 		29B97314FDCFA39411CA2CEA /* GemRB_OSX */ = {
 			isa = PBXGroup;
 			children = (
+				A2374CA115F1486E002A1C8C /* libbz2.dylib */,
 				A2AAC14615C1C2F500D27766 /* FreeType.framework */,
 				A2FE553A13982BA6006AB962 /* config.h */,
 				A2D4C51D13A978110086BCC4 /* includes */,
@@ -2183,7 +2179,6 @@
 				A2EC8062146056490033754A /* QuartzCore.framework */,
 				A2830A3F13A05B81000A63FE /* QuartzCore.framework */,
 				A2D0505014D0B06C00D8CD77 /* SDL.framework */,
-				A259F3F6142BFBCD00D49124 /* SDL_ttf.framework */,
 				A239390A145F8677007895B3 /* UIKit.framework */,
 				A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */,
 				A2AAF36713A1507100AE8402 /* CoreAudio.framework */,
@@ -3057,7 +3052,6 @@
 			children = (
 				A22B5D5D1583D816007B4AA4 /* libFreetype2.a */,
 				A22B5D5E1583D816007B4AA4 /* libPython.a */,
-				A22B5D5F1583D816007B4AA4 /* libSDL_ttf.a */,
 				A22B5D601583D816007B4AA4 /* libSDL2.a */,
 			);
 			name = "iOS static libs";
@@ -3224,7 +3218,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				A2A4392115D1B9DC009DA865 /* PBXTargetDependency */,
+				A295047A1609725F00BB22AA /* PBXTargetDependency */,
 				A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */,
 				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
 				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
@@ -3287,22 +3281,6 @@
 			name = AREImporter;
 			productName = AREImporter;
 			productReference = A2462F1113A036B1002D1F02 /* AREImporter.so */;
-			productType = "com.apple.product-type.library.dynamic";
-		};
-		A269030F142BEE2F003E8BCC /* TTFImporter */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A2690314142BEE2F003E8BCC /* Build configuration list for PBXNativeTarget "TTFImporter" */;
-			buildPhases = (
-				A2690310142BEE2F003E8BCC /* Sources */,
-				A2690312142BEE2F003E8BCC /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A2E9967C14DE128E0052BABE /* PBXTargetDependency */,
-			);
-			name = TTFImporter;
-			productName = SAVImporter;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		A276B3C913A2867900D41A8A /* BIFImporter */ = {
@@ -3920,6 +3898,23 @@
 			productReference = A27E830A13A0358200B41410 /* 2DAImporter.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		A295046C1609721300BB22AA /* TTFImporter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A29504741609721300BB22AA /* Build configuration list for PBXNativeTarget "TTFImporter" */;
+			buildPhases = (
+				A295046F1609721300BB22AA /* Sources */,
+				A29504711609721300BB22AA /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A295046D1609721300BB22AA /* PBXTargetDependency */,
+			);
+			name = TTFImporter;
+			productName = SAVImporter;
+			productReference = A29504771609721300BB22AA /* TTFImporter.so */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		A298DD0614EB4E8C00F59F56 /* SDL2Video */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A298DD0E14EB4E8C00F59F56 /* Build configuration list for PBXNativeTarget "SDL2Video" */;
@@ -4107,13 +4102,13 @@
 				A276B4F313A28C0400D41A8A /* STOImporter */,
 				A276B49013A28AA800D41A8A /* TISImporter */,
 				A276B49613A28AB800D41A8A /* TLKImporter */,
+				A295046C1609721300BB22AA /* TTFImporter */,
 				A2BD124A15A7EDFE000FAB95 /* VLCPlayer */,
 				A276B49C13A28AC800D41A8A /* WAVReader */,
 				A276B4A213A28AD300D41A8A /* WEDImporter */,
 				A276B4A813A28AE100D41A8A /* WMPImporter */,
 				A276B4AE13A28AEE00D41A8A /* ZLibManager */,
 				A2F0505013ABB80B0023B7EB /* SAVImporter */,
-				A269030F142BEE2F003E8BCC /* TTFImporter */,
 				A2F8708C14AE439000F9CC1F /* ReleasePackage */,
 			);
 		};
@@ -4202,7 +4197,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\nDATE=`date -u +%Y-%m-%d\\T%T\\Z`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n\n#updtate the iTumesMetaData\ncp ios/iTunesMetadata.plist.in ios/iTunesMetadata.plist\n/usr/libexec/PlistBuddy -c \"Set :softwareVersionExternalIdentifier $REV\" \"ios/iTunesMetadata.plist\"\n/usr/libexec/PlistBuddy -c \"Set :releaseDate $DATE\" \"ios/iTunesMetadata.plist\"\n\ncp ios/GemRB.cfg.newinstall \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\"/override\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\" -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\" -name Makefile.am | xargs -I{} rm {}\n\n#make ipa\n#purge payload of everything\nif [ -d `ios/Payload`];\nthen\n    rm -r ios/Payload;\nfi\nmkdir ios/Payload\n\ncp -r \"$BUILT_PRODUCTS_DIR\"/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB-ios-$VERSION.ipa iTunesArtWork iTunesMetadata.plist Payload";
+			shellScript = "#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\nDATE=`date -u +%Y-%m-%d\\T%T\\Z`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n\n#updtate the iTumesMetaData\ncp ios/iTunesMetadata.plist.in ios/iTunesMetadata.plist\n/usr/libexec/PlistBuddy -c \"Set :softwareVersionExternalIdentifier $REV\" \"ios/iTunesMetadata.plist\"\n/usr/libexec/PlistBuddy -c \"Set :releaseDate $DATE\" \"ios/iTunesMetadata.plist\"\n\ncp ios/GemRB.cfg.newinstall \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\"/GemRB.cfg.newinstall\ncp -r ../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\"/GUIScripts\ncp -r ../gemrb/override/ \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\"/override\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\" -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR\"/\"$CONTENTS_FOLDER_PATH\" -name Makefile.am | xargs -I{} rm {}\n";
 		};
 		A2F8709214AE448500F9CC1F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4215,7 +4210,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "VERSION=`git describe --tags --dirty=-patched`\n/Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out osx/GemRB-osx-$VERSION.pkg";
+			shellScript = "VERSION=`git describe --tags --dirty=-patched`\n\n# packagemaker is depricated\n# /Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out osx/GemRB-osx-$VERSION.pkg\n\n#make iOS ipa\n#purge payload of everything\nif [ -d `ios/Payload`];\nthen\nrm -r ios/Payload;\nfi\nmkdir ios/Payload\n\ncp -r \"$BUILT_PRODUCTS_DIR\"-iphoneos/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB-ios-$VERSION.ipa iTunesArtWork iTunesMetadata.plist Payload\n\n# copy the optional plugins\ncd ..\ncp \"$BUILT_PRODUCTS_DIR\"/OGGReader.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/OGGReader.so\ncp \"$BUILT_PRODUCTS_DIR\"/PNGImporter.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/PNGImporter.so\n\n#zip OS X distro too\ncd osx\nzip -r GemRB-osx-$VERSION.zip \"$BUILT_PRODUCTS_DIR\"/GemRB.app\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4234,14 +4229,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A2690310142BEE2F003E8BCC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A2A6A45D146893CC000F1688 /* TTFFontManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4562,6 +4549,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A27E831313A035C600B41410 /* 2DAImporter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A295046F1609721300BB22AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A29504701609721300BB22AA /* TTFFontManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5127,30 +5122,30 @@
 			target = A2F0505013ABB80B0023B7EB /* SAVImporter */;
 			targetProxy = A23EBFFB1419A81500CC049E /* PBXContainerItemProxy */;
 		};
+		A295046D1609721300BB22AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E66337139E875400310FC8 /* gemrb_core */;
+			targetProxy = A295046E1609721300BB22AA /* PBXContainerItemProxy */;
+		};
+		A295047A1609725F00BB22AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A295046C1609721300BB22AA /* TTFImporter */;
+			targetProxy = A29504791609725F00BB22AA /* PBXContainerItemProxy */;
+		};
+		A295048716097E3700BB22AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A276B45A13A28A1C00D41A8A /* OGGReader */;
+			targetProxy = A295048616097E3700BB22AA /* PBXContainerItemProxy */;
+		};
+		A295049116097F9D00BB22AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
+			targetProxy = A295049016097F9D00BB22AA /* PBXContainerItemProxy */;
+		};
 		A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A2BD124A15A7EDFE000FAB95 /* VLCPlayer */;
 			targetProxy = A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */;
-		};
-		A2A1417914B4E907003FE672 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
-			targetProxy = A2A1417814B4E907003FE672 /* PBXContainerItemProxy */;
-		};
-		A2A4392115D1B9DC009DA865 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A269030F142BEE2F003E8BCC /* TTFImporter */;
-			targetProxy = A2A4392015D1B9DC009DA865 /* PBXContainerItemProxy */;
-		};
-		A2AF8FC914DDCE9D005CAC5D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A276B45A13A28A1C00D41A8A /* OGGReader */;
-			targetProxy = A2AF8FC814DDCE9D005CAC5D /* PBXContainerItemProxy */;
-		};
-		A2AF8FCB14DDCEA8005CAC5D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A269030F142BEE2F003E8BCC /* TTFImporter */;
-			targetProxy = A2AF8FCA14DDCEA8005CAC5D /* PBXContainerItemProxy */;
 		};
 		A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -5206,11 +5201,6 @@
 			isa = PBXTargetDependency;
 			target = A2E66337139E875400310FC8 /* gemrb_core */;
 			targetProxy = A2E6633B139E876900310FC8 /* PBXContainerItemProxy */;
-		};
-		A2E9967C14DE128E0052BABE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A2E66337139E875400310FC8 /* gemrb_core */;
-			targetProxy = A2E9967B14DE128E0052BABE /* PBXContainerItemProxy */;
 		};
 		A2E9967E14DE12970052BABE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -5269,42 +5259,6 @@
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = AREImporter;
-			};
-			name = Release;
-		};
-		A2690315142BEE2F003E8BCC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = "";
-				DYLIB_CURRENT_VERSION = "";
-				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				HEADER_SEARCH_PATHS = (
-					"$(HEADER_SEARCH_PATHS)",
-					../gemrb/includes,
-					/Library/Frameworks/FreeType.framework/Headers,
-				);
-				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				MACH_O_TYPE = mh_bundle;
-				PRODUCT_NAME = TTFImporter;
-			};
-			name = Debug;
-		};
-		A2690316142BEE2F003E8BCC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = "";
-				DYLIB_CURRENT_VERSION = "";
-				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				HEADER_SEARCH_PATHS = (
-					"$(HEADER_SEARCH_PATHS)",
-					../gemrb/includes,
-					/Library/Frameworks/FreeType.framework/Headers,
-				);
-				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				MACH_O_TYPE = mh_bundle;
-				PRODUCT_NAME = TTFImporter;
 			};
 			name = Release;
 		};
@@ -6344,6 +6298,42 @@
 			};
 			name = Release;
 		};
+		A29504751609721300BB22AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS)",
+					../gemrb/includes,
+					/Library/Frameworks/FreeType.framework/Headers,
+				);
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = TTFImporter;
+			};
+			name = Debug;
+		};
+		A29504761609721300BB22AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS)",
+					../gemrb/includes,
+					/Library/Frameworks/FreeType.framework/Headers,
+				);
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = TTFImporter;
+			};
+			name = Release;
+		};
 		A298DD0F14EB4E8C00F59F56 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -6601,6 +6591,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 			};
 			name = Debug;
 		};
@@ -6608,6 +6599,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 			};
 			name = Release;
 		};
@@ -6773,15 +6765,6 @@
 			buildConfigurations = (
 				A2462F1213A036B2002D1F02 /* Debug */,
 				A2462F1313A036B2002D1F02 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A2690314142BEE2F003E8BCC /* Build configuration list for PBXNativeTarget "TTFImporter" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A2690315142BEE2F003E8BCC /* Debug */,
-				A2690316142BEE2F003E8BCC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -7124,6 +7107,15 @@
 			buildConfigurations = (
 				A27E830B13A0358300B41410 /* Debug */,
 				A27E830C13A0358300B41410 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A29504741609721300BB22AA /* Build configuration list for PBXNativeTarget "TTFImporter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A29504751609721300BB22AA /* Debug */,
+				A29504761609721300BB22AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
