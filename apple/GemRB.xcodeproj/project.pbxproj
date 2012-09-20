@@ -6408,19 +6408,21 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GEM_IOS_INC_PATH = ios/lib/include;
+				GEM_IOS_LIB_PATH = ios/lib;
 				HEADER_SEARCH_PATHS = (
 					./,
 					../gemrb/includes,
-					ios/lib/include,
-					ios/lib/include/SDL,
-					ios/lib/include/SDL_ttf,
-					ios/lib/include/python,
+					$GEM_IOS_INC_PATH,
+					$GEM_IOS_INC_PATH/SDL,
+					$GEM_IOS_INC_PATH/python,
 				);
 				INFOPLIST_FILE = ios/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					$SDK_DIR/usr/lib,
 					"\"$(SRCROOT)/ios/lib/$PLATFORM_NAME\"",
+					$GEM_IOS_LIB_PATH/$PLATFORM_NAME,
 				);
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
@@ -6438,7 +6440,7 @@
 				SDKROOT = iphoneos;
 				"SDKROOT[arch=*]" = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7 i386";
 			};
 			name = Debug;
 		};
@@ -6450,19 +6452,21 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GEM_IOS_INC_PATH = ios/lib/include;
+				GEM_IOS_LIB_PATH = ios/lib;
 				HEADER_SEARCH_PATHS = (
 					./,
 					../gemrb/includes,
-					ios/lib/include,
-					ios/lib/include/SDL,
-					ios/lib/include/SDL_ttf,
-					ios/lib/include/python,
+					$GEM_IOS_INC_PATH,
+					$GEM_IOS_INC_PATH/SDL,
+					$GEM_IOS_INC_PATH/python,
 				);
 				INFOPLIST_FILE = ios/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					$SDK_DIR/usr/lib,
 					"\"$(SRCROOT)/ios/lib/$PLATFORM_NAME\"",
+					$GEM_IOS_LIB_PATH/$PLATFORM_NAME,
 				);
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
@@ -6479,7 +6483,7 @@
 				SDKROOT = iphoneos;
 				"SDKROOT[arch=*]" = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7 i386";
 			};
 			name = Release;
 		};
@@ -6591,7 +6595,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
 			};
 			name = Debug;
 		};
@@ -6599,7 +6602,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
 			};
 			name = Release;
 		};
