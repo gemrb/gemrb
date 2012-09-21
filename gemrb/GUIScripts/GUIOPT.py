@@ -164,7 +164,7 @@ def OpenOptionsWindow ():
 		# Keyboard shortcuts
 		KeyboardButton = Window.GetControl (13)
 		KeyboardButton.SetText (33468)
-		KeyboardButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenKeyboardWindow
+		KeyboardButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenHotkeyOptionsWindow)
 
 		# Movies
 		MoviesButton = Window.GetControl (14)
