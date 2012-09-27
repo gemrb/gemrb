@@ -147,9 +147,9 @@ def OpenVideoOptionsWindow ():
 	PSTOptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
 	PSTOptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
 
-	PSTOptCheckbox ('VideoOptions', 'SoftwareBlitting', Window, 6, 15, 30898, None) #TODO: SoftBlt
-	PSTOptCheckbox ('VideoOptions', 'SoftwareMirroring', Window, 4, 13, 30896, None) #TODO: SoftMirrorBlt
-	PSTOptCheckbox ('VideoOptions', 'SoftwareTransparency', Window, 5, 14, 30897, None) #TODO: SoftSrcKeyBlt
+	PSTOptCheckbox (31052, 31221, VideoHelpText, Window, 6, 15, 30898, "SoftBlt")
+	PSTOptCheckbox (31052, 31216, VideoHelpText, Window, 4, 13, 30896, "SoftMirrorBlt")
+	PSTOptCheckbox (31052, 31220, VideoHelpText, Window, 5, 14, 30897, "SoftSrcKeyBlt")
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -158,20 +158,6 @@ def OpenVideoOptionsWindow ():
 def GammaFeedback ():
 	GemRB.SetGamma (GemRB.GetVar("Brightness Correction")/5,GemRB.GetVar("Gamma Correction")/20)
 	return
-
-def DisplayHelpVideoOptions ():
-	VideoHelpText.SetText (31052)
-
-def DisplayHelpSoftwareBlitting ():
-	VideoHelpText.SetText (31221)
-
-def DisplayHelpSoftwareMirroring ():
-	VideoHelpText.SetText (31216)
-
-def DisplayHelpSoftwareTransparency ():
-	VideoHelpText.SetText (31220)
-
-
 
 ###################################################
 
@@ -215,9 +201,9 @@ def OpenAudioOptionsWindow ():
 	PSTOptSlider (31210, 31225, AudioHelpText, Window, 4, 13, 31468, "Volume Music", UpdateVolume)
 	PSTOptSlider (31210, 31229, AudioHelpText, Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
 	
-	PSTOptCheckbox ('AudioOptions', 'CreativeEAX', Window, 6, 15, 30900, "Environmental Audio")
-	PSTOptCheckbox ('AudioOptions', 'SoundProcessing', Window, 16, 17, 63242, "Sound Processing")
-	PSTOptCheckbox ('AudioOptions', 'MusicProcessing', Window, 18, 19, 63243, "Music Processing")
+	PSTOptCheckbox (31210, 31224, AudioHelpText, Window, 6, 15, 30900, "Environmental Audio")
+	PSTOptCheckbox (31210, 63244, AudioHelpText, Window, 16, 17, 63242, "Sound Processing")
+	PSTOptCheckbox (31210, 63247, AudioHelpText, Window, 18, 19, 63243, "Music Processing")
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -225,20 +211,6 @@ def OpenAudioOptionsWindow ():
 def UpdateVolume ():
 	GemRB.UpdateAmbientsVolume ()
 	GemRB.UpdateMusicVolume ()
-	
-def DisplayHelpAudioOptions ():
-	AudioHelpText.SetText (31210)
-
-def DisplayHelpCreativeEAX ():
-	AudioHelpText.SetText (31224)
-
-def DisplayHelpSoundProcessing ():
-	AudioHelpText.SetText (63244)
-	
-def DisplayHelpMusicProcessing ():
-	AudioHelpText.SetText (63247)
-
-
 
 ###################################################
 
@@ -267,9 +239,9 @@ def OpenGameplayOptionsWindow ():
 	PSTOptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed", UpdateKeyboardSpeed)
 	PSTOptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
 
-	PSTOptCheckbox ('GameplayOptions', 'DitherAlways', Window, 5, 17, 31217, "Always Dither")
-	PSTOptCheckbox ('GameplayOptions', 'Gore', Window, 6, 18, 31218, "Gore???")
-	PSTOptCheckbox ('GameplayOptions', 'AlwaysRun', Window, 22, 23, 62418, "Always Run")
+	PSTOptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
+	PSTOptCheckbox (31212, 31223, GameplayHelpText, Window, 6, 18, 31218, "Gore")
+	PSTOptCheckbox (31212, 62419, GameplayHelpText, Window, 22, 23, 62418, "Always Run")
 
 	PSTOptButton (31212, 31213, GameplayHelpText, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
 	PSTOptButton (31212, 31214, GameplayHelpText, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
@@ -277,9 +249,6 @@ def OpenGameplayOptionsWindow ():
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
-
-def DisplayHelpGameplayOptions ():
-	GameplayHelpText.SetText (31212)
 
 def UpdateTooltips ():
 	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
@@ -290,15 +259,6 @@ def UpdateMouseSpeed ():
 def UpdateKeyboardSpeed ():
 	#GemRB.SetKeyboardScrollSpeed (GemRB.GetVar ("Keyboard Scroll Speed") )
 	return
-
-def DisplayHelpDitherAlways ():
-	GameplayHelpText.SetText (31222)
-
-def DisplayHelpGore ():
-	GameplayHelpText.SetText (31223)
-
-def DisplayHelpAlwaysRun ():
-	GameplayHelpText.SetText (62419)
 
 ###################################################
 	
@@ -328,37 +288,18 @@ def OpenFeedbackOptionsWindow ():
 	PSTOptSlider (31213, 54878, FeedbackHelpText, Window, 20, 21, 54879, "Selection Sounds Frequency")
 	PSTOptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
 
-	PSTOptCheckbox ('FeedbackOptions', 'CharacterStates', Window, 6, 15, 37594, "")
-	PSTOptCheckbox ('FeedbackOptions', 'MiscellaneousMessages', Window, 17, 19, 37596, "")
-	PSTOptCheckbox ('FeedbackOptions', 'ToHitRolls', Window, 3, 12, 37588, "")
-	PSTOptCheckbox ('FeedbackOptions', 'CombatInfo', Window, 4, 13, 37590, "")
-	PSTOptCheckbox ('FeedbackOptions', 'SpellCasting', Window, 5, 14, 37592, "")
-
+	# TODO: once the pst overhead messaging system is in place, add the relevant game vars below
+	PSTOptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, "")
+	PSTOptCheckbox (31213, 37462, FeedbackHelpText, Window, 17, 19, 37596, "")
+	PSTOptCheckbox (31213, 37453, FeedbackHelpText, Window, 3, 12, 37588, "")
+	PSTOptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, "")
+	PSTOptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, "")
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
 def UpdateMarkerFeedback ():
 	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
-
-def DisplayHelpFeedbackOptions ():
-	GameplayHelpText.SetText (31213)
-
-def DisplayHelpCharacterStates ():
-	FeedbackHelpText.SetText (37460)
-
-def DisplayHelpMiscellaneousMessages ():
-	FeedbackHelpText.SetText (37462)
-
-def DisplayHelpToHitRolls ():
-	FeedbackHelpText.SetText (37453)
-
-def DisplayHelpCombatInfo ():
-	FeedbackHelpText.SetText (37457)
-
-def DisplayHelpSpellCasting ():
-	FeedbackHelpText.SetText (37458)
-
 
 ###################################################
 
@@ -395,18 +336,16 @@ def OpenAutopauseOptionsWindow ():
 	GemRB.SetVar("AutoPauseState_EndRound", (state & 0x40) != 0 )
 	
 
-	PSTOptCheckbox ('AutopauseOptions', 'CharacterHit', Window, 2, 9, 37598, "AutoPauseState_Hit", OnAutoPauseClicked)
-	PSTOptCheckbox ('AutopauseOptions', 'CharacterInjured', Window, 3, 10, 37681, "AutoPauseState_Wounded", OnAutoPauseClicked)
-	PSTOptCheckbox ('AutopauseOptions', 'CharacterDead', Window, 4, 11, 37682, "AutoPauseState_Dead", OnAutoPauseClicked)
-	PSTOptCheckbox ('AutopauseOptions', 'CharacterAttacked', Window, 5, 12, 37683, "AutoPauseState_Attacked", OnAutoPauseClicked)
-	PSTOptCheckbox ('AutopauseOptions', 'WeaponUnusable', Window, 6, 13, 37684, "AutoPauseState_Unusable", OnAutoPauseClicked)
-	PSTOptCheckbox ('AutopauseOptions', 'TargetGone', Window, 7, 14, 37685, "AutoPauseState_NoTarget", OnAutoPauseClicked)
-	PSTOptCheckbox ('AutopauseOptions', 'EndOfRound', Window, 8, 15, 37686, "AutoPauseState_EndRound", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "AutoPauseState_Hit", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37689, AutopauseHelpText, Window, 3, 10, 37681, "AutoPauseState_Wounded", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37690, AutopauseHelpText, Window, 4, 11, 37682, "AutoPauseState_Dead", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37691, AutopauseHelpText, Window, 5, 12, 37683, "AutoPauseState_Attacked", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37692, AutopauseHelpText, Window, 6, 13, 37684, "AutoPauseState_Unusable", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "AutoPauseState_NoTarget", OnAutoPauseClicked)
+	PSTOptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "AutoPauseState_EndRound", OnAutoPauseClicked)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-
 
 def OnAutoPauseClicked ():
 	state = (0x01 * GemRB.GetVar("AutoPauseState_Unusable") +
@@ -418,28 +357,6 @@ def OnAutoPauseClicked ():
 		 0x40 * GemRB.GetVar("AutoPauseState_EndRound"))
 
 	GemRB.SetVar("Auto Pause State", state)
-	
-def DisplayHelpCharacterHit ():
-	AutopauseHelpText.SetText (37688)
-
-def DisplayHelpCharacterInjured ():
-	AutopauseHelpText.SetText (37689)
-
-def DisplayHelpCharacterDead ():
-	AutopauseHelpText.SetText (37690)
-
-def DisplayHelpCharacterAttacked ():
-	AutopauseHelpText.SetText (37691)
-
-def DisplayHelpWeaponUnusable ():
-	AutopauseHelpText.SetText (37692)
-
-def DisplayHelpTargetGone ():
-	AutopauseHelpText.SetText (37693)
-
-def DisplayHelpEndOfRound ():
-	AutopauseHelpText.SetText (37694)
-
 
 ###################################################
 ###################################################
@@ -774,12 +691,12 @@ def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_
 
 	return slider
 
-def PSTOptCheckbox (winname, ctlname, window, button_id, label_id, label_strref, assoc_var = None, handler = None):
+def PSTOptCheckbox (winname, ctlname, help_ta, window, button_id, label_id, label_strref, assoc_var = None, handler = None):
 	"""Standard checkbox for option windows"""
 
-	action = eval("DisplayHelp" + ctlname)
-	button = GUIOPTControls.OptCheckbox(action, window, button_id, label_id, assoc_var, 1)
-	button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
+	button = GUIOPTControls.OptCheckboxNoCallback (ctlname, help_ta, window, button_id, label_id, assoc_var)
+	# this is commented out since it causes glitches with toggling the button
+	#button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 	if assoc_var:
 		if GemRB.GetVar (assoc_var):
 			button.SetState (IE_GUI_BUTTON_PRESSED)
@@ -788,13 +705,14 @@ def PSTOptCheckbox (winname, ctlname, window, button_id, label_id, label_strref,
 	else: 
 		button.SetState (IE_GUI_BUTTON_UNPRESSED)
 
+	# FIXME: this overrides the strref setter from GUIOPTControls
 	if handler:
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
 
 	label = window.GetControl (label_id)
 	label.SetText (label_strref)
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, action)
-	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
+	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
+	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
 	return button
 
