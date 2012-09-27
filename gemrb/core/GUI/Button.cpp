@@ -216,7 +216,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 	}
 
 	// Button picture
-	int picXPos, picYPos;
+	int picXPos = 0, picYPos = 0;
 	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
 		picXPos = ( Width / 2 ) - ( Picture->Width / 2 ) + x + XPos;
