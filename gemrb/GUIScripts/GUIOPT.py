@@ -236,7 +236,6 @@ def SetGfxCorrection ():
 	Gamma = GemRB.GetVar("Gamma Correction")
 	if GUICommon.GameIsIWD2(): # 10/11 ticks
 		Gamma /= 2
-	# TODO: check if pst really has them quintupled
 
 	GemRB.SetGamma (Brightness, Gamma)
 

@@ -177,7 +177,7 @@ def OpenVideoOptionsWindow ():
 	return
 	
 def GammaFeedback ():
-	GemRB.SetGamma (GemRB.GetVar("Brightness Correction")/5,GemRB.GetVar("Gamma Correction")/5)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction")/5,GemRB.GetVar("Gamma Correction")/20)
 	return
 
 def DisplayHelpVideoOptions ():
