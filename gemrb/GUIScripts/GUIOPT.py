@@ -454,10 +454,9 @@ def OpenAutopauseOptionsWindow ():
 	elif not GUICommon.GameIsIWD1():
 		GUIOPTControls.OptCheckboxNoCallback (23514, HelpTextArea2, Window, 26, 27, 'Auto Pause State', 128)
 	if GUICommon.GameIsBG2():
-		# TODO: recheck if the first and third are correctly mapped
-		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 31, 33, 'Auto Pause State', 256)
+		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 31, 33, 'Auto Pause State', 256)
 		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 37, 36, 'Auto Pause Center', 1)
-		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
+		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
 
 	SubSubOptionsWindow = Window
 
