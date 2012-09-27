@@ -494,6 +494,8 @@ public:
 	bool IsTimestopActive() const;
 	/** Checks the bounty encounters (used in bg1) */
 	bool RandomEncounter(ieResRef &BaseArea);
+	/** Resets the area and bored comment timers of the whole party */
+	void ResetPartyCommentTimes();
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);

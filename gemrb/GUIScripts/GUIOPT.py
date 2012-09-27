@@ -236,7 +236,6 @@ def SetGfxCorrection ():
 	Gamma = GemRB.GetVar("Gamma Correction")
 	if GUICommon.GameIsIWD2(): # 10/11 ticks
 		Gamma /= 2
-	# TODO: check if pst really has them quintupled
 
 	GemRB.SetGamma (Brightness, Gamma)
 
@@ -455,10 +454,9 @@ def OpenAutopauseOptionsWindow ():
 	elif not GUICommon.GameIsIWD1():
 		GUIOPTControls.OptCheckboxNoCallback (23514, HelpTextArea2, Window, 26, 27, 'Auto Pause State', 128)
 	if GUICommon.GameIsBG2():
-		# TODO: recheck if the first and third are correctly mapped
-		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 31, 33, 'Auto Pause State', 256)
+		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 31, 33, 'Auto Pause State', 256)
 		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 37, 36, 'Auto Pause Center', 1)
-		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
+		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
 
 	SubSubOptionsWindow = Window
 
@@ -471,7 +469,9 @@ def MoviePlayPress():
 	s = GemRB.GetVar("MovieIndex")
 	for i in range(0, MoviesTable.GetRowCount() ):
 		t = MoviesTable.GetRowName(i)
-		if GemRB.GetVar(t)==1:
+		#temporarily out (change simultaneously with OpenMovieWindow)
+		#if GemRB.GetVar(t)==1:
+		if 1==1:
 			if s==0:
 				s = MoviesTable.GetRowName(i)
 				GemRB.PlayMovie(s, 1)
@@ -501,7 +501,9 @@ def OpenMovieWindow ():
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
 	for i in range(0, MoviesTable.GetRowCount() ):
 		t = MoviesTable.GetRowName(i)
-		if GemRB.GetVar(t)==1:
+		#temporarily out too (see above)
+		#if GemRB.GetVar(t)==1:
+		if 1==1:
 			s = MoviesTable.GetValue(i, 0)
 			TextAreaControl.Append(s,-1)
 	TextAreaControl.SetVarAssoc("MovieIndex",0)
@@ -677,8 +679,9 @@ def CloseQuitMsgWindow ():
 	return
 
 ###################################################
-#TODO
 def OpenHotkeyOptionsWindow ():
+	print("TODO: implement OpenHotkeyOptionsWindow!")
+	# check if pst's guiopt's OpenKeyboardMappingsWindow is reusable
 	return
 
 def CloseHotkeyOptionsWindow ():

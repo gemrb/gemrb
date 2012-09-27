@@ -1920,4 +1920,11 @@ bool Game::RandomEncounter(ieResRef &BaseArea)
 	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
 }
 
+void Game::ResetPartyCommentTimes()
+{
+	for (unsigned int slot=0; slot<PCs.size(); slot++) {
+		PCs[slot]->ResetCommentTime();
+	}
+}
+
 }

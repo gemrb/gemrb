@@ -20,6 +20,7 @@
 # Options.py - scripts to control options windows mostly from GUIOPT winpack
 
 import GemRB
+import GUIOPT
 from GUIDefines import *
 
 OptionsWindow = 0
@@ -58,15 +59,15 @@ def OnLoad():
 	ReturnButton = OptionsWindow.GetControl(11)
 
 	GraphicsButton.SetText(17162)
-	GraphicsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GraphicsPress)
+	GraphicsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenVideoOptionsWindow)
 	SoundButton.SetText(17164)
-	SoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoundPress)
+	SoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenAudioOptionsWindow)
 	GamePlayButton.SetText(17165)
-	GamePlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GamePlayPress)
+	GamePlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenGameplayOptionsWindow)
 	MoviesButton.SetText(15415)
-	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePress)
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenMovieWindow)
 	KeyboardButton.SetText(33468)
-	KeyboardButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None) #TODO: KeyboardPress
+	KeyboardButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenHotkeyOptionsWindow)
 
 	ReturnButton.SetText(10308)
 	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ReturnPress)
@@ -81,32 +82,4 @@ def ReturnPress():
 	if OptionsWindow:
 		OptionsWindow.Unload()
 	GemRB.SetNextScript("Start")
-	return
-
-def GraphicsPress():
-	global OptionsWindow
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("Graphics")
-	return
-
-def SoundPress():
-	global OptionsWindow
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("Sound")
-	return
-
-def GamePlayPress():
-	global OptionsWindow
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("GamePlay")
-	return
-
-def MoviePress():
-	global OptionsWindow
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("Movies")
 	return
