@@ -678,14 +678,11 @@ def CloseSubSubOptionsWindow ():
 def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
 	"""Standard slider for option windows"""
 	slider = GUIOPTControls.OptSlider (action, window, slider_id, variable, value)
-	#slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
-	#slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 	
 	label = window.GetControl (label_id)
 	label.SetText (label_strref)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
-	#label.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, lambda: help_ta.SetText (ctlname))
 	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
 	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
