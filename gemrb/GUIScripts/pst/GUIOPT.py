@@ -694,13 +694,6 @@ def PSTOptCheckbox (winname, ctlname, help_ta, window, button_id, label_id, labe
 	button = GUIOPTControls.OptCheckboxNoCallback (ctlname, help_ta, window, button_id, label_id, assoc_var)
 	# this is commented out since it causes glitches with toggling the button
 	#button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
-	if assoc_var:
-		if GemRB.GetVar (assoc_var):
-			button.SetState (IE_GUI_BUTTON_PRESSED)
-		else:
-			button.SetState (IE_GUI_BUTTON_UNPRESSED)
-	else: 
-		button.SetState (IE_GUI_BUTTON_UNPRESSED)
 
 	# FIXME: this overrides the strref setter from GUIOPTControls
 	if handler:
