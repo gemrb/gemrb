@@ -236,7 +236,7 @@ def OpenGameplayOptionsWindow ():
 
 	PSTOptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
 	PSTOptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
-	PSTOptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed", UpdateKeyboardSpeed)
+	PSTOptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed")
 	PSTOptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
 
 	PSTOptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
@@ -255,10 +255,6 @@ def UpdateTooltips ():
 
 def UpdateMouseSpeed ():
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
-
-def UpdateKeyboardSpeed ():
-	#GemRB.SetKeyboardScrollSpeed (GemRB.GetVar ("Keyboard Scroll Speed") )
-	return
 
 ###################################################
 	
