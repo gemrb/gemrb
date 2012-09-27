@@ -144,8 +144,8 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (OpenVideoOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (OpenVideoOptionsWindow, Window, 8)
 
-	PSTOptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
-	PSTOptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
+	PSTOptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
+	PSTOptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
 
 	PSTOptCheckbox ('VideoOptions', 'SoftwareBlitting', Window, 6, 15, 30898, None) #TODO: SoftBlt
 	PSTOptCheckbox ('VideoOptions', 'SoftwareMirroring', Window, 4, 13, 30896, None) #TODO: SoftMirrorBlt
@@ -161,12 +161,6 @@ def GammaFeedback ():
 
 def DisplayHelpVideoOptions ():
 	VideoHelpText.SetText (31052)
-
-def DisplayHelpBrightness ():
-	VideoHelpText.SetText (31431)
-
-def DisplayHelpContrast ():
-	VideoHelpText.SetText (31459)
 
 def DisplayHelpSoftwareBlitting ():
 	VideoHelpText.SetText (31221)
@@ -215,11 +209,11 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptDone (OpenAudioOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (OpenAudioOptionsWindow, Window, 8)
 
-	PSTOptSlider ('AudioOptions', 'AmbientVolume', Window, 1, 10, 31460, "Volume Ambients", UpdateVolume)
-	PSTOptSlider ('AudioOptions', 'SoundFXVolume', Window, 2, 11, 31466, "Volume SFX", UpdateVolume)
-	PSTOptSlider ('AudioOptions', 'VoiceVolume', Window, 3, 12, 31467, "Volume Voices", UpdateVolume)
-	PSTOptSlider ('AudioOptions', 'MusicVolume', Window, 4, 13, 31468, "Volume Music", UpdateVolume)
-	PSTOptSlider ('AudioOptions', 'MovieVolume', Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
+	PSTOptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", UpdateVolume)
+	PSTOptSlider (31210, 31228, AudioHelpText, Window, 2, 11, 31466, "Volume SFX", UpdateVolume)
+	PSTOptSlider (31210, 31226, AudioHelpText, Window, 3, 12, 31467, "Volume Voices", UpdateVolume)
+	PSTOptSlider (31210, 31225, AudioHelpText, Window, 4, 13, 31468, "Volume Music", UpdateVolume)
+	PSTOptSlider (31210, 31229, AudioHelpText, Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
 	
 	PSTOptCheckbox ('AudioOptions', 'CreativeEAX', Window, 6, 15, 30900, "Environmental Audio")
 	PSTOptCheckbox ('AudioOptions', 'SoundProcessing', Window, 16, 17, 63242, "Sound Processing")
@@ -234,21 +228,6 @@ def UpdateVolume ():
 	
 def DisplayHelpAudioOptions ():
 	AudioHelpText.SetText (31210)
-
-def DisplayHelpAmbientVolume ():
-	AudioHelpText.SetText (31227)
-	
-def DisplayHelpSoundFXVolume ():
-	AudioHelpText.SetText (31228)
-
-def DisplayHelpVoiceVolume ():
-	AudioHelpText.SetText (31226)
-
-def DisplayHelpMusicVolume ():
-	AudioHelpText.SetText (31225)
-
-def DisplayHelpMovieVolume ():
-	AudioHelpText.SetText (31229)
 
 def DisplayHelpCreativeEAX ():
 	AudioHelpText.SetText (31224)
@@ -283,10 +262,10 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptDone (OpenGameplayOptionsWindow, Window, 10)
 	GUIOPTControls.OptCancel (OpenGameplayOptionsWindow, Window, 11)
 
-	PSTOptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
-	PSTOptSlider ('GameplayOptions', 'MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
-	PSTOptSlider ('GameplayOptions', 'KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed", UpdateKeyboardSpeed)
-	PSTOptSlider ('GameplayOptions', 'Difficulty', Window, 4, 16, 31479, "Difficulty Level")
+	PSTOptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
+	PSTOptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
+	PSTOptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed", UpdateKeyboardSpeed)
+	PSTOptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
 
 	PSTOptCheckbox ('GameplayOptions', 'DitherAlways', Window, 5, 17, 31217, "Always Dither")
 	PSTOptCheckbox ('GameplayOptions', 'Gore', Window, 6, 18, 31218, "Gore???")
@@ -305,24 +284,12 @@ def DisplayHelpGameplayOptions ():
 def UpdateTooltips ():
 	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
 
-def DisplayHelpTooltipDelay ():
-	GameplayHelpText.SetText (31232)
-
 def UpdateMouseSpeed ():
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
-
-def DisplayHelpMouseScrollingSpeed ():
-	GameplayHelpText.SetText (31230)
 
 def UpdateKeyboardSpeed ():
 	#GemRB.SetKeyboardScrollSpeed (GemRB.GetVar ("Keyboard Scroll Speed") )
 	return
-
-def DisplayHelpKeyboardScrollingSpeed ():
-	GameplayHelpText.SetText (31231)
-
-def DisplayHelpDifficulty ():
-	GameplayHelpText.SetText (31233)
 
 def DisplayHelpDitherAlways ():
 	GameplayHelpText.SetText (31222)
@@ -338,8 +305,6 @@ def DisplayHelpFeedbackOptions ():
 
 def DisplayHelpAutopauseOptions ():
 	GameplayHelpText.SetText (31214)
-
-
 
 ###################################################
 	
@@ -364,10 +329,10 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptDone (OpenFeedbackOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (OpenFeedbackOptionsWindow, Window, 8)
 
-	PSTOptSlider ('FeedbackOptions', 'MarkerFeedback', Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
-	PSTOptSlider ('FeedbackOptions', 'LocatorFeedback', Window, 2, 11, 37586, "Locator Feedback Level")
-	PSTOptSlider ('FeedbackOptions', 'SelectionFeedbackLevel', Window, 20, 21, 54879, "Selection Sounds Frequency")
-	PSTOptSlider ('FeedbackOptions', 'CommandFeedbackLevel', Window, 22, 23, 55012, "Command Sounds Frequency")
+	PSTOptSlider (31213, 37411, FeedbackHelpText, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
+	PSTOptSlider (31213, 37447, FeedbackHelpText, Window, 2, 11, 37586, "Locator Feedback Level")
+	PSTOptSlider (31213, 54878, FeedbackHelpText, Window, 20, 21, 54879, "Selection Sounds Frequency")
+	PSTOptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
 
 	PSTOptCheckbox ('FeedbackOptions', 'CharacterStates', Window, 6, 15, 37594, "")
 	PSTOptCheckbox ('FeedbackOptions', 'MiscellaneousMessages', Window, 17, 19, 37596, "")
@@ -382,17 +347,8 @@ def OpenFeedbackOptionsWindow ():
 def UpdateMarkerFeedback ():
 	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
 
-def DisplayHelpMarkerFeedback ():
-	FeedbackHelpText.SetText (37411)
-
-def DisplayHelpLocatorFeedback ():
-	FeedbackHelpText.SetText (37447)
-
-def DisplayHelpSelectionFeedbackLevel ():
-	FeedbackHelpText.SetText (54878)
-
-def DisplayHelpCommandFeedbackLevel ():
-	FeedbackHelpText.SetText (54880)
+def DisplayHelpFeedbackOptions ():
+	GameplayHelpText.SetText (31213)
 
 def DisplayHelpCharacterStates ():
 	FeedbackHelpText.SetText (37460)
@@ -808,19 +764,19 @@ def CloseSubSubOptionsWindow ():
 # These controls are usually made from an active
 #   control (button, slider ...) and a label
 
-def PSTOptSlider (winname, ctlname, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
+def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
 	"""Standard slider for option windows"""
 	slider = GUIOPTControls.OptSlider (action, window, slider_id, variable, value)
-	#slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
-	#slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
+	#slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
+	#slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 	
 	label = window.GetControl (label_id)
 	label.SetText (label_strref)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
-	#label.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, eval("DisplayHelp" + ctlname))
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
-	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
+	#label.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, lambda: help_ta.SetText (ctlname))
+	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
+	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
 	return slider
 
