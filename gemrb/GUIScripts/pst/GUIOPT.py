@@ -271,8 +271,8 @@ def OpenGameplayOptionsWindow ():
 	PSTOptCheckbox ('GameplayOptions', 'Gore', Window, 6, 18, 31218, "Gore???")
 	PSTOptCheckbox ('GameplayOptions', 'AlwaysRun', Window, 22, 23, 62418, "Always Run")
 
-	PSTOptButton ('GameplayOptions', 'FeedbackOptions', Window, 8, 20, 31478)
-	PSTOptButton ('GameplayOptions', 'AutopauseOptions', Window, 9, 21, 31470)
+	PSTOptButton (31212, 31213, GameplayHelpText, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
+	PSTOptButton (31212, 31214, GameplayHelpText, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -299,12 +299,6 @@ def DisplayHelpGore ():
 
 def DisplayHelpAlwaysRun ():
 	GameplayHelpText.SetText (62419)
-
-def DisplayHelpFeedbackOptions ():
-	GameplayHelpText.SetText (31213)
-
-def DisplayHelpAutopauseOptions ():
-	GameplayHelpText.SetText (31214)
 
 ###################################################
 	
@@ -804,19 +798,19 @@ def PSTOptCheckbox (winname, ctlname, window, button_id, label_id, label_strref,
 
 	return button
 
-def PSTOptButton (winname, ctlname, window, button_id, label_id, label_strref):
+def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %ctlname))
-	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
-	button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
+	button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
 	label = window.GetControl (label_id)
 	label.SetText (label_strref)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + ctlname))
-	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, eval("DisplayHelp" + winname))
+	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
+	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
 ###################################################
 # End of file GUIOPT.py
