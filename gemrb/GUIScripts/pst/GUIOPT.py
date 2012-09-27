@@ -42,15 +42,10 @@ from GUIDefines import *
 
 ###################################################
 OptionsWindow = None
-VideoOptionsWindow = None
-AudioOptionsWindow = None
-GameplayOptionsWindow = None
-FeedbackOptionsWindow = None
-AutopauseOptionsWindow = None
+SubOptionsWindow = None
+SubSubOptionsWindow = None
 LoadMsgWindow = None
 QuitMsgWindow = None
-MoviesWindow = None
-KeysWindow = None
 
 ###################################################
 def OpenOptionsWindow ():
@@ -58,16 +53,6 @@ def OpenOptionsWindow ():
 	global OptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		if VideoOptionsWindow: OpenVideoOptionsWindow ()
-		if AudioOptionsWindow: OpenAudioOptionsWindow ()
-		if GameplayOptionsWindow: OpenGameplayOptionsWindow ()
-		if FeedbackOptionsWindow: OpenFeedbackOptionsWindow ()
-		if AutopauseOptionsWindow: OpenAutopauseOptionsWindow ()
-		if LoadMsgWindow: OpenLoadMsgWindow ()
-		if QuitMsgWindow: OpenQuitMsgWindow ()
-		if KeysWindow: OpenKeysWindow ()
-		if MoviesWindow: OpenMoviesWindow ()
-		
 		GemRB.HideGUI ()
 		if OptionsWindow:
 			OptionsWindow.Unload ()
@@ -133,7 +118,6 @@ def OpenOptionsWindow ():
 	Label = Window.GetControl (0x10000007)
 	Label.SetText (GEMRB_VERSION)
 	
-	#Window.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 
 
@@ -142,22 +126,17 @@ def OpenOptionsWindow ():
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global VideoOptionsWindow, VideoHelpText
+	global SubOptionsWindow, VideoHelpText
 
 	GemRB.HideGUI ()
 
-	if VideoOptionsWindow:
-		if VideoOptionsWindow:
-			VideoOptionsWindow.Unload ()
-		VideoOptionsWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
+	if SubOptionsWindow:
+		CloseSubOptionsWindow ()
 		GemRB.UnhideGUI ()
 		return
 
-	
-	VideoOptionsWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar ("FloatWindow", VideoOptionsWindow.ID)
+	SubOptionsWindow = Window = GemRB.LoadWindow (1)
+	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 
 
 	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', Window, 9, 31052)
@@ -206,15 +185,12 @@ saved_audio_options = {}
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global AudioOptionsWindow, AudioHelpText
+	global SubOptionsWindow, AudioHelpText
 
 	GemRB.HideGUI ()
 
-	if AudioOptionsWindow:
-		if AudioOptionsWindow:
-			AudioOptionsWindow.Unload ()
-		AudioOptionsWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
+	if SubOptionsWindow:
+		CloseSubOptionsWindow ()
 
 		# Restore values in case of cancel
 		if GemRB.GetVar ("Cancel") == 1:
@@ -225,9 +201,8 @@ def OpenAudioOptionsWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	
-	AudioOptionsWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", AudioOptionsWindow.ID)
+	SubOptionsWindow = Window = GemRB.LoadWindow (5)
+	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 	
 
 	# save values, so we can restore them on cancel
@@ -250,7 +225,6 @@ def OpenAudioOptionsWindow ():
 	PSTOptCheckbox ('AudioOptions', 'SoundProcessing', Window, 16, 17, 63242, "Sound Processing")
 	PSTOptCheckbox ('AudioOptions', 'MusicProcessing', Window, 18, 19, 63243, "Music Processing")
 
-	#AudioOptionsWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
@@ -291,25 +265,17 @@ def DisplayHelpMusicProcessing ():
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global GameplayOptionsWindow, GameplayHelpText
+	global SubOptionsWindow, GameplayHelpText
 
 	GemRB.HideGUI ()
 
-	if GameplayOptionsWindow:
-		if FeedbackOptionsWindow: OpenFeedbackOptionsWindow()
-		if AutopauseOptionsWindow: OpenAutopauseOptionsWindow()
-
-		if GameplayOptionsWindow:
-			GameplayOptionsWindow.Unload ()
-		GameplayOptionsWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
+	if SubOptionsWindow:
+		CloseSubOptionsWindow ()
 		GemRB.UnhideGUI ()
 		return
 
-	
-	GameplayOptionsWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("FloatWindow", GameplayOptionsWindow.ID)
+	SubOptionsWindow = Window = GemRB.LoadWindow (6)
+	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 	
 
 	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 12, 31212)
@@ -379,23 +345,17 @@ def DisplayHelpAutopauseOptions ():
 	
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
-	global FeedbackOptionsWindow, FeedbackHelpText
+	global SubSubOptionsWindow, FeedbackHelpText
 	
 	GemRB.HideGUI ()
 
-	if FeedbackOptionsWindow:
-		if FeedbackOptionsWindow:
-			FeedbackOptionsWindow.Unload ()
-		FeedbackOptionsWindow = None
-		GemRB.SetVar ("FloatWindow", GameplayOptionsWindow.ID)
-		
+	if SubSubOptionsWindow:
+		CloseSubSubOptionsWindow ()
 		GemRB.UnhideGUI ()
-		GameplayOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	
-	FeedbackOptionsWindow = Window = GemRB.LoadWindow (8)
-	GemRB.SetVar ("FloatWindow", FeedbackOptionsWindow.ID)
+	SubSubOptionsWindow = Window = GemRB.LoadWindow (8)
+	GemRB.SetVar ("FloatWindow", SubSubOptionsWindow.ID)
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
 
@@ -454,23 +414,18 @@ def DisplayHelpSpellCasting ():
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
-	global AutopauseOptionsWindow, AutopauseHelpText
+	global SubSubOptionsWindow, AutopauseHelpText
 	
 	GemRB.HideGUI ()
 
-	if AutopauseOptionsWindow:
-		if AutopauseOptionsWindow:
-			AutopauseOptionsWindow.Unload ()
-		AutopauseOptionsWindow = None
-		GemRB.SetVar ("FloatWindow", GameplayOptionsWindow.ID)
-		
+	if SubSubOptionsWindow:
+		CloseSubSubOptionsWindow ()
 		GemRB.UnhideGUI ()
-		GameplayOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
 	
-	AutopauseOptionsWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("FloatWindow", AutopauseOptionsWindow.ID)
+	SubSubOptionsWindow = Window = GemRB.LoadWindow (9)
+	GemRB.SetVar ("FloatWindow", SubSubOptionsWindow.ID)
 
 
 	AutopauseHelpText = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 1, 31214)
@@ -657,17 +612,15 @@ KEYS_PAGE_SIZE = 60
 KEYS_PAGE_COUNT = ((len (key_list) - 1) / KEYS_PAGE_SIZE)+ 1
 
 def OpenKeyboardMappingsWindow ():
-	global KeysWindow
+	global SubOptionsWindow
 	global last_key_action
 
 	last_key_action = None
 
 	GemRB.HideGUI()
 
-	if KeysWindow:		
-		if KeysWindow:
-			KeysWindow.Unload ()
-		KeysWindow = None
+	if SubOptionsWindow:
+		CloseSubOptionsWindow ()
 		GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 		
 		GemRB.LoadWindowPack ("GUIOPT")
@@ -675,9 +628,8 @@ def OpenKeyboardMappingsWindow ():
 		return
 		
 	GemRB.LoadWindowPack ("GUIKEYS")
-	KeysWindow = Window = GemRB.LoadWindow (0)
-	GemRB.SetVar ("OtherWindow", KeysWindow.ID)
-
+	SubOptionsWindow = Window = GemRB.LoadWindow (0)
+	GemRB.SetVar ("OtherWindow", SubOptionsWindow.ID)
 
 	# Default
 	Button = Window.GetControl (3)
@@ -698,14 +650,10 @@ def OpenKeyboardMappingsWindow ():
 
 	keys_setup_page (0)
 
-
-	#KeysWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 
-
 def keys_setup_page (pageno):
-	Window = KeysWindow
-
+	Window = SubOptionsWindow
 
 	# Page n of n
 	Label = Window.GetControl (0x10000001)
@@ -714,14 +662,12 @@ def keys_setup_page (pageno):
 	GemRB.SetToken ('NUMPAGES', str (KEYS_PAGE_COUNT))
 	Label.SetText (49053)
 
-
 	for i in range (KEYS_PAGE_SIZE):
 		try:
 			label, key = key_list[pageno * KEYS_PAGE_SIZE + i]
 		except:
 			label = ''
 			key = None
-			
 
 		if key == None:
 			# Section header
@@ -742,14 +688,13 @@ def keys_setup_page (pageno):
 			Label.SetText (label)
 			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, OnActionLabelPress)
 			Label.SetVarAssoc ("KeyAction", i)	
-		
 
 
 last_key_action = None
 def OnActionLabelPress ():
 	global last_key_action
 	
-	Window = KeysWindow
+	Window = SubOptionsWindow
 	i = GemRB.GetVar ("KeyAction")
 
 	if last_key_action != None:
@@ -770,25 +715,19 @@ def OnActionLabelPress ():
 ###################################################
 
 def OpenMoviesWindow ():
-	global MoviesWindow
+	global SubOptionsWindow
 
 	GemRB.HideGUI()
 
-	if MoviesWindow:		
-		if MoviesWindow:
-			MoviesWindow.Unload ()
-		MoviesWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-
+	if SubOptionsWindow:
+		CloseSubOptionsWindow ()
 		GemRB.LoadWindowPack ("GUIOPT")
 		GemRB.UnhideGUI ()
 		return
 		
 	GemRB.LoadWindowPack ("GUIMOVIE")
-	# FIXME: clean the window to black
-	MoviesWindow = Window = GemRB.LoadWindow (0)
-	GemRB.SetVar ("FloatWindow", MoviesWindow.ID)
-
+	SubOptionsWindow = Window = GemRB.LoadWindow (0)
+	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 
 	# Play Movie
 	Button = Window.GetControl (2)
@@ -809,9 +748,6 @@ def OpenMoviesWindow ():
 	List = Window.GetControl (0)
 	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedMovie', -1)
-	
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMoviesWindow)
-
 
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
 
@@ -820,11 +756,8 @@ def OpenMoviesWindow ():
 		desc = MovieTable.GetValue (i, 0)
 		List.Append (desc, i)
 
-
-
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_BLACK)
-
 
 ###################################################
 def OnPlayMoviePress ():
@@ -845,6 +778,27 @@ def OnCreditsPress ():
 	GemRB.PlayMovie ("CREDITS")
 
 ###################################################
+
+def CloseSubOptionsWindow ():
+	global SubOptionsWindow
+
+	if SubOptionsWindow:
+		SubOptionsWindow.Unload ()
+		SubOptionsWindow = None
+	GemRB.SetVar ("FloatWindow", -1)
+	return
+
+def CloseSubSubOptionsWindow ():
+	global SubSubOptionsWindow, SubOptionsWindow
+
+	if SubSubOptionsWindow:
+		SubSubOptionsWindow.Unload ()
+		SubSubOptionsWindow = None
+	if SubOptionsWindow:
+		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
+		GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
+	return
+
 ###################################################
 
 # These functions help to setup controls found
