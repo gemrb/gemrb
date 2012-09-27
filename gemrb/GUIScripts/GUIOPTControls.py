@@ -65,9 +65,7 @@ def OptRadio (action, window, button_id, label_id, variable, value):
 	if GUICommon.GameIsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	label = window.GetControl (label_id)
-	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	label.SetState (IE_GUI_BUTTON_LOCKED)
+	OptBuddyLabel (window, label_id)
 
 	return button
 
@@ -108,9 +106,7 @@ def OptCheckboxCommon (window, button, label_id, variable, value=1):
 	elif GUICommon.GameIsIWD1():
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
 
-	label = window.GetControl (label_id)
-	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	label.SetState (IE_GUI_BUTTON_LOCKED)
+	OptBuddyLabel (window, label_id)
 
 	return button
 
@@ -148,6 +144,16 @@ def OptHelpText (name, window, text_id, text_strref):
 	text = window.GetControl (text_id)
 	text.SetText (text_strref)
 	return text
+
+def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, ctlname = None, winname = None):
+	label = window.GetControl (label_id)
+	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	label.SetState (IE_GUI_BUTTON_LOCKED)
+	if label_strref:
+		label.SetText (label_strref)
+	if help_ta:
+		label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
+		label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
 ###################################################
 # End of file GUIOPTControls.py

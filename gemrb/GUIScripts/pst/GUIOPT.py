@@ -679,12 +679,7 @@ def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_
 	"""Standard slider for option windows"""
 	slider = GUIOPTControls.OptSlider (action, window, slider_id, variable, value)
 	
-	label = window.GetControl (label_id)
-	label.SetText (label_strref)
-	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	label.SetState (IE_GUI_BUTTON_LOCKED)
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
-	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
+	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
 
 	return slider
 
@@ -699,10 +694,7 @@ def PSTOptCheckbox (winname, ctlname, help_ta, window, button_id, label_id, labe
 	if handler:
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
 
-	label = window.GetControl (label_id)
-	label.SetText (label_strref)
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
-	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
+	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
 
 	return button
 
@@ -713,12 +705,7 @@ def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_
 	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
 	button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 
-	label = window.GetControl (label_id)
-	label.SetText (label_strref)
-	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	label.SetState (IE_GUI_BUTTON_LOCKED)
-	label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
-	label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
+	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
 
 ###################################################
 # End of file GUIOPT.py
