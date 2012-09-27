@@ -1,11 +1,17 @@
-GemRB git (0de48ce62):
+GemRB git (ea889eca):
   New features:
     - 
-    - gemrb output can now be shown in the ingame message window (debug(5))
+    - GemRB now asks for confirmation when exiting
+    - output can now be shown in the ingame message window (run debug(5))
+    - ToBEx flags for effect damage: bypass mirror image, ignore difficulty
+    - SDL2 software keyboard
 
   Improved features:
     - 
-    - actions, fonts
+    - custom dialog.tlk encoding support
+    - fonts, effect icons, initials, chapter text
+    - option windows
+    - actions, triggers
     - bugfixes
 
 GemRB V0.7.1 (2012-07-15):
