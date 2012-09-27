@@ -320,39 +320,17 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptDone (OpenAutopauseOptionsWindow, Window, 16)
 	GUIOPTControls.OptCancel (OpenAutopauseOptionsWindow, Window, 17)
 
-	# Set variable for each checkbox according to a particular bit of
-	#   AutoPauseState
-	state = GemRB.GetVar ("Auto Pause State")
-	GemRB.SetVar("AutoPauseState_Unusable", (state & 0x01) != 0 )
-	GemRB.SetVar("AutoPauseState_Attacked", (state & 0x02) != 0 )
-	GemRB.SetVar("AutoPauseState_Hit", (state & 0x04) != 0 )
-	GemRB.SetVar("AutoPauseState_Wounded", (state & 0x08) != 0 )
-	GemRB.SetVar("AutoPauseState_Dead", (state & 0x10) != 0 )
-	GemRB.SetVar("AutoPauseState_NoTarget", (state & 0x20) != 0 )
-	GemRB.SetVar("AutoPauseState_EndRound", (state & 0x40) != 0 )
-	
-
-	PSTOptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "AutoPauseState_Hit", OnAutoPauseClicked)
-	PSTOptCheckbox (31214, 37689, AutopauseHelpText, Window, 3, 10, 37681, "AutoPauseState_Wounded", OnAutoPauseClicked)
-	PSTOptCheckbox (31214, 37690, AutopauseHelpText, Window, 4, 11, 37682, "AutoPauseState_Dead", OnAutoPauseClicked)
-	PSTOptCheckbox (31214, 37691, AutopauseHelpText, Window, 5, 12, 37683, "AutoPauseState_Attacked", OnAutoPauseClicked)
-	PSTOptCheckbox (31214, 37692, AutopauseHelpText, Window, 6, 13, 37684, "AutoPauseState_Unusable", OnAutoPauseClicked)
-	PSTOptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "AutoPauseState_NoTarget", OnAutoPauseClicked)
-	PSTOptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "AutoPauseState_EndRound", OnAutoPauseClicked)
+	# checkboxes OR the values if they associate to the same variable
+	PSTOptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "Auto Pause State", None, 4)
+	PSTOptCheckbox (31214, 37689, AutopauseHelpText, Window, 3, 10, 37681, "Auto Pause State", None, 8)
+	PSTOptCheckbox (31214, 37690, AutopauseHelpText, Window, 4, 11, 37682, "Auto Pause State", None, 16)
+	PSTOptCheckbox (31214, 37691, AutopauseHelpText, Window, 5, 12, 37683, "Auto Pause State", None, 2)
+	PSTOptCheckbox (31214, 37692, AutopauseHelpText, Window, 6, 13, 37684, "Auto Pause State", None, 1)
+	PSTOptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "Auto Pause State", None, 32)
+	PSTOptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "Auto Pause State", None, 64)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-def OnAutoPauseClicked ():
-	state = (0x01 * GemRB.GetVar("AutoPauseState_Unusable") +
-		 0x02 * GemRB.GetVar("AutoPauseState_Attacked") + 
-		 0x04 * GemRB.GetVar("AutoPauseState_Hit") +
-		 0x08 * GemRB.GetVar("AutoPauseState_Wounded") +
-		 0x10 * GemRB.GetVar("AutoPauseState_Dead") +
-		 0x20 * GemRB.GetVar("AutoPauseState_NoTarget") +
-		 0x40 * GemRB.GetVar("AutoPauseState_EndRound"))
-
-	GemRB.SetVar("Auto Pause State", state)
 
 ###################################################
 ###################################################
@@ -679,10 +657,10 @@ def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_
 
 	return slider
 
-def PSTOptCheckbox (winname, ctlname, help_ta, window, button_id, label_id, label_strref, assoc_var = None, handler = None):
+def PSTOptCheckbox (winname, ctlname, help_ta, window, button_id, label_id, label_strref, assoc_var = None, handler = None, value = 1):
 	"""Standard checkbox for option windows"""
 
-	button = GUIOPTControls.OptCheckboxNoCallback (ctlname, help_ta, window, button_id, label_id, assoc_var)
+	button = GUIOPTControls.OptCheckboxNoCallback (ctlname, help_ta, window, button_id, label_id, assoc_var, value)
 	# this is commented out since it causes glitches with toggling the button
 	#button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
 

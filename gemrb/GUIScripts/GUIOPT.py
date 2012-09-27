@@ -439,6 +439,7 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
 	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
 
+	# checkboxes OR the values if they associate to the same variable
 	GUIOPTControls.OptCheckboxNoCallback (18032, HelpTextArea2, Window, 1, 17, 'Auto Pause State', 1)
 	GUIOPTControls.OptCheckboxNoCallback (18033, HelpTextArea2, Window, 2, 18, 'Auto Pause State', 2)
 	GUIOPTControls.OptCheckboxNoCallback (18034, HelpTextArea2, Window, 3, 19, 'Auto Pause State', 4)
