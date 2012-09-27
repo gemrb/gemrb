@@ -6083,6 +6083,9 @@ void Actor::UpdateActorState(ieDword gameTime) {
 				// TODO: wait for a round until allowing new states?
 			}
 		}
+
+		// shut everyone up, so they don't whine if the actor is on a long hiding-in-shadows recon mission
+		core->GetGame()->ResetPartyCommentTimes();
 	}
 
 }
