@@ -91,7 +91,8 @@ def OptCheckboxNoCallback (strref, help_ta, window, button_id, label_id, variabl
 	OptCheckboxCommon (window, button, label_id, variable, value)
 
 	# create an anonymous callback, so we don't need to create a separate function for each string
-	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda s=strref, ta=help_ta: ta.SetText (s))
+	# NOTE: IE_GUI_MOUSE_ENTER_BUTTON would be more UX-sensible, but interferes with toggling
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda s=strref, ta=help_ta: ta.SetText (s))
 
 	return button
 
