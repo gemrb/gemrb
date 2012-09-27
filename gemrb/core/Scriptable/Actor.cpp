@@ -8565,7 +8565,7 @@ void Actor::ResetCommentTime()
 // FIXME: the penalites are too high, the items use a different value!
 int Actor::GetArmorFailure() const
 {
-	if (!core->HasFeature(GF_3ED_RULES)) return 0;
+	if (!third) return 0;
 
 	ieWord armorType = inventory.GetArmorItemType();
 	int penalty = core->GetArmorFailure(armorType);
