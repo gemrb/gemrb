@@ -364,6 +364,18 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			yOffset = ((h - backBuf->h) / 2) * -1;
 		}
 #endif
+		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId == 0) {
+			// this is a rare case where multiple fingers touch simultaniously (within the same tick)
+			// TODO: this is probably simulator only. if so lets ifdef it for the simulator
+
+			firstFingerDown.timestamp = GetTickCount();
+			firstFingerDown.x = (state->fingers[0]->x / xScaleFactor) + xOffset;
+			firstFingerDown.y = (state->fingers[0]->y / yScaleFactor) + yOffset;
+			firstFingerDown.dx = state->fingers[0]->xdelta / xScaleFactor;
+			firstFingerDown.dy = state->fingers[0]->ydelta / yScaleFactor;
+			firstFingerDown.fingerId = state->fingers[0]->id;
+			firstFingerDown.pressure = state->fingers[0]->pressure;
+		}
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
