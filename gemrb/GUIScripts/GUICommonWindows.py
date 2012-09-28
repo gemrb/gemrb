@@ -1091,10 +1091,15 @@ def OpenPortraitWindow (needcontrols=0):
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		if GUICommon.GameIsIWD1():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 			Button.SetFont ("STATES")
+			# label for status flags (dialog, store, level up)
+			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
 		else:
 			Button.SetFont ("STATES2")
+			# label for status flags (dialog, store, level up)
+			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
+
 		Button.SetVarAssoc ("PressedPortrait", i+1)
 
 		if needcontrols or GUICommon.GameIsIWD2():
@@ -1109,12 +1114,6 @@ def OpenPortraitWindow (needcontrols=0):
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
-
-		# label for status flags (dialog, store, level up)
-		if GUICommon.GameIsIWD1():
-			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP)
-		else:
-			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP)
 
 		Label = Window.GetControl(200 + i)
 		if GUICommon.GameIsIWD1():
@@ -1177,21 +1176,13 @@ def UpdatePortraitWindow ():
 		ratio_str, color = GUICommon.SetupDamageInfo (portid+1, Button, Window)
 
 		# character - 1 == bam cycle
-		# blank space
+		talk = store = flag = blank = ""
 		if GUICommon.GameIsBG2():
+			# as far as I can tell only BG2 has icons for talk or store
 			flag = blank = chr(238)
-			talk = 154
-			store = 155
-		elif GUICommon.GameIsIWD2():
-			talk = store = flag = blank = ""
-		else:
-			# iwd is missing all of these, including the blank (didn't display a talking icon though)
-			# TODO: add another string tag to make glyphs 100% transparent?
-			flag = blank = chr(33)
-			talk = store = 37
+			talk = 154 # dialog icon
+			store = 155 # shopping icon
 
-		if not GUICommon.GameIsIWD1():
-			# shopping icon
 			if pc==portid+1:
 				if GemRB.GetStore()!=None:
 					flag = chr(store)
