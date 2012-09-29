@@ -3149,6 +3149,9 @@ void Actor::ReactToDeath(const char * deadname)
 			break;
 		}
 	}
+
+	// take a hit on morale
+	NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 }
 
 //issue area specific comments
