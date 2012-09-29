@@ -2135,8 +2135,7 @@ bool Interface::LoadConfig(void)
 	}
 
 	strcpy( name, s );
-	//if (!name[0])		// FIXME: could this happen?
-	//	strcpy (name, PACKAGE); // ugly hack
+	assert(name[0]);
 
 	// If we were called as $0 -c <filename>, load config from filename
 	if (argc > 2 && ! strcmp("-c", argv[1])) {
