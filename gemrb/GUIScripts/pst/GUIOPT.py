@@ -144,8 +144,8 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (OpenVideoOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (OpenVideoOptionsWindow, Window, 8)
 
-	PSTOptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
-	PSTOptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
+	GUIOPTControls.OptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", lambda: GammaFeedback(31431))
+	GUIOPTControls.OptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", lambda: GammaFeedback(31459))
 
 	GUIOPTControls.OptCheckbox (31052, 31221, VideoHelpText, Window, 6, 15, 30898, "SoftBlt")
 	GUIOPTControls.OptCheckbox (31052, 31216, VideoHelpText, Window, 4, 13, 30896, "SoftMirrorBlt")
@@ -155,7 +155,8 @@ def OpenVideoOptionsWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 	
-def GammaFeedback ():
+def GammaFeedback (feedback_ref):
+	VideoHelpText.SetText (feedback_ref)
 	GemRB.SetGamma (GemRB.GetVar("Brightness Correction")/5,GemRB.GetVar("Gamma Correction")/20)
 	return
 
@@ -176,7 +177,7 @@ def OpenAudioOptionsWindow ():
 		if GemRB.GetVar ("Cancel") == 1:
 			for k, v in saved_audio_options.items ():
 				GemRB.SetVar (k, v)
-			UpdateVolume ()
+			UpdateVolume (31210)
 		
 		GemRB.UnhideGUI ()
 		return
@@ -195,11 +196,11 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptDone (OpenAudioOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (OpenAudioOptionsWindow, Window, 8)
 
-	PSTOptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", UpdateVolume)
-	PSTOptSlider (31210, 31228, AudioHelpText, Window, 2, 11, 31466, "Volume SFX", UpdateVolume)
-	PSTOptSlider (31210, 31226, AudioHelpText, Window, 3, 12, 31467, "Volume Voices", UpdateVolume)
-	PSTOptSlider (31210, 31225, AudioHelpText, Window, 4, 13, 31468, "Volume Music", UpdateVolume)
-	PSTOptSlider (31210, 31229, AudioHelpText, Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
+	GUIOPTControls.OptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", lambda: UpdateVolume(31227))
+	GUIOPTControls.OptSlider (31210, 31228, AudioHelpText, Window, 2, 11, 31466, "Volume SFX", lambda: UpdateVolume(31228))
+	GUIOPTControls.OptSlider (31210, 31226, AudioHelpText, Window, 3, 12, 31467, "Volume Voices", lambda: UpdateVolume(31226))
+	GUIOPTControls.OptSlider (31210, 31225, AudioHelpText, Window, 4, 13, 31468, "Volume Music", lambda: UpdateVolume(31225))
+	GUIOPTControls.OptSlider (31210, 31229, AudioHelpText, Window, 5, 14, 31469, "Volume Movie", lambda: UpdateVolume(31229))
 	
 	GUIOPTControls.OptCheckbox (31210, 31224, AudioHelpText, Window, 6, 15, 30900, "Environmental Audio")
 	GUIOPTControls.OptCheckbox (31210, 63244, AudioHelpText, Window, 16, 17, 63242, "Sound Processing")
@@ -208,7 +209,8 @@ def OpenAudioOptionsWindow ():
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
-def UpdateVolume ():
+def UpdateVolume (volume_ref):
+	AudioHelpText.SetText (volume_ref)
 	GemRB.UpdateAmbientsVolume ()
 	GemRB.UpdateMusicVolume ()
 
@@ -234,10 +236,10 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptDone (OpenGameplayOptionsWindow, Window, 10)
 	GUIOPTControls.OptCancel (OpenGameplayOptionsWindow, Window, 11)
 
-	PSTOptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
-	PSTOptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
-	PSTOptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed")
-	PSTOptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
+	GUIOPTControls.OptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
+	GUIOPTControls.OptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
+	GUIOPTControls.OptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed")
+	GUIOPTControls.OptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
 
 	GUIOPTControls.OptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
 	GUIOPTControls.OptCheckbox (31212, 31223, GameplayHelpText, Window, 6, 18, 31218, "Gore")
@@ -251,9 +253,11 @@ def OpenGameplayOptionsWindow ():
 	return
 
 def UpdateTooltips ():
+	GameplayHelpText.SetText (31232)
 	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
 
 def UpdateMouseSpeed ():
+	GameplayHelpText.SetText (31230)
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
 
 ###################################################
@@ -279,10 +283,10 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptDone (OpenFeedbackOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (OpenFeedbackOptionsWindow, Window, 8)
 
-	PSTOptSlider (31213, 37411, FeedbackHelpText, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
-	PSTOptSlider (31213, 37447, FeedbackHelpText, Window, 2, 11, 37586, "Locator Feedback Level")
-	PSTOptSlider (31213, 54878, FeedbackHelpText, Window, 20, 21, 54879, "Selection Sounds Frequency")
-	PSTOptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
+	GUIOPTControls.OptSlider (31213, 37411, FeedbackHelpText, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
+	GUIOPTControls.OptSlider (31213, 37447, FeedbackHelpText, Window, 2, 11, 37586, "Locator Feedback Level")
+	GUIOPTControls.OptSlider (31213, 54878, FeedbackHelpText, Window, 20, 21, 54879, "Selection Sounds Frequency")
+	GUIOPTControls.OptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
 
 	# TODO: once the pst overhead messaging system is in place, add the relevant game vars below
 	GUIOPTControls.OptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, "")
@@ -639,23 +643,6 @@ def CloseSubSubOptionsWindow ():
 		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 		GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 	return
-
-###################################################
-
-# These functions help to setup controls found
-#   in Video, Audio, Gameplay, Feedback and Autopause
-#   options windows
-
-# These controls are usually made from an active
-#   control (button, slider ...) and a label
-
-def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
-	"""Standard slider for option windows"""
-	slider = GUIOPTControls.OptSlider (action, window, slider_id, variable, value)
-	
-	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
-
-	return slider
 
 def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):
 	"""Standard subwindow button for option windows"""

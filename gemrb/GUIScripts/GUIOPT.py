@@ -194,8 +194,8 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (CloseVideoOptionsWindow, Window, 21)
 	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, Window, 32)
 
-	GUIOPTControls.OptSlider (DisplayHelpBrightness, Window, 3, 'Brightness Correction', 4)
-	GUIOPTControls.OptSlider (DisplayHelpContrast, Window, 22, 'Gamma Correction', 1)
+	GUIOPTControls.OptSlider (18038, 17203, HelpTextArea, Window, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
+	GUIOPTControls.OptSlider (18038, 17204, HelpTextArea, Window, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
 
 	GUIOPTControls.OptRadio (DisplayHelpBPP, Window, 5, 37, 'BitsPerPixel', 16)
 	GUIOPTControls.OptRadio (DisplayHelpBPP, Window, 6, 37, 'BitsPerPixel', 24)
@@ -258,11 +258,11 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptCancel (CloseAudioOptionsWindow, Window, 25)
 	GUIOPTControls.OptButton (OpenCharacterSoundsWindow, Window, 13, 17778)
 
-	GUIOPTControls.OptSlider (DisplayHelpAmbientVolume, Window, 1, 'Volume Ambients', 10)
-	GUIOPTControls.OptSliderNoCallback (18009, HelpTextArea, Window, 2, 'Volume SFX', 10)
-	GUIOPTControls.OptSliderNoCallback (18010, HelpTextArea, Window, 3, 'Volume Voices', 10)
-	GUIOPTControls.OptSlider (DisplayHelpMusicVolume, Window, 4, 'Volume Music', 10)
-	GUIOPTControls.OptSliderNoCallback (18012, HelpTextArea, Window, 22, 'Volume Movie', 10)
+	GUIOPTControls.OptSlider (18040, 18008, HelpTextArea, Window, 1, 16, 16514, 'Volume Ambients', DisplayHelpAmbientVolume, 10)
+	GUIOPTControls.OptSlider (18040, 18009, HelpTextArea, Window, 2, 17, 16515, 'Volume SFX', None, 10)
+	GUIOPTControls.OptSlider (18040, 18010, HelpTextArea, Window, 3, 18, 16512, 'Volume Voices', None, 10)
+	GUIOPTControls.OptSlider (18040, 18011, HelpTextArea, Window, 4, 19, 16511, 'Volume Music', DisplayHelpMusicVolume, 10)
+	GUIOPTControls.OptSlider (18040, 18012, HelpTextArea, Window, 22, 20, 16546, 'Volume Movie', None, 10)
 
 	GUIOPTControls.OptCheckbox (18040, 18022, HelpTextArea, Window, 26, 28, 20689, 'Environmental Audio')
 
@@ -342,10 +342,10 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptDone (CloseGameplayOptionsWindow, Window, 7)
 	GUIOPTControls.OptCancel (CloseGameplayOptionsWindow, Window, 20)
 
-	GUIOPTControls.OptSlider (DisplayHelpTooltipDelay, Window, 1, 'Tooltips', TOOLTIP_DELAY_FACTOR)
-	GUIOPTControls.OptSlider (DisplayHelpMouseScrollingSpeed, Window, 2, 'Mouse Scroll Speed', 5)
-	GUIOPTControls.OptSliderNoCallback (18019, HelpTextArea, Window, 3, 'Keyboard Scroll Speed', 5)
-	GUIOPTControls.OptSliderNoCallback (18020, HelpTextArea, Window, 12, 'Difficulty Level', 0)
+	GUIOPTControls.OptSlider (18042, 18017, HelpTextArea, Window, 1, 21, 17143, 'Tooltips', DisplayHelpTooltipDelay, TOOLTIP_DELAY_FACTOR)
+	GUIOPTControls.OptSlider (18042, 18018, HelpTextArea, Window, 2, 22, 17144, 'Mouse Scroll Speed', DisplayHelpMouseScrollingSpeed, 5)
+	GUIOPTControls.OptSlider (18042, 18019, HelpTextArea, Window, 3, 23, 17145, 'Keyboard Scroll Speed', None, 5)
+	GUIOPTControls.OptSlider (18042, 18020, HelpTextArea, Window, 12, 24, 13911, 'Difficulty Level', None, 0)
 
 	GUIOPTControls.OptCheckbox (18042, 18021, HelpTextArea, Window, 14, 25, 13697, 'Always Dither')
 	GUIOPTControls.OptCheckbox (18042, 18023, HelpTextArea, Window, 19, 27, 17182, 'Gore')
@@ -397,8 +397,8 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptDone (CloseFeedbackOptionsWindow, Window, 26)
 	GUIOPTControls.OptCancel (CloseFeedbackOptionsWindow, Window, 27)
 
-	GUIOPTControls.OptSlider (DisplayHelpMarkerFeedback, Window, 8, 'Circle Feedback', 1)
-	GUIOPTControls.OptSliderNoCallback (18025, HelpTextArea2, Window, 9, 'Locator Feedback Level', 1)
+	GUIOPTControls.OptSlider (18043, 18024, HelpTextArea2, Window, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
+	GUIOPTControls.OptSlider (18043, 18025, HelpTextArea2, Window, 9, 31, 17769, 'Locator Feedback Level')
 
 	GUIOPTControls.OptCheckbox (18043, 18026, HelpTextArea2, Window, 10, 32, 17149, 'Rolls')
 	GUIOPTControls.OptCheckbox (18043, 18027, HelpTextArea2, Window, 11, 33, 17150, 'Combat Info')
