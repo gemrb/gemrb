@@ -201,12 +201,12 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptRadio (DisplayHelpBPP, Window, 6, 37, 'BitsPerPixel', 24)
 	GUIOPTControls.OptRadio (DisplayHelpBPP, Window, 7, 37, 'BitsPerPixel', 32)
 
-	GUIOPTControls.OptCheckbox (DisplayHelpFullScreen, Window, 9, 38, 'Full Screen', 1)
+	GUIOPTControls.OptCheckbox (18038, 18000, HelpTextArea, Window, 9, 38, 17131, 'Full Screen', DisplayHelpFullScreen)
 
-	GUIOPTControls.OptCheckboxNoCallback (20620, HelpTextArea, Window, 51, 50, 'Translucent Shadows')
-	GUIOPTControls.OptCheckboxNoCallback (18004, HelpTextArea, Window, 40, 44, 'SoftMirrorBlt')
-	GUIOPTControls.OptCheckboxNoCallback (18006, HelpTextArea, Window, 41, 46, 'SoftSrcKeyBlt')
-	GUIOPTControls.OptCheckboxNoCallback (18007, HelpTextArea, Window, 42, 48, 'SoftBltFast')
+	GUIOPTControls.OptCheckbox (18038, 20620, HelpTextArea, Window, 51, 50, 20617, 'Translucent Shadows')
+	GUIOPTControls.OptCheckbox (18038, 18004, HelpTextArea, Window, 40, 44, 17134, 'SoftMirrorBlt')
+	GUIOPTControls.OptCheckbox (18038, 18006, HelpTextArea, Window, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
+	GUIOPTControls.OptCheckbox (18038, 18007, HelpTextArea, Window, 42, 48, 17135, 'SoftBltFast') # software transparent blit
 
 	SubOptionsWindow = Window
 
@@ -264,7 +264,7 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptSlider (DisplayHelpMusicVolume, Window, 4, 'Volume Music', 10)
 	GUIOPTControls.OptSliderNoCallback (18012, HelpTextArea, Window, 22, 'Volume Movie', 10)
 
-	GUIOPTControls.OptCheckboxNoCallback (18022, HelpTextArea, Window, 26, 28, 'Environmental Audio')
+	GUIOPTControls.OptCheckbox (18040, 18022, HelpTextArea, Window, 26, 28, 20689, 'Environmental Audio')
 
 	SubOptionsWindow = Window
 
@@ -298,9 +298,9 @@ def OpenCharacterSoundsWindow ():
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
 	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
 
-	GUIOPTControls.OptCheckboxNoCallback (18015, HelpTextArea2, Window, 5, 20, 'Subtitles')
-	GUIOPTControls.OptCheckboxNoCallback (18013, HelpTextArea2, Window, 6, 18, 'Attack Sound')
-	GUIOPTControls.OptCheckboxNoCallback (18014, HelpTextArea2, Window, 7, 19, 'Footsteps')
+	GUIOPTControls.OptCheckbox (18041, 18015, HelpTextArea2, Window, 5, 20, 17138, 'Subtitles')
+	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sound')
+	GUIOPTControls.OptCheckbox (18041, 18014, HelpTextArea2, Window, 7, 19, 17140, 'Footsteps')
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 2)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 1)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 10, 21, 'Command Sounds Frequency', 0)
@@ -347,14 +347,14 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptSliderNoCallback (18019, HelpTextArea, Window, 3, 'Keyboard Scroll Speed', 5)
 	GUIOPTControls.OptSliderNoCallback (18020, HelpTextArea, Window, 12, 'Difficulty Level', 0)
 
-	GUIOPTControls.OptCheckboxNoCallback (18021, HelpTextArea, Window, 14, 25, 'Always Dither')
-	GUIOPTControls.OptCheckboxNoCallback (18023, HelpTextArea, Window, 19, 27, 'Gore')
-	GUIOPTControls.OptCheckboxNoCallback (11797, HelpTextArea, Window, 42, 44, 'Infravision')
-	GUIOPTControls.OptCheckboxNoCallback (20619, HelpTextArea, Window, 47, 46, 'Weather')
+	GUIOPTControls.OptCheckbox (18042, 18021, HelpTextArea, Window, 14, 25, 13697, 'Always Dither')
+	GUIOPTControls.OptCheckbox (18042, 18023, HelpTextArea, Window, 19, 27, 17182, 'Gore')
+	GUIOPTControls.OptCheckbox (18042, 11797, HelpTextArea, Window, 42, 44, 11795, 'Infravision')
+	GUIOPTControls.OptCheckbox (18042, 20619, HelpTextArea, Window, 47, 46, 20618, 'Weather')
 	if GUICommon.GameIsBG2():
-		GUIOPTControls.OptCheckboxNoCallback (2242, HelpTextArea, Window, 50, 48, 'Heal Party on Rest')
+		GUIOPTControls.OptCheckbox (18042, 2242, HelpTextArea, Window, 50, 48, 2241, 'Heal Party on Rest')
 	elif GUICommon.GameIsIWD2():
-		GUIOPTControls.OptCheckboxNoCallback (15136, HelpTextArea, Window, 50, 49, 'Maximum HP')
+		GUIOPTControls.OptCheckbox (18042, 15136, HelpTextArea, Window, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, Window, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, Window, 6, 17166)
@@ -400,12 +400,12 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptSlider (DisplayHelpMarkerFeedback, Window, 8, 'Circle Feedback', 1)
 	GUIOPTControls.OptSliderNoCallback (18025, HelpTextArea2, Window, 9, 'Locator Feedback Level', 1)
 
-	GUIOPTControls.OptCheckboxNoCallback (18026, HelpTextArea2, Window, 10, 32, 'Rolls')
-	GUIOPTControls.OptCheckboxNoCallback (18027, HelpTextArea2, Window, 11, 33, 'Combat Info')
-	GUIOPTControls.OptCheckboxNoCallback (18028, HelpTextArea2, Window, 12, 34, 'Actions')
-	GUIOPTControls.OptCheckboxNoCallback (18029, HelpTextArea2, Window, 13, 35, 'State Changes')
-	GUIOPTControls.OptCheckboxNoCallback (18030, HelpTextArea2, Window, 14, 36, 'Selection Text')
-	GUIOPTControls.OptCheckboxNoCallback (18031, HelpTextArea2, Window, 15, 37, 'Miscellaneous Text')
+	GUIOPTControls.OptCheckbox (18043, 18026, HelpTextArea2, Window, 10, 32, 17149, 'Rolls')
+	GUIOPTControls.OptCheckbox (18043, 18027, HelpTextArea2, Window, 11, 33, 17150, 'Combat Info')
+	GUIOPTControls.OptCheckbox (18043, 18028, HelpTextArea2, Window, 12, 34, 17151, 'Actions')
+	GUIOPTControls.OptCheckbox (18043, 18029, HelpTextArea2, Window, 13, 35, 17152, 'State Changes')
+	GUIOPTControls.OptCheckbox (18043, 18030, HelpTextArea2, Window, 14, 36, 17181, 'Selection Text')
+	GUIOPTControls.OptCheckbox (18043, 18031, HelpTextArea2, Window, 15, 37, 17153, 'Miscellaneous Text')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
@@ -440,24 +440,24 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
 
 	# checkboxes OR the values if they associate to the same variable
-	GUIOPTControls.OptCheckboxNoCallback (18032, HelpTextArea2, Window, 1, 17, 'Auto Pause State', 1)
-	GUIOPTControls.OptCheckboxNoCallback (18033, HelpTextArea2, Window, 2, 18, 'Auto Pause State', 2)
-	GUIOPTControls.OptCheckboxNoCallback (18034, HelpTextArea2, Window, 3, 19, 'Auto Pause State', 4)
-	GUIOPTControls.OptCheckboxNoCallback (18035, HelpTextArea2, Window, 4, 20, 'Auto Pause State', 8)
-	GUIOPTControls.OptCheckboxNoCallback (18036, HelpTextArea2, Window, 5, 21, 'Auto Pause State', 16)
-	GUIOPTControls.OptCheckboxNoCallback (18037, HelpTextArea2, Window, 13, 22, 'Auto Pause State', 32)
-	GUIOPTControls.OptCheckboxNoCallback (10640, HelpTextArea2, Window, 25, 24, 'Auto Pause State', 64)
+	GUIOPTControls.OptCheckbox (18044, 18032, HelpTextArea2, Window, 1, 17, 17159, 'Auto Pause State', None, 1) # weapon unusable
+	GUIOPTControls.OptCheckbox (18044, 18033, HelpTextArea2, Window, 2, 18, 17158, 'Auto Pause State', None, 2) # attacked
+	GUIOPTControls.OptCheckbox (18044, 18034, HelpTextArea2, Window, 3, 19, 17155, 'Auto Pause State', None, 4) # hit
+	GUIOPTControls.OptCheckbox (18044, 18035, HelpTextArea2, Window, 4, 20, 17156, 'Auto Pause State', None, 8) # wounded
+	GUIOPTControls.OptCheckbox (18044, 18036, HelpTextArea2, Window, 5, 21, 17157, 'Auto Pause State', None, 16) # dead
+	GUIOPTControls.OptCheckbox (18044, 18037, HelpTextArea2, Window, 13, 22, 17160, 'Auto Pause State', None, 32) # target gone
+	GUIOPTControls.OptCheckbox (18044, 10640, HelpTextArea2, Window, 25, 24, 10639, 'Auto Pause State', None, 64) # end of round
 	if GUICommon.GameIsIWD2():
-		GUIOPTControls.OptCheckboxNoCallback (23514, HelpTextArea2, Window, 30, 31, 'Auto Pause State', 128)
-		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 256)
-		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 33, 34, 'Auto Pause Center', 1)
-		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 26, 28, 'Auto Pause State', 512)
+		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 30, 31, 23516, 'Auto Pause State', None, 128) # enemy sighted
+		GUIOPTControls.OptCheckbox (18044, 18560, HelpTextArea2, Window, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
+		GUIOPTControls.OptCheckbox (18044, 26311, HelpTextArea2, Window, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
+		GUIOPTControls.OptCheckbox (18044, 24888, HelpTextArea2, Window, 33, 34, 10574, 'Auto Pause Center', None, 1)
 	elif not GUICommon.GameIsIWD1():
-		GUIOPTControls.OptCheckboxNoCallback (23514, HelpTextArea2, Window, 26, 27, 'Auto Pause State', 128)
+		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
 	if GUICommon.GameIsBG2():
-		GUIOPTControls.OptCheckboxNoCallback (31872, HelpTextArea2, Window, 31, 33, 'Auto Pause State', 256)
-		GUIOPTControls.OptCheckboxNoCallback (10571, HelpTextArea2, Window, 37, 36, 'Auto Pause Center', 1)
-		GUIOPTControls.OptCheckboxNoCallback (58171, HelpTextArea2, Window, 34, 30, 'Auto Pause State', 512)
+		GUIOPTControls.OptCheckbox (18044, 31872, HelpTextArea2, Window, 31, 33, 57354, 'Auto Pause State', None, 256) # trap found
+		GUIOPTControls.OptCheckbox (18044, 58171, HelpTextArea2, Window, 34, 30, 31875, 'Auto Pause State', None, 512) # spell cast
+		GUIOPTControls.OptCheckbox (18044, 10571, HelpTextArea2, Window, 37, 36, 10574, 'Auto Pause Center', None, 1)
 
 	SubSubOptionsWindow = Window
 

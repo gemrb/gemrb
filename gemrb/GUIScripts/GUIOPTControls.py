@@ -69,34 +69,11 @@ def OptRadio (action, window, button_id, label_id, variable, value):
 
 	return button
 
-def OptCheckbox (action, window, button_id, label_id, variable, value):
+# NOTE: make sure handler users also set the strref in them!
+def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_strref, variable, handler=None, value=1):
 	"""Standard checkbox for option windows"""
 
 	button = window.GetControl (button_id)
-	OptCheckboxCommon (window, button, label_id, variable, value)
-
-	if GUICommon.GameIsPST():
-		button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, action)
-	else:
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-
-	return button
-
-def OptCheckboxNoCallback (strref, help_ta, window, button_id, label_id, variable, value=1):
-	"""Standard checkbox for option windows, but without a custom callback"""
-
-	button = window.GetControl (button_id)
-	OptCheckboxCommon (window, button, label_id, variable, value)
-
-	# create an anonymous callback, so we don't need to create a separate function for each string
-	# NOTE: IE_GUI_MOUSE_ENTER_BUTTON would be more UX-sensible, but interferes with toggling
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda s=strref, ta=help_ta: ta.SetText (s))
-
-	return button
-
-def OptCheckboxCommon (window, button, label_id, variable, value=1):
-	"""Common checkbox routine calls"""
-
 	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	if variable:
 		button.SetVarAssoc (variable, value)
@@ -106,7 +83,14 @@ def OptCheckboxCommon (window, button, label_id, variable, value=1):
 	elif GUICommon.GameIsIWD1():
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
 
-	OptBuddyLabel (window, label_id)
+	if handler:
+		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
+	else:
+		# create an anonymous callback, so we don't need to create a separate function for each string
+		# FIXME: IE_GUI_MOUSE_ENTER_BUTTON would be more UX-sensible, but interferes with toggling
+		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda s=ctlhelp, ta=help_ta: ta.SetText (s))
+
+	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
 
 	return button
 
@@ -149,7 +133,7 @@ def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, ctlnam
 	label = window.GetControl (label_id)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
-	if label_strref:
+	if label_strref and GUICommon.GameIsPST():
 		label.SetText (label_strref)
 	if help_ta:
 		label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))

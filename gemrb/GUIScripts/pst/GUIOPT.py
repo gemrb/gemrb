@@ -147,9 +147,9 @@ def OpenVideoOptionsWindow ():
 	PSTOptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", GammaFeedback, 1)
 	PSTOptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", GammaFeedback, 1)
 
-	PSTOptCheckbox (31052, 31221, VideoHelpText, Window, 6, 15, 30898, "SoftBlt")
-	PSTOptCheckbox (31052, 31216, VideoHelpText, Window, 4, 13, 30896, "SoftMirrorBlt")
-	PSTOptCheckbox (31052, 31220, VideoHelpText, Window, 5, 14, 30897, "SoftSrcKeyBlt")
+	GUIOPTControls.OptCheckbox (31052, 31221, VideoHelpText, Window, 6, 15, 30898, "SoftBlt")
+	GUIOPTControls.OptCheckbox (31052, 31216, VideoHelpText, Window, 4, 13, 30896, "SoftMirrorBlt")
+	GUIOPTControls.OptCheckbox (31052, 31220, VideoHelpText, Window, 5, 14, 30897, "SoftSrcKeyBlt")
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -201,9 +201,9 @@ def OpenAudioOptionsWindow ():
 	PSTOptSlider (31210, 31225, AudioHelpText, Window, 4, 13, 31468, "Volume Music", UpdateVolume)
 	PSTOptSlider (31210, 31229, AudioHelpText, Window, 5, 14, 31469, "Volume Movie", UpdateVolume)
 	
-	PSTOptCheckbox (31210, 31224, AudioHelpText, Window, 6, 15, 30900, "Environmental Audio")
-	PSTOptCheckbox (31210, 63244, AudioHelpText, Window, 16, 17, 63242, "Sound Processing")
-	PSTOptCheckbox (31210, 63247, AudioHelpText, Window, 18, 19, 63243, "Music Processing")
+	GUIOPTControls.OptCheckbox (31210, 31224, AudioHelpText, Window, 6, 15, 30900, "Environmental Audio")
+	GUIOPTControls.OptCheckbox (31210, 63244, AudioHelpText, Window, 16, 17, 63242, "Sound Processing")
+	GUIOPTControls.OptCheckbox (31210, 63247, AudioHelpText, Window, 18, 19, 63243, "Music Processing")
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -239,9 +239,9 @@ def OpenGameplayOptionsWindow ():
 	PSTOptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed")
 	PSTOptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
 
-	PSTOptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
-	PSTOptCheckbox (31212, 31223, GameplayHelpText, Window, 6, 18, 31218, "Gore")
-	PSTOptCheckbox (31212, 62419, GameplayHelpText, Window, 22, 23, 62418, "Always Run")
+	GUIOPTControls.OptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
+	GUIOPTControls.OptCheckbox (31212, 31223, GameplayHelpText, Window, 6, 18, 31218, "Gore")
+	GUIOPTControls.OptCheckbox (31212, 62419, GameplayHelpText, Window, 22, 23, 62418, "Always Run")
 
 	PSTOptButton (31212, 31213, GameplayHelpText, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
 	PSTOptButton (31212, 31214, GameplayHelpText, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
@@ -285,11 +285,11 @@ def OpenFeedbackOptionsWindow ():
 	PSTOptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
 
 	# TODO: once the pst overhead messaging system is in place, add the relevant game vars below
-	PSTOptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, "")
-	PSTOptCheckbox (31213, 37462, FeedbackHelpText, Window, 17, 19, 37596, "")
-	PSTOptCheckbox (31213, 37453, FeedbackHelpText, Window, 3, 12, 37588, "")
-	PSTOptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, "")
-	PSTOptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, "")
+	GUIOPTControls.OptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, "")
+	GUIOPTControls.OptCheckbox (31213, 37462, FeedbackHelpText, Window, 17, 19, 37596, "")
+	GUIOPTControls.OptCheckbox (31213, 37453, FeedbackHelpText, Window, 3, 12, 37588, "")
+	GUIOPTControls.OptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, "")
+	GUIOPTControls.OptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, "")
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -321,13 +321,13 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCancel (OpenAutopauseOptionsWindow, Window, 17)
 
 	# checkboxes OR the values if they associate to the same variable
-	PSTOptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "Auto Pause State", None, 4)
-	PSTOptCheckbox (31214, 37689, AutopauseHelpText, Window, 3, 10, 37681, "Auto Pause State", None, 8)
-	PSTOptCheckbox (31214, 37690, AutopauseHelpText, Window, 4, 11, 37682, "Auto Pause State", None, 16)
-	PSTOptCheckbox (31214, 37691, AutopauseHelpText, Window, 5, 12, 37683, "Auto Pause State", None, 2)
-	PSTOptCheckbox (31214, 37692, AutopauseHelpText, Window, 6, 13, 37684, "Auto Pause State", None, 1)
-	PSTOptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "Auto Pause State", None, 32)
-	PSTOptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "Auto Pause State", None, 64)
+	GUIOPTControls.OptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "Auto Pause State", None, 4)
+	GUIOPTControls.OptCheckbox (31214, 37689, AutopauseHelpText, Window, 3, 10, 37681, "Auto Pause State", None, 8)
+	GUIOPTControls.OptCheckbox (31214, 37690, AutopauseHelpText, Window, 4, 11, 37682, "Auto Pause State", None, 16)
+	GUIOPTControls.OptCheckbox (31214, 37691, AutopauseHelpText, Window, 5, 12, 37683, "Auto Pause State", None, 2)
+	GUIOPTControls.OptCheckbox (31214, 37692, AutopauseHelpText, Window, 6, 13, 37684, "Auto Pause State", None, 1)
+	GUIOPTControls.OptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "Auto Pause State", None, 32)
+	GUIOPTControls.OptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "Auto Pause State", None, 64)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -656,21 +656,6 @@ def PSTOptSlider (winname, ctlname, help_ta, window, slider_id, label_id, label_
 	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
 
 	return slider
-
-def PSTOptCheckbox (winname, ctlname, help_ta, window, button_id, label_id, label_strref, assoc_var = None, handler = None, value = 1):
-	"""Standard checkbox for option windows"""
-
-	button = GUIOPTControls.OptCheckboxNoCallback (ctlname, help_ta, window, button_id, label_id, assoc_var, value)
-	# this is commented out since it causes glitches with toggling the button
-	#button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
-
-	# FIXME: this overrides the strref setter from GUIOPTControls
-	if handler:
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
-
-	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
-
-	return button
 
 def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):
 	"""Standard subwindow button for option windows"""
