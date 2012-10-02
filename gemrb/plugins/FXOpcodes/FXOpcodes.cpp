@@ -1623,11 +1623,15 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			STATE_SET( STATE_INVISIBLE );
 		}
-		HandleBonus(target, IE_TOHIT, 4, fx->TimingMode);
+		if (fx->FirstApply || fx->TimingMode != FX_DURATION_INSTANT_PERMANENT) {
+			HandleBonus(target, IE_TOHIT, 4, fx->TimingMode);
+		}
 		break;
 	case 1:
 		STATE_SET( STATE_INVIS2 );
-		HandleBonus(target, IE_ARMORCLASS, 4, fx->TimingMode);
+		if (fx->FirstApply || fx->TimingMode != FX_DURATION_INSTANT_PERMANENT) {
+			HandleBonus(target, IE_ARMORCLASS, 4, fx->TimingMode);
+		}
 		break;
 	default:
 		break;
@@ -1649,6 +1653,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	fx->Parameter4 = Trans;
 	STAT_SET( IE_TRANSLUCENT, Trans);
 	//FIXME: probably FX_PERMANENT, but TRANSLUCENT has no saved base stat
+	// we work around it by only applying the tohit/ac bonus once
 	return FX_APPLIED;
 }
 
@@ -6766,7 +6771,7 @@ int fx_to_hit_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	HandleBonus( target, IE_HITBONUS, fx->Parameter1, fx->TimingMode );
-	return FX_APPLIED;
+	return FX_PERMANENT;
 }
 
 // 0x117 RenableButton
