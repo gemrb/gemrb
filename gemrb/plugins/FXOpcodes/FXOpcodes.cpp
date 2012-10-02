@@ -2261,7 +2261,7 @@ int fx_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	HandleBonus( target, IE_TOHIT, fx->Parameter1, fx->TimingMode );
-	return FX_APPLIED;
+	return FX_PERMANENT;
 }
 
 // 0x37 KillCreatureType
