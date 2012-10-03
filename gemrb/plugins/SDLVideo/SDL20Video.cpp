@@ -57,6 +57,8 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 {
 	bpp=b;
 	fullscreen=fs;
+	width = w, height = h;
+
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 #if TARGET_OS_IPHONE || ANDROID
@@ -73,7 +75,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		//since we are in fullscreen this has no effect outside Android/iOS
 		winFlags |= SDL_WINDOW_BORDERLESS;
 	}
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, winFlags);
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, winFlags);
 	renderer = SDL_CreateRenderer(window, -1, 0);
 
 	if (renderer == NULL) {
@@ -81,14 +83,11 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		return GEM_ERROR;
 	}
 
-#if TARGET_OS_IPHONE
-	// on iOS the window is always the entire screen
-	// simulate a window by making the using passed in values for the backBuf size
-	width = w;
-	height = h;
-#else
-	SDL_GetWindowSize(window, &width, &height);
-#endif
+	// we set logical size so that platforms where the window can be a diffrent size then requested
+	// function properly. eg iPhone and Android the requested size may be 640x480,
+	// but the window will always be the size of the screen
+	SDL_RenderSetLogicalSize(renderer, width, height);
+
 	Viewport.w = width;
 	Viewport.h = height;
 
@@ -109,7 +108,7 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	SDL_RenderClear(renderer);
 
 	int winW, winH;
-	SDL_GetWindowSize(window, &winW, &winH);
+	SDL_RenderGetLogicalSize(renderer, &winW, &winH);
 
 	if (videoPlayer) SDL_DestroyTexture(videoPlayer);
 	if (yuv) {
@@ -273,18 +272,9 @@ int SDL20VideoDriver::SwapBuffers(void)
 	}
 
 	int w, h = 0;
-	SDL_GetWindowSize(window, &w, &h);
-	SDL_Rect dstRect = {0, 0, w, h};
-#if TARGET_OS_IPHONE
-	// our "window" is simulated
-	if (!fullscreen) {
-		dstRect.x = (w - backBuf->w) / 2;
-		dstRect.y = (h - backBuf->h) / 2;
-		dstRect.w = backBuf->w;
-		dstRect.h = backBuf->h;
-	}
-#endif
-	SDL_RenderCopy(renderer, tex, NULL, &dstRect);
+	SDL_RenderGetLogicalSize(renderer, &w, &h);
+
+	SDL_RenderCopy(renderer, tex, NULL, NULL);
 
 	SDL_RenderPresent( renderer );
 	SDL_DestroyTexture(tex);
@@ -341,36 +331,23 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
 	 */
 	SDL_Touch *state = SDL_GetTouch(event.tfinger.touchId);
-	float xScaleFactor, yScaleFactor = 1.0;
-	int xOffset, yOffset = 0;
+	float xScaleFactor = 1.0, yScaleFactor = 1.0;
 	int numFingers = 0;
 	if(state){
 		focusCtrl = EvntManager->GetMouseFocusedControl();
 		numFingers = state->num_fingers;
-#if TARGET_OS_IPHONE
-		if (fullscreen) {
-			// simulated window adjustment
-			xScaleFactor = (state->xres / backBuf->w);
-			yScaleFactor = (state->yres / backBuf->h);
-		} else {
-#endif
+
 		int w, h;
-		SDL_GetWindowSize(window, &w, &h);
+		SDL_RenderGetLogicalSize(renderer, &w, &h);
 		xScaleFactor = (state->xres / w);
 		yScaleFactor = (state->yres / h);
-#if TARGET_OS_IPHONE
-			// now we need to offset the x/y coordinates
-			xOffset = ((w - backBuf->w) / 2) * -1;
-			yOffset = ((h - backBuf->h) / 2) * -1;
-		}
-#endif
 		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId == 0) {
 			// this is a rare case where multiple fingers touch simultaniously (within the same tick)
 			// TODO: this is probably simulator only. if so lets ifdef it for the simulator
 
 			firstFingerDown.timestamp = GetTickCount();
-			firstFingerDown.x = (state->fingers[0]->x / xScaleFactor) + xOffset;
-			firstFingerDown.y = (state->fingers[0]->y / yScaleFactor) + yOffset;
+			firstFingerDown.x = (state->fingers[0]->x / xScaleFactor);
+			firstFingerDown.y = (state->fingers[0]->y / yScaleFactor);
 			firstFingerDown.dx = state->fingers[0]->xdelta / xScaleFactor;
 			firstFingerDown.dy = state->fingers[0]->ydelta / yScaleFactor;
 			firstFingerDown.fingerId = state->fingers[0]->id;
@@ -427,7 +404,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				ProcessFirstTouch(GEM_MB_ACTION);
 				ignoreNextFingerUp = false;
 				// standard mouse movement
-				MouseMovement((event.tfinger.x / xScaleFactor) + xOffset, (event.tfinger.y / yScaleFactor) + yOffset);
+				MouseMovement((event.tfinger.x / xScaleFactor), (event.tfinger.y / yScaleFactor));
 			}
 			break;
 		case SDL_FINGERDOWN:
@@ -436,9 +413,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
 				firstFingerDown.x /= xScaleFactor;
-				firstFingerDown.x += xOffset;
 				firstFingerDown.y /= yScaleFactor;
-				firstFingerDown.y += yOffset;
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
 				ProcessFirstTouch(GEM_MB_ACTION);
 				EvntManager->OnSpecialKeyPress( GEM_TAB );
@@ -458,8 +433,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						CursorPos.x = event.button.x;
 						CursorPos.y = event.button.y;
 
-						EvntManager->MouseUp((event.tfinger.x / xScaleFactor) + xOffset,
-											 (event.tfinger.y / yScaleFactor) + yOffset,
+						EvntManager->MouseUp((event.tfinger.x / xScaleFactor),
+											 (event.tfinger.y / yScaleFactor),
 											 mouseButton, GetModState(SDL_GetModState()) );
 					}
 				}
