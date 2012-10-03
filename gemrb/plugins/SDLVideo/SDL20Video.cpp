@@ -157,7 +157,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	if (g_truecolor) {
 		Uint16 *src = (Uint16*)buf;
 		for (row = 0; row < bufh; ++row) {
-			dst = (Uint32*)((Uint16*)pixels + row * pitch);
+			dst = (Uint32*)((Uint8*)pixels + row * pitch);
 			for (col = 0; col < bufw; ++col) {
 				color.r = ((*src & 0x7C00) >> 7) | ((*src & 0x7C00) >> 12);
 				color.g = ((*src & 0x03E0) >> 2) | ((*src & 0x03E0) >> 8);
