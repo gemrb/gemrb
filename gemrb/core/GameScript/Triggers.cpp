@@ -3912,7 +3912,7 @@ int GameScript::InMyGroup(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 */
-	if ( ((Actor *) tar)->GetStat(IE_SPECIFIC)==((Actor *) tar)->GetStat(IE_SPECIFIC) ) {
+	if ( ((Actor *) tar)->GetStat(IE_SPECIFIC)==((Actor *) Sender)->GetStat(IE_SPECIFIC) ) {
 		return 1;
 	}
 	return 0;
