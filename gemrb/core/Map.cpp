@@ -1309,6 +1309,11 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 	while (i--) {
 		Actor *listener = actors[i];
 
+		// skip the shouter, so gpshout's InMyGroup(LastHeardBy(Myself)) can get two distinct actors
+		if (listener == actor) {
+			continue;
+		}
+
 		if (radius) {
 			if (Distance(actor->Pos, listener->Pos)>radius) {
 				continue;
