@@ -127,6 +127,7 @@ static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
 static ieDword always_dither = 1;
 static ieDword GameDifficulty = DIFF_CORE;
+static ieDword NoExtraDifficultyDmg = 0;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
@@ -1546,6 +1547,9 @@ GEM_EXPORT void UpdateActorConfig()
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
 	}
 	if (GameDifficulty>DIFF_NIGHTMARE) GameDifficulty = DIFF_NIGHTMARE;
+
+	// iwd has a config option for leniency
+	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
 }
 
 static void InitActorTables()
@@ -3593,7 +3597,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		// -50%, -25%, 0, 50%, 100%, 150%
 		if (Modified[IE_EA] < EA_GOODCUTOFF) {
 			int adjustmentPercent = dmgadjustments[GameDifficulty];
-			damage += (damage * adjustmentPercent)/100;
+			if (!NoExtraDifficultyDmg || adjustmentPercent < 0) {
+				damage += (damage * adjustmentPercent)/100;
+			}
 		}
 	}
 

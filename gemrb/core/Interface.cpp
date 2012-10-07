@@ -3968,6 +3968,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Nightmare Mode", 0},
 		{"Game Options", "Selection Sounds Frequency", 0},
 		{"Game Options", "Sound Processing", 1}, // TODO: turn sound off completely; someday we could swap the driver for NullSound and back
+		{"Game Options", "Suppress Extra Difficulty Damage", 0},
 		{"Game Options", "Weather", 1},
 	};
 
