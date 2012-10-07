@@ -45,7 +45,6 @@ def OnLoad():
 		# with delayed execution, more of the game files get loaded
 		threading.Timer(1, EndTest).start() # the 1s varies!
 
-	GemRB.EnableCheatKeys(1)
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
 		GemRB.PlayMovie ("BISLOGO", 1)

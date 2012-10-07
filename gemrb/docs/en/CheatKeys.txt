@@ -9,9 +9,10 @@ This list can be incomplete and obsolete - for current status, look into
 gemrb/plugins/Core/GameControl.cpp, functions GameControl::OnKeyRelease() 
 and GameControl::Draw().
 
-Cheat keys are disabled by default. To activate them, either type command
-GemRB.EnableCheatKeys(1) on console (pops-up with CTRL+SPACE key combination)
-or put it into some GUIScript - e.g. for PS:T in Start.py.
+Cheat keys are enabled by default. To activate them, either type command
+GemRB.EnableCheatKeys(1) on console (pops-up with CTRL+SPACE key combination),
+put EnableCheatKeys=1 in the GemRB config or Cheats=1 under game options in
+baldur.ini/icewind.ini/torment.ini found in the top game directory.
 
 GameControl control must be focused for the keys to be recognized, so it
 might be needed to 'click' the GameControl (i.e. map) first.

@@ -3984,6 +3984,10 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	if (!ini->GetKeyAsInt("Config", "Sound", 1))
 		AudioDriverName = "null";
 
+	if (ini->GetKeyAsInt("Game Options", "Cheats", 1)) {
+		EnableCheatKeys(1);
+	}
+
 	if (!Width || !Height) {
 		Height = ini->GetKeyAsInt("Config", "ConfigHeight", Height);
 		int tmpWidth = ini->GetKeyAsInt("Config", "ConfigWidth", 0);
