@@ -108,7 +108,7 @@ static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
 //XP adjustments on easy setting (need research on the amount)
 //Seems like bg1 halves xp, bg2 doesn't have any impact
-static int xpadjustments[6]={0, -50, 0, 0, 0, 0};
+static int xpadjustments[6]={0, 0, 0, 0, 0, 0};
 
 static int FistRows = -1;
 static int *wmlevels[20];
