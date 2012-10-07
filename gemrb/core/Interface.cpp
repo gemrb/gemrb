@@ -3923,13 +3923,12 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		int defaultValue;
 	} whitelist[] = {
 		// Program Options
-		{"Program Options", "Full Screen", (int)FullScreen},
+		{"Program Options", "3D Acceleration", 0},
 		{"Program Options", "BitsPerPixel", Bpp},
 		{"Program Options", "Brightness Correction", 0},
-		{"Program Options", "3D Acceleration", 0},
-		{"Program Options", "Translucent Shadows", 0},
-		{"Program Options", "Display Subtitles", 0},		// identical to Display Movie Subtitles
 		{"Program Options", "Display Movie Subtitles", 0},	// identical to Display Subtitles
+		{"Program Options", "Display Subtitles", 0},		// identical to Display Movie Subtitles
+		{"Program Options", "Full Screen", (int)FullScreen},
 		{"Program Options", "Gamma Correction", 0},
 		{"Program Options", "SoftBlt", 0}, // unused
 		{"Program Options", "SoftMirrorBlt", 0}, // unused
@@ -3937,7 +3936,8 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Program Options", "Subtitles", 0}, // TODO: not identical to the above, likely for the overhead text duplication
 		{"Program Options", "Strref On", 0},
 		{"Program Options", "Tooltips", 50},
-		// Game Options - Audio
+		{"Program Options", "Translucent Shadows", 0},
+		// Program Options - Audio
 		{"Program Options", "Volume Ambients", 100},
 		{"Program Options", "Volume Movie", 100},
 		{"Program Options", "Volume Music", 100},
@@ -3946,27 +3946,27 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		// Debug
 		{"Program Options", "Debug Mode", 0},				// not used. should be implemented. (for logging especially)
 		// Game Options
+		{"Game Options", "Always Dither", 0},
+		{"Game Options", "Always Run", 0},
+		{"Game Options", "Auto Pause Center", 1},
+		{"Game Options", "Auto Pause State", 0},
+		{"Game Options", "Bored Timeout", 0},
+		{"Game Options", "Command Sounds Frequency", 0},
 		{"Game Options", "Difficulty Level", 0},
-		{"Game Options", "Mouse Scroll Speed", 0},
+		{"Game Options", "Environmental Audio", 0}, // TODO: Creative's EAX
 		{"Game Options", "Footsteps", 1},
 		{"Game Options", "Gore", 0}, // unused
 		{"Game Options", "GUI Feedback Level", 0},
-		{"Game Options", "Locator Feedback Level", 0},
-		{"Game Options", "Bored Timeout", 0},
-		{"Game Options", "Always Dither", 0},
-		{"Game Options", "Always Run", 0},
-		{"Game Options", "Keyboard Scroll Speed", 64},
-		{"Game Options", "Command Sounds Frequency", 0},
-		{"Game Options", "Selection Sounds Frequency", 0},
-		{"Game Options", "Infravision", 1},
-		{"Game Options", "Weather", 1},						// not used. should be implemented.
-		{"Game Options", "Auto Pause State", 0},
-		{"Game Options", "Auto Pause Center", 1},
-		{"Game Options", "HP Over Head", 0},				// not used. should be implemented.
 		{"Game Options", "Hotkeys On Tooltips", 1},			// not used. should be implemented.
-		{"Game Options", "Sound Processing", 1}, // TODO: turn sound off completely; someday we could swap the driver for NullSound and back
+		{"Game Options", "HP Over Head", 0},				// not used. should be implemented.
+		{"Game Options", "Infravision", 1},
+		{"Game Options", "Keyboard Scroll Speed", 64},
+		{"Game Options", "Locator Feedback Level", 0},
+		{"Game Options", "Mouse Scroll Speed", 0},
 		{"Game Options", "Music Processing", 1}, // TODO: turn music off completely; someday we could swap the driver for NullSound and back
-		{"Game Options", "Environmental Audio", 0}, // TODO: Creative's EAX
+		{"Game Options", "Selection Sounds Frequency", 0},
+		{"Game Options", "Sound Processing", 1}, // TODO: turn sound off completely; someday we could swap the driver for NullSound and back
+		{"Game Options", "Weather", 1},						// not used. should be implemented.
 	};
 
 	// iterate our whitelist and load the ini values into vars
