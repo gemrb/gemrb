@@ -3414,7 +3414,9 @@ bool Map::HasWeather()
 	if ((AreaType & (AT_WEATHER|AT_OUTDOOR) ) != (AT_WEATHER|AT_OUTDOOR) ) {
 		return false;
 	}
-	return true;
+	ieDword tmp = 1;
+	core->GetDictionary()->Lookup("Weather", tmp);
+	return !!tmp;
 }
 
 int Map::GetWeather()
