@@ -271,9 +271,6 @@ int SDL20VideoDriver::SwapBuffers(void)
 		SDL_RenderFillRect(renderer, &dst);
 	}
 
-	int w, h = 0;
-	SDL_RenderGetLogicalSize(renderer, &w, &h);
-
 	SDL_RenderCopy(renderer, tex, NULL, NULL);
 
 	SDL_RenderPresent( renderer );
