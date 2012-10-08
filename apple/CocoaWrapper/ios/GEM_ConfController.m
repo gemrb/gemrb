@@ -112,8 +112,10 @@ enum ConfigTableSection {
 	NSFileManager *manager = [NSFileManager defaultManager];
 	NSArray* files = [manager contentsOfDirectoryAtPath:docDir error:nil];
 
+	NSLog(@"scanning documents: %@", [files description]);
+
 	configFiles = [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.cfg'"]];
-	NSArray *installExtensions = [NSArray arrayWithObjects:@"bg1", @"bg2", @"tob", @"iwd", @"how", @"iwd2", @"pst", nil];
+	NSArray *installExtensions = [NSArray arrayWithObjects:@"bg1", @"bg2", @"iwd", @"how", @"iwd2", @"pst", nil];
 	installFiles = [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"pathExtension IN %@", installExtensions]];
 	logFiles = [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.log'"]];
 
