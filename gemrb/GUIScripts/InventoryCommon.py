@@ -34,6 +34,7 @@ ItemIdentifyWindow = None
 ItemAbilitiesWindow = None
 ErrorWindow = None
 StackAmount = 0
+pause = None
 
 def OnDragItemGround ():
 	"""Drops and item to the ground."""
@@ -697,7 +698,7 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
-	global level, spell_ref
+	global level, spell_ref, pause
 	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -729,6 +730,8 @@ def ReadItemWindow ():
 			else:
 				strref = -1
 		else:
+			pause = GemRB.GamePause(3,1) #query the pause state
+			GemRB.GamePause(0,1)
 			GemRB.UseItem (pc, slot, 1, 5)
 			GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
 			return
@@ -744,6 +747,10 @@ def ReadItemWindow ():
 
 def DelayedReadItemWindow ():
 	global level, spell_ref
+
+	#restore the pause state
+	if pause:
+		GemRB.GamePause(1,1)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref)!=-1:
