@@ -6025,9 +6025,12 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		return;
 	}
 
-	//IWD2 has no autodetect, you actually should 'search'
+	int roundFraction = (gameTime-roundTime) % core->Time.round_size;
+
 	//actually, iwd2 has autosearch, also, this is useful for dayblindness
-	if (InParty && core->HasFeature(GF_AUTOSEARCH_HIDDEN) ) {
+	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
+	// FIXME: split dayblindness out of detect.spl and only run that each tick + simplify this check
+	if (InParty && core->HasFeature(GF_AUTOSEARCH_HIDDEN) && (third || ((roundFraction%AI_UPDATE_TIME) == 0))) {
 		core->ApplySpell("detect", this, this, 0);
 	}
 
@@ -6075,7 +6078,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 	}
 
 	//apply the modal effect on the beginning of each round
-	if ((((gameTime-roundTime)%core->Time.round_size)==0)) {
+	if (roundFraction == 0) {
 		// handle lingering modal spells like bardsong in iwd2
 		if (modalSpellLingering && LingeringModalSpell[0]) {
 			modalSpellLingering--;
