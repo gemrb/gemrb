@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_spells import LS_MEMO
 import GUICommon
 import Spellbook
 import CommonTables
@@ -127,7 +128,7 @@ def HLADonePress ():
 			# make sure it isn't already learned
 			SpellIndex = Spellbook.HasSpell (pc, HLAType, HLALevel, HLARef[3:])
 			if SpellIndex < 0: # gotta learn it
-				GemRB.LearnSpell (pc, HLARef[3:], 8)
+				GemRB.LearnSpell (pc, HLARef[3:], LS_MEMO)
 			else: # memorize it again
 				GemRB.MemorizeSpell (pc, HLAType, HLALevel, SpellIndex)
 
