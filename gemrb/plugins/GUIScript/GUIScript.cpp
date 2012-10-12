@@ -8020,25 +8020,40 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GamePause__doc,
-"GamePause(Pause, Quiet)\n\n"
-"Pause or unpause the game or just toggle the pause.");
+"GamePause(Pause, Quiet)==> pause state\n\n"
+"Pause or unpause the game or just toggle the pause state.");
 
 static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 {
 	int pause, quiet;
+	int ret;
 
 	if (!PyArg_ParseTuple( args, "ii", &pause, &quiet)) {
 		return AttributeError( GemRB_GamePause__doc );
 	}
-	//this will trigger when pause is not 0 or 1
-	if ((unsigned int) pause > 1) {
-		core->TogglePause();
-	} else {
-		core->SetPause((PauseSetting)pause, quiet);
-	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	GET_GAMECONTROL();
+
+	//this will trigger when pause is not 0 or 1
+	switch(pause)
+	{
+	case 2:
+		ret = core->TogglePause();
+		break;
+	case 0:
+	case 1:
+		core->SetPause((PauseSetting)pause, quiet);
+	default:
+		ret = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
+	}
+        if (ret) {
+                Py_INCREF( Py_True );
+                return Py_True;
+        } else {
+                Py_INCREF( Py_False );
+                return Py_False;
+        }
+
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
