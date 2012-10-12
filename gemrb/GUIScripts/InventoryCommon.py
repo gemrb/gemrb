@@ -746,7 +746,7 @@ def DelayedReadItemWindow ():
 	global level, spell_ref
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref):
+	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref)!=-1:
 		strref = 10830
 	else:
 		ret = LSR_FAILED
