@@ -5093,7 +5093,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 
 	ieDword kit = GetStat(IE_KIT);
 
-	if (flags & LS_STATS) {
+	if ((flags & LS_STATS) && (GameDifficulty>DIFF_NORMAL) ) {
 		// chance to learn roll
 		int roll = LuckyRoll(1, 100, 0);
 		// adjust the roll for specialist mages
