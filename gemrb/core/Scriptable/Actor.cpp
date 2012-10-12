@@ -6031,18 +6031,17 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		core->ApplySpell("detect", this, this, 0);
 	}
 
-	//
 	ieDword state = Modified[IE_STATE_ID];
 
-	if (state&STATE_CONFUSED) {
+	if ((state&STATE_CONFUSED) && !(gameTime&0x3f) ) {
 		char Tmp[40];
 
 		int tmp = core->Roll(1,3,0);
 		switch(tmp) {
-		case 1:
+		case 2:
 			strncpy(Tmp,"RandomWalk()",sizeof(Tmp));
 			break;
-		case 2:
+		case 1:
 			strncpy(Tmp,"Attack([0])",sizeof(Tmp));
 			break;
 		default:
@@ -6055,8 +6054,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 		return;
 	}
-	//
-
 
 	// this is a HACK, fuzzie can't work out where else to do this for now
 	// but we shouldn't be resetting rounds/attacks just because the actor

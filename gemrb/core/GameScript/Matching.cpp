@@ -194,11 +194,13 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		if (ac == Sender) continue;
 		bool filtered = false;
 		if (DoObjectIDSCheck(oC, ac, &filtered)) {
+/* apparently this is not needed Attack([0]) should attack nearest anyone
 			if (!filtered) {
 				// if no filters were applied..
 				assert(!tgts);
 				return NULL;
 			}
+*/
 			int dist;
 			if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0)) {
 				if (!tgts) tgts = new Targets();
@@ -303,9 +305,6 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	Scriptable *aC = NULL;
 
-	if (!oC) {
-		return NULL;
-	}
 	Game *game = core->GetGame();
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);
 	if (tgts) {
@@ -318,6 +317,10 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 
 		//global actors are always found by object ID!
 		return game->GetGlobalActorByGlobalID(oC->objectFields[1]);
+	}
+
+	if (!oC) {
+		return NULL;
 	}
 
 	if (oC->objectName[0]) {
