@@ -6031,6 +6031,33 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		core->ApplySpell("detect", this, this, 0);
 	}
 
+	//
+	ieDword state = Modified[IE_STATE_ID];
+
+	if (state&STATE_CONFUSED) {
+		char Tmp[40];
+
+		int tmp = core->Roll(1,3,0);
+		switch(tmp) {
+		case 1:
+			strncpy(Tmp,"RandomWalk()",sizeof(Tmp));
+			break;
+		case 2:
+			strncpy(Tmp,"Attack([0])",sizeof(Tmp));
+			break;
+		default:
+			strncpy(Tmp,"NoAction()",sizeof(Tmp));
+			break;
+		}
+		Action *action = GenerateAction( Tmp );
+		if (action) {
+			AddActionInFront(action);
+		}
+		return;
+	}
+	//
+
+
 	// this is a HACK, fuzzie can't work out where else to do this for now
 	// but we shouldn't be resetting rounds/attacks just because the actor
 	// wandered away, the action code should probably be responsible somehow
@@ -6067,7 +6094,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 		// some states and timestop disable modal actions
 		// interestingly the original doesn't include STATE_DISABLED, STATE_FROZEN/STATE_PETRIFIED
-		ieDword state = Modified[IE_STATE_ID];
 		if (Immobile() || (state & (STATE_CONFUSED | STATE_DEAD | STATE_HELPLESS | STATE_PANIC | STATE_BERSERK | STATE_SLEEP))) {
 			return;
 		}
@@ -8470,7 +8496,7 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 
 	//cheap substitute of the original hardcoded feature, returns true if already affected by the exact spell
 	//no (spell)state checks based on every effect in the spell
-	//FIXME: create a more compatible version  if needed
+	//FIXME: create a more compatible version if needed
 	if (fxqueue.HasSource(spellres)) return true;
 	//return true if caster cannot cast
 	if (!caster->CanCast(spellres)) return true;
