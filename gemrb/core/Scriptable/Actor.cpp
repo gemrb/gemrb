@@ -3894,7 +3894,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Area:       %.8s   ", Area );
 	buffer.appendFormatted("Dialog:     %.8s\n", Dialog );
 	buffer.appendFormatted("Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
-	buffer.appendFormatted("Script name:%.32s    Current action: %d\n", scriptName, CurrentAction ? CurrentAction->actionID : -1);
+	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
 	buffer.appendFormatted("Int. Flags: 0x%x ", InternalFlags);
 	buffer.appendFormatted("TalkCount:  %d   ", TalkCount );
 	buffer.appendFormatted("Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
@@ -3908,14 +3908,14 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
 
 	//this works for both level slot style
-	buffer.appendFormatted("Levels:\n");
+	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
 	for (i = 0;i<ISCLASSES;i++) {
 		int level = GetClassLevel(i);
 		if (level) {
 			buffer.appendFormatted("%s: %d    ", isclassnames[i], level);
 		}
 	}
-	buffer.appendFormatted("\nSummary: %d\n", GetXPLevel(true) );
+	buffer.appendFormatted("\n");
 
 	buffer.appendFormatted("current HP:%d\n", BaseStats[IE_HITPOINTS] );
 	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s\n", Modified[IE_ANIMATION_ID], anims->ResRef );
