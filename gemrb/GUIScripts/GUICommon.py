@@ -407,6 +407,10 @@ def GetActorClassTitle (actor):
 		Multi = CommonTables.Classes.GetValue (ClassIndex, 4)
 		Dual = IsDualClassed (actor, 1)
 
+		# we have no entries for npc creature classes, so treat them as single-classed
+		if Multi == "*":
+			Multi = 0
+
 		if Multi and Dual[0] == 0: # true multi class
 			ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 2)
 			ClassTitle = GemRB.GetString (ClassTitle)
@@ -468,12 +472,17 @@ def IsDualClassed(actor, verbose):
 	if GameIsIWD2():
 		return (0,-1,-1)
 
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	ClassIndex = CommonTables.Classes.FindValue (5, Class)
+	Multi = CommonTables.Classes.GetValue (ClassIndex, 4)
+
+	# we have no entries for npc creature classes, so treat them as single-classed
+	if Multi == "*":
+		return (0, -1, -1)
+
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 
 	if verbose:
-		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassIndex = CommonTables.Classes.FindValue (5, Class)
-		Multi = CommonTables.Classes.GetValue (ClassIndex, 4)
 		DualInfo = []
 		KitIndex = GetKitIndex (actor)
 
@@ -567,6 +576,10 @@ def IsMultiClassed (actor, verbose):
 	ClassIndex = CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
 	IsMulti = CommonTables.Classes.GetValue (ClassIndex, 4) # 0 if not multi'd
 	IsDual = IsDualClassed (actor, 0)
+
+	# we have no entries for npc creature classes, so treat them as single-classed
+	if IsMulti == "*":
+		IsMulti = 0
 
 	# dual-class char's look like multi-class chars
 	if (IsMulti == 0) or (IsDual[0] > 0):
