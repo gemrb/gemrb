@@ -3446,7 +3446,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	ImageFactory* fact = ( ImageFactory* )
-		gamedata->GetFactoryResource( ResRef, IE_BMP_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource(ResRef, IE_BMP_CLASS_ID, IE_NORMAL, true);
 
 	//if the resource doesn't exist, but we have a default resource
 	//use this resource

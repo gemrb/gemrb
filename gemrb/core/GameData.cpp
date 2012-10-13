@@ -476,7 +476,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 	case IE_BMP_CLASS_ID:
 	{
-		ResourceHolder<ImageMgr> img(resname);
+		ResourceHolder<ImageMgr> img(resname, silent);
 		if (img) {
 			ImageFactory* fact = img->GetImageFactory( resname );
 			factory->AddFactoryObject( fact );
