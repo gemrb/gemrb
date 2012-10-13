@@ -95,10 +95,7 @@ void TextArea::RefreshSprite(const char *portrait)
 		SetAnimPicture(NULL);
 	}
 	strnlwrcpy(PortraitResRef, portrait, 8);
-	if (!strnicmp(PortraitResRef, "none", 8) ) {
-		return;
-	}
-	ResourceHolder<ImageMgr> im(PortraitResRef);
+	ResourceHolder<ImageMgr> im(PortraitResRef, true);
 	if (im == NULL) {
 		return;
 	}
