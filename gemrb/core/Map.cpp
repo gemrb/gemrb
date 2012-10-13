@@ -678,7 +678,6 @@ void Map::UpdateScripts()
 	if (!timestop) {
 		game->timestop_owner = NULL;
 	}
-	Actor *timestop_owner = game->timestop_owner;
 
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
@@ -689,7 +688,7 @@ void Map::UpdateScripts()
 		}
 
 		//FIXME:we need a better timestop hack, actors shouldn't abort moving after a timestop expired
-		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] == 0) {
+		if (game->TimeStoppedFor(actor)) {
 			actor->no_more_steps = true;
 			actor->ClearPath(); //HACK: prevents jumping when timestop ends
 			continue;
