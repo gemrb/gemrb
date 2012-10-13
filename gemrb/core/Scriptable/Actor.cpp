@@ -6037,7 +6037,8 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 	ieDword state = Modified[IE_STATE_ID];
 
-	if ((state&STATE_CONFUSED) && !(gameTime&0x3f) ) {
+	// each round also re-confuse the actor
+	if ((state&STATE_CONFUSED) && roundFraction == 0) {
 		char Tmp[40];
 
 		int tmp = core->Roll(1,3,0);
@@ -6054,7 +6055,9 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 		Action *action = GenerateAction( Tmp );
 		if (action) {
+			ReleaseCurrentAction();
 			AddActionInFront(action);
+			print("Confusion: added %s", Tmp);
 		}
 		return;
 	}
