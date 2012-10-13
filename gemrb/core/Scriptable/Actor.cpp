@@ -4927,6 +4927,7 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 	if (ga_flags&GA_SELECT) {
 		if (UnselectableTimer) return false;
 		if (Immobile()) return false;
+		if (Modified[IE_STATE_ID] & STATE_CONFUSED) return false;
 	}
 	return true;
 }
@@ -6417,7 +6418,7 @@ void Actor::UpdateAnimations()
 
 	//make actor unselectable and unselected when it is not moving
 	//dead, petrified, frozen, paralysed or unavailable to player
-	if (Immobile() || !ShouldDrawCircle()) {
+	if (Immobile() || !ShouldDrawCircle() || (Modified[IE_STATE_ID]&STATE_CONFUSED)) {
 		core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	}
 
