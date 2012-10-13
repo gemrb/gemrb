@@ -974,8 +974,9 @@ def ClassPress():
 	HasMulti = 0
 	j = 2
 	for i in range (ClassCount):
-		Allowed = CommonTables.Classes.GetValue (CommonTables.Classes.GetRowName (i), RaceName)
-		if CommonTables.Classes.GetValue (i, 4):
+		ClassRowName = CommonTables.Classes.GetRowName (i)
+		Allowed = CommonTables.Classes.GetValue (ClassRowName, RaceName)
+		if CommonTables.Classes.GetValue (ClassRowName, "MULTI"):
 			if Allowed != 0:
 				HasMulti = 1
 		else:
