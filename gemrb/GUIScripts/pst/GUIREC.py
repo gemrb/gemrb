@@ -425,7 +425,7 @@ def GetCharacterHeader (pc):
 	BioTable = GemRB.LoadTable ("bios")
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
-	Multi = CommonTables.Classes.GetValue (Class, 4)
+	Multi = GUICommon.HasMultiClassBits (pc)
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 
 	#Nameless is Specific == 1

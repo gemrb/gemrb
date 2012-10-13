@@ -863,7 +863,7 @@ def OpenKitInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	Multi = CommonTables.Classes.GetValue (ClassIndex, 4)
+	Multi = GUICommon.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 
 	if Multi and Dual[0] == 0: # true multi class
