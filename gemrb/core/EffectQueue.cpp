@@ -876,10 +876,12 @@ static int check_type(Actor* actor, Effect* fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, 0, fx->Power);
-	if( efx ) {
-		if (DecreaseEffect(efx))
-			return 0;
+	if (fx->Power) {
+		efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, 0, fx->Power);
+		if( efx ) {
+			if (DecreaseEffect(efx))
+				return 0;
+		}
 	}
 
 	//decrementing spell immunity
@@ -913,21 +915,25 @@ static int check_type(Actor* actor, Effect* fx)
 	//if the spelltrap effect already absorbed enough levels
 	//but still didn't get removed, it will absorb levels it shouldn't
 	//it will also absorb multiple spells in a single round
-	efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
-	if( efx) {
-		//storing the absorbed spell level
-		efx->Parameter3+=fx->Power;
-		//instead of a single effect, they had to create an effect for each level
-		//HOW DAMN LAME
-		//if decrease needs the spell level, use fx->Power here
-		actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
-		//efx->Parameter1--;
-		return 0;
+	if (fx->Power) {
+		efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
+		if( efx) {
+			//storing the absorbed spell level
+			efx->Parameter3+=fx->Power;
+			//instead of a single effect, they had to create an effect for each level
+			//HOW DAMN LAME
+			//if decrease needs the spell level, use fx->Power here
+			actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
+			//efx->Parameter1--;
+			return 0;
+		}
 	}
 
 	//bounce checks
-	if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx->Power) ) {
-		return 0;
+	if (fx->Power) {
+		if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx->Power) ) {
+			return 0;
+		}
 	}
 
 	if( fx->Source[0] && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
@@ -948,11 +954,13 @@ static int check_type(Actor* actor, Effect* fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if( (bounce&BNC_LEVEL_DEC)) {
-		efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
-		if( efx) {
-			if (DecreaseEffect(efx))
-				return -1;
+	if (fx->Power) {
+		if( (bounce&BNC_LEVEL_DEC)) {
+			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
+			if( efx) {
+				if (DecreaseEffect(efx))
+					return -1;
+			}
 		}
 	}
 
@@ -2058,9 +2066,11 @@ int EffectQueue::CheckImmunity(Actor *target) const
 
 		//don't resist item projectile payloads based on spell school, bounce, etc.
 		//FIXME: -Uh, why not ?
-		if( fx->InventorySlot) {
-			return 1;
-		}
+		//Allegedly, the book of infinite spells needed this, but irresistable by level
+		//spells got fx->Power = 0, so i added those exceptions and removed this
+		//if( fx->InventorySlot) {
+		//	return 1;
+		//}
 
 		//check level resistances
 		//check specific spell immunity
