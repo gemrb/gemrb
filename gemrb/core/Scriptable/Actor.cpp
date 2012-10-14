@@ -8678,7 +8678,7 @@ int Actor::UpdateAnimationID(bool derived)
 	const char *poi = mtm->QueryField( 0 );
 	// the base animation id
 	int AnimID = strtoul( poi, NULL, 0 );
-	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):GetBase(IE_ANIMATION_ID);
+	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):AnimID;
 	if (StatID<AnimID || StatID>AnimID+0x1000) return 1; //no change
 
 	// tables for additive modifiers of the animation id (race, gender, class)
