@@ -5368,39 +5368,14 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (Portrait2) {
 		actor->SetPortrait( Portrait2, 2);
 	}
-	int mastertable = gamedata->LoadTable( "avprefix" );
-	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
-	if (!mtm) {
-		return RuntimeError("Couldn't load avprefix table.");
+
+	//set up animation ID
+	switch(actor->UpdateAnimationID(0)) {
+	case -1: return RuntimeError("avprefix table contains no entries." );
+	case -2: return RuntimeError("Couldn't load avprefix table.");
+	case -3: return RuntimeError("Couldn't load an avprefix subtable.");
 	}
-	int count = mtm->GetRowCount();
-	if (count< 1 || count>8) {
-		return RuntimeError("avprefix table contains no entries." );
-	}
-	const char *poi = mtm->QueryField( 0 );
-	// the base animation id
-	int AnimID = strtoul( poi, NULL, 0 );
-	// tables for additive modifiers of the animation id (race, gender, class)
-	for (int i = 1; i < count; i++) {
-		poi = mtm->QueryField( i );
-		int table = gamedata->LoadTable( poi );
-		Holder<TableMgr> tm = gamedata->GetTable( table );
-		if (!tm) {
-			return RuntimeError("Couldn't load an avprefix table.");
-		}
-		int StatID = atoi( tm->QueryField() );
-		StatID = actor->GetBase( StatID );
-		poi = tm->QueryField( StatID );
-		AnimID += strtoul( poi, NULL, 0 );
-		gamedata->DelTable( table );
-	}
-	actor->SetBase(IE_ANIMATION_ID, AnimID);
-	//setting PST's starting stance to 18
-	poi = mtm->QueryField( 0, 1 );
-	if (*poi != '*') {
-		actor->SetStance( atoi( poi ) );
-	}
-	gamedata->DelTable( mastertable );
+
 	actor->SetOver( false );
 	actor->InitButtons(actor->GetStat(IE_CLASS), true); //force re-init of actor's buttons
 	Py_INCREF( Py_None );

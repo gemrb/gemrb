@@ -5181,6 +5181,10 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 	return ApplyEffectQueue(fxqueue, actor, caster, p);
 }
 
+//FIXME: AddAllEffects will directly apply the effects outside of the mechanisms of Actor::RefreshEffects
+//This means, pcf functions may not be executed when the effect is first applied
+//Adding this new effect block via RefreshEffects is possible, but that might apply existing effects twice
+
 int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p)
 {
 	int res = fxqueue->CheckImmunity ( actor );

@@ -824,6 +824,7 @@ public:
 	int GetArmorFailure() const;
 	bool IsDead() const;
 	bool IsInvisibleTo(Scriptable *checker) const;
+	int UpdateAnimationID(bool derived);
 };
 }
 

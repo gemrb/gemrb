@@ -8664,4 +8664,49 @@ bool Actor::IsInvisibleTo(Scriptable *checker) const
 	return false;
 }
 
+int Actor::UpdateAnimationID(bool derived)
+{
+	int mastertable = gamedata->LoadTable( "avprefix" );
+	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
+	if (!mtm) {
+		return -2;
+	}
+	int count = mtm->GetRowCount();
+	if (count< 1 || count>8) {
+		return -1;
+	}
+	const char *poi = mtm->QueryField( 0 );
+	// the base animation id
+	int AnimID = strtoul( poi, NULL, 0 );
+	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):GetBase(IE_ANIMATION_ID);
+	if (StatID<AnimID || StatID>AnimID+0x1000) return 1; //no change
+
+	// tables for additive modifiers of the animation id (race, gender, class)
+	for (int i = 1; i < count; i++) {
+		poi = mtm->QueryField( i );
+		int table = gamedata->LoadTable( poi );
+		Holder<TableMgr> tm = gamedata->GetTable( table );
+		if (!tm) {
+			return -3;
+		}
+		StatID = atoi( tm->QueryField() );
+		StatID = GetBase( StatID );
+		poi = tm->QueryField( StatID );
+		AnimID += strtoul( poi, NULL, 0 );
+		gamedata->DelTable( table );
+	}
+	if (derived) {
+		SetAnimationID(AnimID);
+        	//setting PST's starting stance to 18
+	        poi = mtm->QueryField( 0, 1 );
+        	if (*poi != '*') {
+                	SetStance( atoi( poi ) );
+	        }
+	} else {
+		SetBase(IE_ANIMATION_ID, AnimID);
+	}
+        gamedata->DelTable( mastertable );
+	return 0;
+}
+
 }
