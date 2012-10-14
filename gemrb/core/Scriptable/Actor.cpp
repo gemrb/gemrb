@@ -1212,6 +1212,14 @@ void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
+//spell casting or other buttons disabled/reenabled
+void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+{
+	if (actor->IsSelected()) {
+		core->SetEventFlag( EF_ACTION );
+	}
+}
+
 //no separate values (changes are permanent)
 void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 {
@@ -1305,9 +1313,9 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, pcf_animid,pcf_state, pcf_extstate, //cf
+NULL,NULL,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
-NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
+NULL,NULL,pcf_dbutton,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
 pcf_level,pcf_level,pcf_level,pcf_level, pcf_level, pcf_level, pcf_level, pcf_level,

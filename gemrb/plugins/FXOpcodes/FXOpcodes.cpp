@@ -4186,7 +4186,6 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		STAT_BIT_OR( IE_DISABLEDBUTTON, 1<<fx->Parameter2 );
 	}
-
 	if (fx->FirstApply && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
 		core->SetEventFlag(EF_ACTION);
 	}
@@ -4241,8 +4240,8 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			STAT_BIT_OR(IE_CASTING, dsc_bits_bg2[tmp] );
 		}
 	}
-	if (fx->FirstApply && display_warning && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
-		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, DMC_RED, target);
+	if (fx->FirstApply && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
+		if (display_warning) displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, DMC_RED, target);
 		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
