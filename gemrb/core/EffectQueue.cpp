@@ -2057,6 +2057,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		if( target->ImmuneToProjectile(fx->Projectile)) return 0;
 
 		//don't resist item projectile payloads based on spell school, bounce, etc.
+		//FIXME: -Uh, why not ?
 		if( fx->InventorySlot) {
 			return 1;
 		}
