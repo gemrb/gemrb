@@ -71,7 +71,11 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		features = equipping_features;
 		count = EquippingFeatureCount;
 	}
+
+	//collecting all self affecting effects in a single queue, so the random value is rolled only once
 	EffectQueue *fxqueue = new EffectQueue();
+	EffectQueue *selfqueue = new EffectQueue();
+	Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 
 	for (int i=0;i<count;i++) {
 		Effect *fx = features+i;
@@ -87,14 +91,18 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 			fx->Projectile = pro;
 			fxqueue->AddEffect( fx );
 		} else {
-			Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
+			//Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 			fx->Projectile = 0;
 			fx->PosX=pos.x;
 			fx->PosY=pos.y;
 			if (target) {
-				core->ApplyEffect(fx, target, self);
+				//core->ApplyEffect(fx, target, self);
+				selfqueue->AddEffect(fx);
 			}
 		}
+	}
+	if (target && selfqueue->GetEffectsCount()) {
+		core->ApplyEffectQueue(selfqueue, target, self);
 	}
 
 	//adding a pulse effect for weapons (PST)

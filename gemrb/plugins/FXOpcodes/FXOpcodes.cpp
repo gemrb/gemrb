@@ -3327,6 +3327,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//will destroy the first item
+print("Destroy Item: %s\n", fx->Resource);
 	if (target->inventory.DestroyItem(fx->Resource,0,1)) {
 		target->ReinitQuickSlots();
 	}
@@ -3584,7 +3585,10 @@ int fx_remove_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_remove_inventory_item(%2d)", fx->Opcode);
 	//FIXME: now equipped items are only wielded weapons
 	//why would it not let equipped items to be destructed?
-	target->inventory.DestroyItem(fx->Resource,IE_INV_ITEM_EQUIPPED,1);
+	//changed to work on any items - book of infinite spells relies on this
+	//selective destruction is available if you set Parameter2 to nonzero
+	//and Parameter1 to the bitfield
+	target->inventory.DestroyItem(fx->Resource,fx->Parameter2?fx->Parameter1:0,1);
 	return FX_NOT_APPLIED;
 }
 
