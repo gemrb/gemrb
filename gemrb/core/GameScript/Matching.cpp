@@ -194,13 +194,12 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		if (ac == Sender) continue;
 		bool filtered = false;
 		if (DoObjectIDSCheck(oC, ac, &filtered)) {
-/* apparently this is not needed Attack([0]) should attack nearest anyone
+			// this is needed so eg. Range trigger gets a good object
 			if (!filtered) {
 				// if no filters were applied..
 				assert(!tgts);
 				return NULL;
 			}
-*/
 			int dist;
 			if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0)) {
 				if (!tgts) tgts = new Targets();
