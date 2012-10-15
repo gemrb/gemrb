@@ -195,6 +195,7 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		bool filtered = false;
 		if (DoObjectIDSCheck(oC, ac, &filtered)) {
 			// this is needed so eg. Range trigger gets a good object
+			// HACK: our parsing of Attack([0]) is broken
 			if (!filtered) {
 				// if no filters were applied..
 				assert(!tgts);
