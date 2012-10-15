@@ -104,6 +104,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 	if (target && selfqueue->GetEffectsCount()) {
 		core->ApplyEffectQueue(selfqueue, target, self);
 	}
+	delete selfqueue;
 
 	//adding a pulse effect for weapons (PST)
 	//if it is an equipping effect block
