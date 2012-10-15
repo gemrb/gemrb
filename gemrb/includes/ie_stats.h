@@ -144,7 +144,7 @@ namespace GemRB {
 
 #define STATE_STILL      (STATE_STUNNED | STATE_FROZEN | STATE_PETRIFIED) //0xc8: not animated
 
-#define STATE_CANTMOVE   0x80180fef
+#define STATE_CANTMOVE   0x180fef   //can't walk or attack - confused characters can do these
 #define STATE_CANTLISTEN 0x80080fef
 #define STATE_CANTSTEAL  0x00180fc0 //can't steal from
 #define STATE_CANTSEE    0x00080fc0 //can't explore (even itself)
