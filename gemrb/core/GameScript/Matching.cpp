@@ -294,7 +294,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flag
 	// maybe store the target if it's an actor..
 	if (tar && tar->Type == ST_ACTOR) {
 		// .. but we only want objects created via objectFilters
-		if (oC->objectFilters[0]) {
+		if (oC && oC->objectFilters[0]) {
 			Sender->CurrentActionTarget = tar->GetGlobalID();
 		}
 	}
@@ -311,7 +311,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 		//now this could return other than actor objects
 		aC = tgts->GetTarget(0,-1);
 		delete tgts;
-		if (aC || oC->objectFields[0]!=-1) {
+		if (aC || !oC || oC->objectFields[0]!=-1) {
 			return aC;
 		}
 
