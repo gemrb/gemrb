@@ -629,12 +629,12 @@ Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned
 		Actor *actor = (Actor *) (t->actor);
 		// IDS targeting already did object checks (unless we need to override Detect?)
 		if (type) { //origin is PC
-			if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+			if (actor->GetStat(IE_EA) <= EA_EVILCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
 				continue;
 			}
 		} else {
-			if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+			if (actor->GetStat(IE_EA) >= EA_GOODCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
 				continue;
 			}
