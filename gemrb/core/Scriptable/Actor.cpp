@@ -4552,6 +4552,12 @@ void Actor::Die(Scriptable *killer)
 
 void Actor::SetPersistent(int partyslot)
 {
+	if (partyslot<0) {
+		//demote actor to be saved in area (after moving between areas)
+		InParty = 0;
+		InternalFlags&=~IF_FROMGAME;
+		return;
+	}
 	InParty = (ieByte) partyslot;
 	InternalFlags|=IF_FROMGAME;
 	//if an actor is coming from a game, it should have these too
@@ -6532,6 +6538,7 @@ bool Actor::HasBodyHeat() const
 void Actor::Draw(const Region &screen)
 {
 	Map* area = GetCurrentArea();
+	if (!area) return;
 
 	int cx = Pos.x;
 	int cy = Pos.y;
@@ -8697,15 +8704,15 @@ int Actor::UpdateAnimationID(bool derived)
 	}
 	if (derived) {
 		SetAnimationID(AnimID);
-        	//setting PST's starting stance to 18
-	        poi = mtm->QueryField( 0, 1 );
-        	if (*poi != '*') {
-                	SetStance( atoi( poi ) );
-	        }
+		//setting PST's starting stance to 18
+		poi = mtm->QueryField( 0, 1 );
+		if (*poi != '*') {
+			SetStance( atoi( poi ) );
+		}
 	} else {
 		SetBase(IE_ANIMATION_ID, AnimID);
 	}
-        gamedata->DelTable( mastertable );
+	gamedata->DelTable( mastertable );
 	return 0;
 }
 

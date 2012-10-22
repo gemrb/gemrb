@@ -4894,10 +4894,13 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!strnicmp(game->CurrentArea, fx->Resource, 8) ) {
-		//UnMakeGlobal
+		//UnMakeGlobal only if it was not in the party
 		int slot = core->GetGame()->InStore( target );
 		if (slot >= 0) {
 			game->DelNPC( slot );
+			if (!target->InParty) {
+				target->SetPersistent(-1);
+			}
 		}
 		//move to area
 		Point p(fx->PosX,fx->PosY);

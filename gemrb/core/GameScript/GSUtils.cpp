@@ -1167,24 +1167,22 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
-		if ( map1!=map2 ) {
-			if (map1) {
-				map1->RemoveActor( actor );
-			}
-			map2->AddActor( actor, true );
-
-			// update the worldmap if needed
-			if (actor->InParty) {
-				WorldMap *worldmap = core->GetWorldMap();
-				unsigned int areaindex;
-				WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
-				if (entry) {
-					// make sure the area is marked as revealed and visited
-					if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-						entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, BM_OR);
-					}
-				}
-			}
+    if (map1) {
+      map1->RemoveActor( actor );
+    }
+    map2->AddActor( actor, true );
+    
+    // update the worldmap if needed
+    if (actor->InParty) {
+      WorldMap *worldmap = core->GetWorldMap();
+      unsigned int areaindex;
+      WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
+      if (entry) {
+        // make sure the area is marked as revealed and visited
+        if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+          entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, BM_OR);
+        }
+      }
 		}
 	}
 	actor->SetPosition(position, adjust);

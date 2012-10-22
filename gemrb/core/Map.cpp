@@ -1429,7 +1429,9 @@ void Map::AddActor(Actor* actor, bool init)
 {
 	//setting the current area for the actor as this one
 	strnlwrcpy(actor->Area, scriptName, 8);
-	actors.push_back( actor );
+	if (!HasActor(actor)) {
+		actors.push_back( actor );
+	}
 	if (init) {
 		actor->SetMap(this);
 		InitActor(actor);
@@ -2171,9 +2173,9 @@ void Map::RemoveActor(Actor* actor)
 	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
-			ClearSearchMapFor(actor);
 			//clear previous walk path
 			actor->ClearPath();
+			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
 			actors.erase( actors.begin()+i );
 			return;

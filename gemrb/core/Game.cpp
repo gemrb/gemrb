@@ -788,10 +788,30 @@ int Game::DelMap(unsigned int index, int forced)
 	return 0;
 }
 
+void Game::PlacePersistents(Map *newMap, const char *ResRef)
+{
+	unsigned int i, last;
+
+	// count the number of replaced actors, so we don't need to recheck them
+	// if their max level is still lower than ours, each check would also result in a substitution
+	last = NPCs.size()-1;
+	for (i = 0; i < NPCs.size(); i++) {
+		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
+			if (i < last && CheckForReplacementActor(i)) {
+				i--;
+				last--;
+				continue;
+			}
+			newMap->AddActor( NPCs[i], false );
+			NPCs[i]->SetMap(newMap);
+		}
+	}
+}
+
 /* Loads an area */
 int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
-	unsigned int i, last, ret;
+	unsigned int i, ret;
 	Map *newMap;
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
@@ -803,6 +823,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	int index = FindMap(ResRef);
 	if (index>=0) {
+		PlacePersistents(GetMap(index), ResRef);
 		return index;
 	}
 
@@ -839,19 +860,9 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 			newMap->AddActor( PCs[i], false );
 		}
 	}
-	// count the number of replaced actors, so we don't need to recheck them
-	// if their max level is still lower than ours, each check would also result in a substitution
-	last = NPCs.size()-1;
-	for (i = 0; i < NPCs.size(); i++) {
-		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
-			if (i < last && CheckForReplacementActor(i)) {
-				i--;
-				last--;
-				continue;
-			}
-			newMap->AddActor( NPCs[i], false );
-		}
-	}
+
+	PlacePersistents(newMap, ResRef);
+
 	if (hide) {
 		core->UnhideGCWindow();
 	}
@@ -867,7 +878,8 @@ failedload:
 }
 
 // check if the actor is in npclevel.2da and replace accordingly
-bool Game::CheckForReplacementActor(int i) {
+bool Game::CheckForReplacementActor(int i)
+{
 	if (core->InCutSceneMode() || npclevels.empty()) {
 		return false;
 	}
@@ -1749,7 +1761,7 @@ void Game::ChangeSong(bool always, bool force)
 }
 
 /* this method redraws weather. If update is false,
-   then the weather particles won't change (game paused)
+// then the weather particles won't change (game paused)
 */
 void Game::DrawWeather(const Region &screen, bool update)
 {

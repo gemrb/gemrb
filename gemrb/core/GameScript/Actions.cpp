@@ -2696,6 +2696,7 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 	slot = core->GetGame()->InStore( act );
 	if (slot >= 0) {
 		core->GetGame()->DelNPC( slot );
+		act->SetPersistent(-1);
 	}
 }
 
