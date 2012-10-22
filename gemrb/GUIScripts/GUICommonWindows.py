@@ -1213,7 +1213,7 @@ def UpdatePortraitWindow ():
 			if (x - idx) % numCols == numCols - 1:
 				states = states + "\n"
 
-		if flag <> blank:
+		if flag != blank:
 			FlagLabel = Window.GetControl(200 + portid)
 			FlagLabel.SetText(flag)
 		Button.SetText(states)
