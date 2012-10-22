@@ -365,6 +365,8 @@ public:
 	bool MasterArea(const char *area);
 	/** Dynamically adding an area to master areas*/
 	void SetMasterArea(const char *area);
+	/** place persistent actors in the fresly loaded area*/
+	void PlacePersistents(Map *map, const char *ResRef);
 	/** Returns slot of the map, if it was already loaded,
 	 * don't load it again, set changepf == true,
 	 * if you want to change the pathfinder too. */
