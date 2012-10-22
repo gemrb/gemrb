@@ -2172,6 +2172,8 @@ void Map::RemoveActor(Actor* actor)
 	while (i--) {
 		if (actors[i] == actor) {
 			ClearSearchMapFor(actor);
+			//clear previous walk path
+			actor->ClearPath();
 			actor->SetMap(NULL);
 			actors.erase( actors.begin()+i );
 			return;
