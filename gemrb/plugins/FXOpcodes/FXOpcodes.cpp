@@ -5383,7 +5383,8 @@ int fx_power_word_stun (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_imprisonment(%2d)", fx->Opcode);
-	target->SetMCFlag(MC_HIDDEN, BM_OR);
+	//target->SetMCFlag(MC_HIDDEN, BM_OR);
+	STAT_BIT_OR( IE_MC_FLAGS, MC_HIDDEN );
 	target->AddPortraitIcon(PI_PRISON);
 	return FX_APPLIED;
 }
@@ -5417,7 +5418,8 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	target->SetMCFlag(MC_HIDDEN, BM_OR);
+	//target->SetMCFlag(MC_HIDDEN, BM_OR);
+	STAT_BIT_OR( IE_MC_FLAGS, MC_HIDDEN );
 	target->AddPortraitIcon(PI_MAZE);
 	return FX_APPLIED;
 }
