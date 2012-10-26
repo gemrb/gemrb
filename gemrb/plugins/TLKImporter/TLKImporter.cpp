@@ -184,6 +184,26 @@ char *TLKImporter::CharName(int slot)
 	return override->CS("?");
 }
 
+int TLKImporter::ClassStrRef(int slot)
+{
+	Actor *act;
+	int clss;
+
+	act=GetActorFromSlot(slot);
+	if (act) {
+		clss=act->GetStat(IE_CLASS);
+	} else {
+		clss=0;
+	}
+
+	AutoTable tab("classes");
+	if (!tab) {
+		return -1;
+	}
+	int row = tab->FindTableValue(5, clss, 0);
+	return atoi(tab->QueryField(row,0) );
+}
+
 int TLKImporter::RaceStrRef(int slot)
 {
 	Actor *act;
@@ -242,6 +262,10 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( 10174, 0 );
 		goto exit_function;
 	}
+	if (!strcmp( Token, "CLASS" )) {
+		Decoded = GetString( ClassStrRef(-1), 0);
+		goto exit_function;
+	}
 	if (!strcmp( Token, "RACE" )) {
 		Decoded = GetString( RaceStrRef(-1), 0);
 		goto exit_function;
@@ -257,6 +281,10 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 	}
 	if (!strcmp( Token, "CHARNAME" )) {
 		Decoded = CharName(charname);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_CLASS" )) {
+		Decoded = GetString( ClassStrRef(0), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_RACE" )) {

@@ -60,6 +60,7 @@ private:
 	/**returns the decoded length of the built-in token
 		 if dest is not NULL it also returns the decoded value */
 	int BuiltinToken(char* Token, char* dest);
+	int ClassStrRef(int slot);
 	int RaceStrRef(int slot);
 	int GenderStrRef(int slot, int malestrref, int femalestrref);
 	char *Gabber();
