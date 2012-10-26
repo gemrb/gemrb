@@ -8716,4 +8716,14 @@ int Actor::UpdateAnimationID(bool derived)
 	return 0;
 }
 
+void Actor::MovementCommand(char *command)
+{
+	UseExit(0);
+	ClearPath();
+	ClearActions();
+	AddAction( GenerateAction( command ) );
+	ProcessActions();
 }
+
+}
+

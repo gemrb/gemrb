@@ -825,6 +825,7 @@ public:
 	bool IsDead() const;
 	bool IsInvisibleTo(Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
+	void MovementCommand(char *command);
 };
 }
 
