@@ -991,11 +991,23 @@ static int check_type(Actor* actor, Effect* fx)
 	return 1;
 }
 
+static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
+
 //check resistances, saving throws
 static bool check_resistance(Actor* actor, Effect* fx)
 {
+	Actor *caster;
+	Scriptable *cob;
+
 	if( !actor) {
 		return false;
+	}
+
+	cob = GetCasterObject();
+	if (cob && cob->Type==ST_ACTOR) {
+		caster = (Actor *) caster;
+	} else {
+		caster = 0;
 	}
 
 	//opcode immunity
@@ -1056,10 +1068,16 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 
 	//saving throws
+	int bonus = fx->SavingThrowBonus;
+
+	if (caster) {
+		bonus += actor->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,caster);
+	}
+
 	bool saved = false;
 	for (int i=0;i<5;i++) {
 		if( fx->SavingThrowType&(1<<i)) {
-			saved = actor->GetSavingThrow(i, fx->SavingThrowBonus);
+			saved = actor->GetSavingThrow(i, bonus);
 			if( saved) {
 				break;
 			}
