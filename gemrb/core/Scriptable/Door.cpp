@@ -356,7 +356,6 @@ void Highlightable::TryDisarm(Actor *actor)
 
 void Door::TryPickLock(Actor *actor)
 {
-	core->PlaySound(DS_PICKLOCK);
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != (ieDword)-1) {
 			displaymsg->DisplayStringName(OpenStrRef, DMC_BG2XPGREEN, actor, IE_STR_SOUND|IE_STR_SPEECH);
@@ -368,11 +367,13 @@ void Door::TryPickLock(Actor *actor)
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
+		core->PlaySound(DS_PICKFAIL);
 		return;
 	}
 	SetDoorLocked( false, true);
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
+	core->PlaySound(DS_PICKLOCK);
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();

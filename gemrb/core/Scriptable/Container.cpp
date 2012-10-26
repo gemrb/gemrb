@@ -229,7 +229,6 @@ int Container::IsOpen() const
 
 void Container::TryPickLock(Actor *actor)
 {
-	core->PlaySound(DS_PICKLOCK);
 	if (LockDifficulty == 100) {
 		if (OpenFail != (ieDword)-1) {
 			displaymsg->DisplayStringName(OpenFail, DMC_BG2XPGREEN, actor, IE_STR_SOUND|IE_STR_SPEECH);
@@ -241,11 +240,13 @@ void Container::TryPickLock(Actor *actor)
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
+		core->PlaySound(DS_PICKFAIL); //AMB_D21
 		return;
 	}
 	SetContainerLocked(false);
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
+	core->PlaySound(DS_PICKLOCK); //AMB_D21D
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();
@@ -255,9 +256,15 @@ void Container::TryPickLock(Actor *actor)
 void Container::TryBashLock(Actor *actor)
 {
 	//Get the strength bonus agains lock difficulty
-	int str = actor->GetStat(IE_STR);
-	int strEx = actor->GetStat(IE_STREXTRA);
-	unsigned int bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+	int bonus;
+
+	if (core->HasFeature(GF_3ED_RULES)) {
+		bonus = actor->GetAbilityBonus(IE_STR);
+	} else {
+		int str = actor->GetStat(IE_STR);
+		int strEx = actor->GetStat(IE_STREXTRA);
+		bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+	}
 	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
 	if(roll < LockDifficulty || LockDifficulty == 100) {
