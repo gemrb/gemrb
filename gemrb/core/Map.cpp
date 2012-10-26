@@ -528,11 +528,14 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		while (i--) {
 			Actor *pc = game->GetPC(i,false);
 			if (pc->GetCurrentArea()==this) {
-				pc->UseExit(0);
-				pc->ClearPath();
-				pc->ClearActions();
-				pc->AddAction( GenerateAction( command ) );
-				pc->ProcessActions();
+			pc->MovementCommand(command);
+			}
+		}
+		i = game->GetNPCCount();
+		while(i--) {
+			Actor *npc = game->GetNPC(i);
+			if (npc->GetCurrentArea()==this) {
+				npc->MovementCommand(command);
 			}
 		}
 		return;
@@ -546,20 +549,20 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 				continue;
 			}
 			if (pc->GetCurrentArea()==this) {
-				pc->UseExit(0);
-				pc->ClearPath();
-				pc->ClearActions();
-				pc->AddAction( GenerateAction( command ) );
-				pc->ProcessActions();
+				pc->MovementCommand(command);
+			}
+		}
+		i = game->GetNPCCount();
+		while(i--) {
+			Actor *npc = game->GetNPC(i);
+			if (npc->IsSelected() && (npc->GetCurrentArea()==this)) {
+				npc->MovementCommand(command);
 			}
 		}
 		return;
 	}
 
-	actor->ClearPath();
-	actor->ClearActions();
-	actor->AddAction( GenerateAction( command ) );
-	actor->ProcessActions();
+	actor->MovementCommand(command);
 }
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)

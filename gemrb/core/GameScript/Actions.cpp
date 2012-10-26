@@ -549,7 +549,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 			CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
 		}
 		Actor *actor = (Actor *) Sender;
-		if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos) ) {
+		if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos) ) {
 			MoveBetweenAreasCore( actor, map->GetScriptName(), tar->Pos, -1, true);
 		}
 	}
@@ -562,6 +562,14 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
 		MoveBetweenAreasCore( tar, parameters->string0Parameter, parameters->pointParameter, -1, true);
+	}
+
+	//move familiars with the party
+	i = game->GetNPCCount();
+	while (i--) {
+		Actor *tar = game->GetNPC(i);
+		if (tar->GetBase(IE_EA)==EA_FAMILIAR)
+			MoveBetweenAreasCore( tar, parameters->string0Parameter, parameters->pointParameter, -1, true);
 	}
 }
 
@@ -577,8 +585,13 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* parameters)
 //add some animation effects too?
 void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
+	int i, cnt;
+	Point pos;
+	ieResRef area;
+
 	Game *game = core->GetGame();
-	for (int i = 0; i < game->GetPartySize(false); i++) {
+	cnt = game->GetPartySize(false);
+	for (i = 0; i < cnt; i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
 			GAMLocationEntry *gle;
@@ -589,10 +602,24 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 			} else {
 				gle = game->GetPlaneLocationEntry(i);
 			}
+			
+			// save player1 location for familiar movement
+			if (!i) {
+				pos = gle->Pos;
+				memcpy(area, gle->AreaResRef, sizeof(area) );
+			}
 			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
 		}
 	}
-
+	
+	// move familiars
+	cnt = game->GetNPCCount();
+	for (i = 0; i < cnt; i++) {
+		Actor* act = game->GetNPC( i );
+		if (act->GetBase(IE_EA)==EA_FAMILIAR) {
+			MoveBetweenAreasCore(act, area, pos, -1, true);
+		}
+	}
 	// don't clear locations!
 }
 
@@ -607,7 +634,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
 			continue;
 		}
-		//no need of CreateMovementEffect, party members are always moved immediately
+		// no need of CreateMovementEffect, party members are always moved immediately
 		MoveBetweenAreasCore( tar, parameters->string1Parameter,
 			parameters->pointParameter, -1, true);
 	}
@@ -2540,7 +2567,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor *actor = (Actor *) Sender;
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
@@ -2979,7 +3006,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
@@ -2995,7 +3022,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
@@ -3033,7 +3060,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
