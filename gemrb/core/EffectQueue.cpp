@@ -1005,7 +1005,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	cob = GetCasterObject();
 	if (cob && cob->Type==ST_ACTOR) {
-		caster = (Actor *) caster;
+		caster = (Actor *) cob;
 	} else {
 		caster = 0;
 	}
