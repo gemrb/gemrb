@@ -6830,6 +6830,14 @@ void Actor::Draw(const Region &screen)
 
 	//draw videocells over the actor
 	DrawVideocells(screen, vvcOverlays, tint);
+
+	// display pc hitpoints if requested
+	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("HP Over Head", tmp);
+	if (tmp && Persistent() && (core->GetGame()->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
+		DisplayHeadHPRatio();
+	}
 }
 
 /* Handling automatic stance changes */

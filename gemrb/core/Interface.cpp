@@ -3959,7 +3959,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Gore", 0}, // unused
 		{"Game Options", "GUI Feedback Level", 0},
 		{"Game Options", "Hotkeys On Tooltips", 1},			// not used. should be implemented.
-		{"Game Options", "HP Over Head", 0},				// not used. should be implemented.
+		{"Game Options", "HP Over Head", 0},
 		{"Game Options", "Infravision", 1},
 		{"Game Options", "Keyboard Scroll Speed", 64},
 		{"Game Options", "Locator Feedback Level", 0},
