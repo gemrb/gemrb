@@ -2747,6 +2747,7 @@ void GameControl::ResizeAdd(Window* win, int type)
 }
 
 //Create an overhead text over an arbitrary point
+// UNUSED
 void GameControl::DisplayString(const Point &p, const char *Text)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
@@ -2770,6 +2771,14 @@ void GameControl::DisplayString(Scriptable* target)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;
+
+	// add as a "subtitle" to the main message window
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("Subtitles", tmp);
+	if (tmp) {
+		// pass NULL target so pst does not display multiple
+		displaymsg->DisplayString(target->overHeadText, NULL);
+	}
 }
 
 /** changes displayed map to the currently selected PC */

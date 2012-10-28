@@ -3933,7 +3933,6 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Program Options", "SoftBlt", 0}, // unused
 		{"Program Options", "SoftMirrorBlt", 0}, // unused
 		{"Program Options", "SoftSrcKeyBlt", 0}, // unused
-		{"Program Options", "Subtitles", 0}, // TODO: not identical to the above, likely for the overhead text duplication
 		{"Program Options", "Strref On", 0},
 		{"Program Options", "Tooltips", 50},
 		{"Program Options", "Translucent Shadows", 0},
@@ -3964,10 +3963,11 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Keyboard Scroll Speed", 64},
 		{"Game Options", "Locator Feedback Level", 0},
 		{"Game Options", "Mouse Scroll Speed", 0},
-		{"Game Options", "Music Processing", 1}, // TODO: turn music off completely; someday we could swap the driver for NullSound and back
+		{"Game Options", "Music Processing", 1}, // TODO: turned music off completely for performance
 		{"Game Options", "Nightmare Mode", 0},
 		{"Game Options", "Selection Sounds Frequency", 0},
-		{"Game Options", "Sound Processing", 1}, // TODO: turn sound off completely; someday we could swap the driver for NullSound and back
+		{"Game Options", "Sound Processing", 1}, // TODO: turned sound off completely for performance
+		{"Game Options", "Subtitles", 0}, // not identical to the above, used for the overhead text duplication
 		{"Game Options", "Suppress Extra Difficulty Damage", 0},
 		{"Game Options", "Weather", 1},
 	};
