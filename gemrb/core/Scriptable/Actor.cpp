@@ -6011,8 +6011,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		if (it == core->DamageInfoMap.end()) {
 			print("Unhandled damagetype:%d", damagetype);
 		} else if (it->second.resist_stat) {
-			// damage type with a resistance stat
-			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
 				int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
@@ -6021,6 +6019,8 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 					print("Bonus damage of %d(%+d%%), neto: %d", int(damage * bonus / 100.0), bonus, -resisted);
 				}
 			}
+			// damage type with a resistance stat
+			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 			damage -= resisted;
 			print("Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// TODO: PST and BG1 may actually heal on negative damage
