@@ -479,8 +479,9 @@ def ApplyFeats(MyChar):
 		Stat = SPLFocusTable.GetValue(Row, "STAT", 2)
 		if Stat:
 			Column = GemRB.GetPlayerStat(MyChar, Stat)
+			print "Stat:",Stat,"Value:",SPLFocusTable.GetValue(i, Column),"Column:", Column
 			if Column:
-				Value = SPLFocusTable.GetValue(i, Column+1)
+				Value = SPLFocusTable.GetValue(i, Column)
 				if Value:
 					#add the effect, value could be 2 or 4, timing mode is 8 - so it is not saved
 					GemRB.ApplyEffect(MyChar, "SpellFocus", Value, i,"","","","SPLFOCUS", 8)
