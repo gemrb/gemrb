@@ -469,6 +469,21 @@ def ApplyFeats(MyChar):
 		GUICommon.MakeSpellCount(MyChar, "SPIN232", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN232")
+
+	#remove any previous SPLFOCUS
+	#GemRB.ApplyEffect(MyChar, "RemoveEffects",0,0,"SPLFOCUS")
+	#spell focus stats
+	SPLFocusTable = GemRB.LoadTable ("splfocus")
+	for i in range(SPLFocusTable.GetRowCount()):
+		Row = SPLFocusTable.GetRowName(i)
+		Stat = SPLFocusTable.GetValue(Row, "STAT", 2)
+		if Stat:
+			Column = GemRB.GetPlayerStat(MyChar, Stat)
+			if Column:
+				Value = SPLFocusTable.GetValue(i, Column+1)
+				if Value:
+					#add the effect, value could be 2 or 4, timing mode is 8 - so it is not saved
+					GemRB.ApplyEffect(MyChar, "SpellFocus", Value, i,"","","","SPLFOCUS", 8)
 	return
 
 def SetSpell(pc, SpellName, Feat):
