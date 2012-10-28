@@ -8726,5 +8726,18 @@ void Actor::MovementCommand(char *command)
 	ProcessActions();
 }
 
+// shows hp/maxhp as overhead text
+void Actor::DisplayHeadHPRatio()
+{
+	//sucks but this is set in different places
+	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return;
+	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return;
+
+	char tmpstr[10];
+	memset(tmpstr, 0, 10);
+	snprintf(tmpstr, 10, "%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
+	DisplayHeadText(strdup(tmpstr));
+}
+
 }
 

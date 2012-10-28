@@ -2404,7 +2404,6 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	int pm;
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	char tmpstr[10];
 	switch (Key) {
 		case GEM_LEFT:
 			OnMouseWheelScroll(keyScrollSpd * -1, 0);
@@ -2426,12 +2425,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			for (pm=0; pm < partysize; pm++) {
 				Actor *pc = game->GetPC(pm, true);
 				if (!pc) continue;
-				//sucks but this is set in different places
-				if (pc->GetStat(IE_MC_FLAGS) & MC_HIDE_HP) continue;
-				if (pc->GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) continue;
-				memset(tmpstr, 0, 10);
-				snprintf(tmpstr, 10, "%d/%d", pc->Modified[IE_HITPOINTS], pc->Modified[IE_MAXHITPOINTS]);
-				pc->DisplayHeadText(strdup(tmpstr));
+				pc->DisplayHeadHPRatio();
 			}
 			return;
 		case GEM_MOUSEOUT:
