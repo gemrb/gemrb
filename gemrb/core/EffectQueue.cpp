@@ -1593,32 +1593,6 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 	return HasOpcodeWithParamPair(effect_reference.opcode, param1, param2);
 }
 
-// sums all the values of the specific damage bonus effects of the passed "damage type"
-/*
-int EffectQueue::SpecificDamageBonus(ieDword opcode, ieDword param2) const
-{
-	int bonus = 0;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
-		bonus += (signed) (*f)->Parameter1;
-	}
-	return bonus;
-}
-
-static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier", -1 };
-int EffectQueue::SpecificDamageBonus(ieDword damage_type) const
-{
-	ResolveEffectRef(fx_damage_bonus_modifier_ref);
-	if(fx_damage_bonus_modifier_ref.opcode < 0) {
-		return 0;
-	}
-	return SpecificDamageBonus(fx_damage_bonus_modifier_ref.opcode, damage_type);
-}
-*/
-
 //this could be used for stoneskins and mirror images as well
 void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 {
