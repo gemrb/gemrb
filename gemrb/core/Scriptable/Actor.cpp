@@ -6253,8 +6253,10 @@ void Actor::AddExperience(int exp, int combat)
 		//TODO find out the 3ED variant
 		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
 	}
-	if (combat) {
-		exp += exp*xpadjustments[GameDifficulty]/100;
+	int adjustmentPercent = dmgadjustments[GameDifficulty];
+	// the "Suppress Extra Difficulty Damage" also switches off the XP bonus
+	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
+		exp += exp * adjustmentPercent/100;
 	}
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
 }
