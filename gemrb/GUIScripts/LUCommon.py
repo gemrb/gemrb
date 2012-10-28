@@ -479,7 +479,6 @@ def ApplyFeats(MyChar):
 		Stat = SPLFocusTable.GetValue(Row, "STAT", 2)
 		if Stat:
 			Column = GemRB.GetPlayerStat(MyChar, Stat)
-			print "Stat:",Stat,"Value:",SPLFocusTable.GetValue(i, Column),"Column:", Column
 			if Column:
 				Value = SPLFocusTable.GetValue(i, Column)
 				if Value:
