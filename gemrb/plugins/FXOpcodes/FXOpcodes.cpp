@@ -707,6 +707,8 @@ static EffectDesc effectnames[] = {
 	{ "Spell:CastPoint", fx_cast_spell_point, 0, -1 },
 	{ "Spell:Learn", fx_learn_spell, 0, -1 },
 	{ "Spell:Remove", fx_remove_spell, 0, -1 },
+	{ "SpellFocus",fx_generic_effect , 0, -1 }, //to implement school specific saving throw penalty to opponent
+	{ "SpellResistance",fx_generic_effect , 0, -1 }, //to implement school specific saving throw bonus
 	{ "Spelltrap",fx_spelltrap , 0, -1 }, //overlay: spmagglo
 	{ "State:Berserk", fx_set_berserk_state, 0, -1 },
 	{ "State:Blind", fx_set_blind_state, 0, -1 },

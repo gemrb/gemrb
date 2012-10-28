@@ -307,6 +307,8 @@ IDS
 0x131	SpellcraftModifier
 0x132	CriticalHitModifier
 0x133	TurnLevelModifier
+397	SpellResistance
+398	SpellFocus
 399	AlterAnimation
 400	Hopelessness
 401	ProtectionFromEvil
