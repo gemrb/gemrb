@@ -9504,6 +9504,7 @@ PyDoc_STRVAR( GemRB_ApplyEffect__doc,
 
 static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 {
+	int timing = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	int globalID;
 	const char *opcodename;
 	int param1, param2;
@@ -9512,7 +9513,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	const char *resref3 = NULL;
 	const char *source = NULL;
 
-	if (!PyArg_ParseTuple( args, "isii|ssss", &globalID, &opcodename, &param1, &param2, &resref1, &resref2, &resref3, &source)) {
+	if (!PyArg_ParseTuple( args, "isii|ssssi", &globalID, &opcodename, &param1, &param2, &resref1, &resref2, &resref3, &source, timing)) {
 		return AttributeError( GemRB_ApplyEffect__doc );
 	}
 	GET_GAME();
@@ -9520,7 +9521,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 
 	work_ref.Name=opcodename;
 	work_ref.opcode=-1;
-	Effect *fx = EffectQueue::CreateEffect(work_ref, param1, param2, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
+	Effect *fx = EffectQueue::CreateEffect(work_ref, param1, param2, timing);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return RuntimeError( "Invalid effect name!\n" );
