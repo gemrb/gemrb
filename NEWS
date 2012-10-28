@@ -1,6 +1,7 @@
-GemRB git (ea889eca):
+GemRB git (01fa3b490):
   New features:
     - 
+    - more original configuration options are honored
     - GemRB now asks for confirmation when exiting
     - output can now be shown in the ingame message window (run debug(5))
     - ToBEx flags for effect damage: bypass mirror image, ignore difficulty
@@ -11,8 +12,8 @@ GemRB git (ea889eca):
     - custom dialog.tlk encoding support
     - fonts, effect icons, initials, chapter text
     - option windows
-    - actions, triggers
-    - bugfixes
+    - actions, triggers, effects
+    - assorted bugfixes
 
 GemRB V0.7.1 (2012-07-15):
   New features:
