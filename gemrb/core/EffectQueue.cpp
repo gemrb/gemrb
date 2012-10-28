@@ -52,6 +52,48 @@ static int effectnames_count = 0;
 static int pstflags = false;
 static bool iwd2fx = false;
 
+static EffectRef fx_unsummon_creature_ref = { "UnsummonCreature", -1 };
+static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
+static EffectRef fx_spell_focus_ref = { "SpellFocus", -1 };
+static EffectRef fx_spell_resistance_ref = { "SpellResistance", -1 };
+static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
+static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
+
+//immunity effects
+static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
+static EffectRef fx_opcode_immunity_ref = { "Protection:Opcode", -1 }; //bg2
+static EffectRef fx_opcode_immunity2_ref = { "Protection:Opcode2", -1 };//iwd
+static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
+static EffectRef fx_spell_immunity2_ref = { "Protection:Spell2", -1 };//iwd
+static EffectRef fx_store_spell_sequencer_ref = { "Sequencer:Store", -1 }; //bg2, works against sequencers
+static EffectRef fx_school_immunity_ref = { "Protection:School", -1 };
+static EffectRef fx_secondary_type_immunity_ref = { "Protection:SecondaryType", -1 };
+
+//decrementing immunity effects
+static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
+static EffectRef fx_spell_immunity_dec_ref = { "Protection:SpellDec", -1 };
+static EffectRef fx_school_immunity_dec_ref = { "Protection:SchoolDec", -1 };
+static EffectRef fx_secondary_type_immunity_dec_ref = { "Protection:SecondaryTypeDec", -1 };
+
+//bounce effects
+static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
+//static EffectRef fx_opcode_bounce_ref = { "Bounce:Opcode", -1 };
+static EffectRef fx_spell_bounce_ref = { "Bounce:Spell", -1 };
+static EffectRef fx_school_bounce_ref = { "Bounce:School", -1 };
+static EffectRef fx_secondary_type_bounce_ref = { "Bounce:SecondaryType", -1 };
+
+//decrementing bounce effects
+static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
+static EffectRef fx_spell_bounce_dec_ref = { "Bounce:SpellDec", -1 };
+static EffectRef fx_school_bounce_dec_ref = { "Bounce:SchoolDec", -1 };
+static EffectRef fx_secondary_type_bounce_dec_ref = { "Bounce:SecondaryTypeDec", -1 };
+
+//spelltrap (multiple decrementing immunity)
+static EffectRef fx_spelltrap = { "SpellTrap", -1 };
+
+//weapon immunity
+static EffectRef fx_weapon_immunity_ref = { "Protection:Weapons", -1 };
+
 bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 {
 	if( value == 0) {
@@ -194,8 +236,6 @@ static EffectDesc* FindEffect(const char* effectname)
 	}
 	return (EffectDesc *) tmp;
 }
-
-static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
 
 static inline void ResolveEffectRef(EffectRef &effect_reference)
 {
@@ -409,8 +449,6 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference
 	}
 	return CreateEffectCopy(oldfx, effect_reference.opcode, param1, param2);
 }
-
-static EffectRef fx_unsummon_creature_ref = { "UnsummonCreature", -1 };
 
 Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 {
@@ -782,38 +820,6 @@ static inline bool check_probability(Effect* fx)
 	return true;
 }
 
-//immunity effects
-static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
-static EffectRef fx_opcode_immunity_ref = { "Protection:Opcode", -1 }; //bg2
-static EffectRef fx_opcode_immunity2_ref = { "Protection:Opcode2", -1 };//iwd
-static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
-static EffectRef fx_spell_immunity2_ref = { "Protection:Spell2", -1 };//iwd
-static EffectRef fx_store_spell_sequencer_ref = { "Sequencer:Store", -1 }; //bg2, works against sequencers
-static EffectRef fx_school_immunity_ref = { "Protection:School", -1 };
-static EffectRef fx_secondary_type_immunity_ref = { "Protection:SecondaryType", -1 };
-
-//decrementing immunity effects
-static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
-static EffectRef fx_spell_immunity_dec_ref = { "Protection:SpellDec", -1 };
-static EffectRef fx_school_immunity_dec_ref = { "Protection:SchoolDec", -1 };
-static EffectRef fx_secondary_type_immunity_dec_ref = { "Protection:SecondaryTypeDec", -1 };
-
-//bounce effects
-static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
-//static EffectRef fx_opcode_bounce_ref = { "Bounce:Opcode", -1 };
-static EffectRef fx_spell_bounce_ref = { "Bounce:Spell", -1 };
-static EffectRef fx_school_bounce_ref = { "Bounce:School", -1 };
-static EffectRef fx_secondary_type_bounce_ref = { "Bounce:SecondaryType", -1 };
-
-//decrementing bounce effects
-static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
-static EffectRef fx_spell_bounce_dec_ref = { "Bounce:SpellDec", -1 };
-static EffectRef fx_school_bounce_dec_ref = { "Bounce:SchoolDec", -1 };
-static EffectRef fx_secondary_type_bounce_dec_ref = { "Bounce:SecondaryTypeDec", -1 };
-
-//spelltrap (multiple decrementing immunity)
-static EffectRef fx_spelltrap = { "SpellTrap", -1 };
-
 //this is for whole spell immunity/bounce
 static inline int DecreaseEffect(Effect *efx)
 {
@@ -991,8 +997,6 @@ static int check_type(Actor* actor, Effect* fx)
 	return 1;
 }
 
-static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
-
 //check resistances, saving throws
 static bool check_resistance(Actor* actor, Effect* fx)
 {
@@ -1047,13 +1051,14 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	bool resisted = false;
+
 	if (iwd2fx) {
 		// 3ed style check
-		// TODO: check if luck really affects it
+		// TODO: check if luck really affects it (i doubt it does)
 		ieDword check = fx->CasterLevel + actor->LuckyRoll(1, 20, 0);
 		// +2/+4 level bonus from the (greater) spell penetration feat
-		if (actor->HasFeat(FEAT_SPELL_PENETRATION)) {
-			check += 2 * actor->GetStat(IE_FEAT_SPELL_PENETRATION);
+		if (caster && caster->HasFeat(FEAT_SPELL_PENETRATION)) {
+			check += 2 * caster->GetStat(IE_FEAT_SPELL_PENETRATION);
 		}
 		resisted = (signed) check < (signed) val;
 	} else {
@@ -1067,11 +1072,12 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		return true;
 	}
 
-	//saving throws
-	int bonus = fx->SavingThrowBonus;
-
+	//saving throws, bonus can be improved by school specific bonus
+	int bonus = fx->SavingThrowBonus + actor->fxqueue.BonusForParam2(fx_spell_resistance_ref, fx->PrimaryType);
 	if (caster) {
 		bonus += actor->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,caster);
+		//saving throw could be made difficult by caster's school specific bonus
+		bonus -= caster->fxqueue.BonusForParam2(fx_spell_focus_ref, fx->PrimaryType);
 	}
 
 	bool saved = false;
@@ -1588,6 +1594,7 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 }
 
 // sums all the values of the specific damage bonus effects of the passed "damage type"
+/*
 int EffectQueue::SpecificDamageBonus(ieDword opcode, ieDword param2) const
 {
 	int bonus = 0;
@@ -1610,6 +1617,7 @@ int EffectQueue::SpecificDamageBonus(ieDword damage_type) const
 	}
 	return SpecificDamageBonus(fx_damage_bonus_modifier_ref.opcode, damage_type);
 }
+*/
 
 //this could be used for stoneskins and mirror images as well
 void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
@@ -1733,6 +1741,28 @@ int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor)
 	return BonusAgainstCreature(effect_reference.opcode, actor);
 }
 
+int EffectQueue::BonusForParam2(ieDword opcode, ieDword param2) const
+{
+	int sum = 0;
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		MATCH_PARAM2();
+		sum += (*f)->Parameter1;
+	}
+	return sum;
+}
+
+int EffectQueue::BonusForParam2(EffectRef &effect_reference, ieDword param2) const
+{
+	ResolveEffectRef(effect_reference);
+	if( effect_reference.opcode<0) {
+		return 0;
+	}
+	return BonusForParam2(effect_reference.opcode, param2);
+}
+
 bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1756,8 +1786,6 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 	}
 	return false;
 }
-
-static EffectRef fx_weapon_immunity_ref = { "Protection:Weapons", -1 };
 
 bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
@@ -1950,8 +1978,6 @@ bool EffectQueue::HasDuration(Effect *fx)
 	}
 	return false;
 }
-
-static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
 
 //returns true if the effect must be saved
 bool EffectQueue::Persistent(Effect* fx)

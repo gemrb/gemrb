@@ -324,6 +324,7 @@ static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
+static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd2
@@ -6014,7 +6015,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
-				int bonus = attacker->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
+				int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
 					print("Bonus damage of %d(%+d%%), neto: %d", int(damage * bonus / 100.0), bonus, -resisted);
