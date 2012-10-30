@@ -1289,7 +1289,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	Actor *tar = NULL;
 	if (target->Type==ST_ACTOR) {
 		tar = (Actor *) target;
+
+		// release if target is invisible to sender (because of death or invisbility spell)
+		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
+			actor->SetStance(IE_ANI_READY);
+			Sender->ReleaseCurrentAction();
+			return;
+		}
 	}
+
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
 		return;
