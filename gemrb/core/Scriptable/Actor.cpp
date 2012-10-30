@@ -2874,9 +2874,10 @@ void Actor::RefreshPCStats() {
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec) {
 		if (!(game->GameTime%mrec)) {
-			if (BaseStats[IE_MORALE] < 10) {
+			int morale = (signed) BaseStats[IE_MORALE];
+			if (morale < 10) {
 				NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-			} else if (BaseStats[IE_MORALE] > 10) {
+			} else if (morale > 10) {
 				NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 			}
 		}
