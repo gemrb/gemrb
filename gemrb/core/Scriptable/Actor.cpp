@@ -2874,9 +2874,10 @@ void Actor::RefreshPCStats() {
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec) {
 		if (!(game->GameTime%mrec)) {
-			if (BaseStats[IE_MORALE] < 10) {
+			int morale = (signed) BaseStats[IE_MORALE];
+			if (morale < 10) {
 				NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-			} else if (BaseStats[IE_MORALE] > 10) {
+			} else if (morale > 10) {
 				NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 			}
 		}
@@ -5755,23 +5756,12 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
-
-	//can't target invisible or dead opponent
-	if (target) {
-		ieDword flag = target->GetSafeStat(IE_STATE_ID);
-		if (!GetSafeStat(IE_SEEINVISIBLE) ) flag &= STATE_DEAD|state_invisible;
-		else flag &= STATE_DEAD;
-
-		if (flag) {
-			target = NULL;
-		}
-	}
-
 	if (!target) {
 		Log(WARNING, "Actor", "Attack without valid target!");
 		return;
 	}
 
+	assert(!(target->IsInvisibleTo((Scriptable *) this) || (target->GetSafeStat(IE_STATE_ID) & STATE_DEAD)));
 	target->AttackedBy(this);
 
 	print("Performattack for %s, target is: %s", ShortName, target->ShortName);
