@@ -529,164 +529,66 @@ Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters, in
 	return parameters;
 }
 
-Targets *GameScript::BestAC(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+//This filter works only on the Party - silly restriction, but the dataset expects this
+Targets *GameScript::StrongestOfMale(Scriptable* Sender, Targets *parameters, int ga_flags)
 {
-	targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
-	}
-	Scriptable *scr=t->actor;
-	Actor *actor=(Actor *) scr;
-	int bestac=actor->GetStat(IE_ARMORCLASS);
-	// assignment in while
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		actor = (Actor *) t->actor;
-		int ac=actor->GetStat(IE_ARMORCLASS);
-		if (bestac<ac) {
-			bestac=ac;
-			scr=t->actor;
-		}
-	}
-
-	parameters->Clear();
-	parameters->AddTarget(scr, 0, ga_flags);
-	return parameters;
-}
-
-/*no idea why this object exists since the gender could be filtered easier*/
-Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
-{
-	targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
-	}
-	int pos=-1;
-	int worsthp=-1;
-	Scriptable *scr = NULL;
-	//assignment intentional
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		Actor *actor = (Actor *) t->actor;
-		if (actor->GetStat(IE_SEX)!=SEX_MALE) continue;
-		int hp=actor->GetStat(IE_HITPOINTS);
-		if ((pos==-1) || (worsthp<hp)) {
-			worsthp=hp;
-			scr=t->actor;
-		}
-	}
-	parameters->Clear();
-	if (scr) {
-		parameters->AddTarget(scr, 0, ga_flags);
-	}
-	return parameters;
-}
-
-Targets *GameScript::StrongestOf(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
-{
-	targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
-	}
-	Scriptable *scr=t->actor;
-	Actor *actor=(Actor *) scr;
-	int besthp=actor->GetStat(IE_HITPOINTS);
-	// assignment in while
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		actor = (Actor *) t->actor;
-		int hp=actor->GetStat(IE_HITPOINTS);
-		if (besthp<hp) {
-			besthp=hp;
-			scr=t->actor;
-		}
-	}
-	parameters->Clear();
-	parameters->AddTarget(scr, 0, ga_flags);
-	return parameters;
-}
-
-Targets *GameScript::WeakestOf(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
-{
-	targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
-	}
-	Scriptable *scr=t->actor;
-	Actor *actor=(Actor *) scr;
-	int worsthp=actor->GetStat(IE_HITPOINTS);
-	// assignment in while
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		actor = (Actor *) t->actor;
-		int hp=actor->GetStat(IE_HITPOINTS);
-		if (worsthp>hp) {
-			worsthp=hp;
-			scr=t->actor;
-		}
-	}
-	parameters->Clear();
-	parameters->AddTarget(scr, 0, ga_flags);
-	return parameters;
-}
-
-Targets *GameScript::WorstAC(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
-{
-	targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
-	}
-	Scriptable *scr=t->actor;
-	Actor *actor=(Actor *) scr;
-	int worstac=actor->GetStat(IE_ARMORCLASS);
-	// assignment in while
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		actor = (Actor *) t->actor;
-		int ac=actor->GetStat(IE_ARMORCLASS);
-		if (worstac>ac) {
-			worstac=ac;
-			scr=t->actor;
-		}
-	}
-	parameters->Clear();
-	parameters->AddTarget(scr, 0, ga_flags);
-	return parameters;
-}
-
-Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int ga_flags)
-{
-	//Original engines restrict this to the PCs...
-	/*targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
-	}
-	Scriptable *scr = t->actor;
-	Actor *actor=(Actor *) scr;
-	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
-	// assignment in while
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		actor = (Actor *) t->actor;
-		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
-		if (worsthp>hp) {
-			worsthp=hp;
-			scr=t->actor;
-		}
-	}
-	parameters->Clear();
-	parameters->AddTarget(scr, 0, ga_flags);
-	return parameters;*/
-	Map* area = Sender->GetCurrentArea() ;
+	Map* area = Sender->GetCurrentArea();
 	Game *game = core->GetGame();
-	Scriptable* scr = NULL ;
-	int worsthp = 0xffff ;
+	Scriptable* scr = NULL;
+	int besthp = 0;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if (actor->GetStat(IE_SEX)!=SEX_MALE) continue;
+		if(actor->GetCurrentArea() == area) {
+			int hp = actor->GetStat(IE_HITPOINTS);
+			if (!scr || besthp<hp) {
+				besthp=hp;
+				scr=actor;
+			}
+		}
+	}
+	parameters->Clear();
+	parameters->AddTarget(scr, 0, ga_flags);
+	return parameters;
+}
+
+//This filter works only on the Party - silly restriction, but the dataset expects this
+Targets *GameScript::StrongestOf(Scriptable* Sender, Targets *parameters, int ga_flags)
+{
+	Map* area = Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL;
+	int besthp = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *actor = game->GetPC(i, false);
 		if(actor->GetCurrentArea() == area) {
-			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
-			if (worsthp>hp) {
+			int hp = actor->GetStat(IE_HITPOINTS);
+			if (!scr || besthp<hp) {
+				besthp=hp;
+				scr=actor;
+			}
+		}
+	}
+	parameters->Clear();
+	parameters->AddTarget(scr, 0, ga_flags);
+	return parameters;
+}
+
+//This filter works only on the Party - silly restriction, but the dataset expects this
+Targets *GameScript::WeakestOf(Scriptable* Sender, Targets *parameters, int ga_flags)
+{
+	Map* area = Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL;
+	int worsthp = 0;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if(actor->GetCurrentArea() == area) {
+			int hp = actor->GetStat(IE_HITPOINTS);
+			if (!scr || worsthp>hp) {
 				worsthp=hp;
 				scr=actor;
 			}
@@ -696,23 +598,93 @@ Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int 
 	parameters->AddTarget(scr, 0, ga_flags);
 	return parameters;
 }
-Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+
+//This filter works only on the Party - silly restriction, but the dataset expects this
+Targets *GameScript::BestAC(Scriptable* Sender, Targets *parameters, int ga_flags)
 {
-	targetlist::iterator m;
-	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
-	if (!t) {
-		return parameters;
+	Map* area = Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL;
+	int bestac = 0;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if(actor->GetCurrentArea() == area) {
+			int ac = actor->GetStat(IE_ARMORCLASS);
+			if (!scr || bestac>ac) {
+				bestac=ac;
+				scr=actor;
+			}
+		}
 	}
-	Scriptable *scr = t->actor;
-	Actor *actor = (Actor *) scr;
-	int besthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
-	// assignment in while
-	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
-		actor = (Actor *) t->actor;
-		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
-		if (besthp<hp) {
-			besthp=hp;
-			scr=t->actor;
+	parameters->Clear();
+	parameters->AddTarget(scr, 0, ga_flags);
+	return parameters;
+}
+
+//This filter works only on the Party - silly restriction, but the dataset expects this
+Targets *GameScript::WorstAC(Scriptable* Sender, Targets *parameters, int ga_flags)
+{
+	Map* area = Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL;
+	int worstac = 0;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if(actor->GetCurrentArea() == area) {
+			int ac = actor->GetStat(IE_ARMORCLASS);
+			if (!scr || worstac<ac) {
+				worstac=ac;
+				scr=actor;
+			}
+		}
+	}
+	parameters->Clear();
+	parameters->AddTarget(scr, 0, ga_flags);
+	return parameters;
+}
+
+//This filter works only on the Party - silly restriction, but the dataset expects this
+Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int ga_flags)
+{
+	Map* area = Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL;
+	int worsthp = 0;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if(actor->GetCurrentArea() == area) {
+			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+			if (!scr || worsthp>hp) {
+				worsthp=hp;
+				scr=actor;
+			}
+		}
+	}
+	parameters->Clear();
+	parameters->AddTarget(scr, 0, ga_flags);
+	return parameters;
+}
+
+//This filter works only on the Party - silly restriction, but the dataset expects this
+//For example the beholder01 script
+Targets *GameScript::LeastDamagedOf(Scriptable* Sender, Targets *parameters, int ga_flags)
+{
+	Map* area = Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL;
+	int besthp = 0;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if(actor->GetCurrentArea() == area) {
+			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+			if (!scr || besthp<hp) {
+				besthp=hp;
+				scr=actor;
+			}
 		}
 	}
 	parameters->Clear();
