@@ -3257,10 +3257,14 @@ int fx_morale_break_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x6b PortraitChange
+// 0 - small
+// 1 - large
+// 2 - both
 int fx_portrait_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_portrait_change(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->SetPortrait( fx->Resource, fx->Parameter2);
+	//in gemrb this is 0 both, 1 Large, 2 Small so we have to swap 2 and 0
+	target->SetPortrait( fx->Resource, fx->Parameter2^2);
 	return FX_NOT_APPLIED;
 }
 
