@@ -816,12 +816,14 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 {
 	char Tmp[256];
 
-	if ( !p.isempty() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
-		//MoveNearerTo will return 0, if the actor is in move
-		//it will return 1 (the fourth parameter) if the target is unreachable
-		if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
-			if(!Sender->InMove()) print("At least it said so...");
-			return;
+	if (Sender->CurrentActionTicks<100) {
+		if ( !p.isempty() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
+			//MoveNearerTo will return 0, if the actor is in move
+			//it will return 1 (the fourth parameter) if the target is unreachable
+			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
+				if(!Sender->InMove()) print("At least it said so...");
+				return;
+			}
 		}
 	}
 
