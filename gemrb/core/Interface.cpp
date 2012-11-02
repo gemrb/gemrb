@@ -3952,7 +3952,9 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Bored Timeout", 0},
 		{"Game Options", "Command Sounds Frequency", 0},
 		{"Game Options", "Critical Hit Screen Shake", 1},
+		{"Game Options", "Darkvision", 1}, // iwd2; treating as replacement for infravision
 		{"Game Options", "Difficulty Level", 0},
+		{"Game Options", "Duplicate Floating Text", 0},
 		{"Game Options", "Environmental Audio", 0}, // TODO: Creative's EAX
 		{"Game Options", "Footsteps", 1},
 		{"Game Options", "Gore", 0}, // unused
@@ -3969,7 +3971,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Old Portrait Health", 0},
 		{"Game Options", "Selection Sounds Frequency", 0},
 		{"Game Options", "Sound Processing", 1}, // TODO: turned sound off completely for performance
-		{"Game Options", "Subtitles", 0}, // not identical to the above, used for the overhead text duplication
+		{"Game Options", "Subtitles", 0}, // not identical to the above; used for displaying verbal constants
 		{"Game Options", "Suppress Extra Difficulty Damage", 0},
 		{"Game Options", "Weather", 1},
 		// Multiplayer
@@ -3991,6 +3993,11 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 
 	if (ini->GetKeyAsInt("Game Options", "Cheats", 1)) {
 		EnableCheatKeys(1);
+	}
+
+	// copies
+	if (!ini->GetKeyAsInt("Game Options", "Darkvision", 1)) {
+		vars->SetAt("Infravision", (ieDword)0);
 	}
 
 	if (!Width || !Height) {

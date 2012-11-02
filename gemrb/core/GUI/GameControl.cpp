@@ -2774,7 +2774,7 @@ void GameControl::DisplayString(Scriptable* target)
 
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("Subtitles", tmp);
+	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
 	if (tmp) {
 		// pass NULL target so pst does not display multiple
 		displaymsg->DisplayString(target->overHeadText, NULL);
