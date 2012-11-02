@@ -1300,7 +1300,7 @@ void LoadActionFlags(const char *tableName, int flag)
 {
 	int i, j;
 
-	int tableIndex = core->LoadSymbol("instant");
+	int tableIndex = core->LoadSymbol(tableName);
 	if (tableIndex < 0) {
 		error("GameScript", "Couldn't find %s symbols!\n",tableName);
 	}
