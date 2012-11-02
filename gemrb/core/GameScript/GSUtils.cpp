@@ -547,7 +547,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
 	//see dead
-	int flags = GA_NO_HIDDEN;
+	int flags = 0;
 
 	if (parameters->int0Parameter) {
 		flags |= GA_DETECT;
@@ -566,6 +566,9 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		return 0;
 	}
 
+	// ignore invisible targets
+	flags |= GA_NO_HIDDEN;
+	
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
