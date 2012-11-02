@@ -524,7 +524,7 @@ static const ActionLink actionnames[] = {
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment, 0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment, 0},
 	{"destroygold", GameScript::DestroyGold, 0},
-	{"destroyitem", GameScript::DestroyItem, 0},
+	{"destroyitem", GameScript::DestroyItem, AF_INSTANT}, //Cespenar won't work without this hack So, do we really need instant.ids?
 	{"destroypartygold", GameScript::DestroyPartyGold, 0},
 	{"destroypartyitem", GameScript::DestroyPartyItem, 0},
 	{"destroyself", GameScript::DestroySelf, 0},
