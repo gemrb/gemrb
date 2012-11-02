@@ -1296,13 +1296,17 @@ void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
 	}
 }
 
-void LoadActionFlags(const char *tableName, int flag)
+void LoadActionFlags(const char *tableName, int flag, bool critical)
 {
 	int i, j;
 
 	int tableIndex = core->LoadSymbol(tableName);
 	if (tableIndex < 0) {
-		error("GameScript", "Couldn't find %s symbols!\n",tableName);
+    if (critical) {
+		  error("GameScript", "Couldn't find %s symbols!\n",tableName);
+    } else {
+      return;
+    }
 	}
 	Holder<SymbolMgr> table = core->GetSymbol(tableIndex);
 	if (!table) {
@@ -1678,9 +1682,9 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	LoadActionFlags("instant", AF_INSTANT);
-	LoadActionFlags("actsleep", AF_SLEEP);
-	LoadActionFlags("chase", AF_CHASE);
+	LoadActionFlags("instant", AF_INSTANT, true);
+	LoadActionFlags("actsleep", AF_SLEEP, false);
+	LoadActionFlags("chase", AF_CHASE, false);
 
 	int savedTriggersIndex = core->LoadSymbol("svtriobj");
 	if (savedTriggersIndex < 0) {
