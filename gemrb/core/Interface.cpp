@@ -3962,14 +3962,18 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		{"Game Options", "Infravision", 1},
 		{"Game Options", "Keyboard Scroll Speed", 64},
 		{"Game Options", "Locator Feedback Level", 0},
+		{"Game Options", "Maximum HP", 0},
 		{"Game Options", "Mouse Scroll Speed", 0},
 		{"Game Options", "Music Processing", 1}, // TODO: turned music off completely for performance
 		{"Game Options", "Nightmare Mode", 0},
+		{"Game Options", "Old Portrait Health", 0},
 		{"Game Options", "Selection Sounds Frequency", 0},
 		{"Game Options", "Sound Processing", 1}, // TODO: turned sound off completely for performance
 		{"Game Options", "Subtitles", 0}, // not identical to the above, used for the overhead text duplication
 		{"Game Options", "Suppress Extra Difficulty Damage", 0},
 		{"Game Options", "Weather", 1},
+		// Multiplayer
+		{"Multiplayer", "Last Protocol Used", 0},
 	};
 
 	// iterate our whitelist and load the ini values into vars
