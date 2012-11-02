@@ -1278,6 +1278,7 @@ bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 {
 	//this is a dangerous cast, make sure actor is Actor * !!!
+	assert(Sender && Sender->Type == ST_ACTOR);
 	Actor *actor = (Actor *) Sender;
 
 	WeaponInfo wi;
