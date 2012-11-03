@@ -359,6 +359,7 @@ int Inventory::CountItems(const char *resref, bool stacks) const
 		}
 		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
 			count+=item->Usages[0];
+			assert(count!=0);
 		}
 		else {
 			count++;
