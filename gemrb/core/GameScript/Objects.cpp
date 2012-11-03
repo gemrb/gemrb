@@ -168,6 +168,24 @@ Targets *GameScript::LastMarkedObject(Scriptable *Sender, Targets *parameters, i
 	return parameters;
 }
 
+Targets *GameScript::SpellTarget(Scriptable *Sender, Targets *parameters, int ga_flags)
+{
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		if (target) {
+			parameters->AddTarget(target, 0, ga_flags);
+		}
+	}
+	return parameters;
+}
+
 //actions should always use LastMarkedObject, because LastSeen could be deleted
 Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters, int ga_flags)
 {

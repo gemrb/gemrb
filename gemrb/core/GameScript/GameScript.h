@@ -1483,6 +1483,7 @@ public:
 	static Targets *SixthNearestEnemyOf(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SixthNearestEnemyOfType(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SixthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets *SpellTarget(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *StrongestOf(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *StrongestOfMale(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *TenthNearest(Scriptable *Sender, Targets *parameters, int ga_flags);

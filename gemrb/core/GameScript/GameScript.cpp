@@ -1056,6 +1056,7 @@ static const ObjectLink objectnames[] = {
 	{"sixthnearestenemyof", GameScript::SixthNearestEnemyOf},
 	{"sixthnearestenemyoftype", GameScript::SixthNearestEnemyOfType},
 	{"sixthnearestmygroupoftype", GameScript::SixthNearestMyGroupOfType},
+	{"spelltarget", GameScript::SpellTarget},
 	{"strongestof", GameScript::StrongestOf},
 	{"strongestofmale", GameScript::StrongestOfMale},
 	{"tenthnearest", GameScript::TenthNearest},
