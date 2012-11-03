@@ -8661,11 +8661,11 @@ bool Actor::IsInvisibleTo(Scriptable *checker) const
 {
 	if (Modified[IE_AVATARREMOVAL]) return true;
 
-	bool seer = false;
+	bool canSeeInvisibles = false;
 	if (checker && checker->Type == ST_ACTOR) {
-		seer = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
+		canSeeInvisibles = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
 	}
-	if (!seer && (Modified[IE_STATE_ID] & state_invisible)) {
+	if (!canSeeInvisibles && (Modified[IE_STATE_ID] & state_invisible)) {
 		return true;
 	}
 

@@ -547,7 +547,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
 	//see dead
-	int flags = GA_NO_HIDDEN;
+	int flags = 0;
 
 	if (parameters->int0Parameter) {
 		flags |= GA_DETECT;
@@ -566,6 +566,9 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		return 0;
 	}
 
+	// ignore invisible targets
+	flags |= GA_NO_HIDDEN;
+	
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
@@ -1278,6 +1281,7 @@ bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 {
 	//this is a dangerous cast, make sure actor is Actor * !!!
+	assert(Sender && Sender->Type == ST_ACTOR);
 	Actor *actor = (Actor *) Sender;
 
 	WeaponInfo wi;
@@ -1296,12 +1300,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
 			actor->SetStance(IE_ANI_READY);
 			Sender->ReleaseCurrentAction();
+			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: %s!", tar->GetName(1));
 			return;
 		}
 	}
 
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
+		Log(WARNING, "AttackCore", "Tried attacking itself: %s!", tar->GetName(1));
 		return;
 	}
 
@@ -1309,6 +1315,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, tar)) {
 		actor->SetStance(IE_ANI_READY);
 		Sender->ReleaseCurrentAction();
+		Log(WARNING, "AttackCore", "Weapon unusable: %s!", actor->GetName(1));
 		return;
 	}
 

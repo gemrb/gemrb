@@ -525,7 +525,9 @@ struct TriggerLink {
 #define AF_INVALID      128
 #define AF_DIRECT       256 //this hack will transfer target from gamecontrol to object1 at compile time
 #define AF_ALIVE        512 //only alive actors can do this
-#define AF_INSTANT      1024
+#define AF_INSTANT      1024 //instant actions
+#define AF_CHASE        2048 // ??? actions involving movement ???
+#define AF_SLEEP        4096 //only awake actors can do this
 
 struct ActionLink {
 	const char* Name;

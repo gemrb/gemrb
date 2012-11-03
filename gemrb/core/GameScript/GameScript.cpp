@@ -524,7 +524,7 @@ static const ActionLink actionnames[] = {
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment, 0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment, 0},
 	{"destroygold", GameScript::DestroyGold, 0},
-	{"destroyitem", GameScript::DestroyItem, 0},
+	{"destroyitem", GameScript::DestroyItem, AF_INSTANT}, //Cespenar won't work without this hack So, do we really need instant.ids?
 	{"destroypartygold", GameScript::DestroyPartyGold, 0},
 	{"destroypartyitem", GameScript::DestroyPartyItem, 0},
 	{"destroyself", GameScript::DestroySelf, 0},
@@ -1297,6 +1297,39 @@ void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
 	}
 }
 
+void LoadActionFlags(const char *tableName, int flag, bool critical)
+{
+	int i, j;
+
+	int tableIndex = core->LoadSymbol(tableName);
+	if (tableIndex < 0) {
+    if (critical) {
+		  error("GameScript", "Couldn't find %s symbols!\n",tableName);
+    } else {
+      return;
+    }
+	}
+	Holder<SymbolMgr> table = core->GetSymbol(tableIndex);
+	if (!table) {
+		error("GameScript", "Couldn't load %s symbols!\n",tableName);
+	}
+	j = table->GetSize();
+	while (j--) {
+		i = table->GetValueIndex( j );
+		if (i >= MAX_ACTIONS) {
+			Log(ERROR, "GameScript", "%s action %d (%s) is too high, ignoring",
+				tableName, i, table->GetStringIndex( j ) );
+			continue;
+		}
+		if (!actions[i]) {
+			Log(WARNING, "GameScript", "%s action %d (%s) doesn't exist, ignoring",
+				tableName, i, table->GetStringIndex( j ) );
+			continue;
+		}
+		actionflags[i] |= flag;
+	}
+}
+
 void InitializeIEScript()
 {
 	std::list<int> missing_triggers;
@@ -1650,29 +1683,9 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	int instantTableIndex = core->LoadSymbol("instant");
-	if (instantTableIndex < 0) {
-		error("GameScript", "Couldn't find instant symbols!\n");
-	}
-	Holder<SymbolMgr> instantTable = core->GetSymbol(instantTableIndex);
-	if (!instantTable) {
-		error("GameScript", "Couldn't load instant symbols!\n");
-	}
-	j = instantTable->GetSize();
-	while (j--) {
-		i = instantTable->GetValueIndex( j );
-		if (i >= MAX_ACTIONS) {
-			Log(ERROR, "GameScript", "instant action %d (%s) is too high, ignoring",
-				i, instantTable->GetStringIndex( j ) );
-			continue;
-		}
-		if (!actions[i]) {
-			Log(WARNING, "GameScript", "instant action %d (%s) doesn't exist, ignoring",
-				i, instantTable->GetStringIndex( j ) );
-			continue;
-		}
-		actionflags[i] |= AF_INSTANT;
-	}
+	LoadActionFlags("instant", AF_INSTANT, true);
+	LoadActionFlags("actsleep", AF_SLEEP, false);
+	LoadActionFlags("chase", AF_CHASE, false);
 
 	int savedTriggersIndex = core->LoadSymbol("svtriobj");
 	if (savedTriggersIndex < 0) {

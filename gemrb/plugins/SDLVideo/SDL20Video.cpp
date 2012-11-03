@@ -373,6 +373,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			ignoreNextFingerUp = true;
+			static SDL_TouchID lastFingerId = 0;
 
 			if (numFingers == core->NumFingScroll
 				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
@@ -389,12 +390,13 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
 
 				EvntManager->MouseWheelScroll( scrollX, scrollY );
-			} else if (numFingers == core->NumFingKboard) {
-				if ((event.tfinger.dy / yScaleFactor) * -1 >= MIN_GESTURE_DELTA_PIXELS){
+			} else if (numFingers == core->NumFingKboard && lastFingerId != state->fingers[0]->id) {
+				int delta = (int)(event.tfinger.dy / yScaleFactor) * -1;
+				if (delta > 0){
 					// if the keyboard is already up interpret this gesture as console pop
 					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
 					else ShowSoftKeyboard();
-				} else if((event.tfinger.dy / yScaleFactor) * -1 <= -MIN_GESTURE_DELTA_PIXELS){
+				} else if (delta < 0) {
 					HideSoftKeyboard();
 				}
 			} else if (numFingers == 1) { //click and drag
@@ -403,6 +405,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// standard mouse movement
 				MouseMovement((event.tfinger.x / xScaleFactor), (event.tfinger.y / yScaleFactor));
 			}
+			lastFingerId = state->fingers[0]->id;
 			break;
 		case SDL_FINGERDOWN:
 			if (numFingers == 1) {
