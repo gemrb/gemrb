@@ -1390,8 +1390,11 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	default:
 		damagetype = DAMAGE_ACID;
 	}
-	//these two bits are turned off on death
-	BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
+
+	if (damagetype!=DAMAGE_COLD) {
+		//these two bits are turned off on death
+		BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
+	}
 
 	Scriptable *killer = GetCasterObject();
 	target->Damage(0, damagetype, killer);
@@ -1405,6 +1408,9 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_cure_frozen_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cure_frozen_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (STATE_GET(STATE_FROZEN) && (STAT_GET(IE_HITPOINTS)<1) ) {
+		BASE_SET(IE_HITPOINTS,1);
+	}
 	BASE_STATE_CURE( STATE_FROZEN );
 	return FX_NOT_APPLIED;
 }
