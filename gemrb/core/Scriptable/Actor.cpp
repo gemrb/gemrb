@@ -561,11 +561,13 @@ void Actor::SetName(const char* ptr, unsigned char type)
 	if (type!=2) {
 		LongName = ( char * ) realloc( LongName, len );
 		memcpy( LongName, ptr, len );
+		LongName[len-1]=0;
 		core->StripLine( LongName, len );
 	}
 	if (type!=1) {
 		ShortName = ( char * ) realloc( ShortName, len );
 		memcpy( ShortName, ptr, len );
+		ShortName[len-1]=0;
 		core->StripLine( ShortName, len );
 	}
 }
