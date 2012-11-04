@@ -528,13 +528,13 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		while (i--) {
 			Actor *pc = game->GetPC(i,false);
 			if (pc->GetCurrentArea()==this) {
-			pc->MovementCommand(command);
+			  pc->MovementCommand(command);
 			}
 		}
 		i = game->GetNPCCount();
 		while(i--) {
 			Actor *npc = game->GetNPC(i);
-			if (npc->GetCurrentArea()==this) {
+			if ((npc->GetCurrentArea()==this) && (npc->GetStat(IE_EA)<EA_GOODCUTOFF) ) {
 				npc->MovementCommand(command);
 			}
 		}
