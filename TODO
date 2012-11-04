@@ -6,25 +6,19 @@ Strings:
 2. implement feature: "<GENDER?stref1:strref2>" (or even more ambitious stat specific strref tokens)
 
 Combat:
-1. (PARTLY) fix combat round timings
+1. (DONE?) fix combat round timings
 2. implement customisable combat calculation, it should be general enough to
 simulate all games, without any hardcoded parts
 
 Items:
 2. (PARTLY) Implement switching weapon abilities
-3. (DONE-almost) Implement item usage (similar to spells)
 
 Effects:
-1. (DONE-almost) Implement common effects
-2. (PARTLY) Implement IWD2 effects
-3. (DONE-almost) Implement TOB effects
-4. (PARTLY) Implement PST effects
-5. (DONE-almost) Implement area/non-living affecting effects 
+2. (DONE-mostly) Implement IWD2 effects
+4. (DONE-mostly) Implement PST effects
 
 Area:
 1. (PARTLY) Don't load scripts for pile items? (research when a script is unused)
-2. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
-3. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
 4. (DONE-almost) fix overlaid tiles - bug #1623839
 
 Animation:
@@ -46,8 +40,6 @@ Game GUI:
 1. (PARTLY) implement class based (but customisable) action button bar. Generally port
    the IWD2 system to all engines
 2. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
-3. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
-   it correctly too.
 4. (PARTLY) Fix unwanted screen shake (especially when on bottom of area on actor selection)
 5. (DONE-almost) Level up code, missing for pst wierdness and iwd2
 
@@ -58,14 +50,11 @@ General:
    right after loading config files and remain static afterwards. Maybe define 
    some PATH variable describing all the directories searched for files
 3. valgrind reports a big heap of unreleased python objects
-4. Implement at least all the options accessible from the GUI options setup,
-   rewrite baldur|torment|icewind.ini
+4. (DONE-mostly) Implement at least all the options accessible from the GUI options setup
 
 Graphics:
 1. use scaling in Video::SpriteScaleDown() instead of in Video::GetPreview() 
    and in BMPImporter
-2. move SDLVideoDriver sprite functions to their own file, rename them to 
-   SpriteIsPixelTransparent etc.
 3. (PARTLY) Add PNG support? (still image done)
 4. Fog of war: fully visible squares with one corner neighbour invisible need alpha of the adjacent corner to the invisible square tuned down (uh, i hope it is clear what to do, look for artifacts in the fog of war edge)
 
@@ -74,7 +63,7 @@ Sound:
    them in another thread (openal weirdness?)
 2. (PARTLY) sounds get sometimes distorted, might be connected to problem #1
 3. (PARTLY) Separate OpenAL interface from ACM loader and MVE player
-5. fix sound settings (currently the volumes get reset on area change, for example)
+5. (FIXED?) fix sound settings (currently the volumes get reset on area change, for example)
 6. implement and use as much from EAX (echo, damping, etc) as possible
 
 Release:
