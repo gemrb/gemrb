@@ -150,6 +150,13 @@ struct SurgeSpell {
 	ieStrRef message;
 };
 
+// whitelist of config values we can push directly into vars
+struct INIWhiteListEntry {
+	const char* INITag;
+	const char* INIKey;
+	int defaultValue;
+};
+
 class ItemList {
 public:
 	ieResRef *ResRefs;
@@ -714,6 +721,8 @@ public:
 	int GetSpecialSpell(const ieResRef resref);
 	int GetSpecialSpellsCount() { return SpecialSpellsCount; }
 	SpellDescType *GetSpecialSpells() { return SpecialSpells; }
+	/** Saves config variables to a file */
+	bool SaveConfig();
 private:
 	int LoadSprites();
 	bool LoadConfig(void);

@@ -120,8 +120,10 @@ def OpenOptionsWindow ():
 	
 	GemRB.UnhideGUI ()
 
+def TrySavingConfiguration():
+	if not GemRB.SaveConfig():
+		print "ARGH, could not write config to disk!!"
 
-	
 ###################################################
 
 def OpenVideoOptionsWindow ():
@@ -132,6 +134,7 @@ def OpenVideoOptionsWindow ():
 
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
+		TrySavingConfiguration()
 		GemRB.UnhideGUI ()
 		return
 
@@ -178,7 +181,8 @@ def OpenAudioOptionsWindow ():
 			for k, v in saved_audio_options.items ():
 				GemRB.SetVar (k, v)
 			UpdateVolume (31210)
-		
+
+		TrySavingConfiguration()
 		GemRB.UnhideGUI ()
 		return
 
@@ -224,6 +228,7 @@ def OpenGameplayOptionsWindow ():
 
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
+		TrySavingConfiguration()
 		GemRB.UnhideGUI ()
 		return
 

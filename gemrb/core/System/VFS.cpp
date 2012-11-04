@@ -123,7 +123,7 @@ bool dir_exists(const char* path)
 	return true;
 }
 
-/** Returns true if path is an existing directory */
+/** Returns true if path is an existing file */
 bool file_exists(const char* path)
 {
 	struct stat buf;
