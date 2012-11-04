@@ -1300,6 +1300,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
 			actor->SetStance(IE_ANI_READY);
 			Sender->ReleaseCurrentAction();
+			actor->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
 			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: %s!", tar->GetName(1));
 			return;
 		}
@@ -1315,6 +1316,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, tar)) {
 		actor->SetStance(IE_ANI_READY);
 		Sender->ReleaseCurrentAction();
+		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
 		Log(WARNING, "AttackCore", "Weapon unusable: %s!", actor->GetName(1));
 		return;
 	}
