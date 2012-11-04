@@ -4090,6 +4090,25 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ind );
 }
 
+PyDoc_STRVAR( GemRB_DumpActor__doc,
+			  "DumpActor(globalID)\n\n"
+			  "Prints the character's debug dump.");
+static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
+{
+	int globalID;
+
+	if (!PyArg_ParseTuple( args, "i", &globalID )) {
+		return AttributeError( GemRB_DumpActor__doc );
+	}
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	actor->dump();
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SaveCharacter__doc,
 "SaveCharacter(PartyID, CharName)\n\n"
 "Exports the character from party.");
@@ -10209,6 +10228,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DragItem, METH_VARARGS),
 	METHOD(DrawWindows, METH_NOARGS),
 	METHOD(DropDraggedItem, METH_VARARGS),
+	METHOD(DumpActor, METH_VARARGS),
 	METHOD(EnableCheatKeys, METH_VARARGS),
 	METHOD(EndCutSceneMode, METH_NOARGS),
 	METHOD(EnterGame, METH_NOARGS),
