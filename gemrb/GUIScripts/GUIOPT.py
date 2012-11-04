@@ -175,10 +175,15 @@ def OpenOptionsWindow ():
 
 	return
 
+def TrySavingConfiguration():
+	if not GemRB.SaveConfig():
+		print "ARGH, could not write config to disk!!"
+
 ###################################################
 
 def CloseVideoOptionsWindow ():
 	CloseSubOptionsWindow ()
+	TrySavingConfiguration()
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
@@ -243,6 +248,7 @@ def SetGfxCorrection ():
 
 def CloseAudioOptionsWindow ():
 	CloseSubOptionsWindow ()
+	TrySavingConfiguration()
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
@@ -326,6 +332,7 @@ def CloseGameplayOptionsWindow ():
 	# FIXME: don't need to do anything, since we save stuff immediately
 	# ergo canceling does not work
 	CloseSubOptionsWindow ()
+	TrySavingConfiguration()
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""

@@ -4112,6 +4112,16 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 	return PyInt_FromLong(core->WriteCharacter(name, actor) );
 }
 
+
+PyDoc_STRVAR( GemRB_SaveConfig__doc,
+			  "SaveConfig()\n\n"
+			  "Exports the game configuration to a file.");
+
+static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
+{
+	return PyBool_FromLong(core->SaveConfig());
+}
+
 PyDoc_STRVAR( GemRB_SaveGame__doc,
 "SaveGame(SlotCount, GameName[,version])\n\n"
 "Dumps the save game, if version is given, it will save a specific version.");
@@ -10326,6 +10336,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(Roll, METH_VARARGS),
 	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
+	METHOD(SaveConfig, METH_NOARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
 	METHOD(SetFeat, METH_VARARGS),
