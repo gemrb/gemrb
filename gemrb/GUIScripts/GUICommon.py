@@ -199,6 +199,10 @@ def SetGamedaysAndHourToken ():
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 
+def Gain(infostr, ability):
+	GemRB.SetToken ('SPECIALABILITYNAME', GemRB.GetString(int(ability) ) )
+	GemRB.DisplayString (infostr)
+
 # Adds class/kit abilities
 def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 	TmpTable = GemRB.LoadTable (table)
@@ -233,14 +237,18 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 					ab = "GA_" + ab
 
 				# apply spell (AP_) or gain spell (GA_)
-				if ab[:2] == "AP":
+				if ab[:3] == "AP_":
 					GemRB.ApplySpell (pc, ab[3:])
-				elif ab[:2] == "GA":
+				elif ab[:3] == "GA_":
 					SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
 					if SpellIndex == -1:
 						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
 					else:
 						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+				elif ab[:3] == "FS_":
+					Gain(26320, ab[3:])
+				elif ab[:3] == "FA_":
+					Gain(10514, ab[3:])
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
@@ -279,15 +287,15 @@ def RemoveClassAbilities (pc, table, Level):
 					ab = "GA_" + ab
 
 				# apply spell (AP_) or gain spell (GA_)?
-				if ab[:2] == "AP":
+				if ab[:3] == "AP_":
 					GemRB.RemoveEffects (pc, ab[3:])
-				elif ab[:2] == "GA":
+				elif ab[:3] == "GA_":
 					if SpellIndex >= 0:
 						# TODO: get the correct counts to avoid removing an innate ability
 						# given by more than one thing?
 						# RemoveSpell will unmemorize them all too
 						GemRB.RemoveSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
-				else:
+				elif ab[:3] != "FA_" and ab[:3] != "FS_":
 					print "ERROR, unknown class ability (type): ", ab
 
 def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
