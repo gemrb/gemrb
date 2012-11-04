@@ -50,6 +50,7 @@ Spellbook::Spellbook()
 		InitializeSpellbook();
 	}
 	spells = new std::vector<CRESpellMemorization*> [NUM_BOOK_TYPES];
+	sorcerer = 0;
 }
 
 void Spellbook::InitializeSpellbook()
