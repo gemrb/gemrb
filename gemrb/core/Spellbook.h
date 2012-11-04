@@ -137,6 +137,7 @@ private:
 	std::vector<CRESpellMemorization*> *spells;
 	std::vector<SpellExtHeader*> spellinfo;
 	int sorcerer;
+	int innate;
 
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);

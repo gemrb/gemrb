@@ -51,6 +51,7 @@ Spellbook::Spellbook()
 	}
 	spells = new std::vector<CRESpellMemorization*> [NUM_BOOK_TYPES];
 	sorcerer = 0;
+	innate = 0;
 }
 
 void Spellbook::InitializeSpellbook()
@@ -435,6 +436,11 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 void Spellbook::SetBookType(int bt)
 {
 	sorcerer = bt;
+	if (IWD2Style) {
+		innate = 1<<IE_IWD2_SPELL_INNATE;
+	} else {
+		innate = 1<<IE_SPELL_TYPE_INNATE;
+	}
 }
 
 //returns the page group of the spellbook this spelltype belongs to
@@ -694,10 +700,11 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 
 bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 {
-	CRESpellMemorization* sm = spells[spell->Type][spell->Level];
-	if (sm->Number2 <= sm->memorized_spells.size()) {
+	ieWord spellType = spell->Type;
+	CRESpellMemorization* sm = spells[spellType][spell->Level];
+	if (sm->Number2 <= sm->memorized_spells.size() && !(innate & (1<<spellType))) {
 		//it is possible to have sorcerer type spellbooks for any spellbook type
-		if (! (sorcerer & (1<<spell->Type) ) )
+		if (! (sorcerer & (1<<spellType) ) )
 			return false;
 	}
 
