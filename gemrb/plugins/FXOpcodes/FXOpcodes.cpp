@@ -1395,6 +1395,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//these two bits are turned off on death
 		BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
 	}
+	BASE_SET(IE_MORALE, 10);
 
 	Scriptable *killer = GetCasterObject();
 	target->Damage(0, damagetype, killer);
@@ -1727,6 +1728,9 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_poisoned_state(%2d): Damage: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
 
 	int count = target->fxqueue.CountEffects(fx_poisoned_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
 	if (count > 1) {
