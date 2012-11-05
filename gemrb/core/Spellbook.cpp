@@ -51,7 +51,11 @@ Spellbook::Spellbook()
 	}
 	spells = new std::vector<CRESpellMemorization*> [NUM_BOOK_TYPES];
 	sorcerer = 0;
-	innate = 0;
+	if (IWD2Style) {
+		innate = 1<<IE_IWD2_SPELL_INNATE;
+	} else {
+		innate = 1<<IE_SPELL_TYPE_INNATE;
+	}
 }
 
 void Spellbook::InitializeSpellbook()
@@ -129,8 +133,8 @@ void Spellbook::CopyFrom(const Actor *source)
 			CRESpellMemorization *sm = new CRESpellMemorization();
 			spells[t].push_back(sm);
 			sm->Level = wm->Level;
-			sm->Number = wm->Number;
-			sm->Number2 = wm->Number2;
+			sm->SlotCount = wm->SlotCount;
+			sm->SlotCountWithBonus = wm->SlotCountWithBonus;
 			sm->Type = wm->Type;
 			for (k = 0; k < wm->known_spells.size(); k++) {
 				CREKnownSpell *tmp_known = new CREKnownSpell();
@@ -436,11 +440,6 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 void Spellbook::SetBookType(int bt)
 {
 	sorcerer = bt;
-	if (IWD2Style) {
-		innate = 1<<IE_IWD2_SPELL_INNATE;
-	} else {
-		innate = 1<<IE_SPELL_TYPE_INNATE;
-	}
 }
 
 //returns the page group of the spellbook this spelltype belongs to
@@ -490,7 +489,7 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 		CRESpellMemorization *sm = new CRESpellMemorization();
 		sm->Type = (ieWord) type;
 		sm->Level = (ieWord) level;
-		sm->Number = sm->Number2 = 0;
+		sm->SlotCount = sm->SlotCountWithBonus = 0;
 		if ( !AddSpellMemorization(sm) ) {
 			delete sm;
 			return false;
@@ -499,8 +498,8 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 
 	spells[type][level]->known_spells.push_back(spl);
 	if (type==IE_SPELL_TYPE_INNATE) {
-		spells[type][level]->Number++;
-		spells[type][level]->Number2++;
+		spells[type][level]->SlotCount++;
+		spells[type][level]->SlotCountWithBonus++;
 	}
 	if (flg) {
 		MemorizeSpell(spl, true);
@@ -604,7 +603,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 		CRESpellMemorization *newsm = new CRESpellMemorization();
 		newsm->Type = sm->Type;
 		newsm->Level = (ieWord) s->size();
-		newsm->Number = newsm->Number2 = 0;
+		newsm->SlotCount = newsm->SlotCountWithBonus = 0;
 		s->push_back( newsm );
 	}
 
@@ -622,7 +621,7 @@ void Spellbook::BonusSpells(int type, int count, int *bonuses)
 	if (level>count) level=count;
 	for (int i = 0; i < level; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(type, i);
-		sm->Number2+=bonuses[i];
+		sm->SlotCountWithBonus+=bonuses[i];
 	}
 }
 
@@ -636,7 +635,7 @@ void Spellbook::ClearBonus()
 		int level = GetSpellLevelCount(type);
 		for (int i = 0; i < level; i++) {
 			CRESpellMemorization* sm = GetSpellMemorization(type, i);
-			sm->Number2=sm->Number;
+			sm->SlotCountWithBonus=sm->SlotCount;
 		}
 	}
 }
@@ -651,7 +650,7 @@ CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigne
 		sm = new CRESpellMemorization();
 		sm->Type = (ieWord) type;
 		sm->Level = (ieWord) level;
-		sm->Number = sm->Number2 = 0;
+		sm->SlotCount = sm->SlotCountWithBonus = 0;
 		if ( !AddSpellMemorization(sm) ) {
 			delete sm;
 			return NULL;
@@ -677,14 +676,14 @@ void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int leve
 	CRESpellMemorization* sm = GetSpellMemorization(type, level);
 	if (bonus) {
 		if (!Value) {
-			Value=sm->Number;
+			Value=sm->SlotCount;
 		}
-		sm->Number2=(ieWord) (sm->Number2+Value);
+		sm->SlotCountWithBonus=(ieWord) (sm->SlotCountWithBonus+Value);
 	}
 	else {
-		diff=sm->Number2-sm->Number;
-		sm->Number=(ieWord) Value;
-		sm->Number2=(ieWord) (Value+diff);
+		diff=sm->SlotCountWithBonus-sm->SlotCount;
+		sm->SlotCount=(ieWord) Value;
+		sm->SlotCountWithBonus=(ieWord) (Value+diff);
 	}
 }
 
@@ -694,15 +693,15 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 		return 0;
 	CRESpellMemorization* sm = spells[type][level];
 	if (bonus)
-		return sm->Number2;
-	return sm->Number;
+		return sm->SlotCountWithBonus;
+	return sm->SlotCount;
 }
 
 bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 {
 	ieWord spellType = spell->Type;
 	CRESpellMemorization* sm = spells[spellType][spell->Level];
-	if (sm->Number2 <= sm->memorized_spells.size() && !(innate & (1<<spellType))) {
+	if (sm->SlotCountWithBonus <= sm->memorized_spells.size() && !(innate & (1<<spellType))) {
 		//it is possible to have sorcerer type spellbooks for any spellbook type
 		if (! (sorcerer & (1<<spellType) ) )
 			return false;
@@ -804,7 +803,7 @@ void Spellbook::CreateSorcererMemory(int type)
 		sm->memorized_spells.clear();
 		for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
 			CREKnownSpell *ck = sm->known_spells[k];
-			cnt = sm->Number2;
+			cnt = sm->SlotCountWithBonus;
 			while(cnt--) {
 				MemorizeSpell(ck, true);
 			}

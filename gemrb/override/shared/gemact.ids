@@ -6,6 +6,7 @@ IDS
 396 SetToken2DA(S:ResRef*)
 395 StartDialogOverride(S:DialogFile*,O:Target*,I:Unused,I:Unused,I:ConverseAsItem)
 394 SetTrackString(I:StrRef, I:Flags, I:Difficulty)
+393 AdvanceTime(I:Seconds*)
 168 Interact(O:Object*)
 148 BashDoor(O:Object)
 112 UseContainer()
