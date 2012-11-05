@@ -305,6 +305,8 @@ def MoveToNewArea ():
 
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
+	# distance is stored in hours, but the action needs seconds
+	GemRB.ExecuteString ("AdvanceTime(%d)"%(tmp["Distance"]*300))
 	return
 
 def ChangeTooltip ():
