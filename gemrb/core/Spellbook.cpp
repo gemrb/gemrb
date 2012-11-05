@@ -51,7 +51,11 @@ Spellbook::Spellbook()
 	}
 	spells = new std::vector<CRESpellMemorization*> [NUM_BOOK_TYPES];
 	sorcerer = 0;
-	innate = 0;
+	if (IWD2Style) {
+		innate = 1<<IE_IWD2_SPELL_INNATE;
+	} else {
+		innate = 1<<IE_SPELL_TYPE_INNATE;
+	}
 }
 
 void Spellbook::InitializeSpellbook()
@@ -436,11 +440,6 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 void Spellbook::SetBookType(int bt)
 {
 	sorcerer = bt;
-	if (IWD2Style) {
-		innate = 1<<IE_IWD2_SPELL_INNATE;
-	} else {
-		innate = 1<<IE_SPELL_TYPE_INNATE;
-	}
 }
 
 //returns the page group of the spellbook this spelltype belongs to
