@@ -361,9 +361,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		//  there is no way currently to use a mouse anyay.
 		//  watch future SDL releases to see if/when disabling mouse events from the touchscreen is available
 		//!!!!!!!!!!!!
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE || ANDROID
+		// TODO: we shoud implement this as a preference so we can support mice on these platforms
+
 		// don't include SDL_MOUSEWHEEL here
-		// note that other platforms (non-iOS) needn't implement this
+		// note that other platforms needn't implement this
 		// and should let SDLVideo handle mouse events
 		case SDL_MOUSEMOTION:
 		case SDL_MOUSEBUTTONDOWN:
