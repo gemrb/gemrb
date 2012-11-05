@@ -779,9 +779,9 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 	str->ReadDword( &MemorizedCount );
 
 	CRESpellMemorization* spl = act->spellbook.GetSpellMemorization(Type, Level);
-	assert(spl && spl->Number == 0 && spl->Number2 == 0); // unused
-	spl->Number = Number;
-	spl->Number2 = Number;
+	assert(spl && spl->SlotCount == 0 && spl->SlotCountWithBonus == 0); // unused
+	spl->SlotCount = Number;
+	spl->SlotCountWithBonus = Number;
 
 	return spl;
 }
@@ -1565,7 +1565,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 
 	int check = 0;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(type, level);
-	assert(sm && sm->Number == 0 && sm->Number2 == 0); // unused
+	assert(sm && sm->SlotCount == 0 && sm->SlotCountWithBonus == 0); // unused
 	while(count--) {
 		str->ReadDword(&spellindex);
 		str->ReadDword(&totalcount);
@@ -1604,9 +1604,9 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		}
 	}
 	str->ReadDword(&tmpDword);
-	sm->Number = (ieWord) tmpDword;
+	sm->SlotCount = (ieWord) tmpDword;
 	str->ReadDword(&tmpDword);
-	sm->Number2 = (ieWord) tmpDword;
+	sm->SlotCountWithBonus = (ieWord) tmpDword;
 }
 
 void CREImporter::GetActorIWD2(Actor *act)
@@ -2961,8 +2961,8 @@ int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellT
 		stream->WriteDword (&known);
 	}
 
-	max = sm->Number;
-	known = sm->Number2;
+	max = sm->SlotCount;
+	known = sm->SlotCountWithBonus;
 	stream->WriteDword ( &max);
 	stream->WriteDword ( &known);
 	return 0;

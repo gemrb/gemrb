@@ -100,8 +100,8 @@ struct CREMemorizedSpell {
 
 struct CRESpellMemorization {
 	ieWord Level;
-	ieWord Number;
-	ieWord Number2;
+	ieWord SlotCount;
+	ieWord SlotCountWithBonus;
 	ieWord Type;
 
 	std::vector<CREKnownSpell*> known_spells;
