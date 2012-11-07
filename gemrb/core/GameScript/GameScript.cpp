@@ -1303,11 +1303,11 @@ void LoadActionFlags(const char *tableName, int flag, bool critical)
 
 	int tableIndex = core->LoadSymbol(tableName);
 	if (tableIndex < 0) {
-    if (critical) {
-		  error("GameScript", "Couldn't find %s symbols!\n",tableName);
-    } else {
-      return;
-    }
+		if (critical) {
+			error("GameScript", "Couldn't find %s symbols!\n",tableName);
+		} else {
+			return;
+		}
 	}
 	Holder<SymbolMgr> table = core->GetSymbol(tableIndex);
 	if (!table) {
@@ -1957,7 +1957,9 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// this one is a bit more complicated, due to possible
 						// interactions with Continue() (lastAction here is always
 						// the first block encountered), needs more testing
-						//if (done) *done = true;
+						//HoW ar9708, djinni would become visible only if this is not commented out
+						//See: SEDJINNI.BCS
+						if (done) *done = true;
 						return false;
 					}
 
