@@ -367,6 +367,15 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 #define WEAPON_BYPASS      0x10000
 #define WEAPON_KEEN        0x20000
 
+static int avBase, avStance;
+struct avType {
+	ieResRef avresref;
+	AutoTable avtable;
+	int stat;
+};
+static avType *avPrefix;
+static int avCount = -1;
+
 /* counts the on bits in a number */
 ieDword bitcount (ieDword n)
 {
@@ -2248,6 +2257,35 @@ static void InitActorTables()
 			xpadjustments[i] = atoi(tm->QueryField(1, i) );
 		}
 	}
+
+	//preload stat derived animation tables
+	tm.load("avprefix");
+	delete [] avPrefix;
+	avBase = 0;
+	avCount = -1;
+	if (tm) {
+		int count = tm->GetRowCount();
+		if (count> 0 && count<8) {
+			avCount = count-1;
+			avPrefix = new avType[count];
+			avBase = strtoul(tm->QueryField(0),NULL, 0);
+			const char *poi = tm->QueryField(0,1);
+			if (*poi!='*') {
+				avStance = strtoul(tm->QueryField(0,1),NULL, 0);
+			} else {
+				avStance = -1;
+			}
+			for (i=0;i<avCount;i++) {
+				strnuprcpy(avPrefix[i].avresref, tm->QueryField(i+1), 8);
+				avPrefix[i].avtable.load(avPrefix[i].avresref);
+				if (avPrefix[i].avtable) {
+					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
+				} else {
+					avPrefix[i].stat = -1;
+				}
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2742,6 +2780,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] < (ieDword)classcount)
 		RefreshPCStats();
+
+	//if the animation ID was not modified by any effect, it may still be modified by something else
+	if((Modified[IE_ANIMATION_ID]==BaseStats[IE_ANIMATION_ID])) {
+		UpdateAnimationID(true);
+	}
 
 	for (i=0;i<MAX_STATS;i++) {
 		if (first || Modified[i]!=previous[i]) {
@@ -8676,46 +8719,35 @@ bool Actor::IsInvisibleTo(Scriptable *checker) const
 
 int Actor::UpdateAnimationID(bool derived)
 {
-	int mastertable = gamedata->LoadTable( "avprefix" );
-	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
-	if (!mtm) {
-		return -2;
-	}
-	int count = mtm->GetRowCount();
-	if (count< 1 || count>8) {
-		return -1;
-	}
-	const char *poi = mtm->QueryField( 0 );
+	if (avCount<0) return 1;
 	// the base animation id
-	int AnimID = strtoul( poi, NULL, 0 );
-	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):AnimID;
-	if (StatID<AnimID || StatID>AnimID+0x1000) return 1; //no change
+	int AnimID = avBase;
+	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):avBase;
+	if (StatID<avBase || StatID>avBase+0x1000) return 1; //no change
+	if (!InParty) return 1; //too many bugs caused by buggy game data, we change only PCs
 
 	// tables for additive modifiers of the animation id (race, gender, class)
-	for (int i = 1; i < count; i++) {
-		poi = mtm->QueryField( i );
-		int table = gamedata->LoadTable( poi );
-		Holder<TableMgr> tm = gamedata->GetTable( table );
+	for (int i = 0; i < avCount; i++) {
+		const TableMgr *tm = avPrefix[i].avtable.ptr();
 		if (!tm) {
 			return -3;
 		}
-		StatID = atoi( tm->QueryField() );
-		StatID = GetBase( StatID );
-		poi = tm->QueryField( StatID );
+		StatID = avPrefix[i].stat;
+		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
+
+		const char *poi = tm->QueryField( StatID );
 		AnimID += strtoul( poi, NULL, 0 );
-		gamedata->DelTable( table );
 	}
-	if (derived) {
-		SetAnimationID(AnimID);
-		//setting PST's starting stance to 18
-		poi = mtm->QueryField( 0, 1 );
-		if (*poi != '*') {
-			SetStance( atoi( poi ) );
-		}
-	} else {
+	if (BaseStats[IE_ANIMATION_ID]!=AnimID) {
 		SetBase(IE_ANIMATION_ID, AnimID);
 	}
-	gamedata->DelTable( mastertable );
+	if (!derived) {
+		SetAnimationID(AnimID);
+		//setting PST's starting stance to 18
+		if (avStance !=-1) {
+			SetStance( avStance );
+		}
+	}
 	return 0;
 }
 
