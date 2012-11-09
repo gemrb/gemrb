@@ -8723,7 +8723,7 @@ int Actor::UpdateAnimationID(bool derived)
 	// the base animation id
 	int AnimID = avBase;
 	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):avBase;
-	if (StatID<avBase || StatID>avBase+0x1000) return 1; //no change
+	if (AnimID<0 || StatID<AnimID || StatID>AnimID+0x1000) return 1; //no change
 	if (!InParty) return 1; //too many bugs caused by buggy game data, we change only PCs
 
 	// tables for additive modifiers of the animation id (race, gender, class)
@@ -8738,8 +8738,8 @@ int Actor::UpdateAnimationID(bool derived)
 		const char *poi = tm->QueryField( StatID );
 		AnimID += strtoul( poi, NULL, 0 );
 	}
-	if (BaseStats[IE_ANIMATION_ID]!=AnimID) {
-		SetBase(IE_ANIMATION_ID, AnimID);
+	if (BaseStats[IE_ANIMATION_ID]!=(unsigned int) AnimID) {
+		SetBase(IE_ANIMATION_ID, (unsigned int) AnimID);
 	}
 	if (!derived) {
 		SetAnimationID(AnimID);
