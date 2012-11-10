@@ -7409,7 +7409,11 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	///fixme: make difference between cursed/unmovable
 	if (! actor->inventory.UnEquipItem( Slot, false )) {
 		// Item is currently undroppable/cursed
-		displaymsg->DisplayConstantString(STR_CANT_DROP_ITEM, DMC_WHITE);
+		if (si->Flags&IE_INV_ITEM_CURSED) {
+			displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
+		} else {
+			displaymsg->DisplayConstantString(STR_CANT_DROP_ITEM, DMC_WHITE);
+		}
 		return NULL;
 	}
 	si = actor->inventory.RemoveItem( Slot, Count );
