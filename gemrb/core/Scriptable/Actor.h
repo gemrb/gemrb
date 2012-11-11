@@ -795,6 +795,8 @@ public:
 	bool IsRacialEnemy(Actor* target) const;
 	/* checks whether the actor can stay in the current modal state */
 	bool ModalSpellSkillCheck();
+	/* check if this actor is seen by or seeing anyone */
+	bool SeeAnyOne(bool enemy, bool seen);
 	/* does all the game logic checks to see if the actor can hide */
 	bool TryToHide();
 	/* checks if the alignment matches one of the masking constants */
