@@ -2122,7 +2122,7 @@ void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int 
 			continue;
 		}
 		//line of sight
-		if( !map->IsVisible(actor->Pos, pos)) {
+		if( !map->IsVisibleLOS(actor->Pos, pos)) {
 			continue;
 		}
 		AddAllEffects(actor, actor->Pos);

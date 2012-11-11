@@ -539,7 +539,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 		}
 	}
 
-	return map->IsVisible(target->Pos, Sender->Pos);
+	return map->IsVisibleLOS(target->Pos, Sender->Pos);
 }
 
 //non actors can see too (reducing function to LOS)
@@ -1172,22 +1172,22 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
-    if (map1) {
-      map1->RemoveActor( actor );
-    }
-    map2->AddActor( actor, true );
-    
-    // update the worldmap if needed
-    if (actor->InParty) {
-      WorldMap *worldmap = core->GetWorldMap();
-      unsigned int areaindex;
-      WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
-      if (entry) {
-        // make sure the area is marked as revealed and visited
-        if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-          entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, BM_OR);
-        }
-      }
+		if (map1) {
+			map1->RemoveActor( actor );
+		}
+		map2->AddActor( actor, true );
+
+		// update the worldmap if needed
+		if (actor->InParty) {
+			WorldMap *worldmap = core->GetWorldMap();
+			unsigned int areaindex;
+			WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
+			if (entry) {
+				// make sure the area is marked as revealed and visited
+				if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+					entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, BM_OR);
+				}
+			}
 		}
 	}
 	actor->SetPosition(position, adjust);
@@ -1343,7 +1343,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
 		(PersonalDistance(Sender, target) > wi.range) ||
-		(!Sender->GetCurrentArea()->IsVisible(Sender->Pos, target->Pos))) {
+		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos))) {
 		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {
@@ -2275,6 +2275,81 @@ int GetGroup(Actor *actor)
 	return type;
 }
 
+Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
+{
+	//determining the allegiance of the origin
+	int type = GetGroup(origin);
+
+	//neutral has no enemies
+	if (type==2) {
+		return NULL;
+	}
+
+	Targets *tgts = new Targets();
+
+	int i = map->GetActorCount(true);
+	Actor *ac;
+	while (i--) {
+		ac=map->GetActor(i,true);
+		if (ac == origin) continue;
+
+		int distance = Distance(ac, origin);
+		if (whoseeswho&ENEMY_SEES_ORIGIN) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+				continue;
+			}
+		}
+		if (whoseeswho&ORIGIN_SEES_ENEMY) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+				continue;
+			}
+		}
+
+		if (type) { //origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				tgts->AddTarget(ac, distance, GA_NO_DEAD);
+			}
+		}
+		else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				tgts->AddTarget(ac, distance, GA_NO_DEAD);
+			}
+		}
+	}
+	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
+	delete tgts;
+	return ac;
+}
+
+Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho)
+{
+	Targets *tgts = new Targets();
+
+	int i = map->GetActorCount(true);
+	Actor *ac;
+	while (i--) {
+		ac=map->GetActor(i,true);
+		if (ac == origin) continue;
+
+		int distance = Distance(ac, origin);
+		if (whoseeswho&ENEMY_SEES_ORIGIN) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+				continue;
+			}
+		}
+		if (whoseeswho&ORIGIN_SEES_ENEMY) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+				continue;
+			}
+		}
+
+		tgts->AddTarget(ac, distance, GA_NO_DEAD);
+	}
+	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
+	delete tgts;
+	return ac;
+}
+
 Point GetEntryPoint(const char *areaname, const char *entryname)
 {
 	Point p;
@@ -2576,7 +2651,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if (act) {
 		//move near to target
 		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
-			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
+			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
 				MoveNearerTo(Sender, tar, dist);
 				return;
 			}
@@ -2669,7 +2744,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 		Actor *act = (Actor *) Sender;
 		//move near to target
-		if ((flags&SC_RANGE_CHECK) && (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, parameters->pointParameter))) {
+		if ((flags&SC_RANGE_CHECK) && (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter))) {
 			MoveNearerTo(Sender,parameters->pointParameter, dist, 0);
 			return;
 		}

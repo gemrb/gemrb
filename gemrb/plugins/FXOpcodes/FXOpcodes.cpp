@@ -53,6 +53,7 @@ using namespace GemRB;
 #define PI_CONFUSED  3
 #define PI_BERSERK   4
 #define PI_POISONED  6
+#define PI_BLIND     8
 #define PI_HELD     13
 #define PI_SLEEP    14
 #define PI_BLESS    17
@@ -880,54 +881,6 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
 {
 	core->GetAudioDrv()->Play(fx->Resource[0]?fx->Resource:defsound, target->Pos.x, target->Pos.y);
-}
-
-//whoseeswho:
-#define ENEMY_SEES_ORIGIN 1
-#define ORIGIN_SEES_ENEMY 2
-
-inline Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
-{
-	//determining the allegiance of the origin
-	int type = GetGroup(origin);
-
-	//neutral has no enemies
-	if (type==2) {
-		return NULL;
-	}
-
-	Targets *tgts = new Targets();
-
-	int i = map->GetActorCount(true);
-	Actor *ac;
-	while (i--) {
-		ac=map->GetActor(i,true);
-		int distance = Distance(ac, origin);
-		if (whoseeswho&ENEMY_SEES_ORIGIN) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
-				continue;
-			}
-		}
-		if (whoseeswho&ORIGIN_SEES_ENEMY) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
-				continue;
-			}
-		}
-
-		if (type) { //origin is PC
-			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				tgts->AddTarget(ac, distance, GA_NO_DEAD);
-			}
-		}
-		else {
-			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				tgts->AddTarget(ac, distance, GA_NO_DEAD);
-			}
-		}
-	}
-	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
-	delete tgts;
-	return ac;
 }
 
 //resurrect code used in many places
@@ -2712,7 +2665,6 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			stat = core->Roll(1,30,15);
 		} else stat = 0;
 		fx->Duration = core->GetGame()->GameTime+stat;
-
 	}
 
 	//don't do this effect twice (bug exists in BG2, but fixed in IWD2)
@@ -2720,9 +2672,13 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET( STATE_BLIND );
 		//the feat normally exists only in IWD2, but won't hurt
 		if (!target->GetFeat(FEAT_BLIND_FIGHT)) {
+			target->AddPortraitIcon(PI_BLIND);
 			if (core->HasFeature(GF_REVERSE_TOHIT)) {
-				STAT_ADD (IE_TOHIT, 10); // all other tohit stats are treated as bonuses
+				//BG2
+				STAT_ADD (IE_ARMORCLASS, 4);
+				STAT_ADD (IE_TOHIT, 4);
 			} else {
+				//IWD2
 				STAT_SUB (IE_ARMORCLASS, 2);
 				// TODO: 50% inherent miss chance (full concealment), no dexterity bonus to AC (flatfooted)
 				STAT_SUB (IE_TOHIT, 5);

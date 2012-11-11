@@ -900,7 +900,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
-	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD, 15*10);
 	int i=0;
 	while(nearActors[i]!=NULL) {
 		nearActors[i]->AddTrigger(entry);

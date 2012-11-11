@@ -37,6 +37,10 @@ namespace GemRB {
 #define ID_ACTIONS   8
 #define ID_TRIGGERS  16
 
+//whoseeswho for GetNearestEnemy:
+#define ENEMY_SEES_ORIGIN 1
+#define ORIGIN_SEES_ENEMY 2
+
 extern Holder<SymbolMgr> triggersTable;
 extern Holder<SymbolMgr> actionsTable;
 extern Holder<SymbolMgr> overrideTriggersTable;
@@ -113,7 +117,8 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_releas
 #define BINARY_LESS 11          //left has less bits than right
 
 GEM_EXPORT int GetGroup(Actor *actor);
-
+GEM_EXPORT Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho);
+GEM_EXPORT Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho);
 GEM_EXPORT void FreeSrc(SrcVector *poi, const ieResRef key);
 GEM_EXPORT SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);

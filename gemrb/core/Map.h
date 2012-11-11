@@ -343,7 +343,7 @@ public:
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(const Point &p, int flags);
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
-	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius);
+	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
@@ -437,7 +437,7 @@ public:
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */
-	bool IsVisible(const Point &s, const Point &d);
+	bool IsVisibleLOS(const Point &s, const Point &d);
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 

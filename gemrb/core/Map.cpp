@@ -1587,7 +1587,7 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 }
 
 //maybe consider using a simple list
-Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius)
+Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see)
 {
 	ieDword count = 1;
 	size_t i;
@@ -1599,14 +1599,15 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
-		if (!actor->ValidTarget(flags) ) {
+		if (!actor->ValidTarget(flags, see) ) {
 			continue;
 		}
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (!(flags&GA_NO_LOS)) {
-			if (!IsVisible(actor->Pos, p)) {
+			//line of sight visibility
+			if (!IsVisibleLOS(actor->Pos, p)) {
 				continue;
 			}
 		}
@@ -1628,7 +1629,7 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 			continue;
 		}
 		if (!(flags&GA_NO_LOS)) {
-			if (!IsVisible(actor->Pos, p)) {
+			if (!IsVisibleLOS(actor->Pos, p)) {
 				continue;
 			}
 		}
@@ -2648,7 +2649,7 @@ PathNode* Map::FindPathNear(const Point &s, const Point &d, unsigned int size, u
 				// we are within the minimum distance of the goal
 				Point ourpos(x*16 + 8, y*12 + 6);
 				// sight check is *slow* :(
-				if (!sight || IsVisible(ourpos, d)) {
+				if (!sight || IsVisibleLOS(ourpos, d)) {
 					// we got all the way to a suitable goal!
 					goal = Point(x, y);
 					found_path = true;
@@ -2859,7 +2860,7 @@ bool Map::IsVisible(const Point &pos, int explored)
 }
 
 //point a is visible from point b (searchmap)
-bool Map::IsVisible(const Point &s, const Point &d)
+bool Map::IsVisibleLOS(const Point &s, const Point &d)
 {
 	int sX=s.x/16;
 	int sY=s.y/12;

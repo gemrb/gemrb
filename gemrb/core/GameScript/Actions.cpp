@@ -4624,14 +4624,40 @@ void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 	core->GetGame()->SetMasterArea(parameters->string0Parameter);
 }
 
-void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::Berserk(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
+
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		return;
+	}
+
 	Actor *act = (Actor *) Sender;
-	act->SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
-	act->Panic(NULL, PANIC_BERSERK);
+	Actor *target;
+
+	if (!act->GetStat(IE_BERSERKSTAGE2) && core->Roll(1,100,0)<90 ) {
+		//anyone
+		target = GetNearestOf(map, act, ORIGIN_SEES_ENEMY);
+	} else {
+		target = GetNearestEnemyOf(map, act, ORIGIN_SEES_ENEMY);
+	}
+
+	if (!target) {
+		Sender->SetWait(6);
+	} else {
+		char Tmp[40];
+
+		//generate attack action
+		sprintf( Tmp, "NIDSpecial3()");
+		Action *newaction = GenerateActionDirect(Tmp, target);
+		if (newaction) {
+			Sender->AddActionInFront(newaction);
+		}
+	}
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)

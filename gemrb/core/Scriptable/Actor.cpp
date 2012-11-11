@@ -698,6 +698,9 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
 		color_index = 5;
+	} else if (Modified[IE_CHECKFORBERSERK]) {
+		color = &yellow;
+		color_index = 5;
 	} else if (gc && gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		color = &white;
 		color_index = 3; //?? made up
@@ -902,6 +905,12 @@ void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		}
 	}
 	//for new colour
+	actor->SetCircleSize();
+}
+
+void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+{
+	//needs for new color
 	actor->SetCircleSize();
 }
 
@@ -1317,7 +1326,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //6f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //7f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //8f
+NULL,NULL,NULL,NULL, NULL, NULL, pcf_berserk, NULL, //8f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
@@ -3452,7 +3461,6 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 		return;
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 	VerbalConstant(VB_PANIC, 1 );
 
 	Action *action;
@@ -3465,18 +3473,18 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 	case PANIC_RUNAWAY:
 		strncpy(Tmp,"RunAwayFromNoInterrupt([-1])", sizeof(Tmp) );
 		action = GenerateActionDirect(Tmp, attacker);
+		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_RANDOMWALK:
 		strncpy(Tmp,"RandomWalk()", sizeof(Tmp) );
 		action = GenerateAction( Tmp );
+		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_BERSERK:
-		if (Modified[IE_EA]<EA_GOODCUTOFF) {
-			strncpy(Tmp,"GroupAttack('[EVILCUTOFF]'", sizeof(Tmp) );
-		} else {
-			strncpy(Tmp,"GroupAttack('[GOODCUTOFF]'", sizeof(Tmp) );
-		}
+		strncpy(Tmp,"Berserk()", sizeof(Tmp) );
 		action = GenerateAction( Tmp );
+		BaseStats[IE_CHECKFORBERSERK]=3;
+		//SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
 		break;
 	default:
 		return;
@@ -4989,6 +4997,9 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 		if (UnselectableTimer) return false;
 		if (Immobile()) return false;
 		if (Modified[IE_STATE_ID] & STATE_CONFUSED) return false;
+		if (Modified[IE_STATE_ID] & STATE_BERSERK) {
+			if (Modified[IE_CHECKFORBERSERK]) return false;
+		}
 	}
 	return true;
 }
@@ -5756,7 +5767,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	// if held or disabled, etc, then cannot continue attacking
 	// TODO: should be in action
 	ieDword state = GetStat(IE_STATE_ID);
-	if (state&STATE_CANTMOVE || Immobile()) {
+	if (Immobile()) {
 		// this is also part of the UpdateActorState hack below. sorry!
 		lastattack = gameTime;
 		return;
@@ -5808,6 +5819,9 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	assert(!(target->IsInvisibleTo((Scriptable *) this) || (target->GetSafeStat(IE_STATE_ID) & STATE_DEAD)));
 	target->AttackedBy(this);
+	if (state&STATE_BERSERK) {
+		BaseStats[IE_CHECKFORBERSERK]=3;
+	}
 
 	print("Performattack for %s, target is: %s", ShortName, target->ShortName);
 
@@ -6072,6 +6086,8 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 }
 
 void Actor::UpdateActorState(ieDword gameTime) {
+	char Tmp[40];
+
 	if (modalTime==gameTime) {
 		return;
 	}
@@ -6088,28 +6104,43 @@ void Actor::UpdateActorState(ieDword gameTime) {
 	ieDword state = Modified[IE_STATE_ID];
 
 	// each round also re-confuse the actor
-	if ((state&STATE_CONFUSED) && roundFraction == 0) {
-		char Tmp[40];
+	if (!roundFraction) {
+		if (BaseStats[IE_CHECKFORBERSERK]) {
+			BaseStats[IE_CHECKFORBERSERK]--;
+		}
+		if ((state&STATE_CONFUSED)) {
 
 		int tmp = core->Roll(1,3,0);
 		switch(tmp) {
-		case 2:
-			strncpy(Tmp,"RandomWalk()",sizeof(Tmp));
-			break;
-		case 1:
-			strncpy(Tmp,"Attack([0])",sizeof(Tmp));
-			break;
-		default:
-			strncpy(Tmp,"NoAction()",sizeof(Tmp));
-			break;
+			case 2:
+				strncpy(Tmp,"RandomWalk()",sizeof(Tmp));
+				break;
+			case 1:
+				strncpy(Tmp,"Attack([0])",sizeof(Tmp));
+				break;
+			default:
+				strncpy(Tmp,"NoAction()",sizeof(Tmp));
+				break;
+			}
+			Action *action = GenerateAction( Tmp );
+			if (action) {
+				ReleaseCurrentAction();
+				AddActionInFront(action);
+				print("Confusion: added %s", Tmp);
+			}
+			return;
 		}
-		Action *action = GenerateAction( Tmp );
-		if (action) {
-			ReleaseCurrentAction();
-			AddActionInFront(action);
-			print("Confusion: added %s", Tmp);
+
+		if (Modified[IE_CHECKFORBERSERK] && !LastTarget && SeeAnyOne(false, false) ) {
+			strncpy(Tmp,"Berserk()",sizeof(Tmp));
+			Action *action = GenerateAction( Tmp );
+			if (action) {
+				ReleaseCurrentAction();
+				AddActionInFront(action);
+				print("Berserk: added %s", Tmp);
+			}
+			return;
 		}
-		return;
 	}
 
 	// this is a HACK, fuzzie can't work out where else to do this for now
@@ -6473,7 +6504,7 @@ void Actor::UpdateAnimations()
 
 	//make actor unselectable and unselected when it is not moving
 	//dead, petrified, frozen, paralysed or unavailable to player
-	if (Immobile() || !ShouldDrawCircle() || (Modified[IE_STATE_ID]&STATE_CONFUSED)) {
+	if (!ValidTarget(GA_SELECT)) {
 		core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	}
 
@@ -8451,7 +8482,8 @@ bool Actor::IsRacialEnemy(Actor* target) const
 	return false;
 }
 
-bool Actor::ModalSpellSkillCheck() {
+bool Actor::ModalSpellSkillCheck()
+{
 	switch(ModalState) {
 	case MS_BATTLESONG:
 		if (isclass[ISBARD]&(1<<Modified[IE_CLASS])) {
@@ -8485,7 +8517,41 @@ inline void HideFailed(Actor* actor)
 	delete newfx;
 }
 
-bool Actor::TryToHide() {
+//checks if we are seen, or seeing anyone
+bool Actor::SeeAnyOne(bool enemy, bool seenby)
+{
+  Map *area = GetCurrentArea();
+  if (!area) return false;
+
+  int flag = seenby?GA_NO_DEAD:GA_NO_DEAD|GA_NO_HIDDEN;
+  if (enemy) {
+    ieDword ea = GetSafeStat(IE_EA);
+    if (ea>=EA_EVILCUTOFF) {
+      flag|=GA_NO_ENEMY|GA_NO_NEUTRAL;
+    } else if (ea<=EA_GOODCUTOFF) {
+      flag|=GA_NO_ALLY|GA_NO_NEUTRAL;
+    } else return false; //neutrals got no enemy
+  } 
+  Actor** visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
+
+	Actor** poi = visActors;
+	bool seeEnemy = false;
+
+  //we need to look harder if we look for seenby anyone
+	while (*poi && !seeEnemy) {
+		Actor *toCheck = *poi++;
+    if (toCheck==this) continue;
+    if (seenby) {
+      if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
+    }
+    else seeEnemy = true;
+	}
+	free(visActors);
+  return seeEnemy;
+}
+
+bool Actor::TryToHide()
+{
 	ieDword roll = LuckyRoll(1, 100, GetArmorFailure());
 	if (roll == 1) {
 		HideFailed(this);
@@ -8499,18 +8565,7 @@ bool Actor::TryToHide() {
 		return false;
 	}
 
-	// check if the actor is seen by enemy
-	Actor** visActors = GetCurrentArea()->GetAllActorsInRadius(Pos, GA_NO_DEAD, Modified[IE_VISUALRANGE]);
-	Actor** poi = visActors;
-	bool seen = false;
-	while (*poi && !seen) {
-		Actor *toCheck = *poi++;
-		if (Modified[IE_EA] >= EA_EVILCUTOFF)
-			seen = toCheck->Modified[IE_EA] < EA_EVILCUTOFF;
-		else
-			seen = toCheck->Modified[IE_EA] > EA_GOODCUTOFF;
-	}
-	free(visActors);
+  bool seen = SeeAnyOne(true, true);
 
 	if (seen) {
 		HideFailed(this);

@@ -105,7 +105,7 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 		if (dist > visualrange*visualrange) return false;
 
 		// LOS check
-		if (!map->IsVisible(Sender->Pos, target->Pos)) return false;
+		if (!map->IsVisibleLOS(Sender->Pos, target->Pos)) return false;
 
 		// protection against creature
 		if (target->fxqueue.HasEffect(fx_protection_creature_ref)) {
