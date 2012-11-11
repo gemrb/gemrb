@@ -4624,7 +4624,7 @@ void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 	core->GetGame()->SetMasterArea(parameters->string0Parameter);
 }
 
-void GameScript::Berserk(Scriptable* Sender, Action* parameters)
+void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return;
