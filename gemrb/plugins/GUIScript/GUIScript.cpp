@@ -4116,8 +4116,8 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DumpActor__doc,
-			  "DumpActor(globalID)\n\n"
-			  "Prints the character's debug dump.");
+		"DumpActor(globalID)\n\n"
+		"Prints the character's debug dump.");
 static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 {
 	int globalID;
@@ -4158,8 +4158,8 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 
 
 PyDoc_STRVAR( GemRB_SaveConfig__doc,
-			  "SaveConfig()\n\n"
-			  "Exports the game configuration to a file.");
+		"SaveConfig()\n\n"
+		"Exports the game configuration to a file.");
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -7628,6 +7628,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
+	if ((Slottype!=-1) && (Slottype & SLOT_WEAPON)) {
+		CREItem *item = actor->inventory.GetUsedWeapon(false, Effect); //recycled variable
+		if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
+			displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
+			return PyInt_FromLong( 0 );
+		}
+	}
+
 	// can't equip item because it is not identified
 	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
 		ITMExtHeader *eh = item->GetExtHeader(0);
@@ -9033,13 +9041,14 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
-"SetEquippedQuickSlot(PartyID, QWeaponSlot[, ability])->int\n\n"
-"Sets the named weapon/item slot as equipped weapon slot, optionally sets the used ability."
-"Returns strref number of failure (0 success, -1 silent failure).\n");
+"SetEquippedQuickSlot(PartyID, QWeaponSlot[, ability])\n\n"
+"Sets the named weapon/item slot as equipped weapon slot, optionally sets the used ability.\n");
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
+	int ret;
 	int slot;
+	int dummy;
 	int globalID;
 	int ability = -1;
 
@@ -9050,8 +9059,17 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int ret = actor->SetEquippedQuickSlot(slot, ability);
-	return PyInt_FromLong( ret );
+	CREItem *item = actor->inventory.GetUsedWeapon(false, dummy);
+	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
+		displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
+	} else {
+		ret = actor->SetEquippedQuickSlot(slot, ability);
+		if (ret) {
+			displaymsg->DisplayConstantString(ret, DMC_WHITE);
+		}
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
@@ -9071,10 +9089,6 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	int ret = actor->inventory.GetEquippedSlot();
-	/*int effect = core->QuerySlotEffects(ret);
-	if (effect == SLOT_EFFECT_MISSILE) {
-		ret = actor->inventory.FindRangedWeapon();
-	}*/
 	if (actor->PCStats) {
 		for(int i=0;i<4;i++) {
 			if (ret == actor->PCStats->QuickWeaponSlots[i]) {
@@ -9085,9 +9099,7 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 				break;
 			}
 		}
-	} /*else {
-		ret-=actor->inventory.GetWeaponSlot();
-	}*/
+	}
 	return PyInt_FromLong( core->FindSlot(ret) );
 }
 
