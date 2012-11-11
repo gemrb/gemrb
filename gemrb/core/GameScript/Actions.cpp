@@ -4638,11 +4638,11 @@ void GameScript::Berserk(Scriptable* Sender, Action* parameters)
 	Actor *act = (Actor *) Sender;
 	Actor *target;
 
-	if (!act->GetStat(IE_BERSERKSTAGE2) && core->Roll(1,100,0)<90 ) {
+	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<90) ) {
 		//anyone
-		target = GetNearestOf(map, act, ORIGIN_SEES_ENEMY);
-	} else {
 		target = GetNearestEnemyOf(map, act, ORIGIN_SEES_ENEMY);
+	} else {
+		target = GetNearestOf(map, act, ORIGIN_SEES_ENEMY);
 	}
 
 	if (!target) {
