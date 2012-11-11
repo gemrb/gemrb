@@ -392,7 +392,7 @@ namespace GemRB {
 #define IE_PUPPETID 				  141
 #define IE_CHECKFORBERSERK  		  142
 #define IE_BERSERKSTAGE1			  143
-#define IE_BERSERKSTAGE2			  144
+#define IE_BERSERKSTAGE2			  144 //attack anyone
 #define IE_DAMAGELUCK   			  145
 #define IE_CRITICALHITBONUS 		  146
 #define IE_VISUALRANGE  			  147
