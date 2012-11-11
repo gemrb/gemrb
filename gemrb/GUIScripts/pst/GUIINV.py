@@ -216,8 +216,7 @@ def RefreshInventoryWindow ():
 	Label = Window.GetControl (0x1000003f)
 	Label.SetText (text)
 
-	held = GemRB.GetPlayerStat (pc, IE_HELD) + GemRB.GetPlayerStat (pc, IE_CASTERHOLD)
-	GUICommon.AdjustWindowVisibility (Window, pc, held)
+	GUICommon.AdjustWindowVisibility (Window, pc, False)
 
 	# update ground inventory slots
 	Container = GemRB.GetContainer(pc, 1)

@@ -304,8 +304,7 @@ def RefreshInventoryWindow ():
 		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#if actor is uncontrollable, make this grayed
-	held = GemRB.GetPlayerStat (pc, IE_HELD) + GemRB.GetPlayerStat (pc, IE_CASTERHOLD)
-	GUICommon.AdjustWindowVisibility (Window, pc, held)
+	GUICommon.AdjustWindowVisibility (Window, pc, False)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return

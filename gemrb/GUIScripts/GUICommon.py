@@ -813,11 +813,11 @@ def SetCurrentDateTokens (stat):
 # Always greys it out for actors that are: dead, berserking
 # The third parameter is another check which must be 0 to maintain window visibility
 def AdjustWindowVisibility (Window, pc, additionalCheck):
-    if additionalCheck or GemRB.GetPlayerStat (pc, IE_STATE_ID) & (STATE_DEAD|STATE_BERSERK):
-        Window.SetVisible (WINDOW_GRAYED)
-    else:
-        Window.SetVisible (WINDOW_VISIBLE)
-    return
+	if not additionalCheck and GemRB.ValidTarget (pc, GA_SELECT|GA_NO_DEAD):
+		Window.SetVisible (WINDOW_VISIBLE)
+	else:
+		Window.SetVisible (WINDOW_GRAYED)
+	return
 
 # return ceil(n/d)
 # 

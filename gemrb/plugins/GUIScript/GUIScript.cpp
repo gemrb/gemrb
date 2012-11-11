@@ -3756,6 +3756,31 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 }
 
 
+PyDoc_STRVAR( GemRB_ValidTarget__doc,
+"ValidTarget(PartyID, flags)\n\n"
+"Checks if an actor is valid for various purposes, like visible, selectable, dead, etc." );
+
+static PyObject* GemRB_ValidTarget(PyObject * /*self*/, PyObject* args)
+{
+	int globalID, flags;
+
+	if (!PyArg_ParseTuple( args, "ii", &globalID, &flags )) {
+		return AttributeError( GemRB_ValidTarget__doc );
+	}
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	if (actor->ValidTarget(flags, actor)) {
+		Py_INCREF( Py_True );
+		return Py_True;
+	} else {
+		Py_INCREF( Py_False );
+		return Py_False;
+	}
+}
+
+
 PyDoc_STRVAR( GemRB_VerbalConstant__doc,
 "VerbalConstant(PartyID, str)\n\n"
 "Plays a Character's SoundSet entry." );
@@ -8054,14 +8079,13 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	default:
 		ret = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
 	}
-        if (ret) {
-                Py_INCREF( Py_True );
-                return Py_True;
-        } else {
-                Py_INCREF( Py_False );
-                return Py_False;
-        }
-
+	if (ret) {
+		Py_INCREF( Py_True );
+		return Py_True;
+	} else {
+		Py_INCREF( Py_False );
+		return Py_False;
+	}
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
@@ -9537,7 +9561,7 @@ PyDoc_STRVAR( GemRB_ApplyEffect__doc,
 
 static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 {
-  int timing = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
+	int timing = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	int globalID;
 	const char *opcodename;
 	int param1, param2;
@@ -10406,6 +10430,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UseItem, METH_VARARGS),
+	METHOD(ValidTarget, METH_VARARGS),
 	METHOD(VerbalConstant, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
