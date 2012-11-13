@@ -202,6 +202,19 @@ Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
 IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
 IE_LEVELSORCEROR, IE_LEVEL2]
 
+def DisplayCommon (pc):
+	Window = RecordsWindow
+
+	Value = GemRB.GetPlayerStat(pc,IE_RACE)
+	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
+	if Value2:
+		Value = Value<<16 | Value2
+	tmp = CommonTables.Races.FindValue (3, Value)
+	Race = CommonTables.Races.GetValue (tmp, 2)
+	Label = Window.GetControl (0x1000000f)
+	Label.SetText (Race)
+	return
+
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
 def DisplayGeneral (pc):
 	Window = RecordsWindow
@@ -247,9 +260,6 @@ def DisplayGeneral (pc):
 	tmp = CommonTables.Races.FindValue (3, Value)
 	Race = CommonTables.Races.GetValue (tmp, 2)
 	tmp = CommonTables.Races.GetValue (tmp, 8)
-
-	Label = Window.GetControl (0x1000000f)
-	Label.SetText (Race)
 
 	if tmp == -1:
 		tmp = highest
@@ -798,6 +808,8 @@ def UpdateRecordsWindow ():
 	RecordsTextArea = Window.GetControl (45)
 	RecordsTextArea.SetText ("")
 	RecordsTextArea.Append ("[capital=0]")
+
+	DisplayCommon (pc)
 
 	SelectWindow = GemRB.GetVar ("SelectWindow")
 	if SelectWindow == 1:
