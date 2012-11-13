@@ -433,7 +433,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Number of Attacks
-	RecordsTextArea.Append (delimited_txt (9458, ":", str (numOfAttacks)))
+	RecordsTextArea.Append (delimited_txt (9458, ":", str (combatdet["APR"]//2)))
 	RecordsTextArea.Append ("\n")
 
 	###################
