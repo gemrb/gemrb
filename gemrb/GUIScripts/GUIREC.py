@@ -462,7 +462,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	tmp = cdet["APR"]
 	if (tmp&1):
-		tmp2 = str (tmp/2) + chr (188)
+		tmp2 = str (tmp/2) + chr (189) #must use one higher than the frame count
 	else:
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
