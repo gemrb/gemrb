@@ -383,13 +383,12 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append ("[/color]\n")
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
-	numOfAttacks = GS (IE_NUMBEROFATTACKS)//2
 
 	# Main Hand
 	# display all the (successive) attack values (+15/+10/+5)
 	total = combatdet["ToHit"]
 	tmpstr = str(total)
-	for i in range(1, numOfAttacks):
+	for i in range(1, combatdet["APR"]//2):
 		tmpstr = tmpstr  + "/" + str(total-i*5)
 	RecordsTextArea.Append (delimited_txt (734, ":", tmpstr, 0))
 	# Base
