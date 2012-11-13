@@ -5432,6 +5432,11 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 
 	actor->SetOver( false );
 	actor->InitButtons(actor->GetStat(IE_CLASS), true); //force re-init of actor's buttons
+
+	//what about multiplayer?
+	if ((globalID == 1) && core->HasFeature(GF_HAS_DPLAYER) ) {
+		actor->SetScript("DPLAYER3", SCR_DEFAULT, false);
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
