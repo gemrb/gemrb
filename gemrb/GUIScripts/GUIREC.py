@@ -321,6 +321,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		str_None = GemRB.GetString (17093)
 
 	stats = []
+	cdet = GemRB.GetCombatDetails(pc, 0)
+
 	# class levels
 	# 16480 <CLASS>: Level <LEVEL>
 	# Experience: <EXPERIENCE>
@@ -447,16 +449,18 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (8442,1,'c') )
 
 	# look ma, I can use both hands
+	
 	if GUICommon.GameIsBG2():
 		stats.append ( (61932, GS (IE_TOHIT), '0') )
 		if (GemRB.IsDualWielding(pc)):
-			stats.append ( (56911, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
+			stats.append ( (56911, cdet["ToHit"], '0') )
 			stats.append ( (56910, GemRB.GetCombatDetails(pc, 1)["ToHit"], '0') )
 		else:
-			stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
+			stats.append ( (9457, cdet["ToHit"], '0') )
 	else:
-		stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(GemRB.GetCombatDetails(pc, 0)["ToHit"])+")", '0') )
-	tmp = GS (IE_NUMBEROFATTACKS)
+		stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(cdet["ToHit"])+")", '0') )
+
+	tmp = cdet["APR"]
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr (188)
 	else:
@@ -650,7 +654,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	if GUICommon.GameIsBG2():
 		# Weapon Style bonuses
 		stats.append (32131)
-		wstyle = GemRB.GetCombatDetails (pc, 0)["Style"] # equipped weapon style + 1000 * proficiency level
+		wstyle = cdet["Style"] # equipped weapon style + 1000 * proficiency level
 		profcount = wstyle / 1000
 		if profcount:
 			wstyletables = { IE_PROFICIENCY2WEAPON:"wstwowpn", IE_PROFICIENCY2HANDED:"wstwohnd", IE_PROFICIENCYSINGLEWEAPON:"wssingle", IE_PROFICIENCYSWORDANDSHIELD:"wsshield" }

@@ -9823,6 +9823,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Speed", PyInt_FromLong (speed));
 	PyDict_SetItemString(dict, "CriticalBonus", PyInt_FromLong (CriticalBonus));
 	PyDict_SetItemString(dict, "Style", PyInt_FromLong (style));
+	PyDict_SetItemString(dict, "APR", PyInt_FromLong (actor->GetNumberOfAttacks() ));
 	return dict;
 }
 
