@@ -5971,7 +5971,7 @@ void GameScript::BreakInstants(Scriptable* Sender, Action* /*parameters*/)
 {
 	//don't do anything, apparently the point of this action is to
 	//delay the execution of further actions to the next AI cycle
-	Sender->SetWait(1);
+	//Sender->SetWait(1);
 	Sender->ReleaseCurrentAction(); // this doesn't really need to block
 }
 

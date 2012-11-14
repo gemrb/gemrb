@@ -276,6 +276,8 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				ta->AppendText( "", -1 );
 			}
 		}
+		target->ImmediateEvent();
+		target->ProcessActions(); //run the action queue now
 
 		if (tr->actions.size()) {
 			// does this belong here? we must clear actions somewhere before
@@ -284,10 +286,12 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			// needs to end before final actions are executed due to
 			// actions making new dialogs!
 			if (target->Type == ST_ACTOR) ((Movable *)target)->ClearPath(); // fuzzie added this
-			target->ClearActions();
+				target->ClearActions();
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
 			char buf[20];
+			strcpy(buf, "BreakInstants()");
+			target->AddAction( GenerateAction( buf ) );
 			strcpy(buf, "SetInterrupt(FALSE)");
 			target->AddAction( GenerateAction( buf ) );
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
