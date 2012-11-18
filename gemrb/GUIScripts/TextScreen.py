@@ -57,6 +57,7 @@ def StartTextScreen ():
 			#apparently, BG2 doesn't always use IncrementChapter to trigger a TextScreen
 			#Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
 			#TableName = "CHPTXT"+str(Chapter)
+			EndTextScreen ()
 			return
 		ID = 62
 	else:
@@ -146,8 +147,8 @@ def FeedScroll ():
 def EndTextScreen ():
 	global TextScreen
 
-	TextScreen.SetVisible (WINDOW_INVISIBLE)
 	if TextScreen:
+		TextScreen.SetVisible (WINDOW_INVISIBLE)
 		TextScreen.Unload ()
 		GemRB.PlaySound(None, 0, 0, 4)
 	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
