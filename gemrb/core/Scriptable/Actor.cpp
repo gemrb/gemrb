@@ -4217,6 +4217,11 @@ ieDword Actor::GetAnyActiveCasterLevel() const
 int Actor::CalculateSpeed(bool feedback)
 {
 	int speed = GetStat(IE_MOVEMENTRATE);
+	if (BaseStats[IE_EA] > EA_GOODCUTOFF && !third) {
+		// cheating bastards (drow in ar2401 for example)
+		return speed;
+	}
+
 	inventory.CalculateWeight();
 	int encumbrance = inventory.GetWeight();
 	SetStat(IE_ENCUMBRANCE, encumbrance, false);
