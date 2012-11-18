@@ -662,6 +662,7 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 	Actor *ac;
 	while (i--) {
 		ac=map->GetActor(i,true);
+		if (ac == origin) continue;
 		int distance;
 		//int distance = Distance(ac, origin);
 		// TODO: if it turns out you need to check Sender here, beware you take the right distance!
