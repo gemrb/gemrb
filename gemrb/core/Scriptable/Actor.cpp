@@ -4220,13 +4220,7 @@ int Actor::CalculateSpeed(bool feedback)
 	inventory.CalculateWeight();
 	int encumbrance = inventory.GetWeight();
 	SetStat(IE_ENCUMBRANCE, encumbrance, false);
-	int maxweight;
-	//if (third) {
-	//	//LOL this won't get us far
-	//	maxweight = GetAbilityBonus(IE_STR);
-	//} else {
-		maxweight = core->GetStrengthBonus(3,GetStat(IE_STR), GetStat(IE_STREXTRA) );
-	//}
+	int maxweight = core->GetStrengthBonus(3, GetStat(IE_STR), GetStat(IE_STREXTRA));
 	if (HasFeat(FEAT_STRONG_BACK)) maxweight += maxweight/2;
 
 	if(encumbrance<=maxweight) {
