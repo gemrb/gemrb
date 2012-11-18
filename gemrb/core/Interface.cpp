@@ -5474,7 +5474,8 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 		value = MaximumAbility;
 
 	int bonus = 0;
-	if (!HasFeature(GF_3ED_RULES)) {
+	// only 18 (human max) has the differentiating extension
+	if (value == 18 && !HasFeature(GF_3ED_RULES)) {
 		if (ex<0)
 			ex=0;
 		else if (ex>100)
