@@ -3765,7 +3765,7 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
 	//bless effect too?
 	STAT_ADD( IE_TOHIT, fx->Parameter1);
-	STAT_ADD( IE_MORALEBREAK, fx->Parameter1);
+	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_AID);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 50, 50, 50);
@@ -3787,6 +3787,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STATE_SET( STATE_BLESS );
 	target->SetSpellState(SS_BLESS);
 	STAT_ADD( IE_TOHIT, fx->Parameter1);
+	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	STAT_ADD( IE_MORALEBREAK, fx->Parameter1);
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_BLESS);
