@@ -54,8 +54,10 @@ def StartTextScreen ():
 	#fixme: we always assume there isn't for non-bg2
 	if GUICommon.GameIsBG2():
 		if TableName == "":
-			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
-			TableName = "CHPTXT"+str(Chapter)
+			#apparently, BG2 doesn't always use IncrementChapter to trigger a TextScreen
+			#Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
+			#TableName = "CHPTXT"+str(Chapter)
+			return
 		ID = 62
 	else:
 		ID = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
@@ -81,7 +83,6 @@ def StartTextScreen ():
 
 	TextArea = TextScreen.GetControl (2)
 	TextArea.SetFlags (IE_GUI_TEXTAREA_SMOOTHSCROLL)
-	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, FeedScroll)
 
 	#caption
 	Table = GemRB.LoadTable (TableName)
@@ -117,7 +118,7 @@ def StartTextScreen ():
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
 	TextScreen.SetVisible (WINDOW_VISIBLE)
 
-	TextArea.Rewind ()
+	ReplayTextScreen()
 	return
 
 def FeedScroll ():
