@@ -263,9 +263,13 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		goto exit_function;
 	}
 	if (!strcmp( Token, "CLASS" )) {
-		Decoded = GetString( ClassStrRef(-1), 0);
+		//allow this to be used by direct setting of the token
+		int strref = ClassStrRef(-1);
+		if (strref<=0) return -1;
+		Decoded = GetString( strref, 0);
 		goto exit_function;
 	}
+
 	if (!strcmp( Token, "RACE" )) {
 		Decoded = GetString( RaceStrRef(-1), 0);
 		goto exit_function;
