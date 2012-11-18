@@ -5470,15 +5470,19 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 
 	if (value<0)
 		value = 0;
-	else if (value>25)
-		value = 25;
+	else if (value>MaximumAbility)
+		value = MaximumAbility;
 
-	if (ex<0)
-		ex=0;
-	else if (ex>100)
-		ex=100;
+	int bonus = 0;
+	if (!HasFeature(GF_3ED_RULES)) {
+		if (ex<0)
+			ex=0;
+		else if (ex>100)
+			ex=100;
+		bonus += strmodex[column*101+ex];
+	}
 
-	return strmod[column*(MaximumAbility+1)+value]+strmodex[column*101+ex];
+	return strmod[column*(MaximumAbility+1)+value] + bonus;
 }
 
 //The maze columns are used only in the maze spell, no need to restrict them further
