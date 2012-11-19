@@ -363,6 +363,7 @@ private:
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the wierd/awesome wild surges */
 	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
+	void ResetCastingState(Actor* caster);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

@@ -118,10 +118,7 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.y = 0;
 
 	LastSpellOnMe = 0xffffffff;
-	SpellHeader = -1;
-	SpellResRef[0] = 0;
-	LastTarget = 0;
-	LastTargetPos.empty();
+	ResetCastingState(NULL);
 	InterruptCasting = false;
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
@@ -909,6 +906,16 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 	free(nearActors);
 }
 
+inline void Scriptable::ResetCastingState(Actor *caster) {
+	SpellHeader = -1;
+	SpellResRef[0] = 0;
+	LastTarget = 0;
+	LastTargetPos.empty();
+	if (caster) {
+		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
+	}
+}
+
 void Scriptable::CastSpellPointEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
@@ -965,13 +972,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		break;
 	}
 
-	SpellHeader = -1;
-	SpellResRef[0] = 0;
-	LastTarget = 0;
-	LastTargetPos.empty();
-	if (caster) {
-		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
-	}
+	ResetCastingState(caster);
 }
 
 void Scriptable::CastSpellEnd(int level, int no_stance)
@@ -1035,13 +1036,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		target->LastSpellOnMe = spellID;
 	}
 
-	SpellHeader = -1;
-	SpellResRef[0] = 0;
-	LastTarget = 0;
-	LastTargetPos.empty();
-	if (caster) {
-		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
-	}
+	ResetCastingState(caster);
 }
 
 // check for input sanity and good casting conditions
