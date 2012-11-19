@@ -4228,6 +4228,13 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
+	if (Owner->Type == ST_ACTOR) {
+		Actor *owner = (Actor *) Owner;
+		// prevent eg. True Sight continuing after death
+		if (!owner->ValidTarget(GA_NO_DEAD)) {
+			return FX_NOT_APPLIED;
+		}
+	}
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
