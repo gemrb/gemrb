@@ -566,8 +566,10 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		return 0;
 	}
 
-	// ignore invisible targets
-	flags |= GA_NO_HIDDEN;
+	// ignore invisible targets for direct matching
+	if (! parameters->int0Parameter) {
+		flags |= GA_NO_HIDDEN;
+	}
 	
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
