@@ -62,6 +62,17 @@ static inline bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
 
 /* do object filtering: Myself, LastAttackerOf(Player1), etc */
 static inline Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Object *oC, int ga_flags) {
+	targetlist::iterator m;
+	const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
+	while (tt) {
+		Actor *target = (Actor *) tt->actor;
+		if (target->ValidTarget(GA_NO_DEAD)) {
+			tt = tgts->GetNextTarget(m, ST_ACTOR);
+		} else {
+			tt = tgts->RemoveTargetAt(m);
+		}
+	}
+
 	for (int i = 0; i < MaxObjectNesting; i++) {
 		int filterid = oC->objectFilters[i];
 		if (!filterid) break;
