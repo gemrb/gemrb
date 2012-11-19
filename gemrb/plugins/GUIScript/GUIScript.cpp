@@ -9067,7 +9067,9 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	CREItem *item = actor->inventory.GetUsedWeapon(false, dummy);
 	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 		displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
-	} else {
+	// no sense in switching from fists to fists
+	// it would actually break monk fists, since it resulted in a quiver slot being set
+	} else if (dummy != actor->inventory.GetFistSlot()) {
 		ret = actor->SetEquippedQuickSlot(slot, ability);
 		if (ret) {
 			displaymsg->DisplayConstantString(ret, DMC_WHITE);
