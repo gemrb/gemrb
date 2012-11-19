@@ -2692,7 +2692,9 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//PST allows deactivating of containers
-	if (tar->Type == ST_CONTAINER) {
+	//but IWD doesn't, ar9705 chests rely on it (if this is changed, make sure they are all still selectable!)
+	//FIXME: add a new game flag / differentiate more container flags
+	if (tar->Type == ST_CONTAINER && !core->HasFeature(GF_SPECIFIC_DMG_BONUS)) {
 		((Container *) tar)->Flags|=CONT_DISABLED;
 		return;
 	}
