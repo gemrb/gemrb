@@ -2791,7 +2791,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		RefreshPCStats();
 
 	//if the animation ID was not modified by any effect, it may still be modified by something else
-	if((Modified[IE_ANIMATION_ID]==BaseStats[IE_ANIMATION_ID])) {
+	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID]) {
 		UpdateAnimationID(true);
 	}
 

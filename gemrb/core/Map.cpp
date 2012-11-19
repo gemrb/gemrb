@@ -3823,3 +3823,4 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 }
 
 }
+
