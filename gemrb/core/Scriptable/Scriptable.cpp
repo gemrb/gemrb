@@ -955,6 +955,11 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	if (!SpellResRef[0]) {
 		return;
 	}
+	if (!area) {
+		Log(ERROR, "Scriptable", "CastSpellPointEnd: lost area, skipping %s!", SpellResRef);
+		ResetCastingState(caster);
+		return;
+	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
@@ -1009,6 +1014,11 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		return;
 	}
 	if (!SpellResRef[0]) {
+		return;
+	}
+	if (!area) {
+		Log(ERROR, "Scriptable", "CastSpellEnd: lost area, skipping %s!", SpellResRef);
+		ResetCastingState(caster);
 		return;
 	}
 
