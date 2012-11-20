@@ -1,3 +1,11 @@
+GemRB git (0913aa2):
+  New features:
+    - 
+
+  Improved features:
+    - 
+    - bugfixes
+
 GemRB v0.7.2 (2012-11-20):
   New features:
     - configuration changes are now saved to gem-baldur.ini (or equivalent)
