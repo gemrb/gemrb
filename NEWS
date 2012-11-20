@@ -1,18 +1,16 @@
-GemRB git (01fa3b490):
+GemRB v0.7.2 (2012-11-20):
   New features:
-    - 
-    - more original configuration options are honored
+    - configuration changes are now saved to gem-baldur.ini (or equivalent)
     - GemRB now asks for confirmation when exiting
     - output can now be shown in the ingame message window (run debug(5))
     - ToBEx flags for effect damage: bypass mirror image, ignore difficulty
     - SDL2 software keyboard
 
   Improved features:
-    - 
     - custom dialog.tlk encoding support
     - fonts, effect icons, initials, chapter text
     - option windows
-    - actions, triggers, effects
+    - actions, triggers, effects, invisibility handling
     - assorted bugfixes
 
 GemRB V0.7.1 (2012-07-15):
