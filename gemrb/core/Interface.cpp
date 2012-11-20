@@ -5761,7 +5761,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 		int row;
 		if (checkcol == -1) {
 			// use the row names
-			char tmp[4];
+			char tmp[30];
 			snprintf(tmp, sizeof(tmp), "%d", value);
 			row = tm->GetRowIndex(tmp);
 		} else {
