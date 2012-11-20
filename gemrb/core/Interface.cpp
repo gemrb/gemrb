@@ -3677,7 +3677,7 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 void Interface::AskAndExit()
 {
 	// if askExit is 1 then we are trying to quit a second time and should instantly do so
-	ieDword askExit;
+	ieDword askExit = 0;
 	vars->Lookup("AskAndExit", askExit);
 	if (game && !askExit) {
 		if (ConsolePopped) {
