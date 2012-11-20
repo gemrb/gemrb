@@ -1170,7 +1170,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
-	if (area[0] && stricmp(area, map1->GetScriptName())) { //do we need to switch area?
+	if (area[0] && (!map1 || stricmp(area, map1->GetScriptName()))) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
