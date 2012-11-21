@@ -2520,7 +2520,7 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( SavePath, true );
 
 	FixPath( CachePath, false );
-	if (!MakeDirectory(CachePath)) {
+	if (!MakeDirectories(CachePath)) {
 		error("Core", "Unable to create cache directory '%s'", CachePath);
 	}
 
