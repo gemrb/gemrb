@@ -54,6 +54,10 @@ static void GemRB::appPutToForeground()
 
 int main(int argc, char* argv[])
 {
+#ifdef HAVE_SETENV
+	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
+#endif
+
 #ifdef M_TRIM_THRESHOLD
 // Prevent fragmentation of the heap by malloc (glibc).
 //
