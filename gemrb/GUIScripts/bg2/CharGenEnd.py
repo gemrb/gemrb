@@ -32,9 +32,7 @@ def OnLoad():
 	# Lay on hands, turn undead and backstab multiplier get set by the core
 	# set my character up
 	MyChar = GemRB.GetVar ("Slot")
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
@@ -53,7 +51,7 @@ def OnLoad():
 	LUCommon.SetupHP (MyChar)
 
 	# mage spells
-	TableName = CommonTables.ClassSkills.GetValue (Class, 2, 0)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0)
 	if TableName != "*":
 		index = 0
 		if IsMulti[0]>1:
@@ -88,8 +86,8 @@ def OnLoad():
 
 	# setup starting gold (uses a roll dictated by class
 	TmpTable = GemRB.LoadTable ("strtgold")
-	temp = GemRB.Roll (TmpTable.GetValue (Class, 1),TmpTable.GetValue (Class, 0), TmpTable.GetValue (Class, 2))
-	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (Class, 3))
+	temp = GemRB.Roll (TmpTable.GetValue (ClassName, "ROLLS"), TmpTable.GetValue (ClassName, "SIDES"), TmpTable.GetValue (ClassName, "MODIFIER"))
+	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (ClassName, "MULTIPLIER"))
 
 	# save the appearance
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )

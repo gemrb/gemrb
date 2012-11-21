@@ -126,7 +126,7 @@ def DualClassWindow ():
 
 	# class name
 	Kit = GUICommon.GetKitIndex (pc)
-	OldClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat (pc, IE_CLASS) ) )
+	OldClassName = GUICommon.GetClassRowName (pc)
 	if Kit:
 		OldKitName = CommonTables.KitList.GetValue (Kit, 0, 0)
 	else:

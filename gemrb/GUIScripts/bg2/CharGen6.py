@@ -53,13 +53,13 @@ def OnLoad():
 	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
 	# learn divine spells if appropriate
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	TableName = CommonTables.ClassSkills.GetValue (Class, 1, 0) # cleric spells
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", 0) # cleric spells
 
 	if TableName == "*": # only druid spells or no spells at all
-		TableName = CommonTables.ClassSkills.GetValue (Class, 0, 0)
+		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0)
 		ClassFlag = 0x8000
-	elif CommonTables.ClassSkills.GetValue (Class, 0, 0) != "*": # cleric and druid spells
+	elif CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0) != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
 		ClassFlag = 0x4000

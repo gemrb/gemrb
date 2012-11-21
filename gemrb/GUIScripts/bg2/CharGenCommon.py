@@ -166,9 +166,8 @@ def DisplayOverview(step):
 			TextAreaControl.Append (CommonTables.Aligns.GetValue (v,2))
 		elif part == 6:
 			TextAreaControl.Append ("\n")
-			ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-			Class = CommonTables.Classes.FindValue (5, ClassID)
-			hasextra = CommonTables.Classes.GetValue (Class, 3)=="SAVEWAR"
+			ClassName = GUICommon.GetClassRowName (MyChar)
+			hasextra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
 				v = AbilityTable.GetValue (i, 2)
@@ -184,9 +183,6 @@ def DisplayOverview(step):
 			# thieving and other skills
 			info = ""
 			SkillTable = GemRB.LoadTable ("skills")
-			ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-			Class = CommonTables.Classes.FindValue (5, ClassID)
-			ClassName = CommonTables.Classes.GetRowName (Class)
 			RangerSkills = CommonTables.ClassSkills.GetValue (ClassName, "RANGERSKILL")
 			BardSkills = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 			KitName = GUICommon.GetKitIndex (MyChar)

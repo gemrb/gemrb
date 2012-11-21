@@ -141,7 +141,9 @@ def UpdatePriestWindow ():
 			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Icon.SetTooltip ('')
-	CantCast = CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1) == "*"
+
+	ClassName = GUICommon.GetClassRowName (pc)
+	CantCast = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*"
 	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 

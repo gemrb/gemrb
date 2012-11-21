@@ -138,7 +138,7 @@ def UpdateMageWindow ():
 			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Icon.SetTooltip ('')
 
-	CantCast = CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2) == "*"
+	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 def MagePrevLevelPress ():

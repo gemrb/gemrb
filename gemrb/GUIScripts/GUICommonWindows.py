@@ -977,7 +977,6 @@ def GetActorClassTitle (actor, ClassIndex):
 	if ClassTitle:
 		return ClassTitle
 
-	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	KitIndex = GetKitIndex (actor, ClassIndex)
 	if KitIndex == 0:
 		ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 0)

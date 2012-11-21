@@ -125,8 +125,7 @@ def unsetHateRace():
 
 def guardHateRace():
 	MyChar = GemRB.GetVar ("Slot")
-	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
-	ClassName = CommonTables.ClassSkills.GetRowName(Class)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	return TableName != "*"
 
@@ -151,8 +150,8 @@ def unsetMageSpells():
 
 def guardMageSpells():
 	MyChar = GemRB.GetVar ("Slot")
-	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
-	TableName = CommonTables.ClassSkills.GetValue(Class, 2)
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELLS")
 	return TableName != "*"
 
 def getMageSpells(TextAreaControl):
@@ -179,9 +178,7 @@ def guardSkills():
 	if Kit != 0: # luckily the first row is a dummy
 		KitName = CommonTables.KitList.GetValue(Kit, 0) #rowname is just a number
 	else:
-		ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-		ClassIndex = CommonTables.Classes.FindValue(5,ClassID)
-		KitName = CommonTables.Classes.GetRowName(ClassIndex)
+		KitName = GUICommon.GetClassRowName (MyChar)
 
 	for i in range(RowCount):
 		SkillName = SkillTable.GetRowName(i+2)
@@ -201,9 +198,7 @@ def getSkills(TextAreaControl):
 	# thieving and other skills
 	info = ""
 	SkillTable = GemRB.LoadTable ("skills")
-	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, ClassID)
-	ClassName = CommonTables.Classes.GetRowName(Class)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	RangerSkills = CommonTables.ClassSkills.GetValue (ClassName, "RANGERSKILL")
 	BardSkills = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 	KitName = GUICommon.GetKitIndex (MyChar)
@@ -280,14 +275,12 @@ def getName(TextAreaControl):
 def setDivineSpells():
 	MyChar = GemRB.GetVar ("Slot")
 	
-	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, ClassID)
-	ClassName = CommonTables.Classes.GetRowName(Class)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	
 	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 	ClericTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
 	
-	print("CGG setDivineSpells: CP1",ClassID,Class,ClassName,DruidTable,ClericTable)
+	print("CGG setDivineSpells: CP1", ClassName, DruidTable, ClericTable)
 	
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
@@ -332,9 +325,7 @@ def setAccept():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
-	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, ClassID)
-	ClassName = CommonTables.Classes.GetRowName(Class)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	
 	#reputation
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)

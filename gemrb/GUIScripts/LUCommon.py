@@ -39,9 +39,7 @@ def CanLevelUp(actor):
 	"""Returns true if the actor can level up."""
 
 	# get our class and placements for Multi'd and Dual'd characters
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, Class)
-	Class = CommonTables.Classes.GetRowName (Class)
+	Class = GUICommon.GetClassRowName (actor)
 	Multi = GUICommon.IsMultiClassed (actor, 1)
 	Dual = GUICommon.IsDualClassed (actor, 1)
 
@@ -50,7 +48,6 @@ def CanLevelUp(actor):
 	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2),\
 		GemRB.GetPlayerStat (actor, IE_LEVEL3)]
 
-	#TODO: double-check this
 	if GemRB.GetPlayerStat(actor, IE_LEVELDRAIN)>0:
 		return 0
 

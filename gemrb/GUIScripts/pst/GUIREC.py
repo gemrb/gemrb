@@ -262,7 +262,7 @@ def UpdateRecordsWindow ():
 
 
 	# class
-	text = CommonTables.Classes.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
+	text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName (pc), "NAME_REF")
 
 	Label = Window.GetControl (0x10000016)
 	Label.SetText (text)

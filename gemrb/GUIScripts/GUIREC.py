@@ -331,9 +331,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# collecting tokens for stat overview
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	GemRB.SetToken ("CLASS", ClassTitle)
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, Class)
-	Class = CommonTables.Classes.GetRowName (Class)
+	Class = GUICommon.GetClassRowName (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 	Multi = GUICommon.IsMultiClassed (pc, 1)
 	XP = GemRB.GetPlayerStat (pc, IE_XP)

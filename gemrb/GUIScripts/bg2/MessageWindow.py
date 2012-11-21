@@ -185,9 +185,7 @@ def FixAnomen( idx):
 #do all the stuff not done yet
 def FixProtagonist( idx):
 	
-	Class = GemRB.GetPlayerStat (idx, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassName = GUICommon.GetClassRowName (idx)
 	KitIndex = GUICommon.GetKitIndex (idx)
 	# only give a few items for transitions from soa
 	if GemRB.GetVar("oldgame"):

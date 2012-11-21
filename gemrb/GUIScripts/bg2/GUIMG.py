@@ -228,7 +228,7 @@ def UpdateMageWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	CantCast = CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2) == "*"
+	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName(pc), "MAGESPELL") == "*"
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 	return
 

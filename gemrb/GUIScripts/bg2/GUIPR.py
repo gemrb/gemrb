@@ -183,12 +183,14 @@ def UpdatePriestWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	DivineCaster = CommonTables.ClassSkills.GetValue (Class, 1)
+	ClassName = GUICommon.GetClassRowName (pc)
+	DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
 	if DivineCaster == "*":
 		# also check the DRUIDSPELL column
-		DivineCaster = CommonTables.ClassSkills.GetValue (Class, 0)
-	CantCast = DivineCaster == "*" or GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
+		DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
+	CantCast = DivineCaster == "*"
+	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
+
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 	return
 

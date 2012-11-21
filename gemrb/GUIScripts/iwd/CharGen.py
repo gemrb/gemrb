@@ -314,9 +314,9 @@ def AcceptPress():
 	#mage spells
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	KitIndex = KitTable.FindValue (3, Kit)
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	TableName = CommonTables.ClassSkills.GetValue (Class, 2, 0)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
@@ -334,10 +334,10 @@ def AcceptPress():
 			j=j<<1
 
 	#priest spells
-	TableName = CommonTables.ClassSkills.GetValue (Class, 1, 0)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", 0)
 	# druids and rangers have a column of their own
 	if TableName == "*":
-		TableName = CommonTables.ClassSkills.GetValue (Class, 0, 0)
+		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0)
 	if TableName != "*":
 		if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
 			ClassFlag = 0x8000
@@ -362,7 +362,7 @@ def AcceptPress():
 
 	# ranger tracking is a hardcoded innate
 	if GUICommon.HasHOW():
-		if CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (MyChar, IE_CLASS), 0) != "*":
+		if CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL") != "*":
 			GemRB.LearnSpell (MyChar, "spin139", LS_MEMO)
 
 	# save all the skills
@@ -378,11 +378,11 @@ def AcceptPress():
 
 	print "Reputation", t
 	TmpTable = GemRB.LoadTable ("strtgold")
-	a = TmpTable.GetValue (Class, 1) #number of dice
-	b = TmpTable.GetValue (Class, 0) #size
-	c = TmpTable.GetValue (Class, 2) #adjustment
-	d = TmpTable.GetValue (Class, 3) #external multiplier
-	e = TmpTable.GetValue (Class, 4) #level bonus rate
+	a = TmpTable.GetValue (ClassName, "ROLLS") #number of dice
+	b = TmpTable.GetValue (ClassName, "SIDES") #size
+	c = TmpTable.GetValue (ClassName, "MODIFIER") #adjustment
+	d = TmpTable.GetValue (ClassName, "MULTIPLIER") #external multiplier
+	e = TmpTable.GetValue (ClassName, "BONUS_PER_LEVEL") #level bonus rate (iwd only!)
 	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL) #FIXME: calculate multiclass average
 	if t>1:
 		e=e*(t-1)
@@ -409,7 +409,7 @@ def AcceptPress():
 	GemRB.SetToken ("CHARNAME","")
 	# don't reset imported char's xp back to start
 	if not ImportedChar:
-		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (Class, 3) )
+		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
@@ -451,14 +451,14 @@ def SetCharacterDescription():
 		else:
 			TextArea.Append (1051)
 	if CharGenState > 2:
-		Class = CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat (MyChar, IE_CLASS) )
+		ClassName = GUICommon.GetClassRowName (MyChar)
 		TextArea.Append (12136, -1)
 		TextArea.Append (": ")
 		#this is only mage school in iwd
 		Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 		KitIndex = KitTable.FindValue (3, Kit)
 		if KitIndex <= 0:
-			ClassTitle = CommonTables.Classes.GetValue (Class, 2)
+			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
 		else:
 			ClassTitle = KitTable.GetValue (KitIndex, 2)
 		TextArea.Append (ClassTitle)
@@ -487,13 +487,11 @@ def SetCharacterDescription():
 			else:
 				TextArea.Append (str(stat) )
 	if CharGenState > 5:
-		ClassName = CommonTables.Classes.GetRowName (Class)
-		Row = CommonTables.Classes.GetValue (Class, 5)
-		DruidSpell = CommonTables.ClassSkills.GetValue (Row, 0)
-		PriestSpell = CommonTables.ClassSkills.GetValue (Row, 1)
-		MageSpell = CommonTables.ClassSkills.GetValue (Row, 2)
-		IsBard = CommonTables.ClassSkills.GetValue (Row, 4)
-		IsThief = CommonTables.ClassSkills.GetValue (Row, 5)
+		DruidSpell = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
+		PriestSpell = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
+		MageSpell = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
+		IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
+		IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
 
 		if IsThief!="*":
 			TextArea.Append ("", -1)
@@ -1206,9 +1204,7 @@ def AlignmentPress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AlignmentWindow = GemRB.LoadWindow (3)
 	ClassAlignmentTable = GemRB.LoadTable ("alignmnt")
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	GemRB.SetVar ("Alignment", 0)
 
 	for i in range (2, 11):
@@ -1296,9 +1292,8 @@ def AbilitiesPress():
 	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
 	PointsLeftLabel.SetUseRGB (1)
 
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, Class)
-	HasStrExtra = CommonTables.Classes.GetValue (Class, 3)=="SAVEWAR"
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
 
 	for i in range (6):
 		AbilitiesLabelButton = AbilitiesWindow.GetControl (30 + i)
@@ -1364,8 +1359,7 @@ def AbilitiesCalcLimits(Index):
 	AbilitiesMaximum = AbilitiesRaceReqTable.GetValue (Race, Index * 2 + 1)
 	AbilitiesModifier = AbilitiesRaceAddTable.GetValue (Race, Index)
 
-	Class = CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat (MyChar, IE_CLASS) )
-	ClassName = CommonTables.Classes.GetRowName (Class)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	ClassIndex = AbilitiesClassReqTable.GetRowIndex (ClassName)
 	Min = AbilitiesClassReqTable.GetValue (ClassIndex, Index)
 	if Min > 0 and AbilitiesMinimum < Min:
@@ -1554,12 +1548,12 @@ def SkillsPress():
 
 	Level = 1
 	SpellLevel = 1
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	DruidSpell = CommonTables.ClassSkills.GetValue (Class, 0)
-	PriestSpell = CommonTables.ClassSkills.GetValue (Class, 1)
-	MageSpell = CommonTables.ClassSkills.GetValue (Class, 2)
-	IsBard = CommonTables.ClassSkills.GetValue (Class, 4)
-	IsThief = CommonTables.ClassSkills.GetValue (Class, 5)
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	DruidSpell = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
+	PriestSpell = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
+	MageSpell = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
+	IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
+	IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
 
 	if SkillsState == 0:
 		GemRB.SetVar ("HatedRace", 0)
@@ -1780,11 +1774,8 @@ def ProficienciesSelect():
 	ProfsMaxTable = GemRB.LoadTable ("profsmax")
 	ClassWeaponsTable = GemRB.LoadTable ("clasweap")
 
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
-	Class = ProfsTable.GetRowIndex (ClassName)
-	ProficienciesPointsLeft = ProfsTable.GetValue (Class, 0)
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	ProficienciesPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
 	PointsLeftLabel = ProficienciesWindow.GetControl (0x10000009)
 	PointsLeftLabel.SetUseRGB (1)
 	PointsLeftLabel.SetText (str(ProficienciesPointsLeft))
@@ -1888,11 +1879,8 @@ def ProficienciesPlusPress():
 
 	ProficienciesIndex = GemRB.GetVar ("ProficienciesIndex") - 1
 	ProficienciesValue = GemRB.GetVar ("Proficiency" + str(ProficienciesIndex) )
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
-	Class = ProfsMaxTable.GetRowIndex (ClassName)
-	if ProficienciesPointsLeft > 0 and ProficienciesValue < ProfsMaxTable.GetValue (Class, 0):
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	if ProficienciesPointsLeft > 0 and ProficienciesValue < ProfsMaxTable.GetValue (ClassName, "FIRST_LEVEL"):
 		ProficienciesPointsLeft = ProficienciesPointsLeft - 1
 		PointsLeftLabel = ProficienciesWindow.GetControl (0x10000009)
 		PointsLeftLabel.SetText (str(ProficienciesPointsLeft))
@@ -2386,8 +2374,7 @@ def DrawAvatar():
 	lookup = CommonTables.Races.GetRowName (lookup)
 	AvatarID = AvatarID+table.GetValue (lookup, "RACE")
 	table = GemRB.LoadTable ("avprefc")
-	lookup = CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat(MyChar, IE_CLASS))
-	lookup = CommonTables.Classes.GetRowName (lookup)
+	lookup = GUICommon.GetClassRowName (MyChar)
 	AvatarID = AvatarID+table.GetValue (lookup, "PREFIX")
 	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX),0)

@@ -465,12 +465,16 @@ def GetKitIndex (actor):
 
 	return KitIndex
 
-# checks the classes.2da table if the class is multiclass/dualclass capable (bits define the class combination)
-def HasMultiClassBits(actor):
+# fetches the rowname of the passed actor's (base) class from classes.2da
+def GetClassRowName(actor):
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassIndex = CommonTables.Classes.FindValue (5, Class)
 	ClassRowName = CommonTables.Classes.GetRowName (ClassIndex)
-	MultiBits = CommonTables.Classes.GetValue (ClassRowName, "MULTI")
+	return ClassRowName
+
+# checks the classes.2da table if the class is multiclass/dualclass capable (bits define the class combination)
+def HasMultiClassBits(actor):
+	MultiBits = CommonTables.Classes.GetValue (GetClassRowName(actor), "MULTI")
 
 	# we have no entries for npc creature classes, so treat them as single-classed
 	if MultiBits == "*":
@@ -587,7 +591,6 @@ def IsMultiClassed (actor, verbose):
 		return (0,-1,-1,-1)
 
 	# get our base class
-	ClassIndex = CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
 	IsMulti = HasMultiClassBits (actor)
 	IsDual = IsDualClassed (actor, 0)
 
@@ -601,7 +604,7 @@ def IsMultiClassed (actor, verbose):
 	Classes = [0]*3
 	NumClasses = 0
 	Mask = 1 # we're looking at multiples of 2
-	ClassNames = CommonTables.Classes.GetRowName(ClassIndex).split("_")
+	ClassNames = GetClassRowName(actor).split("_")
 
 	# loop through each class and test it as a mask
 	ClassCount = CommonTables.Classes.GetRowCount()
@@ -639,9 +642,7 @@ def CanDualClass(actor):
 
 	DualClassTable = GemRB.LoadTable ("dualclas")
 	CurrentStatTable = GemRB.LoadTable ("abdcscrq")
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassName = GetClassRowName(actor)
 	KitIndex = GetKitIndex (actor)
 	if KitIndex == 0:
 		ClassTitle = ClassName
@@ -719,12 +720,10 @@ def CanDualClass(actor):
 	return 0
 
 def IsWarrior (actor):
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
-	IsWarrior = CommonTables.ClassSkills.GetValue (ClassName, "NO_PROF")
+	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF")
 
 	# warriors get only a -2 penalty for wielding weapons they are not proficient with
+	# FIXME: make the check more robust, someone may change the value!
 	IsWarrior = (IsWarrior == -2)
 
 	Dual = IsDualClassed (actor, 0)

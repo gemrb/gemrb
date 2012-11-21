@@ -20,7 +20,8 @@
 
 import GemRB
 import CommonTables
-from ie_stats import IE_RACE, IE_CLASS, IE_SEX
+import GUICommon
+from ie_stats import IE_RACE, IE_SEX
 
 def RefreshPDoll(button, MinorColor, MajorColor, SkinColor, HairColor):
 	MyChar = GemRB.GetVar ("Slot")
@@ -29,8 +30,8 @@ def RefreshPDoll(button, MinorColor, MajorColor, SkinColor, HairColor):
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	AnimID = AnimID + table.GetValue(Race, 0)
 	table = GemRB.LoadTable ("avprefc")
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	AnimID = AnimID + table.GetValue (Class, 0)
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	AnimID = AnimID + table.GetValue (ClassName, "CLASS")
 	table = GemRB.LoadTable ("avprefg")
 	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
 	AnimID = AnimID + table.GetValue (Gender, 0)
