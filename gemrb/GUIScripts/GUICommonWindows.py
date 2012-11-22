@@ -154,8 +154,12 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	# Party mgmt
 	Button = Window.GetControl (8)
-	Button.SetTooltip (16312)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
+	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	else:
+		Button.SetTooltip (16312)
 
 	# pause button
 	if Gears:
@@ -1199,7 +1203,7 @@ def UpdatePortraitWindow ():
 			flag = flag + blank + chr(255)
 		elif GUICommon.GameIsIWD1():
 			HPLabel = Window.GetControl (100+portid)
-			HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
+			HPLabel.SetText (ratio_str)
 			HPLabel.SetTextColor (*color)
 
 		#add effects on the portrait
