@@ -44,7 +44,8 @@ def OnLoad():
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
-		if CommonTables.Classes.GetValue(i-1,4):
+		ClassName = CommonTables.Classes.GetRowName (i-1)
+		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
 			continue
 		if j>7:
 			Button = ClassWindow.GetControl(j+7)
@@ -60,7 +61,7 @@ def OnLoad():
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
-		if CommonTables.Classes.GetValue(i-1,4):
+		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
 			if Allowed!=0:
 				HasMulti = 1
 			continue
@@ -69,7 +70,7 @@ def OnLoad():
 		else:
 			Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = CommonTables.Classes.GetValue(i-1, 0)
+		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 
 		if Allowed==0:
@@ -94,12 +95,12 @@ def OnLoad():
 
 	TextAreaControl = ClassWindow.GetControl(13)
 
-	Class = GemRB.GetVar("Class")-1
-	if Class<0:
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	if ClassName == "*":
 		TextAreaControl.SetText(17242)
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
-		TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
@@ -118,7 +119,8 @@ def BackPress():
 def SetClass():
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
+	ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
+	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
@@ -129,7 +131,6 @@ def SetClass():
 		KitValue = (0x4000 + KitIndex)
 		GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
-	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class))
 	# protect against barbarians; this stat will be overwritten later
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, ClassIndex)
 

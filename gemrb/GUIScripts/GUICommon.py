@@ -409,14 +409,13 @@ def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 
 	if ClassTitle == 0:
-		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassIndex = CommonTables.Classes.FindValue ( 5, Class )
+		ClassName = GetClassRowName (actor)
 		KitIndex = GetKitIndex (actor)
 		Multi = HasMultiClassBits (actor)
 		Dual = IsDualClassed (actor, 1)
 
 		if Multi and Dual[0] == 0: # true multi class
-			ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 2)
+			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
 			ClassTitle = GemRB.GetString (ClassTitle)
 		else:
 			if Dual[0]: # dual class
@@ -424,14 +423,14 @@ def GetActorClassTitle (actor):
 				if Dual[0] == 1:
 					ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
 				elif Dual[0] == 2:
-					ClassTitle = CommonTables.Classes.GetValue (Dual[1], 2)
+					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
 				ClassTitle = GemRB.GetString (ClassTitle) + " / "
-				ClassTitle += GemRB.GetString (CommonTables.Classes.GetValue (Dual[2], 2))
+				ClassTitle += GemRB.GetString (CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF"))
 			else: # ordinary class or kit
 				if KitIndex:
 					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
 				else:
-					ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 2)
+					ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
 				if ClassTitle != "*":
 					ClassTitle = GemRB.GetString (ClassTitle)
 	else:
@@ -449,7 +448,6 @@ def GetKitIndex (actor):
 
 	Returns 0 if the class is not kitted."""
 
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
 
@@ -466,9 +464,18 @@ def GetKitIndex (actor):
 	return KitIndex
 
 # fetches the rowname of the passed actor's (base) class from classes.2da
-def GetClassRowName(actor):
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
+def GetClassRowName(value, which=-1):
+	if which == "index":
+		ClassIndex = value
+		# if barbarians cause problems, repeat the lookup again here
+	else:
+		if which == -1:
+			Class = GemRB.GetPlayerStat (value, IE_CLASS)
+		elif which == "class":
+			Class = value
+		else:
+			raise RuntimeError, "Bad type parameter for GetClassRowName: ", which
+		ClassIndex = CommonTables.Classes.FindValue (5, Class)
 	ClassRowName = CommonTables.Classes.GetRowName (ClassIndex)
 	return ClassRowName
 
@@ -556,22 +563,18 @@ def IsDualSwap (actor):
 
 	# split the full class name into its individual parts
 	# i.e FIGHTER_MAGE becomes [FIGHTER, MAGE]
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, Class)
-	Class = CommonTables.Classes.GetRowName (Class)
-	Class = Class.split("_")
+	Class = GetClassRowName(actor).split("_")
 
 	# get our old class name
 	if Dual[0] == 2:
-		BaseClass = CommonTables.Classes.GetRowName (Dual[1])
+		BaseClass = GetClassRowName(Dual[1], "index")
 	else:
 		BaseClass = GetKitIndex (actor)
 		BaseClass = CommonTables.KitList.GetValue (BaseClass, 7)
 		if BaseClass == "*":
 			# mod boilerplate
 			return 0
-		BaseClass = CommonTables.Classes.FindValue (5, BaseClass)
-		BaseClass = CommonTables.Classes.GetRowName (BaseClass)
+		BaseClass = GetClassRowName(BaseClass, "index")
 
 	# if our old class is the first class, we need to swap
 	if Class[0] == BaseClass:
@@ -612,7 +615,7 @@ def IsMultiClassed (actor, verbose):
 		if IsMulti&Mask: # it's part of this class
 			#we need to place the classes in the array based on their order in the name,
 			#NOT the order they are detected in
-			CurrentName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, i))
+			CurrentName = GetClassRowName (i, "class")
 			if CurrentName == "*":
 				# we read too far, as the upper range limit is greater than the number of "single" classes
 				break

@@ -985,7 +985,7 @@ def ClassPress():
 			else:
 				ClassSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassSelectPress)
-			ClassSelectButton.SetText (CommonTables.Classes.GetValue (i, 0) )
+			ClassSelectButton.SetText (CommonTables.Classes.GetValue (ClassRowName, "NAME_REF"))
 			ClassSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiButton = ClassWindow.GetControl (10)
@@ -1027,8 +1027,8 @@ def ClassPress():
 def ClassSelectPress():
 	global ClassWindow, ClassTextArea, ClassDoneButton
 
-	Class = GemRB.GetVar ("Class") - 1
-	ClassTextArea.SetText (CommonTables.Classes.GetValue (Class, 1) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	ClassTextArea.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	ClassDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -1057,7 +1057,7 @@ def ClassMultiPress():
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassMultiSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassMultiSelectPress)
-			ClassMultiSelectButton.SetText (CommonTables.Classes.GetValue (i, 0) )
+			ClassMultiSelectButton.SetText (CommonTables.Classes.GetValue (ClassName, "NAME_REF"))
 			ClassMultiSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiTextArea = ClassMultiWindow.GetControl (12)
@@ -1081,8 +1081,8 @@ def ClassMultiPress():
 def ClassMultiSelectPress():
 	global ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
-	Class = GemRB.GetVar ("Class") - 1
-	ClassMultiTextArea.SetText (CommonTables.Classes.GetValue (Class, 1) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	ClassMultiTextArea.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	ClassMultiDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -1173,8 +1173,8 @@ def ClassDonePress():
 	AlignmentButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AlignmentButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	Kit = KitTable.GetValue (GemRB.GetVar ("MAGESCHOOL"), 3 )

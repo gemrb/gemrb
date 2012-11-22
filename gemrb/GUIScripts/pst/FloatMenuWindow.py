@@ -365,7 +365,8 @@ def RefreshSpellList(pc, innate):
 	if innate:
 		type = IE_SPELL_TYPE_INNATE
 	else:
-		if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
+		ClassName = GUICommon.GetClassRowName (pc)
+		if CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
 			type = IE_SPELL_TYPE_WIZARD
 		else:
 			type = IE_SPELL_TYPE_PRIEST

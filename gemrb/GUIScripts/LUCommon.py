@@ -55,8 +55,8 @@ def CanLevelUp(actor):
 		xp = xp/Multi[0] # divide the xp evenly between the classes
 		for i in range (Multi[0]):
 			# if any class can level, return 1
-			ClassIndex = CommonTables.Classes.FindValue (5, Multi[i+1])
-			tmpNext = int(GetNextLevelExp (Levels[i], CommonTables.Classes.GetRowName (ClassIndex) ) )
+			TmpClassName = GUICommon.GetClassRowName (Multi[i+1], "class")
+			tmpNext = int(GetNextLevelExp (Levels[i], TmpClassName))
 			if tmpNext != 0 and tmpNext <= xp:
 				return 1
 
@@ -100,7 +100,8 @@ def SetupSavingThrows (pc, Level=None):
 		NumClasses = Multi[0]
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
-		Class = [CommonTables.Classes.GetValue (Dual[2], 5)]
+		Class = GUICommon.GetClassRowName(Dual[2], "index")
+		Class = [CommonTables.Classes.GetValue (Class, "ID")]
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
@@ -121,8 +122,7 @@ def SetupSavingThrows (pc, Level=None):
 	SaveTables = []
 	ClassBonus = 0
 	for i in range (NumClasses):
-		Row = CommonTables.Classes.FindValue (5, Class[i])
-		RowName = CommonTables.Classes.GetRowName (Row)
+		RowName = GUICommon.GetClassRowName (Class[i], "class")
 		SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", 0)
 		SaveTables.append (GemRB.LoadTable (SaveName) )
 		#use numeric value
@@ -159,8 +159,7 @@ def SetupSavingThrows (pc, Level=None):
 def GetNextLevelFromExp (XP, Class):
 	"""Gets the next level based on current experience."""
 
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassName = GUICommon.GetClassRowName (Class, "class")
 	Row = CommonTables.NextLevel.GetRowIndex (ClassName)
 	NLNumCols = CommonTables.NextLevel.GetColumnCount()
 	for i in range(1, NLNumCols):
@@ -197,7 +196,8 @@ def SetupThaco (pc, Level=None):
 		NumClasses = Multi[0]
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
-		Class = [CommonTables.Classes.GetValue (Dual[2], 5)]
+		Class = GUICommon.GetClassRowName(Dual[2], "index")
+		Class = [CommonTables.Classes.GetValue (Class, "ID")]
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
@@ -215,7 +215,7 @@ def SetupThaco (pc, Level=None):
 	for i in range (NumClasses):
 		#loop through each class and update the save value if we have
 		#a better thac0
-		ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class[i]))
+		ClassName = GUICommon.GetClassRowName (Class[i], "class")
 		TmpThaco = ThacoTable.GetValue (ClassName, str(Levels[i]+1))
 		if TmpThaco < CurrentThaco:
 			NewThaco = 1
@@ -256,7 +256,8 @@ def SetupLore (pc, LevelDiff=None):
 		NumClasses = Multi[0]
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
-		Class = [CommonTables.Classes.GetValue (Dual[2], 5)]
+		Class = GUICommon.GetClassRowName(Dual[2], "index")
+		Class = [CommonTables.Classes.GetValue (Class, "ID")]
 		#if LevelDiff is passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
@@ -267,7 +268,7 @@ def SetupLore (pc, LevelDiff=None):
 	CurrentLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
 	for i in range (NumClasses):
 		#correct unlisted progressions
-		ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class[i]) )
+		ClassName = GUICommon.GetClassRowName (Class[i], "class")
 		if ClassName == "SORCERER":
 			ClassName = "MAGE"
 		elif ClassName == "MONK": #monks have a rate of 1, so this is arbitrary
@@ -324,7 +325,8 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		#we only get the hp bonus if the old class is reactivated
 		if (Levels[0]<=Levels[1]):
 			return
-		Class = [CommonTables.Classes.GetValue (Dual[2], 5)]
+		Class = GUICommon.GetClassRowName(Dual[2], "index")
+		Class = [CommonTables.Classes.GetValue (Class, "ID")]
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
@@ -350,7 +352,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	for i in range (NumClasses):
 		#check this classes hp table for any gain
 		if not ClassName or NumClasses > 1:
-			ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class[i]) )
+			ClassName = GUICommon.GetClassRowName (Class[i], "class")
 		HPTable = CommonTables.Classes.GetValue (ClassName, "HP")
 		HPTable = GemRB.LoadTable (HPTable)
 

@@ -53,7 +53,8 @@ def OnLoad():
 
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
-		if CommonTables.Classes.GetValue(i-1,4):
+		ClassName = CommonTables.Classes.GetRowName (i-1)
+		if CommonTables.Classes.GetValue(ClassName, "MULTI"):
 			continue
 			
 		Button = ClassWindow.GetControl(i+1)
@@ -65,14 +66,14 @@ def OnLoad():
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
-		if CommonTables.Classes.GetValue(i-1,4):
+		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
 			if Allowed!=0:
 				HasMulti = 1
 			continue
 			
 		Button = ClassWindow.GetControl(i+1)
 		
-		t = CommonTables.Classes.GetValue(i-1, 0)
+		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 
 		if Allowed==2:
@@ -102,12 +103,12 @@ def OnLoad():
 
 	TextAreaControl = ClassWindow.GetControl(13)
 
-	Class = GemRB.GetVar("Class")-1
-	if Class<0:
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	if ClassName == "*":
 		TextAreaControl.SetText(17242)
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
-		TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
@@ -129,18 +130,15 @@ def SpecialistPress():
 	CharGenCommon.next()
 	
 def ClassPress():
-	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF") )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	# find the class from the class table
-	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
-	#protect against barbarians
-	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class) )
-	
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	CharGenCommon.next()

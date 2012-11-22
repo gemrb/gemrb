@@ -29,11 +29,12 @@ import LUSpellSelection
 def OnLoad():
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
-	TableName = CommonTables.ClassSkills.GetValue(Class, 2)
+	ClassName = GUICommon.GetClassRowName (Class, "class")
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELL")
 
 	# make sure we have a correct table
 	if Class == 19:
-		# sorcerer's need their known not max table
+		# sorcerers need their known not max table or they would progress too slowly
 		TableName = "SPLSRCKN"
 
 	# get our kit
@@ -45,7 +46,8 @@ def OnLoad():
 	Level = GemRB.GetPlayerStat (Slot, IE_LEVEL)
 	if IsMulti[0]>1:
 		for i in range (1, IsMulti[0]):
-			if CommonTables.ClassSkills.GetValue (IsMulti[i], 2, 0) != "*":
+			ClassName = GUICommon.GetClassRowName (IsMulti[i], "class")
+			if CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
 	Spellbook.SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)

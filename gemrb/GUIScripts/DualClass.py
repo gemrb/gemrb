@@ -202,7 +202,8 @@ def DCMainDonePress ():
 	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
 
 	# new saves
-	SavesTable = CommonTables.Classes.GetValue (CommonTables.Classes.FindValue (5, NewClassId), 3, 0)
+	ClassName = GUICommon.GetClassRowName (NewClassId, "class")
+	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", 0)
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))

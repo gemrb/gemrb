@@ -78,7 +78,7 @@ def OnLoad():
 			#be looked at first in Cleric/Ranger multi's, which is correct
 			foundindex = 0
 			for i in range (IsMulti[0]):
-				ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, IsMulti[i+1]) )
+				ClassName = GUICommon.GetClassRowName (IsMulti[i+1], "class")
 				for table in "CLERICSPELL", "DRUIDSPELL":
 					if CommonTables.ClassSkills.GetValue (ClassName, table) != "*":
 						index = i

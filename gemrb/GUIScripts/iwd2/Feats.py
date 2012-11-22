@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+import GUICommon
 import CommonTables
 
 FeatWindow = 0
@@ -29,7 +30,6 @@ FeatTable = 0
 FeatReqTable = 0
 TopIndex = 0
 Level = 0
-ClassColumn = 0
 KitColumn = 0
 RaceColumn = 0
 FeatsClassColumn = 0
@@ -188,7 +188,7 @@ def OnLoad():
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
 	global FeatTable, FeatReqTable
 	global KitName, Level, PointsLeft
-	global ClassColumn, KitColumn, RaceColumn, FeatsClassColumn
+	global KitColumn, RaceColumn, FeatsClassColumn
 
 	GemRB.SetVar("Level",1) #for simplicity
 
@@ -198,15 +198,16 @@ def OnLoad():
 	# could use column ID as well, but they tend to change :)
 	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN")
 
-	Class = GemRB.GetVar("Class") - 1
-	KitName = CommonTables.Classes.GetRowName(Class)
+	ClassIndex = GemRB.GetVar("Class") - 1
+	ClassName = KitName = GUICommon.GetClassRowName (ClassIndex, "index")
 	# classcolumn is base class or 0 if it is not a kit
-	ClassColumn = CommonTables.Classes.GetValue(Class, 3) - 1
+	ClassColumn = CommonTables.Classes.GetValue(ClassName, "CLASS") - 1
 	if ClassColumn < 0:  #it was already a base class
-		ClassColumn = Class
-		FeatsClassColumn = CommonTables.Classes.GetValue(Class, 2) + 2
+		ClassColumn = ClassIndex
+		# feats.2da is transposed, but has the same ordering
+		FeatsClassColumn = ClassIndex + 3 # CommonTables.Classes.GetValue (ClassName, "ID") + 2
 	else:
-		FeatsClassColumn = CommonTables.Classes.GetValue(Class, 3) + 2
+		FeatsClassColumn = ClassColumn + 3
 
 	FeatTable = GemRB.LoadTable("feats")
 	RowCount = FeatTable.GetRowCount()
@@ -226,9 +227,9 @@ def OnLoad():
 	#this one exists only for clerics
 	# Although it should be made extendable to all kits
 	# A FEAT_COLUMN is needed in classes.2da or better yet, a whole new 2da
-	if CommonTables.Classes.GetValue(Class, 3) == "CLERIC":
-		ClassColumn += 3
+	if CommonTables.Classes.GetValue (ClassName, "CLASS") == CommonTables.Classes.GetValue ("CLERIC", "ID"):
 		if KitColumn:
+			# 3 to get to the class columns (feats.2da) and 11 to get to these cleric kit columns
 			KitColumn = 3 + KitColumn + 11
 
 	#Always raise one level at once

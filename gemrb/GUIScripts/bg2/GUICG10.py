@@ -45,7 +45,7 @@ def OnLoad():
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
-		if CommonTables.Classes.GetValue(i-1,4)==0:
+		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
 			# not a multiclass
 			continue
 		MCRowIndices.append((i-1, Allowed))
@@ -87,8 +87,8 @@ def OnLoad():
 
 def ClassPress():
 	GUICG2.SetClass()
-	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -105,10 +105,8 @@ def NextPress():
 		ClassWindow.Unload()
 
 	# find the class from the class table
-	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
-	#protect against barbarians
-	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	GemRB.SetNextScript("CharGen4") #alignment
@@ -124,7 +122,8 @@ def RedrawMCs():
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-		t = CommonTables.Classes.GetValue(MCRowIndices[i-2][0], 0)
+		t = GUICommon.GetClassRowName (MCRowIndices[i-2][0], "index")
+		t = CommonTables.Classes.GetValue(t, "NAME_REF")
 		Button.SetText(t )
 		if not MCRowIndices[i-2][1]:
 			Button.SetState(IE_GUI_BUTTON_DISABLED)

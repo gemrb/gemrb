@@ -348,10 +348,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (19721,1,'c') )
 		stats.append (None)
 		for i in range (Multi[0]):
-			ClassIndex = CommonTables.Classes.FindValue (5, Multi[i+1])
-			ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (ClassIndex, 2))
+			Class = GUICommon.GetClassRowName (Multi[i+1], "class")
+			ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (Class, "CAP_REF"))
 			GemRB.SetToken ("CLASS", ClassTitle)
-			Class = CommonTables.Classes.GetRowName (ClassIndex)
 			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
 			if LevelDrain:
@@ -377,10 +376,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 		Levels[0] += LevelDiff[0]
 
-		ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (Dual[2], 2))
+		Class = CommonTables.Classes.GetRowName (Dual[2])
+		ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (Class, "CAP_REF"))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
-		Class = CommonTables.Classes.GetRowName (Dual[2])
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
 		GemRB.SetToken ("EXPERIENCE", str (XP2) )
 		if LevelDrain:
@@ -395,7 +394,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		if Dual[0] == 1:
 			ClassTitle = GemRB.GetString (CommonTables.KitList.GetValue (Dual[1], 2))
 		elif Dual[0] == 2:
-			ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (Dual[1], 2))
+			ClassTitle = GUICommon.GetClassRowName(Dual[1], "index")
+			ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (ClassTitle, "CAP_REF"))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
@@ -405,8 +405,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		else:
 			BaseClass = GUICommon.GetKitIndex (pc)
 			BaseClass = CommonTables.KitList.GetValue (BaseClass, 7)
-			BaseClass = CommonTables.Classes.FindValue (5, BaseClass)
-			BaseClass = CommonTables.Classes.GetRowName (BaseClass)
+			BaseClass = GUICommon.GetClassRowName (BaseClass, "class")
 		# the first class' XP is discarded and set to the minimum level
 		# requirement, so if you don't dual class right after a levelup,
 		# the game would eat some of your XP
@@ -863,13 +862,12 @@ def OpenKitInfoWindow ():
 	TextArea = KitInfoWindow.GetControl (0)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassIndex = CommonTables.Classes.FindValue (5, Class)
+	ClassName = GUICommon.GetClassRowName (pc)
 	Multi = GUICommon.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 
 	if Multi and Dual[0] == 0: # true multi class
-		text = CommonTables.Classes.GetValue (ClassIndex, 1)
+		text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 		TextArea.SetText (text)
 		KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
@@ -881,17 +879,19 @@ def OpenKitInfoWindow ():
 		if Dual[0] == 1:
 			text = CommonTables.KitList.GetValue (Dual[1], 3)
 		elif Dual[0] == 2:
-			text = CommonTables.Classes.GetValue (Dual[1], 1)
+			text = GUICommon.GetClassRowName(Dual[1], "index")
+			text = CommonTables.Classes.GetValue (text, "DESC_REF")
 
 		TextArea.SetText (text)
 		TextArea.Append ("\n\n")
-		text = CommonTables.Classes.GetValue (Dual[2], 1)
+		text = GUICommon.GetClassRowName(Dual[2], "index")
+		text = CommonTables.Classes.GetValue (text, "DESC_REF")
 
 	else: # ordinary class or kit
 		if KitIndex:
 			text = CommonTables.KitList.GetValue (KitIndex, 3)
 		else:
-			text = CommonTables.Classes.GetValue (ClassIndex, 1)
+			text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 
 	TextArea.Append (text)
 

@@ -18,6 +18,7 @@
 #
 #character generation, racial enemy (GUICG15)
 import GemRB
+import GUICommon
 import CommonTables
 from GUIDefines import *
 
@@ -51,9 +52,10 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
 	RaceWindow = GemRB.LoadWindow(15)
-
 	Class = GemRB.GetVar("BaseClass")
-	TableName = CommonTables.ClassSkills.GetValue(Class, 0)
+	ClassName = GUICommon.GetClassRowName (Class, "index")
+	print "TODO: check if class %s really has an ID of %d" %(ClassName, Class)
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "RANGERSKILL")
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return

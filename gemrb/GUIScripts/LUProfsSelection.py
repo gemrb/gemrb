@@ -198,11 +198,11 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
 	elif IsDual[0]:
-		Class = CommonTables.Classes.GetValue (IsDual[2], 5)
+		Class = GUICommon.GetClassRowName(IsDual[2], "index")
+		Class = CommonTables.Classes.GetValue (Class, "ID")
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassName = CommonTables.Classes.FindValue (5, Class)
-	ClassName = CommonTables.Classes.GetRowName (ClassName)
+	ClassName = GUICommon.GetClassRowName (Class, "class")
 
 	# profs.2da has entries for everyone, so no need to muck around
 	ProfsRate = ProfsTable.GetValue (ClassName, "RATE")

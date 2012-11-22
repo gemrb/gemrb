@@ -27,7 +27,7 @@ KitWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 SchoolList = 0
-ClassID = 0
+ClassName = 0
 TopIndex = 0
 RowCount = 10
 KitTable = 0
@@ -38,7 +38,7 @@ EnhanceGUI = GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS #extra kit button and
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
-	global SchoolList, ClassID
+	global SchoolList, ClassName
 	global RowCount, TopIndex, KitTable, Init, MyChar
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
@@ -46,7 +46,6 @@ def OnLoad():
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue (3, Race) )
 
-	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	ClassName = CommonTables.Classes.GetRowName (GemRB.GetPlayerStat (MyChar, IE_HITPOINTS)) # barbarian hack
 
 	KitTable = GemRB.LoadTable("kittable")
@@ -58,7 +57,7 @@ def OnLoad():
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
 	KitWindow = GemRB.LoadWindow(22)
-	if ClassID == 1:
+	if ClassName == "MAGE":
 		Label = KitWindow.GetControl(0xfffffff)
 		Label.SetText(595)
 
@@ -73,7 +72,7 @@ def OnLoad():
 	if not KitTable: # sorcerer or monk
 		RowCount = 1
 	else:
-		if ClassID == 1: # mages
+		if ClassName == "MAGE": # mages
 			RowCount = SchoolList.GetRowCount()
 		else:
 			RowCount = KitTable.GetRowCount()
@@ -137,17 +136,17 @@ def RedrawKits():
 			Button = KitWindow.GetControl(i+5)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
-			if ClassID == 1:
+			if ClassName == "MAGE":
 				# TODO: check if this is ever reached
 				Kit = GemRB.GetVar("MAGESCHOOL")
 				KitName = SchoolList.GetValue(i+TopIndex, 0)
 				Kit = SchoolList.GetValue (Kit, 3)
 			else:
 				Kit = 0
-				KitName = CommonTables.Classes.GetValue(GemRB.GetVar("Class")-1, 0)
+				KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 		else:
 			Kit = KitTable.GetValue (i+TopIndex,0)
-			if ClassID == 1:
+			if ClassName == "MAGE":
 				KitName = SchoolList.GetValue (i+TopIndex, 0)
 				if Kit == 0:
 					KitName = SchoolList.GetValue (0, 0)
@@ -162,7 +161,7 @@ def RedrawKits():
 				if Kit:
 					KitName = CommonTables.KitList.GetValue(Kit, 1)
 				else:
-					KitName = CommonTables.Classes.GetValue(GemRB.GetVar("Class")-1, 0)
+					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 		Button.SetText(KitName)
 		if not EnabledButtons or i+TopIndex in EnabledButtons:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -190,7 +189,7 @@ def KitPress():
 	ButtonPressed=GemRB.GetVar("ButtonPressed")
 	KitSelected = ButtonPressed + TopIndex
 	if not KitTable:
-		if ClassID == 1: 
+		if ClassName == "MAGE":
 			# TODO: this seems to be never reached
 			Kit = GemRB.GetVar("MAGESCHOOL")
 			Kit = SchoolList.GetValue (Kit, 3)
@@ -198,19 +197,19 @@ def KitPress():
 			Kit = 0
 	else:
 		Kit = KitTable.GetValue (ButtonPressed+TopIndex, 0)
-		if ClassID == 1:
+		if ClassName == "MAGE":
 			if ButtonPressed + TopIndex == 0:
 				Kit = 0
 			else:
 				Kit = ButtonPressed + TopIndex + 21
 
-	if ClassID == 1 and Kit != 0:
+	if ClassName == "MAGE" and Kit != 0:
 		GemRB.SetVar("MAGESCHOOL", Kit-21) # hack: -21 to make the generalist 0
 	else:
 		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
 
 	if Kit == 0:
-		KitDescription = CommonTables.Classes.GetValue(GemRB.GetVar("Class")-1, 1)
+		KitDescription = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 	else:
 		KitDescription = CommonTables.KitList.GetValue(Kit, 3)
 

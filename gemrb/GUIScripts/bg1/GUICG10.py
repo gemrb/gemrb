@@ -42,7 +42,8 @@ def OnLoad():
 
 	j=0
 	for i in range(1,ClassCount):
-		if CommonTables.Classes.GetValue(i-1,4)==0:
+		ClassName = CommonTables.Classes.GetRowName (i-1)
+		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
@@ -51,18 +52,19 @@ def OnLoad():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		j = j + 1
+
 	j=0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.Classes.GetRowName(i-1)
+		ClassName = CommonTables.Classes.GetRowName (i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
-		if CommonTables.Classes.GetValue(i-1,4)==0:
+		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		t = CommonTables.Classes.GetValue(i-1, 0)
+		t = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
@@ -86,15 +88,15 @@ def OnLoad():
 	return
 
 def ClassPress():
-	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	#class	
-	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	CharGenCommon.next()

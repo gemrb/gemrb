@@ -470,12 +470,13 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 				originalkit = CommonTables.KitList.GetValue (originalkit, 7)
 			else: # just get the class value
 				originalkit = GemRB.GetPlayerStat (pc, IE_CLASS)
+			originalkit = GUICommon.GetClassRowName (originalkit, "class")
 
 			# this is is specifically for dual-classes and will not work to remove only one
 			# spell type from a ranger/cleric multi-class
-			if CommonTables.ClassSkills.GetValue (originalkit, 0, 0) != "*": # knows druid spells
+			if CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", 0) != "*": # knows druid spells
 				originalkit = 0x8000
-			elif CommonTables.ClassSkills.GetValue (originalkit, 1, 0) != "*": # knows cleric spells
+			elif CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", 0) != "*": # knows cleric spells
 				originalkit = 0x4000
 			else: # don't know any other spells
 				originalkit = 0

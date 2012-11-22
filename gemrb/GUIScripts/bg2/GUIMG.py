@@ -92,8 +92,9 @@ def SetupMageWindow ():
 	global BookType
 
 	pc = GemRB.GameGetSelectedPCSingle ()
+	ClassName = GUICommon.GetClassRowName (pc)
 	BookType = 0
-	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
+	if CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
 		BookType = 1
 
 	if MageWindow:
@@ -444,6 +445,7 @@ def OpenSequencerWindow ():
 	Spell3 = ""
 	#the target player (who receives the contingency or sequencer)
 	pc = GemRB.GetVar("P0")
+	ClassName = GUICommon.GetClassRowName (pc)
 	#maximum spell level
 	MaxLevel = GemRB.GetVar("P1")
 	#target 0 - any, 1 - caster only, 2 - sequencer
@@ -487,8 +489,8 @@ def OpenSequencerWindow ():
 	TypeButton = Window.GetControl (8)
 
 	#no cleric spells available
-	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 0)=="*" and
-			CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1)=="*"):
+	if CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL") == "*" and\
+			CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
 		TypeButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if Target == 2:

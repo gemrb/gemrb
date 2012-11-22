@@ -945,8 +945,7 @@ def OpenLevelUpWindow ():
 	# Recording this avatar's current proficiency level
 	# Since Nameless one is not covered, hammer and club can't occur
 	# What is the avatar's class (Which we can use to lookup XP)
-	ClassRow = GemRB.GetPlayerStat (pc, IE_CLASS)-1
-	Class = CommonTables.Classes.GetRowName (ClassRow)
+	Class = GUICommon.GetClassRowName (pc)
 
 	# name
 	Label = Window.GetControl (0x10000000)
@@ -954,7 +953,7 @@ def OpenLevelUpWindow ():
 
 	# class
 	Label = Window.GetControl (0x10000001)
-	Label.SetText (CommonTables.Classes.GetValue (ClassRow, 0))
+	Label.SetText (CommonTables.Classes.GetValue (Class, "NAME_REF"))
 
 	# Armor Class
 	Label = Window.GetControl (0x10000023)

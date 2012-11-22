@@ -131,10 +131,11 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	if classid: #used when dual-classing
 		Class = classid
 	elif IsDual[0]: #only care about the current class
-		Class = CommonTables.Classes.GetValue (IsDual[2], 5)
+		Class = GUICommon.GetClassRowName(IsDual[2], "index")
+		Class = CommonTables.Classes.GetValue (Class, "ID")
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class) )
+	ClassName = GUICommon.GetClassRowName(Class, "class")
 
 	#get the number of classes
 	if IsMulti[0]>1:
@@ -158,7 +159,8 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		TmpClass = Class
 		if NumClasses > 1:
 			TmpClass = IsMulti[i+1]
-		if (CommonTables.ClassSkills.GetValue (TmpClass, 5, 0) != "*"):
+		TmpClass = GUICommon.GetClassRowName (TmpClass, "class")
+		if (CommonTables.ClassSkills.GetValue (TmpClass, "THIEFSKILL", 0) != "*"):
 			SkillIndex = i
 			break
 
@@ -212,7 +214,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 				classname = IsMulti[i+1]
 			else:
 				classname = Class
-			classname = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, classname))
+			classname = GUICommon.GetClassRowName (classname, "class")
 			for table in "RANGERSKILL", "BARDSKILL":
 				SpecialSkillsTable = CommonTables.ClassSkills.GetValue (classname, table)
 				if SpecialSkillsTable != "*":

@@ -19,6 +19,7 @@
 #character generation, class (GUICG2)
 import GemRB
 from GUIDefines import *
+import GUICommon
 import CommonTables
 
 ClassWindow = 0
@@ -32,9 +33,8 @@ ClassID = 0
 def AdjustTextArea():
 	global HasSubClass, ClassID
 
-	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
-	ClassName = CommonTables.Classes.GetRowName(Class)
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	ClassID = CommonTables.Classes.GetValue(ClassName, "ID")
 	#determining if this class has any subclasses
 	HasSubClass = 0
@@ -158,8 +158,8 @@ def ClassPress():
 	return
 
 def ClassPress2():
-	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -181,10 +181,10 @@ def BackPress():
 
 def NextPress():
 	#classcolumn is base class
-	Class = GemRB.GetVar("Class")
-	ClassColumn = CommonTables.Classes.GetValue(Class - 1, 3)
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	ClassColumn = CommonTables.Classes.GetValue (ClassName, "CLASS")
 	if ClassColumn <= 0:  #it was already a base class
-		ClassColumn = Class 
+		ClassColumn = GemRB.GetVar("Class")
 	GemRB.SetVar("BaseClass", ClassColumn)
 	if ClassWindow:
 		ClassWindow.Unload()

@@ -57,7 +57,8 @@ def OnLoad():
 		if IsMulti[0]>1:
 			#find out which class gets mage spells
 			for i in range (IsMulti[0]):
-				if CommonTables.ClassSkills.GetValue (IsMulti[i+1], 2, 0) != "*":
+				TmpClassName = GUICommon.GetClassRowName (IsMulti[i+1], "class")
+				if CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", 0) != "*":
 					index = i
 					break
 		Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
@@ -67,7 +68,7 @@ def OnLoad():
 	if IsMulti[0]>1:
 		#get the class abilites for each class
 		for i in range (IsMulti[0]):
-			TmpClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, IsMulti[i+1]) )
+			TmpClassName = GUICommon.GetClassRowName (IsMulti[i+1], "class")
 			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
 			if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 				GUICommon.AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])

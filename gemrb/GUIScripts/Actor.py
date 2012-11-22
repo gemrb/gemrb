@@ -20,6 +20,7 @@
 # Actor.py: Contains the actor class.
 
 import GemRB
+import GUICommon
 from GUIDefines import *
 from ie_stats import *
 #this import is primarily for the tables
@@ -55,12 +56,13 @@ class Actor:
 		dualswap = [0]*classcount
 
 		for i in range(classcount):
-			classid = CommonTables.Classes.GetValue (i, 5)
-			classnames = CommonTables.Classes.GetRowName(i).split("_")
+			rowname = CommonTables.Classes.GetRowName(i)
+			classid = CommonTables.Classes.GetValue (rowname, "ID")
+			classnames = rowname.split("_")
 
 			#set the MC_WAS_ID of the first class
 			if len(classnames) == 2:
-				dualswap[classid-1] = CommonTables.Classes.GetValue (i, 8)
+				dualswap[classid-1] = CommonTables.Classes.GetValue (rowname, "MC_WAS_ID")
 
 	def Classes (self):
 		"""Returns a list with all the class IDs."""
@@ -74,7 +76,7 @@ class Actor:
 		"""Returns a list will all the class names."""
 
 		if self.__classnames == None:
-			self.__classnames = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, self.classid) ).split("_")
+			self.__classnames = GUICommon.GetClassRowName (self.classid, "class").split("_")
 			if self.IsDualSwap():
 				self.__classnames.reverse()
 		return self.__classnames
@@ -89,24 +91,23 @@ class Actor:
 
 		if self.__classtitle == 0:
 			if self.multiclass and self.isdual == 0:
-				self.__classtitle = CommonTables.Classes.GetValue (self.classindex, 2)
+				self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF")
 				self.__classtitle = GemRB.GetString (self.__classtitle)
 			elif self.isdual:
 				# first (previous) kit or class of the dual class
 				self.Classes()
+				self.ClassNames()
 				if self.KitIndex():
 					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2)
 				else:
-					self.__classtitle = CommonTables.Classes.GetValue (CommonTables.Classes.FindValue \
-						(5, self.__classes[1]), 2)
+					self.__classtitle = CommonTables.Classes.GetValue (self.__classnames[1], "CAP_REF")
 				self.__classtitle = GemRB.GetString (self.__classtitle) + " / " + \
-					GemRB.GetString (CommonTables.Classes.GetValue (CommonTables.Classes.FindValue \
-						(5, self.__classes[0]), 2) )
+					GemRB.GetString (CommonTables.Classes.GetValue (self.__classnames[0], "CAP_REF") )
 			else: # ordinary class or kit
 				if self.KitIndex():
 					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2)
 				else:
-					self.__classtitle = CommonTables.Classes.GetValue (self.classindex, 2)
+					self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF")
 				self.__classtitle = GemRB.GetString (self.__classtitle)
 
 		if self.__classtitle == "*":
@@ -210,9 +211,8 @@ class Actor:
 		#accessible variables
 		self.pc = pc
 		self.classid = GemRB.GetPlayerStat (self.pc, IE_CLASS)
-		self.classindex = CommonTables.Classes.FindValue (5, self.classid)
 		self.isdual = GemRB.GetPlayerStat (self.pc, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
-		self.multiclass = CommonTables.Classes.GetValue (self.classindex, 4)
+		self.multiclass = CommonTables.Classes.GetValue (GUICommon.GetClassRowName (pc), "MULTI")
 
 		#internal variables - these are only intialized on the first
 		#call to their respective function, and stored thereafter

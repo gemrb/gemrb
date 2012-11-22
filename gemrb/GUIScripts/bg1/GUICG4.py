@@ -125,16 +125,15 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex (MyChar)
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.Classes.FindValue (5, Class)
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	if Kit == 0:
-		KitName = CommonTables.Classes.GetRowName(Class)
+		KitName = ClassName
 	else:
 		#rowname is just a number, first value row what we need here
 		KitName = CommonTables.KitList.GetValue(Kit, 0)
 
 	#if the class uses the warrior table for saves, then it may have the extra strength
-	if CommonTables.Classes.GetValue(Class, 3)=="SAVEWAR":
+	if CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR":
 		HasStrExtra=1
 	else:
 		HasStrExtra=0

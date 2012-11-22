@@ -960,11 +960,15 @@ def GetKitIndex (actor, ClassIndex):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
 	KitIndex = -1
-	ClassID = CommonTables.Classes.GetValue (ClassIndex, 2)
+	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassID = CommonTables.Classes.GetValue (ClassName, "ID")
 	# skip the primary classes
+	# TODO: make more robust, mods could add new primaries
 	for ci in range (10, CommonTables.Classes.GetRowCount ()):
-		BaseClass = CommonTables.Classes.GetValue (ci, 3)
-		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (ci, 2):
+		RowName = CommonTables.Classes.GetRowName (ci)
+		BaseClass = CommonTables.Classes.GetValue (RowName, "CLASS")
+		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (RowName, "ID"):
+			#FIXME: this will return the last kit only, check if proper multikit return values are needed
 			KitIndex = ci
 
 	if KitIndex == -1:
@@ -979,9 +983,10 @@ def GetActorClassTitle (actor, ClassIndex):
 
 	KitIndex = GetKitIndex (actor, ClassIndex)
 	if KitIndex == 0:
-		ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 0)
+		ClassName = CommonTables.Classes.GetRowName (ClassIndex)
 	else:
-		ClassTitle = CommonTables.Classes.GetValue (KitIndex, 0)
+		ClassName = CommonTables.Classes.GetRowName (KitIndex)
+	ClassTitle = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 
 	if ClassTitle == "*":
 		return 0

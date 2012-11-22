@@ -266,7 +266,7 @@ def DisplayGeneral (pc):
 	else:
 		tmp = GetFavoredClass(pc, tmp)
 
-	tmp = CommonTables.Classes.GetValue (tmp, 0)
+	tmp = CommonTables.Classes.GetValue (CommonTables.Classes.GetRowName(tmp), "NAME_REF")
 	RecordsTextArea.Append (": ")
 	RecordsTextArea.Append (tmp)
 
