@@ -89,6 +89,9 @@ namespace GemRB {
 
 #define GUIBT_COUNT (MAX_QSLOTS + 3)
 
+#define FAV_SPELL  0
+#define FAV_WEAPON 1
+
 class GEM_EXPORT PCStatsStruct {
 public:
 	ieStrRef  BestKilledName;
@@ -131,6 +134,7 @@ public:
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
+	void RegisterFavourite(ieResRef fav, int what);
 };
 }
 
