@@ -88,7 +88,7 @@ class Actor:
 			return self.__classtitle
 
 		self.__classtitle = GemRB.GetPlayerStat (self.pc, IE_TITLE1)
-
+		self.ClassNames()
 		if self.__classtitle == 0:
 			if self.multiclass and self.isdual == 0:
 				self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF")
@@ -96,7 +96,6 @@ class Actor:
 			elif self.isdual:
 				# first (previous) kit or class of the dual class
 				self.Classes()
-				self.ClassNames()
 				if self.KitIndex():
 					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2)
 				else:
