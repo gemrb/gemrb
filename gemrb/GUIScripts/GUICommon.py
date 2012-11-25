@@ -185,8 +185,8 @@ def HasHOW ():
 def HasTOTL ():
 	return GemRB.HasResource ("ar9700", RES_ARE)
 
-def GetIWDSpellButtonCount ():
-	if HasHOW():
+def GetGUISpellButtonCount ():
+	if HasHOW() or GameIsBG2():
 		return 24
 	else:
 		return 20
