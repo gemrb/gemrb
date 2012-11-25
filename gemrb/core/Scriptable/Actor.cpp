@@ -5368,16 +5368,11 @@ ieDword Actor::GetNumberOfAttacks() const
 {
 	int bonus = 0;
 
-	if (monkbon != NULL) {
+	if (monkbon != NULL && Equipped == IW_NO_EQUIPPED) {
 		unsigned int level = GetMonkLevel();
-		if (Equipped == IW_NO_EQUIPPED) {
-			if (level>=monkbon_cols) level=monkbon_cols-1;
-			if (level>0) {
-				bonus = monkbon[0][level-1];
-			}
-		} else {
-			// will also trigger for weapons, but this is a rare and easily checkable use case
-			Log(ERROR, "Actor", "Monk with strange equipped value: %d\n\n\n", Equipped);
+		if (level>=monkbon_cols) level=monkbon_cols-1;
+		if (level>0) {
+			bonus = monkbon[0][level-1];
 		}
 	}
 
