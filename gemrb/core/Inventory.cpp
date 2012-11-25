@@ -434,7 +434,7 @@ void Inventory::KillSlot(unsigned int index)
 					if (Equipped!=IW_NO_EQUIPPED) {
 						EquipItem(GetEquippedSlot());
 					} else {
-						EquipItem(SLOT_FIST);
+						EquipBestWeapon(EQUIP_MELEE);
 					}
 				}
 			}
@@ -460,7 +460,7 @@ void Inventory::KillSlot(unsigned int index)
 								if (Equipped!=IW_NO_EQUIPPED) {
 									EquipItem(GetEquippedSlot());
 								} else {
-									EquipItem(SLOT_FIST);
+									EquipBestWeapon(EQUIP_MELEE);
 								}
 							}
 							gamedata->FreeItem(itm2, item2->ItemResRef, false);
