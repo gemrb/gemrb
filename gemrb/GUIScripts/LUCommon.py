@@ -73,7 +73,7 @@ def CanLevelUp(actor):
 	return (tmpNext != 0 and tmpNext <= xp)
 
 # internal shared function for the various Setup* stat updaters
-def _SetupLevels (pc, Level, offset=0):
+def _SetupLevels (pc, Level, offset=0, noclass=0):
 	#storing levels as an array makes them easier to deal with
 	if not Level:
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)+offset, \
@@ -83,21 +83,12 @@ def _SetupLevels (pc, Level, offset=0):
 		Levels = []
 		for level in Level:
 			Levels.append (level+offset)
-	return Levels
 
-def SetupSavingThrows (pc, Level=None):
-	"""Updates an actors saving throws based upon level.
+	if noclass:
+		return Levels, -1, -1
 
-	Level should contain the actors current level.
-	If Level is None, it is filled with the actors current level."""
-
-	Levels = _SetupLevels (pc, Level, -1)
-
-	#get some basic values
+	# adjust the class for multi/dual chars
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-	Race = GemRB.GetPlayerStat (pc, IE_RACE)
-
-	#adjust the class for multi/dual chars
 	Multi = GUICommon.IsMultiClassed (pc, 1)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 	NumClasses = 1
@@ -110,8 +101,21 @@ def SetupSavingThrows (pc, Level=None):
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
-	if NumClasses>len(Levels):
+
+	return Levels, NumClasses, Class
+
+def SetupSavingThrows (pc, Level=None):
+	"""Updates an actors saving throws based upon level.
+
+	Level should contain the actors current level.
+	If Level is None, it is filled with the actors current level."""
+
+	Levels, NumClasses, Class = _SetupLevels (pc, Level, -1)
+	if NumClasses > len(Levels):
 		return
+
+	#get some basic values
+	Race = GemRB.GetPlayerStat (pc, IE_RACE)
 
 	#see if we can add racial bonuses to saves
 	Race = CommonTables.Races.GetRowName (CommonTables.Races.FindValue (3, Race) )
@@ -179,27 +183,12 @@ def SetupThaco (pc, Level=None):
 	Level should contain the actors current level.
 	If Level is None it is filled with the actors current level."""
 
-	Levels = _SetupLevels (pc, Level, -1)
+	Levels, NumClasses, Class = _SetupLevels (pc, Level, -1)
+	if NumClasses > len(Levels):
+		return
 
 	#get some basic values
-	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	ThacoTable = GemRB.LoadTable ("THAC0")
-
-	#adjust the class for multi/dual chars
-	Multi = GUICommon.IsMultiClassed (pc, 1)
-	Dual = GUICommon.IsDualClassed (pc, 1)
-	NumClasses = 1
-	if Multi[0]>1: #get each of the multi-classes
-		NumClasses = Multi[0]
-		Class = [Multi[1], Multi[2], Multi[3]]
-	elif Dual[0]: #only worry about the newer class
-		Class = GUICommon.GetClassRowName(Dual[2], "index")
-		Class = [CommonTables.Classes.GetValue (Class, "ID")]
-		#assume Level is correct if passed
-		if GUICommon.IsDualSwap(pc) and not Level:
-			Levels = [Levels[1], Levels[0], Levels[2]]
-	if NumClasses>len(Levels):
-		return
 
 	#make sure to limit the levels to the table allowable
 	MaxLevel = ThacoTable.GetColumnCount ()-1
@@ -231,27 +220,12 @@ def SetupLore (pc, LevelDiff=None):
 	Level and LevelDiff must be of the same length.
 	If either are None, they are filled with the actors current level."""
 
-	LevelDiffs = _SetupLevels (pc, LevelDiff)
+	LevelDiffs, NumClasses, Class = _SetupLevels (pc, LevelDiff)
+	if NumClasses > len(LevelDiffs):
+		return
 
 	#get some basic values
-	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	LoreTable = GemRB.LoadTable ("lore")
-
-	#adjust the class for multi/dual chars
-	Multi = GUICommon.IsMultiClassed (pc, 1)
-	Dual = GUICommon.IsDualClassed (pc, 1)
-	NumClasses = 1
-	if Multi[0]>1: #get each of the multi-classes
-		NumClasses = Multi[0]
-		Class = [Multi[1], Multi[2], Multi[3]]
-	elif Dual[0]: #only worry about the newer class
-		Class = GUICommon.GetClassRowName(Dual[2], "index")
-		Class = [CommonTables.Classes.GetValue (Class, "ID")]
-		#if LevelDiff is passed, we assume it is correct
-		if GUICommon.IsDualSwap(pc) and not LevelDiff:
-			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
-	if NumClasses>len(LevelDiffs):
-		return
 
 	#loop through each class and update the lore value if we have
 	CurrentLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
@@ -280,15 +254,13 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	Level and LevelDiff must be of the same length.
 	If either are None, they are filled with the actors current level."""
 
-	Levels = _SetupLevels (pc, Level)
-	LevelDiffs = _SetupLevels (pc, LevelDiff)
+	Levels, NumClasses, Class = _SetupLevels (pc, Level, noclass=1)
+	LevelDiffs, NumClasses, Class = _SetupLevels (pc, LevelDiff, noclass=1)
 	if len (Levels) != len (LevelDiffs):
 		return
 
-	#get some basic values
-	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-		
 	#adjust the class for multi/dual chars
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	Multi = GUICommon.IsMultiClassed (pc, 1)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 	NumClasses = 1
