@@ -72,21 +72,26 @@ def CanLevelUp(actor):
 	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
 	return (tmpNext != 0 and tmpNext <= xp)
 
+# internal shared function for the various Setup* stat updaters
+def _SetupLevels (pc, Level, offset=0):
+	#storing levels as an array makes them easier to deal with
+	if not Level:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)+offset, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2)+offset, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)+offset]
+	else:
+		Levels = []
+		for level in Level:
+			Levels.append (level+offset)
+	return Levels
+
 def SetupSavingThrows (pc, Level=None):
 	"""Updates an actors saving throws based upon level.
 
 	Level should contain the actors current level.
 	If Level is None, it is filled with the actors current level."""
 
-	#storing levels as an array makes them easier to deal with
-	if not Level:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2)-1, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)-1]
-	else:
-		Levels = []
-		for level in Level:
-			Levels.append (level-1)
+	Levels = _SetupLevels (pc, Level, -1)
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
@@ -174,15 +179,7 @@ def SetupThaco (pc, Level=None):
 	Level should contain the actors current level.
 	If Level is None it is filled with the actors current level."""
 
-	#storing levels as an array makes them easier to deal with
-	if not Level:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2)-1, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)-1]
-	else:
-		Levels = []
-		for level in Level:
-			Levels.append (level-1)
+	Levels = _SetupLevels (pc, Level, -1)
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
@@ -234,15 +231,7 @@ def SetupLore (pc, LevelDiff=None):
 	Level and LevelDiff must be of the same length.
 	If either are None, they are filled with the actors current level."""
 
-	#storing levels as an array makes them easier to deal with
-	if not LevelDiff:
-		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
-	else:
-		LevelDiffs = []
-		for diff in LevelDiff:
-			LevelDiffs.append (diff)
+	LevelDiffs = _SetupLevels (pc, LevelDiff)
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
@@ -291,23 +280,8 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	Level and LevelDiff must be of the same length.
 	If either are None, they are filled with the actors current level."""
 
-	#storing levels as an array makes them easier to deal with
-	if not Level:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
-	else:
-		Levels = []
-		for level in Level:
-			Levels.append (level)
-	if not LevelDiff:
-		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
-	else:
-		LevelDiffs = []
-		for diff in LevelDiff:
-			LevelDiffs.append (diff)
+	Levels = _SetupLevels (pc, Level)
+	LevelDiffs = _SetupLevels (pc, LevelDiff)
 	if len (Levels) != len (LevelDiffs):
 		return
 
