@@ -175,6 +175,7 @@ def UpdatePriestWindow ():
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
 			spell = GemRB.GetSpell (ks['SpellResRef'])
@@ -365,7 +366,7 @@ def OnPriestRemoveSpell ():
 
 	index = GemRB.GetVar ("SpellButton") - 100
 
-	#remove spell from book
+	#remove spell from memory
 	GemRB.RemoveSpell (pc, type, level, index)
 	OpenPriestSpellInfoWindow()
 	return
