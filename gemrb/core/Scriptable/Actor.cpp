@@ -5832,13 +5832,18 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
 	int tohit;
-	//ieDword Flags;
 	int DamageBonus, CriticalBonus;
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
 	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
+	}
+
+	if (PCStats) {
+		CREItem *slot = inventory.GetUsedWeapon(leftorright, wi.slot);
+		//if slot was null, then GetCombatDetails returned false
+		PCStats->RegisterFavourite(slot->ItemResRef, FAV_WEAPON);
 	}
 
 	//if this is the first call of the round, we need to update next attack
@@ -8519,34 +8524,34 @@ inline void HideFailed(Actor* actor)
 //checks if we are seen, or seeing anyone
 bool Actor::SeeAnyOne(bool enemy, bool seenby)
 {
-  Map *area = GetCurrentArea();
-  if (!area) return false;
+	Map *area = GetCurrentArea();
+	if (!area) return false;
 
-  int flag = seenby?GA_NO_DEAD:GA_NO_DEAD|GA_NO_HIDDEN;
-  if (enemy) {
-    ieDword ea = GetSafeStat(IE_EA);
-    if (ea>=EA_EVILCUTOFF) {
-      flag|=GA_NO_ENEMY|GA_NO_NEUTRAL;
-    } else if (ea<=EA_GOODCUTOFF) {
-      flag|=GA_NO_ALLY|GA_NO_NEUTRAL;
-    } else return false; //neutrals got no enemy
-  } 
-  Actor** visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
+	int flag = seenby?GA_NO_DEAD:GA_NO_DEAD|GA_NO_HIDDEN;
+	if (enemy) {
+		ieDword ea = GetSafeStat(IE_EA);
+		if (ea>=EA_EVILCUTOFF) {
+			flag|=GA_NO_ENEMY|GA_NO_NEUTRAL;
+		} else if (ea<=EA_GOODCUTOFF) {
+			flag|=GA_NO_ALLY|GA_NO_NEUTRAL;
+		} else return false; //neutrals got no enemy
+	}
+	Actor** visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
 
 	Actor** poi = visActors;
 	bool seeEnemy = false;
 
-  //we need to look harder if we look for seenby anyone
+	//we need to look harder if we look for seenby anyone
 	while (*poi && !seeEnemy) {
 		Actor *toCheck = *poi++;
-    if (toCheck==this) continue;
-    if (seenby) {
-      if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
-    }
-    else seeEnemy = true;
+		if (toCheck==this) continue;
+		if (seenby) {
+			if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
+		}
+		else seeEnemy = true;
 	}
 	free(visActors);
-  return seeEnemy;
+	return seeEnemy;
 }
 
 bool Actor::TryToHide()
@@ -8564,7 +8569,7 @@ bool Actor::TryToHide()
 		return false;
 	}
 
-  bool seen = SeeAnyOne(true, true);
+	bool seen = SeeAnyOne(true, true);
 
 	if (seen) {
 		HideFailed(this);
