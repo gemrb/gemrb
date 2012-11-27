@@ -961,6 +961,10 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		return;
 	}
 
+	if (caster && caster->PCStats) {
+		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
+	}
+
 	CreateProjectile(SpellResRef, 0, level, false);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
@@ -1020,6 +1024,10 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		Log(ERROR, "Scriptable", "CastSpellEnd: lost area, skipping %s!", SpellResRef);
 		ResetCastingState(caster);
 		return;
+	}
+
+	if (caster && caster->PCStats) {
+		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
