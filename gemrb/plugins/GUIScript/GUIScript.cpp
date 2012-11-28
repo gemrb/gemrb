@@ -5082,7 +5082,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Item not found!\n" );
 		}
 
-		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong ((signed) item->GetItemName(false)));
+		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong ((signed) item->GetItemName(true)));
 
 		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
