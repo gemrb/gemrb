@@ -5841,7 +5841,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (PCStats) {
-		CREItem *slot = inventory.GetUsedWeapon(leftorright, wi.slot);
+		CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wi.slot);
 		//if slot was null, then GetCombatDetails returned false
 		PCStats->RegisterFavourite(slot->ItemResRef, FAV_WEAPON);
 	}
