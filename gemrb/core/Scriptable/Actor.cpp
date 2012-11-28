@@ -5841,7 +5841,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (PCStats) {
-		CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wi.slot);
+		// make a copy of wi.slot, since GetUsedWeapon can modify it
+		int wislot = wi.slot;
+		CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wislot);
 		//if slot was null, then GetCombatDetails returned false
 		PCStats->RegisterFavourite(slot->ItemResRef, FAV_WEAPON);
 	}
