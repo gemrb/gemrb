@@ -4056,7 +4056,7 @@ bool Interface::SaveConfig()
 			contents.appendFormatted("[%s]\n", lastTag);
 		}
 
-		ieDword keyValue;
+		ieDword keyValue = 0;
 		assert(vars->Lookup(entry.INIKey, keyValue));
 		contents.appendFormatted("%s = %d\n", entry.INIKey, keyValue);
 	}
