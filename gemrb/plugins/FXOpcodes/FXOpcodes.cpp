@@ -1499,7 +1499,7 @@ int fx_current_hp_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 	switch(type) {
 	case MOD_ADDITIVE:
 	case MOD_ABSOLUTE:
-		target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
+		target->NewBase( IE_HITPOINTS, fx->Parameter1, type);
 		break;
 	case MOD_PERCENT:
 		target->NewBase( IE_HITPOINTS, target->GetSafeStat(IE_MAXHITPOINTS)*fx->Parameter1/100, MOD_ABSOLUTE);
