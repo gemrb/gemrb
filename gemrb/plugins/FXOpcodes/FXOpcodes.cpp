@@ -1462,6 +1462,22 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11 CurrentHPModifier
+int GetSpecialHealAmount(int type, Scriptable *caster)
+{
+	if (!caster || caster->Type!=ST_ACTOR) return 0;
+	Actor *actor = (Actor *) caster;
+	switch(type) {
+		case 3: //paladin's lay on hands, the amount is already calculated in a compatible way
+			return actor->GetSafeStat(IE_LAYONHANDSAMOUNT);
+		case 4: //monk wholeness of body
+			return actor->GetSafeStat(IE_LEVELMONK)*2; //ignore level 7 restriction, since the spell won't be granted under level 7
+		case 5: //lathander's renewal
+			return actor->GetSafeStat(IE_LEVELCLERIC)*2; //ignore kit restriction, since the spell won't be granted to non lathander
+		default:
+			return 0;
+	}
+}
+
 int fx_current_hp_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_current_hp_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
@@ -1479,13 +1495,18 @@ int fx_current_hp_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//current hp percent is relative to modified max hp
-	switch(fx->Parameter2&0xffff) {
+	int type = fx->Parameter2&0xffff;
+	switch(type) {
 	case MOD_ADDITIVE:
 	case MOD_ABSOLUTE:
 		target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
 		break;
 	case MOD_PERCENT:
 		target->NewBase( IE_HITPOINTS, target->GetSafeStat(IE_MAXHITPOINTS)*fx->Parameter1/100, MOD_ABSOLUTE);
+		break;
+	default: // lay on hands amount, wholeness of body, lathander's renewal
+		target->NewBase( IE_HITPOINTS, GetSpecialHealAmount(type, GetCasterObject()), MOD_ADDITIVE);
+		break;
 	}
 	//never stay permanent
 	return FX_NOT_APPLIED;
