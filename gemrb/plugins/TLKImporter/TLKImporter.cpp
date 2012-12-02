@@ -200,7 +200,7 @@ int TLKImporter::ClassStrRef(int slot)
 	if (!tab) {
 		return -1;
 	}
-	int row = tab->FindTableValue(5, clss, 0);
+	int row = tab->FindTableValue("ID", clss, 0);
 	return atoi(tab->QueryField(row,0) );
 }
 
