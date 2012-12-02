@@ -1022,16 +1022,25 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 	int ti, col;
 	int start = 0;
 	long Value;
+	char* colname;
 
 	if (!PyArg_ParseTuple( args, "iil|i", &ti, &col, &Value, &start )) {
-		return AttributeError( GemRB_Table_FindValue__doc );
+		PyErr_Clear(); //clearing the exception
+		col = -1;
+		if (!PyArg_ParseTuple( args, "isl|i", &ti, &colname, &Value, &start )) {
+			return AttributeError( GemRB_Table_FindValue__doc );
+		}
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
-	return PyInt_FromLong(tm->FindTableValue(col, Value, start));
+	if (col == -1) {
+		return PyInt_FromLong(tm->FindTableValue(colname, Value, start));
+	} else {
+		return PyInt_FromLong(tm->FindTableValue(col, Value, start));
+	}
 }
 
 PyDoc_STRVAR( GemRB_Table_GetRowIndex__doc,

@@ -166,6 +166,18 @@ public:
 		}
 		return -1;
 	}
+
+	inline int FindTableValue(const char* col, long val, int start) const
+	{
+		ieDword coli = GetColumnIndex(col);
+		return FindTableValue(coli, val, start);
+	}
+
+	inline int FindTableValue(const char* col, const char* val, int start) const
+	{
+		ieDword coli = GetColumnIndex(col);
+		return FindTableValue(coli, val, start);
+	}
 };
 
 }

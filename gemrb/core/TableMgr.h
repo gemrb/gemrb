@@ -65,6 +65,8 @@ public:
 	virtual const char* GetRowName(unsigned int index) const = 0;
 	virtual int FindTableValue(unsigned int column, long value, int start = 0) const = 0;
 	virtual int FindTableValue(unsigned int column, const char* value, int start = 0) const = 0;
+	virtual int FindTableValue(const char* column, long value, int start = 0) const = 0;
+	virtual int FindTableValue(const char* column, const char* value, int start = 0) const = 0;
 
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream) = 0;
