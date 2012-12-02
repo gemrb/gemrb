@@ -1,25 +1,25 @@
 2DA V1.0
 *
                     DRUIDSPELL CLERICSPELL MAGESPELL  STARTXP    BARDSKILL  THIEFSKILL LAYHANDS   TURNLEVEL  BOOKTYPE   HATERACE   SAVEBONUS NO_PROF
-UNUSED              *          *          *          *          *          *          *          0          0          *          *          *
-MAGE                *          *          MXSPLWIZ   89000      *          *          *          0          1          *          0          -4
-FIGHTER             *          *          *          89000      *          *          *          0          0          *          0          -2
-CLERIC              *          MXSPLPRS   *          89000      *          *          *          1          1          *          0          -3
-THIEF               *          *          *          89000      *          SKILLS     *          0          0          *          0          -3
-BARD                *          *          MXSPLBRD   89000      SKILLBRD   *          *          0          1          *          0          -3
-PALADIN             *          MXSPLPAL   *          89000      *          *          PALADIN    5          1          *          2          -2
-FIGHTER_MAGE        *          *          MXSPLWIZ   89000      *          *          *          0          1          *          0          -2
-FIGHTER_CLERIC      *          MXSPLPRS   *          89000      *          *          *          0          1          *          0          -2
-FIGHTER_THIEF       *          *          *          89000      *          SKILLS     *          0          0          *          0          -2
-FIGHTER_MAGE_THIEF  *          *          MXSPLWIZ   89000      *          SKILLS     *          0          1          *          0          -2
-DRUID               MXSPLPRS   *          *          89000      *          *          *          0          1          *          0          -3
-RANGER              MXSPLRAN   *          *          89000      *          *          *          0          1          HATERACE   0          -2
-MAGE_THIEF          *          *          MXSPLWIZ   89000      *          SKILLS     *          0          1          *          0          -3
-CLERIC_MAGE         *          MXSPLPRS   MXSPLWIZ   89000      *          *          *          0          1          *          0          -3
-CLERIC_THIEF        *          MXSPLPRS   *          89000      *          SKILLS     *          0          1          *          0          -3
-FIGHTER_DRUID       MXSPLPRS   *          *          89000      *          *          *          0          1          *          0          -2
-FIGHTER_MAGE_CLERIC *          MXSPLPRS   MXSPLWIZ   89000      *          *          *          0          1          *          0          -2
-CLERIC_RANGER       MXSPLRAN   MXSPLPRS   *          89000      *          *          *          0          1          HATERACE   0          -2
-SORCERER            *          *          MXSPLSRC   89000      *          *          *          0          2          *          0          -4
-MONK                *          *          *          89000      *          SKILLS     *          0          0          *          0          -3
+UNUSED              *          *           *          *          *          *          *          0          0          *          *         *
+MAGE                *          *           MXSPLWIZ   89000      *          *          *          0          1          *          0         -4
+FIGHTER             *          *           *          89000      *          *          *          0          0          *          0         -2
+CLERIC              *          MXSPLPRS    *          89000      *          *          *          1          1          *          0         -3
+THIEF               *          *           *          89000      *          SKILLS     *          0          0          *          0         -3
+BARD                *          *           MXSPLBRD   89000      SKILLBRD   *          *          0          1          *          0         -3
+PALADIN             *          MXSPLPAL    *          89000      *          *          PALADIN    5          1          *          2         -2
+FIGHTER_MAGE        *          *           MXSPLWIZ   89000      *          *          *          0          1          *          0         -2
+FIGHTER_CLERIC      *          MXSPLPRS    *          89000      *          *          *          0          1          *          0         -2
+FIGHTER_THIEF       *          *           *          89000      *          SKILLS     *          0          0          *          0         -2
+FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   89000      *          SKILLS     *          0          1          *          0         -2
+DRUID               MXSPLPRS   *           *          89000      *          *          *          0          1          *          0         -3
+RANGER              MXSPLRAN   *           *          89000      *          *          *          0          1          HATERACE   0         -2
+MAGE_THIEF          *          *           MXSPLWIZ   89000      *          SKILLS     *          0          1          *          0         -3
+CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   89000      *          *          *          0          1          *          0         -3
+CLERIC_THIEF        *          MXSPLPRS    *          89000      *          SKILLS     *          0          1          *          0         -3
+FIGHTER_DRUID       MXSPLPRS   *           *          89000      *          *          *          0          1          *          0         -2
+FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   89000      *          *          *          0          1          *          0         -2
+CLERIC_RANGER       MXSPLRAN   MXSPLPRS    *          89000      *          *          *          0          1          HATERACE   0         -2
+SORCERER            *          *           MXSPLSRC   89000      *          *          *          0          2          *          0         -4
+MONK                *          *           *          89000      *          SKILLS     *          0          0          *          0         -3
 

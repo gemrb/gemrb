@@ -1,25 +1,25 @@
 2DA V1.0
 *
                     DRUIDSPELL CLERICSPELL MAGESPELL  STARTXP    BARDSKILL  THIEFSKILL LAYHANDS   TURNLEVEL  BOOKTYPE   HATERACE   ABILITIES  NO_PROF    STARTXP2   RANGERSKILL SAVEBONUS
-UNUSED              *          *          *          *          *          *          *          0          0          *          *          *          *          *          *
-MAGE                *          *          MXSPLWIZ   89000      *          *          *          0          1          *          CLABMA01   -4         2500000    *          0
-FIGHTER             *          *          *          89000      *          *          *          0          0          *          CLABFI01   -2         2500000    *          0
-CLERIC              *          MXSPLPRS   *          89000      *          *          *          1          1          *          CLABPR01   -3         2500000    *          0
-THIEF               *          *          *          89000      *          SKILLS     *          0          0          *          CLABTH01   -3         2500000    *          0
-BARD                *          *          MXSPLBRD   89000      SKILLBRD   *          *          0          1          *          CLABBA01   -3         2500000    *          0
-PALADIN             *          MXSPLPAL   *          89000      *          *          PALADIN    5          1          *          CLABPA01   -2         2500000    *          2
-FIGHTER_MAGE        *          *          MXSPLWIZ   89000      *          *          *          0          1          *          CLABFI01   -2         2500000    *          0
-FIGHTER_CLERIC      *          MXSPLPRS   *          89000      *          *          *          1          1          *          FI01,PR01  -2         2500000    *          0
-FIGHTER_THIEF       *          *          *          89000      *          SKILLS     *          0          0          *          FI01,TH01  -2         2500000    *          0
-FIGHTER_MAGE_THIEF  *          *          MXSPLWIZ   89000      *          SKILLS     *          0          1          *          FI01,TH01  -2         2500000    *          0
-DRUID               MXSPLDRU   *          *          89000      *          *          *          0          1          *          CLABDR01   -3         2500000    *          0
-RANGER              MXSPLRAN   *          *          89000      *          *          *          0          1          HATERACE   CLABRN01   -2         2500000    SKILLRNG   0
-MAGE_THIEF          *          *          MXSPLWIZ   89000      *          SKILLS     *          0          1          *          CLABTH01   -3         2500000    *          0
-CLERIC_MAGE         *          MXSPLPRS   MXSPLWIZ   89000      *          *          *          1          1          *          CLABPR01   -3         2500000    *          0
-CLERIC_THIEF        *          MXSPLPRS   *          89000      *          SKILLS     *          1          1          *          PR01,TH01  -3         2500000    *          0
-FIGHTER_DRUID       MXSPLDRU   *          *          89000      *          *          *          0          1          *          FI01,DR01  -2         2500000    *          0
-FIGHTER_MAGE_CLERIC *          MXSPLPRS   MXSPLWIZ   89000      *          *          *          1          1          *          FI01,PR01  -2         2500000    *          0
-CLERIC_RANGER       MXSPLRAN   MXSPLPRS   *          89000      *          *          *          1          1          HATERACE   PR01,RN01  -2         2500000    SKILLRNG   0
-SORCERER            *          *          MXSPLSRC   89000      *          *          *          0          2          *          *          -4         2500000    *          0
-MONK                *          *          *          89000      *          SKILLS     *          0          0          *          CLABMO01   -3         2500000    *          0
+UNUSED              *          *           *          *          *          *          *          0          0          *          *          *          *          *           *
+MAGE                *          *           MXSPLWIZ   89000      *          *          *          0          1          *          CLABMA01   -4         2500000    *           0
+FIGHTER             *          *           *          89000      *          *          *          0          0          *          CLABFI01   -2         2500000    *           0
+CLERIC              *          MXSPLPRS    *          89000      *          *          *          1          1          *          CLABPR01   -3         2500000    *           0
+THIEF               *          *           *          89000      *          SKILLS     *          0          0          *          CLABTH01   -3         2500000    *           0
+BARD                *          *           MXSPLBRD   89000      SKILLBRD   *          *          0          1          *          CLABBA01   -3         2500000    *           0
+PALADIN             *          MXSPLPAL    *          89000      *          *          PALADIN    5          1          *          CLABPA01   -2         2500000    *           2
+FIGHTER_MAGE        *          *           MXSPLWIZ   89000      *          *          *          0          1          *          CLABFI01   -2         2500000    *           0
+FIGHTER_CLERIC      *          MXSPLPRS    *          89000      *          *          *          1          1          *          FI01,PR01  -2         2500000    *           0
+FIGHTER_THIEF       *          *           *          89000      *          SKILLS     *          0          0          *          FI01,TH01  -2         2500000    *           0
+FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   89000      *          SKILLS     *          0          1          *          FI01,TH01  -2         2500000    *           0
+DRUID               MXSPLDRU   *           *          89000      *          *          *          0          1          *          CLABDR01   -3         2500000    *           0
+RANGER              MXSPLRAN   *           *          89000      *          *          *          0          1          HATERACE   CLABRN01   -2         2500000    SKILLRNG    0
+MAGE_THIEF          *          *           MXSPLWIZ   89000      *          SKILLS     *          0          1          *          CLABTH01   -3         2500000    *           0
+CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   89000      *          *          *          1          1          *          CLABPR01   -3         2500000    *           0
+CLERIC_THIEF        *          MXSPLPRS    *          89000      *          SKILLS     *          1          1          *          PR01,TH01  -3         2500000    *           0
+FIGHTER_DRUID       MXSPLDRU   *           *          89000      *          *          *          0          1          *          FI01,DR01  -2         2500000    *           0
+FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   89000      *          *          *          1          1          *          FI01,PR01  -2         2500000    *           0
+CLERIC_RANGER       MXSPLRAN   MXSPLPRS    *          89000      *          *          *          1          1          HATERACE   PR01,RN01  -2         2500000    SKILLRNG    0
+SORCERER            *          *           MXSPLSRC   89000      *          *          *          0          2          *          *          -4         2500000    *           0
+MONK                *          *           *          89000      *          SKILLS     *          0          0          *          CLABMO01   -3         2500000    *           0
 
