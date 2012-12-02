@@ -184,8 +184,9 @@ def DCMainDonePress ():
 	# save our new class and say was multi
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
-	MultClassId = CommonTables.Classes.FindValue (4, MultClassId)
-	MultClassId = CommonTables.Classes.GetValue (MultClassId, 5)
+	MultClassId = CommonTables.Classes.FindValue ("MULTI", MultClassId)
+	MultClassId = CommonTables.Classes.GetRowName (MultClassId)
+	MultClassId = CommonTables.Classes.GetValue (MultClassId, "ID")
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
 	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", 1))
 

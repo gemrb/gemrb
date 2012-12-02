@@ -475,7 +475,7 @@ def GetClassRowName(value, which=-1):
 			Class = value
 		else:
 			raise RuntimeError, "Bad type parameter for GetClassRowName: ", which
-		ClassIndex = CommonTables.Classes.FindValue (5, Class)
+		ClassIndex = CommonTables.Classes.FindValue ("ID", Class)
 	ClassRowName = CommonTables.Classes.GetRowName (ClassIndex)
 	return ClassRowName
 
@@ -512,8 +512,7 @@ def IsDualClassed(actor, verbose):
 		KitIndex = GetKitIndex (actor)
 
 		if DualedFrom > 0: # first (previous) class of the dual class
-			MCColumn = CommonTables.Classes.GetColumnIndex ("MC_WAS_ID")
-			FirstClassIndex = CommonTables.Classes.FindValue (MCColumn, DualedFrom)
+			FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
 			if KitIndex:
 				DualInfo.append (1)
 				DualInfo.append (KitIndex)
@@ -525,7 +524,7 @@ def IsDualClassed(actor, verbose):
 			Mask = 1
 			for i in range (1,16):
 				if Multi & Mask:
-					ClassIndex = CommonTables.Classes.FindValue (5, i)
+					ClassIndex = CommonTables.Classes.FindValue ("ID", i)
 					if ClassIndex == FirstClassIndex:
 						Mask = 1 << i
 						continue
@@ -732,8 +731,7 @@ def IsWarrior (actor):
 	Dual = IsDualClassed (actor, 0)
 	if Dual[0] > 0:
 		DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
-		MCColumn = CommonTables.Classes.GetColumnIndex ("MC_WAS_ID")
-		FirstClassIndex = CommonTables.Classes.FindValue (MCColumn, DualedFrom)
+		FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
 		FirstClassName = CommonTables.Classes.GetRowName (FirstClassIndex)
 		OldIsWarrior = CommonTables.ClassSkills.GetValue (FirstClassName, "NO_PROF")
 		# there are no warrior to warrior dualclasses, so if the previous class was one, the current one certainly isn't

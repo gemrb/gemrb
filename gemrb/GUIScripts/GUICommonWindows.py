@@ -968,7 +968,7 @@ def GetKitIndex (actor, ClassIndex):
 	ClassID = CommonTables.Classes.GetValue (ClassName, "ID")
 	# skip the primary classes
 	# start at the first original kit - in iwd2 both classes and kits are in the same table
-	KitOffset = CommonTables.Classes.FindValue (3, 7)
+	KitOffset = CommonTables.Classes.FindValue ("CLASS", 7)
 	for ci in range (KitOffset, CommonTables.Classes.GetRowCount ()):
 		RowName = CommonTables.Classes.GetRowName (ci)
 		BaseClass = CommonTables.Classes.GetValue (RowName, "CLASS")
