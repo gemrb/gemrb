@@ -1893,9 +1893,10 @@ static void InitActorTables()
 
 		memset(classesiwd2, 0 , sizeof(classesiwd2) );
 		for (i=0; i<classcount; i++) {
+			const char* classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
-			tmpindex = atoi(tm->QueryField(i, 5));
+			tmpindex = atoi(tm->QueryField(classname, "ID"));
 			if (!tmpindex)
 				continue;
 			tmpindex--;
@@ -1910,15 +1911,14 @@ static void InitActorTables()
 				continue;
 			}
 
-			const char* classname = tm->GetRowName(i);
 			buffer.appendFormatted("Name: %s ", classname);
 			int classis = 0;
 			//default all levelslots to 0
 			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
 
 			//single classes only worry about IE_LEVEL
-			long tmpclass = 0; //atoi(tm->QueryField(i, 4));
-			valid_number( tm->QueryField(i, 4), tmpclass);
+			long tmpclass = 0;
+			valid_number(tm->QueryField(classname, "MULTI"), tmpclass);
 			multi[tmpindex] = (ieDword) tmpclass;
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
@@ -1929,7 +1929,7 @@ static void InitActorTables()
 					buffer.appendFormatted("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm.load(tm->QueryField(i, 6), true);
+					hptm.load(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
 						int tmphp = 0;
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -1962,7 +1962,7 @@ static void InitActorTables()
 					break;
 				if ((1<<j)&tmpclass) {
 					//save the IE_LEVEL information
-					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue(5, j+1)));
+					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue("ID", j+1)));
 					classis = IsClassFromName(currentname);
 					if (classis>=0) {
 						//search for the current class in the split of the names to get it's
