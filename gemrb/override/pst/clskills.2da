@@ -1,13 +1,13 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARD  THIEF    LAYHANDS  TURNLEVEL  BOOKTYPE
-UNUSED              *          *           *          *        *     *        *         0          0
-MAGE                *          *           MXSPLWIZ   0        *     *        *         0          1
-FIGHTER             *          *           *          0        *     *        *         0          0
-CLERIC              *          MXSPLPRS    *          0        *     *        *         1          1
-THIEF               *          *           *          0        *     SKILLS   *         0          0
-BARD                *          *           MXSPLBRD   0        *     *        *         0          1
-PALADIN             *          MXSPLPAL    *          0        *     *        PALADIN   5          1
-FIGHTER_MAGE        *          *           MXSPLWIZ   0        *     *        *         0          1
-FIGHTER_CLERIC      *          MXSPLPRS    *          0        *     *        *         0          1
-FIGHTER_THIEF       *          *           *          0        *     SKILLS   *         0          0
+                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARD  THIEF    LAYHANDS  TURNLEVEL  BOOKTYPE  SAVEBONUS
+UNUSED              *          *           *          *        *     *        *         0          0         0
+MAGE                *          *           MXSPLWIZ   0        *     *        *         0          1         0
+FIGHTER             *          *           *          0        *     *        *         0          0         0
+CLERIC              *          MXSPLPRS    *          0        *     *        *         1          1         0
+THIEF               *          *           *          0        *     SKILLS   *         0          0         0
+BARD                *          *           MXSPLBRD   0        *     *        *         0          1         0
+PALADIN             *          MXSPLPAL    *          0        *     *        PALADIN   5          1         2
+FIGHTER_MAGE        *          *           MXSPLWIZ   0        *     *        *         0          1         0
+FIGHTER_CLERIC      *          MXSPLPRS    *          0        *     *        *         0          1         0
+FIGHTER_THIEF       *          *           *          0        *     SKILLS   *         0          0         0
