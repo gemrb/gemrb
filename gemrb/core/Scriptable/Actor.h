@@ -367,8 +367,6 @@ private:
 	void SetupColors();
 	/** debugging function, gets the scripting name of an actor referenced by a global ID */
 	const char* GetActorNameByID(ieDword ID) const;
-	/* if Lasttarget is gone, call this */
-	void StopAttack();
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which);
 	/* helper for usability checks */
@@ -830,6 +828,8 @@ public:
 	void MovementCommand(char *command);
 	/* shows hp/maxhp as overhead text */
 	void DisplayHeadHPRatio();
+	/* if Lasttarget is gone, call this */
+	void StopAttack();
 };
 }
 

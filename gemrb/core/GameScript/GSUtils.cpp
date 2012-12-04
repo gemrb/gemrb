@@ -1300,7 +1300,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 		// release if target is invisible to sender (because of death or invisbility spell)
 		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
-			actor->SetStance(IE_ANI_READY);
+			actor->StopAttack();
 			Sender->ReleaseCurrentAction();
 			actor->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
 			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: %s!", tar->GetName(1));
@@ -1316,7 +1316,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	//will return false on any errors (eg, unusable weapon)
 	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, tar)) {
-		actor->SetStance(IE_ANI_READY);
+		actor->StopAttack();
 		Sender->ReleaseCurrentAction();
 		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
 		Log(WARNING, "AttackCore", "Weapon unusable: %s!", actor->GetName(1));
