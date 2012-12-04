@@ -447,11 +447,11 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
 
 	# checkboxes OR the values if they associate to the same variable
-	GUIOPTControls.OptCheckbox (18044, 18032, HelpTextArea2, Window, 1, 17, 17159, 'Auto Pause State', None, 1) # weapon unusable
-	GUIOPTControls.OptCheckbox (18044, 18033, HelpTextArea2, Window, 2, 18, 17158, 'Auto Pause State', None, 2) # attacked
-	GUIOPTControls.OptCheckbox (18044, 18034, HelpTextArea2, Window, 3, 19, 17155, 'Auto Pause State', None, 4) # hit
-	GUIOPTControls.OptCheckbox (18044, 18035, HelpTextArea2, Window, 4, 20, 17156, 'Auto Pause State', None, 8) # wounded
-	GUIOPTControls.OptCheckbox (18044, 18036, HelpTextArea2, Window, 5, 21, 17157, 'Auto Pause State', None, 16) # dead
+	GUIOPTControls.OptCheckbox (18044, 18032, HelpTextArea2, Window, 1, 17, 17155, 'Auto Pause State', None, 4) # hit
+	GUIOPTControls.OptCheckbox (18044, 18033, HelpTextArea2, Window, 2, 18, 17156, 'Auto Pause State', None, 8) # wounded
+	GUIOPTControls.OptCheckbox (18044, 18034, HelpTextArea2, Window, 3, 19, 17157, 'Auto Pause State', None, 16) # dead
+	GUIOPTControls.OptCheckbox (18044, 18035, HelpTextArea2, Window, 4, 20, 17158, 'Auto Pause State', None, 2) # attacked
+	GUIOPTControls.OptCheckbox (18044, 18036, HelpTextArea2, Window, 5, 21, 17159, 'Auto Pause State', None, 1) # weapon unusable
 	GUIOPTControls.OptCheckbox (18044, 18037, HelpTextArea2, Window, 13, 22, 17160, 'Auto Pause State', None, 32) # target gone
 	GUIOPTControls.OptCheckbox (18044, 10640, HelpTextArea2, Window, 25, 24, 10639, 'Auto Pause State', None, 64) # end of round
 	if GUICommon.GameIsIWD2():
@@ -462,8 +462,8 @@ def OpenAutopauseOptionsWindow ():
 	elif not GUICommon.GameIsIWD1():
 		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
 	if GUICommon.GameIsBG2():
-		GUIOPTControls.OptCheckbox (18044, 31872, HelpTextArea2, Window, 31, 33, 57354, 'Auto Pause State', None, 256) # trap found
-		GUIOPTControls.OptCheckbox (18044, 58171, HelpTextArea2, Window, 34, 30, 31875, 'Auto Pause State', None, 512) # spell cast
+		GUIOPTControls.OptCheckbox (18044, 58171, HelpTextArea2, Window, 31, 30, 31875, 'Auto Pause State', None, 512) # spell cast
+		GUIOPTControls.OptCheckbox (18044, 31872, HelpTextArea2, Window, 34, 33, 57354, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 10571, HelpTextArea2, Window, 37, 36, 10574, 'Auto Pause Center', None, 1)
 
 	SubSubOptionsWindow = Window
