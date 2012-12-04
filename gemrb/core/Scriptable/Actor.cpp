@@ -7466,6 +7466,10 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		//'my weapon has no effect'
 		damage = 0;
 		critical = false;
+		if (InParty) {
+			VerbalConstant(VB_TIMMUNE, 1);
+			core->Autopause(AP_UNUSABLE, this);
+		}
 		return;
 	}
 
