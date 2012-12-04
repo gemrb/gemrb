@@ -5338,6 +5338,7 @@ void Actor::FaceTarget( Scriptable *target)
 void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
+	lastattack = 0;
 	secondround = 0;
 	//InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
