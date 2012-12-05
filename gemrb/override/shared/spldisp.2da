@@ -1,14 +1,16 @@
 2DA V1.0
 0
                 ROWS    AS_COL   KEY1          KEY2           KEY3
-USE_ROW         1
+DESCENDING      0
+USE_ROW         2
 DEFAULT         1       0        0             0              0
 TYPELEVEL       1       0        SpellType     SpellLevel     0
 HOSTLEVELTYPE   1       0        NonHostile    SpellLevel     SpellType
 SPHERETYPELEVEL 2       0        BookType      SpellType      SpellLevel
 VERTLEVELS      9       1        SpellLevel    SpellSchool    0
 
-# USE_ROW dictates which table row to use (counting from 0, defaulting to DEFAULT)
+# DESCENDING: set ROWS to 1 to sort the spell list in the opposite order
+# USE_ROW dictates which table row to use (counting from 2 - DEFAULT)
 # keys can be any index that GemRB_GetSpell provides plus BookType (mage vs priest)
 # NOTE: most of these are 0 in bg1
 # NOTE: SpellName is a number (strref)

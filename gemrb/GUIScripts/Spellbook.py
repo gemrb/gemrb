@@ -159,16 +159,17 @@ def SortUsableSpells(memorizedSpells):
 	# sort it by using the spldisp.2da table
 	layout = CommonTables.SpellDisplay.GetValue ("USE_ROW", "ROWS")
 	layout = CommonTables.SpellDisplay.GetRowName (layout)
+	order = CommonTables.SpellDisplay.GetValue ("DESCENDING", "ROWS")
 	key1 = CommonTables.SpellDisplay.GetValue (layout, "KEY1")
 	key2 = CommonTables.SpellDisplay.GetValue (layout, "KEY2")
 	key3 = CommonTables.SpellDisplay.GetValue (layout, "KEY3")
 	if key1:
 		if key3 and key2:
-			memorizedSpells = sorted(memorizedSpells, key=itemgetter(key1, key2, key3))
+			memorizedSpells = sorted(memorizedSpells, key=itemgetter(key1, key2, key3), reverse=order)
 		elif key2:
-			memorizedSpells = sorted(memorizedSpells, key=itemgetter(key1, key2))
+			memorizedSpells = sorted(memorizedSpells, key=itemgetter(key1, key2), reverse=order)
 		else:
-			memorizedSpells = sorted(memorizedSpells, key=itemgetter(key1))
+			memorizedSpells = sorted(memorizedSpells, key=itemgetter(key1), reverse=order)
 
 	return memorizedSpells
 
