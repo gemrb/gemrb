@@ -265,6 +265,7 @@ PluginsPath=./gemrb/plugins/
 #####################################################
 
 #GemRBOverridePath=/usr/share/games/gemrb
+#GemRBUnhardcodedPath=/usr/share/games/gemrb
 
 #####################################################
 #  Input Parameters                                 #

@@ -266,6 +266,7 @@ Interface::Interface(int iargc, char* iargv[])
 	PluginsPath[0] = 0;
 	CachePath[0] = 0;
 	GemRBOverridePath[0] = 0;
+	GemRBUnhardcodedPath[0] = 0;
 	GameName[0] = 0;
 	CustomFontPath[0] = 0;
 
@@ -1628,6 +1629,17 @@ int Interface::Init()
 			}
 		}
 		free(description);
+
+		// most of the old gemrb override files can be found here,
+		// so they have a lower priority than the game files and can more easily be modded
+		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+		if (!strcmp(GameType, "auto")) {
+			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
+		} else {
+			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		}
+		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", "shared", NULL);
+		gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
 	{
@@ -1657,6 +1669,8 @@ int Interface::Init()
 		char path[_MAX_PATH];
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	}
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
@@ -2387,6 +2401,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_PATH("GUIScriptsPath", GUIScriptsPath);
 		CONFIG_PATH("GamePath", GamePath);
 		CONFIG_PATH("GemRBOverridePath", GemRBOverridePath);
+		CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath);
 		CONFIG_PATH("GemRBPath", GemRBPath);
 		CONFIG_PATH("PluginsPath", PluginsPath);
 		CONFIG_PATH("SavePath", SavePath);
@@ -2441,6 +2456,18 @@ bool Interface::LoadConfig(const char* filename)
 #endif
 	} else {
 		ResolveFilePath(GemRBOverridePath);
+	}
+
+	if (!GemRBUnhardcodedPath[0]) {
+#if TARGET_OS_MAC
+		// override will ALWAYS be in the app bundle if not specified in the config
+		// the build process always copys them to the Recources diectory
+		strcpy(GemRBUnhardcodedPath, ""PACKAGE".app/Contents/Resources/");
+#else
+		strcpy(GemRBUnhardcodedPath, GemRBPath);
+#endif
+	} else {
+		ResolveFilePath(GemRBUnhardcodedPath);
 	}
 
 	if (!PluginsPath[0]) {
@@ -2510,7 +2537,8 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( PluginsPath, true );
 	FixPath( GemRBPath, true );
 	FixPath( GemRBOverridePath, true );
-
+	FixPath(GemRBUnhardcodedPath, true);
+	
 	if (GamePath[0]) {
 		FixPath( GamePath, true );
 	}

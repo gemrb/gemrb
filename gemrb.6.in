@@ -245,7 +245,16 @@ Path to the directory with scripts controlling the game's GUI. (To be obsoleted;
 Path where GemRB looks for its game override directory.
 It defaults to
 .IR GemRBPath .
-The original games hardcoded this information in the engine. (To be obsoleted; preset at build time).
+GemRB reuses some of the unused files from the original or replaces them
+and this is the where they can be found. The path is preset at build time.
+
+.TP
+.BR GemRBUnhardcodedPath =PATH
+Path where GemRB looks for its unhardcoded engine data.
+It defaults to
+.IR GemRBPath .
+The original games hardcoded this information in the engine. 
+The path is preset at build time.
 
 .TP
 .I The following variables do not need to be altered, unless you are doing something really special!

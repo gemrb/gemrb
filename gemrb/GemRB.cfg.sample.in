@@ -275,6 +275,7 @@ CachePath=./Cache/
 #####################################################
 
 #GemRBOverridePath=@DATA_DIR@
+#GemRBUnhardcodedPath=@DATA_DIR@
 
 #####################################################
 #  Input Parameters                                 #

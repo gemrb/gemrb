@@ -766,6 +766,7 @@ public:
 	char GamePortraitsPath[_MAX_PATH];
 	char GameCharactersPath[_MAX_PATH];
 	char GemRBOverridePath[_MAX_PATH];
+	char GemRBUnhardcodedPath[_MAX_PATH];
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
