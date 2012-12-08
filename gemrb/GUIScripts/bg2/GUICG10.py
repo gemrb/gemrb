@@ -18,6 +18,7 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
+import GUICommon
 import CommonTables
 from ie_stats import *
 from GUIDefines import *
