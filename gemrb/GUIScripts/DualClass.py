@@ -149,6 +149,7 @@ def DCMainDonePress ():
 	This de-activates our old class and readjusts the basic actor stats, such as
 	THAC0, spell casting, proficiencies, and so forth, to the new class."""
 	import GUIREC
+	global ClassName
 
 	# save our proficiencies
 	LUProfsSelection.ProfsSave (pc, LUProfsSelection.LUPROFS_TYPE_DUALCLASS)
@@ -203,7 +204,6 @@ def DCMainDonePress ():
 	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
 
 	# new saves
-	ClassName = GUICommon.GetClassRowName (NewClassId, "class")
 	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", 0)
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
