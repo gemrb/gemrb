@@ -247,6 +247,10 @@ It defaults to
 .IR GemRBPath .
 GemRB reuses some of the unused files from the original or replaces them
 and this is the where they can be found. The path is preset at build time.
+This directory has the highest priority when searching, so putting files in
+the game override will not affect them. Use another directory and add it as
+.IR ModPath
+to the GemRB config.
 
 .TP
 .BR GemRBUnhardcodedPath =PATH
@@ -309,6 +313,12 @@ Usually it's
 Path to the original game's installed data files, relative to GamePath.
 Usually it's 
 .IR sounds .
+
+.TP
+.BR ModPath =PATH
+Path where GemRB looks for additional engine override files.
+It is not set by default. This directory has precedence over
+.IR GemRBOverridePath .
 
 .\"###################################################
 .SH Input Parameters:

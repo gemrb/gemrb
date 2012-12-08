@@ -1592,15 +1592,15 @@ int Interface::Init()
 			return GEM_ERROR;
 		}
 
+		size_t i;
+		for (i = 0; i < ModPath.size(); ++i)
+			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
 		if (!strcmp( GameType, "auto" ))
 			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
 		else
 			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		size_t i;
-		for (i = 0; i < ModPath.size(); ++i)
-			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GemRBOverridePath, "override", "shared", NULL);
 		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
