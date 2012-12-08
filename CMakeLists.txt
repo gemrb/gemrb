@@ -355,6 +355,10 @@ MACRO(ADD_GEMRB_OVERRIDE game_name)
 	FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
 	INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${DATA_DIR}/override/${game_name} )
 ENDMACRO(ADD_GEMRB_OVERRIDE )
+MACRO(ADD_GEMRB_UNHARDCODED game_name)
+	FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
+	INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${DATA_DIR}/unhardcoded/${game_name} )
+ENDMACRO(ADD_GEMRB_UNHARDCODED)
 
 # also put the chosen paths in the man page (Ubuntu)
 CONFIGURE_FILE(

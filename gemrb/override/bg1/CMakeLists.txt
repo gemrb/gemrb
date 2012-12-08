@@ -1,1 +1,2 @@
 ADD_GEMRB_OVERRIDE (bg1)
+
