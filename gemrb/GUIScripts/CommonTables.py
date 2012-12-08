@@ -24,11 +24,12 @@ from ie_restype import RES_2DA
 # these two are only used in SetEncumbranceLabels, but that is called very often
 StrMod = StrModEx = None
 Classes = KitList = ClassSkills = Races = NextLevel = None
-Pdolls = SpellDisplay = Aligns = None
+Pdolls = SpellDisplay = Aligns = ItemType =None
 
 def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
 	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
+	global ItemType
 
 	print # so the following output isn't appended to an existing line
 	if not Classes:
@@ -50,3 +51,5 @@ def Load():
 		SpellDisplay = GemRB.LoadTable ("spldisp")
 	if not Aligns and GemRB.HasResource("aligns", RES_2DA):
 		Aligns = GemRB.LoadTable ("aligns")
+	if not ItemType:
+		ItemType = GemRB.LoadTable ("itemtype")

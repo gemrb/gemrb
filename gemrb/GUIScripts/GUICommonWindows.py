@@ -27,6 +27,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
+from ie_slots import SLOT_QUIVER
 import GUICommon
 import CommonTables
 import LUCommon
@@ -422,27 +423,94 @@ def SelectItemAbility():
 	GemRB.SetVar ("ActionLevel", 0)
 	return
 
+def SelectQuiverSlot():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("Slot")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	# HACK: implement SetEquippedAmmunition instead?
+	if not GemRB.IsDraggingItem ():
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, slot, item["ItemIcon"]) #, 0, 0)
+		GemRB.DropDraggedItem (pc, slot)
+	GemRB.SetVar ("ActionLevel", 0)
+	return
+
 def SetupItemAbilities(pc, slot):
 	slot_item = GemRB.GetSlotItem(pc, slot)
 	if not slot_item:
-		# empty quickslot
+		# CHIV: Could configure empty quickslots from the game screen ala spells heres
 		return
+
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
-	for i in range (12):
-		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+	# clear buttons here
+	EmptyControls()
+
+	# check A: whether ranged weapon and B: whether to bother at all
+	ammotype = 0
+	if item["Type"] == CommonTables.ItemType.GetRowIndex ("BOW"):
+		ammotype = CommonTables.ItemType.GetRowIndex ("ARROW")
+	elif item["Type"] == CommonTables.ItemType.GetRowIndex ("XBOW"):
+		ammotype = CommonTables.ItemType.GetRowIndex ("BOLT")
+	elif item["Type"] == CommonTables.ItemType.GetRowIndex ("SLING"):
+		ammotype = CommonTables.ItemType.GetRowIndex ("BULLET")
+
+	# FIXME: ammo does not preclude the item from also having abilities (eg. bg2:bow19)
+	ammoSlotCount = 0
+	if ammotype:
+		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
+		currentammo = GemRB.GetEquippedAmmunition (pc)
+		for i in range (12):
+			Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+			Button.SetPicture ("")
+			if i < len(ammoslots):
+				ammoslot = GemRB.GetSlotItem (pc, ammoslots[i])
+				st = GemRB.GetSlotType (ammoslots[i])
+				ammoitem = GemRB.GetItem (ammoslot['ItemResRef']) # needed to show the ammo count
+				Tips = ammoitem["Tooltips"]
+				# if this item is valid ammo and was really found in a quiver slot
+				if ammoitem['Type'] == ammotype and st["Type"] == SLOT_QUIVER:
+					ammoSlotCount += 1
+					Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
+					Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+					Button.SetItemIcon (ammoslot['ItemResRef'])
+					Button.SetText (str(ammoslot["Usages0"]))
+					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
+					Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectQuiverSlot)
+					Button.SetVarAssoc ("Slot", ammoslots[i])
+					Button.SetTooltip ("%s" % (GemRB.GetString (Tips[0])))
+					print currentammo, i+1, ammoslots[i]
+					if currentammo == ammoslots[i]: # this check is ok, but the results are unreliable?!
+						Button.SetState (IE_GUI_BUTTON_SELECTED)
+
+	# skip when there is only one choice
+	if ammoSlotCount == 1:
+		ammoSlotCount = 0
+
+	# reset back to the main action bar if there are no extra headers or quivers
+	reset = not ammoSlotCount
+	# check for item abilities and skip the first that crops up (main header - nothing special)
+	for i in range (1, 12-ammoSlotCount):
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
 		Button.SetPicture ("")
 		if i<len(Tips):
+			reset = False
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
 			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
-			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
+			Button.SetItemIcon (slot_item['ItemResRef'], i-1+6)
+			Button.SetText ("")
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
-
-			Button.SetTooltip ("F%d - %s"%(i+1,GemRB.GetString(Tips[i])) )
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i-1])) )
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+
+	if reset:
+		GemRB.SetVar ("ActionLevel", 0)
+		UpdateActionsWindow ()
 	return
 
 def SetupBookSelection ():
