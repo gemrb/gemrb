@@ -224,6 +224,11 @@ def OpenStoreShoppingWindow ():
 
 	CloseWindows()
 
+	GemRB.SetVar ("LeftIndex", 0) # reset the shopkeeps list
+	GemRB.SetVar ("LeftTopIndex", 0)
+	GemRB.SetVar ("RightTopIndex", 0)
+	GemRB.SetVar ("LeftTopIndex", 0)
+
 	StoreShoppingWindow = Window = GemRB.LoadWindow (2)
 
 	# left scrollbar
@@ -630,9 +635,7 @@ def GetPC():
 			PreviousPC = pc
 			# reset the store indices, to prevent overscrolling
 			GemRB.SetVar ("RightIndex", 0)
-			GemRB.SetVar ("LeftIndex", 0)
 			GemRB.SetVar ("RightTopIndex", 0)
-			GemRB.SetVar ("LeftTopIndex", 0)
 			GemRB.SetVar ("Index", 0)
 			GemRB.SetVar ("TopIndex", 0)
 	else:
