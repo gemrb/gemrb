@@ -9118,23 +9118,19 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedAmmunition__doc,
-"GetEquippedAmmunition(PartyID) => QSlot\n\n"
+"GetEquippedAmmunition(globalID) => QSlot\n\n"
 "Returns the equipped ammunition slot, if any; -1 if none." );
 
 static PyObject* GemRB_GetEquippedAmmunition(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID;
+	int globalID;
 
-	if (!PyArg_ParseTuple( args, "i", &PartyID)) {
+	if (!PyArg_ParseTuple( args, "i", &globalID)) {
 		return AttributeError( GemRB_GetEquippedQuickSlot__doc );
 	}
 
 	GET_GAME();
-
-	Actor* actor = game->FindPC( PartyID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	int ret = actor->inventory.GetEquippedSlot();
 	int effect = core->QuerySlotEffects(ret);
