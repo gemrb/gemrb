@@ -547,6 +547,9 @@ Interface::~Interface(void)
 
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
+
+	AudioDriver.release();
+	video.release();
 }
 
 void Interface::SetWindowFrame(int i, Sprite2D *Picture)
