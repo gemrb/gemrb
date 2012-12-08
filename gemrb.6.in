@@ -320,6 +320,13 @@ Path where GemRB looks for additional engine override files.
 It is not set by default. This directory has precedence over
 .IR GemRBOverridePath .
 
+.TP
+.BR CustomFontPath =PATH
+Path where GemRB looks for additional font files. It is meant to be used
+with the TTF font plugin and fonts.2da as a way to specify where to look for
+system or other external fonts. Check the online documentation for the details.
+It is not set by default.
+
 .\"###################################################
 .SH Input Parameters:
 
@@ -354,6 +361,14 @@ The value should not be equal to
 .TP
 .BR NumFingInfo =(2|3|4)
 Number of fingers for multitouch to emulate a special keypress (alt, tab). The default is 2.
+
+.TP
+.BR MouseFeedback =(0-3)
+Bitfield with reserved bits for disabling the mouse.
+  Show mouse+tooltips = 0 (default)
+  Hide mouse          = 1
+  Hide tooltips       = 2
+  Hide mouse+tooltips = 3
 
 .\"###################################################
 .SH Development parameters:
