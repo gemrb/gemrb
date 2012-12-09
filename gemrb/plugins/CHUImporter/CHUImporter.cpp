@@ -76,6 +76,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	ieResRef MosFile;
 	unsigned int i;
 
+	if (!str) {
+		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
+		return NULL;
+	}
+
 	bool found = false;
 	for (unsigned int c = 0; c < WindowCount; c++) {
 		str->Seek( WEOffset + ( 0x1c * c ), GEM_STREAM_START );
