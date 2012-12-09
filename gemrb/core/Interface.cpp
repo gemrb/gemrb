@@ -5788,6 +5788,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 		}
 		int table = gamedata->LoadTable( tablename );
 		Holder<TableMgr> tm = gamedata->GetTable( table );
+		if (!tm) continue;
 
 		int row;
 		if (checkcol == -1) {
