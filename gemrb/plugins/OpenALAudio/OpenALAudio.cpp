@@ -248,7 +248,10 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 
 	stayAlive = false;
+// AmigaOS4 can't kill threads and would just wait forever
+#ifndef __amigaos4__
 	SDL_WaitThread(musicThread, NULL);
+#endif
 
 	for(int i =0; i<num_streams; i++) {
 		streams[i].ForceClear();
