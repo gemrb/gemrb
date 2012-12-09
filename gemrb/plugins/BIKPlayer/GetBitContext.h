@@ -64,16 +64,16 @@ private:
 #else
 #define GET_DATA(v, table, i, wrap, size) \
 {\
-	const uint8_t *ptr = (const uint8_t *)table + i * wrap;\
+	const uint8_t *ptr = reinterpret_cast<const uint8_t *>(table) + i * wrap;\
 	switch(size) {\
 	case 1:\
-		v = *(const uint8_t *)ptr;\
+		v = *reinterpret_cast<const uint8_t *>(ptr);\
 		break;\
 	case 2:\
-		v = *(const uint16_t *)ptr;\
+		v = *reinterpret_cast<const uint16_t *>(ptr);\
 		break;\
 	default:\
-		v = *(const uint32_t *)ptr;\
+		v = *reinterpret_cast<const uint32_t *>(ptr);\
 		break;\
 	}\
 }

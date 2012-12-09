@@ -953,7 +953,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 			// NB: GemRB::Color has exactly the same layout as SDL_Color
 			if (!palette)
-				col = (const Color*)surf->format->palette->colors;
+				col = reinterpret_cast<const Color*>(surf->format->palette->colors);
 			else
 				col = palette->col;
 

@@ -1155,7 +1155,8 @@ int BIKPlayer::read_colors(Bundle *b)
 int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 {
 	int i, j, len, len2, bsize, v, v2;
-	SET_INT_TYPE *dst = (SET_INT_TYPE*)b->cur_dec;
+
+	SET_INT_TYPE *dst = reinterpret_cast<SET_INT_TYPE*>(b->cur_dec);
 	//int16_t *dst = (int16_t*)b->cur_dec;
 
 	CHECK_READ_VAL(v_gb, b, len);

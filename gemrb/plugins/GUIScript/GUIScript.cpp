@@ -9950,12 +9950,12 @@ static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	maze_header *h = (maze_header *) (game->AllocateMazeData()+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
+	maze_header *h = reinterpret_cast<maze_header *> (game->AllocateMazeData()+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
 	memset(h, 0, MAZE_HEADER_SIZE);
 	h->maze_sizex = xsize;
 	h->maze_sizey = ysize;
 	for(int i=0;i<MAZE_ENTRY_COUNT;i++) {
-		maze_entry *m = (maze_entry *) (game->mazedata+i*MAZE_ENTRY_SIZE);
+		maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+i*MAZE_ENTRY_SIZE);
 		memset(m, 0, MAZE_ENTRY_SIZE);
 		bool used = (i/MAZE_MAX_DIM<ysize) && (i%MAZE_MAX_DIM<xsize);
 		m->valid = used;
@@ -9991,7 +9991,7 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 		return RuntimeError( "No maze set up!" );
 	}
 
-	maze_entry *m = (maze_entry *) (game->mazedata+entry*MAZE_ENTRY_SIZE);
+	maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+entry*MAZE_ENTRY_SIZE);
 	maze_entry *m2;
 	switch(index) {
 		case ME_OVERRIDE:
@@ -10015,28 +10015,28 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 			m->walls |= value;
 			if (value & WALL_SOUTH) {
 				if (entry%MAZE_MAX_DIM!=MAZE_MAX_DIM-1) {
-					m2 = (maze_entry *) (game->mazedata+(entry+1)*MAZE_ENTRY_SIZE);
+					m2 = reinterpret_cast<maze_entry *> (game->mazedata+(entry+1)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_NORTH;
 				}
 			}
 
 			if (value & WALL_NORTH) {
 				if (entry%MAZE_MAX_DIM) {
-					m2 = (maze_entry *) (game->mazedata+(entry-1)*MAZE_ENTRY_SIZE);
+					m2 = reinterpret_cast<maze_entry *> (game->mazedata+(entry-1)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_SOUTH;
 				}
 			}
 
 			if (value & WALL_EAST) {
 				if (entry+MAZE_MAX_DIM<MAZE_ENTRY_COUNT) {
-					m2 = (maze_entry *) (game->mazedata+(entry+MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
+					m2 = reinterpret_cast<maze_entry *> (game->mazedata+(entry+MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_WEST;
 				}
 			}
 
 			if (value & WALL_WEST) {
 				if (entry>=MAZE_MAX_DIM) {
-					m2 = (maze_entry *) (game->mazedata+(entry-MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
+					m2 = reinterpret_cast<maze_entry *> (game->mazedata+(entry-MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_EAST;
 				}
 			}
@@ -10071,7 +10071,7 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 		return RuntimeError( "No maze set up!" );
 	}
 
-	maze_header *h = (maze_header *) (game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
+	maze_header *h = reinterpret_cast<maze_header *> (game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
 	switch(entry) {
 		case MH_POS1X:
 			h->pos1x = value;
@@ -10131,7 +10131,7 @@ static PyObject* GemRB_GetMazeHeader(PyObject* /*self*/, PyObject* /*args*/)
 	}
 
 	PyObject* dict = PyDict_New();
-	maze_header *h = (maze_header *) (game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
+	maze_header *h = reinterpret_cast<maze_header *> (game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
 	PyDict_SetItemString(dict, "MazeX", PyInt_FromLong (h->maze_sizex));
 	PyDict_SetItemString(dict, "MazeY", PyInt_FromLong (h->maze_sizey));
 	PyDict_SetItemString(dict, "Pos1X", PyInt_FromLong (h->pos1x));
@@ -10170,7 +10170,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
-	maze_entry *m = (maze_entry *) (game->mazedata+entry*MAZE_ENTRY_SIZE);
+	maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+entry*MAZE_ENTRY_SIZE);
 	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->override));
 	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
 	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));

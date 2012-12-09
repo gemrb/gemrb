@@ -64,7 +64,7 @@ namespace GemRB {
 	(ptr)++;
 #else
 #define GET_INT_VALUE(value, ptr)\
-	(value) = *(int16_t*)(ptr); \
+	(value) = *reinterpret_cast<int16_t*>(ptr); \
 	(ptr) += 2;
 #endif
 
