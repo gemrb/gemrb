@@ -64,6 +64,8 @@ def OptRadio (action, window, button_id, label_id, variable, value):
 	button.SetVarAssoc (variable, value)
 	if GUICommon.GameIsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
+	elif GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
+		button.SetSprites ("TOGGLE", 0, 0, 1, 3, 2)
 
 	OptBuddyLabel (window, label_id)
 
@@ -80,7 +82,7 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 
 	if GUICommon.GameIsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	elif GUICommon.GameIsIWD1():
+	elif GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
 
 	if handler:
