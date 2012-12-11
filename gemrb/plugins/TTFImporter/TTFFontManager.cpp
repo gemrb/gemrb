@@ -324,12 +324,27 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 			continue;
 		}
 
-		pixels = (uint8_t*)calloc(sprWidth, sprHeight);
+		// we need 1px empty space on each side
+		sprWidth += 2;
+
+		pixels = (uint8_t*)malloc(sprWidth * sprHeight);
+		uint8_t* dest = pixels;
+		uint8_t* src = bitmap->buffer;
 
 		for( int row = 0; row < sprHeight; row++ ) {
 			// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
-			memcpy(pixels+(row * sprWidth), bitmap->buffer+(row * bitmap->pitch), sprWidth);
+
+			// add 1px left padding
+			memset(dest++, 0, 1);
+			// -2 to account for padding
+			memcpy(dest, src, sprWidth - 2);
+			dest += sprWidth - 2;
+			src += bitmap->pitch;
+			// add 1px right padding
+			memset(dest++, 0, 1);
 		}
+		// assert that we fill the buffer exactly
+		assert((dest - pixels) == (sprWidth * sprHeight));
 
 		// TODO: do an underline if requested
 
