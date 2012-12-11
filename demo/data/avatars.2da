@@ -4,5 +4,5 @@
 0x0300     SPSMPUFF   SPSMPUFF   SPSMPUFF   SPSMPUFF   13         0          0          *
 0x0400     SKLH       SKLH       SKLH       SKLH       13         0          1          *
 0x1000     MWYV       MWYV       MWYV       MWYV       11         3          1          *
-0xc800     ZHMW1      ZHMW1      ZHMW1      ZHMW1      9          3          1          *
+0xc800     ZHMW1      ZHMW1      ZHMW1      ZHMW1      9          2          1          *
 
