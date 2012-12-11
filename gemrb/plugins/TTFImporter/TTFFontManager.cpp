@@ -251,12 +251,12 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 	FT_GlyphSlot glyph;
 	FT_Glyph_Metrics* metrics;
 
-	int maxx, maxy, yoffset;
+	int maxx, yoffset;
 	for (ch = FirstChar; ch <= LastChar; ch++) {
 		/* Load the glyph */
 		index = FT_Get_Char_Index( face, ch );
 		// maybe one day we will subclass Font such that we can be more dynamic and support kerning.
-		// until then load the glyphs as monospace.
+		// until then the only options we should pass are default and monochrome.
 		error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
 		if( error ) {
 			LogFTError(error);
@@ -271,8 +271,7 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		if ( FT_IS_SCALABLE( face ) ) {
 			/* Get the bounding box */
 			maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->width);
-			maxy = FT_FLOOR(metrics->horiBearingY);
-			yoffset = font.ascent - maxy;
+			yoffset = font.ascent - FT_FLOOR(metrics->horiBearingY);
 		} else {
 			/* Get the bounding box for non-scalable format.
 			 * Again, freetype2 fills in many of the font metrics
@@ -281,7 +280,6 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 			 * assumptions about non-scalable formats.
 			 * */
 			maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->horiAdvance);
-			maxy = FT_FLOOR(metrics->horiBearingY);
 			yoffset = 0;
 		}
 
@@ -293,14 +291,11 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 			maxx += (int)ceil(font.glyph_italics);
 		}
 
-		int sprWidth, sprHeight;
-		sprWidth = maxx;
-		sprHeight = font.ascent;
-
-		if (sprWidth == 0 || sprHeight == 0) {
-			glyphs[ch - FirstChar] = NULL;
-			continue;
-		}
+		/*
+		 FIXME: maxx is currently unused.
+		 glyph spacing is non existant right now
+		 font styles are non functional too
+		 */
 
 		FT_Bitmap* bitmap;
 		uint8_t* pixels = NULL;
@@ -314,6 +309,15 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		}
 
 		bitmap = &glyph->bitmap;
+
+		int sprHeight = bitmap->rows;
+		int sprWidth = bitmap->width;
+
+		if (sprWidth == 0 || sprHeight == 0) {
+			glyphs[ch - FirstChar] = NULL;
+			continue;
+		}
+
 		pixels = (uint8_t*)calloc(sprWidth, sprHeight);
 
 		/* Ensure the width of the pixmap is correct. On some cases,
@@ -323,8 +327,9 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 			width = sprWidth;
 		}
 
-		for( int row = 0; row < bitmap->rows; ++row ) {
-			memcpy(pixels+(row * sprWidth), bitmap->buffer+(row * bitmap->pitch), bitmap->pitch);
+		for( int row = 0; row < sprHeight; row++ ) {
+			// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
+			memcpy(pixels+(row * sprWidth), bitmap->buffer+(row * bitmap->pitch), sprWidth);
 		}
 
 		// TODO: do an underline if requested
