@@ -313,19 +313,18 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		int sprHeight = bitmap->rows;
 		int sprWidth = bitmap->width;
 
+		/* Ensure the width of the pixmap is correct. On some cases,
+		 * freetype may report a larger pixmap than possible.*/
+		if (sprWidth > maxx) {
+			sprWidth = maxx;
+		}
+
 		if (sprWidth == 0 || sprHeight == 0) {
 			glyphs[ch - FirstChar] = NULL;
 			continue;
 		}
 
 		pixels = (uint8_t*)calloc(sprWidth, sprHeight);
-
-		/* Ensure the width of the pixmap is correct. On some cases,
-		 * freetype may report a larger pixmap than possible.*/
-		int width = glyph->bitmap.width;
-		if (width > sprWidth) {
-			width = sprWidth;
-		}
 
 		for( int row = 0; row < sprHeight; row++ ) {
 			// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
