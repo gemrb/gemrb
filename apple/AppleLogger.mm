@@ -41,7 +41,7 @@ AppleLogger::~AppleLogger()
 void AppleLogger::textcolor(log_color /*c*/)
 {}
 	
-void AppleLogger::log(log_level level, const char* owner, const char* message, log_color color)
+void AppleLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
 {
 	if (level == FATAL) {
 		// display a GUI alert for FATAL errors
@@ -63,7 +63,8 @@ void AppleLogger::log(log_level level, const char* owner, const char* message, l
 		NSRunAlertPanel(alertTitle, alertMessage, @"OK", nil, nil);
 #endif
 	}
-	StdioLogger::log(level, owner, message, color);
+
+	StdioLogger::LogInternal(level, owner, message, color);
 }
 
 Logger* createAppleLogger()
