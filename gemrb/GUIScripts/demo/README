@@ -1,0 +1,5 @@
+The empty files are temporary here to:
+ - override shared code, 
+ - satisfy global dependencies
+ - squash missing function errors (noop functions)
+

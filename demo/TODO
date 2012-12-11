@@ -1,0 +1,10 @@
+fix dud fonts.2da entries
+real bams for cursors, carot
+real mos
+fist.itm is missing some resources like icons
+dialog.tlk entries
+(proper mapicon0.png)
+
+CONSIDER REMOVING:
+- mastarea.2da
+- the fonts, now included for easier testing (otherwise add all the needed boilerplate)
