@@ -1756,7 +1756,7 @@ int Interface::Init()
 		if (pal256im)
 			pal256 = pal256im->GetImage();
 		if (!pal16 || !pal32 || !pal256) {
-			Log(ERROR, "Core", "No palettes found.");
+			Log(FATAL, "Core", "No palettes found.");
 			return GEM_ERROR;
 		}
 		Log(MESSAGE, "Core", "Palettes Loaded");
