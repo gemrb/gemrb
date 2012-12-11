@@ -82,6 +82,8 @@ def UpdateControlStatus():
 		MessageTA.MoveText(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
 
+	TMessageTA.SetText("DEMO"*50)
+
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
 	if Override:
