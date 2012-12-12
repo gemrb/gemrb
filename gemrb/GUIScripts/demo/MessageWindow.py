@@ -82,7 +82,7 @@ def UpdateControlStatus():
 		MessageTA.MoveText(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
 
-	TMessageTA.SetText("DEMO"*50)
+	TMessageTA.SetText("DEMO "*150)
 
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
