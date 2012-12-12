@@ -3,5 +3,9 @@ Description: This table lists special items that won't be dropped by certain act
 Columns:
 USER   - the scripting name of the playable character
 STRREF - the displayed string
-
+FLAGS - usability bitfield
+  1 - named actor cannot remove it
+  2 - anyone else cannot equip it
+  4 - can only swap it for something else
+  
 Rows: Item resrefs
