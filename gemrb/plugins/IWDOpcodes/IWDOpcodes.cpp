@@ -3740,6 +3740,7 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {
 		if (target->SetSpellState( SS_RAPIDSHOT)) return FX_NOT_APPLIED; //don't apply it twice
 
+		STAT_ADD(IE_TOHIT, -2);
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
 			//none i know of
