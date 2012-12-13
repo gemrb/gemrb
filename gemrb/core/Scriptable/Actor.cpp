@@ -5515,7 +5515,10 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		ieDword clss = BaseStats[IE_CLASS];
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
-			THAC0Bonus += defaultprof[clss];
+			// but skip fists, since they don't have a proficiency
+			if (Equipped != IW_NO_EQUIPPED) {
+				THAC0Bonus += defaultprof[clss];
+			}
 		} else {
 			//it is not clear what is the penalty for non player classes
 			THAC0Bonus += 4;
