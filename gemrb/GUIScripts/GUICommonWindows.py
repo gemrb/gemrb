@@ -424,7 +424,7 @@ def SelectItemAbility():
 	return
 
 def SelectQuiverSlot():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	# HACK: implement SetEquippedAmmunition instead?
