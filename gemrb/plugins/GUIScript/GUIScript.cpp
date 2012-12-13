@@ -7460,16 +7460,16 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 }
 
 PyDoc_STRVAR( GemRB_DragItem__doc,
-"DragItem(PartyID, Slot, ResRef, [Count=0, Type])\n\n"
-"Start dragging specified item, if Slot is negative, drag the PartyID portrait instead." );
+"DragItem(globalID, Slot, ResRef, [Count=0, Type])\n\n"
+"Start dragging specified item, if Slot is negative, drag the globalID party portrait instead." );
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
 	ieResRef Sound;
-	int PartyID, Slot, Count = 0, Type = 0;
+	int globalID, Slot, Count = 0, Type = 0;
 	const char *ResRef;
 
-	if (!PyArg_ParseTuple( args, "iis|ii", &PartyID, &Slot, &ResRef, &Count, &Type)) {
+	if (!PyArg_ParseTuple( args, "iis|ii", &globalID, &Slot, &ResRef, &Count, &Type)) {
 		return AttributeError( GemRB_DragItem__doc );
 	}
 
@@ -7482,16 +7482,21 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	GET_GAME();
+	Actor* actor;
+	if (globalID > 1000) {
+		actor = game->GetActorByGlobalID( globalID );
+	} else {
+		actor = game->FindPC( globalID );
+	}
 
-	Actor* actor = game->FindPC( PartyID );
 	//allow -1,-1
-	if (!actor && ( PartyID || ResRef[0]) ) {
+	if (!actor && ( globalID || ResRef[0]) ) {
 		return RuntimeError( "Actor not found!\n" );
 	}
 
 	//dragging a portrait
 	if (!ResRef[0]) {
-		core->SetDraggedPortrait(PartyID, Slot);
+		core->SetDraggedPortrait(globalID, Slot);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
