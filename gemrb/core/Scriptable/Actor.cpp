@@ -8739,7 +8739,7 @@ void Actor::ResetCommentTime()
 // 7-,  heavy: splint, plate, full plate
 // the values are taken from our dehardcoded itemdata.2da
 // FIXME: the penalites are too high, the items use a different value!
-int Actor::GetArmorFailure() const
+int Actor::GetArmorFailure(int profcheck) const
 {
 	if (!third) return 0;
 
@@ -8756,14 +8756,19 @@ int Actor::GetArmorFailure() const
 	}
 
 	// ignore the penalty if we are proficient
-	if (GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
+	if (profcheck && GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
 		penalty = 0;
 	}
 
 	// check also the shield penalty
 	armorType = inventory.GetShieldItemType();
-	if (!HasFeat(FEAT_SHIELD_PROF)) {
-		penalty += core->GetShieldPenalty(armorType);
+	int shieldPenalty = core->GetShieldPenalty(armorType);
+	if (profcheck) {
+		if (!HasFeat(FEAT_SHIELD_PROF)) {
+			penalty += shieldPenalty;
+		}
+	} else {
+		penalty += shieldPenalty;
 	}
 
 	return -penalty;
