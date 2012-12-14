@@ -1238,7 +1238,9 @@ def GetRealPrice (pc, mode, Item, Slot):
 	# get the base from the item
 	price = Item['Price']
 
-	if Item['MaxCharge']>0:
+	if Item['MaxStackAmount']>1:
+		price = price * Slot['Usages0']
+	elif Item['MaxCharge']>0:
 		price = price * Slot['Usages0'] / Item['MaxCharge']
 
 	# modifier from store properties (in percent)
