@@ -83,8 +83,9 @@ def CloseOptionsWindow ():
 	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
-	GUICommonWindows.PortraitWindow = OldPortraitWindow
-	OldPortraitWindow = None
+	if not GUICommon.GameIsBG1():
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
 	return
 
 ###################################################
