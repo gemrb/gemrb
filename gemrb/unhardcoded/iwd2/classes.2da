@@ -1,38 +1,38 @@
 2DA V1.0
 *
-                 NAME_REF   DESC_REF   ID         CLASS      CLAB       SAVE       HP	USABILITY       HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC    
-BARBARIAN        34         37         1          0          CLABFI05   SAVEWAR    HPBARB	1     1          1          1          1          1          1          1          
-BARD             1083       9562       2          0          CLABBA01   SAVEBRD    HPBRD	2      1          1          1          1          1          1          1          
-CLERIC           1079       9559       3          0          CLABPR01   SAVEPRS    HPPRS        4	1          1          1          1          1          1          1          
-DRUID            1080       9560       4          0          CLABDR01   SAVEPRS    HPPRS        8	1          1          1          1          1          1          1          
-FIGHTER          10174      9556       5          0          CLABFI01   SAVEWAR    HPWAR       16	1          1          1          1          1          1          1          
-MONK             33         36         6          0          CLABMO01   SAVEMONK   HPMONK      32	1          1          1          1          1          1          1          
-PALADIN          1078       9558       7          0          CLABPA01   SAVEWAR    HPWAR       64	1          1          1          1          1          1          1          
-RANGER           1077       9557       8          0          CLABRN01   SAVEWAR    HPWAR      128	1          1          1          1          1          1          1          
-ROGUE            1082       9561       9          0          CLABTH01   SAVEROG    HPROG      256	1          1          1          1          1          1          1          
-SORCERER         32         35         10         0          CLABSR01   SAVEWIZ    HPWIZ      512	1          1          1          1          1          1          1          
-WIZARD           9987       9563       11         0          CLABMA01   SAVEWIZ    HPWIZ     1024	1          1          1          1          1          1          1   
-PALADIN_ILMATER  36875      39407      1          7          CLABPA01   SAVEWAR    HPWAR        1	1          1          1          1          1          1          1          
-PALADIN_HELM     36872      39408      2          7          CLABPA01   SAVEWAR    HPWAR        2	1          1          1          1          1          1          1          
-PALADIN_MYSTRA   36873      39409      4          7          CLABPA01   SAVEWAR    HPWAR        4	1          1          1          1          1          1          1          
-MONK_OLD_ORDER   36877      39410      8          6          CLABMO01   SAVEMONK   HPMONK       8	1          1          1          1          1          1          1          
-MONK_BROKEN_ONES 36878      39411      0x10       6          CLABMO01   SAVEMONK   HPMONK      16	1          1          1          1          1          1          1          
-MONK_DARK_MOON   36879      39412      0x20       6          CLABMO01   SAVEMONK   HPMONK      32	1          1          1          1          1          1          1          
-MAGE_GENERALIST  9987       9563       0x4000     11         CLABMA01   SAVEWIZ    HPWIZ    0x4000	1          1          1          1          1          1          1          
-MAGE_ABJURER     502        9564       0x40       11         CLABMA02   SAVEWIZ    HPWIZ      0x40	1          1          1          1          1          1          1          
-MAGE_CONJURER    504        9565       0x80       11         CLABMA06   SAVEWIZ    HPWIZ      0x80	1          1          1          1          1          1          1          
-MAGE_DIVINER     2012       9566       0x100      11         CLABMA05   SAVEWIZ    HPWIZ     0x100	1          1          1          1          1          1          1          
-MAGE_ENCHANTER   2022       9567       0x200      11         CLABMA09   SAVEWIZ    HPWIZ     0x200	1          1          1          1          1          1          1          
-MAGE_EVOKER      12786      9569       0x800      11         CLABMA07   SAVEWIZ    HPWIZ     0x400	1          1          1          1          1          1          1          
-MAGE_ILLUSIONIST 12785      9568       0x400      11         CLABMA08   SAVEWIZ    HPWIZ     0x800	1          1          1          1          1          1          1          
-MAGE_NECROMANCER 12787      9570       0x1000     11         CLABMA03   SAVEWIZ    HPWIZ    0x1000	1          1          1          1          1          1          1          
-MAGE_TRANSMUTER  12788      9571       0x2000     11         CLABMA04   SAVEWIZ    HPWIZ    0x2000	1          1          1          1          1          1          1          
-CLERIC_ILMATER   38097      38118      0x8000     3          CLABCL01   SAVEPRS    HPPRS    0x8000	1          1          1          1          1          1          1          
-CLERIC_LATHANDER 38098      38119      0x10000    3          CLABCL02   SAVEPRS    HPPRS   0x10000	1          1          1          1          1          1          1          
-CLERIC_SELUNE    38099      38120      0x20000    3          CLABCL03   SAVEPRS    HPPRS   0x20000	1          1          1          1          1          1          1          
-CLERIC_HELM      38100      38121      0x40000    3          CLABCL04   SAVEPRS    HPPRS   0x40000	1          1          1          1          1          1          1          
-CLERIC_OGHMA     38101      38122      0x80000    3          CLABCL05   SAVEPRS    HPPRS   0x80000	1          1          1          1          1          1          1          
-CLERIC_TEMPUS    38102      38123      0x100000   3          CLABCL06   SAVEPRS    HPPRS  0x100000	1          1          1          1          1          1          1          
-CLERIC_BANE      38103      38124      0x200000   3          CLABCL07   SAVEPRS    HPPRS  0x200000	1          1          1          1          1          1          1          
-CLERIC_MASK      38106      38125      0x400000   3          CLABCL08   SAVEPRS    HPPRS  0x400000	1          1          1          1          1          1          1          
-CLERIC_TALOS     38107      38126      0x800000   3          CLABCL09   SAVEPRS    HPPRS  0x800000	1          1          1          1          1          1          1          
+                 NAME_REF   DESC_REF   ID         CLASS      CLAB       SAVE       HP	USABILITY       HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC  TOHIT
+BARBARIAN        34         37         1          0          CLABFI05   SAVEWAR    HPBARB	1     1          1          1          1          1          1          1              BAATFGT
+BARD             1083       9562       2          0          CLABBA01   SAVEBRD    HPBRD	2      1          1          1          1          1          1          1             BAATNFG
+CLERIC           1079       9559       3          0          CLABPR01   SAVEPRS    HPPRS        4	1          1          1          1          1          1          1            BAATNFG
+DRUID            1080       9560       4          0          CLABDR01   SAVEPRS    HPPRS        8	1          1          1          1          1          1          1            BAATNFG
+FIGHTER          10174      9556       5          0          CLABFI01   SAVEWAR    HPWAR       16	1          1          1          1          1          1          1            BAATFGT
+MONK             33         36         6          0          CLABMO01   SAVEMONK   HPMONK      32	1          1          1          1          1          1          1            BAATMKU
+PALADIN          1078       9558       7          0          CLABPA01   SAVEWAR    HPWAR       64	1          1          1          1          1          1          1            BAATFGT
+RANGER           1077       9557       8          0          CLABRN01   SAVEWAR    HPWAR      128	1          1          1          1          1          1          1            BAATFGT
+ROGUE            1082       9561       9          0          CLABTH01   SAVEROG    HPROG      256	1          1          1          1          1          1          1            BAATNFG
+SORCERER         32         35         10         0          CLABSR01   SAVEWIZ    HPWIZ      512	1          1          1          1          1          1          1            BAATMAG
+WIZARD           9987       9563       11         0          CLABMA01   SAVEWIZ    HPWIZ     1024	1          1          1          1          1          1          1            BAATMAG
+PALADIN_ILMATER  36875      39407      1          7          CLABPA01   SAVEWAR    HPWAR        1	1          1          1          1          1          1          1            BAATFGT
+PALADIN_HELM     36872      39408      2          7          CLABPA01   SAVEWAR    HPWAR        2	1          1          1          1          1          1          1            BAATFGT
+PALADIN_MYSTRA   36873      39409      4          7          CLABPA01   SAVEWAR    HPWAR        4	1          1          1          1          1          1          1            BAATFGT
+MONK_OLD_ORDER   36877      39410      8          6          CLABMO01   SAVEMONK   HPMONK       8	1          1          1          1          1          1          1            BAATMKU
+MONK_BROKEN_ONES 36878      39411      0x10       6          CLABMO01   SAVEMONK   HPMONK      16	1          1          1          1          1          1          1            BAATMKU
+MONK_DARK_MOON   36879      39412      0x20       6          CLABMO01   SAVEMONK   HPMONK      32	1          1          1          1          1          1          1            BAATMKU
+MAGE_GENERALIST  9987       9563       0x4000     11         CLABMA01   SAVEWIZ    HPWIZ    0x4000	1          1          1          1          1          1          1            BAATMAG
+MAGE_ABJURER     502        9564       0x40       11         CLABMA02   SAVEWIZ    HPWIZ      0x40	1          1          1          1          1          1          1            BAATMAG
+MAGE_CONJURER    504        9565       0x80       11         CLABMA06   SAVEWIZ    HPWIZ      0x80	1          1          1          1          1          1          1            BAATMAG
+MAGE_DIVINER     2012       9566       0x100      11         CLABMA05   SAVEWIZ    HPWIZ     0x100	1          1          1          1          1          1          1            BAATMAG
+MAGE_ENCHANTER   2022       9567       0x200      11         CLABMA09   SAVEWIZ    HPWIZ     0x200	1          1          1          1          1          1          1            BAATMAG
+MAGE_EVOKER      12786      9569       0x800      11         CLABMA07   SAVEWIZ    HPWIZ     0x400	1          1          1          1          1          1          1            BAATMAG
+MAGE_ILLUSIONIST 12785      9568       0x400      11         CLABMA08   SAVEWIZ    HPWIZ     0x800	1          1          1          1          1          1          1            BAATMAG
+MAGE_NECROMANCER 12787      9570       0x1000     11         CLABMA03   SAVEWIZ    HPWIZ    0x1000	1          1          1          1          1          1          1            BAATMAG
+MAGE_TRANSMUTER  12788      9571       0x2000     11         CLABMA04   SAVEWIZ    HPWIZ    0x2000	1          1          1          1          1          1          1            BAATMAG
+CLERIC_ILMATER   38097      38118      0x8000     3          CLABCL01   SAVEPRS    HPPRS    0x8000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_LATHANDER 38098      38119      0x10000    3          CLABCL02   SAVEPRS    HPPRS   0x10000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_SELUNE    38099      38120      0x20000    3          CLABCL03   SAVEPRS    HPPRS   0x20000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_HELM      38100      38121      0x40000    3          CLABCL04   SAVEPRS    HPPRS   0x40000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_OGHMA     38101      38122      0x80000    3          CLABCL05   SAVEPRS    HPPRS   0x80000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_TEMPUS    38102      38123      0x100000   3          CLABCL06   SAVEPRS    HPPRS  0x100000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_BANE      38103      38124      0x200000   3          CLABCL07   SAVEPRS    HPPRS  0x200000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_MASK      38106      38125      0x400000   3          CLABCL08   SAVEPRS    HPPRS  0x400000	1          1          1          1          1          1          1            BAATNFG
+CLERIC_TALOS     38107      38126      0x800000   3          CLABCL09   SAVEPRS    HPPRS  0x800000	1          1          1          1          1          1          1            BAATNFG
