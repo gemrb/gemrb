@@ -8668,14 +8668,14 @@ int Actor::GetClassMask() const
 
 int Actor::GetBookMask() const
 {
-	int classmask = 0;
+	int bookmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {
 		if (Modified[levelslotsiwd2[i]] > 0) {
-			classmask |= 1<<(booksiwd2[i]-1);
+			bookmask |= 1<<(booksiwd2[i]-1);
 		}
 	}
 
-	return classmask;
+	return bookmask;
 }
 
 // returns the combined dexterity and racial bonus to specified thieving skill
