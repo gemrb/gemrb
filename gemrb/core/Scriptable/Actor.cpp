@@ -5474,6 +5474,11 @@ int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 	ieDword LevelSum = 0;
 	int i;
 
+	if (!third) {
+		BAB = pBAB;
+		return 0;
+	}
+
 	for (i = 0; i<ISCLASSES; i++) {
 		int level = GetClassLevel(i);
 		if (level) {
