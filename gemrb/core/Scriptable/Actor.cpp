@@ -1547,7 +1547,15 @@ void Actor::ReleaseMemory()
 /* returns the ISCLASS for the class based on name */
 int IsClassFromName (const char* name)
 {
-	//TODO: is there a better way of doing this?
+	//TODO: convert this mess to a std::map
+	// iwd2 has some different names
+	if (third) {
+		if (strcmp(name, "ROGUE") == 0) {
+			return ISTHIEF;
+		} else if (strcmp(name, "WIZARD") == 0) {
+			return ISMAGE;
+		}
+	}
 	for (int i=0; i<ISCLASSES; i++) {
 		if (strcmp(name, isclassnames[i]) == 0)
 			return i;
