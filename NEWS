@@ -1,9 +1,13 @@
-GemRB git (0913aa2):
+GemRB git (5801eed2ea2):
   New features:
     - 
+    - initial bundled gemrb demo stubs
+    - most gemrb overrides were moved and are now moddable via game override
+    - favourite weapon/spell tracking
 
   Improved features:
     - 
+    - iwd2 combat
     - bugfixes
 
 GemRB v0.7.2 (2012-11-20):
