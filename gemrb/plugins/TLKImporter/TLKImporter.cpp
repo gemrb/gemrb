@@ -129,11 +129,14 @@ bool TLKImporter::Open(DataStream* stream)
 	return true;
 }
 
+//when copying the token, skip spaces
 inline char* mystrncpy(char* dest, const char* source, int maxlength,
 	char delim)
 {
 	while (*source && ( *source != delim ) && maxlength--) {
-		*dest++ = *source++;
+		char chr = *source++;
+		if (chr!=' ') *dest++ = chr;
+		//*dest++ = *source++;
 	}
 	*dest = 0;
 	return dest;
