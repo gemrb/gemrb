@@ -374,8 +374,12 @@ def DisplayGeneral (pc):
 
 	return
 
+def PlusMinusStat(value):
+	if value > 0:
+		return "+" + str(value)
+	return str(value)
+
 #FIXME: display only nonzero values except for casting failure
-#TODO: +/- prefix
 #TODO: check if there are any other entries
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%206/
 def DisplayWeapons (pc):
@@ -397,9 +401,13 @@ def DisplayWeapons (pc):
 	# Main Hand
 	# display all the (successive) attack values (+15/+10/+5)
 	total = combatdet["ToHit"]
-	tmpstr = str(total)
+	tmpstr = PlusMinusStat(str(total))
+	babDec = 5
+	if GS(IE_LEVELMONK): #TODO: only true if not wearing armor and no weapons equipped
+		babDec = 3
 	for i in range(1, combatdet["APR"]//2):
-		tmpstr = tmpstr  + "/" + str(total-i*5)
+		if total-i*babDec > 0:
+			tmpstr = tmpstr  + "/" + PlusMinusStat(total-i*babDec)
 	RecordsTextArea.Append (delimited_txt (734, ":", tmpstr, 0))
 	# Base
 	RecordsTextArea.Append ("  ", -1) # indentation
