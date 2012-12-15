@@ -1067,12 +1067,8 @@ def GetActorClassTitle (actor, ClassIndex):
 
 # overriding the one in GUICommon, since we use a different table and animations
 def GetActorPaperDoll (actor):
-	PortraitTable = GemRB.LoadTable ("avatars")
-	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
 	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
-	row = "0x%04X" %anim_id
-	which = "AT_%d" %(level+1)
-	return PortraitTable.GetValue (row, which)
+	return GemRB.GetAvatarsValue (actor, level)
 
 
 SelectionChangeHandler = None

@@ -189,6 +189,7 @@ public: //attribute functions
 	unsigned int GetFlags() const;
 	const ieResRef &GetWalkSound() const;
 	int GetWalkSoundCount() const;
+	const ieResRef &GetArmourLevel(int ArmourLevel) const;
 	void PulseRGBModifiers();
 	void DebugDump();
 private:

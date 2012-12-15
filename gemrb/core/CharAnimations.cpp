@@ -188,6 +188,15 @@ int CharAnimations::GetTotalPartCount() const
 	}
 }
 
+const ieResRef& CharAnimations::GetArmourLevel(int ArmourLevel) const
+{
+	//ignore ArmourLevel for the static pst anims (all sprites are displayed)
+	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
+		ArmourLevel = 0;
+	}
+	return AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel];
+}
+
 void CharAnimations::SetArmourLevel(int ArmourLevel)
 {
 	if (AvatarsRowNum==~0u) return;

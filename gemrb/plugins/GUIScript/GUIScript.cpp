@@ -23,6 +23,7 @@
 #include "PythonHelpers.h"
 
 #include "Audio.h"
+#include "CharAnimations.h"
 #include "ControlAnimation.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
@@ -7810,6 +7811,26 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetAvatarsValue__doc,
+"GetAvatarsValue(globalID, column)\n\n"
+"Returns an entry from the avatars.2da table, accounting for animation ID ranges.");
+// NOTE: currently it can only lookup the animation prefixes!
+static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
+{
+	int globalID, col;
+
+	if (!PyArg_ParseTuple(args, "ii", &globalID, &col)) {
+		return AttributeError( GemRB_GetAvatarsValue__doc );
+	}
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	ieResRef prefix;
+	strnuprcpy(prefix, actor->GetAnims()->GetArmourLevel(col), sizeof(ieResRef)-1);
+
+	return PyString_FromResRef(prefix);
+}
+
 PyDoc_STRVAR( GemRB_SetMapAnimation__doc,
 "SetMapAnimation(X, Y, BAMresref[, flags, cycle, height])\n\n"
 "Creates an area animation.");
@@ -10319,6 +10340,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetProtagonistMode, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(GetAreaInfo, METH_NOARGS),
+	METHOD(GetAvatarsValue, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
 	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
