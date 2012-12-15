@@ -731,7 +731,7 @@ def ReadItemWindow ():
 			if GUICommon.GameIsBG2():
 				strref = 32097
 			else:
-				strref = -1
+				strref = 10831
 		else:
 			pause = GemRB.GamePause(3,1) #query the pause state
 			GemRB.GamePause(0,1)
