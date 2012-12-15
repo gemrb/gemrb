@@ -245,6 +245,12 @@ struct WeaponInfo {
 	int critmulti; //critical hit multiplier (usually 2)
 };
 
+struct BABTable {
+	ieDword level;
+	int bab; // basic attack bonus
+	int apr; // attacks per round
+};
+
 extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 

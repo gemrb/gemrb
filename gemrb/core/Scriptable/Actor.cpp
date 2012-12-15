@@ -313,6 +313,11 @@ static int spllevels;
 std::vector<std::vector<int> > skilldex;
 std::vector<std::vector<int> > skillrac;
 
+// iwd2 class to-hit and apr tables read into a single object
+std::map<char *, std::vector<BABTable> > IWD2HitTable;
+typedef std::map<char *, std::vector<BABTable> >::iterator IWD2HitTableIter;
+std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
+
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
 static int CheckAbilities=false;
@@ -1516,6 +1521,8 @@ void Actor::ReleaseMemory()
 		}
 		skilldex.clear();
 		skillrac.clear();
+		IWD2HitTable.clear();
+		BABClassMap.clear();
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1884,10 +1891,59 @@ static void InitActorTables()
 		}
 	}
 
-	//TODO: check iwd2
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	tm.load("classes");
-	if (tm && !core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+	if (!tm) {
+		error("Actor", "Missing classes.2da!");
+	}
+	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+		// we need to set up much less here due to a saner class/level system in 3ed
+		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
+		AutoTable tht;
+		for (i=0; i<classcount; i++) {
+			const char *classname = tm->GetRowName(i);
+			int classis = IsClassFromName(classname);
+			ieDword classID = atoi(tm->QueryField(classname, "ID"));
+			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
+			if (!classID || classcol) {
+				continue;
+			}
+
+			// set up the tohit/apr tables
+			char tohit[9];
+			strnuprcpy(tohit, tm->QueryField(classname, "TOHIT"), 8);
+			BABClassMap[classis] = strdup(tohit);
+			// the tables repeat, but we need to only load one copy
+			// FIXME: the attempt at skipping doesn't work!
+			IWD2HitTableIter it = IWD2HitTable.find(tohit);
+			if (it == IWD2HitTable.end()) {
+				tht.load(tohit, false);
+				if (!tht || !tohit[0]) {
+					error("Actor", "TOHIT table for %s does not exist!", classname);
+				}
+				ieDword row;
+				BABTable bt;
+				std::vector<BABTable> btv;
+				btv.reserve(tht->GetRowCount());
+				for (row = 0; row < tht->GetRowCount(); row++) {
+					bt.level = atoi(tht->GetRowName(row));
+					bt.bab = atoi(tht->QueryField(row, 0));
+					bt.apr = atoi(tht->QueryField(row, 1));
+					btv.push_back(bt);
+				}
+				IWD2HitTable.insert(std::make_pair <char*, std::vector<BABTable> > (BABClassMap[classis], btv));
+			}
+
+			StringBuffer buffer;
+			buffer.appendFormatted("\tID: %d, ", classID);
+			buffer.appendFormatted("Name: %s, ", classname);
+			buffer.appendFormatted("Classis: %d, ", classis);
+			buffer.appendFormatted("ToHit: %s ", tohit);
+
+			//TODO: generate classesiwd2 here, so it can be unhardcoded
+			Log(DEBUG, "Actor", buffer);
+		}
+	} else {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
 		Log(MESSAGE, "Actor", "Examining classes.2da");
