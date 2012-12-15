@@ -836,6 +836,8 @@ public:
 	void DisplayHeadHPRatio();
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
+	int GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const;
+	int BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const;
 };
 }
 

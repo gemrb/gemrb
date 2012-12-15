@@ -5433,15 +5433,113 @@ ieDword Actor::GetNumberOfAttacks() const
 {
 	int bonus = 0;
 
-	if (monkbon != NULL && Equipped == IW_NO_EQUIPPED) {
-		unsigned int level = GetMonkLevel();
-		if (level>=monkbon_cols) level=monkbon_cols-1;
-		if (level>0) {
-			bonus = monkbon[0][level-1];
+	if (third) {
+		int tmp;
+		int base = GetBaseAPRandAB (true, tmp);
+		// add the offhand extra attack
+		// TODO: check effects too
+		bonus = 2 * IsDualWielding();
+		return base + bonus;
+	} else {
+		if (monkbon != NULL && Equipped == IW_NO_EQUIPPED) {
+			unsigned int level = GetMonkLevel();
+			if (level>=monkbon_cols) level=monkbon_cols-1;
+			if (level>0) {
+				bonus = monkbon[0][level-1];
+			}
+		}
+
+		return GetStat(IE_NUMBEROFATTACKS)+bonus;
+	}
+}
+static const int BaseAttackBonusDecrement = 5; // iwd2; number of tohit points for another attack per round
+static int SetLevelBAB(int level, ieDword index)
+{
+	if (!level) {
+		return 0;
+	}
+	assert(index < BABClassMap.size());
+
+	IWD2HitTableIter table = IWD2HitTable.find(BABClassMap[index]);
+	assert(table != IWD2HitTable.end());
+	return table->second[level-1].bab;
+}
+
+// return the base APR derived from the base attack bonus, which we have to construct here too
+int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
+{
+	int pBAB = BaseStats[IE_TOHIT];
+	int pBABDecrement = BaseAttackBonusDecrement;
+	ieDword MonkLevel = 0;
+	ieDword LevelSum = 0;
+	int i;
+
+	for (i = 0; i<ISCLASSES; i++) {
+		int level = GetClassLevel(i);
+		if (level) {
+			// silly monks, always wanting to be special
+			if (i == ISMONK) {
+				MonkLevel = level;
+				if (MonkLevel+LevelSum == Modified[IE_CLASSLEVELSUM]) {
+					// only the monk left to check, so skip the rest
+					break;
+				} else {
+					continue;
+				}
+			}
+			pBAB += SetLevelBAB(level, i);
+			LevelSum += level;
+			if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
+				// skip to apr calc, no need to check the other classes
+				BAB = pBAB;
+				return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
+			}
 		}
 	}
 
-	return GetStat(IE_NUMBEROFATTACKS)+bonus;
+	if (MonkLevel) {
+		// act as a rogue unless barefisted and without armor
+		// TODO: check why it also checked pBAB - meaning that if it has any other class, it will not add monk bab/apr
+		if (/*pBAB ||*/ Equipped != IW_NO_EQUIPPED || GetArmorFailure(0)) {
+			pBAB += SetLevelBAB(MonkLevel, ISTHIEF);
+		} else {
+			pBABDecrement = 3;
+			pBAB += SetLevelBAB(MonkLevel, ISMONK);
+		}
+		LevelSum += MonkLevel;
+	}
+
+	assert(LevelSum == Modified[IE_CLASSLEVELSUM]);
+	BAB = pBAB;
+	return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
+}
+
+int Actor::BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const
+{
+	if (CheckRapidShot && HasSpellState(SS_RAPIDSHOT)) {
+		WeaponInfo wi;
+		ITMExtHeader *HittingHeader = GetRangedWeapon(wi);
+		if (HittingHeader) {
+			ieDword AttackTypeLowBits = HittingHeader->AttackType & 0xFF; // this is done by the original; leaving in case we expand
+			if (AttackTypeLowBits == ITEM_AT_BOW || AttackTypeLowBits == ITEM_AT_PROJECTILE) {
+				// rapid shot gives another attack and since it is computed from the BAB, we just increase that ...
+				// but monk get their speedy handy work only for fists, so we can't use the passed pBABDecrement
+				pBAB += BaseAttackBonusDecrement;
+			}
+		}
+	}
+
+	int APR = (pBAB - 1) / pBABDecrement + 1;
+	//FIXME: why is it not using the other IWD2HitTable column? Less moddable this way
+	// the original hardcoded this, but we can do better - all the data is already in the tables
+	// HOWEVER, what to do with multiclass characters? -> check the monk table, since it is prone to have the highest values?
+	// additionally, 5 is the real max, but not without dualwielding or effects
+	if (APR > 4) {
+		APR = 4;
+	}
+	// NOTE: we currently double the value, since it is stored doubled in other games and effects rely on it
+	// if you want to change it, don't forget to do the same for the bonus in GetNumberOfAttacks
+	return APR*2;
 }
 
 //calculate how many attacks will be performed
@@ -5490,7 +5588,7 @@ void Actor::InitRound(ieDword gameTime)
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const
 {
-	tohit = GetStat(IE_TOHIT);
+	GetBaseAPRandAB(true, tohit);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
 	ieDword dualwielding = IsDualWielding();
 	header = GetWeapon(wi, leftorright && dualwielding);
