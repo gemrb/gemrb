@@ -333,7 +333,7 @@ bool TLKImporter::ResolveTags(char* dest, char* source, int Length)
 	NewLength = 0;
 	for (int i = 0; source[i]; i++) {
 		if (source[i] == '<') {
-			i += (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - source) + 1;
+			i = (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - source);
 			int TokenLength = BuiltinToken( Token, dest + NewLength );
 			if (TokenLength == -1) {
 				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
@@ -373,7 +373,7 @@ bool TLKImporter::GetNewStringLength(char* string, int& Length)
 		if (string[i] == '<') {
 			// token
 			lChange = true;
-			i += (int) (mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - string) + 1;
+			i = (int) (mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - string);
 			int TokenLength = BuiltinToken( Token, NULL );
 			if (TokenLength == -1) {
 				NewLength += core->GetTokenDictionary()->GetValueLength( Token );
