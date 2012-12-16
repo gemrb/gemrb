@@ -1976,7 +1976,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					}
 
 					//this works only if there are no spaces
-					if (*src++!='"' || *src++!=',' || *src++!='"' || *src++!='#') {
+					if (*src++!='"' || *src++!=',' || *src++!='"') {
 						break;
 					}
 					//reading the context string
