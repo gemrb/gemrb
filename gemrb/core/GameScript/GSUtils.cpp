@@ -1945,7 +1945,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				else {
 					i=0;
 				}
-				while (*src != '"') {
+				while (*src != '"' && *src != '#') {
 					if (*src == 0) {
 						delete newTrigger;
 						return NULL;
@@ -1976,12 +1976,12 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					}
 
 					//this works only if there are no spaces
-					if (*src++!='"' || *src++!=',' || *src++!='"') {
+					if (*src++!='"' || *src++!=',' || *src++!='"' || *src++!='#') {
 						break;
 					}
 					//reading the context string
 					i=0;
-					while (*src != '"') {
+					while (*src != '"' && *src != '#') {
 						if (*src == 0) {
 							delete newTrigger;
 							return NULL;
