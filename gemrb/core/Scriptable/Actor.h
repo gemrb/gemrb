@@ -693,6 +693,8 @@ public:
 	ieDword GetSpellFailure(bool arcana) const;
 	/* returns the dexterity AC adjusted by armor, iwd2 compatible */
 	int GetDexterityAC() const;
+	/* returns the monk wisdom AC adjusted by armor (iwd2) */
+	int GetWisdomAC() const;
 	/* PST specific criticals */
 	int GetCriticalType() const;
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */

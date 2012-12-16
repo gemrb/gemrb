@@ -2443,23 +2443,25 @@ int Actor::GetDexterityAC() const
 			dexbonus = 0;
 		}
 	}
-
-	//and the monk wisdom bonus
-	if (third) {
-		//if the monk has a shield equipped, no bonus
-		int itemtype = inventory.GetShieldItemType();
-		//items with critical range are weapons, not shields, so they are ok
-		//empty hand is also ok
-		if (GetStat(IE_LEVELMONK) && (itemtype==0xffff || core->GetArmorFailure(itemtype))) {
-			//too many variables, recycling
-			itemtype = GetAbilityBonus(IE_WIS);
-			//add the bonus only if it is a bonus (the dexbonus is negative)
-			if (itemtype>0) {
-				dexbonus += itemtype;
-			}
-		}
-	}
 	return dexbonus;
+}
+
+//wisdom AC bonus for 3ed light monks
+int Actor::GetWisdomAC() const
+{
+	if (!third) {
+		return 0;
+	}
+
+	int bonus = 0;
+	//if the monk has a shield equipped, no bonus
+	int itemtype = inventory.GetShieldItemType();
+	//items with critical range are weapons, not shields, so they are ok
+	//empty hand is also ok
+	if (GetStat(IE_LEVELMONK) && (itemtype==0xffff || core->GetArmorFailure(itemtype))) {
+		bonus = GetAbilityBonus(IE_WIS);
+	}
+	return bonus;
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
@@ -5918,7 +5920,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker) const
 		}
 	}
 	//Dexterity bonus is stored negative in 2da files.
-	defense += GetDexterityAC();
+	defense += GetDexterityAC()+GetWisdomAC();
 
 	if (attacker) {
 		defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
