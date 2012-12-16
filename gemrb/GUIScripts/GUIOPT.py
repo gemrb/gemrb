@@ -29,6 +29,7 @@
 # 9 - Autopause options window
 
 ###################################################
+import CommonWindow
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -99,6 +100,7 @@ def OpenOptionsWindow ():
 		CloseOptionsWindow()
 		return
 
+	CommonWindow.CloseContainerWindow ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 	if GUICommon.GameIsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
