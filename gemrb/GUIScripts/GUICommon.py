@@ -362,7 +362,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
 	# encumbrance
-	max_encumb = CommonTables.StrMod.GetValue (sstr, 3) + CommonTables.StrModEx.GetValue (ext_str, 3)
+	max_encumb = GemRB.GetAbilityBonus (IE_STR, 3, sstr, ext_str)
 	if GemRB.HasFeat (pc, FEAT_STRONG_BACK):
 		max_encumb += max_encumb/2
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
