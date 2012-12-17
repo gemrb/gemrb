@@ -118,6 +118,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 
 	//no exploring while in dialogue
 	gc->SetScreenFlags(/*SF_GUIENABLED|*/SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
+	gc->SetScrolling(false);
 	Log(WARNING, "DialogHandler", "Errors occuring while in dialog mode cannot be logged in the MessageWindow.");
 	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
 
