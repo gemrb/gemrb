@@ -168,6 +168,7 @@ public: //Events
 	void OnSpecialKeyPress(unsigned char Key);
 	void DisplayTooltip();
 	void UpdateScrolling();
+	void SetScrolling(bool scroll);
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
 	void SetScreenFlags(int value, int mode);

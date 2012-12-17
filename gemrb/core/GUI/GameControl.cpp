@@ -1360,13 +1360,10 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 		if ((moveX != 0 || moveY != 0) && touched) {
-			scrolling = true;
+			SetScrolling(true);
 			return;
 		} else {
-			moveX = 0;
-			moveY = 0;
-			scrolling = false;
-			video->SetCursor(NULL, VID_CUR_DRAG);
+			SetScrolling(false);
 		}
 	}
 
@@ -1573,14 +1570,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 				moveY = 0;
 		}
 
-		if (moveX != 0 || moveY != 0) {
-			scrolling = true;
-		} else if (scrolling) {
-			scrolling = false;
-			// only clear the drag cursor when changing scrolling to false!
-			// clearing on every move kills drag operations such as dragging portraits
-			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
-		}
+		SetScrolling(moveX != 0 || moveY != 0);
 	}
 }
 #endif
@@ -1607,6 +1597,20 @@ void GameControl::UpdateScrolling() {
 	cursor->release();
 
 	numScrollCursor = (numScrollCursor+1) % 15;
+}
+
+void GameControl::SetScrolling(bool scroll) {
+	if (scrolling != scroll) {
+		scrolling = scroll;
+		if (!scrolling) {
+			moveX = 0;
+			moveY = 0;
+
+			// only clear the drag cursor when changing scrolling to false!
+			// clearing on every move kills drag operations such as dragging portraits
+			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
+		}
+	}
 }
 
 //generate action code for source actor to try to attack a target
@@ -2035,11 +2039,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	if (touchScrollAreasEnabled) {
 		touched=false;
 		if (scrolling) {
-			moveX = 0;
-			moveY = 0;
-			scrolling=false;
-			Video* video = core->GetVideoDriver();
-			video->SetCursor(NULL, VID_CUR_DRAG);
+			SetScrolling(false);
 			if (DrawSelectionRect) {
 				Actor** ab;
 				unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
