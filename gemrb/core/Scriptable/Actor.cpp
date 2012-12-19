@@ -2446,7 +2446,7 @@ int Actor::GetDexterityAC() const
 //wisdom AC bonus for 3ed light monks
 int Actor::GetWisdomAC() const
 {
-	if (!third) {
+	if (!third || !GetStat(IE_LEVELMONK)) {
 		return 0;
 	}
 
@@ -2455,7 +2455,7 @@ int Actor::GetWisdomAC() const
 	int itemtype = inventory.GetShieldItemType();
 	//items with critical range are weapons, not shields, so they are ok
 	//empty hand is also ok
-	if (GetStat(IE_LEVELMONK) && (itemtype==0xffff || core->GetArmorFailure(itemtype))) {
+	if (itemtype == 0xffff || core->GetArmorFailure(itemtype)) {
 		bonus = GetAbilityBonus(IE_WIS);
 	}
 	return bonus;
