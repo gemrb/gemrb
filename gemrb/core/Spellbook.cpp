@@ -1007,7 +1007,7 @@ SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, 
 
 void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const ieResRef spellname, unsigned int idx)
 {
-	Spell *spl = gamedata->GetSpell(spellname);
+	Spell *spl = gamedata->GetSpell(spellname, true);
 	if (!spl)
 		return;
 	if (spl->ExtHeaderCount<1)
