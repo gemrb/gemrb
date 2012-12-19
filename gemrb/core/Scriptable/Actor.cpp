@@ -2416,14 +2416,11 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 //dexterity AC (the lesser the better), do another negation for 3ED rules
 int Actor::GetDexterityAC() const
 {
-	int dexbonus;
-
-	if (third) {
-		dexbonus = GetAbilityBonus(IE_DEX);
-	} else {
-		dexbonus = core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	if (!third) {
+		return core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX));
 	}
 
+	int dexbonus = GetAbilityBonus(IE_DEX);
 	if (dexbonus) {
 		// FIXME: the maximum dexterity bonus isn't stored(?),
 		// but can usually be calculated from 8-AC+enchantment (or 8-AC if you don't count that bonus in AC already)
