@@ -161,7 +161,7 @@ CREItem *Inventory::GetItem(unsigned int slot)
 //if their charge is zero
 static inline void HackCharges(CREItem *item)
 {
-	Item *itm = gamedata->GetItem( item->ItemResRef );
+	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (itm) {
 		for (int i=0;i<3;i++) {
 			if (item->Usages[i]) {
@@ -203,7 +203,7 @@ void Inventory::CalculateWeight() const
 			continue;
 		}
 		if (slot->Weight == -1) {
-			Item *itm = gamedata->GetItem( slot->ItemResRef );
+			Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 			if (itm) {
 				//simply adding the item flags to the slot
 				slot->Flags |= (itm->Flags<<8);
@@ -412,9 +412,10 @@ void Inventory::KillSlot(unsigned int index)
 		return;
 	}
 	RemoveSlotEffects( index );
-	Item *itm = gamedata->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	//this cannot happen, but stuff happens!
 	if (!itm) {
+		error("Inventory", "Invalid item: %s!", item->ItemResRef);
 		return;
 	}
 	ItemExcl &= ~itm->ItemExcl;
@@ -453,7 +454,7 @@ void Inventory::KillSlot(unsigned int index)
 					int weaponslot = FindTypedRangedWeapon(type);
 					CREItem *item2 = Slots[weaponslot];
 					if (item2) {
-						Item *itm2 = gamedata->GetItem(item2->ItemResRef);
+						Item *itm2 = gamedata->GetItem(item2->ItemResRef, true);
 						if (itm2) {
 							if (type == header->ProjectileQualifier) {
 								Equipped = FindRangedProjectile(header->ProjectileQualifier);
@@ -770,9 +771,11 @@ int Inventory::DepleteItem(ieDword flags)
 
 		//if flags = 0 then weapons are not depleted
 		if (!flags) {
-			Item *itm = gamedata->GetItem( item->ItemResRef );
-			if (!itm)
+			Item *itm = gamedata->GetItem(item->ItemResRef, true);
+			if (!itm) {
+				Log(WARNING, "Inventory", "Invalid item to deplete: %s!", item->ItemResRef);
 				continue;
+			}
 			//if the item is usable in weapon slot, then it is weapon
 			int weapon = core->CanUseItemType( SLOT_WEAPON, itm );
 			gamedata->FreeItem( itm, item->ItemResRef, false );
@@ -952,7 +955,7 @@ bool Inventory::EquipItem(ieDword slot)
 
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
-	Item *itm = gamedata->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (!itm) {
 		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef, slot);
 		return false;
@@ -1757,7 +1760,7 @@ void Inventory::UpdateWeaponAnimation()
 				si = GetSlotItem( (ieDword) slot );
 			}
 			if (si) {
-				Item* it = gamedata->GetItem(si->ItemResRef);
+				Item* it = gamedata->GetItem(si->ItemResRef, true);
 				if (core->CanUseItemType(SLOT_WEAPON, it))
 					twoweapon = true;
 				gamedata->FreeItem(it, si->ItemResRef, false);
@@ -1862,7 +1865,7 @@ void Inventory::ChargeAllItems(int hours)
 			continue;
 		}
 
-		Item *itm = gamedata->GetItem( item->ItemResRef );
+		Item *itm = gamedata->GetItem(item->ItemResRef, true);
 		if (!itm)
 			continue;
 		for(int h=0;h<CHARGE_COUNTERS;h++) {
@@ -1923,7 +1926,7 @@ bool Inventory::ProvidesCriticalAversion()
 			continue;
 		}
 
-		Item *itm = gamedata->GetItem(item->ItemResRef);
+		Item *itm = gamedata->GetItem(item->ItemResRef, true);
 		if (!itm) {
 			continue;
 		}

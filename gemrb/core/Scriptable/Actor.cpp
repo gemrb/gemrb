@@ -4784,8 +4784,11 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	}
 	const CREItem *slot = inventory.GetSlotItem(idx);
 	if (!slot) return; //quick item slot is empty
-	Item *itm = gamedata->GetItem(slot->ItemResRef);
-	if (!itm) return; //quick item slot contains invalid item resref
+	Item *itm = gamedata->GetItem(slot->ItemResRef, true);
+	if (!itm) {
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef);
+		return; //quick item slot contains invalid item resref
+	}
 	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
 	//item has no extended header, or header index is wrong
 	if (!ext_header) return;
@@ -4901,7 +4904,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
 			const CREItem *slotitm = inventory.GetSlotItem(slot);
 			assert(slotitm);
-			Item *itm = gamedata->GetItem(slotitm->ItemResRef);
+			Item *itm = gamedata->GetItem(slotitm->ItemResRef, true);
 			assert(itm);
 			ITMExtHeader *ext_header = itm->GetExtHeader(header);
 			if (ext_header) {
@@ -5113,8 +5116,9 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	if (!wield) {
 		return NULL;
 	}
-	Item *item = gamedata->GetItem(wield->ItemResRef);
+	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
+		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef);
 		return NULL;
 	}
 	//The magic of the bow and the arrow add up?
@@ -5136,8 +5140,9 @@ int Actor::IsDualWielding() const
 		return 0;
 	}
 
-	Item *itm = gamedata->GetItem( wield->ItemResRef );
+	Item *itm = gamedata->GetItem(wield->ItemResRef, true);
 	if (!itm) {
+		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef);
 		return 0;
 	}
 
@@ -5159,8 +5164,9 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	if (!wield) {
 		return 0;
 	}
-	Item *item = gamedata->GetItem(wield->ItemResRef);
+	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
+		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef);
 		return 0;
 	}
 
@@ -7583,8 +7589,11 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ieResRef tmpresref;
 	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
 
-	Item *itm = gamedata->GetItem(tmpresref);
-	if (!itm) return false; //quick item slot contains invalid item resref
+	Item *itm = gamedata->GetItem(tmpresref, true);
+	if (!itm) {
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmpresref);
+		return false; //quick item slot contains invalid item resref
+	}
 	//item is depleted for today
 	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
@@ -7706,7 +7715,10 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
 
 	Item *itm = gamedata->GetItem(tmpresref);
-	if (!itm) return false; //quick item slot contains invalid item resref
+	if (!itm) {
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmpresref);
+		return false; //quick item slot contains invalid item resref
+	}
 	//item is depleted for today
 	if (itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
@@ -7752,9 +7764,12 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		item = inventory.GetSlotItem(slot);
 		if (!item)
 			return;
-		itm = gamedata->GetItem(item->ItemResRef);
+		itm = gamedata->GetItem(item->ItemResRef, true);
 	}
-	if (!itm) return; //quick item slot contains invalid item resref
+	if (!itm) {
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", item->ItemResRef);
+		return; //quick item slot contains invalid item resref
+	}
 
 	if (IsSelected()) {
 		core->SetEventFlag( EF_ACTION );

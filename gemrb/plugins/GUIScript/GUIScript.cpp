@@ -5576,7 +5576,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		//no incref here!
 		return Py_None;
 	}
-	Item* item = gamedata->GetItem(ItemResRef);
+	Item* item = gamedata->GetItem(ItemResRef, true);
 	if (item == NULL) {
 		btn->SetPicture(NULL);
 		//no incref here!
@@ -5607,7 +5607,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		Picture = GetUsedWeaponIcon(item, Which-4);
 		if (Item2ResRef) {
 			btn->SetPicture( NULL ); // also calls ClearPictureList
-			Item* item2 = gamedata->GetItem(Item2ResRef);
+			Item* item2 = gamedata->GetItem(Item2ResRef, true);
 			if (item2) {
 				Sprite2D* Picture2;
 				Picture2 = gamedata->GetBAMSprite(item2->ItemIcon, -1, Which-4);
@@ -5798,8 +5798,9 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (ci->Usages[2]));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ci->Flags));
 
-	Item *item = gamedata->GetItem( ci->ItemResRef );
+	Item *item = gamedata->GetItem(ci->ItemResRef, true);
 	if (!item) {
+		Log(MESSAGE, "GUIScript", "Cannot find container (%s) item %s!", container->GetScriptName(), ci->ItemResRef);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
@@ -6072,7 +6073,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
 	}
-	Item *item = gamedata->GetItem( ItemResRef );
+	Item *item = gamedata->GetItem(ItemResRef, true);
 	if (!item) {
 		Log(ERROR, "GUIScript", "Invalid resource reference: %s",
 			ItemResRef);
@@ -6331,8 +6332,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( amount ) );
 	}
 
-	Item *item = gamedata->GetItem( si->ItemResRef );
-
+	Item *item = gamedata->GetItem(si->ItemResRef, true);
 	if (!item) {
 		Log(WARNING, "GUIScript", "Item is not available???");
 		Py_INCREF( Py_None );
@@ -7187,8 +7187,9 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	if (!ItemName[0]) {
 		return PyInt_FromLong(0);
 	}
-	Item *item = gamedata->GetItem(ItemName);
+	Item *item = gamedata->GetItem(ItemName, true);
 	if (!item) {
+		Log(MESSAGE, "GUIScript", "Cannot find item %s to check!", ItemName);
 		return PyInt_FromLong(0);
 	}
 	Actor* actor = NULL;
@@ -7292,8 +7293,9 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		actor = game->FindPC( PartyID );
 	}
 
-	Item* item = gamedata->GetItem(ResRef);
+	Item* item = gamedata->GetItem(ResRef, true);
 	if (item == NULL) {
+		Log(MESSAGE, "GUIScript", "Cannot get item %s!", ResRef);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}

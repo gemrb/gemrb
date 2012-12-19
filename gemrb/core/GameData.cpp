@@ -289,13 +289,13 @@ void GameData::FreePalette(Palette *&pal, const ieResRef name)
 	pal = NULL;
 }
 
-Item* GameData::GetItem(const ieResRef resname)
+Item* GameData::GetItem(const ieResRef resname, bool silent)
 {
 	Item *item = (Item *) ItemCache.GetResource(resname);
 	if (item) {
 		return item;
 	}
-	DataStream* str = GetResource( resname, IE_ITM_CLASS_ID );
+	DataStream* str = GetResource(resname, IE_ITM_CLASS_ID, silent);
 	PluginHolder<ItemMgr> sm(IE_ITM_CLASS_ID);
 	if (!sm) {
 		delete ( str );

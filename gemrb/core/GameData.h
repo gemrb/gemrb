@@ -85,7 +85,7 @@ public:
 	Palette* GetPalette(const ieResRef resname);
 	void FreePalette(Palette *&pal, const ieResRef name=NULL);
 	
-	Item* GetItem(const ieResRef resname);
+	Item* GetItem(const ieResRef resname, bool silent=false);
 	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
 	Spell* GetSpell(const ieResRef resname, bool silent=false);
 	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);

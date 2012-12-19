@@ -1035,7 +1035,7 @@ int Interface::GetItemTooltip(const ieResRef itemname, int header, int identifie
 	if (value && (value[header]>=0)) {
 		return value[header];
 	}
-	Item *item = gamedata->GetItem(itemname);
+	Item *item = gamedata->GetItem(itemname, true);
 	if (!item) {
 		return -1;
 	}
