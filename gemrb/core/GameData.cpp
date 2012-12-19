@@ -433,11 +433,11 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
+Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
 {
 	Sprite2D *tspr;
 	AnimationFactory* af = ( AnimationFactory* )
-		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL, silent );
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );

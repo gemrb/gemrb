@@ -5538,9 +5538,9 @@ static Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 		ieh = item->GetWeaponHeader(true);
 	}
 	if (ieh) {
-		return gamedata->GetBAMSprite(ieh->UseIcon, -1, which);
+		return gamedata->GetBAMSprite(ieh->UseIcon, -1, which, true);
 	}
-	return gamedata->GetBAMSprite(item->ItemIcon, -1, which);
+	return gamedata->GetBAMSprite(item->ItemIcon, -1, which, true);
 }
 
 static void SetItemText(int wi, int ci, int charges, bool oneisnone)
@@ -5589,12 +5589,12 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 	int i;
 	switch (Which) {
 	case 0: case 1:
-		Picture = gamedata->GetBAMSprite(item->ItemIcon, -1, Which);
+		Picture = gamedata->GetBAMSprite(item->ItemIcon, -1, Which, true);
 		break;
 	case 2:
 		btn->SetPicture( NULL ); // also calls ClearPictureList
 		for (i=0;i<4;i++) {
-			Picture = gamedata->GetBAMSprite(item->DescriptionIcon, -1, i);
+			Picture = gamedata->GetBAMSprite(item->DescriptionIcon, -1, i, true);
 			if (Picture)
 				btn->StackPicture(Picture);
 		}
@@ -5610,7 +5610,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			Item* item2 = gamedata->GetItem(Item2ResRef, true);
 			if (item2) {
 				Sprite2D* Picture2;
-				Picture2 = gamedata->GetBAMSprite(item2->ItemIcon, -1, Which-4);
+				Picture2 = gamedata->GetBAMSprite(item2->ItemIcon, -1, Which-4, true);
 				if (Picture2) btn->StackPicture(Picture2);
 				gamedata->FreeItem( item2, Item2ResRef, false );
 			}
@@ -5621,7 +5621,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 	default:
 		ITMExtHeader *eh = item->GetExtHeader(Which-6);
 		if (eh) {
-			Picture = gamedata->GetBAMSprite(eh->UseIcon, -1, 0);
+			Picture = gamedata->GetBAMSprite(eh->UseIcon, -1, 0, true);
 		}
 		else {
 			Picture = NULL;
@@ -8566,11 +8566,11 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 		Sprite2D *Picture = NULL;
 
 		if (item->UseIcon[0]) {
-			Picture = gamedata->GetBAMSprite(item->UseIcon, 1, 0);
+			Picture = gamedata->GetBAMSprite(item->UseIcon, 1, 0, true);
 			// try cycle 0 if cycle 1 doesn't exist
 			// (needed for e.g. sppr707b which is used by Daystar's Sunray)
 			if (!Picture)
-				Picture = gamedata->GetBAMSprite(item->UseIcon, 0, 0);
+				Picture = gamedata->GetBAMSprite(item->UseIcon, 0, 0, true);
 		}
 
 		if (!Picture) {

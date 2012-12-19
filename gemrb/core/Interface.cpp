@@ -5206,7 +5206,7 @@ Sprite2D *Interface::GetCursorSprite()
 
 Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 {
-	return gamedata->GetBAMSprite(ScrollCursorBam, frameNum, spriteNum);
+	return gamedata->GetBAMSprite(ScrollCursorBam, frameNum, spriteNum, true);
 }
 
 /* we should return -1 if it isn't gold, otherwise return the gold value */

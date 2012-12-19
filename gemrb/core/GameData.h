@@ -96,7 +96,7 @@ public:
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
-	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);
+	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
 
 	/** returns factory resource, currently works only with animations */
 	void* GetFactoryResource(const char* resname, SClass_ID type,
