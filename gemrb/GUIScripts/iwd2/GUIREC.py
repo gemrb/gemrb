@@ -374,6 +374,10 @@ def DisplayGeneral (pc):
 
 	return
 
+# some of the displayed stats are manually indented
+def AddIndent():
+	RecordsTextArea.Append ("   ", -1)
+
 def PlusMinusStat(value):
 	if value > 0:
 		return "+" + str(value)
@@ -410,20 +414,20 @@ def DisplayWeapons (pc):
 			tmpstr = tmpstr  + "/" + PlusMinusStat(total-i*babDec)
 	RecordsTextArea.Append (delimited_txt (734, ":", tmpstr, 0))
 	# Base
-	RecordsTextArea.Append ("  ", -1) # indentation
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (31353, ":", str (GS(IE_TOHIT)), 0))
 	total = total - GS(IE_TOHIT)
 	# Weapon bonus
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (32560 , ":", str (0), 0))
 	# Proficiency bonus
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (32561, ":", str (0), 0))
 	# Armor Penalty
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
 	# Shield Penalty (if you don't have the shield proficiency feat; maybe more)
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (39822 , ":", str (0), 0))
 	# Ability  bonus
 	#FIXME: this is different for ranged weapons (dex only)
@@ -434,11 +438,11 @@ def DisplayWeapons (pc):
 		if dexbon > strbon:
 			strbon = dexbon
 	if strbon:
-		RecordsTextArea.Append ("  ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (33547, ":", str (strbon), 0))
 	total = total - strbon
 	# Others
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (33548, ":", str (total))) # just the remnants of "total"
 	RecordsTextArea.Append ("\n")
 
@@ -463,31 +467,31 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append (delimited_txt (33553, ":", str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
-	RecordsTextArea.Append ("   ", -1) # indentation
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (31353, ":", str (ac["Natural"]), 0))
 	# Armor
 	if ac["Armor"]:
-		RecordsTextArea.Append ("   ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (11997, ":", PlusMinusStat (ac["Armor"]), 0))
 	# Shield
 	if ac["Shield"]:
-		RecordsTextArea.Append ("   ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (6347, ":", PlusMinusStat (ac["Shield"]), 0))
 	# Deflection
 	if ac["Deflection"]:
-		RecordsTextArea.Append ("   ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (33551, ":", PlusMinusStat (ac["Deflection"]), 0))
 	# Generic
 	if ac["Generic"]:
-		RecordsTextArea.Append ("   ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (33552, ":", PlusMinusStat (ac["Generic"]), 0))
 	# Dexterity
 	if ac["Dexterity"]:
-		RecordsTextArea.Append ("   ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (1151, ":", PlusMinusStat (ac["Dexterity"]), 0))
 	# Monk Wisdom Bonus: <number> to AC
 	if ac["Wisdom"]:
-		RecordsTextArea.Append ("   ", -1)
+		AddIndent()
 		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
 		RecordsTextArea.Append (39431, -1)
 
@@ -503,19 +507,19 @@ def DisplayWeapons (pc):
 
 		# Missile
 		if GS (IE_ACMISSILEMOD):
-			RecordsTextArea.Append ("  ", -1) # indentation
+			AddIndent()
 			RecordsTextArea.Append (delimited_txt (11767, ":", str (GS (IE_ACMISSILEMOD)), 0))
 		# Slashing
 		if GS (IE_ACSLASHINGMOD):
-			RecordsTextArea.Append ("  ", -1)
+			AddIndent()
 			RecordsTextArea.Append (delimited_txt (11768, ":", str (GS (IE_ACSLASHINGMOD)), 0))
 		# Piercing
 		if GS (IE_ACPIERCINGMOD):
-			RecordsTextArea.Append ("  ", -1)
+			AddIndent()
 			RecordsTextArea.Append (delimited_txt (11769, ":", str (GS (IE_ACPIERCINGMOD)), 0))
 		# Bludgeoning
 		if GS (IE_ACCRUSHINGMOD):
-			RecordsTextArea.Append ("  ", -1)
+			AddIndent()
 			RecordsTextArea.Append (delimited_txt (11770, ":", str (GS (IE_ACCRUSHINGMOD))))
 
 		RecordsTextArea.Append ("\n")
@@ -530,10 +534,10 @@ def DisplayWeapons (pc):
 		# Casting Failure
 		RecordsTextArea.Append (delimited_txt (41390 , ":", str (GS(IE_SPELLFAILUREMAGE)), 0))
 		# Armor Penalty
-		RecordsTextArea.Append ("  ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
 		# Shield Penalty
-		RecordsTextArea.Append ("  ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (39822, ":", str (0), 0))
 		#TODO: check if there's also the bonus from armored arcana
 
@@ -555,19 +559,19 @@ def DisplayWeapons (pc):
 
 	# Damage
 	# TODO: display the unresolved damage string (2d6)
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (39518, ":", str (0), 0))
 	# Strength
 	# TODO: check if the weapon takes strength bonus at all
 	if GA(IE_STR):
-		RecordsTextArea.Append ("  ", -1)
+		AddIndent()
 		RecordsTextArea.Append (delimited_txt (1145, ":", str (GA(IE_STR)), 0))
 	# Launcher
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (41408, ":", str (0), 0))
 	# Damage Potential
 	# TODO: display the unresolved total damage potential (2-12)
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (41120, ":", str (0), 0))
 	# Critical Hit (19-20 / x2)
 	# TODO: display the number of rolls and check if the critical range is already ok
@@ -576,7 +580,7 @@ def DisplayWeapons (pc):
 		crange = "20 / x" + str(1)
 	else:
 		crange = str(crange) + "-20 / x" + str(1)
-	RecordsTextArea.Append ("  ", -1)
+	AddIndent()
 	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
 
 	#TODO: probably repeat for the off-hand
