@@ -533,7 +533,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 void SDL20VideoDriver::HideSoftKeyboard()
 {
 	if(core->UseSoftKeyboard){
-		SDL_HideScreenKeyboard(window);
+		SDL_StopTextInput();
 		if(core->ConsolePopped) core->PopupConsole();
 	}
 }
@@ -544,7 +544,7 @@ void SDL20VideoDriver::HideSoftKeyboard()
 void SDL20VideoDriver::ShowSoftKeyboard()
 {
 	if(core->UseSoftKeyboard){
-		SDL_ShowScreenKeyboard(window);
+		SDL_StartTextInput();
 	}
 }
 
