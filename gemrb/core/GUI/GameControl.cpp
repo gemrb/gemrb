@@ -1927,6 +1927,14 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			trap->GetCurrentArea()->LastGoCloser = 0;
 			return false;
 		case ST_TRIGGER:
+			// always display overhead text; totsc's ar0511 library relies on it
+			if (trap->overHeadText) {
+				if (trap->textDisplaying != 1) {
+					trap->textDisplaying = 1;
+					trap->timeStartDisplaying = core->GetGame()->Ticks;
+					DisplayString( trap );
+				}
+			}
 			//the importer shouldn't load the script
 			//if it is unallowed anyway (though
 			//deactivated scripts could be reactivated)
@@ -1941,14 +1949,6 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 					// FIXME
 					trap->ExecuteScript(1);
 					trap->ProcessActions();
-				}
-			} else {
-				if (trap->overHeadText) {
-					if (trap->textDisplaying != 1) {
-						trap->textDisplaying = 1;
-						trap->timeStartDisplaying = core->GetGame()->Ticks;
-						DisplayString( trap );
-					}
 				}
 			}
 			if (trap->GetUsePoint() ) {
