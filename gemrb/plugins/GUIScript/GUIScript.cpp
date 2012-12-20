@@ -9862,6 +9862,18 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "CriticalBonus", PyInt_FromLong (CriticalBonus));
 	PyDict_SetItemString(dict, "Style", PyInt_FromLong (style));
 	PyDict_SetItemString(dict, "APR", PyInt_FromLong (actor->GetNumberOfAttacks() ));
+
+	actor->AC.dump();
+	PyObject *ac = PyDict_New();
+	PyDict_SetItemString(ac, "Total", PyInt_FromLong (actor->AC.GetTotal()));
+	PyDict_SetItemString(ac, "Natural", PyInt_FromLong (actor->AC.GetNatural()));
+	PyDict_SetItemString(ac, "Armor", PyInt_FromLong (actor->AC.GetArmorBonus()));
+	PyDict_SetItemString(ac, "Shield", PyInt_FromLong (actor->AC.GetShieldBonus()));
+	PyDict_SetItemString(ac, "Deflection", PyInt_FromLong (actor->AC.GetDeflectionBonus()));
+	PyDict_SetItemString(ac, "Generic", PyInt_FromLong (actor->AC.GetGenericBonus()));
+	PyDict_SetItemString(ac, "Dexterity", PyInt_FromLong (actor->AC.GetDexterityBonus()));
+	PyDict_SetItemString(ac, "Wisdom", PyInt_FromLong (actor->AC.GetWisdomBonus()));
+	PyDict_SetItemString(dict, "AC", ac);
 	return dict;
 }
 

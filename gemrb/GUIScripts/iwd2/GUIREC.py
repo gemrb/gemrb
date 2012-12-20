@@ -456,36 +456,40 @@ def DisplayWeapons (pc):
 
 	###################
 	# Armor Class
+	ac = combatdet["AC"]
 	RecordsTextArea.Append ("[color=ffff00]")
 	RecordsTextArea.Append (33553)
 	RecordsTextArea.Append ("[/color]\n")
-	RecordsTextArea.Append (delimited_txt (33553, ":", str (GS(IE_ARMORCLASS)), 0))
+	RecordsTextArea.Append (delimited_txt (33553, ":", str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
-	RecordsTextArea.Append ("  ", -1) # indentation
-	RecordsTextArea.Append (delimited_txt (31353, ":", str (10), 0))
+	RecordsTextArea.Append ("   ", -1) # indentation
+	RecordsTextArea.Append (delimited_txt (31353, ":", str (ac["Natural"]), 0))
 	# Armor
-	RecordsTextArea.Append ("  ", -1)
-	RecordsTextArea.Append (delimited_txt (11997, ":", str (0), 0))
+	if ac["Armor"]:
+		RecordsTextArea.Append ("   ", -1)
+		RecordsTextArea.Append (delimited_txt (11997, ":", PlusMinusStat (ac["Armor"]), 0))
 	# Shield
-	RecordsTextArea.Append ("  ", -1)
-	RecordsTextArea.Append (delimited_txt (6347, ":", str (0), 0))
+	if ac["Shield"]:
+		RecordsTextArea.Append ("   ", -1)
+		RecordsTextArea.Append (delimited_txt (6347, ":", PlusMinusStat (ac["Shield"]), 0))
 	# Deflection
-	RecordsTextArea.Append ("  ", -1)
-	RecordsTextArea.Append (delimited_txt (33551, ":", str (0), 0))
+	if ac["Deflection"]:
+		RecordsTextArea.Append ("   ", -1)
+		RecordsTextArea.Append (delimited_txt (33551, ":", PlusMinusStat (ac["Deflection"]), 0))
 	# Generic
-	RecordsTextArea.Append ("  ", -1)
-	RecordsTextArea.Append (delimited_txt (33552, ":", str (0), 0))
+	if ac["Generic"]:
+		RecordsTextArea.Append ("   ", -1)
+		RecordsTextArea.Append (delimited_txt (33552, ":", PlusMinusStat (ac["Generic"]), 0))
 	# Dexterity
-	if GA(IE_DEX):
-		RecordsTextArea.Append ("  ", -1)
-		RecordsTextArea.Append (delimited_txt (1151, ":", str (GA(IE_DEX)), 0))
+	if ac["Dexterity"]:
+		RecordsTextArea.Append ("   ", -1)
+		RecordsTextArea.Append (delimited_txt (1151, ":", PlusMinusStat (ac["Dexterity"]), 0))
 	# Monk Wisdom Bonus: <number> to AC
-	if GS(IE_LEVELMONK):
-		RecordsTextArea.Append ("  ", -1)
-		GemRB.SetToken ("number", str (GA(IE_WIS)))
+	if ac["Wisdom"]:
+		RecordsTextArea.Append ("   ", -1)
+		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
 		RecordsTextArea.Append (39431, -1)
-	#TODO: Dodge?
 
 	RecordsTextArea.Append ("\n\n")
 
