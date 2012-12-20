@@ -5480,14 +5480,14 @@ static int SetLevelBAB(int level, ieDword index)
 // return the base APR derived from the base attack bonus, which we have to construct here too
 int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 {
-	int pBAB = BaseStats[IE_TOHIT];
+	int pBAB = 0;
 	int pBABDecrement = BaseAttackBonusDecrement;
 	ieDword MonkLevel = 0;
 	ieDword LevelSum = 0;
 	int i;
 
 	if (!third) {
-		BAB = pBAB;
+		BAB = BaseStats[IE_TOHIT];
 		return 0;
 	}
 
