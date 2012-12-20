@@ -8932,9 +8932,9 @@ int Actor::GetArmorFailure(int profcheck) const
 	int penalty = core->GetArmorFailure(armorType);
 	int weightClass = 0;
 
-	if (penalty >= 1 || penalty < 4) {
+	if (penalty >= 1 && penalty < 4) {
 		weightClass = 1;
-	} else if (penalty >= 4 || penalty < 7) {
+	} else if (penalty >= 4 && penalty < 7) {
 		weightClass = 2;
 	} else if (penalty >= 7) {
 		weightClass = 3;
