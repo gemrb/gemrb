@@ -6690,7 +6690,7 @@ void Actor::UpdateAnimations()
 
 	//make actor unselectable and unselected when it is not moving
 	//dead, petrified, frozen, paralysed or unavailable to player
-	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY)) {
+	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL)) {
 		core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	}
 
