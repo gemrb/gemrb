@@ -251,7 +251,6 @@ def RefreshInventoryWindow ():
 
 	#armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
 	Label = Window.GetControl (0x10000038)
 	Label.SetText (str (ac))
 

@@ -623,11 +623,10 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 }
 
 // fx_ac_vs_damage_type_modifier_iwd2
+// the major difference from bg2 are the different type values and more AC types
 int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_ac_vs_damage_type_modifier_iwd2(%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d", fx->Opcode, fx->Parameter1, fx->Parameter2,(int) fx->DiceSides,(int) fx->DiceThrown);
-	//check level was pulled outside as a common functionality
-	//CHECK_LEVEL();
 
 	// it is a bitmask
 	int type = fx->Parameter2;
@@ -636,33 +635,27 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Ef
 	switch(type)
 	{
 	case 0: //generic
-		HandleBonus(target, IE_ARMORCLASS, fx->Parameter1, fx->TimingMode);
+		target->AC.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		break;
 	case 1: //armor
-		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
-				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
-			}
-		} else {
-			if (STAT_GET( IE_ARMORCLASS) > fx->Parameter1) {
-				STAT_SET( IE_ARMORCLASS, fx->Parameter1 );
-			}
-		}
-		return FX_INSERT;
+		target->AC.SetArmorBonus(fx->Parameter1, 0);
+		break;
 	case 2: //deflection
+		target->AC.SetDeflectionBonus(fx->Parameter1, 0);
 		break;
 	case 3: //shield
+		target->AC.SetShieldBonus(fx->Parameter1, 0);
 		break;
-	case 4:
+	case 4: // crushing
 		HandleBonus(target, IE_ACCRUSHINGMOD, fx->Parameter1, fx->TimingMode);
 		break;
-	case 5:
+	case 5: // piercing
 		HandleBonus(target, IE_ACPIERCINGMOD, fx->Parameter1, fx->TimingMode);
 		break;
-	case 6:
+	case 6: // slashing
 		HandleBonus(target, IE_ACSLASHINGMOD, fx->Parameter1, fx->TimingMode);
 		break;
-	case 7:
+	case 7: // missile
 		HandleBonus(target, IE_ACMISSILEMOD, fx->Parameter1, fx->TimingMode);
 		break;
 	}
@@ -1964,7 +1957,7 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 		if (target->SetSpellState(SS_REBUKED)) {
 			//display string rebuked
 		}
-		STAT_SUB(IE_ARMORCLASS,4);
+		target->AC.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		break;
 	case 2://destroy
 		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
@@ -2772,7 +2765,8 @@ int fx_barkskin (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		bonus=3;
 	}
-	STAT_ADD(IE_ARMORCLASS,bonus);
+	target->AC.HandleFxBonus(bonus, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_BARKSKIN);
 		target->SetGradient(2);
@@ -3370,7 +3364,7 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		BASE_ADD( IE_HITPOINTS, fx->Parameter3);
 	}
 
-	STAT_ADD(IE_ARMORCLASS, 4); //FIXME: this is a bonus
+	target->AC.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD(IE_SAVEFORTITUDE, 5); //FIXME: this is a bonus
 	STAT_ADD(IE_MAXHITPOINTS, fx->Parameter3);
 	STAT_ADD(IE_STR, fx->Parameter4);
@@ -3430,7 +3424,7 @@ int fx_alicorn_lance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_alicorn_lance(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_ALICORNLANCE)) return FX_APPLIED;
 	////target->AddPortraitIcon(PI_ALICORN); //no portrait icon
-	STAT_SUB(IE_ARMORCLASS, 2);
+	target->AC.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	//color glow
 	if (enhanced_effects) {
 		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xb9, 0xb9, 0xb9);

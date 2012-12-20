@@ -247,9 +247,6 @@ def RefreshInventoryWindow ():
 
 	#armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	#temporary solution, the dexterity bonus should be handled by the core
-	#some ac bonuses are not cummulative with this AC bonus!
-	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
 	Label = Window.GetControl (0x10000038)
 	Label.SetText (str (ac))
 	Label.SetTooltip (10339)

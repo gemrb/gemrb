@@ -329,6 +329,11 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 
 static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, bool pcf)
 {
+	// special AC handling
+	if (StatID == IE_ARMORCLASS) {
+		actor->AC.SetNatural(StatValue);
+		return 1;
+	}
 	//this is a hack, if more PCStats fields are needed, improve it
 	if (StatID&EXTRASETTINGS) {
 		PCStatsStruct *ps = actor->PCStats;

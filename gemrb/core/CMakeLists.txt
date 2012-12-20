@@ -22,6 +22,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Calendar.cpp
 	Callback.cpp
 	CharAnimations.cpp
+	CombatInfo.cpp
 	Compressor.cpp
 	ControlAnimation.cpp
 	Core.cpp

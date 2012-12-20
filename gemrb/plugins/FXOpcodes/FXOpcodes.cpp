@@ -910,6 +910,14 @@ inline void HandlePercentageDamage(Effect *fx, Actor *target) {
 // Effect opcodes
 
 // 0x00 ACVsDamageTypeModifier
+// Known values for Parameter2 are:
+// 0   All
+// 1   Crushing
+// 2   Missile
+// 4   Piercing
+// 8   Slashing
+// 16  Base AC setting (sets the targets AC to the value specifiedg)
+// since the implemented ad&d doesn't have separate stats for all, we use them as the generic bonus
 int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_ac_vs_damage_type_modifier(%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d", fx->Opcode, fx->Parameter1, fx->Parameter2,(int) fx->DiceSides,(int) fx->DiceThrown);
@@ -929,20 +937,22 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 
 	// it is a bitmask
 	int type = fx->Parameter2;
-	if (type == 0) {
-		HandleBonus(target, IE_ARMORCLASS, fx->Parameter1, fx->TimingMode);
+	if (type == 0) { // generic bonus
+		target->AC.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		return FX_PERMANENT;
 	}
 
 	//convert to signed so -1 doesn't turn to an astronomical number
-	if (type == 16) {
+	if (type == 16) { // natural AC
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if ((signed)BASE_GET( IE_ARMORCLASS) > (signed)fx->Parameter1) {
-				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
+			if ((signed)target->AC.GetNatural() > (signed)fx->Parameter1) {
+				target->AC.SetNatural(fx->Parameter1);
 			}
 		} else {
-			if ((signed)STAT_GET( IE_ARMORCLASS) > (signed)fx->Parameter1) {
-				STAT_SET( IE_ARMORCLASS, fx->Parameter1 );
+			if ((signed)target->AC.GetTotal() > (signed)fx->Parameter1) {
+				// previously we were overriding the whole stat, but now we can be finegrained
+				// and reuse the deflection bonus, since iwd2 has its own version of this effect
+				target->AC.SetDeflectionBonus(- (target->AC.GetNatural()-fx->Parameter1));
 			}
 		}
 		return FX_INSERT;
@@ -1613,7 +1623,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case 1:
 		STATE_SET( STATE_INVIS2 );
 		if (fx->FirstApply || fx->TimingMode != FX_DURATION_INSTANT_PERMANENT) {
-			HandleBonus(target, IE_ARMORCLASS, 4, fx->TimingMode);
+			target->AC.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		}
 		break;
 	default:
@@ -2696,12 +2706,13 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->AddPortraitIcon(PI_BLIND);
 			if (core->HasFeature(GF_REVERSE_TOHIT)) {
 				//BG2
-				STAT_ADD (IE_ARMORCLASS, 4);
+				target->AC.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 				STAT_ADD (IE_TOHIT, 4);
 			} else {
 				//IWD2
-				STAT_SUB (IE_ARMORCLASS, 2);
-				// TODO: 50% inherent miss chance (full concealment), no dexterity bonus to AC (flatfooted)
+				target->AC.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+				// TODO: 50% inherent miss chance (full concealment)
+				target->AC.SetDexterityBonus(0); // no dexterity bonus to AC (caught flatfooted)
 				STAT_SUB (IE_TOHIT, 5);
 			}
 		}

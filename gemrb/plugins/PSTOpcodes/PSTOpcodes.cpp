@@ -941,9 +941,9 @@ int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1);
 	if (fx->Parameter2) {
-		STAT_ADD( IE_ARMORCLASS,2 );
+		target->AC.HandleFxBonus(2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	} else {
-		STAT_ADD( IE_ARMORCLASS,1 );
+		target->AC.HandleFxBonus(1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	}
 	return FX_APPLIED;
 }

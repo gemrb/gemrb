@@ -628,7 +628,7 @@ Targets *GameScript::BestAC(Scriptable* Sender, Targets *parameters, int ga_flag
 	while (i--) {
 		Actor *actor = game->GetPC(i, false);
 		if(actor->GetCurrentArea() == area) {
-			int ac = actor->GetStat(IE_ARMORCLASS);
+			int ac = actor->AC.GetTotal();
 			if (!scr || bestac>ac) {
 				bestac=ac;
 				scr=actor;
@@ -651,7 +651,7 @@ Targets *GameScript::WorstAC(Scriptable* Sender, Targets *parameters, int ga_fla
 	while (i--) {
 		Actor *actor = game->GetPC(i, false);
 		if(actor->GetCurrentArea() == area) {
-			int ac = actor->GetStat(IE_ARMORCLASS);
+			int ac = actor->AC.GetTotal();
 			if (!scr || worstac<ac) {
 				worstac=ac;
 				scr=actor;

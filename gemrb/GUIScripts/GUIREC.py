@@ -194,7 +194,6 @@ def UpdateRecordsWindow ():
 	# armorclass
 	Label = Window.GetControl (0x10000028)
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
 	Label.SetText (str (ac))
 	Label.SetTooltip (17183)
 

@@ -54,6 +54,7 @@
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "System/StringBuffer.h"
+#include <CombatInfo.h>
 
 #include <cassert>
 
@@ -520,6 +521,7 @@ Actor::Actor()
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
+	AC.SetOwner(this);
 }
 
 Actor::~Actor(void)
@@ -2791,6 +2793,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (PCStats) {
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
+	AC.ResetAll();
 
 	if (fx) {
 		fx->SetOwner(this);
@@ -2802,6 +2805,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//also clear the spell bonuses just given, they will be
 		//recalculated below again
 		spellbook.ClearBonus();
+		//AC.ResetAll(); // TODO: check if this is needed
 	}
 
 	unsigned int i;
@@ -2848,6 +2852,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 			}
 		}
 	}
+	// we need to recalc these, since the stats or equipped gear may have changed (and this is relevant in iwd2)
+	AC.SetWisdomBonus(GetWisdomAC());
+	AC.SetDexterityBonus(GetDexterityAC()); // FIXME: but the effects may reset this too and we shouldn't touch it in that case (flatfooted!)
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] < (ieDword)classcount)
@@ -5866,7 +5873,7 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 	return tohit;
 }
 
-int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker) const
+int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
 {
 	//specific damage type bonus.
 	int defense = 0;
@@ -5914,16 +5921,13 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker) const
 		}
 	}
 
-
 	if (! (wflags&WEAPON_BYPASS)) {
 		if (ReverseToHit) {
-			defense = GetStat(IE_ARMORCLASS)-defense;
+			defense = AC.GetTotal()-defense;
 		} else {
-			defense += GetStat(IE_ARMORCLASS);
+			defense += AC.GetTotal();
 		}
 	}
-	//Dexterity bonus is stored negative in 2da files.
-	defense += GetDexterityAC()+GetWisdomAC();
 
 	if (attacker) {
 		defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
@@ -8256,7 +8260,7 @@ void Actor::CreateDerivedStatsBG()
 	if (isclass[ISMONK]&(1<<classid)) {
 		unsigned int level = GetMonkLevel()-1;
 		if (level < monkbon_cols) {
-			BaseStats[IE_ARMORCLASS] = DEFAULTAC - monkbon[1][level];
+			AC.SetNatural(DEFAULTAC - monkbon[1][level]);
 			BaseStats[IE_ACMISSILEMOD] = - monkbon[2][level];
 		}
 	}

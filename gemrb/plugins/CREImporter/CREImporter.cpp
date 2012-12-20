@@ -964,7 +964,7 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadWord( &tmpWord );
 	//skipping a word
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -1309,7 +1309,7 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	//skipping a word( useful for something)
 	str->ReadWord( &tmpWord );
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -1397,7 +1397,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->ReadWord( &tmpWord );
 	//skipping a word
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -1620,7 +1620,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -1915,7 +1915,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->ReadWord( &tmpWord );
 	//skipping a word
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -2291,12 +2291,12 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
 	stream->Write( &tmpByte, 1 );
 	//from here it differs, slightly
-	tmpWord = actor->BaseStats[IE_ARMORCLASS];
+	tmpWord = actor->AC.GetNatural();
 	stream->WriteWord( &tmpWord);
 	//iwd2 doesn't store this a second time,
 	//probably gemrb format shouldn't either?
 	if (actor->version != IE_CRE_V2_2) {
-		tmpWord = actor->BaseStats[IE_ARMORCLASS];
+		tmpWord = actor->AC.GetNatural();
 		stream->WriteWord( &tmpWord);
 	}
 	tmpWord = actor->BaseStats[IE_ACCRUSHINGMOD];

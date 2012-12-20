@@ -29,6 +29,7 @@
 #include "ie_types.h"
 
 #include "Audio.h"
+#include "CombatInfo.h"
 #include "EffectQueue.h"
 #include "Palette.h"
 
@@ -38,6 +39,7 @@
 namespace GemRB {
 
 class Animation;
+class ArmorClass;
 class CharAnimations;
 class DataFileMgr;
 class Map;
@@ -308,6 +310,7 @@ public:
 	ieDword appearance;
 	ieDword ModalState;
 	int PathTries; //the # of previous tries to pick up a new walkpath
+	ArmorClass AC;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieDword UsedExit;
@@ -614,7 +617,7 @@ public:
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags, Actor *target) const;
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType, ieDword wflags, Actor *attacker) const;
+	int GetDefense(int DamageType, ieDword wflags, Actor *attacker);
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
