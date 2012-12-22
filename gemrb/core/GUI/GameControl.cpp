@@ -1175,8 +1175,9 @@ void GameControl::DisplayTooltip() {
 						// neutral: display name only
 						snprintf(buffer, 100, "%s", name);
 					} else if (strindex == -1) {
-						// non-neutral, not in party, no injured strings: display hp
-						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						// non-neutral, not in party, no injured strings: display name
+						// this case is mostly hit in bg1
+						snprintf(buffer, 100, "%s", name);
 					} else {
 						// non-neutral, not in party: display injured string
 						int strindex;
