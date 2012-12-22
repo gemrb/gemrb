@@ -491,7 +491,6 @@ def DisplayWeapons (pc):
 		RecordsTextArea.Append (delimited_txt (1151, ":", PlusMinusStat (ac["Dexterity"]), 0))
 	# Monk Wisdom Bonus: <number> to AC
 	if ac["Wisdom"]:
-		AddIndent()
 		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
 		RecordsTextArea.Append (39431, -1)
 
@@ -508,21 +507,21 @@ def DisplayWeapons (pc):
 		# Missile
 		if GS (IE_ACMISSILEMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11767, ":", str (GS (IE_ACMISSILEMOD)), 0))
+			RecordsTextArea.Append (delimited_txt (11767, ":", PlusMinusStat(GS (IE_ACMISSILEMOD)), 0))
 		# Slashing
 		if GS (IE_ACSLASHINGMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11768, ":", str (GS (IE_ACSLASHINGMOD)), 0))
+			RecordsTextArea.Append (delimited_txt (11768, ":", PlusMinusStat (GS (IE_ACSLASHINGMOD)), 0))
 		# Piercing
 		if GS (IE_ACPIERCINGMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11769, ":", str (GS (IE_ACPIERCINGMOD)), 0))
+			RecordsTextArea.Append (delimited_txt (11769, ":", PlusMinusStat (GS (IE_ACPIERCINGMOD)), 0))
 		# Bludgeoning
 		if GS (IE_ACCRUSHINGMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11770, ":", str (GS (IE_ACCRUSHINGMOD))))
+			RecordsTextArea.Append (delimited_txt (11770, ":", PlusMinusStat (GS (IE_ACCRUSHINGMOD))))
 
-		RecordsTextArea.Append ("\n")
+		RecordsTextArea.Append ("\n\n")
 
 	###################
 	# Arcane spell failure
