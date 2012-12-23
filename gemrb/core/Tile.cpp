@@ -24,7 +24,7 @@ namespace GemRB {
 
 Tile::Tile(Animation* anim, Animation* sec)
 {
-	tileIndex = 0;
+	tileIndex = om = 0;
 	this->anim[0] = anim;
 	if (sec) {
 		this->anim[1] = sec;
