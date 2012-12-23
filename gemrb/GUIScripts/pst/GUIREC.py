@@ -1074,7 +1074,7 @@ def OpenLevelUpWindow ():
 			# Thac0
 			Thac0 = GetThac0 (Class, NextLevel)
 			# Is the new thac0 better than old? (The smaller, the better)
-			if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT):
+			if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
 				Thac0Updated = True
 
 	else:
@@ -1139,7 +1139,7 @@ def OpenLevelUpWindow ():
 		# Multi class use the primary class level to determine Thac0
 		Thac0 = GetThac0 (Class, PrimNextLevel)
 		# Is the new thac0 better than old? (The smaller the better)
-		if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT):
+		if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
 			Thac0Updated = True
 
 
