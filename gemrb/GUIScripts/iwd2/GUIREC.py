@@ -383,6 +383,16 @@ def PlusMinusStat(value):
 		return "+" + str(value)
 	return str(value)
 
+def CascadeToHit(total, ac, apr):
+	cascade = PlusMinusStat(str(total))
+	babDec = 5
+	if ac["Wisdom"]: #TODO: also chech that there are no weapons equipped
+		babDec = 3
+	for i in range(1, apr):
+		if total-i*babDec > 0: # TODO: does it really skip negative ones?
+			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
+	return cascade
+
 #FIXME: display only nonzero values except for casting failure
 #TODO: check if there are any other entries
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%206/
@@ -401,22 +411,18 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append ("[/color]\n")
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
+	ac = combatdet["AC"]
 
 	# Main Hand
 	# display all the (successive) attack values (+15/+10/+5)
 	total = combatdet["ToHit"]
-	tmpstr = PlusMinusStat(str(total))
-	babDec = 5
-	if GS(IE_LEVELMONK): #TODO: only true if not wearing armor and no weapons equipped
-		babDec = 3
-	for i in range(1, combatdet["APR"]//2):
-		if total-i*babDec > 0:
-			tmpstr = tmpstr  + "/" + PlusMinusStat(total-i*babDec)
-	RecordsTextArea.Append (delimited_txt (734, ":", tmpstr, 0))
+	hits = CascadeToHit(total, ac, combatdet["APR"]//2)
+	RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
 	# Base
 	AddIndent()
-	RecordsTextArea.Append (delimited_txt (31353, ":", str (GS(IE_TOHIT)), 0))
 	total = total - GS(IE_TOHIT)
+	hits = CascadeToHit(total, ac, combatdet["APR"]//2)
+	RecordsTextArea.Append (delimited_txt (31353, ":", hits, 0))
 	# Weapon bonus
 	AddIndent()
 	RecordsTextArea.Append (delimited_txt (32560 , ":", str (0), 0))
@@ -460,7 +466,6 @@ def DisplayWeapons (pc):
 
 	###################
 	# Armor Class
-	ac = combatdet["AC"]
 	RecordsTextArea.Append ("[color=ffff00]")
 	RecordsTextArea.Append (33553)
 	RecordsTextArea.Append ("[/color]\n")
