@@ -35,6 +35,9 @@
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873D139F0A7D0002DC13 /* StackLock.cpp */; };
 		A218A75214A8F3DB001142CF /* ../artwork/gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */; };
+		A21EDB551688C96900F90180 /* CombatInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A21EDB531688C96900F90180 /* CombatInfo.cpp */; };
+		A21EDB561688C96900F90180 /* CombatInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = A21EDB541688C96900F90180 /* CombatInfo.h */; };
+		A21EDB581688C97300F90180 /* CombatInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A21EDB531688C96900F90180 /* CombatInfo.cpp */; };
 		A22693791422934E004468E8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
 		A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */; };
 		A226F41113A119E2009CE75E /* ACMReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B869E139F0A7D0002DC13 /* ACMReader.cpp */; };
@@ -1129,6 +1132,8 @@
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = osx/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
+		A21EDB531688C96900F90180 /* CombatInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CombatInfo.cpp; sourceTree = "<group>"; };
+		A21EDB541688C96900F90180 /* CombatInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombatInfo.h; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
@@ -2753,6 +2758,8 @@
 				A2BF9FA51395FF61006ADC12 /* Callback.h */,
 				A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */,
 				A2BF9FA71395FF61006ADC12 /* CharAnimations.h */,
+				A21EDB531688C96900F90180 /* CombatInfo.cpp */,
+				A21EDB541688C96900F90180 /* CombatInfo.h */,
 				A2BF9FA91395FF61006ADC12 /* Compressor.cpp */,
 				A2BF9FAA1395FF61006ADC12 /* Compressor.h */,
 				A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */,
@@ -3198,6 +3205,7 @@
 				A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */,
 				A2CB5AC515000A0D00B5C154 /* File.h in Headers */,
 				A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */,
+				A21EDB561688C96900F90180 /* CombatInfo.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4771,6 +4779,7 @@
 				A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */,
 				A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */,
 				A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */,
+				A21EDB581688C97300F90180 /* CombatInfo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4913,6 +4922,7 @@
 				A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */,
 				A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */,
 				A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */,
+				A21EDB551688C96900F90180 /* CombatInfo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
