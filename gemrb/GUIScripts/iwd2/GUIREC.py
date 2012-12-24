@@ -558,25 +558,40 @@ def DisplayWeapons (pc):
 		print "ARGHH, no slot item, bailing out"
 		return
 	item = GemRB.GetItem (slot_item["ItemResRef"])
+	# Main Hand - weapon name
 	##FIXME: display Ranged (41123) + ammo for ranged weapons
 	RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
 
 	# Damage
 	# TODO: display the unresolved damage string (2d6)
+	# this is ammo, launcher details come later
+	wdice = 1
+	wsides = 3
+	wbonus = +1
 	AddIndent()
-	RecordsTextArea.Append (delimited_txt (39518, ":", str (0), 0))
+	RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
 	# Strength
-	# TODO: check if the weapon takes strength bonus at all
-	if GA(IE_STR):
+	# TODO: check if the weapon takes strength bonus at all and take into account twohandedness - Actor::WeaponDamageBonus
+	abonus = GA(IE_STR)
+	if abonus:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (1145, ":", str (GA(IE_STR)), 0))
+		RecordsTextArea.Append (delimited_txt (1145, ":", PlusMinusStat (abonus), 0))
+	# Proficiency (bonus)
+	pbonus = 0 # FIXME
+	if pbonus:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(pbonus), 0))
 	# Launcher
+	lbonus = 0 # FIXME
+	if lbonus:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))
+	# Damage Potential (2-12)
+	# add any other bonus to the ammo damage calc
 	AddIndent()
-	RecordsTextArea.Append (delimited_txt (41408, ":", str (0), 0))
-	# Damage Potential
-	# TODO: display the unresolved total damage potential (2-12)
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (41120, ":", str (0), 0))
+	wmin = wdice + wbonus + abonus + pbonus + lbonus
+	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus
+	RecordsTextArea.Append (delimited_txt (41120, ":", str (wmin)+"-"+str(wmax), 0))
 	# Critical Hit (19-20 / x2)
 	# TODO: display the number of rolls and check if the critical range is already ok
 	crange = 20 - combatdet["CriticalBonus"]
