@@ -65,7 +65,7 @@ class Projectile;
 #define IE_ITEM_USEDEXTERITY 4          //gemrb weapon (move this if tobex implements it elsewhere)
 #define IE_ITEM_HOSTILE      0x400      //equipment
 #define IE_ITEM_RECHARGE     0x800      //equipment
-#define IE_ITEM_IGNORESHIELD 0x10000    //weapon
+#define IE_ITEM_BYPASS       0x10000    //weapon (bypass shield and armor bonus)
 #define IE_ITEM_KEEN         0x20000    //weapon
 
 //modder extensions

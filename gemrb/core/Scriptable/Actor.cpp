@@ -5651,8 +5651,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
 	// this flag is set in dagger/shortsword by the loader
 	if (header->RechargeFlags&IE_ITEM_USEDEXTERITY) wi.wflags|=WEAPON_FINESSE;
-	//also copy these flags
-	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_IGNORESHIELD);
+	//also copy these flags (they match their WEAPON_ counterparts)
+	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_BYPASS);
 
 	// get our dual wielding modifier
 	if (dualwielding) {
