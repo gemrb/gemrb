@@ -479,6 +479,7 @@ void Projectile::SetDelay(int delay)
 //copied from Actor.cpp
 #define ATTACKROLL    20
 #define WEAPON_FIST        0
+#define WEAPON_BYPASS      0x10000
 
 bool Projectile::FailedIDS(Actor *target) const
 {
@@ -525,7 +526,8 @@ bool Projectile::FailedIDS(Actor *target) const
 				//handle attack type here, weapon depends on it too?
 				int tohit = caster->GetToHit(0, WEAPON_FIST, target);
 				//damage type, should be generic?
-				int defense = target->GetDefense(0, 0, caster);
+				// ignore the armor bonus
+				int defense = target->GetDefense(0, WEAPON_BYPASS, caster);
 				if(target->IsReverseToHit()) {
 					fail = roll + defense < tohit;
 				} else {
