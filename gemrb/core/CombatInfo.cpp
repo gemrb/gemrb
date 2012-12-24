@@ -28,6 +28,55 @@ namespace GemRB {
 
 static bool third = false;
 
+/*
+ * Shared code between the classes
+ */
+static void SetBonusInternal(int& current, int bonus, int mod)
+{
+	int newBonus = current;
+
+	switch (mod) {
+		case 0: // cummulative modifier
+			if (third) {
+				// 3ed boni don't stack
+				// but, use some extra logic so any negative boni first try to cancel out
+				int tmp = bonus;
+				if ((current < 0) ^ (bonus < 0)) {
+					tmp = current + bonus;
+				}
+				if (tmp != bonus) {
+					// we just summed the boni, so we need to be careful about the resulting sign, since (-2+3)>(-2), but abs(-2+3)<abs(-2)
+					if (tmp > current) {
+						newBonus = tmp;
+					} // else leave it be at the current value
+				} else {
+					if (abs(tmp) > abs(current)) {
+						newBonus = tmp;
+					} // else leave it be at the current value
+				}
+			} else {
+				newBonus += bonus;
+			}
+			break;
+		// like with other effects, the following options have chicked-and-egg problems and the result depends on the order of application
+		case 1: // flat modifier
+			newBonus = bonus;
+			break;
+		case 2: // percent modifier
+			newBonus = current * bonus / 100;
+			break;
+		default:
+			error("CombatInfo", "Bad bonus mod type: %d", mod);
+			break;
+	}
+
+	current = newBonus;
+}
+
+
+/*
+ * Class holding the main armor class stat and general boni
+ */
 ArmorClass::ArmorClass()
 {
 	natural = 0;
@@ -110,44 +159,7 @@ void ArmorClass::SetGenericBonus(int bonus, int mod)
 
 void ArmorClass::SetBonus(int& current, int bonus, int mod)
 {
-	int newBonus = current;
-
-	switch (mod) {
-		case 0: // cummulative modifier
-			if (third) {
-				// 3ed boni don't stack
-				// but, use some extra logic so any negative boni first try to cancel out
-				int tmp = bonus;
-				if ((current < 0) ^ (bonus < 0)) {
-					tmp = current + bonus;
-				}
-				if (tmp != bonus) {
-					// we just summed the boni, so we need to be careful about the resulting sign, since (-2+3)>(-2), but abs(-2+3)<abs(-2)
-					if (tmp > current) {
-						newBonus = tmp;
-					} // else leave it be at the current value
-				} else {
-					if (abs(tmp) > abs(current)) {
-						newBonus = tmp;
-					} // else leave it be at the current value
-				}
-			} else {
-				newBonus += bonus;
-			}
-			break;
-		// like with other effects, the following options have chicked-and-egg problems and the result depends on the order of application
-		case 1: // flat modifier
-			newBonus = bonus;
-			break;
-		case 2: // percent modifier
-			newBonus = current * bonus / 100;
-			break;
-		default:
-			error("ArmorClass", "Bad bonus mod type: %d", mod);
-			break;
-	}
-
-	current = newBonus;
+	SetBonusInternal(current, bonus, mod);
 	RefreshTotal();
 }
 
