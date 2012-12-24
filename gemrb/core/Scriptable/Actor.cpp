@@ -5921,7 +5921,14 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
 		}
 	}
 
-	if (! (wflags&WEAPON_BYPASS)) {
+	if (wflags&WEAPON_BYPASS) {
+		if (ReverseToHit) {
+			// deflection is used to store the armor value in adnd
+			defense = AC.GetTotal() - AC.GetDeflectionBonus() - defense;
+		} else {
+			defense += AC.GetTotal() - AC.GetArmorBonus() - AC.GetShieldBonus();
+		}
+	} else {
 		if (ReverseToHit) {
 			defense = AC.GetTotal()-defense;
 		} else {
