@@ -8915,6 +8915,13 @@ void Actor::ResetCommentTime()
 	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 }
 
+// this one is just a hack, so we can keep a bunch of other functions const
+int Actor::GetArmorFailure(int profcheck) const
+{
+	int tmp1, tmp2;
+	return GetArmorFailure(profcheck, tmp1, tmp2);
+}
+
 // Returns the armor check penalty.
 // used for mapping the iwd2 armor feat to the equipped armor's weight class
 // the armor weight class is roughly deduced from the penalty as following:
@@ -8924,7 +8931,7 @@ void Actor::ResetCommentTime()
 // 7-,  heavy: splint, plate, full plate
 // the values are taken from our dehardcoded itemdata.2da
 // FIXME: the penalites are too high, the items use a different value!
-int Actor::GetArmorFailure(int profcheck) const
+int Actor::GetArmorFailure(int profcheck, int &armor, int &shield) const
 {
 	if (!third) return 0;
 
@@ -8944,17 +8951,21 @@ int Actor::GetArmorFailure(int profcheck) const
 	if (profcheck && GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
 		penalty = 0;
 	}
+	armor = penalty;
 
 	// check also the shield penalty
 	armorType = inventory.GetShieldItemType();
 	int shieldPenalty = core->GetShieldPenalty(armorType);
 	if (profcheck) {
-		if (!HasFeat(FEAT_SHIELD_PROF)) {
+		if (HasFeat(FEAT_SHIELD_PROF)) {
+			shieldPenalty = 0;
+		} else {
 			penalty += shieldPenalty;
 		}
 	} else {
 		penalty += shieldPenalty;
 	}
+	shield = shieldPenalty;
 
 	return -penalty;
 }

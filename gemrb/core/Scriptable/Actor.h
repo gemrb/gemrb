@@ -833,6 +833,7 @@ public:
 	void ResetCommentTime();
 	/* returns the armor check penalty */
 	int GetArmorFailure(int profcheck=1) const;
+	int GetArmorFailure(int profcheck, int &armor, int &shield) const;
 	bool IsDead() const;
 	bool IsInvisibleTo(Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
