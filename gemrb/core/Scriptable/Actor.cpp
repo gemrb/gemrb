@@ -5632,6 +5632,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	ITMExtHeader *rangedheader = NULL;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
 	DamageBonus = hittingheader->DamageBonus;
+	wi.launcherdmgbon = 0;
 
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
@@ -5650,6 +5651,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			return false;
 		}
 		wi.wflags = WEAPON_RANGED;
+		wi.launcherdmgbon = DamageBonus; // save the original (launcher) bonus
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
 		THAC0Bonus += rangedheader->THAC0Bonus;
@@ -5705,7 +5707,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			prof += wspecial[stars][0];
 		}
 	}
-	DamageBonus += wspecial[stars][1];
+	wi.profdmgbon = wspecial[stars][1];
+	DamageBonus += wi.profdmgbon;
 	speed += wspecial[stars][2];
 	// add non-proficiency penalty, which is missing from the table in non-iwd2
 	// stored negative

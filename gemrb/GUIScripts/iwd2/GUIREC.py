@@ -584,35 +584,46 @@ def DisplayWeapons (pc):
 	slot = GemRB.GetEquippedQuickSlot (pc)
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	if not slot_item:
-		print "ARGHH, no slot item at slot", slot, ", bailing out!"
+		print "ARGHH, no slot item at slot %d (%d), bailing out!" %(slot, combatdet["Slot"])
 		return
 	item = GemRB.GetItem (slot_item["ItemResRef"])
+	ammoslot = GemRB.GetEquippedAmmunition (pc)
+	ammo = None
+	if ammoslot != -1:
+		ammosi = GemRB.GetSlotItem (pc, slot)
+		ammo = GemRB.GetItem (ammosi["ItemResRef"])
+	print "SAD DEBUG LOG", ammoslot, ammo
 	# Main Hand - weapon name
-	##FIXME: display Ranged (41123) + ammo for ranged weapons
-	RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
+	#  or Ranged - ammo
+	if combatdet["Flags"]&15 == 2 and ammo: # this is basically wi.wflags & WEAPON_STYLEMASK == WEAPON_RANGED
+		RecordsTextArea.Append (delimited_str (41123, " -", ammo["ItemNameIdentified"], 0))
+	else:
+		RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
 
 	# Damage
-	# TODO: display the unresolved damage string (2d6)
+	# display the unresolved damage string (2d6)
 	# this is ammo, launcher details come later
-	wdice = 1
-	wsides = 3
-	wbonus = +1
+	wdice = combatdet["HitHeaderNumDice"]
+	wsides = combatdet["HitHeaderDiceSides"]
+	wbonus = combatdet["HitHeaderDiceBonus"]
 	AddIndent()
-	RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
-	# TODO: any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total
+	if wbonus:
+		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
+	else:
+		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
+	# TODO: any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
 	# Strength
-	# TODO: check if the weapon takes strength bonus at all and take into account twohandedness - Actor::WeaponDamageBonus
-	abonus = GA(IE_STR)
+	abonus = combatdet["WeaponStrBonus"]
 	if abonus:
 		AddIndent()
 		RecordsTextArea.Append (delimited_txt (1145, ":", PlusMinusStat (abonus), 0))
 	# Proficiency (bonus)
-	pbonus = 0 # FIXME
+	pbonus = combatdet["ProfDmgBon"]
 	if pbonus:
 		AddIndent()
 		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(pbonus), 0))
 	# Launcher
-	lbonus = 0 # FIXME
+	lbonus = combatdet["LauncherDmgBon"]
 	if lbonus:
 		AddIndent()
 		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))

@@ -9866,6 +9866,12 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "APR", PyInt_FromLong (actor->GetNumberOfAttacks() ));
 	PyDict_SetItemString(dict, "CriticalMultiplier", PyInt_FromLong (wi.critmulti));
 	PyDict_SetItemString(dict, "CriticalRange", PyInt_FromLong (wi.critrange));
+	PyDict_SetItemString(dict, "ProfDmgBon", PyInt_FromLong (wi.profdmgbon));
+	PyDict_SetItemString(dict, "LauncherDmgBon", PyInt_FromLong (wi.launcherdmgbon));
+	PyDict_SetItemString(dict, "WeaponStrBonus", PyInt_FromLong (actor->WeaponDamageBonus(wi)));
+	PyDict_SetItemString(dict, "HitHeaderNumDice", PyInt_FromLong (hittingheader->DiceThrown));
+	PyDict_SetItemString(dict, "HitHeaderDiceSides", PyInt_FromLong (hittingheader->DiceSides));
+	PyDict_SetItemString(dict, "HitHeaderDiceBonus", PyInt_FromLong (hittingheader->DamageBonus));
 
 	actor->AC.dump();
 	actor->ToHit.dump();
