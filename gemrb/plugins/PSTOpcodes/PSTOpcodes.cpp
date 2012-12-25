@@ -850,7 +850,7 @@ int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->SetColorMod(255, RGBModifier::ADD, 0x18, 0xc8, 0xc8, 0xc8);
 
 	STATE_SET( STATE_BLESS );
-	STAT_SUB( IE_TOHIT, fx->Parameter1);
+	target->ToHit.HandleFxBonus(-fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
 	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1);
 	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1);
@@ -870,7 +870,7 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_PST_CURSE) ) //curse is non cumulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_PST_CURSE );
-	STAT_SUB( IE_TOHIT, fx->Parameter1);
+	target->ToHit.HandleFxBonus(-fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
 	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1);
 	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1);

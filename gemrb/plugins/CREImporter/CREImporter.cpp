@@ -974,7 +974,7 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
+	act->ToHit.SetBase((ieByteSigned) tmpByte);
 	str->Read( &tmpByte, 1 );
 	tmpByte = tmpByte * 2;
 	if (tmpByte>10) tmpByte-=11;
@@ -1319,7 +1319,7 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
+	act->ToHit.SetBase((ieByteSigned) tmpByte);
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1407,7 +1407,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
+	act->ToHit.SetBase((ieByteSigned) tmpByte);
 	str->Read( &tmpByte, 1 );
 	tmpWord = tmpByte * 2;
 	if (tmpWord>10) tmpWord-=11;
@@ -1630,7 +1630,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;//Unknown in CRE V2.2
+	act->ToHit.SetBase((ieByteSigned) tmpByte);//Unknown in CRE V2.2
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;//Unknown in CRE V2.2
 	str->Read( &tmpByte, 1 );
@@ -1925,7 +1925,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
+	act->ToHit.SetBase((ieByteSigned) tmpByte);
 	str->Read( &tmpByte, 1 );
 	tmpByte = tmpByte * 2;
 	if (tmpByte>10) tmpByte-=11;
@@ -2307,7 +2307,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_ACSLASHINGMOD];
 	stream->WriteWord( &tmpWord);
-	tmpByte = actor->BaseStats[IE_TOHIT];
+	tmpByte = actor->ToHit.GetBase();
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
 	if (actor->version == IE_CRE_V2_2) {

@@ -522,6 +522,7 @@ Actor::Actor()
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
 	AC.SetOwner(this);
+	ToHit.SetOwner(this);
 }
 
 Actor::~Actor(void)
@@ -2794,6 +2795,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
 	AC.ResetAll();
+	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 
 	if (fx) {
 		fx->SetOwner(this);
@@ -2806,6 +2808,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//recalculated below again
 		spellbook.ClearBonus();
 		//AC.ResetAll(); // TODO: check if this is needed
+		//ToHit.ResetAll();
 	}
 
 	unsigned int i;
@@ -5478,6 +5481,7 @@ static int SetLevelBAB(int level, ieDword index)
 }
 
 // return the base APR derived from the base attack bonus, which we have to construct here too
+//NOTE: this doesn't break iwd2 monsters, since they have their level stored as fighters (if not more)
 int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 {
 	int pBAB = 0;
@@ -5603,9 +5607,10 @@ void Actor::InitRound(ieDword gameTime)
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target)
 {
 	GetBaseAPRandAB(true, tohit);
+	ToHit.SetBase(tohit);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
 	ieDword dualwielding = IsDualWielding();
 	header = GetWeapon(wi, leftorright && dualwielding);
@@ -5646,6 +5651,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		wi.wflags = 0;
 		return false;
 	}//melee or ranged
+	if (ReverseToHit) THAC0Bonus = -THAC0Bonus;
+	ToHit.SetWeaponBonus(THAC0Bonus);
+
 	//TODO easier copying of recharge flags into wflags
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
@@ -5672,35 +5680,37 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	//tenser's transformation makes the actor proficient in any weapons
 	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
 
-	//hit/damage/speed bonuses from wspecial
+	//hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
 	if ((signed)stars > wspecial_max) {
 		stars = wspecial_max;
 	}
 
+	int prof = 0;
 	if (wi.wflags&WEAPON_BYPASS) {
 		//FIXME:this type of weapon ignores all armor, -4 is for balance?
 		//or i just got lost a negation somewhere
-		THAC0Bonus -= 4;
+		prof += -4;
 	} else {
 		// everyone is proficient with fists
 		if (Equipped != IW_NO_EQUIPPED) {
-			THAC0Bonus += wspecial[stars][0];
+			prof += wspecial[stars][0];
 		}
 	}
 	DamageBonus += wspecial[stars][1];
 	speed += wspecial[stars][2];
-	// add non-proficiency penalty, which is missing from the table
+	// add non-proficiency penalty, which is missing from the table in non-iwd2
+	// stored negative
 	if (stars == 0 && !third) {
 		ieDword clss = BaseStats[IE_CLASS];
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
 			if (Equipped != IW_NO_EQUIPPED) {
-				THAC0Bonus += defaultprof[clss];
+				prof += defaultprof[clss];
 			}
 		} else {
 			//it is not clear what is the penalty for non player classes
-			THAC0Bonus += 4;
+			prof += 4;
 		}
 	}
 
@@ -5710,7 +5720,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
-		THAC0Bonus += wsdualwield[stars][leftorright?1:0];
+		prof += wsdualwield[stars][leftorright?1:0];
 	} else if (wi.itemflags&(IE_INV_ITEM_TWOHANDED) && (wi.wflags&WEAPON_MELEE) && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
@@ -5744,15 +5754,21 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
 
-	//second parameter is left or right hand flag
-	tohit = GetToHit(THAC0Bonus, wi.wflags, target);
 	if (third) {
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
 		// it is limited to shortswords and daggers, which also have this flag set
+		// FIXME: actually do check just the offhand, even though the bonus is applied to both
 		if (dualwielding && (wi.wflags&WEAPON_FINESSE)) {
-			tohit += 2;
+			prof += 2;
 		}
+	} else {
+		prof = -prof;
 	}
+	ToHit.SetProficiencyBonus(prof);
+
+	// get the remaining boni
+	// FIXME: merge
+	tohit = GetToHit(wi.wflags, target);
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
@@ -5768,17 +5784,18 @@ int Actor::MeleePenalty() const
 	return 0;
 }
 
-int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
+//FIXME: can get called on its own and ToHit could erroneusly give weapon and some prof boni in that case
+int Actor::GetToHit(ieDword Flags, Actor *target)
 {
-	int tohit = bonus;
-	int strbonus = 0;
+	int generic = 0;
+	int prof = 0;
 
 	//get our dual wielding modifier
 	if (IsDualWielding()) {
 		if (Flags&WEAPON_LEFTHAND) {
-			tohit += GetStat(IE_HITBONUSLEFT);
+			generic = GetStat(IE_HITBONUSLEFT);
 		} else {
-			tohit += GetStat(IE_HITBONUSRIGHT);
+			generic = GetStat(IE_HITBONUSRIGHT);
 		}
 		if (third) {
 			// FIXME: externalise
@@ -5788,19 +5805,74 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 			// +2 main, +2 off with two weapon fighting
 			// +2 main, +2 off with a simple weapons in the off hand (handled in GetCombatDetails)
 			if (HasFeat(FEAT_TWO_WEAPON_FIGHTING)) {
-				tohit += 2;
+				prof += 2;
 			}
 			if (Flags&WEAPON_LEFTHAND) {
-				tohit -= 6;
+				prof -= 6;
 			} else {
-				tohit -= 10;
+				prof -= 10;
 				if (HasFeat(FEAT_AMBIDEXTERITY)) {
-					tohit += 4;
+					prof += 4;
 				}
 			}
 		}
 	}
+	ToHit.SetProficiencyBonus(ToHit.GetProficiencyBonus()+prof);
 
+	// set up strength/dexterity boni
+	GetTHAbilityBonus(Flags);
+
+	// check if there is any armor unproficiency penalty
+	int am = 0, sm = 0;
+	GetArmorFailure(1, am, sm);
+	ToHit.SetArmorBonus(am);
+	ToHit.SetShieldBonus(sm);
+
+	//get attack style (melee or ranged)
+	switch(Flags&WEAPON_STYLEMASK) {
+		case WEAPON_MELEE:
+			generic += GetStat(IE_MELEETOHIT);
+			break;
+		case WEAPON_FIST:
+			generic += GetStat(IE_FISTHIT);
+			break;
+		case WEAPON_RANGED:
+			generic += GetStat(IE_MISSILEHITBONUS);
+			break;
+	}
+
+	if (target) {
+		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
+		if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
+			if (target->GetAttackStyle() == WEAPON_RANGED) {
+				generic += 4;
+			}
+		}
+
+		// melee vs. unarmed
+		generic += target->MeleePenalty() - MeleePenalty();
+
+		// add +4 attack bonus vs racial enemies
+		if (GetRangerLevel()) {
+			if (IsRacialEnemy(target)) {
+				generic += 4;
+			}
+		}
+		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
+	}
+
+	// finally involve the Modified stat and add to it the rest of the generic bonus
+	if (ReverseToHit) {
+		ToHit.SetGenericBonus(ToHit.GetGenericBonus()-generic);
+	} else {
+		ToHit.SetGenericBonus(ToHit.GetGenericBonus()+generic); // flat out cummulative
+	}
+	return ToHit.GetTotal();
+}
+
+void Actor::GetTHAbilityBonus(ieDword Flags)
+{
+	int dexbonus = 0, strbonus = 0;
 	//add strength bonus if we need
 	if (Flags&WEAPON_USESTRENGTH) {
 		if (third) {
@@ -5813,64 +5885,39 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
-			tohit += GetStat(IE_MELEETOHIT);
 			if ((Flags&WEAPON_FINESSE) && HasFeat(FEAT_WEAPON_FINESSE) ) {
-				int dexbonus;
 				if (third) {
 					dexbonus = GetAbilityBonus(IE_DEX );
 				} else {
-					//FIXME check with ToBEx if they want a new column for this
 					dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 				}
-				if (dexbonus>strbonus) strbonus = dexbonus;
+				// weapon finesse is not cummulative
+				if (dexbonus > strbonus) {
+					strbonus = 0;
+				} else {
+					dexbonus = 0;
+				}
 			}
-			break;
-		case WEAPON_FIST:
-			tohit += GetStat(IE_FISTHIT);
 			break;
 		case WEAPON_RANGED:
-			tohit += GetStat(IE_MISSILEHITBONUS);
 			//add dexterity bonus
 			if (third) {
-				tohit += GetAbilityBonus(IE_DEX );
+				dexbonus = GetAbilityBonus(IE_DEX);
 			} else {
-				tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+				dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			}
+			//TODO: check what to do with weapons with WEAPON_USESTRENGTH (there's a sling in bg2 with it)
+			// do these stack or are handled like finesse or are really only damage boni or there is no game with both?
 			break;
-	}
-	tohit += strbonus;
-
-	// check if there is any armor unproficiency penalty
-	tohit += GetArmorFailure();
-
-	if (target) {
-		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
-		if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
-			if (target->GetAttackStyle() == WEAPON_RANGED) {
-				tohit += 4;
-			}
-		}
-
-		// melee vs. unarmed
-		tohit += target->MeleePenalty() - MeleePenalty();
-
-		// add +4 attack bonus vs racial enemies
-		if (GetRangerLevel()) {
-			if (IsRacialEnemy(target)) {
-				tohit += 4;
-			}
-		}
-		tohit += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
-
+		// no ability tohit bonus for WEAPON_FIST
 	}
 
-
-	if (ReverseToHit) {
-		tohit = (signed)GetStat(IE_TOHIT)-tohit;
+	// both strength and dex bonus are stored positive only in iwd2
+	if (third) {
+		ToHit.SetAbilityBonus(dexbonus + strbonus);
 	} else {
-		tohit += GetStat(IE_TOHIT);
+		ToHit.SetAbilityBonus(-(dexbonus + strbonus));
 	}
-	return tohit;
 }
 
 int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)

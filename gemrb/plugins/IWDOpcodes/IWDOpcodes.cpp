@@ -994,7 +994,7 @@ int fx_prayer (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		value = 1;
 	}
 
-	STAT_ADD( IE_TOHIT, value);
+	target->ToHit.HandleFxBonus(value, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_SAVEFORTITUDE, value);
 	STAT_ADD( IE_SAVEREFLEX, value);
 	STAT_ADD( IE_SAVEWILL, value);
@@ -1009,7 +1009,7 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_curse(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (target->SetSpellState(SS_BADPRAYER)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_PRAYER_BAD);
-	STAT_ADD( IE_TOHIT, -1);
+	target->ToHit.HandleFxBonus(-1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_SAVEFORTITUDE, -1);
 	STAT_ADD( IE_SAVEREFLEX, -1);
 	STAT_ADD( IE_SAVEWILL, -1);
@@ -1143,7 +1143,7 @@ int fx_recitation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		value = 2;
 	}
 
-	STAT_ADD( IE_TOHIT, value);
+	target->ToHit.HandleFxBonus(value, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_SAVEFORTITUDE, value);
 	STAT_ADD( IE_SAVEREFLEX, value);
 	STAT_ADD( IE_SAVEWILL, value);
@@ -1158,7 +1158,7 @@ int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_recitation(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (target->SetSpellState(SS_BADRECIT)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_REC_BAD);
-	STAT_ADD( IE_TOHIT, -2);
+	target->ToHit.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_SAVEFORTITUDE, -2);
 	STAT_ADD( IE_SAVEREFLEX, -2);
 	STAT_ADD( IE_SAVEWILL, -2);
@@ -3028,7 +3028,7 @@ int fx_executioner_eyes (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState( SS_EXECUTIONER)) return FX_APPLIED;
 
 	STAT_ADD(IE_CRITICALHITBONUS, 4);
-	STAT_ADD(IE_TOHIT, 4);
+	target->ToHit.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_EXECUTIONER);
@@ -3226,7 +3226,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	STAT_SUB(IE_SAVEVSBREATH, penalty);
 	STAT_SUB(IE_SAVEVSSPELL, penalty);
 	//bigger is better in iwd2
-	STAT_SUB(IE_TOHIT, penalty);
+	target->ToHit.HandleFxBonus(-penalty, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 
 	//decrease all skills by 1
 	for(int i=0;i<32;i++) {
@@ -3601,7 +3601,7 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_BANE);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
 	}
-	STAT_ADD( IE_TOHIT, -fx->Parameter1);
+	target->ToHit.HandleFxBonus(-fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_MORALEBREAK, -fx->Parameter1);
 	return FX_APPLIED;
 }
@@ -3734,7 +3734,7 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {
 		if (target->SetSpellState( SS_RAPIDSHOT)) return FX_NOT_APPLIED; //don't apply it twice
 
-		STAT_ADD(IE_TOHIT, -2);
+		target->ToHit.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
 			//none i know of

@@ -321,6 +321,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	stats = []
 	cdet = GemRB.GetCombatDetails(pc, 0)
+	tohit = cdet["ToHitStats"]
 
 	# class levels
 	# 16480 <CLASS>: Level <LEVEL>
@@ -447,14 +448,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# look ma, I can use both hands
 	
 	if GUICommon.GameIsBG2():
-		stats.append ( (61932, GS (IE_TOHIT), '0') )
+		stats.append ( (61932, tohit["Base"], '0') )
 		if (GemRB.IsDualWielding(pc)):
-			stats.append ( (56911, cdet["ToHit"], '0') )
-			stats.append ( (56910, GemRB.GetCombatDetails(pc, 1)["ToHit"], '0') )
+			stats.append ( (56911, tohit["Total"], '0') ) # main
+			stats.append ( (56910, GemRB.GetCombatDetails(pc, 1)["ToHitStats"]["Total"], '0') ) # offhand
 		else:
-			stats.append ( (9457, cdet["ToHit"], '0') )
+			stats.append ( (9457, tohit["Total"], '0') )
 	else:
-		stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(cdet["ToHit"])+")", '0') )
+		stats.append ( (9457, str(tohit["Base"])+" ("+str(tohit["Total"])+")", '0') )
 
 	tmp = cdet["APR"]
 	if (tmp&1):

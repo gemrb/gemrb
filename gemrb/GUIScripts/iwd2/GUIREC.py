@@ -389,7 +389,7 @@ def CascadeToHit(total, ac, apr):
 	if ac["Wisdom"]: #TODO: also chech that there are no weapons equipped
 		babDec = 3
 	for i in range(1, apr):
-		if total-i*babDec > 0: # TODO: does it really skip negative ones?
+		if total-i*babDec > 0: # skips negative ones, meaning a lower number of attacks can be displayed
 			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
 	return cascade
 
@@ -412,49 +412,45 @@ def DisplayWeapons (pc):
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
 	ac = combatdet["AC"]
+	tohit = combatdet["ToHitStats"]
 
 	# Main Hand
 	# display all the (successive) attack values (+15/+10/+5)
-	total = combatdet["ToHit"]
-	hits = CascadeToHit(total, ac, combatdet["APR"]//2)
+	hits = CascadeToHit(tohit["Total"], ac, combatdet["APR"]//2)
 	RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
 	# Base
 	AddIndent()
-	total = total - GS(IE_TOHIT)
-	hits = CascadeToHit(total, ac, combatdet["APR"]//2)
+	hits = CascadeToHit(tohit["Base"], ac, combatdet["APR"]//2)
 	RecordsTextArea.Append (delimited_txt (31353, ":", hits, 0))
 	# Weapon bonus
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (32560 , ":", str (0), 0))
-	# Proficiency bonus
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (32561, ":", str (0), 0))
-	# Armor Penalty
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
-	# Shield Penalty (if you don't have the shield proficiency feat; maybe more)
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (39822 , ":", str (0), 0))
-	# Ability  bonus
-	#FIXME: this is different for ranged weapons (dex only)
-	strbon = GA(IE_STR)
-	dexbon = GA(IE_DEX)
-	# weapon finesse uses the best of both
-	if GemRB.HasFeat(pc, FEAT_WEAPON_FINESSE):
-		if dexbon > strbon:
-			strbon = dexbon
-	if strbon:
+	if tohit["Weapon"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (33547, ":", str (strbon), 0))
-	total = total - strbon
+		RecordsTextArea.Append (delimited_txt (32560 , ":", PlusMinusStat(tohit["Weapon"]), 0))
+	# Proficiency bonus
+	if tohit["Proficiency"]:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(tohit["Proficiency"]), 0))
+	# Armor Penalty
+	if tohit["Armor"]:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(tohit["Armor"]), 0))
+	# Shield Penalty (if you don't have the shield proficiency feat)
+	if tohit["Shield"]:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (39822 , ":", PlusMinusStat(tohit["Shield"]), 0))
+	# Ability  bonus
+	if tohit["Ability"]:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (33547, ":", PlusMinusStat(tohit["Ability"]), 0))
 	# Others
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (33548, ":", str (total))) # just the remnants of "total"
-	RecordsTextArea.Append ("\n")
+	if tohit["Generic"]:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(tohit["Generic"]), 0))
+	RecordsTextArea.Append ("\n\n")
 
 	# Off Hand
 	if (GemRB.IsDualWielding(pc)):
-		RecordsTextArea.Append (delimited_txt (733, ":", str (GemRB.GetCombatDetails(pc, 1)["ToHit"]), 0))
+		RecordsTextArea.Append (delimited_txt (733, ":", str (GemRB.GetCombatDetails(pc, 1)["ToHitStats"]["Total"]), 0))
 		RecordsTextArea.Append ("\n")
 		#TODO: probably all the same categories as above
 

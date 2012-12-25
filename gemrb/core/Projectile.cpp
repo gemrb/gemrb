@@ -524,7 +524,7 @@ bool Projectile::FailedIDS(Actor *target) const
 				}
 
 				//handle attack type here, weapon depends on it too?
-				int tohit = caster->GetToHit(0, WEAPON_FIST, target);
+				int tohit = caster->GetToHit(WEAPON_FIST, target);
 				//damage type, should be generic?
 				// ignore the armor bonus
 				int defense = target->GetDefense(0, WEAPON_BYPASS, caster);

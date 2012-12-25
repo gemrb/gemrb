@@ -333,6 +333,9 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 	if (StatID == IE_ARMORCLASS) {
 		actor->AC.SetNatural(StatValue);
 		return 1;
+	} else if (StatID == IE_TOHIT) {
+		actor->ToHit.SetBase(StatValue);
+		return 1;
 	}
 	//this is a hack, if more PCStats fields are needed, improve it
 	if (StatID&EXTRASETTINGS) {
@@ -9856,7 +9859,6 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Enchantment", PyInt_FromLong (wi.enchantment));
 	PyDict_SetItemString(dict, "Range", PyInt_FromLong (wi.range));
 	PyDict_SetItemString(dict, "Proficiency", PyInt_FromLong (wi.prof));
-	PyDict_SetItemString(dict, "ToHit", PyInt_FromLong (tohit));
 	PyDict_SetItemString(dict, "DamageBonus", PyInt_FromLong (DamageBonus));
 	PyDict_SetItemString(dict, "Speed", PyInt_FromLong (speed));
 	PyDict_SetItemString(dict, "CriticalBonus", PyInt_FromLong (CriticalBonus));
@@ -9864,6 +9866,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "APR", PyInt_FromLong (actor->GetNumberOfAttacks() ));
 
 	actor->AC.dump();
+	actor->ToHit.dump();
 	PyObject *ac = PyDict_New();
 	PyDict_SetItemString(ac, "Total", PyInt_FromLong (actor->AC.GetTotal()));
 	PyDict_SetItemString(ac, "Natural", PyInt_FromLong (actor->AC.GetNatural()));
@@ -9874,6 +9877,17 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(ac, "Dexterity", PyInt_FromLong (actor->AC.GetDexterityBonus()));
 	PyDict_SetItemString(ac, "Wisdom", PyInt_FromLong (actor->AC.GetWisdomBonus()));
 	PyDict_SetItemString(dict, "AC", ac);
+
+	PyObject *tohits = PyDict_New();
+	PyDict_SetItemString(tohits, "Total", PyInt_FromLong (actor->ToHit.GetTotal()));
+	PyDict_SetItemString(tohits, "Base", PyInt_FromLong (actor->ToHit.GetBase()));
+	PyDict_SetItemString(tohits, "Armor", PyInt_FromLong (actor->ToHit.GetArmorBonus()));
+	PyDict_SetItemString(tohits, "Shield", PyInt_FromLong (actor->ToHit.GetShieldBonus()));
+	PyDict_SetItemString(tohits, "Proficiency", PyInt_FromLong (actor->ToHit.GetProficiencyBonus()));
+	PyDict_SetItemString(tohits, "Generic", PyInt_FromLong (actor->ToHit.GetGenericBonus()));
+	PyDict_SetItemString(tohits, "Ability", PyInt_FromLong (actor->ToHit.GetAbilityBonus()));
+	PyDict_SetItemString(tohits, "Weapon", PyInt_FromLong (actor->ToHit.GetWeaponBonus()));
+	PyDict_SetItemString(dict, "ToHitStats", tohits);
 	return dict;
 }
 

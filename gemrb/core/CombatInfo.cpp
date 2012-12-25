@@ -192,5 +192,123 @@ void ArmorClass::dump() const
 	Log(DEBUG, "ArmorClass", buffer);
 }
 
+/*
+ * Class holding the main to-hit/thac0 stat and general boni
+ * NOTE: Always use it through GetCombatDetails to get the full state
+ */
+ToHitStats::ToHitStats()
+{
+	base = 0;
+	Owner = NULL;
+	ResetAll();
+
+	third = !!core->HasFeature(GF_3ED_RULES);
+}
+
+void ToHitStats::SetOwner(Actor* owner)
+{
+	Owner = owner;
+	// rerun this, so both the stats get set correctly
+	SetBase(base);
+}
+
+int ToHitStats::GetTotal() const
+{
+	return total;
+}
+
+void ToHitStats::RefreshTotal()
+{
+	total = base + proficiencyBonus + armorBonus + shieldBonus + abilityBonus + weaponBonus + genericBonus;
+	if (Owner) { // not true for a short while during init, but we make amends immediately
+		Owner->Modified[IE_TOHIT] = total;
+	}
+}
+
+// resets all the boni
+void ToHitStats::ResetAll() {
+	weaponBonus = 0;
+	armorBonus = 0;
+	shieldBonus = 0;
+	abilityBonus = 0;
+	proficiencyBonus = 0;
+	genericBonus = 0;
+	RefreshTotal();
+}
+
+void ToHitStats::SetBase(int tohit, int /*mod*/)
+{
+	base = tohit;
+	if (Owner) { // not true for a short while during init, but we make amends immediately
+		Owner->BaseStats[IE_TOHIT] = tohit;
+	}
+	RefreshTotal();
+}
+
+void ToHitStats::SetProficiencyBonus(int bonus, int mod)
+{
+	SetBonus(proficiencyBonus, bonus, mod);
+}
+
+void ToHitStats::SetArmorBonus(int bonus, int mod)
+{
+	SetBonus(armorBonus, bonus, mod);
+}
+
+void ToHitStats::SetShieldBonus(int bonus, int mod)
+{
+	SetBonus(shieldBonus, bonus, mod);
+}
+
+void ToHitStats::SetAbilityBonus(int bonus, int mod)
+{
+	SetBonus(abilityBonus, bonus, mod);
+}
+
+void ToHitStats::SetWeaponBonus(int bonus, int mod)
+{
+	SetBonus(weaponBonus, bonus, mod);
+}
+
+void ToHitStats::SetGenericBonus(int bonus, int mod)
+{
+	SetBonus(genericBonus, bonus, mod);
+}
+
+void ToHitStats::SetBonus(int& current, int bonus, int mod)
+{
+	SetBonusInternal(current, bonus, mod);
+	RefreshTotal();
+}
+
+void ToHitStats::HandleFxBonus(int mod, bool permanent)
+{
+	if (permanent) {
+		if (Owner->IsReverseToHit()) {
+			SetBase(base-mod);
+		} else {
+			SetBase(base+mod);
+		}
+		return;
+	}
+	// this was actually aditively modifying Modified directly before
+	if (Owner->IsReverseToHit()) {
+		SetGenericBonus(-mod, 0);
+	} else {
+		SetGenericBonus(mod, 0);
+	}
+}
+
+void ToHitStats::dump() const
+{
+	StringBuffer buffer;
+	buffer.appendFormatted("Debugdump of ToHit of %s:\n", Owner->GetName(1));
+	buffer.appendFormatted("TOTAL: %d\n", total);
+	buffer.appendFormatted("Base: %2d\tGeneric: %d\tAbility: %d\n", base, genericBonus, abilityBonus);
+	buffer.appendFormatted("Armor: %d\tShield: %d\n", armorBonus, shieldBonus);
+	buffer.appendFormatted("Weapon: %d\tProficiency: %d\n\n", weaponBonus, proficiencyBonus);
+	Log(DEBUG, "ToHit", buffer);
+}
+
 
 }

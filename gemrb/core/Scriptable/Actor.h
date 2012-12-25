@@ -45,6 +45,7 @@ class DataFileMgr;
 class Map;
 class ScriptedAnimation;
 class StringBuffer;
+class ToHitStats;
 struct PolymorphCache;
 
 }
@@ -311,6 +312,7 @@ public:
 	ieDword ModalState;
 	int PathTries; //the # of previous tries to pick up a new walkpath
 	ArmorClass AC;
+	ToHitStats ToHit;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieDword UsedExit;
@@ -615,12 +617,13 @@ public:
 	/* returns melee penalty */
 	int MeleePenalty() const;
 	/* gets the to hit value */
-	int GetToHit(int bonus, ieDword Flags, Actor *target) const;
+	int GetToHit(ieDword Flags, Actor* target);
+	void GetTHAbilityBonus(ieDword Flags);
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType, ieDword wflags, Actor *attacker);
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* calculates strength (dexterity) based damage adjustment */

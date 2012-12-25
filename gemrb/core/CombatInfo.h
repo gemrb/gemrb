@@ -75,6 +75,51 @@ private:
 };
 
 
+class GEM_EXPORT ToHitStats {
+public:
+	ToHitStats();
+
+	int GetTotal() const;
+	int GetBase() const { return base; };
+	int GetWeaponBonus() const { return weaponBonus; };
+	int GetArmorBonus() const { return armorBonus; };
+	int GetShieldBonus() const { return shieldBonus; };
+	int GetAbilityBonus() const { return abilityBonus; };
+	int GetProficiencyBonus() const { return proficiencyBonus; };
+	int GetGenericBonus() const { return genericBonus; };
+
+	void ResetAll();
+	void SetOwner(Actor *owner);
+	// no total, it is always kept up to date with RefreshTotal
+	void SetBase(int tohit, int mod=1);
+	void SetProficiencyBonus(int bonus, int mod=1);
+	void SetArmorBonus(int bonus, int mod=1);
+	void SetShieldBonus(int bonus, int mod=1);
+	void SetAbilityBonus(int bonus, int mod=1);
+	void SetWeaponBonus(int bonus, int mod=1);
+	void SetGenericBonus(int bonus, int mod=1);
+
+	void HandleFxBonus(int mod, bool permanent);
+	void dump() const;
+
+private:
+	Actor *Owner;
+	int total; // modified stat, now really containing all the boni
+	int base; // base stat
+
+	// to-hit boni
+	int weaponBonus;
+	int armorBonus; // this is a malus
+	int shieldBonus; // this is a malus
+	int abilityBonus;
+	int proficiencyBonus;
+	int genericBonus; // "other"
+
+	void SetBonus(int &current, int bonus, int mod);
+	void RefreshTotal();
+};
+
+
 }
 
 #endif

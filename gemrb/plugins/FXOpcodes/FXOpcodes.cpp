@@ -1617,7 +1617,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			STATE_SET( STATE_INVISIBLE );
 		}
 		if (fx->FirstApply || fx->TimingMode != FX_DURATION_INSTANT_PERMANENT) {
-			HandleBonus(target, IE_TOHIT, 4, fx->TimingMode);
+			target->ToHit.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		}
 		break;
 	case 1:
@@ -2261,7 +2261,7 @@ int fx_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	HandleBonus( target, IE_TOHIT, fx->Parameter1, fx->TimingMode );
+	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	return FX_PERMANENT;
 }
 
@@ -2707,13 +2707,13 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (core->HasFeature(GF_REVERSE_TOHIT)) {
 				//BG2
 				target->AC.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-				STAT_ADD (IE_TOHIT, 4);
+				target->ToHit.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 			} else {
 				//IWD2
 				target->AC.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 				// TODO: 50% inherent miss chance (full concealment)
 				target->AC.SetDexterityBonus(0); // no dexterity bonus to AC (caught flatfooted)
-				STAT_SUB (IE_TOHIT, 5);
+				target->ToHit.HandleFxBonus(-5, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 			}
 		}
 	}
@@ -3796,7 +3796,7 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
 	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
 	//bless effect too?
-	STAT_ADD( IE_TOHIT, fx->Parameter1);
+	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_AID);
@@ -3818,7 +3818,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	STATE_SET( STATE_BLESS );
 	target->SetSpellState(SS_BLESS);
-	STAT_ADD( IE_TOHIT, fx->Parameter1);
+	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	STAT_ADD( IE_MORALEBREAK, fx->Parameter1);
 	if (enhanced_effects) {
