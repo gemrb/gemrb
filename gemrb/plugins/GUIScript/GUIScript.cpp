@@ -8262,7 +8262,7 @@ endofquest:
 
 PyDoc_STRVAR( GemRB_HasFeat__doc,
 "HasFeat(Slot, feat)\n\n"
-"Returns 1 if the player in Slot has the passed feat id (from ie_feats.py)." );
+"Returns the number of times this feat was taken if the player in Slot has the passed feat id (from ie_feats.py)." );
 
 static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 {
@@ -8273,7 +8273,7 @@ static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-	return PyInt_FromLong( actor->HasFeat(featindex) );
+	return PyInt_FromLong(actor->GetFeat(featindex));
 }
 
 PyDoc_STRVAR( GemRB_SetFeat__doc,
