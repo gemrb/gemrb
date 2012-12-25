@@ -25,6 +25,7 @@
 #include "defsounds.h"
 #include "ie_feats.h"
 
+#include "AmbientMgr.h"
 #include "Audio.h"
 #include "CharAnimations.h"
 #include "DialogHandler.h"
@@ -2477,8 +2478,13 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
 	}
 	if (!anim) {
-		Log(ERROR, "GSUtils", "No Animation Named \"%s\" or \"%s\"",
-			parameters->string0Parameter,parameters->objects[1]->objectName );
+		// iwd2 expects this behaviour in ar6001 by (de)activating sound_portal
+		AmbientMgr *ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+		if (flag) {
+			ambientmgr->activate(parameters->objects[1]->objectName);
+		} else {
+			ambientmgr->deactivate(parameters->objects[1]->objectName);
+		}
 		return;
 	}
 	int i;
