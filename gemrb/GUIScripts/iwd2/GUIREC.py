@@ -581,9 +581,10 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append (41119)
 	RecordsTextArea.Append ("[/color]\n")
 
-	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
+	slot = GemRB.GetEquippedQuickSlot (pc)
+	slot_item = GemRB.GetSlotItem (pc, slot)
 	if not slot_item:
-		print "ARGHH, no slot item, bailing out"
+		print "ARGHH, no slot item at slot", slot, ", bailing out!"
 		return
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	# Main Hand - weapon name
