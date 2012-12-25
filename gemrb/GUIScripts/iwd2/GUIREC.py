@@ -441,8 +441,7 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 		RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(tohit["Generic"]), 0))
 	RecordsTextArea.Append ("\n\n")
 
-#TODO: check if there are any other entries
-# screenshots at http:// lparchive.org/Icewind-Dale-2/Update%206/
+
 def DisplayWeapons (pc):
 	Window = RecordsWindow
 
@@ -552,14 +551,21 @@ def DisplayWeapons (pc):
 
 		# Casting Failure
 		total = GemRB.GetSpellFailure (pc)
-		other = total - 5*(tohit["Armor"] + tohit["Shield"])
+		other = 5*(tohit["Armor"] + tohit["Shield"]) - 5*GemRB.HasFeat(FEAT_ARMORED_ARCANA)
+		# account for armored arcana only if it doesn't cause a negative value (eating into the misc bonus)
+		verbose = 0
+		if other < 0:
+			other = total
+		else:
+			other = total - other
+			verbose = 1
 		RecordsTextArea.Append (delimited_txt (41390 , ":", str (total)+"%", 0))
 		# Armor Penalty (same as for skills and everything else)
-		if tohit["Armor"]:
+		if verbose and tohit["Armor"]:
 			AddIndent()
 			RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(5*tohit["Armor"])+"%", 0))
 		# Shield Penalty
-		if tohit["Shield"]:
+		if verbose and tohit["Shield"]:
 			AddIndent()
 			RecordsTextArea.Append (delimited_txt (39822, ":", PlusMinusStat(5*tohit["Shield"])+"%", 0))
 		# Other, just a guess to show the remainder
