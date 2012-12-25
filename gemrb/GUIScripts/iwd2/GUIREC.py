@@ -30,7 +30,7 @@ import GUIRECCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
-from ie_feats import FEAT_WEAPON_FINESSE
+from ie_feats import FEAT_WEAPON_FINESSE, FEAT_ARMORED_ARCANA
 
 SelectWindow = 0
 Topic = None
@@ -551,7 +551,7 @@ def DisplayWeapons (pc):
 
 		# Casting Failure
 		total = GemRB.GetSpellFailure (pc)
-		other = 5*(tohit["Armor"] + tohit["Shield"]) - 5*GemRB.HasFeat(FEAT_ARMORED_ARCANA)
+		other = 5*(tohit["Armor"] + tohit["Shield"]) - 5*GemRB.HasFeat(pc, FEAT_ARMORED_ARCANA)
 		# account for armored arcana only if it doesn't cause a negative value (eating into the misc bonus)
 		verbose = 0
 		if other < 0:
