@@ -6239,6 +6239,8 @@ int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 			int bonus = GetAbilityBonus(IE_STR);
 			// 150% bonus for twohanders
 			if (wi.itemflags&IE_INV_ITEM_TWOHANDED) bonus+=bonus/2;
+			// only 50% for the offhand
+			if (wi.wflags&WEAPON_LEFTHAND) bonus=bonus/2;
 			return bonus;
 		}
 		return core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
