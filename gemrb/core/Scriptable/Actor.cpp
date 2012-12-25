@@ -5516,12 +5516,12 @@ int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 
 	if (MonkLevel) {
 		// act as a rogue unless barefisted and without armor
-		// TODO: check why it also checked pBAB - meaning that if it has any other class, it will not add monk bab/apr
-		if (/*pBAB ||*/ Equipped != IW_NO_EQUIPPED || GetArmorFailure(0)) {
+		// multiclassed monks only use their monk levels when determining barefisted bab
+		if (Equipped != IW_NO_EQUIPPED || GetArmorFailure(0)) {
 			pBAB += SetLevelBAB(MonkLevel, ISTHIEF);
 		} else {
 			pBABDecrement = 3;
-			pBAB += SetLevelBAB(MonkLevel, ISMONK);
+			pBAB = SetLevelBAB(MonkLevel, ISMONK);
 		}
 		LevelSum += MonkLevel;
 	}
