@@ -472,7 +472,11 @@ def DisplayWeapons (pc):
 
 	###################
 	# Number of Attacks
-	RecordsTextArea.Append (delimited_txt (9458, ":", str (combatdet["APR"]//2)))
+	if dualwielding:
+		# only one extra offhand attack and it is displayed as eg. 2+1
+		RecordsTextArea.Append (delimited_txt (9458, ":", str (combatdet["APR"]//2-1)+"+1"))
+	else:
+		RecordsTextArea.Append (delimited_txt (9458, ":", str (combatdet["APR"]//2)))
 	RecordsTextArea.Append ("\n")
 
 	###################
@@ -588,6 +592,7 @@ def DisplayWeapons (pc):
 	wbonus = +1
 	AddIndent()
 	RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
+	# TODO: any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total
 	# Strength
 	# TODO: check if the weapon takes strength bonus at all and take into account twohandedness - Actor::WeaponDamageBonus
 	abonus = GA(IE_STR)
