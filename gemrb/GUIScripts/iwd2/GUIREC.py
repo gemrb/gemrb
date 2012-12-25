@@ -393,34 +393,27 @@ def CascadeToHit(total, ac, apr):
 			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
 	return cascade
 
-#FIXME: display only nonzero values except for casting failure
-#TODO: check if there are any other entries
-# screenshots at http:// lparchive.org/Icewind-Dale-2/Update%206/
-def DisplayWeapons (pc):
-	Window = RecordsWindow
-
-	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
-	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
-	# maybe add an iwd2 mode to GemRB.GetAbilityBonus
-	GA = lambda s, pc=pc: int((GS(s)-10)/2)
-
-	###################
-	# Attack Roll Modifiers
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (9457)
-	RecordsTextArea.Append ("[/color]\n")
-
-	combatdet = GemRB.GetCombatDetails(pc, 0)
+def ToHitOfHand(combatdet, dualwielding, left=0):
 	ac = combatdet["AC"]
 	tohit = combatdet["ToHitStats"]
 
-	# Main Hand
 	# display all the (successive) attack values (+15/+10/+5)
-	hits = CascadeToHit(tohit["Total"], ac, combatdet["APR"]//2)
-	RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
+	if left:
+		apr = 1 # offhand gives just one extra attack
+		hits = CascadeToHit(tohit["Total"], ac, apr)
+		RecordsTextArea.Append (delimited_txt (733, ":", hits, 0))
+	else:
+		# account for the fact that the total apr contains the one for the other hand too
+		if dualwielding:
+			apr = combatdet["APR"]//2 - 1
+		else:
+			apr = combatdet["APR"]//2
+		hits = CascadeToHit(tohit["Total"], ac, apr)
+		RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
+
 	# Base
 	AddIndent()
-	hits = CascadeToHit(tohit["Base"], ac, combatdet["APR"]//2)
+	hits = CascadeToHit(tohit["Base"], ac, apr)
 	RecordsTextArea.Append (delimited_txt (31353, ":", hits, 0))
 	# Weapon bonus
 	if tohit["Weapon"]:
@@ -448,11 +441,33 @@ def DisplayWeapons (pc):
 		RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(tohit["Generic"]), 0))
 	RecordsTextArea.Append ("\n\n")
 
+#TODO: check if there are any other entries
+# screenshots at http:// lparchive.org/Icewind-Dale-2/Update%206/
+def DisplayWeapons (pc):
+	Window = RecordsWindow
+
+	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
+	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
+	# maybe add an iwd2 mode to GemRB.GetAbilityBonus
+	GA = lambda s, pc=pc: int((GS(s)-10)/2)
+
+	###################
+	# Attack Roll Modifiers
+	RecordsTextArea.Append ("[color=ffff00]")
+	RecordsTextArea.Append (9457)
+	RecordsTextArea.Append ("[/color]\n")
+
+	combatdet = GemRB.GetCombatDetails(pc, 0)
+	ac = combatdet["AC"]
+	tohit = combatdet["ToHitStats"]
+	dualwielding = GemRB.IsDualWielding(pc)
+
+	# Main Hand
+	ToHitOfHand (combatdet, dualwielding)
+
 	# Off Hand
-	if (GemRB.IsDualWielding(pc)):
-		RecordsTextArea.Append (delimited_txt (733, ":", str (GemRB.GetCombatDetails(pc, 1)["ToHitStats"]["Total"]), 0))
-		RecordsTextArea.Append ("\n")
-		#TODO: probably all the same categories as above
+	if dualwielding:
+		ToHitOfHand (GemRB.GetCombatDetails(pc, 1), dualwielding, 1)
 
 
 	###################
