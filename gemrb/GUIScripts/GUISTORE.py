@@ -1349,11 +1349,14 @@ def UpdateStoreHealWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
+	labelOffset = 0x1000000c
+	if GUICommon.GameIsIWD2():
+		labelOffset += 1 # grrr
 	for i in range (ItemButtonCount):
 		Cure = GemRB.GetStoreCure (TopIndex+i)
 
 		Button = Window.GetControl (i+8)
-		Label = Window.GetControl (0x1000000c+i)
+		Label = Window.GetControl (labelOffset+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Cure:
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
