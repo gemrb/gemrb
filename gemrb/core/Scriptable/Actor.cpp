@@ -2401,8 +2401,11 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	ieDword base = arcana?Modified[IE_SPELLFAILUREMAGE]:Modified[IE_SPELLFAILUREPRIEST];
 	if (HasSpellState(SS_DOMINATION)) base += 100;
 	if (HasSpellState(SS_BLINK)) base += 20;
-	//FIXME: IWD2 has this as 20, other games as 50
-	if (HasSpellState(SS_DEAF)) base += 20;
+	// IWD2 has this as 20, other games as 50
+	if (HasSpellState(SS_DEAF)) {
+		base += 20;
+		if (!third) base += 30;
+	}
 	if (!arcana) return base;
 
 	ieDword armor = -GetArmorFailure();
