@@ -246,6 +246,7 @@ struct WeaponInfo {
 	bool backstabbing;
 	ieDword wflags;
 	int critmulti; //critical hit multiplier (usually 2)
+	int critrange; // the lower value of the critical range (eg. 19 in 19-20/x3)
 };
 
 struct BABTable {

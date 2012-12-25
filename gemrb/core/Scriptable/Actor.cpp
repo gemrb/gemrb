@@ -5184,6 +5184,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	wi.itemflags = wield->Flags;
 	wi.prof = item->WeaProf;
 	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);
+	wi.critrange = core->GetCriticalRange(item->ItemType);
 
 	//select first weapon header
 	ITMExtHeader *which;
@@ -5203,6 +5204,11 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 		} else {
 			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
 		}
+	}
+
+	if (which && (which->RechargeFlags&IE_ITEM_KEEN)) {
+		//this is correct, the threat range is only increased by one in the original engine
+		wi.critrange--;
 	}
 
 	//make sure we use 'false' in this freeitem
@@ -6144,11 +6150,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
 	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
 	if (third) {
-		int ThreatRangeMin = ATTACKROLL; // FIXME: this is just the default
-		if (header && (header->RechargeFlags&IE_ITEM_KEEN)) {
-			//this is correct, the threat range is only increased by one in the original engine
-			ThreatRangeMin--;
-		}
+		int ThreatRangeMin = wi.critrange;
 		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus); // TODO: move to GetCombatDetails
 		criticalroll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
 		if (criticalroll < ThreatRangeMin) {

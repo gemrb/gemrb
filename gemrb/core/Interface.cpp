@@ -215,7 +215,6 @@ Interface::Interface(int iargc, char* iargv[])
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
-	itemtypedata = NULL;
 
 	ModalWindow = NULL;
 	tooltip_x = 0;
@@ -440,7 +439,7 @@ Interface::~Interface(void)
 
 	free( slottypes );
 	free( slotmatrix );
-	free( itemtypedata );
+	itemtypedata.clear();
 
 	delete sgiterator;
 
@@ -4380,9 +4379,6 @@ bool Interface::InitItemTypes()
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
-	if (itemtypedata) {
-		free(itemtypedata);
-	}
 
 	AutoTable it("itemtype");
 	ItemTypes = 0;
@@ -4411,22 +4407,28 @@ bool Interface::InitItemTypes()
 		}
 	}
 
-	//itemtype data stores armor failure and critical damage multipliers
-	itemtypedata = (ieDword *) calloc(ItemTypes, sizeof(ieDword) );
-
-	//default values in case itemdata is missing (it is needed only for iwd2)
+	//itemtype data stores (armor failure and critical damage multipliers), critical range
+	itemtypedata.reserve(ItemTypes);
 	for (i=0;i<ItemTypes;i++) {
+		itemtypedata.push_back(std::vector<int>(3));
+		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
-			itemtypedata[i]=2;
+			itemtypedata[i][0] = 2; // malus/multiplier
+			itemtypedata[i][1] = 20; // crit range
 		}
 	}
 	AutoTable af("itemdata");
 	if (af) {
 		int armcount = af->GetRowCount();
+		int colcount = af->GetColumnCount();
+		int j;
 		for (i = 0; i < armcount; i++) {
 			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
 			if (itemtype<ItemTypes) {
-				itemtypedata[itemtype] = (ieWord) atoi( af->QueryField(i,1) );
+				// we don't need the itemtype column, since it is equal to the position
+				for (j=0; j < colcount-1; j++) {
+					itemtypedata[itemtype][j] = atoi(af->QueryField(i, j+1));
+				}
 			}
 		}
 	}
@@ -4570,7 +4572,7 @@ int Interface::GetArmorFailure(unsigned int itemtype) const
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_WEAPON) return 0;
-	return itemtypedata[itemtype];
+	return itemtypedata[itemtype][0];
 }
 
 int Interface::GetShieldPenalty(unsigned int itemtype) const
@@ -4578,7 +4580,7 @@ int Interface::GetShieldPenalty(unsigned int itemtype) const
 	if (itemtype>=(unsigned int) ItemTypes) {
 		return 0;
 	}
-	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype];
+	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][0];
 	return 0;
 }
 
@@ -4587,7 +4589,16 @@ int Interface::GetCriticalMultiplier(unsigned int itemtype) const
 	if (itemtype>=(unsigned int) ItemTypes) {
 		return 0;
 	}
-	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype];
+	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype][0];
+	return 0;
+}
+
+int Interface::GetCriticalRange(unsigned int itemtype) const
+{
+	if (itemtype>=(unsigned int) ItemTypes) {
+		return 0;
+	}
+	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype][1];
 	return 0;
 }
 

@@ -347,7 +347,7 @@ private:
 	ieResRef Palette32;
 	ieResRef Palette256;
 	ieDword* slotmatrix; //itemtype vs slottype
-	ieDword* itemtypedata; //armor failure, critical multiplier
+	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	SlotType* slottypes;
 	int ItemTypes;
 	int tooltip_x;
@@ -589,6 +589,7 @@ public:
 	int GetArmorFailure(unsigned int itemtype) const;
 	int GetShieldPenalty(unsigned int itemtype) const;
 	int GetCriticalMultiplier(unsigned int itemtype) const;
+	int GetCriticalRange(unsigned int itemtype) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, Item *item, Actor *actor=NULL, bool feedback=false, bool equipped=false) const;
 	/*removes single file from cache*/
