@@ -592,14 +592,17 @@ Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_fl
 	while ( t ) {
 		Actor *tmp = (Actor *) (t->actor);
 		if (tmp->GetStat(IE_SEX) != SEX_SUMMON) {
+			t = parameters->GetNextTarget(m, ST_ACTOR);
 			continue;
 		}
 		if (type) { //origin is PC
 			if (tmp->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				t = parameters->GetNextTarget(m, ST_ACTOR);
 				continue;
 			}
 		} else {
 			if (tmp->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				t = parameters->GetNextTarget(m, ST_ACTOR);
 				continue;
 			}
 		}
