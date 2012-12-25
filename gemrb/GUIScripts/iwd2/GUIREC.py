@@ -532,14 +532,21 @@ def DisplayWeapons (pc):
 		RecordsTextArea.Append ("[/color]\n")
 
 		# Casting Failure
-		RecordsTextArea.Append (delimited_txt (41390 , ":", str (GS(IE_SPELLFAILUREMAGE)), 0))
-		# Armor Penalty
-		AddIndent()
-		RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
+		total = GemRB.GetSpellFailure (pc)
+		other = total - 5*(tohit["Armor"] + tohit["Shield"])
+		RecordsTextArea.Append (delimited_txt (41390 , ":", str (total)+"%", 0))
+		# Armor Penalty (same as for skills and everything else)
+		if tohit["Armor"]:
+			AddIndent()
+			RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(5*tohit["Armor"])+"%", 0))
 		# Shield Penalty
-		AddIndent()
-		RecordsTextArea.Append (delimited_txt (39822, ":", str (0), 0))
-		#TODO: check if there's also the bonus from armored arcana
+		if tohit["Shield"]:
+			AddIndent()
+			RecordsTextArea.Append (delimited_txt (39822, ":", PlusMinusStat(5*tohit["Shield"])+"%", 0))
+		# Other, just a guess to show the remainder
+		if other:
+			AddIndent()
+			RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(other)+"%", 0))
 
 		RecordsTextArea.Append ("\n\n")
 

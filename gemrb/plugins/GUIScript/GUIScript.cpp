@@ -9891,6 +9891,25 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
+PyDoc_STRVAR( GemRB_GetSpellFailure__doc,
+			  "GetSpellFailure(pc[, cleric])\n\n"
+			  "returns the (arcane unless cleric is set) spell failure in percent.");
+static PyObject* GemRB_GetSpellFailure(PyObject * /*self*/, PyObject* args)
+{
+	int globalID;
+	int cleric = 0;
+
+	if (!PyArg_ParseTuple( args, "i|i", &globalID, &cleric)) {
+		return AttributeError( GemRB_GetSpellFailure__doc );
+	}
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	// true means arcane, so reverse the passed argument
+	int failure = actor->GetSpellFailure(!cleric);
+	return PyInt_FromLong(failure);
+}
+
 PyDoc_STRVAR( GemRB_IsDualWielding__doc,
 "IsDualWielding(pc)\n\n"
 "1 if the pc is dual wielding; 0 otherwise.");
@@ -10416,6 +10435,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetSelectedActors, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
+	METHOD(GetSpellFailure, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
 	METHOD(GetSlotType, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),
