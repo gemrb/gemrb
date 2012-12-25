@@ -9864,6 +9864,8 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "CriticalBonus", PyInt_FromLong (CriticalBonus));
 	PyDict_SetItemString(dict, "Style", PyInt_FromLong (style));
 	PyDict_SetItemString(dict, "APR", PyInt_FromLong (actor->GetNumberOfAttacks() ));
+	PyDict_SetItemString(dict, "CriticalMultiplier", PyInt_FromLong (wi.critmulti));
+	PyDict_SetItemString(dict, "CriticalRange", PyInt_FromLong (wi.critrange));
 
 	actor->AC.dump();
 	actor->ToHit.dump();

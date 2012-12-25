@@ -623,12 +623,12 @@ def DisplayWeapons (pc):
 	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus
 	RecordsTextArea.Append (delimited_txt (41120, ":", str (wmin)+"-"+str(wmax), 0))
 	# Critical Hit (19-20 / x2)
-	# TODO: display the number of rolls and check if the critical range is already ok
-	crange = 20 - combatdet["CriticalBonus"]
+	crange = combatdet["CriticalRange"]
+	cmulti = combatdet["CriticalMultiplier"]
 	if crange == 20:
-		crange = "20 / x" + str(1)
+		crange = "20 / x" + str(cmulti)
 	else:
-		crange = str(crange) + "-20 / x" + str(1)
+		crange = str(crange) + "-20 / x" + str(cmulti)
 	AddIndent()
 	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
 
