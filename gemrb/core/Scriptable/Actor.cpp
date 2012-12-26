@@ -329,7 +329,7 @@ static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
-static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier", -1 };
+static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd2

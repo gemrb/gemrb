@@ -248,7 +248,7 @@ static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectDesc effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1 }, //0
-	{ "DamageBonusModifier", fx_damage_bonus_modifier, 0, -1 }, //49
+	{ "DamageBonusModifier2", fx_damage_bonus_modifier, 0, -1 }, //49
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1 },//84 (iwd2)
 	{ "IronSkins", fx_ironskins, 0, -1 }, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, 0, -1 }, //e8

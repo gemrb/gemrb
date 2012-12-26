@@ -72,7 +72,7 @@ IDS
 0x46	Cure:NonDetection
 0x47	SexModifier
 0x48	AIIdentifierModifier
-0x49	DamageBonusModifier
+0x49	DamageBonusModifier2
 0x4a	State:Blind
 0x4b	Cure:Blind
 0x4c	State:Feeblemind
