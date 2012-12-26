@@ -213,15 +213,15 @@ def MoveToNewArea ():
 
 def ChangeTooltip ():
 	global WorldMapWindow, WorldMapControl
-	global str
 
-	tmp = WorldMapControl.GetDestinationArea ()
-	if (tmp):
-		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
-	else:
-		str=""
+	tt = ""
+	area = WorldMapControl.GetDestinationArea ()
+	if (area):
+		str = GemRB.GetString(23084)
+		if (str):
+			tt = "%s: %d"%(str,area["Distance"])
 
-	WorldMapControl.SetTooltip (str)
+	WorldMapControl.SetTooltip (tt)
 	return
 
 def CloseWorldMapWindow ():
