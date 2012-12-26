@@ -218,25 +218,16 @@ def DisplayCommon (pc):
 def DisplaySavingThrows (pc):
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
 	RecordsTextArea.Append (17379)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("[/color]\n")
+
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
-	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE, 1)
-	if tmp<0: stmp = str(tmp)
-	else: stmp = "+"+str(tmp)
-	RecordsTextArea.Append (17380,-1)
-	RecordsTextArea.Append (": "+stmp )
+	RecordsTextArea.Append (delimited_txt(17380, ":", PlusMinusStat(tmp)))
+
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEREFLEX)
-	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEREFLEX, 1)
-	if tmp<0: stmp = str(tmp)
-	else: stmp = "+"+str(tmp)
-	RecordsTextArea.Append (17381,-1)
-	RecordsTextArea.Append (": "+stmp )
+	RecordsTextArea.Append (delimited_txt(17381, ":", PlusMinusStat(tmp)))
+
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEWILL)
-	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEWILL, 1)
-	if tmp<0: stmp = str(tmp)
-	else: stmp = "+"+str(tmp)
-	RecordsTextArea.Append (17382,-1)
-	RecordsTextArea.Append (": "+stmp )
+	RecordsTextArea.Append (delimited_txt(17382, ":", PlusMinusStat(tmp), 0))
 
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
 def DisplayGeneral (pc):
