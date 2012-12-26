@@ -7119,14 +7119,16 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSlotItem__doc,
-"GetSlotItem(PartyID, slot)=>dict\n\n"
-"Returns dict with specified slot item from PC's inventory or the dragged item if PartyID is 0.\n");
+"GetSlotItem(globalID, slot[, translated])=>dict\n\n"
+"Returns dict with specified slot item from PC's inventory or the dragged item if globalID is 0.\n\n"
+"If translated is nonzero, the slot will not be looked up again.\n");
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot;
+	int translated = 0; // inventory slots are numbered differently in CRE and need to be remapped
 
-	if (!PyArg_ParseTuple( args, "ii", &globalID, &Slot)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &globalID, &Slot, &translated)) {
 		return AttributeError( GemRB_GetSlotItem__doc );
 	}
 	CREItem *si;
@@ -7138,7 +7140,9 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		GET_GAME();
 		GET_ACTOR_GLOBAL();
 
-		Slot = core->QuerySlot(Slot);
+		if (!translated) {
+			Slot = core->QuerySlot(Slot);
+		}
 		header = actor->PCStats->GetHeaderForSlot(Slot);
 
 		si = actor->inventory.GetSlotItem( Slot );
