@@ -5288,7 +5288,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		int roll = LuckyRoll(1, 100, 0);
 		// adjust the roll for specialist mages
 		// doesn't work in bg1, since its spells don't have PrimaryType set (0 is NONE)
-		if (GetKitIndex(kit) && spell->PrimaryType) {
+		if (!third && GetKitIndex(kit) && spell->PrimaryType) {
 			if (kit == (unsigned) 1<<(spell->PrimaryType+5)) { // +5 since the kit values start at 0x40
 				roll += 15;
 			} else {
