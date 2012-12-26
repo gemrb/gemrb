@@ -1570,6 +1570,10 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter1<=1) {
 		ret = FX_NOT_APPLIED;
+		// prevent an underflow
+		if (fx->Parameter1 == 0) {
+			return ret;
+		}
 	}
 
 	//timing
