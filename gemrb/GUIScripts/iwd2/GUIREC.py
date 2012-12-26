@@ -611,7 +611,22 @@ def DisplayWeapons (pc):
 		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
 	else:
 		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
-	# TODO: any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
+	# any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
+	alldos = combatdet["DamageOpcodes"]
+	dosmin = 0
+	dosmax = 0
+	for dos in alldos:
+		ddice = dos["NumDice"]
+		dsides = dos["DiceSides"]
+		dbonus = dos["DiceBonus"]
+		AddIndent()
+		if dbonus:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus))
+		else:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides))
+		dosmin += ddice + dbonus
+		dosmax += ddice*dsides + dbonus
+
 	# Strength
 	abonus = combatdet["WeaponStrBonus"]
 	if abonus:
@@ -630,8 +645,8 @@ def DisplayWeapons (pc):
 	# Damage Potential (2-12)
 	# add any other bonus to the ammo damage calc
 	AddIndent()
-	wmin = wdice + wbonus + abonus + pbonus + lbonus
-	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus
+	wmin = wdice + wbonus + abonus + pbonus + lbonus + dosmin
+	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus + dosmax
 	RecordsTextArea.Append (delimited_txt (41120, ":", str (wmin)+"-"+str(wmax), 0))
 	# Critical Hit (19-20 / x2)
 	crange = combatdet["CriticalRange"]

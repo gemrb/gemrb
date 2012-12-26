@@ -258,4 +258,52 @@ unsigned int Item::GetCastingDistance(int idx) const
 	return (unsigned int) seh->Range;
 }
 
+static EffectRef fx_damage_ref = { "Damage", -1 };
+// returns a vector with details about any extended headers containing fx_damage with a 100% probability
+std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) const
+{
+	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
+	std::multimap<ieDword, DamageInfoStruct>::iterator it;
+	std::vector<DMGOpcodeInfo> damage_opcodes;
+	if (!header) return damage_opcodes;
+	for (int i=0; i< header->FeatureCount; i++) {
+		Effect *fx = header->features+i;
+		// Probability1 is the high number
+		if (fx->Opcode == damage_opcode && fx->Probability1 == 100) {
+			// it's not the same damagetype, these are different values, so we need a translation
+			// 0-3 -> 0 (crushing)
+			// 2^16+[0-3] -> 1 (acid)
+			// 2^17+[0-3] -> 2 (cold)
+			// 2^18+[0-3] -> 4 (electricity)
+			// and so on. Should be fine up until DAMAGE_MAGICFIRE, where we may start making wrong lookups
+			ieDword damagetype = fx->Parameter2;
+			if (damagetype < 4) {
+				damagetype = 0;
+			} else {
+				// 2^(log2(damagetype)-15-1)
+				int pow = 0;
+				while (damagetype) {
+					damagetype = damagetype>>1;
+					pow++;
+				}
+				damagetype = 1<<(pow - 17);
+			}
+			it = core->DamageInfoMap.find(damagetype);
+			if (it == core->DamageInfoMap.end()) {
+				print("Unhandled damagetype: %d", damagetype);
+				continue;
+			}
+			DMGOpcodeInfo damage;
+			// it's lower case instead of title case, but let's see how long it takes for anyone to notice - 26.12.2012
+			damage.TypeName = core->GetString(it->second.strref, 0);
+			damage.DiceThrown = fx->DiceThrown;
+			damage.DiceSides = fx->DiceSides;
+			damage.DiceBonus = fx->Parameter1;
+			damage_opcodes.push_back(damage);
+		}
+	}
+	return damage_opcodes;
+}
+
+
 }

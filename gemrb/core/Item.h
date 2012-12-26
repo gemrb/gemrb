@@ -33,6 +33,8 @@
 
 #include "EffectQueue.h"
 
+#include <vector>
+
 namespace GemRB {
 
 class Projectile;
@@ -105,6 +107,14 @@ class Projectile;
 
 //items caster level is hardcoded to 10
 #define ITEM_CASTERLEVEL   10
+
+struct DMGOpcodeInfo {
+	const char *TypeName;
+	int DiceThrown;
+	int DiceSides;
+	int DiceBonus;
+};
+
 /**
  * @class ITMExtHeader
  * Header for special effects and uses of an Item.
@@ -266,6 +276,8 @@ public:
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
 	unsigned int GetCastingDistance(int header) const;
+	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
+	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(ITMExtHeader *header) const;
 private:
 };
 

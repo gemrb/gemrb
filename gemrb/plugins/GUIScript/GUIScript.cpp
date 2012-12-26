@@ -9842,8 +9842,8 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 
 	leftorright = leftorright&1;
 	WeaponInfo wi;
-	ITMExtHeader *header = NULL;
-	ITMExtHeader *hittingheader = NULL;
+	ITMExtHeader *header = NULL; // contains the weapon header
+	ITMExtHeader *hittingheader = NULL; // same header, except for ranged weapons it is the ammo header
 	int tohit=20;
 	int DamageBonus=0;
 	int CriticalBonus=0;
@@ -9896,6 +9896,33 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(tohits, "Ability", PyInt_FromLong (actor->ToHit.GetAbilityBonus()));
 	PyDict_SetItemString(tohits, "Weapon", PyInt_FromLong (actor->ToHit.GetWeaponBonus()));
 	PyDict_SetItemString(dict, "ToHitStats", tohits);
+
+	//FIXME this returns the launcher, not ammo
+	//FIXME: remove the need to look it up again
+	const CREItem *wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
+	if (!wield) {
+		return 0;
+	}
+	Item *item = gamedata->GetItem(wield->ItemResRef, true);
+	if (!item) {
+		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef);
+		return dict;
+	}
+
+	// create a tuple with all the 100% probable damage opcodes' stats
+	std::vector<DMGOpcodeInfo> damage_opcodes = item->GetDamageOpcodesDetails(header) ;
+	PyObject *alldos = PyTuple_New(damage_opcodes.size());
+	unsigned int i;
+	for (i = 0; i < damage_opcodes.size(); i++) {
+		PyObject *dos = PyDict_New();
+		PyDict_SetItemString(dos, "TypeName", PyString_FromString (damage_opcodes[i].TypeName));
+		PyDict_SetItemString(dos, "NumDice", PyInt_FromLong (damage_opcodes[i].DiceThrown));
+		PyDict_SetItemString(dos, "DiceSides", PyInt_FromLong (damage_opcodes[i].DiceSides));
+		PyDict_SetItemString(dos, "DiceBonus", PyInt_FromLong (damage_opcodes[i].DiceBonus));
+		PyTuple_SetItem(alldos, i, dos);
+	}
+	PyDict_SetItemString(dict, "DamageOpcodes", alldos);
+
 	return dict;
 }
 
