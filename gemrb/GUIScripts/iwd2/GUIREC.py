@@ -215,6 +215,29 @@ def DisplayCommon (pc):
 	Label.SetText (Race)
 	return
 
+def DisplaySavingThrows (pc):
+	RecordsTextArea.Append ("\n\n[color=ffff00]")
+	RecordsTextArea.Append (17379)
+	RecordsTextArea.Append ("[/color]")
+	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
+	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE, 1)
+	if tmp<0: stmp = str(tmp)
+	else: stmp = "+"+str(tmp)
+	RecordsTextArea.Append (17380,-1)
+	RecordsTextArea.Append (": "+stmp )
+	tmp = GemRB.GetPlayerStat (pc, IE_SAVEREFLEX)
+	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEREFLEX, 1)
+	if tmp<0: stmp = str(tmp)
+	else: stmp = "+"+str(tmp)
+	RecordsTextArea.Append (17381,-1)
+	RecordsTextArea.Append (": "+stmp )
+	tmp = GemRB.GetPlayerStat (pc, IE_SAVEWILL)
+	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEWILL, 1)
+	if tmp<0: stmp = str(tmp)
+	else: stmp = "+"+str(tmp)
+	RecordsTextArea.Append (17382,-1)
+	RecordsTextArea.Append (": "+stmp )
+
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
 def DisplayGeneral (pc):
 	Window = RecordsWindow
@@ -310,27 +333,7 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (Align,-1)
 
 	#saving throws
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (17379)
-	RecordsTextArea.Append ("[/color]")
-	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
-	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE, 1)
-	if tmp<0: stmp = str(tmp)
-	else: stmp = "+"+str(tmp)
-	RecordsTextArea.Append (17380,-1)
-	RecordsTextArea.Append (": "+stmp )
-	tmp = GemRB.GetPlayerStat (pc, IE_SAVEREFLEX)
-	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEREFLEX, 1)
-	if tmp<0: stmp = str(tmp)
-	else: stmp = "+"+str(tmp)
-	RecordsTextArea.Append (17381,-1)
-	RecordsTextArea.Append (": "+stmp )
-	tmp = GemRB.GetPlayerStat (pc, IE_SAVEWILL)
-	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEWILL, 1)
-	if tmp<0: stmp = str(tmp)
-	else: stmp = "+"+str(tmp)
-	RecordsTextArea.Append (17382,-1)
-	RecordsTextArea.Append (": "+stmp )
+	DisplaySavingThrows (pc)
 
 	#class features
 	if HasClassFeatures(pc):
@@ -522,7 +525,8 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		crange = str(crange) + "-20 / x" + str(cmulti)
 	AddIndent()
 	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
-	RecordsTextArea.Append ("\n")
+	if not left and dualwielding:
+		RecordsTextArea.Append ("\n")
 
 def DisplayWeapons (pc):
 	Window = RecordsWindow
@@ -671,6 +675,7 @@ def DisplayWeapons (pc):
 		RecordsTextArea.Append ("\n")
 		WeaponOfHand(pc, GemRB.GetCombatDetails(pc, 1), dualwielding, 1)
 
+	DisplaySavingThrows (pc)
 
 	return
 
