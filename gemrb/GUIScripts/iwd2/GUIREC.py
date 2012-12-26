@@ -441,6 +441,88 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 		RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(tohit["Generic"]), 0))
 	RecordsTextArea.Append ("\n\n")
 
+def WeaponOfHand(pc, combatdet, dualwielding, left=0):
+	slot = combatdet["Slot"]
+	slot_item = GemRB.GetSlotItem (pc, slot, 1)
+	if not slot_item:
+		print "ARGHH, no slot item at slot %d, bailing out!" %(combatdet["Slot"])
+		return
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	ammo = None
+	if not left: # only the main hand can have ranged weapons, even one-handed
+		ammoslot = GemRB.GetEquippedAmmunition (pc)
+		if ammoslot != -1:
+			ammosi = GemRB.GetSlotItem (pc, ammoslot)
+			ammo = GemRB.GetItem (ammosi["ItemResRef"])
+
+	# Main Hand - weapon name
+	#  or Ranged - ammo
+	if combatdet["Flags"]&15 == 2 and ammo: # this is basically wi.wflags & WEAPON_STYLEMASK == WEAPON_RANGED
+		RecordsTextArea.Append (delimited_str (41123, " -", ammo["ItemNameIdentified"], 0))
+	else:
+		if dualwielding and left:
+			RecordsTextArea.Append (delimited_str (733, " -", item["ItemNameIdentified"], 0))
+		else:
+			RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
+
+	# Damage
+	# display the unresolved damage string (2d6)
+	# this is ammo, launcher details come later
+	wdice = combatdet["HitHeaderNumDice"]
+	wsides = combatdet["HitHeaderDiceSides"]
+	wbonus = combatdet["HitHeaderDiceBonus"]
+	AddIndent()
+	if wbonus:
+		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
+	else:
+		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
+	# any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
+	alldos = combatdet["DamageOpcodes"]
+	dosmin = 0
+	dosmax = 0
+	for dos in alldos:
+		ddice = dos["NumDice"]
+		dsides = dos["DiceSides"]
+		dbonus = dos["DiceBonus"]
+		AddIndent()
+		if dbonus:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus))
+		else:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides))
+		dosmin += ddice + dbonus
+		dosmax += ddice*dsides + dbonus
+
+	# Strength
+	abonus = combatdet["WeaponStrBonus"]
+	if abonus:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (1145, ":", PlusMinusStat (abonus), 0))
+	# Proficiency (bonus)
+	pbonus = combatdet["ProfDmgBon"]
+	if pbonus:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(pbonus), 0))
+	# Launcher
+	lbonus = combatdet["LauncherDmgBon"]
+	if lbonus:
+		AddIndent()
+		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))
+	# Damage Potential (2-12)
+	# add any other bonus to the ammo damage calc
+	AddIndent()
+	wmin = wdice + wbonus + abonus + pbonus + lbonus + dosmin
+	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus + dosmax
+	RecordsTextArea.Append (delimited_txt (41120, ":", str (wmin)+"-"+str(wmax), 0))
+	# Critical Hit (19-20 / x2)
+	crange = combatdet["CriticalRange"]
+	cmulti = combatdet["CriticalMultiplier"]
+	if crange == 20:
+		crange = "20 / x" + str(cmulti)
+	else:
+		crange = str(crange) + "-20 / x" + str(cmulti)
+	AddIndent()
+	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
+	RecordsTextArea.Append ("\n")
 
 def DisplayWeapons (pc):
 	Window = RecordsWindow
@@ -581,84 +663,14 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append (41119)
 	RecordsTextArea.Append ("[/color]\n")
 
-	slot = GemRB.GetEquippedQuickSlot (pc)
-	slot_item = GemRB.GetSlotItem (pc, slot)
-	if not slot_item:
-		print "ARGHH, no slot item at slot %d (%d), bailing out!" %(slot, combatdet["Slot"])
-		return
-	item = GemRB.GetItem (slot_item["ItemResRef"])
-	ammoslot = GemRB.GetEquippedAmmunition (pc)
-	ammo = None
-	if ammoslot != -1:
-		ammosi = GemRB.GetSlotItem (pc, slot)
-		ammo = GemRB.GetItem (ammosi["ItemResRef"])
-	print "SAD DEBUG LOG", ammoslot, ammo
-	# Main Hand - weapon name
-	#  or Ranged - ammo
-	if combatdet["Flags"]&15 == 2 and ammo: # this is basically wi.wflags & WEAPON_STYLEMASK == WEAPON_RANGED
-		RecordsTextArea.Append (delimited_str (41123, " -", ammo["ItemNameIdentified"], 0))
-	else:
-		RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
+	# Main hand
+	WeaponOfHand(pc, combatdet, dualwielding)
 
-	# Damage
-	# display the unresolved damage string (2d6)
-	# this is ammo, launcher details come later
-	wdice = combatdet["HitHeaderNumDice"]
-	wsides = combatdet["HitHeaderDiceSides"]
-	wbonus = combatdet["HitHeaderDiceBonus"]
-	AddIndent()
-	if wbonus:
-		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
-	else:
-		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
-	# any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
-	alldos = combatdet["DamageOpcodes"]
-	dosmin = 0
-	dosmax = 0
-	for dos in alldos:
-		ddice = dos["NumDice"]
-		dsides = dos["DiceSides"]
-		dbonus = dos["DiceBonus"]
-		AddIndent()
-		if dbonus:
-			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus))
-		else:
-			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides))
-		dosmin += ddice + dbonus
-		dosmax += ddice*dsides + dbonus
+	# Off-hand (if any)
+	if dualwielding:
+		RecordsTextArea.Append ("\n")
+		WeaponOfHand(pc, GemRB.GetCombatDetails(pc, 1), dualwielding, 1)
 
-	# Strength
-	abonus = combatdet["WeaponStrBonus"]
-	if abonus:
-		AddIndent()
-		RecordsTextArea.Append (delimited_txt (1145, ":", PlusMinusStat (abonus), 0))
-	# Proficiency (bonus)
-	pbonus = combatdet["ProfDmgBon"]
-	if pbonus:
-		AddIndent()
-		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(pbonus), 0))
-	# Launcher
-	lbonus = combatdet["LauncherDmgBon"]
-	if lbonus:
-		AddIndent()
-		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))
-	# Damage Potential (2-12)
-	# add any other bonus to the ammo damage calc
-	AddIndent()
-	wmin = wdice + wbonus + abonus + pbonus + lbonus + dosmin
-	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus + dosmax
-	RecordsTextArea.Append (delimited_txt (41120, ":", str (wmin)+"-"+str(wmax), 0))
-	# Critical Hit (19-20 / x2)
-	crange = combatdet["CriticalRange"]
-	cmulti = combatdet["CriticalMultiplier"]
-	if crange == 20:
-		crange = "20 / x" + str(cmulti)
-	else:
-		crange = str(crange) + "-20 / x" + str(cmulti)
-	AddIndent()
-	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
-
-	#TODO: probably repeat for the off-hand
 
 	return
 
