@@ -22,7 +22,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Calendar.cpp
 	Callback.cpp
 	CharAnimations.cpp
-	CombatInfo.cpp
 	Compressor.cpp
 	ControlAnimation.cpp
 	Core.cpp
@@ -118,6 +117,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
 	Scriptable/Actor.cpp
+	Scriptable/CombatInfo.cpp
 	Scriptable/Container.cpp
 	Scriptable/Door.cpp
 	Scriptable/InfoPoint.cpp

@@ -54,7 +54,6 @@
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "System/StringBuffer.h"
-#include <CombatInfo.h>
 
 #include <cassert>
 
