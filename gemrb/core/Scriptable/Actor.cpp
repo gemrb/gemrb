@@ -152,10 +152,13 @@ static const char *skillcolumns[12]={
 static ieResRef featspells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
+//static ieDword *kituse = NULL;
+//static int kitcount = -1;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
 static bool raresnd = false;
+static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 
@@ -411,7 +414,12 @@ void ReleaseMemoryActor()
 		delete [] itemuse;
 		itemuse = NULL;
 	}
-
+/*
+	if (kituse) {
+		delete [] kituse;
+		kituse = NULL;
+	}
+*/
 	if (itemanim) {
 		delete [] itemanim;
 		itemanim = NULL;
@@ -956,7 +964,7 @@ void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
-	actor->InitButtons(newValue, !core->HasFeature(GF_LEVELSLOT_PER_CLASS));
+	actor->InitButtons(newValue, !iwd2class);
 
 	int sorcerer=0;
 	if (newValue<(ieDword) classcount) {
@@ -1607,6 +1615,7 @@ static void InitActorTables()
 	nocreate = !!core->HasFeature(GF_NO_NEW_VARIABLES);
 	third = !!core->HasFeature(GF_3ED_RULES);
 	raresnd = !!core->HasFeature(GF_RARE_ACTION_VB);
+	iwd2class = !!core->HasFeature(GF_LEVELSLOT_PER_CLASS);
 
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
@@ -1898,7 +1907,8 @@ static void InitActorTables()
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
 	}
-	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+	if (iwd2class) {
+		//kitcount = 0;
 		// we need to set up much less here due to a saner class/level system in 3ed
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
@@ -1907,7 +1917,8 @@ static void InitActorTables()
 			int classis = IsClassFromName(classname);
 			ieDword classID = atoi(tm->QueryField(classname, "ID"));
 			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
-			if (!classID || classcol) {
+			if (classcol) {
+				//kitcount++;
 				continue;
 			}
 
@@ -1945,6 +1956,18 @@ static void InitActorTables()
 			//TODO: generate classesiwd2 here, so it can be unhardcoded
 			Log(DEBUG, "Actor", buffer);
 		}
+		/*
+		//pass two: iwd2 kit usabilities
+		kituse = (ieDword *) calloc(kitcount, sizeof(ieDword) );
+		int idx = 0;
+		for(i=0;i<classcount;i++) {
+			const char *classname = tm->GetRowName(i);
+			ieDword classcol = atoi(tm->QueryField(classname, "CLASS") );
+			ieDword usability = strtoul(tm->QueryField(classname, "USABILITY"), NULL, 0 );
+			if (!classcol) continue;
+			kituse[j++]=usability;
+		}
+		*/
 	} else {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
@@ -4181,7 +4204,7 @@ ieDword Actor::GetXPLevel(int modified) const
 
 	int clscount = 0;
 	float average = 0;
-	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+	if (iwd2class) {
 		// iwd2
 		for (int i=0; i < ISCLASSES; i++) {
 			if (stats[levelslotsiwd2[i]] > 0) clscount++;
@@ -8088,12 +8111,18 @@ int Actor::CheckUsability(Item *item) const
 		ieDword itemvalue = itembits[itemuse[i].which];
 		ieDword stat = GetStat(itemuse[i].stat);
 		ieDword mcol = itemuse[i].mcol;
-		//if we have a kit, we just we use it's index for the lookup
+		//if we have a kit, we just use its index for the lookup
 		if (itemuse[i].stat==IE_KIT) {
-			stat = GetKitIndex(stat, itemuse[i].table);
-			mcol = 0xff;
+			if (!iwd2class) {
+				stat = GetKitIndex(stat, itemuse[i].table);
+				mcol = 0xff;
+			} else {
+				//iwd2 doesn't need translation from kit to usability, the kit value IS usability
+				goto no_resolve;
+			}
 		}
 		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+no_resolve:
 		if (stat&itemvalue) {
 			//print("failed usability: itemvalue %d, stat %d, stat value %d", itemvalue, itemuse[i].stat, stat);
 			return STR_CANNOT_USE_ITEM;
@@ -8393,7 +8422,7 @@ void Actor::CreateDerivedStatsIWD2()
 //and similar derived stats that change with level
 void Actor::CreateDerivedStats()
 {
-	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+	if (iwd2class) {
 		multiclass = 0;
 	} else {
 		ieDword cls = BaseStats[IE_CLASS]-1;
