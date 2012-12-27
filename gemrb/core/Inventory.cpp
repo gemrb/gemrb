@@ -797,7 +797,7 @@ int Inventory::DepleteItem(ieDword flags)
 // if flags is 0, skips undroppable items
 // if flags is IE_INV_ITEM_UNDROPPABLE, doesn't skip undroppable items
 // TODO: once all callers have been checked, this can be reversed to make more sense
-int Inventory::FindItem(const char *resref, unsigned int flags) const
+int Inventory::FindItem(const char *resref, unsigned int flags, unsigned int skip) const
 {
 	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
 	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
@@ -814,7 +814,11 @@ int Inventory::FindItem(const char *resref, unsigned int flags) const
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		return (int) i;
+		if (skip) {
+			skip--;
+		} else {
+			return (int) i;
+		}
 	}
 	return -1;
 }

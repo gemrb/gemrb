@@ -271,7 +271,7 @@ public:
 	//charges recharging items
 	void ChargeAllItems(int hours);
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
-	int FindItem(const char *resref, unsigned int flags) const;
+	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, const Point &loc);
 	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header);
