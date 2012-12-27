@@ -235,7 +235,6 @@ struct ActionButtonRow2 {
 };
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
-typedef std::list<ieResRef*> resourceList;
 
 struct WeaponInfo {
 	int slot;
