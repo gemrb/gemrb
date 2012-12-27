@@ -3704,6 +3704,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	if (InternalFlags & IF_REALLYDIED) {
 		return 0;
 	}
+	// hidden creatures are immune too, iwd2 Targos palisade attack relies on it (12cspn1a.bcs)
+	if (Modified[IE_AVATARREMOVAL]) {
+		return 0;
+	}
 
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
