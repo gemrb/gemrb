@@ -3627,7 +3627,7 @@ void Actor::DialogInterrupt()
 
 void Actor::GetHit()
 {
-	if (!Immobile()) {
+	if (!Immobile() && !(InternalFlags & IF_REALLYDIED)) {
 		SetStance( IE_ANI_DAMAGE );
 	}
 	VerbalConstant(VB_DAMAGE, 1 );
