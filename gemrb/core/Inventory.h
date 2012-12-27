@@ -363,6 +363,7 @@ private:
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(Item *it);
+	void SanitizeItem(CREItem *item);
 };
 
 }

@@ -157,12 +157,16 @@ CREItem *Inventory::GetItem(unsigned int slot)
 	return item;
 }
 
-//This hack sets the charge counters for non-rechargeable items,
-//if their charge is zero
-static inline void HackCharges(CREItem *item)
+//Make sure the item attributes are valid
+//we don't update all flags here because some need to be set later (like
+//unmovable items in containers (e.g. the bg2 protal key) so that they
+//can actually be picked up)
+void Inventory::SanitizeItem(CREItem *item)
 {
 	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (itm) {
+		//This hack sets the charge counters for non-rechargeable items,
+		//if their charge is zero
 		for (int i=0;i<3;i++) {
 			if (item->Usages[i]) {
 				continue;
@@ -177,6 +181,19 @@ static inline void HackCharges(CREItem *item)
 				}
 			}
 		}
+
+		//auto identify basic items
+		if (!itm->LoreToID) {
+			item->Flags |= IE_INV_ITEM_IDENTIFIED;
+		}
+
+		//if item is stacked mark it as so
+		if (itm->MaxStackAmount) {
+			item->Flags |= IE_INV_ITEM_STACKED;
+		}
+
+		item->MaxStackAmount = itm->MaxStackAmount;
+
 		gamedata->FreeItem( itm, item->ItemResRef, false );
 	}
 }
@@ -185,10 +202,7 @@ void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
-	HackCharges(item);
-	//this will update the flags (needed for unmovable items in containers)
-	//but those *can* be picked up (like the bg2 portal key), so we skip it
-	//Changed=true;
+	SanitizeItem(item);
 }
 
 void Inventory::CalculateWeight() const
@@ -227,18 +241,8 @@ void Inventory::CalculateWeight() const
 					slot->Flags |= IE_INV_ITEM_STOLEN;
 				}
 
-				//auto identify basic items
-				if (!itm->LoreToID) {
-					slot->Flags |= IE_INV_ITEM_IDENTIFIED;
-				}
-
-				//if item is stacked mark it as so
-				if (itm->MaxStackAmount) {
-					slot->Flags |= IE_INV_ITEM_STACKED;
-				}
-
 				slot->Weight = itm->Weight;
-				slot->MaxStackAmount = itm->MaxStackAmount;
+
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
@@ -613,7 +617,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		delete Slots[slot];
 	}
 
-	HackCharges(item);
+	SanitizeItem(item);
 
 	Slots[slot] = item;
 
