@@ -223,8 +223,8 @@ public:
 	bool HasItemInSlot(const char *resref, unsigned int slot) const;
 	/** returns true if contains one itemtype equipped */
 	bool HasItemType(ieDword type) const;
-	/** Looks for a particular item in the inventory. */
-	/* flags: see ieCREItemFlagBits */
+	/** Looks for a particular item in the inventory.
+	 * flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags) const;
 
 	void CalculateWeight(void) const;
