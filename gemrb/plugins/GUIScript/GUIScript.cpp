@@ -102,6 +102,9 @@ static int ItemSoundsCount = -1;
 //bit used in SetCreatureStat to access some fields
 #define EXTRASETTINGS 0x1000
 
+//maximum distance for passing items between two characters
+#define MAX_DISTANCE 500
+
 struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
@@ -7646,6 +7649,16 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		Slottype = core->QuerySlotType( Slot );
 		Effect = core->QuerySlotEffects( Slot );
 	}
+
+	// too far away?
+	Actor *current = core->GetFirstSelectedPC(false);
+	if (current && current != actor &&
+		(actor->GetCurrentArea() != current->GetCurrentArea() ||
+		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
+		displaymsg->DisplayConstantString(STR_TOOFARAWAY, DMC_WHITE);
+		return PyInt_FromLong( 0 );
+	}
+
 	CREItem * slotitem = core->GetDraggedItem();
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
 	if (!item) {

@@ -216,8 +216,9 @@ namespace GemRB {
 #define STR_CANTMOVE 181
 #define STR_SUMMONINGLIMIT 182
 #define STR_INVFULL 183
+#define STR_TOOFARAWAY 184
 
-#define STRREF_COUNT 184
+#define STRREF_COUNT 185
 
 }
 
