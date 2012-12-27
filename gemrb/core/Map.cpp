@@ -3351,6 +3351,29 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 			}
 		}
 	}
+
+	// reshuffle the items so they are sorted
+	unsigned int i = othercontainer->inventory.GetSlotCount();
+	if (i < 3) {
+		// nothing to do
+		return;
+	}
+
+	// sort by removing all items that have copies and readding them at the end
+	i = othercontainer->inventory.GetSlotCount();
+	while (i--) {
+		CREItem *item = othercontainer->inventory.GetSlotItem(i);
+		int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
+		if (count == 1) continue;
+
+		while (count) {
+			int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
+			assert (slot != -1);
+			// containers don't really care about position, so every new item is placed at the last spot
+			CREItem *item = othercontainer->RemoveItem(slot, 0);
+			othercontainer->AddItem(item);
+		}
+	}
 }
 
 Container *Map::GetPile(Point position)
