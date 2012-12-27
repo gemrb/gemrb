@@ -3339,13 +3339,30 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 			unsigned int i=c->inventory.GetSlotCount();
 			while (i--) {
 				CREItem *item = c->RemoveItem(i, 0);
-				int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0);
-				if (slot != -1) {
+				int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
+				if (count == 0) {
+					othercontainer->AddItem(item);
+					continue;
+				}
+				// ensure slots are stacked fully before adding new ones
+				int skipped = count;
+				while (count) {
+					int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
+					CREItem *otheritem = othercontainer->inventory.GetSlotItem(slot);
+					if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
+						// already full (or nonstackable), nothing to do here
+						skipped--;
+						continue;
+					}
 					if (othercontainer->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
 						// the merge either failed (add whole) or went over the limit (add remainder)
 						othercontainer->AddItem(item);
 					}
-				} else {
+					skipped = 1; // just in case we would be eligible for the safety net below
+					break;
+				}
+				// all found slots were already unsuitable, so just dump the item to a new one
+				if (!skipped) {
 					othercontainer->AddItem(item);
 				}
 			}
@@ -3360,7 +3377,6 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	}
 
 	// sort by removing all items that have copies and readding them at the end
-	i = othercontainer->inventory.GetSlotCount();
 	while (i--) {
 		CREItem *item = othercontainer->inventory.GetSlotItem(i);
 		int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
