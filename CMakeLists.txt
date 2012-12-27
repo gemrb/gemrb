@@ -48,7 +48,7 @@ if (NOT LAYOUT)
 	if (WIN32)
 		set(LAYOUT "home")
 	elseif (APPLE)
-		set(LAYOUT "library")
+		set(LAYOUT "bundle")
 		# favor mac frameworks over unix libraries
 		set(CMAKE_FIND_FRAMEWORK FIRST)
 	else (APPLE)
@@ -107,19 +107,13 @@ elseif (${LAYOUT} MATCHES "opt")
 	SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps )
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
 	SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
-else (${LAYOUT} MATCHES "library") # mac
-	SET_PATH( APPLICATION_SUPPORT $ENV{HOME}/Library/Application\ Support/GemRB)
-	SET_PATH( LIB_DIR ${APPLICATION_SUPPORT}) #should go in app bundle!
-	SET_PATH( PLUGIN_DIR ${APPLICATION_SUPPORT}/plugins )
-	SET_PATH( DATA_DIR ${APPLICATION_SUPPORT} )
-	SET_PATH( MAN_DIR /usr/share/man/man6 )
+else (${LAYOUT} MATCHES "bundle") # Mac or iOS
+	# most paths are irrelevant since the items will be bundled with application
 	SET_PATH( BIN_DIR /Applications )
-	SET_PATH( SYSCONF_DIR ${APPLICATION_SUPPORT})
-	SET_PATH( DOC_DIR ${APPLICATION_SUPPORT} )
-	SET_PATH( ICON_DIR ${APPLICATION_SUPPORT}/share/pixmaps )
-	SET_PATH( SVG_DIR ${APPLICATION_SUPPORT}/share/icons/hicolor/scalable/apps )
-	SET_PATH( MENU_DIR ${APPLICATION_SUPPORT}/share/applications )
-	SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
+	# TODO: these should be copied during build and not install.
+	SET_PATH( LIB_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Frameworks" )
+	SET_PATH( PLUGIN_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Plugins" )
+	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 endif (${LAYOUT} MATCHES "home")
 
 # check if this is a release version
@@ -350,16 +344,6 @@ MACRO(ADD_GEMRB_PLUGIN plugin_name)
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/plugins)
 ENDMACRO(ADD_GEMRB_PLUGIN)
 
-#gemrb overrides macro
-MACRO(ADD_GEMRB_OVERRIDE game_name)
-	FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
-	INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${DATA_DIR}/override/${game_name} )
-ENDMACRO(ADD_GEMRB_OVERRIDE )
-MACRO(ADD_GEMRB_UNHARDCODED game_name)
-	FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
-	INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${DATA_DIR}/unhardcoded/${game_name} )
-ENDMACRO(ADD_GEMRB_UNHARDCODED)
-
 # also put the chosen paths in the man page (Ubuntu)
 CONFIGURE_FILE(
 	"${CMAKE_CURRENT_SOURCE_DIR}/gemrb.6.in"
@@ -368,13 +352,15 @@ CONFIGURE_FILE(
 )
 
 ADD_SUBDIRECTORY( gemrb )
-INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6" DESTINATION ${MAN_DIR} )
-INSTALL( FILES artwork/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png )
-INSTALL( FILES artwork/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg )
-INSTALL( FILES gemrb.desktop DESTINATION ${MENU_DIR} )
+IF (NOT APPLE)
+	INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6" DESTINATION ${MAN_DIR} )
+	INSTALL( FILES artwork/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png )
+	INSTALL( FILES artwork/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg )
+	INSTALL( FILES gemrb.desktop DESTINATION ${MENU_DIR} )
+ENDIF()
 INSTALL( FILES README INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
 INSTALL( FILES admin/extend2da.py DESTINATION ${BIN_DIR}
-	PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+		PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 CONFIGURE_FILE(
 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
