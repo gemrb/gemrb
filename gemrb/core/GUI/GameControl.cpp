@@ -349,8 +349,11 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 		draw |= D_BOTTOM;
 	}
 	if (arrow_orientations[draw]>=0) {
-		video->BlitGameSprite( core->GetScrollCursorSprite(arrow_orientations[draw], 0), p.x+screen.x, p.y+screen.y, BLIT_TINTED, color, NULL);
+		Sprite2D *arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
+		video->BlitGameSprite(arrow, p.x+screen.x, p.y+screen.y, BLIT_TINTED, color, NULL);
+		arrow->release();
 	}
+	spr->release();
 }
 
 void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash, bool actorSelected)
