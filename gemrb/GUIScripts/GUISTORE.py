@@ -162,13 +162,6 @@ def OpenStoreWindow ():
 	else:
 		GemRB.LoadWindowPack ("GUISTORE", 640, 480)
 	StoreWindow = Window = GemRB.LoadWindow (3)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	if GUICommon.GameIsIWD2() or GUICommon.GameIsBG1():
-		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-		pass
-	else:
-		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
@@ -211,6 +204,17 @@ def OpenStoreWindow ():
 	ActionWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
+
+	# Portrait window must be loaded after store, because UpdatePortraitWindow
+	# checks GUISTORE.StoreHealWindow
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	if GUICommon.GameIsIWD2() or GUICommon.GameIsBG1():
+		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
+		pass
+	else:
+		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+
 	if not GUICommon.GameIsIWD2():
 		if GUICommon.GameIsBG1():
 			GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
@@ -1366,8 +1370,9 @@ def UpdateStoreHealWindow ():
 			dead = GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD
 			# toggle raise dead/resurrect based on state
 			# unfortunately the flags are not set properly in iwd
-			if (dead and Spell["SpellTargetType"] != 3) or \
-			   (not dead and Spell["SpellTargetType"] == 3): # 3 - non-living
+			if not GUICommon.GameIsIWD1() and (  # 3 - non-living
+					(dead and Spell["SpellTargetType"] != 3) or \
+					(not dead and Spell["SpellTargetType"] == 3)):
 				# locked and shaded
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
 				Button.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
