@@ -129,14 +129,6 @@ def OnDropItemToPC ():
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
-	if GemRB.IsDraggingItem ()==1:
-		if GUICommon.HasTOB ():
-			GemRB.DisplayString (61794, 0xffffff)
-		elif GUICommon.GameIsPST ():
-			GemRB.DisplayString (19257, 0xffffff)
-		else:
-			GemRB.DisplayString (17999, 0xffffff)
-
 	GUIINV.UpdateInventoryWindow ()
 	return
 

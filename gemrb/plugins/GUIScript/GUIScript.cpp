@@ -7739,7 +7739,10 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		} else {
 			res = ASI_FAILED;
 		}
+	} else {
+		displaymsg->DisplayConstantString(STR_INVFULL, DMC_WHITE);
 	}
+
 	if (Sound[0]) {
 		core->GetAudioDrv()->Play(Sound);
 	}

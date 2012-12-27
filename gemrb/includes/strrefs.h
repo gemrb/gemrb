@@ -215,8 +215,9 @@ namespace GemRB {
 #define STR_HALFSPEED 180
 #define STR_CANTMOVE 181
 #define STR_SUMMONINGLIMIT 182
+#define STR_INVFULL 183
 
-#define STRREF_COUNT 183
+#define STRREF_COUNT 184
 
 }
 
