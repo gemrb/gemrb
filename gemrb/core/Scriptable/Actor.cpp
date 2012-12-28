@@ -2430,7 +2430,7 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	}
 	if (!arcana) return base;
 
-	ieDword armor = -GetArmorFailure();
+	ieDword armor = -GetArmorFailure(0);
 
 	if (armor) {
 		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA);
