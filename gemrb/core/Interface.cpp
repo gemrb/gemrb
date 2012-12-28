@@ -3078,6 +3078,7 @@ bool Interface::LoadWindowPack(const char* name)
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	unsigned int i;
+	GameControl *gc = GetGameControl ();
 
 	for (i = 0; i < windows.size(); i++) {
 		Window *win = windows[i];
@@ -3090,6 +3091,8 @@ int Interface::LoadWindow(unsigned short WindowID)
 			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
 			SetOnTop( i );
 			win->Invalidate();
+			if (gc)
+				gc->SetScrolling( false );
 			return i;
 		}
 	}
@@ -3113,6 +3116,8 @@ int Interface::LoadWindow(unsigned short WindowID)
 		windows[slot] = win;
 	}
 	win->Invalidate();
+	if (gc)
+		gc->SetScrolling( false );
 	return slot;
 }
 // FIXME: it's a clone of LoadWindow
