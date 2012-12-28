@@ -189,13 +189,17 @@ def GetFavoredClass (pc, code):
 	return code-1
 
 #class is ignored
-def GetNextLevelExp (Level, Adjustment):
+def GetNextLevelExp (Level, Adjustment, string=0):
 	if Adjustment>5:
 		Adjustment = 5
 	if (Level < CommonTables.NextLevel.GetColumnCount (4) - 5):
-		return str(CommonTables.NextLevel.GetValue (4, Level + Adjustment ) )
+		if string:
+			return str(CommonTables.NextLevel.GetValue (4, Level + Adjustment))
+		return CommonTables.NextLevel.GetValue (4, Level + Adjustment )
 
-	return GemRB.GetString(24342) #godhood
+	if string:
+		return GemRB.GetString(24342) #godhood
+	return 0
 
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
 Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
@@ -293,7 +297,7 @@ def DisplayGeneral (pc):
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
 	RecordsTextArea.Append (": "+str(xp) )
 	RecordsTextArea.Append (17091,-1)
-	tmp = GetNextLevelExp (levelsum, adj)
+	tmp = GetNextLevelExp (levelsum, adj, 1)
 	RecordsTextArea.Append (": "+tmp )
 
 	#current effects
@@ -835,6 +839,15 @@ def UpdateRecordsWindow ():
 	Label = Window.GetControl (0x1000002a)
 	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
 	Label.SetTooltip (17378)
+
+	#level up
+	Button = Window.GetControl (37)
+	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	#TODO: get special level penalty for subrace
+	if GetNextLevelExp(levelsum, 0) <= GemRB.GetPlayerStat (pc, IE_XP):
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# stats
 
