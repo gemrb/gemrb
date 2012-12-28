@@ -675,7 +675,7 @@ Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int 
 		Actor *actor = game->GetPC(i, false);
 		if(actor->GetCurrentArea() == area) {
 			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
-			if (!scr || worsthp>hp) {
+			if (!scr || hp>worsthp) {
 				worsthp=hp;
 				scr=actor;
 			}
