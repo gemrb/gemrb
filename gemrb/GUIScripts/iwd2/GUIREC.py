@@ -935,7 +935,7 @@ def UpdateRecordsWindow ():
 		DisplayMisc (pc)
 
 	#if actor is uncontrollable, make this grayed
-	Window.SetVisible (WINDOW_VISIBLE)
+	GUICommon.AdjustWindowVisibility (Window, pc, 0)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return
