@@ -632,8 +632,9 @@ def DisplayWeapons (pc):
 		RecordsTextArea.Append ("[/color]\n")
 
 		# Casting Failure
-		total = GemRB.GetSpellFailure (pc)
-		other = 5*(tohit["Armor"] + tohit["Shield"]) - 5*GemRB.HasFeat(pc, FEAT_ARMORED_ARCANA)
+		failure = GemRB.GetSpellFailure (pc)
+		total = failure["Total"]
+		other = 5*(failure["Armor"] + failure["Shield"]) - 5*GemRB.HasFeat(pc, FEAT_ARMORED_ARCANA)
 		# account for armored arcana only if it doesn't cause a negative value (eating into the misc bonus)
 		verbose = 0
 		if other < 0:
@@ -643,13 +644,13 @@ def DisplayWeapons (pc):
 			verbose = 1
 		RecordsTextArea.Append (delimited_txt (41390 , ":", str (total)+"%", 0))
 		# Armor Penalty (same as for skills and everything else)
-		if verbose and tohit["Armor"]:
+		if verbose and failure["Armor"]:
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(5*tohit["Armor"])+"%", 0))
+			RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(5*failure["Armor"])+"%", 0))
 		# Shield Penalty
-		if verbose and tohit["Shield"]:
+		if verbose and failure["Shield"]:
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (39822, ":", PlusMinusStat(5*tohit["Shield"])+"%", 0))
+			RecordsTextArea.Append (delimited_txt (39822, ":", PlusMinusStat(5*failure["Shield"])+"%", 0))
 		# Other, just a guess to show the remainder
 		if other:
 			AddIndent()

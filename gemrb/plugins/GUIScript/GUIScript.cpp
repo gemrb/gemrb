@@ -9964,9 +9964,16 @@ static PyObject* GemRB_GetSpellFailure(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
+	PyObject *failure = PyDict_New();
 	// true means arcane, so reverse the passed argument
-	int failure = actor->GetSpellFailure(!cleric);
-	return PyInt_FromLong(failure);
+	PyDict_SetItemString(failure, "Total", PyInt_FromLong (actor->GetSpellFailure(!cleric)));
+	// set also the shield and armor penalty - we can't reuse the ones for to-hit boni, since they also considered armor proficiency
+	int am = 0, sm = 0;
+	actor->GetArmorFailure(0, am, sm);
+	PyDict_SetItemString(failure, "Armor", PyInt_FromLong (am));
+	PyDict_SetItemString(failure, "Shield", PyInt_FromLong (sm));
+
+	return failure;
 }
 
 PyDoc_STRVAR( GemRB_IsDualWielding__doc,
