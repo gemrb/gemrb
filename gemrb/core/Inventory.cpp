@@ -1484,7 +1484,7 @@ ieWord Inventory::GetShieldItemType() const
 	const Item *itm = GetItemPointer(slotNum, Slot);
 	if (!itm) return 0xffff;
 	ret = itm->ItemType;
-	gamedata->FreeItem( itm, Slot->ItemResRef, true );
+	gamedata->FreeItem(itm, Slot->ItemResRef);
 	return ret;
 }
 
@@ -1500,7 +1500,7 @@ ieWord Inventory::GetArmorItemType() const
 	const Item *itm = GetItemPointer(slotNum, Slot);
 	if (!itm) return 0xffff;
 	ret = itm->ItemType;
-	gamedata->FreeItem( itm, Slot->ItemResRef, true );
+	gamedata->FreeItem(itm, Slot->ItemResRef);
 	return ret;
 }
 
