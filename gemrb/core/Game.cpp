@@ -91,8 +91,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 
 	//loading rest/daylight switching movies (only bg2 has them)
 	memset(restmovies,'*',sizeof(restmovies));
-	memset(daymovies,'*',sizeof(restmovies));
-	memset(nightmovies,'*',sizeof(restmovies));
+	memset(daymovies,'*',sizeof(daymovies));
+	memset(nightmovies,'*',sizeof(nightmovies));
 	if (table.load("restmov")) {
 		for(int i=0;i<8;i++) {
 			strnuprcpy(restmovies[i],table->QueryField(i,0),8);
