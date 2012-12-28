@@ -1466,6 +1466,7 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 			}
 			src++; //skipping (
 			if (*src==')') {
+				src++;
 				break;
 			}
 			Nesting++;
