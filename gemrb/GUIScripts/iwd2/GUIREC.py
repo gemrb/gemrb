@@ -355,12 +355,13 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (40315)
 	RecordsTextArea.Append ("[/color]")
 
-	RecordsTextArea.Append (10338,-1) #strength
+	RecordsTextArea.Append (10338, -1) # Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
-	RecordsTextArea.Append (": " + str(tmp) )
+	RecordsTextArea.Append (": " + str(tmp) + " lb.")
 	tmp = GUICommon.GetAbilityBonus(pc, IE_CON)
 	RecordsTextArea.Append (10342,-1)
-	RecordsTextArea.Append (": " + str(tmp) ) #con bonus
+	RecordsTextArea.Append (": " + PlusMinusStat(tmp) ) #con bonus to hitpoints
+	RecordsTextArea.Append ("\n")
 
 	RecordsTextArea.Append (15581,-1) #spell resistance
 	tmp = GemRB.GetPlayerStat (pc, IE_MAGICDAMAGERESISTANCE)
@@ -373,7 +374,7 @@ def AddIndent():
 	RecordsTextArea.Append ("   ", -1)
 
 def PlusMinusStat(value):
-	if value > 0:
+	if value >= 0:
 		return "+" + str(value)
 	return str(value)
 
@@ -881,27 +882,27 @@ def UpdateRecordsWindow ():
 	ColorDiff2 (Window, Label, dchr)
 
 	Label = Window.GetControl (0x10000035)
-	Label.SetText (str(bstr))
+	Label.SetText (PlusMinusStat(bstr))
 	ColorDiff (Window, Label, bstr)
 
 	Label = Window.GetControl (0x10000036)
-	Label.SetText (str(bdex))
+	Label.SetText (PlusMinusStat(bdex))
 	ColorDiff (Window, Label, bdex)
 
 	Label = Window.GetControl (0x10000037)
-	Label.SetText (str(bcon))
+	Label.SetText (PlusMinusStat(bcon))
 	ColorDiff (Window, Label, bcon)
 
 	Label = Window.GetControl (0x10000038)
-	Label.SetText (str(bint))
+	Label.SetText (PlusMinusStat(bint))
 	ColorDiff (Window, Label, bint)
 
 	Label = Window.GetControl (0x10000039)
-	Label.SetText (str(bwis))
+	Label.SetText (PlusMinusStat(bwis))
 	ColorDiff (Window, Label, bwis)
 
 	Label = Window.GetControl (0x1000003a)
-	Label.SetText (str(bchr))
+	Label.SetText (PlusMinusStat(bchr))
 	ColorDiff (Window, Label, bchr)
 
 	RecordsTextArea = Window.GetControl (45)
