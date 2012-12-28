@@ -3956,15 +3956,19 @@ void Actor::PlayWalkSound()
 	cnt=core->Roll(1,cnt,-1);
 	strnuprcpy(Sound, anims->GetWalkSound(), sizeof(ieResRef)-1 );
 	area->ResolveTerrainSound(Sound, Pos);
-	if (cnt) {
-		int len = strlen(Sound);
-		if (len<8) {
-			Sound[len]=cnt+0x60;
+
+	if (Sound[0] != '*') {
+		if (cnt) {
+			int l = strlen(Sound);
+			if (l < 8) {
+				Sound[l] = cnt + 0x60; // append 'a'-'g'
+				Sound[l+1] = 0;
+			}
 		}
+		unsigned int len = 0;
+		core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
+		nextWalk = thisTime + len;
 	}
-	unsigned int len = 0;
-	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
-	nextWalk = thisTime + len;
 }
 
 //Play hit sounds (HIT_0<dtype><armor>)
