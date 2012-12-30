@@ -154,7 +154,17 @@ def NextPress():
 	Class=GemRB.GetVar ("BaseClass")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	#kit
-	GemRB.SetPlayerStat (MyChar, IE_KIT, GemRB.GetVar ("Class") )
+	kitrow = GemRB.GetVar ("Class")-1
+	kit = CommonTables.Classes.GetValue(kitrow, 2)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, kit )
+	if (kit==0x4000):
+		#baseclass
+		clssname = CommonTables.Classes.GetRowName (Class-1)
+	else:
+		#kit
+		clssname = CommonTables.Classes.GetRowName (kitrow)
+	LUCommon.SetClassResistances( MyChar, clssname )
+
 	t=GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, CommonTables.Aligns.GetValue (t, 3))
 	TmpTable=GemRB.LoadTable ("repstart")
