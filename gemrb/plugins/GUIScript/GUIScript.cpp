@@ -8459,6 +8459,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
 		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
 		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, NULL );
+		btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, NULL );
 		core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, "" );
 		//no incref
 		return Py_None;

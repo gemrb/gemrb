@@ -240,6 +240,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	buttonCount = 12 - More # GUIBT_COUNT in PCStatsStruct
 	for i in range (buttonCount):
 		Button = Window.GetControl (i+Offset+More)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 
 		if i+Start >= len(memorizedSpells):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -265,7 +266,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		if specialSpell or (disabled_spellcasting&spellType):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.EnableBorder(1, 0)
-			#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.UpdateActionsWindow) # noop if it worked or not :)
 		else:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.SpellPressed)

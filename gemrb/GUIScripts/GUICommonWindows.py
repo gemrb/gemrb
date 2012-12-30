@@ -354,6 +354,7 @@ def SetupFormation ():
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormationPreset)
+		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 	return
 
 def GroupControls ():
@@ -463,7 +464,6 @@ def SetupItemAbilities(pc, slot):
 		currentammo = GemRB.GetEquippedAmmunition (pc)
 		for i in range (12):
 			Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
-			Button.SetPicture ("")
 			if i < len(ammoslots):
 				ammoslot = GemRB.GetSlotItem (pc, ammoslots[i])
 				st = GemRB.GetSlotType (ammoslots[i])
@@ -491,22 +491,20 @@ def SetupItemAbilities(pc, slot):
 	# reset back to the main action bar if there are no extra headers or quivers
 	reset = not ammoSlotCount
 	# check for item abilities and skip the first that crops up (main header - nothing special)
-	for i in range (1, 12-ammoSlotCount):
-		Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
-		Button.SetPicture ("")
-		if i<len(Tips):
-			reset = False
+	if (len(Tips) > 1):
+		reset = False
+		rmax = min(len(Tips) - 1, 12-ammoSlotCount)
+		for i in range (rmax):
+			Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
 			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
-			Button.SetItemIcon (slot_item['ItemResRef'], i-1+6)
+			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
 			Button.SetText ("")
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i-1])) )
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i])) )
 
 	if reset:
 		GemRB.SetVar ("ActionLevel", 0)
