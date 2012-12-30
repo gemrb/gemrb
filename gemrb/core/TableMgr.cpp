@@ -37,9 +37,9 @@ AutoTable::AutoTable()
 {
 }
 
-AutoTable::AutoTable(const char* ResRef)
+AutoTable::AutoTable(const char* ResRef, bool silent)
 {
-	load(ResRef);
+	load(ResRef, silent);
 }
 
 AutoTable::AutoTable(const AutoTable& other)
