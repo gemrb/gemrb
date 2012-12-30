@@ -185,7 +185,6 @@ def NextPress():
 	ClassColumn = CommonTables.Classes.GetValue (ClassName, "CLASS")
 	if ClassColumn <= 0:  #it was already a base class
 		ClassColumn = GemRB.GetVar("Class")
-		GemRB.SetVar("Class", CommonTables.Classes.FindValue(2, 0x4000) ) #it is a baseclass, so clear the kit
 	GemRB.SetVar("BaseClass", ClassColumn)
 	if ClassWindow:
 		ClassWindow.Unload()

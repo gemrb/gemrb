@@ -234,6 +234,13 @@ def DisplaySavingThrows (pc):
 	RecordsTextArea.Append (delimited_txt(17382, ":", PlusMinusStat(tmp), 0))
 
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
+def GNZS(pc, s1, st):
+	value = GemRB.GetPlayerStat (pc, st)
+	if value:
+		RecordsTextArea.Append (s1, -1)
+		RecordsTextArea.Append (": "+ str(value) )
+	return
+
 def DisplayGeneral (pc):
 	Window = RecordsWindow
 
@@ -367,10 +374,30 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (": " + PlusMinusStat(tmp) ) #con bonus to hitpoints
 	RecordsTextArea.Append ("\n")
 
-	RecordsTextArea.Append (15581,-1) #spell resistance
-	tmp = GemRB.GetPlayerStat (pc, IE_MAGICDAMAGERESISTANCE)
-	RecordsTextArea.Append (": "+str(tmp) )
-
+	#Fire
+	GNZS(pc, 14012, IE_RESISTFIRE)
+	#Magic Fire
+	GNZS(pc, 14077, IE_RESISTMAGICFIRE)
+	#Cold
+	GNZS(pc, 14014, IE_RESISTCOLD)
+	#Magic Cold
+	GNZS(pc, 14078, IE_RESISTMAGICCOLD)
+	#Electricity
+	GNZS(pc, 14013, IE_RESISTELECTRICITY)
+	#Acid
+	GNZS(pc, 14015, IE_RESISTACID)
+	#Spell
+	GNZS(pc, 15581, IE_MAGICDAMAGERESISTANCE)
+	# Missile
+	GNZS(pc, 11767, IE_RESISTMISSILE)
+	# Slashing
+	GNZS(pc, 11768, IE_RESISTSLASHING)
+	# Piercing
+	GNZS(pc, 11769, IE_RESISTPIERCING)
+	# Crushing
+	GNZS(pc, 11770, IE_RESISTCRUSHING)
+	# Poison
+	GNZS(pc, 14017, IE_RESISTPOISON)
 	return
 
 # some of the displayed stats are manually indented

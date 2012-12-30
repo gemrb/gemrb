@@ -157,7 +157,7 @@ def NextPress():
 	kitrow = GemRB.GetVar ("Class")-1
 	kit = CommonTables.Classes.GetValue(kitrow, 2)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, kit )
-	if (kit==0x4000):
+	if (CommonTables.Classes.GetValue(kitrow, 3) == 0):
 		#baseclass
 		clssname = CommonTables.Classes.GetRowName (Class-1)
 	else:
