@@ -345,8 +345,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	// small map is *optional*!
 	ResourceHolder<ImageMgr> sm(TmpResRef);
+	if (!sm) {
+		//fall back to day minimap
+		sm = ResourceHolder<ImageMgr> (map->WEDResRef);
+	}
 
 	//if the Script field is empty, the area name will be copied into it on first load
 	//this works only in the iwd branch of the games
