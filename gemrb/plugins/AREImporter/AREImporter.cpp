@@ -256,7 +256,12 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	// Small map for MapControl
 	ResourceHolder<ImageMgr> sm(TmpResRef);
-	// small map is *optional*!
+
+	// night small map is *optional*!
+	if (!sm) {
+		//fall back to day minimap
+		sm = ResourceHolder<ImageMgr> (map->WEDResRef);
+	}
 
 	//the map state was altered, no need to hold this off for any later
 	map->DayNight = day_or_night;
