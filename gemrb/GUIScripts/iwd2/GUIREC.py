@@ -319,6 +319,8 @@ def DisplayGeneral (pc):
 			RecordsTextArea.Append ("[capital=2]"+c+" ", -1)
 			RecordsTextArea.Append (tmp)
 
+	# TODO: Active Feats (eg. Power attack 4)
+
 	#race
 	RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
 	RecordsTextArea.Append (1048)
@@ -356,12 +358,19 @@ def DisplayGeneral (pc):
 		if tmp:
 			RecordsTextArea.Append (12127,-1)
 			RecordsTextArea.Append (": "+str(tmp) )
+		# don't forget to change  also add to HasClassFeatures too
+		#TODO: wholeness of body (monk)
+		#TODO: wisdom bonus to AC
+		#TODO: favoured enemies; eg Goblins: +2 & Harpies: +1
+		#TODO: fix elsewhere, when a new racial enemy is added, the boni to the previous ones are incremented by 1
 
 	#bonus spells
 	if HasBonusSpells(pc):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (10344)
 		RecordsTextArea.Append ("[/color]\n")
+		#TODO: class/kit name
+		# indent, Level X: +Y
 
 	#ability statistics
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
@@ -505,7 +514,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
 	else:
 		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
-	# any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
+	# any extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
 	alldos = combatdet["DamageOpcodes"]
 	dosmin = 0
 	dosmax = 0
@@ -536,6 +545,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	if lbonus:
 		AddIndent()
 		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))
+	#TODO: Power Attack has its own row
 	# Damage Potential (2-12)
 	# add any other bonus to the ammo damage calc
 	AddIndent()
