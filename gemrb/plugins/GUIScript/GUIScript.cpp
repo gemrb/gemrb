@@ -5879,11 +5879,22 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Invalid Container slot!");
 		}
 
-		res = core->CanMoveItem(container->inventory.GetSlotItem(Slot) );
+		si = container->inventory.GetSlotItem(Slot);
+		res = core->CanMoveItem(si);
 		if (!res) { //cannot move
 			Log(MESSAGE, "GUIScript", "Cannot move item, it is undroppable!");
 			Py_INCREF( Py_None );
 			return Py_None;
+		}
+
+		// check for full inventory up front to prevent unnecessary shuffling of container
+		// items; note that shuffling will still occur when picking up stacked items where
+		// not the entire stack fits
+		if (res == -1) { // not gold
+			if (actor->inventory.FindCandidateSlot(SLOT_INVENTORY, 0, si->ItemResRef) == -1) {
+				Py_INCREF( Py_None );
+				return Py_None;
+			}
 		}
 
 		//this will update the container
