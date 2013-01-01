@@ -9944,6 +9944,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dos, "NumDice", PyInt_FromLong (damage_opcodes[i].DiceThrown));
 		PyDict_SetItemString(dos, "DiceSides", PyInt_FromLong (damage_opcodes[i].DiceSides));
 		PyDict_SetItemString(dos, "DiceBonus", PyInt_FromLong (damage_opcodes[i].DiceBonus));
+		PyDict_SetItemString(dos, "Chance", PyInt_FromLong (damage_opcodes[i].Chance));
 		PyTuple_SetItem(alldos, i, dos);
 	}
 	PyDict_SetItemString(dict, "DamageOpcodes", alldos);

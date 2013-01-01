@@ -522,12 +522,18 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		ddice = dos["NumDice"]
 		dsides = dos["DiceSides"]
 		dbonus = dos["DiceBonus"]
+		dchance = dos["Chance"]
 		AddIndent()
-		if dbonus:
-			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus))
+		# only display the chance when it isn't 100%
+		if dchance == 100:
+			dchance = ""
+			dosmin += ddice + dbonus
 		else:
-			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides))
-		dosmin += ddice + dbonus
+			dchance = " (%d%%)" % dchance
+		if dbonus:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus)+dchance)
+		else:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+dchance)
 		dosmax += ddice*dsides + dbonus
 
 	# Strength

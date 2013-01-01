@@ -113,6 +113,7 @@ struct DMGOpcodeInfo {
 	int DiceThrown;
 	int DiceSides;
 	int DiceBonus;
+	int Chance;
 };
 
 /**
