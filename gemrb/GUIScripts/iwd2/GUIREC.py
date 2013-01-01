@@ -410,7 +410,7 @@ def PlusMinusStat(value):
 	return str(value)
 
 def CascadeToHit(total, ac, apr):
-	cascade = PlusMinusStat(str(total))
+	cascade = PlusMinusStat(total)
 	babDec = 5
 	if ac["Wisdom"]: #TODO: also chech that there are no weapons equipped
 		babDec = 3
