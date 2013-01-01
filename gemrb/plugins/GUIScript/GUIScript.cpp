@@ -9933,9 +9933,15 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(tohits, "Weapon", PyInt_FromLong (actor->ToHit.GetWeaponBonus()));
 	PyDict_SetItemString(dict, "ToHitStats", tohits);
 
-	//FIXME this returns the launcher, not ammo
+	const CREItem *wield;
+	// wi.slot has the launcher, so look up the ammo
 	//FIXME: remove the need to look it up again
-	const CREItem *wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
+	if (hittingheader && (hittingheader->AttackType&ITEM_AT_PROJECTILE)) {
+		wield = actor->inventory.GetSlotItem(actor->inventory.GetEquippedSlot());
+		header = hittingheader;
+	} else {
+		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
+	}
 	if (!wield) {
 		return 0;
 	}
