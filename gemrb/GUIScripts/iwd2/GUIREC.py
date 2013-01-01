@@ -346,8 +346,10 @@ def DisplayGeneral (pc):
 		if tmp:
 			RecordsTextArea.Append (12126,-1)
 			RecordsTextArea.Append (": "+str(tmp) )
-		tmp = GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER)
+		# 1d6 at level 1 and +1d6 every two extra rogue levels
+		tmp = GemRB.GetPlayerStat (pc, IE_LEVELTHIEF)
 		if tmp:
+			tmp = (tmp+1)//2
 			RecordsTextArea.Append (24898,-1)
 			RecordsTextArea.Append (": "+str(tmp)+"d6" )
 		tmp = GemRB.GetPlayerStat (pc, IE_LAYONHANDSAMOUNT)
