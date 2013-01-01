@@ -2977,6 +2977,7 @@ void Actor::RefreshHP() {
 	//		apply the highest constitution bonus for levels up (and including) to maxLevelForHpRoll (already the max of the classes)
 	//		BUT divide it by the number of classes (ideally the last one to levelup should get all the fractions)
 	//	for levels after maxLevelForHpRoll there is NO constitution bonus anymore
+	// IN IWD2, it's a simple level*conbon calculation without any fiddling
 	int bonus;
 	// this is wrong for dual-classed (so we override it later)
 	// and sometimes marginally wrong for multi-classed (but we usually round the average up)
@@ -2986,9 +2987,13 @@ void Actor::RefreshHP() {
 	ieDword bonindex = BaseStats[IE_CLASS]-1;
 
 	//we must limit the levels to the max allowable
-	if (bonlevel>maxLevelForHpRoll[bonindex])
-		bonlevel = maxLevelForHpRoll[bonindex];
-
+	if (third) {
+		bonlevel = Modified[IE_CLASSLEVELSUM];
+	} else {
+		if (bonlevel>maxLevelForHpRoll[bonindex]) {
+			bonlevel = maxLevelForHpRoll[bonindex];
+		}
+	}
 	if (IsDualClassed()) {
 		// just the old consititution bonus
 		oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
