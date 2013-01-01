@@ -5832,9 +5832,21 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (third) {
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
 		// it is limited to shortswords and daggers, which also have this flag set
-		// FIXME: actually do check just the offhand, even though the bonus is applied to both
-		if (dualwielding && (wi.wflags&WEAPON_FINESSE)) {
-			prof += 2;
+		// the bonus is applied to both hands
+		if (dualwielding) {
+			if (leftorright) {
+				if (wi.wflags&WEAPON_FINESSE) {
+					prof += 2;
+				}
+			} else {
+				// lookup the offhand
+				ITMExtHeader *header2;
+				WeaponInfo wi2;
+				header2 = GetWeapon(wi2, true);
+				if (header2->RechargeFlags&IE_ITEM_USEDEXTERITY) { // identical to the WEAPON_FINESSE check
+					prof += 2;
+				}
+			}
 		}
 	} else {
 		prof = -prof;
