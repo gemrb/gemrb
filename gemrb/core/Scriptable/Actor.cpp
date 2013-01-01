@@ -1084,20 +1084,32 @@ void pcf_stat_int(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	pcf_stat(actor, newValue, IE_INT);
 }
 
-void pcf_stat_wis(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_WIS);
+	if (third) {
+		int oldBonus = actor->GetAbilityBonus(IE_WIS, oldValue);
+		actor->Modified[IE_SAVEWILL] += actor->GetAbilityBonus(IE_WIS) - oldBonus;
+	}
 }
 
-void pcf_stat_dex(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_DEX);
+	if (third) {
+		int oldBonus = actor->GetAbilityBonus(IE_DEX, oldValue);
+		actor->Modified[IE_SAVEREFLEX] += actor->GetAbilityBonus(IE_DEX) - oldBonus;
+	}
 }
 
-void pcf_stat_con(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CON);
 	pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
+	if (third) {
+		int oldBonus = actor->GetAbilityBonus(IE_CON, oldValue);
+		actor->Modified[IE_SAVEFORTITUDE] += actor->GetAbilityBonus(IE_CON) - oldBonus;
+	}
 }
 
 void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -2844,6 +2856,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 	for (i = 0; i < vvcShields.size(); i++) {
 		if (vvcShields[i] && vvcShields[i]->effect_owned) vvcShields[i]->active = false;
+	}
+
+	// give the 3ed save bonus before applying the effects, since they may do extra rolls
+	if (third) {
+		Modified[IE_SAVEWILL] += GetAbilityBonus(IE_WIS);
+		Modified[IE_SAVEREFLEX] += GetAbilityBonus(IE_DEX);
+		Modified[IE_SAVEFORTITUDE] += GetAbilityBonus(IE_CON);
 	}
 
 	fxqueue.ApplyAllEffects( this );
@@ -8246,9 +8265,13 @@ bool Actor::HasSpellState(unsigned int spellstate) const
 }
 
 //this is a very specific rule that might need an external table later
-int Actor::GetAbilityBonus(unsigned int ability) const
+int Actor::GetAbilityBonus(unsigned int ability, int value) const
 {
-	return GetStat(ability)/2-5;
+	if (value == -1) { // invalid (default), use the current value
+		return GetStat(ability)/2-5;
+	} else {
+		return value/2-5;
+	}
 }
 
 int Actor::GetSkillStat(unsigned int skill) const
