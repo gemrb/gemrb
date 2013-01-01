@@ -238,7 +238,7 @@ typedef std::vector< ScriptedAnimation*> vvcVector;
 
 struct WeaponInfo {
 	int slot;
-	int enchantment;
+	ieDword enchantment;
 	unsigned int range;
 	ieDword itemflags;
 	ieDword prof;
