@@ -134,6 +134,12 @@ unsigned int CharAnimations::GetFlags() const
 	return AvatarTable[AvatarsRowNum].Flags;
 }
 
+unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
+{
+	if(AvatarsRowNum==~0u) return stance;
+	return AvatarTable[AvatarsRowNum].StanceOverride[stance];
+}
+
 static ieResRef EmptySound={0};
 
 const ieResRef &CharAnimations::GetWalkSound() const
@@ -502,6 +508,9 @@ void CharAnimations::InitAvatarsTable()
 		AvatarTable[i].WalkScale = 0;
 		AvatarTable[i].RunScale = 0;
 		AvatarTable[i].Bestiary = -1;
+		
+		for (int j = 0; j < MAX_ANIMS; j++)
+			AvatarTable[i].StanceOverride[j] = j;
 
 		if (resdata) {
 			char section[12];
@@ -573,6 +582,31 @@ void CharAnimations::InitAvatarsTable()
 				if (rmin>AvatarTable[j].AnimID) continue;
 				memcpy(AvatarTable[j].WalkSound, value, sizeof(ieResRef) );
 				AvatarTable[j].WalkSoundCount = (unsigned int) range;
+			}
+		}
+	}
+
+	AutoTable stances("stances", true);
+	if (stances) {
+		int rows = stances->GetRowCount();
+		for (int i = 0; i < rows; i++) {
+			unsigned long id = 0, s1 = 0, s2 = 0;
+			valid_number(stances->GetRowName(i), (long &)id);
+			valid_number(stances->QueryField(i, 0), (long &)s1);
+			valid_number(stances->QueryField(i, 1), (long &)s2);
+
+			if (s1 >= MAX_ANIMS || s2 >= MAX_ANIMS) {
+				Log(ERROR, "CharAnimations", "Invalid stances entry: %04x %d %d",
+						(unsigned int) id, (unsigned int) s1, (unsigned int) s2);
+				continue;
+			}
+
+			for (int j = 0; j < AvatarsCount; j++) {
+				if (id < AvatarTable[j].AnimID) break;
+				if (id == AvatarTable[j].AnimID) {
+					AvatarTable[j].StanceOverride[s1] = s2;
+					break;
+				}
 			}
 		}
 	}
@@ -845,6 +879,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			StanceID=IE_ANI_TWITCH;
 		}
 	}
+
+	StanceID = MaybeOverrideStance(StanceID);
 
 	//TODO: Implement Auto Resource Loading
 	//setting up the sequencing of animation cycles

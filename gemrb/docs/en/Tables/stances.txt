@@ -1,0 +1,12 @@
+Description: Using this table you can override the animations for certain stances for specific avatars.
+
+Columns:
+STANCE - the stance ID to override
+OVERRIDE - the stance ID to use instead
+
+Rows:
+Each row can be used to override one stance for one animation. If you need to override multiple stances for the same animations, add one row for each override.
+
+Example:
+(Kobold from BG1 - don't use ATTACK_JAB because that animation is for SHOOT)
+0x8200     13         12

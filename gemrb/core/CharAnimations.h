@@ -128,6 +128,9 @@ struct AvatarStruct {
 	/* comes from walksnd.2da */
 	ieResRef WalkSound;
 	ieByte WalkSoundCount;
+
+	/* comes from stances.2da */
+	unsigned char StanceOverride[MAX_ANIMS];
 };
 
 struct EquipResRefData;
@@ -236,6 +239,7 @@ private:
 		char* ResRef, unsigned char& Cycle, int Part, EquipResRefData*& equip);
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		char* ResRef, unsigned char& Cycle, EquipResRefData* equip);
+	unsigned char MaybeOverrideStance(unsigned char stance) const;
 };
 
 }
