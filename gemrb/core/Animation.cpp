@@ -144,7 +144,7 @@ Sprite2D* Animation::NextFrame(void)
 	else
 		ret = frames[pos];
 
-	if (endReached && (Flags&A_ANI_PLAYONCE) )
+	if ((endReached && (Flags&A_ANI_PLAYONCE)) || (Flags&A_ANI_FROZEN))
 		return ret;
 
 	unsigned long time;
@@ -192,8 +192,10 @@ Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
 		ret = frames[pos];
 
 	starttime = master->starttime;
-	pos = master->pos;
 	endReached = master->endReached;
+
+	if (!(Flags&A_ANI_FROZEN))
+		pos = master->pos;
 
 	return ret;
 }
