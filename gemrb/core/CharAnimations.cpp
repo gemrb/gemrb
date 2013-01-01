@@ -2097,22 +2097,17 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
 			strcat( ResRef, "g2" );
 			strcpy( EquipData->Suffix, "g2" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_SHOOT:
 			strcat( ResRef, "g2" );
 			strcpy( EquipData->Suffix, "g2" );
 			Cycle = 16 + Orient / 2;
-			break;
-		case IE_ANI_CAST:
-		case IE_ANI_CONJURE:
-		case IE_ANI_SHOOT:
-			//these animations are missing
-			strcat( ResRef, "g2" );
-			strcpy( EquipData->Suffix, "g2" );
-			Cycle = Orient / 2;
 			break;
 		case IE_ANI_WALK:
 			strcat( ResRef, "g1" );
