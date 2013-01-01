@@ -2239,17 +2239,20 @@ void GameControl::OnMouseWheelScroll(short x, short y)
 	
 	Point mapsize = map->TMap->GetMapSize();
 	
-	if (Viewport.x + x <= 0) {
+	Viewport.x += x;
+	if (Viewport.x <= 0) {
 		Viewport.x = 0;
-	}else if (Viewport.x + Viewport.w + x < mapsize.x) {
-		Viewport.x += x;
+	} else if (Viewport.x + Viewport.w >= mapsize.x) {
+		Viewport.x = mapsize.x - Viewport.w - 1;
 	}
-	
-	if (Viewport.y + y <= 0) {
+
+	Viewport.y += y;
+	if (Viewport.y <= 0) {
 		Viewport.y = 0;
-	}else if (Viewport.y + Viewport.h + y < mapsize.y) {
-		Viewport.y += y;
+	} else if (Viewport.y + Viewport.h >= mapsize.y) {
+		Viewport.y = mapsize.y - Viewport.h - 1;
 	}
+
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
