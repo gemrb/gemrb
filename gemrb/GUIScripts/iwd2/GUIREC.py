@@ -566,16 +566,19 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append ("[/color]\n")
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
+	combatdet2 = combatdet # placeholder for the potential offhand numbers
 	ac = combatdet["AC"]
 	tohit = combatdet["ToHitStats"]
 	dualwielding = GemRB.IsDualWielding(pc)
+	if dualwielding:
+		combatdet2 = GemRB.GetCombatDetails(pc, 1)
 
 	# Main Hand
 	ToHitOfHand (combatdet, dualwielding)
 
 	# Off Hand
 	if dualwielding:
-		ToHitOfHand (GemRB.GetCombatDetails(pc, 1), dualwielding, 1)
+		ToHitOfHand (combatdet2, dualwielding, 1)
 
 
 	###################
@@ -697,7 +700,7 @@ def DisplayWeapons (pc):
 	# Off-hand (if any)
 	if dualwielding:
 		RecordsTextArea.Append ("\n")
-		WeaponOfHand(pc, GemRB.GetCombatDetails(pc, 1), dualwielding, 1)
+		WeaponOfHand(pc, combatdet2, dualwielding, 1)
 
 	DisplaySavingThrows (pc)
 
