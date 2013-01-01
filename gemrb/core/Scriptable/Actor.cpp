@@ -3040,10 +3040,15 @@ void Actor::RefreshHP() {
 
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
+	ieDword oldmax = Modified[IE_MAXHITPOINTS];
 	Modified[IE_MAXHITPOINTS]+=bonus;
-	//	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
-	//		bonus = 0;
-	//	BaseStats[IE_HITPOINTS]+=bonus;
+	// applying the bonus to the current hitpoints is trickier, since we don't want to cause regeneration
+	if (!(BaseStats[IE_STATE_ID]&STATE_DEAD)) {
+		// for now only apply it to fully healed actors iff the bonus is positive (fixes starting hp)
+		if (BaseStats[IE_HITPOINTS] == oldmax && bonus > 0) {
+			BaseStats[IE_HITPOINTS] += bonus;
+		}
+	}
 }
 
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
