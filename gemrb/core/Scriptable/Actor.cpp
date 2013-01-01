@@ -5196,8 +5196,10 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef);
 		return NULL;
 	}
-	//The magic of the bow and the arrow add up?
-	wi.enchantment += item->Enchantment;
+	//The magic of the bow and the arrow do not add up
+	if (item->Enchantment > wi.enchantment) {
+		wi.enchantment = item->Enchantment;
+	}
 	wi.itemflags = wield->Flags;
 	//wi.range is not set, the projectile has no effect on range?
 
