@@ -403,7 +403,12 @@ void GameScript::SetHPPercent(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->NewBase( IE_HITPOINTS, parameters->int0Parameter, MOD_PERCENT);
+	// 0 - adjust to max hp, 1 - adjust to current
+	if (parameters->int1Parameter) {
+		actor->NewBase(IE_HITPOINTS, parameters->int0Parameter, MOD_PERCENT);
+	} else {
+		actor->NewBase(IE_HITPOINTS, actor->GetStat(IE_MAXHITPOINTS) * parameters->int0Parameter/100, MOD_ABSOLUTE);
+	}
 }
 
 void GameScript::AddHP(Scriptable* Sender, Action* parameters)
