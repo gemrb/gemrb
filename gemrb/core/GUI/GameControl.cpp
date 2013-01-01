@@ -438,15 +438,15 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		viewport.x += moveX;
 		viewport.y += moveY;
 		Point mapsize = area->TMap->GetMapSize();
-		if ( viewport.x < 0 )//if we are at top of the map
+		if ( viewport.x < 0 )//if we are at the left of the map
 			viewport.x = 0;
-		else if ( (viewport.x + viewport.w) >= mapsize.x) //if we are at the bottom
-			viewport.x = mapsize.x - viewport.w;
+		else if ( (viewport.x + viewport.w) >= mapsize.x) //if we are at the right
+			viewport.x = mapsize.x - viewport.w - 1;
 
-		if ( viewport.y < 0 ) //if we are at the left of the map
+		if ( viewport.y < 0 ) //if we are at the top of the map
 			viewport.y = 0;
-		else if ( (viewport.y + viewport.h ) >= mapsize.y ) //if we are at the right
-			viewport.y = mapsize.y - viewport.h;
+		else if ( (viewport.y + viewport.h ) >= mapsize.y ) //if we are at the bottom
+			viewport.y = mapsize.y - viewport.h - 1;
 
 		// override any existing viewport moves which may be in progress
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
