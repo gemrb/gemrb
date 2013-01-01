@@ -366,15 +366,14 @@ def DisplayGeneral (pc):
 	#ability statistics
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
 	RecordsTextArea.Append (40315)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("[/color]\n")
 
-	RecordsTextArea.Append (10338, -1) # Weight Allowance
+	# Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
-	RecordsTextArea.Append (": " + str(tmp) + " lb.")
+	RecordsTextArea.Append (delimited_txt (10338, ":", str(tmp) + " lb."))
+	# constitution bonus to hitpoints
 	tmp = GUICommon.GetAbilityBonus(pc, IE_CON)
-	RecordsTextArea.Append (10342,-1)
-	RecordsTextArea.Append (": " + PlusMinusStat(tmp) ) #con bonus to hitpoints
-	RecordsTextArea.Append ("\n")
+	RecordsTextArea.Append (delimited_txt (10342, ":", PlusMinusStat(tmp)))
 
 	#Fire
 	GNZS(pc, 14012, IE_RESISTFIRE)
