@@ -8456,8 +8456,18 @@ void Actor::CreateDerivedStatsIWD2()
 		if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
 	}
 
-	int layonhandsamount = GetPaladinLevel() * GetAbilityBonus(IE_CHR);
-	if (layonhandsamount<1) layonhandsamount = 1;
+	int layonhandsamount = 0;
+	int level = GetPaladinLevel();
+	if (level) {
+		// when this is called for the first time, Modified is not set yet
+		// FIXME: move to RefreshEffects, since it relies on a volatile stat
+		int mod = GetAbilityBonus(IE_CHR, BaseStats[IE_CHR]);
+		if (mod < 1) {
+			layonhandsamount = level;
+		} else {
+			layonhandsamount = level * mod;
+		}
+	}
 
 	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
