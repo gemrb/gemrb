@@ -82,6 +82,7 @@ namespace GemRB {
 #define IE_ANI_FOUR_FILES_2		14 //METT
 #define IE_ANI_CODE_MIRROR_3	15 //MSPS
 #define IE_ANI_TWO_FILES_3B		16    //iwd animations (eg. MBBM)
+#define IE_ANI_TWO_PIECE		17    //MAKH
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		56   //full animation
@@ -215,6 +216,8 @@ private:
 		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddSixSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
+	void AddTwoPieceSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, int Part);
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
 	void GetMHREquipmentRef(char* ResRef, unsigned char& Cycle,

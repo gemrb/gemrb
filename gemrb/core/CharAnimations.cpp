@@ -39,6 +39,8 @@ static AvatarStruct *AvatarTable = NULL;
 static const ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
 
+static const int zOrder_TwoPiece[2] = { 1, 0 };
+
 static const int zOrder_Mirror16[16][4] = {
 	{ 0, 3, 2, 1 },
 	{ 0, 3, 2, 1 },
@@ -162,6 +164,8 @@ int CharAnimations::GetActorPartCount() const
 		return 9;
 	case IE_ANI_FOUR_FRAMES: //wyvern animations
 		return 4;
+	case IE_ANI_TWO_PIECE:   //ankheg animations
+		return 2;
 	case IE_ANI_PST_GHOST:   //special pst anims
 		if (AvatarTable[AvatarsRowNum].Prefixes[1][0]=='*') {
 			return 1;
@@ -454,9 +458,11 @@ Palette* CharAnimations::GetPartPalette(int part)
 	int actorPartCount = GetActorPartCount();
 	PaletteType type = PAL_MAIN;
 
-	if (part == actorPartCount) type = PAL_WEAPON;
-	if (part == actorPartCount+1) type = PAL_OFFHAND;
-	if (part == actorPartCount+2) type = PAL_HELMET;
+	// always use unmodified BAM palette for the supporting part
+	if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return NULL;
+	else if (part == actorPartCount) type = PAL_WEAPON;
+	else if (part == actorPartCount+1) type = PAL_OFFHAND;
+	else if (part == actorPartCount+2) type = PAL_HELMET;
 
 	if (modifiedPalette[(int)type])
 		return modifiedPalette[(int)type];
@@ -789,6 +795,9 @@ IE_ANI_TWO_FILES_3B:	Animations using this type are stored using the following t
 			This is the standard IWD animation, but BG2 also has it.
 			See MOR2
 
+IE_ANI_TWO_PIECE: This is a modified IE_ANI_SIX_FILES with supporting still frames (using a
+			different palette) stored in a second set of files. Currently only used by MAKH
+
 IE_ANI_FOUR_FRAMES:	These animations are large, four bams make a frame.
 
 
@@ -846,7 +855,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	}
 
 	//for paletted dragon animations, we need the stance id
-	StanceID  = nextStanceID = Stance;
+	StanceID = nextStanceID = Stance;
 	int AnimType = GetAnimType();
 
 	//alter stance here if it is missing and you know a substitute
@@ -936,7 +945,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 	int partCount = GetTotalPartCount();
 	int actorPartCount = GetActorPartCount();
-	if (partCount < 0) return 0;
+	if (partCount <= 0) return 0;
 	anims = new Animation*[partCount];
 
 	EquipResRefData* equipdat = 0;
@@ -1093,6 +1102,11 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 					a->MirrorAnimation( );
 				}
 				break;
+			case IE_ANI_TWO_PIECE:
+				if (part == 1) {
+					a->Flags |= A_ANI_FROZEN;
+				}
+				break;
 			default:
 				break;
 		}
@@ -1122,6 +1136,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_FOUR_FILES:
 		case IE_ANI_FOUR_FILES_2:
 		case IE_ANI_SIX_FILES_2:
+		case IE_ANI_TWO_PIECE:
 		case IE_ANI_FRAGMENT:
 			Orient&=~1;
 			Anims[StanceID][Orient] = anims;
@@ -1233,6 +1248,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			AddLR3Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
+		case IE_ANI_TWO_PIECE: //MAKH
+			AddTwoPieceSuffix( NewResRef, StanceID, Cycle, Orient, Part );
+			break;
+
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
 			AddVHR2Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
@@ -1290,6 +1309,8 @@ const int* CharAnimations::GetZOrder(unsigned char Orient)
 			return zOrder_8[Orient/2];
 		case IE_ANI_FOUR_FILES:
 			return 0; // FIXME
+		case IE_ANI_TWO_PIECE:
+			return zOrder_TwoPiece;
 		default:
 			return 0;
 	}
@@ -2082,6 +2103,65 @@ void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
 		strcat( EquipData->Suffix, "e");
 	}
 	EquipData->Cycle = Cycle;
+}
+
+void CharAnimations::AddTwoPieceSuffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient, int Part)
+{
+	if (Part == 1) {
+		strcat( ResRef, "d" );
+	}
+
+	switch (StanceID) {
+		case IE_ANI_DIE:
+			strcat( ResRef, "g1" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_TWITCH:
+		case IE_ANI_SLEEP:
+			strcat( ResRef, "g1" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_READY:
+		case IE_ANI_HEAD_TURN:
+		case IE_ANI_AWAKE:
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "g1" );
+			Cycle = 24 + Orient / 2;
+			break;
+		case IE_ANI_WALK:
+			strcat( ResRef, "g2" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			strcat( ResRef, "g2" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_HIDE:
+			strcat( ResRef, "g2" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "g3" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+		case IE_ANI_SHOOT:
+			strcat( ResRef, "g3" );
+			Cycle = 8 + Orient / 2;
+			break;
+		default:
+			error("CharAnimation", "Two-piece Animation: unhandled stance: %s %d", ResRef, StanceID);
+			break;
+	}
+	if (Orient > 9) {
+		strcat( ResRef, "e" );
+	}
 }
 
 void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,

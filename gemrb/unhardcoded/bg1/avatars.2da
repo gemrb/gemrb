@@ -20,7 +20,7 @@
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1          *
 0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0          S
 0x2300     MDKN       MDKN       MDKN       MDKN       2          2          1          *
-0x3000     MAKH       MAKH       MAKH       MAKH       2          3          1          *
+0x3000     MAKH       MAKH       MAKH       MAKH       17         3          1          *
 0x4000     SNOMC      SNOMC      SNOMC      SNOMC      1          2          0          *
 0x4002     SNOMM      SNOMM      SNOMM      SNOMM      1          2          0          *
 0x4010     SNOWC      SNOWC      SNOWC      SNOWC      1          2          0          *
