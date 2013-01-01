@@ -5953,9 +5953,7 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 
 		// add +4 attack bonus vs racial enemies
 		if (GetRangerLevel()) {
-			if (IsRacialEnemy(target)) {
-				generic += 4;
-			}
+			generic += GetRacialEnemyBonus(target);
 		}
 		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
 	}
@@ -8837,19 +8835,25 @@ bool Actor::IsBehind(Actor* target) const
 }
 
 // checks all the actor's stats to see if the target is her racial enemy
-bool Actor::IsRacialEnemy(Actor* target) const
+int Actor::GetRacialEnemyBonus(Actor* target) const
 {
-	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
-		return true;
-	} else if (third) {
+	if (third) {
+		int level = GetRangerLevel();
+		if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+			return (level+4)/5;
+		}
 		// iwd2 supports multiple racial enemies gained through level progression
 		for (unsigned int i=0; i<7; i++) {
 			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
-				return true;
+				return (level+4)/5-i-1;
 			}
 		}
+		return 0;
 	}
-	return false;
+	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+		return 4;
+	}
+	return 0;
 }
 
 bool Actor::ModalSpellSkillCheck()
