@@ -234,9 +234,9 @@ def DisplaySavingThrows (pc):
 	RecordsTextArea.Append (delimited_txt(17382, ":", PlusMinusStat(tmp), 0))
 
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
-def GNZS(pc, s1, st):
+def GNZS(pc, s1, st, force=False):
 	value = GemRB.GetPlayerStat (pc, st)
-	if value:
+	if value or force:
 		RecordsTextArea.Append (s1, -1)
 		RecordsTextArea.Append (": "+ str(value) )
 	return
@@ -375,6 +375,8 @@ def DisplayGeneral (pc):
 	tmp = GUICommon.GetAbilityBonus(pc, IE_CON)
 	RecordsTextArea.Append (delimited_txt (10342, ":", PlusMinusStat(tmp)))
 
+	# Magic
+	GNZS(pc, 15581, IE_RESISTMAGIC, True)
 	#Fire
 	GNZS(pc, 14012, IE_RESISTFIRE)
 	#Magic Fire
@@ -388,7 +390,7 @@ def DisplayGeneral (pc):
 	#Acid
 	GNZS(pc, 14015, IE_RESISTACID)
 	#Spell
-	GNZS(pc, 15581, IE_MAGICDAMAGERESISTANCE)
+	GNZS(pc, 40319, IE_MAGICDAMAGERESISTANCE)
 	# Missile
 	GNZS(pc, 11767, IE_RESISTMISSILE)
 	# Slashing
