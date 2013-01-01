@@ -2863,6 +2863,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		Modified[IE_SAVEWILL] += GetAbilityBonus(IE_WIS);
 		Modified[IE_SAVEREFLEX] += GetAbilityBonus(IE_DEX);
 		Modified[IE_SAVEFORTITUDE] += GetAbilityBonus(IE_CON);
+		// paladins add their charisma modifier to all saving throws
+		if (GetPaladinLevel()) {
+			Modified[IE_SAVEWILL] += GetAbilityBonus(IE_CHR);
+			Modified[IE_SAVEREFLEX] += GetAbilityBonus(IE_CHR);
+			Modified[IE_SAVEFORTITUDE] += GetAbilityBonus(IE_CHR);
+		}
 	}
 
 	fxqueue.ApplyAllEffects( this );
