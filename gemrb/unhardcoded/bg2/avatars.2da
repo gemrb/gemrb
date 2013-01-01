@@ -16,7 +16,7 @@
 0x1206     MDR1       MDR1       MDR1       MDR1       12         7          BR         *
 0x1207     MDR1       MDR1       MDR1       MDR1       12         7          MC         *
 0x1208     MDR1       MDR1       MDR1       MDR1       12         7          PU         *
-0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0          *
+0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0          +
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1          *
 0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0          S
 0x2300     MDKN       MDKN       MDKN       MDKN       2          2          1          *
@@ -231,9 +231,9 @@
 0x7F3C     MASL       MASL       MASL       MASL       4          2          1          *
 0x7F3D     MMEL       MMEL       MMEL       MMEL       14         2          1          *
 0x7F3E     MFIG       MFIG       MFIG       MFIG       4          3          1          *
-0x8000     MGNL       MGNL       MGNL       MGNL       2          2          0          *
-0x8100     MHOB       MHOB       MHOB       MHOB       2          2          0          *
-0x8200     MKOB       MKOB       MKOB       MKOB       2          2          0          *
+0x8000     MGNL       MGNL       MGNL       MGNL       2          2          0          +
+0x8100     MHOB       MHOB       MHOB       MHOB       2          2          0          +
+0x8200     MKOB       MKOB       MKOB       MKOB       2          2          0          +
 0x9000     MOGR       MOGR       MOGR       MOGR       5          2          0          *
 0xA000     MWYV       MWYV       MWYV       MWYV       8          3          1          *
 0xA100     MCAR       MCAR       MCAR       MCAR       8          3          1          *
