@@ -6814,6 +6814,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = sparkle; //animation type
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Duration = parameters->int1Parameter * 15;
+	fx->Target = FX_TARGET_PRESET;
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, (Actor *) src, src);
