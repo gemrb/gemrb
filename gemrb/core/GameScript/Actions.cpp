@@ -4098,6 +4098,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 }
 
 //same as equipitem, but with additional slots parameter, and object to perform action
+// XEquipItem("00Troll1",Myself,SLOT_RING_LEFT,TRUE)
 void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4106,11 +4107,36 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
+	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	if (slot<0) {
 		return;
 	}
-	actor->inventory.EquipItem(slot);
+
+	int slot2 = parameters->int0Parameter;
+	bool equip = parameters->int1Parameter;
+
+	if (equip) {
+		if (slot != slot2) {
+			// swap them first, so we equip to the desired slot
+			CREItem *si = actor->inventory.RemoveItem(slot);
+			actor->inventory.AddSlotItem(si, slot2);
+		}
+		actor->inventory.EquipItem(slot2);
+	} else {
+		CREItem *si = actor->inventory.RemoveItem(slot);
+		if (si) {
+			if (actor->inventory.AddSlotItem(si, SLOT_ONLYINVENTORY) == ASI_FAILED) {
+				Map *map = Sender->GetCurrentArea();
+				if (map) {
+					//drop item at the feet of the character instead of destroying it
+					map->AddItemToLocation(Sender->Pos, si);
+				} else {
+					delete si;
+				}
+			}
+		}
+	}
+
 	actor->ReinitQuickSlots();
 }
 
