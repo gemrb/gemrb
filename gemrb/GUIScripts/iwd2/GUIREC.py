@@ -235,6 +235,20 @@ def GetFavoredClass (pc, code):
 
 	return code-1
 
+# returns the race or subrace
+def GetRace (pc):
+	Race = GemRB.GetPlayerStat (pc, IE_RACE)
+	Subrace = GemRB.GetPlayerStat (pc, IE_SUBRACE)
+	if Subrace:
+		Race = Race<<16 | Subrace
+	return CommonTables.Races.FindValue (3, Race)
+
+# returns the effective character level modifier
+def GetECL (pc):
+	RaceIndex = GetRace (pc)
+	RaceRowName = CommonTables.Races.GetRowName (RaceIndex)
+	return CommonTables.Races.GetValue (RaceRowName, "ECL")
+
 #class is ignored
 def GetNextLevelExp (Level, Adjustment, string=0):
 	if Adjustment>5:
@@ -292,8 +306,8 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (" - ")
 	RecordsTextArea.Append (40309)
 	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
-	#TODO: get special level penalty for subrace
-	adj = 0
+	# get special level penalty for subrace
+	adj = GetECL (pc)
 	RecordsTextArea.Append (": "+str(levelsum) )
 	RecordsTextArea.Append ("[/color]")
 	#the class name for highest
@@ -320,13 +334,9 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (40310,-1)
 
 	#get the subrace value
-	Value = GemRB.GetPlayerStat(pc,IE_RACE)
-	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
-	if Value2:
-		Value = Value<<16 | Value2
-	tmp = CommonTables.Races.FindValue (3, Value)
-	Race = CommonTables.Races.GetValue (tmp, 2)
-	tmp = CommonTables.Races.GetValue (tmp, 8)
+	RaceIndex = GetRace (pc)
+	Race = CommonTables.Races.GetValue (RaceIndex, 2)
+	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
 
 	if tmp == -1:
 		tmp = highest
@@ -941,8 +951,7 @@ def UpdateRecordsWindow ():
 	#level up
 	Button = Window.GetControl (37)
 	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
-	#TODO: get special level penalty for subrace
-	if GetNextLevelExp(levelsum, 0) <= GemRB.GetPlayerStat (pc, IE_XP):
+	if GetNextLevelExp(levelsum, GetECL(pc)) <= GemRB.GetPlayerStat (pc, IE_XP):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
