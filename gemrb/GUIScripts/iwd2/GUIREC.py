@@ -46,10 +46,17 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+BonusSpellTable = None
+
+#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
+Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
+IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
+IE_LEVELSORCEROR, IE_LEVEL2]
 
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
+	global BonusSpellTable
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if RecordsWindow:
@@ -83,6 +90,9 @@ def OpenRecordsWindow ():
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
 	Window.SetFrame ()
+
+	if not BonusSpellTable:
+		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -165,8 +175,45 @@ def ColorDiff2 (Window, Label, diff):
 		Label.SetTextColor (255, 255, 255)
 	return
 
-def HasBonusSpells (pc):
-	return False
+def GetBonusSpells (pc):
+	bonusSpells = []
+	classes = []
+	# cheack each class/kit
+	for i in range(11):
+		level = GemRB.GetPlayerStat (pc, Classes[i])
+		if not level:
+			continue
+
+		ClassTitle = GUICommonWindows.GetActorClassTitle (pc, i)
+		# find the casting stat
+		ClassName = GUICommon.GetClassRowName (i, "index")
+		Stat = CommonTables.ClassSkills.GetValue (ClassName, "CASTING")
+		if Stat == "*":
+			continue
+		Stat = GemRB.GetPlayerStat (pc, Stat)
+		if Stat < 12: # boni start with positive modifiers
+			continue
+
+		# get max spell level we can cast, since only usable boni are displayed
+		# check the relevant mxspl* table
+		SpellTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
+		if SpellTable == "*":
+			SpellTable = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
+		SpellTable = GemRB.LoadTable (SpellTable)
+		maxLevel = 0
+		for i in range(SpellTable.GetColumnCount()):
+			spells = SpellTable.GetValue (str(level), str(i+1)) # not all tables start at 1, so use a named lookup
+			if not spells:
+				break
+			maxLevel = i+1
+
+		classes.append(ClassTitle)
+		# check if at casting stat size, there is any bonus spell in BonusSpellTable
+		bonusSpells = [0] * maxLevel
+		for level in range (1, maxLevel+1):
+			bonusSpells[level-1] = BonusSpellTable.GetValue (Stat-12, level-1)
+
+	return bonusSpells, classes
 
 def HasClassFeatures (pc):
 	#clerics turning
@@ -200,11 +247,6 @@ def GetNextLevelExp (Level, Adjustment, string=0):
 	if string:
 		return GemRB.GetString(24342) #godhood
 	return 0
-
-#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
-Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCEROR, IE_LEVEL2]
 
 def DisplayCommon (pc):
 	Window = RecordsWindow
@@ -365,12 +407,18 @@ def DisplayGeneral (pc):
 		#TODO: fix elsewhere, when a new racial enemy is added, the boni to the previous ones are incremented by 1
 
 	#bonus spells
-	if HasBonusSpells(pc):
+	bonusSpells, classes = GetBonusSpells(pc)
+	if sum(bonusSpells):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (10344)
 		RecordsTextArea.Append ("[/color]\n")
-		#TODO: class/kit name
-		# indent, Level X: +Y
+		for c in classes:
+			# class/kit name
+			RecordsTextArea.Append (c)
+			for level in range(len(bonusSpells)):
+				AddIndent()
+				# Level X: +Y
+				RecordsTextArea.Append (delimited_txt(7192, " " + str(level+1)+":", "+" + str(bonusSpells[level]), 0))
 
 	#ability statistics
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
