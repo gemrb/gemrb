@@ -47,6 +47,7 @@ OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 BonusSpellTable = None
+HateRaceTable = None
 
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
 Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
@@ -56,7 +57,7 @@ IE_LEVELSORCEROR, IE_LEVEL2]
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
-	global BonusSpellTable
+	global BonusSpellTable, HateRaceTable
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if RecordsWindow:
@@ -93,6 +94,8 @@ def OpenRecordsWindow ():
 
 	if not BonusSpellTable:
 		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
+	if not HateRaceTable:
+		HateRaceTable = GemRB.LoadTable ("haterace")
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -225,7 +228,26 @@ def HasClassFeatures (pc):
 	#paladins healing
 	if GemRB.GetPlayerStat(pc, IE_LAYONHANDSAMOUNT):
 		return True
+	# wisdom ac bonus, wholeness of body
+	if GemRB.GetPlayerStat (pc, IE_LEVELMONK):
+		return True
 	return False
+
+def DisplayFavouredEnemy (pc, RangerLevel, second=-1):
+	RaceID = 0
+	if second == -1:
+		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE)
+	else:
+		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE2+second)
+	if RaceID:
+		FavouredIndex = HateRaceTable.FindValue (1, RaceID)
+		if FavouredIndex == -1:
+			return
+		FavouredName = HateRaceTable.GetValue (FavouredIndex, 0)
+		if second == -1:
+			RecordsTextArea.Append (delimited_txt(FavouredName, ":", PlusMinusStat((RangerLevel+4)/5)))
+		else:
+			RecordsTextArea.Append (delimited_txt(FavouredName, ":", PlusMinusStat((RangerLevel+4)/5-second-1)))
 
 def GetFavoredClass (pc, code):
 	if GemRB.GetPlayerStat (pc, IE_SEX)==1:
@@ -410,11 +432,27 @@ def DisplayGeneral (pc):
 		if tmp:
 			RecordsTextArea.Append (12127,-1)
 			RecordsTextArea.Append (": "+str(tmp) )
-		# don't forget to change  also add to HasClassFeatures too
-		#TODO: wholeness of body (monk)
-		#TODO: wisdom bonus to AC
-		#TODO: favoured enemies; eg Goblins: +2 & Harpies: +1
-		#TODO: fix elsewhere, when a new racial enemy is added, the boni to the previous ones are incremented by 1
+		MonkLevel = GemRB.GetPlayerStat (pc, IE_LEVELMONK)
+		if MonkLevel:
+			AC = GemRB.GetCombatDetails(pc, 0)["AC"]
+			GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
+			RecordsTextArea.Append (39431, -1)
+			# wholeness of body
+			RecordsTextArea.Append (39749, -1)
+			RecordsTextArea.Append (": "+str(MonkLevel*2))
+
+	# favoured enemies; eg Goblins: +2 & Harpies: +1
+	RangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
+	if RangerLevel:
+		RecordsTextArea.Append ("\n\n[color=ffff00]")
+		if RangerLevel > 5:
+			RecordsTextArea.Append (15982)
+		else:
+			RecordsTextArea.Append (15897)
+		RecordsTextArea.Append ("[/color]\n")
+		DisplayFavouredEnemy (pc, RangerLevel)
+		for i in range (7):
+			DisplayFavouredEnemy (pc, RangerLevel, i)
 
 	#bonus spells
 	bonusSpells, classes = GetBonusSpells(pc)
