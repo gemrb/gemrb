@@ -1,4 +1,4 @@
-GemRB git (5801eed2ea2):
+GemRB git (35c8b01390):
   New features:
     - 
     - initial bundled gemrb demo stubs
@@ -7,7 +7,9 @@ GemRB git (5801eed2ea2):
 
   Improved features:
     - 
-    - iwd2 combat
+    - animations
+    - looting
+    - iwd2 combat, stats, effects and actions
     - bugfixes
 
 GemRB v0.7.2 (2012-11-20):
