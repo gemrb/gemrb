@@ -302,7 +302,7 @@ def DisplayGeneral (pc):
 
 	RecordsTextArea.Append (36928,-1)
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
-	RecordsTextArea.Append (": "+str(xp) )
+	RecordsTextArea.Append (str(xp))
 	RecordsTextArea.Append (17091,-1)
 	tmp = GetNextLevelExp (levelsum, adj, 1)
 	RecordsTextArea.Append (": "+tmp )
