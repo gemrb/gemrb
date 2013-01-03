@@ -141,7 +141,8 @@ def FeedScroll ():
 
 	Value = Table.GetValue (Row, Position)
 
-	TextArea.Append (Value, -1, 6)
+	# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
+	TextArea.Append (Value, -1, 14)
 	return
 
 def EndTextScreen ():
