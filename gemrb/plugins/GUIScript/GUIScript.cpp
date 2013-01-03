@@ -8954,7 +8954,7 @@ jump_label2:
 		break;
 		case ACT_IWDQITEM:
 			if (i>3) {
-				tmp = i-3;
+				tmp = (i+1)%3;
 				goto jump_label;
 			}
 		case ACT_QSLOT1:
