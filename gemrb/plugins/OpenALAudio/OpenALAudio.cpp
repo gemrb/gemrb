@@ -364,7 +364,6 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 		*length = time_length;
 	}
 
-	ALuint Source;
 	ALfloat SourcePos[] = {
 		(float) XPos, (float) YPos, 0.0f
 	};
@@ -373,93 +372,76 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	};
 
 	ieDword volume = 100;
+	ALint loop = (flags & GEM_SND_LOOPING ? 1 : 0);
+
+	AudioStream* stream = NULL;
 
 	if (flags & GEM_SND_SPEECH) {
-		//speech has a single channel, if a new speech started
-		//we stop the previous one
-		if(!speech.free && (speech.Source && alIsSource(speech.Source))) {
-			alSourceStop( speech.Source );
-			checkALError("Unable to stop speech", WARNING);
-			speech.ClearProcessedBuffers();
-		}
-		if(!speech.Source || !alIsSource(speech.Source)) {
-			alGenSources( 1, &speech.Source );
-			if (checkALError("Error creating source for speech", ERROR)) {
-				return Holder<SoundHandle>();
+		stream = &speech;
+
+		if (!(flags & GEM_SND_QUEUE)) {
+			//speech has a single channel, if a new speech started
+			//we stop the previous one
+
+			if(!speech.free && (speech.Source && alIsSource(speech.Source))) {
+				alSourceStop( speech.Source );
+				checkALError("Unable to stop speech", WARNING);
+				speech.ClearProcessedBuffers();
 			}
 		}
 
-		alSourcef( speech.Source, AL_PITCH, 1.0f );
-		alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
-		alSourcei( speech.Source, AL_LOOPING, 0 );
-		alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-		checkALError("Unable to set speech parameters", WARNING);
-		speech.free = false;
-		print("speech.free: %d source:%d", speech.free, speech.Source);
-
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
-		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
-		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
-		alSourcefv( speech.Source, AL_POSITION, SourcePos );
-		assert(!speech.delete_buffers);
-		alSourcei( speech.Source, AL_BUFFER, Buffer );
-		checkALError("Unable to set speech parameters", WARNING);
-		speech.Buffer = Buffer;
-		alSourcePlay( speech.Source );
-		if (checkALError("Unable to play speech", ERROR)) {
+
+		loop = 0; // Speech ignores GEM_SND_LOOPING
+	} else {
+		// do we want to be able to queue sfx too? not so far. How would we?
+		for (int i = 0; i < num_streams; i++) {
+			streams[i].ClearIfStopped();
+			if (streams[i].free) {
+				stream = &streams[i];
+				break;
+			}
+		}
+
+		core->GetDictionary()->Lookup( "Volume SFX", volume );
+
+		if (stream == NULL) {
+			// Failed to assign new sound.
+			// The buffercache will handle deleting Buffer.
 			return Holder<SoundHandle>();
 		}
-		speech.handle = new OpenALSoundHandle(&speech);
-		return speech.handle.get();
 	}
 
-	int stream = -1;
-	for (int i = 0; i < num_streams; i++) {
-		streams[i].ClearIfStopped();
-		if (streams[i].free) {
-			stream = i;
-			break;
+	assert(stream);
+	ALuint Source = stream->Source;
+
+	if(!Source || !alIsSource(Source)) {
+		alGenSources( 1, &Source );
+		if (checkALError("Error creating source", ERROR)) {
+			return Holder<SoundHandle>();
 		}
-	}
-
-	if (stream == -1) {
-		// Failed to assign new sound.
-		// The buffercache will handle deleting Buffer.
-		return Holder<SoundHandle>();
-	}
-
-	// not speech
-	alGenSources( 1, &Source );
-	if (checkALError("Unable to create source", ERROR)) {
-		return Holder<SoundHandle>();
 	}
 
 	alSourcef( Source, AL_PITCH, 1.0f );
 	alSourcefv( Source, AL_VELOCITY, SourceVel );
-	alSourcei( Source, AL_LOOPING, (flags & GEM_SND_LOOPING ? 1 : 0) );
+	alSourcei( Source, AL_LOOPING, loop);
 	alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-	core->GetDictionary()->Lookup( "Volume SFX", volume );
 	alSourcef( Source, AL_GAIN, 0.01f * volume );
 	alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 	alSourcefv( Source, AL_POSITION, SourcePos );
-	assert(!streams[stream].delete_buffers);
-	alSourcei( Source, AL_BUFFER, Buffer );
+	checkALError("Unable to set audio parameters", WARNING);
 
-	if (checkALError("Unable to set sound parameters", ERROR)) {
+	assert(!stream->delete_buffers);
+
+	stream->Source = Source;
+	stream->free = false;
+
+	if (QueueALBuffer(Source, &Buffer) != GEM_OK) {
 		return Holder<SoundHandle>();
 	}
 
-	streams[stream].Buffer = Buffer;
-	streams[stream].Source = Source;
-	streams[stream].free = false;
-	alSourcePlay( Source );
-
-	if (checkALError("Unable to play sound", ERROR)) {
-		return Holder<SoundHandle>();
-	}
-
-	streams[stream].handle = new OpenALSoundHandle(&streams[stream]);
-	return streams[stream].handle.get();
+	stream->handle = new OpenALSoundHandle(stream);
+	return stream->handle.get();
 }
 
 bool OpenALAudioDriver::IsSpeaking()
