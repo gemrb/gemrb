@@ -99,7 +99,7 @@ def OnLoad():
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = KitWindow.GetControl(11)
-	TextAreaControl.SetText(17247)
+	TextAreaControl.SetText(17245)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
