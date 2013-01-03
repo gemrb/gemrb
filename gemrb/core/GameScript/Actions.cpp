@@ -7053,4 +7053,18 @@ void GameScript::SetNamelessDeath(Scriptable* Sender, Action* parameters)
 	sp->SetNamelessDeath(area, parameters->pointParameter, parameters->int1Parameter);
 }
 
+// like GameScript::Kill, but forces chunking damage (disabling resurrection)
+void GameScript::ChunkCreature(Scriptable *Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+
+	Actor *target = (Actor *) tar;
+	Effect *fx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
+	target->fxqueue.AddEffect(fx, false);
+	delete fx;
+}
+
 }
