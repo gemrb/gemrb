@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
+from ie_slots import *
 import GUICommon
 import Spellbook
 import CommonTables
@@ -208,6 +209,22 @@ def DCMainDonePress ():
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))
+
+	# dump any equipped items that are now unusable
+	SlotTypes = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, SLOT_BELT, SLOT_ITEM, SLOT_WEAPON, SLOT_QUIVER ]
+	for type in SlotTypes:
+		Slots = GemRB.GetSlots (pc, type)
+		if not len(Slots):
+			# nothing there
+			continue
+		for slot in Slots:
+			SlotType = GemRB.GetSlotType (slot, pc)
+			CREItem = GemRB.GetSlotItem (pc, slot)
+			if not GemRB.CanUseItemType (SlotType["Type"], CREItem["ItemResRef"], pc):
+				# move it to a free inventory slot by mimicking dragging
+				Item = GemRB.GetItem (CREItem["ItemResRef"])
+				GemRB.DragItem (pc, slot, Item["ItemIcon"])
+				GemRB.DropDraggedItem (pc, -3)
 
 	# close our window
 	if DCMainWindow:
