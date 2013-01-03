@@ -244,6 +244,7 @@ void Container::TryPickLock(Actor *actor)
 		return;
 	}
 	SetContainerLocked(false);
+	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK); //AMB_D21D
@@ -274,6 +275,7 @@ void Container::TryBashLock(Actor *actor)
 
 	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, DMC_LIGHTGREY, actor);
 	SetContainerLocked(false);
+	core->GetGameControl()->ResetTargetMode();
 	//Is this really useful ?
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
