@@ -125,7 +125,10 @@ public:
 	void SetAmbientStreamVolume(int stream, int volume);
 	void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
-				int size, int samplerate) ;
+				int size, int samplerate);
+private:
+	int QueueALBuffer(ALuint source, ALuint* buffer);
+
 private:
 	ALCcontext *alutContext;
 	ALuint MusicSource;

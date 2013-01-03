@@ -711,20 +711,8 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 
 	assert(!streams[stream].delete_buffers);
 
-	alSourceQueueBuffers(source, 1, &Buffer);
-	if (checkALError("Unable to queue ambient buffer", ERROR)) {
-		return -1;
-	}
-
-	// play
-	ALint state;
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	if (!checkALError("Unable to query ambient source state", ERROR) &&
-			state != AL_PLAYING)
-	{ // play on playing source would rewind it
-		alSourcePlay( source );
-		if (checkALError("Unable to play ambient source", ERROR))
-			return -1;
+	if (QueueALBuffer(source, &Buffer) != GEM_OK) {
+		return GEM_ERROR;
 	}
 
 	return time_length;
@@ -932,23 +920,33 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 	streams[stream].delete_buffers = true;
 	streams[stream].ClearProcessedBuffers();
 
-	alSourceQueueBuffers(streams[stream].Source, 1, &Buffer );
+	QueueALBuffer(streams[stream].Source, &Buffer);
+}
+
+// !!!!!!!!!!!!!!!
+// Private Methods
+// !!!!!!!!!!!!!!!
+
+int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint* buffer)
+{
+	alSourceQueueBuffers(source, 1, buffer);
 	if (checkALError("Unable to queue buffer", ERROR)) {
-		return;
+		return GEM_ERROR;
 	}
 
 	ALenum state;
-	alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state);
+	alGetSourcei(source, AL_SOURCE_STATE, &state);
 	if (checkALError("Unable to query source state", ERROR)) {
-		return;
+		return GEM_ERROR;
 	}
 
+	// queueing always implies playing for us
 	if (state != AL_PLAYING ) {
-		alSourcePlay(streams[stream].Source);
+		alSourcePlay(source);
 		checkALError("Unable to play source", ERROR);
+		return GEM_ERROR;
 	}
-
-	return;
+	return GEM_OK;
 }
 
 #include "plugindef.h"
