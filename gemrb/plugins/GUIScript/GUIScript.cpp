@@ -544,6 +544,7 @@ static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
+	core->GetAudioDrv()->Play( NULL, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	ctrl->SetupScroll();
 	Py_INCREF( Py_None );
 	return Py_None;
