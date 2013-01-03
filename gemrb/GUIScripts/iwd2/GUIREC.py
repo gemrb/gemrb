@@ -517,11 +517,12 @@ def PlusMinusStat(value):
 		return "+" + str(value)
 	return str(value)
 
-def CascadeToHit(total, ac, apr):
+def CascadeToHit(total, ac, apr, slot):
 	cascade = PlusMinusStat(total)
 	babDec = 5
-	if ac["Wisdom"]: #TODO: also chech that there are no weapons equipped
-		babDec = 3
+	if ac["Wisdom"]:
+		if slot == 10: # fist slot - nothing is equipped
+			babDec = 3
 	for i in range(1, apr):
 		if total-i*babDec > 0: # skips negative ones, meaning a lower number of attacks can be displayed
 			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
@@ -534,7 +535,7 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 	# display all the (successive) attack values (+15/+10/+5)
 	if left:
 		apr = 1 # offhand gives just one extra attack
-		hits = CascadeToHit(tohit["Total"], ac, apr)
+		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
 		RecordsTextArea.Append (delimited_txt (733, ":", hits, 0))
 	else:
 		# account for the fact that the total apr contains the one for the other hand too
@@ -542,12 +543,12 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 			apr = combatdet["APR"]//2 - 1
 		else:
 			apr = combatdet["APR"]//2
-		hits = CascadeToHit(tohit["Total"], ac, apr)
+			hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
 		RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
 
 	# Base
 	AddIndent()
-	hits = CascadeToHit(tohit["Base"], ac, apr)
+	hits = CascadeToHit(tohit["Base"], ac, apr, combatdet["Slot"])
 	RecordsTextArea.Append (delimited_txt (31353, ":", hits, 0))
 	# Weapon bonus
 	if tohit["Weapon"]:
