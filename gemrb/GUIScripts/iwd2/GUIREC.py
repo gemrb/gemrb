@@ -556,7 +556,7 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 			apr = combatdet["APR"]//2 - 1
 		else:
 			apr = combatdet["APR"]//2
-			hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
+		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
 		RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
 
 	# Base
