@@ -1353,6 +1353,11 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	default:
 		damagetype = DAMAGE_ACID;
 	}
+	if (fx->Parameter3) {
+		// disintegration marked this, so it can be discerned from other magic damage
+		// hack: reuse a state bit to convey this info to Actor::CheckOnDeath
+		target->SetBaseBit(IE_STATE_ID, STATE_INFRA, true);
+	}
 
 	if (damagetype!=DAMAGE_COLD) {
 		//these two bits are turned off on death
@@ -6133,6 +6138,7 @@ int fx_disintegrate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
 		fx->Parameter1 = 0;
 		fx->Parameter2 = 0x200;
+		fx->Parameter3 = 1; // mark it as disintegration, so we can destroy items later properly
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;

@@ -259,7 +259,7 @@ unsigned int Item::GetCastingDistance(int idx) const
 }
 
 static EffectRef fx_damage_ref = { "Damage", -1 };
-// returns a vector with details about any extended headers containing fx_damage with a 100% probability
+// returns a vector with details about any extended headers containing fx_damage
 std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) const
 {
 	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
@@ -268,8 +268,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) c
 	if (!header) return damage_opcodes;
 	for (int i=0; i< header->FeatureCount; i++) {
 		Effect *fx = header->features+i;
-		// Probability1 is the high number
-		if (fx->Opcode == damage_opcode && fx->Probability1 == 100) {
+		if (fx->Opcode == damage_opcode) {
 			// it's not the same damagetype, these are different values, so we need a translation
 			// 0-3 -> 0 (crushing)
 			// 2^16+[0-3] -> 1 (acid)
@@ -299,6 +298,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) c
 			damage.DiceThrown = fx->DiceThrown;
 			damage.DiceSides = fx->DiceSides;
 			damage.DiceBonus = fx->Parameter1;
+			damage.Chance = fx->Probability1 - fx->Probability2; // Probability1 is the high number
 			damage_opcodes.push_back(damage);
 		}
 	}

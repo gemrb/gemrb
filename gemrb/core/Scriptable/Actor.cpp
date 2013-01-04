@@ -3040,10 +3040,15 @@ void Actor::RefreshHP() {
 
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
+	ieDword oldmax = Modified[IE_MAXHITPOINTS];
 	Modified[IE_MAXHITPOINTS]+=bonus;
-	//	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
-	//		bonus = 0;
-	//	BaseStats[IE_HITPOINTS]+=bonus;
+	// applying the bonus to the current hitpoints is trickier, since we don't want to cause regeneration
+	if (!(BaseStats[IE_STATE_ID]&STATE_DEAD)) {
+		// for now only apply it to fully healed actors iff the bonus is positive (fixes starting hp)
+		if (BaseStats[IE_HITPOINTS] == oldmax && bonus > 0) {
+			BaseStats[IE_HITPOINTS] += bonus;
+		}
+	}
 }
 
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
@@ -4795,8 +4800,8 @@ bool Actor::CheckOnDeath()
 	// .. but this can't go in Die() because that is called
 	// from effects and dropping items might change effects!
 
-	//destroy normal items if difficulty level is high enough
-	if ((LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
+	// disintegration destroys normal items if difficulty level is high enough (STATE_INFRA is just a conduct)
+	if ((BaseStats[IE_STATE_ID]&STATE_INFRA) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
 		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 	}
 	DropItem("",0);
@@ -5191,8 +5196,10 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef);
 		return NULL;
 	}
-	//The magic of the bow and the arrow add up?
-	wi.enchantment += item->Enchantment;
+	//The magic of the bow and the arrow do not add up
+	if (item->Enchantment > wi.enchantment) {
+		wi.enchantment = item->Enchantment;
+	}
 	wi.itemflags = wield->Flags;
 	//wi.range is not set, the projectile has no effect on range?
 
@@ -5946,9 +5953,7 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 
 		// add +4 attack bonus vs racial enemies
 		if (GetRangerLevel()) {
-			if (IsRacialEnemy(target)) {
-				generic += 4;
-			}
+			generic += GetRacialEnemyBonus(target);
 		}
 		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
 	}
@@ -8451,8 +8456,18 @@ void Actor::CreateDerivedStatsIWD2()
 		if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
 	}
 
-	int layonhandsamount = GetPaladinLevel() * GetAbilityBonus(IE_CHR);
-	if (layonhandsamount<1) layonhandsamount = 1;
+	int layonhandsamount = 0;
+	int level = GetPaladinLevel();
+	if (level) {
+		// when this is called for the first time, Modified is not set yet
+		// FIXME: move to RefreshEffects, since it relies on a volatile stat
+		int mod = GetAbilityBonus(IE_CHR, BaseStats[IE_CHR]);
+		if (mod < 1) {
+			layonhandsamount = level;
+		} else {
+			layonhandsamount = level * mod;
+		}
+	}
 
 	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
@@ -8820,19 +8835,25 @@ bool Actor::IsBehind(Actor* target) const
 }
 
 // checks all the actor's stats to see if the target is her racial enemy
-bool Actor::IsRacialEnemy(Actor* target) const
+int Actor::GetRacialEnemyBonus(Actor* target) const
 {
-	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
-		return true;
-	} else if (third) {
+	if (third) {
+		int level = GetRangerLevel();
+		if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+			return (level+4)/5;
+		}
 		// iwd2 supports multiple racial enemies gained through level progression
 		for (unsigned int i=0; i<7; i++) {
 			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
-				return true;
+				return (level+4)/5-i-1;
 			}
 		}
+		return 0;
 	}
-	return false;
+	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+		return 4;
+	}
+	return 0;
 }
 
 bool Actor::ModalSpellSkillCheck()

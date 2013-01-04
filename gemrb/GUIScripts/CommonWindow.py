@@ -322,10 +322,5 @@ def TakeItemContainer ():
 	if LeftIndex >= Container['ItemCount']:
 		return
 
-	pc = GemRB.GameGetFirstSelectedPC ()
-	inventory_slots = GemRB.GetSlots (pc, 0x8000, -1) # empty slots
-	if not len(inventory_slots):
-		return
-
 	GemRB.ChangeContainerItem (0, LeftIndex, 1)
 	UpdateContainerWindow ()

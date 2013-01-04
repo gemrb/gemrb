@@ -347,6 +347,7 @@ void Highlightable::TryDisarm(Actor *actor)
 		int xp = actor->CalculateExperience(XP_DISARM, actor->GetXPLevel(1));
 		Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
+		core->GetGameControl()->ResetTargetMode();
 	} else {
 		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, DMC_LIGHTGREY, actor);
 		TriggerTrap(skill, actor->GetGlobalID());
@@ -371,6 +372,7 @@ void Door::TryPickLock(Actor *actor)
 		return;
 	}
 	SetDoorLocked( false, true);
+	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK);
@@ -401,6 +403,7 @@ void Door::TryBashLock(Actor *actor)
 
 	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, DMC_LIGHTGREY, actor);
 	SetDoorLocked(false, true);
+	core->GetGameControl()->ResetTargetMode();
 	Flags|=DOOR_BROKEN;
 
 	//This is ok, bashdoor also sends the unlocked trigger

@@ -1,19 +1,19 @@
 2DA V1.0
 -1
-                     NAME_REF   DESC_REF   CAP_REF    ID         USABILITY  HAIR       SKIN       SKILL_COLUMN FAVORED_CLASS FEATBONUS
-HUMAN                7193       9550       1096       1          0x08000000 HAIRNORM   SKINNORM   23         -1 1
-DWARF                7182       9551       1100       4          0x01000000 HAIRNORM   SKINNORM   29         0x505 0
-ELF                  7194       9552       1097       2          0x00800000 HAIRNORM   SKINNORM   26         0xb0b 0
-GNOME                7196       9553       1099       6          0x10000000 HAIRNORM   SKINNORM   35         0xb0b 0
-HALF_ELF             7197       9555       1098       3          0x02000000 HAIRNORM   SKINNORM   37         -1 0    
-HALF_ORC             22         25         23         7          0x80000000 HAIRNORM   SKINNORM   38         0x101 0
-HALFLING             7195       9554       5374       5          0x04000000 HAIRNORM   SKINNORM   32         0x909 0
-HUMAN_AASIMAR        5377       5386       5377       0x10001    0x00000000 HAIRAASM   SKINAASM   24         0x707 0
-HUMAN_TIEFLING       5378       5388       5378       0x10002    0x00000000 HAIRTIEF   SKINTIEF   25         0x909 0
-ELF_DROW             5379       5394       5379       0x20001    0x00000000 HAIRDARK   SKINDARK   27         0x30b 0
-ELF_WILD             5380       5397       5380       0x20002    0x00000000 HAIRWOOD   SKINWOOD   28         0xa0a 0
-DWARF_GOLD           5381       5413       5381       0x40001    0x00000000 HAIRGOLD   SKINGOLD   30         0x505 0
-DWARF_GRAY           5382       5416       5382       0x40002    0x00000000 HAIRGRAY   SKINGRAY   31         0x505 0
-HALFLING_STRONGHEART 5383       5660       5383       0x50001    0x00000000 HAIRNORM   SKINNORM   33         0x909 0
-HALFLING_GHOSTWISE   5384       5661       5384       0x50002    0x00000000 HAIRNORM   SKINNORM   34         0x101 0
-GNOME_DEEP           5385       5662       5385       0x60001    0x00000000 HAIRNORM   SKINNORM   36         0xb0b 0
+                     NAME_REF   DESC_REF   CAP_REF    ID         USABILITY  HAIR       SKIN       SKILL_COLUMN FAVORED_CLASS FEATBONUS  ECL
+HUMAN                7193       9550       1096       1          0x08000000 HAIRNORM   SKINNORM   23         -1 1                       0
+DWARF                7182       9551       1100       4          0x01000000 HAIRNORM   SKINNORM   29         0x505 0                    0
+ELF                  7194       9552       1097       2          0x00800000 HAIRNORM   SKINNORM   26         0xb0b 0                    0
+GNOME                7196       9553       1099       6          0x10000000 HAIRNORM   SKINNORM   35         0xb0b 0                    0
+HALF_ELF             7197       9555       1098       3          0x02000000 HAIRNORM   SKINNORM   37         -1 0                       0
+HALF_ORC             22         25         23         7          0x80000000 HAIRNORM   SKINNORM   38         0x101 0                    0
+HALFLING             7195       9554       5374       5          0x04000000 HAIRNORM   SKINNORM   32         0x909 0                    0
+HUMAN_AASIMAR        5377       5386       5377       0x10001    0x00000000 HAIRAASM   SKINAASM   24         0x707 0                    1
+HUMAN_TIEFLING       5378       5388       5378       0x10002    0x00000000 HAIRTIEF   SKINTIEF   25         0x909 0                    1
+ELF_DROW             5379       5394       5379       0x20001    0x00000000 HAIRDARK   SKINDARK   27         0x30b 0                    2
+ELF_WILD             5380       5397       5380       0x20002    0x00000000 HAIRWOOD   SKINWOOD   28         0xa0a 0                    0
+DWARF_GOLD           5381       5413       5381       0x40001    0x00000000 HAIRGOLD   SKINGOLD   30         0x505 0                    0
+DWARF_GRAY           5382       5416       5382       0x40002    0x00000000 HAIRGRAY   SKINGRAY   31         0x505 0                    2
+HALFLING_STRONGHEART 5383       5660       5383       0x50001    0x00000000 HAIRNORM   SKINNORM   33         0x909 0                    0
+HALFLING_GHOSTWISE   5384       5661       5384       0x50002    0x00000000 HAIRNORM   SKINNORM   34         0x101 0                    0
+GNOME_DEEP           5385       5662       5385       0x60001    0x00000000 HAIRNORM   SKINNORM   36         0xb0b 0                    3

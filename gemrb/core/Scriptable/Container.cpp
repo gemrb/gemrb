@@ -172,8 +172,8 @@ void Container::DestroyContainer()
 CREItem *Container::RemoveItem(unsigned int idx, unsigned int count)
 {
 	CREItem *ret = inventory.RemoveItem(idx, count);
-	//we just took the 3. or less item, groundpile changed
-	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<3)) {
+	//if we just took one of the first few items, groundpile changed
+	if ((Type == IE_CONTAINER_PILE) && (idx<MAX_GROUND_ICON_DRAWN)) {
 		RefreshGroundIcons();
 	}
 	return ret;
@@ -185,7 +185,7 @@ int Container::AddItem(CREItem *item)
 {
 	inventory.AddItem(item);
 	//we just added a 3. or less item, groundpile changed
-	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<4)) {
+	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<=MAX_GROUND_ICON_DRAWN)) {
 		RefreshGroundIcons();
 	}
 	return 2;
@@ -244,6 +244,7 @@ void Container::TryPickLock(Actor *actor)
 		return;
 	}
 	SetContainerLocked(false);
+	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK); //AMB_D21D
@@ -274,6 +275,7 @@ void Container::TryBashLock(Actor *actor)
 
 	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, DMC_LIGHTGREY, actor);
 	SetContainerLocked(false);
+	core->GetGameControl()->ResetTargetMode();
 	//Is this really useful ?
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();

@@ -238,7 +238,7 @@ typedef std::vector< ScriptedAnimation*> vvcVector;
 
 struct WeaponInfo {
 	int slot;
-	int enchantment;
+	ieDword enchantment;
 	unsigned int range;
 	ieDword itemflags;
 	ieDword prof;
@@ -806,7 +806,7 @@ public:
 	/* checks whether the actor is behind the target */
 	bool IsBehind(Actor* target) const;
 	/* checks whether the target is the actor's racial enemy */
-	bool IsRacialEnemy(Actor* target) const;
+	int GetRacialEnemyBonus(Actor* target) const;
 	/* checks whether the actor can stay in the current modal state */
 	bool ModalSpellSkillCheck();
 	/* check if this actor is seen by or seeing anyone */

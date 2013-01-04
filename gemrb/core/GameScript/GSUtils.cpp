@@ -137,8 +137,8 @@ int GetReaction(Actor *target, Scriptable *Sender)
 	reaction = 10 + rmodrep[rep] + rmodchr[chr];
 
 	// add -4 penalty when dealing with racial enemies
-	if (Sender && target->GetRangerLevel() && Sender->Type == ST_ACTOR && target->IsRacialEnemy((Actor *)Sender)) {
-		reaction -= 4;
+	if (Sender && target->GetRangerLevel() && (Sender->Type == ST_ACTOR) ) {
+		reaction -= target->GetRacialEnemyBonus((Actor *) Sender);
 	}
 
 	return reaction;

@@ -46,10 +46,18 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+BonusSpellTable = None
+HateRaceTable = None
+
+#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
+Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
+IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
+IE_LEVELSORCEROR, IE_LEVEL2]
 
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
+	global BonusSpellTable, HateRaceTable
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if RecordsWindow:
@@ -83,6 +91,11 @@ def OpenRecordsWindow ():
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
 	Window.SetFrame ()
+
+	if not BonusSpellTable:
+		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
+	if not HateRaceTable:
+		HateRaceTable = GemRB.LoadTable ("haterace")
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -165,8 +178,45 @@ def ColorDiff2 (Window, Label, diff):
 		Label.SetTextColor (255, 255, 255)
 	return
 
-def HasBonusSpells (pc):
-	return False
+def GetBonusSpells (pc):
+	bonusSpells = []
+	classes = []
+	# cheack each class/kit
+	for i in range(11):
+		level = GemRB.GetPlayerStat (pc, Classes[i])
+		if not level:
+			continue
+
+		ClassTitle = GUICommonWindows.GetActorClassTitle (pc, i)
+		# find the casting stat
+		ClassName = GUICommon.GetClassRowName (i, "index")
+		Stat = CommonTables.ClassSkills.GetValue (ClassName, "CASTING")
+		if Stat == "*":
+			continue
+		Stat = GemRB.GetPlayerStat (pc, Stat)
+		if Stat < 12: # boni start with positive modifiers
+			continue
+
+		# get max spell level we can cast, since only usable boni are displayed
+		# check the relevant mxspl* table
+		SpellTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
+		if SpellTable == "*":
+			SpellTable = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
+		SpellTable = GemRB.LoadTable (SpellTable)
+		maxLevel = 0
+		for i in range(SpellTable.GetColumnCount()):
+			spells = SpellTable.GetValue (str(level), str(i+1)) # not all tables start at 1, so use a named lookup
+			if not spells:
+				break
+			maxLevel = i+1
+
+		classes.append(ClassTitle)
+		# check if at casting stat size, there is any bonus spell in BonusSpellTable
+		bonusSpells = [0] * maxLevel
+		for level in range (1, maxLevel+1):
+			bonusSpells[level-1] = BonusSpellTable.GetValue (Stat-12, level-1)
+
+	return bonusSpells, classes
 
 def HasClassFeatures (pc):
 	#clerics turning
@@ -178,7 +228,26 @@ def HasClassFeatures (pc):
 	#paladins healing
 	if GemRB.GetPlayerStat(pc, IE_LAYONHANDSAMOUNT):
 		return True
+	# wisdom ac bonus, wholeness of body
+	if GemRB.GetPlayerStat (pc, IE_LEVELMONK):
+		return True
 	return False
+
+def DisplayFavouredEnemy (pc, RangerLevel, second=-1):
+	RaceID = 0
+	if second == -1:
+		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE)
+	else:
+		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE2+second)
+	if RaceID:
+		FavouredIndex = HateRaceTable.FindValue (1, RaceID)
+		if FavouredIndex == -1:
+			return
+		FavouredName = HateRaceTable.GetValue (FavouredIndex, 0)
+		if second == -1:
+			RecordsTextArea.Append (delimited_txt(FavouredName, ":", PlusMinusStat((RangerLevel+4)/5)))
+		else:
+			RecordsTextArea.Append (delimited_txt(FavouredName, ":", PlusMinusStat((RangerLevel+4)/5-second-1)))
 
 def GetFavoredClass (pc, code):
 	if GemRB.GetPlayerStat (pc, IE_SEX)==1:
@@ -187,6 +256,20 @@ def GetFavoredClass (pc, code):
 		code = (code>>8)&15
 
 	return code-1
+
+# returns the race or subrace
+def GetRace (pc):
+	Race = GemRB.GetPlayerStat (pc, IE_RACE)
+	Subrace = GemRB.GetPlayerStat (pc, IE_SUBRACE)
+	if Subrace:
+		Race = Race<<16 | Subrace
+	return CommonTables.Races.FindValue (3, Race)
+
+# returns the effective character level modifier
+def GetECL (pc):
+	RaceIndex = GetRace (pc)
+	RaceRowName = CommonTables.Races.GetRowName (RaceIndex)
+	return CommonTables.Races.GetValue (RaceRowName, "ECL")
 
 #class is ignored
 def GetNextLevelExp (Level, Adjustment, string=0):
@@ -200,11 +283,6 @@ def GetNextLevelExp (Level, Adjustment, string=0):
 	if string:
 		return GemRB.GetString(24342) #godhood
 	return 0
-
-#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
-Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCEROR, IE_LEVEL2]
 
 def DisplayCommon (pc):
 	Window = RecordsWindow
@@ -234,9 +312,9 @@ def DisplaySavingThrows (pc):
 	RecordsTextArea.Append (delimited_txt(17382, ":", PlusMinusStat(tmp), 0))
 
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
-def GNZS(pc, s1, st):
+def GNZS(pc, s1, st, force=False):
 	value = GemRB.GetPlayerStat (pc, st)
-	if value:
+	if value or force:
 		RecordsTextArea.Append (s1, -1)
 		RecordsTextArea.Append (": "+ str(value) )
 	return
@@ -250,8 +328,8 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (" - ")
 	RecordsTextArea.Append (40309)
 	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
-	#TODO: get special level penalty for subrace
-	adj = 0
+	# get special level penalty for subrace
+	adj = GetECL (pc)
 	RecordsTextArea.Append (": "+str(levelsum) )
 	RecordsTextArea.Append ("[/color]")
 	#the class name for highest
@@ -278,13 +356,9 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (40310,-1)
 
 	#get the subrace value
-	Value = GemRB.GetPlayerStat(pc,IE_RACE)
-	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
-	if Value2:
-		Value = Value<<16 | Value2
-	tmp = CommonTables.Races.FindValue (3, Value)
-	Race = CommonTables.Races.GetValue (tmp, 2)
-	tmp = CommonTables.Races.GetValue (tmp, 8)
+	RaceIndex = GetRace (pc)
+	Race = CommonTables.Races.GetValue (RaceIndex, 2)
+	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
 
 	if tmp == -1:
 		tmp = highest
@@ -302,7 +376,7 @@ def DisplayGeneral (pc):
 
 	RecordsTextArea.Append (36928,-1)
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
-	RecordsTextArea.Append (": "+str(xp) )
+	RecordsTextArea.Append (str(xp))
 	RecordsTextArea.Append (17091,-1)
 	tmp = GetNextLevelExp (levelsum, adj, 1)
 	RecordsTextArea.Append (": "+tmp )
@@ -318,6 +392,8 @@ def DisplayGeneral (pc):
 			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
 			RecordsTextArea.Append ("[capital=2]"+c+" ", -1)
 			RecordsTextArea.Append (tmp)
+
+	# TODO: Active Feats (eg. Power attack 4)
 
 	#race
 	RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
@@ -346,34 +422,66 @@ def DisplayGeneral (pc):
 		if tmp:
 			RecordsTextArea.Append (12126,-1)
 			RecordsTextArea.Append (": "+str(tmp) )
-		tmp = GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER)
+		# 1d6 at level 1 and +1d6 every two extra rogue levels
+		tmp = GemRB.GetPlayerStat (pc, IE_LEVELTHIEF)
 		if tmp:
+			tmp = (tmp+1)//2
 			RecordsTextArea.Append (24898,-1)
 			RecordsTextArea.Append (": "+str(tmp)+"d6" )
 		tmp = GemRB.GetPlayerStat (pc, IE_LAYONHANDSAMOUNT)
 		if tmp:
 			RecordsTextArea.Append (12127,-1)
 			RecordsTextArea.Append (": "+str(tmp) )
+		MonkLevel = GemRB.GetPlayerStat (pc, IE_LEVELMONK)
+		if MonkLevel:
+			AC = GemRB.GetCombatDetails(pc, 0)["AC"]
+			GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
+			RecordsTextArea.Append (39431, -1)
+			# wholeness of body
+			RecordsTextArea.Append (39749, -1)
+			RecordsTextArea.Append (": "+str(MonkLevel*2))
+
+	# favoured enemies; eg Goblins: +2 & Harpies: +1
+	RangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
+	if RangerLevel:
+		RecordsTextArea.Append ("\n\n[color=ffff00]")
+		if RangerLevel > 5:
+			RecordsTextArea.Append (15982)
+		else:
+			RecordsTextArea.Append (15897)
+		RecordsTextArea.Append ("[/color]\n")
+		DisplayFavouredEnemy (pc, RangerLevel)
+		for i in range (7):
+			DisplayFavouredEnemy (pc, RangerLevel, i)
 
 	#bonus spells
-	if HasBonusSpells(pc):
+	bonusSpells, classes = GetBonusSpells(pc)
+	if sum(bonusSpells):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (10344)
 		RecordsTextArea.Append ("[/color]\n")
+		for c in classes:
+			# class/kit name
+			RecordsTextArea.Append (c)
+			for level in range(len(bonusSpells)):
+				AddIndent()
+				# Level X: +Y
+				RecordsTextArea.Append (delimited_txt(7192, " " + str(level+1)+":", "+" + str(bonusSpells[level]), 0))
 
 	#ability statistics
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
 	RecordsTextArea.Append (40315)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("[/color]\n")
 
-	RecordsTextArea.Append (10338, -1) # Weight Allowance
+	# Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
-	RecordsTextArea.Append (": " + str(tmp) + " lb.")
+	RecordsTextArea.Append (delimited_txt (10338, ":", str(tmp) + " lb."))
+	# constitution bonus to hitpoints
 	tmp = GUICommon.GetAbilityBonus(pc, IE_CON)
-	RecordsTextArea.Append (10342,-1)
-	RecordsTextArea.Append (": " + PlusMinusStat(tmp) ) #con bonus to hitpoints
-	RecordsTextArea.Append ("\n")
+	RecordsTextArea.Append (delimited_txt (10342, ":", PlusMinusStat(tmp)))
 
+	# Magic
+	GNZS(pc, 15581, IE_RESISTMAGIC, True)
 	#Fire
 	GNZS(pc, 14012, IE_RESISTFIRE)
 	#Magic Fire
@@ -387,7 +495,7 @@ def DisplayGeneral (pc):
 	#Acid
 	GNZS(pc, 14015, IE_RESISTACID)
 	#Spell
-	GNZS(pc, 15581, IE_MAGICDAMAGERESISTANCE)
+	GNZS(pc, 40319, IE_MAGICDAMAGERESISTANCE)
 	# Missile
 	GNZS(pc, 11767, IE_RESISTMISSILE)
 	# Slashing
@@ -409,11 +517,12 @@ def PlusMinusStat(value):
 		return "+" + str(value)
 	return str(value)
 
-def CascadeToHit(total, ac, apr):
+def CascadeToHit(total, ac, apr, slot):
 	cascade = PlusMinusStat(total)
 	babDec = 5
-	if ac["Wisdom"]: #TODO: also chech that there are no weapons equipped
-		babDec = 3
+	if ac["Wisdom"]:
+		if slot == 10: # fist slot - nothing is equipped
+			babDec = 3
 	for i in range(1, apr):
 		if total-i*babDec > 0: # skips negative ones, meaning a lower number of attacks can be displayed
 			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
@@ -426,7 +535,7 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 	# display all the (successive) attack values (+15/+10/+5)
 	if left:
 		apr = 1 # offhand gives just one extra attack
-		hits = CascadeToHit(tohit["Total"], ac, apr)
+		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
 		RecordsTextArea.Append (delimited_txt (733, ":", hits, 0))
 	else:
 		# account for the fact that the total apr contains the one for the other hand too
@@ -434,12 +543,12 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 			apr = combatdet["APR"]//2 - 1
 		else:
 			apr = combatdet["APR"]//2
-		hits = CascadeToHit(tohit["Total"], ac, apr)
+			hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
 		RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
 
 	# Base
 	AddIndent()
-	hits = CascadeToHit(tohit["Base"], ac, apr)
+	hits = CascadeToHit(tohit["Base"], ac, apr, combatdet["Slot"])
 	RecordsTextArea.Append (delimited_txt (31353, ":", hits, 0))
 	# Weapon bonus
 	if tohit["Weapon"]:
@@ -502,7 +611,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
 	else:
 		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
-	# any 100% chance extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
+	# any extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
 	alldos = combatdet["DamageOpcodes"]
 	dosmin = 0
 	dosmax = 0
@@ -510,12 +619,18 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		ddice = dos["NumDice"]
 		dsides = dos["DiceSides"]
 		dbonus = dos["DiceBonus"]
+		dchance = dos["Chance"]
 		AddIndent()
-		if dbonus:
-			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus))
+		# only display the chance when it isn't 100%
+		if dchance == 100:
+			dchance = ""
+			dosmin += ddice + dbonus
 		else:
-			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides))
-		dosmin += ddice + dbonus
+			dchance = " (%d%%)" % dchance
+		if dbonus:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+PlusMinusStat(dbonus)+dchance)
+		else:
+			RecordsTextArea.Append (dos["TypeName"] + ": +" + str (ddice)+"d"+str(dsides)+dchance)
 		dosmax += ddice*dsides + dbonus
 
 	# Strength
@@ -533,6 +648,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	if lbonus:
 		AddIndent()
 		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))
+	#TODO: Power Attack has its own row
 	# Damage Potential (2-12)
 	# add any other bonus to the ammo damage calc
 	AddIndent()
@@ -874,8 +990,7 @@ def UpdateRecordsWindow ():
 	#level up
 	Button = Window.GetControl (37)
 	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
-	#TODO: get special level penalty for subrace
-	if GetNextLevelExp(levelsum, 0) <= GemRB.GetPlayerStat (pc, IE_XP):
+	if GetNextLevelExp(levelsum, GetECL(pc)) <= GemRB.GetPlayerStat (pc, IE_XP):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)

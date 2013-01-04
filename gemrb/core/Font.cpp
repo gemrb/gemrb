@@ -315,7 +315,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			initials_x = x;
 
 			//how many more lines to be indented (one was already indented)
-			initials_rows = 1 + ((initials->maxHeight - 1) / maxHeight); // ceiling
+			initials_rows = (initials->maxHeight - 1) / maxHeight;
 			initials_rows += num_empty_rows;
 			initials_row = row;
 			last_initial_row = initials_row;
@@ -615,7 +615,7 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 			enablecap=false;
 			initials_x = wx + psx;
 			//how many more lines to be indented (one was already indented)
-			initials_rows = 1 + ((initials->maxHeight - 1) / maxHeight); // ceiling
+			initials_rows = (initials->maxHeight - 1) / maxHeight;
 			continue;
 		} else {
 			wx += GetCharSprite((unsigned char)string[pos])->Width;

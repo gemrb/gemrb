@@ -403,7 +403,12 @@ void GameScript::SetHPPercent(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->NewBase( IE_HITPOINTS, parameters->int0Parameter, MOD_PERCENT);
+	// 0 - adjust to max hp, 1 - adjust to current
+	if (parameters->int1Parameter) {
+		actor->NewBase(IE_HITPOINTS, parameters->int0Parameter, MOD_PERCENT);
+	} else {
+		actor->NewBase(IE_HITPOINTS, actor->GetStat(IE_MAXHITPOINTS) * parameters->int0Parameter/100, MOD_ABSOLUTE);
+	}
 }
 
 void GameScript::AddHP(Scriptable* Sender, Action* parameters)
@@ -4093,6 +4098,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 }
 
 //same as equipitem, but with additional slots parameter, and object to perform action
+// XEquipItem("00Troll1",Myself,SLOT_RING_LEFT,TRUE)
 void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4101,11 +4107,36 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
+	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	if (slot<0) {
 		return;
 	}
-	actor->inventory.EquipItem(slot);
+
+	int slot2 = parameters->int0Parameter;
+	bool equip = parameters->int1Parameter;
+
+	if (equip) {
+		if (slot != slot2) {
+			// swap them first, so we equip to the desired slot
+			CREItem *si = actor->inventory.RemoveItem(slot);
+			actor->inventory.AddSlotItem(si, slot2);
+		}
+		actor->inventory.EquipItem(slot2);
+	} else {
+		CREItem *si = actor->inventory.RemoveItem(slot);
+		if (si) {
+			if (actor->inventory.AddSlotItem(si, SLOT_ONLYINVENTORY) == ASI_FAILED) {
+				Map *map = Sender->GetCurrentArea();
+				if (map) {
+					//drop item at the feet of the character instead of destroying it
+					map->AddItemToLocation(Sender->Pos, si);
+				} else {
+					delete si;
+				}
+			}
+		}
+	}
+
 	actor->ReinitQuickSlots();
 }
 
@@ -6809,6 +6840,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = sparkle; //animation type
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Duration = parameters->int1Parameter * 15;
+	fx->Target = FX_TARGET_PRESET;
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, (Actor *) src, src);
@@ -7019,6 +7051,20 @@ void GameScript::SetNamelessDeath(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	sp->SetNamelessDeath(area, parameters->pointParameter, parameters->int1Parameter);
+}
+
+// like GameScript::Kill, but forces chunking damage (disabling resurrection)
+void GameScript::ChunkCreature(Scriptable *Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+
+	Actor *target = (Actor *) tar;
+	Effect *fx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
+	target->fxqueue.AddEffect(fx, false);
+	delete fx;
 }
 
 }

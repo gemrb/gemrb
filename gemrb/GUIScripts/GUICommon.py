@@ -464,6 +464,7 @@ def GetKitIndex (actor):
 	return KitIndex
 
 # fetches the rowname of the passed actor's (base) class from classes.2da
+# NOTE: only the "index" method is iwd2-ready, since you can have multiple classes and kits
 def GetClassRowName(value, which=-1):
 	if which == "index":
 		ClassIndex = value

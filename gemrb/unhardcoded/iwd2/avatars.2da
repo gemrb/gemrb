@@ -54,7 +54,7 @@
 0x5103     CIMB1      CIMB2      CIMB3      CIMF4      0          2          0          *
 0x5110     CHFB1      CHFB2      CHFB3      CHFF4      0          2          0          *
 0x5111     CEFB1      CEFB2      CEFB3      CEFF4      0          2          0          *
-0x5112     CDMB1      CDFB2      CDFB3      CDFF4      0          2          0          *
+0x5112     CDMB1      CDMB2      CDMB3      CDMF4      0          2          0          *
 0x5113     CIFB1      CIFB2      CIFB3      CIFF4      0          2          0          *
 0x5200     CHMW1      CHMW2      CHMW3      CHMW4      0          2          0          *
 0x5201     CEMW1      CEMW2      CEMW3      CEMW4      0          2          0          *
@@ -70,7 +70,7 @@
 0x5303     CIMB1      CIMT2      CIMB3      CIMF4      0          2          0          *
 0x5310     CHFB1      CHFT2      CHFB3      CHFF4      0          2          0          *
 0x5311     CEFB1      CEFT2      CEFB3      CEFF4      0          2          0          *
-0x5312     CDMB1      CDFT2      CDFB3      CDFF4      0          2          0          *
+0x5312     CDMB1      CDMT2      CDMB3      CDMF4      0          2          0          *
 0x5313     CIFB1      CIFT2      CIFB3      CIFF4      0          2          0          *
 0x6000     CHMB1      CHMB2      CHMB3      CHMC4      0          2          0          *
 0x6001     CEMB1      CEMB2      CEMB3      CEMC4      0          2          0          *
@@ -80,7 +80,7 @@
 0x6005     CHMB1      CHMB2      CHMB3      CHMC4      0          2          0          *
 0x6010     CHFB1      CHFB2      CHFB3      CHFC4      0          2          0          *
 0x6011     CEFB1      CEFB2      CEFB3      CEFC4      0          2          0          *
-0x6012     CDMB1      CDFB2      CDFB3      CDFC4      0          2          0          *
+0x6012     CDMB1      CDMB2      CDMB3      CDMC4      0          2          0          *
 0x6013     CIFB1      CIFB2      CIFB3      CIFC4      0          2          0          *
 0x6014     CIFB1      CIFB2      CIFB3      CIFC4      0          2          0          *
 0x6015     CHFB1      CHFB2      CHFB3      CHFC4      0          2          0          *
@@ -92,7 +92,7 @@
 0x6105     CHMB1      CHMB2      CHMB3      CHMF4      0          2          0          *
 0x6110     CHFB1      CHFB2      CHFB3      CHFF4      0          2          0          *
 0x6111     CEFB1      CEFB2      CEFB3      CEFF4      0          2          0          *
-0x6112     CDMB1      CDFB2      CDFB3      CDFF4      0          2          0          *
+0x6112     CDMB1      CDMB2      CDMB3      CDMF4      0          2          0          *
 0x6113     CIFB1      CIFB2      CIFB3      CIFF4      0          2          0          *
 0x6114     CIFB1      CIFB2      CIFB3      CIFF4      0          2          0          *
 0x6115     CHFB1      CHFB2      CHFB3      CHFF4      0          2          0          *
@@ -116,7 +116,7 @@
 0x6305     CHMB1      CHMT2      CHMB3      CHMF4      0          2          0          *
 0x6310     CHFB1      CHFT2      CHFB3      CHFF4      0          2          0          *
 0x6311     CEFB1      CEFT2      CEFB3      CEFF4      0          2          0          *
-0x6312     CDMB1      CDFT2      CDFB3      CDFF4      0          2          0          *
+0x6312     CDMB1      CDMT2      CDMB3      CDMF4      0          2          0          *
 0x6313     CIFB1      CIFT2      CIFB3      CIFF4      0          2          0          *
 0x6314     CIFB1      CIFT2      CIFB3      CIFF4      0          2          0          *
 0x6315     CHFB1      CHFT2      CHFT3      CHFF4      0          2          0          *

@@ -528,8 +528,8 @@ static PyObject* GemRB_TextArea_MoveText(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Rewind__doc,
-"RewindTA(Win, Ctrl, Ticks)\n\n"
-"Sets up a TextArea for scrolling. Ticks is the delay between the steps in scrolling.");
+"RewindTA(Win, Ctrl)\n\n"
+"Sets up a TextArea for scrolling.");
 
 static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 {
@@ -544,6 +544,7 @@ static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
+	core->GetAudioDrv()->Play( NULL, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	ctrl->SetupScroll();
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5879,11 +5880,22 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Invalid Container slot!");
 		}
 
-		res = core->CanMoveItem(container->inventory.GetSlotItem(Slot) );
+		si = container->inventory.GetSlotItem(Slot);
+		res = core->CanMoveItem(si);
 		if (!res) { //cannot move
 			Log(MESSAGE, "GUIScript", "Cannot move item, it is undroppable!");
 			Py_INCREF( Py_None );
 			return Py_None;
+		}
+
+		// check for full inventory up front to prevent unnecessary shuffling of container
+		// items; note that shuffling will still occur when picking up stacked items where
+		// not the entire stack fits
+		if (res == -1) { // not gold
+			if (actor->inventory.FindCandidateSlot(SLOT_INVENTORY, 0, si->ItemResRef) == -1) {
+				Py_INCREF( Py_None );
+				return Py_None;
+			}
 		}
 
 		//this will update the container
@@ -8943,7 +8955,7 @@ jump_label2:
 		break;
 		case ACT_IWDQITEM:
 			if (i>3) {
-				tmp = i-3;
+				tmp = (i+1)%3;
 				goto jump_label;
 			}
 		case ACT_QSLOT1:
@@ -9922,9 +9934,15 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(tohits, "Weapon", PyInt_FromLong (actor->ToHit.GetWeaponBonus()));
 	PyDict_SetItemString(dict, "ToHitStats", tohits);
 
-	//FIXME this returns the launcher, not ammo
+	const CREItem *wield;
+	// wi.slot has the launcher, so look up the ammo
 	//FIXME: remove the need to look it up again
-	const CREItem *wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
+	if (hittingheader && (hittingheader->AttackType&ITEM_AT_PROJECTILE)) {
+		wield = actor->inventory.GetSlotItem(actor->inventory.GetEquippedSlot());
+		header = hittingheader;
+	} else {
+		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
+	}
 	if (!wield) {
 		return 0;
 	}
@@ -9944,6 +9962,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dos, "NumDice", PyInt_FromLong (damage_opcodes[i].DiceThrown));
 		PyDict_SetItemString(dos, "DiceSides", PyInt_FromLong (damage_opcodes[i].DiceSides));
 		PyDict_SetItemString(dos, "DiceBonus", PyInt_FromLong (damage_opcodes[i].DiceBonus));
+		PyDict_SetItemString(dos, "Chance", PyInt_FromLong (damage_opcodes[i].Chance));
 		PyTuple_SetItem(alldos, i, dos);
 	}
 	PyDict_SetItemString(dict, "DamageOpcodes", alldos);

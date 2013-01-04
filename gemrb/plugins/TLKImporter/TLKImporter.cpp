@@ -475,7 +475,7 @@ empty:
 		if (SoundResRef[0] != 0) {
 			int xpos = 0;
 			int ypos = 0;
-			unsigned int flag = GEM_SND_RELATIVE | (flags&GEM_SND_SPEECH);
+			unsigned int flag = GEM_SND_RELATIVE | (flags&(GEM_SND_SPEECH|GEM_SND_QUEUE));
 			//IE_STR_SPEECH will stop the previous sound source
 			core->GetAudioDrv()->Play( SoundResRef, xpos, ypos, flag);
 		}
