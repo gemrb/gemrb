@@ -1637,6 +1637,7 @@ void Projectile::DrawTravel(const Region &screen)
 	//Area tint
 	if (TFlags&PTF_TINT) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
+		tint.a = 255;
 		flag |= BLIT_TINTED;
 	}
 
