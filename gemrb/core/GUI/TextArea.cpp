@@ -54,7 +54,6 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	seltext = -1;
 	Value = 0xffffffff;
 	ResetEventHandler( TextAreaOnChange );
-	ResetEventHandler( TextAreaOutOfText );
 	PortraitResRef[0]=0;
 	palette = core->CreatePalette( hitextcolor, lowtextcolor );
 	initpalette = core->CreatePalette( initcolor, lowtextcolor );
@@ -229,13 +228,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			//the buffer is filled enough
 			return;
 		}
-		if (RunEventHandler( TextAreaOutOfText )) {
-			return;
-		}
-		if (linesize==lines.size()) {
-			ResetEventHandler( TextAreaOutOfText );
-			return;
-		}
+
 		AppendText("\n",-1);
 		return;
 	}
@@ -920,9 +913,6 @@ bool TextArea::SetEvent(int eventType, EventHandler handler)
 	switch (eventType) {
 	case IE_GUI_TEXTAREA_ON_CHANGE:
 		TextAreaOnChange = handler;
-		break;
-	case IE_GUI_TEXTAREA_OUT_OF_TEXT:
-		TextAreaOutOfText = handler;
 		break;
 	default:
 		return false;

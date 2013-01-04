@@ -40,7 +40,6 @@ namespace GemRB {
 // Keep these synchronized with GUIDefines.py
 // 0x05 is the control type of TextArea
 #define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000
-#define IE_GUI_TEXTAREA_OUT_OF_TEXT 0x05000001
 
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
@@ -180,8 +179,6 @@ public: //Events
 	void SetFocus(bool focus);
 	/** OnChange Scripted Event Function Name */
 	EventHandler TextAreaOnChange;
-	/** OutOfText Scripted Event Function Name */
-	EventHandler TextAreaOutOfText;
 };
 
 }
