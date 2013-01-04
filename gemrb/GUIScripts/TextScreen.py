@@ -25,7 +25,6 @@ import GUICommon
 TextScreen = None
 TextArea = None
 Row = 1
-Position = 0
 Chapter = 0
 TableName = None
 
@@ -122,8 +121,23 @@ def StartTextScreen ():
 	ReplayTextScreen()
 	return
 
-def FeedScroll ():
-	global TextArea, Position
+def EndTextScreen ():
+	global TextScreen
+
+	if TextScreen:
+		TextScreen.SetVisible (WINDOW_INVISIBLE)
+		TextScreen.Unload ()
+		GemRB.PlaySound(None, 0, 0, 4)
+
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
+	GemRB.UnhideGUI ()
+	GemRB.GamePause (0, 3)
+	return
+
+def ReplayTextScreen ():
+	global TextArea
+
+	TextArea.Rewind ()
 
 	Table = GemRB.LoadTable (TableName)
 	Count = Table.GetColumnCount (Row)
@@ -133,34 +147,9 @@ def FeedScroll ():
 	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 		Count = 2
 
-	if Position>=Count-1:
-		Position = 0
-		return
-	else:
-		Position = Position + 1
+	for i in range(1, Count):
+		TextArea.Append ("\n")
+		# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
+		TextArea.Append (Table.GetValue (Row, i), -1, 14)
 
-	Value = Table.GetValue (Row, Position)
-
-	# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
-	TextArea.Append (Value, -1, 14)
-	return
-
-def EndTextScreen ():
-	global TextScreen
-
-	if TextScreen:
-		TextScreen.SetVisible (WINDOW_INVISIBLE)
-		TextScreen.Unload ()
-		GemRB.PlaySound(None, 0, 0, 4)
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
-	GemRB.UnhideGUI ()
-	GemRB.GamePause (0, 3)
-	return
-
-def ReplayTextScreen ():
-	global TextArea, Position
-
-	Position = 0
-	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, FeedScroll)
-	TextArea.Rewind ()
 	return

@@ -971,10 +971,10 @@ void TextArea::SetupScroll()
 	SetPreservedRow(0);
 	startrow = 0;
 	// ticks is the number of ticks it takes to scroll this font 1 px
-	ticks = 2000 / ftext->maxHeight; // 2000 is just a value based off the previous magic number.
+	ticks = 2400 / ftext->maxHeight;
 	//clearing the textarea
 	Clear();
-	unsigned int i = (unsigned int) (Height/ftext->maxHeight);
+	unsigned int i = (unsigned int) (1 + ((Height - 1) / ftext->maxHeight)); // ceiling
 	while (i--) { //push empty lines so that the text starts out of view.
 		char *str = (char *) malloc(1);
 		str[0]=0;
@@ -984,16 +984,6 @@ void TextArea::SetupScroll()
 	i = (unsigned int) lines.size();
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	starttime = GetTickCount();
-	if (RunEventHandler( TextAreaOutOfText )) {
-		//event handler destructed this object?
-		return;
-	}
-	if (i==lines.size()) {
-		ResetEventHandler( TextAreaOutOfText );
-		return;
-	}
-	//recalculates rows
-	AppendText("\n",-1);
 }
 
 void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
