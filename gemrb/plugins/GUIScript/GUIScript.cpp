@@ -528,8 +528,8 @@ static PyObject* GemRB_TextArea_MoveText(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Rewind__doc,
-"RewindTA(Win, Ctrl, Ticks)\n\n"
-"Sets up a TextArea for scrolling. Ticks is the delay between the steps in scrolling.");
+"RewindTA(Win, Ctrl)\n\n"
+"Sets up a TextArea for scrolling.");
 
 static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 {
