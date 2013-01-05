@@ -126,6 +126,7 @@ INIWhiteListEntry ConfigWhitelist[] = {
 	{"Program Options", "Brightness Correction", 0},
 	{"Program Options", "Display Movie Subtitles", 0},	// identical to Display Subtitles
 	{"Program Options", "Display Subtitles", 0},		// identical to Display Movie Subtitles
+	{"Program Options", "EnableRollFeedback", 0}, // hidden iwd2 setting for extra roll messages
 	{"Program Options", "Full Screen", 0},
 	{"Program Options", "Gamma Correction", 0},
 	{"Program Options", "SoftBlt", 0}, // unused

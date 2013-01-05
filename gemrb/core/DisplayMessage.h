@@ -78,6 +78,8 @@ public:
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const;
 	void DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const;
+	/** iwd2 hidden roll debugger */
+	void DisplayRollStringName(int stridx, unsigned int color, const Scriptable *speaker, ...) const;
 };
 
 extern GEM_EXPORT DisplayMessage * displaymsg;

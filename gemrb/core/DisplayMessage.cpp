@@ -28,6 +28,8 @@
 #include "GUI/TextArea.h"
 #include "Scriptable/Actor.h"
 
+#include <cstdarg>
+
 namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
@@ -227,6 +229,22 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 	core->FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
+}
+
+// display tokenized strings like ~Open lock check. Open lock skill %d vs. lock difficulty %d (%d DEX bonus).~
+void DisplayMessage::DisplayRollStringName(int stridx, unsigned int color, const Scriptable *speaker, ...) const
+{
+	ieDword feedback = 0;
+	core->GetDictionary()->Lookup("EnableRollFeedback", feedback);
+	if (feedback) {
+		char tmp[200];
+		va_list numbers;
+		va_start(numbers, speaker);
+		// fill it out
+		vsnprintf(tmp, sizeof(tmp), core->GetString(stridx), numbers);
+		displaymsg->DisplayStringName(tmp, color, speaker);
+		va_end(numbers);
+	}
 }
 
 void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const
