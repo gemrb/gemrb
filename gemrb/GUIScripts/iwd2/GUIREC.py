@@ -54,6 +54,13 @@ Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
 IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
 IE_LEVELSORCEROR, IE_LEVEL2]
 
+#don't allow exporting polymorphed or dead characters
+def Exportable(pc):
+	if not (GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE): return False
+	if GemRB.GetPlayerStat (pc, IE_POLYMORPHED): return False
+	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
+	return True
+
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
@@ -295,6 +302,12 @@ def DisplayCommon (pc):
 	Race = CommonTables.Races.GetValue (tmp, 2)
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (Race)
+
+	Button = Window.GetControl (36)
+	if Exportable (pc):
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
 def DisplaySavingThrows (pc):

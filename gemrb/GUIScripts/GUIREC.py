@@ -140,6 +140,13 @@ def OpenRecReformPartyWindow ():
 	GemRB.SetTimedEvent (GUIWORLD.OpenReformPartyWindow, 1)
 	return
 
+#don't allow exporting polymorphed or dead characters
+def Exportable(pc):
+	if not (GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE): return False
+	if GemRB.GetPlayerStat (pc, IE_POLYMORPHED): return False
+	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
+	return True
+
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
 
@@ -159,7 +166,7 @@ def UpdateRecordsWindow ():
 
 	# exportable
 	Button = Window.GetControl (36)
-	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
+	if Exportable (pc):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
