@@ -4375,16 +4375,27 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 
 	int skill = snd->GetStat(IE_PICKPOCKET);
 	int tgt = scr->GetStat(IE_PICKPOCKET);
-	//the original engine has no random here
-	if (tgt != 255) {
-		skill -= tgt;
-		//if you want original behaviour: remove this
-		skill += core->Roll(1,100, snd->GetStat(IE_LUCK) );
+	int check;
+	if (core->HasFeature(GF_3ED_RULES)) {
+		int roll = core->Roll(1, 20, 0);
+		int level = scr->GetXPLevel(true);
+		int wismod = scr->GetAbilityBonus(IE_WIS);
+		// ~Pick pocket check. (10 + skill w/Dex bonus) %d vs. ((d20 + target's level) + Wisdom modifier) %d + %d.~
+		displaymsg->DisplayRollStringName(39302, DMC_LIGHTGREY, snd, 10+skill, roll+level, wismod);
+		check = (10 + skill) > (roll + level + wismod);
 	} else {
-		skill = 0;
+		//the original engine has no random here
+		if (tgt != 255) {
+			skill -= tgt;
+			//if you want original behaviour: remove this
+			skill += core->Roll(1,100, snd->GetStat(IE_LUCK) );
+		} else {
+			skill = 0;
+		}
+		//and change this 50 to 0.
+		check = skill < 50;
 	}
-	//and change this 50 to 0.
-	if (skill<50) {
+	if (check) {
 		//noticed attempt
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL, DMC_WHITE);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
