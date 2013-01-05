@@ -338,17 +338,38 @@ void Highlightable::TryDisarm(Actor *actor)
 	if (!Trapped || !TrapDetected) return;
 
 	int skill = actor->GetStat(IE_TRAPS);
+	int roll = 0;
+	int bonus = 0;
+	int trapDC = TrapRemovalDiff;
 
-	if (skill/2+core->Roll(1,skill/2,0)>TrapRemovalDiff) {
+	if (core->HasFeature(GF_3ED_RULES)) {
+		roll = core->Roll(1, 20, 0);
+		bonus = actor->GetAbilityBonus(IE_INT);
+		trapDC = TrapRemovalDiff/7 + 10; // oddity from the original
+	} else {
+		roll = core->Roll(1, skill/2, 0);
+		skill /= 2;
+	}
+
+	int check = skill + roll + bonus;
+	if (check > trapDC) {
 		AddTrigger(TriggerEntry(trigger_disarmed, actor->GetGlobalID()));
 		//trap removed
 		Trapped = 0;
+		if (core->HasFeature(GF_3ED_RULES)) {
+			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
+			displaymsg->DisplayRollStringName(39266, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+		}
 		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, DMC_LIGHTGREY, actor);
 		int xp = actor->CalculateExperience(XP_DISARM, actor->GetXPLevel(1));
 		Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
 	} else {
+		if (core->HasFeature(GF_3ED_RULES)) {
+			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
+			displaymsg->DisplayRollStringName(39266, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+		}
 		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, DMC_LIGHTGREY, actor);
 		TriggerTrap(skill, actor->GetGlobalID());
 	}
