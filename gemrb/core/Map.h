@@ -86,6 +86,10 @@ class Wall_Polygon;
 //creature area flags
 #define AF_CRE_NOT_LOADED 1
 #define AF_NAME_OVERRIDE  8
+//same flags in IWD2
+#define AF_SEEN_PARTY     2
+#define AF_INVULNERABLE   4
+#define AF_ENABLED        8
 
 //getline flags
 #define GL_NORMAL         0
