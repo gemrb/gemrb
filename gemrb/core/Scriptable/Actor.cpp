@@ -731,10 +731,12 @@ void Actor::SetCircleSize()
 				color = &green;
 				color_index = 0;
 				break;
-
+			case EA_EVILCUTOFF:
+				color = &yellow;
+				color_index = 5;
+				break;
 			case EA_ENEMY:
 			case EA_GOODBUTRED:
-			case EA_EVILCUTOFF:
 			case EA_CHARMEDPC:
 				color = &red;
 				color_index = 1;
