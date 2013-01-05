@@ -239,7 +239,8 @@ void Container::TryPickLock(Actor *actor)
 	}
 	int stat = actor->GetStat(IE_LOCKPICKING);
 	if (core->HasFeature(GF_3ED_RULES)) {
-		stat *= 5; // convert to percent
+		stat *= 7; // convert to percent (magic 7 is from RE)
+		stat += actor->GetAbilityBonus(IE_DEX);
 	}
 	if (stat < LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);

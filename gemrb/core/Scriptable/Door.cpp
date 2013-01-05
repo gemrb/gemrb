@@ -365,7 +365,12 @@ void Door::TryPickLock(Actor *actor)
 		}
 		return;
 	}
-	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
+	int stat = actor->GetStat(IE_LOCKPICKING);
+	if (core->HasFeature(GF_3ED_RULES)) {
+		stat *= 7; // convert to percent (magic 7 is from RE)
+		stat += actor->GetAbilityBonus(IE_DEX);
+	}
+	if (stat < (signed)LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		core->PlaySound(DS_PICKFAIL);
