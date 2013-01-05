@@ -34,21 +34,28 @@ def FindTextRow (Table):
 	#this is still not the full implementation, but the original engine never used this stuff
 	Row = Table.GetRowIndex("DEFAULT")
 	if Table.GetValue (Row, 1)== -1:
-		Row = Table.GetRowIndex("GOOD_REPUTATION")
+		if GemRB.GameGetReputation() >= 100:
+			Row = Table.GetRowIndex("GOOD_REPUTATION")
+		else:
+			Row = Table.GetRowIndex("BAD_REPUTATION")
 	return
 
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter, TableName, Row
 
 	GemRB.GamePause (1, 3)
-	GemRB.DisplayString (17556, 0xff0000) #Paused for chapter text
+
+	LoadPic = TableName = GemRB.GetGameString (STR_LOADMOS)
+	if TableName[:6] == "drmtxt":
+		GemRB.DisplayString (17558, 0xff0000) #Paused for rest
+	else:
+		GemRB.DisplayString (17556, 0xff0000) #Paused for chapter text
 
 	if GUICommon.GameIsIWD2():
 		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
 	else:
 		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 
-	LoadPic = TableName = GemRB.GetGameString (STR_LOADMOS)
 	#if there is no preset loadpic, try to determine it from the chapter
 	#fixme: we always assume there isn't for non-bg2
 	if GUICommon.GameIsBG2():
@@ -59,6 +66,8 @@ def StartTextScreen ():
 			EndTextScreen ()
 			return
 		ID = 62
+	elif TableName[:6] == "drmtxt":
+		ID = 50 + (GemRB.GetGameVar("DREAM") & 0x7fffffff)
 	else:
 		ID = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
 		Chapter = ID + 1
@@ -114,6 +123,8 @@ def StartTextScreen ():
 	Button.SetText (16510)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReplayTextScreen)
 
+	#if this was opened from somewhere other than game control close that window
+	GUICommon.CloseOtherWindow(None)
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
 	TextScreen.SetVisible (WINDOW_VISIBLE)

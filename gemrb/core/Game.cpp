@@ -1508,6 +1508,38 @@ void Game::PlayerDream()
 	delete( gs );
 }
 
+//Start a TextScreen dream for the protagonist
+void Game::TextDream()
+{
+	ieDword dream, chapter;
+	locals->Lookup("CHAPTER", chapter);
+	if (!locals->Lookup("DREAM", dream)) {
+		dream = 1;
+	}
+	snprintf(LoadMos, sizeof(ieResRef)-1, "drmtxt%d", dream+1);
+	if ((chapter > dream) && (core->Roll(1, 100, 0) <= 33)
+		&& gamedata->Exists(LoadMos, IE_2DA_CLASS_ID)) {
+
+		// give innate spell to protagonist
+		AutoTable drm(LoadMos);
+		if (drm) {
+			const char *repLabel;
+			if (Reputation >= 100)
+				repLabel = "GOOD_POWER";
+			else
+				repLabel = "BAD_POWER";
+			int row = drm->GetRowIndex(repLabel);
+			if (row != -1) {
+				Actor *actor = GetPC(0, false);
+				actor->LearnSpell(drm->QueryField(row, 0), LS_MEMO|LS_LEARN);
+			}
+		}
+
+		locals->SetAt("DREAM", dream+1);
+		core->SetEventFlag(EF_TEXTSCREEN);
+	}
+}
+
 //noareacheck = no random encounters
 //dream = 0 - based on area non-0 - select from list
 //-1 no dream
@@ -1604,11 +1636,14 @@ void Game::RestParty(int checks, int dream, int hp)
 		return;
 	}
 
-	//movie and cutscene dreams
+	//movie, cutscene, and still frame dreams
 	if (dream>=0) {
 		//cutscene dreams
-		if (gamedata->Exists("player1d",IE_BCS_CLASS_ID, true))
+		if (gamedata->Exists("player1d",IE_BCS_CLASS_ID, true)) {
 			PlayerDream();
+		} else if (gamedata->Exists("drmtxt2", IE_2DA_CLASS_ID, true)) {
+			TextDream();
+		}
 
 		//select dream based on area
 		ieResRef *movie;
