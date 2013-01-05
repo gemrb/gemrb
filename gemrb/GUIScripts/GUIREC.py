@@ -602,10 +602,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# only bg2 displayed all the resistances, but it is useful information
 	# Resistances
-	if GUICommon.GameIsIWD1():
+	if GUICommon.GameIsBG2():
+		stats.append(32204)
+	elif not GUICommon.GameIsBG1():
 		stats.append (15544)
-	else:
-		stats.append (32204)
 	# 32213 Normal Fire
 	# 32222 Magic Fire
 	# 32214 Normal Cold
