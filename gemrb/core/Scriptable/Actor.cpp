@@ -4099,8 +4099,9 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Dialog:     %.8s\n", Dialog );
 	buffer.appendFormatted("Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
 	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, (long) actionQueue.size());
-	buffer.appendFormatted("Int. Flags: 0x%x ", InternalFlags);
-	buffer.appendFormatted("TalkCount:  %d   ", TalkCount );
+	buffer.appendFormatted("Int. Flags: 0x%x    ", InternalFlags);
+	buffer.appendFormatted("MC Flags: 0x%x    ", Modified[IE_MC_FLAGS]);
+	buffer.appendFormatted("TalkCount:  %d   \n", TalkCount );
 	buffer.appendFormatted("Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	buffer.appendFormatted("Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
 	buffer.appendFormatted("Race:       %d   current race:%d\n", BaseStats[IE_RACE], Modified[IE_RACE] );
