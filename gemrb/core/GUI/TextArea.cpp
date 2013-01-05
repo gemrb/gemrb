@@ -228,7 +228,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			//the buffer is filled enough
 			return;
 		}
-
+		if (linesize==lines.size()) {
+			return;
+		}
 		AppendText("\n",-1);
 		return;
 	}
