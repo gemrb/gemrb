@@ -237,7 +237,11 @@ void Container::TryPickLock(Actor *actor)
 		}
 		return;
 	}
-	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
+	int stat = actor->GetStat(IE_LOCKPICKING);
+	if (core->HasFeature(GF_3ED_RULES)) {
+		stat *= 5; // convert to percent
+	}
+	if (stat < LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		core->PlaySound(DS_PICKFAIL); //AMB_D21
