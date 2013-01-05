@@ -1764,7 +1764,20 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	if (!CanDetectTrap()) return;
 	if (!Scripts[0]) return;
 	if ((skill>=100) && (skill!=256) ) skill = 100;
-	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
+	int check = 0;
+	if (core->HasFeature(GF_3ED_RULES)) {
+		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
+		Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
+		int bonus = 0;
+		if (detective) {
+			bonus = detective->GetAbilityBonus(IE_INT);
+			displaymsg->DisplayRollStringName(39303, DMC_LIGHTGREY, detective, skill-bonus, TrapDetectionDiff, bonus);
+		}
+		check = skill + bonus;
+	} else {
+		check = skill/2 + core->Roll(1, skill/2, 0);
+	}
+	if (check > TrapDetectionDiff) {
 		SetTrapDetected(1); //probably could be set to the player #?
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
 	}
