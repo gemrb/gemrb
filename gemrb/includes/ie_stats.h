@@ -196,8 +196,8 @@ namespace GemRB {
 #define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over, also 'limbo creature' according to IE dev info
 #define MC_BEENINPARTY          0x8000
-#define MC_HIDDEN               0x10000 //iwd
-
+#define MC_SEENPARTY            0x10000 //iwd2
+#define MC_INVULNERABLE         0x20000 //iwd2
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
 
 //stats

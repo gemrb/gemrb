@@ -970,6 +970,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			if ((Flags&AF_NAME_OVERRIDE) || (core->HasFeature(GF_IWD2_SCRIPTNAME)) ) {
 				ab->SetScriptName(DefaultName);
 			}
+			//IWD2 specific hacks
+			if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+				//This flag is used for something else in IWD2
+				if (Flags&AF_NAME_OVERRIDE) {
+					ab->BaseStats[IE_EA]=EA_EVILCUTOFF;
+				}
+				if (Flags&AF_SEEN_PARTY) {
+					ab->SetMCFlag(MC_SEENPARTY,BM_OR);
+				}
+				if (Flags&AF_INVULNERABLE) {
+					ab->SetMCFlag(MC_INVULNERABLE,BM_OR);
+				}
+			}
 
 			if (Dialog[0]) {
 				ab->SetDialog(Dialog);

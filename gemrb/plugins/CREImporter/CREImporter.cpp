@@ -1813,7 +1813,16 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_SAVEDYPOS] = tmpWord;
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_SAVEDFACE] = tmpWord;
-	str->Seek( 146, GEM_CURRENT_POS );
+
+	str->Seek( 15, GEM_CURRENT_POS );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_TRANSLUCENT]=tmpByte;
+	str->Read( &tmpByte, 1); //fade speed
+	str->Read( &tmpByte, 1); //spec. flags
+	str->Read( &tmpByte, 1); //invisible
+	str->ReadWord( &tmpWord); //unknown
+	str->Read( &tmpByte, 1); //unused skill points
+	str->Seek( 124, GEM_CURRENT_POS );
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_EA]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -2745,7 +2754,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	ieByte tmpByte;
 	ieWord tmpWord;
 	int i;
-	char filling[146];
+	char filling[124];
 
 	memset(filling,0,sizeof(filling));
 	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
@@ -2766,7 +2775,11 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_SAVEDFACE];
 	stream->WriteWord( &tmpWord);
-	stream->Write( filling, 146);
+	stream->Write( filling, 15);
+	tmpByte = actor->BaseStats[IE_TRANSLUCENT];
+	stream->Write(&tmpByte, 1);
+	stream->Write( filling, 6); //fade speed, spec flags, invisible, unused skill points
+	stream->Write( filling, 124);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
 	stream->Write( &tmpByte, 1);
