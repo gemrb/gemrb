@@ -1145,11 +1145,12 @@ int Game::GetXPFromCR(int cr)
 	if (!crtable) LoadCRTable();
 	if (crtable) {
 		int level = GetPartyLevel(true);
-		if (cr>=MAX_CRLEVEL) {
-			cr=MAX_CRLEVEL-1;
+		if (cr+1>=MAX_CRLEVEL) {
+			cr=MAX_CRLEVEL-2;
 		}
 		Log(MESSAGE, "Game", "Challenge Rating: %d, party level: %d", cr, level);
-		return crtable[level][cr];
+		// it also has a column for cr 0.25 and 0.5
+		return crtable[level-1][cr+1];
 	}
 	Log(ERROR, "Game", "Cannot find moncrate.2da!");
 	return 0;
