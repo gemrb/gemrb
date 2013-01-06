@@ -3662,7 +3662,7 @@ void Actor::DialogInterrupt()
 	}
 }
 
-void Actor::GetHit()
+void Actor::GetHit(int damage, int spellLevel)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED)) {
 		SetStance( IE_ANI_DAMAGE );
@@ -3676,7 +3676,30 @@ void Actor::GetHit()
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
 	}
-	InterruptCasting = true;
+	if (CheckCastingInterrupt(damage, spellLevel)) {
+		InterruptCasting = true;
+	}
+}
+
+// TODO: check that this isn't the same thing we have in GSUtils (that one is missing a debug string in the original)
+bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
+{
+	if (!third) {
+		return true;
+	}
+	int roll = core->Roll(1, 20, 0);
+	int concentration = Modified[IE_CONCENTRATION];
+	int bonus = 4; // combat casting bonus for when injured
+	if (BaseStats[IE_HITPOINTS] == Modified[IE_HITPOINTS]) {
+		bonus = 0;
+	}
+	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
+	displaymsg->DisplayRollStringName(39842, DMC_LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
+	int chance = (roll + concentration + bonus) > (10 + damage + spellLevel);
+	if (chance) {
+		return false;
+	}
+	return true;
 }
 
 bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant)
@@ -3851,7 +3874,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		if (act && (damage>chp)) {
 			act->CheckCleave();
 		}
-		GetHit();
+		GetHit(damage, 3); // FIXME: carry over the correct spellLevel
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
