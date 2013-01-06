@@ -3694,7 +3694,10 @@ bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
 		bonus = 0;
 	}
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
-	displaymsg->DisplayRollStringName(39842, DMC_LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
+	if (GameScript::ID_ClassMask(this, 0x6ee)) { // 0x6ee == CLASSMASK_GROUP_CASTERS
+		// no spam for noncasters
+		displaymsg->DisplayRollStringName(39842, DMC_LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
+	}
 	int chance = (roll + concentration + bonus) > (10 + damage + spellLevel);
 	if (chance) {
 		return false;
