@@ -134,10 +134,15 @@ def SelectedNewPlayer ():
 		
 	ScrollBar = Window.GetControl (54)
 	GemRB.SetVar ("SpellTopIndex",0)
-	ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
+	ScrollBar.SetVarAssoc ("SpellTopIndex", len(Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel))) # make global, move to Update
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.SetDefaultScrollBar ()
 	GemRB.SetVar ("SelectedBook",SelectedBook)
 	UpdateSpellBookWindow ()
 	return
+
+def ScrollBarPress ():
+	UpdateSpellBookWindow ()
 
 def UpdateSpellBookWindow ():
 	global SpellBookSpellLevel
@@ -195,18 +200,19 @@ def UpdateSpellBookWindow ():
 
 	Spells = Spellbook.GetKnownSpellsLevel (pc, type, level)
 	known_cnt = len (Spells)
+	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Label = Window.GetControl (0x10000025+i)
 		if i+SpellTopIndex < known_cnt:
-			ks = Spells[i]
+			ks = Spells[i+SpellTopIndex]
 			spell = ks['SpellResRef']
 			Button.SetSpellIcon (spell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookMemorizeSpell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenSpellBookSpellInfoWindow)
 			Label.SetText (ks['SpellName'])
-			Button.SetVarAssoc ("SpellButton", 100 + i)
+			Button.SetVarAssoc ("SpellButton", 100 + i + SpellTopIndex)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -232,7 +238,7 @@ def UpdateSpellBookWindow ():
 
 #TODO: spell type selector
 def SpellBookPrevPress ():
-	global BookTopIndex
+	global BookTopIndex, SpellTopIndex
 
 	BookTopIndex = GemRB.GetVar ("BookTopIndex")
 	if BookTopIndex>0:
@@ -245,7 +251,7 @@ def SpellBookPrevPress ():
 
 #TODO: spell type selector
 def SpellBookNextPress ():
-	global BookTopIndex
+	global BookTopIndex, SpellTopIndex
 
 	BookTopIndex = GemRB.GetVar ("BookTopIndex")
 	if BookTopIndex<BookCount-4:
