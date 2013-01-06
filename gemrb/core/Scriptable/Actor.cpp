@@ -8885,13 +8885,35 @@ bool Actor::ModalSpellSkillCheck()
 	}
 }
 
-inline void HideFailed(Actor* actor)
+inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 0, int targetDC = 0)
 {
 	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
 	newfx->Duration = core->Time.round_sec; // 90 ticks, 1 round
 	core->ApplyEffect(newfx, actor, actor);
 	delete newfx;
+
+	if (!third) {
+		return;
+	}
+
+	int bonus = actor->GetAbilityBonus(IE_DEX);
+	switch (reason) {
+		case 0:
+			// ~Failed hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
+			displaymsg->DisplayRollStringName(39300, DMC_LIGHTGREY, actor, skill-bonus, roll, bonus);
+			break;
+		case 1:
+			// ~Failed hide in shadows because you were seen by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
+			displaymsg->DisplayRollStringName(39298, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			break;
+		case 2:
+			// ~Failed hide in shadows because you were heard by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
+			displaymsg->DisplayRollStringName(39297, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+		default:
+			// no message
+			break;
+	}
 }
 
 //checks if we are seen, or seeing anyone
@@ -8929,10 +8951,17 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 
 bool Actor::TryToHide()
 {
-	ieDword roll = LuckyRoll(1, 100, GetArmorFailure());
-	if (roll == 1) {
-		HideFailed(this);
-		return false;
+	ieDword roll = 0;
+	if (third) {
+		// FIXME: GetArmorFailure probably needs a multiplier (*5 or *7) here
+		roll = LuckyRoll(1, 20, GetArmorFailure(0));
+	} else {
+		roll = LuckyRoll(1, 100, GetArmorFailure(0));
+		// critical failure
+		if (roll == 1) {
+			HideFailed(this);
+			return false;
+		}
 	}
 
 	// check for disabled dualclassed thieves (not sure if we need it)
@@ -8944,11 +8973,9 @@ bool Actor::TryToHide()
 
 	bool seen = SeeAnyOne(true, true);
 
-	if (seen) {
-		HideFailed(this);
-		return false;
-	}
-
+	// TODO: iwd2 seems to separately check move silently
+	// this seems to be checked only when trying to maintain invisibility out of sight range
+	// @112   = ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
 	ieDword skill;
 	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
 		skill = (GetStat(IE_HIDEINSHADOWS) + GetStat(IE_STEALTH))/2;
@@ -8956,6 +8983,25 @@ bool Actor::TryToHide()
 		skill = GetStat(IE_STEALTH);
 	}
 
+	// TODO: better seen check for iwd2, since we need more data and you can try hiding while enemies are nearby
+	// this is checked only when trying to maintain/refresh invisibility
+	if (third) {
+		// FIXME: 0 should be the sum of viewer's cr level, wisdom mod, race mod
+		if (seen) {
+			HideFailed(this, 1, skill, roll, 0);
+		} else {
+			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
+			displaymsg->DisplayRollStringName(28379, DMC_LIGHTGREY, this, skill, 0, roll);
+		}
+	} else {
+		if (seen) {
+			HideFailed(this, 1);
+		}
+	}
+
+	if (third) {
+		skill *= 7; // FIXME: temporary increase for the lightness percentage calculation (does iwd2 use it at all?)
+	}
 	Game *game = core->GetGame();
 	// check how bright our spot is
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
@@ -8965,9 +9011,12 @@ bool Actor::TryToHide()
 	ieDword chance = (100 - light_diff) * skill/100;
 
 	if (roll > chance) {
-		HideFailed(this);
+		HideFailed(this, 0, skill/7, roll);
 		return false;
 	}
+	if (!third) return true;
+	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
+	displaymsg->DisplayRollStringName(39299, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
 	return true;
 }
 
