@@ -281,13 +281,16 @@ def OpenSpellBookSpellInfoWindow ():
 	Button.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellInfoWindow)
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	level = SpellBookSpellLevel
+	type = SelectedBook
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
 		ms = GemRB.GetMemorizedSpell (pc, type, level, index)
 		ResRef = ms['SpellResRef']
 	else:
-		ResRef = SpellBookKnownSpellList[index - 100]
-
+		# FIXME: ugly, make the list global again like SpellBookKnownSpellList of yore
+		ResRef = Spellbook.GetKnownSpellsLevel (pc, type, level)[index - 100]["SpellResRef"]
 	spell = GemRB.GetSpell (ResRef)
 
 	Label = Window.GetControl (0x0fffffff)
