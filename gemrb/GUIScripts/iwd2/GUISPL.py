@@ -261,15 +261,10 @@ def RefreshSpellBookLevel ():
 def OpenSpellBookSpellInfoWindow ():
 	global SpellBookSpellInfoWindow
 
-	GemRB.HideGUI ()
-
 	if SpellBookSpellInfoWindow != None:
-		if SpellBookSpellInfoWindow:
-			SpellBookSpellInfoWindow.Unload ()
+		SpellBookSpellInfoWindow.Unload ()
 		SpellBookSpellInfoWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
@@ -307,7 +302,6 @@ def OpenSpellBookSpellInfoWindow ():
 	#Button = Window.GetControl (5)
 	#Button.SetSprites (IconResRef, 0, 0, 0, 0, 0)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
