@@ -3752,6 +3752,9 @@ void Actor::CheckCleave()
 			fx->Duration = core->Time.round_sec;
 			core->ApplyEffect(fx, this, this);
 			delete fx;
+			// ~Cleave feat adds another level %d attack.~
+			// FIXME: probably uses the same tohit as the previous attack
+			displaymsg->DisplayRollStringName(39846, DMC_LIGHTGREY, this, ToHit.GetTotal());
 		}
 	}
 }
