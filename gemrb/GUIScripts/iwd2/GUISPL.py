@@ -164,9 +164,6 @@ def UpdateSpellBookWindow ():
 	level = SpellBookSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
-	#Label = Window.GetControl (0x10000032)
-	#Label.SetText (GemRB.GetString(12137)+str(level+1) )
-
 	Name = GemRB.GetPlayerName (pc, 0)
 	Label = Window.GetControl (0xfffffff)
 	Label.SetText (Name)
@@ -216,6 +213,14 @@ def UpdateSpellBookWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
+
+	# number of available spell slots
+	# sorcerer-style books are different, since max_mem_cnt holds the total level capacity, not the slot count
+	Label = Window.GetControl (0x10000004)
+	if GemRB.GetPlayerStat (pc, IE_LEVELSORCEROR) or GemRB.GetPlayerStat (pc, IE_LEVELBARD):
+		Label.SetText (str(0)) # known_cnt-mem_cnt, but it is always 0
+	else:
+		Label.SetText (str(max_mem_cnt-mem_cnt))
 
 	#if actor is uncontrollable, make this grayed
 	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
@@ -296,11 +301,6 @@ def OpenSpellBookSpellInfoWindow ():
 
 	Text = Window.GetControl (3)
 	Text.SetText (spell['SpellDesc'])
-
-	#IconResRef = 'SPL' + spell['SpellBookIcon'][2:]
-
-	#Button = Window.GetControl (5)
-	#Button.SetSprites (IconResRef, 0, 0, 0, 0, 0)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
