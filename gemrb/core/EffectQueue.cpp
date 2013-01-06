@@ -1055,12 +1055,17 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	if (iwd2fx) {
 		// 3ed style check
 		// TODO: check if luck really affects it (i doubt it does)
-		ieDword check = fx->CasterLevel + actor->LuckyRoll(1, 20, 0);
+		int roll = actor->LuckyRoll(1, 20, 0);
+		ieDword check = fx->CasterLevel + roll;
+		int penetration = 0;
 		// +2/+4 level bonus from the (greater) spell penetration feat
 		if (caster && caster->HasFeat(FEAT_SPELL_PENETRATION)) {
-			check += 2 * caster->GetStat(IE_FEAT_SPELL_PENETRATION);
+			penetration += 2 * caster->GetStat(IE_FEAT_SPELL_PENETRATION);
 		}
+		check += penetration;
 		resisted = (signed) check < (signed) val;
+		// ~Spell Resistance check (Spell resistance:) %d vs. (d20 + caster level + spell resistance mod)  = %d + %d + %d.~
+		displaymsg->DisplayRollStringName(39673, DMC_LIGHTGREY, actor, val, roll, fx->CasterLevel, penetration);
 	} else {
 		// 2.5 style check
 		resisted = (signed) fx->random_value < (signed) val;
