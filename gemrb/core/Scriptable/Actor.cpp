@@ -9068,7 +9068,7 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 	//FIXME: create a more compatible version if needed
 	if (fxqueue.HasSource(spellres)) return true;
 	//return true if caster cannot cast
-	if (!caster->CanCast(spellres)) return true;
+	if (!caster->CanCast(spellres, false)) return true;
 
 	if (!range) return false;
 

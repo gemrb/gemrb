@@ -1058,7 +1058,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 }
 
 // check for input sanity and good casting conditions
-int Scriptable::CanCast(const ieResRef SpellResRef) {
+int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 	Spell* spl = gamedata->GetSpell(SpellResRef);
 	if (!spl) {
 		SpellHeader = -1;
@@ -1104,23 +1104,31 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		// check for miscast magic and similar
 		ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
 		bool failed = false;
+		ieDword chance = 0;
 		switch(spl->SpellType)
 		{
 		case IE_SPL_PRIEST:
-			if (actor->GetSpellFailure(false) >= roll) {
+			chance = actor->GetSpellFailure(false);
+			if (chance >= roll) {
 				failed = true;
 			}
 			break;
 		case IE_SPL_WIZARD:
-			if (actor->GetSpellFailure(true) >= roll) {
+			chance = actor->GetSpellFailure(true);
+			if (chance >= roll) {
 				failed = true;
 			}
 			break;
 		case IE_SPL_INNATE:
-			if (actor->Modified[IE_SPELLFAILUREINNATE] >= roll) {
+			chance = actor->Modified[IE_SPELLFAILUREINNATE];
+			if (chance >= roll) {
 				failed = true;
 			}
 			break;
+		}
+		if (verbose && core->HasFeature(GF_3ED_RULES)) {
+			// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
+			displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
 		}
 		if (failed) {
 			// TODO: display fizzling animation

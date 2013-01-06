@@ -340,7 +340,7 @@ public:
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(const Region &screen);
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellResRef);
+	int CanCast(const ieResRef SpellResRef, bool verbose=true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
 	/* actor/scriptable casts spell */
