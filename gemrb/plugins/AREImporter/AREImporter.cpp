@@ -470,11 +470,21 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &PosY);
 		//maybe we have to store this
 		str->Seek( 36, GEM_CURRENT_POS );
-		str->ReadResRef( WavResRef );
-		str->ReadWord( &TalkX);
-		str->ReadWord( &TalkY);
-		str->ReadDword( &DialogName );
-		str->ReadResRef( DialogResRef );
+
+		if (core->HasFeature(GF_CLEAR_UNUSED_AREA)) {
+			memset( WavResRef, 0, sizeof(WavResRef));
+			TalkX = 0;
+			TalkY = 0;
+			DialogName = -1;
+			memset( DialogResRef, 0, sizeof(DialogResRef));
+		}	else {
+			str->ReadResRef( WavResRef );
+			str->ReadWord( &TalkX);
+			str->ReadWord( &TalkY);
+			str->ReadDword( &DialogName );
+			str->ReadResRef( DialogResRef );
+		}
+
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );

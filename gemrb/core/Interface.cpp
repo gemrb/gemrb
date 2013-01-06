@@ -2643,6 +2643,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"RareActionSounds",   //66GF_RARE_ACTION_VB
 		"NoUndroppable",      //67GF_NO_UNDROPPABLE
 		"StartActive",        //68GF_START_ACTIVE
+		"ClearUnusedArea",    //69GF_CLEAR_UNUSED_AREA
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
