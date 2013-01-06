@@ -11,6 +11,6 @@ FIREL	SPFIRIMP	SPBURN          19
 SPARKS	SPSHKIMP	SPSPARKS        -1
 SPARKM	SPSHKIMP	SPSPARKS        -1
 SPARKL	SPSHKIMP	SPSPARKS        -1
-ICES	FIRIMP		*               71
-ICEM	FIRIMP		*               71
-ICEL	FIRIMP		*               71
+ICES	SPFIRIMP	*               71
+ICEM	SPFIRIMP	*               71
+ICEL	SPFIRIMP	*               71
