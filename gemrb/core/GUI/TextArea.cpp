@@ -149,10 +149,11 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	size_t linesize = lines.size();
-	if (linesize == 0) {
+
+	if (lines.size() == 0) {
 		return;
 	}
+	size_t linesize = lines.size() - 1; // -1 because 0 counts
 
 	//if textarea is 'selectable' it actually means, it is a listbox
 	//in this case the selected value equals the line number
@@ -164,7 +165,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		Buffer[0] = 0;
 		int len = 0;
 		int lastlen = 0;
-		for (size_t i = 0; i < linesize; i++) {
+		for (size_t i = 0; i <= linesize; i++) {
 			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
 				int tlen;
 				unsigned long acolor, bcolor;
@@ -196,7 +197,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				memcpy( &Buffer[lastlen], lines[i], len - lastlen );
 			}
 			lastlen = len;
-			if (i != linesize - 1) {
+			if (i != linesize) {
 				Buffer[lastlen - 1] = '\n';
 				Buffer[lastlen] = 0;
 			}
@@ -216,21 +217,19 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		short LineOffset = (short)(TextYPos % ftext->maxHeight);
 		Region textClip(clip.x, clip.y - LineOffset, clip.w, clip.h + LineOffset);
 
-
 		ftext->PrintFromLine( startrow, textClip,
 							 ( unsigned char * ) Buffer, palette,
 							 IE_FONT_ALIGN_LEFT, finit, Cursor, pos );
 		free( Buffer );
 		video->SetClipRect( NULL );
-		//streaming text
-		if (linesize>50) {
-			//the buffer is filled enough
-			return;
+
+		if ((Flags &IE_GUI_TEXTAREA_SMOOTHSCROLL)
+			&& linesize <= (size_t)(1 + (Height - 1) / ftext->maxHeight)) {
+			// streaming text: keep pushing newlines until we have an entire areas worth of them.
+			// this way it will appear that the text scrolls out of view
+			AppendText("\n", -1);
 		}
-		if (linesize==lines.size()) {
-			return;
-		}
-		AppendText("\n",-1);
+
 		return;
 	}
 	// normal scrolling textarea
