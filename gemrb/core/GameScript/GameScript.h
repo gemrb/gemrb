@@ -1247,6 +1247,7 @@ public:
 	static void RestUntilHealed(Scriptable *Sender, Action* parameters);
 	static void ReturnToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void ReturnToSavedLocationDelete(Scriptable* Sender, Action* parameters);
+	static void ReturnToStartLocation(Scriptable* Sender, Action* parameters);
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
@@ -1288,6 +1289,7 @@ public:
 	static void SetGlobalTimerOnce(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimerRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTint(Scriptable* Sender, Action* parameters);
+	static void SetHomeLocation(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetHPPercent(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);

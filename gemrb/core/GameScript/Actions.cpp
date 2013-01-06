@@ -1314,6 +1314,32 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	}
 }
 
+void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
+	if (!tar) {
+		tar = Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Actor* actor = (Actor *) tar;
+	Point p = actor->HomeLocation;
+	if (p.isnull()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo(p, 0, 0);
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
+}
+
 void GameScript::TriggerWalkTo(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], 0 );
@@ -4650,18 +4676,17 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	//damagetype seems to be always 0
 	damagee->Damage( damage, 0, damager, type);
 }
-/*
+
 void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	Movable *movable = (Movable *) tar; //not actor, though it is the only moveable
-	movable->Destination = parameters->pointParameter;
+	Actor *movable = (Actor *) tar;
+	movable->HomeLocation = parameters->pointParameter;
 	//no movement should be started here, i think
 }
-*/
 
 void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 {

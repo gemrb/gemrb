@@ -782,6 +782,7 @@ static const ActionLink actionnames[] = {
 	{"returntosavedlocation", GameScript::ReturnToSavedLocation, AF_BLOCKING|AF_ALIVE},
 	{"returntosavedlocationdelete", GameScript::ReturnToSavedLocationDelete, AF_BLOCKING|AF_ALIVE},
 	{"returntosavedplace", GameScript::ReturnToSavedLocation, AF_BLOCKING|AF_ALIVE},
+	{"returntostartloc", GameScript::ReturnToStartLocation, AF_BLOCKING|AF_ALIVE}, // iwd2
 	{"revealareaonmap", GameScript::RevealAreaOnMap, 0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING|AF_ALIVE},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING|AF_ALIVE},
@@ -828,7 +829,7 @@ static const ActionLink actionnames[] = {
 	{"setglobaltimeronce", GameScript::SetGlobalTimerOnce,AF_MERGESTRINGS},
 	{"setglobaltimerrandom", GameScript::SetGlobalTimerRandom,AF_MERGESTRINGS},
 	{"setglobaltint", GameScript::SetGlobalTint, 0},
-	{"sethomelocation", GameScript::SetSavedLocation, 0}, //bg2
+	{"sethomelocation", GameScript::SetHomeLocation, 0}, //bg2
 	{"sethp", GameScript::SetHP, 0},
 	{"sethppercent", GameScript::SetHPPercent, 0},
 	{"setinternal", GameScript::SetInternal, 0},

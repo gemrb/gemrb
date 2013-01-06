@@ -963,8 +963,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			map->AddActor(ab, false);
 			ab->Pos.x = XPos;
 			ab->Pos.y = YPos;
-			ab->Destination.x = XDes;
-			ab->Destination.y = YDes;
+			ab->Destination.x = XPos;
+			ab->Destination.y = YPos;
+			ab->HomeLocation.x = XDes;
+			ab->HomeLocation.y = YDes;
 			//copying the scripting name into the actor
 			//if the CreatureAreaFlag was set to 8
 			if ((Flags&AF_NAME_OVERRIDE) || (core->HasFeature(GF_IWD2_SCRIPTNAME)) ) {
@@ -1868,9 +1870,9 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ac->Pos.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ac->Destination.x;
+		tmpWord = (ieWord) ac->HomeLocation.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ac->Destination.y;
+		tmpWord = (ieWord) ac->HomeLocation.y;
 		stream->WriteWord( &tmpWord);
 
 		stream->WriteDword( &tmpDword); //used fields flag always 0 for saved areas
