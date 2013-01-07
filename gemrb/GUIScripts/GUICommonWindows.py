@@ -28,11 +28,13 @@ from ie_stats import *
 from ie_modal import *
 from ie_action import *
 from ie_slots import SLOT_QUIVER
+import GUIClasses ##this may not be absolutely necessary?
 import GUICommon
 import CommonTables
 import LUCommon
 import InventoryCommon
-import Spellbook
+if not GUICommon.GameIsPST():
+  import Spellbook  ##not used in pst - YET
 
 # needed for all the Open*Window callbacks in the OptionsWindow
 import GUIJRNL
@@ -50,6 +52,13 @@ import GUIREC
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
+if GUICommon.GameIsPST():
+  TimeWindow = None
+  PortWindow = None
+  MenuWindow = None
+  MainWindow = None
+  DiscWindow = None
+
 PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
@@ -57,7 +66,70 @@ CurrentWindow = None
 DraggedPortrait = None
 ActionBarControlOffset = 0
 
-def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+
+#if the GUIEnhancements bit is set this repositions a window from its original 640x480 position to somewhere saner
+#returns false if the option is not set
+#Ypos 0 = drop to bottom ; 1 = centre; 2 = top
+#Xpos: todo if needed
+def RepositionWindow(Window=0, Ypos=1): #set 0 for game conrols
+	if(GemRB.GetVar("GUIEnhancements"))&GE_OVERRIDE_CHU_POSITIONS:
+		
+		if Window:
+			screen_width = GemRB.GetSystemVariable (SV_WIDTH)
+			screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
+		
+			if screen_height == 600 and screen_width == 800:
+				return #gemrb ships with GUIW08.CHU
+		
+			ofsx = (screen_width-640) / 2 #some handy offsets to centre controls
+			ofsy = (screen_height-480) / 2
+			position = Window.GetPos()
+			height = 480 - position[1]
+			if Ypos == 1:
+				Window.SetPos(position[0]+ofsx, position[1]+ofsy)
+			elif Ypos == 2:
+				Window.SetPos(position[0]+ofsx, 0)
+			else:
+				Window.SetPos(position[0]+ofsx, screen_height-height)
+
+		return True
+		
+	return False
+
+
+OptionTip = { #dictionary to the stringrefs in each games dialog.tlk
+'Inventory' : 16307,
+'Map': 16310,
+'Mage': 16309,
+'Priest': 14930,
+'Stats': 16306,
+'Journal': 16308,
+'Options' : 16311,
+'Rest': 11942,
+'Follow': 41647,
+'Expand': 41660,
+'AI' : 1,
+'Game' : 16313,
+'Party' : 16312
+}
+
+OptionControl = { #dictionary to the control indexes in the window (.CHU)
+'Inventory' : 3,
+'Map' : 1,
+'Mage': 5,
+'Priest': 6,
+'Stats': 4,
+'Journal': 2,
+'Options' : 7,
+'Rest': 9,
+'Follow': 0, #pst
+'Expand': 10, #pst
+'AI': 4, #pst
+'Game': 0, #not in pst
+'Party' : 8 #not in pst
+}
+
+def SetupMenuWindowControls (Window, Gears=None, ReturnToGame=None): # gears/rtg not used in pst
 	"""Sets up all of the basic control windows."""
 
 	global OptionsWindow, ActionBarControlOffset
@@ -70,23 +142,42 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		SetupIWD2WindowControls (Window, Gears, ReturnToGame)
 		return
 
-	# Return to Game
-	Button = Window.GetControl (0)
-	Button.SetTooltip (16313)
-	Button.SetVarAssoc ("SelectedWindow", 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	if GUICommon.GameIsBG1():
-		# enabled BAM isn't present in .chu, defining it here
-		Button.SetSprites ("GUILSOP", 0,16,17,28,16)
-	if GUICommon.GameIsIWD1():
-		# disabled/selected frame isn't present in .chu, defining it here
-		Button.SetSprites ("GUILSOP", 0,16,17,16,16)
+	if not GUICommon.GameIsPST(): ## pst lacks these two controls
+		# Return to Game
+		Button = Window.GetControl (OptionControl['Game'])
+		Button.SetTooltip (OptionTip['Game'])
+		Button.SetVarAssoc ("SelectedWindow", 0)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+		Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		if GUICommon.GameIsBG1():
+			# enabled BAM isn't present in .chu, defining it here
+			Button.SetSprites ("GUILSOP", 0,16,17,28,16)
+		if GUICommon.GameIsIWD1():
+			# disabled/selected frame isn't present in .chu, defining it here
+			Button.SetSprites ("GUILSOP", 0,16,17,16,16)
+
+		# Party mgmt
+		Button = Window.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
+		if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		else:
+			Button.SetTooltip (OptionTip['Party'])
+	else: #pst has these two instead
+		# (Un)Lock view on character
+		Button = Window.GetControl (OptionControl['Follow'])
+		Button.SetTooltip (OptionTip['Follow'])  # or 41648 Unlock ...
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
+		# AI
+		Button = Window.GetControl (OptionControl['AI'])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
+		AIPress(toggle=0)
 
 	# Map
-	Button = Window.GetControl (1)
-	Button.SetTooltip (16310)
-	Button.SetVarAssoc ("SelectedWindow", 1)
+	Button = Window.GetControl (OptionControl['Map'])
+	Button.SetTooltip (OptionTip['Map'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Map'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
@@ -94,9 +185,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
-	Button = Window.GetControl (2)
-	Button.SetTooltip (16308)
-	Button.SetVarAssoc ("SelectedWindow", 2)
+	Button = Window.GetControl (OptionControl['Journal'])
+	Button.SetTooltip (OptionTip['Journal'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Journal'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
@@ -104,9 +195,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
-	Button = Window.GetControl (3)
-	Button.SetTooltip (16307)
-	Button.SetVarAssoc ("SelectedWindow", 3)
+	Button = Window.GetControl (OptionControl['Inventory'])
+	Button.SetTooltip (OptionTip['Inventory'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Inventory'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
@@ -114,9 +205,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
-	Button = Window.GetControl (4)
-	Button.SetTooltip (16306)
-	Button.SetVarAssoc ("SelectedWindow", 4)
+	Button = Window.GetControl (OptionControl['Stats'])
+	Button.SetTooltip (OptionTip['Stats'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Stats'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
@@ -124,9 +215,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetSprites ("GUILSOP", 0,6,7,23,23)
 
 	# Mage
-	Button = Window.GetControl (5)
-	Button.SetTooltip (16309)
-	Button.SetVarAssoc ("SelectedWindow", 5)
+	Button = Window.GetControl (OptionControl['Mage'])
+	Button.SetTooltip (OptionTip['Mage'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Mage'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,8,9,24,8)
@@ -134,9 +225,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 	# Priest
-	Button = Window.GetControl (6)
-	Button.SetTooltip (14930)
-	Button.SetVarAssoc ("SelectedWindow", 6)
+	Button = Window.GetControl (OptionControl['Priest'])
+	Button.SetTooltip (OptionTip['Priest'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Priest'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIPR.OpenPriestWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,10,11,25,10)
@@ -144,23 +235,15 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
-	Button = Window.GetControl (7)
-	Button.SetTooltip (16311)
-	Button.SetVarAssoc ("SelectedWindow", 7)
+	Button = Window.GetControl (OptionControl['Options'])
+	Button.SetTooltip (OptionTip['Options'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Options'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
 	if GUICommon.GameIsBG1():
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 	if GUICommon.GameIsIWD1():
 		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
 
-	# Party mgmt
-	Button = Window.GetControl (8)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
-	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	else:
-		Button.SetTooltip (16312)
 
 	# pause button
 	if Gears:
@@ -184,13 +267,13 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetTooltip(GemRB.GetString (16041))
 		rb = 11
 	else:
-		rb = 9
+		rb = OptionControl['Rest']
 
 	# Rest
 	if Window.HasControl (rb):
 		Button = Window.GetControl (rb)
+		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
-		Button.SetTooltip (11942)
 
 	MarkMenuButton (Window)
 
