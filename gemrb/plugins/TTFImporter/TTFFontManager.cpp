@@ -199,10 +199,15 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		 * */
 		if ( ptSize >= font.face->num_fixed_sizes )
 			ptSize = font.face->num_fixed_sizes - 1;
-		//font.font_size_family = ptsize;
+
 		error = FT_Set_Pixel_Sizes( face,
 								   face->available_sizes[ptSize].height,
 								   face->available_sizes[ptSize].width );
+
+		if (error) {
+			LogFTError(error);
+			return NULL;
+		}
 		/* With non-scalale fonts, Freetype2 likes to fill many of the
 		 * font metrics with the value of 0.  The size of the
 		 * non-scalable fonts must be determined differently
