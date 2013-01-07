@@ -2984,8 +2984,6 @@ void Actor::RefreshHP() {
 	// this is wrong for dual-classed (so we override it later)
 	// and sometimes marginally wrong for multi-classed (but we usually round the average up)
 	int bonlevel = GetXPLevel(true);
-	int oldlevel, oldbonus;
-	oldlevel = oldbonus = 0;
 	ieDword bonindex = BaseStats[IE_CLASS]-1;
 
 	//we must limit the levels to the max allowable
@@ -2997,8 +2995,10 @@ void Actor::RefreshHP() {
 		}
 	}
 	if (IsDualClassed()) {
+		int oldbonus = 0;
+
 		// just the old consititution bonus
-		oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
+		int oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
 		bonlevel = IsDualSwap() ? BaseStats[IE_LEVEL2] : BaseStats[IE_LEVEL];
 		oldlevel = (oldlevel > maxLevelForHpRoll[bonindex]) ? maxLevelForHpRoll[bonindex] : oldlevel;
 		// give the bonus only for the levels where there were actually rolls
