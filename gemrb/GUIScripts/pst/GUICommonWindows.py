@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
+
 # GUICommonWindows.py - functions to open common
 # windows in lower part of the screen
 ###################################################
@@ -24,107 +25,263 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_modal import *
 from ie_action import *
-import GUIClasses
+from ie_slots import SLOT_QUIVER
+import GUIClasses ##this may not be absolutely necessary?
 import GUICommon
 import CommonTables
 import LUCommon
 import InventoryCommon
+if not GUICommon.GameIsPST():
+  import Spellbook  ##not used in pst - YET
 
 # needed for all the Open*Window callbacks in the OptionsWindow
 import GUIJRNL
 import GUIMA
-import GUIMG
 import GUIINV
 import GUIOPT
-import GUIPR
+if GUICommon.GameIsIWD2():
+	# one spellbook for all spell types
+	import GUISPL
+else:
+	import GUIMG
+	import GUIPR
 import GUIREC
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
-TimeWindow = None
-PortWindow = None
-MenuWindow = None
-MainWindow = None
-global PortraitWindow
+if GUICommon.GameIsPST():
+  TimeWindow = None
+  PortWindow = None
+  MenuWindow = None
+  MainWindow = None
+  DiscWindow = None
+
 PortraitWindow = None
-global ActionsWindow
-ActionsWindow = None
-global OptionsWindow
 OptionsWindow = None
+ActionsWindow = None
+CurrentWindow = None
 DraggedPortrait = None
-DiscWindow = None
+ActionBarControlOffset = 0
 
-# Buttons:
-# 0 CNTREACH
-# 1 INVNT
-# 2 MAP
-# 3 MAGE
-# 4 AI
-# 5 STATS
-# 6 JRNL
-# 7 PRIEST
-# 8 OPTION
-# 9 REST
-# 10 TXTE
 
-def SetupMenuWindowControls (Window):
-	global OptionsWindow
+#if the GUIEnhancements bit is set this repositions a window from its original 640x480 position to somewhere saner
+#returns false if the option is not set
+#Ypos 0 = drop to bottom ; 1 = centre; 2 = top
+#Xpos: todo if needed
+def RepositionWindow(Window=0, Ypos=1): #set 0 for game conrols
+	if(GemRB.GetVar("GUIEnhancements"))&GE_OVERRIDE_CHU_POSITIONS:
+		
+		if Window:
+			screen_width = GemRB.GetSystemVariable (SV_WIDTH)
+			screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
+		
+			if screen_height == 600 and screen_width == 800:
+				return #gemrb ships with GUIW08.CHU
+		
+			ofsx = (screen_width-640) / 2 #some handy offsets to centre controls
+			ofsy = (screen_height-480) / 2
+			position = Window.GetPos()
+			height = 480 - position[1]
+			if Ypos == 1:
+				Window.SetPos(position[0]+ofsx, position[1]+ofsy)
+			elif Ypos == 2:
+				Window.SetPos(position[0]+ofsx, 0)
+			else:
+				Window.SetPos(position[0]+ofsx, screen_height-height)
 
-	# Inventory
+		return True
+		
+	return False
+
+
+OptionTip = { #dictionary to the stringrefs in each games dialog.tlk
+'Inventory' : 41601,
+'Map': 41625,
+'Mage': 41624,
+'Priest': 4709,
+'Stats': 4707,
+'Journal': 41623,
+'Options' : 41626,
+'Rest': 41628,
+'Follow': 41647,
+'Expand': 41660,
+'AI' : 1,
+'Game' : 1,
+'Party' : 1
+}
+
+OptionControl = { #dictionary to the control indexes in the window (.CHU)
+'Inventory' : 1,
+'Map' : 2,
+'Mage': 3,
+'Priest': 7,
+'Stats': 5,
+'Journal': 6,
+'Options' : 8,
+'Rest': 9,
+'Follow': 0, #pst
+'Expand': 10, #pst
+'AI': 4, #pst
+'Game': 0, #not in pst
+'Party' : 8 #not in pst
+}
+
+def SetupMenuWindowControls (Window, Gears=None, ReturnToGame=None): # gears/rtg not used in pst
+	"""Sets up all of the basic control windows."""
+
+	global OptionsWindow, ActionBarControlOffset
+
 	OptionsWindow = Window
-	Button = Window.GetControl (1)
-	Button.SetTooltip (41601)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
+	# FIXME: add "(key)" to tooltips!
+
+	if GUICommon.GameIsIWD2():
+		ActionBarControlOffset = 6
+		SetupIWD2WindowControls (Window, Gears, ReturnToGame)
+		return
+
+	if not GUICommon.GameIsPST(): ## pst lacks these two controls
+		# Return to Game
+		Button = Window.GetControl (OptionControl['Game'])
+		Button.SetTooltip (OptionTip['Game'])
+		Button.SetVarAssoc ("SelectedWindow", 0)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+		Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		if GUICommon.GameIsBG1():
+			# enabled BAM isn't present in .chu, defining it here
+			Button.SetSprites ("GUILSOP", 0,16,17,28,16)
+		if GUICommon.GameIsIWD1():
+			# disabled/selected frame isn't present in .chu, defining it here
+			Button.SetSprites ("GUILSOP", 0,16,17,16,16)
+		# Party mgmt
+		Button = Window.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
+		if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		else:
+			Button.SetTooltip (OptionTip['Party'])
+	else: #pst has these two instead
+		# (Un)Lock view on character
+		Button = Window.GetControl (OptionControl['Follow'])
+		Button.SetTooltip (OptionTip['Follow'])  # or 41648 Unlock ...
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
+		# AI
+		Button = Window.GetControl (OptionControl['AI'])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
+		AIPress(toggle=0)
+
 
 	# Map
-	Button = Window.GetControl (2)
-	Button.SetTooltip (41625)
+	Button = Window.GetControl (OptionControl['Map'])
+	Button.SetTooltip (OptionTip['Map'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Map'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
-
-	# Mage
-	Button = Window.GetControl (3)
-	Button.SetTooltip (41624)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
-	# Stats
-	Button = Window.GetControl (5)
-	Button.SetTooltip (4707)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
-	Button = Window.GetControl (6)
-	Button.SetTooltip (41623)
+	Button = Window.GetControl (OptionControl['Journal'])
+	Button.SetTooltip (OptionTip['Journal'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Journal'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
+
+	# Inventory
+	Button = Window.GetControl (OptionControl['Inventory'])
+	Button.SetTooltip (OptionTip['Inventory'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Inventory'])
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
+	# Records
+	Button = Window.GetControl (OptionControl['Stats'])
+	Button.SetTooltip (OptionTip['Stats'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Stats'])
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,6,7,23,23)
+
+	# Mage
+	Button = Window.GetControl (OptionControl['Mage'])
+	Button.SetTooltip (OptionTip['Mage'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Mage'])
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,8,9,24,8)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 	# Priest
-	Button = Window.GetControl (7)
-	Button.SetTooltip (4709)
+	Button = Window.GetControl (OptionControl['Priest'])
+	Button.SetTooltip (OptionTip['Priest'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Priest'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIPR.OpenPriestWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,10,11,25,10)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
-	Button = Window.GetControl (8)
-	Button.SetTooltip (41626)
+	Button = Window.GetControl (OptionControl['Options'])
+	Button.SetTooltip (OptionTip['Options'])
+	Button.SetVarAssoc ("SelectedWindow", OptionControl['Options'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
+	if GUICommon.GameIsBG1():
+		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
+	if GUICommon.GameIsIWD1():
+		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
+	# pause button
+	if Gears:
+		# Pendulum, gears, sun/moon dial (time)
+		# FIXME: display all animations: CPEN, CGEAR, CDIAL
+		if GUICommon.HasHOW(): # how doesn't have this in the right place
+			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
+			Window.CreateButton (9, 6, pos, 64, 71)
+		Button = Window.GetControl (9)
+		if GUICommon.GameIsBG2():
+			Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
+			Label.SetAnimation ("CPEN")
+
+		Button.SetAnimation ("CGEAR")
+		if GUICommon.GameIsBG2():
+			Button.SetBAM ("CDIAL", 0, 0)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+		GUICommon.SetGamedaysAndHourToken()
+		Button.SetTooltip(GemRB.GetString (16041))
+		rb = 11
+	else:
+		rb = OptionControl['Rest']
 
 	# Rest
-	Button = Window.GetControl (9)
-	Button.SetTooltip (41628)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+	if Window.HasControl (rb):
+		Button = Window.GetControl (rb)
+		Button.SetTooltip (OptionTip['Rest'])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 
-	# AI
-	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
-	AIPress(toggle=0)
+	#MarkMenuButton (Window) 
 
-	# (Un)Lock view on character
-	Button = Window.GetControl (0)
-	Button.SetTooltip (41647)  # or 41648 Unlock ...
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
 
-	# Message popup
-	Button = Window.GetControl (10)
-	Button.SetTooltip (41660)  # or 41661 Close ...
+	if PortraitWindow:
+		UpdatePortraitWindow ()
+	return
+
+	# Message popup FIXME disable on non game screen...
+	Button = Window.GetControl (OptionControl['Expand'])
+	Button.SetTooltip (OptionTip['Expand'])  # or 41661 Close ...
 
 
 def OnLockViewPress ():
