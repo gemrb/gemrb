@@ -1,0 +1,16 @@
+Use Q in gource to see the "log position" to be used with --start-position and
+--stop-position .
+
+Use -c with a value greater than 1.0 to speed up the animation even further.
+
+Use -H to see all the possible gource options.
+
+FFMpeg encoding quality and options are practically arbitrary. Now the video is
+720p (-1280x720), but consider increasing the bitrate (-b) or improve quality some
+other way.
+
+gource --logo artwork/gemrb-logo.png --title "GemRB development 2012" \
+  --seconds-per-day 1 --auto-skip-seconds 1 \
+  -p 0.8447  -1280x720 -o - |
+ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - -vcodec libvpx -b:v 10000K gource.webm
+
