@@ -1915,8 +1915,8 @@ void CREImporter::GetActorIWD2(Actor *act)
 
 	for(i=0;i<8;i++) {
 		for(int lev=0;lev<9;lev++) {
-			//if everything is alright, then this seek is not needed
-			str->Seek(CREOffset+ClassSpellOffsets[i*9+lev], GEM_STREAM_START);
+			//if everything is alright, then seeking is not needed
+			assert(str->GetPos() == CREOffset+ClassSpellOffsets[i*9+lev]);
 			GetIWD2Spellpage(act, (ieIWD2SpellType) i, lev, ClassSpellCounts[i*9+lev]);
 		}
 	}
