@@ -929,8 +929,9 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 			GetActorIWD1(act);
 			break;
 		default:
-			Inventory_Size=0;
-			error("CREImporter", "Unknown creature signature: %d\n", CREVersion);
+			Log(ERROR, "CREImporter", "Unknown creature signature: %d\n", CREVersion);
+			delete act;
+			return NULL;
 	}
 
 	// Read saved effects
