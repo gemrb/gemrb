@@ -193,6 +193,7 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 		unsigned char* inpix;
 		inpix = (unsigned char*)malloc( RLESize );
 		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
+			free( pixels );
 			free( inpix );
 			return NULL;
 		}
