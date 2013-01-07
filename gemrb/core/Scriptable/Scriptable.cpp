@@ -1126,7 +1126,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 			}
 			break;
 		}
-		if (verbose && core->HasFeature(GF_3ED_RULES)) {
+		if (verbose && chance && core->HasFeature(GF_3ED_RULES)) {
 			// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
 			displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
 		}
