@@ -6346,13 +6346,10 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
 	PyDict_SetItemString(dict, "Purchased", PyInt_FromLong (si->PurchasedAmount) );
 
-	int amount;
 	if (si->InfiniteSupply==-1) {
 		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( -1 ) );
-		amount = 100;
 	} else {
-		amount = si->AmountInStock;
-		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( amount ) );
+		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( si->AmountInStock ) );
 	}
 
 	Item *item = gamedata->GetItem(si->ItemResRef, true);

@@ -3195,7 +3195,6 @@ void Interface::AddWindow(Window * win)
 	}
 	if(slot == -1) {
 		windows.push_back(win);
-		slot=(int)windows.size()-1;
 	}
 	else
 		windows[slot] = win;

@@ -84,7 +84,7 @@ Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;
-	unsigned char * src = ( unsigned char * ) pixels;
+	unsigned char * src = NULL;
 	for (int y = Height - 1; y >= 0; y--) {
 		src = ( unsigned char * ) pixels + ( y * Width * 2 );
 		for (unsigned int x = 0; x < Width; x++) {

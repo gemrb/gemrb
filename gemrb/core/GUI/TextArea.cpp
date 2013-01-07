@@ -971,7 +971,6 @@ void TextArea::SetupScroll()
 		lines.push_back(str);
 		lrows.push_back(0);
 	}
-	i = (unsigned int) lines.size();
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	starttime = GetTickCount();
 }
