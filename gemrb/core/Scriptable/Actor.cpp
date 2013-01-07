@@ -4299,6 +4299,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		else if (IsMultiClassed()) {
 				//clscount is the number of on bits in the MULTI field
 				clscount = bitcount (multiclass);
+				assert(clscount && clscount <= 3);
 				for (int i=1; i<clscount; i++)
 					average += levels[i];
 		} //else single classed
