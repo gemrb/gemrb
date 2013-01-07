@@ -5750,7 +5750,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 
 ieDword* Interface::GetListFrom2DA(const ieResRef tablename)
 {
-	ieDword *list;
+	ieDword *list = NULL;
 
 	if (!lists->Lookup(tablename, (void *&) list)) {
 		list = GetListFrom2DAInternal(tablename);

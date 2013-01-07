@@ -243,7 +243,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
 	int TokenLength;	 //decoded token length
-	gt_type *entry;
+	gt_type *entry = NULL;
 
 	//these are gender specific tokens, they are customisable by gender.2da
 	if (gtmap.Lookup(Token, (void *&) entry) ) {
