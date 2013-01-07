@@ -1943,7 +1943,7 @@ static void InitActorTables()
 			// FIXME: the attempt at skipping doesn't work!
 			IWD2HitTableIter it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
-				tht.load(tohit, false);
+				tht.load(tohit, true);
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for %s does not exist!", classname);
 				}
