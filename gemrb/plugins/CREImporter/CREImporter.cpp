@@ -128,9 +128,10 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 		return;
 	}
 
-	level--;
+	level--; // convert to 0-based for internal use
 	for(int i=0;i<count;i++) {
 		if(levels[i].kit==kit && levels[i].level==level) {
+			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: %s", spell);
 			return;
 		}
 	}
