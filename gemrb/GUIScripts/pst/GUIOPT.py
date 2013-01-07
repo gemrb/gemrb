@@ -380,6 +380,7 @@ def OpenLoadMsgWindow ():
 
 
 def LoadGame ():
+	OpenLoadMsgWindow () ##close self
 	OpenOptionsWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ('GUILOAD')
