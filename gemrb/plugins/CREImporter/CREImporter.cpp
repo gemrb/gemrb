@@ -269,6 +269,18 @@ int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 	return -1;
 }
 
+// just returns the integer part of the log
+// perfect for deducing kit values, since they are bitfields and we don't care about any noise
+static int log2(int value)
+{
+	int pow = -1;
+	while (value) {
+		value = value>>1;
+		pow++;
+	}
+	return pow;
+}
+
 //input: index, level, type, kit
 static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
 {
@@ -299,11 +311,16 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		if (index>=domcount) {
 			return NULL;
 		}
+		// translate the actual kit to a column index to make them comparable
+		// luckily they are in order
+		kit = log2(kit/0x8000); // 0x8000 is the first cleric kit
 		return domlist[index].FindSpell(level, kit);
 	case IE_IWD2_SPELL_WIZARD:
 		if (index>=magcount) {
 			break;
 		}
+		// translate the actual kit to a column index to make them comparable
+		kit = log2(kit/0x40); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
 		ret = maglist[index].FindSpell(level, kit);
 		if ( ret) {
