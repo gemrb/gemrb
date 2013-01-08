@@ -46,7 +46,6 @@ public:
 	bool Pause() { return true; } /*not implemented*/
 	bool Resume() { return true; } /*not implemented*/
 	bool CanPlay();
-	bool IsSpeaking();
 	void ResetMusics();
 	void UpdateListenerPos(int XPos, int YPos);
 	void GetListenerPos(int& XPos, int& YPos);

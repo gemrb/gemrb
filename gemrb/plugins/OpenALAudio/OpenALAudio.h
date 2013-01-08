@@ -107,7 +107,6 @@ public:
 	bool Init(void);
 	Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos,
 					unsigned int flags = 0, unsigned int *length = 0);
-	bool IsSpeaking();
 	void UpdateVolume(unsigned int flags);
 	bool CanPlay();
 	void ResetMusics();

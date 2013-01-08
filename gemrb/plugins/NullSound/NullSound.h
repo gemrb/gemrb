@@ -37,7 +37,6 @@ public:
 	bool Pause();
 	bool Resume();
 	bool CanPlay();
-	bool IsSpeaking();
 	void ResetMusics();
 	void UpdateListenerPos(int XPos, int YPos);
 	void GetListenerPos(int& XPos, int& YPos);

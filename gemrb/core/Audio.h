@@ -58,7 +58,6 @@ public:
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int *length = 0) { return Play(ResRef, 0, 0, GEM_SND_RELATIVE, length); }
-	virtual bool IsSpeaking() = 0;
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;

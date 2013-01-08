@@ -84,11 +84,6 @@ bool NullSound::CanPlay()
 	return false;
 }
 
-bool NullSound::IsSpeaking()
-{
-	return false;
-}
-
 void NullSound::UpdateListenerPos(int x, int y)
 {
 	XPos = x;

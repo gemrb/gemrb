@@ -234,11 +234,6 @@ bool SDLAudio::CanPlay()
 	return true;
 }
 
-bool SDLAudio::IsSpeaking()
-{
-	return Mix_Playing(0);
-}
-
 void SDLAudio::UpdateListenerPos(int x, int y)
 {
 	// TODO

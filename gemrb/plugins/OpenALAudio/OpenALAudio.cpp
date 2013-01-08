@@ -444,12 +444,6 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	return stream->handle.get();
 }
 
-bool OpenALAudioDriver::IsSpeaking()
-{
-	speech.ClearIfStopped();
-	return !speech.free;
-}
-
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 {
 	ieDword volume;
