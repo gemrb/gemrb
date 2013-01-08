@@ -82,7 +82,7 @@ def OnLoad():
 	FormationButton = ActionsWindow.GetControl (4)
 	FormationButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
 
-	GUICommonWindows.SetupActionsWindowControls (ActionsWindow)
+	GUICommonWindows.SetupClockWindowControls (ActionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()

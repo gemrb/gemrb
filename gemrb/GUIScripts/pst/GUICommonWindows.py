@@ -159,7 +159,7 @@ def AIPress (toggle=1):
 def TxtePress ():
 	print "TxtePress"
 
-def SetupActionsWindowControls (Window):
+def SetupClockWindowControls (Window):
 	global ActionsWindow
 
 	ActionsWindow = Window
