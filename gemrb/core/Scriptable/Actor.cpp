@@ -30,7 +30,6 @@
 #include "opcode_params.h"
 #include "win32def.h"
 
-#include "Audio.h" //pst (react to death sounds)
 #include "Bitmap.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h" // checking for dialog
