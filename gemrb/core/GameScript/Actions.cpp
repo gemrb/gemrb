@@ -1719,10 +1719,9 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 //DisplayStringHead, but wait until done
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
+	ieWord gt = core->GetGame()->GameTime;
 	if (Sender->CurrentActionState) {
-		// TODO: should probably store the actual time and wait for that,
-		// rather than this hack
-		if (!core->GetAudioDrv()->IsSpeaking()) {
+		if (gt >= parameters->int2Parameter) {
 			Sender->ReleaseCurrentAction();
 		}
 		return;
@@ -1733,6 +1732,8 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	}
 	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->CurrentActionState = 1;
+	// parameters->int2Parameter is unused here so hijack it to store the wait time
+	parameters->int2Parameter = gt + target->GetWait();
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
