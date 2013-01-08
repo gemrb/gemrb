@@ -26,7 +26,6 @@
 #include "win32def.h"
 
 #include "AmbientMgr.h"
-#include "Audio.h"
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
