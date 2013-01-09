@@ -129,10 +129,8 @@ def SelectedNewPlayer ():
 		SelectedBook = ActiveSpellBooks[0]
 	else:
 		SelectedBook = 0
-		
-	ResetScrollBar ()
 	GemRB.SetVar ("SelectedBook",SelectedBook)
-	UpdateSpellBookWindow ()
+	UpdateSpellBook ()
 	return
 
 def ResetScrollBar ():
@@ -147,6 +145,9 @@ def ScrollBarPress ():
 	UpdateSpellBookWindow ()
 
 def UpdateSpellBook ():
+	global SelectedBook
+
+	SelectedBook = GemRB.GetVar ("SelectedBook")
 	ResetScrollBar ()
 	UpdateSpellBookWindow ()
 
