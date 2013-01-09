@@ -41,7 +41,6 @@ OldOptionsWindow = None
 ActiveSpellBooks = []
 BookCount = 0
 BookTopIndex = 0
-SpellTopIndex = 0
 SelectedBook = 0
 BookNames = (1083,1079,1080,1078,1077,32,1081,39722)
 
@@ -137,9 +136,6 @@ def SelectedNewPlayer ():
 	return
 
 def ResetScrollBar ():
-	global SpellTopIndex
-
-	SpellTopIndex = 0
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ScrollBar = SpellBookWindow.GetControl (54)
 	GemRB.SetVar ("SpellTopIndex",0)
