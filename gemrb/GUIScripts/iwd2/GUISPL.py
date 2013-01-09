@@ -182,6 +182,7 @@ def UpdateSpellBookWindow ():
 
 	Button = Window.GetControl (1)
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	Spells = Spellbook.GetMemorizedSpells (pc, type, level)
 	mem_cnt = len (Spells)
