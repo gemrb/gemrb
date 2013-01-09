@@ -6909,11 +6909,7 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 	}
 
 	GET_GAME();
-
-	Actor* actor = game->GetActorByGlobalID( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	SpellExtHeader spelldata;
 	int ret = actor->spellbook.FindSpellInfo(&spelldata, spellResRef, type);
@@ -6935,11 +6931,7 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 	}
 
 	GET_GAME();
-
-	Actor* actor = game->GetActorByGlobalID( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
+	GET_ACTOR_GLOBAL();
 
 	SpellExtHeader spelldata;
 	int i = 0;
