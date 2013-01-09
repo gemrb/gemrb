@@ -169,6 +169,8 @@ def SetupActionsWindowControls (Window):
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
+	SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (GemRB.GetString(65027))
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
@@ -596,10 +598,12 @@ def UpdateClock():
 	ActionsWindow = GemRB.LoadWindow(0)
 	Button = ActionsWindow.GetControl (0)
 	SetPSTGamedaysAndHourToken ()
-	Button.SetTooltip (65027)
-
+	Button.SetTooltip (GemRB.GetString(65027))
+	#this function does update the clock tip, but the core fails to display it
+	
 def UpdateActionsWindow():
-	# pst doesn't need this, but it is one of the core callbacks, so it has to be defined
+	UpdateClock()
+	#This at least ensures the clock gets a relatively regular update
 	return
 
 def ActionStopPressed ():
