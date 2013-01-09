@@ -1,9 +1,21 @@
-fix dud fonts.2da entries
-real bams for cursors ...
-real mos
+CODE:
+fix slow scrolling
+fix missing tooltip crash
+fix actor selection
+set actor palette
+
+DATA:
+real bams for cursors (add as needed), tooltip bg
 fist.itm is missing some resources like icons
 dialog.tlk entries
 (proper mapicon0.png)
+
+add an infopoint somewhere
+make the cave entrance, sides a travel region (to self)
+add area music
+add another actor
+write dialogs
+add a cutscene
 
 CONSIDER REMOVING:
 - mastarea.2da
