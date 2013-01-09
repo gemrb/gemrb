@@ -273,8 +273,12 @@ def CloseContainerWindow ():
 	ContainerWindow.Unload ()
 
 	if GUICommon.GameIsPST():
-		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.SetVar ("PortraitWindow", GUIWORLD.OldPortraitWindow.ID)
+		GUICommonWindows.EnableAnimatedWindows ()
+		 #PST needs a reminder to redraw the  clock for some reason
+		if GUICommonWindows.ActionsWindow:
+			GUICommonWindows.ActionsWindow.SetVisible(WINDOW_VISIBLE)
+		
 
 	# FIXME: iwd2 bug or just bad naming?
 	if GUICommon.GameIsIWD2():
