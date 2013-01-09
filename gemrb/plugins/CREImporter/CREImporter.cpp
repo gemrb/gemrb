@@ -66,6 +66,7 @@ class SpellEntry
 public:
 	~SpellEntry();
 	SpellEntry();
+	const ieResRef *GetSpell() const;
 	const ieResRef *FindSpell(unsigned int level, unsigned int kit) const;
 	int FindSpell(unsigned int kit) const;
 	bool Equals(const char *spl) const;
@@ -90,6 +91,11 @@ SpellEntry::~SpellEntry()
 	levels = NULL;
 }
 
+const ieResRef *SpellEntry::GetSpell() const
+{
+	return &spell;
+}
+
 const ieResRef *SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
 {
 	int i = count;
@@ -110,6 +116,17 @@ int SpellEntry::FindSpell(unsigned int kit) const
 		}
 	}
 	return 0;
+}
+
+static int FindSpell(ieResRef spellref, SpellEntry* list, int listsize)
+{
+	int i = listsize;
+	while (i--) {
+		if (list[i].Equals(spellref)) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 bool SpellEntry::Equals(const char *spl) const
@@ -257,10 +274,6 @@ int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 		}
 		break;
 	case IE_IWD2_SPELL_DOMAIN:
-		for(i=0;i<domcount;i++) {
-			if (domlist[i].Equals(name) ) return i;
-		}
-		break;
 	default:
 		for(i=0;i<splcount;i++) {
 			if (spllist[i].Equals(name) ) return i;
@@ -308,7 +321,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		}
 		return &shplist[index];
 	case IE_IWD2_SPELL_DOMAIN:
-		if (index>=domcount) {
+		if (index>=splcount) {
 			return NULL;
 		}
 		// translate the actual kit to a column index to make them comparable
@@ -316,7 +329,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		kit = log2(kit/0x8000); // 0x8000 is the first cleric kit
 		return domlist[index].FindSpell(level, kit);
 	case IE_IWD2_SPELL_WIZARD:
-		if (index>=magcount) {
+		if (index>=splcount) {
 			break;
 		}
 		// translate the actual kit to a column index to make them comparable
@@ -333,13 +346,29 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		break;
 	}
 
+	// type matches the table columns (0-bard to 6-wizard)
 	ret = spllist[index].FindSpell(level, type);
-	if ( !ret || (kit==-1) ) {
+	if (!ret) {
+		// some npcs have spells at odd levels, so the lookup just failed
+		// eg. slayer knights of xvim with sppr325 at level 2 instead of 3
+		Log(ERROR, "CREImporter", "Spell (%d of type %d) found at unexpected level (%d)!", index, type, level);
+		int level2 = spllist[index].FindSpell(type);
+		// grrr, some rows have no levels set - they're all 0, but with a valid resref, so just return that
+		if (!level2) {
+			Log(DEBUG, "CREImporter", "Spell entry (%d) without any levels set!", index);
+			return spllist[index].GetSpell();
+		}
+		ret = spllist[index].FindSpell(level2, type);
+		if (ret) Log(DEBUG, "CREImporter", "The spell was found at level %d!", level2);
+	}
+	if (ret || (kit==-1) ) {
 		return ret;
 	}
 
+	Log(DEBUG, "CREImporter", "Doing extra mage spell lookups!");
+	// FIXME: is this really needed? reachable only if wizard index was too high
+	kit = log2(kit/0x40); // 0x40 is the first mage kit
 	int i;
-
 	for(i=0;i<magcount;i++) {
 		if (maglist[i].Equals(*ret)) {
 			return maglist[i].FindSpell(level, kit);
@@ -413,6 +442,7 @@ static ieResRef *GetSpellTable(const ieResRef tableresref, int &count)
 	return reslist;
 }
 
+// different tables, but all use listspll.2da for the spell indices
 static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 {
 	count = 0;
@@ -426,11 +456,32 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 	}
 
 	count = tab->GetRowCount();
-	SpellEntry *reslist = new SpellEntry[count];
+	SpellEntry *reslist;
+	bool indexlist = false;
+	if (!strnicmp(tableresref, "listspll", 8)) {
+		indexlist = true;
+		reslist = new SpellEntry[count];
+	} else {
+		reslist = new SpellEntry[splcount]; // needs to be the same size for the simple index lookup we do!
+	}
+	int index;
 	for(int i = 0;i<count;i++) {
-		reslist[i].SetSpell(tab->QueryField(i,column));
+		if (indexlist) {
+			index = i;
+		} else {
+			// find the correct index in listspll.2da
+			ieResRef spellref;
+			strnlwrcpy(spellref, tab->QueryField(i, column), 8);
+			// the table has disabled spells in it and they all have the first two chars replaced by '*'
+			if (spellref[0] == '*') {
+				continue;
+			}
+			index = FindSpell(spellref, spllist, splcount);
+			assert (index != -1);
+		}
+		reslist[index].SetSpell(tab->QueryField(i, column));
 		for(int col=0;col<column;col++) {
-			reslist[i].AddLevel(atoi(tab->QueryField(i,col)), col);
+			reslist[index].AddLevel(atoi(tab->QueryField(i, col)), col);
 		}
 	}
 	return reslist;
@@ -446,7 +497,7 @@ static void InitSpellbook()
 		innlist = GetSpellTable("listinnt", inncount);
 		snglist = GetSpellTable("listsong", sngcount);
 		shplist = GetSpellTable("listshap", shpcount);
-		spllist = GetKitSpell("listspll", splcount);
+		spllist = GetKitSpell("listspll", splcount); // need to init this one first, since the other two rely on it
 		maglist = GetKitSpell("listmage", magcount);
 		domlist = GetKitSpell("listdomn", domcount);
 	}
@@ -1618,7 +1669,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 				sm->memorized_spells.push_back(memory);
 			}
 		} else {
-			Log(ERROR, "CREImporter", "Unresolved spell index: %d level:%d, type: %d",
+			error("CREImporter", "Unresolved spell index: %d level:%d, type: %d",
 				spellindex, level+1, type);
 		}
 	}
