@@ -196,6 +196,7 @@ def UpdateSpellBookWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 			Button.SetTooltip (ms['SpellName'])
 			Button.SetVarAssoc ("SpellButton", i)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenSpellBookSpellInfoWindow)
 			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
 		else:
