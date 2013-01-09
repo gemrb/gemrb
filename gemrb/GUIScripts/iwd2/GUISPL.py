@@ -322,8 +322,8 @@ def OnSpellBookMemorizeSpell ():
 	Window = SpellBookWindow
 	
 	index = GemRB.GetVar ("SpellButton") - 100
-
-	if GemRB.MemorizeSpell (pc, type, level, index + TopIndex):
+	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	if GemRB.MemorizeSpell (pc, type, level, index + SpellTopIndex):
 		UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_24")
 		Button = Window.GetControl(index + 30)
