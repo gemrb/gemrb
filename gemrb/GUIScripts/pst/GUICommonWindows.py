@@ -278,6 +278,7 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDropItemToPC)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT, OnDropPortraitToPC)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
@@ -399,7 +400,12 @@ def PortraitButtonOnPress ():
 	return
 
 def PortraitButtonOnShiftPress ():
-	i = GemRB.GetVar ('PressedPortrait')
+	"""Handles selecting multiple portaits with shift."""
+
+	i = GemRB.GetVar ("PressedPortrait")
+
+	if not i:
+		return
 
 	if (not SelectionChangeHandler):
 		sel = GemRB.GameIsPCSelected (i)
@@ -459,24 +465,52 @@ def PortraitButtonOnMouseEnter ():
 	if not i:
 		return
 
-	if DraggedPortrait != None:
-		GemRB.DragItem (0, -1, "")
-		#this might not work
-		GemRB.SwapPCs (DraggedPortrait, i)
-		DraggedPortrait = None
+	GemRB.GameControlSetLastActor( i )
+	if GemRB.IsDraggingItem()==2:
+		if DraggedPortrait != None:
+			GemRB.SwapPCs (DraggedPortrait, i)
+			#GemRB.SetVar ("PressedPortrait", DraggedPortrait)
+			#possibly review why the other games do that ^^
+			#it completely breaks the dragging in PST
+			DraggedPortrait = i
+			GemRB.SetTimedEvent (CheckDragging, 1)
+		else:
+			OnDropPortraitToPC()
+		return
 
 	if GemRB.IsDraggingItem ():
 		Button = PortraitWindow.GetControl (i-1)
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
+	return
+
+def OnDropPortraitToPC ():
+	GemRB.SetVar ("PressedPortrait",0)
+	GemRB.DragItem (0, -1, "")
+	DraggedPortrait = None
+	return
+
+def CheckDragging():
+	"""Contains portrait dragging in case of mouse out-of-range."""
+
+	global DraggedPortrait
+
+	i = GemRB.GetVar ("PressedPortrait")
+	if not i:
+		GemRB.DragItem (0, -1, "")
+
+	if GemRB.IsDraggingItem()!=2:
+		DraggedPortrait = None
+	return
 
 def PortraitButtonOnMouseLeave ():
 	i = GemRB.GetVar ("PressedPortrait")
 	if not i:
 		return
 
-	if GemRB.IsDraggingItem ():
-		Button = PortraitWindow.GetControl (i-1)
-		Button.EnableBorder (FRAME_PC_TARGET, 0)
+	Button = PortraitWindow.GetControl (i-1)
+	Button.EnableBorder (FRAME_PC_TARGET, 0)
+	GemRB.SetVar ("PressedPortrait", 0)
+	GemRB.SetTimedEvent (CheckDragging, 1)
 	return
 
 def DisableAnimatedWindows ():
