@@ -8982,7 +8982,6 @@ bool Actor::TryToHide()
 {
 	ieDword roll = 0;
 	if (third) {
-		// FIXME: GetArmorFailure probably needs a multiplier (*5 or *7) here
 		roll = LuckyRoll(1, 20, GetArmorFailure(0));
 	} else {
 		roll = LuckyRoll(1, 100, GetArmorFailure(0));
@@ -9001,8 +9000,10 @@ bool Actor::TryToHide()
 	}
 
 	bool seen = SeeAnyOne(true, true);
+	bool continuation = third && (Modified[IE_STATE_ID]&state_invisible);
 
 	// TODO: iwd2 seems to separately check move silently
+	// TODO: ignore it if the checker is deaf or we're not moving
 	// this seems to be checked only when trying to maintain invisibility out of sight range
 	// @112   = ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
 	ieDword skill;
@@ -9014,13 +9015,16 @@ bool Actor::TryToHide()
 
 	// TODO: better seen check for iwd2, since we need more data and you can try hiding while enemies are nearby
 	// this is checked only when trying to maintain/refresh invisibility
+	// TODO: ignore it if the checker is blind
 	if (third) {
 		// FIXME: 0 should be the sum of viewer's cr level, wisdom mod, race mod
 		if (seen) {
 			HideFailed(this, 1, skill, roll, 0);
 		} else {
-			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(28379, DMC_LIGHTGREY, this, skill, 0, roll);
+			if (continuation) {
+				// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
+				displaymsg->DisplayRollStringName(28379, DMC_LIGHTGREY, this, skill, 0, roll);
+			}
 		}
 	} else {
 		if (seen) {
