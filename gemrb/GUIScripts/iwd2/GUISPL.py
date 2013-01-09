@@ -333,15 +333,12 @@ def OnSpellBookMemorizeSpell ():
 def OpenSpellBookSpellRemoveWindow ():
 	global SpellBookSpellUnmemorizeWindow
 
-	GemRB.HideGUI ()
-
 	if SpellBookSpellUnmemorizeWindow != None:
 		if SpellBookSpellUnmemorizeWindow:
 			SpellBookSpellUnmemorizeWindow.Unload ()
 		SpellBookSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
@@ -363,14 +360,11 @@ def OpenSpellBookSpellRemoveWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenSpellBookSpellUnmemorizeWindow ():
 	global SpellBookSpellUnmemorizeWindow
-
-	GemRB.HideGUI ()
 
 	if SpellBookSpellUnmemorizeWindow != None:
 		if SpellBookSpellUnmemorizeWindow:
@@ -378,7 +372,6 @@ def OpenSpellBookSpellUnmemorizeWindow ():
 		SpellBookSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
@@ -400,7 +393,6 @@ def OpenSpellBookSpellUnmemorizeWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellUnmemorizeWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
