@@ -115,7 +115,7 @@ def OpenSpellBookWindow ():
 
 def SelectedNewPlayer ():
 	global ActiveSpellBooks
-	global BookTopIndex, SpellTopIndex, BookCount, SelectedBook
+	global BookTopIndex, BookCount, SelectedBook
 	
 	Window = SpellBookWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -126,22 +126,32 @@ def SelectedNewPlayer ():
 			ActiveSpellBooks+=[i]
 	BookCount = len(ActiveSpellBooks)
 	BookTopIndex = 0
-	SpellTopIndex = 0
 	if len (ActiveSpellBooks):
 		SelectedBook = ActiveSpellBooks[0]
 	else:
 		SelectedBook = 0
 		
-	ScrollBar = Window.GetControl (54)
-	GemRB.SetVar ("SpellTopIndex",0)
-	ScrollBar.SetVarAssoc ("SpellTopIndex", len(Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel))) # make global, move to Update
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	ScrollBar.SetDefaultScrollBar ()
+	ResetScrollBar ()
 	GemRB.SetVar ("SelectedBook",SelectedBook)
 	UpdateSpellBookWindow ()
 	return
 
+def ResetScrollBar ():
+	global SpellTopIndex
+
+	SpellTopIndex = 0
+	pc = GemRB.GameGetSelectedPCSingle ()
+	ScrollBar = SpellBookWindow.GetControl (54)
+	GemRB.SetVar ("SpellTopIndex",0)
+	ScrollBar.SetVarAssoc ("SpellTopIndex", len(Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel))) # make global, move to Update
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.SetDefaultScrollBar ()
+
 def ScrollBarPress ():
+	UpdateSpellBookWindow ()
+
+def UpdateSpellBook ():
+	ResetScrollBar ()
 	UpdateSpellBookWindow ()
 
 def UpdateSpellBookWindow ():
@@ -159,7 +169,7 @@ def UpdateSpellBookWindow ():
 			Button.SetVarAssoc ("SelectedBook", type)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateSpellBookWindow)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateSpellBook)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
@@ -238,28 +248,24 @@ def UpdateSpellBookWindow ():
 
 #TODO: spell type selector
 def SpellBookPrevPress ():
-	global BookTopIndex, SpellTopIndex
+	global BookTopIndex
 
 	BookTopIndex = GemRB.GetVar ("BookTopIndex")
 	if BookTopIndex>0:
 		BookTopIndex -= 1
-	SpellTopIndex = 0
 	GemRB.SetVar("BookTopIndex", BookTopIndex)
-	GemRB.SetVar("SpellTopIndex", SpellTopIndex)
-	UpdateSpellBookWindow ()
+	UpdateSpellBook ()
 	return
 
 #TODO: spell type selector
 def SpellBookNextPress ():
-	global BookTopIndex, SpellTopIndex
+	global BookTopIndex
 
 	BookTopIndex = GemRB.GetVar ("BookTopIndex")
 	if BookTopIndex<BookCount-4:
 		BookTopIndex += 1
-	SpellTopIndex = 0
 	GemRB.SetVar("BookTopIndex", BookTopIndex)
-	GemRB.SetVar("SpellTopIndex", SpellTopIndex)
-	UpdateSpellBookWindow ()
+	UpdateSpellBook ()
 	return
 
 def RefreshSpellBookLevel ():
