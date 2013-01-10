@@ -387,6 +387,9 @@ int Game::LeaveParty (Actor* actor)
 
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		actor->SetScript( "", SCR_DEFAULT );
+		if (actor->GetBase(IE_MC_FLAGS) & MC_EXPORTABLE) {
+			actor->SetDialog("MULTIJ");
+		}
 	}
 	actor->SetBase( IE_EA, EA_NEUTRAL );
 	return ( int ) NPCs.size() - 1;
