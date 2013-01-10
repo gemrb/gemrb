@@ -8980,6 +8980,18 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 
 bool Actor::TryToHide()
 {
+	if (Modified[IE_DISABLEDBUTTON] & (1<<ACT_STEALTH)) {
+		HideFailed(this);
+		return false;
+	}
+
+	// iwd2 is like the others only when trying to hide for the first time
+	// TODO: once understood, the visual checks need syncing (not just lightness)
+	bool continuation = third && (Modified[IE_STATE_ID]&state_invisible);
+	if (third && continuation) {
+		return TryToHideIWD2();
+	}
+
 	ieDword roll = 0;
 	if (third) {
 		roll = LuckyRoll(1, 20, GetArmorFailure(0));
@@ -8994,18 +9006,8 @@ bool Actor::TryToHide()
 
 	// check for disabled dualclassed thieves (not sure if we need it)
 
-	if (Modified[IE_DISABLEDBUTTON] & (1<<ACT_STEALTH)) {
-		HideFailed(this);
-		return false;
-	}
-
 	bool seen = SeeAnyOne(true, true);
-	bool continuation = third && (Modified[IE_STATE_ID]&state_invisible);
 
-	// TODO: iwd2 seems to separately check move silently
-	// TODO: ignore it if the checker is deaf or we're not moving
-	// this seems to be checked only when trying to maintain invisibility out of sight range
-	// @112   = ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
 	ieDword skill;
 	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
 		skill = (GetStat(IE_HIDEINSHADOWS) + GetStat(IE_STEALTH))/2;
@@ -9013,28 +9015,14 @@ bool Actor::TryToHide()
 		skill = GetStat(IE_STEALTH);
 	}
 
-	// TODO: better seen check for iwd2, since we need more data and you can try hiding while enemies are nearby
-	// this is checked only when trying to maintain/refresh invisibility
-	// TODO: ignore it if the checker is blind
-	if (third) {
-		// FIXME: 0 should be the sum of viewer's cr level, wisdom mod, race mod
-		if (seen) {
-			HideFailed(this, 1, skill, roll, 0);
-		} else {
-			if (continuation) {
-				// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-				displaymsg->DisplayRollStringName(28379, DMC_LIGHTGREY, this, skill, 0, roll);
-			}
-		}
-	} else {
-		if (seen) {
-			HideFailed(this, 1);
-		}
+	if (seen) {
+		HideFailed(this, 1);
 	}
 
 	if (third) {
-		skill *= 7; // FIXME: temporary increase for the lightness percentage calculation (does iwd2 use it at all?)
+		skill *= 7; // FIXME: temporary increase for the lightness percentage calculation
 	}
+	// TODO: figure out how iwd2 uses the area lightness and crelight.2da
 	Game *game = core->GetGame();
 	// check how bright our spot is
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
@@ -9050,6 +9038,78 @@ bool Actor::TryToHide()
 	if (!third) return true;
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
 	displaymsg->DisplayRollStringName(39299, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
+	return true;
+}
+
+// skill check when trying to maintain invisibility: separate move silently and visibility check
+bool Actor::TryToHideIWD2()
+{
+	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF, 60);
+	Actor **poi = neighbours;
+	ieDword roll = LuckyRoll(1, 20, GetArmorFailure(0));
+	int targetDC = 0;
+	bool checked = false;
+
+	// visibility check, you can try hiding while enemies are nearby
+	// TODO: add lightness check as in TryToHide
+	// TODO: use crehidemd.2da as a skill bonus/malus (after refreshing effects, not here)
+	ieDword skill = GetStat(IE_HIDEINSHADOWS);
+	bool seen = false;
+	while (*poi) {
+		Actor *toCheck = *poi++;
+		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
+			continue;
+		}
+		// we need to do a visual range check here, since we ignored it above, so hearing is not affected
+		if (toCheck->GetStat(IE_VISUALRANGE)*10 < PersonalDistance(toCheck, this)) {
+			continue;
+		}
+		// IE_XPVALUE is the CR value in iwd2
+		// the third summand should be a racial bonus, but since skillrac has other values, we use their search skill directly
+		targetDC = toCheck->GetStat(IE_XPVALUE) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
+		seen = skill < (roll + targetDC);
+		if (seen) {
+			HideFailed(this, 1, skill, roll, targetDC);
+			free(neighbours);
+			return false;
+		} else {
+			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
+			displaymsg->DisplayRollStringName(28379, DMC_LIGHTGREY, this, skill, targetDC, roll);
+		}
+	}
+
+	// we're stationary, so no need to check if we're making movement sounds
+	if (!InMove() && !checked) {
+		free(neighbours);
+		return true;
+	}
+
+	// separate move silently check
+	skill = GetStat(IE_STEALTH);
+	poi = neighbours;
+	bool heard = false;
+	targetDC = 0;
+	while (*poi) {
+		Actor *toCheck = *poi++;
+		if (toCheck->HasSpellState(SS_DEAF)) {
+			continue;
+		}
+		// NOTE: pretending there is no hearing range
+		// IE_XPVALUE is the CR value in iwd2
+		// the third summand should be a racial bonus, but since skillrac has other values, we use their search skill directly
+		targetDC = toCheck->GetStat(IE_XPVALUE) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
+		heard = skill < (roll + targetDC);
+		if (heard) {
+			HideFailed(this, 2, skill, roll, targetDC);
+			free(neighbours);
+			return false;
+		} else {
+			// ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
+			displaymsg->DisplayRollStringName(112, DMC_LIGHTGREY, this, skill, targetDC, roll);
+		}
+	}
+
+	free(neighbours);
 	return true;
 }
 
