@@ -327,6 +327,30 @@ def AIPress (toggle=1):
 def TxtePress ():
 	print "TxtePress"
 
+def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
+	global ActionsWindow
+
+	ActionsWindow = Window
+	# 1280 and higher don't have this control
+	if not Window.HasControl (62):
+		UpdateActionsWindow ()
+		return
+	# Gears (time) when options pane is down
+	Button = Window.GetControl (62)
+	Label = Button.CreateLabelOnButton (0x1000003e, "NORMAL", 0)
+
+	# FIXME: display all animations
+	Label.SetAnimation ("CPEN")
+	Button.SetAnimation ("CGEAR")
+	Button.SetBAM ("CDIAL", 0, 0)
+	Button.SetState (IE_GUI_BUTTON_ENABLED)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	GUICommon.SetGamedaysAndHourToken()
+	Button.SetTooltip(GemRB.GetString (16041))
+	UpdateActionsWindow ()
+	return
+
 def SetupClockWindowControls (Window):
 	global ActionsWindow
 
@@ -334,6 +358,7 @@ def SetupClockWindowControls (Window):
 	# time button
 	Button = Window.GetControl (0)
 	Button.SetAnimation ("WMTIME")
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
@@ -357,6 +382,7 @@ def SetupClockWindowControls (Window):
 	Button = Window.GetControl (4)
 	Button.SetTooltip (44945)
 
+	return
 
 
 # which=INVENTORY|STATS|FMENU

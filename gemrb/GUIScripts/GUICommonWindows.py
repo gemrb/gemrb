@@ -391,7 +391,7 @@ def GroupControls ():
 		Button.SetTooltip (4935, 8+i)
 	return
 
-def OpenActionsWindowControls (Window):
+def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
 	global ActionsWindow
 
 	ActionsWindow = Window
@@ -413,6 +413,39 @@ def OpenActionsWindowControls (Window):
 	GUICommon.SetGamedaysAndHourToken()
 	Button.SetTooltip(GemRB.GetString (16041))
 	UpdateActionsWindow ()
+	return
+
+def SetupClockWindowControls (Window):
+	global ActionsWindow
+
+	ActionsWindow = Window
+	# time button
+	Button = Window.GetControl (0)
+	Button.SetAnimation ("WMTIME")
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
+	SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (GemRB.GetString(65027))
+
+	# 41627 - Return to the Game World
+	Button = Window.GetControl (2)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetTooltip (41627)
+
+	# Select all characters
+	Button = Window.GetControl (1)
+	Button.SetTooltip (41659)
+
+	# Abort current action
+	Button = Window.GetControl (3)
+	Button.SetTooltip (41655)
+
+	# Formations
+	Button = Window.GetControl (4)
+	Button.SetTooltip (44945)
+
 	return
 
 def SelectItemAbility():
