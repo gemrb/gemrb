@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
+
 # GUICommonWindows.py - functions to open common
 # windows in lower part of the screen
 ###################################################
@@ -24,50 +25,98 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_modal import *
 from ie_action import *
-import GUIClasses
+from ie_slots import SLOT_QUIVER
 import GUICommon
 import CommonTables
 import LUCommon
 import InventoryCommon
+if not GUICommon.GameIsPST():
+  import Spellbook  ##not used in pst - YET
 
 # needed for all the Open*Window callbacks in the OptionsWindow
 import GUIJRNL
 import GUIMA
-import GUIMG
 import GUIINV
 import GUIOPT
-import GUIPR
+if GUICommon.GameIsIWD2():
+	# one spellbook for all spell types
+	import GUISPL
+else:
+	import GUIMG
+	import GUIPR
 import GUIREC
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
-TimeWindow = None
-PortWindow = None
-MenuWindow = None
-MainWindow = None
-global PortraitWindow
 PortraitWindow = None
-global ActionsWindow
-ActionsWindow = None
-global OptionsWindow
 OptionsWindow = None
+ActionsWindow = None
+CurrentWindow = None
 DraggedPortrait = None
-DiscWindow = None
+ActionBarControlOffset = 0
 
-# Buttons:
-# 0 CNTREACH
-# 1 INVNT
-# 2 MAP
-# 3 MAGE
-# 4 AI
-# 5 STATS
-# 6 JRNL
-# 7 PRIEST
-# 8 OPTION
-# 9 REST
-# 10 TXTE
+#The following tables deal with the different control indexes and string refs of each game
+#so that actual interface code can be game neutral
+if GUICommon.GameIsPST(): #Torment
+	import GUIClasses
+	TimeWindow = None
+	PortWindow = None
+	MenuWindow = None
+	MainWindow = None
+	DiscWindow = None
+	AITip = {	"Deactivate" : 41631,	"Enable" : 41646 }
+	OptionTip = { #dictionary to the stringrefs in each games dialog.tlk
+	'Inventory' : 41601,'Map': 41625,'Mage': 41624,'Priest': 4709,'Stats': 4707,'Journal': 41623,
+	'Options' : 41626,'Rest': 41628,'Follow': 41647,'Expand': 41660,'AI' : 1,'Game' : 1,'Party' : 1
+	}
+	OptionControl = { #dictionary to the control indexes in the window (.CHU)
+	'Inventory' : 1, 'Map' : 2, 'Mage': 3, 'Priest': 7, 'Stats': 5, 'Journal': 6,
+	'Options' : 8, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'AI': 4,
+	'Game': 0, 'Party' : 8 , 'Time': 9 #not in pst
+	}
+elif GUICommon.GameIsIWD2(): #Icewind Dale 2
+	OptionTip = {
+	'Inventory' : 16307, 'Map': 16310, 'Mage': 16309, 'Priest': 14930, 'Stats': 16306, 'Journal': 16308,
+	'Options' : 16311, 'Rest': 11942, 'Follow': 41647, 'Expand': 41660, 'AI' : 1,'Game' : 16313,  'Party' : 16312,
+	'SpellBook': 16309, 'SelectAll': 10485
+	}
+	OptionControl = {
+	'Inventory' : 5, 'Map' : 7, 'Mage': 5, 'Priest': 6, 'Stats': 8, 'Journal': 6,
+	'Options' : 9, 'Rest': 12, 'Follow': 0, 'Expand': 10, 'AI': 6,
+	'Game': 0, 'Party' : 13,  'Time': 10, #not in pst
+	'SpellBook': 4, 'SelectAll': 11
+	}
+else: # Baldurs Gate, Icewind Dale
+	AITip = {"Deactivate" : 15918, "Enable" : 15917}
+	OptionTip = {
+	'Inventory' : 16307, 'Map': 16310, 'Mage': 16309, 'Priest': 14930, 'Stats': 16306, 'Journal': 16308,
+	'Options' : 16311, 'Rest': 11942, 'Follow': 41647,  'Expand': 41660, 'AI' : 1, 'Game' : 16313, 'Party' : 16312
+	}
+	OptionControl = {
+	'Inventory' : 3, 'Map' : 1, 'Mage': 5, 'Priest': 6, 'Stats': 4, 'Journal': 2, 
+	'Options' : 7, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'AI': 6,
+	'Game': 0, 'Party' : 8, 'Time': 9 #not in pst
+	}
+
+# Generic option button init. Pass it the options window. Index is a key to the dicts,
+# IsPage means whether the game should mark the button selected
+def InitOptionButton(Window, Index, Action=0,IsPage=1):
+	if not Window.HasControl(OptionControl[Index]):
+		print "InitOptionButton cannot find the button: " + Index
+		return
+
+	Button = Window.GetControl (OptionControl[Index])
+	# FIXME: add "(key)" to tooltips!
+	Button.SetTooltip (OptionTip[Index])
+	if Action:
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Action)
+	if IsPage:
+		Button.SetVarAssoc ("SelectedWindow", OptionControl[Index])
+	return Button
+
 
 def SetupMenuWindowControls (Window):
 	global OptionsWindow
