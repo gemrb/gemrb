@@ -627,11 +627,6 @@ def PortraitButtonHPOnPress ():
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 	return
 
-def StopAllOnPress ():
-	for i in GemRB.GetSelectedActors():
-		GemRB.ClearActions (i)
-	return
-
 # Run by Game class when selection was changed
 def SelectionChanged ():
 	# FIXME: hack. If defined, display single selection
@@ -706,6 +701,23 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetVar ("PressedPortrait", 0)
 	GemRB.SetTimedEvent (CheckDragging, 1)
 	return
+
+def ActionStopPressed ():
+	for i in GemRB.GetSelectedActors():
+		GemRB.ClearActions (i)
+	return
+
+def ActionTalkPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK,GA_NO_DEAD|GA_NO_ENEMY|GA_NO_HIDDEN)
+
+def ActionAttackPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK,GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
+
+def ActionDefendPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
+#FIXME: there is currently no way to use this  in pst
+def ActionThievingPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def DisableAnimatedWindows ():
 	global ActionsWindow, OptionsWindow
@@ -833,24 +845,6 @@ def UpdateActionsWindow():
 	UpdateClock()
 	#This at least ensures the clock gets a relatively regular update
 	return
-
-def ActionStopPressed ():
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i + 1):
-			GemRB.ClearActions (i + 1)
-	return
-
-def ActionTalkPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK,GA_NO_DEAD|GA_NO_ENEMY|GA_NO_HIDDEN)
-
-def ActionAttackPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK,GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
-
-def ActionDefendPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-
-def ActionThievingPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 #this is an unused callback in PST
 def EmptyControls ():

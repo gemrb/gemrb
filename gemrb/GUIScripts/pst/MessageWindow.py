@@ -77,7 +77,7 @@ def OnLoad():
 
 	# Select all
 	Button = ActionsWindow.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.StopAllOnPress)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.ActionStopPressed)
 
 	FormationButton = ActionsWindow.GetControl (4)
 	FormationButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
