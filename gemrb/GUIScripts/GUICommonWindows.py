@@ -117,212 +117,150 @@ def InitOptionButton(Window, Index, Action=0,IsPage=1):
 		Button.SetVarAssoc ("SelectedWindow", OptionControl[Index])
 	return Button
 
-
-def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+##these defaults don't seem to break the games other than pst
+def SetupMenuWindowControls (Window, Gears=None, ReturnToGame=None):
 	"""Binds all of the basic controls and windows to the options pane."""
 
 	global OptionsWindow, ActionBarControlOffset
 
 	OptionsWindow = Window
-	# FIXME: add "(key)" to tooltips!
 
-	if GUICommon.GameIsIWD2():
-		ActionBarControlOffset = 6
-		SetupIWD2WindowControls (Window, Gears, ReturnToGame)
-		return
+	bg1 = GUICommon.GameIsBG1()
+	bg2 = GUICommon.GameIsBG2()
+	iwd1 = GUICommon.GameIsIWD1()
+	how = GUICommon.HasHOW()
+	iwd2 = GUICommon.GameIsIWD2()
+	pst = GUICommon.GameIsPST()
+	#store these instead of doing 50 calls...
 
-	# Return to Game
-	Button = Window.GetControl (0)
-	Button.SetTooltip (16313)
-	Button.SetVarAssoc ("SelectedWindow", 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	if GUICommon.GameIsBG1():
-		# enabled BAM isn't present in .chu, defining it here
-		Button.SetSprites ("GUILSOP", 0,16,17,28,16)
-	if GUICommon.GameIsIWD1():
-		# disabled/selected frame isn't present in .chu, defining it here
-		Button.SetSprites ("GUILSOP", 0,16,17,16,16)
+	if iwd2: # IWD2 has one spellbook to rule them all
+		ActionBarControlOffset = 6 #portrait and action window were merged
+		# Spellbook
+		Button = InitOptionButton(Window, 'SpellBook', GUISPL.OpenSpellBookWindow)
+		if Gears: # todo: don't know if it needs this if or if it's if'fing around
+			# Select All
+			Button = InitOptionButton(Window, 'SelectAll', GUICommon.SelectAllOnPress)
+
+	elif pst: #pst has these three controls here instead of portrait pane
+		# (Un)Lock view on character
+		Button = InitOptionButton(Window, 'Follow', OnLockViewPress)  # or 41648 Unlock ...
+		# AI
+		Button = InitOptionButton(Window, 'AI', AIPress)
+		AIPress(toggle=0)
+		# Message popup FIXME disable on non game screen...
+		Button = InitOptionButton(Window,'Expand')# or 41661 Close ...
+
+	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
+		# Return to Game
+		Button = InitOptionButton(Window,'Game', ReturnToGame)
+		Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		if bg1:
+			# enabled BAM isn't present in .chu, defining it here
+			Button.SetSprites ("GUILSOP", 0,16,17,28,16)
+		if iwd1:
+			# disabled/selected frame isn't present in .chu, defining it here
+			Button.SetSprites ("GUILSOP", 0,16,17,16,16)
+
+	# Party managment / character arbitration. Distinct form reform party window.
+	if not pst:
+		Button = Window.GetControl (OptionControl['Party'])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
+		if bg1 or bg2:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		else:
+			Button.SetTooltip (OptionTip['Party'])
 
 	# Map
-	Button = Window.GetControl (1)
-	Button.SetTooltip (16310)
-	Button.SetVarAssoc ("SelectedWindow", 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
-	if GUICommon.GameIsBG1():
+	Button = InitOptionButton(Window, 'Map', GUIMA.OpenMapWindow)
+	if bg1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
-	if GUICommon.GameIsIWD1():
+	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
-	Button = Window.GetControl (2)
-	Button.SetTooltip (16308)
-	Button.SetVarAssoc ("SelectedWindow", 2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
-	if GUICommon.GameIsBG1():
+	Button = InitOptionButton(Window, 'Journal', GUIJRNL.OpenJournalWindow)
+	if bg1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
-	if GUICommon.GameIsIWD1():
+	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
-	Button = Window.GetControl (3)
-	Button.SetTooltip (16307)
-	Button.SetVarAssoc ("SelectedWindow", 3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
-	if GUICommon.GameIsBG1():
+	Button = InitOptionButton(Window, 'Inventory', GUIINV.OpenInventoryWindow)
+	if bg1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
-	if GUICommon.GameIsIWD1():
+	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
-	Button = Window.GetControl (4)
-	Button.SetTooltip (16306)
-	Button.SetVarAssoc ("SelectedWindow", 4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
-	if GUICommon.GameIsBG1():
+	Button = InitOptionButton(Window, 'Stats', GUIREC.OpenRecordsWindow)
+	if bg1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
-	if GUICommon.GameIsIWD1():
+	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,23)
 
-	# Mage
-	Button = Window.GetControl (5)
-	Button.SetTooltip (16309)
-	Button.SetVarAssoc ("SelectedWindow", 5)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
-	if GUICommon.GameIsBG1():
-		Button.SetSprites ("GUILSOP", 0,8,9,24,8)
-	if GUICommon.GameIsIWD1():
-		Button.SetSprites ("GUILSOP", 0,8,9,24,24)
+	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
+		# Mage
+		Button = InitOptionButton(Window, 'Mage', GUIMG.OpenMageWindow)
+		if bg1:
+			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
+		if iwd1:
+			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
-	# Priest
-	Button = Window.GetControl (6)
-	Button.SetTooltip (14930)
-	Button.SetVarAssoc ("SelectedWindow", 6)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIPR.OpenPriestWindow)
-	if GUICommon.GameIsBG1():
-		Button.SetSprites ("GUILSOP", 0,10,11,25,10)
-	if GUICommon.GameIsIWD1():
-		Button.SetSprites ("GUILSOP", 0,10,11,25,25)
+		# Priest
+		Button = InitOptionButton(Window, 'Priest', GUIPR.OpenPriestWindow)
+		if bg1:
+			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
+		if iwd1:
+			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
-	Button = Window.GetControl (7)
-	Button.SetTooltip (16311)
-	Button.SetVarAssoc ("SelectedWindow", 7)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
-	if GUICommon.GameIsBG1():
+	Button = InitOptionButton(Window, 'Options', GUIOPT.OpenOptionsWindow)
+	if bg1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
-	if GUICommon.GameIsIWD1():
+	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
 
-	# Party mgmt
-	Button = Window.GetControl (8)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
-	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	else:
-		Button.SetTooltip (16312)
 
 	# pause button
 	if Gears:
 		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
-		if GUICommon.HasHOW(): # how doesn't have this in the right place
+		if how: # how doesn't have this in the right place
 			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
 			Window.CreateButton (9, 6, pos, 64, 71)
-		Button = Window.GetControl (9)
-		if GUICommon.GameIsBG2():
+		Button = Window.GetControl (OptionControl['Time'])
+		if bg2:
 			Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
 			Label.SetAnimation ("CPEN")
 
 		Button.SetAnimation ("CGEAR")
-		if GUICommon.GameIsBG2():
+		if bg2:
 			Button.SetBAM ("CDIAL", 0, 0)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 		GUICommon.SetGamedaysAndHourToken()
 		Button.SetTooltip(GemRB.GetString (16041))
-		rb = 11
+		if iwd2:
+			Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
+			rb = OptionControl['Rest']
+		else:
+			rb = 11
 	else:
-		rb = 9
+		rb = OptionControl['Rest']
 
 	# Rest
 	if Window.HasControl (rb):
 		Button = Window.GetControl (rb)
+		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
-		Button.SetTooltip (11942)
 
-	MarkMenuButton (Window)
+	if bg1 or iwd1 or bg2:
+		MarkMenuButton (Window)
 
 	if PortraitWindow:
 		UpdatePortraitWindow ()
-	return
-
-def SetupIWD2WindowControls (Window, Gears, ReturnToGame):
-	"""Sets up all of the basic iwd2 control windows."""
-
-	global OptionsWindow
-
-	OptionsWindow = Window
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
-
-	# Spellbook
-	Button = Window.GetControl (4)
-	Button.SetTooltip (16309)
-	Button.SetVarAssoc ("SelectedWindow", 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUISPL.OpenSpellBookWindow)
-
-	# Inventory
-	Button = Window.GetControl (5)
-	Button.SetTooltip (16307)
-	Button.SetVarAssoc ("SelectedWindow", 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
-
-	# Journal
-	Button = Window.GetControl (6)
-	Button.SetTooltip (16308)
-	Button.SetVarAssoc ("SelectedWindow", 2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
-
-	# Map
-	Button = Window.GetControl (7)
-	Button.SetTooltip (16310)
-	Button.SetVarAssoc ("SelectedWindow", 3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
-
-	# Records
-	Button = Window.GetControl (8)
-	Button.SetTooltip (16306)
-	Button.SetVarAssoc ("SelectedWindow", 4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
-
-	# Options
-	Button = Window.GetControl (9)
-	Button.SetTooltip (16311)
-	Button.SetVarAssoc ("SelectedWindow", 7)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
-
-	# Gears
-	Button = Window.GetControl (10)
-	Button.SetAnimation ("CGEAR")
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-	if Gears:
-		# Select All
-		Button = Window.GetControl (11)
-		Button.SetTooltip (10485)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
-		# Rest
-		Button = Window.GetControl (12)
-		Button.SetTooltip (11942)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
-
-		# Character Arbitration
-		Button = Window.GetControl (13)
-		Button.SetTooltip (16312)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: CharacterWindow
 	return
 
 def MarkMenuButton (WindowIndex):
@@ -337,7 +275,7 @@ def MarkMenuButton (WindowIndex):
 	else: # highlight return to game
 		Button = WindowIndex.GetControl (0)
 
-	# NOTE: Alternatively, comment out this block or add a feature check, so that 
+	# NOTE: Alternatively, comment out this block or add a feature check, so that
 	#   clicking button the second time closes a window again, which might be preferred
 	if GUICommon.GameIsIWD1() and GemRB.GetVar ("SelectedWindow") != 0:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
