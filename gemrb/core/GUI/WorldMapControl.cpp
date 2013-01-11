@@ -125,12 +125,20 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		int yOffs = MAP_TO_SCREENY(m->Y);
 		Sprite2D* icon = m->GetMapIcon(worldmap->bam);
 		if( icon ) {
-			video->BlitSprite( icon, xOffs, yOffs, true, &r );
+			if (m == Area) {
+				Palette *pal = icon->GetPalette();
+				icon->SetPalette(pal_selected);
+				video->BlitSprite( icon, xOffs, yOffs, true, &r );
+				icon->SetPalette(pal);
+				pal->Release();
+			} else {
+				video->BlitSprite( icon, xOffs, yOffs, true, &r );
+			}
 			video->FreeSprite( icon );
 		}
 
 		if (AnimPicture && !strnicmp(m->AreaResRef, currentArea, 8) ) {
-			core->GetVideoDriver()->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
+			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
 		}
 	}
 
