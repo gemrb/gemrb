@@ -736,7 +736,7 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 	return false;
 }
 
-bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete)
+bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete, bool onlydepleted)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -744,6 +744,9 @@ bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete)
 			std::vector< CREMemorizedSpell* >::iterator s;
 			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
 				if (strnicmp(ResRef, (*s)->SpellResRef, sizeof(ieResRef) ) ) {
+					continue;
+				}
+				if (onlydepleted && (*s)->Flags != 0) {
 					continue;
 				}
 				if (deplete) {

@@ -7111,14 +7111,15 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_UnmemorizeSpell__doc,
-"UnmemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
-"Unmemorizes specified known spell. Returns 1 on success." );
+"UnmemorizeSpell(PartyID, SpellType, Level, Index[, onlydepleted])=>bool\n\n"
+"Unmemorizes specified known spell. Returns 1 on success.\n"
+"If onlydepleted is set, it will remove only already depleted spells." );
 
 static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, SpellType, Level, Index;
+	int globalID, SpellType, Level, Index, onlydepleted=0;
 
-	if (!PyArg_ParseTuple( args, "iiii", &globalID, &SpellType, &Level, &Index )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &globalID, &SpellType, &Level, &Index, &onlydepleted )) {
 		return AttributeError( GemRB_UnmemorizeSpell__doc );
 	}
 	GET_GAME();
@@ -7128,8 +7129,7 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 	if (! ms) {
 		return RuntimeError( "Spell not found!\n" );
 	}
-
-	return PyInt_FromLong( actor->spellbook.UnmemorizeSpell( ms ) );
+	return PyInt_FromLong(actor->spellbook.UnmemorizeSpell(ms->SpellResRef, false, onlydepleted));
 }
 
 PyDoc_STRVAR( GemRB_GetSlotItem__doc,
