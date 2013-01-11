@@ -1951,8 +1951,6 @@ bool Game::IsTimestopActive() const
 
 bool Game::RandomEncounter(ieResRef &BaseArea)
 {
-	displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-
 	if (bntrows<0) {
 		AutoTable table;
 

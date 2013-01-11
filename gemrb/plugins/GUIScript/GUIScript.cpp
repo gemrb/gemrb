@@ -2857,7 +2857,6 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
 	//evaluate the area the user will fall on in a random encounter
 	if (encounter && eval) {
-		displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 
 		if(wal->EncounterChance>=100) {
 			wal->EncounterChance-=100;
@@ -2868,6 +2867,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 
 		memcpy(tmpresref, wmc->Area->AreaName, sizeof(ieResRef) );
 		if (core->GetGame()->RandomEncounter(tmpresref)) {
+			displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 			PyDict_SetItemString(dict, "Destination", PyString_FromString (tmpresref) );
 			PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
 		} else {
@@ -2878,6 +2878,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 				const char *area = wal->EncounterAreaResRef[(i+j)%5];
 
 				if (area[0]) {
+					displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 					PyDict_SetItemString(dict, "Destination", PyString_FromString (area) );
 					PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
 					// do we need to change Direction here?
