@@ -1508,8 +1508,62 @@ def ActionDefendPressed ():
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
-def MinimizePortraits():
+def MinimizePortraits(): #bg2
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
+
+def DisableAnimatedWindows (): #pst
+	global ActionsWindow, OptionsWindow
+	GemRB.SetVar ("PortraitWindow", -1)
+	ActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
+	GemRB.SetVar ("ActionsWindow", -1)
+	OptionsWindow = GUIClasses.GWindow( GemRB.GetVar ("OptionsWindow") )
+	GemRB.SetVar ("OptionsWindow", -1)
+	GemRB.GamePause (1,3)
+
+def EnableAnimatedWindows (): #pst
+	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
+	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
+	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
+	GemRB.GamePause (0,3)
+
+def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers
+	if Slot != None:
+		Item = GemRB.GetItem (Slot['ItemResRef'])
+		identified = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
+		#Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
+		#Button.SetSprites ('IVSLOT', 0,  0, 0, 0, 0)
+		Button.SetItemIcon (Slot['ItemResRef'],0)
+
+		if Item['MaxStackAmount'] > 1:
+			Button.SetText (str (Slot['Usages0']))
+		else:
+			Button.SetText ('')
+
+
+		if not identified or Item['ItemNameIdentified'] == -1:
+			Button.SetTooltip (Item['ItemName'])
+		else:
+			Button.SetTooltip (Item['ItemNameIdentified'])
+
+		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
+
+	else:
+		#Button.SetVarAssoc ("LeftIndex", -1)
+		Button.SetItemIcon ('')
+		Button.SetTooltip (4273)  # Ground Item
+		Button.SetText ('')
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow
@@ -1555,9 +1609,33 @@ def OpenWaitForDiscWindow ():
 	except:
 		DiscWindow.SetVisible (WINDOW_VISIBLE)
 
+def SetPSTGamedaysAndHourToken ():
+	currentTime = GemRB.GetGameTime()
+	hours = (currentTime % 7200) / 300
+	if hours < 12:
+		ampm = "AM"
+	else:
+		ampm = "PM"
+		hours -= 12
+	minutes = (currentTime % 300) / 60
+
+	GemRB.SetToken ('CLOCK_HOUR', str (hours))
+	GemRB.SetToken ('CLOCK_MINUTE', '%02d' %minutes)
+	GemRB.SetToken ('CLOCK_AMPM', ampm)
+
+def UpdateClock(): #used to update the pst clock tooltip
+	ActionsWindow = GemRB.LoadWindow(0)
+	Button = ActionsWindow.GetControl (0)
+	SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (GemRB.GetString(65027))
+	#this function does update the clock tip, but the core fails to display it
+
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
 
-def HideInterface():
+def HideInterface(): #todo:should really add to pst if possible
 	GemRB.GameSetScreenFlags (GS_HIDEGUI, OP_XOR)
 	return
+
+def ToggleAlwaysRun():
+	GemRB.GameControlToggleAlwaysRun()

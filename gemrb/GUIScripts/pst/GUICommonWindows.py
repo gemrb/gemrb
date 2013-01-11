@@ -1453,7 +1453,10 @@ def ActionDefendPressed ():
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
-def DisableAnimatedWindows ():
+def MinimizePortraits(): #bg2
+	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
+
+def DisableAnimatedWindows (): #pst
 	global ActionsWindow, OptionsWindow
 	GemRB.SetVar ("PortraitWindow", -1)
 	ActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
@@ -1462,13 +1465,13 @@ def DisableAnimatedWindows ():
 	GemRB.SetVar ("OptionsWindow", -1)
 	GemRB.GamePause (1,3)
 
-def EnableAnimatedWindows ():
+def EnableAnimatedWindows (): #pst
 	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
 	GemRB.GamePause (0,3)
 
-def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
+def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers
 	if Slot != None:
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 		identified = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
@@ -1509,7 +1512,6 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow
-	#print "OpenWaitForDiscWindow"
 
 	if DiscWindow:
 		GemRB.HideGUI ()
@@ -1539,7 +1541,6 @@ def OpenWaitForDiscWindow ():
 	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
 	label.SetText (text)
 	DisableAnimatedWindows ()
-
 	# 31483 - Please place PS:T disc number
 	# 31568 - Please place the PS:T DVD
 	# 31569 - in drive
@@ -1547,7 +1548,6 @@ def OpenWaitForDiscWindow ():
 	# 31571 - There is no disc in drive
 	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
 	# 49152 - To quit the game, press Alt-F4
-
 
 	try:
 		GemRB.UnhideGUI ()
@@ -1568,15 +1568,19 @@ def SetPSTGamedaysAndHourToken ():
 	GemRB.SetToken ('CLOCK_MINUTE', '%02d' %minutes)
 	GemRB.SetToken ('CLOCK_AMPM', ampm)
 
-def UpdateClock():
+def UpdateClock(): #used to update the pst clock tooltip
 	ActionsWindow = GemRB.LoadWindow(0)
 	Button = ActionsWindow.GetControl (0)
 	SetPSTGamedaysAndHourToken ()
 	Button.SetTooltip (GemRB.GetString(65027))
 	#this function does update the clock tip, but the core fails to display it
-	
+
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
+
+def HideInterface(): #todo:should really add to pst if possible
+	GemRB.GameSetScreenFlags (GS_HIDEGUI, OP_XOR)
+	return
 
 def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
