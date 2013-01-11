@@ -335,10 +335,10 @@ def OnSpellBookMemorizeSpell ():
 	
 	index = GemRB.GetVar ("SpellButton") - 100
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
-	if GemRB.MemorizeSpell (pc, type, level, index + SpellTopIndex):
+	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_24")
-		Button = Window.GetControl(index + 30) # FIXME: wrong button if the spell will be stacked
+		Button = Window.GetControl(index - SpellTopIndex + 30) # FIXME: wrong button if the spell will be stacked
 		Button.SetAnimation ("FLASH")
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 		Button = Window.GetControl(mem_cnt + 5)
