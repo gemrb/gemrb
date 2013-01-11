@@ -1101,6 +1101,7 @@ def EquipmentPressed ():
 
 ######################
 
+# NOTE: the following two features are only used in pst
 # which=INVENTORY|STATS|FMENU
 def GetActorPortrait (actor, which):
 	#return GemRB.GetPlayerPortrait( actor, which)
@@ -1140,6 +1141,60 @@ def UpdateAnimation ():
 		return
 	GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, value)
 	return
+
+# NOTE: the following 4 functions are only used in iwd2
+def GetActorRaceTitle (actor):
+	RaceID = GemRB.GetPlayerStat (actor, IE_SUBRACE)
+	if RaceID:
+		RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
+	else:
+		RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
+	row = CommonTables.Races.FindValue (3, RaceID )
+	RaceTitle = CommonTables.Races.GetValue (row, 2)
+	return RaceTitle
+
+# NOTE: this function is called with the primary classes
+def GetKitIndex (actor, ClassIndex):
+	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
+
+	KitIndex = -1
+	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassID = CommonTables.Classes.GetValue (ClassName, "ID")
+	# skip the primary classes
+	# start at the first original kit - in iwd2 both classes and kits are in the same table
+	KitOffset = CommonTables.Classes.FindValue ("CLASS", 7)
+	for ci in range (KitOffset, CommonTables.Classes.GetRowCount ()):
+		RowName = CommonTables.Classes.GetRowName (ci)
+		BaseClass = CommonTables.Classes.GetValue (RowName, "CLASS")
+		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (RowName, "ID"):
+			#FIXME: this will return the last kit only, check if proper multikit return values are needed
+			KitIndex = ci
+
+	if KitIndex == -1:
+		return 0
+
+	return KitIndex
+
+def GetActorClassTitle (actor, ClassIndex):
+	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+	if ClassTitle:
+		return ClassTitle
+
+	KitIndex = GetKitIndex (actor, ClassIndex)
+	if KitIndex == 0:
+		ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	else:
+		ClassName = CommonTables.Classes.GetRowName (KitIndex)
+	ClassTitle = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+
+	if ClassTitle == "*":
+		return 0
+	return ClassTitle
+
+# overriding the one in GUICommon, since we use a different table and animations
+def GetActorPaperDoll (actor):
+	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
+	return GemRB.GetAvatarsValue (actor, level)
 
 
 SelectionChangeHandler = None

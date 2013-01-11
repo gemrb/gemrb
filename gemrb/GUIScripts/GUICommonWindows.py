@@ -479,6 +479,7 @@ def SetupClockWindowControls (Window):
 
 	return
 
+##not used in pst - not sure any items have abilities, but it is worth making a note to find out
 def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
@@ -487,6 +488,7 @@ def SelectItemAbility():
 	GemRB.SetVar ("ActionLevel", 0)
 	return
 
+#in pst only nordom has bolts and they show on the same floatmenu as quickweapons, so needs work here
 def SelectQuiverSlot():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
@@ -499,6 +501,7 @@ def SelectQuiverSlot():
 	GemRB.SetVar ("ActionLevel", 0)
 	return
 
+#this doubles up as an ammo selector (not yet used in pst)
 def SetupItemAbilities(pc, slot):
 	slot_item = GemRB.GetSlotItem(pc, slot)
 	if not slot_item:
@@ -588,8 +591,22 @@ def SetupSkillSelection ():
 	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
 	return
 
+########################
+
+#None of the following functions are implemented yet for pst (or not fully)
+#some are needed (eg stealth, innates), but some may be redundant
+#however, it would still be nice to add them via game mods for replay value
+
+########################
+
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
+
+	if GUICommon.GameIsPST():
+		UpdateClock()
+		#This at least ensures the clock gets a relatively regular update
+		return
+
 
 	global CurrentWindow, OptionsWindow, PortraitWindow
 	global level, TopIndex
@@ -1078,6 +1095,53 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
+######################
+
+#End of features that need adding to pst
+
+######################
+
+# NOTE: the following two features are only used in pst
+# which=INVENTORY|STATS|FMENU
+def GetActorPortrait (actor, which):
+	#return GemRB.GetPlayerPortrait( actor, which)
+
+	# only the lowest byte is meaningful here (OneByteAnimID)
+	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID) & 255
+	row = "0x%02X" %anim_id
+
+	return CommonTables.Pdolls.GetValue (row, which)
+
+
+def UpdateAnimation ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	disguise = GemRB.GetGameVar ("APPEARANCE")
+	if disguise == 2: #dustman
+		animid = "DR"
+	elif disguise == 1: #zombie
+		animid = "ZO"
+	else:
+		slot = GemRB.GetEquippedQuickSlot (pc)
+		item = GemRB.GetSlotItem (pc, slot )
+		animid = ""
+		if item:
+			item = GemRB.GetItem(item["ItemResRef"])
+			if item:
+				animid = item["AnimationType"]
+
+	BioTable = GemRB.LoadTable ("BIOS")
+	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	AvatarName = BioTable.GetValue (Specific, "PC")
+	AnimTable = GemRB.LoadTable ("ANIMS")
+	if animid=="":
+		animid="*"
+	value = AnimTable.GetValue (animid, AvatarName)
+	if value<0:
+		return
+	GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, value)
+	return
+
 # NOTE: the following 4 functions are only used in iwd2
 def GetActorRaceTitle (actor):
 	RaceID = GemRB.GetPlayerStat (actor, IE_SUBRACE)
@@ -1504,7 +1568,7 @@ def ActionAttackPressed ():
 
 def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-
+#FIXME: there is currently no way to use this  in pst
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
