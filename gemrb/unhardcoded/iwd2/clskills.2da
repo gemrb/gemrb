@@ -3,7 +3,7 @@
                     HATERACE   CLERICSPELL MAGESPELL STARTXP BARDSKILL THIEFSKILL LAYHANDS TURNLEVEL  BOOKTYPE  CASTING
 UNUSED   *          *          *           *         0       *         *          *        0          0         *
 BARBARIAN           *          *           *         0       *         SKILLS     *        0          0         *
-BARD                *          *           MXSPLBRD  0       SKILLBRD  SKILLS     *        0          1         42
+BARD                *          *           MXSPLBRD  0       SKILLBRD  SKILLS     *        0          2         42
 CLERIC              *          MXSPLCLR    *         0       *         SKILLS     *        1          1         39
 DRUID               *          MXSPLDRD    *         0       *         SKILLS     *        0          5         39
 FIGHTER             *          *           *         0       *         SKILLS     *        0          0         *
