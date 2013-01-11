@@ -206,6 +206,7 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 
 		if (error) {
 			LogFTError(error);
+			Close();
 			return NULL;
 		}
 		/* With non-scalale fonts, Freetype2 likes to fill many of the
