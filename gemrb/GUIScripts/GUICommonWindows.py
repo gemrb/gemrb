@@ -1342,6 +1342,10 @@ def UpdatePortraitWindow ():
 	Inventory = GemRB.GetVar ("Inventory")
 
 	for portid in range (PARTY_SIZE):
+		if GUICommon.GameIsPST():
+			UpdateAnimatedPortrait(Window,portid)
+			continue
+
 		Button = Window.GetControl (portid)
 		pic = GemRB.GetPlayerPortrait (portid+1, 1)
 		if Inventory and pc != portid+1:
@@ -1416,6 +1420,73 @@ def UpdatePortraitWindow ():
 		else:
 			FlagLabel.SetText("")
 		Button.SetText(states)
+	return
+
+def UpdateAnimatedPortrait (Window,i):
+	"""Selects the correct portrait cycle depending on character state"""
+	#FIXME: Actually doesn't, and I can't see why. Same in master. Help?
+	#note: there are actually two portraits per chr, eg PPPANN, WMPANN
+	Button = Window.GetControl (i)
+	ButtonHP = Window.GetControl (6 + i)
+	pic = GemRB.GetPlayerPortrait (i+1, 0)
+	if not pic:
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		return
+		#sel = GemRB.GameGetSelectedPCSingle () == i + 1
+	Button.SetBAM (pic, 0, 0, -1)
+	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
+	hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
+	hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+	if state & STATE_DEAD:
+			cycle = 9
+	elif state & STATE_HELPLESS:
+			cycle = 8
+	elif state & STATE_PETRIFIED:
+			cycle = 7
+	elif state & STATE_PANIC:
+			cycle = 6
+	elif state & STATE_POISONED:
+			cycle = 2
+	elif hp<hp_max/2:
+		cycle = 4
+	else:
+		cycle = 0
+	if cycle<6:
+		Button.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_PLAYRANDOM|IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
+	else:
+		Button.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
+
+	Button.SetAnimation (pic, cycle)
+	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
+
+	if hp_max<1:
+		ratio = 0.0
+	else:
+		ratio = (hp + 0.0) / hp_max
+		if ratio > 1.0: ratio = 1.0
+
+	r = int (255 * (1.0 - ratio))
+	g = int (255 * ratio)
+
+	ButtonHP.SetText ("%d / %d" %(hp, hp_max))
+	ButtonHP.SetTextColor (r, g, 0, False)
+	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
+	ButtonHP.SetPictureClipping (ratio)
+
+	#print "PORTRAIT DEBUG:"
+	#print "state: " + str(state) + " hp: " + str(hp) + " hp_max: " + str(hp_max) + "ratio: " + str(ratio) + " cycle: " + str(cycle) + " state: " + str(state)
+
+	if portrait_hp_numeric[i-1]:
+		op = OP_NAND
+	else:
+		op = OP_OR
+	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
+
+	#if sel:
+	#	Button.EnableBorder(FRAME_PC_SELECTED, 1)
+	#else:
+	#	Button.EnableBorder(FRAME_PC_SELECTED, 0)
 	return
 
 def PortraitButtonOnDrag ():
