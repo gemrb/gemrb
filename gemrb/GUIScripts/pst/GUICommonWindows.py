@@ -1231,17 +1231,91 @@ def RunSelectionChangeHandler ():
 		SelectionChangeHandler ()
 	return
 
+#NOTE: this is for pst's hp buttons, but it could be optionally exported to other games
 portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 
-
-def OpenPortraitWindow (needcontrols):
+def OpenPortraitWindow (needcontrols=0):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindow (1)
+	#take care, this window is different in how/iwd
+	if GUICommon.HasHOW() and needcontrols:
+		PortraitWindow = Window = GemRB.LoadWindow (26)
+	else:
+		PortraitWindow = Window = GemRB.LoadWindow (1)
+
+	if needcontrols and not GUICommon.GameIsPST(): #not in pst
+		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
+		# 1280 and higher don't have this control
+		if Window.HasControl (8):
+			Button=Window.GetControl (8)
+			if GUICommon.GameIsIWD():
+				# Rest (iwd)
+				Button.SetTooltip (11942)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+			else:
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
+		else:
+			if GUICommon.HasHOW():
+				# Rest (how)
+				pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
+				Window.CreateButton (8, 6, pos, 55, 37)
+				Button = Window.GetControl (8)
+				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
+				Button.SetTooltip (11942)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+
+				pos = pos - 37
+				Window.CreateButton (6, 6, pos, 27, 36)
+
+		# AI
+		Button = Window.GetControl (6)
+		#fixing a gui bug, and while we are at it, hacking it to be easier
+		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
+		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
+
+		GemRB.SetVar ("AI", GSFlags)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
+		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		Button.SetVarAssoc ("AI", GS_PARTYAI)
+		if GSFlags:
+			Button.SetTooltip (15917)
+		else:
+			Button.SetTooltip (15918)
+
+		#Select All
+		if GUICommon.HasHOW():
+			Window.CreateButton (7, 33, pos, 27, 36)
+			Button = Window.GetControl (7)
+			Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
+		else:
+			Button = Window.GetControl (7)
+		Button.SetTooltip (10485)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+	else:
+		# Rest
+		if Window.HasControl(6) and not GUICommon.GameIsIWD2():
+			Button = Window.GetControl (6)
+			Button.SetTooltip (11942)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		Button.SetVarAssoc ('PressedPortrait', i+1)
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+			Button.SetFont ("STATES")
+			# label for status flags (dialog, store, level up)
+			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
+		elif not GUICommon.GameIsPST():
+			Button.SetFont ("STATES2")
+			# label for status flags (dialog, store, level up)
+			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
+
+		Button.SetVarAssoc ("PressedPortrait", i+1)
+
+		if needcontrols or GUICommon.GameIsIWD2():
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
+		else:
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, PortraitButtonOnPress)
+
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDropItemToPC)
@@ -1250,14 +1324,28 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
 
-		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
-		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+		if GUICommon.GameIsIWD1():
+			# overlay a label, so we can display the hp with the correct font. Regular button label
+			#   is used by effect icons
+			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT)
+			HPLabel = Window.GetControl (100+i)
+			HPLabel.SetUseRGB (True)
 
-		ButtonHP = Window.GetControl (6 + i)
-		ButtonHP.SetVarAssoc ('PressedPortraitHP', i+1)
-		ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
-
-		portrait_hp_numeric[i] = 0
+		# unlike other buttons, this one lacks extra frames for a selection effect
+		# so we create it and shift it to cover the grooves of the image
+		# except iwd2's second frame already has it incorporated (but we miscolor it)
+		if GUICommon.GameIsIWD2():
+			Button.SetBorder (FRAME_PC_SELECTED, 0, 0, 0, 0, 0, 255, 0, 255)
+			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
+		elif GUICommon.GameIsPST():
+			Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
+			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+			ButtonHP = Window.GetControl (6 + i)
+			ButtonHP.SetVarAssoc ('PressedPortraitHP', i+1)
+			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
+		else:
+			Button.SetBorder (FRAME_PC_SELECTED, 4, 3, 4, 3, 0, 255, 0, 255)
+			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
 
 	UpdatePortraitWindow ()
 	SelectionChanged ()
@@ -1407,7 +1495,7 @@ def UpdateAnimatedPortrait (Window,i):
 	#print "PORTRAIT DEBUG:"
 	#print "state: " + str(state) + " hp: " + str(hp) + " hp_max: " + str(hp_max) + "ratio: " + str(ratio) + " cycle: " + str(cycle) + " state: " + str(state)
 
-	if portrait_hp_numeric[i-1]:
+	if portrait_hp_numeric[i]:
 		op = OP_NAND
 	else:
 		op = OP_OR
@@ -1467,7 +1555,7 @@ def PortraitButtonOnShiftPress ():
 		RunSelectionChangeHandler ()
 	return
 
-def PortraitButtonHPOnPress ():
+def PortraitButtonHPOnPress (): ##pst hitpoint display
 	Window = PortraitWindow
 
 	i = GemRB.GetVar ('PressedPortraitHP')
@@ -1530,9 +1618,10 @@ def PortraitButtonOnMouseEnter ():
 	if GemRB.IsDraggingItem()==2:
 		if DraggedPortrait != None:
 			GemRB.SwapPCs (DraggedPortrait, i)
-			#GemRB.SetVar ("PressedPortrait", DraggedPortrait)
-			#possibly review why the other games do that ^^
-			#it completely breaks the dragging in PST
+			if not GUICommon.GameIsPST():
+				GemRB.SetVar ("PressedPortrait", DraggedPortrait)
+				#possibly review why the other games do that ^^
+				#it completely breaks the dragging in PST
 			DraggedPortrait = i
 			GemRB.SetTimedEvent (CheckDragging, 1)
 		else:

@@ -35,6 +35,13 @@ InventoryWindow = None
 ItemAmountWindow = None
 OverSlot = None
 
+def OpenInventoryWindowClick ():
+	tmp = GemRB.GetVar ("PressedPortrait")
+	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
+	OpenInventoryWindow ()
+	return
+
+
 ItemHash = {}
 
 # Control ID's:
