@@ -293,6 +293,7 @@ def OptionsPress ():
 		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_NAND)
 	else:
 		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_OR)
+	return
 
 def OnLockViewPress ():
 	Button = OptionsWindow.GetControl (0)
@@ -302,14 +303,25 @@ def OnLockViewPress ():
 	if OnLockViewPress.counter % 2:
 		# unlock
 		Button.SetTooltip (41648)
+		Button.SetState(IE_GUI_BUTTON_SELECTED)#dont ask
 	else:
 		# lock
 		Button.SetTooltip (41647)
+		Button.SetState(IE_GUI_BUTTON_NORMAL)
 	OnLockViewPress.counter += 1
 
 	return
 
 OnLockViewPress.counter = 1
+
+def PortraitPress (): #not used in pst. TODO:make an enhancement option?
+	"""Toggles the portraits pane """
+	PP = GemRB.GetMessageWindowSize () & GS_PORTRAITPANE
+	if PP:
+		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_NAND)
+	else:
+		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_OR)
+	return
 
 def AIPress (toggle=1):
 	"""Toggles the party AI or refreshes the button state if toggle = 0"""
@@ -337,8 +349,78 @@ def AIPress (toggle=1):
 	Button.SetVarAssoc ("AI", GS_PARTYAI)
 	return
 
-def TxtePress ():
-	print "TxtePress"
+## The following four functions are for the action bar
+## they are currently unused in pst
+def EmptyControls ():
+	if GUICommon.GameIsPST():
+		return
+	Selected = GemRB.GetSelectedSize()
+	if Selected==1:
+		pc = GemRB.GameGetFirstSelectedActor ()
+		#init spell list
+		GemRB.SpellCast (pc, -1, 0)
+
+	GemRB.SetVar ("ActionLevel", 0)
+	for i in range (12):
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetPicture ("")
+		Button.SetText ("")
+		Button.SetActionIcon (globals(), -1)
+	return
+
+def SelectFormationPreset ():
+	"""Choose the default formation."""
+	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
+	GroupControls ()
+	return
+
+def SetupFormation ():
+	"""Opens the formation selection section."""
+	for i in range (12):
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
+		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+		Button.SetBAM ("FORM%x"%i,0,0,-1)
+		Button.SetVarAssoc ("Value", i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormationPreset)
+		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
+	return
+
+def GroupControls ():
+	"""Sections that control group actions."""
+	GemRB.SetVar ("ActionLevel", 0)
+	Button = CurrentWindow.GetControl (ActionBarControlOffset)
+	if GUICommon.GameIsBG2():
+		Button.SetActionIcon (globals(), 7) #talk icon
+	else:
+		Button.SetActionIcon (globals(), 14)#guard icon
+	Button = CurrentWindow.GetControl (1+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), 15)
+	Button = CurrentWindow.GetControl (2+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), 21)
+	Button = CurrentWindow.GetControl (3+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), -1)
+	Button = CurrentWindow.GetControl (4+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), -1)
+	Button = CurrentWindow.GetControl (5+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), -1)
+	Button = CurrentWindow.GetControl (6+ActionBarControlOffset)
+	Button.SetActionIcon (globals(), -1)
+	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
+	for i in range (5):
+		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		idx = GemRB.GameGetFormation (i)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
+		# kill the previous sprites or they show through
+		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+		Button.SetBAM ("FORM%x"%idx,0,0,-1)
+		Button.SetVarAssoc ("Formation", i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
+		Button.SetTooltip (4935, 8+i)
+	return
 
 def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
 	global ActionsWindow
@@ -857,10 +939,6 @@ def UpdateClock():
 def UpdateActionsWindow():
 	UpdateClock()
 	#This at least ensures the clock gets a relatively regular update
-	return
-
-#this is an unused callback in PST
-def EmptyControls ():
 	return
 
 def CheckLevelUp(pc):

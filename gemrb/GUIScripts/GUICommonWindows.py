@@ -295,7 +295,26 @@ def OptionsPress ():
 		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_OR)
 	return
 
-def PortraitPress ():
+def OnLockViewPress ():
+	Button = OptionsWindow.GetControl (0)
+	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_XOR)
+
+	# no way to get the screen flags
+	if OnLockViewPress.counter % 2:
+		# unlock
+		Button.SetTooltip (41648)
+		Button.SetState(IE_GUI_BUTTON_SELECTED)#dont ask
+	else:
+		# lock
+		Button.SetTooltip (41647)
+		Button.SetState(IE_GUI_BUTTON_NORMAL)
+	OnLockViewPress.counter += 1
+
+	return
+
+OnLockViewPress.counter = 1
+
+def PortraitPress (): #not used in pst. TODO:make an enhancement option?
 	"""Toggles the portraits pane """
 	PP = GemRB.GetMessageWindowSize () & GS_PORTRAITPANE
 	if PP:
@@ -330,7 +349,11 @@ def AIPress (toggle=1):
 	Button.SetVarAssoc ("AI", GS_PARTYAI)
 	return
 
+## The following four functions are for the action bar
+## they are currently unused in pst
 def EmptyControls ():
+	if GUICommon.GameIsPST():
+		return
 	Selected = GemRB.GetSelectedSize()
 	if Selected==1:
 		pc = GemRB.GameGetFirstSelectedActor ()
