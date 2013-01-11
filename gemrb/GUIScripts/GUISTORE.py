@@ -945,6 +945,7 @@ def RedrawStoreIdentifyWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+			Button.SetText ("")
 			Label.SetText ("")
 
 	Button = Window.GetControl (5)
