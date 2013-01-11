@@ -297,7 +297,6 @@ def OpenSpellBookSpellInfoWindow ():
 		return
 
 	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("FloatWindow", SpellBookSpellInfoWindow.ID)
 
 	#back
 	Button = Window.GetControl (5)
@@ -354,12 +353,9 @@ def OpenSpellBookSpellRemoveWindow ():
 		if SpellBookSpellUnmemorizeWindow:
 			SpellBookSpellUnmemorizeWindow.Unload ()
 		SpellBookSpellUnmemorizeWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-
 		return
 
 	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", SpellBookSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
