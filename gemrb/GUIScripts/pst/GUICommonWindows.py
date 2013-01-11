@@ -146,7 +146,8 @@ def SetupMenuWindowControls (Window, Gears=None, ReturnToGame=None):
 		Button = InitOptionButton(Window, 'Follow', OnLockViewPress)  # or 41648 Unlock ...
 		# AI
 		Button = InitOptionButton(Window, 'AI', AIPress)
-		AIPress(toggle=0)
+		AIPress(0) #this initialises the state and tooltip
+
 		# Message popup FIXME disable on non game screen...
 		Button = InitOptionButton(Window,'Expand')# or 41661 Close ...
 
@@ -311,18 +312,30 @@ def OnLockViewPress ():
 OnLockViewPress.counter = 1
 
 def AIPress (toggle=1):
-	Button = OptionsWindow.GetControl (4)
+	"""Toggles the party AI or refreshes the button state if toggle = 0"""
 
+	if GUICommon.GameIsPST():
+		Button = OptionsWindow.GetControl (OptionControl['AI'])
+	else:
+		Button = PortraitWindow.GetControl (OptionControl['AI'])
+
+	print "AIPress: GS_PARTYAI was:", GemRB.GetMessageWindowSize () & GS_PARTYAI, "at toggle:", toggle
 	if toggle:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_XOR)
-	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
+	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 	if AI:
-		# disactivate
-		Button.SetTooltip (41631)
+		GemRB.SetVar ("AI", 0)
+		Button.SetTooltip (AITip['Deactivate'])
+		Button.SetState(IE_GUI_BUTTON_SELECTED)
 	else:
-		# activate
-		Button.SetTooltip (41646)
+		GemRB.SetVar ("AI", GS_PARTYAI)
+		Button.SetTooltip (AITip['Enable'])
+		Button.SetState(IE_GUI_BUTTON_NORMAL)
+
+	#force redrawing, in case a hotkey triggered this function
+	Button.SetVarAssoc ("AI", GS_PARTYAI)
+	return
 
 def TxtePress ():
 	print "TxtePress"
