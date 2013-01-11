@@ -163,13 +163,12 @@ void TTFFontManager::Close()
 	font = TTF_Font();
 }
 
-Font* TTFFontManager::GetFont(ieWord FirstChar,
-							  ieWord LastChar,
+Font* TTFFontManager::GetFont(ieWord /*FirstChar*/,
+							  ieWord /*LastChar*/,
 							  unsigned short ptSize,
 							  FontStyle style, Palette* pal)
 {
 	Log(MESSAGE, "TTF", "Constructing TTF font.");
-	Log(MESSAGE, "TTF", "Creating font of size %i with %i characters...", ptSize, LastChar - FirstChar);
 
 	/* Make sure that our font face is scalable (global metrics) */
 	FT_Face face = font.face;
@@ -249,25 +248,53 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		pal->CreateShadedAlphaChannel();
 	}
 
-	Sprite2D** glyphs = (Sprite2D**)malloc((LastChar - FirstChar + 1) * sizeof(Sprite2D*));
-
-	// use ieWord for double byte character suport
-	ieWord index, ch;
+	FT_UInt index, spriteIndex;
+	FT_ULong firstChar = FT_Get_First_Char(face, &index);
+	FT_ULong curCharcode = firstChar;
+	FT_ULong prevCharCode = 0;
 
 	FT_GlyphSlot glyph;
 	FT_Glyph_Metrics* metrics;
 
+	FT_UInt glyphCount = 1;
+	do {
+		if (curCharcode > prevCharCode)
+			glyphCount += (curCharcode - prevCharCode);
+		prevCharCode = curCharcode;
+		curCharcode = FT_Get_Next_Char(face, curCharcode, &index);
+	} while ( index != 0 );
+
+	glyphCount -= firstChar;
+	assert(glyphCount);
+
+	// FIXME: this is incredibly wasteful! it results in a mostly empty array
+	// when using encodings that go beyond extended ascii
+	
+	// TODO: options for fixing:
+	//	1. modify font class to take entire block sturctures with offset, size, glyphs
+	//	2. ?
+
+	Sprite2D** glyphs = (Sprite2D**)calloc(glyphCount, sizeof(Sprite2D*));
+	//malloc(glyphCount * sizeof(Sprite2D*));
+
+	firstChar = FT_Get_First_Char(face, &index);
+	curCharcode = firstChar;
+	
+#define NEXT_LOOP_CHAR(FACE, CODE, INDEX) \
+	curCharcode = FT_Get_Next_Char(FACE, CODE, &INDEX); \
+	continue;
+	
 	int maxx, yoffset;
-	for (ch = FirstChar; ch <= LastChar; ch++) {
-		/* Load the glyph */
-		index = FT_Get_Char_Index( face, ch );
+	while ( index != 0 ) {
+		spriteIndex = curCharcode - firstChar;
+		assert(spriteIndex < glyphCount);
+
 		// maybe one day we will subclass Font such that we can be more dynamic and support kerning.
 		// until then the only options we should pass are default and monochrome.
 		error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
 		if( error ) {
 			LogFTError(error);
-			glyphs[ch - FirstChar] = NULL;
-			continue;
+			NEXT_LOOP_CHAR(face, curCharcode, index);
 		}
 
 		glyph = face->glyph;
@@ -310,8 +337,7 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		error = FT_Render_Glyph( glyph, ft_render_mode_normal );
 		if( error ) {
 			LogFTError(error);
-			glyphs[ch - FirstChar] = NULL;
-			continue;
+			NEXT_LOOP_CHAR(face, curCharcode, index);
 		}
 
 		bitmap = &glyph->bitmap;
@@ -326,8 +352,7 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 		}
 
 		if (sprWidth == 0 || sprHeight == 0) {
-			glyphs[ch - FirstChar] = NULL;
-			continue;
+			NEXT_LOOP_CHAR(face, curCharcode, index);
 		}
 
 		// we need 1px empty space on each side
@@ -354,11 +379,15 @@ Font* TTFFontManager::GetFont(ieWord FirstChar,
 
 		// TODO: do an underline if requested
 
-		glyphs[ch - FirstChar] = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, 8, pixels, pal->col, true, 0);
+		glyphs[spriteIndex] = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, 8, pixels, pal->col, true, 0);
 		// for some reason BAM fonts are all based of a YPos of 13
-		glyphs[ch - FirstChar]->YPos = 13 - yoffset;
+		glyphs[spriteIndex]->YPos = 13 - yoffset;
+
+		curCharcode = FT_Get_Next_Char(face, curCharcode, &index);
 	}
-	Font* font = new Font(glyphs, FirstChar, LastChar, pal);
+#undef NEXT_LOOP_CHAR
+	
+	Font* font = new Font(glyphs, firstChar, firstChar + glyphCount, pal);
 	font->ptSize = ptSize;
 	font->style = style;
 	return font;
