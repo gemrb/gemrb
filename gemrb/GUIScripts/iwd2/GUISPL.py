@@ -175,6 +175,7 @@ def UpdateSpellBookWindow ():
 	type = SelectedBook
 	level = SpellBookSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
+	sorcerer_style = (type == IE_IWD2_SPELL_BARD) or (type == IE_IWD2_SPELL_SORCEROR)
 
 	Name = GemRB.GetPlayerName (pc, 0)
 	Label = Window.GetControl (0xfffffff)
@@ -186,11 +187,13 @@ def UpdateSpellBookWindow ():
 
 	Spells = Spellbook.GetMemorizedSpells (pc, type, level)
 	mem_cnt = len (Spells)
+	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
 	for i in range (24):
 		Button = Window.GetControl (6 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Label = Window.GetControl (0x1000003f+i)
-		if i < mem_cnt:
+		# actually, it doesn't display any memorized spells for sorcerer-style spellbooks
+		if i < mem_cnt and not sorcerer_style:
 			ms = Spells[i]
 			spell = ms['SpellResRef']
 			Button.SetSpellIcon (spell)
@@ -225,7 +228,8 @@ def UpdateSpellBookWindow ():
 			ks = Spells[i+SpellTopIndex]
 			spell = ks['SpellResRef']
 			Button.SetSpellIcon (spell)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookMemorizeSpell)
+			if not sorcerer_style:
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookMemorizeSpell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenSpellBookSpellInfoWindow)
 			Label.SetText (ks['SpellName'])
 			Button.SetVarAssoc ("SpellButton", 100 + i + SpellTopIndex)
@@ -238,9 +242,10 @@ def UpdateSpellBookWindow ():
 
 	# number of available spell slots
 	# sorcerer-style books are different, since max_mem_cnt holds the total level capacity, not the slot count
+	# and they display just the current and total number of memorizazions per level
 	Label = Window.GetControl (0x10000004)
-	if GemRB.GetPlayerStat (pc, IE_LEVELSORCEROR) or GemRB.GetPlayerStat (pc, IE_LEVELBARD):
-		Label.SetText (str(0)) # known_cnt-mem_cnt, but it is always 0
+	if sorcerer_style:
+		Label.SetText (str(true_mem_cnt)+"/"+str(max_mem_cnt))
 	else:
 		Label.SetText (str(max_mem_cnt-mem_cnt))
 
