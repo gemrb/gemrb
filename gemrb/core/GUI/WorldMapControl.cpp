@@ -249,10 +249,12 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 
 			Sprite2D *icon=ae->GetMapIcon(worldmap->bam);
-			int h=0,w=0;
+			int h=0, w=0, iconx=0, icony=0;
 			if (icon) {
 				h=icon->Height;
 				w=icon->Width;
+				iconx = icon->XPos;
+				icony = icon->YPos;
 				core->GetVideoDriver()->FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
@@ -263,10 +265,10 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				if(w<tw)
 					w=tw;
 			}
-			if (ae->X > x) continue;
-			if (ae->X + w < x) continue;
-			if (ae->Y > y) continue;
-			if (ae->Y + h < y) continue;
+			if (ae->X - iconx > x) continue;
+			if (ae->X - iconx + w < x) continue;
+			if (ae->Y - icony > y) continue;
+			if (ae->Y - icony + h < y) continue;
 			lastCursor = IE_CURSOR_NORMAL;
 			Area=ae;
 			if(oldArea!=ae) {
