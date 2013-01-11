@@ -479,6 +479,118 @@ def SetupClockWindowControls (Window):
 
 	return
 
+##not used in pst - not sure any items have abilities, but it is worth making a note to find out
+def SelectItemAbility():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	slot = GemRB.GetVar ("Slot")
+	ability = GemRB.GetVar ("Ability")
+	GemRB.SetupQuickSlot (pc, 0, slot, ability)
+	GemRB.SetVar ("ActionLevel", 0)
+	return
+
+#in pst only nordom has bolts and they show on the same floatmenu as quickweapons, so needs work here
+def SelectQuiverSlot():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	slot = GemRB.GetVar ("Slot")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	# HACK: implement SetEquippedAmmunition instead?
+	if not GemRB.IsDraggingItem ():
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, slot, item["ItemIcon"]) #, 0, 0)
+		GemRB.DropDraggedItem (pc, slot)
+	GemRB.SetVar ("ActionLevel", 0)
+	return
+
+#this doubles up as an ammo selector (not yet used in pst)
+def SetupItemAbilities(pc, slot):
+	slot_item = GemRB.GetSlotItem(pc, slot)
+	if not slot_item:
+		# CHIV: Could configure empty quickslots from the game screen ala spells heres
+		return
+
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	Tips = item["Tooltips"]
+
+	# clear buttons here
+	EmptyControls()
+
+	# check A: whether ranged weapon and B: whether to bother at all
+	ammotype = 0
+	if item["Type"] == CommonTables.ItemType.GetRowIndex ("BOW"):
+		ammotype = CommonTables.ItemType.GetRowIndex ("ARROW")
+	elif item["Type"] == CommonTables.ItemType.GetRowIndex ("XBOW"):
+		ammotype = CommonTables.ItemType.GetRowIndex ("BOLT")
+	elif item["Type"] == CommonTables.ItemType.GetRowIndex ("SLING"):
+		ammotype = CommonTables.ItemType.GetRowIndex ("BULLET")
+
+	# FIXME: ammo does not preclude the item from also having abilities (eg. bg2:bow19)
+	ammoSlotCount = 0
+	if ammotype:
+		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
+		currentammo = GemRB.GetEquippedAmmunition (pc)
+		for i in range (12):
+			Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+			if i < len(ammoslots):
+				ammoslot = GemRB.GetSlotItem (pc, ammoslots[i])
+				st = GemRB.GetSlotType (ammoslots[i])
+				ammoitem = GemRB.GetItem (ammoslot['ItemResRef']) # needed to show the ammo count
+				Tips = ammoitem["Tooltips"]
+				# if this item is valid ammo and was really found in a quiver slot
+				if ammoitem['Type'] == ammotype and st["Type"] == SLOT_QUIVER:
+					ammoSlotCount += 1
+					Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
+					Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+					Button.SetItemIcon (ammoslot['ItemResRef'])
+					Button.SetText (str(ammoslot["Usages0"]))
+					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
+					Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectQuiverSlot)
+					Button.SetVarAssoc ("Slot", ammoslots[i])
+					Button.SetTooltip ("%s" % (GemRB.GetString (Tips[0])))
+					print currentammo, i+1, ammoslots[i]
+					if currentammo == ammoslots[i]: # this check is ok, but the results are unreliable?!
+						Button.SetState (IE_GUI_BUTTON_SELECTED)
+
+	# skip when there is only one choice
+	if ammoSlotCount == 1:
+		ammoSlotCount = 0
+
+	# reset back to the main action bar if there are no extra headers or quivers
+	reset = not ammoSlotCount
+	# check for item abilities and skip the first that crops up (main header - nothing special)
+	if (len(Tips) > 1):
+		reset = False
+		rmax = min(len(Tips) - 1, 12-ammoSlotCount)
+		for i in range (rmax):
+			Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
+			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
+			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
+			Button.SetText ("")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectItemAbility)
+			Button.SetVarAssoc ("Ability", i)
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i])) )
+
+	if reset:
+		GemRB.SetVar ("ActionLevel", 0)
+		UpdateActionsWindow ()
+	return
+
+ #only in iwd2? could be exported...
+def SetupBookSelection ():
+	for i in range (12):
+		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
+		Button.SetActionIcon (globals(), 50+i)
+	return
+
+#you can change this for custom skills, this is the original engine
+skillbar=(ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, 100, 100, 100, 100, 100, 100, 100)
+def SetupSkillSelection ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
+	return
+
 
 # which=INVENTORY|STATS|FMENU
 def GetActorPortrait (actor, which):

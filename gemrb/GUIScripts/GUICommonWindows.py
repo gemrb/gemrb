@@ -574,6 +574,7 @@ def SetupItemAbilities(pc, slot):
 		UpdateActionsWindow ()
 	return
 
+ #only in iwd2? could be exported...
 def SetupBookSelection ():
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
