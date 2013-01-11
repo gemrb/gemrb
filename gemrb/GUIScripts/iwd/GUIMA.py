@@ -208,7 +208,7 @@ def MoveToNewArea ():
 	tmp = WorldMapControl.GetDestinationArea (1)
 	CloseWorldMapWindow ()
 	
-	if (tmp["CurrentArea"] == 0:
+	if tmp["CurrentArea"] == 0:
 		GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
 		# distance is stored in hours, but the action needs seconds
 		GemRB.ExecuteString ("AdvanceTime(%d)"%(tmp["Distance"]*300))
