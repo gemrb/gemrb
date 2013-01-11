@@ -2837,13 +2837,22 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	PyObject* dict = PyDict_New();
 	//the area the user clicked on
 	PyDict_SetItemString(dict, "Target", PyString_FromString (wmc->Area->AreaName) );
+	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
+
+	if (!strnicmp(wmc->Area->AreaName, core->GetGame()->CurrentArea, 8)) {
+		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
+		PyDict_SetItemString(dict, "CurrentArea", PyInt_FromLong (1) );
+		return dict;
+	} else {
+		PyDict_SetItemString(dict, "CurrentArea", PyInt_FromLong (0) );
+	}
+
 	bool encounter;
 	WMPAreaLink *wal = wm->GetEncounterLink(wmc->Area->AreaName, encounter);
 	if (!wal) {
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
 		return dict;
 	}
-	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
 	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
 	//evaluate the area the user will fall on in a random encounter

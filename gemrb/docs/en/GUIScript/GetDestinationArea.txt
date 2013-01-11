@@ -15,7 +15,6 @@ Target      - The target area selected by the player
 Distance    - The traveling distance, if it is negative, the way is blocked
 Destination - The area resource reference where the player arrives (if there was a random encounter, it differs from Target)
 Entrance    - The area entrance in the Destination area, it could be empty, in this casethe player should appear in middle of the area
+CurrentArea - 0 or 1, depending on whether the target area is the current area
 
 See also: CreateWorldMapControl, CreateMovement, accessing_gui_controls
-
-MD5: b19700ed972c915b0910b40a746a87ee

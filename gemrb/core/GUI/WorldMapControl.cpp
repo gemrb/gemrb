@@ -252,9 +252,6 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			if ( (ae->GetAreaStatus() & WMP_ENTRY_WALKABLE)!=WMP_ENTRY_WALKABLE) {
 				continue; //invisible or inaccessible
 			}
-			if (!strnicmp(ae->AreaResRef, currentArea, 8) ) {
-				continue; //current area
-			}
 
 			Sprite2D *icon=ae->GetMapIcon(worldmap->bam);
 			int h=0, w=0, iconx=0, icony=0;

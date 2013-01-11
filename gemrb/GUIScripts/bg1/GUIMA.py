@@ -201,11 +201,14 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = WorldMapControl.GetDestinationArea (1)
-	if tmp["Distance"]==-1:
+	CloseWorldMapWindow ()
+
+	if tmp["CurrentArea"] == 1:
+		return
+	elif tmp["Distance"] == -1:
 		print "Invalid target", tmp
 		return
 
-	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
 	# distance is stored in hours, but the action needs seconds
 	GemRB.ExecuteString ("AdvanceTime(%d)"%(tmp["Distance"]*300))
@@ -216,7 +219,7 @@ def ChangeTooltip ():
 
 	tt = ""
 	area = WorldMapControl.GetDestinationArea ()
-	if (area):
+	if area and area["Distance"] >= 0:
 		str = GemRB.GetString(23084)
 		if (str):
 			tt = "%s: %d"%(str,area["Distance"])
