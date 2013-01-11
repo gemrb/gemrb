@@ -1143,7 +1143,7 @@ def UpdateAnimation ():
 
 
 SelectionChangeHandler = None
-SelectionChangeMultiHandler = None
+SelectionChangeMultiHandler = None ##relates to floatmenu
 
 def SetSelectionChangeHandler (handler):
 	"""Updates the selection handler."""
@@ -1153,8 +1153,8 @@ def SetSelectionChangeHandler (handler):
 	# Switching from walking to non-walking environment:
 	# set the first selected PC in walking env as a selected
 	# in nonwalking env
-	#if (not SelectionChangeHandler) and handler and (not GUICommon.NextWindowFn):
-	if (not SelectionChangeHandler) and handler:
+	#if (not SelectionChangeHandler) and handler:
+	if (not SelectionChangeHandler) and handler and (not GUICommon.NextWindowFn):
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
 			sel = 1
@@ -1164,6 +1164,7 @@ def SetSelectionChangeHandler (handler):
 
 	# redraw selection on change main selection | single selection
 	SelectionChanged ()
+	return
 
 def SetSelectionChangeMultiHandler (handler):
 	global SelectionChangeMultiHandler
@@ -1173,6 +1174,7 @@ def SetSelectionChangeMultiHandler (handler):
 def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
+	return
 
 portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 
@@ -1343,10 +1345,18 @@ def PortraitButtonHPOnPress ():
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 	return
 
-# Run by Game class when selection was changed
 def SelectionChanged ():
+	"""Ran by the Game class when a PC selection is changed."""
+
+	global PortraitWindow
+
+	if not PortraitWindow:
+		return
+
 	# FIXME: hack. If defined, display single selection
+	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
+		UpdateActionsWindow ()
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
 			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
@@ -1355,11 +1365,19 @@ def SelectionChanged ():
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
 
+		#update mage school
+		GemRB.SetVar ("MAGESCHOOL", 0)
+		Kit = GUICommon.GetKitIndex (sel)
+		if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
+			MageTable = GemRB.LoadTable ("magesch")
+			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
+
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
+
 	return
 
 def PortraitButtonOnMouseEnter ():

@@ -1134,6 +1134,7 @@ def GetActorPaperDoll (actor):
 
 
 SelectionChangeHandler = None
+SelectionChangeMultiHandler = None ##relates to floatmenu
 
 def SetSelectionChangeHandler (handler):
 	"""Updates the selection handler."""
@@ -1155,6 +1156,11 @@ def SetSelectionChangeHandler (handler):
 	# redraw selection on change main selection | single selection
 	SelectionChanged ()
 	return
+
+def SetSelectionChangeMultiHandler (handler):
+	global SelectionChangeMultiHandler
+	SelectionChangeMultiHandler = handler
+	#SelectionChanged ()
 
 def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
@@ -1404,12 +1410,15 @@ def SelectionChanged ():
 	if not PortraitWindow:
 		return
 
+	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
 			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
+		if SelectionChangeMultiHandler:
+			SelectionChangeMultiHandler ()
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
 
