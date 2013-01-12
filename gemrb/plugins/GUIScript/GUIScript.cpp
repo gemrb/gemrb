@@ -8337,6 +8337,24 @@ static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetMaxEncumbrance__doc,
+"GetMaxEncumbrance(pc) => int\n\n"
+"Returns the maximum weight the PC may carry before becoming encumbered.");
+
+static PyObject* GemRB_GetMaxEncumbrance(PyObject * /*self*/, PyObject* args)
+{
+	int globalID;
+
+	if (!PyArg_ParseTuple( args, "i", &globalID )) {
+		return AttributeError( GemRB_GetMaxEncumbrance__doc );
+	}
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	return PyInt_FromLong( actor->GetMaxEncumbrance() );
+}
+
 PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
 "GetAbilityBonus(stat, column, value[, ex])\n\n"
 "Returns an ability bonus value based on various .2da files.");
@@ -10511,6 +10529,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetJournalSize, METH_VARARGS),
 	METHOD(GetKnownSpell, METH_VARARGS),
 	METHOD(GetKnownSpellsCount, METH_VARARGS),
+	METHOD(GetMaxEncumbrance, METH_VARARGS),
 	METHOD(GetMazeEntry, METH_VARARGS),
 	METHOD(GetMazeHeader, METH_NOARGS),
 	METHOD(GetMemorizableSpellsCount, METH_VARARGS),
