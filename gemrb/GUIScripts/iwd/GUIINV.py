@@ -121,8 +121,12 @@ def OpenInventoryWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnAutoEquip)
 
 	#encumbrance
-	Label = Window.CreateLabel (0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	Label = Window.CreateLabel (0x10000044, 5,455,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+	Button = Window.GetControl (67)
+	r = Button.GetRect ()
+	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
+		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
+		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
 
 	#armor class
 	Label = Window.GetControl (0x10000038)

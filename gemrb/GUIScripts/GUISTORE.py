@@ -340,8 +340,11 @@ def OpenStoreShoppingWindow ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# encumbrance
-	Label = Window.CreateLabel (0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	Label = Window.CreateLabel (0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+	r = Button.GetRect ()
+	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
+		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
+		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
@@ -448,8 +451,11 @@ def OpenStoreStealWindow ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# encumbrance
-	Label = Window.CreateLabel (0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	Label = Window.CreateLabel (0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+	r = Button.GetRect ()
+	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
+		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
+		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
