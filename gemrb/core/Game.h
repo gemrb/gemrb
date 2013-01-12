@@ -298,6 +298,7 @@ public:
 	ieResRef CurrentArea;
 	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
 	ieResRef LoadMos;
+	ieResRef TextScreen;
 	Actor *timestop_owner;
 	ieDword timestop_end;
 	Particles *weather;

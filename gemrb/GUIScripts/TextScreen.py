@@ -45,7 +45,7 @@ def StartTextScreen ():
 
 	GemRB.GamePause (1, 3)
 
-	LoadPic = TableName = GemRB.GetGameString (STR_LOADMOS)
+	LoadPic = TableName = GemRB.GetGameString (STR_TEXTSCREEN)
 	if TableName[:6] == "drmtxt":
 		GemRB.DisplayString (17558, 0xff0000) #Paused for rest
 	else:

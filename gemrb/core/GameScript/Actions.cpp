@@ -3038,11 +3038,10 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	//the LoadMos ResRef may be empty, don't overwrite it if there is one set (textscreens may do this)
+	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
@@ -3058,7 +3057,6 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
@@ -3075,7 +3073,6 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(game->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	//strncpy(game->LoadMos, parameters->string1Parameter,8);
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.isempty()) {
 		Sender->ReleaseCurrentAction();
@@ -3096,7 +3093,6 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	//strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
@@ -3113,7 +3109,6 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(game->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	//strncpy(game->LoadMos, parameters->string1Parameter,8);
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.isempty()) {
 		Sender->ReleaseCurrentAction();
@@ -3546,7 +3541,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
-	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter, sizeof(ieResRef)-1);
+	strnlwrcpy(core->GetGame()->TextScreen, parameters->string0Parameter, sizeof(ieResRef)-1);
 	core->SetEventFlag(EF_TEXTSCREEN);
 }
 

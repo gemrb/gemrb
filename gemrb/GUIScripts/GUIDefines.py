@@ -295,6 +295,7 @@ TOOLTIP_DELAY_FACTOR = 250
 #game strings
 STR_LOADMOS  = 0
 STR_AREANAME = 1
+STR_TEXTSCREEN = 2
 
 #game integers
 SV_BPP = 0

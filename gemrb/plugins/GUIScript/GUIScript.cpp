@@ -453,6 +453,8 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 			return PyString_FromString( game->LoadMos );
 		case 1:
 			return PyString_FromString( game->CurrentArea );
+		case 2:
+			return PyString_FromString( game->TextScreen );
 		}
 	}
 

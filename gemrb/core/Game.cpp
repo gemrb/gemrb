@@ -53,6 +53,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	version = 0;
 	Expansion = 0;
 	LoadMos[0] = 0;
+	TextScreen[0] = 0;
 	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
@@ -1522,12 +1523,12 @@ void Game::TextDream()
 	if (!locals->Lookup("DREAM", dream)) {
 		dream = 1;
 	}
-	snprintf(LoadMos, sizeof(ieResRef)-1, "drmtxt%d", dream+1);
+	snprintf(TextScreen, sizeof(ieResRef)-1, "drmtxt%d", dream+1);
 	if ((chapter > dream) && (core->Roll(1, 100, 0) <= 33)
-		&& gamedata->Exists(LoadMos, IE_2DA_CLASS_ID)) {
+		&& gamedata->Exists(TextScreen, IE_2DA_CLASS_ID)) {
 
 		// give innate spell to protagonist
-		AutoTable drm(LoadMos);
+		AutoTable drm(TextScreen);
 		if (drm) {
 			const char *repLabel;
 			if (Reputation >= 100)
