@@ -731,6 +731,7 @@ public:
 	/* initialize the action buttons based on class. If forced, it will override
 		previously customized or set buttons. */
 	void InitButtons(ieDword cls, bool forced);
+	int GetMaxEncumbrance() const;
 	int GetAbilityBonus(unsigned int ability, int value = -1) const;
 	int GetSkillStat(unsigned int skill) const;
 	int GetSkill(unsigned int skill) const;

@@ -4398,8 +4398,7 @@ int Actor::CalculateSpeed(bool feedback)
 	inventory.CalculateWeight();
 	int encumbrance = inventory.GetWeight();
 	SetStat(IE_ENCUMBRANCE, encumbrance, false);
-	int maxweight = core->GetStrengthBonus(3, GetStat(IE_STR), GetStat(IE_STREXTRA));
-	if (HasFeat(FEAT_STRONG_BACK)) maxweight += maxweight/2;
+	int maxweight = GetMaxEncumbrance();
 
 	if(encumbrance<=maxweight) {
 		return speed;
@@ -8322,6 +8321,13 @@ bool Actor::HasSpellState(unsigned int spellstate) const
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
 	return false;
+}
+
+int Actor::GetMaxEncumbrance() const
+{
+	int max = core->GetStrengthBonus(3, GetStat(IE_STR), GetStat(IE_STREXTRA));
+	if (HasFeat(FEAT_STRONG_BACK)) max += max/2;
+	return max;
 }
 
 //this is a very specific rule that might need an external table later
