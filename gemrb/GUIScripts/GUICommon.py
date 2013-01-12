@@ -357,15 +357,9 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = False):
 	"""Displays the encumbrance as a ratio of current to maximum."""
 
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
 	# encumbrance
-	max_encumb = GemRB.GetAbilityBonus (IE_STR, 3, sstr, ext_str)
-	if GemRB.HasFeat (pc, FEAT_STRONG_BACK):
-		max_encumb += max_encumb/2
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+	max_encumb = GemRB.GetMaxEncumbrance (pc)
 
 	Control = Window.GetControl (ControlID)
 	if GameIsPST():
