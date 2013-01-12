@@ -878,6 +878,7 @@ def RedrawStoreShoppingWindow ():
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx)
 
+	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 	return
 
 def UpdateStoreIdentifyWindow ():
@@ -1154,6 +1155,8 @@ def RedrawStoreStealWindow ():
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
+
+	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 	return
 
 def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
