@@ -618,8 +618,9 @@ def OpenStoreRentWindow ():
 
 def UpdateStoreCommon (Window, title, name, gold):
 
-	Label = Window.GetControl (title)
-	Label.SetText (Store['StoreName'])
+	if Store['StoreName'] != -1:
+		Label = Window.GetControl (title)
+		Label.SetText (Store['StoreName'])
 
 	if name:
 		pc = GemRB.GameGetSelectedPCSingle ()
