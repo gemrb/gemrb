@@ -843,8 +843,17 @@ def RedrawStoreShoppingWindow ():
 		Label.SetText ("")
 	else:
 		Label.SetText (str(BuySum) )
+
+	# shade the inventory icon if it is full
+	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
+	Button = Window.GetControl (44)
+	if free_slots == 0:
+		Button.SetState (IE_GUI_BUTTON_PRESSED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+
 	# also disable the button if the inventory is full
-	if BuySum and selected_count <= len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1)):
+	if BuySum and selected_count <= free_slots:
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1150,8 +1159,16 @@ def RedrawStoreStealWindow ():
 		if Flags & SHOP_SELECT:
 			selected_count += 1
 
+	# shade the inventory icon if it is full
+	Button = Window.GetControl (37)
+	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
+	if free_slots == 0:
+		Button.SetState (IE_GUI_BUTTON_PRESSED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+
 	# also disable the button if the inventory is full
-	if LeftIndex>=0 and selected_count <= len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1)):
+	if LeftIndex>=0 and selected_count <= free_slots:
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
