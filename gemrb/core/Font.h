@@ -103,15 +103,15 @@ public:
 
 	// Printing methods
 	void Print(Region cliprgn, Region rgn, const unsigned char* string,
-		Palette* color, unsigned char Alignment, bool anchor = false,
+		Palette* color, ieByte Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false) const;
 	void Print(Region rgn, const unsigned char* string, Palette* color,
-		unsigned char Alignment, bool anchor = false,
+		ieByte Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false) const;
 	void PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-		Palette* color, unsigned char Alignment,
+		Palette* color, ieByte Alignment,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false) const;
 
