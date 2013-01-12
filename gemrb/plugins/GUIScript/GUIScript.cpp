@@ -6266,6 +6266,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		} else {
 			store->RemoveItem( Slot );
 		}
+		//keep encumbrance labels up to date
+		actor->CalculateSpeed(false);
 		res = ASI_SUCCESS;
 		break;
 	}
@@ -6327,6 +6329,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			store->AddItem( si );
 		}
 		delete si;
+		//keep encumbrance labels up to date
+		actor->CalculateSpeed(false);
 		res = ASI_SUCCESS;
 		break;
 	}
