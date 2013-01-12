@@ -26,21 +26,13 @@ Tile::Tile(Animation* anim, Animation* sec)
 {
 	tileIndex = om = 0;
 	this->anim[0] = anim;
-	if (sec) {
-		this->anim[1] = sec;
-	} else {
-		this->anim[1] = NULL;
-	}
+	this->anim[1] = sec;
 }
 
 Tile::~Tile(void)
 {
-	if (anim[0]) {
-		delete( anim[0] );
-	}
-	if (anim[1]) {
-		delete( anim[1] );
-	}
+	delete( anim[0] );
+	delete( anim[1] );
 }
 
 }
