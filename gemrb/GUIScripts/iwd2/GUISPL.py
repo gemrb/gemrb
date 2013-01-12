@@ -186,7 +186,7 @@ def UpdateSpellBookWindow ():
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	mem_cnt = len (MemorizedSpellList)
+	mem_cnt = GetMemorizedSpellsCount () # count of unique memorized spells
 	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
 	for i in range (24):
 		Button = Window.GetControl (6 + i)
@@ -241,11 +241,13 @@ def UpdateSpellBookWindow ():
 
 	# number of available spell slots
 	# sorcerer-style books are different, since max_mem_cnt holds the total level capacity, not the slot count
-	# and they display just the current and total number of memorizazions per level
+	# and they display just the current and total number of memorizations per level
 	Label = Window.GetControl (0x10000004)
 	if sorcerer_style:
 		Label.SetText (str(true_mem_cnt)+"/"+str(max_mem_cnt))
 	else:
+		# reset mem_cnt to take into account stacks
+		mem_cnt = GetMemorizedSpellsCount (True)
 		Label.SetText (str(max_mem_cnt-mem_cnt))
 
 	#if actor is uncontrollable, make this grayed
@@ -255,6 +257,18 @@ def UpdateSpellBookWindow ():
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return
+
+def GetMemorizedSpellsCount (total=False):
+	'''count the real number of spells in MemorizedSpellList'''
+	# can't use len here, since there could be more than one memorization (a "stack")
+	# put the counts into a list and sum it, but be careful about depleted spells
+	# eg. fully depleted should still count as 1 and each partial too
+	count = 'MemoCount' # non-depleted only
+	if total:
+		count = 'KnownCount' # all
+
+	counts = map (lambda x: (x[count] & x[count]) or 1, MemorizedSpellList)
+	return sum(counts)
 
 def SpellBookPrevPress ():
 	global BookTopIndex
