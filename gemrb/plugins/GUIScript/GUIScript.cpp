@@ -890,16 +890,16 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_Window_GetPos__doc,
-"window.GetPos()\n\n"
-"Returns tuple (x,y) of window position." );
+PyDoc_STRVAR( GemRB_Window_GetRect__doc,
+"window.GetRect()\n\n"
+"Returns a dict with the window position and size." );
 
-static PyObject* GemRB_Window_GetPos(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Window_GetRect(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
 
 	if (!PyArg_ParseTuple( args, "i", &WindowIndex)) {
-		return AttributeError( GemRB_Window_GetPos__doc );
+		return AttributeError( GemRB_Window_GetRect__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -907,7 +907,12 @@ static PyObject* GemRB_Window_GetPos(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	return Py_BuildValue("(ii)", (int)win->XPos, (int)win->YPos);
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "X", PyInt_FromLong( win->XPos ));
+	PyDict_SetItemString(dict, "Y", PyInt_FromLong( win->YPos ));
+	PyDict_SetItemString(dict, "Width", PyInt_FromLong( win->Width ));
+	PyDict_SetItemString(dict, "Height", PyInt_FromLong( win->Height ));
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_LoadTable__doc,
@@ -3083,16 +3088,16 @@ static PyObject* GemRB_Control_SetPos(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_Control_GetPos__doc,
-"control.GetPos()\n\n"
-"Returns tuple (x,y) of control position." );
+PyDoc_STRVAR( GemRB_Control_GetRect__doc,
+"control.GetRect()\n\n"
+"Returns a dict with the control position and size." );
 
-static PyObject* GemRB_Control_GetPos(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Control_GetRect(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
-		return AttributeError( GemRB_Control_GetPos__doc );
+		return AttributeError( GemRB_Control_GetRect__doc );
 	}
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
@@ -3100,7 +3105,12 @@ static PyObject* GemRB_Control_GetPos(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue("(ii)", (int)ctrl->XPos, (int)ctrl->YPos);
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "X", PyInt_FromLong( ctrl->XPos ));
+	PyDict_SetItemString(dict, "Y", PyInt_FromLong( ctrl->YPos ));
+	PyDict_SetItemString(dict, "Width", PyInt_FromLong( ctrl->Width ));
+	PyDict_SetItemString(dict, "Height", PyInt_FromLong( ctrl->Height ));
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetSize__doc,
@@ -10648,7 +10658,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
 	METHOD(Control_AttachScrollBar, METH_VARARGS),
-	METHOD(Control_GetPos, METH_VARARGS),
+	METHOD(Control_GetRect, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
@@ -10702,7 +10712,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_CreateWorldMapControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
-	METHOD(Window_GetPos, METH_VARARGS),
+	METHOD(Window_GetRect, METH_VARARGS),
 	METHOD(Window_HasControl, METH_VARARGS),
 	METHOD(Window_Invalidate, METH_VARARGS),
 	METHOD(Window_SetFrame, METH_VARARGS),

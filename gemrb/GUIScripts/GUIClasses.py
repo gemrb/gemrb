@@ -50,7 +50,7 @@ class GSymbol:
 class GWindow:
   __metaclass__ = metaIDWrapper
   methods = {
-    'GetPos': _GemRB.Window_GetPos,
+    'GetRect': _GemRB.Window_GetRect,
     'SetSize': _GemRB.Window_SetSize,
     'SetFrame': _GemRB.Window_SetFrame,
     'SetPicture': _GemRB.Window_SetPicture,
@@ -94,7 +94,7 @@ class GWindow:
 class GControl:
   __metaclass__ = metaControl
   methods = {
-    'GetPos': _GemRB.Control_GetPos,
+    'GetRect': _GemRB.Control_GetRect,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,
     'SetPos': _GemRB.Control_SetPos,
     'SetSize': _GemRB.Control_SetSize,
