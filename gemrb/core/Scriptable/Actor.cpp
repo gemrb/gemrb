@@ -1681,8 +1681,14 @@ static void InitActorTables()
 			}
 			field = tm->QueryField(rowname, "CLERICSPELL");
 			if (field[0]!='*') {
-				isclass[ISCLERIC] |= bitmask;
-				clericspelltables[i]=strdup(field);
+				// iwd2 has no DRUIDSPELL
+				if (third && !strnicmp(field, "MXSPLDRD", 8)) {
+					isclass[ISDRUID] |= bitmask;
+					druidspelltables[i]=strdup(field);
+				} else {
+					isclass[ISCLERIC] |= bitmask;
+					clericspelltables[i]=strdup(field);
+				}
 			}
 
 			field = tm->QueryField(rowname, "MAGESPELL");
