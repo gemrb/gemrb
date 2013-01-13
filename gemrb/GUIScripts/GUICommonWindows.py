@@ -1173,16 +1173,8 @@ def OpenPortraitWindow (needcontrols=0):
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
-		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
-
-		GemRB.SetVar ("AI", GSFlags)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
-		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		Button.SetVarAssoc ("AI", GS_PARTYAI)
-		if GSFlags:
-			Button.SetTooltip (15917)
-		else:
-			Button.SetTooltip (15918)
+		Button = InitOptionButton(Window, 'AI', AIPress)
+		AIPress(0) #this initialises the state and tooltip
 
 		#Select All
 		if GUICommon.HasHOW():
