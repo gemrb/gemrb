@@ -551,10 +551,15 @@ def OpenStoreRumourWindow ():
 	StoreRumourWindow = Window = GemRB.LoadWindow (8)
 
 	#removing those pesky labels
-	for i in range (5):
-		Window.DeleteControl (0x10000005+i)
+	if not GUICommon.GameIsIWD2():
+		for i in range (5):
+			Window.DeleteControl (0x10000005+i)
 
-	TextArea = Window.GetControl (11)
+	TextArea = None
+	if GUICommon.GameIsIWD2():
+		TextArea = Window.GetControl (13)
+	else:
+		TextArea = Window.GetControl (11)
 	TextArea.SetText (14144)
 
 	#tavern quality image
@@ -1480,19 +1485,32 @@ def UpdateStoreRumourWindow ():
 
 	UpdateStoreCommon (Window, 0x10000011, 0, 0x10000012)
 	TopIndex = GemRB.GetVar ("TopIndex")
-	for i in range (5):
+	DrinkButtonCount = ItemButtonCount + 1
+	offset = 0
+	if GUICommon.GameIsIWD2():
+		offset = 40
+		DrinkButtonCount += 1 # shows even more than with inventories
+	for i in range (DrinkButtonCount):
 		Drink = GemRB.GetStoreDrink (TopIndex+i)
-		Button = Window.GetControl (i)
+		Button = Window.GetControl (i+offset)
 		Button.SetVarAssoc ("Index", i)
 		if Drink:
-			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Drink['DrinkName']))
-			GemRB.SetToken ("ITEMCOST", str(Drink['Price']) )
-			Button.SetText (10162)
+			if GUICommon.GameIsIWD2():
+				Button.SetText (GemRB.GetString (Drink['DrinkName']))
+				CostLabel = Window.GetControl (0x10000000+29+i)
+				CostLabel.SetText (str(Drink['Price']))
+			else:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Drink['DrinkName']))
+				GemRB.SetToken ("ITEMCOST", str(Drink['Price']) )
+				Button.SetText (10162)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GulpDrink)
 		else:
 			Button.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			if GUICommon.GameIsIWD2():
+				CostLabel = Window.GetControl (0x10000000+29+i)
+				CostLabel.SetText ("")
 	return
 
 def GulpDrink ():
