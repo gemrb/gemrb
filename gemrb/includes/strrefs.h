@@ -150,15 +150,15 @@ namespace GemRB {
 #define STR_INJURED2      115
 #define STR_INJURED3      116
 #define STR_INJURED4      117       //near death
-#define STR_HOURS         118       //<HOUR> hours
-#define STR_HOUR          119
+#define STR_HOURS         118       //<HOUR> hours / Hours
+#define STR_HOUR          119       //<HOUR> hours / Hour
 #define STR_DAYS          120       //<GAMEDAYS> days
 #define STR_DAY           121
-#define STR_REST          122       //You have rested for <DURATION>
+#define STR_REST          122       //You have rested for <DURATION> / <HOUR> <DURATION>
 #define STR_JOURNEY       123       //The journey took <DURATION>
-#define STR_PST_REST      124       //You have rested for <HOUR> <DURATION>
-#define STR_PST_HOUR      125
-#define STR_PST_HOURS     126
+#define STR_SUMMONINGLIMIT 124
+#define STR_INVFULL       125
+#define STR_TOOFARAWAY    126
 #define STR_DAMAGE_IMMUNITY 127
 #define STR_DAMAGE1       128
 #define STR_DAMAGE2       129
@@ -214,11 +214,8 @@ namespace GemRB {
 #define STR_HELD 179
 #define STR_HALFSPEED 180
 #define STR_CANTMOVE 181
-#define STR_SUMMONINGLIMIT 182
-#define STR_INVFULL 183
-#define STR_TOOFARAWAY 184
 
-#define STRREF_COUNT 185
+#define STRREF_COUNT 182
 
 }
 

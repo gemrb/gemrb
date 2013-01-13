@@ -1669,24 +1669,18 @@ void Game::RestParty(int checks, int dream, int hp)
 	area->PartyRested();
 	core->SetEventFlag(EF_ACTION);
 
-	//restindex will be -1 in the case of PST
-	//FIXME: I don't quite see why we can't sumply use the same strings.2da entry
-	//It seems we could reduce complexity here, and free up 2-3 string slots too
+	//bg1 has "You have rested for <DURATION>" while pst has "You have
+	//rested for <HOUR> <DURATION>" and then bg1 has "<HOUR> hours" while
+	//pst just has "Hours", so this works for both
 	int restindex = displaymsg->GetStringReference(STR_REST);
-	int strindex;
+	int hrsindex = displaymsg->GetStringReference(STR_HOURS);
 	char* tmpstr = NULL;
 
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
-	if (restindex != -1) {
-		strindex = displaymsg->GetStringReference(STR_HOURS);
-	} else {
-		strindex = displaymsg->GetStringReference(STR_PST_HOURS);
-		restindex = displaymsg->GetStringReference(STR_PST_REST);
-	}
 
 	//this would be bad
-	if (strindex == -1 || restindex == -1) return;
-	tmpstr = core->GetString(strindex, 0);
+	if (hrsindex == -1 || restindex == -1) return;
+	tmpstr = core->GetString(hrsindex, 0);
 	//as would this
 	if (!tmpstr) return;
 
