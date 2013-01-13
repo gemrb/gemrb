@@ -91,6 +91,7 @@ static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
 static int *defaultprof = NULL;
+static int *castingstat = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
@@ -1429,6 +1430,11 @@ void Actor::ReleaseMemory()
 			booktypes=NULL;
 		}
 
+		if (castingstat) {
+			free(castingstat);
+			castingstat=NULL;
+		}
+
 		if (xpbonus) {
 			free(xpbonus);
 			xpbonus=NULL;
@@ -1679,6 +1685,7 @@ static void InitActorTables()
 		booktypes = (int *) calloc(classcount, sizeof(int));
 		classabilities = (char **) calloc(classcount, sizeof(char*));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
+		castingstat = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
 
@@ -1731,7 +1738,12 @@ static void InitActorTables()
 				isclass[ISSORCERER] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_HATERACE] );
+			if (third) {
+				field = tm->QueryField(rowname, "CASTING"); // COL_HATERACE but different name
+				castingstat[i] = atoi(field);
+			}
+
+			field = tm->QueryField(rowname, "HATERACE");
 			if (field[0]!='*') {
 				isclass[ISRANGER] |= bitmask;
 			}
@@ -1880,7 +1892,13 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("mxsplwis");
+	// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
+	// luckily, they both use the same format
+	if (third) {
+		tm.load("mxsplbon");
+	} else {
+		tm.load("mxsplwis");
+	}
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
 		int max = core->GetMaximumAbility();
@@ -2927,11 +2945,28 @@ void Actor::RefreshEffects(EffectQueue *fx)
 			}
 		}
 	}
-	//add wisdom bonus spells
-	if (!spellbook.IsIWDSpellBook() && mxsplwis) {
-		int level = Modified[IE_WIS];
-		if (level--) {
-			spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
+	//add wisdom/casting_ability bonus spells
+	if (mxsplwis) {
+		if (spellbook.IsIWDSpellBook()) {
+			// check each class separately for the casting stat and booktype (luckily there is no bonus for domain spells)
+			for (i=0; i < ISCLASSES; i++) {
+				int level = GetClassLevel(i);
+				int booktype = booksiwd2[i]; // ieIWD2SpellType
+				if (!level || booktype == -1) {
+					continue;
+				}
+				level = Modified[castingstat[classesiwd2[i]]];
+				// FIXME: this ignores level requirements (bards ...), but we can avoid that by checking max level
+				// a shortcut is possible, since no class has both cleric and mage spells, so always at least one of the clskills columns is empty
+				if (level--) {
+					spellbook.BonusSpells(booktype, spllevels, mxsplwis+spllevels*level);
+				}
+			}
+		} else {
+			int level = Modified[IE_WIS];
+			if (level--) {
+				spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
+			}
 		}
 	}
 
