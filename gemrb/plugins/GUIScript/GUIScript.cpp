@@ -7122,7 +7122,11 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	// auto-refresh innates (memorisation defaults to depleted)
-	if (SpellType == IE_SPELL_TYPE_INNATE) enabled = 1;
+	if (core->HasFeature(GF_HAS_SPELLLIST)) {
+		if (SpellType == IE_IWD2_SPELL_INNATE) enabled = 1;
+	} else {
+		if (SpellType == IE_SPELL_TYPE_INNATE) enabled = 1;
+	}
 
 	return PyInt_FromLong( actor->spellbook.MemorizeSpell( ks, enabled ) );
 }
