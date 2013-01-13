@@ -365,7 +365,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		return ret;
 	}
 
-	Log(DEBUG, "CREImporter", "Doing extra mage spell lookups!");
+	error("CREImporter", "Doing extra mage spell lookups!");
 	// FIXME: is this really needed? reachable only if wizard index was too high
 	kit = log2(kit/0x40); // 0x40 is the first mage kit
 	int i;
