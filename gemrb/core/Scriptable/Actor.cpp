@@ -144,11 +144,6 @@ struct ItemUseType {
 	ieByte which;	//which item dword should be used (1 = kit)
 };
 
-static const char *skillcolumns[12]={
-	"DRUIDSPELL", "CLERICSPELL", "MAGESPELL", NULL, "BARDSKILL", "THIEFSKILL",
-	"LAYHANDS", "TURNLEVEL", "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
-};
-
 static ieResRef featspells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
@@ -1563,19 +1558,6 @@ void Actor::ReleaseMemory()
 	classcount = -1;
 }
 
-#define COL_DRUID_SPELL   0   //ranger type racial enemy
-#define COL_CLERIC_SPELL  1   //cleric spells
-#define COL_MAGE_SPELL    2   //mage spells
-#define COL_STARTXP       3   //starting xp
-#define COL_BARD_SKILL    4   //bard skills
-#define COL_THIEF_SKILL   5   //thief skills
-#define COL_LAYHANDS      6   //paladin ability
-#define COL_TURNLEVEL     7   //paladin/cleric
-#define COL_BOOKTYPE      8   //sorceror
-#define COL_HATERACE      9   //ranger special
-#define COL_ABILITIES     10  //clab
-#define COL_NO_PROF       11  //default proficiency penalty
-
 #define COL_MAIN       0
 #define COL_SPARKS     1
 #define COL_GRADIENT   2
@@ -1693,18 +1675,18 @@ static void InitActorTables()
 			const char *field;
 			const char *rowname = tm->GetRowName(i);
 
-			field = tm->QueryField( rowname, skillcolumns[COL_DRUID_SPELL] );
+			field = tm->QueryField(rowname, "DRUIDSPELL");
 			if (field[0]!='*') {
 				isclass[ISDRUID] |= bitmask;
 				druidspelltables[i]=strdup(field);
 			}
-			field = tm->QueryField( rowname, skillcolumns[COL_CLERIC_SPELL] );
+			field = tm->QueryField(rowname, "CLERICSPELL");
 			if (field[0]!='*') {
 				isclass[ISCLERIC] |= bitmask;
 				clericspelltables[i]=strdup(field);
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_MAGE_SPELL] );
+			field = tm->QueryField(rowname, "MAGESPELL");
 			if (field[0]!='*') {
 				isclass[ISMAGE] |= bitmask;
 				wizardspelltables[i]=strdup(field);
@@ -1712,25 +1694,25 @@ static void InitActorTables()
 
 			// field 3 holds the starting xp
 
-			field = tm->QueryField( rowname, skillcolumns[COL_BARD_SKILL] );
+			field = tm->QueryField(rowname, "BARDSKILL");
 			if (field[0]!='*') {
 				isclass[ISBARD] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_THIEF_SKILL] );
+			field = tm->QueryField(rowname, "THIEFSKILL");
 			if (field[0]!='*') {
 				isclass[ISTHIEF] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_LAYHANDS] );
+			field = tm->QueryField(rowname, "LAYHANDS");
 			if (field[0]!='*') {
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_TURNLEVEL] );
+			field = tm->QueryField(rowname, "TURNLEVEL");
 			turnlevels[i]=atoi(field);
 
-			field = tm->QueryField( rowname, skillcolumns[COL_BOOKTYPE] );
+			field = tm->QueryField(rowname, "BOOKTYPE");
 			booktypes[i]=atoi(field);
 			//if booktype == 3 then it is a 'divine sorceror' class
 			//we shouldn't hardcode iwd2 classes this heavily
@@ -1748,13 +1730,13 @@ static void InitActorTables()
 				isclass[ISRANGER] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_ABILITIES] );
+			field = tm->QueryField(rowname, "ABILITIES");
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
 			classabilities[i]=strdup(field);
 
-			field = tm->QueryField( rowname, skillcolumns[COL_NO_PROF] );
+			field = tm->QueryField(rowname, "NO_PROF");
 			defaultprof[i]=atoi(field);
 
 			bitmask <<=1;
