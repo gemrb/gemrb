@@ -341,6 +341,15 @@ def OpenSpellBookSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+# FIXME: for now don't do anything if paused, since we'd get stuck with the first frame
+# EH, doesn't work on the known spell buttons?
+def FlashOverButton (ControlID):
+	pause = GemRB.GamePause (10, 1) # quietly get the pause state
+	if pause == 1: # paused
+		return
+	Button = SpellBookWindow.GetControl(ControlID)
+	Button.SetAnimation ("FLASH")
+	# TODO: wait until it is done; the two flashes for memorizing were not shown in parallel
 
 def OnSpellBookMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -353,11 +362,9 @@ def OnSpellBookMemorizeSpell ():
 	if GemRB.MemorizeSpell (pc, type, level, index):
 		RefreshSpellBookLevel () # calls also UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_24")
-		Button = Window.GetControl(index - SpellTopIndex + 30) # FIXME: wrong button if the spell will be stacked
-		Button.SetAnimation ("FLASH")
+		FlashOverButton (index - SpellTopIndex + 30) # FIXME: wrong button if the spell will be stacked
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-		Button = Window.GetControl(mem_cnt + 5)
-		Button.SetAnimation ("FLASH")
+		FlashOverButton (mem_cnt + 5)
 	return
 
 def OpenSpellBookSpellRemoveWindow ():
@@ -423,8 +430,7 @@ def UnmemoSpell (index, onlydepleted=False):
 	if GemRB.UnmemorizeSpell (pc, type, level, index, onlydepleted):
 		UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_44")
-		Button = SpellBookWindow.GetControl(index + 6)
-		Button.SetAnimation ("FLASH")
+		FlashOverButton (index + 6)
 	else:
 		print "Spell unmemorization failed, huh?", pc, type, level, index, onlydepleted
 
