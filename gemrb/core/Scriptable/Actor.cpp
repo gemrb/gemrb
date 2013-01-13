@@ -2943,8 +2943,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 					continue;
 				}
 				level = Modified[castingstat[classesiwd2[i]]];
-				// FIXME: this ignores level requirements (bards ...), but we can avoid that by checking max level
-				// a shortcut is possible, since no class has both cleric and mage spells, so always at least one of the clskills columns is empty
 				if (level--) {
 					spellbook.BonusSpells(booktype, spllevels, mxsplwis+spllevels*level);
 				}
