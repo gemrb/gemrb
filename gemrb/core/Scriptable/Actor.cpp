@@ -196,9 +196,9 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 //autogenerating for non IWD2 now!!!
 static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
-static const unsigned int booksiwd2[ISCLASSES]={0, 1<<IE_IWD2_SPELL_WIZARD, 0, 0, 
- 1<<IE_IWD2_SPELL_BARD, 1<<IE_IWD2_SPELL_CLERIC, 1<<IE_IWD2_SPELL_DRUID, 0,
- 1<<IE_IWD2_SPELL_PALADIN, 1<<IE_IWD2_SPELL_RANGER, 1<<IE_IWD2_SPELL_SORCEROR, 0, 0};
+static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
+ IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
+ IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_SORCEROR, -1, -1};
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
@@ -9182,7 +9182,7 @@ int Actor::GetBookMask() const
 	int bookmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {
 		if (Modified[levelslotsiwd2[i]] > 0) {
-			bookmask |= 1<<(booksiwd2[i]-1);
+			bookmask |= 1<<((1<<booksiwd2[i])-1);
 		}
 	}
 
