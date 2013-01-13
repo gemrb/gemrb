@@ -186,7 +186,7 @@ def ColorDiff2 (Window, Label, diff):
 	return
 
 def GetBonusSpells (pc):
-	bonusSpells = []
+	bonusSpells = {}
 	classes = []
 	# cheack each class/kit
 	for i in range(11):
@@ -219,9 +219,9 @@ def GetBonusSpells (pc):
 
 		classes.append(ClassTitle)
 		# check if at casting stat size, there is any bonus spell in BonusSpellTable
-		bonusSpells = [0] * maxLevel
+		bonusSpells[ClassTitle] = [0] * maxLevel
 		for level in range (1, maxLevel+1):
-			bonusSpells[level-1] = BonusSpellTable.GetValue (Stat-12, level-1)
+			bonusSpells[ClassTitle][level-1] = BonusSpellTable.GetValue (Stat-12, level-1)
 
 	return bonusSpells, classes
 
@@ -469,17 +469,20 @@ def DisplayGeneral (pc):
 
 	#bonus spells
 	bonusSpells, classes = GetBonusSpells(pc)
-	if sum(bonusSpells):
+	if len(bonusSpells):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (10344)
-		RecordsTextArea.Append ("[/color]\n")
+		RecordsTextArea.Append ("[/color]")
 		for c in classes:
+			if not len(bonusSpells[c]):
+				continue
 			# class/kit name
+			RecordsTextArea.Append ("\n")
 			RecordsTextArea.Append (c)
-			for level in range(len(bonusSpells)):
+			for level in range(len(bonusSpells[c])):
 				AddIndent()
 				# Level X: +Y
-				RecordsTextArea.Append (delimited_txt(7192, " " + str(level+1)+":", "+" + str(bonusSpells[level]), 0))
+				RecordsTextArea.Append (delimited_txt(7192, " " + str(level+1)+":", "+" + str(bonusSpells[c][level]), 0))
 
 	#ability statistics
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
