@@ -1624,7 +1624,6 @@ static void InitActorTables()
 		state_invisible=STATE_INVISIBLE;
 	}
 
-	//I'm not sure if xp is reduced or not in iwd2 on easy setting
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_COMBAT|SX_CR;
 	} else {
