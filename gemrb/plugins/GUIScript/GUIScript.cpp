@@ -1286,7 +1286,9 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 
 	int ctrlindex = core->GetControl(WindowIndex, ControlID);
 	if (ctrlindex == -1) {
-		return RuntimeError( "Control is not found" );
+		char tmp[40];
+		snprintf(tmp, sizeof(tmp), "Control (ID: %d) was not found!", ControlID);
+		return RuntimeError(tmp);
 	}
 
 	PyObject* ret = 0;
