@@ -1673,10 +1673,20 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 				spellindex, level+1, type);
 		}
 	}
+	// hacks for domain spells, since their count is not stored and also always 1
+	// NOTE: luckily this does not cause save game incompatibility
 	str->ReadDword(&tmpDword);
-	sm->SlotCount = (ieWord) tmpDword;
+	if (type == IE_IWD2_SPELL_DOMAIN) {
+		sm->SlotCount = 1;
+	} else {
+		sm->SlotCount = (ieWord) tmpDword;
+	}
 	str->ReadDword(&tmpDword);
-	sm->SlotCountWithBonus = (ieWord) tmpDword;
+	if (type == IE_IWD2_SPELL_DOMAIN) {
+		sm->SlotCountWithBonus = 1;
+	} else {
+		sm->SlotCountWithBonus = (ieWord) tmpDword;
+	}
 }
 
 void CREImporter::GetActorIWD2(Actor *act)
