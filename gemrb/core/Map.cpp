@@ -1131,6 +1131,10 @@ void Map::DrawMap(Region screen)
 	Projectile *pro = GetNextProjectile(proidx);
 	Particles *spark = GetNextSpark(spaidx);
 
+	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by
+	// an area animation with height > 0 even if the actors themselves are not
+	// hidden by it.
+
 	while (actor || a || sca || spark || pro) {
 		switch(SelectObject(actor,q,a,sca,spark,pro)) {
 		case AOT_ACTOR:
@@ -3749,11 +3753,11 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 int AreaAnimation::GetHeight() const
 {
 	if (Flags&A_ANI_BACKGROUND) return -9999;
+	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
+		return -9999;
 	return Pos.y+height;
-	//FIXME: this is obviously a hack that is destined to crash, also useless, so
-	//See ar9101 in HoW and ar0602 in bg2 before committing anything
-	//return Pos.y+height-animation[0][0].GetFrame(0)->Height;
 }
+
 
 void AreaAnimation::Draw(const Region &screen, Map *area)
 {
@@ -3767,11 +3771,20 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;
 	}
-	if (!(Flags&A_ANI_NO_WALL)) {
-		if (!covers) {
-			covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
-		}
+	bool covered = true;
+
+	// TODO: This needs more testing. The HOW ar9101 roast seems to need it.
+	// The conditional on height<=0 is unverified.
+	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
+		covered = false;
+
+	if (Flags&A_ANI_NO_WALL)
+		covered = false;
+
+	if (covered && !covers) {
+		covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
 	}
+
 
 	int ac = animcount;
 	while (ac--) {
@@ -3780,6 +3793,8 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 		if(covers) {
 			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
 				delete covers[ac];
+				// TODO: Should this build a sprite cover with base point
+				// Pos.x,Pos.y, or with Pos.y,Pos.y+height ?
 				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y, -anim->animArea.x,
 					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0);
 			}

@@ -2640,6 +2640,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"NoUndroppable",      //67GF_NO_UNDROPPABLE
 		"StartActive",        //68GF_START_ACTIVE
 		"ClearUnusedArea",    //69GF_CLEAR_UNUSED_AREA
+		"ImplicitAreaAnimBackground", //70GF_IMPLICIT_AREAANIM_BACKGROUND
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
