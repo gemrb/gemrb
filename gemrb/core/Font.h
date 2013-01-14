@@ -93,8 +93,6 @@ public:
 	//allow reading but not setting glyphs
 	const Sprite2D* GetCharSprite(ieWord index) const;
 
-	int GetCharacterCount(){ return glyphCount; };
-
 	bool AddResRef(const ieResRef resref);
 	bool MatchesResRef(const ieResRef resref);
 
