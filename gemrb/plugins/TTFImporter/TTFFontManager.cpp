@@ -168,10 +168,17 @@ Font* TTFFontManager::GetFont(unsigned short ptSize,
 {
 	Log(MESSAGE, "TTF", "Constructing TTF font.");
 
-	/* Make sure that our font face is scalable (global metrics) */
-	FT_Face face = font.face;
-	FT_Fixed scale;
 	FT_Error error;
+	FT_Face face = font.face;
+	error = FT_Select_Charmap(face, FT_ENCODING_APPLE_ROMAN);
+	if ( error ) {
+		LogFTError(error);
+		Close();
+		return NULL;
+	}
+
+	/* Make sure that our font face is scalable (global metrics) */
+	FT_Fixed scale;
 	if ( FT_IS_SCALABLE(face) ) {
 		/* Set the character size and use default DPI (72) */
 		error = FT_Set_Char_Size( font.face, 0, ptSize * 64, 0, 0 );
@@ -385,7 +392,7 @@ Font* TTFFontManager::GetFont(unsigned short ptSize,
 	}
 #undef NEXT_LOOP_CHAR
 	
-	Font* font = new Font(glyphs, firstChar, firstChar + glyphCount, pal);
+	Font* font = new Font(glyphs, firstChar, firstChar + glyphCount - 1, pal);
 	font->ptSize = ptSize;
 	font->style = style;
 	return font;
