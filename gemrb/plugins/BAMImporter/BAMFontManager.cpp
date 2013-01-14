@@ -45,58 +45,45 @@ bool BAMFontManager::Open(DataStream* stream)
 	return bamImp->Open(stream);
 }
 
-Font* BAMFontManager::GetFont(ieWord FirstChar,
-			  ieWord LastChar,
+Font* BAMFontManager::GetFont(ieWord /*FirstChar*/,
+			  ieWord /*LastChar*/,
 			  unsigned short /*ptSize*/,
 			  FontStyle /*style*/, Palette* pal)
 {
 	AnimationFactory* af = bamImp->GetAnimationFactory("dummy"); // FIXME: how does this get released?
-	unsigned int i = 0, glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;
-	unsigned int CyclesCount = af->GetCycleCount();
+	//int glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;
+	size_t glyphCount = 0, cycleCount = af->GetCycleCount();
 
-	// Numeric fonts have all frames in single cycle
-	if (CyclesCount > 1) {
-		Count = CyclesCount;
-		glyphCount = (LastChar - FirstChar + 1);
-		if (Count < glyphCount){
-			LastChar = LastChar - (glyphCount - Count);
-			glyphCount = Count;
-		}
-		i = (FirstChar) ? FirstChar - 1 : FirstChar;
-		limit = (FirstChar) ? LastChar - 1 : LastChar;
-		glyphIndexOffset = i;
-	} else { //numeric font
-		Count = af->GetFrameCount();
-		glyphCount = Count;
-		if (FirstChar+Count != (unsigned int) LastChar+1) {
-			Log(ERROR, "BAMFontManager", "inconsistent font %s: FirstChar=%d LastChar=%d Count=%d",
-				str->filename, FirstChar, LastChar, Count);
-			return NULL;
-		}
-		limit = glyphCount - 1;
+	// FIXME: we will end up with many useless (blank) glyphs
+	for (size_t i = 0; i < cycleCount; i++) {
+		glyphCount += af->GetCycleSize(i);
 	}
 
 	Sprite2D** glyphs = (Sprite2D**)malloc( glyphCount * sizeof(Sprite2D*) );
+	ieWord glyphIndex = 0;
 
-	for (; i <= limit; i++) {
-		if (CyclesCount > 1) {
-			glyphs[i - glyphIndexOffset] = af->GetFrame(0, i);
+	for (size_t i = 0; i < cycleCount; i++) {
+		for (int j = 0; j < af->GetCycleSize(i); j++) {
+			glyphs[glyphIndex] = af->GetFrame(j, i);
 
-			// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
-			// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
 			if (isStateFont) {
-				// since initials and state icons should all be the same size/position we can just take the position of the first one
-				glyphs[i - glyphIndexOffset]->YPos = glyphs[0]->YPos;
+				// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
+				// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
+
+				// since state icons should all be the same size/position we can just take the position of the first one
+				glyphs[glyphIndex]->YPos = glyphs[0]->YPos;
+			} else if (cycleCount == 1) {
+				// this is a numeric font
+				// we want them to have the same baseline as the rest
+				glyphs[glyphIndex]->YPos = 13 - glyphs[glyphIndex]->Height;
 			}
-		} else {
-			glyphs[i - glyphIndexOffset] = af->GetFrameWithoutCycle(i);
-			glyphs[i - glyphIndexOffset]->YPos = 13 - glyphs[i - glyphIndexOffset]->Height;
+			glyphIndex++;
 		}
 	}
 
 	// assume all sprites have same palette
 	Palette* palette = glyphs[0]->GetPalette();
-	Font* fnt = new Font(glyphs, FirstChar, LastChar, palette);
+	Font* fnt = new Font(glyphs, 1, glyphCount, palette);
 	palette->Release();
 	if (pal) {
 		fnt->SetPalette(pal);
