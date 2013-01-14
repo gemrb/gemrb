@@ -4072,7 +4072,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	long value =(long) CheckVariable(Sender, Variable, Context);
-	Log(WARNING, "GUISCript", "%s %s=%ld",
+	Log(DEBUG, "GUISCript", "%s %s=%ld",
 		Context, Variable, value);
 	return PyInt_FromLong( value );
 }
