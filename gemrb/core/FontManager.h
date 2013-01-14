@@ -49,10 +49,8 @@ public:
 	FontManager(void);
 	virtual ~FontManager(void);
 
-	virtual Font* GetFont(ieWord FirstChar,
-			ieWord LastChar,
-			unsigned short ptSize,
-			FontStyle style, Palette* pal = NULL) = 0;
+	virtual Font* GetFont(unsigned short ptSize,
+						  FontStyle style, Palette* pal = NULL) = 0;
 };
 
 }

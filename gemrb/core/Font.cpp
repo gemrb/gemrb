@@ -155,7 +155,7 @@ bool Font::MatchesResRef(const ieResRef resref)
 }
 
 void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-	Palette* hicolor, unsigned char Alignment, Font* initials,
+	Palette* hicolor, ieByte Alignment, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	bool enablecap=false;
@@ -263,10 +263,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			}
 
 			if (strnicmp( tag, "color=", 6 ) == 0) {
-				unsigned int r,g,b;
+				ieByte r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				const Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
+				const Color c = {r, g, b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
 				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
@@ -351,7 +351,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 }
 
 void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
-	unsigned char Alignment, bool anchor, Font* initials,
+	ieByte Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	Region cliprgn = rgn;
@@ -364,7 +364,7 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 }
 
 void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
-	Palette* hicolor, unsigned char Alignment, bool anchor, Font* initials,
+	Palette* hicolor, ieByte Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	int capital = (initials) ? 1 : 0;
@@ -455,10 +455,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			}
 			
 			if (strnicmp( tag, "color=", 6 ) == 0) {
-				unsigned int r,g,b;
+				ieByte r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				const Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
+				const Color c = {r, g, b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
 				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
