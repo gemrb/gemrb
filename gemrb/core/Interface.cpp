@@ -1400,18 +1400,20 @@ int Interface::LoadSprites()
 	}
 
 	int count = tab->GetRowCount();
+	const char* rowName = NULL;
 	for (int row = 0; row < count; row++) {
-		const char* ResRef = tab->QueryField(row, 0);
-		int needpalette = atoi(tab->QueryField(row, 1));
+		rowName = tab->GetRowName(row);
+		const char* ResRef = tab->QueryField(rowName, "RESREF");
+		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
 
 		const char* font_name;
 		unsigned short font_size = 0;
 		FontStyle font_style = NORMAL;
 
 		if (CustomFontPath[0]) {
-			font_name = tab->QueryField( row, 2 );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
-			font_size = atoi( tab->QueryField( row, 3 ) );// not available in BAM fonts.
-			font_style = (FontStyle)atoi( tab->QueryField( row, 4 ) );// not available in BAM fonts.
+			font_name = tab->QueryField( rowName, "FONT_NAME" );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
+			font_size = atoi( tab->QueryField( rowName, "PT_SIZE" ) );// not available in BAM fonts.
+			font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) );// not available in BAM fonts.
 		}else{
 			font_name = ResRef;
 		}
@@ -1438,7 +1440,7 @@ int Interface::LoadSprites()
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
 				if (CustomFontPath[0]) {
-					const char* colorString = tab->QueryField( i, 5 );
+					const char* colorString = tab->QueryField( rowName, "COLOR" );
 					unsigned long combinedColor = strtoul(colorString, NULL, 16);
 					ieByte* color = (ieByte*)&combinedColor;
 					fore.r = *color++;
