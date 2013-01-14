@@ -263,10 +263,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			}
 
 			if (strnicmp( tag, "color=", 6 ) == 0) {
-				ieByte r,g,b;
+				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				const Color c = {r, g, b, 0};
+				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
 				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
@@ -455,10 +455,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			}
 			
 			if (strnicmp( tag, "color=", 6 ) == 0) {
-				ieByte r,g,b;
+				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				const Color c = {r, g, b, 0};
+				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
 				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
