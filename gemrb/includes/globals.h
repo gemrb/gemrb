@@ -157,9 +157,10 @@ namespace GemRB {
 #define  GF_NO_UNDROPPABLE              67 //iwd,how
 #define  GF_START_ACTIVE                68 //bg1
 #define  GF_CLEAR_UNUSED_AREA           69 //bg1
+#define  GF_IMPLICIT_AREAANIM_BACKGROUND    70 //idw,how,iwd2
 
 //update this or bad things can happen
-#define GF_COUNT 70
+#define GF_COUNT 71
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

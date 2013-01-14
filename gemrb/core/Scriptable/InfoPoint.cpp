@@ -70,6 +70,9 @@ InfoPoint::InfoPoint(void)
 		else if (core->HasFeature(GF_USEPOINT_200)) TRAP_USEPOINT = _TRAVEL_NONPC;
 		else TRAP_USEPOINT = 0;
 	}
+	StrRef = 0;
+	UsePoint.empty();
+	TalkPos.empty();
 }
 
 InfoPoint::~InfoPoint(void)

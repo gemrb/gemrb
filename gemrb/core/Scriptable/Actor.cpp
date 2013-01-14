@@ -5526,6 +5526,7 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 int Actor::GetAttackStyle() const
 {
 	WeaponInfo wi;
+	wi.enchantment = 0;
 	//Non NULL if the equipped slot is a projectile or a throwing weapon
 	//TODO some weapons have both melee and ranged capability
 	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED;
