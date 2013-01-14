@@ -176,7 +176,7 @@ def UpdateSpellBookWindow ():
 	type = SelectedBook
 	level = SpellBookSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
-	sorcerer_style = (type == IE_IWD2_SPELL_BARD) or (type == IE_IWD2_SPELL_SORCEROR)
+	sorcerer_style = (type == IE_IWD2_SPELL_BARD) or (type == IE_IWD2_SPELL_SORCERER)
 
 	Name = GemRB.GetPlayerName (pc, 0)
 	Label = Window.GetControl (0xfffffff)

@@ -407,7 +407,7 @@ def HasSpell (Actor, SpellType, Level, Ref):
 def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	# disqualify sorcerors immediately
+	# disqualify sorcerers immediately
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 		return LSR_STAT
 

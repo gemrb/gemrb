@@ -1,11 +1,11 @@
 2DA V1.0
 4
                         MULTIPLE               MAX_LEVEL  A_STAT              A_VALUE    B_STAT              B_VALUE    C_STAT            C_VALUE    D_STAT             D_VALUE    A_OP       B_OP       C_OP       D_OP       
-AEGIS_OF_RIME           0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+AEGIS_OF_RIME           0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCERER 7          *          *          *          *          
 AMBIDEXTERITY           0                      1          DEX                 15         0                   0          0                 0          0                  0          *          *          *          *          
-AQUA_MORTIS             0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+AQUA_MORTIS             0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCERER 7          *          *          *          *          
 ARMOR_PROF              FEAT_ARMOUR            3          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
-ARMORED_ARCANA          FEAT_ARMORED_ARCANA    3          CLASSLEVELMAGE      1          CLASSLEVELSORCEROR  1          0                 0          0                  0          *          *          *          *          
+ARMORED_ARCANA          FEAT_ARMORED_ARCANA    3          CLASSLEVELMAGE      1          CLASSLEVELSORCERER  1          0                 0          0                  0          *          *          *          *          
 ARTERIAL_STRIKE         0                      1          CLASSLEVELTHIEF     1          0                   0          HITBONUS          4          0                  0          *          *          *          *          
 BLIND_FIGHT             0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
 BULLHEADED              0                      1          RACE                1          RACE                4          0                 0          0                  0          1          1          *          *          
@@ -52,7 +52,7 @@ POWER_ATTACK            0                      1          STR                 13
 PRECISE_SHOT            0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
 RAPID_SHOT              0                      1          DEX                 13         0                   0          0                 0          0                  0          *          *          *          *          
 RESIST_POISON           0                      1          CLASSLEVELSUM       1          0                   0          SUBRACE           0x40002    RACE               7          1          *          1          1          
-SCION_OF_STORMS         0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+SCION_OF_STORMS         0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCERER 7          *          *          *          *          
 SHIELD_PROF             0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
 SIMPLE_CROSSBOW         FEAT_CROSSBOW          3          CLASSLEVELFIGHTER   4          FEAT_CROSSBOW       2          0                 0          0                  0          *          0          *          *          
 SIMPLE_MACE             FEAT_MACE              3          CLASSLEVELFIGHTER   4          FEAT_MACE           2          0                 0          0                  0          *          0          *          *          
@@ -66,7 +66,7 @@ SPELL_FOCUS_EVOCATION   FEAT_EVOCATION         2          0                   0 
 SPELL_FOCUS_NECROMANCY  FEAT_NECROMANCY        2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
 SPELL_FOCUS_TRANSMUTE   FEAT_TRANSMUTE         2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
 SPELL_PENETRATION       FEAT_SPELL_PENETRATION 2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
-SPIRIT_OF_FLAME         0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+SPIRIT_OF_FLAME         0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCERER 7          *          *          *          *          
 STRONG_BACK             0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
 STUNNING_FIST           0                      1          AllOfThreeGE        -1         DEX                 13         WIS               13         HITBONUS           8          *          *          *          *          
 SUBVOCAL_CASTING        0                      1          IsCaster            -1         0                   0          0                 0          0                  0          *          *          *          *          

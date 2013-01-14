@@ -1772,7 +1772,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELTHIEF]=tmpByte;
 	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELSORCEROR]=tmpByte;
+	act->BaseStats[IE_LEVELSORCERER]=tmpByte;
 	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELMAGE]=tmpByte;
 	str->Seek( 22, GEM_CURRENT_POS ); //levels for classes
@@ -2500,7 +2500,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELTHIEF];
 		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELSORCEROR];
+		tmpByte = actor->BaseStats[IE_LEVELSORCERER];
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELMAGE];
 		stream->Write( &tmpByte, 1);

@@ -1025,7 +1025,7 @@ def ActionRangerSpellPressed ():
 	return
 
 def ActionSorcererSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_SORCEROR)
+	TypeSpellPressed(IE_IWD2_SPELL_SORCERER)
 	return
 
 def ActionWizardSpellPressed ():

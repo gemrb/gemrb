@@ -353,7 +353,7 @@ IE_LEVELDRUID                   = 243
 IE_LEVELMONK                    = 244
 IE_LEVELPALADIN                 = 245
 IE_LEVELRANGER                  = 246
-IE_LEVELSORCEROR                = 247
+IE_LEVELSORCERER                = 247
 #248 IE_LEVELCLASS12
 #249 IE_LEVELCLASS13
 #the remaining six stats are spell states

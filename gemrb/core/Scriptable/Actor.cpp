@@ -179,7 +179,7 @@ static const char *isclassnames[ISCLASSES] = {
 	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "CLASS12", "CLASS13" };
 static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
 	IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
-	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCEROR, IE_LEVELCLASS12, IE_LEVELCLASS13};
+	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCERER, IE_LEVELCLASS12, IE_LEVELCLASS13};
 
 #define BGCLASSCNT 23
 //fighter is the default level here
@@ -194,7 +194,7 @@ static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 1
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
  IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
- IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_SORCEROR, -1, -1};
+ IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_SORCERER, -1, -1};
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
@@ -1719,7 +1719,7 @@ static void InitActorTables()
 
 			field = tm->QueryField(rowname, "BOOKTYPE");
 			booktypes[i]=atoi(field);
-			//if booktype == 3 then it is a 'divine sorceror' class
+			//if booktype == 3 then it is a 'divine sorcerer' class
 			//we shouldn't hardcode iwd2 classes this heavily
 			if (booktypes[i]==2) {
 				isclass[ISSORCERER] |= bitmask;

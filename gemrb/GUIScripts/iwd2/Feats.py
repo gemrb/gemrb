@@ -366,7 +366,7 @@ def Check_AllOfThreeGE(pl, ass, a, bs, b, cs, c, *garbage):
 def Check_IsCaster(pl, *garbage):
 	# CLASSLEVELMAGE is IE_LEVEL2 (pst)
 	possible_casters = { IE_LEVEL2:1, IE_LEVELCLERIC:1, IE_LEVELDRUID:1,
-		IE_LEVELSORCEROR:1, IE_LEVELPALADIN:4, IE_LEVELRANGER:4, IE_LEVELBARD:2 }
+		IE_LEVELSORCERER:1, IE_LEVELPALADIN:4, IE_LEVELRANGER:4, IE_LEVELBARD:2 }
 	Caster = False
 
 	for stat in possible_casters:

@@ -299,7 +299,7 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl(9)
 	drink = (type&1) and (item["Function"]&1)
 	read = (type&1) and (item["Function"]&2)
-	#sorcerors cannot learn spells
+	# sorcerers cannot learn spells
 	# FIXME: unhardcode
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
