@@ -55,6 +55,12 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	for (size_t i = 0; i < cycleCount; i++) {
 		glyphCount += af->GetCycleSize(i);
 	}
+	if (glyphCount == 0) {
+		// minimal test uses bam without cycles
+		// this will fall into the "numeric" case below
+		glyphCount = af->GetFrameCount();
+	}
+	assert(glyphCount);
 
 	Sprite2D** glyphs = (Sprite2D**)malloc( glyphCount * sizeof(Sprite2D*) );
 	ieWord glyphIndex = 0;
@@ -62,7 +68,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 
 	if (cycleCount > 1) {
 		for (size_t i = 0; i < cycleCount; i++) {
-			if (af->GetFrameCount() < 255) {
+			if (af->GetFrameCount() < 256) {
 				glyphs[glyphIndex] = af->GetFrame(0, i);
 				if (isStateFont) {
 					// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
