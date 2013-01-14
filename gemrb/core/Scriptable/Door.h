@@ -37,9 +37,12 @@ class TileOverlay;
 #define DOOR_LINKED      64   //info trigger linked to this door
 #define DOOR_SECRET      128  //door is secret
 #define DOOR_FOUND       256  //secret door found
-#define DOOR_TRANSPARENT 512  //obscures vision
-#define DOOR_KEY         1024 //key removed when used
-#define DOOR_SLIDE       2048 //impeded blocks ignored
+#define DOOR_TRANSPARENT 512  //obscures vision (LOCKEDINFOTEXT in iwd2)
+#define DOOR_KEY         1024 //key removed when used (SEETHROUGH in iwd2)
+#define DOOR_SLIDE       2048 //impeded blocks ignored (WARNINGINFOTEXT in iwd2)
+//#define DOOR_WARNINGTEXTDISPLAYED 0x1000 // iwd2
+#define DOOR_HIDDEN2      8192 // iwd2, ignore the door
+//#define DOOR_USEUPKEY    0x4000 // sounds identical to DOOR_KEY
 
 class GEM_EXPORT Door : public Highlightable {
 public:
