@@ -1366,6 +1366,9 @@ bool Map::AnyEnemyNearPoint(const Point &p)
 		if (actor->IsDead() ) {
 			continue;
 		}
+		if (actor->GetStat(IE_AVATARREMOVAL)) {
+			continue;
+		}
 		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
 			continue;
 		}
