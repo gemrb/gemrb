@@ -1403,17 +1403,15 @@ int Interface::LoadSprites()
 	for (int row = 0; row < count; row++) {
 		const char* ResRef = tab->QueryField(row, 0);
 		int needpalette = atoi(tab->QueryField(row, 1));
-		int first_char = atoi(tab->QueryField(row, 2));
-		int last_char = atoi(tab->QueryField(row, 3));
 
 		const char* font_name;
 		unsigned short font_size = 0;
 		FontStyle font_style = NORMAL;
 
 		if (CustomFontPath[0]) {
-			font_name = tab->QueryField( row, 4 );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
-			font_size = atoi( tab->QueryField( row, 5 ) );// not available in BAM fonts.
-			font_style = (FontStyle)atoi( tab->QueryField( row, 6 ) );// not available in BAM fonts.
+			font_name = tab->QueryField( row, 2 );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
+			font_size = atoi( tab->QueryField( row, 3 ) );// not available in BAM fonts.
+			font_style = (FontStyle)atoi( tab->QueryField( row, 4 ) );// not available in BAM fonts.
 		}else{
 			font_name = ResRef;
 		}
@@ -1422,7 +1420,6 @@ int Interface::LoadSprites()
 		Font* fnt = NULL;
 		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
 			if (stricmp(fonts[fntIdx]->name, font_name) == 0
-					&& fonts[fntIdx]->GetCharacterCount() == (last_char - first_char + 1)
 					&& fonts[fntIdx]->ptSize == font_size
 					&& fonts[fntIdx]->style == font_style) {
 				fnt = fonts[fntIdx];
@@ -1441,7 +1438,7 @@ int Interface::LoadSprites()
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
 				if (CustomFontPath[0]) {
-					const char* colorString = tab->QueryField( i, 7 );
+					const char* colorString = tab->QueryField( i, 5 );
 					unsigned long combinedColor = strtoul(colorString, NULL, 16);
 					ieByte* color = (ieByte*)&combinedColor;
 					fore.r = *color++;
@@ -1460,7 +1457,7 @@ int Interface::LoadSprites()
 				pal = CreatePalette(fore, back);
 			}
 			ResourceHolder<FontManager> fntMgr(font_name);
-			if (fntMgr) fnt = fntMgr->GetFont(first_char, last_char, font_size, font_style, pal);
+			if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
 			gamedata->FreePalette(pal);
 		}
 

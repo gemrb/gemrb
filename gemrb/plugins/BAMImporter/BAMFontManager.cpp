@@ -45,10 +45,8 @@ bool BAMFontManager::Open(DataStream* stream)
 	return bamImp->Open(stream);
 }
 
-Font* BAMFontManager::GetFont(ieWord /*FirstChar*/,
-			  ieWord /*LastChar*/,
-			  unsigned short /*ptSize*/,
-			  FontStyle /*style*/, Palette* pal)
+Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
+							  FontStyle /*style*/, Palette* pal)
 {
 	AnimationFactory* af = bamImp->GetAnimationFactory("dummy"); // FIXME: how does this get released?
 	//int glyphIndexOffset = 0, limit = 0, Count = 0, glyphCount = 0;

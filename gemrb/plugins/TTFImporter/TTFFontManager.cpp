@@ -163,9 +163,7 @@ void TTFFontManager::Close()
 	font = TTF_Font();
 }
 
-Font* TTFFontManager::GetFont(ieWord /*FirstChar*/,
-							  ieWord /*LastChar*/,
-							  unsigned short ptSize,
+Font* TTFFontManager::GetFont(unsigned short ptSize,
 							  FontStyle style, Palette* pal)
 {
 	Log(MESSAGE, "TTF", "Constructing TTF font.");

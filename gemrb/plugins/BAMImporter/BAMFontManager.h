@@ -43,10 +43,8 @@ public:
 
 	bool Open(DataStream* stream);
 
-	Font* GetFont(ieWord FirstChar,
-			ieWord LastChar,
-			unsigned short ptSize,
-			FontStyle style, Palette* pal = NULL);
+	Font* GetFont(unsigned short ptSize,
+				  FontStyle style, Palette* pal = NULL);
 };
 
 }

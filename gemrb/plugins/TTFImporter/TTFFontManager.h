@@ -70,9 +70,7 @@ Public methods
 	bool Open(DataStream* stream);
 	void Close();
 
-	Font* GetFont(ieWord FirstChar,
-				  ieWord LastChar,
-				  unsigned short ptSize,
+	Font* GetFont(unsigned short ptSize,
 				  FontStyle style, Palette* pal = NULL);
 
 	// freetype "callbacks"

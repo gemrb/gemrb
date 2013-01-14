@@ -1,14 +1,14 @@
 2DA V1.0
 FONTDLG
-	RESREF		NEED_PALETTE	FIRST_CHAR	LAST_CHAR	FONT_NAME	PT_SIZE		STYLE	COLOR
-0	FONTDLG		1				33			255			FONTDLG		14			0		0xffffffff
-1	TRMTFONT	1				33			255			TRMTFONT	14			0		0xffffffff
-2	EXOFONT		1				33			255			EXOFONT		14			0		0xffffffff
-3	POSTANT 	1				33			255			POSTANT		14			0		0xffffffff
-4	NUMBER		0				48			58			NUMBER		14			0		0xffffffff
-5	NUMBER2		0				48			58			NUMBER2		14			0		0xffffffff
-6	NUMBER3		0				48			58			NUMBER3		14			0		0xffffffff
-7	SYSFONT		1				33			255			SYSFONT		14			0		0xffffffff
-8	FONTDLG		1				33			255			FONTDLG		14			0		0xffffffff
+	RESREF		NEED_PALETTE	FONT_NAME	PT_SIZE		STYLE	COLOR
+0	FONTDLG		1		FONTDLG		14		0	0xffffffff
+1	TRMTFONT	1		TRMTFONT	14		0	0xffffffff
+2	EXOFONT		1		EXOFONT		14		0	0xffffffff
+3	POSTANT 	1		POSTANT		14		0	0xffffffff
+4	NUMBER		0		NUMBER		14		0	0xffffffff
+5	NUMBER2		0		NUMBER2		14		0	0xffffffff
+6	NUMBER3		0		NUMBER3		14		0	0xffffffff
+7	SYSFONT		1		SYSFONT		14		0	0xffffffff
+8	FONTDLG		1		FONTDLG		14		0	0xffffffff
 
 # Customization How To: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
