@@ -133,7 +133,7 @@ public:
 	Point Pos;
 	ieWord color;
 	char *text;
-	MapNote() { text=NULL; }
+	MapNote() { text=NULL; strref=0; Pos.empty(); color=0; }
 	~MapNote() { if(text) free(text); }
 };
 
