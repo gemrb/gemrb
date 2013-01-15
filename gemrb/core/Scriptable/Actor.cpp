@@ -2508,11 +2508,10 @@ int Actor::GetWisdomAC() const
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
-//TODO: may want to preload the crits table to avoid spam in the log
 int Actor::GetCriticalType() const
 {
 	long ret = 0;
-	AutoTable tm("crits");
+	AutoTable tm("crits", true);
 	if (!tm) return 0;
 	//the ID of this PC (first 2 rows are empty)
 	int row = BaseStats[IE_SPECIFIC];
@@ -6598,7 +6597,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 					displaymsg->DisplayStringName(core->ModalStates[ModalState].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 				ModalState = MS_NONE;
-				// TODO: wait for a round until allowing new states?
 			}
 		}
 
@@ -6710,7 +6708,6 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp, int combat)
 {
 	if (core->HasFeature(GF_WISDOM_BONUS)) {
-		//TODO find out the 3ED variant
 		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
 	}
 	int adjustmentPercent = dmgadjustments[GameDifficulty];
