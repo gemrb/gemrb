@@ -27,18 +27,7 @@
 
 namespace GemRB {
 
-struct TTF_Font {
-	FT_Face face;
 
-	int height;
-	int ascent;
-	int descent;
-
-	int glyph_overhang;
-	float glyph_italics;
-
-	int face_style;
-};
 
 class TTFFontManager : public FontManager {
 /*
@@ -46,8 +35,8 @@ Private ivars
 */
 private:
 	FT_Stream ftStream;
+	FT_Face face;
 
-	TTF_Font font;
 public:
 /*
 Public methods

@@ -22,6 +22,7 @@
 #define __GemRB__TTFFont__
 
 #include "Font.h"
+#include "Freetype.h"
 
 namespace GemRB {
 
@@ -31,8 +32,16 @@ private:
 	FontStyle style;
 	ieWord ptSize;
 
+	FT_Face face;
+	int height;
+	int ascent;
+	int descent;
+	
+	int glyph_overhang;
+	float glyph_italics;
+
 public:
-	TTFFont(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
+	TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal);
 	~TTFFont(void);
 };
 
