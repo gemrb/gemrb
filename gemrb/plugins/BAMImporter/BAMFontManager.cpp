@@ -18,6 +18,7 @@
  *
  */
 
+#include "BAMFont.h"
 #include "BAMFontManager.h"
 #include "Palette.h"
 #include "Sprite2D.h"
@@ -97,7 +98,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 
 	// assume all sprites have same palette
 	Palette* palette = glyphs[0]->GetPalette();
-	Font* fnt = new Font(glyphs, firstChar, firstChar + glyphIndex - 1, palette);
+	Font* fnt = new BAMFont(glyphs, firstChar, firstChar + glyphIndex - 1, palette);
 	palette->Release();
 	if (pal) {
 		fnt->SetPalette(pal);

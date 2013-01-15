@@ -66,7 +66,7 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Font {
-private:
+protected:
 	int glyphCount;
 
 	ieResRef* resRefs;
@@ -88,7 +88,7 @@ public:
 	int maxHeight;
 public:
 	Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
-	~Font(void);
+	virtual ~Font(void);
 
 	//allow reading but not setting glyphs
 	const Sprite2D* GetCharSprite(ieWord index) const;
