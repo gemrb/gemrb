@@ -374,6 +374,12 @@ resource, and always use frames 0, 1, 2, 3 from their associated
 BAM. (PST, ...)
 
 
+ImplicitAreaAnimBackground = <bool>
+- - - - - - - - - - - - - -
+If set to 1, area animations will have a different renderering order.
+This is used to fix some animations in the IWD line of games
+
+
 IWD2DeathVarFormat = <bool>
 - - - - - - - - - - - - - -
 Toggles whether the game uses the IWD2 death var format ("_DEAD%s").
