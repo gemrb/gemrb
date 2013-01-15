@@ -22,7 +22,8 @@ Options that do not deal strictly with data availability and diversity
 may be freely changed. Some that may be interesting to users include:
 AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
 HasSpecificDamageBonus (mod required), HasWisdomBonusTable (mod required),
-KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack and TeamMovement.
+HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack
+ and TeamMovement.
 
 [FIXME: eventually, this file could be searched for in user's config directory too]
 

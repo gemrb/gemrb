@@ -158,9 +158,10 @@ namespace GemRB {
 #define  GF_START_ACTIVE                68 //bg1
 #define  GF_CLEAR_UNUSED_AREA           69 //bg1
 #define  GF_IMPLICIT_AREAANIM_BACKGROUND    70 //idw,how,iwd2
+#define  GF_HEAL_ON_100PLUS             71 //bg1, bg2, pst
 
 //update this or bad things can happen
-#define GF_COUNT 71
+#define GF_COUNT 72
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
