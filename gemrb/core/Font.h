@@ -85,6 +85,7 @@ public:
 
 	int maxHeight;
 public:
+	Font(); // temporary default constructor
 	Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
 	virtual ~Font(void);
 

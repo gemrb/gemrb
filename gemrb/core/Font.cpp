@@ -40,6 +40,13 @@ if (palette) ((Palette*)palette)->IncRef();\
 if (blitPalette) blitPalette->Release();\
 blitPalette = palette;
 
+// temporary default constructor
+Font::Font()
+: glyphCount(0), resRefs(NULL), numResRefs(0), palette(NULL), glyphs(0), FirstChar(0), LastChar(0), maxHeight(0)
+{
+	name[0] = '\0';
+}
+
 /*
 glyphs should be all characters we are interested in printing with the font save whitespace
 Font takes responsibility for glyphs so we must free them once done
