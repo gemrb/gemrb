@@ -1421,9 +1421,7 @@ int Interface::LoadSprites()
 		// Do search for existing font here
 		Font* fnt = NULL;
 		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
-			if (stricmp(fonts[fntIdx]->name, font_name) == 0
-					&& fonts[fntIdx]->ptSize == font_size
-					&& fonts[fntIdx]->style == font_style) {
+			if (stricmp(fonts[fntIdx]->name, font_name) == 0) {
 				fnt = fonts[fntIdx];
 				fnt->AddResRef(ResRef);
 				break;

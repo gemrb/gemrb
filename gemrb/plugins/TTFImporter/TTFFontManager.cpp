@@ -374,8 +374,6 @@ Font* TTFFontManager::GetFont(unsigned short ptSize,
 #undef NEXT_LOOP_CHAR
 	
 	Font* font = new TTFFont(glyphs, firstChar, firstChar + glyphCount - 1, pal);
-	font->ptSize = ptSize;
-	font->style = style;
 	return font;
 }
 

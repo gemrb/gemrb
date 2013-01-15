@@ -82,8 +82,6 @@ protected:
 	ieWord LastChar;
 public:
 	char name[20];
-	FontStyle style;	  // for informational purposes only
-	unsigned short ptSize;// for informational purposes only
 
 	int maxHeight;
 public:

@@ -28,6 +28,8 @@ namespace GemRB {
 class TTFFont : public Font
 {
 private:
+	FontStyle style;
+	ieWord ptSize;
 
 public:
 	TTFFont(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
