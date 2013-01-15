@@ -45,7 +45,6 @@ class TTFFontManager : public FontManager {
 Private ivars
 */
 private:
-	FT_Library library;
 	FT_Stream ftStream;
 
 	TTF_Font font;

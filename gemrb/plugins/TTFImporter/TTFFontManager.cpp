@@ -48,6 +48,23 @@
 
 using namespace GemRB;
 
+FT_Library library = NULL;
+
+void loadFT()
+{
+	FT_Error error = FT_Init_FreeType( &library );
+	if ( error ) {
+		LogFTError(error);
+	}
+}
+
+void destroyFT()
+{
+	if (library) {
+		FT_Done_FreeType( library );
+	}
+}
+
 unsigned long TTFFontManager::read(FT_Stream		  stream,
 								   unsigned long   offset,
 								   unsigned char*  buffer,
@@ -61,19 +78,11 @@ unsigned long TTFFontManager::read(FT_Stream		  stream,
 TTFFontManager::~TTFFontManager(void)
 {
 	Close();
-	if (library) {
-		FT_Done_FreeType( library );
-	}
 }
 
 TTFFontManager::TTFFontManager(void)
 : ftStream(NULL), font()
-{
-	FT_Error error = FT_Init_FreeType( &library );
-	if ( error ) {
-		LogFTError(error);
-	}
-}
+{}
 
 bool TTFFontManager::Open(DataStream* stream)
 {
@@ -374,4 +383,6 @@ Font* TTFFontManager::GetFont(unsigned short ptSize,
 
 GEMRB_PLUGIN(0x3AD6427C, "TTF Font Importer")
 PLUGIN_RESOURCE(TTFFontManager, "ttf")
+PLUGIN_INITIALIZER(loadFT)
+PLUGIN_CLEANUP(destroyFT)
 END_PLUGIN()
