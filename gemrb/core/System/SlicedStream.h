@@ -30,7 +30,7 @@ namespace GemRB {
 class GEM_EXPORT SlicedStream : public DataStream
 {
 private:
-	bool autoFree;
+//	bool autoFree;
 	unsigned long startpos;
 	DataStream* str;
 public:

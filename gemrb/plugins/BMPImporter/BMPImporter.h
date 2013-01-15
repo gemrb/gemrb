@@ -28,7 +28,7 @@ namespace GemRB {
 class BMPImporter : public ImageMgr {
 private:
 	//BITMAPINFOHEADER
-	ieDword Size, Width, Height, Compression, ImageSize, ColorsUsed, ColorsImportant;
+	ieDword Size, Width, Height, Compression, ImageSize/*, ColorsUsed, ColorsImportant*/;
 	ieWord Planes, BitCount;
 
 	//COLORTABLE

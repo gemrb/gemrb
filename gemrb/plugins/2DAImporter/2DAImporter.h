@@ -34,7 +34,6 @@ typedef std::vector< char*> RowEntry;
 
 class p2DAImporter : public TableMgr {
 private:
-	DataStream* str;
 	std::vector< char*> colNames;
 	std::vector< char*> rowNames;
 	std::vector< char*> ptrs;

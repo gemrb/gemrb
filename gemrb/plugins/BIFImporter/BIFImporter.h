@@ -48,7 +48,6 @@ struct TileEntry {
 
 class BIFImporter : public IndexedArchive {
 private:
-	char path[_MAX_PATH];
 	FileEntry* fentries;
 	TileEntry* tentries;
 	ieDword fentcount, tentcount;

@@ -120,7 +120,7 @@ public:
 private:
 	Element *points;
 	ieDword timetolive;
-	ieDword target;    //could be 0, in that case target is pos
+//	ieDword target;    //could be 0, in that case target is pos
 	ieWord size;       //spark number
 	ieWord last_insert;//last spark idx added
 	Scriptable *owner; //could be area or game or actor
