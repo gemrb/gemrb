@@ -18,57 +18,38 @@
  *
  */
 
-#ifndef GemRB_TTFFont_h
-#define GemRB_TTFFont_h
-
 #include "Freetype.h"
-
-#include "FontManager.h"
+#include "System/Logging.h"
 
 namespace GemRB {
 
-struct TTF_Font {
-	FT_Face face;
-
-	int height;
-	int ascent;
-	int descent;
-
-	int glyph_overhang;
-	float glyph_italics;
-
-	int face_style;
-};
-
-class TTFFontManager : public FontManager {
-/*
-Private ivars
-*/
-private:
-	FT_Library library;
-	FT_Stream ftStream;
-
-	TTF_Font font;
-public:
-/*
-Public methods
-*/
-	~TTFFontManager(void);
-	TTFFontManager(void);
-
-	bool Open(DataStream* stream);
-	void Close();
-
-	Font* GetFont(unsigned short ptSize,
-				  FontStyle style, Palette* pal = NULL);
-
-	// freetype "callbacks"
-	static unsigned long read( FT_Stream       stream,
-							  unsigned long   offset,
-							  unsigned char*  buffer,
-							  unsigned long   count );
-};
-
+void LogFTError(FT_Error errCode)
+{
+#undef __FTERRORS_H__
+#define FT_ERRORDEF( e, v, s )  { e, s },
+#define FT_ERROR_START_LIST     {
+#define FT_ERROR_END_LIST       { 0, 0 } };
+	
+	static const struct
+	{
+		int          err_code;
+		const char*  err_msg;
+	} ft_errors[] =
+#include FT_ERRORS_H
+	int i;
+	const char *err_msg;
+	
+	err_msg = NULL;
+	for ( i=0; i < (int)((sizeof ft_errors)/(sizeof ft_errors[0])); ++i ) {
+		if ( errCode == ft_errors[i].err_code ) {
+			err_msg = ft_errors[i].err_msg;
+			break;
+		}
+	}
+	if ( !err_msg ) {
+		err_msg = "unknown FreeType error";
+	}
+	Log(ERROR, "FreeType", "%s", err_msg);
 }
 
-#endif
+}
