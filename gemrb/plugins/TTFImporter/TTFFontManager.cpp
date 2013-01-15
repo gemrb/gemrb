@@ -89,7 +89,6 @@ bool TTFFontManager::Open(DataStream* stream)
 	Close();
 	if (stream) {
 		FT_Error error;
-		FT_CharMap found;
 
 		ftStream = (FT_Stream)calloc(sizeof(*ftStream), 1);
 		ftStream->read = read;
@@ -109,24 +108,9 @@ bool TTFFontManager::Open(DataStream* stream)
 			return false;
 		}
 
-		/* Set charmap for loaded font */
-		found = 0;
-		FT_Face face = font.face;
-		for (int i = 0; i < face->num_charmaps; i++) {
-			FT_CharMap charmap = face->charmaps[i];
-			if ((charmap->platform_id == 3 && charmap->encoding_id == 1) /* Windows Unicode */
-				|| (charmap->platform_id == 3 && charmap->encoding_id == 0) /* Windows Symbol */
-				|| (charmap->platform_id == 2 && charmap->encoding_id == 1) /* ISO Unicode */
-				|| (charmap->platform_id == 0)) { /* Apple Unicode */
-				found = charmap;
-				break;
-			}
-		}
-		if ( found ) {
-			/* If this fails, continue using the default charmap */
-			FT_Set_Charmap(face, found);
-		}
-
+		// we always convert to UTF-16
+		// TODO: maybe we should allow an override encoding?
+		FT_Select_Charmap(font.face, FT_ENCODING_UNICODE);
 		return true;
 	}
 	return false;
