@@ -40,26 +40,6 @@ if (palette) ((Palette*)palette)->IncRef();\
 if (blitPalette) blitPalette->Release();\
 blitPalette = palette;
 
-static const Color black = {0, 0, 0, 0};
-
-inline size_t mystrlen(const char* string)
-{
-	if (!string) {
-		return ( size_t ) 0;
-	}
-	const char* tmp = string;
-	size_t count = 0;
-	while (*tmp != 0) {
-		if (( ( unsigned char ) * tmp ) >= 0xf0) {
-			tmp += 3;
-			count += 3;
-		}
-		count++;
-		tmp++;
-	}
-	return count;
-}
-
 /*
 glyphs should be all characters we are interested in printing with the font save whitespace
 Font takes responsibility for glyphs so we must free them once done
