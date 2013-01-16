@@ -1,0 +1,25 @@
+#!/bin/bash
+#If you have ieparse (from ie_shell) or ielister, you can make git diff/log/show
+# output diffs of text dumps of the binary files it supports instead of just skipping
+# them.
+
+#1. Install either.
+
+#2. Register the blob types
+cat >> .gitattributes <<-"IE"
+*.bcs diff=ie
+*.chu diff=ie
+*.pro diff=ie
+*.spl diff=ie
+*.vvc diff=ie
+IE
+
+#3. Define the new diff driver and optionally make it cache the results:
+# NOTE: use the correct path if the binary is not in the system path!
+
+cat >> .git/config <<-"IE"
+[diff "ie"]
+  textconv = ielister
+  cachetextconv = true
+IE
+
