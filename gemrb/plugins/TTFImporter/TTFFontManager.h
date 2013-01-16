@@ -27,8 +27,6 @@
 
 namespace GemRB {
 
-
-
 class TTFFontManager : public FontManager {
 /*
 Private ivars

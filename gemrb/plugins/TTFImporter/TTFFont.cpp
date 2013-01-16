@@ -174,7 +174,7 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 		 * */
 		if ( ptSize >= face->num_fixed_sizes )
 			ptSize = face->num_fixed_sizes - 1;
-		
+
 		error = FT_Set_Pixel_Sizes( face,
 								   face->available_sizes[ptSize].height,
 								   face->available_sizes[ptSize].width );

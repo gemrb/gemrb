@@ -18,8 +18,6 @@
  *
  */
 
-#include <math.h>
-
 #include "Interface.h"
 #include "Palette.h"
 #include "TTFFont.h"
