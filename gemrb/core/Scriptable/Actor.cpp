@@ -8900,6 +8900,10 @@ bool Actor::IsBehind(Actor* target) const
 // checks all the actor's stats to see if the target is her racial enemy
 int Actor::GetRacialEnemyBonus(Actor* target) const
 {
+	if (!target) {
+		return 0;
+	}
+
 	if (third) {
 		int level = GetRangerLevel();
 		if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
