@@ -431,6 +431,8 @@ Interface::~Interface(void)
 	}
 	SurgeSpells.clear();
 
+	FreeResourceVector( Font, fonts );
+	// fonts need to be destroyed before TTF plugin
 	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
@@ -453,7 +455,6 @@ Interface::~Interface(void)
 		delete[] Cursors;
 	}
 
-	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
 	size_t i;
