@@ -21,6 +21,7 @@
 #ifndef __GemRB__BAMFont__
 #define __GemRB__BAMFont__
 
+#include "AnimationFactory.h"
 #include "Font.h"
 
 namespace GemRB {
@@ -28,9 +29,9 @@ namespace GemRB {
 class BAMFont : public Font
 {
 private:
-
+	AnimationFactory* factory;
 public:
-	BAMFont(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
+	BAMFont(AnimationFactory* af, int* baseline = NULL);
 	~BAMFont(void);
 };
 
