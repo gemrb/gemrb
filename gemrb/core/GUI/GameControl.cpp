@@ -1426,7 +1426,13 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 
 		Actor *prevActor = lastActor;
-		lastActor = area->GetActor( p, target_types);
+		// let us target party members even if they are invisible
+		lastActor = area->GetActor(p, GA_NO_DEAD);
+		if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
+			if (!lastActor->ValidTarget(target_types)) {
+				lastActor = NULL;
+			}
+		}
 		if (lastActor != prevActor) {
 			// we store prevActor so we can remove the tooltip on actor change
 			// (maybe we should be checking this and actor movements every frame?)
@@ -2082,9 +2088,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		return;
 	}
 
-	//hidden actors are not selectable by clicking on them
+	//hidden actors are not selectable by clicking on them unless they're party members
 	Actor* actor = NULL;
-	if (!FormationRotation) actor = area->GetActor( p, GA_DEFAULT /*| GA_NO_DEAD */| GA_NO_HIDDEN | target_types);
+	if (!FormationRotation) {
+		actor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
+		if (actor && actor->Modified[IE_EA]>=EA_CONTROLLED) {
+			if (!actor->ValidTarget(GA_NO_HIDDEN)) {
+				actor = NULL;
+			}
+		}
+	}
 	if (Button == GEM_MB_MENU && (!core->HasFeature(GF_HAS_FLOAT_MENU) || Mod)) {
 		if (actor) {
 			//play select sound on right click on actor
