@@ -28,61 +28,39 @@ namespace GemRB {
 BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 {
 	factory = af;
-
-	size_t glyphCount = 0, cycleCount = af->GetCycleCount();
-	// FIXME: we will end up with many useless (blank) glyphs
-	for (size_t i = 0; i < cycleCount; i++) {
-		glyphCount += af->GetCycleSize(i);
-	}
-	if (glyphCount == 0) {
-		// minimal test uses bam without cycles
-		// this will fall into the "numeric" case below
-		glyphCount = af->GetFrameCount();
-	}
-	assert(glyphCount);
-
-	glyphs = (Sprite2D**)malloc( glyphCount * sizeof(Sprite2D*) );
-	ieWord glyphIndex = 0;
-	FirstChar = 1;
 	maxHeight = 0;
 
+	Sprite2D* curGlyph = NULL;
+	size_t cycleCount = af->GetCycleCount();
 	if (cycleCount > 1) {
 		for (size_t i = 0; i < cycleCount; i++) {
-			if (af->GetFrameCount() < 256) {
-				glyphs[glyphIndex] = af->GetFrame(0, i);
-				glyphs[glyphIndex]->XPos = 0;
-				if (baseline) {
-					glyphs[glyphIndex]->YPos = *baseline;
-				}
-				if (glyphs[glyphIndex]->Height > maxHeight)
-					maxHeight = glyphs[glyphIndex]->Height;
-				glyphIndex++;
-			} else {
-				for (int j = 0; j < af->GetCycleSize(i); j++) {
-					glyphs[glyphIndex] = af->GetFrame(j, i);
-					glyphs[glyphIndex]->XPos = 0;
-					if (glyphs[glyphIndex]->Height > maxHeight)
-						maxHeight = glyphs[glyphIndex]->Height;
-					glyphIndex++;
+			for (int j = 0; j < af->GetCycleSize(i); j++) {
+				curGlyph = af->GetFrame(j, i);
+				if (curGlyph) {
+					if (curGlyph->Height > maxHeight)
+						maxHeight = curGlyph->Height;
+					if (baseline)
+						curGlyph->YPos = *baseline;
+					curGlyph->XPos = 0;
 				}
 			}
 		}
 	} else {
-		// this is a numeric font
-		FirstChar = '0';
-		for (glyphIndex = 0; glyphIndex < af->GetFrameCount(); glyphIndex++) {
-			glyphs[glyphIndex] = af->GetFrameWithoutCycle(glyphIndex);
-			// we want them to have the same baseline as the rest
-			glyphs[glyphIndex]->YPos = 13 - glyphs[glyphIndex]->Height;
-			glyphs[glyphIndex]->XPos = 0;
-			if (glyphs[glyphIndex]->Height > maxHeight)
-				maxHeight = glyphs[glyphIndex]->Height;
+		// numeric font
+		for (size_t i = 0; i < af->GetFrameCount(); i++) {
+			curGlyph = af->GetFrameWithoutCycle(i);
+			if (curGlyph) {
+				if (curGlyph->Height > maxHeight)
+					maxHeight = curGlyph->Height;
+				curGlyph->XPos = 0;
+				// we want them to have the same baseline as the rest
+				curGlyph->YPos = 13 - curGlyph->Height;
+			}
 		}
 	}
-	LastChar = glyphIndex--;
 
 	// assume all sprites have same palette
-	Palette* pal = glyphs[0]->GetPalette();
+	Palette* pal = af->GetFrameWithoutCycle(0)->GetPalette();
 	SetPalette(pal);
 	pal->Release();
 
@@ -95,24 +73,28 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 
 BAMFont::~BAMFont()
 {
-	for (int i = 0; i < LastChar; i++)
-	{
-		core->GetVideoDriver()->FreeSprite(glyphs[i]);
-	}
-	free(glyphs);
-
 	delete factory;
 }
 
 const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
 {
-	if (chr >= FirstChar && chr <= LastChar) {
-		return glyphs[chr - FirstChar];
+	Sprite2D* spr = NULL;
+	size_t cycleCount = factory->GetCycleCount();
+	if (cycleCount > 1) {
+		if (factory->GetFrameCount() <= 256) {
+			spr = factory->GetFrame(0, chr-1);
+		} else {
+			// chr is multibyte
+			// TODO: implement multibyte bam support
+		}
+	} else {
+		// numeric font
+		spr = factory->GetFrameWithoutCycle(chr - '0');
 	}
-	if (chr == ' ') return whiteSpace[SPACE];
-	if (chr == '\t') return  whiteSpace[TAB];
-	//otherwise return an empty sprite
-	return whiteSpace[BLANK];
+	if (!spr) {
+		spr = whiteSpace[BLANK];
+	}
+	return spr;
 }
 
 }

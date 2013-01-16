@@ -31,11 +31,6 @@ class BAMFont : public Font
 private:
 	AnimationFactory* factory;
 
-	ieWord FirstChar;
-	ieWord LastChar;
-	
-	Sprite2D** glyphs;
-
 public:
 	BAMFont(AnimationFactory* af, int* baseline = NULL);
 	~BAMFont(void);
