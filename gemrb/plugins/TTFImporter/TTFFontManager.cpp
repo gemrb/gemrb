@@ -54,9 +54,17 @@ unsigned long TTFFontManager::read(FT_Stream		  stream,
 	return dstream->Read(buffer, count);
 }
 
+void TTFFontManager::close( FT_Stream stream )
+{
+	if (stream)
+		free(stream);
+}
+
 TTFFontManager::~TTFFontManager(void)
 {
-	Close();
+	if (face) {
+		FT_Done_Face(face);
+	}
 }
 
 TTFFontManager::TTFFontManager(void)
@@ -71,6 +79,7 @@ bool TTFFontManager::Open(DataStream* stream)
 
 		ftStream = (FT_Stream)calloc(sizeof(*ftStream), 1);
 		ftStream->read = read;
+		ftStream->close = close;
 		ftStream->descriptor.pointer = stream;
 		ftStream->pos = stream->GetPos();
 		ftStream->size = stream->Size();
@@ -99,10 +108,7 @@ void TTFFontManager::Close()
 	if (face) {
 		FT_Done_Face(face);
 	}
-	if (ftStream) {
-		free(ftStream);
-		ftStream = NULL;
-	}
+	close(ftStream);
 }
 
 Font* TTFFontManager::GetFont(unsigned short ptSize,

@@ -55,6 +55,8 @@ Public methods
 							  unsigned long   offset,
 							  unsigned char*  buffer,
 							  unsigned long   count );
+
+	static void close( FT_Stream stream );
 };
 
 }
