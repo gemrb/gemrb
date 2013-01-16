@@ -23,12 +23,17 @@
 
 #include "Font.h"
 #include "Freetype.h"
+#include "HashMap.h"
+#include "Holder.h"
 
 namespace GemRB {
+class Sprite2D;
 
 class TTFFont : public Font
 {
 private:
+	HashMap<ieWord, Holder<Sprite2D> >* glyphCache;
+
 	FontStyle style;
 	ieWord ptSize;
 

@@ -34,6 +34,9 @@ namespace GemRB {
 TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	: style(style), ptSize(ptSize), face(face)
 {
+	glyphCache = new HashMap<ieWord, Holder<Sprite2D> >();
+	glyphCache->init(256, 128);
+
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 
 	FT_Error error;
@@ -259,6 +262,7 @@ continue;
 TTFFont::~TTFFont()
 {
 	FT_Done_Face(face);
+	delete glyphCache;
 }
 
 }
