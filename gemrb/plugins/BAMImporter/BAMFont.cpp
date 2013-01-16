@@ -40,13 +40,11 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 		// this will fall into the "numeric" case below
 		glyphCount = af->GetFrameCount();
 	}
-	glyphCount--;
 	assert(glyphCount);
 
 	glyphs = (Sprite2D**)malloc( glyphCount * sizeof(Sprite2D*) );
 	ieWord glyphIndex = 0;
 	FirstChar = 1;
-	LastChar = glyphCount;
 	maxHeight = 0;
 
 	if (cycleCount > 1) {
@@ -82,6 +80,7 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 				maxHeight = glyphs[glyphIndex]->Height;
 		}
 	}
+	LastChar = glyphIndex--;
 
 	// assume all sprites have same palette
 	Palette* pal = glyphs[0]->GetPalette();
@@ -98,6 +97,17 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 BAMFont::~BAMFont()
 {
 	delete factory;
+}
+
+const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
+{
+	if (chr >= FirstChar && chr <= LastChar) {
+		return glyphs[chr - FirstChar];
+	}
+	if (chr == ' ') return whiteSpace[SPACE];
+	if (chr == '\t') return  whiteSpace[TAB];
+	//otherwise return an empty sprite
+	return whiteSpace[BLANK];
 }
 
 }

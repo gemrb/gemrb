@@ -90,7 +90,7 @@ public:
 	virtual ~Font(void);
 
 	//allow reading but not setting glyphs
-	virtual const Sprite2D* GetCharSprite(ieWord chr) const;
+	virtual const Sprite2D* GetCharSprite(ieWord chr) const = 0;
 
 	bool AddResRef(const ieResRef resref);
 	bool MatchesResRef(const ieResRef resref);

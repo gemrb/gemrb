@@ -102,21 +102,6 @@ Font::~Font(void)
 	free(resRefs);
 }
 
-/*
- Return a region specefying the size of character 'chr'
- if 'chr' is not in the font then return empty region.
- */
-const Sprite2D* Font::GetCharSprite(ieWord chr) const
-{
-	if (chr >= FirstChar && chr <= LastChar) {
-		return glyphs[chr - FirstChar];
-	}
-	if (chr == ' ') return whiteSpace[SPACE];
-	if (chr == '\t') return  whiteSpace[TAB];
-	//otherwise return an empty sprite
-	return whiteSpace[BLANK];
-}
-
 bool Font::AddResRef(const ieResRef resref)
 {
 	if (resref) {

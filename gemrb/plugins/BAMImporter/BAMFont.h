@@ -33,6 +33,8 @@ private:
 public:
 	BAMFont(AnimationFactory* af, int* baseline = NULL);
 	~BAMFont(void);
+
+	const Sprite2D* GetCharSprite(ieWord chr) const;
 };
 
 }
