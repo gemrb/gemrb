@@ -48,6 +48,8 @@ private:
 public:
 	TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal);
 	~TTFFont(void);
+
+	const Sprite2D* GetCharSprite(ieWord chr) const;
 };
 
 }
