@@ -621,7 +621,10 @@ void Spellbook::BonusSpells(int type, int count, int *bonuses)
 	if (level>count) level=count;
 	for (int i = 0; i < level; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(type, i);
-		sm->SlotCountWithBonus+=bonuses[i];
+		// don't give access to new spell levels through these boni
+		if (sm->SlotCountWithBonus) {
+			sm->SlotCountWithBonus+=bonuses[i];
+		}
 	}
 }
 

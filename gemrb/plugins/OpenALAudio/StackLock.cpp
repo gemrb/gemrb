@@ -29,6 +29,7 @@ using namespace GemRB;
 StackLock::StackLock(SDL_mutex* mutex, const char *mutexName)
 	: _mutex(mutex), _mutexName(mutexName) {
 	lock();
+	(void)_mutexName; // NOOP to silence clang
 }
 
 StackLock::~StackLock() {

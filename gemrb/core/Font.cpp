@@ -40,26 +40,6 @@ if (palette) ((Palette*)palette)->IncRef();\
 if (blitPalette) blitPalette->Release();\
 blitPalette = palette;
 
-static const Color black = {0, 0, 0, 0};
-
-inline size_t mystrlen(const char* string)
-{
-	if (!string) {
-		return ( size_t ) 0;
-	}
-	const char* tmp = string;
-	size_t count = 0;
-	while (*tmp != 0) {
-		if (( ( unsigned char ) * tmp ) >= 0xf0) {
-			tmp += 3;
-			count += 3;
-		}
-		count++;
-		tmp++;
-	}
-	return count;
-}
-
 /*
 glyphs should be all characters we are interested in printing with the font save whitespace
 Font takes responsibility for glyphs so we must free them once done
@@ -155,7 +135,7 @@ bool Font::MatchesResRef(const ieResRef resref)
 }
 
 void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-	Palette* hicolor, unsigned char Alignment, Font* initials,
+	Palette* hicolor, ieByte Alignment, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	bool enablecap=false;
@@ -266,7 +246,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				const Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
+				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
 				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );
@@ -351,7 +331,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 }
 
 void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
-	unsigned char Alignment, bool anchor, Font* initials,
+	ieByte Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	Region cliprgn = rgn;
@@ -364,7 +344,7 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 }
 
 void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
-	Palette* hicolor, unsigned char Alignment, bool anchor, Font* initials,
+	Palette* hicolor, ieByte Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	int capital = (initials) ? 1 : 0;
@@ -458,7 +438,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				const Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
+				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
 				SET_BLIT_PALETTE(newPal);
 				gamedata->FreePalette( newPal );

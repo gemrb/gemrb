@@ -4234,7 +4234,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			case 1: // mage and cleric
 			case 2: // mage
 				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_BARD, 0)) display_warning = true;
-				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_SORCEROR, 0)) display_warning = true;
+				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_SORCERER, 0)) display_warning = true;
 				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_WIZARD, 0)) display_warning = true;
 				break;
 		}

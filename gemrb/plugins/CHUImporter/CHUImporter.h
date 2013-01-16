@@ -34,7 +34,7 @@ namespace GemRB {
 class CHUImporter : public WindowMgr {
 private:
 	DataStream* str;
-	bool autoFree;
+//	bool autoFree;
 	ieDword WindowCount, CTOffset, WEOffset;
 public: 
 	CHUImporter();

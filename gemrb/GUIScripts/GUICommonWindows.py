@@ -28,6 +28,7 @@ from ie_stats import *
 from ie_modal import *
 from ie_action import *
 from ie_slots import SLOT_QUIVER
+from ie_restype import RES_2DA
 import GUICommon
 import CommonTables
 import LUCommon
@@ -1024,7 +1025,7 @@ def ActionRangerSpellPressed ():
 	return
 
 def ActionSorcererSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_SORCEROR)
+	TypeSpellPressed(IE_IWD2_SPELL_SORCERER)
 	return
 
 def ActionWizardSpellPressed ():
@@ -1114,6 +1115,11 @@ def GetActorPortrait (actor, which):
 
 
 def UpdateAnimation ():
+	if not GemRB.HasResource ("ANIMS", RES_2DA):
+		# FIXME: make a simpler version for non-pst too
+		# this is a callback from the core on EF_UPDATEANIM!
+		return
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	disguise = GemRB.GetGameVar ("APPEARANCE")

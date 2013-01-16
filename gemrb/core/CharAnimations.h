@@ -83,6 +83,7 @@ namespace GemRB {
 #define IE_ANI_CODE_MIRROR_3	15 //MSPS
 #define IE_ANI_TWO_FILES_3B		16    //iwd animations (eg. MBBM)
 #define IE_ANI_TWO_PIECE		17    //MAKH
+#define IE_ANI_FOUR_FILES_3		18    //mostly civilians
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		56   //full animation
@@ -204,6 +205,8 @@ private:
 		unsigned char& Cycle, unsigned char Orient);
 	void AddFFSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part);
+	void AddHLSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
 	void AddNFSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part);
 	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,

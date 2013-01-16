@@ -1104,6 +1104,12 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::ItemIsIdentified(Scriptable* Sender, Trigger* parameters)
 {
+	// hardcode the Nothing filtering exception (needed for most iwd2 dialog uses)
+	bool nothing = parameters->objectParameter[0].objectFilters[0] == 255;
+	if (nothing) {
+		// reset the filter to 19 LastTalkedToBy
+		parameters->objectParameter[0].objectFilters[0] = 19;
+	}
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if ( !scr || scr->Type!=ST_ACTOR) {
 		return 0;

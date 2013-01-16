@@ -25,7 +25,7 @@ import CharOverview
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
 Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
 IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCEROR, IE_LEVEL2]
+IE_LEVELSORCERER, IE_LEVEL2]
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")

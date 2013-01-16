@@ -39,7 +39,7 @@ private:
 	unsigned char bits_buffer[UNPACKER_BUFFER_SIZE];
 	unsigned int buffer_bit_offset;
 
-	int sb_size, block_size;
+	int sb_size;
 	short* amp_buffer, * buff_middle;
 	int* block_ptr;
 
@@ -73,7 +73,7 @@ public:
 		: levels( lev_cnt ), subblocks( sb_count ), next_bits( 0 ),
 		avail_bits( 0 ), buffer_bit_offset( UNPACKER_BUFFER_SIZE ),
 		sb_size( 1 << levels ),
-		block_size( sb_size*subblocks ), amp_buffer( NULL ),
+		amp_buffer( NULL ),
 		buff_middle( NULL ), block_ptr( NULL )
 	{
 		this->stream = stream;

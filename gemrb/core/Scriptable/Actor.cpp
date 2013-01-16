@@ -91,6 +91,7 @@ static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
 static int *defaultprof = NULL;
+static int *castingstat = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
@@ -143,11 +144,6 @@ struct ItemUseType {
 	ieByte which;	//which item dword should be used (1 = kit)
 };
 
-static const char *skillcolumns[12]={
-	"DRUIDSPELL", "CLERICSPELL", "MAGESPELL", NULL, "BARDSKILL", "THIEFSKILL",
-	"LAYHANDS", "TURNLEVEL", "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
-};
-
 static ieResRef featspells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
@@ -183,7 +179,7 @@ static const char *isclassnames[ISCLASSES] = {
 	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "CLASS12", "CLASS13" };
 static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
 	IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
-	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCEROR, IE_LEVELCLASS12, IE_LEVELCLASS13};
+	IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCERER, IE_LEVELCLASS12, IE_LEVELCLASS13};
 
 #define BGCLASSCNT 23
 //fighter is the default level here
@@ -196,9 +192,9 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 //autogenerating for non IWD2 now!!!
 static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
-static const unsigned int booksiwd2[ISCLASSES]={0, 1<<IE_IWD2_SPELL_WIZARD, 0, 0, 
- 1<<IE_IWD2_SPELL_BARD, 1<<IE_IWD2_SPELL_CLERIC, 1<<IE_IWD2_SPELL_DRUID, 0,
- 1<<IE_IWD2_SPELL_PALADIN, 1<<IE_IWD2_SPELL_RANGER, 1<<IE_IWD2_SPELL_SORCEROR, 0, 0};
+static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
+ IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
+ IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_SORCERER, -1, -1};
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
@@ -1316,11 +1312,11 @@ void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 }
 
 static int maximum_values[MAX_STATS]={
-32767,32767,20,100,100,100,100,25,10,25,25,25,25,25,100,100,//0f
-100,100,100,100,100,100,100,100,100,100,255,255,255,255,100,100,//1f
+32767,32767,20,100,100,100,100,25,10,25,25,25,25,25,200,200,//0f
+200,200,200,200,200,100,100,100,100,100,255,255,255,255,100,100,//1f
 200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
 200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,0,//3f
-511,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,100,100,255,1,20,20,25,//4f
+511,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,200,200,255,1,20,20,25,//4f
 25,1,1,255,25,25,255,255,25,255,255,255,255,255,255,255,//5f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//6f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//7f
@@ -1427,6 +1423,11 @@ void Actor::ReleaseMemory()
 		if (booktypes) {
 			free(booktypes);
 			booktypes=NULL;
+		}
+
+		if (castingstat) {
+			free(castingstat);
+			castingstat=NULL;
 		}
 
 		if (xpbonus) {
@@ -1557,19 +1558,6 @@ void Actor::ReleaseMemory()
 	classcount = -1;
 }
 
-#define COL_DRUID_SPELL   0   //ranger type racial enemy
-#define COL_CLERIC_SPELL  1   //cleric spells
-#define COL_MAGE_SPELL    2   //mage spells
-#define COL_STARTXP       3   //starting xp
-#define COL_BARD_SKILL    4   //bard skills
-#define COL_THIEF_SKILL   5   //thief skills
-#define COL_LAYHANDS      6   //paladin ability
-#define COL_TURNLEVEL     7   //paladin/cleric
-#define COL_BOOKTYPE      8   //sorceror
-#define COL_HATERACE      9   //ranger special
-#define COL_ABILITIES     10  //clab
-#define COL_NO_PROF       11  //default proficiency penalty
-
 #define COL_MAIN       0
 #define COL_SPARKS     1
 #define COL_GRADIENT   2
@@ -1636,7 +1624,6 @@ static void InitActorTables()
 		state_invisible=STATE_INVISIBLE;
 	}
 
-	//I'm not sure if xp is reduced or not in iwd2 on easy setting
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_COMBAT|SX_CR;
 	} else {
@@ -1679,6 +1666,7 @@ static void InitActorTables()
 		booktypes = (int *) calloc(classcount, sizeof(int));
 		classabilities = (char **) calloc(classcount, sizeof(char*));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
+		castingstat = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
 
@@ -1686,18 +1674,24 @@ static void InitActorTables()
 			const char *field;
 			const char *rowname = tm->GetRowName(i);
 
-			field = tm->QueryField( rowname, skillcolumns[COL_DRUID_SPELL] );
+			field = tm->QueryField(rowname, "DRUIDSPELL");
 			if (field[0]!='*') {
 				isclass[ISDRUID] |= bitmask;
 				druidspelltables[i]=strdup(field);
 			}
-			field = tm->QueryField( rowname, skillcolumns[COL_CLERIC_SPELL] );
+			field = tm->QueryField(rowname, "CLERICSPELL");
 			if (field[0]!='*') {
-				isclass[ISCLERIC] |= bitmask;
-				clericspelltables[i]=strdup(field);
+				// iwd2 has no DRUIDSPELL
+				if (third && !strnicmp(field, "MXSPLDRD", 8)) {
+					isclass[ISDRUID] |= bitmask;
+					druidspelltables[i]=strdup(field);
+				} else {
+					isclass[ISCLERIC] |= bitmask;
+					clericspelltables[i]=strdup(field);
+				}
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_MAGE_SPELL] );
+			field = tm->QueryField(rowname, "MAGESPELL");
 			if (field[0]!='*') {
 				isclass[ISMAGE] |= bitmask;
 				wizardspelltables[i]=strdup(field);
@@ -1705,44 +1699,49 @@ static void InitActorTables()
 
 			// field 3 holds the starting xp
 
-			field = tm->QueryField( rowname, skillcolumns[COL_BARD_SKILL] );
+			field = tm->QueryField(rowname, "BARDSKILL");
 			if (field[0]!='*') {
 				isclass[ISBARD] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_THIEF_SKILL] );
+			field = tm->QueryField(rowname, "THIEFSKILL");
 			if (field[0]!='*') {
 				isclass[ISTHIEF] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_LAYHANDS] );
+			field = tm->QueryField(rowname, "LAYHANDS");
 			if (field[0]!='*') {
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_TURNLEVEL] );
+			field = tm->QueryField(rowname, "TURNLEVEL");
 			turnlevels[i]=atoi(field);
 
-			field = tm->QueryField( rowname, skillcolumns[COL_BOOKTYPE] );
+			field = tm->QueryField(rowname, "BOOKTYPE");
 			booktypes[i]=atoi(field);
-			//if booktype == 3 then it is a 'divine sorceror' class
+			//if booktype == 3 then it is a 'divine sorcerer' class
 			//we shouldn't hardcode iwd2 classes this heavily
 			if (booktypes[i]==2) {
 				isclass[ISSORCERER] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_HATERACE] );
+			if (third) {
+				field = tm->QueryField(rowname, "CASTING"); // COL_HATERACE but different name
+				castingstat[i] = atoi(field);
+			}
+
+			field = tm->QueryField(rowname, "HATERACE");
 			if (field[0]!='*') {
 				isclass[ISRANGER] |= bitmask;
 			}
 
-			field = tm->QueryField( rowname, skillcolumns[COL_ABILITIES] );
+			field = tm->QueryField(rowname, "ABILITIES");
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
 			classabilities[i]=strdup(field);
 
-			field = tm->QueryField( rowname, skillcolumns[COL_NO_PROF] );
+			field = tm->QueryField(rowname, "NO_PROF");
 			defaultprof[i]=atoi(field);
 
 			bitmask <<=1;
@@ -1880,7 +1879,13 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("mxsplwis");
+	// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
+	// luckily, they both use the same format
+	if (third) {
+		tm.load("mxsplbon");
+	} else {
+		tm.load("mxsplwis");
+	}
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
 		int max = core->GetMaximumAbility();
@@ -2503,11 +2508,10 @@ int Actor::GetWisdomAC() const
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
-//TODO: may want to preload the crits table to avoid spam in the log
 int Actor::GetCriticalType() const
 {
 	long ret = 0;
-	AutoTable tm("crits");
+	AutoTable tm("crits", true);
 	if (!tm) return 0;
 	//the ID of this PC (first 2 rows are empty)
 	int row = BaseStats[IE_SPECIFIC];
@@ -2927,11 +2931,26 @@ void Actor::RefreshEffects(EffectQueue *fx)
 			}
 		}
 	}
-	//add wisdom bonus spells
-	if (!spellbook.IsIWDSpellBook() && mxsplwis) {
-		int level = Modified[IE_WIS];
-		if (level--) {
-			spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
+	//add wisdom/casting_ability bonus spells
+	if (mxsplwis) {
+		if (spellbook.IsIWDSpellBook()) {
+			// check each class separately for the casting stat and booktype (luckily there is no bonus for domain spells)
+			for (i=0; i < ISCLASSES; i++) {
+				int level = GetClassLevel(i);
+				int booktype = booksiwd2[i]; // ieIWD2SpellType
+				if (!level || booktype == -1) {
+					continue;
+				}
+				level = Modified[castingstat[classesiwd2[i]]];
+				if (level--) {
+					spellbook.BonusSpells(booktype, spllevels, mxsplwis+spllevels*level);
+				}
+			}
+		} else {
+			int level = Modified[IE_WIS];
+			if (level--) {
+				spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
+			}
 		}
 	}
 
@@ -5506,6 +5525,7 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 int Actor::GetAttackStyle() const
 {
 	WeaponInfo wi;
+	wi.enchantment = 0;
 	//Non NULL if the equipped slot is a projectile or a throwing weapon
 	//TODO some weapons have both melee and ranged capability
 	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED;
@@ -5868,6 +5888,11 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		}
 	} else {
 		// ranged - no bonus
+	}
+
+	// racial enemies suffer 4hp more in all games
+	if (GetRangerLevel() && GetRacialEnemyBonus(target)) {
+		DamageBonus += 4;
 	}
 
 	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
@@ -6438,8 +6463,10 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 			damage -= resisted;
 			print("Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
-			// TODO: PST and BG1 may actually heal on negative damage
-			if (damage <= 0) resisted = DR_IMMUNE;
+			// PST and BG1 may actually heal on negative damage
+			if (!core->HasFeature(GF_HEAL_ON_100PLUS)) {
+				if (damage <= 0) resisted = DR_IMMUNE;
+			}
 		}
 	}
 
@@ -6570,7 +6597,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 					displaymsg->DisplayStringName(core->ModalStates[ModalState].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 				ModalState = MS_NONE;
-				// TODO: wait for a round until allowing new states?
 			}
 		}
 
@@ -6682,7 +6708,6 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp, int combat)
 {
 	if (core->HasFeature(GF_WISDOM_BONUS)) {
-		//TODO find out the 3ED variant
 		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
 	}
 	int adjustmentPercent = dmgadjustments[GameDifficulty];
@@ -9182,7 +9207,7 @@ int Actor::GetBookMask() const
 	int bookmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {
 		if (Modified[levelslotsiwd2[i]] > 0) {
-			bookmask |= 1<<(booksiwd2[i]-1);
+			bookmask |= 1<<((1<<booksiwd2[i])-1);
 		}
 	}
 

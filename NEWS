@@ -1,7 +1,7 @@
-GemRB git (e513bd3232ed):
+GemRB git (938d11a24):
   New features:
     - 
-    - iwd2: ECL handling
+    - iwd2: Prologue completable, full spellbook and ECL support
     - initial bundled gemrb demo stubs
     - most gemrb overrides were moved and are now moddable via game override
     - favourite weapon/spell tracking, bg1 dreams
@@ -9,7 +9,7 @@ GemRB git (e513bd3232ed):
   Improved features:
     - 
     - animations, speech
-    - looting
+    - looting, worldmap
     - iwd2 combat, stats, spells, skills, effects and actions
     - bugfixes
 

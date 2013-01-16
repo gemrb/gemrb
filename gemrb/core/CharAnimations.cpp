@@ -751,6 +751,11 @@ IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old T
 
 IE_ANI_FOUR_FILES_2:	Like IE_ANI_FOUR_FILES but with only 16 cycles per frame.
 
+IE_ANI_FOUR_FILES_3: A variation of the four files animation without equipment, and
+			with even and odd orientations split across two files, plus the standard
+			separate eastern parts, so the layout is
+			[NAME][H|L]G1[/E]
+
 IE_ANI_TWENTYTWO:	This Animation Type stores the Animation in the following format
 			[NAME][ACTIONCODE][/E]
 			ACTIONCODE=A1-6, CA, SX, SA (sling is A1)
@@ -1142,6 +1147,16 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			Anims[StanceID][Orient] = anims;
 			Anims[StanceID][Orient + 1] = anims;
 			break;
+		case IE_ANI_FOUR_FILES_3:
+			//only 8 orientations for WALK
+			if (StanceID == IE_ANI_WALK) {
+				Orient&=~1;
+				Anims[StanceID][Orient] = anims;
+				Anims[StanceID][Orient + 1] = anims;
+			} else {
+				Anims[StanceID][Orient] = anims;
+			}
+			break;
 
 		case IE_ANI_PST_ANIMATION_3: //no stc just std
 		case IE_ANI_PST_ANIMATION_2: //no std just stc
@@ -1242,6 +1257,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_FOUR_FILES_2:
 			AddLRSuffix2( NewResRef, StanceID, Cycle, Orient, EquipData );
+			break;
+
+		case IE_ANI_FOUR_FILES_3:
+			AddHLSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
@@ -2463,6 +2482,65 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
+	}
+}
+
+void CharAnimations::AddHLSuffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	//even orientations in 'h', odd in 'l', and since the WALK animation
+	//with fewer orientations is first in h, all other stances in that
+	//file need to be offset by those cycles
+	int offset = ((Orient % 2)^1) * 8;
+
+	switch (StanceID) {
+
+		case IE_ANI_WALK:
+			//only available in 8 orientations instead of the usual 16
+			Cycle = 0 + Orient / 2;
+			offset = 1;
+			break;
+
+		case IE_ANI_HEAD_TURN:
+			Cycle = offset + Orient / 2;
+			break;
+
+		case IE_ANI_AWAKE:
+		case IE_ANI_READY:
+		//the following are not available
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+		case IE_ANI_HIDE:
+		case IE_ANI_SHOOT:
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_BACKSLASH:
+		case IE_ANI_ATTACK_JAB:
+			Cycle = 8 + offset + Orient / 2;
+			break;
+
+		case IE_ANI_DAMAGE:
+			Cycle = 16 + offset + Orient / 2;
+			break;
+
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			Cycle = 24 + offset + Orient / 2;
+			break;
+
+		case IE_ANI_SLEEP:
+		case IE_ANI_TWITCH:
+			Cycle = 32 + offset + Orient / 2;
+			break;
+
+		default:
+			error("CharAnimation", "HL Animation: unhandled stance: %s %d", ResRef, StanceID);
+			break;
+	}
+	strcat(ResRef, offset ? "hg1" : "lg1");
+	if (Orient > 9) {
+		strcat(ResRef, "e");
 	}
 }
 

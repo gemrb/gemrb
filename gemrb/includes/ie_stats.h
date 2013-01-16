@@ -525,7 +525,7 @@ namespace GemRB {
 #define IE_LEVELMONK             244
 #define IE_LEVELPALADIN          245
 #define IE_LEVELRANGER           246
-#define IE_LEVELSORCEROR         247
+#define IE_LEVELSORCERER         247
 // place for 2 more classes
 #define IE_LEVELCLASS12          248
 #define IE_LEVELCLASS13          249

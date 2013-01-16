@@ -22,7 +22,8 @@ Options that do not deal strictly with data availability and diversity
 may be freely changed. Some that may be interesting to users include:
 AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
 HasSpecificDamageBonus (mod required), HasWisdomBonusTable (mod required),
-KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack and TeamMovement.
+HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack
+ and TeamMovement.
 
 [FIXME: eventually, this file could be searched for in user's config directory too]
 
@@ -372,6 +373,12 @@ IgnoreButtonFrames = <bool>
 If set to 1, buttons will ignore frame numbers as set in button CHU
 resource, and always use frames 0, 1, 2, 3 from their associated
 BAM. (PST, ...)
+
+
+ImplicitAreaAnimBackground = <bool>
+- - - - - - - - - - - - - -
+If set to 1, area animations will have a different renderering order.
+This is used to fix some animations in the IWD line of games
 
 
 IWD2DeathVarFormat = <bool>

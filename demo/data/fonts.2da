@@ -1,10 +1,10 @@
 2DA V1.0
 NORMAL
-	RESREF		NEED_PALETTE	FIRST_CHAR	LAST_CHAR	FONT_NAME	PT_SIZE		STYLE	COLOR
-0	NORMAL		1				33			255			DejaVuSans		14			0		0xffffffff
-1	FLOATTXT	1				33			255			DejaVuSans	12			0		0xffffffff
+	RESREF		NEED_PALETTE	FONT_NAME	PT_SIZE		STYLE	COLOR
+0	NORMAL		1				DejaVuSans	14			0		0xffffffff
+1	FLOATTXT	1				DejaVuSans	12			0		0xffffffff
 #these are the same font so list the larger one first and gemrb only needs to create one font
-2	INITIALS	0				33			255			Eadui	36			0		0xffffffff
-3	NUMBER		0				48			58			Eadui		14			0		0xffffffff
+2	INITIALS	0				Eadui		36			0		0xffffffff
+3	NUMBER		0				Eadui		14			0		0xffffffff
 
 # Customization How To: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
