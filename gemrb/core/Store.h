@@ -56,7 +56,7 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 #define IE_STORE_SELECT   0x40   //valid when these flags used as store action
 #define IE_STORE_RENT     128    //gemrb extension
 #define IE_STORE_QUALITY  0x600  //2 bits
-#define IE_STORE_FENCE    0x2000 //
+#define IE_STORE_FENCE    0x1000 //
 #define IE_STORE_RECHARGE 0x4000 //gemrb extension, if set, store won't recharge
 
 
