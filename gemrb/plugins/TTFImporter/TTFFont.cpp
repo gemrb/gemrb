@@ -219,8 +219,6 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	glyph_italics = 0.207f;
 	glyph_italics *= height;
 
-	glyphs = NULL;
-
 	SetPalette(pal);
 
 	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);

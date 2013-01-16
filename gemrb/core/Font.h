@@ -67,26 +67,18 @@ class Sprite2D;
 
 class GEM_EXPORT Font {
 protected:
-	int glyphCount;
-
 	ieResRef* resRefs;
 	int numResRefs;
 
 	Palette* palette;
-	Sprite2D** glyphs;
 	Sprite2D* whiteSpace[3];
 
-	/** Sets ASCII code of the first character in the font.
-	 * (it allows remapping numeric fonts from \000 to '0') */
-	ieWord FirstChar;
-	ieWord LastChar;
 public:
 	char name[20];
 
 	int maxHeight;
 public:
-	Font(); // temporary default constructor
-	Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
+	Font();
 	virtual ~Font(void);
 
 	//allow reading but not setting glyphs

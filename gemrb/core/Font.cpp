@@ -40,51 +40,10 @@ if (palette) ((Palette*)palette)->IncRef();\
 if (blitPalette) blitPalette->Release();\
 blitPalette = palette;
 
-// temporary default constructor
 Font::Font()
-: glyphCount(0), resRefs(NULL), numResRefs(0), palette(NULL), glyphs(0), FirstChar(0), LastChar(0), maxHeight(0)
+: resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
 	name[0] = '\0';
-}
-
-/*
-glyphs should be all characters we are interested in printing with the font save whitespace
-Font takes responsibility for glyphs so we must free them once done
-*/
-Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
-	: glyphCount(lastChar - firstChar + 1), glyphs(glyphs), FirstChar(firstChar), LastChar(lastChar)
-{
-	assert(glyphs);
-	assert(pal);
-	assert(firstChar <= lastChar);
-
-	palette = NULL;
-	resRefs = NULL;
-	numResRefs = 0;
-	maxHeight = 0;
-	name[0] = '\0';
-
-	SetPalette(pal);
-
-	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
-
-	for (int i = 0; i < glyphCount; i++)
-	{
-		if (glyphs[i] != NULL) {
-			glyphs[i]->XPos = 0;
-			glyphs[i]->SetPalette(palette);
-			if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
-		} else {
-			// use our empty glyph for safety reasons
-			whiteSpace[BLANK]->acquire();
-			glyphs[i] = whiteSpace[BLANK];
-		}
-	}
-
-	// standard space width is 1/4 ptSize
-	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(maxHeight * 0.25), 0, 8, NULL, palette->col);
-	// standard tab width is 4 spaces???
-	whiteSpace[TAB] = core->GetVideoDriver()->CreateSprite8((whiteSpace[1]->Width * 4), 0, 8, NULL, palette->col);
 }
 
 Font::~Font(void)
@@ -93,12 +52,8 @@ Font::~Font(void)
 	whiteSpace[SPACE]->release();
 	whiteSpace[TAB]->release();
 
-	for (int i = 0; i < glyphCount; i++)
-	{
-		core->GetVideoDriver()->FreeSprite(glyphs[i]);
-	}
 	SetPalette(NULL);
-	free(glyphs);
+
 	free(resRefs);
 }
 

@@ -29,8 +29,7 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 {
 	factory = af;
 
-	glyphCount = 0;
-	size_t cycleCount = af->GetCycleCount();
+	size_t glyphCount = 0, cycleCount = af->GetCycleCount();
 	// FIXME: we will end up with many useless (blank) glyphs
 	for (size_t i = 0; i < cycleCount; i++) {
 		glyphCount += af->GetCycleSize(i);
@@ -96,6 +95,12 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 
 BAMFont::~BAMFont()
 {
+	for (int i = 0; i < LastChar; i++)
+	{
+		core->GetVideoDriver()->FreeSprite(glyphs[i]);
+	}
+	free(glyphs);
+
 	delete factory;
 }
 
