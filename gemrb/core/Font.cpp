@@ -48,12 +48,8 @@ Font::Font()
 
 Font::~Font(void)
 {
-	whiteSpace[BLANK]->release();
-	whiteSpace[SPACE]->release();
-	whiteSpace[TAB]->release();
-
+	blank->release();
 	SetPalette(NULL);
-
 	free(resRefs);
 }
 

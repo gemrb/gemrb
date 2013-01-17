@@ -64,11 +64,7 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 	SetPalette(pal);
 	pal->Release();
 
-	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
-	// standard space width is 1/4 ptSize
-	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(maxHeight * 0.25), 0, 8, NULL, palette->col);
-	// standard tab width is 4 spaces???
-	whiteSpace[TAB] = core->GetVideoDriver()->CreateSprite8((whiteSpace[1]->Width * 4), 0, 8, NULL, palette->col);
+	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 }
 
 BAMFont::~BAMFont()
@@ -92,7 +88,7 @@ const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
 		spr = factory->GetFrameWithoutCycle(chr - '0');
 	}
 	if (!spr) {
-		spr = whiteSpace[BLANK];
+		spr = blank;
 	}
 	return spr;
 }

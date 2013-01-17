@@ -45,14 +45,14 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 	FT_Error error = 0;
 	FT_UInt index = FT_Get_Char_Index(face, chr);
 	if (!index) {
-		return whiteSpace[BLANK];
+		return blank;
 	}
 
 	int maxx, yoffset;
 	error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
 	if( error ) {
 		LogFTError(error);
-		return whiteSpace[BLANK];
+		return blank;
 	}
 
 	FT_GlyphSlot glyph = face->glyph;
@@ -89,7 +89,7 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 	error = FT_Render_Glyph( glyph, ft_render_mode_normal );
 	if( error ) {
 		LogFTError(error);
-		return whiteSpace[BLANK];
+		return blank;
 	}
 
 	bitmap = &glyph->bitmap;
@@ -104,7 +104,7 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 	}
 
 	if (sprWidth == 0 || sprHeight == 0) {
-		return whiteSpace[BLANK];
+		return blank;
 	}
 
 	// we need 1px empty space on each side
@@ -221,14 +221,16 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 
 	SetPalette(pal);
 
-	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
+	// TODO: ttf fonts have a "box" glyph they use for this
+	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 	// ttf fonts dont produce glyphs for whitespace
-	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(ptSize * 0.25), 0, 8, NULL, palette->col);;
-	whiteSpace[TAB] = core->GetVideoDriver()->CreateSprite8((whiteSpace[SPACE]->Width)*4, 0, 8, NULL, palette->col);
+	Sprite2D* space = core->GetVideoDriver()->CreateSprite8((int)(ptSize * 0.25), 0, 8, NULL, palette->col);;
+	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, 8, NULL, palette->col);
 
 	// now cache these glyphs for quick access
-	glyphCache->set(' ', whiteSpace[SPACE]);
-	glyphCache->set('\t', whiteSpace[TAB]);
+	// WARNING: if we ever did something to purge the cache these would be lost
+	glyphCache->set(' ', space);
+	glyphCache->set('\t', tab);
 }
 
 TTFFont::~TTFFont()

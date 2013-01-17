@@ -41,12 +41,6 @@ enum FontStyle {
 	UNDERLINE = 0x04
 };
 
-enum WhiteSpace {
-	BLANK = 0,
-	SPACE = 1,
-	TAB = 2
-};
-
 class Palette;
 class Sprite2D;
 
@@ -71,7 +65,7 @@ protected:
 	int numResRefs;
 
 	Palette* palette;
-	Sprite2D* whiteSpace[3];
+	Sprite2D* blank;
 
 public:
 	char name[20];
