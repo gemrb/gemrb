@@ -253,6 +253,9 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	// WARNING: if we ever did something to purge the cache these would be lost
 	glyphCache->set(' ', space);
 	glyphCache->set('\t', tab);
+	// retained by the cache
+	space->release();
+	tab->release();
 }
 
 TTFFont::~TTFFont()
