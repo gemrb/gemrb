@@ -2468,9 +2468,8 @@ int Actor::GetDexterityAC() const
 
 	int dexbonus = GetAbilityBonus(IE_DEX);
 	if (dexbonus) {
-		// FIXME: the maximum dexterity bonus isn't stored(?),
-		// but can usually be calculated from 8-AC+enchantment (or 8-AC if you don't count that bonus in AC already)
-		// or from the armor penalty (works for light armors)
+		// the maximum dexterity bonus isn't stored,
+		// but can reliably be calculated from 8-spell failure (except for robes, which have no limit)
 		ieWord armtype = inventory.GetArmorItemType();
 		int armor = (int) core->GetArmorFailure(armtype);
 
