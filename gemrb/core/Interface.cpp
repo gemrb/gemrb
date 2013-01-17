@@ -112,7 +112,7 @@ static int **reputationmod = NULL;
 static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 
-static ieWord IDT_PENALTY = 0;
+static ieWord IDT_FAILURE = 0;
 static ieWord IDT_CRITRANGE = 1;
 static ieWord IDT_CRITMULTI = 2;
 
@@ -4422,7 +4422,7 @@ bool Interface::InitItemTypes()
 		itemtypedata.push_back(std::vector<int>(3));
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
-			itemtypedata[i][IDT_PENALTY] = 0; // armor malus
+			itemtypedata[i][IDT_FAILURE] = 0; // armor malus
 			itemtypedata[i][IDT_CRITRANGE] = 20; // crit range
 			itemtypedata[i][IDT_CRITMULTI] = 2; // crit multiplier
 		}
@@ -4582,7 +4582,7 @@ int Interface::GetArmorFailure(unsigned int itemtype) const
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_WEAPON) return 0;
-	return itemtypedata[itemtype][IDT_PENALTY];
+	return itemtypedata[itemtype][IDT_FAILURE];
 }
 
 int Interface::GetShieldPenalty(unsigned int itemtype) const
@@ -4590,7 +4590,7 @@ int Interface::GetShieldPenalty(unsigned int itemtype) const
 	if (itemtype>=(unsigned int) ItemTypes) {
 		return 0;
 	}
-	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][IDT_PENALTY];
+	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][IDT_FAILURE];
 	return 0;
 }
 

@@ -1,6 +1,6 @@
 2DA V1.0
 0
-           ITEMTYPE   PENALTY  CRITRANGE  CRITMULTI  SKILL_PENALTY
+           ITEMTYPE   FAILURE  CRITRANGE  CRITMULTI  SKILL_PENALTY
 LEATHER    60         2        20         0          0
 STUDDED    61         3        20         0          1
 CHAIN      62         6        20         0          5
