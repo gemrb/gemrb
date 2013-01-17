@@ -320,6 +320,7 @@ Interface::Interface(int iargc, char* iargv[])
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
 	Encoding = "default";
+	TLKEncoding = "ISO-8859-1";
 
 	gamedata = new GameData();
 }
