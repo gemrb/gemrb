@@ -106,7 +106,7 @@
 0x6211     CEFW1      CEFW2      CEFW3      CEFW4      0          2          0          *
 0x6212     CDMW1      CDFW2      CDFW3      CDFW4      0          2          0          *
 0x6213     CDMW1      CDFW2      CDFW3      CDFW4      0          2          0          *
-0x6214     CDMW1      CIFW2      CIFW3      CIFW4      0          2          0          *
+0x6214     CDMW1      CDMW2      CDMW3      CDMW4      0          2          0          *
 0x6215     CHFW1      CHFW2      CHFW3      CHFW4      0          2          0          *
 0x6300     CHMB1      CHMT2      CHMB3      CHMF4      0          2          0          *
 0x6301     CEMB1      CEMT2      CEMB3      CEMF4      0          2          0          *
