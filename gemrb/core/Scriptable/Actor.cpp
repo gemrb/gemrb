@@ -9287,6 +9287,7 @@ int Actor::GetArmorSkillPenalty(int profcheck) const
 // 4-6, medium: hide, chain, scale
 // 7-,  heavy: splint, plate, full plate
 // the values are taken from our dehardcoded itemdata.2da
+// magical shields and armors get a +1 bonus
 int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 {
 	if (!third) return 0;
@@ -9307,11 +9308,37 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 	if (profcheck && GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
 		penalty = 0;
 	}
+	bool magical = false;
+	int armorSlot = inventory.GetArmorSlot();
+	CREItem *armorItem = inventory.GetSlotItem(armorSlot);
+	if (armorItem) {
+		magical = armorItem->Flags&IE_INV_ITEM_MAGICAL;
+	}
+	if (magical) {
+		penalty -= 1;
+		if (penalty < 0) {
+			penalty = 0;
+		}
+	}
 	armor = penalty;
 
 	// check also the shield penalty
 	armorType = inventory.GetShieldItemType();
 	int shieldPenalty = core->GetShieldPenalty(armorType);
+	magical = false;
+	armorSlot = inventory.GetShieldSlot();
+	if (armorSlot != -1) { // there is a shield
+		armorItem = inventory.GetSlotItem(armorSlot);
+		if (armorItem) {
+			magical = armorItem->Flags&IE_INV_ITEM_MAGICAL;
+		}
+	}
+	if (magical) {
+		shieldPenalty -= 1;
+		if (shieldPenalty < 0) {
+			shieldPenalty = 0;
+		}
+	}
 	if (profcheck) {
 		if (HasFeat(FEAT_SHIELD_PROF)) {
 			shieldPenalty = 0;
