@@ -4581,8 +4581,8 @@ int Interface::GetArmorFailure(unsigned int itemtype) const
 	if (itemtype>=(unsigned int) ItemTypes) {
 		return 0;
 	}
-	if (slotmatrix[itemtype]&SLOT_WEAPON) return 0;
-	return itemtypedata[itemtype][IDT_FAILURE];
+	if (slotmatrix[itemtype]&SLOT_ARMOUR) return itemtypedata[itemtype][IDT_FAILURE];
+	return 0;
 }
 
 int Interface::GetShieldPenalty(unsigned int itemtype) const
