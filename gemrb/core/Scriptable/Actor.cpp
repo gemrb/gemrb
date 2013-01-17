@@ -2448,7 +2448,7 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	}
 	if (!arcana) return base;
 
-	ieDword armor = -GetArmorFailure(0);
+	ieDword armor = -GetTotalArmorFailure();
 
 	if (armor) {
 		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA);
@@ -2501,7 +2501,7 @@ int Actor::GetWisdomAC() const
 	int itemtype = inventory.GetShieldItemType();
 	//items with critical range are weapons, not shields, so they are ok
 	//empty hand is also ok
-	if (itemtype == 0xffff || core->GetArmorFailure(itemtype)) {
+	if (itemtype == 0xffff && !core->GetShieldPenalty(itemtype)) {
 		bonus = GetAbilityBonus(IE_WIS);
 	}
 	return bonus;
@@ -5278,6 +5278,7 @@ int Actor::IsDualWielding() const
 	}
 	if (core->GetShieldPenalty(itm->ItemType)) {
 		// it's a shield in iwd2
+		// not using the actor method here is correct, since magical shields can have 0 penalty
 		return 0;
 	}
 
@@ -5656,7 +5657,8 @@ int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 	if (MonkLevel) {
 		// act as a rogue unless barefisted and without armor
 		// multiclassed monks only use their monk levels when determining barefisted bab
-		if (Equipped != IW_NO_EQUIPPED || GetArmorFailure(0)) {
+		// check the spell failure instead of the skill penalty, since otherwise leather armor would also be treated as none
+		if (Equipped != IW_NO_EQUIPPED || GetTotalArmorFailure()) {
 			pBAB += SetLevelBAB(MonkLevel, ISTHIEF);
 		} else {
 			pBABDecrement = 3;
@@ -5979,7 +5981,7 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 
 	// check if there is any armor unproficiency penalty
 	int am = 0, sm = 0;
-	GetArmorFailure(1, am, sm);
+	GetArmorSkillPenalty(1, am, sm);
 	ToHit.SetArmorBonus(-am);
 	ToHit.SetShieldBonus(-sm);
 
@@ -9029,9 +9031,9 @@ bool Actor::TryToHide()
 
 	ieDword roll = 0;
 	if (third) {
-		roll = LuckyRoll(1, 20, GetArmorFailure(0));
+		roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	} else {
-		roll = LuckyRoll(1, 100, GetArmorFailure(0));
+		roll = LuckyRoll(1, 100, GetArmorSkillPenalty(0));
 		// critical failure
 		if (roll == 1) {
 			HideFailed(this);
@@ -9081,7 +9083,7 @@ bool Actor::TryToHideIWD2()
 {
 	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF, 60);
 	Actor **poi = neighbours;
-	ieDword roll = LuckyRoll(1, 20, GetArmorFailure(0));
+	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
 	bool checked = false;
 
@@ -9271,10 +9273,10 @@ void Actor::ResetCommentTime()
 }
 
 // this one is just a hack, so we can keep a bunch of other functions const
-int Actor::GetArmorFailure(int profcheck) const
+int Actor::GetArmorSkillPenalty(int profcheck) const
 {
 	int tmp1, tmp2;
-	return GetArmorFailure(profcheck, tmp1, tmp2);
+	return GetArmorSkillPenalty(profcheck, tmp1, tmp2);
 }
 
 // Returns the armor check penalty.
@@ -9285,13 +9287,12 @@ int Actor::GetArmorFailure(int profcheck) const
 // 4-6, medium: hide, chain, scale
 // 7-,  heavy: splint, plate, full plate
 // the values are taken from our dehardcoded itemdata.2da
-// FIXME: the penalites are too high, the items use a different value!
-int Actor::GetArmorFailure(int profcheck, int &armor, int &shield) const
+int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 {
 	if (!third) return 0;
 
 	ieWord armorType = inventory.GetArmorItemType();
-	int penalty = core->GetArmorFailure(armorType);
+	int penalty = core->GetArmorPenalty(armorType);
 	int weightClass = 0;
 
 	if (penalty >= 1 && penalty < 4) {
@@ -9320,6 +9321,30 @@ int Actor::GetArmorFailure(int profcheck, int &armor, int &shield) const
 	} else {
 		penalty += shieldPenalty;
 	}
+	shield = shieldPenalty;
+
+	return -penalty;
+}
+
+int Actor::GetTotalArmorFailure() const
+{
+	int armorfailure, shieldfailure;
+	GetArmorFailure(armorfailure, shieldfailure);
+	return armorfailure+shieldfailure;
+}
+
+int Actor::GetArmorFailure(int &armor, int &shield) const
+{
+	if (!third) return 0;
+
+	ieWord armorType = inventory.GetArmorItemType();
+	int penalty = core->GetArmorFailure(armorType);
+	armor = penalty;
+
+	// check also the shield penalty
+	armorType = inventory.GetShieldItemType();
+	int shieldPenalty = core->GetShieldPenalty(armorType);
+	penalty += shieldPenalty;
 	shield = shieldPenalty;
 
 	return -penalty;

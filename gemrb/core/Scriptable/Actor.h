@@ -841,8 +841,10 @@ public:
 	/* resets the bored and area comment timers */
 	void ResetCommentTime();
 	/* returns the armor check penalty */
-	int GetArmorFailure(int profcheck=1) const;
-	int GetArmorFailure(int profcheck, int &armor, int &shield) const;
+	int GetArmorSkillPenalty(int profcheck=1) const;
+	int GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const;
+	int GetTotalArmorFailure() const;
+	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
 	bool IsInvisibleTo(Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
