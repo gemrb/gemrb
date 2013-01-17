@@ -18,6 +18,9 @@
  *
  */
 
+//This class represents game fonts. Fonts are special .bam files.
+//Each cycle stands for a letter. except for numerical or "multibyte" fonts
+
 #ifndef __GemRB__BAMFont__
 #define __GemRB__BAMFont__
 
