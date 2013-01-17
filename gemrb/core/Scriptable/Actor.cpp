@@ -5980,8 +5980,8 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 	// check if there is any armor unproficiency penalty
 	int am = 0, sm = 0;
 	GetArmorFailure(1, am, sm);
-	ToHit.SetArmorBonus(am);
-	ToHit.SetShieldBonus(sm);
+	ToHit.SetArmorBonus(-am);
+	ToHit.SetShieldBonus(-sm);
 
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
