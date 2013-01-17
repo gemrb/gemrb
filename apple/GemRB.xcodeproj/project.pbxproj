@@ -88,6 +88,7 @@
 		A226F44A13A11ABE009CE75E /* WEDImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B877C139F0A7D0002DC13 /* WEDImporter.cpp */; };
 		A226F44B13A11AC3009CE75E /* WMPImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8781139F0A7D0002DC13 /* WMPImporter.cpp */; };
 		A226F44C13A11AC8009CE75E /* ZLibManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */; };
+		A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A228D24816A86FA00053375D /* libiconv.dylib */; };
 		A22B5D611583D816007B4AA4 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5D1583D816007B4AA4 /* libFreetype2.a */; };
 		A22B5D621583D816007B4AA4 /* libPython.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5E1583D816007B4AA4 /* libPython.a */; };
 		A22B5D641583D816007B4AA4 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D601583D816007B4AA4 /* libSDL2.a */; };
@@ -351,6 +352,7 @@
 		A2A2EA3516A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3616A5FC860092B903 /* Freetype.cpp */; };
 		A2A2EA3916A5FC860092B903 /* Freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3616A5FC860092B903 /* Freetype.cpp */; };
+		A2A2EA4716A76AE90092B903 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2EA4516A76ACC0092B903 /* libiconv.dylib */; };
 		A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */; };
 		A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7DF14A5130F00F705CF /* CocoaMain.m */; };
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
@@ -1139,6 +1141,7 @@
 		8D1107320486CEB800E47090 /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
+		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
 		A22B5D601583D816007B4AA4 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ios/lib/iphonesimulator/libSDL2.a; sourceTree = "<group>"; };
@@ -1346,6 +1349,7 @@
 		A2A2EA3316A5EB630092B903 /* TTFFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTFFont.h; sourceTree = "<group>"; };
 		A2A2EA3616A5FC860092B903 /* Freetype.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Freetype.cpp; sourceTree = "<group>"; };
 		A2A2EA3716A5FC860092B903 /* Freetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Freetype.h; sourceTree = "<group>"; };
+		A2A2EA4516A76ACC0092B903 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
 		A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CocoaWrapper.mm; path = CocoaWrapper/mac/CocoaWrapper.mm; sourceTree = "<group>"; };
 		A2A3A7DF14A5130F00F705CF /* CocoaMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaMain.m; sourceTree = "<group>"; };
 		A2A3A7E014A5130F00F705CF /* GEM_ConfController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_ConfController.h; sourceTree = "<group>"; };
@@ -1974,6 +1978,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2A2EA4716A76AE90092B903 /* libiconv.dylib in Frameworks */,
 				A29504721609721300BB22AA /* FreeType.framework in Frameworks */,
 				A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */,
 			);
@@ -2001,6 +2006,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */,
 				A2374CA215F1486E002A1C8C /* libbz2.dylib in Frameworks */,
 				A288622214A5501F009AC280 /* libz.dylib in Frameworks */,
 				A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */,
@@ -3085,6 +3091,8 @@
 		A2E7985C14845B3F00B15DF4 /* dylibs */ = {
 			isa = PBXGroup;
 			children = (
+				A228D24816A86FA00053375D /* libiconv.dylib */,
+				A2A2EA4516A76ACC0092B903 /* libiconv.dylib */,
 				A288621F14A54FFD009AC280 /* libarchive.dylib */,
 				A288622114A5501F009AC280 /* libz.dylib */,
 				A273DC7B14856755000DA299 /* libz.dylib */,
@@ -6740,6 +6748,7 @@
 					"-W",
 					"-Wextra",
 					"-Wformat",
+					"-Wall",
 				);
 				SDKROOT = "";
 				"SDKROOT[arch=*]" = "";

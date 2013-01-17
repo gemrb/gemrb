@@ -19,6 +19,7 @@
  */
 
 #define NOCOLOR 1
+#define HAVE_ICONV 1
 
 #ifndef HAVE_SNPRINTF
 	#define HAVE_SNPRINTF 1

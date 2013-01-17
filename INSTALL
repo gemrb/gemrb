@@ -16,6 +16,7 @@ Libraries:
   - SDL_mixer (optional, for fast lower-quality sound)
   - libpng (optional, for the png importer plugin)
   - FreeType (optional, for the TTF fonts plugin)
+  - iconv (optional, for the TTF fonts plugin and only needed when using a non unicode compatible TLK)
   - (lib)VLC 2.0+ (optional, for movies in some mac distributions of the games)
 
 Building GemRB on unix-like systems

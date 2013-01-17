@@ -25,6 +25,11 @@
 
 #define uint8_t unsigned char
 
+#if HAVE_ICONV
+#include <iconv.h>
+#include <errno.h>
+#endif
+
 /* Handy routines for converting from fixed point */
 #define FT_FLOOR(X)	((X & -64) / 64)
 #define FT_CEIL(X)	(((X + 63) & -64) / 64)
@@ -33,6 +38,23 @@ namespace GemRB {
 
 const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 {
+#if HAVE_ICONV
+	char* oldchar = (char*)&chr;
+	ieWord unicodeChr = 0;
+	char* newchar = (char*)&unicodeChr;
+	size_t in = 2, out = 2;
+
+	// TODO: make this work on BE systems
+	// TODO: maybe we want to work witn non-unicode fonts?
+	iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.c_str());
+	int ret = iconv(cd, &oldchar, &in, &newchar, &out);
+
+	if (ret != GEM_OK) {
+		Log(ERROR, "FONT", "iconv error: %d", errno);
+	}
+	iconv_close(cd);
+	chr = unicodeChr;
+#endif
 	const Holder<Sprite2D>* sprCache = glyphCache->get(chr);
 	if (sprCache) {
 		// found in cache
