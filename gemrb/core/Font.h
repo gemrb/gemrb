@@ -67,6 +67,8 @@ protected:
 	Palette* palette;
 	Sprite2D* blank;
 
+	bool multibyte;
+
 public:
 	char name[20];
 

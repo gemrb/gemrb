@@ -44,6 +44,20 @@ Font::Font()
 : resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
 	name[0] = '\0';
+	multibyte = false;
+
+	// TODO: list incomplete
+	// maybe want to externalize this
+	const char* multibyteEncodings[] = {"GBK", "BIG5"};
+	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+	const char* encoding = core->TLKEncoding.c_str();
+
+	for (size_t i = 0; i < listSize; i++) {
+		if (stricmp(encoding, multibyteEncodings[i]) == 0) {
+			multibyte = true;
+			break;
+		}
+	}
 }
 
 Font::~Font(void)
