@@ -9280,7 +9280,7 @@ int Actor::GetArmorSkillPenalty(int profcheck) const
 
 // Returns the armor check penalty.
 // used for mapping the iwd2 armor feat to the equipped armor's weight class
-// the armor weight class is roughly deduced from the penalty as following:
+// the armor weight class is perfectly deduced from the penalty as following:
 // 0,   none: none, robes
 // 1-3, light: leather, studded
 // 4-6, medium: hide, chain, scale
