@@ -2448,7 +2448,7 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 	}
 	if (!arcana) return base;
 
-	ieDword armor = -GetTotalArmorFailure();
+	ieDword armor = GetTotalArmorFailure();
 
 	if (armor) {
 		ieDword feat = GetFeat(FEAT_ARMORED_ARCANA);
