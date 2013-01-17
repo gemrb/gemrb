@@ -3551,7 +3551,7 @@ void Interface::DrawTooltip ()
 
 	int w1 = 0;
 	int w2 = 0;
-	int strw = fnt->CalcStringWidth( tooltip_text ) + 8;
+	int strw = fnt->CalcStringWidth( (unsigned char*)tooltip_text ) + 8;
 	int w = strw;
 	int h = fnt->maxHeight;
 

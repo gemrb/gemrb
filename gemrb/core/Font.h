@@ -101,11 +101,14 @@ public:
 		unsigned int curpos = 0, bool NoColor = false) const;
 
 	/** Returns width of the string rendered in this font in pixels */
-	int CalcStringWidth(const char* string, bool NoColor = false) const;
-	void SetupString(char* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
+	int CalcStringWidth(const unsigned char* string, bool NoColor = false) const;
+	void SetupString(ieWord* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
+	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
 
 private:
-	int PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const;
+	int PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const;
+	int CalcStringWidth(const ieWord* string, bool NoColor = false) const;
+	int dbStrLen(const ieWord* string) const;
 };
 
 }

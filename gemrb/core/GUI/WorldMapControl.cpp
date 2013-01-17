@@ -164,7 +164,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		if (!m->GetCaption())
 			continue;
 
-		int tw = ftext->CalcStringWidth( m->GetCaption() ) + 5;
+		int tw = ftext->CalcStringWidth( (unsigned char*)m->GetCaption() ) + 5;
 		int th = ftext->maxHeight;
 		
 		Palette* text_pal = pal_normal;
@@ -263,7 +263,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				core->GetVideoDriver()->FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
-				int tw = ftext->CalcStringWidth( ae->GetCaption() ) + 5;
+				int tw = ftext->CalcStringWidth( (unsigned char*)ae->GetCaption() ) + 5;
 				int th = ftext->maxHeight;
 				if(h<th)
 					h=th;

@@ -723,12 +723,11 @@ void TextArea::CalcRowCount()
 		for (size_t i = 0; i < lines.size(); i++) {
 //			rows++;
 			tr = 0;
-			int len = ( int ) strlen( lines[i] );
-			char* tmp = (char *) malloc( len + 1 );
-			memcpy( tmp, lines[i], len + 1 );
+			ieWord* tmp = NULL;
+			size_t len = (int)ftext->GetDoubleByteString((unsigned char*)lines[i], tmp);
 			ftext->SetupString( tmp, w );
-			for (int p = 0; p <= len; p++) {
-				if (( ( unsigned char ) tmp[p] ) == '[') {
+			for (size_t p = 0; p <= len; p++) {
+				if (( tmp[p] ) == '[') {
 					p++;
 					//char tag[256];
 					int k = 0;

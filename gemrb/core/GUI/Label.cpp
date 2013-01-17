@@ -61,7 +61,7 @@ void Label::Draw(unsigned short x, unsigned short y)
 	}
 	if (font && Buffer) {
 		font->Print( Region( this->XPos + x, this->YPos + y,
-			this->Width, this->Height ), ( unsigned char * ) Buffer,
+			this->Width, this->Height ), (unsigned char*)Buffer,
 			useRGB?palette:NULL,
 					 Alignment | IE_FONT_SINGLE_LINE, true );
 	}
