@@ -587,6 +587,8 @@ public:
 	ieDword QuerySlotEffects(unsigned int idx) const;
 	const char * QuerySlotResRef(unsigned int idx) const;
 	int GetArmorFailure(unsigned int itemtype) const;
+	int GetShieldFailure(unsigned int itemtype) const;
+	int GetArmorPenalty(unsigned int itemtype) const;
 	int GetShieldPenalty(unsigned int itemtype) const;
 	int GetCriticalMultiplier(unsigned int itemtype) const;
 	int GetCriticalRange(unsigned int itemtype) const;

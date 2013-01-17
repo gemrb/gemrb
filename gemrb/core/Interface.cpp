@@ -115,6 +115,7 @@ static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieWord IDT_FAILURE = 0;
 static ieWord IDT_CRITRANGE = 1;
 static ieWord IDT_CRITMULTI = 2;
+static ieWord IDT_SKILLPENALTY = 3;
 
 // whitelist of config values we can push directly into vars
 // one map for each ini section we are interested in
@@ -4425,6 +4426,7 @@ bool Interface::InitItemTypes()
 			itemtypedata[i][IDT_FAILURE] = 0; // armor malus
 			itemtypedata[i][IDT_CRITRANGE] = 20; // crit range
 			itemtypedata[i][IDT_CRITMULTI] = 2; // crit multiplier
+			itemtypedata[i][IDT_SKILLPENALTY] = 0; // skill check malus
 		}
 	}
 	AutoTable af("itemdata");
@@ -4585,12 +4587,30 @@ int Interface::GetArmorFailure(unsigned int itemtype) const
 	return 0;
 }
 
-int Interface::GetShieldPenalty(unsigned int itemtype) const
+int Interface::GetShieldFailure(unsigned int itemtype) const
 {
 	if (itemtype>=(unsigned int) ItemTypes) {
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][IDT_FAILURE];
+	return 0;
+}
+
+int Interface::GetArmorPenalty(unsigned int itemtype) const
+{
+	if (itemtype>=(unsigned int) ItemTypes) {
+		return 0;
+	}
+	if (slotmatrix[itemtype]&SLOT_ARMOUR) return itemtypedata[itemtype][IDT_SKILLPENALTY];
+	return 0;
+}
+
+int Interface::GetShieldPenalty(unsigned int itemtype) const
+{
+	if (itemtype>=(unsigned int) ItemTypes) {
+		return 0;
+	}
+	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][IDT_SKILLPENALTY];
 	return 0;
 }
 
