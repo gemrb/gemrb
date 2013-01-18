@@ -52,6 +52,7 @@ namespace GemRB {
 // we start this at a non-zero value to make debugging easier
 static ieDword globalActorCounter = 10000;
 static bool startActive = false;
+static bool third = false;
 
 /***********************
  *  Scriptable Class   *
@@ -128,6 +129,7 @@ Scriptable::Scriptable(ScriptableType type)
 
 	memset( script_timers,0, sizeof(script_timers));
 	startActive = core->HasFeature(GF_START_ACTIVE);
+	third = core->HasFeature(GF_3ED_RULES);
 }
 
 Scriptable::~Scriptable(void)
@@ -1126,7 +1128,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 			}
 			break;
 		}
-		if (verbose && chance && core->HasFeature(GF_3ED_RULES)) {
+		if (verbose && chance && third) {
 			// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
 			displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
 		}
@@ -1773,7 +1775,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	if (!Scripts[0]) return;
 	if ((skill>=100) && (skill!=256) ) skill = 100;
 	int check = 0;
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (third) {
 		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
 		Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
 		int bonus = 0;
