@@ -34,13 +34,16 @@ BAMFontManager::BAMFontManager(void)
 {
 	isStateFont = false;
 	bamImp = new BAMImporter();
+	memset(resRef, 0, sizeof(ieResRef));
 }
 
 bool BAMFontManager::Open(DataStream* stream)
 {
-	char tmp[16]; // 16 is the fileneame length in DataStream
-	strncpy(tmp, stream->filename, 6); // only copy length of "STATES" characters so we can match "STATES2" or others too
-	if (strnicmp(tmp, "STATES", 6) == 0) {
+	ieWord len = strlench(stream->filename, '.');
+	len = (len <= sizeof(ieResRef)-1) ? len : sizeof(ieResRef)-1;
+	strncpy(resRef, stream->filename, len);
+	// compare only first 6 chars so we can match states2 or others
+	if (strnicmp(resRef, "STATES", 6) == 0) {
 		isStateFont = true;
 	}
 	return bamImp->Open(stream);
@@ -49,7 +52,7 @@ bool BAMFontManager::Open(DataStream* stream)
 Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 							  FontStyle /*style*/, Palette* pal)
 {
-	AnimationFactory* af = bamImp->GetAnimationFactory("dummy"); // released by BAMFont
+	AnimationFactory* af = bamImp->GetAnimationFactory(resRef); // released by BAMFont
 
 	int* baseline = NULL;
 	if (isStateFont) {

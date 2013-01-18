@@ -32,6 +32,7 @@ private:
 	/** private data members */
 	BAMImporter* bamImp;
 	bool isStateFont;
+	ieResRef resRef;
 public:
 	/** public data members */
 private:
