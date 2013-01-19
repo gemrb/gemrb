@@ -9178,10 +9178,7 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 
 	if (!range) return false;
 
-	Spell *spl = gamedata->GetSpell(spellres);
-	int srange = spl->GetCastingDistance(caster);
-	gamedata->FreeSpell(spl, spellres, false);
-
+	int srange = GetSpellDistance(spellres, caster);
 	return srange<range;
 }
 
