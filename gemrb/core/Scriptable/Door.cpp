@@ -424,6 +424,7 @@ void Door::TryBashLock(Actor *actor)
 	}
 	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
+	actor->FaceTarget(this);
 	if (core->HasFeature(GF_3ED_RULES)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
 		displaymsg->DisplayRollStringName(20460, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);

@@ -1350,8 +1350,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
 		}
 	}
-	//action performed
-	actor->FaceTarget( target );
 
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
 		(PersonalDistance(Sender, target) > wi.range) ||
@@ -1375,6 +1373,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	//action performed
+	actor->FaceTarget(target);
 
 	Sender->LastTarget = target->GetGlobalID();
 	actor->PerformAttack(core->GetGame()->GameTime);

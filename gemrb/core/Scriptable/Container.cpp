@@ -281,6 +281,7 @@ void Container::TryBashLock(Actor *actor)
 		displaymsg->DisplayRollStringName(20460, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);
 	}
 
+	actor->FaceTarget(this);
 	if(roll < LockDifficulty || LockDifficulty == 100) {
 		displaymsg->DisplayConstantStringName(STR_CONTBASH_FAIL, DMC_BG2XPGREEN, actor);
 		return;
