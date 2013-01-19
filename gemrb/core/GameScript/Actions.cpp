@@ -3541,6 +3541,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
+	core->SetPause(PAUSE_ON, 1);
 	strnlwrcpy(core->GetGame()->TextScreen, parameters->string0Parameter, sizeof(ieResRef)-1);
 	core->SetEventFlag(EF_TEXTSCREEN);
 }
