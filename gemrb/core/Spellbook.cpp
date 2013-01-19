@@ -154,6 +154,11 @@ void Spellbook::CopyFrom(const Actor *source)
 
 //ITEM, SPPR, SPWI, SPIN, SPCL
 int sections[]={3,0,1,2,2};
+// domain spells are of all types, so look them up in all cases
+// ignore songs and shapes altogether
+int arcanetypes[] = {IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_SORCERER, IE_IWD2_SPELL_WIZARD, IE_IWD2_SPELL_DOMAIN};
+int divinetypes[] = {IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_DOMAIN};
+int *alltypes[2] = {divinetypes, arcanetypes};
 
 //flags bits
 // 1 - unmemorize it
@@ -163,12 +168,41 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 	if (type>4) {
 		return false;
 	}
-	type = sections[type];
-	if (type >= NUM_BOOK_TYPES) {
-		return false;
+	int idx = -1;
+	unsigned int bookcount;
+	if (IWD2Style) {
+		if (type == 1) {
+			// check divine
+			idx = 0;
+			bookcount = sizeof(divinetypes)/sizeof(int);
+		} else if (type == 2) {
+			// check arcane
+			idx = 1;
+			bookcount = sizeof(arcanetypes)/sizeof(int);
+		} else if (type == 3) {
+			type = IE_IWD2_SPELL_INNATE;
+		}
+	} else {
+		type = sections[type];
+		if (type >= NUM_BOOK_TYPES) {
+			return false;
+		}
 	}
 	spellid = spellid % 1000;
 
+	if (idx == -1) {
+		return HaveSpell(spellid, type, flags);
+	} else {
+		for (unsigned int book = 0; book < bookcount; book++) {
+			if (HaveSpell(spellid, alltypes[idx][book], flags)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
+{
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		CRESpellMemorization* sm = spells[type][j];
 		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
