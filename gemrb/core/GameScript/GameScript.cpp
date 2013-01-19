@@ -355,6 +355,7 @@ static const TriggerLink triggernames[] = {
 	{"sequence", GameScript::Sequence, 0},
 	{"setlastmarkedobject", GameScript::SetLastMarkedObject, 0},
 	{"setmarkedspell", GameScript::SetMarkedSpell_Trigger, 0},
+	{"setspelltarget", GameScript::SetSpellTarget, 0},
 	{"specifics", GameScript::Specifics, 0},
 	{"spellcast", GameScript::SpellCast, 0},
 	{"spellcastinnate", GameScript::SpellCastInnate, 0},

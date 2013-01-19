@@ -872,6 +872,7 @@ public: //Script Functions
 	static int Sequence(Scriptable* Sender, Trigger* parameters);
 	static int SetLastMarkedObject(Scriptable* Sender, Trigger* parameters);
 	static int SetMarkedSpell_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int SetSpellTarget(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int SpellCast(Scriptable* Sender, Trigger* parameters);
 	static int SpellCastInnate(Scriptable* Sender, Trigger* parameters);
