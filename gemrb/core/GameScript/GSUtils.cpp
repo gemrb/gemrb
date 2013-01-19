@@ -1355,7 +1355,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
 		(PersonalDistance(Sender, target) > wi.range) ||
-		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos))) {
+		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
+		!CanSee(Sender, target, true, 0)) {
 		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {
