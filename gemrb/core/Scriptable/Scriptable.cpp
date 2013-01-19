@@ -1158,6 +1158,50 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 	return 1;
 }
 
+// checks if a party-friendly actor is nearby and if so, if it reckognizes the spell
+// this enemy just started casting
+void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef)
+{
+	if (!third || !caster || caster->GetStat(IE_EA) <= EA_CONTROLLABLE || !area) {
+		return;
+	}
+
+	Spell* spl = gamedata->GetSpell(SpellResRef);
+	assert(spl); // only a bad surge could make this fail and we want to catch it
+	int AdjustedSpellLevel = spl->SpellLevel + 15;
+	Actor **neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF, 10*caster->GetBase(IE_VISUALRANGE));
+	Actor **poi = neighbours;
+	while (*poi) {
+		Actor *detective = *poi;
+		// disallow neutrals from helping the party
+		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
+			poi++;
+			continue;
+		}
+		if ((signed)detective->GetStat(IE_SPELLCRAFT) <= 0) {
+			poi++;
+			continue;
+		}
+
+		// ~Spellcraft check (d20 roll + Spellcraft level + int mod) %d vs. (spell level + 15)  = %d.   (Int mod = %d)~
+		int Spellcraft = core->Roll(1, 20, 0) + detective->GetStat(IE_SPELLCRAFT);
+		int IntMod = detective->GetAbilityBonus(IE_INT);
+
+		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
+			char tmpstr[100];
+			memset(tmpstr, 0, sizeof(tmpstr));
+			// eg. .:Casts Word of Recall:.
+			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetString(displaymsg->GetStringReference(STR_CASTS)), core->GetString(spl->SpellName));
+			DisplayHeadText(strdup(tmpstr));
+			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
+			break;
+		}
+		poi++;
+	}
+	gamedata->FreeSpell(spl, SpellResRef, false);
+	free(neighbours);
+}
+
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
@@ -1185,6 +1229,9 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 
 	if(!CheckWildSurge()) {
 		return -1;
+	}
+	if (!instant) {
+		SpellcraftCheck(actor, SpellResRef);
 	}
 	return SpellCast(instant);
 }
@@ -1224,6 +1271,9 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 		return -1;
 	}
 
+	if (!instant) {
+		SpellcraftCheck(actor, SpellResRef);
+	}
 	return SpellCast(instant);
 }
 

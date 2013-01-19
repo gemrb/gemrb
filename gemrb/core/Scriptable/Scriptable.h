@@ -343,6 +343,7 @@ public:
 	int CanCast(const ieResRef SpellResRef, bool verbose=true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
+	void SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef);
 	/* actor/scriptable casts spell */
 	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false, bool nointerrupt = false );
 	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );
