@@ -160,16 +160,12 @@ int arcanetypes[] = {IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_SORCERER, IE_IWD2_SPELL_W
 int divinetypes[] = {IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_DOMAIN};
 int *alltypes[2] = {divinetypes, arcanetypes};
 
-//flags bits
-// 1 - unmemorize it
-bool Spellbook::HaveSpell(int spellid, ieDword flags)
+int inline GetType(int spellid, unsigned int &bookcount, int &idx)
 {
 	int type = spellid/1000;
 	if (type>4) {
-		return false;
+		return -1;
 	}
-	int idx = -1;
-	unsigned int bookcount;
 	if (IWD2Style) {
 		if (type == 1) {
 			// check divine
@@ -185,9 +181,23 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 	} else {
 		type = sections[type];
 		if (type >= NUM_BOOK_TYPES) {
-			return false;
+			return -1;
 		}
 	}
+	return type;
+}
+
+//flags bits
+// 1 - unmemorize it
+bool Spellbook::HaveSpell(int spellid, ieDword flags)
+{
+	int idx = -1;
+	unsigned int bookcount;
+	int type = GetType(spellid, bookcount, idx);
+	if (type == -1) {
+		return false;
+	}
+
 	spellid = spellid % 1000;
 
 	if (idx == -1) {
@@ -255,16 +265,28 @@ int Spellbook::CountSpells(const char *resref, unsigned int type, int flag)
 
 bool Spellbook::KnowSpell(int spellid)
 {
-	int type = spellid/1000;
-	if (type>4) {
-		return false;
-	}
-	type = sections[type];
-	if (type >= NUM_BOOK_TYPES) {
+	int idx = -1;
+	unsigned int bookcount;
+	int type = GetType(spellid, bookcount, idx);
+	if (type == -1) {
 		return false;
 	}
 	spellid = spellid % 1000;
 
+	if (idx == -1) {
+		return KnowSpell(spellid, type);
+	} else {
+		for (unsigned int book = 0; book < bookcount; book++) {
+			if (KnowSpell(spellid, alltypes[idx][book])) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Spellbook::KnowSpell(int spellid, int type) const
+{
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		CRESpellMemorization* sm = spells[type][j];
 		for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
@@ -421,15 +443,26 @@ bool Spellbook::RemoveSpell(CREKnownSpell* spell)
 //IWD2 clab files use it
 void Spellbook::RemoveSpell(int spellid)
 {
-	int type = spellid/1000;
-	if (type>4) {
-		return;
-	}
-	type = sections[type];
-	if (type >= NUM_BOOK_TYPES) {
+	int idx = -1;
+	unsigned int bookcount;
+	int type = GetType(spellid, bookcount, idx);
+	if (type == -1) {
 		return;
 	}
 	spellid = spellid % 1000;
+
+	if (idx == -1) {
+		return RemoveSpell(spellid, type);
+	} else {
+		for (unsigned int book = 0; book < bookcount; book++) {
+			RemoveSpell(spellid, alltypes[idx][book]);
+		}
+	}
+
+}
+
+void Spellbook::RemoveSpell(int spellid, int type)
+{
 	std::vector< CRESpellMemorization* >::iterator sm;
 	for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
 		std::vector< CREKnownSpell* >::iterator ks;
