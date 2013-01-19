@@ -364,6 +364,7 @@ private:
 	/* do some magic for the wierd/awesome wild surges */
 	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
+	void DisplaySpellCastMessage(ieDword tgt, Spell *spl);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

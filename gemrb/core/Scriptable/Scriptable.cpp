@@ -863,31 +863,18 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	if (spellnum!=0xffffffff) {
 		area->SeeSpellCast(this, spellnum);
 
-		// caster - Casts spellname : target OR
-		// caster - spellname : target (repeating spells)
-		Scriptable *target = NULL;
-		if (tgt) {
-			target = area->GetActorByGlobalID(tgt);
-			if (!target) {
-				target=core->GetGame()->GetActorByGlobalID(tgt);
+		// spellcasting feedback
+		if (third) {
+			// only display it for party friendly creatures - enemies require a successful spellcraft check
+			if (Type == ST_ACTOR) {
+				Actor *caster = ((Actor *) this);
+				if (caster->GetStat(IE_EA) <= EA_CONTROLLABLE) {
+					DisplaySpellCastMessage(tgt, spl);
+				}
 			}
+		} else {
+			DisplaySpellCastMessage(tgt, spl);
 		}
-		char* spell = core->GetString(spl->SpellName);
-		if (stricmp(spell, "") && Type == ST_ACTOR) {
-			char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-			char *tmp;
-			if (target) {
-				tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+5);
-				sprintf(tmp, "%s %s : %s", msg, spell, target->GetName(-1));
-			} else {
-				tmp = (char *) malloc(strlen(spell)+strlen(GetName(-1))+4);
-				sprintf(tmp, "%s : %s", spell, GetName(-1));
-			}
-			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
-			core->FreeString(msg);
-			free(tmp);
-		}
-		core->FreeString(spell);
 	}
 	// only trigger the autopause when in combat or buffing gets very annoying
 	if (core->GetGame()->CombatCounter) {
@@ -895,6 +882,35 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	}
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
+}
+
+void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
+{
+	// caster - Casts spellname : target OR
+	// caster - spellname : target (repeating spells)
+	Scriptable *target = NULL;
+	if (tgt) {
+		target = area->GetActorByGlobalID(tgt);
+		if (!target) {
+			target=core->GetGame()->GetActorByGlobalID(tgt);
+		}
+	}
+	char* spell = core->GetString(spl->SpellName);
+	if (stricmp(spell, "") && Type == ST_ACTOR) {
+		char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+		char *tmp;
+		if (target) {
+			tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+5);
+			sprintf(tmp, "%s %s : %s", msg, spell, target->GetName(-1));
+		} else {
+			tmp = (char *) malloc(strlen(spell)+strlen(GetName(-1))+4);
+			sprintf(tmp, "%s : %s", spell, GetName(-1));
+		}
+		displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
+		core->FreeString(msg);
+		free(tmp);
+	}
+	core->FreeString(spell);
 }
 
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
