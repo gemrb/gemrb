@@ -1324,8 +1324,17 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
-	if (header) wi.range *= 10;
-	else wi.range = 0;
+	if (header) {
+		// see note in PerformAttack
+		if (wi.wflags&2) { //WEAPON_RANGED
+			wi.range *= 4;
+		} else {
+			wi.range *= 10;
+		}
+	}
+	else {
+		wi.range = 0;
+	}
 
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		wi.range += 10;

@@ -6257,7 +6257,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	// FIXME: use proper weapon range
-	if((PersonalDistance(this, target) > wi.range*10) || (GetCurrentArea()!=target->GetCurrentArea() ) ) {
+	int rangemultiplier = 10;
+	if (wi.wflags&WEAPON_RANGED) rangemultiplier = 4; // ranged weapons are almost fine
+	if((PersonalDistance(this, target) > wi.range*rangemultiplier) || (GetCurrentArea()!=target->GetCurrentArea() ) ) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
