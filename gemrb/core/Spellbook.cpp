@@ -233,7 +233,7 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 }
 
 //returns count of memorized spells of a given name/type
-int Spellbook::CountSpells(const char *resref, unsigned int type, int flag)
+int Spellbook::CountSpells(const char *resref, unsigned int type, int flag) const
 {
 	int i, max;
 	int count = 0;
@@ -263,7 +263,7 @@ int Spellbook::CountSpells(const char *resref, unsigned int type, int flag)
 	return count;
 }
 
-bool Spellbook::KnowSpell(int spellid)
+bool Spellbook::KnowSpell(int spellid) const
 {
 	int idx = -1;
 	unsigned int bookcount;
@@ -300,7 +300,7 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 }
 
 //if resref=="" then it is a knownanyspell
-bool Spellbook::KnowSpell(const char *resref)
+bool Spellbook::KnowSpell(const char *resref) const
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
@@ -836,7 +836,7 @@ bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete, bool onlyde
 
 //bitfield disabling type: 1 - mage, 2 - cleric etc
 //level: if set, then finds that level only
-CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level)
+CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level) const
 {
 	int mask=1;
 

@@ -172,10 +172,10 @@ public:
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
 
-	int CountSpells(const char *resref, unsigned int type, int flag);
+	int CountSpells(const char *resref, unsigned int type, int flag) const;
 	/** Check if the spell is in the book */
-	bool KnowSpell(const char *resref);
-	bool KnowSpell(int spellid);
+	bool KnowSpell(const char *resref) const;
+	bool KnowSpell(int spellid) const;
 
 	/** returns a CRESpellMemorization pointer */
 	CRESpellMemorization *GetSpellMemorization(unsigned int type, unsigned int level);
@@ -220,7 +220,7 @@ public:
 	bool UnmemorizeSpell(const char *resref, bool deplete, bool onlydepleted=false);
 
 	/** finds the first spell needing to rememorize */
-	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0);
+	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0) const;
 
 	/** Sets spell from memorized as 'not-yet-cast' */
 	bool ChargeSpell(CREMemorizedSpell* spl);
