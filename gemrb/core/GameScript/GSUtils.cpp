@@ -1287,14 +1287,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	assert(Sender && Sender->Type == ST_ACTOR);
 	Actor *actor = (Actor *) Sender;
 
-	WeaponInfo wi;
-	ITMExtHeader *header = NULL;
-	ITMExtHeader *hittingheader = NULL;
-	int tohit;
-	int DamageBonus, CriticalBonus;
-	int speed, style;
-
-	bool leftorright = false;
 	Actor *tar = NULL;
 	if (target->Type==ST_ACTOR) {
 		tar = (Actor *) target;
@@ -1315,8 +1307,11 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
+	WeaponInfo wi;
+	bool leftorright = false;
+	ITMExtHeader *header = actor->GetWeapon(wi, leftorright && actor->IsDualWielding());
 	//will return false on any errors (eg, unusable weapon)
-	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, tar)) {
+	if (!header || !actor->WeaponIsUsable(leftorright, header)) {
 		actor->StopAttack();
 		Sender->ReleaseCurrentAction();
 		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));

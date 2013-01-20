@@ -625,6 +625,8 @@ public:
 	void GetTHAbilityBonus(ieDword Flags);
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType, ieDword wflags, Actor *attacker);
+	/* checks if something is wrong with the weapon we are using for the attack */
+	bool WeaponIsUsable(bool leftorright, ITMExtHeader *header=NULL) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target);
