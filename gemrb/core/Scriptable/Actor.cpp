@@ -6214,7 +6214,17 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
-	bool leftorright = (bool) ((attacksperround-attackcount)&1);
+	// however, in 3ed, only one attack can be made by the offhand
+	bool leftorright;
+	if (third) {
+		leftorright = false;
+		// make only the last attack with the offhand (iwd2)
+		if (attackcount == 1 && IsDualWielding()) {
+			leftorright = true;
+		}
+	} else {
+		leftorright = (bool) ((attacksperround-attackcount)&1);
+	}
 
 	WeaponInfo wi;
 	ITMExtHeader *header = NULL;
