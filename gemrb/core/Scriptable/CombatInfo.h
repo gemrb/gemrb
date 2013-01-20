@@ -99,6 +99,7 @@ public:
 	void SetWeaponBonus(int bonus, int mod=1);
 	void SetGenericBonus(int bonus, int mod=1);
 
+	void SetBABDecrement(int decrement);
 	void HandleFxBonus(int mod, bool permanent);
 	void dump() const;
 
@@ -106,6 +107,7 @@ private:
 	Actor *Owner;
 	int total; // modified stat, now really containing all the boni
 	int base; // base stat
+	int babDecrement; // 3ed, used for calculating the tohit value of succeeding attacks
 
 	// to-hit boni
 	int weaponBonus;

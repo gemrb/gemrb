@@ -199,6 +199,7 @@ void ArmorClass::dump() const
 ToHitStats::ToHitStats()
 {
 	base = 0;
+	babDecrement = 0;
 	Owner = NULL;
 	ResetAll();
 
@@ -297,6 +298,10 @@ void ToHitStats::HandleFxBonus(int mod, bool permanent)
 	} else {
 		SetGenericBonus(mod, 0);
 	}
+}
+
+void ToHitStats::SetBABDecrement(int decrement) {
+	babDecrement = decrement;
 }
 
 void ToHitStats::dump() const

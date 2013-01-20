@@ -5647,6 +5647,7 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 			if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
 				// skip to apr calc, no need to check the other classes
 				ToHit.SetBase(pBAB);
+				ToHit.SetBABDecrement(pBABDecrement);
 				return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
 			}
 		}
@@ -5667,6 +5668,7 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 
 	assert(LevelSum == Modified[IE_CLASSLEVELSUM]);
 	ToHit.SetBase(pBAB);
+	ToHit.SetBABDecrement(pBABDecrement);
 	return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
 }
 
