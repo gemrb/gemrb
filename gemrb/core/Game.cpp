@@ -1148,7 +1148,7 @@ int Game::GetXPFromCR(int cr)
 {
 	if (!crtable) LoadCRTable();
 	if (crtable) {
-		int level = GetPartyLevel(true);
+		int level = GetPartyLevel(true) / GetPartySize(true);
 		if (cr+1>=MAX_CRLEVEL) {
 			cr=MAX_CRLEVEL-2;
 		}
