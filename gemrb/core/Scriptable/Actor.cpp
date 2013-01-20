@@ -5973,13 +5973,16 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 {
 	int generic = 0;
 	int prof = 0;
+	int attacknum = attackcount;
 
 	//get our dual wielding modifier
 	if (IsDualWielding()) {
 		if (Flags&WEAPON_LEFTHAND) {
 			generic = GetStat(IE_HITBONUSLEFT);
+			attacknum = 1; // shouldn't be needed, but let's play safe
 		} else {
 			generic = GetStat(IE_HITBONUSRIGHT);
+			attacknum--; // remove 1, since it is for the other hand (otherwise we would never use the max tohit for this hand)
 		}
 		if (third) {
 			// FIXME: externalise
@@ -6049,7 +6052,7 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 		return ToHit.GetTotal();
 	} else {
 		ToHit.SetGenericBonus(ToHit.GetGenericBonus()+generic); // flat out cummulative
-		return ToHit.GetTotalForAttackNum(attackcount);
+		return ToHit.GetTotalForAttackNum(attacknum);
 	}
 }
 
