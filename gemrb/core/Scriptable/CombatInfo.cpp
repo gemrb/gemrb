@@ -304,6 +304,19 @@ void ToHitStats::SetBABDecrement(int decrement) {
 	babDecrement = decrement;
 }
 
+int ToHitStats::GetTotalForAttackNum(unsigned int number) const
+{
+	if (number <= 1) { // out of combat, we'd get 0 and that's fine
+		return total;
+	}
+	number--;
+	// compute the cascaded values
+	// only base tohit affects the number of attacks (Actor::GetBaseAPRandAB),
+	// so make sure the other boni don't grant new ones if called with a too high number
+	assert((base-(signed)number*babDecrement) >= 0);
+	return total-number*babDecrement;
+}
+
 void ToHitStats::dump() const
 {
 	StringBuffer buffer;

@@ -6018,10 +6018,11 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 	// finally involve the Modified stat and add to it the rest of the generic bonus
 	if (ReverseToHit) {
 		ToHit.SetGenericBonus(ToHit.GetGenericBonus()-generic);
+		return ToHit.GetTotal();
 	} else {
 		ToHit.SetGenericBonus(ToHit.GetGenericBonus()+generic); // flat out cummulative
+		return ToHit.GetTotalForAttackNum(attackcount);
 	}
-	return ToHit.GetTotal();
 }
 
 void Actor::GetTHAbilityBonus(ieDword Flags)

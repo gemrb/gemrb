@@ -88,6 +88,10 @@ public:
 	int GetProficiencyBonus() const { return proficiencyBonus; };
 	int GetGenericBonus() const { return genericBonus; };
 
+	// returns the value of the cascade for the specified attack
+	// eg. one of +11/+6/+1 for 1,2,3
+	int GetTotalForAttackNum(unsigned int number) const;
+
 	void ResetAll();
 	void SetOwner(Actor *owner);
 	// no total, it is always kept up to date with RefreshTotal
