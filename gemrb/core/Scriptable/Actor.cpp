@@ -5579,13 +5579,12 @@ int Actor::Immobile() const
 	return 0;
 }
 
-ieDword Actor::GetNumberOfAttacks() const
+ieDword Actor::GetNumberOfAttacks()
 {
 	int bonus = 0;
 
 	if (third) {
-		int tmp;
-		int base = GetBaseAPRandAB (true, tmp);
+		int base = SetBaseAPRandAB (true);
 		// add the offhand extra attack
 		// TODO: check effects too
 		bonus = 2 * IsDualWielding();
@@ -5617,7 +5616,7 @@ static int SetLevelBAB(int level, ieDword index)
 
 // return the base APR derived from the base attack bonus, which we have to construct here too
 //NOTE: this doesn't break iwd2 monsters, since they have their level stored as fighters (if not more)
-int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
+int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 {
 	int pBAB = 0;
 	int pBABDecrement = BaseAttackBonusDecrement;
@@ -5626,7 +5625,7 @@ int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 	int i;
 
 	if (!third) {
-		BAB = BaseStats[IE_TOHIT];
+		ToHit.SetBase(BaseStats[IE_TOHIT]);
 		return 0;
 	}
 
@@ -5647,7 +5646,7 @@ int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 			LevelSum += level;
 			if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
 				// skip to apr calc, no need to check the other classes
-				BAB = pBAB;
+				ToHit.SetBase(pBAB);
 				return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
 			}
 		}
@@ -5667,7 +5666,7 @@ int Actor::GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const
 	}
 
 	assert(LevelSum == Modified[IE_CLASSLEVELSUM]);
-	BAB = pBAB;
+	ToHit.SetBase(pBAB);
 	return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
 }
 
@@ -5745,8 +5744,7 @@ void Actor::InitRound(ieDword gameTime)
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target)
 {
-	GetBaseAPRandAB(true, tohit);
-	ToHit.SetBase(tohit);
+	SetBaseAPRandAB(true);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
 	ieDword dualwielding = IsDualWielding();
 	header = GetWeapon(wi, leftorright && dualwielding);

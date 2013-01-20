@@ -615,7 +615,7 @@ public:
 	/* reorients to face target (for immediate attack) */
 	void FaceTarget(Scriptable *actor);
 	/* returns the number of attacks (handles monk barehanded bonus) */
-	ieDword GetNumberOfAttacks() const;
+	ieDword GetNumberOfAttacks();
 	/* starts combat round*/
 	void InitRound(ieDword gameTime);
 	/* returns melee penalty */
@@ -853,7 +853,7 @@ public:
 	void DisplayHeadHPRatio();
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
-	int GetBaseAPRandAB(bool CheckRapidShot, int &BAB) const;
+	int SetBaseAPRandAB(bool CheckRapidShot);
 	int BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const;
 };
 }
