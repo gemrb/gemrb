@@ -6267,10 +6267,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	// FIXME: use proper weapon range
-	int rangemultiplier = 10;
-	if (wi.wflags&WEAPON_RANGED) rangemultiplier = 4; // ranged weapons are almost fine
-	if((PersonalDistance(this, target) > wi.range*rangemultiplier) || (GetCurrentArea()!=target->GetCurrentArea() ) ) {
+	unsigned int weaponrange = GetWeaponRange(wi);
+	if ((PersonalDistance(this, target) > weaponrange) || (GetCurrentArea() != target->GetCurrentArea())) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
@@ -6393,6 +6391,23 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, critical?UI_CRITICAL:0, damage);
 	ResetState();
+}
+
+// FIXME: figure out and use proper weapon ranges
+// long bows and xbows have a range of 100, shortbows 75, while melee weapons around 0
+// 400 units is about the normal sight range
+int Actor::GetWeaponRange(const WeaponInfo &wi) const
+{
+	if (!wi.range) {
+		// hitting header lookup failed
+		return 0;
+	}
+
+	int rangemultiplier = 10;
+	if (wi.wflags&WEAPON_RANGED) {
+		rangemultiplier = 4; // ranged weapons are almost fine
+	}
+	return rangemultiplier * wi.range;
 }
 
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const

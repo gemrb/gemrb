@@ -630,6 +630,8 @@ public:
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
+	/* returns the adjusted weapon range, since items have odd values stored */
+	int GetWeaponRange(const WeaponInfo &wi) const;
 	/* calculates strength (dexterity) based damage adjustment */
 	int WeaponDamageBonus(const WeaponInfo &wi) const;
 	/* handles critical, backstab, etc. damage modifications */

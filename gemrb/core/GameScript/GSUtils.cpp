@@ -1324,20 +1324,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
-	if (header) {
-		// see note in PerformAttack
-		if (wi.wflags&2) { //WEAPON_RANGED
-			wi.range *= 4;
-		} else {
-			wi.range *= 10;
-		}
-	}
-	else {
-		wi.range = 0;
-	}
+	unsigned int weaponrange = actor->GetWeaponRange(wi);
 
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
-		wi.range += 10;
+		weaponrange += 10;
 	}
 	if (!(flags&AC_NO_SOUND) ) {
 		if (!Sender->CurrentActionTicks) {
@@ -1352,10 +1342,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		(PersonalDistance(Sender, target) > wi.range) ||
+		(PersonalDistance(Sender, target) > weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
 		!CanSee(Sender, target, true, 0)) {
-		MoveNearerTo(Sender, target, wi.range);
+		MoveNearerTo(Sender, target, weaponrange);
 		return;
 	} else if (target->Type == ST_DOOR) {
 		//Forcing a lock does not launch the trap...
