@@ -252,7 +252,7 @@ static EffectDesc effectnames[] = {
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1 },//84 (iwd2)
 	{ "IronSkins", fx_ironskins, 0, -1 }, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, 0, -1 }, //e8
-	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0, -1 }, //e9
+	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, EFFECT_NO_ACTOR, -1 }, //e9
 	{ "ColdDamage", fx_cold_damage, EFFECT_DICED, -1 }, //ea
 	{ "ChillTouch", fx_chill_touch, 0, -1 }, //ec (how)
 	{ "ChillTouchPanic", fx_chill_touch_panic, 0, -1 }, //ec (iwd2)
