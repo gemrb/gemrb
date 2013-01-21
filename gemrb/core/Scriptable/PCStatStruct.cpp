@@ -149,6 +149,8 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 		QuickWeaponSlots[7]=slot2;
 		QuickWeaponHeaders[7]=header;
 		break;
+	default:
+		Log(DEBUG, "PCSS", "InitQuickSlot: unknown which/slot %d/%d", which, slot);
 	}
 }
 
