@@ -584,6 +584,11 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 	return dbLen;
 }
 
+void Font::SetName(const char* newName)
+{
+	strnlwrcpy( name, newName, sizeof(name)-1);
+}
+
 Palette* Font::GetPalette() const
 {
 	assert(palette);

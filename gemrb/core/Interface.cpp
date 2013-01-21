@@ -1423,7 +1423,7 @@ int Interface::LoadSprites()
 		// Do search for existing font here
 		Font* fnt = NULL;
 		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
-			if (stricmp(fonts[fntIdx]->name, font_name) == 0) {
+			if (stricmp(fonts[fntIdx]->GetName(), font_name) == 0) {
 				fnt = fonts[fntIdx];
 				fnt->AddResRef(ResRef);
 				break;
@@ -1469,7 +1469,7 @@ int Interface::LoadSprites()
 		}
 
 		fnt->AddResRef(ResRef);
-		strnlwrcpy( fnt->name, font_name, sizeof(fnt->name)-1);
+		fnt->SetName(font_name);
 
 		fonts.push_back(fnt);
 	}

@@ -63,6 +63,7 @@ class GEM_EXPORT Font {
 protected:
 	ieResRef* resRefs;
 	int numResRefs;
+	char name[20];
 
 	Palette* palette;
 	Sprite2D* blank;
@@ -70,9 +71,8 @@ protected:
 	bool multibyte;
 
 public:
-	char name[20];
-
 	int maxHeight;
+
 public:
 	Font();
 	virtual ~Font(void);
@@ -82,6 +82,9 @@ public:
 
 	bool AddResRef(const ieResRef resref);
 	bool MatchesResRef(const ieResRef resref);
+
+	const char* GetName() const {return name;};
+	void SetName(const char* newName);
 
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
