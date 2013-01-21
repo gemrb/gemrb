@@ -9033,6 +9033,14 @@ jump_label:
 						SetItemIcon(wi, ci, item->ItemResRef,header+6,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, NULL);
 						SetItemText(wi, ci, usages, false);
 					}
+				} else {
+					if (action == ACT_IWDQITEM) {
+						action = -1; // so it gets marked as disabled below
+					}
+				}
+			} else {
+				if (action == ACT_IWDQITEM) {
+					action = -1; // so it gets marked as disabled below
 				}
 			}
 		}
