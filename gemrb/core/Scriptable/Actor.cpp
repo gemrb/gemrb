@@ -5265,23 +5265,10 @@ int Actor::IsDualWielding() const
 	if (!wield || slot == inventory.GetFistSlot()) {
 		return 0;
 	}
-	if (wield->Flags&IE_INV_ITEM_TWOHANDED) {
-		// twohanded
-		return 0;
-	}
 
 	Item *itm = gamedata->GetItem(wield->ItemResRef, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef);
-		return 0;
-	}
-	if (itm->GetWeaponHeader(true) && !itm->GetWeaponHeader(false)) {
-		// can't dual wield pure ranged weapons
-		return 0;
-	}
-	if (core->GetShieldPenalty(itm->ItemType)) {
-		// it's a shield in iwd2
-		// not using the actor method here is correct, since magical shields can have 0 penalty
 		return 0;
 	}
 
