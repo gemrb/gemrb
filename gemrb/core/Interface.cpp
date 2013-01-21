@@ -2778,8 +2778,9 @@ bool Interface::LoadEncoding()
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
-	const char *s;
+	TLKEncoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.c_str());
 
+	const char *s;
 	unsigned int i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
 	if (i>99) i=99;
 	while(i--) {
