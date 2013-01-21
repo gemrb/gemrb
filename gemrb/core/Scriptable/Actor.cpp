@@ -5320,6 +5320,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 		} else {
 			wi.backstabbing = false;
 		}
+		wi.wflags |= WEAPON_RANGED;
 	} else {
 		which = item->GetWeaponHeader(false);
 		// any melee weapon usable by a single class thief is game (UAI does not affect this)
