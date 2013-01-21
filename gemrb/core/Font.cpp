@@ -587,6 +587,11 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 void Font::SetName(const char* newName)
 {
 	strnlwrcpy( name, newName, sizeof(name)-1);
+
+	if (strnicmp(name, "STATES", 6) == 0) {
+		// state fonts are NEVER multibyte; regardless of TKL encoding.
+		multibyte = false;
+	}
 }
 
 Palette* Font::GetPalette() const
