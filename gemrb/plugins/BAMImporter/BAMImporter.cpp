@@ -143,15 +143,12 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 		assert(data);
 		const unsigned char* framedata = data;
 		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-		if (RLECompressed) {
-			spr = core->GetVideoDriver()->CreateSpriteBAM8(
-				frames[findex].Width, frames[findex].Height,
-				true, framedata, datasrc, palette, CompressedColorIndex);
-		} else {
-			spr = core->GetVideoDriver()->CreateSpriteBAM8(
-				frames[findex].Width, frames[findex].Height, false,
-				framedata, datasrc, palette, CompressedColorIndex );
-		}
+		spr = core->GetVideoDriver()->CreateSpriteBAM8(frames[findex].Width,
+													   frames[findex].Height,
+													   RLECompressed,
+													   framedata, datasrc,
+													   palette,
+													   CompressedColorIndex);
 	} else {
 		void* pixels = GetFramePixels(findex);
 		spr = core->GetVideoDriver()->CreateSprite8(
