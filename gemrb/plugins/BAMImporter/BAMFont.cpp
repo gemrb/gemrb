@@ -29,35 +29,22 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 {
 	factory = af;
 	maxHeight = 0;
-
 	Sprite2D* curGlyph = NULL;
-	size_t cycleCount = af->GetCycleCount();
-	if (cycleCount > 1) {
-		for (size_t i = 0; i < cycleCount; i++) {
-			for (int j = 0; j < af->GetCycleSize(i); j++) {
-				curGlyph = af->GetFrame(j, i);
-				if (curGlyph) {
-					if (curGlyph->Height > maxHeight)
-						maxHeight = curGlyph->Height;
-					if (baseline)
-						curGlyph->YPos = *baseline;
-					curGlyph->XPos = 0;
-					curGlyph->release();
-				}
-			}
-		}
-	} else {
-		// numeric font
-		for (size_t i = 0; i < af->GetFrameCount(); i++) {
-			curGlyph = af->GetFrameWithoutCycle(i);
-			if (curGlyph) {
-				if (curGlyph->Height > maxHeight)
-					maxHeight = curGlyph->Height;
-				curGlyph->XPos = 0;
+	bool isNumeric = (af->GetCycleCount() <= 1);
+
+	for (size_t i = 0; i < af->GetFrameCount(); i++) {
+		curGlyph = af->GetFrameWithoutCycle(i);
+		if (curGlyph) {
+			if (curGlyph->Height > maxHeight)
+				maxHeight = curGlyph->Height;
+			curGlyph->XPos = 0;
+			if (isNumeric) {
 				// we want them to have the same baseline as the rest
 				curGlyph->YPos = 13 - curGlyph->Height;
-				curGlyph->release();
+			} else if (baseline) {
+				curGlyph->YPos = *baseline;
 			}
+			curGlyph->release();
 		}
 	}
 
