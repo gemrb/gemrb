@@ -2415,8 +2415,8 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 		InternalStack.pop();
 		unsigned int x = pos >> 16;
 		unsigned int y = pos & 0xffff;
-		long tx = ( x - goal.x );
-		long ty = ( y - goal.y );
+		long tx = (long) x - goal.x;
+		long ty = (long) y - goal.y;
 		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
 		if (dist<distance) {
 			best.x=(ieWord) x;
@@ -2426,7 +2426,6 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 
 		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
 		if (Cost > PathLen) {
-			//print("Path not found!");
 			break;
 		}
 		SetupNode( x - 1, y - 1, size, Cost );
