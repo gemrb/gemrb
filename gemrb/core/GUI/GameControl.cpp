@@ -2454,7 +2454,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			return;
 		case GEM_ESCAPE:
 			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
-			core->SetEventFlag(EF_ACTION);
+			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			return;
 		case GEM_PGUP:
 			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnIncreaseSize");
