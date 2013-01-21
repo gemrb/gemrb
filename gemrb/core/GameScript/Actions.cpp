@@ -6871,8 +6871,8 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
 				Sender->Pos.y, 0 );
 
-	fx->Probability1 = 100;
-	fx->Probability2 = 0;
+	fx->ProbabilityRangeMax = 100;
+	fx->ProbabilityRangeMin = 0;
 	fx->Parameter2 = sparkle; //animation type
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Duration = parameters->int1Parameter * 15;
@@ -6908,8 +6908,8 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
-	fx->Probability1 = 100;
-	fx->Probability2 = 0;
+	fx->ProbabilityRangeMax = 100;
+	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	fx->PosX=tar->Pos.x;
 	fx->PosY=tar->Pos.y;
@@ -6935,8 +6935,8 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
-	fx->Probability1 = 100;
-	fx->Probability2 = 0;
+	fx->ProbabilityRangeMax = 100;
+	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	fx->PosX=parameters->pointParameter.x;
 	fx->PosY=parameters->pointParameter.y;

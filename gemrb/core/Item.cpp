@@ -298,7 +298,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) c
 			damage.DiceThrown = fx->DiceThrown;
 			damage.DiceSides = fx->DiceSides;
 			damage.DiceBonus = fx->Parameter1;
-			damage.Chance = fx->Probability1 - fx->Probability2; // Probability1 is the high number
+			damage.Chance = fx->ProbabilityRangeMax - fx->ProbabilityRangeMin;
 			damage_opcodes.push_back(damage);
 		}
 	}

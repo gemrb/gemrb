@@ -106,9 +106,9 @@ Effect* EFFImporter::GetEffectV1(Effect *fx)
 	fx->Resistance = tmpByte;
 	str->ReadDword( &fx->Duration );
 	str->Read( &tmpByte, 1 );
-	fx->Probability1 = tmpByte;
+	fx->ProbabilityRangeMax = tmpByte;
 	str->Read( &tmpByte, 1 );
-	fx->Probability2 = tmpByte;
+	fx->ProbabilityRangeMin = tmpByte;
 	str->ReadResRef( fx->Resource );
 	str->ReadDword( &fx->DiceThrown );
 	str->ReadDword( &fx->DiceSides );
@@ -137,8 +137,8 @@ Effect* EFFImporter::GetEffectV20(Effect *fx)
 	str->ReadWord( &fx->TimingMode );
 	str->ReadWord( &fx->unknown2 );
 	str->ReadDword( &fx->Duration );
-	str->ReadWord( &fx->Probability1 );
-	str->ReadWord( &fx->Probability2 );
+	str->ReadWord( &fx->ProbabilityRangeMax );
+	str->ReadWord( &fx->ProbabilityRangeMin );
 	str->ReadResRef( fx->Resource );
 	str->ReadDword( &fx->DiceThrown );
 	str->ReadDword( &fx->DiceSides );
@@ -199,8 +199,8 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteWord( &fx->TimingMode);
 	stream->WriteWord( &fx->unknown2);
 	stream->WriteDword( &fx->Duration);
-	stream->WriteWord( &fx->Probability1);
-	stream->WriteWord( &fx->Probability2);
+	stream->WriteWord( &fx->ProbabilityRangeMax);
+	stream->WriteWord( &fx->ProbabilityRangeMin);
 	if (fx->IsVariable) {
 		stream->Write( filling,8 );
 	} else {

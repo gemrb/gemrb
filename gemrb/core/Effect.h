@@ -93,8 +93,8 @@ struct Effect {
 	ieWord unknown2;
 	ieDword Resistance;
 	ieDword Duration;
-	ieWord Probability1;
-	ieWord Probability2;
+	ieWord ProbabilityRangeMax;
+	ieWord ProbabilityRangeMin;
 	//keep these four in one bunch, VariableName will
 	//spread across them
 	ieResRef Resource;

@@ -2981,9 +2981,9 @@ int CREImporter::PutEffects( DataStream *stream, Actor *actor)
 			tmpByte = (ieByte) fx->Resistance;
 			stream->Write(&tmpByte, 1);
 			stream->WriteDword( &fx->Duration);
-			tmpByte = (ieByte) fx->Probability1;
+			tmpByte = (ieByte) fx->ProbabilityRangeMax;
 			stream->Write(&tmpByte, 1);
-			tmpByte = (ieByte) fx->Probability2;
+			tmpByte = (ieByte) fx->ProbabilityRangeMin;
 			stream->Write(&tmpByte, 1);
 			stream->Write(fx->Resource, 8);
 			stream->WriteDword( &fx->DiceThrown );

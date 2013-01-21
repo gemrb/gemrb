@@ -363,8 +363,7 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	memset(fx,0,sizeof(Effect));
 	fx->Target = FX_TARGET_SELF;
 	fx->Opcode = opcode;
-	//probability2 is the low number (by effectqueue 331)
-	fx->Probability1 = 100;
+	fx->ProbabilityRangeMax = 100;
 	fx->Parameter1 = param1;
 	fx->Parameter2 = param2;
 	fx->TimingMode = timing;
@@ -811,10 +810,8 @@ static inline bool check_level(Actor *target, Effect *fx)
 //roll should hit in the middle
 static inline bool check_probability(Effect* fx)
 {
-	//watch for this, probability1 is the high number
-	//probability2 is the low number
 	//random value is 0-99
-	if(fx->random_value<fx->Probability2 || fx->random_value>fx->Probability1) {
+	if (fx->random_value<fx->ProbabilityRangeMin || fx->random_value>fx->ProbabilityRangeMax) {
 		return false;
 	}
 	return true;
@@ -1133,9 +1130,9 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		}
 
 		//gemrb specific, stat based chance
-		if ((fx->Probability2 == 100) && Owner && (Owner->Type==ST_ACTOR) ) {
-			fx->Probability2 = 0;
-			fx->Probability1 = ((Actor *) Owner)->GetSafeStat(fx->Probability1);
+		if ((fx->ProbabilityRangeMin == 100) && Owner && (Owner->Type==ST_ACTOR) ) {
+			fx->ProbabilityRangeMin = 0;
+			fx->ProbabilityRangeMax = ((Actor *) Owner)->GetSafeStat(fx->ProbabilityRangeMax);
 		}
 
 		if (resistance) {
