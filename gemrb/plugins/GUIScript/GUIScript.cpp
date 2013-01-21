@@ -8776,11 +8776,9 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		if (action==100) {
 			action = -1;
 		} else {
-			if ( (action>=ACT_IWDQSPELL) && (action<=ACT_IWDQSPELL+9) ) action = ACT_IWDQSPELL;
-			else if ( (action>=ACT_IWDQITEM) && (action<=ACT_IWDQITEM+9) ) action = ACT_IWDQITEM;
-			else if ( (action>=ACT_IWDQSPEC) && (action<=ACT_IWDQSPEC+9) ) action = ACT_IWDQSPEC;
-			else if ( (action>=ACT_IWDQSONG) && (action<=ACT_IWDQSONG+9) ) action = ACT_IWDQSONG;
-			action%=100;
+			if (action < ACT_IWDQSPELL) {
+				action %= 100;
+			}
 		}
 		Button * btn = (Button *) GetControl(wi,ci,IE_GUI_BUTTON);
 		if (!btn) {
@@ -8789,6 +8787,14 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 		SetItemText(wi, ci, 0, false);
 		PyObject *ret = SetActionIcon(wi,ci,dict, action,i+1);
+
+		if (action!=-1) {
+			// reset it to the first one, so we can handle them more easily below
+			if ( (action>=ACT_IWDQSPELL) && (action<=ACT_IWDQSPELL+9) ) action = ACT_IWDQSPELL;
+			else if ( (action>=ACT_IWDQITEM) && (action<=ACT_IWDQITEM+9) ) action = ACT_IWDQITEM;
+			else if ( (action>=ACT_IWDQSPEC) && (action<=ACT_IWDQSPEC+9) ) action = ACT_IWDQSPEC;
+			else if ( (action>=ACT_IWDQSONG) && (action<=ACT_IWDQSONG+9) ) action = ACT_IWDQSONG;
+		}
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->ModalState;
