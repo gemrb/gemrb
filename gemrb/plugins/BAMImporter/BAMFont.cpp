@@ -65,6 +65,7 @@ BAMFont::~BAMFont()
 
 const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
 {
+	if (chr == 0) return blank;
 	Sprite2D* spr = NULL;
 	size_t cycleCount = factory->GetCycleCount();
 	if (cycleCount > 1) {

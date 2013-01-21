@@ -577,6 +577,7 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 			++i;
 		} else
 			dbString[dbLen] = string[i];
+		assert(dbString[dbLen] != 0);
 		++dbLen;
 	}
 	dbString[dbLen] = '\0';
