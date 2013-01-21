@@ -39,6 +39,7 @@ def OnLoad():
 
 	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
 	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
+	GemRB.SetVar ("ActionsWindow", 12345) # dummy so the EF_ACTION callback works
 	GemRB.SetVar ("TopWindow", -1)
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVar ("FloatWindow", -1)
