@@ -257,7 +257,7 @@
 0xC400     ASQU       ASQU       ASQU       ASQU       3          1          1          *
 0xC500     ABAT       ABAT       ABAT       ABAT       3          1          1          *
 0xC600     NBEG       NBEG       NBEG       NBEG       18         2          0          *
-0xC610     NPROH      NPROH      NPROH      NPROH      18         2          0          *
+0xC610     NPRO       NPRO       NPRO       NPRO       18         2          0          *
 0xC700     NBOY       NBOY       NBOY       NBOY       18         2          0          *
 0xC710     NGRL       NGRL       NGRL       NGRL       18         2          0          *
 0xC800     NFAM       NFAM       NFAM       NFAM       18         2          0          *
