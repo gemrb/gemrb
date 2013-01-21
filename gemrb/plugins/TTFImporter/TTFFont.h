@@ -50,6 +50,9 @@ public:
 	~TTFFont(void);
 
 	const Sprite2D* GetCharSprite(ieWord chr) const;
+
+	ieWord GetPointSize() const {return ptSize;};
+	FontStyle GetStyle() const {return style;};
 };
 
 }

@@ -86,6 +86,9 @@ public:
 	const char* GetName() const {return name;};
 	void SetName(const char* newName);
 
+	virtual ieWord GetPointSize() const {return 0;};
+	virtual FontStyle GetStyle() const {return NORMAL;};
+
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
 
