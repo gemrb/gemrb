@@ -42,6 +42,7 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 					if (baseline)
 						curGlyph->YPos = *baseline;
 					curGlyph->XPos = 0;
+					curGlyph->release();
 				}
 			}
 		}
@@ -55,14 +56,17 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 				curGlyph->XPos = 0;
 				// we want them to have the same baseline as the rest
 				curGlyph->YPos = 13 - curGlyph->Height;
+				curGlyph->release();
 			}
 		}
 	}
 
 	// assume all sprites have same palette
-	Palette* pal = af->GetFrameWithoutCycle(0)->GetPalette();
+	Sprite2D* first = af->GetFrameWithoutCycle(0);
+	Palette* pal = first->GetPalette();
 	SetPalette(pal);
 	pal->Release();
+	first->release();
 
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 }
@@ -89,6 +93,8 @@ const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
 	}
 	if (!spr) {
 		spr = blank;
+	} else {
+		spr->release();
 	}
 	return spr;
 }
