@@ -5275,6 +5275,10 @@ int Actor::IsDualWielding() const
 		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef);
 		return 0;
 	}
+	if (itm->GetWeaponHeader(true) && !itm->GetWeaponHeader(false)) {
+		// can't dual wield pure ranged weapons
+		return 0;
+	}
 	if (core->GetShieldPenalty(itm->ItemType)) {
 		// it's a shield in iwd2
 		// not using the actor method here is correct, since magical shields can have 0 penalty
