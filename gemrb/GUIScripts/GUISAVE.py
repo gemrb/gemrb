@@ -255,6 +255,7 @@ def SavePress():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
+	ConfirmWindow.ShowModal (MODAL_SHADOW_NONE)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
