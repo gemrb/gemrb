@@ -248,6 +248,7 @@ struct WeaponInfo {
 	int critrange; // the lower value of the critical range (eg. 19 in 19-20/x3)
 	int profdmgbon;
 	int launcherdmgbon;
+	WeaponInfo(): slot(0), enchantment(0), range(0), itemflags(0), prof(0), backstabbing(false), wflags(0), critmulti(0), critrange(0), profdmgbon(0), launcherdmgbon(0) {};
 };
 
 struct BABTable {

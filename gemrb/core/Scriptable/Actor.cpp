@@ -5517,7 +5517,6 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 int Actor::GetAttackStyle() const
 {
 	WeaponInfo wi;
-	wi.enchantment = 0;
 	//Non NULL if the equipped slot is a projectile or a throwing weapon
 	//TODO some weapons have both melee and ranged capability
 	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED;
@@ -5779,7 +5778,6 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	ITMExtHeader *rangedheader = NULL;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
 	DamageBonus = hittingheader->DamageBonus;
-	wi.launcherdmgbon = 0;
 
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
