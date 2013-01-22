@@ -1376,7 +1376,7 @@ bool Map::AnyEnemyNearPoint(const Point &p)
 		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
 			continue;
 		}
-		if (actor->GetStat(IE_EA)<EA_EVILCUTOFF) {
+		if (actor->GetStat(IE_EA)<=EA_EVILCUTOFF) {
 			continue;
 		}
 
