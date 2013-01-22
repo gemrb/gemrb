@@ -5227,6 +5227,10 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
+	if (!tar) {
+		// target died on us
+		return;
+	}
 	Actor *actor = NULL;
 	if (tar->Type == ST_ACTOR) {
 		actor = (Actor *) tar;
