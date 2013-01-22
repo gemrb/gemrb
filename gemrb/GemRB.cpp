@@ -31,6 +31,8 @@
 #include <unistd.h>
 #endif
 
+using namespace GemRB;
+
 #ifdef ANDROID
 #include <SDL/SDL.h>
 // if/when android moves to SDL 1.3 remove these special functions.
@@ -72,7 +74,6 @@ int main(int argc, char* argv[])
 	#endif
 	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
 #endif
-	using namespace GemRB;
 
 	Interface::SanityCheck(VERSION_GEMRB);
 	InitializeLogging();
