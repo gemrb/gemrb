@@ -3901,7 +3901,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
-		AddTrigger(TriggerEntry(trigger_hitby, LastHitter)); // FIXME: lastdamager? LastHitter is not set for spell damage
+		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: lastdamager? LastHitter is not set for spell damage
 	}
 
 	InternalFlags|=IF_ACTIVE;
