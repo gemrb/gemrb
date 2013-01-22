@@ -29,7 +29,7 @@ void LogFTError(FT_Error errCode)
 #define FT_ERRORDEF( e, v, s )  { e, s },
 #define FT_ERROR_START_LIST     {
 #define FT_ERROR_END_LIST       { 0, 0 } };
-	
+
 	static const struct
 	{
 		int          err_code;
@@ -38,7 +38,7 @@ void LogFTError(FT_Error errCode)
 #include FT_ERRORS_H
 	int i;
 	const char *err_msg;
-	
+
 	err_msg = NULL;
 	for ( i=0; i < (int)((sizeof ft_errors)/(sizeof ft_errors[0])); ++i ) {
 		if ( errCode == ft_errors[i].err_code ) {
