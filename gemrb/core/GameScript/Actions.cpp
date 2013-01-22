@@ -6338,7 +6338,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	ieResRef itemres;
 
 	if (parameters->string0Parameter[0]) {
-		Slot = act->inventory.FindItem(parameters->string0Parameter, 0);
+		Slot = act->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
 		flags = parameters->int1Parameter;
