@@ -4420,7 +4420,7 @@ bool Interface::InitItemTypes()
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
 	itemtypedata.reserve(ItemTypes);
 	for (i=0;i<ItemTypes;i++) {
-		itemtypedata.push_back(std::vector<int>(3));
+		itemtypedata.push_back(std::vector<int>(4));
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
 			itemtypedata[i][IDT_FAILURE] = 0; // armor malus
