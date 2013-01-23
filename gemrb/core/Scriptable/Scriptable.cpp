@@ -1849,7 +1849,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 			bonus = detective->GetAbilityBonus(IE_INT);
 			displaymsg->DisplayRollStringName(39303, DMC_LIGHTGREY, detective, skill-bonus, TrapDetectionDiff, bonus);
 		}
-		check = skill + bonus;
+		check = (skill + bonus)*7;
 	} else {
 		check = skill/2 + core->Roll(1, skill/2, 0);
 	}
