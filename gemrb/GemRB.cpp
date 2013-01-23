@@ -42,12 +42,12 @@ using namespace GemRB;
 #include "Audio.h"
 
 // pause audio playing if app goes in background
-static void GemRB::appPutToBackground()
+static void appPutToBackground()
 {
   core->GetAudioDrv()->Pause();
 }
 // resume audio playing if app return to foreground
-static void GemRB::appPutToForeground()
+static void appPutToForeground()
 {
   core->GetAudioDrv()->Resume();
 }
