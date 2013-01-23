@@ -267,6 +267,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			if (num_empty_rows && row <= num_empty_rows) continue;
 			else x += psx;
 		}
+		if (i > 0) {
+			// kerning
+			x -= GetKerningOffset(tmp[i-1], currChar);
+		}
 		currGlyph = GetCharSprite(currChar);
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, blitPalette);
 		if (cursor && ( i == curpos )) {
@@ -425,6 +429,11 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		if (initials && capital) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
 			continue;
+		}
+		
+		if (i > 0) {
+			// kerning
+			x -= GetKerningOffset(tmp[i-1], currChar);
 		}
 
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette);

@@ -45,6 +45,8 @@ private:
 	int glyph_overhang;
 	float glyph_italics;
 
+protected:
+	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
 public:
 	TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal);
 	~TTFFont(void);

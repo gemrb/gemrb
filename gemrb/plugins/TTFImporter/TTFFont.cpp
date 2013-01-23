@@ -162,6 +162,21 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 	return spr;
 }
 
+int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
+{
+	FT_UInt leftIndex = FT_Get_Char_Index(face, leftChr);
+	FT_UInt rightIndex = FT_Get_Char_Index(face, rightChr);
+	FT_Vector kerning = {0,0};
+	// FT_KERNING_DEFAULT is "grid fitted". we will end up with a scaled multiple of 64
+	FT_Error error = FT_Get_Kerning(face, leftIndex, rightIndex, FT_KERNING_DEFAULT, &kerning);
+	if (error) {
+		LogFTError(error);
+		return 0;
+	}
+	// kerning is in 26.6 format. basically divide by 64 to get the number of pixels.
+	return -kerning.x / 64;
+}
+
 TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	: style(style), ptSize(ptSize), face(face)
 {

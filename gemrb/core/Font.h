@@ -111,6 +111,8 @@ public:
 	void SetupString(ieWord* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
 	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
 
+protected:
+	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:
 	int PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const;
 	int CalcStringWidth(const ieWord* string, bool NoColor = false) const;
