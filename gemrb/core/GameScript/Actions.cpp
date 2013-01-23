@@ -3583,7 +3583,11 @@ void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetMCFlag(parameters->int0Parameter, parameters->int1Parameter);
+	if (parameters->int1Parameter) {
+		actor->SetMCFlag(parameters->int0Parameter, BM_OR);
+	} else {
+		actor->SetMCFlag(parameters->int0Parameter, BM_NAND);
+	}
 }
 
 //this will be a global change, fixme if it should be local
