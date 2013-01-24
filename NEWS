@@ -1,7 +1,8 @@
 GemRB git (938d11a24):
   New features:
     - 
-    - iwd2: Prologue completable, full spellbook and ECL support
+    - multibyte font support (chinese and similar)
+    - iwd2: Chapter 0+1 completable, full spellbook and ECL support
     - initial bundled gemrb demo stubs
     - most gemrb overrides were moved and are now moddable via game override
     - favourite weapon/spell tracking, bg1 dreams
