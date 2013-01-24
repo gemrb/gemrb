@@ -18,9 +18,6 @@
  *
  */
 
-//This class represents game fonts. Fonts are special .bam files.
-//Each cycle stands for a letter. 
-
 #include "Font.h"
 
 #include "win32def.h"
@@ -40,77 +37,31 @@ if (palette) ((Palette*)palette)->IncRef();\
 if (blitPalette) blitPalette->Release();\
 blitPalette = palette;
 
-/*
-glyphs should be all characters we are interested in printing with the font save whitespace
-Font takes responsibility for glyphs so we must free them once done
-*/
-Font::Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal)
-	: glyphCount(lastChar - firstChar + 1), glyphs(glyphs), FirstChar(firstChar), LastChar(lastChar)
+Font::Font()
+: resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
-	assert(glyphs);
-	assert(pal);
-	assert(firstChar <= lastChar);
-
-	palette = NULL;
-	resRefs = NULL;
-	numResRefs = 0;
-	maxHeight = 0;
-
-	ptSize = 0;
 	name[0] = '\0';
-	style = NORMAL;
+	multibyte = false;
 
-	SetPalette(pal);
+	// TODO: list incomplete
+	// maybe want to externalize this
+	const char* multibyteEncodings[] = {"GBK", "BIG5"};
+	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+	const char* encoding = core->TLKEncoding.c_str();
 
-	whiteSpace[BLANK] = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
-
-	for (int i = 0; i < glyphCount; i++)
-	{
-		if (glyphs[i] != NULL) {
-			glyphs[i]->XPos = 0;
-			glyphs[i]->SetPalette(palette);
-			if (glyphs[i]->Height > maxHeight) maxHeight = glyphs[i]->Height;
-		} else {
-			// use our empty glyph for safety reasons
-			whiteSpace[BLANK]->acquire();
-			glyphs[i] = whiteSpace[BLANK];
+	for (size_t i = 0; i < listSize; i++) {
+		if (stricmp(encoding, multibyteEncodings[i]) == 0) {
+			multibyte = true;
+			break;
 		}
 	}
-
-	// standard space width is 1/4 ptSize
-	whiteSpace[SPACE] = core->GetVideoDriver()->CreateSprite8((int)(maxHeight * 0.25), 0, 8, NULL, palette->col);
-	// standard tab width is 4 spaces???
-	whiteSpace[TAB] = core->GetVideoDriver()->CreateSprite8((whiteSpace[1]->Width * 4), 0, 8, NULL, palette->col);
 }
 
 Font::~Font(void)
 {
-	whiteSpace[BLANK]->release();
-	whiteSpace[SPACE]->release();
-	whiteSpace[TAB]->release();
-
-	for (int i = 0; i < glyphCount; i++)
-	{
-		core->GetVideoDriver()->FreeSprite(glyphs[i]);
-	}
+	blank->release();
 	SetPalette(NULL);
-	free(glyphs);
 	free(resRefs);
-}
-
-/*
- Return a region specefying the size of character 'chr'
- if 'chr' is not in the font then return empty region.
- */
-const Sprite2D* Font::GetCharSprite(ieWord chr) const
-{
-	if (chr >= FirstChar && chr <= LastChar) {
-		return glyphs[chr - FirstChar];
-	}
-	if (chr == ' ') return whiteSpace[SPACE];
-	if (chr == '\t') return  whiteSpace[TAB];
-	//otherwise return an empty sprite
-	return whiteSpace[BLANK];
 }
 
 bool Font::AddResRef(const ieResRef resref)
@@ -144,8 +95,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int last_initial_row = 0;
 	int initials_x = 0;
 	int initials_row = 0;
-	unsigned char currCap = 0;
-	size_t len = strlen( ( char* ) string );
+	ieWord currCap = 0;
+	ieWord* tmp;
+	size_t len = GetDoubleByteString(string, tmp);
+
 	int num_empty_rows = 0;
 
 	if (initials && initials != this)
@@ -173,15 +126,13 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	Palette* blitPalette = NULL;
 	SET_BLIT_PALETTE(pal);
 
-	char* tmp = ( char* ) malloc( len + 1 );
-	memcpy( tmp, ( char * ) string, len + 1 );
 	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
 
 	if (startrow) enablecap=false;
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		for (size_t i = 0; i < len; i++) {
-			int height = GetCharSprite((unsigned char)tmp[i])->Height;
+			int height = GetCharSprite(tmp[i])->Height;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -218,15 +169,15 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 	Video* video = core->GetVideoDriver();
 	const Sprite2D* currGlyph;
-	unsigned char currChar = '\0';
+	ieWord currChar = '\0';
 	int row = 0;
 	for (size_t i = 0; i < len; i++) {
-		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
+		if (( tmp[i] ) == '[' && !NoColor) {
 			i++;
 			char tag[256];
 			tag[0]=0;
 
-			for (int k = 0; k < 256 && i<len; k++) {
+			for (size_t k = 0; k < 256 && i<len; k++) {
 				if (tmp[i] == ']') {
 					tag[k] = 0;
 					break;
@@ -316,6 +267,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			if (num_empty_rows && row <= num_empty_rows) continue;
 			else x += psx;
 		}
+		if (i > 0) {
+			// kerning
+			x -= GetKerningOffset(tmp[i-1], currChar);
+		}
 		currGlyph = GetCharSprite(currChar);
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, blitPalette);
 		if (cursor && ( i == curpos )) {
@@ -361,9 +316,8 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Palette* blitPalette = NULL;
 	SET_BLIT_PALETTE( pal );
 
-	size_t len = strlen( ( char* ) string );
-	char* tmp = ( char* ) malloc( len + 1 );
-	memcpy( tmp, ( char * ) string, len + 1 );
+	ieWord* tmp;
+	size_t len = GetDoubleByteString(string, tmp);
 	while (len > 0 && (tmp[len - 1] == '\n' || tmp[len - 1] == '\r')) {
 		// ignore trailing newlines
 		tmp[len - 1] = 0;
@@ -375,7 +329,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		
 		for (size_t i = 0; i < len; i++) {
-			int height = GetCharSprite((unsigned char)tmp[i])->Height;
+			int height = GetCharSprite(tmp[i])->Height;
 			if (ystep < height)
 				ystep = height;
 		}
@@ -414,14 +368,14 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		y += IE_FONT_PADDING;
 	}
 
-	unsigned char currChar = '\0';
+	ieWord currChar = '\0';
 	const Sprite2D* currGlyph = NULL;
 	for (size_t i = 0; i < len; i++) {
-		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
+		if (( tmp[i] ) == '[' && !NoColor) {
 			i++;
 			char tag[256];
 			tag[0]=0;
-			for (int k = 0; k < 256 && i<len; k++) {
+			for (size_t k = 0; k < 256 && i<len; k++) {
 				if (tmp[i] == ']') {
 					tag[k] = 0;
 					break;
@@ -476,6 +430,11 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			x = initials->PrintInitial( x, y, rgn, currChar );
 			continue;
 		}
+		
+		if (i > 0) {
+			// kerning
+			x -= GetKerningOffset(tmp[i-1], currChar);
+		}
 
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette);
 
@@ -490,7 +449,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	free( tmp );
 }
 
-int Font::PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const
+int Font::PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const
 {
 	const Sprite2D* glyph = GetCharSprite(currChar);
 	core->GetVideoDriver()->BlitSprite(glyph, x + rgn.x, y + rgn.y, true, &rgn);
@@ -499,23 +458,32 @@ int Font::PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) 
 	return x;
 }
 
-int Font::CalcStringWidth(const char* string, bool NoColor) const
+int Font::CalcStringWidth(const unsigned char* string, bool NoColor) const
 {
-	size_t ret = 0, len = strlen( string );
+	ieWord* tmp;
+	GetDoubleByteString(string, tmp);
+	int width = CalcStringWidth(tmp, NoColor);
+	free(tmp);
+	return width;
+}
+
+int Font::CalcStringWidth(const ieWord* string, bool NoColor) const
+{
+	size_t ret = 0, len = dbStrLen(string);
 	for (size_t i = 0; i < len; i++) {
-		if (( ( unsigned char ) string[i] ) == '[' && !NoColor) {
-			while(i<len && ((unsigned char) string[i]) != ']') {
+		if (( string[i] ) == '[' && !NoColor) {
+			while(i<len && (string[i]) != ']') {
 				i++;
 			}
 		}
-		ret += GetCharSprite((unsigned char)string[i])->Width;
+		ret += GetCharSprite(string[i])->Width;
 	}
 	return ( int ) ret;
 }
 
-void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *initials, bool enablecap) const
+void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *initials, bool enablecap) const
 {
-	size_t len = strlen( string );
+	size_t len = dbStrLen(string);
 	unsigned int psx = IE_FONT_PADDING;
 	int lastpos = 0;
 	unsigned int x = psx, wx = 0;
@@ -554,7 +522,7 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 			endword = true;
 			continue;
 		}
-		if (( ( unsigned char ) string[pos] ) == '[' && !NoColor) {
+		if (( string[pos] ) == '[' && !NoColor) {
 			pos++;
 			if (pos>=len)
 				break;
@@ -586,19 +554,15 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 			continue;
 		}
 
-		if (string[pos] && string[pos] != ' ') {
-			string[pos] = ( unsigned char ) (string[pos]);
-		}
-
 		if (initials && enablecap) {
-			wx += initials->GetCharSprite((unsigned char)string[pos])->Width;
+			wx += initials->GetCharSprite(string[pos])->Width;
 			enablecap=false;
 			initials_x = wx + psx;
 			//how many more lines to be indented (one was already indented)
 			initials_rows = (initials->maxHeight - 1) / maxHeight;
 			continue;
 		} else {
-			wx += GetCharSprite((unsigned char)string[pos])->Width;
+			wx += GetCharSprite(string[pos])->Width;
 		}
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
@@ -606,6 +570,37 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *ini
 			lastpos = ( int ) pos;
 			endword = true;
 		}
+	}
+}
+
+size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const
+{
+	size_t len = strlen((char*)string);
+	dbString = (ieWord*)malloc((len+1) * sizeof(ieWord));
+	size_t dbLen = 0;
+	for(size_t i=0; i<len; ++i)
+	{
+		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
+		if( multibyte && (i+1 < len) && (string[i] >= 128 || string[i] < 32)) { // this is a double byte char
+			dbString[dbLen] = (string[i+1] << 8) + string[i];
+			++i;
+		} else
+			dbString[dbLen] = string[i];
+		assert(dbString[dbLen] != 0);
+		++dbLen;
+	}
+	dbString[dbLen] = '\0';
+
+	return dbLen;
+}
+
+void Font::SetName(const char* newName)
+{
+	strnlwrcpy( name, newName, sizeof(name)-1);
+
+	if (strnicmp(name, "STATES", 6) == 0) {
+		// state fonts are NEVER multibyte; regardless of TKL encoding.
+		multibyte = false;
 	}
 }
 
@@ -622,5 +617,14 @@ void Font::SetPalette(Palette* pal)
 	if (palette) palette->Release();
 	palette = pal;
 }
+
+int Font::dbStrLen(const ieWord* string) const
+{
+	if (string == NULL) return 0;
+	int count = 0;
+	for (; string[count] != 0; count++);
+	return count;
+}
+
 #undef SET_BLIT_PALETTE
 }

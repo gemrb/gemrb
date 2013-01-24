@@ -18,6 +18,7 @@
  *
  */
 
+#include "BAMFont.h"
 #include "BAMFontManager.h"
 #include "Palette.h"
 #include "Sprite2D.h"
@@ -33,13 +34,16 @@ BAMFontManager::BAMFontManager(void)
 {
 	isStateFont = false;
 	bamImp = new BAMImporter();
+	memset(resRef, 0, sizeof(ieResRef));
 }
 
 bool BAMFontManager::Open(DataStream* stream)
 {
-	char tmp[16]; // 16 is the fileneame length in DataStream
-	strncpy(tmp, stream->filename, 6); // only copy length of "STATES" characters so we can match "STATES2" or others too
-	if (strnicmp(tmp, "STATES", 6) == 0) {
+	ieWord len = strlench(stream->filename, '.');
+	len = (len <= sizeof(ieResRef)-1) ? len : sizeof(ieResRef)-1;
+	strncpy(resRef, stream->filename, len);
+	// compare only first 6 chars so we can match states2 or others
+	if (strnicmp(resRef, "STATES", 6) == 0) {
 		isStateFont = true;
 	}
 	return bamImp->Open(stream);
@@ -48,57 +52,25 @@ bool BAMFontManager::Open(DataStream* stream)
 Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 							  FontStyle /*style*/, Palette* pal)
 {
-	AnimationFactory* af = bamImp->GetAnimationFactory("dummy"); // FIXME: how does this get released?
-	size_t glyphCount = 0, cycleCount = af->GetCycleCount();
+	AnimationFactory* af = bamImp->GetAnimationFactory(resRef); // released by BAMFont
 
-	// FIXME: we will end up with many useless (blank) glyphs
-	for (size_t i = 0; i < cycleCount; i++) {
-		glyphCount += af->GetCycleSize(i);
-	}
-	if (glyphCount == 0) {
-		// minimal test uses bam without cycles
-		// this will fall into the "numeric" case below
-		glyphCount = af->GetFrameCount();
-	}
-	assert(glyphCount);
+	int* baseline = NULL;
+	if (isStateFont) {
+		// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
+		// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
 
-	Sprite2D** glyphs = (Sprite2D**)malloc( glyphCount * sizeof(Sprite2D*) );
-	ieWord glyphIndex = 0;
-	ieWord firstChar = 1;
-
-	if (cycleCount > 1) {
-		for (size_t i = 0; i < cycleCount; i++) {
-			if (af->GetFrameCount() < 256) {
-				glyphs[glyphIndex] = af->GetFrame(0, i);
-				if (isStateFont) {
-					// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
-					// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
-					
-					// since state icons should all be the same size/position we can just take the position of the first one
-					glyphs[glyphIndex]->YPos = glyphs[0]->YPos;
-					//firstChar = 0;
-				}
-				glyphIndex++;
-			} else {
-				for (int j = 0; j < af->GetCycleSize(i); j++) {
-					glyphs[glyphIndex++] = af->GetFrame(j, i);
-				}
-			}
-		}
-	} else {
-		// this is a numeric font
-		firstChar = '0';
-		for (glyphIndex = 0; glyphIndex < af->GetFrameCount(); glyphIndex++) {
-			glyphs[glyphIndex] = af->GetFrameWithoutCycle(glyphIndex);
-			// we want them to have the same baseline as the rest
-			glyphs[glyphIndex]->YPos = 13 - glyphs[glyphIndex]->Height;
-		}
+		// since state icons should all be the same size/position we can just take the position of the first one
+		Sprite2D* first = af->GetFrame(0, 0);
+		int pos = first->YPos;
+		baseline = &pos;
+		first->release();
 	}
 
-	// assume all sprites have same palette
-	Palette* palette = glyphs[0]->GetPalette();
-	Font* fnt = new Font(glyphs, firstChar, firstChar + glyphIndex - 1, palette);
-	palette->Release();
+	Font* fnt = new BAMFont(af, baseline);
+	if (!fnt) {
+		delete af;
+		return NULL;
+	}
 	if (pal) {
 		fnt->SetPalette(pal);
 	}

@@ -5,12 +5,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
-
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
-
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -18,29 +18,38 @@
  *
  */
 
-#define NOCOLOR 1
-#define HAVE_ICONV 1
+#include "Freetype.h"
+#include "System/Logging.h"
 
-#ifndef HAVE_SNPRINTF
-	#define HAVE_SNPRINTF 1
-#endif
+namespace GemRB {
 
-#if TARGET_OS_IPHONE
-	#define PACKAGE "GemRB"
-	#define TOUCHSCREEN
-	#define STATIC_LINK//this is in the target build settings now.
-	#define SIZEOF_INT 4
-	#define SIZEOF_LONG_INT 8
+void LogFTError(FT_Error errCode)
+{
+#undef __FTERRORS_H__
+#define FT_ERRORDEF( e, v, s )  { e, s },
+#define FT_ERROR_START_LIST     {
+#define FT_ERROR_END_LIST       { 0, 0 } };
 
-	#define DATADIR UserDir
-#else
-	#define PACKAGE "GemRB"
-	#define SIZEOF_INT 4
-	#define SIZEOF_LONG_INT 8
+	static const struct
+	{
+		int          err_code;
+		const char*  err_msg;
+	} ft_errors[] =
+#include FT_ERRORS_H
+	int i;
+	const char *err_msg;
 
-	#define MAC_GEMRB_APPSUPPORT "~/Library/Application Support/GemRB"
-	#define PLUGINDIR "~/Library/Application Support/GemRB/plugins"
-	#define DATADIR UserDir
-#endif
+	err_msg = NULL;
+	for ( i=0; i < (int)((sizeof ft_errors)/(sizeof ft_errors[0])); ++i ) {
+		if ( errCode == ft_errors[i].err_code ) {
+			err_msg = ft_errors[i].err_msg;
+			break;
+		}
+	}
+	if ( !err_msg ) {
+		err_msg = "unknown FreeType error";
+	}
+	Log(ERROR, "FreeType", "%s", err_msg);
+}
 
-#define HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
+}

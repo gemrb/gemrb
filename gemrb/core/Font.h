@@ -41,12 +41,6 @@ enum FontStyle {
 	UNDERLINE = 0x04
 };
 
-enum WhiteSpace {
-	BLANK = 0,
-	SPACE = 1,
-	TAB = 2
-};
-
 class Palette;
 class Sprite2D;
 
@@ -66,35 +60,34 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Font {
-private:
-	int glyphCount;
-
+protected:
 	ieResRef* resRefs;
 	int numResRefs;
+	char name[20];
 
 	Palette* palette;
-	Sprite2D** glyphs;
-	Sprite2D* whiteSpace[3];
+	Sprite2D* blank;
 
-	/** Sets ASCII code of the first character in the font.
-	 * (it allows remapping numeric fonts from \000 to '0') */
-	ieWord FirstChar;
-	ieWord LastChar;
+	bool multibyte;
+
 public:
-	char name[20];
-	FontStyle style;	  // for informational purposes only
-	unsigned short ptSize;// for informational purposes only
-
 	int maxHeight;
+
 public:
-	Font(Sprite2D* glyphs[], ieWord firstChar, ieWord lastChar, Palette* pal);
-	~Font(void);
+	Font();
+	virtual ~Font(void);
 
 	//allow reading but not setting glyphs
-	const Sprite2D* GetCharSprite(ieWord index) const;
+	virtual const Sprite2D* GetCharSprite(ieWord chr) const = 0;
 
 	bool AddResRef(const ieResRef resref);
 	bool MatchesResRef(const ieResRef resref);
+
+	const char* GetName() const {return name;};
+	void SetName(const char* newName);
+
+	virtual ieWord GetPointSize() const {return 0;};
+	virtual FontStyle GetStyle() const {return NORMAL;};
 
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
@@ -114,11 +107,16 @@ public:
 		unsigned int curpos = 0, bool NoColor = false) const;
 
 	/** Returns width of the string rendered in this font in pixels */
-	int CalcStringWidth(const char* string, bool NoColor = false) const;
-	void SetupString(char* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
+	int CalcStringWidth(const unsigned char* string, bool NoColor = false) const;
+	void SetupString(ieWord* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
+	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
 
+protected:
+	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:
-	int PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const;
+	int PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const;
+	int CalcStringWidth(const ieWord* string, bool NoColor = false) const;
+	int dbStrLen(const ieWord* string) const;
 };
 
 }

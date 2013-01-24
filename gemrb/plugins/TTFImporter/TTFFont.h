@@ -5,12 +5,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
-
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
-
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -18,29 +18,45 @@
  *
  */
 
-#define NOCOLOR 1
-#define HAVE_ICONV 1
+#ifndef __GemRB__TTFFont__
+#define __GemRB__TTFFont__
 
-#ifndef HAVE_SNPRINTF
-	#define HAVE_SNPRINTF 1
-#endif
+#include "Font.h"
+#include "Freetype.h"
+#include "HashMap.h"
+#include "Holder.h"
 
-#if TARGET_OS_IPHONE
-	#define PACKAGE "GemRB"
-	#define TOUCHSCREEN
-	#define STATIC_LINK//this is in the target build settings now.
-	#define SIZEOF_INT 4
-	#define SIZEOF_LONG_INT 8
+namespace GemRB {
+class Sprite2D;
 
-	#define DATADIR UserDir
-#else
-	#define PACKAGE "GemRB"
-	#define SIZEOF_INT 4
-	#define SIZEOF_LONG_INT 8
+class TTFFont : public Font
+{
+private:
+	HashMap<ieWord, Holder<Sprite2D> >* glyphCache;
 
-	#define MAC_GEMRB_APPSUPPORT "~/Library/Application Support/GemRB"
-	#define PLUGINDIR "~/Library/Application Support/GemRB/plugins"
-	#define DATADIR UserDir
-#endif
+	FontStyle style;
+	ieWord ptSize;
 
-#define HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
+	FT_Face face;
+	int height;
+	int ascent;
+	int descent;
+	
+	int glyph_overhang;
+	float glyph_italics;
+
+protected:
+	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
+public:
+	TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal);
+	~TTFFont(void);
+
+	const Sprite2D* GetCharSprite(ieWord chr) const;
+
+	ieWord GetPointSize() const {return ptSize;};
+	FontStyle GetStyle() const {return style;};
+};
+
+}
+
+#endif /* defined(__GemRB__TTFFont__) */

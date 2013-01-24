@@ -321,6 +321,7 @@ Interface::Interface(int iargc, char* iargv[])
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
 	Encoding = "default";
+	TLKEncoding = "ISO-8859-1";
 
 	gamedata = new GameData();
 }
@@ -432,6 +433,8 @@ Interface::~Interface(void)
 	}
 	SurgeSpells.clear();
 
+	FreeResourceVector( Font, fonts );
+	// fonts need to be destroyed before TTF plugin
 	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
@@ -454,7 +457,6 @@ Interface::~Interface(void)
 		delete[] Cursors;
 	}
 
-	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
 	size_t i;
@@ -1422,9 +1424,9 @@ int Interface::LoadSprites()
 		// Do search for existing font here
 		Font* fnt = NULL;
 		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
-			if (stricmp(fonts[fntIdx]->name, font_name) == 0
-					&& fonts[fntIdx]->ptSize == font_size
-					&& fonts[fntIdx]->style == font_style) {
+			if (stricmp(fonts[fntIdx]->GetName(), font_name) == 0
+				&& fonts[fntIdx]->GetStyle() == font_style
+				&& fonts[fntIdx]->GetPointSize() == font_size) {
 				fnt = fonts[fntIdx];
 				fnt->AddResRef(ResRef);
 				break;
@@ -1470,7 +1472,7 @@ int Interface::LoadSprites()
 		}
 
 		fnt->AddResRef(ResRef);
-		strnlwrcpy( fnt->name, font_name, sizeof(fnt->name)-1);
+		fnt->SetName(font_name);
 
 		fonts.push_back(fnt);
 	}
@@ -2780,8 +2782,9 @@ bool Interface::LoadEncoding()
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
-	const char *s;
+	TLKEncoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.c_str());
 
+	const char *s;
 	unsigned int i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
 	if (i>99) i=99;
 	while(i--) {
@@ -3553,7 +3556,7 @@ void Interface::DrawTooltip ()
 
 	int w1 = 0;
 	int w2 = 0;
-	int strw = fnt->CalcStringWidth( tooltip_text ) + 8;
+	int strw = fnt->CalcStringWidth( (unsigned char*)tooltip_text ) + 8;
 	int w = strw;
 	int h = fnt->maxHeight;
 

@@ -376,6 +376,7 @@ private:
 	KeyMap *keymap;
 	std::string Encoding;
 public:
+	std::string TLKEncoding;
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
