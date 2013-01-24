@@ -72,14 +72,12 @@ const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
 		ieByte frame = ((chr >> 8) > 0) ? (chr >> 8) - 1 : 0; // multibyte char when > 0
 		ieByte cycle = chr; // purposely truncating bits
 		spr = factory->GetFrame(frame, cycle-1);
-		if (!spr) {
-			Log(ERROR, "BAMFont", "%s missing glyph for character '%x' using %s encoding.", name, chr, core->TLKEncoding.c_str());
-		}
 	} else {
 		// numeric font
 		spr = factory->GetFrameWithoutCycle(chr - '0');
 	}
 	if (!spr) {
+		Log(ERROR, "BAMFont", "%s missing glyph for character '%x' using %s encoding.", name, chr, core->TLKEncoding.c_str());
 		spr = blank;
 	} else {
 		spr->release();
