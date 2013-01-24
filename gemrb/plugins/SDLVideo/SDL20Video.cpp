@@ -403,7 +403,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				} else if (delta < 0) {
 					HideSoftKeyboard();
 				}
-			} else if (numFingers == 1) { //click and drag
+			} else if (numFingers <= 1) { //click and drag
+				// sometimes numFingers can be 0 here!
+				// no idea how that is allowed, but it happens
 				ProcessFirstTouch(GEM_MB_ACTION);
 				ignoreNextFingerUp = false;
 				// standard mouse movement
