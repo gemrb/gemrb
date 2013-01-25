@@ -45,7 +45,15 @@ Font::Font()
 
 	// TODO: list incomplete
 	// maybe want to externalize this
-	const char* multibyteEncodings[] = {"GBK", "BIG5"};
+	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings&s[]=tlk
+	const char* multibyteEncodings[] = {
+										// Chinese
+										"GBK", "BIG5",
+										// Korean
+										"EUCKR",
+										// Japanese
+										"SJIS"
+										};
 	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
 	const char* encoding = core->TLKEncoding.c_str();
 
