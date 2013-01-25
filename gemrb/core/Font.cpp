@@ -630,7 +630,7 @@ int Font::dbStrLen(const ieWord* string) const
 {
 	if (string == NULL) return 0;
 	int count = 0;
-	for (; string[count] != 0; count++);
+	for ( ; string[count] != 0; count++);
 	return count;
 }
 
