@@ -299,6 +299,7 @@ IF(APPLE)
 	ADD_DEFINITIONS("-x objective-c++")
 	INCLUDE_DIRECTORIES(apple)
 	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
+	FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
 	# for objective-c++
 	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTARGET_OS_MAC")
 	# for pure objective-c
