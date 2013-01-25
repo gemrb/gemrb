@@ -183,8 +183,10 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	glyphCache = new HashMap<ieWord, Holder<Sprite2D> >();
 	glyphCache->init(256, 128);
 
+// on FT < 2.4.2 the manager will difer ownership to this object
+#if FREETYPE_VERSION_ATLEAST(2,4,2)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
-
+#endif
 	FT_Error error = 0;
 
 	/* Make sure that our font face is scalable (global metrics) */

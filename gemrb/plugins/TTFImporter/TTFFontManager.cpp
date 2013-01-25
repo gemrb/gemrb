@@ -60,9 +60,14 @@ void TTFFontManager::close( FT_Stream stream )
 
 TTFFontManager::~TTFFontManager(void)
 {
+// TTFFont uses FT_Reference_Face only available in 2.4.2 or later
+// if using prior freetype let the font own the face and destroy it
+// WARNING: this carries the implication that the font manager can only create a single font
+#if FREETYPE_VERSION_ATLEAST(2,4,2)
 	if (face) {
 		FT_Done_Face(face);
 	}
+#endif
 }
 
 TTFFontManager::TTFFontManager(void)
