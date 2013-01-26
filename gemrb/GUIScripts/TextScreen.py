@@ -25,7 +25,6 @@ import GUICommon
 TextScreen = None
 TextArea = None
 Row = 1
-Chapter = 0
 TableName = None
 
 def FindTextRow (Table):
@@ -41,57 +40,54 @@ def FindTextRow (Table):
 	return
 
 def StartTextScreen ():
-	global TextScreen, TextArea, Chapter, TableName, Row
+	global TextScreen, TextArea, TableName, Row
 
 	GemRB.GamePause (1, 3)
 
-	LoadPic = TableName = GemRB.GetGameString (STR_TEXTSCREEN)
-	if TableName[:6] == "drmtxt":
-		GemRB.DisplayString (17558, 0xff0000) #Paused for rest
+	ID = -1
+	MusicName = "*"
+	Message = 17556   # default: Paused for chapter text
+	TableName = GemRB.GetGameString (STR_TEXTSCREEN)
+
+	#iwd2/bg2 has no separate music
+	if GUICommon.GameIsIWD1():
+		if TableName == "":
+			MusicName = "chap0"
+		else:
+			MusicName = "chap1"
+		TableName = "chapters"
+	elif GUICommon.GameIsIWD2():
+		TableName = "chapters"
+
+	if TableName == "":
+		EndTextScreen ()
+		return
 	else:
-		GemRB.DisplayString (17556, 0xff0000) #Paused for chapter text
+		TextTable = GemRB.LoadTable ("textscrn", 1)
+		if TextTable != None:
+			TxtRow = TextTable.GetRowIndex (TableName)
+			if TxtRow >= 0:
+				ID = TextTable.GetValue (TxtRow, 0)
+				MusicName = TextTable.GetValue (TxtRow, 1)
+				Message = TextTable.GetValue (TxtRow, 2)
+
+	if Message != "*":
+		GemRB.DisplayString (Message, 0xff0000)
 
 	if GUICommon.GameIsIWD2():
 		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
 	else:
 		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 
-	#if there is no preset loadpic, try to determine it from the chapter
-	#fixme: we always assume there isn't for non-bg2
 	if GUICommon.GameIsBG2():
-		if TableName == "":
-			#apparently, BG2 doesn't always use IncrementChapter to trigger a TextScreen
-			#Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
-			#TableName = "CHPTXT"+str(Chapter)
-			EndTextScreen ()
-			return
 		ID = 62
-	elif TableName[:6] == "drmtxt":
-		ID = 50 + (GemRB.GetGameVar("DREAM") & 0x7fffffff)
-	elif TableName == "islon":
-		ID = 58
-	elif TableName == "isloff":
-		ID = 59
-	elif TableName == "toscst":
-		ID = 60
-	elif TableName == "toscend":
-		ID = 61
-	else:
+	elif ID == -1:
+		#default: try to determine ID from current chapter
 		ID = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
 		Chapter = ID + 1
 
-	#iwd2/bg2 has no separate music
-	if GUICommon.GameIsIWD1():
-		if LoadPic == "":
-			GemRB.LoadMusicPL ("chap0.mus")
-		else:
-			GemRB.LoadMusicPL ("chap1.mus")
-		TableName = "chapters"
-	elif GUICommon.GameIsIWD2():
-		GemRB.HardEndPL ()
-		TableName = "chapters"
-	elif GUICommon.GameIsBG1() and TableName[:6] == "chptxt":
-		GemRB.LoadMusicPL ("chapter.mus")
+	if MusicName != "*":
+		GemRB.LoadMusicPL (MusicName + ".mus")
 	else:
 		GemRB.HardEndPL ()
 
@@ -101,7 +97,6 @@ def StartTextScreen ():
 	TextArea = TextScreen.GetControl (2)
 	TextArea.SetFlags (IE_GUI_TEXTAREA_SMOOTHSCROLL)
 
-	#caption
 	Table = GemRB.LoadTable (TableName)
 	if GUICommon.GameIsBG1():
 		#these suckers couldn't use a fix row
@@ -114,6 +109,7 @@ def StartTextScreen ():
 	else:
 		Row = Chapter
 
+	#caption
 	Value = Table.GetValue (Row, 0)
 	#don't display the fake -1 string (No caption in toscst.2da)
 	if Value!="NONE" and Value>0 and TextScreen.HasControl(0x10000000):
@@ -154,7 +150,7 @@ def EndTextScreen ():
 	return
 
 def ReplayTextScreen ():
-	global TextArea
+	global TextArea, TableName, Row
 
 	TextArea.Rewind ()
 

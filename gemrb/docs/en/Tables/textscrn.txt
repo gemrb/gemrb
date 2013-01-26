@@ -1,0 +1,12 @@
+Description: This table defines various attributes of text screens used in the games.
+
+Columns:
+WINDOW - window ID from the GUICHAP pack
+MUSIC - music to play
+STRING - string to display on the console
+
+Rows:
+Each row describes one textscreen 2da file.
+
+Example (BG1):
+CHPTXT1     1         CHAPTER   17556
