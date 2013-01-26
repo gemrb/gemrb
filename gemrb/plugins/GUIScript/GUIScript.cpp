@@ -929,8 +929,13 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	}
 
 	int ind = gamedata->LoadTable( tablename );
-	if (!noerror && ind == -1) {
-		return RuntimeError("Can't find resource");
+	if (ind == -1) {
+		if (noerror) {
+			Py_INCREF( Py_None );
+			return Py_None;
+		} else {
+			return RuntimeError("Can't find resource");
+		}
 	}
 	return gs->ConstructObject("Table", ind);
 }
