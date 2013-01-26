@@ -68,6 +68,14 @@ def StartTextScreen ():
 		ID = 62
 	elif TableName[:6] == "drmtxt":
 		ID = 50 + (GemRB.GetGameVar("DREAM") & 0x7fffffff)
+	elif TableName == "islon":
+		ID = 58
+	elif TableName == "isloff":
+		ID = 59
+	elif TableName == "toscst":
+		ID = 60
+	elif TableName == "toscend":
+		ID = 61
 	else:
 		ID = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
 		Chapter = ID + 1
