@@ -194,7 +194,9 @@ namespace GemRB {
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800
 #define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
-#define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over, also 'limbo creature' according to IE dev info
+#define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over (IWD2)
+#define MC_LARGE_CREATURE       0x2000  //creature is subject to alternative melee damage - semi invulnerability (BG2)
+#define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
 #define MC_SEENPARTY            0x10000 //iwd2
 #define MC_INVULNERABLE         0x20000 //iwd2
