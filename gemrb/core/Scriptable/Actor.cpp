@@ -9407,6 +9407,7 @@ int Actor::GetTotalArmorFailure() const
 
 int Actor::GetArmorFailure(int &armor, int &shield) const
 {
+	armor = shield = 0;
 	if (!third) return 0;
 
 	ieWord armorType = inventory.GetArmorItemType();
