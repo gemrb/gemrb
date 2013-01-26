@@ -2819,6 +2819,32 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_UpdateWorldMap__doc,
+"UpdateWorldMap(ResRef, [AreaResRef])\n\n"
+"Reloads the world map from ResRef.\n"
+"If AreaResRef is given only updates if that area is missing." );
+
+static PyObject* GemRB_UpdateWorldMap(PyObject * /*self*/, PyObject* args)
+{
+	char *wmResRef, *areaResRef = NULL;
+	bool update = true;
+
+	if (!PyArg_ParseTuple( args, "s|s", &wmResRef, &areaResRef)) {
+		return AttributeError( GemRB_UpdateWorldMap__doc );
+	}
+
+	if (areaResRef != NULL) {
+		unsigned int i;
+		update = (core->GetWorldMap()->GetArea( areaResRef, i ) == NULL);
+	}
+
+	if (update)
+		core->UpdateWorldMap(wmResRef);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_WorldMap_GetDestinationArea__doc,
 "GetDestinationArea(WindowIndex, ControlID[, RndEncounter]) => WorldMap entry\n\n"
 "Returns the last area pointed on the worldmap.\n"
@@ -10675,6 +10701,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),
+	METHOD(UpdateWorldMap, METH_VARARGS),
 	METHOD(UseItem, METH_VARARGS),
 	METHOD(ValidTarget, METH_VARARGS),
 	METHOD(VerbalConstant, METH_VARARGS),

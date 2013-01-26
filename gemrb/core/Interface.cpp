@@ -4345,6 +4345,38 @@ cleanup:
 	delete sav_str;
 }
 
+/* replace the current world map but sync areas available in old and new */
+void Interface::UpdateWorldMap(ieResRef wmResRef)
+{
+	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+
+	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
+		Log(ERROR, "Core", "Could not update world map %s", wmResRef);
+		return;
+	}
+
+	WorldMapArray *new_worldmap = wmp_mgr->GetWorldMapArray();
+	WorldMap *wm = worldmap->GetWorldMap(0);
+	WorldMap *nwm = new_worldmap->GetWorldMap(0);
+
+	unsigned int i, ni;
+	unsigned int ec = wm->GetEntryCount();
+	//update status of the previously existing areas
+	for(i=0;i<ec;i++) {
+		WMPAreaEntry *ae = wm->GetEntry(i);
+		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
+		if (nae != NULL) {
+			nae->SetAreaStatus(ae->GetAreaStatus(), BM_SET);
+		}
+	}
+	
+	delete worldmap;
+	worldmap = new_worldmap;
+	strncpy(WorldMapName[0], wmResRef, sizeof(ieResRef) - 1);
+	WorldMapName[0][8] = 0;
+}
+
 /* swapping out old resources */
 void Interface::UpdateMasterScript()
 {
