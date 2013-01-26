@@ -452,7 +452,7 @@ void Spellbook::RemoveSpell(int spellid)
 	spellid = spellid % 1000;
 
 	if (idx == -1) {
-		return RemoveSpell(spellid, type);
+		RemoveSpell(spellid, type);
 	} else {
 		for (unsigned int book = 0; book < bookcount; book++) {
 			RemoveSpell(spellid, alltypes[idx][book]);
