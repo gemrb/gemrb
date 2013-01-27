@@ -7524,26 +7524,32 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 	CreateStats();
 	InitButtons(GetStat(IE_CLASS), false);
 	for(int i=0;i<GUIBT_COUNT;i++) {
-		ieByte tmp=PCStats->QSlots[i];
-		//the first three buttons are hardcoded in gemrb
-		//don't mess with them
-		if (QslotTranslation && i>2) {
-			if (tmp>=110) { //quick songs
-				tmp = ACT_IWDQSONG+tmp%10;
-			} else if (tmp>=90) { //quick abilities
-				tmp=ACT_IWDQSPEC+tmp%10;
-			} else if (tmp>=80) { //quick items
-				tmp=ACT_IWDQITEM+tmp%10;
-			} else if (tmp>=70) { //quick spells
-				tmp=ACT_IWDQSPELL+tmp%10;
-			} else if (tmp>=50) { //spellbooks
-				tmp=ACT_BARD+tmp%10;
-			} else {
-				tmp=iwd2gemrb[tmp];
-			}
-		}
-		ar[i]=tmp;
+		ar[i] = IWD2GemrbQslot(i);
 	}
+}
+
+int Actor::IWD2GemrbQslot (int slotindex)
+{
+	//the first three buttons are hardcoded in gemrb
+	//don't mess with them
+	if (QslotTranslation && slotindex>2) {
+		ieByte tmp = PCStats->QSlots[slotindex];
+		if (tmp>=110) { //quick songs
+			tmp = ACT_IWDQSONG + tmp%10;
+		} else if (tmp>=90) { //quick abilities
+			tmp = ACT_IWDQSPEC + tmp%10;
+		} else if (tmp>=80) { //quick items
+			tmp = ACT_IWDQITEM + tmp%10;
+		} else if (tmp>=70) { //quick spells
+			tmp = ACT_IWDQSPELL + tmp%10;
+		} else if (tmp>=50) { //spellbooks
+			tmp = ACT_BARD + tmp%10;
+		} else {
+			tmp = iwd2gemrb[tmp];
+		}
+		return tmp;
+	}
+	return slotindex;
 }
 
 void Actor::SetPortrait(const char* ResRef, int Which)

@@ -674,6 +674,8 @@ public:
 	void SetActionButtonRow(ActionButtonRow &ar);
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
+	/* converts the iwd2 qslot index to our internal representation */
+	int IWD2GemrbQslot (int slotindex);
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
