@@ -864,8 +864,10 @@ def DisplaySkills (pc):
 		stat = SkillTable.GetValue (i, 0, 2)
 		value = GemRB.GetPlayerStat (pc, stat)
 		base = GemRB.GetPlayerStat (pc, stat, 1)
+		untrained = SkillName.GetValue (i, 3)
 
-		if value:
+		# only show (modified) skills that either don't require training or had it already
+		if (value and untrained) or (not untrained and base):
 			skill = SkillName.GetValue (i, 1)
 			skills.append (GemRB.GetString(skill) + ": " + str(value) + " (" + str(base) + ")\n")
 
