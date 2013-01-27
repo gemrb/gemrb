@@ -1608,6 +1608,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			Cycle += 48;
 			break;
 
+		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "g2" );
 			Cycle += 64;
