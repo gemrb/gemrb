@@ -87,6 +87,8 @@ def CloseOptionsWindow ():
 	if not GUICommon.GameIsBG1():
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+
+	GemRB.GamePause (0, 3)
 	return
 
 ###################################################
@@ -99,6 +101,8 @@ def OpenOptionsWindow ():
 	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
 		CloseOptionsWindow()
 		return
+
+	GemRB.GamePause (1, 3)
 
 	CommonWindow.CloseContainerWindow ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
