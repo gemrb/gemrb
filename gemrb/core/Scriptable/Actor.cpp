@@ -3335,6 +3335,15 @@ void Actor::VerbalConstant(int start, int count) const
 	}
 }
 
+void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
+	int strref = displaymsg->GetStringReference(str);
+	if (strref != -1) {
+		DisplayStringCore((Scriptable *const) this, strref, DS_CONSOLE);
+	} else {
+		VerbalConstant(vcstat, vccount);
+	}
+}
+
 void Actor::ReactToDeath(const char * deadname)
 {
 	AutoTable tm("death");
@@ -6523,7 +6532,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	if (damage<=0) {
 		if (attacker && attacker->InParty) {
-			attacker->VerbalConstant(VB_TIMMUNE, 1);
+			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE, 1);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 	}
@@ -7906,7 +7915,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		damage = 0;
 		critical = false;
 		if (InParty) {
-			VerbalConstant(VB_TIMMUNE, 1);
+			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE, 1);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 		return;

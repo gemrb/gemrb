@@ -529,6 +529,8 @@ public:
 	ieStrRef GetVerbalConstant(int index) const;
 	/* displaying a random verbal constant */
 	void VerbalConstant(int start, int count) const;
+	/* display string or verbal constant depending on what is available */
+	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
