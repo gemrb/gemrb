@@ -45,7 +45,12 @@ def OnLoad ():
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTable ("PICTURES")
-	LastPortrait = 0
+	PortraitsStart = PortraitsTable.FindValue (0, 2)
+	FemaleCount = PortraitsTable.GetRowCount () - PortraitsStart + 1
+	if Gender == 2:
+		LastPortrait = GemRB.Roll (1, FemaleCount, PortraitsStart-1)
+	else:
+		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount()-FemaleCount, 0)
 
 	PortraitButton = AppearanceWindow.GetControl (1)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
