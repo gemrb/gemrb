@@ -4594,6 +4594,8 @@ void Actor::Die(Scriptable *killer)
 	//JUSTDIED will be removed after the first script check
 	//otherwise it is the same as REALLYDIED
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
+	//remove IDLE so the actor gets a chance to die properly
+	InternalFlags&=~IF_IDLE;
 	SetStance( IE_ANI_DIE );
 	AddTrigger(TriggerEntry(trigger_die));
 
