@@ -196,13 +196,6 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 
-	#setting skills
-	TmpTable = GemRB.LoadTable ("skillsta")
-	SkillCount = TmpTable.GetRowCount ()
-	for i in range (SkillCount):
-		StatID = TmpTable.GetValue (i, 0, 2) # translate the stat name to its numeric ID
-		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
-
 	#setting feats
 	TmpTable = GemRB.LoadTable ("featreq")
 	FeatCount = TmpTable.GetRowCount ()
