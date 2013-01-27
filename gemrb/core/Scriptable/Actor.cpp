@@ -7536,10 +7536,10 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 
 int Actor::IWD2GemrbQslot (int slotindex)
 {
+	ieByte tmp = PCStats->QSlots[slotindex];
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
 	if (QslotTranslation && slotindex>2) {
-		ieByte tmp = PCStats->QSlots[slotindex];
 		if (tmp>=110) { //quick songs
 			tmp = ACT_IWDQSONG + tmp%10;
 		} else if (tmp>=90) { //quick abilities
@@ -7553,9 +7553,8 @@ int Actor::IWD2GemrbQslot (int slotindex)
 		} else {
 			tmp = iwd2gemrb[tmp];
 		}
-		return tmp;
 	}
-	return slotindex;
+	return tmp;
 }
 
 void Actor::SetPortrait(const char* ResRef, int Which)
