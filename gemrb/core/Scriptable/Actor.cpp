@@ -4963,9 +4963,8 @@ void Actor::ReinitQuickSlots()
 	int i=sizeof(PCStats->QSlots);
 	while (i--) {
 		int slot;
-		int which;
-		if (i<0) which = ACT_WEAPON4+i+1;
-		else which = PCStats->QSlots[i];
+		int which = IWD2GemrbQslot(i);
+
 		switch (which) {
 			case ACT_WEAPON1:
 			case ACT_WEAPON2:
@@ -4980,6 +4979,13 @@ void Actor::ReinitQuickSlots()
 			case ACT_QSLOT3: slot = inventory.GetQuickSlot()+2; break;
 			case ACT_QSLOT4: slot = inventory.GetQuickSlot()+3; break;
 			case ACT_QSLOT5: slot = inventory.GetQuickSlot()+4; break;
+			case ACT_IWDQITEM: slot = inventory.GetQuickSlot(); break;
+			case ACT_IWDQITEM+1: slot = inventory.GetQuickSlot()+1; break;
+			case ACT_IWDQITEM+2: slot = inventory.GetQuickSlot()+2; break;
+			case ACT_IWDQITEM+3: slot = inventory.GetQuickSlot()+3; break;
+			case ACT_IWDQITEM+4: slot = inventory.GetQuickSlot()+4; break;
+			// the rest are unavailable - only three slots in the actual inventory layout, 5 in the class for pst
+			// case ACT_IWDQITEM+9:
 			default:
 				slot = 0;
 		}

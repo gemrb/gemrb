@@ -125,6 +125,16 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 	case ACT_QSLOT3: SetQuickItemSlot(2,slot,headerindex); break;
 	case ACT_QSLOT4: SetQuickItemSlot(3,slot,headerindex); break;
 	case ACT_QSLOT5: SetQuickItemSlot(4,slot,headerindex); break;
+	case ACT_IWDQITEM:
+	case ACT_IWDQITEM+1:
+	case ACT_IWDQITEM+2:
+	case ACT_IWDQITEM+3:
+	case ACT_IWDQITEM+4:
+	case ACT_IWDQITEM+5: // crashy from here on until we do do/use 9 quickslots
+	case ACT_IWDQITEM+6:
+	case ACT_IWDQITEM+7:
+	case ACT_IWDQITEM+8:
+	case ACT_IWDQITEM+9: SetQuickItemSlot(which - ACT_IWDQITEM, slot, headerindex); break;
 	case ACT_WEAPON1:
 		QuickWeaponSlots[0]=slot;
 		QuickWeaponHeaders[0]=header;
@@ -165,6 +175,16 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 	case ACT_QSLOT3: idx = 2; break;
 	case ACT_QSLOT4: idx = 3; break;
 	case ACT_QSLOT5: idx = 4; break;
+	case ACT_IWDQITEM:
+	case ACT_IWDQITEM+1:
+	case ACT_IWDQITEM+2:
+	case ACT_IWDQITEM+3:
+	case ACT_IWDQITEM+4:
+	case ACT_IWDQITEM+5: // crashy from here on until we do do/use 9 quickslots
+	case ACT_IWDQITEM+6:
+	case ACT_IWDQITEM+7:
+	case ACT_IWDQITEM+8:
+	case ACT_IWDQITEM+9: idx = which - ACT_IWDQITEM; break;
 	default: error("Core", "Unknown Quickslot accessed '%d'.\n", which);
 	}
 	slot=QuickItemSlots[idx];
