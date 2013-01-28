@@ -258,20 +258,13 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr;
+	int ret = InPartyAllowDead(Sender, parameters);
 
-	if (parameters->objectParameter) {
-		scr = GetActorFromObject( Sender, parameters->objectParameter );
-	} else {
-		scr = Sender;
+	if (!ret || core->HasFeature(GF_IN_PARTY_ALLOWS_DEAD)) {
+		return ret;
 	}
-	if (!scr || scr->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor *tar = (Actor *) scr;
-	if (core->GetGame()->InParty( tar ) <0) {
-		return 0;
-	}
+
+	Actor *tar = (Actor *) Sender;
 	//don't allow dead, don't allow maze and similar effects
 	if (tar->ValidTarget(GA_NO_DEAD) && tar->GetStat(IE_AVATARREMOVAL) == 0) {
 		return 1;

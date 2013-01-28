@@ -2675,6 +2675,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ClearUnusedArea",    //69GF_CLEAR_UNUSED_AREA
 		"ImplicitAreaAnimBackground", //70GF_IMPLICIT_AREAANIM_BACKGROUND
 		"HealOn100Plus",      //71GF_HEAL_ON_100PLUS
+		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
