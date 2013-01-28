@@ -45,7 +45,7 @@ Font::Font()
 
 	// TODO: list incomplete
 	// maybe want to externalize this
-	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings&s[]=tlk
+	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
 	const char* multibyteEncodings[] = {
 										// Chinese
 										"GBK", "BIG5",
@@ -395,7 +395,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 				sscanf( tag, "capital=%d", &capital);
 				continue;
 			}
-			
+
 			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
@@ -438,7 +438,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			x = initials->PrintInitial( x, y, rgn, currChar );
 			continue;
 		}
-		
+
 		if (i > 0) {
 			// kerning
 			x -= GetKerningOffset(tmp[i-1], currChar);
@@ -630,7 +630,8 @@ int Font::dbStrLen(const ieWord* string) const
 {
 	if (string == NULL) return 0;
 	int count = 0;
-	for ( ; string[count] != 0; count++);
+	for ( ; string[count] != 0; count++)
+		continue; // intentionally empty loop
 	return count;
 }
 
