@@ -340,6 +340,7 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 	if (!ctrl || !ctrl->OnKeyPress( Key, Mod )) {
 		// FIXME: need a better way to determine when to call ResolveKey/SetHotKey
 		if (core->GetGameControl()
+			&& !MButtons // checking for drag actions
 			&& !core->IsPresentingModalWindow()
 			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
 			core->GetGame()->SetHotKey(toupper(Key));
