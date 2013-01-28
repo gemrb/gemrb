@@ -344,6 +344,10 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
 			core->GetGame()->SetHotKey(toupper(Key));
 		}
+		//this is to refresh changing mouse cursors should the focus change)
+		int x,y;
+		core->GetVideoDriver()->GetMousePos(x,y);
+		MouseMove((unsigned short) x, (unsigned short) y);
 	}
 }
 
