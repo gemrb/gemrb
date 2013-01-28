@@ -445,6 +445,7 @@ public:
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Creates a Window in the Window Manager */
+	bool IsPresentingModalWindow() {return (bool)(ModalWindow);};
 #ifdef WIN32
 #ifdef CreateWindow
 #undef CreateWindow
