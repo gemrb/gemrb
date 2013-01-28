@@ -183,18 +183,6 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	video->SetClipRect(&clipbackup);
 }
 
-/** Key Release Event */
-void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
-{
-	switch (Key) {
-		case 'f':
-			if (Mod & GEM_MOD_CTRL)
-				core->GetVideoDriver()->ToggleFullscreenMode();
-			break;
-		default:
-			break;
-	}
-}
 void WorldMapControl::AdjustScrolling(short x, short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
@@ -355,7 +343,7 @@ void WorldMapControl::OnMouseWheelScroll(short x, short y)
 }
 
 /** Special Key Press */
-void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
+bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
@@ -379,6 +367,7 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 			Log(MESSAGE, "WorldMapControl", "TAB pressed");
 			break;
 	}
+	return true;
 }
 
 bool WorldMapControl::SetEvent(int eventType, EventHandler handler)

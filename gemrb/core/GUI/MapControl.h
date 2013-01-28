@@ -92,10 +92,8 @@ public:
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
-	/** Key Release Event */
-	void OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
-	void OnSpecialKeyPress(unsigned char Key);
+	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 private:

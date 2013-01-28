@@ -35,7 +35,7 @@ public:
 	KeyMap();
 	~KeyMap();
 	bool InitializeKeyMap(const char *inifile, const char *keyfile);
-	void ResolveKey(int key, int group);
+	bool ResolveKey(int key, int group);
 };
 
 class Function {

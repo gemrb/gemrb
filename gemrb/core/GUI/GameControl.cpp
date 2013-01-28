@@ -33,7 +33,6 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Item.h"
-#include "KeyMap.h"
 #include "PathFinder.h"
 #include "SaveGameIterator.h"
 #include "ScriptEngine.h"
@@ -687,14 +686,14 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 }
 
 /** Key Press Event */
-void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
-		return;
+		return false;
 	}
 	unsigned int i, pc;
 	Game* game = core->GetGame();
-	if (!game) return;
+	if (!game) return false;
 
 	switch (Key) {
 		case '0':
@@ -742,12 +741,12 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			break;
 		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
-			return;
+			break;
 #endif
 	default:
-		core->GetGame()->SetHotKey(toupper(Key));
-		break;
+			return false;
 	}
+	return true;
 }
 
 //Select (or deselect) a new actor (or actors)
@@ -788,16 +787,16 @@ static EffectRef heal_ref = { "CurrentHPModifier", -1 };
 static EffectRef damage_ref = { "Damage", -1 };
 
 /** Key Release Event */
-void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
+bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	unsigned int i;
 	Game* game = core->GetGame();
 
 	if (!game)
-		return;
+		return false;
 
 	if (DialogueFlags&DF_IN_DIALOG) {
-		if (Mod) return;
+		if (Mod) return false;
 		switch(Key) {
 			case '1':
 			case '2':
@@ -811,12 +810,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				{
 					TextArea *ta = core->GetMessageTextArea();
 					if (ta) {
-						ta->OnKeyPress(Key,Mod);
+						return ta->OnKeyPress(Key,Mod);
 					}
 				}
 				break;
 		}
-		return;
+		return false;
 	}
 	if (Mod & GEM_MOD_SHIFT) {
 		Key = toupper(Key);
@@ -825,11 +824,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
 		if (!core->CheatEnabled()) {
-			return;
+			return false;
 		}
 		Map* area = game->GetCurrentArea( );
 		if (!area)
-			return;
+			return false;
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		Point p(lastMouseX, lastMouseY);
 		core->GetVideoDriver()->ConvertToGame( p.x, p.y );
@@ -1117,7 +1116,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				Log(MESSAGE, "GameControl", "KeyRelease:%d - %d", Key, Mod );
 				break;
 		}
-		return; //return from cheatkeys
+		return true; //return from cheatkeys
 	}
 	switch (Key) {
 //FIXME: move these to guiscript
@@ -1134,9 +1133,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			break;
 		default:
-			core->GetKeyMap()->ResolveKey(Key,0);
-			break;
+			return false;
 	}
+	return true;
 }
 
 void GameControl::DisplayTooltip() {
@@ -2406,7 +2405,7 @@ void GameControl::UpdateTargetMode() {
 }
 
 /** Special Key Press */
-void GameControl::OnSpecialKeyPress(unsigned char Key)
+bool GameControl::OnSpecialKeyPress(unsigned char Key)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
 		switch(Key) {
@@ -2415,10 +2414,10 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 				core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "CloseContinueWindow");
 				break;
 		}
-		return; //don't accept keys in dialog
+		return false; //don't accept keys in dialog
 	}
 	Game *game = core->GetGame();
-	if (!game) return;
+	if (!game) return false;
 	int partysize = game->GetPartySize(false);
 	
 	int pm;
@@ -2439,7 +2438,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_ALT:
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
-			return;
+			break;
 		case GEM_TAB:
 			// show partymember hp/maxhp as overhead text
 			for (pm=0; pm < partysize; pm++) {
@@ -2447,24 +2446,25 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 				if (!pc) continue;
 				pc->DisplayHeadHPRatio();
 			}
-			return;
+			break;
 		case GEM_MOUSEOUT:
 			moveX = 0;
 			moveY = 0;
-			return;
+			break;
 		case GEM_ESCAPE:
 			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
-			return;
+			break;
 		case GEM_PGUP:
 			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnIncreaseSize");
-			return;
+			break;
 		case GEM_PGDOWN:
 			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnDecreaseSize");
-			return;
+			break;
 		default:
-			return;
+			return false;
 	}
+	return true;
 }
 
 void GameControl::CalculateSelection(const Point &p)

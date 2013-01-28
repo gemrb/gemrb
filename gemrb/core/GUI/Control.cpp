@@ -137,36 +137,6 @@ int Control::RunEventHandler(EventHandler handler)
 	return 1;
 }
 
-/** Key Press Event */
-void Control::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
-{
-	//print("OnKeyPress: CtrlID = 0x%08X, Key = %c(0x%02hX)",(unsigned int) ControlID, Key, Key);
-}
-
-/** Key Release Event */
-void Control::OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/)
-{
-	//print("OnKeyRelease: CtrlID = 0x%08X, Key = %c(0x%02hX)",(unsigned int) ControlID, Key, Key);
-}
-
-/** Mouse Enter Event */
-void Control::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
-{
-	//print("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd",(unsigned int) ControlID, x, y);
-}
-
-/** Mouse Leave Event */
-void Control::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
-{
-	//print("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd",(unsigned int) ControlID, x, y);
-}
-
-/** Mouse Over Event */
-void Control::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
-{
-	//print("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd",(unsigned int) ControlID, x, y);
-}
-
 /** Mouse Button Down */
 void Control::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short Button, unsigned short Mod)
@@ -196,14 +166,15 @@ void Control::OnMouseWheelScroll( short x, short y)
 }
 
 /** Special Key Press */
-void Control::OnSpecialKeyPress(unsigned char Key)
+bool Control::OnSpecialKeyPress(unsigned char Key)
 {
 	if (Key == GEM_UP || Key == GEM_DOWN) {
 		Control *ctrl = Owner->GetScrollControl();
 		if (ctrl && (ctrl!=this)) {
-			ctrl->OnSpecialKeyPress(Key);
+			return ctrl->OnSpecialKeyPress(Key);
 		}
 	}
+	return false;
 }
 void Control::SetFocus(bool focus)
 {

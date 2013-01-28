@@ -107,10 +107,8 @@ private:
 		unsigned short Mod);
 	/** Mouse Wheel Event */
 	void OnMouseWheelScroll(short x, short y);
-	/** Key Release Event */
-	void OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
-	void OnSpecialKeyPress(unsigned char Key);
+	bool OnSpecialKeyPress(unsigned char Key);
 	/** DisplayTooltip */
 	void DisplayTooltip();
 };

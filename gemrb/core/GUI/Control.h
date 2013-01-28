@@ -127,25 +127,25 @@ public: //Events
 	/** Run specified handler, it may return error code */
 	int RunEventHandler(EventHandler handler);
 	/** Key Press Event */
-	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
+	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	/** Key Release Event */
-	virtual void OnKeyRelease(unsigned char Key, unsigned short Mod);
+	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	/** Mouse Enter Event */
-	virtual void OnMouseEnter(unsigned short x, unsigned short y);
+	virtual void OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/) {};
 	/** Mouse Leave Event */
-	virtual void OnMouseLeave(unsigned short x, unsigned short y);
+	virtual void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/) {};
 	/** Mouse Over Event */
-	virtual void OnMouseOver(unsigned short x, unsigned short y);
+	virtual void OnMouseOver(unsigned short /*x*/, unsigned short /*y*/) {};
 	/** Mouse Button Down */
-	virtual void OnMouseDown(unsigned short x, unsigned short y,
-		unsigned short Button, unsigned short Mod);
+	virtual void OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
+							 unsigned short /*Button*/, unsigned short /*Mod*/);
 	/** Mouse Button Up */
-	virtual void OnMouseUp(unsigned short x, unsigned short y,
-		unsigned short Button, unsigned short Mod);
+	virtual void OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+						   unsigned short /*Button*/, unsigned short /*Mod*/);
 	/** Mouse wheel scroll */
 	virtual void OnMouseWheelScroll( short x, short y);
 	/** Special Key Press */
-	virtual void OnSpecialKeyPress(unsigned char Key);
+	virtual bool OnSpecialKeyPress(unsigned char Key);
 	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
 		return false;
 	}

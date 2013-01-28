@@ -92,9 +92,9 @@ private:
 	Palette* palette;
 public: //Events
 	/** Key Press Event */
-	void OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
-	void OnSpecialKeyPress(unsigned char Key);
+	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 	void SetFocus(bool focus);

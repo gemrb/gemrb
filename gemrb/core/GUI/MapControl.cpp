@@ -281,30 +281,6 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	}
 }
 
-/** Key Press Event */
-//void MapControl::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
-//{
-//}
-
-/** Key Release Event */
-void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
-{
-	switch (Key) {
-		case '\t':
-			//not GEM_TAB
-			Log(MESSAGE, "MapControl", "TAB released");
-			return;
-		case 'f':
-			if (Mod & GEM_MOD_CTRL)
-				core->GetVideoDriver()->ToggleFullscreenMode();
-			break;
-		default:
-			break;
-	}
-	if (!core->CheatEnabled()) {
-		return;
-	}
-}
 /** Mouse Over Event */
 void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
@@ -486,7 +462,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 }
 
 /** Special Key Press */
-void MapControl::OnSpecialKeyPress(unsigned char Key)
+bool MapControl::OnSpecialKeyPress(unsigned char Key)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
@@ -521,6 +497,7 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
+	return true;
 }
 
 bool MapControl::SetEvent(int eventType, EventHandler handler)

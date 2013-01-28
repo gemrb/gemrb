@@ -382,23 +382,23 @@ void Button::SetFont(Font* newfont)
 	font = newfont;
 }
 /** Handling The default button (enter) */
-void Button::OnSpecialKeyPress(unsigned char Key)
+bool Button::OnSpecialKeyPress(unsigned char Key)
 {
 	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
 		if (Key == GEM_RETURN) {
 			if (Flags & IE_GUI_BUTTON_DEFAULT ) {
 				RunEventHandler( ButtonOnPress );
-				return;
+				return true;
 			}
 		}
 		else if (Key == GEM_ESCAPE) {
 			if (Flags & IE_GUI_BUTTON_CANCEL ) {
 				RunEventHandler( ButtonOnPress );
-				return;
+				return true;
 			}
 		}
 	}
-	Control::OnSpecialKeyPress(Key);
+	return Control::OnSpecialKeyPress(Key);
 }
 
 /** Mouse Button Down */

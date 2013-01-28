@@ -166,7 +166,7 @@ public: // Public Events
 	/** Mouse wheel scroll */
 	void OnMouseWheelScroll(short x, short y);
 	/** A special key has been pressed */
-	void OnSpecialKeyPress(unsigned char Key);
+	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 	/** Button Pressed Event Script Function Name */

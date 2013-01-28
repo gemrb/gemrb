@@ -461,7 +461,7 @@ void TextArea::SetFonts(Font* init, Font* text)
 }
 
 /** Key Press Event */
-void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
@@ -480,24 +480,24 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			CalcRowCount();
 			RunEventHandler( TextAreaOnChange );
 		}
-		return;
+		return true;
 	}
 
 	//Selectable=false for dialogs, rather unintuitive, but fact
 	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' ))
-		return;
+		return false;
 	GameControl *gc = core->GetGameControl();
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 		Changed = true;
 		seltext=minrow-1;
 		if ((unsigned int) seltext>=lines.size()) {
-			return;
+			return true;
 		}
 		for(int i=0;i<Key-'0';i++) {
 			do {
 				seltext++;
 				if ((unsigned int) seltext>=lines.size()) {
-					return;
+					return true;
 				}
 			}
 			while (strnicmp( lines[seltext], "[s=", 3 ) != 0 );
@@ -507,20 +507,22 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		if (idx==-1) {
 			//this kills this object, don't use any more data!
 			gc->dialoghandler->EndDialog();
-			return;
+			return true;
 		}
 		gc->dialoghandler->DialogChoose( idx );
+		return true;
 	}
+	return false;
 }
 
 /** Special Key Press */
-void TextArea::OnSpecialKeyPress(unsigned char Key)
+bool TextArea::OnSpecialKeyPress(unsigned char Key)
 {
 	int len;
 	int i;
 
 	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
-		return;
+		return false;
 	}
 	Owner->Invalidate();
 	Changed = true;
@@ -632,6 +634,7 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 	}
 	CalcRowCount();
 	RunEventHandler( TextAreaOnChange );
+	return true;
 }
 
 /** Returns Row count */

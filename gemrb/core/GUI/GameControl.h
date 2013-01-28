@@ -150,9 +150,9 @@ private:
 	bool AlwaysRun;
 public: //Events
 	/** Key Press Event */
-	void OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Key Release Event */
-	void OnKeyRelease(unsigned char Key, unsigned short Mod);
+	bool OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Global Mouse Move Event */
@@ -165,7 +165,7 @@ public: //Events
 		unsigned short Mod);
 	void OnMouseWheelScroll(short x, short y);
 	/** Special Key Press */
-	void OnSpecialKeyPress(unsigned char Key);
+	bool OnSpecialKeyPress(unsigned char Key);
 	void DisplayTooltip();
 	void UpdateScrolling();
 	void SetScrolling(bool scroll);

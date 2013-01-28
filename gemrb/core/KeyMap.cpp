@@ -135,7 +135,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 //group can be:
 //main gamecontrol
-void KeyMap::ResolveKey(int key, int group)
+bool KeyMap::ResolveKey(int key, int group)
 {
 	Function *fun;
 	void *tmp;
@@ -147,16 +147,17 @@ void KeyMap::ResolveKey(int key, int group)
 	print("Looking up key: %c(%s) ", key, keystr);
 
 	if (!keymap.Lookup(keystr, tmp) ) {
-		return;
+		return false;
 	}
 	fun = (Function *) tmp;
 	
 	if (fun->group!=group) {
-		return;
+		return false;
 	}
 
 	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->module, fun->function);
 	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
+	return true;
 }
 
 

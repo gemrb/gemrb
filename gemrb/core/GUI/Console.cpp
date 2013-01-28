@@ -101,7 +101,7 @@ void Console::SetText(const char* string)
 	strncpy( ( char * ) Buffer, string, max );
 }
 /** Key Press Event */
-void Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Key >= 0x20) {
 		size_t len = strlen( ( char* ) Buffer );
@@ -112,10 +112,12 @@ void Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			Buffer[CurPos++] = Key;
 			Buffer[len + 1] = 0;
 		}
+		return true;
 	}
+	return false;
 }
 /** Special Key Press */
-void Console::OnSpecialKeyPress(unsigned char Key)
+bool Console::OnSpecialKeyPress(unsigned char Key)
 {
 	size_t len;
 
@@ -169,6 +171,7 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 			Changed = true;
 			break;
 	}
+	return true;
 }
 
 //ctrl-up

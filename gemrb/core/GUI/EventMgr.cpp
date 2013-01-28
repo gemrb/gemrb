@@ -25,7 +25,9 @@
 #include "win32def.h"
 #include "ie_cursors.h"
 
+#include "Game.h"
 #include "Interface.h"
+#include "KeyMap.h"
 #include "Video.h"
 #include "GUI/Window.h"
 
@@ -335,18 +337,25 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 {
 	if (last_win_focused == NULL) return;
 	Control *ctrl = last_win_focused->GetFocus();
-	if (ctrl == NULL) return;
-	ctrl->OnKeyPress( Key, Mod );
+	if (!ctrl || !ctrl->OnKeyPress( Key, Mod )) {
+		// FIXME: need a better way to determine when to call ResolveKey/SetHotKey
+		if (core->GetGameControl()
+			&& !core->IsPresentingModalWindow()
+			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
+			core->GetGame()->SetHotKey(toupper(Key));
+		}
+	}
 }
+
 /** BroadCast Key Release Event */
 void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
 {
 	if (last_win_focused == NULL) return;
-	Control *ctrl = last_win_focused->GetFocus();
 	if (Key == GEM_GRAB) {
 		core->GetVideoDriver()->ToggleGrabInput();
 		return;
 	}
+	Control *ctrl = last_win_focused->GetFocus();
 	if (ctrl == NULL) return;
 	ctrl->OnKeyRelease( Key, Mod );
 }

@@ -125,11 +125,11 @@ void TextEdit::SetBackGround(Sprite2D* back)
 }
 
 /** Key Press Event */
-void TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Key >= 0x20) {
 		if (Value && ( (Key<'0') || (Key>'9') ) )
-			return;
+			return false;
 		Owner->Invalidate();
 		Changed = true;
 		int len = ( int ) strlen( ( char* ) Buffer );
@@ -142,10 +142,12 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			CurPos++;
 		}
 		RunEventHandler( EditOnChange );
+		return true;
 	}
+	return false;
 }
 /** Special Key Press */
-void TextEdit::OnSpecialKeyPress(unsigned char Key)
+bool TextEdit::OnSpecialKeyPress(unsigned char Key)
 {
 	int len;
 
@@ -188,10 +190,9 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_RETURN:
 			RunEventHandler( EditOnDone );
-			return;
-
 	}
 	RunEventHandler( EditOnChange );
+	return true;
 }
 
 void TextEdit::SetFocus(bool focus)
