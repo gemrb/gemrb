@@ -816,10 +816,13 @@ void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Button*/,
+void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short /*Mod*/)
 {
-	if (( x <= Width ) && ( y <= ( Height - 5 ) ) && ( seltext != -1 )) {
+	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)))
+		return;
+
+	if ((x < Width) && (y < Height - 5) && (seltext != -1)) {
 		Value = (unsigned int) seltext;
 		Changed = true;
 		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
