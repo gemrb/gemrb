@@ -479,14 +479,8 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 		case GEM_DOWN:
 			ScrollY += keyScrollSpd;
 			break;
-		case GEM_ALT:
-			Log(MESSAGE, "MapControl", "ALT pressed");
-			break;
-		case GEM_TAB:
-			Log(MESSAGE, "MapControl", "TAB pressed");
-			break;
 		default:
-			break;
+			return false;
 	}
 
 	if (ScrollX > MapWidth - Width)

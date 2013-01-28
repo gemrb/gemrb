@@ -360,12 +360,8 @@ bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 		case GEM_DOWN:
 			OnMouseWheelScroll(0, keyScrollSpd);
 			break;
-		case GEM_ALT:
-			Log(MESSAGE, "WorldMapControl", "ALT pressed");
-			break;
-		case GEM_TAB:
-			Log(MESSAGE, "WorldMapControl", "TAB pressed");
-			break;
+		default:
+			return false;
 	}
 	return true;
 }
