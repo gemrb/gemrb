@@ -429,17 +429,7 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 					return;
 				}
 				break;
-			case IE_GUI_GAMECONTROL:
-			case IE_GUI_WORLDMAP:
-				//gamecontrols will receive all special keys
-				break;
-			case IE_GUI_EDIT:
-			case IE_GUI_TEXTAREA:
-				//editboxes and textareas will receive all special keys
-				break;
-			default:
-				//other controls don't receive any
-				return;
+				// shouldnt be any harm in sending these events to any control
 		}
 		ctrl->OnSpecialKeyPress( Key );
 	}
