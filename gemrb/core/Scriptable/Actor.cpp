@@ -3382,9 +3382,6 @@ void Actor::ReactToDeath(const char * deadname)
 			break;
 		}
 	}
-
-	// take a hit on morale
-	NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 }
 
 //issue area specific comments
@@ -4556,8 +4553,18 @@ void Actor::SendDiedTrigger()
 {
 	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD, GetSafeStat(IE_VISUALRANGE));
 	Actor **poi = neighbours;
+	ieDword ea = Modified[IE_EA];
 	while (*poi) {
 		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
+
+		// allies take a hit on morale and nobody cares about neutrals
+		int pea = (*poi)->GetStat(IE_EA);
+		if (ea < EA_GOODCUTOFF && pea < EA_GOODCUTOFF) {
+			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+		} else if (ea > EA_EVILCUTOFF && pea > EA_EVILCUTOFF) {
+			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+		}
+
 		poi++;
 	}
 	free(neighbours);
