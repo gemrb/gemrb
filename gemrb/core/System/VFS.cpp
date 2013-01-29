@@ -39,6 +39,11 @@
 #include <dirent.h>
 #endif
 
+#ifdef __APPLE__
+// for getting resources inside the bundle
+#include <CoreFoundation/CFBundle.h>
+#endif
+
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
 #endif
@@ -104,8 +109,32 @@ static void closedir(DIR* dirp)
 
 #endif // WIN32
 
-
 namespace GemRB {
+#if __APPLE__
+//bundle path functions
+void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir)
+{
+	CFBundleRef mainBundle = CFBundleGetMainBundle();
+	CFURLRef bundleDirURL = NULL;
+	switch (dir) {
+		case RESOURCES:
+			bundleDirURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+			break;
+		case PLUGINS:
+			// undeined on iOS!
+			bundleDirURL = CFBundleCopyBuiltInPlugInsURL(mainBundle);
+			break;
+	}
+	if (bundleDirURL) {
+		CFURLRef absoluteURL = CFURLCopyAbsoluteURL(bundleDirURL);
+		CFRelease(bundleDirURL);
+		CFStringRef bundleDirPath = CFURLCopyFileSystemPath( absoluteURL, kCFURLPOSIXPathStyle );
+		CFRelease(absoluteURL);
+		CFStringGetCString( bundleDirPath, outPath, maxLen, kCFStringEncodingASCII );
+		CFRelease(bundleDirPath);
+	}
+}
+#endif
 
 /** Returns true if path is an existing directory */
 bool dir_exists(const char* path)

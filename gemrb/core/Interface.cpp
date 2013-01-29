@@ -88,34 +88,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef __APPLE__
-// for getting resources inside the bundle
-#include <CoreFoundation/CFBundle.h>
-
-CFBundleRef mainBundle = CFBundleGetMainBundle();
-
-#define COPY_RES_PATH(charArray) \
-	CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle); \
-	CFURLRef absoluteURL = CFURLCopyAbsoluteURL(resourcesURL); \
-	CFRelease(resourcesURL); \
-	CFStringRef resourcesPath = CFURLCopyFileSystemPath( absoluteURL, kCFURLPOSIXPathStyle ); \
-	CFRelease(absoluteURL); \
-	CFStringGetCString( resourcesPath, charArray, sizeof(charArray), kCFStringEncodingASCII ); \
-	CFRelease(resourcesPath);
-
-#if TARGET_OS_MAC
-// iOS doesnt use plugins
-#define COPY_PLUGIN_PATH(charArray) \
-	CFURLRef pluginURL = CFBundleCopyBuiltInPlugInsURL(mainBundle); \
-	CFURLRef absoluteURL = CFURLCopyAbsoluteURL(pluginURL); \
-	CFRelease(pluginURL); \
-	CFStringRef pluginPath = CFURLCopyFileSystemPath( absoluteURL, kCFURLPOSIXPathStyle ); \
-	CFRelease(absoluteURL); \
-	CFStringGetCString( pluginPath, charArray, sizeof(charArray), kCFStringEncodingASCII ); \
-	CFRelease(pluginPath);
-#endif
-#endif
-
 #include <cstdlib>
 #include <time.h>
 #include <vector>
@@ -1576,7 +1548,7 @@ int Interface::Init()
 	// since bundle plugins are loaded first dyld will give them precedence
 	// if duplicates are found in the PluginsPath
 	char bundlePluginsPath[_MAX_PATH];
-	COPY_PLUGIN_PATH(bundlePluginsPath);
+	CopyBundlePath(bundlePluginsPath, sizeof(bundlePluginsPath), PLUGINS);
 	ResolveFilePath(bundlePluginsPath);
 	LoadPlugins(bundlePluginsPath);
 #endif
@@ -2485,7 +2457,7 @@ bool Interface::LoadConfig(const char* filename)
 #if __APPLE__
 		// override will ALWAYS be in the app bundle if not specified in the config
 		// the build process always copys them to the Recources diectory
-		COPY_RES_PATH(GemRBOverridePath);
+		CopyBundlePath(GemRBOverridePath, sizeof(GemRBOverridePath));
 #else
 		strcpy( GemRBOverridePath, GemRBPath );
 #endif
@@ -2497,7 +2469,7 @@ bool Interface::LoadConfig(const char* filename)
 #if __APPLE__
 		// override will ALWAYS be in the app bundle if not specified in the config
 		// the build process always copys them to the Recources diectory
-		COPY_RES_PATH(GemRBUnhardcodedPath);
+		CopyBundlePath(GemRBUnhardcodedPath, sizeof(GemRBUnhardcodedPath));
 #else
 		strcpy(GemRBUnhardcodedPath, GemRBPath);
 #endif
@@ -2520,7 +2492,7 @@ bool Interface::LoadConfig(const char* filename)
 #if __APPLE__
 		// GUI scripts will ALWAYS be in the app bundle if not specified in the config
 		// the build process always copys them to the Recources diectory
-		COPY_RES_PATH(GUIScriptsPath);
+		CopyBundlePath(GUIScriptsPath, sizeof(GUIScriptsPath));
 #else
 		strcpy( GUIScriptsPath, GemRBPath );
 #endif

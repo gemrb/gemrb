@@ -59,6 +59,15 @@ namespace GemRB {
 
 #else  // ! WIN32
 
+#ifdef __APPLE__
+// bundle path functions
+enum BundleDirectory {
+	RESOURCES,
+	PLUGINS
+};
+GEM_EXPORT void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir = RESOURCES);
+#endif
+
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
 GEM_EXPORT void ResolveFilePath(char* FilePath);
 GEM_EXPORT void ResolveFilePath(std::string& FilePath);
