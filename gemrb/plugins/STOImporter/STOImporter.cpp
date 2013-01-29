@@ -245,6 +245,7 @@ void STOImporter::CalculateStoredFileSize(Store *s)
 			headersize = 156;
 			//trigger ref on a dword and 56 bytes of crap
 			itemsize = 28 + 60;
+			break;
 		default:
 			headersize = 156;
 			itemsize = 28;
