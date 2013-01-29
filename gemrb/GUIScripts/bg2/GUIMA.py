@@ -397,6 +397,7 @@ def WorldMapWindowCommon (Travel):
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.SetVisible (WINDOW_VISIBLE)
 	MapC()
+	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
 def MapN():
