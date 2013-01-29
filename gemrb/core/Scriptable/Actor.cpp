@@ -4608,6 +4608,10 @@ void Actor::Die(Scriptable *killer)
 	if (killer) {
 		if (killer->Type==ST_ACTOR) {
 			act = (Actor *) killer;
+			// for unknown reasons the original only sends the trigger if the killer is ok
+			if (act && !(act->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
+				killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
+			}
 		}
 	}
 
