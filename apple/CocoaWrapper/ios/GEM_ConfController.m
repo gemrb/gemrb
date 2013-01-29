@@ -167,6 +167,7 @@ enum ConfigTableSection {
 
 	if (error) {
 		NSLog(@"FM error for %@:\n%@", srcPath, [error localizedDescription]);
+		[pool release];
 		return NO;
 	}
 
@@ -197,164 +198,180 @@ enum ConfigTableSection {
 	archive_write_disk_set_standard_lookup(ext);
 	struct archive_entry *entry;
 
-	//warning super bad code can cause memory leak.
-	// !!! cleanup and do right
-	int r;
-	if ((r = archive_read_open_file(a, archiveAbsPath, 10240))) {
-		NSLog(@"error opening archive (%i):%s", r, archive_error_string(a));
-		return NO;
-	}
-
-	NSString* installName = nil;
-	BOOL archiveHasRootDir = YES;
-	unsigned long long progressSize = 0;
-	for (;;) {
-		r = archive_read_next_header(a, &entry);
-		if (r == ARCHIVE_EOF) break;
-		NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
-		archive_entry_set_pathname(entry, [[dstPath stringByAppendingString:tmp] cStringUsingEncoding:NSASCIIStringEncoding]);
-		// Mac OS X has an annoying thing where it embeds crap in the archive. skip it.
-		if ([tmp rangeOfString:@"__MACOSX/"].location != NSNotFound) continue;
-		if (!installName) {
-			if ([tmp rangeOfString:@"/"].location != NSNotFound) {
-				installName = tmp;
-			} else {
+	@try {
+		int r;
+		if ((r = archive_read_open_file(a, archiveAbsPath, 10240))) {
+			@throw ([NSException exceptionWithName:@"ArchiveException"
+											reason:[NSString stringWithFormat:@"Error opening archive (%i):%s",
+													r, archive_error_string(a)]
+										  userInfo:nil]);
+		}
+		NSString* installName = nil;
+		BOOL archiveHasRootDir = YES;
+		unsigned long long progressSize = 0;
+		for (;;) {
+			r = archive_read_next_header(a, &entry);
+			if (r == ARCHIVE_EOF) break;
+			NSString* tmp = [NSString stringWithFormat:@"%s", archive_entry_pathname(entry)];
+			archive_entry_set_pathname(entry, [[dstPath stringByAppendingString:tmp] cStringUsingEncoding:NSASCIIStringEncoding]);
+			// Mac OS X has an annoying thing where it embeds crap in the archive. skip it.
+			if ([tmp rangeOfString:@"__MACOSX/"].location != NSNotFound) continue;
+			if (!installName) {
+				if ([tmp rangeOfString:@"/"].location != NSNotFound) {
+					installName = tmp;
+				} else {
+					archiveHasRootDir = NO;
+				}
+			} else if ([tmp rangeOfString:installName].location != 0) {
 				archiveHasRootDir = NO;
 			}
-		} else if ([tmp rangeOfString:installName].location != 0) {
-			archiveHasRootDir = NO;
+			
+			if (r != ARCHIVE_OK) {
+				NSLog(@"error reading archive (%i):%s", r, archive_error_string(a));
+				break;
+			}
+			
+			r = archive_write_header(ext, entry);
+			if (r != ARCHIVE_OK)
+				NSLog(@"%s", archive_error_string(a));
+			else {
+				int status;
+				const void *buff;
+				size_t size;
+				off_t offset;
+
+				for (;;) {
+					status = archive_read_data_block(a, &buff, &size, &offset);
+					if (status == ARCHIVE_EOF) break;
+					if (status != ARCHIVE_OK) {
+						NSLog(@"%s", archive_error_string(a));
+						break;
+					}
+					progressSize += size;
+					status = archive_write_data_block(ext, buff, size, offset);
+					if (status != ARCHIVE_OK) {
+						NSLog(@"%s", archive_error_string(a));
+						break;
+					}
+				}
+
+				dispatch_async(dispatch_get_main_queue(), ^{
+					pv.progress = (float)((double)progressSize / (double)totalBytes);
+				});
+			}
+		}
+		// result from a break above
+		if (r == ARCHIVE_FATAL) {
+			@throw ([NSException exceptionWithName:@"Archive Error"
+											reason:[NSString stringWithFormat:@"Fatal error reading archive:%s", archive_error_string(a)]
+										  userInfo:nil]);
 		}
 
-		if (r != ARCHIVE_OK) {
-			NSLog(@"error reading archive (%i):%s", r, archive_error_string(a));
-			break;
+		installName = [installName lastPathComponent];
+		NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+		// delete anything at gamePath. our install overwrites existing data.
+		[fm removeItemAtPath:gamePath error:nil];
+		if (archiveHasRootDir) {
+			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@/", dstPath, installName]
+						toPath:gamePath error:nil];
+			[fm removeItemAtPath:dstPath error:nil];
+		} else {
+			// simply rename the tmp dir to archivePath
+			installName = [archivePath stringByDeletingPathExtension];
+			[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 		}
 
-		r = archive_write_header(ext, entry);
-		if (r != ARCHIVE_OK)
-			NSLog(@"%s", archive_error_string(a));
-		else {
-			int status;
-			const void *buff;
-			size_t size;
-			off_t offset;
+		NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@/", libDir, [archivePath pathExtension]];
+		NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
-			for (;;) {
-				status = archive_read_data_block(a, &buff, &size, &offset);
-				if (status == ARCHIVE_EOF) break;
-				if (status != ARCHIVE_OK) //need to set a return value
-					break;
-				progressSize += size;
-				status = archive_write_data_block(ext, buff, size, offset);
-				if (status != ARCHIVE_OK) {
-					NSLog(@"%s", archive_error_string(a));
-					break;
+		NSLog(@"moving %@ to %@", oldSavePath, savePath);
+		NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
+		for (NSString* saveName in saves) {
+			NSString* fullSavePath = [NSString stringWithFormat:@"%@save/%@", savePath, saveName];
+			[fm removeItemAtPath:fullSavePath error:nil];
+			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
+			NSLog(@"Moving save '%@' to %@", saveName, fullSavePath);
+		}
+
+		oldSavePath = [NSString stringWithFormat:@"%@/mpsave/", gamePath];
+		saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
+
+		for (NSString* saveName in saves) {
+			NSString* fullSavePath = [NSString stringWithFormat:@"%@mpsave/%@", savePath, saveName];
+			[fm removeItemAtPath:fullSavePath error:nil];
+			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
+			NSLog(@"Moving mpsave '%@' to %@", saveName, fullSavePath);
+		}
+
+		NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [archivePath pathExtension]];
+
+		NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], gamePath, [[UIDevice currentDevice] userInterfaceIdiom]);
+		NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
+		if ([fm fileExistsAtPath:newCfgPath]) {
+			if (configIndexPath) {
+				// close the config file before overwriting it.
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[controlTable deselectRowAtIndexPath:configIndexPath animated:YES];
+					[self tableView:controlTable didDeselectRowAtIndexPath:configIndexPath];
+				});
+			}
+			// new data overwrites old data therefore new config should do the same.
+			[fm removeItemAtPath:newCfgPath error:nil];
+		}
+		if (newConfig) {
+			[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
+			[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
+			// No need for CD paths
+			[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
+			[newConfig appendFormat:@"\nSavePath = %@", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
+
+			[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
+
+			NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
+			if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
+				// PST & BG1 & IWD are 640x480 without mod
+				[newConfig appendString:@"\nWidth = 640"];
+				[newConfig appendString:@"\nHeight = 480"];
+			} else {
+				if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+					[newConfig appendString:@"\nWidth = 1024"];
+					[newConfig appendString:@"\nHeight = 768"];
+				}else{
+					[newConfig appendString:@"\nWidth = 800"];
+					[newConfig appendString:@"\nHeight = 600"];
 				}
 			}
 
-			dispatch_async(dispatch_get_main_queue(), ^{
-				pv.progress = (float)((double)progressSize / (double)totalBytes);
-			});
-		}
-	}
-	archive_read_close(a);
-	archive_read_finish(a);
-
-	if (r == ARCHIVE_FATAL) return NO;
-
-	installName = [installName lastPathComponent];
-	NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
-	// delete anything at gamePath. our install overwrites existing data.
-	[fm removeItemAtPath:gamePath error:nil];
-	if (archiveHasRootDir) {
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@/", dstPath, installName]
-					toPath:gamePath error:nil];
-		[fm removeItemAtPath:dstPath error:nil];
-	} else {
-		// simply rename the tmp dir to archivePath
-		installName = [archivePath stringByDeletingPathExtension];
-		[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
-	}
-
-	NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@/", libDir, [archivePath pathExtension]];
-	NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
-
-	NSLog(@"moving %@ to %@", oldSavePath, savePath);
-	NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
-	for (NSString* saveName in saves) {
-		NSString* fullSavePath = [NSString stringWithFormat:@"%@save/%@", savePath, saveName];
-		[fm removeItemAtPath:fullSavePath error:nil];
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
-		NSLog(@"Moving save '%@' to %@", saveName, fullSavePath);
-	}
-
-	oldSavePath = [NSString stringWithFormat:@"%@/mpsave/", gamePath];
-	saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
-
-	for (NSString* saveName in saves) {
-		NSString* fullSavePath = [NSString stringWithFormat:@"%@mpsave/%@", savePath, saveName];
-		[fm removeItemAtPath:fullSavePath error:nil];
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@", oldSavePath, saveName] toPath:fullSavePath error:nil];
-		NSLog(@"Moving mpsave '%@' to %@", saveName, fullSavePath);
-	}
-
-	NSString* newCfgPath = [NSString stringWithFormat:@"%@/%@.%@.cfg", docDir, installName, [archivePath pathExtension]];
-
-	NSLog(@"Automatically creating config for %@ installed at %@ running on %i", [archivePath pathExtension], gamePath, [[UIDevice currentDevice] userInterfaceIdiom]);
-	NSMutableString* newConfig = [NSMutableString stringWithContentsOfFile:@"GemRB.cfg.newinstall" encoding:NSUTF8StringEncoding error:nil];
-	if ([fm fileExistsAtPath:newCfgPath]) {
-		if (configIndexPath) {
-			// close the config file before overwriting it.
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[controlTable deselectRowAtIndexPath:configIndexPath animated:YES];
-				[self tableView:controlTable didDeselectRowAtIndexPath:configIndexPath];
-			});
-		}
-		// new data overwrites old data therefore new config should do the same.
-		[fm removeItemAtPath:newCfgPath error:nil];
-	}
-	if (newConfig) {
-		[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
-		// No need for CD paths
-		[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
-		[newConfig appendFormat:@"\nSavePath = %@", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
-
-		[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
-
-		NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
-		if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
-			// PST & BG1 & IWD are 640x480 without mod
-			[newConfig appendString:@"\nWidth = 640"];
-			[newConfig appendString:@"\nHeight = 480"];
-		} else {
-			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-				[newConfig appendString:@"\nWidth = 1024"];
-				[newConfig appendString:@"\nHeight = 768"];
-			}else{
-				[newConfig appendString:@"\nWidth = 800"];
-				[newConfig appendString:@"\nHeight = 600"];
+			NSError* err = nil;
+			if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
+				NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
 			}
+		}else{
+			NSLog(@"Unable to open GemRB.cfg.newinstall");
 		}
-
-		NSError* err = nil;
-		if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
-			NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
-		}
-	}else{
-		NSLog(@"Unable to open GemRB.cfg.newinstall");
+		[pv removeFromSuperview];
+		[pv release];
+// dont delete the archive from simulator
+#if TARGET_IPHONE_SIMULATOR == 0
+		[fm removeItemAtPath:srcPath error:nil];
+#endif
+	}
+	@catch (NSException *exception) {
+		// TODO: present an alert box
+		NSLog(@"%@", exception);
+		return NO;
+	}
+	@finally {
+		archive_read_close(a);
+		archive_read_finish(a);
+		[libDir release];
+		[self reloadTableData];
+		[pool release];
 	}
 
-	[pv removeFromSuperview];
-	[pv release];
-#if TARGET_IPHONE_SIMULATOR == 0
-	[fm removeItemAtPath:srcPath error:nil];
-#endif
-	[self reloadTableData];
-	[pool release];
 	return YES;
 }
 
