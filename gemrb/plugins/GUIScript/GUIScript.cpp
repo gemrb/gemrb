@@ -11089,7 +11089,7 @@ bool GUIScript::LoadScript(const char* filename)
 	return true;
 }
 
-/* Similar to RunFunction, but with parameters, and doesn't necessarily fails */
+/* Similar to RunFunction, but with parameters, and doesn't necessarily fail */
 PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
 {
 	if (!Py_IsInitialized()) {
