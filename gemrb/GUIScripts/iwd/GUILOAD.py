@@ -24,6 +24,7 @@
 
 import GemRB
 import LoadScreen
+import GUICommon
 from GUIDefines import *
 
 LoadWindow = 0
@@ -34,11 +35,13 @@ ScrollBar = 0
 def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
-	GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
-	GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
+	if GUICommon.GameIsIWD1():
+		GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
+		GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
 	GemRB.LoadWindowPack ("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow (0)
 	LoadWindow.SetFrame ()
+
 	CancelButton=LoadWindow.GetControl (34)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
@@ -126,8 +129,11 @@ def LoadGamePress ():
 		LoadWindow.Unload ()
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	LoadScreen.StartLoadScreen()
-	GemRB.LoadGame(Games[Pos]) #loads and enters savegame
-	GemRB.SetNextScript ("PartyFormation")
+	GemRB.LoadGame (Games[Pos]) #loads and enters savegame
+	if GUICommon.GameIsIWD1():
+		GemRB.SetNextScript ("PartyFormation")
+	else:
+		GemRB.EnterGame ()
 	return
 
 def DeleteGameConfirm():

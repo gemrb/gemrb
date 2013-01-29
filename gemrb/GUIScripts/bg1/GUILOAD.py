@@ -24,6 +24,7 @@
 
 import GemRB
 import LoadScreen
+import GUICommon
 from GUIDefines import *
 
 LoadWindow = 0
@@ -34,6 +35,9 @@ ScrollBar = 0
 def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
+	if GUICommon.GameIsIWD1():
+		GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
+		GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
 	GemRB.LoadWindowPack ("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow (0)
 	LoadWindow.SetFrame ()
@@ -101,7 +105,7 @@ def ScrollBarPress ():
 		Label.SetText (Slotname)
 
 		if ActPos<len(Games):
-			Slotname = Games[ActPos].GetDate()
+			Slotname = Games[ActPos].GetGameDate()
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x10000010+i)
@@ -126,7 +130,10 @@ def LoadGamePress ():
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame (Games[Pos]) #loads and enters savegame
-	GemRB.EnterGame ()
+	if GUICommon.GameIsIWD1():
+		GemRB.SetNextScript ("PartyFormation")
+	else:
+		GemRB.EnterGame ()
 	return
 
 def DeleteGameConfirm():
