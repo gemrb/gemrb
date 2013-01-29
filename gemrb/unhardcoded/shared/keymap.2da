@@ -8,6 +8,7 @@ Journal               GUIJRNL          OpenJournalWindow                 0
 Map                   GUIMA            OpenMapWindow                     0 
 Wizard_Spells         GUIMG            OpenMageWindow                    0
 Priest_Spells         GUIPR            OpenPriestWindow                  0
+Spellbook             GUISPL           OpenSpellBookWindow               0
 Options               GUIOPT           OpenOptionsWindow                 0
 Character_Arbitration GUIMP            * 
 Guard_/_Protect       GUICommonWindows ActionDefendPressed               0
