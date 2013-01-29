@@ -9219,7 +9219,6 @@ bool Actor::TryToHideIWD2()
 	skill = GetStat(IE_STEALTH);
 	poi = neighbours;
 	bool heard = false;
-	targetDC = 0;
 	while (*poi) {
 		Actor *toCheck = *poi++;
 		if (toCheck->HasSpellState(SS_DEAF)) {
