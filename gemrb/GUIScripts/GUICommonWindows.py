@@ -58,6 +58,7 @@ ActionsWindow = None
 CurrentWindow = None
 DraggedPortrait = None
 ActionBarControlOffset = 0
+ReturnToGame = None
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -119,12 +120,13 @@ def InitOptionButton(Window, Index, Action=0,IsPage=1):
 	return Button
 
 ##these defaults don't seem to break the games other than pst
-def SetupMenuWindowControls (Window, Gears=None, ReturnToGame=None):
+def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	"""Binds all of the basic controls and windows to the options pane."""
 
-	global OptionsWindow, ActionBarControlOffset
+	global OptionsWindow, ActionBarControlOffset, ReturnToGame
 
 	OptionsWindow = Window
+	ReturnToGame = CloseWindowCallback
 
 	bg1 = GUICommon.GameIsBG1()
 	bg2 = GUICommon.GameIsBG2()
