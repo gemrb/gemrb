@@ -228,9 +228,9 @@ void Scriptable::DisplayHeadText(const char* text)
 	if (overHeadText) {
 		core->FreeString( overHeadText );
 	}
-	overHeadText = (char *) text;
 	overHeadTextPos.empty();
 	if (text) {
+		overHeadText = strdup(text);
 		timeStartDisplaying = core->GetGame()->Ticks;
 		textDisplaying = 1;
 	}
@@ -1192,7 +1192,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			memset(tmpstr, 0, sizeof(tmpstr));
 			// eg. .:Casts Word of Recall:.
 			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetString(displaymsg->GetStringReference(STR_CASTS)), core->GetString(spl->SpellName));
-			DisplayHeadText(strdup(tmpstr));
+			DisplayHeadText(tmpstr);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}

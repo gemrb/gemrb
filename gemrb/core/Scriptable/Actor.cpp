@@ -9539,7 +9539,7 @@ void Actor::DisplayHeadHPRatio()
 	char tmpstr[10];
 	memset(tmpstr, 0, 10);
 	snprintf(tmpstr, 10, "%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
-	DisplayHeadText(strdup(tmpstr));
+	DisplayHeadText(tmpstr);
 }
 
 }

@@ -73,9 +73,7 @@ void DisplayMessage::DisplayString(const char* Text, Scriptable *target) const
 		ta->AppendText( Text, -1 );
 	} else {
 		if(target) {
-			char *tmp = strdup(Text);
-
-			target->DisplayHeadText(tmp);
+			target->DisplayHeadText(Text);
 		}
 	}
 }
