@@ -140,7 +140,7 @@ def LoadGamePress ():
 	return
 
 def GetQuickLoadSlot():
-	global Games, QuickLoadSlot
+	global Games
 
 	Games=GemRB.GetSaveGames()
 	QuickLoadSlot = None
@@ -150,12 +150,10 @@ def GetQuickLoadSlot():
 		if Slotname == 1:
 		        QuickLoadSlot = Game
 		        break
-	return
+	return QuickLoadSlot
 
 def QuickLoadPressed():
-	global QuickLoadSlot
-
-	GetQuickLoadSlot()
+	QuickLoadSlot = GetQuickLoadSlot()
 	if QuickLoadSlot!=None:
 		LoadScreen.StartLoadScreen()
 		GemRB.LoadGame(QuickLoadSlot)
