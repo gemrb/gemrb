@@ -480,11 +480,13 @@ int Font::CalcStringWidth(const ieWord* string, bool NoColor) const
 	size_t ret = 0, len = dbStrLen(string);
 	for (size_t i = 0; i < len; i++) {
 		if (( string[i] ) == '[' && !NoColor) {
+			i++; // cannot be ']' when it is '['
 			while(i<len && (string[i]) != ']') {
 				i++;
 			}
+		} else {
+			ret += GetCharSprite(string[i])->Width;
 		}
-		ret += GetCharSprite(string[i])->Width;
 	}
 	return ( int ) ret;
 }
