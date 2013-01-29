@@ -385,6 +385,7 @@ def WorldMapWindowCommon (Travel):
 	else:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Window.SetVisible (WINDOW_VISIBLE)
+	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 ###################################################
 # End of file GUIMA.py

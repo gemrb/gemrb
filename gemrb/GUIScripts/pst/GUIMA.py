@@ -177,7 +177,8 @@ def WorldMapWindowCommon (Travel):
 	WMap.SetAnimation ("WMPTY")
 	#center on current area
 	WMap.AdjustScrolling (0,0)
-	
+	WMap.SetStatus (IE_GUI_CONTROL_FOCUSED)
+
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
