@@ -123,9 +123,7 @@ using namespace GemRB;
 - (void)toggleDebug:(id) __unused sender
 {
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	NSString* docDir = [[paths objectAtIndex:0] copy];
-
-	NSString* logFile = [NSString stringWithFormat:@"%@/GemRB.log", docDir];
+	NSString* logFile = [NSString stringWithFormat:@"%@/GemRB.log", [paths objectAtIndex:0]];
 	//OpenFile();
 	const char* cLogFile = [logFile cStringUsingEncoding:NSASCIIStringEncoding];
 	FileStream *fs = new FileStream();
