@@ -25,7 +25,6 @@
 import GemRB
 import LoadScreen
 import GUICommon
-from GUIDefines import *
 
 LoadWindow = 0
 TextAreaControl = 0
@@ -129,10 +128,37 @@ def LoadGamePress ():
 		LoadWindow.Unload ()
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	LoadScreen.StartLoadScreen()
-	GemRB.LoadGame (Games[Pos]) #loads and enters savegame
+	#loads savegame
+	GemRB.LoadGame (Games[Pos])
+
+	#enters game
 	if GUICommon.GameIsIWD1():
 		GemRB.SetNextScript ("PartyFormation")
 	else:
+		# it will close windows, including the loadscreen
+		GemRB.EnterGame ()
+	return
+
+def GetQuickLoadSlot():
+	global Games, QuickLoadSlot
+
+	Games=GemRB.GetSaveGames()
+	QuickLoadSlot = None
+	for Game in Games:
+		Slotname = Game.GetSaveID()
+		# quick save is 1
+		if Slotname == 1:
+		        QuickLoadSlot = Game
+		        break
+	return
+
+def QuickLoadPressed():
+	global QuickLoadSlot
+
+	GetQuickLoadSlot()
+	if QuickLoadSlot!=None:
+		LoadScreen.StartLoadScreen()
+		GemRB.LoadGame(QuickLoadSlot)
 		GemRB.EnterGame ()
 	return
 
