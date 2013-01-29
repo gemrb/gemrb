@@ -4552,6 +4552,17 @@ const char *GetVarName(const char *table, int value)
 	return NULL;
 }
 
+void Actor::SendDiedTrigger()
+{
+	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD, GetSafeStat(IE_VISUALRANGE));
+	Actor **poi = neighbours;
+	while (*poi) {
+		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
+		poi++;
+	}
+	free(neighbours);
+}
+
 void Actor::Die(Scriptable *killer)
 {
 	int i,j;
@@ -4598,6 +4609,7 @@ void Actor::Die(Scriptable *killer)
 	InternalFlags&=~IF_IDLE;
 	SetStance( IE_ANI_DIE );
 	AddTrigger(TriggerEntry(trigger_die));
+	SendDiedTrigger();
 
 	Actor *act=NULL;
 	if (!killer) {

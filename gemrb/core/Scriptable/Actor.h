@@ -535,6 +535,8 @@ public:
 	void Response(int type) const;
 	/* called when someone died in the party */
 	void ReactToDeath(const char *deadname);
+	/* sends trigger_died to everyone in visual range */
+	void SendDiedTrigger();
 	/* called when someone talks to Actor */
 	void DialogInterrupt();
 	/* called when actor was hit */

@@ -3898,6 +3898,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_set_petrified_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	BASE_STATE_SET( STATE_PETRIFIED );
+	target->SendDiedTrigger();
 	//always permanent effect, in fact in the original it is a death opcode (Avenger)
 	//i just would like this to be less difficult to use in mods (don't destroy petrified creatures)
 	return FX_NOT_APPLIED;
@@ -5402,6 +5403,7 @@ int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_imprisonment(%2d)", fx->Opcode);
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_PRISON);
+	target->SendDiedTrigger();
 	return FX_APPLIED;
 }
 
