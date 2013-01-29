@@ -1,0 +1,5 @@
+*.bcs diff=ie
+*.chu diff=ie
+*.pro diff=ie
+*.spl diff=ie
+*.vvc diff=ie
