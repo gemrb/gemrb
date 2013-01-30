@@ -454,7 +454,7 @@ void Door::dump() const
 	buffer.appendFormatted( "Door Global ID: %d\n", GetGlobalID());
 	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
 	buffer.appendFormatted( "Door Open: %s\n", YESNO(IsOpen()));
-	buffer.appendFormatted( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
+	buffer.appendFormatted( "Door Locked: %s	Difficulty: %d\n", YESNO(Flags&DOOR_LOCKED), LockDifficulty);
 	buffer.appendFormatted( "Door Trapped: %s	Difficulty: %d\n", YESNO(Trapped), TrapRemovalDiff);
 	if (Trapped) {
 		buffer.appendFormatted( "Trap Permanent: %s Detectable: %s\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
