@@ -41,7 +41,7 @@ class TileOverlay;
 #define DOOR_KEY         1024 //key removed when used (SEETHROUGH in iwd2)
 #define DOOR_SLIDE       2048 //impeded blocks ignored (WARNINGINFOTEXT in iwd2)
 //#define DOOR_WARNINGTEXTDISPLAYED 0x1000 // iwd2
-#define DOOR_HIDDEN2      8192 // iwd2, ignore the door
+#define DOOR_HIDDEN      8192 // iwd2, ignore the door
 //#define DOOR_USEUPKEY    0x4000 // sounds identical to DOOR_KEY
 
 class GEM_EXPORT Door : public Highlightable {

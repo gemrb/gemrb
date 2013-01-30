@@ -2326,7 +2326,7 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 		flag&=~DOOR_LOCKED;
 		door->SetDoorLocked(parameters->int1Parameter!=0, false);
 	}
-	if (flag&(DOOR_OPEN|DOOR_HIDDEN2)) {
+	if (flag&(DOOR_OPEN|DOOR_HIDDEN)) {
 		flag&=~DOOR_OPEN;
 		door->SetDoorOpen(parameters->int1Parameter!=0, false, 0);
 	}
