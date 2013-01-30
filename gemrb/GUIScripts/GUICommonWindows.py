@@ -616,6 +616,7 @@ def UpdateActionsWindow ():
 
 	if GUICommon.GameIsIWD2():
 		CurrentWindow = PortraitWindow
+		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
 	else:
 		CurrentWindow = ActionsWindow
 
