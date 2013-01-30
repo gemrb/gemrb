@@ -500,7 +500,8 @@ namespace GemRB {
 #define IE_TEAM			220
 #define IE_FACTION		221
 #define IE_SUBRACE		222
-#define IE_SPECIES              223
+#define IE_SPECIES              223 // pst specific
+#define IE_UNUSED_SKILLPTS 223 // iwd2 specific
 //temporarily here for iwd2
 #define IE_HATEDRACE2       224
 #define IE_HATEDRACE3       225

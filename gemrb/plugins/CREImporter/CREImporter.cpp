@@ -1902,6 +1902,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1); //invisible
 	str->ReadWord( &tmpWord); //unknown
 	str->Read( &tmpByte, 1); //unused skill points
+	act->BaseStats[IE_UNUSED_SKILLPTS] = tmpByte;
 	str->Seek( 124, GEM_CURRENT_POS );
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_EA]=tmpByte;
@@ -2858,7 +2859,9 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->Write( filling, 15);
 	tmpByte = actor->BaseStats[IE_TRANSLUCENT];
 	stream->Write(&tmpByte, 1);
-	stream->Write( filling, 6); //fade speed, spec flags, invisible, unused skill points
+	stream->Write( filling, 5); //fade speed, spec flags, invisible
+	tmpByte = actor->BaseStats[IE_UNUSED_SKILLPTS];
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 124);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
