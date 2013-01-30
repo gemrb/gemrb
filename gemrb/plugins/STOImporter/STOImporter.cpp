@@ -266,6 +266,7 @@ void STOImporter::CalculateStoredFileSize(Store *s)
 
 	//items
 	s->ItemsOffset = headersize;
+	headersize += s->ItemsCount * itemsize;
 }
 
 void STOImporter::PutPurchasedCategories(DataStream *stream, Store* s)
