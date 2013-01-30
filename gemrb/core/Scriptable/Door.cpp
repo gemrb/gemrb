@@ -112,9 +112,6 @@ void Door::UpdateDoor()
 
 	if (Flags & DOOR_TRANSPARENT) {
 		pmdflags = PATH_MAP_DOOR_IMPASSABLE;
-	} else if ((area->version == 16) && (Flags & DOOR_KEY)) {
-		// ARE9.1 has a slightly different set of bits
-		pmdflags = PATH_MAP_DOOR_IMPASSABLE;
 	} else {
 		//both door flags are needed here, one for transparency the other
 		//is for passability

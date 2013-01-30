@@ -282,6 +282,34 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	return true;
 }
 
+// everything is the same up to DOOR_FOUND, but then it gets messy (see Door.h)
+static const ieDword gemrbDoorFlags[6] = { DOOR_TRANSPARENT, DOOR_KEY, DOOR_SLIDE, DOOR_USEUPKEY, DOOR_LOCKEDINFOTEXT, DOOR_WARNINGINFOTEXT };
+// the last two are 0, since they are outside the original bit range, so all the constants can coexist
+static const ieDword iwd2DoorFlags[6] = { DOOR_LOCKEDINFOTEXT, DOOR_TRANSPARENT, DOOR_WARNINGINFOTEXT, DOOR_KEY, 0, 0 };
+inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
+{
+	if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		return Flags;
+	}
+
+	ieDword bit, otherbit, maskOff = 0, maskOn= 0;
+	for (int i=0; i < 6; i++) {
+		if (!reverse) {
+			bit = gemrbDoorFlags[i];
+			otherbit = iwd2DoorFlags[i];
+		} else {
+			bit = iwd2DoorFlags[i];
+			otherbit = gemrbDoorFlags[i];
+		}
+		if (Flags & bit) {
+			maskOff |= bit;
+			maskOn |= otherbit;
+		}
+	}
+	// delayed bad bit removal due to chain overlapping
+	return Flags = (Flags & ~maskOff) | maskOn;
+}
+
 Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 {
 	unsigned int i,x;
@@ -671,6 +699,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		LongName[32] = 0;
 		str->ReadResRef( ShortName );
 		str->ReadDword( &Flags );
+		Flags = FixIWD2DoorFlags(Flags, false);
 		str->ReadDword( &OpenFirstVertex );
 		str->ReadWord( &OpenVerticesCount );
 		str->ReadWord( &ClosedVerticesCount );
@@ -1535,6 +1564,7 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 
 		stream->Write( d->GetScriptName(), 32);
 		stream->WriteResRef( d->ID);
+		d->Flags = FixIWD2DoorFlags(d->Flags, true);
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
 		tmpWord = (ieWord) d->open->count;
