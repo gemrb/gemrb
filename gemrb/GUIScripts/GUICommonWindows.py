@@ -619,6 +619,7 @@ def UpdateActionsWindow ():
 		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
 	else:
 		CurrentWindow = ActionsWindow
+		ActionBarControlOffset = 0
 
 	if CurrentWindow == -1:
 		return
