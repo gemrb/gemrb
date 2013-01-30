@@ -4551,6 +4551,7 @@ const char *GetVarName(const char *table, int value)
 
 void Actor::SendDiedTrigger()
 {
+	if (!area) return;
 	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD, GetSafeStat(IE_VISUALRANGE));
 	Actor **poi = neighbours;
 	ieDword ea = Modified[IE_EA];
