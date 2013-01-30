@@ -54,8 +54,6 @@ using namespace GemRB;
 
 #define DEF_COUNT 4
 
-#define DOOR_HIDDEN 128
-
 //something non signed, non ascii
 #define UNINITIALIZED_BYTE  0x11
 
@@ -826,7 +824,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		if (OpenResRef[0])
 			memcpy( door->OpenSound, OpenResRef, sizeof(OpenResRef) );
 		else {
-			if (Flags & DOOR_HIDDEN)
+			if (Flags & DOOR_SECRET)
 				memcpy( door->OpenSound, Sounds[DEF_HOPEN], 9 );
 			else
 				memcpy( door->OpenSound, Sounds[DEF_OPEN], 9 );
@@ -834,7 +832,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		if (CloseResRef[0])
 			memcpy( door->CloseSound, CloseResRef, sizeof(CloseResRef) );
 		else {
-			if (Flags & DOOR_HIDDEN)
+			if (Flags & DOOR_SECRET)
 				memcpy( door->CloseSound, Sounds[DEF_HCLOSE], 9 );
 			else
 				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
