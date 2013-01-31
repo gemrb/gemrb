@@ -258,7 +258,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if Window.HasControl (rb):
 		Button = Window.GetControl (rb)
 		Button.SetTooltip (OptionTip['Rest'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	if bg1 or iwd1 or bg2:
 		MarkMenuButton (Window)
@@ -1261,7 +1261,7 @@ def OpenPortraitWindow (needcontrols=0):
 			if GUICommon.GameIsIWD():
 				# Rest (iwd)
 				Button.SetTooltip (11942)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 			else:
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
 		else:
@@ -1272,7 +1272,7 @@ def OpenPortraitWindow (needcontrols=0):
 				Button = Window.GetControl (8)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 				Button.SetTooltip (11942)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 				pos = pos - 37
 				Window.CreateButton (6, 6, pos, 27, 36)
@@ -1298,7 +1298,7 @@ def OpenPortraitWindow (needcontrols=0):
 		if Window.HasControl(6) and not GUICommon.GameIsIWD2():
 			Button = Window.GetControl (6)
 			Button.SetTooltip (11942)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
@@ -1813,3 +1813,8 @@ def HideInterface(): #todo:should really add to pst if possible
 
 def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
+
+def RestPress ():
+	# FIXME: check "rest until healed", it's an option in some games
+	GemRB.RestParty(0, 0, 8)
+	return

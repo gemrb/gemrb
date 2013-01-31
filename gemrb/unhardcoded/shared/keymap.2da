@@ -27,7 +27,7 @@ Equip_Melee_Weapon    GUICommonWindows ActionMeleePressed                0
 Equip_Range_Weapon    GUICommonWindows ActionRangePressed                0
 Quick_Load            GUILOAD          QuickLoadPressed                  0
 Quick_Save            GUISAVE          QuickSavePressed                  0
-Rest                  GUICommon        RestPress                         0
+Rest                  GUICommonWindows RestPress                         0
 Hide_Interface        GUICommonWindows HideInterface                     0
 Right_Interface       GUICommonWindows PortraitPress                     0
 Left_Interface        GUICommonWindows OptionsPress                      0

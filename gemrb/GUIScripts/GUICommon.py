@@ -91,11 +91,6 @@ def LocationPressed ():
 	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
 	return
 
-def RestPress ():
-	# FIXME: check "rest until healed", it's an option in some games
-	GemRB.RestParty(0, 0, 8)
-	return
-
 def SelectFormation ():
 	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))
 	return
