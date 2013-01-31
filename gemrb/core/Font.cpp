@@ -104,7 +104,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int initials_x = 0;
 	int initials_row = 0;
 	ieWord currCap = 0;
-	ieWord* tmp;
+	ieWord* tmp = NULL;
 	size_t len = GetDoubleByteString(string, tmp);
 
 	int num_empty_rows = 0;
@@ -324,7 +324,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Palette* blitPalette = NULL;
 	SET_BLIT_PALETTE( pal );
 
-	ieWord* tmp;
+	ieWord* tmp = NULL;
 	size_t len = GetDoubleByteString(string, tmp);
 	while (len > 0 && (tmp[len - 1] == '\n' || tmp[len - 1] == '\r')) {
 		// ignore trailing newlines
@@ -468,7 +468,7 @@ int Font::PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const
 
 int Font::CalcStringWidth(const unsigned char* string, bool NoColor) const
 {
-	ieWord* tmp;
+	ieWord* tmp = NULL;
 	GetDoubleByteString(string, tmp);
 	int width = CalcStringWidth(tmp, NoColor);
 	free(tmp);
@@ -600,6 +600,14 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 		++dbLen;
 	}
 	dbString[dbLen] = '\0';
+
+	// we dont always use everything we allocated.
+	// realloc in this case to avoid static anylizer warnings about "garbage values"
+	// since this realloc always truncates it *should* be quick
+	ieWord* test = dbString;
+	dbString = (ieWord*)realloc(dbString, (dbLen+1) * sizeof(ieWord));
+	// since this is truncation we *should* get the same ptr back
+	assert(test == dbString);
 
 	return dbLen;
 }
