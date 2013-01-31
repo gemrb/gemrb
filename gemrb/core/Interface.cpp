@@ -158,6 +158,7 @@ INIWhiteListEntry ConfigWhitelist[] = {
 	{"Game Options", "Footsteps", 1},
 	{"Game Options", "Gore", 0}, // unused
 	{"Game Options", "GUI Feedback Level", 0},
+	{"Game Options", "Heal Party on Rest", 0}, // TODO: see Game::RestParty
 	{"Game Options", "Hotkeys On Tooltips", 1},			// not used. should be implemented.
 	{"Game Options", "HP Over Head", 0},
 	{"Game Options", "Infravision", 1},
