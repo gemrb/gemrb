@@ -232,23 +232,24 @@ void STOImporter::GetPurchasedCategories(Store* s)
 //call this before any write, it updates offsets!
 void STOImporter::CalculateStoredFileSize(Store *s)
 {
-	int headersize, itemsize;
+	int headersize;
+	//int headersize, itemsize;
 
 	//header
 	switch (s->version) {
 		case 90:
 			//capacity on a dword and 80 bytes of crap
 			headersize = 156 + 84;
-			itemsize = 28;
+			//itemsize = 28;
 			break;
 		case 11:
 			headersize = 156;
 			//trigger ref on a dword and 56 bytes of crap
-			itemsize = 28 + 60;
+			//itemsize = 28 + 60;
 			break;
 		default:
 			headersize = 156;
-			itemsize = 28;
+			//itemsize = 28;
 			break;
 	}
 
@@ -266,7 +267,7 @@ void STOImporter::CalculateStoredFileSize(Store *s)
 
 	//items
 	s->ItemsOffset = headersize;
-	headersize += s->ItemsCount * itemsize;
+	//headersize += s->ItemsCount * itemsize;
 }
 
 void STOImporter::PutPurchasedCategories(DataStream *stream, Store* s)
