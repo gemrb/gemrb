@@ -6552,8 +6552,15 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				}
 			}
 			// damage type with a resistance stat
-			resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
-			damage -= resisted;
+			if (third) {
+				// flat resistance, eg. 10/- or eg. 5/+2 for physical types
+				// TODO: implement the /+x creature enchantment check
+				resisted = (signed)GetSafeStat(it->second.resist_stat);
+				damage -= resisted;
+			} else {
+				resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
+				damage -= resisted;
+			}
 			print("Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// PST and BG1 may actually heal on negative damage
 			if (!core->HasFeature(GF_HEAL_ON_100PLUS)) {
