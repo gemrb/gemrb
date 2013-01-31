@@ -1587,6 +1587,7 @@ void Game::RestParty(int checks, int dream, int hp)
 	}
 
 	//rest check, if PartyRested should be set, area should return true
+	// TODO: implement "rest until healed", it's an option in some games
 	int hours = 8;
 	int hoursLeft = 0;
 	if (!(checks&REST_NOAREA) ) {

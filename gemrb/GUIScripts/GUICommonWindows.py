@@ -1815,6 +1815,5 @@ def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
 
 def RestPress ():
-	# FIXME: check "rest until healed", it's an option in some games
-	GemRB.RestParty(0, 0, 8)
+	GemRB.RestParty(0, 0, 1)
 	return
