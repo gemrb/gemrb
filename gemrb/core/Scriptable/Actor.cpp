@@ -6564,7 +6564,10 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			print("Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// PST and BG1 may actually heal on negative damage
 			if (!core->HasFeature(GF_HEAL_ON_100PLUS)) {
-				if (damage <= 0) resisted = DR_IMMUNE;
+				if (damage <= 0) {
+					resisted = DR_IMMUNE;
+					damage = 0;
+				}
 			}
 		}
 	}
