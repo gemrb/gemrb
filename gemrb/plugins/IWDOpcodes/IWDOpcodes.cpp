@@ -2526,7 +2526,7 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTCOLD,fx->Parameter1 );
 	STAT_ADD(IE_RESISTELECTRICITY,fx->Parameter1 );
 	STAT_ADD(IE_RESISTACID,fx->Parameter1 );
-	STAT_ADD(IE_RESISTMAGIC,fx->Parameter1 );
+	STAT_ADD(IE_MAGICDAMAGERESISTANCE,fx->Parameter1 );
 	STAT_ADD(IE_RESISTSLASHING,fx->Parameter1 );
 	STAT_ADD(IE_RESISTCRUSHING,fx->Parameter1 );
 	STAT_ADD(IE_RESISTPIERCING,fx->Parameter1 );
