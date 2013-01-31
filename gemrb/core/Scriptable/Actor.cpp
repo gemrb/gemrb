@@ -3888,7 +3888,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
-	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+	// can be negative if we're healing on 100%+ resistance
+	if (damage != 0) {
+		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+	}
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
