@@ -1794,58 +1794,6 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 	}
 }
 
-/* no longer needed, use IE_CASTING stat
-static EffectRef fx_disable_spellcasting_ref = { "DisableCasting", -1 };
-int EffectQueue::DisabledSpellcasting(int types) const
-{
-	ResolveEffectRef(fx_disable_spellcasting_ref);
-	if( fx_disable_spellcasting_ref.opcode < 0) {
-		return 0;
-	}
-
-	unsigned int spelltype_mask = 0;
-	ieDword opcode = fx_disable_spellcasting_ref.opcode;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-
-		if (iwd2fx) {
-			switch((*f)->Parameter2) {
-				case 0: // all
-					spelltype_mask |= 7;
-					break;
-				case 1: // mage and cleric
-					spelltype_mask |= 3;
-					break;
-				case 2: // mage
-					spelltype_mask |= 2;
-					break;
-				case 3: // cleric
-					spelltype_mask |= 1;
-					break;
-				case 4: // innate
-					spelltype_mask |= 4;
-					break;
-			}
-		} else {
-			switch((*f)->Parameter2) {
-				case 0: // mage
-					spelltype_mask |= 2;
-					break;
-				case 1: // cleric
-					spelltype_mask |= 1;
-					break;
-				case 2: // innate
-					spelltype_mask |= 4;
-					break;
-			}
-		}
-	}
-	return spelltype_mask & types;
-}
-*/
-
 //useful for immunity vs spell, can't use item, etc.
 Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const
 {
