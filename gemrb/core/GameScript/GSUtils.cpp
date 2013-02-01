@@ -1287,6 +1287,13 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	assert(Sender && Sender->Type == ST_ACTOR);
 	Actor *actor = (Actor *) Sender;
 
+	// mislead and projected images can't attack
+	int puppet = actor->GetStat(IE_PUPPETMASTERTYPE);
+	if (puppet && puppet < 3) {
+		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: %s!", actor->GetName(1));
+		return;
+	}
+
 	Actor *tar = NULL;
 	if (target->Type==ST_ACTOR) {
 		tar = (Actor *) target;
