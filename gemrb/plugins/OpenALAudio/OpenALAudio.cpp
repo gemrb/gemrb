@@ -640,7 +640,10 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 			break;
 		}
 	}
-	if (stream == -1) return -1;
+	if (stream == -1) {
+		Log(ERROR, "OpenAL", "No available audio streams out of %d", num_streams);
+		return -1;
+	}
 
 	ALuint source;
 	alGenSources(1, &source);
