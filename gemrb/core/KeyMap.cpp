@@ -144,7 +144,7 @@ bool KeyMap::ResolveKey(int key, int group)
 	keystr[0]=(char) key;
 	keystr[1]=0;
 
-	print("Looking up key: %c(%s) ", key, keystr);
+	Log(MESSAGE, "KeyMap", "Looking up key: %c(%s) ", key, keystr);
 
 	if (!keymap.Lookup(keystr, tmp) ) {
 		return false;
