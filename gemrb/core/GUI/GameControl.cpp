@@ -833,9 +833,6 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		Point p(lastMouseX, lastMouseY);
 		core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 		switch (Key) {
-			case 'f': //toggle full screen mode
-				core->GetVideoDriver()->ToggleFullscreenMode();
-				break;
 			case 'd': //detect a trap or door
 				if (overInfoPoint) {
 					overInfoPoint->DetectTrap(256, lastActorID);
