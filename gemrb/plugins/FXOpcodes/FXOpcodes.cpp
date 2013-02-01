@@ -6086,7 +6086,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case 3:
 		resref = "simulacr";
 		// healable level drain
-		// FIXME: second generation simulacri are supposedly at a different level:
+		// second generation simulacri are supposedly at a different level, but that makes little sense:
 		// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21
 		newfx = EffectQueue::CreateEffect(fx_leveldrain_ref, copy->GetXPLevel(1)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 		if (newfx) {
