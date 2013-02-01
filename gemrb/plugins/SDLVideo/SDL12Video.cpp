@@ -172,6 +172,7 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 {
 	if (fullscreen != set) {
 		fullscreen=set;
+		// FIXME: SDL_WM_ToggleFullScreen only works on X11. use SDL_SetVideoMode()
 		SDL_WM_ToggleFullScreen( disp );
 		//readjust mouse to original position
 		MoveMouse(CursorPos.x, CursorPos.y);
