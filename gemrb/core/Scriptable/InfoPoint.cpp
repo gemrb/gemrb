@@ -213,6 +213,11 @@ check:
 		return false;
 	}
 
+	// allow entering trap when trying to disarm
+	if (Type == ST_PROXIMITY && actor->GetDisarmingTrap() == GetGlobalID()) {
+		return false;
+	}
+
 	if (actor->InParty || (Flags&TRAP_NPC) ) {
 		//no need to avoid a travel trigger
 

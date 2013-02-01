@@ -368,6 +368,8 @@ private:
 	ieDword nextattack;
 	ieDword nextWalk;
 	ieDword lastattack;
+	//trap we're trying to disarm
+	ieDword disarmTrap;
 	ieDword InTrap;
 	char AttackStance;
 	/*The projectile bringing the current attack*/
@@ -866,6 +868,10 @@ public:
 	void StopAttack();
 	int SetBaseAPRandAB(bool CheckRapidShot);
 	int BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const;
+	/* set to trap id if current action is disarm; unset after */
+	void SetDisarmingTrap(ieDword trapId) { disarmTrap = trapId; }
+	ieDword GetDisarmingTrap() const { return disarmTrap; }
+	void ReleaseCurrentAction();
 };
 }
 

@@ -326,7 +326,7 @@ public:
 	Action* GetNextAction() const;
 	Action* PopNextAction();
 	void ClearActions();
-	void ReleaseCurrentAction();
+	virtual void ReleaseCurrentAction();
 	bool InMove() const;
 	void ProcessActions();
 	//these functions handle clearing of triggers that resulted a

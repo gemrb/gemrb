@@ -9555,5 +9555,11 @@ void Actor::DisplayHeadHPRatio()
 	DisplayHeadText(tmpstr);
 }
 
+void Actor::ReleaseCurrentAction()
+{
+	disarmTrap = -1;
+	Scriptable::ReleaseCurrentAction();
+}
+
 }
 

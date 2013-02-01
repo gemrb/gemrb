@@ -2350,6 +2350,7 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	Actor * actor = (Actor *) Sender;
 	unsigned int distance;
 	Point *p, *otherp;
 	Door *door = NULL;
@@ -2386,12 +2387,12 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 		otherp = p;
 		distance = Distance(tar, Sender);
 		flags = trigger->Trapped && trigger->TrapDetected && trigger->CanDetectTrap();
+		actor->SetDisarmingTrap(trigger->GetGlobalID());
 		break;
 	default:
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor * actor = (Actor *) Sender;
 	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		if (flags) {
