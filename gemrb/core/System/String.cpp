@@ -144,6 +144,27 @@ GEM_EXPORT char* strndup(const char* s, size_t l)
 }
 #endif
 
+#ifndef HAVE_STRLCPY
+GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
+{
+	char *dst = d;
+	const char *src = s;
+
+	if (l != 0) {
+		while (--l != 0) {
+			if ((*dst++ = *src++) == '\0')
+				break;
+		}
+		if (l == 0)
+			*dst = '\0';
+	}
+
+	if (l == 0)
+		while (*src++);
+	return src - s - 1; /* length of source, excluding NULL */
+}
+#endif
+
 #ifdef WIN32
 
 #else

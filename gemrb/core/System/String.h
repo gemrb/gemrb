@@ -55,6 +55,9 @@ GEM_EXPORT int strnlen(const char* string, int maxlen);
 #ifndef HAVE_STRNDUP
 GEM_EXPORT char* strndup(const char* s, size_t l);
 #endif
+#ifndef HAVE_STRLCPY
+GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
+#endif
 
 #ifndef WIN32
 GEM_EXPORT char* strupr(char* string);

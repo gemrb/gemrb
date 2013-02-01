@@ -2,9 +2,8 @@
 
 #cmakedefine SIZEOF_INT ${SIZEOF_INT}
 #cmakedefine SIZEOF_LONG_INT ${SIZEOF_LONG_INT}
-#ifndef HAVE_STRNDUP
 #cmakedefine HAVE_STRNDUP 1
-#endif
+#cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
 #define PLUGINDIR "${PLUGIN_DIR}"
 #define DATADIR "${DATA_DIR}"
