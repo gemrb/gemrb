@@ -1,7 +1,7 @@
-GemRB git (938d11a24):
+GemRB git (78fb5eeb):
   New features:
     - 
-    - multibyte font support (chinese and similar)
+    - multibyte font support (chinese, korean, japanese)
     - iwd2: Chapter 0+1 completable, full spellbook and ECL support
     - initial bundled gemrb demo stubs
     - most gemrb overrides were moved and are now moddable via game override
@@ -10,7 +10,7 @@ GemRB git (938d11a24):
   Improved features:
     - 
     - animations, speech
-    - looting, worldmap
+    - looting, worldmap, hotkeys (work everywhere)
     - iwd2 combat, stats, spells, skills, effects and actions
     - bugfixes
 
