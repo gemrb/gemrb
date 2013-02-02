@@ -214,8 +214,7 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
 		ArmourLevel = 0;
 	}
-	strncpy( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel], 8 );
-	ResRef[8]=0;
+	strlcpy( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel], sizeof(ResRef) );
 	DropAnims();
 }
 
@@ -969,7 +968,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			if (equipdat) delete equipdat;
 
 			//we need this long for special anims
-			strncpy( NewResRef, ResRef, 8 );
+			strlcpy( NewResRef, ResRef, sizeof(ieResRef) );
 			GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part, equipdat);
 		} else {
 			// Equipment animation parts

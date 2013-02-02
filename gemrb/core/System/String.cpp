@@ -138,8 +138,7 @@ GEM_EXPORT char* strndup(const char* s, size_t l)
 		l = len;
 	}
 	char* string = ( char* ) malloc( l + 1 );
-	strncpy( string, s, l );
-	string[l] = 0;
+	strlcpy( string, s, l + 1 );
 	return string;
 }
 #endif

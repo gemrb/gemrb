@@ -206,9 +206,9 @@ void TextEdit::SetFocus(bool focus)
 /** Sets the Text of the current control */
 void TextEdit::SetText(const char* string)
 {
-	strncpy( ( char * ) Buffer, string, max );
-	Buffer[max]=0;
-	CurPos = (ieWord) strlen((char *) Buffer);
+	int len = strlcpy( ( char * ) Buffer, string, max + 1 );
+	if (len > max) CurPos = max + 1;
+	else CurPos = len;
 	if (Owner) {
 		Owner->Invalidate();
 	}

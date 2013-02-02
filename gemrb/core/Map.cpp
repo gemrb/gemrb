@@ -2148,7 +2148,7 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
 {
 	Entrance* ent = new Entrance();
-	strncpy( ent->Name, Name, 32 );
+	strlcpy( ent->Name, Name, sizeof(ent->Name) );
 	ent->Pos.x = (ieWord) XPos;
 	ent->Pos.y = (ieWord) YPos;
 	ent->Face = (ieWord) Face;

@@ -35,8 +35,8 @@ SlicedStream::SlicedStream(DataStream* str, int startpos, int size)
 	assert(this->str);
 	this->size = size;
 	this->startpos = startpos;
-	strncpy(originalfile, str->originalfile, _MAX_PATH);
-	strncpy(filename, str->filename, sizeof(filename));
+	strlcpy(originalfile, str->originalfile, _MAX_PATH);
+	strlcpy(filename, str->filename, sizeof(filename));
 	this->str->Seek(this->startpos, GEM_STREAM_START);
 }
 

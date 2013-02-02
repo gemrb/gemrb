@@ -193,7 +193,7 @@ bool FileStream::Open(const char* fname)
 	created = false;
 	FindLength();
 	ExtractFileFromPath( filename, fname );
-	strncpy( originalfile, fname, _MAX_PATH);
+	strlcpy( originalfile, fname, _MAX_PATH);
 	return true;
 }
 
@@ -211,7 +211,7 @@ bool FileStream::Modify(const char* fname)
 	created = true;
 	FindLength();
 	ExtractFileFromPath( filename, fname );
-	strncpy( originalfile, fname, _MAX_PATH);
+	strlcpy( originalfile, fname, _MAX_PATH);
 	Pos = 0;
 	return true;
 }
@@ -237,7 +237,7 @@ bool FileStream::Create(const char *path)
 	Close();
 
 	ExtractFileFromPath( filename, path );
-	strncpy(originalfile, path, _MAX_PATH);
+	strlcpy(originalfile, path, _MAX_PATH);
 
 	if (!str->OpenNew(originalfile)) {
 		return false;

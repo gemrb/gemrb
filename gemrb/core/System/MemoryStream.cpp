@@ -32,7 +32,7 @@ MemoryStream::MemoryStream(char *name, void* data, unsigned long size)
 {
 	this->size = size;
 	ExtractFileFromPath(filename, name);
-	strncpy(originalfile, name, _MAX_PATH);
+	strlcpy(originalfile, name, _MAX_PATH);
 }
 
 MemoryStream::~MemoryStream()

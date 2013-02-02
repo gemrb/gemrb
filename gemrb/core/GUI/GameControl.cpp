@@ -1030,7 +1030,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->ClearActions();
 					lastActor->ClearPath();
 					char Tmp[40];
-					strncpy(Tmp,"JoinParty()",sizeof(Tmp) );
+					strlcpy(Tmp, "JoinParty()", sizeof(Tmp));
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
@@ -1043,7 +1043,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->ClearActions();
 					lastActor->ClearPath();
 					char Tmp[40];
-					strncpy(Tmp,"LeaveParty()",sizeof(Tmp) );
+					strlcpy(Tmp, "LeaveParty()", sizeof(Tmp));
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
@@ -1626,7 +1626,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
-	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
+	strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 	source->CommandActor();
 }
@@ -1639,7 +1639,7 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	source->SetModal(MS_NONE);
-	strncpy(Tmp,"NIDSpecial4()",sizeof(Tmp) );
+	strlcpy(Tmp, "NIDSpecial4()", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 	source->CommandActor();
 }
@@ -1653,7 +1653,7 @@ void GameControl::TryToPick(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	source->SetModal(MS_NONE);
-	strncpy(Tmp,"PickPockets([-1])", sizeof(Tmp) );
+	strlcpy(Tmp, "PickPockets([-1])", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 	source->CommandActor();
 }
@@ -1667,9 +1667,9 @@ void GameControl::TryToPick(Actor *source, Door *tgt)
 	source->ClearActions();
 	source->SetModal(MS_NONE);
 	if (tgt->Trapped && tgt->TrapDetected) {
-		strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
+		strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
 	} else {
-		strncpy(Tmp, "PickLock([-1])", sizeof(Tmp) );
+		strlcpy(Tmp, "PickLock([-1])", sizeof(Tmp));
 	}
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 	source->CommandActor();
@@ -1684,9 +1684,9 @@ void GameControl::TryToPick(Actor *source, Container *tgt)
 	source->ClearActions();
 	source->SetModal(MS_NONE);
 	if (tgt->Trapped && tgt->TrapDetected) {
-		strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
+		strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
 	} else {
-		strncpy(Tmp, "PickLock([-1])", sizeof(Tmp) );
+		strlcpy(Tmp, "PickLock([-1])", sizeof(Tmp));
 	}
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 	source->CommandActor();
@@ -1702,7 +1702,7 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	source->SetModal(MS_NONE);
-	strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
+	strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 	source->CommandActor();
 }
@@ -1722,13 +1722,13 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	spellCount--;
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			strncpy(Tmp, "SpellPointNoDec(\"\",[0.0])", sizeof(Tmp) );
+			strlcpy(Tmp, "SpellPointNoDec(\"\",[0.0])", sizeof(Tmp));
 		} else {
-			strncpy(Tmp, "SpellPoint(\"\",[0.0])", sizeof(Tmp) );
+			strlcpy(Tmp, "SpellPoint(\"\",[0.0])", sizeof(Tmp));
 		}
 	} else {
 		//using item on target
-		strncpy(Tmp, "UseItemPoint(\"\",[0,0],0)", sizeof(Tmp) );
+		strlcpy(Tmp, "UseItemPoint(\"\",[0,0],0)", sizeof(Tmp));
 	}
 	Action* action = GenerateAction( Tmp );
 	action->pointParameter=tgt;
@@ -1824,7 +1824,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	source->SetModal(MS_NONE);
-	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
+	strlcpy(Tmp, "NIDSpecial1()", sizeof(Tmp));
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 	source->CommandActor();
@@ -1865,7 +1865,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 
 	actor->ClearPath();
 	actor->ClearActions();
-	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
+	strlcpy(Tmp, "UseContainer()", sizeof(Tmp));
 	core->SetCurrentContainer( actor, container);
 	actor->AddAction( GenerateAction( Tmp) );
 	actor->CommandActor();

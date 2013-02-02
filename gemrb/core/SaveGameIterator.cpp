@@ -101,10 +101,10 @@ static void ParseGameDate(DataStream *ds, char *Date)
 
 SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID)
 {
-	strncpy( Prefix, prefix, sizeof( Prefix ) );
-	strncpy( Path, path, sizeof( Path ) );
-	strncpy( Name, name, sizeof( Name ) );
-	strncpy( SlotName, slotname, sizeof( SlotName ) );
+	strlcpy( Prefix, prefix, sizeof( Prefix ) );
+	strlcpy( Path, path, sizeof( Path ) );
+	strlcpy( Name, name, sizeof( Name ) );
+	strlcpy( SlotName, slotname, sizeof( SlotName ) );
 	PortraitCount = pCount;
 	SaveID = saveID;
 	char nPath[_MAX_PATH];

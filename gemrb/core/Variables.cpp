@@ -295,7 +295,7 @@ bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 		return false; // not in map
 	}
 
-	strncpy( dest, pAssoc->Value.sValue, MaxLength );
+	strlcpy( dest, pAssoc->Value.sValue, MaxLength );
 	return true;
 }
 

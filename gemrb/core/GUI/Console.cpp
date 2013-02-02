@@ -98,7 +98,7 @@ void Console::SetBackGround(Sprite2D* back)
 /** Sets the Text of the current control */
 void Console::SetText(const char* string)
 {
-	strncpy( ( char * ) Buffer, string, max );
+	strlcpy( ( char * ) Buffer, string, max );
 }
 /** Key Press Event */
 bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)

@@ -4985,7 +4985,7 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 		if (gc) {
 			//saving the target object ID from the gui variable
 			char Tmp[40];
-			strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
+			strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
 			scr->AddAction( GenerateActionDirect(Tmp, (Actor *) tar) );
 		}
 	} else {

@@ -105,9 +105,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	//loading npc starting levels
 	ieResRef tn;
 	if (Expansion == 5) { // tob is special
-		strncpy(tn, "npclvl25", sizeof(ieResRef));
+		strlcpy(tn, "npclvl25", sizeof(ieResRef));
 	} else {
-		strncpy(tn, "npclevel", sizeof(ieResRef));
+		strlcpy(tn, "npclevel", sizeof(ieResRef));
 	}
 	if (table.load(tn)) {
 		int cols = table->GetColumnCount();
@@ -119,10 +119,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 			for(j = -1; j < cols; j++) {
 				char *ref = new char[9];
 				if (j == -1) {
-					strncpy(ref, table->GetRowName(i), sizeof(ieResRef));
+					strlcpy(ref, table->GetRowName(i), sizeof(ieResRef));
 					npclevels[i][j+1] = ref;
 				} else {
-					strncpy(ref, table->QueryField(i, j), sizeof(ieResRef));
+					strlcpy(ref, table->QueryField(i, j), sizeof(ieResRef));
 					npclevels[i][j+1] = ref;
 				}
 			}
@@ -902,7 +902,7 @@ bool Game::CheckForReplacementActor(int i)
 				if (level < safeLevel) {
 					safeLevel = level;
 				}
-				strncpy(newcre, (*it)[safeLevel-2], sizeof(ieResRef));
+				strlcpy(newcre, (*it)[safeLevel-2], sizeof(ieResRef));
 				break;
 			}
 		}
@@ -917,7 +917,7 @@ bool Game::CheckForReplacementActor(int i)
 					error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
 				} else {
 					newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
-					strncpy(newact->Area, act->Area, sizeof(ieResRef));
+					strlcpy(newact->Area, act->Area, sizeof(ieResRef));
 					DelNPC(InStore(act));
 					return true;
 				}

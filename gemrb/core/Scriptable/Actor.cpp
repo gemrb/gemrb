@@ -3370,7 +3370,7 @@ void Actor::ReactToDeath(const char * deadname)
 				while(*value && *value!=',') value++;
 				if (*value==',') value++;
 			}
-			strncpy(resref, value, 8);
+			strlcpy(resref, value, sizeof(resref));
 			for(count=0;count<8 && resref[count]!=',';count++) {};
 			resref[count]=0;
 
@@ -3491,7 +3491,7 @@ bool Actor::GetPartyComment()
 			//V2 interact
 			char Tmp[40];
 			LastTalker = target->GetGlobalID();
-			strncpy(Tmp,"Interact([-1])", sizeof(Tmp) );
+			strlcpy(Tmp, "Interact([-1])", sizeof(Tmp));
 			Action *action = GenerateActionDirect(Tmp, target);
 			if (action) {
 				AddActionInFront(action);
@@ -3629,17 +3629,17 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 
 	switch(panicmode) {
 	case PANIC_RUNAWAY:
-		strncpy(Tmp,"RunAwayFromNoInterrupt([-1])", sizeof(Tmp) );
+		strlcpy(Tmp, "RunAwayFromNoInterrupt([-1])", sizeof(Tmp));
 		action = GenerateActionDirect(Tmp, attacker);
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_RANDOMWALK:
-		strncpy(Tmp,"RandomWalk()", sizeof(Tmp) );
+		strlcpy(Tmp, "RandomWalk()", sizeof(Tmp));
 		action = GenerateAction( Tmp );
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_BERSERK:
-		strncpy(Tmp,"Berserk()", sizeof(Tmp) );
+		strlcpy(Tmp, "Berserk()", sizeof(Tmp));
 		action = GenerateAction( Tmp );
 		BaseStats[IE_CHECKFORBERSERK]=3;
 		//SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
@@ -6611,13 +6611,13 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		int tmp = core->Roll(1,3,0);
 		switch(tmp) {
 			case 2:
-				strncpy(Tmp,"RandomWalk()",sizeof(Tmp));
+				strlcpy(Tmp, "RandomWalk()", sizeof(Tmp));
 				break;
 			case 1:
-				strncpy(Tmp,"Attack([0])",sizeof(Tmp));
+				strlcpy(Tmp, "Attack([0])", sizeof(Tmp));
 				break;
 			default:
-				strncpy(Tmp,"NoAction()",sizeof(Tmp));
+				strlcpy(Tmp, "NoAction()", sizeof(Tmp));
 				break;
 			}
 			Action *action = GenerateAction( Tmp );
@@ -6630,7 +6630,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 
 		if (Modified[IE_CHECKFORBERSERK] && !LastTarget && SeeAnyOne(false, false) ) {
-			strncpy(Tmp,"Berserk()",sizeof(Tmp));
+			strlcpy(Tmp, "Berserk()", sizeof(Tmp));
 			Action *action = GenerateAction( Tmp );
 			if (action) {
 				ReleaseCurrentAction();
@@ -7508,7 +7508,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 		while(*resource && *resource!=',') resource++;
 			if (*resource==',') resource++;
 	}
-	strncpy(Sound, resource, 8);
+	strlcpy(Sound, resource, sizeof(Sound));
 	for(count=0;count<8 && Sound[count]!=',';count++) {};
 	Sound[count]=0;
 }
@@ -7609,11 +7609,11 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 
 	if(Which!=1) {
 		memset( SmallPortrait, 0, 8 );
-		strncpy( SmallPortrait, ResRef, 8 );
+		strlcpy( SmallPortrait, ResRef, sizeof(SmallPortrait) );
 	}
 	if(Which!=2) {
 		memset( LargePortrait, 0, 8 );
-		strncpy( LargePortrait, ResRef, 8 );
+		strlcpy( LargePortrait, ResRef, sizeof(LargePortrait) );
 	}
 	if(!Which) {
 		for (i = 0; i < 8 && ResRef[i]; i++) {};

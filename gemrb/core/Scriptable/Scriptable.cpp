@@ -1385,8 +1385,7 @@ int Scriptable::CheckWildSurge()
 
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;
-				memset(surgeSpellRef, 0, sizeof(surgeSpellRef));
-				strncpy(surgeSpellRef, core->SurgeSpells[check-1].spell, 8);
+				strlcpy(surgeSpellRef, core->SurgeSpells[check-1].spell, sizeof(surgeSpellRef));
 
 				if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
 					// handle the hardcoded cases - they'll also fail here
@@ -1398,7 +1397,7 @@ int Scriptable::CheckWildSurge()
 				} else {
 					// finally change the spell
 					// the hardcoded bunch does it on its own when needed
-					strncpy(SpellResRef, surgeSpellRef, 8);
+					strlcpy(SpellResRef, surgeSpellRef, sizeof(SpellResRef));
 				}
 			}
 		}
@@ -1467,17 +1466,17 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			for (i=0; i<count; i++) {
 				if (target) {
 					caster->CastSpell(target, false, true);
-					strncpy(newspl, SpellResRef, 8);
+					strlcpy(newspl, SpellResRef, sizeof(newspl));
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellEnd(level, 1);
 				} else {
 					caster->CastSpellPoint(targetpos, false, true);
-					strncpy(newspl, SpellResRef, 8);
+					strlcpy(newspl, SpellResRef, sizeof(newspl));
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellPointEnd(level, 1);
 				}
 				// reset the ref, since CastSpell*End destroyed it
-				strncpy(SpellResRef, newspl, 8);
+				strlcpy(SpellResRef, newspl, sizeof(SpellResRef));
 			}
 			caster->Modified[IE_FORCESURGE] = tmp;
 			caster->Modified[IE_SURGEMOD] = tmp2;
@@ -1504,7 +1503,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 				int id = core->Roll(1, spellCount, -1);
 				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
 				if (ck) {
-					strncpy(SpellResRef, ck->SpellResRef, 8);
+					strlcpy(SpellResRef, ck->SpellResRef, sizeof(SpellResRef));
 					break;
 				}
 			}

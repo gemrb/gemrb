@@ -239,7 +239,7 @@ Interface::Interface(int iargc, char* iargv[])
 
 	mousescrollspd = 10;
 
-	strncpy( GameType, "auto", sizeof( GameType )-1);
+	strlcpy( GameType, "auto", sizeof( GameType ));
 	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 1;
@@ -274,23 +274,23 @@ Interface::Interface(int iargc, char* iargv[])
 	GameName[0] = 0;
 	CustomFontPath[0] = 0;
 
-	strncpy( GameOverridePath, "override", sizeof(GameOverridePath) );
-	strncpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
-	strncpy( GameScriptsPath, "scripts", sizeof(GameScriptsPath) );
-	strncpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
-	strncpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
-	strncpy( GameDataPath, "data", sizeof(GameDataPath) );
-	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
-	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
-	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
-	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
-	strncpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
-	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
-	strncpy( WorldMapName[0], "WORLDMAP", sizeof(ieResRef) );
+	strlcpy( GameOverridePath, "override", sizeof(GameOverridePath) );
+	strlcpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
+	strlcpy( GameScriptsPath, "scripts", sizeof(GameScriptsPath) );
+	strlcpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
+	strlcpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
+	strlcpy( GameDataPath, "data", sizeof(GameDataPath) );
+	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
+	strlcpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
+	strlcpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
+	strlcpy( MovieFont, "STONESML", sizeof(MovieFont) );
+	strlcpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
+	strlcpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
+	strlcpy( WorldMapName[0], "WORLDMAP", sizeof(ieResRef) );
 	memset( WorldMapName[1], 0, sizeof(ieResRef) );
-	strncpy( Palette16, "MPALETTE", sizeof(Palette16) );
-	strncpy( Palette32, "PAL32", sizeof(Palette32) );
-	strncpy( Palette256, "MPAL256", sizeof(Palette256) );
+	strlcpy( Palette16, "MPALETTE", sizeof(Palette16) );
+	strlcpy( Palette32, "PAL32", sizeof(Palette32) );
+	strlcpy( Palette256, "MPAL256", sizeof(Palette256) );
 	strcpy( TooltipBackResRef, "\0" );
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		strcpy( GroundCircleBam[size], "\0" );
@@ -890,7 +890,7 @@ bool Interface::ReadSpecialSpells()
 	if (table) {
 		SurgeSpell ss;
 		for (i = 0; (unsigned)i < table->GetRowCount(); i++) {
-			strncpy(ss.spell, table->QueryField(i, 0), 8);
+			strlcpy(ss.spell, table->QueryField(i, 0), sizeof(ss.spell));
 			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
 			// comment ignored
 			SurgeSpells.push_back(ss);
@@ -1160,7 +1160,7 @@ bool Interface::ReadModalStates()
 
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		strncpy(ms.spell, table->QueryField(i, 0), 8);
+		strlcpy(ms.spell, table->QueryField(i, 0), sizeof(ms.spell));
 		strncpy(ms.action, table->QueryField(i, 1), 16);
 		ms.entering_str = atoi(table->QueryField(i, 2));
 		ms.leaving_str = atoi(table->QueryField(i, 3));
@@ -1698,8 +1698,8 @@ int Interface::Init()
 	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
 	PathJoin(ini_path, GamePath, gemrbINI, NULL);
 	if (file_exists(ini_path)) {
-		strncpy(tmp, INIConfig, sizeof(tmp));
-		strncpy(INIConfig, gemrbINI, sizeof(INIConfig));
+		strlcpy(tmp, INIConfig, sizeof(tmp));
+		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
 	}
 	if (!IgnoreOriginalINI) {
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
@@ -1711,7 +1711,7 @@ int Interface::Init()
 
 	// restore the game config name if we read it from our version
 	if (tmp[0]) {
-		strncpy(INIConfig, tmp, sizeof(INIConfig));
+		strlcpy(INIConfig, tmp, sizeof(INIConfig));
 	}
 
 	int i;
@@ -2384,7 +2384,7 @@ bool Interface::LoadConfig(const char* filename)
 #undef CONFIG_INT
 #define CONFIG_STRING(str, var) \
 		} else if (stricmp(name, str) == 0) { \
-			strncpy(var, value, sizeof(var))
+			strlcpy(var, value, sizeof(var))
 		CONFIG_STRING("GameCharactersPath", GameCharactersPath);
 		CONFIG_STRING("GameDataPath", GameDataPath);
 		CONFIG_STRING("CustomFontPath", CustomFontPath);
@@ -2404,7 +2404,7 @@ bool Interface::LoadConfig(const char* filename)
 #undef CONFIG_STRING
 #define CONFIG_PATH(str, var) \
 		} else if (stricmp(name, str) == 0) { \
-			strncpy(var, value, sizeof(var));
+			strlcpy(var, value, sizeof(var));
 		CONFIG_PATH("CachePath", CachePath);
 		CONFIG_PATH("GUIScriptsPath", GUIScriptsPath);
 		CONFIG_PATH("GamePath", GamePath);
@@ -2444,7 +2444,7 @@ bool Interface::LoadConfig(const char* filename)
 	// of the config file.
 
 	if (stricmp( GameType, "tob" ) == 0) {
-		strncpy( GameType, "bg2", sizeof(GameType) );
+		strlcpy( GameType, "bg2", sizeof(GameType) );
 	}
 
 #ifdef DATADIR
@@ -2725,8 +2725,7 @@ bool Interface::LoadGemRBINI()
 			const char *pos = strchr( s, '/' );
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
-				strncpy( GroundCircleBam[size], s, pos - s );
-				GroundCircleBam[size][pos - s] = '\0';
+				strlcpy( GroundCircleBam[size], s, pos - s + 1 );
 			} else {
 				strcpy( GroundCircleBam[size], s );
 			}
@@ -3076,9 +3075,7 @@ bool Interface::LoadWindowPack(const char* name)
 		return false;
 	}
 
-	strncpy( WindowPack, name, sizeof( WindowPack ) );
-	WindowPack[sizeof( WindowPack ) - 1] = '\0';
-
+	strlcpy( WindowPack, name, sizeof( WindowPack ) );
 	return true;
 }
 
@@ -4097,7 +4094,7 @@ bool Interface::SaveConfig()
 		INIWhiteListEntry entry = ConfigWhitelist[i];
 		// write section header
 		if (stricmp(lastTag, entry.INITag)) {
-			strncpy(lastTag, entry.INITag, sizeof(lastTag));
+			strlcpy(lastTag, entry.INITag, sizeof(lastTag));
 			contents.appendFormatted("[%s]\n", lastTag);
 		}
 
@@ -4347,8 +4344,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 	
 	delete worldmap;
 	worldmap = new_worldmap;
-	strncpy(WorldMapName[0], wmResRef, sizeof(ieResRef) - 1);
-	WorldMapName[0][8] = 0;
+	strlcpy(WorldMapName[0], wmResRef, sizeof(ieResRef));
 }
 
 /* swapping out old resources */
@@ -5922,7 +5918,7 @@ void Interface::SetTickHook(EventHandler hook)
 
 void Interface::SetNextScript(const char *script)
 {
-	strncpy( NextScript, script, sizeof(NextScript) );
+	strlcpy( NextScript, script, sizeof(NextScript) );
 	QuitFlag |= QF_CHANGESCRIPT;
 }
 

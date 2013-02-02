@@ -32,10 +32,8 @@ namespace GemRB {
 Function::Function(const char *m, const char *f, int g)
 {
 	//make sure the module an function names are no longer than 32 characters, or they will be truncated
-	strncpy(module, m, sizeof(module)-1);
-	strncpy(function, f, sizeof(function)-1);
-	module[32]=0;
-	function[32]=0;
+	strlcpy(module, m, sizeof(module));
+	strlcpy(function, f, sizeof(function));
 	group = g;
 }
 

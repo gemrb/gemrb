@@ -2018,8 +2018,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 			VarName, value );
 	}
 
-	strncpy( newVarName, Context, 6 );
-	newVarName[6]=0;
+	strlcpy( newVarName, Context, 7 );
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( VarName, value, NoCreate );
 		return;
@@ -2063,22 +2062,21 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 	if (InDebug&ID_VARIABLES) {
 		Log(DEBUG, "GSUtils", "Setting variable(\"%s\", %d)", VarName, value );
 	}
-	strncpy( newVarName, VarName, 6 );
-	newVarName[6]=0;
-	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
+	strlcpy( newVarName, VarName, 7 );
+	if (stricmp( newVarName, "MYAREA" ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
+	if (stricmp( newVarName, "LOCALS" ) == 0) {
 		Sender->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
 	Game *game = core->GetGame();
-	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
+	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (strnicmp(newVarName,"GLOBAL",6) ) {
+	if (stricmp(newVarName,"GLOBAL") ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
@@ -2099,22 +2097,21 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 	const char *poi;
 	ieDword value = 0;
 
-	strncpy( newVarName, VarName, 6 );
-	newVarName[6]=0;
+	strlcpy( newVarName, VarName, 7 );
 	poi = &VarName[6];
 	//some HoW triggers use a : to separate the scope from the variable name
 	if (*poi==':') {
 		poi++;
 	}
 
-	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
+	if (stricmp( newVarName, "MYAREA" ) == 0) {
 		Sender->GetCurrentArea()->locals->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s: %d", VarName, value);
 		}
 		return value;
 	}
-	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
+	if (stricmp( newVarName, "LOCALS" ) == 0) {
 		Sender->locals->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s: %d", VarName, value);
@@ -2122,14 +2119,14 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 		return value;
 	}
 	Game *game = core->GetGame();
-	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
+	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s: %d", VarName, value);
 		}
 		return value;
 	}
-	if (strnicmp(newVarName,"GLOBAL",6) ) {
+	if (strncmp(newVarName,"GLOBAL") ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->Lookup( poi, value);
@@ -2156,16 +2153,15 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 	char newVarName[8];
 	ieDword value = 0;
 
-	strncpy(newVarName, Context, 6);
-	newVarName[6]=0;
-	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
+	strlcpy(newVarName, Context, 7);
+	if (stricmp( newVarName, "MYAREA" ) == 0) {
 		Sender->GetCurrentArea()->locals->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
 		return value;
 	}
-	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
+	if (stricmp( newVarName, "LOCALS" ) == 0) {
 		Sender->locals->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s%s: %d", Context, VarName, value);
@@ -2173,14 +2169,14 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		return value;
 	}
 	Game *game = core->GetGame();
-	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
+	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
 		return value;
 	}
-	if (strnicmp(newVarName,"GLOBAL",6) ) {
+	if (stricmp(newVarName,"GLOBAL") ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->Lookup( VarName, value);

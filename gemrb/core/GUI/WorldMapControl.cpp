@@ -46,11 +46,11 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	Value = direction;
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
-	strncpy(currentArea, game->CurrentArea, 8);
+	strlcpy(currentArea, game->CurrentArea, sizeof(currentArea));
 	int entry = core->GetAreaAlias(currentArea);
 	if (entry >= 0) {
 		WMPAreaEntry *m = worldmap->GetEntry(entry);
-		strncpy(currentArea, m->AreaResRef, 8);
+		strlcpy(currentArea, m->AreaResRef, sizeof(currentArea));
 	}
 
 	//if there is no trivial area, look harder
@@ -58,7 +58,7 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
 		WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
 		if (m) {
-			strncpy(currentArea, m->AreaResRef, 8);
+			strlcpy(currentArea, m->AreaResRef, sizeof(currentArea));
 		}
 	}
 
