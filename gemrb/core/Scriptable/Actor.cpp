@@ -6220,15 +6220,6 @@ void Actor::PerformAttack(ieDword gameTime)
 		game->PartyAttack = true;
 	}
 
-	// if held or disabled, etc, then cannot continue attacking
-	// TODO: should be in action
-	ieDword state = GetStat(IE_STATE_ID);
-	if (Immobile()) {
-		// this is also part of the UpdateActorState hack below. sorry!
-		lastattack = gameTime;
-		return;
-	}
-
 	if (!roundTime || (gameTime-roundTime > core->Time.attack_round_size)) { // the original didn't use a normal round
 		// TODO: do we need cleverness for secondround here?
 		InitRound(gameTime);
@@ -6275,6 +6266,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	assert(!(target->IsInvisibleTo((Scriptable *) this) || (target->GetSafeStat(IE_STATE_ID) & STATE_DEAD)));
 	target->AttackedBy(this);
+	ieDword state = GetStat(IE_STATE_ID);
 	if (state&STATE_BERSERK) {
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}

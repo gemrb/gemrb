@@ -1287,6 +1287,13 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	assert(Sender && Sender->Type == ST_ACTOR);
 	Actor *actor = (Actor *) Sender;
 
+	// if held or disabled, etc, then cannot start or continue attacking
+	if (actor->Immobile()) {
+		actor->roundTime = 0;
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	// mislead and projected images can't attack
 	int puppet = actor->GetStat(IE_PUPPETMASTERTYPE);
 	if (puppet && puppet < 3) {
