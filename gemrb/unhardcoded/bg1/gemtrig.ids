@@ -1,2 +1,9 @@
 IDS
 0x4076 OpenState(O:Object*,I:Open*BOOLEAN)
+0x4077 NumItems(S:ResRef*,O:Object*,I:Num*)
+0x4078 NumItemsGT(S:ResRef*,O:Object*,I:Num*)
+0x4079 NumItemsLT(S:ResRef*,O:Object*,I:Num*)
+0x407A NumItemsParty(S:ResRef*,I:Num*)
+0x407B NumItemsPartyGT(S:ResRef*,I:Num*)
+0x407C NumItemsPartyLT(S:ResRef*,I:Num*)
+0x407D IsOverMe(O:Object*)
