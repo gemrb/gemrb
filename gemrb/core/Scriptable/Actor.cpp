@@ -6581,14 +6581,14 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it == core->DamageInfoMap.end()) {
-			print("Unhandled damagetype:%d", damagetype);
+			Log(ERROR, "ModifyDamage", "Unhandled damagetype:%d", damagetype);
 		} else if (it->second.resist_stat) {
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
 				int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
-					print("Bonus damage of %d(%+d%%), neto: %d", int(damage * bonus / 100.0), bonus, -resisted);
+					Log(COMBAT, "ModifyDamage", "Bonus damage of %d(%+d%%), neto: %d", int(damage * bonus / 100.0), bonus, -resisted);
 				}
 			}
 			// damage type with a resistance stat
@@ -6609,7 +6609,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
 				damage -= resisted;
 			}
-			print("Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
+			Log(COMBAT, "ModifyDamage", "Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// PST and BG1 may actually heal on negative damage
 			if (!core->HasFeature(GF_HEAL_ON_100PLUS)) {
 				if (damage <= 0) {
