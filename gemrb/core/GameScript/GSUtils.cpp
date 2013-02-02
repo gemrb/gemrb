@@ -2126,7 +2126,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 		}
 		return value;
 	}
-	if (strcmp(newVarName,"GLOBAL") ) {
+	if (stricmp(newVarName,"GLOBAL") ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->Lookup( poi, value);
