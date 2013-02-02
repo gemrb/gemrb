@@ -3146,7 +3146,7 @@ void Actor::RefreshPCStats() {
 
 	// add fatigue every 4 hours
 	// but make sure we're in the game already or players will start tired due to getting called with equipping effects before
-	if (game->GameTime && !(game->GameTime % 18000)) {
+	if (game->GameTime && !(game->GameTime % 18000) && InParty) {
 		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
 	}
 	if (core->ResolveStatBonus(this, "fatigue")) {
