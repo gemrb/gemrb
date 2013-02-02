@@ -4651,19 +4651,19 @@ int Interface::GetShieldPenalty(unsigned int itemtype) const
 int Interface::GetCriticalMultiplier(unsigned int itemtype) const
 {
 	if (itemtype>=(unsigned int) ItemTypes) {
-		return 0;
+		return 2;
 	}
 	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype][IDT_CRITMULTI];
-	return 0;
+	return 2;
 }
 
 int Interface::GetCriticalRange(unsigned int itemtype) const
 {
 	if (itemtype>=(unsigned int) ItemTypes) {
-		return 0;
+		return 20;
 	}
 	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype][IDT_CRITRANGE];
-	return 0;
+	return 20;
 }
 
 // checks the itemtype vs. slottype, and also checks the usability flags
