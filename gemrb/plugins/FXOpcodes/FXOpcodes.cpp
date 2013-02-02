@@ -2955,7 +2955,7 @@ int fx_slashing_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effec
 	if(0) print("fx_slashing_resistance_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		STAT_MOD( IE_RESISTSLASHING );
+		BASE_MOD( IE_RESISTSLASHING );
 	} else {
 		STAT_MOD( IE_RESISTSLASHING );
 	}
