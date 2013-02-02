@@ -2,7 +2,7 @@
 -1
            EFFECT_NAME     STRREF
 13         DEATH           14026
-12         DAMAGE          14027
+#12         DAMAGE          14027
 68         UNSUMMON        14065
 132        DRAWUPONHOLY    14125
 400        HOPELESSNESS    1280
