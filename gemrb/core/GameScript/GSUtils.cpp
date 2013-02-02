@@ -1339,7 +1339,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 				actor->VerbalConstant(VB_ATTACK, 5);
 			}
 			//display attack message
-			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
+			if (target->GetGlobalID() != Sender->LastTarget) {
+				displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
+			}
 		}
 	}
 
