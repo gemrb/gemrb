@@ -282,6 +282,7 @@ public:
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const;
 	//getting weapon immunity flag
 	bool WeaponImmunity(int enchantment, ieDword weapontype) const;
+	int SumDamageReduction(EffectRef &effect_reference, ieDword weaponEnchantment, int &total) const;
 	//melee and ranged effects
 	void AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) const;
 	// checks if spells of type "types" are disabled (usually by armor)

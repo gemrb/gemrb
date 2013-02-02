@@ -1794,6 +1794,35 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 	}
 }
 
+// figure out how much damage reduction applies for a given weapon enchantment and damage type
+int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponEnchantment, int &total) const
+{
+	ResolveEffectRef(effect_reference);
+	ieDword opcode = effect_reference.opcode;
+	int remaining = 0;
+	int count = 0;
+
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+
+		Effect* fx = *f;
+		if (!fx) continue;
+		count++;
+		// add up if the effect has enough enchantment (or ignores it)
+		if (!fx->Parameter2 || fx->Parameter2 > weaponEnchantment) {
+			remaining += fx->Parameter1;
+		}
+		total += fx->Parameter1;
+	}
+	if (count) {
+		return remaining;
+	} else {
+		return -1;
+	}
+}
+
 //useful for immunity vs spell, can't use item, etc.
 Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const
 {

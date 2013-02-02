@@ -351,6 +351,8 @@ static EffectRef fx_cant_use_item_type_ref = { "CantUseItemType", -1 };
 static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
 static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
 static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
+static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
+static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
 
 //used by iwd2
 static ieResRef resref_cripstr={"cripstr"};
@@ -6493,6 +6495,41 @@ int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 	return 0;
 }
 
+// filter out any damage reduction that is cancelled by high weapon enchantment
+// damage reduction (the effect and other uses) is implemented as normal resistance for physical damage, just with extra checks
+int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
+{
+	// this is the total, but some of it may have to be discarded
+	int resisted = (signed)GetSafeStat(resist_stat);
+	if (!resisted) {
+		return 0;
+	}
+	int remaining = 0;
+	int total = 0;
+	if (resist_stat == IE_RESISTMISSILE) {
+		remaining = fxqueue.SumDamageReduction(fx_missile_damage_reduction_ref, weaponEnchantment, total);
+	} else {
+		// the usual 3 physical types
+		remaining = fxqueue.SumDamageReduction(fx_damage_reduction_ref, weaponEnchantment, total);
+	}
+
+	if (remaining == -1) {
+		// no relevant effects were found, so the whole resistance value ignores enchantment checks
+		return resisted;
+	}
+	if (remaining == resisted) {
+		Log(COMBAT, "DamageReduction", "Damage resistance (%d) is completely from damage reduction.", resisted);
+		return resisted;
+	}
+	if (remaining == total) {
+		Log(COMBAT, "DamageReduction", "No weapon enchantment breach — full damage reduction and resistance used.");
+		return resisted;
+	} else {
+		Log(COMBAT, "DamageReduction", "Ignoring %d of %d damage reduction due to weapon enchantment breach.", total-remaining, total);
+		return resisted - (total-remaining);
+	}
+}
+
 /*Always call this on the suffering actor */
 void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype)
 {
@@ -6557,8 +6594,16 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			// damage type with a resistance stat
 			if (third) {
 				// flat resistance, eg. 10/- or eg. 5/+2 for physical types
-				// TODO: implement the /+x creature enchantment check
-				resisted = (signed)GetSafeStat(it->second.resist_stat);
+				// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
+				if (attacker && it->second.reduction) {
+					WeaponInfo wi;
+					attacker->GetWeapon(wi, 0); // FIXME: use a cheaper way to share the weaponEnchantment + this might have been the left hand
+					ieDword weaponEnchantment = wi.enchantment;
+					// disregard other resistance boni when checking whether to skip reduction
+					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
+				} else {
+					resisted = (signed)GetSafeStat(it->second.resist_stat);
+				}
 				damage -= resisted;
 			} else {
 				resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);

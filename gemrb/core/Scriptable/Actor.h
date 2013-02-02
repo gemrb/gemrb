@@ -641,6 +641,8 @@ public:
 	void PerformAttack(ieDword gameTime);
 	/* returns the adjusted weapon range, since items have odd values stored */
 	int GetWeaponRange(const WeaponInfo &wi) const;
+	/* filter out any damage reduction that is cancelled by high weapon enchantment and return the resulting resistance */
+	int GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const;
 	/* calculates strength (dexterity) based damage adjustment */
 	int WeaponDamageBonus(const WeaponInfo &wi) const;
 	/* handles critical, backstab, etc. damage modifications */
