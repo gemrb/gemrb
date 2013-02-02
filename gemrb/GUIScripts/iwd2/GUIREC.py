@@ -522,6 +522,41 @@ def DisplayGeneral (pc):
 	GNZS(pc, 11770, IE_RESISTCRUSHING)
 	# Poison
 	GNZS(pc, 14017, IE_RESISTPOISON)
+
+	# Damage Reduction - Spell Effect: Damage Reduction [436] (plain boni are mentioned above as resistances)
+	BaseString = 0
+	DisplayedHeader = 0
+	for damageType in 0, 1:
+		if damageType:
+			# missile
+			BaseString = 11767
+		else:
+			# general (physical)
+			BaseString = 40316
+
+		# cheat a bit and use the reduction at +10 as a modifier to remove from all other values
+		# it will hold all the non-enchantment related resistance (there are no +10 weapons)
+		mod = GemRB.GetDamageReduction (pc, damageType, 10)
+		if mod == -1:
+			mod = 0
+		for enchantment in range(6):
+			damage = GemRB.GetDamageReduction (pc, damageType, enchantment)
+			if damage == -1 or damage-mod <= 0:
+				continue
+			if not DisplayedHeader:
+				RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
+				RecordsTextArea.Append (39325)
+				RecordsTextArea.Append ("[/color]\n")
+				DisplayedHeader = 1
+
+			enchantment += 1 # since we were checking what is allowable, not what bypasses it
+			if enchantment:
+				enchantment = "+" + str(enchantment)
+			else:
+				enchantment = "-"
+			reduction = "%d/%s" %(damage-mod, enchantment)
+			RecordsTextArea.Append (delimited_txt(BaseString, ":", reduction, 1))
+
 	return
 
 # some of the displayed stats are manually indented

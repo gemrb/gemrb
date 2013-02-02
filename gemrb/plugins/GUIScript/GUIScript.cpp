@@ -10057,6 +10057,31 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
+PyDoc_STRVAR( GemRB_GetDamageReduction__doc,
+			  "GetDamageReduction(pc, enchantment[, missile])\n\n"
+			  "returns the damage reduction for the specified enchantment level and type.");
+static PyObject* GemRB_GetDamageReduction(PyObject * /*self*/, PyObject* args)
+{
+	int globalID;
+	unsigned int enchantment = 0;
+	int missile = 0;
+
+	if (!PyArg_ParseTuple( args, "ii|i", &globalID, &enchantment, &missile)) {
+		return AttributeError( GemRB_GetDamageReduction__doc );
+	}
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	int total = 0;
+	if (missile) {
+		total = actor->GetDamageReduction(IE_RESISTMISSILE, enchantment);
+	} else {
+		total = actor->GetDamageReduction(IE_RESISTCRUSHING, enchantment);
+	}
+
+	return PyInt_FromLong(total);
+}
+
 PyDoc_STRVAR( GemRB_GetSpellFailure__doc,
 			  "GetSpellFailure(pc[, cleric])\n\n"
 			  "returns the (arcane unless cleric is set) spell failure in percent.");
@@ -10571,6 +10596,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
+	METHOD(GetDamageReduction, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
 	METHOD(GetGamePortraitPreview, METH_VARARGS),
