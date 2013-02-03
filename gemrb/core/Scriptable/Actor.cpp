@@ -522,6 +522,7 @@ Actor::Actor()
 	GotLUFeedback = false;
 	RollSaves();
 	WMLevelMod = 0;
+	TicksLastRested = 0;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -1268,30 +1269,6 @@ void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 }
 
 //no separate values (changes are permanent)
-void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
-{
-	// get the old fatigue luck modifier
-	int luckMod = core->ResolveStatBonus(actor, "fatigue", 1, oldValue);
-	actor->BaseStats[IE_FATIGUE] = newValue;
-	// compensate for the change and modify luck
-	if ((int)newValue < 0) {
-		// need to just undo the bonus/malus from before
-		luckMod = - luckMod;
-	} else {
-		luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
-	}
-	// the default value isn't 0, but the maximum penalty and we need to ignore
-	// it due to the constitution bonus possibly putting the value out of range
-	if (luckMod < -80) luckMod = 0;
-	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
-
-	// reuse the luck mod to determine when the actor is tired
-	if (luckMod < 0) {
-		actor->VerbalConstant(VB_TIRED, 1);
-	}
-}
-
-//no separate values (changes are permanent)
 void pcf_intoxication(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	actor->BaseStats[IE_INTOXICATION]=newValue;
@@ -1338,7 +1315,7 @@ static PostChangeFunctionType post_change_functions[MAX_STATS]={
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, pcf_intoxication, //1f
 NULL,NULL,pcf_level,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
 pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
@@ -3144,16 +3121,7 @@ void Actor::RefreshPCStats() {
 	// apply the intelligence and wisdom bonus to lore
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
 
-	// add fatigue every 4 hours
-	// but make sure we're in the game already or players will start tired due to getting called with equipping effects before
-	if (game->GameTime && !(game->GameTime % 18000) && InParty) {
-		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
-	}
-	if (core->ResolveStatBonus(this, "fatigue")) {
-		AddPortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
-	} else {
-		DisablePortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
-	}
+	UpdateFatigue();
 
 	// regenerate actors with high enough constitution
 	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
@@ -3171,6 +3139,43 @@ void Actor::RefreshPCStats() {
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
 	Modified[IE_DETECTILLUSIONS] += GetSkillBonus(6);
 	Modified[IE_SETTRAPS] += GetSkillBonus(7);
+}
+
+// add fatigue every 4 hours since resting and check if the actor is penalised for it
+void Actor::UpdateFatigue()
+{
+	Game *game = core->GetGame();
+	if (!InParty || !game->GameTime) {
+		return;
+	}
+	// do icons here, so they persist for more than a tick
+	int LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
+	if (LuckMod) {
+		AddPortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+	} else {
+		DisablePortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+	}
+
+	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / 18000; // 18000 == 4 hours
+	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
+	FatigueLevel = (signed)FatigueLevel - FatigueBonus >= 0 ? FatigueLevel - FatigueBonus : 0;
+
+	// don't run on init or we automatically make the character supertired
+	if (FatigueLevel != BaseStats[IE_FATIGUE] && TicksLastRested) {
+		int OldLuckMod = LuckMod;
+		NewBase(IE_FATIGUE, FatigueLevel, MOD_ABSOLUTE);
+		LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
+		BaseStats[IE_LUCK] += LuckMod-OldLuckMod;
+		if (LuckMod < 0) {
+			VerbalConstant(VB_TIRED, 1);
+		}
+	} else if (!TicksLastRested) {
+		//if someone changed FatigueLevel, or loading a game, reset
+		TicksLastRested = game->GameTime - 18000 * BaseStats[IE_FATIGUE];
+		if (LuckMod < 0) {
+			VerbalConstant(VB_TIRED, 1);
+		}
+	}
 }
 
 void Actor::RollSaves()
@@ -7830,17 +7835,10 @@ int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
 //replenishes spells, cures fatigue
 void Actor::Rest(int hours)
 {
-	// this is stored in reversed order (negative malus, positive bonus)
-	int fatigueBonus = - core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
 	if (hours < 8) {
+		// partial (interrupted) rest does not affect fatigue
 		//do remove effects
 		int remaining = hours*10;
-		//removes hours*10 fatigue points
-		if (remaining < (signed)Modified[IE_FATIGUE]) {
-			NewStat (IE_FATIGUE, -remaining, MOD_ADDITIVE);
-		} else {
-			NewStat (IE_FATIGUE, fatigueBonus, MOD_ABSOLUTE);
-		}
 		NewStat (IE_INTOXICATION, -remaining, MOD_ADDITIVE);
 		//restore hours*10 spell levels
 		//rememorization starts with the lower spell levels?
@@ -7857,7 +7855,7 @@ void Actor::Rest(int hours)
 			}
 		}
 	} else {
-		SetBase (IE_FATIGUE, fatigueBonus);
+		TicksLastRested = core->GetGame()->GameTime;
 		SetBase (IE_INTOXICATION, 0);
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();

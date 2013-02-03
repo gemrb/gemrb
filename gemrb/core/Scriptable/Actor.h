@@ -374,6 +374,7 @@ private:
 	char AttackStance;
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
+	int TicksLastRested;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -405,6 +406,7 @@ private:
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData();
+	void UpdateFatigue();
 public:
 	Actor(void);
 	~Actor(void);
