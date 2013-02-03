@@ -3365,11 +3365,14 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter3=core->Roll(fx->CasterLevel, 6, 0);
 		fx->Parameter4=core->Roll(2,4,0);
 		fx->Parameter5=core->Roll(2,4,0);
-		BASE_ADD( IE_HITPOINTS, fx->Parameter3);
+		BASE_ADD(IE_HITPOINTS, fx->Parameter3); // FIXME: permanent
 	}
 
 	target->AC.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD(IE_SAVEFORTITUDE, 5); //FIXME: this is a bonus
+	// FIXME: should actually increase the base, so extra attacks can be gained
+	// but then the effect would be permanent and Actor::GetNumberOfAttacks doesn't handle effects yet
+	target->ToHit.HandleFxBonus(fx->CasterLevel/2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+	STAT_ADD(IE_SAVEFORTITUDE, 5);
 	STAT_ADD(IE_MAXHITPOINTS, fx->Parameter3);
 	STAT_ADD(IE_STR, fx->Parameter4);
 	STAT_ADD(IE_CON, fx->Parameter5);
