@@ -626,7 +626,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ((15546, GS (IE_RESISTCOLD), '%'))
 		stats.append ((15580, GS (IE_RESISTMAGICCOLD), '%'))
 	# 32220 Electricity
-	if GUICommon.GameIsBG1():
+	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
 		stats.append ((14013, GS (IE_RESISTELECTRICITY), '%'))
 	else:
 		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
