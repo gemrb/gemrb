@@ -2018,6 +2018,9 @@ int fx_set_slowed_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		BASE_STATE_CURE( STATE_HASTED );
 		target->fxqueue.RemoveAllEffects( fx_set_haste_state_ref );
 		target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_HASTED );
+	} else if (STATE_GET(STATE_SLOWED)) {
+		// already slowed
+		return FX_NOT_APPLIED;
 	} else {
 		STATE_SET( STATE_SLOWED );
 		target->AddPortraitIcon(PI_SLOWED);
