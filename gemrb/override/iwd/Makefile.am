@@ -1,3 +1,3 @@
-iwdoverride_DATA = *.2da *.bmp *.ini *.chu *.ids *.bcs
+iwdoverride_DATA = *.2da *.bcs
 iwdoverridedir = $(moddir)/override/iwd/
-EXTRA_DIST = *.2da *.bmp *.ini *.chu *.ids *.bcs
+EXTRA_DIST = *.2da *.bcs

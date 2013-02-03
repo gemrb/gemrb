@@ -1,3 +1,3 @@
-sharedoverride_DATA = *.2da *.ids *.spl *.pro
+sharedoverride_DATA = *.ids
 sharedoverridedir = $(moddir)/override/shared/
-EXTRA_DIST = *.2da *.ids *.spl *.pro
+EXTRA_DIST = *.ids

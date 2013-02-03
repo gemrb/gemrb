@@ -1,3 +1,3 @@
-iwdunhardcoded_DATA = *.2da *.bmp *.ini *.chu *.ids *.bcs
+iwdunhardcoded_DATA = *.2da *.bmp *.ini *.chu *.ids *.pro *.spl
 iwdunhardcodeddir = $(moddir)/unhardcoded/iwd/
-EXTRA_DIST = *.2da *.bmp *.ini *.chu *.ids *.bcs
+EXTRA_DIST = *.2da *.bmp *.ini *.chu *.ids *.pro *.spl

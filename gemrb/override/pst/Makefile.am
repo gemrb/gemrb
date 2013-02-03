@@ -1,3 +1,3 @@
-pstoverride_DATA = *.2da *.bmp *.ini *.chu *.ids *.bcs *.pro
+pstoverride_DATA = *.2da *.bcs
 pstoverridedir = $(moddir)/override/pst/
-EXTRA_DIST = *.2da *.bmp *.ini *.chu *.ids *.bcs *.pro
+EXTRA_DIST = *.2da *.bcs

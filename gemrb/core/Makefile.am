@@ -88,6 +88,7 @@ libgemrb_core_la_SOURCES = \
 	SaveGameMgr.cpp \
 	ScriptEngine.cpp \
 	Scriptable/Actor.cpp \
+	Scriptable/CombatInfo.cpp \
 	Scriptable/Container.cpp \
 	Scriptable/Door.cpp \
 	Scriptable/InfoPoint.cpp \
@@ -104,12 +105,17 @@ libgemrb_core_la_SOURCES = \
 	StoreMgr.cpp \
 	StringMgr.cpp \
 	SymbolMgr.cpp \
+	System/Logger/File.cpp \
+	System/Logger/MessageWindowLogger.cpp \
+	System/Logger/Stdio.cpp \
 	System/DataStream.cpp \
 	System/FileStream.cpp \
+	System/Logger.cpp \
 	System/Logging.cpp \
 	System/MemoryStream.cpp \
 	System/SlicedStream.cpp \
 	System/String.cpp \
+	System/StringBuffer.cpp \
 	System/VFS.cpp \
 	TableMgr.cpp \
 	Tile.cpp \

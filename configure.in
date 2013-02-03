@@ -119,6 +119,7 @@ AC_CHECK_FUNCS([strtol])
 AC_CHECK_FUNCS([strtoul])
 AC_CHECK_FUNCS([strndup])
 AC_CHECK_FUNCS([strnlen])
+AC_CHECK_FUNCS([strlcpy])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([stddef.h])
 AC_CHECK_HEADERS([sys/time.h])
@@ -237,6 +238,14 @@ gemrb/override/iwd/Makefile
 gemrb/override/iwd2/Makefile
 gemrb/override/pst/Makefile
 gemrb/override/shared/Makefile
+gemrb/unhardcoded/Makefile
+gemrb/unhardcoded/bg1/Makefile
+gemrb/unhardcoded/bg2/Makefile
+gemrb/unhardcoded/how/Makefile
+gemrb/unhardcoded/iwd/Makefile
+gemrb/unhardcoded/iwd2/Makefile
+gemrb/unhardcoded/pst/Makefile
+gemrb/unhardcoded/shared/Makefile
 gemrb/GUIScripts/Makefile
 gemrb/GUIScripts/bg1/Makefile
 gemrb/GUIScripts/bg2/Makefile
