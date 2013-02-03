@@ -98,7 +98,7 @@ GEM_EXPORT ieDword ResolveSpellNumber(const ieResRef spellres);
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
 void EscapeAreaCore(Scriptable *Sender, const Point &p, const char *area, const Point &enter, int flags, int wait);
 void GoNear(Scriptable *Sender, const Point &p);
-void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance);
+void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release=0);
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_release);
 
 #define NO_OPERATION -1

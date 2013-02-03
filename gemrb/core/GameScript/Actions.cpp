@@ -5401,7 +5401,7 @@ void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 }
 
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)
-void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -5421,10 +5421,26 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	if (parameters->int2Parameter > 20) {
+		Log(WARNING, "GameScript", "Could not get close enough to container!");
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 
 	ieDword distance = PersonalDistance(Sender, container);
 	ieDword needed = MAX_OPERATING_DISTANCE;
-	if (container->Type==IE_CONTAINER_PILE) {
+	// give up the strictness after 10 retries from the same spot
+	if (!parameters->int2Parameter) {
+		parameters->int1Parameter = distance;
+		parameters->int2Parameter = 1;
+	} else {
+		if (parameters->int1Parameter == (signed)distance) {
+			parameters->int2Parameter++;
+		} else {
+			parameters->int1Parameter = distance;
+		}
+	}
+	if (container->Type==IE_CONTAINER_PILE && parameters->int2Parameter < 10) {
 		needed = 0; // less than a search square (width)
 	}
 	if (distance<=needed)
@@ -5448,7 +5464,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	MoveNearerTo(Sender, container, needed);
+	MoveNearerTo(Sender, container, needed, 1);
 }
 
 //call the usecontainer action in target (not used)

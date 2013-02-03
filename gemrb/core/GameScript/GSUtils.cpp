@@ -1712,7 +1712,7 @@ void GoNear(Scriptable *Sender, const Point &p)
 	Sender->AddActionInFront( action );
 }
 
-void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
+void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release)
 {
 	Point p;
 	Map *myarea, *hisarea;
@@ -1750,7 +1750,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 		distance += ((Actor *)target)->size*10;
 	}
 
-	MoveNearerTo(Sender, p, distance, 0);
+	MoveNearerTo(Sender, p, distance, dont_release);
 }
 
 //It is not always good to release the current action if target is unreachable
