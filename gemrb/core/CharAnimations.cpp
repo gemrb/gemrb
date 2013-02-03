@@ -214,7 +214,7 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
 		ArmourLevel = 0;
 	}
-	strlcpy( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel], sizeof(ResRef) );
+	CopyResRef( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel] );
 	DropAnims();
 }
 

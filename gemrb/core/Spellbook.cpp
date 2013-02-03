@@ -520,7 +520,7 @@ void Spellbook::SetBookType(int bt)
 int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
-	strlcpy(spl->SpellResRef, spell->Name, sizeof(spl->SpellResRef));
+	CopyResRef(spl->SpellResRef, spell->Name);
 	spl->Level = 0;
 	if (IWD2Style) {
 		PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
@@ -778,7 +778,7 @@ bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 	}
 
 	CREMemorizedSpell* mem_spl = new CREMemorizedSpell();
-	strlcpy( mem_spl->SpellResRef, spell->SpellResRef, sizeof(mem_spl->SpellResRef) );
+	CopyResRef( mem_spl->SpellResRef, spell->SpellResRef );
 	mem_spl->Flags = usable ? 1 : 0; // FIXME: is it all it's used for?
 
 	sm->memorized_spells.push_back( mem_spl );

@@ -3372,7 +3372,7 @@ void Actor::ReactToDeath(const char * deadname)
 				while(*value && *value!=',') value++;
 				if (*value==',') value++;
 			}
-			strlcpy(resref, value, sizeof(resref));
+			CopyResRef(resref, value);
 			for(count=0;count<8 && resref[count]!=',';count++) {};
 			resref[count]=0;
 
@@ -7553,7 +7553,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 		while(*resource && *resource!=',') resource++;
 			if (*resource==',') resource++;
 	}
-	strlcpy(Sound, resource, sizeof(Sound));
+	CopyResRef(Sound, resource);
 	for(count=0;count<8 && Sound[count]!=',';count++) {};
 	Sound[count]=0;
 }
@@ -7653,12 +7653,10 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 	}
 
 	if(Which!=1) {
-		memset( SmallPortrait, 0, 8 );
-		strlcpy( SmallPortrait, ResRef, sizeof(SmallPortrait) );
+		CopyResRef( SmallPortrait, ResRef );
 	}
 	if(Which!=2) {
-		memset( LargePortrait, 0, 8 );
-		strlcpy( LargePortrait, ResRef, sizeof(LargePortrait) );
+		CopyResRef( LargePortrait, ResRef );
 	}
 	if(!Which) {
 		for (i = 0; i < 8 && ResRef[i]; i++) {};

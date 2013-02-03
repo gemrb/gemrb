@@ -213,4 +213,11 @@ int EARelation(Scriptable* Owner, Actor* target)
 	return EAR_NEUTRAL;
 }
 
+// safely copies a ResRef (ie. nulls out the unused buffer size)
+void CopyResRef(ieResRef d, const ieResRef s)
+{
+	strncpy(d, s, sizeof(ieResRef) - 1);
+	d[sizeof(ieResRef) - 1] = '\0';
+}
+
 }

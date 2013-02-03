@@ -281,19 +281,19 @@ Interface::Interface(int iargc, char* iargv[])
 	strlcpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
 	strlcpy( GameDataPath, "data", sizeof(GameDataPath) );
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
-	strlcpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
-	strlcpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
-	strlcpy( MovieFont, "STONESML", sizeof(MovieFont) );
-	strlcpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
-	strlcpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
-	strlcpy( WorldMapName[0], "WORLDMAP", sizeof(ieResRef) );
-	memset( WorldMapName[1], 0, sizeof(ieResRef) );
-	strlcpy( Palette16, "MPALETTE", sizeof(Palette16) );
-	strlcpy( Palette32, "PAL32", sizeof(Palette32) );
-	strlcpy( Palette256, "MPAL256", sizeof(Palette256) );
+	CopyResRef( ButtonFont, "STONESML" );
+	CopyResRef( TooltipFont, "STONESML" );
+	CopyResRef( MovieFont, "STONESML" );
+	CopyResRef( ScrollCursorBam, "CURSARW" );
+	CopyResRef( GlobalScript, "BALDUR" );
+	CopyResRef( WorldMapName[0], "WORLDMAP" );
+	CopyResRef( WorldMapName[1], "" );
+	CopyResRef( Palette16, "MPALETTE" );
+	CopyResRef( Palette32, "PAL32" );
+	CopyResRef( Palette256, "MPAL256" );
 	strcpy( TooltipBackResRef, "\0" );
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		strcpy( GroundCircleBam[size], "\0" );
+		CopyResRef(GroundCircleBam[size], "");
 		GroundCircleScale[size] = 0;
 	}
 	TooltipColor.r = 0;
@@ -890,7 +890,7 @@ bool Interface::ReadSpecialSpells()
 	if (table) {
 		SurgeSpell ss;
 		for (i = 0; (unsigned)i < table->GetRowCount(); i++) {
-			strlcpy(ss.spell, table->QueryField(i, 0), sizeof(ss.spell));
+			CopyResRef(ss.spell, table->QueryField(i, 0));
 			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
 			// comment ignored
 			SurgeSpells.push_back(ss);
@@ -1161,7 +1161,7 @@ bool Interface::ReadModalStates()
 
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		strlcpy(ms.spell, table->QueryField(i, 0), sizeof(ms.spell));
+		CopyResRef(ms.spell, table->QueryField(i, 0));
 		strncpy(ms.action, table->QueryField(i, 1), 16);
 		ms.entering_str = atoi(table->QueryField(i, 2));
 		ms.leaving_str = atoi(table->QueryField(i, 3));
@@ -3076,7 +3076,7 @@ bool Interface::LoadWindowPack(const char* name)
 		return false;
 	}
 
-	strlcpy( WindowPack, name, sizeof( WindowPack ) );
+	CopyResRef( WindowPack, name );
 	return true;
 }
 
@@ -4345,7 +4345,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 	
 	delete worldmap;
 	worldmap = new_worldmap;
-	strlcpy(WorldMapName[0], wmResRef, sizeof(ieResRef));
+	CopyResRef(WorldMapName[0], wmResRef);
 }
 
 /* swapping out old resources */
