@@ -3399,6 +3399,11 @@ int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_smite_evil(%2d)", fx->Opcode);
 	target->SetSpellState(SS_SMITEEVIL);
+	int chrmod = target->GetAbilityBonus(IE_CHR);
+	if (chrmod > 0) {
+		target->ToHit.HandleFxBonus(chrmod, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+	}
+	STAT_ADD(IE_DAMAGEBONUS, target->GetPaladinLevel());
 	return FX_NOT_APPLIED;
 }
 
