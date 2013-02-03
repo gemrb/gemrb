@@ -1,0 +1,296 @@
+# -*-autoconf-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003-2005 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+
+###################################################
+
+# I used fluxbox's configure.in as a template of sorts, and 
+# Redhat's autotools book. Thanks to everyone involved with 
+# both of these projects!
+# The build system was mostly done by edheldil & subvertir
+
+dnl Initialize autoconf and automake
+
+AC_PREREQ([2.57])
+AC_INIT(gemrb, 0.7.2-git)
+
+AC_MSG_WARN([
+
+
+The autotools build system is NO LONGER MAINTAINED and may be dropped in
+future versions! Please switch to using cmake instead.
+
+])
+
+AC_CONFIG_AUX_DIR([admin])
+AC_CONFIG_SRCDIR([gemrb/])
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME,AC_PACKAGE_VERSION)
+AM_CONFIG_HEADER(config.h)
+AC_USE_SYSTEM_EXTENSIONS
+
+for top_builddir in . .. ../.. $ac_auxdir $ac_auxdir/..; do
+  test -f $top_builddir/configure && break
+done
+
+dnl Check for required software.
+AC_DISABLE_STATIC
+AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+
+AC_LANG([C++])
+
+if test "x$docdir" = "x" ; then
+  docdir=$datadir/doc
+fi
+
+AC_ARG_ENABLE(subdirs, AS_HELP_STRING(--disable-subdirs,Install plugins and data directly to LIBDIR and DATADIR), gemrb_use_subdirs=$enableval, gemrb_use_subdirs=yes)
+if test "x$gemrb_use_subdirs" = "xno" ; then
+  plugindir=$libdir/plugins
+  moddir=$datadir
+else
+  plugindir=$libdir/gemrb/plugins
+  moddir=$datadir/gemrb
+fi
+
+AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug,Build in debug mode), gemrb_use_debug=$enableval, gemrb_use_debug=no)
+if test "x$gemrb_use_debug" = "xyes" ; then
+  CFLAGS="$CFLAGS -O0 -g"
+  CXXFLAGS="$CXXFLAGS -O0 -g"
+fi
+
+AC_SUBST(plugindir)
+AC_SUBST(moddir)
+AC_SUBST(docdir)
+
+
+dnl Check for recent STL with <vector>::at()
+AC_CHECK_STL_CONTAINER_AT([], [AC_MSG_ERROR([
+
+*** Your STL library does not define method container::at().
+*** It probably means that its version is too old.
+*** Please upgrade your standard C++ library to version 3.x.
+])])
+
+dnl Determine prefix.
+if test "x$prefix" = "xNONE"; then
+  prefix=$ac_default_prefix
+  ac_configure_args="$ac_configure_args --prefix $prefix"
+fi
+
+dnl Check various functions.
+AC_CHECK_SIZEOF([char])
+AC_CHECK_SIZEOF([short int])
+AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([long int])
+AC_CHECK_SIZEOF([long long int])
+AC_CHECK_FUNCS([getcwd])
+AC_CHECK_FUNCS([gettimeofday])
+AC_CHECK_FUNCS([memchr])
+AC_CHECK_FUNCS([memmove])
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([mkdir])
+AC_CHECK_FUNCS([rmdir])
+AC_CHECK_FUNCS([sqrt])
+AC_CHECK_FUNCS([strcasecmp])
+AC_CHECK_FUNCS([strchr])
+AC_CHECK_FUNCS([strdup])
+AC_CHECK_FUNCS([strrchr])
+AC_CHECK_FUNCS([strstr])
+AC_CHECK_FUNCS([strtol])
+AC_CHECK_FUNCS([strtoul])
+AC_CHECK_FUNCS([strndup])
+AC_CHECK_FUNCS([strnlen])
+AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([stddef.h])
+AC_CHECK_HEADERS([sys/time.h])
+AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_LIB(dl, dlopen, [LIBDL="-ldl"], [LIBDL=""])
+AC_SUBST(LIBDL)
+
+AC_CHECK_PTHREADS
+
+dnl Check for zlib.
+CHECK_ZLIB()
+
+dnl Check for libSDL Version 1.2 or greater, fail if not found.
+AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
+
+*** You need LibSDL (www.libsdl.org) version 1.2.0 or greater to compile GemRB
+])])
+
+dnl Check for OpenAL, fail if not found.
+AM_PATH_OPENAL([], [AC_MSG_ERROR([
+
+*** You need OpenAL (www.openal.org) to compile GemRB
+])])
+
+#AC_CHECK_LIB([openal], [alGetError], [ $(which true) ], [AC_MSG_ERROR([
+#*** You need OpenAL (www.openal.org) to compile GemRB
+#])])
+##AC_CHECK_LIB([alut], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
+##*** You need OpenAL (www.openal.org) to compile GemRB
+##])])
+#OPENAL_LIBS="`openal-config --libs`"
+
+##GEMRB_CHECK_ALUT()
+
+dnl Check for Python version >= 2.3.0, fail if not found.
+AM_PATH_PYTHON(2.3.0, [], [AC_MSG_ERROR([
+
+*** You need Python (www.python.org) version 2.3.0 or greater to compile GemRB
+])])
+
+dnl Check for Python headers and libraries, fail if not found.
+AM_CHECK_PYTHON_HEADERS([], [AC_MSG_ERROR([
+
+*** You need Python >=2.3.0 headers installed to compile GemRB
+*** See if your distribution offers -dev packages!
+])])
+
+dnl Check for Python libraries, fail if not found.
+AM_CHECK_PYTHON_LIBS([], [AC_MSG_ERROR([
+
+*** You need Python >=2.3.0 shared libraries installed to compile GemRB
+*** Maybe you need to recompile python with --shared-libs
+])])
+
+
+AC_CHECK_HEADER([vorbis/vorbisfile.h],
+	[AC_CHECK_LIB(vorbisfile, ov_info,
+		[AC_DEFINE( HAS_VORBIS_SUPPORT, 1, [Handling of .ogg soundfiles])
+		vorbis_ok=yes],[vorbis_ok=no], -lvorbis )],
+	[vorbis_ok=no])
+AM_CONDITIONAL([VORBIS], [test x$vorbis_ok = xyes])
+
+dnl FIXME: check for libpng properly, using libpng(12)-config
+AC_CHECK_HEADER(png.h,,AC_MSG_ERROR([*** libpng not found!]))
+AC_CHECK_LIB(png,png_create_read_struct,,AC_MSG_ERROR([*** libpng not found!]))
+AC_SUBST(LIBPNG,-lpng)
+
+AC_C_CONST
+AC_C_INLINE
+AC_C_RESTRICT
+AC_C_VOLATILE
+AC_FUNC_CLOSEDIR_VOID
+AC_FUNC_MALLOC
+AC_FUNC_MEMCMP
+AC_FUNC_REALLOC
+AC_FUNC_STAT
+AC_FUNC_STRFTIME
+AC_FUNC_STRNLEN
+AC_HEADER_DIRENT
+AC_HEADER_STDBOOL
+AC_HEADER_STAT
+AC_HEADER_TIME
+AC_REPLACE_FNMATCH
+AC_STRUCT_TM
+AC_TYPE_SIZE_T
+
+CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/gemrb/includes -I\$(top_srcdir)/gemrb/core"
+CXXFLAGS="$CXXFLAGS -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
+
+AC_ARG_ENABLE(werror, AS_HELP_STRING(--disable-werror,Make compiler warning non-fatal.), enable_werror=$enableval, enable_werror=yes)
+if test "x$enable_werror" = "xyes" ; then
+  CXXFLAGS="$CXXFLAGS -Werror"
+fi
+
+# only export symbols explicitly marked to be exported
+CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+
+dnl Check for "ISO C++ forbids casting between pointer-to-function and pointer-to-object" as in GCC4
+AC_CHECK_OBJECT_TO_FUNCTION_CAST
+
+
+AC_SUBST(LIBS)
+AC_SUBST(OPENAL_LIBS)
+
+AC_CONFIG_FILES([
+Makefile
+gemrb/Makefile 
+gemrb/core/Makefile
+gemrb/includes/Makefile 
+gemrb/override/Makefile
+gemrb/override/bg1/Makefile
+gemrb/override/bg2/Makefile
+gemrb/override/how/Makefile
+gemrb/override/iwd/Makefile
+gemrb/override/iwd2/Makefile
+gemrb/override/pst/Makefile
+gemrb/override/shared/Makefile
+gemrb/GUIScripts/Makefile
+gemrb/GUIScripts/bg1/Makefile
+gemrb/GUIScripts/bg2/Makefile
+gemrb/GUIScripts/iwd/Makefile
+gemrb/GUIScripts/iwd2/Makefile
+gemrb/GUIScripts/pst/Makefile
+gemrb/plugins/Makefile 
+gemrb/plugins/2DAImporter/Makefile 
+gemrb/plugins/ACMReader/Makefile
+gemrb/plugins/OGGReader/Makefile
+gemrb/plugins/WAVReader/Makefile
+gemrb/plugins/AREImporter/Makefile 
+gemrb/plugins/BAMImporter/Makefile 
+gemrb/plugins/BIFImporter/Makefile 
+gemrb/plugins/BIKPlayer/Makefile
+gemrb/plugins/BMPImporter/Makefile 
+gemrb/plugins/BMPWriter/Makefile
+gemrb/plugins/PNGImporter/Makefile 
+gemrb/plugins/CHUImporter/Makefile 
+gemrb/plugins/CREImporter/Makefile 
+gemrb/plugins/DLGImporter/Makefile 
+gemrb/plugins/EFFImporter/Makefile 
+gemrb/plugins/FXOpcodes/Makefile 
+gemrb/plugins/IWDOpcodes/Makefile 
+gemrb/plugins/PSTOpcodes/Makefile 
+gemrb/plugins/GAMImporter/Makefile 
+gemrb/plugins/GUIScript/Makefile 
+gemrb/plugins/IDSImporter/Makefile 
+gemrb/plugins/INIImporter/Makefile 
+gemrb/plugins/ITMImporter/Makefile 
+gemrb/plugins/KEYImporter/Makefile 
+gemrb/plugins/DirectoryImporter/Makefile
+gemrb/plugins/MOSImporter/Makefile 
+gemrb/plugins/MUSImporter/Makefile 
+gemrb/plugins/MVEPlayer/Makefile
+gemrb/plugins/NullSound/Makefile 
+gemrb/plugins/OpenALAudio/Makefile 
+gemrb/plugins/PLTImporter/Makefile 
+gemrb/plugins/PROImporter/Makefile 
+gemrb/plugins/SAVImporter/Makefile
+gemrb/plugins/SDLVideo/Makefile 
+gemrb/plugins/SPLImporter/Makefile 
+gemrb/plugins/STOImporter/Makefile 
+gemrb/plugins/TISImporter/Makefile 
+gemrb/plugins/TLKImporter/Makefile 
+gemrb/plugins/TTFImporter/Makefile
+gemrb/plugins/WEDImporter/Makefile 
+gemrb/plugins/WMPImporter/Makefile 
+gemrb/plugins/ZLibManager/Makefile
+gemrb/docs/Makefile 
+gemrb/docs/en/Makefile 
+gemrb/docs/en/GUIScript/Makefile 
+gemrb/docs/en/Tables/Makefile 
+gemrb/docs/en/Engine/Makefile 
+])
+AC_CONFIG_FILES([gemrb.spec])
+AC_OUTPUT

@@ -5,6 +5,7 @@ Preparing and testing GIT
 =========================
 
 * Make sure that version numbers in 
+    configure.in
     gemrb/includes/globals.h 
   are correct for the upcoming version.
 
@@ -29,14 +30,13 @@ Preparing and testing GIT
 Source release
 ==============
 
-* via cmake:
+* via cmake/autotools:
   make dist
 
 
 Linux binary release
 ====================
 
-  ### OBSOLETE - needs update ###
   ./autogen.sh
   ./configure --prefix=/usr/local
   make
