@@ -1393,6 +1393,7 @@ public:
 	static void Turn(Scriptable* Sender, Action* parameters);
 	static void TurnAMT(Scriptable* Sender, Action* parameters);
 	static void UndoExplore(Scriptable *Sender, Action *parameters);
+	static void Unhide(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
 	static void UnlockScroll(Scriptable* Sender, Action* parameters);

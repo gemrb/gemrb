@@ -5592,6 +5592,20 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 
 }
 
+static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
+void GameScript::Unhide(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+
+	if (actor->ModalState == MS_STEALTH) {
+		actor->SetModal(MS_NONE);
+	}
+	actor->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
+}
+
 void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {

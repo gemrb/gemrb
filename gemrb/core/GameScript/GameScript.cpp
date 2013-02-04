@@ -947,6 +947,7 @@ static const ActionLink actionnames[] = {
 	{"turn", GameScript::Turn, 0},
 	{"turnamt", GameScript::TurnAMT, AF_BLOCKING}, //relative Face()
 	{"undoexplore", GameScript::UndoExplore, 0},
+	{"unhide", GameScript::Unhide, 0},
 	{"unhidegui", GameScript::UnhideGUI, 0},
 	{"unloadarea", GameScript::UnloadArea, 0},
 	{"unlock", GameScript::Unlock, 0},
