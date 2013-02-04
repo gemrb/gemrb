@@ -2650,6 +2650,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ImplicitAreaAnimBackground", //70GF_IMPLICIT_AREAANIM_BACKGROUND
 		"HealOn100Plus",      //71GF_HEAL_ON_100PLUS
 		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD
+		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

@@ -798,7 +798,7 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
-	if (valid && value1) {
+	if (valid && (core->HasFeature(GF_ZERO_TIMER_IS_VALID) || value1)) {
 		if ( value1 < core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
