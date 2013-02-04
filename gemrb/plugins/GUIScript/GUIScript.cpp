@@ -8554,7 +8554,6 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 		ReadActionButtons();
 	}
 
-
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
 		gamedata->GetFactoryResource( GUIResRef[Index],
@@ -8582,9 +8581,13 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, new PythonCallback(func2) );
 
 	//cannot make this const, because it will be freed
-	char *txt = core->GetString( GUITooltip[Index] );
+	char *txt = NULL;
+	if (GUITooltip[Index] != (ieDword) -1) {
+		txt = core->GetString( GUITooltip[Index] );
+	}
 	//will free txt
 	SetFunctionTooltip(WindowIndex, ControlIndex, txt, Function);
+
 	//no incref
 	return Py_None;
 }
