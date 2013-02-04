@@ -211,16 +211,13 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	# TODO: ASCOL, ROWS
 	#AsCol = CommonTables.SpellDisplay.GetValue (layout, "AS_COL")
 	#Rows = CommonTables.SpellDisplay.GetValue (layout, "ROWS")
-	More = len(memorizedSpells) > 12
-	if not More and Start:
-		More = True
+	More = len(memorizedSpells) > 12 or Start > 0
 
 	# scroll left button
 	if More:
 		Button = Window.GetControl (Offset)
 		Button.SetText ("")
 		if Start:
-			#Button.SetActionIcon(globals(), ACT_LEFT, 0)
 			GUICommonWindows.SetActionIconWorkaround (Button, ACT_LEFT, 0)
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 		else:
@@ -237,7 +234,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	spellSections = [2, 4, 8, 16, 16]
 
 	# create the spell icon buttons
-	buttonCount = 12 - More # GUIBT_COUNT in PCStatsStruct
+	buttonCount = 12 - More * 2 # GUIBT_COUNT in PCStatsStruct
 	for i in range (buttonCount):
 		Button = Window.GetControl (i+Offset+More)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
@@ -283,7 +280,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 
 	# scroll right button
 	if More:
-		Button = Window.GetControl (Offset+buttonCount)
+		Button = Window.GetControl (Offset+buttonCount+1)
 		GUICommonWindows.SetActionIconWorkaround (Button, ACT_RIGHT, buttonCount)
 		Button.SetText ("")
 		if len(memorizedSpells) - Start > 10:
