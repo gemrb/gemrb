@@ -2207,6 +2207,33 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 	return value;
 }
 
+// checks if a variable exists in any context
+bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context)
+{
+	ieDword value = 0;
+	char newVarName[8];
+	strlcpy(newVarName, Context, 7);
+	Game *game = core->GetGame();
+
+	if (Sender->GetCurrentArea()->locals->Lookup(VarName, value)) {
+		return true;
+	} else if (Sender->locals->Lookup(VarName, value)) {
+		return true;
+	} else if (HasKaputz && game->kaputz->Lookup(VarName, value)) {
+		return true;
+	} else if (game->locals->Lookup(VarName, value)) {
+		return true;
+	} else {
+		Map *map = game->GetMap(game->FindMap(newVarName));
+		if (map) {
+			if (map->locals->Lookup(VarName, value)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 int DiffCore(ieDword a, ieDword b, int diffmode)
 {
 	switch (diffmode) {

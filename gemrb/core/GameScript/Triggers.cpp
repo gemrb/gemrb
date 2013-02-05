@@ -804,7 +804,7 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-//globaltimernotexpired returns false if the timer doesn't exist
+//globaltimernotexpired returns false if the timer doesn't exist or is zero
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
 	bool valid=true;
@@ -817,14 +817,11 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 }
 
 //globaltimerstarted returns false if the timer doesn't exist
-//is it the same as globaltimernotexpired?
 int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid=true;
-
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
-	if (valid && value1) {
-		if ( value1 > core->GetGame()->GameTime ) return 1;
+	bool valid = VariableExists(Sender, parameters->string0Parameter, parameters->string1Parameter);
+	if (valid) {
+		return 1;
 	}
 	return 0;
 }
