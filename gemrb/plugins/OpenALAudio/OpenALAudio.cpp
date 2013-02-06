@@ -53,6 +53,7 @@ void OpenALSoundHandle::SetPos(int XPos, int YPos) {
 	};
 
 	alSourcefv(parent->Source, AL_POSITION, SourcePos);
+	checkALError("Unable to set source position", WARNING);
 }
 
 bool OpenALSoundHandle::Playing() {
@@ -72,13 +73,13 @@ void OpenALSoundHandle::StopLooping() {
 	if (!parent) return;
 
 	alSourcei(parent->Source, AL_LOOPING, 0);
+	checkALError("Unable to stop audio loop", WARNING);
 }
 
 void AudioStream::ClearProcessedBuffers()
 {
 	ALint processed = 0;
 	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );
-
 	checkALError("Failed to get processed buffers", WARNING);
 
 	if (processed > 0) {
@@ -111,7 +112,10 @@ void AudioStream::ClearIfStopped()
 {
 	if (free || locked) return;
 
-	if (!Source || !alIsSource(Source)) return;
+	if (!Source || !alIsSource(Source)) {
+		checkALError("No AL Context", WARNING);
+		return;
+	}
 
 	ALint state;
 	alGetSourcei( Source, AL_SOURCE_STATE, &state );
@@ -305,6 +309,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	ResourceHolder<SoundMgr> acm(ResRef);
 	if (!acm) {
 		alDeleteBuffers( 1, &Buffer );
+		checkALError("Unable to delete buffer!", ERROR);
 		return 0;
 	}
 	int cnt = acm->get_length();
@@ -599,6 +604,7 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
 {
 	alListener3f( AL_POSITION, (float) XPos, (float) YPos, 0.0f );
+	checkALError("Unable to update listener position.", WARNING);
 }
 
 void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
