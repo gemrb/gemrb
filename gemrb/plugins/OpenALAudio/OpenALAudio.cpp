@@ -807,12 +807,22 @@ int OpenALAudioDriver::MusicManager(void* arg)
 								driver->music_memory, ACM_BUFFERSIZE,
 								driver->MusicReader->get_samplerate() );
 						}
+						checkALError("Unable to buffer data.", ERROR);
+						// FIXME: determine if we should error out if any data fails to buffer
 						alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
-						if (driver->MusicSource && alIsSource( driver->MusicSource )) {
-							alSourcePlay( driver->MusicSource );
-							checkALError("Error playing music source", ERROR);
+						if (!checkALError("Unable to queue buffer.", ERROR)) {
+							if (driver->MusicSource && alIsSource( driver->MusicSource )) {
+								alSourcePlay( driver->MusicSource );
+								if (!checkALError("Error playing music source", ERROR)) {
+									// no errors happened
+									bFinished = AL_FALSE;
+									break;
+								}
+							}
 						}
-						bFinished = AL_FALSE;
+						// if all had gone well we would have broken out
+						driver->MusicPlaying = false;
+						return -1;
 					}
 					break;
 				case AL_STOPPED:
