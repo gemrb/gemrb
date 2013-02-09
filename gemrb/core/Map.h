@@ -52,7 +52,7 @@ class Wall_Polygon;
 #define SPAWN_RANGE       400
 
 //area flags
-#define AF_SAVE           1
+#define AF_NOSAVE         1
 #define AF_TUTORIAL       2
 #define AF_DEADMAGIC      4
 #define AF_DREAM          8

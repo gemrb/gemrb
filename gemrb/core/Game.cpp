@@ -1603,7 +1603,7 @@ void Game::RestParty(int checks, int dream, int hp)
 	int hoursLeft = 0;
 	if (!(checks&REST_NOAREA) ) {
 		//you cannot rest here
-		if (area->AreaFlags&AF_SAVE) {
+		if (area->AreaFlags&AF_NOSAVE) {
 			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
 			return;
 		}

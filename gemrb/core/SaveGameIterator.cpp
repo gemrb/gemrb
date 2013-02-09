@@ -491,7 +491,7 @@ static int CanSave()
 		return -1;
 	}
 
-	if (map->AreaFlags&AF_SAVE) {
+	if (map->AreaFlags&AF_NOSAVE) {
 		//cannot save in area
 		displaymsg->DisplayConstantString(STR_CANTSAVEMONS, DMC_BG2XPGREEN);
 		return 4;
