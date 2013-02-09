@@ -1339,15 +1339,11 @@ int Map::CountSummons(ieDword flags, ieDword sex)
 {
 	int count = 0;
 
-	ieDword gametime = core->GetGame()->GameTime;
 	size_t i = actors.size();
 	while (i--) {
 		Actor *actor = actors[i];
 
 		if (!actor->ValidTarget(flags) ) {
-			continue;
-		}
-		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (actor->GetStat(IE_SEX)==sex) {
@@ -1555,7 +1551,6 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 */
 Actor* Map::GetActor(const Point &p, int flags)
 {
-	ieDword gametime = core->GetGame()->GameTime;
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
@@ -1565,9 +1560,6 @@ Actor* Map::GetActor(const Point &p, int flags)
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
-		if (!actor->Schedule(gametime, true) ) {
-			continue;
-		}
 		return actor;
 	}
 	return NULL;
@@ -1575,7 +1567,6 @@ Actor* Map::GetActor(const Point &p, int flags)
 
 Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 {
-	ieDword gametime = core->GetGame()->GameTime;
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
@@ -1583,9 +1574,6 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags) ) {
-			continue;
-		}
-		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		return actor;
@@ -1597,19 +1585,13 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see)
 {
 	ieDword count = 1;
-	size_t i;
-
-	ieDword gametime = core->GetGame()->GameTime;
-	i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags, see) ) {
-			continue;
-		}
-		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (!(flags&GA_NO_LOS)) {
@@ -1630,9 +1612,6 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags) ) {
-			continue;
-		}
-		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (!(flags&GA_NO_LOS)) {

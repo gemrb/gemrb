@@ -3466,16 +3466,11 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 		except = (Actor *) Sender;
 	}
 	Map *map = Sender->GetCurrentArea();
-	ieDword gametime = core->GetGame()->GameTime;
 	int i = map->GetActorCount(true);
 	while(i--) {
 		Actor* act = map->GetActor(i,true);
 		if (act && act!=except) {
 			if (!act->ValidTarget(GA_NO_DEAD) ) {
-				continue;
-			}
-			//Do we need this???
-			if (!act->Schedule(gametime, false) ) {
 				continue;
 			}
 			act->ClearActions();

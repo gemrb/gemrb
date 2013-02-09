@@ -5205,6 +5205,13 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 {
 	//scripts can still see this type of actor
 
+	//assuming that unscheduled actors can never be valid targets
+	Game *game = core->GetGame();
+	if (game) {
+		ieDword gametime = game->GameTime;
+		if (!Schedule(gametime, true)) return false;
+	}
+
 	if (ga_flags&GA_NO_HIDDEN) {
 		if (IsInvisibleTo(checker)) return false;
 	}
@@ -6878,7 +6885,7 @@ int Actor::CalculateExperience(int type, int level)
 	return xpbonus[type*xpbonuslevels+l];
 }
 
-bool Actor::Schedule(ieDword gametime, bool checkhide)
+bool Actor::Schedule(ieDword gametime, bool checkhide) const
 {
 	if (checkhide) {
 		if (!(InternalFlags&IF_VISIBLE) ) {
