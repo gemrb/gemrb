@@ -2196,6 +2196,7 @@ void Map::RemoveActor(Actor* actor)
 }
 
 //returns true if none of the partymembers are on the map
+//and noone is trying to follow the party out
 bool Map::CanFree()
 {
 	size_t i=actors.size();
@@ -2204,7 +2205,7 @@ bool Map::CanFree()
 			return false;
 		}
 
-		if (actors[i]->GetInternalFlag()&(IF_ACTIVE|IF_USEEXIT) ) {
+		if (actors[i]->GetInternalFlag()&IF_USEEXIT) {
 			return false;
 		}
 	}

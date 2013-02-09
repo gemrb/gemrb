@@ -780,6 +780,17 @@ int Game::DelMap(unsigned int index, int forced)
 		{
 			return 1;
 		}
+		//if there are still selected actors on the map (e.g. summons)
+		//unselect them now before they get axed
+		std::vector< Actor*>::iterator m;
+		for (m = selected.begin(); m != selected.end();) {
+			if (!(*m)->InParty && !stricmp(Maps[index]->GetScriptName(), (*m)->Area)) {
+				m = selected.erase(m);
+			} else {
+				++m;
+			}
+		}
+
 		//remove map from memory
 		core->SwapoutArea(Maps[index]);
 		delete( Maps[index] );
