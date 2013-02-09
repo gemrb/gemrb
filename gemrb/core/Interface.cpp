@@ -5396,6 +5396,14 @@ Effect *Interface::GetEffect(const ieResRef resname, int level, const Point &p)
 // dealing with saved games
 int Interface::SwapoutArea(Map *map)
 {
+	//refuse to save ambush areas, for example
+	if (map->AreaFlags & AF_SAVE) {
+		Log(DEBUG, "Core", "Not saving area %s",
+			map->GetScriptName());
+		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
+		return 0;
+	}
+
 	PluginHolder<MapMgr> mm(IE_ARE_CLASS_ID);
 	if (mm == NULL) {
 		return -1;
