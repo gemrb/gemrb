@@ -252,7 +252,8 @@ ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 
 # On Release builds cmake automatically defines NDEBUG, so we
 # explicitly undefine it:
-if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT MSVC)
+# This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
+if(CMAKE_BUILD_TYPE MATCHES "Rel.*" AND NOT MSVC)
 	ADD_DEFINITIONS("-UNDEBUG")
 endif()
 
