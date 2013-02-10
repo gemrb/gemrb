@@ -128,10 +128,6 @@ public: //struct members
 	ieStrRef AreaName;
 	ieDword unknown1;
 	ieDword unknown2;
-	ieDword AreaEntriesCount;
-	ieDword AreaEntriesOffset;
-	ieDword AreaLinksOffset;
-	ieDword AreaLinksCount;
 	ieResRef MapIconResRef;
 
 	AnimationFactory *bam;

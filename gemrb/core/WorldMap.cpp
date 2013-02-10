@@ -197,8 +197,6 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLin
 			}
 		}
 	}
-	//update the link count, just in case
-	AreaLinksCount++;
 }
 
 void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
@@ -382,7 +380,8 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 //returns the index of the area owning this link
 unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 {
-	for (unsigned int i=0;i<AreaEntriesCount;i++) {
+	unsigned int cnt = GetEntryCount();
+	for (unsigned int i = 0; i < cnt; i++) {
 		WMPAreaEntry *ae=area_entries[i];
 		for (int direction=0;direction<4;direction++)
 		{

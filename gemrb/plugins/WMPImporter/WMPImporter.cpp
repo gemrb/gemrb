@@ -107,6 +107,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index)
 {
 	unsigned int i;
 	unsigned int WorldMapsOffset;
+	ieDword AreaEntriesCount, AreaEntriesOffset, AreaLinksCount, AreaLinksOffset;
 
 	if (index && str==str2) {
 		WorldMapsOffset=WorldMapsOffset2;
@@ -123,10 +124,10 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index)
 	str->ReadDword( &m->AreaName );
 	str->ReadDword( &m->unknown1 );
 	str->ReadDword( &m->unknown2 );
-	str->ReadDword( &m->AreaEntriesCount );
-	str->ReadDword( &m->AreaEntriesOffset );
-	str->ReadDword( &m->AreaLinksOffset );
-	str->ReadDword( &m->AreaLinksCount );
+	str->ReadDword( &AreaEntriesCount );
+	str->ReadDword( &AreaEntriesOffset );
+	str->ReadDword( &AreaLinksOffset );
+	str->ReadDword( &AreaLinksCount );
 	str->ReadResRef( m->MapIconResRef );
 
 	// Load map bitmap
@@ -147,18 +148,18 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index)
 			m->SetMapIcons( af );
 	}
 
-	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
+	str->Seek( AreaEntriesOffset, GEM_STREAM_START );
 
 
 	WMPAreaLink al;
-	for (i = 0; i < m->AreaEntriesCount; i++) {
+	for (i = 0; i < AreaEntriesCount; i++) {
 		//this weird stuff is requires so we don't create
 		//data here, all data is created in the core
 		m->SetAreaEntry(i,GetAreaEntry(str, m->GetNewAreaEntry()));
 	}
 
-	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
-	for (i = 0; i < m->AreaLinksCount; i++) {
+	str->Seek( AreaLinksOffset, GEM_STREAM_START );
+	for (i = 0; i < AreaLinksCount; i++) {
 		m->SetAreaLink(i,GetAreaLink(str, &al));
 	}
 
@@ -233,12 +234,8 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 		headersize += 184;
 		WorldMap *map = wmap->GetWorldMap(i);
 
-		//Update the links and entries counts now, in case the worldmap has changed
-		map->AreaEntriesCount = map->GetEntryCount();
-		headersize += map->AreaEntriesCount * 240;
-
-		map->AreaLinksCount = map->GetLinkCount();
-		headersize += map->AreaLinksCount * 216;
+		headersize += map->GetEntryCount() * 240;
+		headersize += map->GetLinkCount() * 216;
 
 		//put the first array into the first map
 		//the rest into the second map if not single
@@ -281,7 +278,8 @@ int WMPImporter::PutLinks(DataStream *stream, WorldMap *wmap)
 	char filling[128];
 
 	memset (filling,0,sizeof(filling));
-	for(unsigned i=0;i<wmap->AreaLinksCount;i++) {
+	unsigned int cnt = wmap->GetLinkCount();
+	for (unsigned i = 0; i < cnt; i++) {
 		WMPAreaLink *al = wmap->GetLink(i);
 
 		stream->WriteDword( &al->AreaIndex );
@@ -301,9 +299,10 @@ int WMPImporter::PutAreas(DataStream *stream, WorldMap *wmap)
 {
 	char filling[128];
 	ieDword tmpDword;
+	unsigned int cnt = wmap->GetEntryCount();
 
 	memset (filling,0,sizeof(filling));
-	for(unsigned i=0;i<wmap->AreaEntriesCount;i++) {
+	for(unsigned i=0;i<cnt;i++) {
 		WMPAreaEntry *ae = wmap->GetEntry(i);
 
 		stream->WriteResRef( ae->AreaName );

@@ -2730,7 +2730,6 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 
 		int thisarea = wmap->GetEntryCount();
 		wmap->AddAreaEntry(entry);
-		wmap->AreaEntriesCount++;
 		for (unsigned int j=0;j<total;j++) {
 			WMPAreaLink *link = new WMPAreaLink();
 			const char *larea = newlinks->QueryField(j,0);
