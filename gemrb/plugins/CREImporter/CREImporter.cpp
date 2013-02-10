@@ -327,7 +327,14 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		// translate the actual kit to a column index to make them comparable
 		// luckily they are in order
 		kit = log2(kit/0x8000); // 0x8000 is the first cleric kit
-		return domlist[index].FindSpell(level, kit);
+		ret = domlist[index].FindSpell(level, kit);
+		if (ret) {
+			return ret;
+		}
+		// sigh, retry with wizard spells, since the table does not cover everything npcs have
+		kit = -1;
+		type = IE_IWD2_SPELL_WIZARD;
+		break;
 	case IE_IWD2_SPELL_WIZARD:
 		if (index>=splcount) {
 			break;
