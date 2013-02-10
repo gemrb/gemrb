@@ -2891,34 +2891,41 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	}
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
 	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
-	//evaluate the area the user will fall on in a random encounter
-	if (encounter && eval) {
 
-		if(wal->EncounterChance>=100) {
-			wal->EncounterChance-=100;
-		}
+	if (eval) {
+		wm->ClearEncounterArea();
 
-		//bounty encounter
-		ieResRef tmpresref;
+		//evaluate the area the user will fall on in a random encounter
+		if (encounter) {
 
-		memcpy(tmpresref, wmc->Area->AreaName, sizeof(ieResRef) );
-		if (core->GetGame()->RandomEncounter(tmpresref)) {
-			displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-			PyDict_SetItemString(dict, "Destination", PyString_FromString (tmpresref) );
-			PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
-		} else {
-			//regular random encounter, find a valid encounter area
-			int i=rand()%5;
+			if(wal->EncounterChance>=100) {
+				wal->EncounterChance-=100;
+			}
 
-			for(int j=0;j<5;j++) {
-				const char *area = wal->EncounterAreaResRef[(i+j)%5];
+			//bounty encounter
+			ieResRef tmpresref;
 
-				if (area[0]) {
-					displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-					PyDict_SetItemString(dict, "Destination", PyString_FromString (area) );
-					PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
-					// do we need to change Direction here?
-					break;
+			CopyResRef(tmpresref, wmc->Area->AreaName);
+			if (core->GetGame()->RandomEncounter(tmpresref)) {
+				displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
+				PyDict_SetItemString(dict, "Destination", PyString_FromString (tmpresref) );
+				PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+				wm->SetEncounterArea(tmpresref, wal);
+			} else {
+				//regular random encounter, find a valid encounter area
+				int i=rand()%5;
+
+				for(int j=0;j<5;j++) {
+					const char *area = wal->EncounterAreaResRef[(i+j)%5];
+
+					if (area[0]) {
+						displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
+						PyDict_SetItemString(dict, "Destination", PyString_FromString (area) );
+						PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+						// do we need to change Direction here?
+						wm->SetEncounterArea(area, wal);
+						break;
+					}
 				}
 			}
 		}

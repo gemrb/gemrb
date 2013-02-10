@@ -137,6 +137,7 @@ private: //non-struct members
 	std::vector< WMPAreaLink*> area_links;
 	int *Distances;
 	int *GotHereFrom;
+	int encounterArea;
 public:
 	void SetMapIcons(AnimationFactory *bam);
 	Sprite2D* GetMapMOS() const { return MapMOS; }
@@ -167,6 +168,8 @@ public:
 	WMPAreaEntry* GetArea(const ieResRef AreaName, unsigned int &i) const;
 	/** Finds an area name closest to the given area */
 	WMPAreaEntry* FindNearestEntry(const ieResRef AreaName, unsigned int &i) const;
+	void SetEncounterArea(const ieResRef area, WMPAreaLink *link);
+	void ClearEncounterArea();
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */
 	void UpdateAreaVisibility(const ieResRef AreaName, int direction);

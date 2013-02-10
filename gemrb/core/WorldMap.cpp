@@ -89,7 +89,7 @@ void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
 
 Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 {
-	if (!bam) {
+	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;
 	}
 	if (!MapIcon) {
@@ -137,6 +137,7 @@ WorldMap::WorldMap(void)
 	Distances = NULL;
 	GotHereFrom = NULL;
 	bam = NULL;
+	encounterArea = -1;
 }
 
 //Allocate AE and AL only in Core, otherwise Win32 will
@@ -463,6 +464,100 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	}
 	while(p!=walkpath.end() );
 	return lastpath;
+}
+
+//adds a temporary AreaEntry to the world map
+//this entry has two links for each direction, leading to the two areas
+//we were travelling between when using the supplied link
+void WorldMap::SetEncounterArea(const ieResRef area, WMPAreaLink *link) {
+	unsigned int i;
+	if (GetArea(area, i)) {
+		return;
+	}
+
+	//determine the area the link came from
+	unsigned int j, cnt = GetLinkCount();
+	for (j = 0; j < cnt; ++j) {
+		if (link == area_links[j]) {
+			break;
+		}
+	}
+
+	i = WhoseLinkAmI(j);
+	if (i == (unsigned int) -1) {
+		Log(ERROR, "WorldMap", "Could not add encounter area");
+		return;
+	}
+
+	WMPAreaEntry *ae = GetNewAreaEntry();
+	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, BM_SET);
+	CopyResRef(ae->AreaName, area);
+	CopyResRef(ae->AreaResRef, area);
+	ae->LocCaptionName = -1;
+	ae->LocTooltipName = -1;
+	ae->IconSeq = -1;
+	CopyResRef(ae->LoadScreenResRef, "");
+
+	WMPAreaEntry *src = area_entries[i];
+	WMPAreaEntry *dest = area_entries[link->AreaIndex];
+	ae->X = src->X + (int) (dest->X - src->X) / 2;
+	ae->Y = src->Y + (int) (dest->Y - src->Y) / 2;
+
+	//setup the area links
+	WMPAreaLink *ldest = new WMPAreaLink();
+	memcpy(ldest, link, sizeof(WMPAreaLink));
+	ldest->DistanceScale = 0;
+	ldest->EncounterChance = 0;
+
+	link = GetLink(dest->AreaName, src->AreaName);
+	if (!link) {
+		Log(ERROR, "WorldMap", "Could not find link from %s to %s",
+			dest->AreaName, src->AreaName);
+		delete ae;
+		delete ldest;
+		return;
+	}
+
+	WMPAreaLink *lsrc = new WMPAreaLink();
+	memcpy(lsrc, link, sizeof(WMPAreaLink));
+	lsrc->DistanceScale = 0;
+	lsrc->EncounterChance = 0;
+
+	unsigned int idx = area_links.size();
+	AddAreaLink(ldest);
+	AddAreaLink(lsrc);
+
+	for (i = 0; i < 4; ++i) {
+		ae->AreaLinksCount[i] = 2;
+		ae->AreaLinksIndex[i] = idx;
+	}
+	
+	encounterArea = area_entries.size();
+	AddAreaEntry(ae);
+}
+
+void WorldMap::ClearEncounterArea()
+{
+	if (encounterArea == -1) {
+		return;
+	}
+
+	WMPAreaEntry *ea = area_entries[encounterArea];
+	area_entries.erase(area_entries.begin() + encounterArea);
+
+	WMPAreaLink *l = area_links[ea->AreaLinksIndex[0]];
+	delete l;
+	l = area_links[ea->AreaLinksIndex[0] + 1];
+	delete l;
+
+	//NOTE: if anything else added links after us we'd have to globally
+	//update all link indices, but since ambush areas do not allow
+	//saving/loading we should be okay with this
+	area_links.erase(area_links.begin() + ea->AreaLinksIndex[0],
+		area_links.begin() + ea->AreaLinksIndex[0] + ea->AreaLinksCount[0]);
+
+	delete ea;
+	encounterArea = -1;
 }
 
 int WorldMap::GetDistance(const ieResRef AreaName) const
