@@ -346,9 +346,7 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 			core->GetGame()->SetHotKey(toupper(Key));
 		}
 		//this is to refresh changing mouse cursors should the focus change)
-		int x,y;
-		core->GetVideoDriver()->GetMousePos(x,y);
-		MouseMove((unsigned short) x, (unsigned short) y);
+		FakeMouseMove();
 	}
 }
 
@@ -435,14 +433,21 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 	}
 }
 
+/** Trigger a fake MouseMove event with current coordinates (typically used to
+ *  refresh the cursor without actual user input) */
+void EventMgr::FakeMouseMove()
+{
+	int x, y;
+	core->GetVideoDriver()->GetMousePos(x, y);
+	MouseMove((unsigned short) x, (unsigned short) y);
+}
+
 void EventMgr::SetFocused(Window *win, Control *ctrl)
 {
 	last_win_focused = win;
 	last_win_focused->SetFocused(ctrl);
 	//this is to refresh changing mouse cursors should the focus change)
-	int x,y;
-	core->GetVideoDriver()->GetMousePos(x,y);
-	MouseMove((unsigned short) x, (unsigned short) y);
+	FakeMouseMove();
 }
 
 void EventMgr::SetDCDelay(unsigned long t)

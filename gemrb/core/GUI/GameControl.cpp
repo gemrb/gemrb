@@ -2107,11 +2107,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			return;
 		}
 		FormationRotation = false;
-		int x,y;
-		//This hack is to refresh the mouse cursor
-		core->GetVideoDriver()->GetMousePos(x,y);
-		//calling into the videodriver to set the mouseposition won't work
-		core->GetEventMgr()->MouseMove(x,y);
+		//refresh the mouse cursor
+		core->GetEventMgr()->FakeMouseMove();
 	}
 
 	if (Button > GEM_MB_MENU) return;
@@ -2270,7 +2267,9 @@ void GameControl::OnMouseWheelScroll(short x, short y)
 		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
 		// move it directly ourselves, since we might be paused
 		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
-	}	
+	}
+	//update cursor
+	core->GetEventMgr()->FakeMouseMove();
 }
 
 void GameControl::PerformActionOn(Actor *actor)
@@ -2383,13 +2382,9 @@ void GameControl::PerformActionOn(Actor *actor)
 
 //sets target mode, and resets the cursor
 void GameControl::SetTargetMode(int mode) {
-	int x,y;
-
 	target_mode = mode;
-	//This hack is to refresh the mouse cursor
-	core->GetVideoDriver()->GetMousePos(x,y);
-	//calling into the videodriver to set the mouseposition won't work
-	core->GetEventMgr()->MouseMove(x,y);
+	//refresh the mouse cursor
+	core->GetEventMgr()->FakeMouseMove();
 }
 
 void GameControl::ResetTargetMode() {
