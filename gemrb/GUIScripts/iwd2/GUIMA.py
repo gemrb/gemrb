@@ -301,7 +301,7 @@ def MoveToNewArea ():
 	tmp = WorldMapControl.GetDestinationArea (1)
 	CloseWorldMapWindow ()
 
-	if tmp["CurrentArea"] == 1:
+	if tmp["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return
 	elif tmp["Distance"] == -1:
 		print "Invalid target", tmp

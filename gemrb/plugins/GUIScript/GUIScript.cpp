@@ -2881,10 +2881,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 
 	if (!strnicmp(wmc->Area->AreaName, core->GetGame()->CurrentArea, 8)) {
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
-		PyDict_SetItemString(dict, "CurrentArea", PyInt_FromLong (1) );
 		return dict;
-	} else {
-		PyDict_SetItemString(dict, "CurrentArea", PyInt_FromLong (0) );
 	}
 
 	bool encounter;
