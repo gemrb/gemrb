@@ -2907,7 +2907,7 @@ int Map::WhichEdge(const Point &s)
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
 	if (!(GetBlocked( sX, sY )&PATH_MAP_TRAVEL)) {
-		Log(WARNING, "Map", "This isn't a travel region [%d.%d]?",
+		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
 			sX, sY);
 		return -1;
 	}

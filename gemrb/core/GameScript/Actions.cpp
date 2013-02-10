@@ -2185,14 +2185,40 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	if (!game->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, true) ) {
+	if (!game->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 		//we abort the command, everyone should be here
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
 	//travel direction passed to guiscript
 	int direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
 	Log(MESSAGE, "Actions", "Travel direction returned: %d", direction);
+	//this is notoriously flaky
+	//if it doesn't work for the sender try other party members, too
+	if (direction == -1) {
+		int i, best, directions[4] = { -1, -1, -1, -1 };
+		for (i = 0; i < game->GetPartySize(false); i++) {
+			actor = game->GetPC(i, false);
+			if (actor != Sender) {
+				int partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
+				if (partydir != -1) {
+					directions[partydir]++;
+				}
+			}
+		}
+		best = 0;
+		for (i = 1; i < 4; ++i) {
+			if (directions[i] > directions[best]) {
+				best = i;
+			}
+		}
+		if (directions[best] != -1) {
+			direction = best;
+		}
+		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
+	}
+
 	if (direction==-1) {
 		Sender->ReleaseCurrentAction();
 		return;
