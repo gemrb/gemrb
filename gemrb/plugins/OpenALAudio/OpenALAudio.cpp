@@ -807,6 +807,9 @@ int OpenALAudioDriver::MusicManager(void* arg)
 				case AL_INITIAL:
 					 {
 						Log(MESSAGE, "OPENAL", "Music in INITIAL State. AutoStarting");
+						// ensure that MusicSource has no buffers attached by passing "NULL" buffer
+						alSourcei(driver->MusicSource, AL_BUFFER, 0);
+						checkALError("Unable to detach buffers from music source.", WARNING);
 						for (int i = 0; i < MUSICBUFFERS; i++) {
 							driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
 							alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
