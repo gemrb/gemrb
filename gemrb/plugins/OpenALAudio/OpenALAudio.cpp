@@ -175,6 +175,9 @@ void OpenALAudioDriver::PrintDeviceList ()
 
 bool OpenALAudioDriver::Init(void)
 {
+	Log(MESSAGE, "OpenAL", "Initializing OpenAL driver:\nAL Version:%s\nAL Renderer:%s\nAL Vendor:%s",
+		alGetString(AL_VERSION), alGetString(AL_RENDERER), alGetString(AL_VENDOR));
+
 	ALCdevice *device;
 	ALCcontext *context;
 
