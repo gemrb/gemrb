@@ -2251,7 +2251,7 @@ int fx_animation_id_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 0: //non permanent animation change
 	default:
-		STAT_SET( IE_ANIMATION_ID, fx->Parameter1 );
+		STAT_SET_PCF( IE_ANIMATION_ID, fx->Parameter1 );
 		return FX_APPLIED;
 	case 1: //remove any non permanent change
 		target->fxqueue.RemoveAllEffects(fx_animation_id_modifier_ref);
