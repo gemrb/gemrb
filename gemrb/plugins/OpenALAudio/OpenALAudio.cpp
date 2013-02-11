@@ -924,6 +924,12 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 
 int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint* buffer)
 {
+	ALint type;
+	alGetSourcei(source, AL_SOURCE_TYPE, &type);
+	if (type == AL_STATIC || checkALError("Cannot get AL source type.", ERROR)) {
+		Log(ERROR, "OpenAL", "Cannot queue a buffer to a static source.");
+		return GEM_ERROR;
+	}
 	alSourceQueueBuffers(source, 1, buffer);
 	if (checkALError("Unable to queue buffer", ERROR)) {
 		return GEM_ERROR;
