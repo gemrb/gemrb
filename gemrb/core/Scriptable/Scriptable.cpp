@@ -2210,9 +2210,9 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	//p.x+=x;
 	//p.y+=(int) sqrt(100-x*x);
 
-	//selecting points in a square around actor
-	p.x+=core->Roll(1,50,-25);
-	p.y+=core->Roll(1,50,-25);
+	//selecting points in a square around actor (-24 to +24)
+	p.x+=core->Roll(1,49,-25);
+	p.y+=core->Roll(1,49,-25);
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
 	path = area->RunAway( Pos, p, size, 50, 1 );
