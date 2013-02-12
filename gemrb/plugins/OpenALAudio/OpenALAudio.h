@@ -126,7 +126,7 @@ public:
 				int channels, short* memory,
 				int size, int samplerate);
 private:
-	int QueueALBuffer(ALuint source, ALuint* buffer);
+	int QueueALBuffer(ALuint source, ALuint buffer);
 
 private:
 	ALCcontext *alutContext;

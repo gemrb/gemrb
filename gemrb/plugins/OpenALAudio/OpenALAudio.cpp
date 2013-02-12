@@ -444,7 +444,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	stream->Source = Source;
 	stream->free = false;
 
-	if (QueueALBuffer(Source, &Buffer) != GEM_OK) {
+	if (QueueALBuffer(Source, Buffer) != GEM_OK) {
 		return Holder<SoundHandle>();
 	}
 
@@ -699,7 +699,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 
 	assert(!streams[stream].delete_buffers);
 
-	if (QueueALBuffer(source, &Buffer) != GEM_OK) {
+	if (QueueALBuffer(source, Buffer) != GEM_OK) {
 		return GEM_ERROR;
 	}
 
@@ -921,14 +921,14 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 	streams[stream].delete_buffers = true;
 	streams[stream].ClearProcessedBuffers();
 
-	QueueALBuffer(streams[stream].Source, &Buffer);
+	QueueALBuffer(streams[stream].Source, Buffer);
 }
 
 // !!!!!!!!!!!!!!!
 // Private Methods
 // !!!!!!!!!!!!!!!
 
-int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint* buffer)
+int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 {
 	ALint type;
 	alGetSourcei(source, AL_SOURCE_TYPE, &type);
@@ -936,7 +936,7 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint* buffer)
 		Log(ERROR, "OpenAL", "Cannot queue a buffer to a static source.");
 		return GEM_ERROR;
 	}
-	alSourceQueueBuffers(source, 1, buffer);
+	alSourceQueueBuffers(source, 1, &buffer);
 	if (checkALError("Unable to queue buffer", ERROR)) {
 		return GEM_ERROR;
 	}
