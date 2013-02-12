@@ -159,7 +159,7 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 	}
 
 	if (l == 0)
-		while (*src++);
+		while (*src++) ;
 	return src - s - 1; /* length of source, excluding NULL */
 }
 #endif
