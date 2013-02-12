@@ -930,6 +930,15 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 
 int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 {
+#ifdef _DEBUG
+	ALint frequency, bits, channels;
+	alGetBufferi(buffer, AL_FREQUENCY, &frequency);
+	alGetBufferi(buffer, AL_BITS, &bits);
+	alGetBufferi(buffer, AL_CHANNELS, &channels);
+	checkALError("Error querying buffer properties.", WARNING);
+	Log(DEBUG, "OpenAL", "Attempting to buffer audio source:%d\nFrequency:%d\nBits:%d\nChannels:%d",
+		source, frequency, bits, channels);
+#endif
 	ALint type;
 	alGetSourcei(source, AL_SOURCE_TYPE, &type);
 	if (type == AL_STATIC || checkALError("Cannot get AL source type.", ERROR)) {
