@@ -193,7 +193,7 @@ void MUSImporter::Start()
 		} else {
 			PLnext = PLpos + 1;
 			if ((unsigned int) PLnext >= playlist.size())
-				PLnext = -1;
+				PLnext = 0;
 		}
 		PlayMusic( PLpos );
 		core->GetAudioDrv()->Play();
