@@ -218,6 +218,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		if (stream >= 0) {
 			// release the stream without immediately stopping it
 			core->GetAudioDrv()->ReleaseStream(stream, false);
+			stream = -1;
 		}
 		return UINT_MAX;
 	}
@@ -239,6 +240,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		if (delay > 500) {
 			// release stream if we're inactive for a while
 			core->GetAudioDrv()->ReleaseStream(stream);
+			stream = -1;
 		}
 		return delay;
 	}
