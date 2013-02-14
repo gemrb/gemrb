@@ -4893,8 +4893,8 @@ bool Actor::CheckOnDeath()
 	// .. but this can't go in Die() because that is called
 	// from effects and dropping items might change effects!
 
-	// disintegration destroys normal items if difficulty level is high enough (STATE_INFRA is just a conduct)
-	if ((BaseStats[IE_STATE_ID]&STATE_INFRA) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
+	// disintegration destroys normal items if difficulty level is high enough (the stat hack is just for differentiation)
+	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
 		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 	}
 	DropItem("",0);

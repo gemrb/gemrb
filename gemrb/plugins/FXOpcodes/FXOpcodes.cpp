@@ -1356,7 +1356,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter3) {
 		// disintegration marked this, so it can be discerned from other magic damage
 		// hack: reuse a state bit to convey this info to Actor::CheckOnDeath
-		target->SetBaseBit(IE_STATE_ID, STATE_INFRA, true);
+		target->SetBaseNoPCF(IE_SPELLDURATIONMODPRIEST, 1);
 	}
 
 	if (damagetype!=DAMAGE_COLD) {
