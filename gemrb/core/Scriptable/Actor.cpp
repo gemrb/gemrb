@@ -4692,9 +4692,7 @@ void Actor::Die(Scriptable *killer)
 		}
 	}
 
-	//moved clear actions after xp is given
-	//it clears some triggers, including the LastHitter
-	ClearActions();
+	ReleaseCurrentAction();
 	ClearPath();
 	SetModal( MS_NONE );
 
