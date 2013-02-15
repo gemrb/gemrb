@@ -3156,6 +3156,7 @@ void Actor::UpdateFatigue()
 	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / 18000; // 18000 == 4 hours
 	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
 	FatigueLevel = (signed)FatigueLevel - FatigueBonus >= 0 ? FatigueLevel - FatigueBonus : 0;
+	FatigueLevel = ClampStat(IE_FATIGUE, FatigueLevel);
 
 	// don't run on init or we automatically make the character supertired
 	if (FatigueLevel != BaseStats[IE_FATIGUE] && TicksLastRested) {
