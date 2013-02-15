@@ -442,6 +442,8 @@ public:
 	bool GetSavingThrow(ieDword type, int modifier);
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
+	/** Clamps a stat value to the valid range for the respective stat */
+	ieDword ClampStat(unsigned int StatIndex, ieDword Value) const;
 	/** Returns a Stat value */
 	ieDword GetStat(unsigned int StatIndex) const;
 	/** Returns a safe Stat value, one, that is not partially computed */

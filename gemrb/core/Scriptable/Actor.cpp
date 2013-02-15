@@ -2566,21 +2566,28 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 	}
 }
 
+ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
+{
+	if (StatIndex < MAX_STATS) {
+		if ((signed) Value < -100) {
+			Value = (ieDword) -100;
+		} else {
+			if (maximum_values[StatIndex] > 0) {
+				if ( (signed) Value > maximum_values[StatIndex]) {
+					Value = (ieDword) maximum_values[StatIndex];
+				}
+			}
+		}
+	}
+	return Value;
+}
+
 bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
 	}
-	if ( (signed) Value<-100) {
-		Value = (ieDword) -100;
-	}
-	else {
-		if ( maximum_values[StatIndex]>0) {
-			if ( (signed) Value>maximum_values[StatIndex]) {
-				Value = (ieDword) maximum_values[StatIndex];
-			}
-		}
-	}
+	Value = ClampStat(StatIndex, Value);
 
 	unsigned int previous = GetSafeStat(StatIndex);
 	if (Modified[StatIndex]!=Value) {
@@ -2621,12 +2628,7 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
 
 	//maximize the base stat
-	if ( maximum_values[StatIndex]) {
-		if ( (signed) Value>maximum_values[StatIndex]) {
-			Value = (ieDword) maximum_values[StatIndex];
-		}
-	}
-
+	Value = ClampStat(StatIndex, Value);
 	BaseStats[StatIndex] = Value;
 
 	//if already initialized, then the modified stats
@@ -2643,12 +2645,7 @@ bool Actor::SetBaseNoPCF(unsigned int StatIndex, ieDword Value)
 	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
 
 	//maximize the base stat
-	if ( maximum_values[StatIndex]) {
-		if ( (signed) Value>maximum_values[StatIndex]) {
-			Value = (ieDword) maximum_values[StatIndex];
-		}
-	}
-
+	Value = ClampStat(StatIndex, Value);
 	BaseStats[StatIndex] = Value;
 
 	//if already initialized, then the modified stats
