@@ -56,6 +56,8 @@ public:
 	void SetText(const char* string);
 	/** Sets the Foreground Font Color */
 	void SetColor(Color col, Color bac);
+	/** Set the font being used */
+	void SetFont(Font *font) { this->font = font; }
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char Alignment);
 	/** Simply returns the pointer to the text, don't modify it! */

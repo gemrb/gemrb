@@ -3174,6 +3174,31 @@ static PyObject* GemRB_Control_SetSize(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Label_SetFont__doc,
+"SetLabelFont(WindowIndex, ControlIndex, FontResRef)\n\n"
+"Sets font used for drawing the label." );
+
+static PyObject* GemRB_Label_SetFont(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	char *FontResRef;
+
+	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
+			&FontResRef)) {
+		return AttributeError( GemRB_Label_SetFont__doc );
+	}
+
+	Label *lbl = (Label *) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
+	if (!lbl) {
+		return NULL;
+	}
+
+	lbl->SetFont( core->GetFont( FontResRef ));
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Label_SetUseRGB__doc,
 "SetLabelUseRGB(WindowIndex, ControlIndex, status)\n\n"
 "Tells a Label to use the RGB colors with the text." );
@@ -10780,6 +10805,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetTooltip, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
+	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
 	METHOD(SaveGame_GetDate, METH_VARARGS),
