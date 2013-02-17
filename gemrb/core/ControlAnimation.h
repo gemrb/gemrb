@@ -45,7 +45,7 @@ private:
 public:
 	ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle = 0);
 	~ControlAnimation(void);
-	void UpdateAnimation();
+	void UpdateAnimation(bool paused);
 	//report if the current resource is the same as descripted by the params
 	bool SameResource(const ieResRef ResRef, int Cycle);
 	void SetPaletteGradients(ieDword *col);

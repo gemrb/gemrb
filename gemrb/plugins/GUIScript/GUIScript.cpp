@@ -3854,7 +3854,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	if (Blend) {
 		anim->SetBlend(true);
 	}
-	anim->UpdateAnimation();
+	anim->UpdateAnimation(false);
 
 	Py_INCREF( Py_None );
 	return Py_None;

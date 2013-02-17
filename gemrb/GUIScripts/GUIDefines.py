@@ -45,12 +45,13 @@ IE_GUI_BUTTON_DRAGGABLE    = 0x00008000
 IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
 IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
 IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
+IE_GUI_BUTTON_PLAYALWAYS = 0x00080000   # animation will play when game is paused
 
-IE_GUI_BUTTON_CENTER_PICTURES = 0x00080000 # center the button's PictureList
-IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00100000 # BG1-style paperdoll
-IE_GUI_BUTTON_HORIZONTAL      = 0x00200000 # horizontal clipping of overlay
-IE_GUI_BUTTON_CANCEL          = 0x00400000 # escape key triggers it
-IE_GUI_BUTTON_CAPS            = 0x00800000 # capitalize all the text (default for bg2)
+IE_GUI_BUTTON_CENTER_PICTURES = 0x00100000 # center the button's PictureList
+IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00200000 # BG1-style paperdoll
+IE_GUI_BUTTON_HORIZONTAL      = 0x00400000 # horizontal clipping of overlay
+IE_GUI_BUTTON_CANCEL          = 0x00800000 # escape key triggers it
+IE_GUI_BUTTON_CAPS            = 0x01000000 # capitalize all the text (default for bg2)
 
 #scrollbar flags
 IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   # mousewheel triggers it (same value as default button)

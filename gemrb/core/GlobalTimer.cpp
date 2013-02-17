@@ -61,6 +61,8 @@ void GlobalTimer::Freeze()
 	unsigned long thisTime;
 	unsigned long advance;
 
+	UpdateAnimations(true);
+
 	thisTime = GetTickCount();
 	advance = thisTime - startTime;
 	if ( advance < interval) {
@@ -159,7 +161,7 @@ bool GlobalTimer::Update()
 	if (gc)
 		gc->UpdateScrolling();
 
-	UpdateAnimations();
+	UpdateAnimations(false);
 
 	thisTime = GetTickCount();
 
@@ -312,7 +314,7 @@ void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 	}
 }
 
-void GlobalTimer::UpdateAnimations()
+void GlobalTimer::UpdateAnimations(bool paused)
 {
 	unsigned long thisTime;
 	thisTime = GetTickCount();
@@ -324,7 +326,7 @@ void GlobalTimer::UpdateAnimations()
 		}
 
 		if (anim->time <= thisTime) {
-			anim->ctlanim->UpdateAnimation();
+			anim->ctlanim->UpdateAnimation(paused);
 			first_animation++;
 			continue;
 		}

@@ -56,6 +56,7 @@ private:
 	Region currentVP;
 
 	void DoFadeStep(ieDword count);
+	void UpdateAnimations(bool paused);
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
@@ -73,7 +74,6 @@ public:
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
 	void ClearAnimations();
-	void UpdateAnimations();
 };
 
 }

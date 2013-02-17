@@ -75,12 +75,13 @@ class Palette;
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
+#define IE_GUI_BUTTON_PLAYALWAYS   0x00080000   // play even when game is paused
 
-#define IE_GUI_BUTTON_CENTER_PICTURES 0x00080000 // center button's PictureList
-#define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00100000 // BG1-style paperdoll PictureList
-#define IE_GUI_BUTTON_HORIZONTAL      0x00200000 // horizontal clipping of overlay
-#define IE_GUI_BUTTON_CANCEL          0x00400000 // cancel key triggers it
-#define IE_GUI_BUTTON_CAPS            0x00800000 // convert text to uppercase
+#define IE_GUI_BUTTON_CENTER_PICTURES 0x00100000 // center button's PictureList
+#define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00200000 // BG1-style paperdoll PictureList
+#define IE_GUI_BUTTON_HORIZONTAL      0x00400000 // horizontal clipping of overlay
+#define IE_GUI_BUTTON_CANCEL          0x00800000 // cancel key triggers it
+#define IE_GUI_BUTTON_CAPS            0x01000000 // convert text to uppercase
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick

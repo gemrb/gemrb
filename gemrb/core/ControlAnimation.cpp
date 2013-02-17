@@ -74,10 +74,16 @@ bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 	return true;
 }
 
-void ControlAnimation::UpdateAnimation(void)
+void ControlAnimation::UpdateAnimation(bool paused)
 {
 	unsigned long time;
 	int Cycle = cycle;
+
+	if (paused && !(control->Flags & IE_GUI_BUTTON_PLAYALWAYS)) {
+		// try again later
+		core->timer->AddAnimation( this, 1 );
+		return;
+	}
 
 	if (control->Flags & IE_GUI_BUTTON_PLAYRANDOM) {
 		// simple Finite-State Machine
