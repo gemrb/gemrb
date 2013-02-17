@@ -239,18 +239,15 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Label.SetAnimation ("CPEN")
 
 		Button.SetAnimation ("CGEAR")
-		if bg2:
-			Button.SetBAM ("CDIAL", 0, 0)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-		GUICommon.SetGamedaysAndHourToken()
-		Button.SetTooltip(GemRB.GetString (16041))
 		if iwd2:
 			Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
 			rb = OptionControl['Rest']
 		else:
 			rb = 11
+		UpdateClock ()
 	else:
 		rb = OptionControl['Rest']
 
@@ -440,12 +437,9 @@ def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
 	# FIXME: display all animations
 	Label.SetAnimation ("CPEN")
 	Button.SetAnimation ("CGEAR")
-	Button.SetBAM ("CDIAL", 0, 0)
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-	GUICommon.SetGamedaysAndHourToken()
-	Button.SetTooltip(GemRB.GetString (16041))
 	UpdateActionsWindow ()
 	return
 
@@ -604,16 +598,11 @@ def SetupSkillSelection ():
 
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
-
-	if GUICommon.GameIsPST():
-		UpdateClock()
-		#This at least ensures the clock gets a relatively regular update
-		return
-
-
 	global CurrentWindow, OptionsWindow, PortraitWindow
 	global level, TopIndex
 
+	if GUICommon.GameIsPST():
+		return
 	if GUICommon.GameIsIWD2():
 		CurrentWindow = PortraitWindow
 		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
@@ -633,14 +622,7 @@ def UpdateActionsWindow ():
 		if GemRB.GetVar ("OtherWindow") != -1:
 			return
 	else:
-		GUICommon.SetGamedaysAndHourToken()
-		if OptionsWindow and OptionsWindow.HasControl (9):
-			Button = OptionsWindow.GetControl (9)
-			Button.SetTooltip (GemRB.GetString (16041)) # refetch the string, since the tokens changed
-		elif ActionsWindow and ActionsWindow.HasControl (62):
-			Button = ActionsWindow.GetControl (62)
-			Button.SetTooltip (GemRB.GetString (16041))
-
+		UpdateClock ()
 		if GemRB.GetVar ("OtherWindow") == -1:
 			if PortraitWindow:
 				PortraitWindow.Invalidate ()
@@ -1797,12 +1779,29 @@ def SetPSTGamedaysAndHourToken ():
 	GemRB.SetToken ('CLOCK_MINUTE', '%02d' %minutes)
 	GemRB.SetToken ('CLOCK_AMPM', ampm)
 
-def UpdateClock(): #used to update the pst clock tooltip
-	ActionsWindow = GemRB.LoadWindow(0)
-	Button = ActionsWindow.GetControl (0)
-	SetPSTGamedaysAndHourToken ()
-	Button.SetTooltip (GemRB.GetString(65027))
-	#this function does update the clock tip, but the core fails to display it
+def UpdateClock ():
+	global ActionsWindow, OptionsWindow
+
+	if GUICommon.GameIsPST ():
+		#used to update the pst clock tooltip
+		ActionsWindow = GemRB.LoadWindow(0)
+		Button = ActionsWindow.GetControl (0)
+		SetPSTGamedaysAndHourToken ()
+		Button.SetTooltip (GemRB.GetString(65027))
+		#this function does update the clock tip, but the core fails to display it
+
+	else:
+		Clock = None
+		if OptionsWindow and OptionsWindow.HasControl (9):
+			Clock = OptionsWindow.GetControl (9)
+		elif ActionsWindow and ActionsWindow.HasControl (62):
+			Clock = ActionsWindow.GetControl (62)
+
+		if Clock:
+			Hours = (GemRB.GetGameTime () % 7200) / 300
+			GUICommon.SetGamedaysAndHourToken ()
+			Clock.SetBAM ("CDIAL", 0, (Hours + 12) % 24)
+			Clock.SetTooltip (GemRB.GetString (16041)) # refetch the string, since the tokens changed
 
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))

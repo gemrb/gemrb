@@ -1332,6 +1332,8 @@ void Game::AdvanceTime(ieDword add)
 	if (h!=GameTime/(300*AI_UPDATE_TIME)) {
 		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
+		//update clock display
+		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
 	}
 	Ticks+=add*interval;
 	//change the tileset if needed
