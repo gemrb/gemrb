@@ -29,7 +29,7 @@ public:
 	virtual ~AndroidLogger();
 
 protected:
-	void LogInternal(log_level, const char*, const char*, log_color)
+	void LogInternal(log_level, const char*, const char*, log_color);
 };
 
 Logger* createAndroidLogger();
