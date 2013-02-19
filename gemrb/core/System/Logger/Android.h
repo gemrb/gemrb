@@ -28,7 +28,8 @@ public:
 	AndroidLogger();
 	virtual ~AndroidLogger();
 
-	void log(log_level level, const char* owner, const char* message, log_color color);
+protected:
+	void LogInternal(log_level, const char*, const char*, log_color)
 };
 
 Logger* createAndroidLogger();

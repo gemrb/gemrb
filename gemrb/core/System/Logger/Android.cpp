@@ -28,7 +28,7 @@ AndroidLogger::AndroidLogger()
 AndroidLogger::~AndroidLogger()
 {}
 
-void AndroidLogger::log(log_level level, const char* owner, const char* message, log_color /*color*/)
+void AndroidLogger::LogInternal(log_level level, const char* owner, const char* message, log_color /*color*/)
 {
 	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
 }
