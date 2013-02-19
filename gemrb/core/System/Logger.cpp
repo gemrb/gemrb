@@ -26,7 +26,8 @@ namespace GemRB {
 
 Logger::Logger(log_level level)
 {
-	SetLogLevel(level);
+	// set level directly instead of calling SetLogLevel() to avoid pure virtual call
+	myLevel = level;
 }
 
 Logger::~Logger()
