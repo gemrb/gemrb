@@ -33,16 +33,16 @@ void AndroidLogger::LogInternal(log_level level, const char* owner, const char* 
 	android_LogPriority priority = ANDROID_LOG_INFO;
 	switch (level) {
 		case FATAL:
-			android_LogPriority = ANDROID_LOG_FATAL;
+			priority = ANDROID_LOG_FATAL;
 			break;
 		case ERROR:
-			android_LogPriority = ANDROID_LOG_ERROR;
+			priority = ANDROID_LOG_ERROR;
 			break;
 		case WARNING:
-			android_LogPriority = ANDROID_LOG_WARN;
+			priority = ANDROID_LOG_WARN;
 			break;
 		case DEBUG:
-			android_LogPriority = ANDROID_LOG_DEBUG;
+			priority = ANDROID_LOG_DEBUG;
 			break;
 	}
 	__android_log_print(priority, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
