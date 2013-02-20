@@ -30,7 +30,22 @@ AndroidLogger::~AndroidLogger()
 
 void AndroidLogger::LogInternal(log_level level, const char* owner, const char* message, log_color /*color*/)
 {
-	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
+	android_LogPriority priority = ANDROID_LOG_INFO;
+	switch (level) {
+		case FATAL:
+			android_LogPriority = ANDROID_LOG_FATAL;
+			break;
+		case ERROR:
+			android_LogPriority = ANDROID_LOG_ERROR;
+			break;
+		case WARNING:
+			android_LogPriority = ANDROID_LOG_WARN;
+			break;
+		case DEBUG:
+			android_LogPriority = ANDROID_LOG_DEBUG;
+			break;
+	}
+	__android_log_print(priority, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
 }
 
 Logger* createAndroidLogger()
