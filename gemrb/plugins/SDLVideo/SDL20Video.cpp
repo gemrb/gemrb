@@ -75,6 +75,11 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 		winFlags |= SDL_WINDOW_BORDERLESS;
 	}
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, winFlags);
+	if (window == NULL) {
+		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
+		return GEM_ERROR;
+	}
+
 	renderer = SDL_CreateRenderer(window, -1, 0);
 
 	if (renderer == NULL) {
