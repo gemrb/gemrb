@@ -53,9 +53,8 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	SDL_DestroyWindow(window);
 }
 
-int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* title)
+int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* title)
 {
-	bpp=b;
 	fullscreen=fs;
 	width = w, height = h;
 
@@ -92,12 +91,13 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	Viewport.h = height;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface...");
-	SDL_Surface* tmp = SDL_CreateRGBSurface( 0, width, height,
-											bpp, 0, 0, 0, 0 );
-
 	Uint32 winFormat = SDL_GetWindowPixelFormat(window);
-	backBuf = SDL_ConvertSurfaceFormat(tmp, winFormat, 0);
-	SDL_FreeSurface( tmp );
+	Uint32 r, g, b, a;
+	SDL_PixelFormatEnumToMasks(winFormat, &this->bpp, &r, &g, &b, &a);
+	a = 0;
+	backBuf = SDL_CreateRGBSurface( 0, width, height,
+											bpp, r, g, b, a );
+
 	if (!backBuf) {
 		Log(ERROR, "SDL 2 Video", "Unable to create backbuffer of %s format: %s",
 			SDL_GetPixelFormatName(winFormat), SDL_GetError());
