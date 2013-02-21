@@ -95,10 +95,16 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	SDL_Surface* tmp = SDL_CreateRGBSurface( 0, width, height,
 											bpp, 0, 0, 0, 0 );
 
-	backBuf = SDL_ConvertSurfaceFormat(tmp, SDL_GetWindowPixelFormat(window), 0);
+	Uint32 winFormat = SDL_GetWindowPixelFormat(window);
+	backBuf = SDL_ConvertSurfaceFormat(tmp, winFormat, 0);
+	SDL_FreeSurface( tmp );
+	if (!backBuf) {
+		Log(ERROR, "SDL 2 Video", "Unable to create backbuffer of %s format: %s",
+			SDL_GetPixelFormatName(winFormat), SDL_GetError());
+		return GEM_ERROR;
+	}
 	disp = backBuf;
 
-	SDL_FreeSurface( tmp );
 	return GEM_OK;
 }
 
