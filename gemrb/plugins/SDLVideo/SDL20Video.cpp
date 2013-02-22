@@ -43,6 +43,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	// touch input
 	ignoreNextFingerUp = false;
 	firstFingerDown = SDL_TouchFingerEvent();
+	firstFingerDown.fingerId = -1;
 	firstFingerDownTime = 0;
 }
 
@@ -306,7 +307,7 @@ int SDL20VideoDriver::PollEvents()
 
 void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
-	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId) {
+	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
 		lastMouseDownTime = EvntManager->GetRKDelay();
 		if (lastMouseDownTime != (unsigned long) ~0) {
 			lastMouseDownTime += lastMouseDownTime + lastTime;
@@ -328,6 +329,7 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 								mouseButton, GetModState(SDL_GetModState()) );
 
 		firstFingerDown = SDL_TouchFingerEvent();
+		firstFingerDown.fingerId = -1;
 		ignoreNextFingerUp = false;
 		firstFingerDownTime = 0;
 	}
@@ -351,7 +353,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		SDL_RenderGetLogicalSize(renderer, &w, &h);
 		xScaleFactor = (state->xres / w);
 		yScaleFactor = (state->yres / h);
-		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId == 0) {
+		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId < 0) {
 			// this is a rare case where multiple fingers touch simultaniously (within the same tick)
 			// TODO: this is probably simulator only. if so lets ifdef it for the simulator
 
@@ -388,7 +390,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			ignoreNextFingerUp = true;
-			static SDL_TouchID lastFingerId = 0;
+			static SDL_TouchID lastFingerId = -1;
 
 			if (numFingers == core->NumFingScroll
 				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
@@ -440,7 +442,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERUP:
 			{
 				// we need to get mouseButton before calling ProcessFirstTouch
-				int mouseButton = (firstFingerDown.fingerId) ? GEM_MB_ACTION : GEM_MB_MENU;
+				int mouseButton = (firstFingerDown.fingerId >= 0) ? GEM_MB_ACTION : GEM_MB_MENU;
 				ProcessFirstTouch(GEM_MB_ACTION);
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					if (!ignoreNextFingerUp) {
@@ -465,7 +467,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			// purposely ignore processing first touch here. I think users ould find it annoying
 			// to attempt a gesture and accidently command a party movement etc
-			if (firstFingerDown.fingerId && numFingers == 2
+			if (firstFingerDown.fingerId >= 0 && numFingers == 2
 				&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
 				/* formation rotation gesture:
 				 first touch with a single finger to obtain the pivot
@@ -518,6 +520,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 */
 					ignoreNextFingerUp = false;
 					firstFingerDown = SDL_TouchFingerEvent();
+					firstFingerDown.fingerId = -1;
 					// should we reset the lastMouseTime vars?
 #if TARGET_OS_IPHONE
 					// FIXME:
