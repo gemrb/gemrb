@@ -1215,7 +1215,8 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_BIRD:
-			Cycle = (ieByte) ((StanceID&1) * 9 + SixteenToNine[Orient]);
+			// TODO: use 0-8 for gliding; those only have a single frame
+			Cycle = 9 + SixteenToNine[Orient];
 			break;
 
 		case IE_ANI_FRAGMENT:

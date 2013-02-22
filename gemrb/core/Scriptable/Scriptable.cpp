@@ -1982,13 +1982,12 @@ void Movable::SetAttackMoveChances(ieWord *amc)
 //this could be used for WingBuffet as well
 void Movable::MoveLine(int steps, int Pass, ieDword orient)
 {
-	//remove previous path
-	ClearPath();
-	if (!steps)
+	if (path || !steps) {
 		return;
+	}
 	Point p = Pos;
 	p.x/=16;
-	p.y/=14;
+	p.y/=12;
 	path = area->GetLine( p, steps, orient, Pass );
 }
 

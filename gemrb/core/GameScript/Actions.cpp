@@ -5414,11 +5414,8 @@ void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 	} else if (x>20) {
 		actor->SetOrientation(actor->GetOrientation()+1, false);
 	}
-	//fly in this direction for 5 steps
-	actor->MoveLine(5, GL_PASS, actor->GetOrientation() );
-	//readding the action to the end of the queue
-	//Sender->AddAction( parameters );
-	//Sender->ReleaseCurrentAction();
+	//fly in this direction for 20 steps
+	actor->MoveLine(20, GL_PASS, actor->GetOrientation() );
 }
 
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)

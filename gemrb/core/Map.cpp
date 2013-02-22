@@ -2517,12 +2517,27 @@ PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags
 {
 	Point dest=start;
 
-	unsigned int st = Steps>=MaxVisibility?MaxVisibility-1:Steps;
-	int p = VisibilityPerimeter*Orientation/MAX_ORIENT;
-	dest.x += VisibilityMasks[st][p].x;
-	dest.y += VisibilityMasks[st][p].y;
-	//FIXME: calculate dest based on distance and orientation
-	return GetLine(start, dest, Steps, Orientation, flags);
+	double xoff, yoff, mult;
+	if (Orientation <= 4) {
+		xoff = -Orientation / 4.0;
+	} else if (Orientation <= 12) {
+		xoff = -1.0 + (Orientation - 4) / 4.0;
+	} else {
+		xoff = 1.0 - (Orientation - 12) / 4.0;
+	}
+
+	if (Orientation <= 8) {
+		yoff = 1.0 - Orientation / 4.0;
+	} else {
+		yoff = -1.0 + (Orientation - 8) / 4.0;
+	}
+
+	mult = 1.0 / (fabs(xoff) > fabs(yoff) ? fabs(xoff) : fabs(yoff));
+
+	dest.x += Steps * mult * xoff + 0.5;
+	dest.y += Steps * mult * yoff + 0.5;
+	
+	return GetLine(start, dest, 2, Orientation, flags);
 }
 
 PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags)
@@ -2538,16 +2553,6 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	int Count = 0;
 	int Max = Distance(start,dest);
 	for (int Steps = 0; Steps<Max; Steps++) {
-		if (!Count) {
-			StartNode->Next = new PathNode;
-			StartNode->Next->Parent = StartNode;
-			StartNode = StartNode->Next;
-			StartNode->Next = NULL;
-			Count=Speed;
-		} else {
-			Count--;
-		}
-
 		Point p;
 		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
 		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
@@ -2560,6 +2565,16 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		}
 		if ((ieWord) p.x>Width*16 || (ieWord) p.y>Height*12) {
 			return Return;
+		}
+
+		if (!Count) {
+			StartNode->Next = new PathNode;
+			StartNode->Next->Parent = StartNode;
+			StartNode = StartNode->Next;
+			StartNode->Next = NULL;
+			Count=Speed;
+		} else {
+			Count--;
 		}
 
 		StartNode->x = p.x;
