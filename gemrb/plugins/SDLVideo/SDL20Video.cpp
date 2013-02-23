@@ -99,10 +99,11 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface...");
 	Uint32 winFormat = SDL_GetWindowPixelFormat(window);
 	Uint32 r, g, b, a;
-	SDL_PixelFormatEnumToMasks(winFormat, &this->bpp, &r, &g, &b, &a);
+	SDL_PixelFormatEnumToMasks(winFormat, &bpp, &r, &g, &b, &a);
 	a = 0;
 	backBuf = SDL_CreateRGBSurface( 0, width, height,
 											bpp, r, g, b, a );
+	this->bpp = bpp;
 
 	if (!backBuf) {
 		Log(ERROR, "SDL 2 Video", "Unable to create backbuffer of %s format: %s",
