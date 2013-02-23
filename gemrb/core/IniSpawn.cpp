@@ -159,7 +159,7 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	if (!stricmp(keyword,"equal_to") ) return EQUALS; // 1
 	if (!stricmp(keyword,"less_than") ) return LESS_THAN; // 2
 	if (!stricmp(keyword,"greater_than") ) return GREATER_THAN; //3
-	if (!stricmp(keyword,"greater_or_equal_to") ) return GREATER_THAN; //4 (gemrb ext)
+	if (!stricmp(keyword,"greater_or_equal_to") ) return GREATER_OR_EQUALS; //4 (gemrb ext)
 	if (!stricmp(keyword,"not_equal_to") ) return NOT_EQUALS; //5
 	return NO_OPERATION;
 }
