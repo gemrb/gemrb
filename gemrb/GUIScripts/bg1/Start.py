@@ -118,6 +118,7 @@ def LoadSingle():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
+	GemRB.SetVar("SaveDir",0)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
