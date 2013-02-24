@@ -109,7 +109,7 @@ IDS
 0x6b	PortraitChange
 0x6c	ReputationModifier
 0x6d	State:HoldNoIcon
-0x6e	RetreatFrom
+0x6e	RetreatFrom2
 0x6f    Item:CreateMagic
 0x70	Item:Remove
 0x71	Item:Equip
