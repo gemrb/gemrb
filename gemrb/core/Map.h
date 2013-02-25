@@ -51,6 +51,11 @@ class Wall_Polygon;
 //distance of actors from spawn point
 #define SPAWN_RANGE       400
 
+//spawn flags
+#define SPF_NOSPAWN		0x0001	//if set don't span if WAIT is set
+#define SPF_ONCE		0x0002	//only spawn a single time
+#define SPF_WAIT		0x0004	//spawn temporarily disabled
+
 //area flags
 #define AF_NOSAVE         1
 #define AF_TUTORIAL       2
@@ -153,7 +158,8 @@ public:
 	ieDword appearance;
 	ieWord DayChance;
 	ieWord NightChance;
-	Spawn() { Creatures=NULL;  }
+	ieDword NextSpawn;
+	Spawn() { Creatures=NULL; NextSpawn = 0; }
 	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }
 };
@@ -462,7 +468,7 @@ public:
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */
 	int CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
-	void SpawnCreature(const Point &pos, const char *CreName, int radiusx = 0, int radiusy = 0);
+	bool SpawnCreature(const Point &pos, const char *creResRef, int radiusx = 0, int radiusy = 0, int *difficulty = NULL, unsigned int *creCount = NULL);
 
 	//spawns
 	void LoadIniSpawn();
@@ -510,6 +516,7 @@ private:
 	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
+	void UpdateSpawns();
 };
 
 }

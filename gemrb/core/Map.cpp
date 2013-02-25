@@ -875,6 +875,7 @@ void Map::UpdateScripts()
 		}
 	}
 
+	UpdateSpawns();
 	GenerateQueues();
 	SortQueues();
 }
@@ -2992,48 +2993,46 @@ void Map::LoadIniSpawn()
 	INISpawn->InitSpawn(WEDResRef);
 }
 
-void Map::SpawnCreature(const Point &pos, const char *CreName, int radiusx, int radiusy)
+bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, int *difficulty, unsigned int *creCount)
 {
-	SpawnGroup *sg=NULL;
-	Actor *creature;
-	void* lookup;
-	if ( !Spawns.Lookup( CreName, lookup) ) {
-		creature = gamedata->GetCreature(CreName);
-		if ( creature ) {
-			AddActor(creature, true);
-			creature->SetPosition( pos, true, radiusx, radiusy );
-			creature->RefreshEffects(NULL);
-		}
-		return;
-	}
-	sg = (SpawnGroup*)lookup;
-	unsigned int count = 0;
-	int amount = core->GetGame()->GetPartyLevel(true);
-	// if the difficulty is too high, distribute it equally over all the
-	// critters and summon as many as the summed difficulty allows
-	if (amount - (signed)sg->Level < 0) {
-		unsigned int share = sg->Level/sg->Count;
-		amount -= share;
-		if (amount < 0) {
-			// a single critter is also too powerful
-			return;
-		}
-		while (amount >= 0) {
-			count++;
-			amount -= share;
-		}
-	} else {
+	bool spawned = false;
+	SpawnGroup *sg = NULL;
+	void *lookup;
+	bool first = (creCount ? *creCount == 0 : true);
+	int level = (difficulty ? *difficulty : core->GetGame()->GetPartyLevel(true));
+	int count = 1;
+
+	if (Spawns.Lookup(creResRef, lookup)) {
+		sg = (SpawnGroup *) lookup;
 		count = sg->Count;
 	}
 
-	while ( count-- ) {
-		creature = gamedata->GetCreature(sg->ResRefs[count]);
-		if ( creature ) {
-			AddActor(creature, true);
-			creature->SetPosition( pos, true, radiusx, radiusy );
-			creature->RefreshEffects(NULL);
-		}
+	while (count--) {
+		Actor *creature = gamedata->GetCreature(sg ? sg->ResRefs[count] : creResRef);
+		if (creature) {
+			// ensure a minimum power level, since many creatures have this as 0
+			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
+
+			//SpawnGroups normally are all or nothing but make sure we spawn
+			//at least one creature if this is the first
+			if (level >= cpl || first) {
+				AddActor(creature, true);
+				creature->SetPosition(pos, true, radiusx, radiusy);
+				creature->RefreshEffects(NULL);
+				if (difficulty && !sg) *difficulty -= cpl;
+				if (creCount) (*creCount)++;
+				spawned = true;
+			} else {
+				break;
+			}
+		} 
 	}
+
+	if (spawned && sg && difficulty) {
+		*difficulty -= sg->Level;
+	}
+		
+	return spawned;
 }
 
 void Map::TriggerSpawn(Spawn *spawn)
@@ -3042,23 +3041,60 @@ void Map::TriggerSpawn(Spawn *spawn)
 	if (!spawn->Enabled) {
 		return;
 	}
+	//temporarily disabled?
+	if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
+		return;
+	}
+
 	//check schedule
-	ieDword bit = 1<<((core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300);
+	ieDword time = core->GetGame()->GameTime;
+	ieDword bit = 1<<((time/AI_UPDATE_TIME)%7200/300);
 	if (!(spawn->appearance & bit)) {
 		return;
 	}
 
 	//check day or night chance
-	if (rand()%100>spawn->DayChance) {
+	bool day = core->GetGame()->IsDay();
+	int chance = rand() % 100;
+	if ((day && chance > spawn->DayChance) ||
+		(!day && chance > spawn->NightChance)) {
+		spawn->NextSpawn = time + spawn->Frequency * AI_UPDATE_TIME * 60;
+		spawn->Method |= SPF_WAIT;
 		return;
 	}
-	// the difficulty check is done in SpawnCreature
 	//create spawns
-	for(unsigned int i = 0;i<spawn->Count;i++) {
-		SpawnCreature(spawn->Pos, spawn->Creatures[i], 0);
+	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
+	unsigned int spawncount = 0, i = 0;
+	while (difficulty >= 0 && spawncount < spawn->Maximum) {
+		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, &difficulty, &spawncount)) {
+			break;
+		}
+		if (++i >= spawn->Count) {
+			i = 0;
+		}
+		
 	}
 	//disable spawnpoint
-	spawn->Enabled = 0;
+	if (spawn->Method & SPF_ONCE || !(spawn->Method & SPF_NOSPAWN)) {
+		spawn->Enabled = 0;
+	} else {
+		spawn->NextSpawn = time + spawn->Frequency * AI_UPDATE_TIME * 60;
+		spawn->Method |= SPF_WAIT;
+	}
+}
+
+void Map::UpdateSpawns()
+{
+	ieDword time = core->GetGame()->GameTime;
+	for (std::vector<Spawn *>::iterator it = spawns.begin() ; it != spawns.end(); ++it) {
+		Spawn *spawn = *it;
+		if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
+			//only reactivate the spawn point if the party cannot currently see it
+			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos, false)) {
+				spawn->Method &= ~SPF_WAIT;
+			}
+		}
+	}
 }
 
 //--------restheader----------------
@@ -3080,7 +3116,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	bool interrupt = rand()%100 < chance;
-	int spawncount = 1;
+	unsigned int spawncount = 0;
 	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
@@ -3091,14 +3127,12 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 				core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);
 				continue;
 			}
-			// ensure a minimum power level, since many creatures have this as 0
-			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
 
 			displaymsg->DisplayString( RestHeader.Strref[idx], DMC_GOLD, IE_STR_SOUND );
-			while (spawnamount > 0 && spawncount <= RestHeader.Maximum) {
-				SpawnCreature(pos, RestHeader.CreResRef[idx], 20);
-				spawnamount -= cpl;
-				spawncount++;
+			while (spawnamount > 0 && spawncount < RestHeader.Maximum) {
+				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], 20, 20, &spawnamount, &spawncount)) {
+					break;
+				}
 			}
 			return hours-i;
 		}
