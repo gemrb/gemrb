@@ -98,6 +98,22 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface...");
 	Uint32 winFormat = SDL_GetWindowPixelFormat(window);
+	if (winFormat == SDL_PIXELFORMAT_UNKNOWN) {
+		switch (bpp) {
+			// make a best guess based on bpp
+			case 32:
+				winFormat = SDL_PIXELFORMAT_RGBX8888; // we dont want alpha for backbuf
+				break;
+			case 16:
+				winFormat = SDL_PIXELFORMAT_RGB565;
+				break;
+			default:
+				Log(ERROR, "SDL 2 Video", "%dbpp is not supported.", bpp);
+				return GEM_ERROR;
+		}
+		Log(WARNING, "SDL 2 Video", "Unable to determine window format, %s. Making best guess of %s",
+			SDL_GetError(), SDL_GetPixelFormatName(winFormat));
+	}
 	Uint32 r, g, b, a;
 	SDL_PixelFormatEnumToMasks(winFormat, &bpp, &r, &g, &b, &a);
 	a = 0;
