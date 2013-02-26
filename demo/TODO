@@ -2,7 +2,6 @@ if ready by release, add to install targets, sample config (gametype!) and
  add instructions with a preconfigured config. Decide about including fonts.
 
 CODE:
-fix slow scrolling
 fix missing tooltip crash
 fix actor selection
 set actor palette
