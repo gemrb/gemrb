@@ -537,7 +537,9 @@ bool OpenALAudioDriver::Pause()
 	SDL_mutexV( musicMutex );
 	((AmbientMgrAL*) ambim)->deactivate();
 #ifdef ANDROID
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
 	al_android_pause_playback(); //call AudioTrack.pause() from JNI
+#endif
 #endif
 	return true;
 }
@@ -545,7 +547,9 @@ bool OpenALAudioDriver::Pause()
 bool OpenALAudioDriver::Resume()
 {
 #ifdef ANDROID
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
 	al_android_resume_playback(); //call AudioTrack.play() from JNI
+#endif
 #endif
 	SDL_mutexP( musicMutex );
 	if (!MusicSource || !alIsSource( MusicSource )) {
