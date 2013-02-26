@@ -3553,6 +3553,9 @@ void Interface::DrawTooltip ()
 		return;
 
 	Font* fnt = GetFont( TooltipFont );
+	if (!fnt) {
+		return;
+	}
 	char *tooltip_text = tooltip_ctrl->Tooltip;
 
 	int w1 = 0;
