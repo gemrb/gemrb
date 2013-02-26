@@ -1,16 +1,17 @@
-GemRB git (78fb5eeb):
+GemRB git (a06b0d3a5b):
   New features:
     - 
     - multibyte font support (chinese, korean, japanese)
     - iwd2: Chapter 0+1 completable, full spellbook and ECL support
-    - initial bundled gemrb demo stubs
-    - most gemrb overrides were moved and are now moddable via game override
     - favourite weapon/spell tracking, bg1 dreams
+    - most gemrb overrides were moved and are now moddable via game override
+    - initial bundled gemrb demo stubs
 
   Improved features:
     - 
+    - random encounters (properly difficult)
     - animations, speech
-    - looting, worldmap, hotkeys (work everywhere)
+    - looting, worldmap, hotkeys (work everywhere), fatigue
     - iwd2 combat, stats, spells, skills, effects and actions
     - bugfixes
 
