@@ -416,15 +416,20 @@ def CannotLearnSlotSpell ():
 		slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
+	level = spell['SpellLevel']
 
 	# maybe she already knows this spell
-	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1, spell_ref) != -1:
+	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, level-1, spell_ref) != -1:
 		return LSR_KNOWN
 
 	# level check (needs enough intelligence for this level of spell)
 	dumbness = GemRB.GetPlayerStat (pc, IE_INT)
-	if spell['SpellLevel'] > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
+	if level > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
 		return LSR_LEVEL
+
+	spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, level-1)
+	if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, dumbness):
+		return LSR_FULL
 
 	return 0
 

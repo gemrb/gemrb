@@ -693,7 +693,7 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
-	global level, spell_ref, pause
+	global pause
 	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -702,60 +702,44 @@ def ReadItemWindow ():
 
 	if ret:
 		# couldn't find any strrefs for the other undhandled values (stat, level)
-		strref = 72873
-		CloseItemInfoWindow ()
-		if GUICommon.HasTOB() and ret == LSR_KNOWN:
-			OpenErrorWindow (strref)
-		return
-
-	if GUICommon.GameIsPST():
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-	else:
-		slot_item = GemRB.GetSlotItem (pc, slot)
-	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
-	spell = GemRB.GetSpell (spell_ref)
-	if spell:
-		# can we learn more spells of this level?
-		level = spell['SpellLevel']-1
-		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, level)
-		if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, GemRB.GetPlayerStat (pc, IE_INT)):
-			ret = LSR_FULL
-			if GUICommon.GameIsBG2():
-				strref = 32097
-			else:
-				strref = 10831
+		if ret == LSR_KNOWN and GUICommon.HasTOB():
+			strref = 72873
+		elif ret == LSR_KNOWN and GUICommon.GameIsPST():
+			strref = 50394
+		elif ret == LSR_FULL and GUICommon.GameIsBG2():
+			strref = 32097
+		elif ret == LSR_FULL and GUICommon.GameIsPST():
+			strref = 50395
+		elif GUICommon.GameIsPST():
+			strref = 4250
 		else:
-			pause = GemRB.GamePause(3,1) #query the pause state
-			GemRB.GamePause(0,1)
-			GemRB.UseItem (pc, slot, 1, 5)
-			GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
-			return
-	else:
-		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
-		CloseItemInfoWindow ()
-		return -1
+			strref = 10831
 
-	CloseItemInfoWindow ()
-	OpenErrorWindow (strref)
+		CloseItemInfoWindow ()
+		OpenErrorWindow (strref)
+
+	else:
+		if GUICommon.GameIsPST():
+			slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+
+		pause = GemRB.GamePause(3,1) #query the pause state
+		GemRB.GamePause(0,1)
+		GemRB.UseItem (pc, slot, 1, 5)
+		GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
 
 	return ret
 
 def DelayedReadItemWindow ():
-	global level, spell_ref
-
 	#restore the pause state
 	if pause:
 		GemRB.GamePause(1,1)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref)!=-1:
-		strref = 10830
-	else:
-		ret = LSR_FAILED
-		strref = 10831
 	CloseItemInfoWindow ()
-	if not GUICommon.GameIsPST():
-		OpenErrorWindow (strref)
+	if GUICommon.GameIsPST():
+		strref = 4249
+	else:
+		strref = 10830
+	OpenErrorWindow (strref)
 	return
 
 def OpenItemWindow ():
