@@ -49,7 +49,8 @@
 #include <alc.h>
 #endif
 
-#ifdef ANDROID
+#if ANDROID && SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+// Pely's build only
 #include <AL/android.h>
 #endif
 
