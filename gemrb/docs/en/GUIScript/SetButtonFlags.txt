@@ -11,7 +11,7 @@ Flags                      - various bits altering the behaviour of the control
 IE_GUI_BUTTON_NO_IMAGE   = 0x00000001, no button image set by SetButtonSprites
 IE_GUI_BUTTON_PICTURE    = 0x00000002, has picture set by other SetButton* commands
 IE_GUI_BUTTON_SOUND      = 0x00000004, clicking the button has a sound
-IE_GUI_BUTTON_ALT_SOUND  = 0x00000008, clicking the button has a different sound
+IE_GUI_BUTTON_CAPS       = 0x00000008, uppercase the button label
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010, it is a checkbox
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020, it is a radio button
 IE_GUI_BUTTON_DEFAULT    = 0x00000040, it is the default button

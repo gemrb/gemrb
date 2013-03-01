@@ -56,7 +56,7 @@ class Palette;
 #define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
 #define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
 #define IE_GUI_BUTTON_SOUND        0x00000004
-#define IE_GUI_BUTTON_ALT_SOUND    0x00000008
+#define IE_GUI_BUTTON_CAPS         0x00000008   // convert text to uppercase
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
 #define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter key triggers it
@@ -81,7 +81,8 @@ class Palette;
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00200000 // BG1-style paperdoll PictureList
 #define IE_GUI_BUTTON_HORIZONTAL      0x00400000 // horizontal clipping of overlay
 #define IE_GUI_BUTTON_CANCEL          0x00800000 // cancel key triggers it
-#define IE_GUI_BUTTON_CAPS            0x01000000 // convert text to uppercase
+//WARNING: we cannot add any more flags here
+//the top 8 bits are reserved for the control ID (see setFlags)
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
