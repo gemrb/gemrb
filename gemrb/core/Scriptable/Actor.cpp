@@ -1614,7 +1614,7 @@ static void InitActorTables()
 	IWDSound = core->HasFeature(GF_SOUNDS_INI);
 
 	//this table lists various level based xp bonuses
-	AutoTable tm("xpbonus");
+	AutoTable tm("xpbonus", true);
 	if (tm) {
 		xpbonustypes = tm->GetRowCount();
 		if (xpbonustypes == 0) {
@@ -1808,7 +1808,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("qslot2");
+	tm.load("qslot2", true);
 	if (tm) {
 		extraslots = tm->GetRowCount();
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
@@ -1824,7 +1824,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("mdfeats");
+	tm.load("mdfeats", true);
 	if (tm) {
 		for (i=0; i<ES_COUNT; i++) {
 			strnuprcpy(featspells[i], tm->QueryField(i,0), sizeof(ieResRef)-1 );
@@ -1848,7 +1848,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("itemanim");
+	tm.load("itemanim", true);
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
@@ -1879,7 +1879,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("featreq");
+	tm.load("featreq", true);
 	if (tm) {
 		unsigned int stat, max;
 
@@ -2160,7 +2160,7 @@ static void InitActorTables()
 	}
 
 	//dual-wielding table
-	tm.load("wstwowpn");
+	tm.load("wstwowpn", true);
 	if (tm) {
 		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2173,7 +2173,7 @@ static void InitActorTables()
 	}
 
 	//two-handed table
-	tm.load("wstwohnd");
+	tm.load("wstwohnd", true);
 	if (tm) {
 		wstwohanded = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2185,8 +2185,8 @@ static void InitActorTables()
 		}
 	}
 
-	//two-handed table
-	tm.load("wsshield");
+	//shield table
+	tm.load("wsshield", true);
 	if (tm) {
 		wsswordshield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2198,7 +2198,7 @@ static void InitActorTables()
 		}
 	}
 
-	//two-handed table
+	//single-handed table
 	tm.load("wssingle");
 	if (tm) {
 		wssingle = (int **) calloc(STYLE_MAX+1, sizeof(int *));
@@ -2212,7 +2212,7 @@ static void InitActorTables()
 	}
 
 	//unhardcoded monk bonus table
-	tm.load("monkbon");
+	tm.load("monkbon", true);
 	if (tm) {
 		monkbon_rows = tm->GetRowCount();
 		monkbon_cols = tm->GetColumnCount();
@@ -2229,7 +2229,7 @@ static void InitActorTables()
 	for(i=0;i<20;i++) {
 		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
 	}
-	tm.load("lvlmodwm");
+	tm.load("lvlmodwm", true);
 	if (tm) {
 		int maxrow = tm->GetRowCount();
 		for (i=0;i<20;i++) {
@@ -2260,7 +2260,7 @@ static void InitActorTables()
 	}
 
 	//initializing the skill->stats conversion table (used in iwd2)
-	tm.load("skillsta");
+	tm.load("skillsta", true);
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		skillcount = rowcount;

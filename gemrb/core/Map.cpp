@@ -172,7 +172,7 @@ static void InitSpawnGroups()
 	ieResRef GroupName;
 	int i;
 
-	AutoTable tab("spawngrp");
+	AutoTable tab("spawngrp", true);
 
 	Spawns.RemoveAll(NULL);
 	Spawns.SetType( GEM_VARIABLES_POINTER );

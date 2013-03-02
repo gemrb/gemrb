@@ -95,7 +95,7 @@ static int GetTrackString(const ieResRef areaName)
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 
 	if (!tracks) {
-		AutoTable tm("tracking");
+		AutoTable tm("tracking", true);
 		if (!tm.ok())
 			return -1;
 		trackcount = tm->GetRowCount();

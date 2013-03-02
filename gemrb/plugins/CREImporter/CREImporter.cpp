@@ -867,7 +867,7 @@ void CREImporter::SetupColor(ieDword &stat)
 	if (RandColor==-1) {
 		RandColor=0;
 		RandRows=0;
-		AutoTable rndcol("randcolr");
+		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();

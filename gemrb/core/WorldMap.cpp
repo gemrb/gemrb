@@ -607,7 +607,7 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 
 void WorldMap::UpdateReachableAreas()
 {
-	AutoTable tab("worlde");
+	AutoTable tab("worlde", true);
 	if (!tab) {
 		return;
 	}

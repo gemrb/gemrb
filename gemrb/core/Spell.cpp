@@ -47,7 +47,7 @@ int schoolcount = 0;
 static void InitSpellTables()
 {
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
-	AutoTable tm("splfocus");
+	AutoTable tm("splfocus", true);
 	if (tm) {
 		schoolcount = tm->GetRowCount();
 
