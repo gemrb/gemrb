@@ -3382,6 +3382,8 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 				btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
 			}
 			break;
+		case IE_GUI_WORLDMAP:
+			break;
 		default:
 			ctrl->Value = Status & 0x7f;
 			break;
