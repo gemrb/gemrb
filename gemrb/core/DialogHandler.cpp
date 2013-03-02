@@ -102,6 +102,13 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
+	Video *video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
+	//allow mouse selection from dialog (even though screen is locked)
+	video->SetMouseEnabled(true);
+	core->timer->SetMoveViewPort( tgt->Pos.x, tgt->Pos.y, 0, true );
+	video->MoveViewportTo( tgt->Pos.x-vp.w/2, tgt->Pos.y-vp.h/2 );
+
 	//check if we are already in dialog
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		return true;
@@ -126,12 +133,6 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		tar->DialogInterrupt();
 	}
 
-	//allow mouse selection from dialog (even though screen is locked)
-	Video *video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
-	video->SetMouseEnabled(true);
-	core->timer->SetMoveViewPort( tgt->Pos.x, tgt->Pos.y, 0, true );
-	video->MoveViewportTo( tgt->Pos.x-vp.w/2, tgt->Pos.y-vp.h/2 );
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	if (!(dlg->Flags&7) ) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
@@ -212,12 +213,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	if (target->Type == ST_ACTOR) {
 		tgt = (Actor *)target;
 	}
-
-	Video *video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
-	video->SetMouseEnabled(true);
-	core->timer->SetMoveViewPort( target->Pos.x, target->Pos.y, 0, true );
-	video->MoveViewportTo( target->Pos.x-vp.w/2, target->Pos.y-vp.h/2 );
 
 	int si;
 	if (choose == (unsigned int) -1) {
