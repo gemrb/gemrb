@@ -188,8 +188,11 @@ bool Control::isFocused()
 /** Sets the Display Flags */
 int Control::SetFlags(int arg_flags, int opcode)
 {
-	if ((arg_flags >>24) != ControlType)
+	if ((arg_flags >>24) != ControlType) {
+		Log(WARNING, "Control", "Trying to modify invalid flag %x on control %d (opcode %d)",
+			arg_flags, ControlID, opcode);
 		return -2;
+	}
 	switch (opcode) {
 		case BM_SET:
 			Flags = arg_flags;  //set
