@@ -251,10 +251,15 @@ Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 
 	int i = map->GetActorCount(true);
 	Targets *tgts = new Targets();
+	//make sure that Sender is always first in the list, even if there
+	//are other (e.g. dead) targets at the same location
+	tgts->AddTarget(Sender, 0, ga_flags);
 	while (i--) {
 		Actor *ac = map->GetActor(i,true);
-		int dist = Distance(Sender->Pos, ac->Pos);
-		tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
+		if (ac != Sender) {
+			int dist = Distance(Sender->Pos, ac->Pos);
+			tgts->AddTarget(ac, dist, ga_flags);
+		}
 	}
 	return tgts;
 }
