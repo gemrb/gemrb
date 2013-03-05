@@ -355,6 +355,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	Control* focusCtrl = NULL; //used for contextual touch events.
 	static int numFingers = 0;
 
+	// beware that this may be removed before all events it created are processed!
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
 	int renderW, renderH;
 	SDL_RenderGetLogicalSize(renderer, &renderW, &renderH);
@@ -410,16 +411,21 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_FINGERDOWN:
-			if (numFingers <= 0) {
-				numFingers++;
-			}
+			if (!finger0) numFingers++;
 			if (numFingers == 1) {
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
 				// ensure we get the coords for the actual first finger
-				firstFingerDown.x = finger0->x * renderW;
-				firstFingerDown.y = finger0->y * renderH;
+				if (finger0) {
+					firstFingerDown.x = finger0->x * renderW;
+					firstFingerDown.y = finger0->y * renderH;
+				} else {
+					// rare case where the touch has
+					// been removed before processing
+					firstFingerDown.x = event.tfinger.x * renderW;
+					firstFingerDown.y = event.tfinger.y * renderH;
+				}
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
 				ProcessFirstTouch(GEM_MB_ACTION);
 				EvntManager->OnSpecialKeyPress( GEM_TAB );
