@@ -359,28 +359,31 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	 the digitizer could have a higher resolution then the screen.
 	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
 	 */
-	SDL_Touch *state = SDL_GetTouch(event.tfinger.touchId);
-	float xScaleFactor = 1.0, yScaleFactor = 1.0;
-	int numFingers = 0;
-	if(state){
-		focusCtrl = EvntManager->GetMouseFocusedControl();
-		numFingers = state->num_fingers;
+	int fingerX = 0, fingerY = 0;
+	int numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);;
+	int renderW, renderH;
+	SDL_RenderGetLogicalSize(renderer, &renderW, &renderH);
 
-		int w, h;
-		SDL_RenderGetLogicalSize(renderer, &w, &h);
-		xScaleFactor = (state->xres / w);
-		yScaleFactor = (state->yres / h);
+	if(numFingers){
+		focusCtrl = EvntManager->GetMouseFocusedControl();
+		fingerX = (event.tfinger.x * renderW);
+		fingerY = (event.tfinger.y * renderH);
+
 		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId < 0) {
 			// this is a rare case where multiple fingers touch simultaniously (within the same tick)
 			// TODO: this is probably simulator only. if so lets ifdef it for the simulator
 
+			SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
+
 			firstFingerDown.timestamp = GetTickCount();
-			firstFingerDown.x = (state->fingers[0]->x / xScaleFactor);
-			firstFingerDown.y = (state->fingers[0]->y / yScaleFactor);
-			firstFingerDown.dx = state->fingers[0]->xdelta / xScaleFactor;
-			firstFingerDown.dy = state->fingers[0]->ydelta / yScaleFactor;
-			firstFingerDown.fingerId = state->fingers[0]->id;
-			firstFingerDown.pressure = state->fingers[0]->pressure;
+			firstFingerDown.x = (finger0->x * renderW);
+			firstFingerDown.y = (finger0->y * renderH);
+			// for some reason SDL no longer tracks the deltas on a per-finger basis
+			// we dont use this ATM so no problem
+			firstFingerDown.dx = 0;
+			firstFingerDown.dy = 0;
+			firstFingerDown.fingerId = finger0->id;
+			firstFingerDown.pressure = finger0->pressure;
 		}
 	}
 
@@ -406,50 +409,53 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 #endif
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
-			ignoreNextFingerUp = true;
-			static SDL_TouchID lastFingerId = -1;
+			{
+				ignoreNextFingerUp = true;
+				static SDL_TouchID lastFingerId = -1;
+				SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
 
-			if (numFingers == core->NumFingScroll
-				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
-				//any # of fingers != NumFingKBoard will scroll a text area
-				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
-					// if we are scrolling a text area we dont want the keyboard in the way
-					HideSoftKeyboard();
-				} else {
-					// ensure the control we touched becomes focused before attempting to scroll it.
+				if (numFingers == core->NumFingScroll
+					|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
+					//any # of fingers != NumFingKBoard will scroll a text area
+					if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
+						// if we are scrolling a text area we dont want the keyboard in the way
+						HideSoftKeyboard();
+					} else {
+						// ensure the control we touched becomes focused before attempting to scroll it.
+						ProcessFirstTouch(GEM_MB_ACTION);
+					}
+					// invert the coordinates such that dragging down scrolls up etc.
+					int scrollX = (event.tfinger.dx * renderW) * -1;
+					int scrollY = (event.tfinger.dy * renderH) * -1;
+
+					EvntManager->MouseWheelScroll( scrollX, scrollY );
+				} else if (numFingers == core->NumFingKboard && lastFingerId != finger0->id) {
+					int delta = (int)(event.tfinger.dy * renderH) * -1;
+					if (delta > 0){
+						// if the keyboard is already up interpret this gesture as console pop
+						if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
+						else ShowSoftKeyboard();
+					} else if (delta < 0) {
+						HideSoftKeyboard();
+					}
+				} else if (numFingers <= 1) { //click and drag
+					// sometimes numFingers can be 0 here!
+					// no idea how that is allowed, but it happens
 					ProcessFirstTouch(GEM_MB_ACTION);
+					ignoreNextFingerUp = false;
+					// standard mouse movement
+					MouseMovement((event.tfinger.x * renderW), (event.tfinger.y * renderH));
 				}
-				// invert the coordinates such that dragging down scrolls up etc.
-				int scrollX = (event.tfinger.dx / xScaleFactor) * -1;
-				int scrollY = (event.tfinger.dy / yScaleFactor) * -1;
-
-				EvntManager->MouseWheelScroll( scrollX, scrollY );
-			} else if (numFingers == core->NumFingKboard && lastFingerId != state->fingers[0]->id) {
-				int delta = (int)(event.tfinger.dy / yScaleFactor) * -1;
-				if (delta > 0){
-					// if the keyboard is already up interpret this gesture as console pop
-					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
-					else ShowSoftKeyboard();
-				} else if (delta < 0) {
-					HideSoftKeyboard();
-				}
-			} else if (numFingers <= 1) { //click and drag
-				// sometimes numFingers can be 0 here!
-				// no idea how that is allowed, but it happens
-				ProcessFirstTouch(GEM_MB_ACTION);
-				ignoreNextFingerUp = false;
-				// standard mouse movement
-				MouseMovement((event.tfinger.x / xScaleFactor), (event.tfinger.y / yScaleFactor));
+				lastFingerId = finger0->id;
 			}
-			lastFingerId = state->fingers[0]->id;
 			break;
 		case SDL_FINGERDOWN:
 			if (numFingers == 1) {
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
-				firstFingerDown.x /= xScaleFactor;
-				firstFingerDown.y /= yScaleFactor;
+				firstFingerDown.x *= renderW;
+				firstFingerDown.y *= renderH;
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
 				ProcessFirstTouch(GEM_MB_ACTION);
 				EvntManager->OnSpecialKeyPress( GEM_TAB );
@@ -469,8 +475,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						CursorPos.x = event.button.x;
 						CursorPos.y = event.button.y;
 
-						EvntManager->MouseUp((event.tfinger.x / xScaleFactor),
-											 (event.tfinger.y / yScaleFactor),
+						EvntManager->MouseUp((event.tfinger.x * renderW),
+											 (event.tfinger.y * renderH),
 											 mouseButton, GetModState(SDL_GetModState()) );
 					}
 				}
@@ -494,7 +500,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				GameControl* gc = core->GetGameControl();
 				if (gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
 					ProcessFirstTouch(GEM_MB_MENU);
-					SDL_Finger* secondFinger = state->fingers[1];
+					SDL_Finger* secondFinger = SDL_GetTouchFinger(event.tfinger.touchId, 1);
 					gc->OnMouseOver(secondFinger->x + Viewport.x, secondFinger->y + Viewport.y);
 				}
 			} else {
