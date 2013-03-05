@@ -331,13 +331,11 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 		}
 
 		// do an actual mouse move first! this is important for things such as ground piles to work!
+		// also ensure any referencing of the cursor is accurate
 		MouseMovement(firstFingerDown.x, firstFingerDown.y);
 
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DOWN;
-		// move cursor to ensure any referencing of the cursor is accurate
-		CursorPos.x = firstFingerDown.x;
-		CursorPos.y = firstFingerDown.y;
 
 		// no need to scale these coordinates. they were scaled previously for us.
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
