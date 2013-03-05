@@ -390,23 +390,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	bool ConsolePopped = core->ConsolePopped;
 
 	switch (event.type) {
-		//!!!!!!!!!!!!
-		// !!!: currently SDL 2.0 brodcasts both mouse and touch events on touch for iOS
-		//  there is no API to prevent the mouse events so we will be ignoring mouse events on iOS
-		//  there is no way currently to use a mouse anyay.
-		//  watch future SDL releases to see if/when disabling mouse events from the touchscreen is available
-		//!!!!!!!!!!!!
-#if TARGET_OS_IPHONE || ANDROID
-		// TODO: we shoud implement this as a preference so we can support mice on these platforms
-
-		// don't include SDL_MOUSEWHEEL here
-		// note that other platforms needn't implement this
-		// and should let SDLVideo handle mouse events
-		case SDL_MOUSEMOTION:
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			break;
-#endif
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			{
@@ -562,6 +545,18 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 */
 			}
 			break;
+		// conditionally handle mouse events
+		// discard them if they are produced by touch events
+		// do NOT discard mouse wheel events
+		case SDL_MOUSEMOTION:
+			if (event.motion.which == SDL_TOUCH_MOUSEID) {
+				break;
+			}
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			if (event.button.which == SDL_TOUCH_MOUSEID) {
+				break;
+			}
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
