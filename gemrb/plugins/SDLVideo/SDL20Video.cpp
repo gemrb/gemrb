@@ -353,10 +353,7 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
-	/*
-	 the digitizer could have a higher resolution then the screen.
-	 we need to get the scale factor to convert digitizer touch coordinates to screen pixel coordinates
-	 */
+
 	int fingerX = 0, fingerY = 0;
 	int numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);;
 	int renderW, renderH;
