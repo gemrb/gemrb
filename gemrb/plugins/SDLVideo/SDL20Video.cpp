@@ -322,7 +322,7 @@ int SDL20VideoDriver::PollEvents()
 	return SDLVideoDriver::PollEvents();
 }
 
-void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
+bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
 	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
 		lastMouseDownTime = EvntManager->GetRKDelay();
@@ -347,7 +347,9 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 		firstFingerDown.fingerId = -1;
 		ignoreNextFingerUp = false;
 		firstFingerDownTime = 0;
+		return true;
 	}
+	return false;
 }
 
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)

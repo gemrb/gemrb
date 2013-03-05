@@ -66,7 +66,7 @@ private:
 	int ProcessEvent(const SDL_Event & event);
 	// the first finger touch of a gesture is delayed until another touch event or until
 	// enough time passes for it to become a right click
-	void ProcessFirstTouch( int mouseButton );
+	bool ProcessFirstTouch( int mouseButton );
 };
 
 }
