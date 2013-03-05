@@ -353,29 +353,15 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
+	static int numFingers = 0;
 
-	int numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);;
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
 	int renderW, renderH;
 	SDL_RenderGetLogicalSize(renderer, &renderW, &renderH);
 
-	if(numFingers){
+	if (finger0) {
+		numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
 		focusCtrl = EvntManager->GetMouseFocusedControl();
-
-		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId < 0) {
-			// this is a rare case where multiple fingers touch simultaniously (within the same tick)
-			// TODO: this is probably simulator only. if so lets ifdef it for the simulator
-
-			firstFingerDown.timestamp = GetTickCount();
-			firstFingerDown.x = (finger0->x * renderW);
-			firstFingerDown.y = (finger0->y * renderH);
-			// for some reason SDL no longer tracks the deltas on a per-finger basis
-			// we dont use this ATM so no problem
-			firstFingerDown.dx = 0;
-			firstFingerDown.dy = 0;
-			firstFingerDown.fingerId = finger0->id;
-			firstFingerDown.pressure = finger0->pressure;
-		}
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
@@ -410,9 +396,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				} else if (delta < 0) {
 					HideSoftKeyboard();
 				}
-			} else if (numFingers <= 1) { //click and drag
-				// sometimes numFingers can be 0 here!
-				// no idea how that is allowed, but it happens
+			} else if (numFingers == 1) { //click and drag
 				ProcessFirstTouch(GEM_MB_ACTION);
 				ignoreNextFingerUp = false;
 				// standard mouse movement
@@ -426,12 +410,16 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_FINGERDOWN:
+			if (numFingers <= 0) {
+				numFingers++;
+			}
 			if (numFingers == 1) {
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
-				firstFingerDown.x *= renderW;
-				firstFingerDown.y *= renderH;
+				// ensure we get the coords for the actual first finger
+				firstFingerDown.x = finger0->x * renderW;
+				firstFingerDown.y = finger0->y * renderH;
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
 				ProcessFirstTouch(GEM_MB_ACTION);
 				EvntManager->OnSpecialKeyPress( GEM_TAB );
@@ -440,6 +428,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_FINGERUP:
 			{
+				if (numFingers) numFingers--;
 				// we need to get mouseButton before calling ProcessFirstTouch
 				int mouseButton = (firstFingerDown.fingerId >= 0) ? GEM_MB_ACTION : GEM_MB_MENU;
 				ProcessFirstTouch(GEM_MB_ACTION);
