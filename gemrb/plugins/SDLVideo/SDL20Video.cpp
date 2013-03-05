@@ -354,7 +354,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
 
-	int fingerX = 0, fingerY = 0;
 	int numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);;
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
 	int renderW, renderH;
@@ -362,8 +361,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 	if(numFingers){
 		focusCtrl = EvntManager->GetMouseFocusedControl();
-		fingerX = (event.tfinger.x * renderW);
-		fingerY = (event.tfinger.y * renderH);
 
 		if (event.type == SDL_FINGERDOWN && numFingers > 1 && firstFingerDown.fingerId < 0) {
 			// this is a rare case where multiple fingers touch simultaniously (within the same tick)
