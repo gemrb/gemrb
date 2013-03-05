@@ -428,6 +428,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					ignoreNextFingerUp = false;
 					// standard mouse movement
 					MouseMovement((event.tfinger.x * renderW), (event.tfinger.y * renderH));
+					lastFingerId = -1;
+					break; // important to bail since finger0 will be null
 				}
 				lastFingerId = finger0->id;
 			}
