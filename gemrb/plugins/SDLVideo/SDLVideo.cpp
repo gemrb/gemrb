@@ -120,11 +120,14 @@ int SDLVideoDriver::PollEvents()
 		ret = ProcessEvent(currentEvent);
 	}
 
-	int x, y;
 	if (ret == GEM_OK && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
 		&& lastTime>lastMouseDownTime
-		&& SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT))
+		&& SDL_GetMouseState(NULL, NULL)==SDL_BUTTON(SDL_BUTTON_LEFT))
 	{
+		// get our internal mouse coordinates instead of system coordinates
+		// this is important for SDL2 (Android, iOS currently)
+		int x, y;
+		GetMousePos(x, y);
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		if (!core->ConsolePopped) {
 			EvntManager->MouseUp( x, y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );

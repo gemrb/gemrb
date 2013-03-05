@@ -332,8 +332,6 @@ void SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 
 		// do an actual mouse move first! this is important for things such as ground piles to work!
 		MouseMovement(firstFingerDown.x, firstFingerDown.y);
-		// important to get the scaled coordinates when we later get the mouse location with SDL_GetMouseState
-		MoveMouse(firstFingerDown.x, firstFingerDown.y);
 
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DOWN;
