@@ -3111,40 +3111,22 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
+//at this time it is unclear what the LeaveAreaLUAPanic* commands are used for
+//since they are always followed by the non-panic version of the command in all
+//games that use them (bg1 + bg2) we simply make them de-facto no-ops for now
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
-		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
-	}
 }
 
-//this is a blocking action, because we have to move to the Entry
 void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Game *game = core->GetGame();
-	if (parameters->string1Parameter[0]) {
-		strnlwrcpy(game->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
-	}
-	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
-	if (p.isempty()) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	parameters->pointParameter=p;
-	strcpy(parameters->string1Parameter, "");
 	LeaveAreaLUAPanic(Sender, parameters);
-	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
