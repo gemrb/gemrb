@@ -1130,7 +1130,7 @@ bool Interface::ReadDamageTypeTable() {
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		di.reduction = atoi(tm->QueryField(i, 4));
-		DamageInfoMap.insert(std::make_pair <ieDword, DamageInfoStruct> ((ieDword)di.value, di));
+		DamageInfoMap.insert(std::make_pair ((ieDword)di.value, di));
 	}
 
 	return true;

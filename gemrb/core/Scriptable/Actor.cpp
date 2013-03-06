@@ -1941,7 +1941,7 @@ static void InitActorTables()
 					bt.apr = atoi(tht->QueryField(row, 1));
 					btv.push_back(bt);
 				}
-				IWD2HitTable.insert(std::make_pair <char*, std::vector<BABTable> > (BABClassMap[classis], btv));
+				IWD2HitTable.insert(std::make_pair (BABClassMap[classis], btv));
 			}
 
 			StringBuffer buffer;
