@@ -374,9 +374,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
 					// if we are scrolling a text area we dont want the keyboard in the way
 					HideSoftKeyboard();
-				} else {
+				} else if (!focusCtrl) {
 					// ensure the control we touched becomes focused before attempting to scroll it.
-					ProcessFirstTouch(GEM_MB_ACTION);
+					// we cannot safely call ProcessFirstTouch anymore because now we process mouse events
+					// this can result in a selection box being created
+					EvntManager->MouseDown(event.tfinger.x * width, event.tfinger.y * height, GEM_MB_ACTION, 0);
 				}
 				// invert the coordinates such that dragging down scrolls up etc.
 				int scrollX = (event.tfinger.dx * width) * -1;
