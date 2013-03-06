@@ -514,6 +514,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					ignoreNextFingerUp = false;
 					firstFingerDown = SDL_TouchFingerEvent();
 					firstFingerDown.fingerId = -1;
+					GameControl* gc = core->GetGameControl();
+					if (gc) {
+						gc->ClearMouseState();
+					}
 					// should we reset the lastMouseTime vars?
 #if TARGET_OS_IPHONE
 					// FIXME:
