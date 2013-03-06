@@ -403,7 +403,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
-			if (numFingers == 1) {
+			if (numFingers == 1
+				// this test is for when multiple fingers begin the first touch
+				// commented out because we dont care right now, but if we need it i want it documented
+				//|| (numFingers > 1 && firstFingerDown.fingerId < 0)
+				) {
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
