@@ -351,7 +351,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
 	static int numFingers = 0;
-	static bool continuingGesture = false; // only resets to false when numFingers = 0
+	static bool continuingGesture = false; // resets when numFingers changes
 
 	// beware that this may be removed before all events it created are processed!
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
@@ -405,6 +405,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
+			continuingGesture = false;
 			if (numFingers == 1
 				// this test is for when multiple fingers begin the first touch
 				// commented out because we dont care right now, but if we need it i want it documented
@@ -432,7 +433,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERUP:
 			{
 				if (numFingers) numFingers--;
-				if (!numFingers) continuingGesture = false;
+				continuingGesture = false;
 				// we need to get mouseButton before calling ProcessFirstTouch
 				int mouseButton = (firstFingerDown.fingerId >= 0) ? GEM_MB_ACTION : GEM_MB_MENU;
 				ProcessFirstTouch(mouseButton);
