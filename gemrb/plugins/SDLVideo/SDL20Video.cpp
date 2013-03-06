@@ -424,10 +424,17 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					firstFingerDown.x = event.tfinger.x * width;
 					firstFingerDown.y = event.tfinger.y * height;
 				}
-			} else if (EvntManager && numFingers == core->NumFingInfo) {
-				ProcessFirstTouch(GEM_MB_ACTION);
-				EvntManager->OnSpecialKeyPress( GEM_TAB );
-				EvntManager->OnSpecialKeyPress( GEM_ALT );
+			} else {
+				if (EvntManager && numFingers == core->NumFingInfo) {
+					ProcessFirstTouch(GEM_MB_ACTION);
+					EvntManager->OnSpecialKeyPress( GEM_TAB );
+					EvntManager->OnSpecialKeyPress( GEM_ALT );
+				}
+				if (numFingers == core->NumFingScroll
+					&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
+					// scrolling cancels previous action
+					((GameControl*)focusCtrl)->ClearMouseState();
+				}
 			}
 			break;
 		case SDL_FINGERUP:
