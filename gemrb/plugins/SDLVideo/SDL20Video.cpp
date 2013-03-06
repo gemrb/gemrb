@@ -136,20 +136,17 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	int winW, winH;
-	SDL_RenderGetLogicalSize(renderer, &winW, &winH);
-
 	if (videoPlayer) SDL_DestroyTexture(videoPlayer);
 	if (yuv) {
 		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, w, h);
 	} else {
-		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, winW, winH);
+		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
 	}
 	if (!videoPlayer) {
 		Log(ERROR, "SDL 2 Driver", "Unable to create texture for video playback: %s", SDL_GetError());
 	}
-	w = winW;
-	h = winH;
+	w = width;
+	h = height;
 	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;
 	subtitleregion.h = h/4;
@@ -358,8 +355,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 	// beware that this may be removed before all events it created are processed!
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
-	int renderW, renderH;
-	SDL_RenderGetLogicalSize(renderer, &renderW, &renderH);
 
 	if (finger0) {
 		numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
@@ -384,12 +379,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					ProcessFirstTouch(GEM_MB_ACTION);
 				}
 				// invert the coordinates such that dragging down scrolls up etc.
-				int scrollX = (event.tfinger.dx * renderW) * -1;
-				int scrollY = (event.tfinger.dy * renderH) * -1;
+				int scrollX = (event.tfinger.dx * width) * -1;
+				int scrollY = (event.tfinger.dy * height) * -1;
 
 				EvntManager->MouseWheelScroll( scrollX, scrollY );
 			} else if (numFingers == core->NumFingKboard && !continuingGesture) {
-				int delta = (int)(event.tfinger.dy * renderH) * -1;
+				int delta = (int)(event.tfinger.dy * height) * -1;
 				if (delta >= MIN_GESTURE_DELTA_PIXELS){
 					// if the keyboard is already up interpret this gesture as console pop
 					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
@@ -401,7 +396,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				ProcessFirstTouch(GEM_MB_ACTION);
 				ignoreNextFingerUp = false;
 				// standard mouse movement
-				MouseMovement((event.tfinger.x * renderW), (event.tfinger.y * renderH));
+				MouseMovement((event.tfinger.x * width), (event.tfinger.y * height));
 			}
 			// we set this on finger motion because simple up/down are not part of gestures
 			continuingGesture = true;
@@ -414,13 +409,13 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				firstFingerDownTime = GetTickCount();
 				// ensure we get the coords for the actual first finger
 				if (finger0) {
-					firstFingerDown.x = finger0->x * renderW;
-					firstFingerDown.y = finger0->y * renderH;
+					firstFingerDown.x = finger0->x * width;
+					firstFingerDown.y = finger0->y * height;
 				} else {
 					// rare case where the touch has
 					// been removed before processing
-					firstFingerDown.x = event.tfinger.x * renderW;
-					firstFingerDown.y = event.tfinger.y * renderH;
+					firstFingerDown.x = event.tfinger.x * width;
+					firstFingerDown.y = event.tfinger.y * height;
 				}
 			} else if (EvntManager && numFingers == core->NumFingInfo) {
 				ProcessFirstTouch(GEM_MB_ACTION);
@@ -443,8 +438,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						CursorPos.x = event.button.x;
 						CursorPos.y = event.button.y;
 
-						EvntManager->MouseUp((event.tfinger.x * renderW),
-											 (event.tfinger.y * renderH),
+						EvntManager->MouseUp((event.tfinger.x * width),
+											 (event.tfinger.y * height),
 											 mouseButton, GetModState(SDL_GetModState()) );
 					}
 				}
