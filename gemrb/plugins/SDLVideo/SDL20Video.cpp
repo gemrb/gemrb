@@ -27,7 +27,7 @@
 using namespace GemRB;
 
 //touch gestures
-#define MIN_GESTURE_DELTA_PIXELS 10
+#define MIN_GESTURE_DELTA_PIXELS 5
 #define TOUCH_RC_NUM_TICKS 500
 
 SDL20VideoDriver::SDL20VideoDriver(void)
@@ -354,6 +354,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
 	static int numFingers = 0;
+	static bool continuingGesture = false; // only resets to false when numFingers = 0
 
 	// beware that this may be removed before all events it created are processed!
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
@@ -371,7 +372,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			ignoreNextFingerUp = true;
-			static SDL_TouchID lastFingerId = -1;
 
 			if (numFingers == core->NumFingScroll
 				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
@@ -388,13 +388,13 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				int scrollY = (event.tfinger.dy * renderH) * -1;
 
 				EvntManager->MouseWheelScroll( scrollX, scrollY );
-			} else if (numFingers == core->NumFingKboard && lastFingerId != finger0->id) {
+			} else if (numFingers == core->NumFingKboard && !continuingGesture) {
 				int delta = (int)(event.tfinger.dy * renderH) * -1;
-				if (delta > 0){
+				if (delta >= MIN_GESTURE_DELTA_PIXELS){
 					// if the keyboard is already up interpret this gesture as console pop
 					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
 					else ShowSoftKeyboard();
-				} else if (delta < 0) {
+				} else if (delta <= -MIN_GESTURE_DELTA_PIXELS) {
 					HideSoftKeyboard();
 				}
 			} else if (numFingers == 1) { //click and drag
@@ -403,12 +403,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// standard mouse movement
 				MouseMovement((event.tfinger.x * renderW), (event.tfinger.y * renderH));
 			}
-			if (finger0) {
-				lastFingerId = finger0->id;
-			} else {
-				// somehow numFingers can be 0
-				lastFingerId = -1;
-			}
+			// we set this on finger motion because simple up/down are not part of gestures
+			continuingGesture = true;
 			break;
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
@@ -435,9 +431,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERUP:
 			{
 				if (numFingers) numFingers--;
+				if (!numFingers) continuingGesture = false;
 				// we need to get mouseButton before calling ProcessFirstTouch
 				int mouseButton = (firstFingerDown.fingerId >= 0) ? GEM_MB_ACTION : GEM_MB_MENU;
-				ProcessFirstTouch(GEM_MB_ACTION);
+				ProcessFirstTouch(mouseButton);
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					if (!ignoreNextFingerUp) {
 						if (CursorIndex != VID_CUR_DRAG)
