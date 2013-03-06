@@ -179,6 +179,7 @@ public: //Events
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	/* centers viewport to the points specified */
 	void Center(unsigned short x, unsigned short y);
+	void ClearMouseState();
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);

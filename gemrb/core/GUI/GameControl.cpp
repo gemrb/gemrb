@@ -118,9 +118,6 @@ GameControl::GameControl(void)
 	lastActorID = 0;
 	trackerID = 0;
 	distance = 0;
-	MouseIsDown = false;
-	DrawSelectionRect = false;
-	FormationRotation = false;
 	overDoor = NULL;
 	overContainer = NULL;
 	overInfoPoint = NULL;
@@ -136,6 +133,7 @@ GameControl::GameControl(void)
 	AlwaysRun = false; //make this a game flag if you wish
 	ieDword tmp=0;
 
+	ClearMouseState();
 	ResetTargetMode();
 
 	core->GetDictionary()->Lookup("TouchScrollAreas",tmp);
@@ -250,6 +248,13 @@ void GameControl::Center(unsigned short x, unsigned short y)
 	Viewport.y += y - Viewport.h / 2;
 	core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
 	video->MoveViewportTo( Viewport.x, Viewport.y );
+}
+
+void GameControl::ClearMouseState()
+{
+	MouseIsDown = false;
+	DrawSelectionRect = false;
+	FormationRotation = false;
 }
 
 // generate an action to do the actual movement
@@ -1996,8 +2001,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
 		}
 		else if (target_mode == TARGET_MODE_NONE) {
-			DrawSelectionRect = false;
-			MouseIsDown = false;
+			ClearMouseState();
 			if (core->GetGame()->selected.size() > 1) {
 				FormationRotation = true;
 				FormationPivotPoint.x = px;
