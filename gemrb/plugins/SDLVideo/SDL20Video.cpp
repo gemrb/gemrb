@@ -41,10 +41,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	videoPlayer = NULL;
 
 	// touch input
-	ignoreNextFingerUp = false;
-	firstFingerDown = SDL_TouchFingerEvent();
-	firstFingerDown.fingerId = -1;
-	firstFingerDownTime = 0;
+	ClearFirstTouch();
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -319,6 +316,14 @@ int SDL20VideoDriver::PollEvents()
 	return SDLVideoDriver::PollEvents();
 }
 
+void SDL20VideoDriver::ClearFirstTouch()
+{
+	firstFingerDown = SDL_TouchFingerEvent();
+	firstFingerDown.fingerId = -1;
+	ignoreNextFingerUp = false;
+	firstFingerDownTime = 0;
+}
+
 bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
 	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
@@ -338,10 +343,7 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
 								mouseButton, GetModState(SDL_GetModState()) );
 
-		firstFingerDown = SDL_TouchFingerEvent();
-		firstFingerDown.fingerId = -1;
-		ignoreNextFingerUp = false;
-		firstFingerDownTime = 0;
+		ClearFirstTouch();
 		return true;
 	}
 	return false;
@@ -518,9 +520,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 reset all input variables as if no events have happened yet
 					 restoring from "minimized state" should be a clean slate.
 					 */
-					ignoreNextFingerUp = false;
-					firstFingerDown = SDL_TouchFingerEvent();
-					firstFingerDown.fingerId = -1;
+					ClearFirstTouch();
 					GameControl* gc = core->GetGameControl();
 					if (gc) {
 						gc->ClearMouseState();

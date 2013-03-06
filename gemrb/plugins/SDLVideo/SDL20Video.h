@@ -67,6 +67,7 @@ private:
 	// the first finger touch of a gesture is delayed until another touch event or until
 	// enough time passes for it to become a right click
 	bool ProcessFirstTouch( int mouseButton );
+	void ClearFirstTouch();
 };
 
 }
