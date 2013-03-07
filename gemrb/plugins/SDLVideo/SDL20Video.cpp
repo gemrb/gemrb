@@ -432,7 +432,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					EvntManager->OnSpecialKeyPress( GEM_TAB );
 					EvntManager->OnSpecialKeyPress( GEM_ALT );
 				}
-				if (numFingers == core->NumFingScroll
+				if ((numFingers == core->NumFingScroll || numFingers == core->NumFingKboard)
 					&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
 					// scrolling cancels previous action
 					((GameControl*)focusCtrl)->ClearMouseState();
