@@ -1,6 +1,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_restype import RES_2DA
 import CharGenCommon
 import GUICommon
 import Spellbook
@@ -366,6 +367,27 @@ def setAccept():
 	#10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
+
+	# apply class/kit abilities
+	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
+	KitIndex = GUICommon.GetKitIndex (MyChar)
+	if IsMulti[0]>1:
+		#get the class abilites for each class
+		for i in range (IsMulti[0]):
+			TmpClassName = GUICommon.GetClassRowName (IsMulti[i+1], "class")
+			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
+			if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
+				GUICommon.AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
+	else:
+		if KitIndex:
+			ABTable = CommonTables.KitList.GetValue (str(KitIndex), "ABILITIES")
+		else:
+			ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
+		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
+			GUICommon.AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
+
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	
