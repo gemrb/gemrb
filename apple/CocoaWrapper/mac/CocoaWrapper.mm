@@ -41,21 +41,6 @@ static BOOL   gCalledAppMainline = FALSE;
 
 /* The main class of the application, the application's delegate */
 @implementation CocoaWrapper
-/* Set the working directory to the .app's parent directory */
-- (void) setupWorkingDirectory:(BOOL)shouldChdir
-{
-    if (shouldChdir)
-    {
-        char parentdir[MAXPATHLEN];
-        CFURLRef url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-        CFURLRef url2 = CFURLCreateCopyDeletingLastPathComponent(0, url);
-        if (CFURLGetFileSystemRepresentation(url2, 1, (UInt8 *)parentdir, MAXPATHLEN)) {
-            chdir(parentdir);   /* chdir to the binary app's parent */
-        }
-        CFRelease(url);
-        CFRelease(url2);
-    }
-}
 
 static void setApplicationMenu(void)
 {
@@ -193,8 +178,6 @@ static void setupWindowMenu(void)
 {
     int status;
 	AddLogger(createAppleLogger());
-    /* Set the working directory to the .app's parent directory */
-    [self setupWorkingDirectory:gFinderLaunch];
 
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
