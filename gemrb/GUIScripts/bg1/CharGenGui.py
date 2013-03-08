@@ -152,7 +152,7 @@ def unsetMageSpells():
 def guardMageSpells():
 	MyChar = GemRB.GetVar ("Slot")
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELLS")
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELL")
 	return TableName != "*"
 
 def getMageSpells(TextAreaControl):
