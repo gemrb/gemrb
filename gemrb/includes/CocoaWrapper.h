@@ -18,6 +18,14 @@
  *
  */
 
+#ifdef GCC_VERSION
+#if GCC_VERSION < 40200
+#warning You may need to disable wanings as errors or unused warnings to compile on this system.
+#undef __unused
+#define __unused
+#endif
+#endif
+
 /*
  !!!:
  Because this file is shared between the CocoaWrapper object and plugins extending it we need to keep it
