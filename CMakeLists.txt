@@ -219,6 +219,8 @@ IF(FREETYPE_FOUND)
 	INCLUDE(FindICONV)
 	IF(NOT ICONV_FOUND)
 		MESSAGE(WARNING "Iconv not found. TTF plugin will not be able to translate non-unicode compatible TLK encodings.")
+	ELSE()
+		set(HAVE_ICONV)
 	ENDIF()
 ELSE()
 	MESSAGE(WARNING "Looking for Freetype: not found!")
@@ -280,7 +282,6 @@ CHECK_FUNCTION_EXISTS("setenv" HAVE_SETENV)
 
 CHECK_INCLUDE_FILES("unistd.h" HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES("malloc.h" HAVE_MALLOC_H)
-CHECK_INCLUDE_FILES("iconv.h" HAVE_ICONV)
 
 #Unneeded on windows
 IF(NOT WIN32)
