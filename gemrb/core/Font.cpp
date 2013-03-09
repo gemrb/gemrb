@@ -137,17 +137,13 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
 
 	if (startrow) enablecap=false;
-	int ystep = 0;
+	int ystep;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
-		for (size_t i = 0; i < len; i++) {
-			int height = GetCharSprite(tmp[i])->Height;
-			if (ystep < height)
-				ystep = height;
-		}
+		ystep = CalcStringHeight(tmp, len, NoColor);
+		if (!ystep) ystep = maxHeight;
 	} else {
 		ystep = maxHeight;
 	}
-	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;
 	int w = CalcStringWidth( tmp, NoColor );
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
@@ -333,18 +329,13 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	}
 
 	SetupString( tmp, rgn.w, NoColor, initials, capital );
-	int ystep = 0;
+	int ystep;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
-		
-		for (size_t i = 0; i < len; i++) {
-			int height = GetCharSprite(tmp[i])->Height;
-			if (ystep < height)
-				ystep = height;
-		}
+		ystep = CalcStringHeight(tmp, len, NoColor);
+		if (!ystep) ystep = maxHeight;
 	} else {
 		ystep = maxHeight;
 	}
-	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;
 	Video* video = core->GetVideoDriver();
 
@@ -489,6 +480,27 @@ int Font::CalcStringWidth(const ieWord* string, bool NoColor) const
 		}
 	}
 	return ( int ) ret;
+}
+
+int Font::CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const
+{
+	int h, max = 0;
+	for (unsigned int i = 0; i < len; i++) {
+		if (( string[i] ) == '[' && !NoColor) {
+			i++; // cannot be ']' when it is '['
+			while(i<len && (string[i]) != ']') {
+				i++;
+			}
+		} else {
+			h = GetCharSprite(string[i])->Height;
+			//the space check is here to hack around overly high frames
+			//in some bg1 fonts that throw vertical alignment off
+			if (h > max && string[i] != ' ') {
+				max = h;
+			}
+		}
+	}
+	return max;
 }
 
 void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *initials, bool enablecap) const

@@ -116,6 +116,7 @@ protected:
 private:
 	int PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const;
 	int CalcStringWidth(const ieWord* string, bool NoColor = false) const;
+	int CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const;
 	int dbStrLen(const ieWord* string) const;
 };
 
