@@ -451,7 +451,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	if (!walkpath.size()) {
 		return NULL;
 	}
-	std::list<WMPAreaLink*>::iterator p=walkpath.begin();
+	std::list<WMPAreaLink*>::reverse_iterator p=walkpath.rbegin();
 	WMPAreaLink *lastpath;
 	encounter=false;
 	do {
@@ -462,7 +462,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 		}
 		p++;
 	}
-	while(p!=walkpath.end() );
+	while(p!=walkpath.rend() );
 	return lastpath;
 }
 
