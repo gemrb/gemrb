@@ -7747,7 +7747,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	// too far away?
-	Actor *current = core->GetFirstSelectedPC(false);
+	Actor *current = game->FindPC(game->GetSelectedPCSingle());
 	if (current && current != actor &&
 		(actor->GetCurrentArea() != current->GetCurrentArea() ||
 		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
