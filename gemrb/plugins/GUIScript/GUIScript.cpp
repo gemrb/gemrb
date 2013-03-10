@@ -2921,8 +2921,9 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 					if (area[0]) {
 						displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 						PyDict_SetItemString(dict, "Destination", PyString_FromString (area) );
+						//drop player in the middle of the map
 						PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
-						// do we need to change Direction here?
+						PyDict_SetItemString(dict, "Direction", PyInt_FromLong (ADIRF_CENTER) );
 						wm->SetEncounterArea(area, wal);
 						break;
 					}

@@ -96,6 +96,13 @@ class Wall_Polygon;
 #define AF_INVULNERABLE   4
 #define AF_ENABLED        8
 
+//direction flags (used in AreaLinks)
+#define ADIRF_NORTH       0x01
+#define ADIRF_EAST        0x02
+#define ADIRF_SOUTH       0x04
+#define ADIRF_WEST        0x08
+#define ADIRF_CENTER      0x10 //not in the original engine
+
 //getline flags
 #define GL_NORMAL         0
 #define GL_PASS           1

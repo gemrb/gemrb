@@ -496,17 +496,20 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 
 		// ok, so the original engine tries these in a different order
 		// (north first, then south) but it doesn't seem to matter
-		if (direction & 0x1) { // north
+		if (direction & ADIRF_NORTH) {
 			X = map->TMap->XCellCount * 32;
 			Y = 0;
-		} else if (direction & 0x2) { // east
+		} else if (direction & ADIRF_EAST) {
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 32;
-		} else if (direction & 0x4) { // south
+		} else if (direction & ADIRF_SOUTH) {
 			X = map->TMap->XCellCount * 32;
 			Y = map->TMap->YCellCount * 64;
-		} else if (direction & 0x8) { // west
+		} else if (direction & ADIRF_WEST) {
 			X = 0;
+			Y = map->TMap->YCellCount * 32;
+		} else if (direction & ADIRF_CENTER) {
+			X = map->TMap->XCellCount * 32;
 			Y = map->TMap->YCellCount * 32;
 		} else {
 			// crashes in original engine
