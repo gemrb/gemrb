@@ -455,9 +455,11 @@ Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 	if( (fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
+		newfx->Target = FX_TARGET_PRESET;
 		if( newfx->Resource3[0]) {
 			strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef)-1 );
 		} else {
+			//FIXME: unhardcode; should probably use a spell hit (shtable) in some way
 			strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef)-1 );
 		}
 		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
