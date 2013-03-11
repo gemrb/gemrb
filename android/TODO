@@ -1,0 +1,7 @@
+2013-03-10
+- prep_env.sh should have more error checks 
+- should probably add a dialog on first run to prompt for GamePath (although there might be a "proper" pre-game config screen a la scummvm?)
+- version checks for override, unhardcoded and GUIScripts
+- mouse cursor seems to get positioned at the corners of the screen touches for some reason, most likely not directly related to the android build though
+- touches have to be rather quick to register as click events, might be related to SDL20Driver::ProcessFirstTouch()
+- add GemRB icon

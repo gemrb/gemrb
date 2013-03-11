@@ -1,0 +1,101 @@
+BUILDING GEMRB FOR ANDROID 
+--------------------------
+
+Tools you will need to build GemRB for Android:
+
+- android-sdk API-level 10 or greater
+- android-ndk (newer is generally better, tested against r8d)
+- ant
+- java 
+- mercurial for building SDL2
+- git for building various other dependencies
+
+--------------------------------------
+Building the apk on a Unix-like System 
+--------------------------------------
+
+Running the following commands from the directory this README resides in will
+build an Android 2.2 and later compatible .apk.
+
+First, use the provided script to prepare the build environment:
+
+  bash prep_env.sh $GEMRB_GIT_PATH
+
+where $GEMRB_GIT_PATH is the full path to the directory above the one this
+README resides in.  This script will create neccessary folders, check out and
+build a few of the neccessary libraries and copy and modify a few project files.
+
+After the completion of the script, you can change into the build directory
+with:
+
+  cd build/gemrb
+
+and subsequently compile the remaining libraries and GemRB itsself with:
+
+  ndk-build 
+
+for a stripped build or 
+
+  ndk-build NDK_DEBUG=1 
+
+if you want a debuggable build.
+
+When the compilation concluded successfully, you can package the apk with:
+
+  ant debug
+
+You can supply the additional argument "install" to ant to directly install the
+resulting apk to a device connected to the computer which builds it, i.e:
+
+  ant debug install
+
+NOTE: To use this command, you HAVE to have USB-Debugging enabled on your
+Android device.
+
+If everything ran without any errors you should find a file named
+"SDLActivity-debug.apk" in build/gemrb/bin below the folder this README resides
+in. If you ran ant with the "install" argument, you can directly run GemRB from
+your devices' main menu. If you didn't, you can copy the apk file to your device
+with 
+
+  adb push bin/SDLActivity-debug.apk /sdcard/
+
+assuming you are still in build/gemrb.
+
+---------------------
+Configuring your game
+---------------------
+
+You will have to install the widescreen mod for your game.
+Depending on the version of Android on your device, you have to adjust the
+height by 48 pixels, seeing as the home bar takes up space on the screen.
+
+NOTE: Due to performance issues, it is recommended to chose a resolution that
+keeps the aspect ratio of your screen but does not equal your native resolution.
+
+-----------------
+Configuring GemRB
+-----------------
+
+The app will most likely not start your game on the first start.
+This is because the supplied config file does not know about the location of
+your game data. You will need to run the following command to retrieve the config
+file:
+
+  adb pull /sdcard/Android/data/net.sourceforge.gemrb/files/.GemRB/GemRB.cfg
+
+and edit it with your preferred text editor. Pay attention to the comments in
+the file, the entries you need to change are:
+
+  - GamePath
+  - CD1 to CD5
+  - CachePath
+
+After you adjust these paths, you have to copy the file back to the correct
+location on your device:
+
+  adb push GemRB.cfg /sdcard/Android/data/net.sourceforge.gemrb/files/.GemRB/GemRB.cfg
+
+Assuming you followed all these steps correctly, you should be able to run the
+app from your device's main menu and the game should start correctly.
+
