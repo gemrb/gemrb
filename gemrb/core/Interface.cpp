@@ -4032,42 +4032,63 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
 
+	DataFileMgr* defaults = NULL;
+	DataFileMgr* overrides = NULL;
+
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
 	// if filename is not set we assume we are creating defaults without an INI
 	if (iniFileName[0] && !ini->Open(iniStream)) {
 		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
+	} else {
+		overrides = ini.get();
 	}
 
-	// now extract only the values we care about with defaults
-	// iterate our whitelist and load the ini values into vars
-	ieDword nothing;
-	const size_t listSize = sizeof(ConfigWhitelist) / sizeof(ConfigWhitelist[0]);
-	for (size_t i = 0; i < listSize; i++) {
-		INIWhiteListEntry entry = ConfigWhitelist[i];
-		if (!vars->Lookup(entry.INIKey, nothing)) //skip any existing entries. GemRB.cfg has priority
-			vars->SetAt(entry.INIKey, ini->GetKeyAsInt(entry.INITag, entry.INIKey, entry.defaultValue));
+	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
+	DataStream* gemINIStream = gamedata->GetResource( "configdefaults", IE_INI_CLASS_ID );
+
+	if (!gemINIStream || !gemINI->Open(gemINIStream)) {
+		Log(WARNING, "Core", "Unable to load GemRB default values.");
+		defaults = ini.get();
+	} else {
+		defaults = gemINI.get();
+		if (!overrides) {
+			overrides = defaults;
+		}
+	}
+
+	for (int i = 0; i < defaults->GetTagsCount(); i++) {
+		const char* tag = defaults->GetTagNameByIndex(i);
+		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
+			ieDword nothing;
+			const char* key = defaults->GetKeyNameByIndex(tag, j);
+			//skip any existing entries. GemRB.cfg has priority
+			if (!vars->Lookup(key, nothing)) {
+				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
+				vars->SetAt(key, overrides->GetKeyAsInt(tag, key, defaultVal));
+			}
+		}
 	}
 
 	// handle a few special cases
-	if (!ini->GetKeyAsInt("Config", "Sound", 1))
+	if (!overrides->GetKeyAsInt("Config", "Sound", 1))
 		AudioDriverName = "null";
 
-	if (ini->GetKeyAsInt("Game Options", "Cheats", 1)) {
+	if (overrides->GetKeyAsInt("Game Options", "Cheats", 1)) {
 		EnableCheatKeys(1);
 	}
 
 	// copies
-	if (!ini->GetKeyAsInt("Game Options", "Darkvision", 1)) {
+	if (!overrides->GetKeyAsInt("Game Options", "Darkvision", 1)) {
 		vars->SetAt("Infravision", (ieDword)0);
 	}
 
 	if (!Width || !Height) {
-		Height = ini->GetKeyAsInt("Config", "ConfigHeight", Height);
-		int tmpWidth = ini->GetKeyAsInt("Config", "ConfigWidth", 0);
+		Height = overrides->GetKeyAsInt("Config", "ConfigHeight", Height);
+		int tmpWidth = overrides->GetKeyAsInt("Config", "ConfigWidth", 0);
 		if (!tmpWidth) {
 			// Resolution is stored as width only. assume 4|3 ratio.
-			Width = ini->GetKeyAsInt("Program Options", "Resolution", Width);
+			Width = overrides->GetKeyAsInt("Program Options", "Resolution", Width);
 			Height = 0.75 * Width;
 		}
 	}
