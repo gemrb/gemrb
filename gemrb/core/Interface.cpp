@@ -117,67 +117,6 @@ static ieWord IDT_CRITRANGE = 1;
 static ieWord IDT_CRITMULTI = 2;
 static ieWord IDT_SKILLPENALTY = 3;
 
-// whitelist of config values we can push directly into vars
-// one map for each ini section we are interested in
-INIWhiteListEntry ConfigWhitelist[] = {
-	// Program Options
-	{"Program Options", "3D Acceleration", 0},
-	{"Program Options", "BitsPerPixel", 16},
-	{"Program Options", "Brightness Correction", 0},
-	{"Program Options", "Display Movie Subtitles", 0},	// identical to Display Subtitles
-	{"Program Options", "Display Subtitles", 0},		// identical to Display Movie Subtitles
-	{"Program Options", "EnableRollFeedback", 0}, // hidden iwd2 setting for extra roll messages
-	{"Program Options", "Full Screen", 0},
-	{"Program Options", "Gamma Correction", 0},
-	{"Program Options", "SoftBlt", 0}, // unused
-	{"Program Options", "SoftMirrorBlt", 0}, // unused
-	{"Program Options", "SoftSrcKeyBlt", 0}, // unused
-	{"Program Options", "Strref On", 0},
-	{"Program Options", "Tooltips", 50},
-	{"Program Options", "Translucent Shadows", 0},
-	// Program Options - Audio
-	{"Program Options", "Volume Ambients", 100},
-	{"Program Options", "Volume Movie", 100},
-	{"Program Options", "Volume Music", 100},
-	{"Program Options", "Volume SFX", 100},
-	{"Program Options", "Volume Voices", 100},
-	// Debug
-	{"Program Options", "Debug Mode", 0},				// not used. should be implemented. (for logging especially)
-	// Game Options
-	{"Game Options", "Always Dither", 0},
-	{"Game Options", "Always Run", 0},
-	{"Game Options", "Auto Pause Center", 1},
-	{"Game Options", "Auto Pause State", 0},
-	{"Game Options", "Bored Timeout", 0},
-	{"Game Options", "Command Sounds Frequency", 0},
-	{"Game Options", "Critical Hit Screen Shake", 1},
-	{"Game Options", "Darkvision", 1}, // iwd2; treating as replacement for infravision
-	{"Game Options", "Difficulty Level", 0},
-	{"Game Options", "Duplicate Floating Text", 0},
-	{"Game Options", "Environmental Audio", 0}, // TODO: Creative's EAX
-	{"Game Options", "Footsteps", 1},
-	{"Game Options", "Gore", 0}, // unused
-	{"Game Options", "GUI Feedback Level", 0},
-	{"Game Options", "Heal Party on Rest", 0}, // TODO: see Game::RestParty
-	{"Game Options", "Hotkeys On Tooltips", 1},			// not used. should be implemented.
-	{"Game Options", "HP Over Head", 0},
-	{"Game Options", "Infravision", 1},
-	{"Game Options", "Keyboard Scroll Speed", 64},
-	{"Game Options", "Locator Feedback Level", 0},
-	{"Game Options", "Maximum HP", 0},
-	{"Game Options", "Mouse Scroll Speed", 0},
-	{"Game Options", "Music Processing", 1}, // TODO: turned music off completely for performance
-	{"Game Options", "Nightmare Mode", 0},
-	{"Game Options", "Old Portrait Health", 0},
-	{"Game Options", "Selection Sounds Frequency", 0},
-	{"Game Options", "Sound Processing", 1}, // TODO: turned sound off completely for performance
-	{"Game Options", "Subtitles", 0}, // not identical to the above; used for displaying verbal constants
-	{"Game Options", "Suppress Extra Difficulty Damage", 0},
-	{"Game Options", "Weather", 1},
-	// Multiplayer
-	{"Multiplayer", "Last Protocol Used", 0},
-};
-
 Interface::Interface(int iargc, char* iargv[])
 {
 	argc = iargc;
@@ -4114,24 +4053,29 @@ bool Interface::SaveConfig()
 		}
 	}
 
-	// dump the formatted whitelisted config options to the file
-	StringBuffer contents;
-	const size_t listSize = sizeof(ConfigWhitelist) / sizeof(ConfigWhitelist[0]);
-	char lastTag[40] = { "\0" };
-	for (size_t i = 0; i < listSize; i++) {
-		INIWhiteListEntry entry = ConfigWhitelist[i];
-		// write section header
-		if (stricmp(lastTag, entry.INITag)) {
-			strlcpy(lastTag, entry.INITag, sizeof(lastTag));
-			contents.appendFormatted("[%s]\n", lastTag);
+	PluginHolder<DataFileMgr> defaultsINI(IE_INI_CLASS_ID);
+	DataStream* INIStream = gamedata->GetResource( "configdefaults", IE_INI_CLASS_ID );
+
+	if (INIStream && defaultsINI->Open(INIStream)) {
+		// dump the formatted default config options to the file
+		StringBuffer contents;
+		for (int i = 0; i < defaultsINI->GetTagsCount(); i++) {
+			const char* tag = defaultsINI->GetTagNameByIndex(i);
+			// write section header
+			contents.appendFormatted("[%s]\n", tag);
+			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
+				const char* key = defaultsINI->GetKeyNameByIndex(tag, j);
+				ieDword value = 0;
+				assert(vars->Lookup(key, value));
+				contents.appendFormatted("%s = %d\n", key, value);
+			}
 		}
 
-		ieDword keyValue = 0;
-		assert(vars->Lookup(entry.INIKey, keyValue));
-		contents.appendFormatted("%s = %d\n", entry.INIKey, keyValue);
+		fs->Write(contents.get().c_str(), contents.get().size());
+	} else {
+		Log(ERROR, "Core", "Unable to open GemRB defaults. Cannot determine what values to write to %s.", ini_path);
 	}
 
-	fs->Write(contents.get().c_str(), contents.get().size());
 	delete fs;
 	return true;
 }
