@@ -62,10 +62,11 @@ namespace GemRB {
 #ifdef __APPLE__
 // bundle path functions
 enum BundleDirectory {
+	BUNDLE,
 	RESOURCES,
 	PLUGINS
 };
-GEM_EXPORT void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir = RESOURCES);
+GEM_EXPORT void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir = BUNDLE);
 #endif
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */

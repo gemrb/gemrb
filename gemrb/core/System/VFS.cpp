@@ -124,6 +124,11 @@ void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir)
 			// undeined on iOS!
 			bundleDirURL = CFBundleCopyBuiltInPlugInsURL(mainBundle);
 			break;
+		case BUNDLE:
+		default:
+			// get the bundle directory istelf by default
+			bundleDirURL = CFBundleCopyBundleURL(mainBundle);
+			break;
 	}
 	if (bundleDirURL) {
 		CFURLRef absoluteURL = CFURLCopyAbsoluteURL(bundleDirURL);

@@ -2398,7 +2398,7 @@ bool Interface::LoadConfig(const char* filename)
 #if __APPLE__
 		// override will ALWAYS be in the app bundle if not specified in the config
 		// the build process always copys them to the Recources diectory
-		CopyBundlePath(GemRBOverridePath, sizeof(GemRBOverridePath));
+		CopyBundlePath(GemRBOverridePath, sizeof(GemRBOverridePath), RESOURCES);
 #else
 		strcpy( GemRBOverridePath, GemRBPath );
 #endif
@@ -2410,7 +2410,7 @@ bool Interface::LoadConfig(const char* filename)
 #if __APPLE__
 		// override will ALWAYS be in the app bundle if not specified in the config
 		// the build process always copys them to the Recources diectory
-		CopyBundlePath(GemRBUnhardcodedPath, sizeof(GemRBUnhardcodedPath));
+		CopyBundlePath(GemRBUnhardcodedPath, sizeof(GemRBUnhardcodedPath), RESOURCES);
 #else
 		strcpy(GemRBUnhardcodedPath, GemRBPath);
 #endif
@@ -2433,7 +2433,7 @@ bool Interface::LoadConfig(const char* filename)
 #if __APPLE__
 		// GUI scripts will ALWAYS be in the app bundle if not specified in the config
 		// the build process always copys them to the Recources diectory
-		CopyBundlePath(GUIScriptsPath, sizeof(GUIScriptsPath));
+		CopyBundlePath(GUIScriptsPath, sizeof(GUIScriptsPath), RESOURCES);
 #else
 		strcpy( GUIScriptsPath, GemRBPath );
 #endif
