@@ -68,6 +68,15 @@ private:
 	// enough time passes for it to become a right click
 	bool ProcessFirstTouch( int mouseButton );
 	void ClearFirstTouch();
+
+	// temporary methods to scale input coordinates from the renderer to the backbuf
+	// once we have a real SDL2 render pipeline in place we shouldnt require this.
+	// this should only apply to devices where the window size cannot be guaranteed
+	// to match the render size (iOS, Android)
+
+	// TODO: probably need to apply this to mouse input
+	float ScaleCoordinateHorizontal(float x);
+	float ScaleCoordinateVertical(float y);
 };
 
 }

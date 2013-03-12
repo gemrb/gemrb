@@ -380,7 +380,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					// ensure the control we touched becomes focused before attempting to scroll it.
 					// we cannot safely call ProcessFirstTouch anymore because now we process mouse events
 					// this can result in a selection box being created
-					EvntManager->MouseDown(event.tfinger.x * width, event.tfinger.y * height, GEM_MB_ACTION, 0);
+
+					EvntManager->MouseDown(ScaleCoordinateHorizontal(event.tfinger.x),
+										   ScaleCoordinateVertical(event.tfinger.y),
+										   GEM_MB_ACTION, 0);
 				}
 				// invert the coordinates such that dragging down scrolls up etc.
 				int scrollX = (event.tfinger.dx * width) * -1;
@@ -400,7 +403,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				ProcessFirstTouch(GEM_MB_ACTION);
 				ignoreNextFingerUp = false;
 				// standard mouse movement
-				MouseMovement((event.tfinger.x * width), (event.tfinger.y * height));
+				MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
+							  ScaleCoordinateVertical(event.tfinger.y));
 			}
 			// we set this on finger motion because simple up/down are not part of gestures
 			continuingGesture = true;
@@ -418,13 +422,13 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				firstFingerDownTime = GetTickCount();
 				// ensure we get the coords for the actual first finger
 				if (finger0) {
-					firstFingerDown.x = finger0->x * width;
-					firstFingerDown.y = finger0->y * height;
+					firstFingerDown.x = ScaleCoordinateHorizontal(finger0->x);
+					firstFingerDown.y = ScaleCoordinateVertical(finger0->y);
 				} else {
 					// rare case where the touch has
 					// been removed before processing
-					firstFingerDown.x = event.tfinger.x * width;
-					firstFingerDown.y = event.tfinger.y * height;
+					firstFingerDown.x = ScaleCoordinateHorizontal(event.tfinger.x);
+					firstFingerDown.y = ScaleCoordinateVertical(event.tfinger.y);
 				}
 			} else {
 				if (EvntManager && numFingers == core->NumFingInfo) {
@@ -454,8 +458,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						CursorPos.x = event.button.x;
 						CursorPos.y = event.button.y;
 
-						EvntManager->MouseUp((event.tfinger.x * width),
-											 (event.tfinger.y * height),
+						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
+											 ScaleCoordinateVertical(event.tfinger.y),
 											 mouseButton, GetModState(SDL_GetModState()) );
 					}
 				}
@@ -619,6 +623,40 @@ bool SDL20VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors
 bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
 {
 	return (SDL_SetSurfaceAlphaMod(surface, alpha) == 0);
+}
+
+float SDL20VideoDriver::ScaleCoordinateHorizontal(float x)
+{
+	float scaleX;
+	SDL_RenderGetScale(renderer, &scaleX, NULL);
+
+	int winW, winH;
+	float xoffset = 0.0;
+	SDL_GetWindowSize(window, &winW, &winH);
+	float winWf = winW, winHf = winH;
+	// only need to scale if they do not have the same ratio
+	if ((winWf / winHf) != ((float)width / height)) {
+		xoffset = ((winWf - (width * scaleX)) / 2) / winWf;
+		return ((x - xoffset) * (winWf / scaleX));
+	}
+	return x;
+}
+
+float SDL20VideoDriver::ScaleCoordinateVertical(float y)
+{
+	float scaleY;
+	SDL_RenderGetScale(renderer, NULL, &scaleY);
+
+	int winW, winH;
+	float yoffset = 0.0;
+	SDL_GetWindowSize(window, &winW, &winH);
+	float winWf = winW, winHf = winH;
+	// only need to scale if they do not have the same ratio
+	if ((winWf / winHf) != ((float)width / height)) {
+		yoffset = ((winHf - (height * scaleY)) / 2) / winHf;
+		return ((y - yoffset) * (winHf / scaleY));
+	}
+	return y;
 }
 
 #include "plugindef.h"
