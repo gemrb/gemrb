@@ -347,10 +347,9 @@ void ResolveFilePath(char* FilePath)
 	char TempFilePath[_MAX_PATH];
 
 	if (FilePath[0]=='~') {
-		const char *home = getenv("HOME");
-		if (home) {
-			strcpy(TempFilePath, FilePath+1);
-			PathJoin(FilePath, home, TempFilePath, NULL);
+		if (CopyHomePath(TempFilePath, _MAX_PATH)) {
+			PathAppend(TempFilePath, FilePath+1);
+			strcpy(FilePath, TempFilePath);
 			return;
 		}
 	}
@@ -367,9 +366,8 @@ void ResolveFilePath(std::string& FilePath)
 	char TempFilePath[_MAX_PATH];
 
 	if (FilePath[0]=='~') {
-		const char *home = getenv("HOME");
-		if (home) {
-			PathJoin(TempFilePath, home, FilePath.c_str()+1, NULL);
+		if (CopyHomePath(TempFilePath, _MAX_PATH)) {
+			PathAppend(TempFilePath, FilePath.c_str()+1);
 			FilePath = TempFilePath;
 			return;
 		}
@@ -437,6 +435,33 @@ bool MakeDirectory(const char* path)
 #undef mkdir
 #endif
 }
+
+GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
+{
+	char* home = getenv( "HOME" );
+	if (home) {
+		strlcpy(outPath, home, maxLen);
+		return outPath;
+	}
+#ifdef WIN32
+	else {
+		// if home is null check HOMEDRIVE + HOMEPATH
+		char* homedrive = getenv("HOMEDRIVE");
+		home = getenv("HOMEPATH");
+
+		if (home) {
+			outPath[0] = '\0'; //ensure start string length is 0
+			if (homedrive) {
+				strlcpy(outPath, homedrive, maxLen);
+			}
+			PathAppend(outPath, home);
+			return outPath;
+		}
+	}
+#endif
+	return NULL;
+}
+
 
 DirectoryIterator::DirectoryIterator(const char *path)
 	: Directory(NULL), Entry(NULL), Path(path)

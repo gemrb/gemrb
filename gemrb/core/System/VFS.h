@@ -124,6 +124,8 @@ GEM_EXPORT char* PathAppend (char* target, const char* name);
 GEM_EXPORT bool MakeDirectories(const char* path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
+GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen);
+
 class GEM_EXPORT DirectoryIterator {
 public:
 	/**

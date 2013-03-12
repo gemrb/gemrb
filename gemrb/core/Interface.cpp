@@ -2150,22 +2150,15 @@ bool Interface::LoadConfig(void)
 	// FIXME: Create it if it does not exist
 	// Use current dir if $HOME is not defined (or bomb out??)
 
-	char* s = getenv( "HOME" );
-	if (s) {
-		strcpy( UserDir, s );
-#if TARGET_OS_IPHONE
-		//we are in both a sandbox and a bundle
-		strcat( UserDir, "/"PACKAGE".app/");
-#else
-		strcat( UserDir, "/."PACKAGE"/" );
-#endif
+	if (CopyHomePath(UserDir, _MAX_PATH)) {
+		PathAppend(UserDir, "."PACKAGE);
 	} else {
 		strcpy( UserDir, "./" );
 	}
 
 	// Find basename of this program. It does the same as basename (3),
 	// but that's probably missing on some archs
-	s = strrchr( argv[0], PathDelimiter );
+	char* s = strrchr( argv[0], PathDelimiter );
 	if (s) {
 		s++;
 	} else {
