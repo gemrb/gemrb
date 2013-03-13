@@ -42,6 +42,9 @@ namespace GemRB {
 
 class GEM_EXPORT FileStream : public DataStream {
 private:
+#ifdef _DEBUG
+	static int FileStreamPtrCount;
+#endif
 	struct File;
 	File* str;
 	bool opened, created;

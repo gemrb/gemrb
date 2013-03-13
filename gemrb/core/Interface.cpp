@@ -1505,9 +1505,7 @@ int Interface::Init()
 	time_t t;
 	t = time( NULL );
 	srand( ( unsigned int ) t );
-#ifdef _DEBUG
-	FileStreamPtrCount = 0;
-#endif
+
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
 	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());

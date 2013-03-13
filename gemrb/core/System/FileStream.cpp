@@ -26,6 +26,10 @@
 
 namespace GemRB {
 
+#ifdef _DEBUG
+int FileStream::FileStreamPtrCount = 0;
+#endif
+
 #ifdef WIN32
 struct FileStream::File {
 private:
@@ -161,7 +165,7 @@ void FileStream::Close()
 {
 	if (opened) {
 #ifdef _DEBUG
-		core->FileStreamPtrCount--;
+		FileStreamPtrCount--;
 #endif
 		str->Close();
 	}
@@ -187,7 +191,7 @@ bool FileStream::Open(const char* fname)
 		return false;
 	}
 #ifdef _DEBUG
-	core->FileStreamPtrCount++;
+	FileStreamPtrCount++;
 #endif
 	opened = true;
 	created = false;
@@ -205,7 +209,7 @@ bool FileStream::Modify(const char* fname)
 		return false;
 	}
 #ifdef _DEBUG
-	core->FileStreamPtrCount++;
+	FileStreamPtrCount++;
 #endif
 	opened = true;
 	created = true;

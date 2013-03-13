@@ -839,10 +839,6 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	void SetTickHook(EventHandler);
-
-#ifdef _DEBUG
-	int FileStreamPtrCount;
-#endif
 };
 
 extern GEM_EXPORT Interface * core;
