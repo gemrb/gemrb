@@ -47,6 +47,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	IndexedArchive.cpp
 	IniSpawn.cpp
 	Interface.cpp
+	InterfaceConfig.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemMgr.cpp

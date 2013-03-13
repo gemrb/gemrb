@@ -60,6 +60,7 @@ libgemrb_core_la_SOURCES = \
 	IndexedArchive.cpp \
 	IniSpawn.cpp \
 	Interface.cpp \
+	InterfaceConfig.cpp \
 	Inventory.cpp \
 	Item.cpp \
 	ItemMgr.cpp \
