@@ -2147,38 +2147,31 @@ bool Interface::LoadConfig(void)
 		// Explicitly specified cfg file HAS to be present
 		return LoadConfig( argv[2] );
 	}
-#ifndef WIN32
+
+	char datadir[_MAX_PATH];
 	char path[_MAX_PATH];
 	char name[_MAX_PATH];
 
-	// Find directory where user stores GemRB configurations (~/.gemrb).
-	// FIXME: Create it if it does not exist
-	// Use current dir if $HOME is not defined (or bomb out??)
-
-	if (CopyHomePath(UserDir, _MAX_PATH)) {
-		PathAppend(UserDir, "."PACKAGE);
-	} else {
-		strcpy( UserDir, "./" );
-	}
-
 	// Find basename of this program. It does the same as basename (3),
 	// but that's probably missing on some archs
-	char* s = strrchr( argv[0], PathDelimiter );
-	if (s) {
-		s++;
+	char* appName = strrchr( argv[0], PathDelimiter );
+	if (appName) {
+		appName++;
 	} else {
-		s = argv[0];
+		appName = argv[0];
 	}
 
-	strcpy( name, s );
+	strcpy( name, appName );
 	assert(name[0]);
 
-	// FIXME: temporary hack, to be deleted??
-	if (LoadConfig( "GemRB.cfg" )) {
-		return true;
-	}
-
-	PathJoinExt( path, UserDir, name, "cfg" );
+#if TARGET_OS_MAC
+	// CopyGemDataPath would give us bundle resources dir
+	CopyHomePath(datadir, _MAX_PATH);
+	PathAppend(datadir, PACKAGE);
+#else
+	CopyGemDataPath(datadir, _MAX_PATH);
+#endif
+	PathJoinExt( path, datadir, name, "cfg" );
 
 	if (LoadConfig( path )) {
 		return true;
@@ -2197,7 +2190,7 @@ bool Interface::LoadConfig(void)
 		return false;
 	}
 
-	PathJoinExt( path, UserDir, PACKAGE, "cfg" );
+	PathJoinExt( path, datadir, PACKAGE, "cfg" );
 
 	if (LoadConfig( path )) {
 		return true;
@@ -2210,12 +2203,7 @@ bool Interface::LoadConfig(void)
 		return true;
 	}
 #endif
-
 	return false;
-#else // WIN32
-	strcpy( UserDir, ".\\" );
-	return LoadConfig( "GemRB.cfg" );
-#endif// WIN32
 }
 
 bool Interface::LoadConfig(const char* filename)
@@ -2370,33 +2358,19 @@ bool Interface::LoadConfig(const char* filename)
 		strlcpy( GameType, "bg2", sizeof(GameType) );
 	}
 
-#ifdef DATADIR
 	if (!GemRBPath[0]) {
-		strcpy( GemRBPath, DATADIR );
+		CopyGemDataPath(GemRBPath, _MAX_PATH);
 	}
-#endif
 	ResolveFilePath(GemRBPath);
 
 	if (!GemRBOverridePath[0]) {
-#if __APPLE__
-		// override will ALWAYS be in the app bundle if not specified in the config
-		// the build process always copys them to the Recources diectory
-		CopyBundlePath(GemRBOverridePath, sizeof(GemRBOverridePath), RESOURCES);
-#else
 		strcpy( GemRBOverridePath, GemRBPath );
-#endif
 	} else {
 		ResolveFilePath(GemRBOverridePath);
 	}
 
 	if (!GemRBUnhardcodedPath[0]) {
-#if __APPLE__
-		// override will ALWAYS be in the app bundle if not specified in the config
-		// the build process always copys them to the Recources diectory
-		CopyBundlePath(GemRBUnhardcodedPath, sizeof(GemRBUnhardcodedPath), RESOURCES);
-#else
 		strcpy(GemRBUnhardcodedPath, GemRBPath);
-#endif
 	} else {
 		ResolveFilePath(GemRBUnhardcodedPath);
 	}
@@ -2413,13 +2387,7 @@ bool Interface::LoadConfig(const char* filename)
 	}
 
 	if (!GUIScriptsPath[0]) {
-#if __APPLE__
-		// GUI scripts will ALWAYS be in the app bundle if not specified in the config
-		// the build process always copys them to the Recources diectory
-		CopyBundlePath(GUIScriptsPath, sizeof(GUIScriptsPath), RESOURCES);
-#else
 		strcpy( GUIScriptsPath, GemRBPath );
-#endif
 	} else {
 		ResolveFilePath( GUIScriptsPath );
 	}
@@ -2438,7 +2406,8 @@ bool Interface::LoadConfig(const char* filename)
 	}
 
 	if (! CachePath[0]) {
-		PathJoin( CachePath, UserDir, "Cache", NULL );
+		CopyGemDataPath(CachePath, _MAX_PATH);
+		PathAppend(CachePath, "Cache");
 	} else {
 		ResolveFilePath(CachePath);
 	}

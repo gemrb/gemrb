@@ -462,6 +462,37 @@ GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 	return NULL;
 }
 
+GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
+{
+// build time supplied directory first
+#ifdef DATADIR
+	strlcpy(outPath, DATADIR, _MAX_PATH);
+#else
+#ifdef __APPLE__
+	CopyBundlePath(outPath, maxLen, RESOURCES);
+#else
+	// check $GEM_DATA env. note that Android wrapper sets this.
+	char* dataDir = getenv("GEM_DATA");
+	if (dataDir) {
+		strlcpy(outPath, dataDir, maxLen);
+	} else {
+		if (!CopyHomePath(outPath, maxLen)) {
+#ifdef WIN32
+			strlcpy(outPath, ".\\", maxLen);
+		} else {
+			PathAppend(outPath, PACKAGE);
+#else
+			strlcpy(outPath, "./", maxLen);
+		} else {
+			PathAppend(outPath, "."PACKAGE);
+#endif
+		}
+	}
+#endif
+#endif
+	return outPath;
+}
+
 
 DirectoryIterator::DirectoryIterator(const char *path)
 	: Directory(NULL), Entry(NULL), Path(path)

@@ -126,6 +126,9 @@ GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
 GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen);
 
+// default directory housing GUIScripts/Override/Unhardcoded
+GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen);
+
 class GEM_EXPORT DirectoryIterator {
 public:
 	/**

@@ -771,7 +771,6 @@ public:
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
-	char UserDir[_MAX_PATH];
 	int argc;
 	char **argv;
 	char CustomFontPath[_MAX_PATH];
