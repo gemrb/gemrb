@@ -2142,6 +2142,11 @@ ieDword Interface::HasFeature(int position) const
 /** Search directories and load a config file */
 bool Interface::LoadConfig(void)
 {
+	// If we were called as $0 -c <filename>, load config from filename
+	if (argc > 2 && ! strcmp("-c", argv[1])) {
+		// Explicitly specified cfg file HAS to be present
+		return LoadConfig( argv[2] );
+	}
 #ifndef WIN32
 	char path[_MAX_PATH];
 	char name[_MAX_PATH];
@@ -2167,16 +2172,6 @@ bool Interface::LoadConfig(void)
 
 	strcpy( name, s );
 	assert(name[0]);
-
-	// If we were called as $0 -c <filename>, load config from filename
-	if (argc > 2 && ! strcmp("-c", argv[1])) {
-		if (LoadConfig( argv[2] )) {
-			return true;
-		} else {
-			// Explicitly specified cfg file HAS to be present
-			return false;
-		}
-	}
 
 	// FIXME: temporary hack, to be deleted??
 	if (LoadConfig( "GemRB.cfg" )) {
@@ -2218,11 +2213,6 @@ bool Interface::LoadConfig(void)
 
 	return false;
 #else // WIN32
-	// If we were called as $0 -c <filename>, load config from filename
-	if (argc > 2 && ! strcmp("-c", argv[1])) {
-		return LoadConfig( argv[2] );
-		// Explicitly specified cfg file HAS to be present
-	}
 	strcpy( UserDir, ".\\" );
 	return LoadConfig( "GemRB.cfg" );
 #endif// WIN32
