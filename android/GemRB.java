@@ -27,14 +27,13 @@ public class GemRB extends SDLActivity {
   public String newPath;
 
   protected void onCreate(Bundle savedInstanceState) {
-    File homePath = getApplicationContext().getExternalFilesDir(null); // null for general purpose files
-    File gemrbHomeFolder = new File(homePath.getAbsolutePath(), ".GemRB");
+    File gemrbHomeFolder = getApplicationContext().getExternalFilesDir(null); // null for general purpose files
     String[] foldersToExtract = { "GUIScripts", "override", "unhardcoded" };
 
     // first clear the directories and their contents
     Log.d("GemRB Activity", "Cleaning up...");
     for(String folder : foldersToExtract) {
-      deleteRecursive(new File(gemrbHomeFolder.getAbsolutePath().concat(homePath.separator).concat(folder)));
+      deleteRecursive(new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat(folder)));
     }
 
     Log.d("GemRB Activity", "Extracting new files...");
@@ -47,25 +46,21 @@ public class GemRB extends SDLActivity {
 
     Log.d("GemRB Activity", "Checking GemRB.cfg content.");
 
-    File finalConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(homePath.separator).concat("GemRB.cfg"));
+    File finalConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
 
     if(!finalConfFile.exists()) {
       Log.d("GemRB Activity", "GemRB.cfg doesn't exist in the expected location, creating it from the packaged template.");
 
       // String[] keysToChange = { "GUIScriptsPath", "GemRBOverridePath", "GemRBUnhardcodedPath" };
       try {
-        File inConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(homePath.separator).concat("packaged.GemRB.cfg"));
+        File inConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("packaged.GemRB.cfg"));
         BufferedReader inConf = new BufferedReader(new FileReader(inConfFile));
-        File outConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(homePath.separator).concat("new.GemRB.cfg"));
+        File outConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("new.GemRB.cfg"));
         BufferedWriter outConf = new BufferedWriter(new FileWriter(outConfFile));
 
         String line;
 
         while((line = inConf.readLine()) != null) {
-          if(line.contains("<EXTPATH_PLACEHOLDER>")) {
-            line = line.replace("<EXTPATH_PLACEHOLDER>", gemrbHomeFolder.toString());
-            Log.d("GemRB Activity", "Line after replace: " + line);
-          }
           outConf.write(line.concat("\n"));
           outConf.flush();
         }
@@ -78,24 +73,7 @@ public class GemRB extends SDLActivity {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    } else if(finalConfFile.exists()) {
-      try {
-        BufferedReader existingConfFile = new BufferedReader(new FileReader(finalConfFile));
-
-        String line;
-        while((line = existingConfFile.readLine()) != null) {
-          if(line.contains("GUIScriptsPath") || line.contains("GemRBOverridePath") || line.contains("GemRBUnhardcodedPath")) {
-            Log.d("GemRB Activity", "At least one of GUIScriptsPath, GemRBOverridePath or GemRBUnhardcodedPath is wrongly configured in your GemRB.cfg");
-          }
-        }
-
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      }
-
-    } else { 
-      Log.d("GemRB Activity", "GemRB.cfg already exists, assuming correct configuration.");
-    }
+    }  
 
     super.onCreate(savedInstanceState);
   }
