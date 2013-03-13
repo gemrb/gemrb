@@ -37,7 +37,6 @@
 	#define SIZEOF_LONG_INT 8
 
 	#define MAC_GEMRB_APPSUPPORT "~/Library/Application Support/GemRB"
-	#define PLUGINDIR "~/Library/Application Support/GemRB/plugins"
 #endif
 
 #define HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1

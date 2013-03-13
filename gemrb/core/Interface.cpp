@@ -117,11 +117,8 @@ static ieWord IDT_CRITRANGE = 1;
 static ieWord IDT_CRITMULTI = 2;
 static ieWord IDT_SKILLPENALTY = 3;
 
-Interface::Interface(int iargc, char* iargv[])
+Interface::Interface()
 {
-	argc = iargc;
-	argv = iargv;
-
 	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 
 	// default to the correct endianswitch
@@ -1456,8 +1453,16 @@ int Interface::LoadSprites()
 	return GEM_OK;
 }
 
-int Interface::Init()
+int Interface::Init(InterfaceConfig* config)
 {
+	if (!config) {
+		Log(FATAL, "Core", "No Configuration context.");
+		return GEM_ERROR;
+	}
+
+	//once GemRB own format is working well, this might be set to 0
+	SaveAsOriginal = 1;
+
 	plugin_flags = new Variables();
 	plugin_flags->SetType( GEM_VARIABLES_INT );
 
@@ -1479,9 +1484,209 @@ int Interface::Init()
 	vars->SetType( GEM_VARIABLES_INT );
 	vars->ParseKey(true);
 
-	if (!LoadConfig()) {
-		Log(ERROR, "Core", "Could not load config file.");
+	const char* value = NULL;
+#define CONFIG_INT(key, var) \
+		value = config->GetValueForKey(key); \
+		if (value) \
+			var ( atoi( value ) ); \
+		value = NULL;
+
+	CONFIG_INT("Bpp", Bpp =);
+	vars->SetAt("BitsPerPixel", Bpp); //put into vars so that reading from game.ini wont overwrite
+	CONFIG_INT("CaseSensitive", CaseSensitive =);
+	CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
+	CONFIG_INT("DrawFPS", DrawFPS = );
+	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
+	CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
+	CONFIG_INT("FogOfWar", FogOfWar = );
+	CONFIG_INT("FullScreen", FullScreen = );
+	vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite
+	CONFIG_INT("GUIEnhancements", GUIEnhancements = );
+	CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
+	CONFIG_INT("Height", Height = );
+	CONFIG_INT("KeepCache", KeepCache = );
+	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
+	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
+	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
+	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
+	CONFIG_INT("SkipIntroVideos", SkipIntroVideos = );
+	CONFIG_INT("TooltipDelay", TooltipDelay = );
+	CONFIG_INT("Width", Width = );
+	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
+	CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
+	CONFIG_INT("NumFingScroll", NumFingScroll = );
+	CONFIG_INT("NumFingKboard", NumFingKboard = );
+	CONFIG_INT("NumFingInfo", NumFingInfo = );
+	CONFIG_INT("MouseFeedback", MouseFeedback = );
+#undef CONFIG_INT
+
+#define CONFIG_STRING(key, var) \
+		value = config->GetValueForKey(key); \
+		if (value) \
+			strlcpy(var, value, sizeof(var)); \
+		value = NULL;
+
+	CONFIG_STRING("GameCharactersPath", GameCharactersPath);
+	CONFIG_STRING("GameDataPath", GameDataPath);
+	CONFIG_STRING("CustomFontPath", CustomFontPath);
+	CONFIG_STRING("GameName", GameName);
+	CONFIG_STRING("GameOverridePath", GameOverridePath);
+	CONFIG_STRING("GamePortraitsPath", GamePortraitsPath);
+	CONFIG_STRING("GameScriptsPath", GameScriptsPath);
+	CONFIG_STRING("GameSoundsPath", GameSoundsPath);
+	CONFIG_STRING("GameType", GameType);
+
+	// Path configureation
+	CONFIG_STRING("CachePath", CachePath);
+	CONFIG_STRING("GUIScriptsPath", GUIScriptsPath);
+	CONFIG_STRING("GamePath", GamePath);
+	CONFIG_STRING("GemRBOverridePath", GemRBOverridePath);
+	CONFIG_STRING("GemRBUnhardcodedPath", GemRBUnhardcodedPath);
+	CONFIG_STRING("GemRBPath", GemRBPath);
+	CONFIG_STRING("PluginsPath", PluginsPath);
+	CONFIG_STRING("SavePath", SavePath);
+#undef CONFIG_STRING
+
+#define CONFIG_STRING(key, var) \
+		value = config->GetValueForKey(key); \
+		if (value) \
+			var = value; \
+		value = NULL;
+
+	CONFIG_STRING("AudioDriver", AudioDriverName);
+	CONFIG_STRING("VideoDriver", VideoDriverName);
+	CONFIG_STRING("Encoding", Encoding);
+#undef CONFIG_STRING
+
+	value = config->GetValueForKey("ModPath");
+	if (value) {
+		for (char *path = strtok((char*)value,SPathListSeparator);
+			 path;
+			 path = strtok(NULL,SPathListSeparator)) {
+			ResolveFilePath(path);
+			ModPath.push_back(path);
+		}
 	}
+	value = config->GetValueForKey("SkipPlugin");
+	if (value) {
+		plugin_flags->SetAt( value, PLF_SKIP );
+	}
+	value = config->GetValueForKey("DelayPlugin");
+	if (value) {
+		plugin_flags->SetAt( value, PLF_DELAY );
+	}
+
+	for(int i = 0; i < MAX_CD; i++) {
+		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
+		value = config->GetValueForKey(keyname);
+		if (value) {
+			for(char *path = strtok((char*)value, SPathListSeparator);
+				path;
+				path = strtok(NULL,SPathListSeparator)) {
+				ResolveFilePath(path);
+				CD[i].push_back(path);
+			}
+		} else {
+			// nothing in config so create our own
+			char name[_MAX_PATH];
+
+			PathJoin(name, GamePath, keyname, NULL);
+			CD[i].push_back(name);
+			PathJoin(name, GamePath, GameDataPath, keyname, NULL);
+			CD[i].push_back(name);
+		}
+	}
+
+	// tob type is obsolete
+	if (stricmp( GameType, "tob" ) == 0) {
+		strlcpy( GameType, "bg2", sizeof(GameType) );
+	}
+
+	if (!GemRBPath[0]) {
+		CopyGemDataPath(GemRBPath, _MAX_PATH);
+	}
+	ResolveFilePath(GemRBPath);
+
+	if (!GemRBOverridePath[0]) {
+		strcpy( GemRBOverridePath, GemRBPath );
+	} else {
+		ResolveFilePath(GemRBOverridePath);
+	}
+
+	if (!GemRBUnhardcodedPath[0]) {
+		strcpy(GemRBUnhardcodedPath, GemRBPath);
+	} else {
+		ResolveFilePath(GemRBUnhardcodedPath);
+	}
+
+	if (!PluginsPath[0]) {
+#ifdef PLUGINDIR
+		// temporarily use ResolveFilePath here.
+		ResolveFilePath( strcpy( PluginsPath, PLUGINDIR ));
+#else
+		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
+#endif
+	} else {
+		ResolveFilePath( PluginsPath );
+	}
+
+	if (!GUIScriptsPath[0]) {
+		strcpy( GUIScriptsPath, GemRBPath );
+	} else {
+		ResolveFilePath( GUIScriptsPath );
+	}
+
+	if (!GameName[0]) {
+		strcpy( GameName, GEMRB_STRING );
+	}
+
+	ResolveFilePath( GamePath );
+
+	if (!SavePath[0]) {
+		// FIXME: maybe should use UserDir instead of GamePath
+		strcpy( SavePath, GamePath );
+	} else {
+		ResolveFilePath( SavePath );
+	}
+
+	if (! CachePath[0]) {
+		CopyGemDataPath(CachePath, _MAX_PATH);
+		PathAppend(CachePath, "Cache");
+	} else {
+		ResolveFilePath(CachePath);
+	}
+
+	FixPath( GUIScriptsPath, true );
+	FixPath( PluginsPath, true );
+	FixPath( GemRBPath, true );
+	FixPath( GemRBOverridePath, true );
+	FixPath(GemRBUnhardcodedPath, true);
+
+	if (GamePath[0]) {
+		FixPath( GamePath, true );
+	}
+
+	//FixPath( SavePath, false );
+	//MakeDirectory(SavePath);
+	FixPath( SavePath, true );
+
+	FixPath( CachePath, false );
+	if (!MakeDirectories(CachePath)) {
+		error("Core", "Unable to create cache directory '%s'", CachePath);
+	}
+
+	// Missing GameType is a common users' error
+	if (!GameType[0]) {
+		Log(ERROR, "Config", "GameType was not set in your config file.");
+		return false;
+	}
+
+	if ( StupidityDetector( CachePath )) {
+		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
+		return false;
+	}
+	if (!KeepCache) DelTree((const char *) CachePath, false);
+
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
 	PluginMgr *plugin = PluginMgr::Get();
 #if TARGET_OS_MAC
@@ -2135,334 +2340,6 @@ void Interface::SetFeature(int flag, int position)
 ieDword Interface::HasFeature(int position) const
 {
 	return GameFeatures[position>>5] & (1<<(position&31));
-}
-
-/** Search directories and load a config file */
-bool Interface::LoadConfig(void)
-{
-	// If we were called as $0 -c <filename>, load config from filename
-	if (argc > 2 && ! strcmp("-c", argv[1])) {
-		// Explicitly specified cfg file HAS to be present
-		return LoadConfig( argv[2] );
-	}
-
-	char datadir[_MAX_PATH];
-	char path[_MAX_PATH];
-	char name[_MAX_PATH];
-
-	// Find basename of this program. It does the same as basename (3),
-	// but that's probably missing on some archs
-	char* appName = strrchr( argv[0], PathDelimiter );
-	if (appName) {
-		appName++;
-	} else {
-		appName = argv[0];
-	}
-
-	strcpy( name, appName );
-	assert(name[0]);
-
-#if TARGET_OS_MAC
-	// CopyGemDataPath would give us bundle resources dir
-	CopyHomePath(datadir, _MAX_PATH);
-	PathAppend(datadir, PACKAGE);
-#else
-	CopyGemDataPath(datadir, _MAX_PATH);
-#endif
-	PathJoinExt( path, datadir, name, "cfg" );
-
-	if (LoadConfig( path )) {
-		return true;
-	}
-
-#ifdef SYSCONFDIR
-	PathJoinExt( path, SYSCONFDIR, name, "cfg" );
-
-	if (LoadConfig( path )) {
-		return true;
-	}
-#endif
-
-	// Don't try with default binary name if we have tried it already
-	if (!strcmp( name, PACKAGE )) {
-		return false;
-	}
-
-	PathJoinExt( path, datadir, PACKAGE, "cfg" );
-
-	if (LoadConfig( path )) {
-		return true;
-	}
-
-#ifdef SYSCONFDIR
-	PathJoinExt( path, SYSCONFDIR, PACKAGE, "cfg" );
-
-	if (LoadConfig( path )) {
-		return true;
-	}
-#endif
-	return false;
-}
-
-bool Interface::LoadConfig(const char* filename)
-{
-	size_t i;
-
-	Log(MESSAGE, "Config", "Trying to open \"%s\".", filename);
-	FileStream* config = FileStream::OpenFile(filename);
-	if (config == NULL) {
-		Log(ERROR, "Config", "Failed to open config file \"%s\".", filename);
-		return false;
-	}
-
-	//once GemRB own format is working well, this might be set to 0
-	SaveAsOriginal = 1;
-
-	int lineno = 0;
-	while (config->Remains()) {
-		char line[1024];
-		char *name, *nameend, *value, *valueend;
-
-		if (config->ReadLine(line, _MAX_PATH) == -1) {
-			break;
-		}
-		lineno++;
-
-		// skip leading blanks from name
-		name = line;
-		name += strspn( line, " \t\r\n" );
-
-		// ignore empty or comment lines
-		if (*name == '\0' || *name == '#') {
-			continue;
-		}
-
-		value = strchr( name, '=' );
-		if (!value || value == name) {
-			Log(WARNING, "Config", "Invalid line %d", lineno);
-			continue;
-		}
-
-		// trim trailing blanks from name
-		nameend = value;
-		while (nameend > name && strchr( "= \t", *nameend )) {
-			*nameend-- = '\0';
-		}
-
-		value++;
-		// skip leading blanks
-		value += strspn( value, " \t");
-
-		// trim trailing blanks from value
-		valueend = value + strlen( value ) - 1;
-		while (valueend >= value && strchr( " \t\r\n", *valueend )) {
-			*valueend-- = '\0';
-		}
-
-		if (false) {
-#define CONFIG_INT(str, var) \
-		} else if (stricmp(name, str) == 0) { \
-			var ( atoi(value) )
-		CONFIG_INT("Bpp", Bpp = );
-			vars->SetAt("BitsPerPixel", Bpp); //put into vars so that reading from game.ini wont overwrite our value
-		CONFIG_INT("CaseSensitive", CaseSensitive = );
-		CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
-		CONFIG_INT("DrawFPS", DrawFPS = );
-		CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
-		CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
-		CONFIG_INT("FogOfWar", FogOfWar = );
-		CONFIG_INT("FullScreen", FullScreen = );
-			vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite our value
-		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
-		CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
-		CONFIG_INT("Height", Height = );
-		CONFIG_INT("KeepCache", KeepCache = );
-		CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
-		CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
-		CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
-		CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
-		CONFIG_INT("SkipIntroVideos", SkipIntroVideos = );
-		CONFIG_INT("TooltipDelay", TooltipDelay = );
-		CONFIG_INT("Width", Width = );
-		CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
-		CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
-		CONFIG_INT("NumFingScroll", NumFingScroll = );
-		CONFIG_INT("NumFingKboard", NumFingKboard = );
-		CONFIG_INT("NumFingInfo", NumFingInfo = );
-		CONFIG_INT("MouseFeedback", MouseFeedback = );
-#undef CONFIG_INT
-#define CONFIG_STRING(str, var) \
-		} else if (stricmp(name, str) == 0) { \
-			strlcpy(var, value, sizeof(var))
-		CONFIG_STRING("GameCharactersPath", GameCharactersPath);
-		CONFIG_STRING("GameDataPath", GameDataPath);
-		CONFIG_STRING("CustomFontPath", CustomFontPath);
-		CONFIG_STRING("GameName", GameName);
-		CONFIG_STRING("GameOverridePath", GameOverridePath);
-		CONFIG_STRING("GamePortraitsPath", GamePortraitsPath);
-		CONFIG_STRING("GameScriptsPath", GameScriptsPath);
-		CONFIG_STRING("GameSoundsPath", GameSoundsPath);
-		CONFIG_STRING("GameType", GameType);
-#undef CONFIG_STRING
-#define CONFIG_STRING(str, var) \
-		} else if (stricmp(name, str) == 0) { \
-			var = value
-		CONFIG_STRING("AudioDriver", AudioDriverName);
-		CONFIG_STRING("VideoDriver", VideoDriverName);
-		CONFIG_STRING("Encoding", Encoding);
-#undef CONFIG_STRING
-#define CONFIG_PATH(str, var) \
-		} else if (stricmp(name, str) == 0) { \
-			strlcpy(var, value, sizeof(var));
-		CONFIG_PATH("CachePath", CachePath);
-		CONFIG_PATH("GUIScriptsPath", GUIScriptsPath);
-		CONFIG_PATH("GamePath", GamePath);
-		CONFIG_PATH("GemRBOverridePath", GemRBOverridePath);
-		CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath);
-		CONFIG_PATH("GemRBPath", GemRBPath);
-		CONFIG_PATH("PluginsPath", PluginsPath);
-		CONFIG_PATH("SavePath", SavePath);
-#undef CONFIG_PATH
-		} else if (stricmp( name, "ModPath" ) == 0) {
-			for (char *path = strtok(value,SPathListSeparator);
-					path;
-					path = strtok(NULL,SPathListSeparator)) {
-				ModPath.push_back(path);
-			}
-		} else if (stricmp( name, "SkipPlugin" ) == 0) {
-			plugin_flags->SetAt( value, PLF_SKIP );
-		} else if (stricmp( name, "DelayPlugin" ) == 0) {
-			plugin_flags->SetAt( value, PLF_DELAY );
-		} else {
-			for(i=0;i<MAX_CD;i++) {
-				char keyname[] = { 'C', 'D', char('1'+i), '\0' };
-				if (stricmp(name, keyname) == 0) {
-					for(char *path = strtok(value, SPathListSeparator);
-							path;
-							path = strtok(NULL,SPathListSeparator)) {
-						CD[i].push_back(path);
-					}
-				}
-			}
-		}
-	}
-	delete config;
-
-	// WARNING: Don't move ResolveFilePath into the loop
-	// Otherwise, it won't obey CaseSensitive set at the end
-	// of the config file.
-
-	if (stricmp( GameType, "tob" ) == 0) {
-		strlcpy( GameType, "bg2", sizeof(GameType) );
-	}
-
-	if (!GemRBPath[0]) {
-		CopyGemDataPath(GemRBPath, _MAX_PATH);
-	}
-	ResolveFilePath(GemRBPath);
-
-	if (!GemRBOverridePath[0]) {
-		strcpy( GemRBOverridePath, GemRBPath );
-	} else {
-		ResolveFilePath(GemRBOverridePath);
-	}
-
-	if (!GemRBUnhardcodedPath[0]) {
-		strcpy(GemRBUnhardcodedPath, GemRBPath);
-	} else {
-		ResolveFilePath(GemRBUnhardcodedPath);
-	}
-
-	if (!PluginsPath[0]) {
-#ifdef PLUGINDIR
-		// temporarily use ResolveFilePAth here. the mac distribution is using ~ for PLUGINDIR
-		ResolveFilePath( strcpy( PluginsPath, PLUGINDIR ));
-#else
-		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
-#endif
-	} else {
-		ResolveFilePath( PluginsPath );
-	}
-
-	if (!GUIScriptsPath[0]) {
-		strcpy( GUIScriptsPath, GemRBPath );
-	} else {
-		ResolveFilePath( GUIScriptsPath );
-	}
-
-	if (!GameName[0]) {
-		strcpy( GameName, GEMRB_STRING );
-	}
-
-	ResolveFilePath( GamePath );
-
-	if (!SavePath[0]) {
-		// FIXME: maybe should use UserDir instead of GamePath
-		strcpy( SavePath, GamePath );
-	} else {
-		ResolveFilePath( SavePath );
-	}
-
-	if (! CachePath[0]) {
-		CopyGemDataPath(CachePath, _MAX_PATH);
-		PathAppend(CachePath, "Cache");
-	} else {
-		ResolveFilePath(CachePath);
-	}
-
-	for (i = 0; i < MAX_CD; ++i) {
-		if (!CD[i].size()) {
-			char cd[] = { 'C', 'D', char('1'+i), '\0' };
-			char name[_MAX_PATH];
-
-			PathJoin(name, GamePath, cd, NULL);
-			CD[i].push_back(name);
-			PathJoin(name, GamePath, GameDataPath, cd, NULL);
-			CD[i].push_back(name);
-		} else {
-			size_t cnt = CD[i].size();
-			while(cnt--) {
-				ResolveFilePath( CD[i][cnt] );
-			}
-		}
-	}
-
-	for (i = 0; i < ModPath.size(); ++i) {
-		ResolveFilePath(ModPath[i]);
-	}
-
-	FixPath( GUIScriptsPath, true );
-	FixPath( PluginsPath, true );
-	FixPath( GemRBPath, true );
-	FixPath( GemRBOverridePath, true );
-	FixPath(GemRBUnhardcodedPath, true);
-	
-	if (GamePath[0]) {
-		FixPath( GamePath, true );
-	}
-
-	//FixPath( SavePath, false );
-	//MakeDirectory(SavePath);
-	FixPath( SavePath, true );
-
-	FixPath( CachePath, false );
-	if (!MakeDirectories(CachePath)) {
-		error("Core", "Unable to create cache directory '%s'", CachePath);
-	}
-
-	// Missing GameType is a common users' error
-	if (!GameType[0]) {
-		Log(ERROR, "Config", "GameType was not set in your config file.");
-		return false;
-	}
-
-	if ( StupidityDetector( CachePath )) {
-		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
-		return false;
-	}
-	if (!KeepCache) DelTree((const char *) CachePath, false);
-
-	return true;
 }
 
 static const char *game_flags[GF_COUNT+1]={

@@ -102,15 +102,18 @@ using namespace GemRB;
 		[confControl release];
 		[procArguments release];
 
-		core = new Interface( argc, argv );
+		INIConfig* config = new INIConfig(argc, argv);
+		core = new Interface();
 		free(argv);
-		if ((ret = core->Init()) == GEM_ERROR) {
+		if ((ret = core->Init(config)) == GEM_ERROR) {
+			delete config;
 			delete( core );
 			Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Relaunching wraper.");
 			// reload the wrapper interface so we can try again instead of dying
 			[self setupWrapper];
 		} else {
 			// pass control to GemRB
+			delete config;
 			core->Main();
 			delete( core );
 			ShutdownLogging();

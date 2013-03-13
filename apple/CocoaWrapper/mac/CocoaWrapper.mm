@@ -181,12 +181,16 @@ static void setupWindowMenu(void)
 
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
-	core = new Interface( gArgc, gArgv );
-	if ((status = core->Init()) == GEM_ERROR) {
+
+	INIConfig* config = new INIConfig(gArgc, gArgv);
+	core = new Interface();
+	if ((status = core->Init(config)) == GEM_ERROR) {
+		delete config;
 		delete( core );
 		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
 	} else {
 		// pass control to GemRB
+		delete config;
 		core->Main();
 		delete( core );
 		ShutdownLogging();

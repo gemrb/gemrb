@@ -78,14 +78,18 @@ int main(int argc, char* argv[])
 	Interface::SanityCheck(VERSION_GEMRB);
 	InitializeLogging();
 
-	core = new Interface( argc, argv );
-	if (core->Init() == GEM_ERROR) {
+	INIConfig* config = new INIConfig(argc, argv);
+
+	core = new Interface();
+	if (core->Init( config ) == GEM_ERROR) {
+		delete config;
 		delete( core );
 		Log(MESSAGE, "Main", "Press enter to continue...");
 		getc(stdin);
 		ShutdownLogging();
 		return -1;
 	}
+	delete config;
 #ifdef ANDROID
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
     SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);

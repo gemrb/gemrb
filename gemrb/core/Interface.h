@@ -33,6 +33,7 @@
 #include "Cache.h"
 #include "Callback.h"
 #include "Holder.h"
+#include "InterfaceConfig.h"
 
 #include <map>
 #include <string>
@@ -399,9 +400,9 @@ public:
 	TimeStruct Time;
 	std::vector<SurgeSpell> SurgeSpells;
 public:
-	Interface(int iargc, char *iargv[]);
+	Interface();
 	~Interface(void);
-	int Init(void);
+	int Init(InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(int value, int position);
 	/* don't rely on the exact return value of this function */
@@ -726,8 +727,6 @@ public:
 	bool SaveConfig();
 private:
 	int LoadSprites();
-	bool LoadConfig(void);
-	bool LoadConfig(const char *filename);
 	bool LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
@@ -771,8 +770,6 @@ public:
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
-	int argc;
-	char **argv;
 	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];
 	char GameType[_MAX_PATH];
