@@ -51,6 +51,8 @@ COCOA_EXPORT
 // Override these application delegate methods in plugin categories
 - (void)applicationWillTerminate:(NSNotification *)aNotification;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
+
+- (IBAction)openGame:(id)sender;
 @end
 
 #if __cplusplus

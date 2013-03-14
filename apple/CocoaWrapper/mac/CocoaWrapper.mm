@@ -128,6 +128,19 @@ static BOOL   gCalledAppMainline = FALSE;
 	// We must exit since the application runloop never returns.
 	exit(status);
 }
+
+- (IBAction)openGame:(id) __unused sender
+{
+	NSOpenPanel* op = [NSOpenPanel openPanel];
+	[op setCanChooseDirectories:YES];
+	[op setCanChooseFiles:NO];
+	[op setAllowsMultipleSelection:NO];
+	[op runModal]; //blocks till user selection
+	
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setObject:[op filename] forKey:@"GamePath"];
+}
+
 @end
 
 @implementation NSString (ReplaceSubString)
