@@ -106,12 +106,27 @@ static BOOL   gCalledAppMainline = FALSE;
 /* Called when the internal event loop has just started running */
 - (void) applicationDidFinishLaunching: (NSNotification *) __unused note
 {
-    int status;
 	AddLogger(createAppleLogger());
 
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
+}
 
+- (IBAction)openGame:(id) __unused sender
+{
+	// be careful to use only methods available in 10.5!
+	NSOpenPanel* op = [NSOpenPanel openPanel];
+	[op setCanChooseDirectories:YES];
+	[op setCanChooseFiles:NO];
+	[op setAllowsMultipleSelection:NO];
+	[op runModal]; //blocks till user selection
+
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setObject:[op filename] forKey:@"GamePath"];
+}
+
+- (IBAction)launchGame:(id) __unused sender
+{
 	InterfaceConfig* config = new InterfaceConfig(gArgc, gArgv);
 
 	// load NSUserDefaults into config
@@ -130,6 +145,7 @@ static BOOL   gCalledAppMainline = FALSE;
 								[value cStringUsingEncoding:NSASCIIStringEncoding]);
 	}
 
+	int status;
 	core = new Interface();
 	if ((status = core->Init(config)) == GEM_ERROR) {
 		delete config;
@@ -147,19 +163,6 @@ static BOOL   gCalledAppMainline = FALSE;
 		// need fancier logic in shouldTerminate implementation first (in SDL plugin)
 		exit(status);
 	}
-}
-
-- (IBAction)openGame:(id) __unused sender
-{
-	// be careful to use only methods available in 10.5!
-	NSOpenPanel* op = [NSOpenPanel openPanel];
-	[op setCanChooseDirectories:YES];
-	[op setCanChooseFiles:NO];
-	[op setAllowsMultipleSelection:NO];
-	[op runModal]; //blocks till user selection
-
-	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-	[defaults setObject:[op filename] forKey:@"GamePath"];
 }
 
 @end

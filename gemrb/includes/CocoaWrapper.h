@@ -53,6 +53,7 @@ COCOA_EXPORT
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
 
 - (IBAction)openGame:(id)sender;
+- (IBAction)launchGame:(id)sender;
 @end
 
 #if __cplusplus
