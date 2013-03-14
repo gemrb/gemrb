@@ -42,76 +42,6 @@ static BOOL   gCalledAppMainline = FALSE;
 /* The main class of the application, the application's delegate */
 @implementation CocoaWrapper
 
-static void setApplicationMenu(void)
-{
-    /* warning: this code is very odd */
-    NSMenu *appleMenu;
-    NSMenuItem *menuItem;
-    NSString *title;
-    NSString *appName;
-
-    appName = @"GemRB";
-    appleMenu = [[NSMenu alloc] initWithTitle:@""];
-
-    /* Add menu items */
-    title = [@"About " stringByAppendingString:appName];
-    [appleMenu addItemWithTitle:title action:@selector(orderFrontStandardAboutPanel:) keyEquivalent:@""];
-
-    [appleMenu addItem:[NSMenuItem separatorItem]];
-
-    title = [@"Hide " stringByAppendingString:appName];
-    [appleMenu addItemWithTitle:title action:@selector(hide:) keyEquivalent:@"h"];
-
-    menuItem = (NSMenuItem *)[appleMenu addItemWithTitle:@"Hide Others" action:@selector(hideOtherApplications:) keyEquivalent:@"h"];
-    [menuItem setKeyEquivalentModifierMask:(NSAlternateKeyMask|NSCommandKeyMask)];
-
-    [appleMenu addItemWithTitle:@"Show All" action:@selector(unhideAllApplications:) keyEquivalent:@""];
-
-    [appleMenu addItem:[NSMenuItem separatorItem]];
-
-    title = [@"Quit " stringByAppendingString:appName];
-    [appleMenu addItemWithTitle:title action:@selector(terminate:) keyEquivalent:@"q"];
-
-    /* Put menu into the menubar */
-    menuItem = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
-    [menuItem setSubmenu:appleMenu];
-    [[NSApp mainMenu] addItem:menuItem];
-
-    /* Tell the application object that this is now the application menu */
-    [NSApp setAppleMenu:appleMenu];
-
-    /* Finally give up our references to the objects */
-    [appleMenu release];
-    [menuItem release];
-}
-
-/* Create a window menu */
-static void setupWindowMenu(void)
-{
-    NSMenu      *windowMenu;
-    NSMenuItem  *windowMenuItem;
-    NSMenuItem  *menuItem;
-
-    windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
-
-    /* "Minimize" item */
-    menuItem = [[NSMenuItem alloc] initWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
-    [windowMenu addItem:menuItem];
-    [menuItem release];
-
-    /* Put menu into the menubar */
-    windowMenuItem = [[NSMenuItem alloc] initWithTitle:@"Window" action:nil keyEquivalent:@""];
-    [windowMenuItem setSubmenu:windowMenu];
-    [[NSApp mainMenu] addItem:windowMenuItem];
-
-    /* Tell the application object that this is now the window menu */
-    [NSApp setWindowsMenu:windowMenu];
-
-    /* Finally give up our references to the objects */
-    [windowMenu release];
-    [windowMenuItem release];
-}
-
 /*
  * Catch document open requests...this lets us notice files when the app
  *  was launched by double-clicking a document, or when a document was
@@ -259,31 +189,23 @@ int main (int argc, char **argv)
         gFinderLaunch = NO;
     }
 
-    NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-    CocoaWrapper				*wrapper;
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
     /* Ensure the application object is initialised */
-    [NSApplication sharedApplication];
-/* Tell the dock about us
-    {
-        CPSProcessSerNum PSN;
-        if (!CPSGetCurrentProcess(&PSN))
-            if (!CPSEnableForegroundOperation(&PSN,0x03,0x3C,0x2C,0x1103))
-                if (!CPSSetFrontProcess(&PSN))
-                    [SDLApplication sharedApplication];
-    }
-*/
+    NSApplication* app = [NSApplication sharedApplication];
+
+	[NSBundle loadNibNamed:@"myMain" owner:NSApp];
 
     /* Set up the menubar */
     [NSApp setMainMenu:[[NSMenu alloc] init]];
-    setApplicationMenu();
-    setupWindowMenu();
 
-    /* Create SDLMain and make it the app delegate */
-    wrapper = [[CocoaWrapper alloc] init];
-    [NSApp setDelegate:wrapper];
+    CocoaWrapper* wrapper = [[CocoaWrapper alloc] init];
+    [app setDelegate:wrapper];
+
+	[NSBundle loadNibNamed:@"GemRB" owner:wrapper];
 
     /* Start the main event loop */
+	[pool drain];
     [NSApp run];
 
     [wrapper release];

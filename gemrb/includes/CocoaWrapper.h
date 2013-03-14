@@ -42,7 +42,7 @@ extern "C" {
 
 COCOA_EXPORT
 @interface CocoaWrapper : NSObject
-#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+#ifdef __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_6
 <NSApplicationDelegate>
 #endif
 {

@@ -389,6 +389,7 @@
 		A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */; };
 		A2E27EF916EEA7B00079E104 /* InterfaceConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E27EF616EEA7B00079E104 /* InterfaceConfig.h */; };
 		A2E27EFA16F109090079E104 /* InterfaceConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */; };
+		A2E27EFC16F12B5A0079E104 /* GemRB.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E27EFB16F12B5A0079E104 /* GemRB.xib */; };
 		A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */; };
 		A2E66350139E882900310FC8 /* Ambient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */; };
@@ -1638,6 +1639,7 @@
 		A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GEM_AppDelegate.mm; sourceTree = "<group>"; };
 		A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InterfaceConfig.cpp; sourceTree = "<group>"; };
 		A2E27EF616EEA7B00079E104 /* InterfaceConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterfaceConfig.h; sourceTree = "<group>"; };
+		A2E27EFB16F12B5A0079E104 /* GemRB.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GemRB.xib; path = CocoaWrapper/mac/nibs/GemRB.xib; sourceTree = "<group>"; };
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2EC8058145F9E6E0033754A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805A1460556B0033754A /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
@@ -2708,6 +2710,7 @@
 			children = (
 				A22693781422931B004468E8 /* CocoaWrapper.h */,
 				A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */,
+				A2E27EFD16F12B6C0079E104 /* nibs */,
 			);
 			name = mac;
 			sourceTree = "<group>";
@@ -3087,6 +3090,14 @@
 				A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */,
 			);
 			path = Logger;
+			sourceTree = "<group>";
+		};
+		A2E27EFD16F12B6C0079E104 /* nibs */ = {
+			isa = PBXGroup;
+			children = (
+				A2E27EFB16F12B5A0079E104 /* GemRB.xib */,
+			);
+			name = nibs;
 			sourceTree = "<group>";
 		};
 		A2E7985B14845AFB00B15DF4 /* iOS static libs */ = {
@@ -4167,6 +4178,7 @@
 			files = (
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A218A75214A8F3DB001142CF /* ../artwork/gemrb.icns in Resources */,
+				A2E27EFC16F12B5A0079E104 /* GemRB.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
