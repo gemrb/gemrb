@@ -1576,7 +1576,8 @@ int Interface::Init(InterfaceConfig* config)
 		plugin_flags->SetAt( value, PLF_DELAY );
 	}
 
-	for(int i = 0; i < MAX_CD; i++) {
+	int i = 0;
+	for(i = 0; i < MAX_CD; i++) {
 		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
 		value = config->GetValueForKey(keyname);
 		if (value) {
@@ -1857,7 +1858,6 @@ int Interface::Init(InterfaceConfig* config)
 		strlcpy(INIConfig, tmp, sizeof(INIConfig));
 	}
 
-	int i;
 	for (i = 0; i < 8; i++) {
 		if (INIConfig[i] == '.')
 			break;
