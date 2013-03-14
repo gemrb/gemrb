@@ -67,7 +67,7 @@ const std::string* InterfaceConfig::GetKeyValuePair(std::string* key) const
 	return NULL;
 }
 	
-INIConfig::INIConfig(int argc, char *argv[])
+CFGConfig::CFGConfig(int argc, char *argv[])
 	: InterfaceConfig(argc, argv)
 {
 	isValid = false;
@@ -143,10 +143,10 @@ done:
 	delete config;
 }
 
-INIConfig::~INIConfig()
+CFGConfig::~CFGConfig()
 {}
 	
-bool INIConfig::InitWithINIData(DataStream* const cfgStream)
+bool CFGConfig::InitWithINIData(DataStream* const cfgStream)
 {
 	if (cfgStream == NULL) {
 		return false;

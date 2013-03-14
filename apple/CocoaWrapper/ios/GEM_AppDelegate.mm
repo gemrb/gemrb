@@ -102,7 +102,7 @@ using namespace GemRB;
 		[confControl release];
 		[procArguments release];
 
-		INIConfig* config = new INIConfig(argc, argv);
+		CFGConfig* config = new CFGConfig(argc, argv);
 		core = new Interface();
 		free(argv);
 		if ((ret = core->Init(config)) == GEM_ERROR) {

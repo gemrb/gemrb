@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 	Interface::SanityCheck(VERSION_GEMRB);
 	InitializeLogging();
 
-	INIConfig* config = new INIConfig(argc, argv);
+	CFGConfig* config = new CFGConfig(argc, argv);
 
 	core = new Interface();
 	if (core->Init( config ) == GEM_ERROR) {

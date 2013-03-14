@@ -46,7 +46,7 @@ public:
 // the defacto config class
 // any platform can use it, but many will want to have their own
 // that coan create a InterfaceConfig instance from non cfg sources
-class GEM_EXPORT INIConfig : public InterfaceConfig
+class GEM_EXPORT CFGConfig : public InterfaceConfig
 {
 private:
 	bool isValid;
@@ -55,8 +55,8 @@ private:
 	bool InitWithINIData(DataStream* const cfgStream);
 
 public:
-	INIConfig(int argc, char *argv[]);
-	~INIConfig();
+	CFGConfig(int argc, char *argv[]);
+	~CFGConfig();
 
 	bool IsValidConfig() {return isValid;};
 };
