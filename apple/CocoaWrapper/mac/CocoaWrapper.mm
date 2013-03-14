@@ -232,8 +232,6 @@ int main (int argc, char **argv)
     /* Ensure the application object is initialised */
     NSApplication* app = [NSApplication sharedApplication];
 
-	[NSBundle loadNibNamed:@"myMain" owner:NSApp];
-
     /* Set up the menubar */
     [NSApp setMainMenu:[[NSMenu alloc] init]];
 
