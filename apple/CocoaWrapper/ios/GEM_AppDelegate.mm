@@ -102,8 +102,8 @@ using namespace GemRB;
 		[confControl release];
 		[procArguments release];
 
-		CFGConfig* config = new CFGConfig(argc, argv);
 		core = new Interface();
+		CFGConfig* config = new CFGConfig(argc, argv);
 		free(argv);
 		if ((ret = core->Init(config)) == GEM_ERROR) {
 			delete config;

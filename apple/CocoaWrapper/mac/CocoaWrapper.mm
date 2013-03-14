@@ -131,6 +131,7 @@ static BOOL   gCalledAppMainline = FALSE;
 
 - (IBAction)launchGame:(id) __unused sender
 {
+	core = new Interface();
 	InterfaceConfig* config = new InterfaceConfig(gArgc, gArgv);
 
 	// load NSUserDefaults into config
@@ -150,7 +151,6 @@ static BOOL   gCalledAppMainline = FALSE;
 	}
 
 	int status;
-	core = new Interface();
 	if ((status = core->Init(config)) == GEM_ERROR) {
 		delete config;
 		delete( core );
