@@ -466,7 +466,7 @@ GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
 {
 // build time supplied directory first
 #ifdef DATADIR
-	strlcpy(outPath, DATADIR, _MAX_PATH);
+	strlcpy(outPath, DATADIR, maxLen);
 #else
 #ifdef __APPLE__
 	CopyBundlePath(outPath, maxLen, RESOURCES);
