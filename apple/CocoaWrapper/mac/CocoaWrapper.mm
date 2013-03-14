@@ -141,9 +141,12 @@ static BOOL   gCalledAppMainline = FALSE;
 		core->Main();
 		delete( core );
 		ShutdownLogging();
+		// We must exit since the application runloop never returns.
+
+		// TODO: we want to be able to use NSApplication terminate method
+		// need fancier logic in shouldTerminate implementation first (in SDL plugin)
+		exit(status);
 	}
-	// We must exit since the application runloop never returns.
-	exit(status);
 }
 
 - (IBAction)openGame:(id) __unused sender
