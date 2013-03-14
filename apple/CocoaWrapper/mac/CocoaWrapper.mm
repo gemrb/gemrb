@@ -112,7 +112,24 @@ static BOOL   gCalledAppMainline = FALSE;
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
 
-	INIConfig* config = new INIConfig(gArgc, gArgv);
+	InterfaceConfig* config = new InterfaceConfig(gArgc, gArgv);
+
+	// load NSUserDefaults into config
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	NSDictionary* dict = [defaults persistentDomainForName:@"net.sourceforge.gemrb"];
+
+	for ( NSString* key in dict ) {
+		NSString* value = nil;
+		id obj = [dict objectForKey:key];
+		if ([obj isKindOfClass:[NSNumber class]]) {
+			value = [(NSNumber*)obj stringValue];
+		} else if ([obj isKindOfClass:[NSString class]]) {
+			value = (NSString*)obj;
+		}
+		config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
+								[value cStringUsingEncoding:NSASCIIStringEncoding]);
+	}
+
 	core = new Interface();
 	if ((status = core->Init(config)) == GEM_ERROR) {
 		delete config;
@@ -131,12 +148,13 @@ static BOOL   gCalledAppMainline = FALSE;
 
 - (IBAction)openGame:(id) __unused sender
 {
+	// be careful to use only methods available in 10.5!
 	NSOpenPanel* op = [NSOpenPanel openPanel];
 	[op setCanChooseDirectories:YES];
 	[op setCanChooseFiles:NO];
 	[op setAllowsMultipleSelection:NO];
 	[op runModal]; //blocks till user selection
-	
+
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 	[defaults setObject:[op filename] forKey:@"GamePath"];
 }
