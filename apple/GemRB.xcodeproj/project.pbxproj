@@ -671,6 +671,11 @@
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
 		A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
+		A2FE2C7B16F2316400DDC6C7 /* DirectoryImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86DD139F0A7D0002DC13 /* DirectoryImporter.cpp */; };
+		A2FE2C7D16F2316400DDC6C7 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2FE2C8416F231ED00DDC6C7 /* NullSound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B872F139F0A7D0002DC13 /* NullSound.cpp */; };
+		A2FE2C8516F231ED00DDC6C7 /* NullSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */; };
+		A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2FE2C8116F2316400DDC6C7 /* NullSource.so */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1073,6 +1078,13 @@
 			remoteGlobalIDString = A29BF85B13A0427900C812DD;
 			remoteInfo = "GemRB iOS";
 		};
+		A2FE2C8216F231CB00DDC6C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2FE2C7916F2316400DDC6C7;
+			remoteInfo = NullSource;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1094,6 +1106,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */,
 				A29504781609724F00BB22AA /* TTFImporter.so in CopyFiles */,
 				A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */,
 				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
@@ -1654,6 +1667,9 @@
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FCD5FB13A0366100271997 /* ACMReader.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = ACMReader.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
+		A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NullSource.cpp; sourceTree = "<group>"; };
+		A2FE2C7816F2313400DDC6C7 /* NullSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NullSource.h; sourceTree = "<group>"; };
+		A2FE2C8116F2316400DDC6C7 /* NullSource.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = NullSource.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FE553A13982BA6006AB962 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -2068,6 +2084,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2FE2C7C16F2316400DDC6C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2FE2C7D16F2316400DDC6C7 /* libgemrb_core.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -2151,6 +2175,7 @@
 				A298DD1114EB4E8C00F59F56 /* SDL2Video.so */,
 				A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */,
 				A29504771609721300BB22AA /* TTFImporter.so */,
+				A2FE2C8116F2316400DDC6C7 /* NullSource.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2262,6 +2287,7 @@
 				A27B871B139F0A7D0002DC13 /* MUSImporter */,
 				A27B8720139F0A7D0002DC13 /* MVEPlayer */,
 				A27B872C139F0A7D0002DC13 /* NullSound */,
+				A2FE2C7516F2313400DDC6C7 /* NullSource */,
 				A27B8731139F0A7D0002DC13 /* OGGReader */,
 				A27B8736139F0A7D0002DC13 /* OpenALAudio */,
 				A27B873F139F0A7D0002DC13 /* PLTImporter */,
@@ -3126,6 +3152,15 @@
 			name = dylibs;
 			sourceTree = "<group>";
 		};
+		A2FE2C7516F2313400DDC6C7 /* NullSource */ = {
+			isa = PBXGroup;
+			children = (
+				A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */,
+				A2FE2C7816F2313400DDC6C7 /* NullSource.h */,
+			);
+			path = NullSource;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -3279,6 +3314,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2FE2C8316F231CB00DDC6C7 /* PBXTargetDependency */,
 				A295047A1609725F00BB22AA /* PBXTargetDependency */,
 				A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */,
 				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
@@ -4096,6 +4132,22 @@
 			productReference = A2FCD5FB13A0366100271997 /* ACMReader.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		A2FE2C7916F2316400DDC6C7 /* NullSource */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2FE2C7E16F2316400DDC6C7 /* Build configuration list for PBXNativeTarget "NullSource" */;
+			buildPhases = (
+				A2FE2C7A16F2316400DDC6C7 /* Sources */,
+				A2FE2C7C16F2316400DDC6C7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NullSource;
+			productName = DirectoryImporter;
+			productReference = A2FE2C8116F2316400DDC6C7 /* NullSource.so */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -4150,6 +4202,7 @@
 				A276B44813A289E000D41A8A /* MUSImporter */,
 				A276B44E13A28A0000D41A8A /* MVEPlayer */,
 				A276B45413A28A0E00D41A8A /* NullSound */,
+				A2FE2C7916F2316400DDC6C7 /* NullSource */,
 				A276B45A13A28A1C00D41A8A /* OGGReader */,
 				A276B46013A28A3100D41A8A /* OpenALAudio */,
 				A276B46613A28A3F00D41A8A /* PLTImporter */,
@@ -4650,6 +4703,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2FE2C8416F231ED00DDC6C7 /* NullSound.cpp in Sources */,
+				A2FE2C8516F231ED00DDC6C7 /* NullSource.cpp in Sources */,
 				A2E27EFA16F109090079E104 /* InterfaceConfig.cpp in Sources */,
 				A29BF8A213A04A6F00C812DD /* ActorMgr.cpp in Sources */,
 				A29BF8A313A04A6F00C812DD /* Ambient.cpp in Sources */,
@@ -5008,6 +5063,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2FE2C7A16F2316400DDC6C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2FE2C7B16F2316400DDC6C7 /* DirectoryImporter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -5295,6 +5358,11 @@
 			isa = PBXTargetDependency;
 			target = A29BF85B13A0427900C812DD /* GemRB iOS */;
 			targetProxy = A2F8709314AE4A8F00F9CC1F /* PBXContainerItemProxy */;
+		};
+		A2FE2C8316F231CB00DDC6C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2FE2C7916F2316400DDC6C7 /* NullSource */;
+			targetProxy = A2FE2C8216F231CB00DDC6C7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -6799,6 +6867,34 @@
 			};
 			name = Release;
 		};
+		A2FE2C7F16F2316400DDC6C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = NullSource;
+			};
+			name = Debug;
+		};
+		A2FE2C8016F2316400DDC6C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = NullSource;
+			};
+			name = Release;
+		};
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -7378,6 +7474,15 @@
 			buildConfigurations = (
 				A2FCD5FC13A0366100271997 /* Debug */,
 				A2FCD5FD13A0366100271997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2FE2C7E16F2316400DDC6C7 /* Build configuration list for PBXNativeTarget "NullSource" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2FE2C7F16F2316400DDC6C7 /* Debug */,
+				A2FE2C8016F2316400DDC6C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
