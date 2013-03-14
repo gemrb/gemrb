@@ -136,7 +136,11 @@ static BOOL   gCalledAppMainline = FALSE;
 
 	// load NSUserDefaults into config
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-	NSDictionary* dict = [defaults persistentDomainForName:@"net.sourceforge.gemrb"];
+	NSDictionary* userValues = [defaults persistentDomainForName:@"net.sourceforge.gemrb"];
+	NSDictionary* defaultValues = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
+
+	NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:defaultValues];
+	[dict addEntriesFromDictionary:userValues];
 
 	for ( NSString* key in dict ) {
 		NSString* value = nil;
