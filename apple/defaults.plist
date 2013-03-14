@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>GUIEnhancements</key>
+	<true/>
+	<key>SkipIntroVideos</key>
+	<false/>
+	<key>DrawFPS</key>
+	<false/>
+	<key>FogOfWar</key>
+	<true/>
+	<key>EnableCheatKeys</key>
+	<true/>
+	<key>Fullscreen</key>
+	<false/>
+	<key>Width</key>
+	<integer>640</integer>
+	<key>Height</key>
+	<integer>480</integer>
+</dict>
+</plist>

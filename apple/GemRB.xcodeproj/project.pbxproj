@@ -669,6 +669,8 @@
 		A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8066146056B40033754A /* CoreGraphics.framework */; };
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
+		A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1651,6 +1653,7 @@
 		A2EC8066146056B40033754A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FCD5FB13A0366100271997 /* ACMReader.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = ACMReader.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
 		A2FE553A13982BA6006AB962 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -2174,6 +2177,7 @@
 		29B97315FDCFA39411CA2CEA /* Cocoa Wrappers */ = {
 			isa = PBXGroup;
 			children = (
+				A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */,
 				A22EBDCC14FF18030029C9C1 /* AppleLogger.h */,
 				A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */,
 				A2A3A7DE14A5130F00F705CF /* ios */,
@@ -4179,6 +4183,7 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A218A75214A8F3DB001142CF /* ../artwork/gemrb.icns in Resources */,
 				A2E27EFC16F12B5A0079E104 /* GemRB.xib in Resources */,
+				A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4192,6 +4197,7 @@
 				A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */,
 				A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */,
 				A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */,
+				A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

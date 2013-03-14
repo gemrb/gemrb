@@ -111,6 +111,9 @@ static BOOL   gCalledAppMainline = FALSE;
 
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
+
+	// Load default defaults
+    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]]];
 }
 
 - (IBAction)openGame:(id) __unused sender
