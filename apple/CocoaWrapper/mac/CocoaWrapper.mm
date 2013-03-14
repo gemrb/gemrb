@@ -165,6 +165,37 @@ static BOOL   gCalledAppMainline = FALSE;
 	}
 }
 
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+	if ([NSApp respondsToSelector:aSelector]) {
+		return YES;
+	}
+	return [super respondsToSelector:aSelector];
+}
+
+- (NSMethodSignature*) methodSignatureForSelector:(SEL)selector
+{
+    // Check if car can handle the message
+    NSMethodSignature* signature = [super
+									methodSignatureForSelector:selector];
+
+    // If not, can the car info string handle the message?
+    if (!signature)
+        signature = [NSApp methodSignatureForSelector:selector];
+
+    return signature;
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation
+{
+    SEL selector = [invocation selector];
+
+    if ([NSApp respondsToSelector:selector])
+    {
+        [invocation invokeWithTarget:NSApp];
+    }
+}
+
 @end
 
 /* Main entry point to executable - should *not* be GemRB_main! */
