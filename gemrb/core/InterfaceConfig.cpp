@@ -137,6 +137,9 @@ if (config->Open(path) \
 		PathJoinExt( path, SYSCONFDIR, PACKAGE, "cfg" );
 		ATTEMPT_INIT;
 #endif
+		// if all else has failed try current directory
+		PathJoinExt(path, "./", PACKAGE, "cfg");
+		ATTEMPT_INIT;
 	}
 #undef ATTEMPT_INIT
 done:
