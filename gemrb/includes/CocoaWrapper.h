@@ -46,8 +46,10 @@ COCOA_EXPORT
 <NSApplicationDelegate>
 #endif
 {
-	// not adding any ivars
+	NSWindow* _prefrences;
 }
+@property(nonatomic, retain) IBOutlet NSWindow* prefrences;
+
 // Override these application delegate methods in plugin categories
 - (void)applicationWillTerminate:(NSNotification *)aNotification;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;

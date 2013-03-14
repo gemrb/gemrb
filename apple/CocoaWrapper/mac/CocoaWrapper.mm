@@ -41,6 +41,7 @@ static BOOL   gCalledAppMainline = FALSE;
 
 /* The main class of the application, the application's delegate */
 @implementation CocoaWrapper
+@synthesize prefrences=_prefrences;
 
 /*
  * Catch document open requests...this lets us notice files when the app
@@ -152,6 +153,7 @@ static BOOL   gCalledAppMainline = FALSE;
 		delete( core );
 		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
 	} else {
+		[_prefrences close];
 		// pass control to GemRB
 		delete config;
 		core->Main();
