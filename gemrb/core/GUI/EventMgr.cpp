@@ -125,7 +125,8 @@ void EventMgr::Clear()
 /** Remove a Window from the array */
 void EventMgr::DelWindow(Window *win)
 {
-	if (last_win_focused == win) {
+	bool focused = (last_win_focused == win);
+	if (focused) {
 		last_win_focused = NULL;
 	}
 	if (last_win_mousefocused == win) {
@@ -152,6 +153,10 @@ void EventMgr::DelWindow(Window *win)
 			for (t = topwin.begin(); t != topwin.end(); ++t) {
 				if ( (*t) == pos) {
 					topwin.erase( t );
+					if (focused && topwin.size() > 0) {
+						//revert focus to new top window
+						SetFocused(windows[topwin[0]], NULL);
+					}
 					return;
 				}
 			}
