@@ -1117,6 +1117,9 @@ static bool check_resistance(Actor* actor, Effect* fx)
 int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance) const
 {
 	//print("FX 0x%02x: %s(%d, %d)", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2);
+	if (fx->TimingMode == FX_DURATION_JUST_EXPIRED) {
+		return FX_NOT_APPLIED;
+	}
 	if( fx->Opcode >= MAX_EFFECTS) {
 		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		return FX_NOT_APPLIED;
