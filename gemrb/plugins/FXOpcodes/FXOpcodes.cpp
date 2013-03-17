@@ -3949,6 +3949,11 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	// kill all other polymorph effects
+	if (fx->FirstApply) {
+		target->fxqueue.RemoveAllEffects(fx_polymorph_ref);
+	}
+
 	// to avoid repeatedly loading the file or keeping all the data around
 	// wasting memory, we keep a PolymorphCache object around, with only
 	// the data we need from the polymorphed creature
