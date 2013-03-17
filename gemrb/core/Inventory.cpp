@@ -445,6 +445,7 @@ void Inventory::KillSlot(unsigned int index)
 			}
 			UpdateWeaponAnimation();
 			break;
+		case SLOT_EFFECT_MAGIC:
 		case SLOT_EFFECT_MELEE:
 			// reset Equipped if it was the removed item
 			if (eqslot == (int)index)
