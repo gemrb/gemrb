@@ -299,6 +299,13 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 IF(APPLE)
+	# Make sure we can find the 'ibtool' program. we need it to compile xibs
+	find_program(IBTOOL ibtool HINTS "/usr/bin" "${OSX_DEVELOPER_ROOT}/usr/bin")
+	IF (${IBTOOL} STREQUAL "IBTOOL-NOTFOUND")
+  		MESSAGE (FATAL_ERROR "ibtool can not be found and is needed to compile the .xib files. It should have been installed with 
+                    the Apple developer tools. The default system paths were searched in addition to ${OSX_DEVELOPER_ROOT}/usr/bin")
+	ENDIF ()
+
 	ADD_DEFINITIONS("-x objective-c++")
 	INCLUDE_DIRECTORIES(apple)
 	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)

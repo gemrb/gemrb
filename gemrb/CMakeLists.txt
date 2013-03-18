@@ -33,13 +33,22 @@ FOREACH(RESOURCE_DIR_NAME ${RESOURCE_LIST})
 ENDFOREACH()
 
 IF(APPLE) #application bundle generation
+	# icon
 	SET_SOURCE_FILES_PROPERTIES(
 		../artwork/gemrb.icns
 		PROPERTIES MACOSX_PACKAGE_LOCATION Resources
 	)
 
+	# default values
+	SET_SOURCE_FILES_PROPERTIES(
+		../apple/defaults.plist
+		PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+	)
+
 	SET(MACOSX_BUNDLE_ICON_FILE gemrb)
-	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm ../artwork/gemrb.icns ${RESOURCE_FILES})
+	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm
+					../artwork/gemrb.icns ../apple/defaults.plist
+					${RESOURCE_FILES})
 	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader \"${BUNDLE_LOADER}\"")
 ELSE(APPLE)
@@ -60,6 +69,16 @@ IF(WIN32)
  TARGET_LINK_LIBRARIES(gemrb gemrb_core)
 ELSE(WIN32)
  IF(APPLE)
+	# custom info.plist
+	SET_TARGET_PROPERTIES(gemrb PROPERTIES MACOSX_BUNDLE_INFO_PLIST ../../apple/osx/Info.plist)
+
+	# compile nib
+	ADD_CUSTOM_COMMAND (TARGET gemrb POST_BUILD 
+                      COMMAND ${IBTOOL} --errors --warnings --notices --output-format human-readable-text 
+                              --compile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources/GemRB.nib 
+                            ../../apple/CocoaWrapper/mac/nibs/GemRB.xib
+                      COMMENT "Compiling GemRB.xib")
+
 	if (STATIC_LINK)
 		TARGET_LINK_LIBRARIES(gemrb
 			  ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
