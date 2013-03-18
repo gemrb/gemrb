@@ -2884,6 +2884,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	}
 
 	bool encounter;
+	int distance;
 	WMPAreaLink *wal = wm->GetEncounterLink(wmc->Area->AreaName, encounter);
 	if (!wal) {
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
@@ -2891,6 +2892,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	}
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
 	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
+	distance = wm->GetDistance(wmc->Area->AreaName);
 
 	if (eval) {
 		wm->ClearEncounterArea();
@@ -2904,12 +2906,14 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 
 			//bounty encounter
 			ieResRef tmpresref;
+			WMPAreaEntry *linkdest = wm->GetEntry(wal->AreaIndex);
 
-			CopyResRef(tmpresref, wmc->Area->AreaName);
+			CopyResRef(tmpresref, linkdest->AreaResRef);
 			if (core->GetGame()->RandomEncounter(tmpresref)) {
 				displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 				PyDict_SetItemString(dict, "Destination", PyString_FromString (tmpresref) );
 				PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+				distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
 				wm->SetEncounterArea(tmpresref, wal);
 			} else {
 				//regular random encounter, find a valid encounter area
@@ -2924,6 +2928,8 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 						//drop player in the middle of the map
 						PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
 						PyDict_SetItemString(dict, "Direction", PyInt_FromLong (ADIRF_CENTER) );
+						//only count half the distance of the final link
+						distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
 						wm->SetEncounterArea(area, wal);
 						break;
 					}
@@ -2932,8 +2938,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 		}
 	}
 
-	//the entrance the user will fall on
-	PyDict_SetItemString(dict, "Distance", PyInt_FromLong (wm->GetDistance(wmc->Area->AreaName)) );
+	PyDict_SetItemString(dict, "Distance", PyInt_FromLong (distance));
 	return dict;
 }
 

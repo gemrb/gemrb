@@ -506,7 +506,7 @@ void WorldMap::SetEncounterArea(const ieResRef area, WMPAreaLink *link) {
 	//setup the area links
 	WMPAreaLink *ldest = new WMPAreaLink();
 	memcpy(ldest, link, sizeof(WMPAreaLink));
-	ldest->DistanceScale = 0;
+	ldest->DistanceScale /= 2;
 	ldest->EncounterChance = 0;
 
 	link = GetLink(dest->AreaName, src->AreaName);
@@ -520,7 +520,7 @@ void WorldMap::SetEncounterArea(const ieResRef area, WMPAreaLink *link) {
 
 	WMPAreaLink *lsrc = new WMPAreaLink();
 	memcpy(lsrc, link, sizeof(WMPAreaLink));
-	lsrc->DistanceScale = 0;
+	lsrc->DistanceScale /= 2;
 	lsrc->EncounterChance = 0;
 
 	unsigned int idx = area_links.size();
