@@ -33,8 +33,8 @@
 namespace GemRB {
 
 #define SET_BLIT_PALETTE( palette )\
-if (palette) ((Palette*)palette)->IncRef();\
-if (blitPalette) blitPalette->Release();\
+if (palette != NULL) ((Palette*)palette)->IncRef();\
+if (blitPalette != NULL) blitPalette->Release();\
 blitPalette = palette;
 
 Font::Font()
