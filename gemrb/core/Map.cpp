@@ -1463,7 +1463,11 @@ bool Map::AnyPCSeesEnemy()
 	return false;
 }
 
-//Make an actor gone for good
+//Make an actor gone for (almost) good
+//If the actor was in the party, it will be moved to the npc storage
+//If the actor is in the NPC storage, its area and some other fields
+//that are needed for proper reentry will be zeroed out
+//If the actor isn't in the NPC storage, it is destructed
 void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
@@ -1475,10 +1479,9 @@ void Map::DeleteActor(int i)
 		ClearSearchMapFor( actor );
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
-		int slot = game->InStore(actor);
-		if (slot >= 0) {
-			game->DelNPC(slot, true);
-		} else {
+		//don't destroy the object in case it is a persistent object
+		//otherwise there is a dead reference causing a crash on save
+		if (game->InStore(actor) < 0) {
 			delete actor;
 		}
 	}
