@@ -6049,6 +6049,8 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		core->GetAudioDrv()->Play(Sound);
 	}
 
+	//keep weight up to date
+	actor->CalculateSpeed(false);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
