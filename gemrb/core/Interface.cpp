@@ -3811,7 +3811,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	}
 
 	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
-	DataStream* gemINIStream = gamedata->GetResource( "configdefaults", IE_INI_CLASS_ID );
+	DataStream* gemINIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
 
 	if (!gemINIStream || !gemINI->Open(gemINIStream)) {
 		Log(WARNING, "Core", "Unable to load GemRB default values.");
@@ -3881,7 +3881,7 @@ bool Interface::SaveConfig()
 	}
 
 	PluginHolder<DataFileMgr> defaultsINI(IE_INI_CLASS_ID);
-	DataStream* INIStream = gamedata->GetResource( "configdefaults", IE_INI_CLASS_ID );
+	DataStream* INIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
 
 	if (INIStream && defaultsINI->Open(INIStream)) {
 		// dump the formatted default config options to the file
