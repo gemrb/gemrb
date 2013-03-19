@@ -4459,7 +4459,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		int money=0;
 		//go for money too
 		if (scr->GetStat(IE_GOLD)>0) {
-			money=RandomNumValue%(scr->GetStat(IE_GOLD)+1);
+			money = (RandomNumValue % scr->GetStat(IE_GOLD)) + 1;
 		}
 		if (!money) {
 			//no stuff to steal
@@ -4471,19 +4471,19 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		if (!CreateItemCore(item, core->GoldResRef, money, 0, 0)) {
 			error("GameScript", "Failed to create pick-pocketed gold '%s' %dg.\n", core->GoldResRef, money);
 		}
-		if ( ASI_SUCCESS == snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
-			scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
-		} else {
+		scr->SetBase(IE_GOLD, scr->GetBase(IE_GOLD) - money);
+		if (ASI_SUCCESS != snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			// drop it at my feet
-			map->AddItemToLocation(Sender->Pos, item);
-			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
-			Sender->ReleaseCurrentAction();
-			return;
+			map->AddItemToLocation(snd->Pos, item);
+			ret = MIC_FULL;
 		}
 	}
 
 	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
 	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
+	if (ret == MIC_FULL && snd->InParty) {
+		displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+	}
 	Sender->ReleaseCurrentAction();
 }
 
