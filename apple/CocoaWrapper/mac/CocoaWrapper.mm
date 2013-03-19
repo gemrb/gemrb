@@ -34,61 +34,14 @@ using namespace GemRB;
 - (void)setAppleMenu:(NSMenu *)menu;
 @end
 
-static int    gArgc;
-static char  **gArgv;
-static BOOL   gFinderLaunch;
-static BOOL   gCalledAppMainline = FALSE;
-
 /* The main class of the application, the application's delegate */
 @implementation CocoaWrapper
 @synthesize prefrences=_prefrences;
 
-/*
- * Catch document open requests...this lets us notice files when the app
- *  was launched by double-clicking a document, or when a document was
- *  dragged/dropped on the app's icon. You need to have a
- *  CFBundleDocumentsType section in your Info.plist to get this message,
- *  apparently.
- *
- * Files are added to gArgv, so to the app, they'll look like command line
- *  arguments. Previously, apps launched from the finder had nothing but
- *  an argv[0].
- *
- * This message may be received multiple times to open several docs on launch.
- *
- * This message is ignored once the app's mainline has been called.
- */
-- (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *)filename
+- (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) __unused filename
 {
-    const char *temparg;
-    size_t arglen;
-    char *arg;
-    char **newargv;
-
-    if (!gFinderLaunch)  /* MacOS is passing command line args. */
-        return FALSE;
-
-    if (gCalledAppMainline)  /* app has started, ignore this document. */
-        return FALSE;
-
-    temparg = [filename UTF8String];
-    arglen = strlen(temparg) + 1;
-    arg = (char *) malloc(arglen);
-    if (arg == NULL)
-        return FALSE;
-
-    newargv = (char **) realloc(gArgv, sizeof (char *) * (gArgc + 2));
-    if (newargv == NULL)
-    {
-        free(arg);
-        return FALSE;
-    }
-    gArgv = newargv;
-
-    strlcpy(arg, temparg, arglen);
-    gArgv[gArgc++] = arg;
-    gArgv[gArgc] = NULL;
-    return TRUE;
+	// TODO: implement this in some way
+	return NO;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *) __unused sender
@@ -108,9 +61,6 @@ static BOOL   gCalledAppMainline = FALSE;
 - (void) applicationDidFinishLaunching: (NSNotification *) __unused note
 {
 	AddLogger(createAppleLogger());
-
-    /* Hand off to main application code */
-    gCalledAppMainline = TRUE;
 
 	// Load default defaults
     [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]]];
@@ -132,7 +82,7 @@ static BOOL   gCalledAppMainline = FALSE;
 - (IBAction)launchGame:(id) __unused sender
 {
 	core = new Interface();
-	InterfaceConfig* config = new InterfaceConfig(gArgc, gArgv);
+	InterfaceConfig* config = new InterfaceConfig(0, NULL);
 
 	// load NSUserDefaults into config
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -208,25 +158,8 @@ static BOOL   gCalledAppMainline = FALSE;
 @end
 
 /* Main entry point to executable - should *not* be GemRB_main! */
-int main (int argc, char **argv)
+int main (int __unused argc, char ** __unused argv)
 {
-    /* Copy the arguments into a global variable */
-    /* This is passed if we are launched by double-clicking */
-    if ( argc >= 2 && strncmp (argv[1], "-psn", 4) == 0 ) {
-        gArgv = (char **) malloc(sizeof (char *) * 2);
-        gArgv[0] = argv[0];
-        gArgv[1] = NULL;
-        gArgc = 1;
-        gFinderLaunch = YES;
-    } else {
-        int i;
-        gArgc = argc;
-        gArgv = (char **) malloc(sizeof (char *) * (argc+1));
-        for (i = 0; i <= argc; i++)
-            gArgv[i] = argv[i];
-        gFinderLaunch = NO;
-    }
-
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
     /* Ensure the application object is initialised */
