@@ -125,18 +125,16 @@ if (config->Open(path) \
 #endif
 
 		// Don't try with default binary name if we have tried it already
-		if (!strcmp( name, PACKAGE )) {
-			goto done;
-		}
+		if (strcmp( name, PACKAGE ) != 0) {
+			PathJoinExt( path, datadir, PACKAGE, "cfg" );
 
-		PathJoinExt( path, datadir, PACKAGE, "cfg" );
-
-		ATTEMPT_INIT;
+			ATTEMPT_INIT;
 
 #ifdef SYSCONFDIR
-		PathJoinExt( path, SYSCONFDIR, PACKAGE, "cfg" );
-		ATTEMPT_INIT;
+			PathJoinExt( path, SYSCONFDIR, PACKAGE, "cfg" );
+			ATTEMPT_INIT;
 #endif
+		}
 		// if all else has failed try current directory
 		PathJoinExt(path, "./", PACKAGE, "cfg");
 		ATTEMPT_INIT;
@@ -148,7 +146,7 @@ done:
 
 CFGConfig::~CFGConfig()
 {}
-	
+
 bool CFGConfig::InitWithINIData(DataStream* const cfgStream)
 {
 	if (cfgStream == NULL) {
