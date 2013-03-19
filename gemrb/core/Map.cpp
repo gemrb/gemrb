@@ -487,7 +487,13 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		command[0]=0;
 		return;
 	}
-	Entrance* ent = map->GetEntrance( entrance );
+	Entrance* ent = NULL;
+	if (entrance[0]) {
+		ent = map->GetEntrance( entrance );
+		if (!ent) {
+			Log(ERROR, "Map", "Invalid entrance '%s' for area %s", entrance, area);
+		}
+	}
 	int X,Y, face;
 	if (!ent) {
 		// no entrance found, try using direction flags
