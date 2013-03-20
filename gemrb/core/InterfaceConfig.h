@@ -40,7 +40,7 @@ public:
 
 	void SetKeyValuePair(const char* key, const char* value);
 	const char* GetValueForKey(const char* key) const;
-	const std::string* GetValueForKey(std::string* key) const;
+	//const std::string* GetValueForKey(std::string* key) const;
 };
 
 // the defacto config class

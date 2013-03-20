@@ -24,7 +24,8 @@
 
 #include "System/FileStream.h"
 
-#include <algorithm>
+// needed for unused std::string version of GetValueForKey
+//#include <algorithm>
 
 namespace GemRB {
 
@@ -70,6 +71,10 @@ const char* InterfaceConfig::GetValueForKey(const char* key) const
 	}
 	return value;
 }
+/*
+Currently unused. does not compile under MSVC.
+
+FIXME: if we need this we should consider having one version of GetValueForKey call the other
 
 const std::string* InterfaceConfig::GetValueForKey(std::string* key) const
 {
@@ -83,7 +88,7 @@ const std::string* InterfaceConfig::GetValueForKey(std::string* key) const
 	}
 	return value;
 }
-	
+*/	
 CFGConfig::CFGConfig(int argc, char *argv[])
 	: InterfaceConfig(argc, argv)
 {
