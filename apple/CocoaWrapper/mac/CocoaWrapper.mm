@@ -46,6 +46,7 @@ using namespace GemRB;
 	if ([fm fileExistsAtPath:filename isDirectory:&isDir] && isDir) {
 		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 		[defaults setObject:filename forKey:@"GamePath"];
+		return YES;
 	}
 	return NO;
 }
