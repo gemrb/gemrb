@@ -95,6 +95,7 @@ class GControl:
   __metaclass__ = metaControl
   methods = {
     'GetRect': _GemRB.Control_GetRect,
+    'HasAnimation': _GemRB.Control_HasAnimation,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,
     'SetPos': _GemRB.Control_SetPos,
     'SetSize': _GemRB.Control_SetSize,

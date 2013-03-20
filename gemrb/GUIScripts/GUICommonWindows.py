@@ -232,7 +232,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		if how: # how doesn't have this in the right place
 			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
-			Window.CreateButton (9, 6, pos, 64, 71)
+			Window.CreateButton (OptionControl['Time'], 6, pos, 64, 71)
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:
 			Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
@@ -1797,7 +1797,7 @@ def UpdateClock ():
 		elif ActionsWindow and ActionsWindow.HasControl (62):
 			Clock = ActionsWindow.GetControl (62)
 
-		if Clock:
+		if Clock and Clock.HasAnimation("CGEAR"):
 			Hours = (GemRB.GetGameTime () % 7200) / 300
 			GUICommon.SetGamedaysAndHourToken ()
 			Clock.SetBAM ("CDIAL", 0, (Hours + 12) % 24)

@@ -3816,6 +3816,28 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject * /*self*/, PyObject
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Control_HasAnimation__doc,
+"HasAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle])\n\n"
+"Checks whether a Control (usually a Button) has a given animation set.");
+
+static PyObject* GemRB_Control_HasAnimation(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	char *ResRef;
+	int Cycle = 0;
+
+	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ResRef, &Cycle )) {
+		return AttributeError( GemRB_Control_HasAnimation__doc );
+	}
+
+	Control* ctl = GetControl(wi, ci, -1);
+	if (ctl && ctl->animation) {
+		return PyBool_FromLong(ctl->animation->SameResource(ResRef, Cycle));
+	}
+
+	return PyBool_FromLong(0);
+}
+
 PyDoc_STRVAR( GemRB_Control_SetAnimation__doc,
 "SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend])\n\n"
 "Sets the animation of a Control (usually a Button) from a BAM file. Optionally an animation cycle could be set too.");
@@ -10802,6 +10824,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetTextColor, METH_VARARGS),
 	METHOD(Control_AttachScrollBar, METH_VARARGS),
 	METHOD(Control_GetRect, METH_VARARGS),
+	METHOD(Control_HasAnimation, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
