@@ -44,17 +44,27 @@ InterfaceConfig::~InterfaceConfig()
 {
 	delete configVars;
 }
-	
+
 void InterfaceConfig::SetKeyValuePair(const char* key, const char* value)
 {
-	configVars->set(key, value);
+	// lowercase the key so that the key is not case sensitive
+	char* keyCopy = strdup(key);
+	for (char* c = keyCopy; *c != '\0'; ++c) *c = tolower(*c);
+	configVars->set(keyCopy, value);
+	free(keyCopy);
 }
 
 const char* InterfaceConfig::GetValueForKey(const char* key) const
 {
 	const char* value = NULL;
-	if (key && configVars->get(key)) {
-		value = configVars->get(key)->c_str();
+	if (key) {
+		// lowercase the key so that the key is not case sensitive
+		char* keyCopy = strdup(key);
+		for (char* c = keyCopy; *c != '\0'; ++c) *c = tolower(*c);
+		if (configVars->get(keyCopy)) {
+			value = configVars->get(keyCopy)->c_str();
+		}
+		free(keyCopy);
 	}
 	return value;
 }
