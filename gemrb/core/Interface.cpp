@@ -1563,8 +1563,8 @@ int Interface::Init(InterfaceConfig* config)
 		for (char *path = strtok((char*)value,SPathListSeparator);
 			 path;
 			 path = strtok(NULL,SPathListSeparator)) {
-			ResolveFilePath(path);
 			ModPath.push_back(path);
+			ResolveFilePath(ModPath.back());
 		}
 	}
 	value = config->GetValueForKey("SkipPlugin");
@@ -1584,8 +1584,8 @@ int Interface::Init(InterfaceConfig* config)
 			for(char *path = strtok((char*)value, SPathListSeparator);
 				path;
 				path = strtok(NULL,SPathListSeparator)) {
-				ResolveFilePath(path);
 				CD[i].push_back(path);
+				ResolveFilePath(CD[i].back());
 			}
 		} else {
 			// nothing in config so create our own
