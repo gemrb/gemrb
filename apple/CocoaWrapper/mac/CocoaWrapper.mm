@@ -38,9 +38,15 @@ using namespace GemRB;
 @implementation CocoaWrapper
 @synthesize prefrences=_prefrences;
 
-- (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) __unused filename
+- (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) filename
 {
-	// TODO: implement this in some way
+	NSFileManager* fm = [NSFileManager defaultManager];
+	// only open if passed a directory
+	BOOL isDir = NO;
+	if ([fm fileExistsAtPath:filename isDirectory:&isDir] && isDir) {
+		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+		[defaults setObject:filename forKey:@"GamePath"];
+	}
 	return NO;
 }
 
@@ -74,8 +80,7 @@ using namespace GemRB;
 	[op setCanChooseFiles:NO];
 	[op setAllowsMultipleSelection:NO];
 	if ([op runModal] == NSFileHandlingPanelOKButton) { //blocks till user selection
-		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-		[defaults setObject:[op filename] forKey:@"GamePath"];
+		[self application:NSApp openFile:[op filename]];
 	}
 }
 
