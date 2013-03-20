@@ -73,10 +73,10 @@ using namespace GemRB;
 	[op setCanChooseDirectories:YES];
 	[op setCanChooseFiles:NO];
 	[op setAllowsMultipleSelection:NO];
-	[op runModal]; //blocks till user selection
-
-	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-	[defaults setObject:[op filename] forKey:@"GamePath"];
+	if ([op runModal] == NSFileHandlingPanelOKButton) { //blocks till user selection
+		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+		[defaults setObject:[op filename] forKey:@"GamePath"];
+	}
 }
 
 - (IBAction)launchGame:(id) __unused sender
