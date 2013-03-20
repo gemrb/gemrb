@@ -1,4 +1,4 @@
-GemRB git (a06b0d3a5b):
+GemRB git (3ab6185f):
   New features:
     - 
     - multibyte font support (chinese, korean, japanese)
@@ -9,8 +9,8 @@ GemRB git (a06b0d3a5b):
 
   Improved features:
     - 
-    - random encounters (properly difficult)
-    - animations, speech
+    - random encounters and spawns (properly difficult)
+    - animations, speech, input
     - looting, worldmap, hotkeys (work everywhere), fatigue
     - iwd2 combat, stats, spells, skills, effects and actions
     - bugfixes
