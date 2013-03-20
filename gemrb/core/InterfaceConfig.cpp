@@ -24,6 +24,8 @@
 
 #include "System/FileStream.h"
 
+#include <algorithm>
+
 namespace GemRB {
 
 InterfaceConfig::InterfaceConfig(int /*argc*/, char** /**argv[]*/)
