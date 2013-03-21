@@ -4506,6 +4506,10 @@ int fx_set_entangle_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_minorglobe_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_minorglobe_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	//the globe vanishes on death
+	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
 	//the resisted levels are stored in minor globe (bit 2-)
 	//the globe effect is stored in the first bit
 	STAT_BIT_OR_PCF( IE_MINORGLOBE, 1);
