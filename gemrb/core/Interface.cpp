@@ -1637,12 +1637,6 @@ int Interface::Init(InterfaceConfig* config)
 		error("Core", "Unable to create cache directory '%s'", CachePath);
 	}
 
-	// Missing GameType is a common users' error
-	if (!GameType[0]) {
-		Log(ERROR, "Config", "GameType was not set in your config file.");
-		return false;
-	}
-
 	if ( StupidityDetector( CachePath )) {
 		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
 		return false;
