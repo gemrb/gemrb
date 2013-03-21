@@ -175,7 +175,7 @@ Interface::Interface()
 
 	mousescrollspd = 10;
 
-	strlcpy( GameType, "auto", sizeof( GameType ));
+	GameType[0] = '\0';
 	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 1;
@@ -209,13 +209,13 @@ Interface::Interface()
 	GemRBUnhardcodedPath[0] = 0;
 	GameName[0] = 0;
 	CustomFontPath[0] = 0;
+	GameOverridePath[0] = 0;
+	GameSoundsPath[0] = 0;
+	GameScriptsPath[0] = 0;
+	GamePortraitsPath[0] = 0;
+	GameCharactersPath[0] = 0;
+	GameDataPath[0] = 0;
 
-	strlcpy( GameOverridePath, "override", sizeof(GameOverridePath) );
-	strlcpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
-	strlcpy( GameScriptsPath, "scripts", sizeof(GameScriptsPath) );
-	strlcpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
-	strlcpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
-	strlcpy( GameDataPath, "data", sizeof(GameDataPath) );
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	CopyResRef( ButtonFont, "STONESML" );
 	CopyResRef( TooltipFont, "STONESML" );
@@ -1520,21 +1520,31 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
 #undef CONFIG_INT
 
-#define CONFIG_STRING(key, var) \
+#define CONFIG_STRING(key, var, default) \
 		value = config->GetValueForKey(key); \
-		if (value) \
+		if (value) { \
 			strlcpy(var, value, sizeof(var)); \
+		} else if (default && default[0]) { \
+			strlcpy(var, default, sizeof(var)); \
+		} else var[0] = '\0'; \
 		value = NULL;
 
-	CONFIG_STRING("GameCharactersPath", GameCharactersPath);
-	CONFIG_STRING("GameDataPath", GameDataPath);
-	CONFIG_STRING("CustomFontPath", CustomFontPath);
-	CONFIG_STRING("GameName", GameName);
-	CONFIG_STRING("GameOverridePath", GameOverridePath);
-	CONFIG_STRING("GamePortraitsPath", GamePortraitsPath);
-	CONFIG_STRING("GameScriptsPath", GameScriptsPath);
-	CONFIG_STRING("GameSoundsPath", GameSoundsPath);
-	CONFIG_STRING("GameType", GameType);
+	CONFIG_STRING("GameCharactersPath", GameCharactersPath, "characters");
+	CONFIG_STRING("GameDataPath", GameDataPath, "data");
+	// TODO: make CustomFontPath cross platform and possibly dynamic
+	CONFIG_STRING("CustomFontPath", CustomFontPath, "/usr/share/fonts/TTF");
+	CONFIG_STRING("GameName", GameName, GEMRB_STRING);
+	CONFIG_STRING("GameOverridePath", GameOverridePath, "override");
+	CONFIG_STRING("GamePortraitsPath", GamePortraitsPath, "portraits");
+	CONFIG_STRING("GameScriptsPath", GameScriptsPath, "scripts");
+	CONFIG_STRING("GameSoundsPath", GameSoundsPath, "sounds");
+	CONFIG_STRING("GameType", GameType, "auto");
+	// tob type is obsolete
+	if (stricmp( GameType, "tob" ) == 0) {
+		strlcpy( GameType, "bg2", sizeof(GameType) );
+	}
+
+#undef CONFIG_STRING
 
 // assumes that default value does not need to be resolved or fixed in any way
 #define CONFIG_PATH(key, var, default) \
@@ -1621,14 +1631,6 @@ int Interface::Init(InterfaceConfig* config)
 			PathJoin(name, GamePath, GameDataPath, keyname, NULL);
 			CD[i].push_back(name);
 		}
-	}
-
-	// tob type is obsolete
-	if (stricmp( GameType, "tob" ) == 0) {
-		strlcpy( GameType, "bg2", sizeof(GameType) );
-	}
-	if (!GameName[0]) {
-		strcpy( GameName, GEMRB_STRING );
 	}
 
 	if (!MakeDirectories(CachePath)) {
