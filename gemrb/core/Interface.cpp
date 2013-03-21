@@ -1536,15 +1536,40 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_STRING("GameSoundsPath", GameSoundsPath);
 	CONFIG_STRING("GameType", GameType);
 
+// assumes that default value does not need to be resolved or fixed in any way
+#define CONFIG_PATH(key, var, default) \
+		value = config->GetValueForKey(key); \
+		if (value) { \
+			strlcpy(var, value, sizeof(var)); \
+			ResolveFilePath(var); \
+			FixPath(var, true); \
+		} else if (default && default[0]) { \
+			strlcpy(var, default, sizeof(var)); \
+		} else var[0] = '\0'; \
+		value = NULL;
+
 	// Path configureation
-	CONFIG_STRING("CachePath", CachePath);
-	CONFIG_STRING("GUIScriptsPath", GUIScriptsPath);
-	CONFIG_STRING("GamePath", GamePath);
-	CONFIG_STRING("GemRBOverridePath", GemRBOverridePath);
-	CONFIG_STRING("GemRBUnhardcodedPath", GemRBUnhardcodedPath);
-	CONFIG_STRING("GemRBPath", GemRBPath);
-	CONFIG_STRING("PluginsPath", PluginsPath);
-	CONFIG_STRING("SavePath", SavePath);
+	CONFIG_PATH("GemRBPath", GemRBPath,
+				CopyGemDataPath(GemRBPath, _MAX_PATH));
+
+	CONFIG_PATH("CachePath", CachePath, "./Cache");
+	FixPath( CachePath, false );
+
+	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
+	CONFIG_PATH("GamePath", GamePath, "");
+
+	CONFIG_PATH("GemRBOverridePath", GemRBOverridePath, GemRBPath);
+	CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath, GemRBPath);
+#ifdef PLUGINDIR
+	CONFIG_PATH("PluginsPath", PluginsPath, PLUGINDIR);
+#else
+	CONFIG_PATH("PluginsPath", PluginsPath, "");
+	if (!PluginsPath[0]) {
+		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
+	}
+#endif
+
+	CONFIG_PATH("SavePath", SavePath, GamePath);
 #undef CONFIG_STRING
 
 #define CONFIG_STRING(key, var) \
@@ -1602,76 +1627,10 @@ int Interface::Init(InterfaceConfig* config)
 	if (stricmp( GameType, "tob" ) == 0) {
 		strlcpy( GameType, "bg2", sizeof(GameType) );
 	}
-
-	if (!GemRBPath[0]) {
-		CopyGemDataPath(GemRBPath, _MAX_PATH);
-	}
-	ResolveFilePath(GemRBPath);
-
-	if (!GemRBOverridePath[0]) {
-		strcpy( GemRBOverridePath, GemRBPath );
-	} else {
-		ResolveFilePath(GemRBOverridePath);
-	}
-
-	if (!GemRBUnhardcodedPath[0]) {
-		strcpy(GemRBUnhardcodedPath, GemRBPath);
-	} else {
-		ResolveFilePath(GemRBUnhardcodedPath);
-	}
-
-	if (!PluginsPath[0]) {
-#ifdef PLUGINDIR
-		// temporarily use ResolveFilePath here.
-		ResolveFilePath( strcpy( PluginsPath, PLUGINDIR ));
-#else
-		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
-#endif
-	} else {
-		ResolveFilePath( PluginsPath );
-	}
-
-	if (!GUIScriptsPath[0]) {
-		strcpy( GUIScriptsPath, GemRBPath );
-	} else {
-		ResolveFilePath( GUIScriptsPath );
-	}
-
 	if (!GameName[0]) {
 		strcpy( GameName, GEMRB_STRING );
 	}
 
-	ResolveFilePath( GamePath );
-
-	if (!SavePath[0]) {
-		// FIXME: maybe should use UserDir instead of GamePath
-		strcpy( SavePath, GamePath );
-	} else {
-		ResolveFilePath( SavePath );
-	}
-
-	if (! CachePath[0]) {
-		CopyGemDataPath(CachePath, _MAX_PATH);
-		PathAppend(CachePath, "Cache");
-	} else {
-		ResolveFilePath(CachePath);
-	}
-
-	FixPath( GUIScriptsPath, true );
-	FixPath( PluginsPath, true );
-	FixPath( GemRBPath, true );
-	FixPath( GemRBOverridePath, true );
-	FixPath(GemRBUnhardcodedPath, true);
-
-	if (GamePath[0]) {
-		FixPath( GamePath, true );
-	}
-
-	//FixPath( SavePath, false );
-	//MakeDirectory(SavePath);
-	FixPath( SavePath, true );
-
-	FixPath( CachePath, false );
 	if (!MakeDirectories(CachePath)) {
 		error("Core", "Unable to create cache directory '%s'", CachePath);
 	}
