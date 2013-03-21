@@ -1522,7 +1522,7 @@ int Interface::Init(InterfaceConfig* config)
 
 #define CONFIG_STRING(key, var, default) \
 		value = config->GetValueForKey(key); \
-		if (value) { \
+		if (value && value[0]) { \
 			strlcpy(var, value, sizeof(var)); \
 		} else if (default && default[0]) { \
 			strlcpy(var, default, sizeof(var)); \
@@ -1549,7 +1549,7 @@ int Interface::Init(InterfaceConfig* config)
 // assumes that default value does not need to be resolved or fixed in any way
 #define CONFIG_PATH(key, var, default) \
 		value = config->GetValueForKey(key); \
-		if (value) { \
+		if (value && value[0]) { \
 			strlcpy(var, value, sizeof(var)); \
 			ResolveFilePath(var); \
 			FixPath(var, true); \
