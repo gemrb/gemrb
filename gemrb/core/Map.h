@@ -86,7 +86,6 @@ class Wall_Polygon;
 #define A_ANI_PALETTE         0x400    //has own palette set
 #define A_ANI_MIRROR          0x800    //mirrored
 #define A_ANI_COMBAT          0x1000   //draw in combat too
-#define A_ANI_FROZEN          0x2000   //still frame, does not change
 
 //creature area flags
 #define AF_CRE_NOT_LOADED 1

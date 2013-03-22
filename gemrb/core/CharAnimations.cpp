@@ -1106,11 +1106,6 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 					a->MirrorAnimation( );
 				}
 				break;
-			case IE_ANI_TWO_PIECE:
-				if (part == 1) {
-					a->Flags |= A_ANI_FROZEN;
-				}
-				break;
 			default:
 				break;
 		}

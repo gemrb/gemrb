@@ -144,7 +144,7 @@ Sprite2D* Animation::NextFrame(void)
 	else
 		ret = frames[pos];
 
-	if ((endReached && (Flags&A_ANI_PLAYONCE)) || (Flags&A_ANI_FROZEN))
+	if (endReached && (Flags&A_ANI_PLAYONCE))
 		return ret;
 
 	unsigned long time;
@@ -182,7 +182,7 @@ Sprite2D* Animation::NextFrame(void)
 Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
-		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive3!");
+		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
 		return NULL;
 	}
 	Sprite2D* ret;
@@ -194,8 +194,8 @@ Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
 	starttime = master->starttime;
 	endReached = master->endReached;
 
-	if (!(Flags&A_ANI_FROZEN))
-		pos = master->pos;
+	//return a valid frame even if the master is longer (e.g. ankhegs)
+	pos = master->pos % indicesCount;
 
 	return ret;
 }
