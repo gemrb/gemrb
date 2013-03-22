@@ -80,7 +80,7 @@ function move_libraries {
   cp $ENVROOT/FREETYPEBUILD_Android.mk $ENVROOT/build/gemrb/jni/freetype2-android/Android/jni/Android.mk
   cp $ENVROOT/RECURSE_Android.mk $ENVROOT/build/gemrb/jni/freetype2-android/Android/Android.mk
   cp $ENVROOT/RECURSE_Android.mk $ENVROOT/build/gemrb/jni/freetype2-android/Android.mk
-  # im not happy with that, but it's ok for now i guess
+  # im not happy with this, but it's ok for now i guess
 
   mkdir build/gemrb/jni/{libogg,libvorbis,libpng,openal}
   cp $ENVROOT/OGG_Android.mk $ENVROOT/build/gemrb/jni/libogg/Android.mk
@@ -110,6 +110,7 @@ function move_libraries {
   ln -s $ENVROOT/openal/include $ENVROOT/build/gemrb/jni/openal/include
 
   # python
+  wget http://sourceforge.net/projects/gemrb/files/Other%20Binaries/android/libpython-2.6.2-pelya.tar.bz2 -O $ENVROOT/libpython.tar
   tar -xf $ENVROOT/libpython.tar -C $ENVROOT/build/gemrb/jni/
 
   echo -en "Done.\n"
