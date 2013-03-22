@@ -78,7 +78,7 @@ class Wall_Polygon;
 #define A_ANI_NO_SHADOW       4        //lightmap doesn't affect it
 #define A_ANI_PLAYONCE        8        //stop after endframe
 #define A_ANI_SYNC            16       //synchronised draw (skip frames if needed)
-#define A_ANI_32              32
+#define A_ANI_RANDOM_START    32       //starts with a random frame in the start range
 #define A_ANI_NO_WALL         64       //draw after walls (walls don't cover it)
 #define A_ANI_NOT_IN_FOG      0x80     //not visible in fog of war
 #define A_ANI_BACKGROUND      0x100    //draw before actors (actors cover it)
