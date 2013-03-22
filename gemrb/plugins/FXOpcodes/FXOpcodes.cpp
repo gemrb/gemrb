@@ -2891,7 +2891,7 @@ int fx_set_deaf_state_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
 	if (!fx->Parameter2) {
-		fx->Parameter1 = 20;
+		fx->Parameter2 = 20;
 	}
 	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
 	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
