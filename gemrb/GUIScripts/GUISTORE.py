@@ -654,6 +654,7 @@ def GetPC():
 			GemRB.SetVar ("RightTopIndex", 0)
 			GemRB.SetVar ("Index", 0)
 			GemRB.SetVar ("TopIndex", 0)
+			UnselectNoRedraw ()
 	else:
 		PreviousPC = GemRB.GameGetSelectedPCSingle ()
 		pc = PreviousPC
