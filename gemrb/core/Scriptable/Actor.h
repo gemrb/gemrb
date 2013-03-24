@@ -609,8 +609,8 @@ public:
 	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
-	/* Heals actor by days */
-	void Heal(int days);
+	/* Heals actor */
+	void Heal(int hp);
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp, int combat);
 	/* Calculate experience bonus */

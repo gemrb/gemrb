@@ -6845,11 +6845,11 @@ void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 	FollowOffset.y = yoffset;
 }
 
-//if days == 0, it means full healing
-void Actor::Heal(int days)
+//if hp <= 0, it means full healing
+void Actor::Heal(int hp)
 {
-	if (days) {
-		SetBase(IE_HITPOINTS, BaseStats[IE_HITPOINTS]+days*2);
+	if (hp > 0) {
+		SetBase(IE_HITPOINTS, BaseStats[IE_HITPOINTS] + hp);
 	} else {
 		SetBase(IE_HITPOINTS, Modified[IE_MAXHITPOINTS]);
 	}
