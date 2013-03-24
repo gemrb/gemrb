@@ -108,7 +108,7 @@ void ScrollBar::SetPos(ieDword NewPos, bool redraw)
 /** Provides per-pixel scrolling. Top = 0px */
 void ScrollBar::SetPosForY(unsigned short y)
 {
-	if (Value > 1) {// if the value is 1 we are simultaniously at both the top and bottom so there is nothing to do
+	if (Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
 		unsigned short YMax = Height
 		- GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
 		- GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
