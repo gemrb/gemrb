@@ -572,8 +572,8 @@ def OpenStoreRumourWindow ():
 	ScrollBar = Window.GetControl (5)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreRumourWindow)
 	Count = Store['StoreDrinkCount']
-	if Count>4:
-		Count = Count-4
+	if Count>5:
+		Count = Count-5
 	else:
 		Count = 0
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
