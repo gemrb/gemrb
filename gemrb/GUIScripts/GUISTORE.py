@@ -621,6 +621,7 @@ def OpenStoreRentWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentRoom)
 
 	GemRB.SetVar ("RentIndex", RentIndex)
+	Window.UpdateVarAssoc ("RentIndex")
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreRentWindow )
 	UpdateStoreRentWindow ()
