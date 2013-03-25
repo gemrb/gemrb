@@ -1707,6 +1707,11 @@ void Map::PurgeArea(bool items)
 			if (ac->Modified[IE_MC_FLAGS] & MC_KEEP_CORPSE) {
 				continue;
 			}
+
+			if (ac->RemovalTime > core->GetGame()->GameTime) {
+				continue;
+			}
+
 			//don't delete persistent actors
 			if (ac->Persistent()) {
 				continue;

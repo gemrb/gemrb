@@ -4853,6 +4853,7 @@ void Actor::SetPersistent(int partyslot)
 void Actor::DestroySelf()
 {
 	InternalFlags|=IF_CLEANUP;
+	RemovalTime = 0;
 	// clear search map so that a new actor can immediately go there
 	// (via ChangeAnimationCore)
 	if (area)
@@ -4904,8 +4905,15 @@ bool Actor::CheckOnDeath()
 	// party actors are never removed
 	if (Persistent()) return false;
 
-	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
+	//TODO: verify removal times
+	ieDword time = core->GetGame()->GameTime;
+	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) {
+		RemovalTime = time;
+		return true;
+	}
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
+	RemovalTime = time + (7200 * AI_UPDATE_TIME); // keep corpse around for a day
+
 	//if chunked death, then return true
 	if (LastDamageType&DAMAGE_CHUNKING) {
 		//play chunky animation
