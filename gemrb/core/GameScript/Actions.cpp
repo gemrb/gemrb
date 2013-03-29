@@ -5180,7 +5180,7 @@ void GameScript::RestNoSpells(Scriptable* Sender, Action* /*parameters*/)
 //this most likely advances time and heals whole party
 void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
 {
-	core->GetGame()->RestParty(REST_NOSCATTER, 0, 0);
+	core->GetGame()->RestParty(REST_NOSCATTER|REST_NOAREA, 0, 0);
 	Sender->ReleaseCurrentAction();
 }
 
