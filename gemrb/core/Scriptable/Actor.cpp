@@ -6614,7 +6614,13 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				}
 				damage -= resisted;
 			} else {
-				resisted = (int) (damage * (signed)GetSafeStat(it->second.resist_stat)/100.0);
+				int resistance = (signed)GetSafeStat(it->second.resist_stat);
+				// avoid buggy data
+				if (abs(resistance) > maximum_values[it->second.resist_stat]) {
+					resistance = 0;
+					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value (%d).", resistance);
+				}
+				resisted = (int) (damage * resistance/100.0);
 				damage -= resisted;
 			}
 			Log(COMBAT, "ModifyDamage", "Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
