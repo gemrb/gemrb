@@ -2838,6 +2838,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		if (vvcShields[i] && vvcShields[i]->effect_owned) vvcShields[i]->active = false;
 	}
 
+	// apply palette changes not caused by persistent effects
+	if (Modified[IE_STATE_ID] & STATE_PETRIFIED) {
+		SetLockedPalette(fullstone);
+	} else if (Modified[IE_STATE_ID] & STATE_FROZEN) {
+		SetLockedPalette(fullwhite);
+	}
+
 	// give the 3ed save bonus before applying the effects, since they may do extra rolls
 	if (third) {
 		Modified[IE_SAVEWILL] += GetAbilityBonus(IE_WIS);
