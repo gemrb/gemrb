@@ -184,7 +184,6 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 				color.r = ((*src & 0x7C00) >> 7) | ((*src & 0x7C00) >> 12);
 				color.g = ((*src & 0x03E0) >> 2) | ((*src & 0x03E0) >> 8);
 				color.b = ((*src & 0x001F) << 3) | ((*src & 0x001F) >> 2);
-				color.unused = 0;
 				// video player texture is of ARGB format. buf is RGB555
 				*dst++ = (0xFF000000|(color.r << 16)|(color.g << 8)|(color.b));
 				src++;
@@ -198,7 +197,6 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 			palette->colors[i].r = ( *pal++ ) << 2;
 			palette->colors[i].g = ( *pal++ ) << 2;
 			palette->colors[i].b = ( *pal++ ) << 2;
-			palette->colors[i].unused = 0;
 		}
 		for (row = 0; row < bufh; ++row) {
 			dst = (Uint32*)((Uint8*)pixels + row * pitch);
