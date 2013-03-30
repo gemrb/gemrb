@@ -123,6 +123,14 @@ function move_and_edit_projectfiles {
   # copy the gemrb activity
   cp $ENVROOT/GemRB.java $ENVROOT/build/gemrb/src/net/sourceforge/gemrb/
 
+  # copy the packaged config file
+  cp $ENVROOT/packaged.GemRB.cfg $ENVROOT/build/gemrb/assets
+
+  # copy the icons
+  cp $GEMRB_GIT_PATH/artwork/gemrb-logo-36px.png $ENVROOT/build/gemrb/res/drawable-ldpi/icon.png
+  cp $GEMRB_GIT_PATH/artwork/gemrb-logo-48px.png $ENVROOT/build/gemrb/res/drawable-mdpi/icon.png
+  cp $GEMRB_GIT_PATH/artwork/gemrb-logo-72px.png $ENVROOT/build/gemrb/res/drawable-hdpi/icon.png
+
   # copy the makefile
   cp $ENVROOT/GEMRB_Android.mk $ENVROOT/build/gemrb/jni/src/Android.mk
 
@@ -132,7 +140,7 @@ function move_and_edit_projectfiles {
 
   # add the neccessary libraries to the base activity
   echo -en "Performing neccessary edits...\n"
-  sed -i -e '59 a\
+  sed -i -e '/System.loadLibrary("SDL2")/ a\
           System.loadLibrary("ogg"); \
           System.loadLibrary("vorbis"); \
           System.loadLibrary("openal"); \
@@ -184,5 +192,5 @@ setup_dir_struct
 move_and_edit_projectfiles
 build_deps
 move_libraries
-android update project -t android-10 -p $ENVROOT/build/gemrb
+android update project -t android-17 -p $ENVROOT/build/gemrb
 finished
