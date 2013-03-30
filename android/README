@@ -1,4 +1,4 @@
-BUILDING GEMRB FOR ANDROID 
+BUILDING GEMRB FOR ANDROID
 --------------------------
 
 Tools you will need to build GemRB for Android:
@@ -6,12 +6,12 @@ Tools you will need to build GemRB for Android:
 - android-sdk API-level 10 or greater
 - android-ndk (newer is generally better, tested against r8d)
 - ant
-- java 
+- java
 - mercurial for building SDL2
 - git for building various other dependencies
 
 --------------------------------------
-Building the apk on a Unix-like System 
+Building the apk on a Unix-like System
 --------------------------------------
 
 Running the following commands from the directory this README resides in will
@@ -32,11 +32,11 @@ with:
 
 and subsequently compile the remaining libraries and GemRB itsself with:
 
-  ndk-build 
+  ndk-build
 
-for a stripped build or 
+for a stripped build or
 
-  ndk-build NDK_DEBUG=1 
+  ndk-build NDK_DEBUG=1
 
 if you want a debuggable build.
 
@@ -56,7 +56,7 @@ If everything ran without any errors you should find a file named
 "SDLActivity-debug.apk" in build/gemrb/bin below the folder this README resides
 in. If you ran ant with the "install" argument, you can directly run GemRB from
 your devices' main menu. If you didn't, you can copy the apk file to your device
-with 
+with
 
   adb push bin/SDLActivity-debug.apk /sdcard/
 

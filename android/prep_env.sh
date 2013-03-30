@@ -71,10 +71,10 @@ function move_libraries {
   echo -en "Creating directories and copying Makefiles for prebuilt libraries...\n"
 
   # freetype2 is special, it's not supposed to be precompiled according to upstream,
-  # additionally, upstream makefile is actually broken and we need makefiles in every 
-  # directory up to where the current one is stored, because ndk-build doesn't see 
+  # additionally, upstream makefile is actually broken and we need makefiles in every
+  # directory up to where the current one is stored, because ndk-build doesn't see
   # the right one otherwise
-  # the alternative would probably be to store the makefile at the root of the 
+  # the alternative would probably be to store the makefile at the root of the
   # freetype directory, but im not sure in how far that messes with library placement
   cp -r $ENVROOT/freetype2-android $ENVROOT/build/gemrb/jni/
   cp $ENVROOT/FREETYPEBUILD_Android.mk $ENVROOT/build/gemrb/jni/freetype2-android/Android/jni/Android.mk

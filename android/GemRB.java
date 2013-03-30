@@ -73,7 +73,7 @@ public class GemRB extends SDLActivity {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    }  
+    }
 
     super.onCreate(savedInstanceState);
   }
