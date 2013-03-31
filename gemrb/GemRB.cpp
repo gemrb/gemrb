@@ -58,6 +58,9 @@ int main(int argc, char* argv[])
 {
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
+#	ifdef ANDROID
+		setenv("GEM_DATA", SDL_AndroidGetExternalStoragePath(), 1);
+#	endif
 #endif
 
 #ifdef M_TRIM_THRESHOLD
