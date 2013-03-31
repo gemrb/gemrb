@@ -228,6 +228,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/Game.cpp \
 		    main/gemrb/core/ImageWriter.cpp \
 		    main/gemrb/core/Interface.cpp \
+		    main/gemrb/core/InterfaceConfig.cpp \
 		    main/gemrb/core/Cache.cpp \
 		    main/gemrb/core/FileCache.cpp \
 		    main/gemrb/core/Palette.cpp \
