@@ -3848,7 +3848,8 @@ bool Interface::SaveConfig()
 			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
 				const char* key = defaultsINI->GetKeyNameByIndex(tag, j);
 				ieDword value = 0;
-				assert(vars->Lookup(key, value));
+				bool found = vars->Lookup(key, value);
+				assert(found);
 				contents.appendFormatted("%s = %d\n", key, value);
 			}
 		}
