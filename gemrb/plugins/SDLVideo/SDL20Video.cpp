@@ -637,7 +637,7 @@ float SDL20VideoDriver::ScaleCoordinateHorizontal(float x)
 		xoffset = ((winWf - (width * scaleX)) / 2) / winWf;
 		return ((x - xoffset) * (winWf / scaleX));
 	}
-	return x;
+	return x * width;
 }
 
 float SDL20VideoDriver::ScaleCoordinateVertical(float y)
@@ -654,7 +654,7 @@ float SDL20VideoDriver::ScaleCoordinateVertical(float y)
 		yoffset = ((winHf - (height * scaleY)) / 2) / winHf;
 		return ((y - yoffset) * (winHf / scaleY));
 	}
-	return y;
+	return y * height;
 }
 
 #include "plugindef.h"
