@@ -208,7 +208,7 @@ public:
 	ieWord transparency;
 	ieWordSigned height;
 	//these are on one dword
-	ieWord unknown3c;
+	ieWord startFrameRange;
 	ieByte skipcycle;
 	ieByte startchance;
 	ieDword unknown48;

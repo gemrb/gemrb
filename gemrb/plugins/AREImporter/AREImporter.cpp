@@ -1050,7 +1050,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		for (i = 0; i < AnimCount; i++) {
 			AreaAnimation* anim = new AreaAnimation();
 			str->Read(anim->Name, 32);
-			ieWord animX, animY;
+			ieWord animX, animY, startFrameRange;
 			str->ReadWord( &animX );
 			str->ReadWord( &animY );
 			anim->Pos.x=animX;
@@ -1062,11 +1062,15 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &anim->Flags );
 			str->ReadWordSigned( &anim->height );
 			str->ReadWord( &anim->transparency );
-			str->ReadWord( &anim->unknown3c ); //not completely understood, if not 0, sequence is started
+			str->ReadWord( &startFrameRange );
 			str->Read( &anim->startchance,1 );
 			if (anim->startchance<=0) {
 				anim->startchance=100; //percentage of starting a cycle
 			}
+			if (startFrameRange && (anim->Flags&A_ANI_RANDOM_START) ) {
+				anim->frame = core->Roll(0,startFrameRange, -1); //roll a number between 0 and startFrameRange
+			}
+			anim->startFrameRange = 0; //this will never get resaved (iirc)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
@@ -1974,7 +1978,7 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteDword( &an->Flags);
 		stream->WriteWord( (ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
-		stream->WriteWord( &an->unknown3c); //animation already played?
+		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START
 		stream->Write( &an->startchance,1);
 		stream->Write( &an->skipcycle,1);
 		stream->WriteResRef( an->PaletteRef);
