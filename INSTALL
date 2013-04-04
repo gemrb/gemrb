@@ -4,7 +4,7 @@ BUILDING GEMRB WITH CMAKE
 Tools you will need to build GemRB:
   - cmake
   - make
-  - g++
+  - g++ or clang (others not tested)
 
 NOTE: g++ 4.3 is known to miscompile gemrb.
 
