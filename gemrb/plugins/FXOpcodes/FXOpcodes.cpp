@@ -4058,6 +4058,10 @@ int fx_animation_stance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_display_string(%2d): StrRef: %d", fx->Opcode, fx->Parameter1);
+	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
 	if(fx->Resource[0]) {
 		//TODO: create a single list reader that handles src and 2da too
 		SrcVector *rndstr=LoadSrc(fx->Resource);
