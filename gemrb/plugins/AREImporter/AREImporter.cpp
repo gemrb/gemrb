@@ -1068,7 +1068,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				anim->startchance=100; //percentage of starting a cycle
 			}
 			if (startFrameRange && (anim->Flags&A_ANI_RANDOM_START) ) {
-				anim->frame = core->Roll(0,startFrameRange, -1); //roll a number between 0 and startFrameRange
+				anim->frame = rand() % startFrameRange;
 			}
 			anim->startFrameRange = 0; //this will never get resaved (iirc)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
