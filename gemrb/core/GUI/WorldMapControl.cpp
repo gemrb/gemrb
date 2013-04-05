@@ -137,7 +137,8 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 			video->FreeSprite( icon );
 		}
 
-		if (AnimPicture && !strnicmp(m->AreaResRef, currentArea, 8) ) {
+		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
+			|| !strnicmp(m->AreaName, currentArea, 8))) {
 			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
 		}
 	}
