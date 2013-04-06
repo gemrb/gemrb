@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="200px"
+   height="200px"
+   viewBox="0 0 200 200"
+   xml:space="preserve"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="logo-rb_only-light_glow.svg"><metadata
+   id="metadata25"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs23"><filter
+     id="filter4246"
+     style="color-interpolation-filters:sRGB;"
+     inkscape:label="Drop Shadow"><feFlood
+       id="feFlood4248"
+       flood-opacity="0.5"
+       flood-color="rgb(255,255,255)"
+       result="flood" /><feComposite
+       id="feComposite4250"
+       in2="SourceGraphic"
+       in="flood"
+       operator="in"
+       result="composite1" /><feGaussianBlur
+       id="feGaussianBlur4252"
+       in="composite"
+       stdDeviation="10"
+       result="blur" /><feOffset
+       id="feOffset4254"
+       dx="0"
+       dy="0"
+       result="offset" /><feComposite
+       id="feComposite4256"
+       in2="offset"
+       in="SourceGraphic"
+       operator="over"
+       result="composite2" /></filter></defs><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1278"
+   inkscape:window-height="748"
+   id="namedview21"
+   showgrid="false"
+   inkscape:zoom="1.0748023"
+   inkscape:cx="152.52136"
+   inkscape:cy="95.261117"
+   inkscape:window-x="86"
+   inkscape:window-y="-3"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<g
+   id="g3"
+   transform="matrix(0.93221496,0,0,0.93221496,6.7780379,6.778504)"
+   style="filter:url(#filter4246)"
+   inkscape:export-filename="/home/lynx/dev/gemrb/gemrb/artwork/gemrb-logo-glow.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+	<path
+   id="rb1_3_"
+   d="M 27.873,193.766 V 135.24 c 0,-23.674 19.191,-42.865 42.866,-42.865 v 37.508 c 0,35.279 28.603,63.883 63.883,63.883 35.281,0 63.884,-28.604 63.884,-63.883 0,-35.283 -28.603,-63.885 -63.884,-63.885 H 97.116 V 6.234 l -26.378,26.378 0.001,33.387 c -38.242,0 -69.244,31 -69.244,69.241 v 58.525 h 26.378 z"
+   inkscape:connector-curvature="0" />
+	<g
+   id="gem_1_">
+		<path
+   d="m 98.383,139.588 c -0.827,-3.096 -1.267,-6.348 -1.267,-9.705 V 92.375 l 37.506,37.508 -36.239,9.705 z"
+   id="path7"
+   inkscape:connector-curvature="0"
+   style="fill:#6156ff" />
+		<path
+   d="m 134.622,129.883 -9.709,36.236 C 112,162.67 101.832,152.502 98.383,139.588 l 36.239,-9.705 z"
+   id="path9"
+   inkscape:connector-curvature="0"
+   style="fill:#867dff" />
+		<path
+   d="m 134.622,129.883 26.521,26.52 c -6.787,6.787 -16.163,10.988 -26.521,10.988 -3.357,0 -6.612,-0.443 -9.709,-1.271 l 9.709,-36.237 z"
+   id="path11"
+   inkscape:connector-curvature="0"
+   style="fill:#6156ff" />
+		<path
+   d="m 170.859,120.172 c 0.828,3.098 1.27,6.352 1.27,9.711 0,10.357 -4.198,19.732 -10.986,26.52 l -26.521,-26.52 36.237,-9.711 z"
+   id="path13"
+   inkscape:connector-curvature="0"
+   style="fill:#3c2eff" />
+		<path
+   d="m 134.622,129.883 9.71,-36.239 c 12.91,3.451 23.077,13.616 26.527,26.528 l -36.237,9.711 z"
+   id="path15"
+   inkscape:connector-curvature="0"
+   style="fill:#2212ff" />
+		<path
+   d="m 97.116,92.375 h 37.506 c 3.357,0 6.613,0.442 9.71,1.269 l -9.71,36.239 -37.506,-37.508 z"
+   id="path17"
+   inkscape:connector-curvature="0"
+   style="fill:#3c2eff" />
+		<polygon
+   points="120.049,115.309 139.956,109.975 154.529,124.547 149.195,144.455 129.288,149.789 114.715,135.215 "
+   id="polygon19"
+   style="fill:#aaa4ff" />
+	</g>
+</g>
+</svg>
