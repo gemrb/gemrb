@@ -72,8 +72,8 @@ public:
 	void ScrollUp();
 	void ScrollDown();
 	double GetStep();
-	/**redraws scrollbar if associated with VarName */
-	void RedrawScrollBar(const char* VarName, int Sum);
+	/** refreshes scrollbar if associated with VarName */
+	void UpdateState(const char* VarName, int Sum);
 	/**/
 	void Draw(unsigned short x, unsigned short y);
 private: //Private attributes

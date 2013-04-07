@@ -365,45 +365,8 @@ void Window::InvalidateForControl(Control *ctrl) {
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
-	for (unsigned int i = 0; i < Controls.size(); i++) {
-		switch (Controls[i]->ControlType) {
-			case IE_GUI_MAP:
-			{
-				MapControl *mc = ( MapControl* ) (Controls[i]);
-				mc->RedrawMapControl( VarName, Sum );
-				break;
-			}
-			case IE_GUI_BUTTON:
-			{
-				Button* bt = ( Button* ) ( Controls[i] );
-				bt->RedrawButton( VarName, Sum );
-				break;
-			}
-			case IE_GUI_TEXTAREA:
-			{
-				TextArea* pb = ( TextArea* ) ( Controls[i] );
-				pb->RedrawTextArea( VarName, Sum );
-				break;
-			}
-			case IE_GUI_PROGRESSBAR:
-			{
-				Progressbar* pb = ( Progressbar* ) ( Controls[i] );
-				pb->RedrawProgressbar( VarName, Sum );
-				break;
-			}
-			case IE_GUI_SLIDER:
-			{
-				Slider* sl = ( Slider* ) ( Controls[i] );
-				sl->RedrawSlider( VarName, Sum );
-				break;
-			}
-			case IE_GUI_SCROLLBAR:
-			{
-				ScrollBar* sb = ( ScrollBar* ) ( Controls[i] );
-				sb->RedrawScrollBar( VarName, Sum );
-				break;
-			}
-		}
+	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+		(*c)->UpdateState( VarName, Sum);
 	}
 }
 

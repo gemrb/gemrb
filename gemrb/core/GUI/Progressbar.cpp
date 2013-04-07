@@ -123,7 +123,7 @@ void Progressbar::SetPosition(unsigned int pos)
 	Changed = true;
 }
 
-void Progressbar::RedrawProgressbar(const char* VariableName, int Sum)
+void Progressbar::UpdateState(const char* VariableName, int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;

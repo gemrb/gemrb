@@ -873,7 +873,7 @@ void TextArea::CopyTo(TextArea *ta)
 	ta->SetText(lines);
 }
 
-void TextArea::RedrawTextArea(const char* VariableName, unsigned int Sum)
+void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
@@ -894,7 +894,7 @@ void TextArea::SelectText(const char *select)
 			} else {
 				SetRow( i );
 			}
-			RedrawTextArea( VarName, i);
+			UpdateState(VarName, i);
 			CalcRowCount();
 			Owner->Invalidate();
 			core->RedrawAll();

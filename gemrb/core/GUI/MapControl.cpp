@@ -176,7 +176,7 @@ void MapControl::Realize()
 	if (YCenter < 0) YCenter = 0;
 }
 
-void MapControl::RedrawMapControl(const char *VariableName, unsigned int Sum)
+void MapControl::UpdateState(const char *VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;

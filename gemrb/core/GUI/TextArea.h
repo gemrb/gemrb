@@ -120,7 +120,7 @@ public:
 	/** Returns the selected text */
 	const char* QueryText();
 	/** Marks textarea for redraw with a new value */
-	void RedrawTextArea(const char* VariableName, unsigned int Sum);
+	void UpdateState(const char* VariableName, unsigned int Sum);
 	int SetScrollBar(Control *ptr);
 private: // Private attributes
 	std::vector< char*> lines;

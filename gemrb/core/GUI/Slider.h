@@ -64,8 +64,8 @@ public:
 	void SetImage(unsigned char type, Sprite2D * img);
 	/** Sets the State of the Slider */
 	void SetState(int arg) { State=(unsigned char) arg; }
-	/** Redraws a slider which is associated with VariableName */
-	void RedrawSlider(const char *VariableName, int Sum);
+	/** Refreshes a slider which is associated with VariableName */
+	void UpdateState(const char *VariableName, int Sum);
 
 private: // Private attributes
 	/** BackGround Image. If smaller than the Control Size, the image will be tiled. */

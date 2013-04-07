@@ -683,8 +683,8 @@ bool Button::SetEvent(int eventType, EventHandler handler)
 	return true;
 }
 
-/** Redraws a button from a given radio button group */
-void Button::RedrawButton(const char* VariableName, unsigned int Sum)
+/** Refresh a button from a given radio button group */
+void Button::UpdateState(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
