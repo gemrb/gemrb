@@ -46,9 +46,9 @@ COCOA_EXPORT
 <NSApplicationDelegate>
 #endif
 {
-	NSWindow* _prefrences;
+	NSWindow* _configWindow;
 }
-@property(nonatomic, retain) IBOutlet NSWindow* prefrences;
+@property(nonatomic, retain) IBOutlet NSWindow* configWindow;
 
 // Override these application delegate methods in plugin categories
 - (void)applicationWillTerminate:(NSNotification *)aNotification;

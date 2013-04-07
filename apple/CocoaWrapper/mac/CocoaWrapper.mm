@@ -36,7 +36,7 @@ using namespace GemRB;
 
 /* The main class of the application, the application's delegate */
 @implementation CocoaWrapper
-@synthesize prefrences=_prefrences;
+@synthesize configWindow=_configWindow;
 
 - (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) filename
 {
@@ -118,7 +118,7 @@ using namespace GemRB;
 		delete( core );
 		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
 	} else {
-		[_prefrences close];
+		[_configWindow close];
 		// pass control to GemRB
 		delete config;
 		core->Main();
