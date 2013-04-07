@@ -94,7 +94,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT Interface* core;
+GEM_EXPORT Interface* core = NULL;
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static const char dialogtlk[] = "dialog.tlk\0";

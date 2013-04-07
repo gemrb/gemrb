@@ -2510,7 +2510,7 @@
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="367.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="367.IBWindowTemplateEditedContentRect">{{307, 836}, {480, 270}}</string>
-				<integer value="1" key="367.NSWindowTemplate.visibleAtLaunch"/>
+				<boolean value="NO" key="367.NSWindowTemplate.visibleAtLaunch"/>
 				<string key="368.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="373.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

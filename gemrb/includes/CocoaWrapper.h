@@ -47,6 +47,8 @@ COCOA_EXPORT
 #endif
 {
 	NSWindow* _configWindow;
+
+	BOOL _showConfigWindow;
 }
 @property(nonatomic, retain) IBOutlet NSWindow* configWindow;
 

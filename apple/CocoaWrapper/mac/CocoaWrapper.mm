@@ -38,6 +38,16 @@ using namespace GemRB;
 @implementation CocoaWrapper
 @synthesize configWindow=_configWindow;
 
+- (id)init
+{
+    self = [super init];
+    if (self) {
+		_configWindow = nil;
+        _showConfigWindow = NO;
+    }
+    return self;
+}
+
 - (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) filename
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
@@ -46,6 +56,12 @@ using namespace GemRB;
 	if ([fm fileExistsAtPath:filename isDirectory:&isDir] && isDir) {
 		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 		[defaults setObject:filename forKey:@"GamePath"];
+
+		if (_showConfigWindow == NO) {
+			// opened via means other than config window
+			[self launchGame:nil];
+		}
+
 		return YES;
 	}
 	return NO;
@@ -64,13 +80,26 @@ using namespace GemRB;
     NSLog(@"Application terminate");
 }
 
-/* Called when the internal event loop has just started running */
-- (void) applicationDidFinishLaunching: (NSNotification *) __unused note
+// always called before openFile when launched via CLI/DragDrop
+- (void)applicationWillFinishLaunching:(NSNotification *) __unused aNotification
 {
 	AddLogger(createAppleLogger());
 
 	// Load default defaults
     [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]]];
+}
+
+/* Called when the internal event loop has just started running */
+- (void) applicationDidFinishLaunching: (NSNotification *) __unused aNotification
+{
+	// we configure this here so that when GemRB is launched though means such as Drag/Drop we dont show the config window
+
+	_showConfigWindow = YES; //still need to set this to YES in case an error occurs
+	[NSBundle loadNibNamed:@"GemRB" owner:self];
+
+	if (core == NULL) {
+		[_configWindow makeKeyAndOrderFront:nil];
+	}
 }
 
 - (IBAction)openGame:(id) __unused sender
@@ -178,8 +207,6 @@ int main (int __unused argc, char ** __unused argv)
 
     CocoaWrapper* wrapper = [[CocoaWrapper alloc] init];
     [app setDelegate:wrapper];
-
-	[NSBundle loadNibNamed:@"GemRB" owner:wrapper];
 
     /* Start the main event loop */
 	[pool drain];
