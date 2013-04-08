@@ -295,15 +295,15 @@ int SDL20VideoDriver::SwapBuffers(void)
 
 	assert(pitch == backBuf->pitch);
 	memcpy(pixels, backBuf->pixels, pitch * height);
-
+/*
 	if (fadeColor.a) {
 		SDL_Rect dst = {
-			Viewport.x, Viewport.y, Viewport.w, Viewport.h
+			xCorr, yCorr, Viewport.w, Viewport.h
 		};
 		SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
 		SDL_RenderFillRect(renderer, &dst);
 	}
-
+*/
 	SDL_UnlockTexture(screenTexture);
 	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
