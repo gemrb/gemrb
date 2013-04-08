@@ -33,19 +33,12 @@ namespace GemRB {
 const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
-	: Viewport()
+	: Viewport(), fadeColor(), CursorPos()
 {
 	CursorIndex = VID_CUR_UP;
 	Cursor[VID_CUR_UP] = NULL;
 	Cursor[VID_CUR_DOWN] = NULL;
 	Cursor[VID_CUR_DRAG] = NULL;
-	CursorPos.x = 0;
-	CursorPos.y = 0;
-
-	fadeColor.a = 0; //fadePercent
-	fadeColor.r = 0;
-	fadeColor.g = 0;
-	fadeColor.b = 0;
 
 	EvntManager = NULL;
 	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
