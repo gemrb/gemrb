@@ -93,14 +93,15 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Viewport.w = width;
 	Viewport.h = height;
 
-	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface...");
 	Uint32 winFormat = SDL_GetWindowPixelFormat(window);
-
 	Uint32 r, g, b, a;
 	SDL_PixelFormatEnumToMasks(winFormat, &bpp, &r, &g, &b, &a);
 	a = 0;
+
+	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
+		width, height, SDL_GetPixelFormatName(winFormat));
 	backBuf = SDL_CreateRGBSurface( 0, width, height,
-											bpp, r, g, b, a );
+									bpp, r, g, b, a );
 	this->bpp = bpp;
 
 	if (!backBuf) {
