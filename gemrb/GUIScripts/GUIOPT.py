@@ -105,6 +105,7 @@ def OpenOptionsWindow ():
 	GemRB.GamePause (1, 3)
 
 	CommonWindow.CloseContainerWindow ()
+	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 	if GUICommon.GameIsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
