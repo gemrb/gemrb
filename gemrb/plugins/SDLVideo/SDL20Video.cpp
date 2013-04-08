@@ -38,7 +38,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 	renderer = NULL;
 	window = NULL;
-	videoPlayer = NULL;
+	screenTexture = NULL;
 
 	// touch input
 	ClearFirstTouch();
@@ -46,7 +46,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
-	SDL_DestroyTexture(videoPlayer);
+	SDL_DestroyTexture(screenTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
@@ -133,13 +133,13 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	if (videoPlayer) SDL_DestroyTexture(videoPlayer);
+	if (screenTexture) SDL_DestroyTexture(screenTexture);
 	if (yuv) {
-		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, w, h);
+		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, w, h);
 	} else {
-		videoPlayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
 	}
-	if (!videoPlayer) {
+	if (!screenTexture) {
 		Log(ERROR, "SDL 2 Driver", "Unable to create texture for video playback: %s", SDL_GetError());
 	}
 	w = width;
@@ -172,7 +172,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	int pitch;
 	SDL_Color color = {0, 0, 0, 0};
 
-	if(SDL_LockTexture(videoPlayer, NULL, &pixels, &pitch) != GEM_OK) {
+	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
 		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
 		return;
 	}
@@ -208,10 +208,10 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 		}
 		SDL_FreePalette(palette);
 	}
-	SDL_UnlockTexture(videoPlayer);
+	SDL_UnlockTexture(screenTexture);
 
 	SDL_RenderFillRect(renderer, &subtitleregion_sdl);
-	SDL_RenderCopy(renderer, videoPlayer, &srcRect, &destRect);
+	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
 
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
@@ -234,7 +234,7 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	Uint8 *pixels;
 	int pitch;
 
-	if(SDL_LockTexture(videoPlayer, NULL, (void**)&pixels, &pitch) != GEM_OK) {
+	if(SDL_LockTexture(screenTexture, NULL, (void**)&pixels, &pitch) != GEM_OK) {
 		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
 		return;
 	}
@@ -273,8 +273,8 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		}
 	}
 
-	SDL_UnlockTexture(videoPlayer);
-	SDL_RenderCopy(renderer, videoPlayer, NULL, &destRect);
+	SDL_UnlockTexture(screenTexture);
+	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
 	SDL_RenderPresent(renderer);
 }
 

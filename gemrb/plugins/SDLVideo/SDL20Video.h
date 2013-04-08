@@ -27,7 +27,7 @@ namespace GemRB {
 
 class SDL20VideoDriver : public SDLVideoDriver {
 private:
-	SDL_Texture* videoPlayer;
+	SDL_Texture* screenTexture;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
