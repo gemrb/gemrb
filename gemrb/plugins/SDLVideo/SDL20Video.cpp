@@ -93,20 +93,37 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Viewport.w = width;
 	Viewport.h = height;
 
-	Uint32 winFormat = SDL_GetWindowPixelFormat(window);
+	Uint32 format = SDL_GetWindowPixelFormat(window);
+
+	if (screenTexture) SDL_DestroyTexture(screenTexture);
+	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+
+	// now get the transfer format of the texture. this can vary from the actual pixel format
+	int access;
+	SDL_QueryTexture(screenTexture,
+                     &format,
+                     &access,
+                     &width,
+                     &height);
+	// FIXME: hack
+	if (format == SDL_PIXELFORMAT_ABGR8888) {
+		// for some reason on iOS the transfer format at this point is the same as the texture format
+		// but later in SwapBuffers() the transfer format has been changed to SDL_PIXELFORMAT_ARGB8888
+		format = SDL_PIXELFORMAT_ARGB8888;
+	}
 	Uint32 r, g, b, a;
-	SDL_PixelFormatEnumToMasks(winFormat, &bpp, &r, &g, &b, &a);
+	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
 	a = 0;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
-		width, height, SDL_GetPixelFormatName(winFormat));
+		width, height, SDL_GetPixelFormatName(format));
 	backBuf = SDL_CreateRGBSurface( 0, width, height,
 									bpp, r, g, b, a );
 	this->bpp = bpp;
 
 	if (!backBuf) {
 		Log(ERROR, "SDL 2 Video", "Unable to create backbuffer of %s format: %s",
-			SDL_GetPixelFormatName(winFormat), SDL_GetError());
+			SDL_GetPixelFormatName(format), SDL_GetError());
 		return GEM_ERROR;
 	}
 	disp = backBuf;
@@ -268,7 +285,16 @@ int SDL20VideoDriver::SwapBuffers(void)
 {
 	int ret = SDLVideoDriver::SwapBuffers();
 
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, backBuf);
+	void *pixels;
+	int pitch;
+
+	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
+		Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
+		return GEM_ERROR;
+	}
+
+	assert(pitch == backBuf->pitch);
+	memcpy(pixels, backBuf->pixels, pitch * height);
 
 	if (fadeColor.a) {
 		SDL_Rect dst = {
@@ -278,10 +304,9 @@ int SDL20VideoDriver::SwapBuffers(void)
 		SDL_RenderFillRect(renderer, &dst);
 	}
 
-	SDL_RenderCopy(renderer, tex, NULL, NULL);
-
+	SDL_UnlockTexture(screenTexture);
+	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
-	SDL_DestroyTexture(tex);
 	return ret;
 }
 
