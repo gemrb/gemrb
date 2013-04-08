@@ -137,7 +137,7 @@ void ScrollBar::SetPosForY(unsigned short y)
 }
 
 /** Refreshes the ScrollBar according to a guiscript variable */
-void ScrollBar::UpdateState(const char* Variable, int Sum)
+void ScrollBar::UpdateState(const char* Variable, unsigned int Sum)
 {
 	if (strnicmp( VarName, Variable, MAX_VARIABLE_LENGTH )) {
 		return;

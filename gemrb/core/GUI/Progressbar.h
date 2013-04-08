@@ -63,7 +63,7 @@ public:
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
 	void SetSliderPos(int x, int y, int x2, int y2);
 	/** Refreshes a progressbar which is associated with VariableName */
-	void UpdateState(const char *VariableName, int Sum);
+	void UpdateState(const char *VariableName, unsigned int Sum);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 

@@ -118,7 +118,7 @@ void Slider::SetPosition(unsigned int pos)
 }
 
 /** Refreshes a slider which is associated with VariableName */
-void Slider::UpdateState(const char* VariableName, int Sum)
+void Slider::UpdateState(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;

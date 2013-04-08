@@ -123,12 +123,12 @@ void Progressbar::SetPosition(unsigned int pos)
 	Changed = true;
 }
 
-void Progressbar::UpdateState(const char* VariableName, int Sum)
+void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
 	}
-	SetPosition((unsigned int) Sum);
+	SetPosition(Sum);
 	if((Value==100) && Changed)
 		RunEventHandler( EndReached );
 }
