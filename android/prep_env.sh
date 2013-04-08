@@ -128,7 +128,7 @@ function move_and_edit_projectfiles {
   cp "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
   # copy the icons
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png $ENVROOT/build/gemrb/res/drawable-ldpi/icon.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/drawable-ldpi/icon.png" &&
   cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/drawable-mdpi/icon.png" &&
   cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-72px.png" "$ENVROOT/build/gemrb/res/drawable-hdpi/icon.png" &&
 
