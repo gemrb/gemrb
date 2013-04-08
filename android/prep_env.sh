@@ -124,6 +124,7 @@ function move_and_edit_projectfiles {
   cp "$ENVROOT/GemRB.java" "$ENVROOT/build/gemrb/src/net/sourceforge/gemrb/" &&
 
   # copy the packaged config file
+  mkdir -p "$ENVROOT/build/gemrb/assets" &&
   cp "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
   # copy the icons
@@ -159,7 +160,7 @@ function move_and_edit_projectfiles {
   sed -i -e s,SDL\ App,GemRB, build/gemrb/res/values/strings.xml &&
 
   echo -en "Copying GemRB override, unhardcoded and GUIScripts folders..." &&
-  mkdir "$ENVROOT/build/gemrb/assets" &&
+  mkdir -p "$ENVROOT/build/gemrb/assets" &&
   cp -r "$ENVROOT/build/gemrb/jni/src/main/gemrb/override" "$ENVROOT/build/gemrb/assets/" &&
   cp -r "$ENVROOT/build/gemrb/jni/src/main/gemrb/unhardcoded" "$ENVROOT/build/gemrb/assets/" &&
   cp -r "$ENVROOT/build/gemrb/jni/src/main/gemrb/GUIScripts" "$ENVROOT/build/gemrb/assets/" &&
