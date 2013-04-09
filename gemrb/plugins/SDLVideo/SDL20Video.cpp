@@ -94,7 +94,34 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Viewport.w = width;
 	Viewport.h = height;
 
-	Uint32 format = SDL_GetWindowPixelFormat(window);
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+
+	Uint32 format = SDL_PIXELFORMAT_UNKNOWN;
+	for (Uint32 i=0; i<info.num_texture_formats; i++) {
+		// TODO: probably could be more educated about selecting the best format.
+		switch (bpp) {
+			case 16:
+				if (SDL_PIXELTYPE(info.texture_formats[i]) == SDL_PIXELTYPE_PACKED16) {
+					format = info.texture_formats[i];
+					goto doneFormat;
+				}
+				continue;
+			case 32:
+			default:
+				if (SDL_PIXELTYPE(info.texture_formats[i]) == SDL_PIXELTYPE_PACKED32) {
+					format = info.texture_formats[i];
+					goto doneFormat;
+				}
+				continue;
+		}
+	}
+
+doneFormat:
+	if (format == SDL_PIXELFORMAT_UNKNOWN) {
+		format = SDL_GetWindowPixelFormat(window);
+		// bpp will be set by SDL_PixelFormatEnumToMasks
+	}
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	int access;
