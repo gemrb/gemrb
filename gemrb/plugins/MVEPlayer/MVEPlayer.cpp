@@ -117,6 +117,7 @@ int MVEPlay::doPlay()
 	}
 
 	video->DrawMovieSubtitle(0);
+	video->DestroyMovieScreen();
 	return 0;
 }
 

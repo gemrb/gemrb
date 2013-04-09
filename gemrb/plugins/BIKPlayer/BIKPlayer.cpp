@@ -332,6 +332,7 @@ int BIKPlayer::doPlay()
 		done = video->PollMovieEvents();
 	}
 
+	video->DestroyMovieScreen();
 	return 0;
 }
 

@@ -215,6 +215,8 @@ public:
 	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
 	/** initializes the screen for movie */
 	virtual void InitMovieScreen(int &w, int &h, bool yuv=false) = 0;
+	/** called when a video player is done. clean up any video specific resources.  */
+	virtual void DestroyMovieScreen() = 0;
 	/** sets the font and color of the movie subtitles */
 	void SetMovieFont(Font *stfont, Palette *pal);
 	/** draws a movie frame */

@@ -145,6 +145,8 @@ void VLCPlayer::cleanup(void *opaque)
 	VideoContext* context = *(VideoContext**)opaque;
 	delete context;
 	context = NULL;
+
+	core->GetVideoDriver()->DestroyMovieScreen();
 }
 
 unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines)

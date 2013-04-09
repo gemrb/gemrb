@@ -32,7 +32,7 @@ SDL12VideoDriver::SDL12VideoDriver(void)
 
 SDL12VideoDriver::~SDL12VideoDriver(void)
 {
-	if (overlay) SDL_FreeYUVOverlay(overlay);
+	DestroyMovieScreen();
 }
 
 int SDL12VideoDriver::Init(void)
@@ -117,6 +117,11 @@ void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	subtitleregion_sdl.h = h/4;
 	subtitleregion_sdl.x = 0;
 	subtitleregion_sdl.y = h-h/4;
+}
+
+void SDL12VideoDriver::DestroyMovieScreen()
+{
+	if (overlay) SDL_FreeYUVOverlay(overlay);
 }
 
 void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,

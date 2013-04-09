@@ -46,6 +46,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
+	// no need to call DestroyMovieScreen()
 	SDL_DestroyTexture(screenTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -94,8 +95,6 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Viewport.h = height;
 
 	Uint32 format = SDL_GetWindowPixelFormat(window);
-
-	if (screenTexture) SDL_DestroyTexture(screenTexture);
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	// now get the transfer format of the texture. this can vary from the actual pixel format
@@ -157,6 +156,14 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	subtitleregion_sdl.h = h/4;
 	subtitleregion_sdl.x = 0;
 	subtitleregion_sdl.y = h-h/4;
+}
+
+void SDL20VideoDriver::DestroyMovieScreen()
+{
+	if (screenTexture) SDL_DestroyTexture(screenTexture);
+	// recreate the texture for gameplay
+	Uint32 format = SDL_GetWindowPixelFormat(window);
+	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 }
 
 void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
