@@ -26,7 +26,22 @@
 // For pixel formats:
 // We hardcode a single pixel format per bit depth.
 
-#if TARGET_OS_MAC && !TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
+// NOTE: TARGET_OS_IPHONE must go before TARGET_OS_MAC
+// I don't know if its just the simulator, but TARGET_OS_MAC is set on iOS
+
+const unsigned int RLOSS16 = 3;
+const unsigned int GLOSS16 = 2;
+const unsigned int BLOSS16 = 3;
+const unsigned int RSHIFT16 = 11;
+const unsigned int GSHIFT16 = 5;
+const unsigned int BSHIFT16 = 0;
+
+const unsigned int RSHIFT32 = 0;
+const unsigned int GSHIFT32 = 8;
+const unsigned int BSHIFT32 = 16;
+
+#elif TARGET_OS_MAC
 
 const unsigned int RLOSS16 = 3;
 const unsigned int GLOSS16 = 2;

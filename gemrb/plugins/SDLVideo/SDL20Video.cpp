@@ -97,19 +97,13 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Uint32 format = SDL_GetWindowPixelFormat(window);
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 
-	// now get the transfer format of the texture. this can vary from the actual pixel format
 	int access;
 	SDL_QueryTexture(screenTexture,
                      &format,
                      &access,
                      &width,
                      &height);
-	// FIXME: hack
-	if (format == SDL_PIXELFORMAT_ABGR8888) {
-		// for some reason on iOS the transfer format at this point is the same as the texture format
-		// but later in SwapBuffers() the transfer format has been changed to SDL_PIXELFORMAT_ARGB8888
-		format = SDL_PIXELFORMAT_ARGB8888;
-	}
+
 	Uint32 r, g, b, a;
 	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
 	a = 0;
