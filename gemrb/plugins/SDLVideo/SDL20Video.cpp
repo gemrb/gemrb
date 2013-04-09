@@ -97,7 +97,11 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	SDL_RendererInfo info;
 	SDL_GetRendererInfo(renderer, &info);
 
-	Uint32 format = SDL_PIXELFORMAT_UNKNOWN;
+	Uint32 format = SDL_PIXELFORMAT_ABGR8888;
+	// TODO: SDL forces SDL_PIXELFORMAT_ABGR8888 on OpenGLES2
+	// if we want to use this driver with other renderers we need to do some
+	// selection such as the commented out code below
+/*
 	for (Uint32 i=0; i<info.num_texture_formats; i++) {
 		// TODO: probably could be more educated about selecting the best format.
 		switch (bpp) {
@@ -122,6 +126,7 @@ doneFormat:
 		format = SDL_GetWindowPixelFormat(window);
 		// bpp will be set by SDL_PixelFormatEnumToMasks
 	}
+*/
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	int access;
