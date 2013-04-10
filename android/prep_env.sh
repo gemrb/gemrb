@@ -183,8 +183,8 @@ function finished {
 
 if [ -z "$1" ]
 then
-  echo -en "Error: No argument supplied.
-Usage:\n
+  echo -en "Error: No argument supplied.\n
+Usage:
   $0 /absolute/path/to/gemrb/git\n"
   exit 1
 fi
