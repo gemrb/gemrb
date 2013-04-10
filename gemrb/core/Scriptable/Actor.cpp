@@ -4630,7 +4630,9 @@ void Actor::Die(Scriptable *killer)
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	//remove IDLE so the actor gets a chance to die properly
 	InternalFlags&=~IF_IDLE;
-	SetStance( IE_ANI_DIE );
+	if (GetStance() != IE_ANI_DIE) {
+		SetStance(IE_ANI_DIE);
+	}
 	AddTrigger(TriggerEntry(trigger_die));
 	SendDiedTrigger();
 
