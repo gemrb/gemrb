@@ -635,7 +635,7 @@ void Scriptable::PartyRested()
 	AddTrigger(TriggerEntry(trigger_partyrested));
 }
 
-ieDword Scriptable::GetInternalFlag()
+ieDword Scriptable::GetInternalFlag() const
 {
 	return InternalFlags;
 }

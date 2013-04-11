@@ -306,7 +306,7 @@ public:
 	void Activate();
 	void Deactivate();
 	void PartyRested();
-	ieDword GetInternalFlag();
+	ieDword GetInternalFlag() const;
 	const char* GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
