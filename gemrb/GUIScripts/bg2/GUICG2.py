@@ -96,7 +96,7 @@ def OnLoad():
 	TextAreaControl = ClassWindow.GetControl(13)
 
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	if ClassName == "*":
+	if ClassName == "":
 		TextAreaControl.SetText(17242)
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
