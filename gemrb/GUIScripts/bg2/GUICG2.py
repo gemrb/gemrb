@@ -135,6 +135,8 @@ def SetClass():
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, ClassIndex)
 
 	#assign the correct XP
+	if ClassName == "BARBARIAN":
+		ClassName = "FIGHTER"
 	if GUICommon.GameIsTOB():
 		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2"))
 	else:
