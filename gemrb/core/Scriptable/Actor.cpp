@@ -6796,7 +6796,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 	}
 
 	//Don't modify the modified stats if the colors were locked (for this ai cycle)
-	if (anims->lockPalette) {
+	if (anims && anims->lockPalette) {
 		return;
 	}
 
