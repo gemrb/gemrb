@@ -5200,11 +5200,8 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	{
 		FileStream str;
 
-		if (!str.Create( Path, name, IE_CHR_CLASS_ID ))
-			return -1;
-
-		int ret = gm->PutActor(&str, actor, true);
-		if (ret <0) {
+		if (!str.Create( Path, name, IE_CHR_CLASS_ID )
+			|| (gm->PutActor(&str, actor, true) < 0)) {
 			Log(WARNING, "Core", "Character cannot be saved: %s", name);
 			return -1;
 		}
