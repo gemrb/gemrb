@@ -136,7 +136,7 @@ Store* STOImporter::GetStore(Store *s)
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
 	for (i = 0; i < s->ItemsCount; i++) {
 		STOItem *item = s->items[i];
-		GetItem(item);
+		GetItem(item, s);
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
 			char *TriggerCode = core->GetString( (ieStrRef) item->InfiniteSupply );
@@ -162,7 +162,7 @@ Store* STOImporter::GetStore(Store *s)
 	return s;
 }
 
-void STOImporter::GetItem(STOItem *it)
+void STOImporter::GetItem(STOItem *it, Store *s)
 {
 	core->ReadItem(str, (CREItem *) it);
 
@@ -178,7 +178,7 @@ void STOImporter::GetItem(STOItem *it)
 	if (item) {
 		it->MaxStackAmount = item->MaxStackAmount;
 		//another hack-fix
-		if (!item->LoreToID) {
+		if (item->LoreToID <= s->Lore) {
 			it->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
 		gamedata->FreeItem( item, it->ItemResRef, false );

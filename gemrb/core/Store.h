@@ -173,6 +173,8 @@ public: //queries
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);
 private:
+	/** Identifies item according to store lore */
+	void IdentifyItem(CREItem *item) const;
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot) const;

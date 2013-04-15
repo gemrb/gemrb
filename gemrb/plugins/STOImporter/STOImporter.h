@@ -47,7 +47,7 @@ public:
 	bool PutStore(DataStream *stream, Store *store);
 
 private:
-	void GetItem(STOItem *item);
+	void GetItem(STOItem *item, Store* s);
 	void GetDrink(STODrink *drink);
 	void GetCure(STOCure *cure);
 	void GetPurchasedCategories(Store* s);

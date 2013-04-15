@@ -229,9 +229,6 @@ void Store::RechargeItem(CREItem *item)
 	if (!itm) {
 		return;
 	}
-	if (!itm->LoreToID) {
-		item->Flags |= IE_INV_ITEM_IDENTIFIED;
-	}
 	//gemrb extension, some shops won't recharge items
 	//containers' behaviour is inverted
 	//bag      0   1   0   1
@@ -253,8 +250,25 @@ void Store::RechargeItem(CREItem *item)
 	gamedata->FreeItem(itm, item->ItemResRef, 0);
 }
 
+void Store::IdentifyItem(CREItem *item) const
+{
+	if (item->Flags & IE_INV_ITEM_IDENTIFIED) {
+		return;
+	}
+
+	Item *itm = gamedata->GetItem(item->ItemResRef);
+	if (!itm) {
+		return;
+	}
+
+	if (itm->LoreToID <= Lore) {
+		item->Flags |= IE_INV_ITEM_IDENTIFIED;
+	}
+}
+
 void Store::AddItem(CREItem *item)
 {
+	IdentifyItem(item);
 	RechargeItem(item);
 	STOItem *temp = FindItem(item, true);
 
