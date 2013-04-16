@@ -6657,7 +6657,6 @@
 					./,
 					"-DSTATIC_LINK",
 					"-DHAVE_CONFIG_H",
-					"-D_DEBUG",
 					"-W",
 					"-Wextra",
 				);
