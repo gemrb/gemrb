@@ -1402,6 +1402,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "g21" );
+			Cycle+=9;
 			break;
 
 		case IE_ANI_ATTACK_SLASH:
@@ -1409,8 +1410,8 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "g26" );
-			Cycle+=45;
+			strcat( ResRef, "g22" );
+			Cycle+=18;
 			break;
 
 		case IE_ANI_CAST: //looping
