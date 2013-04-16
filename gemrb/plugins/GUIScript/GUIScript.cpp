@@ -3739,7 +3739,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 		btn->SetFlags ( IE_GUI_BUTTON_BG1_PAPERDOLL, BM_OR );
 		btn->StackPicture( Picture2 );
 	} else if (type == 0) {
-		btn->SetFlags ( ~IE_GUI_BUTTON_BG1_PAPERDOLL, BM_AND );
+		btn->SetFlags ( IE_GUI_BUTTON_BG1_PAPERDOLL, BM_NAND );
 	}
 
 	Py_INCREF( Py_None );
