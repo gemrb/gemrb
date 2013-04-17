@@ -616,10 +616,7 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 	// we dont always use everything we allocated.
 	// realloc in this case to avoid static anylizer warnings about "garbage values"
 	// since this realloc always truncates it *should* be quick
-	ieWord* test = dbString;
 	dbString = (ieWord*)realloc(dbString, (dbLen+1) * sizeof(ieWord));
-	// since this is truncation we *should* get the same ptr back
-	assert(test == dbString);
 
 	return dbLen;
 }
