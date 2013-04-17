@@ -182,6 +182,10 @@ void STOImporter::GetItem(STOItem *it, Store *s)
 			it->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
 		gamedata->FreeItem( item, it->ItemResRef, false );
+		//make sure it has at least one charge for proper pricing purposes
+		if (!it->Usages[0]) {
+			it->Usages[0] = 1;
+		}
 	}
 	str->ReadDword( (ieDword *) &it->InfiniteSupply );
 	ieDwordSigned tmp;
