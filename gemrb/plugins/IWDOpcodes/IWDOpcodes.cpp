@@ -3270,12 +3270,12 @@ int fx_disguise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	ieDword anim = BASE_GET(IE_ANIMATION_ID);
-	if (anim>=0x6000 || anim<=0x6fff) {
+	if (anim>=0x6000 && anim<=0x6fff) {
 		STAT_SET(IE_ANIMATION_ID, anim&0x600f);
 		return FX_APPLIED;
 	}
 
-	if (anim>=0x5000 || anim<=0x5fff) {
+	if (anim>=0x5000 && anim<=0x5fff) {
 		STAT_SET(IE_ANIMATION_ID, anim&0x500f);
 		return FX_APPLIED;
 	}
