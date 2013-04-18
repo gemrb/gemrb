@@ -563,7 +563,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				if (target->GetStat(IE_NOTRACKING)) continue;
 				DrawArrowMarker(screen, target->Pos, viewport, black);
 			}
-			delete monsters;
+			free(monsters);
 		} else {
 			trackerID = 0;
 		}
