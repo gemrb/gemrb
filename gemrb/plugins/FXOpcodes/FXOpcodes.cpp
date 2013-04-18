@@ -3724,7 +3724,7 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	} else {
 		strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
 	}
-	core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
+	core->GetResRefFrom2DA(table, monster, hit, areahit);
 
 	if (!hit[0]) {
 		strnuprcpy(hit, fx->Resource2, 8);
