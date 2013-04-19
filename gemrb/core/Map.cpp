@@ -3018,7 +3018,11 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 
 	if (Spawns.Lookup(creResRef, lookup)) {
 		sg = (SpawnGroup *) lookup;
-		count = sg->Count;
+		if (level >= (int) sg->Level) {
+			count = sg->Count;
+		} else if (!first) {
+			count = 0;
+		}
 	}
 
 	while (count--) {
@@ -3029,15 +3033,13 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 
 			//SpawnGroups normally are all or nothing but make sure we spawn
 			//at least one creature if this is the first
-			if (level >= cpl || first) {
+			if (level >= cpl || sg || first) {
 				AddActor(creature, true);
 				creature->SetPosition(pos, true, radiusx, radiusy);
 				creature->RefreshEffects(NULL);
 				if (difficulty && !sg) *difficulty -= cpl;
 				if (creCount) (*creCount)++;
 				spawned = true;
-			} else {
-				break;
 			}
 		} 
 	}
