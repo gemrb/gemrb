@@ -4098,9 +4098,6 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (!actor) {
-		return 0;
-	}
 
 	if (actor->GetInternalFlag()&IF_USEEXIT) {
 		return 0;
