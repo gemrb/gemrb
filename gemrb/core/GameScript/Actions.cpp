@@ -1867,7 +1867,7 @@ void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 {
 	//iwd2 allows setting all 10 slots, though, there is no evidence they are used
-	if (parameters->int0Parameter>10) return;
+	if (parameters->int0Parameter >= 10) return;
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	map->SongHeader.SongList[parameters->int0Parameter]=parameters->int1Parameter;
