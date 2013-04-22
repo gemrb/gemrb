@@ -1703,6 +1703,8 @@ void Map::PurgeArea(bool items)
 	int i=(int) actors.size();
 	while (i--) {
 		Actor *ac = actors[i];
+		//we're going to drop the map from memory so clear the reference
+		ac->SetMap(NULL);
 
 		if (ac->Modified[IE_STATE_ID]&STATE_NOSAVE) {
 			if (ac->Modified[IE_MC_FLAGS] & MC_KEEP_CORPSE) {
