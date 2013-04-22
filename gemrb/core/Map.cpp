@@ -1485,6 +1485,7 @@ void Map::DeleteActor(int i)
 		ClearSearchMapFor( actor );
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
+		CopyResRef(actor->Area, "");
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
 		if (game->InStore(actor) < 0) {
@@ -2182,6 +2183,7 @@ void Map::RemoveActor(Actor* actor)
 			actor->ClearPath();
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
+			CopyResRef(actor->Area, "");
 			actors.erase( actors.begin()+i );
 			return;
 		}
