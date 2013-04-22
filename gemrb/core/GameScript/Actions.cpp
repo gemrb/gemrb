@@ -1834,7 +1834,7 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
 	//don't break on bad values
-	if (parameters->int0Parameter>10) return;
+	if (parameters->int0Parameter >= 10) return;
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	bool force, restart;
