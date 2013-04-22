@@ -1022,6 +1022,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					if (fx) {
 						core->ApplyEffect(fx, lastActor, lastActor);
 					}
+					delete fx;
 				}
 				break;
 			case 't'://advances time
@@ -1075,13 +1076,15 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					Effect *newfx;
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 					core->ApplyEffect(newfx, lastActor, lastActor);
+					delete newfx;
 					if (! (lastActor->GetInternalFlag() & IF_REALLYDIED)) {
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
+						delete newfx;
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
+						delete newfx;
 					}
-					delete newfx;
 				} else if (overContainer) {
 					overContainer->SetContainerLocked(0);
 				} else if (overDoor) {
