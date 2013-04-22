@@ -4106,12 +4106,12 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 
 		snprintf(section,10,"%d", animid);
 
-		if (armor<0 || armor>35) return;
 		if (type<0) {
 			type = -type;
 		} else {
 			armor = resdata->GetKeyAsInt(section, "armor",0);
 		}
+		if (armor<0 || armor>35) return;
 	} else {
 		//hack for stun (always first armortype)
 		if (type<0) {
