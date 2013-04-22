@@ -5489,7 +5489,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_play_visual_effect(%2d): Resource: %s Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 
 	//this is in the original engine (dead actors lose this effect)
-	if (STATE_GET( STATE_DEAD) ) {
+	if (!target || STATE_GET(STATE_DEAD)) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -5532,7 +5532,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//not sticky
-	if (fx->Parameter2 == 2 || !target) {
+	if (fx->Parameter2 == 2) {
 		sca->XPos = fx->PosX;
 		sca->YPos = fx->PosY;
 	} else {
