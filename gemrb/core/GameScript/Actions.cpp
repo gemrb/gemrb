@@ -878,7 +878,7 @@ void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	if (((ieDword) parameters->int0Parameter)>100) {
+	if (((ieDword) parameters->int0Parameter)>=100) {
 		Log(WARNING, "GameScript", "Invalid index %d in SetPlayerSound.", parameters->int0Parameter);
 		return;
 	}
