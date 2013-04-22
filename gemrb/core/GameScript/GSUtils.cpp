@@ -1161,6 +1161,7 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position)
 	fx->SetPosition(position);
 	strnuprcpy(fx->Resource, area, 8);
 	core->ApplyEffect(fx, actor, actor);
+	delete fx;
 	return true;
 }
 

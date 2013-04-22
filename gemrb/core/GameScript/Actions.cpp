@@ -6919,6 +6919,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, (Actor *) src, src);
+	delete fx;
 }
 
 //this action plays a vvc animation over target
@@ -6954,6 +6955,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->PosY=tar->Pos.y;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, (Actor *) tar, src);
+	delete fx;
 }
 
 void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
@@ -6981,6 +6983,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->PosY=parameters->pointParameter.y;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
+	delete fx;
 }
 
 
