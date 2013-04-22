@@ -1159,7 +1159,9 @@ int Game::GetXPFromCR(int cr)
 {
 	if (!crtable) LoadCRTable();
 	if (crtable) {
-		int level = GetPartyLevel(true) / GetPartySize(true);
+		int size = GetPartySize(true);
+		if (!size) return 0; // everyone just died anyway
+		int level = GetPartyLevel(true) / size;
 		if (cr+1>=MAX_CRLEVEL) {
 			cr=MAX_CRLEVEL-2;
 		}
