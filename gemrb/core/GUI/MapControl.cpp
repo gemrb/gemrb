@@ -397,7 +397,7 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short /*Mod*/)
 {
-	switch((unsigned char) Button) {
+	switch((unsigned char) Button & GEM_MB_NORMAL) {
 		case GEM_MB_SCRLUP:
 			OnSpecialKeyPress(GEM_UP);
 			return;
