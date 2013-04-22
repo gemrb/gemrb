@@ -2096,8 +2096,8 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			if (x) {
 				stream->Write( filling, x);
 			}
-			stream->WriteWord( &mn->color);
-			stream->WriteWord( &tmpWord);
+			tmpDword = (ieDword) mn->color;
+			stream->WriteDword(&tmpDword);
 			for (x=0;x<5;x++) { //5 empty dwords
 				stream->Write( filling, 4);
 			}
