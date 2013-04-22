@@ -1963,7 +1963,10 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// the first block encountered), needs more testing
 						//HoW ar9708, djinni would become visible only if this is not commented out
 						//See: SEDJINNI.BCS
-						if (done) *done = true;
+						//BG2 on the other hand ... (eg. spirit trolls trollsp01 in ar1506)
+						if (core->HasFeature(GF_SKIPUPDATE_HACK)) {
+							if (done) *done = true;
+						}
 						return false;
 					}
 

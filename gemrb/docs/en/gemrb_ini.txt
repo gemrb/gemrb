@@ -514,6 +514,11 @@ Determines whether the magic resistance applies to all effects, even the
 beneficial ones.
 
 
+SkipUpdateHack = <bool>
+- - - - - - - - - - - -
+Determines how the engine treats a very specific script continuation nuance.
+
+
 SmallFog = <bool>
 - - - - - - - - - - -
 Whether fog-of-war maintained in Map::ExploredBitmap is aligned with
