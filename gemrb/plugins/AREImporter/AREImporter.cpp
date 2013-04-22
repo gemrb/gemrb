@@ -2081,7 +2081,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 		int x;
 
 		if (pst) {
-			tmpDword = (ieWord) mn->Pos.x;
+			tmpDword = (ieDword) mn->Pos.x;
 			stream->WriteDword( &tmpDword );
 			tmpDword = (ieDword) mn->Pos.y;
 			stream->WriteDword( &tmpDword );
