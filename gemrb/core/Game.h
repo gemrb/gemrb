@@ -469,7 +469,7 @@ public:
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
 	/** runs area functionality, sets partyrested trigger */
-	void RestParty(int checks, int dream, int hp);
+	bool RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
 	/** check if the passed actor is a victim of timestop */

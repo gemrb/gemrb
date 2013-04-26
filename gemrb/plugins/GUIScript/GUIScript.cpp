@@ -9707,9 +9707,7 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 
-	game->RestParty(noareacheck, dream, hp);
-	Py_INCREF( Py_None );
-	return Py_None;
+	return PyInt_FromLong(game->RestParty(noareacheck, dream, hp));
 }
 
 PyDoc_STRVAR( GemRB_ChargeSpells__doc,

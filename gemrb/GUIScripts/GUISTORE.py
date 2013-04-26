@@ -1566,19 +1566,22 @@ def RentConfirm ():
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
-	GemRB.RestParty (13, 1, RentIndex+1)
+	cutscene = GemRB.RestParty (13, 1, RentIndex+1)
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()
 	Window = StoreRentWindow
-	TextArea = Window.GetControl (12)
-	#is there any way to change this???
-	GemRB.SetToken ("HOUR", "8")
-	GemRB.SetToken ("HP", "%d"%(RentIndex+1))
-	TextArea.SetText (16476)
-	GemRB.SetVar ("RentIndex", -1)
-	Button = Window.GetControl (RentIndex+4)
-	Button.SetState (IE_GUI_BUTTON_ENABLED)
-	UpdateStoreRentWindow ()
+	if cutscene:
+		CloseStoreWindow ()
+	else:
+		TextArea = Window.GetControl (12)
+		#is there any way to change this???
+		GemRB.SetToken ("HOUR", "8")
+		GemRB.SetToken ("HP", "%d"%(RentIndex+1))
+		TextArea.SetText (16476)
+		GemRB.SetVar ("RentIndex", -1)
+		Button = Window.GetControl (RentIndex+4)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		UpdateStoreRentWindow ()
 	return
 
 def RentDeny () :

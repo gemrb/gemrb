@@ -1566,16 +1566,17 @@ void Game::TextDream()
 //dream = 0 - based on area non-0 - select from list
 //-1 no dream
 //hp is how much hp the rest will heal
-void Game::RestParty(int checks, int dream, int hp)
+//returns true if a cutscene dream is about to be played
+bool Game::RestParty(int checks, int dream, int hp)
 {
 	if (!(checks&REST_NOMOVE) ) {
 		if (!EveryoneStopped()) {
-			return;
+			return false;
 		}
 	}
 	Actor *leader = GetPC(0, true);
 	if (!leader) {
-		return;
+		return false;
 	}
 
 	Map *area = leader->GetCurrentArea();
@@ -1584,7 +1585,7 @@ void Game::RestParty(int checks, int dream, int hp)
 		if (!EveryoneNearPoint( area, leader->Pos, 0 ) ) {
 			//party too scattered
 			displaymsg->DisplayConstantString( STR_SCATTERED, DMC_RED );
-			return;
+			return false;
 		}
 	}
 
@@ -1592,12 +1593,12 @@ void Game::RestParty(int checks, int dream, int hp)
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
 			displaymsg->DisplayConstantString( STR_CANTRESTMONS, DMC_RED );
-			return;
+			return false;
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
 			displaymsg->DisplayConstantString( STR_CANTRESTMONS, DMC_RED );
-			return;
+			return false;
 		}
 	}
 
@@ -1609,13 +1610,13 @@ void Game::RestParty(int checks, int dream, int hp)
 		//you cannot rest here
 		if (area->AreaFlags&AF_NOSAVE) {
 			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
-			return;
+			return false;
 		}
 		//you may not rest here, find an inn
 		if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
 		{
 			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
-			return;
+			return false;
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
@@ -1632,7 +1633,7 @@ void Game::RestParty(int checks, int dream, int hp)
 			hours -= hoursLeft;
 			// the interruption occured before any resting could be done, so just bail out
 			if (!hours) {
-				return;
+				return false;
 			}
 		}
 	} else {
@@ -1656,13 +1657,15 @@ void Game::RestParty(int checks, int dream, int hp)
 
 	// abort the partial rest; we got what we wanted
 	if (hoursLeft) {
-		return;
+		return false;
 	}
 
 	//movie, cutscene, and still frame dreams
+	bool cutscene = false;
 	if (dream>=0) {
 		//cutscene dreams
 		if (gamedata->Exists("player1d",IE_BCS_CLASS_ID, true)) {
+			cutscene = true;
 			PlayerDream();
 		} else if (gamedata->Exists("drmtxt2", IE_2DA_CLASS_ID, true)) {
 			TextDream();
@@ -1695,14 +1698,15 @@ void Game::RestParty(int checks, int dream, int hp)
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 
 	//this would be bad
-	if (hrsindex == -1 || restindex == -1) return;
+	if (hrsindex == -1 || restindex == -1) return cutscene;
 	tmpstr = core->GetString(hrsindex, 0);
 	//as would this
-	if (!tmpstr) return;
+	if (!tmpstr) return cutscene;
 
 	core->GetTokenDictionary()->SetAtCopy("DURATION", tmpstr);
 	core->FreeString(tmpstr);
 	displaymsg->DisplayString(restindex, DMC_WHITE, 0);
+	return cutscene;
 }
 
 //timestop effect
