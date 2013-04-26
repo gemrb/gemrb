@@ -1575,7 +1575,6 @@ def RentConfirm ():
 	else:
 		TextArea = Window.GetControl (12)
 		#is there any way to change this???
-		GemRB.SetToken ("HOUR", "8")
 		GemRB.SetToken ("HP", "%d"%(RentIndex+1))
 		TextArea.SetText (16476)
 		GemRB.SetVar ("RentIndex", -1)
