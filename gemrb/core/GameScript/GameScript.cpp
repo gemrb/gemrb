@@ -2177,6 +2177,9 @@ bool Condition::Evaluate(Scriptable* Sender)
 			//we started an Or() block
 			if (ORcount) {
 				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+				if (!subresult) {
+					return 0;
+				}
 			}
 			ORcount = result;
 			subresult = false;
@@ -2195,6 +2198,7 @@ bool Condition::Evaluate(Scriptable* Sender)
 	}
 	if (ORcount) {
 		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+		return subresult;
 	}
 	return 1;
 }
