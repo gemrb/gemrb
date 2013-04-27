@@ -1814,5 +1814,6 @@ def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
 
 def RestPress ():
-	GemRB.RestParty(0, 0, 1)
+	if GemRB.RestParty(0, 0, 1):
+		GUICommon.CloseOtherWindow(None)
 	return
