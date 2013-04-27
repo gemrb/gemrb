@@ -6,6 +6,7 @@
 
 ENVROOT=$PWD
 GEMRB_GIT_PATH=$1
+GEMRB_VERSION=""
 
 function build_vorbis {
   echo -en "Checking out libogg-vorbis.\n"
@@ -127,10 +128,13 @@ function move_and_edit_projectfiles {
   mkdir -p "$ENVROOT/build/gemrb/assets" &&
   cp "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
+  mkdir -p "$ENVROOT/build/gemrb/res/drawable-ldpi/"
   # copy the icons
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/drawable-ldpi/icon.png" &&
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/drawable-mdpi/icon.png" &&
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-72px.png" "$ENVROOT/build/gemrb/res/drawable-hdpi/icon.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/drawable-ldpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/drawable-mdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-72px.png" "$ENVROOT/build/gemrb/res/drawable-hdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-96px.png" "$ENVROOT/build/gemrb/res/drawable-xhdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-144px.png" "$ENVROOT/build/gemrb/res/drawable-xxhdpi/ic_launcher.png" &&
 
   # copy the makefile
   cp "$ENVROOT/GEMRB_Android.mk" "$ENVROOT/build/gemrb/jni/src/Android.mk" &&
@@ -154,7 +158,8 @@ function move_and_edit_projectfiles {
 
   # change activity class and application name, as well as enable debuggable
   sed -i -e s,org.libsdl.app,net.sourceforge.gemrb, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
-  sed -i -e s,SDLActivity,GemRB, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
+  sed -i -e s,org.libsdl.app,net.sourceforge.gemrb, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
+  sed -i -e s,android:versionName=.*,android:versionName=$GEMRB_VERSION, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
   sed -i -e '21 a\
                  android:debuggable="true"' "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
   sed -i -e s,SDL\ App,GemRB, build/gemrb/res/values/strings.xml &&
@@ -189,12 +194,13 @@ Usage:
   exit 1
 fi
 
+GEMRB_VERSION=$(grep "#define VERSION_GEMRB" $GEMRB_GIT_PATH/gemrb/includes/globals.h | awk -F' ' '{print $3}')
 setup_dir_struct &&
 move_and_edit_projectfiles &&
 build_deps &&
 move_libraries &&
 android update project -t android-17 -p "$ENVROOT/build/gemrb" &&
 finished || {
-echo 'Building failed!'
-exit 2
+  echo 'Building failed!'
+  exit 2
 }
