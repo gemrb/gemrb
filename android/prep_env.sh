@@ -128,7 +128,7 @@ function move_and_edit_projectfiles {
   mkdir -p "$ENVROOT/build/gemrb/assets" &&
   cp "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
-  mkdir -p "$ENVROOT/build/gemrb/res/drawable-ldpi/"
+  mkdir -p "$ENVROOT/build/gemrb/res/drawable-ldpi/" &&
   # copy the icons
   cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/drawable-ldpi/ic_launcher.png" &&
   cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/drawable-mdpi/ic_launcher.png" &&
@@ -194,7 +194,7 @@ Usage:
   exit 1
 fi
 
-GEMRB_VERSION=$(grep "#define VERSION_GEMRB" $GEMRB_GIT_PATH/gemrb/includes/globals.h | awk -F' ' '{print $3}')
+GEMRB_VERSION=$(grep "#define VERSION_GEMRB" "$GEMRB_GIT_PATH/gemrb/includes/globals.h" | awk -F' ' '{print $3}') &&
 setup_dir_struct &&
 move_and_edit_projectfiles &&
 build_deps &&
