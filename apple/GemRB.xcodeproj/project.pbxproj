@@ -4327,7 +4327,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "VERSION=`git describe --tags --dirty=-patched`\n\n# packagemaker is depricated\n# /Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out osx/GemRB-osx-$VERSION.pkg\n\n#make iOS ipa\n#purge payload of everything\nif [ -d `ios/Payload`];\nthen\nrm -r ios/Payload;\nfi\nmkdir ios/Payload\n\ncp -r \"$BUILT_PRODUCTS_DIR\"-iphoneos/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB-ios-$VERSION.ipa iTunesArtWork iTunesMetadata.plist Payload\n\n# copy the optional plugins\ncd ..\ncp \"$BUILT_PRODUCTS_DIR\"/OGGReader.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/OGGReader.so\ncp \"$BUILT_PRODUCTS_DIR\"/PNGImporter.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/PNGImporter.so\n\n#zip OS X distro too\ncd osx\nzip -r GemRB-osx-$VERSION.zip \"$BUILT_PRODUCTS_DIR\"/GemRB.app\n";
+			shellScript = "VERSION=`git describe --tags --dirty=-patched`\n\n# packagemaker is depricated\n# /Developer/usr/bin/packagemaker --verbose --doc osx/GemRB.pmdoc --out osx/GemRB-osx-$VERSION.pkg\n\n#make iOS ipa\n#purge payload of everything\nif [ -d `ios/Payload`];\nthen\nrm -r ios/Payload;\nfi\nmkdir ios/Payload\n\ncp -r \"$BUILT_PRODUCTS_DIR\"-iphoneos/GemRB.app ios/Payload/GemRB.app\ncd ios\nzip -r GemRB-ios-$VERSION.ipa iTunesArtWork iTunesMetadata.plist Payload\n\n# copy the optional plugins\ncd ..\ncp \"$BUILT_PRODUCTS_DIR\"/OGGReader.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/OGGReader.so\ncp \"$BUILT_PRODUCTS_DIR\"/PNGImporter.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/PNGImporter.so\n\n#zip OS X distro too\ncd \"$BUILT_PRODUCTS_DIR\"\nzip -r GemRB-osx-$VERSION.zip GemRB.app\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
