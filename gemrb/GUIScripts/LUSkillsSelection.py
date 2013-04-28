@@ -237,7 +237,8 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		return
 	
 	#skills scrollbar
-	GemRB.SetVar ("SkillsTopIndex", 0)
+	SkillsTopIndex = 0
+	GemRB.SetVar ("SkillsTopIndex", SkillsTopIndex)
 	if len(SkillsIndices) > SkillsNumButtons:
 		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, SkillScrollBarPress)
 		#decrease it with the number of controls on screen (list size) and two unrelated rows
