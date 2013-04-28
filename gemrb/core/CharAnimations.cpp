@@ -1485,6 +1485,7 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "g21" );
+			Cycle+=9;
 			break;
 
 		case IE_ANI_ATTACK_SLASH:
@@ -1492,22 +1493,18 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "g26" );
+		case IE_ANI_CONJURE://ending
+			strcat( ResRef, "g22" );
 			Cycle+=18;
 			break;
 
 		case IE_ANI_CAST: //looping
-			strcat( ResRef, "g25" );
-			Cycle+=45;
-			break;
-
-		case IE_ANI_CONJURE://ending
-			strcat( ResRef, "g26" );
-			Cycle+=36;
+			strcat( ResRef, "g22" );
+			Cycle+=27;
 			break;
 
 		case IE_ANI_SHOOT:
-			strcat( ResRef, "g24" );
+			strcat( ResRef, "g23" );
 			Cycle+=27;
 			break;
 
@@ -1518,12 +1515,8 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat( ResRef, "g15" );
-			Cycle+=45;
-			break;
-
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "g14" );
+			strcat( ResRef, "g15" );
 			Cycle+=45;
 			break;
 
