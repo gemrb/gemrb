@@ -575,12 +575,14 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
+			//TODO: maybe set the object references here too
 			return 1;
 		}
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
 			Actor* snd = ( Actor* ) Sender;
 			//additional checks for invisibility?
 			snd->LastSeen = tar->GetGlobalID();
+			snd->LastMarked = tar->GetGlobalID();
 		}
 		return 1;
 	}

@@ -1937,6 +1937,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
+			actor->LastMarked = trap->GetGlobalID();
 			//clear the go closer flag
 			trap->GetCurrentArea()->LastGoCloser = 0;
 			return false;
@@ -1958,6 +1959,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
+					actor->LastMarked = trap->GetGlobalID();
 					//directly feeding the event, even if there are actions in the queue
 					//trap->Scripts[0]->Update();
 					// FIXME

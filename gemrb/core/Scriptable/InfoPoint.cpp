@@ -206,6 +206,7 @@ bool InfoPoint::Entered(Actor *actor)
 	return false;
 check:
 	if (Type==ST_TRAVEL) {
+		actor->LastMarked = GetGlobalID();
 		return true;
 	}
 
@@ -223,6 +224,7 @@ check:
 
 		//skill?
 		if (TriggerTrap(0, actor->GetGlobalID()) ) {
+			actor->LastMarked = GetGlobalID();
 			return true;
 		}
 	}
