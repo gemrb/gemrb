@@ -129,4 +129,10 @@ public class GemRB extends SDLActivity {
           }
       }
   }
+
+  public void onConfigurationChanged(Configuration newConfig) {
+    // we're only overriding for orientation change (cmp AndroidManifest.xml)
+    // but we don't actually want to react to that
+    super.onConfigurationChanged(newConfig);
+  }
 }
