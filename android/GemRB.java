@@ -21,6 +21,7 @@ import java.util.Properties;
 import android.app.AlertDialog;
 import android.widget.EditText;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 
 public class GemRB extends SDLActivity {
 
