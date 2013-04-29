@@ -747,6 +747,12 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius/16, radius/12 );
 	ab->SetOrientation(parameters->int0Parameter, false );
 
+	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->LastMarked = ab->GetGlobalID();
+	}
+
 	//if string1 is animation, then we can't use it for a DV too
 	if (flags & CC_PLAY_ANIM) {
 		CreateVisualEffectCore( ab, ab->Pos, parameters->string1Parameter, 1);

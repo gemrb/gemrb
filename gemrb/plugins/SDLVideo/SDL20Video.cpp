@@ -325,8 +325,14 @@ int SDL20VideoDriver::SwapBuffers(void)
 		return GEM_ERROR;
 	}
 
-	assert(pitch == backBuf->pitch);
-	memcpy(pixels, backBuf->pixels, pitch * height);
+	ieByte* src = (ieByte*)backBuf->pixels;
+	ieByte* dest = (ieByte*)pixels;
+	for( int row = 0; row < height; row++ ) {
+		memcpy(dest, src, width * backBuf->format->BytesPerPixel);
+		dest += pitch;
+		src += backBuf->pitch;
+	}
+
 /*
 	if (fadeColor.a) {
 		SDL_Rect dst = {
