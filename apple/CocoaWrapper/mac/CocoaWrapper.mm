@@ -142,6 +142,7 @@ using namespace GemRB;
 		if ( [obj isKindOfClass:[NSDictionary class]] ) {
 			// move it to the root level
 			[dict addEntriesFromDictionary:obj];
+			[dict removeObjectForKey:key];
 		}
 	}
 
