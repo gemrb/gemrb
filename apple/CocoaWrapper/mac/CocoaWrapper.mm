@@ -86,7 +86,15 @@ using namespace GemRB;
 	AddLogger(createAppleLogger());
 
 	// Load default defaults
-    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]]];
+	NSString* defaultsPath = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
+	NSDictionary* defaultDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPath];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults registerDefaults:defaultDict];
+
+	if (![defaults stringForKey:@"CachePath"]) {
+		NSString* cachePath = [NSString stringWithFormat:@"%@gemrb", NSTemporaryDirectory()];
+		[defaults setValue:cachePath forKey:@"CachePath"];
+	}
 }
 
 /* Called when the internal event loop has just started running */
