@@ -137,8 +137,10 @@ using namespace GemRB;
 		} else if ([obj isKindOfClass:[NSString class]]) {
 			value = (NSString*)obj;
 		}
-		config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
+		if (value) {
+			config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
 								[value cStringUsingEncoding:NSASCIIStringEncoding]);
+		}
 	}
 
 	int status;
