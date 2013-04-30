@@ -129,6 +129,14 @@ using namespace GemRB;
 	NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:defaultValues];
 	[dict addEntriesFromDictionary:userValues];
 
+	for ( NSString* key in dict.allKeys ) {
+		id obj = [dict objectForKey:key];
+		if ( [obj isKindOfClass:[NSDictionary class]] ) {
+			// move it to the root level
+			[dict addEntriesFromDictionary:obj];
+		}
+	}
+
 	for ( NSString* key in dict ) {
 		NSString* value = nil;
 		id obj = [dict objectForKey:key];

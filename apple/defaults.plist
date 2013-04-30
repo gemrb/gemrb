@@ -18,5 +18,22 @@
 	<integer>640</integer>
 	<key>Height</key>
 	<integer>480</integer>
+	<key>AdditionalPaths</key>
+	<dict>
+		<key>CustomFontPath</key>
+		<string>~/Library/Fonts</string>
+		<key>CD1</key>
+		<string></string>
+		<key>CD2</key>
+		<string></string>
+		<key>CD3</key>
+		<string></string>
+		<key>CD4</key>
+		<string></string>
+		<key>CD5</key>
+		<string></string>
+		<key>CD6</key>
+		<string></string>
+	</dict>
 </dict>
 </plist>
