@@ -493,17 +493,18 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERUP:
 			{
 				if (numFingers) numFingers--;
-				continuingGesture = false;
+				
 				// we need to get mouseButton before calling ProcessFirstTouch
-				int mouseButton = (firstFingerDown.fingerId >= 0) ? GEM_MB_ACTION : GEM_MB_MENU;
+				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
+				continuingGesture = false;
 				ProcessFirstTouch(mouseButton);
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					if (!ignoreNextFingerUp) {
 						if (CursorIndex != VID_CUR_DRAG)
 							CursorIndex = VID_CUR_UP;
 						// move cursor to ensure any referencing of the cursor is accurate
-						CursorPos.x = event.button.x;
-						CursorPos.y = event.button.y;
+						MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
+									  ScaleCoordinateVertical(event.tfinger.y));
 
 						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
 											 ScaleCoordinateVertical(event.tfinger.y),
