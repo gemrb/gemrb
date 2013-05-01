@@ -502,8 +502,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						if (CursorIndex != VID_CUR_DRAG)
 							CursorIndex = VID_CUR_UP;
 						// move cursor to ensure any referencing of the cursor is accurate
-						CursorPos.x = event.button.x;
-						CursorPos.y = event.button.y;
+						MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
+									  ScaleCoordinateVertical(event.tfinger.y));
 
 						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
 											 ScaleCoordinateVertical(event.tfinger.y),
