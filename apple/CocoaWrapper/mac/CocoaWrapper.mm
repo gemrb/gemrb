@@ -86,7 +86,15 @@ using namespace GemRB;
 	AddLogger(createAppleLogger());
 
 	// Load default defaults
-    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]]];
+	NSString* defaultsPath = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
+	NSDictionary* defaultDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPath];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults registerDefaults:defaultDict];
+
+	if (![defaults stringForKey:@"CachePath"]) {
+		NSString* cachePath = [NSString stringWithFormat:@"%@gemrb", NSTemporaryDirectory()];
+		[defaults setValue:cachePath forKey:@"CachePath"];
+	}
 }
 
 /* Called when the internal event loop has just started running */
@@ -129,6 +137,15 @@ using namespace GemRB;
 	NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:defaultValues];
 	[dict addEntriesFromDictionary:userValues];
 
+	for ( NSString* key in dict.allKeys ) {
+		id obj = [dict objectForKey:key];
+		if ( [obj isKindOfClass:[NSDictionary class]] ) {
+			// move it to the root level
+			[dict addEntriesFromDictionary:obj];
+			[dict removeObjectForKey:key];
+		}
+	}
+
 	for ( NSString* key in dict ) {
 		NSString* value = nil;
 		id obj = [dict objectForKey:key];
@@ -137,8 +154,10 @@ using namespace GemRB;
 		} else if ([obj isKindOfClass:[NSString class]]) {
 			value = (NSString*)obj;
 		}
-		config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
+		if (value) {
+			config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
 								[value cStringUsingEncoding:NSASCIIStringEncoding]);
+		}
 	}
 
 	int status;

@@ -577,11 +577,11 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 }
 
 //flags set disable item transfer
-//except for undroppable and equipped, which are opposite (and shouldn't be set)
+//except for undroppable which is opposite (and shouldn't be set)
 int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_item, int count)
 {
 	size_t slot = Slots.size();
-	unsigned int mask = (flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED));
+	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
 	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
 		mask &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
