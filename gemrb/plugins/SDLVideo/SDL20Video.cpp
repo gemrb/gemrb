@@ -41,6 +41,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	screenTexture = NULL;
 
 	// touch input
+	ignoreNextFingerUp = 1;
 	ClearFirstTouch();
 }
 
@@ -359,7 +360,7 @@ int SDL20VideoDriver::PollEvents()
 		int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
 		EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
-		ignoreNextFingerUp = true;
+		ignoreNextFingerUp++;
 	}
 
 	return SDLVideoDriver::PollEvents();
@@ -369,7 +370,7 @@ void SDL20VideoDriver::ClearFirstTouch()
 {
 	firstFingerDown = SDL_TouchFingerEvent();
 	firstFingerDown.fingerId = -1;
-	ignoreNextFingerUp = false;
+	ignoreNextFingerUp--;
 	firstFingerDownTime = 0;
 }
 
@@ -417,7 +418,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	switch (event.type) {
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
-			ignoreNextFingerUp = true;
+			if (numFingers > 1) {
+				ignoreNextFingerUp = numFingers;
+			}
 
 			if (numFingers == core->NumFingScroll
 				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
@@ -454,7 +457,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			} else if (numFingers == 1) { //click and drag
 				ProcessFirstTouch(GEM_MB_ACTION);
-				ignoreNextFingerUp = false;
+				//ignoreNextFingerUp--;
 				// standard mouse movement
 				MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
 							  ScaleCoordinateVertical(event.tfinger.y));
@@ -499,13 +502,15 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERUP:
 			{
 				if (numFingers) numFingers--;
-				
+
 				// we need to get mouseButton before calling ProcessFirstTouch
 				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
 				continuingGesture = false;
-				ProcessFirstTouch(mouseButton);
+
 				if (numFingers == 0) { // this event was the last finger that was in contact
-					if (!ignoreNextFingerUp) {
+					ProcessFirstTouch(mouseButton);
+					if (ignoreNextFingerUp <= 0) {
+						ignoreNextFingerUp = 1;
 						if (CursorIndex != VID_CUR_DRAG)
 							CursorIndex = VID_CUR_UP;
 						// move cursor to ensure any referencing of the cursor is accurate
@@ -522,6 +527,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					// this isn't causing a problem currently
 					EvntManager->KeyRelease( GEM_ALT, 0 );
 				}
+				ignoreNextFingerUp--;
 			}
 			break;
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
