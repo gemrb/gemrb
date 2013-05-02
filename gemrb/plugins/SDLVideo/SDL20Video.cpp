@@ -433,6 +433,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					EvntManager->MouseDown(ScaleCoordinateHorizontal(event.tfinger.x),
 										   ScaleCoordinateVertical(event.tfinger.y),
 										   GEM_MB_ACTION, 0);
+					focusCtrl = EvntManager->GetMouseFocusedControl();
+					if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
+						((GameControl*)focusCtrl)->ClearMouseState();
+					}
 				}
 				// invert the coordinates such that dragging down scrolls up etc.
 				int scrollX = (event.tfinger.dx * width) * -1;
