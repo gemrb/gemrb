@@ -314,6 +314,10 @@ def DisplayItem (itemresref, type):
 		Button.SetText (strrefs[4])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
 	elif container:
+		# Just skip the redundant info page and go directly to the container
+		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
+			OpenItemWindow()
+			return
 		if GUICommon.GameIsIWD2() or GUICommon.GameIsHOW():
 			Button.SetText (24891) # Open Container
 		elif GUICommon.GameIsBG2():
@@ -323,9 +327,6 @@ def DisplayItem (itemresref, type):
 			# FIXME: where do mods add the new string? This is untranslatable
 			Button.SetText ("Open container")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
-		# Just skip the redundant info page and go directly to the container
-		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
-			OpenItemWindow()
 	elif dialog:
 		Button.SetText (strrefs[5])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
