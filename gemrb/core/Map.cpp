@@ -3109,8 +3109,10 @@ void Map::UpdateSpawns()
 	for (std::vector<Spawn *>::iterator it = spawns.begin() ; it != spawns.end(); ++it) {
 		Spawn *spawn = *it;
 		if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
-			//only reactivate the spawn point if the party cannot currently see it
-			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos, false)) {
+			//only reactivate the spawn point if the party cannot currently see it;
+			//also make sure the party has moved away some
+			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos, false) &&
+				!GetActorInRadius(spawn->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_NEUTRAL, SPAWN_RANGE * 2)) {
 				spawn->Method &= ~SPF_WAIT;
 			}
 		}

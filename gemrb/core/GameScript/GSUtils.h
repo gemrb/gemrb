@@ -88,7 +88,7 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag, int count = 0);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
-bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
+GEM_EXPORT bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags);
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);

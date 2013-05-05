@@ -4675,7 +4675,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	if (video) {
 		Sprite2D* DraggedCursor = NULL;
 		if (item) {
-			DraggedCursor = gamedata->GetBAMSprite( Picture, 0, 0 );
+			DraggedCursor = gamedata->GetBAMSprite( Picture, -1, 0 );
 		}
 		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
 		if (DraggedCursor) DraggedCursor->release();
@@ -4785,17 +4785,60 @@ CREItem *Interface::ReadItem(DataStream *str, CREItem *itm)
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );
 	str->ReadDword( &itm->Flags );
-	//the stacked flag will be set by the engine if the item is indeed stacked
-	//this is to fix buggy saves so TakeItemNum works
-	//the equipped bit is also reset
-	itm->Flags&=~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
-	if (GF_NO_UNDROPPABLE) {
-		itm->Flags&=~IE_INV_ITEM_UNDROPPABLE;
-	}
-	if (ResolveRandomItem(itm) ) {
+	if (ResolveRandomItem(itm)) {
+		SanitizeItem(itm);
 		return itm;
 	}
 	return NULL;
+}
+
+//Make sure the item attributes are valid
+//we don't update all flags here because some need to be set later (like
+//unmovable items in containers (e.g. the bg2 portal key) so that they
+//can actually be picked up)
+void Interface::SanitizeItem(CREItem *item) const
+{
+	//the stacked flag will be set by the engine if the item is indeed stacked
+	//this is to fix buggy saves so TakeItemNum works
+	//the equipped bit is also reset
+	item->Flags &= ~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
+	if (GF_NO_UNDROPPABLE) {
+		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
+	}
+
+	Item *itm = gamedata->GetItem(item->ItemResRef, true);
+	if (itm) {
+		//This hack sets the charge counters for non-rechargeable items,
+		//if their charge is zero
+		for (int i = 0; i < CHARGE_COUNTERS; i++) {
+			if (item->Usages[i]) {
+				continue;
+			}
+			ITMExtHeader *h = itm->GetExtHeader(i);
+			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
+				//HACK: the original (bg2) allows for 0 charged gems
+				if (h->Charges) {
+					item->Usages[i] = h->Charges;
+				} else {
+					item->Usages[i] = 1;
+				}
+			}
+		}
+
+		//auto identify basic items
+		if (!itm->LoreToID) {
+			item->Flags |= IE_INV_ITEM_IDENTIFIED;
+		}
+
+		//if item is stacked mark it as so
+		if (itm->MaxStackAmount) {
+			item->Flags |= IE_INV_ITEM_STACKED;
+		}
+
+		item->MaxStackAmount = itm->MaxStackAmount;
+
+		gamedata->FreeItem(itm, item->ItemResRef, false);
+	}
 }
 
 #define MAX_LOOP 10

@@ -616,6 +616,7 @@ public:
 	void SetDraggedPortrait(int dp, int cursor=-1);
 	CREItem *ReadItem(DataStream *str);
 	CREItem *ReadItem(DataStream *str, CREItem *itm);
+	void SanitizeItem(CREItem *item) const;
 	bool ResolveRandomItem(CREItem *itm);
 	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();

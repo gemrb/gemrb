@@ -84,6 +84,7 @@ namespace GemRB {
 #define IE_ANI_TWO_FILES_3B		16    //iwd animations (eg. MBBM)
 #define IE_ANI_TWO_PIECE		17    //MAKH
 #define IE_ANI_FOUR_FILES_3		18    //mostly civilians
+#define IE_ANI_TWO_FILES_4		19
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		56   //full animation

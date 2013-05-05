@@ -30,6 +30,7 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "GameScript/GSUtils.h"
 #include "Interface.h"
 #include "Item.h"
 #include "Map.h"
@@ -157,52 +158,10 @@ CREItem *Inventory::GetItem(unsigned int slot)
 	return item;
 }
 
-//Make sure the item attributes are valid
-//we don't update all flags here because some need to be set later (like
-//unmovable items in containers (e.g. the bg2 protal key) so that they
-//can actually be picked up)
-void Inventory::SanitizeItem(CREItem *item)
-{
-	Item *itm = gamedata->GetItem(item->ItemResRef, true);
-	if (itm) {
-		//This hack sets the charge counters for non-rechargeable items,
-		//if their charge is zero
-		for (int i=0;i<3;i++) {
-			if (item->Usages[i]) {
-				continue;
-			}
-			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-				//HACK: the original (bg2) allows for 0 charged gems
-				if (h->Charges) {
-					item->Usages[i] = h->Charges;
-				} else {
-					item->Usages[i] = 1;
-				}
-			}
-		}
-
-		//auto identify basic items
-		if (!itm->LoreToID) {
-			item->Flags |= IE_INV_ITEM_IDENTIFIED;
-		}
-
-		//if item is stacked mark it as so
-		if (itm->MaxStackAmount) {
-			item->Flags |= IE_INV_ITEM_STACKED;
-		}
-
-		item->MaxStackAmount = itm->MaxStackAmount;
-
-		gamedata->FreeItem( itm, item->ItemResRef, false );
-	}
-}
-
 void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
-	SanitizeItem(item);
 }
 
 void Inventory::CalculateWeight() const
@@ -617,8 +576,6 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	if (Slots[slot]) {
 		delete Slots[slot];
 	}
-
-	SanitizeItem(item);
 
 	Slots[slot] = item;
 
@@ -1429,13 +1386,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	CREItem *TmpItem = new CREItem();
-	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->Expired=0;
-	TmpItem->Usages[0]=(ieWord) Charge0;
-	TmpItem->Usages[1]=(ieWord) Charge1;
-	TmpItem->Usages[2]=(ieWord) Charge2;
-	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem)) {
+	if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
 		int ret = AddSlotItem( TmpItem, SlotID );
 		if (ret != ASI_SUCCESS) {
 			// put the remainder on the ground
@@ -1448,23 +1399,17 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 				delete TmpItem;
 			}
 		}
+		CalculateWeight();
 	} else {
 		delete TmpItem;
 	}
-	CalculateWeight();
 }
 
 void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	if(ItemResRef[0]) {
 		CREItem *TmpItem = new CREItem();
-		strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-		TmpItem->Expired=0;
-		TmpItem->Usages[0]=(ieWord) Charge0;
-		TmpItem->Usages[1]=(ieWord) Charge1;
-		TmpItem->Usages[2]=(ieWord) Charge2;
-		TmpItem->Flags=0;
-		if (core->ResolveRandomItem(TmpItem)) {
+		if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
 			SetSlotItem( TmpItem, SlotID );
 		} else {
 			delete TmpItem;

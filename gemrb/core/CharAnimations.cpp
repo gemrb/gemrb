@@ -799,6 +799,9 @@ IE_ANI_TWO_FILES_3B:	Animations using this type are stored using the following t
 			This is the standard IWD animation, but BG2 also has it.
 			See MOR2
 
+IE_ANI_TWO_FILES_4: This type stores animations in two files (G1 and G2) which each having only
+			one cycle. And both of those seem to be identical.
+
 IE_ANI_TWO_PIECE: This is a modified IE_ANI_SIX_FILES with supporting still frames (using a
 			different palette) stored in a second set of files. Currently only used by MAKH
 
@@ -1151,6 +1154,13 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				Anims[StanceID][Orient] = anims;
 			}
 			break;
+		case IE_ANI_TWO_FILES_4: {
+			for (int i = 0; i < MAX_ANIMS; ++i) {
+				for (int j = 0; j < MAX_ORIENT; ++j) {
+					Anims[i][j] = anims;
+				}
+			}}
+			break; 
 
 		case IE_ANI_PST_ANIMATION_3: //no stc just std
 		case IE_ANI_PST_ANIMATION_2: //no std just stc
@@ -1240,6 +1250,11 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_TWO_FILES_3B: //IWD style anims
 			AddMMR2Suffix( NewResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_TWO_FILES_4:
+			strcat( NewResRef, "g1");
+			Cycle = 0;
 			break;
 
 		case IE_ANI_TWO_FILES:

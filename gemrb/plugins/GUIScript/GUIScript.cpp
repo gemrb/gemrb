@@ -361,25 +361,6 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 	return 1;
 }
 
-/* create an item entry
- TODO: this code snippet exists in many copies, maybe consolidate */
-static CREItem *CreateCreItem(const char *ItemResRef, int Charge0, int Charge1, int Charge2)
-{
-	CREItem *TmpItem = new CREItem();
-	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->Expired=0;
-	TmpItem->Usages[0]=(ieWord) Charge0;
-	TmpItem->Usages[1]=(ieWord) Charge1;
-	TmpItem->Usages[2]=(ieWord) Charge2;
-	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem)) {
-		return TmpItem;
-	}
-	/* item couldn't be resolved */
-	delete TmpItem;
-	return NULL;
-}
-
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 "SetInfoTextColor(red, green, blue, [alpha])\n\n"
 "Sets the color of Floating Messages in GameControl." );
@@ -7972,8 +7953,10 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		// Create item on ground
 		Map *map = actor->GetCurrentArea();
 		if (map) {
-			CREItem *item = CreateCreItem(ItemResRef, Charge0, Charge1, Charge2 );
-			if (item) {
+			CREItem *item = new CREItem();
+			if (!CreateItemCore(item, ItemResRef, Charge0, Charge1, Charge2)) {
+				delete item;
+			} else {
 				map->AddItemToLocation(actor->Pos, item);
 			}
 		}

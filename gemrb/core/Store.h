@@ -172,6 +172,7 @@ public: //queries
 	const char *GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);
+	bool IsBag() const;
 private:
 	/** Identifies item according to store lore */
 	void IdentifyItem(CREItem *item) const;
