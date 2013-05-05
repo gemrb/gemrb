@@ -174,18 +174,19 @@ void STOImporter::GetItem(STOItem *it, Store *s)
 	}
 	// make sure the inventory knows that it needs to update flags+weight
 	it->Weight = -1;
-	Item *item = gamedata->GetItem( it->ItemResRef );
-	if (item) {
-		it->MaxStackAmount = item->MaxStackAmount;
-		//another hack-fix
-		if (item->LoreToID <= s->Lore && !s->IsBag()) {
-			it->Flags |= IE_INV_ITEM_IDENTIFIED;
+	if (!(it->Flags & IE_INV_ITEM_IDENTIFIED) && !s->IsBag()) {
+		Item *item = gamedata->GetItem( it->ItemResRef );
+		if (item) {
+			//another hack-fix
+			if (item->LoreToID <= s->Lore) {
+				it->Flags |= IE_INV_ITEM_IDENTIFIED;
+			}
+			gamedata->FreeItem( item, it->ItemResRef, false );
 		}
-		gamedata->FreeItem( item, it->ItemResRef, false );
-		//make sure it has at least one charge for proper pricing purposes
-		if (!it->Usages[0]) {
-			it->Usages[0] = 1;
-		}
+	}
+	//make sure it has at least one charge for proper pricing purposes
+	if (!it->Usages[0]) {
+		it->Usages[0] = 1;
 	}
 	str->ReadDword( (ieDword *) &it->InfiniteSupply );
 	ieDwordSigned tmp;

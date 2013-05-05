@@ -158,52 +158,10 @@ CREItem *Inventory::GetItem(unsigned int slot)
 	return item;
 }
 
-//Make sure the item attributes are valid
-//we don't update all flags here because some need to be set later (like
-//unmovable items in containers (e.g. the bg2 protal key) so that they
-//can actually be picked up)
-void Inventory::SanitizeItem(CREItem *item)
-{
-	Item *itm = gamedata->GetItem(item->ItemResRef, true);
-	if (itm) {
-		//This hack sets the charge counters for non-rechargeable items,
-		//if their charge is zero
-		for (int i=0;i<3;i++) {
-			if (item->Usages[i]) {
-				continue;
-			}
-			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-				//HACK: the original (bg2) allows for 0 charged gems
-				if (h->Charges) {
-					item->Usages[i] = h->Charges;
-				} else {
-					item->Usages[i] = 1;
-				}
-			}
-		}
-
-		//auto identify basic items
-		if (!itm->LoreToID) {
-			item->Flags |= IE_INV_ITEM_IDENTIFIED;
-		}
-
-		//if item is stacked mark it as so
-		if (itm->MaxStackAmount) {
-			item->Flags |= IE_INV_ITEM_STACKED;
-		}
-
-		item->MaxStackAmount = itm->MaxStackAmount;
-
-		gamedata->FreeItem( itm, item->ItemResRef, false );
-	}
-}
-
 void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
-	SanitizeItem(item);
 }
 
 void Inventory::CalculateWeight() const
@@ -618,8 +576,6 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	if (Slots[slot]) {
 		delete Slots[slot];
 	}
-
-	SanitizeItem(item);
 
 	Slots[slot] = item;
 

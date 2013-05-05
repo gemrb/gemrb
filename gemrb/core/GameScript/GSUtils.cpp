@@ -1276,6 +1276,7 @@ bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 	}
 	item->Flags=0;
 	item->Expired=0;
+	core->SanitizeItem(item);
 	return true;
 }
 
