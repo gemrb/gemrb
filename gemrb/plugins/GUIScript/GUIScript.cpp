@@ -6210,7 +6210,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 
 	//don't allow overstuffing bags
 	if (store->Capacity && store->Capacity<=store->GetRealStockSize()) {
-		ret &= ~IE_STORE_SELL;
+		ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_SELL;
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );

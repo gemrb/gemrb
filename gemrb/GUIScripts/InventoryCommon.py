@@ -107,10 +107,17 @@ def OnDragItem ():
 					#enter the store
 					GemRB.EnterStore (slot_item["ItemResRef"])
 					#if it is possible to add, then do it
-					if GemRB.IsValidStoreItem (pc, slot, 0)&SHOP_SELL:
+					ret = GemRB.IsValidStoreItem (pc, slot, 0)
+					if ret&SHOP_SELL:
 						GemRB.ChangeStoreItem (pc, slot, SHOP_SELL)
 					else:
-						GemRB.DisplayString( 9375, 0xffffff)
+						msg = 9375
+						if ret&SHOP_FULL:
+							if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+								msg = 24893
+							elif GUICommon.HasTOB:
+								msg = 54692
+						GemRB.DisplayString(msg, 0xffffff)
 					#leave (save) store
 					GemRB.LeaveStore()
 

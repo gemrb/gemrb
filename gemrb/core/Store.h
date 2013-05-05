@@ -58,6 +58,7 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 #define IE_STORE_QUALITY  0x600  //2 bits
 #define IE_STORE_FENCE    0x1000 //
 #define IE_STORE_RECHARGE 0x4000 //gemrb extension, if set, store won't recharge
+#define IE_STORE_CAPACITY 0x8000 //used for error reporting purposes
 
 
 /**

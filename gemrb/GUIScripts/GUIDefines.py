@@ -285,6 +285,7 @@ SHOP_SELL   = 2
 SHOP_ID     = 4
 SHOP_STEAL  = 8
 SHOP_SELECT = 0x40
+SHOP_FULL   = 0x8000
 
 #game constants
 PARTY_SIZE = 6
