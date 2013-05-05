@@ -954,16 +954,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	speaker = NULL;
 	target = (Actor *) tar;
-	if ((Flags & BD_CHECKDIST) && !CanSee(scr, target, false, seeflag) ) {
-		Log(ERROR, "GameScript", "CanSee returned false! Speaker (%s, type %d) and target are:",
-			scr->GetScriptName(), scr->Type);
-		if (scr->Type == ST_ACTOR) {
-			((Actor *) scr)->dump();
-		}
-		((Actor *) tar)->dump();
-		Sender->ReleaseCurrentAction();
-		return;
-	}
 	bool swap = false;
 	if (scr->Type==ST_ACTOR) {
 		speaker = (Actor *) scr;
