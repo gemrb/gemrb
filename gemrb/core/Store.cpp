@@ -268,6 +268,7 @@ void Store::IdentifyItem(CREItem *item) const
 	if (itm->LoreToID <= Lore) {
 		item->Flags |= IE_INV_ITEM_IDENTIFIED;
 	}
+	gamedata->FreeItem(itm, item->ItemResRef, 0);
 }
 
 void Store::AddItem(CREItem *item)
