@@ -88,6 +88,11 @@ int Store::GetRealStockSize()
 	return count;
 }
 
+bool Store::IsBag() const
+{
+	return (Type==STT_BG2CONT || Type==STT_IWD2CONT);
+}
+
 int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 {
 	int ret;
@@ -234,8 +239,7 @@ void Store::RechargeItem(CREItem *item)
 	//bag      0   1   0   1
 	//flag     0   0   1   1
 	//recharge 1   0   0   1
-	bool bag = (Type==STT_BG2CONT || Type==STT_IWD2CONT);
-	if (bag != !(Flags&IE_STORE_RECHARGE)) {
+	if (IsBag() != !(Flags&IE_STORE_RECHARGE)) {
 		for (int i=0;i<CHARGE_COUNTERS;i++) {
 			ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
@@ -252,7 +256,7 @@ void Store::RechargeItem(CREItem *item)
 
 void Store::IdentifyItem(CREItem *item) const
 {
-	if (item->Flags & IE_INV_ITEM_IDENTIFIED) {
+	if ((item->Flags & IE_INV_ITEM_IDENTIFIED) || IsBag()) {
 		return;
 	}
 

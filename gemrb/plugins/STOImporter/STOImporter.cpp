@@ -178,7 +178,7 @@ void STOImporter::GetItem(STOItem *it, Store *s)
 	if (item) {
 		it->MaxStackAmount = item->MaxStackAmount;
 		//another hack-fix
-		if (item->LoreToID <= s->Lore) {
+		if (item->LoreToID <= s->Lore && !s->IsBag()) {
 			it->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
 		gamedata->FreeItem( item, it->ItemResRef, false );
