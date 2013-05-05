@@ -32,7 +32,7 @@ private:
 	SDL_Renderer* renderer;
 
 	// touch input vars
-	bool ignoreNextFingerUp;
+	int ignoreNextFingerUp;
 	SDL_TouchFingerEvent firstFingerDown;
 	unsigned long firstFingerDownTime;
 public:
