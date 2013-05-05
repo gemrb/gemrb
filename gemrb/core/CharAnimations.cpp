@@ -1154,12 +1154,12 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				Anims[StanceID][Orient] = anims;
 			}
 			break;
-		case IE_ANI_TWO_FILES_4:
+		case IE_ANI_TWO_FILES_4: {
 			for (int i = 0; i < MAX_ANIMS; ++i) {
 				for (int j = 0; j < MAX_ORIENT; ++j) {
 					Anims[i][j] = anims;
 				}
-			}
+			}}
 			break; 
 
 		case IE_ANI_PST_ANIMATION_3: //no stc just std
