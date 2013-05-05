@@ -22,11 +22,14 @@ import android.app.AlertDialog;
 import android.widget.EditText;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.content.Environment;
+import android.app.Notification;
+import android.app.NotificationManager;
+import java.util.ArrayList;
 
 public class GemRB extends SDLActivity {
 
-  public String newPath;
+  private int numNotifs = 0;
+  private ArrayList<String> notifStrings = new ArrayList<String>();
 
   protected void onCreate(Bundle savedInstanceState) {
     File gemrbHomeFolder = getApplicationContext().getExternalFilesDir(null); // null for general purpose files
@@ -49,9 +52,8 @@ public class GemRB extends SDLActivity {
     Log.d("GemRB Activity", "Checking GemRB.cfg content.");
 
     File finalConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
-    File userSuppliedConfig = new File(Environment.getExternalStoragePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
 
-    if(!finalConfFile.exists() && !userSuppliedConfig.exists()) {
+    if(!finalConfFile.exists()) {
       Log.d("GemRB Activity", "GemRB.cfg doesn't exist in the expected location, creating it from the packaged template.");
 
       // String[] keysToChange = { "GUIScriptsPath", "GemRBOverridePath", "GemRBUnhardcodedPath" };
@@ -76,20 +78,6 @@ public class GemRB extends SDLActivity {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    } else if (!finalConfFile.exists() && userSuppliedConfig.exists()) {
-        BufferedReader inConf = new BufferedReader(new FileReader(userSuppliedConfig));
-        File outConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
-        BufferedWriter outConf = new BufferedWriter(new FileWriter(outConfFile));
-
-        String line;
-
-        while((line = inConf.readLine()) != null) {
-          outConf.write(line.concat("\n"));
-          outConf.flush();
-        }
-        inConf.close();
-        outConf.flush();
-        outConf.close();
     }
 
     super.onCreate(savedInstanceState);
@@ -151,5 +139,27 @@ public class GemRB extends SDLActivity {
     // we're only overriding for orientation change (cmp AndroidManifest.xml)
     // but we don't actually want to react to that
     super.onConfigurationChanged(newConfig);
+  }
+
+  public void buildFatalErrorDialog(String message) {
+    Notification.Builder mBuilder = new Notification.Builder(this)
+      .setSmallIcon(R.drawable.ic_launcher)
+      .setContentTitle("Fatal Error")
+      .setContentText(message);
+
+    notifStrings.add(message);
+
+    Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
+    inboxStyle.setBigContentTitle("GemRB Fatal Error Details: ");
+
+    for(int i = 0; i < notifStrings.size(); ++i) {
+      inboxStyle.addLine(notifStrings.get(i));
+    }
+
+    mBuilder.setStyle(inboxStyle);
+
+    int mId = 1;
+    NotificationManager nManager = (NotificationManager) getSystemService(getContext().NOTIFICATION_SERVICE);
+    nManager.notify(mId, mBuilder.build());
   }
 }
