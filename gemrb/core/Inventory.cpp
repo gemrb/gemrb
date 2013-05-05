@@ -30,6 +30,7 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "GameScript/GSUtils.h"
 #include "Interface.h"
 #include "Item.h"
 #include "Map.h"
@@ -1429,13 +1430,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	CREItem *TmpItem = new CREItem();
-	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->Expired=0;
-	TmpItem->Usages[0]=(ieWord) Charge0;
-	TmpItem->Usages[1]=(ieWord) Charge1;
-	TmpItem->Usages[2]=(ieWord) Charge2;
-	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem)) {
+	if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
 		int ret = AddSlotItem( TmpItem, SlotID );
 		if (ret != ASI_SUCCESS) {
 			// put the remainder on the ground
@@ -1448,23 +1443,17 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 				delete TmpItem;
 			}
 		}
+		CalculateWeight();
 	} else {
 		delete TmpItem;
 	}
-	CalculateWeight();
 }
 
 void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	if(ItemResRef[0]) {
 		CREItem *TmpItem = new CREItem();
-		strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-		TmpItem->Expired=0;
-		TmpItem->Usages[0]=(ieWord) Charge0;
-		TmpItem->Usages[1]=(ieWord) Charge1;
-		TmpItem->Usages[2]=(ieWord) Charge2;
-		TmpItem->Flags=0;
-		if (core->ResolveRandomItem(TmpItem)) {
+		if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
 			SetSlotItem( TmpItem, SlotID );
 		} else {
 			delete TmpItem;
