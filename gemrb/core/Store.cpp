@@ -218,22 +218,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 			}
 			// Check if we have a non-stackable item with a different number of charges.
 			if (!item->MaxStackAmount && memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
-				Item *itm = gamedata->GetItem(item->ItemResRef);
-				if (!itm) {
-					continue;
-				}
-				bool chargesValid = false;
-				for (int j = 0; j < itm->ExtHeaderCount; ++j) {
-					ITMExtHeader *h = itm->GetExtHeader(j);
-					if (h->Charges > 0) {
-						chargesValid = true;
-						break;
-					}
-				}
-				gamedata->FreeItem(itm, item->ItemResRef, 0);
-				if (chargesValid) {
-					continue;
-				}
+				continue;
 			}
 		}
 		return temp;

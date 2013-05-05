@@ -166,6 +166,10 @@ void STOImporter::GetItem(STOItem *it, Store *s)
 {
 	core->ReadItem(str, (CREItem *) it);
 
+	//fix item properties if necessary
+	s->IdentifyItem((CREItem *) it);
+	s->RechargeItem((CREItem *) it);
+
 	str->ReadDword( &it->AmountInStock );
 	//if there was no item on stock, how this could be 0
 	//we hack-fix this here so it won't cause trouble
@@ -174,20 +178,7 @@ void STOImporter::GetItem(STOItem *it, Store *s)
 	}
 	// make sure the inventory knows that it needs to update flags+weight
 	it->Weight = -1;
-	if (!(it->Flags & IE_INV_ITEM_IDENTIFIED) && !s->IsBag()) {
-		Item *item = gamedata->GetItem( it->ItemResRef );
-		if (item) {
-			//another hack-fix
-			if (item->LoreToID <= s->Lore) {
-				it->Flags |= IE_INV_ITEM_IDENTIFIED;
-			}
-			gamedata->FreeItem( item, it->ItemResRef, false );
-		}
-	}
-	//make sure it has at least one charge for proper pricing purposes
-	if (!it->Usages[0]) {
-		it->Usages[0] = 1;
-	}
+
 	str->ReadDword( (ieDword *) &it->InfiniteSupply );
 	ieDwordSigned tmp;
 

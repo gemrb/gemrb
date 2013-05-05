@@ -163,6 +163,8 @@ public: //queries
 	int GetRealStockSize();
 	/** Recharges item */
 	void RechargeItem(CREItem *item);
+	/** Identifies item according to store lore */
+	void IdentifyItem(CREItem *item) const;
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);
@@ -174,8 +176,6 @@ public: //queries
 	void SetOwnerID(ieDword owner);
 	bool IsBag() const;
 private:
-	/** Identifies item according to store lore */
-	void IdentifyItem(CREItem *item) const;
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot) const;
