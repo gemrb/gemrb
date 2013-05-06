@@ -1822,6 +1822,20 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 	return count;
 }
 
+bool Map::SpawnsAlive() const
+{
+	size_t i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (!actor->ValidTarget(GA_NO_DEAD) )
+			continue;
+		if (actor->Spawned) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 {
 	//Ok, we use a non constant pointer here, so it is easy to disable
@@ -3040,6 +3054,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 			if (level >= cpl || sg || first) {
 				AddActor(creature, true);
 				creature->SetPosition(pos, true, radiusx, radiusy);
+				creature->Spawned = true;
 				creature->RefreshEffects(NULL);
 				if (difficulty && !sg) *difficulty -= cpl;
 				if (creCount) (*creCount)++;
@@ -3105,6 +3120,10 @@ void Map::TriggerSpawn(Spawn *spawn)
 
 void Map::UpdateSpawns()
 {
+	//don't reactivate if there are spawns left in the area
+	if (SpawnsAlive()) {
+		return;
+	}
 	ieDword time = core->GetGame()->GameTime;
 	for (std::vector<Spawn *>::iterator it = spawns.begin() ; it != spawns.end(); ++it) {
 		Spawn *spawn = *it;

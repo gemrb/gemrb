@@ -943,7 +943,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule, RemovalTime;
-			ieWord XPos, YPos, XDes, YDes;
+			ieWord XPos, YPos, XDes, YDes, Spawned;
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order
 			ieDword Flags;
@@ -954,7 +954,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &XDes );
 			str->ReadWord( &YDes );
 			str->ReadDword( &Flags );
-			str->Seek( 8, GEM_CURRENT_POS );
+			str->ReadWord( &Spawned );
+			str->Seek( 6, GEM_CURRENT_POS );
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
 			str->Seek( 4, GEM_CURRENT_POS );
@@ -1004,6 +1005,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->Destination.y = YPos;
 			ab->HomeLocation.x = XDes;
 			ab->HomeLocation.y = YDes;
+			ab->Spawned = Spawned;
 			//copying the scripting name into the actor
 			//if the CreatureAreaFlag was set to 8
 			if ((Flags&AF_NAME_OVERRIDE) || (core->HasFeature(GF_IWD2_SCRIPTNAME)) ) {
@@ -1918,7 +1920,10 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord);
 
 		stream->WriteDword( &tmpDword); //used fields flag always 0 for saved areas
-		stream->WriteDword( &tmpDword); //unknown2c
+		tmpWord = ac->Spawned;
+		stream->WriteWord( &tmpWord);
+		tmpWord = 0;
+		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &tmpDword); //actor animation, unused
 		tmpWord = ac->GetOrientation();
 		stream->WriteWord( &tmpWord);

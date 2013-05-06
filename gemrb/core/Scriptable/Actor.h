@@ -332,6 +332,7 @@ public:
 	int LastDamage;
 	Point FollowOffset;//follow lastfollowed at this offset
 	Point HomeLocation;//spawnpoint, return here after rest
+	bool Spawned;      //has been created by a spawn point
 
 	ieDword TargetDoor;
 
