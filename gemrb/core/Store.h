@@ -65,7 +65,7 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
  * @struct STOItem
  * Item in a store, together with available amount etc.
  */
-struct STOItem {
+struct GEM_EXPORT STOItem {
 	ieResRef ItemResRef;
 	ieWord PurchasedAmount;
 	ieWord Usages[CHARGE_COUNTERS];
@@ -79,6 +79,8 @@ struct STOItem {
 	Trigger *trigger;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
+	
+	~STOItem();
 };
 
 

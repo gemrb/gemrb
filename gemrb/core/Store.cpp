@@ -33,6 +33,11 @@
 
 namespace GemRB {
 
+STOItem::~STOItem(void)
+{
+	if (trigger) trigger->Release();
+}
+
 Store::Store(void)
 {
 	HasTriggers = false;
@@ -48,8 +53,6 @@ Store::~Store(void)
 	unsigned int i;
 
 	for (i = 0; i < items.size(); i++) {
-		if (items[i]->trigger)
-			items[i]->trigger->Release();
 		delete( items[i] );
 	}
 	if(drinks)

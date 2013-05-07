@@ -6337,6 +6337,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 		} else {
 			store->RemoveItem( Slot );
+			delete si;
 		}
 		//keep encumbrance labels up to date
 		actor->CalculateSpeed(false);
