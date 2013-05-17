@@ -112,6 +112,10 @@ namespace GemRB {
 
 enum PaletteType {
 	PAL_MAIN,
+	PAL_MAIN_2,
+	PAL_MAIN_3,
+	PAL_MAIN_4,
+	PAL_MAIN_5,
 	PAL_WEAPON,
 	PAL_OFFHAND,
 	PAL_HELMET,
@@ -164,7 +168,7 @@ public:
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
-	ieResRef PaletteResRef;
+	ieResRef PaletteResRef[5];
 	unsigned char nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;
