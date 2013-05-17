@@ -288,7 +288,7 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 
 //                                          0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
 static const char StancePrefix[] =        {'3','2','5','5','4','4','2','2','5','4','1','3','3','3','4','1','4','4','4'};
-static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','1','1','1','1','1','1','1','1'};
+static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','0','0','0','1','1','1','1','1'};
 static const unsigned int CycleOffset[] = { 0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9, 18,  0,  0,  0,  0,  0 };
 
 #define NINE_FRAMES_PALETTE(stance)	((PaletteType) (StancePrefix[stance] - '1'))
