@@ -287,10 +287,10 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	}
 }
 
-//                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-static const char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
-static const char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
-static const unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
+//                                          0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+static const char StancePrefix[] =        {'3','2','5','5','4','4','2','2','5','4','1','3','3','3','4','1','4','4','4'};
+static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','1','1','1','1','1','1','1','1'};
+static const unsigned int CycleOffset[] = { 0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9, 18,  0,  0,  0,  0,  0 };
 
 void CharAnimations::SetColors(const ieDword *arg)
 {
@@ -327,7 +327,7 @@ void CharAnimations::CheckColorMod()
 
 void CharAnimations::SetupColors(PaletteType type)
 {
-	Palette* pal = palette[(int)type];
+	Palette* pal = palette[type];
 
 	if (!pal) {
 		return;
@@ -392,35 +392,35 @@ void CharAnimations::SetupColors(PaletteType type)
 			needmod = true;
 		}
 		if (!needmod && PaletteResRef[0]) {
-			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
+			gamedata->FreePalette(palette[type], PaletteResRef);
 		}
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-				snprintf(PaletteResRef,9,"%.4s_%-.2s%s",ResRef, (char *) &PType, StancePrefix[StanceID]);
+				snprintf(PaletteResRef,9,"%.4s_%-.2s%c",ResRef, (char *) &PType, StancePrefix[StanceID]);
 			} else {
 				snprintf(PaletteResRef,9,"%.4s_%-.2s",ResRef, (char *) &PType);
 			}
 			strlwr(PaletteResRef);
 			Palette *tmppal = gamedata->GetPalette(PaletteResRef);
 			if (tmppal) {
-				palette[PAL_MAIN] = tmppal;
+				palette[type] = tmppal;
 			} else {
 				PaletteResRef[0]=0;
 			}
 		}
 		if (needmod) {
-			if (!modifiedPalette[PAL_MAIN])
-				modifiedPalette[PAL_MAIN] = new Palette();
-			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
+			if (!modifiedPalette[type])
+				modifiedPalette[type] = new Palette();
+			modifiedPalette[type]->SetupGlobalRGBModification(palette[type], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(modifiedPalette[PAL_MAIN], 0);
+			gamedata->FreePalette(modifiedPalette[type], 0);
 		}
 		return;
 	}
 
-	pal->SetupPaperdollColours(Colors, (int)type);
+	pal->SetupPaperdollColours(Colors, type);
 	if (lockPalette) {
 		return;
 	}
@@ -431,23 +431,23 @@ void CharAnimations::SetupColors(PaletteType type)
 		needmod = true;
 	} else {
 		for (i = 0; i < 7; ++i) {
-			if (ColorMods[i+8*((int)type)].type != RGBModifier::NONE)
+			if (ColorMods[i+8*type].type != RGBModifier::NONE)
 				needmod = true;
 		}
 	}
 
 
 	if (needmod) {
-		if (!modifiedPalette[(int)type])
-			modifiedPalette[(int)type] = new Palette();
+		if (!modifiedPalette[type])
+			modifiedPalette[type] = new Palette();
 
 		if (GlobalColorMod.type != RGBModifier::NONE) {
-			modifiedPalette[(int)type]->SetupGlobalRGBModification(palette[(int)type], GlobalColorMod);
+			modifiedPalette[type]->SetupGlobalRGBModification(palette[type], GlobalColorMod);
 		} else {
-			modifiedPalette[(int)type]->SetupRGBModification(palette[(int)type],ColorMods, (int)type);
+			modifiedPalette[type]->SetupRGBModification(palette[type],ColorMods, type);
 		}
 	} else {
-		gamedata->FreePalette(modifiedPalette[(int)type], 0);
+		gamedata->FreePalette(modifiedPalette[type], 0);
 	}
 
 }
@@ -463,10 +463,10 @@ Palette* CharAnimations::GetPartPalette(int part)
 	else if (part == actorPartCount+1) type = PAL_OFFHAND;
 	else if (part == actorPartCount+2) type = PAL_HELMET;
 
-	if (modifiedPalette[(int)type])
-		return modifiedPalette[(int)type];
+	if (modifiedPalette[type])
+		return modifiedPalette[type];
 
-	return palette[(int)type];
+	return palette[type];
 }
 
 static int compare_avatars(const void *a, const void *b)
@@ -623,6 +623,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	int i,j;
 	for (i = 0; i < 4; ++i) {
 		change[i] = true;
+	}
+	for (i = 0; i < PAL_MAX; ++i) {
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
@@ -709,9 +711,9 @@ CharAnimations::~CharAnimations(void)
 	DropAnims();
 	gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
 	int i;
-	for (i = 1; i < 4; ++i)
+	for (i = 1; i < PAL_MAX; ++i)
 		gamedata->FreePalette(palette[i], 0);
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
 }
 /*
@@ -857,7 +859,7 @@ WSW 003      |      013 ESE
 
 Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Orient)
 {
-	if (StanceID>=MAX_ANIMS) {
+	if (Stance >= MAX_ANIMS) {
 		error("CharAnimation", "Illegal stance ID\n");
 	}
 
@@ -1629,7 +1631,7 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part+1,
+	snprintf(prefix, 9, "%s%c%d%c%d", ResRef, StancePrefix[StanceID], Part+1,
 			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);

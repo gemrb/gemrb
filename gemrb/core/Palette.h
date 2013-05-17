@@ -28,13 +28,6 @@
 
 namespace GemRB {
 
-enum PaletteType {
-	PAL_MAIN,
-	PAL_WEAPON,
-	PAL_OFFHAND,
-	PAL_HELMET
-};
-
 struct RGBModifier {
 	Color rgb;
 	int speed;
