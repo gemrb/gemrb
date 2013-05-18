@@ -30,6 +30,7 @@ public class GemRB extends SDLActivity {
 
   private int numNotifs = 0;
   private ArrayList<String> notifStrings = new ArrayList<String>();
+  public boolean showErrors = false;
 
   protected void onCreate(Bundle savedInstanceState) {
     File gemrbHomeFolder = getApplicationContext().getExternalFilesDir(null); // null for general purpose files
@@ -81,6 +82,26 @@ public class GemRB extends SDLActivity {
     }
 
     super.onCreate(savedInstanceState);
+  }
+
+  public void showNotification() {
+    Log.d("GemRB Activity", "In showNotification()");
+    Notification.Builder mBuilder = new Notification.Builder(this)
+      .setSmallIcon(R.drawable.ic_launcher)
+      .setContentTitle("Fatal Error");
+
+    Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
+    inboxStyle.setBigContentTitle("GemRB Fatal Error Details: ");
+
+    for(int i = 0; i < notifStrings.size(); ++i) {
+      inboxStyle.addLine(notifStrings.get(i));
+    }
+
+    mBuilder.setStyle(inboxStyle);
+
+    int mId = 1;
+    NotificationManager nManager = (NotificationManager) getSystemService(getContext().NOTIFICATION_SERVICE);
+    nManager.notify(mId, mBuilder.build());
   }
 
   private static void deleteRecursive(File fileOrDirectory) {
@@ -141,25 +162,7 @@ public class GemRB extends SDLActivity {
     super.onConfigurationChanged(newConfig);
   }
 
-  public void buildFatalErrorDialog(String message) {
-    Notification.Builder mBuilder = new Notification.Builder(this)
-      .setSmallIcon(R.drawable.ic_launcher)
-      .setContentTitle("Fatal Error")
-      .setContentText(message);
-
+  public void addMessages(String message) {
     notifStrings.add(message);
-
-    Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
-    inboxStyle.setBigContentTitle("GemRB Fatal Error Details: ");
-
-    for(int i = 0; i < notifStrings.size(); ++i) {
-      inboxStyle.addLine(notifStrings.get(i));
-    }
-
-    mBuilder.setStyle(inboxStyle);
-
-    int mId = 1;
-    NotificationManager nManager = (NotificationManager) getSystemService(getContext().NOTIFICATION_SERVICE);
-    nManager.notify(mId, mBuilder.build());
   }
 }
