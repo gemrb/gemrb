@@ -35,6 +35,16 @@ using namespace GemRB;
 
 #ifdef ANDROID
 #include <SDL.h>
+#include <jni.h>
+
+void showNotification() {
+  JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+  jobject activityInstance = (jobject) SDL_AndroidGetActivity();
+  jclass activityClass = (jclass) env->GetObjectClass(activityInstance);
+  jmethodID method = (jmethodID) env->GetMethodID(activityClass, "showNotification", "()V");
+  env->CallVoidMethod(activityInstance, method);
+}
+
 // if/when android moves to SDL 1.3 remove these special functions.
 // SDL 1.3 fires window events for these conditions that are handled in SDLVideo.cpp.
 // see SDL_WINDOWEVENT_MINIMIZED and SDL_WINDOWEVENT_RESTORED
@@ -89,6 +99,14 @@ int main(int argc, char* argv[])
 		Log(MESSAGE, "Main", "Press enter to continue...");
 		getc(stdin);
 		ShutdownLogging();
+#ifdef ANDROID
+                // this is a bit hackish, but a proper solution would involve re-evaluating the
+                // usage of log levels throughout GemRB
+                // basically, the android logger throws FATAL and ERROR into the activity,
+                // so we have to tell the activity to not show ERRORs when GemRB ran
+                // (presumably) successfully, i.e. core->Init() didn't return GEM_ERROR
+                showNotification();
+#endif
 		return -1;
 	}
 	delete config;
