@@ -814,7 +814,7 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 	last = NPCs.size()-1;
 	for (i = 0; i < NPCs.size(); i++) {
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
-			if (i < last && CheckForReplacementActor(i)) {
+			if (i <= last && CheckForReplacementActor(i)) {
 				i--;
 				last--;
 				continue;
@@ -840,7 +840,6 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	int index = FindMap(ResRef);
 	if (index>=0) {
-		PlacePersistents(GetMap(index), ResRef);
 		return index;
 	}
 
@@ -929,7 +928,7 @@ bool Game::CheckForReplacementActor(int i)
 				} else {
 					newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
 					CopyResRef(newact->Area, act->Area);
-					DelNPC(InStore(act));
+					DelNPC(InStore(act), true);
 					return true;
 				}
 			}

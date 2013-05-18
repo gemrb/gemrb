@@ -76,7 +76,6 @@ struct EquipResRefData {
 	unsigned char Cycle;
 };
 
-
 void CharAnimations::ReleaseMemory()
 {
 	if (AvatarTable) {
@@ -287,15 +286,21 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	}
 }
 
-//                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-static const char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
-static const char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
-static const unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
+//                                          0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+static const char StancePrefix[] =        {'3','2','5','5','4','4','2','2','5','4','1','3','3','3','4','1','4','4','4'};
+static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','0','0','0','1','1','1','1','1'};
+static const unsigned int CycleOffset[] = { 0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9, 18,  0,  0,  0,  0,  0 };
+
+#define NINE_FRAMES_PALETTE(stance)	((PaletteType) (StancePrefix[stance] - '1'))
 
 void CharAnimations::SetColors(const ieDword *arg)
 {
 	Colors = arg;
 	SetupColors(PAL_MAIN);
+	SetupColors(PAL_MAIN_2);
+	SetupColors(PAL_MAIN_3);
+	SetupColors(PAL_MAIN_4);
+	SetupColors(PAL_MAIN_5);
 	SetupColors(PAL_WEAPON);
 	SetupColors(PAL_OFFHAND);
 	SetupColors(PAL_HELMET);
@@ -327,7 +332,7 @@ void CharAnimations::CheckColorMod()
 
 void CharAnimations::SetupColors(PaletteType type)
 {
-	Palette* pal = palette[(int)type];
+	Palette* pal = palette[type];
 
 	if (!pal) {
 		return;
@@ -386,41 +391,37 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	int PType = NoPalette();
-	if ( PType && (type == PAL_MAIN) ) {
-		bool needmod = false;
-		if (GlobalColorMod.type != RGBModifier::NONE) {
-			needmod = true;
-		}
-		if (!needmod && PaletteResRef[0]) {
-			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
-		}
-		PaletteResRef[0]=0;
+	if ( PType && (type <= PAL_MAIN_5) ) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
+			ieResRef oldResRef;
+			CopyResRef(oldResRef, PaletteResRef[type]);
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-				snprintf(PaletteResRef,9,"%.4s_%-.2s%s",ResRef, (char *) &PType, StancePrefix[StanceID]);
+				snprintf(PaletteResRef[type],9,"%.4s_%-.2s%c",ResRef, (char *) &PType, '1'+type);
 			} else {
-				snprintf(PaletteResRef,9,"%.4s_%-.2s",ResRef, (char *) &PType);
+				snprintf(PaletteResRef[type],9,"%.4s_%-.2s",ResRef, (char *) &PType);
 			}
-			strlwr(PaletteResRef);
-			Palette *tmppal = gamedata->GetPalette(PaletteResRef);
+			strlwr(PaletteResRef[type]);
+			Palette *tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
-				palette[PAL_MAIN] = tmppal;
+				gamedata->FreePalette(palette[type], oldResRef);
+				palette[type] = tmppal;
 			} else {
-				PaletteResRef[0]=0;
+				PaletteResRef[type][0]=0;
 			}
 		}
+		bool needmod = GlobalColorMod.type != RGBModifier::NONE;
 		if (needmod) {
-			if (!modifiedPalette[PAL_MAIN])
-				modifiedPalette[PAL_MAIN] = new Palette();
-			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
+			if (!modifiedPalette[type])
+				modifiedPalette[type] = new Palette();
+			modifiedPalette[type]->SetupGlobalRGBModification(palette[type], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(modifiedPalette[PAL_MAIN], 0);
+			gamedata->FreePalette(modifiedPalette[type], 0);
 		}
 		return;
 	}
 
-	pal->SetupPaperdollColours(Colors, (int)type);
+	pal->SetupPaperdollColours(Colors, type);
 	if (lockPalette) {
 		return;
 	}
@@ -431,23 +432,23 @@ void CharAnimations::SetupColors(PaletteType type)
 		needmod = true;
 	} else {
 		for (i = 0; i < 7; ++i) {
-			if (ColorMods[i+8*((int)type)].type != RGBModifier::NONE)
+			if (ColorMods[i+8*type].type != RGBModifier::NONE)
 				needmod = true;
 		}
 	}
 
 
 	if (needmod) {
-		if (!modifiedPalette[(int)type])
-			modifiedPalette[(int)type] = new Palette();
+		if (!modifiedPalette[type])
+			modifiedPalette[type] = new Palette();
 
 		if (GlobalColorMod.type != RGBModifier::NONE) {
-			modifiedPalette[(int)type]->SetupGlobalRGBModification(palette[(int)type], GlobalColorMod);
+			modifiedPalette[type]->SetupGlobalRGBModification(palette[type], GlobalColorMod);
 		} else {
-			modifiedPalette[(int)type]->SetupRGBModification(palette[(int)type],ColorMods, (int)type);
+			modifiedPalette[type]->SetupRGBModification(palette[type],ColorMods, type);
 		}
 	} else {
-		gamedata->FreePalette(modifiedPalette[(int)type], 0);
+		gamedata->FreePalette(modifiedPalette[type], 0);
 	}
 
 }
@@ -456,17 +457,20 @@ Palette* CharAnimations::GetPartPalette(int part)
 {
 	int actorPartCount = GetActorPartCount();
 	PaletteType type = PAL_MAIN;
-
+	if (GetAnimType() == IE_ANI_NINE_FRAMES) {
+		//these animations use several palettes
+		type = NINE_FRAMES_PALETTE(StanceID);
+	}
 	// always use unmodified BAM palette for the supporting part
-	if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return NULL;
+	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return NULL;
 	else if (part == actorPartCount) type = PAL_WEAPON;
 	else if (part == actorPartCount+1) type = PAL_OFFHAND;
 	else if (part == actorPartCount+2) type = PAL_HELMET;
 
-	if (modifiedPalette[(int)type])
-		return modifiedPalette[(int)type];
+	if (modifiedPalette[type])
+		return modifiedPalette[type];
 
-	return palette[(int)type];
+	return palette[type];
 }
 
 static int compare_avatars(const void *a, const void *b)
@@ -623,6 +627,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	int i,j;
 	for (i = 0; i < 4; ++i) {
 		change[i] = true;
+	}
+	for (i = 0; i < PAL_MAX; ++i) {
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
@@ -642,7 +648,9 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	ArmorType = 0;
 	RangedType = 0;
 	WeaponType = 0;
-	PaletteResRef[0] = 0;
+	for (i = 0; i < 5; ++i) {
+		PaletteResRef[i][0] = 0;
+	}
 	WeaponRef[0] = 0;
 	HelmetRef[0] = 0;
 	OffhandRef[0] = 0;
@@ -707,11 +715,12 @@ void CharAnimations::DropAnims()
 CharAnimations::~CharAnimations(void)
 {
 	DropAnims();
-	gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
 	int i;
-	for (i = 1; i < 4; ++i)
+	for (i = 0; i <= PAL_MAIN_5; ++i)
+		gamedata->FreePalette(palette[i], PaletteResRef[i]);
+	for (; i < PAL_MAX; ++i)
 		gamedata->FreePalette(palette[i], 0);
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
 }
 /*
@@ -857,7 +866,7 @@ WSW 003      |      013 ESE
 
 Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Orient)
 {
-	if (StanceID>=MAX_ANIMS) {
+	if (Stance >= MAX_ANIMS) {
 		error("CharAnimation", "Illegal stance ID\n");
 	}
 
@@ -1040,16 +1049,22 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		}
 
 		if (part < actorPartCount) {
+			PaletteType ptype = PAL_MAIN;
+			if (AnimType == IE_ANI_NINE_FRAMES) {
+				//these animations use several palettes
+				ptype = NINE_FRAMES_PALETTE(StanceID);
+			}
+			
 			//if you need to revert this change, consider true paletted
 			//animations which need a GlobalColorMod (mgir for example)
 
 			//if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
-			if(!palette[PAL_MAIN]) {
+			if(!palette[ptype]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				palette[PAL_MAIN] = a->GetFrame(0)->GetPalette()->Copy();
+				palette[ptype] = a->GetFrame(0)->GetPalette()->Copy();
 				// ...and setup the colours properly
-				SetupColors(PAL_MAIN);
+				SetupColors(ptype);
 			}
 		} else if (part == actorPartCount) {
 			if (!palette[PAL_WEAPON]) {
@@ -1629,7 +1644,7 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part+1,
+	snprintf(prefix, 9, "%s%c%d%c%d", ResRef, StancePrefix[StanceID], Part+1,
 			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);
@@ -2589,6 +2604,10 @@ void CharAnimations::PulseRGBModifiers()
 	if (change[0]) {
 		change[0]=0;
 		SetupColors(PAL_MAIN);
+		SetupColors(PAL_MAIN_2);
+		SetupColors(PAL_MAIN_3);
+		SetupColors(PAL_MAIN_4);
+		SetupColors(PAL_MAIN_5);
 	}
 	if (change[1]) {
 		change[1]=0;

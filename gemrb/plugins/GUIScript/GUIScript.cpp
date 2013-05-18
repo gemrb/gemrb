@@ -1927,29 +1927,6 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_Window_UpdateVarAssoc__doc,
-"UpdateVarAssoc(WindowIndex)\n\n"
-"Redraw controls in the given Window associated with a variable." );
-
-static PyObject* GemRB_Window_UpdateVarAssoc(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex;
-	ieDword Value;
-	char* VarName;
-
-	if (!PyArg_ParseTuple( args, "is", &WindowIndex, &VarName )) {
-		return AttributeError( GemRB_Window_UpdateVarAssoc__doc );
-	}
-
-	Value = 0;
-	core->GetDictionary()->Lookup( VarName, Value );
-	Window* win = core->GetWindow( WindowIndex );
-	win->RedrawControls(VarName, Value);
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_Window_Unload__doc,
 "UnloadWindow(WindowIndex)\n\n"
 "Unloads a previously Loaded Window." );
@@ -6233,7 +6210,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 
 	//don't allow overstuffing bags
 	if (store->Capacity && store->Capacity<=store->GetRealStockSize()) {
-		ret &= ~IE_STORE_SELL;
+		ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_SELL;
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
@@ -6360,6 +6337,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 		} else {
 			store->RemoveItem( Slot );
+			delete si;
 		}
 		//keep encumbrance labels up to date
 		actor->CalculateSpeed(false);
@@ -10895,7 +10873,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
 	METHOD(Window_Unload, METH_VARARGS),
-	METHOD(Window_UpdateVarAssoc, METH_VARARGS),
 	METHOD(WorldMap_AdjustScrolling, METH_VARARGS),
 	METHOD(WorldMap_GetDestinationArea, METH_VARARGS),
 	METHOD(WorldMap_SetTextColor, METH_VARARGS),

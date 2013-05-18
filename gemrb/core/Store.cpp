@@ -33,6 +33,11 @@
 
 namespace GemRB {
 
+STOItem::~STOItem(void)
+{
+	if (trigger) trigger->Release();
+}
+
 Store::Store(void)
 {
 	HasTriggers = false;
@@ -48,8 +53,6 @@ Store::~Store(void)
 	unsigned int i;
 
 	for (i = 0; i < items.size(); i++) {
-		if (items[i]->trigger)
-			items[i]->trigger->Release();
 		delete( items[i] );
 	}
 	if(drinks)
@@ -218,22 +221,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 			}
 			// Check if we have a non-stackable item with a different number of charges.
 			if (!item->MaxStackAmount && memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
-				Item *itm = gamedata->GetItem(item->ItemResRef);
-				if (!itm) {
-					continue;
-				}
-				bool chargesValid = false;
-				for (int j = 0; j < itm->ExtHeaderCount; ++j) {
-					ITMExtHeader *h = itm->GetExtHeader(j);
-					if (h->Charges > 0) {
-						chargesValid = true;
-						break;
-					}
-				}
-				gamedata->FreeItem(itm, item->ItemResRef, 0);
-				if (chargesValid) {
-					continue;
-				}
+				continue;
 			}
 		}
 		return temp;
@@ -283,6 +271,7 @@ void Store::IdentifyItem(CREItem *item) const
 	if (itm->LoreToID <= Lore) {
 		item->Flags |= IE_INV_ITEM_IDENTIFIED;
 	}
+	gamedata->FreeItem(itm, item->ItemResRef, 0);
 }
 
 void Store::AddItem(CREItem *item)

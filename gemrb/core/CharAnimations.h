@@ -110,6 +110,18 @@ namespace GemRB {
 //special flags
 #define AV_NO_BODY_HEAT                 1
 
+enum PaletteType {
+	PAL_MAIN,
+	PAL_MAIN_2,
+	PAL_MAIN_3,
+	PAL_MAIN_4,
+	PAL_MAIN_5,
+	PAL_WEAPON,
+	PAL_OFFHAND,
+	PAL_HELMET,
+	PAL_MAX
+};
+
 struct AvatarStruct {
 	/* entries from avatars.2da */
 	unsigned int AnimID;
@@ -151,12 +163,12 @@ public:
 	RGBModifier GlobalColorMod; // global color modification effect
 
 	bool change[4];
-	Palette* palette[4];
-	Palette* modifiedPalette[4];
+	Palette* palette[PAL_MAX];
+	Palette* modifiedPalette[PAL_MAX];
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
-	ieResRef PaletteResRef;
+	ieResRef PaletteResRef[5];
 	unsigned char nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;

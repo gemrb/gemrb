@@ -62,7 +62,6 @@ class GWindow:
     'SetVisible': _GemRB.Window_SetVisible,
     'ShowModal': _GemRB.Window_ShowModal,
     'Invalidate': _GemRB.Window_Invalidate,
-    'UpdateVarAssoc': _GemRB.Window_UpdateVarAssoc
   }
   def __nonzero__(self):
     return self.ID != -1

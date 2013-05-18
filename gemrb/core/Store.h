@@ -58,13 +58,14 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 #define IE_STORE_QUALITY  0x600  //2 bits
 #define IE_STORE_FENCE    0x1000 //
 #define IE_STORE_RECHARGE 0x4000 //gemrb extension, if set, store won't recharge
+#define IE_STORE_CAPACITY 0x8000 //used for error reporting purposes
 
 
 /**
  * @struct STOItem
  * Item in a store, together with available amount etc.
  */
-struct STOItem {
+struct GEM_EXPORT STOItem {
 	ieResRef ItemResRef;
 	ieWord PurchasedAmount;
 	ieWord Usages[CHARGE_COUNTERS];
@@ -78,6 +79,8 @@ struct STOItem {
 	Trigger *trigger;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
+	
+	~STOItem();
 };
 
 
@@ -163,6 +166,8 @@ public: //queries
 	int GetRealStockSize();
 	/** Recharges item */
 	void RechargeItem(CREItem *item);
+	/** Identifies item according to store lore */
+	void IdentifyItem(CREItem *item) const;
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);
@@ -174,8 +179,6 @@ public: //queries
 	void SetOwnerID(ieDword owner);
 	bool IsBag() const;
 private:
-	/** Identifies item according to store lore */
-	void IdentifyItem(CREItem *item) const;
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot) const;

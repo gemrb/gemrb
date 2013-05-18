@@ -367,6 +367,7 @@ public:
 	Actor* GetActorByResource(const char* resref);
 	Actor* GetActorByScriptName(const char* name);
 	bool HasActor(Actor *actor);
+	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);

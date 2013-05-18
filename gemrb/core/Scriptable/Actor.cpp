@@ -507,6 +507,7 @@ Actor::Actor()
 	RemovalTime = ~0;
 	HomeLocation.x = 0;
 	HomeLocation.y = 0;
+	Spawned = false;
 	version = 0;
 	//these are used only in iwd2 so we have to default them
 	for(i=0;i<7;i++) {

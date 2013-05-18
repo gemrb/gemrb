@@ -4808,20 +4808,25 @@ void Interface::SanitizeItem(CREItem *item) const
 
 	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (itm) {
-		//This hack sets the charge counters for non-rechargeable items,
-		//if their charge is zero
+		//set charge counters for non-rechargeable items if their charge is zero
+		//set charge counters for items not using charges to one
 		for (int i = 0; i < CHARGE_COUNTERS; i++) {
-			if (item->Usages[i]) {
-				continue;
-			}
 			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-				//HACK: the original (bg2) allows for 0 charged gems
-				if (h->Charges) {
-					item->Usages[i] = h->Charges;
-				} else {
+			if (h) {
+				if (item->Usages[i] == 0) {
+					if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
+						//HACK: the original (bg2) allows for 0 charged gems
+						if (h->Charges) {
+							item->Usages[i] = h->Charges;
+						} else {
+							item->Usages[i] = 1;
+						}
+					}
+				} else if (h->Charges == 0) {
 					item->Usages[i] = 1;
 				}
+			} else {
+				item->Usages[i] = 0;
 			}
 		}
 
