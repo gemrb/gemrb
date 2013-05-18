@@ -48,13 +48,14 @@ void AndroidLogger::LogInternal(log_level level, const char* owner, const char* 
 			break;
 	}
 
-        if(level == FATAL) {
+        if(level == FATAL || level == ERROR) {
           JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
           jstring jMessage = env->NewStringUTF(message);
-          jobject activity = (jobject) SDL_AndroidGetActivity();
-          jclass instance = (jclass) env->GetObjectClass(activity);
-          jmethodID method = (jmethodID) env->GetMethodID(instance, "buildFatalErrorDialog", "(Ljava/lang/String;)V");
-          env->CallVoidMethod(activity, method, jMessage);
+          jstring jLevel = env->NewStringUTF(level == FATAL ? "FATAL" : "ERROR");
+          jobject activityInstance = (jobject) SDL_AndroidGetActivity();
+          jclass activityClass = (jclass) env->GetObjectClass(activityInstance);
+          jmethodID method = (jmethodID) env->GetMethodID(activityClass, "addMessages", "(Ljava/lang/String;)V");
+          env->CallVoidMethod(activityInstance, method, jMessage);
         }
 
 	__android_log_print(priority, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
