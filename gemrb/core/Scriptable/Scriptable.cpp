@@ -921,6 +921,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 		nearActors[i]->AddTrigger(entry);
 		++i;
 	}
+	area->AddTrigger(entry);
 	free(nearActors);
 }
 
