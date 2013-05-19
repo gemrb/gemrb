@@ -2336,24 +2336,24 @@ Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 
 		int distance = Distance(ac, origin);
 		if (whoseeswho&ENEMY_SEES_ORIGIN) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
 		if (whoseeswho&ORIGIN_SEES_ENEMY) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
 
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				tgts->AddTarget(ac, distance, GA_NO_DEAD);
+				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			}
 		}
 		else {
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				tgts->AddTarget(ac, distance, GA_NO_DEAD);
+				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			}
 		}
 	}
@@ -2374,17 +2374,17 @@ Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho)
 
 		int distance = Distance(ac, origin);
 		if (whoseeswho&ENEMY_SEES_ORIGIN) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
 		if (whoseeswho&ORIGIN_SEES_ENEMY) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
 
-		tgts->AddTarget(ac, distance, GA_NO_DEAD);
+		tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	}
 	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
 	delete tgts;

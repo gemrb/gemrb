@@ -5220,11 +5220,11 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 {
 	//scripts can still see this type of actor
 
-	//assuming that unscheduled actors can never be valid targets
-	Game *game = core->GetGame();
-	if (game) {
-		ieDword gametime = game->GameTime;
-		if (!Schedule(gametime, true)) return false;
+	if (ga_flags&GA_NO_UNSCHEDULED) {
+		Game *game = core->GetGame();
+		if (game) {
+			if (!Schedule(game->GameTime, true)) return false;
+		}
 	}
 
 	if (ga_flags&GA_NO_HIDDEN) {
@@ -9157,7 +9157,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 	Map *area = GetCurrentArea();
 	if (!area) return false;
 
-	int flag = seenby?GA_NO_DEAD:GA_NO_DEAD|GA_NO_HIDDEN;
+	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED;
 	if (enemy) {
 		ieDword ea = GetSafeStat(IE_EA);
 		if (ea>=EA_EVILCUTOFF) {
@@ -9250,7 +9250,7 @@ bool Actor::TryToHide()
 // skill check when trying to maintain invisibility: separate move silently and visibility check
 bool Actor::TryToHideIWD2()
 {
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF, 60);
+	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, 60);
 	Actor **poi = neighbours;
 	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
