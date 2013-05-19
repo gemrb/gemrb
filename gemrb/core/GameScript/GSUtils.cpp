@@ -1640,7 +1640,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					i=0;
 				}
 				//breaking on ',' in case of a monkey attack
-				//fixes bg1:melicamp.dlg, bg1:sharte.dlg
+				//fixes bg1:melicamp.dlg, bg1:sharte.dlg, bg2:udvith.dlg
 				//if strings ever need a , inside, this is a FIXME
 				while (*src != '"' && *src !=',') {
 					if (*src == 0) {
@@ -1652,6 +1652,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 						*dst++ = (char) tolower(*src);
 						i++;
 					}
+					src++;
+				}
+				if (*src == '"') {
 					src++;
 				}
 				*dst = 0;
@@ -1672,7 +1675,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					}
 
 					//this works only if there are no spaces
-					if (*src++!='"' || *src++!=',' || *src++!='"') {
+					if (*src++!=',' || *src++!='"') {
 						break;
 					}
 					//reading the context string
@@ -1687,8 +1690,8 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 						}
 						src++;
 					}
+					src++; //skipping "
 				}
-				src++; //skipping "
 				stringsCount++;
 			}
 			break;
