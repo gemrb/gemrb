@@ -361,7 +361,7 @@ int SDL20VideoDriver::PollEvents()
 		int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
 		EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
-		ignoreNextFingerUp++;
+		ignoreNextFingerUp = 1;
 	}
 
 	return SDLVideoDriver::PollEvents();
