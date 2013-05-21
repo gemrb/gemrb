@@ -139,6 +139,7 @@ doneFormat:
 
 	Uint32 r, g, b, a;
 	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
+	a = 0; //force a to 0 or screenshots will be all black!
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
 		width, height, SDL_GetPixelFormatName(format));
