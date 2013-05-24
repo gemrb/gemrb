@@ -455,6 +455,19 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					HideSoftKeyboard();
 				}
 			} else if (numFingers == 1) { //click and drag
+				if (!continuingGesture) {
+					int x = event.tfinger.dx * width;
+					int y = event.tfinger.dy * height;
+					if ((x >= -MIN_GESTURE_DELTA_PIXELS
+						&& x <= MIN_GESTURE_DELTA_PIXELS)
+						||
+						(y >= -MIN_GESTURE_DELTA_PIXELS
+						&& y <= MIN_GESTURE_DELTA_PIXELS)) {
+						break;
+					} else /*if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)*/ {
+						//break;
+					}
+				}
 				ProcessFirstTouch(GEM_MB_ACTION);
 				//ignoreNextFingerUp--;
 				// standard mouse movement
