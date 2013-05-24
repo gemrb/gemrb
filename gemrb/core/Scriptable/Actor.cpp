@@ -3237,15 +3237,15 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	switch (ModifierType) {
 		case MOD_ADDITIVE:
 			//flat point modifier
-			SetStat(StatIndex, Modified[StatIndex]+ModifierValue, 0);
+			SetStat(StatIndex, Modified[StatIndex]+ModifierValue, 1);
 			break;
 		case MOD_ABSOLUTE:
 			//straight stat change
-			SetStat(StatIndex, ModifierValue, 0);
+			SetStat(StatIndex, ModifierValue, 1);
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue / 100, 0);
+			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue / 100, 1);
 			break;
 	}
 	return Modified[StatIndex] - oldmod;
