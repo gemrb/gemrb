@@ -356,7 +356,8 @@ int SDL20VideoDriver::SwapBuffers(void)
 
 int SDL20VideoDriver::PollEvents()
 {
-	if (firstFingerDownTime
+	if (ignoreNextFingerUp <= 0
+		&& firstFingerDownTime
 		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
 		int x = firstFingerDown.x;
