@@ -427,7 +427,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
 					// if we are scrolling a text area we dont want the keyboard in the way
 					HideSoftKeyboard();
-				} else if (!focusCtrl) {
+				} else if (!focusCtrl || focusCtrl->ControlType == IE_GUI_BUTTON) {
 					// ensure the control we touched becomes focused before attempting to scroll it.
 					// we cannot safely call ProcessFirstTouch anymore because now we process mouse events
 					// this can result in a selection box being created
