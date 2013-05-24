@@ -554,7 +554,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
-			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS, distance);
+			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
 
 			int i = 0;
 			while(monsters[i]) {

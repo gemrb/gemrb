@@ -149,6 +149,8 @@ namespace GemRB {
 
 // Detect() mode: IDS matching ignores invisibility
 #define GA_DETECT 8192
+//cannot target unscheduled actors
+#define GA_NO_UNSCHEDULED 16384
 
 #define VCONST_COUNT 100
 

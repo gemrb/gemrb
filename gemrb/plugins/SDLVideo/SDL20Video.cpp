@@ -21,6 +21,8 @@
 #include "SDL20Video.h"
 
 #include "Interface.h"
+
+#include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
 
@@ -139,6 +141,7 @@ doneFormat:
 
 	Uint32 r, g, b, a;
 	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
+	a = 0; //force a to 0 or screenshots will be all black!
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
 		width, height, SDL_GetPixelFormatName(format));
@@ -360,7 +363,7 @@ int SDL20VideoDriver::PollEvents()
 		int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
 		EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
-		ignoreNextFingerUp++;
+		ignoreNextFingerUp = 1;
 	}
 
 	return SDLVideoDriver::PollEvents();
@@ -377,11 +380,6 @@ void SDL20VideoDriver::ClearFirstTouch()
 bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
 	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
-		lastMouseDownTime = EvntManager->GetRKDelay();
-		if (lastMouseDownTime != (unsigned long) ~0) {
-			lastMouseDownTime += lastMouseDownTime + lastTime;
-		}
-
 		// do an actual mouse move first! this is important for things such as ground piles to work!
 		// also ensure any referencing of the cursor is accurate
 		MouseMovement(firstFingerDown.x, firstFingerDown.y);
@@ -466,6 +464,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			continuingGesture = true;
 			break;
 		case SDL_FINGERDOWN:
+			lastMouseDownTime = EvntManager->GetRKDelay();
+			if (lastMouseDownTime != (unsigned long) ~0) {
+				lastMouseDownTime += lastMouseDownTime + lastTime;
+			}
+
 			if (!finger0) numFingers++;
 			continuingGesture = false;
 			if (numFingers == 1
@@ -520,6 +523,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
 											 ScaleCoordinateVertical(event.tfinger.y),
 											 mouseButton, GetModState(SDL_GetModState()) );
+					} else {
+						focusCtrl = EvntManager->GetMouseFocusedControl();
+						if (focusCtrl && focusCtrl->ControlType == IE_GUI_BUTTON)
+							// these are repeat events so the control should stay pressed
+							((Button*)focusCtrl)->SetState(IE_GUI_BUTTON_UNPRESSED);
 					}
 				}
 				if (numFingers != core->NumFingInfo) {

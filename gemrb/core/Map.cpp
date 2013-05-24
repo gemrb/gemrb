@@ -926,7 +926,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS, MAX_CIRCLE_SIZE*2*16);
+	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*2*16);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 
 	// Restore the searchmap areas of any nearby actors that could
@@ -1810,7 +1810,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 		// this is called by non-selection code..
 		if (onlyparty && !actor->ValidTarget(GA_SELECT))
 			continue;
-		if (!actor->ValidTarget(GA_NO_DEAD) )
+		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
 			continue;
 		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
 			continue;
@@ -1827,7 +1827,7 @@ bool Map::SpawnsAlive() const
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		if (!actor->ValidTarget(GA_NO_DEAD) )
+		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
 			continue;
 		if (actor->Spawned) {
 			return true;
@@ -3131,7 +3131,7 @@ void Map::UpdateSpawns()
 			//only reactivate the spawn point if the party cannot currently see it;
 			//also make sure the party has moved away some
 			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos, false) &&
-				!GetActorInRadius(spawn->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_NEUTRAL, SPAWN_RANGE * 2)) {
+				!GetActorInRadius(spawn->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_UNSCHEDULED, SPAWN_RANGE * 2)) {
 				spawn->Method &= ~SPF_WAIT;
 			}
 		}

@@ -921,6 +921,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 		nearActors[i]->AddTrigger(entry);
 		++i;
 	}
+	area->AddTrigger(entry);
 	free(nearActors);
 }
 
@@ -1169,7 +1170,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 	Spell* spl = gamedata->GetSpell(SpellResRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
-	Actor **neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF, 10*caster->GetBase(IE_VISUALRANGE));
+	Actor **neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE));
 	Actor **poi = neighbours;
 	while (*poi) {
 		Actor *detective = *poi;
