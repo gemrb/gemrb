@@ -43,7 +43,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	screenTexture = NULL;
 
 	// touch input
-	ignoreNextFingerUp = 1;
+	ignoreNextFingerUp = 0;
 	ClearFirstTouch();
 }
 
@@ -373,7 +373,6 @@ void SDL20VideoDriver::ClearFirstTouch()
 {
 	firstFingerDown = SDL_TouchFingerEvent();
 	firstFingerDown.fingerId = -1;
-	ignoreNextFingerUp--;
 	firstFingerDownTime = 0;
 }
 
@@ -392,6 +391,7 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 								mouseButton, GetModState(SDL_GetModState()) );
 
 		ClearFirstTouch();
+		ignoreNextFingerUp--;
 		return true;
 	}
 	return false;
@@ -513,7 +513,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					ProcessFirstTouch(mouseButton);
 					if (ignoreNextFingerUp <= 0) {
-						ignoreNextFingerUp = 1;
+						ignoreNextFingerUp = 1; // set to one because we decrement unconditionally later
 						if (CursorIndex != VID_CUR_DRAG)
 							CursorIndex = VID_CUR_UP;
 						// move cursor to ensure any referencing of the cursor is accurate
@@ -593,6 +593,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 restoring from "minimized state" should be a clean slate.
 					 */
 					ClearFirstTouch();
+					ignoreNextFingerUp = 0;
 					GameControl* gc = core->GetGameControl();
 					if (gc) {
 						gc->ClearMouseState();
