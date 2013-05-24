@@ -43,7 +43,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	screenTexture = NULL;
 
 	// touch input
-	ignoreNextFingerUp = 1;
+	ignoreNextFingerUp = 0;
 	ClearFirstTouch();
 }
 
@@ -356,7 +356,8 @@ int SDL20VideoDriver::SwapBuffers(void)
 
 int SDL20VideoDriver::PollEvents()
 {
-	if (firstFingerDownTime
+	if (ignoreNextFingerUp <= 0
+		&& firstFingerDownTime
 		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
 		int x = firstFingerDown.x;
@@ -373,7 +374,6 @@ void SDL20VideoDriver::ClearFirstTouch()
 {
 	firstFingerDown = SDL_TouchFingerEvent();
 	firstFingerDown.fingerId = -1;
-	ignoreNextFingerUp--;
 	firstFingerDownTime = 0;
 }
 
@@ -392,6 +392,7 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 								mouseButton, GetModState(SDL_GetModState()) );
 
 		ClearFirstTouch();
+		ignoreNextFingerUp--;
 		return true;
 	}
 	return false;
@@ -426,7 +427,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
 					// if we are scrolling a text area we dont want the keyboard in the way
 					HideSoftKeyboard();
-				} else if (!focusCtrl) {
+				} else if (!focusCtrl || focusCtrl->ControlType == IE_GUI_BUTTON) {
 					// ensure the control we touched becomes focused before attempting to scroll it.
 					// we cannot safely call ProcessFirstTouch anymore because now we process mouse events
 					// this can result in a selection box being created
@@ -454,6 +455,19 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					HideSoftKeyboard();
 				}
 			} else if (numFingers == 1) { //click and drag
+				if (!continuingGesture) {
+					int x = event.tfinger.dx * width;
+					int y = event.tfinger.dy * height;
+					if ((x >= -MIN_GESTURE_DELTA_PIXELS
+						&& x <= MIN_GESTURE_DELTA_PIXELS)
+						||
+						(y >= -MIN_GESTURE_DELTA_PIXELS
+						&& y <= MIN_GESTURE_DELTA_PIXELS)) {
+						break;
+					} else /*if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)*/ {
+						//break;
+					}
+				}
 				ProcessFirstTouch(GEM_MB_ACTION);
 				//ignoreNextFingerUp--;
 				// standard mouse movement
@@ -464,11 +478,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			continuingGesture = true;
 			break;
 		case SDL_FINGERDOWN:
-			lastMouseDownTime = EvntManager->GetRKDelay();
-			if (lastMouseDownTime != (unsigned long) ~0) {
-				lastMouseDownTime += lastMouseDownTime + lastTime;
-			}
-
 			if (!finger0) numFingers++;
 			continuingGesture = false;
 			if (numFingers == 1
@@ -476,6 +485,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// commented out because we dont care right now, but if we need it i want it documented
 				//|| (numFingers > 1 && firstFingerDown.fingerId < 0)
 				) {
+				lastMouseDownTime = EvntManager->GetRKDelay();
+				if (ignoreNextFingerUp <= 0 && lastMouseDownTime != (unsigned long) ~0) {
+					lastMouseDownTime += lastMouseDownTime + lastTime;
+				}
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
@@ -513,7 +526,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					ProcessFirstTouch(mouseButton);
 					if (ignoreNextFingerUp <= 0) {
-						ignoreNextFingerUp = 1;
+						ignoreNextFingerUp = 1; // set to one because we decrement unconditionally later
 						if (CursorIndex != VID_CUR_DRAG)
 							CursorIndex = VID_CUR_UP;
 						// move cursor to ensure any referencing of the cursor is accurate
@@ -593,6 +606,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 restoring from "minimized state" should be a clean slate.
 					 */
 					ClearFirstTouch();
+					ignoreNextFingerUp = 0;
 					GameControl* gc = core->GetGameControl();
 					if (gc) {
 						gc->ClearMouseState();
