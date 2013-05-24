@@ -478,11 +478,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			continuingGesture = true;
 			break;
 		case SDL_FINGERDOWN:
-			lastMouseDownTime = EvntManager->GetRKDelay();
-			if (lastMouseDownTime != (unsigned long) ~0) {
-				lastMouseDownTime += lastMouseDownTime + lastTime;
-			}
-
 			if (!finger0) numFingers++;
 			continuingGesture = false;
 			if (numFingers == 1
@@ -490,6 +485,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// commented out because we dont care right now, but if we need it i want it documented
 				//|| (numFingers > 1 && firstFingerDown.fingerId < 0)
 				) {
+				lastMouseDownTime = EvntManager->GetRKDelay();
+				if (ignoreNextFingerUp <= 0 && lastMouseDownTime != (unsigned long) ~0) {
+					lastMouseDownTime += lastMouseDownTime + lastTime;
+				}
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
