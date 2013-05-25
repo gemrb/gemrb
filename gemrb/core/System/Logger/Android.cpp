@@ -19,6 +19,8 @@
 #include "System/Logger/Android.h"
 
 #include <android/log.h>
+#include <jni.h>
+#include <SDL_system.h>
 
 namespace GemRB {
 
@@ -45,6 +47,17 @@ void AndroidLogger::LogInternal(log_level level, const char* owner, const char* 
 			priority = ANDROID_LOG_DEBUG;
 			break;
 	}
+
+        if(level == FATAL || level == ERROR) {
+          JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+          jstring jMessage = env->NewStringUTF(message);
+          jstring jLevel = env->NewStringUTF(level == FATAL ? "FATAL" : "ERROR");
+          jobject activityInstance = (jobject) SDL_AndroidGetActivity();
+          jclass activityClass = (jclass) env->GetObjectClass(activityInstance);
+          jmethodID method = (jmethodID) env->GetMethodID(activityClass, "addMessages", "(Ljava/lang/String;)V");
+          env->CallVoidMethod(activityInstance, method, jMessage);
+        }
+
 	__android_log_print(priority, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
 }
 

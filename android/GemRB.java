@@ -21,10 +21,16 @@ import java.util.Properties;
 import android.app.AlertDialog;
 import android.widget.EditText;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
+import android.app.Notification;
+import android.app.NotificationManager;
+import java.util.ArrayList;
 
 public class GemRB extends SDLActivity {
 
-  public String newPath;
+  private int numNotifs = 0;
+  private ArrayList<String> notifStrings = new ArrayList<String>();
+  public boolean showErrors = false;
 
   protected void onCreate(Bundle savedInstanceState) {
     File gemrbHomeFolder = getApplicationContext().getExternalFilesDir(null); // null for general purpose files
@@ -78,6 +84,26 @@ public class GemRB extends SDLActivity {
     super.onCreate(savedInstanceState);
   }
 
+  public void showNotification() {
+    Log.d("GemRB Activity", "In showNotification()");
+    Notification.Builder mBuilder = new Notification.Builder(this)
+      .setSmallIcon(R.drawable.ic_launcher)
+      .setContentTitle("Fatal Error");
+
+    Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
+    inboxStyle.setBigContentTitle("GemRB Fatal Error Details: ");
+
+    for(int i = 0; i < notifStrings.size(); ++i) {
+      inboxStyle.addLine(notifStrings.get(i));
+    }
+
+    mBuilder.setStyle(inboxStyle);
+
+    int mId = 1;
+    NotificationManager nManager = (NotificationManager) getSystemService(getContext().NOTIFICATION_SERVICE);
+    nManager.notify(mId, mBuilder.build());
+  }
+
   private static void deleteRecursive(File fileOrDirectory) {
       if (fileOrDirectory.isDirectory())
           for (File child : fileOrDirectory.listFiles())
@@ -128,5 +154,15 @@ public class GemRB extends SDLActivity {
               is.close();
           }
       }
+  }
+
+  public void onConfigurationChanged(Configuration newConfig) {
+    // we're only overriding for orientation change (cmp AndroidManifest.xml)
+    // but we don't actually want to react to that
+    super.onConfigurationChanged(newConfig);
+  }
+
+  public void addMessages(String message) {
+    notifStrings.add(message);
   }
 }
