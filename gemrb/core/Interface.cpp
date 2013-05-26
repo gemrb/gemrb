@@ -118,6 +118,7 @@ static ieWord IDT_CRITMULTI = 2;
 static ieWord IDT_SKILLPENALTY = 3;
 
 Interface::Interface()
+	: TLKEncoding()
 {
 	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 

@@ -142,8 +142,8 @@ struct TimeStruct {
 struct TLKEncodingStruct
 {
 	std::string encoding;
-	bool multibyte = false;
-	bool zerospace = false;
+	bool multibyte;
+	bool zerospace;
 };
 
 struct SpellDescType {
