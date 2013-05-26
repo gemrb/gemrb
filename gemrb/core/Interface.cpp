@@ -259,6 +259,7 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding = "ISO-8859-1";
+	ZeroSpace = false;
 
 	gamedata = new GameData();
 }
@@ -1518,6 +1519,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
+	CONFIG_INT("ZeroSpace", ZeroSpace = );
 #undef CONFIG_INT
 
 #define CONFIG_STRING(key, var, default) \

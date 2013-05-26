@@ -39,6 +39,7 @@ namespace GemRB {
 const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 {
 #if HAVE_ICONV
+	if (!utf8) {
 	char* oldchar = (char*)&chr;
 	ieWord unicodeChr = 0;
 	char* newchar = (char*)&unicodeChr;
@@ -57,6 +58,7 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 	}
 	iconv_close(cd);
 	chr = unicodeChr;
+	}
 #endif
 	const Holder<Sprite2D>* sprCache = glyphCache->get(chr);
 	if (sprCache) {
@@ -266,7 +268,8 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	// TODO: ttf fonts have a "box" glyph they use for this
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 	// ttf fonts dont produce glyphs for whitespace
-	Sprite2D* space = core->GetVideoDriver()->CreateSprite8((int)(ptSize * 0.25), 0, 8, NULL, palette->col);;
+	int SpaceWidth = core->ZeroSpace? 1 : (ptSize * 0.25) ;
+	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, 8, NULL, palette->col);;
 	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, 8, NULL, palette->col);
 
 	// now cache these glyphs for quick access

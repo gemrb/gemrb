@@ -42,7 +42,7 @@ Font::Font()
 {
 	name[0] = '\0';
 	multibyte = false;
-
+	utf8 = false;
 	// TODO: list incomplete
 	// maybe want to externalize this
 	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
@@ -58,6 +58,10 @@ Font::Font()
 	const char* encoding = core->TLKEncoding.c_str();
 
 	for (size_t i = 0; i < listSize; i++) {
+		if (stricmp(encoding, "UTF-8") == 0) {
+			utf8 = true;
+			break;
+		}
 		if (stricmp(encoding, multibyteEncodings[i]) == 0) {
 			multibyte = true;
 			break;
@@ -597,6 +601,10 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 
 size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const
 {
+	if (utf8)
+	{
+		return GetUtf8String(string, dbString);
+	}
 	size_t len = strlen((char*)string);
 	dbString = (ieWord*)malloc((len+1) * sizeof(ieWord));
 	size_t dbLen = 0;
@@ -652,6 +660,74 @@ int Font::dbStrLen(const ieWord* string) const
 	for ( ; string[count] != 0; count++)
 		continue; // intentionally empty loop
 	return count;
+}
+
+/* The first byte of a UTF-8 encoding reveals its length. */
+unsigned char utf8_bytes[0x100] = {
+    /* 00-7f are themselves */
+/*00*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*10*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*20*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*30*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*40*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*50*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*60*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*70*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* 80-bf are later bytes, out-of-sync if first */
+/*80*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*90*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*a0*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*b0*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* c0-df are first byte of two-byte sequences (5+6=11 bits) */
+    /* c0-c1 are noncanonical */
+/*c0*/ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*d0*/ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    /* e0-ef are first byte of three-byte (4+6+6=16 bits) */
+    /* e0 80-9f are noncanonical */
+/*e0*/ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    /* f0-f7 are first byte of four-byte (3+6+6+6=21 bits) */
+    /* f0 80-8f are noncanonical */
+/*f0*/ 4, 4, 4, 4, 4, 4, 4, 4,
+    /* f8-fb are first byte of five-byte (2+6+6+6+6=26 bits) */
+    /* f8 80-87 are noncanonical */
+/*f8*/ 5, 5, 5, 5,
+    /* fc-fd are first byte of six-byte (1+6+6+6+6+6=31 bits) */
+    /* fc 80-83 are noncanonical */
+/*fc*/ 6, 6,
+    /* fe and ff are not part of valid UTF-8 so they stand alone */
+/*fe*/ 1, 1
+};
+
+ieWord Font::readUtf8(const unsigned char *src, size_t *readed_length) const
+{
+    size_t nb = utf8_bytes[*src];
+
+    *readed_length = nb;
+    if (nb <= 1 || nb > 6)
+        return *src;
+    ieWord ch = *src & ((1 << (7 - nb)) - 1);
+    while (--nb)
+        ch <<= 6, ch |= *++src & 0x3f;
+
+    return ch;
+}
+
+size_t Font::GetUtf8String(const unsigned char* utf8String, ieWord* &utf16String) const
+{
+	size_t utf8Len = strlen((char*)utf8String);
+	utf16String = (ieWord*)malloc((utf8Len+1) * sizeof(ieWord));
+	size_t utf16Len = 0;
+	while (utf8Len > 0)
+	{
+		size_t len;
+		utf16String[utf16Len] = readUtf8(utf8String, &len);
+		utf8Len -= len;
+		utf8String += len;
+		utf16Len++;
+	}
+	utf16String[utf16Len] = '\0';
+	utf16String = (ieWord*)realloc(utf16String, (utf16Len+1) * sizeof(ieWord));
+	return utf16Len;
 }
 
 #undef SET_BLIT_PALETTE
