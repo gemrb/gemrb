@@ -40,24 +40,24 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 {
 #if HAVE_ICONV
 	if (!utf8) {
-	char* oldchar = (char*)&chr;
-	ieWord unicodeChr = 0;
-	char* newchar = (char*)&unicodeChr;
-	size_t in = (multibyte) ? 2 : 1, out = 2;
+		char* oldchar = (char*)&chr;
+		ieWord unicodeChr = 0;
+		char* newchar = (char*)&unicodeChr;
+		size_t in = (multibyte) ? 2 : 1, out = 2;
 
-	// TODO: make this work on BE systems
-	// TODO: maybe we want to work witn non-unicode fonts?
-	iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.c_str());
-#if __FreeBSD__
-	int ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
-#else
-	int ret = iconv(cd, &oldchar, &in, &newchar, &out);
-#endif
-	if (ret != GEM_OK) {
-		Log(ERROR, "FONT", "iconv error: %d", errno);
-	}
-	iconv_close(cd);
-	chr = unicodeChr;
+		// TODO: make this work on BE systems
+		// TODO: maybe we want to work witn non-unicode fonts?
+		iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.encoding.c_str());
+	#if __FreeBSD__
+		int ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
+	#else
+		int ret = iconv(cd, &oldchar, &in, &newchar, &out);
+	#endif
+		if (ret != GEM_OK) {
+			Log(ERROR, "FONT", "iconv error: %d", errno);
+		}
+		iconv_close(cd);
+		chr = unicodeChr;
 	}
 #endif
 	const Holder<Sprite2D>* sprCache = glyphCache->get(chr);
