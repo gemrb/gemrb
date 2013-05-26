@@ -428,8 +428,6 @@ bool MakeDirectory(const char* path)
 			return false;
 		}
 	}
-	// Ignore errors from chmod
-	chmod(path, S_IREAD|S_IWRITE|S_IEXEC);
 	return true;
 #ifdef WIN32
 #undef mkdir
