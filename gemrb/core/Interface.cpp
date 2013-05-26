@@ -4680,7 +4680,11 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	if (video) {
 		Sprite2D* DraggedCursor = NULL;
 		if (item) {
-			DraggedCursor = gamedata->GetBAMSprite( Picture, -1, 0 );
+			DraggedCursor = gamedata->GetBAMSprite(Picture, 0, 0);
+			if (!DraggedCursor) {
+				// use any / the smaller icon if the dragging one is unavailable
+				DraggedCursor = gamedata->GetBAMSprite(Picture, -1, 0);
+			}
 		}
 		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
 		if (DraggedCursor) DraggedCursor->release();
