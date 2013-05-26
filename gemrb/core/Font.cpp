@@ -41,33 +41,14 @@ Font::Font()
 : resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
 	name[0] = '\0';
-	multibyte = false;
+	multibyte = core->TLKEncoding.multibyte;
 	utf8 = false;
-	zeroSpace = false;
-	// TODO: list incomplete
-	// maybe want to externalize this
-	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
-	const char* multibyteEncodings[] = {
-										// Chinese
-										"GBK", "BIG5",
-										// Korean
-										"EUCKR",
-										// Japanese
-										"SJIS"
-										};
-	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
-	const char* encoding = core->TLKEncoding.c_str();
 
-	for (size_t i = 0; i < listSize; i++) {
-		if (stricmp(encoding, "UTF-8") == 0) {
-			utf8 = true;
-			break;
-		}
-		if (stricmp(encoding, multibyteEncodings[i]) == 0) {
-			multibyte = true;
-			break;
-		}
+	if (stricmp(core->TLKEncoding.encoding.c_str(), "UTF-8") == 0) {
+		utf8 = true;
 	}
+	// utf8 & multibyte are mutually exclusive
+	assert(utf8 == false || multibyte == false);
 }
 
 Font::~Font(void)

@@ -77,7 +77,7 @@ const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
 		spr = factory->GetFrameWithoutCycle(chr - '0');
 	}
 	if (!spr) {
-		Log(ERROR, "BAMFont", "%s missing glyph for character '%x' using %s encoding.", name, chr, core->TLKEncoding.c_str());
+		Log(ERROR, "BAMFont", "%s missing glyph for character '%x' using %s encoding.", name, chr, core->TLKEncoding.encoding.c_str());
 		spr = blank;
 	} else {
 		spr->release();

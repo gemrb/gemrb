@@ -70,7 +70,6 @@ protected:
 
 	bool multibyte;
 	bool utf8;
-	bool zeroSpace;
 
 public:
 	int maxHeight;
@@ -90,7 +89,6 @@ public:
 
 	virtual ieWord GetPointSize() const {return 0;};
 	virtual FontStyle GetStyle() const {return NORMAL;};
-	void SetIgnoreSpaceWidth(bool ignore) { zeroSpace = ignore; };
 
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);

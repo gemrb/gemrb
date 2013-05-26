@@ -139,6 +139,13 @@ struct TimeStruct {
 	unsigned int attack_round_size;
 };
 
+struct TLKEncodingStruct
+{
+	std::string encoding;
+	bool multibyte = false;
+	bool zerospace = false;
+};
+
 struct SpellDescType {
 	ieResRef resref;
 	ieStrRef value;
@@ -371,7 +378,7 @@ private:
 	KeyMap *keymap;
 	std::string Encoding;
 public:
-	std::string TLKEncoding;
+	TLKEncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;

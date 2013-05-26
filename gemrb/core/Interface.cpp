@@ -258,7 +258,7 @@ Interface::Interface()
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
 	Encoding = "default";
-	TLKEncoding = "ISO-8859-1";
+	TLKEncoding.encoding = "ISO-8859-1";
 
 	gamedata = new GameData();
 }
@@ -1413,7 +1413,6 @@ int Interface::LoadSprites()
 
 		fnt->AddResRef(ResRef);
 		fnt->SetName(font_name);
-		fnt->SetIgnoreSpaceWidth(zero_space);
 
 		fonts.push_back(fnt);
 	}
@@ -2511,7 +2510,28 @@ bool Interface::LoadEncoding()
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
-	TLKEncoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.c_str());
+	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
+	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
+
+	// TODO: list incomplete
+	// maybe want to externalize this
+	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
+	const char* multibyteEncodings[] = {
+		// Chinese
+		"GBK", "BIG5",
+		// Korean
+		"EUCKR",
+		// Japanese
+		"SJIS"
+	};
+	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+
+	for (size_t i = 0; i < listSize; i++) {
+		if (stricmp(TLKEncoding.encoding.c_str(), multibyteEncodings[i]) == 0) {
+			TLKEncoding.multibyte = true;
+			break;
+		}
+	}
 
 	const char *s;
 	unsigned int i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
