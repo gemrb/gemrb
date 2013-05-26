@@ -2716,7 +2716,11 @@ int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
 	if (!tar) {
 		return 0;
 	}
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)) {
+	Map *map = tar->GetCurrentArea();
+	if (!map) {
+		return 0;
+	}
+	if (!strnicmp(map->GetScriptName(), parameters->string0Parameter, 8)) {
 		return 1;
 	}
 	return 0;
