@@ -43,6 +43,7 @@ Font::Font()
 	name[0] = '\0';
 	multibyte = false;
 	utf8 = false;
+	zeroSpace = false;
 	// TODO: list incomplete
 	// maybe want to externalize this
 	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings

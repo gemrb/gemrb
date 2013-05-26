@@ -268,7 +268,7 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	// TODO: ttf fonts have a "box" glyph they use for this
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
 	// ttf fonts dont produce glyphs for whitespace
-	int SpaceWidth = core->ZeroSpace? 1 : (ptSize * 0.25) ;
+	int SpaceWidth = zeroSpace? 1 : (ptSize * 0.25);
 	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, 8, NULL, palette->col);;
 	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, 8, NULL, palette->col);
 

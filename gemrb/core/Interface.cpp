@@ -259,7 +259,6 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding = "ISO-8859-1";
-	ZeroSpace = false;
 
 	gamedata = new GameData();
 }
@@ -1351,11 +1350,13 @@ int Interface::LoadSprites()
 		const char* font_name;
 		unsigned short font_size = 0;
 		FontStyle font_style = NORMAL;
+		bool zero_space = false;
 
 		if (CustomFontPath[0]) {
 			font_name = tab->QueryField( rowName, "FONT_NAME" );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
 			font_size = atoi( tab->QueryField( rowName, "PT_SIZE" ) );// not available in BAM fonts.
 			font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) );// not available in BAM fonts.
+			zero_space = (bool)atoi( tab->QueryField( rowName, "ZEROSPACE" ) );
 		}else{
 			font_name = ResRef;
 		}
@@ -1412,6 +1413,7 @@ int Interface::LoadSprites()
 
 		fnt->AddResRef(ResRef);
 		fnt->SetName(font_name);
+		fnt->SetIgnoreSpaceWidth(zero_space);
 
 		fonts.push_back(fnt);
 	}
@@ -1519,7 +1521,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
-	CONFIG_INT("ZeroSpace", ZeroSpace = );
+
 #undef CONFIG_INT
 
 #define CONFIG_STRING(key, var, default) \

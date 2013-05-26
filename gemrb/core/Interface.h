@@ -794,7 +794,7 @@ public:
 	int GUIEnhancements;
 	bool KeepCache;
 	bool MultipleQuickSaves;
-	bool ZeroSpace;
+
 	Variables *plugin_flags;
 	/** The Main program loop */
 	void Main(void);
