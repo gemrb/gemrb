@@ -1351,13 +1351,11 @@ int Interface::LoadSprites()
 		const char* font_name;
 		unsigned short font_size = 0;
 		FontStyle font_style = NORMAL;
-		bool zero_space = false;
 
 		if (CustomFontPath[0]) {
 			font_name = tab->QueryField( rowName, "FONT_NAME" );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
 			font_size = atoi( tab->QueryField( rowName, "PT_SIZE" ) );// not available in BAM fonts.
 			font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) );// not available in BAM fonts.
-			zero_space = (bool)atoi( tab->QueryField( rowName, "ZEROSPACE" ) );
 		}else{
 			font_name = ResRef;
 		}
