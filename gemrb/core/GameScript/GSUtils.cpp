@@ -1138,6 +1138,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	Sender->ReleaseCurrentAction();
+	//force ProcessActions to suspend until dialog has started
+	Sender->SetWait(1);
 
 	if (!ret) {
 		if (Flags & BD_NOEMPTY) {
