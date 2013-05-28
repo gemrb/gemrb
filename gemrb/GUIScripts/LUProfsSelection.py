@@ -214,8 +214,12 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfIndex = 0
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)
 	if IsMulti[0] > 1:
-		# sum the levels, since the rate is for the combined multiclass
-		ProfsPointsLeft += (sum(level2) - sum(level1))/ProfsRate
+		if sum (level1) == 0: #character is being generated (either chargen or dual)
+			# don't give too many points; exact formula unknown, but this works with f/m and f/m/t
+			ProfsPointsLeft += sum(level2)/IsMulti[0]/ProfsRate
+		else:
+			# sum the levels, since the rate is for the combined multiclass
+			ProfsPointsLeft += (sum(level2) - sum(level1))/ProfsRate
 	else:
 		if GUICommon.IsDualSwap (pc):
 			ProfIndex = 1
