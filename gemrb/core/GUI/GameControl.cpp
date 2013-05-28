@@ -1431,7 +1431,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 		Actor *prevActor = lastActor;
 		// let us target party members even if they are invisible
-		lastActor = area->GetActor(p, GA_NO_DEAD);
+		lastActor = area->GetActor(p, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
 			if (!lastActor->ValidTarget(target_types)) {
 				lastActor = NULL;
@@ -2397,7 +2397,7 @@ void GameControl::SetTargetMode(int mode) {
 }
 
 void GameControl::ResetTargetMode() {
-	target_types = GA_NO_DEAD|GA_NO_HIDDEN;
+	target_types = GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED;
 	SetTargetMode(TARGET_MODE_NONE);
 }
 
