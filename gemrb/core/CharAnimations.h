@@ -158,11 +158,11 @@ private:
 	char OffhandRef[2];
 public:
 	const ieDword *Colors; //these are the custom color indices
-	RGBModifier ColorMods[32]; // color modification effects
+	RGBModifier ColorMods[PAL_MAX*8]; // color modification effects
 	unsigned long lastModUpdate;
 	RGBModifier GlobalColorMod; // global color modification effect
 
-	bool change[4];
+	bool change[PAL_MAX];
 	Palette* palette[PAL_MAX];
 	Palette* modifiedPalette[PAL_MAX];
 	unsigned int AvatarsRowNum;

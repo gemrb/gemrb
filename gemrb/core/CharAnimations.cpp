@@ -312,12 +312,14 @@ void CharAnimations::CheckColorMod()
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			GlobalColorMod.type = RGBModifier::NONE;
 			GlobalColorMod.speed = 0;
-		  change[0]=change[1]=change[2]=change[3]=true;
+			for (int i = 0; i < PAL_MAX; ++i) {
+				change[i] = true;
+			}
 		}
 	}
 	unsigned int location;
 
-	for (location = 0; location < 32; ++location) {
+	for (location = 0; location < PAL_MAX * 8; ++location) {
 		if (!ColorMods[location].phase) {
 		  if (ColorMods[location].type != RGBModifier::NONE) {
 				ColorMods[location].type = RGBModifier::NONE;
@@ -436,7 +438,6 @@ void CharAnimations::SetupColors(PaletteType type)
 				needmod = true;
 		}
 	}
-
 
 	if (needmod) {
 		if (!modifiedPalette[type])
@@ -625,10 +626,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
 	int i,j;
-	for (i = 0; i < 4; ++i) {
-		change[i] = true;
-	}
 	for (i = 0; i < PAL_MAX; ++i) {
+		change[i] = true;
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
@@ -654,7 +653,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	WeaponRef[0] = 0;
 	HelmetRef[0] = 0;
 	OffhandRef[0] = 0;
-	for (i = 0; i < 32; ++i) {
+	for (i = 0; i < PAL_MAX * 8; ++i) {
 		ColorMods[i].type = RGBModifier::NONE;
 		ColorMods[i].speed = 0;
 		// make initial phase depend on location to make the pulse appear
@@ -2563,6 +2562,7 @@ void CharAnimations::AddHLSuffix(char* ResRef, unsigned char StanceID,
 void CharAnimations::PulseRGBModifiers()
 {
 	unsigned long time = core->GetGame()->Ticks;
+	int i;
 
 	if (time - lastModUpdate <= 40)
 		return;
@@ -2575,7 +2575,9 @@ void CharAnimations::PulseRGBModifiers()
 		GlobalColorMod.speed > 0)
 	{
 		GlobalColorMod.phase += inc;
-		change[0] = change[1] = change[2] = change[3] = true;
+		for (i = 0; i < PAL_MAX; ++i) {
+			change[i] = true;
+		}
 
 		// reset if done
 		if (GlobalColorMod.phase > 2*GlobalColorMod.speed) {
@@ -2586,12 +2588,12 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	for (int i = 0; i < 32; ++i) {
+	for (i = 0; i < PAL_MAX * 8; ++i) {
 		if (ColorMods[i].type != RGBModifier::NONE &&
 			ColorMods[i].speed > 0)
 		{
-			ColorMods[i].phase += inc;
 			change[i>>3] = true;
+			ColorMods[i].phase += inc;
 			if (ColorMods[i].phase > 2*ColorMods[i].speed) {
 				ColorMods[i].type = RGBModifier::NONE;
 				ColorMods[i].phase = 0;
@@ -2601,25 +2603,11 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	if (change[0]) {
-		change[0]=0;
-		SetupColors(PAL_MAIN);
-		SetupColors(PAL_MAIN_2);
-		SetupColors(PAL_MAIN_3);
-		SetupColors(PAL_MAIN_4);
-		SetupColors(PAL_MAIN_5);
-	}
-	if (change[1]) {
-		change[1]=0;
-		SetupColors(PAL_WEAPON);
-	}
-	if (change[2]) {
-		change[2]=0;
-		SetupColors(PAL_OFFHAND);
-	}
-	if (change[3]) {
-		change[3]=0;
-		SetupColors(PAL_HELMET);
+	for (i = 0; i < PAL_MAX; ++i) {
+		if (change[i]) {
+			change[i] = false;
+			SetupColors((PaletteType) i);
+		}
 	}
 
 	lastModUpdate += inc*40;
