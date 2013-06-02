@@ -1108,7 +1108,7 @@ void CREImporter::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=tmpByte;
+	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
 	//last byte is actually an undead level (according to IE dev info)
 	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 );
@@ -1450,7 +1450,7 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=tmpByte;
+	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
 	//these could be used to save iwd2 skills
 	//TODO: gemrb format
@@ -1540,7 +1540,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=tmpByte;
+	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
 	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
@@ -1756,7 +1756,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=tmpByte;
+	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
 	str->Seek( 34, GEM_CURRENT_POS ); //unknowns
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_CLASSLEVELSUM]=tmpByte; //total levels
@@ -2078,7 +2078,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=tmpByte;
+	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
 	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
