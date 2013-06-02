@@ -8964,7 +8964,7 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent
 	}
 
 	if (dice < 1 || size < 1) {
-		return add + luck;
+		return (add + luck > 1 ? add + luck : 1);
 	}
 
 	ieDword critical = flags&LR_CRITICAL;
