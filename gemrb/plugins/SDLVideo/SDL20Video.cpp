@@ -389,6 +389,13 @@ void SDL20VideoDriver::ClearFirstTouch()
 
 void SDL20VideoDriver::ClearGesture()
 {
+	if (currentGesture.type) {
+		GameControl* gc = core->GetGameControl();
+		if (gc) {
+			// FIXME: should this always happen?
+			gc->ClearMouseState();
+		}
+	}
 	currentGesture = MultiGesture();
 	currentGesture.endPoint = Point(-1, -1);
 }
