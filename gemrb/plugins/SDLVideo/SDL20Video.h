@@ -25,6 +25,20 @@
 
 namespace GemRB {
 
+enum MultiGestureType {
+	GESTURE_NONE = 0,
+	GESTURE_FORMATION_ROTATION = 1
+};
+
+struct MultiGesture {
+	MultiGestureType type;
+	Point endPoint;
+	// for future consideration
+	// float theta;
+	// int dx;
+	// int dy;
+};
+
 class SDL20VideoDriver : public SDLVideoDriver {
 private:
 	SDL_Texture* screenTexture;
@@ -35,6 +49,7 @@ private:
 	int ignoreNextFingerUp;
 	SDL_TouchFingerEvent firstFingerDown;
 	unsigned long firstFingerDownTime;
+	MultiGesture currentGesture;
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
@@ -71,6 +86,7 @@ private:
 	// enough time passes for it to become a right click
 	bool ProcessFirstTouch( int mouseButton );
 	void ClearFirstTouch();
+	void ClearGesture();
 
 	// temporary methods to scale input coordinates from the renderer to the backbuf
 	// once we have a real SDL2 render pipeline in place we shouldnt require this.

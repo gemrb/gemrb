@@ -33,6 +33,7 @@ using namespace GemRB;
 #define TOUCH_RC_NUM_TICKS 500
 
 SDL20VideoDriver::SDL20VideoDriver(void)
+: currentGesture()
 {
 	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
 	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
@@ -360,11 +361,20 @@ int SDL20VideoDriver::PollEvents()
 		&& firstFingerDownTime
 		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
+
 		int x = firstFingerDown.x;
 		int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
-		EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
-		ignoreNextFingerUp = 1;
+
+		Control* focusCtrl = EvntManager->GetMouseFocusedControl();
+		if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
+			&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE
+			&& currentGesture.type == GESTURE_NONE) {
+			currentGesture.type = GESTURE_FORMATION_ROTATION;
+		} else if (currentGesture.type == GESTURE_NONE) {
+			EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
+			ignoreNextFingerUp = 1;
+		}
 	}
 
 	return SDLVideoDriver::PollEvents();
@@ -375,6 +385,12 @@ void SDL20VideoDriver::ClearFirstTouch()
 	firstFingerDown = SDL_TouchFingerEvent();
 	firstFingerDown.fingerId = -1;
 	firstFingerDownTime = 0;
+}
+
+void SDL20VideoDriver::ClearGesture()
+{
+	currentGesture = MultiGesture();
+	currentGesture.endPoint = Point(-1, -1);
 }
 
 bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
@@ -409,14 +425,26 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 	if (finger0) {
 		numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
+	}
+	// need 2 separate tests.
+	// sometimes finger0 will become null while we are still processig its touches
+	if (numFingers) {
 		focusCtrl = EvntManager->GetMouseFocusedControl();
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
 
+	// TODO: we need a method to process gestures when numFingers changes
+	// some gestures would want to continue while some would want to end/abort
+	// currently finger up clears the gesture and finger down does not
+	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
 	switch (event.type) {
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
+			if (currentGesture.type) {
+				continuingGesture = false;
+				break; // finger motion has no further power over multigestures
+			}
 			if (numFingers > 1) {
 				ignoreNextFingerUp = numFingers;
 			}
@@ -467,9 +495,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					} else /*if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)*/ {
 						//break;
 					}
+					ProcessFirstTouch(GEM_MB_ACTION);
 				}
-				ProcessFirstTouch(GEM_MB_ACTION);
-				//ignoreNextFingerUp--;
+				CursorIndex = VID_CUR_DRAG;
+
 				// standard mouse movement
 				MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
 							  ScaleCoordinateVertical(event.tfinger.y));
@@ -480,6 +509,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
 			continuingGesture = false;
+
 			if (numFingers == 1
 				// this test is for when multiple fingers begin the first touch
 				// commented out because we dont care right now, but if we need it i want it documented
@@ -502,9 +532,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					firstFingerDown.x = ScaleCoordinateHorizontal(event.tfinger.x);
 					firstFingerDown.y = ScaleCoordinateVertical(event.tfinger.y);
 				}
-			} else {
+			} else if (currentGesture.type == GESTURE_NONE) {
 				if (EvntManager && numFingers == core->NumFingInfo) {
-					ProcessFirstTouch(GEM_MB_ACTION);
 					EvntManager->OnSpecialKeyPress( GEM_TAB );
 					EvntManager->OnSpecialKeyPress( GEM_ALT );
 				}
@@ -522,6 +551,20 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// we need to get mouseButton before calling ProcessFirstTouch
 				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
 				continuingGesture = false;
+
+				if (currentGesture.type) {
+					if (!currentGesture.endPoint.isempty()) {
+						// dont send events for invalid coordinates
+						// we assume this means the gesture doesnt want an up event
+						EvntManager->MouseUp(currentGesture.endPoint.x,
+											 currentGesture.endPoint.y,
+											 // FIXME: hack, we are forcing GEM_MB_MENU because our only current gesture is
+											 // formation rotation and GEM_MB_ACTION leaves the reticles on the GC
+											 GEM_MB_MENU, GetModState(SDL_GetModState()) );
+					}
+					ClearGesture();
+					break;
+				}
 
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					ProcessFirstTouch(mouseButton);
@@ -552,23 +595,29 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
-			// purposely ignore processing first touch here. I think users ould find it annoying
-			// to attempt a gesture and accidently command a party movement etc
-			if (firstFingerDown.fingerId >= 0 && numFingers == 2
-				&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
+			{
 				/* formation rotation gesture:
-				 first touch with a single finger to obtain the pivot
-				 then touch and drag with a second finger (while maintaining contact with first)
-				 to move the application point
-				 */
-				GameControl* gc = core->GetGameControl();
-				if (gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
-					ProcessFirstTouch(GEM_MB_MENU);
-					SDL_Finger* secondFinger = SDL_GetTouchFinger(event.tfinger.touchId, 1);
-					gc->OnMouseOver(secondFinger->x + Viewport.x, secondFinger->y + Viewport.y);
+				first touch with a single finger to obtain the pivot
+				then touch and drag with a second finger (while maintaining contact with first)
+				to move the application point
+				*/
+				GameControl* gc = (GameControl*)focusCtrl;
+				switch (currentGesture.type) {
+					case GESTURE_FORMATION_ROTATION:
+					{
+						SDL_Finger* secondFinger = SDL_GetTouchFinger(event.mgesture.touchId, 1);
+						if (secondFinger && gc->GetTargetMode() == TARGET_MODE_NONE) {
+							int x = ScaleCoordinateHorizontal(secondFinger->x);// + Viewport.x;
+							int y = ScaleCoordinateVertical(secondFinger->y);// + Viewport.y;
+							gc->OnMouseOver(x, y);
+							currentGesture.endPoint = Point(x, y);
+						}
+						break;
+					}
+					case GESTURE_NONE:
+					default:
+						break;
 				}
-			} else {
-				ProcessFirstTouch(GEM_MB_ACTION);
 			}
 			break;
 		case SDL_MOUSEWHEEL:
