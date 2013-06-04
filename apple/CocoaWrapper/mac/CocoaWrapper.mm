@@ -180,6 +180,11 @@ using namespace GemRB;
 	}
 }
 
+- (id)validRequestorForSendType:(NSString *) __unused sendType returnType:(NSString *) __unused returnType
+{
+	return nil;
+}
+
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
 	if ([NSApp respondsToSelector:aSelector]) {
@@ -190,11 +195,8 @@ using namespace GemRB;
 
 - (NSMethodSignature*) methodSignatureForSelector:(SEL)selector
 {
-    // Check if car can handle the message
-    NSMethodSignature* signature = [super
-									methodSignatureForSelector:selector];
+    NSMethodSignature* signature = [super methodSignatureForSelector:selector];
 
-    // If not, can the car info string handle the message?
     if (!signature)
         signature = [NSApp methodSignatureForSelector:selector];
 
@@ -208,7 +210,9 @@ using namespace GemRB;
     if ([NSApp respondsToSelector:selector])
     {
         [invocation invokeWithTarget:NSApp];
-    }
+    } else {
+		[super forwardInvocation:invocation];
+	}
 }
 
 @end
