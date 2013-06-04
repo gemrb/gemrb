@@ -375,6 +375,7 @@
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
 		A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
 		A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2C76D2914F196E900961680 /* StringBuffer.h */; };
+		A2C8E56D175E973F00863FA9 /* EmptyStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */; };
 		A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
 		A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
 		A2CB5AC515000A0D00B5C154 /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = A2CB5AC215000A0D00B5C154 /* File.h */; };
@@ -1625,6 +1626,8 @@
 		A2C66D9C13A2953D00C0AA8E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2C76D2814F196E900961680 /* StringBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuffer.cpp; sourceTree = "<group>"; };
 		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
+		A2C8E56B175E973F00863FA9 /* EmptyStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyStringTransformer.h; sourceTree = "<group>"; };
+		A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyStringTransformer.m; sourceTree = "<group>"; };
 		A2CB5AC115000A0D00B5C154 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		A2CB5AC215000A0D00B5C154 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
 		A2D0505014D0B06C00D8CD77 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
@@ -2205,6 +2208,8 @@
 				A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */,
 				A22EBDCC14FF18030029C9C1 /* AppleLogger.h */,
 				A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */,
+				A2C8E56B175E973F00863FA9 /* EmptyStringTransformer.h */,
+				A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */,
 				A2A3A7DE14A5130F00F705CF /* ios */,
 				A2BD82721396B886007E9C63 /* GemRB.cpp */,
 				A2A3A7D614A5030600F705CF /* mac */,
@@ -4338,6 +4343,7 @@
 			files = (
 				A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */,
 				A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */,
+				A2C8E56D175E973F00863FA9 /* EmptyStringTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
