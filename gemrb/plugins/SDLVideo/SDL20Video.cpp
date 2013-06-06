@@ -367,15 +367,16 @@ int SDL20VideoDriver::PollEvents()
 		int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
 
-		Control* focusCtrl = EvntManager->GetMouseFocusedControl();
-		if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
-			&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE
-			&& currentGesture.type == GESTURE_NONE) {
+		if (currentGesture.type == GESTURE_NONE) {
+			Control* focusCtrl = EvntManager->GetMouseFocusedControl();
+			if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
+				&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE) {
 
-			BeginMultiGesture(GESTURE_FORMATION_ROTATION);
-		} else if (currentGesture.type == GESTURE_NONE) {
-			EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
-			ignoreNextFingerUp = 1;
+				BeginMultiGesture(GESTURE_FORMATION_ROTATION);
+			} else {
+				EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
+				ignoreNextFingerUp = 1;
+			}
 		}
 	}
 
