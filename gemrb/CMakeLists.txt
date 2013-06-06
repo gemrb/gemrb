@@ -46,7 +46,7 @@ IF(APPLE) #application bundle generation
 	)
 
 	SET(MACOSX_BUNDLE_ICON_FILE gemrb)
-	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm
+	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm ../apple/EmptyStringTransformer.m
 					../artwork/gemrb.icns ../apple/defaults.plist
 					${RESOURCE_FILES})
 	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
