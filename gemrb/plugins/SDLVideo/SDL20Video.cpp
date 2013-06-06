@@ -33,7 +33,6 @@ using namespace GemRB;
 #define TOUCH_RC_NUM_TICKS 500
 
 SDL20VideoDriver::SDL20VideoDriver(void)
-: currentGesture()
 {
 	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
 	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
@@ -46,6 +45,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	// touch input
 	ignoreNextFingerUp = 0;
 	ClearFirstTouch();
+	EndMultiGesture();
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -371,8 +371,8 @@ int SDL20VideoDriver::PollEvents()
 		if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
 			&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE
 			&& currentGesture.type == GESTURE_NONE) {
-			currentGesture.type = GESTURE_FORMATION_ROTATION;
-			currentGesture.endButton = GEM_MB_MENU;
+
+			BeginMultiGesture(GESTURE_FORMATION_ROTATION);
 		} else if (currentGesture.type == GESTURE_NONE) {
 			EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
 			ignoreNextFingerUp = 1;
@@ -389,8 +389,33 @@ void SDL20VideoDriver::ClearFirstTouch()
 	firstFingerDownTime = 0;
 }
 
-void SDL20VideoDriver::ClearGesture()
+void SDL20VideoDriver::BeginMultiGesture(MultiGestureType type)
 {
+	assert(type != GESTURE_NONE);
+	assert(currentGesture.type == GESTURE_NONE);
+	// warning: we are assuming this is a "virgin" gesture initialized by EndGesture
+	currentGesture.type = type;
+	switch (type) {
+		case GESTURE_FORMATION_ROTATION:
+			currentGesture.endButton = GEM_MB_MENU;
+			break;
+		default:
+			currentGesture.endButton = GEM_MB_ACTION;
+			break;
+	}
+}
+
+void SDL20VideoDriver::EndMultiGesture(bool success)
+{
+	if (success && currentGesture.type) {
+		if (!currentGesture.endPoint.isempty()) {
+			// dont send events for invalid coordinates
+			// we assume this means the gesture doesnt want an up event
+			EvntManager->MouseUp(currentGesture.endPoint.x,
+								 currentGesture.endPoint.y,
+								 currentGesture.endButton, GetModState(SDL_GetModState()) );
+		}
+	}
 	if (currentGesture.type) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
@@ -398,6 +423,7 @@ void SDL20VideoDriver::ClearGesture()
 			gc->ClearMouseState();
 		}
 	}
+
 	currentGesture = MultiGesture();
 	currentGesture.endPoint = Point(-1, -1);
 }
@@ -560,18 +586,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// we need to get mouseButton before calling ProcessFirstTouch
 				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
 				continuingGesture = false;
-
-				if (currentGesture.type) {
-					if (!currentGesture.endPoint.isempty()) {
-						// dont send events for invalid coordinates
-						// we assume this means the gesture doesnt want an up event
-						EvntManager->MouseUp(currentGesture.endPoint.x,
-											 currentGesture.endPoint.y,
-											 currentGesture.endButton, GetModState(SDL_GetModState()) );
-					}
-					ClearGesture();
-					break;
-				}
+				EndMultiGesture(true);
 
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					ProcessFirstTouch(mouseButton);

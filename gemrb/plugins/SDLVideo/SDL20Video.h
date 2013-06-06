@@ -87,7 +87,8 @@ private:
 	// enough time passes for it to become a right click
 	bool ProcessFirstTouch( int mouseButton );
 	void ClearFirstTouch();
-	void ClearGesture();
+	void BeginMultiGesture(MultiGestureType type);
+	void EndMultiGesture(bool success = false);
 
 	// temporary methods to scale input coordinates from the renderer to the backbuf
 	// once we have a real SDL2 render pipeline in place we shouldnt require this.
