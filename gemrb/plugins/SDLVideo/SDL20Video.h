@@ -33,6 +33,7 @@ enum MultiGestureType {
 struct MultiGesture {
 	MultiGestureType type;
 	Point endPoint;
+	ieWord endButton;
 	// for future consideration
 	// float theta;
 	// int dx;

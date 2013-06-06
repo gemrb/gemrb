@@ -362,6 +362,7 @@ int SDL20VideoDriver::PollEvents()
 		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
 
+		// store the finger coordinates before calling ProcessFirstTouch (they get cleared)
 		int x = firstFingerDown.x;
 		int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
@@ -371,6 +372,7 @@ int SDL20VideoDriver::PollEvents()
 			&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE
 			&& currentGesture.type == GESTURE_NONE) {
 			currentGesture.type = GESTURE_FORMATION_ROTATION;
+			currentGesture.endButton = GEM_MB_MENU;
 		} else if (currentGesture.type == GESTURE_NONE) {
 			EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
 			ignoreNextFingerUp = 1;
@@ -565,9 +567,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						// we assume this means the gesture doesnt want an up event
 						EvntManager->MouseUp(currentGesture.endPoint.x,
 											 currentGesture.endPoint.y,
-											 // FIXME: hack, we are forcing GEM_MB_MENU because our only current gesture is
-											 // formation rotation and GEM_MB_ACTION leaves the reticles on the GC
-											 GEM_MB_MENU, GetModState(SDL_GetModState()) );
+											 currentGesture.endButton, GetModState(SDL_GetModState()) );
 					}
 					ClearGesture();
 					break;
