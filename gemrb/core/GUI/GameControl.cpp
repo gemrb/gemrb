@@ -1652,51 +1652,29 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	source->CommandActor();
 }
 
-//generate action code for source actor to try to pick pockets of a target
-//The -1 flag is a placeholder for dynamic target IDs
-void GameControl::TryToPick(Actor *source, Actor *tgt)
+// generate action code for source actor to try to pick pockets of a target (if an actor)
+// else if door/container try to pick a lock/disable trap
+// The -1 flag is a placeholder for dynamic target IDs
+void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 {
 	char Tmp[40];
 
 	source->ClearPath();
 	source->ClearActions();
 	source->SetModal(MS_NONE);
-	strlcpy(Tmp, "PickPockets([-1])", sizeof(Tmp));
+	if (tgt->Type == ST_ACTOR) {
+		strlcpy(Tmp, "PickPockets([-1])", sizeof(Tmp));
+	} else if (tgt->Type == ST_DOOR || tgt->Type == ST_CONTAINER) {
+		if (((Highlightable*)tgt)->Trapped && ((Highlightable*)tgt)->TrapDetected) {
+			strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
+		} else {
+			strlcpy(Tmp, "PickLock([-1])", sizeof(Tmp));
+		}
+	} else {
+		Log(ERROR, "GameControl", "Invalid pick target of type %d", tgt->Type);
+		return;
+	}
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
-	source->CommandActor();
-}
-
-//generate action code for source actor to try to pick a lock/disable trap on a door
-void GameControl::TryToPick(Actor *source, Door *tgt)
-{
-	char Tmp[40];
-
-	source->ClearPath();
-	source->ClearActions();
-	source->SetModal(MS_NONE);
-	if (tgt->Trapped && tgt->TrapDetected) {
-		strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
-	} else {
-		strlcpy(Tmp, "PickLock([-1])", sizeof(Tmp));
-	}
-	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
-	source->CommandActor();
-}
-
-//generate action code for source actor to try to pick a lock/disable trap on a container
-void GameControl::TryToPick(Actor *source, Container *tgt)
-{
-	char Tmp[40];
-
-	source->ClearPath();
-	source->ClearActions();
-	source->SetModal(MS_NONE);
-	if (tgt->Trapped && tgt->TrapDetected) {
-		strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
-	} else {
-		strlcpy(Tmp, "PickLock([-1])", sizeof(Tmp));
-	}
-	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 	source->CommandActor();
 }
 

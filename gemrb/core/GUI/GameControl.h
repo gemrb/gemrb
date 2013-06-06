@@ -217,9 +217,7 @@ public:
 	void TryToCast(Actor *source, Actor *target);
 	void TryToDefend(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
-	void TryToPick(Actor *source, Actor *tgt);
-	void TryToPick(Actor *source, Door *tgt);
-	void TryToPick(Actor *source, Container *tgt);
+	void TryToPick(Actor *source, Scriptable *tgt);
 	void TryToDisarm(Actor *source, InfoPoint *tgt);
 	void PerformActionOn(Actor *actor);
 	void ResetTargetMode();
