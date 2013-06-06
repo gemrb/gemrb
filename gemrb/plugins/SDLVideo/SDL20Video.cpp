@@ -426,7 +426,7 @@ void SDL20VideoDriver::EndMultiGesture(bool success)
 	}
 
 	currentGesture = MultiGesture();
-	currentGesture.endPoint = Point(-1, -1);
+	currentGesture.endPoint.empty();
 }
 
 bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
