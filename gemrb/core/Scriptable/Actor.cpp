@@ -4288,6 +4288,7 @@ void Actor::SetPosition(const Point &position, int jump, int radiusx, int radius
 	p.x = position.x/16;
 	p.y = position.y/12;
 	q = p;
+	lastFrame = NULL;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
