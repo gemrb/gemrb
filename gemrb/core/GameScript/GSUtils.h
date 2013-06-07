@@ -131,7 +131,7 @@ GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* const Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
-bool CreateMovementEffect(Actor* actor, const char *area, const Point &position);
+bool CreateMovementEffect(Actor* actor, const char *area, const Point &position, int face);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid = NULL);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid = NULL);

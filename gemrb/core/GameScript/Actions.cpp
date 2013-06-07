@@ -553,7 +553,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 			CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
 		}
 		Actor *actor = (Actor *) Sender;
-		if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos) ) {
+		if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos, 0) ) {
 			MoveBetweenAreasCore( actor, map->GetScriptName(), tar->Pos, -1, true);
 		}
 	}
@@ -673,7 +673,7 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) tar;
 	//FIXME:CreateMovement UnMakes globals, probably this isn't what we want!!!
 	//maybe there is some flag that marks real global actors and temporary ones
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, 0) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, -1, true);
 	}
 }
@@ -693,7 +693,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 
 	if (map) {
 		Actor *actor = (Actor *) tar;
-		if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos) ) {
+		if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos, 0) ) {
 			MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(), to->Pos, -1, true);
 		}
 	}
@@ -711,7 +711,7 @@ void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameter
 	}
 
 	Actor *actor = (Actor *) tar;
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos) ) {
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos, 0) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, to->Pos, -1, false);
 	}
 }
@@ -2625,7 +2625,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor *actor = (Actor *) Sender;
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
@@ -3069,7 +3069,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
@@ -3084,7 +3084,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
