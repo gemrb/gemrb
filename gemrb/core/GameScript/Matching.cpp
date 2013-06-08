@@ -598,9 +598,14 @@ Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_fl
 	}
 
 	actor = NULL;
+	ieDword gametime = core->GetGame()->GameTime;
 	while ( t ) {
 		Actor *tmp = (Actor *) (t->actor);
 		if (tmp->GetStat(IE_SEX) != SEX_SUMMON) {
+			t = parameters->GetNextTarget(m, ST_ACTOR);
+			continue;
+		}
+		if (!tmp->Schedule(gametime, true)) {
 			t = parameters->GetNextTarget(m, ST_ACTOR);
 			continue;
 		}
@@ -644,6 +649,7 @@ Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned
 		return parameters;
 	}
 
+	ieDword gametime = core->GetGame()->GameTime;
 	while ( t ) {
 		if (t->actor->Type!=ST_ACTOR) {
 			t=parameters->RemoveTargetAt(m);
@@ -651,6 +657,10 @@ Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned
 		}
 		Actor *actor = (Actor *) (t->actor);
 		// IDS targeting already did object checks (unless we need to override Detect?)
+		if (!actor->Schedule(gametime, true)) {
+			t = parameters->RemoveTargetAt(m);
+			continue;
+		}
 		if (type) { //origin is PC
 			if (actor->GetStat(IE_EA) <= EA_EVILCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
@@ -682,9 +692,9 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 	}
 	Map *map = origin->GetCurrentArea();
 	int i = map->GetActorCount(true);
-	Actor *ac;
+	ga_flags |= GA_NO_UNSCHEDULED;
 	while (i--) {
-		ac=map->GetActor(i,true);
+		Actor *ac = map->GetActor(i,true);
 		if (ac == origin) continue;
 		int distance;
 		//int distance = Distance(ac, origin);
