@@ -117,7 +117,7 @@ using namespace GemRB;
 	[op setCanChooseDirectories:YES];
 	[op setCanChooseFiles:NO];
 	[op setAllowsMultipleSelection:NO];
-	[op setMessage:@"Select a folder containing an IE game (has a chiten.key)."];
+	[op setMessage:@"Select a folder containing an IE game (has a chitin.key)."];
 	[op setPrompt:@"Select Game"];
 	if ([op runModal] == NSFileHandlingPanelOKButton) { //blocks till user selection
 		[self application:NSApp openFile:[op filename]];
