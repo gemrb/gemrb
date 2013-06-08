@@ -138,12 +138,18 @@ using namespace GemRB;
 	}
 }
 
-- (IBAction)launchGame:(id) __unused sender
+- (IBAction)launchGame:(id) sender
 {
 	if (core) {
 		Log(FATAL, "Launch Game", "GemRB game is currently running. Please close it before trying to open another.");
 		return;
 	}
+	if (sender) {
+		// Note: use NSRunLoop over NSObject performSelector!
+		[[NSRunLoop mainRunLoop] performSelector:@selector(launchGame:) target:self argument:nil order:0 modes:@[NSDefaultRunLoopMode]];
+		return;
+	}
+
 	core = new Interface();
 	InterfaceConfig* config = new InterfaceConfig(0, NULL);
 
