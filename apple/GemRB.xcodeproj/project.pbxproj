@@ -14,6 +14,7 @@
 				A2F8709214AE448500F9CC1F /* ShellScript */,
 			);
 			dependencies = (
+				A272F8FE1762ECCB0048C004 /* PBXTargetDependency */,
 				A272F8FC1762DE650048C004 /* PBXTargetDependency */,
 				A295049116097F9D00BB22AA /* PBXTargetDependency */,
 				A295048716097E3700BB22AA /* PBXTargetDependency */,
@@ -946,6 +947,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A2BD124A15A7EDFE000FAB95;
 			remoteInfo = VLCPlayer;
+		};
+		A272F8FD1762ECCB0048C004 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A295046C1609721300BB22AA;
+			remoteInfo = TTFImporter;
 		};
 		A295046E1609721300BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -5259,6 +5267,11 @@
 			isa = PBXTargetDependency;
 			target = A2BD124A15A7EDFE000FAB95 /* VLCPlayer */;
 			targetProxy = A272F8FB1762DE650048C004 /* PBXContainerItemProxy */;
+		};
+		A272F8FE1762ECCB0048C004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A295046C1609721300BB22AA /* TTFImporter */;
+			targetProxy = A272F8FD1762ECCB0048C004 /* PBXContainerItemProxy */;
 		};
 		A295046D1609721300BB22AA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
