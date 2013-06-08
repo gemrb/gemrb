@@ -417,7 +417,9 @@ void Inventory::KillSlot(unsigned int index)
 					int type = header->ProjectileQualifier;
 					int weaponslot = FindTypedRangedWeapon(type);
 					CREItem *item2 = Slots[weaponslot];
-					if (item2) {
+					if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
+						EquipBestWeapon(EQUIP_MELEE);
+					} else if (item2) {
 						Item *itm2 = gamedata->GetItem(item2->ItemResRef, true);
 						if (itm2) {
 							if (type == header->ProjectileQualifier) {
