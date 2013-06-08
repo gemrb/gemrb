@@ -1531,15 +1531,7 @@ int Interface::Init(InterfaceConfig* config)
 		} else var[0] = '\0'; \
 		value = NULL;
 
-	CONFIG_STRING("GameCharactersPath", GameCharactersPath, "characters");
-	CONFIG_STRING("GameDataPath", GameDataPath, "data");
-	// TODO: make CustomFontPath cross platform and possibly dynamic
-	CONFIG_STRING("CustomFontPath", CustomFontPath, "/usr/share/fonts/TTF");
 	CONFIG_STRING("GameName", GameName, GEMRB_STRING);
-	CONFIG_STRING("GameOverridePath", GameOverridePath, "override");
-	CONFIG_STRING("GamePortraitsPath", GamePortraitsPath, "portraits");
-	CONFIG_STRING("GameScriptsPath", GameScriptsPath, "scripts");
-	CONFIG_STRING("GameSoundsPath", GameSoundsPath, "sounds");
 	CONFIG_STRING("GameType", GameType, "auto");
 	// tob type is obsolete
 	if (stricmp( GameType, "tob" ) == 0) {
@@ -1559,6 +1551,15 @@ int Interface::Init(InterfaceConfig* config)
 			strlcpy(var, default, sizeof(var)); \
 		} else var[0] = '\0'; \
 		value = NULL;
+
+	// TODO: make CustomFontPath cross platform and possibly dynamic
+	CONFIG_PATH("CustomFontPath", CustomFontPath, "/usr/share/fonts/TTF");
+	CONFIG_PATH("GameCharactersPath", GameCharactersPath, "characters");
+	CONFIG_PATH("GameDataPath", GameDataPath, "data");
+	CONFIG_PATH("GameOverridePath", GameOverridePath, "override");
+	CONFIG_PATH("GamePortraitsPath", GamePortraitsPath, "portraits");
+	CONFIG_PATH("GameScriptsPath", GameScriptsPath, "scripts");
+	CONFIG_PATH("GameSoundsPath", GameSoundsPath, "sounds");
 
 	// Path configureation
 	CONFIG_PATH("GemRBPath", GemRBPath,
