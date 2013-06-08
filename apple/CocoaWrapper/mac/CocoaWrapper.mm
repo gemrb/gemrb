@@ -140,6 +140,10 @@ using namespace GemRB;
 
 - (IBAction)launchGame:(id) __unused sender
 {
+	if (core) {
+		Log(FATAL, "Launch Game", "GemRB game is currently running. Please close it before trying to open another.");
+		return;
+	}
 	core = new Interface();
 	InterfaceConfig* config = new InterfaceConfig(0, NULL);
 
