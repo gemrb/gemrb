@@ -76,8 +76,7 @@ using namespace GemRB;
 
 - (void)applicationWillTerminate:(NSNotification *) __unused aNotification
 {
-    //override this method using plugin categories.
-    NSLog(@"Application terminate");
+	ShutdownLogging();
 }
 
 // always called before openFile when launched via CLI/DragDrop
@@ -186,12 +185,9 @@ using namespace GemRB;
 		delete config;
 		core->Main();
 		delete( core );
-		ShutdownLogging();
 		// We must exit since the application runloop never returns.
 
-		// TODO: we want to be able to use NSApplication terminate method
-		// need fancier logic in shouldTerminate implementation first (in SDL plugin)
-		exit(status);
+		[NSApp terminate:self];
 	}
 }
 
