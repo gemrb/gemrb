@@ -32,11 +32,6 @@
 
 namespace GemRB {
 
-#define SET_BLIT_PALETTE( palette )\
-if (palette != NULL) ((Palette*)palette)->acquire();\
-if (blitPalette != NULL) blitPalette->release();\
-blitPalette = palette;
-
 Font::Font()
 : resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
@@ -117,8 +112,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		pal = palette;
 	}
 
-	Palette* blitPalette = NULL;
-	SET_BLIT_PALETTE(pal);
+	Holder<Palette> blitPalette = pal;
 
 	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
 
@@ -189,12 +183,12 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 					continue;
 				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
-				SET_BLIT_PALETTE(newPal);
+				blitPalette = newPal;
 				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
-				SET_BLIT_PALETTE(pal);
+				blitPalette = pal;
 				continue;
 			}
 			if (stricmp( "p", tag ) == 0) {
@@ -262,7 +256,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			x -= GetKerningOffset(tmp[i-1], currChar);
 		}
 		currGlyph = GetCharSprite(currChar);
-		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, blitPalette);
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, blitPalette.get());
 		if (cursor && ( i == curpos )) {
 			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, true, &rgn );
 		}
@@ -271,7 +265,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	if (cursor && ( curpos == len )) {
 		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, true, &rgn );
 	}
-	SET_BLIT_PALETTE(NULL);
+	blitPalette = NULL;
 	free( tmp );
 }
 
@@ -303,9 +297,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		initials = NULL;
 	}
 
-	Palette* blitPalette = NULL;
-	SET_BLIT_PALETTE( pal );
-
+	Holder<Palette> blitPalette = pal;
 	ieWord* tmp = NULL;
 	size_t len = GetDoubleByteString(string, tmp);
 	while (len > 0 && (tmp[len - 1] == '\n' || tmp[len - 1] == '\r')) {
@@ -379,12 +371,12 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 					continue;
 				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, palette->back );
-				SET_BLIT_PALETTE(newPal);
+				blitPalette = newPal;
 				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
-				SET_BLIT_PALETTE(pal);
+				blitPalette = pal;
 				continue;
 			}
 			if (stricmp( "p", tag ) == 0) {
@@ -421,7 +413,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			x -= GetKerningOffset(tmp[i-1], currChar);
 		}
 
-		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette);
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette.get());
 
 		if (cursor && ( curpos == i ))
 			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
@@ -430,7 +422,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	if (cursor && ( curpos == len )) {
 		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
 	}
-	SET_BLIT_PALETTE(NULL);
+	blitPalette = NULL;
 	free( tmp );
 }
 
@@ -712,5 +704,4 @@ size_t Font::GetUtf8String(const unsigned char* utf8String, ieWord* &utf16String
 	return utf16Len;
 }
 
-#undef SET_BLIT_PALETTE
 }
