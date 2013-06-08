@@ -557,7 +557,12 @@ enum ConfigTableSection {
 	// GemRB is diffrent and our wrapper interface makes that impossible.
 	SDL_iPhoneSetEventPump(SDL_TRUE);
 
-	[[self delegate] performSelectorOnMainThread:@selector(setupComplete:) withObject:[self selectedConfigPath] waitUntilDone:NO];
+	// Note: use NSRunLoop over NSObject performSelector!
+	NSArray* modes = [NSArray arrayWithObject:NSDefaultRunLoopMode];
+	[[NSRunLoop mainRunLoop] performSelector:@selector(setupComplete:)
+									  target:[self delegate]
+									argument:[self selectedConfigPath]
+									   order:0 modes:modes];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView
