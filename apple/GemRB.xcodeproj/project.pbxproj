@@ -14,6 +14,7 @@
 				A2F8709214AE448500F9CC1F /* ShellScript */,
 			);
 			dependencies = (
+				A272F8FC1762DE650048C004 /* PBXTargetDependency */,
 				A295049116097F9D00BB22AA /* PBXTargetDependency */,
 				A295048716097E3700BB22AA /* PBXTargetDependency */,
 				A2F8709114AE43BB00F9CC1F /* PBXTargetDependency */,
@@ -113,6 +114,7 @@
 		A265ECEF13A8669700C6DF12 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
+		A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46D13A28A5000D41A8A /* PNGImporter.so */; };
 		A273DC7C14856756000DA299 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A273DC7B14856755000DA299 /* libz.dylib */; };
 		A276B4C513A28B0000D41A8A /* BIFImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86B2139F0A7D0002DC13 /* BIFImporter.cpp */; };
 		A276B4C613A28B0D00D41A8A /* BIKPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86B7139F0A7D0002DC13 /* BIKPlayer.cpp */; };
@@ -375,6 +377,7 @@
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
 		A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
 		A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2C76D2914F196E900961680 /* StringBuffer.h */; };
+		A2C8E56A175E86BE00863FA9 /* PathFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C8E569175E86BE00863FA9 /* PathFormatter.m */; };
 		A2C8E56D175E973F00863FA9 /* EmptyStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */; };
 		A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
 		A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
@@ -939,19 +942,19 @@
 			remoteGlobalIDString = A2F0505013ABB80B0023B7EB;
 			remoteInfo = SAVImporter;
 		};
+		A272F8FB1762DE650048C004 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2BD124A15A7EDFE000FAB95;
+			remoteInfo = VLCPlayer;
+		};
 		A295046E1609721300BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A2E66337139E875400310FC8;
 			remoteInfo = gemrb_core;
-		};
-		A29504791609725F00BB22AA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A295046C1609721300BB22AA;
-			remoteInfo = TTFImporter;
 		};
 		A295048616097E3700BB22AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -966,13 +969,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = A276B46C13A28A5000D41A8A;
 			remoteInfo = PNGImporter;
-		};
-		A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A2BD124A15A7EDFE000FAB95;
-			remoteInfo = VLCPlayer;
 		};
 		A2AF8FCC14DDCEBD005CAC5D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1107,6 +1103,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */,
 				A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */,
 				A29504781609724F00BB22AA /* TTFImporter.so in CopyFiles */,
 				A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */,
@@ -1626,6 +1623,8 @@
 		A2C66D9C13A2953D00C0AA8E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2C76D2814F196E900961680 /* StringBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuffer.cpp; sourceTree = "<group>"; };
 		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
+		A2C8E568175E86BE00863FA9 /* PathFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PathFormatter.h; sourceTree = "<group>"; };
+		A2C8E569175E86BE00863FA9 /* PathFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PathFormatter.m; sourceTree = "<group>"; };
 		A2C8E56B175E973F00863FA9 /* EmptyStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyStringTransformer.h; sourceTree = "<group>"; };
 		A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyStringTransformer.m; sourceTree = "<group>"; };
 		A2CB5AC115000A0D00B5C154 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
@@ -2210,6 +2209,8 @@
 				A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */,
 				A2C8E56B175E973F00863FA9 /* EmptyStringTransformer.h */,
 				A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */,
+				A2C8E568175E86BE00863FA9 /* PathFormatter.h */,
+				A2C8E569175E86BE00863FA9 /* PathFormatter.m */,
 				A2A3A7DE14A5130F00F705CF /* ios */,
 				A2BD82721396B886007E9C63 /* GemRB.cpp */,
 				A2A3A7D614A5030600F705CF /* mac */,
@@ -3320,8 +3321,6 @@
 			);
 			dependencies = (
 				A2FE2C8316F231CB00DDC6C7 /* PBXTargetDependency */,
-				A295047A1609725F00BB22AA /* PBXTargetDependency */,
-				A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */,
 				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
 				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
 				A23EBFFC1419A81500CC049E /* PBXTargetDependency */,
@@ -4343,6 +4342,7 @@
 			files = (
 				A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */,
 				A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */,
+				A2C8E56A175E86BE00863FA9 /* PathFormatter.m in Sources */,
 				A2C8E56D175E973F00863FA9 /* EmptyStringTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5265,15 +5265,15 @@
 			target = A2F0505013ABB80B0023B7EB /* SAVImporter */;
 			targetProxy = A23EBFFB1419A81500CC049E /* PBXContainerItemProxy */;
 		};
+		A272F8FC1762DE650048C004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2BD124A15A7EDFE000FAB95 /* VLCPlayer */;
+			targetProxy = A272F8FB1762DE650048C004 /* PBXContainerItemProxy */;
+		};
 		A295046D1609721300BB22AA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A2E66337139E875400310FC8 /* gemrb_core */;
 			targetProxy = A295046E1609721300BB22AA /* PBXContainerItemProxy */;
-		};
-		A295047A1609725F00BB22AA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A295046C1609721300BB22AA /* TTFImporter */;
-			targetProxy = A29504791609725F00BB22AA /* PBXContainerItemProxy */;
 		};
 		A295048716097E3700BB22AA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -5284,11 +5284,6 @@
 			isa = PBXTargetDependency;
 			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
 			targetProxy = A295049016097F9D00BB22AA /* PBXContainerItemProxy */;
-		};
-		A29F3EE415A8E6DE00C85084 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A2BD124A15A7EDFE000FAB95 /* VLCPlayer */;
-			targetProxy = A29F3EE315A8E6DE00C85084 /* PBXContainerItemProxy */;
 		};
 		A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
