@@ -927,6 +927,8 @@ bool Game::CheckForReplacementActor(int i)
 					error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
 				} else {
 					newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
+					newact->TalkCount = act->TalkCount;
+					newact->InteractCount = act->InteractCount;
 					CopyResRef(newact->Area, act->Area);
 					DelNPC(InStore(act), true);
 					return true;
