@@ -46,7 +46,7 @@ class AnimationFactory;
 class Sprite2D_BAM_Internal {
 public:
 	Sprite2D_BAM_Internal() { pal = 0; }
-	~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
+	~Sprite2D_BAM_Internal() { if (pal) { pal->release(); pal = 0; } }
 
 	Palette* pal;
 	bool RLE;

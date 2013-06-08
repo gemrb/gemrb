@@ -163,7 +163,7 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 		// without creating a local copy for this sprite?
 		Palette* pal = spr->GetPalette();
 		pal->CreateShadedAlphaChannel();
-		pal->Release();
+		pal->release();
 	}
 	return spr;
 }

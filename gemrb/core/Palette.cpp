@@ -62,7 +62,7 @@ void Palette::Brighten()
 Palette* Palette::Copy()
 {
 	Palette* pal = new Palette(col, alpha);
-	Release();
+	release();
 	return pal;
 }
 

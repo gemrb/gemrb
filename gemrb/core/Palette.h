@@ -65,11 +65,11 @@ public:
 	Color front; // Original colors used by core->CreatePalette()
 	Color back;
 
-	void IncRef() {
+	void acquire() {
 		refcount++;
 	}
 
-	void Release() {
+	void release() {
 		assert(refcount > 0);
 		if (!--refcount)
 			delete this;

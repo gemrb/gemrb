@@ -130,7 +130,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 				icon->SetPalette(pal_selected);
 				video->BlitSprite( icon, xOffs, yOffs, true, &r );
 				icon->SetPalette(pal);
-				pal->Release();
+				pal->release();
 			} else {
 				video->BlitSprite( icon, xOffs, yOffs, true, &r );
 			}

@@ -52,7 +52,7 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 	Sprite2D* first = af->GetFrameWithoutCycle(0);
 	Palette* pal = first->GetPalette();
 	SetPalette(pal);
-	pal->Release();
+	pal->release();
 	first->release();
 
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);

@@ -3740,7 +3740,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 		Palette* newpal = Picture->GetPalette()->Copy();
 		core->GetPalette( col1, 12, &newpal->col[4]);
 		Picture->SetPalette( newpal );
-		newpal->Release();
+		newpal->release();
 	}
 
 	btn->SetPicture( Picture );

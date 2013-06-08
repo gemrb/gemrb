@@ -138,13 +138,13 @@ void ControlAnimation::UpdateAnimation(bool paused)
 			palette->CreateShadedAlphaChannel();
 		}
 		pic->SetPalette(palette);
-		palette->Release();
+		palette->release();
 	} else {
 		if (is_blended) {
 			Palette* palette = pic->GetPalette();
 			palette->CreateShadedAlphaChannel();
 			pic->SetPalette(palette);
-			palette->Release();
+			palette->release();
 		}
 	}
 

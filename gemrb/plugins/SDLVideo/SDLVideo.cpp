@@ -430,7 +430,7 @@ Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 {
 	Sprite2D_BAM_Internal* data = new Sprite2D_BAM_Internal;
 
-	palette->IncRef();
+	palette->acquire();
 	data->pal = palette;
 	data->transindex = transindex;
 	data->flip_hor = false;
@@ -692,7 +692,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 			SetSurfacePalette(( SDL_Surface * )spr->vptr, (SDL_Color*)palette->col, 256);
 			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
 			SetSurfacePalette(( SDL_Surface * )spr->vptr, (SDL_Color*)tmpPal->col, 256);
-			tmpPal->Release();
+			tmpPal->release();
 		} else {
 			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
 		}

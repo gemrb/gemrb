@@ -87,7 +87,7 @@ Palette* Sprite2D::GetPalette() const
 	}
 
 	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
-	data->pal->IncRef();
+	data->pal->acquire();
 	return data->pal;
 }
 
@@ -98,8 +98,8 @@ void Sprite2D::SetPalette(Palette* pal)
 		core->GetVideoDriver()->SetPalette(vptr, pal);
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
-		data->pal->Release();
-		pal->IncRef();
+		data->pal->release();
+		pal->acquire();
 		data->pal = pal;
 	}
 }

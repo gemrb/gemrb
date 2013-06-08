@@ -68,7 +68,7 @@ static void ReleasePalette(void *poi)
 	//we allow nulls, but we shouldn't release them
 	if (!poi) return;
 	//as long as palette has its own refcount, this should be Release
-	((Palette *) poi)->Release();
+	((Palette *) poi)->release();
 }
 
 GEM_EXPORT GameData* gamedata;
@@ -271,7 +271,7 @@ void GameData::FreePalette(Palette *&pal, const ieResRef name)
 		if(pal->named) {
 			error("GameData", "Palette is supposed to be named, but got no name!\n");
 		} else {
-			pal->Release();
+			pal->release();
 			pal=NULL;
 		}
 		return;
@@ -284,7 +284,7 @@ void GameData::FreePalette(Palette *&pal, const ieResRef name)
 		error("Core", "Corrupted Palette cache encountered (reference count went below zero), Palette name is: %.8s\n", name);
 	}
 	if (!res) {
-		pal->Release();
+		pal->release();
 	}
 	pal = NULL;
 }

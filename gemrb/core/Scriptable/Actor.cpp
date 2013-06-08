@@ -620,7 +620,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
-			recover->IncRef();
+			recover->acquire();
 		}
 		delete( anims );
 	}

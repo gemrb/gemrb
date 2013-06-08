@@ -136,7 +136,7 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		Palette* palette = Picture2->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
 		Picture2->SetPalette(palette);
-		palette->Release();
+		palette->release();
 	}
 
 	Picture2->XPos = (short)frames[1]->XPos;
@@ -148,7 +148,7 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		Palette* palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
 		spr->SetPalette(palette);
-		palette->Release();
+		palette->release();
 	}
 
 	spr->XPos = (short)frames[0]->XPos;

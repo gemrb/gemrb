@@ -33,8 +33,8 @@
 namespace GemRB {
 
 #define SET_BLIT_PALETTE( palette )\
-if (palette != NULL) ((Palette*)palette)->IncRef();\
-if (blitPalette != NULL) blitPalette->Release();\
+if (palette != NULL) ((Palette*)palette)->acquire();\
+if (blitPalette != NULL) blitPalette->release();\
 blitPalette = palette;
 
 Font::Font()
@@ -624,14 +624,14 @@ void Font::SetName(const char* newName)
 Palette* Font::GetPalette() const
 {
 	assert(palette);
-	palette->IncRef();
+	palette->acquire();
 	return palette;
 }
 
 void Font::SetPalette(Palette* pal)
 {
-	if (pal) pal->IncRef();
-	if (palette) palette->Release();
+	if (pal) pal->acquire();
+	if (palette) palette->release();
 	palette = pal;
 }
 
