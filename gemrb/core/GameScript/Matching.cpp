@@ -528,6 +528,10 @@ Targets *XthNearestOf(Targets *parameters, int count, int ga_flags)
 
 	if (count<0) {
 		const targettype *t = parameters->GetLastTarget(ST_ACTOR);
+		if (!t) {
+			parameters->Clear();
+			return parameters;
+		}
 		origin = t->actor;
 	} else {
 		origin = parameters->GetTarget(count, ST_ACTOR);
