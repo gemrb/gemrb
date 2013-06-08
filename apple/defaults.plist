@@ -18,6 +18,8 @@
 	<integer>640</integer>
 	<key>Height</key>
 	<integer>480</integer>
+	<key>GameType</key>
+	<string>auto</string>
 	<key>AdditionalPaths</key>
 	<dict>
 		<key>CustomFontPath</key>

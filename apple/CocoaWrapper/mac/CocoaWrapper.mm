@@ -87,7 +87,22 @@ using namespace GemRB;
 
 	// Load default defaults
 	NSString* defaultsPath = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
-	NSDictionary* defaultDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPath];
+	NSMutableDictionary* defaultDict = [NSMutableDictionary dictionaryWithContentsOfFile:defaultsPath];
+
+	NSString* path = [[NSBundle mainBundle].resourcePath stringByAppendingFormat:@"/GUIScripts"];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	NSError* error = nil;
+	NSArray* items = [fm contentsOfDirectoryAtPath:path error:&error];
+
+	NSMutableArray* gameTypes = [NSMutableArray arrayWithObject:@"auto"];
+	for (NSString* subPath in items) {
+		BOOL isDir = NO;
+		if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@", path, subPath] isDirectory:&isDir] && isDir) {
+			[gameTypes addObject:[subPath lastPathComponent]];
+		}
+	}
+	[defaultDict setValue:gameTypes forKey:@"gameTypes"];
+
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults registerDefaults:defaultDict];
 
