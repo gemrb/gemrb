@@ -188,6 +188,7 @@ using namespace GemRB;
 	if ((status = core->Init(config)) == GEM_ERROR) {
 		delete config;
 		delete( core );
+		core = NULL;
 		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
 	} else {
 		[_configWindow close];
@@ -195,9 +196,11 @@ using namespace GemRB;
 		delete config;
 		core->Main();
 		delete( core );
-		// We must exit since the application runloop never returns.
+		core = NULL;
 
-		[NSApp terminate:self];
+		if ([defaults boolForKey:@"TerminateOnClose"]) {
+			[NSApp terminate:self];
+		}
 	}
 }
 

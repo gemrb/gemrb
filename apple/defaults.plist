@@ -20,6 +20,8 @@
 	<integer>480</integer>
 	<key>GameType</key>
 	<string>auto</string>
+	<key>TerminateOnClose</key>
+	<true/>
 	<key>AdditionalPaths</key>
 	<dict>
 		<key>CustomFontPath</key>
