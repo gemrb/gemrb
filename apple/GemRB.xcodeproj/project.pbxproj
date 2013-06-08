@@ -372,7 +372,6 @@
 		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
 		A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */; };
 		A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
-		A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C66D9C13A2953D00C0AA8E /* Python.framework */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
 		A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
@@ -1620,7 +1619,6 @@
 		A2BFA07D1395FF62006ADC12 /* WorldMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMap.h; sourceTree = "<group>"; };
 		A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMapMgr.cpp; sourceTree = "<group>"; };
 		A2BFA07F1395FF62006ADC12 /* WorldMapMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMapMgr.h; sourceTree = "<group>"; };
-		A2C66D9C13A2953D00C0AA8E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2C76D2814F196E900961680 /* StringBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuffer.cpp; sourceTree = "<group>"; };
 		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
 		A2C8E568175E86BE00863FA9 /* PathFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PathFormatter.h; sourceTree = "<group>"; };
@@ -1786,7 +1784,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A276B53013A28D0000D41A8A /* libgemrb_core.dylib in Frameworks */,
-				A2C66D9D13A2953D00C0AA8E /* Python.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2244,7 +2241,6 @@
 				A2830A0F13A05A64000A63FE /* OpenAL.framework */,
 				A2EC805F146055D80033754A /* OpenGLES.framework */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
-				A2C66D9C13A2953D00C0AA8E /* Python.framework */,
 				A2EC8062146056490033754A /* QuartzCore.framework */,
 				A2830A3F13A05B81000A63FE /* QuartzCore.framework */,
 				A2D0505014D0B06C00D8CD77 /* SDL.framework */,
@@ -5724,11 +5720,12 @@
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				HEADER_SEARCH_PATHS = (
-					/System/Library/Frameworks/Python.framework/Headers,
+					/System/Library/Frameworks/Python.framework/Versions/2.5/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
+				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.5/Python;
 				PRODUCT_NAME = GUIScript;
 			};
 			name = Debug;
@@ -5742,11 +5739,12 @@
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				HEADER_SEARCH_PATHS = (
-					/System/Library/Frameworks/Python.framework/Headers,
+					/System/Library/Frameworks/Python.framework/Versions/2.5/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
+				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.5/Python;
 				PRODUCT_NAME = GUIScript;
 			};
 			name = Release;
