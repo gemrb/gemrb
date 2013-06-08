@@ -169,7 +169,7 @@ using namespace GemRB;
 		} else if ([obj isKindOfClass:[NSString class]]) {
 			value = (NSString*)obj;
 		}
-		if (value) {
+		if (value && ![value isEqualToString:@""]) {
 			config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
 								[value cStringUsingEncoding:NSASCIIStringEncoding]);
 		}
