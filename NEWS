@@ -1,9 +1,11 @@
-GemRB git (4e7a891):
+GemRB git (47ec1f01):
   New features:
     - 
+    - utf-8 converter for dialog.tlk to be able to use any (cjk) font
 
   Improved features:
     - 
+    - animations, scripting, touch input
     - bugfixes
 
 GemRB v0.8.0 (2013-04-27):
