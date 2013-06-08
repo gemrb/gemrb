@@ -146,7 +146,8 @@ using namespace GemRB;
 	}
 	if (sender) {
 		// Note: use NSRunLoop over NSObject performSelector!
-		[[NSRunLoop mainRunLoop] performSelector:@selector(launchGame:) target:self argument:nil order:0 modes:@[NSDefaultRunLoopMode]];
+		NSArray* modes = [NSArray arrayWithObject:NSDefaultRunLoopMode];
+		[[NSRunLoop mainRunLoop] performSelector:@selector(launchGame:) target:self argument:nil order:0 modes:modes];
 		return;
 	}
 
