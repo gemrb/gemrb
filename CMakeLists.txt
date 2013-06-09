@@ -108,12 +108,14 @@ elseif (${LAYOUT} MATCHES "opt")
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
 	SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
 else (${LAYOUT} MATCHES "bundle") # Mac or iOS
+	SET(CMAKE_INSTALL_RPATH @loader_path/../Frameworks)
+	SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
 	# most paths are irrelevant since the items will be bundled with application
 	SET_PATH( BIN_DIR /Applications )
 	# TODO: these should be copied during build and not install.
-	SET_PATH( LIB_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Frameworks" )
 	SET_PATH( PLUGIN_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Plugins" )
 	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
+	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 endif (${LAYOUT} MATCHES "home")
 
 # check if this is a release version
