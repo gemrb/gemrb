@@ -965,6 +965,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order
 			ieDword Flags;
+			ieByte DifficultyMargin;
+
 			str->Read( DefaultName, 32);
 			DefaultName[32]=0;
 			str->ReadWord( &XPos );
@@ -973,7 +975,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &YDes );
 			str->ReadDword( &Flags );
 			str->ReadWord( &Spawned );
-			str->Seek( 6, GEM_CURRENT_POS );
+			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, TODO: purpose unknown (portraits?)
+			str->Read( &DifficultyMargin, 1 ); // iwd2 only
+			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
 			str->Seek( 4, GEM_CURRENT_POS );
@@ -1042,6 +1046,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					ab->SetMCFlag(MC_INVULNERABLE,BM_OR);
 				}
 			}
+			ab->DifficultyMargin = DifficultyMargin;
 
 			if (Dialog[0]) {
 				ab->SetDialog(Dialog);
@@ -1928,6 +1933,7 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
+	ieByte tmpByte;
 	ieDword CreatureOffset = EmbeddedCreOffset;
 	char filling[120];
 	unsigned int i;
@@ -1950,8 +1956,9 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		stream->WriteDword( &tmpDword); //used fields flag always 0 for saved areas
 		tmpWord = ac->Spawned;
 		stream->WriteWord( &tmpWord);
-		tmpWord = 0;
-		stream->WriteWord( &tmpWord);
+		stream->Write(filling, 1); // letter
+		tmpByte = ac->DifficultyMargin;
+		stream->Write( &tmpByte, 1 );
 		stream->WriteDword( &tmpDword); //actor animation, unused
 		tmpWord = ac->GetOrientation();
 		stream->WriteWord( &tmpWord);
