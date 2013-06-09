@@ -714,6 +714,7 @@ static const ActionLink actionnames[] = {
 	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
 	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
+	{"multiplayersync", GameScript::MultiPlayerSync, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING|AF_DIRECT|AF_ALIVE},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
 	{"nidspecial3", GameScript::Attack,AF_BLOCKING|AF_DIRECT|AF_ALIVE},//this hack is for attacking preset target

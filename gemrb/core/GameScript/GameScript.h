@@ -1191,6 +1191,7 @@ public:
 	static void MoveToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
 	static void MoveViewObject(Scriptable* Sender, Action* parameters);
+	static void MultiPlayerSync(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial2(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);

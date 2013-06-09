@@ -7145,4 +7145,9 @@ void GameScript::ChunkCreature(Scriptable *Sender, Action* parameters)
 	delete fx;
 }
 
+void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)
+{
+	Sender->SetWait(1);
+}
+
 }
