@@ -39,6 +39,7 @@ void destroyFT()
 {
 	if (library) {
 		FT_Done_FreeType( library );
+		library = NULL;
 	}
 }
 
