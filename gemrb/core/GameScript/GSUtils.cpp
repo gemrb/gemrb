@@ -275,7 +275,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	return ret;
 }
 
-bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname)
+bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -289,9 +289,18 @@ bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef it
 
 	STOItem *si = store->GetItem(idx, false);
 	memcpy( &item, si, sizeof( CREItem ) );
-	store->RemoveItem(idx);
-	//store changed, save it
-	gamedata->SaveStore(store);
+	if (item.MaxStackAmount) {
+		item.Usages[0] = count;
+	}
+	if (si->InfiniteSupply != -1) {
+		if (si->AmountInStock > count) {
+			si->AmountInStock -= count;
+		} else {
+			store->RemoveItem(idx);
+		}
+		//store changed, save it
+		gamedata->SaveStore(store);
+	}
 	return true;
 }
 
@@ -405,7 +414,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 }
 
 //finds and takes an item from a container in the given inventory
-bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname)
+bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
 {
 	int i=inventory->GetSlotCount();
 	while (i--) {
@@ -421,7 +430,7 @@ bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef i
 		if (!ret)
 			continue;
 		//the store is the same as the item's name
-		if (StoreGetItemCore(itemslot2, itemslot->ItemResRef, itemname)) {
+		if (StoreGetItemCore(itemslot2, itemslot->ItemResRef, itemname, count)) {
 			return true;
 		}
 	}
@@ -622,7 +631,8 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	if (!item) {
 		item = new CREItem();
 
-		if (!GetItemContainer(*item, myinv, resref)) {
+		if (count <= 0) count = 1;
+		if (!GetItemContainer(*item, myinv, resref, count)) {
 			delete item;
 			item = NULL;
 		}
