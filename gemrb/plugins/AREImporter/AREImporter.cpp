@@ -176,6 +176,23 @@ bool AREImporter::Open(DataStream* stream)
 	str->ReadWord( &WFog );
 	str->ReadWord( &WLightning );
 	str->ReadWord( &WUnknown );
+	AreaDifficulty = 0;
+	if (bigheader) {
+		// are9.1 difficulty bits for level2/level3
+		// TODO: there must be more advanced logic here for sure (guessing vs party level)
+		// ar4000 for example has a bunch of actors for all area difficulty levels, so these here are likely just the allowed levels
+		AreaDifficulty = 1;
+		ieByte tmp = 0;
+		str->Read( &tmp, 1);
+		if (tmp) {
+			AreaDifficulty = 2;
+		}
+		tmp = 0;
+		str->Read( &tmp, 1);
+		if (tmp) {
+			AreaDifficulty = 4;
+		}
+	}
 	//bigheader gap is here
 	str->Seek( 0x54 + bigheader, GEM_STREAM_START );
 	str->ReadDword( &ActorOffset );
@@ -333,6 +350,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	map->Lightning = WLightning;
 	map->AreaType = AreaType;
 	map->DayNight = day_or_night;
+	map->AreaDifficulty = AreaDifficulty;
 	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
 	strnlwrcpy( map->Dream[0], Dream1, 8);
 	strnlwrcpy( map->Dream[1], Dream2, 8);
@@ -1497,8 +1515,18 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 	stream->WriteWord( &map->Lightning);
 	stream->WriteWord( &tmpWord);
 
-	if (map->version==16) { //writing 16 bytes of 0's
-		stream->Write( Signature, 8);
+	if (map->version == 16) { //writing 14 bytes of 0's
+		char tmp[1] = { '0' };
+		if (map->AreaDifficulty == 2) {
+			tmp[0] = 1;
+		}
+		stream->Write( tmp, 1);
+		tmp[0] = 0;
+		if (map->AreaDifficulty == 4) {
+			tmp[0] = 1;
+		}
+		stream->Write( tmp, 1);
+		stream->Write( Signature, 6);
 		stream->Write( Signature, 8);
 	}
 

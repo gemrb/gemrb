@@ -381,6 +381,7 @@ public:
 
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
+	int AreaDifficulty;
 
 	//count of all projectiles that are saved
 	size_t GetProjectileCount(proIterator &iter);

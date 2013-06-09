@@ -58,6 +58,7 @@ private:
 	ieDword EffectOffset;
 	ieResRef Script;
 	ieResRef Dream1, Dream2; //only in ToB
+	ieByte AreaDifficulty;
 public:
 	AREImporter(void);
 	~AREImporter(void);
