@@ -725,6 +725,12 @@ void Map::UpdateScripts()
 			}
 		}
 
+		if (actor->GetStat(IE_AVATARREMOVAL)) {
+			actor->no_more_steps = true;
+			actor->ClearPath();
+			continue;
+		}
+
 		//FIXME: we need a better immobile hack, the actors used to retain their target
 		//and resume moving after the hold effect stopped
 		actor->no_more_steps = false;
