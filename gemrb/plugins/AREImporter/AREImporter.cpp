@@ -1045,6 +1045,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				if (Flags&AF_INVULNERABLE) {
 					ab->SetMCFlag(MC_INVULNERABLE,BM_OR);
 				}
+				if (!(Flags&AF_ENABLED)) {
+					// DifficultyMargin - only enable actors that are difficult enough vs the area difficulty
+					// 1 - area difficulty 1
+					// 2 - area difficulty 2
+					// 4 - area difficulty 3
+					if (!DifficultyMargin || (DifficultyMargin & map->AreaDifficulty)) {
+						//TODO: save AF_ENABLED instead, so if someone implements Imprisonment for iwd2, this won't interfere
+						ab->SetBase(IE_AVATARREMOVAL, 0);
+					} else {
+						// iwd2 has GF_START_ACTIVE off, but that only touches IF_IDLE
+						ab->SetBase(IE_AVATARREMOVAL, 1);
+					}
+				}
 			}
 			ab->DifficultyMargin = DifficultyMargin;
 
