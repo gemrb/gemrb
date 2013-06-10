@@ -1287,7 +1287,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	// Reading spellbook
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
-	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREKnownSpell *) );
+	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREMemorizedSpell *) );
 
 	str->Seek( KnownSpellsOffset+CREOffset, GEM_STREAM_START );
 	for (i = 0; i < KnownSpellsCount; i++) {
