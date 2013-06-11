@@ -162,9 +162,10 @@ namespace GemRB {
 #define  GF_IN_PARTY_ALLOWS_DEAD	72 //all except bg2
 #define  GF_ZERO_TIMER_IS_VALID         73 // how, not bg2, other unknown
 #define  GF_SKIPUPDATE_HACK             74 // how, not bg2
+#define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
 
 //update this or bad things can happen
-#define GF_COUNT 75
+#define GF_COUNT 76
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

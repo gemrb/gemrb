@@ -2376,6 +2376,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD
 		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
 		"SkipUpdateHack",     //74GF_SKIPUPDATE_HACK
+		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
