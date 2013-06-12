@@ -5925,6 +5925,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		strncpy(refs[1], fx->Resource2, sizeof(ieResRef));
 		strncpy(refs[2], fx->Resource3, sizeof(ieResRef));
 		strncpy(refs[3], fx->Resource4, sizeof(ieResRef));
+		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
+		ieResRef OldSpellResRef;
+		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 		for (i=0; i < 4; i++) {
 			if (!refs[i][0]) {
 				continue;
@@ -5942,8 +5945,13 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 					continue;
 				}
 			}
-			core->ApplySpell(refs[i], actor, Owner, fx->Power);
+			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
+			Owner->SetSpellResRef(refs[i]);
+			//cast spell on target
+			Owner->CastSpell(actor, false, true, true); //flags: deplete, instant, no interrupt
+			Owner->CastSpellEnd(fx->Power, 1); //flag: no casting animation
 		}
+		Owner->SetSpellResRef(OldSpellResRef);
 
 		if (fx->Parameter3) {
 			// Contingencies only run once, remove ourselves.
