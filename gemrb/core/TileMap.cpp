@@ -125,6 +125,9 @@ Door* TileMap::GetDoor(const Point &p) const
 		Gem_Polygon *doorpoly;
 
 		Door* door = doors[i];
+		if (door->Flags&DOOR_HIDDEN) {
+			continue;
+		}
 		if (door->Flags&DOOR_OPEN)
 			doorpoly = door->open;
 		else
