@@ -301,7 +301,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 // return true if the door isn't secret or if it is, but was already discovered
 bool Door::Visible()
 {
-	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND));
+	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
