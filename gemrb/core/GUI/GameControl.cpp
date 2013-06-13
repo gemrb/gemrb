@@ -1849,6 +1849,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
+	container->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 	actor->ClearPath();
 	actor->ClearActions();
 	strlcpy(Tmp, "UseContainer()", sizeof(Tmp));
@@ -1889,6 +1890,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		return;
 	}
 
+	door->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 	actor->ClearPath();
 	actor->ClearActions();
 	actor->TargetDoor = door->GetGlobalID();
