@@ -4281,7 +4281,7 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Inventory *inv = NULL;
-	switch (Sender->Type) {
+	switch (tar->Type) {
 		case ST_ACTOR:
 			inv = &(((Actor *) tar)->inventory);
 			break;
