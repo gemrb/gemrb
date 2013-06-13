@@ -438,6 +438,12 @@ values might cause problems. Its value should be 40 for IWD2, 25 for all
 other games.
 
 
+MeleeHeaderUsesProjectile = <bool>
+- - - - - - - - -
+Toggles whether melee hitting headers should use their set projectile or not.
+Disabled by default everywhere.
+
+
 NoDropCanMove = <bool>
 - - - - - - - - - - - -
 Toggles whether undroppable items can be moved around.
