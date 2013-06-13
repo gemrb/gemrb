@@ -484,6 +484,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Door *d;
 	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
 		d->Highlight = false;
+		if (d->Flags & DOOR_HIDDEN) {
+			continue;
+		}
 		if (overDoor == d) {
 			if (target_mode) {
 				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
