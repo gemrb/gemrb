@@ -40,6 +40,26 @@ Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixel
 	renderFlags = 0;
 }
 
+Sprite2D::Sprite2D(const Sprite2D &obj)
+{
+	BAM = false;
+	RefCount = 1;
+	vptr = obj.vptr; // TODO: vptr is deprecated
+
+	XPos = obj.XPos;
+	YPos = obj.YPos;
+	Width = obj.Width;
+	Height = obj.Height;
+	Bpp = obj.Bpp;
+
+	pixels = obj.pixels;
+}
+
+Sprite2D* Sprite2D::copy() const
+{
+	return new Sprite2D(*this);
+}
+
 Sprite2D::~Sprite2D()
 {
 }

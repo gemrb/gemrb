@@ -74,7 +74,10 @@ public:
 	bool BAM;
 	ieDword renderFlags;
 	const void* pixels;
+
 	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
+	Sprite2D(const Sprite2D &obj);
+	virtual Sprite2D* copy() const;
 	~Sprite2D();
 	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
 	Palette *GetPalette() const;
