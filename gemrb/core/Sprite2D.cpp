@@ -37,6 +37,7 @@ Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixel
 	YPos = 0;
 	RefCount = 1;
 	colorkey = 0;
+	renderFlags = 0;
 }
 
 Sprite2D::~Sprite2D()

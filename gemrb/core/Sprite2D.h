@@ -33,6 +33,9 @@
 #include "Palette.h"
 #include "TypeID.h"
 
+#define RENDER_FLIP_HORIZONTAL	0x00000001
+#define RENDER_FLIP_VERTICAL	0x00000002
+
 namespace GemRB {
 
 class AnimationFactory;
@@ -69,6 +72,7 @@ public:
 	/** Pointer to the Driver Video Structure */
 	void* vptr;
 	bool BAM;
+	ieDword renderFlags;
 	const void* pixels;
 	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
 	~Sprite2D();
