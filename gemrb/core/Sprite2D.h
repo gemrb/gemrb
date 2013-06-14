@@ -62,6 +62,8 @@ public:
 class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
+protected:
+	ieDword colorkey;
 public:
 	int XPos, YPos, Width, Height, Bpp;
 	/** Pointer to the Driver Video Structure */
@@ -74,6 +76,8 @@ public:
 	Palette *GetPalette() const;
 	void SetPalette(Palette *pal);
 	Color GetPixel(unsigned short x, unsigned short y) const;
+	virtual ieDword GetColorKey() const;
+	virtual void SetColorKey(ieDword ck);
 public: // public only for SDLVideo
 	int RefCount;
 public:
