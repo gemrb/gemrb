@@ -44,38 +44,8 @@ Sprite2D::~Sprite2D()
 
 bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 {
-	if (x >= Width || y >= Height) return true;
-
-	if (!BAM) {
-		return core->GetVideoDriver()->GetPixel(vptr, x, y)==0;
-	}
-
-	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
-
-	if (data->flip_ver)
-		y = Height - y - 1;
-	if (data->flip_hor)
-		x = Width - x - 1;
-
-	int skipcount = y * Width + x;
-
-	const ieByte* rle = (const ieByte*)pixels;
-	if (data->RLE) {
-		while (skipcount > 0) {
-			if (*rle++ == data->transindex)
-				skipcount -= (*rle++)+1;
-			else
-				skipcount--;
-		}
-	} else {
-		// uncompressed
-		rle += skipcount;
-		skipcount = 0;
-	}
-	if (skipcount < 0 || *rle == data->transindex)
-		return true;
-
-	return false;
+	// TODO: this wont work for non-bam sprites, but it isn't used for any currently.
+	return GetPixel(x, y).a == 0;
 }
 
 /** Get the Palette of a Sprite */
