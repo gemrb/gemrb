@@ -269,24 +269,14 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) c
 	for (int i=0; i< header->FeatureCount; i++) {
 		Effect *fx = header->features+i;
 		if (fx->Opcode == damage_opcode) {
-			// it's not the same damagetype, these are different values, so we need a translation
+			// damagetype is the same as in dmgtype.ids but GemRB uses those values
+			// shifted by two bytes
 			// 0-3 -> 0 (crushing)
 			// 2^16+[0-3] -> 1 (acid)
 			// 2^17+[0-3] -> 2 (cold)
 			// 2^18+[0-3] -> 4 (electricity)
 			// and so on. Should be fine up until DAMAGE_MAGICFIRE, where we may start making wrong lookups
-			ieDword damagetype = fx->Parameter2;
-			if (damagetype < 4) {
-				damagetype = 0;
-			} else {
-				// 2^(log2(damagetype)-15-1)
-				int pow = 0;
-				while (damagetype) {
-					damagetype = damagetype>>1;
-					pow++;
-				}
-				damagetype = 1<<(pow - 17);
-			}
+			ieDword damagetype = fx->Parameter2 >> 16;
 			it = core->DamageInfoMap.find(damagetype);
 			if (it == core->DamageInfoMap.end()) {
 				print("Unhandled damagetype: %d", damagetype);

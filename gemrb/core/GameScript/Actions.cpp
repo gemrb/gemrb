@@ -4631,7 +4631,7 @@ void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)
 	} else {
 		damager=damagee;
 	}
-	damagee->Damage(parameters->int0Parameter, parameters->int1Parameter, damager);
+	damagee->Damage(parameters->int0Parameter, parameters->int1Parameter >> 16, damager);
 }
 
 void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
@@ -4649,9 +4649,9 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 		damager=damagee;
 	}
 	//this, if the percent is calculated from the current hp
-	damagee->Damage((parameters->int0Parameter*damagee->Modified[IE_HITPOINTS])/100, parameters->int1Parameter, damager);
+	damagee->Damage((parameters->int0Parameter*damagee->Modified[IE_HITPOINTS])/100, parameters->int1Parameter >> 16, damager);
 	//this, if the percent is calculated from the max hp
-	//damagee->Damage(parameters->int0Parameter, parameters->int1Parameter, damager, MOD_PERCENT);
+	//damagee->Damage(parameters->int0Parameter, parameters->int1Parameter >> 16, damager, MOD_PERCENT);
 }
 
 void GameScript::Damage(Scriptable* Sender, Action* parameters)
