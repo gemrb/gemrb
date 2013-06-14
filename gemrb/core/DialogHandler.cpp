@@ -47,6 +47,7 @@ DialogHandler::DialogHandler(void)
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
+	initialState = -1;
 	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) ) {
 		memcpy(sectionMap, bg2Sections, sizeof(sectionMap) );
 	} else {
@@ -114,8 +115,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return true;
 	}
 
-	int si = dlg->FindFirstState( tgt );
-	if (si < 0) {
+	initialState = dlg->FindFirstState( tgt );
+	if (initialState < 0) {
 		return false;
 	}
 
@@ -218,7 +219,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	if (choose == (unsigned int) -1) {
 		//increasing talkcount after top level condition was determined
 
-		si = dlg->FindFirstState( tgt );
+		si = initialState;
 		if (si<0) {
 			EndDialog();
 			return;

@@ -37,6 +37,7 @@ private:
 private:
 	DialogState* ds;
 	Dialog* dlg;
+	int initialState;
 public:
 	ieDword speakerID;
 	ieDword targetID;
