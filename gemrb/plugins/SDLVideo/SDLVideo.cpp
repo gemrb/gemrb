@@ -400,8 +400,7 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
 				rMask, gMask, bMask, aMask );
 	if (cK) {
-		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-			index );
+		SDL_SetColorKey( p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index );
 	}
 	return new Sprite2D(w, h, bpp, p, pixels);
 }
@@ -416,9 +415,9 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	} else {
 		colorcount = 16;
 	}
-	SetSurfacePalette( ( SDL_Surface * ) p, ( SDL_Color * ) palette, colorcount );
+	SetSurfacePalette( p, ( SDL_Color * ) palette, colorcount );
 	if (cK) {
-		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY, index );
+		SDL_SetColorKey( p, SDL_SRCCOLORKEY, index );
 	}
 	return new Sprite2D(w, h, bpp, p, pixels);
 }
