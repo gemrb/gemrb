@@ -664,6 +664,8 @@
 		A2E9967814DE05590052BABE /* ZLibManager.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4AF13A28AEE00D41A8A /* ZLibManager.so */; };
 		A2E9967914DE05590052BABE /* STOImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B4F413A28C0400D41A8A /* STOImporter.so */; };
 		A2E9967A14DE05590052BABE /* SAVImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F0505113ABB80B0023B7EB /* SAVImporter.so */; };
+		A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */; };
+		A2EC2F91176BD28E00FD960E /* BAMSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */; };
 		A2EC8059145F9E6E0033754A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8058145F9E6E0033754A /* Foundation.framework */; };
 		A2EC805B1460556B0033754A /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC805A1460556B0033754A /* OpenAL.framework */; };
 		A2EC805D1460559C0033754A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC805C1460559C0033754A /* CoreAudio.framework */; };
@@ -1661,6 +1663,8 @@
 		A2E27EF616EEA7B00079E104 /* InterfaceConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterfaceConfig.h; sourceTree = "<group>"; };
 		A2E27EFB16F12B5A0079E104 /* GemRB.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GemRB.xib; path = CocoaWrapper/mac/nibs/GemRB.xib; sourceTree = "<group>"; };
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMSprite2D.cpp; sourceTree = "<group>"; };
+		A2EC2F8F176BD28E00FD960E /* BAMSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMSprite2D.h; sourceTree = "<group>"; };
 		A2EC8058145F9E6E0033754A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805A1460556B0033754A /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805C1460559C0033754A /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
@@ -2358,6 +2362,8 @@
 				A28D24A3143C24E500A27897 /* BAMFontManager.h */,
 				A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */,
 				A27B86AE139F0A7D0002DC13 /* BAMImporter.h */,
+				A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */,
+				A2EC2F8F176BD28E00FD960E /* BAMSprite2D.h */,
 			);
 			path = BAMImporter;
 			sourceTree = "<group>";
@@ -4700,6 +4706,7 @@
 				A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */,
 				A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */,
 				A2A2EA3016A5EB4C0092B903 /* BAMFont.cpp in Sources */,
+				A2EC2F91176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4902,6 +4909,7 @@
 				A2A2EA2F16A5EB4C0092B903 /* BAMFont.cpp in Sources */,
 				A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */,
 				A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */,
+				A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

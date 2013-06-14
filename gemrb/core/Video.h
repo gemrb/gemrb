@@ -136,11 +136,6 @@ public:
 		bool cK = false, int index = 0) = 0;
 	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSpriteBAM8(int /*w*/, int /*h*/, bool /* RLE */,
-		 const unsigned char* /*pixeldata*/,
-		 AnimationFactory* /*datasrc*/,
-		 Palette* /*palette*/,
-		 int /*transindex*/) { return 0; }
 	virtual bool SupportsBAMSprites() { return false; }
 	virtual void FreeSprite(Sprite2D* &spr) = 0;
 	virtual Sprite2D* DuplicateSprite(const Sprite2D* spr) = 0;

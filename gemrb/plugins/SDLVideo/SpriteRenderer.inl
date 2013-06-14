@@ -780,8 +780,7 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
 {
 	bool RLE = false;
 	if (spr->BAM) {
-		Sprite2D_BAM_Internal *data = (Sprite2D_BAM_Internal*)spr->vptr;
-		RLE = data->RLE;
+		RLE = spr->RLE;
 	} else {
 		// Not BAM -> not RLE.
 	}

@@ -423,27 +423,6 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	return new Sprite2D(w, h, bpp, p, pixels);
 }
 
-Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
-				const unsigned char* pixeldata,
-				AnimationFactory* datasrc,
-				Palette* palette, int transindex)
-{
-	Sprite2D_BAM_Internal* data = new Sprite2D_BAM_Internal;
-
-	palette->acquire();
-	data->pal = palette;
-	data->transindex = transindex;
-	data->flip_hor = false;
-	data->flip_ver = false;
-	data->RLE = rle;
-	data->source = datasrc;
-	datasrc->IncDataRefCount();
-
-	Sprite2D* spr = new Sprite2D(w, h, 8 /* FIXME!!!! */, data, pixeldata);
-	spr->BAM = true;
-	return spr;
-}
-
 void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 {
 	if(!spr)
@@ -455,12 +434,9 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 	}
 
 	if (spr->BAM) {
-		if (spr->vptr) {
-			Sprite2D_BAM_Internal* tmp = (Sprite2D_BAM_Internal*)spr->vptr;
-			tmp->source->DecDataRefCount();
-			delete tmp;
-			// this delete also calls Release() on the used palette
-		}
+		// currently in the process of removing vptr, but it needs to be set for some methods to work
+		// so i am setting it to the object itself for bam sprites for now
+		assert(spr->vptr == spr);
 	} else {
 		if (spr->vptr) {
 			SDL_FreeSurface( ( SDL_Surface * ) spr->vptr );
@@ -486,17 +462,7 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 						newpixels, tmp->format->palette->colors, true, 0);
 		SDL_UnlockSurface( tmp );
 	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*) sprite->vptr;
-		const unsigned char * rledata;
-
-		rledata = (const unsigned char*) sprite->pixels;
-
-		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
-								rledata, data->source, data->pal,
-								data->transindex);
-		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
-		destdata->flip_ver = data->flip_ver;
-		destdata->flip_hor = data->flip_hor;
+		dest = sprite->copy();
 	}
 
 	return dest;
@@ -697,8 +663,6 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
 		}
 	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
 
 		Region finalclip = computeClipRect(backBuf, clip, tx, ty, spr->Width, spr->Height);
@@ -708,21 +672,25 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 
 		SDL_LockSurface(backBuf);
 
-		Palette* pal = (palette) ? palette : data->pal;
+		Palette* pal = palette;
+		if (!pal) {
+			pal = spr->GetPalette();
+			pal->release();
+		}
 		SRShadow_Regular shadow;
 
 		if (pal->alpha) {
 			SRTinter_NoTint<true> tinter;
 			SRBlender_Alpha blender;
 
-			BlitSpritePAL_dispatch(false, data->flip_hor,
-			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
+			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, (spr->renderFlags&RENDER_FLIP_VERTICAL), finalclip, (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		} else {
 			SRTinter_NoTint<false> tinter;
 			SRBlender_NoAlpha blender;
 
-			BlitSpritePAL_dispatch(false, data->flip_hor,
-			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, data->flip_ver, finalclip, (Uint8)data->transindex, 0, spr, 0, shadow, tinter, blender);
+			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
+			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, (spr->renderFlags&RENDER_FLIP_VERTICAL), finalclip, (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
 
 		SDL_UnlockSurface(backBuf);
@@ -738,9 +706,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	assert(spr);
 	if (!spr->vptr) return;
 
-	// WARNING: this pointer is only valid with BAM sprites
-	Sprite2D_BAM_Internal* data = NULL;
-
 	if (!spr->BAM) {
 		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
 		if (surf->format->BytesPerPixel != 4 && surf->format->BytesPerPixel != 1) {
@@ -750,9 +715,10 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 			return;
 		}
 	} else {
-		data = (Sprite2D_BAM_Internal*)spr->vptr;
-		if (!palette)
-			palette = data->pal;
+		if (!palette) {
+			palette = spr->GetPalette();
+			palette->release(); // GetPalette increases the ref count
+		}
 	}
 
 	// global tint
@@ -817,8 +783,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 	SDL_LockSurface(backBuf);
 
-	bool hflip = spr->BAM ? data->flip_hor : false;
-	bool vflip = spr->BAM ? data->flip_ver : false;
+	bool hflip = spr->BAM ? (spr->renderFlags&RENDER_FLIP_HORIZONTAL) : false;
+	bool vflip = spr->BAM ? (spr->renderFlags&RENDER_FLIP_VERTICAL) : false;
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 
@@ -834,7 +800,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_Tint<false, false> tinter(tint);
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_TRANSSHADOW)) {
 
@@ -842,7 +808,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_Tint<false, false> tinter(tint);
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_NOSHADOW)) {
 
@@ -850,7 +816,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_Tint<false, false> tinter(tint);
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == BLIT_HALFTRANS) {
 
@@ -858,7 +824,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_NoTint<false> tinter;
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == 0) {
 
@@ -866,7 +832,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_NoTint<false> tinter;
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM) {
 		// handling the following effects with conditionals:
@@ -894,24 +860,24 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 				SRTinter_Flags<true> tinter(tint);
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<true> tinter;
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			}
 		} else {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<false> tinter(tint);
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<false> tinter;
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)data->transindex, cover, spr, remflags, shadow, tinter, blender);
+				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			}
 
 		}
@@ -1021,7 +987,7 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 void SDLVideoDriver::SetPalette(void *data, Palette* pal)
 {
 	SDL_Surface* sur = ( SDL_Surface* ) data;
-	SetSurfacePalette(sur, ( SDL_Color * ) pal->col, 256);
+	SetSurfacePalette(sur, ( SDL_Color * ) pal->col, sizeof(pal->col) / 4);
 }
 
 void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
@@ -1661,8 +1627,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool Mirr
 			}
 		}
 	} else {
-		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
-		destdata->flip_ver = !destdata->flip_ver;
+		dest->renderFlags |= RENDER_FLIP_VERTICAL;
 	}
 
 	dest->XPos = sprite->XPos;
@@ -1694,8 +1659,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(const Sprite2D* sprite, bool Mi
 			}
 		}
 	} else {
-		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
-		destdata->flip_hor = !destdata->flip_hor;
+		dest->renderFlags |= RENDER_FLIP_HORIZONTAL;
 	}
 
 	if (MirrorAnchor)

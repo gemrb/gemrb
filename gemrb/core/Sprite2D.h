@@ -46,22 +46,6 @@ class AnimationFactory;
  * Objects of this class are usually created by Video driver.
  */
 
-class Sprite2D_BAM_Internal {
-public:
-	Sprite2D_BAM_Internal() { pal = 0; }
-	~Sprite2D_BAM_Internal() { if (pal) { pal->release(); pal = 0; } }
-
-	Palette* pal;
-	bool RLE;
-	int transindex;
-	bool flip_hor;
-	bool flip_ver;
-
-	// The AnimationFactory in which the data for this sprite is stored.
-	// (Used for refcounting of the data.)
-	AnimationFactory* source;
-};
-
 class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
@@ -72,17 +56,19 @@ public:
 	/** Pointer to the Driver Video Structure */
 	void* vptr;
 	bool BAM;
+	bool RLE; // in theory this could apply to more than BAMs, but currently does not.
 	ieDword renderFlags;
 	const void* pixels;
 
 	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
 	Sprite2D(const Sprite2D &obj);
 	virtual Sprite2D* copy() const;
-	~Sprite2D();
+	virtual ~Sprite2D();
+
 	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
-	Palette *GetPalette() const;
-	void SetPalette(Palette *pal);
-	Color GetPixel(unsigned short x, unsigned short y) const;
+	virtual Palette *GetPalette() const;
+	virtual void SetPalette(Palette *pal);
+	virtual Color GetPixel(unsigned short x, unsigned short y) const;
 	virtual ieDword GetColorKey() const;
 	virtual void SetColorKey(ieDword ck);
 public: // public only for SDLVideo
