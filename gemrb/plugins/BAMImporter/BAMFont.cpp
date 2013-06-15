@@ -55,7 +55,7 @@ BAMFont::BAMFont(AnimationFactory* af, int* baseline)
 	pal->release();
 	first->release();
 
-	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
+	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
 }
 
 BAMFont::~BAMFont()

@@ -153,8 +153,8 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 	} else {
 		void* pixels = GetFramePixels(findex);
 		spr = core->GetVideoDriver()->CreateSprite8(
-			frames[findex].Width, frames[findex].Height, 8,
-			pixels, palette->col, true, 0 );
+			frames[findex].Width, frames[findex].Height,
+			pixels, palette, true, 0 );
 	}
 
 	spr->XPos = (ieWordSigned)frames[findex].XPos;
@@ -287,7 +287,7 @@ Sprite2D* BAMImporter::GetPalette()
 	for (int i = 0; i < 256; i++) {
 		*p++ = ( unsigned char ) i;
 	}
-	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
+	return core->GetVideoDriver()->CreateSprite8( 16, 16, pixels, palette );
 }
 
 #include "BAMFontManager.h"

@@ -87,8 +87,10 @@ public:
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);
-	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
-		void* palette, bool cK = false, int index = 0);
+	Sprite2D* CreateSprite8(int w, int h, void* pixels,
+							Palette* palette, bool cK, int index);
+	Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+								   Color* palette, bool cK = false, int index = 0);
 	bool SupportsBAMSprites() { return true; }
 	void FreeSprite(Sprite2D* &spr);
 	Sprite2D* DuplicateSprite(const Sprite2D* spr);

@@ -393,29 +393,28 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly
 	}
 }
 
-
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
 	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
-				rMask, gMask, bMask, aMask );
+											  rMask, gMask, bMask, aMask );
 	if (cK) {
 		SDL_SetColorKey( p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index );
 	}
 	return new Sprite2D(w, h, bpp, p, pixels);
 }
 
-Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
-	void* palette, bool cK, int index)
+Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
+										Palette* palette, bool cK, int index)
+{
+	return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
+}
+
+Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+											   Color* palette, bool cK, int index)
 {
 	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, 8, w, 0, 0, 0, 0 );
-	int colorcount;
-	if (bpp == 8) {
-		colorcount = 256;
-	} else {
-		colorcount = 16;
-	}
-	SetSurfacePalette( p, ( SDL_Color * ) palette, colorcount );
+	SetSurfacePalette( p, (SDL_Color*)palette, 0x01 << bpp );
 	if (cK) {
 		SDL_SetColorKey( p, SDL_SRCCOLORKEY, index );
 	}
@@ -457,8 +456,8 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 
 		SDL_LockSurface( tmp );
 		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
-		dest = CreateSprite8(sprite->Width, sprite->Height, 8,
-						newpixels, tmp->format->palette->colors, true, 0);
+		dest = CreatePalettedSprite(sprite->Width, sprite->Height, 8, newpixels,
+									(Color*)tmp->format->palette->colors, true, 0);
 		SDL_UnlockSurface( tmp );
 	} else {
 		dest = sprite->copy();
