@@ -58,7 +58,6 @@ static int SLOT_ARMOR = -1;
 
 //IWD2 style slots
 static bool IWD2 = false;
-static int MagicBit = 0;
 
 static void InvalidSlot(int slot)
 {
@@ -75,7 +74,7 @@ inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
 	return gamedata->GetItem(item->ItemResRef);
 }
 
-void Inventory::Init(int mb)
+void Inventory::Init()
 {
 	SLOT_MAGIC=-1;
 	SLOT_FIST=-1;
@@ -89,7 +88,6 @@ void Inventory::Init(int mb)
 	SLOT_ARMOR=-1;
 	//TODO: set this correctly
 	IWD2 = false;
-	MagicBit = mb;
 }
 
 Inventory::Inventory()
@@ -178,35 +176,10 @@ void Inventory::CalculateWeight() const
 		if (slot->Weight == -1) {
 			Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 			if (itm) {
-				//simply adding the item flags to the slot
-				slot->Flags |= (itm->Flags<<8);
-				//some slot flags might be affected by the item flags
-				if (!(slot->Flags & IE_INV_ITEM_CRITICAL)) {
-					slot->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-				}
-				//this is for converting IWD items magic flag
-				if (MagicBit) {
-					if (slot->Flags&IE_INV_ITEM_UNDROPPABLE) {
-						slot->Flags|=IE_INV_ITEM_MAGICAL;
-						slot->Flags&=~IE_INV_ITEM_UNDROPPABLE;
-					}
-				}
-
-				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
-					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
-				}
-
-				if (slot->Flags & IE_INV_ITEM_STOLEN2) {
-					slot->Flags |= IE_INV_ITEM_STOLEN;
-				}
-
 				slot->Weight = itm->Weight;
-
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
-			}
-			else {
-				Log(ERROR, "Inventory", "Invalid item: %s!",
-					slot->ItemResRef);
+			} else {
+				Log(ERROR, "Inventory", "Invalid item: %s!", slot->ItemResRef);
 				slot->Weight = 0;
 			}
 		} else {

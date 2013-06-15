@@ -117,6 +117,8 @@ static ieWord IDT_CRITRANGE = 1;
 static ieWord IDT_CRITMULTI = 2;
 static ieWord IDT_SKILLPENALTY = 3;
 
+static int MagicBit = 0;
+
 Interface::Interface()
 	: TLKEncoding()
 {
@@ -260,6 +262,7 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
+	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
 }
@@ -4261,7 +4264,7 @@ bool Interface::InitItemTypes()
 	}
 
 	//slottype describes the inventory structure
-	Inventory::Init(HasFeature(GF_MAGICBIT));
+	Inventory::Init();
 	AutoTable st("slottype");
 	if (slottypes) {
 		free(slottypes);
@@ -4858,6 +4861,28 @@ void Interface::SanitizeItem(CREItem *item) const
 			} else {
 				item->Usages[i] = 0;
 			}
+		}
+
+		//simply adding the item flags to the slot
+		item->Flags |= (itm->Flags<<8);
+		//some slot flags might be affected by the item flags
+		if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
+			item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
+		}
+		//this is for converting IWD items magic flag
+		if (MagicBit) {
+			if (item->Flags&IE_INV_ITEM_UNDROPPABLE) {
+				item->Flags|=IE_INV_ITEM_MAGICAL;
+				item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
+			}
+		}
+
+		if (!(item->Flags & IE_INV_ITEM_MOVABLE)) {
+			item->Flags |= IE_INV_ITEM_UNDROPPABLE;
+		}
+
+		if (item->Flags & IE_INV_ITEM_STOLEN2) {
+			item->Flags |= IE_INV_ITEM_STOLEN;
 		}
 
 		//auto identify basic items

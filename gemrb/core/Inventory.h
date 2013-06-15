@@ -335,7 +335,7 @@ public:
 	/** tries to merge the passed item with the on in the passed slot */
 	int MergeItems(int slot, CREItem *item);
 	//setting important constants
-	static void Init(int mb);
+	static void Init();
 	static void SetArmorSlot(int arg);
 	static void SetHeadSlot(int arg);
 	static void SetFistSlot(int arg);
