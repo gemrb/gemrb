@@ -562,8 +562,6 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 	const Region* clip, Palette* palette)
 {
-	if (!spr->vptr) return;
-
 	int tx = x - spr->XPos;
 	int ty = y - spr->YPos;
 	if (!anchor) {
@@ -615,17 +613,14 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 			srect = &t;
 
 		}
+		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (palette) {
-			// FIXME: casting away const to temporarily change the palette for the
-			// blit opperation. this is no diffrent than what we did before with the
-			// vptr, and the end result leavs the sprite unchanged, but is there a better way?
-			Palette* tmpPal = spr->GetPalette();
-			((Sprite2D*)spr)->SetPalette(palette);
-			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
-			((Sprite2D*)spr)->SetPalette(tmpPal);
-			tmpPal->release();
+			SDL_Color* palColors = (SDL_Color*)spr->GetPaletteColors();
+			SDLSurfaceSprite2D::SetSurfacePalette(surf, (SDL_Color*)palette->col);
+			SDL_BlitSurface( surf, srect, backBuf, &drect );
+			SDLSurfaceSprite2D::SetSurfacePalette(surf, palColors);
 		} else {
-			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
+			SDL_BlitSurface( surf, srect, backBuf, &drect );
 		}
 	} else {
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
@@ -669,10 +664,9 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		const Region* clip, bool anchor)
 {
 	assert(spr);
-	if (!spr->vptr) return;
 
 	if (!spr->BAM) {
-		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
+		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (surf->format->BytesPerPixel != 4 && surf->format->BytesPerPixel != 1) {
 			// TODO...
 			Log(ERROR, "SDLVideo", "BlitGameSprite not supported for this sprite");
@@ -881,8 +875,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		}
 
 		const Color *col = 0;
-
-		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
+		const SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (surf->format->BytesPerPixel == 1) {
 
 			if (remflags & BLIT_TINTED)
@@ -942,8 +935,8 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	SDL_Rect src = {(Sint16)r.x, (Sint16)r.y, (Uint16)r.w, (Uint16)r.h};
 
 	void* pixels = malloc( Width * Height * 3 );
-	Sprite2D* screenshot = CreateSprite( Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels, false, 0 );
-	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, (SDL_Surface*)screenshot->vptr, NULL);
+	SDLSurfaceSprite2D* screenshot = (SDLSurfaceSprite2D*)CreateSprite( Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels);
+	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, (SDL_Surface*)screenshot->GetSurface(), NULL);
 
 	return screenshot;
 }
@@ -1001,7 +994,7 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 		return;
 	}
 
-	SDL_Surface* surf = ( SDL_Surface* ) sprite->vptr;
+	SDL_Surface* surf = ((SDLSurfaceSprite2D*)sprite)->GetSurface();
 	SDL_Rect drect = {
 		(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h
 	};
@@ -1519,7 +1512,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 
 Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 {
-	if (!sprite || !sprite->vptr)
+	if (!sprite)
 		return NULL;
 
 	Sprite2D* dest = DuplicateSprite(sprite);
@@ -1553,7 +1546,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool Mirr
 //   flips its anchor (i.e. origin//base point) as well
 Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAnchor)
 {
-	if (!sprite || !sprite->vptr)
+	if (!sprite)
 		return NULL;
 
 	Sprite2D* dest = DuplicateSprite(sprite);

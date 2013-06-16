@@ -53,14 +53,13 @@ private:
 	int RefCount;
 public:
 	int XPos, YPos, Width, Height, Bpp;
-	/** Pointer to the Driver Video Structure */
-	void* vptr;
+
 	bool BAM;
 	bool RLE; // in theory this could apply to more than BAMs, but currently does not.
 	ieDword renderFlags;
 	const void* pixels;
 
-	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
+	Sprite2D(int Width, int Height, int Bpp, const void* pixels);
 	Sprite2D(const Sprite2D &obj);
 	virtual Sprite2D* copy() const = 0;
 	virtual ~Sprite2D();

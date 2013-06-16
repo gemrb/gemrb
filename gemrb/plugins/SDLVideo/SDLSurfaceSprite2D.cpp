@@ -27,11 +27,10 @@
 namespace GemRB {
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels)
-	: Sprite2D(Width, Height, Bpp, NULL, pixels)
+	: Sprite2D(Width, Height, Bpp, pixels)
 {
 	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   0, 0, 0, 0 );
-	vptr = surface;
 	freePixels = true;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_SetSurfaceRLE(surface, SDL_TRUE);
@@ -40,11 +39,10 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pix
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pixels,
 										Uint32 rmask, Uint32 gmask, Uint32 bmask, Uint32 amask)
-	: Sprite2D(Width, Height, Bpp, NULL, pixels)
+	: Sprite2D(Width, Height, Bpp, pixels)
 {
 	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   rmask, gmask, bmask, amask );
-	vptr = surface;
 	freePixels = true;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_SetSurfaceRLE(surface, SDL_TRUE);
@@ -57,7 +55,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
 	pixels = surface->pixels;
 	freePixels = false;
-	vptr = surface;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_SetSurfaceRLE(surface, SDL_TRUE);
 #endif

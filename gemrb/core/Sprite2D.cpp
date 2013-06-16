@@ -29,8 +29,8 @@ namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels)
-	: Width(Width), Height(Height), Bpp(Bpp), vptr(vptr), pixels(pixels)
+Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
+	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
 {
 	BAM = false;
 	XPos = 0;
@@ -43,7 +43,6 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 {
 	BAM = false;
 	RefCount = 1;
-	vptr = obj.vptr; // TODO: vptr is deprecated
 
 	XPos = obj.XPos;
 	YPos = obj.YPos;

@@ -27,7 +27,7 @@ namespace GemRB {
 BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
 						 bool rle, AnimationFactory* datasrc,
 						 Palette* palette, ieDword ck)
-	: Sprite2D(Width, Height, 8, NULL, pixels)
+	: Sprite2D(Width, Height, 8, pixels)
 {
 	palette->acquire();
 	pal = palette;
@@ -36,7 +36,6 @@ BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
 	source = datasrc;
 	datasrc->IncDataRefCount();
 	BAM = true;
-	vptr = this;
 }
 
 BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
@@ -52,7 +51,6 @@ BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	source = obj.source;
 	source->IncDataRefCount();
 	BAM = true;
-	vptr = this;
 }
 
 BAMSprite2D* BAMSprite2D::copy() const
