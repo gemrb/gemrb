@@ -676,7 +676,7 @@ static const ActionLink actionnames[] = {
 	{"leavearealua", GameScript::LeaveAreaLUA, 0},
 	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,AF_BLOCKING},
 	{"leavearealuapanic", GameScript::LeaveAreaLUAPanic, 0},
-	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry,AF_BLOCKING},
+	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry, 0},
 	{"leaveparty", GameScript::LeaveParty, 0},
 	{"lock", GameScript::Lock, 0},//key not checked at this time!
 	{"lockscroll", GameScript::LockScroll, 0},
