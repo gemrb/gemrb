@@ -72,6 +72,8 @@ public:
 	virtual Color GetPixel(unsigned short x, unsigned short y) const = 0;
 	virtual ieDword GetColorKey() const = 0;
 	virtual void SetColorKey(ieDword ck) = 0;
+	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
+							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
 
 	void acquire() { ++RefCount; }
 	void release();

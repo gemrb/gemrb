@@ -951,19 +951,14 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 {
 	if (!sprite->BAM) {
-		SDL_Surface* ss = ( SDL_Surface* ) sprite->vptr;
+		// TODO: is this really true and if so should we move this to SDLSurfaceSprite2D::ConvertFormatTo()?
+		SDL_Surface* ss = ((SDLSurfaceSprite2D*)sprite)->GetSurface();
 		if (ss->format->Amask != 0) //Surface already converted
 		{
 			return;
 		}
-		SDL_Surface* ns = SDL_ConvertSurface( ss, disp->format, 0);
-		if (ns == NULL) {
-			return;
-		}
-		SDL_FreeSurface( ss );
-		free( (void*)sprite->pixels );
-		sprite->pixels = NULL;
-		sprite->vptr = ns;
+		SDL_PixelFormat* fmt = disp->format;
+		sprite->ConvertFormatTo(fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
 	}
 }
 

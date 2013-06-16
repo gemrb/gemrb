@@ -47,6 +47,8 @@ public:
 	ieDword GetColorKey() const;
 	void SetColorKey(ieDword ck);
 	Color GetPixel(unsigned short x, unsigned short y) const;
+	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
+						 ieDword bmask, ieDword amask);
 
 	SDL_Surface* GetSurface() const { return surface; };
 

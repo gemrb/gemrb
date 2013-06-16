@@ -20,6 +20,8 @@
 
 #include "SDLSurfaceSprite2D.h"
 
+#include "System/Logging.h"
+
 #include <SDL/SDL.h>
 
 namespace GemRB {
@@ -151,6 +153,44 @@ Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
 
 	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 	return c;
+}
+
+bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
+					 ieDword bmask, ieDword amask)
+{
+	if (bpp >= 8) {
+#if SDL_VERSION_ATLEAST(1,3,0)
+		Uint32 fmt = SDL_MasksToPixelFormatEnum(bpp, rmask, gmask, bmask, amask);
+		if (fmt != SDL_PIXELFORMAT_UNKNOWN) {
+			SDL_Surface* ns = SDL_ConvertSurfaceFormat( surface, fmt, 0);
+#else
+		SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Width, Height, bpp, rmask, gmask, bmask, amask);
+		if (tmp) {
+			SDL_Surface* ns = SDL_ConvertSurface( surface, tmp->format, 0);
+			SDL_FreeSurface(tmp);
+#endif
+			if (ns) {
+				SDL_FreeSurface(surface);
+				if (freePixels) {
+					free((void*)pixels);
+				}
+				freePixels = false;
+				surface = ns;
+				pixels = surface->pixels;
+				Bpp = bpp;
+				return true;
+			} else {
+				Log(MESSAGE, "SDLSurfaceSprite2D",
+#if SDL_VERSION_ATLEAST(1,3,0)
+					"Cannot convert sprite to format: %s\nError: %s", SDL_GetPixelFormatName(fmt),
+#else
+					"Cannot convert sprite to format: %s",
+#endif
+					SDL_GetError());
+			}
+		}
+	}
+	return false;
 }
 
 void SDLSurfaceSprite2D::SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors)
