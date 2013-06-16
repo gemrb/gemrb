@@ -432,22 +432,7 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 {
 	if (!sprite) return NULL;
-	Sprite2D* dest = NULL;
-
-	if (!sprite->BAM) {
-		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
-		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
-
-		SDL_LockSurface( tmp );
-		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
-		dest = CreatePalettedSprite(sprite->Width, sprite->Height, 8, newpixels,
-									(Color*)tmp->format->palette->colors, true, 0);
-		SDL_UnlockSurface( tmp );
-	} else {
-		dest = sprite->copy();
-	}
-
-	return dest;
+	return sprite->copy();
 }
 
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
