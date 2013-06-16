@@ -83,8 +83,10 @@ Color Sprite2D::GetPixel(unsigned short x, unsigned short y) const
 
 void Sprite2D::release()
 {
-	Sprite2D *that = this;
-	core->GetVideoDriver()->FreeSprite(that);
+	assert(RefCount > 0);
+	if (--RefCount == 0) {
+		delete this;
+	}
 }
 
 }

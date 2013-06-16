@@ -30,6 +30,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pix
 	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   0, 0, 0, 0 );
 	vptr = surface;
+	freePixels = true;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_SetSurfaceRLE(surface, SDL_TRUE);
 #endif
@@ -42,6 +43,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   rmask, gmask, bmask, amask );
 	vptr = surface;
+	freePixels = true;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_SetSurfaceRLE(surface, SDL_TRUE);
 #endif
@@ -51,6 +53,8 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	: Sprite2D(obj)
 {
 	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
+	pixels = surface->pixels;
+	freePixels = false;
 	vptr = surface;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_SetSurfaceRLE(surface, SDL_TRUE);
@@ -65,6 +69,10 @@ SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
 SDLSurfaceSprite2D::~SDLSurfaceSprite2D()
 {
 	SDL_FreeSurface(surface);
+	if (freePixels) {
+		// FIXME: casting away const.
+		free((void*)pixels);
+	}
 }
 
 /** Get the Palette of a Sprite */

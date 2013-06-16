@@ -423,23 +423,10 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixe
 
 void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 {
-	if(!spr)
-		return;
-	assert(spr->RefCount > 0);
-	if (--spr->RefCount > 0) {
+	if (spr) {
+		spr->release();
 		spr = NULL;
-		return;
 	}
-
-	if (spr->BAM) {
-		// currently in the process of removing vptr, but it needs to be set for some methods to work
-		// so i am setting it to the object itself for bam sprites for now
-		assert(spr->vptr == spr);
-	} else {
-		free( (void*)spr->pixels );
-	}
-	delete spr;
-	spr = NULL;
 }
 
 Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
