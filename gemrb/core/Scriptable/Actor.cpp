@@ -3816,10 +3816,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	//FIXME: what does original do?
 	LastDamageType|=damagetype;
 	Actor *act=NULL;
-	if (!hitter) {
-		// TODO: check this
-		hitter = area->GetActorByGlobalID(LastHitter);
-	}
 
 	if (hitter) {
 		if (hitter->Type==ST_ACTOR) {
