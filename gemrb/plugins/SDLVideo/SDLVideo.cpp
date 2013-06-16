@@ -480,12 +480,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	const Uint8* mask_data = NULL;
 	Uint32 ck = 0;
 	if (mask) {
-		mask_data = (Uint8*) (( SDL_Surface * ) mask->vptr)->pixels;
-#if SDL_VERSION_ATLEAST(1,3,0)
-		SDL_GetColorKey(( SDL_Surface * ) mask->vptr, &ck);
-#else
-		ck = (( SDL_Surface * ) mask->vptr)->format->colorkey;
-#endif
+		ck = mask->GetColorKey();
 	}
 
 	bool tint = false;
