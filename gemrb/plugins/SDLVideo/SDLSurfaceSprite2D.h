@@ -32,6 +32,8 @@ class SDLSurfaceSprite2D : public Sprite2D {
 private:
 	bool freePixels;
 	SDL_Surface* surface;
+private:
+	void SetSurfaceRLE(bool);
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels);
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,

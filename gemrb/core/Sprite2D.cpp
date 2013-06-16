@@ -32,6 +32,7 @@ Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
 	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
 {
 	BAM = false;
+	RLE = false;
 	XPos = 0;
 	YPos = 0;
 	RefCount = 1;
@@ -41,6 +42,7 @@ Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
 Sprite2D::Sprite2D(const Sprite2D &obj)
 {
 	BAM = false;
+	RLE = false;
 	RefCount = 1;
 
 	XPos = obj.XPos;
