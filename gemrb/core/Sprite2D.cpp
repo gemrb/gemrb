@@ -23,7 +23,6 @@
 #include "win32def.h"
 
 #include "Interface.h"
-#include "Video.h"
 
 namespace GemRB {
 

@@ -53,10 +53,8 @@ Animation::Animation(int count)
 
 Animation::~Animation(void)
 {
-	Video *video = core->GetVideoDriver();
-
 	for (unsigned int i = 0; i < indicesCount; i++) {
-		video->FreeSprite( frames[i] );
+		frames[i]->release();
 	}
 	free(frames);
 }
@@ -221,7 +219,7 @@ void Animation::MirrorAnimation()
 	for (size_t i = 0; i < indicesCount; i++) {
 		Sprite2D * tmp = frames[i];
 		frames[i] = video->MirrorSpriteHorizontal( tmp, true );
-		video->FreeSprite(tmp);
+		tmp->release();
 	}
 
 	// flip animArea horizontally as well
@@ -235,7 +233,7 @@ void Animation::MirrorAnimationVert()
 	for (size_t i = 0; i < indicesCount; i++) {
 		Sprite2D * tmp = frames[i];
 		frames[i] = video->MirrorSpriteVertical( tmp, true );
-		video->FreeSprite(tmp);
+		tmp->release();
 	}
 
 	// flip animArea vertically as well

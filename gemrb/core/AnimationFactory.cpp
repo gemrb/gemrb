@@ -24,7 +24,6 @@
 
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -39,7 +38,7 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 AnimationFactory::~AnimationFactory(void)
 {
 	for (unsigned int i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->FreeSprite( frames[i] );
+		frames[i]->release();
 	}
 	if (FLTable)
 		free( FLTable);
