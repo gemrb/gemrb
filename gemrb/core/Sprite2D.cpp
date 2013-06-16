@@ -36,7 +36,6 @@ Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixel
 	XPos = 0;
 	YPos = 0;
 	RefCount = 1;
-	colorkey = 0;
 	renderFlags = 0;
 }
 
@@ -86,16 +85,6 @@ void Sprite2D::release()
 {
 	Sprite2D *that = this;
 	core->GetVideoDriver()->FreeSprite(that);
-}
-
-ieDword Sprite2D::GetColorKey() const
-{
-	return colorkey;
-}
-
-void Sprite2D::SetColorKey(ieDword ck)
-{
-	colorkey = ck;
 }
 
 }

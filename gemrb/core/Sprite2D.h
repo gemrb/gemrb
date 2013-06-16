@@ -49,8 +49,6 @@ class AnimationFactory;
 class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
-protected:
-	ieDword colorkey;
 public:
 	int XPos, YPos, Width, Height, Bpp;
 	/** Pointer to the Driver Video Structure */
@@ -69,8 +67,8 @@ public:
 	virtual Palette *GetPalette() const = 0;
 	virtual void SetPalette(Palette *pal) = 0;
 	virtual Color GetPixel(unsigned short x, unsigned short y) const;
-	virtual ieDword GetColorKey() const;
-	virtual void SetColorKey(ieDword ck);
+	virtual ieDword GetColorKey() const = 0;
+	virtual void SetColorKey(ieDword ck) = 0;
 public: // public only for SDLVideo
 	int RefCount;
 public:

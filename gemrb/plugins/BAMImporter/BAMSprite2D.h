@@ -30,6 +30,7 @@ class AnimationFactory;
 class BAMSprite2D : public Sprite2D {
 private:
 	Palette* pal;
+	ieDword colorkey;
 	// The AnimationFactory in which the data for this sprite is stored.
 	// (Used for refcounting of the data.)
 	AnimationFactory* source;
@@ -46,6 +47,8 @@ public:
 	Palette *GetPalette() const;
 	void SetPalette(Palette *pal);
 	Color GetPixel(unsigned short x, unsigned short y) const;
+	ieDword GetColorKey() const { return colorkey; };
+	void SetColorKey(ieDword ck) { colorkey = ck; };
 };
 
 }
