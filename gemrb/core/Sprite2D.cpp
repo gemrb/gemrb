@@ -64,13 +64,6 @@ bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 	return GetPixel(x, y).a == 0;
 }
 
-/** Get the Palette of a Sprite */
-Palette* Sprite2D::GetPalette() const
-{
-	if (!vptr) return NULL;
-	return core->GetVideoDriver()->GetPalette(vptr);
-}
-
 Color Sprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
 	Color c = { 0, 0, 0, 0 };

@@ -1566,21 +1566,6 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 	return;
 }
 
-Palette* SDLVideoDriver::GetPalette(void *vptr)
-{
-	SDL_Surface* s = ( SDL_Surface* ) vptr;
-	if (s->format->BitsPerPixel != 8) {
-		return NULL;
-	}
-	Palette* pal = new Palette();
-	for (int i = 0; i < s->format->palette->ncolors; i++) {
-		pal->col[i].r = s->format->palette->colors[i].r;
-		pal->col[i].g = s->format->palette->colors[i].g;
-		pal->col[i].b = s->format->palette->colors[i].b;
-	}
-	return pal;
-}
-
 // Flips given sprite vertically (up-down). If MirrorAnchor=true,
 // flips its anchor (i.e. origin//base point) as well
 // returns new sprite
