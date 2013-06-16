@@ -112,8 +112,6 @@ public:
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);
 	/** Gets the pixel of the backbuffer surface */
 	void GetPixel(short x, short y, Color& color);
-	/** Gets the pixel of any supplied surface */
-	void GetPixel(void *vptr, unsigned short x, unsigned short y, Color& color);
 	void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
@@ -173,7 +171,6 @@ protected:
 	virtual int ProcessEvent(const SDL_Event & event);
 
 public:
-	long GetPixel(void *data, unsigned short x, unsigned short y);
 	void SetGamma(int brightness, int contrast)=0;
 	void SetMouseScrollSpeed(int speed);
 };

@@ -64,16 +64,6 @@ bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 	return GetPixel(x, y).a == 0;
 }
 
-Color Sprite2D::GetPixel(unsigned short x, unsigned short y) const
-{
-	Color c = { 0, 0, 0, 0 };
-
-	if (x >= Width || y >= Height) return c;
-
-	core->GetVideoDriver()->GetPixel(vptr, x, y, c);
-	return c;
-}
-
 void Sprite2D::release()
 {
 	assert(RefCount > 0);

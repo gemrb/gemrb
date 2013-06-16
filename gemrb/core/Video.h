@@ -161,8 +161,6 @@ public:
 	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
 	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
 	virtual void GetPixel(short x, short y, Color& color) = 0;
-	virtual long GetPixel(void *, unsigned short x, unsigned short y) = 0;
-	virtual void GetPixel(void *, unsigned short x, unsigned short y, Color &color) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
 	/** Draws an Ellipse Segment */
