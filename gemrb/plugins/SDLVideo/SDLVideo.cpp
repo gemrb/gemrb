@@ -429,12 +429,6 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 	}
 }
 
-Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
-{
-	if (!sprite) return NULL;
-	return sprite->copy();
-}
-
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
 	if (spr->BAM) {
@@ -1515,7 +1509,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool Mirr
 	if (!sprite)
 		return NULL;
 
-	Sprite2D* dest = DuplicateSprite(sprite);
+	Sprite2D* dest = sprite->copy();
 
 	if (!sprite->BAM) {
 		for (int x = 0; x < dest->Width; x++) {
@@ -1549,7 +1543,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(const Sprite2D* sprite, bool Mi
 	if (!sprite)
 		return NULL;
 
-	Sprite2D* dest = DuplicateSprite(sprite);
+	Sprite2D* dest = sprite->copy();
 
 	if (!sprite->BAM) {
 		for (int y = 0; y < dest->Height; y++) {
