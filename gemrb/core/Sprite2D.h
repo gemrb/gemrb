@@ -62,12 +62,12 @@ public:
 
 	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
 	Sprite2D(const Sprite2D &obj);
-	virtual Sprite2D* copy() const;
+	virtual Sprite2D* copy() const = 0;
 	virtual ~Sprite2D();
 
 	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
-	virtual Palette *GetPalette() const;
-	virtual void SetPalette(Palette *pal);
+	virtual Palette *GetPalette() const = 0;
+	virtual void SetPalette(Palette *pal) = 0;
 	virtual Color GetPixel(unsigned short x, unsigned short y) const;
 	virtual ieDword GetColorKey() const;
 	virtual void SetColorKey(ieDword ck);

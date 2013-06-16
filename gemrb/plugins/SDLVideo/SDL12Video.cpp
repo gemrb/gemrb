@@ -326,11 +326,6 @@ void SDL12VideoDriver::HideSoftKeyboard()
 
 // Private methods
 
-bool SDL12VideoDriver::SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)
-{
-	return (bool)SDL_SetPalette( surface, SDL_LOGPAL, colors, 0, ncolors );
-}
-
 bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
 {
 	return (SDL_SetAlpha( surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha ) == 0);

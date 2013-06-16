@@ -105,8 +105,6 @@ public:
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetScreenshot( Region r );
 	void ConvertToVideoFormat(Sprite2D* sprite);
-	/** Sets the palette of an SDL surface pointed by */
-	void SetPalette(void* data, Palette* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
@@ -172,7 +170,6 @@ public:
 
 protected:
 	void DrawMovieSubtitle(ieDword strRef);
-	virtual bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)=0;
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);

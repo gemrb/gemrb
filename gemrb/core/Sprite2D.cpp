@@ -55,11 +55,6 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 	pixels = obj.pixels;
 }
 
-Sprite2D* Sprite2D::copy() const
-{
-	return new Sprite2D(*this);
-}
-
 Sprite2D::~Sprite2D()
 {
 }
@@ -75,12 +70,6 @@ Palette* Sprite2D::GetPalette() const
 {
 	if (!vptr) return NULL;
 	return core->GetVideoDriver()->GetPalette(vptr);
-}
-
-void Sprite2D::SetPalette(Palette* pal)
-{
-	if (!vptr) return;
-	core->GetVideoDriver()->SetPalette(vptr, pal);
 }
 
 Color Sprite2D::GetPixel(unsigned short x, unsigned short y) const

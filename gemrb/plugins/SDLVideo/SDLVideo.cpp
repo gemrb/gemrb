@@ -20,7 +20,7 @@
 
 #include "SDLVideo.h"
 
-#include "Sprite2D.h"
+#include "SDLSurfaceSprite2D.h"
 
 #include "TileRenderer.inl"
 #include "SpriteRenderer.inl"
@@ -396,12 +396,12 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
-											  rMask, gMask, bMask, aMask );
+	SDLSurfaceSprite2D* spr = new SDLSurfaceSprite2D(w, h, bpp, pixels, rMask, gMask, bMask, aMask);
+
 	if (cK) {
-		SDL_SetColorKey( p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index );
+		spr->SetColorKey(index);
 	}
-	return new Sprite2D(w, h, bpp, p, pixels);
+	return spr;
 }
 
 Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
@@ -413,12 +413,12 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 											   Color* palette, bool cK, int index)
 {
-	SDL_Surface* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, 8, w, 0, 0, 0, 0 );
-	SetSurfacePalette( p, (SDL_Color*)palette, 0x01 << bpp );
+	SDLSurfaceSprite2D* spr = new SDLSurfaceSprite2D(w, h, bpp, pixels);
+	spr->SetPalette(palette);
 	if (cK) {
-		SDL_SetColorKey( p, SDL_SRCCOLORKEY, index );
+		spr->SetColorKey(index);
 	}
-	return new Sprite2D(w, h, bpp, p, pixels);
+	return spr;
 }
 
 void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
@@ -436,9 +436,6 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 		// so i am setting it to the object itself for bam sprites for now
 		assert(spr->vptr == spr);
 	} else {
-		if (spr->vptr) {
-			SDL_FreeSurface( ( SDL_Surface * ) spr->vptr );
-		}
 		free( (void*)spr->pixels );
 	}
 	delete spr;
@@ -652,10 +649,13 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 
 		}
 		if (palette) {
+			// FIXME: casting away const to temporarily change the palette for the
+			// blit opperation. this is no diffrent than what we did before with the
+			// vptr, and the end result leavs the sprite unchanged, but is there a better way?
 			Palette* tmpPal = spr->GetPalette();
-			SetSurfacePalette(( SDL_Surface * )spr->vptr, (SDL_Color*)palette->col, 256);
+			((Sprite2D*)spr)->SetPalette(palette);
 			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
-			SetSurfacePalette(( SDL_Surface * )spr->vptr, (SDL_Color*)tmpPal->col, 256);
+			((Sprite2D*)spr)->SetPalette(tmpPal);
 			tmpPal->release();
 		} else {
 			SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
@@ -981,13 +981,6 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	return screenshot;
 }
 
-/** No descriptions */
-void SDLVideoDriver::SetPalette(void *data, Palette* pal)
-{
-	SDL_Surface* sur = ( SDL_Surface* ) data;
-	SetSurfacePalette(sur, ( SDL_Color * ) pal->col, sizeof(pal->col) / 4);
-}
-
 void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 {
 	if (!sprite->BAM) {
@@ -1025,7 +1018,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 			c.r = color.r;
 			c.b = color.b;
 			c.g = color.g;
-			SetSurfacePalette( rectsurf, &c, 1 );
+			SDLSurfaceSprite2D::SetSurfacePalette(rectsurf, &c, 1);
 			SetSurfaceAlpha(rectsurf, color.a);
 			SDL_BlitSurface( rectsurf, NULL, backBuf, &drect );
 			SDL_FreeSurface( rectsurf );
@@ -1061,7 +1054,7 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 		c.r = color.r;
 		c.b = color.b;
 		c.g = color.g;
-		SetSurfacePalette( rectsurf, &c, 1 );
+		SDLSurfaceSprite2D::SetSurfacePalette(rectsurf, &c, 1);
 		SetSurfaceAlpha(rectsurf, color.a);
 		SDL_BlitSurface( rectsurf, NULL, surf, &drect );
 		SDL_FreeSurface( rectsurf );

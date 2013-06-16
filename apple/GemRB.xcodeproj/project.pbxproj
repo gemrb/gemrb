@@ -666,6 +666,8 @@
 		A2E9967A14DE05590052BABE /* SAVImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F0505113ABB80B0023B7EB /* SAVImporter.so */; };
 		A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */; };
 		A2EC2F91176BD28E00FD960E /* BAMSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */; };
+		A2EC2F94176BD44C00FD960E /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
+		A2EC2F95176BD44D00FD960E /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2EC8059145F9E6E0033754A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8058145F9E6E0033754A /* Foundation.framework */; };
 		A2EC805B1460556B0033754A /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC805A1460556B0033754A /* OpenAL.framework */; };
 		A2EC805D1460559C0033754A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC805C1460559C0033754A /* CoreAudio.framework */; };
@@ -1665,6 +1667,8 @@
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMSprite2D.cpp; sourceTree = "<group>"; };
 		A2EC2F8F176BD28E00FD960E /* BAMSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMSprite2D.h; sourceTree = "<group>"; };
+		A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDLSurfaceSprite2D.cpp; sourceTree = "<group>"; };
+		A2EC2F93176BD44C00FD960E /* SDLSurfaceSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceSprite2D.h; sourceTree = "<group>"; };
 		A2EC8058145F9E6E0033754A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805A1460556B0033754A /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC805C1460559C0033754A /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
@@ -2647,15 +2651,17 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
-				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
-				A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */,
-				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
-				A298DD1814EB4EEB00F59F56 /* SDL20Video.h */,
+				A249187B141075A60038B170 /* CocoaWrapper.m */,
 				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
 				A298DD1414EB4EDE00F59F56 /* SDL12Video.h */,
-				A249187B141075A60038B170 /* CocoaWrapper.m */,
+				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
+				A298DD1814EB4EEB00F59F56 /* SDL20Video.h */,
+				A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */,
+				A2EC2F93176BD44C00FD960E /* SDLSurfaceSprite2D.h */,
 				A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */,
 				A27B875B139F0A7D0002DC13 /* SDLVideo.h */,
+				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
+				A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */,
 			);
 			path = SDLVideo;
 			sourceTree = "<group>";
@@ -4603,6 +4609,7 @@
 				A22693791422934E004468E8 /* CocoaWrapper.m in Sources */,
 				A276B4EF13A28BE100D41A8A /* SDLVideo.cpp in Sources */,
 				A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */,
+				A2EC2F95176BD44D00FD960E /* SDLSurfaceSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4910,6 +4917,7 @@
 				A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */,
 				A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */,
 				A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,
+				A2EC2F94176BD44C00FD960E /* SDLSurfaceSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
