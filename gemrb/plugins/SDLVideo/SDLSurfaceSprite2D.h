@@ -41,6 +41,7 @@ public:
 	~SDLSurfaceSprite2D();
 
 	Palette *GetPalette() const;
+	const Color* GetPaletteColors() const;
 	void SetPalette(Palette *pal);
 	void SetPalette(Color* pal);
 	ieDword GetColorKey() const;

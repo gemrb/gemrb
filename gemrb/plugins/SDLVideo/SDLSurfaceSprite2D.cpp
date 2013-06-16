@@ -86,6 +86,11 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 	return pal;
 }
 
+const Color* SDLSurfaceSprite2D::GetPaletteColors() const
+{
+	return reinterpret_cast<const Color*>(surface->format->palette->colors);
+}
+
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
 	SetPalette(pal->col);

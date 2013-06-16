@@ -474,8 +474,8 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	if (y + h > clipy + cliph)
 		h -= (y + h - clipy - cliph);
 
-	const Uint8* data = (Uint8*) (( SDL_Surface * ) spr->vptr)->pixels;
-	const SDL_Color* pal = (( SDL_Surface * ) spr->vptr)->format->palette->colors;
+	const Uint8* data = (const Uint8*)spr->pixels;
+	const SDL_Color* pal = reinterpret_cast<const SDL_Color*>(spr->GetPaletteColors());
 
 	const Uint8* mask_data = NULL;
 	Uint32 ck = 0;
