@@ -335,6 +335,9 @@ def ProfsRedraw (first=0):
 			MaxProf = ClassWeaponsTable.GetValue (ClassNameSave, ProfsTable.GetRowName(Pos))
 		else:
 			MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn)
+			ProfName = ProfsTable.GetValue(Pos+ProfsTableOffset, 1)
+			if ProfName > 0x1000000 or ProfName < 0:
+				MaxProf = 0
 
 		cid = i*2+ProfsOffsetButton1
 		if Profs2ndOffsetButton1 != -1 and i > 7:
