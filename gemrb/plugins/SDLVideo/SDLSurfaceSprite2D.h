@@ -48,6 +48,8 @@ public:
 	void SetColorKey(ieDword ck);
 	Color GetPixel(unsigned short x, unsigned short y) const;
 
+	SDL_Surface* GetSurface() const { return surface; };
+
 	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
 };
 
