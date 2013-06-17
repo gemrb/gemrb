@@ -31,6 +31,7 @@ const TypeID Sprite2D::ID = { "Sprite2D" };
 Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
 	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
 {
+	freePixels = true;
 	BAM = false;
 	RLE = false;
 	XPos = 0;
@@ -52,10 +53,15 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 	Bpp = obj.Bpp;
 
 	pixels = obj.pixels;
+	freePixels = false;
 }
 
 Sprite2D::~Sprite2D()
 {
+	if (freePixels && pixels) {
+		// FIXME: casting away const.
+		free((void*)pixels);
+	}
 }
 
 bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const

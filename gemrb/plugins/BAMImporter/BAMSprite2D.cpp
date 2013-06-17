@@ -36,6 +36,7 @@ BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
 	source = datasrc;
 	datasrc->IncDataRefCount();
 	BAM = true;
+	freePixels = false; // managed by datasrc
 }
 
 BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
@@ -51,6 +52,7 @@ BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	source = obj.source;
 	source->IncDataRefCount();
 	BAM = true;
+	freePixels = false; // managed by datasrc
 }
 
 BAMSprite2D* BAMSprite2D::copy() const

@@ -30,7 +30,6 @@ namespace GemRB {
 
 class SDLSurfaceSprite2D : public Sprite2D {
 private:
-	bool freePixels;
 	SDL_Surface* surface;
 private:
 	void SetSurfaceRLE(bool);

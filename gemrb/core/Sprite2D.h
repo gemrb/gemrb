@@ -51,6 +51,8 @@ public:
 	static const TypeID ID;
 private:
 	int RefCount;
+protected:
+	bool freePixels;
 public:
 	int XPos, YPos, Width, Height, Bpp;
 
