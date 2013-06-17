@@ -26,15 +26,6 @@
 
 namespace GemRB {
 
-SDLSurfaceSprite2D::SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels)
-	: Sprite2D(Width, Height, Bpp, pixels)
-{
-	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
-									   0, 0, 0, 0 );
-	freePixels = true;
-	SetSurfaceRLE(true);
-}
-
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pixels,
 										Uint32 rmask, Uint32 gmask, Uint32 bmask, Uint32 amask)
 	: Sprite2D(Width, Height, Bpp, pixels)
@@ -144,6 +135,13 @@ Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
 	SDL_UnlockSurface( surface );
 
 	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
+	if (c.a == 0 && (c.r || c.g || c.b)) {
+		c.a = 0xff;
+	}
+	ieDword ck = GetColorKey();
+	if (ck) {
+		ck;
+	}
 	return c;
 }
 

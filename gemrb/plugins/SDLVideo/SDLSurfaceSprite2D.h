@@ -35,9 +35,8 @@ private:
 private:
 	void SetSurfaceRLE(bool);
 public:
-	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels);
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
+					   ieDword rmask = 0, ieDword gmask = 0, ieDword bmask = 0, ieDword amask = 0);
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
 	SDLSurfaceSprite2D* copy() const;
 	~SDLSurfaceSprite2D();
