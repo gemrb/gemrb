@@ -832,7 +832,8 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	SDL_Rect src = {(Sint16)r.x, (Sint16)r.y, (Uint16)r.w, (Uint16)r.h};
 
 	void* pixels = malloc( Width * Height * 3 );
-	SDLSurfaceSprite2D* screenshot = (SDLSurfaceSprite2D*)CreateSprite( Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels);
+	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
+															0x00ff0000, 0x0000ff00, 0x000000ff);
 	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, (SDL_Surface*)screenshot->GetSurface(), NULL);
 
 	return screenshot;
