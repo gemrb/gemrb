@@ -4190,7 +4190,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("\n");
 
 	buffer.appendFormatted("current HP:%d\n", BaseStats[IE_HITPOINTS] );
-	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s\n", Modified[IE_ANIMATION_ID], anims->ResRef );
+	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s Stance: %d\n", Modified[IE_ANIMATION_ID], anims->ResRef, GetStance() );
 	buffer.appendFormatted("TURNUNDEADLEVEL: %d current: %d\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	buffer.appendFormatted("Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
