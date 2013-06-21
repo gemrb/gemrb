@@ -280,7 +280,7 @@
 0xE060     MLIC       MLIC       MLIC       MLIC       9          2          1          *
 0xE070     MMIN       MMIN       MMIN       MMIN       9          2          1          *
 0xE080     MMUM       MMUM       MMUM       MMUM       9          2          1          *
-0xE090     MMER       MMER       MMER       MMER       9          2          1          *
+0xE090     MTAN       MTAN       MTAN       MTAN       16         3          1          *
 0xE0A0     MTIC       MTIC       MTIC       MTIC       9          2          1          *
 0xE0B0     MTRO       MTRO       MTRO       MTRO       9          2          1          *
 0xE0C0     MTSN       MTSN       MTSN       MTSN       9          2          1          *
