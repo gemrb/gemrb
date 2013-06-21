@@ -61,9 +61,10 @@ SDLSurfaceSprite2D::~SDLSurfaceSprite2D()
 /** Get the Palette of a Sprite */
 Palette* SDLSurfaceSprite2D::GetPalette() const
 {
-	if (surface->format->BitsPerPixel != 8) {
+	if (surface->format->BytesPerPixel != 1) {
 		return NULL;
 	}
+	assert(surface->format->palette->ncolors <= 256);
 	Palette* pal = new Palette();
 	memcpy(pal->col, surface->format->palette->colors, surface->format->palette->ncolors * 4);
 	return pal;
