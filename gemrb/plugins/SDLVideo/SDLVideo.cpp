@@ -308,6 +308,10 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	if (cK) {
 		spr->SetColorKey(index);
 	}
+	// make sure colorkey is set prior to conversion
+	SDL_PixelFormat* fmt = backBuf->format;
+	spr->ConvertFormatTo(fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+
 	return spr;
 }
 
@@ -832,20 +836,6 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, (SDL_Surface*)screenshot->GetSurface(), NULL);
 
 	return screenshot;
-}
-
-void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
-{
-	if (!sprite->BAM) {
-		// TODO: is this really true and if so should we move this to SDLSurfaceSprite2D::ConvertFormatTo()?
-		SDL_Surface* ss = ((SDLSurfaceSprite2D*)sprite)->GetSurface();
-		if (ss->format->Amask != 0) //Surface already converted
-		{
-			return;
-		}
-		SDL_PixelFormat* fmt = disp->format;
-		sprite->ConvertFormatTo(fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
-	}
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
