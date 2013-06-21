@@ -44,8 +44,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
 	pixels = surface->pixels;
 	colorkeyIdx = obj.colorkeyIdx;
-
-	SetSurfaceRLE(obj.RLE);
 }
 
 SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
