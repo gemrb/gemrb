@@ -30,17 +30,15 @@
 #include "globals.h"
 
 #include "Plugin.h"
+#include "Polygon.h"
 #include "ScriptedAnimation.h"
 
 namespace GemRB {
 
-class AnimationFactory;
 class EventMgr;
 class Font;
-class Gem_Polygon;
 class Palette;
 class SpriteCover;
-class Wall_Polygon;
 
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW, and BLIT_GREY overrides BLIT_SEPIA
@@ -126,10 +124,10 @@ public:
 	/** Displays or hides a virtual (software) keyboard*/
 	virtual void ShowSoftKeyboard() = 0;
 	virtual void HideSoftKeyboard() = 0;
-	
-	virtual void InitSpriteCover(SpriteCover* sc, int flags) = 0;
-	virtual void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly) = 0;
-	virtual void DestroySpriteCover(SpriteCover* sc) = 0;
+
+	void InitSpriteCover(SpriteCover* sc, int flags);
+	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
+	void DestroySpriteCover(SpriteCover* sc);
 
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
@@ -139,7 +137,7 @@ public:
 	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
-	virtual void FreeSprite(Sprite2D* &spr) = 0;
+	void FreeSprite(Sprite2D* &spr);
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags) = 0;
 	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 		const Region* clip = NULL, Palette* palette = NULL) = 0;
@@ -198,7 +196,7 @@ public:
 	/** Gets Clip Rectangle */
 	virtual void GetClipRect(Region& clip) = 0;
 	/** returns the current mouse coordinates */
-	virtual void GetMousePos(int &x, int &y) = 0;
+	void GetMousePos(int &x, int &y);
 	/** clicks the mouse forcibly */
 	virtual void ClickMouse(unsigned int button) = 0;
 	/** moves the mouse forcibly */

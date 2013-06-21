@@ -80,7 +80,6 @@ public:
 	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);
 
-	void GetMousePos(int &x, int &y);
 	void MouseMovement(int x, int y);
 	void ClickMouse(unsigned int button);
 	void MouseClickEvent(SDL_EventType type, Uint8 button);
@@ -92,7 +91,6 @@ public:
 	Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
 	bool SupportsBAMSprites() { return true; }
-	void FreeSprite(Sprite2D* &spr);
 	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
 	void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 					const Region* clip = NULL, Palette* palette = NULL);

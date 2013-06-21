@@ -19,7 +19,6 @@
  */
 
 #include "SDLVideo.h"
-
 #include "SDLSurfaceSprite2D.h"
 
 #include "TileRenderer.inl"
@@ -30,16 +29,12 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "Polygon.h"
-#include "SpriteCover.h"
 
 #include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/Window.h"
 
 #include <cmath>
-#include <cassert>
-#include <cstdio>
 
 using namespace GemRB;
 
@@ -305,94 +300,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-void SDLVideoDriver::InitSpriteCover(SpriteCover* sc, int flags)
-{
-	int i;
-	sc->flags = flags;
-	sc->pixels = new unsigned char[sc->Width * sc->Height];
-	for (i = 0; i < sc->Width*sc->Height; ++i)
-		sc->pixels[i] = 0;
-
-}
-
-void SDLVideoDriver::DestroySpriteCover(SpriteCover* sc)
-{
-	delete[] sc->pixels;
-	sc->pixels = NULL;
-}
-
-
-// flags: 0 - never dither (full cover)
-//	1 - dither if polygon wants it
-//	2 - always dither
-void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly)
-{
-
-	// possible TODO: change the cover to use a set of intervals per line?
-	// advantages: faster
-	// disadvantages: makes the blitter much more complex
-
-	int xoff = sc->worldx - sc->XPos;
-	int yoff = sc->worldy - sc->YPos;
-
-	std::list<Trapezoid>::iterator iter;
-	for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
-		++iter)
-	{
-		int y_top = iter->y1 - yoff; // inclusive
-		int y_bot = iter->y2 - yoff; // exclusive
-
-		if (y_top < 0) y_top = 0;
-		if ( y_bot > sc->Height) y_bot = sc->Height;
-		if (y_top >= y_bot) continue; // clipped
-
-		int ledge = iter->left_edge;
-		int redge = iter->right_edge;
-		Point& a = poly->points[ledge];
-		Point& b = poly->points[(ledge+1)%(poly->count)];
-		Point& c = poly->points[redge];
-		Point& d = poly->points[(redge+1)%(poly->count)];
-
-		unsigned char* line = sc->pixels + (y_top)*sc->Width;
-		for (int sy = y_top; sy < y_bot; ++sy) {
-			int py = sy + yoff;
-
-			// TODO: maybe use a 'real' line drawing algorithm to
-			// compute these values faster.
-
-			int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
-			int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
-
-			lt -= xoff;
-			rt -= xoff;
-
-			if (lt < 0) lt = 0;
-			if (rt > sc->Width) rt = sc->Width;
-			if (lt >= rt) { line += sc->Width; continue; } // clipped
-			int dither;
-
-			if (sc->flags == 1) {
-				dither = poly->wall_flag & WF_DITHER;
-			} else {
-				dither = sc->flags;
-			}
-			if (dither) {
-				unsigned char* pix = line + lt;
-				unsigned char* end = line + rt;
-
-				if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
-				for (; pix < end; pix += 2)
-					*pix = 1;
-			} else {
-				// we hope memset is faster
-				// condition: lt < rt is true
-				memset (line+lt, 1, rt-lt);
-			}
-			line += sc->Width;
-		}
-	}
-}
-
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
@@ -419,14 +326,6 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixe
 		spr->SetColorKey(index);
 	}
 	return spr;
-}
-
-void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
-{
-	if (spr) {
-		spr->release();
-		spr = NULL;
-	}
 }
 
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
@@ -1613,13 +1512,6 @@ void SDLVideoDriver::GetClipRect(Region& clip)
 	clip.y = tmp.y;
 	clip.w = tmp.w;
 	clip.h = tmp.h;
-}
-
-
-void SDLVideoDriver::GetMousePos(int &x, int &y)
-{
-	x=CursorPos.x;
-	y=CursorPos.y;
 }
 
 void SDLVideoDriver::MouseMovement(int x, int y)
