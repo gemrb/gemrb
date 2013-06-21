@@ -509,9 +509,9 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (palette) {
 			SDL_Color* palColors = (SDL_Color*)spr->GetPaletteColors();
-			SDLSurfaceSprite2D::SetSurfacePalette(surf, (SDL_Color*)palette->col);
+			SetSurfacePalette(surf, (SDL_Color*)palette->col);
 			SDL_BlitSurface( surf, srect, backBuf, &drect );
-			SDLSurfaceSprite2D::SetSurfacePalette(surf, palColors);
+			SetSurfacePalette(surf, palColors);
 		} else {
 			SDL_BlitSurface( surf, srect, backBuf, &drect );
 		}
@@ -866,7 +866,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 			c.r = color.r;
 			c.b = color.b;
 			c.g = color.g;
-			SDLSurfaceSprite2D::SetSurfacePalette(rectsurf, &c, 1);
+			SetSurfacePalette(rectsurf, &c, 1);
 			SetSurfaceAlpha(rectsurf, color.a);
 			SDL_BlitSurface( rectsurf, NULL, backBuf, &drect );
 			SDL_FreeSurface( rectsurf );
@@ -902,46 +902,10 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 		c.r = color.r;
 		c.b = color.b;
 		c.g = color.g;
-		SDLSurfaceSprite2D::SetSurfacePalette(rectsurf, &c, 1);
+		SDLVideoDriver::SetSurfacePalette(rectsurf, &c, 1);
 		SetSurfaceAlpha(rectsurf, color.a);
 		SDL_BlitSurface( rectsurf, NULL, surf, &drect );
 		SDL_FreeSurface( rectsurf );
-	}
-}
-
-inline void ReadPixel(long &val, Pixel* pixels , int BytesPerPixel) {
-	if (BytesPerPixel == 1) {
-		val = *pixels;
-	} else if (BytesPerPixel == 2) {
-		val = *(Uint16 *)pixels;
-	} else if (BytesPerPixel == 3) {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		val = pixels[0] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[2] << 16);
-#else
-		val = pixels[2] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[0] << 16);
-#endif
-	} else if (BytesPerPixel == 4) {
-		val = *(Uint32 *)pixels;
-	}
-}
-
-inline void WritePixel(const long val, Pixel* pixels, int BytesPerPixel) {
-	if (BytesPerPixel == 1) {
-		*pixels = (unsigned char)val;
-	} else if (BytesPerPixel == 2) {
-		*(Uint16 *)pixels = (Uint16)val;
-	} else if (BytesPerPixel == 3) {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		pixels[0] = val & 0xff;
-		pixels[1] = (val >> 8) & 0xff;
-		pixels[2] = (val >> 16) & 0xff;
-#else
-		pixels[2] = val & 0xff;
-		pixels[1] = (val >> 8) & 0xff;
-		pixels[0] = (val >> 16) & 0xff;
-#endif
-	} else if (BytesPerPixel == 4) {
-		*(Uint32 *)pixels = val;
 	}
 }
 
@@ -966,25 +930,12 @@ void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped
 		}
 	}
 
-	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
-		( ( y * disp->w + x) * disp->format->BytesPerPixel );
-
-	long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
-	SDL_LockSurface( backBuf );
-	WritePixel(val, pixels, backBuf->format->BytesPerPixel);
-	SDL_UnlockSurface( backBuf );
+	SDLVideoDriver::SetSurfacePixel(backBuf, x, y, color);
 }
 
 void SDLVideoDriver::GetPixel(short x, short y, Color& c)
 {
-	SDL_LockSurface( backBuf );
-	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
-		( ( y * disp->w + x) * disp->format->BytesPerPixel );
-	long val = 0;
-	ReadPixel(val, pixels, backBuf->format->BytesPerPixel);
-	SDL_UnlockSurface( backBuf );
-
-	SDL_GetRGBA( val, backBuf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
+	SDLVideoDriver::GetSurfacePixel(backBuf, x, y, c);
 }
 
 /*
@@ -1596,4 +1547,78 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 		backBuf = temp;
 	}
+}
+
+// static class methods
+
+void SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors)
+{
+#if SDL_VERSION_ATLEAST(1,3,0)
+	SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+#else
+	SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
+#endif
+}
+
+void SDLVideoDriver::SetSurfacePixel(SDL_Surface* surface, short x, short y, const Color& color)
+{
+	SDL_PixelFormat* fmt = surface->format;
+	unsigned char * pixels = ( ( unsigned char * ) surface->pixels ) +
+	( ( y * surface->w + x) * fmt->BytesPerPixel );
+
+	Uint32 val = SDL_MapRGBA( fmt, color.r, color.g, color.b, color.a );
+	SDL_LockSurface( surface );
+
+	switch (fmt->BytesPerPixel) {
+		case 1:
+			*pixels = (unsigned char)val;
+			break;
+		case 2:
+			*(Uint16 *)pixels = (Uint16)val;
+			break;
+		case 3:
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+			pixels[0] = val & 0xff;
+			pixels[1] = (val >> 8) & 0xff;
+			pixels[2] = (val >> 16) & 0xff;
+#else
+			pixels[2] = val & 0xff;
+			pixels[1] = (val >> 8) & 0xff;
+			pixels[0] = (val >> 16) & 0xff;
+#endif
+			break;
+		case 4:
+			*(Uint32 *)pixels = val;
+		default:
+			Log(ERROR, "SDLSurfaceSprite2D", "Working with unknown pixel format: %s", SDL_GetError());
+			break;
+	}
+
+	SDL_UnlockSurface( surface );
+}
+
+void SDLVideoDriver::GetSurfacePixel(SDL_Surface* surface, short x, short y, Color& c)
+{
+	SDL_LockSurface( surface );
+	Uint8 Bpp = surface->format->BytesPerPixel;
+	unsigned char * pixels = ( ( unsigned char * ) surface->pixels ) +
+	( ( y * surface->w + x) * Bpp );
+	Uint32 val = 0;
+
+	if (Bpp == 1) {
+		val = *pixels;
+	} else if (Bpp == 2) {
+		val = *(Uint16 *)pixels;
+	} else if (Bpp == 3) {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+		val = pixels[0] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[2] << 16);
+#else
+		val = pixels[2] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[0] << 16);
+#endif
+	} else if (Bpp == 4) {
+		val = *(Uint32 *)pixels;
+	}
+
+	SDL_UnlockSurface( surface );
+	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 }

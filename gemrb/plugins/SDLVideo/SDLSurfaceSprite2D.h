@@ -51,8 +51,6 @@ public:
 						 ieDword bmask, ieDword amask);
 
 	SDL_Surface* GetSurface() const { return surface; };
-
-	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
 };
 
 }

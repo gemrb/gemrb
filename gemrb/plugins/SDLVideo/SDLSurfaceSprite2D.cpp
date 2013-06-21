@@ -19,6 +19,7 @@
  */
 
 #include "SDLSurfaceSprite2D.h"
+#include "SDLVideo.h"
 
 #include "System/Logging.h"
 
@@ -76,7 +77,7 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 
 void SDLSurfaceSprite2D::SetPalette(Color* pal)
 {
-	SDLSurfaceSprite2D::SetSurfacePalette(surface, (SDL_Color*)pal, 0x01 << Bpp);
+	SDLVideoDriver::SetSurfacePalette(surface, (SDL_Color*)pal, 0x01 << Bpp);
 }
 
 ieDword SDLSurfaceSprite2D::GetColorKey() const
@@ -103,39 +104,9 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
 	Color c = { 0, 0, 0, 0 };
-
 	if (x >= Width || y >= Height) return c;
 
-	SDL_LockSurface( surface );
-	Uint8 Bpp = surface->format->BytesPerPixel;
-	unsigned char * pixels = ( ( unsigned char * ) surface->pixels ) +
-	( ( y * surface->w + x) * Bpp );
-	long val = 0;
-
-	if (Bpp == 1) {
-		val = *pixels;
-	} else if (Bpp == 2) {
-		val = *(Uint16 *)pixels;
-	} else if (Bpp == 3) {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		val = pixels[0] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[2] << 16);
-#else
-		val = pixels[2] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[0] << 16);
-#endif
-	} else if (Bpp == 4) {
-		val = *(Uint32 *)pixels;
-	}
-
-	SDL_UnlockSurface( surface );
-
-	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
-	if (c.a == 0 && (c.r || c.g || c.b)) {
-		c.a = 0xff;
-	}
-	ieDword ck = GetColorKey();
-	if (ck) {
-		ck;
-	}
+	SDLVideoDriver::GetSurfacePixel(surface, x, y, c);
 	return c;
 }
 
@@ -193,15 +164,6 @@ void SDLSurfaceSprite2D::SetSurfaceRLE(bool rle)
 	// and we are left to access the pixels in decoded form (updated by SDL_UnlockSurface).
 	// SDL Blits will make use of RLE acceleration, but our internal blitters cannot.
 	assert(RLE == false);
-}
-
-void SDLSurfaceSprite2D::SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors)
-{
-#if SDL_VERSION_ATLEAST(1,3,0)
-	SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
-#else
-	SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
-#endif
 }
 
 }

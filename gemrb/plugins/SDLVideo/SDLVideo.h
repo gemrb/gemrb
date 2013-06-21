@@ -168,8 +168,10 @@ protected:
 	virtual int ProcessEvent(const SDL_Event & event);
 
 public:
-	void SetGamma(int brightness, int contrast)=0;
-	void SetMouseScrollSpeed(int speed);
+	// static functions for manipulating surfaces
+	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
+	static void SetSurfacePixel(SDL_Surface* surf, short x, short y, const Color& color);
+	static void GetSurfacePixel(SDL_Surface* surf, short x, short y, Color& c);
 };
 
 }
