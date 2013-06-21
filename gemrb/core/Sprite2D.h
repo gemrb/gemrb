@@ -71,8 +71,10 @@ public:
 	virtual const Color* GetPaletteColors() const = 0;
 	virtual void SetPalette(Palette *pal) = 0;
 	virtual Color GetPixel(unsigned short x, unsigned short y) const = 0;
+	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
 	virtual ieDword GetColorKey() const = 0;
-	virtual void SetColorKey(ieDword ck) = 0;
+	/* SetColorKey: ieDword is either a px value or a palete index if sprite has a palette. */
+	virtual void SetColorKey(ieDword) = 0;
 	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
 							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
 

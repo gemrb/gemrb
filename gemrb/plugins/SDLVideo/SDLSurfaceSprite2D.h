@@ -31,6 +31,7 @@ namespace GemRB {
 class SDLSurfaceSprite2D : public Sprite2D {
 private:
 	SDL_Surface* surface;
+	ieByte colorkeyIdx;
 private:
 	void SetSurfaceRLE(bool);
 public:
@@ -45,7 +46,7 @@ public:
 	void SetPalette(Palette *pal);
 	void SetPalette(Color* pal);
 	ieDword GetColorKey() const;
-	void SetColorKey(ieDword ck);
+	void SetColorKey(ieDword pxvalue);
 	Color GetPixel(unsigned short x, unsigned short y) const;
 	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 						 ieDword bmask, ieDword amask);
