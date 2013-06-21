@@ -162,6 +162,7 @@ int CharAnimations::GetActorPartCount() const
 	case IE_ANI_NINE_FRAMES: //dragon animations
 		return 9;
 	case IE_ANI_FOUR_FRAMES: //wyvern animations
+	case IE_ANI_FOUR_FRAMES_2: //demogorgon animations
 		return 4;
 	case IE_ANI_TWO_PIECE:   //ankheg animations
 		return 2;
@@ -462,6 +463,7 @@ Palette* CharAnimations::GetPartPalette(int part)
 		//these animations use several palettes
 		type = NINE_FRAMES_PALETTE(StanceID);
 	}
+	else if (GetAnimType() == IE_ANI_FOUR_FRAMES_2) return NULL;
 	// always use unmodified BAM palette for the supporting part
 	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return NULL;
 	else if (part == actorPartCount) type = PAL_WEAPON;
@@ -815,6 +817,7 @@ IE_ANI_TWO_PIECE: This is a modified IE_ANI_SIX_FILES with supporting still fram
 
 IE_ANI_FOUR_FRAMES:	These animations are large, four bams make a frame.
 
+IE_ANI_FOUR_FRAMES_2:	Another variation of the four frames format with more files.
 
 IE_ANI_NINE_FRAMES:     These animations are huge, nine bams make a frame.
 
@@ -1053,7 +1056,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				//these animations use several palettes
 				ptype = NINE_FRAMES_PALETTE(StanceID);
 			}
-			
+
 			//if you need to revert this change, consider true paletted
 			//animations which need a GlobalColorMod (mgir for example)
 
@@ -1111,6 +1114,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		switch (GetAnimType()) {
 			case IE_ANI_NINE_FRAMES: //dragon animations
 			case IE_ANI_FOUR_FRAMES: //wyvern animations
+			case IE_ANI_FOUR_FRAMES_2:
 			case IE_ANI_BIRD:
 			case IE_ANI_CODE_MIRROR:
 			case IE_ANI_CODE_MIRROR_2: //9 orientations
@@ -1136,6 +1140,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	switch (GetAnimType()) {
 		case IE_ANI_NINE_FRAMES: //dragon animations
 		case IE_ANI_FOUR_FRAMES: //wyvern animations
+		case IE_ANI_FOUR_FRAMES_2:
 		case IE_ANI_BIRD:
 		case IE_ANI_CODE_MIRROR:
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
@@ -1223,6 +1228,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
 			AddFFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
+			break;
+
+		case IE_ANI_FOUR_FRAMES_2:
+			AddFF2Suffix( NewResRef, StanceID, Cycle, Orient, Part );
 			break;
 
 		case IE_ANI_NINE_FRAMES:
@@ -1635,6 +1644,68 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 	}
 	ResRef[6]=(char) (Part+'1');
 	ResRef[7]=0;
+}
+
+void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient, int Part) const
+{
+	Cycle = SixteenToNine[Orient];
+	switch (StanceID) {
+		case IE_ANI_HEAD_TURN:
+			strcat( ResRef, "g101" );
+			break;
+
+		case IE_ANI_READY:
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "g102" );
+			Cycle += 9;
+			break;
+
+		case IE_ANI_WALK:
+			strcat( ResRef, "g101" );
+			break;
+
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+			strcat( ResRef, "g205" );
+			Cycle += 45;
+			break;
+
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+			strcat( ResRef, "g206" );
+			Cycle += 54;
+			break;
+
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "g202" );
+			break;
+
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "g203" );
+			Cycle += 18;
+			break;
+
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			strcat( ResRef, "g104" );
+			Cycle += 36;
+			break;
+
+		case IE_ANI_SLEEP:
+		case IE_ANI_TWITCH:
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "g103" );
+			Cycle += 27;
+			break;
+
+		default:
+			error("CharAnimation", "Four frames 2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			break;
+
+	}
+	ResRef[6]=(char) (Part+'1');
 }
 
 void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,

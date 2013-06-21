@@ -16,6 +16,7 @@
 0x1206     MDR1       MDR1       MDR1       MDR1       12         7          BR         *
 0x1207     MDR1       MDR1       MDR1       MDR1       12         7          MC         *
 0x1208     MDR1       MDR1       MDR1       MDR1       12         7          PU         *
+0x1300     MDEM       MDEM       MDEM       MDEM       20         4          0          *
 0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0          +
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1          *
 0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0          S
