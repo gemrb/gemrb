@@ -5218,6 +5218,8 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 	//scripts can still see this type of actor
 
 	if (ga_flags&GA_NO_UNSCHEDULED) {
+		if (Modified[IE_AVATARREMOVAL]) return false;
+
 		Game *game = core->GetGame();
 		if (game) {
 			if (!Schedule(game->GameTime, true)) return false;
@@ -7195,6 +7197,11 @@ void Actor::Draw(const Region &screen)
 		return;
 	}
 
+	//iwd has this flag saved in the creature
+	if (Modified[IE_AVATARREMOVAL]) {
+		return;
+	}
+
 	//visual feedback
 	CharAnimations* ca = GetAnims();
 	if (!ca) {
@@ -7207,11 +7214,6 @@ void Actor::Draw(const Region &screen)
 
 	if (Trans>255) {
 		Trans=255;
-	}
-
-	//iwd has this flag saved in the creature
-	if (Modified[IE_AVATARREMOVAL]) {
-		Trans = 255;
 	}
 
 	int State = Modified[IE_STATE_ID];
@@ -9542,11 +9544,8 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 }
 
 // checks whether the actor is visible to another scriptable
-// if flags is 1, it skips the EA check for STATE_INVISIBLE
 bool Actor::IsInvisibleTo(Scriptable *checker) const
 {
-	if (Modified[IE_AVATARREMOVAL]) return true;
-
 	bool canSeeInvisibles = false;
 	if (checker && checker->Type == ST_ACTOR) {
 		canSeeInvisibles = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
