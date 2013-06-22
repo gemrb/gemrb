@@ -797,7 +797,7 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
-	int height = ftext->maxHeight; //size[1].h;
+	int height = ftext->maxHeight;
 	int r = y / height;
 	int row = 0;
 
@@ -805,14 +805,14 @@ void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 		row += lrows[i];
 		if (r < ( row - startrow )) {
 			if (seltext != (int) i)
-				core->RedrawAll();
+				Changed = true;
 			seltext = ( int ) i;
 			//print("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d", ControlID, i, rows, row, r);
 			return;
 		}
 	}
 	if (seltext != -1) {
-		core->RedrawAll();
+		Changed = true;
 	}
 	seltext = -1;
 	//print("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d", ControlID, seltext, rows, row, r);
