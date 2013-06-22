@@ -556,8 +556,8 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 //non actors can be seen too (reducing function to LOS)
 int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
-	//see dead
-	int flags = 0;
+	//see dead; unscheduled actors are never visible, though
+	int flags = GA_NO_UNSCHEDULED;
 
 	if (parameters->int0Parameter) {
 		flags |= GA_DETECT;
@@ -567,12 +567,6 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter, flags );
 	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
-		return 0;
-	}
-
-	//Deactivated (hidden) creatures are not seen
-	//Check windspear quest (when garren leaves you alone with the kid)
-	if (! (tar->GetInternalFlag()&IF_VISIBLE)) {
 		return 0;
 	}
 

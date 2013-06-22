@@ -3337,7 +3337,7 @@ PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
 static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
 {
 	int Mode;
-	int Types = GA_SELECT | GA_NO_DEAD | GA_NO_HIDDEN;
+	int Types = GA_SELECT | GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED;
 
 	if (!PyArg_ParseTuple( args, "i|i", &Mode, &Types )) {
 		return AttributeError( GemRB_GameControlSetTargetMode__doc );
