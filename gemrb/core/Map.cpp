@@ -62,6 +62,8 @@ namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
+#define ANI_PRI_BACKGROUND	-9999
+
 // TODO: fix this hardcoded resource reference
 static ieResRef PortalResRef={"EF03TPR3"};
 static unsigned int PortalTime = 15;
@@ -1126,9 +1128,6 @@ void Map::DrawMap(Region screen)
 		}
 
 		TMap->DrawOverlays( screen, rain, flags );
-
-		//Draw Outlines
-		DrawHighlightables( screen );
 	}
 
 	//drawing queues 1 and 0
@@ -1146,6 +1145,17 @@ void Map::DrawMap(Region screen)
 	ScriptedAnimation *sca = GetNextScriptedAnimation(scaidx);
 	Projectile *pro = GetNextProjectile(proidx);
 	Particles *spark = GetNextSpark(spaidx);
+
+	//draw all background animations first
+	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
+		a->Draw(screen, this);
+		a = GetNextAreaAnimation(aniidx, gametime);
+	}
+
+	if (!bgoverride) {
+		//Draw Outlines
+		DrawHighlightables(screen);
+	}
 
 	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by
 	// an area animation with height > 0 even if the actors themselves are not
@@ -3827,9 +3837,9 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 
 int AreaAnimation::GetHeight() const
 {
-	if (Flags&A_ANI_BACKGROUND) return -9999;
+	if (Flags&A_ANI_BACKGROUND) return ANI_PRI_BACKGROUND;
 	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
-		return -9999;
+		return ANI_PRI_BACKGROUND;
 	return Pos.y+height;
 }
 
