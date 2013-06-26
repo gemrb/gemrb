@@ -1925,7 +1925,7 @@ unsigned int Map::GetBlocked(const Point &c)
 //	2 - always dither
 
 SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
-	unsigned int width, unsigned int height, int flags)
+	unsigned int width, unsigned int height, int flags, bool areaanim)
 {
 	SpriteCover* sc = new SpriteCover;
 	sc->worldx = x;
@@ -1946,6 +1946,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 		Wall_Polygon* wp = GetWallGroup(i);
 		if (!wp) continue;
 		if (!wp->PointCovered(x, y)) continue;
+		if (areaanim && !(wp->GetPolygonFlag() & WF_COVERANIMS)) continue;
 
 		video->AddPolygonToSpriteCover(sc, wp);
 	}
@@ -3881,7 +3882,7 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 				// TODO: Should this build a sprite cover with base point
 				// Pos.x,Pos.y, or with Pos.y,Pos.y+height ?
 				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y, -anim->animArea.x,
-					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0);
+					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
 			}
 		}
 		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y,
