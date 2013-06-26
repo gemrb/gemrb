@@ -3879,9 +3879,7 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 		if(covers) {
 			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
 				delete covers[ac];
-				// TODO: Should this build a sprite cover with base point
-				// Pos.x,Pos.y, or with Pos.y,Pos.y+height ?
-				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y, -anim->animArea.x,
+				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y + height, -anim->animArea.x,
 					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
 			}
 		}
