@@ -267,17 +267,21 @@ def GameExpansion():
 	while idx:
 		name = GemRB.GetPlayerName(idx, 2) #scripting name
 		# change the override script to the new one
-		newScript = PDialogTable.GetValue ("25OVERRIDE_SCRIPT_FILE", name.upper())
-		SetPlayerScript (idx, newScript, 0) # 0 is SCR_OVERRIDE, the override script slot
-		if name == "yoshimo":
-			RemoveYoshimo(idx)
-		elif name == "imoen":
-			RemoveImoen(idx)
-		elif name == "edwin":
-			FixEdwin(idx)
-		elif name == "anomen":
-			FixAnomen(idx)
-		elif name == "none":
+		if name != "none":
+			newScript = PDialogTable.GetValue (name.upper(), "25OVERRIDE_SCRIPT_FILE")
+			newDialog = PDialogTable.GetValue (name.upper(), "25JOIN_DIALOG_FILE")
+			SetPlayerScript (idx, newScript, 0) # 0 is SCR_OVERRIDE, the override script slot
+			SetPlayerDialog (idx, newDialog)
+		
+			if name == "yoshimo":
+				RemoveYoshimo(idx)
+			elif name == "imoen":
+				RemoveImoen(idx)
+			elif name == "edwin":
+				FixEdwin(idx)
+			elif name == "anomen":
+				FixAnomen(idx)
+		else:
 			FixProtagonist(idx)
 			GemRB.GameSelectPC (idx, True, SELECT_REPLACE)
 		idx=idx-1
