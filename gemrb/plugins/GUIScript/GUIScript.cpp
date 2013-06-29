@@ -5514,6 +5514,26 @@ static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetPlayerDialog__doc,
+"SetPlayerDialog(Slot, Resource)\n\n"
+"Sets the dialog resource for a player." );
+
+static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
+{
+	const char *DialogName;
+	int globalID;
+
+	if (!PyArg_ParseTuple( args, "is", &globalID, &DialogName )) {
+		return AttributeError( GemRB_SetPlayerDialog__doc );
+	}
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	actor->SetDialog(DialogName);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
 "FillPlayerInfo(Slot[, Portrait1, Portrait2])\n\n"
 "Fills basic character info, that is not stored in stats." );
@@ -10751,6 +10771,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetModalState, METH_VARARGS),
 	METHOD(SetMouseScrollSpeed, METH_VARARGS),
 	METHOD(SetNextScript, METH_VARARGS),
+	METHOD(SetPlayerDialog, METH_VARARGS),
 	METHOD(SetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerScript, METH_VARARGS),
 	METHOD(SetPlayerStat, METH_VARARGS),

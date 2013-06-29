@@ -5493,6 +5493,11 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	return LSR_OK;
 }
 
+void Actor::SetDialog(const ieResRef resref)
+{
+	CopyResRef(Dialog, resref);
+}
+
 const char *Actor::GetDialog(int flags) const
 {
 	if (!flags) {

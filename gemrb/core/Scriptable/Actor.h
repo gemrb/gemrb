@@ -502,6 +502,7 @@ public:
 
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(int flags=GD_NORMAL) const;
+	void SetDialog(const ieResRef resref);
 	/** Gets the Portrait ResRef */
 	const char* GetPortrait(int which) const
 	{
