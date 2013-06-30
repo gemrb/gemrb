@@ -176,9 +176,9 @@ public:
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite vertically, returns new sprite */
-	virtual Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor) = 0;
+	Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor);
 	/** Flips sprite horizontally, returns new sprite */
-	virtual Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor) = 0;
+	Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor);
 	/** Duplicates and transforms sprite to have an alpha channel */
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 

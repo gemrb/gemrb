@@ -68,6 +68,81 @@ void Video::SetEventMgr(EventMgr* evnt)
 	EvntManager = evnt;
 }
 
+// Flips given sprite vertically (up-down). If MirrorAnchor=true,
+// flips its anchor (i.e. origin//base point) as well
+// returns new sprite
+Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
+{
+	if (!sprite)
+		return NULL;
+	
+	Sprite2D* dest = sprite->copy();
+	
+	if (sprite->pixels != dest->pixels) {
+		assert(!sprite->BAM);
+		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
+		for (int x = 0; x < dest->Width; x++) {
+			unsigned char * dst = ( unsigned char * ) dest->pixels + x;
+			unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
+			for (int y = 0; y < dest->Height / 2; y++) {
+				unsigned char swp = *dst;
+				*dst = *src;
+				*src = swp;
+				dst += dest->Width;
+				src -= dest->Width;
+			}
+		}
+	} else {
+		// if the pixel buffers are the same then either there are no pixels (NULL)
+		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
+		dest->renderFlags |= RENDER_FLIP_VERTICAL;
+	}
+	
+	dest->XPos = sprite->XPos;
+	if (MirrorAnchor)
+		dest->YPos = sprite->Height - sprite->YPos;
+	else
+		dest->YPos = sprite->YPos;
+	
+	return dest;
+}
+
+// Flips given sprite horizontally (left-right). If MirrorAnchor=true,
+//   flips its anchor (i.e. origin//base point) as well
+Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAnchor)
+{
+	if (!sprite)
+		return NULL;
+	
+	Sprite2D* dest = sprite->copy();
+	
+	if (sprite->pixels != dest->pixels) {
+		assert(!sprite->BAM);
+		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
+		for (int y = 0; y < dest->Height; y++) {
+			unsigned char * dst = (unsigned char *) dest->pixels + ( y * dest->Width );
+			unsigned char * src = dst + dest->Width - 1;
+			for (int x = 0; x < dest->Width / 2; x++) {
+				unsigned char swp=*dst;
+				*dst++ = *src;
+				*src-- = swp;
+			}
+		}
+	} else {
+		// if the pixel buffers are the same then either there are no pixels (NULL)
+		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
+		dest->renderFlags |= RENDER_FLIP_HORIZONTAL;
+	}
+	
+	if (MirrorAnchor)
+		dest->XPos = sprite->Width - sprite->XPos;
+	else
+		dest->XPos = sprite->XPos;
+	dest->YPos = sprite->YPos;
+	
+	return dest;
+}
+
 void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
 {
 	if (cur) {

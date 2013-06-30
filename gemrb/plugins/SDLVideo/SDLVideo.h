@@ -122,10 +122,7 @@ public:
 	void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
-	/** Flips sprite vertically */
-	Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor);
-	/** Flips sprite horizontally */
-	Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor);
+
 	/** Set Clip Rect */
 	void SetClipRect(const Region* clip);
 	/** Get Clip Rect */
