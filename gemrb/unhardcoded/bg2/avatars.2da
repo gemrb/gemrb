@@ -309,10 +309,10 @@
 0xE700     MNO1       MNO1       MNO1       MNO1       9          2          1          *
 0xE710     MNO2       MNO2       MNO2       MNO2       9          2          1          *
 0xE720     MNO3       MNO3       MNO3       MNO3       9          2          1          *
-0xE800     MOR1       MOR1       MOR1       MOR1       9          2          1          *
-0xE810     MOR2       MOR2       MOR2       MOR2       9          2          1          *
-0xE820     MOR3       MOR3       MOR3       MOR3       9          2          1          *
-0xE830     MOR4       MOR4       MOR4       MOR4       9          2          1          *
+0xE800     MOR1       MOR1       MOR1       MOR1       16         2          1          *
+0xE810     MOR2       MOR2       MOR2       MOR2       16         2          1          *
+0xE820     MOR3       MOR3       MOR3       MOR3       16         2          1          *
+0xE830     MOR4       MOR4       MOR4       MOR4       16         2          1          *
 0xE840     MOR5       MOR5       MOR5       MOR5       9          2          1          *
 0xE900     MSAL       MSAL       MSAL       MSAL       9          2          1          *
 0xE910     MSA2       MSA2       MSA2       MSA2       9          2          1          *
