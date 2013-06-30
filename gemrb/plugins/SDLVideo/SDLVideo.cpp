@@ -98,9 +98,33 @@ int SDLVideoDriver::SwapBuffers(void)
 	lastTime = time;
 
 	bool ConsolePopped = core->ConsolePopped;
-
 	if (ConsolePopped) {
 		core->DrawConsole();
+	}
+
+	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
+		
+		if (MouseFlags&MOUSE_GRAYED) {
+			//used for greyscale blitting, fadeColor is unused
+			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
+		} else {
+			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
+		}
+	}
+	if (!(MouseFlags & MOUSE_NO_TOOLTIPS)) {
+		//handle tooltips
+		unsigned int delay = core->TooltipDelay;
+		// The multiplication by 10 is there since the last, disabling slider position is the eleventh
+		if (!core->ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
+			unsigned long time = GetTickCount();
+			/** Display tooltip if mouse is idle */
+			if (( time - lastMouseMoveTime ) > delay) {
+				if (EvntManager)
+					EvntManager->MouseIdle( time - lastMouseMoveTime );
+			}
+
+			core->DrawTooltip();
+		}
 	}
 
 	return PollEvents();

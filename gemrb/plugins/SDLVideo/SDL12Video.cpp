@@ -190,8 +190,6 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 
 int SDL12VideoDriver::SwapBuffers(void)
 {
-	int ret = SDLVideoDriver::SwapBuffers();
-
 	SDL_BlitSurface( backBuf, NULL, disp, NULL );
 	if (fadeColor.a) {
 		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
@@ -204,36 +202,12 @@ int SDL12VideoDriver::SwapBuffers(void)
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
 
-	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
-		SDL_Surface* temp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		if (MouseFlags&MOUSE_GRAYED) {
-			//used for greyscale blitting, fadeColor is unused
-			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
-		} else {
-			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
-		}
-		backBuf = temp;
-	}
-	if (!(MouseFlags & MOUSE_NO_TOOLTIPS)) {
-		//handle tooltips
-		unsigned int delay = core->TooltipDelay;
-		// The multiplication by 10 is there since the last, disabling slider position is the eleventh
-		if (!core->ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
-			unsigned long time = GetTickCount();
-			/** Display tooltip if mouse is idle */
-			if (( time - lastMouseMoveTime ) > delay) {
-				if (EvntManager)
-					EvntManager->MouseIdle( time - lastMouseMoveTime );
-			}
+	/** This causes the tooltips/cursors to be rendered directly to display */
+	SDL_Surface* tmp = backBuf;
+	backBuf = disp; // FIXME: UGLY HACK!
+	int ret = SDLVideoDriver::SwapBuffers();
+	backBuf = tmp;
 
-			/** This causes the tooltip to be rendered directly to display */
-			SDL_Surface* tmp = backBuf;
-			backBuf = disp; // FIXME: UGLY HACK!
-			core->DrawTooltip();
-			backBuf = tmp;
-		}
-	}
 	SDL_Flip( disp );
 	return ret;
 }
