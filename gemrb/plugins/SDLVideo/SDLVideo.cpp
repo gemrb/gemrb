@@ -46,6 +46,8 @@ using namespace GemRB;
 #define SDLK_KP4 SDLK_KP_4
 #define SDLK_KP6 SDLK_KP_6
 #define SDLK_KP8 SDLK_KP_8
+#else
+typedef Sint32 SDL_Keycode;
 #endif
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -164,7 +166,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	if (!EvntManager)
 		return GEM_ERROR;
 
-	unsigned char key = 0;
+	SDL_Keycode key = SDLK_UNKNOWN;
 	int modstate = GetModState(event.key.keysym.mod);
 
 	/* Loop until there are no events left on the queue */
@@ -195,7 +197,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					// fallthrough
 				default:
 					if (event.key.keysym.sym<256) {
-						key=(unsigned char) event.key.keysym.sym;
+						key = event.key.keysym.sym;
 					}
 					break;
 			}
@@ -207,7 +209,11 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				core->PopupConsole();
 				break;
 			}
-			key = (unsigned char) event.key.keysym.unicode;
+#if SDL_VERSION_ATLEAST(1,3,0)
+			key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
+#else
+			key = event.key.keysym.unicode;
+#endif
 			if (key < 32 || key == 127) {
 				switch (event.key.keysym.sym) {
 					case SDLK_ESCAPE:
