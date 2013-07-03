@@ -1239,11 +1239,13 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 	int oldslot = GetEquippedSlot();
 	int newslot = GetWeaponSlot(slotcode);
 
+	//remove previous slot effects
+	if (Equipped != IW_NO_EQUIPPED) {
+		RemoveSlotEffects(oldslot);
+	}
+
 	//unequipping (fist slot will be used now)
 	if (slotcode == IW_NO_EQUIPPED || !HasItemInSlot("", newslot)) {
-		if (Equipped != IW_NO_EQUIPPED) {
-			RemoveSlotEffects( oldslot);
-		}
 		Equipped = IW_NO_EQUIPPED;
 		//fist slot equipping effects
 		AddSlotEffects(SLOT_FIST);
@@ -1251,11 +1253,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 		return true;
 	}
 
-	//equipping a weapon, but remove its effects first
-	if (Equipped != IW_NO_EQUIPPED) {
-		RemoveSlotEffects( oldslot);
-	}
-
+	//equipping a weapon
 	Equipped = slotcode;
 	int effects = core->QuerySlotEffects( newslot);
 	if (effects) {
