@@ -913,23 +913,24 @@ bool Inventory::EquipItem(ieDword slot)
 		EquippedHeader = 0;
 		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
+			ieDword equip;
 			if (header->AttackType == ITEM_AT_BOW) {
 				//find the ranged projectile associated with it, this returns equipped code
-				Equipped = FindRangedProjectile(header->ProjectileQualifier);
+				equip = FindRangedProjectile(header->ProjectileQualifier);
 				//this is the real item slot of the quarrel
-				slot = Equipped + SLOT_MELEE;
+				slot = equip + SLOT_MELEE;
 			} else {
 				//this is always 0-3
-				Equipped = weaponslot;
+				equip = weaponslot;
 				slot = GetWeaponSlot(weaponslot);
 			}
-			if (Equipped != IW_NO_EQUIPPED) {
+			if (equip != IW_NO_EQUIPPED) {
 				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, EquippedHeader);
 			}
-			SetEquippedSlot(Equipped, EquippedHeader);
+			SetEquippedSlot(equip, EquippedHeader);
 			//don't clear effect in case of a launcher, we need to find it and add its effects too
 			//slot is 'negative' for launchers
-			if ((int) Equipped>=0) {
+			if ((int) equip>=0) {
 				effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			} else {
 				effect = SLOT_EFFECT_MISSILE;
