@@ -8110,9 +8110,10 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	gamedata->FreeItem(itm,tmpresref, false);
 	ResetCommentTime();
 	if (pro) {
-		//ieDword is unsigned!!
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
-		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
+		if (flags & UI_FAKE) {
+			delete pro;
+		} else if (((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			bool ranged = header == (ieDword)-2;
 			ITMExtHeader *which = itm->GetWeaponHeader(ranged);
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
