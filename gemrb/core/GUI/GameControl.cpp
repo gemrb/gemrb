@@ -1610,8 +1610,9 @@ void GameControl::UpdateScrolling() {
 	}
 
 	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-	core->GetVideoDriver()->SetCursor(cursor, VID_CUR_DRAG);
-	cursor->release();
+	Video* video = core->GetVideoDriver();
+	video->SetCursor(cursor, VID_CUR_DRAG);
+	video->FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;
 }
