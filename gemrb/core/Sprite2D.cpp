@@ -51,6 +51,7 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 	Width = obj.Width;
 	Height = obj.Height;
 	Bpp = obj.Bpp;
+	renderFlags = obj.renderFlags;
 
 	pixels = obj.pixels;
 	freePixels = false;
