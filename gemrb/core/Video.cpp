@@ -75,9 +75,9 @@ Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
-	
+
 	Sprite2D* dest = sprite->copy();
-	
+
 	if (sprite->pixels != dest->pixels) {
 		assert(!sprite->BAM);
 		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
@@ -95,15 +95,16 @@ Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 	} else {
 		// if the pixel buffers are the same then either there are no pixels (NULL)
 		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
-		dest->renderFlags |= RENDER_FLIP_VERTICAL;
+		// toggle the bit because it could be a mirror of a mirror
+		dest->renderFlags ^= RENDER_FLIP_VERTICAL;
 	}
-	
+
 	dest->XPos = sprite->XPos;
 	if (MirrorAnchor)
 		dest->YPos = sprite->Height - sprite->YPos;
 	else
 		dest->YPos = sprite->YPos;
-	
+
 	return dest;
 }
 
@@ -113,9 +114,9 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 {
 	if (!sprite)
 		return NULL;
-	
+
 	Sprite2D* dest = sprite->copy();
-	
+
 	if (sprite->pixels != dest->pixels) {
 		assert(!sprite->BAM);
 		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
@@ -131,15 +132,16 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 	} else {
 		// if the pixel buffers are the same then either there are no pixels (NULL)
 		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
-		dest->renderFlags |= RENDER_FLIP_HORIZONTAL;
+		// toggle the bit because it could be a mirror of a mirror
+		dest->renderFlags ^= RENDER_FLIP_HORIZONTAL;
 	}
-	
+
 	if (MirrorAnchor)
 		dest->XPos = sprite->Width - sprite->XPos;
 	else
 		dest->XPos = sprite->XPos;
 	dest->YPos = sprite->YPos;
-	
+
 	return dest;
 }
 
