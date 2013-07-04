@@ -1542,6 +1542,7 @@ void SDLVideoDriver::SetSurfacePixel(SDL_Surface* surface, short x, short y, con
 			break;
 		case 4:
 			*(Uint32 *)pixels = val;
+			break;
 		default:
 			Log(ERROR, "SDLSurfaceSprite2D", "Working with unknown pixel format: %s", SDL_GetError());
 			break;
