@@ -31,7 +31,7 @@ const TypeID Sprite2D::ID = { "Sprite2D" };
 Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
 	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
 {
-	freePixels = true;
+	freePixels = (bool)(pixels);
 	BAM = false;
 	RLE = false;
 	XPos = 0;
@@ -59,7 +59,7 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 
 Sprite2D::~Sprite2D()
 {
-	if (freePixels && pixels) {
+	if (freePixels) {
 		// FIXME: casting away const.
 		free((void*)pixels);
 	}
