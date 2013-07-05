@@ -26,6 +26,8 @@
 	<dict>
 		<key>CustomFontPath</key>
 		<string>~/Library/Fonts</string>
+		<key>SavePath</key>
+		<string></string>
 		<key>CD1</key>
 		<string></string>
 		<key>CD2</key>

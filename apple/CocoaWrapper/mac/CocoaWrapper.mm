@@ -110,6 +110,9 @@ using namespace GemRB;
 		NSString* fontPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Fonts"];
 		[additionalPaths setValue:fontPath forKey:@"CustomFontPath"];
 	}
+	if ([additionalPaths valueForKey:@"SavePath"] == nil) {
+		[additionalPaths setValue:[defaults valueForKey:@"GamePath"] forKey:@"SavePath"];
+	}
 }
 
 /* Called when the internal event loop has just started running */
