@@ -103,6 +103,13 @@ using namespace GemRB;
 		NSString* cachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"gemrb"];
 		[defaults setValue:cachePath forKey:@"CachePath"];
 	}
+
+	NSMutableDictionary* additionalPaths = [defaults valueForKey:@"AdditionalPaths"];
+	if ([additionalPaths valueForKey:@"CustomFontPath"] == nil) {
+		NSArray* paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, NO);
+		NSString* fontPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Fonts"];
+		[additionalPaths setValue:fontPath forKey:@"CustomFontPath"];
+	}
 }
 
 /* Called when the internal event loop has just started running */
