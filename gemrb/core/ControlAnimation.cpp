@@ -26,8 +26,6 @@
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Interface.h"
-#include "Palette.h"    /* needed only for paperdoll palettes */
-#include "Video.h"      /* needed only for paperdoll palettes */
 #include "GUI/Button.h"
 
 namespace GemRB {

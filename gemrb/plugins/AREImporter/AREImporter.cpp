@@ -37,7 +37,6 @@
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "TileMapMgr.h"
-#include "Video.h"
 #include "GameScript/GameScript.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

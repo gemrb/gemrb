@@ -30,7 +30,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "Sprite2D.h"
+#include "BAMSprite2D.h"
 #include "Video.h"
 #include "System/FileStream.h"
 
@@ -143,17 +143,18 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 		assert(data);
 		const unsigned char* framedata = data;
 		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-		spr = core->GetVideoDriver()->CreateSpriteBAM8(frames[findex].Width,
-													   frames[findex].Height,
-													   RLECompressed,
-													   framedata, datasrc,
-													   palette,
-													   CompressedColorIndex);
+		spr = new BAMSprite2D (frames[findex].Width,
+							   frames[findex].Height,
+							   framedata,
+							   RLECompressed,
+							   datasrc,
+							   palette,
+							   CompressedColorIndex);
 	} else {
 		void* pixels = GetFramePixels(findex);
 		spr = core->GetVideoDriver()->CreateSprite8(
-			frames[findex].Width, frames[findex].Height, 8,
-			pixels, palette->col, true, 0 );
+			frames[findex].Width, frames[findex].Height,
+			pixels, palette, true, 0 );
 	}
 
 	spr->XPos = (ieWordSigned)frames[findex].XPos;
@@ -286,7 +287,7 @@ Sprite2D* BAMImporter::GetPalette()
 	for (int i = 0; i < 256; i++) {
 		*p++ = ( unsigned char ) i;
 	}
-	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
+	return core->GetVideoDriver()->CreateSprite8( 16, 16, pixels, palette );
 }
 
 #include "BAMFontManager.h"

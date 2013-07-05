@@ -24,7 +24,6 @@
 
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -39,7 +38,7 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 AnimationFactory::~AnimationFactory(void)
 {
 	for (unsigned int i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->FreeSprite( frames[i] );
+		frames[i]->release();
 	}
 	if (FLTable)
 		free( FLTable);
@@ -127,8 +126,7 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		return NULL;
 	}
 
-	Video* video = core->GetVideoDriver();
-	Picture2 = video->DuplicateSprite(frames[1]);
+	Picture2 = frames[1]->copy();
 	if (!Picture2) {
 		return NULL;
 	}
@@ -142,8 +140,7 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	Picture2->XPos = (short)frames[1]->XPos;
 	Picture2->YPos = (short)frames[1]->YPos - 80;
 
-
-	Sprite2D* spr = core->GetVideoDriver()->DuplicateSprite(frames[0]);
+	Sprite2D* spr = frames[0]->copy();
 	if (Colors) {
 		Palette* palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
@@ -153,8 +150,6 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 
 	spr->XPos = (short)frames[0]->XPos;
 	spr->YPos = (short)frames[0]->YPos;
-
-	//don't free pixels, createsprite stores it in spr
 
 	return spr;
 }

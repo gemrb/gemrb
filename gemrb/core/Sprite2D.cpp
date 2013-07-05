@@ -23,23 +23,46 @@
 #include "win32def.h"
 
 #include "Interface.h"
-#include "Video.h"
 
 namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels)
-	: Width(Width), Height(Height), Bpp(Bpp), vptr(vptr), pixels(pixels)
+Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
+	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
 {
+	freePixels = true;
 	BAM = false;
+	RLE = false;
 	XPos = 0;
 	YPos = 0;
 	RefCount = 1;
+	renderFlags = 0;
+}
+
+Sprite2D::Sprite2D(const Sprite2D &obj)
+{
+	BAM = false;
+	RLE = false;
+	RefCount = 1;
+
+	XPos = obj.XPos;
+	YPos = obj.YPos;
+	Width = obj.Width;
+	Height = obj.Height;
+	Bpp = obj.Bpp;
+	renderFlags = obj.renderFlags;
+
+	pixels = obj.pixels;
+	freePixels = false;
 }
 
 Sprite2D::~Sprite2D()
 {
+	if (freePixels && pixels) {
+		// FIXME: casting away const.
+		free((void*)pixels);
+	}
 }
 
 bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
@@ -48,77 +71,12 @@ bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 	return GetPixel(x, y).a == 0;
 }
 
-/** Get the Palette of a Sprite */
-Palette* Sprite2D::GetPalette() const
-{
-	if (!vptr) return NULL;
-	if (!BAM) {
-		return core->GetVideoDriver()->GetPalette(vptr);
-	}
-
-	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
-	data->pal->acquire();
-	return data->pal;
-}
-
-void Sprite2D::SetPalette(Palette* pal)
-{
-	if (!vptr) return;
-	if (!BAM) {
-		core->GetVideoDriver()->SetPalette(vptr, pal);
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
-		data->pal->release();
-		pal->acquire();
-		data->pal = pal;
-	}
-}
-
-Color Sprite2D::GetPixel(unsigned short x, unsigned short y) const
-{
-	Color c = { 0, 0, 0, 0 };
-
-	if (x >= Width || y >= Height) return c;
-
-	if (!BAM) {
-		core->GetVideoDriver()->GetPixel(vptr, x, y, c);
-		return c;
-	}
-
-	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
-
-	if (data->flip_ver)
-		y = Height - y - 1;
-	if (data->flip_hor)
-		x = Width - x - 1;
-
-	int skipcount = y * Width + x;
-
-	const ieByte *rle = (const ieByte*)pixels;
-	if (data->RLE) {
-		while (skipcount > 0) {
-			if (*rle++ == data->transindex)
-				skipcount -= (*rle++)+1;
-			else
-				skipcount--;
-		}
-	} else {
-		// uncompressed
-		rle += skipcount;
-		skipcount = 0;
-	}
-
-	if (skipcount >= 0 && *rle != data->transindex) {
-		c = data->pal->col[*rle];
-		c.a = 0xff;
-	}
-	return c;
-}
-
 void Sprite2D::release()
 {
-	Sprite2D *that = this;
-	core->GetVideoDriver()->FreeSprite(that);
+	assert(RefCount > 0);
+	if (--RefCount == 0) {
+		delete this;
+	}
 }
 
 }

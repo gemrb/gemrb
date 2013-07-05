@@ -180,8 +180,7 @@ Sprite2D* PNGImporter::GetSprite2D()
 		Color pal[256];
 		GetPalette(256, pal);
 		// TODO: colorkey
-		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8,
-													buffer, pal, false, 0);
+		spr = core->GetVideoDriver()->CreatePalettedSprite(Width, Height, 8, buffer, pal);
 	} else {
 		spr = core->GetVideoDriver()->CreateSprite(Width, Height, 32,
 												   red_mask, green_mask,

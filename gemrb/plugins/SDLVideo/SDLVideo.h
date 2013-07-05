@@ -80,21 +80,17 @@ public:
 	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);
 
-	void GetMousePos(int &x, int &y);
 	void MouseMovement(int x, int y);
 	void ClickMouse(unsigned int button);
 	void MouseClickEvent(SDL_EventType type, Uint8 button);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);
-	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
-		void* palette, bool cK = false, int index = 0);
-	Sprite2D* CreateSpriteBAM8(int w, int h, bool RLE,
-		const unsigned char* pixeldata, AnimationFactory* datasrc,
-		Palette* palette, int transindex);
+	Sprite2D* CreateSprite8(int w, int h, void* pixels,
+							Palette* palette, bool cK, int index);
+	Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+								   Color* palette, bool cK = false, int index = 0);
 	bool SupportsBAMSprites() { return true; }
-	void FreeSprite(Sprite2D* &spr);
-	Sprite2D* DuplicateSprite(const Sprite2D* spr);
 	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
 	void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 					const Region* clip = NULL, Palette* palette = NULL);
@@ -105,9 +101,6 @@ public:
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetScreenshot( Region r );
-	void ConvertToVideoFormat(Sprite2D* sprite);
-	/** Sets the palette of an SDL surface pointed by */
-	void SetPalette(void* data, Palette* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
@@ -115,8 +108,6 @@ public:
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);
 	/** Gets the pixel of the backbuffer surface */
 	void GetPixel(short x, short y, Color& color);
-	/** Gets the pixel of any supplied surface */
-	void GetPixel(void *vptr, unsigned short x, unsigned short y, Color& color);
 	void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
@@ -131,12 +122,7 @@ public:
 	void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
-	/** Get the Palette of a surface */
-	Palette* GetPalette(void *vptr);
-	/** Flips sprite vertically */
-	Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor);
-	/** Flips sprite horizontally */
-	Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor);
+
 	/** Set Clip Rect */
 	void SetClipRect(const Region* clip);
 	/** Get Clip Rect */
@@ -173,15 +159,15 @@ public:
 
 protected:
 	void DrawMovieSubtitle(ieDword strRef);
-	virtual bool SetSurfacePalette(SDL_Surface* surface, SDL_Color* colors, int ncolors)=0;
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
 
 public:
-	long GetPixel(void *data, unsigned short x, unsigned short y);
-	void SetGamma(int brightness, int contrast)=0;
-	void SetMouseScrollSpeed(int speed);
+	// static functions for manipulating surfaces
+	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
+	static void SetSurfacePixel(SDL_Surface* surf, short x, short y, const Color& color);
+	static void GetSurfacePixel(SDL_Surface* surf, short x, short y, Color& c);
 };
 
 }

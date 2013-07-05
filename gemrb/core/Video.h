@@ -30,17 +30,15 @@
 #include "globals.h"
 
 #include "Plugin.h"
+#include "Polygon.h"
 #include "ScriptedAnimation.h"
 
 namespace GemRB {
 
-class AnimationFactory;
 class EventMgr;
 class Font;
-class Gem_Polygon;
 class Palette;
 class SpriteCover;
-class Wall_Polygon;
 
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW, and BLIT_GREY overrides BLIT_SEPIA
@@ -126,24 +124,20 @@ public:
 	/** Displays or hides a virtual (software) keyboard*/
 	virtual void ShowSoftKeyboard() = 0;
 	virtual void HideSoftKeyboard() = 0;
-	
-	virtual void InitSpriteCover(SpriteCover* sc, int flags) = 0;
-	virtual void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly) = 0;
-	virtual void DestroySpriteCover(SpriteCover* sc) = 0;
+
+	void InitSpriteCover(SpriteCover* sc, int flags);
+	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
+	void DestroySpriteCover(SpriteCover* sc);
 
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
-		void* palette, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSpriteBAM8(int /*w*/, int /*h*/, bool /* RLE */,
-		 const unsigned char* /*pixeldata*/,
-		 AnimationFactory* /*datasrc*/,
-		 Palette* /*palette*/,
-		 int /*transindex*/) { return 0; }
+	virtual Sprite2D* CreateSprite8(int w, int h, void* pixels,
+									Palette* palette, bool cK = false, int index = 0) = 0;
+	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
-	virtual void FreeSprite(Sprite2D* &spr) = 0;
-	virtual Sprite2D* DuplicateSprite(const Sprite2D* spr) = 0;
+	void FreeSprite(Sprite2D* &spr);
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags) = 0;
 	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 		const Region* clip = NULL, Palette* palette = NULL) = 0;
@@ -157,17 +151,12 @@ public:
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
-	virtual void ConvertToVideoFormat(Sprite2D* sprite) = 0;
-	/** Sets the palette of a plugin specific sprite */
-	virtual void SetPalette(void* data, Palette* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
 	/** this function draws a clipped sprite */
 	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
 	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
 	virtual void GetPixel(short x, short y, Color& color) = 0;
-	virtual long GetPixel(void *, unsigned short x, unsigned short y) = 0;
-	virtual void GetPixel(void *, unsigned short x, unsigned short y, Color &color) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
 	/** Draws an Ellipse Segment */
@@ -186,12 +175,10 @@ public:
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
-	/** Gets the Palette of a surface */
-	virtual Palette* GetPalette(void* surface) = 0;
 	/** Flips sprite vertically, returns new sprite */
-	virtual Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor) = 0;
+	Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor);
 	/** Flips sprite horizontally, returns new sprite */
-	virtual Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor) = 0;
+	Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor);
 	/** Duplicates and transforms sprite to have an alpha channel */
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 
@@ -208,7 +195,7 @@ public:
 	/** Gets Clip Rectangle */
 	virtual void GetClipRect(Region& clip) = 0;
 	/** returns the current mouse coordinates */
-	virtual void GetMousePos(int &x, int &y) = 0;
+	void GetMousePos(int &x, int &y);
 	/** clicks the mouse forcibly */
 	virtual void ClickMouse(unsigned int button) = 0;
 	/** moves the mouse forcibly */

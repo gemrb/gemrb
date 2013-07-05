@@ -158,7 +158,7 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 
 	// TODO: do an underline if requested
 
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, 8, pixels, palette, true, 0);
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, pixels, palette, true, 0);
 	// for some reason BAM fonts are all based of a YPos of 13
 	spr->YPos = 13 - yoffset;
 	// cache the glyph
@@ -266,11 +266,11 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	SetPalette(pal);
 
 	// TODO: ttf fonts have a "box" glyph they use for this
-	blank = core->GetVideoDriver()->CreateSprite8(0, 0, 8, NULL, palette->col);
+	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
 	// ttf fonts dont produce glyphs for whitespace
 	int SpaceWidth = core->TLKEncoding.zerospace ? 1 : (ptSize * 0.25);
-	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, 8, NULL, palette->col);;
-	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, 8, NULL, palette->col);
+	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, NULL, palette);
+	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, NULL, palette);
 
 	// now cache these glyphs for quick access
 	// WARNING: if we ever did something to purge the cache these would be lost

@@ -33,6 +33,9 @@
 #include "Palette.h"
 #include "TypeID.h"
 
+#define RENDER_FLIP_HORIZONTAL	0x00000001
+#define RENDER_FLIP_VERTICAL	0x00000002
+
 namespace GemRB {
 
 class AnimationFactory;
@@ -43,40 +46,38 @@ class AnimationFactory;
  * Objects of this class are usually created by Video driver.
  */
 
-class Sprite2D_BAM_Internal {
-public:
-	Sprite2D_BAM_Internal() { pal = 0; }
-	~Sprite2D_BAM_Internal() { if (pal) { pal->release(); pal = 0; } }
-
-	Palette* pal;
-	bool RLE;
-	int transindex;
-	bool flip_hor;
-	bool flip_ver;
-
-	// The AnimationFactory in which the data for this sprite is stored.
-	// (Used for refcounting of the data.)
-	AnimationFactory* source;
-};
-
 class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
+private:
+	int RefCount;
+protected:
+	bool freePixels;
 public:
 	int XPos, YPos, Width, Height, Bpp;
-	/** Pointer to the Driver Video Structure */
-	void* vptr;
+
 	bool BAM;
+	bool RLE; // in theory this could apply to more than BAMs, but currently does not.
+	ieDword renderFlags;
 	const void* pixels;
-	Sprite2D(int Width, int Height, int Bpp, void* vptr, const void* pixels);
-	~Sprite2D();
+
+	Sprite2D(int Width, int Height, int Bpp, const void* pixels);
+	Sprite2D(const Sprite2D &obj);
+	virtual Sprite2D* copy() const = 0;
+	virtual ~Sprite2D();
+
 	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
-	Palette *GetPalette() const;
-	void SetPalette(Palette *pal);
-	Color GetPixel(unsigned short x, unsigned short y) const;
-public: // public only for SDLVideo
-	int RefCount;
-public:
+	virtual Palette *GetPalette() const = 0;
+	virtual const Color* GetPaletteColors() const = 0;
+	virtual void SetPalette(Palette *pal) = 0;
+	virtual Color GetPixel(unsigned short x, unsigned short y) const = 0;
+	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
+	virtual ieDword GetColorKey() const = 0;
+	/* SetColorKey: ieDword is either a px value or a palete index if sprite has a palette. */
+	virtual void SetColorKey(ieDword) = 0;
+	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
+							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
+
 	void acquire() { ++RefCount; }
 	void release();
 };

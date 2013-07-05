@@ -30,7 +30,6 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Palette.h"
-#include "Video.h"
 
 namespace GemRB {
 

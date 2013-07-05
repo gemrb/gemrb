@@ -33,7 +33,6 @@
 #include "Spell.h"
 #include "SpriteCover.h"
 #include "TileMap.h"
-#include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "Scriptable/InfoPoint.h"

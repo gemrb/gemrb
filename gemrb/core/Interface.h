@@ -337,7 +337,6 @@ private:
 	ieResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
-	ieDword FullScreen;
 	ieResRef TooltipFont;
 	ieResRef TooltipBackResRef;
 	ieResRef MovieFont;

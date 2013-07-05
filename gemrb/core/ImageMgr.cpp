@@ -24,7 +24,6 @@
 
 #include "ImageFactory.h"
 #include "Interface.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -55,7 +54,7 @@ Bitmap* ImageMgr::GetBitmap()
 		}
 	}
 
-	core->GetVideoDriver()->FreeSprite(spr);
+	spr->release();
 
 	return data;
 }
@@ -74,7 +73,7 @@ Image* ImageMgr::GetImage()
 		}
 	}
 
-	core->GetVideoDriver()->FreeSprite(spr);
+	spr->release();
 
 	return data;
 }

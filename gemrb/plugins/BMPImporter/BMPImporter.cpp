@@ -234,8 +234,8 @@ Sprite2D* BMPImporter::GetSprite2D()
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );
-		spr = core->GetVideoDriver()->CreateSprite8( Width, Height, NumColors==16?4:8,
-			p, Palette, true, 0 );
+		spr = core->GetVideoDriver()->CreatePalettedSprite(Width, Height, NumColors == 16 ? 4 : 8,
+														   p, Palette, true, 0);
 	}
 	return spr;
 }

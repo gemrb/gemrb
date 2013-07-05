@@ -21,7 +21,6 @@
 #include "ImageFactory.h"
 
 #include "Interface.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -33,7 +32,7 @@ ImageFactory::ImageFactory(const char* ResRef, Sprite2D* bitmap_)
 
 ImageFactory::~ImageFactory(void)
 {
-	core->GetVideoDriver()->FreeSprite( bitmap );
+	bitmap->release();
 }
 
 Sprite2D* ImageFactory::GetSprite2D() const

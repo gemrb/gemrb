@@ -778,13 +778,7 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
-	bool RLE = false;
-	if (spr->BAM) {
-		Sprite2D_BAM_Internal *data = (Sprite2D_BAM_Internal*)spr->vptr;
-		RLE = data->RLE;
-	} else {
-		// Not BAM -> not RLE.
-	}
+	bool RLE = spr->RLE;
 
 	if (!COVER && !XFLIP)
 		if (RLE)

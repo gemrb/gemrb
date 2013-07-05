@@ -201,7 +201,6 @@ Interface::Interface()
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
 	Bpp = 32;
-	FullScreen = 0;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -1128,16 +1127,9 @@ static const Region bg( 0, 0, 100, 30 );
 /** this is the main loop */
 void Interface::Main()
 {
-	ieDword brightness = 10;
-	ieDword contrast = 5;
 	ieDword speed = 10;
 
-	vars->Lookup("Full Screen", FullScreen);
-	video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName);
-	vars->Lookup("Brightness Correction", brightness);
-	vars->Lookup("Gamma Correction", contrast);
 	vars->Lookup("Mouse Scroll Speed", speed);
-	video->SetGamma(brightness, contrast);
 	SetMouseScrollSpeed((int) speed);
 	if (vars->Lookup("Tooltips", TooltipDelay)) {
 		// the games store the slider position*10, not the actual delay
@@ -1503,6 +1495,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 	CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
 	CONFIG_INT("FogOfWar", FogOfWar = );
+	ieDword FullScreen = 0;
 	CONFIG_INT("FullScreen", FullScreen = );
 	vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite
 	CONFIG_INT("GUIEnhancements", GUIEnhancements = );
@@ -1684,6 +1677,17 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
+	ieDword brightness = 10;
+	ieDword contrast = 5;
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	vars->Lookup("Full Screen", FullScreen);
+	video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName);
+	vars->Lookup("Brightness Correction", brightness);
+	vars->Lookup("Gamma Correction", contrast);
+	video->SetGamma(brightness, contrast);
+
 	Color defcolor={255,255,255,200};
 	SetInfoTextColor(defcolor);
 

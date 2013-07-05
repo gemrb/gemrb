@@ -107,7 +107,7 @@ Sprite2D* TISImporter::GetTile(int index)
 		memset(pixels, 0, 4096);
 		memset(Palette, 0, 256 * sizeof(Color));
 		Palette[0].g = 200;
-		Sprite2D* spr = core->GetVideoDriver()->CreateSprite8( 64, 64, 8, pixels, Palette, false, 0 );
+		Sprite2D* spr = core->GetVideoDriver()->CreatePalettedSprite( 64, 64, 8, pixels, Palette );
 		spr->XPos = spr->YPos = 0;
 		return spr;
 	}
@@ -130,7 +130,7 @@ Sprite2D* TISImporter::GetTile(int index)
 		}
 	}
 	str->Read( pixels, 4096 );
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8( 64, 64, 8, pixels, Palette, transparent, transindex );
+	Sprite2D* spr = core->GetVideoDriver()->CreatePalettedSprite( 64, 64, 8, pixels, Palette, transparent, transindex );
 	spr->XPos = spr->YPos = 0;
 	return spr;
 }
