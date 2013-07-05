@@ -356,6 +356,7 @@ void Inventory::KillSlot(unsigned int index)
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();
+	ieDword equip;
 
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
@@ -367,9 +368,11 @@ void Inventory::KillSlot(unsigned int index)
 				if (Equipped < 0) {
 					//always get the projectile weapon header (this quiver was equipped)
 					ITMExtHeader *header = itm->GetWeaponHeader(true);
-					Equipped = FindRangedProjectile(header->ProjectileQualifier);
-					if (Equipped!=IW_NO_EQUIPPED) {
-						EquipItem(GetEquippedSlot());
+					//remove potential launcher effects too
+					RemoveSlotEffects(FindTypedRangedWeapon(header->ProjectileQualifier));
+					equip = FindRangedProjectile(header->ProjectileQualifier);
+					if (equip != IW_NO_EQUIPPED) {
+						EquipItem(GetWeaponSlot(equip));
 					} else {
 						EquipBestWeapon(EQUIP_MELEE);
 					}
@@ -380,9 +383,9 @@ void Inventory::KillSlot(unsigned int index)
 		case SLOT_EFFECT_MAGIC:
 		case SLOT_EFFECT_MELEE:
 			// reset Equipped if it was the removed item
-			if (eqslot == (int)index)
-				Equipped = IW_NO_EQUIPPED;
-			else if (Equipped < 0) {
+			if (eqslot == (int)index) {
+				SetEquippedSlot(IW_NO_EQUIPPED, 0);
+			} else if (Equipped < 0) {
 				//always get the projectile weapon header (this is a bow, because Equipped is negative)
 				ITMExtHeader *header = itm->GetWeaponHeader(true);
 				if (header) {
@@ -396,9 +399,9 @@ void Inventory::KillSlot(unsigned int index)
 						Item *itm2 = gamedata->GetItem(item2->ItemResRef, true);
 						if (itm2) {
 							if (type == header->ProjectileQualifier) {
-								Equipped = FindRangedProjectile(header->ProjectileQualifier);
-								if (Equipped!=IW_NO_EQUIPPED) {
-									EquipItem(GetEquippedSlot());
+								equip = FindRangedProjectile(header->ProjectileQualifier);
+								if (equip != IW_NO_EQUIPPED) {
+									EquipItem(GetWeaponSlot(equip));
 								} else {
 									EquipBestWeapon(EQUIP_MELEE);
 								}
@@ -928,14 +931,7 @@ bool Inventory::EquipItem(ieDword slot)
 				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, EquippedHeader);
 			}
 			SetEquippedSlot(equip, EquippedHeader);
-			//don't clear effect in case of a launcher, we need to find it and add its effects too
-			//slot is 'negative' for launchers
-			if ((int) equip>=0) {
-				effect = 0; // SetEquippedSlot will already call AddSlotEffects
-			} else {
-				effect = SLOT_EFFECT_MISSILE;
-			}
-			UpdateWeaponAnimation();
+			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 		}
 		break;
 	case SLOT_EFFECT_MISSILE:
@@ -973,9 +969,6 @@ bool Inventory::EquipItem(ieDword slot)
 	if (effect) {
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
-		}
-		if (effect == SLOT_EFFECT_MISSILE) {
-			slot = FindRangedWeapon();
 		}
 		AddSlotEffects( slot );
 	}
@@ -1242,6 +1235,14 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 	//remove previous slot effects
 	if (Equipped != IW_NO_EQUIPPED) {
 		RemoveSlotEffects(oldslot);
+		//for projectiles we may need to remove the launcher effects too
+		int oldeffects = core->QuerySlotEffects(oldslot);
+		if (oldeffects == SLOT_EFFECT_MISSILE) {
+			int launcher = FindSlotRangedWeapon(oldslot);
+			if (launcher != SLOT_FIST) {
+				RemoveSlotEffects(launcher);
+			}
+		}
 	}
 
 	//unequipping (fist slot will be used now)
@@ -1263,6 +1264,12 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
 		AddSlotEffects(newslot);
+
+		//in case of missiles also look for an appropriate launcher
+		if (effects == SLOT_EFFECT_MISSILE) {
+			newslot = FindRangedWeapon();
+			AddSlotEffects(newslot);
+		}
 	}
 	UpdateWeaponAnimation();
 	return true;
