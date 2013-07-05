@@ -52,7 +52,7 @@ using namespace GemRB;
 
 		if (_showConfigWindow == NO) {
 			// opened via means other than config window
-			[self launchGame:nil];
+			[self launchGame:self];
 		}
 
 		return YES;
