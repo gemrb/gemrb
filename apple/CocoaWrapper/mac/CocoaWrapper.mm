@@ -99,7 +99,8 @@ using namespace GemRB;
     [defaults registerDefaults:defaultDict];
 
 	if (![defaults stringForKey:@"CachePath"]) {
-		NSString* cachePath = [NSString stringWithFormat:@"%@gemrb", NSTemporaryDirectory()];
+		NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, NO);
+		NSString* cachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"gemrb"];
 		[defaults setValue:cachePath forKey:@"CachePath"];
 	}
 }
