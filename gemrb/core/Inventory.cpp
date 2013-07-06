@@ -1065,7 +1065,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 		//always look for a ranged header when looking for a projectile/projector
 		ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 		int weapontype = 0;
-		if (ext_header) {
+		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW)) {
 			weapontype = ext_header->ProjectileQualifier;
 		}
 		gamedata->FreeItem(itm, Slot->ItemResRef, false);
