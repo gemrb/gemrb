@@ -476,8 +476,6 @@ Actor::Actor()
 	nextBored = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
-	Equipped = 0;
-	EquippedHeader = 0;
 
 	fxqueue.SetOwner( this );
 	inventory.SetOwner( this );
@@ -4267,12 +4265,8 @@ void Actor::SetMap(Map *map)
 		//case of quivers. (weird IE magic)
 		//The other word is the equipped header.
 		//find a quiver for the bow, etc
-		if (Equipped!=IW_NO_EQUIPPED) {
-			inventory.EquipItem( Equipped+inventory.GetWeaponSlot());
-		} else {
-			inventory.EquipItem(inventory.GetFistSlot());
-		}
-		SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
+		inventory.EquipItem(inventory.GetEquippedSlot());
+		SetEquippedQuickSlot(inventory.GetEquipped(), inventory.GetEquippedHeader());
 	}
 }
 
@@ -5659,7 +5653,7 @@ ieDword Actor::GetNumberOfAttacks()
 		bonus = 2 * IsDualWielding();
 		return base + bonus;
 	} else {
-		if (monkbon != NULL && Equipped == IW_NO_EQUIPPED) {
+		if (monkbon != NULL && inventory.GetEquipped() == IW_NO_EQUIPPED) {
 			unsigned int level = GetMonkLevel();
 			if (level>=monkbon_cols) level=monkbon_cols-1;
 			if (level>0) {
@@ -5726,7 +5720,7 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 		// act as a rogue unless barefisted and without armor
 		// multiclassed monks only use their monk levels when determining barefisted bab
 		// check the spell failure instead of the skill penalty, since otherwise leather armor would also be treated as none
-		if (Equipped != IW_NO_EQUIPPED || GetTotalArmorFailure()) {
+		if (inventory.GetEquipped() != IW_NO_EQUIPPED || GetTotalArmorFailure()) {
 			pBAB += SetLevelBAB(MonkLevel, ISTHIEF);
 		} else {
 			pBABDecrement = 3;
@@ -5926,7 +5920,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		prof += -4;
 	} else {
 		// everyone is proficient with fists
-		if (Equipped != IW_NO_EQUIPPED) {
+		if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
 			prof += wspecial[stars][0];
 		}
 	}
@@ -5940,7 +5934,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
-			if (Equipped != IW_NO_EQUIPPED) {
+			if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
 				prof += defaultprof[clss];
 			}
 		} else {
@@ -7931,9 +7925,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 		}
 		//if it is the fist slot and not currently used, then set it up
 		if (i==MAX_QUICKWEAPONSLOT) {
-			Equipped = IW_NO_EQUIPPED;
-			EquippedHeader = 0;
-			inventory.SetEquippedSlot(Equipped, EquippedHeader);
+			inventory.SetEquippedSlot(IW_NO_EQUIPPED, 0);
 			return 0;
 		}
 	}
@@ -7946,8 +7938,6 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 		PCStats->QuickWeaponHeaders[slot]=header;
 	}
 	slot = inventory.GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
-	Equipped = (ieWordSigned) slot;
-	EquippedHeader = (ieWord) header;
 	if (inventory.SetEquippedSlot(slot, header)) {
 		return 0;
 	}
@@ -8784,8 +8774,6 @@ Actor *Actor::CopySelf(bool mislead) const
 		newActor->inventory.SetSlotCount(inventory.GetSlotCount());
 	} else {
 		newActor->inventory.CopyFrom(this);
-		newActor->Equipped = Equipped;
-		newActor->EquippedHeader = EquippedHeader;
 		if (PCStats) {
 			newActor->CreateStats();
 			memcpy(newActor->PCStats, PCStats, sizeof(PCStatsStruct));

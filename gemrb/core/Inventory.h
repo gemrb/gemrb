@@ -277,6 +277,7 @@ public:
 	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header);
 	int GetEquipped() const;
 	int GetEquippedHeader() const;
+	void SetEquipped(ieWordSigned slot, ieWord header);
 	//right hand
 	int GetEquippedSlot() const;
 	//left hand

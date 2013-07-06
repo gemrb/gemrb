@@ -1243,6 +1243,8 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	ieWord *indices = (ieWord *) calloc(Inventory_Size, sizeof(ieWord));
 	//CREItem** items;
 	unsigned int i,j,k;
+	ieWordSigned eqslot;
+	ieWord eqheader;
 
 	act->inventory.SetSlotCount(Inventory_Size+1);
 	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
@@ -1256,9 +1258,10 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// 1000 - fist
 	// -24,-23,-22,-21 - quiver
 	//the equipping effects are delayed until the actor gets an area
-	str->ReadWordSigned( &act->Equipped );
+	str->ReadWordSigned(&eqslot);
 	//the equipped slot's selected ability is stored here
-	str->ReadWord( &act->EquippedHeader );
+	str->ReadWord(&eqheader);
+	act->inventory.SetEquipped(eqslot, eqheader);
 
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating

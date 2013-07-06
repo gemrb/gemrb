@@ -303,8 +303,6 @@ public:
 	ieByte SetDeathVar, IncKillCount, UnknownField; // boolean fields from iwd1 and iwd2
 
 	Inventory inventory;
-	ieWordSigned Equipped;         //the equipped weapon slot
-	ieWord EquippedHeader;         //the used extended header
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
 	int version;

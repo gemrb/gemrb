@@ -1285,6 +1285,12 @@ int Inventory::GetEquippedHeader() const
 	return EquippedHeader;
 }
 
+void Inventory::SetEquipped(ieWordSigned slot, ieWord header)
+{
+	Equipped = slot;
+	EquippedHeader = header;
+}
+
 //returns the fist weapon if there is nothing else
 //This will return the actual weapon, I mean the bow in the case of bow+arrow combination
 CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
