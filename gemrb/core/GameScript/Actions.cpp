@@ -459,12 +459,10 @@ void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
 
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* ip;
+	Scriptable* ip = Sender;
 
-	if (!parameters->objects[1]) {
-		ip=Sender;
-	} else {
-		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+	if (parameters->objects[1]) {
+		ip = GetActorFromObject(Sender, parameters->objects[1]);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
 		Log(WARNING, "Actions", "Script error: No Trigger Named \"%s\"", parameters->objects[1]->objectName);
