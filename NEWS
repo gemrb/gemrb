@@ -1,6 +1,5 @@
 GemRB git (95288c):
   New features:
-    - 
     - utf-8 converter for dialog.tlk to be able to use any (cjk) font
 
   Improved features:
