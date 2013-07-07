@@ -4252,6 +4252,7 @@ void Actor::SetMap(Map *map)
 			switch (slottype) {
 			case SLOT_EFFECT_NONE:
 			case SLOT_EFFECT_MELEE:
+			case SLOT_EFFECT_MISSILE:
 				break;
 			default:
 				inventory.EquipItem( Slot );
