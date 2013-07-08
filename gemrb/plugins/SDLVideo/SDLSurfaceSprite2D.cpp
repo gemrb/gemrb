@@ -33,13 +33,12 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 {
 	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   rmask, gmask, bmask, amask );
-	SetSurfaceRLE(true);
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	: Sprite2D(obj)
 {
-	// SDL_ConvertSurface should copy colorkey/palette/pixels
+	// SDL_ConvertSurface should copy colorkey/palette/pixels/surface RLE
 	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
 	pixels = surface->pixels;
 }
@@ -100,6 +99,7 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 #else
 	SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
 #endif
+	SetSurfaceRLE(true);
 }
 
 Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
