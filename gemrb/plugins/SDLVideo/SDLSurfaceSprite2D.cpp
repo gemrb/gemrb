@@ -34,7 +34,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   rmask, gmask, bmask, amask );
 	SetSurfaceRLE(true);
-	colorkeyIdx = 0;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
@@ -43,7 +42,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	// SDL_ConvertSurface should copy colorkey/palette/pixels
 	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
 	pixels = surface->pixels;
-	colorkeyIdx = obj.colorkeyIdx;
 }
 
 SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
@@ -85,9 +83,6 @@ void SDLSurfaceSprite2D::SetPalette(Color* pal)
 
 ieDword SDLSurfaceSprite2D::GetColorKey() const
 {
-	if (surface->format->palette) {
-		return colorkeyIdx;
-	}
 	ieDword ck = 0;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	SDL_GetColorKey(surface, &ck);
@@ -99,14 +94,6 @@ ieDword SDLSurfaceSprite2D::GetColorKey() const
 
 void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 {
-	if (surface->format->palette) {
-		colorkeyIdx = ck;
-		// convert the index to a pixel value
-		const Color* cols = GetPaletteColors();
-		assert(cols);
-		Color c = cols[ck];
-		ck = SDL_MapRGB(surface->format, c.r, c.g, c.b);
-	}
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// SDL 2 will enforce SDL_RLEACCEL
 	SDL_SetColorKey(surface, SDL_TRUE, ck);

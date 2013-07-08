@@ -31,7 +31,6 @@ namespace GemRB {
 class SDLSurfaceSprite2D : public Sprite2D {
 private:
 	SDL_Surface* surface;
-	ieByte colorkeyIdx;
 private:
 	void SetSurfaceRLE(bool);
 public:
