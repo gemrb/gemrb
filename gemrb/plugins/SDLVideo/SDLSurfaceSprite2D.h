@@ -31,8 +31,6 @@ namespace GemRB {
 class SDLSurfaceSprite2D : public Sprite2D {
 private:
 	SDL_Surface* surface;
-private:
-	void SetSurfaceRLE(bool);
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
 					   ieDword rmask = 0, ieDword gmask = 0, ieDword bmask = 0, ieDword amask = 0);

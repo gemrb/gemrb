@@ -771,7 +771,11 @@ bool SDL20VideoDriver::ToggleGrabInput()
 
 bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
 {
-	return (SDL_SetSurfaceAlphaMod(surface, alpha) == 0);
+	bool ret = SDL_SetSurfaceAlphaMod(surface, alpha);
+	if (ret == GEM_OK) {
+		SDL_SetSurfaceRLE(surface, SDL_TRUE);
+	}
+	return ret;
 }
 
 float SDL20VideoDriver::ScaleCoordinateHorizontal(float x)

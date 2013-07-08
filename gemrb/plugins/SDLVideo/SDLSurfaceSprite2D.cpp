@@ -96,10 +96,16 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// SDL 2 will enforce SDL_RLEACCEL
 	SDL_SetColorKey(surface, SDL_TRUE, ck);
+	SDL_SetSurfaceRLE(surface, SDL_TRUE);
 #else
 	SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
 #endif
-	SetSurfaceRLE(true);
+
+	// regardless of rle or the success of SDL_SetSurfaceRLE
+	// we must keep RLE false because SDL hides the actual RLE data from us (see SDL_BlitMap)
+	// and we are left to access the pixels in decoded form (updated by SDL_UnlockSurface).
+	// SDL Blits will make use of RLE acceleration, but our internal blitters cannot.
+	assert(RLE == false);
 }
 
 Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
@@ -147,24 +153,6 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 		}
 	}
 	return false;
-}
-
-void SDLSurfaceSprite2D::SetSurfaceRLE(bool rle)
-{
-#if SDL_VERSION_ATLEAST(1,3,0)
-	SDL_SetSurfaceRLE(surface, rle);
-#else
-	if (rle) {
-		surface->flags |= SDL_RLEACCEL;
-	} else {
-		surface->flags &= ~SDL_RLEACCEL;
-	}
-#endif
-	// regardless of rle or the success of SDL_SetSurfaceRLE
-	// we must keep RLE false because SDL hides the actual RLE data from us (see SDL_BlitMap)
-	// and we are left to access the pixels in decoded form (updated by SDL_UnlockSurface).
-	// SDL Blits will make use of RLE acceleration, but our internal blitters cannot.
-	assert(RLE == false);
 }
 
 }
