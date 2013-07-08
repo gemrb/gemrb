@@ -407,6 +407,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	const Uint8* mask_data = NULL;
 	Uint32 ck = 0;
 	if (mask) {
+		mask_data = (Uint8*) mask->pixels;
 		ck = mask->GetColorKey();
 	}
 
