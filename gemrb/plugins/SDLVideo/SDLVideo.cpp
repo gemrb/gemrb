@@ -338,10 +338,14 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	if (cK) {
 		spr->SetColorKey(index);
 	}
+	/*
+	 there is at least one place (BlitGameSprite) that requires 8 or 32bpp sprites
+	 untill we support 16bpp fully we cannot do this
+
 	// make sure colorkey is set prior to conversion
 	SDL_PixelFormat* fmt = backBuf->format;
 	spr->ConvertFormatTo(fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
-
+	*/
 	return spr;
 }
 
