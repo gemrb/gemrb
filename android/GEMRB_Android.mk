@@ -48,6 +48,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMFontManager.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMFont.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMImporter.cpp \
+		    main/gemrb/plugins/BAMImporter/BAMSprite2D.cpp \
 		    main/gemrb/plugins/PSTOpcodes/PSTOpcodes.cpp \
 		    main/gemrb/plugins/ITMImporter/ITMImporter.cpp \
 		    main/gemrb/plugins/BMPImporter/BMPImporter.cpp \
@@ -89,6 +90,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/GAMImporter/GAMImporter.cpp \
 		    main/gemrb/plugins/SDLVideo/SDL20Video.cpp \
 		    main/gemrb/plugins/SDLVideo/SDLVideo.cpp \
+		    main/gemrb/plugins/SDLVideo/SDLSurfaceSprite2D.cpp \
 		    main/gemrb/plugins/BIFImporter/BIFImporter.cpp \
 		    main/gemrb/plugins/KEYImporter/KEYImporter.cpp \
 		    main/gemrb/plugins/AREImporter/AREImporter.cpp \

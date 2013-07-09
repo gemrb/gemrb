@@ -1,6 +1,11 @@
 2013-03-10
 - prep_env.sh should have more error checks
-- add a dialog on first run to prompt for GamePath
-- version checks for override, unhardcoded and GUIScripts
+- add a dialog on first run to prompt for GamePath (add.: make this a full-fledged configuration screen please)
+- version checks for override, unhardcoded and GUIScripts (unneccessary, seeing as the .apk extracts version-appropriate folders)
 - mouse cursor seems to get positioned at the corners of the screen touches for some reason, most likely not directly related to the android build though
 - touches have to be rather quick to register as click events, might be related to SDL20Driver::ProcessFirstTouch()
+
+2013-06-05
+- replace the renderer/texture bits with SDL_GetWindowSurface and SDL_UpdateWindowSurface for performance, trading in scalability
+  * possible as a checkbox?
+- configuration screen on first start, config selector on subsequent starts
