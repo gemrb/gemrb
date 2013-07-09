@@ -49,9 +49,9 @@ public class GemRB extends SDLActivity {
     Log.d("GemRB Activity", "Checking GemRB.cfg content.");
 
     File finalConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
-    File userSuppliedConfig = new File(Environment.getExternalStoragePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
+    File userSuppliedConfig = new File(Environment.getExternalStorageDirectory().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
 
-    if(!finalConfFile.exists() && !userSuppliedConfig.exists()) {
+    if(!finalConfFile.exists()) {
       Log.d("GemRB Activity", "GemRB.cfg doesn't exist in the expected location, creating it from the packaged template.");
 
       // String[] keysToChange = { "GUIScriptsPath", "GemRBOverridePath", "GemRBUnhardcodedPath" };
@@ -76,20 +76,6 @@ public class GemRB extends SDLActivity {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    } else if (!finalConfFile.exists() && userSuppliedConfig.exists()) {
-        BufferedReader inConf = new BufferedReader(new FileReader(userSuppliedConfig));
-        File outConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
-        BufferedWriter outConf = new BufferedWriter(new FileWriter(outConfFile));
-
-        String line;
-
-        while((line = inConf.readLine()) != null) {
-          outConf.write(line.concat("\n"));
-          outConf.flush();
-        }
-        inConf.close();
-        outConf.flush();
-        outConf.close();
     }
 
     super.onCreate(savedInstanceState);
