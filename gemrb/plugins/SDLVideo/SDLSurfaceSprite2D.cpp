@@ -23,7 +23,11 @@
 
 #include "System/Logging.h"
 
+#ifdef ANDROID
+#include <SDL.h>
+#else
 #include <SDL/SDL.h>
+#endif
 
 namespace GemRB {
 
