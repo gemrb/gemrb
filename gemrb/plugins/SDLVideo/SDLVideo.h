@@ -169,7 +169,7 @@ public:
 	static void GetSurfacePixel(SDL_Surface* surf, short x, short y, Color& c);
 
 	// we need to beable to convert between Region and SDL_Rect
-	static SDL_Rect RectFromReigon(const Region& rgn);
+	static SDL_Rect RectFromRegion(const Region& rgn);
 };
 
 }

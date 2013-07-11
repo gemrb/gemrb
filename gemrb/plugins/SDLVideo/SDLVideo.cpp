@@ -1568,7 +1568,7 @@ void SDLVideoDriver::GetSurfacePixel(SDL_Surface* surface, short x, short y, Col
 	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 }
 
-SDL_Rect SDLVideoDriver::RectFromReigon(const Region& rgn)
+SDL_Rect SDLVideoDriver::RectFromRegion(const Region& rgn)
 {
 	SDL_Rect rect = {(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h};
 	return rect;
