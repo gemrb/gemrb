@@ -772,7 +772,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 			}
 
 		}
-
 	} else {
 		// non-BAM Blitting
 
@@ -868,7 +867,7 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	void* pixels = malloc( Width * Height * 3 );
 	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
 															0x00ff0000, 0x0000ff00, 0x000000ff);
-	SDL_Rect src = RectFromReigon(r);
+	SDL_Rect src = RectFromRegion(r);
 	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
 
 	return screenshot;
@@ -877,7 +876,7 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
 {
-	SDL_Rect drect = RectFromReigon(rgn);
+	SDL_Rect drect = RectFromRegion(rgn);
 	if (fill) {
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
@@ -912,7 +911,7 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 	}
 
 	SDL_Surface* surf = ((SDLSurfaceSprite2D*)sprite)->GetSurface();
-	SDL_Rect drect = RectFromReigon(rgn);
+	SDL_Rect drect = RectFromRegion(rgn);
 	if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 		return;
 	} else if ( SDL_ALPHA_OPAQUE == color.a ) {
@@ -1397,7 +1396,7 @@ void SDLVideoDriver::SetFadePercent(int percent)
 void SDLVideoDriver::SetClipRect(const Region* clip)
 {
 	if (clip) {
-		SDL_Rect tmp = RectFromReigon(*clip);
+		SDL_Rect tmp = RectFromRegion(*clip);
 		SDL_SetClipRect( backBuf, &tmp );
 	} else {
 		SDL_SetClipRect( backBuf, NULL );
@@ -1406,7 +1405,7 @@ void SDLVideoDriver::SetClipRect(const Region* clip)
 
 void SDLVideoDriver::GetClipRect(Region& clip)
 {
-	SDL_Rect tmp = RectFromReigon(clip);
+	SDL_Rect tmp = RectFromRegion(clip);
 	SDL_GetClipRect( backBuf, &tmp );
 }
 

@@ -151,7 +151,7 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	destRect.w = w;
 	destRect.h = h;
 
-	SDL_Rect rect = RectFromReigon(subtitleregion);
+	SDL_Rect rect = RectFromRegion(subtitleregion);
 	SDL_FillRect(disp, &rect, 0);
 	SDL_BlitSurface( sprite, &srcRect, disp, &destRect );
 	if (titleref>0)
@@ -255,7 +255,7 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	destRect.y = dsty;
 	destRect.w = w;
 	destRect.h = h;
-	SDL_Rect rect = RectFromReigon(subtitleregion);
+	SDL_Rect rect = RectFromRegion(subtitleregion);
 	SDL_FillRect(disp, &rect, 0);
 	SDL_DisplayYUVOverlay(overlay, &destRect);
 	if (titleref>0)
