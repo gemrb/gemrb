@@ -20,7 +20,7 @@
 
 #import "GEM_ConfController.h"
 
-#import <SDL/SDL.h>
+#import <SDL.h>
 
 #include <archive.h>
 #include <archive_entry.h>
