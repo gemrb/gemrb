@@ -1570,5 +1570,6 @@ void SDLVideoDriver::GetSurfacePixel(SDL_Surface* surface, short x, short y, Col
 
 SDL_Rect SDLVideoDriver::RectFromReigon(const Region& rgn)
 {
-	return (SDL_Rect){(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h};
+	SDL_Rect rect = {(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h};
+	return rect;
 }
