@@ -181,11 +181,6 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	subtitleregion.h = h/4;
 	subtitleregion.x = 0;
 	subtitleregion.y = h-h/4;
-	//same for SDL
-	subtitleregion_sdl.w = w;
-	subtitleregion_sdl.h = h/4;
-	subtitleregion_sdl.x = 0;
-	subtitleregion_sdl.y = h-h/4;
 }
 
 void SDL20VideoDriver::DestroyMovieScreen()
@@ -252,7 +247,8 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	}
 	SDL_UnlockTexture(screenTexture);
 
-	SDL_RenderFillRect(renderer, &subtitleregion_sdl);
+	SDL_Rect rect = RectFromReigon(subtitleregion);
+	SDL_RenderFillRect(renderer, &rect);
 	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
 
 	if (titleref>0)

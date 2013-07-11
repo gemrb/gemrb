@@ -864,12 +864,12 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 {
 	unsigned int Width = r.w ? r.w : disp->w;
 	unsigned int Height = r.h ? r.h : disp->h;
-	SDL_Rect src = {(Sint16)r.x, (Sint16)r.y, (Uint16)r.w, (Uint16)r.h};
 
 	void* pixels = malloc( Width * Height * 3 );
 	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
 															0x00ff0000, 0x0000ff00, 0x000000ff);
-	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, (SDL_Surface*)screenshot->GetSurface(), NULL);
+	SDL_Rect src = RectFromReigon(r);
+	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
 
 	return screenshot;
 }
@@ -877,9 +877,7 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
 {
-	SDL_Rect drect = {
-		(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h
-	};
+	SDL_Rect drect = RectFromReigon(rgn);
 	if (fill) {
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
@@ -914,9 +912,7 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 	}
 
 	SDL_Surface* surf = ((SDLSurfaceSprite2D*)sprite)->GetSurface();
-	SDL_Rect drect = {
-		(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h
-	};
+	SDL_Rect drect = RectFromReigon(rgn);
 	if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 		return;
 	} else if ( SDL_ALPHA_OPAQUE == color.a ) {
@@ -1401,11 +1397,7 @@ void SDLVideoDriver::SetFadePercent(int percent)
 void SDLVideoDriver::SetClipRect(const Region* clip)
 {
 	if (clip) {
-		SDL_Rect tmp;
-		tmp.x = clip->x;
-		tmp.y = clip->y;
-		tmp.w = clip->w;
-		tmp.h = clip->h;
+		SDL_Rect tmp = RectFromReigon(*clip);
 		SDL_SetClipRect( backBuf, &tmp );
 	} else {
 		SDL_SetClipRect( backBuf, NULL );
@@ -1414,13 +1406,8 @@ void SDLVideoDriver::SetClipRect(const Region* clip)
 
 void SDLVideoDriver::GetClipRect(Region& clip)
 {
-	SDL_Rect tmp;
+	SDL_Rect tmp = RectFromReigon(clip);
 	SDL_GetClipRect( backBuf, &tmp );
-
-	clip.x = tmp.x;
-	clip.y = tmp.y;
-	clip.w = tmp.w;
-	clip.h = tmp.h;
 }
 
 void SDLVideoDriver::MouseMovement(int x, int y)
@@ -1501,7 +1488,6 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		backBuf = disp;
 
 		//FYI: that 0 is pitch black
-		//SDL_FillRect(disp, &subtitleregion_sdl, 0);
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 		backBuf = temp;
 	}
@@ -1580,4 +1566,9 @@ void SDLVideoDriver::GetSurfacePixel(SDL_Surface* surface, short x, short y, Col
 
 	SDL_UnlockSurface( surface );
 	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
+}
+
+SDL_Rect SDLVideoDriver::RectFromReigon(const Region& rgn)
+{
+	return (SDL_Rect){(Sint16)rgn.x, (Sint16)rgn.y, (Uint16)rgn.w, (Uint16)rgn.h};
 }

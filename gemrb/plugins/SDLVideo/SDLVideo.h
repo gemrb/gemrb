@@ -56,7 +56,6 @@ protected:
 	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
 
-	SDL_Rect subtitleregion_sdl;  //we probably have the same stuff, twice
 	char *subtitletext;
 	ieDword subtitlestrref;
 public:
@@ -168,6 +167,9 @@ public:
 	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
 	static void SetSurfacePixel(SDL_Surface* surf, short x, short y, const Color& color);
 	static void GetSurfacePixel(SDL_Surface* surf, short x, short y, Color& c);
+
+	// we need to beable to convert between Region and SDL_Rect
+	static SDL_Rect RectFromReigon(const Region& rgn);
 };
 
 }

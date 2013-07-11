@@ -75,10 +75,8 @@ public:
 class GEM_EXPORT Region {
 public:
 	Region(void);
-	int x;
-	int y;
-	int w;
-	int h;
+	int x, y;
+	int w, h;
 	Region(const Point& p, int w, int h);
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
