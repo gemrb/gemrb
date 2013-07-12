@@ -787,7 +787,7 @@ def OpenInformationWindow ():
 
 	#favourite spell
 	Label = Window.GetControl (0x10000007)
-	Label.SetText (GemRB.GetString (stat['FavouriteSpell']))
+	Label.SetText (stat['FavouriteSpell'])
 
 	#favourite weapon
 	Label = Window.GetControl (0x10000008)
