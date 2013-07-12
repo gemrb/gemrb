@@ -1148,7 +1148,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 void GameControl::DisplayTooltip() {
 	Game* game = core->GetGame();
-	if (game) {
+	if (game && !(ScreenFlags & SF_DISABLEMOUSE)) {
 		Map* area = game->GetCurrentArea( );
 		if (area) {
 			Actor *actor = area->GetActorByGlobalID(lastActorID);
