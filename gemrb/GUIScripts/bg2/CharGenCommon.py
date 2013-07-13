@@ -328,6 +328,8 @@ def CancelPress():
 		GemRB.SetNextScript ("Start")
 	else:
 		GemRB.SetNextScript ("CharGen")
+		GemRB.SetToken ("LargePortrait", "")
+		GemRB.SetToken ("SmallPortrait", "")
 	return
 
 def ImportPress():
