@@ -73,6 +73,8 @@ public:
 
 	//! return the map icon of this location. Free the sprite afterwards.
 	Sprite2D *GetMapIcon(AnimationFactory *bam);
+	// note that this is only valid after GetMapIcon has been called
+	bool HighlightSelected() const { return SingleFrame; }
 	const char* GetCaption();
 	const char* GetTooltip();
 private:
@@ -80,6 +82,7 @@ private:
 	Sprite2D *MapIcon;
 	char *StrCaption;
 	char *StrTooltip;
+	bool SingleFrame;
 
 	void SetPalette(int gradient, Sprite2D *MapIcon);
 public:

@@ -36,6 +36,7 @@ WMPAreaEntry::WMPAreaEntry()
 	MapIcon = NULL;
 	StrCaption = NULL;
 	StrTooltip = NULL;
+	SingleFrame = false;
 }
 
 WMPAreaEntry::~WMPAreaEntry()
@@ -103,12 +104,13 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 			case 0: frame = 2; break;
 		}
 		if (bam->GetCycleSize(IconSeq)<5) {
+			SingleFrame = true;
 			color = gradients[frame];
 			frame = 0;
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
 		if (!MapIcon) {
-			print("WMPAreaEntry::GetMapIcon failed for frame %d, seq %d", frame, IconSeq);
+			Log(ERROR, "WMPAreaEntry", "GetMapIcon failed for frame %d, seq %d", frame, IconSeq);
 			return NULL;
 		}
 		if (color>=0) {

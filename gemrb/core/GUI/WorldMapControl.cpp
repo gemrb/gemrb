@@ -125,7 +125,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		int yOffs = MAP_TO_SCREENY(m->Y);
 		Sprite2D* icon = m->GetMapIcon(worldmap->bam);
 		if( icon ) {
-			if (m == Area) {
+			if (m == Area && m->HighlightSelected()) {
 				Palette *pal = icon->GetPalette();
 				icon->SetPalette(pal_selected);
 				video->BlitSprite( icon, xOffs, yOffs, true, &r );
