@@ -514,18 +514,18 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//maybe we have to store this
 		str->Seek( 36, GEM_CURRENT_POS );
 
-		if (core->HasFeature(GF_CLEAR_UNUSED_AREA)) {
-			memset( WavResRef, 0, sizeof(WavResRef));
-			TalkX = 0;
-			TalkY = 0;
-			DialogName = -1;
-			memset( DialogResRef, 0, sizeof(DialogResRef));
-		}	else {
+		if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
 			str->ReadResRef( WavResRef );
 			str->ReadWord( &TalkX);
 			str->ReadWord( &TalkY);
 			str->ReadDword( &DialogName );
 			str->ReadResRef( DialogResRef );
+		} else {
+			memset(WavResRef, 0, sizeof(WavResRef));
+			TalkX = 0;
+			TalkY = 0;
+			DialogName = -1;
+			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
 
 		char* string = core->GetString( StrRef );

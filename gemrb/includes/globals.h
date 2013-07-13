@@ -156,7 +156,7 @@ namespace GemRB {
 #define  GF_RARE_ACTION_VB              66 //pst
 #define  GF_NO_UNDROPPABLE              67 //iwd,how
 #define  GF_START_ACTIVE                68 //bg1
-#define  GF_CLEAR_UNUSED_AREA           69 //bg1
+#define  GF_INFOPOINT_DIALOGS           69 //pst, but only bg1 has garbage there
 #define  GF_IMPLICIT_AREAANIM_BACKGROUND    70 //idw,how,iwd2
 #define  GF_HEAL_ON_100PLUS             71 //bg1, bg2, pst
 #define  GF_IN_PARTY_ALLOWS_DEAD	72 //all except bg2

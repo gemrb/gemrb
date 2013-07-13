@@ -2377,7 +2377,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"RareActionSounds",   //66GF_RARE_ACTION_VB
 		"NoUndroppable",      //67GF_NO_UNDROPPABLE
 		"StartActive",        //68GF_START_ACTIVE
-		"ClearUnusedArea",    //69GF_CLEAR_UNUSED_AREA
+		"HasInfopointDialogs", //69GF_INFOPOINT_DIALOGS
 		"ImplicitAreaAnimBackground", //70GF_IMPLICIT_AREAANIM_BACKGROUND
 		"HealOn100Plus",      //71GF_HEAL_ON_100PLUS
 		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD

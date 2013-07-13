@@ -203,13 +203,6 @@ CheckAbilities = <bool>
 Determines if character abilities should matter in item usability checks.
 
 
-ClearUnusedArea = <bool>
-- - - - - - - - - - -
-Determines whether some fields in ARE files that are not used in all of
-the games should be cleared on load. If you don't do this in BG1, for
-example, those unitialized values in the data files will cause errors.
-
-
 CutsceneAreascripts = <bool>
 - - - - - - - - - -
 Determines whether area scripts should run during cutscenes or not.
@@ -299,6 +292,13 @@ HasHideInShadows = <bool>
 - - - - - - - - - - - -
 Enable this if the characters also have the IE_HIDEINSHADOWS stat besides
 IE_STEALTH.
+
+
+HasInfopointDialogs = <bool>
+- - - - - - - - - - - - - - 
+Determines whether ARE files can contain dialog references for infopoints.
+Of the original games only PST uses this feature but it only needs to be
+switched off for BG1 since those fields contain garbage there.
 
 
 HasKaputz = <bool>
