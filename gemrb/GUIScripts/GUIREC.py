@@ -540,7 +540,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stat = table.GetValue (i, 0)
 		if not offset and not GUICommon.GameIsIWD1(): # TODO: fishy, recheck
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
-		stats.append ( (text, GS (stat)&0x07, '+') )
+		if text < 0x20000:
+			stats.append ( (text, GS (stat)&0x07, '+') )
 	stats.append (None)
 
 	# 11766 AC Bonuses
