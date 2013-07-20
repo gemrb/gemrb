@@ -187,7 +187,7 @@ static void InitSpawnGroups()
 		int j=tab->GetRowCount();
 		while (j--) {
 			const char *crename = tab->QueryField( j,i );
-			if (crename[0] != '*') break;
+			if (strcmp(crename, tab->QueryDefault())) break;
 		}
 		if (j>0) {
 			SpawnGroup *creatures = new SpawnGroup(j);
@@ -3053,9 +3053,9 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 
 	if (Spawns.Lookup(creResRef, lookup)) {
 		sg = (SpawnGroup *) lookup;
-		if (level >= (int) sg->Level) {
+		if (first || (level >= (int) sg->Level)) {
 			count = sg->Count;
-		} else if (!first) {
+		} else {
 			count = 0;
 		}
 	}
@@ -3066,7 +3066,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
 
-			//SpawnGroups normally are all or nothing but make sure we spawn
+			//SpawnGroups are all or nothing but make sure we spawn
 			//at least one creature if this is the first
 			if (level >= cpl || sg || first) {
 				AddActor(creature, true);
@@ -3116,7 +3116,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	}
 	//create spawns
 	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
-	unsigned int spawncount = 0, i = 0;
+	unsigned int spawncount = 0, i = rand() % spawn->Count;
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, &difficulty, &spawncount)) {
 			break;
