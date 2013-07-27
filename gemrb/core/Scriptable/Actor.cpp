@@ -7172,7 +7172,10 @@ bool Actor::HasBodyHeat() const
 void Actor::Draw(const Region &screen)
 {
 	Map* area = GetCurrentArea();
-	if (!area) return;
+	if (!area) {
+		InternalFlags &= ~IF_TRIGGER_AP;
+		return;
+	}
 
 	int cx = Pos.x;
 	int cy = Pos.y;
@@ -7187,6 +7190,7 @@ void Actor::Draw(const Region &screen)
 		if (!(InternalFlags&IF_REALLYDIED)) {
 			// for a while this didn't return (disable drawing) if about to hibernate;
 			// Avenger said (aa10aaed) "we draw the actor now for the last time".
+			InternalFlags &= ~IF_TRIGGER_AP;
 			return;
 		}
 	}
@@ -7194,6 +7198,7 @@ void Actor::Draw(const Region &screen)
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
 	if (!(InternalFlags & IF_VISIBLE)) {
+		InternalFlags &= ~IF_TRIGGER_AP;
 		return;
 	}
 
@@ -7205,6 +7210,7 @@ void Actor::Draw(const Region &screen)
 	//visual feedback
 	CharAnimations* ca = GetAnims();
 	if (!ca) {
+		InternalFlags &= ~IF_TRIGGER_AP;
 		return;
 	}
 
@@ -7470,6 +7476,15 @@ void Actor::Draw(const Region &screen)
 	core->GetDictionary()->Lookup("HP Over Head", tmp);
 	if (tmp && Persistent() && (core->GetGame()->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
 		DisplayHeadHPRatio();
+	}
+
+	// trigger on-enemy-sighted autopause
+	if (!(InternalFlags & IF_TRIGGER_AP)) {
+		// always recheck in case of EA changes (npc going hostile)
+		if (Modified[IE_EA] > EA_EVILCUTOFF && !(InternalFlags & IF_STOPATTACK)) {
+			InternalFlags |= IF_TRIGGER_AP;
+			core->Autopause(AP_ENEMY, this);
+		}
 	}
 }
 

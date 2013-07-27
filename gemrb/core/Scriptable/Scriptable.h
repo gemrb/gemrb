@@ -108,6 +108,7 @@ class SpriteCover;
 #define IF_IDLE          0x100000
 //#define IF_PARTYRESTED   0x200000 //party rested trigger event
 #define IF_FORCEUPDATE   0x400000
+#define IF_TRIGGER_AP    0x800000
 
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
@@ -307,6 +308,7 @@ public:
 	void Deactivate();
 	void PartyRested();
 	ieDword GetInternalFlag() const;
+	void SetInternalFlag(int value, int mode);
 	const char* GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
