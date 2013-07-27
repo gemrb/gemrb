@@ -105,7 +105,7 @@ void Map::ReleaseMemory()
 	}
 }
 
-static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
+static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro, Container *pile)
 {
 	int actorh;
 	if (actor) {
@@ -143,6 +143,14 @@ static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimatio
 		proh = pro->GetHeight();
 	} else {
 		proh = 0x7fffffff;
+	}
+
+	// piles should always be drawn last, except if there is a corpse in the way
+	if (actor && (actor->GetStat(IE_STATE_ID) & STATE_DEAD)) {
+		return AOT_ACTOR;
+	}
+	if (pile) {
+		return AOT_PILE;
 	}
 
 	if (proh<actorh && proh<scah && proh<aah && proh<spah) return AOT_PROJECTILE;
@@ -949,27 +957,16 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	free(nearActors);
 }
 
-void Map::DrawHighlightables( Region screen )
+void Map::DrawHighlightables()
 {
-	Region vp = core->GetVideoDriver()->GetViewport();
+	// NOTE: piles are drawn in the main queue
 	unsigned int i = 0;
 	Container *c;
 
 	while ( (c = TMap->GetContainer(i++))!=NULL ) {
-		Color tint = LightMap->GetPixel( c->Pos.x / 16, c->Pos.y / 12);
-		tint.a = 255;
-
 		if (c->Highlight) {
-			if (c->Type==IE_CONTAINER_PILE) {
-				Color tint = LightMap->GetPixel( c->Pos.x / 16, c->Pos.y / 12);
-				tint.a = 255;
-				c->DrawPile(true, screen, tint);
-			} else {
+			if (c->Type != IE_CONTAINER_PILE) {
 				c->DrawOutline();
-			}
-		} else if (c->Type==IE_CONTAINER_PILE) {
-			if (c->outline->BBox.InsideRegion( vp )) {
-				c->DrawPile(false, screen, tint);
 			}
 		}
 	}
@@ -985,6 +982,37 @@ void Map::DrawHighlightables( Region screen )
 	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
 		if (p->Highlight) p->DrawOutline();
 	}
+}
+
+void Map::DrawPile(Region screen, int pileidx)
+{
+	Region vp = core->GetVideoDriver()->GetViewport();
+	Container *c = TMap->GetContainer(pileidx);
+	assert(c != NULL);
+
+	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
+	tint.a = 255;
+
+	if (c->Highlight) {
+		c->DrawPile(true, screen, tint);
+	} else {
+		if (c->outline->BBox.InsideRegion(vp)) {
+			c->DrawPile(false, screen, tint);
+		}
+	}
+}
+
+Container *Map::GetNextPile(int &index) const
+{
+	Container *c = TMap->GetContainer(index++);
+
+	while (c) {
+		if (c->Type == IE_CONTAINER_PILE) {
+			return c;
+		}
+		c = TMap->GetContainer(index++);
+	}
+	return NULL;
 }
 
 Actor *Map::GetNextActor(int &q, int &index)
@@ -1140,6 +1168,8 @@ void Map::DrawMap(Region screen)
 	scaIterator scaidx = vvcCells.begin();
 	proIterator proidx = projectiles.begin();
 	spaIterator spaidx = particles.begin();
+	int pileidx = 0;
+	Container *pile = GetNextPile(pileidx);
 
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	ScriptedAnimation *sca = GetNextScriptedAnimation(scaidx);
@@ -1154,19 +1184,26 @@ void Map::DrawMap(Region screen)
 
 	if (!bgoverride) {
 		//Draw Outlines
-		DrawHighlightables(screen);
+		DrawHighlightables();
 	}
 
 	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by
 	// an area animation with height > 0 even if the actors themselves are not
 	// hidden by it.
 
-	while (actor || a || sca || spark || pro) {
-		switch(SelectObject(actor,q,a,sca,spark,pro)) {
+	while (actor || a || sca || spark || pro || pile) {
+		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
 			actor->Draw( screen );
 			actor->UpdateAnimations();
 			actor = GetNextActor(q, index);
+			break;
+		case AOT_PILE:
+			// draw piles
+			if (!bgoverride) {
+				DrawPile(screen, pileidx-1);
+				pile = GetNextPile(pileidx);
+			}
 			break;
 		case AOT_AREA:
 			//draw animation

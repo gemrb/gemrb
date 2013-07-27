@@ -230,7 +230,7 @@ private:
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
 };
 
-enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE};
+enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE, AOT_PILE};
 
 //i believe we need only the active actors/visible inactive actors queues
 #define QUEUE_COUNT 2
@@ -317,7 +317,7 @@ public:
 	void MoveVisibleGroundPiles(const Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
-	void DrawHighlightables(Region screen);
+	void DrawHighlightables();
 	void DrawMap(Region screen);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
@@ -510,6 +510,8 @@ private:
 	Particles *GetNextSpark(spaIterator &iter);
 	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
+	Container *GetNextPile (int &index) const;
+	void DrawPile (Region screen, int pileidx);
 	void DrawSearchMap(const Region &screen);
 	void GenerateQueues();
 	void SortQueues();
