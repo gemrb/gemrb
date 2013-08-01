@@ -247,7 +247,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	}
 	SDL_UnlockTexture(screenTexture);
 
-	SDL_Rect rect = RectFromReigon(subtitleregion);
+	SDL_Rect rect = RectFromRegion(subtitleregion);
 	SDL_RenderFillRect(renderer, &rect);
 	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
 
