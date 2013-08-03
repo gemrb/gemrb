@@ -31,6 +31,7 @@ namespace GemRB {
 
 class DataStream;
 class Map;
+class ScriptedAnimation;
 
 typedef enum VEF_TYPES {VEF_INVALID=-1, VEF_BAM=0, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
 
@@ -48,7 +49,7 @@ private:
 	std::list<ScheduleEntry> entries;
 public:
 	//adds a new entry (use when loading)
-	void AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDword type);
+	void AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
 	bool Draw(const Region &screen, Point &position, const Color &p_tint, Map *area, int dither, int orientation, int height);
 	void Load2DA(ieResRef resource);
@@ -56,8 +57,10 @@ public:
 private:
 	//clears the schedule, used internally
 	void Init();
-	//load a resource into the object
+	//load a 2DA/VEF resource into the object
 	VEFObject *CreateObject(ieResRef res, SClass_ID id);
+	//load a BAM/VVC resource into the object
+	ScriptedAnimation *CreateCell(ieResRef res, ieDword start, ieDword end);
 	//load a single entry from stream
 	void ReadEntry(DataStream *stream);
 };

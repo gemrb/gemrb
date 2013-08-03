@@ -24,6 +24,7 @@
 
 #include "win32def.h"
 
+#include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "ScriptedAnimation.h"
@@ -53,17 +54,27 @@ void VEFObject::Init()
 	}
 }
 
-void VEFObject::AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDword type)
+void VEFObject::AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
 {
 	ScheduleEntry entry;
 
 	memcpy(entry.resourceName, res, sizeof(ieResRef) );
-	entry.start = st;
+	entry.start = gtime+st;
+	if (len!=0xffffffff) len+=entry.start;
 	entry.length = len;
 	entry.offset = pos;
 	entry.type = type;
 	entry.ptr = NULL;
 	entries.push_back(entry);
+}
+
+ScriptedAnimation *VEFObject::CreateCell(ieResRef res, ieDword start, ieDword end)
+{
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation( res, false);
+	if (sca && end!=0xffffffff) {
+		sca->SetDefaultDuration(AI_UPDATE_TIME*(end-start) );
+	}
+	return sca;
 }
 
 VEFObject *VEFObject::CreateObject(ieResRef res, SClass_ID id)
@@ -87,10 +98,15 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 	bool ret = true;
 
 	if (!area) return true; //end immediately
+	ieDword GameTime = core->GetGame()->GameTime;
 
 	std::list<ScheduleEntry>::iterator iter;
 
 	for(iter=entries.begin();iter!=entries.end();iter++) {
+		//don't render the animation if it is outside of the cycle
+		if ( (*iter).start>GameTime) continue;
+		if ( (*iter).length<GameTime) continue;
+
 		Point pos = ((*iter).offset);
 		pos.x+=position.x;
 		pos.y+=position.y;
@@ -108,7 +124,7 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 					//fall back to BAM or VVC
 				case VEF_BAM: //just a BAM
 				case VEF_VVC: //videocell (can contain a BAM)
-					(*iter).ptr = gamedata->GetScriptedAnimation( (*iter).resourceName, false);
+					(*iter).ptr = CreateCell( (*iter).resourceName, (*iter).length, (*iter).start);
 					break;
 				default:;
 			}
@@ -129,6 +145,9 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 		default:
 			tmp = true; //unknown/invalid type
 		}
+		if (tmp) {
+			(*iter).length = 0; //stop playing this if reached end
+		}
 		ret &= tmp;
 	}
 	return ret;
@@ -142,6 +161,7 @@ void VEFObject::Load2DA(ieResRef resource)
 	if (!tab) {
 		return;
 	}
+	ieDword GameTime = core->GetGame()->GameTime;
 	int rows = tab->GetRowCount();
 	while(rows--) {
 		Point offset;
@@ -153,7 +173,7 @@ void VEFObject::Load2DA(ieResRef resource)
 		delay = atoi(tab->QueryField(rows,3));
 		duration = atoi(tab->QueryField(rows,4));
 		strnuprcpy(resource, tab->QueryField(rows,2), 8);
-		AddEntry(resource, delay, duration, offset, VEF_VVC);
+		AddEntry(resource, delay, duration, offset, VEF_VVC, GameTime);
 	}
 }
 
@@ -178,7 +198,8 @@ void VEFObject::ReadEntry(DataStream *stream)
 	stream->Seek( 49*4, GEM_CURRENT_POS); //skip empty fields
 
 	if (continuous) length = -1;
-	AddEntry(resource, start, length, position, type);
+	ieDword GameTime = core->GetGame()->GameTime;
+	AddEntry(resource, start, length, position, type, GameTime);
 }
 
 void VEFObject::LoadVEF(DataStream *stream)
