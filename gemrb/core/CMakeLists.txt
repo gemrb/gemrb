@@ -93,6 +93,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	TileOverlay.cpp
 	TileSetMgr.cpp
 	Variables.cpp
+	VEFObject.cpp
 	Video.cpp
 	WindowMgr.cpp
 	WorldMap.cpp

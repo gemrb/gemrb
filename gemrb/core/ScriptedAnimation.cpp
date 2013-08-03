@@ -688,7 +688,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 
 	int cx = Pos.x + XPos;
 	int cy = Pos.y - ZPos + YPos;
-  if (SequenceFlags&IE_VVC_HEIGHT) cy-=height;
+	if (SequenceFlags&IE_VVC_HEIGHT) cy-=height;
 
 	if( SequenceFlags&IE_VVC_NOCOVER) {
 		if (cover) SetSpriteCover(NULL);
