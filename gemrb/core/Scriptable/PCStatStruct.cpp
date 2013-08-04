@@ -41,6 +41,7 @@ PCStatsStruct::PCStatsStruct()
 	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
 	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
+	memset( ExtraSettings, 0, sizeof(ExtraSettings) );
 	SoundSet[0]=0;
 	SoundFolder[0]=0;
 	QSlots[0]=0xff;
