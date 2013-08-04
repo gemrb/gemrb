@@ -47,8 +47,9 @@ class Palette;
 class ScriptedAnimation;
 class Spell;
 class Sprite2D;
-class TableMgr;
 class Store;
+class TableMgr;
+class VEFObject;
 
 struct Table {
 	Holder<TableMgr> tm;
@@ -94,6 +95,9 @@ public:
 
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
+
+	/** creates a composite vef/2da animation */
+	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
 	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);

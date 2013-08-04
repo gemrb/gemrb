@@ -41,6 +41,7 @@
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "StoreMgr.h"
+#include "VEFObject.h"
 #include "Scriptable/Actor.h"
 #include "System/FileStream.h"
 
@@ -427,6 +428,29 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 	}
 	if (ret) {
 		strnlwrcpy(ret->ResName, effect, 8);
+	}
+	return ret;
+}
+
+VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
+{
+	VEFObject *ret = NULL;
+
+	if (Exists( effect, IE_VEF_CLASS_ID, true ) ) {
+		DataStream *ds = GetResource( effect, IE_VEF_CLASS_ID );
+		ret = new VEFObject();
+		strnlwrcpy(ret->ResName, effect, 8);
+		ret->LoadVEF(ds);
+	} else {
+		if (Exists( effect, IE_2DA_CLASS_ID, true ) ) {
+			ret = new VEFObject();
+			ret->Load2DA(effect);
+		} else {
+			ScriptedAnimation *sca = GetScriptedAnimation(effect, doublehint);
+			if (sca) {
+				ret = new VEFObject(sca);
+			}
+		}
 	}
 	return ret;
 }

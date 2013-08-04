@@ -40,6 +40,7 @@
 #include "StringMgr.h"
 #include "TableMgr.h"
 #include "TileMap.h"
+#include "VEFObject.h"
 #include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
@@ -806,7 +807,7 @@ void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const cha
 	if (vvc) {
 		vvc->XPos +=position.x;
 		vvc->YPos +=position.y;
-		Sender->GetCurrentArea( )->AddVVCell( vvc );
+		Sender->GetCurrentArea( )->AddVVCell( new VEFObject(vvc) );
 	}
 }
 

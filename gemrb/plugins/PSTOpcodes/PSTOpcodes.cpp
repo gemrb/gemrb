@@ -29,6 +29,7 @@
 #include "Map.h"
 #include "TableMgr.h"
 #include "TileMap.h"
+#include "VEFObject.h"
 #include "Video.h" //for tints
 #include "Scriptable/Actor.h"
 
@@ -207,7 +208,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2&2) {
 		sca->XPos+=fx->PosX;
 		sca->YPos+=fx->PosY;
-		area->AddVVCell(sca);
+		area->AddVVCell( new VEFObject(sca));
 	} else {
 		ScriptedAnimation *twin = sca->DetachTwin();
 		if (twin) {
@@ -327,9 +328,9 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		if (twin) {
 			twin->XPos+=fx->PosX-x;
 			twin->YPos+=fx->PosY+twin->ZPos-y;
-			area->AddVVCell(twin);
+			area->AddVVCell( new VEFObject(twin) );
 		}
-		area->AddVVCell(sca);
+		area->AddVVCell( new VEFObject(sca) );
 	}
 	return FX_NOT_APPLIED;
 }
@@ -461,6 +462,11 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	if (!area)
 		return FX_NOT_APPLIED;
 
+	VEFObject *vef = gamedata->GetVEFObject(fx->Resource, true);
+	if (vef) {
+		area->AddVVCell(vef);
+	}
+/*
 	AutoTable tab(fx->Resource);
 	if (!tab)
 		return FX_NOT_APPLIED;
@@ -483,6 +489,7 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		sca->YPos+=fx->PosY+offset.y;
 		area->AddVVCell(sca);
 	}
+*/
 	return FX_NOT_APPLIED;
 }
 

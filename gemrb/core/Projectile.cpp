@@ -30,9 +30,10 @@
 #include "Image.h"
 #include "Interface.h"
 #include "ProjectileServer.h"
-#include "Scriptable/Actor.h"
 #include "Sprite2D.h"
+#include "VEFObject.h"
 #include "Video.h"
+#include "Scriptable/Actor.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -757,10 +758,19 @@ void Projectile::EndTravel()
 	}
 }
 
+//Note: trails couldn't be higher than VVC, but this shouldn't be a problem
 int Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
 {
-	ScriptedAnimation *sca=gamedata->GetScriptedAnimation(BAM,0);
+/*
+	VEFObject *vef=gamedata->GetVEFObject(BAM,0);
+	if (!vef) return 0;
+	ScriptedAnimation *sca=vef->GetSingleObject();
 	if (!sca) return 0;
+*/
+	ScriptedAnimation* sca=gamedata->GetScriptedAnimation(BAM,0);
+	if (!sca) return 0;
+	VEFObject *vef = new VEFObject(sca);
+
 	if(pal) {
 		if (ExtFlags & PEF_TINT) {
 			Color tmpColor[PALSIZE];
@@ -779,7 +789,7 @@ int Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
 	sca->SetBlend();
 	sca->XPos += Pos.x;
 	sca->YPos += Pos.y;
-	area->AddVVCell(sca);
+	area->AddVVCell(vef);
 	return sca->GetSequenceDuration(AI_UPDATE_TIME);
 }
 
@@ -1407,6 +1417,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	if (phase==P_EXPLODING1) {
 		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y);
 		//play VVC in center
+		//FIXME: make it possible to play VEF too?
 		if (aoeflags&PAF_VVC) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
 			if (vvc) {
@@ -1430,7 +1441,8 @@ void Projectile::DrawExplosion(const Region &screen)
 				vvc->YPos+=Pos.y;
 				vvc->PlayOnce();
 				vvc->SetBlend();
-				area->AddVVCell(vvc);
+				//quick hack to use the single object envelope
+				area->AddVVCell(new VEFObject(vvc));
 			}
 		}
 		

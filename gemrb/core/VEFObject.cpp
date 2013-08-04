@@ -24,6 +24,8 @@
 
 #include "win32def.h"
 
+#define YESNO(x) ( (x)?"Yes":"No")
+
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -33,6 +35,44 @@
 #include "System/DataStream.h"
 
 namespace GemRB {
+
+VEFObject::VEFObject()
+{
+	XPos=0;
+	YPos=0;
+	ZPos=0;
+	ResName[0]=0;
+	SingleObject=false;
+	Blend=false;
+	PlayOne=false;
+}
+
+VEFObject::VEFObject(ScriptedAnimation *sca)
+{
+	if (!sca) return; //wtf, should avoid this
+
+	XPos=sca->XPos;
+	YPos=sca->YPos;
+	ZPos=sca->ZPos; //sometimes this is not an actual ZPos - PST portals, don't use it for rendering?
+	ResName[0]=0;
+	SingleObject=true;
+	//Blend=false;
+	//PlayOne=false;
+	ScheduleEntry entry;
+	entry.start = core->GetGame()->GameTime;
+	if (sca->Duration==0xffffffff) entry.length = 0xffffffff;
+	else entry.length = sca->Duration+entry.start;
+	entry.offset = Point(0,0);
+	entry.type = VEF_VVC;
+	entry.ptr = sca;
+	memcpy(entry.resourceName, sca->ResName, sizeof(ieResRef) );
+	entries.push_back(entry);
+}
+
+VEFObject::~VEFObject()
+{
+	Init();
+}
 
 void VEFObject::Init()
 {
@@ -54,7 +94,7 @@ void VEFObject::Init()
 	}
 }
 
-void VEFObject::AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
+void VEFObject::AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
 {
 	ScheduleEntry entry;
 
@@ -68,7 +108,7 @@ void VEFObject::AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDwo
 	entries.push_back(entry);
 }
 
-ScriptedAnimation *VEFObject::CreateCell(ieResRef res, ieDword start, ieDword end)
+ScriptedAnimation *VEFObject::CreateCell(const ieResRef res, ieDword start, ieDword end)
 {
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation( res, false);
 	if (sca && end!=0xffffffff) {
@@ -77,7 +117,7 @@ ScriptedAnimation *VEFObject::CreateCell(ieResRef res, ieDword start, ieDword en
 	return sca;
 }
 
-VEFObject *VEFObject::CreateObject(ieResRef res, SClass_ID id)
+VEFObject *VEFObject::CreateObject(const ieResRef res, SClass_ID id)
 {
 	if (gamedata->Exists( res, id, true) ) {
 		VEFObject *obj = new VEFObject();
@@ -86,6 +126,7 @@ VEFObject *VEFObject::CreateObject(ieResRef res, SClass_ID id)
 			obj->Load2DA(res);
 		} else {
 			DataStream* stream = gamedata->GetResource(res, id);
+			strnlwrcpy(obj->ResName, res, 8);
 			obj->LoadVEF(stream);
 		}
 		return obj;
@@ -117,10 +158,15 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 			switch((*iter).type) {
 				case VEF_2DA: //original gemrb implementation of composite video effects
 					(*iter).ptr = CreateObject( (*iter).resourceName, IE_2DA_CLASS_ID);
-					break;
+					if ( (*iter).ptr ) {
+						break;
+					}
+					//fall back to VEF
 				case VEF_VEF: //vanilla engine implementation of composite video effects
 					(*iter).ptr = CreateObject( (*iter).resourceName, IE_VEF_CLASS_ID);
-					if ( (*iter).ptr ) break;
+					if ( (*iter).ptr ) {
+						break;
+					}
 					//fall back to BAM or VVC
 				case VEF_BAM: //just a BAM
 				case VEF_VVC: //videocell (can contain a BAM)
@@ -153,7 +199,7 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 	return ret;
 }
 
-void VEFObject::Load2DA(ieResRef resource)
+void VEFObject::Load2DA(const ieResRef resource)
 {
 	Init();
 	AutoTable tab(resource);
@@ -161,6 +207,8 @@ void VEFObject::Load2DA(ieResRef resource)
 	if (!tab) {
 		return;
 	}
+	SingleObject = false;
+	strnlwrcpy(ResName, resource, 8);
 	ieDword GameTime = core->GetGame()->GameTime;
 	int rows = tab->GetRowCount();
 	while(rows--) {
@@ -215,10 +263,11 @@ void VEFObject::LoadVEF(DataStream *stream)
 
 	stream->ReadResRef( Signature);
 	if (strncmp( Signature, "VEF V1.0", 8 ) != 0) {
-		print("Not a valid VEF File");
+		Log(ERROR, "VEFObject", "Not a valid VEF File: %s", ResName);
 		delete stream;
 		return;
 	}
+	SingleObject = false;
 	stream->ReadDword( &offset1);
 	stream->ReadDword( &count1);
 	stream->ReadDword( &offset2);
@@ -234,4 +283,60 @@ void VEFObject::LoadVEF(DataStream *stream)
 		ReadEntry(stream);
 	}
 }
+
+/*
+void VEFObject::SetBlend()
+{
+	Blend=true;
+}
+
+void VEFObject::PlayOnce()
+{
+	PlayOne=true;
+}
+*/
+//works only with single objects
+/*
+ieDword VEFObject::GetSequenceDuration(ieDword multiplier)
+{
+	std::list<ScheduleEntry>::iterator iter;
+
+	for(iter=entries.begin();iter!=entries.end();iter++) {
+		if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
+			ScriptedAnimation *sca = (ScriptedAnimation *) (*iter).ptr;
+			if (sca) return sca->GetSequenceDuration(multiplier);
+		}
+	}
+	return 0;
+}
+
+ieDword VEFObject::GetCurrentFrame()
+{
+	std::list<ScheduleEntry>::iterator iter;
+
+	for(iter=entries.begin();iter!=entries.end();iter++) {
+		if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
+			ScriptedAnimation *sca = (ScriptedAnimation *) (*iter).ptr;
+			if (sca) return sca->GetCurrentFrame();
+		}
+	}
+	return 0;
+}
+*/
+
+ScriptedAnimation *VEFObject::GetSingleObject()
+{
+	ScriptedAnimation *sca = NULL;
+
+	if (SingleObject) {
+		std::list<ScheduleEntry>::iterator iter = entries.begin();
+		if (iter!=entries.end() ) {
+			if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
+				sca = (ScriptedAnimation *) (*iter).ptr;
+			}
+		}
+	}
+	return sca;
+}
+
 }

@@ -67,6 +67,7 @@
 #include "StringMgr.h"
 #include "SymbolMgr.h"
 #include "TileMap.h"
+#include "VEFObject.h"
 #include "Video.h"
 #include "WindowMgr.h"
 #include "WorldMapMgr.h"
@@ -2252,6 +2253,9 @@ const char* Interface::TypeExt(SClass_ID type) const
 		case IE_VAR_CLASS_ID:
 			return "var";
 
+		case IE_VEF_CLASS_ID:
+			return "vef";
+
 		case IE_VVC_CLASS_ID:
 			return "vvc";
 
@@ -2266,6 +2270,9 @@ const char* Interface::TypeExt(SClass_ID type) const
 
 		case IE_WMP_CLASS_ID:
 			return "wmp";
+
+		default:
+			Log(ERROR, "Interface", "No extension associated to class ID: %lu", (unsigned long) type );
 	}
 	return NULL;
 }
@@ -2769,7 +2776,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 				vvc->YPos=ab->Pos.y;
 				//force vvc to play only once
 				vvc->PlayOnce();
-				map->AddVVCell( vvc );
+				map->AddVVCell( new VEFObject(vvc) );
 
 				//set up the summon disable effect
 				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);

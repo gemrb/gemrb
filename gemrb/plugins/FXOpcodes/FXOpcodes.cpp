@@ -36,6 +36,7 @@
 #include "ScriptedAnimation.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
+#include "VEFObject.h"
 #include "damages.h"
 #include "GameScript/GSUtils.h" //needs for MoveBetweenAreasCore
 #include "GameScript/Matching.h" //needs for GetAllObjects
@@ -2565,7 +2566,7 @@ int fx_unsummon_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (sca) {
 			sca->XPos+=target->Pos.x;
 			sca->YPos+=target->Pos.y;
-			area->AddVVCell(sca);
+			area->AddVVCell(new VEFObject(sca));
 		}
 		//remove the creature
 		target->DestroySelf();
@@ -4128,7 +4129,7 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		} else {
 			sca->SetDefaultDuration(10000);
 		}
-		map->AddVVCell(sca);
+		map->AddVVCell(new VEFObject(sca));
 	} else {
 		//simulate sparkle casting glows
 		Effect *newfx;
@@ -4175,7 +4176,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		sca->SetBlend();
 		sca->PlayOnce();
-		map->AddVVCell(sca);
+		map->AddVVCell( new VEFObject(sca));
 	} else {
 		print("fx_visual_spell_hit: Unhandled Type: %d", fx->Parameter2);
 	}
@@ -5076,7 +5077,7 @@ Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resour
 			vvc->YPos=fam->Pos.y;
 			//force vvc to play only once
 			vvc->PlayOnce();
-			map->AddVVCell( vvc );
+			map->AddVVCell( new VEFObject(vvc) );
 		}
 	}
 
@@ -5546,7 +5547,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		sca->YPos = target->Pos.y;
 	}
 	sca->PlayOnce();
-	map->AddVVCell( sca );
+	map->AddVVCell( new VEFObject(sca) );
 	return FX_NOT_APPLIED;
 }
 

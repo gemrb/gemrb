@@ -43,6 +43,7 @@
 #include "SaveGameIterator.h"
 #include "ScriptedAnimation.h"
 #include "TileMap.h"
+#include "VEFObject.h"
 #include "Video.h"
 #include "WorldMap.h"
 #include "strrefs.h"
@@ -105,7 +106,7 @@ void Map::ReleaseMemory()
 	}
 }
 
-static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro, Container *pile)
+static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, VEFObject *sca, Particles *spark, Projectile *pro, Container *pile)
 {
 	int actorh;
 	if (actor) {
@@ -632,10 +633,12 @@ void Map::DrawPortal(InfoPoint *ip, int enable)
 		if (sca) {
 			sca->SetBlend();
 			sca->PlayOnce();
-			sca->XPos=ip->Pos.x;
-			sca->YPos=ip->Pos.y;
-			sca->ZPos=gotportal;
-			AddVVCell(sca);
+			//exact position, because HasVVCCell depends on the coordinates, PST had no coordinate offset anyway
+			sca->XPos = ip->Pos.x;
+			sca->YPos = ip->Pos.y;
+			//this is actually ordered by time, not by height
+			sca->ZPos = gotportal;
+			AddVVCell( new VEFObject(sca));
 		}
 		return;
 	}
@@ -1101,7 +1104,7 @@ ieDword Map::GetTrapCount(proIterator &iter)
 
 
 //doesn't increase iterator, because we might need to erase it from the list
-ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
+VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter)
 {
 	if (iter==vvcCells.end()) {
 		return NULL;
@@ -1172,7 +1175,7 @@ void Map::DrawMap(Region screen)
 	Container *pile = GetNextPile(pileidx);
 
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
-	ScriptedAnimation *sca = GetNextScriptedAnimation(scaidx);
+	VEFObject *sca = GetNextScriptedAnimation(scaidx);
 	Projectile *pro = GetNextProjectile(proidx);
 	Particles *spark = GetNextSpark(spaidx);
 
@@ -2162,16 +2165,21 @@ ieDword Map::HasVVCCell(const ieResRef resource, const Point &p)
 			if ((*iter)->YPos!=p.y) continue;
 		}
 		if (strnicmp(resource, (*iter)->ResName, sizeof(ieResRef) )) continue;
-		ieDword tmp = (*iter)->GetSequenceDuration(AI_UPDATE_TIME)-(*iter)->GetCurrentFrame();
-		if (tmp>ret) {
-			ret = tmp;
+		ScriptedAnimation *sca = (*iter)->GetSingleObject();
+		if (sca) {
+			ieDword tmp = sca->GetSequenceDuration(AI_UPDATE_TIME)-sca->GetCurrentFrame();
+			if (tmp>ret) {
+				ret = tmp;
+			}
+		} else {
+			ret = 1;
 		}
 	}
 	return ret;
 }
 
 //adding videocell in order, based on its height parameter
-void Map::AddVVCell(ScriptedAnimation* vvc)
+void Map::AddVVCell(VEFObject* vvc)
 {
 	scaIterator iter;
 

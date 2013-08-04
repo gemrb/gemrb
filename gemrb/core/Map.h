@@ -46,6 +46,7 @@ class Projectile;
 class ScriptedAnimation;
 class SpriteCover;
 class TileMap;
+class VEFObject;
 class Wall_Polygon;
 
 //distance of actors from spawn point
@@ -241,7 +242,7 @@ enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJ
 #define PR_IGNORE  2
 
 typedef std::list<AreaAnimation*>::iterator aniIterator;
-typedef std::list<ScriptedAnimation*>::iterator scaIterator;
+typedef std::list<VEFObject*>::iterator scaIterator;
 typedef std::list<Projectile*>::iterator proIterator;
 typedef std::list<Particles*>::iterator spaIterator;
 
@@ -280,7 +281,7 @@ private:
 	std::vector< Actor*> actors;
 	Wall_Polygon **Walls;
 	unsigned int WallCount;
-	std::list< ScriptedAnimation*> vvcCells;
+	std::list< VEFObject*> vvcCells;
 	std::list< Projectile*> projectiles;
 	std::list< Particles*> particles;
 	std::vector< Entrance*> entrances;
@@ -397,7 +398,7 @@ public:
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
 	ieDword HasVVCCell(const ieResRef resource, const Point &p);
-	void AddVVCell(ScriptedAnimation* vvc);
+	void AddVVCell(VEFObject* vvc);
 	bool CanFree();
 	int GetCursor( const Point &p);
 	//adds a sparkle puff of colour to a point in the area
@@ -508,7 +509,7 @@ public:
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
-	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
+	VEFObject *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	Container *GetNextPile (int &index) const;
 	void DrawPile (Region screen, int pileidx);

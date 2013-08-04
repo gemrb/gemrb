@@ -45,22 +45,36 @@ struct ScheduleEntry {
 };
 
 class GEM_EXPORT VEFObject {
+public:
+	ieResRef ResName;
+	int XPos, YPos, ZPos;
+	bool Blend;
+	bool PlayOne;
+	VEFObject();
+	VEFObject(ScriptedAnimation *sca);
+	~VEFObject();
 private:
 	std::list<ScheduleEntry> entries;
+	bool SingleObject;
 public:
 	//adds a new entry (use when loading)
-	void AddEntry(ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
+	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
 	bool Draw(const Region &screen, Point &position, const Color &p_tint, Map *area, int dither, int orientation, int height);
-	void Load2DA(ieResRef resource);
+	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
+	//void SetBlend();
+	//void PlayOnce();
+	//ieDword GetSequenceDuration(ieDword multiplier);
+	//ieDword GetCurrentFrame();
+	ScriptedAnimation *GetSingleObject();
 private:
 	//clears the schedule, used internally
 	void Init();
 	//load a 2DA/VEF resource into the object
-	VEFObject *CreateObject(ieResRef res, SClass_ID id);
+	VEFObject *CreateObject(const ieResRef res, SClass_ID id);
 	//load a BAM/VVC resource into the object
-	ScriptedAnimation *CreateCell(ieResRef res, ieDword start, ieDword end);
+	ScriptedAnimation *CreateCell(const ieResRef res, ieDword start, ieDword end);
 	//load a single entry from stream
 	void ReadEntry(DataStream *stream);
 };
