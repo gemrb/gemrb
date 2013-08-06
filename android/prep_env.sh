@@ -153,8 +153,8 @@ function move_and_edit_projectfiles {
 
   sed -i -e 's,sdlFormat = 0x8,sdlFormat = 0x1,g' "$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java" &&
 
-  sed -i -e 's,SDL_app,GemRB,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.cpp" &&
-  sed -i -e 's,//exit,exit,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.cpp" &&
+  sed -i -e 's,SDL_app,GemRB,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.c" &&
+  sed -i -e 's,//exit,exit,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.c" &&
 
   # change activity class and application name, as well as enable debuggable
   sed -i -e s,org.libsdl.app,net.sourceforge.gemrb, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&

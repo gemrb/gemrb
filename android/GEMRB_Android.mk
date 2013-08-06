@@ -236,7 +236,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/Palette.cpp \
 		    main/gemrb/core/System/swab.c \
 		    main/gemrb/GemRB.cpp \
-		    ../SDL/src/main/android/SDL_android_main.cpp \
+		    ../SDL/src/main/android/SDL_android_main.c \
 		    # main/gemrb/plugins/SDLAudio/SDLAudio.cpp \
 
 LOCAL_SHARED_LIBRARIES := SDL2 openal ogg vorbis python

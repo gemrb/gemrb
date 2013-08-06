@@ -22,7 +22,7 @@ import android.app.AlertDialog;
 import android.widget.EditText;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.content.Environment;
+import android.os.Environment;
 
 public class GemRB extends SDLActivity {
 
@@ -49,7 +49,7 @@ public class GemRB extends SDLActivity {
     Log.d("GemRB Activity", "Checking GemRB.cfg content.");
 
     File finalConfFile = new File(gemrbHomeFolder.getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
-    File userSuppliedConfig = new File(Environment.getExternalStorageDirectory().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
+    File userSuppliedConfig = new File(Environment.getExternalStorageDirectory().getAbsolutePath().concat(gemrbHomeFolder.separator).concat("GemRB.cfg"));
 
     if(!finalConfFile.exists()) {
       Log.d("GemRB Activity", "GemRB.cfg doesn't exist in the expected location, creating it from the packaged template.");
