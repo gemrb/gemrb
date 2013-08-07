@@ -5853,6 +5853,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	bool condition;
 	bool per_round = true; // 4xxx trigger?
 	const TriggerEntry *entry = NULL;
+	ieDword timeOfDay;
 
 	// check the condition
 	switch (fx->Parameter2) {
@@ -5909,6 +5910,17 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		// TookDamage()
 		entry = target->GetMatchingTrigger(trigger_tookdamage, TEF_PROCESSED_EFFECTS);
 		per_round = false;
+		break;
+	case COND_KILLER:
+		// killed someone (BGEE: Dorn's sword)
+		entry = target->GetMatchingTrigger(trigger_killed, TEF_PROCESSED_EFFECTS);
+		per_round = false;
+		break;
+	case COND_TIMEOFDAY:
+		// BGEE: Night Club
+		if (actor != target) break;
+		timeOfDay = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/1800;
+		condition = timeOfDay == fx->IsVariable;
 		break;
 	default:
 		condition = false;

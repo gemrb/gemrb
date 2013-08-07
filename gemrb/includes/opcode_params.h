@@ -69,6 +69,8 @@ namespace GemRB {
 #define COND_NEAR10 9
 #define COND_EVERYROUND 10
 #define COND_TOOKDAMAGE 11
+#define COND_KILLER 12
+#define COND_TIMEOFDAY 13
 
 //resources for the seven eyes effect
 #define EYE_MIND   0
