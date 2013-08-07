@@ -60,6 +60,7 @@ static const TriggerLink triggernames[] = {
 	{"assaltedby", GameScript::AttackedBy, 0},//pst
 	{"attackedby", GameScript::AttackedBy, 0},
 	{"becamevisible", GameScript::BecameVisible, 0},
+	{"beeninparty", GameScript::BeenInParty, 0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
@@ -157,6 +158,7 @@ static const TriggerLink triggernames[] = {
 	{"harmlessentered", GameScript::HarmlessEntered, 0}, //pst
 	{"harmlessopened", GameScript::HarmlessOpened, 0}, //pst
 	{"hasbounceeffects", GameScript::HasBounceEffects, 0},
+	{"hasdlc", GameScript::HasDLC, 0},
 	{"hasimmunityeffects", GameScript::HasImmunityEffects, 0},
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
@@ -225,6 +227,7 @@ static const TriggerLink triggernames[] = {
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
 	{"isspelltargetvalid", GameScript::IsSpellTargetValid, 0},
 	{"isteambiton", GameScript::IsTeamBitOn, 0},
+	{"istouchgui", GameScript::IsTouchGUI, 0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog, 0},
 	{"isvalidforpartydialogue", GameScript::IsValidForPartyDialog, 0},
 	{"isweaponranged", GameScript::IsWeaponRanged, 0},

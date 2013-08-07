@@ -612,6 +612,7 @@ public: //Script Functions
 	static int AtLocation(Scriptable* Sender, Trigger* parameter);
 	static int AttackedBy(Scriptable* Sender, Trigger* parameters);
 	static int BecameVisible(Scriptable* Sender, Trigger* parameters);
+	static int BeenInParty(Scriptable* Sender, Trigger* /*parameters*/);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -701,6 +702,7 @@ public: //Script Functions
 	static int HarmlessEntered(Scriptable* Sender, Trigger* parameters);
 	static int HarmlessOpened(Scriptable* Sender, Trigger* parameters);
 	static int HasBounceEffects(Scriptable* Sender, Trigger* parameters);
+	static int HasDLC(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int HasImmunityEffects(Scriptable* Sender, Trigger* parameters);
 	static int HasInnateAbility(Scriptable* Sender, Trigger* parameters);
 	static int HasItem(Scriptable* Sender, Trigger* parameters);
@@ -758,6 +760,7 @@ public: //Script Functions
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsSpellTargetValid( Scriptable* Sender, Trigger* parameters);
 	static int IsTeamBitOn(Scriptable* Sender, Trigger* parameters);
+	static int IsTouchGUI(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int IsWeaponRanged(Scriptable* Sender, Trigger* parameters);
 	static int IsWeather(Scriptable* Sender, Trigger* parameters);

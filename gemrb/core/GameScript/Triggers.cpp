@@ -4138,4 +4138,25 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::IsTouchGUI(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	return core->GetVideoDriver()->TouchInputEnabled();
+}
+
+// always evaluates to true on Windows/OS X/Linux (there's no DLC); on other platforms it depends
+//TODO: add the real check
+int GameScript::HasDLC(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	return 1;
+}
+
+int GameScript::BeenInParty(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	return actor->GetStat(IE_MC_FLAGS) & MC_BEENINPARTY;
+}
+
 }
