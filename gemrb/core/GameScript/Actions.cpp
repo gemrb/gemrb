@@ -1544,6 +1544,7 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	//actor->InternalFlags|=IF_NOINT;
 	actor->NoInterrupt();
+	//TODO: actor could use travel areas; once implemented, copy original to RunAwayFromNoInterruptNoLeaveArea and break the alias in GameScript.cpp
 	// we should be using int0Parameter for the timing here, not distance
 	if (!actor->InMove()) {
 		// we should make sure our existing walk is a 'run away', or fix moving/path code

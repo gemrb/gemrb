@@ -788,6 +788,7 @@ static const ActionLink actionnames[] = {
 	{"revealareaonmap", GameScript::RevealAreaOnMap, 0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING|AF_ALIVE},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING|AF_ALIVE},
+	{"runawayfromnointerruptnoleavearea", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING|AF_ALIVE},
 	{"runawayfromnoleavearea", GameScript::RunAwayFromNoLeaveArea,AF_BLOCKING|AF_ALIVE},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING|AF_ALIVE},
 	{"runfollow", GameScript::RunAwayFrom,AF_BLOCKING|AF_ALIVE},
