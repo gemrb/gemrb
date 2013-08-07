@@ -808,6 +808,7 @@ static const ActionLink actionnames[] = {
 	{"setapparentnamestrref", GameScript::SetApparentName, 0},
 	{"setareaflags", GameScript::SetAreaFlags, 0},
 	{"setarearestflag", GameScript::SetAreaRestFlag, 0},
+	{"setareascript", GameScript::ChangeAIScript, 0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags, 0},
 	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
