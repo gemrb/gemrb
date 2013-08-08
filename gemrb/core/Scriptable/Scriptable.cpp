@@ -68,6 +68,7 @@ Scriptable::Scriptable(ScriptableType type)
 	textDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
+	scriptlevel = 0;
 
 	LastAttacker = 0;
 	LastCommander = 0;
