@@ -896,13 +896,13 @@ void CREImporter::SetupColor(ieDword &stat)
 		int i;
 		for (i=(int) stat;i>=0;i--) {
 			if (randcolors[i][0]==stat) {
-				stat=randcolors[i][ rand()%RandRows + 1];
+				stat=randcolors[i][rand()%RandRows];
 				return;
 			}
 		}
 		for (i=(int) stat+1;i<RandColor;i++) {
 			if (randcolors[i][0]==stat) {
-				stat=randcolors[i][ rand()%RandRows + 1];
+				stat=randcolors[i][rand()%RandRows];
 				return;
 			}
 		}
