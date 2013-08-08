@@ -49,8 +49,6 @@ VEFObject::VEFObject()
 
 VEFObject::VEFObject(ScriptedAnimation *sca)
 {
-	if (!sca) return; //wtf, should avoid this
-
 	XPos=sca->XPos;
 	YPos=sca->YPos;
 	ZPos=sca->ZPos; //sometimes this is not an actual ZPos - PST portals, don't use it for rendering?
