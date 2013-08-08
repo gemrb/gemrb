@@ -5850,7 +5850,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	bool condition;
+	bool condition = false;
 	bool per_round = true; // 4xxx trigger?
 	const TriggerEntry *entry = NULL;
 	ieDword timeOfDay;
