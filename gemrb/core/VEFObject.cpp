@@ -43,8 +43,6 @@ VEFObject::VEFObject()
 	ZPos=0;
 	ResName[0]=0;
 	SingleObject=false;
-	Blend=false;
-	PlayOne=false;
 }
 
 VEFObject::VEFObject(ScriptedAnimation *sca)
@@ -54,8 +52,6 @@ VEFObject::VEFObject(ScriptedAnimation *sca)
 	ZPos=sca->ZPos; //sometimes this is not an actual ZPos - PST portals, don't use it for rendering?
 	ResName[0]=0;
 	SingleObject=true;
-	//Blend=false;
-	//PlayOne=false;
 	ScheduleEntry entry;
 	entry.start = core->GetGame()->GameTime;
 	if (sca->Duration==0xffffffff) entry.length = 0xffffffff;
@@ -281,46 +277,6 @@ void VEFObject::LoadVEF(DataStream *stream)
 		ReadEntry(stream);
 	}
 }
-
-/*
-void VEFObject::SetBlend()
-{
-	Blend=true;
-}
-
-void VEFObject::PlayOnce()
-{
-	PlayOne=true;
-}
-*/
-//works only with single objects
-/*
-ieDword VEFObject::GetSequenceDuration(ieDword multiplier)
-{
-	std::list<ScheduleEntry>::iterator iter;
-
-	for(iter=entries.begin();iter!=entries.end();iter++) {
-		if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
-			ScriptedAnimation *sca = (ScriptedAnimation *) (*iter).ptr;
-			if (sca) return sca->GetSequenceDuration(multiplier);
-		}
-	}
-	return 0;
-}
-
-ieDword VEFObject::GetCurrentFrame()
-{
-	std::list<ScheduleEntry>::iterator iter;
-
-	for(iter=entries.begin();iter!=entries.end();iter++) {
-		if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
-			ScriptedAnimation *sca = (ScriptedAnimation *) (*iter).ptr;
-			if (sca) return sca->GetCurrentFrame();
-		}
-	}
-	return 0;
-}
-*/
 
 ScriptedAnimation *VEFObject::GetSingleObject()
 {

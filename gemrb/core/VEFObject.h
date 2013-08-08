@@ -48,8 +48,6 @@ class GEM_EXPORT VEFObject {
 public:
 	ieResRef ResName;
 	int XPos, YPos, ZPos;
-	bool Blend;
-	bool PlayOne;
 	VEFObject();
 	VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
@@ -63,10 +61,6 @@ public:
 	bool Draw(const Region &screen, Point &position, const Color &p_tint, Map *area, int dither, int orientation, int height);
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
-	//void SetBlend();
-	//void PlayOnce();
-	//ieDword GetSequenceDuration(ieDword multiplier);
-	//ieDword GetCurrentFrame();
 	ScriptedAnimation *GetSingleObject();
 private:
 	//clears the schedule, used internally
