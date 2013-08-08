@@ -204,7 +204,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	ItemExcl|=itm->ItemExcl;
 	ieDword pos = itm->ItemType/32;
 	ieDword bit = itm->ItemType%32;
-	if (pos<4) {
+	if (pos<8) {
 		ItemTypes[pos]|=1<<bit;
 	}
 

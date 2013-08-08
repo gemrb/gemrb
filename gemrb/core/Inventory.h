@@ -205,7 +205,7 @@ private:
 	ieWord EquippedHeader;
 	/** this isn't saved */
 	ieDword ItemExcl;
-	ieDword ItemTypes[4]; //256 bits
+	ieDword ItemTypes[8]; //256 bits
 public: 
 	Inventory();
 	virtual ~Inventory();
