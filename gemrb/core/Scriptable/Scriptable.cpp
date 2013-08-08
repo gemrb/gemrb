@@ -795,6 +795,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 						}
 					}
 					// we need to refetch the projectile, so the effect queue is created
+					delete pro; // don't leak the original one
 					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
@@ -851,6 +852,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 				}
 				// we need to refetch the projectile, so the new one is used
+				delete pro; // don't leak the original one
 				pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 				pro->SetCaster(GetGlobalID(), level);
 			}
