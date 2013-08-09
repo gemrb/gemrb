@@ -503,6 +503,7 @@ void Scriptable::ClearActions()
 	actionQueue.clear();
 	WaitCounter = 0;
 	LastTarget = 0;
+	LastTargetPos.empty();
 
 	if (Type == ST_ACTOR) {
 		Interrupt();
