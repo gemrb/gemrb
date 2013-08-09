@@ -849,6 +849,7 @@ static const ActionLink actionnames[] = {
 	{"setmazeharder", GameScript::SetMazeHarder, 0}, //pst specific crap
 	{"setmoraleai", GameScript::SetMoraleAI, 0},
 	{"setmusic", GameScript::SetMusic, 0},
+	{"setmytarget", GameScript::SetMyTarget, 0},
 	{"setname", GameScript::SetApparentName, 0},
 	{"setnamelessclass", GameScript::SetNamelessClass, 0},
 	{"setnamelessdeath", GameScript::SetNamelessDeath, 0},

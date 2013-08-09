@@ -2091,6 +2091,20 @@ void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 	}
 }
 
+// the spell target and attack target are different only in iwd2
+void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
+{
+	Actor *actor = (Actor *) Sender;
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1]);
+	actor->LastTargetPos.empty();
+	if (!tar) {
+		// we got called with Nothing to invalidate the target
+		actor->LastTarget = 0;
+		return;
+	}
+	actor->LastTarget = tar->GetGlobalID();
+}
+
 // PlaySequence without object parameter defaults to Sender
 void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 {

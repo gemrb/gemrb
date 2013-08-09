@@ -1306,6 +1306,7 @@ public:
 	static void SetMazeHarder(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetMusic(Scriptable* Sender, Action* parameters);
+	static void SetMyTarget(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDeath(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
