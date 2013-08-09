@@ -7047,6 +7047,8 @@ bool Actor::ShouldHibernate() {
 		return false;
 	if (LastTarget) //currently attacking someone
 		return false;
+	if (!LastTargetPos.isempty()) //currently casting at the ground
+		return false;
 	if (InternalFlags&IF_JUSTDIED) // didn't have a chance to run a script
 		return false;
 	if (CurrentAction)
