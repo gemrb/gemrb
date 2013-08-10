@@ -4235,7 +4235,8 @@ void Actor::dump(StringBuffer& buffer) const
 	}
 	buffer.append("\n");
 	buffer.appendFormatted("WaitCounter: %d\n", (int) GetWait());
-	buffer.appendFormatted("LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
+	buffer.appendFormatted("LastTarget: %d %s    ", LastTarget, GetActorNameByID(LastTarget));
+	buffer.appendFormatted("LastSpellTarget: %d %s\n", LastSpellTarget, GetActorNameByID(LastSpellTarget));
 	buffer.appendFormatted("LastTalked: %d %s\n", LastTalker, GetActorNameByID(LastTalker));
 	inventory.dump(buffer);
 	spellbook.dump(buffer);
@@ -7104,6 +7105,8 @@ bool Actor::ShouldHibernate() {
 	if (LastTarget) //currently attacking someone
 		return false;
 	if (!LastTargetPos.isempty()) //currently casting at the ground
+		return false;
+	if (LastSpellTarget) //currently casting at someone
 		return false;
 	if (InternalFlags&IF_JUSTDIED) // didn't have a chance to run a script
 		return false;

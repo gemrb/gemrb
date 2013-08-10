@@ -2146,6 +2146,7 @@ int GameScript::SetLastMarkedObject(Scriptable* Sender, Trigger* parameters)
 }
 
 // TODO: should there be any more failure modes?
+// iwd2 only
 int GameScript::SetSpellTarget(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -2156,11 +2157,13 @@ int GameScript::SetSpellTarget(Scriptable* Sender, Trigger* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
-		scr->LastTarget = 0;
+		scr->LastSpellTarget = 0;
 		scr->LastTargetPos.empty();
 		return 1;
 	}
-	scr->LastTarget = tar->GetGlobalID();
+	scr->LastTarget = 0;
+	scr->LastTargetPos.empty();
+	scr->LastSpellTarget = tar->GetGlobalID();
 	return 1;
 }
 

@@ -2102,6 +2102,7 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 		actor->LastTarget = 0;
 		return;
 	}
+	actor->LastSpellTarget = 0;
 	actor->LastTarget = tar->GetGlobalID();
 }
 

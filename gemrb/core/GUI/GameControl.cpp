@@ -806,7 +806,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					if (target) {
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
-						if (src->LastTarget) {
+						if (src->LastSpellTarget) {
 							src->CastSpellEnd(0, 0);
 						} else {
 							src->CastSpellPointEnd(0, 0);

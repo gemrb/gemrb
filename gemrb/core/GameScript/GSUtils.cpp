@@ -2604,8 +2604,8 @@ inline static bool InterruptSpellcasting(Scriptable* Sender) {
 
 	// abort casting on invisible or dead targets
 	// not all spells should be interrupted on death - some for chunking, some for raising the dead
-	if (Sender->LastTarget) {
-		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastTarget);
+	if (Sender->LastSpellTarget) {
+		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
 		if (target) {
 			ieDword state = target->GetStat(IE_STATE_ID);
 			if (state & STATE_DEAD) {
@@ -2728,7 +2728,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	if (Sender->LastTarget) {
+	if (Sender->LastSpellTarget) {
 		//if target was set, fire spell
 		Sender->CastSpellEnd(level, flags&SC_INSTANT);
 	} else if(!Sender->LastTargetPos.isempty()) {

@@ -283,7 +283,7 @@ public:
 	// this is used by GUIScript :(
 	ieDword LastSpellOnMe;  //Last spell cast on this scriptable
 
-	ieDword LastTarget;
+	ieDword LastTarget, LastSpellTarget;
 	Point LastTargetPos;
 	int SpellHeader;
 	ieResRef SpellResRef;

@@ -9135,7 +9135,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty()) {
+	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
 		Py_INCREF( Py_None );
 		return Py_None;

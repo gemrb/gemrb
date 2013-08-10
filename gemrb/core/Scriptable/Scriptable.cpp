@@ -110,6 +110,7 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.x = 0;
 	Pos.y = 0;
 
+	LastTarget = 0;
 	LastSpellOnMe = 0xffffffff;
 	ResetCastingState(NULL);
 	InterruptCasting = false;
@@ -493,6 +494,7 @@ void Scriptable::ClearActions()
 	WaitCounter = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
+	LastSpellTarget = 0;
 
 	if (Type == ST_ACTOR) {
 		Interrupt();
@@ -803,7 +805,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 						}
 					}
 					if (tgt) {
-						LastTarget = newact->GetGlobalID();
+						LastSpellTarget = newact->GetGlobalID();
 						LastTargetPos = newact->Pos;
 					} else {
 						// no better idea; I wonder if the original randomized point targets at all
@@ -937,8 +939,8 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 inline void Scriptable::ResetCastingState(Actor *caster) {
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
-	LastTarget = 0;
 	LastTargetPos.empty();
+	LastSpellTarget = 0;
 	if (caster) {
 		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
 	}
@@ -1038,10 +1040,10 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	}
 
 	if (SpellHeader == -1) {
-		LastTarget = 0;
+		LastSpellTarget = 0;
 		return;
 	}
-	if (!LastTarget) {
+	if (!LastSpellTarget) {
 		SpellHeader = -1;
 		return;
 	}
@@ -1059,7 +1061,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
-	CreateProjectile(SpellResRef, LastTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
+	CreateProjectile(SpellResRef, LastSpellTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
@@ -1076,7 +1078,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	}
 
 	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
-	Actor *target = area->GetActorByGlobalID(LastTarget);
+	Actor *target = area->GetActorByGlobalID(LastSpellTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
 		target->LastSpellOnMe = spellID;
@@ -1231,7 +1233,7 @@ void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int le
 //if spell is illegal stop casting
 int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant, bool nointerrupt )
 {
-	LastTarget = 0;
+	LastSpellTarget = 0;
 	LastTargetPos.empty();
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
@@ -1265,7 +1267,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 //if spell is illegal stop casting
 int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool nointerrupt )
 {
-	LastTarget = 0;
+	LastSpellTarget = 0;
 	LastTargetPos.empty();
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
@@ -1288,7 +1290,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 
 	LastTargetPos = target->Pos;
 	if (target->Type==ST_ACTOR) {
-		LastTarget = target->GetGlobalID();
+		LastSpellTarget = target->GetGlobalID();
 	}
 
 	if(!CheckWildSurge()) {
@@ -1474,10 +1476,10 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			tmp3 = caster->WMLevelMod; // also save caster level; the original didn't reroll the bonus
 			caster->Modified[IE_FORCESURGE] = 7;
 			caster->Modified[IE_SURGEMOD] = - caster->GetCasterLevel(spl->SpellType); // nulify the bonus
-			if (LastTarget) {
-				target = area->GetActorByGlobalID(LastTarget);
+			if (LastSpellTarget) {
+				target = area->GetActorByGlobalID(LastSpellTarget);
 				if (!target) {
-					target = core->GetGame()->GetActorByGlobalID(LastTarget);
+					target = core->GetGame()->GetActorByGlobalID(LastSpellTarget);
 				}
 			}
 			if (!LastTargetPos.isempty()) {
