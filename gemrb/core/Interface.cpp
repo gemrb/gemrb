@@ -2549,11 +2549,11 @@ bool Interface::LoadEncoding()
 	}
 
 	const char *s;
-	unsigned int i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
-	if (i>99) i=99;
-	while(i--) {
+	unsigned int cc = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
+	if (cc>99) cc=99;
+	while(cc--) {
 		char key[10];
-		snprintf(key,9,"Letter%d", i+1);
+		snprintf(key,9,"Letter%d", cc+1);
 		s = ini->GetKeyAsString( "charset", key, NULL );
 		if (s) {
 			const char *s2 = strchr(s,',');
