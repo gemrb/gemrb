@@ -260,10 +260,10 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	}
 	for (i++; i < linesize; i++) {
 		Palette* pal = NULL;
-		if (seltext == (int) i)
-			pal = selected;
-		else if (Value == i)
+		if (Value == i)
 			pal = lineselpal;
+		else if (seltext == (int) i)
+			pal = selected;
 		else
 			pal = palette;
 		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
