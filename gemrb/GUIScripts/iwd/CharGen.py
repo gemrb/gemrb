@@ -2731,9 +2731,9 @@ def ImportDonePress():
 	SkillsButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	AppearanceButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AppearanceButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	BiographyButton.SetState (IE_GUI_BUTTON_ENABLED)
+	BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
 	BiographyButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	NameButton.SetState (IE_GUI_BUTTON_ENABLED)
+	NameButton.SetState (IE_GUI_BUTTON_DISABLED)
 	NameButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	if ImportWindow:
