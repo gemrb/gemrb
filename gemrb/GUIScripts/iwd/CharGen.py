@@ -2560,8 +2560,13 @@ def BiographyPress():
 	BiographyWindow = GemRB.LoadWindow (51)
 	BiographyField = BiographyWindow.GetControl (4)
 	BiographyField = BiographyField.ConvertEdit (3)
-	BiographyField.SetText (19423)
 	BiographyField.SetStatus (IE_GUI_CONTROL_FOCUSED)
+
+	BIO = GemRB.GetToken("Biography")
+	if BIO:
+ 		BiographyField.SetText (BIO)
+	else:
+		BiographyField.SetText (19423)
 
 	BiographyClearButton = BiographyWindow.GetControl (5)
 	BiographyClearButton.SetState (IE_GUI_BUTTON_ENABLED)
