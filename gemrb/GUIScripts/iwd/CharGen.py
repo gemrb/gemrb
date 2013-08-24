@@ -2558,10 +2558,10 @@ def BiographyPress():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	BiographyWindow = GemRB.LoadWindow (51)
-
 	BiographyField = BiographyWindow.GetControl (4)
+	BiographyField = BiographyField.ConvertEdit (3)
 	BiographyField.SetText (19423)
-	BiographyField.SetBackground("")
+	BiographyField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	BiographyClearButton = BiographyWindow.GetControl (5)
 	BiographyClearButton.SetState (IE_GUI_BUTTON_ENABLED)
