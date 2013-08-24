@@ -2583,7 +2583,6 @@ def BiographyPress():
 	BiographyDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	BiographyDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BiographyDonePress)
 	BiographyDoneButton.SetText (11973)
-	BiographyDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	BiographyWindow.SetVisible (WINDOW_VISIBLE)
 	return
