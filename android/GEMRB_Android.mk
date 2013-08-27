@@ -106,6 +106,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/PLTImporter/PLTImporter.cpp \
 		    main/gemrb/plugins/PNGImporter/PNGImporter.cpp \
 		    main/gemrb/plugins/MUSImporter/MUSImporter.cpp \
+		    main/gemrb/core/VEFObject.cpp \
 		    main/gemrb/core/Projectile.cpp \
 		    main/gemrb/core/AnimationMgr.cpp \
 		    main/gemrb/core/Store.cpp \
