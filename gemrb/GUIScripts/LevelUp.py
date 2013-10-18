@@ -173,7 +173,7 @@ def OpenLevelUpWindow():
 			if IsDual[0] == 1: # kit
 				Classes[1] = CommonTables.KitList.GetValue (IsDual[1], 7)
 			else: # class
-				TmpClassName = GUICommon.GetClassRowName (Classes[1], "class")
+				TmpClassName = GUICommon.GetClassRowName (Classes[1], "index")
 				Classes[1] = CommonTables.Classes.GetValue (TmpClassName, "ID")
 
 		# store a boolean for IsDual
@@ -189,7 +189,7 @@ def OpenLevelUpWindow():
 	if IsDual:
 		# convert the classes from indicies to class id's
 		DualSwap = GUICommon.IsDualSwap (pc)
-		ClassName = GUICommon.GetClassRowName (Classes[0], "class")
+		ClassName = GUICommon.GetClassRowName (Classes[0], "index")
 		KitName = ClassName # for simplicity throughout the code
 		Classes[0] = CommonTables.Classes.GetValue (ClassName, "ID")
 		# Class[1] is taken care of above
