@@ -104,7 +104,7 @@ using namespace GemRB;
 		[defaults setValue:cachePath forKey:@"CachePath"];
 	}
 
-	NSMutableDictionary* additionalPaths = [defaults valueForKey:@"AdditionalPaths"];
+	NSMutableDictionary* additionalPaths = [[defaults dictionaryForKey:@"AdditionalPaths"] mutableCopy];
 	if ([additionalPaths valueForKey:@"CustomFontPath"] == nil) {
 		NSArray* paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, NO);
 		NSString* fontPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Fonts"];
@@ -113,6 +113,8 @@ using namespace GemRB;
 	if ([additionalPaths valueForKey:@"SavePath"] == nil) {
 		[additionalPaths setValue:[defaults valueForKey:@"GamePath"] forKey:@"SavePath"];
 	}
+	[defaults setObject:additionalPaths forKey:@"AdditionalPaths"];
+	[additionalPaths release];
 }
 
 /* Called when the internal event loop has just started running */
