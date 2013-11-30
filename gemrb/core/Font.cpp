@@ -606,6 +606,7 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 					nb = 6;
 				} else {
 					Log(WARNING, "Font", "Invalid UTF-8 character: %x", currentChr);
+					continue;
 				}
 
 				ieWord ch = currentChr & ((1 << (7 - nb)) - 1);
