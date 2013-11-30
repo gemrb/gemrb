@@ -2537,7 +2537,9 @@ bool Interface::LoadEncoding()
 		// Korean
 		"EUCKR",
 		// Japanese
-		"SJIS"
+		"SJIS",
+		// UTF8
+		"UTF-8",
 	};
 	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
 

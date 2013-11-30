@@ -41,9 +41,8 @@ Font::Font()
 
 	if (stricmp(core->TLKEncoding.encoding.c_str(), "UTF-8") == 0) {
 		utf8 = true;
+		assert(multibyte);
 	}
-	// utf8 & multibyte are mutually exclusive
-	assert(utf8 == false || multibyte == false);
 }
 
 Font::~Font(void)
@@ -580,63 +579,45 @@ size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString)
 	size_t dbLen = 0;
 	for(size_t i=0; i<len; ++i)
 	{
-		if (utf8) {
-			/* The first byte of a UTF-8 encoding reveals its length. */
-			static const unsigned char utf8_bytes[0x100] = {
-				/* 00-7f are themselves */
-				/*00*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*10*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*20*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*30*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*40*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*50*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*60*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*70*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/* 80-bf are later bytes, out-of-sync if first */
-				/*80*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*90*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*a0*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/*b0*/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				/* c0-df are first byte of two-byte sequences (5+6=11 bits) */
-				/* c0-c1 are noncanonical */
-				/*c0*/ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-				/*d0*/ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-				/* e0-ef are first byte of three-byte (4+6+6=16 bits) */
-				/* e0 80-9f are noncanonical */
-				/*e0*/ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-				/* f0-f7 are first byte of four-byte (3+6+6+6=21 bits) */
-				/* f0 80-8f are noncanonical */
-				/*f0*/ 4, 4, 4, 4, 4, 4, 4, 4,
-				/* f8-fb are first byte of five-byte (2+6+6+6+6=26 bits) */
-				/* f8 80-87 are noncanonical */
-				/*f8*/ 5, 5, 5, 5,
-				/* fc-fd are first byte of six-byte (1+6+6+6+6+6=31 bits) */
-				/* fc 80-83 are noncanonical */
-				/*fc*/ 6, 6,
-				/* fe and ff are not part of valid UTF-8 so they stand alone */
-				/*fe*/ 1, 1
-			};
+		ieWord currentChr = string[i];
+		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
+		if( multibyte && (i+1 < len) && (currentChr >= 128 || currentChr < 32)) { // this is a double byte char
+			if (utf8) {
+				size_t nb = 0;
+				if (currentChr >= 0xC0 && currentChr <= 0xDF) {
+					/* c0-df are first byte of two-byte sequences (5+6=11 bits) */
+					/* c0-c1 are noncanonical */
+					nb = 2;
+				} else if (currentChr >= 0xE0 && currentChr <= 0XEF) {
+					/* e0-ef are first byte of three-byte (4+6+6=16 bits) */
+					/* e0 80-9f are noncanonical */
+					nb = 3;
+				} else if (currentChr >= 0xF0 && currentChr <= 0XF7) {
+					/* f0-f7 are first byte of four-byte (3+6+6+6=21 bits) */
+					/* f0 80-8f are noncanonical */
+					nb = 4;
+				} else if (currentChr >= 0xF8 && currentChr <= 0XFB) {
+					/* f8-fb are first byte of five-byte (2+6+6+6+6=26 bits) */
+					/* f8 80-87 are noncanonical */
+					nb = 5;
+				} else if (currentChr >= 0xFC && currentChr <= 0XFD) {
+					/* fc-fd are first byte of six-byte (1+6+6+6+6+6=31 bits) */
+					/* fc 80-83 are noncanonical */
+					nb = 6;
+				} else {
+					Log(WARNING, "Font", "Invalid UTF-8 character: %x", currentChr);
+				}
 
-			size_t nb = utf8_bytes[*string];
-
-			i += nb;
-			if (nb <= 1 || nb > 6) {
-				dbString[dbLen] = *string;
-			} else {
-				ieWord ch = *string & ((1 << (7 - nb)) - 1);
+				ieWord ch = currentChr & ((1 << (7 - nb)) - 1);
 				while (--nb)
-					ch <<= 6, ch |= *++string & 0x3f;
+					ch <<= 6, ch |= string[++i] & 0x3f;
 
 				dbString[dbLen] = ch;
+			} else {
+				dbString[dbLen] = (string[++i] << 8) + currentChr;
 			}
 		} else {
-			// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
-			if( multibyte && (i+1 < len) && (string[i] >= 128 || string[i] < 32)) { // this is a double byte char
-				dbString[dbLen] = (string[i+1] << 8) + string[i];
-				++i;
-			} else {
-				dbString[dbLen] = string[i];
-			}
+			dbString[dbLen] = currentChr;
 		}
 		assert(dbString[dbLen] != 0); // premature end of string
 		++dbLen;
