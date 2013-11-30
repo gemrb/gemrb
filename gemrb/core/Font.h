@@ -111,7 +111,6 @@ public:
 	int CalcStringWidth(const unsigned char* string, bool NoColor = false) const;
 	void SetupString(ieWord* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
 	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
-	size_t GetUtf8String(const unsigned char* string, ieWord* &uniString) const;
 
 protected:
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
@@ -120,7 +119,6 @@ private:
 	int CalcStringWidth(const ieWord* string, bool NoColor = false) const;
 	int CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const;
 	int dbStrLen(const ieWord* string) const;
-	ieWord readUtf8(const unsigned char *src, size_t *readed_length) const;
 };
 
 }
