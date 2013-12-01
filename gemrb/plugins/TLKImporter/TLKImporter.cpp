@@ -277,8 +277,9 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( RaceStrRef(-1), 0);
 		goto exit_function;
 	}
-	if (!strncmp( Token, "PLAYER",6 )) {
-		Decoded = CharName(Token[6]-'1');
+	if (!strncmp( Token, "PLAYER", 6 )) {
+		// FIXME: this assumes a single digit number of players.
+		Decoded = CharName(Token[strlen(Token)-1]-'1');
 		goto exit_function;
 	}
 

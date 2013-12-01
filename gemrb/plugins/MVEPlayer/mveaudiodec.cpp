@@ -55,7 +55,7 @@ ipaudio_uncompress (short *buffer, unsigned short buf_len,
     const unsigned char *data, unsigned char channels)
 {
   int i, out = 0;
-  int predictor[2];
+  int predictor[2] = {};
   int channel_number = 0;
 
   for (i = 0; i < channels; ++i) {

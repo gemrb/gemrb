@@ -7610,7 +7610,7 @@ PyDoc_STRVAR( GemRB_DragItem__doc,
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
-	ieResRef Sound;
+	ieResRef Sound = {};
 	int globalID, Slot, Count = 0, Type = 0;
 	const char *ResRef;
 
