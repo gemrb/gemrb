@@ -8860,7 +8860,6 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	}
 	ieDword fistweapon = actor->inventory.GetFistSlot();
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
-	ieDword disabledbutton = actor->GetStat(IE_DISABLEDBUTTON);
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
 		int ci = core->GetControl(wi, i+Start);
@@ -9153,7 +9152,8 @@ jump_label:
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
-		if (action<0 || (disabledbutton & (1<<action) )) {
+		ieDword disabledbutton = actor->GetStat(IE_DISABLEDBUTTON);
+		if (action<0 || (action <= ACT_SKILLS && (disabledbutton & (1<<action) ))) {
 			state = IE_GUI_BUTTON_DISABLED;
 		}
 		btn->SetState(state);
