@@ -3922,7 +3922,7 @@ void CopyPolymorphStats(Actor *source, Actor *target)
 	if(!polymorph_stats) {
 		AutoTable tab("polystat");
 		if (!tab) {
-			polymorph_stats = (int *) malloc(0);
+			polymorph_stats = NULL;
 			polystatcount=0;
 			return;
 		}
