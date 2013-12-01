@@ -68,10 +68,6 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		fnt = new BAMFont(af, NULL);
 	}
 
-	if (!fnt) {
-		delete af;
-		return NULL;
-	}
 	if (pal) {
 		fnt->SetPalette(pal);
 	}
