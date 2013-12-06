@@ -327,5 +327,33 @@ def TakeItemContainer ():
 	if LeftIndex >= Container['ItemCount']:
 		return
 
+
+	pc = GemRB.GameGetFirstSelectedPC ()
+	pc_inventory = GemRB.GetSlots (pc, 32768,1) #do this before moving the item to player or a bag might try to bag itself and the universe would explode into 15 dimensions I think
+	pc_inventory_size = len(pc_inventory)
+
+	item = GemRB.GetContainerItem(0, LeftIndex)
+	item_dest_slot = GemRB.GetSlots (pc, 32768, -1) #this gets all empty slots, but we only need the first
+
+	if len(item_dest_slot) < 1: #changecontaineritem checks for empty slot anyway, but doesn't seem to share the result with python
+		return
+
 	GemRB.ChangeContainerItem (0, LeftIndex, 1)
+
+	#if the player picked it up, see if it can also go in a bag;
+	#for each inventory slot, check if is a container, then
+	#if the item will go in the container, bash it in the container
+	if GemRB.GetVar("GUIEnhancements")&GE_TRY_TO_BAG_LOOT:
+		for i in range (pc_inventory_size):
+			pc_item = GemRB.GetSlotItem(pc,pc_inventory[i])
+			if pc_item:
+				pc_item_details = GemRB.GetItem(pc_item['ItemResRef'])
+				if pc_item_details['Function']&4:
+					GemRB.EnterStore(pc_item['ItemResRef'])
+					ret = GemRB.IsValidStoreItem (pc, item_dest_slot[0], 0)
+					if ret&SHOP_SELL:
+						GemRB.ChangeStoreItem (pc, item_dest_slot[0], SHOP_SELL)
+					GemRB.LeaveStore()
+
+
 	UpdateContainerWindow ()

@@ -309,6 +309,7 @@ GEMRB_VERSION = -1
 GE_SCROLLBARS = 1
 GE_TRY_IDENTIFY_ON_TRANSFER = 2
 GE_ALWAYS_OPEN_CONTAINER_ITEMS = 4
+GE_TRY_TO_BAG_LOOT = 8
 
 # Log Levels
 # !!! Keep this synchronized with System/Logging.h !!!
