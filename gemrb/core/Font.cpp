@@ -87,7 +87,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	ieWord* tmp = NULL;
 	size_t len = GetDoubleByteString(string, tmp);
 
-	int num_empty_rows = 0;
+	ieWord num_empty_rows = 0;
 
 	if (initials && initials != this)
 	{
@@ -96,7 +96,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		initials_rows = 1 + ((initials->maxHeight - 1) / maxHeight); // ceiling
 		currCap = string[0];
 		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
-			while(isspace(currCap) && num_empty_rows < (int)len){//we cant cap whiteSpace so keep looking
+			while(isspace(currCap) && num_empty_rows < len){//we cant cap whiteSpace so keep looking
 				currCap = string[++num_empty_rows];
 				// WARNING: this assumes all preceeding whiteSpace is an empty line
 			}
@@ -124,7 +124,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		ystep = maxHeight;
 	}
 	int x = psx, y = ystep;
-	int w = CalcStringWidth( tmp, NoColor );
+	size_t w = CalcStringWidth( tmp, NoColor );
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
 		x = ( rgn.w - w) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -209,7 +209,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		if (( tmp[i] == 0 ) || ( tmp[i] == '\n' )) {
 			y += ystep;
 			x = psx;
-			int w = CalcStringWidth( &tmp[i + 1], NoColor );
+			size_t w = CalcStringWidth( &tmp[i + 1], NoColor );
 			if (initials_rows > 0) {
 				initials_rows--;
 				x += initials_x;
@@ -317,10 +317,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Video* video = core->GetVideoDriver();
 
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
-		int w = CalcStringWidth( tmp, NoColor );
+		size_t w = CalcStringWidth( tmp, NoColor );
 		x = ( rgn.w - w ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
-		int w = CalcStringWidth( tmp, NoColor );
+		size_t w = CalcStringWidth( tmp, NoColor );
 		x = ( rgn.w - w ) - IE_FONT_PADDING;
 	}
 
@@ -392,7 +392,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		if (tmp[i] == 0) {
 			y += ystep;
 			x = psx;
-			int w = CalcStringWidth( &tmp[i + 1], NoColor );
+			size_t w = CalcStringWidth( &tmp[i + 1], NoColor );
 			if (Alignment & IE_FONT_ALIGN_CENTER) {
 				x = ( rgn.w - w ) / 2;
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -434,7 +434,7 @@ int Font::PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const
 	return x;
 }
 
-int Font::CalcStringWidth(const unsigned char* string, bool NoColor) const
+size_t Font::CalcStringWidth(const unsigned char* string, bool NoColor) const
 {
 	ieWord* tmp = NULL;
 	GetDoubleByteString(string, tmp);
@@ -443,7 +443,7 @@ int Font::CalcStringWidth(const unsigned char* string, bool NoColor) const
 	return width;
 }
 
-int Font::CalcStringWidth(const ieWord* string, bool NoColor) const
+size_t Font::CalcStringWidth(const ieWord* string, bool NoColor) const
 {
 	size_t ret = 0, len = dbStrLen(string);
 	for (size_t i = 0; i < len; i++) {
@@ -456,10 +456,10 @@ int Font::CalcStringWidth(const ieWord* string, bool NoColor) const
 			ret += GetCharSprite(string[i])->Width;
 		}
 	}
-	return ( int ) ret;
+	return ret;
 }
 
-int Font::CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const
+size_t Font::CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const
 {
 	int h, max = 0;
 	for (unsigned int i = 0; i < len; i++) {
@@ -484,7 +484,7 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 {
 	size_t len = dbStrLen(string);
 	unsigned int psx = IE_FONT_PADDING;
-	int lastpos = 0;
+	size_t lastpos = 0;
 	unsigned int x = psx, wx = 0;
 	bool endword = false;
 	int initials_rows = 0;
@@ -493,7 +493,7 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 		if (x + wx > width) {
 			// we wrapped, force a new line somewhere
 			if (!endword && ( x == psx ))
-				lastpos = ( int ) pos;
+				lastpos = pos;
 			else
 				string[lastpos] = 0;
 			x = psx;
@@ -517,7 +517,7 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 				initials_rows--;
 				x += initials_x;
 			}
-			lastpos = ( int ) pos;
+			lastpos = pos;
 			endword = true;
 			continue;
 		}
@@ -566,7 +566,7 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
 			wx = 0;
-			lastpos = ( int ) pos;
+			lastpos = pos;
 			endword = true;
 		}
 	}
@@ -657,7 +657,7 @@ void Font::SetPalette(Palette* pal)
 	palette = pal;
 }
 
-int Font::dbStrLen(const ieWord* string) const
+size_t Font::dbStrLen(const ieWord* string)
 {
 	if (string == NULL) return 0;
 	int count = 0;
