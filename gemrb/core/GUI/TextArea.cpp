@@ -698,7 +698,7 @@ void TextArea::SetRow(int row)
 void TextArea::CalcRowCount()
 {
 	int tr;
-	int w = Width;
+	size_t w = Width;
 
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
 		const char *portrait = NULL;
@@ -727,7 +727,7 @@ void TextArea::CalcRowCount()
 //			rows++;
 			tr = 0;
 			ieWord* tmp = NULL;
-			size_t len = (int)ftext->GetDoubleByteString((unsigned char*)lines[i], tmp);
+			size_t len = ftext->GetDoubleByteString((unsigned char*)lines[i], tmp);
 			ftext->SetupString( tmp, w );
 			for (size_t p = 0; p <= len; p++) {
 				if (( tmp[p] ) == '[') {
