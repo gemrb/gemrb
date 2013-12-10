@@ -262,9 +262,11 @@ def OpenStoreShoppingWindow ():
 
 	## encumbrance
 	Button = Window.GetControl (25)
-	GUICommon.SetEncumbranceLabels (Window, 25, None, GemRB.GameGetSelectedPCSingle ())
-	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	GUICommon.SetEncumbranceLabels (Window, 25, None, GemRB.GameGetSelectedPCSingle (), True)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Button.SetFont ('NUMBER')
+
 	##Label = Window.CreateLabel (0x10000019, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	##Label = Window.CreateLabel (0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
@@ -343,8 +345,10 @@ def OpenStoreStealWindow ():
 	# encumbrance
 	Button = Window.GetControl (22)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	GUICommon.SetEncumbranceLabels (Window, 22, None, GemRB.GameGetSelectedPCSingle ())
-	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	GUICommon.SetEncumbranceLabels (Window, 22, None, GemRB.GameGetSelectedPCSingle (), True)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Button.SetFont ('NUMBER')
+
 	#Label = Window.CreateLabel (0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	#Label = Window.CreateLabel (0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 

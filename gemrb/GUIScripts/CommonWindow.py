@@ -196,6 +196,7 @@ def OpenContainerWindow ():
 		Button.SetVarAssoc ("LeftIndex", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, TakeItemContainer)
 		if GUICommon.GameIsPST():
+			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
 	# 10-13 - Personal Item
@@ -204,6 +205,7 @@ def OpenContainerWindow ():
 		Button.SetVarAssoc ("RightIndex", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DropItemContainer)
 		if GUICommon.GameIsPST():
+			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
 	# left scrollbar (container)

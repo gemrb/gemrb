@@ -124,9 +124,9 @@ def OpenInventoryWindow ():
 
 	# encumbrance
 	Button = Window.GetControl (46)
-	Button.SetFont ("NUMBER")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Button.SetFont ('NUMBER')
 
 	# armor class
 	Label = Window.GetControl (0x1000003a)

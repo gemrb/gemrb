@@ -359,7 +359,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 	Control = Window.GetControl (ControlID)
 	if GameIsPST():
 		# FIXME: there should be a space before LB symbol (':')
-		Control.SetText (str (encumbrance) + ":\n\n\n\n" + str (max_encumb) + ":")
+		Control.SetText (str (encumbrance) + ":\n\n" + str (max_encumb) + ":")
 	elif GameIsIWD2() and not Control2ID:
 		Control.SetText (str (encumbrance) + "/" + str(max_encumb) + GemRB.GetString(39537))
 	else:
