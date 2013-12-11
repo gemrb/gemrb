@@ -171,9 +171,9 @@ char *TLKImporter::Gabber()
 
 	act=core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
-		return override->CS(act->LongName);
+		return strdup(act->LongName);
 	}
-	return override->CS("?");
+	return strdup("?");
 }
 
 char *TLKImporter::CharName(int slot)
@@ -182,9 +182,9 @@ char *TLKImporter::CharName(int slot)
 
 	act=GetActorFromSlot(slot);
 	if (act) {
-		return override->CS(act->LongName);
+		return strdup(act->LongName);
 	}
-	return override->CS("?");
+	return strdup("?");
 }
 
 int TLKImporter::ClassStrRef(int slot)

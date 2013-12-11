@@ -38,15 +38,6 @@ CTlkOverride::~CTlkOverride()
 	CloseResources();
 }
 
-char *CTlkOverride::CS(const char *src)
-{
-	if(!src) return NULL;
-	int len=strlen(src)+1;
-	char *ret = (char *) malloc(len);
-	memcpy(ret, src, len);
-	return ret;
-}
-
 bool CTlkOverride::Init()
 {
 	CloseResources();

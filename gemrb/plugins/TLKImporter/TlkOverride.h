@@ -78,7 +78,6 @@ public:
 	bool Init();
 	char *ResolveAuxString(ieStrRef strref, int &Length);
 	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
-	char *CS(const char *src);
 };
 
 #endif //TLKOVERRIDE_H
