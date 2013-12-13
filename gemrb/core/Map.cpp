@@ -733,6 +733,7 @@ void Map::UpdateScripts()
 		}
 
 		if (actor->GetStat(IE_AVATARREMOVAL)) {
+			actor->Stop(); // maze and imprisonment should invalidate existing actions
 			continue;
 		}
 
