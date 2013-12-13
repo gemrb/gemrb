@@ -894,10 +894,8 @@ void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 	if (clab[0]!='*') {
 		if (max) {
 			//singleclass
-			if (remove) {
-				ApplyClab_internal(this, clab, max, true);
-			} else {
-				ApplyClab_internal(this, clab, max, true);
+			ApplyClab_internal(this, clab, max, true);
+			if (!remove) {
 				ApplyClab_internal(this, clab, max, false);
 			}
 		}
