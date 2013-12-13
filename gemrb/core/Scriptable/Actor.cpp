@@ -2940,6 +2940,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 			memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
 		}
 	}
+	if (Immobile()) {
+		timeStartStep = core->GetGame()->Ticks;
+	}
 }
 
 int Actor::GetProficiency(int proftype) const
@@ -5639,6 +5642,15 @@ int Actor::Immobile() const
 	}
 
 	return 0;
+}
+
+bool Actor::DoStep(unsigned int walk_speed, ieDword time)
+{
+	if (Immobile()) {
+		return true;
+	}
+
+	return Movable::DoStep(walk_speed, time);
 }
 
 ieDword Actor::GetNumberOfAttacks()

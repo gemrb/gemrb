@@ -698,6 +698,7 @@ public:
 	void UpdateAnimations();
 	/* if necessary, draw actor */
 	void Draw(const Region &screen);
+	bool DoStep(unsigned int walk_speed, ieDword time = 0);
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);

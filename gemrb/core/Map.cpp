@@ -712,10 +712,8 @@ void Map::UpdateScripts()
 			continue;
 		}
 
-		//FIXME:we need a better timestop hack, actors shouldn't abort moving after a timestop expired
 		if (game->TimeStoppedFor(actor)) {
 			actor->no_more_steps = true;
-			actor->ClearPath(); //HACK: prevents jumping when timestop ends
 			continue;
 		}
 
@@ -740,16 +738,9 @@ void Map::UpdateScripts()
 
 		if (actor->GetStat(IE_AVATARREMOVAL)) {
 			actor->no_more_steps = true;
-			actor->ClearPath();
 			continue;
 		}
-
-		//FIXME: we need a better immobile hack, the actors used to retain their target
-		//and resume moving after the hold effect stopped
 		actor->no_more_steps = false;
-		if (actor->Immobile()) {
-			actor->ClearPath(); //HACK: prevents jumping when effect ends
-		}
 
 		/*
 		 * we run scripts all at once because one of the actions in ProcessActions
