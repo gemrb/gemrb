@@ -3084,6 +3084,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	switch (visible) {
 		case WINDOW_GRAYED:
 			win->Invalidate();
+			win->DrawWindow();
 			//here is a fallthrough
 		case WINDOW_INVISIBLE:
 			//hiding the viewport if the gamecontrol window was made invisible
