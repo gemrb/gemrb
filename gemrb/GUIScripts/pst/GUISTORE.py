@@ -531,7 +531,7 @@ def UpdateStoreCommon (Window, title, name, gold):
 	if name:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Label = Window.GetControl (name)
-		Label.SetText (GemRB.GetPlayerName (pc, 0) )
+		Label.SetText (GemRB.GetPlayerName (pc, -1) )
 
 	Label = Window.GetControl (gold)
 	Label.SetText (str(GemRB.GameGetPartyGold ()))
@@ -657,6 +657,8 @@ def RedrawStoreShoppingWindow ():
 
 	UpdateStoreCommon (Window, 0x10000001, 0x10000005, 0x10000002)
 	pc = GemRB.GameGetSelectedPCSingle ()
+
+	GUICommon.SetEncumbranceLabels (Window, 25, None, GemRB.GameGetSelectedPCSingle (), True)
 
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
