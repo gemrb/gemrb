@@ -231,12 +231,12 @@ def OpenStoreShoppingWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+8)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 
 		Button = Window.GetControl (i+17)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
@@ -315,7 +315,7 @@ def OpenStoreIdentifyWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+6)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreIdentifyWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
@@ -339,11 +339,11 @@ def OpenStoreStealWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+5)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
 
 		Button = Window.GetControl (i+14)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 
 	# Steal
