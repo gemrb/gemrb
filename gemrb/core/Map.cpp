@@ -895,8 +895,11 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
-	bool no_more_steps = true;
+	if (actor->Immobile()) {
+		return true;
+	}
 
+	bool no_more_steps = true;
 	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
 
@@ -909,11 +912,9 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 		}
 	}
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
-		if (!actor->Immobile()) {
-			no_more_steps = actor->DoStep( speed, time );
-			if (actor->BlocksSearchMap()) {
-				BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
-			}
+		no_more_steps = actor->DoStep( speed, time );
+		if (actor->BlocksSearchMap()) {
+			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		}
 	}
 
