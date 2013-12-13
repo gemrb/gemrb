@@ -328,6 +328,7 @@ public:
 	Action* GetNextAction() const;
 	Action* PopNextAction();
 	void ClearActions();
+	virtual void Stop();
 	virtual void ReleaseCurrentAction();
 	bool InMove() const;
 	void ProcessActions();
@@ -498,11 +499,12 @@ public:
 	void FixPosition();
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
+	void Stop();
 	void ClearPath();
+
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
 	virtual bool BlocksSearchMap() const = 0;
-
 };
 
 //Tiled objects are not used (and maybe not even implemented correctly in IE)

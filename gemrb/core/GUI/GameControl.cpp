@@ -1036,8 +1036,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'q': //joins actor to the party
 				if (lastActor && !lastActor->InParty) {
-					lastActor->ClearActions();
-					lastActor->ClearPath();
+					lastActor->Stop();
 					char Tmp[40];
 					strlcpy(Tmp, "JoinParty()", sizeof(Tmp));
 					lastActor->AddAction( GenerateAction(Tmp) );
@@ -1049,8 +1048,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'k': //kicks out actor
 				if (lastActor && lastActor->InParty) {
-					lastActor->ClearActions();
-					lastActor->ClearPath();
+					lastActor->Stop();
 					char Tmp[40];
 					strlcpy(Tmp, "LeaveParty()", sizeof(Tmp));
 					lastActor->AddAction( GenerateAction(Tmp) );
@@ -1073,8 +1071,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (lastActor) {
 					//using action so the actor is killed
 					//correctly (synchronisation)
-					lastActor->ClearActions();
-					lastActor->ClearPath();
+					lastActor->Stop();
 
 					Effect *newfx;
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
@@ -1636,8 +1633,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 	strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 	source->CommandActor();
@@ -1648,8 +1644,7 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "NIDSpecial4()", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
@@ -1663,8 +1658,7 @@ void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 {
 	char Tmp[40];
 
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 	source->SetModal(MS_NONE);
 	if (tgt->Type == ST_ACTOR) {
 		strlcpy(Tmp, "PickPockets([-1])", sizeof(Tmp));
@@ -1689,8 +1683,7 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 
 	char Tmp[40];
 
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
@@ -1706,8 +1699,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		ResetTargetMode();
 		return; //not casting or using an own item
 	}
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 
 	spellCount--;
 	if (spellOrItem>=0) {
@@ -1755,8 +1747,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		ResetTargetMode();
 		return; //not casting or using an own item
 	}
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 
 	// cannot target spells on invisible or sanctuaried creatures
 	// invisible actors are invisible, so this is usually impossible by itself, but improved invisibility changes that
@@ -1811,8 +1802,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
-	source->ClearPath();
-	source->ClearActions();
+	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "NIDSpecial1()", sizeof(Tmp));
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
@@ -1840,8 +1830,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		actor->ClearPath();
-		actor->ClearActions();
+		actor->Stop();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
 		actor->AddAction(GenerateAction(Tmp));
 		actor->CommandActor();
@@ -1854,8 +1843,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	}
 
 	container->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-	actor->ClearPath();
-	actor->ClearActions();
+	actor->Stop();
 	strlcpy(Tmp, "UseContainer()", sizeof(Tmp));
 	core->SetCurrentContainer( actor, container);
 	actor->AddAction( GenerateAction( Tmp) );
@@ -1881,8 +1869,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		actor->ClearPath();
-		actor->ClearActions();
+		actor->Stop();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
 		actor->AddAction(GenerateAction(Tmp));
 		actor->CommandActor();
@@ -1895,8 +1882,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 
 	door->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-	actor->ClearPath();
-	actor->ClearActions();
+	actor->Stop();
 	actor->TargetDoor = door->GetGlobalID();
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
 	sprintf( Tmp, "NIDSpecial9()" );
@@ -2158,8 +2144,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				return;
 			}
 
-			pc->ClearPath();
-			pc->ClearActions();
+			pc->Stop();
 			CreateMovement(pc, p);
 			if (DoubleClick) Center(x,y);
 			//p is a searchmap travel region
@@ -2202,8 +2187,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
-			actor->ClearPath();
-			actor->ClearActions();
+			actor->Stop();
 
 			Map* map = actor->GetCurrentArea();
 			move = GetFormationPoint(map, i, src, p);

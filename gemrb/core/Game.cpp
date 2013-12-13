@@ -1645,8 +1645,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	while (i--) {
 		Actor *tar = GetPC(i, true);
-		tar->ClearPath();
-		tar->ClearActions();
+		tar->Stop();
 		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);

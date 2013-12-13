@@ -2234,7 +2234,7 @@ void Map::RemoveActor(Actor* actor)
 	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
-			//clear previous walk path
+			//path is invalid outside this area, but actions may be valid
 			actor->ClearPath();
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);

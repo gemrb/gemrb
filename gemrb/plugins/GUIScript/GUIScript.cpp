@@ -8531,8 +8531,7 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 		GameScript::SetLeavePartyDialogFile(actor, NULL);
 		if(actor->GetBase(IE_HITPOINTS) > 0) {
 			char Tmp[40];
-			actor->ClearPath();
-			actor->ClearActions();
+			actor->Stop();
 			strncpy(Tmp,"Dialogue([PC])",sizeof(Tmp) );
 			actor->AddAction( GenerateAction(Tmp) );
 		}
@@ -9189,8 +9188,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	actor->ClearPath();      //stop walking
-	actor->ClearActions();   //stop pending action involved walking
+	actor->Stop(); //stop pending action involved walking
 	actor->SetModal(MS_NONE);//stop modal actions
 	Py_INCREF( Py_None );
 	return Py_None;

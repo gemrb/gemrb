@@ -4529,8 +4529,7 @@ void Actor::Resurrect()
 	//resurrect spell sets the hitpoints to maximum in a separate effect
 	//raise dead leaves it at 1 hp
 	SetBase(IE_HITPOINTS, 1);
-	ClearActions();
-	ClearPath();
+	Stop();
 	SetStance(IE_ANI_EMERGE);
 	Game *game = core->GetGame();
 	//readjust death variable on resurrection
@@ -9616,8 +9615,7 @@ int Actor::UpdateAnimationID(bool derived)
 void Actor::MovementCommand(char *command)
 {
 	UseExit(0);
-	ClearPath();
-	ClearActions();
+	Stop();
 	AddAction( GenerateAction( command ) );
 	ProcessActions();
 }

@@ -512,6 +512,11 @@ void Scriptable::ClearActions()
 	}
 }
 
+void Scriptable::Stop()
+{
+	ClearActions();
+}
+
 void Scriptable::ReleaseCurrentAction()
 {
 	if (CurrentAction) {
@@ -2241,6 +2246,12 @@ void Movable::MoveTo(const Point &Des)
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
 	}
+}
+
+void Movable::Stop()
+{
+	Scriptable::Stop();
+	ClearPath();
 }
 
 void Movable::ClearPath()

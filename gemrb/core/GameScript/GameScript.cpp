@@ -1979,12 +1979,9 @@ bool GameScript::Update(bool *continuing, bool *done)
 
 					//movetoobjectfollow would break if this isn't called
 					//(what is broken if it is here?)
-					MySelf->ClearActions();
 					//IE even clears the path, shall we?
 					//yes we must :)
-					if (MySelf->Type == ST_ACTOR) {
-						((Movable *)MySelf)->ClearPath();
-					}
+					MySelf->Stop();
 				}
 				lastAction=a;
 			}

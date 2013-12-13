@@ -3494,8 +3494,7 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 			if (!act->ValidTarget(GA_NO_DEAD) ) {
 				continue;
 			}
-			act->ClearActions();
-			act->ClearPath();
+			act->Stop();
 			act->SetModal(MS_NONE);
 		}
 	}
@@ -3512,13 +3511,7 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 			return;
 		}
 	}
-	tar->ClearActions();
-	if (tar->Type==ST_ACTOR) {
-		Actor* act = (Actor *) tar;
-		act->ClearPath();
-		//not sure about this
-		//act->SetModal(MS_NONE);
-	}
+	tar->Stop();
 }
 
 void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
@@ -4619,11 +4612,7 @@ void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return;
-	}
-	Actor *actor = (Actor *) Sender;
-	actor->ClearPath();
+	Sender->Stop();
 }
 
 void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)

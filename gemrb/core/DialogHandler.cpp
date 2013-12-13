@@ -281,8 +281,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			// executing actions directly does not work, because dialog
 			// needs to end before final actions are executed due to
 			// actions making new dialogs!
-			if (target->Type == ST_ACTOR) ((Movable *)target)->ClearPath(); // fuzzie added this
-				target->ClearActions();
+			target->Stop();
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
 			char buf[20];
