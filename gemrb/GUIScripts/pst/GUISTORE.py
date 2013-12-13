@@ -33,6 +33,7 @@ StoreWindow = None
 
 MessageWindow = None
 ActionWindow = None
+MenuWindow = None
 PortraitWindow = None
 StoreShoppingWindow = None
 StoreIdentifyWindow = None
@@ -91,7 +92,7 @@ def CloseWindows ():
 
 def CloseStoreWindow ():
 	import GUIINV
-	global StoreWindow, ActionWindow, PortraitWindow
+	global StoreWindow, ActionWindow, MenuWindow, PortraitWindow
 	global OldPortraitWindow
 
 	GemRB.SetVar ("Inventory", 0)
@@ -100,6 +101,8 @@ def CloseStoreWindow ():
 		StoreWindow.Unload ()
 	if ActionWindow:
 		ActionWindow.Unload ()
+	if MenuWindow:
+		MenuWindow.Unload ()
 	if PortraitWindow:
 		PortraitWindow.Unload ()
 	StoreWindow = None
@@ -117,7 +120,7 @@ def CloseStoreWindow ():
 
 def OpenStoreWindow ():
 	global Store
-	global StoreWindow, ActionWindow, PortraitWindow
+	global StoreWindow, ActionWindow, MenuWindow, PortraitWindow
 	global OldPortraitWindow
 	global store_funcs
 	global Inventory
@@ -150,6 +153,8 @@ def OpenStoreWindow ():
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
 
+	MenuWindow = GemRB.LoadWindow (2)
+
 	Store = GemRB.GetStore ()
 
 	# Done
@@ -181,7 +186,8 @@ def OpenStoreWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	ActionWindow.SetVisible (WINDOW_VISIBLE)
+	ActionWindow.SetVisible (WINDOW_GRAYED)
+	MenuWindow.SetVisible (WINDOW_GRAYED)
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
