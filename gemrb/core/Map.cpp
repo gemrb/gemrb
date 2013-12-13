@@ -708,12 +708,10 @@ void Map::UpdateScripts()
 		Actor* actor = queue[PR_SCRIPT][q];
 		//actor just moved away, don't run its script from this side
 		if (actor->GetCurrentArea()!=this) {
-			actor->no_more_steps = true;
 			continue;
 		}
 
 		if (game->TimeStoppedFor(actor)) {
-			actor->no_more_steps = true;
 			continue;
 		}
 
@@ -730,17 +728,13 @@ void Map::UpdateScripts()
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
 			//if that isn't true either, remove this block completely
 			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
-				actor->no_more_steps = true;
-				//FIXME:obviously we miss the ClearPath hack here (but we need a better one)
 				continue;
 			}
 		}
 
 		if (actor->GetStat(IE_AVATARREMOVAL)) {
-			actor->no_more_steps = true;
 			continue;
 		}
-		actor->no_more_steps = false;
 
 		/*
 		 * we run scripts all at once because one of the actions in ProcessActions
@@ -754,20 +748,6 @@ void Map::UpdateScripts()
 		 * and we should probably be staggering the script executions anyway
 		 */
 		actor->Update();
-
-	}
-
-	//clean up effects on dead actors too
-	q=Qcount[PR_DISPLAY];
-	while(q--) {
-		Actor* actor = queue[PR_DISPLAY][q];
-		actor->fxqueue.Cleanup();
-	}
-
-	q=Qcount[PR_SCRIPT];
-	while (q--) {
-		Actor* actor = queue[PR_SCRIPT][q];
-		if (actor->no_more_steps) continue;
 
 		actor->UpdateActorState(game->GameTime);
 
@@ -794,6 +774,13 @@ void Map::UpdateScripts()
 		actor->speed = speed;
 	}
 
+	//clean up effects on dead actors too
+	q=Qcount[PR_DISPLAY];
+	while(q--) {
+		Actor* actor = queue[PR_DISPLAY][q];
+		actor->fxqueue.Cleanup();
+	}
+
 	// We need to step through the list of actors until all of them are done
 	// taking steps.
 	bool more_steps = true;
@@ -804,7 +791,6 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
-			if (actor->no_more_steps) continue;
 
 			// try to exclude actors which only just died
 			// (shouldn't we not be stepping actors which don't have a path anyway?)
@@ -812,8 +798,7 @@ void Map::UpdateScripts()
 			if (!actor->ValidTarget(GA_NO_DEAD)) continue;
 			//if (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag() & IF_JUSTDIED) continue;
 
-			actor->no_more_steps = DoStepForActor(actor, actor->speed, time);
-			if (!actor->no_more_steps) more_steps = true;
+			if (!DoStepForActor(actor, actor->speed, time)) more_steps = true;
 		}
 	}
 

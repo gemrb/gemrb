@@ -349,7 +349,6 @@ public:
 	ieDword nextComment;         //do something random (area comment, interaction)
 	ieDword nextBored;           //do something when bored
 	ieDword lastInit;
-	bool no_more_steps;
 	int speed;
 	//how many attacks left in this round, must be public for cleave opcode
 	int attackcount;
