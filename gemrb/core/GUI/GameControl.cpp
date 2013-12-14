@@ -1632,7 +1632,6 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
-	source->Stop();
 	strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
 	source->CommandActor(GenerateActionDirect( Tmp, tgt));
 }
@@ -1642,7 +1641,6 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
-	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "NIDSpecial4()", sizeof(Tmp));
 	source->CommandActor(GenerateActionDirect( Tmp, tgt));
@@ -1655,7 +1653,6 @@ void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 {
 	char Tmp[40];
 
-	source->Stop();
 	source->SetModal(MS_NONE);
 	if (tgt->Type == ST_ACTOR) {
 		strlcpy(Tmp, "PickPockets([-1])", sizeof(Tmp));
@@ -1679,7 +1676,6 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 
 	char Tmp[40];
 
-	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
 	source->CommandActor(GenerateActionDirect( Tmp, tgt ));
@@ -1797,7 +1793,6 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
-	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "NIDSpecial1()", sizeof(Tmp));
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
@@ -1824,7 +1819,6 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		actor->Stop();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
 		actor->CommandActor(GenerateAction(Tmp));
 		return;
@@ -1836,7 +1830,6 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	}
 
 	container->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-	actor->Stop();
 	strlcpy(Tmp, "UseContainer()", sizeof(Tmp));
 	core->SetCurrentContainer( actor, container);
 	actor->CommandActor(GenerateAction( Tmp));
@@ -1861,7 +1854,6 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		actor->Stop();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
 		actor->CommandActor(GenerateAction(Tmp));
 		return;
@@ -1873,7 +1865,6 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 
 	door->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-	actor->Stop();
 	actor->TargetDoor = door->GetGlobalID();
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
 	sprintf( Tmp, "NIDSpecial9()" );

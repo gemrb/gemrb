@@ -3549,7 +3549,8 @@ void Actor::PlaySelectionSound()
 //call this when a PC receives a command from GUI
 void Actor::CommandActor(Action* action)
 {
-	AddAction(action);
+	Stop(); // stop what you were doing
+	AddAction(action); // now do this new thing
 	switch (cmd_snd_freq) {
 		case 0:
 			return;
