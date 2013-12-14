@@ -279,8 +279,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 		action = GenerateAction( Tmp );
 	}
 
-	actor->AddAction( action );
-	actor->CommandActor();
+	actor->CommandActor(action);
 }
 
 GameControl::~GameControl(void)
@@ -1635,8 +1634,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 
 	source->Stop();
 	strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
-	source->AddAction( GenerateActionDirect( Tmp, tgt) );
-	source->CommandActor();
+	source->CommandActor(GenerateActionDirect( Tmp, tgt));
 }
 
 //generate action code for source actor to try to defend a target
@@ -1647,8 +1645,7 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "NIDSpecial4()", sizeof(Tmp));
-	source->AddAction( GenerateActionDirect( Tmp, tgt) );
-	source->CommandActor();
+	source->CommandActor(GenerateActionDirect( Tmp, tgt));
 }
 
 // generate action code for source actor to try to pick pockets of a target (if an actor)
@@ -1672,8 +1669,7 @@ void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 		Log(ERROR, "GameControl", "Invalid pick target of type %d", tgt->Type);
 		return;
 	}
-	source->AddAction( GenerateActionDirect( Tmp, tgt) );
-	source->CommandActor();
+	source->CommandActor(GenerateActionDirect( Tmp, tgt));
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
@@ -1686,8 +1682,7 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 	source->Stop();
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
-	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
-	source->CommandActor();
+	source->CommandActor(GenerateActionDirect( Tmp, tgt ));
 }
 
 //generate action code for source actor to use item/cast spell on a point
@@ -1806,8 +1801,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->SetModal(MS_NONE);
 	strlcpy(Tmp, "NIDSpecial1()", sizeof(Tmp));
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
-	source->AddAction( GenerateActionDirect( Tmp, tgt) );
-	source->CommandActor();
+	source->CommandActor(GenerateActionDirect( Tmp, tgt));
 }
 
 //generate action code for actor appropriate for the target mode when the target is a container
@@ -1832,8 +1826,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	if (target_mode == TARGET_MODE_ATTACK) {
 		actor->Stop();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
-		actor->AddAction(GenerateAction(Tmp));
-		actor->CommandActor();
+		actor->CommandActor(GenerateAction(Tmp));
 		return;
 	}
 
@@ -1846,8 +1839,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	actor->Stop();
 	strlcpy(Tmp, "UseContainer()", sizeof(Tmp));
 	core->SetCurrentContainer( actor, container);
-	actor->AddAction( GenerateAction( Tmp) );
-	actor->CommandActor();
+	actor->CommandActor(GenerateAction( Tmp));
 }
 
 //generate action code for actor appropriate for the target mode when the target is a door
@@ -1871,8 +1863,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	if (target_mode == TARGET_MODE_ATTACK) {
 		actor->Stop();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
-		actor->AddAction(GenerateAction(Tmp));
-		actor->CommandActor();
+		actor->CommandActor(GenerateAction(Tmp));
 		return;
 	}
 
@@ -1886,8 +1877,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	actor->TargetDoor = door->GetGlobalID();
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
 	sprintf( Tmp, "NIDSpecial9()" );
-	actor->AddAction( GenerateAction( Tmp) );
-	actor->CommandActor();
+	actor->CommandActor(GenerateAction( Tmp));
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
@@ -1940,8 +1930,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			if (trap->GetUsePoint() ) {
 				char Tmp[256];
 				sprintf(Tmp, "TriggerWalkTo(\"%s\")", trap->GetScriptName());
-				actor->AddAction(GenerateAction(Tmp));
-				actor->CommandActor();
+				actor->CommandActor(GenerateAction(Tmp));
 				return true;
 			}
 			return true;

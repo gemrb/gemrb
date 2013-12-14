@@ -3547,8 +3547,9 @@ void Actor::PlaySelectionSound()
 #define SEL_ACTION_COUNT_ALL     7
 
 //call this when a PC receives a command from GUI
-void Actor::CommandActor()
+void Actor::CommandActor(Action* action)
 {
+	AddAction(action);
 	switch (cmd_snd_freq) {
 		case 0:
 			return;
