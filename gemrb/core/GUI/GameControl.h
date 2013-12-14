@@ -94,6 +94,13 @@ static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
  */
 
 class GEM_EXPORT GameControl : public Control {
+	enum WINDOW_GROUP {
+		WINDOW_GROUP_LEFT,
+		WINDOW_GROUP_BOTTOM,
+		WINDOW_GROUP_RIGHT,
+		WINDOW_GROUP_TOP,
+		WINDOW_GROUP_COUNT,
+	};
 public:
 	GameControl(void);
 	~GameControl(void);
@@ -106,6 +113,7 @@ public:
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
 private:
+	int windowGroupCounts[WINDOW_GROUP_COUNT];
 	ieDword lastActorID;
 	ieDword trackerID;
 	ieDword distance;  //tracking distance
@@ -193,7 +201,6 @@ private:
 	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
 
 private:
-	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 	Actor *user;     //the user of item or spell
 public:
 	DialogHandler *dialoghandler;

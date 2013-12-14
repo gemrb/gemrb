@@ -105,6 +105,7 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 }
 
 GameControl::GameControl(void)
+	: windowGroupCounts()
 {
 	if (!formations) {
 		ReadFormations();
@@ -152,10 +153,6 @@ GameControl::GameControl(void)
 	} else {
 		ScreenFlags = SF_CENTERONACTOR;
 	}
-	LeftCount = 0;
-	BottomCount = 0;
-	RightCount = 0;
-	TopCount = 0;
 	DialogueFlags = 0;
 	dialoghandler = new DialogHandler();
 	DisplayText = NULL;
@@ -2585,63 +2582,41 @@ int GameControl::UnhideGUI()
 //a window got removed, so the GameControl gets enlarged
 void GameControl::ResizeDel(Window* win, int type)
 {
-	switch (type) {
-	case 0: //Left
-		if (LeftCount!=1) {
-			Log(ERROR, "GameControl", "More than one left window!");
+	if (type < WINDOW_GROUP_COUNT) {
+		if (windowGroupCounts[type] != 1) {
+			Log(ERROR, "GameControl", "More than one window in group %d!", type);
 		}
-		LeftCount--;
-		if (!LeftCount) {
-			Owner->XPos -= win->Width;
-			Owner->Width += win->Width;
-			Width = Owner->Width;
+		windowGroupCounts[type]--;
+		if (!windowGroupCounts[type]) {
+			switch (type) {
+				case WINDOW_GROUP_LEFT:
+					Owner->XPos -= win->Width;
+					Owner->Width += win->Width;
+					Width = Owner->Width;
+					break;
+				case WINDOW_GROUP_BOTTOM:
+					Owner->Height += win->Height;
+					Height = Owner->Height;
+					break;
+				case WINDOW_GROUP_RIGHT:
+					Owner->Width += win->Width;
+					Width = Owner->Width;
+					break;
+				case WINDOW_GROUP_TOP:
+					Owner->YPos -= win->Height;
+					Owner->Height += win->Height;
+					Height = Owner->Height;
+					break;
+			}
 		}
-		break;
-
-	case 1: //Bottom
-		if (BottomCount!=1) {
-			Log(ERROR, "GameControl", "More than one bottom window!");
-		}
-		BottomCount--;
-		if (!BottomCount) {
-			Owner->Height += win->Height;
-			Height = Owner->Height;
-		}
-		break;
-
-	case 2: //Right
-		if (RightCount!=1) {
-			Log(ERROR, "GameControl", "More than one right window!");
-		}
-		RightCount--;
-		if (!RightCount) {
-			Owner->Width += win->Width;
-			Width = Owner->Width;
-		}
-		break;
-
-	case 3: //Top
-		if (TopCount!=1) {
-			Log(ERROR, "GameControl", "More than one top window!");
-		}
-		TopCount--;
-		if (!TopCount) {
-			Owner->YPos -= win->Height;
-			Owner->Height += win->Height;
-			Height = Owner->Height;
-		}
-		break;
-
-	case 4: //BottomAdded
-		BottomCount--;
+	}
+	// 4 == BottomAdded; 5 == Inactivating
+	else if (type <= 5) {
+		windowGroupCounts[WINDOW_GROUP_BOTTOM]--;
 		Owner->Height += win->Height;
 		Height = Owner->Height;
-		break;
-	case 5: //Inactivating
-		BottomCount--;
-		Owner->Height += win->Height;
-		Height = Owner->Height;
-		break;
+	} else {
+		Log(ERROR, "GameControl", "Unknown resize type: %d", type);
 	}
 }
 
@@ -2650,51 +2625,39 @@ void GameControl::ResizeDel(Window* win, int type)
 //GameControl is the only control on that window
 void GameControl::ResizeAdd(Window* win, int type)
 {
-	switch (type) {
-	case 0: //Left
-		LeftCount++;
-		if (LeftCount == 1) {
-			Owner->XPos += win->Width;
-			Owner->Width -= win->Width;
-			Width = Owner->Width;
+	if (type < WINDOW_GROUP_COUNT) {
+		windowGroupCounts[type]++;
+		if (windowGroupCounts[type] == 1) {
+			switch (type) {
+				case WINDOW_GROUP_LEFT:
+					Owner->XPos += win->Width;
+					Owner->Width -= win->Width;
+					Width = Owner->Width;
+					break;
+				case WINDOW_GROUP_BOTTOM:
+					Owner->Height -= win->Height;
+					Height = Owner->Height;
+					break;
+				case WINDOW_GROUP_RIGHT:
+					Owner->Width -= win->Width;
+					Width = Owner->Width;
+					break;
+				case WINDOW_GROUP_TOP:
+					Owner->YPos += win->Height;
+					Owner->Height -= win->Height;
+					Height = Owner->Height;
+					break;
+			}
 		}
-		break;
-
-	case 1: //Bottom
-		BottomCount++;
-		if (BottomCount == 1) {
-			Owner->Height -= win->Height;
-			Height = Owner->Height;
-		}
-		break;
-
-	case 2: //Right
-		RightCount++;
-		if (RightCount == 1) {
-			Owner->Width -= win->Width;
-			Width = Owner->Width;
-		}
-		break;
-
-	case 3: //Top
-		TopCount++;
-		if (TopCount == 1) {
-			Owner->YPos += win->Height;
-			Owner->Height -= win->Height;
-			Height = Owner->Height;
-		}
-		break;
-
-	case 4: //BottomAdded
-		BottomCount++;
+	}
+	// 4 == BottomAdded; 5 == Inactivating
+	else if (type <= 5) {
+		windowGroupCounts[WINDOW_GROUP_BOTTOM]++;
 		Owner->Height -= win->Height;
 		Height = Owner->Height;
-		break;
-
-	case 5: //Inactivating
-		BottomCount++;
-		Owner->Height -= win->Height;
-		Height = 0;
+		if (type == 5) Height = 0;
+	} else {
+		Log(ERROR, "GameControl", "Unknown resize type: %d", type);
 	}
 }
 
