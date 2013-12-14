@@ -101,6 +101,10 @@ class GEM_EXPORT GameControl : public Control {
 		WINDOW_GROUP_TOP,
 		WINDOW_GROUP_COUNT,
 	};
+	enum WINDOW_RESIZE_OPERATION {
+		WINDOW_EXPAND = -1,
+		WINDOW_CONTRACT = 1
+	};
 public:
 	GameControl(void);
 	~GameControl(void);
@@ -192,8 +196,7 @@ private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
 	void CalculateSelection(const Point &p);
-	void ResizeDel(Window* win, int type);
-	void ResizeAdd(Window* win, int type);
+	void ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION);
 	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
 	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();

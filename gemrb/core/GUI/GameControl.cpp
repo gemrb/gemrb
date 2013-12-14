@@ -2481,7 +2481,7 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 			if (w) {
 				core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
 				if (dict->Lookup( WindowPosition, index )) {
-					ResizeDel( w, index );
+					ResizeParentWindowFor( w, index, WINDOW_EXPAND );
 				}
 				return;
 			}
@@ -2534,7 +2534,7 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 			if (w) {
 				core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
 				if (dict->Lookup( WindowPosition, index )) {
-					ResizeAdd( w, index );
+					ResizeParentWindowFor( w, index, WINDOW_CONTRACT );
 				}
 				return;
 			}
@@ -2579,83 +2579,41 @@ int GameControl::UnhideGUI()
 	return 1;
 }
 
-//a window got removed, so the GameControl gets enlarged
-void GameControl::ResizeDel(Window* win, int type)
+void GameControl::ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION op)
 {
+	// when GameControl contracts it adds to windowGroupCounts
+	// WINDOW_CONTRACT is a positive operation and WINDOW_EXPAND is negative
 	if (type < WINDOW_GROUP_COUNT) {
-		if (windowGroupCounts[type] != 1) {
-			Log(ERROR, "GameControl", "More than one window in group %d!", type);
-		}
-		windowGroupCounts[type]--;
-		if (!windowGroupCounts[type]) {
+		windowGroupCounts[type] += op;
+		if ((op == WINDOW_CONTRACT && windowGroupCounts[type] == 1)
+			|| (op == WINDOW_EXPAND && !windowGroupCounts[type])) {
 			switch (type) {
 				case WINDOW_GROUP_LEFT:
-					Owner->XPos -= win->Width;
-					Owner->Width += win->Width;
-					Width = Owner->Width;
-					break;
-				case WINDOW_GROUP_BOTTOM:
-					Owner->Height += win->Height;
-					Height = Owner->Height;
-					break;
+					Owner->XPos += win->Width * op;
+					// fallthrough
 				case WINDOW_GROUP_RIGHT:
-					Owner->Width += win->Width;
-					Width = Owner->Width;
+					Owner->Width -= win->Width * op;
 					break;
 				case WINDOW_GROUP_TOP:
-					Owner->YPos -= win->Height;
-					Owner->Height += win->Height;
-					Height = Owner->Height;
+					Owner->YPos += win->Height * op;
+					// fallthrough
+				case WINDOW_GROUP_BOTTOM:
+					Owner->Height -= win->Height * op;
 					break;
 			}
 		}
+		Width = Owner->Width;
+		Height = Owner->Height;
 	}
 	// 4 == BottomAdded; 5 == Inactivating
 	else if (type <= 5) {
-		windowGroupCounts[WINDOW_GROUP_BOTTOM]--;
-		Owner->Height += win->Height;
-		Height = Owner->Height;
-	} else {
-		Log(ERROR, "GameControl", "Unknown resize type: %d", type);
-	}
-}
-
-//a window got added, so the GameControl gets shrunk
-//Owner is the GameControl's window
-//GameControl is the only control on that window
-void GameControl::ResizeAdd(Window* win, int type)
-{
-	if (type < WINDOW_GROUP_COUNT) {
-		windowGroupCounts[type]++;
-		if (windowGroupCounts[type] == 1) {
-			switch (type) {
-				case WINDOW_GROUP_LEFT:
-					Owner->XPos += win->Width;
-					Owner->Width -= win->Width;
-					Width = Owner->Width;
-					break;
-				case WINDOW_GROUP_BOTTOM:
-					Owner->Height -= win->Height;
-					Height = Owner->Height;
-					break;
-				case WINDOW_GROUP_RIGHT:
-					Owner->Width -= win->Width;
-					Width = Owner->Width;
-					break;
-				case WINDOW_GROUP_TOP:
-					Owner->YPos += win->Height;
-					Owner->Height -= win->Height;
-					Height = Owner->Height;
-					break;
-			}
+		windowGroupCounts[WINDOW_GROUP_BOTTOM] += op;
+		Owner->Height -= win->Height * op;
+		if (op == WINDOW_CONTRACT && type == 5) {
+			Height = 0;
+		} else {
+			Height = Owner->Height;
 		}
-	}
-	// 4 == BottomAdded; 5 == Inactivating
-	else if (type <= 5) {
-		windowGroupCounts[WINDOW_GROUP_BOTTOM]++;
-		Owner->Height -= win->Height;
-		Height = Owner->Height;
-		if (type == 5) Height = 0;
 	} else {
 		Log(ERROR, "GameControl", "Unknown resize type: %d", type);
 	}
