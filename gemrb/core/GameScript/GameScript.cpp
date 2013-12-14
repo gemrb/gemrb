@@ -2277,7 +2277,7 @@ int Response::Execute(Scriptable* Sender)
 {
 	int ret = 0; // continue or not
 	for (size_t i = 0; i < actions.size(); i++) {
-		if (canary == 0xdddddddd) {
+		if (!CheckCanary()) {
 			// FIXME: hack to prevent crashing when a script deletes itself.
 			// this object has been deleted and this should not be considered a fix (it may cause unforseen problems too).
 			Log(ERROR, "GameScript", "Aborting response execution due to object deletion.\n \
@@ -2485,7 +2485,7 @@ void Object::dump(StringBuffer& buffer) const
 {
 	int i;
 
-	GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+	AssertCanary(__FUNCTION__);
 	if(objectName[0]) {
 		buffer.appendFormatted("Object: %s\n",objectName);
 		return;
@@ -2528,7 +2528,7 @@ void Trigger::dump() const
 
 void Trigger::dump(StringBuffer& buffer) const
 {
-	GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+	AssertCanary(__FUNCTION__);
 	buffer.appendFormatted("Trigger: %d\n", triggerID);
 	buffer.appendFormatted("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
@@ -2553,7 +2553,7 @@ void Action::dump(StringBuffer& buffer) const
 {
 	int i;
 
-	GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+	AssertCanary(__FUNCTION__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
 	for (i=0;i<3;i++) {

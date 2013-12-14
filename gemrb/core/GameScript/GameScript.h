@@ -122,12 +122,6 @@ class StringBuffer;
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5
 
-#define GSASSERT(f,c) \
-	if(!(f))  \
-	{  \
-		error("GSASSERT", "Assertion failed: %s [0x%08lX] Line %d\n",#f, c, __LINE__); \
-	}
-
 typedef std::vector<ieDword> SrcVector;
 
 struct targettype {
@@ -160,41 +154,57 @@ public:
 	void Clear();
 };
 
-class GEM_EXPORT Object {
+class Canary {
+private:
+	volatile unsigned long canary;
+protected:
+	Canary() // protected constructor
+	{
+		canary = (unsigned long) 0xdeadbeef;
+	}
+	~Canary() // protected destructor
+	{
+		AssertCanary("Destroying Canary");
+		canary = 0xdddddddd;
+	}
+	void AssertCanary(const char* msg) const
+	{
+		if (!CheckCanary()) {
+			error("Canary Died", "Canary([0x%08lX]) != 0xdeadbeef. Message: %s\n", canary, msg);
+		}
+	}
+	bool CheckCanary() const
+	{
+		return (canary == (unsigned long) 0xdeadbeef);
+	}
+};
+
+class GEM_EXPORT Object : protected Canary {
 public:
 	Object()
 	{
 		memset( objectName, 0, 65 );
-
 		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
 		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
 		memset( objectRect, 0, 4 * sizeof( int ) );
-
-		canary = (unsigned long) 0xdeadbeef;
-	}
-	~Object()
-	{
 	}
 public:
 	int objectFields[MAX_OBJECT_FIELDS];
 	int objectFilters[MAX_NESTING];
 	int objectRect[4];
 	char objectName[65];
-private:
-	volatile unsigned long canary;
+
 public:
 	void dump() const;
 	void dump(StringBuffer&) const;
 	void Release()
 	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
 		delete this;
 	}
 	bool isNull();
 };
 
-class GEM_EXPORT Trigger {
+class GEM_EXPORT Trigger : protected Canary {
 public:
 	Trigger()
 	{
@@ -207,7 +217,6 @@ public:
 		int1Parameter = 0;
 		int2Parameter = 0;
 		pointParameter.null();
-		canary = (unsigned long) 0xdeadbeef;
 	}
 	~Trigger()
 	{
@@ -227,26 +236,19 @@ public:
 	char string0Parameter[65];
 	char string1Parameter[65];
 	Object* objectParameter;
-private:
-	volatile unsigned long canary;
+
 public:
 	void dump() const;
 	void dump(StringBuffer&) const;
 
 	void Release()
 	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
 		delete this;
 	}
 };
 
-class GEM_EXPORT Condition {
+class GEM_EXPORT Condition : protected Canary {
 public:
-	Condition()
-	{
-		canary = (unsigned long) 0xdeadbeef;
-	}
 	~Condition()
 	{
 		for (size_t c = 0; c < triggers.size(); ++c) {
@@ -256,21 +258,16 @@ public:
 			}
 		}
 	}
+	void Release()
+	{
+		delete this;
+	}
 	bool Evaluate(Scriptable* Sender);
 public:
 	std::vector<Trigger*> triggers;
-private:
-	volatile unsigned long canary;
-public:
-	void Release()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
-		delete this;
-	}
 };
 
-class GEM_EXPORT Action {
+class GEM_EXPORT Action : protected Canary {
 public:
 	Action(bool autoFree)
 	{
@@ -290,7 +287,6 @@ public:
 		} else {
 			RefCount = 1; //one reference hold by the script
 		}
-		canary = (unsigned long) 0xdeadbeef;
 	}
 	~Action()
 	{
@@ -312,7 +308,6 @@ public:
 	char string1Parameter[65];
 private:
 	int RefCount;
-	volatile unsigned long canary;
 public:
 	int GetRef() {
 		return RefCount;
@@ -323,20 +318,19 @@ public:
 
 	void Release()
 	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+		AssertCanary(__FUNCTION__);
 		if (!RefCount) {
 			error("GameScript", "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__);
 		}
 		RefCount--;
 		if (!RefCount) {
-			canary = 0xdddddddd;
 			delete this;
 		}
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+		AssertCanary(__FUNCTION__);
 		RefCount++;
 		if (RefCount >= 65536) {
 			error("GameScript", "Refcount increased to: %d in action %d\n", RefCount,
@@ -345,12 +339,11 @@ public:
 	}
 };
 
-class GEM_EXPORT Response {
+class GEM_EXPORT Response : protected Canary {
 public:
 	Response()
 	{
 		weight = 0;
-		canary = (unsigned long) 0xdeadbeef;
 	}
 	~Response()
 	{
@@ -364,27 +357,18 @@ public:
 			}
 		}
 	}
+	void Release()
+	{
+		delete this;
+	}
 	int Execute(Scriptable* Sender);
 public:
 	unsigned char weight;
 	std::vector<Action*> actions;
-private:
-	volatile unsigned long canary;
-public:
-	void Release()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
-		delete this;
-	}
 };
 
-class GEM_EXPORT ResponseSet {
+class GEM_EXPORT ResponseSet : protected Canary {
 public:
-	ResponseSet()
-	{
-		canary = (unsigned long) 0xdeadbeef;
-	}
 	~ResponseSet()
 	{
 		for (size_t b = 0; b < responses.size(); b++) {
@@ -392,27 +376,21 @@ public:
 			responses[b] = NULL;
 		}
 	}
+	void Release()
+	{
+		delete this;
+	}
 	int Execute(Scriptable* Sender);
 public:
 	std::vector<Response*> responses;
-private:
-	volatile unsigned long canary;
-public:
-	void Release()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
-		delete this;
-	}
 };
 
-class GEM_EXPORT ResponseBlock {
+class GEM_EXPORT ResponseBlock : protected Canary {
 public:
 	ResponseBlock()
 	{
 		condition = NULL;
 		responseSet = NULL;
-		canary = (unsigned long) 0xdeadbeef;
 	}
 	~ResponseBlock()
 	{
@@ -425,26 +403,17 @@ public:
 			responseSet = NULL;
 		}
 	}
+	void Release()
+	{
+		delete this;
+	}
 public:
 	Condition* condition;
 	ResponseSet* responseSet;
-private:
-	volatile unsigned long canary;
-public:
-	void Release()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
-		delete this;
-	}
 };
 
-class GEM_EXPORT Script {
+class GEM_EXPORT Script : protected Canary {
 public:
-	Script()
-	{
-		canary = (unsigned long) 0xdeadbeef;
-	}
 	~Script()
 	{
 		for (unsigned int i = 0; i < responseBlocks.size(); i++) {
@@ -456,13 +425,9 @@ public:
 	}
 public:
 	std::vector<ResponseBlock*> responseBlocks;
-private:
-	volatile unsigned long canary;
 public:
 	void Release()
 	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		canary = 0xdddddddd;
 		delete this;
 	}
 };
