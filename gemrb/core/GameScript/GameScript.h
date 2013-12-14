@@ -1524,8 +1524,8 @@ public:
 	static Targets *Player8Fill(Scriptable *Sender, Targets *parameters, int ga_flags);
 };
 
-GEM_EXPORT Action* GenerateAction(char* String);
-Action* GenerateActionDirect(char* String, Scriptable *object);
+GEM_EXPORT Action* GenerateAction(const char* String);
+Action* GenerateActionDirect(const char* String, Scriptable *object);
 GEM_EXPORT Trigger* GenerateTrigger(char* String);
 
 void InitializeIEScript();

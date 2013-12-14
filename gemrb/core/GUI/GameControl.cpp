@@ -1036,9 +1036,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'q': //joins actor to the party
 				if (lastActor && !lastActor->InParty) {
 					lastActor->Stop();
-					char Tmp[40];
-					strlcpy(Tmp, "JoinParty()", sizeof(Tmp));
-					lastActor->AddAction( GenerateAction(Tmp) );
+					lastActor->AddAction( GenerateAction("JoinParty()") );
 				}
 				break;
 			case 'p': //center on actor
@@ -1048,9 +1046,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'k': //kicks out actor
 				if (lastActor && lastActor->InParty) {
 					lastActor->Stop();
-					char Tmp[40];
-					strlcpy(Tmp, "LeaveParty()", sizeof(Tmp));
-					lastActor->AddAction( GenerateAction(Tmp) );
+					lastActor->AddAction( GenerateAction("LeaveParty()") );
 				}
 				break;
 			case 'Y': // damages all enemies by 300 (resistances apply)
@@ -1630,20 +1626,14 @@ void GameControl::SetScrolling(bool scroll) {
 //generate action code for source actor to try to attack a target
 void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
-	char Tmp[40];
-
-	strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
-	source->CommandActor(GenerateActionDirect( Tmp, tgt));
+	source->CommandActor(GenerateActionDirect( "NIDSpecial3()", tgt));
 }
 
 //generate action code for source actor to try to defend a target
 void GameControl::TryToDefend(Actor *source, Actor *tgt)
 {
-	char Tmp[40];
-
 	source->SetModal(MS_NONE);
-	strlcpy(Tmp, "NIDSpecial4()", sizeof(Tmp));
-	source->CommandActor(GenerateActionDirect( Tmp, tgt));
+	source->CommandActor(GenerateActionDirect( "NIDSpecial4()", tgt));
 }
 
 // generate action code for source actor to try to pick pockets of a target (if an actor)
@@ -1651,22 +1641,25 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 // The -1 flag is a placeholder for dynamic target IDs
 void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 {
-	char Tmp[40];
-
 	source->SetModal(MS_NONE);
-	if (tgt->Type == ST_ACTOR) {
-		strlcpy(Tmp, "PickPockets([-1])", sizeof(Tmp));
-	} else if (tgt->Type == ST_DOOR || tgt->Type == ST_CONTAINER) {
-		if (((Highlightable*)tgt)->Trapped && ((Highlightable*)tgt)->TrapDetected) {
-			strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
-		} else {
-			strlcpy(Tmp, "PickLock([-1])", sizeof(Tmp));
-		}
-	} else {
-		Log(ERROR, "GameControl", "Invalid pick target of type %d", tgt->Type);
-		return;
+	const char* cmdString = NULL;
+	switch (tgt->Type) {
+		case ST_ACTOR:
+			cmdString = "PickPockets([-1])";
+			break;
+		case ST_DOOR:
+		case ST_CONTAINER:
+			if (((Highlightable*)tgt)->Trapped && ((Highlightable*)tgt)->TrapDetected) {
+				cmdString = "RemoveTraps([-1])";
+			} else {
+				cmdString = "PickLock([-1])";
+			}
+			break;
+		default:
+			Log(ERROR, "GameControl", "Invalid pick target of type %d", tgt->Type);
+			return;
 	}
-	source->CommandActor(GenerateActionDirect( Tmp, tgt));
+	source->CommandActor(GenerateActionDirect(cmdString, tgt));
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
@@ -1674,11 +1667,8 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 {
 	if (tgt->Type!=ST_PROXIMITY) return;
 
-	char Tmp[40];
-
 	source->SetModal(MS_NONE);
-	strlcpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp));
-	source->CommandActor(GenerateActionDirect( Tmp, tgt ));
+	source->CommandActor(GenerateActionDirect( "RemoveTraps([-1])", tgt ));
 }
 
 //generate action code for source actor to use item/cast spell on a point
@@ -1787,23 +1777,18 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 //generate action code for source actor to use talk to target actor
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
-	char Tmp[40];
-
 	//Nidspecial1 is just an unused action existing in all games
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
 	source->SetModal(MS_NONE);
-	strlcpy(Tmp, "NIDSpecial1()", sizeof(Tmp));
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
-	source->CommandActor(GenerateActionDirect( Tmp, tgt));
+	source->CommandActor(GenerateActionDirect( "NIDSpecial1()", tgt));
 }
 
 //generate action code for actor appropriate for the target mode when the target is a container
 void GameControl::HandleContainer(Container *container, Actor *actor)
 {
-	char Tmp[256];
-
 	//container is disabled, it should not react
 	if (container->Flags & CONT_DISABLED) {
 		return;
@@ -1819,6 +1804,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
+		char Tmp[256];
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
 		actor->CommandActor(GenerateAction(Tmp));
 		return;
@@ -1830,16 +1816,13 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	}
 
 	container->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-	strlcpy(Tmp, "UseContainer()", sizeof(Tmp));
 	core->SetCurrentContainer( actor, container);
-	actor->CommandActor(GenerateAction( Tmp));
+	actor->CommandActor(GenerateAction("UseContainer()"));
 }
 
 //generate action code for actor appropriate for the target mode when the target is a door
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
-	char Tmp[256];
-
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
 		Point *p = door->toOpen;
@@ -1854,6 +1837,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
+		char Tmp[256];
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
 		actor->CommandActor(GenerateAction(Tmp));
 		return;
@@ -1867,8 +1851,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	door->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 	actor->TargetDoor = door->GetGlobalID();
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
-	sprintf( Tmp, "NIDSpecial9()" );
-	actor->CommandActor(GenerateAction( Tmp));
+	actor->CommandActor(GenerateAction("NIDSpecial9()"));
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)

@@ -4723,11 +4723,8 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 	if (!target) {
 		Sender->SetWait(6);
 	} else {
-		char Tmp[40];
-
 		//generate attack action
-		sprintf( Tmp, "NIDSpecial3()");
-		Action *newaction = GenerateActionDirect(Tmp, target);
+		Action *newaction = GenerateActionDirect("NIDSpecial3()", target);
 		if (newaction) {
 			Sender->AddActionInFront(newaction);
 		}
@@ -4985,9 +4982,7 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		if (gc) {
 			//saving the target object ID from the gui variable
-			char Tmp[40];
-			strlcpy(Tmp, "NIDSpecial3()", sizeof(Tmp));
-			scr->AddAction( GenerateActionDirect(Tmp, (Actor *) tar) );
+			scr->AddAction( GenerateActionDirect("NIDSpecial3()", (Actor *) tar) );
 		}
 	} else {
 		char Tmp[80];
@@ -5473,9 +5468,7 @@ void GameScript::ForceUseContainer(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
 	}
-	char Tmp[256];
-	sprintf( Tmp, "UseContainer()");
-	Action *newaction = GenerateAction(Tmp);
+	Action *newaction = GenerateAction("UseContainer()");
 	tar->AddActionInFront(newaction);
 	Sender->ReleaseCurrentAction(); //why blocking???
 }

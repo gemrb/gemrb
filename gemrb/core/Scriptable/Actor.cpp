@@ -3502,10 +3502,8 @@ bool Actor::GetPartyComment()
 			case 1: return true;
 			default:
 			//V2 interact
-			char Tmp[40];
 			LastTalker = target->GetGlobalID();
-			strlcpy(Tmp, "Interact([-1])", sizeof(Tmp));
-			Action *action = GenerateActionDirect(Tmp, target);
+			Action *action = GenerateActionDirect("Interact([-1])", target);
 			if (action) {
 				AddActionInFront(action);
 			} else {
@@ -3637,25 +3635,21 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 	VerbalConstant(VB_PANIC, 1 );
 
 	Action *action;
-	char Tmp[40];
 	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {
 		panicmode = PANIC_RANDOMWALK;
 	}
 
 	switch(panicmode) {
 	case PANIC_RUNAWAY:
-		strlcpy(Tmp, "RunAwayFromNoInterrupt([-1])", sizeof(Tmp));
-		action = GenerateActionDirect(Tmp, attacker);
+		action = GenerateActionDirect("RunAwayFromNoInterrupt([-1])", attacker);
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_RANDOMWALK:
-		strlcpy(Tmp, "RandomWalk()", sizeof(Tmp));
-		action = GenerateAction( Tmp );
+		action = GenerateAction( "RandomWalk()" );
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_BERSERK:
-		strlcpy(Tmp, "Berserk()", sizeof(Tmp));
-		action = GenerateAction( Tmp );
+		action = GenerateAction( "Berserk()" );
 		BaseStats[IE_CHECKFORBERSERK]=3;
 		//SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
 		break;
@@ -6664,8 +6658,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 }
 
 void Actor::UpdateActorState(ieDword gameTime) {
-	char Tmp[40];
-
 	if (modalTime==gameTime) {
 		return;
 	}
@@ -6688,34 +6680,33 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 		if ((state&STATE_CONFUSED)) {
 
+		const char* actionString = NULL;
 		int tmp = core->Roll(1,3,0);
 		switch(tmp) {
 			case 2:
-				strlcpy(Tmp, "RandomWalk()", sizeof(Tmp));
+				actionString = "RandomWalk()";
 				break;
 			case 1:
-				strlcpy(Tmp, "Attack([0])", sizeof(Tmp));
+				actionString = "Attack([0])";
 				break;
 			default:
-				strlcpy(Tmp, "NoAction()", sizeof(Tmp));
+				actionString = "NoAction()";
 				break;
 			}
-			Action *action = GenerateAction( Tmp );
+			Action *action = GenerateAction( actionString );
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);
-				print("Confusion: added %s", Tmp);
+				print("Confusion: added %s", actionString);
 			}
 			return;
 		}
 
 		if (Modified[IE_CHECKFORBERSERK] && !LastTarget && SeeAnyOne(false, false) ) {
-			strlcpy(Tmp, "Berserk()", sizeof(Tmp));
-			Action *action = GenerateAction( Tmp );
+			Action *action = GenerateAction( "Berserk()" );
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);
-				print("Berserk: added %s", Tmp);
 			}
 			return;
 		}
