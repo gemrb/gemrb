@@ -2522,28 +2522,6 @@ int GameControl::HideGUI()
 	return 1;
 }
 
-//Change game window geometries when a new window gets activated
-void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowPosition)
-{
-	Variables* dict = core->GetDictionary();
-	ieDword index;
-
-	if (dict->Lookup( WindowName, index )) {
-		if (index != (ieDword) -1) {
-			Window* w = core->GetWindow( (unsigned short) index );
-			if (w) {
-				core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
-				if (dict->Lookup( WindowPosition, index )) {
-					ResizeParentWindowFor( w, index, WINDOW_CONTRACT );
-				}
-				return;
-			}
-			Log(ERROR, "GameControl", "Invalid Window Index %s:%u",
-				WindowName, index);
-		}
-	}
-}
-
 //Reveal all windows on the GUI (including this one)
 int GameControl::UnhideGUI()
 {
@@ -2555,15 +2533,36 @@ int GameControl::UnhideGUI()
 	// Unhide the gamecontrol window
 	core->SetVisible( 0, WINDOW_VISIBLE );
 
-	HandleWindowReveal("ActionsWindow", "ActionsPosition");
-	HandleWindowReveal("MessageWindow", "MessagePosition");
-	HandleWindowReveal("OptionsWindow", "OptionsPosition");
-	HandleWindowReveal("TopWindow", "TopPosition");
-	HandleWindowReveal("OtherWindow", "OtherPosition");
-	HandleWindowReveal("PortraitWindow", "PortraitPosition");
+	static const char* keys[6][2] = {
+		{"ActionsWindow", "ActionsPosition"},
+		{"MessageWindow", "MessagePosition"},
+		{"OptionsWindow", "OptionsPosition"},
+		{"TopWindow", "TopPosition"},
+		{"OtherWindow", "OtherPosition"},
+		{"PortraitWindow", "PortraitPosition"},
+	};
+
 	//the floatwindow is a special case
 	Variables* dict = core->GetDictionary();
 	ieDword index;
+
+	for (size_t i=0; i < 6; i++) {
+		const char** val = keys[i];
+		if (dict->Lookup( *val, index )) {
+			if (index != (ieDword) -1) {
+				Window* w = core->GetWindow(index);
+				if (w) {
+					core->SetVisible(index, WINDOW_VISIBLE);
+					if (dict->Lookup( *++val, index )) {
+						ResizeParentWindowFor( w, index, WINDOW_CONTRACT );
+						continue;
+					}
+				}
+				Log(ERROR, "GameControl", "Invalid Window Index %s:%u",
+					*val, index);
+			}
+		}
+	}
 
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
