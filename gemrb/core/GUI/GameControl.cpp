@@ -2469,28 +2469,6 @@ void GameControl::SetCutSceneMode(bool active)
 	}
 }
 
-//Change game window geometries when a new window gets deactivated
-void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPosition)
-{
-	Variables* dict = core->GetDictionary();
-	ieDword index;
-
-	if (dict->Lookup( WindowName, index )) {
-		if (index != (ieDword) -1) {
-			Window* w = core->GetWindow( (unsigned short) index );
-			if (w) {
-				core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
-				if (dict->Lookup( WindowPosition, index )) {
-					ResizeParentWindowFor( w, index, WINDOW_EXPAND );
-				}
-				return;
-			}
-			Log(ERROR, "GameControl", "Invalid Window Index: %s:%u",
-				WindowName, index);
-		}
-	}
-}
-
 //Hide all other windows on the GUI (gamecontrol is not hidden by this)
 int GameControl::HideGUI()
 {
@@ -2503,15 +2481,37 @@ int GameControl::HideGUI()
 		return 0;
 	}
 	ScreenFlags &=~SF_GUIENABLED;
-	HandleWindowHide("PortraitWindow", "PortraitPosition");
-	HandleWindowHide("OtherWindow", "OtherPosition");
-	HandleWindowHide("TopWindow", "TopPosition");
-	HandleWindowHide("OptionsWindow", "OptionsPosition");
-	HandleWindowHide("MessageWindow", "MessagePosition");
-	HandleWindowHide("ActionsWindow", "ActionsPosition");
+
+	static const char* keys[6][2] = {
+		{"PortraitWindow", "PortraitPosition"},
+		{"OtherWindow", "OtherPosition"},
+		{"TopWindow", "TopPosition"},
+		{"OptionsWindow", "OptionsPosition"},
+		{"MessageWindow", "MessagePosition"},
+		{"ActionsWindow", "ActionsPosition"},
+	};
+
 	//FloatWindow doesn't affect gamecontrol, so it is special
 	Variables* dict = core->GetDictionary();
 	ieDword index;
+
+	for (size_t i=0; i < 6; i++) {
+		const char** val = keys[i];
+		if (dict->Lookup( *val, index )) {
+			if (index != (ieDword) -1) {
+				Window* w = core->GetWindow( (unsigned short) index );
+				if (w) {
+					core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
+					if (dict->Lookup( *++val, index )) {
+						ResizeParentWindowFor( w, index, WINDOW_EXPAND );
+						continue;
+					}
+				}
+				Log(ERROR, "GameControl", "Invalid Window Index: %s:%u",
+					*val, index);
+			}
+		}
+	}
 
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {

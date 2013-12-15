@@ -197,7 +197,6 @@ private:
 	Actor *GetActorByGlobalID(ieDword ID);
 	void CalculateSelection(const Point &p);
 	void ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION);
-	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
