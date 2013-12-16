@@ -75,9 +75,7 @@ Button::Button()
 Button::~Button()
 {
 	Video* video = core->GetVideoDriver();
-	for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-		video->FreeSprite(buttonImages[i]);
-	}
+	SetImage(BUTTON_IMAGE_NONE, NULL);
 	video->FreeSprite( Picture );
 	ClearPictureList();
 	if (Text) {
@@ -88,16 +86,44 @@ Button::~Button()
 }
 
 /** Sets the 'type' Image of the Button to 'img'.
-see 'BUTTON_IMAGE_TYPE' */
+ see 'BUTTON_IMAGE_TYPE' */
 void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 {
 	if (type >= BUTTON_IMAGE_TYPE_COUNT) {
 		Log(ERROR, "Button", "Trying to set a button image index out of range: %d", type);
 		return;
 	}
-	core->GetVideoDriver()->FreeSprite(buttonImages[type]);
-	buttonImages[type] = img;
-	// FIXME: why do we not acquire the image here?!
+
+	if (type <= BUTTON_IMAGE_NONE) {
+		for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
+			core->GetVideoDriver()->FreeSprite(buttonImages[i]);
+		}
+		Flags &= IE_GUI_BUTTON_NO_IMAGE;
+	} else {
+		core->GetVideoDriver()->FreeSprite(buttonImages[type]);
+		buttonImages[type] = img;
+		// FIXME: why do we not acquire the image here?!
+		/*
+		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
+		 leaving this here commented out in case it may be useful in the future.
+
+		if (img) {
+			Flags &= ~IE_GUI_BUTTON_NO_IMAGE;
+		} else {
+			// check if we should set IE_GUI_BUTTON_NO_IMAGE
+
+			int i=0;
+			for (; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
+				if (buttonImages[i] != NULL) {
+					break;
+				}
+			}
+			if (i == BUTTON_IMAGE_TYPE_COUNT) {
+				// we made it to the end of the list without breaking so we have no images
+				Flags &= IE_GUI_BUTTON_NO_IMAGE;
+			}
+		}*/
+	}
 	Changed = true;
 }
 
