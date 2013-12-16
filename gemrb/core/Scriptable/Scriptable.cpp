@@ -23,27 +23,18 @@
 #include "strrefs.h"
 #include "ie_cursors.h"
 
-#include "Audio.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "Interface.h"
-#include "Item.h"
 #include "Font.h"
-#include "Map.h"
 #include "Projectile.h"
 #include "Spell.h"
 #include "SpriteCover.h"
-#include "TileMap.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
-//#include "GUI/Window.h"
 #include "Scriptable/InfoPoint.h"
-
-#include <cassert>
-#include <cmath>
 
 namespace GemRB {
 

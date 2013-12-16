@@ -33,7 +33,6 @@
 #include "EffectQueue.h"
 #include "Palette.h"
 
-#include <cstring>
 #include <vector>
 
 namespace GemRB {
