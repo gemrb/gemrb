@@ -30,9 +30,7 @@
 #include "ie_cursors.h"
 
 #include "GameData.h"
-#include "Interface.h"
 #include "Palette.h"
-#include "Variables.h"
 #include "Video.h"
 
 namespace GemRB {

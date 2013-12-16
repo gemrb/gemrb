@@ -32,10 +32,10 @@
 #include "exports.h"
 
 #include "Dialog.h"
-#include "Interface.h"
 
 namespace GemRB {
 
+class Font;
 class Palette;
 class WMPAreaEntry;
 class WorldMapControl;

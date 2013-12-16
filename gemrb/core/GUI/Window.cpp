@@ -21,15 +21,11 @@
 #include "GUI/Window.h"
 
 #include "GUI/Button.h"
-#include "GUI/Control.h"
 #include "GUI/MapControl.h"
-#include "GUI/Progressbar.h"
 #include "GUI/ScrollBar.h"
-#include "GUI/Slider.h"
 
 #include "win32def.h"
 
-#include "Interface.h"
 #include "Video.h"
 
 #include "ie_cursors.h"
