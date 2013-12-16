@@ -38,8 +38,8 @@
 namespace GemRB {
 
 Button::Button()
+	: buttonImages()
 {
-	Unpressed = Pressed = Selected = Disabled = NULL;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ResetEventHandler( ButtonOnPress );
 	ResetEventHandler( ButtonOnDoublePress );
@@ -75,10 +75,9 @@ Button::Button()
 Button::~Button()
 {
 	Video* video = core->GetVideoDriver();
-	video->FreeSprite( Disabled );
-	video->FreeSprite( Selected );
-	video->FreeSprite( Pressed );
-	video->FreeSprite( Unpressed );
+	for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
+		video->FreeSprite(buttonImages[i]);
+	}
 	video->FreeSprite( Picture );
 	ClearPictureList();
 	if (Text) {
@@ -87,39 +86,18 @@ Button::~Button()
 	gamedata->FreePalette( normal_palette);
 	gamedata->FreePalette( disabled_palette);
 }
+
 /** Sets the 'type' Image of the Button to 'img'.
-'type' may assume the following values:
-- IE_GUI_BUTTON_UNPRESSED
-- IE_GUI_BUTTON_PRESSED
-- IE_GUI_BUTTON_SELECTED
-- IE_GUI_BUTTON_DISABLED */
-void Button::SetImage(unsigned char type, Sprite2D* img)
+see 'BUTTON_IMAGE_TYPE' */
+void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 {
-	switch (type) {
-		case IE_GUI_BUTTON_UNPRESSED:
-		case IE_GUI_BUTTON_LOCKED:
-		case IE_GUI_BUTTON_LOCKED_PRESSED:
-			core->GetVideoDriver()->FreeSprite( Unpressed );
-			Unpressed = img;
-			break;
-
-		case IE_GUI_BUTTON_FAKEPRESSED:
-		case IE_GUI_BUTTON_PRESSED:
-			core->GetVideoDriver()->FreeSprite( Pressed );
-			Pressed = img;
-			break;
-
-		case IE_GUI_BUTTON_SELECTED:
-			core->GetVideoDriver()->FreeSprite( Selected );
-			Selected = img;
-			break;
-
-		case IE_GUI_BUTTON_DISABLED:
-		case IE_GUI_BUTTON_FAKEDISABLED:
-			core->GetVideoDriver()->FreeSprite( Disabled );
-			Disabled = img;
-			break;
+	if (type >= BUTTON_IMAGE_TYPE_COUNT) {
+		Log(ERROR, "Button", "Trying to set a button image index out of range: %d", type);
+		return;
 	}
+	core->GetVideoDriver()->FreeSprite(buttonImages[type]);
+	buttonImages[type] = img;
+	// FIXME: why do we not acquire the image here?!
 	Changed = true;
 }
 
@@ -177,28 +155,22 @@ void Button::Draw(unsigned short x, unsigned short y)
 			case IE_GUI_BUTTON_UNPRESSED:
 			case IE_GUI_BUTTON_LOCKED:
 			case IE_GUI_BUTTON_LOCKED_PRESSED:
-				Image = Unpressed;
+				Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
 				break;
-
 			case IE_GUI_BUTTON_FAKEPRESSED:
 			case IE_GUI_BUTTON_PRESSED:
-				Image = Pressed;
-				if (! Image)
-					Image = Unpressed;
+				Image = buttonImages[BUTTON_IMAGE_PRESSED];
 				break;
-
 			case IE_GUI_BUTTON_SELECTED:
-				Image = Selected;
-				if (! Image)
-					Image = Unpressed;
+				Image = buttonImages[BUTTON_IMAGE_SELECTED];
 				break;
-
 			case IE_GUI_BUTTON_DISABLED:
 			case IE_GUI_BUTTON_FAKEDISABLED:
-				Image = Disabled;
-				if (! Image)
-					Image = Unpressed;
+				Image = buttonImages[BUTTON_IMAGE_DISABLED];
 				break;
+		}
+		if (!Image) {
+			Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
@@ -743,6 +715,7 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 {
 	// some buttons have hollow Image frame filled w/ Picture
 	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
+	Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
 	if (Picture || PictureList.size() || ! Unpressed) return false;
 	int xOffs = ( Width / 2 ) - ( Unpressed->Width / 2 );
 	int yOffs = ( Height / 2 ) - ( Unpressed->Height / 2 );

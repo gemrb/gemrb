@@ -192,22 +192,22 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				}
 				/** Cycle is only a byte for buttons */
 				Sprite2D* tspr = bam->GetFrame( UnpressedIndex, (unsigned char) Cycle );
-				btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
+				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 				tspr = bam->GetFrame( PressedIndex, Cycle );
-				btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
+				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 				//ignorebuttonframes is a terrible hack
 				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
 					if (bam->GetCycleSize(Cycle) == 4 )
 						SelectedIndex=2;
 				}
 				tspr = bam->GetFrame( SelectedIndex, (unsigned char) Cycle );
-				btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
+				btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
 				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
 					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 )
 						DisabledIndex=3;
 				}
 				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
-				btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
+				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 				win->AddControl( btn );
 			}
 			break;
