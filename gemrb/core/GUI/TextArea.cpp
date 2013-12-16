@@ -719,30 +719,12 @@ void TextArea::CalcRowCount()
 	rows = 0;
 	if (lines.size() != 0) {
 		for (size_t i = 0; i < lines.size(); i++) {
-//			rows++;
 			tr = 0;
 			ieWord* tmp = NULL;
 			size_t len = ftext->GetDoubleByteString((unsigned char*)lines[i], tmp);
 			ftext->SetupString( tmp, w );
 			for (size_t p = 0; p <= len; p++) {
-				if (( tmp[p] ) == '[') {
-					p++;
-					//char tag[256];
-					int k = 0;
-					for (k = 0; k < 256; k++) {
-						if (tmp[p] == ']') {
-							//tag[k] = 0;
-							break;
-						}
-						p++;
-						//tag[k] = tmp[p++];
-					}
-
-					continue;
-				}
 				if (tmp[p] == 0) {
-//					if (p != len)
-//						rows++;
 					tr++;
 				}
 			}
