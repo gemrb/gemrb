@@ -641,8 +641,6 @@ void Button::SetText(const char* string)
 /** Set Event Handler */
 bool Button::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 		case IE_GUI_BUTTON_ON_PRESS:
 			ButtonOnPress = handler;
@@ -677,7 +675,7 @@ bool Button::SetEvent(int eventType, EventHandler handler)
 	default:
 		return false;
 	}
-
+	Changed = true;
 	return true;
 }
 
