@@ -263,15 +263,6 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	free( tmp );
 }
 
-int Font::PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const
-{
-	const Sprite2D* glyph = GetCharSprite(currChar);
-	core->GetVideoDriver()->BlitSprite(glyph, x + rgn.x, y + rgn.y, true, &rgn);
-
-	x += glyph->Width;
-	return x;
-}
-
 size_t Font::CalcStringWidth(const unsigned char* string) const
 {
 	ieWord* tmp = NULL;
@@ -311,8 +302,7 @@ void Font::SetupString(ieWord* string, unsigned int width) const
 	size_t lastpos = 0;
 	unsigned int x = psx, wx = 0;
 	bool endword = false;
-	int initials_rows = 0;
-	int initials_x = 0;
+
 	for (size_t pos = 0; pos < len; pos++) {
 		if (x + wx > width) {
 			// we wrapped, force a new line somewhere
@@ -321,10 +311,6 @@ void Font::SetupString(ieWord* string, unsigned int width) const
 			else
 				string[lastpos] = 0;
 			x = psx;
-			if (initials_rows > 0) {
-				initials_rows--;
-				x += initials_x;
-			}
 		}
 		if (string[pos] == 0) {
 			continue;
@@ -337,10 +323,6 @@ void Font::SetupString(ieWord* string, unsigned int width) const
 			string[pos] = 0;
 			x = psx;
 			wx = 0;
-			if (initials_rows > 0) {
-				initials_rows--;
-				x += initials_x;
-			}
 			lastpos = pos;
 			endword = true;
 			continue;

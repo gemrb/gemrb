@@ -109,7 +109,6 @@ public:
 protected:
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:
-	int PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const;
 	size_t CalcStringWidth(const ieWord* string) const;
 	size_t CalcStringHeight(const ieWord* string, unsigned int len) const;
 	static size_t dbStrLen(const ieWord* string);
