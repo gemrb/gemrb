@@ -220,6 +220,7 @@ public:
 	void SetCutSceneMode(bool active);
 	int HideGUI();
 	int UnhideGUI();
+	bool SetGUIHidden(bool hide);
 	void TryToAttack(Actor *source, Actor *target);
 	void TryToCast(Actor *source, const Point &p);
 	void TryToCast(Actor *source, Actor *target);

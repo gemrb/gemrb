@@ -2472,110 +2472,82 @@ void GameControl::SetCutSceneMode(bool active)
 //Hide all other windows on the GUI (gamecontrol is not hidden by this)
 int GameControl::HideGUI()
 {
-	//hidegui is in effect
-	if (!(ScreenFlags&SF_GUIENABLED) ) {
-		return 0;
-	}
-	//no gamecontrol visible
-	if (Owner->Visible == WINDOW_INVISIBLE ) {
-		return 0;
-	}
-	ScreenFlags &=~SF_GUIENABLED;
-
-	static const char* keys[6][2] = {
-		{"PortraitWindow", "PortraitPosition"},
-		{"OtherWindow", "OtherPosition"},
-		{"TopWindow", "TopPosition"},
-		{"OptionsWindow", "OptionsPosition"},
-		{"MessageWindow", "MessagePosition"},
-		{"ActionsWindow", "ActionsPosition"},
-	};
-
-	//FloatWindow doesn't affect gamecontrol, so it is special
-	Variables* dict = core->GetDictionary();
-	ieDword index;
-
-	for (size_t i=0; i < 6; i++) {
-		const char** val = keys[i];
-		if (dict->Lookup( *val, index )) {
-			if (index != (ieDword) -1) {
-				Window* w = core->GetWindow( (unsigned short) index );
-				if (w) {
-					core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
-					if (dict->Lookup( *++val, index )) {
-						ResizeParentWindowFor( w, index, WINDOW_EXPAND );
-						continue;
-					}
-				}
-				Log(ERROR, "GameControl", "Invalid Window Index: %s:%u",
-					*val, index);
-			}
-		}
-	}
-
-	if (dict->Lookup( "FloatWindow", index )) {
-		if (index != (ieDword) -1) {
-			core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
-		}
-	}
-	core->GetVideoDriver()->SetViewport( Owner->XPos, Owner->YPos, Width, Height );
-	return 1;
+	return SetGUIHidden(true);
 }
 
 //Reveal all windows on the GUI (including this one)
 int GameControl::UnhideGUI()
 {
-	if (ScreenFlags&SF_GUIENABLED) {
-		return 0;
+	return SetGUIHidden(false);
+}
+
+bool GameControl::SetGUIHidden(bool hide)
+{
+	if (hide) {
+		//no gamecontrol visible
+		if (!(ScreenFlags&SF_GUIENABLED)
+			|| Owner->Visible == WINDOW_INVISIBLE ) {
+			return false;
+		}
+		ScreenFlags &=~SF_GUIENABLED;
+	} else {
+		if (ScreenFlags&SF_GUIENABLED) {
+			return false;
+		}
+		ScreenFlags |= SF_GUIENABLED;
+		// Unhide the gamecontrol window
+		core->SetVisible( 0, WINDOW_VISIBLE );
 	}
 
-	ScreenFlags |= SF_GUIENABLED;
-	// Unhide the gamecontrol window
-	core->SetVisible( 0, WINDOW_VISIBLE );
-
 	static const char* keys[6][2] = {
-		{"ActionsWindow", "ActionsPosition"},
-		{"MessageWindow", "MessagePosition"},
-		{"OptionsWindow", "OptionsPosition"},
-		{"TopWindow", "TopPosition"},
-		{"OtherWindow", "OtherPosition"},
 		{"PortraitWindow", "PortraitPosition"},
+		{"OtherWindow", "OtherPosition"},
+		{"TopWindow", "TopPosition"},
+		{"OptionsWindow", "OptionsPosition"},
+		{"MessageWindow", "MessagePosition"},
+		{"ActionsWindow", "ActionsPosition"},
 	};
 
-	//the floatwindow is a special case
 	Variables* dict = core->GetDictionary();
 	ieDword index;
 
-	for (size_t i=0; i < 6; i++) {
+	// iterate the list forwards for hiding, and in reverse for unhiding
+	int i = hide ? 0 : 5;
+	int inc = hide ? 1 : -1;
+	WINDOW_RESIZE_OPERATION op = hide ? WINDOW_EXPAND : WINDOW_CONTRACT;
+	for (;i >= 0 && i <= 5; i+=inc) {
 		const char** val = keys[i];
+		Log(MESSAGE, "GameControl", "window: %s", *val);
 		if (dict->Lookup( *val, index )) {
 			if (index != (ieDword) -1) {
 				Window* w = core->GetWindow(index);
 				if (w) {
-					core->SetVisible(index, WINDOW_VISIBLE);
+					core->SetVisible(index, !hide);
 					if (dict->Lookup( *++val, index )) {
-						ResizeParentWindowFor( w, index, WINDOW_CONTRACT );
+						Log(MESSAGE, "GameControl", "position: %s", *val);
+						ResizeParentWindowFor( w, index, op );
 						continue;
 					}
 				}
-				Log(ERROR, "GameControl", "Invalid Window Index %s:%u",
+				Log(ERROR, "GameControl", "Invalid window or position: %s:%u",
 					*val, index);
 			}
 		}
 	}
 
-	if (dict->Lookup( "FloatWindow", index )) {
+	//FloatWindow doesn't affect gamecontrol, so it is special
+	if (dict->Lookup("FloatWindow", index)) {
 		if (index != (ieDword) -1) {
-			Window* fw = core->GetWindow( (unsigned short) index );
-			if (fw) {
-				core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
+			core->SetVisible(index, !hide);
+			if (!hide) {
+				Window* fw = core->GetWindow(index);
 				fw->Flags |=WF_FLOAT;
-				core->SetOnTop( index );
+				core->SetOnTop(index);
 			}
 		}
 	}
 	core->GetVideoDriver()->SetViewport( Owner->XPos, Owner->YPos, Width, Height );
-	return 1;
+	return true;
 }
 
 void GameControl::ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION op)
