@@ -78,6 +78,7 @@
 #include "GUI/GameControl.h"
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
+#include "GUI/TextArea.h"
 #include "GUI/Window.h"
 #include "GUI/WorldMapControl.h"
 #include "Scriptable/Container.h"

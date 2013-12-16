@@ -18,25 +18,18 @@
  *
  */
 
-#include "GUI/TextArea.h"
-
-#include "GUI/GameControl.h"
+#include "TextArea.h"
 
 #include "win32def.h"
 
 #include "DialogHandler.h"
 #include "GameData.h"
 #include "ImageMgr.h"
-#include "Interface.h"
-#include "Palette.h"
-#include "Variables.h"
 #include "Video.h"
 #include "GUI/EventMgr.h"
+#include "GUI/GameControl.h"
 #include "GUI/Window.h"
 #include "Scriptable/Actor.h"
-
-#include <cstdio>
-#include <cstdlib>
 
 namespace GemRB {
 

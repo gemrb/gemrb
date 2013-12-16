@@ -23,7 +23,6 @@
 
 #include "GameData.h"
 #include "Interface.h"
-#include "Palette.h"
 #include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"

@@ -24,7 +24,6 @@
 
 #include "GameData.h"
 #include "Interface.h"
-#include "Palette.h"
 #include "Sprite2D.h"
 #include "Variables.h"
 #include "Video.h"
