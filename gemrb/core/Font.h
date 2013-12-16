@@ -95,29 +95,23 @@ public:
 
 	// Printing methods
 	void Print(Region cliprgn, Region rgn, const unsigned char* string,
-		Palette* color, ieByte Alignment, bool anchor = false,
-		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0, bool NoColor = false) const;
+		Palette* color, ieByte Alignment, bool anchor = false) const;
 	void Print(Region rgn, const unsigned char* string, Palette* color,
-		ieByte Alignment, bool anchor = false,
-		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0, bool NoColor = false) const;
+		ieByte Alignment, bool anchor = false) const;
 	void PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-		Palette* color, ieByte Alignment,
-		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0, bool NoColor = false) const;
+		Palette* color, ieByte Alignment) const;
 
 	/** Returns width of the string rendered in this font in pixels */
-	size_t CalcStringWidth(const unsigned char* string, bool NoColor = false) const;
-	void SetupString(ieWord* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
+	size_t CalcStringWidth(const unsigned char* string) const;
+	void SetupString(ieWord* string, unsigned int width) const;
 	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
 
 protected:
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:
 	int PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const;
-	size_t CalcStringWidth(const ieWord* string, bool NoColor = false) const;
-	size_t CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const;
+	size_t CalcStringWidth(const ieWord* string) const;
+	size_t CalcStringHeight(const ieWord* string, unsigned int len) const;
 	static size_t dbStrLen(const ieWord* string);
 };
 

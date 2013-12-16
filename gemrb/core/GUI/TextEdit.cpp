@@ -82,8 +82,9 @@ void TextEdit::Draw(unsigned short x, unsigned short y)
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
 		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
-				palette, Alignment,
-				true, NULL, Cursor, CurPos );
+				palette, Alignment, true );
+		// TODO: draw the cursor by printing everything before the cursor
+		// then draw the cursor, then draw everything after the cursor
 	} else {
 		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
 				palette, Alignment, true );

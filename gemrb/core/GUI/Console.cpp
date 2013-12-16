@@ -72,8 +72,9 @@ void Console::Draw(unsigned short x, unsigned short y)
 	Region r( (short)x + XPos, (short)y + YPos, Width, Height );
 	core->GetVideoDriver()->DrawRect( r, black );
 	font->Print( r, Buffer, palette,
-			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL,
-			Cursor, CurPos, true );
+			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
+	// TODO: draw the cursor by printing everything before the cursor
+	// then draw the cursor, then draw everything after the cursor
 }
 /** Set Font */
 void Console::SetFont(Font* f)

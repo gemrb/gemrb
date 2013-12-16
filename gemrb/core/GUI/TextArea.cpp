@@ -212,7 +212,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 
 		ftext->PrintFromLine( startrow, textClip,
 							 ( unsigned char * ) Buffer, palette,
-							 IE_FONT_ALIGN_LEFT, finit, Cursor, pos );
+							 IE_FONT_ALIGN_LEFT );
+		// TODO: draw the cursor by printing everything before the cursor
+		// then draw the cursor, then draw everything after the cursor
 		free( Buffer );
 		video->SetClipRect( NULL );
 
@@ -244,8 +246,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		else
 			pal = palette;
 		ftext->PrintFromLine( sr, clip,
-			( unsigned char * ) lines[i], pal,
-			IE_FONT_ALIGN_LEFT, finit, NULL );
+			(unsigned char*)lines[i], pal,
+			IE_FONT_ALIGN_LEFT );
 		yl = ftext->maxHeight * (lrows[i]-sr);
 		clip.y+=yl;
 		clip.h-=yl;

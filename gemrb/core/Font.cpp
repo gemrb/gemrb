@@ -74,36 +74,10 @@ bool Font::MatchesResRef(const ieResRef resref)
 }
 
 void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-	Palette* hicolor, ieByte Alignment, Font* initials,
-	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
+	Palette* hicolor, ieByte Alignment) const
 {
-	bool enablecap=false;
-	int capital = 0;
-	int initials_rows = 0;
-	int last_initial_row = 0;
-	int initials_x = 0;
-	int initials_row = 0;
-	ieWord currCap = 0;
 	ieWord* tmp = NULL;
 	size_t len = GetDoubleByteString(string, tmp);
-
-	ieWord num_empty_rows = 0;
-
-	if (initials && initials != this)
-	{
-		capital=1;
-		enablecap=true;
-		initials_rows = 1 + ((initials->maxHeight - 1) / maxHeight); // ceiling
-		currCap = string[0];
-		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
-			while(isspace(currCap) && num_empty_rows < len){//we cant cap whiteSpace so keep looking
-				currCap = string[++num_empty_rows];
-				// WARNING: this assumes all preceeding whiteSpace is an empty line
-			}
-			last_initial_row = startrow - 1; // always the row before current since this cannot be the first row
-			initials_rows = initials_rows - (startrow + 1) + num_empty_rows; // startrow + 1 because start row is 0 based, but initials_rows is 1 based
-		}
-	}
 
 	unsigned int psx = IE_FONT_PADDING;
 	Palette *pal = hicolor;
@@ -113,18 +87,17 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 	Holder<Palette> blitPalette = pal;
 
-	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
+	SetupString( tmp, rgn.w );
 
-	if (startrow) enablecap=false;
 	int ystep;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
-		ystep = CalcStringHeight(tmp, len, NoColor);
+		ystep = CalcStringHeight(tmp, len);
 		if (!ystep) ystep = maxHeight;
 	} else {
 		ystep = maxHeight;
 	}
 	int x = psx, y = ystep;
-	size_t w = CalcStringWidth( tmp, NoColor );
+	size_t w = CalcStringWidth( tmp );
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
 		x = ( rgn.w - w) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -155,50 +128,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	ieWord currChar = '\0';
 	int row = 0;
 	for (size_t i = 0; i < len; i++) {
-		if (( tmp[i] ) == '[' && !NoColor) {
-			i++;
-			char tag[256];
-			tag[0]=0;
-
-			for (size_t k = 0; k < 256 && i<len; k++) {
-				if (tmp[i] == ']') {
-					tag[k] = 0;
-					break;
-				}
-				tag[k] = tmp[i++];
-			}
-
-			if (strnicmp( tag, "capital=",8)==0) {
-				sscanf( tag, "capital=%d", &capital);
-				if (capital && (row>=startrow) ) {
-					enablecap=true;
-				}
-				continue;
-			}
-
-			if (strnicmp( tag, "color=", 6 ) == 0) {
-				unsigned int r,g,b;
-				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
-					continue;
-				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
-				Palette* newPal = core->CreatePalette( c, palette->back );
-				blitPalette = newPal;
-				gamedata->FreePalette( newPal );
-				continue;
-			}
-			if (stricmp( tag, "/color" ) == 0) {
-				blitPalette = pal;
-				continue;
-			}
-			if (stricmp( "p", tag ) == 0) {
-				psx = x;
-				continue;
-			}
-			if (stricmp( "/p", tag ) == 0) {
-				psx = IE_FONT_PADDING;
-			}
-			continue;
-		}
 
 		if (row < startrow) {
 			if (tmp[i] == 0) {
@@ -209,12 +138,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		if (( tmp[i] == 0 ) || ( tmp[i] == '\n' )) {
 			y += ystep;
 			x = psx;
-			size_t w = CalcStringWidth( &tmp[i + 1], NoColor );
-			if (initials_rows > 0) {
-				initials_rows--;
-				x += initials_x;
-				w += initials_x;
-			}
+			size_t w = CalcStringWidth( &tmp[i + 1] );
+
 			if (Alignment & IE_FONT_ALIGN_CENTER) {
 				x = ( rgn.w - w ) / 2;
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -223,54 +148,23 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			continue;
 		}
 		currChar = tmp[i];
-		if (initials && capital && enablecap) {
-			currCap = currChar;
-			x = initials->PrintInitial( x, y, rgn, currChar );
-			initials_x = x;
 
-			//how many more lines to be indented (one was already indented)
-			initials_rows = (initials->maxHeight - 1) / maxHeight;
-			initials_rows += num_empty_rows;
-			initials_row = row;
-			last_initial_row = initials_row;
-
-			enablecap = false;
-			continue;
-		} else if (initials && currCap
-				   && row > last_initial_row
-				   && (row - num_empty_rows - initials_row) <= ((initials->maxHeight-1)/maxHeight)){
-			// means this row doesnt have a cap, but a preceeding one did and its overlapping this row
-			int initY = y;
-			if (!num_empty_rows || row > num_empty_rows) {// num_empty_rows is for scrolling text areas
-				initY = (y - (maxHeight * (row - initials_row - num_empty_rows)));
-			}
-			x = initials->PrintInitial( x, initY, rgn, currCap );
-			initials_x = x;
-			last_initial_row++;
-			if (num_empty_rows && row <= num_empty_rows) continue;
-			else x += psx;
-		}
 		if (i > 0) {
 			// kerning
 			x -= GetKerningOffset(tmp[i-1], currChar);
 		}
 		currGlyph = GetCharSprite(currChar);
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, blitPalette.get());
-		if (cursor && ( i == curpos )) {
-			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, true, &rgn );
-		}
+
 		x += currGlyph->Width;
 	}
-	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, true, &rgn );
-	}
+
 	blitPalette = NULL;
 	free( tmp );
 }
 
 void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
-	ieByte Alignment, bool anchor, Font* initials,
-	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
+	ieByte Alignment, bool anchor) const
 {
 	Region cliprgn = rgn;
 	if (!anchor) {
@@ -278,22 +172,16 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 		cliprgn.x -= Viewport.x;
 		cliprgn.y -= Viewport.y;
 	}
-	Print(cliprgn, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
+	Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
 }
 
 void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
-	Palette* hicolor, ieByte Alignment, bool anchor, Font* initials,
-	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
+	Palette* hicolor, ieByte Alignment, bool anchor) const
 {
-	int capital = (initials) ? 1 : 0;
-
 	unsigned int psx = IE_FONT_PADDING;
 	Palette* pal = hicolor;
 	if (!pal) {
 		pal = palette;
-	}
-	if (initials==this) {
-		initials = NULL;
 	}
 
 	Holder<Palette> blitPalette = pal;
@@ -305,10 +193,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		len--;
 	}
 
-	SetupString( tmp, rgn.w, NoColor, initials, capital );
+	SetupString( tmp, rgn.w );
 	int ystep;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
-		ystep = CalcStringHeight(tmp, len, NoColor);
+		ystep = CalcStringHeight(tmp, len);
 		if (!ystep) ystep = maxHeight;
 	} else {
 		ystep = maxHeight;
@@ -317,10 +205,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Video* video = core->GetVideoDriver();
 
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
-		size_t w = CalcStringWidth( tmp, NoColor );
+		size_t w = CalcStringWidth( tmp );
 		x = ( rgn.w - w ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
-		size_t w = CalcStringWidth( tmp, NoColor );
+		size_t w = CalcStringWidth( tmp );
 		x = ( rgn.w - w ) - IE_FONT_PADDING;
 	}
 
@@ -347,52 +235,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	ieWord currChar = '\0';
 	const Sprite2D* currGlyph = NULL;
 	for (size_t i = 0; i < len; i++) {
-		if (( tmp[i] ) == '[' && !NoColor) {
-			i++;
-			char tag[256];
-			tag[0]=0;
-			for (size_t k = 0; k < 256 && i<len; k++) {
-				if (tmp[i] == ']') {
-					tag[k] = 0;
-					break;
-				}
-				tag[k] = tmp[i++];
-			}
-
-			if (strnicmp( tag, "capital=",8)==0) {
-				sscanf( tag, "capital=%d", &capital);
-				continue;
-			}
-
-			if (strnicmp( tag, "color=", 6 ) == 0) {
-				unsigned int r,g,b;
-				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
-					continue;
-				const Color c = {(unsigned char)r, (unsigned char)g, (unsigned char)b, 0};
-				Palette* newPal = core->CreatePalette( c, palette->back );
-				blitPalette = newPal;
-				gamedata->FreePalette( newPal );
-				continue;
-			}
-			if (stricmp( tag, "/color" ) == 0) {
-				blitPalette = pal;
-				continue;
-			}
-			if (stricmp( "p", tag ) == 0) {
-				psx = x;
-				continue;
-			}
-			if (stricmp( "/p", tag ) == 0) {
-				psx = IE_FONT_PADDING;
-				continue;
-			}
-			continue;
-		}
-
 		if (tmp[i] == 0) {
 			y += ystep;
 			x = psx;
-			size_t w = CalcStringWidth( &tmp[i + 1], NoColor );
+			size_t w = CalcStringWidth( &tmp[i + 1] );
 			if (Alignment & IE_FONT_ALIGN_CENTER) {
 				x = ( rgn.w - w ) / 2;
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -402,10 +248,6 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		}
 		currChar = tmp[i];
 		currGlyph = GetCharSprite(currChar);
-		if (initials && capital) {
-			x = initials->PrintInitial( x, y, rgn, currChar );
-			continue;
-		}
 
 		if (i > 0) {
 			// kerning
@@ -414,13 +256,9 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette.get());
 
-		if (cursor && ( curpos == i ))
-			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
 		x += currGlyph->Width;
 	}
-	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
-	}
+
 	blitPalette = NULL;
 	free( tmp );
 }
@@ -434,53 +272,39 @@ int Font::PrintInitial(int x, int y, const Region &rgn, ieWord currChar) const
 	return x;
 }
 
-size_t Font::CalcStringWidth(const unsigned char* string, bool NoColor) const
+size_t Font::CalcStringWidth(const unsigned char* string) const
 {
 	ieWord* tmp = NULL;
 	GetDoubleByteString(string, tmp);
-	int width = CalcStringWidth(tmp, NoColor);
+	int width = CalcStringWidth(tmp);
 	free(tmp);
 	return width;
 }
 
-size_t Font::CalcStringWidth(const ieWord* string, bool NoColor) const
+size_t Font::CalcStringWidth(const ieWord* string) const
 {
 	size_t ret = 0, len = dbStrLen(string);
 	for (size_t i = 0; i < len; i++) {
-		if (( string[i] ) == '[' && !NoColor) {
-			i++; // cannot be ']' when it is '['
-			while(i<len && (string[i]) != ']') {
-				i++;
-			}
-		} else {
-			ret += GetCharSprite(string[i])->Width;
-		}
+		ret += GetCharSprite(string[i])->Width;
 	}
 	return ret;
 }
 
-size_t Font::CalcStringHeight(const ieWord* string, unsigned int len, bool NoColor) const
+size_t Font::CalcStringHeight(const ieWord* string, unsigned int len) const
 {
 	int h, max = 0;
 	for (unsigned int i = 0; i < len; i++) {
-		if (( string[i] ) == '[' && !NoColor) {
-			i++; // cannot be ']' when it is '['
-			while(i<len && (string[i]) != ']') {
-				i++;
-			}
-		} else {
-			h = GetCharSprite(string[i])->Height;
-			//the space check is here to hack around overly high frames
-			//in some bg1 fonts that throw vertical alignment off
-			if (h > max && string[i] != ' ') {
-				max = h;
-			}
+		h = GetCharSprite(string[i])->Height;
+		//the space check is here to hack around overly high frames
+		//in some bg1 fonts that throw vertical alignment off
+		if (h > max && string[i] != ' ') {
+			max = h;
 		}
 	}
 	return max;
 }
 
-void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *initials, bool enablecap) const
+void Font::SetupString(ieWord* string, unsigned int width) const
 {
 	size_t len = dbStrLen(string);
 	unsigned int psx = IE_FONT_PADDING;
@@ -521,48 +345,9 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 			endword = true;
 			continue;
 		}
-		if (( string[pos] ) == '[' && !NoColor) {
-			pos++;
-			if (pos>=len)
-				break;
-			char tag[256];
-			int k = 0;
-			for (k = 0; k < 256; k++) {
-				if (string[pos] == ']') {
-					tag[k] = 0;
-					break;
-				}
-				tag[k] = string[pos++];
-			}
-			if (strnicmp( tag, "capital=",8)==0) {
-				int capital = 0;
-				sscanf( tag, "capital=%d", &capital);
-				if (capital) {
-					enablecap=true;
-				}
-				continue;
-			}
-			if (stricmp( "p", tag ) == 0) {
-				psx = x;
-				continue;
-			}
-			if (stricmp( "/p", tag ) == 0) {
-				psx = IE_FONT_PADDING;
-				continue;
-			}
-			continue;
-		}
 
-		if (initials && enablecap) {
-			wx += initials->GetCharSprite(string[pos])->Width;
-			enablecap=false;
-			initials_x = wx + psx;
-			//how many more lines to be indented (one was already indented)
-			initials_rows = (initials->maxHeight - 1) / maxHeight;
-			continue;
-		} else {
-			wx += GetCharSprite(string[pos])->Width;
-		}
+		wx += GetCharSprite(string[pos])->Width;
+
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
 			wx = 0;
