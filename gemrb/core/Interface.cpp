@@ -529,7 +529,7 @@ GameControl* Interface::StartGameControl()
 	evntmgr->SetFocused(gamewin, gc);
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
-		gc->UnhideGUI();
+		gc->SetGUIHidden(false);
 	}
 
 	return gc;
@@ -578,10 +578,7 @@ void Interface::HandleEvents()
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
 		//this is the only value we can use here
-		if (game->ControlStatus & CS_HIDEGUI)
-			gc->HideGUI();
-		else
-			gc->UnhideGUI();
+		gc->SetGUIHidden(game->ControlStatus & CS_HIDEGUI);
 		return;
 	}
 	if ((EventFlag&EF_SHOWMAP) && gc) {

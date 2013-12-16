@@ -218,8 +218,6 @@ public:
 	void SelectActor(int whom, int type = -1);
 	void SetLastActor(Actor *actor, Actor *prevActor);
 	void SetCutSceneMode(bool active);
-	int HideGUI();
-	int UnhideGUI();
 	bool SetGUIHidden(bool hide);
 	void TryToAttack(Actor *source, Actor *target);
 	void TryToCast(Actor *source, const Point &p);

@@ -2469,18 +2469,7 @@ void GameControl::SetCutSceneMode(bool active)
 	}
 }
 
-//Hide all other windows on the GUI (gamecontrol is not hidden by this)
-int GameControl::HideGUI()
-{
-	return SetGUIHidden(true);
-}
-
-//Reveal all windows on the GUI (including this one)
-int GameControl::UnhideGUI()
-{
-	return SetGUIHidden(false);
-}
-
+//Hide or unhide all other windows on the GUI (gamecontrol is not hidden by this)
 bool GameControl::SetGUIHidden(bool hide)
 {
 	if (hide) {
@@ -2682,11 +2671,11 @@ Sprite2D* GameControl::GetScreenshot(bool show_gui)
 	if (show_gui) {
 		screenshot = core->GetVideoDriver()->GetScreenshot( Region( 0, 0, 0, 0) );
 	} else {
-		int hf = HideGUI ();
+		int hf = SetGUIHidden(true);
 		Draw (0, 0);
 		screenshot = core->GetVideoDriver()->GetScreenshot( Region( 0, 0, 0, 0 ) );
 		if (hf) {
-			UnhideGUI ();
+			SetGUIHidden(false);
 		}
 		core->DrawWindows ();
 	}

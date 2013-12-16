@@ -389,7 +389,7 @@ static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 	if (!gc) {
 		return RuntimeError("No gamecontrol!");
 	}
-	gc->UnhideGUI();
+	gc->SetGUIHidden(false);
 	//this enables mouse in dialogs, which is wrong
 	//gc->SetCutSceneMode( false );
 	Py_INCREF( Py_None );
@@ -407,7 +407,7 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 	if (!gc) {
 		return PyInt_FromLong( 0 );
 	}
-	int ret = gc->HideGUI();
+	int ret = gc->SetGUIHidden(true);
 
 	return PyInt_FromLong( ret );
 }
