@@ -38,7 +38,6 @@
 #include "DisplayMessage.h"
 #include "GameData.h"
 #include "Image.h"
-#include "Interface.h"
 #include "Item.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack
 #include "Projectile.h"
@@ -53,8 +52,6 @@
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "System/StringBuffer.h"
-
-#include <cassert>
 
 namespace GemRB {
 

@@ -22,24 +22,15 @@
 #include "strrefs.h"
 #include "win32def.h"
 
-#include "Audio.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "Interface.h"
-#include "Item.h"
-#include "Map.h"
 #include "Projectile.h"
-#include "Spell.h"
-#include "SpriteCover.h"
 #include "TileMap.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
-
-#include <cassert>
-#include <cmath>
 
 namespace GemRB {
 
