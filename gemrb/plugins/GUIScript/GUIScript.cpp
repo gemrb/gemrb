@@ -2396,10 +2396,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (ResRef[0] == 0) {
-		btn->SetImage( BUTTON_IMAGE_UNPRESSED, 0 );
-		btn->SetImage( BUTTON_IMAGE_PRESSED, 0 );
-		btn->SetImage( BUTTON_IMAGE_SELECTED, 0 );
-		btn->SetImage( BUTTON_IMAGE_DISABLED, 0 );
+		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
@@ -8597,11 +8594,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	}
 
 	if (Index<0) {
-		btn->SetImage( BUTTON_IMAGE_UNPRESSED, 0 );
-		btn->SetImage( BUTTON_IMAGE_PRESSED, 0 );
-		btn->SetImage( BUTTON_IMAGE_SELECTED, 0 );
-		btn->SetImage( BUTTON_IMAGE_DISABLED, 0 );
-		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
+		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
 		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, NULL );
 		btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, NULL );
 		core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, "" );
