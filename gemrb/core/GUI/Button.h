@@ -114,6 +114,13 @@ struct ButtonBorder {
 
 #define MAX_NUM_BORDERS 3
 
+enum BUTTON_IMAGE_TYPE {
+	BUTTON_IMAGE_UNPRESSED,
+	BUTTON_IMAGE_PRESSED,
+	BUTTON_IMAGE_SELECTED,
+	BUTTON_IMAGE_DISABLED,
+	BUTTON_IMAGE_TYPE_COUNT
+};
 
 /**
  * @class Button
@@ -126,12 +133,8 @@ public:
 	Button();
 	~Button();
 	/** Sets the 'type' Image of the Button to 'img'.
-	'type' may assume the following values:
-	- IE_GUI_BUTTON_UNPRESSED
-	- IE_GUI_BUTTON_PRESSED
-	- IE_GUI_BUTTON_SELECTED
-	- IE_GUI_BUTTON_DISABLED */
-	void SetImage(unsigned char type, Sprite2D* img);
+	see 'BUTTON_IMAGE_TYPE' */
+	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Button State */
@@ -199,14 +202,7 @@ private: // Private attributes
 	bool ToggleState;
 	Palette* normal_palette;
 	Palette* disabled_palette;
-	/** Button Unpressed Image */
-	Sprite2D* Unpressed;
-	/** Button Pressed Image */
-	Sprite2D* Pressed;
-	/** Button Selected Image */
-	Sprite2D* Selected;
-	/** Button Disabled Image */
-	Sprite2D* Disabled;
+	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */

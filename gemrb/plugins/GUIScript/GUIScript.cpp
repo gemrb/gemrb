@@ -2396,10 +2396,10 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (ResRef[0] == 0) {
-		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, 0 );
-		btn->SetImage( IE_GUI_BUTTON_PRESSED, 0 );
-		btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
-		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
+		btn->SetImage( BUTTON_IMAGE_UNPRESSED, 0 );
+		btn->SetImage( BUTTON_IMAGE_PRESSED, 0 );
+		btn->SetImage( BUTTON_IMAGE_SELECTED, 0 );
+		btn->SetImage( BUTTON_IMAGE_DISABLED, 0 );
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
@@ -2414,13 +2414,13 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( tmpstr );
 	}
 	Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
-	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
+	btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 	tspr = af->GetFrame( pressed, (unsigned char) cycle);
-	btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
+	btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 	tspr = af->GetFrame( selected, (unsigned char) cycle);
-	btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
+	btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
 	tspr = af->GetFrame( disabled, (unsigned char) cycle);
-	btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
+	btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5622,10 +5622,10 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		btn->SetPicture( af->GetFrame(0, 0));
 	}
 	else { //pst
-		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, af->GetFrame(0, 0));
-		btn->SetImage( IE_GUI_BUTTON_PRESSED, af->GetFrame(1, 0));
-		btn->SetImage( IE_GUI_BUTTON_SELECTED, af->GetFrame(2, 0));
-		btn->SetImage( IE_GUI_BUTTON_DISABLED, af->GetFrame(3, 0));
+		btn->SetImage( BUTTON_IMAGE_UNPRESSED, af->GetFrame(0, 0));
+		btn->SetImage( BUTTON_IMAGE_PRESSED, af->GetFrame(1, 0));
+		btn->SetImage( BUTTON_IMAGE_SELECTED, af->GetFrame(2, 0));
+		btn->SetImage( BUTTON_IMAGE_DISABLED, af->GetFrame(3, 0));
 	}
 	if (tooltip) {
 		char *str = core->GetString(spell->SpellName,0);
@@ -8576,7 +8576,7 @@ static void ReadActionButtons()
 static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
 {
 	Sprite2D *tspr = bam->GetFrame( cycle, 0 );
-	btn->SetImage( which, tspr );
+	btn->SetImage( (BUTTON_IMAGE_TYPE)which, tspr );
 }
 
 PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,
@@ -8597,10 +8597,10 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	}
 
 	if (Index<0) {
-		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, 0 );
-		btn->SetImage( IE_GUI_BUTTON_PRESSED, 0 );
-		btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
-		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
+		btn->SetImage( BUTTON_IMAGE_UNPRESSED, 0 );
+		btn->SetImage( BUTTON_IMAGE_PRESSED, 0 );
+		btn->SetImage( BUTTON_IMAGE_SELECTED, 0 );
+		btn->SetImage( BUTTON_IMAGE_DISABLED, 0 );
 		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
 		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, NULL );
 		btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, NULL );
