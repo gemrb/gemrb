@@ -91,7 +91,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 	int ystep;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
-		ystep = CalcStringHeight(tmp, len);
+		ystep = CalcStringHeight(tmp);
 		if (!ystep) ystep = maxHeight;
 	} else {
 		ystep = maxHeight;
@@ -196,7 +196,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	SetupString( tmp, rgn.w );
 	int ystep;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
-		ystep = CalcStringHeight(tmp, len);
+		ystep = CalcStringHeight(tmp);
 		if (!ystep) ystep = maxHeight;
 	} else {
 		ystep = maxHeight;
@@ -274,6 +274,8 @@ size_t Font::CalcStringWidth(const unsigned char* string) const
 
 size_t Font::CalcStringWidth(const ieWord* string) const
 {
+	// TODO: it is a bit wasteful to recalc the string length when we already know it
+	// I think switching to std::string or a custom cstring wrapper class will is the way to go
 	size_t ret = 0, len = dbStrLen(string);
 	for (size_t i = 0; i < len; i++) {
 		ret += GetCharSprite(string[i])->Width;
@@ -281,9 +283,11 @@ size_t Font::CalcStringWidth(const ieWord* string) const
 	return ret;
 }
 
-size_t Font::CalcStringHeight(const ieWord* string, unsigned int len) const
+size_t Font::CalcStringHeight(const ieWord* string) const
 {
-	int h, max = 0;
+	// TODO: it is a bit wasteful to recalc the string length when we already know it
+	// I think switching to std::string or a custom cstring wrapper class will is the way to go
+	size_t h = 0, max = 0, len = dbStrLen(string);
 	for (unsigned int i = 0; i < len; i++) {
 		h = GetCharSprite(string[i])->Height;
 		//the space check is here to hack around overly high frames
