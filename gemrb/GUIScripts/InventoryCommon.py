@@ -760,11 +760,11 @@ def OpenItemWindow ():
 
 	#close inventory
 	GemRB.SetVar ("Inventory", 1)
+	slot = GemRB.GetVar ("ItemButton") #get this before closing win
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
 	GUIINV.OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
 	#the store will have to reopen the inventory
