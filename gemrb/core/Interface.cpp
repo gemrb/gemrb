@@ -1917,7 +1917,6 @@ int Interface::Init(InterfaceConfig* config)
 
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
-	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
 	vars->SetAt( "TouchScrollAreas", (unsigned long)TouchScrollAreas );
 
 	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
