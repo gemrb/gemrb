@@ -34,6 +34,7 @@ import GameCheck
 import GemRB
 import GUICommon
 import GUICommonWindows
+import GemOptions
 import GUISAVE
 import GUIOPTControls
 from GUIDefines import *
@@ -50,6 +51,8 @@ LoadMsgWindow = None
 QuitMsgWindow = None
 SubOptionsWindow = None
 SubSubOptionsWindow = None
+
+GemOptionsWindow = None
 
 if GameCheck.IsBG1():
 	HelpTextArea2 = None
@@ -168,6 +171,18 @@ def OpenOptionsWindow ():
 	VersionLabel = Window.GetControl (0x1000000b)
 	VersionLabel.SetText (GEMRB_VERSION)
 
+	# Gemrb enhancement options panel
+	gmo = VersionLabel.GetRect()
+	bgfx = "TOGGLE", 0,3,1,3,4
+	if GameCheck.IsPST():
+		VersionLabel.SetSize(130, 25)
+		gmo = VersionLabel.GetRect()
+		bgfx = "GPERBUT4", 0,3,2,3,0
+	if not Window.HasControl(84):
+		Button = Window.CreateButton(84, gmo['X']+gmo['Width']+5, gmo['Y'], gmo['Height'] , gmo['Height']) #proportionally sized and placed
+		Button.SetSprites(bgfx[0],bgfx[1],bgfx[2],bgfx[3],bgfx[4],bgfx[5])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GemOptions.ToggleGemRBOptionsWindow)
+
 	if GameCheck.IsIWD2():
 		# Keyboard shortcuts
 		KeyboardButton = Window.GetControl (13)
@@ -186,8 +201,6 @@ def OpenOptionsWindow ():
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
 		print "ARGH, could not write config to disk!!"
-
-###################################################
 
 def CloseVideoOptionsWindow ():
 	CloseSubOptionsWindow ()
