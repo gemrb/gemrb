@@ -62,7 +62,17 @@ def OnLoad():
 	ExitButton = StartWindow.GetControl(3)
 
 	BackToMain()
+	import GemOptions
+	# Gemrb enhancement options pane
+	gmo = {'X':376, 'Y':26, 'Width':40, 'Height': 40}
+	bgfx = "TOGGLE", 0,3,1,3,4
+	Window  = StartWindow
 	
+	if not Window.HasControl(84):
+		Button = Window.CreateButton(84, gmo['X']+gmo['Width']+5, gmo['Y'], gmo['Height'] , gmo['Height']) #proportionally sized and placed
+		Button.SetSprites(bgfx[0],bgfx[1],bgfx[2],bgfx[3],bgfx[4],bgfx[5])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GemOptions.ToggleGemRBOptionsWindow)
+
 	GemRB.LoadMusicPL("Theme.mus")
 	return
 	
