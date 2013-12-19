@@ -692,7 +692,6 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
-	int tr;
 	size_t w = Width;
 
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
@@ -717,20 +716,50 @@ void TextArea::CalcRowCount()
 	}
 
 	rows = 0;
+	int tr = 0;
 	if (lines.size() != 0) {
 		for (size_t i = 0; i < lines.size(); i++) {
-			tr = 0;
-			ieWord* tmp = NULL;
-			size_t len = ftext->GetDoubleByteString((unsigned char*)lines[i], tmp);
-			ftext->SetupString( tmp, w );
-			for (size_t p = 0; p <= len; p++) {
-				if (tmp[p] == 0) {
+			const char* line = lines[i];
+			size_t len = strlen(line);
+			// FIXME: shouldn't rely on "font padding"
+			// should be intrinsic to TextArea
+			size_t psx = IE_FONT_PADDING;
+			size_t lineWidth = psx, wordWidth = 0;
+
+			for (size_t pos = 0; pos < len; pos++) {
+				// FIXME: multibyte text support is broken here
+				// we need to convert the TextAreas buffers to be double byte
+				// and have them converted at some earlier point
+				char currChar = line[pos];
+				if (lineWidth + wordWidth > w) {
+					// line wrap
 					tr++;
+					lineWidth = psx;
+				}
+				if (currChar == '\0') {
+					continue;
+				}
+				if (currChar == '\n') {
+					tr++;
+					lineWidth = psx;
+					wordWidth = 0;
+					continue;
+				}
+
+				wordWidth += ftext->GetCharSprite(currChar)->Width;
+				if (pos > 0) {
+					// kerning
+					wordWidth -= ftext->GetKerningOffset(line[pos-1], currChar);
+				}
+
+				if (( currChar == ' ' ) || ( currChar == '-' )) {
+					lineWidth += wordWidth;
+					wordWidth = 0;
 				}
 			}
+
 			lrows[i] = tr;
 			rows += tr;
-			free( tmp );
 		}
 	}
 

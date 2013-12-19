@@ -106,7 +106,6 @@ public:
 	void SetupString(ieWord* string, unsigned int width) const;
 	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
 
-protected:
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:
 	size_t CalcStringWidth(const ieWord* string) const;
