@@ -30,9 +30,11 @@
 
 ###################################################
 import CommonWindow
+import GameCheck
 import GemRB
 import GUICommon
 import GUICommonWindows
+import GemOptions
 import GUISAVE
 import GUIOPTControls
 from GUIDefines import *
@@ -43,6 +45,9 @@ SubOptionsWindow = None
 SubSubOptionsWindow = None
 LoadMsgWindow = None
 QuitMsgWindow = None
+
+GemOptionsWindow = None
+
 
 ###################################################
 def OpenOptionsWindow ():
@@ -104,6 +109,24 @@ def OpenOptionsWindow ():
 	Button.SetText (29722)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenGameplayOptionsWindow)
 
+	# game version, e.g. v1.1.0000
+	VersionLabel = Window.GetControl (0x10000007)
+	VersionLabel.SetText (GEMRB_VERSION)
+
+	# Gemrb enhancement options panel
+	gmo = VersionLabel.GetRect()
+	bgfx = "TOGGLE", 0,3,1,3,4
+	if GameCheck.IsPST():
+		VersionLabel.SetSize(130, 25)
+		gmo = VersionLabel.GetRect()
+		bgfx = "GPERBUT4", 0,3,2,3,0
+	if not Window.HasControl(84):
+		Button = Window.CreateButton(84, gmo['X']+gmo['Width']+5, gmo['Y'], gmo['Height'] , gmo['Height']) #proportionally sized and placed
+		Button.SetSprites(bgfx[0],bgfx[1],bgfx[2],bgfx[3],bgfx[4],bgfx[5])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GemOptions.ToggleGemRBOptionsWindow)
+
+	GemRB.UnhideGUI ()
+
 	# Keyboard Mappings
 	Button = Window.GetControl (7)
 	Button.SetText (29723)
@@ -123,8 +146,6 @@ def OpenOptionsWindow ():
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
 		print "ARGH, could not write config to disk!!"
-
-###################################################
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
