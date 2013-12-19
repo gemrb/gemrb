@@ -31,8 +31,8 @@
 # 8 - Feedback options window
 # 9 - Autopause options window
 
-
 ###################################################
+import CommonWindow
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -62,7 +62,10 @@ def OpenOptionsWindow ():
 		
 		GemRB.UnhideGUI ()
 		return
-		
+
+	GemRB.GamePause (1, 1)
+
+	CommonWindow.CloseContainerWindow ()
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIOPT")
 	OptionsWindow = Window = GemRB.LoadWindow (0)
