@@ -210,9 +210,11 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		short LineOffset = (short)(TextYPos % ftext->maxHeight);
 		Region textClip(clip.x, clip.y - LineOffset, clip.w, clip.h + LineOffset);
 
-		ftext->PrintFromLine( startrow, textClip,
-							 ( unsigned char * ) Buffer, palette,
-							 IE_FONT_ALIGN_LEFT );
+		// TODO: we need to select the location within the buffer to start printing from
+		// currently this wont "scroll".
+		ftext->Print(textClip, ( unsigned char * )Buffer,
+					 palette, IE_FONT_ALIGN_LEFT, true);
+
 		// TODO: draw the cursor by printing everything before the cursor
 		// then draw the cursor, then draw everything after the cursor
 		free( Buffer );
@@ -245,9 +247,10 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
 			pal = palette;
-		ftext->PrintFromLine( sr, clip,
-			(unsigned char*)lines[i], pal,
-			IE_FONT_ALIGN_LEFT );
+		// TODO: we need to select the location within the buffer to start printing from
+		// currently this wont "scroll".
+		ftext->Print(clip, (unsigned char*)lines[i],
+					 pal, IE_FONT_ALIGN_LEFT, true);
 		yl = ftext->maxHeight * (lrows[i]-sr);
 		clip.y+=yl;
 		clip.h-=yl;

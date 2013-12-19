@@ -98,8 +98,6 @@ public:
 		Palette* color, ieByte Alignment, bool anchor = false) const;
 	void Print(Region rgn, const unsigned char* string, Palette* color,
 		ieByte Alignment, bool anchor = false) const;
-	void PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-		Palette* color, ieByte Alignment) const;
 
 	/** Returns width of the string rendered in this font in pixels */
 	size_t CalcStringWidth(const unsigned char* string) const;
