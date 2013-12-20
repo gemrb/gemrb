@@ -197,19 +197,12 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		}
 		video->SetClipRect( &clip );
 
-		int pos;
-
-		if (startrow==CurLine) {
-			pos = CurPos;
-		} else {
-			pos = -1;
-		}
-
 		/* lets fake scrolling the text by simply offsetting the textClip by between 0 and maxHeight pixels.
 			don't forget to increase the clipping height by the same amount */
 		short LineOffset = (short)(TextYPos % ftext->maxHeight);
 		Region textClip(clip.x, clip.y - LineOffset, clip.w, clip.h + LineOffset);
 
+		
 		// TODO: we need to select the location within the buffer to start printing from
 		// currently this wont "scroll".
 		ftext->Print(textClip, ( unsigned char * )Buffer,
