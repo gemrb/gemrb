@@ -35,6 +35,8 @@
 
 #include "Font.h"
 
+#include <vector>
+
 namespace GemRB {
 
 // Keep these synchronized with GUIDefines.py

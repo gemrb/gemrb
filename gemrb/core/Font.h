@@ -30,8 +30,6 @@
 #include "globals.h"
 #include "exports.h"
 
-#include <vector>
-
 namespace GemRB {
 
 enum FontStyle {
