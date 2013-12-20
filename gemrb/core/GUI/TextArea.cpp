@@ -156,8 +156,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
 		char* Buffer = (char *) malloc( 1 );
 		Buffer[0] = 0;
-		int len = 0;
-		int lastlen = 0;
+		size_t len = 0;
+		size_t lastlen = 0;
 		for (size_t i = 0; i <= linesize; i++) {
 			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
 				int tlen;
@@ -202,10 +202,55 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		short LineOffset = (short)(TextYPos % ftext->maxHeight);
 		Region textClip(clip.x, clip.y - LineOffset, clip.w, clip.h + LineOffset);
 
-		
-		// TODO: we need to select the location within the buffer to start printing from
-		// currently this wont "scroll".
-		ftext->Print(textClip, ( unsigned char * )Buffer,
+		// FIXME: this code is duplicated throughout this method.
+		// I think the best solution is to have the text digested into lines as it is added
+		// this way we dont have to fuss with an unnecesary copy and we can simply call ftext->Print on every line
+		// starting with startrow. The obsticle is apparently seaparating listbox behavior into its own class.
+
+		// FIXME: shouldn't rely on "font padding"
+		// should be intrinsic to TextArea
+		size_t psx = IE_FONT_PADDING;
+		size_t lineWidth = psx, wordWidth = 0;
+
+		int rows = 0;
+		size_t bufPos = 0;
+		for (size_t pos = 0; pos < lastlen; pos++) {
+			// FIXME: multibyte text support is broken here
+			// we need to convert the TextAreas buffers to be double byte
+			// and have them converted at some earlier point
+			char currChar = Buffer[pos];
+			if (lineWidth + wordWidth > Width) {
+				// line wrap
+				rows++;
+				lineWidth = psx;
+			}
+			if (rows >= startrow) {
+				break;
+			}
+			if (currChar == '\0') {
+				continue;
+			} else if (currChar == '\n') {
+				rows++;
+				lineWidth = psx;
+				wordWidth = 0;
+				bufPos = pos+1;
+				continue;
+			}
+
+			wordWidth += ftext->GetCharSprite(currChar)->Width;
+			if (pos > 0) {
+				// kerning
+				wordWidth -= ftext->GetKerningOffset(Buffer[pos-1], currChar);
+			}
+
+			if (( currChar == ' ' ) || ( currChar == '-' )) {
+				lineWidth += wordWidth;
+				wordWidth = 0;
+				bufPos = pos+1;
+			}
+		}
+
+		ftext->Print(textClip, ( unsigned char * )&Buffer[bufPos],
 					 palette, IE_FONT_ALIGN_LEFT, true);
 
 		// TODO: draw the cursor by printing everything before the cursor
@@ -240,9 +285,51 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
 			pal = palette;
-		// TODO: we need to select the location within the buffer to start printing from
-		// currently this wont "scroll".
-		ftext->Print(clip, (unsigned char*)lines[i],
+
+		// FIXME: shouldn't rely on "font padding"
+		// should be intrinsic to TextArea
+		size_t psx = IE_FONT_PADDING;
+		size_t lineWidth = psx, wordWidth = 0;
+
+		int rows = 0;
+		size_t bufPos = 0;
+		for (size_t pos = 0; pos < strlen(lines[i]); pos++) {
+			// FIXME: multibyte text support is broken here
+			// we need to convert the TextAreas buffers to be double byte
+			// and have them converted at some earlier point
+			char currChar = lines[i][pos];
+			if (lineWidth + wordWidth > Width) {
+				// line wrap
+				rows++;
+				lineWidth = psx;
+			}
+			if (rows >= startrow) {
+				break;
+			}
+			if (currChar == '\0') {
+				continue;
+			} else if (currChar == '\n') {
+				rows++;
+				lineWidth = psx;
+				wordWidth = 0;
+				bufPos = pos+1;
+				continue;
+			}
+
+			wordWidth += ftext->GetCharSprite(currChar)->Width;
+			if (pos > 0) {
+				// kerning
+				wordWidth -= ftext->GetKerningOffset(lines[i][pos-1], currChar);
+			}
+
+			if (( currChar == ' ' ) || ( currChar == '-' )) {
+				lineWidth += wordWidth;
+				wordWidth = 0;
+				bufPos = pos+1;
+			}
+		}
+
+		ftext->Print(clip, (unsigned char*)&lines[i][bufPos],
 					 pal, IE_FONT_ALIGN_LEFT, true);
 		yl = ftext->maxHeight * (lrows[i]-sr);
 		clip.y+=yl;
@@ -734,8 +821,7 @@ void TextArea::CalcRowCount()
 				}
 				if (currChar == '\0') {
 					continue;
-				}
-				if (currChar == '\n') {
+				} else if (currChar == '\n') {
 					tr++;
 					lineWidth = psx;
 					wordWidth = 0;
