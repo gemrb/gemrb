@@ -1119,8 +1119,6 @@ char *Interface::GetMusicPlaylist(int SongType) const {
 	return musiclist[SongType];
 }
 
-static const Color white = {0xff,0xff,0xff,0xff};
-static const Color black = {0x00,0x00,0x00,0xff};
 static const Region bg( 0, 0, 100, 30 );
 
 /** this is the main loop */
@@ -1140,7 +1138,7 @@ void Interface::Main()
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
 	double frames = 0.0;
-	Palette* palette = CreatePalette( white, black );
+	Palette* palette = CreatePalette( ColorWhite, ColorBlack );
 	do {
 		//don't change script when quitting is pending
 
@@ -1164,7 +1162,7 @@ void Interface::Main()
 				frame = 0;
 				sprintf( fpsstring, "%.3f fps", frames );
 			}
-			video->DrawRect( bg, black );
+			video->DrawRect( bg, ColorBlack );
 			fps->Print( bg,
 				( unsigned char * ) fpsstring, palette,
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
@@ -3176,11 +3174,9 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	DrawWindows();
 	win->Invalidate();
 
+	// FIXME: this is just black with alpha. what is the intent here?
 	Color gray = {
 		0, 0, 0, 128
-	};
-	Color black = {
-		0, 0, 0, 255
 	};
 
 	Region r( 0, 0, Width, Height );
@@ -3188,7 +3184,7 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	if (Shadow == MODAL_SHADOW_GRAY) {
 		video->DrawRect( r, gray );
 	} else if (Shadow == MODAL_SHADOW_BLACK) {
-		video->DrawRect( r, black );
+		video->DrawRect( r, ColorBlack );
 	}
 
 	ModalWindow = win;
@@ -5629,7 +5625,7 @@ void Interface::SetInfoTextColor(const Color &color)
 	if (InfoTextPalette) {
 		gamedata->FreePalette(InfoTextPalette);
 	}
-	InfoTextPalette = CreatePalette(color, black);
+	InfoTextPalette = CreatePalette(color, ColorBlack);
 }
 
 //todo row?

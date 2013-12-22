@@ -44,10 +44,9 @@ TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short p
 	ResetEventHandler( EditOnChange );
 	ResetEventHandler( EditOnDone );
 	ResetEventHandler( EditOnCancel );
-	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
-	palette = core->CreatePalette( white, black );
+	palette = core->CreatePalette( ColorWhite, ColorBlack );
 }
 
 TextEdit::~TextEdit(void)

@@ -54,35 +54,6 @@ namespace GemRB {
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_LIGHTMAP     0x08
 
-static const Color cyan = {
-	0x00, 0xff, 0xff, 0xff
-};
-static const Color red = {
-	0xff, 0x00, 0x00, 0xff
-};
-static const Color magenta = {
-	0xff, 0x00, 0xff, 0xff
-};
-static const Color green = {
-	0x00, 0xff, 0x00, 0xff
-};
-static const Color darkgreen = {
-	0x00, 0x78, 0x00, 0xff
-};
-static Color white = {
-	0xff, 0xff, 0xff, 0xff
-};
-
-static const Color black = {
-	0x00, 0x00, 0x00, 0xff
-};
-static const Color blue = {
-	0x00, 0x00, 0xff, 0x80
-};
-static const Color gray = {
-	0x80, 0x80, 0x80, 0xff
-};
-
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
@@ -371,12 +342,12 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	unsigned short xradius = (size * 4) - 5;
 	unsigned short yradius = (size * 3) - 5;
 
-	Color color = green;
+	Color color = ColorGreen;
 	if (flash) {
 		if (step & 2) {
-			color = white;
+			color = ColorWhite;
 		} else {
-			if (!actorSelected) color = darkgreen;
+			if (!actorSelected) color = ColorGreenDark;
 		}
 	}
 
@@ -417,7 +388,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Map *area = core->GetGame()->GetCurrentArea();
 	Video* video = core->GetVideoDriver();
 	if (!area) {
-		video->DrawRect( screen, blue, true );
+		video->DrawRect( screen, ColorBlue, true );
 		return;
 	}
 
@@ -448,7 +419,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		// move it directly ourselves, since we might be paused
 		video->MoveViewportTo( viewport.x, viewport.y );
 	}
-	video->DrawRect( screen, black, true );
+	video->DrawRect( screen, ColorBlack, true );
 
 	// setup outlines
 	InfoPoint *i;
@@ -457,15 +428,15 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		i->Highlight = false;
 		if (overInfoPoint == i && target_mode) {
 			if (i->VisibleTrap(0)) {
-				i->outlineColor = green;
+				i->outlineColor = ColorGreen;
 				i->Highlight = true;
 				continue;
 			}
 		}
 		if (i->VisibleTrap(DebugFlags & DEBUG_SHOW_INFOPOINTS)) {
-			i->outlineColor = red; // traps
+			i->outlineColor = ColorRed; // traps
 		} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
-			i->outlineColor = blue; // debug infopoints
+			i->outlineColor = ColorBlue; // debug infopoints
 		} else {
 			continue;
 		}
@@ -482,28 +453,28 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			if (target_mode) {
 				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
 					// only highlight targettable doors
-					d->outlineColor = green;
+					d->outlineColor = ColorGreen;
 					d->Highlight = true;
 					continue;
 				}
 			} else if (!(d->Flags & DOOR_SECRET)) {
 				// mouse over, not in target mode, no secret door
-				d->outlineColor = cyan;
+				d->outlineColor = ColorCyan;
 				d->Highlight = true;
 				continue;
 			}
 		}
 		if (d->VisibleTrap(0)) {
-			d->outlineColor = red; // traps
+			d->outlineColor = ColorRed; // traps
 		} else if (d->Flags & DOOR_SECRET) {
 			if (DebugFlags & DEBUG_SHOW_DOORS || d->Flags & DOOR_FOUND) {
-				d->outlineColor = magenta; // found hidden door
+				d->outlineColor = ColorMagenta; // found hidden door
 			} else {
 				// secret door is invisible
 				continue;
 			}
 		} else if (DebugFlags & DEBUG_SHOW_DOORS) {
-			d->outlineColor = cyan; // debug doors
+			d->outlineColor = ColorCyan; // debug doors
 		} else {
 			continue;
 		}
@@ -520,20 +491,20 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if (overContainer == c && target_mode) {
 			if (c->VisibleTrap(0) || (c->Flags & CONT_LOCKED)) {
 				// only highlight targettable containers
-				c->outlineColor = green;
+				c->outlineColor = ColorGreen;
 				c->Highlight = true;
 				continue;
 			}
 		} else if (overContainer == c) {
 			// mouse over, not in target mode
-			c->outlineColor = cyan;
+			c->outlineColor = ColorCyan;
 			c->Highlight = true;
 			continue;
 		}
 		if (c->VisibleTrap(0)) {
-			c->outlineColor = red; // traps
+			c->outlineColor = ColorRed; // traps
 		} else if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
-			c->outlineColor = cyan; // debug containers
+			c->outlineColor = ColorCyan; // debug containers
 		} else {
 			continue;
 		}
@@ -555,7 +526,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				Actor *target = monsters[i++];
 				if (target->InParty) continue;
 				if (target->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(screen, target->Pos, viewport, black);
+				DrawArrowMarker(screen, target->Pos, viewport, ColorBlack);
 			}
 			free(monsters);
 		} else {
@@ -566,7 +537,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (lastActorID) {
 		Actor* actor = GetLastActor();
 		if (actor) {
-			DrawArrowMarker(screen, actor->Pos, viewport, green);
+			DrawArrowMarker(screen, actor->Pos, viewport, ColorGreen);
 		}
 	}
 
@@ -578,7 +549,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	// Draw selection rect
 	if (DrawSelectionRect) {
 		CalculateSelection( p );
-		video->DrawRect( SelectionRect, green, false, true );
+		video->DrawRect( SelectionRect, ColorGreen, false, true );
 	}
 
 	// draw reticles
@@ -630,13 +601,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		while (true) {
 			Point p( ( node-> x*16) + 8, ( node->y*12 ) + 6 );
 			if (!node->Parent) {
-				video->DrawCircle( p.x, p.y, 2, red );
+				video->DrawCircle( p.x, p.y, 2, ColorRed );
 			} else {
 				short oldX = ( node->Parent-> x*16) + 8, oldY = ( node->Parent->y*12 ) + 6;
-				video->DrawLine( oldX, oldY, p.x, p.y, green );
+				video->DrawLine( oldX, oldY, p.x, p.y, ColorGreen );
 			}
 			if (!node->Next) {
-				video->DrawCircle( p.x, p.y, 2, green );
+				video->DrawCircle( p.x, p.y, 2, ColorGreen );
 				break;
 			}
 			node = node->Next;
@@ -649,7 +620,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		video->BlitSprite( spr, 0, 0, true );
 		video->FreeSprite( spr );
 		Region point( p.x / 16, p.y / 12, 2, 2 );
-		video->DrawRect( point, red );
+		video->DrawRect( point, ColorRed );
 	}
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
@@ -666,21 +637,21 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	if (touchScrollAreasEnabled) {
 		if (moveY < 0 && scrolling)
-			video->DrawLine(screen.x+4, screen.y+scrollAreasWidth, screen.w+screen.x-4, screen.y+scrollAreasWidth, red);
+			video->DrawLine(screen.x+4, screen.y+scrollAreasWidth, screen.w+screen.x-4, screen.y+scrollAreasWidth, ColorRed);
 		else
-			video->DrawLine(screen.x+4, screen.y+scrollAreasWidth, screen.w+screen.x-4, screen.y+scrollAreasWidth, gray);
+			video->DrawLine(screen.x+4, screen.y+scrollAreasWidth, screen.w+screen.x-4, screen.y+scrollAreasWidth, ColorGray);
 		if (moveY > 0 && scrolling)
-			video->DrawLine(screen.x+4, screen.h-scrollAreasWidth, screen.w+screen.x-4, screen.h-scrollAreasWidth, red);
+			video->DrawLine(screen.x+4, screen.h-scrollAreasWidth, screen.w+screen.x-4, screen.h-scrollAreasWidth, ColorRed);
 		else
-			video->DrawLine(screen.x+4, screen.h-scrollAreasWidth, screen.w+screen.x-4, screen.h-scrollAreasWidth, gray);
+			video->DrawLine(screen.x+4, screen.h-scrollAreasWidth, screen.w+screen.x-4, screen.h-scrollAreasWidth, ColorGray);
 		if (moveX < 0 && scrolling)
-			video->DrawLine(screen.x+scrollAreasWidth, screen.y+4, screen.x+scrollAreasWidth, screen.h+screen.y-4, red);
+			video->DrawLine(screen.x+scrollAreasWidth, screen.y+4, screen.x+scrollAreasWidth, screen.h+screen.y-4, ColorRed);
 		else
-			video->DrawLine(screen.x+scrollAreasWidth, screen.y+4, screen.x+scrollAreasWidth, screen.h+screen.y-4, gray);
+			video->DrawLine(screen.x+scrollAreasWidth, screen.y+4, screen.x+scrollAreasWidth, screen.h+screen.y-4, ColorGray);
 		if (moveX > 0 && scrolling)
-			video->DrawLine(screen.w+screen.x-scrollAreasWidth, screen.y+4, screen.w+screen.x-scrollAreasWidth, screen.h-4, red);
+			video->DrawLine(screen.w+screen.x-scrollAreasWidth, screen.y+4, screen.w+screen.x-scrollAreasWidth, screen.h-4, ColorRed);
 		else
-			video->DrawLine(screen.w+screen.x-scrollAreasWidth, screen.y+4, screen.w+screen.x-scrollAreasWidth, screen.h-4, gray);
+			video->DrawLine(screen.w+screen.x-scrollAreasWidth, screen.y+4, screen.w+screen.x-scrollAreasWidth, screen.h-4, ColorGray);
 	}
 }
 

@@ -92,8 +92,7 @@ void Label::SetText(const char* string)
 		Buffer = strdup( string );
 	}
 	if (!palette) {
-		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
-		SetColor(white, black);
+		SetColor(ColorWhite, ColorBlack);
 	}
 	if (Owner) {
 		Owner->Invalidate();

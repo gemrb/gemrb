@@ -239,8 +239,6 @@ void Scriptable::FixHeadTextPos()
 }
 
 #define MAX_DELAY  6000
-static const Color black={0,0,0,0};
-
 void Scriptable::DrawOverheadText(const Region &screen)
 {
 	unsigned long time = core->GetGame()->Ticks;
@@ -260,7 +258,7 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		if (time<256) {
 			ieByte time2 = time; // shut up narrowing warnings
 			const Color overHeadColor = {time2,time2,time2,time2};
-			palette = core->CreatePalette(overHeadColor, black);
+			palette = core->CreatePalette(overHeadColor, ColorBlack);
 		}
 	}
 

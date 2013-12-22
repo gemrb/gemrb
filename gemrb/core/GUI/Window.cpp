@@ -103,8 +103,7 @@ void Window::DrawWindow()
 		Region screen( 0, 0, core->Width, core->Height );
 		video->SetClipRect( NULL );
 		//removed this?
-		Color black = { 0, 0, 0, 255 };
-		video->DrawRect( screen, black );
+		video->DrawRect( screen, ColorBlack );
 		if (core->WindowFrames[0])
 			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
 		if (core->WindowFrames[1])

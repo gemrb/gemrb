@@ -66,11 +66,9 @@ void Console::Draw(unsigned short x, unsigned short y)
 	if (Back) {
 		core->GetVideoDriver()->BlitSprite( Back, 0, y, true );
 	}
-	Color black = {
-		0x00, 0x00, 0x00, 0xff
-	};
+
 	Region r( (short)x + XPos, (short)y + YPos, Width, Height );
-	core->GetVideoDriver()->DrawRect( r, black );
+	core->GetVideoDriver()->DrawRect( r, ColorBlack );
 	font->Print( r, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL,
 			Cursor, CurPos, true );
