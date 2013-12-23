@@ -70,7 +70,8 @@ Color colors[]={
 #define SCREEN_TO_GAMEX(x) (SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV)
 #define SCREEN_TO_GAMEY(y) (SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV)
 
-MapControl::MapControl(void)
+MapControl::MapControl(const Region& frame)
+	: Control(frame)
 {
 	ControlType = IE_GUI_MAP;
 	if (core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {

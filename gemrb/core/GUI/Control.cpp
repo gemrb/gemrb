@@ -39,7 +39,7 @@
 
 namespace GemRB {
 
-Control::Control()
+Control::Control(const Region& frame)
 {
 	hasFocus = false;
 	Changed = true;
@@ -49,8 +49,10 @@ Control::Control()
 	Flags = 0;
 	Tooltip = NULL;
 	Owner = NULL;
-	XPos = 0;
-	YPos = 0;
+	XPos = frame.x;
+	YPos = frame.y;
+	Width = frame.w;
+	Height = frame.h;
 
 	sb = NULL;
 	animation = NULL;
@@ -70,6 +72,11 @@ Control::~Control()
 	delete animation;
 
 	core->GetVideoDriver()->FreeSprite(AnimPicture);
+}
+
+Region Control::ControlFrame()
+{
+	return Region(XPos, YPos, Width, Height);
 }
 
 /** Sets the Tooltip text of the current control */

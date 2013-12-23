@@ -70,7 +70,7 @@ public:
 	EventHandler MapControlOnRightPress;
 	EventHandler MapControlOnDoublePress;
 
-	MapControl(void);
+	MapControl(const Region& frame);
 	~MapControl(void);
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(const char *VariableName, unsigned int Sum);

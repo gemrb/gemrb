@@ -31,7 +31,8 @@
 
 namespace GemRB {
 
-Label::Label(Font* font, const char* string)
+Label::Label(const Region& frame, Font* font, const char* string)
+	: Control(frame)
 {
 	ControlType = IE_GUI_LABEL;
 	this->font = font;

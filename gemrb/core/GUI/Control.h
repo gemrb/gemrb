@@ -67,8 +67,9 @@ protected:
 	/** Focused Control */
 	bool hasFocus;
 public:
-	Control();
+	Control(const Region& frame);
 	virtual ~Control();
+	Region ControlFrame();
 	/** Draws the Control on the Output Display */
 	virtual void Draw(unsigned short x, unsigned short y) = 0;
 	/** Sets the Text of the current control */

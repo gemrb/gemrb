@@ -31,7 +31,8 @@
 
 namespace GemRB {
 
-Console::Console(void)
+Console::Console(const Region& frame)
+	: Control(frame)
 {
 	Cursor = NULL;
 	Back = NULL;

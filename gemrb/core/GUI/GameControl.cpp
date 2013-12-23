@@ -70,8 +70,9 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 	distance = dist;
 }
 
-GameControl::GameControl(void)
-	: windowGroupCounts()
+GameControl::GameControl(const Region& frame)
+	: Control(frame),
+	windowGroupCounts()
 {
 	ControlType = IE_GUI_GAMECONTROL;
 	if (!formations) {

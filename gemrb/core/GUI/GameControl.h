@@ -106,7 +106,7 @@ class GEM_EXPORT GameControl : public Control {
 		WINDOW_CONTRACT = 1
 	};
 public:
-	GameControl(void);
+	GameControl(const Region& frame);
 	~GameControl(void);
 public:
 	/** Draws the Control on the Output Display */

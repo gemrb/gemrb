@@ -46,7 +46,7 @@ namespace GemRB {
 
 class GEM_EXPORT Progressbar : public Control  {
 public: 
-	Progressbar(unsigned short KnobStepsCount, bool Clear = false);
+	Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear = false);
 	~Progressbar();
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);

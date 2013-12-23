@@ -52,7 +52,7 @@ namespace GemRB {
 
 class GEM_EXPORT Slider : public Control  {
 public:
-	Slider(short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
+	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);

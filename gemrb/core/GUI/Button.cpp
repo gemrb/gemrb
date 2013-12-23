@@ -35,8 +35,9 @@
 
 namespace GemRB {
 
-Button::Button()
-	: buttonImages()
+Button::Button(Region& frame)
+	: Control(frame),
+	buttonImages()
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;

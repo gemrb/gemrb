@@ -59,7 +59,7 @@ class WorldMapControl;
 
 class GEM_EXPORT WorldMapControl : public Control {
 public:
-	WorldMapControl(const char *fontname, int direction);
+	WorldMapControl(const Region& frame, const char *fontname, int direction);
 	~WorldMapControl(void);
 
 	/** Allows modification of the scrolling factor from outside */

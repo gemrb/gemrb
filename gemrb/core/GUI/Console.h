@@ -48,7 +48,7 @@ class Palette;
 
 class Console : public Control {
 public:
-	Console(void);
+	Console(const Region& frame);
 	~Console(void);
 	/** Draws the Console on the Output Display */
 	void Draw(unsigned short x, unsigned short y);

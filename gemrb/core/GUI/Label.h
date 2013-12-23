@@ -48,7 +48,7 @@ class Palette;
 
 class GEM_EXPORT Label : public Control {
 public: 
-	Label(Font* font, const char* string);
+	Label(const Region& frame, Font* font, const char* string);
 	~Label();
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);

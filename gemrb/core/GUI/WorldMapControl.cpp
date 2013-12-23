@@ -36,7 +36,8 @@ namespace GemRB {
 #define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
 
-WorldMapControl::WorldMapControl(const char *font, int direction)
+WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
+	: Control(frame)
 {
 	ControlType = IE_GUI_WORLDMAP;
 	ScrollX = 0;

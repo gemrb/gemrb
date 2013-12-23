@@ -2013,11 +2013,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	if (!btn) {
 		return NULL;
 	}
-	Label* lbl = new Label( core->GetFont( font ), "" );
-	lbl->XPos = btn->XPos;
-	lbl->YPos = btn->YPos;
-	lbl->Width = btn->Width;
-	lbl->Height = btn->Height;
+	Label* lbl = new Label( btn->ControlFrame(), core->GetFont( font ), "" );
 	lbl->ControlID = ControlID;
 	lbl->Owner = win;
 	lbl->SetAlignment( align );
@@ -2039,11 +2035,12 @@ PyDoc_STRVAR( GemRB_Window_CreateLabel__doc,
 
 static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h, align;
+	int WindowIndex, ControlID, align;
+	Region rgn;
 	char *font, *text;
 
-	if (!PyArg_ParseTuple( args, "iiiiiissi", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &font, &text, &align )) {
+	if (!PyArg_ParseTuple( args, "iiiiiissi", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &font, &text, &align )) {
 		return AttributeError( GemRB_Window_CreateLabel__doc );
 	}
 
@@ -2051,11 +2048,7 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	Label* lbl = new Label( core->GetFont( font ), text );
-	lbl->XPos = x;
-	lbl->YPos = y;
-	lbl->Width = w;
-	lbl->Height = h;
+	Label* lbl = new Label(rgn, core->GetFont( font ), text );
 	lbl->ControlID = ControlID;
 	lbl->Owner = win;
 	lbl->SetAlignment( align );
@@ -2103,11 +2096,12 @@ PyDoc_STRVAR( GemRB_Window_CreateTextEdit__doc,
 
 static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 	char *font, *text;
 
-	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &font, &text )) {
+	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &font, &text )) {
 		return AttributeError( GemRB_Window_CreateTextEdit__doc );
 	}
 
@@ -2116,12 +2110,8 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 		return RuntimeError("Cannot find window!");
 	}
 	//there is no need to set these differently, currently
-	TextEdit* edit = new TextEdit( 500, 0, 0);
+	TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
 	edit->SetFont( core->GetFont( font ) );
-	edit->XPos = x;
-	edit->YPos = y;
-	edit->Width = w;
-	edit->Height = h;
 	edit->ControlID = ControlID;
 	edit->Owner = win;
 	edit->SetText( text );
@@ -2150,10 +2140,11 @@ PyDoc_STRVAR( GemRB_Window_CreateScrollBar__doc,
 
 static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x, &y,
-			&w, &h )) {
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h )) {
 		return AttributeError( GemRB_Window_CreateScrollBar__doc );
 	}
 
@@ -2162,11 +2153,7 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 		return RuntimeError("Cannot find window!");
 	}
 
-	ScrollBar* sb = new ScrollBar( );
-	sb->XPos = x;
-	sb->YPos = y;
-	sb->Width = w;
-	sb->Height = h;
+	ScrollBar* sb = new ScrollBar(rgn);
 	sb->ControlID = ControlID;
 	sb->Owner = win;
 	win->AddControl( sb );
@@ -2188,10 +2175,11 @@ PyDoc_STRVAR( GemRB_Window_CreateButton__doc,
 
 static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x, &y,
-			&w, &h )) {
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h )) {
 		return AttributeError( GemRB_Window_CreateButton__doc );
 	}
 
@@ -2200,11 +2188,7 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 
-	Button* btn = new Button( );
-	btn->XPos = x;
-	btn->YPos = y;
-	btn->Width = w;
-	btn->Height = h;
+	Button* btn = new Button(rgn);
 	btn->ControlID = ControlID;
 	btn->Owner = win;
 	win->AddControl( btn );
@@ -2245,11 +2229,7 @@ static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	TextArea* ta = new TextArea( fore, init, back );
-	ta->XPos = ctrl->XPos;
-	ta->YPos = ctrl->YPos;
-	ta->Width = ctrl->Width;
-	ta->Height = ctrl->Height;
+	TextArea* ta = new TextArea( ctrl->ControlFrame(), fore, init, back );
 	ta->ControlID = ctrl->ControlID;
 	ta->Owner = win;
 	ta->SetFonts (ctrl->GetFont(), ctrl->GetFont() );
@@ -2910,11 +2890,12 @@ PyDoc_STRVAR( GemRB_Window_CreateWorldMapControl__doc,
 
 static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h, direction;
+	int WindowIndex, ControlID, direction;
+	Region rgn;
 	char *font=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &direction, &font )) {
+	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &direction, &font )) {
 		return AttributeError( GemRB_Window_CreateWorldMapControl__doc );
 	}
 
@@ -2925,18 +2906,11 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
-		x = ctrl->XPos;
-		y = ctrl->YPos;
-		w = ctrl->Width;
-		h = ctrl->Height;
+		rgn = ctrl->ControlFrame();
 		//flags = ctrl->Value;
 		win->DelControl( CtrlIndex );
 	}
-	WorldMapControl* wmap = new WorldMapControl( font?font:"", direction );
-	wmap->XPos = x;
-	wmap->YPos = y;
-	wmap->Width = w;
-	wmap->Height = h;
+	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;
 	wmap->Owner = win;
 	win->AddControl( wmap );
@@ -2987,17 +2961,18 @@ PyDoc_STRVAR( GemRB_Window_CreateMapControl__doc,
 
 static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 	int LabelID;
 	char *Flag=NULL;
 	char *Flag2=NULL;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiis|s", &WindowIndex, &ControlID,
-			&x, &y, &w, &h, &LabelID, &Flag, &Flag2)) {
+			&rgn.x, &rgn.y, &rgn.w, &rgn.h, &LabelID, &Flag, &Flag2)) {
 		Flag=NULL;
 		PyErr_Clear(); //clearing the exception
 		if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID,
-			&x, &y, &w, &h)) {
+			&rgn.x, &rgn.y, &rgn.w, &rgn.h)) {
 			return AttributeError( GemRB_Window_CreateMapControl__doc );
 		}
 	}
@@ -3008,20 +2983,13 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
-		x = ctrl->XPos;
-		y = ctrl->YPos;
-		w = ctrl->Width;
-		h = ctrl->Height;
+		rgn = ctrl->ControlFrame();
 		// do *not* delete the existing control, we want to replace
 		// it in the sort order!
 		//win->DelControl( CtrlIndex );
 	}
 
-	MapControl* map = new MapControl( );
-	map->XPos = x;
-	map->YPos = y;
-	map->Width = w;
-	map->Height = h;
+	MapControl* map = new MapControl(rgn);
 	map->ControlID = ControlID;
 	map->Owner = win;
 	if (Flag2) { //pst flavour

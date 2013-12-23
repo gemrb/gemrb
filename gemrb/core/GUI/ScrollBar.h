@@ -62,7 +62,7 @@ namespace GemRB {
 
 class GEM_EXPORT ScrollBar : public Control {
 public:
-	ScrollBar(void);
+	ScrollBar(const Region& frame);
 	~ScrollBar(void);
 	/** safe method to get the height of a frame */
 	int GetFrameHeight(int frame) const;

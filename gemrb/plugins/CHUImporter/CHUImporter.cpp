@@ -117,28 +117,24 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	for (i = 0; i < ControlsCount; i++) {
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
-		ieWord XPos, YPos, Width, Height;
+		Region ctrlFrame;
 		ieByte ControlType, temp;
 		str->ReadDword( &COffset );
 		str->ReadDword( &CLength );
 		str->Seek( COffset, GEM_STREAM_START );
 		str->ReadDword( &ControlID );
-		str->ReadWord( &XPos );
-		str->ReadWord( &YPos );
-		str->ReadWord( &Width );
-		str->ReadWord( &Height );
+		str->ReadWord( (ieWord*)&ctrlFrame.x );
+		str->ReadWord( (ieWord*)&ctrlFrame.y );
+		str->ReadWord( (ieWord*)&ctrlFrame.w );
+		str->ReadWord( (ieWord*)&ctrlFrame.h );
 		str->Read( &ControlType, 1 );
 		str->Read( &temp, 1 );
 		switch (ControlType) {
 			case IE_GUI_BUTTON:
 			{
 				//Button
-				Button* btn = new Button( );
+				Button* btn = new Button(ctrlFrame);
 				btn->ControlID = ControlID;
-				btn->XPos = XPos;
-				btn->YPos = YPos;
-				btn->Width = Width;
-				btn->Height = Height;
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -230,12 +226,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
-				Progressbar* pbar = new Progressbar(KnobStepsCount, true );
+				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, true );
 				pbar->ControlID = ControlID;
-				pbar->XPos = XPos;
-				pbar->YPos = YPos;
-				pbar->Width = Width;
-				pbar->Height = Height;
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;
@@ -280,12 +272,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
-				Slider* sldr = new Slider( KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
+				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
 				sldr->ControlID = ControlID;
-				sldr->XPos = XPos;
-				sldr->YPos = YPos;
-				sldr->Width = Width;
-				sldr->Height = Height;
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
@@ -354,12 +342,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					img = mos->GetSprite2D();
 				}
 
-				TextEdit* te = new TextEdit( maxInput, PosX, PosY );
+				TextEdit* te = new TextEdit( ctrlFrame, maxInput, PosX, PosY );
 				te->ControlID = ControlID;
-				te->XPos = XPos;
-				te->YPos = YPos;
-				te->Width = Width;
-				te->Height = Height;
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackGround( img );
@@ -383,12 +367,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
-				TextArea* ta = new TextArea( fore, init, back );
+				TextArea* ta = new TextArea( ctrlFrame, fore, init, back );
 				ta->ControlID = ControlID;
-				ta->XPos = XPos;
-				ta->YPos = YPos;
-				ta->Width = Width;
-				ta->Height = Height;
 				ta->SetFonts( ini, fnt );
 				win->AddControl( ta );
 				if (SBID != 0xffff)
@@ -410,13 +390,9 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &back, 4 );
 				str->ReadWord( &alignment );
 				char* str = core->GetString( StrRef );
-				Label* lab = new Label( fnt, str );
+				Label* lab = new Label( ctrlFrame, fnt, str );
 				core->FreeString( str );
 				lab->ControlID = ControlID;
-				lab->XPos = XPos;
-				lab->YPos = YPos;
-				lab->Width = Width;
-				lab->Height = Height;
 
 				if (alignment & 1) {
 					lab->useRGB = true;
@@ -476,12 +452,8 @@ endalign:
 				str->ReadWord( &Trough );
 				str->ReadWord( &Slider );
 				str->ReadWord( &TAID );
-				ScrollBar* sbar = new ScrollBar();
+				ScrollBar* sbar = new ScrollBar(ctrlFrame);
 				sbar->ControlID = ControlID;
-				sbar->XPos = XPos;
-				sbar->YPos = YPos;
-				sbar->Width = Width;
-				sbar->Height = Height;
 
 				AnimationFactory* bam = ( AnimationFactory* )
 					gamedata->GetFactoryResource( BAMResRef,

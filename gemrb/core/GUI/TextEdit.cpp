@@ -29,7 +29,8 @@
 
 namespace GemRB {
 
-TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
+TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short px, unsigned short py)
+	: Control(frame)
 {
 	ControlType = IE_GUI_EDIT;
 	max = maxLength;

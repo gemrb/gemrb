@@ -53,7 +53,7 @@ class Palette;
 
 class GEM_EXPORT TextEdit : public Control {
 public:
-	TextEdit(unsigned short maxLength, unsigned short x, unsigned short y);
+	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);

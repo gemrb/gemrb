@@ -515,11 +515,7 @@ GameControl* Interface::StartGameControl()
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	gamewin->WindowPack[0]=0;
-	GameControl* gc = new GameControl();
-	gc->XPos = 0;
-	gc->YPos = 0;
-	gc->Width = (ieWord) Width;
-	gc->Height = (ieWord) Height;
+	GameControl* gc = new GameControl(Region(0, 0, Width, Height));
 	gc->Owner = gamewin;
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
@@ -1898,11 +1894,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
 	QuitFlag = QF_CHANGESCRIPT;
-	console = new Console();
-	console->XPos = 0;
-	console->YPos = (ieWord) (Height - 25);
-	console->Width = (ieWord) Width;
-	console->Height = 25;
+	console = new Console(Region(0, (Height - 25), Width, 25));
 	if (fonts.size() > 0) {
 		console->SetFont( fonts[0] );
 	}
