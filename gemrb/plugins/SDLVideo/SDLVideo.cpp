@@ -99,11 +99,6 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
-	bool ConsolePopped = core->ConsolePopped;
-	if (ConsolePopped) {
-		core->DrawConsole();
-	}
-
 	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		
 		if (MouseFlags&MOUSE_GRAYED) {

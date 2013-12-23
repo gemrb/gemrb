@@ -493,8 +493,6 @@ public:
 	void RedrawControls(const char *varname, unsigned int value);
 	/** Popup the Console */
 	void PopupConsole();
-	/** Draws the Console */
-	void DrawConsole();
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */

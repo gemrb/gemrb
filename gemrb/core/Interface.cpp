@@ -3297,6 +3297,10 @@ void Interface::DrawWindows(bool allow_delete)
 			}
 		}
 	}
+	// draw the console
+	if (ConsolePopped) {
+		console->Draw( 0, (Height * -1) + console->Height);
+	}
 }
 
 void Interface::DrawTooltip ()
@@ -3459,12 +3463,6 @@ void Interface::PopupConsole()
 	ConsolePopped = !ConsolePopped;
 	RedrawAll();
 	console->Changed = true;
-}
-
-/** Draws the Console */
-void Interface::DrawConsole()
-{
-	console->Draw( 0, (Height * -1) + console->Height);
 }
 
 /** Get the Sound Manager */
