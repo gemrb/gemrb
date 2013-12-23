@@ -1359,16 +1359,7 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	switch(ctrl->ControlType) {
-	case IE_GUI_LABEL:
-		return PyString_FromString(((Label *) ctrl)->QueryText() );
-	case IE_GUI_EDIT:
-		return PyString_FromString(((TextEdit *) ctrl)->QueryText() );
-	case IE_GUI_TEXTAREA:
-		return PyString_FromString(((TextArea *) ctrl)->QueryText() );
-	default:
-		return RuntimeError("Invalid control type");
-	}
+	return PyString_FromString(ctrl->QueryText() ?: "");
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,

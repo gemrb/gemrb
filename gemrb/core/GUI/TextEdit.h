@@ -66,8 +66,8 @@ public:
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
 	void SetText(const char* string);
-	/** Sets the Text of the current control */
-	const char* QueryText();
+	/** Gets the Text of the current control */
+	const char* QueryText() const;
 	/** Sets the buffer length */
 	void SetBufferLength(ieWord buflen);
 	/** Sets the alignment */

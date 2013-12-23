@@ -224,7 +224,7 @@ void TextEdit::SetBufferLength(ieWord buflen)
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
-const char* TextEdit::QueryText()
+const char* TextEdit::QueryText() const
 {
 	return ( const char * ) Buffer;
 }

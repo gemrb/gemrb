@@ -897,12 +897,12 @@ void TextArea::SelectText(const char *select)
 	}
 }
 
-const char* TextArea::QueryText()
+const char* TextArea::QueryText() const
 {
 	if ( Value<lines.size() ) {
 		return ( const char * ) lines[Value];
 	}
-	return ( const char *) "";
+	return "";
 }
 
 bool TextArea::SetEvent(int eventType, EventHandler handler)
