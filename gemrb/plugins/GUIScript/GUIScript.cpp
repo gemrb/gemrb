@@ -385,7 +385,7 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
 	//this is not the usual gc retrieval
-	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
+	GameControl* gc = core->GetGameControl();
 	if (!gc) {
 		return RuntimeError("No gamecontrol!");
 	}
