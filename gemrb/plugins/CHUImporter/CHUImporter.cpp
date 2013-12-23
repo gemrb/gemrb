@@ -139,7 +139,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				btn->YPos = YPos;
 				btn->Width = Width;
 				btn->Height = Height;
-				btn->ControlType = ControlType;
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -235,7 +234,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				pbar->ControlID = ControlID;
 				pbar->XPos = XPos;
 				pbar->YPos = YPos;
-				pbar->ControlType = ControlType;
 				pbar->Width = Width;
 				pbar->Height = Height;
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
@@ -286,7 +284,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				sldr->ControlID = ControlID;
 				sldr->XPos = XPos;
 				sldr->YPos = YPos;
-				sldr->ControlType = ControlType;
 				sldr->Width = Width;
 				sldr->Height = Height;
 				ResourceHolder<ImageMgr> mos(MOSFile);
@@ -363,7 +360,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				te->YPos = YPos;
 				te->Width = Width;
 				te->Height = Height;
-				te->ControlType = ControlType;
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackGround( img );
@@ -393,7 +389,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				ta->YPos = YPos;
 				ta->Width = Width;
 				ta->Height = Height;
-				ta->ControlType = ControlType;
 				ta->SetFonts( ini, fnt );
 				win->AddControl( ta );
 				if (SBID != 0xffff)
@@ -422,7 +417,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				lab->YPos = YPos;
 				lab->Width = Width;
 				lab->Height = Height;
-				lab->ControlType = ControlType;
 
 				if (alignment & 1) {
 					lab->useRGB = true;
@@ -488,7 +482,6 @@ endalign:
 				sbar->YPos = YPos;
 				sbar->Width = Width;
 				sbar->Height = Height;
-				sbar->ControlType = ControlType;
 
 				AnimationFactory* bam = ( AnimationFactory* )
 					gamedata->GetFactoryResource( BAMResRef,

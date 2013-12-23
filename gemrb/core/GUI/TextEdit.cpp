@@ -31,6 +31,7 @@ namespace GemRB {
 
 TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
 {
+	ControlType = IE_GUI_EDIT;
 	max = maxLength;
 	FontPosX = px;
 	FontPosY = py;

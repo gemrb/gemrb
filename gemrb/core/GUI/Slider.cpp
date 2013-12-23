@@ -34,6 +34,7 @@ namespace GemRB {
 Slider::Slider(short KnobXPos, short KnobYPos, short KnobStep,
 	unsigned short KnobStepsCount, bool Clear)
 {
+	ControlType = IE_GUI_SLIDER;
 	this->KnobXPos = KnobXPos;
 	this->KnobYPos = KnobYPos;
 	this->KnobStep = KnobStep;

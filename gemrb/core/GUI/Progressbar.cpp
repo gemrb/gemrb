@@ -32,6 +32,7 @@ namespace GemRB {
 
 Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 {
+	ControlType = IE_GUI_PROGRESSBAR;
 	BackGround = NULL;
 	BackGround2 = NULL;
 	this->Clear = Clear;

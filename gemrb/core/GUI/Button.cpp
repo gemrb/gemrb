@@ -38,6 +38,7 @@ namespace GemRB {
 Button::Button()
 	: buttonImages()
 {
+	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ResetEventHandler( ButtonOnPress );
 	ResetEventHandler( ButtonOnDoublePress );

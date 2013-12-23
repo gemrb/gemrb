@@ -73,6 +73,7 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 GameControl::GameControl(void)
 	: windowGroupCounts()
 {
+	ControlType = IE_GUI_GAMECONTROL;
 	if (!formations) {
 		ReadFormations();
 	}

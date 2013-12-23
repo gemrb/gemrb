@@ -38,6 +38,7 @@ namespace GemRB {
 
 WorldMapControl::WorldMapControl(const char *font, int direction)
 {
+	ControlType = IE_GUI_WORLDMAP;
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;

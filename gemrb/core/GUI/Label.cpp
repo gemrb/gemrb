@@ -33,6 +33,7 @@ namespace GemRB {
 
 Label::Label(Font* font, const char* string)
 {
+	ControlType = IE_GUI_LABEL;
 	this->font = font;
 	Buffer = NULL;
 	useRGB = false;

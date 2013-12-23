@@ -32,6 +32,7 @@ namespace GemRB {
 
 ScrollBar::ScrollBar(void)
 {
+	ControlType = IE_GUI_SCROLLBAR;
 	Pos = 0;
 	Value = 0;
 	State = 0;

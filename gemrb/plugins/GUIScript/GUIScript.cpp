@@ -2028,7 +2028,6 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	lbl->Width = btn->Width;
 	lbl->Height = btn->Height;
 	lbl->ControlID = ControlID;
-	lbl->ControlType = IE_GUI_LABEL;
 	lbl->Owner = win;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
@@ -2067,7 +2066,6 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	lbl->Width = w;
 	lbl->Height = h;
 	lbl->ControlID = ControlID;
-	lbl->ControlType = IE_GUI_LABEL;
 	lbl->Owner = win;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
@@ -2134,7 +2132,6 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	edit->Width = w;
 	edit->Height = h;
 	edit->ControlID = ControlID;
-	edit->ControlType = IE_GUI_EDIT;
 	edit->Owner = win;
 	edit->SetText( text );
 
@@ -2180,7 +2177,6 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 	sb->Width = w;
 	sb->Height = h;
 	sb->ControlID = ControlID;
-	sb->ControlType = IE_GUI_SCROLLBAR;
 	sb->Owner = win;
 	win->AddControl( sb );
 
@@ -2219,7 +2215,6 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 	btn->Width = w;
 	btn->Height = h;
 	btn->ControlID = ControlID;
-	btn->ControlType = IE_GUI_BUTTON;
 	btn->Owner = win;
 	win->AddControl( btn );
 
@@ -2265,7 +2260,6 @@ static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	ta->Width = ctrl->Width;
 	ta->Height = ctrl->Height;
 	ta->ControlID = ctrl->ControlID;
-	ta->ControlType = IE_GUI_TEXTAREA;
 	ta->Owner = win;
 	ta->SetFonts (ctrl->GetFont(), ctrl->GetFont() );
 	ta->Flags |= IE_GUI_TEXTAREA_EDITABLE;
@@ -2953,7 +2947,6 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	wmap->Width = w;
 	wmap->Height = h;
 	wmap->ControlID = ControlID;
-	wmap->ControlType = IE_GUI_WORLDMAP;
 	wmap->Owner = win;
 	win->AddControl( wmap );
 
@@ -3039,7 +3032,6 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	map->Width = w;
 	map->Height = h;
 	map->ControlID = ControlID;
-	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;

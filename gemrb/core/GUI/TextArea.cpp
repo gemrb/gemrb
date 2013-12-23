@@ -35,6 +35,7 @@ namespace GemRB {
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
+	ControlType = IE_GUI_TEXTAREA;
 	keeplines = 100;
 	rows = 0;
 	TextYPos = 0;

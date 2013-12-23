@@ -72,6 +72,7 @@ Color colors[]={
 
 MapControl::MapControl(void)
 {
+	ControlType = IE_GUI_MAP;
 	if (core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
 		MAP_DIV=4;
 		MAP_MULT=32;
