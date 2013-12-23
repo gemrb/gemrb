@@ -381,10 +381,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 
-	if (Owner->Visible!=WINDOW_VISIBLE) {
-		return;
-	}
-
 	Region screen( x + XPos, y + YPos, Width, Height );
 	Map *area = core->GetGame()->GetCurrentArea();
 	Video* video = core->GetVideoDriver();

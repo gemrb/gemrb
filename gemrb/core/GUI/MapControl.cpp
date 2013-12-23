@@ -192,9 +192,6 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	if (!Width || !Height) {
 		return;
 	}
-	if (Owner->Visible!=WINDOW_VISIBLE) {
-		return;
-	}
 
 	if (Changed) {
 		Realize();

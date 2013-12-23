@@ -96,6 +96,7 @@ void Window::SetBackGround(Sprite2D* img, bool clean)
 /** This function Draws the Window on the Output Screen */
 void Window::DrawWindow()
 {
+	if (!Visible) return; // no point in drawing invisible windows
 	Video* video = core->GetVideoDriver();
 	Region clip( XPos, YPos, Width, Height );
 	//Frame && Changed
