@@ -42,7 +42,6 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
-	Changed = true;
 	Area = NULL;
 	Value = direction;
 	Game* game = core->GetGame();

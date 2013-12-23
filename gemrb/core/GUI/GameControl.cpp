@@ -80,7 +80,6 @@ GameControl::GameControl(void)
 	//this is the default action, individual actors should have one too
 	//at this moment we use only this
 	//maybe we don't even need it
-	Changed = true;
 	spellCount = 0;
 	user = NULL;
 	lastActorID = 0;
