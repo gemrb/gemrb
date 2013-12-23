@@ -62,13 +62,14 @@ namespace GemRB {
  */
 
 class GEM_EXPORT TextArea : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
 public:
 	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
 	/** global configuration */
 	static void SetNoteString(const char *s);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Set the TextArea value to the line number containing the string parameter */
 	void SelectText(const char *select);
 	/** Sets the Actual Text */

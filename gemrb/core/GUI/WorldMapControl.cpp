@@ -33,8 +33,8 @@
 
 namespace GemRB {
 
-#define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
+#define MAP_TO_SCREENX(x) XWin - ScrollX + (x)
+#define MAP_TO_SCREENY(y) YWin - ScrollY + (y)
 
 WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
 	: Control(frame)
@@ -100,21 +100,19 @@ WorldMapControl::~WorldMapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
+void WorldMapControl::DrawInternal(Region& rgn)
 {
+	ieWord XWin = rgn.x;
+	ieWord YWin = rgn.y;
 	WorldMap* worldmap = core->GetWorldMap();
-	if (!Width || !Height) {
-		return;
-	}
+
 	if(!Changed)
 		return;
-	Changed = false;
 	Video* video = core->GetVideoDriver();
-	Region r( XWin+XPos, YWin+YPos, Width, Height );
 	Region clipbackup;
 	video->GetClipRect(clipbackup);
-	video->SetClipRect(&r);
-	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+	video->SetClipRect(&rgn);
+	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
 
 	unsigned int i;
 	unsigned int ec = worldmap->GetEntryCount();
@@ -129,18 +127,18 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 			if (m == Area && m->HighlightSelected()) {
 				Palette *pal = icon->GetPalette();
 				icon->SetPalette(pal_selected);
-				video->BlitSprite( icon, xOffs, yOffs, true, &r );
+				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
 				icon->SetPalette(pal);
 				pal->release();
 			} else {
-				video->BlitSprite( icon, xOffs, yOffs, true, &r );
+				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
 			}
 			video->FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
+			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &rgn );
 		}
 	}
 

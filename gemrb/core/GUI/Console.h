@@ -50,8 +50,6 @@ class Console : public Control {
 public:
 	Console(const Region& frame);
 	~Console(void);
-	/** Draws the Console on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Set Font */
 	void SetFont(Font* f);
 	/** Set Cursor */
@@ -60,6 +58,9 @@ public:
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
 	void SetText(const char* string);
+protected:
+	/** Draws the Console on the Output Display */
+	void DrawInternal(Region& drawFrame);
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;

@@ -79,6 +79,25 @@ Region Control::ControlFrame()
 	return Region(XPos, YPos, Width, Height);
 }
 
+void Control::Draw(unsigned short x, unsigned short y)
+{
+	// FIXME: Draw shouldnt be getting called on controls that are offscreen...
+	if (XPos == 65535) {
+		return;
+	}
+	// no point in drawing something with a 0 w/h
+	if (!Width || !Height) {
+		return;
+	}
+	//it is unlikely that a floating window is above us, but...
+	if (!Changed && (Owner && !(Owner->Flags&WF_FLOAT)) ) {
+		return;
+	}
+	Region drawFrame = Region(x + XPos, y + YPos, Width, Height);
+	DrawInternal(drawFrame);
+	Changed = false; // set *after* calling DrawInternal
+}
+
 /** Sets the Tooltip text of the current control */
 int Control::SetTooltip(const char* string)
 {

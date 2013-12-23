@@ -96,20 +96,18 @@ void TextArea::RefreshSprite(const char *portrait)
 	SetAnimPicture ( im->GetSprite2D() );
 }
 
-void TextArea::Draw(unsigned short x, unsigned short y)
+void TextArea::DrawInternal(Region& clip)
 {
 	/** Don't come back recursively */
 	if (InternalFlags&TA_BITEMYTAIL) {
 		return;
 	}
-	int tx=x+XPos;
-	int ty=y+YPos;
-	Region clip( tx, ty, Width, Height );
+
 	Video *video = core->GetVideoDriver();
 
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
 		if (AnimPicture) {
-			video->BlitSprite(AnimPicture, tx,ty, true, &clip);
+			video->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
 			clip.x+=AnimPicture->Width;
 			clip.w-=AnimPicture->Width;
 		}
@@ -134,15 +132,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			Owner->DrawWindow();
 			InternalFlags &= ~TA_BITEMYTAIL;
 		}
-	}
-
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-
-	if (XPos == 65535) {
-		return;
 	}
 
 	if (lines.size() == 0) {

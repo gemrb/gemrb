@@ -369,7 +369,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 }
 
 /** Draws the Control on the Output Display */
-void GameControl::Draw(unsigned short x, unsigned short y)
+void GameControl::DrawInternal(Region& screen)
 {
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 
@@ -377,11 +377,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (!game)
 		return;
 
-	if (((short) Width) <=0 || ((short) Height) <= 0) {
-		return;
-	}
-
-	Region screen( x + XPos, y + YPos, Width, Height );
 	Map *area = core->GetGame()->GetCurrentArea();
 	Video* video = core->GetVideoDriver();
 	if (!area) {
@@ -1567,6 +1562,7 @@ void GameControl::UpdateScrolling() {
 	video->FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;
+	Changed = true;
 }
 
 void GameControl::SetScrolling(bool scroll) {

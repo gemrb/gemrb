@@ -51,11 +51,12 @@ namespace GemRB {
  */
 
 class GEM_EXPORT Slider : public Control  {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
 public:
 	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();
 	/** Sets the actual Slider Position trimming to the Max and Min Values */

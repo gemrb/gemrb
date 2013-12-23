@@ -67,34 +67,26 @@ Slider::~Slider()
 }
 
 /** Draws the Control on the Output Display */
-void Slider::Draw(unsigned short x, unsigned short y)
+void Slider::DrawInternal(Region& rgn)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
-	Region r( x + XPos, y + YPos, Width, Height );
 	if (BackGround) {
 		if (( BackGround->Width < Width ) || ( BackGround->Height < Height )) {
-			core->GetVideoDriver()->BlitTiled( r, BackGround, true );
+			core->GetVideoDriver()->BlitTiled( rgn, BackGround, true );
 		} else {
-			core->GetVideoDriver()->BlitSprite( BackGround, x + XPos, y + YPos, true, &r );
+			core->GetVideoDriver()->BlitSprite( BackGround, rgn.x, rgn.y, true, &rgn );
 		}
 	}
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
 			core->GetVideoDriver()->BlitSprite( Knob,
-				x + XPos + KnobXPos + ( Pos * KnobStep ),
-				y + YPos + KnobYPos, true );
+				rgn.x + KnobXPos + ( Pos * KnobStep ),
+				rgn.y + KnobYPos, true );
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
 			core->GetVideoDriver()->BlitSprite( GrabbedKnob,
-				x + XPos + KnobXPos + ( Pos * KnobStep ),
-				y + YPos + KnobYPos, true );
+				rgn.x + KnobXPos + ( Pos * KnobStep ),
+				rgn.y + KnobYPos, true );
 			break;
 	}
 }

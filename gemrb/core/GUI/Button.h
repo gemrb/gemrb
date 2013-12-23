@@ -130,14 +130,15 @@ enum BUTTON_IMAGE_TYPE {
  */
 
 class GEM_EXPORT Button : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawRegion);
 public: 
 	Button(Region& frame);
 	~Button();
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
 	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */

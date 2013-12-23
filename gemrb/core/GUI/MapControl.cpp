@@ -57,8 +57,8 @@ Color colors[]={
  { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
-#define MAP_TO_SCREENX(x) (XWin + XPos + XCenter - ScrollX + (x))
-#define MAP_TO_SCREENY(y) (YWin + YPos + YCenter - ScrollY + (y))
+#define MAP_TO_SCREENX(x) (XWin + XCenter - ScrollX + (x))
+#define MAP_TO_SCREENY(y) (YWin + YCenter - ScrollY + (y))
 // Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is 
 //   already relative to control [XY]Pos there
 #define SCREEN_TO_MAPX(x) ((x) - XCenter + ScrollX)
@@ -122,15 +122,15 @@ MapControl::~MapControl(void)
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog(unsigned short XWin, unsigned short YWin)
+void MapControl::DrawFog(const Region& rgn)
 {
+	ieWord XWin = rgn.x;
+	ieWord YWin = rgn.y;
 	Video *video = core->GetVideoDriver();
 
 	Region old_clip;
 	video->GetClipRect(old_clip);
-
-	Region r( XWin + XPos, YWin + YPos, Width, Height );
-	video->SetClipRect(&r);
+	video->SetClipRect(&rgn);
 
 	// FIXME: this is ugly, the knowledge of Map and ExploredMask
 	//   sizes should be in Map.cpp
@@ -187,15 +187,13 @@ void MapControl::UpdateState(const char *VariableName, unsigned int Sum)
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::Draw(unsigned short XWin, unsigned short YWin)
+void MapControl::DrawInternal(Region& rgn)
 {
-	if (!Width || !Height) {
-		return;
-	}
+	ieWord XWin = rgn.x;
+	ieWord YWin = rgn.y;
 
 	if (Changed) {
 		Realize();
-		Changed = false;
 	}
 
 	// we're going to paint over labels/etc, so they need to repaint!
@@ -214,14 +212,12 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	}
 
 	Video* video = core->GetVideoDriver();
-	Region r( XWin + XPos, YWin + YPos, Width, Height );
-
 	if (MapMOS) {
-		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
-		DrawFog(XWin, YWin);
+		DrawFog(rgn);
 
 	Region vp = video->GetViewport();
 
@@ -271,7 +267,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 				continue;
 
 			if (anim) {
-				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &r );
+				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &rgn );
 			} else {
 				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn->color&7], false );
 			}

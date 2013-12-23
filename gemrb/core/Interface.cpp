@@ -3275,6 +3275,9 @@ void Interface::DrawWindows(bool allow_delete)
 		ModalWindow->DrawWindow();
 		return;
 	}
+	// FIXME: hack. seems like GameControl ought to be able to set Changed...
+	GameControl* gc = GetGameControl();
+	if (gc) gc->Changed = true;
 	size_t i = topwin.size();
 	while(i--) {
 		unsigned int t = topwin[i];
@@ -3297,9 +3300,10 @@ void Interface::DrawWindows(bool allow_delete)
 			}
 		}
 	}
+
 	// draw the console
 	if (ConsolePopped) {
-		console->Draw( 0, (Height * -1) + console->Height);
+		console->Draw( 0, (Height * -1) + console->ControlFrame().h);
 	}
 }
 

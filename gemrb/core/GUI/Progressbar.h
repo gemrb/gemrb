@@ -45,11 +45,12 @@ namespace GemRB {
  */
 
 class GEM_EXPORT Progressbar : public Control  {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
 public: 
 	Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear = false);
 	~Progressbar();
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Returns the actual Progressbar Position */
 	unsigned int GetPosition();
 	/** Sets the actual Progressbar Position trimming to the Max and Min Values */

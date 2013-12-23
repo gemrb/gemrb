@@ -52,11 +52,12 @@ class Palette;
  */
 
 class GEM_EXPORT TextEdit : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
 public:
 	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Set Font */
 	void SetFont(Font* f);
 	Font *GetFont();

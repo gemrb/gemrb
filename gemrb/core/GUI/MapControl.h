@@ -46,6 +46,10 @@ namespace GemRB {
  */
 
 class GEM_EXPORT MapControl : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
+	void DrawFog(const Region& rgn);
 public:
 	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;
@@ -74,9 +78,6 @@ public:
 	~MapControl(void);
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(const char *VariableName, unsigned int Sum);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short XWin, unsigned short YWin);
-	void DrawFog(unsigned short XWin, unsigned short YWin);
 	/** Compute parameters after changes in control's or screen geometry */
 	void Realize();
 

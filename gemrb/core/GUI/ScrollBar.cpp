@@ -166,16 +166,8 @@ double ScrollBar::GetStep()
 }
 
 /** Draws the ScrollBar control */
-void ScrollBar::Draw(unsigned short x, unsigned short y)
+void ScrollBar::DrawInternal(Region& drawFrame)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
-
 	Video *video=core->GetVideoDriver();
 	int upMy = GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
 	int doMy = GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED);
@@ -184,37 +176,37 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
 		if (Frames[IE_GUI_SCROLLBAR_UP_PRESSED])
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_PRESSED], x + XPos, y + YPos, true );
+			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_PRESSED], drawFrame.x, drawFrame.y, true );
 	} else {
 		if (Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED])
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED], x + XPos, y + YPos, true );
+			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED], drawFrame.x, drawFrame.y, true );
 	}
 	//draw the trough
-	int maxy = y + YPos + Height - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED);
+	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IE_GUI_SCROLLBAR_TROUGH);
 	if (stepy) {
-		Region rgn( x + XPos, y + YPos + upMy, Width, domy - upMy);
-		for (int dy = y + YPos + upMy; dy < maxy; dy += stepy) {
+		Region rgn( drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
+		for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 			//TROUGH surely exists if it has a nonzero height
 			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_TROUGH],
-				x + XPos + ( ( Width / 2 ) - Frames[IE_GUI_SCROLLBAR_TROUGH]->Width / 2 ),
+				drawFrame.x + ( ( Width / 2 ) - Frames[IE_GUI_SCROLLBAR_TROUGH]->Width / 2 ),
 				dy, true, &rgn );
 		}
 	}
 	//draw the down button
 	if (( State & DOWN_PRESS ) != 0) {
 		if (Frames[IE_GUI_SCROLLBAR_DOWN_PRESSED]) 
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_PRESSED], x + XPos, maxy, true );
+			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_PRESSED], drawFrame.x, maxy, true );
 	} else {
 		if (Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED])
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED], x + XPos, maxy, true );
+			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED], drawFrame.x, maxy, true );
 	}
 	//draw the slider if it exists
 	if (Frames[IE_GUI_SCROLLBAR_SLIDER]) {
 		unsigned short slx = ( unsigned short ) ((Width - Frames[IE_GUI_SCROLLBAR_SLIDER]->Width) / 2 );
 		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_SLIDER],
-			x + XPos + slx + Frames[IE_GUI_SCROLLBAR_SLIDER]->XPos,
-			y + YPos + Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos + SliderYPos,
+			drawFrame.x + slx + Frames[IE_GUI_SCROLLBAR_SLIDER]->XPos,
+			drawFrame.y + Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos + SliderYPos,
 			true );
 	}
 }

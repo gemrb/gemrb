@@ -66,12 +66,13 @@ class GEM_EXPORT Control {
 protected:
 	/** Focused Control */
 	bool hasFocus;
+	virtual void DrawInternal(Region& drawFrame)=0;
 public:
 	Control(const Region& frame);
 	virtual ~Control();
 	Region ControlFrame();
 	/** Draws the Control on the Output Display */
-	virtual void Draw(unsigned short x, unsigned short y) = 0;
+	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Text of the current control */
 	virtual void SetText(const char* string);
 	/** Sets the Tooltip text of the current control */

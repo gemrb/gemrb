@@ -57,16 +57,8 @@ Progressbar::~Progressbar()
 }
 
 /** Draws the Control on the Output Display */
-void Progressbar::Draw(unsigned short x, unsigned short y)
+void Progressbar::DrawInternal(Region& rgn)
 {
-	//it is unlikely that a floating window is above us, but...
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
 	Sprite2D *bcksprite;
 
 	if((Value >= 100) && KnobStepsCount && BackGround2) {
@@ -76,9 +68,8 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 		bcksprite=BackGround;
 	}
 	if (bcksprite) {
-		Region r( x + XPos, y + YPos, Width, Height );
 		core->GetVideoDriver()->BlitSprite( bcksprite,
-			x + XPos, y + YPos, true, &r );
+			rgn.x, rgn.y, true, &rgn );
 		if( bcksprite==BackGround2) {
 			return; //done for animated progbar
 		}
@@ -92,12 +83,12 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 		int h = BackGround2->Height;
 		//this is the PST/IWD specific part
 		Count = Value*w/100;
-		Region r( x + XPos + KnobXPos, y + YPos + KnobYPos, Count, h );
+		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
 		core->GetVideoDriver()->BlitSprite( BackGround2, 
 			r.x, r.y, true, &r );
 
 		core->GetVideoDriver()->BlitSprite( PBarCap,
-			x+XPos+CapXPos+Count-PBarCap->Width, y+YPos+CapYPos, true );
+			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos, true );
 		return;
 	}
 
@@ -105,7 +96,7 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, x , y , true );
+		core->GetVideoDriver()->BlitSprite( Knob, 0, 0, true );
 	}
 }
 

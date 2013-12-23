@@ -161,16 +161,8 @@ void Button::CloseUpColor()
 }
 
 /** Draws the Control on the Output Display */
-void Button::Draw(unsigned short x, unsigned short y)
+void Button::DrawInternal(Region& rgn)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535 || Width == 0) {
-		return;
-	}
-
 	Video * video = core->GetVideoDriver();
 
 	// Button image
@@ -203,26 +195,26 @@ void Button::Draw(unsigned short x, unsigned short y)
 			int xOffs = ( Width / 2 ) - ( Image->Width / 2 );
 			int yOffs = ( Height / 2 ) - ( Image->Height / 2 );
 
-			video->BlitSprite( Image, x + XPos + xOffs, y + YPos + yOffs, true );
+			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs, true );
 		}
 	}
 
 	if (State == IE_GUI_BUTTON_PRESSED) {
 		//shift the writing/border a bit
-		x+= PushOffset.x;
-		y+= PushOffset.y;
+		rgn.x += PushOffset.x;
+		rgn.y += PushOffset.y;
 	}
 
 	// Button picture
 	if (AnimPicture) {
 		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
 
 		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, x + XPos + xOffs + AnimPicture->XPos, y + YPos + yOffs + AnimPicture->YPos, true, &r );
+			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
 		} else {
-			video->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
 		}
 	}
 
@@ -230,8 +222,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 	int picXPos = 0, picYPos = 0;
 	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
-		picXPos = ( Width / 2 ) - ( Picture->Width / 2 ) + x + XPos;
-		picYPos = ( Height / 2 ) - ( Picture->Height / 2 ) + y + YPos;
+		picXPos = ( rgn.w / 2 ) - ( Picture->Width / 2 ) + rgn.x;
+		picYPos = ( rgn.h / 2 ) - ( Picture->Height / 2 ) + rgn.y;
 		if (Flags & IE_GUI_BUTTON_HORIZONTAL) {
 			picXPos += Picture->XPos;
 			picYPos += Picture->YPos;
@@ -281,7 +273,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite( *iter, x + XPos + xOffs, y + YPos + yOffs, true );
+			video->BlitSprite( *iter, rgn.x + xOffs, rgn.y + yOffs, true );
 		}
 	}
 
@@ -317,11 +309,11 @@ void Button::Draw(unsigned short x, unsigned short y)
 		Region r;
 		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
-			// we are subtracting IE_FONT_PADDING because Font indents 5px, but we dont want that here
+			// FIXME: we are subtracting IE_FONT_PADDING because Font indents 5px, but we dont want that here
 			r = Region(picXPos - IE_FONT_PADDING, picYPos + IE_FONT_PADDING,
 					   Picture->Width + IE_FONT_PADDING, Picture->Height);
 		} else {
-			r = Region( x + XPos, y + YPos, Width - 2, Height - 2);
+			r = Region( rgn.x, rgn.y, rgn.w - 2, rgn.h - 2);
 		}
 
 		font->Print( r, ( unsigned char * ) Text, ppoi, (ieByte) align, true );
@@ -332,7 +324,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			ButtonBorder *fr = &borders[i];
 			if (! fr->enabled) continue;
 
-			Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
+			Region r = Region( rgn.x + fr->dx1, rgn.y + fr->dy1, rgn.w - (fr->dx1 + fr->dx2 + 1), rgn.h - (fr->dy1 + fr->dy2 + 1) );
 			video->DrawRect( r, fr->color, fr->filled );
 		}
 	}

@@ -62,15 +62,14 @@ Console::~Console(void)
 }
 
 /** Draws the Console on the Output Display */
-void Console::Draw(unsigned short x, unsigned short y)
+void Console::DrawInternal(Region& drawFrame)
 {
 	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, 0, y, true );
+		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );
 	}
 
-	Region r( (short)x + XPos, (short)y + YPos, Width, Height );
-	core->GetVideoDriver()->DrawRect( r, ColorBlack );
-	font->Print( r, Buffer, palette,
+	core->GetVideoDriver()->DrawRect( drawFrame, ColorBlack );
+	font->Print( drawFrame, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL,
 			Cursor, CurPos, true );
 }

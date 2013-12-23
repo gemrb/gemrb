@@ -108,9 +108,10 @@ class GEM_EXPORT GameControl : public Control {
 public:
 	GameControl(const Region& frame);
 	~GameControl(void);
-public:
+protected:
 	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
+	void DrawInternal(Region& drawFrame);
+public:
 	/** Draws the target reticle for Actor movement. */
 	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
 	/** Sets multiple quicksaves flag*/

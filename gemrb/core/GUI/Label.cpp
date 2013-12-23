@@ -52,18 +52,10 @@ Label::~Label()
 	}
 }
 /** Draws the Control on the Output Display */
-void Label::Draw(unsigned short x, unsigned short y)
+void Label::DrawInternal(Region& rgn)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT)) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
 	if (font && Buffer) {
-		font->Print( Region( this->XPos + x, this->YPos + y,
-			this->Width, this->Height ), (unsigned char*)Buffer,
+		font->Print( rgn, (unsigned char*)Buffer,
 			useRGB?palette:NULL,
 					 Alignment | IE_FONT_SINGLE_LINE, true );
 	}
@@ -71,8 +63,8 @@ void Label::Draw(unsigned short x, unsigned short y)
 	if (AnimPicture) {
 		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
-		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
+		core->GetVideoDriver()->BlitSprite( AnimPicture, r.x + xOffs, r.y + yOffs, true, &r );
 	}
 
 }

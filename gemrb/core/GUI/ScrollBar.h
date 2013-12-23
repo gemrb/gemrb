@@ -61,6 +61,8 @@ namespace GemRB {
 #define SB_RES_COUNT 6
 
 class GEM_EXPORT ScrollBar : public Control {
+protected:
+	void DrawInternal(Region& drawFrame);
 public:
 	ScrollBar(const Region& frame);
 	~ScrollBar(void);
@@ -74,8 +76,6 @@ public:
 	double GetStep();
 	/** refreshes scrollbar if associated with VarName */
 	void UpdateState(const char* VarName, unsigned int Sum);
-	/**/
-	void Draw(unsigned short x, unsigned short y);
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
 	Sprite2D* Frames[SB_RES_COUNT];
