@@ -2022,7 +2022,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	if (!btn) {
 		return NULL;
 	}
-	Label* lbl = new Label( core->GetFont( font ) );
+	Label* lbl = new Label( core->GetFont( font ), "" );
 	lbl->XPos = btn->XPos;
 	lbl->YPos = btn->YPos;
 	lbl->Width = btn->Width;
@@ -2061,7 +2061,7 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	Label* lbl = new Label( core->GetFont( font ) );
+	Label* lbl = new Label( core->GetFont( font ), text );
 	lbl->XPos = x;
 	lbl->YPos = y;
 	lbl->Width = w;
@@ -2069,7 +2069,6 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	lbl->ControlID = ControlID;
 	lbl->ControlType = IE_GUI_LABEL;
 	lbl->Owner = win;
-	lbl->SetText( text );
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 

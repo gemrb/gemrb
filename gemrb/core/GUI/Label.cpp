@@ -31,7 +31,7 @@
 
 namespace GemRB {
 
-Label::Label(Font* font)
+Label::Label(Font* font, const char* string)
 {
 	this->font = font;
 	Buffer = NULL;
@@ -40,6 +40,7 @@ Label::Label(Font* font)
 
 	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
 	palette = NULL;
+	SetText(string);
 }
 Label::~Label()
 {

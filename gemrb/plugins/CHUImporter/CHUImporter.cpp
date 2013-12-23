@@ -414,16 +414,16 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &fore, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &alignment );
-				Label* lab = new Label( fnt );
+				char* str = core->GetString( StrRef );
+				Label* lab = new Label( fnt, str );
+				core->FreeString( str );
 				lab->ControlID = ControlID;
 				lab->XPos = XPos;
 				lab->YPos = YPos;
 				lab->Width = Width;
 				lab->Height = Height;
 				lab->ControlType = ControlType;
-				char* str = core->GetString( StrRef );
-				lab->SetText( str );
-				core->FreeString( str );
+
 				if (alignment & 1) {
 					lab->useRGB = true;
 					Color f, b;
