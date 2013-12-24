@@ -96,13 +96,27 @@ void TextArea::RefreshSprite(const char *portrait)
 	SetAnimPicture ( im->GetSprite2D() );
 }
 
+bool TextArea::NeedsDraw()
+{
+	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
+		//this might look better in GlobalTimer
+		//or you might want to change the animated button to work like this
+		static bool redraw = true;
+		if (redraw) {
+			redraw = false; // prevent recursive reentry from DrawWindow() below
+			// FIXME: hack: because TextArea has no background, we get "streaky" text
+			// if we dont redraw the entire window (the background) before animating a scroll
+			Owner->Invalidate();
+			Owner->DrawWindow();
+			redraw = true;
+		}
+		return redraw;
+	}
+	return Control::NeedsDraw();
+}
+
 void TextArea::DrawInternal(Region& clip)
 {
-	/** Don't come back recursively */
-	if (InternalFlags&TA_BITEMYTAIL) {
-		return;
-	}
-
 	Video *video = core->GetVideoDriver();
 
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
@@ -113,8 +127,6 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	//this might look better in GlobalTimer
-	//or you might want to change the animated button to work like this
 	if (Flags &IE_GUI_TEXTAREA_SMOOTHSCROLL)
 	{
 		unsigned long thisTime;
@@ -125,12 +137,6 @@ void TextArea::DrawInternal(Region& clip)
 
 			TextYPos++;// can't use ScrollToY
 			if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
-
-			/** Forcing redraw of whole screen before drawing text*/
-			Owner->Invalidate();
-			InternalFlags |= TA_BITEMYTAIL;
-			Owner->DrawWindow();
-			InternalFlags &= ~TA_BITEMYTAIL;
 		}
 	}
 

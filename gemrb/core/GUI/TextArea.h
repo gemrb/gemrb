@@ -53,7 +53,6 @@ namespace GemRB {
 
 // internal flags
 #define TA_INITIALS    1
-#define TA_BITEMYTAIL  2
 
 /**
  * @class TextArea
@@ -65,6 +64,7 @@ class GEM_EXPORT TextArea : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
+	bool NeedsDraw();
 public:
 	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
