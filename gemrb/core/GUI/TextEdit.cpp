@@ -126,7 +126,6 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (Key >= 0x20) {
 		if (Value && ( (Key<'0') || (Key>'9') ) )
 			return false;
-		Owner->Invalidate();
 		MarkDirty();
 		int len = ( int ) strlen( ( char* ) Buffer );
 		if (len + 1 < max) {
@@ -147,7 +146,6 @@ bool TextEdit::OnSpecialKeyPress(unsigned char Key)
 {
 	int len;
 
-	Owner->Invalidate();
 	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:
@@ -205,9 +203,7 @@ void TextEdit::SetText(const char* string)
 	int len = strlcpy( ( char * ) Buffer, string, max + 1 );
 	if (len > max) CurPos = max + 1;
 	else CurPos = len;
-	if (Owner) {
-		Owner->Invalidate();
-	}
+	MarkDirty();
 }
 
 void TextEdit::SetBufferLength(ieWord buflen)

@@ -448,7 +448,6 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
-			Owner->Invalidate();
 			MarkDirty();
 			int len = GetRowLength(CurLine);
 			//print("len: %d Before: %s", len, lines[CurLine]);
@@ -507,7 +506,6 @@ bool TextArea::OnSpecialKeyPress(unsigned char Key)
 	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
 		return false;
 	}
-	Owner->Invalidate();
 	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:

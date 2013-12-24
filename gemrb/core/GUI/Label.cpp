@@ -89,9 +89,7 @@ void Label::SetText(const char* string)
 	if (!palette) {
 		SetColor(ColorWhite, ColorBlack);
 	}
-	if (Owner) {
-		Owner->Invalidate();
-	}
+	MarkDirty();
 }
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)

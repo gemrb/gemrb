@@ -701,7 +701,6 @@ void Button::SetPicture(Sprite2D* newpic)
 	Picture = newpic;
 	MarkDirty();
 	Flags |= IE_GUI_BUTTON_PICTURE;
-	Owner->Invalidate();
 }
 
 /** Clears the list of Pictures */
@@ -713,7 +712,6 @@ void Button::ClearPictureList()
 		video->FreeSprite( *iter );
 	PictureList.clear();
 	MarkDirty();
-	Owner->Invalidate();
 }
 
 /** Add picture to the end of the list of Pictures */
@@ -722,7 +720,6 @@ void Button::StackPicture(Sprite2D* Picture)
 	PictureList.push_back(Picture);
 	MarkDirty();
 	Flags |= IE_GUI_BUTTON_PICTURE;
-	Owner->Invalidate();
 }
 
 bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
