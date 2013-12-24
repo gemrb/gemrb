@@ -798,7 +798,7 @@ def IdentifyUseSpell ():
 	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
-	GemRB.HasSpecialSpell (pc, 1, 1)
+	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
@@ -843,7 +843,7 @@ def IdentifyItemWindow ():
 	else:
 		Button.SetText (17105)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyUseSpell)
-	if not GemRB.HasSpecialSpell (pc, 1, 0):
+	if not GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (1)
