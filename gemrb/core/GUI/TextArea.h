@@ -51,9 +51,6 @@ namespace GemRB {
 #define IE_GUI_TEXTAREA_ALT_FONT     32   //this one disables drop capitals
 #define IE_GUI_TEXTAREA_EDITABLE     64
 
-// internal flags
-#define TA_INITIALS    1
-
 /**
  * @class TextArea
  * Widget capable of displaying long paragraphs of text.
@@ -145,8 +142,7 @@ private: // Private attributes
 	Palette* initpalette;
 	Palette* selected;
 	Palette* lineselpal;
-	/** a hack for smooth windows, drop capitals */
-	ieDword InternalFlags;
+
 	/** Fonts */
 	Font* finit, * ftext;
 	ieResRef PortraitResRef;
