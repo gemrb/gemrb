@@ -2375,9 +2375,9 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( tmpstr );
 	}
 	Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
-	btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-	tspr = af->GetFrame( pressed, (unsigned char) cycle);
 	btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
+	tspr = af->GetFrame( pressed, (unsigned char) cycle);
+	btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 	tspr = af->GetFrame( selected, (unsigned char) cycle);
 	btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
 	tspr = af->GetFrame( disabled, (unsigned char) cycle);
