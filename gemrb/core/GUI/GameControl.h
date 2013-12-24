@@ -133,10 +133,6 @@ private:
 	Point FormationPivotPoint;
 	Point FormationApplicationPoint;
 	short StartX, StartY;
-	// following variables used for touch scroll areas
-	bool touchScrollAreasEnabled; // true, if scroll areas enabled
-	bool touched; // true, if player touched screen (left button down and hold)
-	unsigned int scrollAreasWidth; // scroll areas width
 
 public:
 	Door* overDoor;
