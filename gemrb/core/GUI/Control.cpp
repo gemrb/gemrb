@@ -79,6 +79,11 @@ Region Control::ControlFrame()
 	return Region(XPos, YPos, Width, Height);
 }
 
+bool Control::NeedsDraw()
+{
+	return (Changed || (Owner->Flags&WF_FLOAT));
+}
+
 void Control::Draw(unsigned short x, unsigned short y)
 {
 	// FIXME: Draw shouldnt be getting called on controls that are offscreen...
@@ -89,10 +94,10 @@ void Control::Draw(unsigned short x, unsigned short y)
 	if (!Width || !Height) {
 		return;
 	}
-	//it is unlikely that a floating window is above us, but...
-	if (!Changed && (Owner && !(Owner->Flags&WF_FLOAT)) ) {
+	if (!NeedsDraw()) {
 		return;
 	}
+
 	Region drawFrame = Region(x + XPos, y + YPos, Width, Height);
 	DrawInternal(drawFrame);
 	Changed = false; // set *after* calling DrawInternal

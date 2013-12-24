@@ -166,7 +166,6 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 			Buffer[0] = 0;
 			CurPos = 0;
 			HistPos = 0;
-			Changed = true;
 			break;
 	}
 	return true;

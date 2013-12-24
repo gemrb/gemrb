@@ -106,8 +106,6 @@ void WorldMapControl::DrawInternal(Region& rgn)
 	ieWord YWin = rgn.y;
 	WorldMap* worldmap = core->GetWorldMap();
 
-	if(!Changed)
-		return;
 	Video* video = core->GetVideoDriver();
 	Region clipbackup;
 	video->GetClipRect(clipbackup);
@@ -208,7 +206,7 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
-	Changed = true;
+	MarkDirty();
 	Area = NULL;
 }
 
@@ -368,8 +366,6 @@ bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 
 bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_WORLDMAP_ON_PRESS:
 		WorldMapControlOnPress = handler;
@@ -420,7 +416,7 @@ void WorldMapControl::SetColor(int which, Color color)
 		break;
 	}
 
-	Changed = true;
+	MarkDirty();
 }
 
 }

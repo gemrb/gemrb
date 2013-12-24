@@ -98,7 +98,7 @@ void Label::SetColor(Color col, Color bac)
 {
 	gamedata->FreePalette( palette );
 	palette = core->CreatePalette( col, bac );
-	Changed = true;
+	MarkDirty();
 }
 
 void Label::SetAlignment(unsigned char Alignment)
@@ -109,7 +109,7 @@ void Label::SetAlignment(unsigned char Alignment)
 			strtolower( Buffer );
 		}
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 void Label::OnMouseUp(unsigned short x, unsigned short y,
@@ -128,8 +128,6 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 
 bool Label::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_LABEL_ON_PRESS:
 		LabelOnPress = handler;

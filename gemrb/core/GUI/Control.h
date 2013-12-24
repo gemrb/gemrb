@@ -63,16 +63,22 @@ class Window;
  */
 
 class GEM_EXPORT Control {
+private:
+	/** If true, control is redrawn during next call to gc->DrawWindows.
+	 * Then it's set back to false. */
+	bool Changed;
 protected:
 	/** Focused Control */
 	bool hasFocus;
 	virtual void DrawInternal(Region& drawFrame)=0;
+	virtual bool NeedsDraw();
 public:
 	Control(const Region& frame);
 	virtual ~Control();
 	Region ControlFrame();
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
+	void MarkDirty() { Changed = true; }
 	/** Sets the Text of the current control */
 	virtual void SetText(const char* string);
 	/** Sets the Tooltip text of the current control */
@@ -106,9 +112,6 @@ public: // Public attributes
 	/** Text to display as a tooltip when the mouse cursor hovers
 	 * for some time over the control */
 	char* Tooltip;
-	/** If true, control is redrawn during next call to gc->DrawWindows.
-	 * Then it's set back to false. */
-	bool Changed;
 	/** True if we are currently in an event handler */
 	bool InHandler;
 	/** Owner Window */

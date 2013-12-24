@@ -297,7 +297,6 @@ void TextArea::SetMinRow(bool enable)
 	} else {
 		minrow = 0;
 	}
-	Changed = true;
 }
 
 //drop lines scrolled out at the top.
@@ -405,7 +404,7 @@ void TextArea::UpdateControls()
 	int pos;
 
 	CalcRowCount();
-	Changed = true;
+	MarkDirty();
 	if (sb) {
 		ScrollBar* bar = ( ScrollBar* ) sb;
 		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -441,7 +440,7 @@ void TextArea::SetFonts(Font* init, Font* text)
 {
 	finit = init;
 	ftext = text;
-	Changed = true;
+	MarkDirty();
 }
 
 /** Key Press Event */
@@ -450,7 +449,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
 			Owner->Invalidate();
-			Changed = true;
+			MarkDirty();
 			int len = GetRowLength(CurLine);
 			//print("len: %d Before: %s", len, lines[CurLine]);
 			lines[CurLine] = (char *) realloc( lines[CurLine], len + 2 );
@@ -472,7 +471,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		return false;
 	GameControl *gc = core->GetGameControl();
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-		Changed = true;
+		MarkDirty();
 		seltext=minrow-1;
 		if ((unsigned int) seltext>=lines.size()) {
 			return true;
@@ -509,7 +508,7 @@ bool TextArea::OnSpecialKeyPress(unsigned char Key)
 		return false;
 	}
 	Owner->Invalidate();
-	Changed = true;
+	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:
 			CurPos = 0;
@@ -676,7 +675,7 @@ void TextArea::SetRow(int row)
 		startrow = row;
 		TextYPos = row * ftext->maxHeight;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 void TextArea::CalcRowCount()
@@ -789,14 +788,14 @@ void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 		row += lrows[i];
 		if (r < ( row - startrow )) {
 			if (seltext != (int) i)
-				Changed = true;
+				MarkDirty();
 			seltext = ( int ) i;
 			//print("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d", ControlID, i, rows, row, r);
 			return;
 		}
 	}
 	if (seltext != -1) {
-		Changed = true;
+		MarkDirty();
 	}
 	seltext = -1;
 	//print("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d", ControlID, seltext, rows, row, r);
@@ -811,7 +810,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short Butt
 
 	if ((x < Width) && (y < Height - 5) && (seltext != -1)) {
 		Value = (unsigned int) seltext;
-		Changed = true;
+		MarkDirty();
 		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
 			if (minrow > seltext)
 				return;
@@ -863,7 +862,7 @@ void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
 		return;
 	}
 	Value = Sum;
-	Changed = true;
+	MarkDirty();
 }
 
 void TextArea::SelectText(const char *select)
@@ -897,8 +896,6 @@ const char* TextArea::QueryText() const
 
 bool TextArea::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_TEXTAREA_ON_CHANGE:
 		TextAreaOnChange = handler;

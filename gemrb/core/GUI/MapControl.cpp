@@ -89,7 +89,7 @@ MapControl::MapControl(const Region& frame)
 	NotePosY = 0;
 	mouseIsDown = false;
 	mouseIsDragging = false;
-	Changed = true;
+	MarkDirty();
 	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
@@ -183,7 +183,7 @@ void MapControl::UpdateState(const char *VariableName, unsigned int Sum)
 		return;
 	}
 	Value = Sum;
-	Changed = true;
+	MarkDirty();
 }
 
 /** Draws the Control on the Output Display */
@@ -192,9 +192,7 @@ void MapControl::DrawInternal(Region& rgn)
 	ieWord XWin = rgn.x;
 	ieWord YWin = rgn.y;
 
-	if (Changed) {
-		Realize();
-	}
+	Realize();
 
 	// we're going to paint over labels/etc, so they need to repaint!
 	bool seen_this = false;
@@ -208,7 +206,7 @@ void MapControl::DrawInternal(Region& rgn)
 		if (ctrl == this) { seen_this = true; continue; }
 		if (!seen_this) continue;
 
-		ctrl->Changed = true;
+		ctrl->MarkDirty();
 	}
 
 	Video* video = core->GetVideoDriver();
@@ -490,8 +488,6 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 
 bool MapControl::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 		case IE_GUI_MAP_ON_PRESS:
 			MapControlOnPress = handler;

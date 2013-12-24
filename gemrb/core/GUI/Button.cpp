@@ -124,7 +124,7 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 			}
 		}*/
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** make SourceRGB go closer to DestRGB */
@@ -135,12 +135,11 @@ void Button::CloseUpColor()
 	//handle Game at this point
 	unsigned long newtime;
 
-	Changed = true;
 	newtime = GetTickCount();
 	if (newtime<starttime) {
 		return;
 	}
-
+	MarkDirty();
 	Color nc;
 
 	nc.r = (SourceRGB.r + DestRGB.r) / 2;
@@ -336,7 +335,7 @@ void Button::SetState(unsigned char state)
 		return;
 	}
 	if (State != state) {
-		Changed = true;
+		MarkDirty();
 		State = state;
 	}
 }
@@ -353,7 +352,7 @@ void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Colo
 	fr->color = color;
 	fr->enabled = enabled;
 	fr->filled = filled;
-	Changed = true;
+	MarkDirty();
 }
 
 void Button::EnableBorder(int index, bool enabled)
@@ -363,7 +362,7 @@ void Button::EnableBorder(int index, bool enabled)
 
 	if (borders[index].enabled != enabled) {
 		borders[index].enabled = enabled;
-		Changed = true;
+		MarkDirty();
 	}
 }
 
@@ -627,7 +626,7 @@ void Button::SetText(const char* string)
 			strtoupper( Text );
 		hasText = true;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Set Event Handler */
@@ -667,7 +666,6 @@ bool Button::SetEvent(int eventType, EventHandler handler)
 	default:
 		return false;
 	}
-	Changed = true;
 	return true;
 }
 
@@ -701,7 +699,7 @@ void Button::SetPicture(Sprite2D* newpic)
 	core->GetVideoDriver()->FreeSprite( Picture );
 	ClearPictureList();
 	Picture = newpic;
-	Changed = true;
+	MarkDirty();
 	Flags |= IE_GUI_BUTTON_PICTURE;
 	Owner->Invalidate();
 }
@@ -714,7 +712,7 @@ void Button::ClearPictureList()
 		 iter != PictureList.end(); ++iter)
 		video->FreeSprite( *iter );
 	PictureList.clear();
-	Changed = true;
+	MarkDirty();
 	Owner->Invalidate();
 }
 
@@ -722,7 +720,7 @@ void Button::ClearPictureList()
 void Button::StackPicture(Sprite2D* Picture)
 {
 	PictureList.push_back(Picture);
-	Changed = true;
+	MarkDirty();
 	Flags |= IE_GUI_BUTTON_PICTURE;
 	Owner->Invalidate();
 }
@@ -743,7 +741,7 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 {
 	gamedata->FreePalette( normal_palette );
 	normal_palette = core->CreatePalette( fore, back );
-	Changed = true;
+	MarkDirty();
 }
 
 void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color &dest)
@@ -763,7 +761,7 @@ void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color
 #endif
 	}
 	Clipping = clip;
-	Changed = true;
+	MarkDirty();
 }
 
 void Button::SetAnchor(ieWord x, ieWord y)

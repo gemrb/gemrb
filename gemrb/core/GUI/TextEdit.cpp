@@ -63,7 +63,7 @@ TextEdit::~TextEdit(void)
 void TextEdit::SetAlignment(unsigned char Alignment)
 {
     this->Alignment = Alignment;
-    Changed = true;
+    MarkDirty();
 }
 
 /** Draws the Control on the Output Display */
@@ -92,7 +92,7 @@ void TextEdit::SetFont(Font* f)
 {
 	if (f != NULL) {
 		font = f;
-		Changed = true;
+		MarkDirty();
 		return;
 	}
 	Log(ERROR, "TextEdit", "Invalid font set!");
@@ -107,7 +107,7 @@ void TextEdit::SetCursor(Sprite2D* cur)
 	if (cur != NULL) {
 		Cursor = cur;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Set BackGround */
@@ -117,7 +117,7 @@ void TextEdit::SetBackGround(Sprite2D* back)
 	if (Back)
 		core->GetVideoDriver()->FreeSprite(Back);
 	Back = back;
-	Changed = true;
+	MarkDirty();
 }
 
 /** Key Press Event */
@@ -127,7 +127,7 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		if (Value && ( (Key<'0') || (Key>'9') ) )
 			return false;
 		Owner->Invalidate();
-		Changed = true;
+		MarkDirty();
 		int len = ( int ) strlen( ( char* ) Buffer );
 		if (len + 1 < max) {
 			for (int i = len; i > CurPos; i--) {
@@ -148,7 +148,7 @@ bool TextEdit::OnSpecialKeyPress(unsigned char Key)
 	int len;
 
 	Owner->Invalidate();
-	Changed = true;
+	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:
 			CurPos = 0;
@@ -228,8 +228,6 @@ const char* TextEdit::QueryText() const
 
 bool TextEdit::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_EDIT_ON_CHANGE:
 		EditOnChange = handler;

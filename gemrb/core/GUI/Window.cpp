@@ -232,11 +232,11 @@ void Window::SetFocused(Control* ctrl)
 void Window::SetMouseFocused(Control* ctrl)
 {
 	if (lastMouseFocus != NULL) {
-		lastMouseFocus->Changed = true;
+		lastMouseFocus->MarkDirty();
 	}
 	lastMouseFocus = ctrl;
 	if (ctrl != NULL) {
-		lastMouseFocus->Changed = true;
+		lastMouseFocus->MarkDirty();
 	}
 }
 
@@ -324,7 +324,7 @@ void Window::Invalidate()
 		if (!Controls[i]) {
 			continue;
 		}
-		Controls[i]->Changed = true;
+		Controls[i]->MarkDirty();
 		switch (Controls[i]->ControlType) {
 			case IE_GUI_SCROLLBAR:
 				if ((ScrollControl == -1) || (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT))

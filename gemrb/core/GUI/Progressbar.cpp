@@ -113,7 +113,7 @@ void Progressbar::SetPosition(unsigned int pos)
 	if (Value == pos)
 		return;
 	Value = pos;
-	Changed = true;
+	MarkDirty();
 }
 
 void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
@@ -122,7 +122,8 @@ void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
 		return;
 	}
 	SetPosition(Sum);
-	if((Value==100) && Changed)
+	MarkDirty();
+	if(Value==100)
 		RunEventHandler( EndReached );
 }
 
@@ -135,7 +136,7 @@ void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 	if (BackGround2 && Clear)
 		core->GetVideoDriver()->FreeSprite( BackGround2 );
 	BackGround2 = img2;
-	Changed = true;
+	MarkDirty();
 }
 
 void Progressbar::SetBarCap(Sprite2D* img3)
@@ -160,8 +161,6 @@ void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
 
 bool Progressbar::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_PROGRESS_END_REACHED:
 		EndReached = handler;

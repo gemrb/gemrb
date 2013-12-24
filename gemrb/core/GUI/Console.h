@@ -61,6 +61,8 @@ public:
 protected:
 	/** Draws the Console on the Output Display */
 	void DrawInternal(Region& drawFrame);
+	// console always needs to redraw
+	bool NeedsDraw() { return true; };
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;

@@ -1562,7 +1562,7 @@ void GameControl::UpdateScrolling() {
 	video->FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;
-	Changed = true;
+	MarkDirty();
 }
 
 void GameControl::SetScrolling(bool scroll) {

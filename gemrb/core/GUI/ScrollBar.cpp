@@ -94,7 +94,7 @@ void ScrollBar::SetPos(ieDword NewPos, bool redraw)
 		return;
 	}
 	
-	Changed = true;
+	MarkDirty();
 	Pos = (ieWord) NewPos;
 	if (ta) {
 		(( TextArea* )ta)->SetRow( Pos );
@@ -221,7 +221,7 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 		core->GetVideoDriver()->FreeSprite(Frames[type]);
 	}
 	Frames[type] = img;
-	Changed = true;
+	MarkDirty();
 }
 
 /** Mouse Button Down */
@@ -264,7 +264,7 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 			unsigned short /*Button*/, unsigned short /*Mod*/)
 {
-	Changed = true;
+	MarkDirty();
 	State = 0;
 	Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = 0; //this is to clear any offset incurred by grabbing the slider
 }
@@ -303,8 +303,6 @@ void ScrollBar::SetMax(unsigned short Max)
 /** Sets the ScrollBarOnChange event (guiscript callback) */
 bool ScrollBar::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_SCROLLBAR_ON_CHANGE:
 		ScrollBarOnChange = handler;

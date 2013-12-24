@@ -108,7 +108,7 @@ void Slider::SetPosition(unsigned int pos)
 			Value = 1;
 		core->GetDictionary()->SetAt( VarName, pos * Value );
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Refreshes a slider which is associated with VariableName */
@@ -124,7 +124,7 @@ void Slider::UpdateState(const char* VariableName, unsigned int Sum)
 	if (Sum <= KnobStepsCount) {
 		Pos = Sum;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Sets the selected image */
@@ -149,14 +149,14 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 			BackGround = img;
 			break;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Mouse Button Down */
 void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Button*/,
 	unsigned short /*Mod*/)
 {
-	Changed = true;
+	MarkDirty();
 	unsigned int oldPos = Pos;
 	int mx = (KnobXPos + ( Pos * KnobStep ) - Knob->XPos);
 	int my = (KnobYPos - Knob->YPos);
@@ -230,7 +230,7 @@ void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned shor
 	unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
-		Changed = true;
+		MarkDirty();
 	}
 	State = IE_GUI_SLIDER_KNOB;
 }
@@ -238,7 +238,7 @@ void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned shor
 /** Mouse Over Event */
 void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 {
-	Changed = true;
+	MarkDirty();
 	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
 		int mx = KnobXPos;
@@ -273,8 +273,6 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 /** Sets the slider change event */
 bool Slider::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_SLIDER_ON_CHANGE:
 		SliderOnChange = handler;
