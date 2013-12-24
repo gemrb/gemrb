@@ -221,12 +221,10 @@ void Window::SetFocused(Control* ctrl)
 {
 	if (lastFocus != NULL) {
 		lastFocus->SetFocus(false);
-		lastFocus->Changed = true;
 	}
 	lastFocus = ctrl;
 	if (ctrl != NULL) {
 		lastFocus->SetFocus(true);
-		lastFocus->Changed = true;
 	}
 }
 

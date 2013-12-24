@@ -205,6 +205,7 @@ bool Control::OnSpecialKeyPress(unsigned char Key)
 void Control::SetFocus(bool focus)
 {
 	hasFocus = focus;
+	Changed = true;
 }
 
 bool Control::isFocused()
