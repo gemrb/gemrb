@@ -9744,17 +9744,17 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasSpecialSpell__doc,
-"HasSpecialSpell(pc, itemtype, useup) => bool\n\n"
+"HasSpecialSpell(pc, specialtype, useup) => bool\n\n"
 "Checks if a team member has a spell, optionally uses it.");
 
-//itemtype 1 - identify
-//         2 - can use in silence
-//         4 - cannot use in wildsurge
+//specialtype 1 - identify
+//            2 - can use in silence
+//            4 - cannot use in wildsurge
 static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, itemtype, useup;
+	int globalID, specialtype, useup;
 
-	if (!PyArg_ParseTuple( args, "iii", &globalID, &itemtype, &useup)) {
+	if (!PyArg_ParseTuple( args, "iii", &globalID, &specialtype, &useup)) {
 		return AttributeError( GemRB_HasSpecialSpell__doc );
 	}
 
@@ -9767,7 +9767,7 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	}
 	SpellDescType *special_spells = core->GetSpecialSpells();
 	while(i--) {
-		if (itemtype&special_spells[i].value) {
+		if (specialtype & special_spells[i].value) {
 			if (actor->spellbook.HaveSpell(special_spells[i].resref,useup)) {
 				if (useup) {
 					//actor->SpellCast(SpecialSpells[i].resref, actor);
