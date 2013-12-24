@@ -532,12 +532,12 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		}
 	case STI_TWO_ROWS:
 		//used in checks where any of two matches are ok (golem or undead etc)
-		if (check_iwd_targeting(Owner, target, value, idx)) return 1;
+		if (check_iwd_targeting(Owner, target, value, rel)) return 1;
 		if (check_iwd_targeting(Owner, target, value, val)) return 1;
 		return 0;
 	case STI_NOT_TWO_ROWS:
 		//this should be the opposite as above
-		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
+		if (check_iwd_targeting(Owner, target, value, rel)) return 0;
 		if (check_iwd_targeting(Owner, target, value, val)) return 0;
 		return 1;
 	case STI_SOURCE_TARGET:
