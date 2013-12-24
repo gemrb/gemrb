@@ -20,3 +20,4 @@ LSR_FULL    = 6  #can't learn more spells of this level (due to level)
 SP_IDENTIFY = 1  # any spell that cannot be cast from the menu
 SP_SILENCE  = 2  # any spell that can be cast in silence
 SP_SURGE    = 4  # any spell that cannot be cast during a wild surge
+SP_REST     = 8  # any spell that is cast upon rest if memorized
