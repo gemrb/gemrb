@@ -1,10 +1,12 @@
-GemRB git (95288c):
+GemRB git (bdfbe4b30):
   New features:
+    - 
     - utf-8 converter for dialog.tlk to be able to use any (cjk) font
 
   Improved features:
     - 
-    - inventory
+    - spawngroups, autopause
+    - inventory, pst guiscripts
     - animations, scripting, dialog, touch input, mac gui
     - bugfixes
 
