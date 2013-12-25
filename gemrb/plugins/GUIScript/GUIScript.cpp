@@ -1359,7 +1359,7 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	return PyString_FromString(ctrl->QueryText() ?: "");
+	return PyString_FromString(ctrl->QueryText());
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
