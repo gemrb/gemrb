@@ -277,6 +277,7 @@ void MapControl::DrawInternal(Region& rgn)
 void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if (mouseIsDown) {
+		MarkDirty();
 		ScrollX -= x - lastMouseX;
 		ScrollY -= y - lastMouseY;
 
@@ -428,6 +429,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 		return;
 	}
 
+	MarkDirty();
 	mouseIsDown = false;
 	mouseIsDragging = false;
 	switch(Value) {
@@ -483,6 +485,7 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
+	MarkDirty();
 	return true;
 }
 
