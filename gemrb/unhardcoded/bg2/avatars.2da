@@ -225,7 +225,7 @@
 0x7F35     MMIS       MMIS       MMIS       MMIS       4          2          1          *
 0x7F36     NSHD       NSHD       NSHD       NSHD       4          2          1          *
 0x7F37     NIRE       NIRE       NIRE       NIRE       4          2          1          *
-0x7F38     MEYE       MEYE       MEYE       MEYE       14         2          1          *
+0x7F38     MEYE       MEYE       MEYE       MEYE       19         2          1          *
 0x7F39     MMST       MMST       MMST       MMST       19         2          1          *
 0x7F3A     NIRO       NIRO       NIRO       NIRO       4          2          1          *
 0x7F3B     MSOL       MSOL       MSOL       MSOL       4          2          1          *
