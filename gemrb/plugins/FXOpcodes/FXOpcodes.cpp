@@ -4295,13 +4295,8 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->SetSpellResRef(fx->Resource);
-	//cast spell on target
-	//flags: deplete, instant, no interrupt
-	Owner->CastSpell(target, false, fx->Parameter2==1, true);
-	//actually finish casting (if this is not good enough, use an action???)
-	//flag: no casting animation
-	Owner->CastSpellEnd(fx->Parameter1, fx->Parameter2);
+	// flags: no deplete, instant?, no interrupt
+	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false, fx->Parameter2==1, true);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;
@@ -5962,10 +5957,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				}
 			}
 			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
-			Owner->SetSpellResRef(refs[i]);
-			//cast spell on target
-			Owner->CastSpell(actor, false, true, true); //flags: deplete, instant, no interrupt
-			Owner->CastSpellEnd(fx->Power, 1); //flag: no casting animation
+			// no casting animation, no deplete, instant, no interrupt
+			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false, true, true);
 		}
 		Owner->SetSpellResRef(OldSpellResRef);
 
