@@ -1649,6 +1649,11 @@ bool Game::RestParty(int checks, int dream, int hp)
 		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
+		// auto-cast memorized healing spells if requested and available
+		// run it only once, since it loops itself to save time
+		if (i+1 == GetPartySize(true)) {
+			CastOnRest();
+		}
 		//removes fatigue, recharges spells
 		tar->Rest(hours);
 		if (!hoursLeft)
@@ -1707,6 +1712,52 @@ bool Game::RestParty(int checks, int dream, int hp)
 	core->FreeString(tmpstr);
 	displaymsg->DisplayString(restindex, DMC_WHITE, 0);
 	return cutscene;
+}
+
+// heal on rest and similar
+void Game::CastOnRest()
+{
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
+	int specialCount = core->GetSpecialSpellsCount();
+
+	if (tmp && specialCount != -1) {
+		int ps = GetPartySize(true);
+		int ps2 = ps;
+		std::vector<Actor *> injurees;
+		for (int idx = 1; idx <= ps; idx++) {
+			Actor *tar = FindPC(idx);
+			if (tar->GetStat(IE_HITPOINTS) < tar->GetStat(IE_MAXHITPOINTS)) {
+				injurees.push_back(tar);
+			}
+		}
+		if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
+
+		SpellDescType *special_spells = core->GetSpecialSpells();
+		while (specialCount--) {
+			if (special_spells[specialCount].value & SP_REST) {
+				if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
+				// check each party member for the spell
+				while (ps--) {
+					Actor *tar = GetPC(ps, true);
+					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+						// we have the spell, so cast it on most injured
+						// NOTE: no distinction is made about the potency of spells
+						Actor *injuree = injurees[0];
+						tar->SetSpellResRef(special_spells[specialCount].resref);
+						tar->CastSpell(injuree, true, true, true);
+						tar->CastSpellEnd(0, 1);
+						if (injuree->GetStat(IE_HITPOINTS) == injuree->GetStat(IE_MAXHITPOINTS)) {
+							if (!injurees.empty()) {
+								injurees.erase(injurees.begin());
+							}
+						}
+					}
+				}
+				ps = ps2;
+			}
+		}
+	}
 }
 
 //timestop effect
