@@ -1744,9 +1744,7 @@ void Game::CastOnRest()
 						// we have the spell, so cast it on most injured
 						// NOTE: no distinction is made about the potency of spells
 						Actor *injuree = injurees[0];
-						tar->SetSpellResRef(special_spells[specialCount].resref);
-						tar->CastSpell(injuree, true, true, true);
-						tar->CastSpellEnd(0, 1);
+						tar->DirectlyCastSpell(injuree, special_spells[specialCount].resref, 0, 1, true, true, true);
 						if (injuree->GetStat(IE_HITPOINTS) == injuree->GetStat(IE_MAXHITPOINTS)) {
 							if (!injurees.empty()) {
 								injurees.erase(injurees.begin());

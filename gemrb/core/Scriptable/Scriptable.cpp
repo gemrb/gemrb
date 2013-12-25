@@ -1212,6 +1212,22 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 	free(neighbours);
 }
 
+// shortcut for internal use when there is no wait
+void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+{
+	SetSpellResRef(spellref);
+	CastSpellPoint(target, deplete, instant, nointerrupt);
+	CastSpellPointEnd(level, no_stance);
+}
+
+// shortcut for internal use
+void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+{
+	SetSpellResRef(spellref);
+	CastSpell(target, deplete, instant, nointerrupt);
+	CastSpellEnd(level, no_stance);
+}
+
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
