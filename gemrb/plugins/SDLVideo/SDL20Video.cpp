@@ -247,6 +247,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	}
 	SDL_UnlockTexture(screenTexture);
 
+	SDL_RenderClear(renderer);
 	SDL_Rect rect = RectFromRegion(subtitleregion);
 	SDL_RenderFillRect(renderer, &rect);
 	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
@@ -311,6 +312,7 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		}
 	}
 
+	SDL_RenderClear(renderer);
 	SDL_UnlockTexture(screenTexture);
 	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
 	SDL_RenderPresent(renderer);
