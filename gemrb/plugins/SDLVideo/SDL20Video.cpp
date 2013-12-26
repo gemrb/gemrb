@@ -248,12 +248,13 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_UnlockTexture(screenTexture);
 
 	SDL_RenderClear(renderer);
-	SDL_Rect rect = RectFromRegion(subtitleregion);
-	SDL_RenderFillRect(renderer, &rect);
 	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
 
-	if (titleref>0)
+	if (titleref>0) {
+		SDL_Rect rect = RectFromRegion(subtitleregion);
+		SDL_RenderFillRect(renderer, &rect);
 		DrawMovieSubtitle( titleref );
+	}
 
 	SDL_RenderPresent(renderer);
 }
