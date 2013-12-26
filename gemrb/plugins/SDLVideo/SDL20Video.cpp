@@ -747,7 +747,9 @@ void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
 
 void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
-	SDL_SetWindowBrightness(window, ((float)brightness/40.0));
+	// FIXME: hardcoded hack. in in Interface our default brigtness value is 10
+	// so we assume that to be "normal" (1.0) value.
+	SDL_SetWindowBrightness(window, (float)brightness/10.0);
 }
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
