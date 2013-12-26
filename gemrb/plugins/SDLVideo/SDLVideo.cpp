@@ -209,92 +209,91 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 #else
 			key = event.key.keysym.unicode;
 #endif
-			if (key < 32 || key == 127) {
-				switch (event.key.keysym.sym) {
-					case SDLK_ESCAPE:
-						key = GEM_ESCAPE;
-						break;
-					case SDLK_END:
-						key = GEM_END;
-						break;
-					case SDLK_HOME:
-						key = GEM_HOME;
-						break;
-					case SDLK_UP:
-					case SDLK_KP8:
-						key = GEM_UP;
-						break;
-					case SDLK_DOWN:
-					case SDLK_KP2:
-						key = GEM_DOWN;
-						break;
-					case SDLK_LEFT:
-					case SDLK_KP4:
-						key = GEM_LEFT;
-						break;
-					case SDLK_RIGHT:
-					case SDLK_KP6:
-						key = GEM_RIGHT;
-						break;
-					case SDLK_DELETE:
+			switch (event.key.keysym.sym) {
+				case SDLK_ESCAPE:
+					key = GEM_ESCAPE;
+					break;
+				case SDLK_END:
+					key = GEM_END;
+					break;
+				case SDLK_HOME:
+					key = GEM_HOME;
+					break;
+				case SDLK_UP:
+				case SDLK_KP8:
+					key = GEM_UP;
+					break;
+				case SDLK_DOWN:
+				case SDLK_KP2:
+					key = GEM_DOWN;
+					break;
+				case SDLK_LEFT:
+				case SDLK_KP4:
+					key = GEM_LEFT;
+					break;
+				case SDLK_RIGHT:
+				case SDLK_KP6:
+					key = GEM_RIGHT;
+					break;
+				case SDLK_DELETE:
 #if TARGET_OS_IPHONE < 1
-						//iOS currently doesnt have a backspace so we use delete.
-						//This change should be future proof in the event apple changes the delete key to a backspace.
-						key = GEM_DELETE;
-						break;
+					//iOS currently doesnt have a backspace so we use delete.
+					//This change should be future proof in the event apple changes the delete key to a backspace.
+					key = GEM_DELETE;
+					break;
 #endif
-					case SDLK_BACKSPACE:
-						key = GEM_BACKSP;
-						break;
-					case SDLK_RETURN:
-					case SDLK_KP_ENTER:
-						key = GEM_RETURN;
-						break;
-					case SDLK_LALT:
-					case SDLK_RALT:
-						key = GEM_ALT;
-						break;
-					case SDLK_TAB:
-						key = GEM_TAB;
-						break;
-					case SDLK_PAGEUP:
-						key = GEM_PGUP;
-						break;
-					case SDLK_PAGEDOWN:
-						key = GEM_PGDOWN;
-						break;
-					case SDLK_SCROLLOCK:
-						key = GEM_GRAB;
-						break;
-					case SDLK_F1:
-					case SDLK_F2:
-					case SDLK_F3:
-					case SDLK_F4:
-					case SDLK_F5:
-					case SDLK_F6:
-					case SDLK_F7:
-					case SDLK_F8:
-					case SDLK_F9:
-					case SDLK_F10:
-					case SDLK_F11:
-					case SDLK_F12:
-						//assuming they come sequentially,
-						//also, there is no need to ever produce more than 12
-						key = GEM_FUNCTION1+event.key.keysym.sym-SDLK_F1;
-						break;
-					default:
-						break;
-				}
-				if (core->ConsolePopped)
-					core->console->OnSpecialKeyPress( key );
-				else
-					EvntManager->OnSpecialKeyPress( key );
-			} else if (( key != 0 )) {
-				if (core->ConsolePopped)
-					core->console->OnKeyPress( key, modstate);
-				else
-					EvntManager->KeyPress( key, modstate);
+				case SDLK_BACKSPACE:
+					key = GEM_BACKSP;
+					break;
+				case SDLK_RETURN:
+				case SDLK_KP_ENTER:
+					key = GEM_RETURN;
+					break;
+				case SDLK_LALT:
+				case SDLK_RALT:
+					key = GEM_ALT;
+					break;
+				case SDLK_TAB:
+					key = GEM_TAB;
+					break;
+				case SDLK_PAGEUP:
+					key = GEM_PGUP;
+					break;
+				case SDLK_PAGEDOWN:
+					key = GEM_PGDOWN;
+					break;
+				case SDLK_SCROLLOCK:
+					key = GEM_GRAB;
+					break;
+				case SDLK_F1:
+				case SDLK_F2:
+				case SDLK_F3:
+				case SDLK_F4:
+				case SDLK_F5:
+				case SDLK_F6:
+				case SDLK_F7:
+				case SDLK_F8:
+				case SDLK_F9:
+				case SDLK_F10:
+				case SDLK_F11:
+				case SDLK_F12:
+					//assuming they come sequentially,
+					//also, there is no need to ever produce more than 12
+					key = GEM_FUNCTION1+event.key.keysym.sym-SDLK_F1;
+					break;
+				default:
+					if (( key != 0 )) {
+						if (core->ConsolePopped)
+							core->console->OnKeyPress( key, modstate);
+						else
+							EvntManager->KeyPress( key, modstate);
+					}
+					return GEM_OK;
 			}
+			if (core->ConsolePopped)
+				core->console->OnSpecialKeyPress( key );
+			else
+				EvntManager->OnSpecialKeyPress( key );
 			break;
 		case SDL_MOUSEMOTION:
 			MouseMovement(event.motion.x, event.motion.y);
