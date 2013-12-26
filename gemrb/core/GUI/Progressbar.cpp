@@ -96,7 +96,7 @@ void Progressbar::DrawInternal(Region& rgn)
 	Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, 0, 0, true );
+		core->GetVideoDriver()->BlitSprite( Knob, Owner->XPos, Owner->YPos, true );
 	}
 }
 
