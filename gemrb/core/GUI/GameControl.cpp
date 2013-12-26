@@ -2516,15 +2516,15 @@ void GameControl::SetDialogueFlags(int value, int mode)
 }
 
 //copies a screenshot into a sprite
-Sprite2D* GameControl::GetScreenshot(bool show_gui)
+Sprite2D* GameControl::GetScreenshot(const Region& rgn, bool show_gui)
 {
 	Sprite2D* screenshot;
 	if (show_gui) {
-		screenshot = core->GetVideoDriver()->GetScreenshot( Region( 0, 0, 0, 0) );
+		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
 	} else {
 		int hf = SetGUIHidden(true);
 		Draw (0, 0);
-		screenshot = core->GetVideoDriver()->GetScreenshot( Region( 0, 0, 0, 0 ) );
+		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
 		if (hf) {
 			SetGUIHidden(false);
 		}
@@ -2562,9 +2562,7 @@ Sprite2D* GameControl::GetPreview()
 	if (!x)
 		y = 0;
 
-	Draw (0, 0);
-	Sprite2D *screenshot = video->GetScreenshot( Region(x, y, w, h) );
-	core->DrawWindows();
+	Sprite2D *screenshot = GetScreenshot( Region(x, y, w, h) );
 
 	Sprite2D* preview = video->SpriteScaleDown ( screenshot, 5 );
 	video->FreeSprite( screenshot );

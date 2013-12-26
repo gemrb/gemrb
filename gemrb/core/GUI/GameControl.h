@@ -253,7 +253,7 @@ public:
 	/** changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
 	/** Returns game screenshot, with or without GUI controls */
-	Sprite2D* GetScreenshot( bool show_gui = 0 );
+	Sprite2D* GetScreenshot(const Region& rgn, bool show_gui = false );
 	/** Returns current area preview for saving a game */
 	Sprite2D* GetPreview();
 	/** Returns PC portrait for a currently running game */
