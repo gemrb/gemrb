@@ -270,10 +270,11 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	destRect.y = dsty;
 	destRect.w = w;
 	destRect.h = h;
-
+/*
+ // This is superseded by SDL_UpdateYUVTexture, but I havent throughly tested it.
+ // Not that I expect it to perform worse than the manual code :)
 	Uint8 *pixels;
 	int pitch;
-
 	if(SDL_LockTexture(screenTexture, NULL, (void**)&pixels, &pitch) != GEM_OK) {
 		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
 		return;
@@ -312,9 +313,11 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 			iV += strides[2];
 		}
 	}
-
-	SDL_RenderClear(renderer);
 	SDL_UnlockTexture(screenTexture);
+ */
+	SDL_RenderClear(renderer);
+	// FIXME: why do we have to invert the last 2 channels? I dont think the data is in the format we claim...
+	SDL_UpdateYUVTexture(screenTexture, NULL, buf[0], strides[0], buf[2], strides[2], buf[1], strides[1]);
 	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
 	SDL_RenderPresent(renderer);
 }
@@ -325,7 +328,6 @@ int SDL20VideoDriver::SwapBuffers(void)
 
 	void *pixels;
 	int pitch;
-
 	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
 		Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
 		return GEM_ERROR;
