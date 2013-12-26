@@ -26,7 +26,7 @@
 // For pixel formats:
 // We hardcode a single pixel format per bit depth.
 
-// SDL2 behavior observed on Android, iOS, and Windows. Linux, Mac unchecked.
+// SDL2 behavior observed on Android, iOS, Mac, and Windows. Linux unchecked.
 #if SDL_VERSION_ATLEAST(1,3,0)
 // NOTE: TARGET_OS_IPHONE must go before TARGET_OS_MAC
 // I don't know if its just the simulator, but TARGET_OS_MAC is set on iOS
