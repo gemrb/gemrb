@@ -1026,6 +1026,43 @@ def ActionWildShapesPressed ():
 	TypeSpellPressed(IE_IWD2_SPELL_SHAPE)
 	return
 
+def SpellShiftPressed ():
+	Spell = GemRB.GetVar ("Spell") # spellindex from spellbook jumbled with booktype
+	Type =  Spell // 1000
+	SpellIndex = Spell % 1000
+
+	# try spontaneous casting
+	if Type == 1<<IE_IWD2_SPELL_CLERIC and GemRB.HasResource ("sponcast", RES_2DA, 1):
+		pc = GemRB.GameGetFirstSelectedActor ()
+		SponCastTable = GemRB.LoadTable ("sponcast")
+		# determine the column number (spell variety) depending on alignment
+		CureOrHarm = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
+		if CureOrHarm % 16 == 3: # evil
+			CureOrHarm = 1
+		else:
+			CureOrHarm = 0
+
+		# figure out the spell's details
+		# TODO: find a simpler way
+		Spell = None
+		MemorisedSpells = Spellbook.GetSpellinfoSpells(pc, IE_IWD2_SPELL_CLERIC) #FIXME: we need Type unshifted for enabling conversion of other types
+		for spell in MemorisedSpells:
+			if spell['SpellIndex']%(255000) == SpellIndex: # 255 is the engine value of Type
+				Spell = spell
+				break
+
+		# rownames==level; col1: good+neutral; col2: evil resref
+		Level = Spell['SpellLevel']
+		ReplacementSpell = SponCastTable.GetValue (Level-1, CureOrHarm).upper()
+		if ReplacementSpell != Spell['SpellResRef'].upper():
+			SpellIndex = GemRB.PrepareSpontaneousCast (pc, Spell['SpellResRef'], Spell['BookType'], Level, ReplacementSpell)
+			GemRB.SetVar ("Spell", SpellIndex+1000*Type)
+			if GUICommon.GameIsIWD2():
+				GemRB.DisplayString (39742, 0xffffff, pc) # Spontaneous Casting
+
+	# proceed as if nothing happened
+	SpellPressed ()
+
 # This is the endpoint for spellcasting, finally calling SpellCast. This always happens at least
 # twice though, the second time to reset the action bar (more if wild magic or subspell selection is involved).
 # Spell and Type (spellbook type) are set during the spell bar construction/use, which is in turn

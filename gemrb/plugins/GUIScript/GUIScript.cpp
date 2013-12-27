@@ -9325,6 +9325,36 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_PrepareSpontaneousCast__doc,
+"PrepareSpontaneousCast(globalID, spellIndex, type, level, spellResRef) => index\n\n"
+"Depletes the memorised spell and replaces it with another (in memory).\n"
+"WARNING: useful only immediately before casting. Returns index of the new spell.\n");
+
+static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* args)
+{
+	int globalID, type, level;
+	const char *spell = NULL;
+	const char *spell2 = NULL;
+	ieResRef replacementSpell;
+
+	if (!PyArg_ParseTuple( args, "isiis", &globalID, &spell, &type, &level, &spell2)) {
+		return AttributeError( GemRB_PrepareSpontaneousCast__doc );
+	}
+	strnlwrcpy(replacementSpell, spell2, 8);
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	// deplete original memorisation
+	actor->spellbook.UnmemorizeSpell(spell, true);
+	// set spellinfo to all known spells of desired type
+	actor->spellbook.SetCustomSpellInfo(NULL, NULL, 1<<type);
+	SpellExtHeader spelldata;
+	int idx = actor->spellbook.FindSpellInfo(&spelldata, replacementSpell, 1<<type);
+
+	return PyInt_FromLong(idx-1);
+}
+
 PyDoc_STRVAR( GemRB_SpellCast__doc,
 "SpellCast(slot, type, spell)\n\n"
 "Makes the actor try to cast a spell. Type is the spell type like 3 for normal spells and 4 for innates.\n"
@@ -10681,6 +10711,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(QuitGame, METH_NOARGS),
 	METHOD(PlaySound, METH_VARARGS),
 	METHOD(PlayMovie, METH_VARARGS),
+	METHOD(PrepareSpontaneousCast, METH_VARARGS),
 	METHOD(RemoveItem, METH_VARARGS),
 	METHOD(RemoveSpell, METH_VARARGS),
 	METHOD(RemoveEffects, METH_VARARGS),
