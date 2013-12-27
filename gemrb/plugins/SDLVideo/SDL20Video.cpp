@@ -681,11 +681,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 restoring from "minimized state" should be a clean slate.
 					 */
 					ClearFirstTouch();
+					EndMultiGesture();
 					ignoreNextFingerUp = 0;
-					GameControl* gc = core->GetGameControl();
-					if (gc) {
-						gc->ClearMouseState();
-					}
 					// should we reset the lastMouseTime vars?
 #if TARGET_OS_IPHONE
 					// FIXME:
