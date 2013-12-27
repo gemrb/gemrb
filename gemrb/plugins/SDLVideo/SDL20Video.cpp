@@ -262,7 +262,7 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 }
 
 void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-				  unsigned int /*bufw*/, unsigned int bufh,
+				  unsigned int /*bufw*/, unsigned int /*bufh*/,
 				  unsigned int w, unsigned int h,
 				  unsigned int dstx, unsigned int dsty,
 				  ieDword /*titleref*/)
