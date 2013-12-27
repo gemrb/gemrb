@@ -2836,12 +2836,18 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//TBD
 		target->AddPortraitIcon(PI_SLOWED);
 		break;
+	case RPD_MOLD2:
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
 		target->SetSpellState(SS_MOLDTOUCH);
-		damage = 1;
-		break;
-	case RPD_MOLD2:
+		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+			return FX_APPLIED;
+		}
+		if (fx->Parameter1<1) {
+			return FX_NOT_APPLIED;
+		}
+		damage = core->Roll(fx->Parameter1--, 6, 0);
+		//TODO: spread to nearest (range 10) non-affected (use spell state?)
 		break;
 	case RPD_PEST:     //cloud of pestilence (iwd2)
 		break;
