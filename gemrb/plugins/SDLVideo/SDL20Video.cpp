@@ -191,6 +191,8 @@ void SDL20VideoDriver::DestroyMovieScreen()
 	Uint32 format = SDL_PIXELFORMAT_ABGR8888;
 	//SDL_GetWindowPixelFormat(window);
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+	// destroy any events that took place during the movies
+	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 }
 
 void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
