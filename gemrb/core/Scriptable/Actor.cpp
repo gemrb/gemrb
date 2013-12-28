@@ -2902,7 +2902,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		RefreshPCStats();
 
 	//if the animation ID was not modified by any effect, it may still be modified by something else
-	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID]) {
+	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
+	ieDword appearance = 0;
+	if (pstflags) {
+		core->GetGame()->locals->Lookup("APPEARANCE", appearance);
+	}
+	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && appearance == 0) {
 		UpdateAnimationID(true);
 	}
 
