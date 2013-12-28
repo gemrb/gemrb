@@ -881,7 +881,7 @@ void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 				position=((InfoPoint *) scr)->UsePoint;
 				break;
 			}
-			position=((InfoPoint *) scr)->TrapLaunch;
+			position=((InfoPoint *) scr)->TalkPos;
 			break;
 		case ST_DOOR: case ST_CONTAINER:
 			position=((Highlightable *) scr)->TrapLaunch;
