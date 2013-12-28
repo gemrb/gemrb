@@ -88,7 +88,6 @@ MapControl::MapControl(const Region& frame)
 	NotePosX = 0;
 	NotePosY = 0;
 	mouseIsDown = false;
-	mouseIsDragging = false;
 	MarkDirty();
 	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
@@ -289,9 +288,6 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 			ScrollX = 0;
 		if (ScrollY < 0)
 			ScrollY = 0;
-	}
-
-	if (mouseIsDragging) {
 		ViewHandle(x,y);
 	}
 
@@ -407,16 +403,10 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short 
 	}
 
 	mouseIsDown = true;
-	short xp = (short) (SCREEN_TO_GAMEX(x));
-	short yp = (short) (SCREEN_TO_GAMEY(y));
 	Region vp = core->GetVideoDriver()->GetViewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
 	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
-	if ((xp>vp.x) && (xp<vp.w) && (yp>vp.y) && (yp<vp.h)) {
-		mouseIsDragging = true;
-	} else {
-		mouseIsDragging = false;
-	}
+	ViewHandle(x,y);
 	lastMouseX = x;
 	lastMouseY = y;
 }
@@ -431,7 +421,6 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 
 	MarkDirty();
 	mouseIsDown = false;
-	mouseIsDragging = false;
 	switch(Value) {
 		case MAP_REVEAL:
 			ViewHandle(x,y);

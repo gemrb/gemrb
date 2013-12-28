@@ -55,7 +55,6 @@ public:
 	int NotePosX, NotePosY;
 	unsigned short lastMouseX, lastMouseY;
 	bool mouseIsDown;
-	bool mouseIsDragging;
 	bool convertToGame;
 	// Small map bitmap
 	Sprite2D* MapMOS;
