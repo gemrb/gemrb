@@ -93,6 +93,9 @@ void TextArea::RefreshSprite(const char *portrait)
 bool TextArea::NeedsDraw()
 {
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
+		if (startrow == rows) { // the text is offscreen
+			return false;
+		}
 		//this might look better in GlobalTimer
 		//or you might want to change the animated button to work like this
 		static bool redraw = true;
@@ -111,8 +114,11 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
-	Video *video = core->GetVideoDriver();
+	if (lines.size() == 0) {
+		return;
+	}
 
+	Video *video = core->GetVideoDriver();
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
 		if (AnimPicture) {
 			video->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
@@ -121,29 +127,22 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	if (Flags &IE_GUI_TEXTAREA_SMOOTHSCROLL)
+	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL)
 	{
-		unsigned long thisTime;
-
-		thisTime = GetTickCount();
+		unsigned long thisTime = GetTickCount();
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
-
 			TextYPos++;// can't use ScrollToY
 			if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
 		}
 	}
-
-	if (lines.size() == 0) {
-		return;
-	}
-	size_t linesize = lines.size() - 1; // -1 because 0 counts
 
 	//if textarea is 'selectable' it actually means, it is a listbox
 	//in this case the selected value equals the line number
 	//if it is 'not selectable' it can still have selectable lines
 	//but then it is like the dialog window in the main game screen:
 	//the selected value is encoded into the line
+	size_t linesize = lines.size() - 1; // -1 because 0 counts
 	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
 		char* Buffer = (char *) malloc( 1 );
 		Buffer[0] = 0;
@@ -206,14 +205,6 @@ void TextArea::DrawInternal(Region& clip)
 							 IE_FONT_ALIGN_LEFT, finit, Cursor, pos );
 		free( Buffer );
 		video->SetClipRect( NULL );
-
-		if ((Flags &IE_GUI_TEXTAREA_SMOOTHSCROLL)
-			&& linesize <= (size_t)(1 + (Height - 1) / ftext->maxHeight)) {
-			// streaming text: keep pushing newlines until we have an entire areas worth of them.
-			// this way it will appear that the text scrolls out of view
-			AppendText("\n", -1);
-		}
-
 		return;
 	}
 	// normal scrolling textarea
@@ -669,7 +660,7 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 /** Set Starting Row */
 void TextArea::SetRow(int row)
 {
-	if (row < rows) {
+	if (row <= rows) {
 		startrow = row;
 		TextYPos = row * ftext->maxHeight;
 	}
