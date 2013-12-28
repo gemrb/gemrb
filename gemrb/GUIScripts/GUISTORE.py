@@ -1567,6 +1567,7 @@ def RentConfirm ():
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
+	# TODO: run GemRB.RunRestScripts ()
 	cutscene = GemRB.RestParty (13, 1, RentIndex+1)
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()

@@ -9643,6 +9643,45 @@ static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_RunRestScripts__doc,
+			  "RunRestScripts()\n\n"
+			  "Executes the party pre-rest scripts if any.");
+
+static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
+{
+	GET_GAME();
+
+	// check if anyone wants to banter first (bg2)
+	static int dreamer = -2;
+	if (dreamer == -2) {
+		AutoTable pdtable("pdialog");
+		dreamer = pdtable->GetColumnIndex("DREAM_SCRIPT_FILE");
+	}
+	if (dreamer >= 0) {
+		AutoTable pdtable("pdialog");
+		int ii = game->GetPartySize(true); // party size, only alive
+		bool bg2expansion = core->GetGame()->Expansion == 5;
+		while (ii--) {
+			Actor *tar = game->GetPC(ii, true);
+			const char* scriptname = tar->GetScriptName();
+			if (pdtable->GetRowIndex(scriptname) != -1) {
+				ieResRef resref;
+				if (bg2expansion) {
+					strnlwrcpy(resref, pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
+				} else {
+					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
+				}
+				GameScript* restscript = new GameScript(resref, tar, 0, 0);
+				restscript->Update();
+				delete restscript;
+			}
+		}
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_RestParty__doc,
 "RestParty(noareacheck, dream, hp)\n\n"
 "Executes the party rest function, used from both stores and via the main screen.");
@@ -10718,6 +10757,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(RevealArea, METH_VARARGS),
 	METHOD(Roll, METH_VARARGS),
+	METHOD(RunRestScripts, METH_NOARGS),
 	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(SaveConfig, METH_NOARGS),

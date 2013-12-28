@@ -1851,6 +1851,11 @@ def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
 
 def RestPress ():
-	if GemRB.RestParty(0, 0, 1):
-		GUICommon.CloseOtherWindow(None)
+	GUICommon.CloseOtherWindow(None)
+	GemRB.RunRestScripts ()
+	# ensure the scripts run before the actual rest
+	GemRB.SetTimedEvent (RealRestPress, 2)
+
+def RealRestPress ():
+	GemRB.RestParty(0, 0, 1)
 	return
