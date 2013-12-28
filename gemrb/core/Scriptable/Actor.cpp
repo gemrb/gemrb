@@ -97,6 +97,7 @@ static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
 static int *skillstats = NULL;
 static int *skillabils = NULL;
+static int *skilltraining = NULL;
 static int skillcount = -1;
 static int **afcomments = NULL;
 static int afcount = -1;
@@ -1438,6 +1439,10 @@ void Actor::ReleaseMemory()
 			free(skillabils);
 			skillabils=NULL;
 		}
+		if (skilltraining) {
+			free(skilltraining);
+			skilltraining=NULL;
+		}
 
 		if (afcomments) {
 			for(i=0;i<afcount;i++) {
@@ -2261,9 +2266,11 @@ static void InitActorTables()
 		if (rowcount) {
 			skillstats = (int *) malloc(rowcount * sizeof(int) );
 			skillabils = (int *) malloc(rowcount * sizeof(int) );
+			skilltraining = (int *) malloc(rowcount * sizeof(int) );
 			while(rowcount--) {
 				skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
 				skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+				skilltraining[rowcount] = atoi(tm->QueryField(rowcount, 2));
 			}
 		}
 	}
@@ -8558,7 +8565,15 @@ int Actor::GetSkillStat(unsigned int skill) const
 int Actor::GetSkill(unsigned int skill) const
 {
 	if (skill>=(unsigned int) skillcount) return -1;
-	int ret = GetStat(skillstats[skill])+GetAbilityBonus(skillabils[skill]);
+	int ret = GetStat(skillstats[skill]);
+	int base = GetBase(skillstats[skill]);
+	// only give other boni for trained skills or those that don't require it
+	// untrained trained skills are not usable!
+	if (base > 0 || skilltraining[skill]) {
+		ret += GetAbilityBonus(skillabils[skill]);
+	} else {
+		ret = 0;
+	}
 	if (ret<0) ret = 0;
 	return ret;
 }
