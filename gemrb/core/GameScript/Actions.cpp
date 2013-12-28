@@ -2593,6 +2593,8 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (!door->TryUnlock(actor)) {
 			displaymsg->DisplayConstantString(STR_DOORLOCKED, DMC_LIGHTGREY, door);
+			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
+
 			//playsound unsuccessful opening of door
 			if(door->IsOpen())
 				core->PlaySound(DS_CLOSE_FAIL);
