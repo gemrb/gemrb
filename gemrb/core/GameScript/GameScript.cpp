@@ -751,6 +751,7 @@ static const ActionLink actionnames[] = {
 	{"polymorph", GameScript::Polymorph, 0},
 	{"polymorphcopy", GameScript::PolymorphCopy, 0},
 	{"polymorphcopybase", GameScript::PolymorphCopyBase, 0},
+	{"polymorphex", GameScript::Polymorph, 0}, //pst FIXME: has RangeModes int1 that we ignore
 	{"protectobject", GameScript::ProtectObject, 0},
 	{"protectpoint", GameScript::ProtectPoint, AF_BLOCKING},
 	{"quitgame", GameScript::QuitGame, 0},
