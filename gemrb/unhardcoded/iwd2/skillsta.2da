@@ -1,19 +1,19 @@
 2DA V1.0
 -1
-                 STAT          ABILITY
-Alchemy          ALCHEMY       INT
-Animal_Empathy   ANIMALS       CHR
-Bluff            BLUFF         CHR
-Concentration    CONCENTRATION CON
-Diplomacy        DIPLOMACY     CHR
-Disable_Device   TRAPS         INT
-Hide             HIDEINSHADOWS DEX
-Intimidate       INTIMIDATE    CHR
-Knowledge_Arcana LORE          INT
-Move_Silently    STEALTH       DEX
-Open_Lock        LOCKPICKING   DEX
-Pick_Pocket      PICKPOCKET    DEX
-Search           SEARCH        INT
-Spellcraft       SPELLCRAFT    INT
-Use_Magic_Device MAGICDEVICE   CHR
-Wilderness_Lore  TRACKING      WIS
+                 STAT          ABILITY  UNTRAINED
+Alchemy          ALCHEMY       INT      0
+Animal_Empathy   ANIMALS       CHR      0
+Bluff            BLUFF         CHR      1
+Concentration    CONCENTRATION CON      1
+Diplomacy        DIPLOMACY     CHR      1
+Disable_Device   TRAPS         INT      0
+Hide             HIDEINSHADOWS DEX      1
+Intimidate       INTIMIDATE    CHR      1
+Knowledge_Arcana LORE          INT      0
+Move_Silently    STEALTH       DEX      1
+Open_Lock        LOCKPICKING   DEX      0
+Pick_Pocket      PICKPOCKET    DEX      0
+Search           SEARCH        INT      1
+Spellcraft       SPELLCRAFT    INT      0
+Use_Magic_Device MAGICDEVICE   CHR      0
+Wilderness_Lore  TRACKING      WIS      1
