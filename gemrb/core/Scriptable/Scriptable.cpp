@@ -1188,7 +1188,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			poi++;
 			continue;
 		}
-		if ((signed)detective->GetStat(IE_SPELLCRAFT) <= 0) {
+		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
 			poi++;
 			continue;
 		}
