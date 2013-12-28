@@ -1672,7 +1672,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 		if (gamedata->Exists("player1d",IE_BCS_CLASS_ID, true)) {
 			cutscene = true;
 			PlayerDream();
-		} else if (gamedata->Exists("drmtxt2", IE_2DA_CLASS_ID, true)) {
+		// all games have these bg1 leftovers, but only bg2 replaced the content
+		} else if (gamedata->GetResource("drmtxt2", IE_2DA_CLASS_ID, true)->Size() > 0) {
 			TextDream();
 		}
 
