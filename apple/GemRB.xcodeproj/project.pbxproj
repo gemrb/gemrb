@@ -391,6 +391,7 @@
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505414D0C17500D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
+		A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
 		A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
@@ -1371,7 +1372,7 @@
 		A29504771609721300BB22AA /* TTFImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TTFImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CombatInfo.cpp; sourceTree = "<group>"; };
 		A2969F0E168CDC0D00D9C6FC /* CombatInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombatInfo.h; sourceTree = "<group>"; };
-		A298DD1114EB4E8C00F59F56 /* SDL2Video.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SDL2Video.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A298DD1114EB4E8C00F59F56 /* SDLVideo.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SDLVideo.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL12Video.cpp; sourceTree = "<group>"; };
 		A298DD1414EB4EDE00F59F56 /* SDL12Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL12Video.h; sourceTree = "<group>"; };
 		A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL20Video.cpp; sourceTree = "<group>"; };
@@ -2198,7 +2199,7 @@
 				A276B4AF13A28AEE00D41A8A /* ZLibManager.so */,
 				A276B4F413A28C0400D41A8A /* STOImporter.so */,
 				A2F0505113ABB80B0023B7EB /* SAVImporter.so */,
-				A298DD1114EB4E8C00F59F56 /* SDL2Video.so */,
+				A298DD1114EB4E8C00F59F56 /* SDLVideo.so */,
 				A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */,
 				A29504771609721300BB22AA /* TTFImporter.so */,
 				A2FE2C8116F2316400DDC6C7 /* NullSource.so */,
@@ -4064,7 +4065,7 @@
 			);
 			name = SDL2Video;
 			productName = SDLVideo;
-			productReference = A298DD1114EB4E8C00F59F56 /* SDL2Video.so */;
+			productReference = A298DD1114EB4E8C00F59F56 /* SDLVideo.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		A29BF7B113A0380F00C812DD /* BAMImporter */ = {
@@ -4724,6 +4725,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */,
 				A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */,
 				A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */,
 				A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
@@ -6613,14 +6615,18 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/SDL.framework/Headers,
+					/Library/Frameworks/SDL2.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				PRODUCT_NAME = SDL2Video;
+				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
 			};
 			name = Debug;
@@ -6634,14 +6640,18 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/SDL.framework/Headers,
+					/Library/Frameworks/SDL2.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				PRODUCT_NAME = SDL2Video;
+				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
 			};
 			name = Release;
