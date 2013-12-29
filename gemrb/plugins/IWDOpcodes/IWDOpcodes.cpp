@@ -622,6 +622,16 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 	}
 }
 
+static inline void HandleSaveBoni(Actor *target, int value, int mode)
+{
+	HandleBonus(target, IE_SAVEFORTITUDE, value, mode);
+	HandleBonus(target, IE_SAVEREFLEX, value, mode);
+	HandleBonus(target, IE_SAVEWILL, value, mode);
+	//make it compatible with 2nd edition
+	HandleBonus(target, IE_SAVEVSBREATH, value, mode);
+	HandleBonus(target, IE_SAVEVSSPELL, value, mode);
+}
+
 // fx_ac_vs_damage_type_modifier_iwd2
 // the major difference from bg2 are the different type values and more AC types
 int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -996,12 +1006,8 @@ int fx_prayer (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->ToHit.HandleFxBonus(value, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	HandleBonus(target, IE_SAVEFORTITUDE, value, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, value, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, value, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, value, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, value, fx->TimingMode);
+	// bonus to all saves
+	HandleSaveBoni(target, value, fx->TimingMode);
 
 	return FX_APPLIED;
 }
@@ -1012,12 +1018,8 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState(SS_BADPRAYER)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_PRAYER_BAD);
 	target->ToHit.HandleFxBonus(-1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	HandleBonus(target, IE_SAVEFORTITUDE, -1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, -1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, -1, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, -1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, -1, fx->TimingMode);
+	// bonus to all saves
+	HandleSaveBoni(target, -1, fx->TimingMode);
 	return FX_APPLIED;
 }
 
@@ -1146,12 +1148,8 @@ int fx_recitation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->ToHit.HandleFxBonus(value, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	HandleBonus(target, IE_SAVEFORTITUDE, value, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, value, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, value, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, value, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, value, fx->TimingMode);
+	// bonus to all saves
+	HandleSaveBoni(target, value, fx->TimingMode);
 	return FX_APPLIED;
 }
 //0xfa RecitationBad
@@ -1161,12 +1159,8 @@ int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState(SS_BADRECIT)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_REC_BAD);
 	target->ToHit.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	HandleBonus(target, IE_SAVEFORTITUDE, -2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, -2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, -2, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, -2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, -2, fx->TimingMode);
+	// bonus to all saves
+	HandleSaveBoni(target, -2, fx->TimingMode);
 	return FX_APPLIED;
 }
 //0xfb LichTouch (how)
@@ -2494,12 +2488,7 @@ int fx_protection_from_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState( SS_PROTFROMEVIL)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_PROTFROMEVIL);
 	//+2 to all saving throws
-	HandleBonus(target, IE_SAVEFORTITUDE, 2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, 2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, 2, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, 2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, 2, fx->TimingMode);
+	HandleSaveBoni(target, 2, fx->TimingMode);
 
 	// immunity to control is handled in fx_control
 	return FX_APPLIED;
@@ -3007,12 +2996,7 @@ int fx_aegis (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTMAGIC, 3);
 
 	//saving throws
-	HandleBonus(target, IE_SAVEFORTITUDE, 2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, 2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, 2, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, 2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, 2, fx->TimingMode);
+	HandleSaveBoni(target, 2, fx->TimingMode);
 
 	if (fx->FirstApply) {
 		fx->Parameter1=8;
@@ -3118,12 +3102,8 @@ int fx_energy_drain (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//if there is another energy drain effect (level drain), add them up
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
-	HandleBonus(target, IE_SAVEFORTITUDE, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, -fx->Parameter1, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, -fx->Parameter1, fx->TimingMode);
+	// bonus to all saves
+	HandleSaveBoni(target, -fx->Parameter1, fx->TimingMode);
 	STAT_SUB(IE_MAXHITPOINTS, fx->Parameter1*5);
 	return FX_APPLIED;
 }
@@ -3229,13 +3209,8 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	target->AddPortraitIcon(PI_DAYBLINDNESS);
 
 	//saving throw penalty (bigger is better in iwd2)
-	HandleBonus(target, IE_SAVEFORTITUDE, -penalty, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, -penalty, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, -penalty, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, -penalty, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, -penalty, fx->TimingMode);
-	//bigger is better in iwd2
+	HandleSaveBoni(target, -penalty, fx->TimingMode);
+
 	target->ToHit.HandleFxBonus(-penalty, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 
 	//decrease all skills by 1
@@ -3301,12 +3276,7 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_DAMAGEBONUS, 1);
 	STAT_ADD( IE_HITBONUS, 1);
 	//+1 to all saves
-	HandleBonus(target, IE_SAVEFORTITUDE, 1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEREFLEX, 1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, 1, fx->TimingMode);
-	//make it compatible with 2nd edition
-	HandleBonus(target, IE_SAVEVSBREATH, 1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, 1, fx->TimingMode);
+	HandleSaveBoni(target, 1, fx->TimingMode);
 
 	return FX_APPLIED;
 }
