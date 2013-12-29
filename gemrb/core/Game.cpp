@@ -1728,7 +1728,7 @@ void Game::CastOnRest()
 		std::vector<Actor *> injurees;
 		for (int idx = 1; idx <= ps; idx++) {
 			Actor *tar = FindPC(idx);
-			if (tar->GetStat(IE_HITPOINTS) < tar->GetStat(IE_MAXHITPOINTS)) {
+			if (tar && tar->GetStat(IE_HITPOINTS) < tar->GetStat(IE_MAXHITPOINTS)) {
 				injurees.push_back(tar);
 			}
 		}

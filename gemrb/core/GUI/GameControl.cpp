@@ -547,7 +547,7 @@ void GameControl::DrawInternal(Region& screen)
 		int formationPos = 0;
 		for(int idx = 1; idx<=max; idx++) {
 			actor = game->FindPC(idx);
-			if(actor->IsSelected()) {
+			if (actor && actor->IsSelected()) {
 				// transform the formation point
 				p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, FormationPivotPoint);
 				DrawTargetReticle(p, 4, false);
@@ -1579,6 +1579,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
 				ResetTargetMode();
+				delete action;
 				return;
 			}
 			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
@@ -1634,6 +1635,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
 				ResetTargetMode();
+				delete action;
 				return;
 			}
 			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
@@ -2381,6 +2383,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			core->SetVisible(index, !hide);
 			if (!hide) {
 				Window* fw = core->GetWindow(index);
+				assert(fw != NULL);
 				fw->Flags |=WF_FLOAT;
 				core->SetOnTop(index);
 			}
