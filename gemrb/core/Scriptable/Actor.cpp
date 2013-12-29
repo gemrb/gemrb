@@ -4904,7 +4904,15 @@ bool Actor::CheckOnDeath()
 	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
 		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 	}
-	DropItem("",0);
+	// ignore TNO, as he needs to keep his gear
+	Game *game = core->GetGame();
+	if (game->protagonist == PM_NO) {
+		if (GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
+			DropItem("", 0);
+		}
+	} else {
+		DropItem("", 0);
+	}
 
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
