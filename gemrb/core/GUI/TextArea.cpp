@@ -40,6 +40,7 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	keeplines = 100;
 	rows = 0;
 	TextYPos = 0;
+	ticks = starttime = 0;
 	startrow = 0;
 	minrow = 0;
 	Cursor = NULL;
@@ -59,6 +60,7 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	tmp.g = 152;
 	tmp.b = 102;
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
+	ftext = finit = NULL;
 }
 
 TextArea::~TextArea(void)

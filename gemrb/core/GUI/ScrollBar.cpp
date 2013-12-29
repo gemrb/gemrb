@@ -37,7 +37,7 @@ ScrollBar::ScrollBar(const Region& frame)
 	Pos = 0;
 	Value = 0;
 	State = 0;
-	stepPx = 0;
+	stepPx = SliderYPos = 0;
 	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
 	for(int i=0;i<SB_RES_COUNT;i++) {

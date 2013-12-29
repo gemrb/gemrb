@@ -87,6 +87,9 @@ MapControl::MapControl(const Region& frame)
 	ScrollY = 0;
 	NotePosX = 0;
 	NotePosY = 0;
+	MapWidth = MapHeight = ViewWidth = ViewHeight = 0;
+	XCenter = YCenter = 0;
+	lastMouseX = lastMouseY = 0;
 	mouseIsDown = false;
 	MarkDirty();
 	convertToGame = true;

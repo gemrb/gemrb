@@ -45,6 +45,7 @@ Control::Control(const Region& frame)
 	Changed = true;
 	InHandler = false;
 	VarName[0] = 0;
+	ControlID = 0;
 	Value = 0;
 	Flags = 0;
 	Tooltip = NULL;

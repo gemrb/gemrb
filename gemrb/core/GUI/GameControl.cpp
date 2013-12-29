@@ -81,7 +81,9 @@ GameControl::GameControl(const Region& frame)
 	//this is the default action, individual actors should have one too
 	//at this moment we use only this
 	//maybe we don't even need it
-	spellCount = 0;
+	spellCount = spellIndex = spellOrItem = spellSlot = 0;
+	spellUser = NULL;
+	spellName[0] = 0;
 	user = NULL;
 	lastActorID = 0;
 	trackerID = 0;
@@ -92,9 +94,11 @@ GameControl::GameControl(const Region& frame)
 	drawPath = NULL;
 	pfs.null();
 	lastCursor = IE_CURSOR_NORMAL;
+	StartX = StartY = lastMouseX = lastMouseY = 0;
 	moveX = moveY = 0;
 	scrolling = false;
 	numScrollCursor = 0;
+	DoubleClick = false;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 	AlwaysRun = false; //make this a game flag if you wish
@@ -113,6 +117,7 @@ GameControl::GameControl(const Region& frame)
 	DialogueFlags = 0;
 	dialoghandler = new DialogHandler();
 	DisplayText = NULL;
+	DisplayTextTime = 0;
 }
 
 //TODO:

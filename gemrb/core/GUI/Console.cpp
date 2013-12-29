@@ -47,6 +47,7 @@ Console::Console(const Region& frame)
 	HistPos = 0;
 	HistMax = 0;
 	palette = NULL;
+	font = NULL;
 }
 
 Console::~Console(void)

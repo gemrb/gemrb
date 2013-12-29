@@ -43,6 +43,8 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
+	lastMouseX = lastMouseY = 0;
+	lastCursor = 0;
 	Area = NULL;
 	Value = direction;
 	Game* game = core->GetGame();
