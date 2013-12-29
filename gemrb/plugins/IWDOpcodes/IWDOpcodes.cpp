@@ -2667,7 +2667,7 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
 		fx->Parameter3 = 0;
-		if (target->GetSavingThrow(IE_SAVEVSSPELL,0) ) return FX_NOT_APPLIED;
+		if (target->GetSavingThrow(IE_SAVEWILL, 0)) return FX_NOT_APPLIED;
 	}
 	if(0) print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
