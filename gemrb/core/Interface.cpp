@@ -3716,6 +3716,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		count++;
 		ta->AppendText( name, -1 );
 	} while (++dir);
+	ta->SortText();
 	return count;
 }
 
@@ -3747,6 +3748,7 @@ int Interface::GetCharSounds(TextArea* ta)
 		count++;
 		ta->AppendText( name, -1 );
 	} while (++dir);
+	ta->SortText();
 	return count;
 }
 
@@ -3774,6 +3776,7 @@ int Interface::GetCharacters(TextArea* ta)
 		count++;
 		ta->AppendText( name, -1 );
 	} while (++dir);
+	ta->SortText();
 	return count;
 }
 
