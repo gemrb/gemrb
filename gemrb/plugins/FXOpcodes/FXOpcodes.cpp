@@ -3811,11 +3811,12 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->FirstApply) {
 		BASE_ADD( IE_HITPOINTS, fx->Parameter1);
 	}
-	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
+	HandleBonus(target, IE_SAVEVSDEATH, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSWANDS, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSPOLY, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSBREATH, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSSPELL, fx->Parameter1, fx->TimingMode);
+
 	//bless effect too?
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
@@ -5562,11 +5563,12 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
 	STAT_SUB(IE_MAXHITPOINTS, x);
-	STAT_SUB(IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
+	HandleBonus(target, IE_SAVEVSDEATH, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSWANDS, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSPOLY, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSBREATH, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSSPELL, -fx->Parameter1, fx->TimingMode);
+
 	target->AddPortraitIcon(PI_LEVELDRAIN);
 	//decrease current hitpoints on first apply
 	if (fx->FirstApply) {
