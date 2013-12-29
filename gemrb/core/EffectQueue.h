@@ -114,6 +114,7 @@ class StringBuffer;
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
+#define STAT_ADD_PCF(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 1 )
 #define STAT_SUB(stat, mod) target->SetStat( stat, STAT_GET( stat ) - ( mod ), 0 )
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat, ( mod ), 0 )
