@@ -263,6 +263,7 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
+	TLKEncoding.multibyte = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
