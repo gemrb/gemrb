@@ -3220,6 +3220,10 @@ void Actor::RollSaves()
 //3 reflex             8   1
 //4 will              16   2
 
+// in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
+// since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
+// FIXME: in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
+
 #define SAVECOUNT 5
 static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
 
