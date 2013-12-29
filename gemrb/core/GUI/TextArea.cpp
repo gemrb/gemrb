@@ -18,6 +18,8 @@
  *
  */
 
+#include <list>
+
 #include "TextArea.h"
 
 #include "win32def.h"
@@ -984,6 +986,18 @@ void TextArea::SetFocus(bool focus)
 	if (hasFocus && Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
+}
+
+static bool charSorter(const char *a, const char *b) {
+	return stricmp(a, b) < 0;
+}
+
+void TextArea::SortText()
+{
+	std::list<char*> sorter(lines.begin(), lines.end());
+	sorter.sort(charSorter);
+	lines.assign(sorter.begin(), sorter.end());
+	CalcRowCount();
 }
 
 }

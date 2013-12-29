@@ -120,6 +120,7 @@ public:
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	int SetScrollBar(Control *ptr);
+	void SortText();
 private: // Private attributes
 	std::vector< char*> lines;
 	std::vector< int> lrows;
