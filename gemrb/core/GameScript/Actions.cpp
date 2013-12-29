@@ -6840,7 +6840,7 @@ void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters
 
 void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar|=~FOG_DITHERSPRITES;
+	core->FogOfWar |= FOG_DITHERSPRITES;
 	DeleteAllSpriteCovers();
 }
 
