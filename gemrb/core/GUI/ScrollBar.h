@@ -79,6 +79,9 @@ public:
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
 	Sprite2D* Frames[SB_RES_COUNT];
+	/** Range of the slider in pixels. The height - buttons - slider */
+	ieDword SliderRange;
+	/** a pixel position between 0 and SliderRange*/
 	unsigned short SliderYPos;
 	/** Item Index */
 	unsigned short Pos;
