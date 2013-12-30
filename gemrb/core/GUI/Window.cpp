@@ -416,7 +416,15 @@ void Window::OnMouseOver(unsigned short x, unsigned short y)
 	if (!lastOver) {
 		return;
 	}
-	lastOver->OnMouseOver( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	short cx = x - XPos - lastOver->XPos;
+	short cy = y - YPos - lastOver->YPos;
+	if (cx < 0) {
+		cx = 0;
+	}
+	if (cy < 0) {
+		cy = 0;
+	}
+	lastOver->OnMouseOver(cx, cy);
 }
 
 }
