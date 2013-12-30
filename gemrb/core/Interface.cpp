@@ -1116,8 +1116,6 @@ char *Interface::GetMusicPlaylist(int SongType) const {
 	return musiclist[SongType];
 }
 
-static const Region bg( 0, 0, 100, 30 );
-
 /** this is the main loop */
 void Interface::Main()
 {
@@ -1131,6 +1129,8 @@ void Interface::Main()
 	}
 
 	Font* fps = GetFont( ( unsigned int ) 0 );
+	// TODO: if we ever want to support dynamic resolution changes this will break
+	const Region fpsRgn( 0, Height - 30, 100, 30 );
 	char fpsstring[40]={"???.??? fps"};
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
@@ -1159,8 +1159,8 @@ void Interface::Main()
 				frame = 0;
 				sprintf( fpsstring, "%.3f fps", frames );
 			}
-			video->DrawRect( bg, ColorBlack );
-			fps->Print( bg,
+			video->DrawRect( fpsRgn, ColorBlack );
+			fps->Print( fpsRgn,
 				( unsigned char * ) fpsstring, palette,
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
