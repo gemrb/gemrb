@@ -118,15 +118,20 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
 		Region ctrlFrame;
+		ieWord tmp;
 		ieByte ControlType, temp;
 		str->ReadDword( &COffset );
 		str->ReadDword( &CLength );
 		str->Seek( COffset, GEM_STREAM_START );
 		str->ReadDword( &ControlID );
-		str->ReadWord( (ieWord*)&ctrlFrame.x );
-		str->ReadWord( (ieWord*)&ctrlFrame.y );
-		str->ReadWord( (ieWord*)&ctrlFrame.w );
-		str->ReadWord( (ieWord*)&ctrlFrame.h );
+		str->ReadWord( &tmp );
+		ctrlFrame.x = tmp;
+		str->ReadWord( &tmp);
+		ctrlFrame.y = tmp;
+		str->ReadWord( &tmp );
+		ctrlFrame.w = tmp;
+		str->ReadWord( &tmp );
+		ctrlFrame.h = tmp;
 		str->Read( &ControlType, 1 );
 		str->Read( &temp, 1 );
 		switch (ControlType) {
