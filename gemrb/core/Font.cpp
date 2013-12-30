@@ -94,10 +94,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		capital=1;
 		enablecap=true;
 		initials_rows = 1 + ((initials->maxHeight - 1) / maxHeight); // ceiling
-		currCap = string[0];
+		currCap = tmp[0];
 		if ((startrow > 0 && initials_rows > 0) || (len > 0 && isspace(currCap))) { // we need to look back to get the cap
 			while(isspace(currCap) && num_empty_rows < len){//we cant cap whiteSpace so keep looking
-				currCap = string[++num_empty_rows];
+				currCap = tmp[++num_empty_rows];
 				// WARNING: this assumes all preceeding whiteSpace is an empty line
 			}
 			last_initial_row = startrow - 1; // always the row before current since this cannot be the first row
