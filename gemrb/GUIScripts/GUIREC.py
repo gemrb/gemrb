@@ -632,7 +632,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else:
 		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
 	# 32221 Acid
-	if GUICommon.GameIsBG1():
+	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
 		stats.append ((14015, GS (IE_RESISTACID), '%'))
 	else:
 		stats.append ((32221, GS (IE_RESISTACID), '%'))
