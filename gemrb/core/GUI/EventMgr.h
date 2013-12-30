@@ -82,6 +82,7 @@ class Window;
 
 class GEM_EXPORT EventMgr {
 private:
+	Control* focusLock;
 	std::vector< Window*> windows;
 	std::vector< int> topwin;
 

@@ -50,6 +50,7 @@ EventMgr::EventMgr(void)
 	dc_delay = 250;
 	rk_delay = 250;
 	rk_flags = GEM_RK_DISABLE;
+	focusLock = NULL;
 }
 
 EventMgr::~EventMgr(void)
@@ -179,6 +180,10 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		// for scrolling
 		gc->OnGlobalMouseMove(x, y);
 	}
+	if (focusLock) {
+		last_win_mousefocused->OnMouseOver(x, y);
+		return;
+	}
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
@@ -288,6 +293,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 				if (ctrl != NULL) {
 					last_win_mousefocused->SetMouseFocused( ctrl );
 					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
+					focusLock = ctrl;
 					return;
 				}
 			}
@@ -312,6 +318,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
+	focusLock = NULL;
 	MButtons &= ~Button;
 	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
 	if (last_ctrl_mousefocused == NULL) return;
