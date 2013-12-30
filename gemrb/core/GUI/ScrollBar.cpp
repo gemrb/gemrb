@@ -103,10 +103,12 @@ void ScrollBar::SetPos(ieDword NewPos, bool redraw)
 
 /** Sets the Pos for a given y coordinate (control coordinates) */
 /** Provides per-pixel scrolling. Top = 0px */
-void ScrollBar::SetPosForY(unsigned short y)
+void ScrollBar::SetPosForY(short y)
 {
 	if (Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
-		if (y > SliderRange) y = SliderRange;
+		// clamp the value
+		if (y < 0) y = 0;
+		else if ((ieWord)y > SliderRange) y = SliderRange;
 
 		if (stepPx) {
 			unsigned short NewPos = (unsigned short)(y / stepPx);
@@ -252,12 +254,7 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = y - SliderYPos;
 		return;
 	}
-	ieWord top = (Height - SliderRange)/2;
-	if (y >= top) {
-		SetPosForY(y - top);
-	} else {
-		SetPosForY(0);
-	}
+	SetPosForY(y - (Height - SliderRange)/2);
 }
 
 /** Mouse Button Up */
@@ -283,13 +280,8 @@ void ScrollBar::OnMouseWheelScroll(short /*x*/, short y)
 /** Mouse Over Event */
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
-	ieWord top = (Height - SliderRange)/2;
 	if (State&SLIDER_GRAB) {
-		if (y >= top) {
-			SetPosForY(y - top);
-		} else {
-			SetPosForY(0);
-		}
+		SetPosForY(y - (Height - SliderRange)/2);
 	}
 }
 

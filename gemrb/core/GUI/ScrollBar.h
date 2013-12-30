@@ -70,7 +70,7 @@ public:
 	int GetFrameHeight(int frame) const;
 	/**sets position, updates associated stuff */
 	void SetPos(ieDword NewPos, bool redraw = true);
-	void SetPosForY(unsigned short y);
+	void SetPosForY(short y);
 	void ScrollUp();
 	void ScrollDown();
 	double GetStep();
