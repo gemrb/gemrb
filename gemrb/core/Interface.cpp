@@ -1895,7 +1895,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
 	QuitFlag = QF_CHANGESCRIPT;
-	console = new Console(Region(0, (Height - 25), Width, 25));
+	console = new Console(Region(0, 0, Width, 25));
 	if (fonts.size() > 0) {
 		console->SetFont( fonts[0] );
 	}
@@ -3302,7 +3302,7 @@ void Interface::DrawWindows(bool allow_delete)
 
 	// draw the console
 	if (ConsolePopped) {
-		console->Draw( 0, (Height * -1) + console->ControlFrame().h);
+		console->Draw(0, 0);
 	}
 }
 
