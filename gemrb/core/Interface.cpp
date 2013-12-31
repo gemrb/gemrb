@@ -1893,19 +1893,7 @@ int Interface::Init(InterfaceConfig* config)
 	int ret = LoadSprites();
 	if (ret) return ret;
 
-	Log(MESSAGE, "Core", "Setting up the Console...");
 	QuitFlag = QF_CHANGESCRIPT;
-	console = new Console(Region(0, 0, Width, 25));
-	if (fonts.size() > 0) {
-		console->SetFont( fonts[0] );
-	}
-
-	Sprite2D *tmpsprite = GetCursorSprite();
-	if (!tmpsprite) {
-		Log(FATAL, "Core", "Failed to load cursor sprite.");
-		return GEM_ERROR;
-	}
-	console->SetCursor (tmpsprite);
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
@@ -2104,8 +2092,17 @@ int Interface::Init(InterfaceConfig* config)
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to initialize keymaps.");
 	}
-	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
+	Log(MESSAGE, "Core", "Setting up the Console...");
+	console = new Console(Region(0, 0, Width, 25));
+	console->SetFont( fonts[0] );
+	Sprite2D* cursor = GetCursorSprite();
+	if (!cursor) {
+		Log(ERROR, "Core", "Failed to load cursor sprite.");
+	} else
+		console->SetCursor (cursor);
+
+	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
 }
 
