@@ -249,9 +249,10 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 	// if we made it this far we will jump the nib to y and "grab" it
 	// this way we only need to click once to jump+scroll
 	State |= SLIDER_GRAB;
-	if (y >= SliderYPos && y <= SliderYPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
+	ieWord sliderPos = SliderYPos + GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
+	if (y >= sliderPos && y <= sliderPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
-		Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = y - SliderYPos;
+		Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = y - sliderPos - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)/2;
 		return;
 	}
 	SetPosForY(y - (Height - SliderRange)/2);
@@ -281,7 +282,7 @@ void ScrollBar::OnMouseWheelScroll(short /*x*/, short y)
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
 	if (State&SLIDER_GRAB) {
-		SetPosForY(y - (Height - SliderRange)/2);
+		SetPosForY(y - (Height - SliderRange)/2 - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
 	}
 }
 
