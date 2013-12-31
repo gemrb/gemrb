@@ -1399,8 +1399,12 @@ void SDLVideoDriver::SetClipRect(const Region* clip)
 
 void SDLVideoDriver::GetClipRect(Region& clip)
 {
-	SDL_Rect tmp = RectFromRegion(clip);
+	SDL_Rect tmp;
 	SDL_GetClipRect( backBuf, &tmp );
+	clip.x = tmp.x;
+	clip.y = tmp.y;
+	clip.w = tmp.w;
+	clip.h = tmp.h;
 }
 
 void SDLVideoDriver::MouseMovement(int x, int y)
