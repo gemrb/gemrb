@@ -180,7 +180,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		// for scrolling
 		gc->OnGlobalMouseMove(x, y);
 	}
-	if (focusLock) {
+	if (last_win_mousefocused && focusLock) {
 		last_win_mousefocused->OnMouseOver(x, y);
 		return;
 	}
