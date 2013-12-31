@@ -50,6 +50,7 @@ protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
 	void DrawFog(const Region& rgn);
+	bool NeedsDraw() {return true;}
 public:
 	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;
