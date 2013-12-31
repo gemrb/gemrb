@@ -6300,6 +6300,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
@@ -6312,6 +6313,7 @@
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = SDLVideo;
+				STRIP_INSTALLED_PRODUCT = NO;
 				UNEXPORTED_SYMBOLS_FILE = "";
 			};
 			name = Release;
@@ -6974,6 +6976,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					/System/Library/Frameworks,
 					"$(FRAMEWORK_SEARCH_PATHS)",
@@ -6981,6 +6984,8 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
 				PRODUCT_NAME = GemRB;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
