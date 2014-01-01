@@ -11,6 +11,8 @@ other way.
 
 gource --logo artwork/gemrb-logo.png --title "GemRB development 2012" \
   --seconds-per-day 1 --auto-skip-seconds 1 \
-  -p 0.8447  -1280x720 -o - |
-ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - -vcodec libvpx -b:v 10000K gource.webm
+  --bloom-intensity 0.001 \
+  -p 0.9447  -1280x720 --multi-sampling -o - |
+ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - \
+  -vcodec libvpx -preset ultrafast -b:v 10000K gource.webm
 
