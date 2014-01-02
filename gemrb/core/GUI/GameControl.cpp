@@ -1805,11 +1805,9 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	short py=y;
 
 	core->GetVideoDriver()->ConvertToGame( px, py );
-	FormationRotation = false;
 
-	DoubleClick = false;
-	switch(Button)
-	{
+	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
+	switch(Button) {
 	case GEM_MB_SCRLUP:
 		OnSpecialKeyPress(GEM_UP);
 		break;
@@ -1820,7 +1818,6 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
 		} else if (target_mode == TARGET_MODE_NONE) {
-			ClearMouseState();
 			if (core->GetGame()->selected.size() > 1) {
 				FormationRotation = true;
 				FormationPivotPoint.x = px;
