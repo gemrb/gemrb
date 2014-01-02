@@ -1984,14 +1984,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		} else {
 			src = party[0]->Pos;
 		}
-		Point move;
+		Point move = p;
 
 		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
 			actor->Stop();
 
-			Map* map = actor->GetCurrentArea();
-			move = GetFormationPoint(map, i, src, p);
+			if (i || party.size() > 1) {
+				Map* map = actor->GetCurrentArea();
+				move = GetFormationPoint(map, i, src, p);
+			}
 			CreateMovement(actor, move);
 		}
 		if (DoubleClick) Center(x,y);
