@@ -98,7 +98,6 @@ GameControl::GameControl(const Region& frame)
 	moveX = moveY = 0;
 	scrolling = false;
 	numScrollCursor = 0;
-	DoubleClick = false;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 	AlwaysRun = false; //make this a game flag if you wish
@@ -214,6 +213,7 @@ void GameControl::ClearMouseState()
 	MouseIsDown = false;
 	DrawSelectionRect = false;
 	FormationRotation = false;
+	DoubleClick = false;
 }
 
 // generate an action to do the actual movement
