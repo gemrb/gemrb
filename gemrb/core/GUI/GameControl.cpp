@@ -72,7 +72,8 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 
 GameControl::GameControl(const Region& frame)
 	: Control(frame),
-	windowGroupCounts()
+	windowGroupCounts(),
+	ClickPoint()
 {
 	ControlType = IE_GUI_GAMECONTROL;
 	if (!formations) {
@@ -94,7 +95,7 @@ GameControl::GameControl(const Region& frame)
 	drawPath = NULL;
 	pfs.null();
 	lastCursor = IE_CURSOR_NORMAL;
-	StartX = StartY = lastMouseX = lastMouseY = 0;
+	lastMouseX = lastMouseY = 0;
 	moveX = moveY = 0;
 	scrolling = false;
 	numScrollCursor = 0;
@@ -556,7 +557,7 @@ void GameControl::DrawInternal(Region& screen)
 			actor = game->FindPC(idx);
 			if (actor && actor->IsSelected()) {
 				// transform the formation point
-				p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, FormationPivotPoint);
+				p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, ClickPoint);
 				DrawTargetReticle(p, 4, false);
 			}
 		}
@@ -1256,7 +1257,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Point p( x,y );
 	video->ConvertToGame( p.x, p.y );
 	if (MouseIsDown && ( !DrawSelectionRect )) {
-		if (( abs( p.x - StartX ) > 5 ) || ( abs( p.y - StartY ) > 5 )) {
+		if (( abs( p.x - ClickPoint.x ) > 5 ) || ( abs( p.y - ClickPoint.y ) > 5 )) {
 			DrawSelectionRect = true;
 		}
 	}
@@ -1803,10 +1804,9 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
 
-	short px=x;
-	short py=y;
-
-	core->GetVideoDriver()->ConvertToGame( px, py );
+	ClickPoint.x = x;
+	ClickPoint.y = y;
+	core->GetVideoDriver()->ConvertToGame( ClickPoint.x, ClickPoint.y );
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
@@ -1832,22 +1832,16 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 			FormationRotation = true;
 		} else {
 			MouseIsDown = true;
-			SelectionRect.x = px;
-			SelectionRect.y = py;
-			StartX = px;
-			StartY = py;
+			SelectionRect.x = ClickPoint.x;
+			SelectionRect.y = ClickPoint.y;
 			SelectionRect.w = 0;
 			SelectionRect.h = 0;
 		}
 		break;
 	}
-	if (FormationRotation) {
-		if (core->GetGame()->selected.size() > 1) {
-			FormationPivotPoint.x = px;
-			FormationPivotPoint.y = py;
-		} else {
-			FormationRotation = false;
-		}
+	if (FormationRotation &&
+		core->GetGame()->selected.size() <= 1) {
+		FormationRotation = false;
 	}
 }
 
@@ -1982,7 +1976,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		//party formation movement
 		Point src;
 		if (FormationRotation) {
-			p = FormationPivotPoint;
+			p = ClickPoint;
 			src = FormationApplicationPoint;
 		} else {
 			src = party[0]->Pos;
@@ -2247,19 +2241,19 @@ void GameControl::CalculateSelection(const Point &p)
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );
 	if (DrawSelectionRect) {
-		if (p.x < StartX) {
-			SelectionRect.w = StartX - p.x;
+		if (p.x < ClickPoint.x) {
+			SelectionRect.w = ClickPoint.x - p.x;
 			SelectionRect.x = p.x;
 		} else {
-			SelectionRect.x = StartX;
-			SelectionRect.w = p.x - StartX;
+			SelectionRect.x = ClickPoint.x;
+			SelectionRect.w = p.x - ClickPoint.x;
 		}
-		if (p.y < StartY) {
-			SelectionRect.h = StartY - p.y;
+		if (p.y < ClickPoint.y) {
+			SelectionRect.h = ClickPoint.y - p.y;
 			SelectionRect.y = p.y;
 		} else {
-			SelectionRect.y = StartY;
-			SelectionRect.h = p.y - StartY;
+			SelectionRect.y = ClickPoint.y;
+			SelectionRect.h = p.y - ClickPoint.y;
 		}
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );

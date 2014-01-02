@@ -130,10 +130,8 @@ private:
 	bool MouseIsDown;
 	bool DoubleClick;
 	Region SelectionRect;
-	Point FormationPivotPoint;
 	Point FormationApplicationPoint;
-	short StartX, StartY;
-
+	Point ClickPoint;
 public:
 	Door* overDoor;
 	Container* overContainer;
