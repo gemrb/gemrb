@@ -214,6 +214,8 @@ void GameControl::ClearMouseState()
 	DrawSelectionRect = false;
 	FormationRotation = false;
 	DoubleClick = false;
+	//refresh the mouse cursor
+	core->GetEventMgr()->FakeMouseMove();
 }
 
 // generate an action to do the actual movement
@@ -1939,8 +1941,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			}
 			if (FormationRotation) {
 				FormationRotation = false;
-				//refresh the mouse cursor
-				core->GetEventMgr()->FakeMouseMove();
+
 				doMove = true;
 			} else if (!actor) {
 				// reset the action bar
