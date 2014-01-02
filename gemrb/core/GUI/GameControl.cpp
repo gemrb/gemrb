@@ -1934,16 +1934,17 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			doMove = (!actor && target_mode == TARGET_MODE_NONE);
 			break;
 		case GEM_MB_MENU:
+			// we used to check mod in this case,
+			// but it doesnt make sense to initiate an action based on a mod on mouse down
+			// then cancel that action because the mod disapeared before mouse up
+			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+				SetTargetMode(TARGET_MODE_NONE);
+			}
 			if (FormationRotation) {
 				FormationRotation = false;
 				//refresh the mouse cursor
 				core->GetEventMgr()->FakeMouseMove();
 				doMove = true;
-			} else if (core->HasFeature(GF_HAS_FLOAT_MENU)) {
-				// we used to check mod in this case,
-				// but it doesnt make sense to initiate an action based on a mod on mouse down
-				// then cancel that action because the mod disapeared before mouse up
-
 			} else if (!actor) {
 				// reset the action bar
 				core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
