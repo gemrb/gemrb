@@ -27,6 +27,7 @@ from GUIDefines import *
 from ie_stats import *
 import GUICommon
 import CommonTables
+import GUICommonWindows
 from ie_spells import LS_MEMO
 
 MageWindow = None
@@ -46,7 +47,6 @@ SpellType = None
 Level = 1
 
 def OpenMageWindow ():
-	import GUICommonWindows
 	global MageWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
