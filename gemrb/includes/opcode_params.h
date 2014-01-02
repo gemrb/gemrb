@@ -205,6 +205,8 @@ namespace GemRB {
 #define SS_LOWERRESIST  140
 #define SS_LUCK         141
 #define SS_VOCALIZE     157
+#define SS_BARBARIANRAGE 159
+#define SS_GREATERRAGE   160
 //tested for this, splstate is wrong or this entry has two uses
 #define SS_DAYBLINDNESS 178
 #define SS_REBUKED      179
