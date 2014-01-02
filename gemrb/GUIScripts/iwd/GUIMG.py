@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -67,6 +67,7 @@ def OpenMageWindow ():
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 	MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
+
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
@@ -94,7 +95,6 @@ def OpenMageWindow ():
 ## 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 ## 		Button.SetVarAssoc ("MageSpellLevel", i)
 
-
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
@@ -111,8 +111,8 @@ def OpenMageWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
+
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	#bringing the window front
 	Window.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
@@ -136,6 +136,7 @@ def UpdateMageWindow ():
 	Name = GemRB.GetPlayerName (pc, 0)
 	Label = Window.GetControl (0x10000035)
 	Label.SetText (Name)
+
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
@@ -212,23 +213,6 @@ def RefreshMageLevel ():
 	UpdateMageWindow ()
 	return
 
-def OnMageMemorizeSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
-
-	index = GemRB.GetVar ("SpellButton") - 100
-
-	if GemRB.MemorizeSpell (pc, type, level, index):
-		UpdateMageWindow ()
-		GemRB.PlaySound ("GAM_24")
-		Button = MageWindow.GetControl(index + 27)
-		Button.SetAnimation ("FLASH",0,1)
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-		Button = MageWindow.GetControl(mem_cnt + 2)
-		Button.SetAnimation ("FLASH",0,1)
-	return
-
 def OpenMageSpellInfoWindow ():
 	global MageSpellInfoWindow
 
@@ -271,6 +255,23 @@ def OpenMageSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def OnMageMemorizeSpell ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	level = MageSpellLevel
+	type = IE_SPELL_TYPE_WIZARD
+
+	index = GemRB.GetVar ("SpellButton") - 100
+
+	if GemRB.MemorizeSpell (pc, type, level, index):
+		UpdateMageWindow ()
+		GemRB.PlaySound ("GAM_24")
+		Button = MageWindow.GetControl(index + 27)
+		Button.SetAnimation ("FLASH",0,1)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
+		Button = MageWindow.GetControl(mem_cnt + 2)
+		Button.SetAnimation ("FLASH",0,1)
+	return
+
 def CloseMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
@@ -292,11 +293,13 @@ def OpenMageSpellRemoveWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageRemoveSpell)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -314,11 +317,13 @@ def OpenMageSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
