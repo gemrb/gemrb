@@ -176,15 +176,15 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		return;
 	}
 
+	GameControl *gc = core->GetGameControl();
+	if (gc && (!focusLock || focusLock == gc)) {
+		// for scrolling
+		gc->OnGlobalMouseMove(x, y);
+	}
 	if (last_win_mousefocused && focusLock) {
 		last_win_mousefocused->OnMouseOver(x, y);
 		RefreshCursor(last_win_mousefocused->Cursor);
 		return;
-	}
-	GameControl *gc = core->GetGameControl();
-	if (gc) {
-		// for scrolling
-		gc->OnGlobalMouseMove(x, y);
 	}
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
