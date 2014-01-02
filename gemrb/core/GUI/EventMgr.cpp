@@ -296,6 +296,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 					last_win_mousefocused->SetMouseFocused( ctrl );
 					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
 					focusLock = ctrl;
+					RefreshCursor(last_win_mousefocused->Cursor);
 					return;
 				}
 			}

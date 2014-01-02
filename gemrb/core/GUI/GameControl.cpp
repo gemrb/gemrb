@@ -1261,6 +1261,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			DrawSelectionRect = true;
 		}
 	}
+	if (FormationRotation) {
+		return;
+	}
 	Game* game = core->GetGame();
 	if (!game) return;
 	Map* area = game->GetCurrentArea( );
@@ -1294,10 +1297,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	overContainer = area->TMap->GetContainer( p );
 
 	if (!DrawSelectionRect) {
-		if (FormationRotation) {
-			nextCursor = IE_CURSOR_USE;
-			goto end_function;
-		}
 		if (overDoor) {
 			nextCursor = GetCursorOverDoor(overDoor);
 		}
@@ -1819,7 +1818,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
-		} else if (target_mode == TARGET_MODE_NONE) {
+		} else {
 			FormationRotation = true;
 		}
 		break;
@@ -1839,9 +1838,13 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		}
 		break;
 	}
-	if (FormationRotation &&
-		core->GetGame()->selected.size() <= 1) {
+	if (core->GetGame()->selected.size() <= 1
+		|| target_mode != TARGET_MODE_NONE) {
 		FormationRotation = false;
+	}
+	if (FormationRotation) {
+		lastCursor = IE_CURSOR_USE;
+		Owner->Cursor = lastCursor;
 	}
 }
 
