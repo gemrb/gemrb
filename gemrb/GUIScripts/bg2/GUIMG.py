@@ -23,11 +23,11 @@
 ###################################################
 
 import GemRB
-from GUIDefines import *
-from ie_stats import *
 import GUICommon
 import CommonTables
 import GUICommonWindows
+from GUIDefines import *
+from ie_stats import *
 from ie_spells import LS_MEMO
 
 MageWindow = None
@@ -38,6 +38,7 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+# bg2 stuff for handling triggers and contingencies
 BookType = None
 OtherWindow = None
 Exclusions = None
@@ -77,12 +78,13 @@ def OpenMageWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
+	if GUICommon.GameIsBG2():
+		GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMageWindow)
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+
 	SetupMageWindow()
 	GUICommonWindows.SetSelectionChangeHandler (SetupMageWindow)
 	return
@@ -94,7 +96,8 @@ def SetupMageWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
 	BookType = 0
-	if CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
+	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
+	if GUICommon.GameIsBG2() and CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
 		BookType = 1
 
 	if MageWindow:
@@ -114,15 +117,17 @@ def SetupMageWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageNextLevelPress)
 
 	#unknown usage
-	Button = Window.GetControl (55)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	if Window.HasControl (55):
+		Button = Window.GetControl (55)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#setup level buttons
-	for i in range (9):
-		Button = Window.GetControl (56 + i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshMageLevel)
-		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetVarAssoc ("MageSpellLevel", i)
+	if GUICommon.GameIsBG2():
+		for i in range (9):
+			Button = Window.GetControl (56 + i)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshMageLevel)
+			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+			Button.SetVarAssoc ("MageSpellLevel", i)
 
 	# Setup memorized spells buttons
 	if not BookType:
@@ -134,14 +139,13 @@ def SetupMageWindow ():
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
-	for i in range (24):
+	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = Window.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	UpdateMageWindow ()
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	#bringing the window front
 	Window.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
@@ -159,8 +163,12 @@ def UpdateMageWindow ():
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
 
 	Label = Window.GetControl (0x10000032)
-	GemRB.SetToken("SPELLLEVEL", str(level+1) )
-	Label.SetText (10345)
+	if GUICommon.GameIsBG2():
+		GemRB.SetToken ("SPELLLEVEL", str(level + 1))
+		Label.SetText (10345)
+	else:
+		GemRB.SetToken ('LEVEL', str(level + 1))
+		Label.SetText (12137)
 
 	Name = GemRB.GetPlayerName (pc, 0)
 	Label = Window.GetControl (0x10000035)
@@ -207,7 +215,7 @@ def UpdateMageWindow ():
 		else:
 			label.SetText ("")
 
-	for i in range (24):
+	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = Window.GetControl (27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
@@ -221,7 +229,6 @@ def UpdateMageWindow ():
 				print "Missing known spell!", ms['SpellResRef']
 				continue
 			Button.SetTooltip (spell['SpellName'])
-
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -229,7 +236,7 @@ def UpdateMageWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName(pc), "MAGESPELL") == "*"
+	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 	return
 
@@ -274,7 +281,7 @@ def OpenMageSpellInfoWindow ():
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
-	if GUICommon.HasTOB():
+	if GUICommon.HasTOB() or Window.HasControl(6):
 		Button = Window.GetControl (6)
 		if index < 100:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -307,15 +314,18 @@ def OnMageMemorizeSpell ():
 	type = IE_SPELL_TYPE_WIZARD
 
 	index = GemRB.GetVar ("SpellButton") - 100
+	blend = 1
+	if GUICommon.GameIsBG2():
+		blend = 0
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdateMageWindow ()
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
-		Button.SetAnimation ("FLASH")
+		Button.SetAnimation ("FLASH", 0, blend)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 		Button = MageWindow.GetControl(mem_cnt + 2)
-		Button.SetAnimation ("FLASH")
+		Button.SetAnimation ("FLASH", 0, blend)
 	return
 
 def CloseMageSpellUnmemorizeWindow ():
@@ -329,7 +339,11 @@ def CloseMageSpellUnmemorizeWindow ():
 def OpenMageSpellRemoveWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (101)
+	if GUICommon.GameIsBG2():
+		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
+	else:
+		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
+	Window = MageSpellUnmemorizeWindow
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -353,7 +367,11 @@ def OpenMageSpellRemoveWindow ():
 def OpenMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (101)
+	if GUICommon.GameIsBG2():
+		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
+	else:
+		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
+	Window = MageSpellUnmemorizeWindow
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -383,12 +401,15 @@ def OnMageUnmemorizeSpell ():
 	type = IE_SPELL_TYPE_WIZARD
 
 	index = GemRB.GetVar ("SpellButton")
+	blend = 1
+	if GUICommon.GameIsBG2():
+		blend = 0
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdateMageWindow ()
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
-		Button.SetAnimation ("FLASH")
+		Button.SetAnimation ("FLASH", 0, blend)
 	return
 
 def OnMageRemoveSpell ():
