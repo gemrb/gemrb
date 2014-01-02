@@ -3284,17 +3284,15 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //same as BG2 OffscreenAIModifier
 
 //440 BarbarianRage
-int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if(0) print("fx_barbarian_rage(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
-	//TODO: is Greater rage handled in the same effect? It increases the boni to 6/3, while not affecting penalties
-	STAT_ADD_PCF( IE_CON, 4 );
-	STAT_ADD_PCF( IE_STR, 4 );
-	HandleBonus(target, IE_ARMORCLASS, -2, fx->TimingMode);
-	HandleBonus(target, IE_SAVEWILL, 2, fx->TimingMode);
-
-	// TODO: after 5 rounds (expiry?) apply the "Fatigued" effect, whereby the barbarian is weakened
-
+	// Greater rage is handled by a different spell and spell state, all set externally
+	// Same goes for normal rage boni
+	// TODO: after 5 rounds (expiry) apply the "Fatigued" effect, whereby the barbarian is weakened (at least STR an DEX)
+	// at level 20 they receive Tireless Rage, which makes this effect useless,
+	//  (unless it really adds immunities to all charm, hold, and fear spells)
+	// it does not appear to be a spell though, so it's was likely a hack
 	return FX_APPLIED;
 }
 
