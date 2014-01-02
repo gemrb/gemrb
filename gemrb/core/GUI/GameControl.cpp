@@ -1820,23 +1820,34 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
 		} else if (target_mode == TARGET_MODE_NONE) {
-			if (core->GetGame()->selected.size() > 1) {
-				FormationRotation = true;
-				FormationPivotPoint.x = px;
-				FormationPivotPoint.y = py;
-			}
+			FormationRotation = true;
 		}
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
 		DoubleClick = true;
 	case GEM_MB_ACTION:
-		MouseIsDown = true;
-		SelectionRect.x = px;
-		SelectionRect.y = py;
-		StartX = px;
-		StartY = py;
-		SelectionRect.w = 0;
-		SelectionRect.h = 0;
+		// PST uses alt + left click for formation rotation
+		// is there any harm in this being true in all games?
+		if (Mod&GEM_MOD_ALT) {
+			FormationRotation = true;
+		} else {
+			MouseIsDown = true;
+			SelectionRect.x = px;
+			SelectionRect.y = py;
+			StartX = px;
+			StartY = py;
+			SelectionRect.w = 0;
+			SelectionRect.h = 0;
+		}
+		break;
+	}
+	if (FormationRotation) {
+		if (core->GetGame()->selected.size() > 1) {
+			FormationPivotPoint.x = px;
+			FormationPivotPoint.y = py;
+		} else {
+			FormationRotation = false;
+		}
 	}
 }
 
@@ -1879,79 +1890,75 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		return;
 	}
 
-	//hidden actors are not selectable by clicking on them unless they're party members
 	Actor* actor = NULL;
+	bool doMove = FormationRotation;
 	if (!FormationRotation) {
+		//hidden actors are not selectable by clicking on them unless they're party members
 		actor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
 		if (actor && actor->Modified[IE_EA]>=EA_CONTROLLED) {
 			if (!actor->ValidTarget(GA_NO_HIDDEN)) {
 				actor = NULL;
 			}
 		}
-	}
-
-	bool doMove = false;
-	switch (Button) {
-		case GEM_MB_ACTION:
-			if (!actor) {
-				Actor *pc = core->GetFirstSelectedPC(false);
-				if (!pc) {
-					//this could be a non-PC
-					pc = game->selected[0];
-				}
-				//add a check if you don't want some random monster handle doors and such
-				if (overDoor) {
-					HandleDoor(overDoor, pc);
-					break;
-				}
-				if (overContainer) {
-					HandleContainer(overContainer, pc);
-					break;
-				}
-				if (overInfoPoint) {
-					if (overInfoPoint->Type==ST_TRAVEL) {
-						int i = game->selected.size();
-						ieDword exitID = overInfoPoint->GetGlobalID();
-						while(i--) {
-							game->selected[i]->UseExit(exitID);
-						}
+		switch (Button) {
+			case GEM_MB_ACTION:
+				if (!actor) {
+					Actor *pc = core->GetFirstSelectedPC(false);
+					if (!pc) {
+						//this could be a non-PC
+						pc = game->selected[0];
 					}
-					if (HandleActiveRegion(overInfoPoint, pc, p)) {
-						core->SetEventFlag(EF_RESETTARGET);
+					//add a check if you don't want some random monster handle doors and such
+					if (overDoor) {
+						HandleDoor(overDoor, pc);
 						break;
 					}
+					if (overContainer) {
+						HandleContainer(overContainer, pc);
+						break;
+					}
+					if (overInfoPoint) {
+						if (overInfoPoint->Type==ST_TRAVEL) {
+							int i = game->selected.size();
+							ieDword exitID = overInfoPoint->GetGlobalID();
+							while(i--) {
+								game->selected[i]->UseExit(exitID);
+							}
+						}
+						if (HandleActiveRegion(overInfoPoint, pc, p)) {
+							core->SetEventFlag(EF_RESETTARGET);
+							break;
+						}
+					}
+					//just a single actor, no formation
+					if (game->selected.size()==1
+						&& target_mode == TARGET_MODE_CAST
+						&& spellCount
+						&& (target_types&GA_POINT)) {
+						//the player is using an item or spell on the ground
+						TryToCast(pc, p);
+					}
 				}
-				//just a single actor, no formation
-				if (game->selected.size()==1
-					&& target_mode == TARGET_MODE_CAST
-					&& spellCount
-					&& (target_types&GA_POINT)) {
-					//the player is using an item or spell on the ground
-					TryToCast(pc, p);
+				doMove = (!actor && target_mode == TARGET_MODE_NONE);
+				break;
+			case GEM_MB_MENU:
+				// we used to check mod in this case,
+				// but it doesnt make sense to initiate an action based on a mod on mouse down
+				// then cancel that action because the mod disapeared before mouse up
+				if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+					SetTargetMode(TARGET_MODE_NONE);
 				}
-			}
-			doMove = (!actor && target_mode == TARGET_MODE_NONE);
-			break;
-		case GEM_MB_MENU:
-			// we used to check mod in this case,
-			// but it doesnt make sense to initiate an action based on a mod on mouse down
-			// then cancel that action because the mod disapeared before mouse up
-			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
-				SetTargetMode(TARGET_MODE_NONE);
-			}
-			if (FormationRotation) {
-				FormationRotation = false;
-
-				doMove = true;
-			} else if (!actor) {
-				// reset the action bar
-				core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
-				core->SetEventFlag(EF_ACTION);
-			}
-			break;
-		default:
-			return; // we dont handle any other buttons beyond this point
+				if (!actor) {
+					// reset the action bar
+					core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
+					core->SetEventFlag(EF_ACTION);
+				}
+				break;
+			default:
+				return; // we dont handle any other buttons beyond this point
+		}
 	}
+
 	if (doMove) {
 		// construct a sorted party
 		// TODO: this is still ugly, help?
@@ -1974,8 +1981,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 		//party formation movement
 		Point src;
-		//p = FormationPivotPoint;
-		if (Button == GEM_MB_MENU) {
+		if (FormationRotation) {
 			p = FormationPivotPoint;
 			src = FormationApplicationPoint;
 		} else {
@@ -2007,6 +2013,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 		PerformActionOn(actor);
 	}
+	FormationRotation = false;
 	return;
 }
 
