@@ -80,6 +80,16 @@ Region Control::ControlFrame()
 	return Region(XPos, YPos, Width, Height);
 }
 
+void Control::MarkDirty() {
+	if (!Changed) {
+		Changed = true;
+		if (Owner && !HasBackground()) {
+			// the window is our background so we must redraw the entire thing :(
+			Owner->InvalidateForControl(this);
+		}
+	}
+}
+
 bool Control::NeedsDraw()
 {
 	return (Changed || (Owner->Flags&WF_FLOAT));
@@ -245,8 +255,7 @@ int Control::SetFlags(int arg_flags, int opcode)
 		default:
 			return -1;
 	}
-	Changed = true;
-	Owner->Invalidate();
+	MarkDirty();
 	return 0;
 }
 

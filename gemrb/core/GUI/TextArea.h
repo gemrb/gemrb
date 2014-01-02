@@ -62,6 +62,7 @@ protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
 	bool NeedsDraw();
+	bool HasBackground() { return false; }
 public:
 	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);

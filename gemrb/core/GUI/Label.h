@@ -50,6 +50,7 @@ class GEM_EXPORT Label : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
+	bool HasBackground() { return false; }
 public: 
 	Label(const Region& frame, Font* font, const char* string);
 	~Label();

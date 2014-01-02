@@ -72,13 +72,14 @@ protected:
 	bool hasFocus;
 	virtual void DrawInternal(Region& drawFrame)=0;
 	virtual bool NeedsDraw();
+	virtual bool HasBackground() { return true; }
 public:
 	Control(const Region& frame);
 	virtual ~Control();
 	Region ControlFrame();
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
-	void MarkDirty() { Changed = true; }
+	void MarkDirty();
 	/** Sets the Text of the current control */
 	virtual void SetText(const char* string);
 	/** Sets the Tooltip text of the current control */
