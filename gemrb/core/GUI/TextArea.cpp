@@ -399,7 +399,6 @@ void TextArea::UpdateControls()
 	int pos;
 
 	CalcRowCount();
-	MarkDirty();
 	if (sb) {
 		ScrollBar* bar = ( ScrollBar* ) sb;
 		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -872,7 +871,6 @@ void TextArea::SelectText(const char *select)
 			}
 			UpdateState(VarName, i);
 			CalcRowCount();
-			Owner->Invalidate();
 			core->RedrawAll();
 			break;
 		}
