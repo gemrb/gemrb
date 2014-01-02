@@ -1819,8 +1819,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
-		}
-		else if (target_mode == TARGET_MODE_NONE) {
+		} else if (target_mode == TARGET_MODE_NONE) {
 			ClearMouseState();
 			if (core->GetGame()->selected.size() > 1) {
 				FormationRotation = true;
@@ -1844,7 +1843,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short Mod)
+	unsigned short /*Mod*/)
 {
 	unsigned int i;
 	char Tmp[256];
@@ -1891,88 +1890,70 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			}
 		}
 	}
-	if (Button == GEM_MB_MENU && (!core->HasFeature(GF_HAS_FLOAT_MENU) || Mod)) {
-		if (actor) {
-			//play select sound on right click on actor
-			actor->PlaySelectionSound();
-			return;
-		}
-		// reset the action bar
-		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
-		core->SetEventFlag(EF_ACTION);
-		if (!FormationRotation) {
-			return;
-		}
-		FormationRotation = false;
-		//refresh the mouse cursor
-		core->GetEventMgr()->FakeMouseMove();
-	}
 
-	if (Button > GEM_MB_MENU) return;
-
-	if (!game->selected.size()) {
-		//TODO: this is a hack, we need some restructuring here
-		//handling the special case when no one was selected, and
-		//the player clicks on a partymember
-		if (actor && (actor->GetStat(IE_EA)<EA_CHARMED)) {
-			if (target_mode==TARGET_MODE_NONE) {
-				PerformActionOn(actor);
-			}
-		}
-		return;
-	}
-
-	Actor *pc = core->GetFirstSelectedPC(false);
-	if (!pc) {
-		//this could be a non-PC
-		pc = game->selected[0];
-	}
-	if (!actor) {
-		if (Button == GEM_MB_ACTION) {
-			//add a check if you don't want some random monster handle doors and such
-			if (overDoor) {
-				HandleDoor(overDoor, pc);
-				return;
-			}
-			if (overContainer) {
-				HandleContainer(overContainer, pc);
-				return;
-			}
-			if (overInfoPoint) {
-				if (overInfoPoint->Type==ST_TRAVEL) {
-					int i = game->selected.size();
-					ieDword exitID = overInfoPoint->GetGlobalID();
-					while(i--) {
-						game->selected[i]->UseExit(exitID);
+	bool doMove = false;
+	switch (Button) {
+		case GEM_MB_ACTION:
+			if (!actor) {
+				Actor *pc = core->GetFirstSelectedPC(false);
+				if (!pc) {
+					//this could be a non-PC
+					pc = game->selected[0];
+				}
+				//add a check if you don't want some random monster handle doors and such
+				if (overDoor) {
+					HandleDoor(overDoor, pc);
+					break;
+				}
+				if (overContainer) {
+					HandleContainer(overContainer, pc);
+					break;
+				}
+				if (overInfoPoint) {
+					if (overInfoPoint->Type==ST_TRAVEL) {
+						int i = game->selected.size();
+						ieDword exitID = overInfoPoint->GetGlobalID();
+						while(i--) {
+							game->selected[i]->UseExit(exitID);
+						}
+					}
+					if (HandleActiveRegion(overInfoPoint, pc, p)) {
+						core->SetEventFlag(EF_RESETTARGET);
+						break;
 					}
 				}
-				if (HandleActiveRegion(overInfoPoint, pc, p)) {
-					core->SetEventFlag(EF_RESETTARGET);
-					return;
-				}
-			}
-		}
-		//just a single actor, no formation
-		if (game->selected.size()==1) {
-			//the player is using an item or spell on the ground
-			if ((target_mode == TARGET_MODE_CAST) && spellCount) {
-				if (target_types & GA_POINT) {
+				//just a single actor, no formation
+				if (game->selected.size()==1
+					&& target_mode == TARGET_MODE_CAST
+					&& spellCount
+					&& (target_types&GA_POINT)) {
+					//the player is using an item or spell on the ground
 					TryToCast(pc, p);
 				}
-				return;
 			}
+			doMove = (!actor && target_mode == TARGET_MODE_NONE);
+			break;
+		case GEM_MB_MENU:
+			if (FormationRotation) {
+				FormationRotation = false;
+				//refresh the mouse cursor
+				core->GetEventMgr()->FakeMouseMove();
+				doMove = true;
+			} else if (core->HasFeature(GF_HAS_FLOAT_MENU)) {
+				// we used to check mod in this case,
+				// but it doesnt make sense to initiate an action based on a mod on mouse down
+				// then cancel that action because the mod disapeared before mouse up
 
-			pc->Stop();
-			CreateMovement(pc, p);
-			if (DoubleClick) Center(x,y);
-			//p is a searchmap travel region
-			if ( pc->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
-				sprintf( Tmp, "NIDSpecial2()" );
-				pc->AddAction( GenerateAction( Tmp) );
+			} else if (!actor) {
+				// reset the action bar
+				core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
+				core->SetEventFlag(EF_ACTION);
 			}
-			return;
-		}
-
+			break;
+		default:
+			return; // we dont handle any other buttons beyond this point
+	}
+	if (doMove) {
 		// construct a sorted party
 		// TODO: this is still ugly, help?
 		std::vector<Actor *> party;
@@ -2018,17 +1999,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			sprintf( Tmp, "NIDSpecial2()" );
 			party[0]->AddAction( GenerateAction( Tmp) );
 		}
-		return;
-	}
-	if (!actor) return;
+	} else if (actor) {
+		if (actor->GetStat(IE_EA)<EA_CHARMED
+			&& target_mode == TARGET_MODE_NONE) {
+			// we are selecting a party member
+			actor->PlaySelectionSound();
+		}
 
-	//we got an actor past this point
-	if (target_mode == TARGET_MODE_NONE) {
-		//play select sound
-		actor->PlaySelectionSound();
+		PerformActionOn(actor);
 	}
-
-	PerformActionOn(actor);
+	return;
 }
 
 void GameControl::OnMouseWheelScroll(short x, short y)
