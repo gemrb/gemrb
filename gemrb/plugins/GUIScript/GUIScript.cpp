@@ -865,7 +865,7 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 
 	win->XPos = X;
 	win->YPos = Y;
-	win->Invalidate();
+	core->RedrawAll();
 
 	Py_INCREF( Py_None );
 	return Py_None;
