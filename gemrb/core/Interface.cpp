@@ -2460,9 +2460,6 @@ bool Interface::LoadGemRBINI()
 		}
 	}
 
-	s = ini->GetKeyAsString( "resources", "NoteString", NULL );
-	TextArea::SetNoteString(s);
-
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strcpy( INIConfig, s );
@@ -2513,6 +2510,8 @@ bool Interface::LoadEncoding()
 
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
+
+	TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 
 	// TODO: list incomplete
 	// maybe want to externalize this
