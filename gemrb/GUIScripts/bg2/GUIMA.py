@@ -241,6 +241,7 @@ def AddNoteWindow ():
 	NoteWindow = GemRB.LoadWindow (5)
 	NoteLabel = NoteWindow.GetControl (1)
 	NoteLabel.SetText (Text)
+	NoteLabel.SetBackground ("")
 	for i in range(8):
 		Label = NoteWindow.GetControl (4+i)
 		#the .chu is crappy, we have to reset the flags
