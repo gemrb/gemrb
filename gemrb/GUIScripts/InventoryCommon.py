@@ -276,13 +276,9 @@ def DisplayItem (itemresref, type):
 		text = item["ItemDesc"]
 	else:
 		text = item["ItemDescIdentified"]
-	if GUICommon.GameIsPST():
-		# add NOTE highlighting; obviously English-only
-		text = GemRB.GetString (text)
-		tmp = text.split("NOTE:")
-		if len(tmp) > 1:
-			text = "[color=FFFFFF]NOTE:[/color]".join(tmp)
-	Text.SetText (text)
+
+	Text.Clear ()
+	Text.Append (text)
 
 	#left button
 	Button = Window.GetControl(8)
