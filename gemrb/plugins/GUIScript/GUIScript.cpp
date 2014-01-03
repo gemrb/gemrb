@@ -2135,16 +2135,17 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateScrollBar__doc,
-"CreateScrollBar(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"CreateScrollBar(WindowIndex, ControlID, x, y, w, h, ResRef) => ControlIndex\n\n"
 "Creates and adds a new ScrollBar to a Window.");
 
 static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
+	char* resRef;
 	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
-			&rgn.w, &rgn.h )) {
+	if (!PyArg_ParseTuple( args, "iiiiiis", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h, &resRef )) {
 		return AttributeError( GemRB_Window_CreateScrollBar__doc );
 	}
 
@@ -2153,10 +2154,19 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 		return RuntimeError("Cannot find window!");
 	}
 
+	AnimationFactory* af = ( AnimationFactory* )
+	gamedata->GetFactoryResource( resRef, IE_BAM_CLASS_ID, IE_NORMAL );
+	if (!af) {
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", resRef);
+		return RuntimeError( tmpstr );
+	}
+
 	Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
 	for (int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
-		// FIXME: we should load the images here
-		images[i] = NULL;
+		// FIXME: this order is not valid for BG2
+		images[i] = af->GetFrame( i, 0 );
 	}
 
 	ScrollBar* sb = new ScrollBar(rgn, images);

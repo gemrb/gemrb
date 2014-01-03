@@ -101,7 +101,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
-			SpellsWindow.CreateScrollBar (1000, 325,42, 16,252)
+			#FIXME: use other resources instead, this one is bg2-only
+			SpellsWindow.CreateScrollBar (1000, 325,42, 16,252, "GUISCRCW")
 			HideUnhideScrollBar(1)
 		SpellStart = 2
 
@@ -124,7 +125,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		SpellsTextArea = SpellsWindow.GetControl(26)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		if(EnhanceGUI):
-			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
+			#FIXME: use other resources instead, this one is bg2-only
+			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252, "GUISCRCW")
 			HideUnhideScrollBar(1)
 			#25th spell button for sorcerers
 			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
@@ -180,9 +182,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 			if(EnhanceGUI):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
-				#FIXME: use other resources instead, this one is bg2-only
-				if GemRB.HasResource ("GUISCRCW", RES_BAM):
-					ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
 				ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
 				ScrollBar.SetDefaultScrollBar ()
 
