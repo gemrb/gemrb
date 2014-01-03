@@ -100,18 +100,8 @@ bool TextArea::NeedsDraw()
 		if (startrow == rows) { // the text is offscreen
 			return false;
 		}
-		//this might look better in GlobalTimer
-		//or you might want to change the animated button to work like this
-		static bool redraw = true;
-		if (redraw) {
-			redraw = false; // prevent recursive reentry from DrawWindow() below
-			// FIXME: hack: because TextArea has no background, we get "streaky" text
-			// if we dont redraw the entire window (the background) before animating a scroll
-			Owner->Invalidate();
-			Owner->DrawWindow();
-			redraw = true;
-		}
-		return redraw;
+		MarkDirty();
+		return true;
 	}
 	return Control::NeedsDraw();
 }
