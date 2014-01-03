@@ -427,6 +427,8 @@ def OpenStoreStealWindow ():
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
+		Button.SetFont ("NUMBER")
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+11)
