@@ -85,7 +85,7 @@ void Control::MarkDirty() {
 		Changed = true;
 		if (Owner && !HasBackground()) {
 			// the window is our background so we must redraw the entire thing :(
-			Owner->InvalidateForControl(this);
+			Owner->Invalidate();
 		}
 	}
 }
