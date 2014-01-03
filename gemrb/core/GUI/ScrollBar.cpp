@@ -159,11 +159,15 @@ double ScrollBar::GetStep()
 
 bool ScrollBar::HasBackground()
 {
+	/*
+	 IWD2 scrollbars have a transparent trough and we dont have a good way to know about such things.
+	 returning false for now.
 	if (Frames[IE_GUI_SCROLLBAR_TROUGH]
 		&& Frames[IE_GUI_SCROLLBAR_SLIDER]) {
 		return (Frames[IE_GUI_SCROLLBAR_TROUGH]->Width >= Frames[IE_GUI_SCROLLBAR_SLIDER]->Width);
 	}
-	return true;
+	 */
+	return false;
 }
 
 /** Draws the ScrollBar control */
