@@ -150,8 +150,7 @@ class GTextEdit(GControl):
 class GScrollBar(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetDefaultScrollBar': _GemRB.ScrollBar_SetDefaultScrollBar,
-    'SetSprites': _GemRB.ScrollBar_SetSprites
+    'SetDefaultScrollBar': _GemRB.ScrollBar_SetDefaultScrollBar
   }
 
 class GButton(GControl):
