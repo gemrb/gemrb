@@ -2153,7 +2153,13 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 		return RuntimeError("Cannot find window!");
 	}
 
-	ScrollBar* sb = new ScrollBar(rgn);
+	Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
+	for (int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
+		// FIXME: we should load the images here
+		images[i] = NULL;
+	}
+
+	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;
 	sb->Owner = win;
 	win->AddControl( sb );

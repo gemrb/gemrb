@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-ScrollBar::ScrollBar(const Region& frame)
+ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT])
 	: Control(frame)
 {
 	ControlType = IE_GUI_SCROLLBAR;
@@ -38,21 +38,23 @@ ScrollBar::ScrollBar(const Region& frame)
 	Value = 0;
 	State = 0;
 	stepPx = SliderYPos = 0;
-	SliderRange = 0;
 	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
-	for(int i=0;i<SB_RES_COUNT;i++) {
-		Frames[i]=NULL;
+
+	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
+		Frames[i] = images[i];
 	}
+	SliderRange = Height
+		- GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
+		- GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
+		- GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
 }
 
 ScrollBar::~ScrollBar(void)
 {
 	Video *video=core->GetVideoDriver();
-	for(int i=0;i<SB_RES_COUNT;i++) {
-		if(Frames[i]) {
-			video->FreeSprite(Frames[i]);
-		}
+	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
+		video->FreeSprite(Frames[i]);
 	}
 }
 
@@ -219,7 +221,7 @@ void ScrollBar::DrawInternal(Region& drawFrame)
 /** Sets a ScrollBar GUI resource */
 void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 {
-	if (type >= SB_RES_COUNT) {
+	if (type >= IE_SCROLLBAR_IMAGE_COUNT) {
 		return;
 	}
 	if (Frames[type]) {

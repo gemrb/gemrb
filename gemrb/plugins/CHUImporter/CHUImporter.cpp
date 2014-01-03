@@ -444,39 +444,27 @@ endalign:
 			{
 				//ScrollBar
 				ieResRef BAMResRef;
-				ieWord Cycle, Trough, Slider, TAID;
-				ieWord UpUnPressed, UpPressed;
-				ieWord DownUnPressed, DownPressed;
-
+				ieWord Cycle, TAID, imgIdx;
 				str->ReadResRef( BAMResRef );
 				str->ReadWord( &Cycle );
-				str->ReadWord( &UpUnPressed );
-				str->ReadWord( &UpPressed );
-				str->ReadWord( &DownUnPressed );
-				str->ReadWord( &DownPressed );
-				str->ReadWord( &Trough );
-				str->ReadWord( &Slider );
-				str->ReadWord( &TAID );
-				ScrollBar* sbar = new ScrollBar(ctrlFrame);
-				sbar->ControlID = ControlID;
 
 				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( BAMResRef,
-							IE_BAM_CLASS_ID, IE_NORMAL );
-				if (bam) {
-					sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
-									bam->GetFrame( UpUnPressed, Cycle ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED,
-									bam->GetFrame( UpPressed, Cycle ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
-									bam->GetFrame( DownUnPressed, Cycle ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED,
-									bam->GetFrame( DownPressed, Cycle ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_TROUGH,
-									bam->GetFrame( Trough, Cycle ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
-									bam->GetFrame( Slider, Cycle ) );
+				gamedata->GetFactoryResource( BAMResRef,
+											 IE_BAM_CLASS_ID, IE_NORMAL );
+				if (!bam) {
+					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef);
+					break;
 				}
+				Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
+				for (int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
+					str->ReadWord( &imgIdx );
+					images[i] = bam->GetFrame( imgIdx, Cycle );
+				}
+				str->ReadWord( &TAID );
+
+				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
+				sbar->ControlID = ControlID;
+
 				win->AddControl( sbar );
 				if (TAID != 0xffff)
 					win->Link( ( unsigned short ) ControlID, TAID );
