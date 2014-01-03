@@ -1712,12 +1712,12 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->string0Parameter[0]) {
 		ieDword value;
+		ieVariable Variable;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");
+			snprintf(Variable,sizeof(ieVariable),"%s_DEAD",parameters->string0Parameter);
+			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			ieVariable Variable;
-
 			snprintf( Variable, 32, core->GetDeathVarFormat(), parameters->string0Parameter );
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
