@@ -63,6 +63,7 @@ namespace GemRB {
 class GEM_EXPORT ScrollBar : public Control {
 protected:
 	void DrawInternal(Region& drawFrame);
+	bool HasBackground();
 public:
 	ScrollBar(const Region& frame);
 	~ScrollBar(void);

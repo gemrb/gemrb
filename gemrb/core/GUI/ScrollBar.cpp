@@ -157,6 +157,15 @@ double ScrollBar::GetStep()
 	return stepPx;
 }
 
+bool ScrollBar::HasBackground()
+{
+	if (Frames[IE_GUI_SCROLLBAR_TROUGH]
+		&& Frames[IE_GUI_SCROLLBAR_SLIDER]) {
+		return (Frames[IE_GUI_SCROLLBAR_TROUGH]->Width >= Frames[IE_GUI_SCROLLBAR_SLIDER]->Width);
+	}
+	return true;
+}
+
 /** Draws the ScrollBar control */
 void ScrollBar::DrawInternal(Region& drawFrame)
 {
