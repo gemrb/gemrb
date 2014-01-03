@@ -43,6 +43,7 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 
 	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
 		Frames[i] = images[i];
+		assert(Frames[i]);
 	}
 	SliderRange = Height
 		- GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
@@ -60,7 +61,6 @@ ScrollBar::~ScrollBar(void)
 
 int ScrollBar::GetFrameHeight(int frame) const
 {
-	if (!Frames[frame]) return 0;
 	return Frames[frame]->Height;
 }
 
@@ -164,10 +164,7 @@ bool ScrollBar::HasBackground()
 	/*
 	 IWD2 scrollbars have a transparent trough and we dont have a good way to know about such things.
 	 returning false for now.
-	if (Frames[IE_GUI_SCROLLBAR_TROUGH]
-		&& Frames[IE_GUI_SCROLLBAR_SLIDER]) {
-		return (Frames[IE_GUI_SCROLLBAR_TROUGH]->Width >= Frames[IE_GUI_SCROLLBAR_SLIDER]->Width);
-	}
+	return (Frames[IE_GUI_SCROLLBAR_TROUGH]->Width >= Frames[IE_GUI_SCROLLBAR_SLIDER]->Width);
 	 */
 	return false;
 }
@@ -216,23 +213,6 @@ void ScrollBar::DrawInternal(Region& drawFrame)
 			drawFrame.y + Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos + upMy + SliderYPos,
 			true, &drawFrame );
 	}
-}
-
-/** Sets a ScrollBar GUI resource */
-void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
-{
-	if (type >= IE_SCROLLBAR_IMAGE_COUNT) {
-		return;
-	}
-	if (Frames[type]) {
-		core->GetVideoDriver()->FreeSprite(Frames[type]);
-	}
-	Frames[type] = img;
-	MarkDirty();
-	SliderRange = Height
-	- GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
-	- GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
-	- GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
 }
 
 /** Mouse Button Down */

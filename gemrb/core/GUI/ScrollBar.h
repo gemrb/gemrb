@@ -94,7 +94,6 @@ private: //Private attributes
 private:
 	void CalculateStep();
 public:
-	void SetImage(unsigned char type, Sprite2D* img);
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);
 	/** TextArea Associated Control */
