@@ -255,7 +255,8 @@ int Control::SetFlags(int arg_flags, int opcode)
 		default:
 			return -1;
 	}
-	MarkDirty();
+	Changed = true;
+	Owner->Invalidate();
 	return 0;
 }
 
