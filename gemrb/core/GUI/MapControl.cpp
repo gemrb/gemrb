@@ -130,10 +130,6 @@ void MapControl::DrawFog(const Region& rgn)
 	ieWord YWin = rgn.y;
 	Video *video = core->GetVideoDriver();
 
-	Region old_clip;
-	video->GetClipRect(old_clip);
-	video->SetClipRect(&rgn);
-
 	// FIXME: this is ugly, the knowledge of Map and ExploredMask
 	//   sizes should be in Map.cpp
 	int w = MyMap->GetWidth() / 2;
@@ -149,8 +145,6 @@ void MapControl::DrawFog(const Region& rgn)
 			}
 		}
 	}
-
-	video->SetClipRect(&old_clip);
 }
 
 // To be called after changes in control's or screen geometry

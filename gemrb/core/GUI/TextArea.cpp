@@ -179,7 +179,6 @@ void TextArea::DrawInternal(Region& clip)
 				Buffer[lastlen] = 0;
 			}
 		}
-		video->SetClipRect( &clip );
 
 		int pos;
 
@@ -198,7 +197,6 @@ void TextArea::DrawInternal(Region& clip)
 							 ( unsigned char * ) Buffer, palette,
 							 IE_FONT_ALIGN_LEFT, finit, Cursor, pos );
 		free( Buffer );
-		video->SetClipRect( NULL );
 		return;
 	}
 	// normal scrolling textarea

@@ -109,9 +109,6 @@ void WorldMapControl::DrawInternal(Region& rgn)
 	WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
-	Region clipbackup;
-	video->GetClipRect(clipbackup);
-	video->SetClipRect(&rgn);
 	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
 
 	unsigned int i;
@@ -144,7 +141,6 @@ void WorldMapControl::DrawInternal(Region& rgn)
 
 	// Draw WMP entry labels
 	if (ftext==NULL) {
-		video->SetClipRect(&clipbackup);
 		return;
 	}
 	for(i=0;i<ec;i++) {
@@ -180,7 +176,6 @@ void WorldMapControl::DrawInternal(Region& rgn)
 		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
 				( const unsigned char * ) m->GetCaption(), text_pal, 0, true );
 	}
-	video->SetClipRect(&clipbackup);
 }
 
 void WorldMapControl::AdjustScrolling(short x, short y)
