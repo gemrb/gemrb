@@ -713,6 +713,14 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			if (event.button.which == SDL_TOUCH_MOUSEID) {
 				break;
 			}
+		case SDL_KEYDOWN:
+			{
+				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
+				if (key > 32 && key < 127) {
+					// ignore keys that generate text. handeled by SDL_TEXTINPUT
+					break;
+				}
+			}
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
