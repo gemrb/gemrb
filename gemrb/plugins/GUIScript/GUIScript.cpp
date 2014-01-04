@@ -10917,6 +10917,7 @@ GUIScript::GUIScript(void)
 	pDict = NULL; //borrowed, but used outside a function
 	pModule = NULL; //should decref it
 	pMainDic = NULL; //borrowed, but used outside a function
+	pGUIClasses = NULL;
 }
 
 GUIScript::~GUIScript(void)
@@ -11160,9 +11161,6 @@ bool GUIScript::LoadScript(const char* filename)
 		return false;
 	}
 	Log(MESSAGE, "GUIScript", "Loading Script %s.", filename);
-
-	char path[_MAX_PATH];
-	strcpy( path, filename );
 
 	PyObject *pName = PyString_FromString( filename );
 	/* Error checking of pName left out */

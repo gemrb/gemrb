@@ -65,7 +65,7 @@ int VideoContext::Unlock()
 void* VideoContext::GetPlane(unsigned idx)
 {
 	if (YUV) {
-		if (idx <= 3) return planes[idx];
+		if (idx < 3) return planes[idx];
 	} else {
 		return planes[0];
 	}
