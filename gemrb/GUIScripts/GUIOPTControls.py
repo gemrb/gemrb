@@ -21,11 +21,12 @@
 
 ###################################################
 import GUICommon
+import GameCheck
 from GUIDefines import *
 
 ###################################################
 # strrefs
-if GUICommon.GameIsPST():
+if GameCheck.IsPST():
 	STR_OPT_DONE = 1403
 	STR_OPT_CANCEL = 4196
 else:
@@ -62,9 +63,9 @@ def OptRadio (action, window, button_id, label_id, variable, value):
 	button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
 	button.SetVarAssoc (variable, value)
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	elif GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
+	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("TOGGLE", 0, 0, 1, 3, 2)
 
 	OptBuddyLabel (window, label_id)
@@ -80,9 +81,9 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 	if variable:
 		button.SetVarAssoc (variable, value)
 
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	elif GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
+	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
 
 	if handler:
@@ -111,7 +112,7 @@ def OptDone (action, window, button_id):
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
 	button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 0)
 
 def OptCancel (action, window, button_id):
@@ -122,7 +123,7 @@ def OptCancel (action, window, button_id):
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
 	button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 1)
 
 def OptHelpText (name, window, text_id, text_strref):
@@ -135,7 +136,7 @@ def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, ctlnam
 	label = window.GetControl (label_id)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
-	if label_strref and GUICommon.GameIsPST():
+	if label_strref and GameCheck.IsPST():
 		label.SetText (label_strref)
 	if help_ta:
 		label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))

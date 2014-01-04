@@ -22,6 +22,7 @@
 
 import GemRB
 from GUIDefines import *
+import GameCheck
 import GUICommon
 
 ###################################################
@@ -197,7 +198,7 @@ def UpdateLogWindow ():
 ###################################################
 def PrevChapterPress ():
 	global Chapter 
-	if GUICommon.GameIsTOB():
+	if GameCheck.IsTOB():
 		firstChapter = 0
 	else:
 		firstChapter = 1

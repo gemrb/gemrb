@@ -23,6 +23,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import LoadScreen
 from GUIDefines import *
@@ -51,7 +52,7 @@ def OpenSaveWindow ():
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		GemRB.LoadWindowPack ("GUISAVE", 800, 600)
 		num_rows = 5
 		ctrl_offset = (55, 60, 25, 0x10000005, 0x1000000a)
@@ -60,7 +61,7 @@ def OpenSaveWindow ():
 		GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 	Window = SaveWindow = GemRB.LoadWindow (0)
 	Window.SetFrame ()
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		CancelButton=Window.GetControl (22)
 	else:
 		CancelButton=Window.GetControl (34)
@@ -93,7 +94,7 @@ def OpenSaveWindow ():
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		ScrollBar=Window.GetControl (23)
 	else:
 		ScrollBar=Window.GetControl (25)
@@ -158,7 +159,7 @@ def ScrollBarPress():
 def QuickSavePressed():
 	Slot = 1
 
-	if GUICommon.GameIsTOB():
+	if GameCheck.IsTOB():
 		Slot = 4
 
 	GemRB.SaveGame(Slot)
@@ -213,7 +214,7 @@ def SavePress():
 
 	#game hours (should be generated from game)
 	if Pos<len(Games):
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
 			Slotname = GemRB.GetString(str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
 		else:
@@ -224,7 +225,7 @@ def SavePress():
 	Label.SetText (Slotname)
 
 	#areapreview
-	if not GUICommon.GameIsIWD2():
+	if not GameCheck.IsIWD2():
 		Button=ConfirmWindow.GetControl (0)
 		if Pos<len(Games):
 			Button.SetSprite2D(Games[Pos].GetPreview())

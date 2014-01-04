@@ -18,6 +18,7 @@
 #
 
 import GemRB
+import GameCheck
 import GUICommon
 import Spellbook
 from GUIDefines import *
@@ -82,10 +83,10 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	SpellsKnownTable = GemRB.LoadTable (table)
 	if not SpellsKnownTable.GetValue (str(level), str(1), 1):
 		if chargen:
-			if GUICommon.GameIsBG2():
+			if GameCheck.IsBG2():
 				# HACK
 				GemRB.SetNextScript("GUICG6")
-			elif GUICommon.GameIsBG1():
+			elif GameCheck.IsBG1():
 				# HACK
 				from CharGenCommon import next
 				next()
@@ -239,7 +240,7 @@ def SpellsDonePress ():
 				# reset the variables
 				GemRB.SetVar ("SpellTopIndex", 0)
 				SpellLevel = i
-				if not (chargen and GUICommon.GameIsBG1()):
+				if not (chargen and GameCheck.IsBG1()):
 					SpellBook = [0]*len(Spells[i])
 
 				if (EnhanceGUI):
@@ -262,7 +263,7 @@ def SpellsDonePress ():
 
 		# bg1 lets you memorize spells too (iwd too, but it does it by itself)
 		# TODO: check iwd2, which is currently lacking all spell handling
-		if chargen and GUICommon.GameIsBG1() and sum(MemoBook) == 0:
+		if chargen and GameCheck.IsBG1() and sum(MemoBook) == 0:
 			SpellLevel = 0
 			SpellsSelectPointsLeft[SpellLevel] = 1
 			if KitMask != 0x4000:
@@ -274,16 +275,16 @@ def SpellsDonePress ():
 			return
 
 	# close our window and update our records
-	if SpellsWindow and (not chargen or GUICommon.GameIsBG2()):
+	if SpellsWindow and (not chargen or GameCheck.IsBG2()):
 		SpellsWindow.Unload ()
 		SpellsWindow = None
 
 	# move to the next script if this is chargen
 	if chargen:
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			# HACK
 			GemRB.SetNextScript("GUICG6")
-		elif GUICommon.GameIsBG1():
+		elif GameCheck.IsBG1():
 			# HACK
 			from CharGenCommon import next
 			next()
@@ -318,7 +319,7 @@ def ShowKnownSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("MemorizePressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MemorizePress)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
@@ -392,7 +393,7 @@ def ShowSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsSelectPress)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
@@ -517,12 +518,12 @@ def SpellsCancelPress ():
 	# remove all learned spells
 	Spellbook.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1, 9, 1)
 
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		# unload teh window and go back
 		if SpellsWindow:
 			SpellsWindow.Unload()
 		GemRB.SetNextScript("CharGen6") #haterace
-	elif GUICommon.GameIsBG1():
+	elif GameCheck.IsBG1():
 		import CharGenCommon
 		CharGenCommon.BackPress()
 	else:

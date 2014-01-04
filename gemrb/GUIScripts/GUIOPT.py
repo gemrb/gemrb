@@ -30,6 +30,7 @@
 
 ###################################################
 import CommonWindow
+import GameCheck
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -50,13 +51,13 @@ QuitMsgWindow = None
 SubOptionsWindow = None
 SubSubOptionsWindow = None
 
-if GUICommon.GameIsBG1():
+if GameCheck.IsBG1():
 	HelpTextArea2 = None
 else:
-	# just an alias to keep our logic from being plagued by too many GUICommon.GameIsBG1() checks
+	# just an alias to keep our logic from being plagued by too many GameCheck.IsBG1() checks
 	HelpTextArea2 = HelpTextArea
 
-if GUICommon.GameIsIWD2():
+if GameCheck.IsIWD2():
 	WIDTH = 800
 	HEIGHT = 600
 else:
@@ -84,7 +85,7 @@ def CloseOptionsWindow ():
 	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
-	if not GUICommon.GameIsBG1():
+	if not GameCheck.IsBG1():
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 
@@ -107,7 +108,7 @@ def OpenOptionsWindow ():
 	CommonWindow.CloseContainerWindow ()
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-	if GUICommon.GameIsBG1():
+	if GameCheck.IsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
 	GemRB.LoadWindowPack ("GUIOPT", WIDTH, HEIGHT)
@@ -118,11 +119,11 @@ def OpenOptionsWindow ():
 		# OptionsWindow is the leftmost menu bar window present in most of the games
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			GUICommonWindows.MarkMenuButton (OptionsWindow)
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
 		OptionsWindow.SetFrame ()
-		if not GUICommon.GameIsBG1(): #not in PST either, but it has its own OpenOptionsWindow()
+		if not GameCheck.IsBG1(): #not in PST either, but it has its own OpenOptionsWindow()
 			OptionsWindow.SetFrame ()
 			#saving the original portrait window
 			OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -168,7 +169,7 @@ def OpenOptionsWindow ():
 	VersionLabel = Window.GetControl (0x1000000b)
 	VersionLabel.SetText (GEMRB_VERSION)
 
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		# Keyboard shortcuts
 		KeyboardButton = Window.GetControl (13)
 		KeyboardButton.SetText (33468)
@@ -247,7 +248,7 @@ def DisplayHelpContrast ():
 def SetGfxCorrection ():
 	Brightness = GemRB.GetVar("Brightness Correction")
 	Gamma = GemRB.GetVar("Gamma Correction")
-	if GUICommon.GameIsIWD2(): # 10/11 ticks
+	if GameCheck.IsIWD2(): # 10/11 ticks
 		Gamma /= 2
 
 	GemRB.SetGamma (Brightness, Gamma)
@@ -366,14 +367,14 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18042, 18023, HelpTextArea, Window, 19, 27, 17182, 'Gore')
 	GUIOPTControls.OptCheckbox (18042, 11797, HelpTextArea, Window, 42, 44, 11795, 'Infravision')
 	GUIOPTControls.OptCheckbox (18042, 20619, HelpTextArea, Window, 47, 46, 20618, 'Weather')
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GUIOPTControls.OptCheckbox (18042, 2242, HelpTextArea, Window, 50, 48, 2241, 'Heal Party on Rest')
-	elif GUICommon.GameIsIWD2():
+	elif GameCheck.IsIWD2():
 		GUIOPTControls.OptCheckbox (18042, 15136, HelpTextArea, Window, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, Window, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, Window, 6, 17166)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GUIOPTControls.OptButton (OpenHotkeyOptionsWindow, Window, 51, 816)
 
 	SubOptionsWindow = Window
@@ -462,14 +463,14 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18044, 18036, HelpTextArea2, Window, 5, 21, 17159, 'Auto Pause State', None, 1) # weapon unusable
 	GUIOPTControls.OptCheckbox (18044, 18037, HelpTextArea2, Window, 13, 22, 17160, 'Auto Pause State', None, 32) # target gone
 	GUIOPTControls.OptCheckbox (18044, 10640, HelpTextArea2, Window, 25, 24, 10639, 'Auto Pause State', None, 64) # end of round
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 30, 31, 23516, 'Auto Pause State', None, 128) # enemy sighted
 		GUIOPTControls.OptCheckbox (18044, 18560, HelpTextArea2, Window, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 26311, HelpTextArea2, Window, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
 		GUIOPTControls.OptCheckbox (18044, 24888, HelpTextArea2, Window, 33, 34, 10574, 'Auto Pause Center', None, 1)
-	elif not GUICommon.GameIsIWD1():
+	elif not GameCheck.IsIWD1():
 		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GUIOPTControls.OptCheckbox (18044, 58171, HelpTextArea2, Window, 31, 30, 31875, 'Auto Pause State', None, 512) # spell cast
 		GUIOPTControls.OptCheckbox (18044, 31872, HelpTextArea2, Window, 34, 33, 57354, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 10571, HelpTextArea2, Window, 37, 36, 10574, 'Auto Pause Center', None, 1)

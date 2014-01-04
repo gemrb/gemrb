@@ -21,6 +21,7 @@
 # GUIREC.py - scripts to control stats/records windows from the GUIREC winpack
 ###################################################
 import GemRB
+import GameCheck
 import GUICommon
 import Spellbook
 import CommonTables
@@ -84,7 +85,7 @@ def OpenRecordsWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GUICommonWindows.MarkMenuButton (OptionsWindow)
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -121,7 +122,7 @@ def OpenRecordsWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenExportWindow)
 
 	# kit info
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		Button = Window.GetControl (52)
 		Button.SetText (61265)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
@@ -193,7 +194,7 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (2)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	if (GUICommon.GameIsBG2() or GUICommon.GameIsIWD1()) and not GUICommon.GameIsBG2Demo():
+	if (GameCheck.IsBG2() or GameCheck.IsIWD1()) and not GameCheck.IsBG2Demo():
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
 	else:
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
@@ -317,11 +318,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
 	# everyone but bg1 has it somewhere
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		str_None = GemRB.GetString (61560)
-	elif GUICommon.GameIsBG1():
+	elif GameCheck.IsBG1():
 		str_None = -1
-	elif GUICommon.GameIsPST():
+	elif GameCheck.IsPST():
 		str_None = GemRB.GetString (41275)
 	else:
 		str_None = GemRB.GetString (17093)
@@ -454,7 +455,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# look ma, I can use both hands
 	
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		stats.append ( (61932, tohit["Base"], '0') )
 		if (GemRB.IsDualWielding(pc)):
 			stats.append ( (56911, tohit["Total"], '0') ) # main
@@ -471,7 +472,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
-	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
+	if GameCheck.IsBG1() or GameCheck.IsIWD1():
 		stats.append ( (19224, GS (IE_RESISTMAGIC), '') )
 
 	# party's reputation
@@ -490,7 +491,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 
 	# these skills were new in bg2
-	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD1():
+	if GameCheck.IsBG2() or GameCheck.IsIWD1():
 		stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
 		stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
 		stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
@@ -526,19 +527,19 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	table = GemRB.LoadTable ("weapprof")
 	RowCount = table.GetRowCount ()
 	# the first 7 profs are foobared (bg1 style)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		offset = 8
 	else:
 		offset = 0
 	for i in range (offset, RowCount):
 		# iwd displays capitalised strings
 		# FIXME: ignore it and do the capitalisation manually, so it works for everyone
-		if GUICommon.GameIsIWD1():
+		if GameCheck.IsIWD1():
 			text = table.GetValue (i, 3)
 		else:
 			text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
-		if not offset and not GUICommon.GameIsIWD1(): # TODO: fishy, recheck
+		if not offset and not GameCheck.IsIWD1(): # TODO: fishy, recheck
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
 		if text < 0x20000:
 			stats.append ( (text, GS (stat)&0x07, '+') )
@@ -603,20 +604,20 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# only bg2 displayed all the resistances, but it is useful information
 	# Resistances
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		stats.append(32204)
-	elif not GUICommon.GameIsBG1():
+	elif not GameCheck.IsBG1():
 		stats.append (15544)
 	# 32213 Normal Fire
 	# 32222 Magic Fire
 	# 32214 Normal Cold
 	# 32223 Magic Cold
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		stats.append ((32213, GS (IE_RESISTFIRE), '%'))
 		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
 		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
-	elif GUICommon.GameIsBG1():
+	elif GameCheck.IsBG1():
 		stats.append ((14012, GS (IE_RESISTFIRE), '%'))
 		stats.append ((14077, GS (IE_RESISTMAGICFIRE), '%'))
 		stats.append ((14014, GS (IE_RESISTCOLD), '%'))
@@ -627,20 +628,20 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ((15546, GS (IE_RESISTCOLD), '%'))
 		stats.append ((15580, GS (IE_RESISTMAGICCOLD), '%'))
 	# 32220 Electricity
-	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
+	if GameCheck.IsBG1() or GameCheck.IsIWD1():
 		stats.append ((14013, GS (IE_RESISTELECTRICITY), '%'))
 	else:
 		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
 	# 32221 Acid
-	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
+	if GameCheck.IsBG1() or GameCheck.IsIWD1():
 		stats.append ((14015, GS (IE_RESISTACID), '%'))
 	else:
 		stats.append ((32221, GS (IE_RESISTACID), '%'))
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		# Magic (others show it higher up)
 		stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
 	# Magic Damage
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		stats.append ((40319, GS (IE_MAGICDAMAGERESISTANCE), '%'))
 	else: # bg2
 		stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
@@ -656,7 +657,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ((14017, GS (IE_RESISTPOISON), '%'))
 	stats.append (None)
 
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		# Weapon Style bonuses
 		stats.append (32131)
 		wstyle = cdet["Style"] # equipped weapon style + 1000 * proficiency level
@@ -871,7 +872,7 @@ def OpenKitInfoWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
-	Multi = GUICommon.HasMultiClassBits (pc)
+	Multi = GameCheck.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 
 	if Multi and Dual[0] == 0: # true multi class

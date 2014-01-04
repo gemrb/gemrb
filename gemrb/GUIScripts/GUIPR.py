@@ -23,6 +23,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import CommonTables
 from GUIDefines import *
@@ -84,7 +85,7 @@ def OpenPriestWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestNextLevelPress)
 
 	#setup level buttons
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		for i in range (7):
 			Button = Window.GetControl (55 + i)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshPriestLevel)
@@ -130,7 +131,7 @@ def UpdatePriestWindow ():
 
 	Label = Window.GetControl (0x10000032)
 	# bg2 uses a shorthand form
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GemRB.SetToken ("SPELLLEVEL", str(level+1))
 		Label.SetText (10345)
 	else:
@@ -248,7 +249,7 @@ def OpenPriestSpellInfoWindow ():
 
 	spell = GemRB.GetSpell (ResRef)
 
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		Label = Window.GetControl (0x0fffffff)
 	else:
 		Label = Window.GetControl (0x10000000)
@@ -276,7 +277,7 @@ def OnPriestMemorizeSpell ():
 		Button = PriestWindow.GetControl(index + 27)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 		Button2 = PriestWindow.GetControl(mem_cnt + 2)
-		if GUICommon.GameIsBG2(): # no blending
+		if GameCheck.IsBG2(): # no blending
 			Button.SetAnimation ("FLASH")
 			Button2.SetAnimation ("FLASH")
 		else:
@@ -354,7 +355,7 @@ def OnPriestUnmemorizeSpell ():
 		UpdatePriestWindow ()
 		GemRB.PlaySound ("GAM_44")
 		Button = PriestWindow.GetControl(index + 3)
-		Button.SetAnimation ("FLASH", 0, GUICommon.GameIsBG2() is False) # no blending for bg2
+		Button.SetAnimation ("FLASH", 0, GameCheck.IsBG2() is False) # no blending for bg2
 	return
 
 def OnPriestRemoveSpell ():

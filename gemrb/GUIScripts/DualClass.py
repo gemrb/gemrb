@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 from ie_slots import *
+import GameCheck
 import GUICommon
 import Spellbook
 import CommonTables
@@ -105,7 +106,7 @@ def DualClassWindow ():
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		DCMainBackButton.SetText (15416)
 	DCMainBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -449,7 +450,7 @@ def DCOpenProfsWindow ():
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindow (15)
 	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", 1)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		LUProfsSelection.SetupProfsWindow (pc, \
 			LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
 	else:
@@ -516,7 +517,7 @@ def DCProfsDonePress ():
 			NewPriestMask = 0x4000
 	elif DruidTable != "*":
 		# make sure we can cast spells at this level (rangers)
-		if GUICommon.HasTOB ():
+		if GameCheck.HasTOB ():
 			DruidTable = GemRB.LoadTable (DruidTable)
 			if DruidTable.GetRowName (0) == "1":
 				NewPriestMask = 0x8000
@@ -553,7 +554,7 @@ def OpenSkillsWindow ():
 	global DCSkillsWindow, DCSkillsDoneButton
 
 	DCSkillsWindow = GemRB.LoadWindow (7)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		LUSkillsSelection.SetupSkillsWindow (pc, \
 			LUSkillsSelection.LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
 	else:

@@ -18,6 +18,7 @@
 #
 
 import GemRB
+import GameCheck
 import GUICommon
 import Spellbook
 from GUIDefines import *
@@ -46,7 +47,7 @@ def OnDragItemGround ():
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
-		if GUICommon.GameIsPST():
+		if GameCheck.IsPST():
 			GemRB.PlaySound (item["DescIcon"])
 	else:
 		GemRB.DropDraggedItem (pc, -2) #dropping on ground
@@ -113,9 +114,9 @@ def OnDragItem ():
 					else:
 						msg = 9375
 						if ret&SHOP_FULL:
-							if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+							if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 								msg = 24893
-							elif GUICommon.HasTOB:
+							elif GameCheck.HasTOB:
 								msg = 54692
 						GemRB.DisplayString(msg, 0xffffff)
 					#leave (save) store
@@ -204,7 +205,7 @@ def MouseLeaveSlot ():
 def MouseEnterGround ():
 	Window = GUIINV.InventoryWindow
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		offset = 47
 	else:
 		offset = 68
@@ -218,7 +219,7 @@ def MouseEnterGround ():
 def MouseLeaveGround ():
 	Window = GUIINV.InventoryWindow
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		offset = 47
 	else:
 		offset = 68
@@ -241,7 +242,7 @@ def DisplayItem (itemresref, type):
 	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
 	else:
 		strrefs = [ 11973, 14133, 11960, 19392, 17104, item["DialogName"], 17108 ]
@@ -256,7 +257,7 @@ def DisplayItem (itemresref, type):
 
 	#item icon
 	Button = Window.GetControl (2)
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetItemIcon (itemresref)
 	else:
@@ -287,7 +288,7 @@ def DisplayItem (itemresref, type):
 	if type&2:
 		Button.SetText (strrefs[1])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
-	elif select and not GUICommon.GameIsPST():
+	elif select and not GameCheck.IsPST():
 		Button.SetText (strrefs[2])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesItemWindow)
 	else:
@@ -295,10 +296,10 @@ def DisplayItem (itemresref, type):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	# description icon (not present in iwds)
-	if not GUICommon.GameIsIWD1() and not GUICommon.GameIsIWD2():
+	if not GameCheck.IsIWD1() and not GameCheck.IsIWD2():
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		if GUICommon.GameIsPST():
+		if GameCheck.IsPST():
 			Button.SetItemIcon (itemresref, 1) # no DescIcon
 		else:
 			Button.SetItemIcon (itemresref, 2)
@@ -327,9 +328,9 @@ def DisplayItem (itemresref, type):
 		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
 			OpenItemWindow()
 			return
-		if GUICommon.GameIsIWD2() or GUICommon.GameIsHOW():
+		if GameCheck.IsIWD2() or GameCheck.IsHOW():
 			Button.SetText (24891) # Open Container
-		elif GUICommon.GameIsBG2():
+		elif GameCheck.IsBG2():
 			Button.SetText (44002) # open container
 		else:
 			# a fallback, since the originals have nothing appropriate
@@ -372,7 +373,7 @@ def OpenItemInfoWindow (slot = None):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if slot == None:
-		if GUICommon.GameIsPST():
+		if GameCheck.IsPST():
 			slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
 		else:
 			slot = GemRB.GetVar ("ItemButton")
@@ -466,7 +467,7 @@ def OpenItemAmountWindow ():
 	Text = Window.GetControl (6)
 	# FIXME: use a proper size
 	# FIXME: fix it for all the games
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		Text.SetSize (40, 40)
 	Text.SetText (str (StackAmount//2))
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
@@ -640,7 +641,7 @@ def GetColor():
 	GUIINV.InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
 	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		Button = ColorPicker.GetControl (35)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelColor)
 		Button.SetText(13727)
@@ -717,15 +718,15 @@ def ReadItemWindow ():
 
 	if ret:
 		# couldn't find any strrefs for the other undhandled values (stat, level)
-		if ret == LSR_KNOWN and GUICommon.HasTOB():
+		if ret == LSR_KNOWN and GameCheck.HasTOB():
 			strref = 72873
-		elif ret == LSR_KNOWN and GUICommon.GameIsPST():
+		elif ret == LSR_KNOWN and GameCheck.IsPST():
 			strref = 50394
-		elif ret == LSR_FULL and GUICommon.GameIsBG2():
+		elif ret == LSR_FULL and GameCheck.IsBG2():
 			strref = 32097
-		elif ret == LSR_FULL and GUICommon.GameIsPST():
+		elif ret == LSR_FULL and GameCheck.IsPST():
 			strref = 50395
-		elif GUICommon.GameIsPST():
+		elif GameCheck.IsPST():
 			strref = 4250
 		else:
 			strref = 10831
@@ -734,7 +735,7 @@ def ReadItemWindow ():
 		OpenErrorWindow (strref)
 
 	else:
-		if GUICommon.GameIsPST():
+		if GameCheck.IsPST():
 			slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
 
 		pause = GemRB.GamePause(3,1) #query the pause state
@@ -750,7 +751,7 @@ def DelayedReadItemWindow ():
 		GemRB.GamePause(1,1)
 
 	CloseItemInfoWindow ()
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		strref = 4249
 	else:
 		strref = 10830
@@ -780,7 +781,7 @@ def DialogItemWindow ():
 		ItemInfoWindow.Unload ()
 	GUIINV.OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
 	else:
 		slot = GemRB.GetVar ("ItemButton")
@@ -840,7 +841,7 @@ def IdentifyItemWindow ():
 
 	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		Button.SetText (4259)
 	else:
 		Button.SetText (17105)
@@ -849,7 +850,7 @@ def IdentifyItemWindow ():
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (1)
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		Button.SetText (4260)
 	else:
 		Button.SetText (17106)
@@ -858,7 +859,7 @@ def IdentifyItemWindow ():
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (2)
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		Button.SetText (4196)
 	else:
 		Button.SetText (13727)
@@ -866,7 +867,7 @@ def IdentifyItemWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = Window.GetControl (3)
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		TextArea.SetText (4258)
 	else:
 		TextArea.SetText (19394)

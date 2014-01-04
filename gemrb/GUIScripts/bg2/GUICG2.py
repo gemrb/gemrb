@@ -18,6 +18,7 @@
 #
 #character generation, class (GUICG2)
 import GemRB
+import GameCheck
 import GUICommon
 import CommonTables
 import LUCommon
@@ -137,7 +138,7 @@ def SetClass():
 	#assign the correct XP
 	if ClassName == "BARBARIAN":
 		ClassName = "FIGHTER"
-	if GUICommon.GameIsTOB():
+	if GameCheck.IsTOB():
 		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2"))
 	else:
 		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))

@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 from GUIDefines import *
 
@@ -45,7 +46,7 @@ def StartLoadScreen ():
 	Middle.SetMOS (LoadPic)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
-	if GUICommon.HasTOB():
+	if GameCheck.HasTOB():
 		Table = GemRB.LoadTable ("loadh25")
 	else:
 		Table = GemRB.LoadTable ("loadhint")
