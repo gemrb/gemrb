@@ -536,8 +536,6 @@ private: //Internal Functions
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
 	Trigger* ReadTrigger(DataStream* stream);
-	static int ParseInt(const char*& src);
-	static void ParseString(const char*& src, char* tmp);
 private: //Internal variables
 	Scriptable* const MySelf;
 	ieResRef Name;
