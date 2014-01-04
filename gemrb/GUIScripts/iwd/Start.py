@@ -23,9 +23,9 @@
 ###################################################
 
 import GemRB
+import GameCheck
 from GUIDefines import *
 from ie_restype import *
-import GUICommon
 
 StartWindow = 0
 JoinGameButton = 0

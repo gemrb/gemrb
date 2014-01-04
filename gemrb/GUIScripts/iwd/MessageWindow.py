@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import GUICommonWindows
 import CommonWindow

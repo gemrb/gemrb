@@ -24,7 +24,7 @@
 
 import GemRB
 from GUIDefines import *
-import GUICommon
+import GameCheck
 import GUICommonWindows
 import LoadScreen
 
