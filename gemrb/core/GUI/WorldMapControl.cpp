@@ -33,15 +33,18 @@
 
 namespace GemRB {
 
-#define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
+#define MAP_TO_SCREENX(x) XWin - ScrollX + (x)
+#define MAP_TO_SCREENY(y) YWin - ScrollY + (y)
 
-WorldMapControl::WorldMapControl(const char *font, int direction)
+WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
+	: Control(frame)
 {
+	ControlType = IE_GUI_WORLDMAP;
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
-	Changed = true;
+	lastMouseX = lastMouseY = 0;
+	lastCursor = 0;
 	Area = NULL;
 	Value = direction;
 	Game* game = core->GetGame();
@@ -99,21 +102,14 @@ WorldMapControl::~WorldMapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
+void WorldMapControl::DrawInternal(Region& rgn)
 {
+	ieWord XWin = rgn.x;
+	ieWord YWin = rgn.y;
 	WorldMap* worldmap = core->GetWorldMap();
-	if (!Width || !Height) {
-		return;
-	}
-	if(!Changed)
-		return;
-	Changed = false;
+
 	Video* video = core->GetVideoDriver();
-	Region r( XWin+XPos, YWin+YPos, Width, Height );
-	Region clipbackup;
-	video->GetClipRect(clipbackup);
-	video->SetClipRect(&r);
-	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
 
 	unsigned int i;
 	unsigned int ec = worldmap->GetEntryCount();
@@ -128,24 +124,23 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 			if (m == Area && m->HighlightSelected()) {
 				Palette *pal = icon->GetPalette();
 				icon->SetPalette(pal_selected);
-				video->BlitSprite( icon, xOffs, yOffs, true, &r );
+				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
 				icon->SetPalette(pal);
 				pal->release();
 			} else {
-				video->BlitSprite( icon, xOffs, yOffs, true, &r );
+				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
 			}
 			video->FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
+			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &rgn );
 		}
 	}
 
 	// Draw WMP entry labels
 	if (ftext==NULL) {
-		video->SetClipRect(&clipbackup);
 		return;
 	}
 	for(i=0;i<ec;i++) {
@@ -181,7 +176,6 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
 				( const unsigned char * ) m->GetCaption(), text_pal, 0, true );
 	}
-	video->SetClipRect(&clipbackup);
 }
 
 void WorldMapControl::AdjustScrolling(short x, short y)
@@ -209,7 +203,7 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
-	Changed = true;
+	MarkDirty();
 	Area = NULL;
 }
 
@@ -369,8 +363,6 @@ bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 
 bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_WORLDMAP_ON_PRESS:
 		WorldMapControlOnPress = handler;
@@ -421,7 +413,7 @@ void WorldMapControl::SetColor(int which, Color color)
 		break;
 	}
 
-	Changed = true;
+	MarkDirty();
 }
 
 }

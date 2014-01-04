@@ -5,7 +5,7 @@ Description:  Checks if a team member has a spell, optionally uses it.
 
 Parameters: 
 pc - position in the party
-itemtype - see splspec.2da
+specialtype - see splspec.2da
 useup - destroy/remove a charge after use
 
 Return value: bool

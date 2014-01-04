@@ -61,6 +61,7 @@ namespace GemRB {
 #define PSF_LOOPING 4         //looping sound
 #define PSF_LOOPING2 8        //looping second sound
 #define PSF_IGNORE_CENTER 16
+#define PSF_BACKGROUND 32
 //gemrb specific internal flag
 #define PSF_SOUND2  0x80000000//already started sound2
 
@@ -296,7 +297,11 @@ public:
 	}
 	//no idea if projectiles got height, using y
 	inline int GetHeight() const {
-		//if projectile is drawn behind target
+		//if projectile is drawn absolutely on the ground
+		if (SFlags&PSF_BACKGROUND) {
+			return 0;
+		}
+		//if projectile is drawn behind target (not behind everyone)
 		if (ExtFlags&PEF_BACKGROUND) {
 			return Pos.y-BACK_DEPTH;
 		}

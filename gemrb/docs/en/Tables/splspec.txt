@@ -1,0 +1,12 @@
+Description: This table lists spells with special properties.
+
+Columns
+- the bit mask of the spell's properties:
+  1 - spells with identification properties
+  2 - spells that can be used while silenced
+  4 - spells that can't be used during a wild surge
+  8 - spells that are autocast on rest (targetting only injured party members)
+
+Rows - spell resrefs
+
+See also: itmspec, HasSpecialSpell

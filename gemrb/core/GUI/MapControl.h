@@ -46,12 +46,16 @@ namespace GemRB {
  */
 
 class GEM_EXPORT MapControl : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
+	void DrawFog(const Region& rgn);
+	bool NeedsDraw() {return true;}
 public:
 	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;
 	unsigned short lastMouseX, lastMouseY;
 	bool mouseIsDown;
-	bool mouseIsDragging;
 	bool convertToGame;
 	// Small map bitmap
 	Sprite2D* MapMOS;
@@ -70,13 +74,10 @@ public:
 	EventHandler MapControlOnRightPress;
 	EventHandler MapControlOnDoublePress;
 
-	MapControl(void);
+	MapControl(const Region& frame);
 	~MapControl(void);
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(const char *VariableName, unsigned int Sum);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short XWin, unsigned short YWin);
-	void DrawFog(unsigned short XWin, unsigned short YWin);
 	/** Compute parameters after changes in control's or screen geometry */
 	void Realize();
 

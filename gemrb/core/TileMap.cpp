@@ -243,7 +243,6 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 		w++;
 		h++;
 	}
-	Color black = { 0, 0, 0, 255 };
 
 	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
@@ -279,7 +278,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 			Region r = Region(x0 + viewport.x + ( (x - sx) * CELL_SIZE ), y0 + viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
 			if (! IS_EXPLORED( x, y )) {
 				// Unexplored tiles are all black
-				vid->DrawRect(r, black, true, true);
+				vid->DrawRect(r, ColorBlack, true, true);
 				continue;  // Don't draw 'invisible' fog
 			}
 			else {
@@ -340,7 +339,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 					FOG( 12 );
 					break;
 				case 15: //this is black too
-					vid->DrawRect(r, black, true, true);
+					vid->DrawRect(r, ColorBlack, true, true);
 					break;
 				}
 			}

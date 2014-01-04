@@ -53,10 +53,6 @@ namespace GemRB {
 #define IE_GUI_TEXTAREA_ALT_FONT     32   //this one disables drop capitals
 #define IE_GUI_TEXTAREA_EDITABLE     64
 
-// internal flags
-#define TA_INITIALS    1
-#define TA_BITEMYTAIL  2
-
 /**
  * @class TextArea
  * Widget capable of displaying long paragraphs of text.
@@ -64,13 +60,16 @@ namespace GemRB {
  */
 
 class GEM_EXPORT TextArea : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
+	bool NeedsDraw();
+	bool HasBackground() { return false; }
 public:
-	TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor);
+	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
 	/** global configuration */
 	static void SetNoteString(const char *s);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Set the TextArea value to the line number containing the string parameter */
 	void SelectText(const char *select);
 	/** Sets the Actual Text */
@@ -120,10 +119,11 @@ public:
 	/** Copies the current TextArea content to another TextArea control */
 	void CopyTo(TextArea* ta);
 	/** Returns the selected text */
-	const char* QueryText();
+	const char* QueryText() const;
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	int SetScrollBar(Control *ptr);
+	void SortText();
 private: // Private attributes
 	std::vector< char*> lines;
 	std::vector< int> lrows;
@@ -146,8 +146,7 @@ private: // Private attributes
 	Palette* initpalette;
 	Palette* selected;
 	Palette* lineselpal;
-	/** a hack for smooth windows, drop capitals */
-	ieDword InternalFlags;
+
 	/** Fonts */
 	Font* finit, * ftext;
 	ieResRef PortraitResRef;

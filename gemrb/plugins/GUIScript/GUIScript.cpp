@@ -385,7 +385,7 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
 	//this is not the usual gc retrieval
-	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
+	GameControl* gc = core->GetGameControl();
 	if (!gc) {
 		return RuntimeError("No gamecontrol!");
 	}
@@ -865,7 +865,7 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 
 	win->XPos = X;
 	win->YPos = Y;
-	win->Invalidate();
+	core->RedrawAll();
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -1359,16 +1359,7 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	switch(ctrl->ControlType) {
-	case IE_GUI_LABEL:
-		return PyString_FromString(((Label *) ctrl)->QueryText() );
-	case IE_GUI_EDIT:
-		return PyString_FromString(((TextEdit *) ctrl)->QueryText() );
-	case IE_GUI_TEXTAREA:
-		return PyString_FromString(((TextArea *) ctrl)->QueryText() );
-	default:
-		return RuntimeError("Invalid control type");
-	}
+	return PyString_FromString(ctrl->QueryText());
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
@@ -1732,7 +1723,7 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Window_ShowModal__doc );
 	}
 
-	int ret = core->ShowModal( WindowIndex, Shadow );
+	int ret = core->ShowModal( WindowIndex, (MODAL_SHADOW)Shadow );
 	if (ret == -1) {
 		return NULL;
 	}
@@ -2022,13 +2013,8 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	if (!btn) {
 		return NULL;
 	}
-	Label* lbl = new Label( core->GetFont( font ) );
-	lbl->XPos = btn->XPos;
-	lbl->YPos = btn->YPos;
-	lbl->Width = btn->Width;
-	lbl->Height = btn->Height;
+	Label* lbl = new Label( btn->ControlFrame(), core->GetFont( font ), "" );
 	lbl->ControlID = ControlID;
-	lbl->ControlType = IE_GUI_LABEL;
 	lbl->Owner = win;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
@@ -2049,11 +2035,12 @@ PyDoc_STRVAR( GemRB_Window_CreateLabel__doc,
 
 static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h, align;
+	int WindowIndex, ControlID, align;
+	Region rgn;
 	char *font, *text;
 
-	if (!PyArg_ParseTuple( args, "iiiiiissi", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &font, &text, &align )) {
+	if (!PyArg_ParseTuple( args, "iiiiiissi", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &font, &text, &align )) {
 		return AttributeError( GemRB_Window_CreateLabel__doc );
 	}
 
@@ -2061,15 +2048,9 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	Label* lbl = new Label( core->GetFont( font ) );
-	lbl->XPos = x;
-	lbl->YPos = y;
-	lbl->Width = w;
-	lbl->Height = h;
+	Label* lbl = new Label(rgn, core->GetFont( font ), text );
 	lbl->ControlID = ControlID;
-	lbl->ControlType = IE_GUI_LABEL;
 	lbl->Owner = win;
-	lbl->SetText( text );
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
@@ -2115,11 +2096,12 @@ PyDoc_STRVAR( GemRB_Window_CreateTextEdit__doc,
 
 static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 	char *font, *text;
 
-	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &font, &text )) {
+	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &font, &text )) {
 		return AttributeError( GemRB_Window_CreateTextEdit__doc );
 	}
 
@@ -2128,14 +2110,9 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 		return RuntimeError("Cannot find window!");
 	}
 	//there is no need to set these differently, currently
-	TextEdit* edit = new TextEdit( 500, 0, 0);
+	TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
 	edit->SetFont( core->GetFont( font ) );
-	edit->XPos = x;
-	edit->YPos = y;
-	edit->Width = w;
-	edit->Height = h;
 	edit->ControlID = ControlID;
-	edit->ControlType = IE_GUI_EDIT;
 	edit->Owner = win;
 	edit->SetText( text );
 
@@ -2158,15 +2135,20 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateScrollBar__doc,
-"CreateScrollBar(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"CreateScrollBar(WindowIndex, ControlID, x, y, w, h, ResRef) => ControlIndex\n\n"
 "Creates and adds a new ScrollBar to a Window.");
 
 static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	char* resRef;
+	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x, &y,
-			&w, &h )) {
+	// hidden parameters from CreateScrollBar decorator
+	int cycle, up, upPr, down, downPr, trough, slider;
+
+	if (!PyArg_ParseTuple( args, "iiiiiisiiiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h, &resRef, &cycle, &up, &upPr, &down, &downPr, &trough, &slider )) {
 		return AttributeError( GemRB_Window_CreateScrollBar__doc );
 	}
 
@@ -2175,13 +2157,25 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 		return RuntimeError("Cannot find window!");
 	}
 
-	ScrollBar* sb = new ScrollBar( );
-	sb->XPos = x;
-	sb->YPos = y;
-	sb->Width = w;
-	sb->Height = h;
+	AnimationFactory* af = ( AnimationFactory* )
+	gamedata->GetFactoryResource( resRef, IE_BAM_CLASS_ID, IE_NORMAL );
+	if (!af) {
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", resRef);
+		return RuntimeError( tmpstr );
+	}
+
+	Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
+	images[IE_GUI_SCROLLBAR_UP_UNPRESSED] = af->GetFrame( up, cycle );
+	images[IE_GUI_SCROLLBAR_UP_PRESSED] = af->GetFrame( upPr, cycle );
+	images[IE_GUI_SCROLLBAR_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
+	images[IE_GUI_SCROLLBAR_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
+	images[IE_GUI_SCROLLBAR_TROUGH] = af->GetFrame( trough, cycle );
+	images[IE_GUI_SCROLLBAR_SLIDER] = af->GetFrame( slider, cycle );
+
+	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;
-	sb->ControlType = IE_GUI_SCROLLBAR;
 	sb->Owner = win;
 	win->AddControl( sb );
 
@@ -2202,10 +2196,11 @@ PyDoc_STRVAR( GemRB_Window_CreateButton__doc,
 
 static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x, &y,
-			&w, &h )) {
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h )) {
 		return AttributeError( GemRB_Window_CreateButton__doc );
 	}
 
@@ -2214,13 +2209,8 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 
-	Button* btn = new Button( );
-	btn->XPos = x;
-	btn->YPos = y;
-	btn->Width = w;
-	btn->Height = h;
+	Button* btn = new Button(rgn);
 	btn->ControlID = ControlID;
-	btn->ControlType = IE_GUI_BUTTON;
 	btn->Owner = win;
 	win->AddControl( btn );
 
@@ -2260,13 +2250,8 @@ static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	TextArea* ta = new TextArea( fore, init, back );
-	ta->XPos = ctrl->XPos;
-	ta->YPos = ctrl->YPos;
-	ta->Width = ctrl->Width;
-	ta->Height = ctrl->Height;
+	TextArea* ta = new TextArea( ctrl->ControlFrame(), fore, init, back );
 	ta->ControlID = ctrl->ControlID;
-	ta->ControlType = IE_GUI_TEXTAREA;
 	ta->Owner = win;
 	ta->SetFonts (ctrl->GetFont(), ctrl->GetFont() );
 	ta->Flags |= IE_GUI_TEXTAREA_EDITABLE;
@@ -2317,64 +2302,6 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_ScrollBar_SetSprites__doc,
-"SetScrollBarSprites(WindowIndex, ControlIndex, ResRef, Cycle, UpUnpressedFrame, UpPressedFrame, DownUnpressedFrame, DownPressedFrame, TroughFrame, SliderFrame)\n\n"
-"Sets a ScrollBar Sprites Images." );
-
-static PyObject* GemRB_ScrollBar_SetSprites(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, cycle, upunpressed, uppressed;
-	int downunpressed, downpressed, trough, knob;
-	char *ResRef;
-
-	if (!PyArg_ParseTuple( args, "iisiiiiiii", &WindowIndex, &ControlIndex,
-			&ResRef, &cycle, &upunpressed, &uppressed, &downunpressed, &downpressed, &trough, &knob )) {
-		return AttributeError( GemRB_ScrollBar_SetSprites__doc );
-	}
-
-	ScrollBar* sb = ( ScrollBar* ) GetControl(WindowIndex, ControlIndex, IE_GUI_SCROLLBAR);
-	if (!sb) {
-		return NULL;
-	}
-
-	if (ResRef[0] == 0) {
-		sb->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_TROUGH, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_SLIDER, 0 );
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource( ResRef,
-				IE_BAM_CLASS_ID, IE_NORMAL );
-	if (!af) {
-		char tmpstr[24];
-
-		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
-		return RuntimeError( tmpstr );
-	}
-	Sprite2D *tspr = af->GetFrame(upunpressed, (unsigned char)cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED, tspr );
-	tspr = af->GetFrame( uppressed, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED, tspr );
-	tspr = af->GetFrame( downunpressed, (unsigned char)cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED, tspr );
-	tspr = af->GetFrame( downpressed, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED, tspr );
-	tspr = af->GetFrame( trough, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_TROUGH, tspr );
-	tspr = af->GetFrame( knob, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_SLIDER, tspr );
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
-
 PyDoc_STRVAR( GemRB_Button_SetSprites__doc,
 "SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n\n"
 "Sets a Button Sprites Images." );
@@ -2411,9 +2338,9 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( tmpstr );
 	}
 	Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
-	btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-	tspr = af->GetFrame( pressed, (unsigned char) cycle);
 	btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
+	tspr = af->GetFrame( pressed, (unsigned char) cycle);
+	btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 	tspr = af->GetFrame( selected, (unsigned char) cycle);
 	btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
 	tspr = af->GetFrame( disabled, (unsigned char) cycle);
@@ -2926,11 +2853,12 @@ PyDoc_STRVAR( GemRB_Window_CreateWorldMapControl__doc,
 
 static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h, direction;
+	int WindowIndex, ControlID, direction;
+	Region rgn;
 	char *font=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &direction, &font )) {
+	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &direction, &font )) {
 		return AttributeError( GemRB_Window_CreateWorldMapControl__doc );
 	}
 
@@ -2941,20 +2869,12 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
-		x = ctrl->XPos;
-		y = ctrl->YPos;
-		w = ctrl->Width;
-		h = ctrl->Height;
+		rgn = ctrl->ControlFrame();
 		//flags = ctrl->Value;
 		win->DelControl( CtrlIndex );
 	}
-	WorldMapControl* wmap = new WorldMapControl( font?font:"", direction );
-	wmap->XPos = x;
-	wmap->YPos = y;
-	wmap->Width = w;
-	wmap->Height = h;
+	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;
-	wmap->ControlType = IE_GUI_WORLDMAP;
 	wmap->Owner = win;
 	win->AddControl( wmap );
 
@@ -3004,17 +2924,18 @@ PyDoc_STRVAR( GemRB_Window_CreateMapControl__doc,
 
 static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID;
+	Region rgn;
 	int LabelID;
 	char *Flag=NULL;
 	char *Flag2=NULL;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiis|s", &WindowIndex, &ControlID,
-			&x, &y, &w, &h, &LabelID, &Flag, &Flag2)) {
+			&rgn.x, &rgn.y, &rgn.w, &rgn.h, &LabelID, &Flag, &Flag2)) {
 		Flag=NULL;
 		PyErr_Clear(); //clearing the exception
 		if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID,
-			&x, &y, &w, &h)) {
+			&rgn.x, &rgn.y, &rgn.w, &rgn.h)) {
 			return AttributeError( GemRB_Window_CreateMapControl__doc );
 		}
 	}
@@ -3025,22 +2946,14 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
-		x = ctrl->XPos;
-		y = ctrl->YPos;
-		w = ctrl->Width;
-		h = ctrl->Height;
+		rgn = ctrl->ControlFrame();
 		// do *not* delete the existing control, we want to replace
 		// it in the sort order!
 		//win->DelControl( CtrlIndex );
 	}
 
-	MapControl* map = new MapControl( );
-	map->XPos = x;
-	map->YPos = y;
-	map->Width = w;
-	map->Height = h;
+	MapControl* map = new MapControl(rgn);
 	map->ControlID = ControlID;
-	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
@@ -9375,6 +9288,36 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_PrepareSpontaneousCast__doc,
+"PrepareSpontaneousCast(globalID, spellIndex, type, level, spellResRef) => index\n\n"
+"Depletes the memorised spell and replaces it with another (in memory).\n"
+"WARNING: useful only immediately before casting. Returns index of the new spell.\n");
+
+static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* args)
+{
+	int globalID, type, level;
+	const char *spell = NULL;
+	const char *spell2 = NULL;
+	ieResRef replacementSpell;
+
+	if (!PyArg_ParseTuple( args, "isiis", &globalID, &spell, &type, &level, &spell2)) {
+		return AttributeError( GemRB_PrepareSpontaneousCast__doc );
+	}
+	strnlwrcpy(replacementSpell, spell2, 8);
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	// deplete original memorisation
+	actor->spellbook.UnmemorizeSpell(spell, true);
+	// set spellinfo to all known spells of desired type
+	actor->spellbook.SetCustomSpellInfo(NULL, NULL, 1<<type);
+	SpellExtHeader spelldata;
+	int idx = actor->spellbook.FindSpellInfo(&spelldata, replacementSpell, 1<<type);
+
+	return PyInt_FromLong(idx-1);
+}
+
 PyDoc_STRVAR( GemRB_SpellCast__doc,
 "SpellCast(slot, type, spell)\n\n"
 "Makes the actor try to cast a spell. Type is the spell type like 3 for normal spells and 4 for innates.\n"
@@ -9663,6 +9606,45 @@ static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_RunRestScripts__doc,
+			  "RunRestScripts()\n\n"
+			  "Executes the party pre-rest scripts if any.");
+
+static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
+{
+	GET_GAME();
+
+	// check if anyone wants to banter first (bg2)
+	static int dreamer = -2;
+	if (dreamer == -2) {
+		AutoTable pdtable("pdialog");
+		dreamer = pdtable->GetColumnIndex("DREAM_SCRIPT_FILE");
+	}
+	if (dreamer >= 0) {
+		AutoTable pdtable("pdialog");
+		int ii = game->GetPartySize(true); // party size, only alive
+		bool bg2expansion = core->GetGame()->Expansion == 5;
+		while (ii--) {
+			Actor *tar = game->GetPC(ii, true);
+			const char* scriptname = tar->GetScriptName();
+			if (pdtable->GetRowIndex(scriptname) != -1) {
+				ieResRef resref;
+				if (bg2expansion) {
+					strnlwrcpy(resref, pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
+				} else {
+					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
+				}
+				GameScript* restscript = new GameScript(resref, tar, 0, 0);
+				restscript->Update();
+				delete restscript;
+			}
+		}
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_RestParty__doc,
 "RestParty(noareacheck, dream, hp)\n\n"
 "Executes the party rest function, used from both stores and via the main screen.");
@@ -9744,17 +9726,17 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasSpecialSpell__doc,
-"HasSpecialSpell(pc, itemtype, useup) => bool\n\n"
+"HasSpecialSpell(pc, specialtype, useup) => bool\n\n"
 "Checks if a team member has a spell, optionally uses it.");
 
-//itemtype 1 - identify
-//         2 - can use in silence
-//         4 - cannot use in wildsurge
+//specialtype 1 - identify
+//            2 - can use in silence
+//            4 - cannot use in wildsurge
 static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, itemtype, useup;
+	int globalID, specialtype, useup;
 
-	if (!PyArg_ParseTuple( args, "iii", &globalID, &itemtype, &useup)) {
+	if (!PyArg_ParseTuple( args, "iii", &globalID, &specialtype, &useup)) {
 		return AttributeError( GemRB_HasSpecialSpell__doc );
 	}
 
@@ -9767,7 +9749,7 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	}
 	SpellDescType *special_spells = core->GetSpecialSpells();
 	while(i--) {
-		if (itemtype&special_spells[i].value) {
+		if (specialtype & special_spells[i].value) {
 			if (actor->spellbook.HaveSpell(special_spells[i].resref,useup)) {
 				if (useup) {
 					//actor->SpellCast(SpecialSpells[i].resref, actor);
@@ -10731,12 +10713,14 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(QuitGame, METH_NOARGS),
 	METHOD(PlaySound, METH_VARARGS),
 	METHOD(PlayMovie, METH_VARARGS),
+	METHOD(PrepareSpontaneousCast, METH_VARARGS),
 	METHOD(RemoveItem, METH_VARARGS),
 	METHOD(RemoveSpell, METH_VARARGS),
 	METHOD(RemoveEffects, METH_VARARGS),
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(RevealArea, METH_VARARGS),
 	METHOD(Roll, METH_VARARGS),
+	METHOD(RunRestScripts, METH_NOARGS),
 	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(SaveConfig, METH_NOARGS),
@@ -10838,7 +10822,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(SaveGame_GetPreview, METH_VARARGS),
 	METHOD(SaveGame_GetSaveID, METH_VARARGS),
 	METHOD(ScrollBar_SetDefaultScrollBar, METH_VARARGS),
-	METHOD(ScrollBar_SetSprites, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),
 	METHOD(Symbol_Unload, METH_VARARGS),
 	METHOD(Table_FindValue, METH_VARARGS),
@@ -10896,6 +10879,7 @@ GUIScript::GUIScript(void)
 	pDict = NULL; //borrowed, but used outside a function
 	pModule = NULL; //should decref it
 	pMainDic = NULL; //borrowed, but used outside a function
+	pGUIClasses = NULL;
 }
 
 GUIScript::~GUIScript(void)
@@ -11139,9 +11123,6 @@ bool GUIScript::LoadScript(const char* filename)
 		return false;
 	}
 	Log(MESSAGE, "GUIScript", "Loading Script %s.", filename);
-
-	char path[_MAX_PATH];
-	strcpy( path, filename );
 
 	PyObject *pName = PyString_FromString( filename );
 	/* Error checking of pName left out */

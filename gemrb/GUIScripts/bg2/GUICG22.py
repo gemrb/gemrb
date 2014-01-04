@@ -89,9 +89,8 @@ def OnLoad():
 			extrakit.SetSprites("GUICGBC",0, 0,1,2,3)
 			RowCount = 11
 		if tmpRowCount>11: #create scroll bar
-			KitWindow.CreateScrollBar(1000, 290, 50, 16, 220)
+			KitWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
 			ScrollBar = KitWindow.GetControl (1000)
-			ScrollBar.SetSprites("GUISCRCW", 0, 0,1,2,3,5,4)
 			ScrollBar.SetVarAssoc("TopIndex",tmpRowCount-10)
 			ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawKits)
 			ScrollBar.SetDefaultScrollBar()

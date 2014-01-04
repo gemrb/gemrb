@@ -1,23 +1,24 @@
-#-*-python-*-
-#GemRB - Infinity Engine Emulator
-#Copyright (C) 2003-2004 The GemRB Project
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003-2004 The GemRB Project
 #
-#This program is free software; you can redistribute it and/or
-#modify it under the terms of the GNU General Public License
-#as published by the Free Software Foundation; either version 2
-#of the License, or (at your option) any later version.
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
 #
-#You should have received a copy of the GNU General Public License
-#along with this program; if not, write to the Free Software
-#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-#GUIINV.py - scripts to control inventory windows from GUIINV winpack
+
+# GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
 ###################################################
 
@@ -86,8 +87,8 @@ def OpenInventoryWindow ():
 	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	OptionsWindow.SetFrame ()
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
+	OptionsWindow.SetFrame ()
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
@@ -135,19 +136,19 @@ def OpenInventoryWindow ():
 	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-20,r["Width"],20,
 		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
 
-	#armor class
+	# armor class
 	Label = Window.GetControl (0x10000038)
 	Label.SetTooltip (17183)
 
-	#hp current
+	# hp current
 	Label = Window.GetControl (0x10000039)
 	Label.SetTooltip (17184)
 
-	#hp max
+	# hp max
 	Label = Window.GetControl (0x1000003a)
 	Label.SetTooltip (17378)
 
-	#info label, game paused, etc
+	# info label, game paused, etc
 	Label = Window.GetControl (0x1000003f)
 	Label.SetText ("")
 
@@ -179,8 +180,9 @@ def OpenInventoryWindow ():
 	GemRB.GamePause(0, 0)
 	return
 
-#complete update
 def UpdateInventoryWindow ():
+	"""Redraws the inventory window and resets TopIndex."""
+
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -191,21 +193,23 @@ def UpdateInventoryWindow ():
 	RefreshInventoryWindow ()
 	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
+
 	for i in range (SlotCount):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
 
-#partial update without altering TopIndex
 def RefreshInventoryWindow ():
+	"""Partial redraw without resetting TopIndex."""
+
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	#name
+	# name
 	Label = Window.GetControl (0x10000032)
 	Label.SetText (GemRB.GetPlayerName (pc, 0))
 
-	#portrait
+	# portrait
 	Button = Window.GetControl (50)
 
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
@@ -226,14 +230,14 @@ def RefreshInventoryWindow ():
 		Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
 			Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 
-		#Weapon
+		# Weapon
 		slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
 		if slot_item:
 			item = GemRB.GetItem (slot_item["ItemResRef"])
 			if (item['AnimationType'] != ''):
 				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
 
-		#Shield
+		# Shield
 		slot_item = GemRB.GetSlotItem (pc, 3)
 		if slot_item:
 			itemname = slot_item["ItemResRef"]
@@ -246,36 +250,36 @@ def RefreshInventoryWindow ():
 					#shield
 					Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 
-		#Helmet
+		# Helmet
 		slot_item = GemRB.GetSlotItem (pc, 1)
 		if slot_item:
 			item = GemRB.GetItem (slot_item["ItemResRef"])
 			if (item['AnimationType'] != ''):
 				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
-	#encumbrance
+	# encumbrance
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
-	#armor class
+	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
 	Label = Window.GetControl (0x10000038)
 	Label.SetText (str (ac))
 
-	#hp current
+	# hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	Label = Window.GetControl (0x10000039)
 	Label.SetText (str (hp))
 
-	#hp max
+	# hp max
 	hpmax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	Label = Window.GetControl (0x1000003a)
 	Label.SetText (str (hpmax))
 
-	#party gold
+	# party gold
 	Label = Window.GetControl (0x10000040)
 	Label.SetText (str (GemRB.GameGetPartyGold ()))
 
-	#class
+	# class
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	Label = Window.GetControl (0x10000042)
 	Label.SetText (ClassTitle)
@@ -288,7 +292,7 @@ def RefreshInventoryWindow ():
 	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
-	#update ground inventory slots
+	# update ground inventory slots
 	Container = GemRB.GetContainer (pc, 1)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
@@ -311,9 +315,9 @@ def RefreshInventoryWindow ():
 
 		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
-	#making window visible/shaded depending on the pc's state
+	# making window visible/shaded depending on the pc's state
 	GUICommon.AdjustWindowVisibility (Window, pc, False)
 	return
 
 ###################################################
-#End of file GUIINV.py
+# End of file GUIINV.py

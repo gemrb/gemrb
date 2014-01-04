@@ -96,6 +96,7 @@ void Window::SetBackGround(Sprite2D* img, bool clean)
 /** This function Draws the Window on the Output Screen */
 void Window::DrawWindow()
 {
+	if (!Visible) return; // no point in drawing invisible windows
 	Video* video = core->GetVideoDriver();
 	Region clip( XPos, YPos, Width, Height );
 	//Frame && Changed
@@ -103,8 +104,7 @@ void Window::DrawWindow()
 		Region screen( 0, 0, core->Width, core->Height );
 		video->SetClipRect( NULL );
 		//removed this?
-		Color black = { 0, 0, 0, 255 };
-		video->DrawRect( screen, black );
+		video->DrawRect( screen, ColorBlack );
 		if (core->WindowFrames[0])
 			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
 		if (core->WindowFrames[1])
@@ -221,12 +221,10 @@ void Window::SetFocused(Control* ctrl)
 {
 	if (lastFocus != NULL) {
 		lastFocus->SetFocus(false);
-		lastFocus->Changed = true;
 	}
 	lastFocus = ctrl;
 	if (ctrl != NULL) {
 		lastFocus->SetFocus(true);
-		lastFocus->Changed = true;
 	}
 }
 
@@ -234,11 +232,11 @@ void Window::SetFocused(Control* ctrl)
 void Window::SetMouseFocused(Control* ctrl)
 {
 	if (lastMouseFocus != NULL) {
-		lastMouseFocus->Changed = true;
+		lastMouseFocus->MarkDirty();
 	}
 	lastMouseFocus = ctrl;
 	if (ctrl != NULL) {
-		lastMouseFocus->Changed = true;
+		lastMouseFocus->MarkDirty();
 	}
 }
 
@@ -326,7 +324,7 @@ void Window::Invalidate()
 		if (!Controls[i]) {
 			continue;
 		}
-		Controls[i]->Changed = true;
+		Controls[i]->MarkDirty();
 		switch (Controls[i]->ControlType) {
 			case IE_GUI_SCROLLBAR:
 				if ((ScrollControl == -1) || (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT))
@@ -418,7 +416,15 @@ void Window::OnMouseOver(unsigned short x, unsigned short y)
 	if (!lastOver) {
 		return;
 	}
-	lastOver->OnMouseOver( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	short cx = x - XPos - lastOver->XPos;
+	short cy = y - YPos - lastOver->YPos;
+	if (cx < 0) {
+		cx = 0;
+	}
+	if (cy < 0) {
+		cy = 0;
+	}
+	lastOver->OnMouseOver(cx, cy);
 }
 
 }

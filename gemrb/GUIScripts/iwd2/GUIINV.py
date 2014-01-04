@@ -153,7 +153,7 @@ def OpenInventoryWindow ():
 	Label = Window.GetControl (0x1000003a)
 	Label.SetTooltip (17378)
 
-	#info label, game paused, etc
+	# info label, game paused, etc
 	Label = Window.GetControl (0x1000003f)
 	Label.SetText ("")
 

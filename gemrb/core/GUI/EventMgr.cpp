@@ -50,6 +50,7 @@ EventMgr::EventMgr(void)
 	dc_delay = 250;
 	rk_delay = 250;
 	rk_flags = GEM_RK_DISABLE;
+	focusLock = NULL;
 }
 
 EventMgr::~EventMgr(void)
@@ -174,10 +175,16 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	if (!last_win_focused) {
 		return;
 	}
+
 	GameControl *gc = core->GetGameControl();
-	if (gc) {
+	if (gc && (!focusLock || focusLock == gc)) {
 		// for scrolling
 		gc->OnGlobalMouseMove(x, y);
+	}
+	if (last_win_mousefocused && focusLock) {
+		last_win_mousefocused->OnMouseOver(x, y);
+		RefreshCursor(last_win_mousefocused->Cursor);
+		return;
 	}
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
@@ -287,7 +294,12 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 				last_win_mousefocused = *m;
 				if (ctrl != NULL) {
 					last_win_mousefocused->SetMouseFocused( ctrl );
-					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
+					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos,
+									  Button, Mod );
+					if (!ctrl->WantsDragOperation()) {
+						focusLock = ctrl;
+					}
+					RefreshCursor(last_win_mousefocused->Cursor);
 					return;
 				}
 			}
@@ -312,6 +324,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
+	focusLock = NULL;
 	MButtons &= ~Button;
 	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
 	if (last_ctrl_mousefocused == NULL) return;

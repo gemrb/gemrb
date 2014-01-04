@@ -1,10 +1,13 @@
-GemRB git (95288c):
+GemRB git (21f2301cd):
   New features:
+    - 
+    - spontaneous casting (iwd2) and "cast healing spells on rest"
     - utf-8 converter for dialog.tlk to be able to use any (cjk) font
 
   Improved features:
     - 
-    - inventory
+    - spawngroups, autopause
+    - inventory, pst guiscripts, pst usability
     - animations, scripting, dialog, touch input, mac gui
     - bugfixes
 

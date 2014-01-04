@@ -23,9 +23,9 @@
 ###################################################
 
 import GemRB
+import GameCheck
 from GUIDefines import *
 from ie_restype import *
-import GUICommon
 
 StartWindow = 0
 JoinGameButton = 0
@@ -43,14 +43,14 @@ def OnLoad ():
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
 		GemRB.PlayMovie ("BISLOGO", 1)
-		if GUICommon.HasHOW():
+		if GameCheck.HasHOW():
 			GemRB.PlayMovie ("WOTC", 1)
 		else:
 			GemRB.PlayMovie ("TSRLOGO", 1)
 		GemRB.PlayMovie("INTRO", 1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	if GUICommon.HasHOW():
+	if GameCheck.HasHOW():
 		GemRB.SetMasterScript("BALDUR","WORLDMAP","EXPMAP")
 	else:
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
@@ -175,7 +175,7 @@ def ProtocolDonePress ():
 def CreatePress ():
 	global StartWindow, GameTypeWindow, ExpansionType
 
-	if not GUICommon.HasHOW():
+	if not GameCheck.HasHOW():
 		GameTypeReallyDonePress()
 
 	GameTypeWindow = GemRB.LoadWindow (24)

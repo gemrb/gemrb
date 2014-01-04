@@ -64,7 +64,7 @@ def OnLoad():
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "EXOFONT", "", 1)
+	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", 1)
 	Label=StartWindow.GetControl(0x0fff0000)
 	Label.SetText(GEMRB_VERSION)
 	

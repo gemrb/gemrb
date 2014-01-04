@@ -339,11 +339,6 @@ Milisecond threshold for detecting a double click. The default is 250.
 Milisecond threshold for detecting a repeated key press. The default is 250.
 
 .TP
-.BR TouchScrollAreas =(0|1)
-Toggles a wider and visible gutter around the screen for scrolling the game
-area. Intended for devices with a touch interface. Disabled by default.
-
-.TP
 .BR UseSoftKeyboard =(0|1)
 Toggles use of software keyboard on devices that support one. It pops up when
 text input is required. Disabled by default.

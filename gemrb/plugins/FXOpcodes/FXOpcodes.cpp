@@ -2836,12 +2836,18 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//TBD
 		target->AddPortraitIcon(PI_SLOWED);
 		break;
+	case RPD_MOLD2:
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
 		target->SetSpellState(SS_MOLDTOUCH);
-		damage = 1;
-		break;
-	case RPD_MOLD2:
+		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+			return FX_APPLIED;
+		}
+		if (fx->Parameter1<1) {
+			return FX_NOT_APPLIED;
+		}
+		damage = core->Roll(fx->Parameter1--, 6, 0);
+		//TODO: spread to nearest (range 10) non-affected (use spell state?)
 		break;
 	case RPD_PEST:     //cloud of pestilence (iwd2)
 		break;
@@ -3805,11 +3811,12 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->FirstApply) {
 		BASE_ADD( IE_HITPOINTS, fx->Parameter1);
 	}
-	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
+	HandleBonus(target, IE_SAVEVSDEATH, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSWANDS, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSPOLY, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSBREATH, fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSSPELL, fx->Parameter1, fx->TimingMode);
+
 	//bless effect too?
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
@@ -4295,13 +4302,8 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->SetSpellResRef(fx->Resource);
-	//cast spell on target
-	//flags: deplete, instant, no interrupt
-	Owner->CastSpell(target, false, fx->Parameter2==1, true);
-	//actually finish casting (if this is not good enough, use an action???)
-	//flag: no casting animation
-	Owner->CastSpellEnd(fx->Parameter1, fx->Parameter2);
+	// flags: no deplete, instant?, no interrupt
+	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false, fx->Parameter2==1, true);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;
@@ -4327,11 +4329,8 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->SetSpellResRef(fx->Resource);
 	Point p(fx->PosX, fx->PosY);
-	Owner->CastSpellPoint(p, false);
-	//actually finish casting (if this is not good enough, use an action???)
-	Owner->CastSpellPointEnd(fx->Parameter1, fx->Parameter2);
+	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, fx->Parameter2, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
@@ -5564,11 +5563,12 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
 	STAT_SUB(IE_MAXHITPOINTS, x);
-	STAT_SUB(IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
+	HandleBonus(target, IE_SAVEVSDEATH, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSWANDS, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSPOLY, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSBREATH, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSSPELL, -fx->Parameter1, fx->TimingMode);
+
 	target->AddPortraitIcon(PI_LEVELDRAIN);
 	//decrease current hitpoints on first apply
 	if (fx->FirstApply) {
@@ -5965,10 +5965,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				}
 			}
 			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
-			Owner->SetSpellResRef(refs[i]);
-			//cast spell on target
-			Owner->CastSpell(actor, false, true, true); //flags: deplete, instant, no interrupt
-			Owner->CastSpellEnd(fx->Power, 1); //flag: no casting animation
+			// no casting animation, no deplete, instant, no interrupt
+			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false, true, true);
 		}
 		Owner->SetSpellResRef(OldSpellResRef);
 
@@ -6394,9 +6392,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->SetSpellResRef(fx->Resource);
-	Owner->CastSpellPoint(target->Pos, false, true, true);
-	Owner->CastSpellPointEnd(0, 1);
+	Owner->DirectlyCastSpellPoint(target->Pos, fx->Resource, 0, 1, false, true, true);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }

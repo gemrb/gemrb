@@ -31,8 +31,10 @@
 
 namespace GemRB {
 
-Label::Label(Font* font)
+Label::Label(const Region& frame, Font* font, const char* string)
+	: Control(frame)
 {
+	ControlType = IE_GUI_LABEL;
 	this->font = font;
 	Buffer = NULL;
 	useRGB = false;
@@ -40,6 +42,7 @@ Label::Label(Font* font)
 
 	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
 	palette = NULL;
+	SetText(string);
 }
 Label::~Label()
 {
@@ -49,18 +52,10 @@ Label::~Label()
 	}
 }
 /** Draws the Control on the Output Display */
-void Label::Draw(unsigned short x, unsigned short y)
+void Label::DrawInternal(Region& rgn)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT)) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
 	if (font && Buffer) {
-		font->Print( Region( this->XPos + x, this->YPos + y,
-			this->Width, this->Height ), (unsigned char*)Buffer,
+		font->Print( rgn, (unsigned char*)Buffer,
 			useRGB?palette:NULL,
 					 Alignment | IE_FONT_SINGLE_LINE, true );
 	}
@@ -68,8 +63,8 @@ void Label::Draw(unsigned short x, unsigned short y)
 	if (AnimPicture) {
 		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
-		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
+		core->GetVideoDriver()->BlitSprite( AnimPicture, r.x + xOffs, r.y + yOffs, true, &r );
 	}
 
 }
@@ -92,19 +87,16 @@ void Label::SetText(const char* string)
 		Buffer = strdup( string );
 	}
 	if (!palette) {
-		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
-		SetColor(white, black);
+		SetColor(ColorWhite, ColorBlack);
 	}
-	if (Owner) {
-		Owner->Invalidate();
-	}
+	MarkDirty();
 }
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)
 {
 	gamedata->FreePalette( palette );
 	palette = core->CreatePalette( col, bac );
-	Changed = true;
+	MarkDirty();
 }
 
 void Label::SetAlignment(unsigned char Alignment)
@@ -115,7 +107,7 @@ void Label::SetAlignment(unsigned char Alignment)
 			strtolower( Buffer );
 		}
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 void Label::OnMouseUp(unsigned short x, unsigned short y,
@@ -134,8 +126,6 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 
 bool Label::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_LABEL_ON_PRESS:
 		LabelOnPress = handler;

@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,14 +22,15 @@
 
 ###################################################
 
-from GUIDefines import *
-from ie_stats import *
-from ie_slots import *
 import GemRB
 import GUICommon
 import CommonTables
 import GUICommonWindows
 import InventoryCommon
+from GUIDefines import *
+from ie_stats import *
+from ie_slots import *
+
 
 InventoryWindow = None
 ItemAmountWindow = None
@@ -65,6 +66,8 @@ ItemHash = {}
 
 
 def OpenInventoryWindow ():
+	"""Opens the inventory window."""
+
 	global AvSlotsTable
 	global InventoryWindow
 
@@ -154,6 +157,7 @@ def OpenInventoryWindow ():
 	return
 
 def UpdateInventoryWindow ():
+	"""Redraws the inventory window and resets TopIndex."""
 	global ItemHash
 	global slot_list
 
@@ -183,7 +187,10 @@ def UpdateInventoryWindow ():
 		UpdateSlot (pc, i)
 
 def RefreshInventoryWindow ():
+	"""Partial redraw without resetting TopIndex."""
+
 	Window = InventoryWindow
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# name

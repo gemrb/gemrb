@@ -23,7 +23,7 @@
 ###################################################
 
 import GemRB
-import GUICommon
+import GameCheck
 ###################################################
 
 PortraitCount = 0
@@ -47,7 +47,7 @@ def Set (PortraitName):
 	global PortraitCount
 
 	# removes the size marking character at the end
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		PortraitName = PortraitName.rstrip ("[ms]")
 	else:
 		PortraitName = PortraitName.rstrip ("[ls]")

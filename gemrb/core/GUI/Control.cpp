@@ -39,18 +39,21 @@
 
 namespace GemRB {
 
-Control::Control()
+Control::Control(const Region& frame)
 {
 	hasFocus = false;
 	Changed = true;
 	InHandler = false;
 	VarName[0] = 0;
+	ControlID = 0;
 	Value = 0;
 	Flags = 0;
 	Tooltip = NULL;
 	Owner = NULL;
-	XPos = 0;
-	YPos = 0;
+	XPos = frame.x;
+	YPos = frame.y;
+	Width = frame.w;
+	Height = frame.h;
 
 	sb = NULL;
 	animation = NULL;
@@ -70,6 +73,51 @@ Control::~Control()
 	delete animation;
 
 	core->GetVideoDriver()->FreeSprite(AnimPicture);
+}
+
+Region Control::ControlFrame()
+{
+	return Region(XPos, YPos, Width, Height);
+}
+
+void Control::MarkDirty() {
+	if (!Changed) {
+		Changed = true;
+		if (Owner && !HasBackground()) {
+			// the window is our background so we must redraw the entire thing :(
+			Owner->InvalidateForControl(this);
+		}
+	}
+}
+
+bool Control::NeedsDraw()
+{
+	return (Changed || (Owner->Flags&WF_FLOAT));
+}
+
+void Control::Draw(unsigned short x, unsigned short y)
+{
+	// FIXME: Draw shouldnt be getting called on controls that are offscreen...
+	if (XPos == 65535) {
+		return;
+	}
+	// no point in drawing something with a 0 w/h
+	if (!Width || !Height) {
+		return;
+	}
+	if (!NeedsDraw()) {
+		return;
+	}
+
+	Region drawFrame = Region(x + XPos, y + YPos, Width, Height);
+	Region clip;
+	Video* video = core->GetVideoDriver();
+	// clip drawing to the control bounds, then restore after drawing
+	video->GetClipRect(clip);
+	video->SetClipRect(&drawFrame);
+	DrawInternal(drawFrame);
+	video->SetClipRect(&clip);
+	Changed = false; // set *after* calling DrawInternal
 }
 
 /** Sets the Tooltip text of the current control */
@@ -179,6 +227,7 @@ bool Control::OnSpecialKeyPress(unsigned char Key)
 void Control::SetFocus(bool focus)
 {
 	hasFocus = focus;
+	Changed = true;
 }
 
 bool Control::isFocused()

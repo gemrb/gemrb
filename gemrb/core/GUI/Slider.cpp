@@ -31,9 +31,11 @@
 
 namespace GemRB {
 
-Slider::Slider(short KnobXPos, short KnobYPos, short KnobStep,
+Slider::Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep,
 	unsigned short KnobStepsCount, bool Clear)
+	: Control(frame)
 {
+	ControlType = IE_GUI_SLIDER;
 	this->KnobXPos = KnobXPos;
 	this->KnobYPos = KnobYPos;
 	this->KnobStep = KnobStep;
@@ -65,34 +67,26 @@ Slider::~Slider()
 }
 
 /** Draws the Control on the Output Display */
-void Slider::Draw(unsigned short x, unsigned short y)
+void Slider::DrawInternal(Region& rgn)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
-	Region r( x + XPos, y + YPos, Width, Height );
 	if (BackGround) {
 		if (( BackGround->Width < Width ) || ( BackGround->Height < Height )) {
-			core->GetVideoDriver()->BlitTiled( r, BackGround, true );
+			core->GetVideoDriver()->BlitTiled( rgn, BackGround, true );
 		} else {
-			core->GetVideoDriver()->BlitSprite( BackGround, x + XPos, y + YPos, true, &r );
+			core->GetVideoDriver()->BlitSprite( BackGround, rgn.x, rgn.y, true, &rgn );
 		}
 	}
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
 			core->GetVideoDriver()->BlitSprite( Knob,
-				x + XPos + KnobXPos + ( Pos * KnobStep ),
-				y + YPos + KnobYPos, true );
+				rgn.x + KnobXPos + ( Pos * KnobStep ),
+				rgn.y + KnobYPos, true );
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
 			core->GetVideoDriver()->BlitSprite( GrabbedKnob,
-				x + XPos + KnobXPos + ( Pos * KnobStep ),
-				y + YPos + KnobYPos, true );
+				rgn.x + KnobXPos + ( Pos * KnobStep ),
+				rgn.y + KnobYPos, true );
 			break;
 	}
 }
@@ -114,7 +108,7 @@ void Slider::SetPosition(unsigned int pos)
 			Value = 1;
 		core->GetDictionary()->SetAt( VarName, pos * Value );
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Refreshes a slider which is associated with VariableName */
@@ -130,7 +124,7 @@ void Slider::UpdateState(const char* VariableName, unsigned int Sum)
 	if (Sum <= KnobStepsCount) {
 		Pos = Sum;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Sets the selected image */
@@ -155,14 +149,14 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 			BackGround = img;
 			break;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Mouse Button Down */
 void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Button*/,
 	unsigned short /*Mod*/)
 {
-	Changed = true;
+	MarkDirty();
 	unsigned int oldPos = Pos;
 	int mx = (KnobXPos + ( Pos * KnobStep ) - Knob->XPos);
 	int my = (KnobYPos - Knob->YPos);
@@ -236,7 +230,7 @@ void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned shor
 	unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
-		Changed = true;
+		MarkDirty();
 	}
 	State = IE_GUI_SLIDER_KNOB;
 }
@@ -244,7 +238,7 @@ void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned shor
 /** Mouse Over Event */
 void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 {
-	Changed = true;
+	MarkDirty();
 	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
 		int mx = KnobXPos;
@@ -279,8 +273,6 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 /** Sets the slider change event */
 bool Slider::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_SLIDER_ON_CHANGE:
 		SliderOnChange = handler;

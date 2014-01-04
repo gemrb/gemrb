@@ -532,12 +532,12 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		}
 	case STI_TWO_ROWS:
 		//used in checks where any of two matches are ok (golem or undead etc)
-		if (check_iwd_targeting(Owner, target, value, idx)) return 1;
+		if (check_iwd_targeting(Owner, target, value, rel)) return 1;
 		if (check_iwd_targeting(Owner, target, value, val)) return 1;
 		return 0;
 	case STI_NOT_TWO_ROWS:
 		//this should be the opposite as above
-		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
+		if (check_iwd_targeting(Owner, target, value, rel)) return 0;
 		if (check_iwd_targeting(Owner, target, value, val)) return 0;
 		return 1;
 	case STI_SOURCE_TARGET:
@@ -620,6 +620,16 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 	} else {
 		STAT_ADD( stat, mod );
 	}
+}
+
+static inline void HandleSaveBoni(Actor *target, int value, int mode)
+{
+	HandleBonus(target, IE_SAVEFORTITUDE, value, mode);
+	HandleBonus(target, IE_SAVEREFLEX, value, mode);
+	HandleBonus(target, IE_SAVEWILL, value, mode);
+	//make it compatible with 2nd edition
+	HandleBonus(target, IE_SAVEVSBREATH, value, mode);
+	HandleBonus(target, IE_SAVEVSSPELL, value, mode);
 }
 
 // fx_ac_vs_damage_type_modifier_iwd2
@@ -837,6 +847,7 @@ int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_save_bonus(%2d): Bonus %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// TODO: check that users are passing appropriate values in iwd1 and iwd2!
 	STAT_MOD( IE_SAVEVSDEATH );
 	STAT_MOD( IE_SAVEVSWANDS );
 	STAT_MOD( IE_SAVEVSPOLY );
@@ -995,12 +1006,9 @@ int fx_prayer (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->ToHit.HandleFxBonus(value, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD( IE_SAVEFORTITUDE, value);
-	STAT_ADD( IE_SAVEREFLEX, value);
-	STAT_ADD( IE_SAVEWILL, value);
-	//make it compatible with 2nd edition
-	STAT_ADD( IE_SAVEVSBREATH, value);
-	STAT_ADD( IE_SAVEVSSPELL, value);
+	// bonus to all saves
+	HandleSaveBoni(target, value, fx->TimingMode);
+
 	return FX_APPLIED;
 }
 //0xf5
@@ -1010,12 +1018,8 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState(SS_BADPRAYER)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_PRAYER_BAD);
 	target->ToHit.HandleFxBonus(-1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD( IE_SAVEFORTITUDE, -1);
-	STAT_ADD( IE_SAVEREFLEX, -1);
-	STAT_ADD( IE_SAVEWILL, -1);
-	//make it compatible with 2nd edition
-	STAT_ADD( IE_SAVEVSBREATH, -1);
-	STAT_ADD( IE_SAVEVSSPELL, -1);
+	// bonus to all saves
+	HandleSaveBoni(target, -1, fx->TimingMode);
 	return FX_APPLIED;
 }
 
@@ -1144,12 +1148,8 @@ int fx_recitation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->ToHit.HandleFxBonus(value, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD( IE_SAVEFORTITUDE, value);
-	STAT_ADD( IE_SAVEREFLEX, value);
-	STAT_ADD( IE_SAVEWILL, value);
-	//make it compatible with 2nd edition
-	STAT_ADD( IE_SAVEVSBREATH, value);
-	STAT_ADD( IE_SAVEVSSPELL, value);
+	// bonus to all saves
+	HandleSaveBoni(target, value, fx->TimingMode);
 	return FX_APPLIED;
 }
 //0xfa RecitationBad
@@ -1159,12 +1159,8 @@ int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState(SS_BADRECIT)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_REC_BAD);
 	target->ToHit.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD( IE_SAVEFORTITUDE, -2);
-	STAT_ADD( IE_SAVEREFLEX, -2);
-	STAT_ADD( IE_SAVEWILL, -2);
-	//make it compatible with 2nd edition
-	STAT_ADD( IE_SAVEVSBREATH, -2);
-	STAT_ADD( IE_SAVEVSSPELL, -2);
+	// bonus to all saves
+	HandleSaveBoni(target, -2, fx->TimingMode);
 	return FX_APPLIED;
 }
 //0xfb LichTouch (how)
@@ -2492,13 +2488,9 @@ int fx_protection_from_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState( SS_PROTFROMEVIL)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_PROTFROMEVIL);
 	//+2 to all saving throws
-	STAT_ADD( IE_SAVEFORTITUDE, 2);
-	STAT_ADD( IE_SAVEREFLEX, 2);
-	STAT_ADD( IE_SAVEWILL, 2);
-	//make it compatible with 2nd edition
-	STAT_ADD( IE_SAVEVSBREATH, 2);
-	STAT_ADD( IE_SAVEVSSPELL, 2);
-	//immune to control
+	HandleSaveBoni(target, 2, fx->TimingMode);
+
+	// immunity to control is handled in fx_control
 	return FX_APPLIED;
 }
 
@@ -2667,7 +2659,7 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
 		fx->Parameter3 = 0;
-		if (target->GetSavingThrow(IE_SAVEVSSPELL,0) ) return FX_NOT_APPLIED;
+		if (target->GetSavingThrow(IE_SAVEWILL, 0)) return FX_NOT_APPLIED;
 	}
 	if(0) print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
@@ -3004,9 +2996,7 @@ int fx_aegis (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTMAGIC, 3);
 
 	//saving throws
-	STAT_ADD(IE_SAVEFORTITUDE, 2);
-	STAT_ADD(IE_SAVEWILL, 2);
-	STAT_ADD(IE_SAVEREFLEX, 2);
+	HandleSaveBoni(target, 2, fx->TimingMode);
 
 	if (fx->FirstApply) {
 		fx->Parameter1=8;
@@ -3112,12 +3102,8 @@ int fx_energy_drain (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//if there is another energy drain effect (level drain), add them up
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
-	STAT_SUB(IE_SAVEFORTITUDE, fx->Parameter1);
-	STAT_SUB(IE_SAVEREFLEX, fx->Parameter1);
-	STAT_SUB(IE_SAVEWILL, fx->Parameter1);
-	//these saving throws don't exist in 2nd edition, but to make it portable, we should affect ALL saving throws
-	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
+	// bonus to all saves
+	HandleSaveBoni(target, -fx->Parameter1, fx->TimingMode);
 	STAT_SUB(IE_MAXHITPOINTS, fx->Parameter1*5);
 	return FX_APPLIED;
 }
@@ -3223,13 +3209,8 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	target->AddPortraitIcon(PI_DAYBLINDNESS);
 
 	//saving throw penalty (bigger is better in iwd2)
-	STAT_SUB(IE_SAVEFORTITUDE, penalty);
-	STAT_SUB(IE_SAVEREFLEX, penalty);
-	STAT_SUB(IE_SAVEWILL, penalty);
-	//for compatibility reasons
-	STAT_SUB(IE_SAVEVSBREATH, penalty);
-	STAT_SUB(IE_SAVEVSSPELL, penalty);
-	//bigger is better in iwd2
+	HandleSaveBoni(target, -penalty, fx->TimingMode);
+
 	target->ToHit.HandleFxBonus(-penalty, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 
 	//decrease all skills by 1
@@ -3295,12 +3276,7 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_DAMAGEBONUS, 1);
 	STAT_ADD( IE_HITBONUS, 1);
 	//+1 to all saves
-	STAT_ADD( IE_SAVEFORTITUDE, 1);
-	STAT_ADD( IE_SAVEREFLEX, 1);
-	STAT_ADD( IE_SAVEWILL, 1);
-	//make it compatible with 2nd edition
-	STAT_ADD( IE_SAVEVSBREATH, 1);
-	STAT_ADD( IE_SAVEVSSPELL, 1);
+	HandleSaveBoni(target, 1, fx->TimingMode);
 
 	return FX_APPLIED;
 }
@@ -3311,7 +3287,12 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if(0) print("fx_barbarian_rage(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
-	//TODO: implement this
+	// Greater rage is handled by a different spell and spell state, all set externally
+	// Same goes for normal rage boni
+	// TODO: after 5 rounds (expiry) apply the "Fatigued" effect, whereby the barbarian is weakened (at least STR an DEX)
+	// at level 20 they receive Tireless Rage, which makes this effect useless,
+	//  (unless it really adds immunities to all charm, hold, and fear spells)
+	// it does not appear to be a spell though, so it's was likely a hack
 	return FX_APPLIED;
 }
 
@@ -3372,7 +3353,7 @@ int fx_tenser_transformation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// FIXME: should actually increase the base, so extra attacks can be gained
 	// but then the effect would be permanent and Actor::GetNumberOfAttacks doesn't handle effects yet
 	target->ToHit.HandleFxBonus(fx->CasterLevel/2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD(IE_SAVEFORTITUDE, 5);
+	HandleBonus(target, IE_SAVEFORTITUDE, 5, fx->TimingMode);
 	STAT_ADD(IE_MAXHITPOINTS, fx->Parameter3);
 	STAT_ADD(IE_STR, fx->Parameter4);
 	STAT_ADD(IE_CON, fx->Parameter5);

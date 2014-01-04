@@ -58,14 +58,15 @@ class WorldMapControl;
 #define IE_GUI_MOUSE_ENTER_WORLDMAP  0x08000002
 
 class GEM_EXPORT WorldMapControl : public Control {
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawInternal(Region& drawFrame);
 public:
-	WorldMapControl(const char *fontname, int direction);
+	WorldMapControl(const Region& frame, const char *fontname, int direction);
 	~WorldMapControl(void);
 
 	/** Allows modification of the scrolling factor from outside */
 	void AdjustScrolling(short x, short y);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
 	/** Set color for one type of area labels */

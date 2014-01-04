@@ -537,16 +537,20 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 
 	if (range) {
 		unsigned int dist;
-
+		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
 			Actor* snd = ( Actor* ) Sender;
 			dist = snd->Modified[IE_VISUALRANGE];
 		} else {
 			dist = 30;
+			los = false;
 		}
 
 		if (Distance(target->Pos, Sender->Pos) > dist * 15) {
 			return 0;
+		}
+		if (!los) {
+			return 1;
 		}
 	}
 
@@ -881,7 +885,7 @@ void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 				position=((InfoPoint *) scr)->UsePoint;
 				break;
 			}
-			position=((InfoPoint *) scr)->TrapLaunch;
+			position=((InfoPoint *) scr)->TalkPos;
 			break;
 		case ST_DOOR: case ST_CONTAINER:
 			position=((Highlightable *) scr)->TrapLaunch;

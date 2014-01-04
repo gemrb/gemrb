@@ -251,7 +251,6 @@ def AddNoteWindow ():
 	#0 is the default Scrollbar ID
 	NoteLabel = NoteLabel.ConvertEdit (0)
 	NoteLabel.SetText (Text)
-	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	print "Just set this:", NoteLabel.QueryText()
 
 	for i in range(8):
@@ -278,8 +277,8 @@ def AddNoteWindow ():
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemoveMapNote)
 	Label.SetText (13957)
 
-	MapWindow.SetVisible (WINDOW_GRAYED)
-	NoteWindow.SetVisible (WINDOW_VISIBLE)
+	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
+	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
 def OpenWorldMapWindowInside ():

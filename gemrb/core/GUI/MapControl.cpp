@@ -57,8 +57,8 @@ Color colors[]={
  { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
-#define MAP_TO_SCREENX(x) (XWin + XPos + XCenter - ScrollX + (x))
-#define MAP_TO_SCREENY(y) (YWin + YPos + YCenter - ScrollY + (y))
+#define MAP_TO_SCREENX(x) (XWin + XCenter - ScrollX + (x))
+#define MAP_TO_SCREENY(y) (YWin + YCenter - ScrollY + (y))
 // Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is 
 //   already relative to control [XY]Pos there
 #define SCREEN_TO_MAPX(x) ((x) - XCenter + ScrollX)
@@ -70,8 +70,10 @@ Color colors[]={
 #define SCREEN_TO_GAMEX(x) (SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV)
 #define SCREEN_TO_GAMEY(y) (SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV)
 
-MapControl::MapControl(void)
+MapControl::MapControl(const Region& frame)
+	: Control(frame)
 {
+	ControlType = IE_GUI_MAP;
 	if (core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
 		MAP_DIV=4;
 		MAP_MULT=32;
@@ -85,9 +87,11 @@ MapControl::MapControl(void)
 	ScrollY = 0;
 	NotePosX = 0;
 	NotePosY = 0;
+	MapWidth = MapHeight = ViewWidth = ViewHeight = 0;
+	XCenter = YCenter = 0;
+	lastMouseX = lastMouseY = 0;
 	mouseIsDown = false;
-	mouseIsDragging = false;
-	Changed = true;
+	MarkDirty();
 	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
@@ -98,7 +102,7 @@ MapControl::MapControl(void)
 	ResetEventHandler( MapControlOnDoublePress );
 
 	MyMap = core->GetGame()->GetCurrentArea();
-	if (MyMap->SmallMap) {
+	if (MyMap && MyMap->SmallMap) {
 		MapMOS = MyMap->SmallMap;
 		MapMOS->acquire();
 	} else
@@ -120,15 +124,11 @@ MapControl::~MapControl(void)
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog(unsigned short XWin, unsigned short YWin)
+void MapControl::DrawFog(const Region& rgn)
 {
+	ieWord XWin = rgn.x;
+	ieWord YWin = rgn.y;
 	Video *video = core->GetVideoDriver();
-
-	Region old_clip;
-	video->GetClipRect(old_clip);
-
-	Region r( XWin + XPos, YWin + YPos, Width, Height );
-	video->SetClipRect(&r);
 
 	// FIXME: this is ugly, the knowledge of Map and ExploredMask
 	//   sizes should be in Map.cpp
@@ -145,8 +145,6 @@ void MapControl::DrawFog(unsigned short XWin, unsigned short YWin)
 			}
 		}
 	}
-
-	video->SetClipRect(&old_clip);
 }
 
 // To be called after changes in control's or screen geometry
@@ -181,23 +179,16 @@ void MapControl::UpdateState(const char *VariableName, unsigned int Sum)
 		return;
 	}
 	Value = Sum;
-	Changed = true;
+	MarkDirty();
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::Draw(unsigned short XWin, unsigned short YWin)
+void MapControl::DrawInternal(Region& rgn)
 {
-	if (!Width || !Height) {
-		return;
-	}
-	if (Owner->Visible!=WINDOW_VISIBLE) {
-		return;
-	}
+	ieWord XWin = rgn.x;
+	ieWord YWin = rgn.y;
 
-	if (Changed) {
-		Realize();
-		Changed = false;
-	}
+	Realize();
 
 	// we're going to paint over labels/etc, so they need to repaint!
 	bool seen_this = false;
@@ -211,18 +202,16 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 		if (ctrl == this) { seen_this = true; continue; }
 		if (!seen_this) continue;
 
-		ctrl->Changed = true;
+		ctrl->MarkDirty();
 	}
 
 	Video* video = core->GetVideoDriver();
-	Region r( XWin + XPos, YWin + YPos, Width, Height );
-
 	if (MapMOS) {
-		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
-		DrawFog(XWin, YWin);
+		DrawFog(rgn);
 
 	Region vp = video->GetViewport();
 
@@ -272,7 +261,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 				continue;
 
 			if (anim) {
-				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &r );
+				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &rgn );
 			} else {
 				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn->color&7], false );
 			}
@@ -284,6 +273,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if (mouseIsDown) {
+		MarkDirty();
 		ScrollX -= x - lastMouseX;
 		ScrollY -= y - lastMouseY;
 
@@ -295,9 +285,6 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 			ScrollX = 0;
 		if (ScrollY < 0)
 			ScrollY = 0;
-	}
-
-	if (mouseIsDragging) {
 		ViewHandle(x,y);
 	}
 
@@ -413,16 +400,10 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short 
 	}
 
 	mouseIsDown = true;
-	short xp = (short) (SCREEN_TO_GAMEX(x));
-	short yp = (short) (SCREEN_TO_GAMEY(y));
 	Region vp = core->GetVideoDriver()->GetViewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
 	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
-	if ((xp>vp.x) && (xp<vp.w) && (yp>vp.y) && (yp<vp.h)) {
-		mouseIsDragging = true;
-	} else {
-		mouseIsDragging = false;
-	}
+	ViewHandle(x,y);
 	lastMouseX = x;
 	lastMouseY = y;
 }
@@ -435,8 +416,8 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 		return;
 	}
 
+	MarkDirty();
 	mouseIsDown = false;
-	mouseIsDragging = false;
 	switch(Value) {
 		case MAP_REVEAL:
 			ViewHandle(x,y);
@@ -490,13 +471,12 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
+	MarkDirty();
 	return true;
 }
 
 bool MapControl::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 		case IE_GUI_MAP_ON_PRESS:
 			MapControlOnPress = handler;

@@ -52,11 +52,13 @@ class Palette;
  */
 
 class GEM_EXPORT TextEdit : public Control {
-public:
-	TextEdit(unsigned short maxLength, unsigned short x, unsigned short y);
-	~TextEdit(void);
+protected:
 	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
+	void DrawInternal(Region& drawFrame);
+	bool HasBackground() { return Back; }
+public:
+	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
+	~TextEdit(void);
 	/** Set Font */
 	void SetFont(Font* f);
 	Font *GetFont();
@@ -66,8 +68,8 @@ public:
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
 	void SetText(const char* string);
-	/** Sets the Text of the current control */
-	const char* QueryText();
+	/** Gets the Text of the current control */
+	const char* QueryText() const;
 	/** Sets the buffer length */
 	void SetBufferLength(ieWord buflen);
 	/** Sets the alignment */

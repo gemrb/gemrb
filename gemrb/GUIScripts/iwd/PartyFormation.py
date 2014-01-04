@@ -24,7 +24,7 @@
 
 import GemRB
 from GUIDefines import *
-import GUICommon
+import GameCheck
 import GUICommonWindows
 import LoadScreen
 
@@ -88,12 +88,12 @@ def OnLoad ():
 		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
-	if not GUICommon.HasHOW():
+	if not GameCheck.HasHOW():
 		GemRB.SetVar ("SaveDir",1) #using mpsave??
 		GemRB.SetVar ("PlayMode",0) #using second row??
 	else:
 		GemRB.SetGlobal ("EXPANSION_DOOR", "GLOBAL", 1) # entrance to the HOW start
-		if GUICommon.HasTOTL():
+		if GameCheck.HasTOTL():
 			GemRB.SetGlobal ("9101_SPAWN_HOBART", "GLOBAL", 1)
 		if GemRB.GetVar("ExpansionGame") == 1:
 			GemRB.SetGlobal ("CHAPTER", "GLOBAL", 1)

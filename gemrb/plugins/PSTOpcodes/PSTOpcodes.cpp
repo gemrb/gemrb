@@ -440,13 +440,8 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	ieResRef OldSpellResRef;
 
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->SetSpellResRef(fx->Resource);
-	//cast spell on target
-	//flags: deplete, instant, no interrupt
-	Owner->CastSpell(target, false, true, true);
-	//actually finish casting (if this is not good enough, use an action???)
-	//flag: instant - no casting animation
-	Owner->CastSpellEnd(fx->CasterLevel, 1);
+	// flags: no deplete, instant, no interrupt
+	Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, 1, false, true, true);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;

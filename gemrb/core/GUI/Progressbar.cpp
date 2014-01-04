@@ -30,8 +30,10 @@
 
 namespace GemRB {
 
-Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
+Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear)
+	: Control(frame)
 {
+	ControlType = IE_GUI_PROGRESSBAR;
 	BackGround = NULL;
 	BackGround2 = NULL;
 	this->Clear = Clear;
@@ -55,16 +57,8 @@ Progressbar::~Progressbar()
 }
 
 /** Draws the Control on the Output Display */
-void Progressbar::Draw(unsigned short x, unsigned short y)
+void Progressbar::DrawInternal(Region& rgn)
 {
-	//it is unlikely that a floating window is above us, but...
-	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
-		return;
-	}
-	Changed = false;
-	if (XPos == 65535) {
-		return;
-	}
 	Sprite2D *bcksprite;
 
 	if((Value >= 100) && KnobStepsCount && BackGround2) {
@@ -74,9 +68,8 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 		bcksprite=BackGround;
 	}
 	if (bcksprite) {
-		Region r( x + XPos, y + YPos, Width, Height );
 		core->GetVideoDriver()->BlitSprite( bcksprite,
-			x + XPos, y + YPos, true, &r );
+			rgn.x, rgn.y, true, &rgn );
 		if( bcksprite==BackGround2) {
 			return; //done for animated progbar
 		}
@@ -90,12 +83,12 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 		int h = BackGround2->Height;
 		//this is the PST/IWD specific part
 		Count = Value*w/100;
-		Region r( x + XPos + KnobXPos, y + YPos + KnobYPos, Count, h );
+		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
 		core->GetVideoDriver()->BlitSprite( BackGround2, 
 			r.x, r.y, true, &r );
 
 		core->GetVideoDriver()->BlitSprite( PBarCap,
-			x+XPos+CapXPos+Count-PBarCap->Width, y+YPos+CapYPos, true );
+			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos, true );
 		return;
 	}
 
@@ -103,7 +96,7 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, x , y , true );
+		core->GetVideoDriver()->BlitSprite( Knob, Owner->XPos, Owner->YPos, true );
 	}
 }
 
@@ -120,7 +113,7 @@ void Progressbar::SetPosition(unsigned int pos)
 	if (Value == pos)
 		return;
 	Value = pos;
-	Changed = true;
+	MarkDirty();
 }
 
 void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
@@ -129,7 +122,8 @@ void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
 		return;
 	}
 	SetPosition(Sum);
-	if((Value==100) && Changed)
+	MarkDirty();
+	if(Value==100)
 		RunEventHandler( EndReached );
 }
 
@@ -142,7 +136,7 @@ void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 	if (BackGround2 && Clear)
 		core->GetVideoDriver()->FreeSprite( BackGround2 );
 	BackGround2 = img2;
-	Changed = true;
+	MarkDirty();
 }
 
 void Progressbar::SetBarCap(Sprite2D* img3)
@@ -167,8 +161,6 @@ void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
 
 bool Progressbar::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_PROGRESS_END_REACHED:
 		EndReached = handler;

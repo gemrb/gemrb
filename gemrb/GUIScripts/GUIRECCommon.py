@@ -18,7 +18,7 @@
 #
 # code shared between the common GUIREC and that of iwd2 (pst)
 import GemRB
-import GUICommon
+import GameCheck
 import Portrait
 from GUIDefines import *
 from ie_stats import IE_SEX, IE_CLASS, IE_MC_FLAGS, MC_EXPORTABLE
@@ -32,12 +32,12 @@ ExportWindow = None
 NameField = ExportDoneButton = None
 ScriptsTable = None
 
-if GUICommon.GameIsBG2() or GUICommon.GameIsBG1():
+if GameCheck.IsBG2() or GameCheck.IsBG1():
 	BioStrRefSlot = 74
 else:
 	BioStrRefSlot = 63
 
-if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
+if GameCheck.IsBG2() or GameCheck.IsIWD2():
 	PortraitNameSuffix = "L"
 else:
 	PortraitNameSuffix = "G"
@@ -46,7 +46,7 @@ PortraitPictureButton = None
 PortraitList1 = PortraitList2 = RowCount1 = RowCount2 = None
 
 # the available sounds
-if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 	SoundSequence = [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', \
 		'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', \
 		'25', '26', '27', '28', '29', '30', '31']
@@ -84,7 +84,7 @@ def OpenCustomizeWindow ():
 	if not Exportable:
 		SoundButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	if not GUICommon.GameIsIWD2():
+	if not GameCheck.IsIWD2():
 		ColorButton = CustomizeWindow.GetControl (2)
 		ColorButton.SetText (10646)
 		ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenColorWindow)
@@ -95,7 +95,7 @@ def OpenCustomizeWindow ():
 	ScriptButton.SetText (17111)
 
 	#This button does not exist in bg1 and pst, but theoretically we could create it here
-	if not (GUICommon.GameIsBG1() or GUICommon.GameIsPST()):
+	if not (GameCheck.IsBG1() or GameCheck.IsPST()):
 		BiographyButton = CustomizeWindow.GetControl (9)
 		BiographyButton.SetText (18003)
 		BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyEditWindow)
@@ -188,7 +188,7 @@ def OpenPortraitSelectWindow ():
 def PortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	# eh, different sizes
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "M", Portrait.Name () + "S")
 	else:
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
@@ -224,7 +224,7 @@ def OpenCustomPortraitWindow ():
 	CustomPortraitCancelButton.SetText (13727)
 	CustomPortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	if not GUICommon.GameIsIWD1():
+	if not GameCheck.IsIWD1():
 		SmallPortraitButton = SubSubCustomizeWindow.GetControl (1)
 		SmallPortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 		LargePortraitButton = SubSubCustomizeWindow.GetControl (0)
@@ -356,7 +356,7 @@ def PlaySoundPressed():
 	global SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText ()
-	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		pc = GemRB.GameGetSelectedPCSingle ()
 		GemRB.SetPlayerSound (pc, CharSound)
 		VoiceSet = GemRB.GetPlayerSound (pc, 1)
@@ -445,7 +445,7 @@ def UpdateScriptSelection():
 def RevertBiography():
 	global BioStrRef
 
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		BioTable = GemRB.LoadTable ("bios")
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
@@ -468,13 +468,13 @@ def OpenBiographyEditWindow ():
 		Changed = 1
 
 	# TODO: check if this is really needed
-	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		SubCustomizeWindow = GemRB.LoadWindow (51)
 	else:
 		SubCustomizeWindow = GemRB.LoadWindow (23)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		ClearButton.SetText (34881)
 	else:
 		ClearButton.SetText (18622)
@@ -483,7 +483,7 @@ def OpenBiographyEditWindow ():
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		RevertButton = SubCustomizeWindow.GetControl (6)
 	else:
 		RevertButton = SubCustomizeWindow.GetControl (3)
@@ -556,7 +556,7 @@ def CloseBiographyWindow ():
 		BiographyWindow = None
 	# TODO: check if bg1 wouldn't benefit from modality too
 	if GUIREC.InformationWindow:
-		if GUICommon.GameIsBG2() or GUICommon.GameIsIWD1():
+		if GameCheck.IsBG2() or GameCheck.IsIWD1():
 			GUIREC.InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		else:
 			GUIREC.InformationWindow.SetVisible (WINDOW_VISIBLE)

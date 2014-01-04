@@ -99,18 +99,21 @@ class GEM_EXPORT GameControl : public Control {
 		WINDOW_GROUP_BOTTOM,
 		WINDOW_GROUP_RIGHT,
 		WINDOW_GROUP_TOP,
-		WINDOW_GROUP_COUNT,
+		WINDOW_GROUP_COUNT
 	};
 	enum WINDOW_RESIZE_OPERATION {
 		WINDOW_EXPAND = -1,
 		WINDOW_CONTRACT = 1
 	};
 public:
-	GameControl(void);
+	GameControl(const Region& frame);
 	~GameControl(void);
-public:
+protected:
 	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
+	void DrawInternal(Region& drawFrame);
+	// GameControl always needs to redraw
+	bool NeedsDraw() { return true; };
+public:
 	/** Draws the target reticle for Actor movement. */
 	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
 	/** Sets multiple quicksaves flag*/
@@ -127,14 +130,8 @@ private:
 	bool MouseIsDown;
 	bool DoubleClick;
 	Region SelectionRect;
-	Point FormationPivotPoint;
 	Point FormationApplicationPoint;
-	short StartX, StartY;
-	// following variables used for touch scroll areas
-	bool touchScrollAreasEnabled; // true, if scroll areas enabled
-	bool touched; // true, if player touched screen (left button down and hold)
-	unsigned int scrollAreasWidth; // scroll areas width
-
+	Point ClickPoint;
 public:
 	Door* overDoor;
 	Container* overContainer;
@@ -254,7 +251,7 @@ public:
 	/** changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
 	/** Returns game screenshot, with or without GUI controls */
-	Sprite2D* GetScreenshot( bool show_gui = 0 );
+	Sprite2D* GetScreenshot(const Region& rgn, bool show_gui = false );
 	/** Returns current area preview for saving a game */
 	Sprite2D* GetPreview();
 	/** Returns PC portrait for a currently running game */

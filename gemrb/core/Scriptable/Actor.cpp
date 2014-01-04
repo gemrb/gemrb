@@ -97,6 +97,7 @@ static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
 static int *skillstats = NULL;
 static int *skillabils = NULL;
+static int *skilltraining = NULL;
 static int skillcount = -1;
 static int **afcomments = NULL;
 static int afcount = -1;
@@ -1438,6 +1439,10 @@ void Actor::ReleaseMemory()
 			free(skillabils);
 			skillabils=NULL;
 		}
+		if (skilltraining) {
+			free(skilltraining);
+			skilltraining=NULL;
+		}
 
 		if (afcomments) {
 			for(i=0;i<afcount;i++) {
@@ -2261,9 +2266,11 @@ static void InitActorTables()
 		if (rowcount) {
 			skillstats = (int *) malloc(rowcount * sizeof(int) );
 			skillabils = (int *) malloc(rowcount * sizeof(int) );
+			skilltraining = (int *) malloc(rowcount * sizeof(int) );
 			while(rowcount--) {
 				skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
 				skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+				skilltraining[rowcount] = atoi(tm->QueryField(rowcount, 2));
 			}
 		}
 	}
@@ -2895,7 +2902,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		RefreshPCStats();
 
 	//if the animation ID was not modified by any effect, it may still be modified by something else
-	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID]) {
+	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
+	ieDword appearance = 0;
+	if (pstflags) {
+		core->GetGame()->locals->Lookup("APPEARANCE", appearance);
+	}
+	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && appearance == 0) {
 		UpdateAnimationID(true);
 	}
 
@@ -3207,6 +3219,10 @@ void Actor::RollSaves()
 //2 fortitude          4   0
 //3 reflex             8   1
 //4 will              16   2
+
+// in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
+// since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
+// FIXME: in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
 
 #define SAVECOUNT 5
 static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
@@ -4892,7 +4908,15 @@ bool Actor::CheckOnDeath()
 	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
 		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 	}
-	DropItem("",0);
+	// ignore TNO, as he needs to keep his gear
+	Game *game = core->GetGame();
+	if (game->protagonist == PM_NO) {
+		if (GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
+			DropItem("", 0);
+		}
+	} else {
+		DropItem("", 0);
+	}
 
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
@@ -8558,7 +8582,15 @@ int Actor::GetSkillStat(unsigned int skill) const
 int Actor::GetSkill(unsigned int skill) const
 {
 	if (skill>=(unsigned int) skillcount) return -1;
-	int ret = GetStat(skillstats[skill])+GetAbilityBonus(skillabils[skill]);
+	int ret = GetStat(skillstats[skill]);
+	int base = GetBase(skillstats[skill]);
+	// only give other boni for trained skills or those that don't require it
+	// untrained trained skills are not usable!
+	if (base > 0 || skilltraining[skill]) {
+		ret += GetAbilityBonus(skillabils[skill]);
+	} else {
+		ret = 0;
+	}
 	if (ret<0) ret = 0;
 	return ret;
 }

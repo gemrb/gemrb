@@ -567,6 +567,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
 
 		//these appear only in PST, but we could support them everywhere
+		// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
+		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+			TalkX = ip->Pos.x;
+			TalkY = ip->Pos.y;
+		}
 		ip->TalkPos.x=TalkX;
 		ip->TalkPos.y=TalkY;
 		ip->DialogName=DialogName;

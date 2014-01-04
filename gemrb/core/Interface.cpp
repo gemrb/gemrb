@@ -163,6 +163,8 @@ Interface::Interface()
 	slotmatrix = NULL;
 
 	ModalWindow = NULL;
+	modalShadow = MODAL_SHADOW_NONE;
+
 	tooltip_x = 0;
 	tooltip_y = 0;
 	tooltip_currtextw = 0;
@@ -263,6 +265,7 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
+	TLKEncoding.multibyte = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
@@ -515,11 +518,7 @@ GameControl* Interface::StartGameControl()
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	gamewin->WindowPack[0]=0;
-	GameControl* gc = new GameControl();
-	gc->XPos = 0;
-	gc->YPos = 0;
-	gc->Width = (ieWord) Width;
-	gc->Height = (ieWord) Height;
+	GameControl* gc = new GameControl(Region(0, 0, Width, Height));
 	gc->Owner = gamewin;
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
@@ -1119,10 +1118,6 @@ char *Interface::GetMusicPlaylist(int SongType) const {
 	return musiclist[SongType];
 }
 
-static const Color white = {0xff,0xff,0xff,0xff};
-static const Color black = {0x00,0x00,0x00,0xff};
-static const Region bg( 0, 0, 100, 30 );
-
 /** this is the main loop */
 void Interface::Main()
 {
@@ -1136,11 +1131,13 @@ void Interface::Main()
 	}
 
 	Font* fps = GetFont( ( unsigned int ) 0 );
+	// TODO: if we ever want to support dynamic resolution changes this will break
+	const Region fpsRgn( 0, Height - 30, 100, 30 );
 	char fpsstring[40]={"???.??? fps"};
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
 	double frames = 0.0;
-	Palette* palette = CreatePalette( white, black );
+	Palette* palette = CreatePalette( ColorWhite, ColorBlack );
 	do {
 		//don't change script when quitting is pending
 
@@ -1164,8 +1161,8 @@ void Interface::Main()
 				frame = 0;
 				sprintf( fpsstring, "%.3f fps", frames );
 			}
-			video->DrawRect( bg, black );
-			fps->Print( bg,
+			video->DrawRect( fpsRgn, ColorBlack );
+			fps->Print( fpsRgn,
 				( unsigned char * ) fpsstring, palette,
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
@@ -1898,23 +1895,7 @@ int Interface::Init(InterfaceConfig* config)
 	int ret = LoadSprites();
 	if (ret) return ret;
 
-	Log(MESSAGE, "Core", "Setting up the Console...");
 	QuitFlag = QF_CHANGESCRIPT;
-	console = new Console();
-	console->XPos = 0;
-	console->YPos = (ieWord) (Height - 25);
-	console->Width = (ieWord) Width;
-	console->Height = 25;
-	if (fonts.size() > 0) {
-		console->SetFont( fonts[0] );
-	}
-
-	Sprite2D *tmpsprite = GetCursorSprite();
-	if (!tmpsprite) {
-		Log(FATAL, "Core", "Failed to load cursor sprite.");
-		return GEM_ERROR;
-	}
-	console->SetCursor (tmpsprite);
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
@@ -2113,8 +2094,17 @@ int Interface::Init(InterfaceConfig* config)
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to initialize keymaps.");
 	}
-	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
+	Log(MESSAGE, "Core", "Setting up the Console...");
+	console = new Console(Region(0, 0, Width, 25));
+	console->SetFont( fonts[0] );
+	Sprite2D* cursor = GetCursorSprite();
+	if (!cursor) {
+		Log(ERROR, "Core", "Failed to load cursor sprite.");
+	} else
+		console->SetCursor (cursor);
+
+	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
 }
 
@@ -2472,9 +2462,6 @@ bool Interface::LoadGemRBINI()
 		}
 	}
 
-	s = ini->GetKeyAsString( "resources", "NoteString", NULL );
-	TextArea::SetNoteString(s);
-
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strcpy( INIConfig, s );
@@ -2525,6 +2512,8 @@ bool Interface::LoadEncoding()
 
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
+
+	TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 
 	// TODO: list incomplete
 	// maybe want to externalize this
@@ -3154,7 +3143,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 }
 
 /** Show a Window in Modal Mode */
-int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
+int Interface::ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow)
 {
 	if (WindowIndex >= windows.size()) {
 		Log(ERROR, "Core", "Window not found");
@@ -3171,26 +3160,9 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
 	evntmgr->SetFocused( win, NULL );
-
-	ModalWindow = NULL;
-	DrawWindows();
 	win->Invalidate();
 
-	Color gray = {
-		0, 0, 0, 128
-	};
-	Color black = {
-		0, 0, 0, 255
-	};
-
-	Region r( 0, 0, Width, Height );
-
-	if (Shadow == MODAL_SHADOW_GRAY) {
-		video->DrawRect( r, gray );
-	} else if (Shadow == MODAL_SHADOW_BLACK) {
-		video->DrawRect( r, black );
-	}
-
+	modalShadow = Shadow;
 	ModalWindow = win;
 	return 0;
 }
@@ -3283,10 +3255,25 @@ void Interface::HandleGUIBehaviour(void)
 void Interface::DrawWindows(bool allow_delete)
 {
 	//here comes the REAL drawing of windows
+	static bool modalShield = false;
 	if (ModalWindow) {
+		if (!modalShield) {
+			// only draw the shield layer once
+			Color shieldColor = Color(); // clear
+			if (modalShadow == MODAL_SHADOW_GRAY) {
+				shieldColor.a = 128;
+			} else if (modalShadow == MODAL_SHADOW_BLACK) {
+				shieldColor.a = 0xff;
+			}
+			video->DrawRect( Region( 0, 0, Width, Height ), shieldColor );
+			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
+			modalShield = true;
+		}
 		ModalWindow->DrawWindow();
 		return;
 	}
+	modalShield = false;
+
 	size_t i = topwin.size();
 	while(i--) {
 		unsigned int t = topwin[i];
@@ -3308,6 +3295,11 @@ void Interface::DrawWindows(bool allow_delete)
 				win->DrawWindow();
 			}
 		}
+	}
+
+	// draw the console
+	if (ConsolePopped) {
+		console->Draw(0, 0);
 	}
 }
 
@@ -3430,7 +3422,6 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	}
 	if (win == ModalWindow) {
 		ModalWindow = NULL;
-		RedrawAll(); //marking windows for redraw
 	}
 	evntmgr->DelWindow( win );
 	win->release();
@@ -3470,13 +3461,6 @@ void Interface::PopupConsole()
 {
 	ConsolePopped = !ConsolePopped;
 	RedrawAll();
-	console->Changed = true;
-}
-
-/** Draws the Console */
-void Interface::DrawConsole()
-{
-	console->Draw( 0, (Height * -1) + console->Height);
 }
 
 /** Get the Sound Manager */
@@ -3728,6 +3712,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		count++;
 		ta->AppendText( name, -1 );
 	} while (++dir);
+	ta->SortText();
 	return count;
 }
 
@@ -3759,6 +3744,7 @@ int Interface::GetCharSounds(TextArea* ta)
 		count++;
 		ta->AppendText( name, -1 );
 	} while (++dir);
+	ta->SortText();
 	return count;
 }
 
@@ -3786,6 +3772,7 @@ int Interface::GetCharacters(TextArea* ta)
 		count++;
 		ta->AppendText( name, -1 );
 	} while (++dir);
+	ta->SortText();
 	return count;
 }
 
@@ -5629,7 +5616,7 @@ void Interface::SetInfoTextColor(const Color &color)
 	if (InfoTextPalette) {
 		gamedata->FreePalette(InfoTextPalette);
 	}
-	InfoTextPalette = CreatePalette(color, black);
+	InfoTextPalette = CreatePalette(color, ColorBlack);
 }
 
 //todo row?

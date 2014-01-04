@@ -23,14 +23,17 @@
 
 #include "GameData.h"
 #include "Interface.h"
+#include "Sprite2D.h"
 #include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
 namespace GemRB {
 
-TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
+TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short px, unsigned short py)
+	: Control(frame)
 {
+	ControlType = IE_GUI_EDIT;
 	max = maxLength;
 	FontPosX = px;
 	FontPosY = py;
@@ -44,10 +47,9 @@ TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short p
 	ResetEventHandler( EditOnChange );
 	ResetEventHandler( EditOnDone );
 	ResetEventHandler( EditOnCancel );
-	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
-	palette = core->CreatePalette( white, black );
+	palette = core->CreatePalette( ColorWhite, ColorBlack );
 }
 
 TextEdit::~TextEdit(void)
@@ -62,31 +64,29 @@ TextEdit::~TextEdit(void)
 void TextEdit::SetAlignment(unsigned char Alignment)
 {
     this->Alignment = Alignment;
-    Changed = true;
+    MarkDirty();
 }
 
 /** Draws the Control on the Output Display */
-void TextEdit::Draw(unsigned short x, unsigned short y)
+void TextEdit::DrawInternal(Region& rgn)
 {
-	if (!Changed && !(Owner->Flags&WF_FLOAT)) {
-		return;
-	}
-	Changed = false;
+	ieWord yOff = FontPosY;
 	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, x + XPos, y + YPos, true );
-
+		core->GetVideoDriver()->BlitSprite( Back, rgn.x, rgn.y, true );
+		if (yOff) yOff += Back->Height;
 	}
 	if (!font)
 		return;
 
+	// FIXME: we should clip text to the background right?
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
-		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
+		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ), Buffer,
 				palette, Alignment, true );
 		// TODO: draw the cursor by printing everything before the cursor
 		// then draw the cursor, then draw everything after the cursor
 	} else {
-		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
+		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Buffer,
 				palette, Alignment, true );
 	}
 }
@@ -96,7 +96,7 @@ void TextEdit::SetFont(Font* f)
 {
 	if (f != NULL) {
 		font = f;
-		Changed = true;
+		MarkDirty();
 		return;
 	}
 	Log(ERROR, "TextEdit", "Invalid font set!");
@@ -111,7 +111,7 @@ void TextEdit::SetCursor(Sprite2D* cur)
 	if (cur != NULL) {
 		Cursor = cur;
 	}
-	Changed = true;
+	MarkDirty();
 }
 
 /** Set BackGround */
@@ -121,7 +121,7 @@ void TextEdit::SetBackGround(Sprite2D* back)
 	if (Back)
 		core->GetVideoDriver()->FreeSprite(Back);
 	Back = back;
-	Changed = true;
+	MarkDirty();
 }
 
 /** Key Press Event */
@@ -130,8 +130,7 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (Key >= 0x20) {
 		if (Value && ( (Key<'0') || (Key>'9') ) )
 			return false;
-		Owner->Invalidate();
-		Changed = true;
+		MarkDirty();
 		int len = ( int ) strlen( ( char* ) Buffer );
 		if (len + 1 < max) {
 			for (int i = len; i > CurPos; i--) {
@@ -151,8 +150,7 @@ bool TextEdit::OnSpecialKeyPress(unsigned char Key)
 {
 	int len;
 
-	Owner->Invalidate();
-	Changed = true;
+	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:
 			CurPos = 0;
@@ -209,9 +207,7 @@ void TextEdit::SetText(const char* string)
 	int len = strlcpy( ( char * ) Buffer, string, max + 1 );
 	if (len > max) CurPos = max + 1;
 	else CurPos = len;
-	if (Owner) {
-		Owner->Invalidate();
-	}
+	MarkDirty();
 }
 
 void TextEdit::SetBufferLength(ieWord buflen)
@@ -225,15 +221,13 @@ void TextEdit::SetBufferLength(ieWord buflen)
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
-const char* TextEdit::QueryText()
+const char* TextEdit::QueryText() const
 {
 	return ( const char * ) Buffer;
 }
 
 bool TextEdit::SetEvent(int eventType, EventHandler handler)
 {
-	Changed = true;
-
 	switch (eventType) {
 	case IE_GUI_EDIT_ON_CHANGE:
 		EditOnChange = handler;

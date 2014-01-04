@@ -239,8 +239,6 @@ void Scriptable::FixHeadTextPos()
 }
 
 #define MAX_DELAY  6000
-static const Color black={0,0,0,0};
-
 void Scriptable::DrawOverheadText(const Region &screen)
 {
 	unsigned long time = core->GetGame()->Ticks;
@@ -260,7 +258,7 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		if (time<256) {
 			ieByte time2 = time; // shut up narrowing warnings
 			const Color overHeadColor = {time2,time2,time2,time2};
-			palette = core->CreatePalette(overHeadColor, black);
+			palette = core->CreatePalette(overHeadColor, ColorBlack);
 		}
 	}
 
@@ -1190,7 +1188,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			poi++;
 			continue;
 		}
-		if ((signed)detective->GetStat(IE_SPELLCRAFT) <= 0) {
+		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
 			poi++;
 			continue;
 		}
@@ -1212,6 +1210,22 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 	}
 	gamedata->FreeSpell(spl, SpellResRef, false);
 	free(neighbours);
+}
+
+// shortcut for internal use when there is no wait
+void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+{
+	SetSpellResRef(spellref);
+	CastSpellPoint(target, deplete, instant, nointerrupt);
+	CastSpellPointEnd(level, no_stance);
+}
+
+// shortcut for internal use
+void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+{
+	SetSpellResRef(spellref);
+	CastSpell(target, deplete, instant, nointerrupt);
+	CastSpellEnd(level, no_stance);
 }
 
 //set target as point

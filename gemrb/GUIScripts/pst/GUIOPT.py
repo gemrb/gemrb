@@ -31,8 +31,8 @@
 # 8 - Feedback options window
 # 9 - Autopause options window
 
-
 ###################################################
+import CommonWindow
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -62,7 +62,10 @@ def OpenOptionsWindow ():
 		
 		GemRB.UnhideGUI ()
 		return
-		
+
+	GemRB.GamePause (1, 1)
+
+	CommonWindow.CloseContainerWindow ()
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIOPT")
 	OptionsWindow = Window = GemRB.LoadWindow (0)
@@ -180,6 +183,7 @@ def OpenAudioOptionsWindow ():
 		if GemRB.GetVar ("Cancel") == 1:
 			for k, v in saved_audio_options.items ():
 				GemRB.SetVar (k, v)
+			AudioHelpText = None
 			UpdateVolume (31210)
 
 		TrySavingConfiguration()
@@ -214,7 +218,8 @@ def OpenAudioOptionsWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
 def UpdateVolume (volume_ref):
-	AudioHelpText.SetText (volume_ref)
+	if AudioHelpText:
+		AudioHelpText.SetText (volume_ref)
 	GemRB.UpdateAmbientsVolume ()
 	GemRB.UpdateMusicVolume ()
 

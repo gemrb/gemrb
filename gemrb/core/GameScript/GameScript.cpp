@@ -751,6 +751,7 @@ static const ActionLink actionnames[] = {
 	{"polymorph", GameScript::Polymorph, 0},
 	{"polymorphcopy", GameScript::PolymorphCopy, 0},
 	{"polymorphcopybase", GameScript::PolymorphCopyBase, 0},
+	{"polymorphex", GameScript::Polymorph, 0}, //pst FIXME: has RangeModes int1 that we ignore
 	{"protectobject", GameScript::ProtectObject, 0},
 	{"protectpoint", GameScript::ProtectPoint, AF_BLOCKING},
 	{"quitgame", GameScript::QuitGame, 0},
@@ -761,9 +762,12 @@ static const ActionLink actionnames[] = {
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING|AF_ALIVE},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
+	{"reallyforcespellres", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
 	{"reallyforcespelldead", GameScript::ReallyForceSpellDead, AF_BLOCKING},
+	{"reallyforcespelldeadres", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"reallyforcespelllevel", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},//this is the same action
 	{"reallyforcespellpoint", GameScript::ReallyForceSpellPoint, AF_BLOCKING|AF_ALIVE},
+	{"reallyforcespellpointres", GameScript::ReallyForceSpellPoint, AF_BLOCKING|AF_ALIVE},
 	{"recoil", GameScript::Recoil, AF_ALIVE},
 	{"regainpaladinhood", GameScript::RegainPaladinHood, 0},
 	{"regainrangerhood", GameScript::RegainRangerHood, 0},

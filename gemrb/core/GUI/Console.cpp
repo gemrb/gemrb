@@ -31,7 +31,8 @@
 
 namespace GemRB {
 
-Console::Console(void)
+Console::Console(const Region& frame)
+	: Control(frame)
 {
 	Cursor = NULL;
 	Back = NULL;
@@ -46,6 +47,7 @@ Console::Console(void)
 	HistPos = 0;
 	HistMax = 0;
 	palette = NULL;
+	font = NULL;
 }
 
 Console::~Console(void)
@@ -61,17 +63,14 @@ Console::~Console(void)
 }
 
 /** Draws the Console on the Output Display */
-void Console::Draw(unsigned short x, unsigned short y)
+void Console::DrawInternal(Region& drawFrame)
 {
 	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, 0, y, true );
+		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );
 	}
-	Color black = {
-		0x00, 0x00, 0x00, 0xff
-	};
-	Region r( (short)x + XPos, (short)y + YPos, Width, Height );
-	core->GetVideoDriver()->DrawRect( r, black );
-	font->Print( r, Buffer, palette,
+
+	core->GetVideoDriver()->DrawRect( drawFrame, ColorBlack );
+	font->Print( drawFrame, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
 	// TODO: draw the cursor by printing everything before the cursor
 	// then draw the cursor, then draw everything after the cursor
@@ -169,7 +168,6 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 			Buffer[0] = 0;
 			CurPos = 0;
 			HistPos = 0;
-			Changed = true;
 			break;
 	}
 	return true;

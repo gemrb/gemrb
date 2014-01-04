@@ -47,11 +47,13 @@ class Palette;
  */
 
 class GEM_EXPORT Label : public Control {
-public: 
-	Label(Font* font);
-	~Label();
+protected:
 	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
+	void DrawInternal(Region& drawFrame);
+	bool HasBackground() { return false; }
+public: 
+	Label(const Region& frame, Font* font, const char* string);
+	~Label();
 	/** This function sets the actual Label Text */
 	void SetText(const char* string);
 	/** Sets the Foreground Font Color */

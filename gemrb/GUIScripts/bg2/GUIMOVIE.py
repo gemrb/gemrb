@@ -17,7 +17,7 @@
 #
 #
 import GemRB
-import GUICommon
+import GameCheck
 
 MovieWindow = 0
 TextAreaControl = 0
@@ -82,7 +82,7 @@ def CreditsPress():
 def DonePress():
 	if MovieWindow:
 		MovieWindow.Unload ()
-	if GUICommon.HasTOB():
+	if GameCheck.HasTOB():
 		GemRB.SetNextScript ("Start2")
 	else:
 		GemRB.SetNextScript ("Start")

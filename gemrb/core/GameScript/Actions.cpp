@@ -2593,6 +2593,8 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (!door->TryUnlock(actor)) {
 			displaymsg->DisplayConstantString(STR_DOORLOCKED, DMC_LIGHTGREY, door);
+			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
+
 			//playsound unsuccessful opening of door
 			if(door->IsOpen())
 				core->PlaySound(DS_CLOSE_FAIL);
@@ -4413,12 +4415,16 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	int tgt = scr->GetStat(IE_PICKPOCKET);
 	int check;
 	if (core->HasFeature(GF_3ED_RULES)) {
+		int skill = snd->GetSkill(IE_PICKPOCKET);
 		int roll = core->Roll(1, 20, 0);
 		int level = scr->GetXPLevel(true);
 		int wismod = scr->GetAbilityBonus(IE_WIS);
 		// ~Pick pocket check. (10 + skill w/Dex bonus) %d vs. ((d20 + target's level) + Wisdom modifier) %d + %d.~
 		displaymsg->DisplayRollStringName(39302, DMC_LIGHTGREY, snd, 10+skill, roll+level, wismod);
 		check = (10 + skill) > (roll + level + wismod);
+		if (skill == 0) { // a trained skill, make sure we fail
+			check = 1;
+		}
 	} else {
 		//the original engine has no random here
 		if (tgt != 255) {
@@ -6834,7 +6840,7 @@ void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters
 
 void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar|=~FOG_DITHERSPRITES;
+	core->FogOfWar |= FOG_DITHERSPRITES;
 	DeleteAllSpriteCovers();
 }
 

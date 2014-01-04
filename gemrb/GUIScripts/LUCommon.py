@@ -20,6 +20,7 @@
 # LUCommon.py - common functions related to leveling up
 
 import GemRB
+import GameCheck
 import GUICommon
 import CommonTables
 from ie_stats import *
@@ -330,7 +331,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 			# BUT when we do roll, constitution gives a kind of a luck bonus to the roll
 			if rolls:
 				if GemRB.GetVar ("Difficulty Level") >= 3 and not GemRB.GetVar ("Maximum HP") \
-				and not (GUICommon.GameIsBG1() and LowLevel == 0) and MinRoll < sides:
+				and not (GameCheck.IsBG1() and LowLevel == 0) and MinRoll < sides:
 					if MinRoll > 1:
 						roll = GemRB.Roll (rolls, sides, bonus)
 						if roll-bonus < MinRoll:
@@ -357,7 +358,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 def ApplyFeats(MyChar):
 
 	#don't mess with feats outside of IWD2
-	if not GUICommon.GameIsIWD2():
+	if not GameCheck.IsIWD2():
 		return
 
 	#feats giving a single innate ability

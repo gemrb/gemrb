@@ -502,6 +502,7 @@ public:
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
+	void CastOnRest();
 	void PlayerDream();
 	void TextDream();
 };

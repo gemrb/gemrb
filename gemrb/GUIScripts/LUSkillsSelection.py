@@ -21,6 +21,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+import GameCheck
 import GUICommon
 import CommonTables
 
@@ -79,7 +80,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		return
 
 	#setup the offsets
-	if type == LUSKILLS_TYPE_LEVELUP and GUICommon.GameIsBG2():
+	if type == LUSKILLS_TYPE_LEVELUP and GameCheck.IsBG2():
 		SkillsOffsetPress = 120
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37

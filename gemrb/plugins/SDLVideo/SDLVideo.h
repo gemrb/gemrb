@@ -97,8 +97,7 @@ public:
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,
 		const Region* clip = NULL, bool anchor = false);
-	void SetCursor(Sprite2D* up, Sprite2D* down);
-	void SetDragCursor(Sprite2D* drag);
+
 	Sprite2D* GetScreenshot( Region r );
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);

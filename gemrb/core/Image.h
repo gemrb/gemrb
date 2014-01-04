@@ -33,8 +33,7 @@ public:
 	Color GetPixel(unsigned int x, unsigned int y) const
 	{
 		if (x >= width || y >= height) {
-			static const Color black = { 0, 0, 0, 0 };
-			return black;
+			return ColorBlack;
 		}
 		return data[width*y+x];
 

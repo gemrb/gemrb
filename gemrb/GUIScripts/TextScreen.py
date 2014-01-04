@@ -21,6 +21,7 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import GameCheck
 
 TextScreen = None
 TextArea = None
@@ -50,13 +51,13 @@ def StartTextScreen ():
 	TableName = GemRB.GetGameString (STR_TEXTSCREEN)
 
 	#iwd2/bg2 has no separate music
-	if GUICommon.GameIsIWD1():
+	if GameCheck.IsIWD1():
 		if TableName == "":
 			MusicName = "chap0"
 		else:
 			MusicName = "chap1"
 		TableName = "chapters"
-	elif GUICommon.GameIsIWD2():
+	elif GameCheck.IsIWD2():
 		TableName = "chapters"
 
 	if TableName == "":
@@ -74,12 +75,12 @@ def StartTextScreen ():
 	if Message != "*":
 		GemRB.DisplayString (Message, 0xff0000)
 
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
 	else:
 		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		ID = 62
 	elif ID == -1:
 		#default: try to determine ID from current chapter
@@ -98,10 +99,10 @@ def StartTextScreen ():
 	TextArea.SetFlags (IE_GUI_TEXTAREA_SMOOTHSCROLL)
 
 	Table = GemRB.LoadTable (TableName)
-	if GUICommon.GameIsBG1():
+	if GameCheck.IsBG1():
 		#these suckers couldn't use a fix row
 		FindTextRow (Table)
-	elif GUICommon.GameIsBG2():
+	elif GameCheck.IsBG2():
 		LoadPic = Table.GetValue (-1, -1)
 		if LoadPic != "":
 			TextScreen.SetPicture (LoadPic)
@@ -159,7 +160,7 @@ def ReplayTextScreen ():
 
 	#hack for messy chapters.2da in IWD
 	#note: iwd doesn't use TextScreen, only IncrementChapter
-	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		Count = 2
 
 	for i in range(1, Count):

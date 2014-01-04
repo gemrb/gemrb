@@ -41,6 +41,12 @@ int SDL12VideoDriver::Init(void)
 	if (ret==GEM_OK) {
 		SDL_EnableUNICODE( 1 );
 		SDL_EnableKeyRepeat( 500, 50 );
+#if TARGET_OS_MAC
+		// Apple laptops have single buttons,
+		// but actually produce more then left mouse events with that single button
+		// this may limit people actually using very old single button mice, but who cares :)
+		setenv("SDL_HAS3BUTTONMOUSE", "SDL_HAS3BUTTONMOUSE", 1);
+#endif
 	}
 	return ret;
 }

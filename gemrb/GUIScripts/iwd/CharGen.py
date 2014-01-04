@@ -361,7 +361,7 @@ def AcceptPress():
 		GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_PRIEST, 0, j, 1)
 
 	# ranger tracking is a hardcoded innate
-	if GUICommon.HasHOW():
+	if GameCheck.HasHOW():
 		if CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL") != "*":
 			GemRB.LearnSpell (MyChar, "spin139", LS_MEMO)
 

@@ -20,9 +20,10 @@
 # GUICommon.py - common functions for GUIScripts of all game types
 
 import GemRB
+import GameCheck
 import GUIClasses
 import CommonTables
-from ie_restype import RES_CHU, RES_WMP, RES_ARE
+from ie_restype import RES_CHU
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
@@ -96,7 +97,7 @@ def SelectFormation ():
 	return
 
 def OpenFloatMenuWindow (x, y):
-	if GameIsPST():
+	if GameCheck.IsPST():
 		import FloatMenuWindow
 		FloatMenuWindow.OpenFloatMenuWindow(x, y)
 	else:
@@ -144,44 +145,8 @@ def CheckStat20 (Actor, Stat, Diff):
 		return True
 	return False
 
-def GameIsPST ():
-	return GemRB.GameType == "pst"
-
-def GameIsIWD ():
-	return GemRB.GameType == "iwd"
-
-def GameIsHOW ():
-	return GemRB.GameType == "how"
-
-def GameIsIWD1 ():
-	return GemRB.GameType == "iwd" or GemRB.GameType == "how"
-
-def GameIsIWD2 ():
-	return GemRB.GameType == "iwd2"
-
-def GameIsBG1 ():
-	return GemRB.GameType == "bg1"
-
-def GameIsBG2 ():
-	return GemRB.GameType == "bg2"
-
-def GameIsBG2Demo ():
-	return ('BG2Demo' in GemRB.__dict__) and (GemRB.BG2Demo == True)
-
-def GameIsTOB ():
-	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
-
-def HasTOB ():
-	return GemRB.HasResource ("worldm25", RES_WMP)
-
-def HasHOW ():
-	return GemRB.HasResource ("expmap", RES_WMP)
-
-def HasTOTL ():
-	return GemRB.HasResource ("ar9700", RES_ARE)
-
 def GetGUISpellButtonCount ():
-	if HasHOW() or GameIsBG2():
+	if GameCheck.HasHOW() or GameCheck.IsBG2():
 		return 24
 	else:
 		return 20
@@ -357,10 +322,10 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 	max_encumb = GemRB.GetMaxEncumbrance (pc)
 
 	Control = Window.GetControl (ControlID)
-	if GameIsPST():
+	if GameCheck.IsPST():
 		# FIXME: there should be a space before LB symbol (':')
 		Control.SetText (str (encumbrance) + ":\n\n" + str (max_encumb) + ":")
-	elif GameIsIWD2() and not Control2ID:
+	elif GameCheck.IsIWD2() and not Control2ID:
 		Control.SetText (str (encumbrance) + "/" + str(max_encumb) + GemRB.GetString(39537))
 	else:
 		Control.SetText (str (encumbrance) + ":")
@@ -371,7 +336,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 		Control2.SetText (str (max_encumb) + ":")
 
 	ratio = (0.0 + encumbrance) / max_encumb
-	if GameIsIWD2 () or GameIsPST ():
+	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
 			if invert_colors:
 				Control.SetTextColor (255, 0, 0, True)
@@ -496,7 +461,7 @@ def IsDualClassed(actor, verbose):
 	Return[2] contains the class index of the new class.
 	If verbose is false, only Return[0] contains useable data."""
 
-	if GameIsIWD2():
+	if GameCheck.IsIWD2():
 		return (0,-1,-1)
 
 	Multi = HasMultiClassBits (actor)
@@ -588,7 +553,7 @@ def IsMultiClassed (actor, verbose):
 	If verbose is false, only Return[0] has useable data."""
 
 	# change this if it will ever be needed
-	if GameIsIWD2():
+	if GameCheck.IsIWD2():
 		return (0,-1,-1,-1)
 
 	# get our base class
@@ -769,7 +734,7 @@ def SetupDamageInfo (pc, Button, Window):
 		band = 4
 		color = (255, 0, 0)  # red
 
-	if GemRB.GetVar("Old Portrait Health") or not GameIsIWD2():
+	if GemRB.GetVar("Old Portrait Health") or not GameCheck.IsIWD2():
 		# draw the blood overlay
 		if hp >= 1 and not (state & STATE_DEAD):
 			Button.SetOverlay (ratio, 160,0,0,200, 60,0,0,190)
@@ -801,7 +766,7 @@ def SetCurrentDateTokens (stat):
 	hours = (party_time % 7200) / 300
 
 	# it is true, they changed the token
-	if GameIsBG2():
+	if GameCheck.IsBG2():
 		GemRB.SetToken ('GAMEDAY', str (days))
 	else:
 		GemRB.SetToken ('GAMEDAYS', str (days))
