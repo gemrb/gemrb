@@ -1055,7 +1055,7 @@ Projectile *Map::GetNextTrap(proIterator &iter)
 
 	do {
 		pro=GetNextProjectile(iter);
-		iter++;
+		if (pro) iter++;
 		//logic to determine dormant traps
 		//if (pro && pro->IsTrap()) break;
 	} while(pro);
