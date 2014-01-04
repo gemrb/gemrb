@@ -2013,6 +2013,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		PerformActionOn(actor);
 	}
 	FormationRotation = false;
+	core->GetEventMgr()->FakeMouseMove();
 	return;
 }
 
