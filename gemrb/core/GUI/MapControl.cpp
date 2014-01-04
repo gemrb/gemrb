@@ -102,7 +102,7 @@ MapControl::MapControl(const Region& frame)
 	ResetEventHandler( MapControlOnDoublePress );
 
 	MyMap = core->GetGame()->GetCurrentArea();
-	if (MyMap->SmallMap) {
+	if (MyMap && MyMap->SmallMap) {
 		MapMOS = MyMap->SmallMap;
 		MapMOS->acquire();
 	} else
