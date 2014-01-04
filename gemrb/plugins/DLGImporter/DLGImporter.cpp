@@ -362,6 +362,10 @@ static char** GetStrings(char* string, unsigned int& count)
 	for (int i = 0; i < (int)count; i++) {
 		while (MyIsSpace( *poi ))
 			poi++;
+		// pst/dmebbeth.dlg: CheckStatGT (Protagonist, 13., INT)
+		if (*poi == '.' && *(poi+1) == ',') {
+			poi++;
+		}
 		int len = GetActionLength( poi );
 		if((*poi=='/') && (*(poi+1)=='/') ) {
 			poi+=len;
@@ -372,6 +376,8 @@ static char** GetStrings(char* string, unsigned int& count)
 		int j;
 		for (j = 0; len; poi++,len--) {
 			if (isspace( *poi ))
+				continue;
+			if (*poi == '.' && *(poi+1) == ',')
 				continue;
 			strings[i][j++] = *poi;
 		}
