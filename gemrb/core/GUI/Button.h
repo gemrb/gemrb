@@ -158,6 +158,7 @@ public:
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
 public: // Public Events
+	bool WantsDragOperation();
 	/** Mouse Enter */
 	void OnMouseEnter(unsigned short x, unsigned short y);
 	/** Mouse Leave */

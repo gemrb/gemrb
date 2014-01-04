@@ -130,6 +130,7 @@ public: //Events
 	int SetFlags(int arg_flags, int opcode);
 	virtual void SetFocus(bool focus);
 	bool isFocused();
+	virtual bool WantsDragOperation() { return false; };
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, EventHandler handler) = 0;
 	/** Run specified handler, it may return error code */

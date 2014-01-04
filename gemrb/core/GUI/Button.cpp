@@ -370,6 +370,12 @@ void Button::SetFont(Font* newfont)
 {
 	font = newfont;
 }
+
+bool Button::WantsDragOperation()
+{
+	return (State != IE_GUI_BUTTON_DISABLED && MouseLeaveButton !=0 && VarName[0] != 0);
+}
+
 /** Handling The default button (enter) */
 bool Button::OnSpecialKeyPress(unsigned char Key)
 {
@@ -600,14 +606,11 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-
-	if (MouseLeaveButton !=0 && VarName[0] != 0) {
+	if (WantsDragOperation()) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
-
 	RunEventHandler( MouseLeaveButton );
 }
-
 
 /** Sets the Text of the current control */
 void Button::SetText(const char* string)
