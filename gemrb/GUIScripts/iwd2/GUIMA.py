@@ -278,8 +278,7 @@ def AddNoteWindow ():
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemoveMapNote)
 	Label.SetText (13957)
 
-	MapWindow.SetVisible (WINDOW_GRAYED)
-	NoteWindow.SetVisible (WINDOW_VISIBLE)
+	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenWorldMapWindowInside ():
