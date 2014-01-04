@@ -163,6 +163,8 @@ Interface::Interface()
 	slotmatrix = NULL;
 
 	ModalWindow = NULL;
+	modalShadow = MODAL_SHADOW_NONE;
+
 	tooltip_x = 0;
 	tooltip_y = 0;
 	tooltip_currtextw = 0;
@@ -3141,7 +3143,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 }
 
 /** Show a Window in Modal Mode */
-int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
+int Interface::ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow)
 {
 	if (WindowIndex >= windows.size()) {
 		Log(ERROR, "Core", "Window not found");
@@ -3158,24 +3160,9 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
 	evntmgr->SetFocused( win, NULL );
-
-	ModalWindow = NULL;
-	DrawWindows();
 	win->Invalidate();
 
-	// FIXME: this is just black with alpha. what is the intent here?
-	Color gray = {
-		0, 0, 0, 128
-	};
-
-	Region r( 0, 0, Width, Height );
-
-	if (Shadow == MODAL_SHADOW_GRAY) {
-		video->DrawRect( r, gray );
-	} else if (Shadow == MODAL_SHADOW_BLACK) {
-		video->DrawRect( r, ColorBlack );
-	}
-
+	modalShadow = Shadow;
 	ModalWindow = win;
 	return 0;
 }
@@ -3268,10 +3255,24 @@ void Interface::HandleGUIBehaviour(void)
 void Interface::DrawWindows(bool allow_delete)
 {
 	//here comes the REAL drawing of windows
+	static bool modalShield = false;
 	if (ModalWindow) {
+		if (!modalShield) {
+			// only draw the shield layer once
+			Color shieldColor = Color(); // clear
+			if (modalShadow == MODAL_SHADOW_GRAY) {
+				shieldColor.a = 128;
+			} else if (modalShadow == MODAL_SHADOW_BLACK) {
+				shieldColor.a = 0xff;
+			}
+			video->DrawRect( Region( 0, 0, Width, Height ), shieldColor );
+			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
+			modalShield = true;
+		}
 		ModalWindow->DrawWindow();
 		return;
 	}
+	modalShield = false;
 
 	size_t i = topwin.size();
 	while(i--) {
@@ -3421,7 +3422,6 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	}
 	if (win == ModalWindow) {
 		ModalWindow = NULL;
-		RedrawAll(); //marking windows for redraw
 	}
 	evntmgr->DelWindow( win );
 	win->release();

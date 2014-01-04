@@ -185,9 +185,11 @@ public:
 
 // Colors of modal window shadow
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define MODAL_SHADOW_NONE	0
-#define MODAL_SHADOW_GRAY	1
-#define MODAL_SHADOW_BLACK	2
+enum MODAL_SHADOW {
+	MODAL_SHADOW_NONE = 0,
+	MODAL_SHADOW_GRAY,
+	MODAL_SHADOW_BLACK
+};
 
 #define WINDOW_INVALID   -1
 #define WINDOW_INVISIBLE 0
@@ -314,6 +316,7 @@ private:
 	EventMgr * evntmgr;
 	Holder<WindowMgr> windowmgr;
 	Window* ModalWindow;
+	MODAL_SHADOW modalShadow;
 	char WindowPack[10];
 	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
@@ -477,7 +480,7 @@ public:
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
-	int ShowModal(unsigned short WindowIndex, int Shadow);
+	int ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow);
 	/** Set the Status of a Control in a Window */
 	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
 	/** Get a Window from the Loaded Window List */

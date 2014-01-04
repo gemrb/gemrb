@@ -1723,7 +1723,7 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Window_ShowModal__doc );
 	}
 
-	int ret = core->ShowModal( WindowIndex, Shadow );
+	int ret = core->ShowModal( WindowIndex, (MODAL_SHADOW)Shadow );
 	if (ret == -1) {
 		return NULL;
 	}
