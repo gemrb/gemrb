@@ -18,7 +18,6 @@
 #
 import GemRB
 import GameCheck
-import GUICommon
 
 MovieWindow = 0
 TextAreaControl = 0

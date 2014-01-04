@@ -19,7 +19,6 @@
 #this is essentially Start.py from the SoA game, except for a very small change
 import GemRB
 import GameCheck
-import GUICommon
 
 StartWindow = 0
 TutorialWindow = 0

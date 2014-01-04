@@ -19,7 +19,6 @@
 #ToB start window, precedes the SoA window
 import GemRB
 import GameCheck
-import GUICommon
 
 try:
 	import os

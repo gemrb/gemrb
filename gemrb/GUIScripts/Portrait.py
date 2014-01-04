@@ -24,7 +24,6 @@
 
 import GemRB
 import GameCheck
-import GUICommon
 ###################################################
 
 PortraitCount = 0

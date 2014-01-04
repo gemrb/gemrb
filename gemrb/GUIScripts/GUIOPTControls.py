@@ -20,7 +20,6 @@
 # GUIOPTControls.py - control functions for the GUIOPT winpack:
 
 ###################################################
-import GUICommon
 import GameCheck
 from GUIDefines import *
 

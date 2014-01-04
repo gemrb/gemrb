@@ -19,7 +19,6 @@
 # code shared between the common GUIREC and that of iwd2 (pst)
 import GemRB
 import GameCheck
-import GUICommon
 import Portrait
 from GUIDefines import *
 from ie_stats import IE_SEX, IE_CLASS, IE_MC_FLAGS, MC_EXPORTABLE

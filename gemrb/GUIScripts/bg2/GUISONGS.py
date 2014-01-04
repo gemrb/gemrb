@@ -19,7 +19,6 @@
 #instead of credits, you can listen the songs of the game :)
 import GemRB
 import GameCheck
-import GUICommon
 
 MovieWindow = 0
 TextAreaControl = 0

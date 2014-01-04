@@ -23,7 +23,6 @@
 
 import GemRB
 import GameCheck
-import GUICommon
 from GUIDefines import *
 
 LoadScreen = None

@@ -25,7 +25,6 @@
 import GemRB
 import LoadScreen
 import GameCheck
-import GUICommon
 
 LoadWindow = 0
 TextAreaControl = 0
