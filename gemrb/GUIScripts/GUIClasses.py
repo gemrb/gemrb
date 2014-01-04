@@ -18,8 +18,15 @@
 
 
 import _GemRB
+import CreateControlDecorators
 
 from MetaClasses import metaIDWrapper, metaControl
+
+def CreateControlDecorator(func):
+	wrapper = getattr(CreateControlDecorators, func.__name__, None)
+	if wrapper:
+		return wrapper(func)
+	return func # unchanged, no wrapper exists
 
 class GTable:
   __metaclass__ = metaIDWrapper
@@ -71,21 +78,27 @@ class GWindow:
       self.ID = -1
   def GetControl(self, control):
     return _GemRB.Window_GetControl(self.ID, control)
+  @CreateControlDecorator
   def CreateWorldMapControl(self, control, *args):
     _GemRB.Window_CreateWorldMapControl(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
+  @CreateControlDecorator
   def CreateMapControl(self, control, *args):
     _GemRB.Window_CreateMapControl(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
+  @CreateControlDecorator
   def CreateLabel(self, control, *args):
     _GemRB.Window_CreateLabel(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
+  @CreateControlDecorator
   def CreateButton(self, control, *args):
     _GemRB.Window_CreateButton(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
+  @CreateControlDecorator
   def CreateScrollBar(self, control, *args):
     _GemRB.Window_CreateScrollBar(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
+  @CreateControlDecorator
   def CreateTextEdit(self, control, *args):
     _GemRB.Window_CreateTextEdit(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
@@ -150,8 +163,7 @@ class GTextEdit(GControl):
 class GScrollBar(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetDefaultScrollBar': _GemRB.ScrollBar_SetDefaultScrollBar,
-    'SetSprites': _GemRB.ScrollBar_SetSprites
+    'SetDefaultScrollBar': _GemRB.ScrollBar_SetDefaultScrollBar
   }
 
 class GButton(GControl):

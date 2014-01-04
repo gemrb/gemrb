@@ -18,6 +18,7 @@
 #
 # character generation end
 import GemRB
+import GameCheck
 import GUICommon
 import Spellbook
 import CommonTables
@@ -108,7 +109,7 @@ def OnLoad():
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
-	if GUICommon.GameIsTOB():
+	if GameCheck.IsTOB():
 		# will also add the starting inventory for tob
 		GemRB.GameSetExpansion (4)
 		# no torture, let's refresh all the spells, at least for sorcerers
@@ -124,7 +125,7 @@ def OnLoad():
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
 	else:
 		#when export is done, go to start
-		if GUICommon.HasTOB():
+		if GameCheck.HasTOB():
 			GemRB.SetToken ("NextScript","Start2")
 		else:
 			GemRB.SetToken ("NextScript","Start")

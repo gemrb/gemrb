@@ -23,6 +23,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import GUICommonWindows
 from GUIDefines import *
@@ -56,7 +57,7 @@ Buttons = [-1,-1,-1,-1]
 inventory_slots = ()
 total_price = 0
 total_income = 0
-if GUICommon.GameIsIWD2():
+if GameCheck.IsIWD2():
 	ItemButtonCount = 6
 else:
 	ItemButtonCount = 4
@@ -80,7 +81,7 @@ BarteringPC = 0
 # 5 - drink
 # 6 - rent
 
-if GUICommon.GameIsIWD1():
+if GameCheck.IsIWD1():
 	# no bam for bags
 	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORSTOR","STORSTOR")
 else:
@@ -111,12 +112,12 @@ def CloseStoreWindow ():
 		StoreWindow.Unload ()
 	if ActionWindow:
 		ActionWindow.Unload ()
-	if not GUICommon.GameIsBG1():
+	if not GameCheck.IsBG1():
 		if PortraitWindow:
 			PortraitWindow.Unload ()
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	if not GUICommon.GameIsBG1():
+	if not GameCheck.IsBG1():
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 	if Inventory:
 		GUIINV.OpenInventoryWindow ()
@@ -156,7 +157,7 @@ def OpenStoreWindow ():
 		GemRB.GamePause (1, 3)
 
 	GemRB.SetVar ("Action", 0)
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		GemRB.LoadWindowPack ("GUISTORE", 800, 600)
 	else:
 		GemRB.LoadWindowPack ("GUISTORE", 640, 480)
@@ -174,7 +175,7 @@ def OpenStoreWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseStoreWindow)
 
 	#Store type icon
-	if not GUICommon.GameIsIWD2():
+	if not GameCheck.IsIWD2():
 		Button = Window.GetControl (5)
 		Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
 
@@ -187,7 +188,7 @@ def OpenStoreWindow ():
 		Button.SetVarAssoc ("Action", i)
 		if Action>=0:
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-			if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				Button.SetSprites ("GUISTBBC", Action, 1,2,0,0)
 			else:
 				Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
@@ -208,14 +209,14 @@ def OpenStoreWindow ():
 	# checks GUISTORE.StoreHealWindow
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	if GUICommon.GameIsIWD2() or GUICommon.GameIsBG1():
+	if GameCheck.IsIWD2() or GameCheck.IsBG1():
 		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 		pass
 	else:
 		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
-	if not GUICommon.GameIsIWD2():
-		if GUICommon.GameIsBG1():
+	if not GameCheck.IsIWD2():
+		if GameCheck.IsBG1():
 			GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
 		else:
 			PortraitWindow.SetVisible (WINDOW_VISIBLE)
@@ -245,9 +246,9 @@ def OpenStoreShoppingWindow ():
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Label.SetText (26291)
-		elif GUICommon.GameIsBG2():
+		elif GameCheck.IsBG2():
 			Label.SetText (51881)
 		else:
 			Label.SetText ("")
@@ -274,7 +275,7 @@ def OpenStoreShoppingWindow ():
 
 	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+5)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
@@ -285,7 +286,7 @@ def OpenStoreShoppingWindow ():
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 		else:
@@ -302,9 +303,9 @@ def OpenStoreShoppingWindow ():
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
 	if Inventory:
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26287)
-		elif GUICommon.GameIsBG2():
+		elif GameCheck.IsBG2():
 			Button.SetText (51882)
 		else:
 			Button.SetText ("")
@@ -316,9 +317,9 @@ def OpenStoreShoppingWindow ():
 	# Sell
 	RightButton = Button = Window.GetControl (3)
 	if Inventory:
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26288)
-		elif GUICommon.GameIsBG2():
+		elif GameCheck.IsBG2():
 			Button.SetText (51883)
 		else:
 			Button.SetText ("")
@@ -329,7 +330,7 @@ def OpenStoreShoppingWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SellPressed)
 
 	# inactive button
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		Button = Window.GetControl (50)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -380,10 +381,10 @@ def OpenStoreIdentifyWindow ():
 	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		elif GUICommon.GameIsBG1():
+		elif GameCheck.IsBG1():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
@@ -422,7 +423,7 @@ def OpenStoreStealWindow ():
 
 	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+4)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
@@ -432,7 +433,7 @@ def OpenStoreStealWindow ():
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+11)
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
@@ -552,19 +553,19 @@ def OpenStoreRumourWindow ():
 	StoreRumourWindow = Window = GemRB.LoadWindow (8)
 
 	#removing those pesky labels
-	if not GUICommon.GameIsIWD2():
+	if not GameCheck.IsIWD2():
 		for i in range (5):
 			Window.DeleteControl (0x10000005+i)
 
 	TextArea = None
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		TextArea = Window.GetControl (13)
 	else:
 		TextArea = Window.GetControl (11)
 	TextArea.SetText (14144)
 
 	#tavern quality image
-	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
+	if GameCheck.IsBG1() or GameCheck.IsBG2():
 		BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
 		Button = Window.GetControl (12)
 		Button.SetSprites (BAM, 0, 0, 0, 0, 0)
@@ -616,7 +617,7 @@ def OpenStoreRentWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreRentWindow)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("RentIndex", i)
-		if GUICommon.GameIsBG1():
+		if GameCheck.IsBG1():
 			#these bioware guys screw up everything possible
 			#remove this line if you fixed guistore
 			Button.SetSprites ("GUISTROC",0, 1,2,0,3)
@@ -939,7 +940,7 @@ def RedrawStoreIdentifyWindow ():
 			Slot = None
 		Button = Window.GetControl (i+8)
 		# TODO: recheck they really differ
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			Label = Window.GetControl (0x1000000d+i)
 		else:
 			Label = Window.GetControl (0x1000000c+i)
@@ -1057,7 +1058,7 @@ def InfoWindow (Slot, Item):
 	MessageWindow = Window = GemRB.LoadWindow (12)
 
 	# TODO: check non-bg2 games to see which label is which
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
 	else:
@@ -1068,7 +1069,7 @@ def InfoWindow (Slot, Item):
 	FakeLabel.SetText ("")
 
 	#description bam
-	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
+	if GameCheck.IsBG1() or GameCheck.IsBG2():
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetItemIcon (Slot['ItemResRef'], 2)
@@ -1091,7 +1092,7 @@ def InfoWindow (Slot, Item):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
 	# hide the empty button
-	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
+	if GameCheck.IsBG2() or GameCheck.IsIWD2():
 		Window.DeleteControl (9)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -1261,9 +1262,9 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 
 		GemRB.SetToken ("ITEMNAME", Name)
 		if Inventory:
-			if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				LabelText = GemRB.GetString (24890)
-			elif GUICommon.GameIsBG2():
+			elif GameCheck.IsBG2():
 				LabelText = GemRB.GetString (28337)
 			else:
 				LabelText = ""
@@ -1394,7 +1395,7 @@ def UpdateStoreHealWindow ():
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	labelOffset = 0x1000000c
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		labelOffset += 1 # grrr
 	for i in range (ItemButtonCount):
 		Cure = GemRB.GetStoreCure (TopIndex+i)
@@ -1410,7 +1411,7 @@ def UpdateStoreHealWindow ():
 			dead = GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD
 			# toggle raise dead/resurrect based on state
 			# unfortunately the flags are not set properly in iwd
-			if not GUICommon.GameIsIWD1() and (  # 3 - non-living
+			if not GameCheck.IsIWD1() and (  # 3 - non-living
 					(dead and Spell["SpellTargetType"] != 3) or \
 					(not dead and Spell["SpellTargetType"] == 3)):
 				# locked and shaded
@@ -1494,7 +1495,7 @@ def UpdateStoreRumourWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	DrinkButtonCount = ItemButtonCount + 1
 	offset = 0
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		offset = 40
 		DrinkButtonCount += 1 # shows even more than with inventories
 	for i in range (DrinkButtonCount):
@@ -1502,7 +1503,7 @@ def UpdateStoreRumourWindow ():
 		Button = Window.GetControl (i+offset)
 		Button.SetVarAssoc ("Index", i)
 		if Drink:
-			if GUICommon.GameIsIWD2():
+			if GameCheck.IsIWD2():
 				Button.SetText (GemRB.GetString (Drink['DrinkName']))
 				CostLabel = Window.GetControl (0x10000000+29+i)
 				CostLabel.SetText (str(Drink['Price']))
@@ -1515,7 +1516,7 @@ def UpdateStoreRumourWindow ():
 		else:
 			Button.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			if GUICommon.GameIsIWD2():
+			if GameCheck.IsIWD2():
 				CostLabel = Window.GetControl (0x10000000+29+i)
 				CostLabel.SetText ("")
 	return

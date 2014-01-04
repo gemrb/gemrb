@@ -23,6 +23,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import CommonTables
 import GUICommonWindows
@@ -78,7 +79,7 @@ def OpenMageWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMageWindow)
 	OptionsWindow.SetFrame ()
@@ -97,7 +98,7 @@ def SetupMageWindow ():
 	ClassName = GUICommon.GetClassRowName (pc)
 	BookType = 0
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
-	if GUICommon.GameIsBG2() and CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
+	if GameCheck.IsBG2() and CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
 		BookType = 1
 
 	if MageWindow:
@@ -122,7 +123,7 @@ def SetupMageWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#setup level buttons
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		for i in range (9):
 			Button = Window.GetControl (56 + i)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshMageLevel)
@@ -163,7 +164,7 @@ def UpdateMageWindow ():
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
 
 	Label = Window.GetControl (0x10000032)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GemRB.SetToken ("SPELLLEVEL", str(level + 1))
 		Label.SetText (10345)
 	else:
@@ -281,7 +282,7 @@ def OpenMageSpellInfoWindow ():
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
-	if GUICommon.HasTOB() or Window.HasControl(6):
+	if GameCheck.HasTOB() or Window.HasControl(6):
 		Button = Window.GetControl (6)
 		if index < 100:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -315,7 +316,7 @@ def OnMageMemorizeSpell ():
 
 	index = GemRB.GetVar ("SpellButton") - 100
 	blend = 1
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		blend = 0
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
@@ -339,7 +340,7 @@ def CloseMageSpellUnmemorizeWindow ():
 def OpenMageSpellRemoveWindow ():
 	global MageSpellUnmemorizeWindow
 
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
 	else:
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
@@ -367,7 +368,7 @@ def OpenMageSpellRemoveWindow ():
 def OpenMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
 	else:
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
@@ -402,7 +403,7 @@ def OnMageUnmemorizeSpell ():
 
 	index = GemRB.GetVar ("SpellButton")
 	blend = 1
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		blend = 0
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):

@@ -18,6 +18,7 @@
 #
 #this is essentially Start.py from the SoA game, except for a very small change
 import GemRB
+import GameCheck
 import GUICommon
 
 StartWindow = 0
@@ -39,7 +40,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
-	if not GUICommon.GameIsBG2Demo():
+	if not GameCheck.IsBG2Demo():
 		TutorialWindow = GemRB.LoadWindow (5)
 		TextAreaControl = TutorialWindow.GetControl (1)
 		CancelButton = TutorialWindow.GetControl (11)
@@ -68,7 +69,7 @@ def OnLoad():
 	StartWindow.SetFrame ()
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
-		if GUICommon.HasTOB():
+		if GameCheck.HasTOB():
 			StartWindow.SetPicture("STARTOLD")
 		if not skip_videos:
 			GemRB.PlayMovie ("INTRO15F", 1)
@@ -86,7 +87,7 @@ def OnLoad():
 	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", 1)
 	Label=StartWindow.GetControl (0x0fff0000)
 	Label.SetText (GEMRB_VERSION)
-	if GUICommon.HasTOB():
+	if GameCheck.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		BackButton.SetText (15416)
 	else:
@@ -95,7 +96,7 @@ def OnLoad():
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
-	if GUICommon.GameIsBG2Demo():
+	if GameCheck.IsBG2Demo():
 		MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
 		MoviesButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
@@ -115,7 +116,7 @@ def OnLoad():
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	if not GUICommon.GameIsBG2Demo():
+	if not GameCheck.IsBG2Demo():
 		TutorialWindow.SetVisible (WINDOW_INVISIBLE)
 	StartWindow.SetVisible (WINDOW_VISIBLE)
 	MusicTable = GemRB.LoadTable ("songlist")
@@ -133,7 +134,7 @@ def SinglePlayerPress():
 	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
 	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 
-	if not GUICommon.GameIsBG2Demo():
+	if not GameCheck.IsBG2Demo():
 		if GemRB.GetVar("oldgame")==1:
 			MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
 			MoviesButton.SetText (33093)
@@ -301,7 +302,7 @@ def BackToMain():
 	SinglePlayerButton.SetText (15413)
 	ExitButton.SetText (15417)
 	OptionsButton.SetText (13905)
-	if GUICommon.GameIsBG2Demo():
+	if GameCheck.IsBG2Demo():
 		MoviesButton.SetText ("")
 		BackButton.SetText ("")
 		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)

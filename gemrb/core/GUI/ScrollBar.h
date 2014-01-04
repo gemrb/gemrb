@@ -42,12 +42,16 @@ namespace GemRB {
 
 #define IE_GUI_SCROLLBAR_DEFAULT      0x00000040   // mousewheel triggers it
 
-#define IE_GUI_SCROLLBAR_UP_UNPRESSED   0
-#define IE_GUI_SCROLLBAR_UP_PRESSED 	1
-#define IE_GUI_SCROLLBAR_DOWN_UNPRESSED 2
-#define IE_GUI_SCROLLBAR_DOWN_PRESSED   3
-#define IE_GUI_SCROLLBAR_TROUGH 		4
-#define IE_GUI_SCROLLBAR_SLIDER 		5
+enum IE_SCROLLBAR_IMAGE_TYPE {
+	IE_GUI_SCROLLBAR_UP_UNPRESSED = 0,
+	IE_GUI_SCROLLBAR_UP_PRESSED,
+	IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
+	IE_GUI_SCROLLBAR_DOWN_PRESSED,
+	IE_GUI_SCROLLBAR_TROUGH,
+	IE_GUI_SCROLLBAR_SLIDER,
+
+	IE_SCROLLBAR_IMAGE_COUNT
+};
 
 #define UP_PRESS	 0x0001
 #define DOWN_PRESS   0x0010
@@ -57,15 +61,12 @@ namespace GemRB {
  * @class ScrollBar
  * Widget displaying scrollbars for paging in long text windows
  */
-
-#define SB_RES_COUNT 6
-
 class GEM_EXPORT ScrollBar : public Control {
 protected:
 	void DrawInternal(Region& drawFrame);
 	bool HasBackground();
 public:
-	ScrollBar(const Region& frame);
+	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
 	~ScrollBar(void);
 	/** safe method to get the height of a frame */
 	int GetFrameHeight(int frame) const;
@@ -79,7 +80,7 @@ public:
 	void UpdateState(const char* VarName, unsigned int Sum);
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
-	Sprite2D* Frames[SB_RES_COUNT];
+	Sprite2D* Frames[IE_SCROLLBAR_IMAGE_COUNT];
 	/** Range of the slider in pixels. The height - buttons - slider */
 	ieDword SliderRange;
 	/** a pixel position between 0 and SliderRange*/
@@ -93,7 +94,6 @@ private: //Private attributes
 private:
 	void CalculateStep();
 public:
-	void SetImage(unsigned char type, Sprite2D* img);
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);
 	/** TextArea Associated Control */

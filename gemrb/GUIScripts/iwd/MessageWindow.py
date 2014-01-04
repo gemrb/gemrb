@@ -47,7 +47,7 @@ def OnLoad():
 	GUICommonWindows.OptionsWindow = None
 
 	#this is different in IWD (0) and HoW (25)
-	if GUICommon.HasHOW():
+	if GameCheck.HasHOW():
 		OptionsWindow = GemRB.LoadWindow (25)
 	else:
 		OptionsWindow = GemRB.LoadWindow (0)

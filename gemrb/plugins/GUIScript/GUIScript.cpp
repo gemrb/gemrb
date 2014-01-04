@@ -2135,16 +2135,20 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateScrollBar__doc,
-"CreateScrollBar(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"CreateScrollBar(WindowIndex, ControlID, x, y, w, h, ResRef) => ControlIndex\n\n"
 "Creates and adds a new ScrollBar to a Window.");
 
 static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
+	char* resRef;
 	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
-			&rgn.w, &rgn.h )) {
+	// hidden parameters from CreateScrollBar decorator
+	int cycle, up, upPr, down, downPr, trough, slider;
+
+	if (!PyArg_ParseTuple( args, "iiiiiisiiiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h, &resRef, &cycle, &up, &upPr, &down, &downPr, &trough, &slider )) {
 		return AttributeError( GemRB_Window_CreateScrollBar__doc );
 	}
 
@@ -2153,7 +2157,24 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 		return RuntimeError("Cannot find window!");
 	}
 
-	ScrollBar* sb = new ScrollBar(rgn);
+	AnimationFactory* af = ( AnimationFactory* )
+	gamedata->GetFactoryResource( resRef, IE_BAM_CLASS_ID, IE_NORMAL );
+	if (!af) {
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", resRef);
+		return RuntimeError( tmpstr );
+	}
+
+	Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
+	images[IE_GUI_SCROLLBAR_UP_UNPRESSED] = af->GetFrame( up, cycle );
+	images[IE_GUI_SCROLLBAR_UP_PRESSED] = af->GetFrame( upPr, cycle );
+	images[IE_GUI_SCROLLBAR_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
+	images[IE_GUI_SCROLLBAR_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
+	images[IE_GUI_SCROLLBAR_TROUGH] = af->GetFrame( trough, cycle );
+	images[IE_GUI_SCROLLBAR_SLIDER] = af->GetFrame( slider, cycle );
+
+	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;
 	sb->Owner = win;
 	win->AddControl( sb );
@@ -2280,64 +2301,6 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 	Py_INCREF( Py_None );
 	return Py_None;
 }
-
-PyDoc_STRVAR( GemRB_ScrollBar_SetSprites__doc,
-"SetScrollBarSprites(WindowIndex, ControlIndex, ResRef, Cycle, UpUnpressedFrame, UpPressedFrame, DownUnpressedFrame, DownPressedFrame, TroughFrame, SliderFrame)\n\n"
-"Sets a ScrollBar Sprites Images." );
-
-static PyObject* GemRB_ScrollBar_SetSprites(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, cycle, upunpressed, uppressed;
-	int downunpressed, downpressed, trough, knob;
-	char *ResRef;
-
-	if (!PyArg_ParseTuple( args, "iisiiiiiii", &WindowIndex, &ControlIndex,
-			&ResRef, &cycle, &upunpressed, &uppressed, &downunpressed, &downpressed, &trough, &knob )) {
-		return AttributeError( GemRB_ScrollBar_SetSprites__doc );
-	}
-
-	ScrollBar* sb = ( ScrollBar* ) GetControl(WindowIndex, ControlIndex, IE_GUI_SCROLLBAR);
-	if (!sb) {
-		return NULL;
-	}
-
-	if (ResRef[0] == 0) {
-		sb->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_TROUGH, 0 );
-		sb->SetImage( IE_GUI_SCROLLBAR_SLIDER, 0 );
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource( ResRef,
-				IE_BAM_CLASS_ID, IE_NORMAL );
-	if (!af) {
-		char tmpstr[24];
-
-		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
-		return RuntimeError( tmpstr );
-	}
-	Sprite2D *tspr = af->GetFrame(upunpressed, (unsigned char)cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED, tspr );
-	tspr = af->GetFrame( uppressed, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED, tspr );
-	tspr = af->GetFrame( downunpressed, (unsigned char)cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED, tspr );
-	tspr = af->GetFrame( downpressed, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED, tspr );
-	tspr = af->GetFrame( trough, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_TROUGH, tspr );
-	tspr = af->GetFrame( knob, (unsigned char) cycle);
-	sb->SetImage( IE_GUI_SCROLLBAR_SLIDER, tspr );
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 
 PyDoc_STRVAR( GemRB_Button_SetSprites__doc,
 "SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n\n"
@@ -10859,7 +10822,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(SaveGame_GetPreview, METH_VARARGS),
 	METHOD(SaveGame_GetSaveID, METH_VARARGS),
 	METHOD(ScrollBar_SetDefaultScrollBar, METH_VARARGS),
-	METHOD(ScrollBar_SetSprites, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),
 	METHOD(Symbol_Unload, METH_VARARGS),
 	METHOD(Table_FindValue, METH_VARARGS),

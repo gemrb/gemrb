@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import GUICommonWindows
 import CommonWindow
@@ -239,7 +240,7 @@ def GameExpansion():
 	if version<3:
 		GemRB.GameSetReputation(100)
 
-	if not GUICommon.HasTOB():
+	if not GameCheck.HasTOB():
 		return
 
 	if version < 5 and not GemRB.GetVar("PlayMode") and GemRB.GetVar("oldgame"):

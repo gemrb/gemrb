@@ -20,6 +20,7 @@
 
 import GemRB
 import CommonTables
+import GameCheck
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_LEFT, ACT_RIGHT
@@ -410,7 +411,7 @@ def CannotLearnSlotSpell ():
 		return LSR_STAT
 
 	import GUICommon
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		import GUIINV
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
 	else:

@@ -23,6 +23,7 @@
 #################################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import GUICommonWindows
 import GUIClasses
@@ -205,9 +206,9 @@ def RemovePlayer ():
 
 def RemovePlayerConfirm ():
 	slot = GemRB.GetVar ("Selected")
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		GemRB.LeaveParty (slot, 2)
-	elif GUICommon.GameIsBG1():
+	elif GameCheck.IsBG1():
 		GemRB.LeaveParty (slot, 1)
 	else:
 		GemRB.LeaveParty (slot)
@@ -293,7 +294,7 @@ def OpenReformPartyWindow ():
 	return
 
 def DeathWindow ():
-	if GUICommon.GameIsIWD1():
+	if GameCheck.IsIWD1():
 		#no death movie, but music is changed
 		GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()
@@ -302,7 +303,7 @@ def DeathWindow ():
 
 def DeathWindowEnd ():
 	#playing death movie before continuing
-	if not GUICommon.GameIsIWD1():
+	if not GameCheck.IsIWD1():
 		GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,3)
 

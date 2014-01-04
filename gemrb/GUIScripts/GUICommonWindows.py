@@ -29,11 +29,12 @@ from ie_modal import *
 from ie_action import *
 from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
+import GameCheck
 import GUICommon
 import CommonTables
 import LUCommon
 import InventoryCommon
-if not GUICommon.GameIsPST():
+if not GameCheck.IsPST():
   import Spellbook  ##not used in pst - YET
 
 # needed for all the Open*Window callbacks in the OptionsWindow
@@ -41,7 +42,7 @@ import GUIJRNL
 import GUIMA
 import GUIINV
 import GUIOPT
-if GUICommon.GameIsIWD2():
+if GameCheck.IsIWD2():
 	# one spellbook for all spell types
 	import GUISPL
 else:
@@ -62,7 +63,7 @@ ReturnToGame = None
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
-if GUICommon.GameIsPST(): #Torment
+if GameCheck.IsPST(): #Torment
 	import GUIClasses
 	TimeWindow = None
 	PortWindow = None
@@ -79,7 +80,7 @@ if GUICommon.GameIsPST(): #Torment
 	'Options' : 8, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'AI': 4,
 	'Game': 0, 'Party' : 8 , 'Time': 9 #not in pst
 	}
-elif GUICommon.GameIsIWD2(): #Icewind Dale 2
+elif GameCheck.IsIWD2(): #Icewind Dale 2
 	OptionTip = {
 	'Inventory' : 16307, 'Map': 16310, 'Mage': 16309, 'Priest': 14930, 'Stats': 16306, 'Journal': 16308,
 	'Options' : 16311, 'Rest': 11942, 'Follow': 41647, 'Expand': 41660, 'AI' : 1,'Game' : 16313,  'Party' : 16312,
@@ -128,12 +129,12 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	OptionsWindow = Window
 	ReturnToGame = CloseWindowCallback
 
-	bg1 = GUICommon.GameIsBG1()
-	bg2 = GUICommon.GameIsBG2()
-	iwd1 = GUICommon.GameIsIWD1()
-	how = GUICommon.HasHOW()
-	iwd2 = GUICommon.GameIsIWD2()
-	pst = GUICommon.GameIsPST()
+	bg1 = GameCheck.IsBG1()
+	bg2 = GameCheck.IsBG2()
+	iwd1 = GameCheck.IsIWD1()
+	how = GameCheck.HasHOW()
+	iwd2 = GameCheck.IsIWD2()
+	pst = GameCheck.IsPST()
 	#store these instead of doing 50 calls...
 
 	if iwd2: # IWD2 has one spellbook to rule them all
@@ -278,7 +279,7 @@ def MarkMenuButton (WindowIndex):
 
 	# NOTE: Alternatively, comment out this block or add a feature check, so that
 	#   clicking button the second time closes a window again, which might be preferred
-	if GUICommon.GameIsIWD1() and GemRB.GetVar ("SelectedWindow") != 0:
+	if GameCheck.IsIWD1() and GemRB.GetVar ("SelectedWindow") != 0:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		return
 
@@ -326,7 +327,7 @@ def PortraitPress (): #not used in pst. TODO:make an enhancement option?
 def AIPress (toggle=1):
 	"""Toggles the party AI or refreshes the button state if toggle = 0"""
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		Button = OptionsWindow.GetControl (OptionControl['AI'])
 	else:
 		Button = PortraitWindow.GetControl (OptionControl['AI'])
@@ -352,7 +353,7 @@ def AIPress (toggle=1):
 ## The following four functions are for the action bar
 ## they are currently unused in pst
 def EmptyControls ():
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		return
 	Selected = GemRB.GetSelectedSize()
 	if Selected==1:
@@ -391,7 +392,7 @@ def GroupControls ():
 	"""Sections that control group actions."""
 	GemRB.SetVar ("ActionLevel", 0)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
-	if GUICommon.GameIsBG2():
+	if GameCheck.IsBG2():
 		Button.SetActionIcon (globals(), 7) #talk icon
 	else:
 		Button.SetActionIcon (globals(), 14)#guard icon
@@ -601,9 +602,9 @@ def UpdateActionsWindow ():
 	global CurrentWindow, OptionsWindow, PortraitWindow
 	global level, TopIndex
 
-	if GUICommon.GameIsPST():
+	if GameCheck.IsPST():
 		return
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		CurrentWindow = PortraitWindow
 		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
 	else:
@@ -618,7 +619,7 @@ def UpdateActionsWindow ():
 
 	#fully redraw the side panes to cover the actions window
 	#do this only when there is no 'otherwindow'
-	if GUICommon.GameIsIWD2():
+	if GameCheck.IsIWD2():
 		if GemRB.GetVar ("OtherWindow") != -1:
 			return
 	else:
@@ -634,7 +635,7 @@ def UpdateActionsWindow ():
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
-		if GUICommon.GameIsBG1():
+		if GameCheck.IsBG1():
 			Button.SetBorder (0,6,6,4,4,0,254,0,255)
 		Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
 		Button.SetFont ("NUMBER")
@@ -659,14 +660,14 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == 2: #spells
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			type = 255
 		else:
 			type = 3
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == 3: #innates
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			type = 256 + 1024
 		else:
 			type = 4
@@ -680,7 +681,7 @@ def UpdateActionsWindow ():
 	elif level == 6: # iwd2 skills
 		SetupSkillSelection()
 	elif level == 7: # quickspells, but with innates too
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			type = 255 + 256 + 1024
 		else:
 			type = 7
@@ -696,7 +697,7 @@ def UpdateActionsWindow ():
 		type = GemRB.GetVar ("Type")
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == 11: # spells from a 2da (fx_select_spell)
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			type = 255
 		else:
 			type = 3
@@ -1057,7 +1058,7 @@ def SpellShiftPressed ():
 		if ReplacementSpell != Spell['SpellResRef'].upper():
 			SpellIndex = GemRB.PrepareSpontaneousCast (pc, Spell['SpellResRef'], Spell['BookType'], Level, ReplacementSpell)
 			GemRB.SetVar ("Spell", SpellIndex+1000*Type)
-			if GUICommon.GameIsIWD2():
+			if GameCheck.IsIWD2():
 				GemRB.DisplayString (39742, 0xffffff, pc) # Spontaneous Casting
 
 	# proceed as if nothing happened
@@ -1267,24 +1268,24 @@ def OpenPortraitWindow (needcontrols=0):
 	global PortraitWindow
 
 	#take care, this window is different in how/iwd
-	if GUICommon.HasHOW() and needcontrols:
+	if GameCheck.HasHOW() and needcontrols:
 		PortraitWindow = Window = GemRB.LoadWindow (26)
 	else:
 		PortraitWindow = Window = GemRB.LoadWindow (1)
 
-	if needcontrols and not GUICommon.GameIsPST(): #not in pst
+	if needcontrols and not GameCheck.IsPST(): #not in pst
 		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
 		# 1280 and higher don't have this control
 		if Window.HasControl (8):
 			Button=Window.GetControl (8)
-			if GUICommon.GameIsIWD():
+			if GameCheck.IsIWD():
 				# Rest (iwd)
 				Button.SetTooltip (11942)
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 			else:
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
 		else:
-			if GUICommon.HasHOW():
+			if GameCheck.HasHOW():
 				# Rest (how)
 				pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
 				Window.CreateButton (8, 6, pos, 55, 37)
@@ -1304,7 +1305,7 @@ def OpenPortraitWindow (needcontrols=0):
 		AIPress(0) #this initialises the state and tooltip
 
 		#Select All
-		if GUICommon.HasHOW():
+		if GameCheck.HasHOW():
 			Window.CreateButton (7, 33, pos, 27, 36)
 			Button = Window.GetControl (7)
 			Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
@@ -1314,25 +1315,25 @@ def OpenPortraitWindow (needcontrols=0):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 	else:
 		# Rest
-		if Window.HasControl(6) and not GUICommon.GameIsIWD2():
+		if Window.HasControl(6) and not GameCheck.IsIWD2():
 			Button = Window.GetControl (6)
 			Button.SetTooltip (11942)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetFont ("STATES")
 			# label for status flags (dialog, store, level up)
 			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
-		elif not GUICommon.GameIsPST():
+		elif not GameCheck.IsPST():
 			Button.SetFont ("STATES2")
 			# label for status flags (dialog, store, level up)
 			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
 
 		Button.SetVarAssoc ("PressedPortrait", i+1)
 
-		if needcontrols or GUICommon.GameIsIWD2():
+		if needcontrols or GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
 		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, PortraitButtonOnPress)
@@ -1345,7 +1346,7 @@ def OpenPortraitWindow (needcontrols=0):
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
 
-		if GUICommon.GameIsIWD1():
+		if GameCheck.IsIWD1():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
 			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT)
@@ -1355,10 +1356,10 @@ def OpenPortraitWindow (needcontrols=0):
 		# unlike other buttons, this one lacks extra frames for a selection effect
 		# so we create it and shift it to cover the grooves of the image
 		# except iwd2's second frame already has it incorporated (but we miscolor it)
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			Button.SetBorder (FRAME_PC_SELECTED, 0, 0, 0, 0, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
-		elif GUICommon.GameIsPST():
+		elif GameCheck.IsPST():
 			Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 			ButtonHP = Window.GetControl (6 + i)
@@ -1381,7 +1382,7 @@ def UpdatePortraitWindow ():
 	Inventory = GemRB.GetVar ("Inventory")
 
 	for portid in range (PARTY_SIZE):
-		if GUICommon.GameIsPST():
+		if GameCheck.IsPST():
 			UpdateAnimatedPortrait(Window,portid)
 			continue
 
@@ -1405,7 +1406,7 @@ def UpdatePortraitWindow ():
 
 		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | \
 						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
-		if GUICommon.GameIsIWD2():
+		if GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 
@@ -1417,7 +1418,7 @@ def UpdatePortraitWindow ():
 
 		# character - 1 == bam cycle
 		talk = store = flag = blank = ""
-		if GUICommon.GameIsBG2():
+		if GameCheck.IsBG2():
 			# as far as I can tell only BG2 has icons for talk or store
 			flag = blank = chr(238)
 			talk = 154 # dialog icon
@@ -1432,7 +1433,7 @@ def UpdatePortraitWindow ():
 
 		if LUCommon.CanLevelUp (portid+1):
 			flag = flag + blank + chr(255)
-		elif GUICommon.GameIsIWD1():
+		elif GameCheck.IsIWD1():
 			HPLabel = Window.GetControl (100+portid)
 			HPLabel.SetText (ratio_str)
 			HPLabel.SetTextColor (*color)
@@ -1440,7 +1441,7 @@ def UpdatePortraitWindow ():
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (portid+1)
 
-		numCols = 4 if GUICommon.GameIsIWD2() else 3
+		numCols = 4 if GameCheck.IsIWD2() else 3
 		numEffects = len(effects)
 
 		states = ""
@@ -1639,7 +1640,7 @@ def PortraitButtonOnMouseEnter ():
 	if GemRB.IsDraggingItem()==2:
 		if DraggedPortrait != None:
 			GemRB.SwapPCs (DraggedPortrait, i)
-			if not GUICommon.GameIsPST():
+			if not GameCheck.IsPST():
 				GemRB.SetVar ("PressedPortrait", DraggedPortrait)
 				#possibly review why the other games do that ^^
 				#it completely breaks the dragging in PST
@@ -1819,7 +1820,7 @@ def SetPSTGamedaysAndHourToken ():
 def UpdateClock ():
 	global ActionsWindow, OptionsWindow
 
-	if GUICommon.GameIsPST ():
+	if GameCheck.IsPST ():
 		#used to update the pst clock tooltip
 		ActionsWindow = GemRB.LoadWindow(0)
 		Button = ActionsWindow.GetControl (0)

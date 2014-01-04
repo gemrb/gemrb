@@ -1,7 +1,7 @@
 v
-Prototype: GemRB.CreateScrollBar(WindowIndex, ControlID, x, y, w, h)
+Prototype: GemRB.CreateScrollBar(WindowIndex, ControlID, x, y, w, h, ResRef)
 
-Metaclass Prototype: CreateScrollBar(ControlID, x, y, w, h)
+Metaclass Prototype: CreateScrollBar(ControlID, x, y, w, h, ResRef)
 
 Description:  Creates and adds a new ScrollBar to a Window.
 
@@ -12,6 +12,7 @@ x - position
 y - position
 w - width
 h - height
+ResRef - the resref for the sprite set
 
 Return value: ControlIndex
 
