@@ -2144,8 +2144,11 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 	char* resRef;
 	Region rgn;
 
-	if (!PyArg_ParseTuple( args, "iiiiiis", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
-			&rgn.w, &rgn.h, &resRef )) {
+	// hidden parameters from CreateScrollBar decorator
+	int cycle, up, upPr, down, downPr, trough, slider;
+
+	if (!PyArg_ParseTuple( args, "iiiiiisiiiiiii", &WindowIndex, &ControlID, &rgn.x, &rgn.y,
+			&rgn.w, &rgn.h, &resRef, &cycle, &up, &upPr, &down, &downPr, &trough, &slider )) {
 		return AttributeError( GemRB_Window_CreateScrollBar__doc );
 	}
 
@@ -2164,10 +2167,12 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 	}
 
 	Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
-	for (int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
-		// FIXME: this order is not valid for BG2
-		images[i] = af->GetFrame( i, 0 );
-	}
+	images[IE_GUI_SCROLLBAR_UP_UNPRESSED] = af->GetFrame( up, cycle );
+	images[IE_GUI_SCROLLBAR_UP_PRESSED] = af->GetFrame( upPr, cycle );
+	images[IE_GUI_SCROLLBAR_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
+	images[IE_GUI_SCROLLBAR_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
+	images[IE_GUI_SCROLLBAR_TROUGH] = af->GetFrame( trough, cycle );
+	images[IE_GUI_SCROLLBAR_SLIDER] = af->GetFrame( slider, cycle );
 
 	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;

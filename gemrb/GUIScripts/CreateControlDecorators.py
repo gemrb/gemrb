@@ -19,3 +19,13 @@
 #
 
 import GameCheck
+
+def CreateScrollBar(func):
+	def wrapper(win, control, *args):
+		# modArgs = BAM Cycle + up, upPr, down, downPr, trough, slider
+		if GameCheck.GameIsBG2():
+			modArgs = args + (0,0,1,2,3,5,4)
+		else:
+			modArgs = args + tuple([0] + range(6))
+		return func(win, control, *modArgs)
+	return wrapper

@@ -26,7 +26,7 @@ def CreateControlDecorator(func):
 	wrapper = getattr(CreateControlDecorators, func.__name__, None)
 	if wrapper:
 		return wrapper(func)
-	return func
+	return func # unchanged, no wrapper exists
 
 class GTable:
   __metaclass__ = metaIDWrapper
