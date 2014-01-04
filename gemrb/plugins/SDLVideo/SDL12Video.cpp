@@ -121,7 +121,10 @@ void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 
 void SDL12VideoDriver::DestroyMovieScreen()
 {
-	if (overlay) SDL_FreeYUVOverlay(overlay);
+	if (overlay) {
+		SDL_FreeYUVOverlay(overlay);
+		overlay = NULL;
+	}
 }
 
 void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
