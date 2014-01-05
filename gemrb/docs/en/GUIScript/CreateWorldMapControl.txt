@@ -1,5 +1,5 @@
 
-Prototype: GemRB.CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font])
+Prototype: GemRB.CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font, recolor])
 
 Metaclass Prototype: CreateWorldMapControl(ControlID, x, y, w, h, direction[, font])
 
@@ -11,6 +11,7 @@ ControlID   - the new control will be available via this controlID
 x,y,w,h     - X position, Y position, Width and Height of the control
 direction
 font        - font uused to display names of map locations
+recolor     - recolor map icons (bg1)
 
 Return value: N/A
 

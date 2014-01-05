@@ -71,6 +71,7 @@ public:
 	void SetDirection(int direction);
 	/** Set color for one type of area labels */
 	void SetColor(int which, Color color);
+	void SetOverrideIconPalette(bool override) { OverrideIconPalette = override; };
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
@@ -85,6 +86,8 @@ private:
 	unsigned char lastCursor;
 	//current area
 	ieResRef currentArea;
+	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient
+	bool OverrideIconPalette;
 	/** Label color of a visited area */
 	Palette *pal_normal;
 	/** Label color of a currently selected area */

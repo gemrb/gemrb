@@ -2853,12 +2853,12 @@ PyDoc_STRVAR( GemRB_Window_CreateWorldMapControl__doc,
 
 static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, direction;
+	int WindowIndex, ControlID, direction, recolor = 0;
 	Region rgn;
 	char *font=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &rgn.x,
-			&rgn.y, &rgn.w, &rgn.h, &direction, &font )) {
+	if (!PyArg_ParseTuple( args, "iiiiiii|si", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &direction, &font, &recolor )) {
 		return AttributeError( GemRB_Window_CreateWorldMapControl__doc );
 	}
 
@@ -2876,6 +2876,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;
 	wmap->Owner = win;
+	wmap->SetOverrideIconPalette(recolor);
 	win->AddControl( wmap );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
