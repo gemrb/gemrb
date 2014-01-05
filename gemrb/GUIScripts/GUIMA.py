@@ -434,6 +434,8 @@ def WorldMapWindowCommon (Travel):
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
 	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
+	# center on current area
+	MapC()
 
 	if not GameCheck.IsIWD2():
 		#north
@@ -480,8 +482,8 @@ def WorldMapWindowCommon (Travel):
 	else:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	Window.SetVisible (WINDOW_VISIBLE)
-	MapC()
 	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
