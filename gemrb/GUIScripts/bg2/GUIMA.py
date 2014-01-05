@@ -25,6 +25,7 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import GUICommonWindows
 
 MapWindow = None
 NoteWindow = None
@@ -36,7 +37,6 @@ OptionsWindow = None
 OldOptionsWindow = None
 
 def RevealMap ():
-	import GUICommonWindows
 	global MapWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -136,7 +136,6 @@ def ShowMap ():
 
 ###################################################
 def OpenMapWindow ():
-	import GUICommonWindows
 	global MapWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
