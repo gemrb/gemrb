@@ -121,11 +121,12 @@ def ShowMap ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Hide or Show mapnotes
-	Button = Window.GetControl (3)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	if HasMapNotes ():
+		Button = Window.GetControl (3)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	Label = Window.GetControl (0x10000003)
-	Label.SetText ("")
+		Label = Window.GetControl (0x10000003)
+		Label.SetText ("")
 
 	# Map Control
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
@@ -133,8 +134,9 @@ def ShowMap ():
 	else:
 		Window.CreateMapControl (2, 0, 0, 0, 0)
 	Map = Window.GetControl (2)
-	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
-	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
+	if HasMapNotes ():
+		GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
+		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
 	Window.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_GRAYED)
@@ -187,7 +189,7 @@ def OpenMapWindow ():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2() or GameCheck.IsBG1():
 		GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
 	OptionsWindow.SetFrame ()
@@ -410,6 +412,7 @@ def WorldMapWindowCommon (Travel):
 
 	#(fuzzie just copied this from the map window code..)
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
+	Window.SetFrame ()
 	#saving the original portrait window
 	if GameCheck.IsIWD2():
 		OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -421,6 +424,10 @@ def WorldMapWindowCommon (Travel):
 
 	if GameCheck.IsBG2():
 		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
+	elif GameCheck.IsBG1():
+		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont")
+		WorldMapControl = Window.GetControl (4)
+		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0xa4, 0x6a, 0x4c, 0x00)
 	else:
 		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
 	WorldMapControl = Window.GetControl (4)
@@ -428,7 +435,7 @@ def WorldMapWindowCommon (Travel):
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
 	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
 
-	if GameCheck.IsBG2() or GameCheck.IsIWD1():
+	if not GameCheck.IsIWD2():
 		#north
 		Button = Window.GetControl (1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
