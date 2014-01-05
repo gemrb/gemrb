@@ -388,33 +388,34 @@ def WorldMapWindowCommon (Travel):
 	Button = Window.GetControl (2)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
 
-	#northwest
-	Button = Window.GetControl (8)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
+	if GameCheck.IsBG2():
+		#northwest
+		Button = Window.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
 
-	#northeast
-	Button = Window.GetControl (9)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
+		#northeast
+		Button = Window.GetControl (9)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
 
-	#west
-	Button = Window.GetControl (10)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
+		#west
+		Button = Window.GetControl (10)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
 
-	#center
-	Button = Window.GetControl (11)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
+		#center
+		Button = Window.GetControl (11)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
 
-	#east
-	Button = Window.GetControl (12)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
+		#east
+		Button = Window.GetControl (12)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
 
-	#southwest
-	Button = Window.GetControl (13)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
+		#southwest
+		Button = Window.GetControl (13)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
 
-	#southeast
-	Button = Window.GetControl (14)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
+		#southeast
+		Button = Window.GetControl (14)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
 
 	# Done
 	Button = Window.GetControl (0)
