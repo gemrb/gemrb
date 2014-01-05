@@ -23,9 +23,10 @@
 ###################################################
 
 import GemRB
-from GUIDefines import *
+import GameCheck
 import GUICommon
 import GUICommonWindows
+from GUIDefines import *
 
 MapWindow = None
 NoteWindow = None
@@ -69,6 +70,7 @@ def RevealMap ():
 # for farsight effect
 ###################################################
 def ShowMap ():
+	import GameCheck
 	import GUICommonWindows
 	global MapWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
@@ -119,7 +121,10 @@ def ShowMap ():
 	Label.SetText ("")
 
 	# Map Control
-	Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	if GameCheck.IsBG2():
+		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	else:
+		Window.CreateMapControl (2, 0, 0, 0, 0)
 	Map = Window.GetControl (2)
 	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
@@ -130,7 +135,11 @@ def ShowMap ():
 	OptionsWindow.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_FRONT)
 	Window.SetVisible (WINDOW_FRONT)
-	Map.SetStatus (IE_GUI_CONTROL_FOCUSED| IE_GUI_MAP_REVEAL_MAP)
+	# TODO: probably more of this function needs ifdefing
+	if HasMapNotes ():
+		Map.SetStatus (IE_GUI_CONTROL_FOCUSED| IE_GUI_MAP_REVEAL_MAP)
+	else:
+		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
 
@@ -168,7 +177,8 @@ def OpenMapWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
+	if GameCheck.IsBG2():
+		GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
@@ -179,26 +189,38 @@ def OpenMapWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindowInside)
 
 	# Hide or Show mapnotes
-	Button = Window.GetControl (3)
-	Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	# Is this an option?
-	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-	Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	if HasMapNotes ():
+		Button = Window.GetControl (3)
+		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		# Is this an option?
+		GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+		Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
-	Label = Window.GetControl (0x10000003)
-	Label.SetText ("")
+		Label = Window.GetControl (0x10000003)
+		Label.SetText ("")
 
 	# Map Control
-	Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	if GameCheck.IsBG2():
+		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	else:
+		Window.CreateMapControl (2, 0, 0, 0, 0)
 	Map = Window.GetControl (2)
-	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-	Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
+	if HasMapNotes ():
+		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
 	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
+
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
+	if HasMapNotes ():
+		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
+	else:
+		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
+
+def HasMapNotes ():
+	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
 
 def LeftDoublePressMap ():
 	#close the map on doubleclick
@@ -349,7 +371,10 @@ def WorldMapWindowCommon (Travel):
 	#saving the original portrait window
 	Window.SetFrame ()
 
-	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
+	if GameCheck.IsBG2():
+		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
+	else:
+		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
 	WorldMapControl = Window.GetControl (4)
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
