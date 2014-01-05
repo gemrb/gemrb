@@ -119,8 +119,7 @@ def OpenOptionsWindow ():
 		# OptionsWindow is the leftmost menu bar window present in most of the games
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
-		if GameCheck.IsBG2():
-			GUICommonWindows.MarkMenuButton (OptionsWindow)
+		GUICommonWindows.MarkMenuButton (OptionsWindow)
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
 		OptionsWindow.SetFrame ()
 		if not GameCheck.IsBG1(): #not in PST either, but it has its own OpenOptionsWindow()

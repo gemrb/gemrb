@@ -189,8 +189,7 @@ def OpenMapWindow ():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	if GameCheck.IsBG2() or GameCheck.IsBG1():
-		GUICommonWindows.MarkMenuButton (OptionsWindow)
+	GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
 	OptionsWindow.SetFrame ()
 

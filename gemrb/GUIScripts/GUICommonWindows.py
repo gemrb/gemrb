@@ -258,14 +258,16 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
-	if bg1 or iwd1 or bg2:
-		MarkMenuButton (Window)
+	MarkMenuButton (Window)
 
 	if PortraitWindow:
 		UpdatePortraitWindow ()
 	return
 
 def MarkMenuButton (WindowIndex):
+	if GameCheck.IsIWD2() or GameCheck.IsPST():
+		return
+
 	Pressed = WindowIndex.GetControl( GemRB.GetVar ("SelectedWindow") )
 
 	for button in range (9):
