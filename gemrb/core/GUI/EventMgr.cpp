@@ -299,7 +299,9 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 					if (!ctrl->WantsDragOperation()) {
 						focusLock = ctrl;
 					}
-					RefreshCursor(last_win_mousefocused->Cursor);
+					if (last_win_mousefocused) {
+						RefreshCursor(last_win_mousefocused->Cursor);
+					}
 					return;
 				}
 			}
