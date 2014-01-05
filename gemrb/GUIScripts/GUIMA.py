@@ -337,39 +337,56 @@ def ChangeTooltip ():
 
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
+	global OldPortraitWindow, OldOptionsWindow
 
-	print "CloseWorldMapWindow found Mapwindow = ",MapWindow
-	if MapWindow:
-		# reopen map window
-		if WorldMapWindow:
-			WorldMapWindow.Unload ()
-		WorldMapWindow = None
-		WorldMapControl = None
-		OpenMapWindow ()
-		return
+	assert GUICommon.CloseOtherWindow (CloseWorldMapWindow)
 
 	if WorldMapWindow:
 		WorldMapWindow.Unload ()
 	WorldMapWindow = None
 	WorldMapControl = None
+	if GameCheck.IsIWD2():
+		if PortraitWindow:
+			PortraitWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
+	GemRB.SetVar ("OtherWindow", -1)
 	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 	return
 
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
+	global OptionsWindow, PortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
-	if WorldMapWindow:
-		CloseWorldMapWindow ()
+	if GUICommon.CloseOtherWindow (CloseWorldMapWindow):
 		return
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
-	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
-	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	if GameCheck.IsIWD2():
+		GemRB.LoadWindowPack ("GUIWMAP",800, 600)
+		WorldMapWindow = Window = GemRB.LoadWindow (2)
+	else:
+		GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
+		WorldMapWindow = Window = GemRB.LoadWindow (0)
+
+	#(fuzzie just copied this from the map window code..)
+	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
 	#saving the original portrait window
-	Window.SetFrame ()
+	if GameCheck.IsIWD2():
+		OldPortraitWindow = GUICommonWindows.PortraitWindow
+		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+		OldOptionsWindow = GUICommonWindows.OptionsWindow
+		OptionsWindow = GemRB.LoadWindow (0)
+		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
+		OptionsWindow.SetFrame ()
 
 	if GameCheck.IsBG2():
 		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
@@ -419,7 +436,10 @@ def WorldMapWindowCommon (Travel):
 
 	# Done
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseWorldMapWindow)
+	if Travel>=0:
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
+	else:
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.SetVisible (WINDOW_VISIBLE)
 	MapC()
