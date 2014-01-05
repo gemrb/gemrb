@@ -342,17 +342,40 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = WorldMapControl.GetDestinationArea (1)
+	hours = tmp["Distance"]
 	CloseWorldMapWindow ()
 
 	if tmp["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return
-	elif tmp["Distance"] == -1:
+	elif hours == -1:
 		print "Invalid target", tmp
 		return
 
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
+
+	if hours == 0:
+		return
+
 	# distance is stored in hours, but the action needs seconds
-	GemRB.ExecuteString ("AdvanceTime(%d)"%(tmp["Distance"]*300))
+	GemRB.ExecuteString ("AdvanceTime(%d)"%(hours*300))
+
+	# ~The journey took <DURATION>.~ but pst has it without the token
+	# HOWEVER: pst has its own GUIMA + uses only neighbour travel (no MoveToNewArea)??
+	if GameCheck.IsPST():
+		# GemRB.DisplayString can only deal with resrefs, so cheat until noticed
+		if hours > 1:
+			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19313))
+		else:
+			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19312))
+	else:
+		time = ""
+		GemRB.SetToken ("HOUR", str(hours))
+		if hours > 1:
+			time =  GemRB.GetString (10700)
+		else:
+			time =  GemRB.GetString (10701)
+		GemRB.SetToken ("DURATION", time)
+		GemRB.DisplayString (10689, 0xffffff)
 	return
 
 def ChangeTooltip ():
