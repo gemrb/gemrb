@@ -106,7 +106,10 @@ void ScrollBar::SetPosForY(short y)
 		unsigned short NewPos = (unsigned short)(y / stepPx);
 		if (Pos != NewPos) {
 			SetPos(NewPos);
+		} else {
+			MarkDirty();
 		}
+
 		if (ta) {
 			// we must "scale" the pixels the slider moves
 			TextArea* t = (TextArea*) ta;

@@ -956,11 +956,9 @@ void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned 
 		switch(Button) {
 		case GEM_MB_SCRLUP:
 			scrlbr->ScrollUp();
-			core->RedrawAll();
 			break;
 		case GEM_MB_SCRLDOWN:
 			scrlbr->ScrollDown();
-			core->RedrawAll();
 			break;
 		}
 	}
