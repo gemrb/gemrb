@@ -216,6 +216,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/FontManager.cpp \
 		    main/gemrb/core/MoviePlayer.cpp \
 		    main/gemrb/core/Font.cpp \
+		    main/gemrb/core/TextContainer.cpp \
 		    main/gemrb/core/MapMgr.cpp \
 		    main/gemrb/core/Compressor.cpp \
 		    main/gemrb/core/PalettedImageMgr.cpp \

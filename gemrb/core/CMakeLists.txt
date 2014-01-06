@@ -87,6 +87,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	StringMgr.cpp
 	SymbolMgr.cpp
 	TableMgr.cpp
+	TextContainer.cpp
 	Tile.cpp
 	TileMap.cpp
 	TileMapMgr.cpp

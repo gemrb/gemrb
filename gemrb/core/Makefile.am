@@ -119,6 +119,7 @@ libgemrb_core_la_SOURCES = \
 	System/StringBuffer.cpp \
 	System/VFS.cpp \
 	TableMgr.cpp \
+	TextContainer.cpp \
 	Tile.cpp \
 	TileMap.cpp \
 	TileMapMgr.cpp \

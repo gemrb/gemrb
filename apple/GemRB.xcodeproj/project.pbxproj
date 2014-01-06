@@ -213,6 +213,9 @@
 		A27E5D6218106384009434E5 /* VEFObject.h in Headers */ = {isa = PBXBuildFile; fileRef = A27E5D5D18106384009434E5 /* VEFObject.h */; };
 		A27E5D63181063A8009434E5 /* VEFObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27E5D5C18106384009434E5 /* VEFObject.cpp */; };
 		A27E831313A035C600B41410 /* 2DAImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */; };
+		A28062861878D1BC009E577D /* TextContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = A28062831878D1BC009E577D /* TextContainer.h */; };
+		A2806287187B7C89009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
+		A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
 		A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621F14A54FFD009AC280 /* libarchive.dylib */; };
 		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
 		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
@@ -1359,6 +1362,8 @@
 		A27E5D5C18106384009434E5 /* VEFObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VEFObject.cpp; sourceTree = "<group>"; };
 		A27E5D5D18106384009434E5 /* VEFObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VEFObject.h; sourceTree = "<group>"; };
 		A27E830A13A0358200B41410 /* 2DAImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = 2DAImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A28062821878D1BC009E577D /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextContainer.cpp; sourceTree = "<group>"; };
+		A28062831878D1BC009E577D /* TextContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextContainer.h; sourceTree = "<group>"; };
 		A2830A0F13A05A64000A63FE /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2830A3913A05B5F000A63FE /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2830A3F13A05B81000A63FE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -2989,6 +2994,8 @@
 				A2BFA0571395FF62006ADC12 /* System */,
 				A2BFA0681395FF62006ADC12 /* TableMgr.cpp */,
 				A2BFA0691395FF62006ADC12 /* TableMgr.h */,
+				A28062821878D1BC009E577D /* TextContainer.cpp */,
+				A28062831878D1BC009E577D /* TextContainer.h */,
 				A2BFA06A1395FF62006ADC12 /* Tile.cpp */,
 				A2BFA06B1395FF62006ADC12 /* Tile.h */,
 				A2BFA06C1395FF62006ADC12 /* TileMap.cpp */,
@@ -3217,6 +3224,7 @@
 				A2E6635E139E883100310FC8 /* Audio.h in Headers */,
 				A2E66360139E883100310FC8 /* Bitmap.h in Headers */,
 				A2E66362139E883100310FC8 /* Cache.h in Headers */,
+				A28062861878D1BC009E577D /* TextContainer.h in Headers */,
 				A2E66364139E883100310FC8 /* Calendar.h in Headers */,
 				A2E66366139E883100310FC8 /* Callback.h in Headers */,
 				A2E66368139E883100310FC8 /* CharAnimations.h in Headers */,
@@ -4932,6 +4940,7 @@
 				A2A3A7EF14A51B1800F705CF /* GEM_SDL_Keyboard.m in Sources */,
 				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
 				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.mm in Sources */,
+				A2806287187B7C89009E577D /* TextContainer.cpp in Sources */,
 				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
 				A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
@@ -5013,6 +5022,7 @@
 				A2E663A7139E883E00310FC8 /* Palette.cpp in Sources */,
 				A2E663A9139E883E00310FC8 /* PalettedImageMgr.cpp in Sources */,
 				A2E663AB139E883E00310FC8 /* Particles.cpp in Sources */,
+				A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */,
 				A2E663AE139E883E00310FC8 /* Plugin.cpp in Sources */,
 				A2E663B0139E883E00310FC8 /* PluginMgr.cpp in Sources */,
 				A2E663B2139E883E00310FC8 /* Polygon.cpp in Sources */,
