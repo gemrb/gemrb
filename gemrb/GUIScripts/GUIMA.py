@@ -144,7 +144,6 @@ def ShowMap ():
 	OptionsWindow.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_FRONT)
 	Window.SetVisible (WINDOW_FRONT)
-	# TODO: probably more of this function needs ifdefing
 	if HasMapNotes ():
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED|IE_GUI_MAP_REVEAL_MAP)
 	else:
