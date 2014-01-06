@@ -74,7 +74,7 @@ bool DLGImporter::Open(DataStream* stream)
 		str->ReadDword( &Flags );
 	}
 	else {
-		Flags = 0;
+		Flags = 1; // none of these game have dialog pause
 	}
 	return true;
 }
