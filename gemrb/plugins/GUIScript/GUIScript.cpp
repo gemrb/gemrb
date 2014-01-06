@@ -1587,7 +1587,6 @@ static PyObject* GemRB_TextArea_Scroll(PyObject * /*self*/, PyObject* args)
 		row = 0;
 	}
 	ta->SetRow( row );
-	core->RedrawAll();
 	Py_INCREF( Py_None );
 	return Py_None;
 }
