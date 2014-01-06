@@ -354,7 +354,7 @@ void Window::InvalidateForControl(Control *ctrl) {
 	// TODO: for this to be general-purpose, we should mark anything inside this
 	// region with Changed, and also do mass Invalidate() if we overlap with
 	// another window, but for now this just clips the *background*, see DrawWindow()
-	clip_regions.push_back( Region(ctrl->XPos, ctrl->YPos, ctrl->Width, ctrl->Height) );
+	clip_regions.push_back( ctrl->ControlFrame() );
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
