@@ -54,7 +54,6 @@ ITEM_STORE = 1
 Inventory = None
 RentIndex = -1
 Store = None
-Buttons = [-1,-1,-1,-1]
 inventory_slots = ()
 total_price = 0
 total_income = 0
@@ -74,8 +73,11 @@ total_income = 0
 # 5 - drink
 # 6 - rent
 
-storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
-storetips = (44970, 44971, 44972, 45118, 45121, 45119, 45120)
+StoreButtonCount = 7
+
+#             Buy/Sell Identify   Steal      Aid        Donate    Drink     Rent
+store_bams = ("SSBBS", "SSBIDNT", "SSBSTEL", "SSBHEAL", "SSBDON", "SSBRMR", "SSBRENT")
+storetips =  (44970,   44971,     44972,     67294,     45121,    45119,    45120)
 roomtypes = (66865, 66866, 66867, 66868)
 store_funcs = None
 
@@ -172,14 +174,14 @@ def OpenStoreWindow ():
 	#based on shop type, these buttons will change
 	store_type = Store['StoreType']
 	store_buttons = Store['StoreButtons']
-	for i in range (4):
-		Buttons[i] = Button = Window.GetControl (i+1)
+	for i in range (StoreButtonCount):
+		Button = Window.GetControl (i+1)
 		Action = store_buttons[i]
 		Button.SetVarAssoc ("Action", i)
 		if Action>=0:
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			#this is different from IWD???
-			#Button.SetSprites ("SSBBS", Action, 0,1,2,0)
+			Button.SetSprites (store_bams[Action], 0, 0,1,2,0)
 			Button.SetTooltip (storetips[Action])
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
