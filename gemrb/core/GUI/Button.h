@@ -133,6 +133,7 @@ class GEM_EXPORT Button : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawRegion);
+	virtual bool HasBackground();
 public: 
 	Button(Region& frame);
 	~Button();

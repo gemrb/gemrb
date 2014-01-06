@@ -159,6 +159,12 @@ void Button::CloseUpColor()
 	starttime = newtime + 40;
 }
 
+bool Button::HasBackground()
+{
+	if (Flags&IE_GUI_BUTTON_PICTURE && !Picture) return false;
+	return Control::HasBackground();
+}
+
 /** Draws the Control on the Output Display */
 void Button::DrawInternal(Region& rgn)
 {
@@ -219,7 +225,7 @@ void Button::DrawInternal(Region& rgn)
 
 	// Button picture
 	int picXPos = 0, picYPos = 0;
-	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
+	if (Picture && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
 		picXPos = ( rgn.w / 2 ) - ( Picture->Width / 2 ) + rgn.x;
 		picYPos = ( rgn.h / 2 ) - ( Picture->Height / 2 ) + rgn.y;
