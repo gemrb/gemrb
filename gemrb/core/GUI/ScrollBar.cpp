@@ -117,7 +117,6 @@ void ScrollBar::SetPosForY(short y)
 			t->ScrollToY(taY, this);
 		}
 		SliderYPos = y;
-		core->RedrawAll();
 	} else {
 		// top is our default position
 		SliderYPos = 0;
