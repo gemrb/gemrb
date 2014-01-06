@@ -98,28 +98,27 @@ void ScrollBar::SetPos(ieDword NewPos)
 /** Provides per-pixel scrolling. Top = 0px */
 void ScrollBar::SetPosForY(short y)
 {
-	if (Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
+	if (y && stepPx && Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
 		// clamp the value
 		if (y < 0) y = 0;
 		else if ((ieWord)y > SliderRange) y = SliderRange;
 
-		if (stepPx) {
-			unsigned short NewPos = (unsigned short)(y / stepPx);
-			if (Pos != NewPos) {
-				SetPos(NewPos);
-			}
-			if (ta) {
-				// we must "scale" the pixels the slider moves
-				TextArea* t = (TextArea*) ta;
-				unsigned int taY = y * (t->GetRowHeight() / stepPx);
-				t->ScrollToY(taY, this);
-			}
-			SliderYPos = y;
-			core->RedrawAll();
+		unsigned short NewPos = (unsigned short)(y / stepPx);
+		if (Pos != NewPos) {
+			SetPos(NewPos);
 		}
+		if (ta) {
+			// we must "scale" the pixels the slider moves
+			TextArea* t = (TextArea*) ta;
+			unsigned int taY = y * (t->GetRowHeight() / stepPx);
+			t->ScrollToY(taY, this);
+		}
+		SliderYPos = y;
+		core->RedrawAll();
 	} else {
 		// top is our default position
 		SliderYPos = 0;
+		SetPos(0);
 	}
 }
 
