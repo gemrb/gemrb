@@ -91,11 +91,16 @@ void ScrollBar::SetPos(ieDword NewPos)
 	if (Pos && ( Pos == NewPos )) {
 		return;
 	}
-	
-	MarkDirty();
+
 	Pos = (ieWord) NewPos;
 	if (ta) {
+		MarkDirty(); // if the FIXME below is ever fixed move this up.
 		(( TextArea* )ta)->SetRow( Pos );
+	} else {
+		// FIXME: hack (I think), this is needed because scrolling the loot windows
+		// will cause the bottom window to draw over the sidebar windows.
+		// possibly some other windows cause problems too.
+		core->RedrawAll();
 	}
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Pos );
