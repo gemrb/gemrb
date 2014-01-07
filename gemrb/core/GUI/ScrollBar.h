@@ -91,6 +91,8 @@ private: //Private attributes
 	double stepPx;
 	/** Scroll Bar Status */
 	unsigned short State;
+private:
+	void CalculateStep();
 public:
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);

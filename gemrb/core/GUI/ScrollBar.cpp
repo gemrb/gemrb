@@ -64,6 +64,15 @@ int ScrollBar::GetFrameHeight(int frame) const
 	return Frames[frame]->Height;
 }
 
+void ScrollBar::CalculateStep()
+{
+	if (Value){
+		stepPx = (double)SliderRange / (double)Value;
+	} else {
+		stepPx = 0.0;
+	}
+}
+
 /** Sets a new position, relays the change to an associated textarea and calls
 	any existing GUI OnChange callback */
 void ScrollBar::SetPos(ieDword NewPos)
@@ -147,6 +156,7 @@ void ScrollBar::ScrollDown()
 
 double ScrollBar::GetStep()
 {
+	CalculateStep();
 	return stepPx;
 }
 
@@ -231,7 +241,7 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		ScrollDown();
 		return;
 	}
-
+	CalculateStep();
 	// if we made it this far we will jump the nib to y and "grab" it
 	// this way we only need to click once to jump+scroll
 	State |= SLIDER_GRAB;
@@ -276,11 +286,6 @@ void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 void ScrollBar::SetMax(unsigned short Max)
 {
 	Value = Max;
-	if (Value){
-		stepPx = (double)SliderRange / (double)Value;
-	} else {
-		stepPx = 0.0;
-	}
 	if (Max == 0) {
 		SetPos( 0 );
 	} else if (Pos >= Max){
