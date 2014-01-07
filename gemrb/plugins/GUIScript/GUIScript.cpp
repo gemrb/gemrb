@@ -7495,8 +7495,14 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	}
 
 	//it is always possible to put these items into the inventory
-	if (!(core->QuerySlotType(Slot)&SLOT_INVENTORY)) {
-		bool isdragging = core->GetDraggedItem()!=NULL;
+	// however in pst, the item_data table is also used in place of the undroppable bit
+	bool isdragging = core->GetDraggedItem() != NULL;
+	if (core->QuerySlotType(Slot)&SLOT_INVENTORY) {
+		// this is not merged due to narrow CRI_SWAP behaviour
+		if (CheckRemoveItem(actor, si, CRI_REMOVE)) {
+			return NULL;
+		}
+	} else {
 		if (CheckRemoveItem(actor, si, isdragging?CRI_SWAP:CRI_REMOVE)) {
 			return NULL;
 		}
