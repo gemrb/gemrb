@@ -19,8 +19,7 @@ namespace GemRB
 		void createGlTextureForPalette();
 		void createGLMaskTexture();
 	public:
-
-		GLuint GetTexture() const { return glTexture; }
+		GLuint GetTexture();
 		GLuint GetPaletteTexture(Palette* pal);
 		GLuint GetPaletteTexture();
 		GLuint GetMaskTexture();

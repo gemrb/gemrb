@@ -23,14 +23,14 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 										Uint32 bmask, Uint32 amask) : Sprite2D(Width, Height, Bpp, pixels)
 {
 	currentPalette = NULL;
+	glTexture = 0;
 	glPaletteTexture = 0;
 	glMaskTexture = 0;
-	colorKeyIndex = 256; // invalid index
+	colorKeyIndex = 0; // invalid index
 	rMask = rmask;
 	gMask = gmask;
 	bMask = bmask;
 	aMask = amask;
-	if (Width > 0 && Height > 0) createGlTexture();
 }
 
 GLTextureSprite2D::~GLTextureSprite2D()
@@ -43,6 +43,8 @@ GLTextureSprite2D::~GLTextureSprite2D()
 GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(obj)
 {
 	// copies only 8 bit sprites
+	glTexture = 0;
+	glMaskTexture = 0;
 	currentPalette = NULL;
 	colorKeyIndex = obj.colorKeyIndex;
 	rMask = obj.rMask;
@@ -50,10 +52,6 @@ GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(ob
 	bMask = obj.bMask;
 	aMask = obj.aMask;
 	SetPalette(obj.currentPalette);
-	if (Width > 0 && Height > 0)
-	{
-		createGlTexture();
-	}
 }
 
 GLTextureSprite2D* GLTextureSprite2D::copy() const
@@ -88,10 +86,18 @@ Palette* GLTextureSprite2D::GetPalette() const
 void GLTextureSprite2D::SetColorKey(ieDword index)
 {
 	colorKeyIndex = index;
-	glDeleteTextures(1, &glPaletteTexture);
-	glDeleteTextures(1, &glMaskTexture);
-	glPaletteTexture = 0;
-	glMaskTexture = 0;
+	if(IsPaletted())
+	{
+		glDeleteTextures(1, &glPaletteTexture);
+		glDeleteTextures(1, &glMaskTexture);
+		glPaletteTexture = 0;
+		glMaskTexture = 0;
+	}
+	else
+	{
+		glDeleteTextures(1, &glTexture);
+		glTexture = 0;
+	}
 }
 
 Color GLTextureSprite2D::GetPixel(unsigned short x, unsigned short y) const
@@ -125,7 +131,9 @@ void GLTextureSprite2D::createGlTexture()
 			Uint8 r = (src & rMask) >> GetShiftValue(rMask);
 			Uint8 g = (src & gMask) >> GetShiftValue(gMask);
 			Uint8 b = (src & bMask) >> GetShiftValue(bMask);
-			Uint8 a = (src & aMask) >> GetShiftValue(aMask); if (a == 0) a = 0xFF; //no transparency
+			Uint8 a = (src & aMask) >> GetShiftValue(aMask); 
+			if (a == 0) a = 0xFF; //no transparency
+			if (src == colorKeyIndex) a = 0x00; // transparent
 			buffer[i] = r | (g << 8) | (b << 16) | (a << 24);
 		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -210,4 +218,14 @@ GLuint GLTextureSprite2D::GetMaskTexture()
 	if (glMaskTexture != 0) return glMaskTexture;
 	createGLMaskTexture();
 	return glMaskTexture;
+}
+
+GLuint GLTextureSprite2D::GetTexture()
+{
+	if (glTexture != 0) return glTexture;
+	if (Width > 0 && Height > 0)
+	{
+		createGlTexture();
+	}
+	return glTexture;
 }

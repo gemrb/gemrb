@@ -297,6 +297,7 @@ void GLVideoDriver::createPrograms()
 Sprite2D* GLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
 	GLTextureSprite2D* spr = new GLTextureSprite2D(w, h, bpp, pixels, rMask, gMask, bMask, aMask);
+	if (cK) spr->SetColorKey(index);
 	return spr;
 }
 
