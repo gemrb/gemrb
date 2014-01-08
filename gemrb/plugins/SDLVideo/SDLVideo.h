@@ -82,25 +82,25 @@ public:
 	void MouseMovement(int x, int y);
 	void ClickMouse(unsigned int button);
 	void MouseClickEvent(SDL_EventType type, Uint8 button);
-	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
+	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);
-	Sprite2D* CreateSprite8(int w, int h, void* pixels,
+	virtual Sprite2D* CreateSprite8(int w, int h, void* pixels,
 							Palette* palette, bool cK, int index);
-	Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
-	bool SupportsBAMSprites() { return true; }
-	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
-	void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
+	virtual bool SupportsBAMSprites() { return true; }
+	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
+	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 					const Region* clip = NULL, Palette* palette = NULL);
-	void BlitGameSprite(const Sprite2D* spr, int x, int y,
+	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,
 		const Region* clip = NULL, bool anchor = false);
 
 	Sprite2D* GetScreenshot( Region r );
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
+	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
 	/** This functions Draws a Circle */
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);
@@ -115,8 +115,8 @@ public:
 		const Color& color, bool clipped = true);
 	/** This function Draws a Polygon on the Screen */
 	void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);
-	void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
-	void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
+	virtual void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
+	virtual void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
 	void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
