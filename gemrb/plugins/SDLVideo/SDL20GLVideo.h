@@ -9,6 +9,8 @@
 #define TEX_SIZE 2
 #define COLOR_SIZE 4
 
+#define BLIT_EXTERNAL_MASK 0x100
+
 namespace GemRB 
 {
 	class GLTextureSprite2D;

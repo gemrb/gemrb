@@ -428,6 +428,7 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 		GLuint maskTexture = ((GLTextureSprite2D*)mask)->GetMaskTexture();
 		glBindTexture(GL_TEXTURE_2D, maskTexture);
 	}
+	if(flags & BLIT_EXTERNAL_MASK) {} // used with external mask
 	else
 	{
 		glActiveTexture(GL_TEXTURE2);
@@ -513,8 +514,40 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		ty -= Viewport.y;
 	}
 	GLTextureSprite2D* glSprite = (GLTextureSprite2D*)spr;
+	GLuint coverTexture = 0;
+	
 	if(glSprite->IsPaletted())
 	{
+		if (cover)
+		{
+			int trueX = cover->XPos - glSprite->XPos;
+			int trueY = cover->YPos - glSprite->YPos;
+			Uint8* data = new Uint8[glSprite->Width*glSprite->Height];
+			Uint8* coverPointer = &cover->pixels[trueY*glSprite->Width + trueX];
+			Uint8* dataPointer = data;
+			for(int h=0; h<glSprite->Height; h++)
+			{
+				for(int w=0; w<glSprite->Width; w++)
+				{
+					*dataPointer = !(*coverPointer);
+					dataPointer++;
+					coverPointer++;
+				}
+				coverPointer += cover->Width - glSprite->Width;
+			}
+			glActiveTexture(GL_TEXTURE2);
+			glGenTextures(1, &coverTexture);
+			glBindTexture(GL_TEXTURE_2D, coverTexture);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, glSprite->Width, glSprite->Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) data);
+			delete data;
+			flags |= BLIT_EXTERNAL_MASK;
+		}
+
 		if (palette)
 		{
 			if (palette) glSprite->SetPalette(palette);
@@ -535,15 +568,17 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 					flags |= BLIT_TINTED;
 					tint = *totint;
 				}
-				blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, flags, &tint);
+				blitSprite(glSprite, tx, ty, clip, flags, &tint);
 			}
 		}
 	}
 	else
-		blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, flags);
-	if (cover)
+		blitSprite(glSprite, tx, ty, clip, flags);
+	if (coverTexture != 0)
 	{
-		int i = 0;
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDeleteTextures(1, &coverTexture);
 	}
 }
 
@@ -596,9 +631,9 @@ void GLVideoDriver::drawColoredRect(const Region& rgn, const Color& color)
 		GLfloat data[] = 
 		{ 
 			-1.0f,  1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
-				1.0f,  1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
+			1.0f,  1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
 			-1.0f, -1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
-				1.0f, -1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255
+			1.0f, -1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255
 		};
 		GLuint buffer;
 		glGenBuffers(1, &buffer);
