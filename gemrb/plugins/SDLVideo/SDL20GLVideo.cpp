@@ -78,8 +78,7 @@ const char* fragmentPal =
 "varying vec4 v_tint;				\n"
 "void main()\n"
 "{\n"
-"  float alphaModifier = v_alphaModifier;\n"
-"  if (texture2D(s_mask, v_texCoord).a == 0.0) alphaModifier = 0.0;\n"
+"  float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;\n"
 "  float index = texture2D(s_texture, v_texCoord).a;\n"
 "  vec4 color = texture2D(s_palette, vec2(index, 0.0));\n"
 "  gl_FragColor = vec4(color.r*v_tint.r, color.g*v_tint.g, color.b*v_tint.b, color.a * alphaModifier);\n"
@@ -97,8 +96,7 @@ const char* fragmentPalGrayed =
 "varying vec4 v_tint;				\n"
 "void main()\n"
 "{\n"
-"  float alphaModifier = v_alphaModifier;\n"
-"  if (texture2D(s_mask, v_texCoord).a == 0.0) alphaModifier = 0.0;\n"
+"  float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;\n"
 "  float index = texture2D(s_texture, v_texCoord).a;\n"
 "  vec4 color = texture2D(s_palette, vec2(index, 0.0));\n"
 "  float gray = (color.r + color.g + color.b)*0.333333;\n"
@@ -119,8 +117,7 @@ const char* fragmentPalSepia =
 "const vec3 darkColor = vec3(0.2, 0.05, 0.0);\n"
 "void main()\n"
 "{\n"
-"  float alphaModifier = v_alphaModifier;\n"
-"  if (texture2D(s_mask, v_texCoord).a == 0.0) alphaModifier = 0.0;\n"
+"  float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;\n"
 "  float index = texture2D(s_texture, v_texCoord).a;\n"
 "  vec4 color = texture2D(s_palette, vec2(index, 0.0));\n"
 "  float gray = (color.r + color.g + color.b)*0.333333;\n"
@@ -529,7 +526,7 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 			{
 				for(int w=0; w<glSprite->Width; w++)
 				{
-					*dataPointer = !(*coverPointer);
+					*dataPointer = !(*coverPointer) * 255;
 					dataPointer++;
 					coverPointer++;
 				}
