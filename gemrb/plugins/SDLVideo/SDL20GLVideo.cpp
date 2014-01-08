@@ -178,7 +178,6 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 		return GEM_ERROR;
 	}
 	SDL_GL_MakeCurrent(window, context);
-	GLenum e = glGetError();
 
 	renderer = SDL_CreateRenderer(window, -1, 0);
 

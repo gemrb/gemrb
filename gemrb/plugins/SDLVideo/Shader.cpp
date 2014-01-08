@@ -23,7 +23,7 @@ ShaderOperationResult* Shader::BuildShader(GLenum type, const char* source)
 	{
         char tmp[2048];
         glGetShaderInfoLog(id, sizeof(tmp), 0, tmp);
-		opResult->Id = -1;
+		opResult->Id = 0;
         //sprintf(tmp, "%s shader compile error: %s", (type == GL_VERTEX_SHADER) ? "Vertex" : "Fragment", tmp);
 		opResult->Message = tmp;
     }
@@ -35,9 +35,9 @@ ShaderOperationResult* Shader::BuildProgram(const char* vertexSource, const char
     GLuint id = glCreateProgram();
 	
     ShaderOperationResult* vertexShader = BuildShader(GL_VERTEX_SHADER, vertexSource);
-	if (vertexShader->Id == -1) return vertexShader;
+	if (vertexShader->Id == 0) return vertexShader;
     ShaderOperationResult* fragmentShader = BuildShader(GL_FRAGMENT_SHADER, fragmentSource);
-	if (fragmentShader->Id == -1) return fragmentShader;
+	if (fragmentShader->Id == 0) return fragmentShader;
 
     glAttachShader(id, vertexShader->Id);
     glAttachShader(id, fragmentShader->Id);
@@ -51,7 +51,7 @@ ShaderOperationResult* Shader::BuildProgram(const char* vertexSource, const char
     if (result != GL_TRUE) 
 	{
         char tmp[2048];
-		opResult->Id = -1;
+		opResult->Id = 0;
         glGetProgramInfoLog(id, sizeof(tmp), 0, tmp);
         tmp[strlen(tmp)]='\0';
 		opResult->Message = tmp;

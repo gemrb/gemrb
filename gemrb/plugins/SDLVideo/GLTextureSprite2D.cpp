@@ -12,7 +12,7 @@ using namespace GemRB;
 
 static Uint8 GetShiftValue(Uint32 value)
 {
-	for(int i=0; i<sizeof(value)*8; i+=8)
+	for(unsigned int i=0; i<sizeof(value)*8; i+=8)
 	{
 		if(((value >> i) & 0x1) > 0) return i;
 	}
@@ -125,7 +125,7 @@ void GLTextureSprite2D::createGlTexture()
 	if(Bpp == 32) // true color textures
 	{
 		int* buffer = new int[Width * Height];
-		for(int i = 0; i < Width*Height; i++)
+		for(unsigned int i = 0; i < Width*Height; i++)
 		{
 			Uint32 src = ((Uint32*) pixels)[i];
 			Uint8 r = (src & rMask) >> GetShiftValue(rMask);
