@@ -125,7 +125,7 @@ void GLTextureSprite2D::createGlTexture()
 	if(Bpp == 32) // true color textures
 	{
 		int* buffer = new int[Width * Height];
-		for(unsigned int i = 0; i < Width*Height; i++)
+		for(int i = 0; i < Width*Height; i++)
 		{
 			Uint32 src = ((Uint32*) pixels)[i];
 			Uint8 r = (src & rMask) >> GetShiftValue(rMask);
@@ -137,12 +137,14 @@ void GLTextureSprite2D::createGlTexture()
 			buffer[i] = r | (g << 8) | (b << 16) | (a << 24);
 		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) buffer);
-		delete buffer;
+		delete[] buffer;
 	}
 	else if(Bpp == 8) // indexed
 	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) pixels);
 	}
 }
@@ -158,7 +160,7 @@ void GLTextureSprite2D::createGlTextureForPalette()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	Color* colors = new Color[256];
 	memcpy(colors, currentPalette->col, sizeof(Color)*256);
-	for(int i=0; i<256; i++)
+	for(unsigned int i=0; i<256; i++)
 	{
 		if(colors[i].a == 0)
 		{
@@ -168,8 +170,9 @@ void GLTextureSprite2D::createGlTextureForPalette()
 			colors[i].a = 0;
 	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) colors);
-	delete colors;
+	delete[] colors;
 }
 
 void GLTextureSprite2D::createGLMaskTexture()
@@ -188,8 +191,9 @@ void GLTextureSprite2D::createGLMaskTexture()
 		else mask[i] = 0x00;  
 	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) mask);
-	delete mask;
+	delete[] mask;
 }
 
 GLuint GLTextureSprite2D::GetPaletteTexture()

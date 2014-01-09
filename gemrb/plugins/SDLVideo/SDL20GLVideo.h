@@ -30,7 +30,7 @@ namespace GemRB
 		GLuint lastUsedProgram; // stores last used program to prevent switching if possible (switching may cause performance lack)
 
 		void useProgram(GLuint program); // use this instead glUseProgram
-		void createPrograms();
+		bool createPrograms();
 		void blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
 		void drawColoredRect(const Region& rgn, const Color& color);
 
@@ -48,6 +48,7 @@ namespace GemRB
 		void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 		void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
 		void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
+		void DestroyMovieScreen();
 	};
 }
 

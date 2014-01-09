@@ -24,8 +24,8 @@ ShaderOperationResult* Shader::BuildShader(GLenum type, const char* source)
         char tmp[2048];
         glGetShaderInfoLog(id, sizeof(tmp), 0, tmp);
 		opResult->Id = 0;
-        //sprintf(tmp, "%s shader compile error: %s", (type == GL_VERTEX_SHADER) ? "Vertex" : "Fragment", tmp);
-		opResult->Message = tmp;
+        tmp[strlen(tmp)]='\0';
+		opResult->Message = strdup(tmp);
     }
     return opResult;
 }
@@ -54,7 +54,7 @@ ShaderOperationResult* Shader::BuildProgram(const char* vertexSource, const char
 		opResult->Id = 0;
         glGetProgramInfoLog(id, sizeof(tmp), 0, tmp);
         tmp[strlen(tmp)]='\0';
-		opResult->Message = tmp;
+		opResult->Message = strdup(tmp);
     }
 
     glDeleteShader(vertexShader->Id);

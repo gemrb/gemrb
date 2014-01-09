@@ -1,11 +1,15 @@
 #ifdef USE_GL
 #include <GL/glew.h>
-#pragma comment(lib, "glew32")
-#pragma comment(lib, "opengl32")
+#ifdef _MSC_VER
+	#pragma comment(lib, "glew32")
+	#pragma comment(lib, "opengl32")
+#endif
 #else
 #include <GLES2/GL2.h>
 #include <GLES2/GL2ext.h>
-#pragma comment(lib, "libGLESv2")
+#ifdef _MSC_VER
+	#pragma comment(lib, "libGLESv2")
+#endif
 #endif
 #include "SDL20GLVideo.h"
 #include "Interface.h"
@@ -225,7 +229,7 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 #ifdef USE_GL
 	glewInit();
 #endif
-	createPrograms();
+	if (!createPrograms()) return GEM_ERROR;
 	glViewport(0, 0, width, height);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -241,10 +245,16 @@ void GLVideoDriver::useProgram(GLuint program)
 	lastUsedProgram = program;
 }
 
-void GLVideoDriver::createPrograms()
+bool GLVideoDriver::createPrograms()
 {
 	ShaderOperationResult* result = Shader::BuildProgram(vertex, fragment);
-	if(result->Id != 0) program32 = result->Id;
+	if(result->Id == 0)
+	{
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
+		delete result;
+		return false;
+	}
+	program32 = result->Id;
 	delete result;
 	glUseProgram(program32);
 	glUniform1i(glGetUniformLocation(program32, "s_texture"), 0);
@@ -254,7 +264,13 @@ void GLVideoDriver::createPrograms()
 	glUseProgram(0);
 
 	result = Shader::BuildProgram(vertex, fragmentPal);
-	if(result->Id != 0) programPal = result->Id;
+	if(result->Id == 0)
+	{
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
+		delete result;
+		return false;
+	}
+	programPal = result->Id;
 	delete result;
 	glUseProgram(programPal);
 	glUniform1i(glGetUniformLocation(programPal, "s_texture"), 0);
@@ -264,7 +280,13 @@ void GLVideoDriver::createPrograms()
 	glUseProgram(0);
 
 	result = Shader::BuildProgram(vertex, fragmentPalGrayed);
-	if(result->Id != 0) programPalGrayed = result->Id;
+	if(result->Id == 0)
+	{
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
+		delete result;
+		return false;
+	}
+	programPalGrayed = result->Id;
 	delete result;
 	glUseProgram(programPalGrayed);
 	glUniform1i(glGetUniformLocation(programPalGrayed, "s_texture"), 0);
@@ -274,7 +296,13 @@ void GLVideoDriver::createPrograms()
 	glUseProgram(0);
 
 	result = Shader::BuildProgram(vertex, fragmentPalSepia);
-	if(result->Id != 0) programPalSepia = result->Id;
+	if(result->Id == 0)
+	{
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
+		delete result;
+		return false;
+	}
+	programPalSepia = result->Id;
 	delete result;
 	glUseProgram(programPalSepia);
 	glUniform1i(glGetUniformLocation(programPalSepia, "s_texture"), 0);
@@ -284,13 +312,20 @@ void GLVideoDriver::createPrograms()
 	glUseProgram(0);
 	
 	result = Shader::BuildProgram(vertexRect, fragmentRect);
-	if(result->Id != 0) programRect = result->Id;
+	if(result->Id == 0)
+	{
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
+		delete result;
+		return false;
+	}
+	programRect = result->Id;
 	delete result;
 	glUseProgram(programRect);
 	glUniformMatrix4fv(glGetUniformLocation(programRect, "u_matrix"), 1, GL_FALSE, matrix);
 	glUseProgram(0);
 	
 	lastUsedProgram = 0;
+	return true;
 }
 
 Sprite2D* GLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
@@ -361,26 +396,14 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 	GLfloat* textureCoords;
-	if (hflip && vflip)
-	{
-		GLfloat coords[] = { 1.0f,1.0f, 0.0f,1.0f, 1.0f,0.0f, 0.0f,0.0f };
-		textureCoords = coords;
-	}
-	else if (hflip)
-	{
-		GLfloat coords[] = { 1.0f,0.0f, 0.0f,0.0f, 1.0f,1.0f, 0.0f,1.0f };
-		textureCoords = coords;
-	}
-	else if (vflip)
-	{
-		GLfloat coords[] = { 0.0f,1.0f, 1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f };
-		textureCoords = coords;
-	}
-	else
-	{
-		GLfloat coords[] = { 0.0f,0.0f, 1.0f,0.0f, 0.0f,1.0f, 1.0f,1.0f };
-		textureCoords = coords;
-	}
+	GLfloat coordsHV[] = { 1.0f,1.0f, 0.0f,1.0f, 1.0f,0.0f, 0.0f,0.0f };
+	GLfloat coordsH[] = { 1.0f,0.0f, 0.0f,0.0f, 1.0f,1.0f, 0.0f,1.0f };
+	GLfloat coordsV[] = { 0.0f,1.0f, 1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f };
+	GLfloat coordsN[] = { 0.0f,0.0f, 1.0f,0.0f, 0.0f,1.0f, 1.0f,1.0f };
+	if (hflip && vflip) textureCoords = coordsHV;
+	else if (hflip) textureCoords = coordsH;
+	else if (vflip) textureCoords = coordsV;
+	else textureCoords = coordsN;
 
 	// alpha modifier
 	GLfloat alphaModifier = flags & BLIT_HALFTRANS ? 0.5f : 1.0f;
@@ -428,6 +451,7 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	if(flags & BLIT_EXTERNAL_MASK) {} // used with external mask
 	else
 	{
+		// disable 3rd texture
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -540,8 +564,9 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, glSprite->Width, glSprite->Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) data);
-			delete data;
+			delete[] data;
 			flags |= BLIT_EXTERNAL_MASK;
 		}
 
@@ -591,7 +616,7 @@ void GLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, b
 	}
 }
 
-void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
+void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool /*clipped*/)
 {
 	Region rgn;
 	rgn.x = x1;
@@ -601,7 +626,7 @@ void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, b
 	return drawColoredRect(rgn, color);
 }
 
-void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
+void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool /*clipped*/)
 {
 	Region rgn;
 	rgn.x = x;
@@ -662,6 +687,13 @@ int GLVideoDriver::SwapBuffers()
 	core->RedrawAll();
 	spritesPerFrame = 0;
 	return val;
+}
+
+void GLVideoDriver::DestroyMovieScreen()
+{
+	SDL20VideoDriver::DestroyMovieScreen();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 #include "plugindef.h"
