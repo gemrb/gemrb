@@ -11,13 +11,14 @@ NOTE: g++ 4.3 is known to miscompile gemrb.
 Libraries:
   - ZLib
   - Python 2.3 or better, compiled with shared libraries
-  - SDL 1.2
+  - SDL 1.2 or SDL 2.0+
   - OpenAL (optional, for sound)
   - SDL_mixer (optional, for fast lower-quality sound)
   - libpng (optional, for the png importer plugin)
   - FreeType (optional, for the TTF fonts plugin)
   - iconv (optional, for the TTF fonts plugin and only needed when using a non unicode compatible TLK)
   - (lib)VLC 2.0+ (optional, for movies in some mac distributions of the games)
+  - OpenGL drivers and GLew (both optional)
 
 Building GemRB on unix-like systems
 -----------------------------------
@@ -42,6 +43,10 @@ schemes.
 If you're on an exotic platform and get a lot of errors trying to build,
 also pass -DDISABLE_WERROR=1, so warnings won't impede you. This option is
 also suggested if you're making a source package.
+
+If you want to build the OpenGL driver, first ensure you have a working SDL2
+install. Then, if you want the standard driver, pass -DUSE_OPENGL=1 and if
+you want the OpenGL ES driver, pass -DUSE_OPENGL=2 .
 
 Please let us know if you encounter any problems while building.
 
