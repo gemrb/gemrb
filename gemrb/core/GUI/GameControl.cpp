@@ -1933,6 +1933,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 						&& (target_types&GA_POINT)) {
 						//the player is using an item or spell on the ground
 						TryToCast(pc, p);
+						break;
 					}
 				}
 				doMove = (!actor && target_mode == TARGET_MODE_NONE);
