@@ -3901,7 +3901,7 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();
 		if(covers) {
-			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
+			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y + height, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
 				delete covers[ac];
 				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y + height, -anim->animArea.x,
 					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
