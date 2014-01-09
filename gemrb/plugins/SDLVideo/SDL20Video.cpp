@@ -202,8 +202,8 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 {
 	assert( bufw == w && bufh == h );
 
-	SDL_Rect srcRect = {sx, sy, w, h};
-	SDL_Rect destRect = {dstx, dsty, w, h};
+	SDL_Rect srcRect = {(int)sx, (int)sy, (int)w, (int)h};
+	SDL_Rect destRect = {(int)dstx, (int)dsty, (int)w, (int)h};
 
 	Uint32 *dst;
 	unsigned int row, col;
