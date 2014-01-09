@@ -3308,6 +3308,12 @@ void GameScript::IncrementGlobalOnce(Scriptable* Sender, Action* parameters)
 	if (value != 0) {
 		return;
 	}
+	//todo:the actual behaviour of this opcode may need to be verified, as this is
+	//just a best guess at how the two parameters are changed, and could
+	//well be more complex; the original usage of this function is currently
+	//not well understood (relates to hardcoded alignment changes)
+	SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter );
+
 	value = CheckVariable( Sender, parameters->string1Parameter );
 	SetVariable( Sender, parameters->string1Parameter,
 		value + parameters->int0Parameter );
