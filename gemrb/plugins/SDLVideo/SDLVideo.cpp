@@ -84,8 +84,9 @@ int SDLVideoDriver::Init(void)
 		//print("[ERROR]");
 		return GEM_ERROR;
 	}
-	//print("[OK]\n");
-	SDL_ShowCursor( SDL_DISABLE );
+	if (!(MouseFlags&MOUSE_HIDDEN)) {
+		SDL_ShowCursor( SDL_DISABLE );
+	}
 	return GEM_OK;
 }
 
