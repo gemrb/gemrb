@@ -4085,6 +4085,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A29BF86313A042B600C812DD /* Build configuration list for PBXNativeTarget "GemRB iOS" */;
 			buildPhases = (
+				A23B17461880787B00EB6AC8 /* ShellScript */,
 				A22DCCDD14A8F78C0067D6D1 /* ShellScript */,
 				A29BF85813A0427900C812DD /* Resources */,
 				A29BF85913A0427900C812DD /* Sources */,
@@ -4321,6 +4322,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
+			shellScript = "cmake \"$SRCROOT\"";
+		};
+		A23B17461880787B00EB6AC8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
 			shellScript = "cmake \"$SRCROOT\"";
 		};
 		A249187F141079510038B170 /* ShellScript */ = {
