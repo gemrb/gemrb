@@ -39,7 +39,7 @@ GLTextureSprite2D::~GLTextureSprite2D()
 	if (glTexture != 0) glDeleteTextures(1, &glTexture);
 	if (glMaskTexture != 0) glDeleteTextures(1, &glMaskTexture);
 	if (IsPaletted() && glPaletteTexture != 0)
-		GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
+		GLPaletteManager::RemovePaletteTexture(glPaletteTexture);
 }
 
 GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(obj)
@@ -73,7 +73,7 @@ void GLTextureSprite2D::SetPalette(Palette *pal)
 	{
 		currentPalette->release();
 	}
-	GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
+	if (glPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(glPaletteTexture);
 	currentPalette = pal;
 	glPaletteTexture = 0;
 }
@@ -91,7 +91,7 @@ void GLTextureSprite2D::SetColorKey(ieDword index)
 	if(IsPaletted())
 	{
 		glDeleteTextures(1, &glMaskTexture);
-		GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
+		if (glPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(glPaletteTexture);
 		glPaletteTexture = 0;
 		glMaskTexture = 0;
 	}

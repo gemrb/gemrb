@@ -66,7 +66,24 @@ void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int color
 			textures.erase(key);
 		}
 	}
+}
 
+void GLPaletteManager::RemovePaletteTexture(GLuint texture)
+{
+	for(std::map<std::pair<Palette*, unsigned int>, PaletteValue>::iterator it = textures.begin(); it != textures.end(); ++it)
+	{
+		if(textures[it->first].first == texture)
+		{
+			if (textures[it->first].second > 1) 
+				textures[it->first].second--;
+			else
+			{
+				glDeleteTextures(1, &texture);
+				textures.erase(it->first);
+			}
+			return;
+		}
+	}
 }
 
 void GLPaletteManager::Clear()

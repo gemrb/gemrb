@@ -17,6 +17,7 @@ namespace GemRB
 		public:
 			static GLuint CreatePaletteTexture(Palette* palette, unsigned int colorKey);
 			static void RemovePaletteTexture(Palette* palette, unsigned int colorKey);
+			static void RemovePaletteTexture(GLuint texture);
 			static void Clear();
 	};
 }
