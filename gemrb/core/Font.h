@@ -92,9 +92,10 @@ public:
 	void SetPalette(Palette* pal);
 
 	// Printing methods
-	void Print(Region cliprgn, Region rgn, const unsigned char* string,
+	// return the number of glyphs printed
+	size_t Print(Region cliprgn, Region rgn, const unsigned char* string,
 		Palette* color, ieByte Alignment, bool anchor = false) const;
-	void Print(Region rgn, const unsigned char* string, Palette* color,
+	size_t Print(Region rgn, const unsigned char* string, Palette* color,
 		ieByte Alignment, bool anchor = false) const;
 
 	/** Returns width of the string rendered in this font in pixels */

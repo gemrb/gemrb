@@ -71,7 +71,7 @@ bool Font::MatchesResRef(const ieResRef resref)
 	return false;
 }
 
-void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
+size_t Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	ieByte Alignment, bool anchor) const
 {
 	Region cliprgn = rgn;
@@ -80,10 +80,10 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 		cliprgn.x -= Viewport.x;
 		cliprgn.y -= Viewport.y;
 	}
-	Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
+	return Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
 }
 
-void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
+size_t Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Palette* hicolor, ieByte Alignment, bool anchor) const
 {
 	unsigned int psx = IE_FONT_PADDING;
@@ -142,7 +142,8 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 
 	ieWord currChar = '\0';
 	const Sprite2D* currGlyph = NULL;
-	for (size_t i = 0; i < len; i++) {
+	size_t i;
+	for (i = 0; i < len; i++) {
 		if (tmp[i] == 0) {
 			y += ystep;
 			x = psx;
@@ -173,6 +174,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 
 	blitPalette = NULL;
 	free( tmp );
+	return i;
 }
 
 size_t Font::CalcStringWidth(const unsigned char* string) const
