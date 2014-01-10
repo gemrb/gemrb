@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "Palette.h"
 #include "ScriptEngine.h"
+#include "Sprite2D.h"
 #include "Video.h"
 #include "GUI/EventMgr.h"
 
@@ -69,11 +70,17 @@ void Console::DrawInternal(Region& drawFrame)
 		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );
 	}
 
-	core->GetVideoDriver()->DrawRect( drawFrame, ColorBlack );
+	Video* video = core->GetVideoDriver();
+	video->DrawRect( drawFrame, ColorBlack );
 	font->Print( drawFrame, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
-	// TODO: draw the cursor by printing everything before the cursor
-	// then draw the cursor, then draw everything after the cursor
+	ieWord tmpChr = Buffer[CurPos];
+	Buffer[CurPos] = '\0';
+	size_t w = font->CalcStringWidth(Buffer);
+	Buffer[CurPos] = tmpChr;
+	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
+	// FIXME: font is still stupid and forces IE_FONT_PADDING
+	video->BlitSprite(Cursor, w + drawFrame.x + IE_FONT_PADDING, vcenter + drawFrame.y, true);
 }
 /** Set Font */
 void Console::SetFont(Font* f)
