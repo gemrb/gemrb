@@ -49,6 +49,7 @@ namespace GemRB
 		void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
 		void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
 		void DestroyMovieScreen();
+		Sprite2D* GetScreenshot(Region r);
 	};
 }
 

@@ -15,6 +15,10 @@ namespace GemRB
 		Uint32 rMask, gMask, bMask, aMask;
 		ieDword colorKeyIndex;
 
+		// blitSprite used attached palette
+		Palette* attachedPalette;
+		GLuint glAttachedPaletteTexture;
+
 		void createGlTexture();
 		void createGlTextureForPalette();
 		void createGLMaskTexture();

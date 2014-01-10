@@ -24,8 +24,10 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 										Uint32 bmask, Uint32 amask) : Sprite2D(Width, Height, Bpp, pixels)
 {
 	currentPalette = NULL;
+	attachedPalette = NULL;
 	glTexture = 0;
 	glPaletteTexture = 0;
+	glAttachedPaletteTexture = 0;
 	glMaskTexture = 0;
 	colorKeyIndex = 0; // invalid index
 	rMask = rmask;
@@ -38,8 +40,10 @@ GLTextureSprite2D::~GLTextureSprite2D()
 {
 	if (glTexture != 0) glDeleteTextures(1, &glTexture);
 	if (glMaskTexture != 0) glDeleteTextures(1, &glMaskTexture);
-	if (IsPaletted() && glPaletteTexture != 0)
-		GLPaletteManager::RemovePaletteTexture(glPaletteTexture);
+	if (glPaletteTexture != 0)
+		GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
+	if (glAttachedPaletteTexture != 0)
+		GLPaletteManager::RemovePaletteTexture(attachedPalette, colorKeyIndex);
 }
 
 GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(obj)
@@ -48,7 +52,9 @@ GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(ob
 	glTexture = 0;
 	glMaskTexture = 0;
 	glPaletteTexture = 0;
+	glAttachedPaletteTexture = 0;
 	currentPalette = NULL;
+	attachedPalette = NULL;
 	colorKeyIndex = obj.colorKeyIndex;
 	rMask = obj.rMask;
 	gMask = obj.bMask;
@@ -64,18 +70,15 @@ GLTextureSprite2D* GLTextureSprite2D::copy() const
 
 void GLTextureSprite2D::SetPalette(Palette *pal)
 {
-	if(!IsPaletted() || currentPalette == pal) return;
-	if (pal != NULL) 
-	{
-		pal->acquire();
-	}
-	if (currentPalette != NULL) 
+	if(!IsPaletted() || currentPalette == pal || !pal) return;
+	pal->acquire();
+	if (currentPalette) 
 	{
 		currentPalette->release();
 	}
-	if (glPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(glPaletteTexture);
-	currentPalette = pal;
+	if (glPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
 	glPaletteTexture = 0;
+	currentPalette = pal;
 }
 
 Palette* GLTextureSprite2D::GetPalette() const
@@ -91,8 +94,10 @@ void GLTextureSprite2D::SetColorKey(ieDword index)
 	if(IsPaletted())
 	{
 		glDeleteTextures(1, &glMaskTexture);
-		if (glPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(glPaletteTexture);
+		if (glPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
+		if (glAttachedPaletteTexture != 0) GLPaletteManager::RemovePaletteTexture(attachedPalette, colorKeyIndex);
 		glPaletteTexture = 0;
+		glAttachedPaletteTexture = 0;
 		glMaskTexture = 0;
 	}
 	else
@@ -185,16 +190,16 @@ GLuint GLTextureSprite2D::GetPaletteTexture()
 	return glPaletteTexture;
 }
 
-GLuint GLTextureSprite2D::GetPaletteTexture(Palette* pal)
+// use this method only for adding external palettes
+GLuint GLTextureSprite2D::GetPaletteTexture(Palette* attached)
 {
-	if (pal == NULL || !IsPaletted()) return 0; // nothing to do
-
-	// we already have a texture from requested palette
-	if (pal == currentPalette && glPaletteTexture != 0) return glPaletteTexture;
-
-	SetPalette(pal);
-	createGlTextureForPalette();
-	return glPaletteTexture;
+	if (attached == NULL || !IsPaletted()) return 0; // nothing to do
+	
+	// we already have a texture for requested palette
+	if (attached == attachedPalette && glAttachedPaletteTexture != 0) return glAttachedPaletteTexture;
+	attachedPalette = attached;
+	glAttachedPaletteTexture = GLPaletteManager::CreatePaletteTexture(attachedPalette, colorKeyIndex);
+	return glAttachedPaletteTexture;
 }
 
 GLuint GLTextureSprite2D::GetMaskTexture()

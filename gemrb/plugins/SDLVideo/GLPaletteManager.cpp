@@ -17,8 +17,8 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 	PaletteKey key = std::make_pair(palette, colorKey);
 	if (GLPaletteManager::textures.find(key) == GLPaletteManager::textures.end())
 	{
-		GLuint texture;
 		// not found, we need to create it
+		GLuint texture;
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

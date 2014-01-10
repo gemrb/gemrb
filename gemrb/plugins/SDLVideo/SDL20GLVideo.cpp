@@ -431,19 +431,17 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 			program = programPal;
 	}
 	else
+	{
 		program = program32;
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 	useProgram(program);
 
 	glActiveTexture(GL_TEXTURE0);
 	GLuint texture = spr->GetTexture();
 	glBindTexture(GL_TEXTURE_2D, texture);
 	
-	if (spr->IsPaletted())
-	{
-		glActiveTexture(GL_TEXTURE1);
-		GLuint palTexture = spr->GetPaletteTexture();
-		glBindTexture(GL_TEXTURE_2D, palTexture);
-	}
 	if (mask)
 	{
 		glActiveTexture(GL_TEXTURE2);
@@ -499,12 +497,19 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	if (flags & TILE_HALFTRANS) blitFlags |= BLIT_HALFTRANS;
 	if (flags & TILE_GREY) blitFlags |= BLIT_GREY;
 	if (flags & TILE_SEPIA) blitFlags |= BLIT_SEPIA;
+	GLTextureSprite2D* glSprite = (GLTextureSprite2D*)spr;
+	if (glSprite->IsPaletted())
+	{
+		GLuint palTexture = glSprite->GetPaletteTexture();
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, palTexture);
+	}
 	if (core->GetGame()) 
 	{
 		const Color* totint = core->GetGame()->GetGlobalTint();
-		return blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, blitFlags, totint, (GLTextureSprite2D*)mask);
+		return blitSprite(glSprite, tx, ty, clip, blitFlags, totint, (GLTextureSprite2D*)mask);
 	}
-	return blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, blitFlags, NULL, (GLTextureSprite2D*)mask);
+	return blitSprite(glSprite, tx, ty, clip, blitFlags, NULL, (GLTextureSprite2D*)mask);
 }
 
 
@@ -519,9 +524,13 @@ void GLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor, c
 		tx -= Viewport.x;
 		ty -= Viewport.y;
 	}
-	if (palette || glSprite->IsPaletted())
+	if (glSprite->IsPaletted())
 	{
-		if (palette) glSprite->SetPalette(palette);
+		GLuint palTexture;
+		if (palette) palTexture = glSprite->GetPaletteTexture(palette);
+		else palTexture = glSprite->GetPaletteTexture();
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, palTexture);
 	}
 	
 	return blitSprite(glSprite, tx, ty, clip);
@@ -572,10 +581,15 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 			flags |= BLIT_EXTERNAL_MASK;
 		}
 
-		if (palette)
+		if (glSprite->IsPaletted())
 		{
-			if (palette) glSprite->SetPalette(palette);
+			GLuint palTexture;
+			if (palette) palTexture = glSprite->GetPaletteTexture(palette);
+			else palTexture = glSprite->GetPaletteTexture();
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, palTexture);
 		}
+
 		if (!anchor && core->GetGame()) 
 		{
 			const Color *totint = core->GetGame()->GetGlobalTint();
@@ -594,7 +608,10 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 				}
 				blitSprite(glSprite, tx, ty, clip, flags, &tint);
 			}
+			else blitSprite(glSprite, tx, ty, clip, flags);
 		}
+		else
+			blitSprite(glSprite, tx, ty, clip, flags);
 	}
 	else
 		blitSprite(glSprite, tx, ty, clip, flags);
@@ -696,6 +713,17 @@ void GLVideoDriver::DestroyMovieScreen()
 	SDL20VideoDriver::DestroyMovieScreen();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_SCISSOR_TEST);
+}
+
+Sprite2D* GLVideoDriver::GetScreenshot(Region r)
+{
+	unsigned int w = r.w ? r.w : width - r.x;
+	unsigned int h = r.h ? r.h : height - r.y;
+	Uint8* pixels = new Uint8[3*w*h];
+	glReadPixels(r.x, r.y, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	Sprite2D* screenshot = new GLTextureSprite2D(w, h, 24, pixels, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	return screenshot;
 }
 
 #include "plugindef.h"
