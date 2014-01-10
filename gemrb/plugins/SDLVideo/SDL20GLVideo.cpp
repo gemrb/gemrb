@@ -15,6 +15,7 @@
 #include "Interface.h"
 #include "Game.h" // for GetGlobalTint
 #include "GLTextureSprite2D.h"
+#include "GLPaletteManager.h"
 #include "Shader.h"
 #include "Matrix.h"
 
@@ -136,6 +137,7 @@ GLVideoDriver::~GLVideoDriver()
 	glDeleteProgram(programPalGrayed);
 	glDeleteProgram(programPalSepia);
 	glDeleteProgram(programRect);
+	GLPaletteManager::Clear();
 	SDL_GL_DeleteContext(context);
 }
 

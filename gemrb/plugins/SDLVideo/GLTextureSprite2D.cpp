@@ -7,6 +7,7 @@
 
 #include "SDLVideo.h"
 #include "GLTextureSprite2D.h"
+#include "GLPaletteManager.h"
 
 using namespace GemRB;
 
@@ -35,9 +36,10 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 
 GLTextureSprite2D::~GLTextureSprite2D()
 {
-	glDeleteTextures(1, &glTexture);
-	glDeleteTextures(1, &glPaletteTexture);
-	glDeleteTextures(1, &glMaskTexture);
+	if (glTexture != 0) glDeleteTextures(1, &glTexture);
+	if (glMaskTexture != 0) glDeleteTextures(1, &glMaskTexture);
+	if (IsPaletted() && glPaletteTexture != 0)
+		GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
 }
 
 GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(obj)
@@ -59,7 +61,6 @@ GLTextureSprite2D* GLTextureSprite2D::copy() const
 	return new GLTextureSprite2D(*this);
 }
 
-
 void GLTextureSprite2D::SetPalette(Palette *pal)
 {
 	if(!IsPaletted() || currentPalette == pal) return;
@@ -71,8 +72,8 @@ void GLTextureSprite2D::SetPalette(Palette *pal)
 	{
 		currentPalette->release();
 	}
+	GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
 	currentPalette = pal;
-	glDeleteTextures(1, &glPaletteTexture);
 	glPaletteTexture = 0;
 }
 
@@ -88,8 +89,8 @@ void GLTextureSprite2D::SetColorKey(ieDword index)
 	colorKeyIndex = index;
 	if(IsPaletted())
 	{
-		glDeleteTextures(1, &glPaletteTexture);
 		glDeleteTextures(1, &glMaskTexture);
+		GLPaletteManager::RemovePaletteTexture(currentPalette, colorKeyIndex);
 		glPaletteTexture = 0;
 		glMaskTexture = 0;
 	}
@@ -115,7 +116,7 @@ Color GLTextureSprite2D::GetPixel(unsigned short x, unsigned short y) const
 
 void GLTextureSprite2D::createGlTexture()
 {
-	glDeleteTextures(1, &glTexture);
+	if (glTexture != 0) glDeleteTextures(1, &glTexture);
 	glGenTextures(1, &glTexture);
 	glBindTexture(GL_TEXTURE_2D, glTexture);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -151,28 +152,7 @@ void GLTextureSprite2D::createGlTexture()
 
 void GLTextureSprite2D::createGlTextureForPalette()
 {
-	glDeleteTextures(1, &glPaletteTexture);
-	glGenTextures(1, &glPaletteTexture);
-	glBindTexture(GL_TEXTURE_2D, glPaletteTexture);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	Color* colors = new Color[256];
-	memcpy(colors, currentPalette->col, sizeof(Color)*256);
-	for(unsigned int i=0; i<256; i++)
-	{
-		if(colors[i].a == 0)
-		{
-			colors[i].a = 0xFF;
-		}
-		if(i == colorKeyIndex) 
-			colors[i].a = 0;
-	}
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) colors);
-	delete[] colors;
+	glPaletteTexture = GLPaletteManager::CreatePaletteTexture(currentPalette, colorKeyIndex);
 }
 
 void GLTextureSprite2D::createGLMaskTexture()

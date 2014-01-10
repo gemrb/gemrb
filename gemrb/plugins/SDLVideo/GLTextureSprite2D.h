@@ -30,7 +30,7 @@ namespace GemRB
 		Color GetPixel(unsigned short x, unsigned short y) const;
 		ieDword GetColorKey() const { return colorKeyIndex; }
 		void SetColorKey(ieDword);
-		bool IsPaletted() const { return Bpp != 32; }
+		bool IsPaletted() const { return Bpp == 8; }
 		GLTextureSprite2D (int Width, int Height, int Bpp, void* pixels, Uint32 rmask=0, Uint32 gmask=0, Uint32 bmask=0, Uint32 amask=0);
 		~GLTextureSprite2D();
 		GLTextureSprite2D(const GLTextureSprite2D &obj);
