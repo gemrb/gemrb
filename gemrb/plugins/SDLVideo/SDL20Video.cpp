@@ -714,6 +714,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				break;
 			}
 		case SDL_KEYDOWN:
+		case SDL_KEYUP:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
 				if (key > 32 && key < 127) {
