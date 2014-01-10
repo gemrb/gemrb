@@ -1,3 +1,5 @@
+// automatically generated file from cmake!
+
 #define PACKAGE "gemrb"
 
 #cmakedefine SIZEOF_INT ${SIZEOF_INT}

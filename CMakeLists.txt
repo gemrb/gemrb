@@ -302,8 +302,6 @@ IF(NOT VORBIS_LIBRARY)
 	MESSAGE(WARNING "While no original game data is in OGG format, some mod data is and will need conversion.")
 ENDIF()
 
-ADD_DEFINITIONS("-DHAVE_CONFIG_H")
-
 # On Release builds cmake automatically defines NDEBUG, so we
 # explicitly undefine it:
 # This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
@@ -322,33 +320,8 @@ endif (STATIC_LINK)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core)
 
-#Platform checks
-INCLUDE (CheckTypeSize)
-CHECK_TYPE_SIZE("int" SIZEOF_INT)
-CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
-
-INCLUDE (CheckFunctionExists)
-CHECK_FUNCTION_EXISTS("strndup" HAVE_STRNDUP)
-CHECK_FUNCTION_EXISTS("strlcpy" HAVE_STRLCPY)
-CHECK_FUNCTION_EXISTS("setenv" HAVE_SETENV)
-
-CHECK_INCLUDE_FILES("unistd.h" HAVE_UNISTD_H)
-CHECK_INCLUDE_FILES("malloc.h" HAVE_MALLOC_H)
-
-#Unneeded on windows
-IF(NOT WIN32)
-	INCLUDE (CheckCXXSourceCompiles)
-	CHECK_CXX_SOURCE_COMPILES("typedef void *(* voidvoid)(void);
-
-		void *object = 0;
-		voidvoid function;
-		function = (voidvoid) object;
-		" PERMITS_OBJECT_TO_FUNCTION_CAST)
-
-	IF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
-		SET(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1)
-	ENDIF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
-ENDIF(NOT WIN32)
+# generate config.h
+INCLUDE (config)
 
 IF(APPLE)
 	# Make sure we can find the 'ibtool' program. we need it to compile xibs
@@ -367,16 +340,6 @@ IF(APPLE)
 	# for pure objective-c
 	SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -DTARGET_OS_MAC")
 ENDIF(APPLE)
-
-IF (MINGW)
-	SET (WIN32_USE_STDIO Yes)
-ENDIF ()
-if (WIN32_USE_STDIO)
-	SET (NOCOLOR Yes)
-ENDIF()
-
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_config.h.in
-	${CMAKE_CURRENT_BINARY_DIR}/config.h ESCAPE_QUOTES)
 
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
