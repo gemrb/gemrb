@@ -28,8 +28,6 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
-#include <cassert>
-
 namespace GemRB {
 
 Font::Font()
@@ -164,6 +162,10 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 			x -= GetKerningOffset(tmp[i-1], currChar);
 		}
 
+		if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
+								 y + rgn.y - currGlyph->YPos)) {
+			break;
+		}
 		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette.get());
 
 		x += currGlyph->Width;
