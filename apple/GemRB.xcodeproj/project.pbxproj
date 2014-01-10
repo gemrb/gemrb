@@ -6992,6 +6992,19 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-DHAVE_ICONV=1",
+					"-g",
+					"-D_DEBUG",
+					"-isystem",
+					./,
+					"-W",
+					"-Wextra",
+					"-Wformat",
+					"-Wall",
+					"-DTARGET_OS_MAC",
+				);
 				PRODUCT_NAME = GemRB;
 				WRAPPER_EXTENSION = app;
 			};
@@ -7009,6 +7022,15 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-isystem",
+					./,
+					"-W",
+					"-Wextra",
+					"-Wformat",
+					"-DTARGET_OS_MAC",
+				);
 				PRODUCT_NAME = GemRB;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
@@ -7055,8 +7077,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
-					"-DTARGET_OS_MAC=1",
 					"-DHAVE_CONFIG_H",
+					"-DHAVE_ICONV=1",
 					"-g",
 					"-D_DEBUG",
 					"-isystem",
@@ -7115,7 +7137,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
-					"-DTARGET_OS_MAC=1",
 					"-DHAVE_CONFIG_H",
 					"-isystem",
 					./,
