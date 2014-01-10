@@ -47,6 +47,7 @@ GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(ob
 	// copies only 8 bit sprites
 	glTexture = 0;
 	glMaskTexture = 0;
+	glPaletteTexture = 0;
 	currentPalette = NULL;
 	colorKeyIndex = obj.colorKeyIndex;
 	rMask = obj.rMask;
