@@ -98,6 +98,7 @@ static int ItemSoundsCount = -1;
 #define CRI_REMOVE 0
 #define CRI_EQUIP  1
 #define CRI_SWAP   2
+#define CRI_REMOVEFORSWAP 3
 
 //bit used in SetCreatureStat to access some fields
 #define EXTRASETTINGS 0x1000
@@ -7477,6 +7478,12 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 				if (!nomatch) continue;
 			} else continue;
 			break;
+		//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
+		case CRI_REMOVEFORSWAP:
+			if (UsedItems[i].flags&1 && UsedItems[i].flags&4) {
+				if (!nomatch) continue;
+			} // no continue
+			break;
 		}
 
 		displaymsg->DisplayString(UsedItems[i].value, DMC_WHITE, IE_STR_SOUND);
@@ -7495,8 +7502,13 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	}
 
 	//it is always possible to put these items into the inventory
-	if (!(core->QuerySlotType(Slot)&SLOT_INVENTORY)) {
-		bool isdragging = core->GetDraggedItem()!=NULL;
+	// however in pst, we need to ensure immovable swappables are swappable
+	bool isdragging = core->GetDraggedItem() != NULL;
+	if (core->QuerySlotType(Slot)&SLOT_INVENTORY) {
+		if (CheckRemoveItem(actor, si, CRI_REMOVEFORSWAP)) {
+			return NULL;
+		}
+	} else {
 		if (CheckRemoveItem(actor, si, isdragging?CRI_SWAP:CRI_REMOVE)) {
 			return NULL;
 		}
