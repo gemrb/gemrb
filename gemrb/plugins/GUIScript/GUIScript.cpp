@@ -6459,6 +6459,8 @@ static void ReadUsedItems()
 			//1 - named actor cannot remove it
 			//2 - anyone else cannot equip it
 			//4 - can only swap it for something else
+			//8 - (pst) can only be equipped in eye slots
+			//16 - (pst) can only be equipped in ear slots
 			UsedItems[i].flags = atoi(tab->QueryField(i,2) );
 		}
 table_loaded:
@@ -7479,8 +7481,9 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 			} else continue;
 			break;
 		//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
+		// and make sure not to treat earrings improperly (add other flags as they come)
 		case CRI_REMOVEFORSWAP:
-			if (UsedItems[i].flags&1 && UsedItems[i].flags&4) {
+			if ((UsedItems[i].flags&1 && UsedItems[i].flags&4) || UsedItems[i].flags&16) {
 				if (!nomatch) continue;
 			} // no continue
 			break;
@@ -7490,6 +7493,32 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 		return 1;
 	}
 	return 0;
+}
+
+// TNO has an ear and an eye slot that share the same slot type, so normal checks fail
+// return false if we're trying to stick an earing into our eye socket or vice versa
+bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
+	if (UsedItemsCount==-1) {
+		ReadUsedItems();
+	}
+	unsigned int i=UsedItemsCount;
+
+	while(i--) {
+		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, NewItem->ItemResRef, 8)) {
+			continue;
+		}
+
+		//8 - (pst) can only be equipped in eye slots
+		//16 - (pst) can only be equipped in ear slots
+		if (UsedItems[i].flags & 8) {
+			return Slot == 1; // eye/left ear/helmet
+		} else if (UsedItems[i].flags & 16) {
+			return Slot == 7; //right ear/caleidoscope
+		}
+
+		return true;
+	}
+	return true;
 }
 
 CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
@@ -7783,6 +7812,11 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (res) {
 			displaymsg->DisplayConstantString(res, DMC_WHITE);
 			return PyInt_FromLong( 0 );
+		}
+		// pst: also check TNO earing/eye silliness: both share the same slot type
+		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
+			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
+			return PyInt_FromLong(0);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
 		if (tmp) {
