@@ -14,6 +14,7 @@
 namespace GemRB 
 {
 	class GLTextureSprite2D;
+	class GLPaletteManager;
 
 	class GLVideoDriver : public SDL20VideoDriver 
 	{
@@ -29,9 +30,11 @@ namespace GemRB
 		Uint32 spritesPerFrame; // sprites counter
 		GLuint lastUsedProgram; // stores last used program to prevent switching if possible (switching may cause performance lack)
 
+		GLPaletteManager* paletteManager; // palette manager instance
+
 		void useProgram(GLuint program); // use this instead glUseProgram
 		bool createPrograms();
-		void blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
+		void blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, Palette* attachedPal = NULL, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
 		void drawColoredRect(const Region& rgn, const Color& color);
 
 	public:

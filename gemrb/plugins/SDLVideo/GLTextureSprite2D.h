@@ -5,6 +5,8 @@
 
 namespace GemRB 
 {
+	class GLPaletteManager;
+
 	class GLTextureSprite2D : public Sprite2D 
 	{
 	private:
@@ -19,12 +21,15 @@ namespace GemRB
 		Palette* attachedPalette;
 		GLuint glAttachedPaletteTexture;
 
+		GLPaletteManager* paletteManager;
+
 		void createGlTexture();
 		void createGlTextureForPalette();
 		void createGLMaskTexture();
 	public:
 		GLuint GetTexture();
-		GLuint GetPaletteTexture(Palette* pal);
+		GLuint GetAttachedPaletteTexture(Palette* attached);
+		void RemoveAttachedPaletteTexture();
 		GLuint GetPaletteTexture();
 		GLuint GetMaskTexture();
 		void SetPaletteTexture(int texture);
@@ -35,6 +40,7 @@ namespace GemRB
 		ieDword GetColorKey() const { return colorKeyIndex; }
 		void SetColorKey(ieDword);
 		bool IsPaletted() const { return Bpp == 8; }
+		void SetPaletteManager(GLPaletteManager* manager) { paletteManager = manager; }
 		GLTextureSprite2D (int Width, int Height, int Bpp, void* pixels, Uint32 rmask=0, Uint32 gmask=0, Uint32 bmask=0, Uint32 amask=0);
 		~GLTextureSprite2D();
 		GLTextureSprite2D(const GLTextureSprite2D &obj);

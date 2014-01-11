@@ -98,7 +98,7 @@ public:
 		SpriteCover* cover, Palette *palette = NULL,
 		const Region* clip = NULL, bool anchor = false);
 
-	Sprite2D* GetScreenshot( Region r );
+	virtual Sprite2D* GetScreenshot( Region r );
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
