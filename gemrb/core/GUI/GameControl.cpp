@@ -774,25 +774,26 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		Point p(lastMouseX, lastMouseY);
 		core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 		switch (Key) {
-			case 'd': //detect a trap or door
-				if (overInfoPoint) {
-					overInfoPoint->DetectTrap(256, lastActorID);
-				}
-				if (overContainer) {
-					overContainer->DetectTrap(256, lastActorID);
-				}
-				if (overDoor) {
-					overDoor->TryDetectSecret(256, lastActorID);
-					overDoor->DetectTrap(256, lastActorID);
-				}
-				break;
-			case 'l': //play an animation (vvc/bam) over an actor
-				//the original engine was able to swap through all animations
+			case 'a': //switches through the avatar animations
 				if (lastActor) {
-					lastActor->AddAnimation("S056ICBL", 0, 0, 0);
+					lastActor->GetNextAnimation();
 				}
 				break;
-
+			case 'b': //draw a path to the target (pathfinder debug)
+				//You need to select an origin with ctrl-o first
+				if (drawPath) {
+					PathNode* nextNode = drawPath->Next;
+					PathNode* thisNode = drawPath;
+					while (true) {
+						delete( thisNode );
+						thisNode = nextNode;
+						if (!thisNode)
+							break;
+						nextNode = thisNode->Next;
+					}
+				}
+				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p, lastActor?lastActor->size:1 );
+				break;
 			case 'c': //force cast a hardcoded spell
 				//caster is the last selected actor
 				//target is the door/actor currently under the pointer
@@ -813,38 +814,44 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 				}
 				break;
+			case 'd': //detect a trap or door
+				if (overInfoPoint) {
+					overInfoPoint->DetectTrap(256, lastActorID);
+				}
+				if (overContainer) {
+					overContainer->DetectTrap(256, lastActorID);
+				}
+				if (overDoor) {
+					overDoor->TryDetectSecret(256, lastActorID);
+					overDoor->DetectTrap(256, lastActorID);
+				}
+				break;
+			// e, f
+			case 'g'://shows loaded areas and other game information
+				game->dump();
+				break;
+			// h
+			case 'i'://interact trigger (from the original game)
+				if (!lastActor) {
+					lastActor = area->GetActor( p, GA_DEFAULT);
+				}
+				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
+					Actor *target;
+					int i = game->GetPartySize(true);
+					if(i<2) break;
+					i=rand()%i;
+					do
+					{
+						target = game->GetPC(i, true);
+						if(target==lastActor) continue;
+						if(target->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE) continue;
 
-			case 'b': //draw a path to the target (pathfinder debug)
-				//You need to select an origin with ctrl-o first
-				if (drawPath) {
-					PathNode* nextNode = drawPath->Next;
-					PathNode* thisNode = drawPath;
-					while (true) {
-						delete( thisNode );
-						thisNode = nextNode;
-						if (!thisNode)
-							break;
-						nextNode = thisNode->Next;
+						char Tmp[40];
+						snprintf(Tmp,sizeof(Tmp),"Interact(\"%s\")",target->GetScriptName() );
+						lastActor->AddAction(GenerateAction(Tmp));
+						break;
 					}
-				}
-				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p, lastActor?lastActor->size:1 );
-
-				break;
-
-			case 'o': //set up the origin for the pathfinder
-				// origin
-				pfs.x = lastMouseX;
-				pfs.y = lastMouseY;
-				core->GetVideoDriver()->ConvertToGame( pfs.x, pfs.y );
-				break;
-			case 'a': //switches through the avatar animations
-				if (lastActor) {
-					lastActor->GetNextAnimation();
-				}
-				break;
-			case 's': //switches through the stance animations
-				if (lastActor) {
-					lastActor->GetNextStance();
+					while(i--);
 				}
 				break;
 			case 'j': //teleports the selected actors
@@ -854,7 +861,18 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
 				}
 				break;
-
+			case 'k': //kicks out actor
+				if (lastActor && lastActor->InParty) {
+					lastActor->Stop();
+					lastActor->AddAction( GenerateAction("LeaveParty()") );
+				}
+				break;
+			case 'l': //play an animation (vvc/bam) over an actor
+				//the original engine was able to swap through all animations
+				if (lastActor) {
+					lastActor->AddAnimation("S056ICBL", 0, 0, 0);
+				}
+				break;
 			case 'M':
 				if (!lastActor) {
 					lastActor = area->GetActor( p, GA_DEFAULT);
@@ -911,42 +929,20 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'N': //prints a list of all the live actors in the area
 				core->GetGame()->GetCurrentArea()->dump(true);
 				break;
-			case 'v': //marks some of the map visited (random vision distance)
-				area->ExploreMapChunk( p, rand()%30, 1 );
+			case 'o': //set up the origin for the pathfinder
+				// origin
+				pfs.x = lastMouseX;
+				pfs.y = lastMouseY;
+				core->GetVideoDriver()->ConvertToGame( pfs.x, pfs.y );
 				break;
-			case 'V': //
-				core->GetDictionary()->DebugDump();
+			case 'p': //center on actor
+				ScreenFlags|=SF_CENTERONACTOR;
+				ScreenFlags^=SF_ALWAYSCENTER;
 				break;
-			case 'w': // consolidates found ground piles under the pointed pc
-				area->MoveVisibleGroundPiles(p);
-				break;
-			case 'x': // shows coordinates on the map
-				Log(MESSAGE, "GameControl", "Position: %s [%d.%d]", area->GetScriptName(), p.x, p.y );
-				break;
-			case 'g'://shows loaded areas and other game information
-				game->dump();
-				break;
-			case 'i'://interact trigger (from the original game)
-				if (!lastActor) {
-					lastActor = area->GetActor( p, GA_DEFAULT);
-				}
-				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
-					Actor *target;
-					int i = game->GetPartySize(true);
-					if(i<2) break;
-					i=rand()%i;
-					do
-					{
-						target = game->GetPC(i, true);
-						if(target==lastActor) continue;
-						if(target->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE) continue;
-
-						char Tmp[40];
-						snprintf(Tmp,sizeof(Tmp),"Interact(\"%s\")",target->GetScriptName() );
-						lastActor->AddAction(GenerateAction(Tmp));
-						break;
-					}
-					while(i--);
+			case 'q': //joins actor to the party
+				if (lastActor && !lastActor->InParty) {
+					lastActor->Stop();
+					lastActor->AddAction( GenerateAction("JoinParty()") );
 				}
 				break;
 			case 'r'://resurrects actor
@@ -961,27 +957,28 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					delete fx;
 				}
 				break;
+			case 's': //switches through the stance animations
+				if (lastActor) {
+					lastActor->GetNextStance();
+				}
+				break;
 			case 't'://advances time
 				// 7200 (one day) /24 (hours) == 300
 				game->AdvanceTime(300*AI_UPDATE_TIME);
 				//refresh gui here once we got it
 				break;
-
-			case 'q': //joins actor to the party
-				if (lastActor && !lastActor->InParty) {
-					lastActor->Stop();
-					lastActor->AddAction( GenerateAction("JoinParty()") );
-				}
+			// u
+			case 'V': //
+				core->GetDictionary()->DebugDump();
 				break;
-			case 'p': //center on actor
-				ScreenFlags|=SF_CENTERONACTOR;
-				ScreenFlags^=SF_ALWAYSCENTER;
+			case 'v': //marks some of the map visited (random vision distance)
+				area->ExploreMapChunk( p, rand()%30, 1 );
 				break;
-			case 'k': //kicks out actor
-				if (lastActor && lastActor->InParty) {
-					lastActor->Stop();
-					lastActor->AddAction( GenerateAction("LeaveParty()") );
-				}
+			case 'w': // consolidates found ground piles under the pointed pc
+				area->MoveVisibleGroundPiles(p);
+				break;
+			case 'x': // shows coordinates on the map
+				Log(MESSAGE, "GameControl", "Position: %s [%d.%d]", area->GetScriptName(), p.x, p.y );
 				break;
 			case 'Y': // damages all enemies by 300 (resistances apply)
 				// mwahaha!
@@ -996,6 +993,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 				}
 				delete newfx;
+				// fallthrough
 			case 'y': //kills actor
 				if (lastActor) {
 					//using action so the actor is killed
