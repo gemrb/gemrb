@@ -45,6 +45,7 @@ namespace GemRB
 		~GLTextureSprite2D();
 		GLTextureSprite2D(const GLTextureSprite2D &obj);
 		GLTextureSprite2D* copy() const;
+		Uint8* GetPixels();
 	};
 }
 

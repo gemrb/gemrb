@@ -210,17 +210,22 @@ GLuint GLTextureSprite2D::GetAttachedPaletteTexture(Palette* attached)
 	// we already have a texture for requested palette
 	if (attached == attachedPalette && glAttachedPaletteTexture != 0) return glAttachedPaletteTexture;
 	attachedPalette = attached;
-	attachedPalette->acquire();
+	if(!attachedPalette->IsShared())
+	{
+		attachedPalette->acquire();
+	}
 	glAttachedPaletteTexture = paletteManager->CreatePaletteTexture(attachedPalette, colorKeyIndex);
 	return glAttachedPaletteTexture;
 }
 
 void GLTextureSprite2D::RemoveAttachedPaletteTexture()
 {
+	if (!attachedPalette->IsShared())
+	{
+		attachedPalette->release();
+	}
 	if (glAttachedPaletteTexture != 0) paletteManager->RemovePaletteTexture(glAttachedPaletteTexture);
 	glAttachedPaletteTexture = 0;
-	attachedPalette->release();
-	attachedPalette = NULL;
 }
 
 GLuint GLTextureSprite2D::GetMaskTexture()
@@ -240,3 +245,9 @@ GLuint GLTextureSprite2D::GetTexture()
 	}
 	return glTexture;
 }
+
+Uint8* GLTextureSprite2D::GetPixels()
+{
+	return NULL;
+}
+

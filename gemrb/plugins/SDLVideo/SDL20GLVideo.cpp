@@ -11,6 +11,7 @@
 	#pragma comment(lib, "libGLESv2")
 #endif
 #endif
+
 #include "SDL20GLVideo.h"
 #include "Interface.h"
 #include "Game.h" // for GetGlobalTint
@@ -493,7 +494,7 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	glDisableVertexAttribArray(a_position);
 
 	// renove attached texture
-	if (attachedPal && !attachedPal->IsShared()) spr->RemoveAttachedPaletteTexture();
+	if (attachedPal) spr->RemoveAttachedPaletteTexture();
 	
 	glDeleteBuffers(1, &buffer);
 	spritesPerFrame++;
@@ -713,7 +714,7 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 	// flip pixels vertical
 	Uint32* pixelDstPointer = pixels;
 	Uint32* pixelSrcPointer = glPixels + (h-1)*w;
-	for(int i=0; i<h; i++)
+	for(unsigned int i=0; i<h; i++)
 	{
 		memcpy(pixelDstPointer, pixelSrcPointer, w*4);
 		pixelDstPointer += w;

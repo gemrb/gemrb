@@ -5,6 +5,8 @@
 #include <GLES2/GL2ext.h>
 #endif
 
+#include <cstring>
+
 #include "GLPaletteManager.h"
 #include "Palette.h"
 
@@ -57,12 +59,14 @@ void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int color
 	}
 	else
 	{
-		PaletteValue value = textures[key];
-		if (value.second > 1) value.second --;
+		if (textures[key].second > 1) 
+		{
+			textures[key].second--;
+		}
 		else
 		{
-			indexes.erase(value.first);
-			glDeleteTextures(1, &(value.first));
+			indexes.erase(textures[key].first);
+			glDeleteTextures(1, &(textures[key].first));
 			textures.erase(key);
 		}
 	}
@@ -77,8 +81,10 @@ void GLPaletteManager::RemovePaletteTexture(GLuint texture)
 	else
 	{
 		PaletteKey key = indexes[texture];
-		PaletteValue value = textures[key];
-		if (value.second > 1) value.second --;
+		if (textures[key].second > 1) 
+		{
+			textures[key].second--;
+		}
 		else
 		{
 			indexes.erase(texture);
@@ -97,6 +103,7 @@ void GLPaletteManager::Clear()
 	textures.clear();
 	indexes.clear();
 }
+
 
 GLPaletteManager::GLPaletteManager()
 {
