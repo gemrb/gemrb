@@ -129,8 +129,11 @@ void ScrollBar::SetPosForY(short y)
 			TextArea* t = (TextArea*) ta;
 			unsigned int taY = y * (t->GetRowHeight() / stepPx);
 			t->ScrollToY(taY, this);
+			SliderYPos = y;
+		} else {
+			// other controls don't support per-pixel scrolling
+			SliderYPos = Pos * stepPx;
 		}
-		SliderYPos = y;
 	} else {
 		// top is our default position
 		SliderYPos = 0;
