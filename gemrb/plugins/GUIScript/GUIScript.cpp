@@ -7481,9 +7481,10 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 			} else continue;
 			break;
 		//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
-		// and make sure not to treat earrings improperly (add other flags as they come)
+		// and make sure not to treat earrings improperly
 		case CRI_REMOVEFORSWAP:
-			if ((UsedItems[i].flags&1 && UsedItems[i].flags&4) || UsedItems[i].flags&16) {
+			int flags = UsedItems[i].flags;
+			if ((flags&1 && flags&4) || !(flags&15)) {
 				continue;
 			} // no continue
 			break;
