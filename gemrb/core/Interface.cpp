@@ -1732,6 +1732,10 @@ int Interface::Init(InterfaceConfig* config)
 		PathJoin( path, GamePath, GameDataPath, NULL);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
+		// accomodating silly installers that create a data/Data/* structure
+		PathJoin( path, GamePath, GameDataPath, "Data", NULL);
+		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
 		//IWD2 movies are on the CD but not in the BIF
 		char *description = strdup("CD1/data");
 		for (i = 0; i < MAX_CD; i++) {
