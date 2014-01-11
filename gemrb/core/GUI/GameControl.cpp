@@ -926,7 +926,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				core->GetGame()->GetCurrentArea()->dump(false);
 				break;
-			case 'N': //prints a list of all the live actors in the area
+			case 'n': //prints a list of all the live actors in the area
 				core->GetGame()->GetCurrentArea()->dump(true);
 				break;
 			case 'o': //set up the origin for the pathfinder
