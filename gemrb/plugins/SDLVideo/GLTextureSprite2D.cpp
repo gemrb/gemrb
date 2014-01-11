@@ -38,12 +38,7 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 
 GLTextureSprite2D::~GLTextureSprite2D()
 {
-	if (glTexture != 0) glDeleteTextures(1, &glTexture);
-	if (glMaskTexture != 0) glDeleteTextures(1, &glMaskTexture);
-	if (glPaletteTexture != 0)
-		paletteManager->RemovePaletteTexture(glPaletteTexture);
-	if (glAttachedPaletteTexture != 0)
-		paletteManager->RemovePaletteTexture(glAttachedPaletteTexture);
+	MakeUnused();
 }
 
 GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(obj)
@@ -246,8 +241,26 @@ GLuint GLTextureSprite2D::GetTexture()
 	return glTexture;
 }
 
-Uint8* GLTextureSprite2D::GetPixels()
+void GLTextureSprite2D::MakeUnused()
 {
-	return NULL;
+	if (glTexture != 0) 
+	{
+		glDeleteTextures(1, &glTexture);
+		glTexture = 0;
+	}
+	if (glMaskTexture != 0) 
+	{
+		glDeleteTextures(1, &glMaskTexture);
+		glMaskTexture = 0;
+	}
+	if (glPaletteTexture != 0)
+	{
+		paletteManager->RemovePaletteTexture(glPaletteTexture);
+		glPaletteTexture = 0;
+	}
+	if (glAttachedPaletteTexture != 0)
+	{
+		paletteManager->RemovePaletteTexture(glAttachedPaletteTexture);
+		glAttachedPaletteTexture = 0;
+	}
 }
-
