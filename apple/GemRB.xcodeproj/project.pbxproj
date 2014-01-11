@@ -6745,6 +6745,7 @@
 					"-DHAVE_CONFIG_H",
 					"-W",
 					"-Wextra",
+					"-DTARGET_OS_MAC=0",
 				);
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
@@ -6785,9 +6786,10 @@
 					./,
 					"-DSTATIC_LINK",
 					"-DHAVE_CONFIG_H",
-					"-DTARGET_OS_IPHONE",
+					"-DTARGET_OS_IPHONE=1",
 					"-W",
 					"-Wextra",
+					"-DTARGET_OS_MAC=0",
 				);
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
@@ -6992,19 +6994,6 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				OTHER_CFLAGS = (
-					"-DHAVE_CONFIG_H",
-					"-DHAVE_ICONV=1",
-					"-g",
-					"-D_DEBUG",
-					"-isystem",
-					./,
-					"-W",
-					"-Wextra",
-					"-Wformat",
-					"-Wall",
-					"-DTARGET_OS_MAC",
-				);
 				PRODUCT_NAME = GemRB;
 				WRAPPER_EXTENSION = app;
 			};
@@ -7022,15 +7011,6 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				OTHER_CFLAGS = (
-					"-DHAVE_CONFIG_H",
-					"-isystem",
-					./,
-					"-W",
-					"-Wextra",
-					"-Wformat",
-					"-DTARGET_OS_MAC",
-				);
 				PRODUCT_NAME = GemRB;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
@@ -7087,6 +7067,7 @@
 					"-Wextra",
 					"-Wformat",
 					"-Wall",
+					"-DTARGET_OS_MAC=1",
 				);
 				SDKROOT = "";
 				"SDKROOT[arch=*]" = "";
@@ -7143,6 +7124,7 @@
 					"-W",
 					"-Wextra",
 					"-Wformat",
+					"-DTARGET_OS_MAC=1",
 				);
 				SDKROOT = "";
 				"SDKROOT[arch=*]" = "";
