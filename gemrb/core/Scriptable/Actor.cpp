@@ -4386,12 +4386,19 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 		level = GetClericLevel();
 		if (!level) level = GetDruidLevel();
 		if (!level) level = GetPaladinLevel();
+		// for cleric/rangers, we can't tell from which class a spell is, unless unique, so we ignore the distinction
 		if (!level) level = GetRangerLevel();
 		break;
 	case IE_SPL_WIZARD:
 		level = GetMageLevel();
 		if (!level) level = GetSorcererLevel();
 		if (!level) level = GetBardLevel();
+		break;
+	default:
+		// checking if anyone uses the psion, item and song types
+		if (spelltype != IE_SPL_INNATE) {
+			Log(ERROR, "Actor", "Unhandled SPL type: %d!", spelltype);
+		}
 		break;
 	}
 	// if nothing was found, use the average level
