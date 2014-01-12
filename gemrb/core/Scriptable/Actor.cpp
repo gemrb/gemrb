@@ -3750,6 +3750,11 @@ bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
 	if (!third) {
 		return true;
 	}
+	// FIXME: change to SpellTarget once the split is done
+	if (!LastTarget && LastTargetPos.isempty()) {
+		// not casting, nothing to do
+		return false;
+	}
 	int roll = core->Roll(1, 20, 0);
 	int concentration = Modified[IE_CONCENTRATION];
 	int bonus = 4; // combat casting bonus for when injured
