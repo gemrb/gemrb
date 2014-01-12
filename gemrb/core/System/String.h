@@ -20,8 +20,10 @@
 #define STRING_H
 
 #include "exports.h"
+#include "ie_types.h"
 
 #include <cstring>
+#include <string>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -33,6 +35,13 @@
 #endif
 
 namespace GemRB {
+
+//typedef std::basic_string<ieWord> String;
+typedef std::wstring String;
+// String creators
+GEM_EXPORT String* StringFromCString(const char* string);
+GEM_EXPORT String* StringFromMBEncodedData(const ieByte* data, bool utf8 = false);
+
 /* this function will work with pl/cz special characters */
 
 extern unsigned char pl_uppercase[256];

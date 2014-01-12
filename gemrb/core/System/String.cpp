@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "System/Logging.h"
 #include "System/String.h"
 
 #include "exports.h"
@@ -30,6 +31,80 @@
 #endif
 
 namespace GemRB {
+
+String* StringFromEncodedData(const ieByte* string, bool multibyte, bool utf8)
+{
+	// i know these params are strange
+	// but utf8 implies multibyte
+	multibyte = (utf8) ? true : multibyte;
+
+	size_t len = strlen((char*)string);
+	String* dbString = new String();
+	dbString->reserve(len);
+	size_t dbLen = 0;
+	for(size_t i=0; i<len; ++i) {
+		ieWord currentChr = string[i];
+		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
+		if(multibyte && (i+1 < len) && (currentChr >= 128 || currentChr < 32)) { // this is a double byte char
+			ieWord ch = 0;
+			if (utf8) {
+				size_t nb = 0;
+				if (currentChr >= 0xC0 && currentChr <= 0xDF) {
+					/* c0-df are first byte of two-byte sequences (5+6=11 bits) */
+					/* c0-c1 are noncanonical */
+					nb = 2;
+				} else if (currentChr >= 0xE0 && currentChr <= 0XEF) {
+					/* e0-ef are first byte of three-byte (4+6+6=16 bits) */
+					/* e0 80-9f are noncanonical */
+					nb = 3;
+				} else if (currentChr >= 0xF0 && currentChr <= 0XF7) {
+					/* f0-f7 are first byte of four-byte (3+6+6+6=21 bits) */
+					/* f0 80-8f are noncanonical */
+					nb = 4;
+				} else if (currentChr >= 0xF8 && currentChr <= 0XFB) {
+					/* f8-fb are first byte of five-byte (2+6+6+6+6=26 bits) */
+					/* f8 80-87 are noncanonical */
+					nb = 5;
+				} else if (currentChr >= 0xFC && currentChr <= 0XFD) {
+					/* fc-fd are first byte of six-byte (1+6+6+6+6+6=31 bits) */
+					/* fc 80-83 are noncanonical */
+					nb = 6;
+				} else {
+					Log(WARNING, "String", "Invalid UTF-8 character: %x", currentChr);
+					continue;
+				}
+
+				ch = currentChr & ((1 << (7 - nb)) - 1);
+				while (--nb)
+					ch <<= 6, ch |= string[++i] & 0x3f;
+			} else {
+				ch = (string[++i] << 8) + currentChr;
+			}
+			dbString->push_back(ch);
+		} else {
+			dbString->push_back(currentChr);
+		}
+		++dbLen;
+	}
+
+	// we dont always use everything we allocated.
+	// realloc in this case to avoid static anylizer warnings about "garbage values"
+	// since this realloc always truncates it *should* be quick
+	dbString->resize(dbLen);
+	return dbString;
+}
+
+String* StringFromCString(const char* string)
+{
+	// basic expansion of cstring to 2 bytes
+	// the only reason this is special, is because it allows characters 128-256.
+	return StringFromEncodedData((ieByte*)string, false, false);
+}
+
+String* StringFromMBEncodedData(const ieByte* data, bool utf8)
+{
+	return StringFromEncodedData(data, true, utf8);
+}
 
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
