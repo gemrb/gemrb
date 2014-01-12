@@ -4374,8 +4374,11 @@ ieDword Actor::GetXPLevel(int modified) const
 }
 
 // returns the guessed caster level by passed spell type
-// FIXME: add iwd2 support (should be more precise, as there are more class types)
 // FIXME: add more logic for cross-type kits (like avengers)?
+// FIXME: iwd2 does the right thing at least for spells cast from spellbooks;
+//        that is, it takes the correct level, not first or average or min or max.
+//        We need to propagate the spellbook info all through here. :/
+//        NOTE: this is only problematic for multiclassed actors
 ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
 	int level = 0;
