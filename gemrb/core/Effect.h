@@ -140,9 +140,6 @@ public:
 	}
 };
 
-// FIXME: what about area spells? They can have map & coordinates as target
-//void AddEffect(Effect* fx, Actor* self, Actor* pretarget);
-
 }
 
 #endif  // ! EFFECT_H
