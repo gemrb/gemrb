@@ -130,6 +130,8 @@ struct Effect {
 	ieDword CasterID;       //10c in bg2 (not saved?)
 	// These are not in the IE files, but are our precomputed values
 	ieDword random_value;
+
+	ieDword SpellLevel; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
 public:
 	//don't modify position in case it was already set
 	void SetPosition(const Point &p) {
