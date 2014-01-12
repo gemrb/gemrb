@@ -2795,30 +2795,28 @@ int fx_bleeding_wounds (Scriptable* Owner, Actor* target, Effect* fx)
 	if(0) print("fx_bleeding_wounds(%2d): Damage: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//also this effect is executed every update
-	ieDword damage;
-	int tmp = fx->Parameter1;
+	ieDword damage = fx->Parameter1;
+	int tmp;
 
+	// a bit different than the poison opcodes
 	switch(fx->Parameter2) {
-	case RPD_PERCENT:
-		damage = STAT_GET(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
-		break;
-	case RPD_ROUNDS:
-		tmp *= 6;
+	case 0: // Parameter1 per round
+		tmp = core->Time.round_sec;
 		goto seconds;
-	case RPD_TURNS:
-		tmp *= 30;
-	case RPD_SECONDS:
-seconds:
+	case 1: // Parameter1 per second
+		tmp = 1;
+		goto seconds;
+	case 2: // 1 hitpoint each Parameter1 seconds
+		tmp = fx->Parameter1;
 		damage = 1;
+seconds:
+		tmp *= AI_UPDATE_TIME;
 		if (tmp && (core->GetGame()->GameTime%tmp)) {
 			return FX_APPLIED;
 		}
 		break;
-	case RPD_POINTS:
-		damage = fx->Parameter1;
-		break;
 	default:
-		damage = 1;
+		Log(GemRB::ERROR, "IWDOpcodes", "Unknown type in fx_bleeding_wounds: %d!", fx->Parameter2);
 		break;
 	}
 	//percent
