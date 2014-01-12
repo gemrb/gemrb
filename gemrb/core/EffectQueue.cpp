@@ -1087,7 +1087,12 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	bool saved = false;
 	for (int i=0;i<5;i++) {
 		if( fx->SavingThrowType&(1<<i)) {
-			saved = actor->GetSavingThrow(i, bonus);
+			// FIXME: first bonus handling for iwd2 is just a guess
+			if (iwd2fx) {
+				saved = actor->GetSavingThrow(i, bonus-fx->SavingThrowBonus, fx->SpellLevel, fx->SavingThrowBonus);
+			} else {
+				saved = actor->GetSavingThrow(i, bonus);
+			}
 			if( saved) {
 				break;
 			}

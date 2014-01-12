@@ -440,7 +440,7 @@ public:
 	/** gets saving throws */
 	void RollSaves();
 	/** returns a saving throw */
-	bool GetSavingThrow(ieDword type, int modifier);
+	bool GetSavingThrow(ieDword type, int modifier, int spellLevel=0, int saveBonus=0);
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */

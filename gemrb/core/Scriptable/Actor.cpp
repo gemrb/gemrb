@@ -3222,21 +3222,39 @@ void Actor::RollSaves()
 
 // in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
 // since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
-// FIXME: in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
+// in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
 
 #define SAVECOUNT 5
 static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
 
 /** returns true if actor made the save against saving throw type */
-bool Actor::GetSavingThrow(ieDword type, int modifier)
+bool Actor::GetSavingThrow(ieDword type, int modifier, int spellLevel, int saveBonus)
 {
 	assert(type<SAVECOUNT);
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
 	if (ret == 1) return false;
 	if (ret == SAVEROLL) return true;
-	ret += modifier + GetStat(IE_LUCK);
-	return ret > (int) GetStat(savingthrows[type]);
+
+	if (!third) {
+		ret += modifier + GetStat(IE_LUCK);
+		return ret > (int) GetStat(savingthrows[type]);
+	}
+
+	int roll = ret;
+	// NOTE: assuming criticals apply to iwd2 too
+	// NOTE: we use GetStat, assuming the stat save bonus can never be negated like some others
+	int save = GetStat(savingthrows[type]);
+	ret = roll + save + modifier;
+	if (ret > 10 + spellLevel + saveBonus) {
+		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
+		displaymsg->DisplayRollStringName(40974, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		return true;
+	} else {
+		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Failed!~
+		displaymsg->DisplayRollStringName(40975, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		return false;
+	}
 }
 
 /** implements a generic opcode function, modify modified stats
