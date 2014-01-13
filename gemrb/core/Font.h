@@ -98,7 +98,13 @@ public:
 	size_t Print(Region rgn, const unsigned char* string, Palette* color,
 		ieByte Alignment, bool anchor = false) const;
 
+	size_t Print(Region cliprgn, Region rgn, const String& string, Palette* color,
+				 ieByte Alignment, bool anchor = false) const;
+	size_t Print(Region rgn, const String& string, Palette* hicolor,
+				 ieByte Alignment, bool anchor) const;
+
 	/** Returns width of the string rendered in this font in pixels */
+	size_t CalcStringWidth(const String) const;
 	size_t CalcStringWidth(const unsigned char* string) const;
 	void SetupString(ieWord* string, unsigned int width) const;
 	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
@@ -106,6 +112,7 @@ public:
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:
 	size_t CalcStringWidth(const ieWord* string) const;
+	size_t CalcStringHeight(const String) const;
 	size_t CalcStringHeight(const ieWord* string) const;
 	static size_t dbStrLen(const ieWord* string);
 };

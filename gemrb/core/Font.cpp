@@ -177,6 +177,100 @@ size_t Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	return i;
 }
 
+size_t Font::Print(Region rgn, const String& string, Palette* hicolor,
+				   ieByte Alignment, bool anchor) const
+{
+	Region cliprgn = rgn;
+	if (!anchor) {
+		Region Viewport = core->GetVideoDriver()->GetViewport();
+		cliprgn.x -= Viewport.x;
+		cliprgn.y -= Viewport.y;
+	}
+	return Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
+}
+
+// FIXME: this is an functionaly incomplete copy of its predecessor
+size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* color,
+				   ieByte Alignment, bool anchor) const
+{
+	unsigned int psx = IE_FONT_PADDING;
+	Palette* pal = color;
+	if (!pal) {
+		pal = palette;
+	}
+
+	Holder<Palette> blitPalette = pal;
+	size_t len = string.length();
+
+	int ystep = maxHeight;
+
+	int x = psx, y = ystep;
+	Video* video = core->GetVideoDriver();
+
+	if (Alignment & IE_FONT_ALIGN_CENTER) {
+		size_t w = CalcStringWidth( string );
+		x = ( rgn.w - w ) / 2;
+	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+		size_t w = CalcStringWidth( string );
+		x = ( rgn.w - w ) - IE_FONT_PADDING;
+	}
+
+	if (Alignment & IE_FONT_ALIGN_MIDDLE) {
+		int h = 0;
+		for (size_t i = 0; i <= len; i++) {
+			if (string[i] == 0)
+				h++;
+		}
+		h = h * ystep;
+		y += ( rgn.h - h ) / 2;
+	} else if (Alignment & IE_FONT_ALIGN_BOTTOM) {
+		int h = 0;
+		for (size_t i = 0; i <= len; i++) {
+			if (string[i] == 0)
+				h++;
+		}
+		h = h * ystep;
+		y += ( rgn.h - h ) - IE_FONT_PADDING;
+	} else if (Alignment & IE_FONT_ALIGN_TOP) {
+		y += IE_FONT_PADDING;
+	}
+
+	ieWord currChar = '\0';
+	const Sprite2D* currGlyph = NULL;
+	size_t i;
+	for (i = 0; i < len; i++) {
+		if (string[i] == 0) {
+			y += ystep;
+			x = psx;
+			size_t w = CalcStringWidth( &string[i + 1] );
+			if (Alignment & IE_FONT_ALIGN_CENTER) {
+				x = ( rgn.w - w ) / 2;
+			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+				x = ( rgn.w - w );
+			}
+			continue;
+		}
+		currChar = string[i];
+		currGlyph = GetCharSprite(currChar);
+
+		if (i > 0) {
+			// kerning
+			x -= GetKerningOffset(string[i-1], currChar);
+		}
+
+		if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
+								 y + rgn.y - currGlyph->YPos)) {
+			break;
+		}
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette.get());
+
+		x += currGlyph->Width;
+	}
+
+	blitPalette = NULL;
+	return i;
+}
+
 size_t Font::CalcStringWidth(const unsigned char* string) const
 {
 	ieWord* tmp = NULL;
@@ -186,6 +280,30 @@ size_t Font::CalcStringWidth(const unsigned char* string) const
 	return width;
 }
 
+size_t Font::CalcStringWidth(const String string) const
+{
+	size_t ret = 0, len = string.length();
+	for (size_t i = 0; i < len; i++) {
+		ret += GetCharSprite(string[i])->Width;
+	}
+	return ret;
+}
+
+size_t Font::CalcStringHeight(const String string) const
+{
+	size_t h = 0, max = 0, len = string.length();
+	for (size_t i = 0; i < len; i++) {
+		h = GetCharSprite(string[i])->Height;
+		//the space check is here to hack around overly high frames
+		//in some bg1 fonts that throw vertical alignment off
+		if (h > max && string[i] != ' ') {
+			max = h;
+		}
+	}
+	return max;
+}
+
+// FIXME: remember to destroy this after transition to sanity
 size_t Font::CalcStringWidth(const ieWord* string) const
 {
 	// TODO: it is a bit wasteful to recalc the string length when we already know it
@@ -197,6 +315,7 @@ size_t Font::CalcStringWidth(const ieWord* string) const
 	return ret;
 }
 
+// FIXME: remember to destroy this after transition to sanity
 size_t Font::CalcStringHeight(const ieWord* string) const
 {
 	// TODO: it is a bit wasteful to recalc the string length when we already know it
@@ -257,6 +376,7 @@ void Font::SetupString(ieWord* string, unsigned int width) const
 	}
 }
 
+// FIXME: remove method after transition to sanity
 size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const
 {
 	size_t len = strlen((char*)string);
@@ -342,6 +462,7 @@ void Font::SetPalette(Palette* pal)
 	palette = pal;
 }
 
+// FIXME: remove after transition to sanity
 size_t Font::dbStrLen(const ieWord* string)
 {
 	if (string == NULL) return 0;
