@@ -22,6 +22,7 @@
 
 #include "win32def.h"
 
+#include "Font.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
@@ -33,30 +34,20 @@
 namespace GemRB {
 
 Console::Console(const Region& frame)
-	: Control(frame)
+	: Control(frame), History(5)
 {
 	Cursor = NULL;
 	Back = NULL;
 	max = 128;
-	Buffer = ( unsigned char * ) malloc( max );
-	Buffer[0] = 0;
-	for(size_t i=0;i<HISTORY_SIZE;i++) {
-		History[i] = ( unsigned char * ) malloc( max );
-		History[i][0] = 0;
-	}
+	Buffer.reserve(max);
 	CurPos = 0;
 	HistPos = 0;
-	HistMax = 0;
 	palette = NULL;
 	font = NULL;
 }
 
 Console::~Console(void)
 {
-	free( Buffer );
-	for (size_t i=0;i<HISTORY_SIZE;i++) {
-		free( History[i] );
-	}
 	Video *video = core->GetVideoDriver();
 
 	gamedata->FreePalette( palette );
@@ -74,10 +65,7 @@ void Console::DrawInternal(Region& drawFrame)
 	video->DrawRect( drawFrame, ColorBlack );
 	font->Print( drawFrame, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
-	ieWord tmpChr = Buffer[CurPos];
-	Buffer[CurPos] = '\0';
-	size_t w = font->CalcStringWidth(Buffer);
-	Buffer[CurPos] = tmpChr;
+	size_t w = font->CalcStringWidth(Buffer.substr(0, CurPos));
 	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
 	// FIXME: font is still stupid and forces IE_FONT_PADDING
 	video->BlitSprite(Cursor, w + drawFrame.x + IE_FONT_PADDING, vcenter + drawFrame.y, true);
@@ -105,19 +93,16 @@ void Console::SetBackGround(Sprite2D* back)
 /** Sets the Text of the current control */
 void Console::SetText(const char* string)
 {
-	strlcpy( ( char * ) Buffer, string, max );
+	// FIXME: we don't use this method, but if we did this assignment is insufficient
+	// in the future the signature will change to String and it will work.
+	Buffer = *string;
 }
 /** Key Press Event */
 bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Key >= 0x20) {
-		size_t len = strlen( ( char* ) Buffer );
-		if (len + 1 < max) {
-			for (size_t i = len; i > CurPos; i--) {
-				Buffer[i] = Buffer[i - 1];
-			}
-			Buffer[CurPos++] = Key;
-			Buffer[len + 1] = 0;
+		if (Buffer.length() < max) {
+			Buffer.insert(CurPos++, 1, Key);
 		}
 		return true;
 	}
@@ -126,24 +111,17 @@ bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 /** Special Key Press */
 bool Console::OnSpecialKeyPress(unsigned char Key)
 {
-	size_t len;
-
 	switch (Key) {
 		case GEM_BACKSP:
 			if (CurPos != 0) {
-				size_t len = strlen( ( const char * ) Buffer );
-				for (size_t i = CurPos; i < len; i++) {
-					Buffer[i - 1] = Buffer[i];
-				}
-				Buffer[len - 1] = 0;
-				CurPos--;
+				Buffer.erase(--CurPos, 1);
 			}
 			break;
 		case GEM_HOME:
 			CurPos = 0;
 			break;
 		case GEM_END:
-			CurPos = (unsigned short) strlen( (const char * ) Buffer);
+			CurPos = Buffer.length();
 			break;
 		case GEM_UP:
 			HistoryBack();
@@ -156,23 +134,24 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 				CurPos--;
 			break;
 		case GEM_RIGHT:
-			len = strlen( ( const char * ) Buffer );
-			if (CurPos < len) {
+			if (CurPos < Buffer.length()) {
 				CurPos++;
 			}
 			break;
 		case GEM_DELETE:
-			len = strlen( ( const char * ) Buffer );
-			if (CurPos < len) {
-				for (size_t i = CurPos; i < len; i++) {
-					Buffer[i] = Buffer[i + 1];
-				}
+			if (CurPos < Buffer.length()) {
+				Buffer.erase(CurPos, 1);
 			}
 			break;			
 		case GEM_RETURN:
-			core->GetGUIScriptEngine()->ExecString( ( char* ) Buffer );
-			HistoryAdd(false);
-			Buffer[0] = 0;
+			char* cBuf = new char[max+1];
+			// FIXME: depends on locale setting
+			wcstombs(cBuf, Buffer.c_str(), max);
+			// FIXME: should prepend "# coding=<encoding name>" as per http://www.python.org/dev/peps/pep-0263/
+			core->GetGUIScriptEngine()->ExecString( cBuf );
+			delete[] cBuf;
+			HistoryAdd();
+			Buffer.erase();
 			CurPos = 0;
 			HistPos = 0;
 			break;
@@ -180,49 +159,34 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 	return true;
 }
 
-//ctrl-up
 void Console::HistoryBack()
 {
-	HistoryAdd(false);
-	if (HistPos < HistMax-1 && Buffer[0]) {
+	if (Buffer[0] && HistPos == 0 && History.Retrieve(HistPos) != Buffer) {
+		HistoryAdd();
 		HistPos++;
 	}
-	memcpy(Buffer, History[HistPos], max);
-	CurPos = (unsigned short) strlen ((const char *) Buffer);
+	Buffer = History.Retrieve(HistPos);
+	CurPos = Buffer.length();
+	if (++HistPos >= (int)History.Size()) {
+		HistPos--;
+	}
 }
 
-//ctrl-down
 void Console::HistoryForward()
 {
-	HistoryAdd(false);
-	if (HistPos == 0) {
-		Buffer[0]=0;
-		CurPos=0;
-		return;
+	if (--HistPos < 0) {
+		Buffer.erase();
+		HistPos++;
+	} else {
+		Buffer = History.Retrieve(HistPos);
 	}
-	HistPos--;
-	memcpy(Buffer, History[HistPos], max);
-	CurPos = (unsigned short) strlen ((const char *) Buffer);
+	CurPos = Buffer.length();
 }
 
 void Console::HistoryAdd(bool force)
 {
-	int i;
-
-	if (!force && !Buffer[0])
-		return;
-	for (i=0;i<HistMax;i++) {
-		if (!strnicmp((const char *) History[i],(const char *) Buffer,max) )
-			return;
-	}
-	if (History[0][0]) {
-		for (i=HISTORY_SIZE-1; i>0; i--) {
-			memcpy(History[i], History[i-1], max);
-		}
-	}
-	memcpy(History[0], Buffer, max);
-	if (HistMax<HISTORY_SIZE) {
-		HistMax++;
+	if (force || Buffer.length()) {
+		History.Append(Buffer, !force);
 	}
 }
 

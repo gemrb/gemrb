@@ -27,11 +27,12 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "Font.h"
+#include "CircularBuffer.h"
 #include "GUI/Control.h"
 
 namespace GemRB {
 
+class Font;
 class Palette;
 
 /**
@@ -42,9 +43,6 @@ class Palette;
  * GemRB python module loaded, so almost any command
  * from GUIScripts can be used.
  */
-
-/** the number of remembered lines in the cheat console*/
-#define HISTORY_SIZE 5
 
 class Console : public Control {
 public:
@@ -73,13 +71,13 @@ private:
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Text Buffer */
-	unsigned char* Buffer;
+	String Buffer;
 	/** History Buffer */
-	unsigned char* History[HISTORY_SIZE];
+	CircularBuffer<String> History;
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** History Position and size */
-	unsigned short HistPos, HistMax;
+	int HistPos;
 	/** Color Palette */
 	Palette* palette;
 
@@ -93,7 +91,7 @@ public: //Events
 private:
 	void HistoryBack();
 	void HistoryForward();
-	void HistoryAdd(bool force);
+	void HistoryAdd(bool force = false);
 };
 
 }
