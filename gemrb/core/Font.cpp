@@ -71,6 +71,73 @@ bool Font::MatchesResRef(const ieResRef resref)
 	return false;
 }
 
+Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPrinted) const
+{
+	int sW = CalcStringWidth(string);
+	int w = 0, h = 0;
+	if (sW <= rgn.w) {
+		// single line of text
+		w = sW;
+		h = CalcStringHeight(string);
+	} else {
+		// text will be multiple lines
+		w = rgn.w;
+		h = maxHeight * (sW / rgn.w);
+	}
+
+	ieDword ck = GetCharSprite(string[0])->GetColorKey();
+	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
+	ieByte* canvasPx = (ieByte*)calloc(w, h);
+	ieByte* dest = canvasPx;
+	if (ck != 0) {
+		// start with transparent canvas
+		memset(canvasPx, ck, w * h);
+	}
+
+	const Sprite2D* curGlyph = NULL;
+	size_t len = string.length();
+	size_t chrIdx = 0;
+	int wCurrent = 0, hCurrent = 0;
+	bool newline = false;
+	for (; chrIdx < len; chrIdx++) {
+		curGlyph = GetCharSprite(string[chrIdx]);
+		assert(!curGlyph->BAM);
+		if (newline) {
+			hCurrent += maxHeight;
+			if ((hCurrent + curGlyph->Height) > h) {
+				// the next line would be clipped. we are done.
+				break;
+			}
+		}
+
+		// copy the glyph to the canvas
+		ieByte* src = (ieByte*)curGlyph->pixels;
+		dest = canvasPx + wCurrent;
+		for( int row = 0; row < curGlyph->Height; row++ ) {
+			memcpy(dest, src, curGlyph->Width);
+			dest += w;
+			src += curGlyph->Width;
+		}
+
+		wCurrent += curGlyph->Width;
+		if (wCurrent >= w) {
+			// we've run off the edge of the region
+			newline = true;
+		}
+	}
+	// should have filled the canvas 100% <- NO! we probably have extra space on the last line
+	//assert((dest - canvasPx) == (w * h));
+
+	if (numPrinted) {
+		*numPrinted = chrIdx;
+	}
+	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(w, h, canvasPx,
+															 palette, true,
+															 curGlyph->GetColorKey());
+	// TODO: adjust canvas position based on alignment flags and rgn
+	return canvas;
+}
+
 size_t Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	ieByte Alignment, bool anchor) const
 {
