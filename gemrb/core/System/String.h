@@ -42,6 +42,10 @@ typedef std::wstring String;
 GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT String* StringFromMBEncodedData(const ieByte* data, bool utf8 = false);
 
+// String manipulators
+GEM_EXPORT void StringToLower(String& string);
+GEM_EXPORT void StringToUpper(String& string);
+
 /* this function will work with pl/cz special characters */
 
 extern unsigned char pl_uppercase[256];

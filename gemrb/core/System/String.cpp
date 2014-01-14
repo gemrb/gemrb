@@ -109,6 +109,28 @@ String* StringFromMBEncodedData(const ieByte* data, bool utf8)
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
 
+void StringToLower(String& string)
+{
+	for (size_t i = 0; i < string.length(); i++) {
+		if (string[i] < 256) {
+			string[i] = pl_lowercase[string[i]];
+		} else {
+			string[i] = ::towlower(string[i]);
+		}
+	}
+}
+
+void StringToUpper(String& string)
+{
+	for (size_t i = 0; i < string.length(); i++) {
+		if (string[i] < 256) {
+			string[i] = pl_uppercase[string[i]];
+		} else {
+			string[i] = ::towupper(string[i]);
+		}
+	}
+}
+
 // these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 {
