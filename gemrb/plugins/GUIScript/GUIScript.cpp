@@ -2848,7 +2848,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateWorldMapControl__doc,
-"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font])\n\n"
+"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font, recolor])\n\n"
 "Creates and adds a new WorldMap control to a Window." );
 
 static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
