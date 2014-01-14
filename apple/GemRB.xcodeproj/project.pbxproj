@@ -104,6 +104,8 @@
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
+		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
+		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
 		A265ECDC13A8661600C6DF12 /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD813A8661600C6DF12 /* FileCache.cpp */; };
 		A265ECDD13A8661600C6DF12 /* IndexedArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */; };
 		A265ECDE13A8661600C6DF12 /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
@@ -1196,6 +1198,8 @@
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
+		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IndexedArchive.cpp; path = ../gemrb/core/IndexedArchive.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECDA13A8661600C6DF12 /* KeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KeyMap.cpp; path = ../gemrb/core/KeyMap.cpp; sourceTree = SOURCE_ROOT; };
@@ -3129,11 +3133,13 @@
 		A2D4C51D13A978110086BCC4 /* includes */ = {
 			isa = PBXGroup;
 			children = (
+				A24E7B9E1884CA8600431DEE /* CircularBuffer.h */,
 				A2D4C51E13A978110086BCC4 /* defsounds.h */,
 				A2D4C51F13A978110086BCC4 /* errors.h */,
 				A2D4C52013A978110086BCC4 /* exports.h */,
 				A2D4C52113A978110086BCC4 /* globals.h */,
 				A2D4C52213A978110086BCC4 /* HashMap.h */,
+				A24E7B9F1884CA8600431DEE /* ie_cursors.h */,
 				A2D4C52313A978110086BCC4 /* ie_feats.h */,
 				A2D4C52413A978110086BCC4 /* ie_stats.h */,
 				A2D4C52513A978110086BCC4 /* ie_types.h */,
@@ -3266,6 +3272,7 @@
 				A2E663AA139E883E00310FC8 /* PalettedImageMgr.h in Headers */,
 				A2E663AC139E883E00310FC8 /* Particles.h in Headers */,
 				A2E663AD139E883E00310FC8 /* PathFinder.h in Headers */,
+				A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */,
 				A2E663AF139E883E00310FC8 /* Plugin.h in Headers */,
 				A2E663B1139E883E00310FC8 /* PluginMgr.h in Headers */,
 				A2E663B3139E883E00310FC8 /* Polygon.h in Headers */,
@@ -3310,6 +3317,7 @@
 				A2E663FF139E885300310FC8 /* FileStream.h in Headers */,
 				A2E66401139E885300310FC8 /* MemoryStream.h in Headers */,
 				A2E66405139E885300310FC8 /* swab.h in Headers */,
+				A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */,
 				A2E66407139E885300310FC8 /* VFS.h in Headers */,
 				A2E66409139E885A00310FC8 /* Actor.h in Headers */,
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
