@@ -436,7 +436,7 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 
 		glActiveTexture(GL_TEXTURE1);
 		if (attachedPal) 
-			palTexture = spr->GetAttachedPaletteTexture(attachedPal);
+			palTexture = paletteManager->CreatePaletteTexture(attachedPal, spr->GetColorKey(), true);
 		else 
 			palTexture = spr->GetPaletteTexture();		
 		glBindTexture(GL_TEXTURE_2D, palTexture);
@@ -493,8 +493,8 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	glDisableVertexAttribArray(a_texCoord);
 	glDisableVertexAttribArray(a_position);
 
-	// renove attached texture
-	if (attachedPal) spr->RemoveAttachedPaletteTexture();
+	// remove attached texture
+	//if (attachedPal) paletteManager->RemovePaletteTexture(palTexture, true);
 	
 	glDeleteBuffers(1, &buffer);
 	spritesPerFrame++;
@@ -689,6 +689,7 @@ int GLVideoDriver::SwapBuffers()
 {	
 	int val = SDLVideoDriver::SwapBuffers();
 	SDL_GL_SwapWindow(window);
+	paletteManager->ClearUnused(true);
 	core->RedrawAll();
 	spritesPerFrame = 0;
 	return val;

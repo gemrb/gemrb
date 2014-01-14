@@ -25,17 +25,23 @@ namespace GemRB
 		PaletteKey() {}
 	};
 
-	typedef std::pair<GLuint, unsigned int> PaletteValue;
-
 	class GLPaletteManager
 	{
 		private:
-			std::map<PaletteKey, PaletteValue, PaletteKey> textures;
+
+			// sprite-owned palettes
+			std::map<PaletteKey, GLuint, PaletteKey> textures;
 			std::map<GLuint, PaletteKey> indexes;
+
+			// attached palettes
+			std::map<PaletteKey, GLuint, PaletteKey> a_textures;
+			std::map<GLuint, PaletteKey> a_indexes;
+
 		public:
-			GLuint CreatePaletteTexture(Palette* palette, unsigned int colorKey);
-			void RemovePaletteTexture(Palette* palette, unsigned int colorKey);
-			void RemovePaletteTexture(GLuint texture);
+			GLuint CreatePaletteTexture(Palette* palette, unsigned int colorKey, bool attached = false);
+			void RemovePaletteTexture(Palette* palette, unsigned int colorKey, bool attached = false);
+			void RemovePaletteTexture(GLuint texture, bool attached = false);
+			void ClearUnused(bool attached = false);
 			void Clear();
 			~GLPaletteManager();
 			GLPaletteManager();

@@ -24,10 +24,8 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 										Uint32 bmask, Uint32 amask) : Sprite2D(Width, Height, Bpp, pixels)
 {
 	currentPalette = NULL;
-	attachedPalette = NULL;
 	glTexture = 0;
 	glPaletteTexture = 0;
-	glAttachedPaletteTexture = 0;
 	glMaskTexture = 0;
 	colorKeyIndex = 0; // invalid index
 	rMask = rmask;
@@ -47,9 +45,7 @@ GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(ob
 	glTexture = 0;
 	glMaskTexture = 0;
 	glPaletteTexture = 0;
-	glAttachedPaletteTexture = 0;
 	currentPalette = NULL;
-	attachedPalette = NULL;
 	colorKeyIndex = obj.colorKeyIndex;
 	paletteManager = obj.paletteManager;
 	rMask = obj.rMask;
@@ -92,9 +88,7 @@ void GLTextureSprite2D::SetColorKey(ieDword index)
 	{
 		glDeleteTextures(1, &glMaskTexture);
 		if (glPaletteTexture != 0) paletteManager->RemovePaletteTexture(glPaletteTexture);
-		if (glAttachedPaletteTexture != 0) paletteManager->RemovePaletteTexture(glAttachedPaletteTexture);
 		glPaletteTexture = 0;
-		glAttachedPaletteTexture = 0;
 		glMaskTexture = 0;
 	}
 	else
@@ -198,31 +192,6 @@ GLuint GLTextureSprite2D::GetPaletteTexture()
 	return glPaletteTexture;
 }
 
-// use this method only for adding external palettes
-GLuint GLTextureSprite2D::GetAttachedPaletteTexture(Palette* attached)
-{
-	if (!IsPaletted()) return 0; 
-	// we already have a texture for requested palette
-	if (attached == attachedPalette && glAttachedPaletteTexture != 0) return glAttachedPaletteTexture;
-	attachedPalette = attached;
-	if(!attachedPalette->IsShared())
-	{
-		attachedPalette->acquire();
-	}
-	glAttachedPaletteTexture = paletteManager->CreatePaletteTexture(attachedPalette, colorKeyIndex);
-	return glAttachedPaletteTexture;
-}
-
-void GLTextureSprite2D::RemoveAttachedPaletteTexture()
-{
-	if (!attachedPalette->IsShared())
-	{
-		attachedPalette->release();
-	}
-	if (glAttachedPaletteTexture != 0) paletteManager->RemovePaletteTexture(glAttachedPaletteTexture);
-	glAttachedPaletteTexture = 0;
-}
-
 GLuint GLTextureSprite2D::GetMaskTexture()
 {
 	if (!IsPaletted()) return 0; // nothing to do
@@ -257,10 +226,5 @@ void GLTextureSprite2D::MakeUnused()
 	{
 		paletteManager->RemovePaletteTexture(glPaletteTexture);
 		glPaletteTexture = 0;
-	}
-	if (glAttachedPaletteTexture != 0)
-	{
-		paletteManager->RemovePaletteTexture(glAttachedPaletteTexture);
-		glAttachedPaletteTexture = 0;
 	}
 }

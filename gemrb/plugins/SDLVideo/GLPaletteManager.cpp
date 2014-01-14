@@ -12,10 +12,23 @@
 
 using namespace GemRB;
 
-GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int colorKey)
+GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int colorKey, bool attached)
 {
 	const PaletteKey key(palette, colorKey);
-	if (textures.find(key) == textures.end())
+	std::map<PaletteKey, GLuint, PaletteKey> *currentTextures;
+	std::map<GLuint, PaletteKey> *currentIndexes;
+	if (attached)
+	{
+		currentTextures = &a_textures;
+		currentIndexes = &a_indexes;
+	}
+	else
+	{
+		currentTextures = &textures;
+		currentIndexes = &indexes;
+	}
+
+	if (currentTextures->find(key) == currentTextures->end())
 	{
 		// not found, we need to create it
 		GLuint texture;
@@ -39,69 +52,126 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) colors);
 		delete[] colors;
-		PaletteValue value = std::make_pair(texture, 1);
-		textures.insert(std::make_pair(key, value));
-		indexes.insert(std::make_pair(texture, key));
+		palette->acquire();
+		currentTextures->insert(std::make_pair(key, texture));
+		currentIndexes->insert(std::make_pair(texture, key));
 	}
-	else
-	{
-		textures[key].second++;
-	}
-	return textures[key].first;
+	return currentTextures->at(key);
 }
 
-void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int colorKey)
+void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int colorKey, bool attached)
 {
 	const PaletteKey key(palette, colorKey);
-	if (textures.find(key) == textures.end())
+
+	std::map<PaletteKey, GLuint, PaletteKey> *currentTextures;
+	std::map<GLuint, PaletteKey> *currentIndexes;
+	if (attached)
+	{
+		currentTextures = &a_textures;
+		currentIndexes = &a_indexes;
+	}
+	else
+	{
+		currentTextures = &textures;
+		currentIndexes = &indexes;
+	}
+
+	if (currentTextures->find(key) == currentTextures->end())
 	{
 		// nothing found
 	}
 	else
 	{
-		if (textures[key].second > 1) 
+		if (!palette->IsShared())
 		{
-			textures[key].second--;
+			currentIndexes->erase(currentTextures->at(key));
+			glDeleteTextures(1, &(currentTextures->at(key)));
+			currentTextures->erase(key);
 		}
 		else
-		{
-			indexes.erase(textures[key].first);
-			glDeleteTextures(1, &(textures[key].first));
-			textures.erase(key);
-		}
+			palette->release();
 	}
 }
 
-void GLPaletteManager::RemovePaletteTexture(GLuint texture)
+void GLPaletteManager::RemovePaletteTexture(GLuint texture, bool attached)
 {
-	if (indexes.find(texture) == indexes.end())
+	std::map<PaletteKey, GLuint, PaletteKey> *currentTextures;
+	std::map<GLuint, PaletteKey> *currentIndexes;
+	if (attached)
+	{
+		currentTextures = &a_textures;
+		currentIndexes = &a_indexes;
+	}
+	else
+	{
+		currentTextures = &textures;
+		currentIndexes = &indexes;
+	}
+
+	if (currentIndexes->find(texture) == currentIndexes->end())
 	{
 		// nothing found
 	}
 	else
 	{
-		PaletteKey key = indexes[texture];
-		if (textures[key].second > 1) 
+		PaletteKey key = currentIndexes->at(texture);
+		if (!key.palette->IsShared())
 		{
-			textures[key].second--;
+			currentIndexes->erase(texture);
+			glDeleteTextures(1, &texture);
+			currentTextures->erase(key);
+		}
+		else
+			key.palette->release();
+	}
+}
+
+void GLPaletteManager::ClearUnused(bool attached)
+{
+	std::map<PaletteKey, GLuint, PaletteKey> *currentTextures;
+	std::map<GLuint, PaletteKey> *currentIndexes;
+	if (attached)
+	{
+		currentTextures = &a_textures;
+		currentIndexes = &a_indexes;
+	}
+	else
+	{
+		currentTextures = &textures;
+		currentIndexes = &indexes;
+	}
+	std::map<PaletteKey, GLuint, PaletteKey>::iterator it = currentTextures->begin();
+	while(it != currentTextures->end())
+	{
+		if (!it->first.palette->IsShared())
+		{
+			glDeleteTextures(1, &(currentTextures->at(it->first)));
+			currentIndexes->erase(it->second);
+			currentTextures->erase(it++);
 		}
 		else
 		{
-			indexes.erase(texture);
-			glDeleteTextures(1, &texture);
-			textures.erase(key);
+			it->first.palette->release();
+			++it;
 		}
 	}
 }
 
 void GLPaletteManager::Clear()
 {
-	for(std::map<PaletteKey, PaletteValue, PaletteKey>::iterator it = textures.begin(); it != textures.end(); ++it)
+	for(std::map<PaletteKey, GLuint, PaletteKey>::iterator it = textures.begin(); it != textures.end(); ++it)
 	{
-		glDeleteTextures(1, &(textures[it->first].first));
+		glDeleteTextures(1, &(textures[it->first]));
 	}
 	textures.clear();
 	indexes.clear();
+
+	for(std::map<PaletteKey, GLuint, PaletteKey>::iterator it = a_textures.begin(); it != a_textures.end(); ++it)
+	{
+		glDeleteTextures(1, &(a_textures[it->first]));
+	}
+	a_textures.clear();
+	a_indexes.clear();
 }
 
 
