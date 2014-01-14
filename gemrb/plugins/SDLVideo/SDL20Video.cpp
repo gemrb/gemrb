@@ -193,6 +193,7 @@ void SDL20VideoDriver::DestroyMovieScreen()
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 	// destroy any events that took place during the movies
 	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+	SDL_RenderClear(renderer); // I guess the videos can potentially be a larger size then the game.
 }
 
 void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
