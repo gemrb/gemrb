@@ -345,6 +345,7 @@ Sprite2D* GLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixel
 	spr->SetPaletteManager(paletteManager);
 	Palette* pal = new Palette(palette);
 	spr->SetPalette(pal);
+	pal->release();
 	if (cK) spr->SetColorKey(index);
 	return spr;
 }
@@ -592,12 +593,9 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 					flags |= BLIT_TINTED;
 					tint = *totint;
 				}
-				blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
 			}
-			else blitSprite(glSprite, tx, ty, clip, palette, flags);
 		}
-		else
-			blitSprite(glSprite, tx, ty, clip, palette, flags);
+		blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
 	}
 	else
 		blitSprite(glSprite, tx, ty, clip, palette, flags);

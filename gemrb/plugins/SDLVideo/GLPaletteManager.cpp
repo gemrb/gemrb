@@ -84,12 +84,11 @@ void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int color
 	{
 		if (!palette->IsShared())
 		{
+			palette->release();
 			currentIndexes->erase(currentTextures->at(key));
 			glDeleteTextures(1, &(currentTextures->at(key)));
 			currentTextures->erase(key);
 		}
-		else
-			palette->release();
 	}
 }
 
@@ -117,12 +116,11 @@ void GLPaletteManager::RemovePaletteTexture(GLuint texture, bool attached)
 		PaletteKey key = currentIndexes->at(texture);
 		if (!key.palette->IsShared())
 		{
+			key.palette->release();
 			currentIndexes->erase(texture);
 			glDeleteTextures(1, &texture);
 			currentTextures->erase(key);
 		}
-		else
-			key.palette->release();
 	}
 }
 
@@ -145,13 +143,13 @@ void GLPaletteManager::ClearUnused(bool attached)
 	{
 		if (!it->first.palette->IsShared())
 		{
+			it->first.palette->release();
 			glDeleteTextures(1, &(currentTextures->at(it->first)));
 			currentIndexes->erase(it->second);
 			currentTextures->erase(it++);
 		}
 		else
 		{
-			it->first.palette->release();
 			++it;
 		}
 	}
@@ -161,6 +159,7 @@ void GLPaletteManager::Clear()
 {
 	for(std::map<PaletteKey, GLuint, PaletteKey>::iterator it = textures.begin(); it != textures.end(); ++it)
 	{
+		it->first.palette->release();
 		glDeleteTextures(1, &(textures[it->first]));
 	}
 	textures.clear();
@@ -168,6 +167,7 @@ void GLPaletteManager::Clear()
 
 	for(std::map<PaletteKey, GLuint, PaletteKey>::iterator it = a_textures.begin(); it != a_textures.end(); ++it)
 	{
+		it->first.palette->release();
 		glDeleteTextures(1, &(a_textures[it->first]));
 	}
 	a_textures.clear();

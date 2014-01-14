@@ -36,6 +36,8 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 
 GLTextureSprite2D::~GLTextureSprite2D()
 {
+	if (currentPalette != NULL)
+		currentPalette->release();
 	MakeUnused();
 }
 
