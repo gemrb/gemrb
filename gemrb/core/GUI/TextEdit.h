@@ -87,7 +87,7 @@ private:
 	/** Client area position */
 	unsigned short FontPosX, FontPosY;
 	/** Text Buffer */
-	unsigned char* Buffer;
+	String Text;
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** Color Palette */
