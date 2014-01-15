@@ -138,9 +138,12 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
-const char* Label::QueryText() const
+const String& Label::QueryText() const
 {
+	return Control::QueryText();
+/*
 	return ( const char * ) Buffer;
+*/
 }
 
 }

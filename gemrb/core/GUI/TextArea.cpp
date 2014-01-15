@@ -958,12 +958,15 @@ void TextArea::SelectText(const char *select)
 	}
 }
 
-const char* TextArea::QueryText() const
+const String& TextArea::QueryText() const
 {
+	return Control::QueryText();
+	/*
 	if ( Value<lines.size() ) {
 		return ( const char * ) lines[Value];
 	}
 	return "";
+	 */
 }
 
 bool TextArea::SetEvent(int eventType, EventHandler handler)

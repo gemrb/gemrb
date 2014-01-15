@@ -1345,7 +1345,7 @@ static PyObject* GemRB_Window_HasControl(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
 "QueryText(WindowIndex, ControlIndex) => string\n\n"
-"Returns the Text of a TextEdit control." );
+"Returns the Text of a control." );
 
 static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 {
@@ -1359,7 +1359,9 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	return PyString_FromString(ctrl->QueryText());
+	char* cStr = MBCStringFromString(ctrl->QueryText());
+	return PyString_FromString(cStr);
+	free(cStr);
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,

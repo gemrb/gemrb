@@ -69,7 +69,7 @@ public:
 	/** Sets the Text of the current control */
 	void SetText(const char* string);
 	/** Gets the Text of the current control */
-	const char* QueryText() const;
+	const String& QueryText() const;
 	/** Sets the buffer length */
 	void SetBufferLength(ieWord buflen);
 	/** Sets the alignment */

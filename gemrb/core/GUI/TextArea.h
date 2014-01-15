@@ -119,7 +119,7 @@ public:
 	/** Copies the current TextArea content to another TextArea control */
 	void CopyTo(TextArea* ta);
 	/** Returns the selected text */
-	const char* QueryText() const;
+	const String& QueryText() const;
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	int SetScrollBar(Control *ptr);
