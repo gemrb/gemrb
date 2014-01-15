@@ -76,7 +76,7 @@ public:
 	EventHandler LabelOnPress;
 private: // Private attributes
 	/** Text String Buffer */
-	char* Buffer;
+	String* Text;
 	/** Font for Text Writing */
 	Font* font;
 	/** Foreground & Background Colors */
