@@ -50,7 +50,7 @@ Button::Button(Region& frame)
 	ResetEventHandler( MouseEnterButton );
 	ResetEventHandler( MouseLeaveButton );
 	ResetEventHandler( MouseOverButton );
-	//Text = ( char * ) calloc( 64, sizeof(char) );
+
 	Text = NULL;
 	hasText = false;
 	font = core->GetButtonFont();
@@ -78,9 +78,8 @@ Button::~Button()
 	SetImage(BUTTON_IMAGE_NONE, NULL);
 	video->FreeSprite( Picture );
 	ClearPictureList();
-	if (Text) {
-		free( Text );
-	}
+
+	delete Text;
 	gamedata->FreePalette( normal_palette);
 	gamedata->FreePalette( disabled_palette);
 }
@@ -315,7 +314,7 @@ void Button::DrawInternal(Region& rgn)
 			r = Region( rgn.x, rgn.y, rgn.w - 2, rgn.h - 2);
 		}
 
-		font->Print( r, ( unsigned char * ) Text, ppoi, (ieByte) align, true );
+		font->Print( r, *Text, ppoi, (ieByte) align, true );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
@@ -615,18 +614,16 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 /** Sets the Text of the current control */
 void Button::SetText(const char* string)
 {
-	free(Text);
-	Text = NULL;
-	if (string == NULL) {
+	delete Text;
+	if (string == NULL || !string[0]) {
 		hasText = false;
-	} else if (string[0] == 0) {
-		hasText = false;
+		Text = NULL;
 	} else {
-		Text = strndup( string, 255 );
+		Text = StringFromCString(string);
 		if (Flags&IE_GUI_BUTTON_LOWERCASE)
-			strtolower( Text );
+			StringToLower( *Text );
 		else if (Flags&IE_GUI_BUTTON_CAPS)
-			strtoupper( Text );
+			StringToUpper( *Text );
 		hasText = true;
 	}
 	MarkDirty();

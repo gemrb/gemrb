@@ -199,7 +199,7 @@ public: // Public Events
 	/** Set offset pictures and label move when button is pressed */
 	void SetPushOffset(ieWord x, ieWord y);
 private: // Private attributes
-	char* Text;
+	String* Text;
 	bool hasText;
 	Font* font;
 	bool ToggleState;
