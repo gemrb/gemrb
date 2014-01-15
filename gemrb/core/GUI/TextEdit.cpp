@@ -69,8 +69,9 @@ void TextEdit::SetAlignment(unsigned char Alignment)
 void TextEdit::DrawInternal(Region& rgn)
 {
 	ieWord yOff = FontPosY;
+	Video* video = core->GetVideoDriver();
 	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, rgn.x, rgn.y, true );
+		video->BlitSprite( Back, rgn.x, rgn.y, true );
 		if (yOff) yOff += Back->Height;
 	}
 	if (!font)
@@ -79,10 +80,18 @@ void TextEdit::DrawInternal(Region& rgn)
 	// FIXME: we should clip text to the background right?
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
-		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ), Text,
-				palette, Alignment, true );
-		// TODO: draw the cursor by printing everything before the cursor
-		// then draw the cursor, then draw everything after the cursor
+		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ),
+					Text, palette, Alignment, true );
+		int w = font->CalcStringWidth(Text.substr(0, CurPos));
+		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
+		if (w > rgn.w) {
+			int rows = (w / rgn.w);
+			vcenter += rows * font->maxHeight;
+			w = w - (rgn.w * rows);
+		}
+		// FIXME: font is still stupid and forces IE_FONT_PADDING
+		video->BlitSprite(Cursor, w + rgn.x + IE_FONT_PADDING + FontPosX,
+						  FontPosY + vcenter + rgn.y, true);
 	} else {
 		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,
 				palette, Alignment, true );
