@@ -3312,11 +3312,11 @@ void Interface::DrawTooltip ()
 	if (!fnt) {
 		return;
 	}
-	char *tooltip_text = tooltip_ctrl->Tooltip;
+	String* tooltip_text = tooltip_ctrl->Tooltip;
 
 	int w1 = 0;
 	int w2 = 0;
-	int strw = fnt->CalcStringWidth( (unsigned char*)tooltip_text ) + 8;
+	int strw = fnt->CalcStringWidth( *tooltip_text ) + 8;
 	int w = strw;
 	int h = fnt->maxHeight;
 
@@ -3376,7 +3376,7 @@ void Interface::DrawTooltip ()
 		strx += TooltipMargin;
 	}
 	Region textr = Region( strx, y, strw, h );
-	fnt->Print( r2, textr, (ieByte *) tooltip_text, NULL,
+	fnt->Print( r2, textr, *tooltip_text, NULL,
 		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
 }
 

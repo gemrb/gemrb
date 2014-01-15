@@ -113,7 +113,7 @@ public: // Public attributes
 	ieByte ControlType;
 	/** Text to display as a tooltip when the mouse cursor hovers
 	 * for some time over the control */
-	char* Tooltip;
+	String* Tooltip;
 	/** True if we are currently in an event handler */
 	bool InHandler;
 	/** Owner Window */
