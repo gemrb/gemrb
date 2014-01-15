@@ -1133,7 +1133,8 @@ void Interface::Main()
 	Font* fps = GetFont( ( unsigned int ) 0 );
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	const Region fpsRgn( 0, Height - 30, 100, 30 );
-	char fpsstring[40]={"???.??? fps"};
+	wchar_t fpsstring[20] = {L"???.??? fps"};
+
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
 	double frames = 0.0;
@@ -1159,12 +1160,11 @@ void Interface::Main()
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
-				sprintf( fpsstring, "%.3f fps", frames );
+				swprintf(fpsstring, sizeof(fpsstring), L"%.3f fps", frames);
 			}
 			video->DrawRect( fpsRgn, ColorBlack );
-			fps->Print( fpsRgn,
-				( unsigned char * ) fpsstring, palette,
-				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
+			fps->Print( fpsRgn, String(fpsstring), palette,
+					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
 		if (TickHook)
 			TickHook->call();
