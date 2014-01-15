@@ -51,6 +51,9 @@ def OnLoad():
 		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
 		PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	else:
+		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
+
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow (3)
 	QuitTextArea = QuitWindow.GetControl (0)

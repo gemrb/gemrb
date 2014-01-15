@@ -193,6 +193,10 @@ GA_NO_ENEMY   = 512
 GA_NO_NEUTRAL = 1024
 GA_NO_SELF    = 2048
 
+# Game features, for Interface::SetFeatures()
+# Defined in globals.h
+GF_ALL_STRINGS_TAGGED = 1
+
 # Shadow color for ShowModal()
 # !!! Keep these synchronized with Interface.h !!!
 MODAL_SHADOW_NONE = 0
