@@ -142,7 +142,8 @@ public:
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
-	void SetText(const char* string);
+	using Control::SetText;
+	void SetText(const String& string);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
 	/** Clears the list of Pictures */
@@ -199,7 +200,7 @@ public: // Public Events
 	/** Set offset pictures and label move when button is pressed */
 	void SetPushOffset(ieWord x, ieWord y);
 private: // Private attributes
-	String* Text;
+	String Text;
 	bool hasText;
 	Font* font;
 	bool ToggleState;

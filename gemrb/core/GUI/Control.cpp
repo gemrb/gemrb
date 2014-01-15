@@ -120,6 +120,15 @@ void Control::Draw(unsigned short x, unsigned short y)
 	Changed = false; // set *after* calling DrawInternal
 }
 
+void Control::SetText(const char* string)
+{
+	if (string) {
+		String* s = StringFromCString(string);
+		SetText(*s);
+		delete s;
+	}
+}
+
 /** Sets the Tooltip text of the current control */
 int Control::SetTooltip(const char* string)
 {
@@ -146,10 +155,6 @@ void Control::DisplayTooltip()
 void Control::ResetEventHandler(EventHandler &handler)
 {
 	handler = NULL;
-}
-
-void Control::SetText(const char* /*string*/)
-{
 }
 
 //return -1 if there is an error

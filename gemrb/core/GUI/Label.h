@@ -55,7 +55,8 @@ public:
 	Label(const Region& frame, Font* font, const char* string);
 	~Label();
 	/** This function sets the actual Label Text */
-	void SetText(const char* string);
+	using Control::SetText;
+	void SetText(const String& string);
 	/** Sets the Foreground Font Color */
 	void SetColor(Color col, Color bac);
 	/** Set the font being used */
@@ -76,7 +77,7 @@ public:
 	EventHandler LabelOnPress;
 private: // Private attributes
 	/** Text String Buffer */
-	String* Text;
+	String Text;
 	/** Font for Text Writing */
 	Font* font;
 	/** Foreground & Background Colors */

@@ -75,6 +75,7 @@ public:
 	/** Sets the Actual Text */
 	void SetText(const char* text);
 	/** Sets text */
+	using Control::SetText;
 	void SetText(const std::vector<char*>& text);
 	/** Clears the textarea */
 	void Clear();

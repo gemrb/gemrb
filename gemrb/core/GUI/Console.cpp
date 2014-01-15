@@ -91,11 +91,9 @@ void Console::SetBackGround(Sprite2D* back)
 	Back = back;
 }
 /** Sets the Text of the current control */
-void Console::SetText(const char* string)
+void Console::SetText(const String& string)
 {
-	// FIXME: we don't use this method, but if we did this assignment is insufficient
-	// in the future the signature will change to String and it will work.
-	Buffer = *string;
+	Buffer = string;
 }
 /** Key Press Event */
 bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)

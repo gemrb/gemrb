@@ -41,20 +41,18 @@ Label::Label(const Region& frame, Font* font, const char* string)
 
 	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
 	palette = NULL;
-	Text = NULL;
-	SetText(string);
+	Control::SetText(string);
 }
 
 Label::~Label()
 {
-	delete Text;
 	gamedata->FreePalette( palette );
 }
 /** Draws the Control on the Output Display */
 void Label::DrawInternal(Region& rgn)
 {
-	if (font && Text->length()) {
-		font->Print( rgn, *Text,
+	if (font && Text.length()) {
+		font->Print( rgn, Text,
 			useRGB?palette:NULL,
 					 Alignment | IE_FONT_SINGLE_LINE, true );
 	}
@@ -68,13 +66,12 @@ void Label::DrawInternal(Region& rgn)
 
 }
 /** This function sets the actual Label Text */
-void Label::SetText(const char* string)
+void Label::SetText(const String& string)
 {
-	delete Text;
-	Text = StringFromCString(string);
+	Text = string;
 	if (Alignment == IE_FONT_ALIGN_CENTER
 		&& core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-		StringToLower(*Text);
+		StringToLower(Text);
 	}
 	if (!palette) {
 		SetColor(ColorWhite, ColorBlack);
@@ -94,7 +91,7 @@ void Label::SetAlignment(unsigned char Alignment)
 	this->Alignment = Alignment;
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			StringToLower(*Text);
+			StringToLower(Text);
 		}
 	}
 	MarkDirty();
@@ -130,9 +127,7 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 /** Simply returns the pointer to the text, don't modify it! */
 const String& Label::QueryText() const
 {
-	if (Text)
-		return *Text;
-	return Control::QueryText();
+	return Text;
 }
 
 }
