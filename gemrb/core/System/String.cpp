@@ -34,6 +34,7 @@ namespace GemRB {
 
 String* StringFromEncodedData(const ieByte* string, bool multibyte, bool utf8)
 {
+	if (!string) return NULL;
 	// i know these params are strange
 	// but utf8 implies multibyte
 	multibyte = (utf8) ? true : multibyte;
@@ -96,6 +97,8 @@ String* StringFromEncodedData(const ieByte* string, bool multibyte, bool utf8)
 
 String* StringFromCString(const char* string)
 {
+	// TODO: determine multibyte/utf8 parameters from TLK encoding
+
 	// basic expansion of cstring to 2 bytes
 	// the only reason this is special, is because it allows characters 128-256.
 	return StringFromEncodedData((ieByte*)string, false, false);
@@ -104,6 +107,16 @@ String* StringFromCString(const char* string)
 String* StringFromMBEncodedData(const ieByte* data, bool utf8)
 {
 	return StringFromEncodedData(data, true, utf8);
+}
+
+char* MBCStringFromString(const String& string)
+{
+	char* cStr = (char*)malloc(string.length()+1);
+	// FIXME: depends on locale setting
+	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
+	size_t newlen = wcstombs(cStr, string.c_str(), string.length());
+	cStr = (char*)realloc(cStr, newlen);
+	return cStr;
 }
 
 unsigned char pl_uppercase[256];

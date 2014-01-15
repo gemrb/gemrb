@@ -42,6 +42,8 @@ typedef std::wstring String;
 GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT String* StringFromMBEncodedData(const ieByte* data, bool utf8 = false);
 
+GEM_EXPORT char* MBCStringFromString(const String& string);
+
 // String manipulators
 GEM_EXPORT void StringToLower(String& string);
 GEM_EXPORT void StringToUpper(String& string);
