@@ -106,16 +106,9 @@ public:
 
 	/** Returns width of the string rendered in this font in pixels */
 	size_t CalcStringWidth(const String) const;
-	size_t CalcStringWidth(const char* string) const;
-	void SetupString(ieWord* string, unsigned int width) const;
-	size_t GetDoubleByteString(const char* string, ieWord* &dbString) const;
+	size_t CalcStringHeight(const String) const;
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
-private:
-	size_t CalcStringWidth(const ieWord* string) const;
-	size_t CalcStringHeight(const String) const;
-	size_t CalcStringHeight(const ieWord* string) const;
-	static size_t dbStrLen(const ieWord* string);
 };
 
 }
