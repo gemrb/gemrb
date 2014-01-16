@@ -614,7 +614,7 @@ void GameControl::DrawInternal(Region& screen)
 	}
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
-		core->GetFont(1)->Print(screen, (unsigned char *)DisplayText, core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+		core->GetFont(1)->Print(screen, DisplayText, core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
 		if (update_scripts) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {

@@ -277,8 +277,8 @@ void Scriptable::DrawOverheadText(const Region &screen)
 	}
 
 	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
-	font->Print( rgn, ( unsigned char * ) overHeadText,
-		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
+	font->Print( rgn, overHeadText, palette?palette:core->InfoTextPalette,
+				IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
 	gamedata->FreePalette(palette);
 }
 

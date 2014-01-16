@@ -94,9 +94,9 @@ public:
 
 	// Printing methods
 	// return the number of glyphs printed
-	size_t Print(Region cliprgn, Region rgn, const unsigned char* string,
+	size_t Print(Region cliprgn, Region rgn, const char* string,
 		Palette* color, ieByte Alignment, bool anchor = false) const;
-	size_t Print(Region rgn, const unsigned char* string, Palette* color,
+	size_t Print(Region rgn, const char* string, Palette* color,
 		ieByte Alignment, bool anchor = false) const;
 
 	size_t Print(Region cliprgn, Region rgn, const String& string, Palette* color,
@@ -106,9 +106,9 @@ public:
 
 	/** Returns width of the string rendered in this font in pixels */
 	size_t CalcStringWidth(const String) const;
-	size_t CalcStringWidth(const unsigned char* string) const;
+	size_t CalcStringWidth(const char* string) const;
 	void SetupString(ieWord* string, unsigned int width) const;
-	size_t GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const;
+	size_t GetDoubleByteString(const char* string, ieWord* &dbString) const;
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 private:

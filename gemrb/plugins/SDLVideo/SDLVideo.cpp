@@ -1485,7 +1485,7 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		backBuf = disp;
 
 		//FYI: that 0 is pitch black
-		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
+		subtitlefont->Print(subtitleregion, subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 		backBuf = temp;
 	}
 }

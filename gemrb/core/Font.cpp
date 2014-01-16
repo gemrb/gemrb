@@ -138,7 +138,7 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 	return canvas;
 }
 
-size_t Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
+size_t Font::Print(Region rgn, const char* string, Palette* hicolor,
 	ieByte Alignment, bool anchor) const
 {
 	Region cliprgn = rgn;
@@ -150,7 +150,7 @@ size_t Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	return Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
 }
 
-size_t Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
+size_t Font::Print(Region cliprgn, Region rgn, const char* string,
 	Palette* hicolor, ieByte Alignment, bool anchor) const
 {
 	unsigned int psx = IE_FONT_PADDING;
@@ -338,7 +338,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 	return i;
 }
 
-size_t Font::CalcStringWidth(const unsigned char* string) const
+size_t Font::CalcStringWidth(const char* string) const
 {
 	ieWord* tmp = NULL;
 	GetDoubleByteString(string, tmp);
@@ -444,7 +444,7 @@ void Font::SetupString(ieWord* string, unsigned int width) const
 }
 
 // FIXME: remove method after transition to sanity
-size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const
+size_t Font::GetDoubleByteString(const char* string, ieWord* &dbString) const
 {
 	size_t len = strlen((char*)string);
 	dbString = (ieWord*)malloc((len+1) * sizeof(ieWord));

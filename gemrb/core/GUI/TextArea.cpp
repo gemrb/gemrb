@@ -231,7 +231,7 @@ void TextArea::DrawInternal(Region& clip)
 			}
 		}
 
-		ftext->Print(textClip, ( unsigned char * )&Buffer[bufPos],
+		ftext->Print(textClip, &Buffer[bufPos],
 					 palette, IE_FONT_ALIGN_LEFT, true);
 
 		// TODO: draw the cursor by printing everything before the cursor
@@ -301,8 +301,7 @@ void TextArea::DrawInternal(Region& clip)
 			}
 		}
 
-		ftext->Print(clip, (unsigned char*)&lines[i][bufPos],
-					 pal, IE_FONT_ALIGN_LEFT, true);
+		ftext->Print(clip, &lines[i][bufPos], pal, IE_FONT_ALIGN_LEFT, true);
 		yl = ftext->maxHeight * (lrows[i]-sr);
 		clip.y+=yl;
 		clip.h-=yl;
@@ -316,8 +315,7 @@ void TextArea::DrawInternal(Region& clip)
 			pal = lineselpal;
 		else
 			pal = palette;
-		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
-			IE_FONT_ALIGN_LEFT, true );
+		ftext->Print( clip, lines[i], pal, IE_FONT_ALIGN_LEFT, true );
 		yl = ftext->maxHeight * lrows[i];
 		clip.y+=yl;
 		clip.h-=yl;
