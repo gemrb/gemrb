@@ -28,6 +28,8 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
+#include <sstream>
+
 namespace GemRB {
 
 Font::Font()
@@ -171,7 +173,6 @@ size_t Font::Print(Region rgn, const String& string, Palette* hicolor,
 	return Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
 }
 
-// FIXME: this is an functionaly incomplete copy of its predecessor
 size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* color,
 				   ieByte Alignment, bool anchor) const
 {
@@ -181,23 +182,14 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 		pal = palette;
 	}
 
-	size_t len = string.length();
 	int ystep = maxHeight;
 	int x = psx, y = ystep;
 	Video* video = core->GetVideoDriver();
 
-	if (Alignment & IE_FONT_ALIGN_CENTER) {
-		size_t w = CalcStringWidth( string );
-		x = ( rgn.w - w ) / 2;
-	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
-		size_t w = CalcStringWidth( string );
-		x = ( rgn.w - w ) - IE_FONT_PADDING;
-	}
-
 	if (Alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
 		int h = 0;
-		for (size_t i = 0; i <= len; i++) {
-			if (string[i] == '\n')
+		for (size_t i = 0; i <= string.length(); i++) {
+			if (string[i] == L'\n')
 				h++;
 		}
 		h = h * ystep;
@@ -210,45 +202,91 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 		y += IE_FONT_PADDING;
 	}
 
-	ieWord currChar = '\0';
+	// is this horribly inefficient?
+	std::wistringstream stream(string);
+	String line, word;
 	const Sprite2D* currGlyph = NULL;
-	size_t i;
-	for (i = 0; i < len; i++) {
-		if (string[i] == 0) {
-			y += ystep;
+	bool done = false, lineBreak = false;
+	size_t charCount = 0;
+
+	while (!done && (lineBreak || getline(stream, line))) {
+		lineBreak = false;
+
+		std::wistringstream lineStream(line);
+
+		size_t lineW = CalcStringWidth(line);
+		if (Alignment & IE_FONT_ALIGN_CENTER) {
+			x = ( rgn.w - lineW ) / 2;
+		} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+			x = ( rgn.w - lineW ) - IE_FONT_PADDING;
+		} else {
 			x = psx;
-			size_t w = CalcStringWidth( &string[i + 1] );
-			if (Alignment & IE_FONT_ALIGN_CENTER) {
-				x = ( rgn.w - w ) / 2;
-			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
-				x = ( rgn.w - w );
+		}
+
+		size_t lineLen = line.length();
+		if (lineLen) {
+			size_t linePos = 0, wordBreak = 0;
+			while (!lineBreak && (wordBreak = line.find_first_of(L' ', linePos))) {
+				if (wordBreak == String::npos) {
+					word = line.substr(linePos);
+				} else {
+					word = line.substr(linePos, wordBreak - linePos);
+				}
+
+				if (!(Alignment&IE_FONT_SINGLE_LINE)) {
+					if (word == line) {
+						Log(WARNING, "Font", "Printing beyond boundary because a word is wider than %d", rgn.w);
+					} else if (x + (int)CalcStringWidth(word) > rgn.w) {
+						// wrap to new line
+						lineBreak = true;
+						line = line.substr(linePos);
+					}
+				}
+
+				if (!lineBreak) {
+					// print the word
+					wchar_t currChar = '\0';
+					size_t i;
+					for (i = 0; i < word.length(); i++) {
+						// process glyphs in word
+						currChar = word[i];
+						if (currChar == '\r') {
+							continue;
+						}
+						if (i > 0) { // kerning
+							x -= GetKerningOffset(word[i-1], currChar);
+						}
+						currGlyph = GetCharSprite(currChar);
+						if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
+												 y + rgn.y - currGlyph->YPos)) {
+							done = true;
+							break;
+						}
+						video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, pal);
+
+						x += currGlyph->Width;
+					}
+					x += GetCharSprite(' ')->Width;
+					linePos += i + 1;
+					charCount += i + 1;
+				}
+				if (wordBreak == String::npos) break;
 			}
-			continue;
-		}
-		currChar = string[i];
-		currGlyph = GetCharSprite(currChar);
-
-		if (i > 0) {
-			// kerning
-			x -= GetKerningOffset(string[i-1], currChar);
 		}
 
-		if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
-								 y + rgn.y - currGlyph->YPos)) {
-			break;
-		}
-		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, color);
-
-		x += currGlyph->Width;
+		if (!lineBreak && !stream.eof())
+			charCount++; // for the newline
+		y += ystep;
 	}
-
-	return i;
+	//assert(charCount <= string.length());
+	return charCount;
 }
 
 size_t Font::CalcStringWidth(const String string) const
 {
 	size_t ret = 0, len = string.length();
 	for (size_t i = 0; i < len; i++) {
+		if (string[i] == L'\n') break;
 		ret += GetCharSprite(string[i])->Width;
 	}
 	return ret;
