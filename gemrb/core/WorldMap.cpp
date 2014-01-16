@@ -41,9 +41,7 @@ WMPAreaEntry::WMPAreaEntry()
 
 WMPAreaEntry::~WMPAreaEntry()
 {
-	if (StrCaption) {
-		core->FreeString(StrCaption);
-	}
+	delete StrCaption;
 	if (StrTooltip) {
 		core->FreeString(StrTooltip);
 	}
@@ -62,10 +60,12 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 	core->GetVideoDriver()->FreeSprite(MapIcon);
 }
 
-const char* WMPAreaEntry::GetCaption()
+const String* WMPAreaEntry::GetCaption()
 {
 	if (!StrCaption) {
-		StrCaption = core->GetString(LocCaptionName);
+		char* tmp = core->GetString(LocCaptionName);
+		StrCaption = StringFromCString(tmp);
+		free(tmp);
 	}
 	return StrCaption;
 }
