@@ -187,12 +187,12 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 	Video* video = core->GetVideoDriver();
 
 	if (Alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
-		int h = 0;
+		int lc = 1;
 		for (size_t i = 0; i <= string.length(); i++) {
 			if (string[i] == L'\n')
-				h++;
+				lc++;
 		}
-		h = h * ystep;
+		int h = lc * ystep;
 		if (Alignment & IE_FONT_ALIGN_MIDDLE) {
 			y += ( rgn.h - h ) / 2;
 		} else {
