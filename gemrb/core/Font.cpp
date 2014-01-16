@@ -182,7 +182,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 		pal = palette;
 	}
 
-	int ystep = maxHeight;
+	int ystep = CalcStringHeight(string);
 	int x = psx, y = ystep;
 	Video* video = core->GetVideoDriver();
 
@@ -296,6 +296,10 @@ size_t Font::CalcStringHeight(const String string) const
 {
 	size_t h = 0, max = 0, len = string.length();
 	for (size_t i = 0; i < len; i++) {
+		if (string[i] == L'\n') { // multiline string, use line height
+			max = maxHeight;
+			break;
+		}
 		h = GetCharSprite(string[i])->Height;
 		//the space check is here to hack around overly high frames
 		//in some bg1 fonts that throw vertical alignment off
