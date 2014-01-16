@@ -181,11 +181,8 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 		pal = palette;
 	}
 
-	Holder<Palette> blitPalette = pal;
 	size_t len = string.length();
-
 	int ystep = maxHeight;
-
 	int x = psx, y = ystep;
 	Video* video = core->GetVideoDriver();
 
@@ -244,12 +241,11 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 								 y + rgn.y - currGlyph->YPos)) {
 			break;
 		}
-		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, blitPalette.get());
+		video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, color);
 
 		x += currGlyph->Width;
 	}
 
-	blitPalette = NULL;
 	return i;
 }
 
