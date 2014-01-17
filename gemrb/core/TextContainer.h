@@ -20,11 +20,9 @@
 #define TEXTCONTAINER_H
 
 #include "Region.h"
+#include "System/String.h"
 
 #include <list>
-#include <string>
-
-typedef std::string String;
 
 namespace GemRB {
 
@@ -36,12 +34,12 @@ class TextSpan
 private:
 	String text;
 	Font* font;
-	Palette* pal;
+	Palette* palette;
 public:
 	// construct a "inline" span that calculates its own region based on font, palette, and string
-	TextSpan(const String& string, const Font* font, const Palette* pal);
+	TextSpan(const String& string, Font* font, Palette* pal);
 	// construct a "block" span with dimentions determined by rgn
-	TextSpan(const String& string, const Font* font, const Palette* pal, const Region& rgn);
+	TextSpan(const String& string, Font* font, Palette* pal, const Region& rgn);
 	~TextSpan();
 };
 
@@ -52,7 +50,7 @@ class TextContainer
 	Font* font;
 	Palette* pallete;
 public:
-	TextContainer(Region& frame, const Font* font, const Palette* pal);
+	TextContainer(Region& frame, Font* font, Palette* pal);
 	~TextContainer();
 
 	// Creates a basic "inline" span using the containers font/palette

@@ -20,17 +20,61 @@
 
 #include "Font.h"
 #include "Palette.h"
+#include "System/String.h"
 
 namespace GemRB {
 
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
+	: text(string)
+{
+	font = fnt;
+
+	pal->acquire();
+	palette = pal;
+}
+
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Region& /*rgn*/)
+	: text(string)
+{
+	font = fnt;
+
+	pal->acquire();
+	palette = pal;
+}
+
+
+
 TextSpan::~TextSpan()
 {
+	palette->release();
+}
+
+
+TextContainer::TextContainer(Region& frame, Font* font, Palette* pal)
+	: frame(frame), font(font)
+{
+	pal->acquire();
+	pallete = pal;
 
 }
 
 TextContainer::~TextContainer()
 {
+	std::list<TextSpan*>::iterator it = spans.begin();
+	for (; it != spans.end(); ++it) {
+		delete *it;
+	}
+	pallete->release();
+}
 
+void TextContainer::AppendText(const String& text)
+{
+	AppendSpan(new TextSpan(text, font, pallete));
+}
+
+void TextContainer::AppendSpan(TextSpan* span)
+{
+	spans.push_back(span);
 }
 
 }
