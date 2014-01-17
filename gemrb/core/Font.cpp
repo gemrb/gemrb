@@ -288,6 +288,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 			charCount++; // for the newline
 		y += ystep;
 	}
+	// FIXME: charCount appears to sometimes be off by 1...
 	//assert(charCount <= string.length());
 	return charCount;
 }
@@ -296,6 +297,7 @@ size_t Font::CalcStringWidth(const String string) const
 {
 	size_t ret = 0, len = string.length();
 	for (size_t i = 0; i < len; i++) {
+		// FIXME: should we be using the longest line instead?
 		if (string[i] == L'\n') break;
 		ret += GetCharSprite(string[i])->Width;
 	}
