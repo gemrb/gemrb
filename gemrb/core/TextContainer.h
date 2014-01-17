@@ -45,6 +45,7 @@ public:
 	TextSpan(const String& string, Font* font, Palette* pal, const Region& rgn);
 	~TextSpan();
 
+	const Region& SpanFrame() const {return frame;}
 	const Sprite2D* RenderedSpan();
 private:
 	void RenderSpan();
@@ -64,6 +65,9 @@ public:
 	// Creates a basic "inline" span using the containers font/palette
 	void AppendText(const String& text);
 	void AppendSpan(TextSpan* span);
+
+	const TextSpan* SpanAtPoint(const Point& p);
+	void Draw();
 };
 
 }
