@@ -154,7 +154,7 @@ private:
 	unsigned long AIUpdateCounter;
 	int ScreenFlags;
 	int DialogueFlags;
-	char *DisplayText;
+	String* DisplayText;
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
 public: //Events

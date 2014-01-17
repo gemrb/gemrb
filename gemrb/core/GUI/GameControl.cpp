@@ -253,9 +253,7 @@ GameControl::~GameControl(void)
 		formations = NULL;
 	}
 	delete dialoghandler;
-	if (DisplayText) {
-		core->FreeString(DisplayText);
-	}
+	delete DisplayText;
 }
 
 // ArrowSprite cycles
@@ -614,7 +612,7 @@ void GameControl::DrawInternal(Region& screen)
 	}
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
-		core->GetFont(1)->Print(screen, DisplayText, core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+		core->GetFont(1)->Print(screen, *DisplayText, core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
 		if (update_scripts) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {
@@ -2662,11 +2660,10 @@ bool GameControl::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 
 void GameControl::SetDisplayText(char *text, unsigned int time)
 {
-	if (DisplayText) {
-		core->FreeString(DisplayText);
-	}
+	delete DisplayText;
 	DisplayTextTime = time;
-	DisplayText = text;
+	DisplayText = StringFromCString(text);
+	free(text);
 }
 
 void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
