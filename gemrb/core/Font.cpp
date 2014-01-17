@@ -234,12 +234,19 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 				}
 
 				if (!(Alignment&IE_FONT_SINGLE_LINE)) {
-					if (word == line) {
-						Log(WARNING, "Font", "Printing beyond boundary because a word is wider than %d", rgn.w);
-					} else if (x + (int)CalcStringWidth(word) > rgn.w) {
-						// wrap to new line
-						lineBreak = true;
-						line = line.substr(linePos);
+					int wordW = CalcStringWidth(word);
+					if (x + wordW > rgn.w) {
+						if (word == line) {
+							// this occurs when a line is a single word, but the word is wider then the region
+#if DEBUG_FONT
+							// needs to be ifdefed, because it naturally happens with portrait icons
+							Log(WARNING, "Font", "Printing beyond boundary because a word is wider than %d", rgn.w);
+#endif
+						} else {
+							// wrap to new line
+							lineBreak = true;
+							line = line.substr(linePos);
+						}
 					}
 				}
 
@@ -259,6 +266,9 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 						currGlyph = GetCharSprite(currChar);
 						if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
 												 y + rgn.y - currGlyph->YPos)) {
+							// FIXME: this doesnt cope with cases when a line should be blitted
+							// beyond the edge of its region because following lines
+							// will fall within the region. AFIK this doesnt happen naturally
 							done = true;
 							break;
 						}
