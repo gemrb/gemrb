@@ -28,19 +28,26 @@ namespace GemRB {
 
 class Font;
 class Palette;
+class Sprite2D;
 
 class TextSpan
 {
 private:
 	String text;
 	Font* font;
+	Region frame;
 	Palette* palette;
+	Sprite2D* spanSprite;
 public:
 	// construct a "inline" span that calculates its own region based on font, palette, and string
 	TextSpan(const String& string, Font* font, Palette* pal);
 	// construct a "block" span with dimentions determined by rgn
 	TextSpan(const String& string, Font* font, Palette* pal, const Region& rgn);
 	~TextSpan();
+
+	const Sprite2D* RenderedSpan();
+private:
+	void RenderSpan();
 };
 
 class TextContainer

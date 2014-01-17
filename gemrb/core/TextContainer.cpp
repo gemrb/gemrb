@@ -20,6 +20,7 @@
 
 #include "Font.h"
 #include "Palette.h"
+#include "Sprite2D.h"
 #include "System/String.h"
 
 namespace GemRB {
@@ -28,26 +29,45 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 	: text(string)
 {
 	font = fnt;
+	spanSprite = NULL;
+	// FIXME: this is only appropriate for inline text
+	// for it to be of general use we would need to change the font calculations (a parameter?)
+	frame = Region(0, 0, font->CalcStringWidth(text), font->CalcStringHeight(string));
 
 	pal->acquire();
 	palette = pal;
 }
 
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Region& /*rgn*/)
-	: text(string)
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Region& rgn)
+	: text(string), frame(rgn)
 {
 	font = fnt;
+	spanSprite = NULL;
 
 	pal->acquire();
 	palette = pal;
 }
-
-
 
 TextSpan::~TextSpan()
 {
 	palette->release();
+	spanSprite->release();
 }
+
+const Sprite2D* TextSpan::RenderedSpan()
+{
+	if (!spanSprite)
+		RenderSpan();
+	return spanSprite;
+}
+
+void TextSpan::RenderSpan()
+{
+	if (spanSprite) spanSprite->release();
+	spanSprite = font->RenderText(text, frame);
+	spanSprite->acquire();
+}
+
 
 
 TextContainer::TextContainer(Region& frame, Font* font, Palette* pal)
