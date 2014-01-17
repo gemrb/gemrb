@@ -1447,12 +1447,12 @@ def UpdatePortraitWindow ():
 		states = ""
 		# calculate the partial row
 		idx = numEffects % numCols
-		states = effects[0:idx] + "\n"
+		states = effects[0:idx]
 
 		for x in range(idx, numEffects): # now do any rows that are full
-			states = states + effects[x]
-			if (x - idx) % numCols == numCols - 1:
+			if (x - idx) % numCols == 0:
 				states = states + "\n"
+			states = states + effects[x]
 
 		FlagLabel = Window.GetControl(200 + portid)
 		if flag != blank:
