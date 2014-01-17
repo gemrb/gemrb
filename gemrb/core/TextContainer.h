@@ -52,7 +52,8 @@ private:
 
 class TextContainer
 {
-	std::list<TextSpan*> spans;
+	typedef std::list<TextSpan*> SpanList;
+	SpanList spans;
 	Region frame;
 	Font* font;
 	Palette* pallete;

@@ -80,7 +80,7 @@ TextContainer::TextContainer(Region& frame, Font* font, Palette* pal)
 
 TextContainer::~TextContainer()
 {
-	std::list<TextSpan*>::iterator it = spans.begin();
+	SpanList::iterator it = spans.begin();
 	for (; it != spans.end(); ++it) {
 		delete *it;
 	}
