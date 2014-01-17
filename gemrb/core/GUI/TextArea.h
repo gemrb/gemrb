@@ -33,7 +33,9 @@
 #include "RGBAColor.h"
 #include "exports.h"
 
+#include "DialogHandler.h"
 #include "Font.h"
+#include "TextContainer.h"
 
 #include <vector>
 
@@ -109,6 +111,8 @@ public:
 	int GetTopIndex();
 	/** Returns total height of the text */
 	int GetRowHeight();
+	void SetDialogOptions(const std::vector<DialogOption>&,
+						  const Color* color, const Color* hiColor);
 	/** Set Starting Row */
 	void SetRow(int row);
 	/** Sets preserved lines */
@@ -126,9 +130,12 @@ public:
 	int SetScrollBar(Control *ptr);
 	void SortText();
 private: // Private attributes
+	typedef std::pair<int, TextSpan*> DialogOptionSpan;
+	std::vector<DialogOptionSpan> dialogOptSpans;
+	TextContainer* dialogOptions;
+	const TextSpan* selectedOption;
 	std::vector< char*> lines;
 	std::vector< int> lrows;
-	int seltext;
 	/** minimum selectable row */
 	int minrow;
 	/** lines to be kept even if scrolled out */
@@ -157,6 +164,7 @@ private: // Private attributes
 	unsigned short CurPos, CurLine;
 
 private: //internal functions
+	void ClearDialogOptions();
 	void CalcRowCount();
 	void UpdateControls();
 	void RefreshSprite(const char *portrait);

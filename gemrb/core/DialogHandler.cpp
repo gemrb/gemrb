@@ -389,9 +389,9 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	//adding a gap between options and npc text
 	ta->AppendText("",-1);
-	int i;
 	int idx = 0;
 	ta->SetMinRow( true );
+	std::vector<DialogOption> dialogOptions;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
 	unsigned int x = ds->transitionsCount;
 	while(x--) {
@@ -425,16 +425,14 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			core->GetDictionary()->SetAt("DialogOption",x);
 			core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 		} else {
-			char *string = ( char * ) malloc( 40 );
-			sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
-			i = ta->AppendText( string, -1 );
-			free( string );
-			string = core->GetString( ds->transitions[x]->textStrRef );
-			ta->AppendText( string, i );
-			free( string );
-			ta->AppendText( "[/p][/s]", i );
+			char* cstring = core->GetString( ds->transitions[x]->textStrRef );
+			String* string = StringFromCString(cstring);
+			dialogOptions.push_back(std::make_pair(x, *string));
+			delete string;
+			free(cstring);
 		}
 	}
+	ta->SetDialogOptions(dialogOptions, &ColorRed, &ColorWhite);
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "Dialog", "There were no valid dialog options!");

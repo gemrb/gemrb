@@ -22,7 +22,6 @@
 
 #include "win32def.h"
 
-#include "DialogHandler.h"
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Video.h"
@@ -46,7 +45,6 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	Cursor = NULL;
 	CurPos = 0;
 	CurLine = 0;
-	seltext = -1;
 	Value = 0xffffffff;
 	ResetEventHandler( TextAreaOnChange );
 	PortraitResRef[0]=0;
@@ -61,10 +59,13 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	tmp.b = 102;
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
 	ftext = finit = NULL;
+	dialogOptions = NULL;
 }
 
 TextArea::~TextArea(void)
 {
+	ClearDialogOptions();
+
 	gamedata->FreePalette( palette );
 	gamedata->FreePalette( initpalette );
 	gamedata->FreePalette( selected );
@@ -158,13 +159,8 @@ void TextArea::DrawInternal(Region& clip)
 					goto notmatched;
 				len += tlen + 23;
 				Buffer = (char *) realloc( Buffer, len + 2 );
-				if (seltext == (int) i) {
-					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
-						acolor, tlen, rest + 1 );
-				} else {
-					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
+				sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
 						bcolor, tlen, rest + 1 );
-				}
 			} else {
 				notmatched:
 				len += ( int ) strlen( lines[i] ) + 1;
@@ -251,9 +247,7 @@ void TextArea::DrawInternal(Region& clip)
 		}
 		sr -= rc;
 		Palette* pal = NULL;
-		if (seltext == (int) i)
-			pal = selected;
-		else if (Value == i)
+		if (Value == i)
 			pal = lineselpal;
 		else
 			pal = palette;
@@ -309,9 +303,7 @@ void TextArea::DrawInternal(Region& clip)
 	}
 	for (i++; i < linesize; i++) {
 		Palette* pal = NULL;
-		if (seltext == (int) i)
-			pal = selected;
-		else if (Value == i)
+		if (Value == i)
 			pal = lineselpal;
 		else
 			pal = palette;
@@ -534,27 +526,14 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	GameControl *gc = core->GetGameControl();
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 		MarkDirty();
-		seltext=minrow-1;
-		if ((unsigned int) seltext>=lines.size()) {
-			return true;
+
+		size_t lookupIdx = Key - '1';
+		int dlgIdx = -1;
+		if (lookupIdx < dialogOptSpans.size()) {
+			dlgIdx = dialogOptSpans[lookupIdx].first;
+			assert(dlgIdx >= 0);
+			gc->dialoghandler->DialogChoose( dlgIdx );
 		}
-		for(int i=0;i<Key-'0';i++) {
-			do {
-				seltext++;
-				if ((unsigned int) seltext>=lines.size()) {
-					return true;
-				}
-			}
-			while (strnicmp( lines[seltext], "[s=", 3 ) != 0 );
-		}
-		int idx=-1;
-		sscanf( lines[seltext], "[s=%d,", &idx);
-		if (idx==-1) {
-			//this kills this object, don't use any more data!
-			gc->dialoghandler->EndDialog();
-			return true;
-		}
-		gc->dialoghandler->DialogChoose( idx );
 		return true;
 	}
 	return false;
@@ -849,54 +828,47 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 }
 
 /** Mouse Over Event */
-void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
+void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
-	int height = ftext->maxHeight;
-	int r = y / height;
-	int row = 0;
+	selectedOption = NULL;
+	if (!dialogOptions) return;
 
-	for (size_t i = 0; i < lines.size(); i++) {
-		row += lrows[i];
-		if (r < ( row - startrow )) {
-			if (seltext != (int) i)
-				MarkDirty();
-			seltext = ( int ) i;
-			//print("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d", ControlID, i, rows, row, r);
-			return;
-		}
-	}
-	if (seltext != -1) {
+	// FIXME: get the point in relation to dialogOptions. this won't work.
+	const TextSpan* hoverSpan = dialogOptions->SpanAtPoint(Point(x, y));
+	if (hoverSpan) {
 		MarkDirty();
+		selectedOption = hoverSpan;
+		// TODO: change the span palette to the selected palette
 	}
-	seltext = -1;
-	//print("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d", ControlID, seltext, rows, row, r);
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+						 unsigned short Button, unsigned short /*Mod*/)
 {
 	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)))
 		return;
 
-	if ((x < Width) && (y < Height - 5) && (seltext != -1)) {
-		Value = (unsigned int) seltext;
+	if (selectedOption) {
 		MarkDirty();
-		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
-			if (minrow > seltext)
-				return;
-			int idx;
-			sscanf( lines[seltext], "[s=%d,", &idx );
-			GameControl* gc = core->GetGameControl();
-			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-				if (idx==-1) {
-					//this kills this object, don't use any more data!
-					gc->dialoghandler->EndDialog();
-					return;
+
+		GameControl* gc = core->GetGameControl();
+		if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+			int dlgIdx = -1;
+			std::vector<DialogOptionSpan>::const_iterator it;
+			for (it = dialogOptSpans.begin(); it != dialogOptSpans.end(); ++it) {
+				if( (*it).second == selectedOption ) {
+					dlgIdx = (*it).first;
+					break;
 				}
-				gc->dialoghandler->DialogChoose( idx );
+			}
+			if (dlgIdx == -1) {
+				//this kills this object, don't use any more data!
+				gc->dialoghandler->EndDialog();
 				return;
 			}
+			gc->dialoghandler->DialogChoose( dlgIdx );
+			return;
 		}
 	}
 
@@ -995,6 +967,36 @@ void TextArea::PadMinRow()
 		AppendText("",-1);
 		row--;
 	}
+}
+
+void TextArea::ClearDialogOptions()
+{
+	dialogOptSpans.clear();
+	delete dialogOptions; // deletes the old spans too
+	dialogOptions = NULL;
+}
+
+void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
+								const Color* color, const Color* /*hiColor*/)
+{
+	Palette* pal = NULL;
+	if (color)
+		pal = core->CreatePalette(*color, ColorBlack);
+	else
+		pal = ftext->GetPalette();
+
+	ClearDialogOptions(); // deletes previous options
+	// FIXME: calculate the real frame
+	Region frame = ControlFrame();
+	dialogOptions = new TextContainer(frame, ftext, pal);
+	wchar_t optNum[6];
+	for (size_t i = 0; i < opts.size(); i++) {
+		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
+		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, pal);
+		dialogOptSpans.push_back(std::make_pair(opts[i].first, span));
+		dialogOptions->AppendSpan(span); // container owns the span
+	}
+	pal->release();
 }
 
 void TextArea::SetPreservedRow(int arg)

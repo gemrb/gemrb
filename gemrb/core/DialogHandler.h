@@ -27,6 +27,8 @@
 
 namespace GemRB {
 
+typedef std::pair<int, String> DialogOption;
+
 class GEM_EXPORT DialogHandler {
 public:
 	DialogHandler();
