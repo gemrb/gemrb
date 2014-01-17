@@ -24,7 +24,7 @@ import GameCheck
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_LEFT, ACT_RIGHT
-from ie_spells import SP_IDENTIFY, SP_SURGE, LSR_KNOWN, LSR_LEVEL, LSR_STAT
+from ie_spells import SP_IDENTIFY, SP_SURGE, LSR_KNOWN, LSR_LEVEL, LSR_STAT, LSR_FULL
 from ie_restype import RES_2DA
 
 #################################################################
