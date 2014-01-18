@@ -15,27 +15,30 @@ namespace GemRB
 {
 	class GLTextureSprite2D;
 	class GLPaletteManager;
+	class GLSLProgram;
 
 	class GLVideoDriver : public SDL20VideoDriver 
 	{
 	private:
 		SDL_GLContext context; // opengl context
 		// Shader programs
-		GLuint program32; // shader program for 32bpp sprites
-		GLuint programPal; // shader program for paletted sprites
-		GLuint programPalGrayed; // shader program for paletted sprites with grayscale effect
-		GLuint programPalSepia; // shader program for paletted sprites  with sepia effect
-		GLuint programRect; // shader program for drawing rects and lines
+		GLSLProgram* program32; // shader program for 32bpp sprites
+		GLSLProgram* programPal; // shader program for paletted sprites
+		GLSLProgram* programPalGrayed; // shader program for paletted sprites with grayscale effect
+		GLSLProgram* programPalSepia; // shader program for paletted sprites  with sepia effect
+		GLSLProgram* programRect; // shader program for drawing rects and lines
+		GLSLProgram* programEllipse; // shader program for drawing ellipses and circles
 		
 		Uint32 spritesPerFrame; // sprites counter
-		GLuint lastUsedProgram; // stores last used program to prevent switching if possible (switching may cause performance lack)
+		GLSLProgram* lastUsedProgram; // stores last used program to prevent switching if possible (switching may cause performance lack)
 
 		GLPaletteManager* paletteManager; // palette manager instance
 
-		void useProgram(GLuint program); // use this instead glUseProgram
+		void useProgram(GLSLProgram* program); // use this instead glUseProgram
 		bool createPrograms();
 		void blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, Palette* attachedPal = NULL, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
 		void drawColoredRect(const Region& rgn, const Color& color);
+		void drawEllipse(int cx, int cy, unsigned short xr, unsigned short yr, float thickness, const Color& color);
 
 	public:
 		~GLVideoDriver();
@@ -51,6 +54,7 @@ namespace GemRB
 		void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 		void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
 		void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
+		void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped = true);
 		void DestroyMovieScreen();
 		Sprite2D* GetScreenshot(Region r);
 	};

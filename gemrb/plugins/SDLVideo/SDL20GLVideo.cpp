@@ -17,35 +17,32 @@
 #include "Game.h" // for GetGlobalTint
 #include "GLTextureSprite2D.h"
 #include "GLPaletteManager.h"
-#include "Shader.h"
+#include "GLSLProgram.h"
 #include "Matrix.h"
 
 using namespace GemRB;
 
 const char* vertexRect=
-"uniform mat4 u_matrix;\n"
 "attribute vec2 a_position;\n"
-"attribute vec4 a_color;\n"
-"varying vec4 v_color;\n"
+"uniform mat4 u_matrix;\n"
 "void main()\n"
 "{\n"
 "  gl_Position = u_matrix * vec4(a_position, 0.0, 1.0);\n"
-"  v_color = a_color;\n"
 "}\n";
 
 const char* fragmentRect =
-"varying vec4 v_color;	\n"
+"uniform vec4 u_color;	\n"
 "void main()            \n"
 "{\n"
-"  gl_FragColor = v_color;\n"
+"  gl_FragColor = u_color;\n"
 "}\n";
 
 const char* vertex =
-"uniform mat4 u_matrix;\n"
 "attribute vec2 a_position;\n"
 "attribute vec2 a_texCoord;\n"
 "attribute float a_alphaModifier;\n"
 "attribute vec4 a_tint;\n"
+"uniform mat4 u_matrix;\n"
 "varying vec2 v_texCoord;\n"
 "varying float v_alphaModifier;\n"
 "varying vec4 v_tint;\n"
@@ -131,13 +128,56 @@ const char* fragmentPalSepia =
 "  gl_FragColor = vec4(sepia, color.a * alphaModifier);\n"
 "}\n";
 
+
+const char* vertexEllipse=
+"attribute vec2 a_position;\n"
+"uniform mat4 u_matrix;\n"
+"attribute vec2 a_texCoord;\n"
+"varying vec2 v_texCoord;\n"
+"void main()\n"
+"{\n"
+"  gl_Position = u_matrix * vec4(a_position, 0.0, 1.0);\n"
+"  v_texCoord = a_texCoord;\n"
+"}\n";
+
+const char* fragmentEllipse =
+#ifndef USE_GL
+"precision highp float;					 \n"
+#endif
+"uniform float u_radiusX;\n"
+"uniform float u_radiusY;\n"
+"uniform float u_thickness;\n"
+"uniform float u_support;\n"
+"uniform vec4 u_color;\n"
+"varying vec2 v_texCoord;\n"
+"void main()\n"
+"{\n"
+"   float x = v_texCoord.x;\n"
+"   float y = v_texCoord.y;\n"
+
+"   float x_mid = u_radiusX + u_thickness/2.0;\n"
+"   float y_mid = u_radiusY + u_thickness/2.0;\n"
+"   float distance1 = sqrt(x*x/(x_mid*x_mid) + y*y/(y_mid*y_mid));\n"
+"   float width1 = fwidth(distance1) * u_support/1.25;\n"
+"   float alpha1  = smoothstep(1.0 - width1, 1.0 + width1, distance1);\n"
+
+"   x_mid = u_radiusX - u_thickness/2.0;\n"
+"   y_mid = u_radiusY - u_thickness/2.0;\n"
+"   float distance2 = sqrt(x*x/(x_mid*x_mid) + y*y/(y_mid*y_mid));\n"
+"   float width2 = fwidth(distance2) * u_support/1.25;\n"
+"   float alpha2  = smoothstep(1.0 + width2, 1.0 - width2, distance2);\n"
+
+"   gl_FragColor = vec4(u_color.rgb, (1.0 - max(alpha1, alpha2))*u_color.a);\n"
+"}\n";
+
 GLVideoDriver::~GLVideoDriver()
 {
-	glDeleteProgram(program32);
-	glDeleteProgram(programPal);
-	glDeleteProgram(programPalGrayed);
-	glDeleteProgram(programPalSepia);
-	glDeleteProgram(programRect);
+	program32->Release();
+	programPal->Release();
+	programPalGrayed->Release();
+	programPalSepia->Release();
+	programRect->Release();
+	programEllipse->Release();
 	delete paletteManager;
 	SDL_GL_DeleteContext(context);
 }
@@ -242,93 +282,111 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 	return GEM_OK;
 }
 
-void GLVideoDriver::useProgram(GLuint program)
+void GLVideoDriver::useProgram(GLSLProgram* program)
 {
-	if(lastUsedProgram == program) return;
-	glUseProgram(program);
+	if (lastUsedProgram == program) return;
+	program->Use();
 	lastUsedProgram = program;
 }
 
 bool GLVideoDriver::createPrograms()
 {
-	ShaderOperationResult* result = Shader::BuildProgram(vertex, fragment);
-	if(result->Id == 0)
-	{
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
-		delete result;
-		return false;
-	}
-	program32 = result->Id;
-	delete result;
-	glUseProgram(program32);
-	glUniform1i(glGetUniformLocation(program32, "s_texture"), 0);
+	char msg[512];
 	float matrix[16];
 	Matrix::SetIdentityM(matrix);
-	glUniformMatrix4fv(glGetUniformLocation(program32, "u_matrix"), 1, GL_FALSE, matrix);
-	glUseProgram(0);
 
-	result = Shader::BuildProgram(vertex, fragmentPal);
-	if(result->Id == 0)
+	program32 = GLSLProgram::Create(vertex, fragment);
+	if (!program32)
 	{
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
-		delete result;
+		GLSLProgram::GetLastError(msg, sizeof(msg));
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
 		return false;
 	}
-	programPal = result->Id;
-	delete result;
-	glUseProgram(programPal);
-	glUniform1i(glGetUniformLocation(programPal, "s_texture"), 0);
-	glUniform1i(glGetUniformLocation(programPal, "s_palette"), 1);
-	glUniform1i(glGetUniformLocation(programPal, "s_mask"), 2);
-	glUniformMatrix4fv(glGetUniformLocation(programPal, "u_matrix"), 1, GL_FALSE, matrix);
-	glUseProgram(0);
-
-	result = Shader::BuildProgram(vertex, fragmentPalGrayed);
-	if(result->Id == 0)
-	{
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
-		delete result;
-		return false;
-	}
-	programPalGrayed = result->Id;
-	delete result;
-	glUseProgram(programPalGrayed);
-	glUniform1i(glGetUniformLocation(programPalGrayed, "s_texture"), 0);
-	glUniform1i(glGetUniformLocation(programPalGrayed, "s_palette"), 1);
-	glUniform1i(glGetUniformLocation(programPalGrayed, "s_mask"), 2);
-	glUniformMatrix4fv(glGetUniformLocation(programPalGrayed, "u_matrix"), 1, GL_FALSE, matrix);
-	glUseProgram(0);
-
-	result = Shader::BuildProgram(vertex, fragmentPalSepia);
-	if(result->Id == 0)
-	{
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
-		delete result;
-		return false;
-	}
-	programPalSepia = result->Id;
-	delete result;
-	glUseProgram(programPalSepia);
-	glUniform1i(glGetUniformLocation(programPalSepia, "s_texture"), 0);
-	glUniform1i(glGetUniformLocation(programPalSepia, "s_palette"), 1);
-	glUniform1i(glGetUniformLocation(programPalSepia, "s_mask"), 2);
-	glUniformMatrix4fv(glGetUniformLocation(programPalSepia, "u_matrix"), 1, GL_FALSE, matrix);
-	glUseProgram(0);
+	program32->Use();
+	program32->StoreUniformLocation("s_texture");
+	program32->SetUniformValue("s_texture", 1, 0);
+	program32->StoreUniformLocation("u_matrix");
+	program32->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 	
-	result = Shader::BuildProgram(vertexRect, fragmentRect);
-	if(result->Id == 0)
+	programPal = GLSLProgram::Create(vertex, fragmentPal);
+	if (!programPal)
 	{
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", result->Message);
-		delete result;
+		GLSLProgram::GetLastError(msg, sizeof(msg));
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
 		return false;
 	}
-	programRect = result->Id;
-	delete result;
-	glUseProgram(programRect);
-	glUniformMatrix4fv(glGetUniformLocation(programRect, "u_matrix"), 1, GL_FALSE, matrix);
-	glUseProgram(0);
+	programPal->Use();
+	programPal->StoreUniformLocation("s_texture");
+	programPal->StoreUniformLocation("s_palette");
+	programPal->StoreUniformLocation("s_mask");
+	programPal->SetUniformValue("s_texture", 1, 0);
+	programPal->SetUniformValue("s_palette", 1, 1);
+	programPal->SetUniformValue("s_mask", 1, 2);
+	programPal->StoreUniformLocation("u_matrix");
+	programPal->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+
+	programPalGrayed = GLSLProgram::Create(vertex, fragmentPalGrayed);
+	if (!programPalGrayed)
+	{
+		GLSLProgram::GetLastError(msg, sizeof(msg));
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		return false;
+	}
+	programPalGrayed->Use();
+	programPalGrayed->StoreUniformLocation("s_texture");
+	programPalGrayed->StoreUniformLocation("s_palette");
+	programPalGrayed->StoreUniformLocation("s_mask");
+	programPal->SetUniformValue("s_texture", 1, 0);
+	programPal->SetUniformValue("s_palette", 1, 1);
+	programPal->SetUniformValue("s_mask", 1, 2);
+	programPalGrayed->StoreUniformLocation("u_matrix");
+	programPalGrayed->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+
+	programPalSepia = GLSLProgram::Create(vertex, fragmentPalSepia);
+	if (!programPalSepia)
+	{
+		GLSLProgram::GetLastError(msg, sizeof(msg));
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		return false;
+	}
+	programPalSepia->Use();
+	programPalSepia->StoreUniformLocation("s_texture");
+	programPalSepia->StoreUniformLocation("s_palette");
+	programPalSepia->StoreUniformLocation("s_mask");
+	programPal->SetUniformValue("s_texture", 1, 0);
+	programPal->SetUniformValue("s_palette", 1, 1);
+	programPal->SetUniformValue("s_mask", 1, 2);;
+	programPalSepia->StoreUniformLocation("u_matrix");
+	programPalSepia->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 	
-	lastUsedProgram = 0;
+	programEllipse = GLSLProgram::Create(vertexEllipse, fragmentEllipse);
+	if (!programEllipse)
+	{
+		GLSLProgram::GetLastError(msg, sizeof(msg));
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		return false;
+	}
+	programEllipse->Use();
+	programEllipse->StoreUniformLocation("u_matrix");
+	programEllipse->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	programEllipse->StoreUniformLocation("u_radiusX");
+	programEllipse->StoreUniformLocation("u_radiusY");
+	programEllipse->StoreUniformLocation("u_thickness");
+	programEllipse->StoreUniformLocation("u_support");
+	programEllipse->StoreUniformLocation("u_color");
+
+	programRect = GLSLProgram::Create(vertexRect, fragmentRect);
+	if (!programRect)
+	{
+		GLSLProgram::GetLastError(msg, sizeof(msg));
+		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		return false;
+	}
+	programRect->Use();
+	programRect->StoreUniformLocation("u_matrix");
+	programRect->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	
+	lastUsedProgram = NULL;
 	return true;
 }
 
@@ -424,7 +482,7 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	};
 
 	// shader program selection
-	GLuint program;
+	GLSLProgram* program;
 	GLuint palTexture;
 	if(spr->IsPaletted())
 	{
@@ -467,10 +525,10 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	GLint a_position = glGetAttribLocation(program, "a_position");
-	GLint a_texCoord = glGetAttribLocation(program, "a_texCoord");
-	GLint a_alphaModifier = glGetAttribLocation(program, "a_alphaModifier");
-	GLint a_tint = glGetAttribLocation(program, "a_tint");
+	GLint a_position = program->GetAttribLocation("a_position");
+	GLint a_texCoord = program->GetAttribLocation("a_texCoord");
+	GLint a_alphaModifier = program->GetAttribLocation("a_alphaModifier");
+	GLint a_tint = program->GetAttribLocation("a_tint");
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
@@ -499,6 +557,86 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	
 	glDeleteBuffers(1, &buffer);
 	spritesPerFrame++;
+}
+
+void GLVideoDriver::drawColoredRect(const Region& rgn, const Color& color)
+{
+	if (SDL_ALPHA_TRANSPARENT == color.a) return;
+
+	glScissor(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
+	if (SDL_ALPHA_OPAQUE == color.a) // possible to work faster than shader but a lot... may be disable in future
+	{
+		glClearColor(color.r/255, color.g/255, color.b/255, color.a/255);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	else
+	{
+		useProgram(programRect);
+		glViewport(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
+		GLfloat data[] = 
+		{ 
+			-1.0f,  1.0f,
+			1.0f,  1.0f,
+			-1.0f, -1.0f,
+			1.0f, -1.0f
+		};
+		GLuint buffer;
+		glGenBuffers(1, &buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+		GLint a_position = programRect->GetAttribLocation("a_position");			
+		glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 0, 0);
+		programRect->SetUniformValue("u_color", 4, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
+
+		glEnableVertexAttribArray(a_position);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDisableVertexAttribArray(a_position);
+
+		glDeleteBuffers(1, &buffer);
+	}
+}
+
+void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned short xr, unsigned short yr, float thickness, const Color& color)
+{
+	const float support = 0.75;
+	useProgram(programEllipse);
+	float alpha = min(thickness, 1.0);
+    thickness = max(thickness, 1.0);
+    float dx = (int)ceilf(xr + thickness/2.0 + 2.5*support);
+    float dy = (int)ceilf(yr + thickness/2.0 + 2.5*support);
+	glViewport(cx - dx, height - cy - dy, dx*2, dy*2);
+	GLfloat data[] = 
+	{ 
+		-1.0f, 1.0f, -1.0f, 1.0f,
+		 1.0f, 1.0f,  1.0f, 1.0f,
+		-1.0f,-1.0f, -1.0f,-1.0f,
+		 1.0f,-1.0f,  1.0f,-1.0f
+	};
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+	GLint a_position = programEllipse->GetAttribLocation("a_position");
+	GLint a_texCoord = programEllipse->GetAttribLocation("a_texCoord");
+
+	programEllipse->SetUniformValue("u_radiusX", 1, (GLfloat)xr/dx);
+	programEllipse->SetUniformValue("u_radiusY", 1, (GLfloat)yr/dy);
+	programEllipse->SetUniformValue("u_thickness", 1, (GLfloat)thickness/(dx + dy));
+	programEllipse->SetUniformValue("u_support", 1, (GLfloat)support);
+	programEllipse->SetUniformValue("u_color", 4, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
+			
+	glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*(VERTEX_SIZE + TEX_SIZE), 0);
+	glVertexAttribPointer(a_texCoord, TEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*(VERTEX_SIZE + TEX_SIZE), BUFFER_OFFSET(sizeof(GLfloat)*VERTEX_SIZE));
+	
+	glEnableVertexAttribArray(a_position);
+	glEnableVertexAttribArray(a_texCoord);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDisableVertexAttribArray(a_texCoord);
+	glDisableVertexAttribArray(a_position);
+
+	glDeleteBuffers(1, &buffer);
 }
 
 void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
@@ -572,7 +710,9 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+#ifdef USE_GL
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, glSprite->Width, glSprite->Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) data);
 			delete[] data;
 			flags |= BLIT_EXTERNAL_MASK;
@@ -639,49 +779,23 @@ void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, b
 	return drawColoredRect(rgn, color);
 }
 
-void GLVideoDriver::drawColoredRect(const Region& rgn, const Color& color)
+void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped)
 {
-	if (SDL_ALPHA_TRANSPARENT == color.a) return;
-
-	glScissor(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
-	if (SDL_ALPHA_OPAQUE == color.a) // possible to work faster than shader but a lot... may be disable in future
+	if (clipped) 
 	{
-		glClearColor(color.r/255, color.g/255, color.b/255, color.a/255);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-	else
+		cx += xCorr;
+		cy += yCorr;
+		if ((cx >= xCorr + Viewport.w || cy >= yCorr + Viewport.h) || (cx < xCorr || cy < yCorr)) 
+			return;
+	} 
+	else 
 	{
-		useProgram(programRect);
-		glViewport(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
-		GLfloat data[] = 
-		{ 
-			-1.0f,  1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
-			1.0f,  1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
-			-1.0f, -1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255,
-			1.0f, -1.0f, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255
-		};
-		GLuint buffer;
-		glGenBuffers(1, &buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-		GLint a_position = glGetAttribLocation(programRect, "a_position");
-		GLint a_color = glGetAttribLocation(programRect, "a_color");
-			
-		glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*6, 0);
-		glVertexAttribPointer(a_color, COLOR_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*6, BUFFER_OFFSET(sizeof(GLfloat)*VERTEX_SIZE));
-
-		glEnableVertexAttribArray(a_position);
-		glEnableVertexAttribArray(a_color);
-
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-		glDisableVertexAttribArray(a_color);
-		glDisableVertexAttribArray(a_position);
-
-		glDeleteBuffers(1, &buffer);
+		if ((cx >= disp->w || cy >= disp->h) || (cx < 0 || cy < 0))
+			return;
 	}
+	return drawEllipse(cx, cy, xr, yr, 3, color);
 }
+
 
 int GLVideoDriver::SwapBuffers()
 {	
@@ -708,7 +822,9 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 	
 	Uint32* glPixels = (Uint32*)malloc( w * h * 4 );
 	Uint32* pixels = (Uint32*)malloc( w * h * 4 );
+#ifdef USE_GL
 	glReadBuffer(GL_BACK);
+#endif
 	glReadPixels(r.x, r.y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, glPixels);
 	// flip pixels vertical
 	Uint32* pixelDstPointer = pixels;

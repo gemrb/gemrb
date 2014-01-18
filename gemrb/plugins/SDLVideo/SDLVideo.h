@@ -111,7 +111,7 @@ public:
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
 		double anglefrom, double angleto, bool drawlines = true, bool clipped = true);
 	/** This functions Draws an Ellipse */
-	void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
+	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
 		const Color& color, bool clipped = true);
 	/** This function Draws a Polygon on the Screen */
 	void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);

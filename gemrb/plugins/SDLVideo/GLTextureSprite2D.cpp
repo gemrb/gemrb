@@ -148,14 +148,18 @@ void GLTextureSprite2D::createGlTexture()
 			buffer[i] = r | (g << 8) | (b << 16) | (a << 24);
 		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+#ifdef USE_GL
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) buffer);
 		delete[] buffer;
 	}
 	else if(Bpp == 8) // indexed
 	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+#ifdef USE_GL
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) pixels);
 	}
 }
@@ -181,7 +185,9 @@ void GLTextureSprite2D::createGLMaskTexture()
 		else mask[i] = 0x00;  
 	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+#ifdef USE_GL
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) mask);
 	delete[] mask;
 }

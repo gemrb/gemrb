@@ -49,7 +49,9 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 			if(i == colorKey) colors[i].a = 0;
 		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+#ifdef USE_GL
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) colors);
 		delete[] colors;
 		palette->acquire();
