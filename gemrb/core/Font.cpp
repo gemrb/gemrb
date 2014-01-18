@@ -233,20 +233,13 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 					word = line.substr(linePos, wordBreak - linePos);
 				}
 
+				int wordW = CalcStringWidth(word);
 				if (!(Alignment&IE_FONT_SINGLE_LINE)) {
-					int wordW = CalcStringWidth(word);
-					if (x + wordW > rgn.w) {
-						if (word == line) {
-							// this occurs when a line is a single word, but the word is wider then the region
-#if DEBUG_FONT
-							// needs to be ifdefed, because it naturally happens with portrait icons
-							Log(WARNING, "Font", "Printing beyond boundary because a word is wider than %d", rgn.w);
-#endif
-						} else {
-							// wrap to new line
-							lineBreak = true;
-							line = line.substr(linePos);
-						}
+					if (x + wordW > rgn.w && wordW != (int)lineW) {
+						//assert(word != line);
+						// wrap to new line, only if the word isnt >= the entire line
+						lineBreak = true;
+						line = line.substr(linePos);
 					}
 				}
 
@@ -266,11 +259,18 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 						currGlyph = GetCharSprite(currChar);
 						if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
 												 y + rgn.y - currGlyph->YPos)) {
-							// FIXME: this doesnt cope with cases when a line should be blitted
-							// beyond the edge of its region because following lines
-							// will fall within the region. AFIK this doesnt happen naturally
-							done = true;
-							break;
+							if (!wordW > (int)lineW) {
+								// this probably doest cover every situation 100%
+								// we consider printing done if the blitter is outside the region
+								// *and* the word isnt wider then the line
+								done = true;
+							} else {
+#if DEBUG_FONT
+								Log(WARNING, "Font", "The word '%ls' (width=%d) overruns %d",
+									word.c_str(), wordW, rgn.w);
+#endif
+							}
+							break; // either done, or skipping
 						}
 						video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, pal);
 
