@@ -7484,9 +7484,9 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 		// and make sure not to treat earrings improperly
 		case CRI_REMOVEFORSWAP:
 			int flags = UsedItems[i].flags;
-			if ((flags&1 && flags&4) || !(flags&15)) {
+			if (!(flags&1) || flags&4) {
 				continue;
-			} // no continue
+			}
 			break;
 		}
 
