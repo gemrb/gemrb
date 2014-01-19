@@ -65,10 +65,6 @@ protected:
 
 	Palette* palette;
 	Sprite2D* blank;
-
-	bool multibyte;
-	bool utf8;
-
 public:
 	int maxHeight;
 

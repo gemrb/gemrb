@@ -36,13 +36,6 @@ Font::Font()
 : resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
 	name[0] = '\0';
-	multibyte = core->TLKEncoding.multibyte;
-	utf8 = false;
-
-	if (stricmp(core->TLKEncoding.encoding.c_str(), "UTF-8") == 0) {
-		utf8 = true;
-		assert(multibyte);
-	}
 }
 
 Font::~Font(void)
@@ -325,11 +318,6 @@ size_t Font::CalcStringHeight(const String string) const
 void Font::SetName(const char* newName)
 {
 	strnlwrcpy( name, newName, sizeof(name)-1);
-
-	if (strnicmp(name, "STATES", 6) == 0) {
-		// state fonts are NEVER multibyte; regardless of TKL encoding.
-		multibyte = false;
-	}
 }
 
 Palette* Font::GetPalette() const

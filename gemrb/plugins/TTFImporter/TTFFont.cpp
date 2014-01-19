@@ -39,14 +39,14 @@ namespace GemRB {
 const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 {
 #if HAVE_ICONV
-	if (!utf8) {
+	if (!core->TLKEncoding.multibyte) {
 		char* oldchar = (char*)&chr;
 		ieWord unicodeChr = 0;
 		char* newchar = (char*)&unicodeChr;
-		size_t in = (multibyte) ? 2 : 1, out = 2;
+		size_t in = (core->TLKEncoding.widechar) ? 2 : 1, out = 2;
 
 		// TODO: make this work on BE systems
-		// TODO: maybe we want to work witn non-unicode fonts?
+		// TODO: maybe we want to work with non-unicode fonts?
 		iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.encoding.c_str());
 	#if __FreeBSD__
 		int ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
