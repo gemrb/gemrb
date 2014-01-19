@@ -265,7 +265,6 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
-	TLKEncoding.multibyte = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
@@ -2515,23 +2514,33 @@ bool Interface::LoadEncoding()
 
 	TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 
-	// TODO: list incomplete
+	// TODO: lists are incomplete
 	// maybe want to externalize this
 	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
-	const char* multibyteEncodings[] = {
+	const char* wideEncodings[] = {
 		// Chinese
 		"GBK", "BIG5",
 		// Korean
 		"EUCKR",
 		// Japanese
 		"SJIS",
-		// UTF8
-		"UTF-8",
 	};
-	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+	size_t listSize = sizeof(wideEncodings) / sizeof(wideEncodings[0]);
 
 	for (size_t i = 0; i < listSize; i++) {
-		if (stricmp(TLKEncoding.encoding.c_str(), multibyteEncodings[i]) == 0) {
+		if (TLKEncoding.encoding == wideEncodings[i]) {
+			TLKEncoding.widechar = true;
+			break;
+		}
+	}
+
+	const char* multibyteEncodings[] = {
+		"UTF-8",
+	};
+	listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+
+	for (size_t i = 0; i < listSize; i++) {
+		if (TLKEncoding.encoding == multibyteEncodings[i]) {
 			TLKEncoding.multibyte = true;
 			break;
 		}

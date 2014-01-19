@@ -139,9 +139,10 @@ struct TimeStruct {
 	unsigned int attack_round_size;
 };
 
-struct TLKEncodingStruct
+struct EncodingStruct
 {
 	std::string encoding;
+	bool widechar;
 	bool multibyte;
 	bool zerospace;
 };
@@ -381,7 +382,7 @@ private:
 	KeyMap *keymap;
 	std::string Encoding;
 public:
-	TLKEncodingStruct TLKEncoding;
+	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
