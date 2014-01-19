@@ -20,6 +20,7 @@
 #include "System/String.h"
 
 #include "exports.h"
+#include "Interface.h"
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -32,12 +33,14 @@
 
 namespace GemRB {
 
-String* StringFromEncodedData(const ieByte* string, bool multibyte, bool utf8)
+String* StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
 {
 	if (!string) return NULL;
-	// i know these params are strange
-	// but utf8 implies multibyte
-	multibyte = (utf8) ? true : multibyte;
+
+	bool convert = encoded.widechar || encoded.multibyte;
+	// assert that its something we know how to handle
+	// TODO: add support for other encodings?
+	assert(!convert || (encoded.widechar || encoded.encoding == "UTF-8"));
 
 	size_t len = strlen((char*)string);
 	String* dbString = new String();
@@ -46,9 +49,10 @@ String* StringFromEncodedData(const ieByte* string, bool multibyte, bool utf8)
 	for(size_t i=0; i<len; ++i) {
 		ieWord currentChr = string[i];
 		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
-		if(multibyte && (i+1 < len) && (currentChr >= 128 || currentChr < 32)) { // this is a double byte char
+		if(convert && (i+1 < len) && (currentChr >= 128 || currentChr < 32)) {
+			// this is a double byte char, or a multibyte sequence
 			ieWord ch = 0;
-			if (utf8) {
+			if (encoded.encoding == "UTF-8") {
 				size_t nb = 0;
 				if (currentChr >= 0xC0 && currentChr <= 0xDF) {
 					/* c0-df are first byte of two-byte sequences (5+6=11 bits) */
@@ -97,16 +101,9 @@ String* StringFromEncodedData(const ieByte* string, bool multibyte, bool utf8)
 
 String* StringFromCString(const char* string)
 {
-	// TODO: determine multibyte/utf8 parameters from TLK encoding
-
-	// basic expansion of cstring to 2 bytes
+	// if multibyte is false this is basic expansion of cstring to wchar_t
 	// the only reason this is special, is because it allows characters 128-256.
-	return StringFromEncodedData((ieByte*)string, false, false);
-}
-
-String* StringFromMBEncodedData(const ieByte* data, bool utf8)
-{
-	return StringFromEncodedData(data, true, utf8);
+	return StringFromEncodedData((ieByte*)string, core->TLKEncoding);
 }
 
 char* MBCStringFromString(const String& string)
