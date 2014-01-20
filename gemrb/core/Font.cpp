@@ -205,8 +205,6 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 	while (!done && (lineBreak || getline(stream, line))) {
 		lineBreak = false;
 
-		std::wistringstream lineStream(line);
-
 		size_t lineW = CalcStringWidth(line);
 		if (Alignment & IE_FONT_ALIGN_CENTER) {
 			x = ( rgn.w - lineW ) / 2;
@@ -286,7 +284,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 	return charCount;
 }
 
-size_t Font::CalcStringWidth(const String string) const
+size_t Font::CalcStringWidth(const String& string) const
 {
 	size_t ret = 0, len = string.length();
 	for (size_t i = 0; i < len; i++) {
@@ -297,7 +295,7 @@ size_t Font::CalcStringWidth(const String string) const
 	return ret;
 }
 
-size_t Font::CalcStringHeight(const String string) const
+size_t Font::CalcStringHeight(const String& string) const
 {
 	size_t h = 0, max = 0, len = string.length();
 	for (size_t i = 0; i < len; i++) {

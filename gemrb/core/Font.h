@@ -101,8 +101,8 @@ public:
 				 ieByte Alignment, bool anchor) const;
 
 	/** Returns width of the string rendered in this font in pixels */
-	size_t CalcStringWidth(const String) const;
-	size_t CalcStringHeight(const String) const;
+	size_t CalcStringWidth(const String&) const;
+	size_t CalcStringHeight(const String&) const;
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 };
