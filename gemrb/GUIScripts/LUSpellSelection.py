@@ -102,8 +102,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
-			#FIXME: use other resources instead, this one is bg2-only
-			SpellsWindow.CreateScrollBar (1000, 325,42, 16,252, "GUISCRCW")
+			SpellsWindow.CreateScrollBar (1000, 325,42, 16,252)
 			HideUnhideScrollBar(1)
 		SpellStart = 2
 
@@ -126,8 +125,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		SpellsTextArea = SpellsWindow.GetControl(26)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		if(EnhanceGUI):
-			#FIXME: use other resources instead, this one is bg2-only
-			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252, "GUISCRCW")
+			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
 			HideUnhideScrollBar(1)
 			#25th spell button for sorcerers
 			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
