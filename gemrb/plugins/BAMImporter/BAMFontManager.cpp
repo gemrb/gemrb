@@ -52,7 +52,7 @@ bool BAMFontManager::Open(DataStream* stream)
 Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 							  FontStyle /*style*/, Palette* pal)
 {
-	AnimationFactory* af = bamImp->GetAnimationFactory(resRef); // released by BAMFont
+	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
 
 	Font* fnt = NULL;
 	if (isStateFont) {

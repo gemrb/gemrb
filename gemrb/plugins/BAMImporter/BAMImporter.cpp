@@ -246,16 +246,16 @@ ieWord * BAMImporter::CacheFLT(unsigned int &count)
 	return FLT;
 }
 
-AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned char mode)
+AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned char mode, bool allowCompression)
 {
 	unsigned int i, count;
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	ieWord *FLT = CacheFLT( count );
 
-	bool videoBAMsupport = core->GetVideoDriver()->SupportsBAMSprites();
+	allowCompression = allowCompression && core->GetVideoDriver()->SupportsBAMSprites();
 	unsigned char* data = NULL;
 
-	if (videoBAMsupport) {
+	if (allowCompression) {
 		str->Seek( DataStart, GEM_STREAM_START );
 		unsigned long length = str->Remains();
 		if (length == 0) return af;
@@ -266,8 +266,8 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 	}
 
 	for (i = 0; i < FramesCount; ++i) {
-		Sprite2D* frame = GetFrameInternal(i, mode, videoBAMsupport, data, af);
-		assert(!videoBAMsupport || frame->BAM);
+		Sprite2D* frame = GetFrameInternal(i, mode, allowCompression, data, af);
+		assert(!allowCompression || frame->BAM);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {
