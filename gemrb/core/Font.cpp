@@ -217,6 +217,10 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 		size_t lineLen = line.length();
 		if (lineLen) {
 			size_t linePos = 0, wordBreak = 0;
+			// FIXME: I'm not sure how to handle Asian text
+			// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
+			// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
+			// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 			while (!lineBreak && (wordBreak = line.find_first_of(L' ', linePos))) {
 				if (wordBreak == String::npos) {
 					word = line.substr(linePos);
@@ -248,6 +252,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 							x -= GetKerningOffset(word[i-1], currChar);
 						}
 						currGlyph = GetCharSprite(currChar);
+						// should probably use rect intersection, but new lines shouldnt be to the left ever.
 						if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
 												 y + rgn.y - currGlyph->YPos)) {
 							if (!wordW > (int)lineW) {
