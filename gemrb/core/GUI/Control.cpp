@@ -121,10 +121,17 @@ void Control::Draw(unsigned short x, unsigned short y)
 
 void Control::SetText(const char* string)
 {
+	// FIXME: now that Font doesnt do on-the-fly text translation
+	// we need somewhere else to put the "STATE" hack.
+	// Button should probably override this method and
+	// call a diffrent String translation function if its font is set to a state font.
+	// TextArea will need to do something similar, but only for the Initials TextSpans
 	if (string) {
 		String* s = StringFromCString(string);
 		SetText(*s);
 		delete s;
+	} else {
+		SetText(String());
 	}
 }
 
