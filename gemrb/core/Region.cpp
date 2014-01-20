@@ -26,7 +26,6 @@ namespace GemRB {
 Point::Point(void)
 {
 	x = y = 0;
-	//memset(this, 0, sizeof(*this));
 }
 
 bool Point::operator==(const Point& pnt)
@@ -35,15 +34,11 @@ bool Point::operator==(const Point& pnt)
 		return true;
 	}
 	return false;
-	//return !memcmp( this, &pnt, sizeof(*this));
 }
 
 bool Point::operator!=(const Point& pnt)
 {
-	if (( x == pnt.x ) && ( y == pnt.y )) {
-		return false;
-	}
-	return true;
+	return !(*this == pnt);
 }
 
 Point::Point(short x, short y)
@@ -106,10 +101,7 @@ bool Region::operator==(const Region& rgn)
 
 bool Region::operator!=(const Region& rgn)
 {
-	if (( x != rgn.x ) || ( y != rgn.y ) || ( w != rgn.w ) || ( h != rgn.h )) {
-		return true;
-	}
-	return false;
+	return !(*this == rgn);
 }
 
 Region::Region(int x, int y, int w, int h)
@@ -130,13 +122,7 @@ Region::Region(const Point &p, int w, int h)
 
 bool Region::PointInside(const Point &p) const
 {
-	if (( p.x < x ) || ( p.x > ( x + w ) )) {
-		return false;
-	}
-	if (( p.y < y ) || ( p.y > ( y + h ) )) {
-		return false;
-	}
-	return true;
+	return PointInside(p.x, p.y);
 }
 
 bool Region::PointInside(unsigned short XPos, unsigned short YPos) const
