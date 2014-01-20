@@ -7040,7 +7040,7 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 		Sprite2D* nextFrame = 0;
 		if (anim)
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-		if (nextFrame && bbox.InsideRegion( vp ) ) {
+		if (nextFrame && bbox.IntersectsRegion( vp ) ) {
 			if (!newsc || !newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
 				// the first anim contains the animarea for
 				// the entire multi-part animation

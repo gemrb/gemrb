@@ -84,6 +84,7 @@ public:
 	bool PointInside(unsigned short XPos, unsigned short YPos) const;
 	bool PointInside(const Point &p) const;
 	bool InsideRegion(const Region& rgn) const;
+	bool IntersectsRegion(const Region& rgn) const;
 	void Normalize();
 };
 

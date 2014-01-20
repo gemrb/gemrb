@@ -977,7 +977,7 @@ void Map::DrawPile(Region screen, int pileidx)
 	if (c->Highlight) {
 		c->DrawPile(true, screen, tint);
 	} else {
-		if (c->outline->BBox.InsideRegion(vp)) {
+		if (c->outline->BBox.IntersectsRegion(vp)) {
 			c->DrawPile(false, screen, tint);
 		}
 	}

@@ -136,19 +136,32 @@ bool Region::PointInside(unsigned short XPos, unsigned short YPos) const
 	return true;
 }
 
+// true if this is completely contained inside rgn
 bool Region::InsideRegion(const Region& rgn) const
 {
+	if (x >= rgn.x && (x + w) <= (rgn.x + rgn.w)) {
+		// horizontal plane is contained
+		if (y >= rgn.y && (y + h) <= (rgn.y + rgn.h)) {
+			// vertical plane is contained
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Region::IntersectsRegion(const Region& rgn) const
+{
 	if (x > ( rgn.x + rgn.w )) {
-		return false;
+		return false; // entirely to the right of rgn
 	}
 	if (( x + w ) < rgn.x) {
-		return false;
+		return false; // entirely to the left of rgn
 	}
 	if (y > ( rgn.y + rgn.h )) {
-		return false;
+		return false; // entirely below rgn
 	}
 	if (( y + h ) < rgn.y) {
-		return false;
+		return false; // entirely above rgn
 	}
 	return true;
 }
