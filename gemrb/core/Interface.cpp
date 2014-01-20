@@ -4844,25 +4844,32 @@ void Interface::SanitizeItem(CREItem *item) const
 
 	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (itm) {
-		//set charge counters for non-rechargeable items if their charge is zero
-		//set charge counters for items not using charges to one
-		for (int i = 0; i < CHARGE_COUNTERS; i++) {
-			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h) {
-				if (item->Usages[i] == 0) {
-					if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-						//HACK: the original (bg2) allows for 0 charged gems
-						if (h->Charges) {
-							item->Usages[i] = h->Charges;
-						} else {
-							item->Usages[i] = 1;
+
+		item->MaxStackAmount = itm->MaxStackAmount;
+		//if item is stacked mark it as so
+		if (itm->MaxStackAmount) {
+			item->Flags |= IE_INV_ITEM_STACKED;
+		} else {
+			//set charge counters for non-rechargeable items if their charge is zero
+			//set charge counters for items not using charges to one
+			for (int i = 0; i < CHARGE_COUNTERS; i++) {
+				ITMExtHeader *h = itm->GetExtHeader(i);
+				if (h) {
+					if (item->Usages[i] == 0) {
+						if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
+							//HACK: the original (bg2) allows for 0 charged gems
+							if (h->Charges) {
+								item->Usages[i] = h->Charges;
+							} else {
+								item->Usages[i] = 1;
+							}
 						}
+					} else if (h->Charges == 0) {
+						item->Usages[i] = 1;
 					}
-				} else if (h->Charges == 0) {
-					item->Usages[i] = 1;
+				} else {
+					item->Usages[i] = 0;
 				}
-			} else {
-				item->Usages[i] = 0;
 			}
 		}
 
@@ -4892,13 +4899,6 @@ void Interface::SanitizeItem(CREItem *item) const
 		if (!itm->LoreToID) {
 			item->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
-
-		//if item is stacked mark it as so
-		if (itm->MaxStackAmount) {
-			item->Flags |= IE_INV_ITEM_STACKED;
-		}
-
-		item->MaxStackAmount = itm->MaxStackAmount;
 
 		gamedata->FreeItem(itm, item->ItemResRef, false);
 	}
