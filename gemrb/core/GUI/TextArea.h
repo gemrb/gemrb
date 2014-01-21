@@ -88,13 +88,6 @@ public:
 	int AppendText(const char* text, int pos = 0);
 	/** Deletes `count' lines (either last or top lines)*/
 	void PopLines(unsigned int count, bool top = false);
-	/** Deletes last lines up to current 'minrow' */
-	void PopMinRow()
-	{
-		PopLines((unsigned int) (lines.size()-minrow));
-	}
-	/** adds empty lines so minrow will be the uppermost visible row */
-	void PadMinRow();
 	/** Sets up auto scrolling (chapter text) */
 	void SetupScroll();
 	/** Per Pixel scrolling */
@@ -119,8 +112,6 @@ public:
 	void SetPreservedRow(int arg);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	/** Set Minimum Selectable Row (to the current ceiling) */
-	void SetMinRow(bool enable);
 	/** Copies the current TextArea content to another TextArea control */
 	void CopyTo(TextArea* ta);
 	/** Returns the selected text */
@@ -136,8 +127,7 @@ private: // Private attributes
 	const TextSpan* selectedOption;
 	std::vector< char*> lines;
 	std::vector< int> lrows;
-	/** minimum selectable row */
-	int minrow;
+
 	/** lines to be kept even if scrolled out */
 	int keeplines;
 	unsigned long TextYPos;

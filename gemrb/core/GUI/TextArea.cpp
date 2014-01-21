@@ -41,7 +41,6 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	TextYPos = 0;
 	ticks = starttime = 0;
 	startrow = 0;
-	minrow = 0;
 	Cursor = NULL;
 	CurPos = 0;
 	CurLine = 0;
@@ -346,15 +345,6 @@ void TextArea::SetText(const char* text)
 	UpdateControls();
 }
 
-void TextArea::SetMinRow(bool enable)
-{
-	if (enable) {
-		minrow = (int) lines.size();
-	} else {
-		minrow = 0;
-	}
-}
-
 //drop lines scrolled out at the top.
 //keeplines is the number of lines that should still be
 //preserved (for scrollback history)
@@ -439,7 +429,7 @@ void TextArea::PopLines(unsigned int count, bool top)
 	while (count > 0 ) {
 		if (top) {
 			int tmp = lrows.front();
-			if (minrow || (startrow<tmp) )
+			if ( startrow < tmp )
 				break;
 			startrow -= tmp;
 			free(lines.front() );
@@ -950,23 +940,6 @@ bool TextArea::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
-}
-
-void TextArea::PadMinRow()
-{
-	int row = 0;
-	int i=(int) (lines.size()-1);
-	//minrow -1 ->gap
-	//minrow -2 ->npc text
-	while (i>=minrow-2 && i>=0) {
-		row+=lrows[i];
-		i--;
-	}
-	row = GetVisibleRowCount()-row;
-	while (row>0) {
-		AppendText("",-1);
-		row--;
-	}
 }
 
 void TextArea::ClearDialogOptions()

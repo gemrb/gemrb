@@ -242,8 +242,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 
 		DialogTransition* tr = ds->transitions[choose];
 
-		ta->PopMinRow();
-
 		if (tr->Flags&IE_DLG_TR_JOURNAL) {
 			int Section = 0;
 			if (tr->Flags&IE_DLG_UNSOLVED) {
@@ -295,7 +293,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		int final_dialog = tr->Flags & IE_DLG_TR_FINAL;
 
 		if (final_dialog) {
-			ta->SetMinRow( false );
 			EndDialog();
 		}
 
@@ -349,7 +346,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			target = tgt;
 			if (!target) {
 				Log(WARNING, "Dialog", "Can't redirect dialog");
-				ta->SetMinRow( false );
 				EndDialog();
 				return;
 			}
@@ -370,7 +366,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			}*/
 			if (!InitDialog( speaker, target, tmpresref)) {
 				// error was displayed by InitDialog
-				ta->SetMinRow( false );
 				EndDialog();
 				return;
 			}
@@ -380,7 +375,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	ds = dlg->GetState( si );
 	if (!ds) {
 		Log(WARNING, "Dialog", "Can't find next dialog");
-		ta->SetMinRow( false );
 		EndDialog();
 		return;
 	}
@@ -390,7 +384,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	//adding a gap between options and npc text
 	ta->AppendText("",-1);
 	int idx = 0;
-	ta->SetMinRow( true );
 	std::vector<DialogOption> dialogOptions;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
 	unsigned int x = ds->transitionsCount;
@@ -441,10 +434,8 @@ void DialogHandler::DialogChoose(unsigned int choose)
 end_of_choose:
 	//padding the rows so our text will be at the top
 	if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
+		// FIXME: this is a poor solution
 		ta->AppendText( "", -1 );
-	}
-	else {
-		ta->PadMinRow();
 	}
 }
 
