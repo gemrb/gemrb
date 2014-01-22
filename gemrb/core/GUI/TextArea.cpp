@@ -959,9 +959,8 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 		pal = ftext->GetPalette();
 
 	ClearDialogOptions(); // deletes previous options
-	// FIXME: calculate the real frame
-	Region frame = ControlFrame();
-	dialogOptions = new TextContainer(frame, ftext, pal);
+	// FIXME: calculate the real frame (padding)
+	dialogOptions = new TextContainer(Size(Width, Height), ftext, pal);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);

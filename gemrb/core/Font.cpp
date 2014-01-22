@@ -66,15 +66,15 @@ bool Font::MatchesResRef(const ieResRef resref)
 	return false;
 }
 
-Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPrinted) const
+Sprite2D* Font::RenderText(const String& string, const Size& size, size_t* numPrinted) const
 {
 	Size canvasSize = StringSize(string);
 	// if the string is larger than the region shrink the canvas
-	if (rgn.w < canvasSize.w) {
-		canvasSize.w = rgn.w;
+	if (size.w < canvasSize.w) {
+		canvasSize.w = size.w;
 	}
-	if (rgn.h < canvasSize.h) {
-		canvasSize.h = rgn.h;
+	if (size.h < canvasSize.h) {
+		canvasSize.h = size.h;
 	}
 	ieWord lineHeight = (maxHeight > canvasSize.h) ? canvasSize.h : maxHeight;
 

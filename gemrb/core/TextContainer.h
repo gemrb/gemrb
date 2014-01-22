@@ -35,17 +35,17 @@ class TextSpan
 private:
 	String text;
 	Font* font;
-	Region frame;
+	Size frame;
 	Palette* palette;
 	Sprite2D* spanSprite;
 public:
 	// construct a "inline" span that calculates its own region based on font, palette, and string
 	TextSpan(const String& string, Font* font, Palette* pal);
 	// construct a "block" span with dimentions determined by rgn
-	TextSpan(const String& string, Font* font, Palette* pal, const Region& rgn);
+	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn);
 	~TextSpan();
 
-	const Region& SpanFrame() const {return frame;}
+	const Size& SpanFrame() const {return frame;}
 	const Sprite2D* RenderedSpan();
 private:
 	void RenderSpan();
@@ -55,11 +55,11 @@ class TextContainer
 {
 	typedef std::list<TextSpan*> SpanList;
 	SpanList spans;
-	Region frame;
+	Size frame;
 	Font* font;
 	Palette* pallete;
 public:
-	TextContainer(Region& frame, Font* font, Palette* pal);
+	TextContainer(const Size& frame, Font* font, Palette* pal);
 	~TextContainer();
 
 	// Creates a basic "inline" span using the containers font/palette

@@ -30,16 +30,14 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 {
 	font = fnt;
 	spanSprite = NULL;
-	// FIXME: this is only appropriate for inline text
-	// for it to be of general use we would need to change the font calculations (a parameter?)
-	frame = Region(Point(0, 0), font->StringSize(text));
+	frame = font->StringSize(text);
 
 	pal->acquire();
 	palette = pal;
 }
 
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Region& rgn)
-	: text(string), frame(rgn)
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame)
+	: text(string), frame(frame)
 {
 	font = fnt;
 	spanSprite = NULL;
@@ -70,7 +68,7 @@ void TextSpan::RenderSpan()
 
 
 
-TextContainer::TextContainer(Region& frame, Font* font, Palette* pal)
+TextContainer::TextContainer(const Size& frame, Font* font, Palette* pal)
 	: frame(frame), font(font)
 {
 	pal->acquire();
@@ -107,8 +105,8 @@ const TextSpan* TextContainer::SpanAtPoint(const Point& p)
 	SpanList::const_iterator it;
 	for (it = spans.begin(); it != spans.end(); ++it) {
 		// this list is "sorted" spans are layed out in this order from top to bottom
-		const Region& spanRgn = (*it)->SpanFrame();
-		rgn.h += spanRgn.h + spanRgn.y; // expand the search
+		const Size& spanRgn = (*it)->SpanFrame();
+		rgn.h += spanRgn.h; // expand the search
 
 		if (rgn.PointInside(p)) {
 			return *it;
