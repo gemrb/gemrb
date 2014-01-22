@@ -85,6 +85,27 @@ bool Point::PointInside(const Point &p) const
 	return true;
 }
 
+Size::Size()
+{
+	w = h = 0;
+}
+
+Size::Size(ieWord w, ieWord h)
+{
+	this->w = w;
+	this->h = h;
+}
+
+bool Size::operator==(const Size& size)
+{
+	return (w == size.w &&  h == size.h);
+}
+
+bool Size::operator!=(const Size& size)
+{
+	return !(*this == size);
+}
+
 /*************** region ****************************/
 Region::Region(void)
 {
@@ -112,12 +133,12 @@ Region::Region(int x, int y, int w, int h)
 	this->h = h;
 }
 
-Region::Region(const Point &p, int w, int h)
+Region::Region(const Point &p, const Size& s)
 {
 	this->x = p.x;
 	this->y = p.y;
-	this->w = w;
-	this->h = h;
+	this->w = s.w;
+	this->h = s.h;
 }
 
 bool Region::PointInside(const Point &p) const

@@ -66,6 +66,15 @@ public:
 	short x,y;
 };
 
+class GEM_EXPORT Size {
+public:
+	ieWord w, h;
+	Size();
+	Size(ieWord, ieWord);
+
+	bool operator==(const Size& size);
+	bool operator!=(const Size& size);
+};
 
 /**
  * @class Region
@@ -77,7 +86,7 @@ public:
 	Region(void);
 	int x, y;
 	int w, h;
-	Region(const Point& p, int w, int h);
+	Region(const Point& p, const Size& s);
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
 	Region(int x, int y, int w, int h);
