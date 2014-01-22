@@ -82,7 +82,7 @@ void TextEdit::DrawInternal(Region& rgn)
 	if (hasFocus) {
 		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ),
 					Text, palette, Alignment, true );
-		int w = font->CalcStringWidth(Text.substr(0, CurPos));
+		int w = font->StringSize(Text.substr(0, CurPos)).w;
 		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
 		if (w > rgn.w) {
 			int rows = (w / rgn.w);

@@ -32,7 +32,7 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 	spanSprite = NULL;
 	// FIXME: this is only appropriate for inline text
 	// for it to be of general use we would need to change the font calculations (a parameter?)
-	frame = Region(0, 0, font->CalcStringWidth(text), font->CalcStringHeight(string));
+	frame = Region(Point(0, 0), font->StringSize(text));
 
 	pal->acquire();
 	palette = pal;

@@ -160,9 +160,6 @@ void WorldMapControl::DrawInternal(Region& rgn)
 		if (!m->GetCaption())
 			continue;
 
-		int tw = ftext->CalcStringWidth( *m->GetCaption() ) + 5;
-		int th = ftext->maxHeight;
-		
 		Palette* text_pal = pal_normal;
 		
 		if (Area == m) {
@@ -173,7 +170,9 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			}
 		}
 
-		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
+		Size padding(5, 0);
+		Size ts = ftext->StringSize(*m->GetCaption(), &padding);
+		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
 					 *m->GetCaption(), text_pal, 0, true );
 	}
 }
@@ -246,12 +245,12 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				core->GetVideoDriver()->FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
-				int tw = ftext->CalcStringWidth( *ae->GetCaption() ) + 5;
-				int th = ftext->maxHeight;
-				if(h<th)
-					h=th;
-				if(w<tw)
-					w=tw;
+				Size padding(5, 0);
+				Size ts = ftext->StringSize(*ae->GetCaption(), &padding);
+				if(h < ts.h)
+					h = ts.h;
+				if(w < ts.w)
+					w = ts.w;
 			}
 			if (ae->X - iconx > x) continue;
 			if (ae->X - iconx + w < x) continue;

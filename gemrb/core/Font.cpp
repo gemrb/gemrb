@@ -68,25 +68,22 @@ bool Font::MatchesResRef(const ieResRef resref)
 
 Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPrinted) const
 {
-	int sW = CalcStringWidth(string);
-	int w = 0, h = 0;
-	if (sW <= rgn.w) {
-		// single line of text
-		w = sW;
-		h = CalcStringHeight(string);
-	} else {
-		// text will be multiple lines
-		w = rgn.w;
-		h = maxHeight * (sW / rgn.w);
+	Size canvasSize = StringSize(string);
+	// if the string is larger than the region shrink the canvas
+	if (rgn.w < canvasSize.w) {
+		canvasSize.w = rgn.w;
+	}
+	if (rgn.h < canvasSize.h) {
+		canvasSize.h = rgn.h;
 	}
 
 	ieDword ck = GetCharSprite(string[0])->GetColorKey();
 	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
-	ieByte* canvasPx = (ieByte*)calloc(w, h);
+	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
 	ieByte* dest = canvasPx;
 	if (ck != 0) {
 		// start with transparent canvas
-		memset(canvasPx, ck, w * h);
+		memset(canvasPx, ck, canvasSize.w * canvasSize.h);
 	}
 
 	const Sprite2D* curGlyph = NULL;
@@ -99,7 +96,7 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 		assert(!curGlyph->BAM);
 		if (newline) {
 			hCurrent += maxHeight;
-			if ((hCurrent + curGlyph->Height) > h) {
+			if ((hCurrent + curGlyph->Height) > canvasSize.h) {
 				// the next line would be clipped. we are done.
 				break;
 			}
@@ -110,12 +107,12 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 		dest = canvasPx + wCurrent;
 		for( int row = 0; row < curGlyph->Height; row++ ) {
 			memcpy(dest, src, curGlyph->Width);
-			dest += w;
+			dest += canvasSize.w;
 			src += curGlyph->Width;
 		}
 
 		wCurrent += curGlyph->Width;
-		if (wCurrent >= w) {
+		if (wCurrent >= canvasSize.w) {
 			// we've run off the edge of the region
 			newline = true;
 		}
@@ -126,9 +123,8 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 	if (numPrinted) {
 		*numPrinted = chrIdx;
 	}
-	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(w, h, canvasPx,
-															 palette, true,
-															 curGlyph->GetColorKey());
+	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(canvasSize.w, canvasSize.h, canvasPx,
+															 palette, true, curGlyph->GetColorKey());
 	// TODO: adjust canvas position based on alignment flags and rgn
 	return canvas;
 }
@@ -175,7 +171,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 		pal = palette;
 	}
 
-	int ystep = CalcStringHeight(string);
+	ieWord ystep = (Alignment&IE_FONT_SINGLE_LINE) ? StringSize(string).h : maxHeight;
 	int x = psx, y = ystep;
 	Video* video = core->GetVideoDriver();
 
@@ -205,7 +201,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 	while (!done && (lineBreak || getline(stream, line))) {
 		lineBreak = false;
 
-		size_t lineW = CalcStringWidth(line);
+		ieWord lineW = StringSize(line).w;
 		if (Alignment & IE_FONT_ALIGN_CENTER) {
 			x = ( rgn.w - lineW ) / 2;
 		} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -228,7 +224,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 					word = line.substr(linePos, wordBreak - linePos);
 				}
 
-				int wordW = CalcStringWidth(word);
+				int wordW = StringSize(word).w;
 				if (!(Alignment&IE_FONT_SINGLE_LINE)) {
 					if (x + wordW > rgn.w && wordW != (int)lineW) {
 						//assert(word != line);
@@ -289,33 +285,35 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 	return charCount;
 }
 
-size_t Font::CalcStringWidth(const String& string) const
+Size Font::StringSize(const String& string, const Size* padding) const
 {
-	size_t ret = 0, len = string.length();
-	for (size_t i = 0; i < len; i++) {
-		// FIXME: should we be using the longest line instead?
-		if (string[i] == L'\n') break;
-		ret += GetCharSprite(string[i])->Width;
-	}
-	return ret;
-}
-
-size_t Font::CalcStringHeight(const String& string) const
-{
-	size_t h = 0, max = 0, len = string.length();
-	for (size_t i = 0; i < len; i++) {
-		if (string[i] == L'\n') { // multiline string, use line height
-			max = maxHeight;
-			break;
-		}
-		h = GetCharSprite(string[i])->Height;
-		//the space check is here to hack around overly high frames
-		//in some bg1 fonts that throw vertical alignment off
-		if (h > max && string[i] != ' ') {
-			max = h;
+	ieWord w = 0, h = 0, lines = 1;
+	ieWord curh = 0, curw = (padding) ? padding->w*2 : 0;
+	bool multiline = false;
+	for (size_t i = 0; i < string.length(); i++) {
+		if (string[i] == L'\n') {
+			if (curw > w)
+				w = curw;
+			curw = (padding) ? padding->w*2 : 0;
+			multiline = true;
+			lines++;
+		} else {
+			curh = GetCharSprite(string[i])->Height;
+			curh += (padding) ? padding->h : 0;
+			if (curh > h)
+				h = curh;
+			curw += GetCharSprite(string[i])->Width;
+			if (i > 0) { // kerning
+				curw -= GetKerningOffset(string[i-1], string[i]);
+			}
 		}
 	}
-	return max;
+	if (!multiline) {
+		w = curw;
+	} else {
+		h = maxHeight * lines;
+	}
+	return Size(w, h);
 }
 
 void Font::SetName(const char* newName)

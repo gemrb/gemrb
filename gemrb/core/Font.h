@@ -100,9 +100,8 @@ public:
 	size_t Print(Region rgn, const String& string, Palette* hicolor,
 				 ieByte Alignment, bool anchor) const;
 
-	/** Returns width of the string rendered in this font in pixels */
-	size_t CalcStringWidth(const String&) const;
-	size_t CalcStringHeight(const String&) const;
+	/** Returns size of the string rendered in this font in pixels */
+	Size StringSize(const String&, const Size* = NULL) const;
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 };
