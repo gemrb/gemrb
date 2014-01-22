@@ -76,6 +76,7 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 	if (rgn.h < canvasSize.h) {
 		canvasSize.h = rgn.h;
 	}
+	ieWord lineHeight = (maxHeight > canvasSize.h) ? canvasSize.h : maxHeight;
 
 	ieDword ck = GetCharSprite(string[0])->GetColorKey();
 	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
@@ -89,13 +90,13 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 	const Sprite2D* curGlyph = NULL;
 	size_t len = string.length();
 	size_t chrIdx = 0;
-	int wCurrent = 0, hCurrent = 0;
+	int wCurrent = 0, hCurrent = 0, offset = 0;
 	bool newline = false;
 	for (; chrIdx < len; chrIdx++) {
 		curGlyph = GetCharSprite(string[chrIdx]);
 		assert(!curGlyph->BAM);
 		if (newline) {
-			hCurrent += maxHeight;
+			hCurrent += lineHeight;
 			if ((hCurrent + curGlyph->Height) > canvasSize.h) {
 				// the next line would be clipped. we are done.
 				break;
@@ -104,7 +105,9 @@ Sprite2D* Font::RenderText(const String& string, const Region rgn, size_t* numPr
 
 		// copy the glyph to the canvas
 		ieByte* src = (ieByte*)curGlyph->pixels;
-		dest = canvasPx + wCurrent;
+		offset = (lineHeight - curGlyph->YPos) * canvasSize.w;
+		assert(offset >= 0);
+		dest = canvasPx + wCurrent + offset;
 		for( int row = 0; row < curGlyph->Height; row++ ) {
 			memcpy(dest, src, curGlyph->Width);
 			dest += canvasSize.w;
