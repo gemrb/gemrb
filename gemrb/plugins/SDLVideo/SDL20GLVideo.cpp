@@ -589,8 +589,20 @@ void GLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, b
 	}
 }
 
-void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool /*clipped*/)
+void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
 {
+	if (x1 > x2) 
+	{
+		short tmpx = x1;
+		x1 = x2;
+		x2 = tmpx;
+	}
+	if (clipped) 
+	{
+		x1 = x1 + xCorr - Viewport.x;
+		x2 = x2 + xCorr - Viewport.x;
+		y = y + yCorr - Viewport.y;
+	}
 	Region rgn;
 	rgn.x = x1;
 	rgn.y = y;
@@ -599,8 +611,20 @@ void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, b
 	return drawColoredRect(rgn, color);
 }
 
-void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool /*clipped*/)
+void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
 {
+	if (y1 > y2) 
+	{
+		short tmpy = y1;
+		y1 = y2;
+		y2 = tmpy;
+	}
+	if (clipped) 
+	{
+		x = x + xCorr - Viewport.x;
+		y1 = y1 + yCorr - Viewport.y;
+		y2 = y2 + yCorr - Viewport.y;
+	}
 	Region rgn;
 	rgn.x = x;
 	rgn.y = y1;
@@ -626,6 +650,10 @@ void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned 
 	return drawEllipse(cx, cy, xr, yr, 3, color);
 }
 
+void GLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped)
+{
+	return DrawEllipse(cx, cy, r, r, color, clipped); 
+}
 
 int GLVideoDriver::SwapBuffers()
 {	

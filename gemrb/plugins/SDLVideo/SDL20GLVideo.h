@@ -63,6 +63,7 @@ namespace GemRB
 		void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
 		void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
 		void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped = true);
+		void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
 		void DestroyMovieScreen();
 		Sprite2D* GetScreenshot(Region r);
 	};
