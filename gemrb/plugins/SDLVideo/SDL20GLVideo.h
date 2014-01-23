@@ -9,14 +9,6 @@
 #define TEX_SIZE 2
 #define COLOR_SIZE 4
 
-#ifndef max
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif
-
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
 #define BLIT_EXTERNAL_MASK 0x100
 
 namespace GemRB 

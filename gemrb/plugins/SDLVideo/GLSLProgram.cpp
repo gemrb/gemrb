@@ -27,7 +27,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	std::string vertexContent;
 	std::string fragmentContent;
     
-	std::ifstream fileStream(vertexSourceFileName, std::ios::in);
+	std::ifstream fileStream(vertexSourceFileName.c_str());
 	if(!fileStream.is_open()) 
 	{
 		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + vertexSourceFileName;
@@ -38,19 +38,23 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+#ifdef USE_GL
+		// remove precisions
+		if (line.find("precision") == 0) continue;
+#endif
         vertexContent.append(line + "\n");
     }
     fileStream.close();
 	
-	fileStream = std::ifstream(fragmentSourceFileName, std::ios::in);
-	if(!fileStream.is_open()) 
+	std::ifstream fileStream2(fragmentSourceFileName.c_str());
+	if(!fileStream2.is_open()) 
 	{
 		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + fragmentSourceFileName;
 		return NULL;
     }
-	while (!fileStream.eof()) 
+	while (!fileStream2.eof()) 
 	{
-        std::getline(fileStream, line);
+        std::getline(fileStream2, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 #ifdef USE_GL
 		// remove precisions
@@ -58,7 +62,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 #endif
         fragmentContent.append(line + "\n");
     }
-	fileStream.close();
+	fileStream2.close();
 	return GLSLProgram::Create(vertexContent, fragmentContent);
 }
 

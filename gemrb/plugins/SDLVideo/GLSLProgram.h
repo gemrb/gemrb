@@ -41,6 +41,6 @@ namespace GemRB
 		GLSLProgram(){}
 		~GLSLProgram(){}
 	};
-};
+}
 
 #endif

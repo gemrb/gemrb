@@ -432,7 +432,7 @@ void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned s
 {
 	const float support = 0.75;
 	useProgram(programEllipse);
-    thickness = max(thickness, 1.0);
+    if (thickness < 1.0) thickness = 1.0;
     float dx = (int)ceilf(xr + thickness/2.0 + 2.5*support);
     float dy = (int)ceilf(yr + thickness/2.0 + 2.5*support);
 	glViewport(cx - dx, height - cy - dy, dx*2, dy*2);
