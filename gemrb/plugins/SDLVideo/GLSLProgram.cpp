@@ -1,13 +1,17 @@
 #include <cstdio>
 #include <cstring>
+#include <fstream>
+#include <algorithm>
+#include <cctype>
+#include <sstream>
 
 #include "GLSLProgram.h"
 
 using namespace GemRB;
 
-char GLSLProgram::errMessage[512];
+std::string GLSLProgram::errMessage;
 
-GLSLProgram* GLSLProgram::Create(const char* vertexSource, const char* fragmentSource)
+GLSLProgram* GLSLProgram::Create(std::string vertexSource, std::string fragmentSource)
 {
 	GLSLProgram* program = new GLSLProgram();
 	if (!program->buildProgram(vertexSource, fragmentSource))
@@ -18,36 +22,88 @@ GLSLProgram* GLSLProgram::Create(const char* vertexSource, const char* fragmentS
 	return program;
 }
 
+GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName)
+{
+	std::string vertexContent;
+	std::string fragmentContent;
+    
+	std::ifstream fileStream(vertexSourceFileName, std::ios::in);
+	if(!fileStream.is_open()) 
+	{
+		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + vertexSourceFileName;
+		return NULL;
+    }
+	std::string line = "";
+    while (!fileStream.eof()) 
+	{
+        std::getline(fileStream, line);
+		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+        vertexContent.append(line + "\n");
+    }
+    fileStream.close();
+	
+	fileStream = std::ifstream(fragmentSourceFileName, std::ios::in);
+	if(!fileStream.is_open()) 
+	{
+		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + fragmentSourceFileName;
+		return NULL;
+    }
+	while (!fileStream.eof()) 
+	{
+        std::getline(fileStream, line);
+		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+#ifdef USE_GL
+		// remove precisions
+		if (line.find("precision") == 0) continue;
+#endif
+        fragmentContent.append(line + "\n");
+    }
+	fileStream.close();
+	return GLSLProgram::Create(vertexContent, fragmentContent);
+}
 
-GLuint GLSLProgram::buildShader(GLenum type, const char* source)
+GLuint GLSLProgram::buildShader(GLenum type, std::string source)
 {
     GLuint id = glCreateShader(type);
-	glShaderSource(id, 1, &source, 0);
+	const char* src = source.c_str();
+	glShaderSource(id, 1, &src, 0);
     glCompileShader(id);
     GLint result = GL_FALSE;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
     if (result != GL_TRUE) 
 	{
-		glGetShaderInfoLog(id, sizeof(GLSLProgram::errMessage), 0, GLSLProgram::errMessage);
-        GLSLProgram::errMessage[strlen(GLSLProgram::errMessage)]='\0';
+		char buff[512];
+		glGetShaderInfoLog(id, sizeof(buff), 0, buff);
+		GLSLProgram::errMessage = std::string(buff);
+		glDeleteShader(id);
+		return 0;
     }
     return id;
 }
 
-bool GLSLProgram::buildProgram(const char* vertexSource, const char* fragmentSource)
+bool GLSLProgram::buildProgram(std::string vertexSource, std::string fragmentSource)
 {
 	program = 0;
     program = glCreateProgram();
 	if (program == 0)
 	{
-		strcpy(GLSLProgram::errMessage, "GLSLProgram error: glCreateProgram failed\0");
+		GLSLProgram::errMessage = "GLSLProgram error: glCreateProgram failed";
+		glDeleteProgram(program);
 		return false;
 	}
 	
     GLuint vertexId = buildShader(GL_VERTEX_SHADER, vertexSource);
-	if (vertexId == 0) return false;
+	if (vertexId == 0)
+	{
+		glDeleteProgram(program);
+		return false;
+	}
     GLuint fragmentId = buildShader(GL_FRAGMENT_SHADER, fragmentSource);
-	if (fragmentId == 0) return false;
+	if (fragmentId == 0) 
+	{
+		glDeleteProgram(program);
+		return false;
+	}
 
     glAttachShader(program, vertexId);
     glAttachShader(program, fragmentId);
@@ -57,22 +113,37 @@ bool GLSLProgram::buildProgram(const char* vertexSource, const char* fragmentSou
     glGetProgramiv(program, GL_LINK_STATUS, &result);
     if (result != GL_TRUE) 
 	{
-        glGetProgramInfoLog(program, sizeof(GLSLProgram::errMessage), 0, GLSLProgram::errMessage);
-        GLSLProgram::errMessage[strlen(GLSLProgram::errMessage)]='\0';
+		char buff[512];
+        glGetProgramInfoLog(program, sizeof(buff), 0, buff);
+        GLSLProgram::errMessage = std::string(buff);
 		glDeleteProgram(program);
 		program = 0;
     }
     glDeleteShader(vertexId);
     glDeleteShader(fragmentId);
+	if (program != 0)
+	{
+		int count = -1;
+		glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count); 
+		for(int i=0; i<count; i++)  
+		{
+			int name_len = -1, num = -1;
+			GLenum type = GL_ZERO;
+			char name[64];
+			glGetActiveUniform(program, GLuint(i), sizeof(name) - 1, &name_len, &num, &type, name);
+			name[name_len] = 0;
+			storeUniformLocation(std::string(name));
+		}
+	}
 
     return program != 0;
 }
 
-GLint GLSLProgram::getUniformLocation(const char* uniformName)
+GLint GLSLProgram::getUniformLocation(std::string uniformName)
 {
 	if (uniforms.find(uniformName) == uniforms.end())
 	{
-		strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform location\0");
+		GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform location";
 		return -1;
 	}
 	return uniforms.at(uniformName);
@@ -84,19 +155,19 @@ void GLSLProgram::Release()
 	delete this;
 }
 
-void GLSLProgram::GetLastError(char* msg , unsigned int msgSize)
+const std::string GLSLProgram::GetLastError()
 {
-	strncpy(msg, GLSLProgram::errMessage, msgSize);
+	return GLSLProgram::errMessage;
 }
 
-bool GLSLProgram::StoreUniformLocation(const char* uniformName)
+bool GLSLProgram::storeUniformLocation(std::string uniformName)
 {
 	if (uniforms.find(uniformName) == uniforms.end())
 	{
-		GLint location = glGetUniformLocation(program, uniformName);
+		GLint location = glGetUniformLocation(program, uniformName.c_str());
 		if (location == -1)
 		{
-			strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform location\0");
+			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform location";
 			return false;
 		}
 		uniforms[uniformName] = location;
@@ -104,12 +175,12 @@ bool GLSLProgram::StoreUniformLocation(const char* uniformName)
 	}
 	else
 	{
-		strcpy(GLSLProgram::errMessage, "GLSLProgram error: uniform already stored\0");
-		return false;
+		GLSLProgram::errMessage = "GLSLProgram error: Uniform already stored";
+		return true;
 	}
 }
 
-bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char size, GLsizei count, const GLfloat* value)
+bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value)
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -128,12 +199,12 @@ bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char s
 			glUniform4fv(location, count, value);
 			return true;
 		default:
-			strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform size\0");
+			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform size";
 			return false;
 	}
 }
 
-bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char size, GLsizei count, const GLint* value)
+bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLint* value)
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -152,12 +223,12 @@ bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char s
 			glUniform4iv(location, count, value);
 			return true;
 		default:
-			strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform size\0");
+			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform size";
 			return false;
 	}
 }
 
-bool GLSLProgram::SetUniformMatrixValue(const char* uniformName, const unsigned char size, GLsizei count, GLboolean transpose, const GLfloat* value)
+bool GLSLProgram::SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, GLboolean transpose, const GLfloat* value)
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -173,16 +244,15 @@ bool GLSLProgram::SetUniformMatrixValue(const char* uniformName, const unsigned 
 			glUniformMatrix4fv(location, count, transpose, value);
 			return true;
 		default:
-			strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform size\0");
+			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform size";
 			return false;
 	}
 }
 
-bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char size, GLfloat value1, GLfloat value2, GLfloat value3, GLfloat value4)
+bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLfloat value1, GLfloat value2, GLfloat value3, GLfloat value4)
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
-	GLint loc;
 	switch(size)
 	{
 		case 1:
@@ -198,12 +268,12 @@ bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char s
 			glUniform4f(location, value1, value2, value3, value4);
 			return true;
 		default:
-			strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform size\0");
+			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform size";
 			return false;
 	}
 }
 
-bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char size, GLint value1, GLint value2, GLint value3, GLint value4)
+bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLint value1, GLint value2, GLint value3, GLint value4)
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -222,7 +292,7 @@ bool GLSLProgram::SetUniformValue(const char* uniformName, const unsigned char s
 			glUniform4i(location, value1, value2, value3, value4);
 			return true;
 		default:
-			strcpy(GLSLProgram::errMessage, "GLSLProgram error: invalid uniform size\0");
+			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform size";
 			return false;
 	}
 }
@@ -237,7 +307,7 @@ void GLSLProgram::UnUse()
 	glUseProgram(0);
 }
 
-GLint GLSLProgram::GetAttribLocation(const char* attribName)
+GLint GLSLProgram::GetAttribLocation(std::string attribName)
 {
-	return glGetAttribLocation(program, attribName);
+	return glGetAttribLocation(program, attribName.c_str());
 }

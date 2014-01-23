@@ -22,154 +22,6 @@
 
 using namespace GemRB;
 
-const char* vertexRect=
-"attribute vec2 a_position;\n"
-"uniform mat4 u_matrix;\n"
-"void main()\n"
-"{\n"
-"  gl_Position = u_matrix * vec4(a_position, 0.0, 1.0);\n"
-"}\n";
-
-const char* fragmentRect =
-"uniform vec4 u_color;	\n"
-"void main()            \n"
-"{\n"
-"  gl_FragColor = u_color;\n"
-"}\n";
-
-const char* vertex =
-"attribute vec2 a_position;\n"
-"attribute vec2 a_texCoord;\n"
-"attribute float a_alphaModifier;\n"
-"attribute vec4 a_tint;\n"
-"uniform mat4 u_matrix;\n"
-"varying vec2 v_texCoord;\n"
-"varying float v_alphaModifier;\n"
-"varying vec4 v_tint;\n"
-"void main()\n"
-"{\n"
-"  gl_Position = u_matrix * vec4(a_position, 0.0, 1.0);\n"
-"  v_texCoord = a_texCoord;\n"
-"  v_alphaModifier = a_alphaModifier;\n"
-"  v_tint = a_tint;\n"
-"}\n";
-
-
-const char* fragment =
-#ifndef USE_GL
-"precision highp float;             \n"
-#endif
-"varying vec2 v_texCoord;			\n"
-"uniform sampler2D s_texture;		\n"
-"varying float v_alphaModifier;		\n"
-"varying vec4 v_tint;				\n"
-"void main()                        \n"
-"{\n"
-"  vec4 color = texture2D(s_texture, v_texCoord); \n"
-"  gl_FragColor = vec4(color.r*v_tint.r, color.g*v_tint.g, color.b*v_tint.b, color.a * v_alphaModifier);\n"
-"}\n";
-
-const char* fragmentPal =
-#ifndef USE_GL
-"precision highp float;					 \n"
-#endif
-"uniform sampler2D s_texture;	// own texture \n"
-"uniform sampler2D s_palette;	// palette 256 x 1 pixels \n"
-"uniform sampler2D s_mask;		// optional mask \n"
-"varying vec2 v_texCoord;\n"
-"varying float v_alphaModifier;\n"
-"varying vec4 v_tint;				\n"
-"void main()\n"
-"{\n"
-"  float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;\n"
-"  float index = texture2D(s_texture, v_texCoord).a;\n"
-"  vec4 color = texture2D(s_palette, vec2(index, 0.0));\n"
-"  gl_FragColor = vec4(color.r*v_tint.r, color.g*v_tint.g, color.b*v_tint.b, color.a * alphaModifier);\n"
-"}\n";
-
-const char* fragmentPalGrayed =
-#ifndef USE_GL
-"precision highp float;					 \n"
-#endif
-"uniform sampler2D s_texture;	// own texture \n"
-"uniform sampler2D s_palette;	// palette 256 x 1 pixels \n"
-"uniform sampler2D s_mask;		// optional mask \n"
-"varying vec2 v_texCoord;\n"
-"varying float v_alphaModifier;\n"
-"varying vec4 v_tint;				\n"
-"void main()\n"
-"{\n"
-"  float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;\n"
-"  float index = texture2D(s_texture, v_texCoord).a;\n"
-"  vec4 color = texture2D(s_palette, vec2(index, 0.0));\n"
-"  float gray = (color.r + color.g + color.b)*0.333333;\n"
-"  gl_FragColor = vec4(gray, gray, gray, color.a * alphaModifier);\n"
-"}\n";
-
-const char* fragmentPalSepia =
-#ifndef USE_GL
-"precision highp float;					 \n"
-#endif
-"uniform sampler2D s_texture;	// own texture \n"
-"uniform sampler2D s_palette;	// palette 256 x 1 pixels \n"
-"uniform sampler2D s_mask;		// optional mask \n"
-"varying vec2 v_texCoord;\n"
-"varying float v_alphaModifier;\n"
-"varying vec4 v_tint;				\n"
-"const vec3 lightColor = vec3(0.9, 0.9, 0.5);\n"
-"const vec3 darkColor = vec3(0.2, 0.05, 0.0);\n"
-"void main()\n"
-"{\n"
-"  float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;\n"
-"  float index = texture2D(s_texture, v_texCoord).a;\n"
-"  vec4 color = texture2D(s_palette, vec2(index, 0.0));\n"
-"  float gray = (color.r + color.g + color.b)*0.333333;\n"
-"  vec3 sepia = darkColor*(1.0 - gray) + lightColor*gray;\n"
-"  gl_FragColor = vec4(sepia, color.a * alphaModifier);\n"
-"}\n";
-
-
-const char* vertexEllipse=
-"attribute vec2 a_position;\n"
-"uniform mat4 u_matrix;\n"
-"attribute vec2 a_texCoord;\n"
-"varying vec2 v_texCoord;\n"
-"void main()\n"
-"{\n"
-"  gl_Position = u_matrix * vec4(a_position, 0.0, 1.0);\n"
-"  v_texCoord = a_texCoord;\n"
-"}\n";
-
-const char* fragmentEllipse =
-#ifndef USE_GL
-"precision highp float;					 \n"
-#endif
-"uniform float u_radiusX;\n"
-"uniform float u_radiusY;\n"
-"uniform float u_thickness;\n"
-"uniform float u_support;\n"
-"uniform vec4 u_color;\n"
-"varying vec2 v_texCoord;\n"
-"void main()\n"
-"{\n"
-"   float x = v_texCoord.x;\n"
-"   float y = v_texCoord.y;\n"
-
-"   float x_mid = u_radiusX + u_thickness/2.0;\n"
-"   float y_mid = u_radiusY + u_thickness/2.0;\n"
-"   float distance1 = sqrt(x*x/(x_mid*x_mid) + y*y/(y_mid*y_mid));\n"
-"   float width1 = fwidth(distance1) * u_support/1.25;\n"
-"   float alpha1  = smoothstep(1.0 - width1, 1.0 + width1, distance1);\n"
-
-"   x_mid = u_radiusX - u_thickness/2.0;\n"
-"   y_mid = u_radiusY - u_thickness/2.0;\n"
-"   float distance2 = sqrt(x*x/(x_mid*x_mid) + y*y/(y_mid*y_mid));\n"
-"   float width2 = fwidth(distance2) * u_support/1.25;\n"
-"   float alpha2  = smoothstep(1.0 + width2, 1.0 - width2, distance2);\n"
-
-"   gl_FragColor = vec4(u_color.rgb, (1.0 - max(alpha1, alpha2))*u_color.a);\n"
-"}\n";
-
 GLVideoDriver::~GLVideoDriver()
 {
 	program32->Release();
@@ -291,99 +143,78 @@ void GLVideoDriver::useProgram(GLSLProgram* program)
 
 bool GLVideoDriver::createPrograms()
 {
-	char msg[512];
+	std::string msg;
 	float matrix[16];
 	Matrix::SetIdentityM(matrix);
 
-	program32 = GLSLProgram::Create(vertex, fragment);
+	program32 = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/Sprite32.glslf");
 	if (!program32)
 	{
-		GLSLProgram::GetLastError(msg, sizeof(msg));
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		msg = GLSLProgram::GetLastError();
+		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	program32->Use();
-	program32->StoreUniformLocation("s_texture");
 	program32->SetUniformValue("s_texture", 1, 0);
-	program32->StoreUniformLocation("u_matrix");
 	program32->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 	
-	programPal = GLSLProgram::Create(vertex, fragmentPal);
+	programPal = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePal.glslf");
 	if (!programPal)
 	{
-		GLSLProgram::GetLastError(msg, sizeof(msg));
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		msg = GLSLProgram::GetLastError();
+		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program :%s", msg.c_str());
 		return false;
 	}
 	programPal->Use();
-	programPal->StoreUniformLocation("s_texture");
-	programPal->StoreUniformLocation("s_palette");
-	programPal->StoreUniformLocation("s_mask");
 	programPal->SetUniformValue("s_texture", 1, 0);
 	programPal->SetUniformValue("s_palette", 1, 1);
 	programPal->SetUniformValue("s_mask", 1, 2);
-	programPal->StoreUniformLocation("u_matrix");
 	programPal->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 
-	programPalGrayed = GLSLProgram::Create(vertex, fragmentPalGrayed);
+	programPalGrayed = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePalGrayed.glslf");
 	if (!programPalGrayed)
 	{
-		GLSLProgram::GetLastError(msg, sizeof(msg));
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		msg = GLSLProgram::GetLastError();
+		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programPalGrayed->Use();
-	programPalGrayed->StoreUniformLocation("s_texture");
-	programPalGrayed->StoreUniformLocation("s_palette");
-	programPalGrayed->StoreUniformLocation("s_mask");
 	programPal->SetUniformValue("s_texture", 1, 0);
 	programPal->SetUniformValue("s_palette", 1, 1);
 	programPal->SetUniformValue("s_mask", 1, 2);
-	programPalGrayed->StoreUniformLocation("u_matrix");
 	programPalGrayed->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 
-	programPalSepia = GLSLProgram::Create(vertex, fragmentPalSepia);
+	programPalSepia = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePalSepia.glslf");
 	if (!programPalSepia)
 	{
-		GLSLProgram::GetLastError(msg, sizeof(msg));
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		msg = GLSLProgram::GetLastError();
+		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programPalSepia->Use();
-	programPalSepia->StoreUniformLocation("s_texture");
-	programPalSepia->StoreUniformLocation("s_palette");
-	programPalSepia->StoreUniformLocation("s_mask");
 	programPal->SetUniformValue("s_texture", 1, 0);
 	programPal->SetUniformValue("s_palette", 1, 1);
 	programPal->SetUniformValue("s_mask", 1, 2);;
-	programPalSepia->StoreUniformLocation("u_matrix");
 	programPalSepia->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 	
-	programEllipse = GLSLProgram::Create(vertexEllipse, fragmentEllipse);
+	programEllipse = GLSLProgram::CreateFromFiles("Shaders/Ellipse.glslv", "Shaders/Ellipse.glslf");
 	if (!programEllipse)
 	{
-		GLSLProgram::GetLastError(msg, sizeof(msg));
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		msg = GLSLProgram::GetLastError();
+		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programEllipse->Use();
-	programEllipse->StoreUniformLocation("u_matrix");
 	programEllipse->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
-	programEllipse->StoreUniformLocation("u_radiusX");
-	programEllipse->StoreUniformLocation("u_radiusY");
-	programEllipse->StoreUniformLocation("u_thickness");
-	programEllipse->StoreUniformLocation("u_support");
-	programEllipse->StoreUniformLocation("u_color");
 
-	programRect = GLSLProgram::Create(vertexRect, fragmentRect);
+	programRect = GLSLProgram::CreateFromFiles("Shaders/Rect.glslv", "Shaders/Rect.glslf");
 	if (!programRect)
 	{
-		GLSLProgram::GetLastError(msg, sizeof(msg));
-		Log(ERROR, "SDL 2 GL Driver", "can't build shader program:%s", msg);
+		msg = GLSLProgram::GetLastError();
+		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programRect->Use();
-	programRect->StoreUniformLocation("u_matrix");
 	programRect->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
 	
 	lastUsedProgram = NULL;
@@ -601,7 +432,6 @@ void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned s
 {
 	const float support = 0.75;
 	useProgram(programEllipse);
-	float alpha = min(thickness, 1.0);
     thickness = max(thickness, 1.0);
     float dx = (int)ceilf(xr + thickness/2.0 + 2.5*support);
     float dy = (int)ceilf(yr + thickness/2.0 + 2.5*support);
