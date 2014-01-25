@@ -74,6 +74,9 @@ public:
 
 	bool operator==(const Size& size);
 	bool operator!=(const Size& size);
+	ieWord Area() const { return w * h; }
+	bool IsZero() const { return w == 0 && h == 0; }
+	bool IsEmpty() const { return !w || !h; }
 };
 
 /**
@@ -83,18 +86,21 @@ public:
 
 class GEM_EXPORT Region {
 public:
-	Region(void);
 	int x, y;
 	int w, h;
+	Region(void);
+	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
+
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
-	Region(int x, int y, int w, int h);
 	bool PointInside(unsigned short XPos, unsigned short YPos) const;
 	bool PointInside(const Point &p) const;
 	bool InsideRegion(const Region& rgn) const;
 	bool IntersectsRegion(const Region& rgn) const;
 	void Normalize();
+	Point Origin() const { return Point(x, y); }
+	Size Dimensions() const { return Size(w, h); }
 };
 
 }
