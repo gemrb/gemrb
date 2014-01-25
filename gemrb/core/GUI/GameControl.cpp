@@ -2012,7 +2012,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	}
 	FormationRotation = false;
 	core->GetEventMgr()->FakeMouseMove();
-	return;
 }
 
 void GameControl::OnMouseWheelScroll(short x, short y)
