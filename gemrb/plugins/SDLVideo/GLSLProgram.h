@@ -27,7 +27,7 @@ namespace GemRB
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLint value1, GLint value2 = 0, GLint value3 = 0, GLint value4 = 0);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLint* value);
-		bool SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, GLboolean transpose, const GLfloat* value);
+		bool SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
 		GLint GetAttribLocation(std::string attribName);
 	private:	
 		static std::string errMessage;

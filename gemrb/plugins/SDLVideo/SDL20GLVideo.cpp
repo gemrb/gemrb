@@ -156,7 +156,7 @@ bool GLVideoDriver::createPrograms()
 	}
 	program32->Use();
 	program32->SetUniformValue("s_texture", 1, 0);
-	program32->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	program32->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 	
 	programPal = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePal.glslf");
 	if (!programPal)
@@ -169,7 +169,7 @@ bool GLVideoDriver::createPrograms()
 	programPal->SetUniformValue("s_texture", 1, 0);
 	programPal->SetUniformValue("s_palette", 1, 1);
 	programPal->SetUniformValue("s_mask", 1, 2);
-	programPal->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	programPal->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 
 	programPalGrayed = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePalGrayed.glslf");
 	if (!programPalGrayed)
@@ -182,7 +182,7 @@ bool GLVideoDriver::createPrograms()
 	programPal->SetUniformValue("s_texture", 1, 0);
 	programPal->SetUniformValue("s_palette", 1, 1);
 	programPal->SetUniformValue("s_mask", 1, 2);
-	programPalGrayed->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	programPalGrayed->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 
 	programPalSepia = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePalSepia.glslf");
 	if (!programPalSepia)
@@ -195,7 +195,7 @@ bool GLVideoDriver::createPrograms()
 	programPal->SetUniformValue("s_texture", 1, 0);
 	programPal->SetUniformValue("s_palette", 1, 1);
 	programPal->SetUniformValue("s_mask", 1, 2);;
-	programPalSepia->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	programPalSepia->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 	
 	programEllipse = GLSLProgram::CreateFromFiles("Shaders/Ellipse.glslv", "Shaders/Ellipse.glslf");
 	if (!programEllipse)
@@ -205,7 +205,7 @@ bool GLVideoDriver::createPrograms()
 		return false;
 	}
 	programEllipse->Use();
-	programEllipse->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	programEllipse->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 
 	programRect = GLSLProgram::CreateFromFiles("Shaders/Rect.glslv", "Shaders/Rect.glslf");
 	if (!programRect)
@@ -215,7 +215,7 @@ bool GLVideoDriver::createPrograms()
 		return false;
 	}
 	programRect->Use();
-	programRect->SetUniformMatrixValue("u_matrix", 4, 1, GL_FALSE, matrix);
+	programRect->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 	
 	lastUsedProgram = NULL;
 	return true;
@@ -428,6 +428,33 @@ void GLVideoDriver::drawColoredRect(const Region& rgn, const Color& color)
 	}
 }
 
+void GLVideoDriver::drawLine(short x1, short y1, short x2, short y2, const Color& color)
+{
+	if (SDL_ALPHA_TRANSPARENT == color.a) return;
+	useProgram(programRect);
+	glViewport(0, 0, width, height);
+	glScissor(0, 0, width, height);
+	GLfloat data[] = 
+	{ 
+		-1.0f + (GLfloat)x1*2/width,  1.0f - (GLfloat)y1*2/height,
+		-1.0f + (GLfloat)x2*2/width,  1.0f - (GLfloat)y2*2/height
+	};
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+	GLint a_position = programRect->GetAttribLocation("a_position");			
+	glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 0, 0);
+	programRect->SetUniformValue("u_color", 4, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
+
+	glEnableVertexAttribArray(a_position);
+	glDrawArrays(GL_LINES, 0, 2);
+	glDisableVertexAttribArray(a_position);
+
+	glDeleteBuffers(1, &buffer);
+}
+
 void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned short xr, unsigned short yr, float thickness, const Color& color)
 {
 	const float support = 0.75;
@@ -591,46 +618,36 @@ void GLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, b
 
 void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
 {
-	if (x1 > x2) 
-	{
-		short tmpx = x1;
-		x1 = x2;
-		x2 = tmpx;
-	}
 	if (clipped) 
 	{
 		x1 = x1 + xCorr - Viewport.x;
 		x2 = x2 + xCorr - Viewport.x;
 		y = y + yCorr - Viewport.y;
 	}
-	Region rgn;
-	rgn.x = x1;
-	rgn.y = y;
-	rgn.h = 1;
-	rgn.w = x2 - x1;
-	return drawColoredRect(rgn, color);
+	return drawLine(x1, y, x2, y, color); 
 }
 
 void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
 {
-	if (y1 > y2) 
-	{
-		short tmpy = y1;
-		y1 = y2;
-		y2 = tmpy;
-	}
 	if (clipped) 
 	{
 		x = x + xCorr - Viewport.x;
 		y1 = y1 + yCorr - Viewport.y;
 		y2 = y2 + yCorr - Viewport.y;
 	}
-	Region rgn;
-	rgn.x = x;
-	rgn.y = y1;
-	rgn.w = 1;
-	rgn.h = y2 - y1;
-	return drawColoredRect(rgn, color);
+	return drawLine(x, y1, x, y2, color); 
+}
+
+void GLVideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped)
+{
+	if (clipped) 
+	{
+		x1 = x1 + xCorr - Viewport.x;
+		x2 = x2 + xCorr - Viewport.x;
+		y1 = y1 + yCorr - Viewport.y;
+		y2 = y2 + yCorr - Viewport.y;
+	}
+	return drawLine(x1, y1, x2, y2, color);
 }
 
 void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped)
@@ -649,6 +666,9 @@ void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned 
 	}
 	return drawEllipse(cx, cy, xr, yr, 3, color);
 }
+
+void GLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, bool clipped)
+{}
 
 void GLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped)
 {

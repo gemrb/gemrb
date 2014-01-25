@@ -232,20 +232,20 @@ bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char s
 	}
 }
 
-bool GLSLProgram::SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, GLboolean transpose, const GLfloat* value)
+bool GLSLProgram::SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value)
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
 	switch(size)
 	{
 		case 2:
-			glUniformMatrix2fv(location, count, transpose, value);
+			glUniformMatrix2fv(location, count, GL_FALSE, value);
 			return true;
 		case 3:
-			glUniformMatrix3fv(location, count, transpose, value);
+			glUniformMatrix3fv(location, count, GL_FALSE, value);
 			return true;
 		case 4:
-			glUniformMatrix4fv(location, count, transpose, value);
+			glUniformMatrix4fv(location, count, GL_FALSE, value);
 			return true;
 		default:
 			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform size";
