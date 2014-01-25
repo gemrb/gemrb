@@ -78,7 +78,7 @@ public:
 	// Returns a non-const pointer to the removed span.
 	TextSpan* RemoveSpan(const TextSpan* span);
 
-	const TextSpan* SpanAtPoint(const Point& p);
+	const TextSpan* SpanAtPoint(const Point& p) const;
 	const Size& ContainerFrame() const { return frame; }
 	void DrawContents(int x, int y) const;
 private:

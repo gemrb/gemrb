@@ -120,22 +120,17 @@ TextSpan* TextContainer::RemoveSpan(const TextSpan* span)
 	return NULL;
 }
 
-const TextSpan* TextContainer::SpanAtPoint(const Point& p)
+const TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 {
 	// the point we are testing is relative to the container
 	Region rgn = Region(0, 0, frame.w, frame.h);
 	if (!rgn.PointInside(p))
 		return NULL;
 
-	rgn.h = 0; // start at 0 and work our way up by moving down the list
-	SpanList::const_iterator it;
-	for (it = spans.begin(); it != spans.end(); ++it) {
-		// this list is "sorted" spans are layed out in this order from top to bottom
-		const Size& spanRgn = (*it)->SpanFrame();
-		rgn.h += spanRgn.h; // expand the search
-
-		if (rgn.PointInside(p)) {
-			return *it;
+	SpanLayout::const_iterator it;
+	for (it = layout.begin(); it != layout.end(); ++it) {
+		if ((*it).second.PointInside(p)) {
+			return (*it).first;
 		}
 	}
 	return NULL;
