@@ -23,6 +23,8 @@
 #include "System/String.h"
 
 #include <list>
+#include <map>
+#include <vector>
 
 namespace GemRB {
 
@@ -55,6 +57,10 @@ class TextContainer
 {
 	typedef std::list<TextSpan*> SpanList;
 	SpanList spans;
+	typedef std::map<TextSpan*, Region> SpanLayout;
+	SpanLayout layout;
+	std::vector<Region> ExclusionRects;
+
 	Size frame;
 	Font* font;
 	Palette* pallete;
@@ -64,10 +70,21 @@ public:
 
 	// Creates a basic "inline" span using the containers font/palette
 	void AppendText(const String& text);
+	// append the span to the end of the container. The container takes ownership of the span.
 	void AppendSpan(TextSpan* span);
+	// Insert a span to a new position in the list. The container takes ownership of the span.
+	void InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing);
+	// removes the span from the container and transfers ownership to the caller.
+	// Returns a non-const pointer to the removed span.
+	TextSpan* RemoveSpan(const TextSpan* span);
 
 	const TextSpan* SpanAtPoint(const Point& p);
-	void Draw();
+	const Size& ContainerFrame() const { return frame; }
+	void DrawContents(int x, int y) const;
+private:
+	void LayoutSpansStartingAt(SpanList::const_iterator start);
+	void AddExclusionRect(const Region& rect);
+	bool RectIsExcluded(const Region& rect);
 };
 
 }

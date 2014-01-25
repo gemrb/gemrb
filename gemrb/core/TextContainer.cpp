@@ -19,9 +19,11 @@
 #include "TextContainer.h"
 
 #include "Font.h"
+#include "Interface.h"
 #include "Palette.h"
 #include "Sprite2D.h"
 #include "System/String.h"
+#include "Video.h"
 
 namespace GemRB {
 
@@ -92,6 +94,30 @@ void TextContainer::AppendText(const String& text)
 void TextContainer::AppendSpan(TextSpan* span)
 {
 	spans.push_back(span);
+	LayoutSpansStartingAt(--spans.end());
+}
+
+void TextContainer::InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing)
+{
+	if (!existing) { // insert at beginning;
+		spans.push_front(newSpan);
+		return;
+	}
+	SpanList::iterator it;
+	it = std::find(spans.begin(), spans.end(), existing);
+	spans.insert(++it, newSpan);
+	LayoutSpansStartingAt(it);
+}
+
+TextSpan* TextContainer::RemoveSpan(const TextSpan* span)
+{
+	SpanList::iterator it;
+	it = std::find(spans.begin(), spans.end(), span);
+	if (it != spans.end()) {
+		LayoutSpansStartingAt(--spans.erase(it));
+		return (TextSpan*)span;
+	}
+	return NULL;
 }
 
 const TextSpan* TextContainer::SpanAtPoint(const Point& p)
@@ -113,6 +139,91 @@ const TextSpan* TextContainer::SpanAtPoint(const Point& p)
 		}
 	}
 	return NULL;
+}
+
+void TextContainer::DrawContents(int x, int y) const
+{
+	Video* video = core->GetVideoDriver();
+	//Region rgn = Region(Point(0,0), frame);
+	SpanLayout::const_iterator it;
+	for (it = layout.begin(); it != layout.end(); ++it) {
+		Region rgn = (*it).second;
+		rgn.x += x;
+		rgn.y += y;
+		video->DrawRect(rgn, ColorRed);
+		video->BlitSprite((*it).first->RenderedSpan(),
+						  rgn.x, rgn.y, true, &rgn);
+	}
+}
+
+void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
+{
+	assert(it != spans.end());
+	Point drawPoint(0, 0);
+	TextSpan* span = *it;
+
+	if (it != spans.begin()) {
+		// get the last draw position
+		const Region& rgn = layout[*--it];
+		drawPoint.x = rgn.x + rgn.w;
+		drawPoint.y = rgn.y;
+		it++;
+	} else {
+		drawPoint.y = span->SpanFrame().h;
+	}
+
+	for (; it != spans.end(); it++) {
+		span = *it;
+		const Size& spanFrame = span->SpanFrame();
+
+		// FIXME: this only calculates left alignment
+		// it also doesnt support block layout
+		Region layoutRgn;
+		//do {
+			if (drawPoint.x + spanFrame.w > frame.w
+				&& frame.w >= spanFrame.w) {
+				// move down and back
+				drawPoint.x = 0;
+				drawPoint.y += spanFrame.h;
+			}
+			layoutRgn = Region(drawPoint, spanFrame);
+			drawPoint.x += spanFrame.w;
+		//} while (RectIsExcluded(layoutRgn));
+
+		layout[span] = layoutRgn;
+		// TODO: need to extend the exclusion rect for some alignments
+		// eg right align should invalidate the entire area infront also
+		AddExclusionRect(layoutRgn);
+	}
+}
+
+void TextContainer::AddExclusionRect(const Region& rect)
+{
+	std::vector<Region>::iterator it;
+	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
+		if (rect.InsideRegion(*it)) {
+			// already have an encompassing region
+			break;
+		} else if ((*it).InsideRegion(rect)) {
+			// new region swallows the old, replace it;
+			*it = rect;
+			break;
+		}
+	}
+	if (it == ExclusionRects.end()) {
+		// no match found
+		ExclusionRects.push_back(rect);
+	}
+}
+
+bool TextContainer::RectIsExcluded(const Region& rect)
+{
+	std::vector<Region>::const_iterator it;
+	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
+		if (rect.IntersectsRegion(*it))
+			return true;
+	}
+	return false;
 }
 
 }
