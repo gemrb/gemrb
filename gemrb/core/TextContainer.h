@@ -47,7 +47,7 @@ public:
 	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn);
 	~TextSpan();
 
-	const Size& SpanFrame() const {return frame;}
+	const Size& SpanFrame();
 	const Sprite2D* RenderedSpan();
 private:
 	void RenderSpan();
@@ -84,7 +84,7 @@ public:
 private:
 	void LayoutSpansStartingAt(SpanList::const_iterator start);
 	void AddExclusionRect(const Region& rect);
-	bool RectIsExcluded(const Region& rect);
+	const Region* ExcludedRegionForRect(const Region& rect);
 };
 
 }

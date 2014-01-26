@@ -964,7 +964,7 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
-		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, pal);
+		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, pal, Size(Width, 0));
 		dialogOptSpans.push_back(std::make_pair(opts[i].first, span));
 		dialogOptions->AppendSpan(span); // container owns the span
 	}

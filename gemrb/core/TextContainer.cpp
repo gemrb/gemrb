@@ -66,8 +66,19 @@ void TextSpan::RenderSpan()
 	if (spanSprite) spanSprite->release();
 	spanSprite = font->RenderText(text, frame);
 	spanSprite->acquire();
+	// frame dimensions of 0 just mean size to fit
+	if (frame.w == 0)
+		frame.w = spanSprite->Width;
+	if (frame.h == 0)
+		frame.h = spanSprite->Height;
 }
 
+const Size& TextSpan::SpanFrame()
+{
+	if (frame.IsEmpty())
+		RenderSpan(); // our true frame is determined by the rendering
+	return frame;
+}
 
 
 TextContainer::TextContainer(const Size& frame, Font* font, Palette* pal)
@@ -160,7 +171,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 	if (it != spans.begin()) {
 		// get the last draw position
 		const Region& rgn = layout[*--it];
-		drawPoint.x = rgn.x + rgn.w;
+		drawPoint.x = rgn.x + rgn.w + 1;
 		drawPoint.y = rgn.y;
 		it++;
 	} else {
@@ -174,16 +185,23 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		// FIXME: this only calculates left alignment
 		// it also doesnt support block layout
 		Region layoutRgn;
-		//do {
-			if (drawPoint.x + spanFrame.w > frame.w
-				&& frame.w >= spanFrame.w) {
+		const Region* excluded = NULL;
+		do {
+			if (excluded) {
+				// we know that we have to move at least to the right
+				// TODO: implement handling for block alignment
+				drawPoint.x = excluded->x + excluded->w + 1;
+			} else if (layoutRgn.w) { // we dont want to evaluate this the first time
+				drawPoint.x += spanFrame.w + 1;
+			}
+			if (drawPoint.x && drawPoint.x + spanFrame.w > frame.w) {
 				// move down and back
 				drawPoint.x = 0;
 				drawPoint.y += spanFrame.h;
 			}
 			layoutRgn = Region(drawPoint, spanFrame);
-			drawPoint.x += spanFrame.w;
-		//} while (RectIsExcluded(layoutRgn));
+			excluded = ExcludedRegionForRect(layoutRgn);
+		} while (excluded);
 
 		layout[span] = layoutRgn;
 		// TODO: need to extend the exclusion rect for some alignments
@@ -194,6 +212,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 
 void TextContainer::AddExclusionRect(const Region& rect)
 {
+	assert(!rect.Dimensions().IsEmpty());
 	std::vector<Region>::iterator it;
 	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
 		if (rect.InsideRegion(*it)) {
@@ -211,14 +230,14 @@ void TextContainer::AddExclusionRect(const Region& rect)
 	}
 }
 
-bool TextContainer::RectIsExcluded(const Region& rect)
+const Region* TextContainer::ExcludedRegionForRect(const Region& rect)
 {
 	std::vector<Region>::const_iterator it;
 	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
 		if (rect.IntersectsRegion(*it))
-			return true;
+			return &*it;
 	}
-	return false;
+	return NULL;
 }
 
 }
