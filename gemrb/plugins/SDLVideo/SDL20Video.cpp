@@ -329,31 +329,37 @@ int SDL20VideoDriver::SwapBuffers(void)
 {
 	int ret = SDLVideoDriver::SwapBuffers();
 
-	void *pixels;
-	int pitch;
-	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-		Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
-		return GEM_ERROR;
-	}
+	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
+	/*
+	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
+	 Don't know how universal it is yet so leaving this in commented out just in case
 
-	ieByte* src = (ieByte*)backBuf->pixels;
-	ieByte* dest = (ieByte*)pixels;
-	for( int row = 0; row < height; row++ ) {
-		memcpy(dest, src, width * backBuf->format->BytesPerPixel);
-		dest += pitch;
-		src += backBuf->pitch;
-	}
+	 void *pixels;
+	 int pitch;
+	 if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
+	 Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
+	 return GEM_ERROR;
+	 }
 
-/*
-	if (fadeColor.a) {
-		SDL_Rect dst = {
-			xCorr, yCorr, Viewport.w, Viewport.h
-		};
-		SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
-		SDL_RenderFillRect(renderer, &dst);
-	}
-*/
-	SDL_UnlockTexture(screenTexture);
+	 ieByte* src = (ieByte*)backBuf->pixels;
+	 ieByte* dest = (ieByte*)pixels;
+	 for( int row = 0; row < height; row++ ) {
+	 memcpy(dest, src, width * backBuf->format->BytesPerPixel);
+	 dest += pitch;
+	 src += backBuf->pitch;
+	 }
+	 SDL_UnlockTexture(screenTexture);
+	 */
+
+	/*
+	 if (fadeColor.a) {
+	 SDL_Rect dst = {
+	 xCorr, yCorr, Viewport.w, Viewport.h
+	 };
+	 SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
+	 SDL_RenderFillRect(renderer, &dst);
+	 }
+	 */
 	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
 	return ret;
