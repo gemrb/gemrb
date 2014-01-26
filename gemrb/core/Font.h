@@ -50,8 +50,6 @@ class Sprite2D;
 #define IE_FONT_ALIGN_MIDDLE 0x20 //Only for single line Text
 #define IE_FONT_SINGLE_LINE  0x40
 
-#define IE_FONT_PADDING 5
-
 /**
  * @class Font
  * Class for using and manipulating images serving as fonts

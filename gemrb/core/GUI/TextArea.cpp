@@ -183,9 +183,8 @@ void TextArea::DrawInternal(Region& clip)
 		// this way we dont have to fuss with an unnecesary copy and we can simply call ftext->Print on every line
 		// starting with startrow. The obsticle is apparently seaparating listbox behavior into its own class.
 
-		// FIXME: shouldn't rely on "font padding"
-		// should be intrinsic to TextArea
-		size_t psx = IE_FONT_PADDING;
+		// FIXME: we need padding
+		size_t psx = 0;
 		size_t lineWidth = psx, wordWidth = 0;
 
 		int rows = 0;
@@ -251,9 +250,8 @@ void TextArea::DrawInternal(Region& clip)
 		else
 			pal = palette;
 
-		// FIXME: shouldn't rely on "font padding"
-		// should be intrinsic to TextArea
-		size_t psx = IE_FONT_PADDING;
+		// FIXME: we need padding
+		size_t psx = 0;
 		size_t lineWidth = psx, wordWidth = 0;
 
 		int rows = 0;
@@ -739,9 +737,8 @@ void TextArea::CalcRowCount()
 		for (size_t i = 0; i < lines.size(); i++) {
 			const char* line = lines[i];
 			size_t len = strlen(line);
-			// FIXME: shouldn't rely on "font padding"
-			// should be intrinsic to TextArea
-			size_t psx = IE_FONT_PADDING;
+			// FIXME: we need padding
+			size_t psx = 0;
 			size_t lineWidth = psx, wordWidth = 0;
 
 			for (size_t pos = 0; pos < len; pos++) {

@@ -176,14 +176,13 @@ size_t Font::Print(Region rgn, const char* string,
 size_t Font::Print(Region rgn, const String& string, Palette* color,
 				   ieByte Alignment) const
 {
-	unsigned int psx = IE_FONT_PADDING;
 	Palette* pal = color;
 	if (!pal) {
 		pal = palette;
 	}
 
 	ieWord ystep = (Alignment&IE_FONT_SINGLE_LINE) ? StringSize(string).h : maxHeight;
-	int x = psx, y = ystep;
+	int x = 0, y = ystep;
 	Video* video = core->GetVideoDriver();
 
 	if (Alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
@@ -196,10 +195,8 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 		if (Alignment & IE_FONT_ALIGN_MIDDLE) {
 			y += ( rgn.h - h ) / 2;
 		} else {
-			y += ( rgn.h - h ) - IE_FONT_PADDING;
+			y += ( rgn.h - h );
 		}
-	} else if (Alignment & IE_FONT_ALIGN_TOP) {
-		y += IE_FONT_PADDING;
 	}
 
 	// is this horribly inefficient?
@@ -216,9 +213,9 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 		if (Alignment & IE_FONT_ALIGN_CENTER) {
 			x = ( rgn.w - lineW ) / 2;
 		} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
-			x = ( rgn.w - lineW ) - IE_FONT_PADDING;
+			x = ( rgn.w - lineW );
 		} else {
-			x = psx;
+			x = 0;
 		}
 
 		size_t lineLen = line.length();

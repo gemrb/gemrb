@@ -89,8 +89,7 @@ void TextEdit::DrawInternal(Region& rgn)
 			vcenter += rows * font->maxHeight;
 			w = w - (rgn.w * rows);
 		}
-		// FIXME: font is still stupid and forces IE_FONT_PADDING
-		video->BlitSprite(Cursor, w + rgn.x + IE_FONT_PADDING + FontPosX,
+		video->BlitSprite(Cursor, w + rgn.x + FontPosX,
 						  FontPosY + vcenter + rgn.y, true);
 	} else {
 		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,

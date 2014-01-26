@@ -305,9 +305,7 @@ void Button::DrawInternal(Region& rgn)
 		Region r;
 		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
-			// FIXME: we are subtracting IE_FONT_PADDING because Font indents 5px, but we dont want that here
-			r = Region(picXPos - IE_FONT_PADDING, picYPos + IE_FONT_PADDING,
-					   Picture->Width + IE_FONT_PADDING, Picture->Height);
+			r = Region(picXPos, picYPos, Picture->Width, Picture->Height);
 		} else {
 			r = Region( rgn.x, rgn.y, rgn.w - 2, rgn.h - 2);
 		}

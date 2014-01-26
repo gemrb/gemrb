@@ -67,8 +67,7 @@ void Console::DrawInternal(Region& drawFrame)
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE);
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
 	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
-	// FIXME: font is still stupid and forces IE_FONT_PADDING
-	video->BlitSprite(Cursor, w + drawFrame.x + IE_FONT_PADDING, vcenter + drawFrame.y, true);
+	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y, true);
 }
 /** Set Font */
 void Console::SetFont(Font* f)
