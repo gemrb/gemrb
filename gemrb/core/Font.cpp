@@ -68,12 +68,42 @@ bool Font::MatchesResRef(const ieResRef resref)
 
 Sprite2D* Font::RenderText(const String& string, const Size& size, size_t* numPrinted) const
 {
-	Size canvasSize = StringSize(string);
+	Size canvasSize = StringSize(string); // same as size(0, 0)
 	// if the string is larger than the region shrink the canvas
-	if (size.w < canvasSize.w) {
-		canvasSize.w = size.w;
+	// except 0 means we should size to fit in that dimension
+	if (size.w) {
+		// potentially resize
+		if (size.w < canvasSize.w) {
+			// we need to resize horizontally which creates new lines
+			ieWord trimmedArea = (canvasSize.w - size.w) * canvasSize.h;
+			// this automatically becomes multiline, therefore use maxHeight
+			ieWord lineArea = size.w * maxHeight;
+			// round up
+			ieWord numLines = 1 + ((trimmedArea - 1) / lineArea);
+			if (!size.h) {
+				// grow as much as needed vertically.
+				canvasSize.h += numLines * maxHeight;
+				// FIXME: there is a chance we didn't grow enough vertically...
+				// we can't possibly know how lines will break ahead of time,
+				// over a long enough paragraph we can overflow the canvas
+				// the easiest solution would be to perform a realloc when it happens (and size.h == 0)
+				// by calculating the additional size by the current substring
+			} else if (size.h > canvasSize.h) {
+				// grow by line increments until we hit the limit
+				// round up, because even a partial line should be blitted (and clipped)
+				ieWord maxLines = 1 + (((size.h - canvasSize.h) - 1) / maxHeight);
+				if (maxLines < numLines) {
+					numLines = maxLines;
+				}
+				canvasSize.h += numLines * maxHeight;
+				// if the new canvas size is taller than size.h it will be dealt with later
+			}
+			canvasSize.w = size.w;
+		}
+		// else: we already fit in the designated area (horizontally). No need to resize.
 	}
-	if (size.h < canvasSize.h) {
+	if (size.h && size.h < canvasSize.h) {
+		// we can't unbreak lines ("\n") so at best we can clip the text.
 		canvasSize.h = size.h;
 	}
 	ieWord lineHeight = (maxHeight > canvasSize.h) ? canvasSize.h : maxHeight;
@@ -99,6 +129,7 @@ Sprite2D* Font::RenderText(const String& string, const Size& size, size_t* numPr
 			hCurrent += lineHeight;
 			if ((hCurrent + curGlyph->Height) > canvasSize.h) {
 				// the next line would be clipped. we are done.
+				// FIXME: we should support partial rows
 				break;
 			}
 		}
@@ -107,7 +138,8 @@ Sprite2D* Font::RenderText(const String& string, const Size& size, size_t* numPr
 		ieByte* src = (ieByte*)curGlyph->pixels;
 		offset = (lineHeight - curGlyph->YPos) * canvasSize.w;
 		assert(offset >= 0);
-		dest = canvasPx + wCurrent + offset;
+		dest = canvasPx + wCurrent + offset + (hCurrent * canvasSize.w);
+		// FIXME: this can overflow due to glyphs that are only partially on the canvas
 		for( int row = 0; row < curGlyph->Height; row++ ) {
 			memcpy(dest, src, curGlyph->Width);
 			dest += canvasSize.w;
