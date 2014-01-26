@@ -54,7 +54,7 @@ void Label::DrawInternal(Region& rgn)
 	if (font && Text.length()) {
 		font->Print( rgn, Text,
 			useRGB?palette:NULL,
-					 Alignment | IE_FONT_SINGLE_LINE, true );
+					 Alignment | IE_FONT_SINGLE_LINE );
 	}
 
 	if (AnimPicture) {

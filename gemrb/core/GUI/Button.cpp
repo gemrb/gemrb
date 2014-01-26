@@ -312,7 +312,7 @@ void Button::DrawInternal(Region& rgn)
 			r = Region( rgn.x, rgn.y, rgn.w - 2, rgn.h - 2);
 		}
 
-		font->Print( r, Text, ppoi, (ieByte) align, true );
+		font->Print( r, Text, ppoi, (ieByte) align );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {

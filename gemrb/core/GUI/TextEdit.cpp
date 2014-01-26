@@ -81,7 +81,7 @@ void TextEdit::DrawInternal(Region& rgn)
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
 		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ),
-					Text, palette, Alignment, true );
+					Text, palette, Alignment );
 		int w = font->StringSize(Text.substr(0, CurPos)).w;
 		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
 		if (w > rgn.w) {
@@ -94,7 +94,7 @@ void TextEdit::DrawInternal(Region& rgn)
 						  FontPosY + vcenter + rgn.y, true);
 	} else {
 		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,
-				palette, Alignment, true );
+				palette, Alignment );
 	}
 }
 

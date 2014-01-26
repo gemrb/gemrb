@@ -64,7 +64,7 @@ void Console::DrawInternal(Region& drawFrame)
 	Video* video = core->GetVideoDriver();
 	video->DrawRect( drawFrame, ColorBlack );
 	font->Print( drawFrame, Buffer, palette,
-			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
+			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE);
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
 	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
 	// FIXME: font is still stupid and forces IE_FONT_PADDING

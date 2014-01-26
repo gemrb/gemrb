@@ -1163,7 +1163,7 @@ void Interface::Main()
 			}
 			video->DrawRect( fpsRgn, ColorBlack );
 			fps->Print( fpsRgn, String(fpsstring), palette,
-					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
+					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE );
 		}
 		if (TickHook)
 			TickHook->call();
@@ -3372,21 +3372,24 @@ void Interface::DrawTooltip ()
 
 	int x = strx + ((strw - w) / 2);
 
-	Region r2 = Region( x, y, w, h );
+	Region clip = Region( x, y, w, h );
 	if (TooltipBack) {
-		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &r2 );
+		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &clip );
 		video->BlitSprite( TooltipBack[1], x, y, true );
 		video->BlitSprite( TooltipBack[2], x + w, y, true );
 	}
 
 	if (TooltipBack) {
-		r2.x += TooltipBack[1]->Width;
-		r2.w -= TooltipBack[2]->Width;
+		clip.x += TooltipBack[1]->Width;
+		clip.w -= TooltipBack[2]->Width;
 		strx += TooltipMargin;
 	}
 	Region textr = Region( strx, y, strw, h );
-	fnt->Print( r2, textr, *tooltip_text, NULL,
-		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
+	// FIXME: we used to clip the text
+	// the font no longer takes responsibility for clipping (aside from print region)
+	// we will have to do the clipping here.
+	fnt->Print( textr, *tooltip_text, NULL,
+		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
 }
 
 //interface for higher level functions, if the window was

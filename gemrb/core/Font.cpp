@@ -158,47 +158,23 @@ Sprite2D* Font::RenderText(const String& string, const Size& size, size_t* numPr
 	if (numPrinted) {
 		*numPrinted = chrIdx;
 	}
-	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(canvasSize.w, canvasSize.h, canvasPx,
-															 palette, true, curGlyph->GetColorKey());
+	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(canvasSize.w, canvasSize.h,
+															 canvasPx, palette, true, ck);
 	// TODO: adjust canvas position based on alignment flags and rgn
 	return canvas;
 }
 
-size_t Font::Print(Region rgn, const char* string, Palette* hicolor,
-	ieByte Alignment, bool anchor) const
-{
-	Region cliprgn = rgn;
-	if (!anchor) {
-		Region Viewport = core->GetVideoDriver()->GetViewport();
-		cliprgn.x -= Viewport.x;
-		cliprgn.y -= Viewport.y;
-	}
-	return Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
-}
-
-size_t Font::Print(Region cliprgn, Region rgn, const char* string,
-	Palette* hicolor, ieByte Alignment, bool anchor) const
+size_t Font::Print(Region rgn, const char* string,
+				   Palette* hicolor, ieByte Alignment) const
 {
 	String* tmp = StringFromCString(string);
-	size_t ret = Print(cliprgn, rgn, *tmp, hicolor, Alignment, anchor);
+	size_t ret = Print(rgn, *tmp, hicolor, Alignment);
 	delete tmp;
 	return ret;
 }
 
-size_t Font::Print(Region rgn, const String& string, Palette* hicolor,
-				   ieByte Alignment, bool anchor) const
-{
-	Region cliprgn = rgn;
-	if (!anchor) {
-		Region Viewport = core->GetVideoDriver()->GetViewport();
-		cliprgn.x -= Viewport.x;
-		cliprgn.y -= Viewport.y;
-	}
-	return Print(cliprgn, rgn, string, hicolor, Alignment, anchor);
-}
-
-size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* color,
-				   ieByte Alignment, bool anchor) const
+size_t Font::Print(Region rgn, const String& string, Palette* color,
+				   ieByte Alignment) const
 {
 	unsigned int psx = IE_FONT_PADDING;
 	Palette* pal = color;
@@ -284,7 +260,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 						}
 						currGlyph = GetCharSprite(currChar);
 						// should probably use rect intersection, but new lines shouldnt be to the left ever.
-						if (!cliprgn.PointInside(x + rgn.x - currGlyph->XPos,
+						if (!rgn.PointInside(x + rgn.x - currGlyph->XPos,
 												 y + rgn.y - currGlyph->YPos)) {
 							if (!wordW > (int)lineW) {
 								// this probably doest cover every situation 100%
@@ -299,7 +275,7 @@ size_t Font::Print(Region cliprgn, Region rgn, const String& string, Palette* co
 							}
 							break; // either done, or skipping
 						}
-						video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, anchor, &cliprgn, pal);
+						video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, pal);
 
 						x += currGlyph->Width;
 					}

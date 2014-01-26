@@ -90,15 +90,10 @@ public:
 
 	// Printing methods
 	// return the number of glyphs printed
-	size_t Print(Region cliprgn, Region rgn, const char* string,
-		Palette* color, ieByte Alignment, bool anchor = false) const;
-	size_t Print(Region rgn, const char* string, Palette* color,
-		ieByte Alignment, bool anchor = false) const;
-
-	size_t Print(Region cliprgn, Region rgn, const String& string, Palette* color,
-				 ieByte Alignment, bool anchor = false) const;
-	size_t Print(Region rgn, const String& string, Palette* hicolor,
-				 ieByte Alignment, bool anchor) const;
+	size_t Print(Region rgn, const char* string,
+				 Palette* color, ieByte Alignment) const;
+	size_t Print(Region rgn, const String& string,
+				 Palette* hicolor, ieByte Alignment) const;
 
 	/** Returns size of the string rendered in this font in pixels */
 	Size StringSize(const String&, const Size* = NULL) const;

@@ -173,7 +173,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 		Size padding(5, 0);
 		Size ts = ftext->StringSize(*m->GetCaption(), &padding);
 		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
-					 *m->GetCaption(), text_pal, 0, true );
+					 *m->GetCaption(), text_pal, 0 );
 	}
 }
 

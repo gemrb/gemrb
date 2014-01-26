@@ -276,9 +276,11 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		y = overHeadTextPos.y;
 	}
 
+	// FIXME: we used to print with anchor=false
+	// we should render the text as a Sprite and print that way
 	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
 	font->Print( rgn, overHeadText, palette?palette:core->InfoTextPalette,
-				IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
+				IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
 	gamedata->FreePalette(palette);
 }
 
