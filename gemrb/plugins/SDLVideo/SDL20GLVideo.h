@@ -17,6 +17,13 @@ namespace GemRB
 	class GLPaletteManager;
 	class GLSLProgram;
 
+	enum PointDrawingMode
+	{
+		LineStrip,
+		LineLoop,
+		FilledPolygon
+	};
+
 	class GLVideoDriver : public SDL20VideoDriver 
 	{
 	private:
@@ -37,9 +44,9 @@ namespace GemRB
 		void useProgram(GLSLProgram* program); // use this instead program->Use()
 		bool createPrograms();
 		void blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, Palette* attachedPal = NULL, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
-		void drawColoredRect(const Region& rgn, const Color& color);
+		void clearRect(const Region& rgn, const Color& color);
 		void drawEllipse(int cx, int cy, unsigned short xr, unsigned short yr, float thickness, const Color& color);
-		void drawLine(short x1, short y1, short x2, short y2, const Color& color);
+		void drawPolygon(Point* points, unsigned int count, const Color& color, PointDrawingMode mode);
 
 	public:
 		~GLVideoDriver();
@@ -56,6 +63,7 @@ namespace GemRB
 		void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
 		void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
 		void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
+		void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);
 		void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped = true);
 		void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
 		void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines = true, bool clipped = true);

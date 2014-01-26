@@ -390,66 +390,44 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	spritesPerFrame++;
 }
 
-void GLVideoDriver::drawColoredRect(const Region& rgn, const Color& color)
+void GLVideoDriver::clearRect(const Region& rgn, const Color& color)
 {
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
-
 	glScissor(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
-	if (SDL_ALPHA_OPAQUE == color.a) // possible to work faster than shader but a lot... may be disable in future
-	{
-		glClearColor(color.r/255, color.g/255, color.b/255, color.a/255);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-	else
-	{
-		useProgram(programRect);
-		glViewport(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
-		GLfloat data[] = 
-		{ 
-			-1.0f,  1.0f,
-			1.0f,  1.0f,
-			-1.0f, -1.0f,
-			1.0f, -1.0f
-		};
-		GLuint buffer;
-		glGenBuffers(1, &buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-		GLint a_position = programRect->GetAttribLocation("a_position");			
-		glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 0, 0);
-		programRect->SetUniformValue("u_color", 4, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
-
-		glEnableVertexAttribArray(a_position);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDisableVertexAttribArray(a_position);
-
-		glDeleteBuffers(1, &buffer);
-	}
+	glClearColor(color.r/255, color.g/255, color.b/255, color.a/255);
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void GLVideoDriver::drawLine(short x1, short y1, short x2, short y2, const Color& color)
+void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& color, PointDrawingMode mode)
 {
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
 	useProgram(programRect);
 	glViewport(0, 0, width, height);
 	glScissor(0, 0, width, height);
-	GLfloat data[] = 
-	{ 
-		-1.0f + (GLfloat)x1*2/width,  1.0f - (GLfloat)y1*2/height,
-		-1.0f + (GLfloat)x2*2/width,  1.0f - (GLfloat)y2*2/height
-	};
+	GLfloat* data = new GLfloat[count*VERTEX_SIZE];
+	for(unsigned int i=0; i<count; i++)
+	{
+		data[i*VERTEX_SIZE] = -1.0f + (GLfloat)points[i].x*2/width;
+		data[i*VERTEX_SIZE + 1] = 1.0f - (GLfloat)points[i].y*2/height;
+	}
+
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*VERTEX_SIZE*count, data, GL_STATIC_DRAW);
+	delete[] data;
 
 	GLint a_position = programRect->GetAttribLocation("a_position");			
 	glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 0, 0);
-	programRect->SetUniformValue("u_color", 4, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
+	programRect->SetUniformValue("u_color", COLOR_SIZE, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
 
 	glEnableVertexAttribArray(a_position);
-	glDrawArrays(GL_LINES, 0, 2);
+	if (mode == PointDrawingMode::LineLoop)
+		glDrawArrays(GL_LINE_LOOP, 0, count);
+	else if (mode == PointDrawingMode::LineStrip)
+		glDrawArrays(GL_LINE_STRIP, 0, count);
+	else
+		glDrawArrays(GL_TRIANGLE_FAN, 0, count);
 	glDisableVertexAttribArray(a_position);
 
 	glDeleteBuffers(1, &buffer);
@@ -606,48 +584,65 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 
 void GLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
 {
-	if (fill) return drawColoredRect(rgn, color);
-	else
+	if (fill && SDL_ALPHA_OPAQUE == color.a)
 	{
-		DrawHLine(rgn.x, rgn.y, rgn.x + rgn.w - 1, color, clipped);
-		DrawVLine(rgn.x, rgn.y, rgn.y + rgn.h - 1, color, clipped);
-		DrawHLine(rgn.x, rgn.y + rgn.h - 1, rgn.x + rgn.w - 1, color, clipped);
-		DrawVLine(rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color, clipped);
+		return clearRect(rgn, color); // possible to work faster than shader but a lot... may be disable in future
 	}
+	Point pt[] = { Point(rgn.x, rgn.y), Point(rgn.x + rgn.w, rgn.y), Point(rgn.x + rgn.w, rgn.y + rgn.h), Point(rgn.x, rgn.y + rgn.h) };
+	if (clipped)
+	{
+		for(int i=0; i<4; i++)
+		{
+			pt[i].x += xCorr - Viewport.x;
+			pt[i].y += yCorr - Viewport.y;
+		}
+	}
+	if (fill)
+		return drawPolygon(pt, 4, color, PointDrawingMode::FilledPolygon);
+	else
+		return drawPolygon(pt, 4, color, PointDrawingMode::LineLoop);
 }
 
 void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
 {
-	if (clipped) 
-	{
-		x1 = x1 + xCorr - Viewport.x;
-		x2 = x2 + xCorr - Viewport.x;
-		y = y + yCorr - Viewport.y;
-	}
-	return drawLine(x1, y, x2, y, color); 
+	return DrawLine(x1, y, x2, y, color, clipped); 
 }
 
 void GLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
 {
-	if (clipped) 
-	{
-		x = x + xCorr - Viewport.x;
-		y1 = y1 + yCorr - Viewport.y;
-		y2 = y2 + yCorr - Viewport.y;
-	}
-	return drawLine(x, y1, x, y2, color); 
+	return DrawLine(x, y1, x, y2, color, clipped); 
 }
 
 void GLVideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped)
 {
+	Point pt[] = { Point(x1, y1), Point(x2, y2) };
 	if (clipped) 
 	{
-		x1 = x1 + xCorr - Viewport.x;
-		x2 = x2 + xCorr - Viewport.x;
-		y1 = y1 + yCorr - Viewport.y;
-		y2 = y2 + yCorr - Viewport.y;
+		pt[0].x += xCorr - Viewport.x;
+		pt[1].x += xCorr - Viewport.x;
+		pt[0].y += yCorr - Viewport.y;
+		pt[1].y += yCorr - Viewport.y;
 	}
-	return drawLine(x1, y1, x2, y2, color);
+	return drawPolygon(pt, 2, color, PointDrawingMode::LineStrip);
+}
+
+void GLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
+{
+	if (poly->count == 0) return;
+	Point* ajustedPoints = new Point[poly->count];
+	for(unsigned int i=0; i<poly->count; i++)
+		ajustedPoints[i] = Point(poly->points[i].x + xCorr - Viewport.x, poly->points[i].y + yCorr - Viewport.y);
+	if (!fill)
+		drawPolygon(ajustedPoints, poly->count, color, PointDrawingMode::LineLoop);
+	else
+	{
+		// not a good to do this here, will be right to do it in game
+		Color c = color;
+		c.a = c.a/2;
+		// end of bad code
+		drawPolygon(ajustedPoints, poly->count, c, PointDrawingMode::FilledPolygon);
+	}
+	delete[] ajustedPoints;
 }
 
 void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped)

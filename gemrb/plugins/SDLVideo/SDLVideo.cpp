@@ -95,7 +95,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	unsigned long time;
 	time = GetTickCount();
 	if (( time - lastTime ) < 33) {
-		SDL_Delay( 33 - (time - lastTime) );
+		//SDL_Delay( 33 - (time - lastTime) );
 		time = GetTickCount();
 	}
 	lastTime = time;
