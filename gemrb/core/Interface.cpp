@@ -4849,6 +4849,9 @@ void Interface::SanitizeItem(CREItem *item) const
 		//if item is stacked mark it as so
 		if (itm->MaxStackAmount) {
 			item->Flags |= IE_INV_ITEM_STACKED;
+			if (item->Usages[0] == 0) {
+				item->Usages[0] = 1;
+			}
 		} else {
 			//set charge counters for non-rechargeable items if their charge is zero
 			//set charge counters for items not using charges to one
