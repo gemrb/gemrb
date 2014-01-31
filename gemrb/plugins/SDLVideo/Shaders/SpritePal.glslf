@@ -9,6 +9,6 @@ void main()
 {
 	float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;
 	float index = texture2D(s_texture, v_texCoord).a;
-	vec4 color = texture2D(s_palette, vec2(index, 0.0));
+	vec4 color = texture2D(s_palette, vec2((0.5 + index*255.0)/256.0, 0.5));
 	gl_FragColor = vec4(color.r*v_tint.r, color.g*v_tint.g, color.b*v_tint.b, color.a * alphaModifier);
 }

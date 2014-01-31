@@ -18,6 +18,7 @@
 #include "GLTextureSprite2D.h"
 #include "GLPaletteManager.h"
 #include "GLSLProgram.h"
+#include "Triangulation.h"
 #include "Matrix.h"
 
 using namespace GemRB;
@@ -422,12 +423,14 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 	programRect->SetUniformValue("u_color", COLOR_SIZE, (GLfloat)color.r/255, (GLfloat)color.g/255, (GLfloat)color.b/255, (GLfloat)color.a/255);
 
 	glEnableVertexAttribArray(a_position);
-	if (mode == PointDrawingMode::LineLoop)
+	if (mode == LineLoop)
 		glDrawArrays(GL_LINE_LOOP, 0, count);
-	else if (mode == PointDrawingMode::LineStrip)
+	else if (mode == LineStrip)
 		glDrawArrays(GL_LINE_STRIP, 0, count);
-	else
+	else if (mode == ConvexFilledPolygon)
 		glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+	else if (mode == FilledTriangulation)
+		glDrawArrays(GL_TRIANGLES, 0, count);
 	glDisableVertexAttribArray(a_position);
 
 	glDeleteBuffers(1, &buffer);
@@ -598,9 +601,9 @@ void GLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, b
 		}
 	}
 	if (fill)
-		return drawPolygon(pt, 4, color, PointDrawingMode::FilledPolygon);
+		return drawPolygon(pt, 4, color, ConvexFilledPolygon);
 	else
-		return drawPolygon(pt, 4, color, PointDrawingMode::LineLoop);
+		return drawPolygon(pt, 4, color, LineLoop);
 }
 
 void GLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
@@ -623,24 +626,38 @@ void GLVideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color
 		pt[0].y += yCorr - Viewport.y;
 		pt[1].y += yCorr - Viewport.y;
 	}
-	return drawPolygon(pt, 2, color, PointDrawingMode::LineStrip);
+	return drawPolygon(pt, 2, color, LineStrip);
 }
 
 void GLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
 {
 	if (poly->count == 0) return;
 	Point* ajustedPoints = new Point[poly->count];
+	bool clipped = true;
 	for(unsigned int i=0; i<poly->count; i++)
+	{
+		if (Viewport.PointInside(poly->points[i])) clipped = false;
 		ajustedPoints[i] = Point(poly->points[i].x + xCorr - Viewport.x, poly->points[i].y + yCorr - Viewport.y);
+	}
+	if (clipped)
+	{
+		delete[] ajustedPoints;
+		return;
+	}
 	if (!fill)
-		drawPolygon(ajustedPoints, poly->count, color, PointDrawingMode::LineLoop);
+	{
+		drawPolygon(ajustedPoints, poly->count, color, LineLoop);
+	}
 	else
 	{
 		// not a good to do this here, will be right to do it in game
 		Color c = color;
 		c.a = c.a/2;
 		// end of bad code
-		drawPolygon(ajustedPoints, poly->count, c, PointDrawingMode::FilledPolygon);
+		std::vector<Point> triangles = Triangulation::TriangulatePolygon(ajustedPoints, poly->count);
+		//drawPolygon(&triangles[0], (short)triangles.size(), c, FilledTriangulation);
+		for(int i=0; i<triangles.size(); i+=3)
+			drawPolygon(&triangles[i], 3, color, LineLoop);
 	}
 	delete[] ajustedPoints;
 }
@@ -712,6 +729,7 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 	Sprite2D* screenshot = new GLTextureSprite2D(w, h, 32, pixels, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 	return screenshot;
 }
+
 
 #include "plugindef.h"
 

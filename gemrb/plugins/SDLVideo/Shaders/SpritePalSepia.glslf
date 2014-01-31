@@ -11,7 +11,7 @@ void main()
 {
 	float alphaModifier = v_alphaModifier * texture2D(s_mask, v_texCoord).a;
 	float index = texture2D(s_texture, v_texCoord).a;
-	vec4 color = texture2D(s_palette, vec2(index, 0.0));
+	vec4 color = texture2D(s_palette, vec2((0.5 + index*255.0)/256.0, 0.5));
 	float gray = (color.r + color.g + color.b)*0.333333;
 	vec3 sepia = darkColor*(1.0 - gray) + lightColor*gray;
 	gl_FragColor = vec4(sepia, color.a * alphaModifier);
