@@ -64,7 +64,8 @@ const Sprite2D* TextSpan::RenderedSpan()
 void TextSpan::RenderSpan()
 {
 	if (spanSprite) spanSprite->release();
-	spanSprite = font->RenderText(text, frame);
+	// TODO: implement span alignments
+	spanSprite = font->RenderTextAsSprite(text, frame, 0);
 	spanSprite->acquire();
 	// frame dimensions of 0 just mean size to fit
 	if (frame.w == 0)

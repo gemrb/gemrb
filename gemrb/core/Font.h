@@ -65,12 +65,18 @@ protected:
 	Sprite2D* blank;
 public:
 	int maxHeight;
-
+private:
+	void BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
+						   ieByte* canvas, const Size& size) const;
+	// Blit to the sprite or screen if canvas is NULL
+	size_t RenderText(const String&, const Region&, Palette*,
+				  ieByte alignment, ieByte* canvas = NULL) const;
 public:
 	Font();
 	virtual ~Font(void);
 
-	Sprite2D* RenderText(const String& string, const Size& size, size_t* numPrinted = NULL) const;
+	Sprite2D* RenderTextAsSprite(const String& string, const Size& size,
+								 ieByte alignment, size_t* numPrinted = NULL) const;
 	//allow reading but not setting glyphs
 	virtual const Sprite2D* GetCharSprite(ieWord chr) const = 0;
 

@@ -66,133 +66,47 @@ bool Font::MatchesResRef(const ieResRef resref)
 	return false;
 }
 
-Sprite2D* Font::RenderText(const String& string, const Size& size, size_t* numPrinted) const
+// Canvas can't be a sprite, because we may need to realloc
+void Font::BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
+							 ieByte* canvas, const Size& size) const
 {
-	Size canvasSize = StringSize(string); // same as size(0, 0)
-	// if the string is larger than the region shrink the canvas
-	// except 0 means we should size to fit in that dimension
-	if (size.w) {
-		// potentially resize
-		if (size.w < canvasSize.w) {
-			// we need to resize horizontally which creates new lines
-			ieWord trimmedArea = (canvasSize.w - size.w) * canvasSize.h;
-			// this automatically becomes multiline, therefore use maxHeight
-			ieWord lineArea = size.w * maxHeight;
-			// round up
-			ieWord numLines = 1 + ((trimmedArea - 1) / lineArea);
-			if (!size.h) {
-				// grow as much as needed vertically.
-				canvasSize.h += numLines * maxHeight;
-				// FIXME: there is a chance we didn't grow enough vertically...
-				// we can't possibly know how lines will break ahead of time,
-				// over a long enough paragraph we can overflow the canvas
-				// the easiest solution would be to perform a realloc when it happens (and size.h == 0)
-				// by calculating the additional size by the current substring
-			} else if (size.h > canvasSize.h) {
-				// grow by line increments until we hit the limit
-				// round up, because even a partial line should be blitted (and clipped)
-				ieWord maxLines = 1 + (((size.h - canvasSize.h) - 1) / maxHeight);
-				if (maxLines < numLines) {
-					numLines = maxLines;
-				}
-				canvasSize.h += numLines * maxHeight;
-				// if the new canvas size is taller than size.h it will be dealt with later
-			}
-			canvasSize.w = size.w;
+	assert(canvas);
+	assert(!glyph->BAM);
+	// TODO: should handle partial glyphs
+	if (!Region(0, 0, size.w, size.h).PointInside(x, y)) {
+		return; // off the canvas
+	}
+
+	// copy the glyph to the canvas
+	ieByte* src = (ieByte*)glyph->pixels;
+	ieByte* dest = canvas + (size.w * y) + x;
+	// FIXME: this can overflow due to glyphs that are only partially on the canvas
+	for(int row = 0; row < glyph->Height; row++ ) {
+		//assert(dest <= canvas + (size.w * size.h));
+		if (dest + glyph->Width > canvas + (size.w * size.h)) {
+			break;
 		}
-		// else: we already fit in the designated area (horizontally). No need to resize.
+		memcpy(dest, src, glyph->Width);
+		dest += size.w;
+		src += glyph->Width;
 	}
-	if (size.h && size.h < canvasSize.h) {
-		// we can't unbreak lines ("\n") so at best we can clip the text.
-		canvasSize.h = size.h;
-	}
-	ieWord lineHeight = (maxHeight > canvasSize.h) ? canvasSize.h : maxHeight;
-
-	ieDword ck = GetCharSprite(string[0])->GetColorKey();
-	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
-	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
-	ieByte* dest = canvasPx;
-	if (ck != 0) {
-		// start with transparent canvas
-		memset(canvasPx, ck, canvasSize.w * canvasSize.h);
-	}
-
-	const Sprite2D* curGlyph = NULL;
-	size_t len = string.length();
-	size_t chrIdx = 0;
-	int wCurrent = 0, hCurrent = 0, offset = 0;
-	bool newline = false;
-	for (; chrIdx < len; chrIdx++) {
-		curGlyph = GetCharSprite(string[chrIdx]);
-		assert(!curGlyph->BAM);
-		if (newline) {
-			hCurrent += lineHeight;
-			if ((hCurrent + curGlyph->Height) > canvasSize.h) {
-				// the next line would be clipped. we are done.
-				// FIXME: we should support partial rows
-				break;
-			}
-		}
-
-		// copy the glyph to the canvas
-		ieByte* src = (ieByte*)curGlyph->pixels;
-		offset = (lineHeight - curGlyph->YPos) * canvasSize.w;
-		assert(offset >= 0);
-		dest = canvasPx + wCurrent + offset + (hCurrent * canvasSize.w);
-		// FIXME: this can overflow due to glyphs that are only partially on the canvas
-		for( int row = 0; row < curGlyph->Height; row++ ) {
-			memcpy(dest, src, curGlyph->Width);
-			dest += canvasSize.w;
-			src += curGlyph->Width;
-		}
-
-		wCurrent += curGlyph->Width;
-		if (wCurrent >= canvasSize.w) {
-			// we've run off the edge of the region
-			newline = true;
-		}
-	}
-	// should have filled the canvas 100% <- NO! we probably have extra space on the last line
-	//assert((dest - canvasPx) == (w * h));
-
-	if (numPrinted) {
-		*numPrinted = chrIdx;
-	}
-	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(canvasSize.w, canvasSize.h,
-															 canvasPx, palette, true, ck);
-	// TODO: adjust canvas position based on alignment flags and rgn
-	return canvas;
 }
 
-size_t Font::Print(Region rgn, const char* string,
-				   Palette* hicolor, ieByte Alignment) const
+size_t Font::RenderText(const String&  string, const Region& rgn,
+						Palette* color, ieByte alignment, ieByte* canvas) const
 {
-	String* tmp = StringFromCString(string);
-	size_t ret = Print(rgn, *tmp, hicolor, Alignment);
-	delete tmp;
-	return ret;
-}
+	assert(color);
+	ieWord lineHeight = (alignment&IE_FONT_SINGLE_LINE) ? StringSize(string).h : maxHeight;
+	int x = 0, y = lineHeight;
 
-size_t Font::Print(Region rgn, const String& string, Palette* color,
-				   ieByte Alignment) const
-{
-	Palette* pal = color;
-	if (!pal) {
-		pal = palette;
-	}
-
-	ieWord ystep = (Alignment&IE_FONT_SINGLE_LINE) ? StringSize(string).h : maxHeight;
-	int x = 0, y = ystep;
-	Video* video = core->GetVideoDriver();
-
-	if (Alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
+	if (alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
 		int lc = 1;
 		for (size_t i = 0; i <= string.length(); i++) {
 			if (string[i] == L'\n')
 				lc++;
 		}
-		int h = lc * ystep;
-		if (Alignment & IE_FONT_ALIGN_MIDDLE) {
+		int h = lc * lineHeight;
+		if (alignment & IE_FONT_ALIGN_MIDDLE) {
 			y += ( rgn.h - h ) / 2;
 		} else {
 			y += ( rgn.h - h );
@@ -210,9 +124,9 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 		lineBreak = false;
 
 		ieWord lineW = StringSize(line).w;
-		if (Alignment & IE_FONT_ALIGN_CENTER) {
+		if (alignment & IE_FONT_ALIGN_CENTER) {
 			x = ( rgn.w - lineW ) / 2;
-		} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+		} else if (alignment & IE_FONT_ALIGN_RIGHT) {
 			x = ( rgn.w - lineW );
 		} else {
 			x = 0;
@@ -233,9 +147,8 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 				}
 
 				int wordW = StringSize(word).w;
-				if (!(Alignment&IE_FONT_SINGLE_LINE)) {
+				if (!(alignment&IE_FONT_SINGLE_LINE)) {
 					if (x + wordW > rgn.w && wordW != (int)lineW) {
-						//assert(word != line);
 						// wrap to new line, only if the word isnt >= the entire line
 						lineBreak = true;
 						line = line.substr(linePos);
@@ -258,7 +171,7 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 						currGlyph = GetCharSprite(currChar);
 						// should probably use rect intersection, but new lines shouldnt be to the left ever.
 						if (!rgn.PointInside(x + rgn.x - currGlyph->XPos,
-												 y + rgn.y - currGlyph->YPos)) {
+											 y + rgn.y - currGlyph->YPos)) {
 							if (!wordW > (int)lineW) {
 								// this probably doest cover every situation 100%
 								// we consider printing done if the blitter is outside the region
@@ -272,7 +185,14 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 							}
 							break; // either done, or skipping
 						}
-						video->BlitSprite(currGlyph, x + rgn.x, y + rgn.y, true, &rgn, pal);
+						if (canvas) {
+							BlitGlyphToCanvas(currGlyph, x,
+											  y - lineHeight + (lineHeight - currGlyph->YPos),
+											  canvas, rgn.Dimensions());
+						} else {
+							core->GetVideoDriver()->BlitSprite(currGlyph, x + rgn.x, y + rgn.y,
+															   true, &rgn, color);
+						}
 
 						x += currGlyph->Width;
 					}
@@ -286,11 +206,92 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
-		y += ystep;
+		y += lineHeight;
 	}
 	// FIXME: charCount appears to sometimes be off by 1...
 	//assert(charCount <= string.length());
 	return charCount;
+}
+
+Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
+								   ieByte alignment, size_t* numPrinted) const
+{
+	Size canvasSize = StringSize(string); // same as size(0, 0)
+	// if the string is larger than the region shrink the canvas
+	// except 0 means we should size to fit in that dimension
+	if (size.w) {
+		// potentially resize
+		if (size.w < canvasSize.w) {
+			if (!(alignment&IE_FONT_SINGLE_LINE)) {
+				// we need to resize horizontally which creates new lines
+				ieWord trimmedArea = (canvasSize.w - size.w) * canvasSize.h;
+				// this automatically becomes multiline, therefore use maxHeight
+				ieWord lineArea = size.w * maxHeight;
+				// round up
+				ieWord numLines = 1 + ((trimmedArea - 1) / lineArea);
+				if (!size.h) {
+					// grow as much as needed vertically.
+					canvasSize.h += numLines * maxHeight;
+					// FIXME: there is a chance we didn't grow enough vertically...
+					// we can't possibly know how lines will break ahead of time,
+					// over a long enough paragraph we can overflow the canvas
+					// the easiest solution would be to perform a realloc when it happens (and size.h == 0)
+					// by calculating the additional size by the current substring
+				} else if (size.h > canvasSize.h) {
+					// grow by line increments until we hit the limit
+					// round up, because even a partial line should be blitted (and clipped)
+					ieWord maxLines = 1 + (((size.h - canvasSize.h) - 1) / maxHeight);
+					if (maxLines < numLines) {
+						numLines = maxLines;
+					}
+					canvasSize.h += numLines * maxHeight;
+					// if the new canvas size is taller than size.h it will be dealt with later
+				}
+			}
+			canvasSize.w = size.w;
+		}
+		// else: we already fit in the designated area (horizontally). No need to resize.
+	}
+	if (size.h && size.h < canvasSize.h) {
+		// we can't unbreak lines ("\n") so at best we can clip the text.
+		canvasSize.h = size.h;
+	}
+	canvasSize.h += 10;
+	ieDword ck = GetCharSprite(string[0])->GetColorKey();
+	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
+	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
+	if (ck != 0) {
+		// start with transparent canvas
+		memset(canvasPx, ck, canvasSize.w * canvasSize.h);
+	}
+
+	size_t ret = RenderText(string, Region(Point(0,0), canvasSize), palette, alignment, canvasPx);
+	if (numPrinted) {
+		*numPrinted = ret;
+	}
+	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(canvasSize.w, canvasSize.h,
+															 canvasPx, palette, true, ck);
+	// TODO: adjust canvas position based on alignment flags and rgn
+	return canvas;
+}
+
+size_t Font::Print(Region rgn, const char* string,
+				   Palette* hicolor, ieByte Alignment) const
+{
+	String* tmp = StringFromCString(string);
+	size_t ret = Print(rgn, *tmp, hicolor, Alignment);
+	delete tmp;
+	return ret;
+}
+
+size_t Font::Print(Region rgn, const String& string, Palette* color,
+				   ieByte alignment) const
+{
+	Palette* pal = color;
+	if (!pal) {
+		pal = palette;
+	}
+	return RenderText(string, rgn, pal, alignment);
 }
 
 Size Font::StringSize(const String& string, const Size* padding) const
