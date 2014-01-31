@@ -146,7 +146,7 @@ bool Region::PointInside(const Point &p) const
 	return PointInside(p.x, p.y);
 }
 
-bool Region::PointInside(unsigned short XPos, unsigned short YPos) const
+bool Region::PointInside(short XPos, short YPos) const
 {
 	if (( XPos < x ) || ( XPos > ( x + w ) )) {
 		return false;
