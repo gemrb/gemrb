@@ -165,16 +165,33 @@ void TextContainer::DrawContents(int x, int y) const
 {
 	Video* video = core->GetVideoDriver();
 	//Region rgn = Region(Point(0,0), frame);
+#if DEBUG_TEXT
+	// Draw the exclusion regions
+	std::vector<Region>::const_iterator ex;
+	for (ex = ExclusionRects.begin(); ex != ExclusionRects.end(); ++ex) {
+		Region rgn = *ex;
+		rgn.x += x;
+		rgn.y += y;
+		video->DrawRect(rgn, ColorRed);
+	}
+#endif
 	SpanLayout::const_iterator it;
 	for (it = layout.begin(); it != layout.end(); ++it) {
 		Region rgn = (*it).second;
 		rgn.x += x;
 		rgn.y += y;
-#if DEBUG_TEXT
-		video->DrawRect(rgn, ColorRed, false);
-#endif
 		video->BlitSprite((*it).first->RenderedSpan(),
 						  rgn.x, rgn.y, true, &rgn);
+#if DEBUG_TEXT
+		// draw the layout rect
+		video->DrawRect(rgn, ColorGreen, false);
+		// draw the actual sprite boundaries
+		rgn.x += (*it).first->RenderedSpan()->XPos;
+		rgn.y += (*it).first->RenderedSpan()->YPos;
+		rgn.w = (*it).first->RenderedSpan()->Width;
+		rgn.h = (*it).first->RenderedSpan()->Height;
+		video->DrawRect(rgn, ColorWhite, false);
+#endif
 	}
 }
 
