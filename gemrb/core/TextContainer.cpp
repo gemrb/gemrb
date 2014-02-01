@@ -159,7 +159,9 @@ void TextContainer::DrawContents(int x, int y) const
 		Region rgn = (*it).second;
 		rgn.x += x;
 		rgn.y += y;
-		video->DrawRect(rgn, ColorRed);
+#if DEBUG_TEXT
+		video->DrawRect(rgn, ColorRed, false);
+#endif
 		video->BlitSprite((*it).first->RenderedSpan(),
 						  rgn.x, rgn.y, true, &rgn);
 	}
