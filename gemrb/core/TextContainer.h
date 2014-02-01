@@ -40,11 +40,12 @@ private:
 	Size frame;
 	Palette* palette;
 	Sprite2D* spanSprite;
+	ieByte alignment;
 public:
 	// construct a "inline" span that calculates its own region based on font, palette, and string
 	TextSpan(const String& string, Font* font, Palette* pal);
 	// construct a "block" span with dimentions determined by rgn
-	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn);
+	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn, ieByte align);
 	~TextSpan();
 
 	const Size& SpanFrame();

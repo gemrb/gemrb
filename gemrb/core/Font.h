@@ -75,8 +75,8 @@ public:
 	Font();
 	virtual ~Font(void);
 
-	Sprite2D* RenderTextAsSprite(const String& string, const Size& size,
-								 ieByte alignment, size_t* numPrinted = NULL) const;
+	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
+								 Palette* pal = NULL, size_t* numPrinted = NULL) const;
 	//allow reading but not setting glyphs
 	virtual const Sprite2D* GetCharSprite(ieWord chr) const = 0;
 

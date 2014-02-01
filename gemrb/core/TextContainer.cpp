@@ -36,9 +36,10 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 
 	pal->acquire();
 	palette = pal;
+	alignment = IE_FONT_SINGLE_LINE;
 }
 
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame)
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame, ieByte align)
 	: text(string), frame(frame)
 {
 	font = fnt;
@@ -46,6 +47,7 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 
 	pal->acquire();
 	palette = pal;
+	alignment = align;
 }
 
 TextSpan::~TextSpan()
@@ -65,7 +67,7 @@ void TextSpan::RenderSpan()
 {
 	if (spanSprite) spanSprite->release();
 	// TODO: implement span alignments
-	spanSprite = font->RenderTextAsSprite(text, frame, 0);
+	spanSprite = font->RenderTextAsSprite(text, frame, alignment, palette);
 	spanSprite->acquire();
 	// frame dimensions of 0 just mean size to fit
 	if (frame.w == 0)

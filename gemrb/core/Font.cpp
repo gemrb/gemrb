@@ -214,7 +214,7 @@ size_t Font::RenderText(const String&  string, const Region& rgn,
 }
 
 Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
-								   ieByte alignment, size_t* numPrinted) const
+								   ieByte alignment, Palette* color, size_t* numPrinted) const
 {
 	Size canvasSize = StringSize(string); // same as size(0, 0)
 	// if the string is larger than the region shrink the canvas
@@ -270,9 +270,21 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	if (numPrinted) {
 		*numPrinted = ret;
 	}
+	Palette* pal = color;
+	if (!pal)
+		pal = palette;
 	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(canvasSize.w, canvasSize.h,
-															 canvasPx, palette, true, ck);
-	// TODO: adjust canvas position based on alignment flags and rgn
+															 canvasPx, pal, true, ck);
+	if (alignment&IE_FONT_ALIGN_CENTER) {
+		canvas->XPos = (size.w - canvasSize.w) / 2;
+	} else if (alignment&IE_FONT_ALIGN_RIGHT) {
+		canvas->XPos = size.w - canvasSize.w;
+	}
+	if (alignment&IE_FONT_ALIGN_MIDDLE) {
+		canvas->YPos = (size.h - canvasSize.h) / 2;
+	} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
+		canvas->YPos = size.h - canvasSize.h;
+	}
 	return canvas;
 }
 
