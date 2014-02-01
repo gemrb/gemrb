@@ -48,7 +48,7 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	ResetEventHandler( TextAreaOnChange );
 	PortraitResRef[0]=0;
 	palette = core->CreatePalette( hitextcolor, lowtextcolor );
-	initpalette = core->CreatePalette( initcolor, lowtextcolor );
+	dialogPal = core->CreatePalette( initcolor, lowtextcolor );
 	Color tmp = {
 		hitextcolor.b, hitextcolor.g, hitextcolor.r, 0
 	};
@@ -59,6 +59,7 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
 	ftext = finit = NULL;
 	dialogOptions = NULL;
+	selectedOption = NULL;
 }
 
 TextArea::~TextArea(void)
@@ -66,7 +67,7 @@ TextArea::~TextArea(void)
 	ClearDialogOptions();
 
 	gamedata->FreePalette( palette );
-	gamedata->FreePalette( initpalette );
+	gamedata->FreePalette( dialogPal );
 	gamedata->FreePalette( selected );
 	gamedata->FreePalette( lineselpal );
 	core->GetVideoDriver()->FreeSprite( Cursor );
@@ -817,15 +818,19 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
-	selectedOption = NULL;
 	if (!dialogOptions) return;
 
 	// FIXME: get the point in relation to dialogOptions. this won't work.
-	const TextSpan* hoverSpan = dialogOptions->SpanAtPoint(Point(x, y));
-	if (hoverSpan) {
+	TextSpan* hoverSpan = dialogOptions->SpanAtPoint(Point(x, y));
+
+	if (selectedOption && selectedOption != hoverSpan) {
+		MarkDirty();
+		selectedOption->SetPalette(dialogPal);
+		selectedOption = NULL;
+	} else if (hoverSpan) {
 		MarkDirty();
 		selectedOption = hoverSpan;
-		// TODO: change the span palette to the selected palette
+		selectedOption->SetPalette(selected);
 	}
 }
 
@@ -944,28 +949,33 @@ void TextArea::ClearDialogOptions()
 	dialogOptSpans.clear();
 	delete dialogOptions; // deletes the old spans too
 	dialogOptions = NULL;
+	selectedOption = NULL;
 }
 
 void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
-								const Color* color, const Color* /*hiColor*/)
+								const Color* color, const Color* hiColor)
 {
-	Palette* pal = NULL;
+	dialogPal->release();
 	if (color)
-		pal = core->CreatePalette(*color, ColorBlack);
+		dialogPal = core->CreatePalette(*color, ColorBlack);
 	else
-		pal = ftext->GetPalette();
+		dialogPal = ftext->GetPalette();
+
+	if (hiColor) {
+		selected->release();
+		selected = core->CreatePalette(*hiColor, ColorBlack);
+	}
 
 	ClearDialogOptions(); // deletes previous options
 	// FIXME: calculate the real frame (padding)
-	dialogOptions = new TextContainer(Size(Width, Height), ftext, pal);
+	dialogOptions = new TextContainer(Size(Width, Height), ftext, dialogPal);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
-		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, pal, Size(Width, 0), IE_FONT_ALIGN_LEFT);
+		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, dialogPal, Size(Width, 0), IE_FONT_ALIGN_LEFT);
 		dialogOptSpans.push_back(std::make_pair(opts[i].first, span));
 		dialogOptions->AppendSpan(span); // container owns the span
 	}
-	pal->release();
 }
 
 void TextArea::SetPreservedRow(int arg)

@@ -32,10 +32,10 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 {
 	font = fnt;
 	spanSprite = NULL;
+	palette = NULL;
 	frame = font->StringSize(text);
 
-	pal->acquire();
-	palette = pal;
+	SetPalette(pal);
 	alignment = IE_FONT_SINGLE_LINE;
 }
 
@@ -44,9 +44,9 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 {
 	font = fnt;
 	spanSprite = NULL;
+	palette = NULL;
 
-	pal->acquire();
-	palette = pal;
+	SetPalette(pal);
 	alignment = align;
 }
 
@@ -81,6 +81,17 @@ const Size& TextSpan::SpanFrame()
 	if (frame.IsEmpty())
 		RenderSpan(); // our true frame is determined by the rendering
 	return frame;
+}
+
+void TextSpan::SetPalette(Palette* pal)
+{
+	assert(pal);
+	pal->acquire();
+	if (palette)
+		palette->release();
+	palette = pal;
+	if (spanSprite)
+		spanSprite->SetPalette(palette);
 }
 
 
@@ -134,7 +145,7 @@ TextSpan* TextContainer::RemoveSpan(const TextSpan* span)
 	return NULL;
 }
 
-const TextSpan* TextContainer::SpanAtPoint(const Point& p) const
+TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 {
 	// the point we are testing is relative to the container
 	Region rgn = Region(0, 0, frame.w, frame.h);

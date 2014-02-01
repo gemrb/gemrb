@@ -121,10 +121,16 @@ public:
 	int SetScrollBar(Control *ptr);
 	void SortText();
 private: // Private attributes
+	// dialog handling
 	typedef std::pair<int, TextSpan*> DialogOptionSpan;
 	std::vector<DialogOptionSpan> dialogOptSpans;
 	TextContainer* dialogOptions;
-	const TextSpan* selectedOption;
+	TextSpan* selectedOption;
+	// standard text display
+	// for normal text areas this collection will be a single TextContainer
+	// for the message window, each dialog creates its own container and they
+	// are automatically cycled out when the buffer fills
+
 	std::vector< char*> lines;
 	std::vector< int> lrows;
 
@@ -140,10 +146,10 @@ private: // Private attributes
 	/** Starting Row */
 	int startrow;
 	/** Text Colors */
-	Palette* palette;
-	Palette* initpalette;
-	Palette* selected;
-	Palette* lineselpal;
+	Palette* palette; // standard text color
+	Palette* dialogPal; // standard color for dialog options
+	Palette* selected; // selected text or highlight for hovered dialog options
+	Palette* lineselpal; // ???
 
 	/** Fonts */
 	Font* finit, * ftext;
