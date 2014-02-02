@@ -96,7 +96,7 @@ void TextSpan::SetPalette(Palette* pal)
 
 
 TextContainer::TextContainer(const Size& frame, Font* font, Palette* pal)
-	: frame(frame), font(font)
+	: maxFrame(frame), frame(), font(font)
 {
 	pal->acquire();
 	pallete = pal;
@@ -113,7 +113,7 @@ TextContainer::~TextContainer()
 
 void TextContainer::AppendText(const String& text)
 {
-	AppendSpan(new TextSpan(text, font, pallete));
+	AppendSpan(new TextSpan(text, font, pallete, Size(maxFrame.w, 0), 0));
 }
 
 void TextContainer::AppendSpan(TextSpan* span)
@@ -164,7 +164,7 @@ TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 void TextContainer::DrawContents(int x, int y) const
 {
 	Video* video = core->GetVideoDriver();
-	//Region rgn = Region(Point(0,0), frame);
+	Region drawRgn = Region(Point(x, y), maxFrame);
 #if DEBUG_TEXT
 	// Draw the exclusion regions
 	std::vector<Region>::const_iterator ex;
@@ -180,6 +180,9 @@ void TextContainer::DrawContents(int x, int y) const
 		Region rgn = (*it).second;
 		rgn.x += x;
 		rgn.y += y;
+		if (!rgn.IntersectsRegion(drawRgn)) {
+			break; // layout is ordered so we know nothing else can draw
+		}
 		video->BlitSprite((*it).first->RenderedSpan(),
 						  rgn.x, rgn.y, true, &rgn);
 #if DEBUG_TEXT
@@ -225,6 +228,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 				// TODO: implement handling for block alignment
 				drawPoint.x = excluded->x + excluded->w + 1;
 			}
+			frame.w = drawPoint.x;
 			if (drawPoint.x && drawPoint.x + spanFrame.w > frame.w) {
 				// move down and back
 				drawPoint.x = 0;
@@ -247,6 +251,11 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		AddExclusionRect(layoutRgn);
 		prevSpan = span;
 	}
+	frame.h = drawPoint.y + span->SpanFrame().h;
+	if (frame.h > maxFrame.h)
+		frame.h = maxFrame.h;
+	if (frame.w > maxFrame.w)
+		frame.w = maxFrame.w;
 }
 
 void TextContainer::AddExclusionRect(const Region& rect)

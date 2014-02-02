@@ -64,6 +64,7 @@ class TextContainer
 	SpanLayout layout;
 	std::vector<Region> ExclusionRects;
 
+	Size maxFrame;
 	Size frame;
 	Font* font;
 	Palette* pallete;
