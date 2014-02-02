@@ -200,15 +200,15 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 	assert(it != spans.end());
 	Point drawPoint(0, 0);
 	TextSpan* span = *it;
+	TextSpan* prevSpan = NULL;
 
 	if (it != spans.begin()) {
-		// get the last draw position
-		const Region& rgn = layout[*--it];
+		// get the next draw position to try
+		prevSpan = *--it;
+		const Region& rgn = layout[prevSpan];
 		drawPoint.x = rgn.x + rgn.w + 1;
 		drawPoint.y = rgn.y;
 		it++;
-	} else {
-		drawPoint.y = span->SpanFrame().h;
 	}
 
 	for (; it != spans.end(); it++) {
@@ -224,14 +224,19 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 				// we know that we have to move at least to the right
 				// TODO: implement handling for block alignment
 				drawPoint.x = excluded->x + excluded->w + 1;
-			} else if (layoutRgn.w) { // we dont want to evaluate this the first time
-				drawPoint.x += spanFrame.w + 1;
 			}
 			if (drawPoint.x && drawPoint.x + spanFrame.w > frame.w) {
 				// move down and back
 				drawPoint.x = 0;
-				drawPoint.y += spanFrame.h;
+				if (excluded) {
+					drawPoint.y = excluded->y + spanFrame.h + 1;
+				} else {
+					const Region& prevFrame = layout[prevSpan];
+					drawPoint.y = prevFrame.h + prevFrame.y + 1;
+				}
 			}
+			// we should not infinitely loop
+			assert(!excluded || drawPoint != Point(layoutRgn.x, layoutRgn.y));
 			layoutRgn = Region(drawPoint, spanFrame);
 			excluded = ExcludedRegionForRect(layoutRgn);
 		} while (excluded);
@@ -240,6 +245,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		// TODO: need to extend the exclusion rect for some alignments
 		// eg right align should invalidate the entire area infront also
 		AddExclusionRect(layoutRgn);
+		prevSpan = span;
 	}
 }
 

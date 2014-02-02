@@ -148,7 +148,7 @@ size_t Font::RenderText(const String&  string, const Region& rgn,
 
 				int wordW = StringSize(word).w;
 				if (!(alignment&IE_FONT_SINGLE_LINE)) {
-					if (x + wordW > rgn.w && wordW != (int)lineW) {
+					if (x + wordW > rgn.w && wordW <= rgn.w) {
 						// wrap to new line, only if the word isnt >= the entire line
 						lineBreak = true;
 						line = line.substr(linePos);
@@ -252,12 +252,18 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 		}
 		// else: we already fit in the designated area (horizontally). No need to resize.
 	}
+	if (!(alignment&IE_FONT_SINGLE_LINE)
+		&& canvasSize.h < maxHeight) {
+		// should be at least maxHeight (+ decender added later then trimmed if too large for size)
+		canvasSize.h = maxHeight;
+	}
 	// FIXME: this decender "calculation" is just a guess
 	canvasSize.h += maxHeight / 2; // compensation for decenders
 	if (size.h && size.h < canvasSize.h) {
 		// we can't unbreak lines ("\n") so at best we can clip the text.
 		canvasSize.h = size.h;
 	}
+
 	ieDword ck = GetCharSprite(string[0])->GetColorKey();
 	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
 	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
