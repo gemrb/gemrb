@@ -36,14 +36,11 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	: Control(frame)
 {
 	ControlType = IE_GUI_TEXTAREA;
-	keeplines = 100;
 	rows = 0;
 	TextYPos = 0;
 	ticks = starttime = 0;
-	startrow = 0;
 	Cursor = NULL;
 	CurPos = 0;
-	CurLine = 0;
 	Value = 0xffffffff;
 	ResetEventHandler( TextAreaOnChange );
 	PortraitResRef[0]=0;
@@ -60,6 +57,7 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	ftext = finit = NULL;
 	dialogOptions = NULL;
 	selectedOption = NULL;
+	TextContiner = NULL;
 }
 
 TextArea::~TextArea(void)
@@ -71,9 +69,7 @@ TextArea::~TextArea(void)
 	gamedata->FreePalette( selected );
 	gamedata->FreePalette( lineselpal );
 	core->GetVideoDriver()->FreeSprite( Cursor );
-	for (size_t i = 0; i < lines.size(); i++) {
-		free( lines[i] );
-	}
+	delete TextContiner;
 }
 
 void TextArea::RefreshSprite(const char *portrait)
@@ -96,7 +92,8 @@ void TextArea::RefreshSprite(const char *portrait)
 bool TextArea::NeedsDraw()
 {
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		if (startrow == rows) { // the text is offscreen
+		// FIXME: actually check the TextYPos compared to the TA height.
+		if (true) { // the text is offscreen
 			return false;
 		}
 		MarkDirty();
@@ -107,7 +104,7 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
-	if (lines.size() == 0) {
+	if (!TextContiner) {
 		return;
 	}
 
@@ -126,190 +123,21 @@ void TextArea::DrawInternal(Region& clip)
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
 			TextYPos++;// can't use ScrollToY
-			if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
+			// FIXME: completely broken
+			//if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
 		}
 	}
 
-	//if textarea is 'selectable' it actually means, it is a listbox
-	//in this case the selected value equals the line number
-	//if it is 'not selectable' it can still have selectable lines
-	//but then it is like the dialog window in the main game screen:
-	//the selected value is encoded into the line
-	size_t linesize = lines.size() - 1; // -1 because 0 counts
-	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
-		char* Buffer = (char *) malloc( 1 );
-		Buffer[0] = 0;
-		size_t len = 0;
-		size_t lastlen = 0;
-		for (size_t i = 0; i <= linesize; i++) {
-			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
-				int tlen;
-				unsigned long acolor, bcolor;
-				char* rest = strchr( lines[i] + 3, ',' );
-				if (*rest != ',')
-					goto notmatched;
-				acolor = strtoul( rest + 1, &rest, 16 );
-				if (*rest != ',')
-					goto notmatched;
-				bcolor = strtoul( rest + 1, &rest, 16 );
-				if (*rest != ']')
-					goto notmatched;
-				tlen = (int)(strstr( rest + 1, "[/s]" ) - rest - 1);
-				if (tlen < 0)
-					goto notmatched;
-				len += tlen + 23;
-				Buffer = (char *) realloc( Buffer, len + 2 );
-				sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
-						bcolor, tlen, rest + 1 );
-			} else {
-				notmatched:
-				len += ( int ) strlen( lines[i] ) + 1;
-				Buffer = (char *) realloc( Buffer, len + 2 );
-				memcpy( &Buffer[lastlen], lines[i], len - lastlen );
-			}
-			lastlen = len;
-			if (i != linesize) {
-				Buffer[lastlen - 1] = '\n';
-				Buffer[lastlen] = 0;
-			}
-		}
+	/* lets fake scrolling the text by simply offsetting the textClip by between 0 and maxHeight pixels.
+	 don't forget to increase the clipping height by the same amount */
+	short LineOffset = (short)(TextYPos % ftext->maxHeight);
+	int x = clip.x, y = clip.y - LineOffset;
+	Region textClip(x, y, clip.w, clip.h + LineOffset);
+	TextContiner->DrawContents(x, y);
 
-		/* lets fake scrolling the text by simply offsetting the textClip by between 0 and maxHeight pixels.
-			don't forget to increase the clipping height by the same amount */
-		short LineOffset = (short)(TextYPos % ftext->maxHeight);
-		Region textClip(clip.x, clip.y - LineOffset, clip.w, clip.h + LineOffset);
-
-		// FIXME: this code is duplicated throughout this method.
-		// I think the best solution is to have the text digested into lines as it is added
-		// this way we dont have to fuss with an unnecesary copy and we can simply call ftext->Print on every line
-		// starting with startrow. The obsticle is apparently seaparating listbox behavior into its own class.
-
-		// FIXME: we need padding
-		size_t psx = 0;
-		size_t lineWidth = psx, wordWidth = 0;
-
-		int rows = 0;
-		size_t bufPos = 0;
-		for (size_t pos = 0; pos < lastlen; pos++) {
-			// FIXME: multibyte text support is broken here
-			// we need to convert the TextAreas buffers to be double byte
-			// and have them converted at some earlier point
-			char currChar = Buffer[pos];
-			if (lineWidth + wordWidth > Width) {
-				// line wrap
-				rows++;
-				lineWidth = psx;
-			}
-			if (rows >= startrow) {
-				break;
-			}
-			if (currChar == '\0') {
-				continue;
-			} else if (currChar == '\n') {
-				rows++;
-				lineWidth = psx;
-				wordWidth = 0;
-				bufPos = pos+1;
-				continue;
-			}
-
-			wordWidth += ftext->GetCharSprite(currChar)->Width;
-			if (pos > 0) {
-				// kerning
-				wordWidth -= ftext->GetKerningOffset(Buffer[pos-1], currChar);
-			}
-
-			if (( currChar == ' ' ) || ( currChar == '-' )) {
-				lineWidth += wordWidth;
-				wordWidth = 0;
-				bufPos = pos+1;
-			}
-		}
-
-		ftext->Print(textClip, &Buffer[bufPos],
-					 palette, IE_FONT_ALIGN_LEFT);
-
-		// TODO: draw the cursor by printing everything before the cursor
-		// then draw the cursor, then draw everything after the cursor
-		free( Buffer );
-		return;
-	}
-	// normal scrolling textarea
-	int rc = 0;
-	int sr = startrow;
-	unsigned int i;
-	int yl;
-	for (i = 0; i < linesize; i++) {
-		if (rc + lrows[i] <= sr) {
-			rc += lrows[i];
-			continue;
-		}
-		sr -= rc;
-		Palette* pal = NULL;
-		if (Value == i)
-			pal = lineselpal;
-		else
-			pal = palette;
-
-		// FIXME: we need padding
-		size_t psx = 0;
-		size_t lineWidth = psx, wordWidth = 0;
-
-		int rows = 0;
-		size_t bufPos = 0;
-		for (size_t pos = 0; pos < strlen(lines[i]); pos++) {
-			// FIXME: multibyte text support is broken here
-			// we need to convert the TextAreas buffers to be double byte
-			// and have them converted at some earlier point
-			char currChar = lines[i][pos];
-			if (lineWidth + wordWidth > Width) {
-				// line wrap
-				rows++;
-				lineWidth = psx;
-			}
-			if (rows >= startrow) {
-				break;
-			}
-			if (currChar == '\0') {
-				continue;
-			} else if (currChar == '\n') {
-				rows++;
-				lineWidth = psx;
-				wordWidth = 0;
-				bufPos = pos+1;
-				continue;
-			}
-
-			wordWidth += ftext->GetCharSprite(currChar)->Width;
-			if (pos > 0) {
-				// kerning
-				wordWidth -= ftext->GetKerningOffset(lines[i][pos-1], currChar);
-			}
-
-			if (( currChar == ' ' ) || ( currChar == '-' )) {
-				lineWidth += wordWidth;
-				wordWidth = 0;
-				bufPos = pos+1;
-			}
-		}
-
-		ftext->Print(clip, &lines[i][bufPos], pal, IE_FONT_ALIGN_LEFT);
-		yl = ftext->maxHeight * (lrows[i]-sr);
-		clip.y+=yl;
-		clip.h-=yl;
-		break;
-	}
-	for (i++; i < linesize; i++) {
-		Palette* pal = NULL;
-		if (Value == i)
-			pal = lineselpal;
-		else
-			pal = palette;
-		ftext->Print( clip, lines[i], pal, IE_FONT_ALIGN_LEFT );
-		yl = ftext->maxHeight * lrows[i];
-		clip.y+=yl;
-		clip.h-=yl;
-
+	if (dialogOptions) {
+		y += TextContiner->ContainerFrame().h;
+		dialogOptions->DrawContents(x, y);
 	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
@@ -324,124 +152,32 @@ int TextArea::SetScrollBar(Control* ptr)
 /** Sets the Actual Text */
 void TextArea::SetText(const char* text)
 {
-	if (!text[0]) {
-		Clear();
-	}
-
-	int newlen = ( int ) strlen( text );
-
-	if (lines.size() == 0) {
-		char* str = (char *) malloc( newlen + 1 );
-		memcpy( str, text, newlen + 1 );
-		lines.push_back( str );
-		lrows.push_back( 0 );
-	} else {
-		lines[0] = (char *) realloc( lines[0], newlen + 1 );
-		memcpy( lines[0], text, newlen + 1 );
-	}
-	CurPos = newlen;
-	CurLine = lines.size()-1;
+	Clear();
+	AppendText(text);
 	UpdateControls();
-}
-
-//drop lines scrolled out at the top.
-//keeplines is the number of lines that should still be
-//preserved (for scrollback history)
-void TextArea::DiscardLines()
-{
-	if (rows<=keeplines) {
-		return;
-	}
-	int drop = rows-keeplines;
-	PopLines(drop, true);
-}
-
-static char *note_const = NULL;
-static const char inserted_crap[]="[/color][color=ffffff]";
-#define CRAPLENGTH sizeof(inserted_crap)-1
-
-void TextArea::SetNoteString(const char *s)
-{
-	free(note_const);
-	if (s) {
-		note_const = (char *) malloc(strlen(s)+5);
-		sprintf(note_const, "\r\n\r\n%s", s);
-	}
 }
 
 /** Appends a String to the current Text */
-int TextArea::AppendText(const char* text, int pos)
+void TextArea::AppendText(const char* text)
 {
-	int ret = 0;
-	if (pos >= ( int ) lines.size()) {
-		return -1;
-	}
-	int newlen = ( int ) strlen( text );
-
-	if (pos == -1) {
-		const char *note = NULL;
-		if (note_const) {
-			note = strstr(text,note_const);
+	if (text) {
+		if (!TextContiner) {
+			TextContiner = new TextContainer(ControlFrame().Dimensions(), ftext, palette);
 		}
-		char *str;
-		if (NULL == note) {
-			str = (char *) malloc( newlen +1 );
-			memcpy(str, text, newlen+1);
-		}
-		else {
-			unsigned int notepos = (unsigned int) (note - text);
-			str = (char *) malloc( newlen + CRAPLENGTH+1 );
-			memcpy(str,text,notepos);
-			memcpy(str+notepos,inserted_crap,CRAPLENGTH);
-			memcpy(str+notepos+CRAPLENGTH, text+notepos, newlen-notepos+1);
-		}
-		lines.push_back( str );
-		lrows.push_back( 0 );
-		ret =(int) (lines.size() - 1);
-	} else {
-		int mylen = ( int ) strlen( lines[pos] );
-
-		lines[pos] = (char *) realloc( lines[pos], mylen + newlen + 1 );
-		memcpy( lines[pos]+mylen, text, newlen + 1 );
-		ret = pos;
+		String* string = StringFromCString(text);
+		// TODO: parse the string tags ([color],[p],etc) into spans
+		//TextSpan* span = new TextSpan(string, ftext, palette, const Size& frame, 0);
+		TextContiner->AppendText(*string);
+		delete string;
+		UpdateControls();
 	}
-
-	//if the textarea is not a listbox, then discard scrolled out
-	//lines
-	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
-		DiscardLines();
-	}
-
-	UpdateControls();
-	return ret;
 }
 
-/** Deletes last or first `count' lines */
-/** Probably not too optimal for many lines, but it isn't used */
-/** for many lines */
-void TextArea::PopLines(unsigned int count, bool top)
+int TextArea::InsertText(const char* text, int pos)
 {
-	if (count > lines.size()) {
-		count = (unsigned int) lines.size();
-	}
-
-	while (count > 0 ) {
-		if (top) {
-			int tmp = lrows.front();
-			if ( startrow < tmp )
-				break;
-			startrow -= tmp;
-			free(lines.front() );
-			lines.erase(lines.begin());
-			lrows.erase(lrows.begin());
-		} else {
-			free(lines.back() );
-			lines.pop_back();
-			lrows.pop_back();
-		}
-		count--;
-	}
-	UpdateControls();
+	// TODO: actually implement this
+	AppendText(text);
+	return pos;
 }
 
 void TextArea::UpdateControls()
@@ -452,7 +188,7 @@ void TextArea::UpdateControls()
 	if (sb) {
 		ScrollBar* bar = ( ScrollBar* ) sb;
 		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
-			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
+			pos = rows - ( Height / ftext->maxHeight );
 		else
 			pos = 0;
 		if (pos < 0)
@@ -460,7 +196,7 @@ void TextArea::UpdateControls()
 		bar->SetPos( pos );
 	} else {
 		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL) {
-			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
+			pos = rows - ( Height / ftext->maxHeight );
 			SetRow(pos);
 		}
 	}
@@ -493,14 +229,9 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
 			MarkDirty();
-			int len = GetRowLength(CurLine);
-			//print("len: %d Before: %s", len, lines[CurLine]);
-			lines[CurLine] = (char *) realloc( lines[CurLine], len + 2 );
-			for (int i = len; i > CurPos; i--) {
-				lines[CurLine][i] = lines[CurLine][i - 1];
-			}
-			lines[CurLine][CurPos] = Key;
-			lines[CurLine][len + 1] = 0;
+
+			// TODO: implement this! currently does nothing
+
 			CurPos++;
 			//print("pos: %d After: %s", CurPos, lines[CurLine]);
 			CalcRowCount();
@@ -531,148 +262,66 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 /** Special Key Press */
 bool TextArea::OnSpecialKeyPress(unsigned char Key)
 {
-	int len;
-	int i;
+	size_t len = 0;
 
 	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
 		return false;
 	}
 	MarkDirty();
+	// TODO: implement text editing. (going to be tricky...)
 	switch (Key) {
 		case GEM_HOME:
 			CurPos = 0;
-			CurLine = 0;
 			break;
 		case GEM_UP:
-			if (CurLine) {
-				CurLine--;
-			}
 			break;
 		case GEM_DOWN:
-			if (CurLine<lines.size()) {
-				CurLine++;
-			}
 			break;
 		case GEM_END:
-			CurLine=lines.size()-1;
-			CurPos = GetRowLength((unsigned int) CurLine);
 			break;
 		case GEM_LEFT:
 			if (CurPos > 0) {
 				CurPos--;
 			} else {
-				if (CurLine) {
-					CurLine--;
-					CurPos = GetRowLength(CurLine);
-				}
+
 			}
 			break;
 		case GEM_RIGHT:
-			len = GetRowLength(CurLine);
 			if (CurPos < len) {
 				CurPos++;
 			} else {
-				if(CurLine<lines.size()) {
-					CurPos=0;
-					CurLine++;
-				}
+
 			}
 			break;
 		case GEM_DELETE:
-			len = GetRowLength(CurLine);
-			//print("len: %d Before: %s", len, lines[CurLine]);
 			if (CurPos>=len) {
-				//TODO: merge next line
 				break;
 			}
-			lines[CurLine] = (char *) realloc( lines[CurLine], len );
-			for (i = CurPos; i < len; i++) {
-				lines[CurLine][i] = lines[CurLine][i + 1];
-			}
-			//print("pos: %d After: %s", CurPos, lines[CurLine]);
 			break;
 		case GEM_BACKSP:
-			len = GetRowLength(CurLine);
 			if (CurPos != 0) {
-				//print("len: %d Before: %s", len, lines[CurLine]);
 				if (len<1) {
 					break;
 				}
-				lines[CurLine] = (char *) realloc( lines[CurLine], len );
-				for (i = CurPos; i < len; i++) {
-					lines[CurLine][i - 1] = lines[CurLine][i];
-				}
-				lines[CurLine][len - 1] = 0;
 				CurPos--;
-				//print("pos: %d After: %s", CurPos, lines[CurLine]);
 			} else {
-				if (CurLine) {
-					//TODO: merge lines
-					int oldline = CurLine;
-					CurLine--;
-					int old = GetRowLength(CurLine);
-					//print("len: %d Before: %s", old, lines[CurLine]);
-					//print("len: %d Before: %s", len, lines[oldline]);
-					lines[CurLine] = (char *) realloc (lines[CurLine], len+old);
-					memcpy(lines[CurLine]+old, lines[oldline],len);
-					free(lines[oldline]);
-					lines[CurLine][old+len]=0;
-					lines.erase(lines.begin()+oldline);
-					lrows.erase(lrows.begin()+oldline);
-					CurPos = old;
-					//print("pos: %d len: %d After: %s", CurPos, GetRowLength(CurLine), lines[CurLine]);
-				}
+
 			}
 			break;
 		 case GEM_RETURN:
 			//add an empty line after CurLine
-			//print("pos: %d Before: %s", CurPos, lines[CurLine]);
-			lrows.insert(lrows.begin()+CurLine, 0);
-			len = GetRowLength(CurLine);
+			// TODO: implement this
 			//copy the text after the cursor into the new line
-			char *str = (char *) malloc(len-CurPos+2);
-			memcpy(str, lines[CurLine]+CurPos, len-CurPos+1);
-			str[len-CurPos+1] = 0;
-			lines.insert(lines.begin()+CurLine+1, str);
+
 			//truncate the current line
-			lines[CurLine] = (char *) realloc (lines[CurLine], CurPos+1);
-			lines[CurLine][CurPos]=0;
+
 			//move cursor to next line beginning
-			CurLine++;
 			CurPos=0;
-			//print("len: %d After: %s", GetRowLength(CurLine-1), lines[CurLine-1]);
-			//print("len: %d After: %s", GetRowLength(CurLine), lines[CurLine]);
 			break;
 	}
 	CalcRowCount();
 	RunEventHandler( TextAreaOnChange );
 	return true;
-}
-
-/** Returns Row count */
-int TextArea::GetRowCount()
-{
-	return ( int ) lines.size();
-}
-
-int TextArea::GetRowLength(unsigned int row)
-{
-	if (lines.size()<=row) {
-		return 0;
-	}
-	//this is just roughly the line size, escape sequences need to be removed
-	return strlen( lines[row] );
-}
-
-int TextArea::GetVisibleRowCount()
-{
-	return (Height-5) / ftext->maxHeight;
-}
-
-/** Returns top index */
-int TextArea::GetTopIndex()
-{
-	return startrow;
 }
 
 int TextArea::GetRowHeight()
@@ -701,7 +350,7 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 void TextArea::SetRow(int row)
 {
 	if (row <= rows) {
-		startrow = row;
+		// FIXME: this is super wrong now
 		TextYPos = row * ftext->maxHeight;
 	}
 	MarkDirty();
@@ -709,98 +358,39 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
-	size_t w = Width;
-
-	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
-		const char *portrait = NULL;
-		Actor *actor = NULL;
-		GameControl *gc = core->GetGameControl();
-		if (gc) {
-			Scriptable *target = gc->dialoghandler->GetTarget();
-			if (target && target->Type == ST_ACTOR) {
-				actor = (Actor *)target;
-			}
-		}
-		if (actor) {
-			portrait = actor->GetPortrait(1);
-		}
-		if (portrait) {
-			RefreshSprite(portrait);
-		}
-		if (AnimPicture) {
-			w-=AnimPicture->Width;
-		}
-	}
-
-	rows = 0;
-	int tr = 0;
-	if (lines.size() != 0) {
-		for (size_t i = 0; i < lines.size(); i++) {
-			const char* line = lines[i];
-			size_t len = strlen(line);
-			// FIXME: we need padding
-			size_t psx = 0;
-			size_t lineWidth = psx, wordWidth = 0;
-
-			for (size_t pos = 0; pos < len; pos++) {
-				// FIXME: multibyte text support is broken here
-				// we need to convert the TextAreas buffers to be double byte
-				// and have them converted at some earlier point
-				char currChar = line[pos];
-				if (lineWidth + wordWidth > w) {
-					// line wrap
-					tr++;
-					lineWidth = psx;
-				}
-				if (currChar == '\0') {
-					continue;
-				} else if (currChar == '\n') {
-					tr++;
-					lineWidth = psx;
-					wordWidth = 0;
-					continue;
-				}
-
-				wordWidth += ftext->GetCharSprite(currChar)->Width;
-				if (pos > 0) {
-					// kerning
-					wordWidth -= ftext->GetKerningOffset(line[pos-1], currChar);
-				}
-
-				if (( currChar == ' ' ) || ( currChar == '-' )) {
-					lineWidth += wordWidth;
-					wordWidth = 0;
+	if (TextContiner) {
+		if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
+			const char *portrait = NULL;
+			Actor *actor = NULL;
+			GameControl *gc = core->GetGameControl();
+			if (gc) {
+				Scriptable *target = gc->dialoghandler->GetTarget();
+				if (target && target->Type == ST_ACTOR) {
+					actor = (Actor *)target;
 				}
 			}
-
-			lrows[i] = tr;
-			rows += tr;
+			if (actor) {
+				portrait = actor->GetPortrait(1);
+			}
+			if (portrait) {
+				RefreshSprite(portrait);
+			}
+			if (AnimPicture) {
+				// TODO: resize TextContiner to account for AnimPicture
+			}
 		}
-	}
-
-	if (lines.size())
-	{
-		if (CurLine>=lines.size()) {
-			CurLine=lines.size()-1;
+		size_t textHeight = TextContiner->ContainerFrame().h;
+		if (dialogOptions) {
+			textHeight += dialogOptions->ContainerFrame().h;
 		}
-		w = strlen(lines[CurLine]);
-		if (CurPos>w) {
-			CurPos = w;
-		}
+		rows = textHeight / GetRowHeight();
 	} else {
-		CurLine=0;
-		CurPos=0;
+		rows = 0;
 	}
-
-	if (!sb) {
+	if (!sb)
 		return;
-	}
 	ScrollBar* bar = ( ScrollBar* ) sb;
-	tr = rows - Height/ftext->maxHeight + 1;
-	if (tr<0) {
-		tr = 0;
-	}
-	bar->SetMax( (ieWord) tr );
+	bar->SetMax(rows);
 }
 
 /** Mousewheel scroll */
@@ -820,8 +410,8 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if (!dialogOptions) return;
 
-	// FIXME: get the point in relation to dialogOptions. this won't work.
-	TextSpan* hoverSpan = dialogOptions->SpanAtPoint(Point(x, y));
+	Point p = Point(x, y - TextContiner->ContainerFrame().h);
+	TextSpan* hoverSpan = dialogOptions->SpanAtPoint(p);
 
 	if (selectedOption && selectedOption != hoverSpan) {
 		MarkDirty();
@@ -870,27 +460,6 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	RunEventHandler( TextAreaOnChange );
 }
 
-void TextArea::SetText(const std::vector<char*>& text)
-{
-	Clear();
-	for (size_t i = 0; i < text.size(); i++) {
-		int newlen = strlen(text[i]);
-		char* str = (char *) malloc(newlen + 1);
-		memcpy(str, text[i], newlen + 1);
-		lines.push_back(str);
-		lrows.push_back(0);
-		CurPos = newlen;
-	}
-	CurLine = lines.size() - 1;
-	UpdateControls();
-}
-
-/** Copies the current TextArea content to another TextArea control */
-void TextArea::CopyTo(TextArea *ta)
-{
-	ta->SetText(lines);
-}
-
 void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
@@ -900,28 +469,14 @@ void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
 	MarkDirty();
 }
 
-void TextArea::SelectText(const char *select)
+void TextArea::SelectText(const char* /*select*/)
 {
-	int i = lines.size();
-	while(i--) {
-		if (!stricmp(lines[i], select) ) {
-			CurLine = i;
-			if (sb) {
-				ScrollBar* bar = ( ScrollBar* ) sb;
-				bar->SetPos( i );
-			} else {
-				SetRow( i );
-			}
-			UpdateState(VarName, i);
-			CalcRowCount();
-			core->RedrawAll();
-			break;
-		}
-	}
+	// TODO: implement this
 }
 
 const String& TextArea::QueryText() const
 {
+	// FIXME: implement this properly
 	return Control::QueryText();
 	/*
 	if ( Value<lines.size() ) {
@@ -978,39 +533,22 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 	}
 }
 
-void TextArea::SetPreservedRow(int arg)
-{
-	keeplines=arg;
-	Flags |= IE_GUI_TEXTAREA_HISTORY;
-}
-
 void TextArea::Clear()
 {
-	for (size_t i = 0; i < lines.size(); i++) {
-		free( lines[i] );
-	}
-	lines.clear();
-	lrows.clear();
-	rows = 0;
+	delete TextContiner;
+	TextContiner = NULL;
 }
 
 //setting up the textarea for smooth scrolling, the first
 //TEXTAREA_OUTOFTEXT callback is called automatically
 void TextArea::SetupScroll()
 {
-	SetPreservedRow(0);
-	startrow = 0;
 	// ticks is the number of ticks it takes to scroll this font 1 px
 	ticks = 2400 / ftext->maxHeight;
 	//clearing the textarea
 	Clear();
-	unsigned int i = (unsigned int) (1 + ((Height - 1) / ftext->maxHeight)); // ceiling
-	while (i--) { //push empty lines so that the text starts out of view.
-		char *str = (char *) malloc(1);
-		str[0]=0;
-		lines.push_back(str);
-		lrows.push_back(0);
-	}
+	//unsigned int i = (unsigned int) (1 + ((Height - 1) / ftext->maxHeight)); // ceiling
+	// FIXME: set the TextYPos out of bounds below the TA
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	starttime = GetTickCount();
 }
@@ -1047,18 +585,6 @@ void TextArea::SetFocus(bool focus)
 	if (hasFocus && Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
-}
-
-static bool charSorter(const char *a, const char *b) {
-	return stricmp(a, b) < 0;
-}
-
-void TextArea::SortText()
-{
-	std::list<char*> sorter(lines.begin(), lines.end());
-	sorter.sort(charSorter);
-	lines.assign(sorter.begin(), sorter.end());
-	CalcRowCount();
 }
 
 }

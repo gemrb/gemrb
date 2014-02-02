@@ -504,7 +504,8 @@ static PyObject* GemRB_TextArea_MoveText(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	SrcTA->CopyTo( DstTA );
+	// TODO: should be something like DstTA->SetText(SrcTA->GetText());
+	//SrcTA->CopyTo( DstTA );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -550,7 +551,7 @@ static PyObject* GemRB_TextArea_SetHistory(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	ctrl->SetPreservedRow(Keep);
+	//ctrl->SetPreservedRow(Keep);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -1513,10 +1514,10 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		Row = PyInt_AsLong( row );
-		if (Row > ta->GetRowCount() - 1)
+		//if (Row > ta->GetRowCount() - 1)
 			Row = -1;
 	} else
-		Row = ta->GetRowCount() - 1;
+		Row = -1;//ta->GetRowCount() - 1;
 
 	if (flag) {
 		if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
@@ -1530,11 +1531,11 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 		string = PyString_AsString( str );
 		if (string == NULL)
 			return RuntimeError("Null string received");
-		ret = ta->AppendText( string, Row );
+		ret = ta->InsertText( string, Row );
 	} else {
 		StrRef = PyInt_AsLong( str );
 		char* str = core->GetString( StrRef, Flag );
-		ret = ta->AppendText( str, Row );
+		ret = ta->InsertText( str, Row );
 		core->FreeString( str );
 	}
 
@@ -1584,12 +1585,14 @@ static PyObject* GemRB_TextArea_Scroll(PyObject * /*self*/, PyObject* args)
 	if (!ta) {
 		return NULL;
 	}
+	/*
 	int row = ta->GetTopIndex()+offset;
 	if (row<0) {
 		row = 0;
 	}
 	ta->SetRow( row );
 	core->RedrawAll();
+	*/
 	Py_INCREF( Py_None );
 	return Py_None;
 }

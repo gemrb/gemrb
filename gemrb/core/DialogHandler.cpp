@@ -267,7 +267,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			//allow_zero is for PST (deionarra's text)
 			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
-				ta->AppendText( "", -1 );
+				ta->AppendText( "" );
 			}
 		}
 		target->ImmediateEvent();
@@ -381,8 +381,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 
 	//displaying npc text
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
-	//adding a gap between options and npc text
-	ta->AppendText("",-1);
+
 	int idx = 0;
 	std::vector<DialogOption> dialogOptions;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
@@ -435,7 +434,7 @@ end_of_choose:
 	//padding the rows so our text will be at the top
 	if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 		// FIXME: this is a poor solution
-		ta->AppendText( "", -1 );
+		ta->AppendText( "" );
 	}
 }
 

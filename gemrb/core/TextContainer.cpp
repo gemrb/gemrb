@@ -53,7 +53,8 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 TextSpan::~TextSpan()
 {
 	palette->release();
-	spanSprite->release();
+	if (spanSprite)
+		spanSprite->release();
 }
 
 const Sprite2D* TextSpan::RenderedSpan()

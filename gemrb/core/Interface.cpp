@@ -2512,7 +2512,7 @@ bool Interface::LoadEncoding()
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
 
-	TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
+	//TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 
 	// TODO: lists are incomplete
 	// maybe want to externalize this
@@ -3708,6 +3708,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		return -1;
 	}
 	print("Looking in %s", Path);
+	// TODO: get a sorted list then append to TA
 	do {
 		char *name = dir.GetName();
 		if (name[0] == '.')
@@ -3722,9 +3723,8 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		if (!pos) continue;
 		pos[1]=0;
 		count++;
-		ta->AppendText( name, -1 );
+		ta->AppendText( name );
 	} while (++dir);
-	ta->SortText();
 	return count;
 }
 
@@ -3741,6 +3741,7 @@ int Interface::GetCharSounds(TextArea* ta)
 		return -1;
 	}
 	print("Looking in %s", Path);
+	// TODO: get a sorted list then append to TA
 	do {
 		char *name = dir.GetName();
 		if (name[0] == '.')
@@ -3754,9 +3755,8 @@ int Interface::GetCharSounds(TextArea* ta)
 			*pos=0;
 		}
 		count++;
-		ta->AppendText( name, -1 );
+		ta->AppendText( name );
 	} while (++dir);
-	ta->SortText();
 	return count;
 }
 
@@ -3771,6 +3771,7 @@ int Interface::GetCharacters(TextArea* ta)
 		return -1;
 	}
 	print("Looking in %s", Path);
+	// TODO: get a sorted list then append to TA
 	do {
 		char *name = dir.GetName();
 		if (name[0] == '.')
@@ -3782,9 +3783,8 @@ int Interface::GetCharacters(TextArea* ta)
 		if (!pos) continue;
 		*pos=0;
 		count++;
-		ta->AppendText( name, -1 );
+		ta->AppendText( name );
 	} while (++dir);
-	ta->SortText();
 	return count;
 }
 

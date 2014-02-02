@@ -70,56 +70,37 @@ protected:
 public:
 	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
-	/** global configuration */
-	static void SetNoteString(const char *s);
 	/** Set the TextArea value to the line number containing the string parameter */
 	void SelectText(const char *select);
 	/** Sets the Actual Text */
 	void SetText(const char* text);
-	/** Sets text */
-	using Control::SetText;
-	void SetText(const std::vector<char*>& text);
 	/** Clears the textarea */
 	void Clear();
-	/** Discards scrolled out lines from the textarea */
-	/** preserving 'keeplines' lines for scroll back history */
-	void DiscardLines();
 	/** Appends a String to the current Text */
-	int AppendText(const char* text, int pos = 0);
-	/** Deletes `count' lines (either last or top lines)*/
-	void PopLines(unsigned int count, bool top = false);
+	void AppendText(const char* text);
+	/** Inserts a String into the current Text at pos */
+	int InsertText(const char* text, int pos);
 	/** Sets up auto scrolling (chapter text) */
 	void SetupScroll();
 	/** Per Pixel scrolling */
 	void ScrollToY(unsigned long y, Control* sender);
 	/** Sets the Fonts */
 	void SetFonts(Font* init, Font* text);
-	/** Returns Number of Rows */
-	int GetRowCount();
-	/** Returns the length of a Row */
-	int GetRowLength(unsigned int row);
-	/** Returns Number of Visible Rows */
-	int GetVisibleRowCount();
-	/** Returns Starting Row */
-	int GetTopIndex();
+
 	/** Returns total height of the text */
 	int GetRowHeight();
 	void SetDialogOptions(const std::vector<DialogOption>&,
 						  const Color* color, const Color* hiColor);
 	/** Set Starting Row */
 	void SetRow(int row);
-	/** Sets preserved lines */
-	void SetPreservedRow(int arg);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	/** Copies the current TextArea content to another TextArea control */
-	void CopyTo(TextArea* ta);
+
 	/** Returns the selected text */
 	const String& QueryText() const;
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	int SetScrollBar(Control *ptr);
-	void SortText();
 private: // Private attributes
 	// dialog handling
 	typedef std::pair<int, TextSpan*> DialogOptionSpan;
@@ -127,15 +108,9 @@ private: // Private attributes
 	TextContainer* dialogOptions;
 	TextSpan* selectedOption;
 	// standard text display
-	// for normal text areas this collection will be a single TextContainer
-	// for the message window, each dialog creates its own container and they
-	// are automatically cycled out when the buffer fills
+	TextContainer* TextContiner;
+	// TODO: we need a circular TextContainer subclass for the message window
 
-	std::vector< char*> lines;
-	std::vector< int> lrows;
-
-	/** lines to be kept even if scrolled out */
-	int keeplines;
 	unsigned long TextYPos;
 	/** timer for scrolling */
 	unsigned long starttime;
@@ -143,8 +118,7 @@ private: // Private attributes
 	unsigned long ticks;
 	/** Number of Text Rows */
 	int rows;
-	/** Starting Row */
-	int startrow;
+
 	/** Text Colors */
 	Palette* palette; // standard text color
 	Palette* dialogPal; // standard color for dialog options
@@ -157,7 +131,7 @@ private: // Private attributes
 
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
-	unsigned short CurPos, CurLine;
+	size_t CurPos;
 
 private: //internal functions
 	void ClearDialogOptions();

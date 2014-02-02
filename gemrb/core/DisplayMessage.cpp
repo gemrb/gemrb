@@ -70,7 +70,7 @@ void DisplayMessage::DisplayString(const char* Text, Scriptable *target) const
 	}
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta) {
-		ta->AppendText( Text, -1 );
+		ta->AppendText( Text );
 	} else {
 		if(target) {
 			target->DisplayHeadText(Text);
