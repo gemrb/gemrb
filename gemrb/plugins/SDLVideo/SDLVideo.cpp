@@ -1340,7 +1340,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			Point& c = poly->points[redge];
 			Point& d = poly->points[(redge+1)%(poly->count)];
 
-                       Pixel* line = (Pixel*)(backBuf->pixels) + (y_top+yCorr)*backBuf->pitch;
+			Pixel* line = (Pixel*)(backBuf->pixels) + (y_top+yCorr)*backBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
 				int py = y + Viewport.y;
