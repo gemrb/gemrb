@@ -11,14 +11,13 @@
 	#pragma comment(lib, "libGLESv2")
 #endif
 #endif
-
+#include <algorithm>
 #include "SDL20GLVideo.h"
 #include "Interface.h"
 #include "Game.h" // for GetGlobalTint
 #include "GLTextureSprite2D.h"
 #include "GLPaletteManager.h"
 #include "GLSLProgram.h"
-#include "Triangulation.h"
 #include "Matrix.h"
 
 using namespace GemRB;
@@ -632,34 +631,64 @@ void GLVideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color
 void GLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
 {
 	if (poly->count == 0) return;
+	if (poly->BBox.x > Viewport.x + Viewport.w) return;
+	if (poly->BBox.y > Viewport.y + Viewport.h) return;
+	if (poly->BBox.x + poly->BBox.w < Viewport.x) return;
+	if (poly->BBox.y + poly->BBox.h < Viewport.y) return;
+
 	Point* ajustedPoints = new Point[poly->count];
-	bool clipped = true;
-	for(unsigned int i=0; i<poly->count; i++)
+	for (unsigned int i=0; i<poly->count; i++)
 	{
-		if (Viewport.PointInside(poly->points[i])) clipped = false;
 		ajustedPoints[i] = Point(poly->points[i].x + xCorr - Viewport.x, poly->points[i].y + yCorr - Viewport.y);
 	}
-	if (clipped)
-	{
-		delete[] ajustedPoints;
-		return;
-	}
-	if (!fill)
-	{
-		drawPolygon(ajustedPoints, poly->count, color, LineLoop);
-	}
-	else
+	drawPolygon(ajustedPoints, poly->count, color, LineLoop);
+	delete[] ajustedPoints;
+	if (fill)
 	{
 		// not a good to do this here, will be right to do it in game
 		Color c = color;
 		c.a = c.a/2;
 		// end of bad code
-		std::vector<Point> triangles = Triangulation::TriangulatePolygon(ajustedPoints, poly->count);
-		//drawPolygon(&triangles[0], (short)triangles.size(), c, FilledTriangulation);
-		for(int i=0; i<triangles.size(); i+=3)
-			drawPolygon(&triangles[i], 3, color, LineLoop);
+		std::vector<Point> triangulation;
+		std::list<Trapezoid>::iterator iter;
+		for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end(); ++iter)
+		{
+			int y_top = iter->y1;
+			int y_bot = iter->y2;
+
+			int ledge = iter->left_edge;
+			int redge = iter->right_edge;
+			Point& a = poly->points[ledge];
+			Point& b = poly->points[(ledge+1)%(poly->count)];
+			Point& c = poly->points[redge];
+			Point& d = poly->points[(redge+1)%(poly->count)];
+
+			Point topleft, topright, bottomleft, bottomright;
+			topleft.y = topright.y = y_top + yCorr - Viewport.y;
+			bottomleft.y = bottomright.y = y_bot + yCorr - Viewport.y;
+
+			int lt, rt, py;
+			py = y_top;
+			lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
+			rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y);
+			topleft.x = lt + xCorr - Viewport.x;
+			topright.x = rt + xCorr - Viewport.x;
+
+			py = y_bot;
+			lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
+			rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y);
+			bottomleft.x = lt + xCorr - Viewport.x;
+			bottomright.x = rt + xCorr - Viewport.x;
+
+			triangulation.push_back(bottomleft);
+			triangulation.push_back(topleft);
+			triangulation.push_back(topright);
+			triangulation.push_back(bottomleft);
+			triangulation.push_back(topright);
+			triangulation.push_back(bottomright);
+		}
+		drawPolygon(&triangulation[0], triangulation.size(), c, FilledTriangulation);
 	}
-	delete[] ajustedPoints;
 }
 
 void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, bool clipped)

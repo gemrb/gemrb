@@ -48,7 +48,6 @@ namespace GemRB
 		void clearRect(const Region& rgn, const Color& color);
 		void drawEllipse(int cx, int cy, unsigned short xr, unsigned short yr, float thickness, const Color& color);
 		void drawPolygon(Point* points, unsigned int count, const Color& color, PointDrawingMode mode);
-		GLfloat* triangulatePolygon(Point* points, unsigned int count, unsigned int &trCount);
 
 	public:
 		~GLVideoDriver();
