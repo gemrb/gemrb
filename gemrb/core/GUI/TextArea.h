@@ -87,7 +87,7 @@ public:
 	void ScrollToY(unsigned long y, Control* sender);
 
 	/** Returns total height of the text */
-	int GetRowHeight();
+	int GetRowHeight() const;
 	void SetDialogOptions(const std::vector<DialogOption>&,
 						  const Color* color, const Color* hiColor);
 	/** Set Starting Row */

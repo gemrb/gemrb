@@ -174,7 +174,26 @@ void TextArea::AppendText(const char* text)
 		String* string = StringFromCString(text);
 		// TODO: parse the string tags ([color],[p],etc) into spans
 		//TextSpan* span = new TextSpan(string, ftext, palette, const Size& frame, 0);
+		if (finit) {
+			// FIXME: this assumes that finit is always for drop caps (not just a diffrent looking font)
+			// append drop cap spans
+			TextSpan* dc = new TextSpan(string->substr(0, 1), finit, NULL);
+			textContainer->AppendSpan(dc);
+			string->erase(0, 1);
+			Size s = Size(Width - 5 - dc->SpanFrame().w, GetRowHeight());
+			TextSpan* span = new TextSpan(*string, ftext, palette, s, IE_FONT_ALIGN_LEFT);
+			textContainer->AppendSpan(span);
+			s.w -= 5; // FIXME: this is arbitrary
+			s.h = dc->SpanFrame().h - GetRowHeight();
+			size_t textLen = span->RenderedString().length() - 1;
+			span = new TextSpan(string->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_RIGHT);
+			textContainer->AppendSpan(span);
+			textLen += span->RenderedString().length() - 1;
+			// append the remainder
+			textContainer->AppendText(string->substr(textLen));
+		} else {
 			textContainer->AppendText(*string);
+		}
 		delete string;
 		UpdateControls();
 	}
@@ -323,7 +342,7 @@ bool TextArea::OnSpecialKeyPress(unsigned char Key)
 	return true;
 }
 
-int TextArea::GetRowHeight()
+int TextArea::GetRowHeight() const
 {
 	return ftext->maxHeight;
 }
