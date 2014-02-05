@@ -36,24 +36,26 @@ class TextSpan
 {
 private:
 	String text;
-	Font* font;
+	size_t stringLen;
 	Size frame;
+	Font* font;
 	Palette* palette;
 	Sprite2D* spanSprite;
 	ieByte alignment;
 public:
 	// construct a "inline" span that calculates its own region based on font, palette, and string
-	TextSpan(const String& string, Font* font, Palette* pal);
+	TextSpan(const String& string, Font* font, Palette* pal = NULL);
 	// construct a "block" span with dimentions determined by rgn
 	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn, ieByte align);
 	~TextSpan();
 
-	const Size& SpanFrame();
-	const Sprite2D* RenderedSpan();
+	const Size& SpanFrame() const { return frame; }
+	const Sprite2D* RenderedSpan() const { return spanSprite; }
+	const String& RenderedString() const { return text; }
 
 	void SetPalette(Palette* pal);
 private:
-	void RenderSpan();
+	void RenderSpan(const String& string);
 };
 
 class TextContainer

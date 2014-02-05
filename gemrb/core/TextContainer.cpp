@@ -28,19 +28,24 @@
 namespace GemRB {
 
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
-	: text(string)
 {
 	font = fnt;
 	spanSprite = NULL;
 	palette = NULL;
 	frame = font->StringSize(text);
 
-	SetPalette(pal);
+	if (!pal) {
+		palette = fnt->GetPalette();
+	} else {
+		SetPalette(pal);
+	}
 	alignment = IE_FONT_SINGLE_LINE;
+	RenderSpan(string);
+	text = string.substr(0, stringLen);
 }
 
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame, ieByte align)
-	: text(string), frame(frame)
+	: frame(frame)
 {
 	font = fnt;
 	spanSprite = NULL;
@@ -48,40 +53,29 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 
 	SetPalette(pal);
 	alignment = align;
+	RenderSpan(string);
+	// string is trimmed down to just the characters that fit.
+	// some spans are created from huge strings but with a small size (the text next to a drop cap)
+	// we may want a variation that keeps the entire string so the span can dynamically rerender
+	text = string.substr(0, stringLen);
 }
 
 TextSpan::~TextSpan()
 {
 	palette->release();
-	if (spanSprite)
-		spanSprite->release();
+	spanSprite->release();
 }
 
-const Sprite2D* TextSpan::RenderedSpan()
-{
-	if (!spanSprite)
-		RenderSpan();
-	return spanSprite;
-}
-
-void TextSpan::RenderSpan()
+void TextSpan::RenderSpan(const String& string)
 {
 	if (spanSprite) spanSprite->release();
 	// TODO: implement span alignments
-	spanSprite = font->RenderTextAsSprite(text, frame, alignment, palette);
-	spanSprite->acquire();
+	spanSprite = font->RenderTextAsSprite(string, frame, alignment, palette, &stringLen);
 	// frame dimensions of 0 just mean size to fit
 	if (frame.w == 0)
 		frame.w = spanSprite->Width;
 	if (frame.h == 0)
 		frame.h = spanSprite->Height;
-}
-
-const Size& TextSpan::SpanFrame()
-{
-	if (frame.IsEmpty())
-		RenderSpan(); // our true frame is determined by the rendering
-	return frame;
 }
 
 void TextSpan::SetPalette(Palette* pal)
@@ -230,7 +224,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 				drawPoint.x = excluded->x + excluded->w + 1;
 			}
 			frame.w = drawPoint.x;
-			if (drawPoint.x && drawPoint.x + spanFrame.w > frame.w) {
+			if (drawPoint.x && drawPoint.x + spanFrame.w > maxFrame.w) {
 				// move down and back
 				drawPoint.x = 0;
 				if (excluded) {
