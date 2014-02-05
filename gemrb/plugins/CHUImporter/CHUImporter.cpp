@@ -372,9 +372,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
-				TextArea* ta = new TextArea( ctrlFrame, fore, init, back );
+				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 				ta->ControlID = ControlID;
-				ta->SetFonts( ini, fnt );
 				win->AddControl( ta );
 				if (SBID != 0xffff)
 					win->Link( SBID, ( unsigned short ) ControlID );

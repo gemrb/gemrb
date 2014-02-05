@@ -68,7 +68,8 @@ protected:
 	bool NeedsDraw();
 	bool HasBackground() { return false; }
 public:
-	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
+	TextArea(const Region& frame, Font* text, Font* caps,
+			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
 	/** Set the TextArea value to the line number containing the string parameter */
 	void SelectText(const char *select);
@@ -84,8 +85,6 @@ public:
 	void SetupScroll();
 	/** Per Pixel scrolling */
 	void ScrollToY(unsigned long y, Control* sender);
-	/** Sets the Fonts */
-	void SetFonts(Font* init, Font* text);
 
 	/** Returns total height of the text */
 	int GetRowHeight();
@@ -108,7 +107,7 @@ private: // Private attributes
 	TextContainer* dialogOptions;
 	TextSpan* selectedOption;
 	// standard text display
-	TextContainer* TextContiner;
+	TextContainer* textContainer;
 	// TODO: we need a circular TextContainer subclass for the message window
 
 	unsigned long TextYPos;
@@ -124,6 +123,7 @@ private: // Private attributes
 	Palette* dialogPal; // standard color for dialog options
 	Palette* selected; // selected text or highlight for hovered dialog options
 	Palette* lineselpal; // ???
+	//Palette* initpalette; // palette for finit. unused, but why?
 
 	/** Fonts */
 	Font* finit, * ftext;

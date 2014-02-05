@@ -32,8 +32,9 @@
 
 namespace GemRB {
 
-TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame)
+TextArea::TextArea(const Region& frame, Font* text, Font* caps,
+				   Color hitextcolor, Color /*initcolor*/, Color lowtextcolor)
+	: Control(frame), ftext(text)
 {
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
@@ -44,8 +45,17 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	Value = 0xffffffff;
 	ResetEventHandler( TextAreaOnChange );
 	PortraitResRef[0]=0;
+	// quick font optimization (prevents creating unnecessary spans)
+	// FIXME: the color/palette for the initials font is unused? why?
+	if (caps == ftext) {
+		finit = NULL;
+		//initpalette = NULL;
+	} else {
+		finit = caps;
+		//initpalette = core->CreatePalette( initcolor, lowtextcolor );
+	}
 	palette = core->CreatePalette( hitextcolor, lowtextcolor );
-	dialogPal = core->CreatePalette( initcolor, lowtextcolor );
+	dialogPal = NULL;
 	Color tmp = {
 		hitextcolor.b, hitextcolor.g, hitextcolor.r, 0
 	};
@@ -54,10 +64,9 @@ TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Colo
 	tmp.g = 152;
 	tmp.b = 102;
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
-	ftext = finit = NULL;
 	dialogOptions = NULL;
 	selectedOption = NULL;
-	TextContiner = NULL;
+	textContainer = new TextContainer(frame.Dimensions(), ftext, palette);
 }
 
 TextArea::~TextArea(void)
@@ -65,11 +74,12 @@ TextArea::~TextArea(void)
 	ClearDialogOptions();
 
 	gamedata->FreePalette( palette );
+	//gamedata->FreePalette( initpalette );
 	gamedata->FreePalette( dialogPal );
 	gamedata->FreePalette( selected );
 	gamedata->FreePalette( lineselpal );
 	core->GetVideoDriver()->FreeSprite( Cursor );
-	delete TextContiner;
+	delete textContainer;
 }
 
 void TextArea::RefreshSprite(const char *portrait)
@@ -104,7 +114,7 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
-	if (!TextContiner) {
+	if (!textContainer) {
 		return;
 	}
 
@@ -133,10 +143,10 @@ void TextArea::DrawInternal(Region& clip)
 	short LineOffset = (short)(TextYPos % ftext->maxHeight);
 	int x = clip.x, y = clip.y - LineOffset;
 	Region textClip(x, y, clip.w, clip.h + LineOffset);
-	TextContiner->DrawContents(x, y);
+	textContainer->DrawContents(x, y);
 
 	if (dialogOptions) {
-		y += TextContiner->ContainerFrame().h;
+		y += textContainer->ContainerFrame().h;
 		dialogOptions->DrawContents(x, y);
 	}
 }
@@ -161,13 +171,10 @@ void TextArea::SetText(const char* text)
 void TextArea::AppendText(const char* text)
 {
 	if (text) {
-		if (!TextContiner) {
-			TextContiner = new TextContainer(ControlFrame().Dimensions(), ftext, palette);
-		}
 		String* string = StringFromCString(text);
 		// TODO: parse the string tags ([color],[p],etc) into spans
 		//TextSpan* span = new TextSpan(string, ftext, palette, const Size& frame, 0);
-		TextContiner->AppendText(*string);
+			textContainer->AppendText(*string);
 		delete string;
 		UpdateControls();
 	}
@@ -213,14 +220,6 @@ void TextArea::UpdateControls()
 	}
 
 	core->RedrawAll();
-}
-
-/** Sets the Fonts */
-void TextArea::SetFonts(Font* init, Font* text)
-{
-	finit = init;
-	ftext = text;
-	MarkDirty();
 }
 
 /** Key Press Event */
@@ -358,7 +357,7 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
-	if (TextContiner) {
+	if (textContainer) {
 		if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
 			const char *portrait = NULL;
 			Actor *actor = NULL;
@@ -379,7 +378,7 @@ void TextArea::CalcRowCount()
 				// TODO: resize TextContiner to account for AnimPicture
 			}
 		}
-		size_t textHeight = TextContiner->ContainerFrame().h;
+		size_t textHeight = textContainer->ContainerFrame().h;
 		if (dialogOptions) {
 			textHeight += dialogOptions->ContainerFrame().h;
 		}
@@ -410,7 +409,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if (!dialogOptions) return;
 
-	Point p = Point(x, y - TextContiner->ContainerFrame().h);
+	Point p = Point(x, y - textContainer->ContainerFrame().h);
 	TextSpan* hoverSpan = dialogOptions->SpanAtPoint(p);
 
 	if (selectedOption && selectedOption != hoverSpan) {
@@ -535,8 +534,8 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 
 void TextArea::Clear()
 {
-	delete TextContiner;
-	TextContiner = NULL;
+	delete textContainer;
+	textContainer = new TextContainer(ControlFrame().Dimensions(), ftext, palette);;
 }
 
 //setting up the textarea for smooth scrolling, the first

@@ -2255,10 +2255,9 @@ static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	TextArea* ta = new TextArea( ctrl->ControlFrame(), fore, init, back );
+	TextArea* ta = new TextArea( ctrl->ControlFrame(), ctrl->GetFont(), NULL, fore, init, back );
 	ta->ControlID = ctrl->ControlID;
 	ta->Owner = win;
-	ta->SetFonts (ctrl->GetFont(), ctrl->GetFont() );
 	ta->Flags |= IE_GUI_TEXTAREA_EDITABLE;
 	win->AddControl( ta );
 	win->Link( ScrollBarID, ( unsigned short ) ta->ControlID );
