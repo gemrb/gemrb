@@ -1325,11 +1325,11 @@ def OpenPortraitWindow (needcontrols=0):
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetFont ("STATES")
 			# label for status flags (dialog, store, level up)
-			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
+			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER) #level up icon is on the right
 		elif not GameCheck.IsPST():
 			Button.SetFont ("STATES2")
 			# label for status flags (dialog, store, level up)
-			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT) #level up icon is on the right
+			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER) #level up icon is on the right
 
 		Button.SetVarAssoc ("PressedPortrait", i+1)
 
