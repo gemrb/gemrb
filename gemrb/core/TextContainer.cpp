@@ -28,11 +28,11 @@
 namespace GemRB {
 
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
+	: frame()
 {
 	font = fnt;
 	spanSprite = NULL;
 	palette = NULL;
-	frame = font->StringSize(text);
 
 	if (!pal) {
 		palette = fnt->GetPalette();
@@ -40,6 +40,7 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 		SetPalette(pal);
 	}
 	alignment = IE_FONT_SINGLE_LINE;
+
 	RenderSpan(string);
 	text = string.substr(0, stringLen);
 }
@@ -63,11 +64,20 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 TextSpan::~TextSpan()
 {
 	palette->release();
-	spanSprite->release();
+	if (spanSprite)
+		spanSprite->release();
 }
 
 void TextSpan::RenderSpan(const String& string)
 {
+	if (string.find_first_not_of(L"\n") == String::npos) {
+		// entire string is newlines (no width, but still need to generate layout)
+		frame.w = -1; // maximum value, nothing should ever go next to a newline
+		// FIXME: this assumes a single newline and no more!
+		frame.h = font->maxHeight; // newline is always a full line height
+		stringLen = string.length();
+		return;
+	}
 	if (spanSprite) spanSprite->release();
 	// TODO: implement span alignments
 	spanSprite = font->RenderTextAsSprite(string, frame, alignment, palette, &stringLen);
@@ -178,8 +188,10 @@ void TextContainer::DrawContents(int x, int y) const
 		if (!rgn.IntersectsRegion(drawRgn)) {
 			break; // layout is ordered so we know nothing else can draw
 		}
-		video->BlitSprite((*it).first->RenderedSpan(),
-						  rgn.x, rgn.y, true, &rgn);
+		const Sprite2D* spr = (*it).first->RenderedSpan();
+		if (!spr) // spr can be NULL if the span is entirely newlines
+			continue;
+		video->BlitSprite(spr, rgn.x, rgn.y, true, &rgn);
 #if DEBUG_TEXT
 		// draw the layout rect
 		video->DrawRect(rgn, ColorGreen, false);
