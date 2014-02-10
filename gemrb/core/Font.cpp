@@ -92,7 +92,7 @@ void Font::BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
 	}
 }
 
-size_t Font::RenderText(const String&  string, const Region& rgn,
+size_t Font::RenderText(const String& string, const Region& rgn,
 						Palette* color, ieByte alignment, ieByte* canvas) const
 {
 	assert(color);
@@ -135,16 +135,16 @@ size_t Font::RenderText(const String&  string, const Region& rgn,
 		size_t lineLen = line.length();
 		if (lineLen) {
 			size_t linePos = 0, wordBreak = 0;
+			while (line[linePos] == L' ') {
+				// skip spaces at the beginning of a line
+				linePos++;
+			}
 			// FIXME: I'm not sure how to handle Asian text
 			// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
 			// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
 			// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 			while (!lineBreak && (wordBreak = line.find_first_of(L' ', linePos))) {
-				if (wordBreak == String::npos) {
-					word = line.substr(linePos);
-				} else {
-					word = line.substr(linePos, wordBreak - linePos);
-				}
+				word = line.substr(linePos, wordBreak - linePos);
 
 				int wordW = StringSize(word).w;
 				if (!(alignment&IE_FONT_SINGLE_LINE)) {
@@ -186,23 +186,21 @@ size_t Font::RenderText(const String&  string, const Region& rgn,
 							break; // either done, or skipping
 						}
 						if (canvas) {
-							BlitGlyphToCanvas(currGlyph, x,
-											  y - lineHeight + (lineHeight - currGlyph->YPos),
+							BlitGlyphToCanvas(currGlyph, x, y - currGlyph->YPos,
 											  canvas, rgn.Dimensions());
 						} else {
 							core->GetVideoDriver()->BlitSprite(currGlyph, x + rgn.x, y + rgn.y,
 															   true, &rgn, color);
 						}
-
 						x += currGlyph->Width;
 					}
 					if (done) break;
 					x += GetCharSprite(' ')->Width;
 					linePos += i + 1;
-					charCount += i + 1;
 				}
 				if (wordBreak == String::npos) break;
 			}
+			charCount += linePos;
 		}
 
 		if (!lineBreak && !stream.eof())
