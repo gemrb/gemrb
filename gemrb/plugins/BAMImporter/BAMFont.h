@@ -35,7 +35,7 @@ private:
 	AnimationFactory* factory;
 
 public:
-	BAMFont(AnimationFactory* af, int* baseline = NULL);
+	BAMFont(Palette* pal, AnimationFactory* af);
 	~BAMFont(void);
 
 	const Sprite2D* GetCharSprite(ieWord chr) const;

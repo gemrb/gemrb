@@ -54,22 +54,35 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 {
 	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
 
-	Font* fnt = NULL;
+	Sprite2D* first = NULL;
 	if (isStateFont) {
 		// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
 		// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
 
 		// since state icons should all be the same size/position we can just take the position of the first one
-		Sprite2D* first = af->GetFrame(0, 0);
-		int pos = first->YPos; // baseline
-		first->release();
-		fnt = new BAMFont(af, &pos);
-	} else {
-		fnt = new BAMFont(af, NULL);
+		// broken cycles:
+		// 254 - level up icon
+		// 153 - dialog icon
+		// 154 - store icon
+		first = af->GetFrameWithoutCycle(0);
 	}
 
-	if (pal) {
-		fnt->SetPalette(pal);
+	Sprite2D* curGlyph = NULL;
+	for (size_t i = 0; i < af->GetFrameCount(); i++) {
+		curGlyph = af->GetFrameWithoutCycle(i);
+		if (curGlyph) {
+			if (first)
+				curGlyph->YPos = first->YPos;
+			curGlyph->XPos = 0;
+			curGlyph->release();
+		}
 	}
-	return fnt;
+	if (!first)
+		first = af->GetFrameWithoutCycle(0);
+
+	assert(first);
+	if (!pal)
+		pal = first->GetPalette();
+	first->release();
+	return new BAMFont(pal, af);;
 }

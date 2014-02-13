@@ -48,7 +48,7 @@ private:
 protected:
 	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
 public:
-	TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal);
+	TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style);
 	~TTFFont(void);
 
 	const Sprite2D* GetCharSprite(ieWord chr) const;

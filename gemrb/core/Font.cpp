@@ -32,10 +32,11 @@
 
 namespace GemRB {
 
-Font::Font()
+Font::Font(Palette* pal)
 : resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
 	name[0] = '\0';
+	SetPalette(pal);
 }
 
 Font::~Font(void)

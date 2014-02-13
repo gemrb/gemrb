@@ -25,35 +25,22 @@
 
 namespace GemRB {
 
-BAMFont::BAMFont(AnimationFactory* af, int* baseline)
+BAMFont::BAMFont(Palette* pal, AnimationFactory* af)
+	: Font(pal)
 {
 	factory = af;
-	maxHeight = 0;
-	Sprite2D* curGlyph = NULL;
 	bool isNumeric = (af->GetCycleCount() <= 1);
-
-	for (size_t i = 0; i < af->GetFrameCount(); i++) {
-		curGlyph = af->GetFrameWithoutCycle(i);
-		if (curGlyph) {
-			if (curGlyph->Height > maxHeight)
-				maxHeight = curGlyph->Height;
-			curGlyph->XPos = 0;
-			if (isNumeric) {
-				// we want them to have the same baseline as the rest
-				curGlyph->YPos = 13 - curGlyph->Height;
-			} else if (baseline) {
-				curGlyph->YPos = *baseline;
-			}
-			curGlyph->release();
-		}
+	// Cycles 0 and 1 of a BAM appear to be "magic" glyphs
+	// I think cycle 1 is for determining line height (maxHeight)
+	// this is important because iterating the initials font would give an incorrect maxHeight
+	// initials should still have 13 for the line height because they have a descent that covers
+	// multiple lines (3 in BG2). numeric and state fonts don't posess these magic glyphs,
+	// but it is harmless to use them the same way
+	if (isNumeric) {
+		maxHeight = af->GetFrame(0)->Height;
+	} else {
+		maxHeight = af->GetFrame(0, 1)->Height;
 	}
-
-	// assume all sprites have same palette
-	Sprite2D* first = af->GetFrameWithoutCycle(0);
-	Palette* pal = first->GetPalette();
-	SetPalette(pal);
-	pal->release();
-	first->release();
 
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
 }

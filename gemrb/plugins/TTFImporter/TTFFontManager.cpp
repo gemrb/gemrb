@@ -122,7 +122,7 @@ Font* TTFFontManager::GetFont(unsigned short ptSize,
 		pal = core->CreatePalette( ColorWhite, ColorBlack );
 		pal->CreateShadedAlphaChannel();
 	}
-	return new TTFFont(face, ptSize, style, pal);
+	return new TTFFont(pal, face, ptSize, style);
 }
 
 #include "plugindef.h"

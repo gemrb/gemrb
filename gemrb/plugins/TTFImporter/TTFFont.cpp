@@ -182,8 +182,8 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 	return -kerning.x / 64;
 }
 
-TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
-	: style(style), ptSize(ptSize), face(face)
+TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
+	: Font(pal), style(style), ptSize(ptSize), face(face)
 {
 	glyphCache = new HashMap<ieWord, Holder<Sprite2D> >();
 	glyphCache->init(256, 128);
@@ -262,8 +262,6 @@ TTFFont::TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal)
 	/* x offset = cos(((90.0-12)/360)*2*M_PI), or 12 degree angle */
 	glyph_italics = 0.207f;
 	glyph_italics *= height;
-
-	SetPalette(pal);
 
 	// TODO: ttf fonts have a "box" glyph they use for this
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);

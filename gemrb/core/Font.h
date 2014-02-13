@@ -72,7 +72,7 @@ private:
 	size_t RenderText(const String&, const Region&, Palette*,
 				  ieByte alignment, ieByte* canvas = NULL) const;
 public:
-	Font();
+	Font(Palette*);
 	virtual ~Font(void);
 
 	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
