@@ -306,10 +306,10 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	// data
 	GLfloat data[] = 
 	{	    
-		-1.0f + spriteRect.x*hscale, 1.0f - spriteRect.y*vscale, textureCoords[0], textureCoords[1], alphaModifier, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255,
-		-1.0f + (spriteRect.x + spriteRect.w)*hscale, 1.0f - spriteRect.y*vscale, textureCoords[2], textureCoords[3], alphaModifier, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255,
-		-1.0f + spriteRect.x*hscale, 1.0f - (spriteRect.y + spriteRect.h)*vscale, textureCoords[4], textureCoords[5], alphaModifier, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255,
-		-1.0f + (spriteRect.x + spriteRect.w)*hscale, 1.0f - (spriteRect.y + spriteRect.h)*vscale, textureCoords[6], textureCoords[7], alphaModifier, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255
+		-1.0f + spriteRect.x*hscale, 1.0f - spriteRect.y*vscale, textureCoords[0], textureCoords[1],
+		-1.0f + (spriteRect.x + spriteRect.w)*hscale, 1.0f - spriteRect.y*vscale, textureCoords[2], textureCoords[3],
+		-1.0f + spriteRect.x*hscale, 1.0f - (spriteRect.y + spriteRect.h)*vscale, textureCoords[4], textureCoords[5],
+		-1.0f + (spriteRect.x + spriteRect.w)*hscale, 1.0f - (spriteRect.y + spriteRect.h)*vscale, textureCoords[6], textureCoords[7]
 	};
 
 	// shader program selection
@@ -356,35 +356,27 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	program->SetUniformValue("u_tint", COLOR_SIZE, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255);
+	program->SetUniformValue("u_alphaModifier", 1, alphaModifier);
+
 	GLint a_position = program->GetAttribLocation("a_position");
 	GLint a_texCoord = program->GetAttribLocation("a_texCoord");
-	GLint a_alphaModifier = program->GetAttribLocation("a_alphaModifier");
-	GLint a_tint = program->GetAttribLocation("a_tint");
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*9, 0);
-	glVertexAttribPointer(a_texCoord, TEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*9, BUFFER_OFFSET(sizeof(GLfloat)*VERTEX_SIZE));
-	glVertexAttribPointer(a_alphaModifier, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*9, BUFFER_OFFSET(sizeof(GLfloat)*(VERTEX_SIZE + TEX_SIZE)));
-	glVertexAttribPointer(a_tint, COLOR_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*9, BUFFER_OFFSET(sizeof(GLfloat)*(VERTEX_SIZE + TEX_SIZE + 1)));
+	glVertexAttribPointer(a_position, VERTEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*(VERTEX_SIZE + TEX_SIZE), 0);
+	glVertexAttribPointer(a_texCoord, TEX_SIZE, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*(VERTEX_SIZE + TEX_SIZE), BUFFER_OFFSET(sizeof(GLfloat)*VERTEX_SIZE));
 
 	glEnableVertexAttribArray(a_position);
 	glEnableVertexAttribArray(a_texCoord);
-	glEnableVertexAttribArray(a_alphaModifier);
-	glEnableVertexAttribArray(a_tint);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	glDisableVertexAttribArray(a_tint);
-	glDisableVertexAttribArray(a_alphaModifier);
 	glDisableVertexAttribArray(a_texCoord);
 	glDisableVertexAttribArray(a_position);
-
-	// remove attached texture
-	//if (attachedPal) paletteManager->RemovePaletteTexture(palTexture, true);
 	
 	glDeleteBuffers(1, &buffer);
 	spritesPerFrame++;
@@ -520,6 +512,25 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 	GLTextureSprite2D* glSprite = (GLTextureSprite2D*)spr;
 	GLuint coverTexture = 0;
 	
+	if (!anchor && core->GetGame()) 
+	{
+		const Color *totint = core->GetGame()->GetGlobalTint();
+		if (totint) 
+		{
+			if (flags & BLIT_TINTED) 
+			{
+				tint.r = (tint.r * totint->r) >> 8;
+				tint.g = (tint.g * totint->g) >> 8;
+				tint.b = (tint.b * totint->b) >> 8;
+			} 
+			else
+			{
+				flags |= BLIT_TINTED;
+				tint = *totint;
+			}
+		}
+	}
+
 	if(glSprite->IsPaletted())
 	{
 		if (cover)
@@ -554,28 +565,9 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 			delete[] data;
 			flags |= BLIT_EXTERNAL_MASK;
 		}
-		if (!anchor && core->GetGame()) 
-		{
-			const Color *totint = core->GetGame()->GetGlobalTint();
-			if (totint) 
-			{
-				if (flags & BLIT_TINTED) 
-				{
-					tint.r = (tint.r * totint->r) >> 8;
-					tint.g = (tint.g * totint->g) >> 8;
-					tint.b = (tint.b * totint->b) >> 8;
-				} 
-				else
-				{
-					flags |= BLIT_TINTED;
-					tint = *totint;
-				}
-			}
-		}
-		blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
 	}
-	else
-		blitSprite(glSprite, tx, ty, clip, palette, flags);
+
+	blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
 	if (coverTexture != 0)
 	{
 		glActiveTexture(GL_TEXTURE2);
