@@ -172,16 +172,16 @@ bool Region::InsideRegion(const Region& rgn) const
 
 bool Region::IntersectsRegion(const Region& rgn) const
 {
-	if (x > ( rgn.x + rgn.w )) {
+	if (x >= ( rgn.x + rgn.w )) {
 		return false; // entirely to the right of rgn
 	}
-	if (( x + w ) < rgn.x) {
+	if (( x + w ) <= rgn.x) {
 		return false; // entirely to the left of rgn
 	}
-	if (y > ( rgn.y + rgn.h )) {
+	if (y >= ( rgn.y + rgn.h )) {
 		return false; // entirely below rgn
 	}
-	if (( y + h ) < rgn.y) {
+	if (( y + h ) <= rgn.y) {
 		return false; // entirely above rgn
 	}
 	return true;
