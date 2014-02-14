@@ -179,11 +179,9 @@ void ScrollBar::DrawInternal(Region& drawFrame)
 	
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		if (Frames[IE_GUI_SCROLLBAR_UP_PRESSED])
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_PRESSED], drawFrame.x, drawFrame.y, true, &drawFrame );
+		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_PRESSED], drawFrame.x, drawFrame.y, true, &drawFrame );
 	} else {
-		if (Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED])
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED], drawFrame.x, drawFrame.y, true, &drawFrame );
+		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED], drawFrame.x, drawFrame.y, true, &drawFrame );
 	}
 	//draw the trough
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED);
@@ -199,20 +197,16 @@ void ScrollBar::DrawInternal(Region& drawFrame)
 	}
 	//draw the down button
 	if (( State & DOWN_PRESS ) != 0) {
-		if (Frames[IE_GUI_SCROLLBAR_DOWN_PRESSED]) 
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_PRESSED], drawFrame.x, maxy, true, &drawFrame );
+		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_PRESSED], drawFrame.x, maxy, true, &drawFrame );
 	} else {
-		if (Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED])
-			video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED], drawFrame.x, maxy, true, &drawFrame );
+		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED], drawFrame.x, maxy, true, &drawFrame );
 	}
-	//draw the slider if it exists
-	if (Frames[IE_GUI_SCROLLBAR_SLIDER]) {
-		short slx = ((Width - Frames[IE_GUI_SCROLLBAR_SLIDER]->Width - 1) / 2 );
-		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_SLIDER],
-			drawFrame.x + slx + Frames[IE_GUI_SCROLLBAR_SLIDER]->XPos,
-			drawFrame.y + Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos + upMy + SliderYPos,
-			true, &drawFrame );
-	}
+
+	short slx = ((Width - Frames[IE_GUI_SCROLLBAR_SLIDER]->Width - 1) / 2 );
+	video->BlitSprite( Frames[IE_GUI_SCROLLBAR_SLIDER],
+		drawFrame.x + slx + Frames[IE_GUI_SCROLLBAR_SLIDER]->XPos,
+		drawFrame.y + Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos + upMy + SliderYPos,
+		true, &drawFrame );
 }
 
 /** Mouse Button Down */
