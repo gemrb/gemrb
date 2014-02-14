@@ -196,10 +196,13 @@ size_t Font::RenderText(const String& string, const Region& rgn,
 						x += currGlyph->Width;
 					}
 					if (done) break;
-					x += GetCharSprite(' ')->Width;
 					linePos += i + 1;
 				}
-				if (wordBreak == String::npos) break;
+				if (wordBreak == String::npos) {
+					linePos--; // we previously counted a non-existant space
+					break;
+				}
+				x += GetCharSprite(' ')->Width;
 			}
 			charCount += linePos;
 		}
@@ -208,8 +211,7 @@ size_t Font::RenderText(const String& string, const Region& rgn,
 			charCount++; // for the newline
 		y += lineHeight;
 	}
-	// FIXME: charCount appears to sometimes be off by 1...
-	//assert(charCount <= string.length());
+	assert(charCount <= string.length());
 	return charCount;
 }
 
