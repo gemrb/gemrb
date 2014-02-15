@@ -71,14 +71,14 @@ static void ParseGameDate(DataStream *ds, char *Date)
 
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
 	if (days) {
-		if (days==1) a=core->GetString(10698);
-		else a=core->GetString(10697);
+		if (days==1) a=core->GetCString(10698);
+		else a=core->GetCString(10697);
 	}
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 	if (hours || !a) {
-		if (a) b=core->GetString(10699);
-		if (hours==1) c=core->GetString(10701);
-		else c=core->GetString(10700);
+		if (a) b=core->GetCString(10699);
+		if (hours==1) c=core->GetCString(10701);
+		else c=core->GetCString(10700);
 	}
 	if (b) {
 		strcat(Date, a);

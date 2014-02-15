@@ -63,7 +63,7 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 const String* WMPAreaEntry::GetCaption()
 {
 	if (!StrCaption) {
-		char* tmp = core->GetString(LocCaptionName);
+		char* tmp = core->GetCString(LocCaptionName);
 		StrCaption = StringFromCString(tmp);
 		free(tmp);
 	}
@@ -73,7 +73,7 @@ const String* WMPAreaEntry::GetCaption()
 const char* WMPAreaEntry::GetTooltip()
 {
 	if (!StrTooltip) {
-		StrTooltip = core->GetString(LocTooltipName);
+		StrTooltip = core->GetCString(LocTooltipName);
 	}
 	return StrTooltip;
 }

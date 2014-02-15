@@ -3147,7 +3147,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
-	char * str = core->GetString( parameters->int0Parameter);
+	char * str = core->GetCString( parameters->int0Parameter);
 	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, str);
 }
 
@@ -4837,7 +4837,7 @@ void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	char *str = core->GetString( parameters->int0Parameter, 0);
+	char *str = core->GetCString( parameters->int0Parameter, 0);
 	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str, parameters->int0Parameter);
 }
 
@@ -5730,7 +5730,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
-		char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
+		char * str = core->GetCString( parameters->int0Parameter, IE_STR_STRREFOFF);
 		char FolderName[_MAX_PATH];
 		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
 		core->FreeString( str );

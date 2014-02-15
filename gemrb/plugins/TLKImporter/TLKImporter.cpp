@@ -247,7 +247,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 
 	//these are gender specific tokens, they are customisable by gender.2da
 	if (gtmap.Lookup(Token, (void *&) entry) ) {
-		Decoded = GetString( GenderStrRef(entry->type, entry->male, entry->female) );
+		Decoded = GetCString( GenderStrRef(entry->type, entry->male, entry->female) );
 		goto exit_function;
 	}
 
@@ -257,24 +257,24 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
-		Decoded = GetString( 15981, 0 );
+		Decoded = GetCString( 15981, 0 );
 		goto exit_function;
 	}
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
-		Decoded = GetString( 10174, 0 );
+		Decoded = GetCString( 10174, 0 );
 		goto exit_function;
 	}
 	if (!strcmp( Token, "CLASS" )) {
 		//allow this to be used by direct setting of the token
 		int strref = ClassStrRef(-1);
 		if (strref<=0) return -1;
-		Decoded = GetString( strref, 0);
+		Decoded = GetCString( strref, 0);
 		goto exit_function;
 	}
 
 	if (!strcmp( Token, "RACE" )) {
-		Decoded = GetString( RaceStrRef(-1), 0);
+		Decoded = GetCString( RaceStrRef(-1), 0);
 		goto exit_function;
 	}
 	if (!strncmp( Token, "PLAYER", 6 )) {
@@ -292,11 +292,11 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_CLASS" )) {
-		Decoded = GetString( ClassStrRef(0), 0);
+		Decoded = GetCString( ClassStrRef(0), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_RACE" )) {
-		Decoded = GetString( RaceStrRef(0), 0);
+		Decoded = GetCString( RaceStrRef(0), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "MAGESCHOOL" )) {
@@ -306,7 +306,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		AutoTable tm("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
-			Decoded = GetString( atoi( value ), 0 );
+			Decoded = GetCString( atoi( value ), 0 );
 			goto exit_function;
 		}
 	}
@@ -414,7 +414,15 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 	return 0xffffffff;
 }
 
-char* TLKImporter::GetString(ieStrRef strref, ieDword flags)
+String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
+{
+	char* cstr = GetCString(strref, flags);
+	String* string = StringFromCString(cstr);
+	free(cstr);
+	return string;
+}
+
+char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 {
 	char* string;
 	
@@ -503,24 +511,16 @@ StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 	}
 	if (strref >= StrRefCount) {
 empty:
-		sb.text = ( char * ) malloc( 1 );
-		sb.text[0] = 0;
 		sb.Sound[0] = 0;
 		return sb;
 	}
-	sb.text = GetString( strref, flags );
+	sb.text = GetCString( strref, flags );
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->ReadWord( &type );
 	str->ReadResRef( sb.Sound );
 	return sb;
 }
-
-void TLKImporter::FreeString(char *str)
-{
-	free(str);
-}
-
 
 #include "plugindef.h"
 

@@ -284,7 +284,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) c
 			}
 			DMGOpcodeInfo damage;
 			// it's lower case instead of title case, but let's see how long it takes for anyone to notice - 26.12.2012
-			damage.TypeName = core->GetString(it->second.strref, 0);
+			damage.TypeName = core->GetCString(it->second.strref, 0);
 			damage.DiceThrown = fx->DiceThrown;
 			damage.DiceSides = fx->DiceSides;
 			damage.DiceBonus = fx->Parameter1;

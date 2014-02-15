@@ -3708,7 +3708,7 @@ bool Map::DisplayTrackString(Actor *target)
 		return true;
 	}
 	if (trackFlag) {
-			char * str = core->GetString( trackString);
+			char * str = core->GetCString( trackString);
 			core->GetTokenDictionary()->SetAt( "CREATURE", str);
 			displaymsg->DisplayConstantStringName(STR_TRACKING, DMC_LIGHTGREY, target);
 			return false;

@@ -528,7 +528,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
 
-		char* string = core->GetString( StrRef );
+		char* string = core->GetCString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
 		for (x = 0; x < VertexCount; x++) {
@@ -1218,7 +1218,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				int value;
 				sprintf(key, "text%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
-				text = core->GetString(value);
+				text = core->GetCString(value);
 				sprintf(key, "xPos%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
 				point.x = value;
@@ -1260,7 +1260,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &py );
 			color=py;
 			str->Seek( 40, GEM_CURRENT_POS );
-			text = core->GetString( strref,0 );
+			text = core->GetCString( strref,0 );
 		}
 		map->AddMapNote( point, color, text, strref );
 	}

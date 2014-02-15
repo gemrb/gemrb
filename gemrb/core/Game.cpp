@@ -1705,7 +1705,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	//this would be bad
 	if (hrsindex == -1 || restindex == -1) return cutscene;
-	tmpstr = core->GetString(hrsindex, 0);
+	tmpstr = core->GetCString(hrsindex, 0);
 	//as would this
 	if (!tmpstr) return cutscene;
 

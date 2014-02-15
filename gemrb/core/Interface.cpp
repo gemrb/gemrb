@@ -2267,7 +2267,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 void Interface::FreeString(char *&str) const
 {
 	if (str) {
-		strings->FreeString(str);
+		free(str);
 	}
 	str = NULL;
 }
@@ -2277,7 +2277,17 @@ ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 	return strings->UpdateString( strref, text );
 }
 
-char* Interface::GetString(ieStrRef strref, ieDword options) const
+char* Interface::GetCString(ieStrRef strref, ieDword options) const
+{
+	ieDword flags = 0;
+
+	if (!(options & IE_STR_STRREFOFF)) {
+		vars->Lookup( "Strref On", flags );
+	}
+	return strings->GetCString( strref, flags | options );
+}
+
+String* Interface::GetString(ieStrRef strref, ieDword options) const
 {
 	ieDword flags = 0;
 
@@ -5328,7 +5338,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 		str.Create( Path, name, IE_BIO_CLASS_ID );
 		//never write the string reference into this string
-		char *tmp = GetString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);
+		char *tmp = GetCString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);
 		str.Write (tmp, strlen(tmp));
 		free(tmp);
 	}

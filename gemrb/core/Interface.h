@@ -424,8 +424,10 @@ public:
 	Video * GetVideoDriver() const;
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
+	/* returns a newly created c string */
+	char* GetCString(ieStrRef strref, ieDword options = 0) const;
 	/* returns a newly created string */
-	char * GetString(ieStrRef strref, ieDword options = 0) const;
+	String* GetString(ieStrRef strref, ieDword options = 0) const;
 	/* makes sure the string is freed in TLKImp */
 	void FreeString(char *&str) const;
 	/* sets the floattext color */

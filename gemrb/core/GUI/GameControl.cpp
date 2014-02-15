@@ -1130,7 +1130,7 @@ void GameControl::DisplayTooltip() {
 						}
 						strindex = displaymsg->GetStringReference(strindex);
 						if (strindex != -1) {
-							injuredstring = core->GetString(strindex, 0);
+							injuredstring = core->GetCString(strindex, 0);
 						}
 
 						if (!injuredstring) {
@@ -2667,7 +2667,7 @@ void GameControl::SetDisplayText(char *text, unsigned int time)
 
 void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 {
-	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), 0), time);
+	SetDisplayText(core->GetCString(displaymsg->GetStringReference(text), 0), time);
 }
 
 void GameControl::ToggleAlwaysRun()

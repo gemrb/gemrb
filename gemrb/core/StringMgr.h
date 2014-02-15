@@ -55,9 +55,9 @@ public:
 	virtual void OpenAux() = 0;
 	virtual void CloseAux() = 0;
 	virtual bool Open(DataStream* stream) = 0;
-	virtual char* GetString(ieStrRef strref, unsigned int flags = 0) = 0;
+	virtual char* GetCString(ieStrRef strref, unsigned int flags = 0) = 0;
+	virtual String* GetString(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
-	virtual void FreeString(char *str) = 0;
 	virtual ieStrRef UpdateString(ieStrRef strref, const char *text) = 0;
 };
 

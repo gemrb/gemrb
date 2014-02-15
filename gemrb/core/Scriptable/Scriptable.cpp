@@ -906,9 +906,9 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 			target=core->GetGame()->GetActorByGlobalID(tgt);
 		}
 	}
-	char* spell = core->GetString(spl->SpellName);
+	char* spell = core->GetCString(spl->SpellName);
 	if (stricmp(spell, "") && Type == ST_ACTOR) {
-		char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+		char* msg = core->GetCString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 		char *tmp;
 		if (target) {
 			tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+5);
@@ -1203,7 +1203,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			char tmpstr[100];
 			memset(tmpstr, 0, sizeof(tmpstr));
 			// eg. .:Casts Word of Recall:.
-			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetString(displaymsg->GetStringReference(STR_CASTS)), core->GetString(spl->SpellName));
+			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetCString(displaymsg->GetStringReference(STR_CASTS)), core->GetCString(spl->SpellName));
 			DisplayHeadText(tmpstr);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
@@ -1402,8 +1402,8 @@ int Scriptable::CheckWildSurge()
 			// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
 			if ((check > 0) && (check < 100) ) {
 				// display feedback: Wild Surge: bla bla
-				char *s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-				char *s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+				char *s1 = core->GetCString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+				char *s2 = core->GetCString(core->SurgeSpells[check-1].message, 0);
 				char *s3 = (char *) malloc(strlen(s1)+strlen(s2)+2);
 				sprintf(s3, "%s %s", s1, s2);
 				core->FreeString(s1);

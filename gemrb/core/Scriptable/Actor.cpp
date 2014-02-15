@@ -595,12 +595,12 @@ void Actor::SetName(int strref, unsigned char type)
 {
 	if (type!=2) {
 		if (LongName) free(LongName);
-		LongName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
+		LongName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
 		LongStrRef = strref;
 	}
 	if (type!=1) {
 		if (ShortName) free(ShortName);
-		ShortName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
+		ShortName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
 		ShortStrRef = strref;
 	}
 }
@@ -3979,7 +3979,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
-			type_name = core->GetString(it->second.strref, 0);
+			type_name = core->GetCString(it->second.strref, 0);
 		}
 		detailed = true;
 	}
@@ -4016,9 +4016,10 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
 			char tmp[64];
-			const char* msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
+			char* msg = core->GetCString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
 			snprintf(tmp, sizeof(tmp), "%s (%d)", msg, damage);
 			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
+			free(msg);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );

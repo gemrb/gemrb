@@ -569,7 +569,7 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii", &Strref, &X, &Y )) {
 		return AttributeError( GemRB_StatComment__doc );
 	}
-	char* text = core->GetString( Strref );
+	char* text = core->GetCString( Strref );
 	size_t bufflen = strlen( text ) + 12;
 	if (bufflen<12) {
 		return AttributeError( GemRB_StatComment__doc );
@@ -597,7 +597,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetString__doc );
 	}
 
-	char *text = core->GetString( strref, flags );
+	char *text = core->GetCString( strref, flags );
 	ret=PyString_FromString( text );
 	core->FreeString( text );
 	return ret;
@@ -1467,7 +1467,7 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 		if (StrRef == -1) {
 			ctrl->SetText(GEMRB_STRING);
 		} else {
-			char *tmpstr = core->GetString( StrRef );
+			char *tmpstr = core->GetCString( StrRef );
 			ctrl->SetText(tmpstr);
 			core->FreeString( tmpstr );
 		}
@@ -1534,7 +1534,7 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 		ret = ta->InsertText( string, Row );
 	} else {
 		StrRef = PyInt_AsLong( str );
-		char* str = core->GetString( StrRef, Flag );
+		char* str = core->GetCString( StrRef, Flag );
 		ret = ta->InsertText( str, Row );
 		core->FreeString( str );
 	}
@@ -1646,7 +1646,7 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 		if (StrRef == -1) {
 			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
 		} else {
-			char* str = core->GetString( StrRef );
+			char* str = core->GetCString( StrRef );
 
 			if (Function) {
 				ret = SetFunctionTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str, Function );
@@ -5542,7 +5542,7 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		btn->SetImage( BUTTON_IMAGE_DISABLED, af->GetFrame(3, 0));
 	}
 	if (tooltip) {
-		char *str = core->GetString(spell->SpellName,0);
+		char *str = core->GetCString(spell->SpellName,0);
 		SetFunctionTooltip(wi, ci, str, Function); //will free str
 	}
 	gamedata->FreeSpell( spell, SpellResRef, false );
@@ -5670,7 +5670,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		btn->SetPicture( Picture );
 	if (tooltip) {
 		//later getitemname could also return tooltip stuff
-		char *str = core->GetString(item->GetItemName(tooltip==2),0);
+		char *str = core->GetCString(item->GetItemName(tooltip==2),0);
 		//this will free str, no need of freeing it
 		SetFunctionTooltip(wi, ci, str, Function);
 	}
@@ -8552,7 +8552,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	//cannot make this const, because it will be freed
 	char *txt = NULL;
 	if (GUITooltip[Index] != (ieDword) -1) {
-		txt = core->GetString( GUITooltip[Index] );
+		txt = core->GetCString( GUITooltip[Index] );
 	}
 	//will free txt
 	SetFunctionTooltip(WindowIndex, ControlIndex, txt, Function);
@@ -8676,7 +8676,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 			int tip = core->GetItemTooltip(item->itemname, item->headerindex, item_slot->Flags&IE_INV_ITEM_IDENTIFIED);
 			if (tip>0) {
 				//cannot make this const, because it will be freed
-				char *tmp = core->GetString((ieStrRef) tip,0);
+				char *tmp = core->GetCString((ieStrRef) tip,0);
 				btn->SetTooltip(tmp);
 				core->FreeString(tmp);
 			} else {
@@ -9373,7 +9373,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	print("Slot: %d", spelldata.slot);
 	print("Type: %d", spelldata.type);
 	//cannot make this const, because it will be freed
-	char *tmp = core->GetString(spelldata.strref);
+	char *tmp = core->GetCString(spelldata.strref);
 	print("Spellname: %s", tmp);
 	core->FreeString(tmp);
 	print("Target: %d", spelldata.Target);

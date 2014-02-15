@@ -1476,7 +1476,7 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		core->FreeString(subtitletext);
 		if (!strRef)
 			return;
-		subtitletext = core->GetString(strRef);
+		subtitletext = core->GetCString(strRef);
 		subtitlestrref = strRef;
 	}
 	if (subtitlefont && subtitletext) {

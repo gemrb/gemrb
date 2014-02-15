@@ -252,7 +252,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			}
 			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 				displaymsg->DisplayConstantString(STR_JOURNALCHANGE, DMC_BG2XPGREEN);
-				char *string = core->GetString( tr->journalStrRef );
+				char* string = core->GetCString( tr->journalStrRef );
 				//cutting off the strings at the first crlf
 				char *poi = strchr(string,'\n');
 				if (poi) {
@@ -417,11 +417,9 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			core->GetDictionary()->SetAt("DialogOption",x);
 			core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 		} else {
-			char* cstring = core->GetString( ds->transitions[x]->textStrRef );
-			String* string = StringFromCString(cstring);
+			String* string = core->GetString( ds->transitions[x]->textStrRef );
 			dialogOptions.push_back(std::make_pair(x, *string));
 			delete string;
-			free(cstring);
 		}
 	}
 	ta->SetDialogOptions(dialogOptions, &ColorRed, &ColorWhite);

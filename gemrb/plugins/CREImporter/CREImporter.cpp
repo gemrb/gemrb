@@ -931,11 +931,11 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->InParty = is_in_party;
 	str->ReadDword( &act->LongStrRef );
 	//Beetle name in IWD needs the allow zero flag
-	char* poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
+	char* poi = core->GetCString( act->LongStrRef, IE_STR_ALLOW_ZERO );
 	act->SetName( poi, 1 ); //setting longname
 	free( poi );
 	str->ReadDword( &act->ShortStrRef );
-	poi = core->GetString( act->ShortStrRef );
+	poi = core->GetCString( act->ShortStrRef );
 	act->SetName( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
