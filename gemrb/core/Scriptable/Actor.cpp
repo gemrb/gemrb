@@ -4015,9 +4015,9 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			char tmp[64];
+			wchar_t tmp[64];
 			char* msg = core->GetCString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
-			snprintf(tmp, sizeof(tmp), "%s (%d)", msg, damage);
+			swprintf(tmp, sizeof(tmp), L"%s (%d)", msg, damage);
 			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
 			free(msg);
 		} else { //bg2
@@ -9650,10 +9650,11 @@ void Actor::DisplayHeadHPRatio()
 	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return;
 	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return;
 
-	char tmpstr[10];
-	memset(tmpstr, 0, 10);
-	snprintf(tmpstr, 10, "%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
-	DisplayHeadText(tmpstr);
+	wchar_t tmpstr[10];
+	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
+	String tmp(tmpstr);
+	// FIXME: convert DisplayHeadText to String
+	//DisplayHeadText(tmpstr);
 }
 
 void Actor::ReleaseCurrentAction()

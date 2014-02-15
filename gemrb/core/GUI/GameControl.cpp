@@ -2452,7 +2452,8 @@ void GameControl::DisplayString(Scriptable* target)
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
 	if (tmp) {
 		// pass NULL target so pst does not display multiple
-		displaymsg->DisplayString(target->overHeadText, NULL);
+		// FIXME: overHeadText needs to be converted to String
+		//displaymsg->DisplayString(target->overHeadText, NULL);
 	}
 }
 

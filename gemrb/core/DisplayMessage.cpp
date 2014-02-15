@@ -38,11 +38,11 @@ static int strref_table[STRREF_COUNT];
 
 #define PALSIZE 8
 static Color ActorColor[PALSIZE];
-static const char* DisplayFormatName = "[color=%06X]%s - [/color][p][color=%06X]%s[/color][/p]";
-static const char* DisplayFormatAction = "[color=%06X]%s - [/color][p][color=%06X]%s %s[/color][/p]";
-static const char* DisplayFormat = "[/color][p][color=%06X]%s[/color][/p]";
-static const char* DisplayFormatValue = "[/color][p][color=%06X]%s: %d[/color][/p]";
-static const char* DisplayFormatNameString = "[color=%06X]%s - [/color][p][color=%06X]%s: %s[/color][/p]";
+static const wchar_t* DisplayFormatName = L"[color=%06X]%s - [/color][p][color=%06X]%ls[/color][/p]";
+static const wchar_t* DisplayFormatAction = L"[color=%06X]%s - [/color][p][color=%06X]%ls %ls[/color][/p]";
+static const wchar_t* DisplayFormat = L"[p][color=%06X]%ls[/color][/p]";
+static const wchar_t* DisplayFormatValue = L"[p][color=%06X]%ls: %d[/color][/p]";
+static const wchar_t* DisplayFormatNameString = L"[color=%06X]%s - [/color][p][color=%06X]%ls: %ls[/color][/p]";
 
 DisplayMessage::DisplayMessage(void) {
 	ReadStrrefs();
@@ -62,7 +62,7 @@ bool DisplayMessage::ReadStrrefs()
 	return true;
 }
 
-void DisplayMessage::DisplayString(const char* Text, Scriptable *target) const
+void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
 {
 	Label *l = core->GetMessageLabel();
 	if (l) {
@@ -70,10 +70,12 @@ void DisplayMessage::DisplayString(const char* Text, Scriptable *target) const
 	}
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta) {
-		ta->AppendText( Text );
+		ta->AppendText( new String(Text) );
 	} else {
 		if(target) {
-			target->DisplayHeadText(Text);
+			// FIXME: need to convert DisplayHeadText to String
+			//target->DisplayHeadText(&Text);
+			//target->SetOverheadText(&Text);
 		}
 	}
 }
@@ -116,25 +118,28 @@ unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable
 void DisplayMessage::DisplayConstantString(int stridx, unsigned int color, Scriptable *target) const
 {
 	if (stridx<0) return;
-	char* text = core->GetCString( strref_table[stridx], IE_STR_SOUND );
-	DisplayString(text, color, target);
-	core->FreeString(text);
+
+	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
+	DisplayString(*text, color, target);
+	delete text;
 }
 
 void DisplayMessage::DisplayString(int stridx, unsigned int color, ieDword flags) const
 {
 	if (stridx<0) return;
-	char* text = core->GetCString( stridx, flags);
-	DisplayString(text, color, NULL);
-	core->FreeString(text);
+	String* text = core->GetString( stridx, flags);
+	DisplayString(*text, color, NULL);
+	delete text;
+
 }
 
-void DisplayMessage::DisplayString(const char *text, unsigned int color, Scriptable *target) const
+void DisplayMessage::DisplayString(const String& text, unsigned int color, Scriptable *target) const
 {
-	if (!text) return;
-	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 12);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormat, color, text );
+	if (!text.length()) return;
+
+	int newlen = (int)(wcslen( DisplayFormat) + text.length() + 12);
+	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
+	swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
 	DisplayString( newstr, target );
 	free( newstr );
 }
@@ -145,9 +150,11 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, 
 {
 	if (stridx<0) return;
 	char* text = core->GetCString( strref_table[stridx], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 28);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatValue, color, text, (int) value );
+
+	int newlen = (int)(wcslen( DisplayFormat ) + strlen( text ) + 28);
+	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
+	swprintf( newstr, newlen, DisplayFormatValue, color, text, value);
+
 	core->FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
@@ -158,18 +165,19 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, 
 void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, const Scriptable *actor) const
 {
 	unsigned int actor_color;
-	const char *name = 0;
+	const char* name = NULL;
 
 	if (stridx<0) return;
 	actor_color = GetSpeakerColor(name, actor);
 	char* text = core->GetCString( strref_table[stridx], IE_STR_SOUND );
 	char* text2 = core->GetCString( strref_table[stridx2], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen(name) + strlen( text ) + strlen(text2) + 20);
-	char* newstr = ( char* ) malloc( newlen );
+
+	int newlen = (int)(wcslen( DisplayFormat ) + strlen(name) + strlen( text ) + strlen(text2) + 20);
+	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
 	if (strlen(text2)) {
-		snprintf( newstr, newlen, DisplayFormatNameString, actor_color, name, color, text, text2 );
+		swprintf( newstr, newlen, DisplayFormatNameString, actor_color, name, color, text, text2 );
 	} else {
-		snprintf( newstr, newlen, DisplayFormatName, color, name, color, text );
+		swprintf( newstr, newlen, DisplayFormatName, color, name, color, text );
 	}
 	core->FreeString( text );
 	core->FreeString( text2 );
@@ -184,9 +192,9 @@ void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, c
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	char* text = core->GetCString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
-	DisplayStringName(text, color, speaker);
-	core->FreeString(text);
+	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	DisplayStringName(*text, color, speaker);
+	delete text;
 }
 
 //Treats the constant string as a numeric format string, otherwise like the previous method
@@ -195,14 +203,14 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int col
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	char* text = core->GetCString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	//allow for a number
-	int bufflen = strlen(text)+6;
-	char* newtext = ( char* ) malloc( bufflen );
-	snprintf( newtext, bufflen, text, value );
-	core->FreeString(text);
+	int bufflen = text->length() +6;
+	wchar_t* newtext = ( wchar_t* ) malloc( bufflen * sizeof(wchar_t));
+	swprintf( newtext, bufflen, text->c_str(), value );
 	DisplayStringName(newtext, color, speaker);
 	free(newtext);
+	delete text;
 }
 
 // String format is
@@ -210,8 +218,7 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int col
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
 {
 	unsigned int attacker_color;
-	const char *name1 = 0;
-	const char *name2 = 0;
+	const char *name1, *name2;
 
 	if (stridx<0) return;
 
@@ -219,9 +226,9 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 	attacker_color = GetSpeakerColor(name1, attacker);
 
 	char* text = core->GetCString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
-	int newlen = (int)(strlen( DisplayFormatAction ) + strlen( name1 ) + strlen( name2 ) + strlen( text ) + 18);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1, color, text, name2);
+	int newlen = (int)(wcslen( DisplayFormatAction ) + strlen(name1) + strlen(name2) + strlen( text ) + 18);
+	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t));
+	swprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1, color,text, name2);
 	core->FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
@@ -233,11 +240,13 @@ void DisplayMessage::DisplayRollStringName(int stridx, unsigned int color, const
 	ieDword feedback = 0;
 	core->GetDictionary()->Lookup("EnableRollFeedback", feedback);
 	if (feedback) {
-		char tmp[200];
+		wchar_t tmp[200];
 		va_list numbers;
 		va_start(numbers, speaker);
 		// fill it out
-		vsnprintf(tmp, sizeof(tmp), core->GetCString(stridx), numbers);
+		String* str = core->GetString(stridx);
+		vswprintf(tmp, sizeof(tmp), str->c_str(), numbers);
+		delete str;
 		displaymsg->DisplayStringName(tmp, color, speaker);
 		va_end(numbers);
 	}
@@ -247,27 +256,27 @@ void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scr
 {
 	if (stridx<0) return;
 
-	char* text = core->GetCString( stridx, flags);
-	DisplayStringName(text, color, speaker);
-	core->FreeString( text );
+	String* text = core->GetString( stridx, flags);
+	DisplayStringName(*text, color, speaker);
+	delete text;
 }
 
-void DisplayMessage::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const
+void DisplayMessage::DisplayStringName(const String& text, unsigned int color, const Scriptable *speaker) const
 {
-	unsigned int speaker_color;
-	const char *name = 0;
+	if (!text.length()) return;
 
-	if (!text) return;
+	unsigned int speaker_color;
+	const char* name;
 	speaker_color = GetSpeakerColor(name, speaker);
 
 	// if there is no name, use the script name to help debugging
-	if (!strcmp(name, "")) {
+	if (!name[0]) {
 		name = speaker->GetScriptName();
 	}
 
-	int newlen = (int)(strlen(DisplayFormatName) + strlen(name) + strlen(text) + 18);
-	char* newstr = (char *) malloc(newlen);
-	snprintf(newstr, newlen, DisplayFormatName, speaker_color, name, color, text);
+	int newlen = (int)(wcslen(DisplayFormatName) + strlen(name) + text.length() + 18);
+	wchar_t* newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
+	swprintf(newstr, newlen, DisplayFormatName, speaker_color, name, color, text.c_str());
 	DisplayString(newstr);
 	free(newstr);
 }

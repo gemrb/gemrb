@@ -76,9 +76,10 @@ void MessageWindowLogger::LogInternal(log_level level, const char* owner, const 
 			// re-assign our internal message level to the real one
 			level = MESSAGE;
 		}
-		const char* fmt = "%s%s: [/color]%s%s[/color]";
-		char* msg = (char*)malloc(strlen(message) + strlen(owner) + strlen(fmt) + 28); // 28 is for sizeof(colors[x]) * 2
-		sprintf(msg, fmt, colors[color], owner, colors[log_level_color[level]], message);
+		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]";
+		size_t len = strlen(message) + strlen(owner) + wcslen(fmt) + 28; // 28 is for sizeof(colors[x]) * 2
+		wchar_t* msg = (wchar_t*)malloc(len * sizeof(wchar_t));
+		swprintf(msg, len, fmt, colors[color], owner, colors[log_level_color[level]], message);
 		displaymsg->DisplayString(msg);
 		free(msg);
 	}

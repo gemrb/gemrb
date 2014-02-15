@@ -29,6 +29,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "System/String.h"
 
 #include <cstdlib>
 
@@ -59,7 +60,7 @@ public:
 	/** returns the speaker's color and name */
 	unsigned int GetSpeakerColor(const char *&name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
-	void DisplayString(const char *txt, Scriptable *speaker=NULL) const;
+	void DisplayString(const String& txt, Scriptable *speaker=NULL) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
@@ -74,10 +75,10 @@ public:
 	void DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(int stridx, unsigned int color, ieDword flags) const;
-	void DisplayString(const char *text, unsigned int color, Scriptable *target) const;
+	void DisplayString(const String& text, unsigned int color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const;
-	void DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const;
+	void DisplayStringName(const String& text, unsigned int color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
 	void DisplayRollStringName(int stridx, unsigned int color, const Scriptable *speaker, ...) const;
 };

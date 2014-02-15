@@ -252,14 +252,11 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			}
 			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 				displaymsg->DisplayConstantString(STR_JOURNALCHANGE, DMC_BG2XPGREEN);
-				char* string = core->GetCString( tr->journalStrRef );
+				String* string = core->GetString( tr->journalStrRef );
 				//cutting off the strings at the first crlf
-				char *poi = strchr(string,'\n');
-				if (poi) {
-					*poi='\0';
-				}
-				displaymsg->DisplayString( string );
-				free( string );
+				string->resize(string->find_first_of(L"\n"));
+				displaymsg->DisplayString( *string );
+				delete string;
 			}
 		}
 

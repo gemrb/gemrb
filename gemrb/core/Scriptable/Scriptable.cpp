@@ -906,22 +906,21 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 			target=core->GetGame()->GetActorByGlobalID(tgt);
 		}
 	}
-	char* spell = core->GetCString(spl->SpellName);
-	if (stricmp(spell, "") && Type == ST_ACTOR) {
-		char* msg = core->GetCString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-		char *tmp;
+
+	String* spell = core->GetString(spl->SpellName);
+	if (spell->length() && Type == ST_ACTOR) {
+		wchar_t str[256];
+
 		if (target) {
-			tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+5);
-			sprintf(tmp, "%s %s : %s", msg, spell, target->GetName(-1));
+			String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			swprintf(str, sizeof(str), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
+			delete msg;
 		} else {
-			tmp = (char *) malloc(strlen(spell)+strlen(GetName(-1))+4);
-			sprintf(tmp, "%s : %s", spell, GetName(-1));
+			swprintf(str, sizeof(str), L"%ls : %s", spell->c_str(), GetName(-1));
 		}
-		displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
-		core->FreeString(msg);
-		free(tmp);
+		displaymsg->DisplayStringName(str, DMC_WHITE, this);
 	}
-	core->FreeString(spell);
+	delete spell;
 }
 
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
@@ -1404,8 +1403,9 @@ int Scriptable::CheckWildSurge()
 				// display feedback: Wild Surge: bla bla
 				char *s1 = core->GetCString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
 				char *s2 = core->GetCString(core->SurgeSpells[check-1].message, 0);
-				char *s3 = (char *) malloc(strlen(s1)+strlen(s2)+2);
-				sprintf(s3, "%s %s", s1, s2);
+				wchar_t *s3 = (wchar_t *) malloc((strlen(s1)+strlen(s2)+2) * sizeof(wchar_t));
+				swprintf(s3, sizeof(s3), L"%s %s", s1, s2);
+
 				core->FreeString(s1);
 				core->FreeString(s2);
 				displaymsg->DisplayStringName(s3, DMC_WHITE, this);
