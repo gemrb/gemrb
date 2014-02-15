@@ -64,7 +64,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
-	core->FreeString(subtitletext); //may be NULL
+	delete subtitletext;
 
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
@@ -1473,10 +1473,10 @@ int SDLVideoDriver::PollMovieEvents()
 void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 {
 	if (strRef!=subtitlestrref) {
-		core->FreeString(subtitletext);
+		delete subtitletext;
 		if (!strRef)
 			return;
-		subtitletext = core->GetCString(strRef);
+		subtitletext = core->GetString(strRef);
 		subtitlestrref = strRef;
 	}
 	if (subtitlefont && subtitletext) {
@@ -1485,7 +1485,7 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		backBuf = disp;
 
 		//FYI: that 0 is pitch black
-		subtitlefont->Print(subtitleregion, subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
+		subtitlefont->Print(subtitleregion, *subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
 		backBuf = temp;
 	}
 }

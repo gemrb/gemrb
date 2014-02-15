@@ -56,7 +56,7 @@ protected:
 	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
 
-	char *subtitletext;
+	String *subtitletext;
 	ieDword subtitlestrref;
 public:
 	SDLVideoDriver(void);
