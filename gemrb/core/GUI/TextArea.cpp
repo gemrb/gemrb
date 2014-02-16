@@ -171,32 +171,46 @@ void TextArea::SetText(const char* text)
 void TextArea::AppendText(const char* text)
 {
 	if (text) {
-		String* string = StringFromCString(text);
-		// TODO: parse the string tags ([color],[p],etc) into spans
-		//TextSpan* span = new TextSpan(string, ftext, palette, const Size& frame, 0);
-		if (finit) {
-			// FIXME: this assumes that finit is always for drop caps (not just a diffrent looking font)
-			// append drop cap spans
-			TextSpan* dc = new TextSpan(string->substr(0, 1), finit, NULL);
+		AppendText(StringFromCString(text));
+	}
+}
+
+void TextArea::AppendText(String* text)
+{
+	// TODO: parse the string tags ([color],[p],etc) into spans
+	//TextSpan* span = new TextSpan(string, ftext, palette, const Size& frame, 0);
+	if (finit) {
+		// FIXME: this assumes that finit is always for drop caps (not just a diffrent looking font)
+		// append drop cap spans
+		size_t whitespace = text->find_first_not_of(L"\n\t\r ");
+		if (whitespace != String::npos) {
+			// ensure we actually have text!
+			TextSpan* dc = new TextSpan(text->substr(0, 1), finit, NULL);
 			textContainer->AppendSpan(dc);
-			string->erase(0, 1);
-			Size s = Size(Width - 5 - dc->SpanFrame().w, GetRowHeight());
-			TextSpan* span = new TextSpan(*string, ftext, palette, s, IE_FONT_ALIGN_LEFT);
+			text->erase(0, 1);
+			// FIXME: the instances of the hard coded numbers are arbitrary padding values
+			Size s = Size(Width - dc->SpanFrame().w, GetRowHeight());
+			TextSpan* span = new TextSpan(*text, ftext, palette, s, IE_FONT_ALIGN_LEFT);
 			textContainer->AppendSpan(span);
-			s.w -= 5; // FIXME: this is arbitrary
-			s.h = dc->SpanFrame().h - GetRowHeight();
+			s.w -= 8; // FIXME: arbitrary padding
+			s.h = dc->SpanFrame().h - dc->SpanDescent() - GetRowHeight() + span->SpanDescent() + 5;
 			size_t textLen = span->RenderedString().length() - 1;
-			span = new TextSpan(string->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_RIGHT);
+			span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
+			//span->SetPadding(5, 0, 0, 0);
 			textContainer->AppendSpan(span);
+			textContainer->SetSpanPadding(span, Size(8, 0)); // FIXME: this is arbitrary
 			textLen += span->RenderedString().length() - 1;
 			// append the remainder
-			textContainer->AppendText(string->substr(textLen));
+			textContainer->AppendText(text->substr(textLen));
 		} else {
-			textContainer->AppendText(*string);
+			textContainer->AppendText(*text);
 		}
-		delete string;
-		UpdateControls();
+	} else {
+		textContainer->AppendText(*text);
 	}
+	// TODO: we will need to keep the string for editable TextAreas
+	delete text; // we own this, but don't need it now
+	UpdateControls();
 }
 
 int TextArea::InsertText(const char* text, int pos)
