@@ -504,22 +504,19 @@ empty:
 
 StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 {
-	StringBlock sb;
-
 	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
 		goto empty;
 	}
 	if (strref >= StrRefCount) {
 empty:
-		sb.Sound[0] = 0;
-		return sb;
+		return StringBlock();
 	}
-	sb.text = GetCString( strref, flags );
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->ReadWord( &type );
-	str->ReadResRef( sb.Sound );
-	return sb;
+	ieResRef soundRef;
+	str->ReadResRef( soundRef );
+	return StringBlock(*GetString( strref, flags ), soundRef);
 }
 
 #include "plugindef.h"

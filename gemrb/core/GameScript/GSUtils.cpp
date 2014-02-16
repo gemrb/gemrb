@@ -440,16 +440,14 @@ bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef i
 
 void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 {
-	StringBlock sb;
 	char Sound[_MAX_PATH];
+	ieResRef soundRef;
 
 	//no one hears you when you are in the Limbo!
 	if (!Sender->GetCurrentArea()) {
 		return;
 	}
 
-	memset(&sb,0,sizeof(sb));
-	Sound[0]=0;
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
@@ -465,12 +463,12 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		int tmp=(int) actor->GetVerbalConstant(Strref);
 		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
-			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
+			actor->ResolveStringConstant(soundRef, (unsigned int) Strref);
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 				snprintf(Sound, _MAX_PATH, "%s/%s",
-					actor->PCStats->SoundFolder, sb.Sound);
+					actor->PCStats->SoundFolder, soundRef);
 			} else {
-				memcpy(Sound, sb.Sound, sizeof(ieResRef) );
+				memcpy(Sound, soundRef, sizeof(ieResRef) );
 			}
 		}
 		Strref = tmp;
@@ -483,27 +481,26 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 	}
 
-	if ((Strref != -1) && !sb.Sound[0]) {
-		sb = core->strings->GetStringBlock( Strref );
+	if ((Strref != -1) && !soundRef[0]) {
+		StringBlock sb = core->strings->GetStringBlock( Strref );
 		memcpy(Sound, sb.Sound, sizeof(ieResRef) );
-		if (sb.text[0] && strcmp(sb.text," ") && (flags & DS_CONSOLE)) {
-			//can't play the sound here, we have to delay action
-			//and for that, we have to know how long the text takes
-			if(flags&DS_NONAME) {
-				// FIXME: sb.text needs to be converted to string
-				//displaymsg->DisplayString( sb.text );
-			} else {
-				displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
+		if (sb.text.length()) {
+			if (flags & DS_CONSOLE) {
+				//can't play the sound here, we have to delay action
+				//and for that, we have to know how long the text takes
+				if(flags&DS_NONAME) {
+					displaymsg->DisplayString( sb.text );
+				} else {
+					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
+				}
+			} else if (flags & (DS_HEAD | DS_AREA)) {
+				// FIXME: DisplayHeadText needs to be converted to String
+				// Sender->DisplayHeadText( &sb.text );
+				//don't free sb.text, it is residing in Sender
+				if (flags & DS_AREA) {
+					Sender->FixHeadTextPos();
+				}
 			}
-		}
-		if (sb.text[0] && strcmp(sb.text," ") && (flags & (DS_HEAD | DS_AREA))) {
-			Sender->DisplayHeadText( sb.text );
-			//don't free sb.text, it is residing in Sender
-			if (flags & DS_AREA) {
-				Sender->FixHeadTextPos();
-			}
-		} else {
-			core->FreeString( sb.text );
 		}
 	}
 	if (Sound[0] && !(flags&DS_SILENT) ) {

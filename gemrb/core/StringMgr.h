@@ -39,8 +39,15 @@ namespace GemRB {
  */
 
 struct StringBlock {
-	char* text;
+	String text;
 	ieResRef Sound;
+
+	StringBlock(const String& text, const ieResRef soundRef)
+	: text(text) {
+		memcpy(Sound, soundRef, sizeof(ieResRef));
+	}
+	StringBlock()
+	: text(), Sound() {}
 };
 
 /**
