@@ -184,7 +184,7 @@ public: //Events
 	void SetDialogueFlags(int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
-	void SetDisplayText(char *text, unsigned int time);
+	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	/* centers viewport to the points specified */
 	void Center(unsigned short x, unsigned short y);

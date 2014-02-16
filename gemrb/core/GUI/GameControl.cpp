@@ -616,7 +616,7 @@ void GameControl::DrawInternal(Region& screen)
 		if (update_scripts) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {
-				SetDisplayText((char *)NULL, 0);
+				SetDisplayText((String*)NULL, 0);
 			} else {
 				DisplayTextTime--;
 			}
@@ -2658,17 +2658,16 @@ bool GameControl::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 	return false;
 }
 
-void GameControl::SetDisplayText(char *text, unsigned int time)
+void GameControl::SetDisplayText(String* text, unsigned int time)
 {
 	delete DisplayText;
 	DisplayTextTime = time;
-	DisplayText = StringFromCString(text);
-	free(text);
+	DisplayText = text;
 }
 
 void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 {
-	SetDisplayText(core->GetCString(displaymsg->GetStringReference(text), 0), time);
+	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), 0), time);
 }
 
 void GameControl::ToggleAlwaysRun()
