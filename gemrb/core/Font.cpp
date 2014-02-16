@@ -98,7 +98,7 @@ size_t Font::RenderText(const String& string, const Region& rgn,
 {
 	assert(color);
 	ieWord lineHeight = (alignment&IE_FONT_SINGLE_LINE) ? StringSize(string).h : maxHeight;
-	int x = 0, y = lineHeight;
+	int x = 0, y = maxHeight;
 
 	if (alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
 		int lc = 1;
@@ -209,7 +209,7 @@ size_t Font::RenderText(const String& string, const Region& rgn,
 
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
-		y += lineHeight;
+		y += maxHeight;
 	}
 	assert(charCount <= string.length());
 	return charCount;
@@ -226,9 +226,9 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 		if (size.w < canvasSize.w) {
 			if (!(alignment&IE_FONT_SINGLE_LINE)) {
 				// we need to resize horizontally which creates new lines
-				ieWord trimmedArea = (canvasSize.w - size.w) * canvasSize.h;
+				ieWord trimmedArea = ((canvasSize.w - size.w) * canvasSize.h) + ((canvasSize.w - size.w) * descent);
 				// this automatically becomes multiline, therefore use maxHeight
-				ieWord lineArea = size.w * maxHeight;
+				ieWord lineArea = (size.w * maxHeight) + (size.w * descent);
 				// round up
 				ieWord numLines = 1 + ((trimmedArea - 1) / lineArea);
 				if (!size.h) {
@@ -254,13 +254,15 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 		}
 		// else: we already fit in the designated area (horizontally). No need to resize.
 	}
-	if (!(alignment&IE_FONT_SINGLE_LINE)
-		&& canvasSize.h < maxHeight) {
-		// should be at least maxHeight (+ decender added later then trimmed if too large for size)
-		canvasSize.h = maxHeight;
+	if (!(alignment&IE_FONT_SINGLE_LINE)) {
+		if (canvasSize.h < maxHeight) {
+			// should be at least maxHeight (+ decender added later then trimmed if too large for size)
+			canvasSize.h = maxHeight;
+		}
+		canvasSize.h += descent; // compensate for last line descenders
+		// FIXME: this decender "calculation" is just a guess
+		//canvasSize.h += maxHeight / 2; // compensation for decenders
 	}
-	// FIXME: this decender "calculation" is just a guess
-	canvasSize.h += maxHeight / 2; // compensation for decenders
 	if (size.h && size.h < canvasSize.h) {
 		// we can't unbreak lines ("\n") so at best we can clip the text.
 		canvasSize.h = size.h;
@@ -319,6 +321,7 @@ Size Font::StringSize(const String& string, const Size* padding) const
 {
 	ieWord w = 0, h = 0, lines = 1;
 	ieWord curh = 0, curw = (padding) ? padding->w*2 : 0;
+	int decent = 0, maxd = 0;
 	bool multiline = false;
 	for (size_t i = 0; i < string.length(); i++) {
 		if (string[i] == L'\n') {
@@ -328,11 +331,14 @@ Size Font::StringSize(const String& string, const Size* padding) const
 			multiline = true;
 			lines++;
 		} else {
-			curh = GetCharSprite(string[i])->Height;
+			const Sprite2D* curGlyph = GetCharSprite(string[i]);
+			curh = curGlyph->Height;
+			decent = curGlyph->Height - curGlyph->YPos;
+			maxd = (decent > maxd) ? decent : maxd;
 			curh += (padding) ? padding->h : 0;
 			if (curh > h)
 				h = curh;
-			curw += GetCharSprite(string[i])->Width;
+			curw += curGlyph->Width;
 			if (i > 0) { // kerning
 				curw -= GetKerningOffset(string[i-1], string[i]);
 			}
@@ -340,8 +346,10 @@ Size Font::StringSize(const String& string, const Size* padding) const
 	}
 	if (!multiline) {
 		w = curw;
+		h += maxd;
 	} else {
 		h = maxHeight * lines;
+		h += this->descent;
 	}
 	return Size(w, h);
 }

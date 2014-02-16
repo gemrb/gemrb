@@ -65,6 +65,7 @@ protected:
 	Sprite2D* blank;
 public:
 	int maxHeight;
+	int descent;
 private:
 	void BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
 						   ieByte* canvas, const Size& size) const;

@@ -19,6 +19,7 @@
 #ifndef TEXTCONTAINER_H
 #define TEXTCONTAINER_H
 
+#include "Font.h"
 #include "Region.h"
 #include "System/String.h"
 
@@ -50,10 +51,12 @@ public:
 	~TextSpan();
 
 	const Size& SpanFrame() const { return frame; }
+	int SpanDescent() const { return font->descent; }
 	const Sprite2D* RenderedSpan() const { return spanSprite; }
 	const String& RenderedString() const { return text; }
 
 	void SetPalette(Palette* pal);
+	void SetPadding(int lft, int top, int right, int bottom);
 private:
 	void RenderSpan(const String& string);
 };
@@ -84,6 +87,7 @@ public:
 	// Returns a non-const pointer to the removed span.
 	TextSpan* RemoveSpan(const TextSpan* span);
 
+	void SetSpanPadding(TextSpan* span, Size pad);
 	TextSpan* SpanAtPoint(const Point& p) const;
 	const Size& ContainerFrame() const { return frame; }
 	void DrawContents(int x, int y) const;

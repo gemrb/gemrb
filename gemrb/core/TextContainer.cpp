@@ -18,7 +18,6 @@
 
 #include "TextContainer.h"
 
-#include "Font.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "Sprite2D.h"
@@ -166,6 +165,18 @@ TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 	return NULL;
 }
 
+void TextContainer::SetSpanPadding(TextSpan* span, Size pad)
+{
+	// FIXME: assuming span belongs to us
+	Region rgn = layout[span];
+	rgn.x += pad.w;
+	rgn.y += pad.h;
+	layout[span] = rgn;
+	rgn.y -= span->SpanDescent();
+	// TODO: the span should be informed so that it can readjust the position of the sprite according to its alignment
+	AddExclusionRect(rgn);
+}
+
 void TextContainer::DrawContents(int x, int y) const
 {
 	Video* video = core->GetVideoDriver();
@@ -216,8 +227,8 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		// get the next draw position to try
 		prevSpan = *--it;
 		const Region& rgn = layout[prevSpan];
-		drawPoint.x = rgn.x + rgn.w + 1;
 		drawPoint.y = rgn.y;
+		drawPoint.x = rgn.x + rgn.w;
 		it++;
 	}
 
@@ -233,17 +244,19 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 			if (excluded) {
 				// we know that we have to move at least to the right
 				// TODO: implement handling for block alignment
-				drawPoint.x = excluded->x + excluded->w + 1;
+				drawPoint.x = excluded->x + excluded->w;
+				if (drawPoint.x <= 0) // newline ?
+					drawPoint.x = maxFrame.w;
 			}
 			frame.w = drawPoint.x;
 			if (drawPoint.x && drawPoint.x + spanFrame.w > maxFrame.w) {
 				// move down and back
 				drawPoint.x = 0;
 				if (excluded) {
-					drawPoint.y = excluded->y + spanFrame.h + 1;
+					drawPoint.y = excluded->y + excluded->h;
 				} else {
 					const Region& prevFrame = layout[prevSpan];
-					drawPoint.y = prevFrame.h + prevFrame.y + 1;
+					drawPoint.y = prevFrame.h + prevFrame.y - prevSpan->SpanDescent();
 				}
 			}
 			// we should not infinitely loop
@@ -255,6 +268,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		layout[span] = layoutRgn;
 		// TODO: need to extend the exclusion rect for some alignments
 		// eg right align should invalidate the entire area infront also
+		layoutRgn.h -= span->SpanDescent();
 		AddExclusionRect(layoutRgn);
 		prevSpan = span;
 	}
