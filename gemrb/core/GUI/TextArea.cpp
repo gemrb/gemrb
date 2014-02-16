@@ -102,8 +102,8 @@ void TextArea::RefreshSprite(const char *portrait)
 bool TextArea::NeedsDraw()
 {
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		// FIXME: actually check the TextYPos compared to the TA height.
-		if (true) { // the text is offscreen
+		if (TextYPos > textContainer->ContainerFrame().h) {
+			 // the text is offscreen
 			return false;
 		}
 		MarkDirty();
@@ -133,16 +133,11 @@ void TextArea::DrawInternal(Region& clip)
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
 			TextYPos++;// can't use ScrollToY
-			// FIXME: completely broken
-			//if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
 		}
 	}
 
-	/* lets fake scrolling the text by simply offsetting the textClip by between 0 and maxHeight pixels.
-	 don't forget to increase the clipping height by the same amount */
-	short LineOffset = (short)(TextYPos % ftext->maxHeight);
-	int x = clip.x, y = clip.y - LineOffset;
-	Region textClip(x, y, clip.w, clip.h + LineOffset);
+	int x = clip.x, y = clip.y - TextYPos;
+	Region textClip(x, y, clip.w, clip.h);
 	textContainer->DrawContents(x, y);
 
 	if (dialogOptions) {
@@ -382,8 +377,7 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 void TextArea::SetRow(int row)
 {
 	if (row <= rows) {
-		// FIXME: this is super wrong now
-		TextYPos = row * ftext->maxHeight;
+		TextYPos = row * GetRowHeight();
 	}
 	MarkDirty();
 }
@@ -555,7 +549,7 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 
 	ClearDialogOptions(); // deletes previous options
 	// FIXME: calculate the real frame (padding)
-	dialogOptions = new TextContainer(Size(Width, Height), ftext, dialogPal);
+	dialogOptions = new TextContainer(Size(Width, -1), ftext, dialogPal);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
@@ -568,7 +562,7 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 void TextArea::Clear()
 {
 	delete textContainer;
-	textContainer = new TextContainer(ControlFrame().Dimensions(), ftext, palette);;
+	textContainer = new TextContainer(Size(Width, -1), ftext, palette);;
 }
 
 //setting up the textarea for smooth scrolling, the first
@@ -577,10 +571,8 @@ void TextArea::SetupScroll()
 {
 	// ticks is the number of ticks it takes to scroll this font 1 px
 	ticks = 2400 / ftext->maxHeight;
-	//clearing the textarea
 	Clear();
-	//unsigned int i = (unsigned int) (1 + ((Height - 1) / ftext->maxHeight)); // ceiling
-	// FIXME: set the TextYPos out of bounds below the TA
+	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	starttime = GetTickCount();
 }

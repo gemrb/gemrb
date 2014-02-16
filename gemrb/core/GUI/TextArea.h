@@ -111,7 +111,7 @@ private: // Private attributes
 	TextContainer* textContainer;
 	// TODO: we need a circular TextContainer subclass for the message window
 
-	unsigned long TextYPos;
+	int TextYPos;
 	/** timer for scrolling */
 	unsigned long starttime;
 	/** timer ticks for scrolling (speed) */
@@ -150,11 +150,11 @@ public: //Events
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseUp(unsigned short x, unsigned short y,
+				   unsigned short Button, unsigned short Mod);
 	/** Mouse button down*/
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseDown(unsigned short x, unsigned short y,
+					 unsigned short Button, unsigned short Mod);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 	void SetFocus(bool focus);
