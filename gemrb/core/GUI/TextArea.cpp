@@ -412,7 +412,7 @@ void TextArea::CalcRowCount()
 	if (!sb)
 		return;
 	ScrollBar* bar = ( ScrollBar* ) sb;
-	bar->SetMax(rows);
+	bar->SetMax(rows - (Height / GetRowHeight()));
 }
 
 /** Mousewheel scroll */
