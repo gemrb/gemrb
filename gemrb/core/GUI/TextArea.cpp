@@ -191,18 +191,14 @@ void TextArea::AppendText(String* text)
 			s.h = dc->SpanFrame().h - dc->SpanDescent() - GetRowHeight() + span->SpanDescent() + 5;
 			size_t textLen = span->RenderedString().length() - 1;
 			span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
-			//span->SetPadding(5, 0, 0, 0);
 			textContainer->AppendSpan(span);
 			textContainer->SetSpanPadding(span, Size(8, 0)); // FIXME: this is arbitrary
 			textLen += span->RenderedString().length() - 1;
-			// append the remainder
-			textContainer->AppendText(text->substr(textLen));
-		} else {
-			textContainer->AppendText(*text);
+			// erase what has been handled
+			text->erase(0, textLen);
 		}
-	} else {
-		textContainer->AppendText(*text);
 	}
+	textContainer->AppendText(*text);
 	// TODO: we will need to keep the string for editable TextAreas
 	delete text; // we own this, but don't need it now
 	UpdateControls();
@@ -363,10 +359,10 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 		// we must "scale" the pixels
 		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep() / (double)ftext->maxHeight));
 		// sb->SetPosForY will recall this method so we dont need to do more... yet.
-	}else if(sb){
+	} else if (sb) {
 		// our scrollbar has set position for us
 		TextYPos = y;
-	}else{
+	} else {
 		// no scrollbar. need to call SetRow myself.
 		// SetRow will set TextYPos.
 		SetRow( y / ftext->maxHeight );
@@ -593,11 +589,9 @@ void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned 
 		switch(Button) {
 		case GEM_MB_SCRLUP:
 			scrlbr->ScrollUp();
-			core->RedrawAll();
 			break;
 		case GEM_MB_SCRLDOWN:
 			scrlbr->ScrollDown();
-			core->RedrawAll();
 			break;
 		}
 	}
