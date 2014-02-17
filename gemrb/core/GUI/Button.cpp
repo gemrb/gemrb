@@ -307,7 +307,7 @@ void Button::DrawInternal(Region& rgn)
 			// constrain the label (status icons) to the picture bounds
 			r = Region(picXPos, picYPos, Picture->Width, Picture->Height);
 		} else {
-			r = Region( rgn.x, rgn.y, rgn.w - 2, rgn.h - 2);
+			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
 		}
 
 		font->Print( r, Text, ppoi, (ieByte) align );

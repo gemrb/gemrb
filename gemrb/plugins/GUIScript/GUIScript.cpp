@@ -2018,7 +2018,10 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	if (!btn) {
 		return NULL;
 	}
-	Label* lbl = new Label( btn->ControlFrame(), core->GetFont( font ), "" );
+	Region frame = btn->ControlFrame();
+	frame.y += 5;
+	frame.h -= 10;
+	Label* lbl = new Label(frame, core->GetFont( font ), "" );
 	lbl->ControlID = ControlID;
 	lbl->Owner = win;
 	lbl->SetAlignment( align );
