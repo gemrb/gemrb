@@ -172,33 +172,145 @@ void TextArea::AppendText(const char* text)
 
 void TextArea::AppendText(String* text)
 {
-	// TODO: parse the string tags ([color],[p],etc) into spans
-	//TextSpan* span = new TextSpan(string, ftext, palette, const Size& frame, 0);
-	if (finit) {
-		// FIXME: this assumes that finit is always for drop caps (not just a diffrent looking font)
-		// append drop cap spans
-		size_t whitespace = text->find_first_not_of(L"\n\t\r ");
-		if (whitespace != String::npos) {
-			// ensure we actually have text!
-			TextSpan* dc = new TextSpan(text->substr(0, 1), finit, NULL);
-			textContainer->AppendSpan(dc);
-			text->erase(0, 1);
-			// FIXME: the instances of the hard coded numbers are arbitrary padding values
-			Size s = Size(Width - dc->SpanFrame().w, GetRowHeight());
-			TextSpan* span = new TextSpan(*text, ftext, palette, s, IE_FONT_ALIGN_LEFT);
+	assert(text && text->length());
+
+	size_t tagPos = text->find_first_of('[');
+	if (tagPos != String::npos) {
+		// parse the text looking for accepted tags ([cap], [color], [p])
+		if (tagPos != 0) {
+			// handle any text before the markup
+			TextSpan* span = new TextSpan(text->substr(0, tagPos), ftext, palette);
 			textContainer->AppendSpan(span);
-			s.w -= 8; // FIXME: arbitrary padding
-			s.h = dc->SpanFrame().h - dc->SpanDescent() - GetRowHeight() + span->SpanDescent() + 5;
-			size_t textLen = span->RenderedString().length() - 1;
-			span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
-			textContainer->AppendSpan(span);
-			textContainer->SetSpanPadding(span, Size(8, 0)); // FIXME: this is arbitrary
-			textLen += span->RenderedString().length() - 1;
-			// erase what has been handled
-			text->erase(0, textLen);
 		}
+
+		// span properties
+		Color palCol;
+		Palette* pal = NULL;
+		Font* fnt = ftext;
+		Size frame;
+
+		enum ParseState {
+			TEXT = 0,
+			OPEN_TAG,
+			CLOSE_TAG,
+			COLOR
+		};
+
+		TextSpan* lastSpan = NULL;
+		String token;
+		ParseState state = TEXT;
+		String::iterator it = text->begin() + tagPos;
+		for (; it != text->end(); it++) {
+			switch (state) {
+				case OPEN_TAG:
+					switch (*it) {
+						case '=':
+							if (token == L"color") {
+								state = COLOR;
+								token.clear();
+							}
+							// else is a parse error...
+							continue;
+						case ']':
+							if (token == L"cap") {
+								fnt = finit;
+							} else if (token == L"p") {
+								int w = Width;
+								if (lastSpan) {
+									w -= lastSpan->SpanFrame().w;
+								}
+								frame.w = w;
+							}
+							state = TEXT;
+							token.clear();
+							continue;
+					}
+					break;
+				case CLOSE_TAG:
+					switch (*it) {
+						case ']':
+							if (token == L"color") {
+								gamedata->FreePalette(pal);
+							} else if (token == L"cap") {
+								fnt = ftext;
+							} else if (token == L"p") {
+								frame.w = 0;
+							}
+							state = TEXT;
+							token.clear();
+							continue;
+					}
+					break;
+				case TEXT:
+					switch (*it) {
+						case '[':
+							if (token.length()) {
+								// TODO: surely we need some alignment flags?
+								TextSpan* span = new TextSpan(token, fnt, pal, frame, 0);
+								textContainer->AppendSpan(span);
+								lastSpan = span;
+								token.clear();
+							}
+							if (*++it == '/')
+								state = CLOSE_TAG;
+							else {
+								it--;
+								state = OPEN_TAG;
+							}
+							continue;
+					}
+					break;
+				case COLOR:
+					switch (*it) {
+						case L']':
+							swscanf(token.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
+							pal = core->CreatePalette(palCol, palette->back);
+							state = TEXT;
+							token.clear();
+							continue;
+					}
+					break;
+				default: // parse error, not clearing token
+					state = TEXT;
+					break;
+			}
+			token += *it;
+		}
+		assert(pal == NULL && state == TEXT);
+		if (token.length()) {
+			// there was some text at the end without markup
+			TextSpan* span = new TextSpan(token, ftext, palette);
+			textContainer->AppendSpan(span);
+		}
+	} else {
+		if (finit) {
+			// FIXME: this assumes that finit is always for drop caps (not just a diffrent looking font)
+			// append drop cap spans
+			size_t cappos = text->find_first_not_of(L"\n\t\r ");
+			if (cappos != String::npos) {
+				// ensure we actually have text!
+				TextSpan* dc = new TextSpan(text->substr(cappos, 1), finit, NULL);
+				textContainer->AppendSpan(dc);
+				text->erase(0, cappos + 1);
+				// FIXME: assuming we have more text!
+				// FIXME: the instances of the hard coded numbers are arbitrary padding values
+				Size s = Size(Width - dc->SpanFrame().w, GetRowHeight());
+				TextSpan* span = new TextSpan(*text, ftext, palette, s, IE_FONT_ALIGN_LEFT);
+				textContainer->AppendSpan(span);
+				s.w -= 8; // FIXME: arbitrary padding
+				s.h = dc->SpanFrame().h - dc->SpanDescent() - GetRowHeight() + span->SpanDescent() + 5;
+				size_t textLen = span->RenderedString().length() - 1;
+				span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
+				textContainer->AppendSpan(span);
+				textContainer->SetSpanPadding(span, Size(8, 0)); // FIXME: this is arbitrary
+				textLen += span->RenderedString().length() - 1;
+				// erase what has been handled
+				text->erase(0, textLen);
+			}
+		}
+		textContainer->AppendText(*text);
 	}
-	textContainer->AppendText(*text);
+
 	// TODO: we will need to keep the string for editable TextAreas
 	delete text; // we own this, but don't need it now
 	UpdateControls();

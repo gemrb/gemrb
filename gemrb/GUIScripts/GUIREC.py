@@ -679,43 +679,43 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			if val == 0 and type != '0':
 				continue
 			if type == '+': #pluses
-				res.append ("[capital=0]"+GemRB.GetString (strref) + ' '+ '+' * val)
+				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
 			elif type == 'p': #a plus prefix if positive
 				if val > 0:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ' +' + str (val) )
+					res.append (GemRB.GetString (strref) + ' +' + str (val) )
 				else:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
+					res.append (GemRB.GetString (strref) + ' ' + str (val) )
 			elif type == 'r': #a plus prefix if positive, strref is an already resolved string
 				if val > 0:
-					res.append ("[capital=0]" + strref + ' +' + str (val) )
+					res.append (strref + ' +' + str (val) )
 				else:
-					res.append ("[capital=0]" + strref + ' ' + str (val) )
+					res.append (strref + ' ' + str (val) )
 			elif type == 's': #both base and (modified) stat, but only if they differ
 				base = GB (val)
 				stat = GS (val)
-				base_str = "[capital=0]" + GemRB.GetString (strref) + ': ' + str(stat)
+				base_str = GemRB.GetString (strref) + ': ' + str(stat)
 				if base == stat:
 					res.append (base_str)
 				else:
 					res.append (base_str + " (" + str(stat-base) + ")")
 			elif type == 'x': #x character before value
-				res.append ("[capital=0]"+GemRB.GetString (strref) +': x' + str (val) )
+				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
-				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
+				res.append ("[cap]"+val+"[/cap] "+GemRB.GetString (strref))
 			elif type == 'b': #strref is an already resolved string
-				res.append ("[capital=0]"+strref+": "+str (val))
+				res.append (strref+": "+str (val))
 			elif type == 'c': #normal string
-				res.append ("[capital=0]"+GemRB.GetString (strref))
+				res.append (GemRB.GetString (strref))
 			elif type == 'd': #strref is an already resolved string
-				res.append ("[capital=0]"+strref)
+				res.append (strref)
 			elif type == '0': #normal value
 				res.append (GemRB.GetString (strref) + ': ' + str (val))
 			else: #normal value + type character, for example percent sign
-				res.append ("[capital=0]"+GemRB.GetString (strref) + ': ' + str (val) + type)
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
 		except:
 			if s != None:
-				res.append ("[capital=0]"+ GemRB.GetString (s) )
+				res.append (GemRB.GetString (s) )
 				lines = 0
 			else:
 				if not lines and str_None != -1:

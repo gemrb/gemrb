@@ -155,9 +155,7 @@ def UpdateOverview(CurrentStep):
 		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0))
 	
 	if GemRB.GetVar('Ability 0') > 0:
-		AddText('\n[color=FFFF00]', -1)
-		AddText(17088)
-		AddText('[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]')
 		for i in range(0, 6):
 			strref = Tables[3].GetValue(i, 2)
 			AddText(strref, -1)
@@ -165,9 +163,7 @@ def UpdateOverview(CurrentStep):
 			AddText(': %d (%+d)' % (abl, abl / 2 - 5))
 	
 	if CurrentStep > 6:
-		AddText('\n[color=FFFF00]', -1)
-		AddText(11983)
-		AddText('[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(11983) + '[/color]')
 		
 		ClassColumn = Tables[1].GetValue(GemRB.GetVar('Class') - 1, 3, 1) # Finds base class row id
 		if ClassColumn < 1: ClassColumn = GemRB.GetVar('Class') - 1 # If 0 then already a base class so need actual row
@@ -205,9 +201,7 @@ def UpdateOverview(CurrentStep):
 				if value != Ranks: strn += ' (' + str(Ranks) + ')'
 				AddText(strn)
 
-		AddText('\n[color=FFFF00]', -1)
-		AddText(36310)
-		AddText('[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(36310) + '[/color]')
 		
 		for i in range(Tables[6].GetRowCount()):
 			value = GemRB.GetVar('Feat ' + str(i))

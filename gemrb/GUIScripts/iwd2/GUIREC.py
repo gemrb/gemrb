@@ -311,9 +311,7 @@ def DisplayCommon (pc):
 	return
 
 def DisplaySavingThrows (pc):
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (17379)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(17379) + "[/color]\n")
 
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
 	RecordsTextArea.Append (delimited_txt(17380, ":", PlusMinusStat(tmp)))
@@ -336,15 +334,11 @@ def DisplayGeneral (pc):
 	Window = RecordsWindow
 
 	#levels
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (40308)
-	RecordsTextArea.Append (" - ")
-	RecordsTextArea.Append (40309)
-	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
 	# get special level penalty for subrace
 	adj = GetECL (pc)
-	RecordsTextArea.Append (": "+str(levelsum) )
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40308) + " - " + GemRB.GetString(40309) + ": " + str(levelsum) + "[/color]")
+	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+
 	#the class name for highest
 	highest = None
 	tmp = 0
@@ -383,9 +377,7 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (tmp)
 
 	#experience
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (17089)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(17089) + "[/color]")
 
 	RecordsTextArea.Append (36928,-1)
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
@@ -397,28 +389,22 @@ def DisplayGeneral (pc):
 	#current effects
 	effects = GemRB.GetPlayerStates (pc)
 	if len(effects):
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
-		RecordsTextArea.Append (32052)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(32052) + "[/color]")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
 			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
-			RecordsTextArea.Append ("[capital=2]"+c+" ", -1)
+			RecordsTextArea.Append ("[cap]"+c+"[/cap] ", -1)
 			RecordsTextArea.Append (tmp)
 
 	# TODO: Active Feats (eg. Power attack 4)
 
 	#race
-	RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
-	RecordsTextArea.Append (1048)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(1048) + "[/color]")
 
 	RecordsTextArea.Append (Race,-1)
 
 	#alignment
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (1049)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(1049) + "[/color]")
 	tmp = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
 	Align = CommonTables.Aligns.GetValue (tmp, 2)
 	RecordsTextArea.Append (Align,-1)
@@ -428,9 +414,7 @@ def DisplayGeneral (pc):
 
 	#class features
 	if HasClassFeatures(pc):
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
-		RecordsTextArea.Append (40314)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(40314) + "[/color]")
 		tmp = GemRB.GetPlayerStat (pc, IE_TURNUNDEADLEVEL)
 		if tmp:
 			RecordsTextArea.Append (12126,-1)
@@ -457,12 +441,12 @@ def DisplayGeneral (pc):
 	# favoured enemies; eg Goblins: +2 & Harpies: +1
 	RangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
 	if RangerLevel:
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
+		RangerString = "\n\n[color=ffff00]"
 		if RangerLevel > 5:
-			RecordsTextArea.Append (15982)
+			RangerString += GemRB.GetString (15982)
 		else:
-			RecordsTextArea.Append (15897)
-		RecordsTextArea.Append ("[/color]\n")
+			RangerString += GemRB.GetString (15897)
+		RecordsTextArea.Append (RangerString + "[/color]\n")
 		DisplayFavouredEnemy (pc, RangerLevel)
 		for i in range (7):
 			DisplayFavouredEnemy (pc, RangerLevel, i)
@@ -470,9 +454,7 @@ def DisplayGeneral (pc):
 	#bonus spells
 	bonusSpells, classes = GetBonusSpells(pc)
 	if len(bonusSpells):
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
-		RecordsTextArea.Append (10344)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(10344) + "[/color]")
 		for c in classes:
 			if not len(bonusSpells[c]):
 				continue
@@ -485,9 +467,7 @@ def DisplayGeneral (pc):
 				RecordsTextArea.Append (delimited_txt(7192, " " + str(level+1)+":", "+" + str(bonusSpells[c][level]), 0))
 
 	#ability statistics
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (40315)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(40315) + "[/color]\n")
 
 	# Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
@@ -544,9 +524,7 @@ def DisplayGeneral (pc):
 			if damage == -1 or damage-mod <= 0:
 				continue
 			if not DisplayedHeader:
-				RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
-				RecordsTextArea.Append (39325)
-				RecordsTextArea.Append ("[/color]\n")
+				RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(39325) + "[/color]\n")
 				DisplayedHeader = 1
 
 			enchantment += 1 # since we were checking what is allowable, not what bypasses it
@@ -731,9 +709,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Attack Roll Modifiers
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (9457)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(9457) + "[/color]\n")
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
 	combatdet2 = combatdet # placeholder for the potential offhand numbers
@@ -762,9 +738,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Armor Class
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (33553)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(33553) + "[/color]\n")
 	RecordsTextArea.Append (delimited_txt (33553, ":", str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
@@ -801,9 +775,7 @@ def DisplayWeapons (pc):
 	# Armor Class Modifiers
 	stat = GS (IE_ACMISSILEMOD) + GS (IE_ACSLASHINGMOD) + GS (IE_ACPIERCINGMOD) + GS (IE_ACCRUSHINGMOD)
 	if stat:
-		RecordsTextArea.Append ("[color=ffff00]")
-		RecordsTextArea.Append (11766)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(11766) + "[/color]")
 
 		# Missile
 		if GS (IE_ACMISSILEMOD):
@@ -827,9 +799,7 @@ def DisplayWeapons (pc):
 	###################
 	# Arcane spell failure
 	if GS(IE_LEVELBARD) + GS(IE_LEVELSORCERER) + GS(IE_LEVELMAGE):
-		RecordsTextArea.Append ("[color=ffff00]")
-		RecordsTextArea.Append (41391)
-		RecordsTextArea.Append ("[/color]\n")
+		RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(41391) + "[/color]\n")
 
 		# Casting Failure
 		failure = GemRB.GetSpellFailure (pc)
@@ -866,9 +836,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Weapon Statistics
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (41119)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(41119) + "[/color]\n")
 
 	# Main hand
 	WeaponOfHand(pc, combatdet, dualwielding)
@@ -890,9 +858,7 @@ def DisplaySkills (pc):
 	rows = SkillTable.GetRowCount ()
 
 	#skills
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (11983)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(11983) + "[/color]\n")
 
 	skills = []
 	for i in range(rows):
@@ -914,9 +880,7 @@ def DisplaySkills (pc):
 	FeatName = GemRB.LoadTable ("feats")
 	rows = FeatTable.GetRowCount ()
 	#feats
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (36361)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(36361) + "[/color]\n")
 
 	feats = []
 	for i in range(rows):
@@ -966,18 +930,14 @@ def DisplayMisc (pc):
 	stat = GemRB.GetPCStats (pc)
 
 	#favourites
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (40320)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40320) + "[/color]\n")
 
 	#favourite spell and weapon
 	RecordsTextArea.Append (delimited_str (11949, ":", stat['FavouriteSpell']))
 	RecordsTextArea.Append (delimited_str (11950, ":", stat['FavouriteWeapon']))
 
 	# combat details
-	RecordsTextArea.Append ("\n[color=ffff00]")
-	RecordsTextArea.Append (40322)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40322) + "[/color]\n")
 
 	#most powerful vanquished, time spent, xp and kills
 	RecordsTextArea.Append (delimited_str (11947, ":", stat['BestKilledName']))
@@ -1128,7 +1088,6 @@ def UpdateRecordsWindow ():
 
 	RecordsTextArea = Window.GetControl (45)
 	RecordsTextArea.SetText ("")
-	RecordsTextArea.Append ("[capital=0]")
 
 	DisplayCommon (pc)
 
