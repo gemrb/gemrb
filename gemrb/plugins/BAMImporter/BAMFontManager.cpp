@@ -73,6 +73,8 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		if (curGlyph) {
 			if (first)
 				curGlyph->YPos = first->YPos;
+			else if (af->GetCycleCount() <= 1) // numeric font
+				curGlyph->YPos = curGlyph->Height; // numeric fonts have no descent
 			curGlyph->XPos = 0;
 			curGlyph->release();
 		}

@@ -38,8 +38,21 @@ BAMFont::BAMFont(Palette* pal, AnimationFactory* af)
 	// but it is harmless to use them the same way
 	if (isNumeric) {
 		maxHeight = af->GetFrame(0)->Height;
+		descent = 0;
 	} else {
 		maxHeight = af->GetFrame(0, 1)->Height;
+
+		Sprite2D* curGlyph = NULL;
+		descent = 0;
+		int curDescent = 0;
+		for (size_t i = 0; i < af->GetFrameCount(); i++) {
+			curGlyph = af->GetFrameWithoutCycle(i);
+			if (curGlyph) {
+				curDescent = curGlyph->Height - curGlyph->YPos;
+				descent = (curDescent > descent) ? curDescent : descent;
+				curGlyph->release();
+			}
+		}
 	}
 
 	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
