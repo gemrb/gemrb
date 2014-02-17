@@ -3395,11 +3395,14 @@ void Interface::DrawTooltip ()
 		strx += TooltipMargin;
 	}
 	Region textr = Region( strx, y, strw, h );
-	// FIXME: we used to clip the text
-	// the font no longer takes responsibility for clipping (aside from print region)
-	// we will have to do the clipping here.
+
+	Region oldclip;
+	// clip drawing to the control bounds, then restore after drawing
+	video->GetClipRect(oldclip);
+	video->SetClipRect(&clip);
 	fnt->Print( textr, *tooltip_text, NULL,
-		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
+			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
+	video->SetClipRect(&oldclip);
 }
 
 //interface for higher level functions, if the window was
