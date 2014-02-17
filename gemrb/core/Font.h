@@ -70,8 +70,8 @@ private:
 	void BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
 						   ieByte* canvas, const Size& size) const;
 	// Blit to the sprite or screen if canvas is NULL
-	size_t RenderText(const String&, const Region&, Palette*,
-				  ieByte alignment, ieByte* canvas = NULL) const;
+	size_t RenderText(const String&, Region&, Palette*,
+				  ieByte alignment, ieByte** canvas = NULL, bool grow = false) const;
 public:
 	Font(Palette*);
 	virtual ~Font(void);

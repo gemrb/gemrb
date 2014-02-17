@@ -317,17 +317,18 @@ size_t Font::Print(Region rgn, const String& string, Palette* color,
 	return RenderText(string, rgn, pal, alignment);
 }
 
-Size Font::StringSize(const String& string, const Size* padding) const
+Size Font::StringSize(const String& string, const Size* stop) const
 {
+	if (!string.length()) return Size();
 	ieWord w = 0, h = 0, lines = 1;
-	ieWord curh = 0, curw = (padding) ? padding->w*2 : 0;
+	ieWord curh = 0, curw = 0;
 	int decent = 0, maxd = 0;
 	bool multiline = false;
 	for (size_t i = 0; i < string.length(); i++) {
 		if (string[i] == L'\n') {
 			if (curw > w)
 				w = curw;
-			curw = (padding) ? padding->w*2 : 0;
+			curw = 0;
 			multiline = true;
 			lines++;
 		} else {
@@ -335,7 +336,7 @@ Size Font::StringSize(const String& string, const Size* padding) const
 			curh = curGlyph->Height;
 			decent = curGlyph->Height - curGlyph->YPos;
 			maxd = (decent > maxd) ? decent : maxd;
-			curh += (padding) ? padding->h : 0;
+			curh += 0;
 			if (curh > h)
 				h = curh;
 			curw += curGlyph->Width;
@@ -343,14 +344,16 @@ Size Font::StringSize(const String& string, const Size* padding) const
 				curw -= GetKerningOffset(string[i-1], string[i]);
 			}
 		}
+		if (stop && (curw > stop->w || curh > stop->h))
+			break;
 	}
 	if (!multiline) {
-		w = curw;
 		h += maxd;
 	} else {
-		h = maxHeight * lines;
-		h += this->descent;
+		h = (maxHeight * lines) + this->descent;
 	}
+	w = (curw > w) ? curw : w;
+	assert(w);
 	return Size(w, h);
 }
 
