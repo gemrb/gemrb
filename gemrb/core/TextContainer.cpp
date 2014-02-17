@@ -50,6 +50,10 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 	font = fnt;
 	spanSprite = NULL;
 	palette = NULL;
+	if (!pal) {
+		pal = fnt->GetPalette();
+		pal->release();
+	}
 
 	SetPalette(pal);
 	alignment = align;
@@ -200,8 +204,6 @@ void TextContainer::DrawContents(int x, int y) const
 			break; // layout is ordered so we know nothing else can draw
 		}
 		const Sprite2D* spr = (*it).first->RenderedSpan();
-		if (!spr) // spr can be NULL if the span is entirely newlines
-			continue;
 		video->BlitSprite(spr, rgn.x, rgn.y, true, &rgn);
 #if DEBUG_TEXT
 		// draw the layout rect
@@ -265,16 +267,24 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 			excluded = ExcludedRegionForRect(layoutRgn);
 		} while (excluded);
 
-		layout[span] = layoutRgn;
+		if (span->RenderedSpan()) // only layout redered spans
+			layout[span] = layoutRgn;
 		// TODO: need to extend the exclusion rect for some alignments
 		// eg right align should invalidate the entire area infront also
 		layoutRgn.h -= span->SpanDescent();
+		assert(layoutRgn.h != -1);
 		AddExclusionRect(layoutRgn);
 		prevSpan = span;
 	}
-	frame.h = drawPoint.y + span->SpanFrame().h;
-	if (frame.h > maxFrame.h)
-		frame.h = maxFrame.h;
+	// TODO: we ould optimize by testing *before* we try to add/layout a new span
+	// we either shouldnt accept new spans that dont fit or at leat not lay them out
+	// currently we cant resize a container dynamically so...
+	ieWord newh = drawPoint.y + span->SpanFrame().h;
+	if (newh > frame.h) {
+		frame.h = newh;
+		if (frame.h > maxFrame.h)
+			frame.h = maxFrame.h;
+	}
 	if (frame.w > maxFrame.w)
 		frame.w = maxFrame.w;
 }
