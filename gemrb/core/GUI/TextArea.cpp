@@ -558,7 +558,13 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 void TextArea::Clear()
 {
 	delete textContainer;
-	textContainer = new TextContainer(Size(Width, -1), ftext, palette);;
+	if (sb) {
+		// if we have a scrollbar we should grow as much as needed vertically
+		textContainer = new TextContainer(Size(Width, -1), ftext, palette);
+	} else {
+		// otherwise limit the text to our frame
+		textContainer = new TextContainer(ControlFrame().Dimensions(), ftext, palette);
+	}
 }
 
 //setting up the textarea for smooth scrolling, the first
