@@ -96,8 +96,13 @@ size_t Font::RenderText(const String& string, Region& rgn,
 						Palette* color, ieByte alignment, ieByte** canvas, bool grow) const
 {
 	assert(color);
-	ieWord lineHeight = (alignment&IE_FONT_SINGLE_LINE) ? StringSize(string).h : maxHeight;
-	int x = 0, y = maxHeight;
+	ieWord lineHeight = maxHeight;
+	if (alignment&IE_FONT_SINGLE_LINE) {
+		int stringh = StringSize(string).h;
+		lineHeight = (stringh < maxHeight) ? stringh : maxHeight;
+	}
+	assert(lineHeight <= maxHeight);
+	int x = 0, y = lineHeight;
 
 	if (!canvas) {
 		// canvas vertical alignment is handled by centering the completed
