@@ -29,6 +29,7 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "System/StringBuffer.h"
+#include "TextContainer.h"
 
 namespace GemRB {
 
@@ -248,7 +249,7 @@ void InfoPoint::dump() const
 			TrapRemovalDiff );
 		break;
 	case ST_TRIGGER:
-		buffer.appendFormatted ( "InfoString: %s\n", overHeadText );
+		buffer.appendFormatted ( "InfoString: %ls\n", OverheadText->RenderedString().c_str() );
 		break;
 	default:;
 	}

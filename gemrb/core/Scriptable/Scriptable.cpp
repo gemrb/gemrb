@@ -29,12 +29,14 @@
 #include "Font.h"
 #include "Projectile.h"
 #include "Spell.h"
+#include "Sprite2D.h"
 #include "SpriteCover.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
 #include "Scriptable/InfoPoint.h"
+#include "TextContainer.h"
 
 namespace GemRB {
 
@@ -54,9 +56,9 @@ Scriptable::Scriptable(ScriptableType type)
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
-	overHeadText = NULL;
+	OverheadText = NULL;
 	overHeadTextPos.empty();
-	textDisplaying = 0;
+	overheadTextDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
 	scriptlevel = 0;
@@ -135,8 +137,8 @@ Scriptable::~Scriptable(void)
 			delete( Scripts[i] );
 		}
 	}
-	if (overHeadText) {
-		core->FreeString( overHeadText );
+	if (OverheadText) {
+		delete OverheadText;
 	}
 	if (locals) {
 		delete( locals );
@@ -215,21 +217,39 @@ void Scriptable::SetSpellResRef(ieResRef resref) {
 	strnuprcpy(SpellResRef, resref, 8);
 }
 
-void Scriptable::DisplayHeadText(const char* text)
+void Scriptable::SetOverheadText(const String* text, bool display)
 {
-	if (overHeadText) {
-		core->FreeString( overHeadText );
+	if (OverheadText) {
+		delete OverheadText;
 	}
 	overHeadTextPos.empty();
 	if (text) {
-		overHeadText = strdup(text);
+		OverheadText = new TextSpan(*text, core->GetFont( 1 ), NULL, Size(200, 400), IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
+		DisplayOverheadText(display);
+	} else {
+		DisplayOverheadText(false);
+	}
+}
+
+bool Scriptable::DisplayOverheadText(bool show)
+{
+	if (show && !overheadTextDisplaying) {
+		overheadTextDisplaying = true;
 		timeStartDisplaying = core->GetGame()->Ticks;
-		textDisplaying = 1;
-	}
-	else {
+		return true;
+	} else if (!show && overheadTextDisplaying) {
+		overheadTextDisplaying = false;
 		timeStartDisplaying = 0;
-		textDisplaying = 0;
+		return true;
 	}
+	return false;
+}
+
+const String* Scriptable::GetOverheadText() {
+	if (OverheadText) {
+		return &OverheadText->RenderedString();
+	}
+	return NULL;
 }
 
 /* 'fix' the current overhead text in the current position */
@@ -244,14 +264,12 @@ void Scriptable::DrawOverheadText(const Region &screen)
 	unsigned long time = core->GetGame()->Ticks;
 	Palette *palette = NULL;
 
-	if (!textDisplaying)
+	if (!overheadTextDisplaying)
 		return;
 
 	time -= timeStartDisplaying;
-
-	Font* font = core->GetFont( 1 );
 	if (time >= MAX_DELAY) {
-		textDisplaying = 0;
+		DisplayOverheadText(false);
 		return;
 	} else {
 		time = (MAX_DELAY-time)/10;
@@ -276,12 +294,16 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		y = overHeadTextPos.y;
 	}
 
-	// FIXME: we used to print with anchor=false
-	// we should render the text as a Sprite and print that way
-	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
-	font->Print( rgn, overHeadText, palette?palette:core->InfoTextPalette,
-				IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
-	gamedata->FreePalette(palette);
+	if (!palette) {
+		palette = core->InfoTextPalette;
+		palette->acquire();
+	}
+
+	const Sprite2D* spr = OverheadText->RenderedSpan();
+	x += screen.x + spr->XPos - (spr->Width / 2);
+	y += screen.y - cs + spr->Height;
+	core->GetVideoDriver()->BlitSprite(spr, x, y, false, NULL, palette);
+	palette->release();
 }
 
 void Scriptable::ImmediateEvent()
@@ -1203,7 +1225,10 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			memset(tmpstr, 0, sizeof(tmpstr));
 			// eg. .:Casts Word of Recall:.
 			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetCString(displaymsg->GetStringReference(STR_CASTS)), core->GetCString(spl->SpellName));
-			DisplayHeadText(tmpstr);
+
+			String* str = StringFromCString(tmpstr);
+			SetOverheadText(str);
+			delete str;
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}

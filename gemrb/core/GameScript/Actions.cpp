@@ -1639,7 +1639,7 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	target->DisplayHeadText(NULL);
+	target->SetOverheadText(NULL);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)

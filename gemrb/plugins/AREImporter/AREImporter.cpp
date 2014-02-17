@@ -528,7 +528,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
 
-		char* string = core->GetCString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
 		for (x = 0; x < VertexCount; x++) {
@@ -547,10 +546,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		// translate door cursor on infopoint to correct cursor
 		if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
 		ip->Cursor = Cursor;
-		ip->overHeadText = string;
+		String* str = core->GetString( StrRef );
+		ip->SetOverheadText(str, false);
+		delete str;
 		ip->StrRef = StrRef; //we need this when saving area
-		ip->textDisplaying = 0;
-		ip->timeStartDisplaying = 0;
 		ip->SetMap(map);
 		ip->Flags = Flags;
 		ip->UsePoint.x = PosX;

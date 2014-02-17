@@ -1759,10 +1759,9 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			return false;
 		case ST_TRIGGER:
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (trap->overHeadText) {
-				if (trap->textDisplaying != 1) {
-					trap->textDisplaying = 1;
-					trap->timeStartDisplaying = core->GetGame()->Ticks;
+			if (trap->GetOverheadText()) {
+				if (!trap->OverheadTextIsDisplaying()) {
+					trap->DisplayOverheadText(true);
 					DisplayString( trap );
 				}
 			}
@@ -2423,6 +2422,7 @@ void GameControl::ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPE
 
 //Create an overhead text over an arbitrary point
 // UNUSED
+/*
 void GameControl::DisplayString(const Point &p, const char *Text)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
@@ -2430,30 +2430,22 @@ void GameControl::DisplayString(const Point &p, const char *Text)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;
-}
+}*/
 
 //Create an overhead text over a scriptable target
 //Multiple texts are possible, as this code copies the text to a new object
 void GameControl::DisplayString(Scriptable* target)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
-	scr->overHeadText = strdup( target->overHeadText );
-/* strdup should work here, we use it elsewhere
-	size_t len = strlen( target->overHeadText ) + 1;
-	scr->overHeadText = ( char * ) malloc( len );
-	strcpy( scr->overHeadText, target->overHeadText );
-*/
-	scr->textDisplaying = 1;
-	scr->timeStartDisplaying = target->timeStartDisplaying;
+	scr->SetOverheadText(target->GetOverheadText());
 	scr->Pos = target->Pos;
 
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
-	if (tmp) {
+	if (tmp && target->GetOverheadText()) {
 		// pass NULL target so pst does not display multiple
-		// FIXME: overHeadText needs to be converted to String
-		//displaymsg->DisplayString(target->overHeadText, NULL);
+		displaymsg->DisplayString(*target->GetOverheadText(), NULL);
 	}
 }
 

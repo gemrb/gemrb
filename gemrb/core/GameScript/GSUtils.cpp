@@ -494,8 +494,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
 				}
 			} else if (flags & (DS_HEAD | DS_AREA)) {
-				// FIXME: DisplayHeadText needs to be converted to String
-				// Sender->DisplayHeadText( &sb.text );
+				Sender->SetOverheadText( &sb.text );
 				//don't free sb.text, it is residing in Sender
 				if (flags & DS_AREA) {
 					Sender->FixHeadTextPos();
