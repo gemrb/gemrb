@@ -46,9 +46,21 @@ class Sprite2D;
 #define IE_FONT_ALIGN_CENTER 0x01
 #define IE_FONT_ALIGN_RIGHT  0x02
 #define IE_FONT_ALIGN_BOTTOM 0x04
-#define IE_FONT_ALIGN_TOP    0x10 //Single-Line and Multi-Line Text
-#define IE_FONT_ALIGN_MIDDLE 0x20 //Only for single line Text
+#define IE_FONT_ALIGN_TOP    0x10
+#define IE_FONT_ALIGN_MIDDLE 0x20
 #define IE_FONT_SINGLE_LINE  0x40
+
+// TODO: this is a placeholder struct
+// eventually fonts will dynamically create pages of glyphs as a single bit map
+// at that time Glyph will have to change to accomodate that.
+// It should be able to take a pointer to a location in the 2D bit map coresponding to its location
+// and access its data using offsets instead of having to copy and free pixel data in the Glyph
+// for now i need something to work with.
+struct Glyph {
+	wchar_t chr;
+	Size dimensions;
+	ieByte* pixels;
+};
 
 /**
  * @class Font
@@ -67,7 +79,7 @@ public:
 	int maxHeight;
 	int descent;
 private:
-	void BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
+	void BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
 						   ieByte* canvas, const Size& size) const;
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, Palette*,

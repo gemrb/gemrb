@@ -67,58 +67,48 @@ bool Font::MatchesResRef(const ieResRef resref)
 	return false;
 }
 
-// Canvas can't be a sprite, because we may need to realloc
-void Font::BlitGlyphToCanvas(const Sprite2D* glyph, int x, int y,
+void Font::BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
 							 ieByte* canvas, const Size& size) const
 {
 	assert(canvas);
-	assert(!glyph->BAM);
 	// TODO: should handle partial glyphs
 	if (!Region(0, 0, size.w, size.h).PointInside(x, y)) {
 		return; // off the canvas
 	}
 
 	// copy the glyph to the canvas
-	ieByte* src = (ieByte*)glyph->pixels;
+	ieByte* src = glyph.pixels;
 	ieByte* dest = canvas + (size.w * y) + x;
-	for(int row = 0; row < glyph->Height; row++ ) {
+	for(int row = 0; row < glyph.dimensions.h; row++ ) {
 		//assert(dest <= canvas + (size.w * size.h));
-		if (dest + glyph->Width > canvas + (size.w * size.h)) {
+		if (dest + glyph.dimensions.w > canvas + (size.w * size.h)) {
 			break;
 		}
-		memcpy(dest, src, glyph->Width);
+		memcpy(dest, src, glyph.dimensions.w);
 		dest += size.w;
-		src += glyph->Width;
+		src += glyph.dimensions.w;
 	}
 }
 
 size_t Font::RenderText(const String& string, Region& rgn,
 						Palette* color, ieByte alignment, ieByte** canvas, bool grow) const
 {
-	assert(color);
-	ieWord lineHeight = maxHeight;
-	if (alignment&IE_FONT_SINGLE_LINE) {
-		int stringh = StringSize(string).h;
-		lineHeight = (stringh < maxHeight) ? stringh : maxHeight;
-	}
-	assert(lineHeight <= maxHeight);
-	int x = 0, y = lineHeight;
+	assert(color); // must have a palette
+	// we dont do vertical alignment here!
+	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
+	assert(canvas || singleLine || !(alignment&(IE_FONT_ALIGN_BOTTOM|IE_FONT_ALIGN_MIDDLE)));
 
-	if (!canvas) {
-		// canvas vertical alignment is handled by centering the completed
-		// canvas within a given frame. also the canvas can possibly grow vertically, rendering this useless.
-		if (alignment & (IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
-			int lc = 1;
-			for (size_t i = 0; i <= string.length(); i++) {
-				if (string[i] == L'\n')
-					lc++;
-			}
-			int h = lc * lineHeight;
-			if (alignment & IE_FONT_ALIGN_MIDDLE) {
-				y += ( rgn.h - h ) / 2;
-			} else {
-				y += ( rgn.h - h );
-			}
+	int x = 0, y = 0;
+	if (singleLine) {
+		// optimization for single line vertical alignment
+		if (alignment&IE_FONT_ALIGN_MIDDLE) {
+			y = (rgn.h - maxHeight);
+			if (y > 0) y /= 2;
+			y -= descent / 2;
+		} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
+			y = (rgn.h - maxHeight);
+		} else {
+			y = -descent;
 		}
 	}
 
@@ -128,9 +118,20 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	const Sprite2D* currGlyph = NULL;
 	bool done = false, lineBreak = false;
 	size_t charCount = 0;
+	ieByte* lineBuffer = NULL;
+	if (!singleLine && alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
+		// blit to a line buffer then blit it to screen/canvas
+		// we dont need it for left alignment
+		lineBuffer = (ieByte*)calloc(maxHeight + descent, rgn.w); // enough for maximum line
+	}
+	Glyph lineGlyphs;
+	lineGlyphs.dimensions.w = rgn.w;
+	lineGlyphs.dimensions.h = maxHeight + descent;
+	lineGlyphs.pixels = lineBuffer;
 
 	while (!done && (lineBreak || getline(stream, line))) {
 		lineBreak = false;
+		y += maxHeight;
 
 		// check if we need to extend the canvas
 		if (canvas && grow && rgn.h < y) {
@@ -143,20 +144,31 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			ieWord numLines = 1 + ((numNewPixels - 1) / lineArea);
 			// extend the region and canvas both
 			size_t curpos = rgn.h * rgn.w;
-			size_t vGrow = (numLines * maxHeight) + descent;
+			int vGrow = (numLines * maxHeight) + descent;
 			rgn.h += vGrow;
+
+#if DEBUG_FONT
+			Log(MESSAGE, "Font", "Resizing canvas from %dx%d to %dx%d",
+				rgn.w, rgn.h - vGrow, rgn.w, rgn.h);
+#endif
+
 			*canvas = (ieByte*)realloc(*canvas, rgn.w * rgn.h);
 			assert(canvas);
-			// "zero out" (using color key) the new area or we will get garbage in the areas we dont blit to
-			ieDword ck = GetCharSprite(string[0])->GetColorKey();
-			memset(*canvas + curpos, ck, vGrow * rgn.w);
+			// fill the buffer with the color key, or the new area or we will get garbage in the areas we dont blit to
+			memset(*canvas + curpos, 0, vGrow * rgn.w);
 		}
+		// reset the buffer
+		if (lineBuffer)
+			memset(lineBuffer, 0, rgn.w * lineGlyphs.dimensions.h);
 
 		ieWord lineW = StringSize(line).w;
-		if (alignment & IE_FONT_ALIGN_CENTER) {
-			x = ( rgn.w - lineW ) / 2;
-		} else if (alignment & IE_FONT_ALIGN_RIGHT) {
-			x = ( rgn.w - lineW );
+		if (singleLine && alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
+			// optimization for single line horizontal alignmnet
+			if (alignment & IE_FONT_ALIGN_CENTER) {
+				x = ( rgn.w - lineW ) / 2;
+			} else if (alignment & IE_FONT_ALIGN_RIGHT) {
+				x = ( rgn.w - lineW );
+			}
 		} else {
 			x = 0;
 		}
@@ -214,9 +226,17 @@ size_t Font::RenderText(const String& string, Region& rgn,
 							}
 							break; // either done, or skipping
 						}
-						if (canvas) {
-							BlitGlyphToCanvas(currGlyph, x, y - currGlyph->YPos,
-											  *canvas, rgn.Dimensions());
+						if (canvas || lineBuffer) {
+							Glyph g;
+							g.dimensions.w = currGlyph->Width;
+							g.dimensions.h = currGlyph->Height;
+							g.pixels = (ieByte*)currGlyph->pixels;
+							if (lineBuffer)
+								BlitGlyphToCanvas(g, x, maxHeight - currGlyph->YPos,
+												  lineBuffer, rgn.Dimensions());
+							else
+								BlitGlyphToCanvas(g, x, y - currGlyph->YPos,
+												  *canvas, rgn.Dimensions());
 						} else {
 							core->GetVideoDriver()->BlitSprite(currGlyph, x + rgn.x, y + rgn.y,
 															   true, &rgn, color);
@@ -234,11 +254,43 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 			charCount += linePos;
 		}
+		if (singleLine) break;
+
+		if (lineBuffer) {
+			if (alignment&IE_FONT_ALIGN_CENTER) {
+				x = (rgn.w - x) / 2;
+			} else { // right alignment
+				x = rgn.w - x;
+			}
+			if (canvas) {
+				BlitGlyphToCanvas(lineGlyphs, x, y - maxHeight, *canvas, rgn.Dimensions());
+			} else {
+				// FIXME: probably not very efficient.
+				// we do this because we dont have ability to update GL texture pixels...
+				Video* video = core->GetVideoDriver();
+				Sprite2D* lineSprite = video->CreateSprite8(rgn.w, maxHeight, lineBuffer, color);
+				video->BlitSprite(lineSprite, x + rgn.x, y + rgn.y, true, &rgn);
+				lineSprite->release();
+			}
+		}
 
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
-		y += maxHeight;
 	}
+	if (lineBuffer)
+		free(lineBuffer);
+
+	// free the unused canvas area (if any)
+	if (canvas) {
+		int usedh = y + descent;
+		if (usedh < rgn.h) {
+			// this is more than just saving memory
+			// vertical alignment will be off if we have extra space
+			*canvas = (ieByte*)realloc(*canvas, rgn.w * usedh);
+			rgn.h = usedh;
+		}
+	}
+
 	assert(charCount <= string.length());
 	return charCount;
 }
@@ -279,6 +331,9 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 				}
 			}
 			canvasSize.w = size.w;
+		} else if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
+			// the size width is how we center or right align so we cant trim the canvas
+			canvasSize.w = size.w;
 		}
 		// else: we already fit in the designated area (horizontally). No need to resize.
 	}
@@ -288,25 +343,18 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 			canvasSize.h = maxHeight;
 		}
 		canvasSize.h += descent; // compensate for last line descenders
-		// FIXME: this decender "calculation" is just a guess
-		//canvasSize.h += maxHeight / 2; // compensation for decenders
 	}
 	if (size.h && size.h < canvasSize.h) {
 		// we can't unbreak lines ("\n") so at best we can clip the text.
 		canvasSize.h = size.h;
 	}
+	assert(size.h || canvasSize.h >= maxHeight + descent);
 
-	ieDword ck = GetCharSprite(string[0])->GetColorKey();
-	// we must calloc/memset because not all glyphs are equal height. set remainder to the color key
+	// we must calloc because not all glyphs are equal height. set remainder to the color key
 	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
-	if (ck != 0) {
-		// start with transparent canvas
-		memset(canvasPx, ck, canvasSize.w * canvasSize.h);
-	}
 
 	Region rgn = Region(Point(0,0), canvasSize);
 	size_t ret = RenderText(string, rgn, palette, alignment, &canvasPx, (size.h) ? false : true);
-	// FIXME: what do we do about overestimates making a canvas to tall and therefore potentially causing misalignment?
 	if (numPrinted) {
 		*numPrinted = ret;
 	}
@@ -315,20 +363,16 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 		pal = palette;
 	// must ue rgn! the canvas height might be changed in RenderText()
 	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h,
-															 canvasPx, pal, true, ck);
+															 canvasPx, pal, true, 0);
 	if (alignment&IE_FONT_ALIGN_CENTER) {
-		canvas->XPos = (size.w - canvasSize.w) / 2;
+		canvas->XPos = (size.w - rgn.w) / 2;
 	} else if (alignment&IE_FONT_ALIGN_RIGHT) {
-		canvas->XPos = size.w - canvasSize.w;
+		canvas->XPos = size.w - rgn.w;
 	}
-	// FIXME: this is broken for size.h == 0
-	// we can re-examine rgn after calling RenderText, to get the actual size
-	// however, the canvas could have been overestimated
-	// we should probably address this in RenderText to realloc the canvas to the final size used
 	if (alignment&IE_FONT_ALIGN_MIDDLE) {
-		canvas->YPos = (size.h - canvasSize.h) / 2;
+		canvas->YPos = -(size.h - rgn.h) / 2;
 	} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
-		canvas->YPos = size.h - canvasSize.h;
+		canvas->YPos = -(size.h - rgn.h);
 	}
 	return canvas;
 }
@@ -342,12 +386,26 @@ size_t Font::Print(Region rgn, const char* string,
 	return ret;
 }
 
-size_t Font::Print(Region rgn, const String& string, Palette* color,
-				   ieByte alignment) const
+size_t Font::Print(Region rgn, const String& string,
+				   Palette* color, ieByte alignment) const
 {
+	if (rgn.Dimensions().IsEmpty()) return 0;
+
 	Palette* pal = color;
 	if (!pal) {
 		pal = palette;
+	}
+	if (!(alignment&IE_FONT_SINGLE_LINE) && alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
+		// easier to render the text as an image then vertically align it within rgn
+
+		// FIXME: this is probably a bad idea to create and destroy the text every call to print.
+		// the GL driver probably causes print to be called every frame which makes it worse
+		// we should consider migrating any clients that use print + these alignments to TextSpans/Contaners
+		size_t ret;
+		Sprite2D* rendered = RenderTextAsSprite(string, rgn.Dimensions(), alignment, color, &ret);
+		core->GetVideoDriver()->BlitSprite(rendered, rgn.x, rgn.y, true, &rgn); // this does the alignment so no need to adjust
+		rendered->release();
+		return ret;
 	}
 	return RenderText(string, rgn, pal, alignment);
 }
@@ -380,7 +438,8 @@ Size Font::StringSize(const String& string, const Size* stop) const
 			}
 		}
 		if (stop && (curw > stop->w || curh > stop->h))
-			break;
+			return Size((curw > stop->w) ? stop->w : curw,
+						(curh > stop->h) ? stop->h : curh);
 	}
 	if (!multiline) {
 		h += maxd;
