@@ -531,6 +531,8 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		}
 	}
 
+
+
 	if(glSprite->IsPaletted())
 	{
 		if (cover)
@@ -567,7 +569,10 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		}
 	}
 
-	blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
+	if (tint.r == tint.g == tint.b == 0)
+		blitSprite(glSprite, tx, ty, clip, palette, flags);
+	else
+		blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
 	if (coverTexture != 0)
 	{
 		glActiveTexture(GL_TEXTURE2);

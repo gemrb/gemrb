@@ -40,14 +40,17 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		Color* colors = new Color[256];
 		memcpy(colors, palette->col, sizeof(Color)*256);
-		for (unsigned int i=0; i<256; i++)
+		if (!palette->alpha)
 		{
-			if (colors[i].a == 0)
+			for (unsigned int i=0; i<256; i++)
 			{
-				colors[i].a = 0xFF;
+				if (colors[i].a == 0)
+				{
+					colors[i].a = 0xFF;
+				}
 			}
-			if (i == colorKey) colors[i].a = 0;
 		}
+		colors[colorKey].a = 0;
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 #ifdef USE_GL
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
