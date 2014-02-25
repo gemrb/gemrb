@@ -143,7 +143,7 @@ void GLTextureSprite2D::createGlTexture()
 			Uint8 g = (src & gMask) >> GetShiftValue(gMask);
 			Uint8 b = (src & bMask) >> GetShiftValue(bMask);
 			Uint8 a = (src & aMask) >> GetShiftValue(aMask); 
-			if (a == 0) a = 0xFF; //no transparency
+			if (a == 0 && aMask == 0) a = 0xFF; //no transparency
 			if (src == colorKeyIndex) a = 0x00; // transparent
 			buffer[i] = r | (g << 8) | (b << 16) | (a << 24);
 		}

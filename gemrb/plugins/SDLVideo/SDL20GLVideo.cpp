@@ -569,7 +569,7 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		}
 	}
 
-	if (tint.r == tint.g == tint.b == 0)
+	if (tint.r == 0 && tint.g == 0 && tint.b == 0)
 		blitSprite(glSprite, tx, ty, clip, palette, flags);
 	else
 		blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
@@ -704,9 +704,9 @@ void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned 
 	}
 	return drawEllipse(cx, cy, xr, yr, 3, color);
 }
-
+/*
 void GLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, bool clipped)
-{}
+{}*/
 
 void GLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped)
 {
