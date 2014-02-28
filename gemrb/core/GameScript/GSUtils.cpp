@@ -493,7 +493,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 				} else {
 					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
 				}
-			} else if (flags & (DS_HEAD | DS_AREA)) {
+			}
+			if (flags & (DS_HEAD | DS_AREA)) {
 				Sender->SetOverheadText( &sb.text );
 				//don't free sb.text, it is residing in Sender
 				if (flags & DS_AREA) {

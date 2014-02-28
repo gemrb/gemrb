@@ -39,10 +39,10 @@ static int strref_table[STRREF_COUNT];
 #define PALSIZE 8
 static Color ActorColor[PALSIZE];
 static const wchar_t* DisplayFormatName = L"[color=%06X]%s - [/color][p][color=%06X]%ls[/color][/p]";
-static const wchar_t* DisplayFormatAction = L"[color=%06X]%s - [/color][p][color=%06X]%ls %ls[/color][/p]";
+static const wchar_t* DisplayFormatAction = L"[color=%06X]%s - [/color][p][color=%06X]%s %s[/color][/p]";
 static const wchar_t* DisplayFormat = L"[p][color=%06X]%ls[/color][/p]";
-static const wchar_t* DisplayFormatValue = L"[p][color=%06X]%ls: %d[/color][/p]";
-static const wchar_t* DisplayFormatNameString = L"[color=%06X]%s - [/color][p][color=%06X]%ls: %ls[/color][/p]";
+static const wchar_t* DisplayFormatValue = L"[p][color=%06X]%s: %d[/color][/p]";
+static const wchar_t* DisplayFormatNameString = L"[color=%06X]%s - [/color][p][color=%06X]%s: %s[/color][/p]";
 
 DisplayMessage::DisplayMessage(void) {
 	ReadStrrefs();
@@ -73,9 +73,7 @@ void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
 		ta->AppendText( new String(Text) );
 	} else {
 		if(target) {
-			// FIXME: need to convert DisplayHeadText to String
-			//target->DisplayHeadText(&Text);
-			//target->SetOverheadText(&Text);
+			target->SetOverheadText(&Text);
 		}
 	}
 }

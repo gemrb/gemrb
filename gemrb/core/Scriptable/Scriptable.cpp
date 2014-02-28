@@ -223,7 +223,7 @@ void Scriptable::SetOverheadText(const String* text, bool display)
 		delete OverheadText;
 	}
 	overHeadTextPos.empty();
-	if (text) {
+	if (text && text->length()) {
 		OverheadText = new TextSpan(*text, core->GetFont( 1 ), NULL, Size(200, 400), IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
 		DisplayOverheadText(display);
 	} else {
@@ -261,11 +261,11 @@ void Scriptable::FixHeadTextPos()
 #define MAX_DELAY  6000
 void Scriptable::DrawOverheadText(const Region &screen)
 {
-	unsigned long time = core->GetGame()->Ticks;
-	Palette *palette = NULL;
-
 	if (!overheadTextDisplaying)
 		return;
+
+	unsigned long time = core->GetGame()->Ticks;
+	Palette *palette = NULL;
 
 	time -= timeStartDisplaying;
 	if (time >= MAX_DELAY) {
