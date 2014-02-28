@@ -375,6 +375,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			dlgIdx = dialogOptSpans[lookupIdx].first;
 			assert(dlgIdx >= 0);
 			gc->dialoghandler->DialogChoose( dlgIdx );
+			ClearDialogOptions();
 		}
 		return true;
 	}
@@ -571,6 +572,7 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 				return;
 			}
 			gc->dialoghandler->DialogChoose( dlgIdx );
+			ClearDialogOptions();
 			return;
 		}
 	}
@@ -631,7 +633,8 @@ void TextArea::ClearDialogOptions()
 void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 								const Color* color, const Color* hiColor)
 {
-	dialogPal->release();
+	if (dialogPal)
+		dialogPal->release();
 	if (color)
 		dialogPal = core->CreatePalette(*color, ColorBlack);
 	else
