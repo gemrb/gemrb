@@ -301,18 +301,21 @@ void TextArea::AppendText(String* text)
 				// ensure we actually have text!
 				TextSpan* dc = new TextSpan(text->substr(cappos, 1), finit, NULL);
 				textContainer->AppendSpan(dc);
+				// this is sort of a hack for BAM fonts.
+				// drop caps dont exclude their entire frame because of their descent so we do it manually
+				textContainer->AddExclusionRect(Region(textContainer->PointForSpan(dc), dc->SpanFrame()));
 				text->erase(0, cappos + 1);
 				// FIXME: assuming we have more text!
 				// FIXME: the instances of the hard coded numbers are arbitrary padding values
-				Size s = Size(Width - dc->SpanFrame().w, GetRowHeight());
+				Size s = Size(Width- dc->SpanFrame().w, GetRowHeight() + ftext->descent);
 				TextSpan* span = new TextSpan(*text, ftext, palette, s, IE_FONT_ALIGN_LEFT);
 				textContainer->AppendSpan(span);
 				s.w -= 8; // FIXME: arbitrary padding
-				s.h = dc->SpanFrame().h - dc->SpanDescent() - GetRowHeight() + span->SpanDescent() + 5;
+				// drop cap height + a line descent minus the first line size
+				s.h = dc->SpanFrame().h + ftext->descent - GetRowHeight() + 1;
 				size_t textLen = span->RenderedString().length() - 1;
 				span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
 				textContainer->AppendSpan(span);
-				textContainer->SetSpanPadding(span, Size(8, 0)); // FIXME: this is arbitrary
 				textLen += span->RenderedString().length() - 1;
 				// erase what has been handled
 				text->erase(0, textLen);
