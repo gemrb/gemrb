@@ -176,18 +176,22 @@ void TextArea::AppendText(String* text)
 
 	size_t tagPos = text->find_first_of('[');
 	if (tagPos != String::npos) {
-		// parse the text looking for accepted tags ([cap], [color], [p])
 		if (tagPos != 0) {
 			// handle any text before the markup
-			TextSpan* span = new TextSpan(text->substr(0, tagPos), ftext, palette);
-			textContainer->AppendSpan(span);
+			textContainer->AppendText(text->substr(0, tagPos));
 		}
+		// parse the text looking for accepted tags ([cap], [color], [p])
+		// [cap] encloses a span of text to be rendered with the finit font
+		// [color=%02X%02X%02X] encloses a span of text to be rendered with the given RGB values
+		// [p] encloses a span of text to be rendered as an inline block:
+		//     it will grow vertically as needed, but be confined to the remaining width of the line
 
 		// span properties
 		Color palCol;
 		Palette* pal = NULL;
 		Font* fnt = ftext;
 		Size frame;
+		ieByte align = 0;
 
 		enum ParseState {
 			TEXT = 0,
@@ -214,6 +218,7 @@ void TextArea::AppendText(String* text)
 						case ']':
 							if (token == L"cap") {
 								fnt = finit;
+								align = IE_FONT_SINGLE_LINE;
 							} else if (token == L"p") {
 								int w = Width;
 								if (lastSpan) {
@@ -233,6 +238,7 @@ void TextArea::AppendText(String* text)
 								gamedata->FreePalette(pal);
 							} else if (token == L"cap") {
 								fnt = ftext;
+								align = 0;
 							} else if (token == L"p") {
 								frame.w = 0;
 							}
@@ -244,13 +250,18 @@ void TextArea::AppendText(String* text)
 				case TEXT:
 					switch (*it) {
 						case '[':
-							if (token.length()) {
-								// TODO: surely we need some alignment flags?
-								TextSpan* span = new TextSpan(token, fnt, pal, frame, 0);
+							if (token.length() && token != L"\n") {
+								// FIXME: lazy hack.
+								// we ought to ignore all white space between markup unless it contains other text
+								Palette* p = pal;
+								if (fnt == ftext && p == NULL) {
+									p = palette;
+								}
+								TextSpan* span = new TextSpan(token, fnt, p, frame, align);
 								textContainer->AppendSpan(span);
 								lastSpan = span;
-								token.clear();
 							}
+							token.clear();
 							if (*++it == '/')
 								state = CLOSE_TAG;
 							else {
@@ -279,8 +290,7 @@ void TextArea::AppendText(String* text)
 		assert(pal == NULL && state == TEXT);
 		if (token.length()) {
 			// there was some text at the end without markup
-			TextSpan* span = new TextSpan(token, ftext, palette);
-			textContainer->AppendSpan(span);
+			textContainer->AppendText(token);
 		}
 	} else {
 		if (finit) {
