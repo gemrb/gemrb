@@ -448,7 +448,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			for c in effects:
 				tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
 				stats.append ( (tmp,c,'a') )
-			stats.append (None)
 
 	#proficiencies
 	stats.append ( (8442,1,'c') )
@@ -701,7 +700,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			elif type == 'x': #x character before value
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
-				res.append ("[cap]"+val+"[/cap] "+GemRB.GetString (strref))
+				# '%' is the separator glyph in the states font
+				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 			elif type == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
 			elif type == 'c': #normal string
