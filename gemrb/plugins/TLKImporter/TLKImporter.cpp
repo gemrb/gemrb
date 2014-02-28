@@ -310,6 +310,10 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 			goto exit_function;
 		}
 	}
+	if (!strcmp( Token, "TM" )) {
+		Decoded = strdup("\x99");
+		goto exit_function;
+	}
 
 	return -1;	//not decided
 
