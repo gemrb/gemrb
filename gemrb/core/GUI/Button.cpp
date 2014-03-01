@@ -302,11 +302,14 @@ void Button::DrawInternal(Region& rgn)
 			align |= IE_FONT_SINGLE_LINE;
 		}
 
-		Region r;
+		Region r = rgn;
 		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			r = Region(picXPos, picYPos, Picture->Width, Picture->Height);
-		} else {
+		} else if ((IE_GUI_BUTTON_ALIGN_LEFT |
+				   IE_GUI_BUTTON_ALIGN_RIGHT |
+				   IE_GUI_BUTTON_ALIGN_TOP   |
+				   IE_GUI_BUTTON_ALIGN_BOTTOM) & Flags) {
 			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
 		}
 
