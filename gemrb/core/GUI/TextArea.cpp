@@ -44,7 +44,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	ticks = starttime = 0;
 	Cursor = NULL;
 	CurPos = 0;
-	Value = 0xffffffff;
+	Value = -1;
 	ResetEventHandler( TextAreaOnChange );
 	PortraitResRef[0]=0;
 	// quick font optimization (prevents creating unnecessary spans)
@@ -57,17 +57,15 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		initpalette = core->CreatePalette( initcolor, lowtextcolor );
 	}
 	palette = core->CreatePalette( hitextcolor, lowtextcolor );
-	dialogPal = NULL;
 	Color tmp = {
-		hitextcolor.b, hitextcolor.g, hitextcolor.r, 0
+		255, 180, 0, 0
 	};
-	selected = core->CreatePalette( tmp, lowtextcolor );
+	hoverPal = core->CreatePalette( tmp, lowtextcolor );
 	tmp.r = 255;
-	tmp.g = 152;
-	tmp.b = 102;
-	lineselpal = core->CreatePalette( tmp, lowtextcolor );
+	tmp.g = 100;
+	tmp.b = 0;
+	selectedPal = core->CreatePalette( tmp, lowtextcolor );
 	dialogOptions = NULL;
-	selectedOption = NULL;
 	textContainer = NULL;
 	Clear();
 }
@@ -78,9 +76,8 @@ TextArea::~TextArea(void)
 
 	gamedata->FreePalette( palette );
 	gamedata->FreePalette( initpalette );
-	gamedata->FreePalette( dialogPal );
-	gamedata->FreePalette( selected );
-	gamedata->FreePalette( lineselpal );
+	gamedata->FreePalette( hoverPal );
+	gamedata->FreePalette( selectedPal );
 	core->GetVideoDriver()->FreeSprite( Cursor );
 	delete textContainer;
 }
@@ -126,6 +123,7 @@ void TextArea::DrawInternal(Region& clip)
 	clip.x += EDGE_PADDING;
 
 	Video *video = core->GetVideoDriver();
+
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
 		if (AnimPicture) {
 			video->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
@@ -134,8 +132,7 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL)
-	{
+	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
 		unsigned long thisTime = GetTickCount();
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
@@ -562,56 +559,84 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
-	if (!dialogOptions) return;
+	if (!dialogOptions && !(Flags&IE_GUI_TEXTAREA_SELECTABLE))
+		return;
 
-	Point p = Point(x, y - textContainer->ContainerFrame().h);
-	TextSpan* hoverSpan = dialogOptions->SpanAtPoint(p);
-
-	if (selectedOption && selectedOption != hoverSpan) {
-		MarkDirty();
-		selectedOption->SetPalette(dialogPal);
-		selectedOption = NULL;
-	} else if (hoverSpan) {
-		MarkDirty();
-		selectedOption = hoverSpan;
-		selectedOption->SetPalette(selected);
+	TextSpan* span = NULL;
+	Point p = Point(x, y);
+	if (dialogOptions) {
+		p.y -= textContainer->ContainerFrame().h;
+		span = dialogOptions->SpanAtPoint(p);
+	} else {
+		span = textContainer->SpanAtPoint(p);
 	}
+
+	if (hoverSpan && hoverSpan != span) {
+		if (hoverSpan == selectedSpan) {
+			hoverSpan->SetPalette(selectedPal);
+		} else {
+			// reset the old hover span
+			// for dialog options we use the "selected" palette for their default look
+			hoverSpan->SetPalette((dialogOptions) ? selectedPal : palette);
+		}
+		hoverSpan = NULL;
+	}
+	if (span) {
+		hoverSpan = span;
+		hoverSpan->SetPalette(hoverPal);
+	}
+	MarkDirty();
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short y,
 						 unsigned short Button, unsigned short /*Mod*/)
 {
-	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)))
+	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
 		return;
 
-	if (selectedOption) {
-		MarkDirty();
+	if (selectedSpan) {
+		// reset the previous selection
+		selectedSpan->SetPalette((dialogOptions) ? selectedPal : palette);
+		Value = -1;
+	}
+	selectedSpan = hoverSpan; // select the item under the mouse
+	if (selectedSpan) {
+		selectedSpan->SetPalette(selectedPal);
 
-		GameControl* gc = core->GetGameControl();
-		if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-			int dlgIdx = -1;
-			std::vector<DialogOptionSpan>::const_iterator it;
-			for (it = dialogOptSpans.begin(); it != dialogOptSpans.end(); ++it) {
-				if( (*it).second == selectedOption ) {
-					dlgIdx = (*it).first;
-					break;
+		if (dialogOptions) {
+			// FIXME: can't this be done by setting Value and doing a callback?
+			// TextArea ideally shouldnt know anything about this
+			GameControl* gc = core->GetGameControl();
+			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+				int dlgIdx = -1;
+				std::vector<DialogOptionSpan>::const_iterator it;
+				for (it = dialogOptSpans.begin(); it != dialogOptSpans.end(); ++it) {
+					if( (*it).second == selectedSpan ) {
+						dlgIdx = (*it).first;
+						break;
+					}
 				}
+				if (dlgIdx == -1) {
+					//this kills this object, don't use any more data!
+					gc->dialoghandler->EndDialog();
+					return;
+				}
+				gc->dialoghandler->DialogChoose( dlgIdx );
+				ClearDialogOptions();
+				//return;
+				Value = dlgIdx;
 			}
-			if (dlgIdx == -1) {
-				//this kills this object, don't use any more data!
-				gc->dialoghandler->EndDialog();
-				return;
-			}
-			gc->dialoghandler->DialogChoose( dlgIdx );
-			ClearDialogOptions();
-			return;
+		} else {
+			Value = (TextYPos + y) / GetRowHeight();
+		}
+
+		if (VarName[0] != 0) {
+			core->GetDictionary()->SetAt( VarName, Value );
 		}
 	}
+	MarkDirty();
 
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Value );
-	}
 	RunEventHandler( TextAreaOnChange );
 }
 
@@ -659,31 +684,33 @@ void TextArea::ClearDialogOptions()
 	dialogOptSpans.clear();
 	delete dialogOptions; // deletes the old spans too
 	dialogOptions = NULL;
-	selectedOption = NULL;
+	selectedSpan = NULL;
+	hoverSpan = NULL;
 }
 
 void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 								const Color* color, const Color* hiColor)
 {
-	if (dialogPal)
-		dialogPal->release();
+	// selectedPal is the normal palette for dialog options
+	if (selectedPal)
+		selectedPal->release();
 	if (color)
-		dialogPal = core->CreatePalette(*color, ColorBlack);
+		selectedPal = core->CreatePalette(*color, ColorBlack);
 	else
-		dialogPal = ftext->GetPalette();
+		selectedPal = ftext->GetPalette();
 
 	if (hiColor) {
-		selected->release();
-		selected = core->CreatePalette(*hiColor, ColorBlack);
+		hoverPal->release();
+		hoverPal = core->CreatePalette(*hiColor, ColorBlack);
 	}
 
 	ClearDialogOptions(); // deletes previous options
 	// FIXME: calculate the real frame (padding)
-	dialogOptions = new TextContainer(Size(Width - EDGE_PADDING, -1), ftext, dialogPal);
+	dialogOptions = new TextContainer(Size(Width - EDGE_PADDING, -1), ftext, selectedPal);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
-		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, dialogPal, Size(Width - EDGE_PADDING, 0), IE_FONT_ALIGN_LEFT);
+		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, selectedPal, Size(Width - EDGE_PADDING, 0), IE_FONT_ALIGN_LEFT);
 		dialogOptSpans.push_back(std::make_pair(opts[i].first, span));
 		dialogOptions->AppendSpan(span); // container owns the span
 	}
@@ -696,7 +723,10 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 
 void TextArea::Clear()
 {
+	selectedSpan = NULL;
+	hoverSpan = NULL;
 	delete textContainer;
+
 	if (sb) {
 		// if we have a scrollbar we should grow as much as needed vertically
 		// pad only on left edge

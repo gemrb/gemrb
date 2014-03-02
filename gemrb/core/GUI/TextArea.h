@@ -47,12 +47,12 @@ namespace GemRB {
 
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
-#define IE_GUI_TEXTAREA_SELECTABLE   1
+#define IE_GUI_TEXTAREA_SELECTABLE   1	// listbox
 #define IE_GUI_TEXTAREA_AUTOSCROLL   2
-#define IE_GUI_TEXTAREA_SMOOTHSCROLL 4
-#define IE_GUI_TEXTAREA_HISTORY      8
-#define IE_GUI_TEXTAREA_SPEAKER      16
-#define IE_GUI_TEXTAREA_ALT_FONT     32   //this one disables drop capitals
+#define IE_GUI_TEXTAREA_SMOOTHSCROLL 4	// chapter text
+#define IE_GUI_TEXTAREA_HISTORY      8	// message window
+#define IE_GUI_TEXTAREA_SPEAKER      16	// message window
+#define IE_GUI_TEXTAREA_ALT_FONT     32	// this one disables drop capitals, unused
 #define IE_GUI_TEXTAREA_EDITABLE     64
 
 /**
@@ -106,7 +106,7 @@ private: // Private attributes
 	typedef std::pair<int, TextSpan*> DialogOptionSpan;
 	std::vector<DialogOptionSpan> dialogOptSpans;
 	TextContainer* dialogOptions;
-	TextSpan* selectedOption;
+	TextSpan* hoverSpan, *selectedSpan;
 	// standard text display
 	TextContainer* textContainer;
 	// TODO: we need a circular TextContainer subclass for the message window
@@ -120,11 +120,10 @@ private: // Private attributes
 	int rows;
 
 	/** Text Colors */
-	Palette* palette; // standard text color
-	Palette* dialogPal; // standard color for dialog options
-	Palette* selected; // selected text or highlight for hovered dialog options
-	Palette* lineselpal; // ???
-	Palette* initpalette; // palette for finit. used only is some cases.
+	Palette* palette;		// standard text color
+	Palette* hoverPal;		// palette for hovering options (dialog/listbox)
+	Palette* selectedPal;	// selected list box option, but also normal palette for dialog options.
+	Palette* initpalette;	// palette for finit. used only is some cases.
 
 	/** Fonts */
 	Font* finit, * ftext;
