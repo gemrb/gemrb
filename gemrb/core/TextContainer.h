@@ -86,10 +86,14 @@ public:
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
 	TextSpan* RemoveSpan(const TextSpan* span);
+	// excludes all attached spans such that new spans cannot flow adjacent
+	void ClearSpans();
 
 	void SetSpanPadding(TextSpan* span, Size pad);
 	TextSpan* SpanAtPoint(const Point& p) const;
+	Point PointForSpan(const TextSpan*);
 	const Size& ContainerFrame() const { return frame; }
+	void SetMaxFrame(const Size&);
 	void DrawContents(int x, int y) const;
 	// public so clients can allocate an area for drawing images or whatever they want
 	void AddExclusionRect(const Region& rect);

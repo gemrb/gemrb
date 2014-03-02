@@ -153,6 +153,17 @@ TextSpan* TextContainer::RemoveSpan(const TextSpan* span)
 	return NULL;
 }
 
+void TextContainer::ClearSpans()
+{
+	// FIXME: this isn't technically accurate
+	Region ex = *--ExclusionRects.end();
+	ex.w = maxFrame.w;
+	ex.h = ex.y + ex.h;
+	ex.y = 0;
+	ex.x = 0;
+	AddExclusionRect(ex);
+}
+
 TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 {
 	// the point we are testing is relative to the container
@@ -167,6 +178,16 @@ TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 		}
 	}
 	return NULL;
+}
+
+Point TextContainer::PointForSpan(const TextSpan* span)
+{
+	SpanList::iterator it;
+	it = std::find(spans.begin(), spans.end(), span);
+	if (it != spans.end()) {
+		return layout[*it].Origin();
+	}
+	return Point(-1, -1);
 }
 
 void TextContainer::SetSpanPadding(TextSpan* span, Size pad)
@@ -287,6 +308,11 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 	}
 	if (frame.w > maxFrame.w)
 		frame.w = maxFrame.w;
+}
+
+void TextContainer::SetMaxFrame(const Size& newSize) {
+	// TODO: need to relayout if width changed, or if hew height is greater
+	maxFrame = newSize;
 }
 
 void TextContainer::AddExclusionRect(const Region& rect)
