@@ -91,9 +91,10 @@ public:
 	TextSpan* SpanAtPoint(const Point& p) const;
 	const Size& ContainerFrame() const { return frame; }
 	void DrawContents(int x, int y) const;
+	// public so clients can allocate an area for drawing images or whatever they want
+	void AddExclusionRect(const Region& rect);
 private:
 	void LayoutSpansStartingAt(SpanList::const_iterator start);
-	void AddExclusionRect(const Region& rect);
 	const Region* ExcludedRegionForRect(const Region& rect);
 };
 
