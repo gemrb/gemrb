@@ -30,6 +30,8 @@
 #include "GUI/Window.h"
 #include "Scriptable/Actor.h"
 
+#define EDGE_PADDING 3
+
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
@@ -66,7 +68,8 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
 	dialogOptions = NULL;
 	selectedOption = NULL;
-	textContainer = new TextContainer(frame.Dimensions(), ftext, palette);
+	textContainer = NULL;
+	Clear();
 }
 
 TextArea::~TextArea(void)
@@ -114,9 +117,13 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
-	if (!textContainer) {
-		return;
+	// apply padding to the clip
+	if (sb) {
+		clip.w -= EDGE_PADDING;
+	} else {
+		clip.w -= EDGE_PADDING * 2;
 	}
+	clip.x += EDGE_PADDING;
 
 	Video *video = core->GetVideoDriver();
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
@@ -149,6 +156,13 @@ void TextArea::DrawInternal(Region& clip)
 	to this Text Area Control. */
 int TextArea::SetScrollBar(Control* ptr)
 {
+	if (!sb && ptr) {
+		// only pad left edge
+		textContainer->SetMaxFrame(Size(Width - EDGE_PADDING, -1));
+	} else if (sb && !ptr) {
+		// pad both edges
+		textContainer->SetMaxFrame(Size(Width - (EDGE_PADDING * 2), Height));
+	}
 	int ret = Control::SetScrollBar(ptr);
 	CalcRowCount();
 	return ret;
@@ -159,7 +173,6 @@ void TextArea::SetText(const char* text)
 {
 	Clear();
 	AppendText(text);
-	UpdateControls();
 }
 
 /** Appends a String to the current Text */
@@ -220,7 +233,7 @@ void TextArea::AppendText(String* text)
 								fnt = finit;
 								align = IE_FONT_SINGLE_LINE;
 							} else if (token == L"p") {
-								int w = Width;
+								int w = Width - EDGE_PADDING;
 								if (lastSpan) {
 									w -= lastSpan->SpanFrame().w;
 								}
@@ -306,7 +319,7 @@ void TextArea::AppendText(String* text)
 				text->erase(0, cappos + 1);
 				// FIXME: assuming we have more text!
 				// FIXME: the instances of the hard coded numbers are arbitrary padding values
-				Size s = Size(Width- dc->SpanFrame().w, GetRowHeight() + ftext->descent);
+				Size s = Size(Width - EDGE_PADDING - dc->SpanFrame().w, GetRowHeight() + ftext->descent);
 				TextSpan* span = new TextSpan(*text, ftext, palette, s, IE_FONT_ALIGN_LEFT);
 				textContainer->AppendSpan(span);
 				s.w -= 8; // FIXME: arbitrary padding
@@ -666,11 +679,11 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 
 	ClearDialogOptions(); // deletes previous options
 	// FIXME: calculate the real frame (padding)
-	dialogOptions = new TextContainer(Size(Width, -1), ftext, dialogPal);
+	dialogOptions = new TextContainer(Size(Width - EDGE_PADDING, -1), ftext, dialogPal);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
-		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, dialogPal, Size(Width, 0), IE_FONT_ALIGN_LEFT);
+		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, dialogPal, Size(Width - EDGE_PADDING, 0), IE_FONT_ALIGN_LEFT);
 		dialogOptSpans.push_back(std::make_pair(opts[i].first, span));
 		dialogOptions->AppendSpan(span); // container owns the span
 	}
@@ -686,10 +699,12 @@ void TextArea::Clear()
 	delete textContainer;
 	if (sb) {
 		// if we have a scrollbar we should grow as much as needed vertically
-		textContainer = new TextContainer(Size(Width, -1), ftext, palette);
+		// pad only on left edge
+		textContainer = new TextContainer(Size(Width - EDGE_PADDING, -1), ftext, palette);
 	} else {
 		// otherwise limit the text to our frame
-		textContainer = new TextContainer(ControlFrame().Dimensions(), ftext, palette);
+		// pad on both edges
+		textContainer = new TextContainer(Size(Width - (EDGE_PADDING * 2), Height), ftext, palette);
 	}
 }
 
