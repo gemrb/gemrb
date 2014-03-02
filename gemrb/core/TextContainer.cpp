@@ -31,14 +31,15 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 {
 	font = fnt;
 	spanSprite = NULL;
-	palette = NULL;
 
 	if (!pal) {
 		palette = fnt->GetPalette();
+		assert(palette);
 	} else {
+		palette = NULL;
 		SetPalette(pal);
 	}
-	alignment = IE_FONT_SINGLE_LINE;
+	alignment = 0;
 
 	RenderSpan(string);
 	text = string.substr(0, stringLen);
@@ -49,13 +50,15 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 {
 	font = fnt;
 	spanSprite = NULL;
-	palette = NULL;
+
 	if (!pal) {
-		pal = fnt->GetPalette();
-		pal->release();
+		palette = fnt->GetPalette();
+		assert(palette);
+	} else {
+		palette = NULL;
+		SetPalette(pal);
 	}
 
-	SetPalette(pal);
 	alignment = align;
 	RenderSpan(string);
 	// string is trimmed down to just the characters that fit.
@@ -192,7 +195,8 @@ Point TextContainer::PointForSpan(const TextSpan* span)
 
 void TextContainer::SetSpanPadding(TextSpan* span, Size pad)
 {
-	// FIXME: assuming span belongs to us
+	if (layout.find(span) == layout.end()) return;
+
 	Region rgn = layout[span];
 	rgn.x += pad.w;
 	rgn.y += pad.h;
