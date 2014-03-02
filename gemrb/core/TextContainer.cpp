@@ -259,9 +259,11 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 	if (it != spans.begin()) {
 		// get the next draw position to try
 		prevSpan = *--it;
-		const Region& rgn = layout[prevSpan];
-		drawPoint.y = rgn.y;
-		drawPoint.x = rgn.x + rgn.w;
+		if (layout.find(prevSpan) != layout.end()) {
+			const Region& rgn = layout[prevSpan];
+			drawPoint.y = rgn.y;
+			drawPoint.x = rgn.x + rgn.w;
+		}
 		it++;
 	}
 
@@ -281,7 +283,6 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 				if (drawPoint.x <= 0) // newline ?
 					drawPoint.x = maxFrame.w;
 			}
-			frame.w = drawPoint.x;
 			if (drawPoint.x && drawPoint.x + spanFrame.w > maxFrame.w) {
 				// move down and back
 				drawPoint.x = 0;
@@ -298,16 +299,25 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 			excluded = ExcludedRegionForRect(layoutRgn);
 		} while (excluded);
 
-		if (span->RenderedSpan()) // only layout redered spans
+		frame.w = (layoutRgn.w > frame.w) ? layoutRgn.w : frame.w;
+		if (span->RenderedSpan()) {
+			// only layout redered spans
+			assert(!layoutRgn.Dimensions().IsEmpty());
 			layout[span] = layoutRgn;
+		}
 		// TODO: need to extend the exclusion rect for some alignments
 		// eg right align should invalidate the entire area infront also
 		layoutRgn.h -= span->SpanDescent();
+		if (span->RenderedString().find_last_of(L"\n") == span->RenderedString().length() - 1) {
+			// if the span eneded in a newline we automatically know
+			// following spans should only go below this one
+			layoutRgn.w = (ieWord)-1;
+		}
 		assert(layoutRgn.h != -1);
 		AddExclusionRect(layoutRgn);
 		prevSpan = span;
 	}
-	// TODO: we ould optimize by testing *before* we try to add/layout a new span
+	// TODO: we could optimize by testing *before* we try to add/layout a new span
 	// we either shouldnt accept new spans that dont fit or at leat not lay them out
 	// currently we cant resize a container dynamically so...
 	ieWord newh = drawPoint.y + span->SpanFrame().h;
@@ -334,9 +344,9 @@ void TextContainer::AddExclusionRect(const Region& rect)
 			// already have an encompassing region
 			break;
 		} else if ((*it).InsideRegion(rect)) {
-			// new region swallows the old, replace it;
-			*it = rect;
-			break;
+			// cant just replace and break. may have eaten more than one...
+			it = ExclusionRects.erase(it);
+			if (it == ExclusionRects.end()) break;
 		}
 	}
 	if (it == ExclusionRects.end()) {
