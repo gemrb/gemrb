@@ -124,7 +124,7 @@ private: // Private attributes
 	Palette* dialogPal; // standard color for dialog options
 	Palette* selected; // selected text or highlight for hovered dialog options
 	Palette* lineselpal; // ???
-	//Palette* initpalette; // palette for finit. unused, but why?
+	Palette* initpalette; // palette for finit. used only is some cases.
 
 	/** Fonts */
 	Font* finit, * ftext;

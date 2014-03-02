@@ -33,7 +33,7 @@
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color hitextcolor, Color /*initcolor*/, Color lowtextcolor)
+				   Color hitextcolor, Color initcolor, Color lowtextcolor)
 	: Control(frame), ftext(text)
 {
 	ControlType = IE_GUI_TEXTAREA;
@@ -49,10 +49,10 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	// FIXME: the color/palette for the initials font is unused? why?
 	if (caps == ftext) {
 		finit = NULL;
-		//initpalette = NULL;
+		initpalette = NULL;
 	} else {
 		finit = caps;
-		//initpalette = core->CreatePalette( initcolor, lowtextcolor );
+		initpalette = core->CreatePalette( initcolor, lowtextcolor );
 	}
 	palette = core->CreatePalette( hitextcolor, lowtextcolor );
 	dialogPal = NULL;
@@ -74,7 +74,7 @@ TextArea::~TextArea(void)
 	ClearDialogOptions();
 
 	gamedata->FreePalette( palette );
-	//gamedata->FreePalette( initpalette );
+	gamedata->FreePalette( initpalette );
 	gamedata->FreePalette( dialogPal );
 	gamedata->FreePalette( selected );
 	gamedata->FreePalette( lineselpal );
@@ -292,18 +292,17 @@ void TextArea::AppendText(String* text)
 			// there was some text at the end without markup
 			textContainer->AppendText(token);
 		}
-	} else {
+	} else if (text->length()) {
 		if (finit) {
-			// FIXME: this assumes that finit is always for drop caps (not just a diffrent looking font)
-			// append drop cap spans
+			// append cap spans
 			size_t cappos = text->find_first_not_of(L"\n\t\r ");
+			// FIXME: ? maybe we actually want the newlines etc?
+			// I think maybe if we clean up the GUIScripts this isn't needed.
 			if (cappos != String::npos) {
-				// ensure we actually have text!
-				TextSpan* dc = new TextSpan(text->substr(cappos, 1), finit, NULL);
+				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
+				// need to figure out how to handle this because it breaks drop caps
+				TextSpan* dc = new TextSpan(text->substr(cappos, 1), finit, initpalette);
 				textContainer->AppendSpan(dc);
-				// this is sort of a hack for BAM fonts.
-				// drop caps dont exclude their entire frame because of their descent so we do it manually
-				textContainer->AddExclusionRect(Region(textContainer->PointForSpan(dc), dc->SpanFrame()));
 				text->erase(0, cappos + 1);
 				// FIXME: assuming we have more text!
 				// FIXME: the instances of the hard coded numbers are arbitrary padding values
@@ -312,16 +311,23 @@ void TextArea::AppendText(String* text)
 				textContainer->AppendSpan(span);
 				s.w -= 8; // FIXME: arbitrary padding
 				// drop cap height + a line descent minus the first line size
-				s.h = dc->SpanFrame().h + ftext->descent - GetRowHeight() + 1;
-				size_t textLen = span->RenderedString().length() - 1;
-				span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
-				textContainer->AppendSpan(span);
-				textLen += span->RenderedString().length() - 1;
+				s.h = dc->SpanFrame().h + ftext->descent - GetRowHeight() + 1;// + span->SpanDescent();
+				size_t textLen = span->RenderedString().length();
+				if (s.h >= ftext->maxHeight) {
+					// this is sort of a hack for BAM fonts.
+					// drop caps dont exclude their entire frame because of their descent so we do it manually
+					textContainer->AddExclusionRect(Region(textContainer->PointForSpan(dc), dc->SpanFrame()));
+
+					span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
+					textContainer->AppendSpan(span);
+					textLen += span->RenderedString().length();
+				}
 				// erase what has been handled
 				text->erase(0, textLen);
 			}
 		}
 		textContainer->AppendText(*text);
+		textContainer->ClearSpans();
 	}
 
 	// TODO: we will need to keep the string for editable TextAreas
