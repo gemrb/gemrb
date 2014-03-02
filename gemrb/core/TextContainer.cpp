@@ -124,7 +124,13 @@ TextContainer::~TextContainer()
 
 void TextContainer::AppendText(const String& text)
 {
-	AppendSpan(new TextSpan(text, font, pallete, Size(maxFrame.w, 0), 0));
+	if (text.length()) {
+		Size stringSize = font->StringSize(text);
+		if (stringSize.w < maxFrame.w)
+			AppendSpan(new TextSpan(text, font, pallete));
+		else
+			AppendSpan(new TextSpan(text, font, pallete, Size(maxFrame.w, 0), 0));
+	}
 }
 
 void TextContainer::AppendSpan(TextSpan* span)
