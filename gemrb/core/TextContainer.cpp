@@ -227,23 +227,25 @@ void TextContainer::DrawContents(int x, int y) const
 	}
 #endif
 	SpanLayout::const_iterator it;
+	TextSpan* span = NULL;
 	for (it = layout.begin(); it != layout.end(); ++it) {
+		span = (*it).first;
 		Region rgn = (*it).second;
 		rgn.x += x;
 		rgn.y += y;
 		if (!rgn.IntersectsRegion(drawRgn)) {
 			break; // layout is ordered so we know nothing else can draw
 		}
-		const Sprite2D* spr = (*it).first->RenderedSpan();
+		const Sprite2D* spr = span->RenderedSpan();
 		video->BlitSprite(spr, rgn.x, rgn.y, true, &rgn);
 #if DEBUG_TEXT
 		// draw the layout rect
 		video->DrawRect(rgn, ColorGreen, false);
 		// draw the actual sprite boundaries
-		rgn.x += (*it).first->RenderedSpan()->XPos;
-		rgn.y += (*it).first->RenderedSpan()->YPos;
-		rgn.w = (*it).first->RenderedSpan()->Width;
-		rgn.h = (*it).first->RenderedSpan()->Height;
+		rgn.x += span->RenderedSpan()->XPos;
+		rgn.y += span->RenderedSpan()->YPos;
+		rgn.w = span->RenderedSpan()->Width;
+		rgn.h = span->RenderedSpan()->Height;
 		video->DrawRect(rgn, ColorWhite, false);
 #endif
 	}
