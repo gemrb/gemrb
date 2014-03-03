@@ -184,6 +184,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
 			// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
 			// that would looks funny with partial translations, however. we would need to handle both simultaniously.
+			// TODO: word breaks shouldprobably happen on other characters such as '-' too.
+			// not as simple as adding it to find_first_of
 			while (!lineBreak && (wordBreak = line.find_first_of(L' ', linePos))) {
 				word = line.substr(linePos, wordBreak - linePos);
 
@@ -274,7 +276,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 		}
 
-		if (!lineBreak && !stream.eof())
+		if (!lineBreak && !stream.eof() && !done)
 			charCount++; // for the newline
 	}
 	if (lineBuffer)
@@ -413,9 +415,9 @@ size_t Font::Print(Region rgn, const String& string,
 Size Font::StringSize(const String& string, const Size* stop) const
 {
 	if (!string.length()) return Size();
+
 	ieWord w = 0, h = 0, lines = 1;
 	ieWord curh = 0, curw = 0;
-	int decent = 0, maxd = 0;
 	bool multiline = false;
 	for (size_t i = 0; i < string.length(); i++) {
 		if (string[i] == L'\n') {
@@ -427,8 +429,6 @@ Size Font::StringSize(const String& string, const Size* stop) const
 		} else {
 			const Sprite2D* curGlyph = GetCharSprite(string[i]);
 			curh = curGlyph->Height;
-			decent = curGlyph->Height - curGlyph->YPos;
-			maxd = (decent > maxd) ? decent : maxd;
 			curh += 0;
 			if (curh > h)
 				h = curh;
@@ -442,12 +442,11 @@ Size Font::StringSize(const String& string, const Size* stop) const
 						(curh > stop->h) ? stop->h : curh);
 	}
 	if (!multiline) {
-		h += maxd;
+		h = maxHeight + descent;
 	} else {
-		h = (maxHeight * lines) + this->descent;
+		h = (maxHeight * lines) + descent;
 	}
 	w = (curw > w) ? curw : w;
-	assert(w);
 	return Size(w, h);
 }
 
