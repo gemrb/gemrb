@@ -70,7 +70,7 @@ void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
 	}
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta) {
-		ta->AppendText( new String(Text) );
+		ta->AppendText( Text );
 	} else {
 		if(target) {
 			target->SetOverheadText(&Text);

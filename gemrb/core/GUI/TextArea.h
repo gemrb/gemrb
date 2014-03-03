@@ -62,6 +62,8 @@ namespace GemRB {
  */
 
 class GEM_EXPORT TextArea : public Control {
+private:
+	String Text;
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
@@ -79,7 +81,7 @@ public:
 	void Clear();
 	/** Appends a String to the current Text */
 	void AppendText(const char* text);
-	void AppendText(String* text);
+	void AppendText(const String& text);
 	/** Inserts a String into the current Text at pos */
 	int InsertText(const char* text, int pos);
 	/** Sets up auto scrolling (chapter text) */

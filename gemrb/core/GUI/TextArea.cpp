@@ -36,7 +36,7 @@ namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 				   Color hitextcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), ftext(text)
+	: Control(frame), Text(), ftext(text)
 {
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
@@ -176,19 +176,19 @@ void TextArea::SetText(const char* text)
 void TextArea::AppendText(const char* text)
 {
 	if (text) {
-		AppendText(StringFromCString(text));
+		String* string = StringFromCString(text);
+		AppendText(*string);
+		delete string;
 	}
 }
 
-void TextArea::AppendText(String* text)
+void TextArea::AppendText(const String& text)
 {
-	assert(text && text->length());
-
-	size_t tagPos = text->find_first_of('[');
+	size_t tagPos = text.find_first_of('[');
 	if (tagPos != String::npos) {
 		if (tagPos != 0) {
 			// handle any text before the markup
-			textContainer->AppendText(text->substr(0, tagPos));
+			textContainer->AppendText(text.substr(0, tagPos));
 		}
 		// parse the text looking for accepted tags ([cap], [color], [p])
 		// [cap] encloses a span of text to be rendered with the finit font
@@ -213,8 +213,8 @@ void TextArea::AppendText(String* text)
 		TextSpan* lastSpan = NULL;
 		String token;
 		ParseState state = TEXT;
-		String::iterator it = text->begin() + tagPos;
-		for (; it != text->end(); it++) {
+		String::const_iterator it = text.begin() + tagPos;
+		for (; it != text.end(); it++) {
 			switch (state) {
 				case OPEN_TAG:
 					switch (*it) {
@@ -302,46 +302,47 @@ void TextArea::AppendText(String* text)
 			// there was some text at the end without markup
 			textContainer->AppendText(token);
 		}
-	} else if (text->length()) {
+	} else if (text.length()) {
 		if (finit) {
 			// append cap spans
-			size_t cappos = text->find_first_not_of(L"\n\t\r ");
+			size_t textpos = text.find_first_not_of(L"\n\t\r ");
 			// FIXME: ? maybe we actually want the newlines etc?
 			// I think maybe if we clean up the GUIScripts this isn't needed.
-			if (cappos != String::npos) {
+			if (textpos != String::npos) {
 				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
 				// need to figure out how to handle this because it breaks drop caps
-				TextSpan* dc = new TextSpan(text->substr(cappos, 1), finit, initpalette);
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, initpalette);
 				textContainer->AppendSpan(dc);
-				text->erase(0, cappos + 1);
+				textpos++;
 				// FIXME: assuming we have more text!
 				// FIXME: the instances of the hard coded numbers are arbitrary padding values
 				Size s = Size(Width - EDGE_PADDING - dc->SpanFrame().w, GetRowHeight() + ftext->descent);
-				TextSpan* span = new TextSpan(*text, ftext, palette, s, IE_FONT_ALIGN_LEFT);
+				TextSpan* span = new TextSpan(text.substr(textpos), ftext, palette, s, IE_FONT_ALIGN_LEFT);
 				textContainer->AppendSpan(span);
 				s.w -= 8; // FIXME: arbitrary padding
 				// drop cap height + a line descent minus the first line size
 				s.h = dc->SpanFrame().h + ftext->descent - GetRowHeight() + 1;// + span->SpanDescent();
-				size_t textLen = span->RenderedString().length();
+				textpos += span->RenderedString().length();
 				if (s.h >= ftext->maxHeight) {
 					// this is sort of a hack for BAM fonts.
 					// drop caps dont exclude their entire frame because of their descent so we do it manually
 					textContainer->AddExclusionRect(Region(textContainer->PointForSpan(dc), dc->SpanFrame()));
 
-					span = new TextSpan(text->substr(textLen), ftext, palette, s, IE_FONT_ALIGN_LEFT);
+					span = new TextSpan(text.substr(textpos), ftext, palette, s, IE_FONT_ALIGN_LEFT);
 					textContainer->AppendSpan(span);
-					textLen += span->RenderedString().length();
+					textpos += span->RenderedString().length();
 				}
-				// erase what has been handled
-				text->erase(0, textLen);
+			} else {
+				textpos = 0;
 			}
+			textContainer->AppendText(text.substr(textpos));
+		} else {
+			textContainer->AppendText(text);
 		}
-		textContainer->AppendText(*text);
 		textContainer->ClearSpans();
 	}
 
-	// TODO: we will need to keep the string for editable TextAreas
-	delete text; // we own this, but don't need it now
+	Text.append(text);
 	UpdateControls();
 }
 
@@ -656,14 +657,7 @@ void TextArea::SelectText(const char* /*select*/)
 
 const String& TextArea::QueryText() const
 {
-	// FIXME: implement this properly
-	return Control::QueryText();
-	/*
-	if ( Value<lines.size() ) {
-		return ( const char * ) lines[Value];
-	}
-	return "";
-	 */
+	return Text;
 }
 
 bool TextArea::SetEvent(int eventType, EventHandler handler)
@@ -723,6 +717,7 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 
 void TextArea::Clear()
 {
+	Text.clear();
 	selectedSpan = NULL;
 	hoverSpan = NULL;
 	delete textContainer;

@@ -504,8 +504,8 @@ static PyObject* GemRB_TextArea_MoveText(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	// TODO: should be something like DstTA->SetText(SrcTA->GetText());
-	//SrcTA->CopyTo( DstTA );
+	DstTA->Clear();
+	DstTA->AppendText(SrcTA->QueryText());
 
 	Py_INCREF( Py_None );
 	return Py_None;
