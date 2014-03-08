@@ -18,12 +18,6 @@
  *
  */
 
-/**
- * @file TextArea.h
- * Declares TextArea widget for displaying long paragraphs of text
- * @author The GemRB Project
- */
-
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
@@ -69,6 +63,7 @@ protected:
 	void DrawInternal(Region& drawFrame);
 	bool NeedsDraw();
 	bool HasBackground() { return false; }
+	void FlagsChanging(ieDword);
 public:
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);

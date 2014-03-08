@@ -49,8 +49,8 @@ def OnLoad():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)
 
 	MessageTA = MessageWindow.GetControl (1)
-	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
-	MessageTA.SetHistory (100)
+	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+
 	GemRB.SetVar ("MessageTextArea", MessageTA.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)

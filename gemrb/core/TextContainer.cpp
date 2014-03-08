@@ -367,4 +367,50 @@ const Region* TextContainer::ExcludedRegionForRect(const Region& rect)
 	return NULL;
 }
 
+
+
+void RestrainedTextContainer::AppendSpan(TextSpan* span)
+{
+	while (spans.size() >= spanLimit) {
+		// we need to remove the first span and any spans on the same "line"
+		SpanList::iterator it = spans.begin();
+		TextSpan* span = *it;
+		Region rgn = layout[span];
+
+		// extend the region all the way across the container and up to the top
+		rgn.x = 0;
+		rgn.w = maxFrame.w;
+		rgn.h += rgn.y;
+		rgn.h -= span->SpanDescent();
+		rgn.y = 0;
+		// now iterate the list and erase until we find a span that doesnt intersect
+		do {
+			span = *it;
+			if (!rgn.IntersectsRegion(layout[span])) {
+				break;
+			}
+			layout.erase(span);
+			delete span;
+		} while (++it != spans.end());
+		spans.erase(spans.begin(), it);
+
+		// adjust the remainder
+		int offset = layout[spans.front()].y;
+		int h = 0;
+		for (it = spans.begin(); it != spans.end(); ++it) {
+			Region& r = layout[*it];
+			r.y -= offset;
+			h += r.h;
+		}
+
+		// destroy all exclusions and recreate a single exclusion
+		ExclusionRects.clear();
+		if (h) {
+			rgn.h = h;
+			AddExclusionRect(rgn);
+		}
+	}
+	TextContainer::AppendSpan(span);
+}
+
 }

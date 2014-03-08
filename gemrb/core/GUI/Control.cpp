@@ -252,25 +252,28 @@ int Control::SetFlags(int arg_flags, int opcode)
 			arg_flags, ControlID, opcode);
 		return -2;
 	}
+	ieDword newFlags = Flags;
 	switch (opcode) {
 		case BM_SET:
-			Flags = arg_flags;  //set
+			newFlags = arg_flags;  //set
 			break;
 		case BM_AND:
-			Flags &= arg_flags;
+			newFlags &= arg_flags;
 			break;
 		case BM_OR:
-			Flags |= arg_flags; //turn on
+			newFlags |= arg_flags; //turn on
 			break;
 		case BM_XOR:
-			Flags ^= arg_flags;
+			newFlags ^= arg_flags;
 			break;
 		case BM_NAND:
-			Flags &= ~arg_flags;//turn off
+			newFlags &= ~arg_flags;//turn off
 			break;
 		default:
 			return -1;
 	}
+	FlagsChanging(newFlags);
+	Flags = newFlags;
 	Changed = true;
 	Owner->Invalidate();
 	return 0;

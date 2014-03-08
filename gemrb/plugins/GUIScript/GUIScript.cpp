@@ -534,28 +534,6 @@ static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_TextArea_SetHistory__doc,
-"SetTAHistory(Win, Ctrl, KeepLines)\n\n"
-"Sets up a TextArea to expire scrolled out lines.");
-
-static PyObject* GemRB_TextArea_SetHistory(PyObject * /*self*/, PyObject* args)
-{
-	int Win, Ctrl, Keep;
-
-	if (!PyArg_ParseTuple( args, "iii", &Win, &Ctrl, &Keep)) {
-		return AttributeError( GemRB_TextArea_SetHistory__doc );
-	}
-
-	TextArea* ctrl = ( TextArea* ) GetControl( Win, Ctrl, IE_GUI_TEXTAREA);
-	if (!ctrl) {
-		return NULL;
-	}
-
-	//ctrl->SetPreservedRow(Keep);
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_StatComment__doc,
 "StatComment(Strref, X, Y) => string\n\n"
 "Replaces values X and Y into an strref in place of %%d." );
@@ -10849,7 +10827,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_Rewind, METH_VARARGS),
 	METHOD(TextArea_Scroll, METH_VARARGS),
 	METHOD(TextArea_SelectText, METH_VARARGS),
-	METHOD(TextArea_SetHistory, METH_VARARGS),
 	METHOD(TextEdit_ConvertEdit, METH_VARARGS),
 	METHOD(TextEdit_SetBackground, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),

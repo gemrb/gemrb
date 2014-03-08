@@ -137,7 +137,6 @@ class GTextArea(GControl):
   __metaclass__ = metaControl
   methods = {
     'Rewind': _GemRB.TextArea_Rewind,
-    'SetHistory': _GemRB.TextArea_SetHistory,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
     'Scroll': _GemRB.TextArea_Scroll,

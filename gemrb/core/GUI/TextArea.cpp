@@ -722,14 +722,32 @@ void TextArea::Clear()
 	hoverSpan = NULL;
 	delete textContainer;
 
+	Size frame;
 	if (sb) {
 		// if we have a scrollbar we should grow as much as needed vertically
 		// pad only on left edge
-		textContainer = new TextContainer(Size(Width - EDGE_PADDING, -1), ftext, palette);
+		frame.w = Width - EDGE_PADDING;
+		frame.h = -1;
 	} else {
 		// otherwise limit the text to our frame
 		// pad on both edges
-		textContainer = new TextContainer(Size(Width - (EDGE_PADDING * 2), Height), ftext, palette);
+		frame.w = Width - (EDGE_PADDING * 2);
+		frame.h = Height;
+	}
+	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
+		// limit of 50 spans is roughly 25 messages (1 span for actor, 1 for message)
+		textContainer = new RestrainedTextContainer(frame, ftext, palette, 50);
+	} else {
+		textContainer = new TextContainer(frame, ftext, palette);
+	}
+}
+
+void TextArea::FlagsChanging(ieDword newFlags)
+{
+	if ((newFlags^Flags)&IE_GUI_TEXTAREA_HISTORY) {
+		// FIXME: not well implemented.
+		// any text is lost when changing this flag.
+		Clear();
 	}
 }
 

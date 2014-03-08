@@ -63,6 +63,7 @@ private:
 
 class TextContainer
 {
+protected:
 	typedef std::list<TextSpan*> SpanList;
 	SpanList spans;
 	typedef std::map<TextSpan*, Region> SpanLayout;
@@ -75,14 +76,14 @@ class TextContainer
 	Palette* pallete;
 public:
 	TextContainer(const Size& frame, Font* font, Palette* pal);
-	~TextContainer();
+	virtual ~TextContainer();
 
 	// Creates a basic "inline" span using the containers font/palette
 	void AppendText(const String& text);
 	// append the span to the end of the container. The container takes ownership of the span.
-	void AppendSpan(TextSpan* span);
+	virtual void AppendSpan(TextSpan* span);
 	// Insert a span to a new position in the list. The container takes ownership of the span.
-	void InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing);
+	virtual void InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing);
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
 	TextSpan* RemoveSpan(const TextSpan* span);
@@ -100,6 +101,30 @@ public:
 private:
 	void LayoutSpansStartingAt(SpanList::const_iterator start);
 	const Region* ExcludedRegionForRect(const Region& rect);
+};
+
+/*
+ We could choose to limit text in any number of ways (by "line", by size, or by span count)
+ Since the goal here is simply to keep the amount of text from becoming burdonsome the method doesn't matter
+ as long as we remain close to the given limit.
+ 
+ I have selected to limit by number of spans since it seemed easiest. This isn't a hard limit as the number of spans may be
+ reduced below the limit based on how many spans intersect the area from the top of the container to the bottom of the top span.
+ 
+ This effectively pops messages one at a time from the MessageWindow instead of droping single lines of text.
+ I feel this is a supirior method because it prevents having truncated messages.
+*/
+
+class RestrainedTextContainer : public TextContainer
+{
+private:
+	size_t spanLimit;
+
+public:
+	RestrainedTextContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
+	: TextContainer(frame, font, pal) { spanLimit = limit; }
+
+	void AppendSpan(TextSpan* span);
 };
 
 }
