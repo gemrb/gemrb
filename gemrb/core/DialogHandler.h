@@ -27,6 +27,8 @@
 
 namespace GemRB {
 
+class Control;
+
 typedef std::pair<int, String> DialogOption;
 
 class GEM_EXPORT DialogHandler {
@@ -50,7 +52,8 @@ public:
 
 	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
-	void DialogChoose(unsigned int choose);
+	bool DialogChoose(unsigned int choose);
+	bool DialogChoose(Control*);
 };
 
 }

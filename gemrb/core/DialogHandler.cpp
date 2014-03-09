@@ -187,28 +187,33 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
+bool DialogHandler::DialogChoose(Control* ctl)
+{
+	return DialogChoose(ctl->Value);
+}
 
-void DialogHandler::DialogChoose(unsigned int choose)
+bool DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
 		Log(ERROR, "GameControl", "Dialog aborted???");
 		EndDialog();
-		return;
+		return false;
 	}
+	ta->ClearDialogOptions();
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
 		Log(ERROR, "GameControl", "Speaker gone???");
 		EndDialog();
-		return;
+		return false;
 	}
 
 	Scriptable *target = GetTarget();
 	if (!target) {
 		Log(ERROR, "GameControl", "Target gone???");
 		EndDialog();
-		return;
+		return false;
 	}
 	Actor *tgt = NULL;
 	if (target->Type == ST_ACTOR) {
@@ -222,7 +227,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		si = initialState;
 		if (si<0) {
 			EndDialog();
-			return;
+			return false;
 		}
 
 		if (tgt) {
@@ -237,7 +242,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		//ds = dlg->GetState( si );
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
-			return;
+			return false;
 		}
 
 		DialogTransition* tr = ds->transitions[choose];
@@ -264,7 +269,6 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			//allow_zero is for PST (deionarra's text)
 			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
-				ta->AppendText( "" );
 			}
 		}
 		target->ImmediateEvent();
@@ -294,7 +298,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (final_dialog) {
-			return;
+			return false;
 		}
 
 		// avoid problems when dhjollde.dlg tries starting a cutscene in the middle of a dialog
@@ -344,7 +348,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			if (!target) {
 				Log(WARNING, "Dialog", "Can't redirect dialog");
 				EndDialog();
-				return;
+				return false;
 			}
 			Actor *oldTarget = GetActorByGlobalID(targetID);
 			targetID = tgt->GetGlobalID();
@@ -364,7 +368,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			if (!InitDialog( speaker, target, tmpresref)) {
 				// error was displayed by InitDialog
 				EndDialog();
-				return;
+				return false;
 			}
 		}
 	}
@@ -373,7 +377,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	if (!ds) {
 		Log(WARNING, "Dialog", "Can't find next dialog");
 		EndDialog();
-		return;
+		return false;
 	}
 
 	//displaying npc text
@@ -381,6 +385,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 
 	int idx = 0;
 	std::vector<DialogOption> dialogOptions;
+	ControlEventHandler handler = NULL;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
 	unsigned int x = ds->transitionsCount;
 	while(x--) {
@@ -420,6 +425,9 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		}
 	}
 	ta->SetDialogOptions(dialogOptions, &ColorRed, &ColorWhite);
+	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
+	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);
+
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "Dialog", "There were no valid dialog options!");
@@ -429,8 +437,8 @@ end_of_choose:
 	//padding the rows so our text will be at the top
 	if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 		// FIXME: this is a poor solution
-		ta->AppendText( "" );
 	}
+	return true;
 }
 
 // TODO: duplicate of the one in GameControl

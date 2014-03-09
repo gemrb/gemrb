@@ -37,7 +37,8 @@ namespace GemRB {
 
 // Keep these synchronized with GUIDefines.py
 // 0x05 is the control type of TextArea
-#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000
+#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000 // text change event (keyboard, etc)
+#define IE_GUI_TEXTAREA_ON_SELECT	0x05000001 // selection event such as dialog or a listbox
 
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
@@ -132,8 +133,9 @@ private: // Private attributes
 
 	/** OnChange Scripted Event Function Name */
 	ControlEventHandler TextAreaOnChange;
+	ControlEventHandler TextAreaOnSelect;
+
 private: //internal functions
-	void ClearDialogOptions();
 	void CalcRowCount();
 	void UpdateControls();
 	void RefreshSprite(const char *portrait);
@@ -156,6 +158,8 @@ public: //Events
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
+
+	void ClearDialogOptions();
 };
 
 }

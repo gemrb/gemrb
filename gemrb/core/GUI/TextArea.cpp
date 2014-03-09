@@ -46,6 +46,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	CurPos = 0;
 	Value = -1;
 	ResetEventHandler( TextAreaOnChange );
+	ResetEventHandler( TextAreaOnSelect );
 	PortraitResRef[0]=0;
 	// quick font optimization (prevents creating unnecessary spans)
 	// FIXME: the color/palette for the initials font is unused? why?
@@ -385,7 +386,6 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			// TODO: implement this! currently does nothing
 
 			CurPos++;
-			//print("pos: %d After: %s", CurPos, lines[CurLine]);
 			CalcRowCount();
 			RunEventHandler( TextAreaOnChange );
 		}
@@ -395,21 +395,19 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	//Selectable=false for dialogs, rather unintuitive, but fact
 	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' ))
 		return false;
-	GameControl *gc = core->GetGameControl();
-	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-		MarkDirty();
 
-		size_t lookupIdx = Key - '1';
-		int dlgIdx = -1;
-		if (lookupIdx < dialogOptSpans.size()) {
-			dlgIdx = dialogOptSpans[lookupIdx].first;
-			assert(dlgIdx >= 0);
-			gc->dialoghandler->DialogChoose( dlgIdx );
-			ClearDialogOptions();
-		}
-		return true;
+	MarkDirty();
+
+	size_t lookupIdx = Key - '1';
+	int dlgIdx = -1;
+	if (lookupIdx < dialogOptSpans.size()) {
+		dlgIdx = dialogOptSpans[lookupIdx].first;
+		assert(dlgIdx >= 0);
+		//gc->dialoghandler->DialogChoose( dlgIdx );
+		Value = dlgIdx;
+		RunEventHandler(TextAreaOnSelect);
 	}
-	return false;
+	return true;
 }
 
 /** Special Key Press */
@@ -590,7 +588,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short y,
+void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 						 unsigned short Button, unsigned short /*Mod*/)
 {
 	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
@@ -606,39 +604,24 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short y,
 		selectedSpan->SetPalette(selectedPal);
 
 		if (dialogOptions) {
-			// FIXME: can't this be done by setting Value and doing a callback?
-			// TextArea ideally shouldnt know anything about this
-			GameControl* gc = core->GetGameControl();
-			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-				int dlgIdx = -1;
-				std::vector<DialogOptionSpan>::const_iterator it;
-				for (it = dialogOptSpans.begin(); it != dialogOptSpans.end(); ++it) {
-					if( (*it).second == selectedSpan ) {
-						dlgIdx = (*it).first;
-						break;
-					}
+			int dlgIdx = -1;
+			std::vector<DialogOptionSpan>::const_iterator it;
+			for (it = dialogOptSpans.begin(); it != dialogOptSpans.end(); ++it) {
+				if( (*it).second == selectedSpan ) {
+					dlgIdx = (*it).first;
+					break;
 				}
-				if (dlgIdx == -1) {
-					//this kills this object, don't use any more data!
-					gc->dialoghandler->EndDialog();
-					return;
-				}
-				gc->dialoghandler->DialogChoose( dlgIdx );
-				ClearDialogOptions();
-				//return;
-				Value = dlgIdx;
 			}
-		} else {
-			Value = (TextYPos + y) / GetRowHeight();
-		}
 
-		if (VarName[0] != 0) {
-			core->GetDictionary()->SetAt( VarName, Value );
+			Value = dlgIdx;
+			RunEventHandler(TextAreaOnSelect);
+
+			if (VarName[0] != 0) {
+				core->GetDictionary()->SetAt( VarName, Value );
+			}
 		}
 	}
 	MarkDirty();
-
-	RunEventHandler( TextAreaOnChange );
 }
 
 void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
@@ -665,6 +648,9 @@ bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
 	switch (eventType) {
 	case IE_GUI_TEXTAREA_ON_CHANGE:
 		TextAreaOnChange = handler;
+		break;
+	case IE_GUI_TEXTAREA_ON_SELECT:
+		TextAreaOnSelect = handler;
 		break;
 	default:
 		return false;
