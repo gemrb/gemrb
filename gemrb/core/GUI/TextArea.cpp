@@ -660,7 +660,7 @@ const String& TextArea::QueryText() const
 	return Text;
 }
 
-bool TextArea::SetEvent(int eventType, EventHandler handler)
+bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_TEXTAREA_ON_CHANGE:

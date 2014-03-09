@@ -1166,7 +1166,7 @@ void Interface::Main()
 					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE );
 		}
 		if (TickHook)
-			TickHook->call();
+			TickHook();
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 	gamedata->FreePalette( palette );
 }

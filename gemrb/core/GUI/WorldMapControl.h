@@ -77,7 +77,7 @@ public:
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	//font for printing area names
 	Font* ftext;
@@ -92,9 +92,9 @@ private:
 	/** Label color of a not yet visited area */
 	Palette *pal_notvisited;
 	/** guiscript Event when button pressed */
-	EventHandler WorldMapControlOnPress;
+	ControlEventHandler WorldMapControlOnPress;
 	/** guiscript Event when mouse is over a reachable area */
-	EventHandler WorldMapControlOnEnter;
+	ControlEventHandler WorldMapControlOnEnter;
 
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);

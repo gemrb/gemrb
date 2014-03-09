@@ -195,7 +195,7 @@ void Console::SetFocus(bool focus)
 	}
 }
 
-bool Console::SetEvent(int /*eventType*/, EventHandler /*handler*/)
+bool Console::SetEvent(int /*eventType*/, ControlEventHandler /*handler*/)
 {
 	return false;
 }

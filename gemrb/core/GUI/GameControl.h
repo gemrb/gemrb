@@ -260,7 +260,7 @@ public:
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
 	void SetupCasting(ieResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	void ToggleAlwaysRun();
 };
 

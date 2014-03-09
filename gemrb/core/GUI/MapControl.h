@@ -70,9 +70,9 @@ public:
 	// Size of area viewport. FIXME: hack!
 	short ViewWidth, ViewHeight;
 	short XCenter, YCenter;
-	EventHandler MapControlOnPress;
-	EventHandler MapControlOnRightPress;
-	EventHandler MapControlOnDoublePress;
+	ControlEventHandler MapControlOnPress;
+	ControlEventHandler MapControlOnRightPress;
+	ControlEventHandler MapControlOnDoublePress;
 
 	MapControl(const Region& frame);
 	~MapControl(void);
@@ -96,7 +96,7 @@ public:
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	/** Call event handler on click */
 	void ClickHandle(unsigned short Button);

@@ -39,15 +39,6 @@ static bool CallPython(PyObject *Function, PyObject *args = NULL)
 	return true;
 }
 
-static bool CallPython(PyObject *Function, int arg)
-{
-	if (!Function) {
-		return false;
-	}
-	PyObject *args = Py_BuildValue("(i)", arg);
-	return CallPython(Function, args);
-}
-
 PythonCallback::PythonCallback(PyObject *Function)
 	: Function(Function)
 {
@@ -65,7 +56,7 @@ PythonCallback::~PythonCallback()
 	}
 }
 
-bool PythonCallback::call ()
+bool PythonCallback::operator() ()
 {
 	if (!Function || !Py_IsInitialized()) {
 		return false;
@@ -73,10 +64,69 @@ bool PythonCallback::call ()
 	return CallPython(Function);
 }
 
-bool PythonCallback::call (int arg)
+
+PythonControlCallback::PythonControlCallback(PyObject *Function)
+: Function(Function)
+{
+	if (Function && PyCallable_Check(Function)) {
+		Py_INCREF(Function);
+	} else {
+		Function = NULL;
+	}
+}
+
+PythonControlCallback::~PythonControlCallback()
+{
+	if (Py_IsInitialized()) {
+		Py_XDECREF(Function);
+	}
+}
+
+bool PythonControlCallback::operator() ()
+{
+	return (*this)(NULL);
+}
+
+bool PythonControlCallback::operator() (Control* /*ctrl*/)
 {
 	if (!Function || !Py_IsInitialized()) {
 		return false;
 	}
-	return CallPython(Function, arg);
+
+	/*
+	const char* type = "Control";
+	switch(ctrl->ControlType) {
+		case IE_GUI_LABEL:
+			type = "Label";
+			break;
+		case IE_GUI_EDIT:
+			type = "TextEdit";
+			break;
+		case IE_GUI_SCROLLBAR:
+			type = "ScrollBar";
+			break;
+		case IE_GUI_TEXTAREA:
+			type = "TextArea";
+			break;
+		case IE_GUI_BUTTON:
+			type = "Button";
+			break;
+		case IE_GUI_WORLDMAP:
+			type = "WorldMap";
+			break;
+		default:
+			break;
+	}
+	// FIXME: how the fuck do you get the window and control index?
+	// I really lothe that we use an index for this :/
+
+	PyObject* ctrltuple = Py_BuildValue("(ii)", 0, 0);
+	PyObject* obj = gs->ConstructObject(type, ctrltuple);
+	Py_DECREF(ctrltuple);
+	PyObject *args = Py_BuildValue("(i)", obj);
+	 return CallPython(Function, args);
+	*/
+
+	// TODO: it would probably be nice for python callbacks to receive the control. could be useful
+	return CallPython(Function, NULL);
 }

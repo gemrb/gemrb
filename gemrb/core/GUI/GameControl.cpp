@@ -2645,7 +2645,7 @@ void GameControl::SetupCasting(ieResRef spellname, int type, int level, int idx,
 }
 
 //another method inherited from Control which has no use here
-bool GameControl::SetEvent(int /*eventType*/, EventHandler /*handler*/)
+bool GameControl::SetEvent(int /*eventType*/, ControlEventHandler /*handler*/)
 {
 	return false;
 }

@@ -98,12 +98,12 @@ public: //Events
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
 	/** OnChange Scripted Event Function Name */
-	EventHandler EditOnChange;
-	EventHandler EditOnDone;
-	EventHandler EditOnCancel;
+	ControlEventHandler EditOnChange;
+	ControlEventHandler EditOnDone;
+	ControlEventHandler EditOnCancel;
 };
 
 }

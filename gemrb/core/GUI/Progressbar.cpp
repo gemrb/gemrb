@@ -159,7 +159,7 @@ void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
 	CapYPos=y2;
 }
 
-bool Progressbar::SetEvent(int eventType, EventHandler handler)
+bool Progressbar::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_PROGRESS_END_REACHED:

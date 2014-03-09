@@ -70,11 +70,11 @@ public:
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** Use the RGB Color for the Font */
 	bool useRGB;
 	/** OnPress Scripted Event Function Name */
-	EventHandler LabelOnPress;
+	ControlEventHandler LabelOnPress;
 private: // Private attributes
 	/** Text String Buffer */
 	String Text;

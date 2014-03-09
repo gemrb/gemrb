@@ -25,14 +25,46 @@
 
 namespace GemRB {
 
-class GEM_EXPORT Callback : public Held<Callback> {
+class GEM_EXPORT VoidCallback : public Held<VoidCallback> {
 public:
-	virtual ~Callback();
-	virtual bool call ();
-	virtual bool call (int);
+	virtual ~VoidCallback() {};
+	virtual bool operator()()=0;
 };
 
-typedef Holder<Callback> EventHandler;
+template<class T>
+class GEM_EXPORT Callback : public VoidCallback {
+public:
+	virtual bool operator()(T target)=0;
+};
+
+template<class L, typename T>
+class GEM_EXPORT MethodCallback : public Callback<T> {
+	typedef bool (L::*CallbackMethod)(T);
+private:
+	L* listener;
+	CallbackMethod callback;
+public:
+	MethodCallback(L* l, CallbackMethod cb)
+	: listener(l), callback(cb) {}
+
+	bool operator()(T target) {
+		return (listener->*callback)(target);
+	}
+
+	bool operator()() {
+		return true;
+	}
+};
+
+class GEM_EXPORT EventHandler : public Holder<VoidCallback> {
+public:
+	EventHandler(VoidCallback* ptr = NULL)
+	: Holder<VoidCallback>(ptr) {}
+
+	bool operator()() {
+		return (*ptr)();
+	}
+};
 
 }
 

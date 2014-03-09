@@ -110,9 +110,9 @@ public: // Public Events
 	/** Mouse Wheel Scroll Event */
 	void OnMouseWheelScroll(short x, short y);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** OnChange Scripted Event Function Name */
-	EventHandler ScrollBarOnChange;
+	ControlEventHandler ScrollBarOnChange;
 };
 
 }

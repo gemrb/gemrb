@@ -157,7 +157,7 @@ void Control::DisplayTooltip()
 		core->DisplayTooltip( 0, 0, NULL );
 }
 
-void Control::ResetEventHandler(EventHandler &handler)
+void Control::ResetEventHandler(ControlEventHandler &handler)
 {
 	handler = NULL;
 }
@@ -165,7 +165,7 @@ void Control::ResetEventHandler(EventHandler &handler)
 //return -1 if there is an error
 //return 1 if there is no handler (not an error)
 //return 0 if the handler ran as intended
-int Control::RunEventHandler(EventHandler handler)
+int Control::RunEventHandler(ControlEventHandler handler)
 {
 	if (InHandler) {
 		Log(WARNING, "Control", "Nested event handlers are not supported!");
@@ -180,7 +180,7 @@ int Control::RunEventHandler(EventHandler handler)
 		unsigned short ID = (unsigned short) ControlID;
 		InHandler = true;
 		//TODO: detect caller errors, trap them???
-		handler->call();
+		handler(this);
 		InHandler = false;
 		if (!core->IsValidWindow(WID,wnd) ) {
 			Log(ERROR, "Control", "Owner window destructed!");

@@ -87,7 +87,7 @@ public: //Events
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
 	void SetFocus(bool focus);
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	void HistoryBack();
 	void HistoryForward();

@@ -53,6 +53,7 @@
 namespace GemRB {
 
 class ControlAnimation;
+class ControlEventHandler;
 class Sprite2D;
 class Window;
 
@@ -125,7 +126,7 @@ public: // Public attributes
 	ieDword FunctionNumber;
 public: //Events
 	/** Reset/init event handler */
-	void ResetEventHandler(EventHandler &handler);
+	void ResetEventHandler(ControlEventHandler &handler);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
@@ -134,9 +135,9 @@ public: //Events
 	bool isFocused();
 	virtual bool WantsDragOperation() { return false; };
 	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, EventHandler handler) = 0;
+	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
 	/** Run specified handler, it may return error code */
-	int RunEventHandler(EventHandler handler);
+	int RunEventHandler(ControlEventHandler handler);
 	/** Key Press Event */
 	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	/** Key Release Event */
@@ -169,6 +170,16 @@ public: //Events
 	/** Assigned function key */
 	void SetFunctionNumber(int x) { FunctionNumber = x; }
 	int GetFunctionNumber() { return FunctionNumber; }
+};
+
+class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*> > {
+public:
+	ControlEventHandler(Callback<Control*>* ptr = NULL)
+	: Holder< Callback<Control*> >(ptr) {}
+
+	bool operator()(Control* ctrl) {
+		return (*ptr)(ctrl);
+	}
 };
 
 }

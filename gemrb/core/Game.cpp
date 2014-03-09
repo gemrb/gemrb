@@ -1468,7 +1468,7 @@ void Game::UpdateScripts()
 	//this is used only for the death delay so far
 	if (event_handler) {
 		if (!event_timer) {
-			event_handler->call();
+			event_handler();
 			event_handler = NULL;
 		}
 		event_timer--;

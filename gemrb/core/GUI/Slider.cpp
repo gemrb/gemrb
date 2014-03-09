@@ -271,7 +271,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 }
 
 /** Sets the slider change event */
-bool Slider::SetEvent(int eventType, EventHandler handler)
+bool Slider::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_SLIDER_ON_CHANGE:

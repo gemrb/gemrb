@@ -1730,10 +1730,8 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetTimedEvent__doc );
 	}
 
-	EventHandler handler;
-	if (function == Py_None) {
-		handler = new Callback();
-	} else if (PyCallable_Check(function)) {
+	EventHandler handler = NULL;
+	if (function != Py_None && PyCallable_Check(function)) {
 		handler = new PythonCallback(function);
 	} else {
 		char buf[256];
@@ -1768,13 +1766,11 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 	if (!ctrl)
 		return NULL;
 
-	EventHandler handler;
-	if (func == Py_None) {
-		handler = new Callback();
-	} else if (PyCallable_Check(func)) {
-		handler = new PythonCallback(func);
+	ControlEventHandler handler = NULL;
+	if (func != Py_None && PyCallable_Check(func)) {
+		handler = new PythonControlCallback(func);
 	}
-	if (!handler || !ctrl->SetEvent(event, handler)) {
+	if (!ctrl->SetEvent(event, handler)) {
 		char buf[256];
 		// TODO: Print function name. (func.__name__)
 		snprintf(buf, sizeof(buf), "Can't set event handler!");
@@ -8524,11 +8520,11 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BM_NAND );
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
-	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new PythonCallback(func) );
+	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(func) );
 
 	PyObject *Event2 = PyString_FromFormat("Action%sRightPressed", GUIEvent[Index]);
 	PyObject *func2 = PyDict_GetItem(dict, Event2);
-	btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, new PythonCallback(func2) );
+	btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, new PythonControlCallback(func2) );
 
 	//cannot make this const, because it will be freed
 	char *txt = NULL;
@@ -8625,7 +8621,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
-		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonCallback(Function));
+		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(Function));
 		strcpy(btn->VarName,"Equipment");
 		btn->Value = Start+i;
 
@@ -10208,10 +10204,8 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetTickHook__doc );
 	}
 
-	EventHandler handler;
-	if (function == Py_None) {
-		handler = new Callback();
-	} else if (PyCallable_Check(function)) {
+	EventHandler handler = NULL;
+	if (function != Py_None && PyCallable_Check(function)) {
 		handler = new PythonCallback(function);
 	} else {
 		char buf[256];

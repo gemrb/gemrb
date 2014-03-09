@@ -360,7 +360,7 @@ bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 	return true;
 }
 
-bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
+bool WorldMapControl::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_WORLDMAP_ON_PRESS:

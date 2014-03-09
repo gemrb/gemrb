@@ -475,7 +475,7 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 	return true;
 }
 
-bool MapControl::SetEvent(int eventType, EventHandler handler)
+bool MapControl::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 		case IE_GUI_MAP_ON_PRESS:

@@ -627,7 +627,7 @@ void Button::SetText(const String& string)
 }
 
 /** Set Event Handler */
-bool Button::SetEvent(int eventType, EventHandler handler)
+bool Button::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 		case IE_GUI_BUTTON_ON_PRESS:

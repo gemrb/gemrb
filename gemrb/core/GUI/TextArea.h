@@ -130,6 +130,8 @@ private: // Private attributes
 	Sprite2D* Cursor;
 	size_t CurPos;
 
+	/** OnChange Scripted Event Function Name */
+	ControlEventHandler TextAreaOnChange;
 private: //internal functions
 	void ClearDialogOptions();
 	void CalcRowCount();
@@ -152,10 +154,8 @@ public: //Events
 	void OnMouseDown(unsigned short x, unsigned short y,
 					 unsigned short Button, unsigned short Mod);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
-	/** OnChange Scripted Event Function Name */
-	EventHandler TextAreaOnChange;
 };
 
 }

@@ -20,7 +20,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Bitmap.cpp
 	Cache.cpp
 	Calendar.cpp
-	Callback.cpp
 	CharAnimations.cpp
 	Compressor.cpp
 	ControlAnimation.cpp

@@ -218,7 +218,7 @@ const String& TextEdit::QueryText() const
 	return Text;
 }
 
-bool TextEdit::SetEvent(int eventType, EventHandler handler)
+bool TextEdit::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_EDIT_ON_CHANGE:

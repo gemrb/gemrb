@@ -111,7 +111,7 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 	}
 }
 
-bool Label::SetEvent(int eventType, EventHandler handler)
+bool Label::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_LABEL_ON_PRESS:

@@ -28,18 +28,33 @@
 #include "Holder.h"
 #include "Interface.h"
 
+#include "GUI/Control.h"
+
 namespace GemRB {
 
-struct PythonCallback : public Callback {
+// could use an adapter pattern to reduce code duplication
+// for the 2 callback types
+
+struct PythonCallback : public VoidCallback {
 public:
 	PythonCallback(PyObject *Function);
 	~PythonCallback();
-	bool call();
-	bool call(int);
+	bool operator()();
 private:
 	PyObject *Function;
 };
 
+
+struct PythonControlCallback : public Callback<Control*> {
+public:
+	PythonControlCallback(PyObject *Function);
+	~PythonControlCallback();
+
+	bool operator()();
+	bool operator()(Control*);
+private:
+	PyObject *Function;
+};
 
 template <typename T>
 class CObject : public Holder<T> {

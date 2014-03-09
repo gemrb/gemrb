@@ -177,18 +177,18 @@ public: // Public Events
 	/** A special key has been pressed */
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** Button Pressed Event Script Function Name */
-	EventHandler ButtonOnPress;
-	EventHandler ButtonOnShiftPress;
-	EventHandler ButtonOnRightPress;
-	EventHandler ButtonOnDoublePress;
-	EventHandler ButtonOnDragDrop;
-	EventHandler ButtonOnDragDropPortrait;
-	EventHandler ButtonOnDrag;
-	EventHandler MouseEnterButton;
-	EventHandler MouseLeaveButton;
-	EventHandler MouseOverButton;
+	ControlEventHandler ButtonOnPress;
+	ControlEventHandler ButtonOnShiftPress;
+	ControlEventHandler ButtonOnRightPress;
+	ControlEventHandler ButtonOnDoublePress;
+	ControlEventHandler ButtonOnDragDrop;
+	ControlEventHandler ButtonOnDragDropPortrait;
+	ControlEventHandler ButtonOnDrag;
+	ControlEventHandler MouseEnterButton;
+	ControlEventHandler MouseLeaveButton;
+	ControlEventHandler MouseOverButton;
 	/** Refreshes the button from a radio group */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */

@@ -257,7 +257,6 @@
 		A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */; };
 		A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA01395FF61006ADC12 /* Cache.cpp */; };
 		A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA21395FF61006ADC12 /* Calendar.cpp */; };
-		A29BF8AD13A04A6F00C812DD /* Callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA41395FF61006ADC12 /* Callback.cpp */; };
 		A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */; };
 		A29BF8AF13A04A6F00C812DD /* Compressor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA91395FF61006ADC12 /* Compressor.cpp */; };
 		A29BF8B013A04A6F00C812DD /* ControlAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */; };
@@ -430,7 +429,6 @@
 		A2E66362139E883100310FC8 /* Cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA11395FF61006ADC12 /* Cache.h */; };
 		A2E66363139E883100310FC8 /* Calendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA21395FF61006ADC12 /* Calendar.cpp */; };
 		A2E66364139E883100310FC8 /* Calendar.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA31395FF61006ADC12 /* Calendar.h */; };
-		A2E66365139E883100310FC8 /* Callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA41395FF61006ADC12 /* Callback.cpp */; };
 		A2E66366139E883100310FC8 /* Callback.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA51395FF61006ADC12 /* Callback.h */; };
 		A2E66367139E883100310FC8 /* CharAnimations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */; };
 		A2E66368139E883100310FC8 /* CharAnimations.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA71395FF61006ADC12 /* CharAnimations.h */; };
@@ -1443,7 +1441,6 @@
 		A2BF9FA11395FF61006ADC12 /* Cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cache.h; sourceTree = "<group>"; };
 		A2BF9FA21395FF61006ADC12 /* Calendar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Calendar.cpp; sourceTree = "<group>"; };
 		A2BF9FA31395FF61006ADC12 /* Calendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Calendar.h; sourceTree = "<group>"; };
-		A2BF9FA41395FF61006ADC12 /* Callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Callback.cpp; sourceTree = "<group>"; };
 		A2BF9FA51395FF61006ADC12 /* Callback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Callback.h; sourceTree = "<group>"; };
 		A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CharAnimations.cpp; sourceTree = "<group>"; };
 		A2BF9FA71395FF61006ADC12 /* CharAnimations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharAnimations.h; sourceTree = "<group>"; };
@@ -2860,7 +2857,6 @@
 				A2BF9FA11395FF61006ADC12 /* Cache.h */,
 				A2BF9FA21395FF61006ADC12 /* Calendar.cpp */,
 				A2BF9FA31395FF61006ADC12 /* Calendar.h */,
-				A2BF9FA41395FF61006ADC12 /* Callback.cpp */,
 				A2BF9FA51395FF61006ADC12 /* Callback.h */,
 				A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */,
 				A2BF9FA71395FF61006ADC12 /* CharAnimations.h */,
@@ -4777,7 +4773,6 @@
 				A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */,
 				A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */,
 				A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */,
-				A29BF8AD13A04A6F00C812DD /* Callback.cpp in Sources */,
 				A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */,
 				A29BF8AF13A04A6F00C812DD /* Compressor.cpp in Sources */,
 				A29BF8B013A04A6F00C812DD /* ControlAnimation.cpp in Sources */,
@@ -4995,7 +4990,6 @@
 				A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */,
 				A2E66361139E883100310FC8 /* Cache.cpp in Sources */,
 				A2E66363139E883100310FC8 /* Calendar.cpp in Sources */,
-				A2E66365139E883100310FC8 /* Callback.cpp in Sources */,
 				A2E66367139E883100310FC8 /* CharAnimations.cpp in Sources */,
 				A2E66369139E883100310FC8 /* Compressor.cpp in Sources */,
 				A2E6636B139E883100310FC8 /* ControlAnimation.cpp in Sources */,
