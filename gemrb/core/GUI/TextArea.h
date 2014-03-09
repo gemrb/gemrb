@@ -103,11 +103,10 @@ private: // Private attributes
 	// dialog handling
 	typedef std::pair<int, TextSpan*> DialogOptionSpan;
 	std::vector<DialogOptionSpan> dialogOptSpans;
-	TextContainer* dialogOptions;
+	ContentContainer* dialogOptions;
 	TextSpan* hoverSpan, *selectedSpan;
 	// standard text display
-	TextContainer* textContainer;
-	// TODO: we need a circular TextContainer subclass for the message window
+	ContentContainer* textContainer;
 
 	int TextYPos;
 	/** timer for scrolling */

@@ -565,9 +565,9 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	Point p = Point(x, y);
 	if (dialogOptions) {
 		p.y -= textContainer->ContainerFrame().h;
-		span = dialogOptions->SpanAtPoint(p);
+		span = dynamic_cast<TextSpan*>(dialogOptions->SpanAtPoint(p));
 	} else {
-		span = textContainer->SpanAtPoint(p);
+		span = dynamic_cast<TextSpan*>(textContainer->SpanAtPoint(p));
 	}
 
 	if (hoverSpan && hoverSpan != span) {
@@ -686,7 +686,7 @@ void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
 
 	ClearDialogOptions(); // deletes previous options
 	// FIXME: calculate the real frame (padding)
-	dialogOptions = new TextContainer(Size(Width - EDGE_PADDING, -1), ftext, selectedPal);
+	dialogOptions = new ContentContainer(Size(Width - EDGE_PADDING, -1), ftext, selectedPal);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
@@ -722,9 +722,9 @@ void TextArea::Clear()
 	}
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
 		// limit of 50 spans is roughly 25 messages (1 span for actor, 1 for message)
-		textContainer = new RestrainedTextContainer(frame, ftext, palette, 50);
+		textContainer = new RestrainedContentContainer(frame, ftext, palette, 50);
 	} else {
-		textContainer = new TextContainer(frame, ftext, palette);
+		textContainer = new ContentContainer(frame, ftext, palette);
 	}
 }
 

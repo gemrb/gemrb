@@ -33,15 +33,31 @@ class Font;
 class Palette;
 class Sprite2D;
 
-class TextSpan
+class ContentSpan
+{
+protected:
+	Size frame;
+	Sprite2D* spanSprite;
+public:
+	ContentSpan();
+	ContentSpan(const Size& size);
+	virtual ~ContentSpan();
+
+	const Size& SpanFrame() const { return frame; }
+	const Sprite2D* RenderedSpan() const { return spanSprite; }
+
+	void SetPadding(int lft, int top, int right, int bottom);
+
+	virtual int SpanDescent() const { return 0; };
+};
+
+class TextSpan : public ContentSpan
 {
 private:
 	String text;
 	size_t stringLen;
-	Size frame;
 	Font* font;
 	Palette* palette;
-	Sprite2D* spanSprite;
 	ieByte alignment;
 public:
 	// construct a "inline" span that calculates its own region based on font, palette, and string
@@ -50,23 +66,26 @@ public:
 	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn, ieByte align);
 	~TextSpan();
 
-	const Size& SpanFrame() const { return frame; }
 	int SpanDescent() const { return font->descent; }
-	const Sprite2D* RenderedSpan() const { return spanSprite; }
 	const String& RenderedString() const { return text; }
 
 	void SetPalette(Palette* pal);
-	void SetPadding(int lft, int top, int right, int bottom);
 private:
 	void RenderSpan(const String& string);
 };
 
-class TextContainer
+class ImageSpan : public ContentSpan
+{
+public:
+	ImageSpan(Sprite2D* image);
+};
+
+class ContentContainer
 {
 protected:
-	typedef std::list<TextSpan*> SpanList;
+	typedef std::list<ContentSpan*> SpanList;
 	SpanList spans;
-	typedef std::map<TextSpan*, Region> SpanLayout;
+	typedef std::map<ContentSpan*, Region> SpanLayout;
 	SpanLayout layout;
 	std::vector<Region> ExclusionRects;
 
@@ -75,24 +94,24 @@ protected:
 	Font* font;
 	Palette* pallete;
 public:
-	TextContainer(const Size& frame, Font* font, Palette* pal);
-	virtual ~TextContainer();
+	ContentContainer(const Size& frame, Font* font, Palette* pal);
+	virtual ~ContentContainer();
 
 	// Creates a basic "inline" span using the containers font/palette
 	void AppendText(const String& text);
 	// append the span to the end of the container. The container takes ownership of the span.
-	virtual void AppendSpan(TextSpan* span);
+	virtual void AppendSpan(ContentSpan* span);
 	// Insert a span to a new position in the list. The container takes ownership of the span.
-	virtual void InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing);
+	virtual void InsertSpanAfter(ContentSpan* newSpan, const ContentSpan* existing);
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
-	TextSpan* RemoveSpan(const TextSpan* span);
+	TextSpan* RemoveSpan(const ContentSpan* span);
 	// excludes all attached spans such that new spans cannot flow adjacent
 	void ClearSpans();
 
-	void SetSpanPadding(TextSpan* span, Size pad);
-	TextSpan* SpanAtPoint(const Point& p) const;
-	Point PointForSpan(const TextSpan*);
+	void SetSpanPadding(ContentSpan* span, Size pad);
+	ContentSpan* SpanAtPoint(const Point& p) const;
+	Point PointForSpan(const ContentSpan*);
 	const Size& ContainerFrame() const { return frame; }
 	void SetMaxFrame(const Size&);
 	void DrawContents(int x, int y) const;
@@ -115,16 +134,16 @@ private:
  I feel this is a supirior method because it prevents having truncated messages.
 */
 
-class RestrainedTextContainer : public TextContainer
+class RestrainedContentContainer : public ContentContainer
 {
 private:
 	size_t spanLimit;
 
 public:
-	RestrainedTextContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
-	: TextContainer(frame, font, pal) { spanLimit = limit; }
+	RestrainedContentContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
+	: ContentContainer(frame, font, pal) { spanLimit = limit; }
 
-	void AppendSpan(TextSpan* span);
+	void AppendSpan(ContentSpan* span);
 };
 
 }

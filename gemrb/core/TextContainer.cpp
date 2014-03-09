@@ -26,12 +26,27 @@
 
 namespace GemRB {
 
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
+ContentSpan::ContentSpan()
 	: frame()
 {
-	font = fnt;
 	spanSprite = NULL;
+}
 
+ContentSpan::ContentSpan(const Size& size)
+	: frame(size)
+{
+	spanSprite = NULL;
+}
+
+ContentSpan::~ContentSpan()
+{
+	if (spanSprite)
+		spanSprite->release();
+}
+
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
+	: ContentSpan()
+{
 	if (!pal) {
 		palette = fnt->GetPalette();
 		assert(palette);
@@ -39,18 +54,15 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 		palette = NULL;
 		SetPalette(pal);
 	}
-	alignment = 0;
 
+	font = fnt;
+	alignment = 0;
 	RenderSpan(string);
-	text = string.substr(0, stringLen);
 }
 
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame, ieByte align)
-	: frame(frame)
+	: ContentSpan(frame)
 {
-	font = fnt;
-	spanSprite = NULL;
-
 	if (!pal) {
 		palette = fnt->GetPalette();
 		assert(palette);
@@ -59,19 +71,14 @@ TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& fr
 		SetPalette(pal);
 	}
 
+	font = fnt;
 	alignment = align;
 	RenderSpan(string);
-	// string is trimmed down to just the characters that fit.
-	// some spans are created from huge strings but with a small size (the text next to a drop cap)
-	// we may want a variation that keeps the entire string so the span can dynamically rerender
-	text = string.substr(0, stringLen);
 }
 
 TextSpan::~TextSpan()
 {
 	palette->release();
-	if (spanSprite)
-		spanSprite->release();
 }
 
 void TextSpan::RenderSpan(const String& string)
@@ -87,6 +94,17 @@ void TextSpan::RenderSpan(const String& string)
 	if (spanSprite) spanSprite->release();
 	// TODO: implement span alignments
 	spanSprite = font->RenderTextAsSprite(string, frame, alignment, palette, &stringLen);
+	// string is trimmed down to just the characters that fit.
+	// some spans are created from huge strings but with a small size (the text next to a drop cap)
+	// we may want a variation that keeps the entire string so the span can dynamically rerender
+	text = string.substr(0, stringLen);
+
+	if (text.find_last_of(L"\n") == text.length() - 1) {
+		// if the span eneded in a newline we automatically know
+		// following spans should only go below this one
+		frame.w = (ieWord)-1;
+	}
+
 	// frame dimensions of 0 just mean size to fit
 	if (frame.w == 0)
 		frame.w = spanSprite->Width;
@@ -106,14 +124,27 @@ void TextSpan::SetPalette(Palette* pal)
 }
 
 
-TextContainer::TextContainer(const Size& frame, Font* font, Palette* pal)
+
+ImageSpan::ImageSpan(Sprite2D* image)
+	: ContentSpan()
+{
+	assert(image);
+	image->acquire();
+	spanSprite = image;
+
+	frame.w = spanSprite->Width;
+	frame.h = spanSprite->Height;
+}
+
+
+ContentContainer::ContentContainer(const Size& frame, Font* font, Palette* pal)
 	: maxFrame(frame), frame(), font(font)
 {
 	pal->acquire();
 	pallete = pal;
 }
 
-TextContainer::~TextContainer()
+ContentContainer::~ContentContainer()
 {
 	SpanList::iterator it = spans.begin();
 	for (; it != spans.end(); ++it) {
@@ -122,7 +153,7 @@ TextContainer::~TextContainer()
 	pallete->release();
 }
 
-void TextContainer::AppendText(const String& text)
+void ContentContainer::AppendText(const String& text)
 {
 	if (text.length()) {
 		Size stringSize = font->StringSize(text);
@@ -133,13 +164,13 @@ void TextContainer::AppendText(const String& text)
 	}
 }
 
-void TextContainer::AppendSpan(TextSpan* span)
+void ContentContainer::AppendSpan(ContentSpan* span)
 {
 	spans.push_back(span);
 	LayoutSpansStartingAt(--spans.end());
 }
 
-void TextContainer::InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing)
+void ContentContainer::InsertSpanAfter(ContentSpan* newSpan, const ContentSpan* existing)
 {
 	if (!existing) { // insert at beginning;
 		spans.push_front(newSpan);
@@ -151,7 +182,7 @@ void TextContainer::InsertSpanAfter(TextSpan* newSpan, const TextSpan* existing)
 	LayoutSpansStartingAt(it);
 }
 
-TextSpan* TextContainer::RemoveSpan(const TextSpan* span)
+TextSpan* ContentContainer::RemoveSpan(const ContentSpan* span)
 {
 	SpanList::iterator it;
 	it = std::find(spans.begin(), spans.end(), span);
@@ -162,7 +193,7 @@ TextSpan* TextContainer::RemoveSpan(const TextSpan* span)
 	return NULL;
 }
 
-void TextContainer::ClearSpans()
+void ContentContainer::ClearSpans()
 {
 	// FIXME: this isn't technically accurate
 	Region ex = *--ExclusionRects.end();
@@ -173,7 +204,7 @@ void TextContainer::ClearSpans()
 	AddExclusionRect(ex);
 }
 
-TextSpan* TextContainer::SpanAtPoint(const Point& p) const
+ContentSpan* ContentContainer::SpanAtPoint(const Point& p) const
 {
 	// the point we are testing is relative to the container
 	Region rgn = Region(0, 0, frame.w, frame.h);
@@ -189,7 +220,7 @@ TextSpan* TextContainer::SpanAtPoint(const Point& p) const
 	return NULL;
 }
 
-Point TextContainer::PointForSpan(const TextSpan* span)
+Point ContentContainer::PointForSpan(const ContentSpan* span)
 {
 	SpanList::iterator it;
 	it = std::find(spans.begin(), spans.end(), span);
@@ -199,7 +230,7 @@ Point TextContainer::PointForSpan(const TextSpan* span)
 	return Point(-1, -1);
 }
 
-void TextContainer::SetSpanPadding(TextSpan* span, Size pad)
+void ContentContainer::SetSpanPadding(ContentSpan* span, Size pad)
 {
 	if (layout.find(span) == layout.end()) return;
 
@@ -212,7 +243,7 @@ void TextContainer::SetSpanPadding(TextSpan* span, Size pad)
 	AddExclusionRect(rgn);
 }
 
-void TextContainer::DrawContents(int x, int y) const
+void ContentContainer::DrawContents(int x, int y) const
 {
 	Video* video = core->GetVideoDriver();
 	Region drawRgn = Region(Point(x, y), maxFrame);
@@ -227,7 +258,7 @@ void TextContainer::DrawContents(int x, int y) const
 	}
 #endif
 	SpanLayout::const_iterator it;
-	TextSpan* span = NULL;
+	ContentSpan* span = NULL;
 	for (it = layout.begin(); it != layout.end(); ++it) {
 		span = (*it).first;
 		Region rgn = (*it).second;
@@ -251,12 +282,12 @@ void TextContainer::DrawContents(int x, int y) const
 	}
 }
 
-void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
+void ContentContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 {
 	assert(it != spans.end());
 	Point drawPoint(0, 0);
-	TextSpan* span = *it;
-	TextSpan* prevSpan = NULL;
+	ContentSpan* span = *it;
+	ContentSpan* prevSpan = NULL;
 
 	if (it != spans.begin()) {
 		// get the next draw position to try
@@ -310,12 +341,7 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		// TODO: need to extend the exclusion rect for some alignments
 		// eg right align should invalidate the entire area infront also
 		layoutRgn.h -= span->SpanDescent();
-		if (span->RenderedString().find_last_of(L"\n") == span->RenderedString().length() - 1) {
-			// if the span eneded in a newline we automatically know
-			// following spans should only go below this one
-			layoutRgn.w = (ieWord)-1;
-		}
-		assert(layoutRgn.h != -1);
+		assert(layoutRgn.h > 0);
 		AddExclusionRect(layoutRgn);
 		prevSpan = span;
 	}
@@ -332,12 +358,12 @@ void TextContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
 		frame.w = maxFrame.w;
 }
 
-void TextContainer::SetMaxFrame(const Size& newSize) {
+void ContentContainer::SetMaxFrame(const Size& newSize) {
 	// TODO: need to relayout if width changed, or if hew height is greater
 	maxFrame = newSize;
 }
 
-void TextContainer::AddExclusionRect(const Region& rect)
+void ContentContainer::AddExclusionRect(const Region& rect)
 {
 	assert(!rect.Dimensions().IsEmpty());
 	std::vector<Region>::iterator it;
@@ -357,7 +383,7 @@ void TextContainer::AddExclusionRect(const Region& rect)
 	}
 }
 
-const Region* TextContainer::ExcludedRegionForRect(const Region& rect)
+const Region* ContentContainer::ExcludedRegionForRect(const Region& rect)
 {
 	std::vector<Region>::const_iterator it;
 	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
@@ -369,12 +395,12 @@ const Region* TextContainer::ExcludedRegionForRect(const Region& rect)
 
 
 
-void RestrainedTextContainer::AppendSpan(TextSpan* span)
+void RestrainedContentContainer::AppendSpan(ContentSpan* span)
 {
 	while (spans.size() >= spanLimit) {
 		// we need to remove the first span and any spans on the same "line"
 		SpanList::iterator it = spans.begin();
-		TextSpan* span = *it;
+		ContentSpan* span = *it;
 		Region rgn = layout[span];
 
 		// extend the region all the way across the container and up to the top
@@ -410,7 +436,7 @@ void RestrainedTextContainer::AppendSpan(TextSpan* span)
 			AddExclusionRect(rgn);
 		}
 	}
-	TextContainer::AppendSpan(span);
+	ContentContainer::AppendSpan(span);
 }
 
 }
