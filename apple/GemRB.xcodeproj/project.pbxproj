@@ -1193,6 +1193,7 @@
 		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		A23A9EB418CD4C4B0047420C /* Predicates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Predicates.h; sourceTree = "<group>"; };
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -3144,6 +3145,7 @@
 				A2D4C52913A978110086BCC4 /* operatorbool.h */,
 				A2D4C52A13A978110086BCC4 /* overlays.h */,
 				A2D4C52B13A978110086BCC4 /* plugindef.h */,
+				A23A9EB418CD4C4B0047420C /* Predicates.h */,
 				A2D4C52C13A978110086BCC4 /* RGBAColor.h */,
 				A2D4C52D13A978110086BCC4 /* SClassID.h */,
 				A2D4C52E13A978110086BCC4 /* StringMap.h */,
