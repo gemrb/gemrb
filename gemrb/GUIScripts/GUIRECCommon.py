@@ -311,7 +311,6 @@ def OpenSoundWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
-	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 
 	VoiceList.SetVarAssoc ("Selected", 0)
 	VoiceList.GetCharSounds()
@@ -386,7 +385,6 @@ def OpenScriptWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
-	ScriptTextArea.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	FillScriptList ()
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)

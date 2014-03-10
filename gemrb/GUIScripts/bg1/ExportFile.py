@@ -38,7 +38,6 @@ def OnLoad():
 	TextAreaControl.SetText (10962)
 
 	TextAreaControl = ExportWindow.GetControl (2)
-	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	TextAreaControl.GetCharacters ()
 
 	FileNameEditBox = ExportWindow.GetControl (7)

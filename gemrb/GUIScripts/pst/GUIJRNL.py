@@ -160,7 +160,6 @@ def OpenQuestsWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
 
 	QuestsList = List = Window.GetControl (1)
-	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedQuest', -1)
 	List.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, OnJournalQuestSelect)
 
@@ -331,7 +330,6 @@ def OpenBeastsWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
 
 	BeastsList = List = Window.GetControl (0)
-	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedBeast', -1)
 	List.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, OnJournalBeastSelect)
 

@@ -41,7 +41,6 @@ def OnLoad():
 			s = MoviesTable.GetValue (i, 0)
 			TextAreaControl.Append (s,-1)
 	TextAreaControl.SetVarAssoc ("MovieIndex",0)
-	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_NAND)
 	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, MoviePress)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)
@@ -55,7 +54,6 @@ def OnLoad():
 
 def MoviePress():
 	PlayButton.SetStatus (IE_GUI_BUTTON_ENABLED)
-	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE,OP_SET) # show selection
 	return
 
 def PlayPress():
@@ -65,7 +63,6 @@ def PlayPress():
 		if GemRB.GetVar (t)==1:
 			if s==0:
 				PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
-				TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE,OP_NAND) # hide selection
 				s = MoviesTable.GetRowName (i)
 				GemRB.PlayMovie (s, 1)
 				MovieWindow.Invalidate ()

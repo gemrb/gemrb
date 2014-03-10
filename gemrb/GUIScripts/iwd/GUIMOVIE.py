@@ -36,7 +36,6 @@ def OnLoad ():
 	MovieWindow = GemRB.LoadWindow (0)
 	MovieWindow.SetFrame ()
 	TextAreaControl = MovieWindow.GetControl (0)
-	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	PlayButton = MovieWindow.GetControl (2)
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)

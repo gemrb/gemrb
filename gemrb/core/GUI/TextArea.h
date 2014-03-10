@@ -27,7 +27,6 @@
 #include "RGBAColor.h"
 #include "exports.h"
 
-#include "DialogHandler.h"
 #include "Font.h"
 #include "TextContainer.h"
 
@@ -49,6 +48,8 @@ namespace GemRB {
 #define IE_GUI_TEXTAREA_SPEAKER      16	// message window
 #define IE_GUI_TEXTAREA_ALT_FONT     32	// this one disables drop capitals, unused
 #define IE_GUI_TEXTAREA_EDITABLE     64
+
+typedef std::pair<int, String> SelectOption;
 
 /**
  * @class TextArea
@@ -87,8 +88,8 @@ public:
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;
-	void SetDialogOptions(const std::vector<DialogOption>&,
-						  const Color* color, const Color* hiColor);
+	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
+						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Starting Row */
 	void SetRow(int row);
 	/** Set Selectable */
@@ -100,10 +101,10 @@ public:
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	int SetScrollBar(Control *ptr);
 private: // Private attributes
-	// dialog handling
-	typedef std::pair<int, TextSpan*> DialogOptionSpan;
-	std::vector<DialogOptionSpan> dialogOptSpans;
-	ContentContainer* dialogOptions;
+	// dialog and listbox handling
+	typedef std::pair<int, TextSpan*> OptionSpan;
+	std::vector<OptionSpan> OptSpans;
+	ContentContainer* selectOptions;
 	TextSpan* hoverSpan, *selectedSpan;
 	// standard text display
 	ContentContainer* textContainer;
@@ -115,12 +116,6 @@ private: // Private attributes
 	unsigned long ticks;
 	/** Number of Text Rows */
 	int rows;
-
-	/** Text Colors */
-	Palette* palette;		// standard text color
-	Palette* hoverPal;		// palette for hovering options (dialog/listbox)
-	Palette* selectedPal;	// selected list box option, but also normal palette for dialog options.
-	Palette* initpalette;	// palette for finit. used only is some cases.
 
 	/** Fonts */
 	Font* finit, * ftext;
@@ -135,9 +130,22 @@ private: // Private attributes
 	ControlEventHandler TextAreaOnSelect;
 
 private: //internal functions
+	enum PALETTE_TYPE {
+		PALETTE_NORMAL = 0,	// standard text color
+		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
+		PALETTE_HOVER,		// palette for hovering options (dialog/listbox)
+		PALETTE_SELECTED,	// selected list box/dialog option.
+		PALETTE_INITIALS,	// palette for finit. used only is some cases.
+
+		PALETTE_TYPE_COUNT
+	};
+	Palette* palettes[PALETTE_TYPE_COUNT];
+	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
+
 	void CalcRowCount();
 	void UpdateControls();
 	void RefreshSprite(const char *portrait);
+	void SetPalette(const Color*, PALETTE_TYPE);
 
 public: //Events
 	/** Key Press Event */
@@ -158,7 +166,7 @@ public: //Events
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
 
-	void ClearDialogOptions();
+	void ClearSelectOptions();
 };
 
 }

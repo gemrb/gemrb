@@ -511,7 +511,6 @@ def OpenMovieWindow ():
 	#reloading the guiopt windowpack
 	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
 	TextAreaControl = Window.GetControl(0)
-	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)
 	PlayButton = Window.GetControl(2)
 	CreditsButton = Window.GetControl(3)
 	DoneButton = Window.GetControl(4)

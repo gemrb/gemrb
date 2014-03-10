@@ -35,8 +35,8 @@
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color hitextcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), Text(), ftext(text)
+				   Color textcolor, Color initcolor, Color lowtextcolor)
+	: Control(frame), Text(), ftext(text), palettes()
 {
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
@@ -48,37 +48,33 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOnSelect );
 	PortraitResRef[0]=0;
-	// quick font optimization (prevents creating unnecessary spans)
-	// FIXME: the color/palette for the initials font is unused? why?
-	if (caps == ftext) {
-		finit = NULL;
-		initpalette = NULL;
-	} else {
+
+	if (caps != ftext) {
+		// quick font optimization (prevents creating unnecessary spans)
 		finit = caps;
-		initpalette = core->CreatePalette( initcolor, lowtextcolor );
+		palettes[PALETTE_INITIALS] = core->CreatePalette( initcolor, lowtextcolor );
+	} else {
+		finit = NULL;
 	}
-	palette = core->CreatePalette( hitextcolor, lowtextcolor );
-	Color tmp = {
-		255, 180, 0, 0
-	};
-	hoverPal = core->CreatePalette( tmp, lowtextcolor );
-	tmp.r = 255;
-	tmp.g = 100;
-	tmp.b = 0;
-	selectedPal = core->CreatePalette( tmp, lowtextcolor );
-	dialogOptions = NULL;
+
+	// init palettes
+	SetPalette(&textcolor, PALETTE_NORMAL);
+	SetPalette(&initcolor, PALETTE_INITIALS);
+	SetPalette(&lowtextcolor, PALETTE_OPTIONS);
+	palette = palettes[PALETTE_NORMAL];
+
+	selectOptions = NULL;
 	textContainer = NULL;
 	Clear();
 }
 
 TextArea::~TextArea(void)
 {
-	ClearDialogOptions();
+	for (int i=0; i < PALETTE_TYPE_COUNT; i++) {
+		gamedata->FreePalette( palettes[i] );
+	}
 
-	gamedata->FreePalette( palette );
-	gamedata->FreePalette( initpalette );
-	gamedata->FreePalette( hoverPal );
-	gamedata->FreePalette( selectedPal );
+	ClearSelectOptions();
 	core->GetVideoDriver()->FreeSprite( Cursor );
 	delete textContainer;
 }
@@ -145,9 +141,9 @@ void TextArea::DrawInternal(Region& clip)
 	Region textClip(x, y, clip.w, clip.h);
 	textContainer->DrawContents(x, y);
 
-	if (dialogOptions) {
+	if (selectOptions) {
 		y += textContainer->ContainerFrame().h;
-		dialogOptions->DrawContents(x, y);
+		selectOptions->DrawContents(x, y);
 	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
@@ -171,6 +167,20 @@ void TextArea::SetText(const char* text)
 {
 	Clear();
 	AppendText(text);
+}
+
+void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
+{
+	assert(idx < PALETTE_TYPE_COUNT);
+	if (color) {
+		gamedata->FreePalette(palettes[idx]);
+		palettes[idx] = core->CreatePalette( *color, ColorBlack );
+	} else if (idx > PALETTE_NORMAL) {
+		// default to normal
+		gamedata->FreePalette(palettes[idx]);
+		palettes[idx] = palettes[PALETTE_NORMAL];
+		palettes[idx]->acquire();
+	}
 }
 
 /** Appends a String to the current Text */
@@ -312,7 +322,7 @@ void TextArea::AppendText(const String& text)
 			if (textpos != String::npos) {
 				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
 				// need to figure out how to handle this because it breaks drop caps
-				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, initpalette);
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS]);
 				textContainer->AppendSpan(dc);
 				textpos++;
 				// FIXME: assuming we have more text!
@@ -392,16 +402,15 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		return true;
 	}
 
-	//Selectable=false for dialogs, rather unintuitive, but fact
-	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' ))
+	if (( Key < '1' ) || ( Key > '9' ))
 		return false;
 
 	MarkDirty();
 
 	size_t lookupIdx = Key - '1';
 	int dlgIdx = -1;
-	if (lookupIdx < dialogOptSpans.size()) {
-		dlgIdx = dialogOptSpans[lookupIdx].first;
+	if (lookupIdx < OptSpans.size()) {
+		dlgIdx = OptSpans[lookupIdx].first;
 		assert(dlgIdx >= 0);
 		//gc->dialoghandler->DialogChoose( dlgIdx );
 		Value = dlgIdx;
@@ -530,8 +539,8 @@ void TextArea::CalcRowCount()
 			}
 		}
 		size_t textHeight = textContainer->ContainerFrame().h;
-		if (dialogOptions) {
-			textHeight += dialogOptions->ContainerFrame().h;
+		if (selectOptions) {
+			textHeight += selectOptions->ContainerFrame().h;
 		}
 		rows = textHeight / GetRowHeight();
 	} else {
@@ -558,31 +567,29 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
-	if (!dialogOptions && !(Flags&IE_GUI_TEXTAREA_SELECTABLE))
+	if (!selectOptions)
 		return;
 
 	TextSpan* span = NULL;
 	Point p = Point(x, y);
-	if (dialogOptions) {
+	if (selectOptions) {
 		p.y -= textContainer->ContainerFrame().h;
-		span = dynamic_cast<TextSpan*>(dialogOptions->SpanAtPoint(p));
-	} else {
-		span = dynamic_cast<TextSpan*>(textContainer->SpanAtPoint(p));
+		// container only has text, so...
+		span = dynamic_cast<TextSpan*>(selectOptions->SpanAtPoint(p));
 	}
 
 	if (hoverSpan && hoverSpan != span) {
 		if (hoverSpan == selectedSpan) {
-			hoverSpan->SetPalette(selectedPal);
+			hoverSpan->SetPalette(palettes[PALETTE_SELECTED]);
 		} else {
 			// reset the old hover span
-			// for dialog options we use the "selected" palette for their default look
-			hoverSpan->SetPalette((dialogOptions) ? selectedPal : palette);
+			hoverSpan->SetPalette(palettes[PALETTE_OPTIONS]);
 		}
 		hoverSpan = NULL;
 	}
 	if (span) {
 		hoverSpan = span;
-		hoverSpan->SetPalette(hoverPal);
+		hoverSpan->SetPalette(palettes[PALETTE_HOVER]);
 	}
 	MarkDirty();
 }
@@ -596,17 +603,17 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 
 	if (selectedSpan) {
 		// reset the previous selection
-		selectedSpan->SetPalette((dialogOptions) ? selectedPal : palette);
+		selectedSpan->SetPalette(palettes[PALETTE_OPTIONS]);
 		Value = -1;
 	}
 	selectedSpan = hoverSpan; // select the item under the mouse
 	if (selectedSpan) {
-		selectedSpan->SetPalette(selectedPal);
+		selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
 
-		if (dialogOptions) {
+		if (selectOptions) {
 			int dlgIdx = -1;
-			std::vector<DialogOptionSpan>::const_iterator it;
-			for (it = dialogOptSpans.begin(); it != dialogOptSpans.end(); ++it) {
+			std::vector<OptionSpan>::const_iterator it;
+			for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
 				if( (*it).second == selectedSpan ) {
 					dlgIdx = (*it).first;
 					break;
@@ -617,6 +624,7 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 			RunEventHandler(TextAreaOnSelect);
 
 			if (VarName[0] != 0) {
+				// FIXME: stupid hack. use callbacks instead
 				core->GetDictionary()->SetAt( VarName, Value );
 			}
 		}
@@ -659,40 +667,34 @@ bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
 	return true;
 }
 
-void TextArea::ClearDialogOptions()
+void TextArea::ClearSelectOptions()
 {
-	dialogOptSpans.clear();
-	delete dialogOptions; // deletes the old spans too
-	dialogOptions = NULL;
+	OptSpans.clear();
+	delete selectOptions;
+	selectOptions = NULL;
 	selectedSpan = NULL;
 	hoverSpan = NULL;
 }
 
-void TextArea::SetDialogOptions(const std::vector<DialogOption>& opts,
-								const Color* color, const Color* hiColor)
+void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
+								const Color* color, const Color* hiColor, const Color* selColor)
 {
-	// selectedPal is the normal palette for dialog options
-	if (selectedPal)
-		selectedPal->release();
-	if (color)
-		selectedPal = core->CreatePalette(*color, ColorBlack);
-	else
-		selectedPal = ftext->GetPalette();
+	SetPalette(color, PALETTE_OPTIONS);
+	SetPalette(hiColor, PALETTE_HOVER);
+	SetPalette(selColor, PALETTE_SELECTED);
 
-	if (hiColor) {
-		hoverPal->release();
-		hoverPal = core->CreatePalette(*hiColor, ColorBlack);
-	}
-
-	ClearDialogOptions(); // deletes previous options
+	ClearSelectOptions(); // deletes previous options
 	// FIXME: calculate the real frame (padding)
-	dialogOptions = new ContentContainer(Size(Width - EDGE_PADDING, -1), ftext, selectedPal);
+	selectOptions = new ContentContainer(Size(Width - EDGE_PADDING, -1), ftext, palettes[PALETTE_SELECTED]);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
-		swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
-		TextSpan* span = new TextSpan(optNum + opts[i].second, ftext, selectedPal, Size(Width - EDGE_PADDING, 0), IE_FONT_ALIGN_LEFT);
-		dialogOptSpans.push_back(std::make_pair(opts[i].first, span));
-		dialogOptions->AppendSpan(span); // container owns the span
+		if (numbered) {
+			swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
+		}
+		TextSpan* span = new TextSpan((numbered) ? optNum + opts[i].second : opts[i].second,
+									  ftext, palettes[PALETTE_OPTIONS], Size(Width - EDGE_PADDING, 0), IE_FONT_ALIGN_LEFT);
+		OptSpans.push_back(std::make_pair(opts[i].first, span));
+		selectOptions->AppendSpan(span); // container owns the span
 	}
 	// This hack is to refresh the mouse cursor so that reply below cursor gets
 	// highlighted during a dialog

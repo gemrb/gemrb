@@ -200,7 +200,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
-	ta->ClearDialogOptions();
+	ta->ClearSelectOptions();
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
@@ -384,7 +384,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 
 	int idx = 0;
-	std::vector<DialogOption> dialogOptions;
+	std::vector<SelectOption> dialogOptions;
 	ControlEventHandler handler = NULL;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
 	unsigned int x = ds->transitionsCount;
@@ -403,7 +403,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 		core->GetDictionary()->SetAt("DialogOption",x);
 		core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
-		goto end_of_choose;
+		return true;
 	}
 	for (x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
@@ -424,7 +424,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			delete string;
 		}
 	}
-	ta->SetDialogOptions(dialogOptions, &ColorRed, &ColorWhite);
+	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
 	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
 	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);
 
@@ -433,11 +433,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		Log(WARNING, "Dialog", "There were no valid dialog options!");
 		core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 	}
-end_of_choose:
-	//padding the rows so our text will be at the top
-	if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
-		// FIXME: this is a poor solution
-	}
+
 	return true;
 }
 

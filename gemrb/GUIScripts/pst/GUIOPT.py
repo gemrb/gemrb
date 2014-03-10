@@ -602,7 +602,6 @@ def OpenMoviesWindow ():
 
 	# movie list
 	List = Window.GetControl (0)
-	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedMovie', -1)
 
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
