@@ -37,6 +37,7 @@
 
 #include "exports.h"
 #include "globals.h"
+#include "Predicates.h"
 
 #include <string>
 #include <sys/stat.h>
@@ -131,6 +132,7 @@ GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen);
 
 class GEM_EXPORT DirectoryIterator {
 public:
+	typedef Predicate<const char*> FileFilterPredicate;
 	/**
 	 * @param[in] path Path to directory to search.
 	 *
@@ -139,14 +141,15 @@ public:
 	 */
 	DirectoryIterator(const char *path);
 	~DirectoryIterator();
+
+	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);
 	bool IsDirectory();
 	/**
 	 * Returns name of current entry.
 	 *
 	 * The returned string is only valid until the iterator is advanced.
-	 * FIXME: This should return a const char*
 	 */
-	char *GetName();
+	const char *GetName();
 	void GetFullPath(char *);
 	DirectoryIterator& operator++();
 #include "operatorbool.h"
@@ -154,6 +157,7 @@ public:
 	bool operator !() { return !Entry; }
 	void Rewind();
 private:
+	FileFilterPredicate* predicate;
 	void* Directory;
 	void* Entry;
 	const char *Path;

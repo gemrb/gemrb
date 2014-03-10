@@ -297,6 +297,12 @@ enum PauseSetting {
 	PAUSE_ON = 1
 };
 
+enum RESOURSE_DIRECTORY {
+	DIRECTORY_CHR_PORTRAITS,
+	DIRECTORY_CHR_SOUNDS,
+	DIRECTORY_CHR_EXPORTS
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -581,12 +587,9 @@ public:
 	void UpdateWorldMap(ieResRef wmResRef);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
-	/*reads the filenames of the portraits folder into a list */
-	int GetPortraits(TextArea* ta, bool smallorlarge);
-	/*reads the filenames of the sounds folder into a list */
-	int GetCharSounds(TextArea *ta);
-	/*reads the filenames of the characters folder into a list */
-	int GetCharacters(TextArea *ta);
+
+	DirectoryIterator GetResourceDirectory(RESOURSE_DIRECTORY);
+
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
 	ieDword QuerySlot(unsigned int idx) const;

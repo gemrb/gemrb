@@ -56,6 +56,7 @@
 #include "Palette.h"
 #include "PluginLoader.h"
 #include "PluginMgr.h"
+#include "Predicates.h"
 #include "ProjectileServer.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
@@ -3700,105 +3701,50 @@ int Interface::Roll(int dice, int size, int add) const
 	return add;
 }
 
-static char bmp_suffix[6]="M.BMP";
-static char png_suffix[6]="M.PNG";
-
-int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
+DirectoryIterator Interface::GetResourceDirectory(RESOURSE_DIRECTORY dir)
 {
-	int count = 0;
-	char Path[_MAX_PATH];
-
-	if (smallorlarge) {
-		bmp_suffix[0]='S';
-		png_suffix[0]='S';
-	} else {
-		bmp_suffix[0]='M';
-		png_suffix[0]='M';
-	}
-	PathJoin( Path, GamePath, GamePortraitsPath, NULL );
-	DirectoryIterator dir(Path);
-	if (!dir) {
-		return -1;
-	}
-	print("Looking in %s", Path);
-	// TODO: get a sorted list then append to TA
-	do {
-		char *name = dir.GetName();
-		if (name[0] == '.')
-			continue;
-		if (dir.IsDirectory())
-			continue;
-		strupr(name);
-		char *pos = strstr(name,bmp_suffix);
-		if (!pos && IsAvailable(IE_PNG_CLASS_ID) ) {
-			pos = strstr(name,png_suffix);
+	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
+		char extension[9];
+		ExtFilter(const char* ext) {
+			memcpy(extension, ext, sizeof(extension));
 		}
-		if (!pos) continue;
-		pos[1]=0;
-		count++;
-		ta->AppendText( name );
-	} while (++dir);
-	return count;
-}
 
-int Interface::GetCharSounds(TextArea* ta)
-{
-	bool hasfolders;
-	int count = 0;
-	char Path[_MAX_PATH];
-
-	PathJoin( Path, GamePath, GameSoundsPath, NULL );
-	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
-	DirectoryIterator dir(Path);
-	if (!dir) {
-		return -1;
-	}
-	print("Looking in %s", Path);
-	// TODO: get a sorted list then append to TA
-	do {
-		char *name = dir.GetName();
-		if (name[0] == '.')
-			continue;
-		if (hasfolders == !dir.IsDirectory())
-			continue;
-		if (!hasfolders) {
-			strupr(name);
-			char *pos = strstr(name,"A.WAV");
-			if (!pos) continue;
-			*pos=0;
+		bool operator()(const char* fname) const {
+			char* extpos = strrchr(fname, '.');
+			if (extpos) {
+				extpos++;
+				return stricmp(extpos, extension) == 0;
+			}
+			return false;
 		}
-		count++;
-		ta->AppendText( name );
-	} while (++dir);
-	return count;
-}
+	};
 
-int Interface::GetCharacters(TextArea* ta)
-{
-	int count = 0;
 	char Path[_MAX_PATH];
-
-	PathJoin( Path, GamePath, GameCharactersPath, NULL );
-	DirectoryIterator dir(Path);
-	if (!dir) {
-		return -1;
+	const char* resourcePath = NULL;
+	DirectoryIterator::FileFilterPredicate* filter = NULL;
+	switch (dir) {
+		case DIRECTORY_CHR_PORTRAITS:
+			resourcePath = GamePortraitsPath;
+			filter = new ExtFilter("BMP");
+			if (IsAvailable(IE_PNG_CLASS_ID)) {
+				// chain an ORed filter for png
+				filter = new OrPredicate<const char*>(filter, new ExtFilter("PNG"));
+			}
+			break;
+		case DIRECTORY_CHR_SOUNDS:
+			resourcePath = GameSoundsPath;
+			filter = new ExtFilter("WAV");
+			break;
+		case DIRECTORY_CHR_EXPORTS:
+			resourcePath = GameCharactersPath;
+			filter = new ExtFilter("CHR");
+			break;
 	}
-	print("Looking in %s", Path);
-	// TODO: get a sorted list then append to TA
-	do {
-		char *name = dir.GetName();
-		if (name[0] == '.')
-			continue;
-		if (dir.IsDirectory())
-			continue;
-		strupr(name);
-		char *pos = strstr(name,".CHR");
-		if (!pos) continue;
-		*pos=0;
-		count++;
-		ta->AppendText( name );
-	} while (++dir);
-	return count;
+
+	PathJoin( Path, GamePath, resourcePath, NULL );
+	DirectoryIterator dirIt(Path);
+	dirIt.SetFilterPredicate(filter);
+	return dirIt;
 }
 
 bool Interface::InitializeVarsWithINI(const char* iniFileName)
@@ -4687,9 +4633,10 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 		return;
 	}
 	do {
-		char *name = dir.GetName();
+		const char *name = dir.GetName();
 		if (dir.IsDirectory())
 			continue;
+		// FIXME: we need a more universal isHidden type method on DirectoryIterator
 		if (name[0] == '.')
 			continue;
 		if (!onlysave || SavedExtension(name) ) {

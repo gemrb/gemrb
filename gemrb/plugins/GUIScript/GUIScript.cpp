@@ -4376,6 +4376,34 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
 }
 
+// FIXME: probably could use a better home, and probably vary from game to game;
+static const Color Hover = {255, 180, 0, 0};
+static const Color Selected = {255, 100, 0, 0};
+
+void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<SelectOption>& opts)
+{
+	std::vector<String> strings;
+	do {
+		const char *name = it.GetName();
+		if (it.IsDirectory())
+			continue;
+
+		String* string = StringFromCString(name);
+		size_t pos = string->find_last_of(L'.');
+		if (pos != String::npos) {
+			string->resize(pos);
+		}
+		StringToUpper(*string);
+		strings.push_back(*string);
+		delete string;
+	} while (++it);
+
+	std::sort(strings.begin(), strings.end());
+	for (size_t i =0; i < strings.size(); i++) {
+		opts.push_back(std::make_pair(i, strings[i]));
+	}
+}
+
 PyDoc_STRVAR( GemRB_TextArea_GetPortraits__doc,
 "GetPortraits(WindowIndex, ControlIndex, SmallOrLarge) => int\n\n"
 "Reads in the contents of the portraits subfolder." );
@@ -4392,7 +4420,30 @@ static PyObject* GemRB_TextArea_GetPortraits(PyObject * /*self*/, PyObject* args
 	if (!ta) {
 		return NULL;
 	}
-	return PyInt_FromLong( core->GetPortraits( ta, suffix ) );
+
+	struct PortraitSizeFilter : DirectoryIterator::FileFilterPredicate {
+		char size;
+		PortraitSizeFilter(char size)
+		: size(size) {}
+
+		bool operator()(const char* fname) const {
+			char* extpos = strrchr(fname, '.');
+			if (extpos) {
+				extpos--;
+				return *extpos == size;
+			}
+			return false;
+		}
+	};
+
+	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_PORTRAITS);
+	dir.SetFilterPredicate(new PortraitSizeFilter((suffix) ? 'S' : 'M'));
+
+	std::vector<SelectOption> TAOptions;
+	ProcessDirectoryForTAOptions(dir, TAOptions);
+	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
+
+	return PyInt_FromLong( TAOptions.size() );
 }
 
 PyDoc_STRVAR( GemRB_TextArea_GetCharSounds__doc,
@@ -4410,7 +4461,13 @@ static PyObject* GemRB_TextArea_GetCharSounds(PyObject * /*self*/, PyObject* arg
 	if (!ta) {
 		return NULL;
 	}
-	return PyInt_FromLong( core->GetCharSounds( ta ) );
+
+	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_SOUNDS);
+	std::vector<SelectOption> TAOptions;
+	ProcessDirectoryForTAOptions(dir, TAOptions);
+	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
+
+	return PyInt_FromLong( TAOptions.size() );
 }
 
 PyDoc_STRVAR( GemRB_TextArea_GetCharacters__doc,
@@ -4428,7 +4485,13 @@ static PyObject* GemRB_TextArea_GetCharacters(PyObject * /*self*/, PyObject* arg
 	if (!ta) {
 		return NULL;
 	}
-	return PyInt_FromLong( core->GetCharacters( ta ) );
+
+	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_EXPORTS);
+	std::vector<SelectOption> TAOptions;
+	ProcessDirectoryForTAOptions(dir, TAOptions);
+	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
+
+	return PyInt_FromLong( TAOptions.size() );
 }
 
 PyDoc_STRVAR( GemRB_GetPartySize__doc,
