@@ -26,6 +26,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
+#include "ImageMgr.h"
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"
@@ -200,6 +201,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
+	// reset the TA
+	ta->SetAnimPicture(NULL);
 	ta->ClearSelectOptions();
 
 	Actor *speaker = GetSpeaker();
@@ -221,6 +224,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	}
 
 	int si;
+	GameControl* gc = core->GetGameControl();
 	if (choose == (unsigned int) -1) {
 		//increasing talkcount after top level condition was determined
 
@@ -231,11 +235,11 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (tgt) {
-			if (core->GetGameControl()->GetDialogueFlags()&DF_TALKCOUNT) {
-				core->GetGameControl()->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
+			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
+				gc->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
 				tgt->TalkCount++;
-			} else if (core->GetGameControl()->GetDialogueFlags()&DF_INTERACT) {
-				core->GetGameControl()->SetDialogueFlags(DF_INTERACT, BM_NAND);
+			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
+				gc->SetDialogueFlags(DF_INTERACT, BM_NAND);
 				tgt->InteractCount++;
 			}
 		}
@@ -380,7 +384,28 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		return false;
 	}
 
-	//displaying npc text
+	// displaying npc text and portrait
+	const char *portrait = NULL;
+	if (tgt) {
+		portrait = tgt->GetPortrait(1);
+	}
+	if (portrait) {
+		// dialog speaker pic
+		ieResRef PortraitResRef;
+		strnlwrcpy(PortraitResRef, portrait, 8);
+		ResourceHolder<ImageMgr> im(PortraitResRef, true);
+		if (im) {
+			// we set the anim picture for the speaker to always be on the side during dialogue,
+			// but also append the image to the TA so that it remains in the backlog.
+			Sprite2D* image = im->GetSprite2D();
+			ta->SetAnimPicture(image);
+
+			// TODO: I would like to actually append the image as content to the TA
+			// the TA supports this, but unfortunately we destroy the TA at the end of dialog
+			// the TA that replaces it is created via ta->QueryText() on the old one so images are lost!
+			//ta->AppendContent(new ImageSpan(image));
+		}
+	}
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 
 	int idx = 0;
@@ -402,7 +427,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 		}
 		core->GetDictionary()->SetAt("DialogOption",x);
-		core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+		gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
 		return true;
 	}
 	for (x = 0; x < ds->transitionsCount; x++) {
@@ -417,13 +442,14 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//dialogchoose should be set to x
 			//it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption",x);
-			core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+			gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 		} else {
 			String* string = core->GetString( ds->transitions[x]->textStrRef );
 			dialogOptions.push_back(std::make_pair(x, *string));
 			delete string;
 		}
 	}
+
 	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
 	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
 	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);
@@ -431,7 +457,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "Dialog", "There were no valid dialog options!");
-		core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+		gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 	}
 
 	return true;

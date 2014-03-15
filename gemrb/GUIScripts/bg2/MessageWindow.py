@@ -131,7 +131,7 @@ def UpdateControlStatus():
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_SPEAKER|IE_GUI_TEXTAREA_HISTORY)
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	hideflag = GemRB.HideGUI()
 	MessageTA = GUIClasses.GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:

@@ -41,13 +41,10 @@ namespace GemRB {
 
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
-#define IE_GUI_TEXTAREA_SELECTABLE   1	// listbox
-#define IE_GUI_TEXTAREA_AUTOSCROLL   2
-#define IE_GUI_TEXTAREA_SMOOTHSCROLL 4	// chapter text
-#define IE_GUI_TEXTAREA_HISTORY      8	// message window
-#define IE_GUI_TEXTAREA_SPEAKER      16	// message window
-#define IE_GUI_TEXTAREA_ALT_FONT     32	// this one disables drop capitals, unused
-#define IE_GUI_TEXTAREA_EDITABLE     64
+#define IE_GUI_TEXTAREA_AUTOSCROLL   1
+#define IE_GUI_TEXTAREA_SMOOTHSCROLL 2	// chapter text
+#define IE_GUI_TEXTAREA_HISTORY      4	// message window
+#define IE_GUI_TEXTAREA_EDITABLE     8
 
 typedef std::pair<int, String> SelectOption;
 
@@ -119,7 +116,6 @@ private: // Private attributes
 
 	/** Fonts */
 	Font* finit, * ftext;
-	ieResRef PortraitResRef;
 
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
@@ -144,7 +140,6 @@ private: //internal functions
 
 	void CalcRowCount();
 	void UpdateControls();
-	void RefreshSprite(const char *portrait);
 	void SetPalette(const Color*, PALETTE_TYPE);
 
 public: //Events

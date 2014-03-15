@@ -23,12 +23,11 @@
 #include "win32def.h"
 
 #include "GameData.h"
-#include "ImageMgr.h"
+#include "Interface.h"
+#include "Variables.h"
 #include "Video.h"
 #include "GUI/EventMgr.h"
-#include "GUI/GameControl.h"
 #include "GUI/Window.h"
-#include "Scriptable/Actor.h"
 
 #define EDGE_PADDING 3
 
@@ -47,7 +46,6 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	Value = -1;
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOnSelect );
-	PortraitResRef[0]=0;
 
 	if (caps != ftext) {
 		// quick font optimization (prevents creating unnecessary spans)
@@ -79,23 +77,6 @@ TextArea::~TextArea(void)
 	delete textContainer;
 }
 
-void TextArea::RefreshSprite(const char *portrait)
-{
-	if (AnimPicture) {
-		if (!strnicmp(PortraitResRef, portrait, 8) ) {
-			return;
-		}
-		SetAnimPicture(NULL);
-	}
-	strnlwrcpy(PortraitResRef, portrait, 8);
-	ResourceHolder<ImageMgr> im(PortraitResRef, true);
-	if (im == NULL) {
-		return;
-	}
-
-	SetAnimPicture ( im->GetSprite2D() );
-}
-
 bool TextArea::NeedsDraw()
 {
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
@@ -119,14 +100,8 @@ void TextArea::DrawInternal(Region& clip)
 	}
 	clip.x += EDGE_PADDING;
 
-	Video *video = core->GetVideoDriver();
-
-	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
-		if (AnimPicture) {
-			video->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
-			clip.x+=AnimPicture->Width;
-			clip.w-=AnimPicture->Width;
-		}
+	if (AnimPicture) {
+		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
 	}
 
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
@@ -518,26 +493,6 @@ void TextArea::SetRow(int row)
 void TextArea::CalcRowCount()
 {
 	if (textContainer) {
-		if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
-			const char *portrait = NULL;
-			Actor *actor = NULL;
-			GameControl *gc = core->GetGameControl();
-			if (gc) {
-				Scriptable *target = gc->dialoghandler->GetTarget();
-				if (target && target->Type == ST_ACTOR) {
-					actor = (Actor *)target;
-				}
-			}
-			if (actor) {
-				portrait = actor->GetPortrait(1);
-			}
-			if (portrait) {
-				RefreshSprite(portrait);
-			}
-			if (AnimPicture) {
-				// TODO: resize TextContiner to account for AnimPicture
-			}
-		}
 		size_t textHeight = textContainer->ContainerFrame().h;
 		if (selectOptions) {
 			textHeight += selectOptions->ContainerFrame().h;
