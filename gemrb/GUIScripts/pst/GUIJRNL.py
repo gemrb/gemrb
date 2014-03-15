@@ -200,15 +200,15 @@ def OnJournalCompletedPress ():
 
 def PopulateQuestsList ():
 	GemRB.SetVar ('SelectedQuest', -1)
-	QuestsList.Clear ()
 	QuestDesc.Clear ()
 
+	opts = []
 	j = 0
 	for q in quests[selected_quest_class]:
 		title = GemRB.GetINIQuestsKey (str (q[0]), 'title', '0')
-		QuestsList.Append ('- ', j)
-		QuestsList.Append (int (title), j)
+		opts.append('- ' + GemRB.GetString(int(title))
 		j = j + 1
+	QuestsList.SetOptions(opts)
 	
 def EvaluateCondition (var, value, condition):
 	cur_value = int (GemRB.GetGameVar (var))
@@ -370,15 +370,16 @@ def OnJournalNPCPress ():
 
 def PopulateBeastsList ():
 	GemRB.SetVar ('SelectedBeast', -1)
-	BeastsList.Clear ()
 	BeastDesc.Clear ()
 	BeastImage.SetPicture ('default')
 
+	opts = []
 	j = 0
 	for b in beasts[selected_beast_class]:
 		name = GemRB.GetINIBeastsKey (str (b), 'name', '0')
-		BeastsList.Append (int (name), j)
+		opts.append(GemRB.GetString(int (name)))
 		j = j + 1
+	BeastsList.SetOptions(opts)
 
 def EvaluateAllBeasts ():
 	del beasts[0][:]

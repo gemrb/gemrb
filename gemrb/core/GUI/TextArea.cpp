@@ -529,6 +529,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	Point p = Point(x, y);
 	if (selectOptions) {
 		p.y -= textContainer->ContainerFrame().h;
+		p.y += TextYPos;
 		// container only has text, so...
 		span = dynamic_cast<TextSpan*>(selectOptions->SpanAtPoint(p));
 	}
@@ -651,6 +652,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		OptSpans.push_back(std::make_pair(opts[i].first, span));
 		selectOptions->AppendSpan(span); // container owns the span
 	}
+	UpdateControls();
 	// This hack is to refresh the mouse cursor so that reply below cursor gets
 	// highlighted during a dialog
 	int x,y;

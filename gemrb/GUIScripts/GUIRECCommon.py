@@ -385,7 +385,22 @@ def OpenScriptWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
-	FillScriptList ()
+	row = ScriptsTable.GetRowCount ()
+	
+	options = []
+	for i in range (row):
+		GemRB.SetToken ("script", ScriptsTable.GetRowName (i) )
+		title = ScriptsTable.GetValue (i,0)
+		if title!=-1:
+			desc = ScriptsTable.GetValue (i,1)
+			txt = GemRB.GetString (title)
+			if (desc!=-1):
+				txt += GemRB.GetString (desc) + "\n"
+			options.append(txt) 
+		else:
+			options.append (ScriptsTable.GetRowName (i) + "\n")
+	ScriptTextArea.SetOptions (options)
+	
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
 	scriptindex = ScriptsTable.GetRowIndex (script)
@@ -405,27 +420,9 @@ def OpenScriptWindow ():
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
-	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, UpdateScriptSelection)
+	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def FillScriptList ():
-	global ScriptTextArea
-
-	ScriptTextArea.Clear ()
-	row = ScriptsTable.GetRowCount ()
-	for i in range (row):
-		GemRB.SetToken ("script", ScriptsTable.GetRowName (i) )
-		title = ScriptsTable.GetValue (i,0)
-		if title!=-1:
-			desc = ScriptsTable.GetValue (i,1)
-			txt = GemRB.GetString (title)
-			if (desc!=-1):
-				txt += GemRB.GetString (desc)
-			ScriptTextArea.Append (txt+"\n", -1)
-		else:
-			ScriptTextArea.Append (ScriptsTable.GetRowName (i)+"\n" ,-1)
 	return
 
 def DoneScriptWindow ():

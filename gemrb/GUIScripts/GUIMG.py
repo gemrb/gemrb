@@ -525,19 +525,17 @@ def OpenSequencerWindow ():
 		sb = Window.GetControl (7)
 		sb.SetPos (-1,-1)
 	else:
-		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, ContingencyHelpCondition)
+		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpCondition)
 		CondSelect.SetVarAssoc ("ContCond", 0)
-		for elem in ContCond:
-			CondSelect.Append (elem[0], -1)
+		CondSelect.SetOptions ([elem[0] for elem in ContCond])
 
-		TargSelect.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, ContingencyHelpTarget)
-		TargSelect.SetVarAssoc ("ContTarg", 0)
-		for elem in ContTarg:
-			TargSelect.Append (elem[0], -1)
-			#check if target is only self
-			if Target:
-				TargSelect.SetVarAssoc ("ContTarg", 1)
-				break
+		TargSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpTarget)
+		if Target:
+			TargSelect.SetVarAssoc ("ContTarg", 1)
+			TargSelect.SetOptions (ContTarg[0][0])
+		else:
+			TargSelect.SetVarAssoc ("ContTarg", 0)
+			TargSelect.SetOptions ([elem[0] for elem in ContTarg])
 
 	GemRB.SetVar ("SpellType", 0)
 	TypeButton.SetVarAssoc ("SpellType", 1)

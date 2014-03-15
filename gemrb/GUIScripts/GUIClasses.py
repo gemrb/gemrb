@@ -142,6 +142,7 @@ class GTextArea(GControl):
     'Scroll': _GemRB.TextArea_Scroll,
     'SelectText': _GemRB.TextArea_SelectText,
     'SetFlags': _GemRB.Control_TextArea_SetFlags,
+    'SetOptions': _GemRB.TextArea_SetOptions,
     'GetCharSounds': _GemRB.TextArea_GetCharSounds,
     'GetCharacters': _GemRB.TextArea_GetCharacters,
     'GetPortraits': _GemRB.TextArea_GetPortraits

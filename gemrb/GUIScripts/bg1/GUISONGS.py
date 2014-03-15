@@ -35,9 +35,7 @@ def OnLoad():
 	CreditsButton = MovieWindow.GetControl(3)
 	DoneButton = MovieWindow.GetControl(4)
 	MoviesTable = GemRB.LoadTable("MUSIC")
-	for i in range(1,MoviesTable.GetRowCount() ):
-			s = MoviesTable.GetValue(i, 0)
-			TextAreaControl.Append(s,-1)
+	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(1,MoviesTable.GetRowCount() )])
 	TextAreaControl.SetVarAssoc("MovieIndex",0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)

@@ -4494,6 +4494,46 @@ static PyObject* GemRB_TextArea_GetCharacters(PyObject * /*self*/, PyObject* arg
 	return PyInt_FromLong( TAOptions.size() );
 }
 
+PyDoc_STRVAR( GemRB_TextArea_SetOptions__doc,
+			 "SetOptions(WindowIndex, ControlIndex, Options)\n\n"
+			 "Set the selectable options for the TextArea" );
+
+static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	PyObject* list;
+
+	if (!PyArg_ParseTuple( args, "iiO", &wi, &ci, &list )) {
+		return AttributeError( GemRB_TextArea_GetCharacters__doc );
+	}
+
+	if (!PyList_Check(list)) {
+		return AttributeError( GemRB_TextArea_SetOptions__doc );
+	}
+
+	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
+	if (!ta) {
+		return NULL;
+	}
+
+	PyList_Sort(list);
+	std::vector<SelectOption> TAOptions;
+	PyObject* item = NULL;
+	for (int i = 0; i < PyList_Size(list); i++) {
+		item = PyList_GetItem(list, i);
+		if(!PyString_Check(item)) {
+			return AttributeError( GemRB_TextArea_SetOptions__doc );
+		}
+		String* string = StringFromCString(PyString_AsString(item));
+		TAOptions.push_back(std::make_pair(i, *string));
+		delete string;
+	}
+	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetPartySize__doc,
 "GetPartySize() => int\n\n"
 "Returns the number of PCs." );
@@ -10880,6 +10920,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_GetCharSounds, METH_VARARGS),
 	METHOD(TextArea_GetCharacters, METH_VARARGS),
 	METHOD(TextArea_GetPortraits, METH_VARARGS),
+	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_MoveText, METH_VARARGS),
 	METHOD(TextArea_Rewind, METH_VARARGS),
 	METHOD(TextArea_Scroll, METH_VARARGS),

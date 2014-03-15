@@ -515,13 +515,7 @@ def OpenMovieWindow ():
 	CreditsButton = Window.GetControl(3)
 	DoneButton = Window.GetControl(4)
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
-	for i in range(0, MoviesTable.GetRowCount() ):
-		t = MoviesTable.GetRowName(i)
-		#temporarily out too (see above)
-		#if GemRB.GetVar(t)==1:
-		if 1==1:
-			s = MoviesTable.GetValue(i, 0)
-			TextAreaControl.Append(s,-1)
+	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(0, MoviesTable.GetRowCount())])
 	TextAreaControl.SetVarAssoc("MovieIndex",0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
