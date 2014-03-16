@@ -474,6 +474,9 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 	} else if (sb) {
 		// our scrollbar has set position for us
 		TextYPos = y;
+		MarkDirty();
+		// refresh the cursor/hover selection
+		core->GetEventMgr()->FakeMouseMove();
 	} else {
 		// no scrollbar. need to call SetRow myself.
 		// SetRow will set TextYPos.
@@ -488,6 +491,8 @@ void TextArea::SetRow(int row)
 		TextYPos = row * GetRowHeight();
 	}
 	MarkDirty();
+	// refresh the cursor/hover selection
+	core->GetEventMgr()->FakeMouseMove();
 }
 
 void TextArea::CalcRowCount()
@@ -504,7 +509,8 @@ void TextArea::CalcRowCount()
 	if (!sb)
 		return;
 	ScrollBar* bar = ( ScrollBar* ) sb;
-	bar->SetMax(rows - (Height / GetRowHeight()));
+	ieWord visibleRows = (Height / GetRowHeight());
+	bar->SetMax(rows - visibleRows);
 }
 
 /** Mousewheel scroll */
@@ -585,7 +591,6 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 			}
 		}
 	}
-	MarkDirty();
 }
 
 void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
@@ -594,7 +599,6 @@ void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
 		return;
 	}
 	Value = Sum;
-	MarkDirty();
 }
 
 void TextArea::SelectText(const char* /*select*/)
@@ -655,9 +659,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	UpdateControls();
 	// This hack is to refresh the mouse cursor so that reply below cursor gets
 	// highlighted during a dialog
-	int x,y;
-	core->GetVideoDriver()->GetMousePos(x,y);
-	core->GetEventMgr()->MouseMove(x,y);
+	core->GetEventMgr()->FakeMouseMove();
 }
 
 void TextArea::Clear()
