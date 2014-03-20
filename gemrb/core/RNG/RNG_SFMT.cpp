@@ -90,8 +90,8 @@ RNG_SFMT* RNG_SFMT::getInstance() {
  */
 unsigned int RNG_SFMT::rand(unsigned int min, unsigned int max) {
   // This all makes no sense if min > max, which should never happen.
-  if (min > max) {
-    throw std::invalid_argument("Invalid bounds for RNG: min > max!");
+  if (min > max || max >= UINT_MAX || min >= UINT_MAX) {
+    throw std::invalid_argument("Invalid bounds for RNG!");
     // at this point, the method exits. No return value is needed, because
     // basically the exception itself is returned.
   }
