@@ -187,6 +187,16 @@ bool Region::IntersectsRegion(const Region& rgn) const
 	return true;
 }
 
+Region Region::Intersect(const Region& rgn) const
+{
+	int ix1 = (x >= rgn.x) ? x : rgn.x;
+	int ix2 = (x + w <= rgn.x + rgn.w) ? x + w : rgn.x + rgn.w;
+	int iy1 = (y >= rgn.y) ? y : rgn.y;
+	int iy2 = (y + h <= rgn.y + rgn.h) ? y + h : rgn.y + rgn.h;
+
+	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
+}
+
 void Region::Normalize()
 {
 	if (x > w) {
