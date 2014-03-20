@@ -118,6 +118,8 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/TextEdit.cpp
 	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
+	RNG/RNG_SFMT.cpp
+	RNG/sfmt/SFMT.c
 	Scriptable/Actor.cpp
 	Scriptable/CombatInfo.cpp
 	Scriptable/Container.cpp
@@ -139,6 +141,8 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/VFS.cpp
 	${PLATFORM_SRC}
 	)
+
+ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 
 if (STATIC_LINK)
 	ADD_LIBRARY(gemrb_core STATIC ${gemrb_core_LIB_SRCS})
