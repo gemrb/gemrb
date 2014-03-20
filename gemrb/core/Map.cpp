@@ -51,6 +51,7 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "GUI/Window.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -2416,7 +2417,7 @@ void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy
 
 	while(radiusx<Width || radiusy<Height) {
 		//lets make it slightly random where the actor will appear
-		if (rand()&1) {
+		if (RAND(0,1)) {
 			if (AdjustPositionX(goal, radiusx, radiusy)) {
 				return;
 			}
@@ -3131,7 +3132,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 
 	//check day or night chance
 	bool day = core->GetGame()->IsDay();
-	int chance = rand() % 100;
+	int chance = RAND(0, 99);
 	if ((day && chance > spawn->DayChance) ||
 		(!day && chance > spawn->NightChance)) {
 		spawn->NextSpawn = time + spawn->Frequency * AI_UPDATE_TIME * 60;
@@ -3140,7 +3141,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	}
 	//create spawns
 	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
-	unsigned int spawncount = 0, i = rand() % spawn->Count;
+	unsigned int spawncount = 0, i = RAND(0, spawn->Count-1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, &difficulty, &spawncount)) {
 			break;
@@ -3197,13 +3198,13 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
-	bool interrupt = rand()%100 < chance;
+	bool interrupt = (int) RAND(0, 99) < chance;
 	unsigned int spawncount = 0;
 	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
 		if (interrupt) {
-			int idx = rand()%RestHeader.CreatureNum;
+			int idx = RAND(0, RestHeader.CreatureNum-1);
 			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
 			if (!creature) {
 				core->GetGame()->AdvanceTime(300*AI_UPDATE_TIME);

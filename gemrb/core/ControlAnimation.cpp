@@ -27,6 +27,7 @@
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "GUI/Button.h"
+#include "RNG/RNG_SFMT.h"
 
 namespace GemRB {
 
@@ -88,11 +89,11 @@ void ControlAnimation::UpdateAnimation(bool paused)
 		if (anim_phase == 0) {
 			frame = 0;
 			anim_phase = 1;
-			time = 500 + 500 * (rand() % 20);
+			time = RAND(500, 10000);
 			cycle&=~1;
 			Cycle=cycle;
 		} else if (anim_phase == 1) {
-			if (rand() % 30 == 0) {
+			if (!RAND(0,29)) {
 				cycle|=1;
 				Cycle=cycle;
 			}

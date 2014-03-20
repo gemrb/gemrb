@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "TableMgr.h"
 #include "Video.h"
+#include "RNG/RNG_SFMT.h"
 
 #include <list>
 
@@ -463,7 +464,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	encounter=false;
 	do {
 		lastpath = *p;
-		if (lastpath->EncounterChance > (unsigned int) (rand()%100)) {
+		if (lastpath->EncounterChance > (unsigned int) RAND(0, 99)) {
 			encounter=true;
 			break;
 		}

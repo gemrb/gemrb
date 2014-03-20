@@ -51,6 +51,7 @@
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
+#include "RNG/RNG_SFMT.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -3367,14 +3368,14 @@ void Actor::VerbalConstant(int start, int count) const
 			ResolveStringConstant(soundref, start+count-1);
 		}
 		if (count > 0){
-			DisplayStringCore((Scriptable *const) this, start + rand()%count, DS_CONSOLE|DS_CONST|DS_SPEECH);
+			DisplayStringCore((Scriptable *const) this, start + RAND(0, count-1), DS_CONSOLE|DS_CONST|DS_SPEECH);
 		}
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
 		}
 		if(count > 0) {
-			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+rand()%count), DS_CONSOLE|DS_SPEECH);
+			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+RAND(0, count-1)), DS_CONSOLE|DS_SPEECH);
 		}
 	}
 }
@@ -7558,7 +7559,7 @@ bool Actor::HandleActorStance()
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
-	int x = rand()%1000;
+	int x = RAND(0, 999);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
