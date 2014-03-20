@@ -484,77 +484,42 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 }
 
-
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
-	const Region* clip, Palette* palette)
+								const Region* clip, Palette* palette)
 {
-	int tx = x - spr->XPos;
-	int ty = y - spr->YPos;
+	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
+
 	if (!anchor) {
-		tx -= Viewport.x;
-		ty -= Viewport.y;
+		dst.x -= Viewport.x;
+		dst.y -= Viewport.y;
 	}
 
+	dst = computeClipRect(backBuf, clip, dst.x, dst.y, dst.w, dst.h);
+
+	BlitSprite(spr, Region(0, 0, spr->Width, spr->Height), dst, palette);
+}
+
+void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
+{
+	// TODO: clip dst to the screen?
+	if (dst.w <= 0 || dst.h <= 0)
+		return; // we already know blit fails
+
 	if (!spr->BAM) {
-		//TODO: Add the destination surface and rect to the Blit Pipeline
-		SDL_Rect drect;
-		SDL_Rect t;
-		SDL_Rect* srect = NULL;
-		drect.x = tx;
-		drect.y = ty;
+		SDL_Rect srect = {src.x, src.y, src.w, src.h};
+		SDL_Rect drect = {dst.x, dst.y, dst.w, dst.h};
 
-		if (clip) {
-			if (drect.x + spr->Width <= clip->x)
-				return;
-			if (drect.x >= clip->x + clip->w)
-				return;
-
-			if (drect.y + spr->Height <= clip->y)
-				return;
-			if (drect.y >= clip->y + clip->h)
-				return;
-
-			// determine srect/drect to clip to 'clip'
-			t.x = 0;
-			t.w = spr->Width;
-			if (drect.x < clip->x) {
-				t.x += clip->x - drect.x;
-				t.w -= clip->x - drect.x;
-				drect.x = clip->x;
-			}
-			if (drect.x + t.w > clip->x + clip->w) {
-				t.w = clip->x + clip->w - drect.x;
-			}
-
-			t.y = 0;
-			t.h = spr->Height;
-			if (drect.y < clip->y) {
-				t.y += clip->y - drect.y;
-				t.h -= clip->y - drect.y;
-				drect.y = clip->y;
-			}
-			if (drect.y + t.h > clip->y + clip->h) {
-				t.h = clip->y + clip->h - drect.y;
-			}
-			srect = &t;
-
-		}
 		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (palette) {
 			SDL_Color* palColors = (SDL_Color*)spr->GetPaletteColors();
 			SetSurfacePalette(surf, (SDL_Color*)palette->col);
-			SDL_BlitSurface( surf, srect, backBuf, &drect );
+			SDL_BlitSurface( surf, &srect, backBuf, &drect );
 			SetSurfacePalette(surf, palColors);
 		} else {
-			SDL_BlitSurface( surf, srect, backBuf, &drect );
+			SDL_BlitSurface( surf, &srect, backBuf, &drect );
 		}
 	} else {
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
-
-		Region finalclip = computeClipRect(backBuf, clip, tx, ty, spr->Width, spr->Height);
-
-		if (finalclip.w <= 0 || finalclip.h <= 0)
-			return;
 
 		SDL_LockSurface(backBuf);
 
@@ -570,15 +535,19 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 			SRBlender_Alpha blender;
 
 			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
-			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, (spr->renderFlags&RENDER_FLIP_VERTICAL), finalclip, (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
+								   backBuf, srcdata, pal->col, dst.x, dst.y, src.w, src.h,
+								   (spr->renderFlags&RENDER_FLIP_VERTICAL), dst,
+								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		} else {
 			SRTinter_NoTint<false> tinter;
 			SRBlender_NoAlpha blender;
 
 			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
-			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, (spr->renderFlags&RENDER_FLIP_VERTICAL), finalclip, (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
+								   backBuf, srcdata, pal->col, dst.x, dst.y, src.w, src.h,
+								   (spr->renderFlags&RENDER_FLIP_VERTICAL), dst,
+								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
-
+		
 		SDL_UnlockSurface(backBuf);
 	}
 }

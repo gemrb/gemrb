@@ -90,13 +90,15 @@ public:
 	Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
 	bool SupportsBAMSprites() { return true; }
-	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
+
+	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
+				  const Region* clip, unsigned int flags);
 	void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 					const Region* clip = NULL, Palette* palette = NULL);
-	void BlitGameSprite(const Sprite2D* spr, int x, int y,
-		unsigned int flags, Color tint,
-		SpriteCover* cover, Palette *palette = NULL,
-		const Region* clip = NULL, bool anchor = false);
+	void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* pal = NULL);
+	void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
+						SpriteCover* cover, Palette *palette = NULL,
+						const Region* clip = NULL, bool anchor = false);
 
 	Sprite2D* GetScreenshot( Region r );
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */

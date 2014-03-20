@@ -116,12 +116,12 @@ void Window::DrawWindow()
 	} else if (clip_regions.size()) {
 		// clip drawing (we only do Background right now) for InvalidateForControl
 		for (unsigned int i = 0; i < clip_regions.size(); i++) {
-			Region to_clip = clip_regions[i];
-			to_clip.x += XPos;
-			to_clip.y += YPos;
-			video->SetClipRect(&to_clip);
+			Region fromClip = clip_regions[i];
+			Region toClip = fromClip;
+			toClip.x += XPos;
+			toClip.y += YPos;
 			if (BackGround) {
-				video->BlitSprite( BackGround, XPos, YPos, true );
+				video->BlitSprite( BackGround, fromClip, toClip);
 			}
 		}
 	}

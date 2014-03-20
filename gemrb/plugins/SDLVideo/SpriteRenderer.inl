@@ -89,36 +89,10 @@ static Region computeClipRect(SDL_Surface* target, const Region* clip,
 	// Intersect with SDL clipping rect
 	SDL_Rect cliprect;
 	SDL_GetClipRect(target, &cliprect);
-	if (cliprect.x > r.x) {
-		r.w -= (cliprect.x - r.x);
-		r.x = cliprect.x;
-	}
-	if (cliprect.y > r.y) {
-		r.h -= (cliprect.y - r.y);
-		r.y = cliprect.y;
-	}
-	if (r.x+r.w > cliprect.x+cliprect.w) {
-		r.w = cliprect.x+cliprect.w-r.x;
-	}
-	if (r.y+r.h > cliprect.y+cliprect.h) {
-		r.h = cliprect.y+cliprect.h-r.y;
-	}
+	r = r.Intersect(Region(cliprect.x, cliprect.y, cliprect.w, cliprect.h));
 
 	// Intersect with actual sprite target rectangle
-	if (r.x < tx) {
-		r.w -= (tx - r.x);
-		r.x = tx;
-	}
-	if (r.y < ty) {
-		r.h -= (ty - r.y);
-		r.y = ty;
-	}
-	if (r.x+r.w > tx+width)
-		r.w = tx+width-r.x;
-	if (r.y+r.h > ty+height)
-		r.h = ty+height-r.y;
-
-	return r;
+	return r.Intersect(Region(tx, ty, width, height));
 }
 
 
