@@ -152,6 +152,8 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if (NOT APPLE AND NOT UNSAFE_PLUGIN)
 		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-undefined")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
+	# GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
+	ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
