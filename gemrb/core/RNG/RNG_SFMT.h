@@ -42,7 +42,7 @@ private:
   sfmt_t sfmt;
 
 public:
-  unsigned int rand(unsigned int min = 0, unsigned int max = UINT_MAX);
+  unsigned int rand(unsigned int min = 0, unsigned int max = UINT_MAX-1);
   static RNG_SFMT* getInstance();
 };
 
