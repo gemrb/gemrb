@@ -89,7 +89,10 @@ void ControlAnimation::UpdateAnimation(bool paused)
 		if (anim_phase == 0) {
 			frame = 0;
 			anim_phase = 1;
-			time = RAND(500, 10000);
+			// note: the granularity of time should be
+			// one of twenty values from [500, 10000]
+			// but not the full range.
+			time = 500 + 500 * RAND(0, 19);
 			cycle&=~1;
 			Cycle=cycle;
 		} else if (anim_phase == 1) {
