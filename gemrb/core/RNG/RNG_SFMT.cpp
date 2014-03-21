@@ -1,6 +1,7 @@
 #include "RNG_SFMT.h"
 #include <climits>
 #include <stdexcept>
+#include "System/Logging.h"
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
 // On C++11 systems, <cstdint> could be included instead.
@@ -91,7 +92,7 @@ RNG_SFMT* RNG_SFMT::getInstance() {
 unsigned int RNG_SFMT::rand(unsigned int min, unsigned int max) {
   // This all makes no sense if min > max, which should never happen.
   if (min > max || max >= UINT_MAX || min >= UINT_MAX) {
-    throw std::invalid_argument("Invalid bounds for RNG!");
+    GemRB::error("RNG", "Invalid bounds for RNG! Got min %d, max %d\n", min, max);
     // at this point, the method exits. No return value is needed, because
     // basically the exception itself is returned.
   }
