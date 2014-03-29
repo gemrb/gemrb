@@ -45,7 +45,7 @@ def itemgetter(*items):
 def GetUsableMemorizedSpells(actor, BookType):
 	memorizedSpells = []
 	spellResRefs = []
-	for level in range (9):
+	for level in range (10):
 		spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False)
 		for i in range (spellCount):
 			Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i)
