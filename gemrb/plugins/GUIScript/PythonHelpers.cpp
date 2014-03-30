@@ -87,46 +87,49 @@ bool PythonControlCallback::operator() ()
 	return (*this)(NULL);
 }
 
-bool PythonControlCallback::operator() (Control* /*ctrl*/)
+bool PythonControlCallback::operator() (Control* ctrl)
 {
 	if (!Function || !Py_IsInitialized()) {
 		return false;
 	}
 
-	/*
-	const char* type = "Control";
-	switch(ctrl->ControlType) {
-		case IE_GUI_LABEL:
-			type = "Label";
-			break;
-		case IE_GUI_EDIT:
-			type = "TextEdit";
-			break;
-		case IE_GUI_SCROLLBAR:
-			type = "ScrollBar";
-			break;
-		case IE_GUI_TEXTAREA:
-			type = "TextArea";
-			break;
-		case IE_GUI_BUTTON:
-			type = "Button";
-			break;
-		case IE_GUI_WORLDMAP:
-			type = "WorldMap";
-			break;
-		default:
-			break;
+	PyObject *args = NULL;
+	PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
+	PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
+	const int count = PyInt_AsLong(co_argcount);
+	if (count) {
+		assert(count == 1);
+		const char* type = "Control";
+		switch(ctrl->ControlType) {
+			case IE_GUI_LABEL:
+				type = "Label";
+				break;
+			case IE_GUI_EDIT:
+				type = "TextEdit";
+				break;
+			case IE_GUI_SCROLLBAR:
+				type = "ScrollBar";
+				break;
+			case IE_GUI_TEXTAREA:
+				type = "TextArea";
+				break;
+			case IE_GUI_BUTTON:
+				type = "Button";
+				break;
+			case IE_GUI_WORLDMAP:
+				type = "WorldMap";
+				break;
+			default:
+				break;
+		}
+		// FIXME: how the fuck do you get the window and control index?
+		// I really lothe that we use an index for this :/
+		PyObject* ctrltuple = Py_BuildValue("(ii)", 0, 0);
+		PyObject* obj = gs->ConstructObject(type, ctrltuple);
+		Py_DECREF(ctrltuple);
+		args = Py_BuildValue("(i)", obj);
 	}
-	// FIXME: how the fuck do you get the window and control index?
-	// I really lothe that we use an index for this :/
-
-	PyObject* ctrltuple = Py_BuildValue("(ii)", 0, 0);
-	PyObject* obj = gs->ConstructObject(type, ctrltuple);
-	Py_DECREF(ctrltuple);
-	PyObject *args = Py_BuildValue("(i)", obj);
-	 return CallPython(Function, args);
-	*/
-
-	// TODO: it would probably be nice for python callbacks to receive the control. could be useful
-	return CallPython(Function, NULL);
+	Py_DECREF(func_code);
+	Py_DECREF(co_argcount);
+	return CallPython(Function, args);
 }
