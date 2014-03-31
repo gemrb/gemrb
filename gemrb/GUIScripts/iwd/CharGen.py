@@ -364,11 +364,6 @@ def AcceptPress():
 	# apply class/kit abilities
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
 
-	# ranger tracking is a hardcoded innate
-	if GameCheck.HasHOW():
-		if CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL") != "*":
-			GemRB.LearnSpell (MyChar, "spin139", LS_MEMO)
-
 	# save all the skills
 	LUSkillsSelection.SkillsSave (MyChar)
 
