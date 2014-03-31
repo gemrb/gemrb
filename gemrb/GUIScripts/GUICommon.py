@@ -23,7 +23,7 @@ import GemRB
 import GameCheck
 import GUIClasses
 import CommonTables
-from ie_restype import RES_CHU
+from ie_restype import RES_CHU, RES_2DA
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
@@ -162,6 +162,28 @@ def SetGamedaysAndHourToken ():
 def Gain(infostr, ability):
 	GemRB.SetToken ('SPECIALABILITYNAME', GemRB.GetString(int(ability) ) )
 	GemRB.DisplayString (infostr)
+
+# chargen version of AddClassAbilities
+def ResolveClassAbilities (pc, ClassName):
+	# apply class/kit abilities
+	IsMulti = IsMultiClassed (pc, 1)
+	Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	KitIndex = GetKitIndex (pc)
+	if IsMulti[0]>1:
+		#get the class abilites for each class
+		for i in range (IsMulti[0]):
+			TmpClassName = GetClassRowName (IsMulti[i+1], "class")
+			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
+			if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
+				AddClassAbilities (pc, ABTable, Levels[i], Levels[i])
+	else:
+		if KitIndex:
+			ABTable = CommonTables.KitList.GetValue (str(KitIndex), "ABILITIES")
+		else:
+			ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
+		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
+			AddClassAbilities (pc, ABTable, Levels[0], Levels[0])
 
 # Adds class/kit abilities
 def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
