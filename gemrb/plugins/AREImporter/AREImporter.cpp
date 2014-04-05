@@ -1038,7 +1038,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				ab->SetScriptName(DefaultName);
 			}
 			//IWD2 specific hacks
-			if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+			if (core->HasFeature(GF_3ED_RULES)) {
 				//This flag is used for something else in IWD2
 				if (Flags&AF_NAME_OVERRIDE) {
 					ab->BaseStats[IE_EA]=EA_EVILCUTOFF;
