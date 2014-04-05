@@ -732,11 +732,6 @@ void Map::UpdateScripts()
 			}
 		}
 
-		if (actor->GetStat(IE_AVATARREMOVAL)) {
-			actor->Stop(); // maze and imprisonment should invalidate existing actions
-			continue;
-		}
-
 		/*
 		 * we run scripts all at once because one of the actions in ProcessActions
 		 * might remove us from a cutscene and then bad things can happen when
