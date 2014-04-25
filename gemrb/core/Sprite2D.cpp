@@ -22,8 +22,6 @@
 
 #include "win32def.h"
 
-#include "Interface.h"
-
 namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };

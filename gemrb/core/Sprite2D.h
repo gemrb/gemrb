@@ -30,8 +30,13 @@
 #include "RGBAColor.h"
 #include "exports.h"
 
+#include "Interface.h"
 #include "Palette.h"
+#include "Region.h"
 #include "TypeID.h"
+#include "Video.h"
+
+#include <map>
 
 #define RENDER_FLIP_HORIZONTAL	0x00000001
 #define RENDER_FLIP_VERTICAL	0x00000002
@@ -80,6 +85,43 @@ public:
 
 	void acquire() { ++RefCount; }
 	void release();
+};
+
+template <typename KeyType>
+class SpriteSheet {
+private:
+	Sprite2D* Sheet;
+	Region SheetRegion;
+	std::map<KeyType, Region> RegionMap;
+public:
+	SpriteSheet(Sprite2D* sheet) : Sheet(sheet) {
+		Sheet->acquire();
+		SheetRegion = Region(0,0, Sheet->Width, Sheet->Height);
+	};
+	~SpriteSheet() {
+		Sheet->release();
+	}
+
+	Region operator[](KeyType key) {
+		return RegionMap[key];
+	}
+
+	// return the passed in region, clipped to the sprite dimensions or a region with -1 w/h if outside the sprite bounds
+	Region MapSheetSegment(KeyType key, Region rgn) {
+		Region intersection = rgn.Intersect(SheetRegion);
+		if (!intersection.Dimensions().IsEmpty()) {
+			if (RegionMap.insert(std::make_pair(key, intersection)).second) {
+				return intersection;
+			}
+			// FIXME: should we return something like Region(0,0,0,0) here?
+			// maybe we should just use Atlas[key] = intersection too.
+		}
+		return Region(0,0, -1,-1);
+	}
+
+	void Draw(KeyType key, const Region& dest) const {
+		core->GetVideoDriver()->BlitSprite(Sheet, RegionMap.at(key), dest);
+	}
 };
 
 }
