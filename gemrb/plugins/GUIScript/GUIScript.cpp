@@ -9461,7 +9461,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplySpell__doc,
-"ApplySpell(actor, spellname)\n\n"
+"ApplySpell(actor, spellname[, caster])\n\n"
 "Applies a spell on actor.");
 
 static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
