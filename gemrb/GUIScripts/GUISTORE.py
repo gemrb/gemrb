@@ -1477,7 +1477,15 @@ def BuyHeal ():
 
 	GemRB.GameSetPartyGold (gold-Cure['Price'])
 	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.ApplySpell (pc, Cure['CureResRef'], pc)
+	Spell = GemRB.GetSpell (Cure['CureResRef'])
+	# for anything but raise/resurrect, the talker should be the caster, so
+	# self-targetting spells work properly. Raise dead is an exception as
+	# the teleporting to the temple would not work otherwise
+	if Spell["SpellTargetType"] == 3: # non-living
+		GemRB.ApplySpell (pc, Cure['CureResRef'], Store['StoreOwner'])
+	else:
+		GemRB.ApplySpell (pc, Cure['CureResRef'], pc)
+
 	if SpellTable:
 		sound = SpellTable.GetValue(Cure['CureResRef'], "SOUND")
 	else:
