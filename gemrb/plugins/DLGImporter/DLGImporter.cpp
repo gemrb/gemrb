@@ -74,7 +74,11 @@ bool DLGImporter::Open(DataStream* stream)
 		str->ReadDword( &Flags );
 	}
 	else {
-		Flags = 1; // none of these game have dialog pause
+		// only bg2 has the Flags field in the disk format
+		// some games default to unpaused, while others don't
+		// iwd/how relies on this for ar2112 dialog with arundel
+		//  after returning from dragon's eye (double dialog break)
+		Flags = !core->HasFeature(GF_FORCE_DIALOGPAUSE);
 	}
 	return true;
 }

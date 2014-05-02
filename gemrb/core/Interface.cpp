@@ -2383,6 +2383,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
 		"SkipUpdateHack",     //74GF_SKIPUPDATE_HACK
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
+		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
