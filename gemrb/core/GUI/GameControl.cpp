@@ -1186,7 +1186,13 @@ int GameControl::GetCursorOverDoor(Door *overDoor) const
 {
 	if (!overDoor->Visible()) {
 		if (target_mode == TARGET_MODE_NONE) {
-			return IE_CURSOR_BLOCKED;
+			// most secret doors are in walls, so default to the blocked cursor to not give them away
+			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
+			Game *game = core->GetGame();
+			if (!game) return IE_CURSOR_BLOCKED;
+			Map *area = game->GetCurrentArea();
+			if (!area) return IE_CURSOR_BLOCKED;
+			return area->GetCursor(overDoor->Pos);
 		} else {
 			return lastCursor|IE_CURSOR_GRAY;
 		}
