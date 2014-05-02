@@ -759,6 +759,6 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 
 #include "plugindef.h"
 
-GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
+GEMRB_PLUGIN(0xDBAAB53, "SDL2 GL Video Driver")
 PLUGIN_DRIVER(GLVideoDriver, "sdl")
 END_PLUGIN()

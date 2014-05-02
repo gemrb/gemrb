@@ -833,7 +833,7 @@ float SDL20VideoDriver::ScaleCoordinateVertical(float y)
 #ifndef USE_OPENGL
 #include "plugindef.h"
 
-GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
+GEMRB_PLUGIN(0xDBAAB51, "SDL2 Video Driver")
 PLUGIN_DRIVER(SDL20VideoDriver, "sdl")
 END_PLUGIN()
 #endif

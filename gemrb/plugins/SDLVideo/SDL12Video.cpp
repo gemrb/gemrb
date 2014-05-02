@@ -312,6 +312,6 @@ bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alph
 
 #include "plugindef.h"
 
-GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
+GEMRB_PLUGIN(0xDBAAB50, "SDL1 Video Driver")
 PLUGIN_DRIVER(SDL12VideoDriver, "sdl")
 END_PLUGIN()
