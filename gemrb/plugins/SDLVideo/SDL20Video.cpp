@@ -830,10 +830,10 @@ float SDL20VideoDriver::ScaleCoordinateVertical(float y)
 	return y * height;
 }
 
-/*
+#ifndef USE_OPENGL
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
 PLUGIN_DRIVER(SDL20VideoDriver, "sdl")
 END_PLUGIN()
-*/
+#endif
