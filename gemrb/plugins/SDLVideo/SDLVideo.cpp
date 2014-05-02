@@ -164,6 +164,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 
 	SDL_Keycode key = SDLK_UNKNOWN;
 	int modstate = GetModState(event.key.keysym.mod);
+	SDLKey sym = event.key.keysym.sym;
 
 	/* Loop until there are no events left on the queue */
 	switch (event.type) {
@@ -174,7 +175,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			return GEM_OK;
 			break;
 		case SDL_KEYUP:
-			switch(event.key.keysym.sym) {
+			switch(sym) {
 				case SDLK_LALT:
 				case SDLK_RALT:
 					key = GEM_ALT;
@@ -192,8 +193,8 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					}
 					// fallthrough
 				default:
-					if (event.key.keysym.sym<256) {
-						key = event.key.keysym.sym;
+					if (sym < 256) {
+						key = sym;
 					}
 					break;
 			}
@@ -201,7 +202,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				EvntManager->KeyRelease( key, modstate );
 			break;
 		case SDL_KEYDOWN:
-			if ((event.key.keysym.sym == SDLK_SPACE) && modstate & GEM_MOD_CTRL) {
+			if ((sym == SDLK_SPACE) && modstate & GEM_MOD_CTRL) {
 				core->PopupConsole();
 				break;
 			}
@@ -210,7 +211,17 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 #else
 			key = event.key.keysym.unicode;
 #endif
-			switch (event.key.keysym.sym) {
+			// reenable special numpad keys unless numlock is off
+			if (SDL_GetModState() & KMOD_NUM) {
+				switch (sym) {
+					case SDLK_KP2: sym = SDLK_2; break;
+					case SDLK_KP4: sym = SDLK_4; break;
+					case SDLK_KP6: sym = SDLK_6; break;
+					case SDLK_KP8: sym = SDLK_8; break;
+					default: break;
+				}
+			}
+			switch (sym) {
 				case SDLK_ESCAPE:
 					key = GEM_ESCAPE;
 					break;
@@ -280,7 +291,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				case SDLK_F12:
 					//assuming they come sequentially,
 					//also, there is no need to ever produce more than 12
-					key = GEM_FUNCTION1+event.key.keysym.sym-SDLK_F1;
+					key = GEM_FUNCTION1 + sym-SDLK_F1;
 					break;
 				default:
 					if (( key != 0 )) {
