@@ -41,11 +41,16 @@ using namespace GemRB;
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
+#define SDLKey SDL_Keycode
 #define SDLK_SCROLLOCK SDLK_SCROLLLOCK
+#define SDLK_KP1 SDLK_KP_1
 #define SDLK_KP2 SDLK_KP_2
+#define SDLK_KP3 SDLK_KP_3
 #define SDLK_KP4 SDLK_KP_4
 #define SDLK_KP6 SDLK_KP_6
+#define SDLK_KP7 SDLK_KP_7
 #define SDLK_KP8 SDLK_KP_8
+#define SDLK_KP9 SDLK_KP_9
 #else
 typedef Sint32 SDL_Keycode;
 #endif
