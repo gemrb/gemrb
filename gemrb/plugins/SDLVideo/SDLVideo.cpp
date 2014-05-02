@@ -214,10 +214,15 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			// reenable special numpad keys unless numlock is off
 			if (SDL_GetModState() & KMOD_NUM) {
 				switch (sym) {
+					case SDLK_KP1: sym = SDLK_1; break;
 					case SDLK_KP2: sym = SDLK_2; break;
+					case SDLK_KP3: sym = SDLK_3; break;
 					case SDLK_KP4: sym = SDLK_4; break;
+					// 5 is not special
 					case SDLK_KP6: sym = SDLK_6; break;
+					case SDLK_KP7: sym = SDLK_7; break;
 					case SDLK_KP8: sym = SDLK_8; break;
+					case SDLK_KP9: sym = SDLK_9; break;
 					default: break;
 				}
 			}
@@ -226,9 +231,11 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					key = GEM_ESCAPE;
 					break;
 				case SDLK_END:
+				case SDLK_KP1:
 					key = GEM_END;
 					break;
 				case SDLK_HOME:
+				case SDLK_KP7:
 					key = GEM_HOME;
 					break;
 				case SDLK_UP:
@@ -269,9 +276,11 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					key = GEM_TAB;
 					break;
 				case SDLK_PAGEUP:
+				case SDLK_KP9:
 					key = GEM_PGUP;
 					break;
 				case SDLK_PAGEDOWN:
+				case SDLK_KP3:
 					key = GEM_PGDOWN;
 					break;
 				case SDLK_SCROLLOCK:
