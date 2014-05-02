@@ -12,6 +12,7 @@
 #cmakedefine SYSCONFDIR "${SYSCONF_DIR}"
 #cmakedefine NOCOLOR ${NOCOLOR}
 #cmakedefine USE_OPENGL ${USE_OPENGL}
+#cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
 #cmakedefine HAVE_MALLOC_H 1
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine WIN32_USE_STDIO 1

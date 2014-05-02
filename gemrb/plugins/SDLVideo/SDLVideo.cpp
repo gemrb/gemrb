@@ -100,7 +100,9 @@ int SDLVideoDriver::SwapBuffers(void)
 	unsigned long time;
 	time = GetTickCount();
 	if (( time - lastTime ) < 33) {
-		//SDL_Delay( 33 - (time - lastTime) );
+#ifndef NOFPSLIMIT
+		SDL_Delay( 33 - (time - lastTime) );
+#endif
 		time = GetTickCount();
 	}
 	lastTime = time;
