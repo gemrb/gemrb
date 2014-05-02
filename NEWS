@@ -1,12 +1,12 @@
-GemRB git (f8c7a94b9):
+GemRB v0.8.1 (2014-05-03):
   New features:
-    - 
+    - experimental OpenGL and OpenGL ES renderers
     - spontaneous casting (iwd2) and "cast healing spells on rest"
+    - iwd2 spawns, saving throws
     - utf-8 converter for dialog.tlk to be able to use any (cjk) font
 
   Improved features:
-    - 
-    - spawngroups, autopause
+    - spawngroups, autopause, bg2 demo compatibility
     - inventory, pst guiscripts, pst usability
     - animations, scripting, dialog, touch input, mac gui
     - bugfixes
