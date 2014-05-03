@@ -12,6 +12,8 @@ Full changelog digest:
 NEWS entry
 [/code]
 
+(Optionally link or copy also the release notes)
+
 ******************* MODDING RING ********************
 For the modding news blurb, just skip the changelog digest and put a link
 to the main forum post. Also add a general intro, since this is syndicated:
@@ -23,10 +25,6 @@ For the details, try GemRB yourself or check the [url=]linked changelog[/url] fo
 For SF, just remove all of the BBCode.
 
 https://sourceforge.net/news/submit.php?group_id=10122
-
-******************** HAPPY PENGUIN ******************
-Visit http://www.happypenguin.org/update?GemRB%3A%20The%20Infinity%20Engine%20Clone
-and insert a shortened NEWS summary (3-10 items)
 
 ******************** LGDB ******************
 http://www.lgdb.org/game/gemrb
