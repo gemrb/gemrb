@@ -5,6 +5,11 @@
 #include <cctype>
 #include <sstream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include "System/VFS.h" // for PathDelimiter
+
 #include "GLSLProgram.h"
 
 using namespace GemRB;
@@ -26,8 +31,16 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 {
 	std::string vertexContent;
 	std::string fragmentContent;
-    
+
+    // first check the build dir then fallback to DATA_DIR
 	std::ifstream fileStream(vertexSourceFileName.c_str());
+#ifdef DATA_DIR
+	if (!fileStream.is_open()) {
+		vertexSourceFileName.insert(0, 1, PathDelimiter);
+		vertexSourceFileName.insert(0, DATA_DIR);
+		fileStream.open(vertexSourceFileName.c_str());
+	}
+#endif
 	if(!fileStream.is_open()) 
 	{
 		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + vertexSourceFileName;
@@ -47,6 +60,13 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
     fileStream.close();
 	
 	std::ifstream fileStream2(fragmentSourceFileName.c_str());
+#ifdef DATA_DIR
+	if (!fileStream2.is_open()) {
+		fragmentSourceFileName.insert(0, 1, PathDelimiter);
+		fragmentSourceFileName.insert(0, DATA_DIR);
+		fileStream2.open(fragmentSourceFileName.c_str());
+	}
+#endif
 	if(!fileStream2.is_open()) 
 	{
 		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + fragmentSourceFileName;
