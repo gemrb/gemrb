@@ -1679,7 +1679,10 @@ int Interface::Init(InterfaceConfig* config)
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format
 	vars->Lookup("Full Screen", FullScreen);
-	video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName);
+	if (video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);
