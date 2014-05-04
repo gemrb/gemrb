@@ -151,7 +151,7 @@ bool GLVideoDriver::createPrograms()
 	if (!program32)
 	{
 		msg = GLSLProgram::GetLastError();
-		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	program32->Use();
@@ -162,7 +162,7 @@ bool GLVideoDriver::createPrograms()
 	if (!programPal)
 	{
 		msg = GLSLProgram::GetLastError();
-		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program :%s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program :%s", msg.c_str());
 		return false;
 	}
 	programPal->Use();
@@ -175,7 +175,7 @@ bool GLVideoDriver::createPrograms()
 	if (!programPalGrayed)
 	{
 		msg = GLSLProgram::GetLastError();
-		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programPalGrayed->Use();
@@ -188,7 +188,7 @@ bool GLVideoDriver::createPrograms()
 	if (!programPalSepia)
 	{
 		msg = GLSLProgram::GetLastError();
-		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programPalSepia->Use();
@@ -201,7 +201,7 @@ bool GLVideoDriver::createPrograms()
 	if (!programEllipse)
 	{
 		msg = GLSLProgram::GetLastError();
-		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programEllipse->Use();
@@ -211,7 +211,7 @@ bool GLVideoDriver::createPrograms()
 	if (!programRect)
 	{
 		msg = GLSLProgram::GetLastError();
-		Log(ERROR, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return false;
 	}
 	programRect->Use();
