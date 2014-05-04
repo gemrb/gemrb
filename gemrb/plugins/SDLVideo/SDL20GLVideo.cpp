@@ -24,12 +24,12 @@ using namespace GemRB;
 
 GLVideoDriver::~GLVideoDriver()
 {
-	program32->Release();
-	programPal->Release();
-	programPalGrayed->Release();
-	programPalSepia->Release();
-	programRect->Release();
-	programEllipse->Release();
+	if (program32) program32->Release();
+	if (programPal) programPal->Release();
+	if (programPalGrayed) programPalGrayed->Release();
+	if (programPalSepia) programPalSepia->Release();
+	if (programRect) programRect->Release();
+	if (programEllipse) programEllipse->Release();
 	delete paletteManager;
 	SDL_GL_DeleteContext(context);
 }
