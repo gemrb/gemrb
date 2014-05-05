@@ -37,7 +37,7 @@ find_path(SDL2_MIXER_INCLUDE_DIR SDL_mixer.h
   HINTS
     ENV SDLMIXERDIR
     ENV SDLDIR
-  PATH_SUFFIXES include/SDL include/SDL2 include
+  PATH_SUFFIXES include/SDL2 include/SDL include
   PATHS
     ~/Library/Frameworks/
     /Library/Frameworks/
