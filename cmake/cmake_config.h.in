@@ -9,7 +9,7 @@
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
 #cmakedefine PLUGIN_DIR "${PLUGIN_DIR}"
 #cmakedefine DATA_DIR "${DATA_DIR}"
-#cmakedefine SYSCONFDIR "${SYSCONF_DIR}"
+#cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
 #cmakedefine NOCOLOR ${NOCOLOR}
 #cmakedefine USE_OPENGL ${USE_OPENGL}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
