@@ -7,7 +7,7 @@
 #cmakedefine HAVE_STRNDUP 1
 #cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
-#cmakedefine PLUGINDIR "${PLUGIN_DIR}"
+#cmakedefine PLUGIN_DIR "${PLUGIN_DIR}"
 #cmakedefine DATA_DIR "${DATA_DIR}"
 #cmakedefine SYSCONFDIR "${SYSCONF_DIR}"
 #cmakedefine NOCOLOR ${NOCOLOR}

@@ -206,7 +206,7 @@ AC_REPLACE_FNMATCH
 AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
-CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATA_DIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
+CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATA_DIR=\\\"\$(moddir)\\\" -DPLUGIN_DIR=\\\"\$(plugindir)\\\""
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/gemrb/includes -I\$(top_srcdir)/gemrb/core"
 CXXFLAGS="$CXXFLAGS -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
 

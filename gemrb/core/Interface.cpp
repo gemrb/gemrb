@@ -1565,8 +1565,8 @@ int Interface::Init(InterfaceConfig* config)
 
 	CONFIG_PATH("GemRBOverridePath", GemRBOverridePath, GemRBPath);
 	CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath, GemRBPath);
-#ifdef PLUGINDIR
-	CONFIG_PATH("PluginsPath", PluginsPath, PLUGINDIR);
+#ifdef PLUGIN_DIR
+	CONFIG_PATH("PluginsPath", PluginsPath, PLUGIN_DIR);
 #else
 	CONFIG_PATH("PluginsPath", PluginsPath, "");
 	if (!PluginsPath[0]) {
