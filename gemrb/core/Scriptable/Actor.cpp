@@ -3758,7 +3758,7 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel)
 		return false;
 	}
 	int roll = core->Roll(1, 20, 0);
-	int concentration = Modified[IE_CONCENTRATION];
+	int concentration = GetSkill(IE_CONCENTRATION);
 	int bonus = 0;
 	// combat casting bonus only applies when injured
 	if (HasFeat(FEAT_COMBAT_CASTING) && BaseStats[IE_HITPOINTS] != Modified[IE_HITPOINTS]) {
