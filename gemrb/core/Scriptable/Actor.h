@@ -881,6 +881,7 @@ public:
 	void SetDisarmingTrap(ieDword trapId) { disarmTrap = trapId; }
 	ieDword GetDisarmingTrap() const { return disarmTrap; }
 	void ReleaseCurrentAction();
+	bool ConcentrationCheck() const;
 };
 }
 

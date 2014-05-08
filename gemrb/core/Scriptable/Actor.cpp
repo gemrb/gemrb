@@ -9700,5 +9700,57 @@ void Actor::ReleaseCurrentAction()
 	Scriptable::ReleaseCurrentAction();
 }
 
+// concentration is annoying: besides special cases, every caster should
+// check if there's an enemy nearby
+bool Actor::ConcentrationCheck() const
+{
+	if (!core->HasFeature(GF_3ED_RULES)) return true;
+
+	// anyone in a 5' radius?
+	// 9 is from the GetSpellDistance estimate
+	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*9);
+	Actor **poi = neighbours;
+	bool enemyFound = false;
+	while (*poi) {
+		Actor *neighbour = *poi;
+		if (neighbour->GetStat(IE_EA) > EA_EVILCUTOFF) {
+			enemyFound = true;
+			break;
+		}
+		poi++;
+	}
+	free(neighbours);
+	if (!enemyFound) return true;
+
+	// so there is someone out to get us and we should do the real concentration check
+	int roll = LuckyRoll(1, 20, 0);
+	// TODO: the manual replaces the con bonus with an int one (verify!)
+	int concentration = GetStat(IE_CONCENTRATION);
+	int bonus = GetAbilityBonus(IE_INT);
+	if (HasFeat(FEAT_COMBAT_CASTING)) {
+		bonus += 4;
+	}
+
+	Spell* spl = gamedata->GetSpell(SpellResRef, true);
+	if (!spl) return true;
+	int spellLevel = spl->SpellLevel;
+	gamedata->FreeSpell(spl, SpellResRef, false);
+
+	if (roll + concentration + bonus < 15 + spellLevel) {
+		if (InParty) {
+			displaymsg->DisplayRollStringName(39258, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+		} else {
+			displaymsg->DisplayRollStringName(39265, DMC_LIGHTGREY, this);
+		}
+		return false;
+	} else {
+		if (InParty) {
+			// ~Successful spell casting concentration check! Check roll %d vs. difficulty %d (%d bonus)~
+			displaymsg->DisplayRollStringName(39257, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+		}
+	}
+	return true;
+}
+
 }
 

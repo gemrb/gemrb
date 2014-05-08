@@ -1163,6 +1163,11 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
 			return 0;
 		}
+
+		// iwd2: make a concentration check if needed
+		if (!actor->ConcentrationCheck()) {
+			return 0;
+		}
 	}
 
 	return 1;
