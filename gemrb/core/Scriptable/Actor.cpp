@@ -3750,8 +3750,7 @@ bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
 	if (!third) {
 		return true;
 	}
-	// FIXME: change to SpellTarget once the split is done
-	if (!LastTarget && LastTargetPos.isempty()) {
+	if (!LastSpellTarget && LastTargetPos.isempty()) {
 		// not casting, nothing to do
 		return false;
 	}
