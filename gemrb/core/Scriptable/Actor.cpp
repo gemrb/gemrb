@@ -3739,13 +3739,16 @@ void Actor::GetHit(int damage, int spellLevel)
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
 	}
-	if (CheckCastingInterrupt(damage, spellLevel)) {
+	if (CheckSpellDisruption(damage, spellLevel)) {
 		InterruptCasting = true;
 	}
 }
 
-// TODO: check that this isn't the same thing we have in GSUtils (that one is missing a debug string in the original)
-bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
+// this has no effect in adnd
+// iwd2 however has two mechanisms: spell disruption and concentration checks:
+// - disruption is checked when a caster is damaged while casting
+// - concentration is checked when casting is taking place <= 5' from an enemy
+bool Actor::CheckSpellDisruption(int damage, int spellLevel)
 {
 	if (!third) {
 		return true;
