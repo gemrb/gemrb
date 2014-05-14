@@ -148,6 +148,8 @@ bool Font::MatchesResRef(const ieResRef resref)
 const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 {
 	assert(AtlasIndex.find(chr) == AtlasIndex.end());
+	// if this character is already an alias then we have a problem...
+	assert(AliasMap.find(chr) == AliasMap.end());
 	assert(spr);
 	
 	Size size(spr->Width, spr->Height);
@@ -167,8 +169,29 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 	return CurrentAtlasPage->GlyphForChr(chr);
 }
 
+void Font::CreateAliasForChar(ieWord chr, ieWord alias)
+{
+	assert(AliasMap.find(alias) == AliasMap.end());
+	// we cannot create an alias of an alias...
+	assert(AliasMap.find(chr) == AliasMap.end());
+	// we cannot create an alias for a chaaracter that doesnt exist
+	assert(AtlasIndex.find(chr) != AtlasIndex.end());
+
+	AliasMap[alias] = chr;
+
+	// we need to now find the page for the existing character and add this new one to that page
+	size_t pageIdx = AtlasIndex.at(chr);
+	AtlasIndex[alias] = pageIdx;
+	Atlas[pageIdx]->MapSheetSegment(alias, (*Atlas[pageIdx])[chr]);
+}
+
 const Glyph& Font::GetGlyph(ieWord chr) const
 {
+	// Aliases are 2 glyphs that share identical BAM frames such as 'ā' and 'a'
+	// we can save a few bytes of memory this way :)
+	if (AliasMap.find(chr) != AliasMap.end()) {
+		chr = AliasMap.at(chr);
+	}
 	return Atlas[AtlasIndex.at(chr)]->GlyphForChr(chr);
 }
 

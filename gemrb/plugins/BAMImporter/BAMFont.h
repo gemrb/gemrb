@@ -33,8 +33,6 @@ class BAMFont : public Font
 {
 public:
 	BAMFont(Palette* pal, AnimationFactory* af);
-
-	const Sprite2D* GetCharSprite(ieWord chr) const;
 };
 
 }

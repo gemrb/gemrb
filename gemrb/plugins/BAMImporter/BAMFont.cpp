@@ -54,6 +54,7 @@ BAMFont::BAMFont(Palette* pal, AnimationFactory* af)
 		}
 	}
 
+	std::map<Sprite2D*, ieWord> tmp;
 	Sprite2D* spr = NULL;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
 		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
@@ -61,12 +62,19 @@ BAMFont::BAMFont(Palette* pal, AnimationFactory* af)
 			assert(spr);
 			wchar_t chr = ((frame << 8) | (cycle&0x00ff)) + 1;
 
-			CreateGlyphForCharSprite(chr, spr);
+			if (tmp.find(spr) != tmp.end()) {
+				// opimization for when glyphs are shared between cycles
+				// just alias the existing character
+				// this is very useful for choping out huge chunks fo unused character ranges
+				CreateAliasForChar(tmp.at(spr), chr);
+			} else {
+				CreateGlyphForCharSprite(chr, spr);
+				tmp[spr] = chr;
+			}
 			spr->release();
 		}
 	}
 	delete af;
 }
-
 
 }
