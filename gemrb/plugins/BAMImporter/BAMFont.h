@@ -31,12 +31,8 @@ namespace GemRB {
 
 class BAMFont : public Font
 {
-private:
-	AnimationFactory* factory;
-
 public:
 	BAMFont(Palette* pal, AnimationFactory* af);
-	~BAMFont(void);
 
 	const Sprite2D* GetCharSprite(ieWord chr) const;
 };

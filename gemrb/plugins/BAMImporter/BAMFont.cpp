@@ -28,7 +28,6 @@ namespace GemRB {
 BAMFont::BAMFont(Palette* pal, AnimationFactory* af)
 	: Font(pal)
 {
-	factory = af;
 	bool isNumeric = (af->GetCycleCount() <= 1);
 	// Cycles 0 and 1 of a BAM appear to be "magic" glyphs
 	// I think cycle 1 is for determining line height (maxHeight)
@@ -55,34 +54,19 @@ BAMFont::BAMFont(Palette* pal, AnimationFactory* af)
 		}
 	}
 
-	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
-}
-
-BAMFont::~BAMFont()
-{
-	delete factory;
-}
-
-const Sprite2D* BAMFont::GetCharSprite(ieWord chr) const
-{
-	if (chr == 0) return blank;
 	Sprite2D* spr = NULL;
-	size_t cycleCount = factory->GetCycleCount();
-	if (cycleCount > 1) {
-		ieByte frame = ((chr >> 8) > 0) ? (chr >> 8) - 1 : 0; // multibyte char when > 0
-		ieByte cycle = chr; // purposely truncating bits
-		spr = factory->GetFrame(frame, cycle-1);
-	} else {
-		// numeric font
-		spr = factory->GetFrameWithoutCycle(chr - '0');
+	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
+		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
+			spr = af->GetFrame(frame, cycle);
+			assert(spr);
+			wchar_t chr = ((frame << 8) | (cycle&0x00ff)) + 1;
+
+			CreateGlyphForCharSprite(chr, spr);
+			spr->release();
+		}
 	}
-	if (!spr) {
-		Log(ERROR, "BAMFont", "%s missing glyph for character '%x' using %s encoding.", name, chr, core->TLKEncoding.encoding.c_str());
-		spr = blank;
-	} else {
-		spr->release();
-	}
-	return spr;
+	delete af;
 }
+
 
 }

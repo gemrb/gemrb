@@ -89,17 +89,21 @@ public:
 
 template <typename KeyType>
 class SpriteSheet {
-private:
+protected:
 	Sprite2D* Sheet;
 	Region SheetRegion;
 	std::map<KeyType, Region> RegionMap;
+
+	SpriteSheet() {
+		Sheet = NULL;
+	}
 public:
 	SpriteSheet(Sprite2D* sheet) : Sheet(sheet) {
 		Sheet->acquire();
 		SheetRegion = Region(0,0, Sheet->Width, Sheet->Height);
 	};
-	~SpriteSheet() {
-		Sheet->release();
+	virtual ~SpriteSheet() {
+		if (Sheet) Sheet->release();
 	}
 
 	Region operator[](KeyType key) {
@@ -120,6 +124,7 @@ public:
 	}
 
 	void Draw(KeyType key, const Region& dest) const {
+		assert(RegionMap.find(key) != RegionMap.end());
 		core->GetVideoDriver()->BlitSprite(Sheet, RegionMap.at(key), dest);
 	}
 };

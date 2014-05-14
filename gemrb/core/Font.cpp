@@ -25,23 +25,101 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "Sprite2D.h"
 #include "Video.h"
 
 #include <sstream>
 
 namespace GemRB {
 
+void BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
+							 ieByte* canvas, const Size& size)
+{
+	assert(canvas);
+
+	// TODO: should handle partial glyphs
+	if (!Region(0, 0, size.w, size.h).PointInside(x, y)) {
+		return; // off the canvas
+	}
+
+	// copy the glyph to the canvas
+	const ieByte* src = glyph.pixels;
+	ieByte* dest = canvas + (size.w * y) + x;
+	for(int row = 0; row < glyph.dimensions.h; row++ ) {
+		//assert(dest <= canvas + (size.w * size.h));
+		if (dest + glyph.dimensions.w > canvas + (size.w * size.h)) {
+			break;
+		}
+		memcpy(dest, src, glyph.dimensions.w);
+		dest += size.w;
+		src += glyph.pitch;
+	}
+}
+
+
+bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
+{
+	assert(glyphs.find(chr) == glyphs.end());
+	if (pageXPos + g.dimensions.w > SheetRegion.w) {
+		return false;
+	}
+	// if we already have a sheet we need to destroy it before we can add more glyphs
+	if (Sheet) {
+		Sheet->release();
+		Sheet = NULL;
+	}
+
+	BlitGlyphToCanvas(g, pageXPos, 0, pageData, Size(SheetRegion.w, SheetRegion.h));
+	MapSheetSegment(chr, Region(pageXPos, 0, g.dimensions.w, g.dimensions.h));
+	// make the non-temporary glyph from our own data
+	ieByte* pageLoc = pageData + pageXPos;
+	glyphs.insert(std::make_pair(chr, Glyph(g.dimensions, g.descent, pageLoc, SheetRegion.w)));
+
+	pageXPos += g.dimensions.w;
+	return true;
+}
+
+const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
+{
+	if (glyphs.find(chr) != glyphs.end()) {
+		return glyphs.at(chr);
+	}
+	static Glyph blank(Size(0,0), 0, NULL, 0);
+	return blank;
+}
+
+void Font::GlyphAtlasPage::Draw(ieWord key, const Region& dest)
+{
+	// ensure that we have a sprite!
+	if (Sheet == NULL) {
+		void* pixels = pageData;
+		// TODO: implement a video driver check to see if the data can be shared
+		if (false) {
+			// pixels are *not* shared
+			// TODO: allocate a new pixel buffer and copy the pixels in
+			// pixels = malloc(size);
+			// memcpy(pixels, GlyphPageData, size);
+		}
+		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, palette, true, 0);
+	}
+	SpriteSheet::Draw(key, dest);
+}
+
+
 Font::Font(Palette* pal)
 : resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
 {
+	CurrentAtlasPage = NULL;
 	name[0] = '\0';
 	SetPalette(pal);
 }
 
 Font::~Font(void)
 {
-	blank->release();
+	GlyphAtlas::iterator it;
+	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
+		delete *it;
+	}
+
 	SetPalette(NULL);
 	free(resRefs);
 }
@@ -67,33 +145,38 @@ bool Font::MatchesResRef(const ieResRef resref)
 	return false;
 }
 
-void Font::BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
-							 ieByte* canvas, const Size& size) const
+const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 {
-	assert(canvas);
-	// TODO: should handle partial glyphs
-	if (!Region(0, 0, size.w, size.h).PointInside(x, y)) {
-		return; // off the canvas
+	assert(AtlasIndex.find(chr) == AtlasIndex.end());
+	assert(spr);
+	
+	Size size(spr->Width, spr->Height);
+	int des = maxHeight - spr->YPos;
+	Glyph tmp = Glyph(size, des, (ieByte*)spr->pixels, spr->Width);
+	// FIXME: should we adjust for spr->XPos too?
+	// adjust the location for the glyph
+	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
+		// page is full, make a new one
+		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, maxHeight + descent), palette);
+		Atlas.push_back(CurrentAtlasPage);
+		CurrentAtlasPage->AddGlyph(chr, tmp);
 	}
+	assert(CurrentAtlasPage);
+	AtlasIndex[chr] = Atlas.size() - 1;
 
-	// copy the glyph to the canvas
-	ieByte* src = glyph.pixels;
-	ieByte* dest = canvas + (size.w * y) + x;
-	for(int row = 0; row < glyph.dimensions.h; row++ ) {
-		//assert(dest <= canvas + (size.w * size.h));
-		if (dest + glyph.dimensions.w > canvas + (size.w * size.h)) {
-			break;
-		}
-		memcpy(dest, src, glyph.dimensions.w);
-		dest += size.w;
-		src += glyph.dimensions.w;
-	}
+	return CurrentAtlasPage->GlyphForChr(chr);
+}
+
+const Glyph& Font::GetGlyph(ieWord chr) const
+{
+	return Atlas[AtlasIndex.at(chr)]->GlyphForChr(chr);
 }
 
 size_t Font::RenderText(const String& string, Region& rgn,
 						Palette* color, ieByte alignment, ieByte** canvas, bool grow) const
 {
 	assert(color); // must have a palette
+
 	// we dont do vertical alignment here!
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
 	assert(canvas || singleLine || !(alignment&(IE_FONT_ALIGN_BOTTOM|IE_FONT_ALIGN_MIDDLE)));
@@ -115,7 +198,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	// is this horribly inefficient?
 	std::wistringstream stream(string);
 	String line, word;
-	const Sprite2D* currGlyph = NULL;
+	//const Sprite2D* currGlyph = NULL;
 	bool done = false, lineBreak = false;
 	size_t charCount = 0;
 	ieByte* lineBuffer = NULL;
@@ -124,14 +207,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		// we dont need it for left alignment
 		lineBuffer = (ieByte*)calloc(maxHeight + descent, rgn.w); // enough for maximum line
 	}
-	Glyph lineGlyphs;
-	lineGlyphs.dimensions.w = rgn.w;
-	lineGlyphs.dimensions.h = maxHeight + descent;
-	lineGlyphs.pixels = lineBuffer;
+	Glyph lineGlyphs(Size(rgn.w, maxHeight + descent), 0, lineBuffer, rgn.w);
 
 	while (!done && (lineBreak || getline(stream, line))) {
 		lineBreak = false;
-		y += maxHeight;
 
 		// check if we need to extend the canvas
 		if (canvas && grow && rgn.h < y) {
@@ -211,10 +290,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 						if (i > 0) { // kerning
 							x -= GetKerningOffset(word[i-1], currChar);
 						}
-						currGlyph = GetCharSprite(currChar);
+
+						const Glyph& curGlyph = GetGlyph(currChar);
 						// should probably use rect intersection, but new lines shouldnt be to the left ever.
-						if (!rgn.PointInside(x + rgn.x - currGlyph->XPos,
-											 y + rgn.y - currGlyph->YPos)) {
+						if (!rgn.PointInside(x + rgn.x, y + rgn.y + curGlyph.descent)) {
 							if (wordW < (int)lineW) {
 								// this probably doest cover every situation 100%
 								// we consider printing done if the blitter is outside the region
@@ -228,22 +307,22 @@ size_t Font::RenderText(const String& string, Region& rgn,
 							}
 							break; // either done, or skipping
 						}
-						if (canvas || lineBuffer) {
-							Glyph g;
-							g.dimensions.w = currGlyph->Width;
-							g.dimensions.h = currGlyph->Height;
-							g.pixels = (ieByte*)currGlyph->pixels;
-							if (lineBuffer)
-								BlitGlyphToCanvas(g, x, maxHeight - currGlyph->YPos,
-												  lineBuffer, rgn.Dimensions());
-							else
-								BlitGlyphToCanvas(g, x, y - currGlyph->YPos,
-												  *canvas, rgn.Dimensions());
+						if (lineBuffer) {
+								BlitGlyphToCanvas(curGlyph, x, curGlyph.descent, lineBuffer, rgn.Dimensions());
+						} else if (canvas) {
+								BlitGlyphToCanvas(curGlyph, x, y + curGlyph.descent, *canvas, rgn.Dimensions());
 						} else {
-							core->GetVideoDriver()->BlitSprite(currGlyph, x + rgn.x, y + rgn.y,
-															   true, &rgn, color);
+							assert(AtlasIndex.find(currChar) != AtlasIndex.end());
+
+							size_t pageIdx = AtlasIndex.at(currChar);
+							assert(pageIdx < AtlasIndex.size());
+
+							GlyphAtlasPage* page = Atlas[pageIdx];
+							Region dst = Region(x + rgn.x, y + rgn.y + curGlyph.descent,
+												curGlyph.dimensions.w, curGlyph.dimensions.h);
+							page->Draw(currChar, dst);
 						}
-						x += currGlyph->Width;
+						x += curGlyph.dimensions.w;
 					}
 					if (done) break;
 					linePos += i + 1;
@@ -252,7 +331,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 					linePos--; // we previously counted a non-existant space
 					break;
 				}
-				x += GetCharSprite(' ')->Width;
+				x += GetGlyph(' ').dimensions.w;
 			}
 			charCount += linePos;
 		}
@@ -278,6 +357,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 		if (!lineBreak && !stream.eof() && !done)
 			charCount++; // for the newline
+		y += maxHeight;
 	}
 	if (lineBuffer)
 		free(lineBuffer);
@@ -427,12 +507,12 @@ Size Font::StringSize(const String& string, const Size* stop) const
 			multiline = true;
 			lines++;
 		} else {
-			const Sprite2D* curGlyph = GetCharSprite(string[i]);
-			curh = curGlyph->Height;
+			const Glyph& curGlyph = GetGlyph(string[i]);
+			curh = curGlyph.dimensions.h;
 			curh += 0;
 			if (curh > h)
 				h = curh;
-			curw += curGlyph->Width;
+			curw += curGlyph.dimensions.w;
 			if (i > 0) { // kerning
 				curw -= GetKerningOffset(string[i-1], string[i]);
 			}
