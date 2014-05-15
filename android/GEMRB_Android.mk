@@ -46,7 +46,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/CHUImporter/CHUImporter.cpp \
 		    main/gemrb/plugins/2DAImporter/2DAImporter.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMFontManager.cpp \
-		    main/gemrb/plugins/BAMImporter/BAMFont.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMImporter.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMSprite2D.cpp \
 		    main/gemrb/plugins/PSTOpcodes/PSTOpcodes.cpp \

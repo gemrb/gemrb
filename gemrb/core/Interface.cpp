@@ -1355,8 +1355,8 @@ int Interface::LoadSprites()
 		Font* fnt = NULL;
 		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
 			if (stricmp(fonts[fntIdx]->GetName(), font_name) == 0
-				&& fonts[fntIdx]->GetStyle() == font_style
-				&& fonts[fntIdx]->GetPointSize() == font_size) {
+				&& fonts[fntIdx]->Style() == font_style
+				&& fonts[fntIdx]->PointSize() == font_size) {
 				fnt = fonts[fntIdx];
 				fnt->AddResRef(ResRef);
 				break;

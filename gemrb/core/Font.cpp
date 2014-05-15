@@ -311,7 +311,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 							continue;
 						}
 						if (i > 0) { // kerning
-							x -= GetKerningOffset(word[i-1], currChar);
+							x -= KerningOffset(word[i-1], currChar);
 						}
 
 						const Glyph& curGlyph = GetGlyph(currChar);
@@ -537,7 +537,7 @@ Size Font::StringSize(const String& string, const Size* stop) const
 				h = curh;
 			curw += curGlyph.dimensions.w;
 			if (i > 0) { // kerning
-				curw -= GetKerningOffset(string[i-1], string[i]);
+				curw -= KerningOffset(string[i-1], string[i]);
 			}
 		}
 		if (stop && (curw > stop->w || curh > stop->h))

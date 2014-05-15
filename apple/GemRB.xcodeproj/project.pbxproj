@@ -359,8 +359,6 @@
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
 		A2A26ADD15AA729800A8E25D /* VideoContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A26ADB15AA729800A8E25D /* VideoContext.cpp */; };
-		A2A2EA2F16A5EB4C0092B903 /* BAMFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA2D16A5EB4C0092B903 /* BAMFont.cpp */; };
-		A2A2EA3016A5EB4C0092B903 /* BAMFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA2D16A5EB4C0092B903 /* BAMFont.cpp */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3516A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3616A5FC860092B903 /* Freetype.cpp */; };
@@ -1391,8 +1389,6 @@
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A26ADB15AA729800A8E25D /* VideoContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VideoContext.cpp; path = ../VLCPlayer/VideoContext.cpp; sourceTree = "<group>"; };
 		A2A26ADC15AA729800A8E25D /* VideoContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoContext.h; path = ../VLCPlayer/VideoContext.h; sourceTree = "<group>"; };
-		A2A2EA2D16A5EB4C0092B903 /* BAMFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFont.cpp; sourceTree = "<group>"; };
-		A2A2EA2E16A5EB4C0092B903 /* BAMFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMFont.h; sourceTree = "<group>"; };
 		A2A2EA3216A5EB630092B903 /* TTFFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TTFFont.cpp; sourceTree = "<group>"; };
 		A2A2EA3316A5EB630092B903 /* TTFFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTFFont.h; sourceTree = "<group>"; };
 		A2A2EA3616A5FC860092B903 /* Freetype.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Freetype.cpp; sourceTree = "<group>"; };
@@ -2381,8 +2377,6 @@
 		A27B86AC139F0A7D0002DC13 /* BAMImporter */ = {
 			isa = PBXGroup;
 			children = (
-				A2A2EA2D16A5EB4C0092B903 /* BAMFont.cpp */,
-				A2A2EA2E16A5EB4C0092B903 /* BAMFont.h */,
 				A28D24A0143C24C100A27897 /* BAMFontManager.cpp */,
 				A28D24A3143C24E500A27897 /* BAMFontManager.h */,
 				A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */,
@@ -4752,7 +4746,6 @@
 			files = (
 				A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */,
 				A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */,
-				A2A2EA3016A5EB4C0092B903 /* BAMFont.cpp in Sources */,
 				A2EC2F91176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4954,7 +4947,6 @@
 				A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */,
 				A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */,
 				A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
-				A2A2EA2F16A5EB4C0092B903 /* BAMFont.cpp in Sources */,
 				A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */,
 				A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */,
 				A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,

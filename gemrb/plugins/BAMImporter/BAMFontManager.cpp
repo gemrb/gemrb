@@ -18,7 +18,6 @@
  *
  */
 
-#include "BAMFont.h"
 #include "BAMFontManager.h"
 #include "Palette.h"
 #include "Sprite2D.h"
@@ -53,6 +52,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 							  FontStyle /*style*/, Palette* pal)
 {
 	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
+	bool isNumeric = (af->GetCycleCount() <= 1);
 
 	Sprite2D* first = NULL;
 	if (isStateFont) {
@@ -67,6 +67,15 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		first = af->GetFrameWithoutCycle(0);
 	}
 
+	// Cycles 0 and 1 of a BAM appear to be "magic" glyphs
+	// I think cycle 1 is for determining line height (maxHeight)
+	// this is important because iterating the initials font would give an incorrect maxHeight
+	// initials should still have 13 for the line height because they have a descent that covers
+	// multiple lines (3 in BG2). numeric and state fonts don't posess these magic glyphs,
+	// but it is harmless to use them the same way
+	int maxHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
+	int descent = 0;
+
 	Sprite2D* curGlyph = NULL;
 	for (size_t i = 0; i < af->GetFrameCount(); i++) {
 		curGlyph = af->GetFrameWithoutCycle(i);
@@ -76,6 +85,12 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 			else if (af->GetCycleCount() <= 1) // numeric font
 				curGlyph->YPos = curGlyph->Height; // numeric fonts have no descent
 			curGlyph->XPos = 0;
+
+			if (!isNumeric) {
+				int curDescent = curGlyph->Height - curGlyph->YPos;
+				descent = (curDescent > descent) ? curDescent : descent;
+			}
+
 			curGlyph->release();
 		}
 	}
@@ -86,5 +101,32 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	if (!pal)
 		pal = first->GetPalette();
 	first->release();
-	return new BAMFont(pal, af);;
+
+	Font* fnt = new Font(pal);
+	fnt->maxHeight = maxHeight;
+	fnt->descent = descent;
+
+	std::map<Sprite2D*, ieWord> tmp;
+	Sprite2D* spr = NULL;
+	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
+		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
+			spr = af->GetFrame(frame, cycle);
+			assert(spr);
+			wchar_t chr = ((frame << 8) | (cycle&0x00ff)) + 1;
+
+			if (tmp.find(spr) != tmp.end()) {
+				// opimization for when glyphs are shared between cycles
+				// just alias the existing character
+				// this is very useful for choping out huge chunks fo unused character ranges
+				fnt->CreateAliasForChar(tmp.at(spr), chr);
+			} else {
+				fnt->CreateGlyphForCharSprite(chr, spr);
+				tmp[spr] = chr;
+			}
+			spr->release();
+		}
+	}
+
+	delete af;
+	return fnt;
 }

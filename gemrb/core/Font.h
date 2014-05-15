@@ -144,12 +144,12 @@ private:
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
 					  ieByte** canvas = NULL, bool grow = false) const;
-protected:
-	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
-	void CreateAliasForChar(ieWord chr, ieWord alias);
 public:
 	Font(Palette*);
-	virtual ~Font(void);
+	~Font();
+
+	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
+	void CreateAliasForChar(ieWord chr, ieWord alias);
 
 	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
 								 Palette* pal = NULL, size_t* numPrinted = NULL) const;
@@ -162,8 +162,9 @@ public:
 	const char* GetName() const {return name;};
 	void SetName(const char* newName);
 
-	virtual ieWord GetPointSize() const {return 0;};
-	virtual FontStyle GetStyle() const {return NORMAL;};
+	ieWord PointSize() const {return 0;};
+	FontStyle Style() const {return NORMAL;};
+	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
@@ -177,8 +178,6 @@ public:
 
 	/** Returns size of the string rendered in this font in pixels */
 	Size StringSize(const String&, const Size* = NULL) const;
-
-	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 };
 
 }
