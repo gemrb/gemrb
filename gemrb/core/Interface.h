@@ -297,7 +297,7 @@ enum PauseSetting {
 	PAUSE_ON = 1
 };
 
-enum RESOURSE_DIRECTORY {
+enum RESOURCE_DIRECTORY {
 	DIRECTORY_CHR_PORTRAITS,
 	DIRECTORY_CHR_SOUNDS,
 	DIRECTORY_CHR_EXPORTS
@@ -588,7 +588,7 @@ public:
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
-	DirectoryIterator GetResourceDirectory(RESOURSE_DIRECTORY);
+	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY);
 
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;

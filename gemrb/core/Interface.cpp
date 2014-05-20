@@ -3701,7 +3701,7 @@ int Interface::Roll(int dice, int size, int add) const
 	return add;
 }
 
-DirectoryIterator Interface::GetResourceDirectory(RESOURSE_DIRECTORY dir)
+DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 {
 	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 		char extension[9];
