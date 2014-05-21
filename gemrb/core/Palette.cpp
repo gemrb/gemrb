@@ -27,6 +27,30 @@ namespace GemRB {
 #define MINCOL 2
 #define MUL    2
 
+Palette::Palette(const Color &color, const Color &back)
+{
+	alpha = false;
+	refcount = 1;
+	named = false;
+
+	front = color;
+	this->back = back;
+	col[0].r = 0;
+	col[0].g = 0xff;
+	col[0].b = 0;
+	col[0].a = 0;
+	for (int i = 1; i < 256; i++) {
+		col[i].r = back.r +
+		( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255 );
+		col[i].g = back.g +
+		( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
+		col[i].b = back.b +
+		( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
+		col[i].a = back.a +
+		( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255 );
+	}
+}
+
 void Palette::CreateShadedAlphaChannel()
 {
 	for (int i = 0; i < 256; ++i) {

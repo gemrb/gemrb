@@ -82,7 +82,7 @@ void Label::SetText(const String& string)
 void Label::SetColor(Color col, Color bac)
 {
 	gamedata->FreePalette( palette );
-	palette = core->CreatePalette( col, bac );
+	palette = new Palette( col, bac );
 	MarkDirty();
 }
 

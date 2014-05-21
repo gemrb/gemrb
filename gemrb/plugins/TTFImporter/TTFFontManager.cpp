@@ -119,7 +119,7 @@ Font* TTFFontManager::GetFont(unsigned short ptSize,
 							  FontStyle style, Palette* pal)
 {
 	if (!pal) {
-		pal = core->CreatePalette( ColorWhite, ColorBlack );
+		pal = new Palette( ColorWhite, ColorBlack );
 		pal->CreateShadedAlphaChannel();
 	}
 	return new TTFFont(pal, face, ptSize, style);

@@ -48,7 +48,7 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short
 	ResetEventHandler( EditOnCancel );
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
-	palette = core->CreatePalette( ColorWhite, ColorBlack );
+	palette = new Palette( ColorWhite, ColorBlack );
 }
 
 TextEdit::~TextEdit(void)

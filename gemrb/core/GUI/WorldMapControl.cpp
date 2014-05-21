@@ -83,9 +83,9 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
 	Color black = { 0x00, 0x00, 0x00, 0x00 };
 
-	pal_normal = core->CreatePalette ( normal, black );
-	pal_selected = core->CreatePalette ( selected, black );
-	pal_notvisited = core->CreatePalette ( notvisited, black );
+	pal_normal = new Palette ( normal, black );
+	pal_selected = new Palette ( selected, black );
+	pal_notvisited = new Palette ( notvisited, black );
 
 
 	ResetEventHandler( WorldMapControlOnPress );
@@ -383,28 +383,28 @@ void WorldMapControl::SetColor(int which, Color color)
 	//   because setting background color creates all palettes anew.
 	switch (which) {
 	case IE_GUI_WMAP_COLOR_BACKGROUND:
-		pal = core->CreatePalette( pal_normal->front, color );
+		pal = new Palette( pal_normal->front, color );
 		gamedata->FreePalette( pal_normal );
 		pal_normal = pal;
-		pal = core->CreatePalette( pal_selected->front, color );
+		pal = new Palette( pal_selected->front, color );
 		gamedata->FreePalette( pal_selected );
 		pal_selected = pal;
-		pal = core->CreatePalette( pal_notvisited->front, color );
+		pal = new Palette( pal_notvisited->front, color );
 		gamedata->FreePalette( pal_notvisited );
 		pal_notvisited = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		pal = core->CreatePalette( color, pal_normal->back );
+		pal = new Palette( color, pal_normal->back );
 		gamedata->FreePalette( pal_normal );
 		pal_normal = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		pal = core->CreatePalette( color, pal_selected->back );
+		pal = new Palette( color, pal_selected->back );
 		gamedata->FreePalette( pal_selected );
 		pal_selected = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		pal = core->CreatePalette( color, pal_notvisited->back );
+		pal = new Palette( color, pal_notvisited->back );
 		gamedata->FreePalette( pal_notvisited );
 		pal_notvisited = pal;
 		break;

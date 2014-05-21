@@ -734,7 +734,7 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 void Button::SetTextColor(const Color &fore, const Color &back)
 {
 	gamedata->FreePalette( normal_palette );
-	normal_palette = core->CreatePalette( fore, back );
+	normal_palette = new Palette( fore, back );
 	MarkDirty();
 }
 

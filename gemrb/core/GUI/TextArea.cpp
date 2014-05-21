@@ -50,7 +50,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	if (caps != ftext) {
 		// quick font optimization (prevents creating unnecessary spans)
 		finit = caps;
-		palettes[PALETTE_INITIALS] = core->CreatePalette( initcolor, lowtextcolor );
+		palettes[PALETTE_INITIALS] = new Palette( initcolor, lowtextcolor );
 	} else {
 		finit = NULL;
 	}
@@ -149,7 +149,7 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 	assert(idx < PALETTE_TYPE_COUNT);
 	if (color) {
 		gamedata->FreePalette(palettes[idx]);
-		palettes[idx] = core->CreatePalette( *color, ColorBlack );
+		palettes[idx] = new Palette( *color, ColorBlack );
 	} else if (idx > PALETTE_NORMAL) {
 		// default to normal
 		gamedata->FreePalette(palettes[idx]);
@@ -271,7 +271,7 @@ void TextArea::AppendText(const String& text)
 					switch (*it) {
 						case L']':
 							swscanf(token.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
-							pal = core->CreatePalette(palCol, palette->back);
+							pal = new Palette(palCol, palette->back);
 							state = TEXT;
 							token.clear();
 							continue;

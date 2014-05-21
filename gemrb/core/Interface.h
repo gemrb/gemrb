@@ -620,8 +620,6 @@ public:
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 
-	Palette* CreatePalette(const Color &color, const Color &back);
-
 	void DragItem(CREItem* item, const ieResRef Picture);
 	CREItem* GetDraggedItem() const { return DraggedItem; }
 	/* use this only when the dragged item is dropped */

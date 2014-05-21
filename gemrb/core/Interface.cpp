@@ -1138,7 +1138,7 @@ void Interface::Main()
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
 	double frames = 0.0;
-	Palette* palette = CreatePalette( ColorWhite, ColorBlack );
+	Palette* palette = new Palette( ColorWhite, ColorBlack );
 	do {
 		//don't change script when quitting is pending
 
@@ -1389,7 +1389,7 @@ int Interface::LoadSprites()
 						back = TooltipColor;
 					}
 				}
-				pal = CreatePalette(fore, back);
+				pal = new Palette(fore, back);
 			}
 			ResourceHolder<FontManager> fntMgr(font_name);
 			if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
@@ -2578,28 +2578,6 @@ bool Interface::LoadEncoding()
 	return true;
 }
 
-Palette* Interface::CreatePalette(const Color &color, const Color &back)
-{
-	Palette* pal = new Palette();
-	pal->front = color;
-	pal->back = back;
-	pal->col[0].r = 0;
-	pal->col[0].g = 0xff;
-	pal->col[0].b = 0;
-	pal->col[0].a = 0;
-	for (int i = 1; i < 256; i++) {
-		pal->col[i].r = back.r +
-			( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255 );
-		pal->col[i].g = back.g +
-			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
-		pal->col[i].b = back.b +
-			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
-		pal->col[i].a = back.a +
-			( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255 );
-	}
-	return pal;
-}
-
 /** No descriptions */
 Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 {
@@ -3653,7 +3631,7 @@ int Interface::PlayMovie(const char* ResRef)
 			if (SubtitleFont) {
 				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
-				palette = CreatePalette( fore, back );
+				palette = new Palette( fore, back );
 			}
 		}
 	}
@@ -5588,7 +5566,7 @@ void Interface::SetInfoTextColor(const Color &color)
 	if (InfoTextPalette) {
 		gamedata->FreePalette(InfoTextPalette);
 	}
-	InfoTextPalette = CreatePalette(color, ColorBlack);
+	InfoTextPalette = new Palette(color, ColorBlack);
 }
 
 //todo row?
