@@ -8753,11 +8753,6 @@ void Actor::CreateDerivedStatsIWD2()
 	int i;
 	int turnundeadlevel = 0;
 
-	// barbarian immunity to backstab was hardcoded
-	if (GetBarbarianLevel()) {
-		BaseStats[IE_DISABLEBACKSTAB] = 1;
-	}
-
 	//this is a bit too much hardcoded, backstab ability should be a class ability (like turn undead)
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
