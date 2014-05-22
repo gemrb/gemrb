@@ -355,6 +355,7 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 //used by iwd2
 static ieResRef resref_cripstr={"cripstr"};
 static ieResRef resref_dirty={"dirty"};
+static ieResRef resref_arterial={"artstr"};
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
@@ -8081,10 +8082,33 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 				wi.backstabbing = false;
 			} else {
 				if (wi.backstabbing) {
-					extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-					// ~Sneak Attack for %d~
-					//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
-					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, extraDamage);
+					// first check for feats that change the sneak dice
+					// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
+					if (BackstabResRef[0]!='*') {
+						if (stricmp(BackstabResRef, resref_arterial)) {
+							// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
+							multiplier -= 2;
+							extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+							displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, extraDamage);
+						} else {
+							// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
+							multiplier--;
+							extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+							displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, extraDamage);
+						}
+						core->ApplySpell(BackstabResRef, target, this, multiplier);
+						//do we need this?
+						BackstabResRef[0]='*';
+						if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
+							core->ApplySpell(resref_cripstr, target, this, multiplier);
+						}
+					}
+					if (!extraDamage) {
+						extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+						// ~Sneak Attack for %d~
+						//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
+						displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, extraDamage);
+					}
 				} else {
 					// weapon is unsuitable for sneak attack
 					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
@@ -8132,16 +8156,6 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			core->Autopause(AP_UNUSABLE, this);
 		}
 		return;
-	}
-
-	//special effects on hit for arterial strike and hamstring
-	if (damage>0 && wi.backstabbing && BackstabResRef[0]!='*') {
-		core->ApplySpell(BackstabResRef, target, this, multiplier);
-		//do we need this?
-		BackstabResRef[0]='*';
-		if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-			core->ApplySpell(resref_cripstr, target, this, multiplier);
-		}
 	}
 
 	//critical protection a la PST
