@@ -8065,13 +8065,41 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical)
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
+	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
+	int multiplier = BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
+	int extraDamage = 0; // damage unaffected by the critical multiplier
+	// check 3ed sneak attack
+	if (third) {
+		// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
+		// or one of the stat overrides is set (unconfirmed for iwd2!)
+		ieDword always = Modified[IE_ALWAYSBACKSTAB];
+		bool invisible = Modified[IE_STATE_ID] & state_invisible;
+		// TODO: should probably be rate limited to once per round
+		if (invisible || always || target->Immobile() || IsBehind(target)) {
+			if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity) {
+				displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+				wi.backstabbing = false;
+			} else {
+				if (wi.backstabbing) {
+					extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+					// ~Sneak Attack for %d~
+					//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
+					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, extraDamage);
+				} else {
+					// weapon is unsuitable for sneak attack
+					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+					wi.backstabbing = false;
+				}
+			}
+		}
+	}
+
 	//ToBEx compatibility in the ALWAYSBACKSTAB field:
 	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
 	//1 Ignore invisible requirement and positioning requirement
 	//2 Ignore invisible requirement only
 	//4 Ignore positioning requirement only
-	int multiplier=BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
-	if (multiplier>1) {
+	if (multiplier > 1 && !third) {
 		ieDword always = Modified[IE_ALWAYSBACKSTAB];
 		if ((Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
 			if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
@@ -8095,7 +8123,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	}
 	damage += WeaponDamageBonus(wi);
 
-	if (target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags) ) {
+	if (weaponImmunity) {
 		//'my weapon has no effect'
 		damage = 0;
 		critical = false;
@@ -8145,6 +8173,8 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			}
 		}
 	}
+	// add damage that is unaffected by criticals
+	damage += extraDamage;
 }
 
 bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
