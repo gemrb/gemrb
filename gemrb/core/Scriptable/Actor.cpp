@@ -8753,24 +8753,16 @@ void Actor::CreateDerivedStatsIWD2()
 	int i;
 	int turnundeadlevel = 0;
 
-	//this is a bit too much hardcoded, backstab ability should be a class ability (like turn undead)
-	ieDword backstabdamagemultiplier=GetThiefLevel();
-	if (backstabdamagemultiplier) {
-		backstabdamagemultiplier += GetMonkLevel();
-		backstabdamagemultiplier += GetBardLevel();
-		AutoTable tm("backstab");
-		if (tm)	{
-			ieDword cols = tm->GetColumnCount();
-			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols-1;
-			backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
-		} else {
-			backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
-		}
-		if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
+	// iwd2 does have backstab.2da but it is both unused and with bad data
+	ieDword backstabdamagemultiplier = 0;
+	int level = GetThiefLevel();
+	if (level) {
+		// +1d6 for each odd level
+		backstabdamagemultiplier = (level + 1) / 2;
 	}
 
 	int layonhandsamount = 0;
-	int level = GetPaladinLevel();
+	level = GetPaladinLevel();
 	if (level) {
 		// when this is called for the first time, Modified is not set yet
 		// FIXME: move to RefreshEffects, since it relies on a volatile stat
