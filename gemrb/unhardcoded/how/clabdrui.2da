@@ -2,5 +2,5 @@
 ****
             1           2           3           4           5           6           7           8  9           10  11          12  13          14  15
 ABILITY1    ****        ****        ****        ****        GA_SPIN110  ****        GA_SPIN111  *  GA_SPIN107  *   GA_SPIN141  *   GA_SPIN142  *   GA_SPIN143
-ABILITY2    ****        ****        ****        ****        ****        ****        *           *  GA_SPIN102  *   *           *   *           *   *
-# level 9 should grant 100% poison immunity instead; level 15 should give fatigue immunity
+ABILITY2    ****        ****        ****        ****        ****        ****        *           *  AP_POISIMM  *   *           *   *           *   *
+# TODO: level 15 should give fatigue immunity
