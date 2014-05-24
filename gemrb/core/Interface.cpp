@@ -238,10 +238,7 @@ Interface::Interface()
 		CopyResRef(GroundCircleBam[size], "");
 		GroundCircleScale[size] = 0;
 	}
-	TooltipColor.r = 0;
-	TooltipColor.g = 255;
-	TooltipColor.b = 0;
-	TooltipColor.a = 255;
+
 	TooltipMargin = 10;
 
 	TooltipBack = NULL;
@@ -2389,18 +2386,6 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
 	if (s)
 		strnlwrcpy( TooltipBackResRef, s, 8 );
-
-	s = ini->GetKeyAsString( "resources", "TooltipColor", NULL );
-	if (s) {
-		if (s[0] == '#') {
-			unsigned long c = strtoul (s + 1, NULL, 16);
-			// FIXME: check errno
-			TooltipColor.r = (unsigned char) (c >> 24);
-			TooltipColor.g = (unsigned char) (c >> 16);
-			TooltipColor.b = (unsigned char) (c >> 8);
-			TooltipColor.a = (unsigned char) (c);
-		}
-	}
 
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));

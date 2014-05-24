@@ -357,7 +357,6 @@ private:
 	ieResRef TooltipBackResRef;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
-	Color TooltipColor;
 	int TooltipMargin;
 	ieResRef Palette16;
 	ieResRef Palette32;

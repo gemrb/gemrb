@@ -97,11 +97,6 @@ tooltips don't use background bitmap.
 (e.g. BG1: TOOLTIP)
 
 
-TooltipColor = <rgba_color>
-- - - - - - - - - - - - - -
-Tooltip text color. Default is #ffffffff, i.e. opaque white.
-
-
 TooltipMargin = <number>
 - - - - - - - - - - - - -
 Space between tooltip text and sides of TooltipBack (x2)
