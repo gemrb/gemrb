@@ -609,11 +609,6 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 	RunEventHandler(TextAreaOnSelect);
 }
 
-void TextArea::SelectText(const char* /*select*/)
-{
-	// TODO: implement this
-}
-
 const String& TextArea::QueryText() const
 {
 	return Text;

@@ -67,8 +67,7 @@ public:
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
-	/** Set the TextArea value to the line number containing the string parameter */
-	void SelectText(const char *select);
+
 	/** Sets the Actual Text */
 	void SetText(const char* text);
 	/** Clears the textarea */

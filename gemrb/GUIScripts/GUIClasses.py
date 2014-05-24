@@ -140,7 +140,6 @@ class GTextArea(GControl):
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
     'Scroll': _GemRB.TextArea_Scroll,
-    'SelectText': _GemRB.TextArea_SelectText,
     'SetFlags': _GemRB.Control_TextArea_SetFlags,
     'SetOptions': _GemRB.TextArea_SetOptions,
     'GetCharSounds': _GemRB.TextArea_GetCharSounds,

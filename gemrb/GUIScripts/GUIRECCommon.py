@@ -311,10 +311,7 @@ def OpenSoundWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
-
-	VoiceList.SetVarAssoc ("Selected", 0)
 	VoiceList.GetCharSounds()
-	VoiceList.SelectText (OldVoiceSet)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
