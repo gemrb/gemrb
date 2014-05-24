@@ -28,12 +28,35 @@
 #define RESOURCE_H
 
 #include "Plugin.h"
-
-#include <cstddef>
+#include "System/String.h"
 
 namespace GemRB {
 
+/** Resource reference */
+typedef char ieResRef[9];
+
 class DataStream;
+
+/* Hopefully we can slowly replace the char array version with this struct... */
+struct IeResRef {
+private:
+	char ref[9];
+public:
+	IeResRef(const char* str) {
+		strncpy(ref, str, sizeof(ref)-1 );
+		ref[sizeof(ref)-1] = '\0';
+	};
+
+	const char* CString() const { return ref; }
+
+	bool operator<(const IeResRef& rhs) const {
+		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;
+	};
+
+	bool operator==(const IeResRef& rhs) const {
+		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) == 0;
+	};
+};
 
 /**
  * Base class for all GemRB resources
