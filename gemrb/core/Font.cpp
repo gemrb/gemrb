@@ -106,10 +106,9 @@ void Font::GlyphAtlasPage::Draw(ieWord key, const Region& dest)
 
 
 Font::Font(Palette* pal)
-: resRefs(NULL), numResRefs(0), palette(NULL), maxHeight(0)
+: palette(NULL), maxHeight(0)
 {
 	CurrentAtlasPage = NULL;
-	name[0] = '\0';
 	SetPalette(pal);
 }
 
@@ -121,28 +120,6 @@ Font::~Font(void)
 	}
 
 	SetPalette(NULL);
-	free(resRefs);
-}
-
-bool Font::AddResRef(const ieResRef resref)
-{
-	if (resref) {
-		resRefs = (ieResRef*)realloc(resRefs, sizeof(ieResRef) * ++numResRefs);
-		strnlwrcpy( resRefs[numResRefs - 1], resref, sizeof(ieResRef)-1);
-		return true;
-	}
-	return false;
-}
-
-bool Font::MatchesResRef(const ieResRef resref)
-{
-	for (int i=0; i < numResRefs; i++)
-	{
-		if (strnicmp( resref, resRefs[i], sizeof(ieResRef)-1) == 0){
-			return true;
-		}
-	}
-	return false;
 }
 
 const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
@@ -551,11 +528,6 @@ Size Font::StringSize(const String& string, const Size* stop) const
 	}
 	w = (curw > w) ? curw : w;
 	return Size(w, h);
-}
-
-void Font::SetName(const char* newName)
-{
-	strnlwrcpy( name, newName, sizeof(name)-1);
 }
 
 Palette* Font::GetPalette() const

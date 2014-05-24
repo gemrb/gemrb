@@ -224,7 +224,7 @@ void Scriptable::SetOverheadText(const String* text, bool display)
 	}
 	overHeadTextPos.empty();
 	if (text && text->length()) {
-		OverheadText = new TextSpan(*text, core->GetFont( 1 ), NULL, Size(200, 400), IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
+		OverheadText = new TextSpan(*text, core->GetTextFont(), NULL, Size(200, 400), IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
 		DisplayOverheadText(display);
 	} else {
 		DisplayOverheadText(false);

@@ -225,7 +225,6 @@
 		A29504701609721300BB22AA /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A29504721609721300BB22AA /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AAC14615C1C2F500D27766 /* FreeType.framework */; };
 		A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
-		A29504781609724F00BB22AA /* TTFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A29504771609721300BB22AA /* TTFImporter.so */; };
 		A2969F0F168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */; };
 		A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */; };
 		A2969F11168CDC0D00D9C6FC /* CombatInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = A2969F0E168CDC0D00D9C6FC /* CombatInfo.h */; };
@@ -1124,7 +1123,6 @@
 			files = (
 				A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */,
 				A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */,
-				A29504781609724F00BB22AA /* TTFImporter.so in CopyFiles */,
 				A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */,
 				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
 				A2E9965414DE05590052BABE /* ACMReader.so in CopyFiles */,

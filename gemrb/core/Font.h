@@ -133,9 +133,6 @@ private:
 	// BAM fonts use alisases a lot so this saves quite a bit of space
 	std::map<ieWord, ieWord> AliasMap; // Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 
-	ieResRef* resRefs;
-	int numResRefs;
-	char name[20];
 	Palette* palette;
 public:
 	int maxHeight;
@@ -151,23 +148,16 @@ public:
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
 	void CreateAliasForChar(ieWord chr, ieWord alias);
 
-	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
-								 Palette* pal = NULL, size_t* numPrinted = NULL) const;
 	//allow reading but not setting glyphs
 	const Glyph& GetGlyph(ieWord chr) const;
 
-	bool AddResRef(const ieResRef resref);
-	bool MatchesResRef(const ieResRef resref);
-
-	const char* GetName() const {return name;};
-	void SetName(const char* newName);
-
-	ieWord PointSize() const {return 0;};
-	FontStyle Style() const {return NORMAL;};
-	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
-
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
+
+	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
+
+	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
+								 Palette* pal = NULL, size_t* numPrinted = NULL) const;
 
 	// Printing methods
 	// return the number of glyphs printed

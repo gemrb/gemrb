@@ -123,7 +123,8 @@ static ieWord IDT_SKILLPENALTY = 3;
 static int MagicBit = 0;
 
 Interface::Interface()
-	: TLKEncoding()
+	: ButtonFontResRef("STONESML"), MovieFontResRef("STONESML"), TextFontResRef("FLOATTXT"), TooltipFontResRef("STONESML"),
+	TLKEncoding()
 {
 	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 
@@ -224,9 +225,7 @@ Interface::Interface()
 	GameDataPath[0] = 0;
 
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
-	CopyResRef( ButtonFont, "STONESML" );
-	CopyResRef( TooltipFont, "STONESML" );
-	CopyResRef( MovieFont, "STONESML" );
+
 	CopyResRef( ScrollCursorBam, "CURSARW" );
 	CopyResRef( GlobalScript, "BALDUR" );
 	CopyResRef( WorldMapName[0], "WORLDMAP" );
@@ -269,17 +268,6 @@ Interface::Interface()
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
-}
-
-#define FreeResourceVector(type, variable) \
-{ \
-	size_t i=variable.size(); \
-	while(i--) { \
-		if (variable[i]) { \
-		delete variable[i]; \
-		} \
-	} \
-	variable.clear(); \
 }
 
 //2da lists are ieDword lists allocated by malloc
@@ -378,7 +366,9 @@ Interface::~Interface(void)
 	}
 	SurgeSpells.clear();
 
-	FreeResourceVector( Font, fonts );
+	std::map<IeResRef, Font*>::iterator fit = fonts.begin();
+	for (; fit != fonts.end(); ++fit)
+		delete (*fit).second;
 	// fonts need to be destroyed before TTF plugin
 	PluginMgr::Get()->RunCleanup();
 
@@ -402,7 +392,9 @@ Interface::~Interface(void)
 		delete[] Cursors;
 	}
 
-	FreeResourceVector( Window, windows );
+	std::vector<Window*>::iterator wit = windows.begin();
+	for (; wit != windows.end(); ++wit) \
+		delete *wit;
 
 	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
@@ -1130,7 +1122,7 @@ void Interface::Main()
 		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
 	}
 
-	Font* fps = GetFont( ( unsigned int ) 0 );
+	Font* fps = GetFont( TextFontResRef );
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	const Region fpsRgn( 0, Height - 30, 100, 30 );
 	wchar_t fpsstring[20] = {L"???.??? fps"};
@@ -1325,108 +1317,6 @@ int Interface::LoadSprites()
 
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 
-	Log(MESSAGE, "Core", "Loading Fonts...");
-	AutoTable tab("fonts");
-	if (!tab) {
-		Log(ERROR, "Core", "Cannot find fonts.2da.");
-		return GEM_ERROR;
-	}
-
-	int count = tab->GetRowCount();
-	const char* rowName = NULL;
-	for (int row = 0; row < count; row++) {
-		rowName = tab->GetRowName(row);
-		const char* ResRef = tab->QueryField(rowName, "RESREF");
-		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
-
-		const char* font_name;
-		unsigned short font_size = 0;
-		FontStyle font_style = NORMAL;
-
-		if (CustomFontPath[0]) {
-			font_name = tab->QueryField( rowName, "FONT_NAME" );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
-			font_size = atoi( tab->QueryField( rowName, "PT_SIZE" ) );// not available in BAM fonts.
-			font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) );// not available in BAM fonts.
-		}else{
-			font_name = ResRef;
-		}
-
-		// Do search for existing font here
-		Font* fnt = NULL;
-		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
-			if (stricmp(fonts[fntIdx]->GetName(), font_name) == 0
-				&& fonts[fntIdx]->Style() == font_style
-				&& fonts[fntIdx]->PointSize() == font_size) {
-				fnt = fonts[fntIdx];
-				fnt->AddResRef(ResRef);
-				break;
-			}
-		}
-
-		if (fnt) {
-			Log(MESSAGE, "Core", "Found existing font for %s.", ResRef);
-			// what about palette etc?
-			continue;
-		} else {
-			Palette* pal = NULL;
-			if (needpalette || (CustomFontPath[0] && strnicmp( font_name, ResRef, sizeof(ieResRef)-1) != 0 )) {//non-BAM fonts
-				Color fore = {0xff, 0xff, 0xff, 0};
-				Color back = {0x00, 0x00, 0x00, 0};
-				if (CustomFontPath[0]) {
-					const char* colorString = tab->QueryField( rowName, "COLOR" );
-					unsigned long combinedColor = strtoul(colorString, NULL, 16);
-					ieByte* color = (ieByte*)&combinedColor;
-					fore.r = *color++;
-					fore.g = *color++;
-					fore.b = *color++;
-					fore.a = *color++;
-				}
-				if (!strnicmp(TooltipFont, ResRef, sizeof(ieResRef)-1)) {
-					if (TooltipColor.a==0xff) {
-						fore = TooltipColor;
-					} else {
-						fore = back;
-						back = TooltipColor;
-					}
-				}
-				pal = new Palette(fore, back);
-			}
-			ResourceHolder<FontManager> fntMgr(font_name);
-			if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
-			gamedata->FreePalette(pal);
-		}
-
-		if (!fnt) {
-			Log(WARNING, "Core", "Unable to load font resource: %s", ResRef);
-			continue;
-		}
-
-		fnt->AddResRef(ResRef);
-		fnt->SetName(font_name);
-
-		fonts.push_back(fnt);
-	}
-
-	if (fonts.size() == 0) {
-		Log(ERROR, "Core", "No default font loaded!");
-		return GEM_ERROR;
-	}
-
-	if (GetFont( ButtonFont ) == NULL) {
-		Log(WARNING, "Core", "ButtonFont not loaded: %s",
-					 ButtonFont);
-	}
-	if (GetFont( MovieFont ) == NULL) {
-		Log(WARNING, "Core", "MovieFont not loaded: %s",
-					 MovieFont);
-	}
-	if (GetFont( TooltipFont ) == NULL) {
-		Log(WARNING, "Core", "TooltipFont not loaded: %s",
-					 TooltipFont);
-	}
-
-	Log(MESSAGE, "Core", "Fonts Loaded...");
-
 	if (TooltipBackResRef[0]) {
 		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
@@ -1442,6 +1332,66 @@ int Interface::LoadSprites()
 		}
 	}
 
+	return GEM_OK;
+}
+
+int Interface::LoadFonts()
+{
+	Log(MESSAGE, "Core", "Loading Fonts...");
+	AutoTable tab("fonts");
+	if (!tab) {
+		Log(ERROR, "Core", "Cannot find fonts.2da.");
+		return GEM_ERROR;
+	}
+
+	// FIXME: we used to try and share like fonts
+	// this only ever had a benefit when using non-bam fonts
+	// it could potentially save a a few megs of space (nice for handhelds)
+	// but we should re-enable this by simply letting Font instances share their atlas data
+
+	int count = tab->GetRowCount();
+	const char* rowName = NULL;
+	for (int row = 0; row < count; row++) {
+		rowName = tab->GetRowName(row);
+
+		IeResRef resref = tab->QueryField(rowName, "RESREF");
+		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
+		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
+		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
+		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
+
+		Palette* pal = NULL;
+		if (needpalette) {
+			Color fore = {0xff, 0xff, 0xff, 0};
+			Color back = {0x00, 0x00, 0x00, 0};
+			const char* colorString = tab->QueryField( rowName, "COLOR" );
+			if (colorString) {
+				sscanf(colorString, "0x%2hhx%2hhx%2hhx%2hhx", &fore.r, &fore.g, &fore.b, &fore.a);
+			}
+			if (TooltipFontResRef == resref) {
+				if (fore.a != 0xff) {
+					// FIXME: should have an explaination
+					back = fore;
+					fore = Color();
+				}
+			}
+			pal = new Palette(fore, back);
+		}
+
+		Font* fnt = NULL;
+		ResourceHolder<FontManager> fntMgr(font_name);
+		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
+		gamedata->FreePalette(pal);
+
+		if (!fnt) {
+			Log(WARNING, "Core", "Unable to load font resource: %s for ResRef %s", font_name, resref.CString());
+		} else {
+			fonts[resref] = fnt;
+			Log(MESSAGE, "Core", "Loaded Font: %s for ResRef %s", font_name, resref.CString());
+		}
+	}
+
+	Log(MESSAGE, "Core", "Fonts Loaded...");
 	return GEM_OK;
 }
 
@@ -1895,6 +1845,9 @@ int Interface::Init(InterfaceConfig* config)
 	int ret = LoadSprites();
 	if (ret) return ret;
 
+	ret = LoadFonts();
+	if (ret) return ret;
+
 	QuitFlag = QF_CHANGESCRIPT;
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
@@ -2097,7 +2050,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
 	console = new Console(Region(0, 0, Width, 25));
-	console->SetFont( fonts[0] );
+	console->SetFont( GetFont(MovieFontResRef) );
 	Sprite2D* cursor = GetCursorSprite();
 	if (!cursor) {
 		Log(ERROR, "Core", "Failed to load cursor sprite.");
@@ -2423,15 +2376,15 @@ bool Interface::LoadGemRBINI()
 
 	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
 	if (s)
-		strnlwrcpy( ButtonFont, s, 8 );
+		ButtonFontResRef = s;
 
 	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
 	if (s)
-		strnlwrcpy( TooltipFont, s, 8 );
+		TooltipFontResRef = s;
 
 	s = ini->GetKeyAsString( "resources", "MovieFont", NULL );
 	if (s)
-		strnlwrcpy( MovieFont, s, 8 );
+		MovieFontResRef = s;
 
 	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
 	if (s)
@@ -2600,27 +2553,22 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 	return pal;
 }
 /** Returns a preloaded Font */
-Font* Interface::GetFont(const char *ResRef) const
+Font* Interface::GetFont(const IeResRef& ResRef) const
 {
-	for (unsigned int i = 0; i < fonts.size(); i++) {
-		if (fonts[i]->MatchesResRef(ResRef)) {
-			return fonts[i];
-		}
+	if (fonts.find(ResRef) != fonts.end()) {
+		return fonts.at(ResRef);
 	}
 	return NULL;
 }
 
-Font* Interface::GetFont(unsigned int index) const
+Font* Interface::GetTextFont() const
 {
-	if (index >= fonts.size()) {
-		return NULL;
-	}
-	return fonts[index];
+	return GetFont( TextFontResRef );
 }
 
 Font* Interface::GetButtonFont() const
 {
-	return GetFont( ButtonFont );
+	return GetFont( ButtonFontResRef );
 }
 
 /** Returns the Event Manager */
@@ -3306,7 +3254,7 @@ void Interface::DrawTooltip ()
 	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip)
 		return;
 
-	Font* fnt = GetFont( TooltipFont );
+	Font* fnt = GetFont( TooltipFontResRef );
 	if (!fnt) {
 		return;
 	}
@@ -3626,7 +3574,7 @@ int Interface::PlayMovie(const char* ResRef)
 		int r = atoi(sttable->QueryField("red", "frame"));
 		int g = atoi(sttable->QueryField("green", "frame"));
 		int b = atoi(sttable->QueryField("blue", "frame"));
-		SubtitleFont = GetFont (MovieFont); //will change
+		SubtitleFont = GetFont (MovieFontResRef); //will change
 		if (r || g || b) {
 			if (SubtitleFont) {
 				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};

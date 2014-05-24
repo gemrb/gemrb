@@ -44,8 +44,7 @@ public:
 
 	bool Open(DataStream* stream);
 
-	Font* GetFont(unsigned short ptSize,
-				  FontStyle style, Palette* pal = NULL);
+	Font* GetFont(ieWord pxSize, FontStyle style, Palette* pal = NULL);
 };
 
 }

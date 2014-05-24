@@ -34,6 +34,7 @@
 #include "Callback.h"
 #include "Holder.h"
 #include "InterfaceConfig.h"
+#include "Resource.h"
 
 #include <map>
 #include <string>
@@ -319,7 +320,7 @@ private:
 	Image * pal256;
 	Image * pal32;
 	Image * pal16;
-	std::vector<Font*> fonts;
+	std::map<IeResRef, Font*> fonts;
 	EventMgr * evntmgr;
 	Holder<WindowMgr> windowmgr;
 	Window* ModalWindow;
@@ -343,14 +344,17 @@ private:
 	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures[(GF_COUNT+31)/32];
-	ieResRef ButtonFont;
 	ieResRef CursorBam;
 	ieResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
-	ieResRef TooltipFont;
+
+	IeResRef ButtonFontResRef;
+	IeResRef MovieFontResRef;
+	IeResRef TextFontResRef;
+	IeResRef TooltipFontResRef;
+
 	ieResRef TooltipBackResRef;
-	ieResRef MovieFont;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
 	Color TooltipColor;
@@ -441,8 +445,8 @@ public:
 	/** returns a gradient set */
 	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
 	/** Returns a preloaded Font */
-	Font * GetFont(const char *) const;
-	Font * GetFont(unsigned int index) const;
+	Font* GetFont(const IeResRef&) const;
+	Font* GetTextFont() const;
 	/** Returns the button font */
 	Font * GetButtonFont() const;
 	/** Returns the Event Manager */
@@ -740,6 +744,7 @@ public:
 	bool SaveConfig();
 private:
 	int LoadSprites();
+	int LoadFonts();
 	bool LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
