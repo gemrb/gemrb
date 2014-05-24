@@ -46,8 +46,6 @@ public:
 	const Size& SpanFrame() const { return frame; }
 	const Sprite2D* RenderedSpan() const { return spanSprite; }
 
-	void SetPadding(int lft, int top, int right, int bottom);
-
 	virtual int SpanDescent() const { return 0; };
 };
 
@@ -105,7 +103,7 @@ public:
 	virtual void InsertSpanAfter(ContentSpan* newSpan, const ContentSpan* existing);
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
-	TextSpan* RemoveSpan(const ContentSpan* span);
+	ContentSpan* RemoveSpan(const ContentSpan* span);
 	// excludes all attached spans such that new spans cannot flow adjacent
 	void ClearSpans();
 

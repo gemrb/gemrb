@@ -182,13 +182,13 @@ void ContentContainer::InsertSpanAfter(ContentSpan* newSpan, const ContentSpan* 
 	LayoutSpansStartingAt(it);
 }
 
-TextSpan* ContentContainer::RemoveSpan(const ContentSpan* span)
+ContentSpan* ContentContainer::RemoveSpan(const ContentSpan* span)
 {
 	SpanList::iterator it;
 	it = std::find(spans.begin(), spans.end(), span);
 	if (it != spans.end()) {
 		LayoutSpansStartingAt(--spans.erase(it));
-		return (TextSpan*)span;
+		return (ContentSpan*)span; // easiest to just cast away const, it would be the same pointer either way
 	}
 	return NULL;
 }
