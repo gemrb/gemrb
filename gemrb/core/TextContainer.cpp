@@ -47,21 +47,16 @@ ContentSpan::~ContentSpan()
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
 	: ContentSpan()
 {
-	if (!pal) {
-		palette = fnt->GetPalette();
-		assert(palette);
-	} else {
-		palette = NULL;
-		SetPalette(pal);
-	}
-
-	font = fnt;
-	alignment = 0;
-	RenderSpan(string);
+	Init(string, fnt, pal, 0);
 }
 
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame, ieByte align)
 	: ContentSpan(frame)
+{
+	Init(string, fnt, pal, align);
+}
+
+void TextSpan::Init(const String& string, Font* fnt, Palette* pal, ieByte align)
 {
 	if (!pal) {
 		palette = fnt->GetPalette();

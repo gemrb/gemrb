@@ -69,6 +69,7 @@ public:
 
 	void SetPalette(Palette* pal);
 private:
+	void Init(const String& string, Font* fnt, Palette* pal, ieByte align);
 	void RenderSpan(const String& string);
 };
 
