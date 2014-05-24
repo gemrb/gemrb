@@ -504,7 +504,7 @@ static PyObject* GemRB_TextArea_MoveText(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	DstTA->Clear();
+	DstTA->ClearText();
 	DstTA->AppendText(SrcTA->QueryText());
 
 	Py_INCREF( Py_None );
@@ -1542,7 +1542,7 @@ static PyObject* GemRB_TextArea_Clear(PyObject * /*self*/, PyObject* args)
 	if (!ta) {
 		return NULL;
 	}
-	ta->Clear();
+	ta->ClearText();
 
 	Py_INCREF( Py_None );
 	return Py_None;

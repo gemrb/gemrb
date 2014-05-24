@@ -72,7 +72,7 @@ public:
 	/** Sets the Actual Text */
 	void SetText(const char* text);
 	/** Clears the textarea */
-	void Clear();
+	void ClearText();
 	/** Appends a String to the current Text */
 	void AppendText(const char* text);
 	void AppendText(const String& text);
@@ -95,7 +95,7 @@ public:
 	/** Returns the selected text */
 	const String& QueryText() const;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(const char* VariableName, unsigned int Sum);
+	void UpdateState(const char* VariableName, unsigned int optIdx);
 	int SetScrollBar(Control *ptr);
 private: // Private attributes
 	// dialog and listbox handling

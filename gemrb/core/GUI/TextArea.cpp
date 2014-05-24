@@ -43,7 +43,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	ticks = starttime = 0;
 	Cursor = NULL;
 	CurPos = 0;
-	Value = -1;
+
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOnSelect );
 
@@ -63,7 +63,10 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 
 	selectOptions = NULL;
 	textContainer = NULL;
-	Clear();
+
+	// initialize the Text containers
+	ClearText();
+	ClearSelectOptions();
 }
 
 TextArea::~TextArea(void)
@@ -140,7 +143,7 @@ int TextArea::SetScrollBar(Control* ptr)
 /** Sets the Actual Text */
 void TextArea::SetText(const char* text)
 {
-	Clear();
+	ClearText();
 	AppendText(text);
 }
 
@@ -383,13 +386,8 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	MarkDirty();
 
 	size_t lookupIdx = Key - '1';
-	int dlgIdx = -1;
 	if (lookupIdx < OptSpans.size()) {
-		dlgIdx = OptSpans[lookupIdx].first;
-		assert(dlgIdx >= 0);
-		//gc->dialoghandler->DialogChoose( dlgIdx );
-		Value = dlgIdx;
-		RunEventHandler(TextAreaOnSelect);
+		UpdateState(VarName, lookupIdx);
 	}
 	return true;
 }
@@ -573,32 +571,42 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 		selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
 
 		if (selectOptions) {
-			int dlgIdx = -1;
+			int optIdx = 0;
 			std::vector<OptionSpan>::const_iterator it;
 			for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
 				if( (*it).second == selectedSpan ) {
-					dlgIdx = (*it).first;
 					break;
 				}
+				optIdx++;
 			}
-
-			Value = dlgIdx;
-			RunEventHandler(TextAreaOnSelect);
-
-			if (VarName[0] != 0) {
-				// FIXME: stupid hack. use callbacks instead
-				core->GetDictionary()->SetAt( VarName, Value );
-			}
+			UpdateState(VarName, optIdx);
 		}
 	}
 }
 
-void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
+void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 {
-	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
+	if (!VariableName[0] || strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
 	}
-	Value = Sum;
+	if (!selectOptions) {
+		// no selectable options present
+		// set state to safe and return
+		ClearSelectOptions();
+		return;
+	}
+	ieDword newValue = OptSpans[optIdx].first;
+	if (newValue == Value) {
+		return; // newval is same as oldval, nothing to do (we dont want to fire the event handler)
+	}
+
+	Value = newValue;
+
+	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
+	selectedSpan = OptSpans[optIdx].second;
+
+	core->GetDictionary()->SetAt( VarName, Value );
+	RunEventHandler(TextAreaOnSelect);
 }
 
 void TextArea::SelectText(const char* /*select*/)
@@ -634,6 +642,8 @@ void TextArea::ClearSelectOptions()
 	selectOptions = NULL;
 	selectedSpan = NULL;
 	hoverSpan = NULL;
+	// also set the value to "none"
+	Value = -1;
 }
 
 void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
@@ -662,7 +672,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	core->GetEventMgr()->FakeMouseMove();
 }
 
-void TextArea::Clear()
+void TextArea::ClearText()
 {
 	Text.clear();
 	selectedSpan = NULL;
@@ -694,7 +704,7 @@ void TextArea::FlagsChanging(ieDword newFlags)
 	if ((newFlags^Flags)&IE_GUI_TEXTAREA_HISTORY) {
 		// FIXME: not well implemented.
 		// any text is lost when changing this flag.
-		Clear();
+		ClearText();
 	}
 }
 
@@ -704,7 +714,7 @@ void TextArea::SetupScroll()
 {
 	// ticks is the number of ticks it takes to scroll this font 1 px
 	ticks = 2400 / ftext->maxHeight;
-	Clear();
+	ClearText();
 	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	starttime = GetTickCount();
