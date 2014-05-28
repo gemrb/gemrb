@@ -1031,8 +1031,8 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		ieStrRef tmp = fx->Parameter1;
 		if (!tmp) tmp = 46633;
 		String* tmpstr = core->GetString(tmp, IE_STR_SPEECH|IE_STR_SOUND);
-		target->SetOverheadText(tmpstr);
-		//tmpstr shouldn't be freed, it is taken care by Actor
+		target->SetOverheadText(*tmpstr);
+		delete tmpstr;
 		target->GetHit();
 	}
 	fx->Parameter4=fx->Parameter3;

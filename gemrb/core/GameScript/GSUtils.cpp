@@ -495,7 +495,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {
-				Sender->SetOverheadText( &sb.text );
+				Sender->SetOverheadText( sb.text );
 				//don't free sb.text, it is residing in Sender
 				if (flags & DS_AREA) {
 					Sender->FixHeadTextPos();

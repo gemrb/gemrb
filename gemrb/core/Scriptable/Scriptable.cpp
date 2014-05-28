@@ -56,10 +56,11 @@ Scriptable::Scriptable(ScriptableType type)
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
-	OverheadText = NULL;
 	overHeadTextPos.empty();
 	overheadTextDisplaying = 0;
 	timeStartDisplaying = 0;
+	OverHeadTextSprite = NULL;
+
 	scriptName[0] = 0;
 	scriptlevel = 0;
 
@@ -137,12 +138,10 @@ Scriptable::~Scriptable(void)
 			delete( Scripts[i] );
 		}
 	}
-	if (OverheadText) {
-		delete OverheadText;
-	}
 	if (locals) {
 		delete( locals );
 	}
+	Sprite2D::FreeSprite(OverHeadTextSprite);
 }
 
 void Scriptable::SetScriptName(const char* text)
@@ -217,14 +216,15 @@ void Scriptable::SetSpellResRef(ieResRef resref) {
 	strnuprcpy(SpellResRef, resref, 8);
 }
 
-void Scriptable::SetOverheadText(const String* text, bool display)
+void Scriptable::SetOverheadText(const String& text, bool display)
 {
-	if (OverheadText) {
-		delete OverheadText;
-	}
 	overHeadTextPos.empty();
-	if (text && text->length()) {
-		OverheadText = new TextSpan(*text, core->GetTextFont(), NULL, Size(200, 400), IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
+	if (!text.empty()) {
+		OverheadText = text;
+		// For performance reasons, render the text into a sprite.
+		Sprite2D::FreeSprite(OverHeadTextSprite);
+		OverHeadTextSprite = core->GetTextFont()->RenderTextAsSprite(OverheadText, Size(200, 400),
+																	 IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
 		DisplayOverheadText(display);
 	} else {
 		DisplayOverheadText(false);
@@ -243,13 +243,6 @@ bool Scriptable::DisplayOverheadText(bool show)
 		return true;
 	}
 	return false;
-}
-
-const String* Scriptable::GetOverheadText() {
-	if (OverheadText) {
-		return &OverheadText->RenderedString();
-	}
-	return NULL;
 }
 
 /* 'fix' the current overhead text in the current position */
@@ -299,10 +292,9 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		palette->acquire();
 	}
 
-	const Sprite2D* spr = OverheadText->RenderedSpan();
-	x += screen.x + spr->XPos - (spr->Width / 2);
-	y += screen.y - cs + spr->Height;
-	core->GetVideoDriver()->BlitSprite(spr, x, y, false, NULL, palette);
+	x += screen.x + OverHeadTextSprite->XPos - (OverHeadTextSprite->Width / 2);
+	y += screen.y - cs + OverHeadTextSprite->Height;
+	core->GetVideoDriver()->BlitSprite(OverHeadTextSprite, x, y, false, NULL, palette);
 	palette->release();
 }
 
@@ -1227,7 +1219,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetCString(displaymsg->GetStringReference(STR_CASTS)), core->GetCString(spl->SpellName));
 
 			String* str = StringFromCString(tmpstr);
-			SetOverheadText(str);
+			SetOverheadText(*str);
 			delete str;
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;

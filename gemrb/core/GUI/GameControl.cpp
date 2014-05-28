@@ -1759,7 +1759,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			return false;
 		case ST_TRIGGER:
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (trap->GetOverheadText()) {
+			if (!trap->GetOverheadText().empty()) {
 				if (!trap->OverheadTextIsDisplaying()) {
 					trap->DisplayOverheadText(true);
 					DisplayString( trap );
@@ -2420,18 +2420,6 @@ void GameControl::ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPE
 	}
 }
 
-//Create an overhead text over an arbitrary point
-// UNUSED
-/*
-void GameControl::DisplayString(const Point &p, const char *Text)
-{
-	Scriptable* scr = new Scriptable( ST_TRIGGER );
-	scr->overHeadText = (char *) Text;
-	scr->textDisplaying = 1;
-	scr->timeStartDisplaying = 0;
-	scr->Pos = p;
-}*/
-
 //Create an overhead text over a scriptable target
 //Multiple texts are possible, as this code copies the text to a new object
 void GameControl::DisplayString(Scriptable* target)
@@ -2443,9 +2431,9 @@ void GameControl::DisplayString(Scriptable* target)
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
-	if (tmp && target->GetOverheadText()) {
+	if (tmp && !target->GetOverheadText().empty()) {
 		// pass NULL target so pst does not display multiple
-		displaymsg->DisplayString(*target->GetOverheadText(), NULL);
+		displaymsg->DisplayString(target->GetOverheadText(), NULL);
 	}
 }
 

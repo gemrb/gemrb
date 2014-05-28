@@ -249,7 +249,7 @@ void InfoPoint::dump() const
 			TrapRemovalDiff );
 		break;
 	case ST_TRIGGER:
-		buffer.appendFormatted ( "InfoString: %ls\n", OverheadText->RenderedString().c_str() );
+		buffer.appendFormatted ( "InfoString: %ls\n", OverheadText.c_str() );
 		break;
 	default:;
 	}

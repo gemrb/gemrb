@@ -9652,8 +9652,7 @@ void Actor::DisplayHeadHPRatio()
 
 	wchar_t tmpstr[10];
 	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
-	String tmp(tmpstr);
-	SetOverheadText(&tmp);
+	SetOverheadText(tmpstr);
 }
 
 void Actor::ReleaseCurrentAction()

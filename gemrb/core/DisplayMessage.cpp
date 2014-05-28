@@ -73,7 +73,7 @@ void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
 		ta->AppendText( Text );
 	} else {
 		if(target) {
-			target->SetOverheadText(&Text);
+			target->SetOverheadText(Text);
 		}
 	}
 }

@@ -547,7 +547,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
 		ip->Cursor = Cursor;
 		String* str = core->GetString( StrRef );
-		ip->SetOverheadText(str, false);
+		ip->SetOverheadText(*str, false);
 		delete str;
 		ip->StrRef = StrRef; //we need this when saving area
 		ip->SetMap(map);

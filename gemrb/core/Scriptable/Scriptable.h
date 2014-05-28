@@ -231,7 +231,8 @@ protected: //let Actor access this
 	Point overHeadTextPos;
 	bool overheadTextDisplaying;
 	unsigned long timeStartDisplaying;
-	TextSpan* OverheadText;
+	String OverheadText;
+	Sprite2D* OverHeadTextSprite;
 public:
 	// State relating to the currently-running action.
 	int CurrentActionState;
@@ -315,8 +316,8 @@ public:
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
 	void SetScript(int index, GameScript* script);
-	void SetOverheadText(const String* text, bool display = true);
-	const String* GetOverheadText();
+	void SetOverheadText(const String& text, bool display = true);
+	const String& GetOverheadText() { return OverheadText; };
 	bool DisplayOverheadText(bool);
 	bool OverheadTextIsDisplaying() { return overheadTextDisplaying; }
 	void FixHeadTextPos();
