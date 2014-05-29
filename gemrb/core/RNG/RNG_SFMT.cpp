@@ -1,6 +1,5 @@
 #include "RNG_SFMT.h"
 #include <climits>
-#include <stdexcept>
 #include "System/Logging.h"
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
