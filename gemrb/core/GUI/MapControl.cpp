@@ -26,7 +26,6 @@
 #include "GlobalTimer.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 #include "Scriptable/Actor.h"
@@ -111,14 +110,12 @@ MapControl::MapControl(const Region& frame)
 
 MapControl::~MapControl(void)
 {
-	Video *video = core->GetVideoDriver();
-
 	if (MapMOS) {
-		video->FreeSprite(MapMOS);
+		Sprite2D::FreeSprite(MapMOS);
 	}
 	for(int i=0;i<8;i++) {
 		if (Flag[i]) {
-			video->FreeSprite(Flag[i]);
+			Sprite2D::FreeSprite(Flag[i]);
 		}
 	}
 }

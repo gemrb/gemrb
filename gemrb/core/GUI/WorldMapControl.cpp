@@ -26,7 +26,6 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "Video.h"
 #include "WorldMap.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
@@ -130,7 +129,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			} else {
 				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
 			}
-			video->FreeSprite( icon );
+			Sprite2D::FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
@@ -153,7 +152,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			w=icon->Width;
 			xpos=icon->XPos;
 			ypos=icon->YPos;
-			video->FreeSprite( icon );
+			Sprite2D::FreeSprite( icon );
 		}
 
 		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
@@ -242,7 +241,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				w=icon->Width;
 				iconx = icon->XPos;
 				icony = icon->YPos;
-				core->GetVideoDriver()->FreeSprite( icon );
+				Sprite2D::FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
 				Size ts = ftext->StringSize(*ae->GetCaption());

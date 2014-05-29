@@ -23,7 +23,6 @@
 #include "win32def.h"
 
 #include "Interface.h"
-#include "Video.h"
 #include "GUI/Window.h"
 
 #include <cstring>
@@ -50,10 +49,10 @@ Progressbar::~Progressbar()
 	if (!Clear) {
 		return;
 	}
-	core->GetVideoDriver()->FreeSprite( BackGround );
-	core->GetVideoDriver()->FreeSprite( BackGround2 );
+	Sprite2D::FreeSprite( BackGround );
+	Sprite2D::FreeSprite( BackGround2 );
 	delete PBarAnim;
-	core->GetVideoDriver()->FreeSprite( PBarCap );
+	Sprite2D::FreeSprite( PBarCap );
 }
 
 /** Draws the Control on the Output Display */
@@ -131,17 +130,17 @@ void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
 void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 {
 	if (BackGround && Clear)
-		core->GetVideoDriver()->FreeSprite( BackGround );
+		Sprite2D::FreeSprite( BackGround );
 	BackGround = img;
 	if (BackGround2 && Clear)
-		core->GetVideoDriver()->FreeSprite( BackGround2 );
+		Sprite2D::FreeSprite( BackGround2 );
 	BackGround2 = img2;
 	MarkDirty();
 }
 
 void Progressbar::SetBarCap(Sprite2D* img3)
 {
-	core->GetVideoDriver()->FreeSprite( PBarCap );
+	Sprite2D::FreeSprite( PBarCap );
 	PBarCap = img3;
 }
 

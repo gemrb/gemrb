@@ -160,7 +160,7 @@ void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
 	}
 	//decrease refcount of the previous cursor
 	if (Cursor[curIdx])
-		FreeSprite(Cursor[curIdx]);
+		Sprite2D::FreeSprite(Cursor[curIdx]);
 	Cursor[curIdx] = cur;
 }
 
@@ -352,14 +352,6 @@ void Video::MoveViewportTo(int x, int y)
 + height / 2 );
 		Viewport.x = x;
 		Viewport.y = y;
-	}
-}
-
-void Video::FreeSprite(Sprite2D*& spr)
-{
-	if (spr) {
-		spr->release();
-		spr = NULL;
 	}
 }
 

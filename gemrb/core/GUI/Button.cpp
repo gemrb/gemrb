@@ -31,7 +31,6 @@
 
 #include "GameData.h"
 #include "Palette.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -73,9 +72,8 @@ Button::Button(Region& frame)
 }
 Button::~Button()
 {
-	Video* video = core->GetVideoDriver();
 	SetImage(BUTTON_IMAGE_NONE, NULL);
-	video->FreeSprite( Picture );
+	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 
 	gamedata->FreePalette( normal_palette);
@@ -93,11 +91,11 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 
 	if (type <= BUTTON_IMAGE_NONE) {
 		for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-			core->GetVideoDriver()->FreeSprite(buttonImages[i]);
+			Sprite2D::FreeSprite(buttonImages[i]);
 		}
 		Flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
-		core->GetVideoDriver()->FreeSprite(buttonImages[type]);
+		Sprite2D::FreeSprite(buttonImages[type]);
 		buttonImages[type] = img;
 		// FIXME: why do we not acquire the image here?!
 		/*
@@ -693,7 +691,7 @@ void Button::UpdateState(const char* VariableName, unsigned int Sum)
 /** Sets the Picture */
 void Button::SetPicture(Sprite2D* newpic)
 {
-	core->GetVideoDriver()->FreeSprite( Picture );
+	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 	Picture = newpic;
 	MarkDirty();
@@ -703,10 +701,9 @@ void Button::SetPicture(Sprite2D* newpic)
 /** Clears the list of Pictures */
 void Button::ClearPictureList()
 {
-	Video* video = core->GetVideoDriver();
 	for (std::list<Sprite2D*>::iterator iter = PictureList.begin();
 		 iter != PictureList.end(); ++iter)
-		video->FreeSprite( *iter );
+		Sprite2D::FreeSprite( *iter );
 	PictureList.clear();
 	MarkDirty();
 }

@@ -137,7 +137,6 @@ public:
 	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
-	void FreeSprite(Sprite2D* &spr);
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
 						  const Region* clip, unsigned int flags) = 0;

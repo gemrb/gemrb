@@ -413,7 +413,7 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		sound_handle.release();
 	}
 	if(light) {
-		core->GetVideoDriver()->FreeSprite(light);
+		Sprite2D::FreeSprite(light);
 	}
 }
 

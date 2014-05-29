@@ -105,7 +105,7 @@ Projectile::~Projectile()
 			if(shadow[i])
 				delete shadow[i];
 		}
-		core->GetVideoDriver()->FreeSprite(light);
+		Sprite2D::FreeSprite(light);
 	}
 
 	if(children) {

@@ -26,7 +26,6 @@
 #include "Interface.h"
 #include "Sprite2D.h"
 #include "Variables.h"
-#include "Video.h"
 #include "GUI/Window.h"
 
 namespace GemRB {

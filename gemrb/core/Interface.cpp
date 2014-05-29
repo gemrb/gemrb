@@ -384,7 +384,7 @@ Interface::~Interface(void)
 
 	if (Cursors) {
 		for (int i = 0; i < CursorCount; i++) {
-			video->FreeSprite( Cursors[i] );
+			Sprite2D::FreeSprite( Cursors[i] );
 		}
 		delete[] Cursors;
 	}
@@ -418,23 +418,23 @@ Interface::~Interface(void)
 	if (video) {
 
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			video->FreeSprite(FogSprites[i]);
+			Sprite2D::FreeSprite(FogSprites[i]);
 		}
 
 		for(i=0;i<4;i++) {
-			video->FreeSprite(WindowFrames[i]);
+			Sprite2D::FreeSprite(WindowFrames[i]);
 		}
 
 		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 			for(i=0;i<6;i++) {
-				video->FreeSprite(GroundCircles[size][i]);
+				Sprite2D::FreeSprite(GroundCircles[size][i]);
 			}
 		}
 
 		if (TooltipBack) {
 			for(i=0;i<3;i++) {
 				//freesprite checks for null pointer
-				video->FreeSprite(TooltipBack[i]);
+				Sprite2D::FreeSprite(TooltipBack[i]);
 			}
 			delete[] TooltipBack;
 		}
@@ -493,7 +493,7 @@ Interface::~Interface(void)
 
 void Interface::SetWindowFrame(int i, Sprite2D *Picture)
 {
-	video->FreeSprite(WindowFrames[i]);
+	Sprite2D::FreeSprite(WindowFrames[i]);
 	WindowFrames[i]=Picture;
 }
 
@@ -1265,7 +1265,7 @@ int Interface::LoadSprites()
 	{
 		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
 		FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		video->FreeSprite( tmpsprite );
+		Sprite2D::FreeSprite( tmpsprite );
 	}
 
 	FogSprites[26] = NULL;
@@ -1274,7 +1274,7 @@ int Interface::LoadSprites()
 	{
 		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
 		FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		video->FreeSprite( tmpsprite );
+		Sprite2D::FreeSprite( tmpsprite );
 	}
 
 	i = 0;
@@ -1283,7 +1283,7 @@ int Interface::LoadSprites()
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 			if (FogSprites[i]) {
 				Sprite2D* alphasprite = video->CreateAlpha( FogSprites[i] );
-				video->FreeSprite ( FogSprites[i] );
+				Sprite2D::FreeSprite ( FogSprites[i] );
 				FogSprites[i] = alphasprite;
 			}
 		}
@@ -1304,7 +1304,7 @@ int Interface::LoadSprites()
 				Sprite2D* sprite = anim->GetFrame( 0, (ieByte) i );
 				if (GroundCircleScale[size]) {
 					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
-					video->FreeSprite( sprite );
+					Sprite2D::FreeSprite( sprite );
 				} else {
 					GroundCircles[size][i] = sprite;
 				}

@@ -24,7 +24,6 @@
 
 #include "Interface.h"
 #include "Variables.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
@@ -53,9 +52,8 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 
 ScrollBar::~ScrollBar(void)
 {
-	Video *video=core->GetVideoDriver();
 	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
-		video->FreeSprite(Frames[i]);
+		Sprite2D::FreeSprite(Frames[i]);
 	}
 }
 

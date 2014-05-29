@@ -26,8 +26,6 @@
 
 #include "win32def.h"
 
-#include "Video.h"
-
 #include "ie_cursors.h"
 
 namespace GemRB {
@@ -63,7 +61,7 @@ Window::~Window()
 		Controls.erase( m );
 		m = Controls.begin();
 	}
-	core->GetVideoDriver()->FreeSprite( BackGround );
+	Sprite2D::FreeSprite( BackGround );
 	BackGround = NULL;
 }
 /** Add a Control in the Window */
@@ -88,7 +86,7 @@ void Window::AddControl(Control* ctrl)
 void Window::SetBackGround(Sprite2D* img, bool clean)
 {
 	if (clean && BackGround) {
-		core->GetVideoDriver()->FreeSprite( this->BackGround );
+		Sprite2D::FreeSprite( this->BackGround );
 	}
 	BackGround = img;
 	Invalidate();

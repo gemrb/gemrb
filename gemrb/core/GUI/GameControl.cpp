@@ -606,7 +606,7 @@ void GameControl::DrawInternal(Region& screen)
 	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
 		Sprite2D* spr = area->LightMap->GetSprite2D();
 		video->BlitSprite( spr, 0, 0, true );
-		video->FreeSprite( spr );
+		Sprite2D::FreeSprite( spr );
 		Region point( p.x / 16, p.y / 12, 2, 2 );
 		video->DrawRect( point, ColorRed );
 	}
@@ -1483,7 +1483,7 @@ void GameControl::UpdateScrolling() {
 	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
 	Video* video = core->GetVideoDriver();
 	video->SetCursor(cursor, VID_CUR_DRAG);
-	video->FreeSprite(cursor);
+	Sprite2D::FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;
 	MarkDirty();
@@ -2549,7 +2549,7 @@ Sprite2D* GameControl::GetPreview()
 	Sprite2D *screenshot = GetScreenshot( Region(x, y, w, h) );
 
 	Sprite2D* preview = video->SpriteScaleDown ( screenshot, 5 );
-	video->FreeSprite( screenshot );
+	Sprite2D::FreeSprite( screenshot );
 	return preview;
 }
 
@@ -2581,7 +2581,7 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 		return img;
 
 	Sprite2D* img_scaled = video->SpriteScaleDown( img, ratio );
-	video->FreeSprite( img );
+	Sprite2D::FreeSprite( img );
 
 	return img_scaled;
 }

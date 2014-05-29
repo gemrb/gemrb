@@ -45,7 +45,7 @@ WMPAreaEntry::~WMPAreaEntry()
 	if (StrTooltip) {
 		core->FreeString(StrTooltip);
 	}
-	core->GetVideoDriver()->FreeSprite(MapIcon);
+	Sprite2D::FreeSprite(MapIcon);
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
@@ -57,7 +57,7 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 	case BM_XOR: AreaStatus ^= arg; break;
 	case BM_AND: AreaStatus &= arg; break;
 	}
-	core->GetVideoDriver()->FreeSprite(MapIcon);
+	Sprite2D::FreeSprite(MapIcon);
 }
 
 const String* WMPAreaEntry::GetCaption()
@@ -236,7 +236,7 @@ WorldMap::~WorldMap(void)
 		delete( area_links[i] );
 	}
 	if (MapMOS) {
-		core->GetVideoDriver()->FreeSprite(MapMOS);
+		Sprite2D::FreeSprite(MapMOS);
 	}
 	if (Distances) {
 		free(Distances);
@@ -251,10 +251,11 @@ void WorldMap::SetMapIcons(AnimationFactory *newicons)
 {
 	bam = newicons;
 }
+
 void WorldMap::SetMapMOS(Sprite2D *newmos)
 {
 	if (MapMOS) {
-		core->GetVideoDriver()->FreeSprite(MapMOS);
+		Sprite2D::FreeSprite(MapMOS);
 	}
 	MapMOS = newmos;
 }

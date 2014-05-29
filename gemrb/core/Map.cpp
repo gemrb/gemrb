@@ -392,7 +392,7 @@ Map::~Map(void)
 	}
 	delete LightMap;
 	delete HeightMap;
-	core->GetVideoDriver()->FreeSprite( SmallMap );
+	Sprite2D::FreeSprite( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
 		queue[i] = NULL;
@@ -438,7 +438,7 @@ Map::~Map(void)
 void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
 {
 	delete LightMap;
-	core->GetVideoDriver()->FreeSprite(SmallMap);
+	Sprite2D::FreeSprite(SmallMap);
 
 	LightMap = lm;
 	SmallMap = sm;
@@ -1112,7 +1112,7 @@ void Map::DrawMap(Region screen)
 
 	if (Background) {
 		if (BgDuration<gametime) {
-			video->FreeSprite(Background);
+			Sprite2D::FreeSprite(Background);
 		} else {
 			video->BlitSprite(Background,0,0,true);
 			bgoverride = true;
@@ -3976,12 +3976,10 @@ void Map::SetInternalSearchMap(int x, int y, int value)
 
 void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 {
-	Video* video = core->GetVideoDriver();
-
 	ResourceHolder<ImageMgr> bmp(bgResRef);
 
 	if (Background) {
-		video->FreeSprite(Background);
+		Sprite2D::FreeSprite(Background);
 	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;

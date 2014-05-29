@@ -85,6 +85,14 @@ public:
 
 	void acquire() { ++RefCount; }
 	void release();
+
+public:
+	static void FreeSprite(Sprite2D*& spr) {
+		if (spr) {
+			spr->release();
+			spr = NULL;
+		}
+	}
 };
 
 template <typename KeyType>

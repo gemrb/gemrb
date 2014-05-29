@@ -28,7 +28,7 @@
 #include "ControlAnimation.h"
 #include "Interface.h"
 #include "ScriptEngine.h"
-#include "Video.h"
+#include "Sprite2D.h"
 
 #ifdef ANDROID
 #include "Variables.h"
@@ -71,7 +71,7 @@ Control::~Control()
 	delete Tooltip;
 	delete animation;
 
-	core->GetVideoDriver()->FreeSprite(AnimPicture);
+	Sprite2D::FreeSprite(AnimPicture);
 }
 
 Region Control::ControlFrame()
@@ -281,7 +281,7 @@ int Control::SetFlags(int arg_flags, int opcode)
 
 void Control::SetAnimPicture(Sprite2D* newpic)
 {
-	core->GetVideoDriver()->FreeSprite(AnimPicture);
+	Sprite2D::FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	//apparently this is needed too, so the artifacts are not visible
 	if (Owner->Visible==WINDOW_VISIBLE) {

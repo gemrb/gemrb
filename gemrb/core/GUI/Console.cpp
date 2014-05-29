@@ -28,7 +28,6 @@
 #include "Palette.h"
 #include "ScriptEngine.h"
 #include "Sprite2D.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 
 namespace GemRB {
@@ -48,10 +47,8 @@ Console::Console(const Region& frame)
 
 Console::~Console(void)
 {
-	Video *video = core->GetVideoDriver();
-
 	gamedata->FreePalette( palette );
-	video->FreeSprite( Cursor );
+	Sprite2D::FreeSprite( Cursor );
 }
 
 /** Draws the Console on the Output Display */

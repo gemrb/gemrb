@@ -25,7 +25,6 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Variables.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
@@ -76,7 +75,7 @@ TextArea::~TextArea(void)
 	}
 
 	ClearSelectOptions();
-	core->GetVideoDriver()->FreeSprite( Cursor );
+	Sprite2D::FreeSprite( Cursor );
 	delete textContainer;
 }
 

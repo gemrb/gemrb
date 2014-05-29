@@ -24,7 +24,6 @@
 
 #include "Interface.h"
 #include "Variables.h"
-#include "Video.h"
 #include "GUI/Window.h"
 
 #include <cmath>
@@ -56,13 +55,13 @@ Slider::~Slider()
 		return;
 	}
 	if (Knob) {
-		core->GetVideoDriver()->FreeSprite( Knob );
+		Sprite2D::FreeSprite( Knob );
 	}
 	if (GrabbedKnob) {
-		core->GetVideoDriver()->FreeSprite( GrabbedKnob );
+		Sprite2D::FreeSprite( GrabbedKnob );
 	}
 	if (BackGround) {
-		core->GetVideoDriver()->FreeSprite( BackGround );
+		Sprite2D::FreeSprite( BackGround );
 	}
 }
 
@@ -133,19 +132,19 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 	switch (type) {
 		case IE_GUI_SLIDER_KNOB:
 			if (Knob && Clear)
-				core->GetVideoDriver()->FreeSprite( Knob );
+				Sprite2D::FreeSprite( Knob );
 			Knob = img;
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
 			if (GrabbedKnob && Clear)
-				core->GetVideoDriver()->FreeSprite( GrabbedKnob );
+				Sprite2D::FreeSprite( GrabbedKnob );
 			GrabbedKnob = img;
 			break;
 
 		case IE_GUI_SLIDER_BACKGROUND:
 			if (BackGround && Clear)
-				core->GetVideoDriver()->FreeSprite( BackGround );
+				Sprite2D::FreeSprite( BackGround );
 			BackGround = img;
 			break;
 	}

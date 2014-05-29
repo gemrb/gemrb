@@ -3589,7 +3589,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 	if (col1 >= 0) {
 		Sprite2D* old = Picture;
 		Picture = old->copy();
-		core->GetVideoDriver()->FreeSprite(old);
+		Sprite2D::FreeSprite(old);
 
 		Palette* newpal = Picture->GetPalette()->Copy();
 		core->GetPalette( col1, 12, &newpal->col[4]);

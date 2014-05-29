@@ -24,7 +24,6 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
@@ -53,10 +52,9 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short
 
 TextEdit::~TextEdit(void)
 {
-	Video *video = core->GetVideoDriver();
 	gamedata->FreePalette( palette );
-	video->FreeSprite( Back );
-	video->FreeSprite( Cursor );
+	Sprite2D::FreeSprite( Back );
+	Sprite2D::FreeSprite( Cursor );
 }
 
 void TextEdit::SetAlignment(unsigned char Alignment)
@@ -113,7 +111,7 @@ Font *TextEdit::GetFont() { return font; }
 /** Set Cursor */
 void TextEdit::SetCursor(Sprite2D* cur)
 {
-	core->GetVideoDriver()->FreeSprite( Cursor );
+	Sprite2D::FreeSprite( Cursor );
 	if (cur != NULL) {
 		Cursor = cur;
 	}
@@ -125,7 +123,7 @@ void TextEdit::SetBackGround(Sprite2D* back)
 {
 	//if 'back' is NULL then no BackGround will be drawn
 	if (Back)
-		core->GetVideoDriver()->FreeSprite(Back);
+		Sprite2D::FreeSprite(Back);
 	Back = back;
 	MarkDirty();
 }

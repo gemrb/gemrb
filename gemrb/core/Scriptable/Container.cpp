@@ -56,11 +56,9 @@ Container::Container(void)
 
 void Container::FreeGroundIcons()
 {
-	Video* video = core->GetVideoDriver();
-
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
-			video->FreeSprite( groundicons[i] );
+			Sprite2D::FreeSprite( groundicons[i] );
 			groundicons[i]=NULL;
 		}
 	}
