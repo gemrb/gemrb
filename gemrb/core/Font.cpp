@@ -349,9 +349,11 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				// FIXME: probably not very efficient.
 				// we do this because we dont have ability to update GL texture pixels...
 				Video* video = core->GetVideoDriver();
-				Sprite2D* lineSprite = video->CreateSprite8(rgn.w, maxHeight, lineBuffer, color);
+				Sprite2D* lineSprite = video->CreateSprite8(rgn.w, maxHeight, lineBuffer, color, true, 0);
 				video->BlitSprite(lineSprite, x + rgn.x, y + rgn.y, true, &rgn);
-				lineSprite->release();
+				lineSprite->release(); // this released lineBuffer
+				// re-allocate the buffer
+				lineBuffer = (ieByte*)calloc(maxHeight + descent, rgn.w); // enough for maximum line
 			}
 		}
 
