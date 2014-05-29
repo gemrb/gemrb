@@ -44,6 +44,39 @@ RNG_SFMT* RNG_SFMT::getInstance() {
 }
 
 /**
+ * This method is the rand() equivalent which calls the cdf with proper bounds.
+ *
+ * It is possible to generate random numbers from [-min, +/-max] though the RNG uses
+ * unsigned numbers only, so this wrapper handles some special cases for min and max.
+ *
+ * It is only necessary that the upper bound is larger or equal to the lower bound - with the exception
+ * that someone wants something like rand() % -foo.
+ */
+unsigned int RNG_SFMT::rand(int min, int max) {
+  /* If min is negative, it would be possible to calculate
+   * cdf(0, max - min) + min
+   * There has been no use for negative random numbers with rand() though, so it's treated as error.
+   */
+  if(min < 0) {
+    GemRB::error("RNG", "Invalid bounds for RNG! Got min %d < 0!\n", min);
+  }
+
+  // For complete fairness and equal timing, this should be a roll, but let's skip it anyway
+  if(min == max)
+    return max;
+
+  // Someone wants rand() % -foo, so we compute -rand(0, +foo)
+  // This is the only time where min > max is (sort of) legal.
+  // Not handling this will cause the application to crash.
+  if(min == 0 && max < 0) {
+    return -cdf(0, -max);
+  }
+
+  // No special cases are left, except !(min > max) which is caught in the cdf itself.
+  return cdf(min, max);
+}
+
+/**
  * Much thought went into this, please read this comment before you modify the
  * code.
  * Let SFMT() be an alias for sfmt_genrand_uint64() aka SFMT's rand() function.
@@ -85,12 +118,12 @@ RNG_SFMT* RNG_SFMT::getInstance() {
  * defined in a RAND_MAX constant.
  * Otherwise you will probably skew the outcome of the rand() method or worsen
  * the performance of the application.
- * 
+ *
  * In threaded environments check the method's code for information on mutexes!
  */
-unsigned int RNG_SFMT::rand(unsigned int min, unsigned int max) {
+unsigned int RNG_SFMT::cdf(unsigned int min, unsigned int max) {
   // This all makes no sense if min > max, which should never happen.
-  if (min > max || max >= UINT_MAX || min >= UINT_MAX) {
+  if (min > max) {
     GemRB::error("RNG", "Invalid bounds for RNG! Got min %d, max %d\n", min, max);
     // at this point, the method exits. No return value is needed, because
     // basically the exception itself is returned.
