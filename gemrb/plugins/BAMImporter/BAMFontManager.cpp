@@ -112,7 +112,13 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
 			spr = af->GetFrame(frame, cycle);
 			assert(spr);
-			wchar_t chr = ((frame << 8) | (cycle&0x00ff)) + 1;
+
+			ieWord chr = '\0';
+			if (isNumeric) {
+				chr = frame + '0';
+			} else {
+				chr = ((frame << 8) | (cycle&0x00ff)) + 1;
+			}
 
 			if (tmp.find(spr) != tmp.end()) {
 				// opimization for when glyphs are shared between cycles
