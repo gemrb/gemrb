@@ -30,6 +30,7 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "TableMgr.h"
+#include "RNG/RNG_SFMT.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -1952,7 +1953,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 	bool continueExecution = false;
 	if (continuing) continueExecution = *continuing;
 
-	RandomNumValue=rand();
+	RandomNumValue=RNG_SFMT::getInstance()->rand();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (rB->condition->Evaluate(MySelf)) {
@@ -2258,7 +2259,7 @@ int ResponseSet::Execute(Scriptable* Sender)
 		maxWeight += responses[i]->weight;
 	}
 	if (maxWeight) {
-		randWeight = rand() % maxWeight;
+		randWeight = RAND(0, maxWeight-1);
 	}
 	else {
 		randWeight = 0;

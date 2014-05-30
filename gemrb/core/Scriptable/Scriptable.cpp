@@ -34,6 +34,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
 
 namespace GemRB {
@@ -1987,7 +1988,7 @@ void Movable::SetStance(unsigned int arg)
 		if (StanceID == IE_ANI_ATTACK) {
 			// Set stance to a random attack animation
 
-			int random = rand()%100;
+			int random = RAND(0, 99);
 			if (random < AttackMovements[0]) {
 				StanceID = IE_ANI_ATTACK_BACKSLASH;
 			} else if (random < AttackMovements[0] + AttackMovements[1]) {
@@ -2222,8 +2223,8 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		return;
 	}
 	//if not continous random walk, then stops for a while
-	if (can_stop && (rand()&3) ) {
-		SetWait((rand()&7)+7);
+	if (can_stop && RAND(0,3)) {
+		SetWait(RAND(7,14));
 		return;
 	}
 	if (run) {

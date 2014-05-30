@@ -33,6 +33,7 @@
 #include "Sprite2D.h"
 #include "VEFObject.h"
 #include "Video.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Actor.h"
 
 #include <cmath>
@@ -140,7 +141,7 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 	}
 
 	if((ExtFlags&PEF_CYCLE) && !Seq) {
-		Seq=rand()%Max;
+		Seq=RAND(0, Max-1);
 	}
 
 	//this hack is needed because bioware .pro files are sometimes
@@ -1478,7 +1479,7 @@ void Projectile::DrawExplosion(const Region &screen)
 			if (children[i])
 				continue;
 			if(apflags&APF_BOTH) {
-				if(rand()&1) {
+				if(RAND(0,1)) {
 					tmp = Extension->Secondary;
 				} else {
 					tmp = Extension->Spread;
@@ -1522,12 +1523,12 @@ void Projectile::DrawExplosion(const Region &screen)
 				//a bit of difference in case crowding is needed
 				//make this a separate flag if speed difference
 				//is not always wanted
-				pro->Speed-=rand()&7;
+				pro->Speed-=RAND(0,7);
 
 				delay = Extension->Delay*extension_explosioncount;
 				if(apflags&APF_BOTH) {
 					if (delay) {
-						delay = rand()%delay;
+						delay = RAND(0, delay-1);
 					}
 				}
 				//this needs to be commented out for ToB horrid wilting

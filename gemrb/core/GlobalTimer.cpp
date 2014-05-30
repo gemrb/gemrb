@@ -25,6 +25,7 @@
 #include "Interface.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
+#include "RNG/RNG_SFMT.h"
 
 namespace GemRB {
 
@@ -139,10 +140,10 @@ void GlobalTimer::DoStep(int count)
 		}
 		if (shakeCounter) {
 			if (shakeX) {
-				x += rand()%shakeX;
+				x += RAND(0, shakeX-1);
 			}
 			if (shakeY) {
-				y += rand()%shakeY;
+				y += RAND(0, shakeY-1);
 			}
 		}
 	}

@@ -118,6 +118,8 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/TextEdit.cpp
 	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
+	RNG/RNG_SFMT.cpp
+	RNG/sfmt/SFMT.c
 	Scriptable/Actor.cpp
 	Scriptable/CombatInfo.cpp
 	Scriptable/Container.cpp

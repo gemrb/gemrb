@@ -44,6 +44,7 @@
 #include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -2479,7 +2480,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		}
 	} else {
 		for(i=0;i<picks;i++) {
-			selects[i]=rand()%count;
+			selects[i]=RAND(0, count-1);
 retry:
 			for(j=0;j<i;j++) {
 				if(selects[i]==selects[j]) {
