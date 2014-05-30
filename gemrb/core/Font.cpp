@@ -344,7 +344,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				x = rgn.w - x;
 			}
 			if (canvas) {
-				BlitGlyphToCanvas(lineGlyphs, x, y - maxHeight, *canvas, rgn.Dimensions());
+				BlitGlyphToCanvas(lineGlyphs, x, y, *canvas, rgn.Dimensions());
 			} else {
 				// FIXME: probably not very efficient.
 				// we do this because we dont have ability to update GL texture pixels...
