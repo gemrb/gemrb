@@ -68,15 +68,15 @@ public:
 
 class GEM_EXPORT Size {
 public:
-	ieWord w, h;
+	int w, h;
 	Size();
-	Size(ieWord, ieWord);
+	Size(int, int);
 
 	bool operator==(const Size& size);
 	bool operator!=(const Size& size);
-	ieWord Area() const { return w * h; }
+	int Area() const { return w * h; }
 	bool IsZero() const { return w == 0 && h == 0; }
-	bool IsEmpty() const { return !w || !h; }
+	bool IsEmpty() const { return w <= 0 || h <= 0; }
 };
 
 /**
