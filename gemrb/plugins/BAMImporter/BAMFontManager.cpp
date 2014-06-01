@@ -96,13 +96,18 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	}
 	if (!first)
 		first = af->GetFrameWithoutCycle(0);
-
 	assert(first);
-	if (!pal)
+
+	Font* fnt = NULL;
+	if (!pal) {
 		pal = first->GetPalette();
+		fnt = new Font(pal);
+		pal->release();
+	} else {
+		fnt = new Font(pal);
+	}
 	first->release();
 
-	Font* fnt = new Font(pal);
 	fnt->maxHeight = maxHeight;
 	fnt->descent = descent;
 

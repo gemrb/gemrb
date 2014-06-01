@@ -34,13 +34,9 @@ private:
 	bool isStateFont;
 	ieResRef resRef;
 public:
-	/** public data members */
-private:
-	void AddChar(unsigned char* spr, int w, int h, short xPos, short yPos);
-public:
 	/** public methods */
 	~BAMFontManager(void);
-	BAMFontManager(void);
+	BAMFontManager();
 
 	bool Open(DataStream* stream);
 
