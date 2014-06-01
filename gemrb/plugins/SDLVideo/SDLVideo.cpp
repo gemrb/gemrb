@@ -494,9 +494,24 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 		dst.y -= Viewport.y;
 	}
 
-	dst = computeClipRect(backBuf, clip, dst.x, dst.y, dst.w, dst.h);
+	Region fClip = computeClipRect(backBuf, clip, dst.x, dst.y, dst.w, dst.h);
 
-	BlitSprite(spr, Region(0, 0, spr->Width, spr->Height), dst, palette);
+	if (fClip.Dimensions().IsEmpty()) {
+		return; // already know blit fails
+	}
+
+	Region src(0, 0, spr->Width, spr->Height);
+
+	// adjust the src region to account for the clipping
+	src.x += fClip.x - dst.x; // the left edge
+	src.w -= dst.w - fClip.w; // the right edge
+	src.y += fClip.y - dst.y; // the top edge
+	src.h -= dst.h - fClip.h; // the bottom edge
+
+	assert(src.w == fClip.w && src.h == fClip.h);
+
+	// just pass fclip as dst
+	BlitSprite(spr, src, fClip, palette);
 }
 
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
@@ -530,12 +545,21 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 		}
 		SRShadow_Regular shadow;
 
+		// FIXME: our BAM blitters dont let us start at an arbitrary point in the source
+		// We will compensate by tricking them by manipulating the location and size of the blit
+		// then using dst as a clipping rect to achieve the effect of a partial src copy
+
+		int x = dst.x - src.x;
+		int y = dst.y - src.y;
+		int w = spr->Width;
+		int h = spr->Height;
+
 		if (pal->alpha) {
 			SRTinter_NoTint<true> tinter;
 			SRBlender_Alpha blender;
 
 			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
-								   backBuf, srcdata, pal->col, dst.x, dst.y, src.w, src.h,
+								   backBuf, srcdata, pal->col, x, y, w, h,
 								   (spr->renderFlags&RENDER_FLIP_VERTICAL), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		} else {
@@ -543,7 +567,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 			SRBlender_NoAlpha blender;
 
 			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
-								   backBuf, srcdata, pal->col, dst.x, dst.y, src.w, src.h,
+								   backBuf, srcdata, pal->col, x, y, w, h,
 								   (spr->renderFlags&RENDER_FLIP_VERTICAL), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
