@@ -1589,7 +1589,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	value = config->GetValueForKey("ModPath");
 	if (value) {
-		for (char *path = strtok((char*)value,SPathListSeparator);
+		for (char *path = strtok(const_cast<char*>(value),SPathListSeparator);
 			 path;
 			 path = strtok(NULL,SPathListSeparator)) {
 			ModPath.push_back(path);
@@ -1610,7 +1610,7 @@ int Interface::Init(InterfaceConfig* config)
 		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
 		value = config->GetValueForKey(keyname);
 		if (value) {
-			for(char *path = strtok((char*)value, SPathListSeparator);
+			for(char *path = strtok(const_cast<char*>(value), SPathListSeparator);
 				path;
 				path = strtok(NULL,SPathListSeparator)) {
 				CD[i].push_back(path);

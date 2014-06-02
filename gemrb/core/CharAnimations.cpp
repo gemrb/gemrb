@@ -476,11 +476,9 @@ Palette* CharAnimations::GetPartPalette(int part)
 	return palette[type];
 }
 
-static int compare_avatars(const void *a, const void *b)
+static inline int compare_avatars(const void *a, const void *b)
 {
-	unsigned int aa = ((AvatarStruct *)a)->AnimID;
-	unsigned int bb = ((AvatarStruct *)b)->AnimID;
-	return (int) (aa-bb);
+	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
 }
 
 void CharAnimations::InitAvatarsTable()

@@ -82,7 +82,7 @@ Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 		assert(!sprite->BAM);
 		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
 		for (int x = 0; x < dest->Width; x++) {
-			unsigned char * dst = ( unsigned char * ) dest->pixels + x;
+			unsigned char * dst = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(dest->pixels)) + x;
 			unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
 			for (int y = 0; y < dest->Height / 2; y++) {
 				unsigned char swp = *dst;
@@ -121,7 +121,7 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 		assert(!sprite->BAM);
 		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
 		for (int y = 0; y < dest->Height; y++) {
-			unsigned char * dst = (unsigned char *) dest->pixels + ( y * dest->Width );
+			unsigned char * dst = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(dest->pixels)) + ( y * dest->Width );
 			unsigned char * src = dst + dest->Width - 1;
 			for (int x = 0; x < dest->Width / 2; x++) {
 				unsigned char swp=*dst;

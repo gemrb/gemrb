@@ -292,7 +292,7 @@ void Scriptable::ImmediateEvent()
 bool Scriptable::IsPC() const
 {
 	if(Type == ST_ACTOR) {
-		if (((Actor *) this)->GetStat(IE_EA) <= EA_CHARMED) {
+		if ((const_cast<Actor *const>(dynamic_cast<const Actor *const>(this)))->GetStat(IE_EA) <= EA_CHARMED) {
 			return true;
 		}
 	}
@@ -574,7 +574,7 @@ bool Scriptable::InMove() const
 	if (Type!=ST_ACTOR) {
 		return false;
 	}
-	Movable *me = (Movable *) this;
+	Movable *me = const_cast<Movable *const>(dynamic_cast<const Movable *const>(this));
 	return me->GetNextStep()!=NULL;
 }
 
@@ -2023,7 +2023,7 @@ void Movable::MoveLine(int steps, int Pass, ieDword orient)
 	path = area->GetLine( p, steps, orient, Pass );
 }
 
-void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
+static void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
 	if (destx > srcx)
 		Pos.x += ( unsigned short )
 			( ( ( ( ( destx * 16 ) + 8 ) - Pos.x ) * ( time_diff ) ) / walk_speed );

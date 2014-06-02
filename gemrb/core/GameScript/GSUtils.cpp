@@ -277,7 +277,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	return ret;
 }
 
-bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
+static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -416,7 +416,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 }
 
 //finds and takes an item from a container in the given inventory
-bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
+static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
 {
 	int i=inventory->GetSlotCount();
 	while (i--) {
@@ -871,7 +871,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 	Sender->AddActionInFront( action );
 }
 
-void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
+static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 {
 	switch (scr->Type) {
 		case ST_AREA: case ST_GLOBAL:
@@ -1525,9 +1525,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.x = (short) strtol( src, const_cast<char **>(&src), 10 );
 				src++; //Skip .
-				newAction->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.y = (short) strtol( src, const_cast<char **>(&src), 10 );
 				src++; //Skip ]
 				break;
 
@@ -1552,11 +1552,11 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 						value = GetIdsValue(src, idsTabName);
 					}
 					else {
-						value = strtol( src, (char **) &src, 0);
+						value = strtol( src, const_cast<char **>(&src), 0);
 					}
 				}
 				else { //no IDS table
-					value = strtol( src, (char **) &src, 0);
+					value = strtol( src, const_cast<char **>(&src), 0);
 				}
 				if (!intCount) {
 					newAction->int0Parameter = value;
@@ -1884,9 +1884,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.x = (short) strtol( src, const_cast<char **>(&src), 10 );
 				src++; //Skip .
-				newTrigger->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.y = (short) strtol( src, const_cast<char **>(&src), 10 );
 				src++; //Skip ]
 				break;
 
@@ -1911,11 +1911,11 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 						value = GetIdsValue(src, idsTabName);
 					}
 					else {
-						value = strtol( src, (char **) &src, 0);
+						value = strtol( src, const_cast<char **>(&src), 0);
 					}
 				}
 				else { //no IDS table
-					value = strtol( src, (char **) &src, 0);
+					value = strtol( src, const_cast<char **>(&src), 0);
 				}
 				if (!intCount) {
 					newTrigger->int0Parameter = value;

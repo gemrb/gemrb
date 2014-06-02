@@ -123,8 +123,8 @@ int DataStream::WriteWord(const ieWord *src)
 	int len;
 	if (EndianSwitch) {
 		char tmp[2];
-		tmp[0]=((unsigned char *) src)[1];
-		tmp[1]=((unsigned char *) src)[0];
+		tmp[0]=(const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(src)))[1];
+		tmp[1]=(const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(src)))[0];
 		len = Write( tmp, 2 );
 	}
 	else {
@@ -153,10 +153,10 @@ int DataStream::WriteDword(const ieDword *src)
 	int len;
 	if (EndianSwitch) {
 		char tmp[4];
-		tmp[0]=((unsigned char *) src)[3];
-		tmp[1]=((unsigned char *) src)[2];
-		tmp[2]=((unsigned char *) src)[1];
-		tmp[3]=((unsigned char *) src)[0];
+		tmp[0]=(const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(src)))[3];
+		tmp[1]=(const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(src)))[2];
+		tmp[2]=(const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(src)))[1];
+		tmp[3]=(const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(src)))[0];
 		len = Write( tmp, 4 );
 	}
 	else {

@@ -61,7 +61,7 @@ Sprite2D::~Sprite2D()
 {
 	if (freePixels) {
 		// FIXME: casting away const.
-		free((void*)pixels);
+		free(const_cast<void*>(pixels));
 	}
 }
 

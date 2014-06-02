@@ -1300,7 +1300,7 @@ static void CleanupIEScript()
 	ObjectIDSTableNames = NULL;
 }
 
-void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
+static void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
@@ -1313,7 +1313,7 @@ void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
 	}
 }
 
-void LoadActionFlags(const char *tableName, int flag, bool critical)
+static void LoadActionFlags(const char *tableName, int flag, bool critical)
 {
 	int i, j;
 
@@ -2309,7 +2309,7 @@ int Response::Execute(Scriptable* Sender)
 	return ret;
 }
 
-void PrintAction(StringBuffer& buffer, int actionID)
+static void PrintAction(StringBuffer& buffer, int actionID)
 {
 	buffer.appendFormatted("Action: %d %s\n", actionID, actionsTable->GetValue(actionID));
 }
