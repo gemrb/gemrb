@@ -85,10 +85,10 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     n = 1 << nbits;
 
     s->tmp_buf = NULL;
-    s->exptab  = (struct FFTComplex *) av_malloc((n / 2) * sizeof(FFTComplex));
+    s->exptab  = (struct FFTComplex *) malloc((n / 2) * sizeof(FFTComplex));
     if (!s->exptab)
         goto fail;
-    s->revtab = (unsigned short *) av_malloc(n * sizeof(uint16_t));
+    s->revtab = (unsigned short *) malloc(n * sizeof(uint16_t));
     if (!s->revtab)
         goto fail;
     s->inverse = inverse;
@@ -106,7 +106,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
         }
         for(i=0; i<n; i++)
             s->revtab[-split_radix_permutation(i, n, s->inverse) & (n-1)] = i;
-        s->tmp_buf = (struct FFTComplex *) av_malloc(n * sizeof(FFTComplex));
+        s->tmp_buf = (struct FFTComplex *) malloc(n * sizeof(FFTComplex));
         if(!s->tmp_buf) {
           goto fail;
         }
@@ -126,7 +126,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
         np = 1 << nbits;
         nblocks = np >> 3;
         np2 = np >> 1;
-        s->exptab1 = (struct FFTComplex *) av_malloc(np * 2 * sizeof(FFTComplex));
+        s->exptab1 = (struct FFTComplex *) malloc(np * 2 * sizeof(FFTComplex));
         if (!s->exptab1)
             goto fail;
         q = s->exptab1;
@@ -144,7 +144,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
             }
             nblocks = nblocks >> 1;
         } while (nblocks != 0);
-        av_freep((void **) &s->exptab);
+        free((void **) &s->exptab);
 
         /* compute bit reverse table */
         for(i=0;i<n;i++) {
@@ -158,10 +158,10 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 
     return 0;
  fail:
-    av_freep((void **) &s->revtab);
-    av_freep((void **) &s->exptab);
-    av_freep((void **) &s->exptab1);
-    av_freep((void **) &s->tmp_buf);
+    free((void **) &s->revtab);
+    free((void **) &s->exptab);
+    free((void **) &s->exptab1);
+    free((void **) &s->tmp_buf);
     return -1;
 }
 
@@ -192,10 +192,10 @@ void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 
 av_cold void ff_fft_end(FFTContext *s)
 {
-    av_freep((void **) &s->revtab);
-    av_freep((void **) &s->exptab);
-    av_freep((void **) &s->exptab1);
-    av_freep((void **) &s->tmp_buf);
+    free((void **) &s->revtab);
+    free((void **) &s->exptab);
+    free((void **) &s->exptab1);
+    free((void **) &s->tmp_buf);
 }
 
 #define sqrthalf (float)M_SQRT1_2

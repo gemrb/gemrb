@@ -154,6 +154,7 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	return false;
 }
 
+/* unused
 static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
 
 static inline bool IsInstant(ieByte timingmode)
@@ -161,6 +162,7 @@ static inline bool IsInstant(ieByte timingmode)
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_instant[timingmode];
 }
+*/
 
 static const bool fx_equipped[MAX_TIMING_MODE]={false,false,true,false,false,true,false,false,true,false,false};
 
@@ -215,12 +217,12 @@ static inline ieByte TriggeredEffect(ieByte timingmode)
 	return fx_triggered[timingmode];
 }
 
-static int compare_effects(const void *a, const void *b)
+static inline int compare_effects(const void *a, const void *b)
 {
-	return stricmp(((EffectRef *) a)->Name,((EffectRef *) b)->Name);
+	return stricmp(((const EffectRef *) a)->Name,((const EffectRef *) b)->Name);
 }
 
-static int find_effect(const void *a, const void *b)
+static inline int find_effect(const void *a, const void *b)
 {
 	return stricmp((const char *) a,((const EffectRef *) b)->Name);
 }
@@ -1015,11 +1017,11 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//opcode immunity
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		Log(MESSAGE, "EffectQueue", "immune to effect: %s", (char*) Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "immune to effect: %s", (const char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		Log(MESSAGE, "EffectQueue", "immune2 to effect: %s", (char*) Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "immune2 to effect: %s", (const char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1072,7 +1074,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
-		Log(MESSAGE, "EffectQueue", "effect resisted: %s", (char*) Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "effect resisted: %s", (const char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1102,7 +1104,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if( fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
 		} else {
-			Log(MESSAGE, "EffectQueue", "%s saved against effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
+			Log(MESSAGE, "EffectQueue", "%s saved against effect: %s", actor->GetName(1), (const char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
 	}
@@ -1914,7 +1916,7 @@ void EffectQueue::dump(StringBuffer& buffer) const
 		if( fx) {
 			char *Name = NULL;
 			if( fx->Opcode < MAX_EFFECTS)
-				Name = (char*) Opcodes[fx->Opcode].Name;
+				Name = const_cast<char*>(Opcodes[fx->Opcode].Name);
 
 			buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source);
 		}

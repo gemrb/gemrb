@@ -2434,7 +2434,7 @@ void GameControl::ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPE
 void GameControl::DisplayString(const Point &p, const char *Text)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
-	scr->overHeadText = (char *) Text;
+	scr->overHeadText = const_cast<char *>(Text);
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;

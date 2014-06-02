@@ -323,7 +323,7 @@ void GameData::FreeItem(Item const *itm, const ieResRef name, bool free)
 {
 	int res;
 
-	res=ItemCache.DecRef((void *) itm, name, free);
+	res=ItemCache.DecRef(const_cast<void*>(reinterpret_cast<const void *>(itm)), name, free);
 	if (res<0) {
 		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name);
 	}

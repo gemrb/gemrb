@@ -574,7 +574,7 @@ void Font::SetupString(ieWord* string, unsigned int width, bool NoColor, Font *i
 
 size_t Font::GetDoubleByteString(const unsigned char* string, ieWord* &dbString) const
 {
-	size_t len = strlen((char*)string);
+	size_t len = strlen(reinterpret_cast<const char*>(string));
 	dbString = (ieWord*)malloc((len+1) * sizeof(ieWord));
 	size_t dbLen = 0;
 	for(size_t i=0; i<len; ++i)

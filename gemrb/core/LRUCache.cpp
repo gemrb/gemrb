@@ -150,7 +150,7 @@ void LRUCache::removeFromList(VarEntry* e)
 	e->prev = e->next = 0;
 }
 
-
+/* unused
 void testLRUCache()
 {
 	int i;
@@ -219,5 +219,5 @@ void testLRUCache()
 
 	assert(!c.getLRU(1, k2, p));
 }
-
+*/
 }

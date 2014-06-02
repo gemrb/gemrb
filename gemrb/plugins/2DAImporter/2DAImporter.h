@@ -67,13 +67,13 @@ public:
 	inline const char* QueryField(unsigned int row = 0, unsigned int column = 0) const
 	{
 		if (rows.size() <= row) {
-			return ( char * ) defVal;
+			return const_cast<char*>(defVal);
 		}
 		if (rows[row].size() <= column) {
-			return ( char * ) defVal;
+			return const_cast<char*>(defVal);
 		}
 		if (rows[row][column][0]=='*' && !rows[row][column][1]) {
-			return ( char * ) defVal;
+			return const_cast<char*>(defVal);
 		}
 		return rows[row][column];
 	}
@@ -86,13 +86,13 @@ public:
 		rowi = GetRowIndex(row);
 
 		if (rowi < 0) {
-			return ( char * ) defVal;
+			return const_cast<char*>(defVal);
 		}
 
 		coli = GetColumnIndex(column);
 		 
 		if (coli < 0) {
-			return ( char * ) defVal;
+			return const_cast<char*>(defVal);
 		}
 
 		return QueryField((unsigned int) rowi, (unsigned int) coli);

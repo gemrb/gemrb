@@ -96,7 +96,7 @@ unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = speaker->GetName(-1);
-			core->GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
+			core->GetPalette( ((const Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
