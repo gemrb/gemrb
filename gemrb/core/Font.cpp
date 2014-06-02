@@ -485,9 +485,11 @@ size_t Font::Print(Region rgn, const String& string,
 		// FIXME: this is probably a bad idea to create and destroy the text every call to print.
 		// the GL driver probably causes print to be called every frame which makes it worse
 		// we should consider migrating any clients that use print + these alignments to TextSpans/Contaners
+		// Things that are known to still use this: ToolTips, OverheadText
+
 		size_t ret;
-		Sprite2D* rendered = RenderTextAsSprite(string, rgn.Dimensions(), alignment, color, &ret);
-		core->GetVideoDriver()->BlitSprite(rendered, rgn.x, rgn.y, true, &rgn); // this does the alignment so no need to adjust
+		Sprite2D* rendered = RenderTextAsSprite(string, rgn.Dimensions(), alignment, color, &ret); // this does the alignment so no need to adjust here
+		core->GetVideoDriver()->BlitSprite(rendered, rgn.x, rgn.y, true, &rgn);
 		rendered->release();
 		return ret;
 	}
