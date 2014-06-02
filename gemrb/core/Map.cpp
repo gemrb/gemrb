@@ -2168,7 +2168,7 @@ AreaAnimation* Map::GetAnimation(const char* Name)
 	for(iter=animations.begin();iter!=animations.end();iter++) {
 		AreaAnimation *anim = *iter;
 
-		if (anim->Name && (strnicmp( anim->Name, Name, 32 ) == 0)) {
+		if (/* always true: anim->Name && */ (strnicmp( anim->Name, Name, 32 ) == 0)) {
 			return anim;
 		}
 	}

@@ -2560,7 +2560,10 @@ void Action::dump(StringBuffer& buffer) const
 
 	AssertCanary(__FUNCTION__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
-	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
+	/* stringXParameter will always evaluate to true
+	 * buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
+	 */
+	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter, string1Parameter);
 	for (i=0;i<3;i++) {
 		if (objects[i]) {
 			buffer.appendFormatted( "%d. ",i+1);
