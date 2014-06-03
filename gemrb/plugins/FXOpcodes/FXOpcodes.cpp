@@ -7268,14 +7268,15 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+// commented out due to g++ -Wall: 'int fx_immunity_sequester(GemRB::Scriptable*, GemRB::Actor*, GemRB::Effect*)' defined but not used [-Werror=unused-function]
 //0x138 //see fx_crash, this effect is not fully enabled in original bg2/tob
-int fx_immunity_sequester (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	if(0) print("fx_immunity_sequester(%2d): Mod: %d", fx->Opcode, fx->Parameter2);
-	//this effect is supposed to provide immunity against sequester (maze/etc?)
-	STAT_SET(IE_NOSEQUESTER, fx->Parameter2);
-	return FX_APPLIED;
-}
+// static int fx_immunity_sequester (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+// {
+// 	if(0) print("fx_immunity_sequester(%2d): Mod: %d", fx->Opcode, fx->Parameter2);
+// 	//this effect is supposed to provide immunity against sequester (maze/etc?)
+// 	STAT_SET(IE_NOSEQUESTER, fx->Parameter2);
+// 	return FX_APPLIED;
+// }
 
 //0x139 //HLA generic effect
 //0x13a StoneSkin2Modifier
