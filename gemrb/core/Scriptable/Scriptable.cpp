@@ -2023,7 +2023,7 @@ void Movable::MoveLine(int steps, int Pass, ieDword orient)
 	path = area->GetLine( p, steps, orient, Pass );
 }
 
-void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
+static void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
 	if (destx > srcx)
 		Pos.x += ( unsigned short )
 			( ( ( ( ( destx * 16 ) + 8 ) - Pos.x ) * ( time_diff ) ) / walk_speed );

@@ -382,7 +382,7 @@ static avType *avPrefix;
 static int avCount = -1;
 
 /* counts the on bits in a number */
-ieDword bitcount (ieDword n)
+static ieDword bitcount (ieDword n)
 {
 	ieDword count=0;
 	while (n) {
@@ -904,7 +904,7 @@ void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 
 //call this when morale or moralebreak changed
 //cannot use old or new value, because it is called two ways
-void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
 		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
@@ -920,13 +920,13 @@ void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	actor->SetCircleSize();
 }
 
-void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//needs for new color
 	actor->SetCircleSize();
 }
 
-void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	if (actor->Selected && (newValue>EA_GOODCUTOFF) ) {
 		core->GetGame()->SelectActor(actor, false, SELECT_NORMAL);
@@ -935,7 +935,7 @@ void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 }
 
 //this is a good place to recalculate level up stuff
-void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword sum =
 		actor->GetFighterLevel()+
@@ -957,7 +957,7 @@ void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 	actor->GotLUFeedback = false;
 }
 
-void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
@@ -975,7 +975,7 @@ void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	actor->spellbook.SetBookType(sorcerer);
 }
 
-void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	actor->SetAnimationID(newValue);
 }
@@ -984,7 +984,7 @@ static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GR
 
 static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
 
-void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
+static void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 {
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 	if (State & STATE_PETRIFIED) {
@@ -1002,7 +1002,7 @@ void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 
 //changes based on extended state bits, right now it is only the seven eyes
 //animation (used in how/iwd2)
-void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
+static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 {
 	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
 		ieDword mask = EXTSTATE_EYE_MIND;
@@ -1023,7 +1023,7 @@ void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 	}
 }
 
-void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
@@ -1042,7 +1042,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
-void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp<(signed) actor->BaseStats[IE_HITPOINTS]) {
 		actor->BaseStats[IE_HITPOINTS]=hp;
@@ -1051,7 +1051,7 @@ void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	}
 }
 
-void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp>(signed) actor->BaseStats[IE_HITPOINTS]) {
 		actor->BaseStats[IE_HITPOINTS]=hp;
@@ -1060,7 +1060,7 @@ void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	}
 }
 
-void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
+static void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 {
 	if ((signed) newValue<=0) {
 		if (DeathOnZeroStat) {
@@ -1071,17 +1071,17 @@ void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 	}
 }
 
-void pcf_stat_str(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_stat_str(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_STR);
 }
 
-void pcf_stat_int(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_stat_int(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_INT);
 }
 
-void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_WIS);
 	if (third) {
@@ -1090,7 +1090,7 @@ void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_DEX);
 	if (third) {
@@ -1099,7 +1099,7 @@ void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CON);
 	pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
@@ -1109,12 +1109,12 @@ void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CHR);
 }
 
-void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	// check if we reached a new level
 	unsigned int pc = actor->InParty;
@@ -1131,7 +1131,7 @@ void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
-void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//this function will make a party member automatically donate their
 	//gold to the party pool, not the same as in the original engine
@@ -1165,7 +1165,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 }
 
 //de/activates the entangle overlay
-void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_ENTANGLE);
@@ -1179,7 +1179,7 @@ void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 //unlike IE, gemrb uses this stat for other overlay fields
 //see the complete list in overlay.2da
 //it loosely follows the internal representation of overlays in IWD2
-void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
 	ieDword mask = 1;
@@ -1196,7 +1196,7 @@ void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the prot from missiles overlay
-void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_SHIELDGLOBE);
@@ -1208,7 +1208,7 @@ void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the globe of invul. overlay
-void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_MINORGLOBE);
@@ -1220,7 +1220,7 @@ void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the grease background
-void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_GREASE);
@@ -1233,7 +1233,7 @@ void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 
 //de/activates the web overlay
 //the web effect also immobilizes the actor!
-void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_WEB);
@@ -1245,7 +1245,7 @@ void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the spell bounce background
-void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue) {
 		handle_overlay(actor, OV_BOUNCE);
@@ -1258,7 +1258,7 @@ void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //spell casting or other buttons disabled/reenabled
-void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if (actor->IsSelected()) {
 		core->SetEventFlag( EF_ACTION );
@@ -1266,12 +1266,12 @@ void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 }
 
 //no separate values (changes are permanent)
-void pcf_intoxication(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_intoxication(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	actor->BaseStats[IE_INTOXICATION]=newValue;
 }
 
-void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
@@ -1279,7 +1279,7 @@ void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
-void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
@@ -1543,7 +1543,7 @@ void Actor::ReleaseMemory()
 #define COL_GRADIENT   2
 
 /* returns the ISCLASS for the class based on name */
-int IsClassFromName (const char* name)
+static int IsClassFromName (const char* name)
 {
 	//TODO: convert this mess to a std::map
 	// iwd2 has some different names
@@ -4596,7 +4596,7 @@ void Actor::Resurrect()
 	//clear effects?
 }
 
-const char *GetVarName(const char *table, int value)
+static const char *GetVarName(const char *table, int value)
 {
 	int symbol = core->LoadSymbol( table );
 	if (symbol!=-1) {

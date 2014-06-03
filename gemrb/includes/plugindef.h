@@ -128,6 +128,8 @@ struct CreateResource {
 
 }
 
+GEM_EXPORT_DLL const char* GemRBPlugin_Version();
+
 #ifndef STATIC_LINK
 
 #ifdef WIN32

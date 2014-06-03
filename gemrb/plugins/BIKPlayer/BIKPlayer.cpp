@@ -1286,7 +1286,7 @@ static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *ds
 #define clear_block(block) memset( (block), 0, sizeof(DCTELEM)*64);
 
 //This replaces the j_rev_dct module
-void bink_idct(DCTELEM *block)
+static void bink_idct(DCTELEM *block)
 {
 	int i, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, tA, tB, tC;
 	int tblock[64];

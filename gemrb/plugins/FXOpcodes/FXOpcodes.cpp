@@ -838,7 +838,7 @@ static void Cleanup()
 	polymorph_stats=NULL;
 }
 
-void RegisterCoreOpcodes()
+static void RegisterCoreOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 	enhanced_effects=core->HasFeature(GF_ENHANCED_EFFECTS);
@@ -885,7 +885,7 @@ static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect*
 }
 
 //resurrect code used in many places
-void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
+static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 {
 	Scriptable *caster = GetCasterObject();
 	if (!caster) {
@@ -1390,7 +1390,7 @@ int fx_cure_frozen_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define CSA_DEX 0
 #define CSA_STR 1
 #define CSA_CNT 2
-int SpellAbilityDieRoll(Actor *target, int which)
+static int SpellAbilityDieRoll(Actor *target, int which)
 {
 	if (which>=CSA_CNT) return 6;
 
@@ -1478,7 +1478,7 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11 CurrentHPModifier
-int GetSpecialHealAmount(int type, Scriptable *caster)
+static int GetSpecialHealAmount(int type, Scriptable *caster)
 {
 	if (!caster || caster->Type!=ST_ACTOR) return 0;
 	Actor *actor = (Actor *) caster;
@@ -2117,7 +2117,7 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x2D State:Stun
-int power_word_stun_iwd2(Actor *target, Effect *fx)
+static int power_word_stun_iwd2(Actor *target, Effect *fx)
 {
 	int hp = BASE_GET(IE_HITPOINTS);
 	if (hp>150) return FX_NOT_APPLIED;
@@ -3922,7 +3922,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x87 Polymorph
-void CopyPolymorphStats(Actor *source, Actor *target)
+static void CopyPolymorphStats(Actor *source, Actor *target)
 {
 	int i;
 
@@ -5020,7 +5020,7 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define FAMILIAR_RESOURCE  2
 
 //returns the familiar if there was no error
-Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resource)
+static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resource)
 {
 	//summon familiar
 	Actor *fam = gamedata->GetCreature(resource);

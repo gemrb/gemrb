@@ -92,7 +92,7 @@ static EffectDesc effectnames[] = {
 	{ NULL, NULL, 0, 0 },
 };
 
-void RegisterTormentOpcodes()
+static void RegisterTormentOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 }
