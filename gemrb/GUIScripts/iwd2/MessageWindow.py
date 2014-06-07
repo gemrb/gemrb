@@ -89,7 +89,7 @@ def UpdateControlStatus():
 
 	MessageTA = GUIClasses.GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
-		MessageTA.MoveText (TMessageTA)
+		TMessageTA.Append(MessageTA.QueryText());
 		GUIClasses.GWindow(MessageWindow).Unload()
 	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)

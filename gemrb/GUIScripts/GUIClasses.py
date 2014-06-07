@@ -146,8 +146,6 @@ class GTextArea(GControl):
     'GetCharacters': _GemRB.TextArea_GetCharacters,
     'GetPortraits': _GemRB.TextArea_GetPortraits
   }
-  def MoveText(self, other):
-    _GemRB.TextArea_MoveText(self.WinID, self.ID, other.WinID, other.ID)
 
 class GTextEdit(GControl):
   __metaclass__ = metaControl

@@ -482,35 +482,6 @@ static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_TextArea_MoveText__doc,
-"MoveTAText(srcWin, srcCtrl, dstWin, dstCtrl)\n\n"
-"Copies a TextArea content to another.");
-
-static PyObject* GemRB_TextArea_MoveText(PyObject * /*self*/, PyObject* args)
-{
-	int srcWin, srcCtrl, dstWin, dstCtrl;
-
-	if (!PyArg_ParseTuple( args, "iiii", &srcWin, &srcCtrl, &dstWin, &dstCtrl )) {
-		return AttributeError( GemRB_TextArea_MoveText__doc );
-	}
-
-	TextArea* SrcTA = ( TextArea* ) GetControl( srcWin, srcCtrl, IE_GUI_TEXTAREA);
-	if (!SrcTA) {
-		return NULL;
-	}
-
-	TextArea* DstTA = ( TextArea* ) GetControl( dstWin, dstCtrl, IE_GUI_TEXTAREA);
-	if (!DstTA) {
-		return NULL;
-	}
-
-	DstTA->ClearText();
-	DstTA->AppendText(SrcTA->QueryText());
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_TextArea_Rewind__doc,
 "RewindTA(Win, Ctrl)\n\n"
 "Sets up a TextArea for scrolling.");
@@ -10898,7 +10869,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_GetCharacters, METH_VARARGS),
 	METHOD(TextArea_GetPortraits, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
-	METHOD(TextArea_MoveText, METH_VARARGS),
 	METHOD(TextArea_Rewind, METH_VARARGS),
 	METHOD(TextArea_Scroll, METH_VARARGS),
 	METHOD(TextEdit_ConvertEdit, METH_VARARGS),
