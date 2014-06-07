@@ -116,10 +116,6 @@ private: // Private attributes
 	/** Fonts */
 	Font* finit, * ftext;
 
-	/** Text Editing Cursor Sprite */
-	Sprite2D* Cursor;
-	size_t CurPos;
-
 	/** OnChange Scripted Event Function Name */
 	ControlEventHandler TextAreaOnChange;
 	ControlEventHandler TextAreaOnSelect;

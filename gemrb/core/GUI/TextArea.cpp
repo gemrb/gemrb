@@ -40,8 +40,6 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	rows = 0;
 	TextYPos = 0;
 	ticks = starttime = 0;
-	Cursor = NULL;
-	CurPos = 0;
 
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOnSelect );
@@ -75,7 +73,6 @@ TextArea::~TextArea(void)
 	}
 
 	ClearSelectOptions();
-	Sprite2D::FreeSprite( Cursor );
 	delete textContainer;
 }
 
@@ -372,7 +369,6 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 
 			// TODO: implement this! currently does nothing
 
-			CurPos++;
 			CalcRowCount();
 			RunEventHandler( TextAreaOnChange );
 		}
@@ -395,6 +391,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 bool TextArea::OnSpecialKeyPress(unsigned char Key)
 {
 	size_t len = 0;
+	size_t CurPos = 0;
 
 	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
 		return false;
