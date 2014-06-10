@@ -124,6 +124,9 @@ class GControl:
     if self.WinID != scrollbar.WinID:
       raise RuntimeError, "Scrollbar must be in same Window as Control"
     return _GemRB.Control_AttachScrollBar(self.WinID, self.ID, scrollbar.ID)
+  def SubstituteForControl(self, target):
+    _GemRB.Control_SubstituteForControl(self.WinID, self.ID, target.WinID, target.ID)
+    return _GemRB.Window_GetControl(target.WinID, target.ID)
 
 class GLabel(GControl):
   __metaclass__ = metaControl
@@ -153,9 +156,6 @@ class GTextEdit(GControl):
     'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
     'SetBackground': _GemRB.TextEdit_SetBackground
   }
-  def ConvertEdit(self, ScrollBarID):
-    newID = _GemRB.TextEdit_ConvertEdit(self.WinID, self.ID, ScrollBarID)
-    return GTextArea(self.WinID, self.ID)
 
 class GScrollBar(GControl):
   __metaclass__ = metaControl

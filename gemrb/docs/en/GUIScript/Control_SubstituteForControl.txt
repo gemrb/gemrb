@@ -1,0 +1,12 @@
+
+Prototype: GemRB.SubstituteForControl(WindowIndex, ControlIndex, TWindowIndex, TControlIndex)
+
+Description: Substitute a control with another control (even of different type), keeping its ControlID and scrollbar.
+
+Parameters:
+WindowIndex - the value returned from LoadWindow for the substitute control
+ControlID   - the substitute control's controlID
+TWindowIndex - the value returned from LoadWindow for the target control
+TControlID   - the old control's controlID
+
+Return value: The new ControlID

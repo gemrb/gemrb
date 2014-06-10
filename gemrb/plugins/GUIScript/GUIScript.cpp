@@ -2134,47 +2134,6 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 	//return Py_None;
 }
 
-
-PyDoc_STRVAR( GemRB_TextEdit_ConvertEdit__doc,
-"ConvertEdit(WindowIndex, ControlIndex, ScrollBarID) => ControlIndex\n\n"
-"Converts a simple Edit Control to a TextArea, keeping its ControlID." );
-
-static PyObject* GemRB_TextEdit_ConvertEdit(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex;
-	const Color fore={255,255,255,0};
-	const Color init={255,255,255,0};
-	const Color back={0,0,0,0};
-	int ScrollBarID=0;
-
-	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlIndex, &ScrollBarID)) {
-		return AttributeError( GemRB_TextEdit_ConvertEdit__doc );
-	}
-
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!");
-	}
-
-	TextEdit *ctrl = (TextEdit *) GetControl(WindowIndex, ControlIndex, IE_GUI_EDIT);
-	if (!ctrl) {
-		return NULL;
-	}
-	TextArea* ta = new TextArea( ctrl->ControlFrame(), ctrl->GetFont(), NULL, fore, init, back );
-	ta->ControlID = ctrl->ControlID;
-	ta->Owner = win;
-	ta->Flags |= IE_GUI_TEXTAREA_EDITABLE;
-	win->AddControl( ta );
-	win->Link( ScrollBarID, ( unsigned short ) ta->ControlID );
-
-	int ret = core->GetControl( WindowIndex, ta->ControlID );
-
-	if (ret<0) {
-		return NULL;
-	}
-	return PyInt_FromLong( ret );
-}
-
 PyDoc_STRVAR( GemRB_TextEdit_SetBackground__doc,
 "SetBackground(WindowIndex, ControlIndex, ResRef)\n\n"
 "Sets the background MOS for a TextEdit control.");
@@ -2902,6 +2861,40 @@ setup_done:
 	return PyInt_FromLong( ret );
 	//Py_INCREF( Py_None );
 	//return Py_None;
+}
+
+
+PyDoc_STRVAR( GemRB_Control_SubstituteForControl__doc,
+			 "SubstituteForControl(WindowIndex, ControlIndex, TWindowIndex, TControlIndex) => ControlIndex\n\n"
+			 "Substitute a control with another control (even of different type), keeping its ControlID, size, and scrollbar." );
+
+static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObject* args)
+{
+	int SubWindowIndex, SubControlID;
+	int WindowIndex, ControlID;
+
+	if (!PyArg_ParseTuple( args, "iiii", &SubWindowIndex, &SubControlID, &WindowIndex, &ControlID)) {
+		return AttributeError( GemRB_Control_SubstituteForControl__doc );
+	}
+
+	int subIdx = SubControlID;//core->GetControl(SubWindowIndex, SubControlID);
+	int targetIdx = ControlID;//core->GetControl(WindowIndex, ControlID);
+	Control* substitute = GetControl(SubWindowIndex, subIdx, -1);
+	Control* target = GetControl(WindowIndex, targetIdx, -1);
+	if (!substitute || !target) {
+		return RuntimeError("Cannot find control!");
+	}
+	substitute->Owner->RemoveControl(subIdx);
+	Window* targetWin = target->Owner;
+	substitute->SetControlFrame(target->ControlFrame());
+
+	substitute->ControlID = ControlID;
+	ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
+	targetWin->AddControl( substitute ); // deletes target!
+	targetWin->Link( sbid, substitute->ControlID );
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetPos__doc,
@@ -10865,6 +10858,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetTooltip, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
+	METHOD(Control_SubstituteForControl, METH_VARARGS),
 	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
@@ -10895,7 +10889,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_Rewind, METH_VARARGS),
 	METHOD(TextArea_Scroll, METH_VARARGS),
-	METHOD(TextEdit_ConvertEdit, METH_VARARGS),
 	METHOD(TextEdit_SetBackground, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(Window_CreateButton, METH_VARARGS),

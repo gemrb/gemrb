@@ -248,8 +248,8 @@ def AddNoteWindow ():
 	NoteWindow = GemRB.LoadWindow (5)
 	#convert to multiline, destroy unwanted resources
 	NoteLabel = NoteWindow.GetControl (1)
-	#0 is the default Scrollbar ID
-	NoteLabel = NoteLabel.ConvertEdit (0)
+	NoteTextArea = NoteWindow.CreateTextArea()
+	NoteLabel = NoteTextArea.SubstituteForControl(NoteLabel)
 	NoteLabel.SetText (Text)
 	print "Just set this:", NoteLabel.QueryText()
 

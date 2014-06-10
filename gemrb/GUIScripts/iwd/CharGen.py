@@ -2560,7 +2560,8 @@ def BiographyPress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	BiographyWindow = GemRB.LoadWindow (51)
 	BiographyField = BiographyWindow.GetControl (4)
-	BiographyField = BiographyField.ConvertEdit (3)
+	BiographyTextArea = BiographyWindow.CreateTextArea()
+	BiographyField = BiographyTextArea.SubstituteForControl(BiographyField)
 	BiographyField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	BIO = GemRB.GetToken("Biography")
