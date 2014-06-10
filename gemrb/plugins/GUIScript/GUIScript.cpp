@@ -1931,7 +1931,6 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	frame.h -= 10;
 	Label* lbl = new Label(frame, core->GetFont( font ), "" );
 	lbl->ControlID = ControlID;
-	lbl->Owner = win;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
@@ -1966,7 +1965,6 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	}
 	Label* lbl = new Label(rgn, core->GetFont( font ), text );
 	lbl->ControlID = ControlID;
-	lbl->Owner = win;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
@@ -2029,16 +2027,14 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
 	edit->SetFont( core->GetFont( font ) );
 	edit->ControlID = ControlID;
-	edit->Owner = win;
 	edit->SetText( text );
+	win->AddControl( edit );
 
 	Sprite2D* spr = core->GetCursorSprite();
 	if (spr)
 		edit->SetCursor( spr );
 	else
 		return RuntimeError( "Cursor BAM not found" );
-
-	win->AddControl( edit );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
@@ -2092,7 +2088,6 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 
 	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;
-	sb->Owner = win;
 	win->AddControl( sb );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
@@ -2127,7 +2122,6 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 
 	Button* btn = new Button(rgn);
 	btn->ControlID = ControlID;
-	btn->Owner = win;
 	win->AddControl( btn );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
@@ -2790,7 +2784,6 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	}
 	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;
-	wmap->Owner = win;
 	win->AddControl( wmap );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
@@ -2869,7 +2862,6 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 
 	MapControl* map = new MapControl(rgn);
 	map->ControlID = ControlID;
-	map->Owner = win;
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );

@@ -508,7 +508,6 @@ GameControl* Interface::StartGameControl()
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(Region(0, 0, Width, Height));
-	gc->Owner = gamewin;
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
 	gamewin->AddControl( gc );

@@ -159,7 +159,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &y1, 1 );
 				str->Read( &DisabledIndex, 1 );
 				str->Read( &y2, 1 );
-				btn->Owner = win;
+
+				win->AddControl( btn );
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
 					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
@@ -176,7 +177,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
 					if (UnpressedIndex == 0) {
 						//printMessage("CHUImporter", "Special Button Control, Skipping Image Loading\n",GREEN );
-						win->AddControl( btn );
 						break;
 					}
 				}
@@ -187,7 +187,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
 					this will handle bad ResRefs */
-					win->AddControl( btn );
 					break;
 				}
 				/** Cycle is only a byte for buttons */
@@ -208,7 +207,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				}
 				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
-				win->AddControl( btn );
 			}
 			break;
 
