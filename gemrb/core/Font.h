@@ -140,7 +140,7 @@ public:
 private:
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
-					  ieByte** canvas = NULL, bool grow = false) const;
+					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
 public:
 	Font(Palette*);
 	~Font();
@@ -157,14 +157,16 @@ public:
 	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
 	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
-								 Palette* pal = NULL, size_t* numPrinted = NULL) const;
+								 Palette* pal = NULL, size_t* numPrinted = NULL, Point* = NULL) const;
 
 	// Printing methods
 	// return the number of glyphs printed
 	size_t Print(Region rgn, const char* string,
 				 Palette* color, ieByte Alignment) const;
+	// the "point" parameter can be passed with a start point for rendering
+	// it will be filled with the point inside 'rgn' where the string ends upon return
 	size_t Print(Region rgn, const String& string,
-				 Palette* hicolor, ieByte Alignment) const;
+				 Palette* hicolor, ieByte Alignment, Point* point = NULL) const;
 
 	/** Returns size of the string rendered in this font in pixels */
 	Size StringSize(const String&, const Size* = NULL) const;

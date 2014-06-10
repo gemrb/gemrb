@@ -173,7 +173,8 @@ const Glyph& Font::GetGlyph(ieWord chr) const
 }
 
 size_t Font::RenderText(const String& string, Region& rgn,
-						Palette* color, ieByte alignment, ieByte** canvas, bool grow) const
+						Palette* color, ieByte alignment,
+						Point* point, ieByte** canvas, bool grow) const
 {
 	assert(color); // must have a palette
 
@@ -181,7 +182,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
 	assert(canvas || singleLine || !(alignment&(IE_FONT_ALIGN_BOTTOM|IE_FONT_ALIGN_MIDDLE)));
 
-	int x = 0, y = 0;
+	int x = (point) ? point->x : 0;
+	int y = (point) ? point->y : 0;
 	if (singleLine) {
 		// optimization for single line vertical alignment
 		if (alignment&IE_FONT_ALIGN_MIDDLE) {
@@ -375,12 +377,16 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		}
 	}
 
+	if (point) {
+		*point = Point(x, y);
+	}
+
 	assert(charCount <= string.length());
 	return charCount;
 }
 
 Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
-								   ieByte alignment, Palette* color, size_t* numPrinted) const
+								   ieByte alignment, Palette* color, size_t* numPrinted, Point* endPoint) const
 {
 	Size canvasSize = StringSize(string); // same as size(0, 0)
 	// if the string is larger than the region shrink the canvas
@@ -438,7 +444,7 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
 
 	Region rgn = Region(Point(0,0), canvasSize);
-	size_t ret = RenderText(string, rgn, palette, alignment, &canvasPx, (size.h) ? false : true);
+	size_t ret = RenderText(string, rgn, palette, alignment, endPoint, &canvasPx, (size.h) ? false : true);
 	if (numPrinted) {
 		*numPrinted = ret;
 	}
@@ -471,7 +477,7 @@ size_t Font::Print(Region rgn, const char* string,
 }
 
 size_t Font::Print(Region rgn, const String& string,
-				   Palette* color, ieByte alignment) const
+				   Palette* color, ieByte alignment, Point* point) const
 {
 	if (rgn.Dimensions().IsEmpty()) return 0;
 
@@ -488,12 +494,12 @@ size_t Font::Print(Region rgn, const String& string,
 		// Things that are known to still use this: ToolTips, OverheadText
 
 		size_t ret;
-		Sprite2D* rendered = RenderTextAsSprite(string, rgn.Dimensions(), alignment, color, &ret); // this does the alignment so no need to adjust here
+		Sprite2D* rendered = RenderTextAsSprite(string, rgn.Dimensions(), alignment, color, &ret, point); // this does the alignment so no need to adjust here
 		core->GetVideoDriver()->BlitSprite(rendered, rgn.x, rgn.y, true, &rgn);
 		rendered->release();
 		return ret;
 	}
-	return RenderText(string, rgn, pal, alignment);
+	return RenderText(string, rgn, pal, alignment, point);
 }
 
 Size Font::StringSize(const String& string, const Size* stop) const
