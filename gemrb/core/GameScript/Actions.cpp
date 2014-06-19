@@ -6829,7 +6829,7 @@ void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/
 	core->FogOfWar&=~FOG_DRAWFOG;
 }
 
-void DeleteAllSpriteCovers()
+static void DeleteAllSpriteCovers()
 {
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);

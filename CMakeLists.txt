@@ -133,7 +133,7 @@ endif()
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=cast-align")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=cast-align -Wmissing-declarations -Winline")
 	endif ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith -Wcast-align")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")

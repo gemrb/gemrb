@@ -150,8 +150,8 @@ void LRUCache::removeFromList(VarEntry* e)
 	e->prev = e->next = 0;
 }
 
-
-void testLRUCache()
+/* commented out due to g++ -Wall: 'void GemRB::testLRUCache()' defined but not used [-Werror=unused-function]
+static void testLRUCache()
 {
 	int i;
 	LRUCache c;
@@ -219,5 +219,6 @@ void testLRUCache()
 
 	assert(!c.getLRU(1, k2, p));
 }
+*/
 
 }

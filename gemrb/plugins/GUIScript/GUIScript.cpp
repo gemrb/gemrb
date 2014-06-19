@@ -1688,7 +1688,7 @@ PyDoc_STRVAR( GemRB_SetMasterScript__doc,
 "SetMasterScript(ScriptResRef, WMPResRef)\n\n"
 "Sets the worldmap and masterscript names." );
 
-PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 {
 	char* script;
 	char* worldmap1;
@@ -5490,7 +5490,7 @@ PyDoc_STRVAR( GemRB_Button_SetSpellIcon__doc,
 "SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type, tooltip, function])\n\n"
 "Sets Spell icon image on a button. Type is the icon's type." );
 
-PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int tooltip, int Function)
+static PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int tooltip, int Function)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -5599,7 +5599,7 @@ PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
 "Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon,\n"
 " 4/5 - Weapon icons, 6 and above - Extended header icons." );
 
-PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
+static PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -7433,7 +7433,7 @@ not_a_scroll:
 	return dict;
 }
 
-void DragItem(CREItem *si)
+static void DragItem(CREItem *si)
 {
 	if (!si) {
 		return;
@@ -7446,7 +7446,7 @@ void DragItem(CREItem *si)
 	gamedata->FreeItem( item, si->ItemResRef, false );
 }
 
-int CheckRemoveItem(Actor *actor, CREItem *si, int action)
+static int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 {
 	///check if item is undroppable because the actor likes it
 	if (UsedItemsCount==-1) {
@@ -7498,7 +7498,7 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 
 // TNO has an ear and an eye slot that share the same slot type, so normal checks fail
 // return false if we're trying to stick an earing into our eye socket or vice versa
-bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
+static bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	if (UsedItemsCount==-1) {
 		ReadUsedItems();
 	}
@@ -7522,7 +7522,7 @@ bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	return true;
 }
 
-CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
+static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 {
 	//we should use getslotitem, because
 	//getitem would remove the item from the inventory!
@@ -11000,7 +11000,7 @@ GUIScript::~GUIScript(void)
  * Quote path for use in python strings.
  * On windows also convert backslashes to forward slashes.
  */
-char* QuotePath(char* tgt, const char* src)
+static char* QuotePath(char* tgt, const char* src)
 {
 	char *p = tgt;
 	char c;

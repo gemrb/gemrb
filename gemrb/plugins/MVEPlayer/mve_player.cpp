@@ -240,7 +240,7 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
  * timer handling
  */
 
-void get_current_time(long &sec, long &usec) {
+static void get_current_time(long &sec, long &usec) {
 #ifdef _WIN32
 	DWORD time;
 	time = GetTickCount();

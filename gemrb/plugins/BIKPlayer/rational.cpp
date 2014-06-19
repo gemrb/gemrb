@@ -31,7 +31,7 @@
 #include "common.h"
 #include "rational.h"
 
-int64_t av_gcd(int64_t a, int64_t b){
+static inline int64_t av_gcd(int64_t a, int64_t b){
     if(b) return av_gcd(b, a%b);
     return a;
 }
