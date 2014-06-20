@@ -1072,14 +1072,12 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 */
 
-	//not resistable (no saves either?)
-	if(fx->Resistance != FX_CAN_RESIST_CAN_DISPEL) {
-		return false;
-	}
-
-	int magic = check_magic_res(actor, fx, caster);
-	if (magic < 2) {
-		return magic;
+	//not resistable (but check saves - for chromatic orb instakill)
+	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
+		int magic = check_magic_res(actor, fx, caster);
+		if (magic < 2) {
+			return magic;
+		}
 	}
 
 	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & (STATE_ANTIMAGIC) ) ) {
