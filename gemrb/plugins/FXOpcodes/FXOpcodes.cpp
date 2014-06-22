@@ -4649,6 +4649,10 @@ int fx_cure_intoxication (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 {
 	if(0) print("fx_pause_target(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// the parameters are not set (bg2), so we can't use STAT_MOD alone
+	if (!fx->Parameter1) {
+		fx->Parameter1 = 1;
+	}
 	STAT_MOD( IE_CASTERHOLD );
 	return FX_PERMANENT;
 }
