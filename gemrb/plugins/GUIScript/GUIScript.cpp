@@ -9041,7 +9041,7 @@ jump_label2:
 				SetSpellIcon(wi, ci, *poi, 1, 1, i+1);
 				int mem = actor->spellbook.GetMemorizedSpellsCount(*poi, -1, true);
 				if (!mem) {
-					state = IE_GUI_BUTTON_DISABLED;
+					state = IE_GUI_BUTTON_FAKEDISABLED;
 				}
 				SetItemText(wi, ci, mem, true);
 			}
