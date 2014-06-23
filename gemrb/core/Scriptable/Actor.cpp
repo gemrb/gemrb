@@ -611,6 +611,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
 	Palette *recover = NULL;
+	ieResRef paletteResRef;
 
 	if (anims) {
 		if (anims->lockPalette) {
@@ -618,7 +619,12 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
-			recover->acquire();
+			CopyResRef(paletteResRef, anims->PaletteResRef[PAL_MAIN]);
+			if (recover->named) {
+				recover = gamedata->GetPalette(paletteResRef);
+			} else {
+				recover->acquire();
+			}
 		}
 		delete( anims );
 	}
@@ -647,6 +653,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims->palette[PAL_MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
+		CopyResRef(anims->PaletteResRef[PAL_MAIN], paletteResRef);
 	}
 	//bird animations are not hindered by searchmap
 	//only animtype==7 (bird) uses this feature
