@@ -65,7 +65,8 @@ using namespace GemRB;
 #define PI_HOPELESS 44
 #define PI_LEVELDRAIN 53
 #define PI_FEEBLEMIND 54
-#define PI_STUN     55
+#define PI_STUN     55 //bg1+bg2
+#define PI_STUN_IWD 44 //iwd1+iwd2
 #define PI_AID      57
 #define PI_HOLY     59
 #define PI_BOUNCE   65
@@ -2129,7 +2130,7 @@ static int power_word_stun_iwd2(Actor *target, Effect *fx)
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Duration = stuntime*6*core->Time.round_size + core->GetGame()->GameTime;
 	STATE_SET( STATE_STUNNED );
-	target->AddPortraitIcon(PI_STUN);
+	target->AddPortraitIcon(PI_STUN_IWD);
 	return FX_APPLIED;
 }
 
@@ -2154,7 +2155,11 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	STATE_SET( STATE_STUNNED );
-	target->AddPortraitIcon(PI_STUN);
+	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) { // all iwds
+		target->AddPortraitIcon(PI_STUN_IWD);
+	} else {
+		target->AddPortraitIcon(PI_STUN);
+	}
 	if (fx->Parameter2==1) {
 		target->SetSpellState(SS_AWAKE);
 	}
