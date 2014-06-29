@@ -87,8 +87,13 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	return blank;
 }
 
-void Font::GlyphAtlasPage::Draw(ieWord key, const Region& dest)
+void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 {
+	if (!pal) {
+		pal = font->GetPalette();
+		pal->release();
+	}
+
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
 		void* pixels = pageData;
@@ -99,9 +104,13 @@ void Font::GlyphAtlasPage::Draw(ieWord key, const Region& dest)
 			// pixels = malloc(size);
 			// memcpy(pixels, GlyphPageData, size);
 		}
-		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, palette, true, 0);
+		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, pal, true, 0);
 	}
-	SpriteSheet::Draw(key, dest);
+	Palette* oldPal = Sheet->GetPalette();
+	Sheet->SetPalette(pal);
+	SpriteSheet::Draw(chr, dest);
+	Sheet->SetPalette(oldPal);
+	oldPal->release();
 }
 
 
@@ -136,7 +145,7 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
 		// page is full, make a new one
-		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, maxHeight + descent), palette);
+		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, maxHeight + descent), this);
 		Atlas.push_back(CurrentAtlasPage);
 		CurrentAtlasPage->AddGlyph(chr, tmp);
 	}
@@ -322,7 +331,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 							GlyphAtlasPage* page = Atlas[pageIdx];
 							Region dst = Region(x + rgn.x, y + rgn.y + curGlyph.descent,
 												curGlyph.dimensions.w, curGlyph.dimensions.h);
-							page->Draw(currChar, dst);
+							page->Draw(currChar, dst, color);
 						}
 						x += curGlyph.dimensions.w;
 					}

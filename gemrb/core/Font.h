@@ -91,12 +91,11 @@ private:
 			std::map<ieWord, Glyph> glyphs;
 			ieByte* pageData; // current raw page being built
 			int pageXPos; // current position on building page
-			Palette* palette;
+			Font* font;
 		public:
-			GlyphAtlasPage(Size pageSize, Palette* pal)
-			: SpriteSheet<ieWord>(), palette(pal)
+			GlyphAtlasPage(Size pageSize, Font* font)
+			: SpriteSheet<ieWord>(), font(font)
 			{
-				palette->acquire();
 				pageXPos = 0;
 				SheetRegion.w = pageSize.w;
 				SheetRegion.h = pageSize.h;
@@ -105,7 +104,6 @@ private:
 			}
 
 			~GlyphAtlasPage() {
-				palette->release();
 				if (Sheet == NULL) {
 					free(pageData);
 				} else {
@@ -118,7 +116,7 @@ private:
 
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet::Draw;
-		void Draw(ieWord key, const Region& dest);
+		void Draw(ieWord chr, const Region& dest, Palette* pal = NULL);
 	};
 
 	// TODO: Unfortunately, we have no smart pointer suitable for an STL container...
