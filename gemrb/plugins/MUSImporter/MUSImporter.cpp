@@ -121,7 +121,11 @@ bool MUSImporter::OpenPlaylist(const char* name)
 				else
 					break;
 			}
-			pls.PLTag[p] = 0;
+			if (p < 9) {
+				pls.PLTag[p] = 0;
+			} else {
+				pls.PLTag[9] = 0;
+			}
 			p = 0;
 			while (i < len) {
 				if (( line[i] == ' ' ) || ( line[i] == '\t' ))
