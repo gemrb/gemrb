@@ -162,7 +162,7 @@ inline PyObject* PyString_FromAnimID(const char* AnimID)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'.
  */
-inline PyObject* RuntimeError(const char* msg)
+static PyObject* RuntimeError(const char* msg)
 {
 	Log(ERROR, "GUIScript", "Runtime Error:");
 	PyErr_SetString( PyExc_RuntimeError, msg );
@@ -177,7 +177,7 @@ inline PyObject* RuntimeError(const char* msg)
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-inline PyObject* AttributeError(const char* doc_string)
+static PyObject* AttributeError(const char* doc_string)
 {
 	Log(ERROR, "GUIScript", "Syntax Error:");
 	PyErr_SetString(PyExc_AttributeError, doc_string);
@@ -216,7 +216,7 @@ inline PyObject* AttributeError(const char* doc_string)
 		return RuntimeError( "Actor not found!\n" ); \
 	}
 
-inline Control *GetControl( int wi, int ci, int ct)
+static Control *GetControl( int wi, int ci, int ct)
 {
 	char errorbuffer[256];
 
