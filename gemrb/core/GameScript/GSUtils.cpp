@@ -2570,7 +2570,7 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	return polygons[index];
 }
 
-inline static bool InterruptSpellcasting(Scriptable* Sender) {
+static bool InterruptSpellcasting(Scriptable* Sender) {
 	if (Sender->Type != ST_ACTOR) return false;
 	Actor *caster = (Actor *) Sender;
 
