@@ -292,7 +292,14 @@ void TextArea::AppendText(const String& text)
 			if (textpos != String::npos) {
 				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
 				// need to figure out how to handle this because it breaks drop caps
-				textContainer->AppendText(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS]);
+
+				// we must create and append this span here (instead of using AppendText),
+				// because the original data files for the DC font specifies a line height of 13
+				// that would cause overlap when the lines wrap beneath the DC if we didnt specify the correct size
+				Size s = finit->GetGlyph(text[textpos]).dimensions;
+				s.h += finit->descent;
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS], &s);
+				textContainer->AppendContent(dc);
 				textpos++;
 				// FIXME: assuming we have more text!
 			} else {
