@@ -515,8 +515,8 @@ Size Font::StringSize(const String& string, const Size* stop) const
 {
 	if (!string.length()) return Size();
 
-	ieWord w = 0, h = 0, lines = 1;
-	ieWord curh = 0, curw = 0;
+	ieWord w = 0, h = maxHeight + descent, lines = 1;
+	ieWord curh = h, curw = w;
 	bool multiline = false;
 	for (size_t i = 0; i < string.length(); i++) {
 		if (string[i] == L'\n') {
@@ -531,18 +531,18 @@ Size Font::StringSize(const String& string, const Size* stop) const
 			curh += 0;
 			if (curh > h)
 				h = curh;
+			else
+				curh = h;
 			curw += curGlyph.dimensions.w;
 			if (i > 0) { // kerning
 				curw -= KerningOffset(string[i-1], string[i]);
 			}
 		}
-		if (stop && (curw > stop->w || curh > stop->h))
-			return Size((curw > stop->w) ? stop->w : curw,
-						(curh > stop->h) ? stop->h : curh);
+		if (stop && ((stop->w && curw > stop->w) || (stop->h && curh > stop->h)))
+			return Size((stop->w && curw > stop->w) ? stop->w : curw,
+						(stop->h && curh > stop->h) ? stop->h : curh);
 	}
-	if (!multiline) {
-		h = maxHeight + descent;
-	} else {
+	if (multiline) {
 		h = (maxHeight * lines) + descent;
 	}
 	w = (curw > w) ? curw : w;
