@@ -28,7 +28,7 @@ Point::Point(void)
 	x = y = 0;
 }
 
-bool Point::operator==(const Point& pnt)
+bool Point::operator==(const Point& pnt) const
 {
 	if (( x == pnt.x ) && ( y == pnt.y )) {
 		return true;
@@ -36,9 +36,19 @@ bool Point::operator==(const Point& pnt)
 	return false;
 }
 
-bool Point::operator!=(const Point& pnt)
+bool Point::operator!=(const Point& pnt) const
 {
 	return !(*this == pnt);
+}
+
+Point Point::operator+(const Point& p) const
+{
+	return Point(x + p.x, y + p.y);
+}
+
+Point Point::operator-(const Point& p) const
+{
+	return Point(x - p.x, y - p.y);
 }
 
 Point::Point(short x, short y)

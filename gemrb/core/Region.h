@@ -43,8 +43,11 @@ public:
 	Point(void);
 	Point(short x, short y);
 
-	bool operator==(const Point &pnt);
-	bool operator!=(const Point &pnt);
+	bool operator==(const Point &pnt) const;
+	bool operator!=(const Point &pnt) const;
+
+	Point operator+(const Point& p) const;
+	Point operator-(const Point& p) const;
 
 	/** if it is [-1.-1] */
 	bool isempty() const;
