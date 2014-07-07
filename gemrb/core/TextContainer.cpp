@@ -24,6 +24,8 @@
 #include "System/String.h"
 #include "Video.h"
 
+#define CONTENT_MAX_SIZE (SHRT_MAX / 2) // just something larger than any screen height and small enough to not overflow
+
 namespace GemRB {
 
 Content::Content(const Size& size)
@@ -34,6 +36,14 @@ Content::Content(const Size& size)
 
 Content::~Content()
 {}
+
+void Content::Draw(Point p) const
+{
+	Size s(frame.Dimensions());
+	s.h = (s.h <= 0) ? CONTENT_MAX_SIZE: s.h;
+	s.w = (s.w <= 0) ? CONTENT_MAX_SIZE: s.w;
+	DrawContents(Point(), Region(p, s));
+}
 
 
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size* frame)
@@ -48,19 +58,18 @@ TextSpan::~TextSpan()
 	palette->release();
 }
 
-void TextSpan::Draw(Point dp) const
+void TextSpan::DrawContents(Point dp, const Region& rgn) const
 {
 	if (!parent && frame.Dimensions().IsEmpty()) {
 		return;
 	}
 
+	Point drawOrigin = rgn.Origin();
 	if (frame.Dimensions().IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
 		Regions lineExclusions;
-		Point drawOrigin = dp;
-		const Size& parentFrame = parent->ContentFrame();
-		Region lineRgn(dp, Size(parentFrame.w, font->maxHeight));
+		Region lineRgn(dp + drawOrigin, Size(rgn.w, font->maxHeight));
 		Region lineSegment = lineRgn;
 
 		const Region* excluded = NULL;
@@ -72,7 +81,7 @@ void TextSpan::Draw(Point dp) const
 					// start next line
 					lineRgn.x = drawOrigin.x;
 					lineRgn.y += font->maxHeight;
-					lineRgn.w = parentFrame.w;
+					lineRgn.w = rgn.w;
 					dp = lineRgn.Origin();
 					lineExclusions.clear();
 					lineSegment = lineRgn;
@@ -117,29 +126,27 @@ void TextSpan::Draw(Point dp) const
 			if (newline) {
 				continue;
 			}
-			// transform the relative line segment into a screen region for blitting
-			//Point sp = ConvertPointToScreen(dp);
-			Region printRgn = Region(dp, lineSegment.Dimensions());
 
 			Point printPoint;
-			numPrinted += font->Print(printRgn, text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
+			numPrinted += font->Print(lineSegment.Intersect(rgn), text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
 			// FIXME: maybe handle this by bailing on the draw
 			assert(numPrinted); // if we didnt print at all there will be an infinite loop.
 			if (printPoint.x) {
-				printRgn.w = printPoint.x;
+				lineSegment.w = printPoint.x;
 				dp.x += printPoint.x;
 			}
-			layoutRegions.push_back(printRgn);
+			layoutRegions.push_back(lineSegment);
 
 			// FIXME: infinite loop possibility.
 		} while (numPrinted < text.length());
 	} else {
 		// we are limited to drawing within our frame :(
 
+		// TODO: implement absolute positioning
 		//dp.x += frame.x;
 		//dp.y += frame.y;
 
-		Region drawRegion = Region(dp, frame.Dimensions());
+		Region drawRegion = Region(dp + drawOrigin, frame.Dimensions());
 
 		// FIXME: we ought to be able to set an alignment for "blocks" of text
 		// probably the way to do this is have alignment on the container
@@ -161,11 +168,11 @@ void TextSpan::Draw(Point dp) const
 
 		Point printPoint;
 		if (drawRegion.h <= 0) {
-			drawRegion.h = SHRT_MAX / 2; // just something larger than any screen height and small enough to not overflow
-			font->Print(drawRegion, text, palette, IE_FONT_ALIGN_LEFT, &printPoint);
+			drawRegion.h = CONTENT_MAX_SIZE;
+			font->Print(drawRegion.Intersect(rgn), text, palette, IE_FONT_ALIGN_LEFT, &printPoint);
 			drawRegion.h = printPoint.y + font->maxHeight;
 		} else {
-			font->Print(drawRegion, text, palette, IE_FONT_ALIGN_LEFT);
+			font->Print(drawRegion.Intersect(rgn), text, palette, IE_FONT_ALIGN_LEFT);
 		}
 
 		assert(drawRegion.h && drawRegion.w);
@@ -193,9 +200,9 @@ ImageSpan::ImageSpan(Sprite2D* im)
 	image = im;
 }
 
-void ImageSpan::Draw(Point dp) const
+void ImageSpan::DrawContents(Point dp, const Region& rgn) const
 {
-	core->GetVideoDriver()->BlitSprite(image, dp.x, dp.y);
+	core->GetVideoDriver()->BlitSprite(image, dp.x + rgn.x, dp.y + rgn.y, true, &rgn);
 }
 
 
@@ -283,9 +290,6 @@ Size ContentContainer::ContentFrame() const
 	if (!layoutRegions.empty()) {
 		return layoutRegions.back().Dimensions();
 	}
-	if (parent && frame.Dimensions().IsEmpty()) {
-		return parent->ContentFrame();
-	}
 	return Content::ContentFrame();
 }
 
@@ -294,19 +298,15 @@ void ContentContainer::SetFrame(const Region& newFrame)
 	frame = newFrame;
 }
 
-void ContentContainer::Draw(Point p) const
+void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 {
-	screenOffset = p;
-	DrawContents(p);
-}
-
-void ContentContainer::DrawContents(Point drawPoint) const
-{
+	screenOffset = rgn.Origin();
 	// TODO: intersect with the screen clip so we can bail out even earlier
 
 	// using a dynamic layout, may not be most efficient,
 	// but its at least as fast as our previous (horrible) string printing implementation
-	Point drawOrigin = drawPoint;
+	const Point& drawOrigin = screenOffset;
+	Point drawPoint = dp + drawOrigin;
 	Content* content = NULL;
 	layout.clear();
 	ContentList::const_iterator it = contents.begin();
@@ -314,7 +314,7 @@ void ContentContainer::DrawContents(Point drawPoint) const
 		content = *it;
 
 		content->layoutRegions.clear();
-		content->Draw(drawPoint);
+		content->DrawContents(drawPoint - drawOrigin, rgn);
 
 		layout.insert(std::make_pair(content, content->layoutRegions));
 		if (it == --contents.end()) break; // dont care about calculating next layout

@@ -46,7 +46,6 @@ protected:
 	Region frame; // TODO: origin currently unused
 	ContentContainer* parent;
 
-	mutable Point screenOffset;
 	mutable Regions layoutRegions;
 
 public:
@@ -55,9 +54,11 @@ public:
 
 	virtual Size ContentFrame() const { return frame.Dimensions(); }
 
-	virtual void Draw(Point p) const=0; // public drawing interface in screen coordinates.
-private:
-	//virtual Regions DrawContents(Point& p) const=0;
+	virtual void Draw(Point p) const; // public drawing interface in screen coordinates.
+
+protected:
+	// point is relative to Region. Region is a screen region.
+	virtual void DrawContents(Point p, const Region&) const=0;
 };
 
 
@@ -80,9 +81,8 @@ public:
 
 	void SetPalette(Palette* pal);
 
-	void Draw(Point p) const;
 protected:
-	//Regions DrawContents(Point& p) const;
+	void DrawContents(Point p, const Region&) const;
 };
 
 
@@ -91,11 +91,11 @@ class ImageSpan : public Content
 private:
 	Sprite2D* image;
 
-protected:
-	void Draw(Point p) const;
-
 public:
 	ImageSpan(Sprite2D* image);
+
+protected:
+	void DrawContents(Point p, const Region&) const;
 };
 
 
@@ -108,6 +108,7 @@ protected:
 
 	typedef std::map<Content*, Regions> ContentLayout;
 	mutable ContentLayout layout;
+	mutable Point screenOffset;
 
 public:
 	ContentContainer(const Size& frame) : Content(frame) {};
@@ -128,10 +129,10 @@ public:
 	void SetFrame(const Region&);
 	virtual Size ContentFrame() const;
 
-	void Draw(Point p) const;
 protected:
-	void DrawContents(Point) const;
+	void DrawContents(Point p, const Region&) const;
 	Content* ContentAtScreenPoint(const Point& p) const;
+
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
