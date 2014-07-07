@@ -26,49 +26,21 @@
 
 namespace GemRB {
 
-ContentSpan::ContentSpan()
-	: frame()
+Content::Content(const Size& size)
+	: frame(Point(-1, -1), size)
 {
-	spanSprite = NULL;
+	parent = NULL;
 }
 
-ContentSpan::ContentSpan(const Size& size)
-	: frame(size)
-{
-	spanSprite = NULL;
-}
+Content::~Content()
+{}
 
-ContentSpan::~ContentSpan()
-{
-	if (spanSprite)
-		spanSprite->release();
-}
 
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal)
-	: ContentSpan()
+TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size* frame)
+	: Content((frame) ? *frame : Size()), text(string), font(fnt)
 {
-	Init(string, fnt, pal, 0);
-}
-
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size& frame, ieByte align)
-	: ContentSpan(frame)
-{
-	Init(string, fnt, pal, align);
-}
-
-void TextSpan::Init(const String& string, Font* fnt, Palette* pal, ieByte align)
-{
-	if (!pal) {
-		palette = fnt->GetPalette();
-		assert(palette);
-	} else {
-		palette = NULL;
-		SetPalette(pal);
-	}
-
-	font = fnt;
-	alignment = align;
-	RenderSpan(string);
+	palette = NULL;
+	SetPalette(pal);
 }
 
 TextSpan::~TextSpan()
@@ -76,320 +48,397 @@ TextSpan::~TextSpan()
 	palette->release();
 }
 
-void TextSpan::RenderSpan(const String& string)
+void TextSpan::Draw(Point dp) const
 {
-	if (string.find_first_not_of(L"\n") == String::npos) {
-		// entire string is newlines (no width, but still need to generate layout)
-		frame.w = -1; // maximum value, nothing should ever go next to a newline
-		// FIXME: this assumes a single newline and no more!
-		frame.h = font->maxHeight; // newline is always a full line height
-		stringLen = string.length();
+	if (!parent && frame.Dimensions().IsEmpty()) {
 		return;
 	}
-	if (spanSprite) spanSprite->release();
-	// TODO: implement span alignments
-	spanSprite = font->RenderTextAsSprite(string, frame, alignment, palette, &stringLen);
-	// string is trimmed down to just the characters that fit.
-	// some spans are created from huge strings but with a small size (the text next to a drop cap)
-	// we may want a variation that keeps the entire string so the span can dynamically rerender
-	text = string.substr(0, stringLen);
 
-	if (text.find_last_of(L"\n") == text.length() - 1) {
-		// if the span eneded in a newline we automatically know
-		// following spans should only go below this one
-		frame.w = (ieWord)-1;
+	if (frame.Dimensions().IsZero()) {
+		// this means we get to wrap :)
+		// calculate each line and print line by line
+		Regions lineExclusions;
+		Point drawOrigin = dp;
+		const Size& parentFrame = parent->ContentFrame();
+		Region lineRgn(dp, Size(parentFrame.w, font->maxHeight));
+		Region lineSegment = lineRgn;
+
+		const Region* excluded = NULL;
+		size_t numPrinted = 0;
+		bool newline = false;
+		do {
+			if (numPrinted) {
+				if (newline || lineSegment.x + lineSegment.w >= lineRgn.x + lineRgn.w) {
+					// start next line
+					lineRgn.x = drawOrigin.x;
+					lineRgn.y += font->maxHeight;
+					lineRgn.w = parentFrame.w;
+					dp = lineRgn.Origin();
+					lineExclusions.clear();
+					lineSegment = lineRgn;
+					newline = false;
+				} else {
+					// we have to add the segment to the container exclusions so that the next iteration works
+					lineExclusions.push_back(lineSegment); // FIXME: if we want an implicit newline, use lineRgn instead.
+				}
+			}
+			do {
+				// process all overlaping exclusion zones until we trim down to the leftmost non conflicting region.
+				// check for intersections with other content
+				excluded = parent->ContentRegionForRect(lineSegment);
+				if (!excluded) {
+					// now check if we already used this region ourselves
+					std::vector<Region>::const_iterator it;
+					for (it = lineExclusions.begin(); it != lineExclusions.end(); ++it) {
+						if (lineSegment.IntersectsRegion(*it)) {
+							excluded = &*it;
+							break;
+						}
+					}
+				}
+				if (excluded) {
+					Region intersect = excluded->Intersect(lineSegment);
+					if (intersect.x > lineSegment.x) { // to the right, simply shrink the width
+						lineSegment.w = intersect.x - lineSegment.x;
+					} else { // overlaps our start point, jump to the right of intersect
+						int x = lineSegment.x;
+						lineSegment.x = intersect.x + intersect.w;
+						// must shrink to compensate for moving x
+						lineSegment.w -= lineSegment.x - x;
+					}
+					// its possible that the resulting segment is 0 in width
+					if (lineSegment.w <= 0) {
+						newline = true;
+						break;
+					}
+				}
+			} while (excluded);
+
+			if (newline) {
+				continue;
+			}
+			// transform the relative line segment into a screen region for blitting
+			//Point sp = ConvertPointToScreen(dp);
+			Region printRgn = Region(dp, lineSegment.Dimensions());
+
+			Point printPoint;
+			numPrinted += font->Print(printRgn, text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
+			// FIXME: maybe handle this by bailing on the draw
+			assert(numPrinted); // if we didnt print at all there will be an infinite loop.
+			if (printPoint.x) {
+				printRgn.w = printPoint.x;
+				dp.x += printPoint.x;
+			}
+			layoutRegions.push_back(printRgn);
+
+			// FIXME: infinite loop possibility.
+		} while (numPrinted < text.length());
+	} else {
+		// we are limited to drawing within our frame :(
+
+		//dp.x += frame.x;
+		//dp.y += frame.y;
+
+		Region drawRegion = Region(dp, frame.Dimensions());
+
+		// FIXME: we ought to be able to set an alignment for "blocks" of text
+		// probably the way to do this is have alignment on the container
+		// then maybe another Draw method that takes an alignment argument?
+		if (drawRegion.w <= 0) {
+			/*
+			// FIXME: probably a better way to do this...
+			Sprite2D* spr = font->RenderTextAsSprite(text, frame.Dimensions(), IE_FONT_ALIGN_LEFT);
+			drawRegion.w = spr->Width;
+			drawRegion.h = spr->Height;
+			core->GetVideoDriver()->BlitSprite(spr, drawRegion.x, drawRegion.y, true);
+			spr->release();
+			*/
+			Size max = Size(0, frame.h);
+			Size ts = font->StringSize(text, &max);
+			assert(ts.w && ts.h);
+			drawRegion.w = (drawRegion.w > 0) ? drawRegion.w : ts.w;
+		}
+
+		Point printPoint;
+		if (drawRegion.h <= 0) {
+			drawRegion.h = SHRT_MAX / 2; // just something larger than any screen height and small enough to not overflow
+			font->Print(drawRegion, text, palette, IE_FONT_ALIGN_LEFT, &printPoint);
+			drawRegion.h = printPoint.y + font->maxHeight;
+		} else {
+			font->Print(drawRegion, text, palette, IE_FONT_ALIGN_LEFT);
+		}
+
+		assert(drawRegion.h && drawRegion.w);
+		layoutRegions.push_back(drawRegion);
 	}
-
-	// frame dimensions of 0 just mean size to fit
-	if (frame.w == 0)
-		frame.w = spanSprite->Width;
-	if (frame.h == 0)
-		frame.h = spanSprite->Height;
 }
 
 void TextSpan::SetPalette(Palette* pal)
 {
-	assert(pal);
+	if (!pal) {
+		pal = font->GetPalette();
+		pal->release();
+	}
 	pal->acquire();
 	if (palette)
 		palette->release();
 	palette = pal;
-	if (spanSprite)
-		spanSprite->SetPalette(palette);
 }
 
-
-
-ImageSpan::ImageSpan(Sprite2D* image)
-	: ContentSpan()
+ImageSpan::ImageSpan(Sprite2D* im)
+	: Content(Size(im->Width, im->Height))
 {
-	assert(image);
-	image->acquire();
-	spanSprite = image;
-
-	frame.w = spanSprite->Width;
-	frame.h = spanSprite->Height;
+	assert(im);
+	im->acquire();
+	image = im;
 }
 
-
-ContentContainer::ContentContainer(const Size& frame, Font* font, Palette* pal)
-	: maxFrame(frame), frame(), font(font)
+void ImageSpan::Draw(Point dp) const
 {
-	pal->acquire();
-	pallete = pal;
+	core->GetVideoDriver()->BlitSprite(image, dp.x, dp.y);
 }
+
 
 ContentContainer::~ContentContainer()
 {
-	SpanList::iterator it = spans.begin();
-	for (; it != spans.end(); ++it) {
+	ContentList::iterator it = contents.begin();
+	for (; it != contents.end(); ++it) {
 		delete *it;
 	}
-	pallete->release();
 }
 
-void ContentContainer::AppendText(const String& text)
+void ContentContainer::AppendContent(Content* content)
 {
-	if (text.length()) {
-		Size stringSize = font->StringSize(text);
-		if (stringSize.w < maxFrame.w)
-			AppendSpan(new TextSpan(text, font, pallete));
-		else
-			AppendSpan(new TextSpan(text, font, pallete, Size(maxFrame.w, 0), 0));
-	}
+	InsertContentAfter(content, *(--contents.end()));
 }
 
-void ContentContainer::AppendSpan(ContentSpan* span)
+void ContentContainer::InsertContentAfter(Content* newContent, const Content* existing)
 {
-	spans.push_back(span);
-	LayoutSpansStartingAt(--spans.end());
-}
-
-void ContentContainer::InsertSpanAfter(ContentSpan* newSpan, const ContentSpan* existing)
-{
+	newContent->parent = this;
 	if (!existing) { // insert at beginning;
-		spans.push_front(newSpan);
+		contents.push_front(newContent);
 		return;
 	}
-	SpanList::iterator it;
-	it = std::find(spans.begin(), spans.end(), existing);
-	spans.insert(++it, newSpan);
-	LayoutSpansStartingAt(it);
+	ContentList::iterator it;
+	it = std::find(contents.begin(), contents.end(), existing);
+	if (it != contents.end()) {
+		contents.insert(++it, newContent);
+	} else {
+		contents.push_back(newContent);
+	}
 }
 
-ContentSpan* ContentContainer::RemoveSpan(const ContentSpan* span)
+Content* ContentContainer::RemoveContent(const Content* span)
 {
-	SpanList::iterator it;
-	it = std::find(spans.begin(), spans.end(), span);
-	if (it != spans.end()) {
-		LayoutSpansStartingAt(--spans.erase(it));
-		return (ContentSpan*)span; // easiest to just cast away const, it would be the same pointer either way
+	ContentList::iterator it;
+	it = std::find(contents.begin(), contents.end(), span);
+	if (it != contents.end()) {
+		contents.erase(it);
+		Content* content = *it;
+		content->parent = NULL;
+		return content;
 	}
 	return NULL;
 }
 
-void ContentContainer::ClearSpans()
+Content* ContentContainer::ContentAtPoint(const Point& p) const
 {
-	// FIXME: this isn't technically accurate
-	Region ex = *--ExclusionRects.end();
-	ex.w = maxFrame.w;
-	ex.h = ex.y + ex.h;
-	ex.y = 0;
-	ex.x = 0;
-	AddExclusionRect(ex);
+	return ContentAtScreenPoint(Point(p.x + screenOffset.x, p.y + screenOffset.y));
 }
 
-ContentSpan* ContentContainer::SpanAtPoint(const Point& p) const
+Content* ContentContainer::ContentAtScreenPoint(const Point& p) const
 {
-	// the point we are testing is relative to the container
-	Region rgn = Region(0, 0, frame.w, frame.h);
-	if (!rgn.PointInside(p))
-		return NULL;
-
-	SpanLayout::const_iterator it;
-	for (it = layout.begin(); it != layout.end(); ++it) {
-		if ((*it).second.PointInside(p)) {
-			return (*it).first;
+	ContentLayout::iterator it = layout.begin();
+	for (; it != layout.end(); ++it) {
+		const Regions& rgns = (*it).second;
+		Regions::const_iterator rit = rgns.begin();
+		for (; rit != rgns.end(); ++rit) {
+			if ((*rit).PointInside(p)) {
+				return (*it).first;
+			}
 		}
 	}
+
 	return NULL;
 }
 
-Point ContentContainer::PointForSpan(const ContentSpan* span)
+const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 {
-	SpanList::iterator it;
-	it = std::find(spans.begin(), spans.end(), span);
-	if (it != spans.end()) {
-		return layout[*it].Origin();
-	}
-	return Point(-1, -1);
-}
-
-void ContentContainer::SetSpanPadding(ContentSpan* span, Size pad)
-{
-	if (layout.find(span) == layout.end()) return;
-
-	Region rgn = layout[span];
-	rgn.x += pad.w;
-	rgn.y += pad.h;
-	layout[span] = rgn;
-	rgn.y -= span->SpanDescent();
-	// TODO: the span should be informed so that it can readjust the position of the sprite according to its alignment
-	AddExclusionRect(rgn);
-}
-
-void ContentContainer::DrawContents(int x, int y) const
-{
-	Video* video = core->GetVideoDriver();
-	Region drawRgn = Region(Point(x, y), maxFrame);
-#if DEBUG_TEXT
-	// Draw the exclusion regions
-	std::vector<Region>::const_iterator ex;
-	for (ex = ExclusionRects.begin(); ex != ExclusionRects.end(); ++ex) {
-		Region rgn = *ex;
-		rgn.x += x;
-		rgn.y += y;
-		video->DrawRect(rgn, ColorRed);
-	}
-#endif
-	SpanLayout::const_iterator it;
-	ContentSpan* span = NULL;
-	for (it = layout.begin(); it != layout.end(); ++it) {
-		span = (*it).first;
-		Region rgn = (*it).second;
-		rgn.x += x;
-		rgn.y += y;
-		if (!rgn.IntersectsRegion(drawRgn)) {
-			break; // layout is ordered so we know nothing else can draw
+	ContentLayout::const_iterator it = layout.begin();
+	for (; it != layout.end(); ++it) {
+		const Regions& rgns = (*it).second;
+		Regions::const_iterator rit = rgns.begin();
+		for (; rit != rgns.end(); ++rit) {
+			if ((*rit).IntersectsRegion(r)) {
+				return &(*rit);
+			}
 		}
-		const Sprite2D* spr = span->RenderedSpan();
-		video->BlitSprite(spr, rgn.x, rgn.y, true, &rgn);
-#if DEBUG_TEXT
-		// draw the layout rect
-		video->DrawRect(rgn, ColorGreen, false);
-		// draw the actual sprite boundaries
-		rgn.x += span->RenderedSpan()->XPos;
-		rgn.y += span->RenderedSpan()->YPos;
-		rgn.w = span->RenderedSpan()->Width;
-		rgn.h = span->RenderedSpan()->Height;
-		video->DrawRect(rgn, ColorWhite, false);
-#endif
 	}
+
+	return NULL;
 }
 
-void ContentContainer::LayoutSpansStartingAt(SpanList::const_iterator it)
+Size ContentContainer::ContentFrame() const
 {
-	assert(it != spans.end());
-	Point drawPoint(0, 0);
-	ContentSpan* span = *it;
-	ContentSpan* prevSpan = NULL;
-
-	if (it != spans.begin()) {
-		// get the next draw position to try
-		prevSpan = *--it;
-		if (layout.find(prevSpan) != layout.end()) {
-			const Region& rgn = layout[prevSpan];
-			drawPoint.y = rgn.y;
-			drawPoint.x = rgn.x + rgn.w;
-		}
-		it++;
+	if (!layoutRegions.empty()) {
+		return layoutRegions.back().Dimensions();
 	}
+	if (parent && frame.Dimensions().IsEmpty()) {
+		return parent->ContentFrame();
+	}
+	return Content::ContentFrame();
+}
 
-	for (; it != spans.end(); it++) {
-		span = *it;
-		const Size& spanFrame = span->SpanFrame();
+void ContentContainer::SetFrame(const Region& newFrame)
+{
+	frame = newFrame;
+}
 
-		// FIXME: this only calculates left alignment
-		// it also doesnt support block layout
-		Region layoutRgn;
+void ContentContainer::Draw(Point p) const
+{
+	screenOffset = p;
+	DrawContents(p);
+}
+
+void ContentContainer::DrawContents(Point drawPoint) const
+{
+	// TODO: intersect with the screen clip so we can bail out even earlier
+
+	// using a dynamic layout, may not be most efficient,
+	// but its at least as fast as our previous (horrible) string printing implementation
+	Point drawOrigin = drawPoint;
+	Content* content = NULL;
+	layout.clear();
+	ContentList::const_iterator it = contents.begin();
+	for (; it != contents.end(); ++it) {
+		content = *it;
+
+		content->layoutRegions.clear();
+		content->Draw(drawPoint);
+
+		layout.insert(std::make_pair(content, content->layoutRegions));
+		if (it == --contents.end()) break; // dont care about calculating next layout
+
 		const Region* excluded = NULL;
 		do {
-			if (excluded) {
-				// we know that we have to move at least to the right
-				// TODO: implement handling for block alignment
-				drawPoint.x = excluded->x + excluded->w;
-				if (drawPoint.x <= 0) // newline ?
-					drawPoint.x = maxFrame.w;
-			}
-			if (drawPoint.x && drawPoint.x + spanFrame.w > maxFrame.w) {
-				// move down and back
-				drawPoint.x = 0;
-				if (excluded) {
-					drawPoint.y = excluded->y + excluded->h;
-				} else {
-					const Region& prevFrame = layout[prevSpan];
-					drawPoint.y = prevFrame.h + prevFrame.y - prevSpan->SpanDescent();
+			excluded = NULL;
+			Content* exContent = ContentAtScreenPoint(drawPoint);
+			if (exContent) {
+				Regions::const_iterator it = layout[exContent].begin();
+				for (; it != layout[exContent].end(); ++it) {
+					if ((*it).PointInside(drawPoint)) {
+						excluded = &(*it);
+						break;
+					}
 				}
 			}
-			// we should not infinitely loop
-			assert(!excluded || drawPoint != Point(layoutRgn.x, layoutRgn.y));
-			layoutRgn = Region(drawPoint, spanFrame);
-			excluded = ExcludedRegionForRect(layoutRgn);
+			if (excluded) {
+				// we know that we have to move at least to the right
+				drawPoint.x = excluded->x + excluded->w + 1;
+				if (drawPoint.x > drawOrigin.x + frame.w) {
+					drawPoint.x = drawOrigin.x;
+					drawPoint.y = excluded->y + excluded->h + 1;
+				}
+			}
 		} while (excluded);
-
-		frame.w = (layoutRgn.w > frame.w) ? layoutRgn.w : frame.w;
-		if (span->RenderedSpan()) {
-			// only layout redered spans
-			assert(!layoutRgn.Dimensions().IsEmpty());
-			layout[span] = layoutRgn;
-		}
-		// TODO: need to extend the exclusion rect for some alignments
-		// eg right align should invalidate the entire area infront also
-		layoutRgn.h -= span->SpanDescent();
-		assert(layoutRgn.h > 0);
-		AddExclusionRect(layoutRgn);
-		prevSpan = span;
 	}
-	// TODO: we could optimize by testing *before* we try to add/layout a new span
-	// we either shouldnt accept new spans that dont fit or at leat not lay them out
-	// currently we cant resize a container dynamically so...
-	ieWord newh = drawPoint.y + span->SpanFrame().h;
-	if (newh > frame.h) {
-		frame.h = newh;
-		if (frame.h > maxFrame.h)
-			frame.h = maxFrame.h;
+	int maxH = drawPoint.y - drawOrigin.y;
+	Regions::const_iterator rit = layout[content].begin();
+	for (; rit != layout[content].end(); ++rit) {
+		int h = ((*rit).y + (*rit).h) - drawOrigin.y;
+		maxH = (h > maxH) ? h : maxH;
 	}
-	if (frame.w > maxFrame.w)
-		frame.w = maxFrame.w;
+	Region layoutRegion = Region(drawOrigin, Size(frame.w, maxH));
+	layoutRegions.push_back(layoutRegion);
+	core->GetVideoDriver()->DrawRect(layoutRegion, ColorRed, false);
 }
 
-void ContentContainer::SetMaxFrame(const Size& newSize) {
-	// TODO: need to relayout if width changed, or if hew height is greater
-	maxFrame = newSize;
-}
 
-void ContentContainer::AddExclusionRect(const Region& rect)
+TextContainer::TextContainer(const Size& frame, Font* fnt, Palette* pal)
+	: ContentContainer(frame), font(fnt)
 {
-	assert(!rect.Dimensions().IsEmpty());
-	std::vector<Region>::iterator it;
-	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
-		if (rect.InsideRegion(*it)) {
-			// already have an encompassing region
-			break;
-		} else if ((*it).InsideRegion(rect)) {
-			// cant just replace and break. may have eaten more than one...
-			it = ExclusionRects.erase(it);
-			if (it == ExclusionRects.end()) break;
+	if (!pal) {
+		palette = font->GetPalette();
+	} else {
+		pal->acquire();
+		palette = pal;
+	}
+}
+
+TextContainer::~TextContainer()
+{
+	palette->release();
+}
+
+void TextContainer::AppendText(const String& text)
+{
+	AppendText(text, font, palette);
+}
+
+void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
+{
+	if (text.length()) {
+		AppendContent(new TextSpan(text, fnt, pal));
+	}
+}
+
+	/*
+void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
+{
+	if (text.length()) {
+		// FIXME: there is probably a better, more efficient, way to layout text
+		// we could use a single span for the entire appended string, however, the way things are now
+		// we have no way to give the font->Print methods an indent, nor does it return the information necessary
+		// to know where the last line ended so we would always have an implicit "newline".
+		// if an implicit "newline" is acceptable (or even desired) we could change this to make a span per line,
+		// but that has its own complications so I'm choosing to keep things simple, and we can optimize or refactor later
+
+		// FIXME: this implementation is still broken for words that are longer than a line...
+
+		// any changes to how we build content spans should maintain the following functionality
+		// 1. layout needs to reflow *correctly* when the container is resized
+		// 2. it should be assumed that text is *editable* and text should reflow accordingly
+		// 3. must support a mixture of spans (different fonts or images etc)
+
+		ContentList::const_iterator layoutIt = contents.end()--;
+		size_t curTextLen = TextString.length();
+		size_t wordBreak = 0;
+		size_t wordPos = text.find_first_not_of(L" \n\t\r");
+		// iterate the string and make a TextSpan for each word
+		// TODO: support word break on '-' (and possibly other) characters.
+		while ((wordBreak = text.find_first_of(L" \n\t\r", wordPos)) != String::npos) {
+			// FIXME: not sure how we want to handle whitespace
+			// I'm taking the HTML approach for now and ignoring contiguous whitespace
+			// The easiest way to handle all whitespace (using this method of layout) would be
+			// to introduce margins to spans, and measure the whitespace following a word and
+			// apply it as a right hand margin
+
+			AppendContent(new TextSpan(*this, Range(wordPos + curTextLen, wordBreak + curTextLen)));
+			// skip any white space to find the next word
+			wordPos = text.find_first_not_of(L" \n\t\r", wordBreak);
+		}
+
+		TextString.append(text);
+		LayoutContentStartingAt(++layoutIt);
+	}
+}
+*/
+const String& TextContainer::Text() const
+{
+	// iterate all the content and pick out the TextSpans and concatonate them into a single string
+	static String text;
+	ContentList::const_iterator it = contents.begin();
+	for (; it != contents.end(); ++it) {
+		if (const TextSpan* textSpan = dynamic_cast<TextSpan*>(*it)) {
+			// FIXME: this will produce odd results since adjacent spans wont be separated by any whitespace
+			text.append(textSpan->Text());
 		}
 	}
-	if (it == ExclusionRects.end()) {
-		// no match found
-		ExclusionRects.push_back(rect);
-	}
-}
-
-const Region* ContentContainer::ExcludedRegionForRect(const Region& rect)
-{
-	std::vector<Region>::const_iterator it;
-	for (it = ExclusionRects.begin(); it != ExclusionRects.end(); ++it) {
-		if (rect.IntersectsRegion(*it))
-			return &*it;
-	}
-	return NULL;
+	return text;
 }
 
 
-
+/*
 void RestrainedContentContainer::AppendSpan(ContentSpan* span)
 {
 	while (spans.size() >= spanLimit) {
@@ -433,5 +482,6 @@ void RestrainedContentContainer::AppendSpan(ContentSpan* span)
 	}
 	ContentContainer::AppendSpan(span);
 }
+*/
 
 }

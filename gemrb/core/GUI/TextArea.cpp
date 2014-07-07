@@ -34,7 +34,7 @@ namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 				   Color textcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), Text(), ftext(text), palettes()
+	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
 {
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
@@ -64,6 +64,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	// initialize the Text containers
 	ClearText();
 	ClearSelectOptions();
+	SetScrollBar(NULL);
 }
 
 TextArea::~TextArea(void)
@@ -71,15 +72,12 @@ TextArea::~TextArea(void)
 	for (int i=0; i < PALETTE_TYPE_COUNT; i++) {
 		gamedata->FreePalette( palettes[i] );
 	}
-
-	ClearSelectOptions();
-	delete textContainer;
 }
 
 bool TextArea::NeedsDraw()
 {
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		if (TextYPos > textContainer->ContainerFrame().h) {
+		if (TextYPos > textContainer->ContentFrame().h) {
 			 // the text is offscreen
 			return false;
 		}
@@ -101,6 +99,8 @@ void TextArea::DrawInternal(Region& clip)
 
 	if (AnimPicture) {
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
+		clip.x += AnimPicture->Width;
+		clip.w -= AnimPicture->Width;
 	}
 
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
@@ -111,14 +111,8 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	int x = clip.x, y = clip.y - TextYPos;
-	Region textClip(x, y, clip.w, clip.h);
-	textContainer->DrawContents(x, y);
-
-	if (selectOptions) {
-		y += textContainer->ContainerFrame().h;
-		selectOptions->DrawContents(x, y);
-	}
+	clip.y -= TextYPos;
+	contentWrapper.Draw(clip.Origin());
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
 	to this Text Area Control. */
@@ -126,10 +120,10 @@ int TextArea::SetScrollBar(Control* ptr)
 {
 	if (!sb && ptr) {
 		// only pad left edge
-		textContainer->SetMaxFrame(Size(Width - EDGE_PADDING, -1));
+		contentWrapper.SetFrame(Region(Point(), Size(Width - EDGE_PADDING, -1)));
 	} else if (sb && !ptr) {
 		// pad both edges
-		textContainer->SetMaxFrame(Size(Width - (EDGE_PADDING * 2), Height));
+		contentWrapper.SetFrame(Region(Point(), Size(Width - (EDGE_PADDING * 2), Height)));
 	}
 	int ret = Control::SetScrollBar(ptr);
 	CalcRowCount();
@@ -217,7 +211,10 @@ void TextArea::AppendText(const String& text)
 							} else if (token == L"p") {
 								int w = Width - EDGE_PADDING;
 								if (lastSpan) {
-									w -= lastSpan->SpanFrame().w;
+									w -= lastSpan->ContentFrame().w;
+								}
+								if (AnimPicture) {
+									w -= AnimPicture->Width;
 								}
 								frame.w = w;
 							}
@@ -252,9 +249,8 @@ void TextArea::AppendText(const String& text)
 								if (fnt == ftext && p == NULL) {
 									p = palette;
 								}
-								TextSpan* span = new TextSpan(token, fnt, p, frame, align);
-								textContainer->AppendSpan(span);
-								lastSpan = span;
+								lastSpan = new TextSpan(token, fnt, p, &frame);
+								textContainer->AppendContent(lastSpan);
 							}
 							token.clear();
 							if (*++it == '/')
@@ -296,27 +292,9 @@ void TextArea::AppendText(const String& text)
 			if (textpos != String::npos) {
 				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
 				// need to figure out how to handle this because it breaks drop caps
-				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS]);
-				textContainer->AppendSpan(dc);
+				textContainer->AppendText(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS]);
 				textpos++;
 				// FIXME: assuming we have more text!
-				// FIXME: the instances of the hard coded numbers are arbitrary padding values
-				Size s = Size(Width - EDGE_PADDING - dc->SpanFrame().w, GetRowHeight() + ftext->descent);
-				TextSpan* span = new TextSpan(text.substr(textpos), ftext, palette, s, IE_FONT_ALIGN_LEFT);
-				textContainer->AppendSpan(span);
-				s.w -= 8; // FIXME: arbitrary padding
-				// drop cap height + a line descent minus the first line size
-				s.h = dc->SpanFrame().h + ftext->descent - GetRowHeight() + 1;// + span->SpanDescent();
-				textpos += span->RenderedString().length();
-				if (s.h >= ftext->maxHeight) {
-					// this is sort of a hack for BAM fonts.
-					// drop caps dont exclude their entire frame because of their descent so we do it manually
-					textContainer->AddExclusionRect(Region(textContainer->PointForSpan(dc), dc->SpanFrame()));
-
-					span = new TextSpan(text.substr(textpos), ftext, palette, s, IE_FONT_ALIGN_LEFT);
-					textContainer->AppendSpan(span);
-					textpos += span->RenderedString().length();
-				}
 			} else {
 				textpos = 0;
 			}
@@ -324,10 +302,7 @@ void TextArea::AppendText(const String& text)
 		} else {
 			textContainer->AppendText(text);
 		}
-		textContainer->ClearSpans();
 	}
-
-	Text.append(text);
 	UpdateControls();
 }
 
@@ -492,9 +467,9 @@ void TextArea::SetRow(int row)
 void TextArea::CalcRowCount()
 {
 	if (textContainer) {
-		size_t textHeight = textContainer->ContainerFrame().h;
+		size_t textHeight = textContainer->ContentFrame().h;
 		if (selectOptions) {
-			textHeight += selectOptions->ContainerFrame().h;
+			textHeight += selectOptions->ContentFrame().h;
 		}
 		rows = textHeight / GetRowHeight();
 	} else {
@@ -528,10 +503,10 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	TextSpan* span = NULL;
 	Point p = Point(x, y);
 	if (selectOptions) {
-		p.y -= textContainer->ContainerFrame().h;
+		p.y -= textContainer->ContentFrame().h;
 		p.y += TextYPos;
 		// container only has text, so...
-		span = dynamic_cast<TextSpan*>(selectOptions->SpanAtPoint(p));
+		span = dynamic_cast<TextSpan*>(selectOptions->ContentAtPoint(p));
 	}
 
 	if (hoverSpan && hoverSpan != span) {
@@ -607,7 +582,7 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 
 const String& TextArea::QueryText() const
 {
-	return Text;
+	return textContainer->Text();
 }
 
 bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
@@ -629,6 +604,7 @@ bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
 void TextArea::ClearSelectOptions()
 {
 	OptSpans.clear();
+	contentWrapper.RemoveContent(selectOptions);
 	delete selectOptions;
 	selectOptions = NULL;
 	selectedSpan = NULL;
@@ -645,18 +621,19 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	SetPalette(selColor, PALETTE_SELECTED);
 
 	ClearSelectOptions(); // deletes previous options
-	// FIXME: calculate the real frame (padding)
-	selectOptions = new ContentContainer(Size(Width - EDGE_PADDING, -1), ftext, palettes[PALETTE_SELECTED]);
+	selectOptions = new TextContainer(Size(0, 0), ftext, palettes[PALETTE_SELECTED]);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		if (numbered) {
 			swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
 		}
 		TextSpan* span = new TextSpan((numbered) ? optNum + opts[i].second : opts[i].second,
-									  ftext, palettes[PALETTE_OPTIONS], Size(Width - EDGE_PADDING, 0), IE_FONT_ALIGN_LEFT);
+									  ftext, palettes[PALETTE_OPTIONS]);
 		OptSpans.push_back(std::make_pair(opts[i].first, span));
-		selectOptions->AppendSpan(span); // container owns the span
+		selectOptions->AppendContent(span); // container owns the span
 	}
+	assert(textContainer);
+	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	UpdateControls();
 	// This hack is to refresh the mouse cursor so that reply below cursor gets
 	// highlighted during a dialog
@@ -665,9 +642,9 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 void TextArea::ClearText()
 {
-	Text.clear();
 	selectedSpan = NULL;
 	hoverSpan = NULL;
+	contentWrapper.RemoveContent(textContainer);
 	delete textContainer;
 
 	Size frame;
@@ -684,10 +661,13 @@ void TextArea::ClearText()
 	}
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
 		// limit of 50 spans is roughly 25 messages (1 span for actor, 1 for message)
-		textContainer = new RestrainedContentContainer(frame, ftext, palette, 50);
+		//textContainer = new RestrainedContentContainer(frame, ftext, palette, 50);
+		//textContainer = new TextContainer(frame, ftext, palette);
 	} else {
-		textContainer = new ContentContainer(frame, ftext, palette);
+		//textContainer = new TextContainer(frame, ftext, palette);
 	}
+	textContainer = new TextContainer(frame, ftext, palette);
+	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
 }
 
 void TextArea::FlagsChanging(ieDword newFlags)

@@ -55,8 +55,6 @@ typedef std::pair<int, String> SelectOption;
  */
 
 class GEM_EXPORT TextArea : public Control {
-private:
-	String Text;
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
@@ -100,10 +98,13 @@ private: // Private attributes
 	// dialog and listbox handling
 	typedef std::pair<int, TextSpan*> OptionSpan;
 	std::vector<OptionSpan> OptSpans;
-	ContentContainer* selectOptions;
 	TextSpan* hoverSpan, *selectedSpan;
-	// standard text display
-	ContentContainer* textContainer;
+	// dialog options container
+	ContentContainer* selectOptions;
+	// standard text display container
+	TextContainer* textContainer;
+	// wrapper containing both of the above
+	ContentContainer contentWrapper;
 
 	int TextYPos;
 	/** timer for scrolling */

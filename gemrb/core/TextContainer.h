@@ -32,93 +32,122 @@ namespace GemRB {
 class Font;
 class Palette;
 class Sprite2D;
+class ContentContainer;
+class TextContainer;
 
-class ContentSpan
-{
+typedef std::vector<Region> Regions;
+
+// interface for both content and content containers
+class Content {
+friend class ContentContainer;
 protected:
-	Size frame;
-	Sprite2D* spanSprite;
+	// content doesnt have an x, y (-1, -1) unless we want absolute positioning
+	// same applies for the dimensions, 0x0 implies unlimited area
+	Region frame; // TODO: origin currently unused
+	ContentContainer* parent;
+
+	mutable Point screenOffset;
+	mutable Regions layoutRegions;
+
 public:
-	ContentSpan();
-	ContentSpan(const Size& size);
-	virtual ~ContentSpan();
+	Content(const Size& size);
+	virtual ~Content();
 
-	const Size& SpanFrame() const { return frame; }
-	const Sprite2D* RenderedSpan() const { return spanSprite; }
+	virtual Size ContentFrame() const { return frame.Dimensions(); }
 
-	virtual int SpanDescent() const { return 0; };
+	virtual void Draw(Point p) const=0; // public drawing interface in screen coordinates.
+private:
+	//virtual Regions DrawContents(Point& p) const=0;
 };
 
-class TextSpan : public ContentSpan
+
+// Content classes
+class TextSpan : public Content
 {
 private:
 	String text;
-	size_t stringLen;
 	Font* font;
 	Palette* palette;
-	ieByte alignment;
+
 public:
-	// construct a "inline" span that calculates its own region based on font, palette, and string
-	TextSpan(const String& string, Font* font, Palette* pal = NULL);
-	// construct a "block" span with dimentions determined by rgn
-	TextSpan(const String& string, Font* font, Palette* pal, const Size& rgn, ieByte align);
+	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
+	// TODO: we should probably be able to align the text in the frame
+	TextSpan(const String& string, Font* font, Palette* pal = NULL, const Size* = NULL);
 	~TextSpan();
 
-	int SpanDescent() const { return font->descent; }
-	const String& RenderedString() const { return text; }
+	const Font* TextFont() const { return font; }
+	const String& Text() const { return text; };
 
 	void SetPalette(Palette* pal);
-private:
-	void Init(const String& string, Font* fnt, Palette* pal, ieByte align);
-	void RenderSpan(const String& string);
+
+	void Draw(Point p) const;
+protected:
+	//Regions DrawContents(Point& p) const;
 };
 
-class ImageSpan : public ContentSpan
+
+class ImageSpan : public Content
 {
+private:
+	Sprite2D* image;
+
+protected:
+	void Draw(Point p) const;
+
 public:
 	ImageSpan(Sprite2D* image);
 };
 
-class ContentContainer
+
+// Content container classes
+class ContentContainer : public Content
 {
 protected:
-	typedef std::list<ContentSpan*> SpanList;
-	SpanList spans;
-	typedef std::map<ContentSpan*, Region> SpanLayout;
-	SpanLayout layout;
-	std::vector<Region> ExclusionRects;
+	typedef std::list<Content*> ContentList;
+	ContentList contents;
 
-	Size maxFrame;
-	Size frame;
-	Font* font;
-	Palette* pallete;
+	typedef std::map<Content*, Regions> ContentLayout;
+	mutable ContentLayout layout;
+
 public:
-	ContentContainer(const Size& frame, Font* font, Palette* pal);
+	ContentContainer(const Size& frame) : Content(frame) {};
 	virtual ~ContentContainer();
 
-	// Creates a basic "inline" span using the containers font/palette
-	void AppendText(const String& text);
-	// append the span to the end of the container. The container takes ownership of the span.
-	virtual void AppendSpan(ContentSpan* span);
+	// append a container to the end of the container. The container takes ownership of the span.
+	virtual void AppendContent(Content* content);
 	// Insert a span to a new position in the list. The container takes ownership of the span.
-	virtual void InsertSpanAfter(ContentSpan* newSpan, const ContentSpan* existing);
+	virtual void InsertContentAfter(Content* newContent, const Content* existing);
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
-	ContentSpan* RemoveSpan(const ContentSpan* span);
-	// excludes all attached spans such that new spans cannot flow adjacent
-	void ClearSpans();
+	Content* RemoveContent(const Content* content);
 
-	void SetSpanPadding(ContentSpan* span, Size pad);
-	ContentSpan* SpanAtPoint(const Point& p) const;
-	Point PointForSpan(const ContentSpan*);
-	const Size& ContainerFrame() const { return frame; }
-	void SetMaxFrame(const Size&);
-	void DrawContents(int x, int y) const;
-	// public so clients can allocate an area for drawing images or whatever they want
-	void AddExclusionRect(const Region& rect);
+	Content* ContentAtPoint(const Point& p) const;
+
+	const Region* ContentRegionForRect(const Region& rect) const;
+
+	void SetFrame(const Region&);
+	virtual Size ContentFrame() const;
+
+	void Draw(Point p) const;
+protected:
+	void DrawContents(Point) const;
+	Content* ContentAtScreenPoint(const Point& p) const;
+};
+
+// TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
+class TextContainer : public ContentContainer {
 private:
-	void LayoutSpansStartingAt(SpanList::const_iterator start);
-	const Region* ExcludedRegionForRect(const Region& rect);
+	// default font/palette for adding plain text
+	Font* font;
+	Palette* palette;
+
+public:
+	TextContainer(const Size& frame, Font* font, Palette*);
+	~TextContainer();
+
+	void AppendText(const String& text);
+	void AppendText(const String& text, Font* fnt, Palette* pal);
+	const String& Text() const;
 };
 
 /*
@@ -140,9 +169,9 @@ private:
 
 public:
 	RestrainedContentContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
-	: ContentContainer(frame, font, pal) { spanLimit = limit; }
+	: ContentContainer(frame) { spanLimit = limit; }
 
-	void AppendSpan(ContentSpan* span);
+	void AppendContent(Content* content);
 };
 
 }
