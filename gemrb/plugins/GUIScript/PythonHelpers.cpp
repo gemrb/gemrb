@@ -97,7 +97,7 @@ bool PythonControlCallback::operator() (Control* ctrl)
 	PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
 	PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
 	const int count = PyInt_AsLong(co_argcount);
-	if (count) {
+	if (/*count*/ false) { // FIXME: this code is incomplete and would break things without being finished
 		assert(count == 1);
 		const char* type = "Control";
 		switch(ctrl->ControlType) {
@@ -122,8 +122,8 @@ bool PythonControlCallback::operator() (Control* ctrl)
 			default:
 				break;
 		}
-		// FIXME: how the fuck do you get the window and control index?
-		// I really lothe that we use an index for this :/
+		// FIXME: how do you get the window and control index?
+		// I really loathe that we use an index for this :/
 		PyObject* ctrltuple = Py_BuildValue("(ii)", 0, 0);
 		PyObject* obj = gs->ConstructObject(type, ctrltuple);
 		Py_DECREF(ctrltuple);
