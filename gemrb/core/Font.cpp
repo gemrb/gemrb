@@ -387,7 +387,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	}
 
 	if (point) {
-		*point = Point(x, y);
+		*point = Point(x, y - maxHeight);
 	}
 
 	assert(charCount <= string.length());
