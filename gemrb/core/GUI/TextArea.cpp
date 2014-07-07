@@ -510,7 +510,6 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	TextSpan* span = NULL;
 	Point p = Point(x, y);
 	if (selectOptions) {
-		p.y -= textContainer->ContentFrame().h;
 		p.y += TextYPos;
 		// container only has text, so...
 		span = dynamic_cast<TextSpan*>(selectOptions->ContentAtPoint(p));
