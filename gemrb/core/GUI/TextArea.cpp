@@ -113,6 +113,24 @@ void TextArea::DrawInternal(Region& clip)
 
 	clip.y -= TextYPos;
 	contentWrapper.Draw(clip.Origin());
+
+	// now the text is layed out in the container so we can calculate the rows
+	int textHeight = contentWrapper.ContentFrame().h;
+	int newRows = 0;
+	if (textHeight > 0) {
+		newRows = textHeight / GetRowHeight();
+	}
+	if (newRows == rows) {
+		// not only do we not need to do anything,
+		// but calling SetMax with the same value causes a jumping stutter
+		return;
+	}
+	rows = newRows;
+	if (!sb)
+		return;
+	ScrollBar* bar = ( ScrollBar* ) sb;
+	ieWord visibleRows = (Height / GetRowHeight());
+	bar->SetMax((rows > visibleRows) ? (rows - visibleRows) : 0);
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
 	to this Text Area Control. */
@@ -125,9 +143,7 @@ int TextArea::SetScrollBar(Control* ptr)
 		// pad both edges
 		contentWrapper.SetFrame(Region(Point(), Size(Width - (EDGE_PADDING * 2), Height)));
 	}
-	int ret = Control::SetScrollBar(ptr);
-	CalcRowCount();
-	return ret;
+	return Control::SetScrollBar(ptr);
 }
 
 /** Sets the Actual Text */
@@ -324,7 +340,6 @@ void TextArea::UpdateControls()
 {
 	int pos;
 
-	CalcRowCount();
 	if (sb) {
 		ScrollBar* bar = ( ScrollBar* ) sb;
 		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -351,7 +366,6 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 
 			// TODO: implement this! currently does nothing
 
-			CalcRowCount();
 			RunEventHandler( TextAreaOnChange );
 		}
 		return true;
@@ -430,7 +444,6 @@ bool TextArea::OnSpecialKeyPress(unsigned char Key)
 			CurPos=0;
 			break;
 	}
-	CalcRowCount();
 	RunEventHandler( TextAreaOnChange );
 	return true;
 }
@@ -469,24 +482,6 @@ void TextArea::SetRow(int row)
 	MarkDirty();
 	// refresh the cursor/hover selection
 	core->GetEventMgr()->FakeMouseMove();
-}
-
-void TextArea::CalcRowCount()
-{
-	if (textContainer) {
-		size_t textHeight = textContainer->ContentFrame().h;
-		if (selectOptions) {
-			textHeight += selectOptions->ContentFrame().h;
-		}
-		rows = textHeight / GetRowHeight();
-	} else {
-		rows = 0;
-	}
-	if (!sb)
-		return;
-	ScrollBar* bar = ( ScrollBar* ) sb;
-	ieWord visibleRows = (Height / GetRowHeight());
-	bar->SetMax(rows - visibleRows);
 }
 
 /** Mousewheel scroll */
