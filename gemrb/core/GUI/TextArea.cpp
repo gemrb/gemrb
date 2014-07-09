@@ -102,6 +102,7 @@ void TextArea::DrawInternal(Region& clip)
 		clip.x += AnimPicture->Width;
 		clip.w -= AnimPicture->Width;
 	}
+	contentWrapper.SetFrame(Region(Point(), Size(clip.w, 0)));
 
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
 		unsigned long thisTime = GetTickCount();
