@@ -4302,6 +4302,38 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
 }
 
+
+PyDoc_STRVAR( GemRB_Window_CreateTextArea__doc,
+			 "CreateLabel(WindowIndex, ControlID, x, y, w, h, font)\n\n"
+			 "Creates and adds a new TextArea to a Window." );
+
+static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlID;
+	Region rgn;
+	char *font;
+
+	if (!PyArg_ParseTuple( args, "iiiiiis", &WindowIndex, &ControlID, &rgn.x,
+						  &rgn.y, &rgn.w, &rgn.h, &font )) {
+		return AttributeError( GemRB_Window_CreateTextArea__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!");
+	}
+	TextArea* ta = new TextArea(rgn, core->GetFont( font ));
+	ta->ControlID = ControlID;
+	win->AddControl( ta );
+
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+}
+
 // FIXME: probably could use a better home, and probably vary from game to game;
 static const Color Hover = {255, 180, 0, 0};
 static const Color Selected = {255, 100, 0, 0};
@@ -10870,6 +10902,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_CreateLabel, METH_VARARGS),
 	METHOD(Window_CreateMapControl, METH_VARARGS),
 	METHOD(Window_CreateScrollBar, METH_VARARGS),
+	METHOD(Window_CreateTextArea, METH_VARARGS),
 	METHOD(Window_CreateTextEdit, METH_VARARGS),
 	METHOD(Window_CreateWorldMapControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
