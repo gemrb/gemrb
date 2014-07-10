@@ -45,19 +45,18 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOnSelect );
 
+	// init palettes
+	SetPalette(&textcolor, PALETTE_NORMAL);
+	SetPalette(&lowtextcolor, PALETTE_OPTIONS);
+	palette = palettes[PALETTE_NORMAL];
+
 	if (caps != ftext) {
 		// quick font optimization (prevents creating unnecessary spans)
 		finit = caps;
-		palettes[PALETTE_INITIALS] = new Palette( initcolor, lowtextcolor );
 	} else {
 		finit = NULL;
+		SetPalette(&initcolor, PALETTE_INITIALS);
 	}
-
-	// init palettes
-	SetPalette(&textcolor, PALETTE_NORMAL);
-	SetPalette(&initcolor, PALETTE_INITIALS);
-	SetPalette(&lowtextcolor, PALETTE_OPTIONS);
-	palette = palettes[PALETTE_NORMAL];
 
 	selectOptions = NULL;
 	textContainer = NULL;
@@ -323,7 +322,7 @@ void TextArea::AppendText(const String& text)
 			} else {
 				textpos = 0;
 			}
-			textContainer->AppendText(text.substr(textpos));
+			textContainer->AppendText(text.substr(textpos), ftext, NULL);
 		} else {
 			textContainer->AppendText(text);
 		}
