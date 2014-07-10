@@ -199,7 +199,10 @@ ImageSpan::ImageSpan(Sprite2D* im)
 
 void ImageSpan::DrawContents(Point dp, const Region& rgn) const
 {
-	core->GetVideoDriver()->BlitSprite(image, dp.x + rgn.x, dp.y + rgn.y, true, &rgn);
+	layoutRegions.clear();
+	Point p( dp.x + rgn.x, dp.y + rgn.y);
+	core->GetVideoDriver()->BlitSprite(image, p.x, p.y, true, &rgn);
+	layoutRegions.push_back(Region(p, Size(image->Width, image->Height)));
 }
 
 
