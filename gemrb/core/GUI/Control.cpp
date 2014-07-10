@@ -74,9 +74,18 @@ Control::~Control()
 	Sprite2D::FreeSprite(AnimPicture);
 }
 
-Region Control::ControlFrame()
+Region Control::ControlFrame() const
 {
 	return Region(XPos, YPos, Width, Height);
+}
+
+void Control::SetControlFrame(const Region& r)
+{
+	// TODO: we should actually represent these with a private Region
+	XPos = r.x;
+	YPos = r.y;
+	Width = r.w;
+	Height = r.h;
 }
 
 void Control::MarkDirty() {

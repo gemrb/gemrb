@@ -78,7 +78,8 @@ protected:
 public:
 	Control(const Region& frame);
 	virtual ~Control();
-	Region ControlFrame();
+	Region ControlFrame() const;
+	void SetControlFrame(const Region&);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	void MarkDirty();
