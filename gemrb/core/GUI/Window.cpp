@@ -262,7 +262,7 @@ bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
 	return false;
 }
 
-void Window::DelControl(unsigned short i)
+Control* Window::RemoveControl(unsigned short i)
 {
 	if (i < Controls.size() ) {
 		Control *ctrl = Controls[i];
@@ -278,10 +278,11 @@ void Window::DelControl(unsigned short i)
 		if (ctrl==lastMouseFocus) {
 			lastMouseFocus=NULL;
 		}
-		delete ctrl;
 		Controls.erase(Controls.begin()+i);
+		Invalidate();
+		return ctrl;
 	}
-	Invalidate();
+	return NULL;
 }
 
 Control* Window::GetDefaultControl(unsigned int ctrltype) const

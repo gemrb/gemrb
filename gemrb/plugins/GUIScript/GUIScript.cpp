@@ -2464,7 +2464,7 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 	if (CtrlIndex == -1) {
 		return RuntimeError( "Control is not found" );
 	}
-	win -> DelControl( CtrlIndex );
+	delete win->RemoveControl(CtrlIndex);
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2780,7 +2780,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 		Control *ctrl = win->GetControl( CtrlIndex );
 		rgn = ctrl->ControlFrame();
 		//flags = ctrl->Value;
-		win->DelControl( CtrlIndex );
+		delete win->RemoveControl( CtrlIndex );
 	}
 	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;

@@ -84,7 +84,7 @@ public:
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
 	bool IsValidControl(unsigned short ID, Control *ctrl) const;
 	/** Deletes the xth. Control */
-	void DelControl(unsigned short i);
+	Control* RemoveControl(unsigned short i);
 	/** Returns the Default Control which may be a button/gamecontrol atm */
 	Control* GetDefaultControl(unsigned int ctrltype) const;
 	/** Returns the Control which should get mouse scroll events */
