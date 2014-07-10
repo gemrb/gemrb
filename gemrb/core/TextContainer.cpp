@@ -307,6 +307,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 	// but its at least as fast as our previous (horrible) string printing implementation
 	const Point& drawOrigin = screenOffset;
 	Point drawPoint = dp + drawOrigin;
+	int maxH = drawPoint.y - drawOrigin.y;
 	Content* content = NULL;
 	layout.clear();
 	ContentList::const_iterator it = contents.begin();
@@ -317,6 +318,11 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 		content->DrawContents(drawPoint - drawOrigin, rgn);
 
 		layout.insert(std::make_pair(content, content->layoutRegions));
+		Regions::const_iterator rit = layout[content].begin();
+		for (; rit != layout[content].end(); ++rit) {
+			int h = ((*rit).y + (*rit).h) - drawOrigin.y;
+			maxH = (h > maxH) ? h : maxH;
+		}
 		if (it == --contents.end()) break; // dont care about calculating next layout
 
 		const Region* excluded = NULL;
@@ -342,12 +348,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 			}
 		} while (excluded);
 	}
-	int maxH = drawPoint.y - drawOrigin.y;
-	Regions::const_iterator rit = layout[content].begin();
-	for (; rit != layout[content].end(); ++rit) {
-		int h = ((*rit).y + (*rit).h) - drawOrigin.y;
-		maxH = (h > maxH) ? h : maxH;
-	}
+
 	Region layoutRegion = Region(drawOrigin, Size(frame.w, maxH));
 	layoutRegions.push_back(layoutRegion);
 	core->GetVideoDriver()->DrawRect(layoutRegion, ColorRed, false);
