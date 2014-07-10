@@ -40,6 +40,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	rows = 0;
 	TextYPos = 0;
 	ticks = starttime = 0;
+	strncpy(VarName, "Selected", sizeof(VarName));
 
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOnSelect );
@@ -559,7 +560,7 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 
 void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 {
-	if (!VariableName[0] || strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
+	if (!VariableName[0]) {
 		return;
 	}
 	if (!selectOptions) {
@@ -568,12 +569,10 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 		ClearSelectOptions();
 		return;
 	}
-	ieDword newValue = OptSpans[optIdx].first;
-	if (newValue == Value) {
-		return; // newval is same as oldval, nothing to do (we dont want to fire the event handler)
-	}
 
-	Value = newValue;
+	// always run the TextAreaOnSelect handler even if the value hasnt changed
+	// the *context* of the value can change (dialog) and the handler will want to know 
+	Value = OptSpans[optIdx].first;
 
 	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
 	selectedSpan = OptSpans[optIdx].second;
