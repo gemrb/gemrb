@@ -32,19 +32,16 @@
 
 namespace GemRB {
 
+TextArea::TextArea(const Region& frame, Font* text)
+	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
+{
+	Init();
+}
+
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 				   Color textcolor, Color initcolor, Color lowtextcolor)
 	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
 {
-	ControlType = IE_GUI_TEXTAREA;
-	rows = 0;
-	TextYPos = 0;
-	ticks = starttime = 0;
-	strncpy(VarName, "Selected", sizeof(VarName));
-
-	ResetEventHandler( TextAreaOnChange );
-	ResetEventHandler( TextAreaOnSelect );
-
 	// init palettes
 	SetPalette(&textcolor, PALETTE_NORMAL);
 	SetPalette(&lowtextcolor, PALETTE_OPTIONS);
@@ -57,6 +54,20 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		finit = NULL;
 		SetPalette(&initcolor, PALETTE_INITIALS);
 	}
+
+	Init();
+}
+
+void TextArea::Init()
+{
+	ControlType = IE_GUI_TEXTAREA;
+	rows = 0;
+	TextYPos = 0;
+	ticks = starttime = 0;
+	strncpy(VarName, "Selected", sizeof(VarName));
+
+	ResetEventHandler( TextAreaOnChange );
+	ResetEventHandler( TextAreaOnSelect );
 
 	selectOptions = NULL;
 	textContainer = NULL;

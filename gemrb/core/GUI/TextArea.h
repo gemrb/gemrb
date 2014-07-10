@@ -62,6 +62,7 @@ protected:
 	bool HasBackground() { return false; }
 	void FlagsChanging(ieDword);
 public:
+	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
@@ -134,6 +135,7 @@ private: //internal functions
 	Palette* palettes[PALETTE_TYPE_COUNT];
 	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
 
+	void Init();
 	void UpdateControls();
 	void SetPalette(const Color*, PALETTE_TYPE);
 
