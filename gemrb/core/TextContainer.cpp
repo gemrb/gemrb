@@ -74,10 +74,10 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
-		bool newline = false;
 		do {
+			newline:
 			if (numPrinted) {
-				if (newline || lineSegment.x + lineSegment.w >= lineRgn.x + lineRgn.w) {
+				if (lineSegment.w == 0 || lineSegment.x + lineSegment.w > lineRgn.x + lineRgn.w) {
 					// start next line
 					lineRgn.x = drawOrigin.x;
 					lineRgn.y += font->maxHeight;
@@ -85,7 +85,6 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 					dp = lineRgn.Origin();
 					lineExclusions.clear();
 					lineSegment = lineRgn;
-					newline = false;
 				} else {
 					// we have to add the segment to the container exclusions so that the next iteration works
 					lineExclusions.push_back(lineSegment); // FIXME: if we want an implicit newline, use lineRgn instead.
@@ -115,17 +114,14 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 						// must shrink to compensate for moving x
 						lineSegment.w -= lineSegment.x - x;
 					}
+
 					// its possible that the resulting segment is 0 in width
 					if (lineSegment.w <= 0) {
-						newline = true;
-						break;
+						assert(numPrinted);
+						goto newline;
 					}
 				}
 			} while (excluded);
-
-			if (newline) {
-				continue;
-			}
 
 			Point printPoint;
 			numPrinted += font->Print(lineSegment.Intersect(rgn), text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
