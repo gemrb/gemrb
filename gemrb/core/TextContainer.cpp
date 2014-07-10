@@ -129,6 +129,7 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			assert(numPrinted); // if we didnt print at all there will be an infinite loop.
 			if (printPoint.x) {
 				lineSegment.w = printPoint.x;
+				lineSegment.h -= (font->descent - 1);
 				dp.x += printPoint.x;
 			}
 			layoutRegions.push_back(lineSegment);
@@ -170,7 +171,7 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 		} else {
 			font->Print(drawRegion.Intersect(rgn), text, palette, IE_FONT_ALIGN_LEFT);
 		}
-
+		drawRegion.h -= (font->descent - 1);
 		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.push_back(drawRegion);
 	}
