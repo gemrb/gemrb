@@ -476,8 +476,6 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 		// our scrollbar has set position for us
 		TextYPos = y;
 		MarkDirty();
-		// refresh the cursor/hover selection
-		core->GetEventMgr()->FakeMouseMove();
 	} else {
 		// no scrollbar. need to call SetRow myself.
 		// SetRow will set TextYPos.
