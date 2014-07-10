@@ -68,8 +68,7 @@ protected:
 public:
 	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
 	~ScrollBar(void);
-	/** safe method to get the height of a frame */
-	int GetFrameHeight(int frame) const;
+
 	/**sets position, updates associated stuff */
 	void SetPos(ieDword NewPos);
 	void SetPosForY(short y);
@@ -79,6 +78,8 @@ public:
 	/** refreshes scrollbar if associated with VarName */
 	void UpdateState(const char* VarName, unsigned int Sum);
 private: //Private attributes
+	/** safe method to get the height of a frame */
+	int GetFrameHeight(int frame) const;
 	/** Images for drawing the Scroll Bar */
 	Sprite2D* Frames[IE_SCROLLBAR_IMAGE_COUNT];
 	/** Range of the slider in pixels. The height - buttons - slider */
