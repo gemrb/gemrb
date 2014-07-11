@@ -71,6 +71,8 @@ public:
 
 	/**sets position, updates associated stuff */
 	void SetPos(ieDword NewPos);
+	ieWord GetPos() const { return Pos; };
+
 	void SetPosForY(short y);
 	void ScrollUp();
 	void ScrollDown();
@@ -87,7 +89,7 @@ private: //Private attributes
 	/** a pixel position between 0 and SliderRange*/
 	unsigned short SliderYPos;
 	/** Item Index */
-	unsigned short Pos;
+	ieWord Pos;
 	/** slider y delta between steps */
 	double stepPx;
 	/** Scroll Bar Status */
