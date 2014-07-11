@@ -134,9 +134,9 @@ private: //internal functions
 	};
 	Palette* palettes[PALETTE_TYPE_COUNT];
 	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
+	bool needScrollUpdate;
 
 	void Init();
-	void UpdateControls();
 	void SetPalette(const Color*, PALETTE_TYPE);
 
 public: //Events

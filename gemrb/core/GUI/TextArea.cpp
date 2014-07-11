@@ -64,6 +64,7 @@ void TextArea::Init()
 	rows = 0;
 	TextYPos = 0;
 	ticks = starttime = 0;
+	needScrollUpdate = false;
 	strncpy(VarName, "Selected", sizeof(VarName));
 
 	ResetEventHandler( TextAreaOnChange );
@@ -92,14 +93,25 @@ bool TextArea::NeedsDraw()
 			 // the text is offscreen
 			return false;
 		}
+		// must mark dirty to invalidate the window BG
 		MarkDirty();
 		return true;
 	}
+	if (needScrollUpdate) {
+		return true;
+	}
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		// FIXME: hack, this shouldnt even be needed.
+		// I'm not sure why the scrollbar isn't drawing without this
+		sb->MarkDirty();
+	}
+
 	return Control::NeedsDraw();
 }
 
 void TextArea::DrawInternal(Region& clip)
 {
+	needScrollUpdate = false;
 	// apply padding to the clip
 	if (sb) {
 		clip.w -= EDGE_PADDING;
@@ -109,6 +121,7 @@ void TextArea::DrawInternal(Region& clip)
 	clip.x += EDGE_PADDING;
 
 	if (AnimPicture) {
+		// speaker portrait
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
 		clip.x += AnimPicture->Width;
 		clip.w -= AnimPicture->Width;
@@ -132,18 +145,23 @@ void TextArea::DrawInternal(Region& clip)
 	if (textHeight > 0) {
 		newRows = textHeight / GetRowHeight();
 	}
-	if (newRows == rows) {
-		// not only do we not need to do anything,
-		// but calling SetMax with the same value causes a jumping stutter
-		return;
-	}
 	rows = newRows;
+
 	if (!sb)
 		return;
+
 	ScrollBar* bar = ( ScrollBar* ) sb;
 	ieWord visibleRows = (Height / GetRowHeight());
-	bar->SetMax((rows > visibleRows) ? (rows - visibleRows) : 0);
+	ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
+	bar->SetMax(sbMax);
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
+		&& bar->GetPos() != sbMax) {
+		needScrollUpdate = true;
+		bar->SetPos(sbMax);
+		Owner->InvalidateForControl(this); // cant use MarkDirty since we are drawing
+	}
 }
+
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
 	to this Text Area Control. */
 int TextArea::SetScrollBar(Control* ptr)
@@ -338,7 +356,7 @@ void TextArea::AppendText(const String& text)
 			textContainer->AppendText(text);
 		}
 	}
-	UpdateControls();
+	MarkDirty();
 }
 
 int TextArea::InsertText(const char* text, int pos)
@@ -346,27 +364,6 @@ int TextArea::InsertText(const char* text, int pos)
 	// TODO: actually implement this
 	AppendText(text);
 	return pos;
-}
-
-void TextArea::UpdateControls()
-{
-	int pos;
-
-	if (sb) {
-		ScrollBar* bar = ( ScrollBar* ) sb;
-		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
-			pos = rows - ( Height / ftext->maxHeight );
-		else
-			pos = 0;
-		if (pos < 0)
-			pos = 0;
-		bar->SetPos( pos );
-	} else {
-		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL) {
-			pos = rows - ( Height / ftext->maxHeight );
-			SetRow(pos);
-		}
-	}
 }
 
 /** Key Press Event */
@@ -643,7 +640,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 	assert(textContainer);
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
-	UpdateControls();
+	MarkDirty();
 	// This hack is to refresh the mouse cursor so that reply below cursor gets
 	// highlighted during a dialog
 	core->GetEventMgr()->FakeMouseMove();
