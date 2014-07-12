@@ -149,6 +149,11 @@ void TextArea::DrawInternal(Region& clip)
 	if (textHeight > 0) {
 		newRows = textHeight / GetRowHeight();
 	}
+	if (newRows == rows) {
+		// we must exit now
+		// updating the scrollbar again would cause a problem for IE_GUI_TEXTAREA_AUTOSCROLL
+		return;
+	}
 	rows = newRows;
 
 	if (!sb)
