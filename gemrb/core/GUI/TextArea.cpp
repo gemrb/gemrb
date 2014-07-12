@@ -671,12 +671,10 @@ void TextArea::ClearText()
 	}
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
 		// limit of 50 spans is roughly 25 messages (1 span for actor, 1 for message)
-		//textContainer = new RestrainedContentContainer(frame, ftext, palette, 50);
-		//textContainer = new TextContainer(frame, ftext, palette);
+		textContainer = new RestrainedTextContainer(frame, ftext, palette, 50);
 	} else {
-		//textContainer = new TextContainer(frame, ftext, palette);
+		textContainer = new TextContainer(frame, ftext, palette);
 	}
-	textContainer = new TextContainer(frame, ftext, palette);
 	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
 }
 
@@ -685,6 +683,8 @@ void TextArea::FlagsChanging(ieDword newFlags)
 	if ((newFlags^Flags)&IE_GUI_TEXTAREA_HISTORY) {
 		// FIXME: not well implemented.
 		// any text is lost when changing this flag.
+		// and we are short circuiting SetFlags
+		Flags |= IE_GUI_TEXTAREA_HISTORY; // needs to be set before ClearText()
 		ClearText();
 	}
 }

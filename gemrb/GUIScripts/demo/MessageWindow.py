@@ -71,8 +71,6 @@ def UpdateControlStatus():
 		TMessageWindow = GemRB.LoadWindow(0)
 		TMessageTA = TMessageWindow.GetControl(0)
 
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-
 	hideflag = GemRB.HideGUI()
 	MessageWindow = GemRB.GetVar("MessageWindow")
 	MessageTA = GUIClasses.GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
@@ -80,6 +78,7 @@ def UpdateControlStatus():
 		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
 
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	TMessageTA.SetText("DEMO "*150)
 
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)

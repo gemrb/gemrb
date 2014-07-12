@@ -163,14 +163,14 @@ public:
  I feel this is a supirior method because it prevents having truncated messages.
 */
 
-class RestrainedContentContainer : public ContentContainer
+class RestrainedTextContainer : public TextContainer
 {
 private:
 	size_t spanLimit;
 
 public:
-	RestrainedContentContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
-	: ContentContainer(frame) { spanLimit = limit; }
+	RestrainedTextContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
+	: TextContainer(frame, font, pal) { spanLimit = limit; }
 
 	void AppendContent(Content* content);
 };

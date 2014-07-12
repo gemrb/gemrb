@@ -256,6 +256,7 @@ Content* ContentContainer::RemoveContent(const Content* span)
 	if (it != contents.end()) {
 		contents.erase(it);
 		Content* content = *it;
+		layout.erase(content);
 		content->parent = NULL;
 		return content;
 	}
@@ -396,47 +397,6 @@ void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
 	}
 }
 
-	/*
-void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
-{
-	if (text.length()) {
-		// FIXME: there is probably a better, more efficient, way to layout text
-		// we could use a single span for the entire appended string, however, the way things are now
-		// we have no way to give the font->Print methods an indent, nor does it return the information necessary
-		// to know where the last line ended so we would always have an implicit "newline".
-		// if an implicit "newline" is acceptable (or even desired) we could change this to make a span per line,
-		// but that has its own complications so I'm choosing to keep things simple, and we can optimize or refactor later
-
-		// FIXME: this implementation is still broken for words that are longer than a line...
-
-		// any changes to how we build content spans should maintain the following functionality
-		// 1. layout needs to reflow *correctly* when the container is resized
-		// 2. it should be assumed that text is *editable* and text should reflow accordingly
-		// 3. must support a mixture of spans (different fonts or images etc)
-
-		ContentList::const_iterator layoutIt = contents.end()--;
-		size_t curTextLen = TextString.length();
-		size_t wordBreak = 0;
-		size_t wordPos = text.find_first_not_of(L" \n\t\r");
-		// iterate the string and make a TextSpan for each word
-		// TODO: support word break on '-' (and possibly other) characters.
-		while ((wordBreak = text.find_first_of(L" \n\t\r", wordPos)) != String::npos) {
-			// FIXME: not sure how we want to handle whitespace
-			// I'm taking the HTML approach for now and ignoring contiguous whitespace
-			// The easiest way to handle all whitespace (using this method of layout) would be
-			// to introduce margins to spans, and measure the whitespace following a word and
-			// apply it as a right hand margin
-
-			AppendContent(new TextSpan(*this, Range(wordPos + curTextLen, wordBreak + curTextLen)));
-			// skip any white space to find the next word
-			wordPos = text.find_first_not_of(L" \n\t\r", wordBreak);
-		}
-
-		TextString.append(text);
-		LayoutContentStartingAt(++layoutIt);
-	}
-}
-*/
 const String& TextContainer::Text() const
 {
 	// iterate all the content and pick out the TextSpans and concatonate them into a single string
@@ -452,50 +412,34 @@ const String& TextContainer::Text() const
 }
 
 
-/*
-void RestrainedContentContainer::AppendSpan(ContentSpan* span)
+void RestrainedTextContainer::AppendContent(Content* newContent)
 {
-	while (spans.size() >= spanLimit) {
+	while (contents.size() >= spanLimit) {
 		// we need to remove the first span and any spans on the same "line"
-		SpanList::iterator it = spans.begin();
-		ContentSpan* span = *it;
-		Region rgn = layout[span];
-
-		// extend the region all the way across the container and up to the top
-		rgn.x = 0;
-		rgn.w = maxFrame.w;
-		rgn.h += rgn.y;
-		rgn.h -= span->SpanDescent();
-		rgn.y = 0;
-		// now iterate the list and erase until we find a span that doesnt intersect
-		do {
-			span = *it;
-			if (!rgn.IntersectsRegion(layout[span])) {
-				break;
-			}
-			layout.erase(span);
-			delete span;
-		} while (++it != spans.end());
-		spans.erase(spans.begin(), it);
-
-		// adjust the remainder
-		int offset = layout[spans.front()].y;
-		int h = 0;
-		for (it = spans.begin(); it != spans.end(); ++it) {
-			Region& r = layout[*it];
-			r.y -= offset;
-			h += r.h;
+		ContentList::iterator it = contents.begin();
+		Content* content = *it;
+		if (layout.find(content) == layout.end()) {
+			return; // no layout yet
 		}
 
-		// destroy all exclusions and recreate a single exclusion
-		ExclusionRects.clear();
-		if (h) {
-			rgn.h = h;
-			AddExclusionRect(rgn);
+		Region rgn = layout[content].front();
+		delete RemoveContent(content);
+		it = contents.begin();
+		while (++it != contents.end()) {
+			content = *it;
+			if (layout.find(content) != layout.end()) {
+				Regions::iterator rit = layout[content].begin();
+				for (; rit != layout[content].end(); ++rit) {
+					if ((*rit).y <= rgn.y + rgn.h) {
+						it--;
+						delete RemoveContent(content);
+						break;
+					}
+				}
+			}
 		}
 	}
-	ContentContainer::AppendSpan(span);
+	ContentContainer::AppendContent(newContent);
 }
-*/
 
 }
