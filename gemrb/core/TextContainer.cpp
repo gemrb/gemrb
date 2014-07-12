@@ -25,6 +25,7 @@
 #include "Video.h"
 
 #define CONTENT_MAX_SIZE (SHRT_MAX / 2) // just something larger than any screen height and small enough to not overflow
+#define DEBUG_TEXT 0
 
 namespace GemRB {
 
@@ -124,6 +125,9 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			} while (excluded);
 
 			Point printPoint;
+#if (DEBUG_TEXT)
+			core->GetVideoDriver()->DrawRect(lineSegment, ColorRed, true);
+#endif
 			// collapse with previous content (shared borders)
 			lineSegment.y--;
 			assert(lineSegment.h == font->maxHeight);
@@ -134,6 +138,9 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 				lineSegment.w = printPoint.x;
 				dp.x += printPoint.x;
 			}
+#if (DEBUG_TEXT)
+			core->GetVideoDriver()->DrawRect(lineSegment, ColorWhite, false);
+#endif
 			layoutRegions.push_back(lineSegment);
 
 			// FIXME: infinite loop possibility.
@@ -176,6 +183,9 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 		} else {
 			font->Print(drawRegion.Intersect(rgn), text, palette, IE_FONT_ALIGN_LEFT);
 		}
+#if (DEBUG_TEXT)
+		core->GetVideoDriver()->DrawRect(drawRegion, ColorWhite, false);
+#endif
 		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.push_back(drawRegion);
 	}
@@ -355,7 +365,6 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 
 	Region layoutRegion = Region(drawOrigin, Size(frame.w, maxH));
 	layoutRegions.push_back(layoutRegion);
-	core->GetVideoDriver()->DrawRect(layoutRegion, ColorRed, false);
 }
 
 
