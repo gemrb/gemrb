@@ -136,7 +136,11 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	clip.y -= TextYPos;
+	// FIXME: no idea why we have to make this +2 adjustment...
+	// I *think* it's related to the borders (Region) of the ContentContainers
+	// so +1 for the contentWrapper and +1 for its nested container
+	// if thats the case then this should probably be adjusted in that class
+	clip.y -= TextYPos + 2;
 	contentWrapper.Draw(clip.Origin());
 
 	// now the text is layed out in the container so we can calculate the rows

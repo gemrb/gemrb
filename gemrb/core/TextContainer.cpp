@@ -124,12 +124,14 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			} while (excluded);
 
 			Point printPoint;
+			// collapse with previous content (shared borders)
+			lineSegment.y--;
+			assert(lineSegment.h == font->maxHeight);
 			numPrinted += font->Print(lineSegment.Intersect(rgn), text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
 			// FIXME: maybe handle this by bailing on the draw
 			assert(numPrinted); // if we didnt print at all there will be an infinite loop.
 			if (printPoint.x) {
 				lineSegment.w = printPoint.x;
-				lineSegment.h -= (font->descent - 1);
 				dp.x += printPoint.x;
 			}
 			layoutRegions.push_back(lineSegment);
@@ -163,15 +165,17 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			drawRegion.w = (drawRegion.w > 0) ? drawRegion.w : ts.w;
 		}
 
+		// collapse with previous content (shared borders)
+		drawRegion.y--;
 		Point printPoint;
 		if (drawRegion.h <= 0) {
 			drawRegion.h = CONTENT_MAX_SIZE;
 			font->Print(drawRegion.Intersect(rgn), text, palette, IE_FONT_ALIGN_LEFT, &printPoint);
 			drawRegion.h = printPoint.y + font->maxHeight;
+			assert(drawRegion.h % font->maxHeight == 0);
 		} else {
 			font->Print(drawRegion.Intersect(rgn), text, palette, IE_FONT_ALIGN_LEFT);
 		}
-		drawRegion.h -= (font->descent - 1);
 		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.push_back(drawRegion);
 	}
