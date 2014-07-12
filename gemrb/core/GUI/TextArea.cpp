@@ -97,13 +97,13 @@ bool TextArea::NeedsDraw()
 		MarkDirty();
 		return true;
 	}
-	if (needScrollUpdate) {
-		return true;
-	}
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
 		// FIXME: hack, this shouldnt even be needed.
 		// I'm not sure why the scrollbar isn't drawing without this
 		sb->MarkDirty();
+		if (needScrollUpdate) {
+			return true;
+		}
 	}
 
 	return Control::NeedsDraw();
