@@ -281,8 +281,8 @@ void ScrollBar::SetMax(unsigned short Max)
 	Value = Max;
 	if (Max == 0) {
 		SetPos( 0 );
-	} else if (Pos >= Max){
-		SetPos( Max - 1 );
+	} else if (Pos > Max){
+		SetPos( Max );
 	}
 }
 
