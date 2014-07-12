@@ -1310,8 +1310,9 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	char* cStr = MBCStringFromString(ctrl->QueryText());
-	return PyString_FromString(cStr);
+	PyObject* pyStr = PyString_FromString(cStr);
 	free(cStr);
+	return pyStr;
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
