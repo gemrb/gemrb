@@ -36,6 +36,16 @@
 		A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873D139F0A7D0002DC13 /* StackLock.cpp */; };
+		A20E4ADA197344BD00A6BC96 /* DialogResponder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */; };
+		A20E4ADB197344BD00A6BC96 /* DialogResponder.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4ACE197344BD00A6BC96 /* DialogResponder.h */; };
+		A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4ACF197344BD00A6BC96 /* FileCache.h */; };
+		A20E4ADD197344BD00A6BC96 /* RNG_SFMT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */; };
+		A20E4ADE197344BD00A6BC96 /* RNG_SFMT.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */; };
+		A20E4ADF197344BD00A6BC96 /* SFMT-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD5197344BD00A6BC96 /* SFMT-common.h */; };
+		A20E4AE0197344BD00A6BC96 /* SFMT-params.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD6197344BD00A6BC96 /* SFMT-params.h */; };
+		A20E4AE1197344BD00A6BC96 /* SFMT-params19937.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */; };
+		A20E4AE2197344BD00A6BC96 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD8197344BD00A6BC96 /* SFMT.c */; };
+		A20E4AE3197344BD00A6BC96 /* SFMT.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD9197344BD00A6BC96 /* SFMT.h */; };
 		A218A75214A8F3DB001142CF /* ../artwork/gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */; };
 		A22693791422934E004468E8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
 		A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */; };
@@ -52,7 +62,6 @@
 		A226F41B13A11A00009CE75E /* dct.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86BC139F0A7D0002DC13 /* dct.cpp */; };
 		A226F41C13A11A00009CE75E /* fft.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86BE139F0A7D0002DC13 /* fft.cpp */; };
 		A226F41D13A11A00009CE75E /* GetBitContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86BF139F0A7D0002DC13 /* GetBitContext.cpp */; };
-		A226F41E13A11A00009CE75E /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C2139F0A7D0002DC13 /* mem.cpp */; };
 		A226F41F13A11A00009CE75E /* rational.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C3139F0A7D0002DC13 /* rational.cpp */; };
 		A226F42013A11A00009CE75E /* rdft.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C5139F0A7D0002DC13 /* rdft.cpp */; };
 		A226F42113A11A07009CE75E /* BMPImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C7139F0A7D0002DC13 /* BMPImporter.cpp */; };
@@ -123,7 +132,6 @@
 		A276B4C713A28B0D00D41A8A /* dct.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86BC139F0A7D0002DC13 /* dct.cpp */; };
 		A276B4C813A28B0D00D41A8A /* fft.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86BE139F0A7D0002DC13 /* fft.cpp */; };
 		A276B4C913A28B0D00D41A8A /* GetBitContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86BF139F0A7D0002DC13 /* GetBitContext.cpp */; };
-		A276B4CA13A28B0D00D41A8A /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C2139F0A7D0002DC13 /* mem.cpp */; };
 		A276B4CB13A28B0D00D41A8A /* rational.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C3139F0A7D0002DC13 /* rational.cpp */; };
 		A276B4CC13A28B0D00D41A8A /* rdft.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C5139F0A7D0002DC13 /* rdft.cpp */; };
 		A276B4CD13A28B2000D41A8A /* BMPImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86C7139F0A7D0002DC13 /* BMPImporter.cpp */; };
@@ -377,7 +385,6 @@
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
 		A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
-		A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */; };
 		A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
@@ -1122,7 +1129,6 @@
 			files = (
 				A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */,
 				A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */,
-				A2BD125E15A8E63B000FAB95 /* VLCPlayer.so in CopyFiles */,
 				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
 				A2E9965414DE05590052BABE /* ACMReader.so in CopyFiles */,
 				A2E9965514DE05590052BABE /* AREImporter.so in CopyFiles */,
@@ -1173,6 +1179,16 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = osx/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DialogResponder.cpp; sourceTree = "<group>"; };
+		A20E4ACE197344BD00A6BC96 /* DialogResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogResponder.h; sourceTree = "<group>"; };
+		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
+		A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG_SFMT.cpp; sourceTree = "<group>"; };
+		A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG_SFMT.h; sourceTree = "<group>"; };
+		A20E4AD5197344BD00A6BC96 /* SFMT-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-common.h"; sourceTree = "<group>"; };
+		A20E4AD6197344BD00A6BC96 /* SFMT-params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params.h"; sourceTree = "<group>"; };
+		A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params19937.h"; sourceTree = "<group>"; };
+		A20E4AD8197344BD00A6BC96 /* SFMT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SFMT.c; sourceTree = "<group>"; };
+		A20E4AD9197344BD00A6BC96 /* SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFMT.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
@@ -1265,7 +1281,6 @@
 		A27B86BE139F0A7D0002DC13 /* fft.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fft.cpp; sourceTree = "<group>"; };
 		A27B86BF139F0A7D0002DC13 /* GetBitContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GetBitContext.cpp; sourceTree = "<group>"; };
 		A27B86C0139F0A7D0002DC13 /* GetBitContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetBitContext.h; sourceTree = "<group>"; };
-		A27B86C2139F0A7D0002DC13 /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		A27B86C3139F0A7D0002DC13 /* rational.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rational.cpp; sourceTree = "<group>"; };
 		A27B86C4139F0A7D0002DC13 /* rational.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rational.h; sourceTree = "<group>"; };
 		A27B86C5139F0A7D0002DC13 /* rdft.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rdft.cpp; sourceTree = "<group>"; };
@@ -2275,6 +2290,28 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A20E4AD0197344BD00A6BC96 /* RNG */ = {
+			isa = PBXGroup;
+			children = (
+				A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */,
+				A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */,
+				A20E4AD3197344BD00A6BC96 /* sfmt */,
+			);
+			path = RNG;
+			sourceTree = "<group>";
+		};
+		A20E4AD3197344BD00A6BC96 /* sfmt */ = {
+			isa = PBXGroup;
+			children = (
+				A20E4AD5197344BD00A6BC96 /* SFMT-common.h */,
+				A20E4AD6197344BD00A6BC96 /* SFMT-params.h */,
+				A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */,
+				A20E4AD8197344BD00A6BC96 /* SFMT.c */,
+				A20E4AD9197344BD00A6BC96 /* SFMT.h */,
+			);
+			path = sfmt;
+			sourceTree = "<group>";
+		};
 		A27979A913ABA4F7009A6FEF /* SAVImporter */ = {
 			isa = PBXGroup;
 			children = (
@@ -2403,7 +2440,6 @@
 				A27B86BE139F0A7D0002DC13 /* fft.cpp */,
 				A27B86BF139F0A7D0002DC13 /* GetBitContext.cpp */,
 				A27B86C0139F0A7D0002DC13 /* GetBitContext.h */,
-				A27B86C2139F0A7D0002DC13 /* mem.cpp */,
 				A27B86C3139F0A7D0002DC13 /* rational.cpp */,
 				A27B86C4139F0A7D0002DC13 /* rational.h */,
 				A27B86C5139F0A7D0002DC13 /* rdft.cpp */,
@@ -2864,6 +2900,8 @@
 				A2BF9FB41395FF61006ADC12 /* DialogHandler.h */,
 				A2BF9FB51395FF61006ADC12 /* DialogMgr.cpp */,
 				A2BF9FB61395FF61006ADC12 /* DialogMgr.h */,
+				A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */,
+				A20E4ACE197344BD00A6BC96 /* DialogResponder.h */,
 				A2BF9FB71395FF61006ADC12 /* DisplayMessage.cpp */,
 				A2BF9FB81395FF61006ADC12 /* DisplayMessage.h */,
 				A2BF9FB91395FF61006ADC12 /* Effect.h */,
@@ -2875,6 +2913,7 @@
 				A2BF9FBF1395FF61006ADC12 /* Factory.h */,
 				A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */,
 				A2BF9FC11395FF61006ADC12 /* FactoryObject.h */,
+				A20E4ACF197344BD00A6BC96 /* FileCache.h */,
 				A2BF9FC21395FF61006ADC12 /* Font.cpp */,
 				A2BF9FC31395FF61006ADC12 /* Font.h */,
 				A28D2498143BEA4200A27897 /* FontManager.cpp */,
@@ -2951,6 +2990,7 @@
 				A2BFA02A1395FF62006ADC12 /* ResourceManager.h */,
 				A2BFA02B1395FF62006ADC12 /* ResourceSource.cpp */,
 				A2BFA02C1395FF62006ADC12 /* ResourceSource.h */,
+				A20E4AD0197344BD00A6BC96 /* RNG */,
 				A2BFA02D1395FF62006ADC12 /* SaveGame.h */,
 				A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */,
 				A2BFA02F1395FF62006ADC12 /* SaveGameIterator.h */,
@@ -3209,6 +3249,7 @@
 				A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */,
 				A2E66351139E882900310FC8 /* Ambient.h in Headers */,
 				A2E66353139E882900310FC8 /* AmbientMgr.h in Headers */,
+				A20E4ADF197344BD00A6BC96 /* SFMT-common.h in Headers */,
 				A2E66355139E882900310FC8 /* Animation.h in Headers */,
 				A2E66357139E883100310FC8 /* AnimationFactory.h in Headers */,
 				A2E66359139E883100310FC8 /* AnimationMgr.h in Headers */,
@@ -3221,10 +3262,12 @@
 				A2E66364139E883100310FC8 /* Calendar.h in Headers */,
 				A2E66366139E883100310FC8 /* Callback.h in Headers */,
 				A2E66368139E883100310FC8 /* CharAnimations.h in Headers */,
+				A20E4AE0197344BD00A6BC96 /* SFMT-params.h in Headers */,
 				A2E6636A139E883100310FC8 /* Compressor.h in Headers */,
 				A2E6636C139E883100310FC8 /* ControlAnimation.h in Headers */,
 				A2E6636E139E883100310FC8 /* damages.h in Headers */,
 				A2E66370139E883100310FC8 /* DataFileMgr.h in Headers */,
+				A20E4AE3197344BD00A6BC96 /* SFMT.h in Headers */,
 				A2E66372139E883100310FC8 /* Dialog.h in Headers */,
 				A2E66374139E883100310FC8 /* DialogHandler.h in Headers */,
 				A2E66376139E883100310FC8 /* DialogMgr.h in Headers */,
@@ -3238,9 +3281,11 @@
 				A2E66381139E883100310FC8 /* FactoryObject.h in Headers */,
 				A2E66383139E883100310FC8 /* Font.h in Headers */,
 				A2E66385139E883100310FC8 /* Game.h in Headers */,
+				A20E4AE1197344BD00A6BC96 /* SFMT-params19937.h in Headers */,
 				A2E66387139E883100310FC8 /* GameData.h in Headers */,
 				A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */,
 				A2E6638A139E883E00310FC8 /* Holder.h in Headers */,
+				A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */,
 				A2E6638C139E883E00310FC8 /* Image.h in Headers */,
 				A2E6638E139E883E00310FC8 /* ImageFactory.h in Headers */,
 				A2E66390139E883E00310FC8 /* ImageMgr.h in Headers */,
@@ -3327,9 +3372,11 @@
 				A2E6642A139E886100310FC8 /* TextArea.h in Headers */,
 				A2E6642C139E886100310FC8 /* TextEdit.h in Headers */,
 				A2E6642E139E886100310FC8 /* Window.h in Headers */,
+				A20E4ADB197344BD00A6BC96 /* DialogResponder.h in Headers */,
 				A2E66430139E886100310FC8 /* WorldMapControl.h in Headers */,
 				A2E66433139E886700310FC8 /* GameScript.h in Headers */,
 				A2E66435139E886700310FC8 /* GSUtils.h in Headers */,
+				A20E4ADE197344BD00A6BC96 /* RNG_SFMT.h in Headers */,
 				A2E66437139E886700310FC8 /* Matching.h in Headers */,
 				A2DE329A14EB071200117503 /* Logger.h in Headers */,
 				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
@@ -4199,7 +4246,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "GemRB" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -4438,7 +4485,6 @@
 				A276B4C713A28B0D00D41A8A /* dct.cpp in Sources */,
 				A276B4C813A28B0D00D41A8A /* fft.cpp in Sources */,
 				A276B4C913A28B0D00D41A8A /* GetBitContext.cpp in Sources */,
-				A276B4CA13A28B0D00D41A8A /* mem.cpp in Sources */,
 				A276B4CB13A28B0D00D41A8A /* rational.cpp in Sources */,
 				A276B4CC13A28B0D00D41A8A /* rdft.cpp in Sources */,
 			);
@@ -4904,7 +4950,6 @@
 				A226F41B13A11A00009CE75E /* dct.cpp in Sources */,
 				A226F41C13A11A00009CE75E /* fft.cpp in Sources */,
 				A226F41D13A11A00009CE75E /* GetBitContext.cpp in Sources */,
-				A226F41E13A11A00009CE75E /* mem.cpp in Sources */,
 				A226F41F13A11A00009CE75E /* rational.cpp in Sources */,
 				A226F42013A11A00009CE75E /* rdft.cpp in Sources */,
 				A226F42113A11A07009CE75E /* BMPImporter.cpp in Sources */,
@@ -5004,6 +5049,7 @@
 				A2E66356139E882900310FC8 /* AnimationFactory.cpp in Sources */,
 				A2E66358139E883100310FC8 /* AnimationMgr.cpp in Sources */,
 				A2E6635B139E883100310FC8 /* ArchiveImporter.cpp in Sources */,
+				A20E4AE2197344BD00A6BC96 /* SFMT.c in Sources */,
 				A2E6635D139E883100310FC8 /* Audio.cpp in Sources */,
 				A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */,
 				A2E66361139E883100310FC8 /* Cache.cpp in Sources */,
@@ -5033,6 +5079,7 @@
 				A2E66395139E883E00310FC8 /* Interface.cpp in Sources */,
 				A2E66397139E883E00310FC8 /* Inventory.cpp in Sources */,
 				A2E66399139E883E00310FC8 /* Item.cpp in Sources */,
+				A20E4ADD197344BD00A6BC96 /* RNG_SFMT.cpp in Sources */,
 				A2E6639B139E883E00310FC8 /* ItemMgr.cpp in Sources */,
 				A2E6639D139E883E00310FC8 /* LRUCache.cpp in Sources */,
 				A2E6639F139E883E00310FC8 /* Map.cpp in Sources */,
@@ -5049,6 +5096,7 @@
 				A2E663B5139E883E00310FC8 /* Projectile.cpp in Sources */,
 				A2E663B7139E883E00310FC8 /* ProjectileMgr.cpp in Sources */,
 				A2E663B9139E883E00310FC8 /* ProjectileServer.cpp in Sources */,
+				A20E4ADA197344BD00A6BC96 /* DialogResponder.cpp in Sources */,
 				A2E663BB139E883E00310FC8 /* Region.cpp in Sources */,
 				A2E663BD139E883E00310FC8 /* Resource.cpp in Sources */,
 				A2E663BF139E883E00310FC8 /* ResourceDesc.cpp in Sources */,
@@ -6720,7 +6768,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -6764,7 +6811,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -6807,7 +6853,6 @@
 		A2BD125415A7EDFE000FAB95 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
@@ -6834,7 +6879,6 @@
 		A2BD125515A7EDFE000FAB95 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
@@ -7026,9 +7070,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -7043,11 +7088,13 @@
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				"GCC_VERSION[arch=x86_64]" = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
@@ -7060,6 +7107,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
 					"-DHAVE_ICONV=1",
@@ -7087,9 +7135,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
@@ -7104,11 +7153,13 @@
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				"GCC_VERSION[arch=x86_64]" = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
