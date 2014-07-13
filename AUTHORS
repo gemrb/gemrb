@@ -1,10 +1,10 @@
+Check README on how to contact us.
+
 A list of GemRB authors is available through:
   git shortlog -se
 
 From pre-svn era:
-  Brian Tanedo <behteh@users.sourceforge.net>
-  Lotana <lotana@users.sourceforge.net>
-  Thuy Nguyen <ndthuy@users.sourceforge.net>
+  Brian Tanedo, Lotana, Thuy Nguyen
 
 On top of that, many 3rd party contributions are mentioned only in old
 commit messages and news.

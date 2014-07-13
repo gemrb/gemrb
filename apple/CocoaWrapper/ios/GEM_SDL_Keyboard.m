@@ -22,7 +22,8 @@
 #import <SDL.h>
 #import <UIKit/UIKit.h>
 
-#include <SDL/SDL_keyboard_c.h>
+extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
+#include <SDL/SDL_keyboard.h>
 
 #pragma mark UIKit button subclasses
 @interface GEM_UIKit_RoundedButton : UIButton

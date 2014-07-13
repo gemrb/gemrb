@@ -1139,7 +1139,6 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 
 		// check for personal dead magic
 		if (actor->Modified[IE_DEADMAGIC]) {
-			// TODO: display fizzling animation
 			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 			return 0;
 		}
@@ -1174,7 +1173,6 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 			displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
 		}
 		if (failed) {
-			// TODO: display fizzling animation
 			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
 			return 0;
 		}

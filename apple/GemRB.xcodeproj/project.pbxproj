@@ -599,7 +599,6 @@
 		A2E66415139E886100310FC8 /* Button.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FD61395FF62006ADC12 /* Button.h */; };
 		A2E66416139E886100310FC8 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD71395FF62006ADC12 /* Console.cpp */; };
 		A2E66417139E886100310FC8 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FD81395FF62006ADC12 /* Console.h */; };
-		A2E66418139E886100310FC8 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = A2FE553A13982BA6006AB962 /* config.h */; };
 		A2E66419139E886100310FC8 /* Control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD91395FF62006ADC12 /* Control.cpp */; };
 		A2E6641A139E886100310FC8 /* Control.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FDA1395FF62006ADC12 /* Control.h */; };
 		A2E6641B139E886100310FC8 /* EventMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FDB1395FF62006ADC12 /* EventMgr.cpp */; };
@@ -1698,7 +1697,6 @@
 		A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NullSource.cpp; sourceTree = "<group>"; };
 		A2FE2C7816F2313400DDC6C7 /* NullSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NullSource.h; sourceTree = "<group>"; };
 		A2FE2C8116F2316400DDC6C7 /* NullSource.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = NullSource.so; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2FE553A13982BA6006AB962 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2211,7 +2209,6 @@
 		29B97314FDCFA39411CA2CEA /* GemRB_OSX */ = {
 			isa = PBXGroup;
 			children = (
-				A2FE553A13982BA6006AB962 /* config.h */,
 				A2D4C51D13A978110086BCC4 /* includes */,
 				A27B8697139F0A7D0002DC13 /* plugins */,
 				A2BF9F8C1395FF61006ADC12 /* core */,
@@ -3319,7 +3316,6 @@
 				A2E66413139E885A00310FC8 /* Scriptable.h in Headers */,
 				A2E66415139E886100310FC8 /* Button.h in Headers */,
 				A2E66417139E886100310FC8 /* Console.h in Headers */,
-				A2E66418139E886100310FC8 /* config.h in Headers */,
 				A2E6641A139E886100310FC8 /* Control.h in Headers */,
 				A2E6641C139E886100310FC8 /* EventMgr.h in Headers */,
 				A2E6641E139E886100310FC8 /* GameControl.h in Headers */,
@@ -3362,9 +3358,9 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
 				A2FE2C8316F231CB00DDC6C7 /* PBXTargetDependency */,
 				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
-				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
 				A23EBFFC1419A81500CC049E /* PBXTargetDependency */,
 				A2375BA113AAF58E00E7EF9B /* PBXTargetDependency */,
 				A2375BA313AAF58E00E7EF9B /* PBXTargetDependency */,
@@ -4095,6 +4091,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A29BF86313A042B600C812DD /* Build configuration list for PBXNativeTarget "GemRB iOS" */;
 			buildPhases = (
+				A23B17461880787B00EB6AC8 /* ShellScript */,
 				A22DCCDD14A8F78C0067D6D1 /* ShellScript */,
 				A29BF85813A0427900C812DD /* Resources */,
 				A29BF85913A0427900C812DD /* Sources */,
@@ -4132,6 +4129,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A2E6633D139E87A400310FC8 /* Build configuration list for PBXNativeTarget "gemrb_core" */;
 			buildPhases = (
+				A23B1745188061AA00EB6AC8 /* ShellScript */,
 				A2E66334139E875400310FC8 /* Headers */,
 				A2E66335139E875400310FC8 /* Sources */,
 				A2E66336139E875400310FC8 /* Frameworks */,
@@ -4316,6 +4314,34 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/*\nThis script makes the bundle thumbnails\n*/\nf=${SRCROOT}\nin=${SRCROOT}/../artwork/gemrb.icns\npng512=${f}/ios/iTunesArtwork\n\nsips --resampleWidth 512 \"${in}\" --out \"${png512}\"\nin=${png512}\necho $in\nsips --setProperty format png --resampleWidth 57 \"${in}\" --out \"${f}/ios/Icon.png\"\nsips --setProperty format png --resampleWidth 114 \"${in}\" --out \"${f}/ios/Icon@2x.png\"\nsips --setProperty format png --resampleWidth 29 \"${in}\" --out \"${f}/ios/Icon-Small.png\"\nsips --setProperty format png --resampleWidth 58 \"${in}\" --out \"${f}/ios/Icon-Small@2x.png\"\nsips --setProperty format png --resampleWidth 50 \"${in}\" --out \"${f}/ios/Icon-Small-50.png\"\nsips --setProperty format png --resampleWidth 72 \"${in}\" --out \"${f}/ios/Icon-72.png\"";
+		};
+		A23B1745188061AA00EB6AC8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/CMakeLists.txt",
+			);
+			outputPaths = (
+				"$(SRCROOT)/config.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "cmake \"$SRCROOT\"";
+		};
+		A23B17461880787B00EB6AC8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cmake \"$SRCROOT\"";
 		};
 		A249187F141079510038B170 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6723,6 +6749,7 @@
 					"-DHAVE_CONFIG_H",
 					"-W",
 					"-Wextra",
+					"-DTARGET_OS_MAC=0",
 				);
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
@@ -6763,9 +6790,10 @@
 					./,
 					"-DSTATIC_LINK",
 					"-DHAVE_CONFIG_H",
-					"-DTARGET_OS_IPHONE",
+					"-DTARGET_OS_IPHONE=1",
 					"-W",
 					"-Wextra",
+					"-DTARGET_OS_MAC=0",
 				);
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
@@ -7033,8 +7061,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
-					"-DTARGET_OS_MAC=1",
 					"-DHAVE_CONFIG_H",
+					"-DHAVE_ICONV=1",
 					"-g",
 					"-D_DEBUG",
 					"-isystem",
@@ -7043,6 +7071,7 @@
 					"-Wextra",
 					"-Wformat",
 					"-Wall",
+					"-DTARGET_OS_MAC=1",
 				);
 				SDKROOT = "";
 				"SDKROOT[arch=*]" = "";
@@ -7093,13 +7122,13 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
-					"-DTARGET_OS_MAC=1",
 					"-DHAVE_CONFIG_H",
 					"-isystem",
 					./,
 					"-W",
 					"-Wextra",
 					"-Wformat",
+					"-DTARGET_OS_MAC=1",
 				);
 				SDKROOT = "";
 				"SDKROOT[arch=*]" = "";

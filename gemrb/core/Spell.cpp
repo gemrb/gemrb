@@ -215,6 +215,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			fx->SourceFlags|=SF_HOSTILE;
 		}
 		fx->CasterLevel = level;
+		fx->SpellLevel = SpellLevel;
 
 		// apply the stat-based spell duration modifier
 		if (self->Type == ST_ACTOR) {

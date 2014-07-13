@@ -2903,11 +2903,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	//if the animation ID was not modified by any effect, it may still be modified by something else
 	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
-	ieDword appearance = 0;
+	ieDword pst_appearance = 0;
 	if (pstflags) {
-		core->GetGame()->locals->Lookup("APPEARANCE", appearance);
+		core->GetGame()->locals->Lookup("APPEARANCE", pst_appearance);
 	}
-	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && appearance == 0) {
+	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && pst_appearance == 0) {
 		UpdateAnimationID(true);
 	}
 
@@ -3222,21 +3222,39 @@ void Actor::RollSaves()
 
 // in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
 // since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
-// FIXME: in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
+// in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
 
 #define SAVECOUNT 5
 static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
 
 /** returns true if actor made the save against saving throw type */
-bool Actor::GetSavingThrow(ieDword type, int modifier)
+bool Actor::GetSavingThrow(ieDword type, int modifier, int spellLevel, int saveBonus)
 {
 	assert(type<SAVECOUNT);
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
 	if (ret == 1) return false;
 	if (ret == SAVEROLL) return true;
-	ret += modifier + GetStat(IE_LUCK);
-	return ret > (int) GetStat(savingthrows[type]);
+
+	if (!third) {
+		ret += modifier + GetStat(IE_LUCK);
+		return ret > (int) GetStat(savingthrows[type]);
+	}
+
+	int roll = ret;
+	// NOTE: assuming criticals apply to iwd2 too
+	// NOTE: we use GetStat, assuming the stat save bonus can never be negated like some others
+	int save = GetStat(savingthrows[type]);
+	ret = roll + save + modifier;
+	if (ret > 10 + spellLevel + saveBonus) {
+		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
+		displaymsg->DisplayRollStringName(40974, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		return true;
+	} else {
+		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Failed!~
+		displaymsg->DisplayRollStringName(40975, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		return false;
+	}
 }
 
 /** implements a generic opcode function, modify modified stats
@@ -3731,6 +3749,11 @@ bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
 {
 	if (!third) {
 		return true;
+	}
+	// FIXME: change to SpellTarget once the split is done
+	if (!LastTarget && LastTargetPos.isempty()) {
+		// not casting, nothing to do
+		return false;
 	}
 	int roll = core->Roll(1, 20, 0);
 	int concentration = Modified[IE_CONCENTRATION];
@@ -4352,8 +4375,11 @@ ieDword Actor::GetXPLevel(int modified) const
 }
 
 // returns the guessed caster level by passed spell type
-// FIXME: add iwd2 support (should be more precise, as there are more class types)
 // FIXME: add more logic for cross-type kits (like avengers)?
+// FIXME: iwd2 does the right thing at least for spells cast from spellbooks;
+//        that is, it takes the correct level, not first or average or min or max.
+//        We need to propagate the spellbook info all through here. :/
+//        NOTE: this is only problematic for multiclassed actors
 ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
 	int level = 0;
@@ -4364,12 +4390,19 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 		level = GetClericLevel();
 		if (!level) level = GetDruidLevel();
 		if (!level) level = GetPaladinLevel();
+		// for cleric/rangers, we can't tell from which class a spell is, unless unique, so we ignore the distinction
 		if (!level) level = GetRangerLevel();
 		break;
 	case IE_SPL_WIZARD:
 		level = GetMageLevel();
 		if (!level) level = GetSorcererLevel();
 		if (!level) level = GetBardLevel();
+		break;
+	default:
+		// checking if anyone uses the psion, item and song types
+		if (spelltype != IE_SPL_INNATE) {
+			Log(ERROR, "Actor", "Unhandled SPL type: %d!", spelltype);
+		}
 		break;
 	}
 	// if nothing was found, use the average level

@@ -46,6 +46,7 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	lastCursor = 0;
 	Area = NULL;
 	Value = direction;
+	OverrideIconPalette = false;
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
 	CopyResRef(currentArea, game->CurrentArea);
@@ -118,7 +119,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 
 		int xOffs = MAP_TO_SCREENX(m->X);
 		int yOffs = MAP_TO_SCREENY(m->Y);
-		Sprite2D* icon = m->GetMapIcon(worldmap->bam);
+		Sprite2D* icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		if( icon ) {
 			if (m == Area && m->HighlightSelected()) {
 				Palette *pal = icon->GetPalette();
@@ -145,7 +146,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 	for(i=0;i<ec;i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
-		Sprite2D *icon=m->GetMapIcon(worldmap->bam);
+		Sprite2D *icon=m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		int h=0,w=0,xpos=0,ypos=0;
 		if (icon) {
 			h=icon->Height;
@@ -234,7 +235,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				continue; //invisible or inaccessible
 			}
 
-			Sprite2D *icon=ae->GetMapIcon(worldmap->bam);
+			Sprite2D *icon=ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
 			int h=0, w=0, iconx=0, icony=0;
 			if (icon) {
 				h=icon->Height;

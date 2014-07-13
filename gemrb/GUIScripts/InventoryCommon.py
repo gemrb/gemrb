@@ -116,7 +116,7 @@ def OnDragItem ():
 						if ret&SHOP_FULL:
 							if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 								msg = 24893
-							elif GameCheck.HasTOB:
+							elif GameCheck.HasTOB():
 								msg = 54692
 						GemRB.DisplayString(msg, 0xffffff)
 					#leave (save) store

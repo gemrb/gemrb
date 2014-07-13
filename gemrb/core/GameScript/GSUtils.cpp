@@ -994,19 +994,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 			if (target->InMove()) {
 				//waiting for target
-				Sender->AddActionInFront( Sender->GetCurrentAction() );
-				Sender->ReleaseCurrentAction();
-				Sender->SetWait(1);
 				return;
 			}
 			GetTalkPositionFromScriptable(scr, TalkPos);
 			if (PersonalDistance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
 				//try to force the target to come closer???
-				GoNear(target, TalkPos);
-				Sender->AddActionInFront( Sender->GetCurrentAction() );
-				Sender->ReleaseCurrentAction();
-				Sender->SetWait(1);
-				return;
+				if(!MoveNearerTo(target, TalkPos, MAX_OPERATING_DISTANCE, 1))
+					return;
 			}
 		}
 	}
@@ -1708,18 +1702,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			src++;
 	}
 	return newAction;
-}
-
-void GoNear(Scriptable *Sender, const Point &p)
-{
-	if (Sender->GetCurrentAction()) {
-		Log(ERROR, "GameScript", "Target busy???");
-		return;
-	}
-	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
-	Action * action = GenerateAction( Tmp);
-	Sender->AddActionInFront( action );
 }
 
 void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release)

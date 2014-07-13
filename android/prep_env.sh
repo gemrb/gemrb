@@ -117,6 +117,37 @@ function move_libraries {
   echo -en "Done.\n"
 }
 
+function prepare_config {
+  template=$1
+  out=$2
+
+  cp -f "$template" "$out" &&
+  # change/enable/override some defaults
+  sed -i 's,^#UseSoftKeyboard,UseSoftKeyboard,' "$out" &&
+  sed -i 's,^Bpp=.*,Bpp=16,' "$out" &&
+  sed -i 's,^#\?AudioDriver.*,AudioDriver = openal,' "$out" &&
+  sed -i 's,^Bpp=.*,Bpp=16,' "$out" &&
+  # unclear why these default clearings are needed
+  # currently the activity doesn't do anything with them
+  sed -i 's,@DATA_DIR@,,' "$out" &&
+  sed -i 's,GameOverridePath=.*,GameOverridePath=,' "$out" &&
+  sed -i 's,GameDataPath=.*,GameDataPath=,' "$out" &&
+  # convenience and better defaults
+  sed -i 's,SavePath=.*,SavePath=/sdcard/gemrb/bg2/,' "$out" &&
+  sed -i 's,CachePath=.*,CachePath=/sdcard/gemrb/bg2/cache,' "$out" &&
+  # replace the whole block
+  sed -i '/^GamePath/,/^CD5/ c\
+#GamePath=/storage/emulated/0/Android/data/net.sourceforge.gemrb/files/bg2/\
+#CD1=/storage/emulated/0/Android/data/net.sourceforge.gemrb/files/bg2/data\
+GamePath=/sdcard/gemrb/bg2\
+CD1=/sdcard/gemrb/bg2/data\
+# CD2=<CD2_PLACEHOLDER>\
+# CD3=<CD3_PLACEHOLDER>\
+# CD4=<CD4_PLACEHOLDER>\
+# CD5=<CD5_PLACEHOLDER>\
+' "$out"
+}
+
 function move_and_edit_projectfiles {
   echo -en "Copying and editing files..."
   mkdir -p "$ENVROOT/build/gemrb/src/net/sourceforge/gemrb/" &&
@@ -124,9 +155,10 @@ function move_and_edit_projectfiles {
   # copy the gemrb activity
   cp "$ENVROOT/GemRB.java" "$ENVROOT/build/gemrb/src/net/sourceforge/gemrb/" &&
 
-  # copy the packaged config file
+  # prepare and copy the config file
   mkdir -p "$ENVROOT/build/gemrb/assets" &&
-  cp "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
+  prepare_config "$GEMRB_GIT_PATH/gemrb/GemRB.cfg.sample.in" "$ENVROOT/packaged.GemRB.cfg" &&
+  mv "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
   mkdir -p "$ENVROOT/build/gemrb/res/drawable-ldpi/" &&
   # copy the icons

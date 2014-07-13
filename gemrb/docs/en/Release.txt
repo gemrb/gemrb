@@ -21,8 +21,6 @@ Preparing and testing GIT
     ver=0.9.0
     git tag -a -m "GemRB $ver" v$ver
     git push origin v$ver
-* Update from GIT to the tagged version
-    git checkout v$ver
 
 * After you're done, update the version with a -git suffix, so it will be
   easier to tell if people are running release builds or not
@@ -76,10 +74,12 @@ options should also be mentioned here if they're not part of the changelog.
 
 * Test the downloads from sourceforge.net
 
-* Announce on homepage, SF, #GemRB in channel and title, Happypenguin, LGDB and
-  Gibberlings3:
+* Announce on SF, #GemRB in channel and title, LGDB and Gibberlings3:
     - our forum
     - modding news (Avenger, Theacefes, Grim Squeaker, DavidW and cmorgan have access)
   (a template is available in admin/announcement.template)
+    - homepages: sidebar (versions and news), news, start (version), changelog (status
+      and log swap), old_changelogs
+    - we also have a Google+ page, but it is currently mostly unused
 
 * Run admin/restart_news.sh to restart the NEWS cycle

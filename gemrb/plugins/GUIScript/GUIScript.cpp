@@ -98,6 +98,7 @@ static int ItemSoundsCount = -1;
 #define CRI_REMOVE 0
 #define CRI_EQUIP  1
 #define CRI_SWAP   2
+#define CRI_REMOVEFORSWAP 3
 
 //bit used in SetCreatureStat to access some fields
 #define EXTRASETTINGS 0x1000
@@ -1504,8 +1505,8 @@ static PyObject* GemRB_TextArea_Scroll(PyObject * /*self*/, PyObject* args)
 		row = 0;
 	}
 	ta->SetRow( row );
-	core->RedrawAll();
 	*/
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2717,17 +2718,17 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateWorldMapControl__doc,
-"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font])\n\n"
+"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font, recolor])\n\n"
 "Creates and adds a new WorldMap control to a Window." );
 
 static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, direction;
+	int WindowIndex, ControlID, direction, recolor = 0;
 	Region rgn;
 	char *font=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &rgn.x,
-			&rgn.y, &rgn.w, &rgn.h, &direction, &font )) {
+	if (!PyArg_ParseTuple( args, "iiiiiii|si", &WindowIndex, &ControlID, &rgn.x,
+			&rgn.y, &rgn.w, &rgn.h, &direction, &font, &recolor )) {
 		return AttributeError( GemRB_Window_CreateWorldMapControl__doc );
 	}
 
@@ -2742,8 +2743,10 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 		//flags = ctrl->Value;
 		delete win->RemoveControl( CtrlIndex );
 	}
+
 	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;
+	wmap->SetOverrideIconPalette(recolor);
 	win->AddControl( wmap );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
@@ -6042,20 +6045,21 @@ PyDoc_STRVAR( GemRB_GetStore__doc,
 "GetStore() => dictionary\n\n"
 "Returns relevant data of the current store." );
 
+#define STOREBUTTON_COUNT 7
 #define STORETYPE_COUNT 7
-static int storebuttons[STORETYPE_COUNT][4]={
+static int storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT]={
 //store
-{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
+{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_ROOMRENT|STA_OPTIONAL},
 //tavern
-{STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL},
+{STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL,STA_ROOMRENT|STA_OPTIONAL},
 //inn
-{STA_ROOMRENT,STA_BUYSELL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL},
+{STA_ROOMRENT,STA_BUYSELL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
 //temple
-{STA_CURE, STA_DONATE|STA_OPTIONAL,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL},
+{STA_CURE, STA_DONATE|STA_OPTIONAL,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_ROOMRENT|STA_OPTIONAL},
 //iwd container
-{STA_BUYSELL,-1,-1,-1,},
+{STA_BUYSELL,-1,-1,-1,-1,-1,-1},
 //no need to steal from your own container (original engine had STEAL instead of DRINK)
-{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
+{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_CURE|STA_OPTIONAL,-1,-1,-1},
 //gemrb specific store type: (temple 2), added steal, removed identify
 {STA_BUYSELL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL} };
 
@@ -6100,9 +6104,9 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	}
 	PyDict_SetItemString(dict, "StoreRoomPrices", p);
 
-	p = PyTuple_New( 4 );
+	p = PyTuple_New( STOREBUTTON_COUNT );
 	j=0;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < STOREBUTTON_COUNT; i++) {
 		k = storebuttons[store->Type][i];
 		if (k&STA_OPTIONAL) {
 			k&=~STA_OPTIONAL;
@@ -6113,7 +6117,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 		}
 		PyTuple_SetItem( p, j++, PyInt_FromLong( k ) );
 	}
-	for (;j<4;j++) {
+	for (; j < STOREBUTTON_COUNT; j++) {
 		PyTuple_SetItem( p, j, PyInt_FromLong( -1 ) );
 	}
 	PyDict_SetItemString(dict, "StoreButtons", p);
@@ -6507,6 +6511,8 @@ static void ReadUsedItems()
 			//1 - named actor cannot remove it
 			//2 - anyone else cannot equip it
 			//4 - can only swap it for something else
+			//8 - (pst) can only be equipped in eye slots
+			//16 - (pst) can only be equipped in ear slots
 			UsedItems[i].flags = atoi(tab->QueryField(i,2) );
 		}
 table_loaded:
@@ -7526,12 +7532,46 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 				if (!nomatch) continue;
 			} else continue;
 			break;
+		//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
+		// and make sure not to treat earrings improperly
+		case CRI_REMOVEFORSWAP:
+			int flags = UsedItems[i].flags;
+			if (!(flags&1) || flags&4) {
+				continue;
+			}
+			break;
 		}
 
 		displaymsg->DisplayString(UsedItems[i].value, DMC_WHITE, IE_STR_SOUND);
 		return 1;
 	}
 	return 0;
+}
+
+// TNO has an ear and an eye slot that share the same slot type, so normal checks fail
+// return false if we're trying to stick an earing into our eye socket or vice versa
+bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
+	if (UsedItemsCount==-1) {
+		ReadUsedItems();
+	}
+	unsigned int i=UsedItemsCount;
+
+	while(i--) {
+		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, NewItem->ItemResRef, 8)) {
+			continue;
+		}
+
+		//8 - (pst) can only be equipped in eye slots
+		//16 - (pst) can only be equipped in ear slots
+		if (UsedItems[i].flags & 8) {
+			return Slot == 1; // eye/left ear/helmet
+		} else if (UsedItems[i].flags & 16) {
+			return Slot == 7; //right ear/caleidoscope
+		}
+
+		return true;
+	}
+	return true;
 }
 
 CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
@@ -7544,8 +7584,13 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	}
 
 	//it is always possible to put these items into the inventory
-	if (!(core->QuerySlotType(Slot)&SLOT_INVENTORY)) {
-		bool isdragging = core->GetDraggedItem()!=NULL;
+	// however in pst, we need to ensure immovable swappables are swappable
+	bool isdragging = core->GetDraggedItem() != NULL;
+	if (core->QuerySlotType(Slot)&SLOT_INVENTORY) {
+		if (CheckRemoveItem(actor, si, CRI_REMOVEFORSWAP)) {
+			return NULL;
+		}
+	} else {
 		if (CheckRemoveItem(actor, si, isdragging?CRI_SWAP:CRI_REMOVE)) {
 			return NULL;
 		}
@@ -7820,6 +7865,11 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (res) {
 			displaymsg->DisplayConstantString(res, DMC_WHITE);
 			return PyInt_FromLong( 0 );
+		}
+		// pst: also check TNO earing/eye silliness: both share the same slot type
+		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
+			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
+			return PyInt_FromLong(0);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
 		if (tmp) {
@@ -9463,7 +9513,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplySpell__doc,
-"ApplySpell(actor, spellname)\n\n"
+"ApplySpell(actor, spellname[, caster])\n\n"
 "Applies a spell on actor.");
 
 static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
@@ -10608,6 +10658,29 @@ static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
 	return Py_None;
 }
 
+
+PyDoc_STRVAR( GemRB_SetFeature__doc,
+"GemRB.SetFeature(feature, value)\n\n"
+"Set GameType flag FEATURE to VALUE, either True or False. \n"
+"FEATURE is defined by GF_xxx defines.\n"
+"Example:\n"
+"GemRB.SetFeature(GF_ALL_STRINGS_TAGGED, True)\n");
+
+static PyObject* GemRB_SetFeature(PyObject* /*self*/, PyObject* args)
+{
+	unsigned int feature;
+	bool value;
+
+	if (!PyArg_ParseTuple(args, "ib", &feature, &value)) {
+		return NULL;
+	}
+
+	core->SetFeature(value, feature);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
 	METHOD(AddGameTypeHint, METH_VARARGS),
@@ -10775,6 +10848,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
 	METHOD(SetFeat, METH_VARARGS),
+	METHOD(SetFeature, METH_VARARGS),
 	METHOD(SetFullScreen, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
 	METHOD(SetGlobal, METH_VARARGS),

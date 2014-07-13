@@ -121,7 +121,10 @@ void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 
 void SDL12VideoDriver::DestroyMovieScreen()
 {
-	if (overlay) SDL_FreeYUVOverlay(overlay);
+	if (overlay) {
+		SDL_FreeYUVOverlay(overlay);
+		overlay = NULL;
+	}
 }
 
 void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -309,6 +312,6 @@ bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alph
 
 #include "plugindef.h"
 
-GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
+GEMRB_PLUGIN(0xDBAAB50, "SDL1 Video Driver")
 PLUGIN_DRIVER(SDL12VideoDriver, "sdl")
 END_PLUGIN()

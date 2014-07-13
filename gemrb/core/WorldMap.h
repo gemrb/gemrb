@@ -72,7 +72,7 @@ public:
 	void SetAreaStatus(ieDword status, int op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
-	Sprite2D *GetMapIcon(AnimationFactory *bam);
+	Sprite2D *GetMapIcon(AnimationFactory *bam, bool overridePalette);
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
 	const String* GetCaption();

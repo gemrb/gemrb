@@ -230,7 +230,7 @@ Sprite2D* BMPImporter::GetSprite2D()
 		memcpy( p, pixels, Width * Height * 4 );
 		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
 			red_mask, green_mask, blue_mask, 0x00000000, p,
-			true, green_mask );
+			true, green_mask|(0xff<<24) );
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );

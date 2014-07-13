@@ -1511,8 +1511,8 @@ int Interface::Init(InterfaceConfig* config)
 
 	CONFIG_PATH("GemRBOverridePath", GemRBOverridePath, GemRBPath);
 	CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath, GemRBPath);
-#ifdef PLUGINDIR
-	CONFIG_PATH("PluginsPath", PluginsPath, PLUGINDIR);
+#ifdef PLUGIN_DIR
+	CONFIG_PATH("PluginsPath", PluginsPath, PLUGIN_DIR);
 #else
 	CONFIG_PATH("PluginsPath", PluginsPath, "");
 	if (!PluginsPath[0]) {
@@ -1625,7 +1625,10 @@ int Interface::Init(InterfaceConfig* config)
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format
 	vars->Lookup("Full Screen", FullScreen);
-	video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName);
+	if (video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);
@@ -1676,6 +1679,10 @@ int Interface::Init(InterfaceConfig* config)
 		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GamePath, GameDataPath, NULL);
+		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+		// accomodating silly installers that create a data/Data/* structure
+		PathJoin( path, GamePath, GameDataPath, "Data", NULL);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
@@ -2338,6 +2345,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
 		"SkipUpdateHack",     //74GF_SKIPUPDATE_HACK
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
+		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -4722,25 +4730,35 @@ void Interface::SanitizeItem(CREItem *item) const
 
 	Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (itm) {
-		//set charge counters for non-rechargeable items if their charge is zero
-		//set charge counters for items not using charges to one
-		for (int i = 0; i < CHARGE_COUNTERS; i++) {
-			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h) {
-				if (item->Usages[i] == 0) {
-					if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-						//HACK: the original (bg2) allows for 0 charged gems
-						if (h->Charges) {
-							item->Usages[i] = h->Charges;
-						} else {
-							item->Usages[i] = 1;
+
+		item->MaxStackAmount = itm->MaxStackAmount;
+		//if item is stacked mark it as so
+		if (itm->MaxStackAmount) {
+			item->Flags |= IE_INV_ITEM_STACKED;
+			if (item->Usages[0] == 0) {
+				item->Usages[0] = 1;
+			}
+		} else {
+			//set charge counters for non-rechargeable items if their charge is zero
+			//set charge counters for items not using charges to one
+			for (int i = 0; i < CHARGE_COUNTERS; i++) {
+				ITMExtHeader *h = itm->GetExtHeader(i);
+				if (h) {
+					if (item->Usages[i] == 0) {
+						if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
+							//HACK: the original (bg2) allows for 0 charged gems
+							if (h->Charges) {
+								item->Usages[i] = h->Charges;
+							} else {
+								item->Usages[i] = 1;
+							}
 						}
+					} else if (h->Charges == 0) {
+						item->Usages[i] = 1;
 					}
-				} else if (h->Charges == 0) {
-					item->Usages[i] = 1;
+				} else {
+					item->Usages[i] = 0;
 				}
-			} else {
-				item->Usages[i] = 0;
 			}
 		}
 
@@ -4762,7 +4780,8 @@ void Interface::SanitizeItem(CREItem *item) const
 			item->Flags |= IE_INV_ITEM_UNDROPPABLE;
 		}
 
-		if (item->Flags & IE_INV_ITEM_STOLEN2) {
+		// pst has no stolen flag, but "steel" in its place
+		if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
 			item->Flags |= IE_INV_ITEM_STOLEN;
 		}
 
@@ -4770,13 +4789,6 @@ void Interface::SanitizeItem(CREItem *item) const
 		if (!itm->LoreToID) {
 			item->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
-
-		//if item is stacked mark it as so
-		if (itm->MaxStackAmount) {
-			item->Flags |= IE_INV_ITEM_STACKED;
-		}
-
-		item->MaxStackAmount = itm->MaxStackAmount;
 
 		gamedata->FreeItem(itm, item->ItemResRef, false);
 	}

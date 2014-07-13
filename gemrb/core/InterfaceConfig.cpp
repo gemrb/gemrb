@@ -145,8 +145,8 @@ if (config->Open(path) \
 
 		ATTEMPT_INIT;
 
-#ifdef SYSCONFDIR
-		PathJoinExt( path, SYSCONFDIR, name, "cfg" );
+#ifdef SYSCONF_DIR
+		PathJoinExt( path, SYSCONF_DIR, name, "cfg" );
 		ATTEMPT_INIT
 #endif
 
@@ -156,8 +156,8 @@ if (config->Open(path) \
 
 			ATTEMPT_INIT;
 
-#ifdef SYSCONFDIR
-			PathJoinExt( path, SYSCONFDIR, PACKAGE, "cfg" );
+#ifdef SYSCONF_DIR
+			PathJoinExt( path, SYSCONF_DIR, PACKAGE, "cfg" );
 			ATTEMPT_INIT;
 #endif
 		}

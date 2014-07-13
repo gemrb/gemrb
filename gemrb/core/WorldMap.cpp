@@ -88,7 +88,7 @@ void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
 	MapIcon->SetPalette(palette);
 }
 
-Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
+Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
 {
 	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;
@@ -103,9 +103,14 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 			case WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED: frame = 1; break;
 			case 0: frame = 2; break;
 		}
+
+		// iwd1, bg1 and pst all have this format
 		if (bam->GetCycleSize(IconSeq)<5) {
 			SingleFrame = true;
-			color = gradients[frame];
+			// ... but only bg1 needs recoloring
+			if (overridePalette) {
+				color = gradients[frame];
+			}
 			frame = 0;
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);

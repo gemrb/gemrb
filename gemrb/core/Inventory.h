@@ -85,7 +85,7 @@ typedef enum ieInventoryType {
 typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
-	IE_INV_ITEM_STOLEN = 4,
+	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
 	//in iwd/iwd2 this flag means 'magical', some hack is needed
 	IE_INV_ITEM_UNDROPPABLE =8,
 	//just recently acquired

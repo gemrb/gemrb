@@ -76,7 +76,7 @@ def OnLoad ():
 	Games=GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4)
 	GemRB.SetVar ("TopIndex",TopIndex)
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
 	ScrollBarPress ()
 	LoadWindow.SetVisible (WINDOW_VISIBLE)
 	return

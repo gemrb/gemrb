@@ -22,10 +22,21 @@ import GameCheck
 
 def CreateScrollBar(func):
 	def wrapper(win, control, *args):
-		# modArgs = BAM Cycle + up, upPr, down, downPr, trough, slider
+		if len(args) < 6:
+			# append the BAM resref
+			if GameCheck.IsBG2():
+				args += ('GUISCRCW',)
+			elif GameCheck.IsPST():
+				args += ('CGSCRL1',)
+			else:
+				# this resource is in almost all games
+				# but is not the main scrollbar except in BG1
+				# probably we dont care about creating scrollbars elsewhere
+				args += ('GUIWSBR',)
+
 		if GameCheck.IsBG2():
-			modArgs = args + (0,0,1,2,3,5,4)
+			args += (0,0,1,2,3,5,4)
 		else:
-			modArgs = args + tuple([0] + range(6))
-		return func(win, control, *modArgs)
+			args += tuple([0] + range(6))
+		return func(win, control, *args)
 	return wrapper

@@ -89,11 +89,16 @@ void ScrollBar::SetPos(ieDword NewPos)
 	if (Pos && ( Pos == NewPos )) {
 		return;
 	}
-	
-	MarkDirty();
+
 	Pos = (ieWord) NewPos;
 	if (ta) {
+		MarkDirty(); // if the FIXME below is ever fixed move this up.
 		(( TextArea* )ta)->SetRow( Pos );
+	} else {
+		// FIXME: hack (I think), this is needed because scrolling the loot windows
+		// will cause the bottom window to draw over the sidebar windows.
+		// possibly some other windows cause problems too.
+		core->RedrawAll();
 	}
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Pos );
@@ -105,28 +110,32 @@ void ScrollBar::SetPos(ieDword NewPos)
 /** Provides per-pixel scrolling. Top = 0px */
 void ScrollBar::SetPosForY(short y)
 {
-	if (Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
+	if (y && stepPx && Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
 		// clamp the value
 		if (y < 0) y = 0;
 		else if ((ieWord)y > SliderRange) y = SliderRange;
 
-		if (stepPx) {
-			unsigned short NewPos = (unsigned short)(y / stepPx);
-			if (Pos != NewPos) {
-				SetPos(NewPos);
-			}
-			if (ta) {
-				// we must "scale" the pixels the slider moves
-				TextArea* t = (TextArea*) ta;
-				unsigned int taY = y * (t->GetRowHeight() / stepPx);
-				t->ScrollToY(taY, this);
-			}
+		unsigned short NewPos = (unsigned short)(y / stepPx);
+		if (Pos != NewPos) {
+			SetPos(NewPos);
+		} else {
+			MarkDirty();
+		}
+
+		if (ta) {
+			// we must "scale" the pixels the slider moves
+			TextArea* t = (TextArea*) ta;
+			unsigned int taY = y * (t->GetRowHeight() / stepPx);
+			t->ScrollToY(taY, this);
 			SliderYPos = y;
-			core->RedrawAll();
+		} else {
+			// other controls don't support per-pixel scrolling
+			SliderYPos = Pos * stepPx;
 		}
 	} else {
 		// top is our default position
 		SliderYPos = 0;
+		SetPos(0);
 	}
 }
 

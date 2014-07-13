@@ -27,7 +27,7 @@
 dnl Initialize autoconf and automake
 
 AC_PREREQ([2.57])
-AC_INIT(gemrb, 0.8.0-git)
+AC_INIT(gemrb, 0.8.1-git)
 
 AC_MSG_WARN([
 
@@ -62,7 +62,7 @@ if test "x$docdir" = "x" ; then
   docdir=$datadir/doc
 fi
 
-AC_ARG_ENABLE(subdirs, AS_HELP_STRING(--disable-subdirs,Install plugins and data directly to LIBDIR and DATADIR), gemrb_use_subdirs=$enableval, gemrb_use_subdirs=yes)
+AC_ARG_ENABLE(subdirs, AS_HELP_STRING(--disable-subdirs,Install plugins and data directly to LIBDIR and DATA_DIR), gemrb_use_subdirs=$enableval, gemrb_use_subdirs=yes)
 if test "x$gemrb_use_subdirs" = "xno" ; then
   plugindir=$libdir/plugins
   moddir=$datadir
@@ -206,7 +206,7 @@ AC_REPLACE_FNMATCH
 AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
-CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
+CPPFLAGS="$CPPFLAGS -DSYSCONF_DIR=\\\"\$(sysconfdir)\\\" -DDATA_DIR=\\\"\$(moddir)\\\" -DPLUGIN_DIR=\\\"\$(plugindir)\\\""
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/gemrb/includes -I\$(top_srcdir)/gemrb/core"
 CXXFLAGS="$CXXFLAGS -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
 

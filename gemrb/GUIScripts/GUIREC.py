@@ -85,8 +85,7 @@ def OpenRecordsWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
-	if GameCheck.IsBG2():
-		GUICommonWindows.MarkMenuButton (OptionsWindow)
+	GUICommonWindows.MarkMenuButton (OptionsWindow)
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
@@ -872,7 +871,7 @@ def OpenKitInfoWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
-	Multi = GameCheck.HasMultiClassBits (pc)
+	Multi = GUICommon.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
 
 	if Multi and Dual[0] == 0: # true multi class

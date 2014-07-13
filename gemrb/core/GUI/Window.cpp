@@ -353,7 +353,22 @@ void Window::InvalidateForControl(Control *ctrl) {
 	// TODO: for this to be general-purpose, we should mark anything inside this
 	// region with Changed, and also do mass Invalidate() if we overlap with
 	// another window, but for now this just clips the *background*, see DrawWindow()
-	clip_regions.push_back( Region(ctrl->XPos, ctrl->YPos, ctrl->Width, ctrl->Height) );
+	Region ctrlFrame = ctrl->ControlFrame();
+	std::vector<Region>::iterator it;
+	for (it = clip_regions.begin(); it != clip_regions.end(); ++it) {
+		Region& r = *it;
+		if (r.InsideRegion(ctrlFrame)) {
+			*it = ctrlFrame;
+			break;
+		} else if (ctrlFrame.InsideRegion(r)) {
+			// already have a rect larger
+			break;
+		}
+	}
+	if (it == clip_regions.end()) {
+		// made it to the end of the list, so we didnt find a match.
+		clip_regions.push_back(ctrlFrame);
+	}
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)

@@ -192,6 +192,10 @@ GA_NO_ENEMY   = 512
 GA_NO_NEUTRAL = 1024
 GA_NO_SELF    = 2048
 
+# Game features, for Interface::SetFeatures()
+# Defined in globals.h
+GF_ALL_STRINGS_TAGGED = 1
+
 # Shadow color for ShowModal()
 # !!! Keep these synchronized with Interface.h !!!
 MODAL_SHADOW_NONE = 0
@@ -253,6 +257,7 @@ IE_ITEM_UNSELLABLE   = (IE_ITEM_CRITICAL | IE_ITEM_STOLEN)
 IE_INV_ITEM_IDENTIFIED    = 0x01
 IE_INV_ITEM_UNSTEALABLE   = 0x02
 IE_INV_ITEM_STOLEN        = 0x04
+IE_INV_ITEM_STEEL         = 0x04 # pst only
 IE_INV_ITEM_UNDROPPABLE   = 0x08
 # GemRB extensions
 IE_INV_ITEM_ACQUIRED      = 0x10

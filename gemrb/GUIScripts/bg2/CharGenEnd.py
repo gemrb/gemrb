@@ -27,7 +27,6 @@ from GUIDefines import *
 from ie_slots import *
 from ie_stats import *
 from ie_spells import *
-from ie_restype import RES_2DA
 
 def OnLoad():
 	# Lay on hands, turn undead and backstab multiplier get set by the core
@@ -65,21 +64,7 @@ def OnLoad():
 		Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
 
 	# apply class/kit abilities
-	KitIndex = GUICommon.GetKitIndex (MyChar)
-	if IsMulti[0]>1:
-		#get the class abilites for each class
-		for i in range (IsMulti[0]):
-			TmpClassName = GUICommon.GetClassRowName (IsMulti[i+1], "class")
-			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
-			if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
-				GUICommon.AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
-	else:
-		if KitIndex:
-			ABTable = CommonTables.KitList.GetValue (str(KitIndex), "ABILITIES")
-		else:
-			ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
-		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
-			GUICommon.AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
+	GUICommon.ResolveClassAbilities (MyChar, ClassName)
 
 	# apply starting (alignment dictated) abilities
 	# pc, table, new level, level diff, alignment

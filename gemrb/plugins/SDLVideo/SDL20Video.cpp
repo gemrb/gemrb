@@ -193,6 +193,7 @@ void SDL20VideoDriver::DestroyMovieScreen()
 	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 	// destroy any events that took place during the movies
 	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+	SDL_RenderClear(renderer); // I guess the videos can potentially be a larger size then the game.
 }
 
 void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -202,8 +203,8 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 {
 	assert( bufw == w && bufh == h );
 
-	SDL_Rect srcRect = {sx, sy, w, h};
-	SDL_Rect destRect = {dstx, dsty, w, h};
+	SDL_Rect srcRect = {(int)sx, (int)sy, (int)w, (int)h};
+	SDL_Rect destRect = {(int)dstx, (int)dsty, (int)w, (int)h};
 
 	Uint32 *dst;
 	unsigned int row, col;
@@ -328,31 +329,37 @@ int SDL20VideoDriver::SwapBuffers(void)
 {
 	int ret = SDLVideoDriver::SwapBuffers();
 
-	void *pixels;
-	int pitch;
-	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-		Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
-		return GEM_ERROR;
-	}
+	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
+	/*
+	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
+	 Don't know how universal it is yet so leaving this in commented out just in case
 
-	ieByte* src = (ieByte*)backBuf->pixels;
-	ieByte* dest = (ieByte*)pixels;
-	for( int row = 0; row < height; row++ ) {
-		memcpy(dest, src, width * backBuf->format->BytesPerPixel);
-		dest += pitch;
-		src += backBuf->pitch;
-	}
+	 void *pixels;
+	 int pitch;
+	 if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
+	 Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
+	 return GEM_ERROR;
+	 }
 
-/*
-	if (fadeColor.a) {
-		SDL_Rect dst = {
-			xCorr, yCorr, Viewport.w, Viewport.h
-		};
-		SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
-		SDL_RenderFillRect(renderer, &dst);
-	}
-*/
-	SDL_UnlockTexture(screenTexture);
+	 ieByte* src = (ieByte*)backBuf->pixels;
+	 ieByte* dest = (ieByte*)pixels;
+	 for( int row = 0; row < height; row++ ) {
+	 memcpy(dest, src, width * backBuf->format->BytesPerPixel);
+	 dest += pitch;
+	 src += backBuf->pitch;
+	 }
+	 SDL_UnlockTexture(screenTexture);
+	 */
+
+	/*
+	 if (fadeColor.a) {
+	 SDL_Rect dst = {
+	 xCorr, yCorr, Viewport.w, Viewport.h
+	 };
+	 SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
+	 SDL_RenderFillRect(renderer, &dst);
+	 }
+	 */
 	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
 	return ret;
@@ -714,6 +721,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				break;
 			}
 		case SDL_KEYDOWN:
+		case SDL_KEYUP:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
 				if (key > 32 && key < 127) {
@@ -822,8 +830,10 @@ float SDL20VideoDriver::ScaleCoordinateVertical(float y)
 	return y * height;
 }
 
+#ifndef USE_OPENGL
 #include "plugindef.h"
 
-GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
+GEMRB_PLUGIN(0xDBAAB51, "SDL2 Video Driver")
 PLUGIN_DRIVER(SDL20VideoDriver, "sdl")
 END_PLUGIN()
+#endif

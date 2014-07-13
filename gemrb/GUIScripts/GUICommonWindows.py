@@ -258,24 +258,26 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
-	if bg1 or iwd1 or bg2:
-		MarkMenuButton (Window)
+	MarkMenuButton (Window)
 
 	if PortraitWindow:
 		UpdatePortraitWindow ()
 	return
 
-def MarkMenuButton (WindowIndex):
-	Pressed = WindowIndex.GetControl( GemRB.GetVar ("SelectedWindow") )
+def MarkMenuButton (MenuWindow):
+	if GameCheck.IsIWD2() or GameCheck.IsPST():
+		return
+
+	Pressed = MenuWindow.GetControl( GemRB.GetVar ("SelectedWindow") )
 
 	for button in range (9):
-		Button = WindowIndex.GetControl (button)
+		Button = MenuWindow.GetControl (button)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	if Pressed:
 		Button = Pressed
 	else: # highlight return to game
-		Button = WindowIndex.GetControl (0)
+		Button = MenuWindow.GetControl (0)
 
 	# NOTE: Alternatively, comment out this block or add a feature check, so that
 	#   clicking button the second time closes a window again, which might be preferred

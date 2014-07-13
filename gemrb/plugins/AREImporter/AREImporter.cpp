@@ -1031,13 +1031,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->HomeLocation.x = XDes;
 			ab->HomeLocation.y = YDes;
 			ab->Spawned = Spawned;
+			ab->appearance = Schedule;
 			//copying the scripting name into the actor
 			//if the CreatureAreaFlag was set to 8
 			if ((Flags&AF_NAME_OVERRIDE) || (core->HasFeature(GF_IWD2_SCRIPTNAME)) ) {
 				ab->SetScriptName(DefaultName);
 			}
 			//IWD2 specific hacks
-			if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+			if (core->HasFeature(GF_3ED_RULES)) {
 				//This flag is used for something else in IWD2
 				if (Flags&AF_NAME_OVERRIDE) {
 					ab->BaseStats[IE_EA]=EA_EVILCUTOFF;
@@ -1053,12 +1054,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					// 1 - area difficulty 1
 					// 2 - area difficulty 2
 					// 4 - area difficulty 3
-					if (!DifficultyMargin || (DifficultyMargin & map->AreaDifficulty)) {
-						//TODO: save AF_ENABLED instead, so if someone implements Imprisonment for iwd2, this won't interfere
-						ab->SetBase(IE_AVATARREMOVAL, 0);
-					} else {
+					if (DifficultyMargin && !(DifficultyMargin & map->AreaDifficulty)) {
 						// iwd2 has GF_START_ACTIVE off, but that only touches IF_IDLE
-						ab->SetBase(IE_AVATARREMOVAL, 1);
+						ab->appearance = 0;
 					}
 				}
 			}
@@ -1073,7 +1071,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				}
 			}
 			ab->SetOrientation( Orientation,0 );
-			ab->appearance = Schedule;
 			ab->TalkCount = TalkCount;
 			// TODO: remove corpse at removal time?
 			ab->RemovalTime = RemovalTime;

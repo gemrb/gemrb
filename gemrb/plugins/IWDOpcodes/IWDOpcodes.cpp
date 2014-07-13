@@ -553,10 +553,21 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 	case STI_CIRCLESIZE:
 		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
 	case STI_EVASION:
-		if (target->GetThiefLevel() < 7 ) {
-			return 0;
+		if (enhanced_effects) {
+			// NOTE: no idea if this is used in iwd2 too
+			// FIXME: check for evasion itself
+			if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
+				return 0;
+			}
+			// FIXME: if it is used, make sure to pass correct values here (pulled from the effect)
+			val = target->GetSavingThrow(4, 0); // reflex
+		} else {
+			if (target->GetThiefLevel() < 7 ) {
+				return 0;
+			}
+			val = target->GetSavingThrow(1,0); //breath
 		}
-		val = target->GetSavingThrow(1,0); //breath
+
 		if (val) {
 			return 1;
 		}
@@ -1195,7 +1206,13 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 		damage *= 2;
 	}
 	//check saving throw
-	bool st = target->GetSavingThrow(0,0); //spell
+	bool st;
+	if (enhanced_effects) {
+		st = target->GetSavingThrow(2, 0, fx->SpellLevel, fx->SavingThrowBonus); // fortitude
+	} else {
+		st = target->GetSavingThrow(0,0); //spell
+	}
+
 	if (st) {
 		target->Damage(damage/2, DAMAGE_FIRE, Owner, fx->IsVariable, fx->SavingThrowType);
 		return FX_NOT_APPLIED;
@@ -2659,7 +2676,9 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
 		fx->Parameter3 = 0;
-		if (target->GetSavingThrow(IE_SAVEWILL, 0)) return FX_NOT_APPLIED;
+		if (target->GetSavingThrow(IE_SAVEWILL, 0, fx->SpellLevel, fx->SavingThrowBonus)) {
+			return FX_NOT_APPLIED;
+		}
 	}
 	if(0) print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
@@ -2776,30 +2795,28 @@ int fx_bleeding_wounds (Scriptable* Owner, Actor* target, Effect* fx)
 	if(0) print("fx_bleeding_wounds(%2d): Damage: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//also this effect is executed every update
-	ieDword damage;
-	int tmp = fx->Parameter1;
+	ieDword damage = fx->Parameter1;
+	int tmp;
 
+	// a bit different than the poison opcodes
 	switch(fx->Parameter2) {
-	case RPD_PERCENT:
-		damage = STAT_GET(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
-		break;
-	case RPD_ROUNDS:
-		tmp *= 6;
+	case 0: // Parameter1 per round
+		tmp = core->Time.round_sec;
 		goto seconds;
-	case RPD_TURNS:
-		tmp *= 30;
-	case RPD_SECONDS:
-seconds:
+	case 1: // Parameter1 per second
+		tmp = 1;
+		goto seconds;
+	case 2: // 1 hitpoint each Parameter1 seconds
+		tmp = fx->Parameter1;
 		damage = 1;
+seconds:
+		tmp *= AI_UPDATE_TIME;
 		if (tmp && (core->GetGame()->GameTime%tmp)) {
 			return FX_APPLIED;
 		}
 		break;
-	case RPD_POINTS:
-		damage = fx->Parameter1;
-		break;
 	default:
-		damage = 1;
+		Log(GemRB::ERROR, "IWDOpcodes", "Unknown type in fx_bleeding_wounds: %d!", fx->Parameter2);
 		break;
 	}
 	//percent
