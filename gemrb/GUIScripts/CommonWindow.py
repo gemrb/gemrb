@@ -95,7 +95,8 @@ def UpdateContainerWindow ():
 def RedrawContainerWindow ():
 	Window = ContainerWindow
 
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex") * 3
+	# scroll in multiples of the number of columns
+	LeftTopIndex = GemRB.GetVar ("LeftTopIndex") * leftdiv
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex") * 2
 	RightIndex = GemRB.GetVar ("RightIndex")

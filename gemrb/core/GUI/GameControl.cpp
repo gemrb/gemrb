@@ -41,6 +41,7 @@
 #include "GUI/EventMgr.h"
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -804,7 +805,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					if (target) {
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
-						if (src->LastTarget) {
+						if (src->LastSpellTarget) {
 							src->CastSpellEnd(0, 0);
 						} else {
 							src->CastSpellPointEnd(0, 0);
@@ -837,7 +838,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					Actor *target;
 					int i = game->GetPartySize(true);
 					if(i<2) break;
-					i=rand()%i;
+					i=RAND(0, i-1);
 					do
 					{
 						target = game->GetPC(i, true);
@@ -970,7 +971,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->GetDictionary()->DebugDump();
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
-				area->ExploreMapChunk( p, rand()%30, 1 );
+				area->ExploreMapChunk( p, RAND(0,29), 1 );
 				break;
 			case 'w': // consolidates found ground piles under the pointed pc
 				area->MoveVisibleGroundPiles(p);

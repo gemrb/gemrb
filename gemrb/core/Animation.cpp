@@ -27,6 +27,7 @@
 #include "Map.h"
 #include "Sprite2D.h"
 #include "Video.h"
+#include "RNG/RNG_SFMT.h"
 
 namespace GemRB {
 
@@ -35,7 +36,7 @@ Animation::Animation(int count)
 	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));
 	indicesCount = count;
 	if (count) {
-		pos = rand() % count;
+		pos = RAND(0, count-1);
 	}
 	else {
 		pos = 0;

@@ -44,6 +44,7 @@
 #include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -276,7 +277,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	return ret;
 }
 
-bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
+static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -415,7 +416,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 }
 
 //finds and takes an item from a container in the given inventory
-bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
+static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
 {
 	int i=inventory->GetSlotCount();
 	while (i--) {
@@ -868,7 +869,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 	Sender->AddActionInFront( action );
 }
 
-void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
+static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 {
 	switch (scr->Type) {
 		case ST_AREA: case ST_GLOBAL:
@@ -2477,7 +2478,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		}
 	} else {
 		for(i=0;i<picks;i++) {
-			selects[i]=rand()%count;
+			selects[i]=RAND(0, count-1);
 retry:
 			for(j=0;j<i;j++) {
 				if(selects[i]==selects[j]) {
@@ -2567,43 +2568,25 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	return polygons[index];
 }
 
-inline static bool InterruptSpellcasting(Scriptable* Sender) {
+static bool InterruptSpellcasting(Scriptable* Sender) {
 	if (Sender->Type != ST_ACTOR) return false;
 	Actor *caster = (Actor *) Sender;
 
 	// ouch, we got hit
 	if (Sender->InterruptCasting) {
-		int roll = 0;
-
-		// iwd2 does an extra concentration check first:
-		// d20 + Concentration Skill Level + Constitution bonus (+4 Combat casting feat) >= 15 + spell level
-		if (core->HasFeature(GF_3ED_RULES)) {
-			roll = core->Roll(1, 20, 0); // TODO: check if the original does a lucky roll
-			roll += caster->GetStat(IE_CONCENTRATION);
-			roll += caster->GetAbilityBonus(IE_CON);
-			if (caster->HasFeat(FEAT_COMBAT_CASTING)) {
-				roll += 4;
-			}
-			Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
-			if (!spl) return false;
-			roll -= spl->SpellLevel;
-			gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+		if (caster->InParty) {
+			displaymsg->DisplayConstantString(STR_SPELLDISRUPT, DMC_WHITE, Sender);
+		} else {
+			displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
 		}
-		if (roll < 15) {
-			if (caster->InParty) {
-				displaymsg->DisplayConstantString(STR_SPELLDISRUPT, DMC_WHITE, Sender);
-			} else {
-				displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
-			}
-			DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
-			return true;
-		}
+		DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
+		return true;
 	}
 
 	// abort casting on invisible or dead targets
 	// not all spells should be interrupted on death - some for chunking, some for raising the dead
-	if (Sender->LastTarget) {
-		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastTarget);
+	if (Sender->LastSpellTarget) {
+		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
 		if (target) {
 			ieDword state = target->GetStat(IE_STATE_ID);
 			if (state & STATE_DEAD) {
@@ -2726,7 +2709,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	if (Sender->LastTarget) {
+	if (Sender->LastSpellTarget) {
 		//if target was set, fire spell
 		Sender->CastSpellEnd(level, flags&SC_INSTANT);
 	} else if(!Sender->LastTargetPos.isempty()) {

@@ -30,6 +30,7 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Palette.h"
+#include "RNG/RNG_SFMT.h"
 
 namespace GemRB {
 
@@ -475,11 +476,9 @@ Palette* CharAnimations::GetPartPalette(int part)
 	return palette[type];
 }
 
-static int compare_avatars(const void *a, const void *b)
+static inline int compare_avatars(const void *a, const void *b)
 {
-	unsigned int aa = ((AvatarStruct *)a)->AnimID;
-	unsigned int bb = ((AvatarStruct *)b)->AnimID;
-	return (int) (aa-bb);
+	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
 }
 
 void CharAnimations::InitAvatarsTable()
@@ -1406,7 +1405,7 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 			Prefix="wlk"; break;
 		case IE_ANI_HEAD_TURN:
 			Cycle=SixteenToFive[Orient];
-			if (rand()&1) {
+			if (RAND(0,1)) {
 				Prefix="sf2";
 				sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
 				if (gamedata->Exists(ResRef, IE_BAM_CLASS_ID) ) {
@@ -1792,7 +1791,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_HEAD_TURN:
-			if (rand()&1) {
+			if (RAND(0,1)) {
 				strcat( ResRef, "g12" );
 				Cycle += 18;
 			} else {

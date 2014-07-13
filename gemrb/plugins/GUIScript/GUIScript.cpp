@@ -162,7 +162,7 @@ inline PyObject* PyString_FromAnimID(const char* AnimID)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'.
  */
-inline PyObject* RuntimeError(const char* msg)
+static PyObject* RuntimeError(const char* msg)
 {
 	Log(ERROR, "GUIScript", "Runtime Error:");
 	PyErr_SetString( PyExc_RuntimeError, msg );
@@ -177,7 +177,7 @@ inline PyObject* RuntimeError(const char* msg)
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-inline PyObject* AttributeError(const char* doc_string)
+static PyObject* AttributeError(const char* doc_string)
 {
 	Log(ERROR, "GUIScript", "Syntax Error:");
 	PyErr_SetString(PyExc_AttributeError, doc_string);
@@ -216,7 +216,7 @@ inline PyObject* AttributeError(const char* doc_string)
 		return RuntimeError( "Actor not found!\n" ); \
 	}
 
-inline Control *GetControl( int wi, int ci, int ct)
+static Control *GetControl( int wi, int ci, int ct)
 {
 	char errorbuffer[256];
 
@@ -1607,7 +1607,7 @@ PyDoc_STRVAR( GemRB_SetMasterScript__doc,
 "SetMasterScript(ScriptResRef, WMPResRef)\n\n"
 "Sets the worldmap and masterscript names." );
 
-PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 {
 	char* script;
 	char* worldmap1;
@@ -5542,7 +5542,7 @@ PyDoc_STRVAR( GemRB_Button_SetSpellIcon__doc,
 "SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type, tooltip, function])\n\n"
 "Sets Spell icon image on a button. Type is the icon's type." );
 
-PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int tooltip, int Function)
+static PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int tooltip, int Function)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -5651,7 +5651,7 @@ PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
 "Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon,\n"
 " 4/5 - Weapon icons, 6 and above - Extended header icons." );
 
-PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
+static PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -7485,7 +7485,7 @@ not_a_scroll:
 	return dict;
 }
 
-void DragItem(CREItem *si)
+static void DragItem(CREItem *si)
 {
 	if (!si) {
 		return;
@@ -7498,7 +7498,7 @@ void DragItem(CREItem *si)
 	gamedata->FreeItem( item, si->ItemResRef, false );
 }
 
-int CheckRemoveItem(Actor *actor, CREItem *si, int action)
+static int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 {
 	///check if item is undroppable because the actor likes it
 	if (UsedItemsCount==-1) {
@@ -7550,7 +7550,7 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 
 // TNO has an ear and an eye slot that share the same slot type, so normal checks fail
 // return false if we're trying to stick an earing into our eye socket or vice versa
-bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
+static bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	if (UsedItemsCount==-1) {
 		ReadUsedItems();
 	}
@@ -7574,7 +7574,7 @@ bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	return true;
 }
 
-CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
+static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 {
 	//we should use getslotitem, because
 	//getitem would remove the item from the inventory!
@@ -9093,7 +9093,7 @@ jump_label2:
 				SetSpellIcon(wi, ci, *poi, 1, 1, i+1);
 				int mem = actor->spellbook.GetMemorizedSpellsCount(*poi, -1, true);
 				if (!mem) {
-					state = IE_GUI_BUTTON_DISABLED;
+					state = IE_GUI_BUTTON_FAKEDISABLED;
 				}
 				SetItemText(wi, ci, mem, true);
 			}
@@ -9187,7 +9187,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty()) {
+	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -11049,7 +11049,7 @@ GUIScript::~GUIScript(void)
  * Quote path for use in python strings.
  * On windows also convert backslashes to forward slashes.
  */
-char* QuotePath(char* tgt, const char* src)
+static char* QuotePath(char* tgt, const char* src)
 {
 	char *p = tgt;
 	char c;

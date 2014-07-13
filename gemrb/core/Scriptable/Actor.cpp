@@ -51,6 +51,7 @@
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
+#include "RNG/RNG_SFMT.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -355,6 +356,7 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 //used by iwd2
 static ieResRef resref_cripstr={"cripstr"};
 static ieResRef resref_dirty={"dirty"};
+static ieResRef resref_arterial={"artstr"};
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
@@ -380,7 +382,7 @@ static avType *avPrefix;
 static int avCount = -1;
 
 /* counts the on bits in a number */
-ieDword bitcount (ieDword n)
+static ieDword bitcount (ieDword n)
 {
 	ieDword count=0;
 	while (n) {
@@ -609,6 +611,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
 	Palette *recover = NULL;
+	ieResRef paletteResRef;
 
 	if (anims) {
 		if (anims->lockPalette) {
@@ -616,7 +619,12 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
-			recover->acquire();
+			CopyResRef(paletteResRef, anims->PaletteResRef[PAL_MAIN]);
+			if (recover->named) {
+				recover = gamedata->GetPalette(paletteResRef);
+			} else {
+				recover->acquire();
+			}
 		}
 		delete( anims );
 	}
@@ -645,6 +653,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims->palette[PAL_MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
+		CopyResRef(anims->PaletteResRef[PAL_MAIN], paletteResRef);
 	}
 	//bird animations are not hindered by searchmap
 	//only animtype==7 (bird) uses this feature
@@ -902,7 +911,7 @@ void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 
 //call this when morale or moralebreak changed
 //cannot use old or new value, because it is called two ways
-void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
 		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
@@ -918,13 +927,13 @@ void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	actor->SetCircleSize();
 }
 
-void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//needs for new color
 	actor->SetCircleSize();
 }
 
-void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	if (actor->Selected && (newValue>EA_GOODCUTOFF) ) {
 		core->GetGame()->SelectActor(actor, false, SELECT_NORMAL);
@@ -933,7 +942,7 @@ void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 }
 
 //this is a good place to recalculate level up stuff
-void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword sum =
 		actor->GetFighterLevel()+
@@ -955,7 +964,7 @@ void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 	actor->GotLUFeedback = false;
 }
 
-void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
@@ -973,7 +982,7 @@ void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	actor->spellbook.SetBookType(sorcerer);
 }
 
-void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	actor->SetAnimationID(newValue);
 }
@@ -982,7 +991,7 @@ static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GR
 
 static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
 
-void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
+static void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 {
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 	if (State & STATE_PETRIFIED) {
@@ -1000,7 +1009,7 @@ void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 
 //changes based on extended state bits, right now it is only the seven eyes
 //animation (used in how/iwd2)
-void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
+static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 {
 	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
 		ieDword mask = EXTSTATE_EYE_MIND;
@@ -1021,7 +1030,7 @@ void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 	}
 }
 
-void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
@@ -1040,7 +1049,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
-void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp<(signed) actor->BaseStats[IE_HITPOINTS]) {
 		actor->BaseStats[IE_HITPOINTS]=hp;
@@ -1049,7 +1058,7 @@ void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	}
 }
 
-void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp>(signed) actor->BaseStats[IE_HITPOINTS]) {
 		actor->BaseStats[IE_HITPOINTS]=hp;
@@ -1058,7 +1067,7 @@ void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	}
 }
 
-void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
+static void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 {
 	if ((signed) newValue<=0) {
 		if (DeathOnZeroStat) {
@@ -1069,17 +1078,17 @@ void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 	}
 }
 
-void pcf_stat_str(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_stat_str(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_STR);
 }
 
-void pcf_stat_int(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_stat_int(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_INT);
 }
 
-void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_WIS);
 	if (third) {
@@ -1088,7 +1097,7 @@ void pcf_stat_wis(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_DEX);
 	if (third) {
@@ -1097,7 +1106,7 @@ void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CON);
 	pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
@@ -1107,12 +1116,12 @@ void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CHR);
 }
 
-void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	// check if we reached a new level
 	unsigned int pc = actor->InParty;
@@ -1129,7 +1138,7 @@ void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
-void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//this function will make a party member automatically donate their
 	//gold to the party pool, not the same as in the original engine
@@ -1163,7 +1172,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 }
 
 //de/activates the entangle overlay
-void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_ENTANGLE);
@@ -1177,7 +1186,7 @@ void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 //unlike IE, gemrb uses this stat for other overlay fields
 //see the complete list in overlay.2da
 //it loosely follows the internal representation of overlays in IWD2
-void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
 	ieDword mask = 1;
@@ -1194,7 +1203,7 @@ void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the prot from missiles overlay
-void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_SHIELDGLOBE);
@@ -1206,7 +1215,7 @@ void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the globe of invul. overlay
-void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_MINORGLOBE);
@@ -1218,7 +1227,7 @@ void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the grease background
-void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_GREASE);
@@ -1231,7 +1240,7 @@ void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 
 //de/activates the web overlay
 //the web effect also immobilizes the actor!
-void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
 		handle_overlay(actor, OV_WEB);
@@ -1243,7 +1252,7 @@ void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //de/activates the spell bounce background
-void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
+static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue) {
 		handle_overlay(actor, OV_BOUNCE);
@@ -1256,7 +1265,7 @@ void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //spell casting or other buttons disabled/reenabled
-void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if (actor->IsSelected()) {
 		core->SetEventFlag( EF_ACTION );
@@ -1264,12 +1273,12 @@ void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 }
 
 //no separate values (changes are permanent)
-void pcf_intoxication(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_intoxication(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	actor->BaseStats[IE_INTOXICATION]=newValue;
 }
 
-void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
@@ -1277,7 +1286,7 @@ void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
-void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
@@ -1541,7 +1550,7 @@ void Actor::ReleaseMemory()
 #define COL_GRADIENT   2
 
 /* returns the ISCLASS for the class based on name */
-int IsClassFromName (const char* name)
+static int IsClassFromName (const char* name)
 {
 	//TODO: convert this mess to a std::map
 	// iwd2 has some different names
@@ -3367,14 +3376,14 @@ void Actor::VerbalConstant(int start, int count) const
 			ResolveStringConstant(soundref, start+count-1);
 		}
 		if (count > 0){
-			DisplayStringCore((Scriptable *const) this, start + rand()%count, DS_CONSOLE|DS_CONST|DS_SPEECH);
+			DisplayStringCore((Scriptable *const) this, start + RAND(0, count-1), DS_CONSOLE|DS_CONST|DS_SPEECH);
 		}
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
 		}
 		if(count > 0) {
-			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+rand()%count), DS_CONSOLE|DS_SPEECH);
+			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+RAND(0, count-1)), DS_CONSOLE|DS_SPEECH);
 		}
 	}
 }
@@ -3739,27 +3748,30 @@ void Actor::GetHit(int damage, int spellLevel)
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
 	}
-	if (CheckCastingInterrupt(damage, spellLevel)) {
+	if (CheckSpellDisruption(damage, spellLevel)) {
 		InterruptCasting = true;
 	}
 }
 
-// TODO: check that this isn't the same thing we have in GSUtils (that one is missing a debug string in the original)
-bool Actor::CheckCastingInterrupt(int damage, int spellLevel)
+// this has no effect in adnd
+// iwd2 however has two mechanisms: spell disruption and concentration checks:
+// - disruption is checked when a caster is damaged while casting
+// - concentration is checked when casting is taking place <= 5' from an enemy
+bool Actor::CheckSpellDisruption(int damage, int spellLevel)
 {
 	if (!third) {
 		return true;
 	}
-	// FIXME: change to SpellTarget once the split is done
-	if (!LastTarget && LastTargetPos.isempty()) {
+	if (!LastSpellTarget && LastTargetPos.isempty()) {
 		// not casting, nothing to do
 		return false;
 	}
 	int roll = core->Roll(1, 20, 0);
-	int concentration = Modified[IE_CONCENTRATION];
-	int bonus = 4; // combat casting bonus for when injured
-	if (BaseStats[IE_HITPOINTS] == Modified[IE_HITPOINTS]) {
-		bonus = 0;
+	int concentration = GetSkill(IE_CONCENTRATION);
+	int bonus = 0;
+	// combat casting bonus only applies when injured
+	if (HasFeat(FEAT_COMBAT_CASTING) && BaseStats[IE_HITPOINTS] != Modified[IE_HITPOINTS]) {
+		bonus += 4;
 	}
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
 	if (GameScript::ID_ClassMask(this, 0x6ee)) { // 0x6ee == CLASSMASK_GROUP_CASTERS
@@ -4236,7 +4248,8 @@ void Actor::dump(StringBuffer& buffer) const
 	}
 	buffer.append("\n");
 	buffer.appendFormatted("WaitCounter: %d\n", (int) GetWait());
-	buffer.appendFormatted("LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
+	buffer.appendFormatted("LastTarget: %d %s    ", LastTarget, GetActorNameByID(LastTarget));
+	buffer.appendFormatted("LastSpellTarget: %d %s\n", LastSpellTarget, GetActorNameByID(LastSpellTarget));
 	buffer.appendFormatted("LastTalked: %d %s\n", LastTalker, GetActorNameByID(LastTalker));
 	inventory.dump(buffer);
 	spellbook.dump(buffer);
@@ -4591,7 +4604,7 @@ void Actor::Resurrect()
 	//clear effects?
 }
 
-const char *GetVarName(const char *table, int value)
+static const char *GetVarName(const char *table, int value)
 {
 	int symbol = core->LoadSymbol( table );
 	if (symbol!=-1) {
@@ -7106,6 +7119,8 @@ bool Actor::ShouldHibernate() {
 		return false;
 	if (!LastTargetPos.isempty()) //currently casting at the ground
 		return false;
+	if (LastSpellTarget) //currently casting at someone
+		return false;
 	if (InternalFlags&IF_JUSTDIED) // didn't have a chance to run a script
 		return false;
 	if (CurrentAction)
@@ -7559,7 +7574,7 @@ bool Actor::HandleActorStance()
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
-	int x = rand()%1000;
+	int x = RAND(0, 999);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
@@ -8060,13 +8075,64 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical)
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
+	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
+	int multiplier = BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
+	int extraDamage = 0; // damage unaffected by the critical multiplier
+	// check 3ed sneak attack
+	if (third) {
+		// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
+		// or one of the stat overrides is set (unconfirmed for iwd2!)
+		ieDword always = Modified[IE_ALWAYSBACKSTAB];
+		bool invisible = Modified[IE_STATE_ID] & state_invisible;
+		// TODO: should probably be rate limited to once per round
+		if (invisible || always || target->Immobile() || IsBehind(target)) {
+			if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity) {
+				displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+				wi.backstabbing = false;
+			} else {
+				if (wi.backstabbing) {
+					// first check for feats that change the sneak dice
+					// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
+					if (BackstabResRef[0]!='*') {
+						if (stricmp(BackstabResRef, resref_arterial)) {
+							// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
+							multiplier -= 2;
+							extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+							displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, extraDamage);
+						} else {
+							// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
+							multiplier--;
+							extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+							displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, extraDamage);
+						}
+						core->ApplySpell(BackstabResRef, target, this, multiplier);
+						//do we need this?
+						BackstabResRef[0]='*';
+						if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
+							core->ApplySpell(resref_cripstr, target, this, multiplier);
+						}
+					}
+					if (!extraDamage) {
+						extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+						// ~Sneak Attack for %d~
+						//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
+						displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, extraDamage);
+					}
+				} else {
+					// weapon is unsuitable for sneak attack
+					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+					wi.backstabbing = false;
+				}
+			}
+		}
+	}
+
 	//ToBEx compatibility in the ALWAYSBACKSTAB field:
 	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
 	//1 Ignore invisible requirement and positioning requirement
 	//2 Ignore invisible requirement only
 	//4 Ignore positioning requirement only
-	int multiplier=BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
-	if (multiplier>1) {
+	if (multiplier > 1 && !third) {
 		ieDword always = Modified[IE_ALWAYSBACKSTAB];
 		if ((Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
 			if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
@@ -8090,7 +8156,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	}
 	damage += WeaponDamageBonus(wi);
 
-	if (target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags) ) {
+	if (weaponImmunity) {
 		//'my weapon has no effect'
 		damage = 0;
 		critical = false;
@@ -8099,16 +8165,6 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			core->Autopause(AP_UNUSABLE, this);
 		}
 		return;
-	}
-
-	//special effects on hit for arterial strike and hamstring
-	if (damage>0 && wi.backstabbing && BackstabResRef[0]!='*') {
-		core->ApplySpell(BackstabResRef, target, this, multiplier);
-		//do we need this?
-		BackstabResRef[0]='*';
-		if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-			core->ApplySpell(resref_cripstr, target, this, multiplier);
-		}
 	}
 
 	//critical protection a la PST
@@ -8140,6 +8196,8 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			}
 		}
 	}
+	// add damage that is unaffected by criticals
+	damage += extraDamage;
 }
 
 bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
@@ -8748,29 +8806,16 @@ void Actor::CreateDerivedStatsIWD2()
 	int i;
 	int turnundeadlevel = 0;
 
-	// barbarian immunity to backstab was hardcoded
-	if (GetBarbarianLevel()) {
-		BaseStats[IE_DISABLEBACKSTAB] = 1;
-	}
-
-	//this is a bit too much hardcoded, backstab ability should be a class ability (like turn undead)
-	ieDword backstabdamagemultiplier=GetThiefLevel();
-	if (backstabdamagemultiplier) {
-		backstabdamagemultiplier += GetMonkLevel();
-		backstabdamagemultiplier += GetBardLevel();
-		AutoTable tm("backstab");
-		if (tm)	{
-			ieDword cols = tm->GetColumnCount();
-			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols-1;
-			backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
-		} else {
-			backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
-		}
-		if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
+	// iwd2 does have backstab.2da but it is both unused and with bad data
+	ieDword backstabdamagemultiplier = 0;
+	int level = GetThiefLevel();
+	if (level) {
+		// +1d6 for each odd level
+		backstabdamagemultiplier = (level + 1) / 2;
 	}
 
 	int layonhandsamount = 0;
-	int level = GetPaladinLevel();
+	level = GetPaladinLevel();
 	if (level) {
 		// when this is called for the first time, Modified is not set yet
 		// FIXME: move to RefreshEffects, since it relies on a volatile stat
@@ -9692,6 +9737,58 @@ void Actor::ReleaseCurrentAction()
 {
 	disarmTrap = -1;
 	Scriptable::ReleaseCurrentAction();
+}
+
+// concentration is annoying: besides special cases, every caster should
+// check if there's an enemy nearby
+bool Actor::ConcentrationCheck() const
+{
+	if (!core->HasFeature(GF_3ED_RULES)) return true;
+
+	// anyone in a 5' radius?
+	// 9 is from the GetSpellDistance estimate
+	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*9);
+	Actor **poi = neighbours;
+	bool enemyFound = false;
+	while (*poi) {
+		Actor *neighbour = *poi;
+		if (neighbour->GetStat(IE_EA) > EA_EVILCUTOFF) {
+			enemyFound = true;
+			break;
+		}
+		poi++;
+	}
+	free(neighbours);
+	if (!enemyFound) return true;
+
+	// so there is someone out to get us and we should do the real concentration check
+	int roll = LuckyRoll(1, 20, 0);
+	// TODO: the manual replaces the con bonus with an int one (verify!)
+	int concentration = GetStat(IE_CONCENTRATION);
+	int bonus = GetAbilityBonus(IE_INT);
+	if (HasFeat(FEAT_COMBAT_CASTING)) {
+		bonus += 4;
+	}
+
+	Spell* spl = gamedata->GetSpell(SpellResRef, true);
+	if (!spl) return true;
+	int spellLevel = spl->SpellLevel;
+	gamedata->FreeSpell(spl, SpellResRef, false);
+
+	if (roll + concentration + bonus < 15 + spellLevel) {
+		if (InParty) {
+			displaymsg->DisplayRollStringName(39258, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+		} else {
+			displaymsg->DisplayRollStringName(39265, DMC_LIGHTGREY, this);
+		}
+		return false;
+	} else {
+		if (InParty) {
+			// ~Successful spell casting concentration check! Check roll %d vs. difficulty %d (%d bonus)~
+			displaymsg->DisplayRollStringName(39257, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+		}
+	}
+	return true;
 }
 
 }

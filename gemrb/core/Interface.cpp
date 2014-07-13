@@ -82,6 +82,7 @@
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
 #include "GUI/WorldMapControl.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "System/FileStream.h"
 #include "System/VFS.h"
@@ -91,8 +92,6 @@
 #include <unistd.h>
 #endif
 
-#include <cstdlib>
-#include <time.h>
 #include <vector>
 
 namespace GemRB {
@@ -1603,10 +1602,6 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 	plugin->RunInitializers();
-
-	time_t t;
-	t = time( NULL );
-	srand( ( unsigned int ) t );
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
@@ -3614,7 +3609,7 @@ int Interface::Roll(int dice, int size, int add) const
 		return add + dice * size / 2;
 	}
 	for (int i = 0; i < dice; i++) {
-		add += rand() % size + 1;
+		add += RAND(1, size);
 	}
 	return add;
 }

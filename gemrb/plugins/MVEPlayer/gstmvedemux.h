@@ -136,6 +136,10 @@ struct _GstMveDemuxStream {
   gboolean compression;*/
 };
 
+int ipvideo_decode_frame8(const GstMveDemuxStream*, const unsigned char*, short unsigned int);
+int ipvideo_decode_frame16(const GstMveDemuxStream*, const unsigned char*, short unsigned int);
+void ipaudio_uncompress(short int*, short unsigned int, const unsigned char*, unsigned char);
+
 /*GType gst_mve_demux_get_type (void);
 
 G_END_DECLS*/

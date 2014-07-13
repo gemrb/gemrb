@@ -27,7 +27,7 @@ using namespace GemRB;
 
 FT_Library library = NULL;
 
-void loadFT()
+static void loadFT()
 {
 	FT_Error error = FT_Init_FreeType( &library );
 	if ( error ) {
@@ -35,7 +35,7 @@ void loadFT()
 	}
 }
 
-void destroyFT()
+static void destroyFT()
 {
 	if (library) {
 		FT_Done_FreeType( library );

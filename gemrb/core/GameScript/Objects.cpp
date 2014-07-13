@@ -178,7 +178,7 @@ Targets *GameScript::SpellTarget(Scriptable *Sender, Targets *parameters, int ga
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSpellTarget);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}

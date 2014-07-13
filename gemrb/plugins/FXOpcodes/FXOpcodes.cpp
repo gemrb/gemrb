@@ -65,7 +65,8 @@ using namespace GemRB;
 #define PI_HOPELESS 44
 #define PI_LEVELDRAIN 53
 #define PI_FEEBLEMIND 54
-#define PI_STUN     55
+#define PI_STUN     55 //bg1+bg2
+#define PI_STUN_IWD 44 //iwd1+iwd2
 #define PI_AID      57
 #define PI_HOLY     59
 #define PI_BOUNCE   65
@@ -838,7 +839,7 @@ static void Cleanup()
 	polymorph_stats=NULL;
 }
 
-void RegisterCoreOpcodes()
+static void RegisterCoreOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 	enhanced_effects=core->HasFeature(GF_ENHANCED_EFFECTS);
@@ -885,7 +886,7 @@ static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect*
 }
 
 //resurrect code used in many places
-void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
+static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 {
 	Scriptable *caster = GetCasterObject();
 	if (!caster) {
@@ -1390,7 +1391,7 @@ int fx_cure_frozen_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define CSA_DEX 0
 #define CSA_STR 1
 #define CSA_CNT 2
-int SpellAbilityDieRoll(Actor *target, int which)
+static int SpellAbilityDieRoll(Actor *target, int which)
 {
 	if (which>=CSA_CNT) return 6;
 
@@ -1478,7 +1479,7 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11 CurrentHPModifier
-int GetSpecialHealAmount(int type, Scriptable *caster)
+static int GetSpecialHealAmount(int type, Scriptable *caster)
 {
 	if (!caster || caster->Type!=ST_ACTOR) return 0;
 	Actor *actor = (Actor *) caster;
@@ -2117,7 +2118,7 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x2D State:Stun
-int power_word_stun_iwd2(Actor *target, Effect *fx)
+static int power_word_stun_iwd2(Actor *target, Effect *fx)
 {
 	int hp = BASE_GET(IE_HITPOINTS);
 	if (hp>150) return FX_NOT_APPLIED;
@@ -2129,7 +2130,7 @@ int power_word_stun_iwd2(Actor *target, Effect *fx)
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Duration = stuntime*6*core->Time.round_size + core->GetGame()->GameTime;
 	STATE_SET( STATE_STUNNED );
-	target->AddPortraitIcon(PI_STUN);
+	target->AddPortraitIcon(PI_STUN_IWD);
 	return FX_APPLIED;
 }
 
@@ -2154,7 +2155,11 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	STATE_SET( STATE_STUNNED );
-	target->AddPortraitIcon(PI_STUN);
+	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) { // all iwds
+		target->AddPortraitIcon(PI_STUN_IWD);
+	} else {
+		target->AddPortraitIcon(PI_STUN);
+	}
 	if (fx->Parameter2==1) {
 		target->SetSpellState(SS_AWAKE);
 	}
@@ -3922,7 +3927,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x87 Polymorph
-void CopyPolymorphStats(Actor *source, Actor *target)
+static void CopyPolymorphStats(Actor *source, Actor *target)
 {
 	int i;
 
@@ -4649,6 +4654,10 @@ int fx_cure_intoxication (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 {
 	if(0) print("fx_pause_target(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// the parameters are not set (bg2), so we can't use STAT_MOD alone
+	if (!fx->Parameter1) {
+		fx->Parameter1 = 1;
+	}
 	STAT_MOD( IE_CASTERHOLD );
 	return FX_PERMANENT;
 }
@@ -5020,7 +5029,7 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define FAMILIAR_RESOURCE  2
 
 //returns the familiar if there was no error
-Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resource)
+static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resource)
 {
 	//summon familiar
 	Actor *fam = gamedata->GetCreature(resource);
@@ -7268,14 +7277,15 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+// commented out due to g++ -Wall: 'int fx_immunity_sequester(GemRB::Scriptable*, GemRB::Actor*, GemRB::Effect*)' defined but not used [-Werror=unused-function]
 //0x138 //see fx_crash, this effect is not fully enabled in original bg2/tob
-int fx_immunity_sequester (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	if(0) print("fx_immunity_sequester(%2d): Mod: %d", fx->Opcode, fx->Parameter2);
-	//this effect is supposed to provide immunity against sequester (maze/etc?)
-	STAT_SET(IE_NOSEQUESTER, fx->Parameter2);
-	return FX_APPLIED;
-}
+// static int fx_immunity_sequester (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+// {
+// 	if(0) print("fx_immunity_sequester(%2d): Mod: %d", fx->Opcode, fx->Parameter2);
+// 	//this effect is supposed to provide immunity against sequester (maze/etc?)
+// 	STAT_SET(IE_NOSEQUESTER, fx->Parameter2);
+// 	return FX_APPLIED;
+// }
 
 //0x139 //HLA generic effect
 //0x13a StoneSkin2Modifier

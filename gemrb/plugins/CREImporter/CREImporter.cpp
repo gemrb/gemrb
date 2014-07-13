@@ -243,7 +243,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 }
 
 //int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
-int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
+static int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 {
 	int i;
 

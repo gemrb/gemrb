@@ -44,6 +44,7 @@
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
+#include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -988,7 +989,7 @@ void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 		if (width<2) {
 			width = parameters->int0Parameter;
 		} else {
-			width = rand() % width + parameters->int0Parameter;
+			width = RAND(0, width-1) + parameters->int0Parameter;
 		}
 		Sender->CurrentActionState = width * AI_UPDATE_TIME;
 	} else {
@@ -1041,7 +1042,7 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 		if (random<1) {
 			random = 1;
 		}
-		Sender->CurrentActionState = rand() % random + parameters->int0Parameter;
+		Sender->CurrentActionState = RAND(0, random-1) + parameters->int0Parameter;
 	} else {
 		Sender->CurrentActionState--;
 	}
@@ -1679,7 +1680,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
-	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
+	DisplayStringCore(target, rndstr->at(RAND(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
@@ -1696,7 +1697,7 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
-	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
+	DisplayStringCore(target, rndstr->at(RAND(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
@@ -2102,6 +2103,7 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 		actor->LastTarget = 0;
 		return;
 	}
+	actor->LastSpellTarget = 0;
 	actor->LastTarget = tar->GetGlobalID();
 }
 
@@ -5394,7 +5396,7 @@ void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	int x = rand()&31;
+	int x = RAND(0,31);
 	if (x<10) {
 		actor->SetOrientation(actor->GetOrientation()-1, false);
 	} else if (x>20) {
@@ -5645,7 +5647,7 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetOrientation(rand() % MAX_ORIENT, true);
+	actor->SetOrientation(RAND(0, MAX_ORIENT-1), true);
 	actor->SetWait( 1 );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -6827,7 +6829,7 @@ void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/
 	core->FogOfWar&=~FOG_DRAWFOG;
 }
 
-void DeleteAllSpriteCovers()
+static void DeleteAllSpriteCovers()
 {
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);

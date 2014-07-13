@@ -42,7 +42,7 @@ KeyMap::KeyMap()
 	keymap.SetType(GEM_VARIABLES_POINTER);
 }
 
-void ReleaseFunction(void *fun)
+static void ReleaseFunction(void *fun)
 {
 	delete (Function *) fun;
 }

@@ -425,7 +425,7 @@ static void Cleanup()
 	}
 }
 
-void RegisterIWDOpcodes()
+static void RegisterIWDOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
@@ -1945,9 +1945,9 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->LastTarget) {
 		//depends on whom it considers enemy
 		if (STAT_GET(IE_EA)<EA_EVILCUTOFF) {
-			Enemy->objectParameter->objectFilters[0]=EA_ENEMY;
+			Enemy->objectParameter->objectFields[0] = EA_ENEMY;
 		} else {
-			Enemy->objectParameter->objectFilters[0]=EA_ALLY;
+			Enemy->objectParameter->objectFields[0] = EA_ALLY;
 		}
 		//see the nearest enemy
 		if (SeeCore(target, Enemy, false)) {
@@ -3443,7 +3443,7 @@ int fx_alicorn_lance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //449 CallLightning
-Actor *GetRandomEnemySeen(Map *map, Actor *origin)
+static Actor *GetRandomEnemySeen(Map *map, Actor *origin)
 {
 	int type = GetGroup(origin);
 

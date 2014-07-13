@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "GameScript/GameScript.h"
+#include "RNG/RNG_SFMT.h"
 
 namespace GemRB {
 
@@ -85,7 +86,7 @@ int Dialog::FindRandomState(Scriptable* target)
 	unsigned int i;
 	unsigned int max = TopLevelCount;
 	if (!max) return -1;
-	unsigned int pick = rand()%max;
+	unsigned int pick = RAND(0, max-1);
 	for (i=pick; i < max; i++) {
 		Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {

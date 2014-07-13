@@ -27,7 +27,7 @@
 
 using namespace GemRB;
 
-bool checkALError(const char* msg, log_level level) {
+static bool checkALError(const char* msg, log_level level) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
 		Log(level, "OpenAL", "%s: 0x%x - %s", msg, error, alGetString(error));
@@ -36,7 +36,7 @@ bool checkALError(const char* msg, log_level level) {
 	return false;
 }
 
-void showALCError(const char* msg, log_level level, ALCdevice *device) {
+static void showALCError(const char* msg, log_level level, ALCdevice *device) {
 	int error = alcGetError(device);
 	if (error != AL_NO_ERROR) {
 		Log(level, "OpenAL", "%s: 0x%x", msg, error);
