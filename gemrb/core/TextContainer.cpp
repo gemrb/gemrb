@@ -195,9 +195,9 @@ void TextSpan::SetPalette(Palette* pal)
 {
 	if (!pal) {
 		pal = font->GetPalette();
-		pal->release();
+	} else {
+		pal->acquire();
 	}
-	pal->acquire();
 	if (palette)
 		palette->release();
 	palette = pal;
