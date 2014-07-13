@@ -1361,7 +1361,7 @@ int Interface::LoadFonts()
 			Color back = {0x00, 0x00, 0x00, 0};
 			const char* colorString = tab->QueryField( rowName, "COLOR" );
 			if (colorString) {
-				sscanf(colorString, "0x%2hhx%2hhx%2hhx%2hhx", &fore.r, &fore.g, &fore.b, &fore.a);
+				sscanf(colorString, "0x%2c%2c%2c%2c", &fore.r, &fore.g, &fore.b, &fore.a);
 			}
 			if (TooltipFontResRef == resref) {
 				if (fore.a != 0xff) {
@@ -3623,7 +3623,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 		}
 
 		bool operator()(const char* fname) const {
-			char* extpos = strrchr(fname, '.');
+			const char* extpos = strrchr(fname, '.');
 			if (extpos) {
 				extpos++;
 				return stricmp(extpos, extension) == 0;

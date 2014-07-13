@@ -4382,7 +4382,7 @@ static PyObject* GemRB_TextArea_GetPortraits(PyObject * /*self*/, PyObject* args
 		: size(size) {}
 
 		bool operator()(const char* fname) const {
-			char* extpos = strrchr(fname, '.');
+			const char* extpos = strrchr(fname, '.');
 			if (extpos) {
 				extpos--;
 				return *extpos == size;
