@@ -235,7 +235,7 @@ void TextArea::AppendText(const String& text)
 		Palette* pal = NULL;
 		Font* fnt = ftext;
 		Size frame;
-		ieByte align = 0;
+		//ieByte align = 0;
 
 		enum ParseState {
 			TEXT = 0,
@@ -262,7 +262,7 @@ void TextArea::AppendText(const String& text)
 						case ']':
 							if (token == L"cap") {
 								fnt = finit;
-								align = IE_FONT_SINGLE_LINE;
+								//align = IE_FONT_SINGLE_LINE;
 							} else if (token == L"p") {
 								int w = Width - EDGE_PADDING;
 								if (lastSpan) {
@@ -285,7 +285,7 @@ void TextArea::AppendText(const String& text)
 								gamedata->FreePalette(pal);
 							} else if (token == L"cap") {
 								fnt = ftext;
-								align = 0;
+								//align = 0;
 							} else if (token == L"p") {
 								frame.w = 0;
 							}
