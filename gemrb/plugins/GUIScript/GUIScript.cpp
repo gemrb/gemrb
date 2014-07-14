@@ -375,8 +375,7 @@ static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 	}
 	const Color c = {(ieByte) r,(ieByte) g,(ieByte) b,(ieByte) a};
 	core->SetInfoTextColor( c );
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_UnhideGUI__doc,
@@ -393,8 +392,7 @@ static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 	gc->SetGUIHidden(false);
 	//this enables mouse in dialogs, which is wrong
 	//gc->SetCutSceneMode( false );
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_HideGUI__doc,
@@ -457,8 +455,7 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 	}
 	CObject<SaveGame> save(obj);
 	core->SetupLoadGame(save, VersionOverride);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_EnterGame__doc,
@@ -468,9 +465,7 @@ PyDoc_STRVAR( GemRB_EnterGame__doc,
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 {
 	core->QuitFlag|=QF_ENTERGAME;
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_QuitGame__doc,
@@ -479,8 +474,7 @@ PyDoc_STRVAR( GemRB_QuitGame__doc,
 static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 {
 	core->QuitFlag=QF_QUITGAME;
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Rewind__doc,
@@ -502,8 +496,7 @@ static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
 
 	core->GetAudioDrv()->Play( NULL, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	ctrl->SetupScroll();
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_StatComment__doc,
@@ -560,8 +553,7 @@ PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
 static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 {
 	core->SetCutSceneMode( false );
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowPack__doc,
@@ -591,8 +583,7 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 			width, height);
 		return RuntimeError("Please change your settings.");
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
@@ -646,8 +637,7 @@ static PyObject* GemRB_Window_SetSize(PyObject * /*self*/, PyObject* args)
 	win->Height = Height;
 	win->Invalidate();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_SetFrame__doc,
@@ -669,8 +659,7 @@ static PyObject* GemRB_Window_SetFrame(PyObject * /*self*/, PyObject* args)
 
 	win->SetFrame();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowFrame__doc,
@@ -706,8 +695,7 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 		core->SetWindowFrame(i, Picture);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -725,8 +713,7 @@ static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 
 	core->EnableCheatKeys( Flag );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_SetPicture__doc,
@@ -753,8 +740,7 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 	}
 	win->Invalidate();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_SetPos__doc,
@@ -818,8 +804,7 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 	win->YPos = Y;
 	core->RedrawAll();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_GetRect__doc,
@@ -863,8 +848,7 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	int ind = gamedata->LoadTable( tablename );
 	if (ind == -1) {
 		if (noerror) {
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		} else {
 			return RuntimeError("Can't find resource");
 		}
@@ -889,8 +873,7 @@ static PyObject* GemRB_Table_Unload(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Can't find resource");
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
@@ -1170,8 +1153,7 @@ static PyObject* GemRB_Symbol_Unload(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Symbol_GetValue__doc,
@@ -1338,8 +1320,7 @@ static PyObject* GemRB_TextEdit_SetBufferLength(PyObject * /*self*/, PyObject* a
 
 	te->SetBufferLength((ieWord) Length );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetText__doc,
@@ -1386,8 +1367,7 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 			core->FreeString( tmpstr );
 		}
 	}
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,
@@ -1480,8 +1460,7 @@ static PyObject* GemRB_TextArea_Clear(PyObject * /*self*/, PyObject* args)
 	}
 	ta->ClearText();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Scroll__doc,
@@ -1507,8 +1486,7 @@ static PyObject* GemRB_TextArea_Scroll(PyObject * /*self*/, PyObject* args)
 	ta->SetRow( row );
 	*/
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
@@ -1598,8 +1576,7 @@ static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
 		core->SetEventFlag(EF_CONTROL);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 //useful only for ToB and HoW, sets masterscript/worldmap name
@@ -1624,8 +1601,7 @@ static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 		strnlwrcpy( core->WorldMapName[1], worldmap2, 8 );
 	}
 	core->UpdateMasterScript();
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_ShowModal__doc,
@@ -1648,8 +1624,7 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->PlaySound(DS_WINDOW_OPEN);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetTimedEvent__doc,
@@ -1679,8 +1654,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	if (game) {
 		game->SetTimedEvent(handler, rounds);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
@@ -1713,8 +1687,7 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 		return RuntimeError(buf);
 	}
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetNextScript__doc,
@@ -1735,8 +1708,7 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 
 	core->SetNextScript(funcName);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetStatus__doc,
@@ -1760,8 +1732,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Control type is not matching." );
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_AttachScrollBar__doc,
@@ -1795,8 +1766,7 @@ static PyObject* GemRB_Control_AttachScrollBar(PyObject * /*self*/, PyObject* ar
 		return NULL;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
@@ -1829,8 +1799,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 	Window* win = core->GetWindow( WindowIndex );
 	win->RedrawControls(VarName, Value);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_Unload__doc,
@@ -1859,8 +1828,7 @@ static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
 
 		core->PlaySound(DS_WINDOW_CLOSE);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_Invalidate__doc,
@@ -1881,8 +1849,7 @@ static PyObject* GemRB_Window_Invalidate(PyObject * /*self*/, PyObject* args)
 	}
 	win->Invalidate();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_CreateWindow__doc,
@@ -1942,8 +1909,6 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateLabel__doc,
@@ -1976,8 +1941,6 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
@@ -2002,8 +1965,7 @@ static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0}, back = {0, 0, 0, 0};
 	lab->SetColor( fore, back );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateTextEdit__doc,
@@ -2044,8 +2006,6 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateScrollBar__doc,
@@ -2098,8 +2058,6 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 
@@ -2132,8 +2090,6 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBackground__doc,
@@ -2168,8 +2124,7 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 		te->SetBackGround(NULL);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetSprites__doc,
@@ -2194,8 +2149,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	AnimationFactory* af = ( AnimationFactory* )
@@ -2216,8 +2170,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 	tspr = af->GetFrame( disabled, (unsigned char) cycle);
 	btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetOverlay__doc,
@@ -2248,8 +2201,7 @@ static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
 	else if (Clipping>1.0) Clipping = 1.0;
 	//can't call clipping, because the change of ratio triggers color change
 	btn->SetHorizontalOverlay(Clipping, src, dest);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetBorder__doc,
@@ -2274,8 +2226,7 @@ static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
 	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a };
 	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, color, (bool)enabled, (bool)filled );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_EnableBorder__doc,
@@ -2298,8 +2249,7 @@ static PyObject* GemRB_Button_EnableBorder(PyObject * /*self*/, PyObject* args)
 
 	btn->EnableBorder( BorderIndex, (bool)enabled );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetFont__doc,
@@ -2323,8 +2273,7 @@ static PyObject* GemRB_Button_SetFont(PyObject * /*self*/, PyObject* args)
 
 	btn->SetFont( core->GetFont( FontResRef ));
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetAnchor__doc,
@@ -2346,8 +2295,7 @@ static PyObject* GemRB_Button_SetAnchor(PyObject * /*self*/, PyObject* args)
 
 	btn->SetAnchor(x, y);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetPushOffset__doc,
@@ -2369,8 +2317,7 @@ static PyObject* GemRB_Button_SetPushOffset(PyObject * /*self*/, PyObject* args)
 
 	btn->SetPushOffset(x, y);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetTextColor__doc,
@@ -2401,8 +2348,7 @@ static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
 		but->SetTextColor( back, fore );
 
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_DeleteControl__doc,
@@ -2427,8 +2373,7 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 	}
 	delete win->RemoveControl(CtrlIndex);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_AddNewArea__doc,
@@ -2549,8 +2494,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_WorldMap_AdjustScrolling__doc,
@@ -2566,8 +2510,7 @@ static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject * /*self*/, PyObject* a
 	}
 
 	core->AdjustScrolling( WindowIndex, ControlIndex, x, y );
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_CreateMovement__doc,
@@ -2594,8 +2537,7 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	map->MoveToNewArea(area, entrance, (unsigned int)direction, everyone, NULL);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_UpdateWorldMap__doc,
@@ -2620,8 +2562,7 @@ static PyObject* GemRB_UpdateWorldMap(PyObject * /*self*/, PyObject* args)
 	if (update)
 		core->UpdateWorldMap(wmResRef);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_WorldMap_GetDestinationArea__doc,
@@ -2644,8 +2585,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	}
 	//no area was pointed on
 	if (!wmc->Area) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	WorldMap *wm = core->GetWorldMap();
 	PyObject* dict = PyDict_New();
@@ -2755,8 +2695,6 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_WorldMap_SetTextColor__doc,
@@ -2781,8 +2719,7 @@ static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args
 	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a};
 	wmap->SetColor( which, color );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -2863,8 +2800,6 @@ setup_done:
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-	//Py_INCREF( Py_None );
-	//return Py_None;
 }
 
 
@@ -2897,8 +2832,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 	targetWin->AddControl( substitute ); // deletes target!
 	targetWin->Link( sbid, substitute->ControlID );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetPos__doc,
@@ -2921,8 +2855,7 @@ static PyObject* GemRB_Control_SetPos(PyObject * /*self*/, PyObject* args)
 	ctrl->XPos = X;
 	ctrl->YPos = Y;
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_GetRect__doc,
@@ -2971,8 +2904,7 @@ static PyObject* GemRB_Control_SetSize(PyObject * /*self*/, PyObject* args)
 	ctrl->Width = Width;
 	ctrl->Height = Height;
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
@@ -2996,8 +2928,7 @@ static PyObject* GemRB_Label_SetFont(PyObject * /*self*/, PyObject* args)
 
 	lbl->SetFont( core->GetFont( FontResRef ));
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Label_SetUseRGB__doc,
@@ -3019,8 +2950,7 @@ static PyObject* GemRB_Label_SetUseRGB(PyObject * /*self*/, PyObject* args)
 
 	lab->useRGB = ( status != 0 );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameSetPartySize__doc,
@@ -3039,8 +2969,7 @@ static PyObject* GemRB_GameSetPartySize(PyObject * /*self*/, PyObject* args)
 
 	game->SetPartySize( Flags );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameSetProtagonistMode__doc,
@@ -3059,8 +2988,7 @@ static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* arg
 
 	game->SetProtagonistMode( Flags );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameGetExpansion__doc,
@@ -3116,8 +3044,7 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 
 	game->SetControlStatus( Flags, Operation );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameControlSetScreenFlags__doc,
@@ -3139,8 +3066,7 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 
 	gc->SetScreenFlags( Flags, Operation );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -3163,8 +3089,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 	gc->SetTargetMode(Mode&GA_ACTION);
 	//target type is all the bits
 	gc->target_types = (Mode&GA_ACTION)|Types;
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameControlGetTargetMode__doc,
@@ -3189,8 +3114,7 @@ static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject*
 
 	gc->ToggleAlwaysRun();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetFlags__doc,
@@ -3219,8 +3143,7 @@ static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_TextArea_SetFlags__doc,
@@ -3250,8 +3173,7 @@ static PyObject* GemRB_Control_TextArea_SetFlags(PyObject * /*self*/, PyObject* 
 		return NULL;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_ScrollBar_SetDefaultScrollBar__doc,
@@ -3273,8 +3195,7 @@ static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject * /*self*/, PyObje
 
 	sb->SetFlags( (IE_GUI_SCROLLBAR<<24) | IE_GUI_SCROLLBAR_DEFAULT, BM_OR );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetState__doc,
@@ -3296,8 +3217,7 @@ static PyObject* GemRB_Button_SetState(PyObject * /*self*/, PyObject* args)
 
 	btn->SetState( state );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetPictureClipping__doc,
@@ -3322,8 +3242,7 @@ static PyObject* GemRB_Button_SetPictureClipping(PyObject * /*self*/, PyObject* 
 	else if (Clipping>1.0) Clipping = 1.0;
 	btn->SetPictureClipping( Clipping );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
@@ -3347,8 +3266,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		btn->SetPicture( NULL );
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	ImageFactory* fact = ( ImageFactory* )
@@ -3372,8 +3290,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 
 	btn->SetPicture( Picture );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetSprite2D__doc,
@@ -3397,8 +3314,7 @@ static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
 
 	btn->SetPicture( spr.get() );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetMOS__doc,
@@ -3421,8 +3337,7 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		btn->SetPicture( NULL );
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	ResourceHolder<ImageMgr> im(ResRef);
@@ -3437,8 +3352,7 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 
 	btn->SetPicture( Picture );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetPLT__doc,
@@ -3467,8 +3381,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	//empty image
 	if (ResRef[0] == 0 || ResRef[0]=='*') {
 		btn->SetPicture( NULL );
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	Sprite2D *Picture;
@@ -3486,8 +3399,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 			if (type == 0)
 				return NULL;
 			else {
-				Py_INCREF( Py_None );
-				return Py_None;
+				Py_RETURN_NONE;
 			}
 		}
 
@@ -3514,8 +3426,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 		btn->SetFlags ( IE_GUI_BUTTON_BG1_PAPERDOLL, BM_NAND );
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetBAM__doc,
@@ -3607,8 +3518,7 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject * /*self*/, PyObject
 	}
 
 	anim->SetPaletteGradients(col);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_HasAnimation__doc,
@@ -3659,8 +3569,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 		//we wanted to set, we don't reset it
 		//but we must reinitialize it, if it was play once
 		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->Flags&IE_GUI_BUTTON_PLAYONCE)) {
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 		delete ctl->animation;
 		ctl->animation = NULL;
@@ -3668,8 +3577,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		ctl->SetAnimPicture( NULL );
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
@@ -3679,8 +3587,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	}
 	anim->UpdateAnimation(false);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -3733,8 +3640,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
 		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
 	core->GetAudioDrv()->Play( Sound, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -3762,8 +3668,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_DrawWindows__doc,
@@ -3774,8 +3679,7 @@ static PyObject* GemRB_DrawWindows(PyObject * /*self*/, PyObject * /*args*/)
 {
 	core->DrawWindows();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Quit__doc,
@@ -3786,8 +3690,7 @@ static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 {
 	core->ExitGemRB();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_LoadMusicPL__doc,
@@ -3805,8 +3708,7 @@ static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 
 	core->GetMusicMgr()->SwitchPlayList( ResRef, (bool) HardEnd );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SoftEndPL__doc,
@@ -3817,8 +3719,7 @@ static PyObject* GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {
 	core->GetMusicMgr()->End();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_HardEndPL__doc,
@@ -3829,8 +3730,7 @@ static PyObject* GemRB_HardEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {
 	core->GetMusicMgr()->HardEnd();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetToken__doc,
@@ -3847,8 +3747,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	}
 	core->GetTokenDictionary()->SetAtCopy( Variable, value );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetVar__doc,
@@ -3869,8 +3768,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
@@ -3991,8 +3889,7 @@ static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 	} // else GLOBAL, area name or KAPUTZ
 
 	SetVariable(Sender, Variable, Context, (ieDword) Value);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetGameVar__doc,
@@ -4058,8 +3955,7 @@ static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 	GET_ACTOR_GLOBAL();
 
 	actor->dump();
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SaveCharacter__doc,
@@ -4154,8 +4050,7 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 
 	CObject<SaveGame> game(Slot);
 	core->GetSaveGameIterator()->DeleteSaveGame( game );
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetName__doc,
@@ -4499,8 +4394,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 	}
 	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetPartySize__doc,
@@ -4553,8 +4447,7 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 
 	game->SetReputation( (unsigned int) Reputation );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_IncreaseReputation__doc,
@@ -4613,8 +4506,7 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 		game->PartyGold=Gold;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameGetFormation__doc,
@@ -4664,8 +4556,7 @@ static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 		game->Formations[Which] = Formation;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetJournalSize__doc,
@@ -4724,8 +4615,7 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 		}
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
@@ -4761,8 +4651,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		game->AddJournalEntry( chapter, section, strref);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
@@ -4949,8 +4838,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 
 	actor->SetName(Name, Which);
 	actor->SetMCFlag(MC_EXPORTABLE,BM_OR);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_CreateString__doc,
@@ -4991,8 +4879,7 @@ static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 
 	actor->StrRefs[StringSlot]=StrRef;
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
@@ -5011,8 +4898,7 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	actor->SetSoundFolder(Sound);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerSound__doc,
@@ -5104,8 +4990,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 	Actor* MyActor = game->FindPC( PartyID );
 	if (!MyActor || !MyActor->PCStats) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	PyObject* dict = PyDict_New();
@@ -5191,8 +5076,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 	if (PartyID > 0) {
 		actor = game->FindPC( PartyID );
 		if (!actor) {
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 	} else {
 		actor = NULL;
@@ -5203,8 +5087,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 		actor->PlaySelectionSound();
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameIsPCSelected__doc,
@@ -5245,8 +5128,7 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 
 	game->SelectPCSingle( index );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
@@ -5322,8 +5204,7 @@ static PyObject* GemRB_GameControlSetLastActor(PyObject * /*self*/, PyObject* ar
 	Actor* actor = game->FindPC( PartyID );
 	gc->SetLastActor(actor, gc->GetLastActor() );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_ActOnPC__doc,
@@ -5346,8 +5227,7 @@ static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
 			gc->PerformActionOn(MyActor);
 		}
 	}
-	Py_INCREF(Py_None) ;
-	return Py_None ;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
@@ -5429,8 +5309,7 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 
 	//Setting the creature's base stat
 	SetCreatureStat( actor, StatID, StatValue, pcf);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerScript__doc,
@@ -5473,8 +5352,7 @@ static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	actor->SetScript(ScriptName, Index, true);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerDialog__doc,
@@ -5493,8 +5371,7 @@ static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	actor->SetDialog(DialogName);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
@@ -5534,8 +5411,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if ((globalID == 1) && core->HasFeature(GF_HAS_DPLAYER) ) {
 		actor->SetScript("DPLAYER3", SCR_DEFAULT, false);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetSpellIcon__doc,
@@ -5767,8 +5643,7 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	core->SetCurrentStore( StoreResRef, 0 );
 
 	core->SetEventFlag(EF_OPENSTORE);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_LeaveStore__doc,
@@ -5780,8 +5655,7 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	core->CloseCurrentStore();
 	core->ResetEventFlag(EF_OPENSTORE);
 	core->SetEventFlag(EF_PORTRAIT);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_LeaveContainer__doc,
@@ -5791,8 +5665,7 @@ PyDoc_STRVAR( GemRB_LeaveContainer__doc,
 static PyObject* GemRB_LeaveContainer(PyObject * /*self*/, PyObject* /*args*/)
 {
 	core->CloseCurrentContainer();
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetContainer__doc,
@@ -5872,8 +5745,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current container!");
 	}
 	if (index>=(int) container->inventory.GetSlotCount()) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	PyObject* dict = PyDict_New();
 
@@ -5888,8 +5760,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	Item *item = gamedata->GetItem(ci->ItemResRef, true);
 	if (!item) {
 		Log(MESSAGE, "GUIScript", "Cannot find container (%s) item %s!", container->GetScriptName(), ci->ItemResRef);
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	bool identified = ci->Flags & IE_INV_ITEM_IDENTIFIED;
@@ -5959,8 +5830,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		res = core->CanMoveItem(si);
 		if (!res) { //cannot move
 			Log(MESSAGE, "GUIScript", "Cannot move item, it is undroppable!");
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 
 		// check for full inventory up front to prevent unnecessary shuffling of container
@@ -5968,8 +5838,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		// not the entire stack fits
 		if (res == -1) { // not gold
 			if (actor->inventory.FindCandidateSlot(SLOT_INVENTORY, 0, si->ItemResRef) == -1) {
-				Py_INCREF( Py_None );
-				return Py_None;
+				Py_RETURN_NONE;
 			}
 		}
 
@@ -5977,8 +5846,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		si = container->RemoveItem(Slot,0);
 		if (!si) {
 			Log(WARNING, "GUIScript", "Cannot move item, there is something weird!");
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
@@ -6002,15 +5870,13 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		res = core->CanMoveItem(actor->inventory.GetSlotItem(core->QuerySlot(Slot) ) );
 		if (!res) { //cannot move
 			Log(MESSAGE, "GUIScript","Cannot move item, it is undroppable!");
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 
 		si = actor->inventory.RemoveItem(core->QuerySlot(Slot));
 		if (!si) {
 			Log(WARNING, "GUIScript", "Cannot move item, there is something weird!");
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
@@ -6037,8 +5903,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 
 	//keep weight up to date
 	actor->CalculateSpeed(false);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetStore__doc,
@@ -6271,8 +6136,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 		si->Flags &= ~IE_INV_ITEM_SELECTED;
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
@@ -6630,8 +6494,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 	} else {
 		GameScript::ExecuteString( game->GetCurrentArea( ), String );
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_EvaluateString__doc,
@@ -6652,8 +6515,7 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 	} else {
 		print("%s returned False", String);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_UpdateMusicVolume__doc,
@@ -6664,8 +6526,7 @@ static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/
 {
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_MUSIC );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_UpdateAmbientsVolume__doc,
@@ -6676,8 +6537,7 @@ static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*arg
 {
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
@@ -6698,8 +6558,7 @@ static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
 		getMessageWindowLogger(true)->SetLogLevel((log_level)logLevel);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetCurrentArea__doc,
@@ -6743,8 +6602,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 		map2->AddActor( actor, true );
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetMemorizableSpellsCount__doc,
@@ -6782,8 +6640,7 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	//the bonus increased value (with wisdom too) is handled by the core
 	actor->spellbook.SetMemorizableSpellsCount( Value, (ieSpellType) SpellType, Level, 0 );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_CountSpells__doc,
@@ -7072,8 +6929,7 @@ static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
 	work_ref.opcode=-1;
 	actor->fxqueue.RemoveAllEffectsWithParam(work_ref, Parameter2);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -7094,8 +6950,7 @@ static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 
 	actor->fxqueue.RemoveAllEffects(SpellResRef);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_RemoveSpell__doc,
@@ -7701,8 +7556,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->DragItem (si, ResRef);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
@@ -7976,8 +7830,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		//EquipItem already called RefreshEffects
 		actor->ReinitQuickSlots();
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetAvatarsValue__doc,
@@ -8035,8 +7888,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	if (Flags&A_ANI_ACTIVE) {
 		map->AddAnimation(&anim);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMapnote__doc,
@@ -8070,8 +7922,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	} else {
 		map->RemoveMapNote(point);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMapDoor__doc,
@@ -8097,8 +7948,7 @@ static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
 	}
 
 	door->SetDoorOpen(State, 0, 0);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMapExit__doc,
@@ -8139,8 +7989,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMapRegion__doc,
@@ -8169,8 +8018,7 @@ static PyObject* GemRB_SetMapRegion(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -8198,8 +8046,7 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 		GET_ACTOR_GLOBAL();
 		map->SpawnCreature(actor->Pos, CreResRef, 10);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_RevealArea__doc,
@@ -8223,8 +8070,7 @@ static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 
 	map->ExploreMapChunk( p, radius, Value );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_ExploreArea__doc,
@@ -8244,8 +8090,7 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 
 	map->Explore( Value );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -8449,8 +8294,7 @@ static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	actor->SetFeatValue(featindex, value);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetMaxEncumbrance__doc,
@@ -8546,8 +8390,7 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	}
 	game->LeaveParty (actor);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 typedef union pack {
@@ -8797,8 +8640,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 		}
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupControls__doc,
@@ -9164,8 +9006,7 @@ jump_label:
 		//FIXME: is this really state==IE_GUI_BUTTON_DISABLED ??? That means active border for a disabled button
 		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_ClearActions__doc,
@@ -9194,8 +9035,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 	}
 	actor->Stop(); //stop pending action involved walking
 	actor->SetModal(MS_NONE);//stop modal actions
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -9213,8 +9053,7 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetDefaultActions__doc );
 	}
 	Actor::SetDefaultActions((bool) qslot, (ieByte) slot1, (ieByte) slot2, (ieByte) slot3);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -9273,8 +9112,7 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 
 	slot = core->QuerySlot(slot);
 	actor->SetupQuickSlot(which, slot, headerindex);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
@@ -9305,8 +9143,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 			displaymsg->DisplayConstantString(ret, DMC_WHITE);
 		}
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
@@ -9384,8 +9221,7 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	actor->SetModal( (ieDword) state, 0);
 	actor->SetModalSpell(state, spell);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_PrepareSpontaneousCast__doc,
@@ -9508,8 +9344,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			print("Unhandled target type: %d", spelldata.Target);
 			break;
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_ApplySpell__doc,
@@ -9536,8 +9371,7 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 
 	core->ApplySpell(spell, actor, caster, 0);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_UseItem__doc,
@@ -9628,8 +9462,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 			Log(ERROR, "GUIScript", "Unhandled target type!");
 			break;
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetGamma__doc,
@@ -9650,8 +9483,7 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Contrast must be 0-5" );
 	}
 	core->GetVideoDriver()->SetGamma(brightness, contrast);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMouseScrollSpeed__doc,
@@ -9668,8 +9500,7 @@ static PyObject* GemRB_SetMouseScrollSpeed(PyObject * /*self*/, PyObject* args)
 
 	core->SetMouseScrollSpeed(mouseSpeed);
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
@@ -9686,8 +9517,7 @@ static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 
 	core->TooltipDelay = tooltipDelay;
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetFullScreen__doc,
@@ -9702,8 +9532,7 @@ static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetFullScreen__doc );
 	}
 	core->GetVideoDriver()->SetFullscreenMode(fullscreen);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_RunRestScripts__doc,
@@ -9741,8 +9570,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 		}
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_RestParty__doc,
@@ -9777,8 +9605,7 @@ static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
 
 	actor->spellbook.ChargeAllSpells();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_HasSpecialItem__doc,
@@ -9916,8 +9743,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	//lets kill it
 	delete fx;
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_CountEffects__doc,
@@ -9965,8 +9791,7 @@ static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 	work_ref.Name=opcodename;
 	work_ref.opcode=-1;
 	actor->fxqueue.ModifyEffectPoint(work_ref, px, py);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_StealFailed__doc,
@@ -10010,8 +9835,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 		owner->AttackedBy(attacker);
 	}
 	owner->AddTrigger(TriggerEntry(trigger_stealfailed, attacker->GetGlobalID()));
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SwapPCs__doc,
@@ -10034,8 +9858,7 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 		DisplayStringCore( game->FindPC(1), VB_LEADER, DS_CONST);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
@@ -10075,8 +9898,7 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 	} else {
 		displaymsg->DisplayString(strref, (unsigned int) color, IE_STR_SOUND);
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetCombatDetails__doc,
@@ -10335,8 +10157,7 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 
 	core->SetTickHook(handler);
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetupMaze__doc,
@@ -10369,8 +10190,7 @@ static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 		m->valid = used;
 		m->accessible = used;
 	}
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMazeEntry__doc,
@@ -10455,8 +10275,7 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 			break;
 	}
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetMazeData__doc,
@@ -10521,8 +10340,7 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 			return AttributeError( GemRB_SetMazeData__doc );
 	}
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetMazeHeader__doc,
@@ -10534,8 +10352,7 @@ static PyObject* GemRB_GetMazeHeader(PyObject* /*self*/, PyObject* /*args*/)
 	GET_GAME();
 
 	if (!game->mazedata) {
-		Py_INCREF(Py_None);
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	PyObject* dict = PyDict_New();
@@ -10617,8 +10434,7 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 		// I assume the '\0' in the end of gametype_hint
 	}
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -10654,8 +10470,7 @@ static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
 	}
 
 	Log(level, owner, "%s", message);
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
@@ -10676,8 +10491,7 @@ static PyObject* GemRB_SetFeature(PyObject* /*self*/, PyObject* args)
 	}
 
 	core->SetFeature(value, feature);
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 
