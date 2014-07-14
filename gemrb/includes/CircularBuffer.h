@@ -22,7 +22,7 @@
 #define CIRCULARBUFFER_H
 
 #include <algorithm>
-#include <vector>
+#include <deque>
 
 namespace GemRB {
 
@@ -31,14 +31,13 @@ class Palette;
 template <typename T>
 class CircularBuffer {
 private:
-	typedef typename std::vector<T>::iterator CacheIterator;
-	std::vector<T> _cache;
+	typedef typename std::deque<T>::iterator CacheIterator;
+	std::deque<T> _cache;
 	size_t _maxSize;
 public:
 	CircularBuffer(size_t max)
 	{
 		_maxSize = max;
-		_cache.reserve(_maxSize);
 	};
 
 	void Append(T item, bool unique = true) {
@@ -49,7 +48,7 @@ public:
 			}
 		}
 		if (_cache.size() == _maxSize) {
-			_cache.erase(_cache.begin());
+			_cache.pop_front();
 		}
 		_cache.push_back(item);
 	}
