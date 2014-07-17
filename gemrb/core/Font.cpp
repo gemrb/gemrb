@@ -259,7 +259,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			} else if (alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - lineW );
 			}
-		} else {
+		} else if (charCount) {
+			// dont overwrite the input coordinate until we have printed something
 			x = 0;
 		}
 
