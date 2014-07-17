@@ -282,7 +282,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 				int wordW = StringSize(word).w;
 				if (!(alignment&IE_FONT_SINGLE_LINE)) {
-					if (x + wordW > rgn.w && wordW <= rgn.w) {
+					if (x + wordW > rgn.w && x > 0) {
 						// wrap to new line, only if the word isnt >= the entire line
 						lineBreak = true;
 						line = line.substr(linePos);
