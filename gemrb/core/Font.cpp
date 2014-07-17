@@ -29,6 +29,8 @@
 
 #include <sstream>
 
+#define DEBUG_FONT 0
+
 namespace GemRB {
 
 void BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
@@ -313,7 +315,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 								done = true;
 							} else {
 #if DEBUG_FONT
-								Log(WARNING, "Font", "The word '%ls' (width=%d) overruns %d",
+								Log(WARNING, "Font", "The word '%ls' (width=%d) overruns available width of %d",
 									word.c_str(), wordW, rgn.w);
 #endif
 							}
