@@ -305,7 +305,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 						const Glyph& curGlyph = GetGlyph(currChar);
 						// should probably use rect intersection, but new lines shouldnt be to the left ever.
 						if (!rgn.PointInside(x + rgn.x, y + rgn.y + curGlyph.descent)) {
-							if (wordW <= (int)lineW) {
+							if (wordW <= (int)((lineW <= rgn.w) ? lineW : rgn.w)) {
 								// this probably doest cover every situation 100%
 								// we consider printing done if the blitter is outside the region
 								// *and* the word isnt wider then the line
