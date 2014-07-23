@@ -39,21 +39,18 @@ TextArea::TextArea(const Region& frame, Font* text)
 }
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color textcolor, Color initcolor, Color lowtextcolor)
+				   Color textcolor, Color /*initcolor*/, Color lowtextcolor)
 	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
 {
-	// init palettes
-	SetPalette(&textcolor, PALETTE_NORMAL);
-	SetPalette(&lowtextcolor, PALETTE_OPTIONS);
+	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
 	palette = palettes[PALETTE_NORMAL];
 
-	if (caps != ftext) {
-		// quick font optimization (prevents creating unnecessary spans)
-		finit = caps;
-	} else {
-		finit = NULL;
-		SetPalette(&initcolor, PALETTE_INITIALS);
-	}
+	// FIXME: initcolor is only used for *some* initial fonts
+	// setting this breaks the item description dropcaps, but not setting it breaks other TAs (minor)
+	//SetPalette(&initcolor, PALETTE_INITIALS);
+
+	// quick font optimization (prevents creating unnecessary cap spans)
+	finit = (caps != ftext) ? caps : ftext;
 
 	Init();
 }
@@ -339,7 +336,7 @@ void TextArea::AppendText(const String& text)
 			textContainer->AppendText(token);
 		}
 	} else if (text.length()) {
-		if (finit) {
+		if (finit != ftext) {
 			// append cap spans
 			size_t textpos = text.find_first_not_of(L"\n\t\r ");
 			// FIXME: ? maybe we actually want the newlines etc?
@@ -359,7 +356,7 @@ void TextArea::AppendText(const String& text)
 			} else {
 				textpos = 0;
 			}
-			textContainer->AppendText(text.substr(textpos), ftext, NULL);
+			textContainer->AppendText(text.substr(textpos));
 		} else {
 			textContainer->AppendText(text);
 		}
