@@ -390,6 +390,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	}
 
 	if (point) {
+		// deal with possible trailing newline
+		if (!done && string[charCount - 1] == L'\n') {
+			y += maxHeight;
+		}
 		*point = Point(x, y - maxHeight);
 	}
 
