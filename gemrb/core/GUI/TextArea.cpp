@@ -353,6 +353,9 @@ void TextArea::AppendText(const String& text)
 				textContainer->AppendContent(dc);
 				textpos++;
 				// FIXME: assuming we have more text!
+				// FIXME: as this is currently implemented, the cap is *not* considered part of the word,
+				// there is potential wrapping errors (BG2 char gen).
+				// we could solve this by wrapping the cap and the letters remaining letters of the word into their own TextContainer
 			} else {
 				textpos = 0;
 			}
