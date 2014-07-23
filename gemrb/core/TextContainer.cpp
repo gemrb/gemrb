@@ -77,19 +77,14 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 		size_t numPrinted = 0;
 		do {
 			newline:
-			if (numPrinted) {
-				if (lineSegment.w == 0 || lineSegment.x + lineSegment.w > lineRgn.x + lineRgn.w) {
-					// start next line
-					lineRgn.x = drawOrigin.x;
-					lineRgn.y += font->maxHeight;
-					lineRgn.w = rgn.w;
-					dp = lineRgn.Origin();
-					lineExclusions.clear();
-					lineSegment = lineRgn;
-				} else {
-					// we have to add the segment to the container exclusions so that the next iteration works
-					lineExclusions.push_back(lineSegment); // FIXME: if we want an implicit newline, use lineRgn instead.
-				}
+			if (lineSegment.w == 0 || lineSegment.x + lineSegment.w > lineRgn.x + lineRgn.w) {
+				// start next line
+				lineRgn.x = drawOrigin.x;
+				lineRgn.y += font->maxHeight;
+				lineRgn.w = rgn.w;
+				dp = lineRgn.Origin();
+				lineExclusions.clear();
+				lineSegment = lineRgn;
 			}
 			do {
 				// process all overlaping exclusion zones until we trim down to the leftmost non conflicting region.
@@ -118,29 +113,33 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 
 					// its possible that the resulting segment is 0 in width
 					if (lineSegment.w <= 0) {
-						assert(numPrinted);
 						goto newline;
 					}
 				}
 			} while (excluded);
 
-			Point printPoint;
 #if (DEBUG_TEXT)
 			core->GetVideoDriver()->DrawRect(lineSegment, ColorRed, true);
 #endif
 			// collapse with previous content (shared borders)
 			lineSegment.y--;
 			assert(lineSegment.h == font->maxHeight);
+			Point printPoint;
 			numPrinted += font->Print(lineSegment.Intersect(rgn), text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
-			// FIXME: maybe handle this by bailing on the draw
-			assert(numPrinted); // if we didnt print at all there will be an infinite loop.
-			if (printPoint.x) {
-				lineSegment.w = printPoint.x;
+
+			lineExclusions.push_back(lineSegment);
+			if (printPoint.y) {
+				// a newline occured; occupy the entire line area
+				lineSegment.w = lineRgn.w;
+			} else if (printPoint.x) {
 				dp.x += printPoint.x;
+				lineSegment.w = printPoint.x;
 			}
+
 #if (DEBUG_TEXT)
 			core->GetVideoDriver()->DrawRect(lineSegment, ColorWhite, false);
 #endif
+
 			layoutRegions.push_back(lineSegment);
 
 			// FIXME: infinite loop possibility.
