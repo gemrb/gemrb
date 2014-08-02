@@ -2667,7 +2667,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
 		stream->Write( &tmpByte, 1);
 		// unknown byte
-		stream->Write( &Signature,1);
+		stream->Write( &filling, 1);
 		tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
 			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 		stream->WriteDword( &tmpDword );
