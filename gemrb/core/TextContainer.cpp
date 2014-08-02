@@ -237,14 +237,10 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 	newContent->parent = this;
 	if (!existing) { // insert at beginning;
 		contents.push_front(newContent);
-		return;
-	}
-	ContentList::iterator it;
-	it = std::find(contents.begin(), contents.end(), existing);
-	if (it != contents.end()) {
-		contents.insert(++it, newContent);
 	} else {
-		contents.push_back(newContent);
+		ContentList::iterator it;
+		it = std::find(contents.begin(), contents.end(), existing);
+		contents.insert(++it, newContent);
 	}
 }
 
