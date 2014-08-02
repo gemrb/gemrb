@@ -525,6 +525,9 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 		span = dynamic_cast<TextSpan*>(selectOptions->ContentAtPoint(p));
 	}
 
+	if (hoverSpan || span)
+		MarkDirty();
+
 	if (hoverSpan && hoverSpan != span) {
 		if (hoverSpan == selectedSpan) {
 			hoverSpan->SetPalette(palettes[PALETTE_SELECTED]);
@@ -538,7 +541,6 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 		hoverSpan = span;
 		hoverSpan->SetPalette(palettes[PALETTE_HOVER]);
 	}
-	MarkDirty();
 }
 
 /** Mouse Button Up */
