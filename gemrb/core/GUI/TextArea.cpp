@@ -204,7 +204,7 @@ void TextArea::DrawInternal(Region& clip)
 	int sr = startrow;
 	unsigned int i;
 	int yl;
-	for (i = 0; i < linesize; i++) {
+	for (i = 0; i <= linesize; i++) {
 		if (rc + lrows[i] <= sr) {
 			rc += lrows[i];
 			continue;
@@ -225,7 +225,7 @@ void TextArea::DrawInternal(Region& clip)
 		clip.h-=yl;
 		break;
 	}
-	for (i++; i < linesize; i++) {
+	for (i++; i <= linesize; i++) {
 		Palette* pal = NULL;
 		if (seltext == (int) i)
 			pal = selected;
