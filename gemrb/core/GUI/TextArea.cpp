@@ -172,13 +172,18 @@ void TextArea::DrawInternal(Region& clip)
 	to this Text Area Control. */
 int TextArea::SetScrollBar(Control* ptr)
 {
-	if (!sb && ptr) {
+	if (ptr) {
 		// only pad left edge
 		contentWrapper.SetFrame(Region(Point(), Size(Width - EDGE_PADDING, -1)));
-	} else if (sb && !ptr) {
+		if (sb) { // had an existing scrollbar
+			((ScrollBar*)ptr)->SetMax(((ScrollBar*)sb)->Value);
+			((ScrollBar*)ptr)->SetPos(((ScrollBar*)sb)->GetPos());
+		}
+	} else {
 		// pad both edges
 		contentWrapper.SetFrame(Region(Point(), Size(Width - (EDGE_PADDING * 2), Height)));
 	}
+
 	return Control::SetScrollBar(ptr);
 }
 
