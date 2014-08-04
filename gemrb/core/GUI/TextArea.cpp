@@ -498,10 +498,8 @@ void TextArea::SetRow(int row)
 {
 	if (row <= rows) {
 		TextYPos = row * GetRowHeight();
+		MarkDirty();
 	}
-	MarkDirty();
-	// refresh the cursor/hover selection
-	core->GetEventMgr()->FakeMouseMove();
 }
 
 /** Mousewheel scroll */
