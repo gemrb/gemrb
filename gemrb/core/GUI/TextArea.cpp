@@ -193,7 +193,7 @@ void TextArea::DrawInternal(Region& clip)
 		Owner->InvalidateForControl(this); // cant use MarkDirty since we are drawing
 		if (dialogNodeHeight > Height) {
 			// last node + select options too large for TA so we cant scroll to bottom!
-			ScrollToY(textContainer->ContentFrame().h + dialogNodeHeight, this);
+			ScrollToY(textHeight - dialogNodeHeight, this);
 		} else {
 			bar->SetPos(sbMax); // scroll to the bottom
 		}
