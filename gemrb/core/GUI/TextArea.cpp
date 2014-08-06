@@ -142,6 +142,31 @@ void TextArea::DrawInternal(Region& clip)
 
 	// now the text is layed out in the container so we can calculate the rows
 	int textHeight = contentWrapper.ContentFrame().h;
+	int dialogNodeHeight = 0;
+	if (selectOptions && Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		// this is for dialog only
+		// Dialog expects the last "text node" at the top of the TA
+		 ContentContainer::ContentList::const_iterator it = textContainer->Contents().end();
+		 TextSpan* node = NULL;
+		 do {
+			 // find the last text node (non-empty)
+			 node = dynamic_cast<TextSpan*>(*--it);
+			 if (node && node->Text() == L"\n") {
+				 // newlines don't count as the "text node", but we still need their height
+				 dialogNodeHeight += node->ContentFrame().h;
+				 node = NULL;
+			 }
+		 } while (node == NULL && it != textContainer->Contents().begin());
+
+		 if (node) {
+			 dialogNodeHeight += node->ContentFrame().h + selectOptions->ContentFrame().h;
+			 if (dialogNodeHeight < Height) {
+				 // compensate so there is enough extra scrolling space to get the "node" to the top of the TA later
+				 textHeight += (Height - dialogNodeHeight);
+			 }
+		 }
+	}
+
 	int newRows = 0;
 	if (textHeight > 0) {
 		newRows = textHeight / GetRowHeight();
@@ -160,11 +185,18 @@ void TextArea::DrawInternal(Region& clip)
 	ieWord visibleRows = (Height / GetRowHeight());
 	ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
 	bar->SetMax(sbMax);
+
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
-		&& bar->GetPos() != sbMax) {
+		&& bar->GetPos() != sbMax)
+	{
 		needScrollUpdate = true;
-		bar->SetPos(sbMax);
 		Owner->InvalidateForControl(this); // cant use MarkDirty since we are drawing
+		if (dialogNodeHeight > Height) {
+			// last node + select options too large for TA so we cant scroll to bottom!
+			ScrollToY(textContainer->ContentFrame().h + dialogNodeHeight, this);
+		} else {
+			bar->SetPos(sbMax); // scroll to the bottom
+		}
 	}
 }
 
