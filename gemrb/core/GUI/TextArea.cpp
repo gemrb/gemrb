@@ -652,6 +652,11 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		selectOptions->AppendContent(span); // container owns the span
 	}
 	assert(textContainer);
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		// we want a newline between dialog chunks
+		textContainer->AppendText(L"\n");
+	}
+
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	MarkDirty();
 	// This hack is to refresh the mouse cursor so that reply below cursor gets
