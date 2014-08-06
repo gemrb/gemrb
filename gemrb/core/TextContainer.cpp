@@ -38,6 +38,23 @@ Content::Content(const Size& size)
 Content::~Content()
 {}
 
+Size Content::ContentFrame() const
+{
+	if (frame.Dimensions().IsEmpty() && !layoutRegions.empty()) {
+		Regions::const_iterator it = layoutRegions.begin();
+		Region consolidated = *it++; // start with the first one
+		for (; it != layoutRegions.end(); ++it) {
+			// now expand it as needed
+			const Region& r = *it;
+			Region intersect = r.Intersect(consolidated);
+			consolidated.h += r.h - intersect.h;
+			consolidated.w += r.w - intersect.w;
+		}
+		return consolidated.Dimensions();
+	}
+	return frame.Dimensions();
+}
+
 void Content::Draw(Point p) const
 {
 	Size s(frame.Dimensions());
@@ -293,14 +310,6 @@ const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 	}
 
 	return NULL;
-}
-
-Size ContentContainer::ContentFrame() const
-{
-	if (!layoutRegions.empty()) {
-		return layoutRegions.back().Dimensions();
-	}
-	return Content::ContentFrame();
 }
 
 void ContentContainer::SetFrame(const Region& newFrame)

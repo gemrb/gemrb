@@ -52,7 +52,7 @@ public:
 	Content(const Size& size);
 	virtual ~Content();
 
-	virtual Size ContentFrame() const { return frame.Dimensions(); }
+	virtual Size ContentFrame() const;
 
 	virtual void Draw(Point p) const; // public drawing interface in screen coordinates.
 
@@ -129,7 +129,6 @@ public:
 	const Region* ContentRegionForRect(const Region& rect) const;
 
 	void SetFrame(const Region&);
-	virtual Size ContentFrame() const;
 
 protected:
 	void DrawContents(Point p, const Region&) const;
