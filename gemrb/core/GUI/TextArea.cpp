@@ -386,6 +386,7 @@ void TextArea::AppendText(const String& text)
 				// because the original data files for the DC font specifies a line height of 13
 				// that would cause overlap when the lines wrap beneath the DC if we didnt specify the correct size
 				Size s = finit->GetGlyph(text[textpos]).dimensions;
+				s.w += EDGE_PADDING;
 				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS], &s);
 				textContainer->AppendContent(dc);
 				textpos++;
