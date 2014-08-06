@@ -319,6 +319,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 	Point drawPoint = dp + drawOrigin;
 	int maxH = drawPoint.y - drawOrigin.y;
 	Content* content = NULL;
+	layoutRegions.clear();
 	layout.clear();
 	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
