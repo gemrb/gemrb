@@ -169,7 +169,8 @@ void TextArea::DrawInternal(Region& clip)
 
 	int newRows = 0;
 	if (textHeight > 0) {
-		newRows = textHeight / GetRowHeight();
+		int rowHeight = GetRowHeight();
+		newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
 	}
 	if (newRows == rows) {
 		// we must exit now
