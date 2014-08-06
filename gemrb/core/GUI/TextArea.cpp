@@ -207,14 +207,11 @@ int TextArea::SetScrollBar(Control* ptr)
 	if (ptr) {
 		// only pad left edge
 		contentWrapper.SetFrame(Region(Point(), Size(Width - EDGE_PADDING, -1)));
-		if (sb) { // had an existing scrollbar
-			((ScrollBar*)ptr)->SetMax(((ScrollBar*)sb)->Value);
-			((ScrollBar*)ptr)->SetPos(((ScrollBar*)sb)->GetPos());
-		}
 	} else {
 		// pad both edges
 		contentWrapper.SetFrame(Region(Point(), Size(Width - (EDGE_PADDING * 2), Height)));
 	}
+	rows = 0; // reset rows so that they get recalculated for the new scrollbar
 
 	return Control::SetScrollBar(ptr);
 }
