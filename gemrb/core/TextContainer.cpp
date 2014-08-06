@@ -317,7 +317,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 	// but its at least as fast as our previous (horrible) string printing implementation
 	const Point& drawOrigin = screenOffset;
 	Point drawPoint = dp + drawOrigin;
-	int maxH = drawPoint.y - drawOrigin.y;
+	int maxH = 0;
 	Content* content = NULL;
 	layoutRegions.clear();
 	layout.clear();
@@ -331,7 +331,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 		layout.insert(std::make_pair(content, content->layoutRegions));
 		Regions::const_iterator rit = layout[content].begin();
 		for (; rit != layout[content].end(); ++rit) {
-			int h = ((*rit).y + (*rit).h) - drawOrigin.y;
+			int h = ((*rit).y + (*rit).h) - drawOrigin.y - dp.y;
 			maxH = (h > maxH) ? h : maxH;
 		}
 		if (it == --contents.end()) break; // dont care about calculating next layout
@@ -360,7 +360,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 		} while (excluded);
 	}
 
-	Region layoutRegion = Region(drawOrigin, Size(frame.w, maxH));
+	Region layoutRegion = Region(drawOrigin + dp, Size(frame.w, maxH));
 	layoutRegions.push_back(layoutRegion);
 }
 
