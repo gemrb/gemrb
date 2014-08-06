@@ -406,6 +406,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//ta->AppendContent(new ImageSpan(image));
 		}
 	}
+	ta->AppendText(L"\n");
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 
 	int idx = 0;

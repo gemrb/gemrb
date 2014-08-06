@@ -151,7 +151,7 @@ void TextArea::DrawInternal(Region& clip)
 		 do {
 			 // find the last text node (non-empty)
 			 node = dynamic_cast<TextSpan*>(*--it);
-			 if (node && node->Text() == L"\n") {
+			 if (node && node->Text().find_first_not_of(L"\n\t\r ") == String::npos) {
 				 // newlines don't count as the "text node", but we still need their height
 				 dialogNodeHeight += node->ContentFrame().h;
 				 node = NULL;
@@ -159,7 +159,7 @@ void TextArea::DrawInternal(Region& clip)
 		 } while (node == NULL && it != textContainer->Contents().begin());
 
 		 if (node) {
-			 dialogNodeHeight += node->ContentFrame().h + selectOptions->ContentFrame().h;
+			 dialogNodeHeight += node->ContentFrame().h + selectOptions->ContentFrame().h + ftext->maxHeight;
 			 if (dialogNodeHeight < Height) {
 				 // compensate so there is enough extra scrolling space to get the "node" to the top of the TA later
 				 textHeight += (Height - dialogNodeHeight);
