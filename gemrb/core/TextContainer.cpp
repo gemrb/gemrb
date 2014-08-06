@@ -421,7 +421,7 @@ void RestrainedTextContainer::AppendContent(Content* newContent)
 		Region rgn = layout[content].front();
 		delete RemoveContent(content);
 		it = contents.begin();
-		while (++it != contents.end()) {
+		while (it != contents.end()) {
 			content = *it;
 			if (layout.find(content) != layout.end()) {
 				Regions::iterator rit = layout[content].begin();
@@ -433,6 +433,7 @@ void RestrainedTextContainer::AppendContent(Content* newContent)
 					}
 				}
 			}
+			it++;
 		}
 	}
 	ContentContainer::AppendContent(newContent);
