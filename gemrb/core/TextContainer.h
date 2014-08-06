@@ -102,8 +102,9 @@ protected:
 // Content container classes
 class ContentContainer : public Content
 {
-protected:
+public:
 	typedef std::list<Content*> ContentList;
+protected:
 	ContentList contents;
 
 	typedef std::map<Content*, Regions> ContentLayout;
@@ -123,6 +124,7 @@ public:
 	Content* RemoveContent(const Content* content);
 
 	Content* ContentAtPoint(const Point& p) const;
+	const ContentList& Contents() { return contents; }
 
 	const Region* ContentRegionForRect(const Region& rect) const;
 
