@@ -119,9 +119,12 @@ void TextArea::DrawInternal(Region& clip)
 
 	if (AnimPicture) {
 		// speaker portrait
-		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
-		clip.x += AnimPicture->Width;
-		clip.w -= AnimPicture->Width;
+		// dont clip the portrait, the original draws slightly outside the TA bounds
+		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x - EDGE_PADDING, clip.y + EDGE_PADDING, true);
+		int offset = AnimPicture->Width + EDGE_PADDING;
+		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
+		clip.x += offset;
+		clip.w -= offset;
 	}
 	contentWrapper.SetFrame(Region(Point(), Size(clip.w, 0)));
 
