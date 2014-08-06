@@ -412,25 +412,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	std::vector<SelectOption> dialogOptions;
 	ControlEventHandler handler = NULL;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
-	unsigned int x = ds->transitionsCount;
-	while(x--) {
-		if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-			continue;
-		}
-		if (ds->transitions[x]->textStrRef != 0xffffffff) {
-			continue;
-		}
-		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (ds->transitions[x]->condition &&
-				!ds->transitions[x]->condition->Evaluate(target)) {
-				continue;
-			}
-		}
-		core->GetDictionary()->SetAt("DialogOption",x);
-		gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
-		return true;
-	}
-	for (x = 0; x < ds->transitionsCount; x++) {
+	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 			if (ds->transitions[x]->condition &&
 				!ds->transitions[x]->condition->Evaluate(target)) {
@@ -442,7 +424,14 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//dialogchoose should be set to x
 			//it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption",x);
-			gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+			if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER
+				&& ds->transitions[x]->condition
+				&& !ds->transitions[x]->condition->Evaluate(target))
+			{
+				gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+			} else {
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+			}
 		} else {
 			String* string = core->GetString( ds->transitions[x]->textStrRef );
 			dialogOptions.push_back(std::make_pair(x, *string));
