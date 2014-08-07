@@ -24,6 +24,9 @@
 #include "System/String.h"
 #include "Video.h"
 
+#include <algorithm>
+#include <climits>
+
 #define CONTENT_MAX_SIZE (SHRT_MAX / 2) // just something larger than any screen height and small enough to not overflow
 #define DEBUG_TEXT 0
 

@@ -63,6 +63,7 @@
 #include "System/Logger/MessageWindowLogger.h"
 #include "System/VFS.h"
 
+#include <algorithm>
 #include <cstdio>
 
 using namespace GemRB;

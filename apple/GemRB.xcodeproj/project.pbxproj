@@ -100,6 +100,9 @@
 		A226F44B13A11AC3009CE75E /* WMPImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8781139F0A7D0002DC13 /* WMPImporter.cpp */; };
 		A226F44C13A11AC8009CE75E /* ZLibManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */; };
 		A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A228D24816A86FA00053375D /* libiconv.dylib */; };
+		A22A6B181994390D00488985 /* Logging.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B151994390D00488985 /* Logging.h */; };
+		A22A6B191994390D00488985 /* SlicedStream.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B161994390D00488985 /* SlicedStream.h */; };
+		A22A6B1A1994390D00488985 /* String.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B171994390D00488985 /* String.h */; };
 		A22B5D611583D816007B4AA4 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5D1583D816007B4AA4 /* libFreetype2.a */; };
 		A22B5D621583D816007B4AA4 /* libPython.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5E1583D816007B4AA4 /* libPython.a */; };
 		A22B5D641583D816007B4AA4 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D601583D816007B4AA4 /* libSDL2.a */; };
@@ -1192,6 +1195,9 @@
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
+		A22A6B151994390D00488985 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		A22A6B161994390D00488985 /* SlicedStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SlicedStream.h; sourceTree = "<group>"; };
+		A22A6B171994390D00488985 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
 		A22B5D601583D816007B4AA4 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ios/lib/iphonesimulator/libSDL2.a; sourceTree = "<group>"; };
@@ -3099,7 +3105,6 @@
 				A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */,
 				A2BF9FE71395FF62006ADC12 /* Slider.cpp */,
 				A2BF9FE81395FF62006ADC12 /* Slider.h */,
-				A265ECEC13A8669700C6DF12 /* String.cpp */,
 				A2BF9FE91395FF62006ADC12 /* TextArea.cpp */,
 				A2BF9FEA1395FF62006ADC12 /* TextArea.h */,
 				A2BF9FEB1395FF62006ADC12 /* TextEdit.cpp */,
@@ -3144,8 +3149,12 @@
 				A2DE329714EB071200117503 /* Logger.cpp */,
 				A2DE329814EB071200117503 /* Logger.h */,
 				A265ECEA13A8669700C6DF12 /* Logging.cpp */,
+				A22A6B151994390D00488985 /* Logging.h */,
 				A2BFA0601395FF62006ADC12 /* MemoryStream.cpp */,
 				A2BFA0611395FF62006ADC12 /* MemoryStream.h */,
+				A22A6B161994390D00488985 /* SlicedStream.h */,
+				A265ECEC13A8669700C6DF12 /* String.cpp */,
+				A22A6B171994390D00488985 /* String.h */,
 				A2C76D2814F196E900961680 /* StringBuffer.cpp */,
 				A2C76D2914F196E900961680 /* StringBuffer.h */,
 				A2BFA0641395FF62006ADC12 /* swab.c */,
@@ -3256,6 +3265,7 @@
 				A2E6635A139E883100310FC8 /* AnimStructures.h in Headers */,
 				A2E6635C139E883100310FC8 /* ArchiveImporter.h in Headers */,
 				A2E6635E139E883100310FC8 /* Audio.h in Headers */,
+				A22A6B181994390D00488985 /* Logging.h in Headers */,
 				A2E66360139E883100310FC8 /* Bitmap.h in Headers */,
 				A2E66362139E883100310FC8 /* Cache.h in Headers */,
 				A28062861878D1BC009E577D /* TextContainer.h in Headers */,
@@ -3314,6 +3324,8 @@
 				A2E663BA139E883E00310FC8 /* ProjectileServer.h in Headers */,
 				A2E663BC139E883E00310FC8 /* Region.h in Headers */,
 				A2E663BE139E883E00310FC8 /* Resource.h in Headers */,
+				A22A6B1A1994390D00488985 /* String.h in Headers */,
+				A22A6B191994390D00488985 /* SlicedStream.h in Headers */,
 				A2E663C0139E883E00310FC8 /* ResourceDesc.h in Headers */,
 				A2E663C2139E883E00310FC8 /* ResourceManager.h in Headers */,
 				A2E663C4139E883E00310FC8 /* ResourceSource.h in Headers */,

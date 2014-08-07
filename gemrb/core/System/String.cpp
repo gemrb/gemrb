@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+#include <cwctype>
 #ifdef WIN32
 #include "win32def.h"
 #ifdef _DEBUG
