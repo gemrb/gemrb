@@ -2559,7 +2559,7 @@ def BiographyPress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	BiographyWindow = GemRB.LoadWindow (51)
 	BiographyField = BiographyWindow.GetControl (4)
-	BiographyTextArea = BiographyWindow.CreateTextArea()
+	BiographyTextArea = BiographyWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
 	BiographyField = BiographyTextArea.SubstituteForControl(BiographyField)
 	BiographyField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 

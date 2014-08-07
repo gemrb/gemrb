@@ -4196,7 +4196,7 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_Window_CreateTextArea__doc,
-			 "CreateLabel(WindowIndex, ControlID, x, y, w, h, font)\n\n"
+			 "CreateTextArea(WindowIndex, ControlID, x, y, w, h, font)\n\n"
 			 "Creates and adds a new TextArea to a Window." );
 
 static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args)

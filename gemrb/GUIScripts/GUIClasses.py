@@ -99,6 +99,10 @@ class GWindow:
     _GemRB.Window_CreateScrollBar(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
   @CreateControlDecorator
+  def CreateTextArea(self, control, *args):
+    _GemRB.Window_CreateTextArea(self.ID, control, *args)
+    return _GemRB.Window_GetControl(self.ID, control)    
+  @CreateControlDecorator
   def CreateTextEdit(self, control, *args):
     _GemRB.Window_CreateTextEdit(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)

@@ -289,7 +289,7 @@ def AddNoteWindow ():
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
 		#0 is the default Scrollbar ID
-		NoteTA = MapWindow.CreateTextArea()
+		NoteTA = MapWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
 		NoteLabel = NoteTA.SubstituteForControl(NoteLabel)
 	else:
 		NoteLabel.SetBackground ("")
