@@ -35,6 +35,8 @@ namespace GemRB {
 TextArea::TextArea(const Region& frame, Font* text)
 	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
 {
+	palette = text->GetPalette();
+	finit = ftext;
 	Init();
 }
 
