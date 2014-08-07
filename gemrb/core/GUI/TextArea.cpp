@@ -29,6 +29,7 @@
 #include "GUI/Window.h"
 
 #define EDGE_PADDING 3
+#define WHITESPACE_STRING L"\n\t\r "
 
 namespace GemRB {
 
@@ -156,7 +157,7 @@ void TextArea::DrawInternal(Region& clip)
 		 do {
 			 // find the last text node (non-empty)
 			 node = dynamic_cast<TextSpan*>(*--it);
-			 if (node && node->Text().find_first_not_of(L"\n\t\r ") == String::npos) {
+			 if (node && node->Text().find_first_not_of(WHITESPACE_STRING) == String::npos) {
 				 // newlines don't count as the "text node", but we still need their height
 				 dialogNodeHeight += node->ContentFrame().h;
 				 node = NULL;
@@ -378,7 +379,7 @@ void TextArea::AppendText(const String& text)
 	} else if (text.length()) {
 		if (finit != ftext) {
 			// append cap spans
-			size_t textpos = text.find_first_not_of(L"\n\t\r ");
+			size_t textpos = text.find_first_not_of(WHITESPACE_STRING);
 			// FIXME: ? maybe we actually want the newlines etc?
 			// I think maybe if we clean up the GUIScripts this isn't needed.
 			if (textpos != String::npos) {
