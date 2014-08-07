@@ -68,7 +68,7 @@ public:
 	~TextArea(void);
 
 	/** Sets the Actual Text */
-	void SetText(const char* text);
+	void SetText(const String& text);
 	/** Clears the textarea */
 	void ClearText();
 	/** Appends a String to the current Text */

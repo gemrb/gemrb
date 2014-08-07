@@ -223,7 +223,7 @@ int TextArea::SetScrollBar(Control* ptr)
 }
 
 /** Sets the Actual Text */
-void TextArea::SetText(const char* text)
+void TextArea::SetText(const String& text)
 {
 	ClearText();
 	AppendText(text);
