@@ -89,7 +89,7 @@ def OpenLevelUpWindow():
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# hide "Character Generation"
-	Label = LevelUpWindow.CreateLabel (0x1000007e, 0,0,0,0,"NUMBER","",1)
+	Label = LevelUpWindow.CreateLabel (0x1000007e, 0,0,0,0,"NUMBER","",IE_FONT_ALIGN_CENTER|IE_FONT_SINGLE_LINE)
 
 	# name
 	pc = GemRB.GameGetSelectedPCSingle ()

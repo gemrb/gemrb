@@ -38,7 +38,7 @@ Label::Label(const Region& frame, Font* font, const char* string)
 	useRGB = false;
 	ResetEventHandler( LabelOnPress );
 
-	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
+	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE|IE_FONT_SINGLE_LINE;
 	palette = NULL;
 	Control::SetText(string);
 }
@@ -51,9 +51,7 @@ Label::~Label()
 void Label::DrawInternal(Region& rgn)
 {
 	if (font && Text.length()) {
-		font->Print( rgn, Text,
-			useRGB?palette:NULL,
-					 Alignment | IE_FONT_SINGLE_LINE );
+		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);
 	}
 
 	if (AnimPicture) {

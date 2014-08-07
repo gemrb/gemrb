@@ -132,9 +132,9 @@ def OpenInventoryWindow ():
 	Button = Window.GetControl (67)
 	r = Button.GetRect ()
 	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],20,
-		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-20,r["Width"],20,
-		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
+		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	# armor class
 	Label = Window.GetControl (0x10000038)

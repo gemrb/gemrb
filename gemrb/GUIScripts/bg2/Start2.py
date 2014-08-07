@@ -86,7 +86,7 @@ def OnLoad():
 	MultiPlayerButton = StartWindow.GetControl (1)
 	MoviesButton = StartWindow.GetControl (2)
 	BackButton = StartWindow.GetControl (5)
-	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", 1)
+	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label=StartWindow.GetControl (0x0fff0000)
 	Label.SetText (GEMRB_VERSION)
 	if GameCheck.HasTOB():
