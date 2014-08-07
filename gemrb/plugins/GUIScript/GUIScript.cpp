@@ -1943,10 +1943,31 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_Label_SetAlignment__doc,
+			 "SetLabelAlignment(WindowIndex, ControlIndex, alignment)\n\n"
+			 "Sets the alignment of a Label Control." );
+static PyObject* GemRB_Label_SetAlignment(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	int align;
+
+	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &align )) {
+		return AttributeError( GemRB_Label_SetAlignment__doc );
+	}
+
+	Label* lab = ( Label* ) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
+	if (!lab) {
+		return NULL;
+	}
+
+	lab->SetAlignment(align);
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
 "SetLabelTextColor(WindowIndex, ControlIndex, red, green, blue)\n\n"
 "Sets the Text Color of a Label Control." );
-
 static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
@@ -10749,6 +10770,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Control_SubstituteForControl, METH_VARARGS),
 	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
+	METHOD(Label_SetAlignment, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
