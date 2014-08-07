@@ -64,9 +64,11 @@ def StartLoadScreen ():
 		Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
-	HintStr = Table.GetValue (tmp, 0)
-	TextArea = LoadScreen.GetControl (2)
-	TextArea.SetText (HintStr)
+
+	Label = LoadScreen.GetControl (2)
+	Label.SetAlignment(IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE)
+	Label.SetText(Table.GetValue (tmp, 0))
+
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
