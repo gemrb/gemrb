@@ -67,12 +67,11 @@ void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
 	Label *l = core->GetMessageLabel();
 	if (l) {
 		l->SetText(Text);
-	}
-	TextArea *ta = core->GetMessageTextArea();
-	if (ta) {
-		ta->AppendText( Text );
 	} else {
-		if(target) {
+		TextArea *ta = core->GetMessageTextArea();
+		if (ta) {
+			ta->AppendText( Text );
+		} else if (target) {
 			target->SetOverheadText(Text);
 		}
 	}
