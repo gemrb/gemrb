@@ -266,6 +266,7 @@ Control* Window::RemoveControl(unsigned short i)
 {
 	if (i < Controls.size() ) {
 		Control *ctrl = Controls[i];
+		InvalidateForControl(ctrl);
 		if (ctrl==lastC) {
 			lastC=NULL;
 		}
@@ -279,7 +280,6 @@ Control* Window::RemoveControl(unsigned short i)
 			lastMouseFocus=NULL;
 		}
 		Controls.erase(Controls.begin()+i);
-		Invalidate();
 		return ctrl;
 	}
 	return NULL;
