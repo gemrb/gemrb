@@ -151,6 +151,8 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			if (printPoint.y) {
 				// a newline occured; occupy the entire line area
 				lineSegment.w = lineRgn.w;
+				// in case the line has multiple line breaks ('\n') use the return point to determine the next line position
+				lineRgn.y += printPoint.y - lineSegment.h;
 			} else if (printPoint.x) {
 				dp.x += printPoint.x;
 				lineSegment.w = printPoint.x;
