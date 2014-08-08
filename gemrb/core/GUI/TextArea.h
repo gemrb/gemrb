@@ -101,7 +101,7 @@ private: // Private attributes
 	std::vector<OptionSpan> OptSpans;
 	TextSpan* hoverSpan, *selectedSpan;
 	// dialog options container
-	ContentContainer* selectOptions;
+	TextContainer* selectOptions;
 	// standard text display container
 	TextContainer* textContainer;
 	// wrapper containing both of the above

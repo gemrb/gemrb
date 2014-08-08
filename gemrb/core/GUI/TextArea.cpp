@@ -687,6 +687,9 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 									  ftext, palettes[PALETTE_OPTIONS]);
 		OptSpans.push_back(std::make_pair(opts[i].first, span));
 		selectOptions->AppendContent(span); // container owns the span
+		// now add a newline for keeping the options spaced out (for touch screens)
+		// TODO: make this optional, or automaticly detected
+		selectOptions->AppendText(L"\n");
 	}
 	assert(textContainer);
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
