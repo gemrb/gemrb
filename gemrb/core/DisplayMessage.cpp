@@ -62,14 +62,12 @@ bool DisplayMessage::ReadStrrefs()
 	return true;
 }
 
-void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
+void DisplayMessage::DisplayMarkupString(const String& Text) const
 {
+	assert(core->GetMessageLabel() == NULL);
 	TextArea *ta = core->GetMessageTextArea();
-	if (ta) {
-		ta->AppendText( Text );
-	} else if (target) {
-		target->SetOverheadText(Text);
-	}
+	assert(ta);
+	ta->AppendText( Text );
 }
 
 ieStrRef DisplayMessage::GetStringReference(int stridx) const
@@ -138,7 +136,12 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 		int newlen = (int)(wcslen( DisplayFormat) + text.length() + 12);
 		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
 		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
-		DisplayString( newstr, target );
+		TextArea* ta = core->GetMessageTextArea();
+		if (ta) {
+			DisplayMarkupString( newstr );
+		} else {
+			target->SetOverheadText( newstr );
+		}
 		free( newstr );
 	}
 }
@@ -155,7 +158,7 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, 
 	swprintf( newstr, newlen, DisplayFormatValue, color, text, value);
 
 	core->FreeString( text );
-	DisplayString( newstr );
+	DisplayMarkupString( newstr );
 	free( newstr );
 }
 
@@ -180,7 +183,7 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int co
 	}
 	core->FreeString( text );
 	core->FreeString( text2 );
-	DisplayString( newstr );
+	DisplayMarkupString( newstr );
 	free( newstr );
 }
 
@@ -229,7 +232,7 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t));
 	swprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1, color,text, name2);
 	core->FreeString( text );
-	DisplayString( newstr );
+	DisplayMarkupString( newstr );
 	free( newstr );
 }
 
@@ -276,7 +279,7 @@ void DisplayMessage::DisplayStringName(const String& text, unsigned int color, c
 	int newlen = (int)(wcslen(DisplayFormatName) + strlen(name) + text.length() + 18);
 	wchar_t* newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
 	swprintf(newstr, newlen, DisplayFormatName, speaker_color, name, color, text.c_str());
-	DisplayString(newstr);
+	DisplayMarkupString(newstr);
 	free(newstr);
 }
 

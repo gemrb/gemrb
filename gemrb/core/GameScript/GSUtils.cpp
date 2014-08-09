@@ -490,7 +490,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 				//can't play the sound here, we have to delay action
 				//and for that, we have to know how long the text takes
 				if(flags&DS_NONAME) {
-					displaymsg->DisplayString( sb.text );
+					displaymsg->DisplayMarkupString( sb.text );
 				} else {
 					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
 				}

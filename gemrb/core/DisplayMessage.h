@@ -60,7 +60,7 @@ public:
 	/** returns the speaker's color and name */
 	unsigned int GetSpeakerColor(const char *&name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
-	void DisplayString(const String& txt, Scriptable *speaker=NULL) const;
+	void DisplayMarkupString(const String& txt) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */

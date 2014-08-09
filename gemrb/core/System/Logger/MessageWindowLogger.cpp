@@ -80,7 +80,7 @@ void MessageWindowLogger::LogInternal(log_level level, const char* owner, const 
 		size_t len = strlen(message) + strlen(owner) + wcslen(fmt) + 28; // 28 is for sizeof(colors[x]) * 2
 		wchar_t* msg = (wchar_t*)malloc(len * sizeof(wchar_t));
 		swprintf(msg, len, fmt, colors[color], owner, colors[log_level_color[level]], message);
-		displaymsg->DisplayString(msg);
+		displaymsg->DisplayMarkupString(msg);
 		free(msg);
 	}
 }
