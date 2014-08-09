@@ -141,7 +141,7 @@ private:
 					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
 public:
 	Font(Palette*);
-	~Font();
+	virtual ~Font();
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
 	void CreateAliasForChar(ieWord chr, ieWord alias);

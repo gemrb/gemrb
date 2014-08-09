@@ -32,8 +32,6 @@ class Sprite2D;
 class TTFFont : public Font
 {
 private:
-	HashMap<ieWord, Holder<Sprite2D> >* glyphCache;
-
 	FontStyle style;
 	ieWord ptSize;
 
@@ -51,7 +49,7 @@ public:
 	TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style);
 	~TTFFont(void);
 
-	const Sprite2D* GetCharSprite(ieWord chr) const;
+	const Glyph& GetGlyph(ieWord chr) const;
 
 	ieWord GetPointSize() const {return ptSize;};
 	FontStyle GetStyle() const {return style;};

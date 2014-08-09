@@ -36,7 +36,7 @@
 
 namespace GemRB {
 
-const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
+const Glyph& TTFFont::GetGlyph(ieWord chr) const
 {
 #if HAVE_ICONV
 	if (!core->TLKEncoding.multibyte) {
@@ -49,9 +49,9 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 		// TODO: maybe we want to work with non-unicode fonts?
 		iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.encoding.c_str());
 	#if __FreeBSD__
-		int ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
+		size_t ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
 	#else
-		int ret = iconv(cd, &oldchar, &in, &newchar, &out);
+		size_t ret = iconv(cd, &oldchar, &in, &newchar, &out);
 	#endif
 		if (ret != GEM_OK) {
 			Log(ERROR, "FONT", "iconv error: %d", errno);
@@ -60,13 +60,17 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 		chr = unicodeChr;
 	}
 #endif
-	const Holder<Sprite2D>* sprCache = glyphCache->get(chr);
-	if (sprCache) {
-		// found in cache
-		return sprCache->get();
+	// first check if the glyph already exists
+	const Glyph& g = Font::GetGlyph(chr);
+	if (g.pixels) {
+		return g;
 	}
 
-	// generate glyph
+	// blank for returning when there is an error
+	// TODO: ttf fonts have a "box" glyph they use for this
+	static Glyph blank(Size(0,0), 0, NULL, 0);
+
+	// attempt to generate glyph
 
 	// TODO: fix the font styles!
 	FT_Error error = 0;
@@ -121,50 +125,49 @@ const Sprite2D* TTFFont::GetCharSprite(ieWord chr) const
 
 	bitmap = &glyph->bitmap;
 
-	int sprHeight = bitmap->rows;
-	int sprWidth = bitmap->width;
+	Size sprSize(bitmap->width, bitmap->rows);
 
 	/* Ensure the width of the pixmap is correct. On some cases,
 	 * freetype may report a larger pixmap than possible.*/
-	if (sprWidth > maxx) {
-		sprWidth = maxx;
+	if (sprSize.w > maxx) {
+		sprSize.w = maxx;
 	}
 
-	if (sprWidth == 0 || sprHeight == 0) {
+	if (sprSize.IsEmpty()) {
 		return blank;
 	}
 
 	// we need 1px empty space on each side
-	sprWidth += 2;
+	sprSize.w += 2;
 
-	pixels = (uint8_t*)malloc(sprWidth * sprHeight);
+	pixels = (uint8_t*)malloc(sprSize.w * sprSize.h);
 	uint8_t* dest = pixels;
 	uint8_t* src = bitmap->buffer;
 
-	for( int row = 0; row < sprHeight; row++ ) {
+	for( int row = 0; row < sprSize.h; row++ ) {
 		// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
 
 		// add 1px left padding
 		memset(dest++, 0, 1);
 		// -2 to account for padding
-		memcpy(dest, src, sprWidth - 2);
-		dest += sprWidth - 2;
+		memcpy(dest, src, sprSize.w - 2);
+		dest += sprSize.w - 2;
 		src += bitmap->pitch;
 		// add 1px right padding
 		memset(dest++, 0, 1);
 	}
 	// assert that we fill the buffer exactly
-	assert((dest - pixels) == (sprWidth * sprHeight));
+	assert((dest - pixels) == (sprSize.w * sprSize.h));
 
 	// TODO: do an underline if requested
 
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprWidth, sprHeight, pixels, palette, true, 0);
-	// for some reason BAM fonts are all based of a YPos of 13
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, NULL, true, 0);
+	// Line height in IE is 13 px
 	spr->YPos = 13 - yoffset;
-	// cache the glyph
-	glyphCache->set(chr, spr);
-	spr->release(); // retained by the cache holder
-	return spr;
+	// FIXME: casting away const
+	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
+	spr->release();
+	return ret;
 }
 
 int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
@@ -179,15 +182,12 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 		return 0;
 	}
 	// kerning is in 26.6 format. basically divide by 64 to get the number of pixels.
-	return -kerning.x / 64;
+	return (int)(-kerning.x / 64);
 }
 
 TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 	: Font(pal), style(style), ptSize(ptSize), face(face)
 {
-	glyphCache = new HashMap<ieWord, Holder<Sprite2D> >();
-	glyphCache->init(256, 128);
-
 // on FT < 2.4.2 the manager will difer ownership to this object
 #if FREETYPE_VERSION_ATLEAST(2,4,2)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
@@ -198,7 +198,7 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 	if ( FT_IS_SCALABLE(face) ) {
 		FT_Fixed scale;
 		/* Set the character size and use default DPI (72) */
-		error = FT_Set_Char_Size( face, 0, ptSize * 64, 0, 0 );
+		error = FT_Set_Pixel_Sizes( face, 0, maxHeight );
 		if( error ) {
 			LogFTError(error);
 		} else {
@@ -263,18 +263,12 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 	glyph_italics = 0.207f;
 	glyph_italics *= height;
 
-	// TODO: ttf fonts have a "box" glyph they use for this
-	blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
 	// ttf fonts dont produce glyphs for whitespace
 	int SpaceWidth = core->TLKEncoding.zerospace ? 1 : (ptSize * 0.25);
-	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, NULL, palette);
-	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, NULL, palette);
-
-	// now cache these glyphs for quick access
-	// WARNING: if we ever did something to purge the cache these would be lost
-	glyphCache->set(' ', space);
-	glyphCache->set('\t', tab);
-	// retained by the cache
+	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, NULL, NULL);
+	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, NULL, NULL);
+	CreateGlyphForCharSprite(' ', space);
+	CreateGlyphForCharSprite('\t', tab);
 	space->release();
 	tab->release();
 }
@@ -282,7 +276,6 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 TTFFont::~TTFFont()
 {
 	FT_Done_Face(face);
-	delete glyphCache;
 }
 
 }
