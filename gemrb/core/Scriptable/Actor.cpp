@@ -3602,8 +3602,10 @@ void Actor::CommandActor(Action* action)
 			}
 		default:;
 	}
-	//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
-	VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
+	if (core->GetFirstSelectedPC(false) == this) {
+		//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
+		VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
+	}
 }
 
 //Generates an idle action (party banter, area comment, bored)
