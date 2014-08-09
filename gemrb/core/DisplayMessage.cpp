@@ -64,10 +64,9 @@ bool DisplayMessage::ReadStrrefs()
 
 void DisplayMessage::DisplayMarkupString(const String& Text) const
 {
-	assert(core->GetMessageLabel() == NULL);
 	TextArea *ta = core->GetMessageTextArea();
-	assert(ta);
-	ta->AppendText( Text );
+	if (ta)
+		ta->AppendText( Text );
 }
 
 ieStrRef DisplayMessage::GetStringReference(int stridx) const
