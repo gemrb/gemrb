@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import MessageWindow
 from GUIDefines import *
 
 LoadScreen = None
@@ -46,16 +47,19 @@ def StartLoadScreen ():
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
 	LoadScreen.SetPicture(LoadPic)
-	Progress = 0
-	GemRB.SetVar ("Progress", Progress)
+	Progress = GemRB.GetVar ("Progress")
 
 	Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
+	HintStr = Table.GetValue (tmp, 0)
 	
 	Label = LoadScreen.GetControl (2)
 	Label.SetAlignment(IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE)
-	Label.SetText(Table.GetValue (tmp, 0))
+	Label.SetText(HintStr)
+	if Progress: # only want 1 hint + game isnt ready till later
+		MessageWindow.UpdateControlStatus()
+		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]")
 
 	Picture = LoadScreen.GetControl (4)
 
