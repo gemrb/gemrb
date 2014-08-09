@@ -435,7 +435,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 
 	MarkDirty();
 
-	size_t lookupIdx = Key - '1';
+	unsigned int lookupIdx = Key - '1';
 	if (lookupIdx < OptSpans.size()) {
 		UpdateState(VarName, lookupIdx);
 	}
@@ -513,7 +513,7 @@ int TextArea::GetRowHeight() const
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(unsigned long y, Control* sender)
+void TextArea::ScrollToY(int y, Control* sender)
 {
 	if (sb && sender != sb) {
 		// we must "scale" the pixels
@@ -547,7 +547,7 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 		unsigned long fauxY = TextYPos;
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
-		ScrollToY(fauxY, this);
+		ScrollToY((int)fauxY, this);
 	}
 }
 
