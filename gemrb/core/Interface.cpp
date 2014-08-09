@@ -657,9 +657,11 @@ void Interface::HandleFlags()
 			EventFlag|=EF_EXPANSION;
 			timer->Init();
 
+			// FIXME: i moved StartGameControl ahead of ConsolidateParty because we need the message window available
+			// however, this change had the side effect of a brief blue flicker when the game is loaded
+			GameControl* gc = StartGameControl();
 			//rearrange party slots
 			game->ConsolidateParty();
-			GameControl* gc = StartGameControl();
 			//switch map to protagonist
 			Actor* actor = GetFirstSelectedPC(true);
 			if (actor) {
