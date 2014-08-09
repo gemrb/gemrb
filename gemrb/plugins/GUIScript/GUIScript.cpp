@@ -7605,6 +7605,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
+	Label* l = core->GetMessageLabel();
+	if (l) {
+		// this is how BG2 behaves, not sure about others
+		l->SetText(""); // clear previous message
+	}
+
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
