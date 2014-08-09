@@ -210,6 +210,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		sca->YPos+=fx->PosY;
 		area->AddVVCell( new VEFObject(sca));
 	} else {
+		assert(target);
 		ScriptedAnimation *twin = sca->DetachTwin();
 		if (twin) {
 			target->AddVVCell(twin);

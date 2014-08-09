@@ -543,6 +543,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
+		assert(self);
 		fx->SetPosition(self->Pos);
 
 		flg = ApplyEffect( st, fx, 1 );
@@ -565,6 +566,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	case FX_TARGET_ALL_BUT_SELF:
 		new_fx = new Effect;
+		assert(self);
 		map=self->GetCurrentArea();
 		i= map->GetActorCount(true);
 		while(i--) {
@@ -615,6 +617,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		if( !pretarget || pretarget->InParty) {
 			goto all_party;
 		}
+		assert(self);
 		map = self->GetCurrentArea();
 		spec = pretarget->GetStat(IE_SPECIFIC);
 
@@ -672,6 +675,7 @@ all_party:
 
 	case FX_TARGET_ALL:
 		new_fx = new Effect;
+		assert(self);
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(true);
 		while(i--) {
@@ -690,6 +694,7 @@ all_party:
 
 	case FX_TARGET_ALL_BUT_PARTY:
 		new_fx = new Effect;
+		assert(self);
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(false);
 		while(i--) {

@@ -920,7 +920,7 @@ static ieResRef PlayerDialogRes = "PLAYERx\0";
 
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
-	Scriptable* tar, *scr;
+	Scriptable* tar = NULL, *scr = NULL;
 	int seeflag = GA_NO_DEAD;
 
 	if (InDebug&ID_VARIABLES) {
@@ -934,6 +934,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		scr = Sender;
 	}
 	if (!scr) {
+		assert(Sender);
 		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.",
 			Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
@@ -1330,6 +1331,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if (!header || !actor->WeaponIsUsable(leftorright, header)) {
 		actor->StopAttack();
 		Sender->ReleaseCurrentAction();
+		assert(tar);
 		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
 		Log(WARNING, "AttackCore", "Weapon unusable: %s!", actor->GetName(1));
 		return;

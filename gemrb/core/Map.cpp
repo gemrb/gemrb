@@ -1255,6 +1255,7 @@ void Map::DrawMap(Region screen)
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
+		assert(TMap);
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
@@ -3037,8 +3038,7 @@ void Map::RemoveMapNote(const Point &point)
 {
 	size_t i = mapnotes.size();
 	while (i--) {
-		if ((point.x==mapnotes[i]->Pos.x) &&
-			(point.y==mapnotes[i]->Pos.y)) {
+		if (point == mapnotes[i]->Pos) {
 			delete mapnotes[i];
 			mapnotes.erase(mapnotes.begin()+i);
 		}
@@ -3794,9 +3794,8 @@ void AreaAnimation::InitAnimation()
 	}
 	free(animation);
 
-	if (Flags & A_ANI_ALLCYCLES) {
-		animcount = (int) af->GetCycleCount();
-
+	animcount = (int) af->GetCycleCount();
+	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
 		animation = (Animation **) malloc(animcount * sizeof(Animation *) );
 		for(int j=0;j<animcount;j++) {
 			animation[j]=GetAnimationPiece(af, j);

@@ -149,7 +149,7 @@ static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 // Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromResRef(char* ResRef)
 {
-	unsigned int i = strnlen(ResRef,sizeof(ieResRef));
+	size_t i = strnlen(ResRef,sizeof(ieResRef));
 	return PyString_FromStringAndSize( ResRef, i );
 }
 

@@ -84,7 +84,10 @@ unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable
 {
 	unsigned int speaker_color;
 
-	if(!speaker) return 0;
+	if(!speaker) {
+		name = "";
+		return 0;
+	}
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = speaker->GetName(-1);
@@ -139,7 +142,7 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 		TextArea* ta = core->GetMessageTextArea();
 		if (ta) {
 			DisplayMarkupString( newstr );
-		} else {
+		} else if (target) {
 			target->SetOverheadText( newstr );
 		}
 		free( newstr );
@@ -207,7 +210,7 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int col
 
 	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	//allow for a number
-	int bufflen = text->length() +6;
+	size_t bufflen = text->length() + 6;
 	wchar_t* newtext = ( wchar_t* ) malloc( bufflen * sizeof(wchar_t));
 	swprintf( newtext, bufflen, text->c_str(), value );
 	DisplayStringName(newtext, color, speaker);
@@ -220,7 +223,7 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int col
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
 {
 	unsigned int attacker_color;
-	const char *name1, *name2;
+	const char *name1 = NULL, *name2 = NULL;
 
 	if (stridx<0) return;
 
