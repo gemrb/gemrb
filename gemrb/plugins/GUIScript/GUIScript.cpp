@@ -1984,8 +1984,8 @@ static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0}, back = {0, 0, 0, 0};
-	lab->SetColor( fore, back );
+	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0};
+	lab->SetColor( fore, ColorBlack );
 
 	Py_RETURN_NONE;
 }
