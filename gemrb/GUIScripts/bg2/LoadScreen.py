@@ -70,7 +70,7 @@ def StartLoadScreen ():
 	Label.SetText(HintStr)
 	if Progress: # only want 1 hint + game isnt ready till later
 		MessageWindow.UpdateControlStatus()
-		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]")
+		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
