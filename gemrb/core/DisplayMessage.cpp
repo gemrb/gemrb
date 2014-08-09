@@ -64,16 +64,11 @@ bool DisplayMessage::ReadStrrefs()
 
 void DisplayMessage::DisplayString(const String& Text, Scriptable *target) const
 {
-	Label *l = core->GetMessageLabel();
-	if (l) {
-		l->SetText(Text);
-	} else {
-		TextArea *ta = core->GetMessageTextArea();
-		if (ta) {
-			ta->AppendText( Text );
-		} else if (target) {
-			target->SetOverheadText(Text);
-		}
+	TextArea *ta = core->GetMessageTextArea();
+	if (ta) {
+		ta->AppendText( Text );
+	} else if (target) {
+		target->SetOverheadText(Text);
 	}
 }
 
@@ -134,11 +129,18 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 {
 	if (!text.length()) return;
 
-	int newlen = (int)(wcslen( DisplayFormat) + text.length() + 12);
-	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
-	swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
-	DisplayString( newstr, target );
-	free( newstr );
+	Label *l = core->GetMessageLabel();
+	if (l) {
+		const Color fore = { (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, (color >> 24) & 0xFF};
+		l->SetColor( fore, ColorBlack );
+		l->SetText(text);
+	} else {
+		int newlen = (int)(wcslen( DisplayFormat) + text.length() + 12);
+		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
+		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
+		DisplayString( newstr, target );
+		free( newstr );
+	}
 }
 
 // String format is
