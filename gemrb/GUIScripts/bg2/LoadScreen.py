@@ -78,6 +78,7 @@ def StartLoadScreen ():
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
 
 def EndLoadScreen ():
+	GemRB.SetVar ("Progress", 0)
 	if GameCheck.IsBG2Demo():
 		Middle = LoadScreen.GetControl (3)
 		Middle.SetBAM ("COADCNTR", 1, 0)

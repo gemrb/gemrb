@@ -70,6 +70,7 @@ def StartLoadScreen ():
 	return
 
 def EndLoadScreen ():
+	GemRB.SetVar ("Progress", 0)
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
