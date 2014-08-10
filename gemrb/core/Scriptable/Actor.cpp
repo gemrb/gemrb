@@ -6517,7 +6517,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
 			success = true;
 		} else {
-			success = roll + rollMod > (ReverseToHit) ? tohit : defense;
+			success = (roll + rollMod) > ((ReverseToHit) ? tohit : defense);
 		}
 	}
 
