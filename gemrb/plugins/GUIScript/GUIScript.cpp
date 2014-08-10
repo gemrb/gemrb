@@ -11216,10 +11216,25 @@ void GUIScript::ExecFile(const char* file)
 /** Exec a single String */
 void GUIScript::ExecString(const char* string)
 {
-	if (PyRun_SimpleString((char*) string) == -1) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
+	PyObject *py_main, *py_dict;
+    py_main = PyImport_AddModule("__main__");
+    py_dict = PyModule_GetDict(py_main);
+	PyObject* run = PyRun_String(string, Py_file_input, py_dict, py_dict);
+
+	if (run) {
+		Py_DECREF(run);
+	} else {
+		PyObject *ptype, *pvalue, *ptraceback;
+		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+
+		//Get error message
+		String* error = StringFromCString(PyString_AsString(pvalue));
+		displaymsg->DisplayString(*error, DMC_RED, NULL);
+		PyErr_Print();
+		Py_DECREF(ptype);
+		Py_DECREF(pvalue);
+		Py_DECREF(ptraceback);
+		free(error);
 	}
 }
 
