@@ -6510,21 +6510,25 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	bool critical = criticalroll>=ATTACKROLL;
 	bool success = critical;
-
+	int defense = target->GetDefense(damagetype, wi.wflags, this);
+	int rollMod = (ReverseToHit) ? defense : tohit;
 	if (!critical) {
-		//get target's defense against attack
-		int defense = target->GetDefense(damagetype, wi.wflags, this);
-
-		if(ReverseToHit) {
-			success = roll + defense > tohit;
-		} else {
-			success = tohit + roll > defense;
-		}
 		// autohit immobile enemies (true for atleast stun, sleep, timestop)
 		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
 			success = true;
+		} else {
+			success = roll + rollMod > (ReverseToHit) ? tohit : defense;
 		}
 	}
+
+	// log the roll
+	// FIXME: Im sure there are string constants we should be using!
+	// FEXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
+	wchar_t* rollLog = (wchar_t*)malloc(40 * sizeof(wchar_t));
+	const wchar_t* fmt = L"Attack Roll %d %ls %d = %d : %ls";
+	swprintf( rollLog, 40, fmt, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, (success) ? L"Hit" : L"Miss" );
+	displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
+	free(rollLog);
 
 	if (!success) {
 		//hit failed
