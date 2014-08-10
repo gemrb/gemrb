@@ -3367,6 +3367,9 @@ void Actor::VerbalConstant(int start, int count) const
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return;
 	}
 
+	ieDword subtitles = 0;
+	core->GetDictionary()->Lookup("Subtitles", subtitles);
+
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
@@ -3375,14 +3378,14 @@ void Actor::VerbalConstant(int start, int count) const
 			count--;
 			ResolveStringConstant(soundref, start+count-1);
 		}
-		if (count > 0){
+		if (count > 0 && subtitles){
 			DisplayStringCore((Scriptable *const) this, start + RAND(0, count-1), DS_CONSOLE|DS_CONST|DS_SPEECH);
 		}
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
 		}
-		if(count > 0) {
+		if(count > 0 && subtitles) {
 			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+RAND(0, count-1)), DS_CONSOLE|DS_SPEECH);
 		}
 	}
