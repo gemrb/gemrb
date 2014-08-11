@@ -10926,6 +10926,12 @@ bool GUIScript::Init(void)
 	if (!Py_IsInitialized()) {
 		return false;
 	}
+
+	PyObject *pMainMod = PyImport_AddModule( "__main__" );
+	/* pMainMod is a borrowed reference */
+	pMainDic = PyModule_GetDict( pMainMod );
+	/* pMainDic is a borrowed reference */
+
 	PyObject* pGemRB = Py_InitModule3( "GemRB", GemRBMethods, GemRB__doc );
 	if (!pGemRB) {
 		return false;
@@ -11026,11 +11032,6 @@ bool GUIScript::Init(void)
 	char include[_MAX_PATH];
 	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
 	ExecFile(include);
-
-	PyObject *pMainMod = PyImport_AddModule( "__main__" );
-	/* pMainMod is a borrowed reference */
-	pMainDic = PyModule_GetDict( pMainMod );
-	/* pMainDic is a borrowed reference */
 
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
 	/* pClassesMod is a borrowed reference */
@@ -11216,10 +11217,7 @@ void GUIScript::ExecFile(const char* file)
 /** Exec a single String */
 void GUIScript::ExecString(const char* string)
 {
-	PyObject *py_main, *py_dict;
-    py_main = PyImport_AddModule("__main__");
-    py_dict = PyModule_GetDict(py_main);
-	PyObject* run = PyRun_String(string, Py_file_input, py_dict, py_dict);
+	PyObject* run = PyRun_String(string, Py_file_input, pMainDic, pMainDic);
 
 	if (run) {
 		// success
