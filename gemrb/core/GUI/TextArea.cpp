@@ -256,6 +256,13 @@ void TextArea::AppendText(const char* text)
 
 void TextArea::AppendText(const String& text)
 {
+	if (selectOptions && Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		// quickly scroll the current content out of view
+		// this way the new content is directly at the top
+		// dont use SctollToY or the scrollbar, however, because the scrollbar will clamp the value!
+		TextYPos = contentWrapper.ContentFrame().h;
+	}
+
 	size_t tagPos = text.find_first_of('[');
 	if (tagPos != String::npos) {
 		if (tagPos != 0) {

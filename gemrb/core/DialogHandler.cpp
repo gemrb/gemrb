@@ -150,6 +150,13 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	TextArea* ta = core->GetMessageTextArea();
+	if (ta) {
+		// reset the TA
+		ta->SetAnimPicture(NULL);
+		ta->ClearSelectOptions();
+	}
+
 	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
 		return;
 	}
@@ -201,9 +208,6 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
-	// reset the TA
-	ta->SetAnimPicture(NULL);
-	ta->ClearSelectOptions();
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
