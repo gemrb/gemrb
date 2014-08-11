@@ -61,7 +61,7 @@ public:
 	const T& Retrieve(size_t index) const
 	{
 		size_t len = _cache.size();
-		if (index <= len) {
+		if (len && index <= len) {
 			// remap so that index 0 is the front
 			return _cache[len - 1 - index];
 		}
