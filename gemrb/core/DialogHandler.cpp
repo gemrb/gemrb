@@ -260,12 +260,16 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				Section |= 2;
 			}
 			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
-				displaymsg->DisplayConstantString(STR_JOURNALCHANGE, DMC_BG2XPGREEN);
-				String* string = core->GetString( tr->journalStrRef );
-				//cutting off the strings at the first crlf
-				string->resize(string->find_first_of(L"\n"));
-				displaymsg->DisplayMarkupString( *string );
-				delete string;
+				 String msg(L"[color=bcefbc]");
+				 String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
+				 msg += *str;
+				 delete str;
+				 str = core->GetString(tr->journalStrRef);
+				 //cutting off the strings at the first crlf
+				 str->resize(str->find_first_of(L"\n"));
+				 msg += L" - [/color][color=e4c999]" + *str + L"[/color]";
+				 delete str;
+				 displaymsg->DisplayMarkupString(msg);
 			}
 		}
 
