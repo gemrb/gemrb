@@ -11222,20 +11222,23 @@ void GUIScript::ExecString(const char* string)
 	PyObject* run = PyRun_String(string, Py_file_input, py_dict, py_dict);
 
 	if (run) {
+		// success
 		Py_DECREF(run);
 	} else {
+		// failure
 		PyObject *ptype, *pvalue, *ptraceback;
 		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
 
 		//Get error message
 		String* error = StringFromCString(PyString_AsString(pvalue));
-		displaymsg->DisplayString(*error, DMC_RED, NULL);
+		displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
 		PyErr_Print();
 		Py_DECREF(ptype);
 		Py_DECREF(pvalue);
 		Py_DECREF(ptraceback);
-		free(error);
+		delete error;
 	}
+	PyErr_Clear();
 }
 
 PyObject* GUIScript::ConstructObject(const char* type, int arg)
