@@ -29,6 +29,10 @@
 /* Begin PBXBuildFile section */
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A20574F819994857007FF22C /* libGLEW.1.10.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F719994857007FF22C /* libGLEW.1.10.0.dylib */; };
+		A20574FA19994967007FF22C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
+		A20574FB19994979007FF22C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
+		A20574FC19994A83007FF22C /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A208210D1419712F002CD244 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A208210E1419712F002CD244 /* IndexedArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */; };
 		A20821101419712F002CD244 /* PluginLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDB13A8661600C6DF12 /* PluginLoader.cpp */; };
@@ -241,7 +245,6 @@
 		A2969F11168CDC0D00D9C6FC /* CombatInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = A2969F0E168CDC0D00D9C6FC /* CombatInfo.h */; };
 		A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
 		A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
-		A298DD0B14EB4E8C00F59F56 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A298DD0C14EB4E8C00F59F56 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
 		A298DD0D14EB4E8C00F59F56 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */; };
@@ -413,6 +416,17 @@
 		A2E27EF916EEA7B00079E104 /* InterfaceConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E27EF616EEA7B00079E104 /* InterfaceConfig.h */; };
 		A2E27EFA16F109090079E104 /* InterfaceConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */; };
 		A2E27EFC16F12B5A0079E104 /* GemRB.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E27EFB16F12B5A0079E104 /* GemRB.xib */; };
+		A2E5A49619992C6100CCE6D8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
+		A2E5A49719992C6100CCE6D8 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
+		A2E5A49819992C6100CCE6D8 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; settings = {COMPILER_FLAGS = "-DUSE_OPENGL=1"; }; };
+		A2E5A49B19992C6100CCE6D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
+		A2E5A49C19992C6100CCE6D8 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2E5A4AF19992CAB00CCE6D8 /* GLPaletteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */; };
+		A2E5A4B019992CAB00CCE6D8 /* GLSLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */; };
+		A2E5A4B119992CAB00CCE6D8 /* GLTextureSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */; };
+		A2E5A4B219992CAB00CCE6D8 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */; };
+		A2E5A4B319992CAB00CCE6D8 /* SDL20GLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */; };
+		A2E5A4C219992EC300CCE6D8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */; };
 		A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */; };
 		A2E66350139E882900310FC8 /* Ambient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */; };
@@ -1182,6 +1196,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = osx/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20574F719994857007FF22C /* libGLEW.1.10.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.1.10.0.dylib; path = /opt/local/lib/libGLEW.1.10.0.dylib; sourceTree = "<absolute>"; };
+		A20574F919994967007FF22C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DialogResponder.cpp; sourceTree = "<group>"; };
 		A20E4ACE197344BD00A6BC96 /* DialogResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogResponder.h; sourceTree = "<group>"; };
 		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
@@ -1699,6 +1715,27 @@
 		A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InterfaceConfig.cpp; sourceTree = "<group>"; };
 		A2E27EF616EEA7B00079E104 /* InterfaceConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterfaceConfig.h; sourceTree = "<group>"; };
 		A2E27EFB16F12B5A0079E104 /* GemRB.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GemRB.xib; path = CocoaWrapper/mac/nibs/GemRB.xib; sourceTree = "<group>"; };
+		A2E5A4A019992C6100CCE6D8 /* SDLVideo.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SDLVideo.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLPaletteManager.cpp; sourceTree = "<group>"; };
+		A2E5A4A219992CAB00CCE6D8 /* GLPaletteManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLPaletteManager.h; sourceTree = "<group>"; };
+		A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLSLProgram.cpp; sourceTree = "<group>"; };
+		A2E5A4A419992CAB00CCE6D8 /* GLSLProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLSLProgram.h; sourceTree = "<group>"; };
+		A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLTextureSprite2D.cpp; sourceTree = "<group>"; };
+		A2E5A4A619992CAB00CCE6D8 /* GLTextureSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTextureSprite2D.h; sourceTree = "<group>"; };
+		A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix.cpp; sourceTree = "<group>"; };
+		A2E5A4A819992CAB00CCE6D8 /* Matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix.h; sourceTree = "<group>"; };
+		A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL20GLVideo.cpp; sourceTree = "<group>"; };
+		A2E5A4AA19992CAB00CCE6D8 /* SDL20GLVideo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL20GLVideo.h; sourceTree = "<group>"; };
+		A2E5A4B719992CC000CCE6D8 /* Ellipse.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Ellipse.glslf; sourceTree = "<group>"; };
+		A2E5A4B819992CC000CCE6D8 /* Ellipse.glslv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Ellipse.glslv; sourceTree = "<group>"; };
+		A2E5A4B919992CC000CCE6D8 /* Rect.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Rect.glslf; sourceTree = "<group>"; };
+		A2E5A4BA19992CC000CCE6D8 /* Rect.glslv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Rect.glslv; sourceTree = "<group>"; };
+		A2E5A4BB19992CC000CCE6D8 /* Sprite.glslv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sprite.glslv; sourceTree = "<group>"; };
+		A2E5A4BC19992CC000CCE6D8 /* Sprite32.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sprite32.glslf; sourceTree = "<group>"; };
+		A2E5A4BD19992CC000CCE6D8 /* SpritePal.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SpritePal.glslf; sourceTree = "<group>"; };
+		A2E5A4BE19992CC000CCE6D8 /* SpritePalGrayed.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SpritePalGrayed.glslf; sourceTree = "<group>"; };
+		A2E5A4BF19992CC000CCE6D8 /* SpritePalSepia.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SpritePalSepia.glslf; sourceTree = "<group>"; };
+		A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMSprite2D.cpp; sourceTree = "<group>"; };
 		A2EC2F8F176BD28E00FD960E /* BAMSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMSprite2D.h; sourceTree = "<group>"; };
@@ -2062,7 +2099,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A298DD0B14EB4E8C00F59F56 /* SDL.framework in Frameworks */,
+				A20574FB19994979007FF22C /* SDL2.framework in Frameworks */,
 				A298DD0C14EB4E8C00F59F56 /* Cocoa.framework in Frameworks */,
 				A298DD0D14EB4E8C00F59F56 /* libgemrb_core.dylib in Frameworks */,
 			);
@@ -2104,6 +2141,18 @@
 			files = (
 				A2DE8807181064DF007B8CC5 /* libvlc.5.dylib in Frameworks */,
 				A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2E5A49919992C6100CCE6D8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A20574FA19994967007FF22C /* SDL2.framework in Frameworks */,
+				A20574F819994857007FF22C /* libGLEW.1.10.0.dylib in Frameworks */,
+				A2E5A4C219992EC300CCE6D8 /* OpenGL.framework in Frameworks */,
+				A2E5A49B19992C6100CCE6D8 /* Cocoa.framework in Frameworks */,
+				A2E5A49C19992C6100CCE6D8 /* libgemrb_core.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2223,6 +2272,7 @@
 				A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */,
 				A29504771609721300BB22AA /* TTFImporter.so */,
 				A2FE2C8116F2316400DDC6C7 /* NullSource.so */,
+				A2E5A4A019992C6100CCE6D8 /* SDLVideo.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2270,6 +2320,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */,
 				A2B67A6816B1DF6500577415 /* CoreFoundation.framework */,
 				A2AAC14615C1C2F500D27766 /* FreeType.framework */,
 				A2EC8064146056900033754A /* AudioToolbox.framework */,
@@ -2288,6 +2339,7 @@
 				A2EC8062146056490033754A /* QuartzCore.framework */,
 				A2830A3F13A05B81000A63FE /* QuartzCore.framework */,
 				A2D0505014D0B06C00D8CD77 /* SDL.framework */,
+				A20574F919994967007FF22C /* SDL2.framework */,
 				A239390A145F8677007895B3 /* UIKit.framework */,
 				A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */,
 				A2AAF36713A1507100AE8402 /* CoreAudio.framework */,
@@ -2703,6 +2755,17 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A2E5A4B619992CC000CCE6D8 /* Shaders */,
+				A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */,
+				A2E5A4A219992CAB00CCE6D8 /* GLPaletteManager.h */,
+				A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */,
+				A2E5A4A419992CAB00CCE6D8 /* GLSLProgram.h */,
+				A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */,
+				A2E5A4A619992CAB00CCE6D8 /* GLTextureSprite2D.h */,
+				A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */,
+				A2E5A4A819992CAB00CCE6D8 /* Matrix.h */,
+				A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */,
+				A2E5A4AA19992CAB00CCE6D8 /* SDL20GLVideo.h */,
 				A249187B141075A60038B170 /* CocoaWrapper.m */,
 				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
 				A298DD1414EB4EDE00F59F56 /* SDL12Video.h */,
@@ -3215,6 +3278,22 @@
 			name = nibs;
 			sourceTree = "<group>";
 		};
+		A2E5A4B619992CC000CCE6D8 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				A2E5A4B719992CC000CCE6D8 /* Ellipse.glslf */,
+				A2E5A4B819992CC000CCE6D8 /* Ellipse.glslv */,
+				A2E5A4B919992CC000CCE6D8 /* Rect.glslf */,
+				A2E5A4BA19992CC000CCE6D8 /* Rect.glslv */,
+				A2E5A4BB19992CC000CCE6D8 /* Sprite.glslv */,
+				A2E5A4BC19992CC000CCE6D8 /* Sprite32.glslf */,
+				A2E5A4BD19992CC000CCE6D8 /* SpritePal.glslf */,
+				A2E5A4BE19992CC000CCE6D8 /* SpritePalGrayed.glslf */,
+				A2E5A4BF19992CC000CCE6D8 /* SpritePalSepia.glslf */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
 		A2E7985B14845AFB00B15DF4 /* iOS static libs */ = {
 			isa = PBXGroup;
 			children = (
@@ -3228,6 +3307,7 @@
 		A2E7985C14845B3F00B15DF4 /* dylibs */ = {
 			isa = PBXGroup;
 			children = (
+				A20574F719994857007FF22C /* libGLEW.1.10.0.dylib */,
 				A2DE880818106615007B8CC5 /* libbz2.dylib */,
 				A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */,
 				A228D24816A86FA00053375D /* libiconv.dylib */,
@@ -4184,6 +4264,22 @@
 			productReference = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		A2E5A49319992C6100CCE6D8 /* SDL2+GLVideo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2E5A49D19992C6100CCE6D8 /* Build configuration list for PBXNativeTarget "SDL2+GLVideo" */;
+			buildPhases = (
+				A2E5A49419992C6100CCE6D8 /* Sources */,
+				A2E5A49919992C6100CCE6D8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SDL2+GLVideo";
+			productName = SDLVideo;
+			productReference = A2E5A4A019992C6100CCE6D8 /* SDLVideo.so */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		A2E66337139E875400310FC8 /* gemrb_core */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A2E6633D139E87A400310FC8 /* Build configuration list for PBXNativeTarget "gemrb_core" */;
@@ -4315,6 +4411,7 @@
 				A276B47E13A28A8500D41A8A /* SDLAudio */,
 				A276B48413A28A9000D41A8A /* SDLVideo */,
 				A298DD0614EB4E8C00F59F56 /* SDL2Video */,
+				A2E5A49319992C6100CCE6D8 /* SDL2+GLVideo */,
 				A276B48A13A28A9E00D41A8A /* SPLImporter */,
 				A276B4F313A28C0400D41A8A /* STOImporter */,
 				A276B49013A28AA800D41A8A /* TISImporter */,
@@ -5041,6 +5138,22 @@
 			files = (
 				A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */,
 				A2A26ADD15AA729800A8E25D /* VideoContext.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2E5A49419992C6100CCE6D8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A20574FC19994A83007FF22C /* SDLSurfaceSprite2D.cpp in Sources */,
+				A2E5A4B319992CAB00CCE6D8 /* SDL20GLVideo.cpp in Sources */,
+				A2E5A4B219992CAB00CCE6D8 /* Matrix.cpp in Sources */,
+				A2E5A49619992C6100CCE6D8 /* CocoaWrapper.m in Sources */,
+				A2E5A4B119992CAB00CCE6D8 /* GLTextureSprite2D.cpp in Sources */,
+				A2E5A49719992C6100CCE6D8 /* SDLVideo.cpp in Sources */,
+				A2E5A4B019992CAB00CCE6D8 /* GLSLProgram.cpp in Sources */,
+				A2E5A4AF19992CAB00CCE6D8 /* GLPaletteManager.cpp in Sources */,
+				A2E5A49819992C6100CCE6D8 /* SDL20Video.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6914,6 +7027,90 @@
 			};
 			name = Release;
 		};
+		A2E5A49E19992C6100CCE6D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS)",
+					/Library/Frameworks/SDL2.framework/Headers,
+					/opt/local/include,
+				);
+				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
+				MACH_O_TYPE = mh_bundle;
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-DHAVE_ICONV=1",
+					"-g",
+					"-D_DEBUG",
+					"-isystem",
+					./,
+					"-W",
+					"-Wextra",
+					"-Wformat",
+					"-Wall",
+					"-DTARGET_OS_MAC=1",
+					"-DUSE_GL=1",
+				);
+				PRODUCT_NAME = SDLVideo;
+				UNEXPORTED_SYMBOLS_FILE = "";
+			};
+			name = Debug;
+		};
+		A2E5A49F19992C6100CCE6D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/GemRB.app/Contents/MacOS/GemRB";
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS)",
+					/Library/Frameworks/SDL2.framework/Headers,
+					/opt/local/include,
+				);
+				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
+				MACH_O_TYPE = mh_bundle;
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-isystem",
+					./,
+					"-W",
+					"-Wextra",
+					"-Wformat",
+					"-DTARGET_OS_MAC=1",
+					"-DUSE_GL=1",
+				);
+				PRODUCT_NAME = SDLVideo;
+				UNEXPORTED_SYMBOLS_FILE = "";
+			};
+			name = Release;
+		};
 		A2E66339139E875500310FC8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -7596,6 +7793,15 @@
 			buildConfigurations = (
 				A2BD125415A7EDFE000FAB95 /* Debug */,
 				A2BD125515A7EDFE000FAB95 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2E5A49D19992C6100CCE6D8 /* Build configuration list for PBXNativeTarget "SDL2+GLVideo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2E5A49E19992C6100CCE6D8 /* Debug */,
+				A2E5A49F19992C6100CCE6D8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
