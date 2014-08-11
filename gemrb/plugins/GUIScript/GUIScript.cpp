@@ -11221,6 +11221,18 @@ void GUIScript::ExecString(const char* string)
 
 	if (run) {
 		// success
+		PyObject* pyGUI = PyImport_ImportModule("GUICommon");
+		if (pyGUI) {
+			PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
+			if (catcher) {
+				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
+				String* msg = StringFromCString(PyString_AsString(output));
+				displaymsg->DisplayString(*msg, DMC_WHITE, NULL);
+				delete msg;
+				Py_DECREF(catcher);
+			}
+			Py_DECREF(pyGUI);
+		}
 		Py_DECREF(run);
 	} else {
 		// failure

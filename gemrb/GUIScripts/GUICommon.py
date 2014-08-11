@@ -827,17 +827,22 @@ class _stdioWrapper(object):
 	def __init__(self, log_level):
 		self.log_level = log_level
 		self.buffer = ""
+		self.lastLine = "" # hack for getting console command output
 	def write(self, message):
 		self.buffer += str(message)
 		if self.buffer.endswith("\n"):
 			out = self.buffer.rstrip("\n")
 			if out:
+				self.lastLine = out[out.rfind("\n"):]
 				GemRB.Log(self.log_level, "Python", out)
 			self.buffer = ""
 
+outputFunnel = _stdioWrapper(LOG_MESSAGE)
+
 def _wrapStdio():
+	global outputFunnel
 	import sys
-	sys.stdout = _stdioWrapper(LOG_MESSAGE)
+	sys.stdout = outputFunnel
 	sys.stderr = _stdioWrapper(LOG_ERROR)
 
 _wrapStdio()
