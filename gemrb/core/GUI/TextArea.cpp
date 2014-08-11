@@ -724,8 +724,8 @@ void TextArea::ClearText()
 		frame.h = Height;
 	}
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
-		// limit of 50 spans is roughly 25 messages (1 span for actor, 1 for message)
-		textContainer = new RestrainedTextContainer(frame, ftext, palette, 50);
+		// limit of 200 spans is roughly 100 messages (1 span for actor, 1 for message)
+		textContainer = new RestrainedTextContainer(frame, ftext, palette, 200);
 	} else {
 		textContainer = new TextContainer(frame, ftext, palette);
 	}
