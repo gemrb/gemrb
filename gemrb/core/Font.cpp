@@ -33,7 +33,7 @@
 
 namespace GemRB {
 
-void BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
+static void BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
 							 ieByte* canvas, const Size& size)
 {
 	assert(canvas);

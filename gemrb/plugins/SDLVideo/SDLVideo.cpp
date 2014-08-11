@@ -549,8 +549,8 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 		return; // we already know blit fails
 
 	if (!spr->BAM) {
-		SDL_Rect srect = {src.x, src.y, src.w, src.h};
-		SDL_Rect drect = {dst.x, dst.y, dst.w, dst.h};
+		SDL_Rect srect = {(Sint16)src.x, (Sint16)src.y, (Uint16)src.w, (Uint16)src.h};
+		SDL_Rect drect = {(Sint16)dst.x, (Sint16)dst.y, (Uint16)dst.w, (Uint16)dst.h};
 
 		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (palette) {

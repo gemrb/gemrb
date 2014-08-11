@@ -34,7 +34,7 @@
 
 namespace GemRB {
 
-String* StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
+static String* StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
 {
 	if (!string) return NULL;
 

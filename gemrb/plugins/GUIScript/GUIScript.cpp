@@ -4252,7 +4252,7 @@ static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args
 static const Color Hover = {255, 180, 0, 0};
 static const Color Selected = {255, 100, 0, 0};
 
-void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<SelectOption>& opts)
+static void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<SelectOption>& opts)
 {
 	std::vector<String> strings;
 	do {

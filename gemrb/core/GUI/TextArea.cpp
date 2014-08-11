@@ -625,7 +625,7 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 	if (!VariableName[0]) {
 		return;
 	}
-	if (!selectOptions) {
+	if (!selectOptions || OptSpans.size() <= optIdx) {
 		// no selectable options present
 		// set state to safe and return
 		ClearSelectOptions();
