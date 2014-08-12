@@ -188,7 +188,3 @@ GLPaletteManager::~GLPaletteManager()
 {
 	Clear();
 }
-
-
-
-
