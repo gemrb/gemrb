@@ -398,34 +398,8 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	x -= Viewport.x;
 	y -= Viewport.y;
 
-	int clipx, clipy, clipw, cliph;
-	if (clip) {
-		clipx = clip->x;
-		clipy = clip->y;
-		clipw = clip->w;
-		cliph = clip->h;
-	} else {
-		clipx = 0;
-		clipy = 0;
-		clipw = backBuf->w;
-		cliph = backBuf->h;
-	}
-
-	int rx = 0,ry = 0;
-	int w = 64,h = 64;
-
-	if (x < clipx) {
-		rx += (clipx - x);
-		w -= (clipx - x);
-	}
-	if (y < clipy) {
-		ry += (clipy - y);
-		h -= (clipy - y);
-	}
-	if (x + w > clipx + clipw)
-		w -= (x + w - clipx - clipw);
-	if (y + h > clipy + cliph)
-		h -= (y + h - clipy - cliph);
+	Region dst(x, y, 64, 64);
+	Region fClip = computeClipRect(backBuf, clip, dst.x, dst.y, dst.w, dst.h);
 
 	const Uint8* data = (const Uint8*)spr->pixels;
 	const SDL_Color* pal = reinterpret_cast<const SDL_Color*>(spr->GetPaletteColors());
@@ -450,9 +424,9 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 #define DO_BLIT \
 		if (backBuf->format->BytesPerPixel == 4) \
-			BlitTile_internal<Uint32>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
+			BlitTile_internal<Uint32>(backBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
 		else \
-			BlitTile_internal<Uint16>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
+			BlitTile_internal<Uint16>(backBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
 
 	if (flags & TILE_GREY) {
 
