@@ -284,21 +284,40 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 		colorTint = *tint;
 	else
 		colorTint.r = colorTint.b = colorTint.g = colorTint.a = 255;
-	
-	// we do flipping here
-	bool hflip = spr->renderFlags & BLIT_MIRRORX;
-	bool vflip = spr->renderFlags & BLIT_MIRRORY;
-	if (flags & BLIT_MIRRORX) hflip = !hflip;
-	if (flags & BLIT_MIRRORY) vflip = !vflip;
-	GLfloat* textureCoords;
-	GLfloat coordsHV[] = { 1.0f,1.0f, 0.0f,1.0f, 1.0f,0.0f, 0.0f,0.0f };
-	GLfloat coordsH[] = { 1.0f,0.0f, 0.0f,0.0f, 1.0f,1.0f, 0.0f,1.0f };
-	GLfloat coordsV[] = { 0.0f,1.0f, 1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f };
-	GLfloat coordsN[] = { 0.0f,0.0f, 1.0f,0.0f, 0.0f,1.0f, 1.0f,1.0f };
-	if (hflip && vflip) textureCoords = coordsHV;
-	else if (hflip) textureCoords = coordsH;
-	else if (vflip) textureCoords = coordsV;
-	else textureCoords = coordsN;
+
+	// FIXME: how should we combine flags? previously we would cancel sprite flags with the flags param.
+	// I think this way makes more sense, but I need to examine the behavior of the the functions passing flag parameters
+	flags |= spr->renderFlags;
+
+	GLfloat x = 0.0f;
+	GLfloat y = 0.0f;
+	GLfloat w = 1.0f;
+	GLfloat h = 1.0f;
+	GLfloat textureCoords[] = { /* lower left */ x, y, /* lower right */x + w, y,
+								/* top left */ x, y + h, /* top right */ x + w, y + h };
+
+	// FIXME: are there constants for accessing these coordinate indices?
+	GLfloat tmp;
+	if (flags&BLIT_MIRRORX) {
+		// swap lower left X with lower right X
+		tmp = textureCoords[0];
+		textureCoords[0] = textureCoords[2];
+		textureCoords[2] = tmp;
+		// swap top left X with top right X
+		tmp = textureCoords[4];
+		textureCoords[4] = textureCoords[6];
+		textureCoords[6] = tmp;
+	}
+	if (flags&BLIT_MIRRORY) {
+		// swap lower left Y with top left Y
+		tmp = textureCoords[1];
+		textureCoords[1] = textureCoords[5];
+		textureCoords[5] = tmp;
+		// swap lower right Y with top right Y
+		tmp = textureCoords[3];
+		textureCoords[3] = textureCoords[7];
+		textureCoords[7] = tmp;
+	}
 
 	// alpha modifier
 	GLfloat alphaModifier = flags & BLIT_HALFTRANS ? 0.5f : 1.0f;
