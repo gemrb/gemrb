@@ -89,9 +89,9 @@ Color BAMSprite2D::GetPixel(unsigned short x, unsigned short y) const
 	Color c = { 0, 0, 0, 0 };
 	if (x >= Width || y >= Height) return c;
 
-	if (renderFlags&RENDER_FLIP_VERTICAL)
+	if (renderFlags&BLIT_MIRRORY)
 		y = Height - y - 1;
-	if (renderFlags&RENDER_FLIP_HORIZONTAL)
+	if (renderFlags&BLIT_MIRRORX)
 		x = Width - x - 1;
 
 	int skipcount = y * Width + x;

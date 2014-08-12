@@ -286,8 +286,8 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 		colorTint.r = colorTint.b = colorTint.g = colorTint.a = 255;
 	
 	// we do flipping here
-	bool hflip = spr->renderFlags & RENDER_FLIP_HORIZONTAL;
-	bool vflip = spr->renderFlags & RENDER_FLIP_VERTICAL;
+	bool hflip = spr->renderFlags & BLIT_MIRRORX;
+	bool vflip = spr->renderFlags & BLIT_MIRRORY;
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 	GLfloat* textureCoords;

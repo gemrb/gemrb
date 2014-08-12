@@ -560,17 +560,17 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 			SRTinter_NoTint<true> tinter;
 			SRBlender_Alpha blender;
 
-			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
+			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
 								   backBuf, srcdata, pal->col, x, y, w, h,
-								   (spr->renderFlags&RENDER_FLIP_VERTICAL), dst,
+								   (spr->renderFlags&BLIT_MIRRORY), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		} else {
 			SRTinter_NoTint<false> tinter;
 			SRBlender_NoAlpha blender;
 
-			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
+			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
 								   backBuf, srcdata, pal->col, x, y, w, h,
-								   (spr->renderFlags&RENDER_FLIP_VERTICAL), dst,
+								   (spr->renderFlags&BLIT_MIRRORY), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
 		
@@ -663,8 +663,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 	SDL_LockSurface(backBuf);
 
-	bool hflip = spr->BAM ? (spr->renderFlags&RENDER_FLIP_HORIZONTAL) : false;
-	bool vflip = spr->BAM ? (spr->renderFlags&RENDER_FLIP_VERTICAL) : false;
+	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
+	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 

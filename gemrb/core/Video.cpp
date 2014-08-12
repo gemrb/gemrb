@@ -96,7 +96,7 @@ Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 		// if the pixel buffers are the same then either there are no pixels (NULL)
 		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
 		// toggle the bit because it could be a mirror of a mirror
-		dest->renderFlags ^= RENDER_FLIP_VERTICAL;
+		dest->renderFlags ^= BLIT_MIRRORY;
 	}
 
 	dest->XPos = sprite->XPos;
@@ -133,7 +133,7 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 		// if the pixel buffers are the same then either there are no pixels (NULL)
 		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
 		// toggle the bit because it could be a mirror of a mirror
-		dest->renderFlags ^= RENDER_FLIP_HORIZONTAL;
+		dest->renderFlags ^= BLIT_MIRRORX;
 	}
 
 	if (MirrorAnchor)

@@ -38,9 +38,6 @@
 
 #include <map>
 
-#define RENDER_FLIP_HORIZONTAL	0x00000001
-#define RENDER_FLIP_VERTICAL	0x00000002
-
 namespace GemRB {
 
 class AnimationFactory;
