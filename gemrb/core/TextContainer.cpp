@@ -429,7 +429,8 @@ void RestrainedTextContainer::AppendContent(Content* newContent)
 		ContentList::iterator it = contents.begin();
 		Content* content = *it;
 		if (layout.find(content) == layout.end()) {
-			return; // no layout yet
+			delete RemoveContent(content);
+			return; // no layout yet, cant possibly delete any other spans
 		}
 
 		Region rgn = layout[content].front();
@@ -446,6 +447,8 @@ void RestrainedTextContainer::AppendContent(Content* newContent)
 						break;
 					}
 				}
+			} else {
+				break; // no more layout available
 			}
 			it++;
 		}
