@@ -79,7 +79,6 @@ public:
 	virtual void SetColorKey(ieDword) = 0;
 	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
 							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
-	virtual void MakeUnused() {}
 	void acquire() { ++RefCount; }
 	void release();
 
