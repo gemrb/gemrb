@@ -60,8 +60,15 @@ void Console::DrawInternal(Region& drawFrame)
 
 	Video* video = core->GetVideoDriver();
 	video->DrawRect( drawFrame, ColorBlack );
-	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE);
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
+	if (w + Cursor->Width > drawFrame.w) {
+		// shift left so the cursor remains visible
+		int shift = (w + Cursor->Width) - drawFrame.w;
+		drawFrame.x -= shift;
+		drawFrame.w += shift;
+	}
+	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
+
 	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
 	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y, true);
 }
