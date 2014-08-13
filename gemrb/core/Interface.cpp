@@ -1153,7 +1153,7 @@ void Interface::Main()
 			}
 			video->DrawRect( fpsRgn, ColorBlack );
 			fps->Print( fpsRgn, String(fpsstring), palette,
-					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE );
+					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
 		}
 		if (TickHook)
 			TickHook();
