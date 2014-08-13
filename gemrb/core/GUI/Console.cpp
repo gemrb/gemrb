@@ -41,13 +41,12 @@ Console::Console(const Region& frame)
 	Buffer.reserve(max);
 	CurPos = 0;
 	HistPos = 0;
-	palette = NULL;
-	font = NULL;
+	palette = new Palette( ColorWhite, ColorBlack );
 }
 
 Console::~Console(void)
 {
-	gamedata->FreePalette( palette );
+	palette->release();
 	Sprite2D::FreeSprite( Cursor );
 }
 
@@ -57,22 +56,16 @@ void Console::DrawInternal(Region& drawFrame)
 	if (Back) {
 		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );
 	}
+	Font* font = core->GetTextFont();
 
 	Video* video = core->GetVideoDriver();
 	video->DrawRect( drawFrame, ColorBlack );
-	font->Print( drawFrame, Buffer, palette,
-			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE);
+	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE);
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
 	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
 	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y, true);
 }
-/** Set Font */
-void Console::SetFont(Font* f)
-{
-	if (f != NULL) {
-		font = f;
-	}
-}
+
 /** Set Cursor */
 void Console::SetCursor(Sprite2D* cur)
 {

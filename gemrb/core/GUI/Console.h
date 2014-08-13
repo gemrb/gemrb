@@ -32,7 +32,6 @@
 
 namespace GemRB {
 
-class Font;
 class Palette;
 
 /**
@@ -48,8 +47,6 @@ class Console : public Control {
 public:
 	Console(const Region& frame);
 	~Console(void);
-	/** Set Font */
-	void SetFont(Font* f);
 	/** Set Cursor */
 	void SetCursor(Sprite2D* cur);
 	/** Set BackGround */
@@ -64,8 +61,6 @@ protected:
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
-	/** Text Font */
-	Font* font;
 	/** Background */
 	Sprite2D* Back;
 	/** Max Edit Text Length */

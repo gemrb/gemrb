@@ -1119,7 +1119,7 @@ void Interface::Main()
 		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
 	}
 
-	Font* fps = GetFont( TextFontResRef );
+	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	const Region fpsRgn( 0, Height - 30, 100, 30 );
 	wchar_t fpsstring[20] = {L"???.??? fps"};
@@ -2050,7 +2050,6 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
 	console = new Console(Region(0, 0, Width, 25));
-	console->SetFont( GetFont(MovieFontResRef) );
 	Sprite2D* cursor = GetCursorSprite();
 	if (!cursor) {
 		Log(ERROR, "Core", "Failed to load cursor sprite.");
