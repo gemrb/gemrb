@@ -42,7 +42,7 @@ namespace GemRB {
 Control::Control(const Region& frame)
 {
 	hasFocus = false;
-	Changed = true;
+	Changed = false; // no window to draw to yet.
 	InHandler = false;
 	VarName[0] = 0;
 	ControlID = 0;
