@@ -403,7 +403,6 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
-		Control::OnMouseDown(x,y,Button,Mod);
 		return;
 	}
 
