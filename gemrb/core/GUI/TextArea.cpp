@@ -63,6 +63,7 @@ void TextArea::Init()
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
 	TextYPos = 0;
+	dialogYPos = 0;
 	ticks = starttime = 0;
 	needScrollUpdate = false;
 	strncpy(VarName, "Selected", sizeof(VarName));
@@ -149,28 +150,12 @@ void TextArea::DrawInternal(Region& clip)
 	// now the text is layed out in the container so we can calculate the rows
 	int textHeight = contentWrapper.ContentFrame().h;
 	int dialogNodeHeight = 0;
-	if (selectOptions && Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		// this is for dialog only
-		// Dialog expects the last "text node" at the top of the TA
-		 ContentContainer::ContentList::const_iterator it = textContainer->Contents().end();
-		 TextSpan* node = NULL;
-		 do {
-			 // find the last text node (non-empty)
-			 node = dynamic_cast<TextSpan*>(*--it);
-			 if (node && node->Text().find_first_not_of(WHITESPACE_STRING) == String::npos) {
-				 // newlines don't count as the "text node", but we still need their height
-				 dialogNodeHeight += node->ContentFrame().h;
-				 node = NULL;
-			 }
-		 } while (node == NULL && it != textContainer->Contents().begin());
-
-		 if (node) {
-			 dialogNodeHeight += node->ContentFrame().h + selectOptions->ContentFrame().h + ftext->maxHeight;
-			 if (dialogNodeHeight < Height) {
-				 // compensate so there is enough extra scrolling space to get the "node" to the top of the TA later
-				 textHeight += (Height - dialogNodeHeight);
-			 }
-		 }
+	if (dialogYPos > 0) {
+		dialogNodeHeight = textHeight - dialogYPos;
+		if (dialogNodeHeight < Height) {
+			// compensate so there is enough extra scrolling space to get the "node" to the top of the TA later
+			textHeight += (Height - dialogNodeHeight);
+		}
 	}
 
 	int newRows = 0;
@@ -257,10 +242,8 @@ void TextArea::AppendText(const char* text)
 void TextArea::AppendText(const String& text)
 {
 	if (selectOptions && Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		// quickly scroll the current content out of view
-		// this way the new content is directly at the top
-		// dont use SctollToY or the scrollbar, however, because the scrollbar will clamp the value!
-		TextYPos = contentWrapper.ContentFrame().h;
+		// set the start position for the next dialog node
+		dialogYPos += ftext->maxHeight;
 	}
 
 	size_t tagPos = text.find_first_of('[');
@@ -661,6 +644,9 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 		return;
 	}
 
+	// set the start position for the next dialog node
+	dialogYPos = textContainer->ContentFrame().h;
+
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
 	Value = OptSpans[optIdx].first;
@@ -701,6 +687,7 @@ void TextArea::ClearSelectOptions()
 	selectOptions = NULL;
 	selectedSpan = NULL;
 	hoverSpan = NULL;
+	dialogYPos = 0;
 	// also set the value to "none"
 	Value = -1;
 }
@@ -732,7 +719,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		// we want a newline between dialog chunks
 		textContainer->AppendText(L"\n");
 	}
-
+	dialogYPos = textContainer->ContentFrame().h;
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	MarkDirty();
 	// This hack is to refresh the mouse cursor so that reply below cursor gets

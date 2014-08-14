@@ -106,6 +106,7 @@ private: // Private attributes
 	TextContainer* textContainer;
 	// wrapper containing both of the above
 	ContentContainer contentWrapper;
+	int dialogYPos;
 
 	int TextYPos;
 	/** timer for scrolling */
