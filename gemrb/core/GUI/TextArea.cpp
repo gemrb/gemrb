@@ -590,6 +590,30 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
+void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
+						   unsigned short /*Mod*/)
+{
+
+	ScrollBar* scrlbr = (ScrollBar*) sb;
+
+	if (!scrlbr) {
+		Control *ctrl = Owner->GetScrollControl();
+		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
+			scrlbr = (ScrollBar *) ctrl;
+		}
+	}
+	if (scrlbr) {
+		switch(Button) {
+			case GEM_MB_SCRLUP:
+				scrlbr->ScrollUp();
+				break;
+			case GEM_MB_SCRLDOWN:
+				scrlbr->ScrollDown();
+				break;
+		}
+	}
+}
+
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 						 unsigned short Button, unsigned short /*Mod*/)
@@ -618,6 +642,11 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 			UpdateState(VarName, optIdx);
 		}
 	}
+}
+
+void TextArea::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+{
+	hoverSpan = NULL;
 }
 
 void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
@@ -760,30 +789,6 @@ void TextArea::SetupScroll()
 	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	starttime = GetTickCount();
-}
-
-void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
-	unsigned short /*Mod*/)
-{
-
-	ScrollBar* scrlbr = (ScrollBar*) sb;
-	
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-	if (scrlbr) {
-		switch(Button) {
-		case GEM_MB_SCRLUP:
-			scrlbr->ScrollUp();
-			break;
-		case GEM_MB_SCRLDOWN:
-			scrlbr->ScrollDown();
-			break;
-		}
-	}
 }
 
 void TextArea::SetFocus(bool focus)

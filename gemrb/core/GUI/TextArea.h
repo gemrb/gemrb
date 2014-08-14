@@ -154,6 +154,7 @@ public: //Events
 	/** Mouse button down*/
 	void OnMouseDown(unsigned short x, unsigned short y,
 					 unsigned short Button, unsigned short Mod);
+	void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
