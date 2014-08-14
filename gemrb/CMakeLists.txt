@@ -1,7 +1,7 @@
 ADD_SUBDIRECTORY( core )
 
 # GUIScripts and override go directly in the bundle
-SET(RESOURCE_LIST "GUIScripts" "override" "unhardcoded")
+SET(RESOURCE_LIST "GUIScripts" "override" "unhardcoded" "plugins/SDLVideo/Shaders")
 SET(RESOURCE_FILES "")
 
 FOREACH(RESOURCE_DIR_NAME ${RESOURCE_LIST})
