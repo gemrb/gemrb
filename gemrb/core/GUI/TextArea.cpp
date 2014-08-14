@@ -565,9 +565,9 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 
 	TextSpan* span = NULL;
-	Point p = Point(x, y);
 	if (selectOptions) {
-		p.y += TextYPos;
+		Point p = Point(x, y + TextYPos);
+		p.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
 		// container only has text, so...
 		span = dynamic_cast<TextSpan*>(selectOptions->ContentAtPoint(p));
 	}
