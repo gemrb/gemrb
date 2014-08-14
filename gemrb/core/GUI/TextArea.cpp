@@ -622,10 +622,10 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 
 void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 {
-	if (!VariableName[0]) {
+	if (!VariableName[0] || optIdx >= OptSpans.size()) {
 		return;
 	}
-	if (!selectOptions || OptSpans.size() <= optIdx) {
+	if (!selectOptions) {
 		// no selectable options present
 		// set state to safe and return
 		ClearSelectOptions();
