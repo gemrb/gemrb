@@ -522,38 +522,42 @@ Size Font::StringSize(const String& string, const Size* stop) const
 {
 	if (!string.length()) return Size();
 
-	ieWord w = 0, h = maxHeight + descent, lines = 1;
-	ieWord curh = h, curw = w;
-	bool multiline = false;
+	ieWord w = 0, lines = 1;
+	ieWord lineW = 0, wordW = 0;
+	bool newline = false, bail = false;
 	for (size_t i = 0; i < string.length(); i++) {
-		if (string[i] == L'\n') {
-			if (curw > w)
-				w = curw;
-			curw = 0;
-			multiline = true;
-			lines++;
+		if (string[i] == L' ') {
+			lineW += wordW;
+			wordW = 0;
+		} else if (string[i] == L'\n') {
+			newline = true;
 		} else {
 			const Glyph& curGlyph = GetGlyph(string[i]);
-			curh = curGlyph.dimensions.h;
-			curh += 0;
-			if (curh > h)
-				h = curh;
-			else
-				curh = h;
-			curw += curGlyph.dimensions.w;
+			wordW += curGlyph.dimensions.w;
 			if (i > 0) { // kerning
-				curw -= KerningOffset(string[i-1], string[i]);
+				wordW -= KerningOffset(string[i-1], string[i]);
+			}
+			if (stop && stop->w && wordW + lineW > stop->w) {
+				newline = true;
 			}
 		}
-		if (stop && ((stop->w && curw > stop->w) || (stop->h && curh > stop->h)))
-			return Size((stop->w && curw > stop->w) ? stop->w : curw,
-						(stop->h && curh > stop->h) ? stop->h : curh);
+
+		if (newline) {
+			newline = false;
+			w = (lineW > w) ? lineW : w;
+			if (stop && stop->h && (maxHeight * lines) + descent > stop->h ) {
+				bail = true;
+				break;
+			}
+			lines++;
+			lineW = 0;
+		}
 	}
-	if (multiline) {
-		h = (maxHeight * lines) + descent;
+	if (!bail) {
+		// add the remainder
+		w += lineW + wordW;
 	}
-	w = (curw > w) ? curw : w;
-	return Size(w, h);
+	return Size(w, (maxHeight * lines) + descent);
 }
 
 Palette* Font::GetPalette() const
