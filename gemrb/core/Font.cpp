@@ -537,7 +537,9 @@ Size Font::StringSize(const String& string, const Size* stop) const
 			if (i > 0) { // kerning
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
-			if (stop && stop->w && wordW + lineW > stop->w) {
+			if (stop && stop->w
+				&& lineW // let this overflow if the word alone is wider than stop->w
+				&& wordW + lineW > stop->w) {
 				newline = true;
 			}
 		}
