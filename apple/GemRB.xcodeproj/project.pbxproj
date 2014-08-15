@@ -229,6 +229,7 @@
 		A276FB01199E8D7D00BD6CEF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */; };
 		A276FB02199E8EEE00BD6CEF /* RNG_SFMT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */; };
 		A276FB03199E8EF300BD6CEF /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD8197344BD00A6BC96 /* SFMT.c */; };
+		A276FB08199EBF7E00BD6CEF /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A276FB07199EBF7E00BD6CEF /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A27ABCD016F2396C00FE11EF /* NullSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */; };
 		A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = A27E5D5918106384009434E5 /* IndexedArchive.h */; };
@@ -1287,6 +1288,7 @@
 		A276B4F413A28C0400D41A8A /* STOImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = STOImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
 		A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLEnv.h; sourceTree = "<group>"; };
+		A276FB07199EBF7E00BD6CEF /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/CoreMotion.framework; sourceTree = DEVELOPER_DIR; };
 		A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SAVImporter.cpp; sourceTree = "<group>"; };
 		A27979AD13ABA4F7009A6FEF /* SAVImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAVImporter.h; sourceTree = "<group>"; };
 		A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = 2DAImporter.cpp; sourceTree = "<group>"; };
@@ -2127,6 +2129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A276FB08199EBF7E00BD6CEF /* CoreMotion.framework in Frameworks */,
 				A276FB01199E8D7D00BD6CEF /* OpenGLES.framework in Frameworks */,
 				A2DE880918106615007B8CC5 /* libbz2.dylib in Frameworks */,
 				A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */,
@@ -2331,6 +2334,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A276FB07199EBF7E00BD6CEF /* CoreMotion.framework */,
 				A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */,
 				A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */,
 				A2B67A6816B1DF6500577415 /* CoreFoundation.framework */,
