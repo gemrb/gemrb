@@ -146,7 +146,7 @@ bool GLVideoDriver::createPrograms()
 	float matrix[16];
 	Matrix::SetIdentityM(matrix);
 
-	program32 = GLSLProgram::CreateFromFiles("/Shaders/Sprite.glslv", "/Shaders/Sprite32.glslf");
+	program32 = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/Sprite32.glslf");
 	if (!program32)
 	{
 		msg = GLSLProgram::GetLastError();
@@ -157,7 +157,7 @@ bool GLVideoDriver::createPrograms()
 	program32->SetUniformValue("s_texture", 1, 0);
 	program32->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 	
-	programPal = GLSLProgram::CreateFromFiles("/Shaders/Sprite.glslv", "/Shaders/SpritePal.glslf");
+	programPal = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePal.glslf");
 	if (!programPal)
 	{
 		msg = GLSLProgram::GetLastError();
@@ -170,7 +170,7 @@ bool GLVideoDriver::createPrograms()
 	programPal->SetUniformValue("s_mask", 1, 2);
 	programPal->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 
-	programPalGrayed = GLSLProgram::CreateFromFiles("/Shaders/Sprite.glslv", "/Shaders/SpritePalGrayed.glslf");
+	programPalGrayed = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePalGrayed.glslf");
 	if (!programPalGrayed)
 	{
 		msg = GLSLProgram::GetLastError();
@@ -183,7 +183,7 @@ bool GLVideoDriver::createPrograms()
 	programPal->SetUniformValue("s_mask", 1, 2);
 	programPalGrayed->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 
-	programPalSepia = GLSLProgram::CreateFromFiles("/Shaders/Sprite.glslv", "/Shaders/SpritePalSepia.glslf");
+	programPalSepia = GLSLProgram::CreateFromFiles("Shaders/Sprite.glslv", "Shaders/SpritePalSepia.glslf");
 	if (!programPalSepia)
 	{
 		msg = GLSLProgram::GetLastError();
@@ -196,7 +196,7 @@ bool GLVideoDriver::createPrograms()
 	programPal->SetUniformValue("s_mask", 1, 2);;
 	programPalSepia->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 	
-	programEllipse = GLSLProgram::CreateFromFiles("/Shaders/Ellipse.glslv", "/Shaders/Ellipse.glslf");
+	programEllipse = GLSLProgram::CreateFromFiles("Shaders/Ellipse.glslv", "Shaders/Ellipse.glslf");
 	if (!programEllipse)
 	{
 		msg = GLSLProgram::GetLastError();
@@ -206,7 +206,7 @@ bool GLVideoDriver::createPrograms()
 	programEllipse->Use();
 	programEllipse->SetUniformMatrixValue("u_matrix", 4, 1, matrix);
 
-	programRect = GLSLProgram::CreateFromFiles("/Shaders/Rect.glslv", "/Shaders/Rect.glslf");
+	programRect = GLSLProgram::CreateFromFiles("Shaders/Rect.glslv", "Shaders/Rect.glslf");
 	if (!programRect)
 	{
 		msg = GLSLProgram::GetLastError();
