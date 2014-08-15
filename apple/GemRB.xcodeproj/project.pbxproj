@@ -221,6 +221,14 @@
 		A276B54713A28D5500D41A8A /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A276B54813A28D5900D41A8A /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A276B54913A28D5D00D41A8A /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A276FAFB199E8C6F00BD6CEF /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */; };
+		A276FAFC199E8C7200BD6CEF /* GLPaletteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */; };
+		A276FAFD199E8C7500BD6CEF /* GLSLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */; };
+		A276FAFE199E8C7A00BD6CEF /* GLTextureSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */; };
+		A276FAFF199E8C7F00BD6CEF /* SDL20GLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */; };
+		A276FB01199E8D7D00BD6CEF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */; };
+		A276FB02199E8EEE00BD6CEF /* RNG_SFMT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */; };
+		A276FB03199E8EF300BD6CEF /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD8197344BD00A6BC96 /* SFMT.c */; };
 		A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A27ABCD016F2396C00FE11EF /* NullSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */; };
 		A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = A27E5D5918106384009434E5 /* IndexedArchive.h */; };
@@ -1277,6 +1285,8 @@
 		A276B4A913A28AE100D41A8A /* WMPImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = WMPImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A276B4AF13A28AEE00D41A8A /* ZLibManager.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = ZLibManager.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A276B4F413A28C0400D41A8A /* STOImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = STOImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
+		A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLEnv.h; sourceTree = "<group>"; };
 		A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SAVImporter.cpp; sourceTree = "<group>"; };
 		A27979AD13ABA4F7009A6FEF /* SAVImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAVImporter.h; sourceTree = "<group>"; };
 		A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = 2DAImporter.cpp; sourceTree = "<group>"; };
@@ -2117,6 +2127,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A276FB01199E8D7D00BD6CEF /* OpenGLES.framework in Frameworks */,
 				A2DE880918106615007B8CC5 /* libbz2.dylib in Frameworks */,
 				A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */,
 				A288622214A5501F009AC280 /* libz.dylib in Frameworks */,
@@ -2320,6 +2331,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */,
 				A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */,
 				A2B67A6816B1DF6500577415 /* CoreFoundation.framework */,
 				A2AAC14615C1C2F500D27766 /* FreeType.framework */,
@@ -2777,6 +2789,7 @@
 				A27B875B139F0A7D0002DC13 /* SDLVideo.h */,
 				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
 				A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */,
+				A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */,
 			);
 			path = SDLVideo;
 			sourceTree = "<group>";
@@ -4945,6 +4958,7 @@
 				A29BF8A813A04A6F00C812DD /* ArchiveImporter.cpp in Sources */,
 				A29BF8A913A04A6F00C812DD /* Audio.cpp in Sources */,
 				A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */,
+				A276FAFC199E8C7200BD6CEF /* GLPaletteManager.cpp in Sources */,
 				A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */,
 				A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */,
 				A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */,
@@ -4975,6 +4989,7 @@
 				A29BF8C713A04A6F00C812DD /* ItemMgr.cpp in Sources */,
 				A29BF8C813A04A6F00C812DD /* LRUCache.cpp in Sources */,
 				A29BF8C913A04A6F00C812DD /* Map.cpp in Sources */,
+				A276FAFF199E8C7F00BD6CEF /* SDL20GLVideo.cpp in Sources */,
 				A29BF8CA13A04A6F00C812DD /* MapMgr.cpp in Sources */,
 				A29BF8CB13A04A6F00C812DD /* MoviePlayer.cpp in Sources */,
 				A29BF8CC13A04A6F00C812DD /* MusicMgr.cpp in Sources */,
@@ -5043,13 +5058,17 @@
 				A29BF90D13A04A6F00C812DD /* Window.cpp in Sources */,
 				A29BF90E13A04A6F00C812DD /* WorldMapControl.cpp in Sources */,
 				A29BF90F13A04A6F00C812DD /* Actions.cpp in Sources */,
+				A276FAFE199E8C7A00BD6CEF /* GLTextureSprite2D.cpp in Sources */,
 				A29BF91013A04A6F00C812DD /* GameScript.cpp in Sources */,
 				A29BF91113A04A6F00C812DD /* GSUtils.cpp in Sources */,
+				A276FB03199E8EF300BD6CEF /* SFMT.c in Sources */,
 				A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */,
 				A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */,
 				A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */,
 				A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */,
 				A226F41113A119E2009CE75E /* ACMReader.cpp in Sources */,
+				A276FAFB199E8C6F00BD6CEF /* Matrix.cpp in Sources */,
+				A276FB02199E8EEE00BD6CEF /* RNG_SFMT.cpp in Sources */,
 				A226F41213A119E2009CE75E /* decoder.cpp in Sources */,
 				A226F41313A119E2009CE75E /* unpacker.cpp in Sources */,
 				A226F41713A119EA009CE75E /* AREImporter.cpp in Sources */,
@@ -5122,6 +5141,7 @@
 				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */,
 				A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */,
+				A276FAFD199E8C7500BD6CEF /* GLSLProgram.cpp in Sources */,
 				A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */,
 				A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */,
 				A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
