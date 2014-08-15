@@ -189,24 +189,13 @@ size_t Font::RenderText(const String& string, Region& rgn,
 {
 	assert(color); // must have a palette
 
-	// we dont do vertical alignment here!
+	// NOTE: vertical alignment is not handled here.
+	// it should have been calculated previously and passed in via the "point" parameter
+
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
-	assert(canvas || singleLine || !(alignment&(IE_FONT_ALIGN_BOTTOM|IE_FONT_ALIGN_MIDDLE)));
 
 	int x = (point) ? point->x : 0;
 	int y = (point) ? point->y : 0;
-	if (singleLine) {
-		// optimization for single line vertical alignment
-		if (alignment&IE_FONT_ALIGN_MIDDLE) {
-			y = (rgn.h - maxHeight);
-			if (y > 0) y /= 2;
-			y -= descent / 2;
-		} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
-			y = (rgn.h - maxHeight);
-		} else {
-			y = -descent;
-		}
-	}
 
 	// is this horribly inefficient?
 	std::wistringstream stream(string);
@@ -501,21 +490,32 @@ size_t Font::Print(Region rgn, const String& string,
 	if (!pal) {
 		pal = palette;
 	}
-	if (!(alignment&IE_FONT_SINGLE_LINE) && alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
-		// easier to render the text as an image then vertically align it within rgn
-
-		// FIXME: this is probably a bad idea to create and destroy the text every call to print.
-		// the GL driver probably causes print to be called every frame which makes it worse
-		// we should consider migrating any clients that use print + these alignments to TextSpans/Contaners
-		// Things that are known to still use this: ToolTips, OverheadText
-
-		size_t ret;
-		Sprite2D* rendered = RenderTextAsSprite(string, rgn.Dimensions(), alignment, color, &ret, point); // this does the alignment so no need to adjust here
-		core->GetVideoDriver()->BlitSprite(rendered, rgn.x, rgn.y, true, &rgn);
-		rendered->release();
-		return ret;
+	Point p = (point) ? *point : Point();
+	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
+		// we assume that point will be an offset from midde/bottom position
+		Size stringSize;
+		if (alignment&IE_FONT_SINGLE_LINE) {
+			// we can optimize single lines without StringSize()
+			stringSize.h = maxHeight + descent;
+		} else {
+			stringSize = rgn.Dimensions();
+			stringSize = StringSize(string, &stringSize);
+		}
+		if (alignment&IE_FONT_ALIGN_MIDDLE) {
+			p.y += (rgn.h - stringSize.h) / 2;
+		} else { // bottom alignment
+			p.y += rgn.h - stringSize.h;
+		}
+	} else if (alignment&IE_FONT_SINGLE_LINE) {
+		// FIXME: I dont remember why this is needed (it is tho... for now)
+		p.y -= descent;
 	}
-	return RenderText(string, rgn, pal, alignment, point);
+
+	size_t ret = RenderText(string, rgn, pal, alignment, &p);
+	if (point) {
+		*point = p;
+	}
+	return ret;
 }
 
 Size Font::StringSize(const String& string, const Size* stop) const
