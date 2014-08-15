@@ -1,12 +1,8 @@
 #ifndef GLSLPROGRAM_H
 #define GLSLPROGRAM_H
 
-#ifdef USE_GL
-#include <GL/glew.h>
-#else
-#include <GLES2/GL2.h>
-#include <GLES2/GL2ext.h>
-#endif
+#include "OpenGLEnv.h"
+
 #include <map>
 #include <string>
 
