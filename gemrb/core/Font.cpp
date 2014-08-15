@@ -187,35 +187,23 @@ size_t Font::RenderText(const String& string, Region& rgn,
 						Palette* color, ieByte alignment,
 						Point* point, ieByte** canvas, bool grow) const
 {
-	assert(color); // must have a palette
-
 	// NOTE: vertical alignment is not handled here.
 	// it should have been calculated previously and passed in via the "point" parameter
 
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
+	Point dp((point) ? point->x : 0, (point) ? point->y : 0);
 
-	int x = (point) ? point->x : 0;
-	int y = (point) ? point->y : 0;
-
+	size_t charCount = 0;
 	// is this horribly inefficient?
 	std::wistringstream stream(string);
-	String line, word;
-	//const Sprite2D* currGlyph = NULL;
 	bool done = false, lineBreak = false;
-	size_t charCount = 0;
-	ieByte* lineBuffer = NULL;
-	if (!singleLine && alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
-		// blit to a line buffer then blit it to screen/canvas
-		// we dont need it for left alignment
-		lineBuffer = (ieByte*)calloc(maxHeight + descent, rgn.w); // enough for maximum line
-	}
-	Glyph lineGlyphs(Size(rgn.w, maxHeight + descent), 0, lineBuffer, rgn.w);
 
+	String line;
 	while (!done && (lineBreak || getline(stream, line))) {
 		lineBreak = false;
 
 		// check if we need to extend the canvas
-		if (canvas && grow && rgn.h < y) {
+		if (canvas && grow && rgn.h < dp.y) {
 			size_t pos = stream.tellg();
 			pos -= line.length();
 			Size textSize = StringSize(string.substr(pos));
@@ -238,138 +226,62 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			// fill the buffer with the color key, or the new area or we will get garbage in the areas we dont blit to
 			memset(*canvas + curpos, 0, vGrow * rgn.w);
 		}
-		// reset the buffer
-		if (lineBuffer)
-			memset(lineBuffer, 0, rgn.w * lineGlyphs.dimensions.h);
 
 		ieWord lineW = StringSize(line).w;
-		if (singleLine && alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
-			// optimization for single line horizontal alignmnet
-			if (alignment & IE_FONT_ALIGN_CENTER) {
-				x = ( rgn.w - lineW ) / 2;
-			} else if (alignment & IE_FONT_ALIGN_RIGHT) {
-				x = ( rgn.w - lineW );
-			}
-		} else if (charCount) {
-			// dont overwrite the input coordinate until we have printed something
-			x = 0;
-		}
+		dp.x = 0;
 
 		size_t lineLen = line.length();
 		if (lineLen) {
-			size_t linePos = 0, wordBreak = 0;
-			while (line[linePos] == L' ') {
-				// skip spaces at the beginning of a line
-				linePos++;
-			}
-			// FIXME: I'm not sure how to handle Asian text
-			// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
-			// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
-			// that would looks funny with partial translations, however. we would need to handle both simultaniously.
-			// TODO: word breaks shouldprobably happen on other characters such as '-' too.
-			// not as simple as adding it to find_first_of
-			while (!lineBreak && (wordBreak = line.find_first_of(L' ', linePos))) {
-				word = line.substr(linePos, wordBreak - linePos);
-
-				int wordW = StringSize(word).w;
-				if (!(alignment&IE_FONT_SINGLE_LINE)) {
-					if (x + wordW > rgn.w && x > 0) {
-						// wrap to new line, only if the word isnt >= the entire line
-						lineBreak = true;
-						line = line.substr(linePos);
-					}
-				}
-
-				if (!lineBreak) {
-					// print the word
-					wchar_t currChar = '\0';
-					size_t i;
-					for (i = 0; i < word.length(); i++) {
-						// process glyphs in word
-						currChar = word[i];
-						if (currChar == '\r') {
-							continue;
-						}
-						if (i > 0) { // kerning
-							x -= KerningOffset(word[i-1], currChar);
-						}
-
-						const Glyph& curGlyph = GetGlyph(currChar);
-						// should probably use rect intersection, but new lines shouldnt be to the left ever.
-						if (!rgn.PointInside(x + rgn.x, y + rgn.y + curGlyph.descent)) {
-							if (wordW <= (int)((lineW <= rgn.w) ? lineW : rgn.w)) {
-								// this probably doest cover every situation 100%
-								// we consider printing done if the blitter is outside the region
-								// *and* the word isnt wider then the line
-								done = true;
-							} else {
-#if DEBUG_FONT
-								Log(WARNING, "Font", "The word '%ls' (width=%d) overruns available width of %d",
-									word.c_str(), wordW, rgn.w);
-#endif
-							}
-							break; // either done, or skipping
-						}
-						if (lineBuffer) {
-								BlitGlyphToCanvas(curGlyph, x, curGlyph.descent, lineBuffer, rgn.Dimensions());
-						} else if (canvas) {
-								BlitGlyphToCanvas(curGlyph, x, y + curGlyph.descent, *canvas, rgn.Dimensions());
-						} else {
-							assert(AtlasIndex.find(currChar) != AtlasIndex.end());
-
-							size_t pageIdx = AtlasIndex.at(currChar);
-							assert(pageIdx < AtlasIndex.size());
-
-							GlyphAtlasPage* page = Atlas[pageIdx];
-							Region dst = Region(x + rgn.x, y + rgn.y + curGlyph.descent,
-												curGlyph.dimensions.w, curGlyph.dimensions.h);
-							page->Draw(currChar, dst, color);
-						}
-						x += curGlyph.dimensions.w;
-					}
-					if (done) break;
-					linePos += i + 1;
-				}
-				if (wordBreak == String::npos) {
-					linePos--; // we previously counted a non-existant space
-					break;
-				}
-				x += GetGlyph(' ').dimensions.w;
-			}
+			// skip spaces at the beginning of a line
+			// FIXME: under what conditions does this not apply? single line?
+			size_t linePos = line.find_first_not_of(L" \n\r\t");
+			line.erase(0, linePos);
 			charCount += linePos;
+
+			Region lineRgn(dp + rgn.Origin(), Size(rgn.w, maxHeight + descent));
+			Point linePoint;
+			if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
+				linePoint.x += (rgn.w - lineW); // this is right aligned, but we can adjust for center later on
+				if (linePoint.x < 0) {
+					linePos = String::npos;
+					size_t prevPos = linePos;
+					String word;
+					while (linePoint.x < 0) {
+						// yuck, this is not optimal. not sure of a better way.
+						// we have to rewind, word by word, until X >= 0
+						linePos = line.find_last_of(L' ', prevPos);
+						// word should be the space + word for calculation purposes
+						word = line.substr(linePos, (prevPos - linePos) + 1);
+						linePoint.x += StringSize(word).w;
+						prevPos = linePos - 1;
+					}
+				}
+				if (alignment&IE_FONT_ALIGN_CENTER) {
+					linePoint.x /= 2;
+				}
+			}
+
+			linePos = RenderLine(line, lineRgn, color, linePoint, (canvas) ? canvas + (linePoint.x * linePoint.y) : NULL);
+			dp = dp + linePoint;
+			charCount += linePos;
+			if (linePos < line.length() - 1) {
+				lineBreak = true;
+				if (!singleLine) {
+					// dont bother getting the next line if we arent going to print it
+					line = line.substr(linePos);
+				}
+			}
 		}
 		if (singleLine) break;
 
-		if (lineBuffer) {
-			if (alignment&IE_FONT_ALIGN_CENTER) {
-				x = (rgn.w - x) / 2;
-			} else { // right alignment
-				x = rgn.w - x;
-			}
-			if (canvas) {
-				BlitGlyphToCanvas(lineGlyphs, x, y, *canvas, rgn.Dimensions());
-			} else {
-				// FIXME: probably not very efficient.
-				// we do this because we dont have ability to update GL texture pixels...
-				Video* video = core->GetVideoDriver();
-				Sprite2D* lineSprite = video->CreateSprite8(rgn.w, maxHeight, lineBuffer, color, true, 0);
-				video->BlitSprite(lineSprite, x + rgn.x, y + rgn.y, true, &rgn);
-				lineSprite->release(); // this released lineBuffer
-				// re-allocate the buffer
-				lineBuffer = (ieByte*)calloc(maxHeight + descent, rgn.w); // enough for maximum line
-			}
-		}
-
 		if (!lineBreak && !stream.eof() && !done)
 			charCount++; // for the newline
-		y += maxHeight;
+		dp.y += maxHeight;
 	}
-	if (lineBuffer)
-		free(lineBuffer);
 
 	// free the unused canvas area (if any)
 	if (canvas) {
-		int usedh = y + descent;
+		int usedh = dp.y + descent;
 		if (usedh < rgn.h) {
 			// this is more than just saving memory
 			// vertical alignment will be off if we have extra space
@@ -381,13 +293,94 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	if (point) {
 		// deal with possible trailing newline
 		if (!done && string[charCount - 1] == L'\n') {
-			y += maxHeight;
+			dp.y += maxHeight;
 		}
-		*point = Point(x, y - maxHeight);
+		*point = Point(dp.x, dp.y - maxHeight);
 	}
 
 	assert(charCount <= string.length());
 	return charCount;
+}
+
+size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* color,
+						Point& dp, ieByte** canvas) const
+{
+	assert(color); // must have a palette
+
+	// NOTE: alignment is not handled here.
+	// it should have been calculated previously and passed in via the "point" parameter
+
+	size_t linePos = 0, wordBreak = 0;
+
+	// FIXME: I'm not sure how to handle Asian text
+	// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
+	// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
+	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
+	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
+	// not as simple as adding it to find_first_of
+	bool done = false;
+	while ((wordBreak = line.find_first_of(L' ', linePos))) {
+		String word = line.substr(linePos, wordBreak - linePos);
+
+		int wordW = StringSize(word).w;
+		if (dp.x + wordW > lineRgn.w && dp.x > 0) {
+			break;
+		}
+
+		// print the word
+		wchar_t currChar = '\0';
+		size_t i = 0;
+		for (; i < word.length(); i++) {
+			// process glyphs in word
+			currChar = word[i];
+			if (currChar == '\r') {
+				continue;
+			}
+			if (i > 0) { // kerning
+				dp.x -= KerningOffset(word[i-1], currChar);
+			}
+
+			const Glyph& curGlyph = GetGlyph(currChar);
+			// should probably use rect intersection, but new lines shouldnt be to the left ever.
+			if (!lineRgn.PointInside(dp.x + lineRgn.x, dp.y + lineRgn.y + curGlyph.descent)) {
+				if (wordW < lineRgn.w) {
+					// this probably doest cover every situation 100%
+					// we consider printing done if the blitter is outside the region
+					// *and* the word isnt wider then the line
+					done = true;
+				} else {
+#if DEBUG_FONT
+					Log(WARNING, "Font", "The word '%ls' (width=%d) overruns available width of %d",
+						word.c_str(), wordW, rgn.w);
+#endif
+				}
+				break; // either done, or skipping
+			}
+			if (canvas) {
+				BlitGlyphToCanvas(curGlyph, dp.x, dp.y + curGlyph.descent, *canvas, lineRgn.Dimensions());
+			} else {
+				assert(AtlasIndex.find(currChar) != AtlasIndex.end());
+
+				size_t pageIdx = AtlasIndex.at(currChar);
+				assert(pageIdx < AtlasIndex.size());
+
+				GlyphAtlasPage* page = Atlas[pageIdx];
+				Region dst = Region(dp.x + lineRgn.x, dp.y + lineRgn.y + curGlyph.descent,
+									curGlyph.dimensions.w, curGlyph.dimensions.h);
+				page->Draw(currChar, dst, color);
+			}
+			dp.x += curGlyph.dimensions.w;
+		}
+		if (done) break;
+		linePos += i + 1;
+
+		if (wordBreak == String::npos) {
+			linePos--; // we previously counted a non-existant space
+			break;
+		}
+		dp.x += GetGlyph(' ').dimensions.w;
+	}
+	return linePos;
 }
 
 Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,

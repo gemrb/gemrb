@@ -139,6 +139,10 @@ private:
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
 					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
+	// render a single line of text. called by RenderText()
+	size_t RenderLine(const String& string, const Region& rgn, Palette* hicolor,
+					  Point& dp, ieByte** canvas = NULL) const;
+
 public:
 	Font(Palette*);
 	virtual ~Font();
