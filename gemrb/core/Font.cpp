@@ -196,10 +196,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	size_t charCount = 0;
 	// is this horribly inefficient?
 	std::wistringstream stream(string);
-	bool done = false, lineBreak = false;
+	bool lineBreak = false;
 
 	String line;
-	while (!done && (lineBreak || getline(stream, line))) {
+	while (lineBreak || getline(stream, line)) {
 		lineBreak = false;
 
 		// check if we need to extend the canvas
@@ -275,7 +275,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		}
 		if (singleLine) break;
 
-		if (!lineBreak && !stream.eof() && !done)
+		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
 		dp.y += maxHeight;
 	}
@@ -293,7 +293,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 	if (point) {
 		// deal with possible trailing newline
-		if (!done && string[charCount - 1] == L'\n') {
+		if (string[charCount - 1] == L'\n') {
 			dp.y += maxHeight;
 		}
 		*point = Point(dp.x, dp.y - maxHeight);
