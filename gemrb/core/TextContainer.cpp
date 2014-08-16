@@ -283,7 +283,7 @@ Content* ContentContainer::RemoveContent(const Content* span)
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
 {
-	return ContentAtScreenPoint(Point(p.x + screenOffset.x, p.y + screenOffset.y));
+	return ContentAtScreenPoint(p + screenOffset);
 }
 
 Content* ContentContainer::ContentAtScreenPoint(const Point& p) const
