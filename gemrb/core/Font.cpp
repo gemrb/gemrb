@@ -236,7 +236,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		if (lineLen) {
 			// skip spaces at the beginning of a line
 			// FIXME: under what conditions does this not apply? single line?
-			size_t linePos = line.find_first_not_of(L" \n\r\t");
+			size_t linePos = line.find_first_not_of(L' ');
 			line.erase(0, linePos);
 			charCount += linePos;
 
