@@ -188,14 +188,6 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 		// probably the way to do this is have alignment on the container
 		// then maybe another Draw method that takes an alignment argument?
 		if (drawRegion.w <= 0) {
-			/*
-			// FIXME: probably a better way to do this...
-			Sprite2D* spr = font->RenderTextAsSprite(text, frame.Dimensions(), IE_FONT_ALIGN_LEFT);
-			drawRegion.w = spr->Width;
-			drawRegion.h = spr->Height;
-			core->GetVideoDriver()->BlitSprite(spr, drawRegion.x, drawRegion.y, true);
-			spr->release();
-			*/
 			Size max = Size(0, frame.h);
 			Size ts = font->StringSize(text, &max);
 			assert(ts.w && ts.h);
