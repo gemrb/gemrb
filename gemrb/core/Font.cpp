@@ -227,8 +227,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			memset(*canvas + curpos, 0, vGrow * rgn.w);
 		}
 
-		ieWord lineW = StringSize(line).w;
 		dp.x = 0;
+		Region lineRgn(dp + rgn.Origin(), Size(rgn.w, maxHeight + descent));
+		Size s = lineRgn.Dimensions();
+		ieWord lineW = StringSize(line, &s).w;
 
 		size_t lineLen = line.length();
 		if (lineLen) {
@@ -238,7 +240,6 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			line.erase(0, linePos);
 			charCount += linePos;
 
-			Region lineRgn(dp + rgn.Origin(), Size(rgn.w, maxHeight + descent));
 			Point linePoint;
 			if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
 				linePoint.x += (rgn.w - lineW); // this is right aligned, but we can adjust for center later on
