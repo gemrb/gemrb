@@ -137,24 +137,24 @@ def DisplayOverview(step):
 				TextAreaControl.SetText ("")
 		elif part == 2:
 			if step == 9:
-				TextAreaControl.Append (GemRB.GetString(1047) + ": " + GemRB.GetToken ("CHARNAME"))
+				TextAreaControl.Append (GemRB.GetString(1047) + ": " + GemRB.GetToken ("CHARNAME") + "\n")
 				
 			if GemRB.GetPlayerStat (MyChar, IE_SEX) == 1:
 				gender = GemRB.GetString (1050)
 			else:
 				gender = GemRB.GetString (1051)
-			TextAreaControl.Append (GemRB.GetString(12135) + ": " + gender)
+			TextAreaControl.Append (GemRB.GetString(12135) + ": " + gender + "\n")
 		elif part == 3:
 			stat = GemRB.GetPlayerStat(MyChar, IE_RACE)
 			v = CommonTables.Races.FindValue (3, stat)
-			TextAreaControl.Append (GemRB.GetString(1048) + ": " + GemRB.GetString( CommonTables.Races.GetValue (v,2)) )
+			TextAreaControl.Append (GemRB.GetString(1048) + ": " + GemRB.GetString( CommonTables.Races.GetValue (v,2)) + "\n")
 		elif part == 4:
 			ClassTitle = GUICommon.GetActorClassTitle (MyChar)
-			TextAreaControl.Append (GemRB.GetString(12136) + ": " + ClassTitle)
+			TextAreaControl.Append (GemRB.GetString(12136) + ": " + ClassTitle + "\n")
 		elif part == 5:
 			stat = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 			v = CommonTables.Aligns.FindValue (3, stat)
-			TextAreaControl.Append (GemRB.GetString(1049) + ": " + GemRB.GetString(CommonTables.Aligns.GetValue (v,2)))
+			TextAreaControl.Append (GemRB.GetString(1049) + ": " + GemRB.GetString(CommonTables.Aligns.GetValue (v,2)) + "\n")
 		elif part == 6:
 			TextAreaControl.Append ("\n")
 			ClassName = GUICommon.GetClassRowName (MyChar)
@@ -165,9 +165,9 @@ def DisplayOverview(step):
 				StatID = AbilityTable.GetValue (i, 3)
 				stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if (i == 0) and hasextra and (stat==18):
-					TextAreaControl.Append (GemRB.GetString(v) + ": " + str(stat) +"/"+str(strextra) )
+					TextAreaControl.Append (GemRB.GetString(v) + ": " + str(stat) + "/" + str(strextra) + "\n")
 				else:
-					TextAreaControl.Append (GemRB.GetString(v) + ": " + str(stat) )
+					TextAreaControl.Append (GemRB.GetString(v) + ": " + str(stat) + "\n")
 		elif part == 7:
 			# thieving and other skills
 			info = ""
@@ -187,14 +187,14 @@ def DisplayOverview(step):
 					statID = SkillTable.GetValue (skill+2, 2)
 					value = GemRB.GetPlayerStat (MyChar, statID, 1)
 					if value >= 0 and available != -1:
-						info += name + ": " + str(value)
+						info += name + ": " + str(value) + "\n"
 			elif BardSkills != "*" or RangerSkills != "*":
 				for skill in range(SkillTable.GetRowCount () - 2):
 					name = GemRB.GetString (SkillTable.GetValue (skill+2, 1))
 					StatID = SkillTable.GetValue (skill+2, 2)
 					value = GemRB.GetPlayerStat (MyChar, StatID, 1)
 					if value > 0:
-						info += name + ": " + str(value)
+						info += name + ": " + str(value) + "\n"
 			if info != "":
 				TextAreaControl.Append (GemRB.GetString(8442) + info)
 
