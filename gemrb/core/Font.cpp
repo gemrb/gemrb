@@ -273,11 +273,14 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				}
 			}
 		}
-		if (singleLine) break;
 
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
 		dp.y += maxHeight;
+
+		if (singleLine || dp.y >= rgn.h) {
+			break;
+		}
 	}
 
 	// free the unused canvas area (if any)
