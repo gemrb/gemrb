@@ -109,7 +109,16 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			do {
 				// process all overlaping exclusion zones until we trim down to the leftmost non conflicting region.
 				// check for intersections with other content
-				excluded = parent->ContentRegionForRect(lineSegment);
+				Size s = lineSegment.Intersect(rgn).Dimensions();
+				Size stringSize = font->StringSize(text.substr(numPrinted, text.find_first_of(L' ')), &s);
+
+				if (s.w > 0 && stringSize.w > s.w) {
+					// we dont even have enough area to print a single word. skip this segment.
+					// if the segment doesnt "exist" (s.w <= 0) it will be handled later
+					excluded = &lineSegment;
+				} else {
+					excluded = parent->ContentRegionForRect(lineSegment);
+				}
 				if (!excluded) {
 					// now check if we already used this region ourselves
 					std::vector<Region>::const_iterator it;
