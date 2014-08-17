@@ -228,8 +228,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		}
 
 		dp.x = 0;
-		Region lineRgn(dp + rgn.Origin(), Size(rgn.w, maxHeight + descent));
-		Size s = lineRgn.Dimensions();
+		const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, maxHeight + descent));
+		const Size s = lineRgn.Dimensions();
 		ieWord lineW = StringSize(line, &s).w;
 
 		size_t lineLen = line.length();
@@ -261,7 +261,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 					linePoint.x /= 2;
 				}
 			}
-
+#if DEBUG_FONT
+			core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
+			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(), Size(lineW, maxHeight)), ColorWhite, false);
+#endif
 			linePos = RenderLine(line, lineRgn, color, linePoint, (canvas) ? canvas + (linePoint.x * linePoint.y) : NULL);
 			dp = dp + linePoint;
 			charCount += linePos;
@@ -355,7 +358,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 				} else {
 #if DEBUG_FONT
 					Log(WARNING, "Font", "The word '%ls' (width=%d) overruns available width of %d",
-						word.c_str(), wordW, rgn.w);
+						word.c_str(), wordW, lineRgn.w);
 #endif
 				}
 				break; // either done, or skipping
@@ -521,41 +524,51 @@ Size Font::StringSize(const String& string, const Size* stop) const
 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0;
-	bool newline = false, bail = false;
+	int spaceW = GetGlyph(' ').dimensions.w;
+	bool newline = false, eos = false;
 	for (size_t i = 0; i < string.length(); i++) {
-		if (string[i] == L' ') {
-			lineW += wordW;
-			wordW = 0;
-		} else if (string[i] == L'\n') {
+		if (i == string.length() - 1) {
+			eos = true;
+		}
+		if (string[i] == L'\n') {
 			newline = true;
-		} else {
+		} else if (string[i] != L' ') {
 			const Glyph& curGlyph = GetGlyph(string[i]);
 			wordW += curGlyph.dimensions.w;
 			if (i > 0) { // kerning
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
+		}
+		if (string[i] == L' ' || eos) {
 			if (stop && stop->w
 				&& lineW // let this overflow if the word alone is wider than stop->w
-				&& wordW + lineW > stop->w) {
+				&& lineW + spaceW + wordW > stop->w) {
 				newline = true;
+			} else {
+				if (lineW) {
+					lineW += spaceW;
+				}
+				lineW += wordW;
+			}
+
+			if (newline || eos) {
+				w = (lineW > w) ? lineW : w;
+			} else {
+				wordW = 0;
 			}
 		}
 
 		if (newline) {
 			newline = false;
-			w = (lineW > w) ? lineW : w;
 			if (stop && stop->h && (maxHeight * lines) + descent > stop->h ) {
-				bail = true;
 				break;
 			}
 			lines++;
 			lineW = 0;
 		}
 	}
-	if (!bail) {
-		// add the remainder
-		w += lineW + wordW;
-	}
+
+	// this can only return w > stop->w if there is a singe word wider than stop.
 	return Size(w, (maxHeight * lines) + descent);
 }
 
