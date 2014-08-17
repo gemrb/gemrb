@@ -1458,7 +1458,7 @@ def UpdatePortraitWindow ():
 
 		FlagLabel = Window.GetControl(200 + portid)
 		if flag != blank:
-			FlagLabel.SetText(flag)
+			FlagLabel.SetText(flag.ljust(3, blank))
 		else:
 			FlagLabel.SetText("")
 		Button.SetText(states)
