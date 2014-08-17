@@ -147,7 +147,13 @@ void TextArea::DrawInternal(Region& clip)
 	clip.y -= TextYPos + 2;
 	contentWrapper.Draw(clip.Origin());
 
-	// now the text is layed out in the container so we can calculate the rows
+	if (selectOptions) {
+		// This hack is to refresh the mouse cursor so that option below cursor gets
+		// highlighted during a dialog
+		core->GetEventMgr()->FakeMouseMove();
+	}
+
+	// now the text is laied out in the container so we can calculate the rows
 	int textHeight = contentWrapper.ContentFrame().h;
 	int dialogNodeHeight = 0;
 	if (dialogYPos > 0) {
@@ -722,9 +728,6 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	dialogYPos = textContainer->ContentFrame().h;
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	MarkDirty();
-	// This hack is to refresh the mouse cursor so that reply below cursor gets
-	// highlighted during a dialog
-	core->GetEventMgr()->FakeMouseMove();
 }
 
 void TextArea::ClearText()
