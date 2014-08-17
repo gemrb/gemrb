@@ -180,7 +180,9 @@ const Glyph& Font::GetGlyph(ieWord chr) const
 	if (AliasMap.find(chr) != AliasMap.end()) {
 		chr = AliasMap.at(chr);
 	}
-	return Atlas[AtlasIndex.at(chr)]->GlyphForChr(chr);
+	size_t idx = 0;
+	if (AtlasIndex.find(chr) != AtlasIndex.end()) idx = AtlasIndex.at(chr);
+	return Atlas[idx]->GlyphForChr(chr);
 }
 
 size_t Font::RenderText(const String& string, Region& rgn,
@@ -524,7 +526,7 @@ Size Font::StringSize(const String& string, const Size* stop) const
 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0;
-	int spaceW = GetGlyph(' ').dimensions.w;
+	int spaceW = GetGlyph(L' ').dimensions.w;
 	bool newline = false, eos = false;
 	for (size_t i = 0; i < string.length(); i++) {
 		if (i == string.length() - 1) {
