@@ -246,7 +246,7 @@ def DisplayOverview(step):
 					pluses = " "
 					for plus in range(0, Value):
 						pluses += "+"
-					TextAreaControl.Append (Weapon + pluses)
+					TextAreaControl.Append (Weapon + pluses + "\n")
 
 		elif part == 8:
 			break
