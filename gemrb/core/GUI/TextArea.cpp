@@ -42,18 +42,21 @@ TextArea::TextArea(const Region& frame, Font* text)
 }
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color textcolor, Color /*initcolor*/, Color lowtextcolor)
+				   Color textcolor, Color initcolor, Color lowtextcolor)
 	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
 {
 	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
 	palette = palettes[PALETTE_NORMAL];
 
-	// FIXME: initcolor is only used for *some* initial fonts
-	// setting this breaks the item description dropcaps, but not setting it breaks other TAs (minor)
-	//SetPalette(&initcolor, PALETTE_INITIALS);
-
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps != ftext) ? caps : ftext;
+
+	if (finit->descent <= ftext->descent) {
+		// FIXME: initcolor is only used for *some* initial fonts
+		// this is a hack to workaround the INITIALS font getting its palette set
+		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
+		SetPalette(&initcolor, PALETTE_INITIALS);
+	}
 
 	Init();
 }
