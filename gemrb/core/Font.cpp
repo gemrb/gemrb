@@ -267,7 +267,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(), Size(lineW, maxHeight)), ColorWhite, false);
 #endif
-			linePos = RenderLine(line, lineRgn, color, linePoint, (canvas) ? canvas + (linePoint.x * linePoint.y) : NULL);
+			linePos = RenderLine(line, lineRgn, color, linePoint, (canvas) ? canvas + (dp.x * dp.y) : NULL);
 			dp = dp + linePoint;
 			charCount += linePos;
 			if (linePos < line.length() - 1) {
