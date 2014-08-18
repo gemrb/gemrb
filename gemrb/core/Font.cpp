@@ -498,7 +498,11 @@ size_t Font::Print(Region rgn, const String& string,
 		Size stringSize;
 		if (alignment&IE_FONT_SINGLE_LINE) {
 			// we can optimize single lines without StringSize()
-			stringSize.h = maxHeight + descent;
+			stringSize.h = maxHeight;
+			if (alignment&IE_FONT_ALIGN_MIDDLE) {
+				// FIXME: should this be something that IE_FONT_ALIGN_BOTTOM subtracts instead (for more than IE_FONT_SINGLE_LINE)?
+				stringSize.h += descent;
+			}
 		} else {
 			stringSize = rgn.Dimensions();
 			stringSize = StringSize(string, &stringSize);
