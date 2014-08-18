@@ -876,32 +876,28 @@ def OpenKitInfoWindow ():
 
 	if Multi and Dual[0] == 0: # true multi class
 		text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
-		TextArea.SetText (text)
-		KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
-		return
+	else:
+		KitIndex = GUICommon.GetKitIndex (pc)
 
-	KitIndex = GUICommon.GetKitIndex (pc)
+		if Dual[0]: # dual class
+			# first (previous) kit or class of the dual class
+			if Dual[0] == 1:
+				text = CommonTables.KitList.GetValue (Dual[1], 3)
+			elif Dual[0] == 2:
+				text = GUICommon.GetClassRowName(Dual[1], "index")
+				text += CommonTables.Classes.GetValue (text, "DESC_REF")
+	
+			text += "\n"
+			text += GUICommon.GetClassRowName(Dual[2], "index")
+			text += CommonTables.Classes.GetValue (text, "DESC_REF")
+	
+		else: # ordinary class or kit
+			if KitIndex:
+				text = CommonTables.KitList.GetValue (KitIndex, 3)
+			else:
+				text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 
-	if Dual[0]: # dual class
-		# first (previous) kit or class of the dual class
-		if Dual[0] == 1:
-			text = CommonTables.KitList.GetValue (Dual[1], 3)
-		elif Dual[0] == 2:
-			text = GUICommon.GetClassRowName(Dual[1], "index")
-			text = CommonTables.Classes.GetValue (text, "DESC_REF")
-
-		TextArea.SetText (text)
-		TextArea.Append ("\n\n")
-		text = GUICommon.GetClassRowName(Dual[2], "index")
-		text = CommonTables.Classes.GetValue (text, "DESC_REF")
-
-	else: # ordinary class or kit
-		if KitIndex:
-			text = CommonTables.KitList.GetValue (KitIndex, 3)
-		else:
-			text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
-
-	TextArea.Append (text)
+	TextArea.SetText ("[p]" + text + "[/p]")
 
 	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
