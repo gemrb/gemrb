@@ -386,7 +386,12 @@ void TextArea::AppendText(const String& text)
 				// because the original data files for the DC font specifies a line height of 13
 				// that would cause overlap when the lines wrap beneath the DC if we didnt specify the correct size
 				Size s = finit->GetGlyph(text[textpos]).dimensions;
-				s.w += EDGE_PADDING;
+				if (s.h > ftext->maxHeight) {
+					// pad this only if it is "real" (it is higher than the other text).
+					// some text areas have a "cap" font assigned in the CHU that differs from ftext, but isnt meant to be a cap
+					// see BG2 chargen
+					s.w += EDGE_PADDING;
+				}
 				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS], &s);
 				textContainer->AppendContent(dc);
 				textpos++;
