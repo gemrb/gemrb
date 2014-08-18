@@ -97,6 +97,7 @@ public:
 
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
+
 	bool PointInside(short XPos, short YPos) const;
 	bool PointInside(const Point &p) const;
 	bool InsideRegion(const Region& rgn) const;
@@ -106,6 +107,22 @@ public:
 	void Normalize();
 	Point Origin() const { return Point(x, y); }
 	Size Dimensions() const { return Size(w, h); }
+
+	template<typename T>
+	static Region RegionEnclosingRegions(T regions) {
+		typename T::const_iterator it = regions.begin();
+		// start with the complete first rect
+		Region bounds = *it++;
+		for (; it != regions.end(); ++it) {
+			// now expand it as needed
+			const Region& r = *it;
+			bounds.x = (r.x < bounds.x) ? r.x : bounds.x;
+			bounds.y = (r.y < bounds.y) ? r.y : bounds.y;
+			bounds.w = (r.x + r.w > bounds.x + bounds.w) ? (r.x + r.w) - bounds.x : bounds.w;
+			bounds.h = (r.y + r.h > bounds.y + bounds.h) ? (r.y + r.h) - bounds.y : bounds.h;
+		}
+		return bounds;
+	}
 };
 
 }
