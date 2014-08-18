@@ -94,6 +94,11 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 				lineRgn.y += font->maxHeight;
 				lineRgn.w = rgn.w;
 				dp = lineRgn.Origin();
+
+				// must claim the lineExclusions as part of the layout
+				// just because we didnt fit doesnt mean somethng else wont...
+				layoutRegions.push_back(Region::RegionEnclosingRegions(lineExclusions));
+
 				lineExclusions.clear();
 				lineSegment = lineRgn;
 			}
@@ -107,6 +112,7 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 					// we dont even have enough area to print a single word. skip this segment.
 					// if the segment doesnt "exist" (s.w <= 0) it will be handled later
 					excluded = &lineSegment;
+					lineExclusions.push_back(lineSegment);
 				} else {
 					excluded = parent->ContentRegionForRect(lineSegment);
 				}
@@ -119,7 +125,7 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 							break;
 						}
 					}
-				}
+				} // no else!
 				if (excluded) {
 					Region intersect = excluded->Intersect(lineSegment);
 					if (intersect.x > lineSegment.x) { // to the right, simply shrink the width
@@ -161,7 +167,7 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 #if (DEBUG_TEXT)
 			core->GetVideoDriver()->DrawRect(lineSegment, ColorWhite, false);
 #endif
-
+			assert(lineSegment.h % font->maxHeight == 0);
 			layoutRegions.push_back(lineSegment);
 
 			// FIXME: infinite loop possibility.
