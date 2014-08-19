@@ -1363,12 +1363,12 @@ int Interface::LoadFonts()
 			Color back = ColorBlack;
 			const char* colorString = tab->QueryField( rowName, "COLOR" );
 			if (colorString) {
-// FIXME: no idea what a correct check for "hh" format support should be, but "02x" doesnt work on Mac...
-#if __clang__
-				sscanf(colorString, "0x%02hhx%2hhx%2hhx%2hhx", &fore.r, &fore.g, &fore.b, &fore.a);
-#else
-				sscanf(colorString, "0x%02x%2x%2x%2x", &fore.r, &fore.g, &fore.b, &fore.a);
-#endif
+				ieDword c;
+				sscanf(colorString, "0x%x", &c);
+				fore.r = (ieByte)((c >> 24) & 0xFF);
+				fore.g = (ieByte)((c >> 16) & 0xFF);
+				fore.b = (ieByte)((c >> 8) & 0xFF);
+				fore.a = (ieByte)(c & 0xFF);
 			}
 			if (TooltipFontResRef == resref) {
 				if (fore.a != 0xff) {
