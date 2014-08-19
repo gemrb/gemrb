@@ -110,6 +110,7 @@ public:
 
 	template<typename T>
 	static Region RegionEnclosingRegions(T regions) {
+		if (regions.empty()) return Region();
 		typename T::const_iterator it = regions.begin();
 		// start with the complete first rect
 		Region bounds = *it++;

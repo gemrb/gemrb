@@ -95,9 +95,11 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 				lineRgn.w = rgn.w;
 				dp = lineRgn.Origin();
 
-				// must claim the lineExclusions as part of the layout
-				// just because we didnt fit doesnt mean somethng else wont...
-				layoutRegions.push_back(Region::RegionEnclosingRegions(lineExclusions));
+				if (lineExclusions.size()) {
+					// must claim the lineExclusions as part of the layout
+					// just because we didnt fit doesnt mean somethng else wont...
+					layoutRegions.push_back(Region::RegionEnclosingRegions(lineExclusions));
+				}
 
 				lineExclusions.clear();
 				lineSegment = lineRgn;
