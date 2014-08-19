@@ -271,7 +271,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				 str = core->GetString(tr->journalStrRef);
 				 //cutting off the strings at the first crlf
 				 str->resize(str->find_first_of(L"\n"));
-				 msg += L" - [/color][color=e4c999]" + *str + L"[/color]\n";
+				 msg += L" - [/color][color=ffd4a9]" + *str + L"[/color]\n";
 				 delete str;
 				 displaymsg->DisplayMarkupString(msg);
 			}
