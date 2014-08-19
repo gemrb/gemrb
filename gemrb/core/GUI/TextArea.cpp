@@ -222,6 +222,8 @@ void TextArea::SetText(const String& text)
 {
 	ClearText();
 	AppendText(text);
+	// reset text position to top
+	ScrollToY(0, this);
 }
 
 void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
