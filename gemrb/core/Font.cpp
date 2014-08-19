@@ -237,8 +237,13 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		size_t lineLen = line.length();
 		if (lineLen) {
 			// skip spaces at the beginning of a line
-			// FIXME: under what conditions does this not apply? single line?
+			// FIXME: under what conditions does this not apply? single line? what about console?
 			size_t linePos = line.find_first_not_of(L' ');
+			if (linePos == String::npos) {
+				// string is only spaces... just skip it
+				charCount += line.length();
+				goto doneline;
+			}
 			line.erase(0, linePos);
 			charCount += linePos;
 
@@ -278,7 +283,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				}
 			}
 		}
-
+		doneline:
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
 		dp.y += maxHeight;
@@ -327,6 +332,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of
+	int spaceW = GetGlyph(L' ').dimensions.w;
 	bool done = false;
 	while ((wordBreak = line.find_first_of(L' ', linePos))) {
 		String word = line.substr(linePos, wordBreak - linePos);
@@ -387,8 +393,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 			linePos--; // we previously counted a non-existant space
 			break;
 		}
-		dp.x += GetGlyph(' ').dimensions.w;
+		dp.x += spaceW;
 	}
+	assert(linePos <= line.length());
 	return linePos;
 }
 
