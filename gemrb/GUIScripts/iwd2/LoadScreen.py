@@ -57,22 +57,22 @@ def StartLoadScreen ():
 	Label = LoadScreen.GetControl (2)
 	Label.SetAlignment(IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE)
 	Label.SetText(HintStr)
-	if Progress: # only want 1 hint + game isnt ready till later
+		
+	Picture = LoadScreen.GetControl (4)
+	
+	def EndLoadScreen ():
+		GemRB.SetVar ("Progress", 0)
 		MessageWindow.UpdateControlStatus()
 		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 
-	Picture = LoadScreen.GetControl (4)
+		Skull = LoadScreen.GetControl (3)
+		Skull.SetMOS ("GTRBPSK2")
+		LoadScreen.SetVisible (WINDOW_VISIBLE)
+		LoadScreen.Unload()
+		return
 
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	return
-
-def EndLoadScreen ():
-	GemRB.SetVar ("Progress", 0)
-	Skull = LoadScreen.GetControl (3)
-	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	LoadScreen.Unload()
 	return
