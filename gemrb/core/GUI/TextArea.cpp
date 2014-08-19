@@ -222,8 +222,6 @@ void TextArea::SetText(const String& text)
 {
 	ClearText();
 	AppendText(text);
-	// reset text position to top
-	ScrollToY(0, this);
 }
 
 void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
@@ -766,6 +764,9 @@ void TextArea::ClearText()
 		textContainer = new TextContainer(frame, ftext, palette);
 	}
 	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
+
+	// reset text position to top
+	ScrollToY(0, this);
 }
 
 void TextArea::FlagsChanging(ieDword newFlags)
