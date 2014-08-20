@@ -1784,7 +1784,6 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damage = 0;
 		tmp = 1;
 		break;
-		break;
 	default:
 		tmp = 1;
 		damage = 1;
