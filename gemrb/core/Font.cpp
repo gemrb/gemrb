@@ -235,15 +235,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		ieWord lineW = StringSize(line, &s).w;
 
 		size_t lineLen = line.length();
-		if (lineLen) {
+		size_t linePos = line.find_first_not_of(L' ');
+		if (lineLen && linePos != String::npos) {
 			// skip spaces at the beginning of a line
 			// FIXME: under what conditions does this not apply? single line? what about console?
-			size_t linePos = line.find_first_not_of(L' ');
-			if (linePos == String::npos) {
-				// string is only spaces... just skip it
-				charCount += line.length();
-				goto doneline;
-			}
 			line.erase(0, linePos);
 			charCount += linePos;
 
@@ -282,8 +277,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 					line = line.substr(linePos);
 				}
 			}
+		} else if (linePos == String::npos) {
+			// string is only spaces... just skip it
+			charCount += line.length();
 		}
-		doneline:
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
 		dp.y += maxHeight;
