@@ -4658,6 +4658,7 @@ int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 		fx->Parameter1 = 1;
 	}
 	STAT_MOD( IE_CASTERHOLD );
+	core->GetGame()->SelectActor(target, false, SELECT_NORMAL);
 	return FX_PERMANENT;
 }
 
