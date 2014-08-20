@@ -1961,7 +1961,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 	}
 
-	if (doMove) {
+	if (doMove && game->selected.size() > 0) {
 		// construct a sorted party
 		// TODO: this is still ugly, help?
 		std::vector<Actor *> party;
