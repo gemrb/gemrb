@@ -87,19 +87,12 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
 		do {
-			newline:
 			if (lineSegment.w == 0 || lineSegment.x + lineSegment.w > lineRgn.x + lineRgn.w) {
 				// start next line
 				lineRgn.x = drawOrigin.x;
 				lineRgn.y += font->maxHeight;
 				lineRgn.w = rgn.w;
 				dp = lineRgn.Origin();
-
-				if (lineExclusions.size()) {
-					// must claim the lineExclusions as part of the layout
-					// just because we didnt fit doesnt mean somethng else wont...
-					layoutRegions.push_back(Region::RegionEnclosingRegions(lineExclusions));
-				}
 
 				lineExclusions.clear();
 				lineSegment = lineRgn;
@@ -149,29 +142,35 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 #if (DEBUG_TEXT)
 			core->GetVideoDriver()->DrawRect(lineSegment, ColorRed, true);
 #endif
-			// collapse with previous content (shared borders)
-			lineSegment.y--;
-			assert(lineSegment.h == font->maxHeight);
-			Point printPoint;
-			numPrinted += font->Print(lineSegment.Intersect(rgn), text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
+			{ // protected scope for goto
+				assert(lineSegment.h == font->maxHeight);
+				Point printPoint;
+				numPrinted += font->Print(lineSegment, text.substr(numPrinted), palette, IE_FONT_ALIGN_LEFT, &printPoint);
 
-			lineExclusions.push_back(lineSegment);
-			if (printPoint.y) {
-				// a newline occured; occupy the entire line area
-				lineSegment.w = lineRgn.w;
-				// in case the line has multiple line breaks ('\n') use the return point to determine the next line position
-				lineRgn.y += printPoint.y - lineSegment.h;
-			} else if (printPoint.x) {
-				dp.x += printPoint.x;
-				lineSegment.w = printPoint.x;
+				if (printPoint.y) {
+					// a newline occured; occupy the entire line area
+					lineSegment.w = lineRgn.w;
+					// in case the line has multiple line breaks ('\n') use the return point to determine the next line position
+					lineRgn.y += printPoint.y - lineSegment.h;
+				} else if (printPoint.x) {
+					dp.x += printPoint.x;
+					lineSegment.w = printPoint.x;
+				}
 			}
-
 #if (DEBUG_TEXT)
 			core->GetVideoDriver()->DrawRect(lineSegment, ColorWhite, false);
 #endif
 			assert(lineSegment.h % font->maxHeight == 0);
-			layoutRegions.push_back(lineSegment);
+			lineExclusions.push_back(lineSegment);
 
+			newline:
+			if (lineExclusions.size()) {
+				// must claim the lineExclusions as part of the layout
+				// just because we didnt fit doesnt mean somethng else wont...
+				Region excluded = Region::RegionEnclosingRegions(lineExclusions);
+				excluded.h--; // we want the following content to "collapse" with this rect
+				layoutRegions.push_back(excluded);
+			}
 			// FIXME: infinite loop possibility.
 		} while (numPrinted < text.length());
 	} else {
@@ -193,8 +192,6 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 			drawRegion.w = (drawRegion.w > 0) ? drawRegion.w : ts.w;
 		}
 
-		// collapse with previous content (shared borders)
-		drawRegion.y--;
 		Point printPoint;
 		if (drawRegion.h <= 0) {
 			drawRegion.h = CONTENT_MAX_SIZE;
@@ -207,6 +204,7 @@ void TextSpan::DrawContents(Point dp, const Region& rgn) const
 #if (DEBUG_TEXT)
 		core->GetVideoDriver()->DrawRect(drawRegion, ColorWhite, false);
 #endif
+		drawRegion.h--; // we want the following content to "collapse" with this rect
 		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.push_back(drawRegion);
 	}
@@ -368,6 +366,7 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 				drawPoint.x = excluded->x + excluded->w + 1;
 				if (drawPoint.x > drawOrigin.x + frame.w) {
 					drawPoint.x = drawOrigin.x;
+					assert(excluded->y + excluded->h >= drawPoint.y);
 					drawPoint.y = excluded->y + excluded->h + 1;
 				}
 			}

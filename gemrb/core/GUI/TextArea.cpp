@@ -143,11 +143,7 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	// FIXME: no idea why we have to make this +2 adjustment...
-	// I *think* it's related to the borders (Region) of the ContentContainers
-	// so +1 for the contentWrapper and +1 for its nested container
-	// if thats the case then this should probably be adjusted in that class
-	clip.y -= TextYPos + 2;
+	clip.y -= TextYPos;
 	contentWrapper.Draw(clip.Origin());
 
 	if (selectOptions) {
