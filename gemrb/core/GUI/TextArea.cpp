@@ -777,17 +777,6 @@ void TextArea::ClearText()
 	ScrollToY(0, this);
 }
 
-void TextArea::FlagsChanging(ieDword newFlags)
-{
-	if ((newFlags^Flags)&IE_GUI_TEXTAREA_HISTORY) {
-		// FIXME: not well implemented.
-		// any text is lost when changing this flag.
-		// and we are short circuiting SetFlags
-		Flags |= IE_GUI_TEXTAREA_HISTORY; // needs to be set before ClearText()
-		ClearText();
-	}
-}
-
 //setting up the textarea for smooth scrolling, the first
 //TEXTAREA_OUTOFTEXT callback is called automatically
 void TextArea::SetupScroll()

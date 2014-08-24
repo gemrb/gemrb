@@ -74,7 +74,6 @@ protected:
 	virtual void DrawInternal(Region& drawFrame)=0;
 	virtual bool NeedsDraw();
 	virtual bool HasBackground() { return true; }
-	virtual void FlagsChanging(ieDword) {};
 public:
 	Control(const Region& frame);
 	virtual ~Control();

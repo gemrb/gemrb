@@ -281,7 +281,6 @@ int Control::SetFlags(int arg_flags, int opcode)
 		default:
 			return -1;
 	}
-	FlagsChanging(newFlags);
 	Flags = newFlags;
 	Changed = true;
 	Owner->Invalidate();

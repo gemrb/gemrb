@@ -60,7 +60,6 @@ protected:
 	void DrawInternal(Region& drawFrame);
 	bool NeedsDraw();
 	bool HasBackground() { return false; }
-	void FlagsChanging(ieDword);
 public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
