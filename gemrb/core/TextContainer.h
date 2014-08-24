@@ -122,6 +122,7 @@ public:
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
 	Content* RemoveContent(const Content* content);
+	virtual void DeleteContentsInRect(Region);
 
 	Content* ContentAtPoint(const Point& p) const;
 	const ContentList& Contents() { return contents; }
@@ -150,30 +151,6 @@ public:
 	void AppendText(const String& text);
 	void AppendText(const String& text, Font* fnt, Palette* pal);
 	const String& Text() const;
-};
-
-/*
- We could choose to limit text in any number of ways (by "line", by size, or by span count)
- Since the goal here is simply to keep the amount of text from becoming burdonsome the method doesn't matter
- as long as we remain close to the given limit.
- 
- I have selected to limit by number of spans since it seemed easiest. This isn't a hard limit as the number of spans may be
- reduced below the limit based on how many spans intersect the area from the top of the container to the bottom of the top span.
- 
- This effectively pops messages one at a time from the MessageWindow instead of droping single lines of text.
- I feel this is a supirior method because it prevents having truncated messages.
-*/
-
-class RestrainedTextContainer : public TextContainer
-{
-private:
-	size_t spanLimit;
-
-public:
-	RestrainedTextContainer(const Size& frame, Font* font, Palette* pal, size_t limit)
-	: TextContainer(frame, font, pal) { spanLimit = limit; }
-
-	void AppendContent(Content* content);
 };
 
 }

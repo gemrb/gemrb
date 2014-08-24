@@ -143,6 +143,23 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
+	int textHeight = contentWrapper.ContentFrame().h;
+	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
+		int heightLimit = (ftext->maxHeight * 200) + ftext->descent;
+		// start trimming content from the top until we are under the limit.
+		Size frame = textContainer->ContentFrame();
+		int currHeight = frame.h;
+		if (currHeight > heightLimit) {
+			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
+			textContainer->DeleteContentsInRect(exclusion);
+			textHeight -= frame.h - textContainer->ContentFrame().h;
+			TextYPos += frame.h - textContainer->ContentFrame().h;
+			dialogYPos -= frame.h - textContainer->ContentFrame().h;
+			needScrollUpdate = true;
+			Owner->InvalidateForControl(this); // cant use MarkDirty since we are drawing
+		}
+	}
+
 	clip.y -= TextYPos;
 	contentWrapper.Draw(clip.Origin());
 
@@ -153,7 +170,6 @@ void TextArea::DrawInternal(Region& clip)
 	}
 
 	// now the text is laied out in the container so we can calculate the rows
-	int textHeight = contentWrapper.ContentFrame().h;
 	int dialogNodeHeight = 0;
 	if (dialogYPos > 0) {
 		dialogNodeHeight = textHeight - dialogYPos;
@@ -753,12 +769,8 @@ void TextArea::ClearText()
 		frame.w = Width - (EDGE_PADDING * 2);
 		frame.h = Height;
 	}
-	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
-		// limit of 200 spans is roughly 100 messages (1 span for actor, 1 for message)
-		textContainer = new RestrainedTextContainer(frame, ftext, palette, 200);
-	} else {
-		textContainer = new TextContainer(frame, ftext, palette);
-	}
+
+	textContainer = new TextContainer(frame, ftext, palette);
 	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
 
 	// reset text position to top

@@ -377,6 +377,28 @@ void ContentContainer::DrawContents(Point dp, const Region& rgn) const
 	layoutRegions.push_back(layoutRegion);
 }
 
+void ContentContainer::DeleteContentsInRect(Region exclusion)
+{
+	// convert rgn to screen
+	exclusion.x += screenOffset.x;
+	exclusion.y += screenOffset.y;
+
+	int top = exclusion.y;
+	int bottom = top;
+
+	while (const Region* rgn = ContentRegionForRect(exclusion)) {
+		const Content* content = ContentAtScreenPoint(rgn->Origin());
+		assert(content);
+
+		top = (rgn->y < top) ? rgn->y : top;
+		bottom = (rgn->y + rgn->h > bottom) ? rgn->y + rgn->h : bottom;
+		// must delete content last!
+		delete RemoveContent(content);
+	}
+
+	layoutRegions[0].h -= bottom - top;
+}
+
 
 TextContainer::TextContainer(const Size& frame, Font* fnt, Palette* pal)
 	: ContentContainer(frame), font(fnt)
@@ -418,41 +440,6 @@ const String& TextContainer::Text() const
 		}
 	}
 	return text;
-}
-
-
-void RestrainedTextContainer::AppendContent(Content* newContent)
-{
-	while (contents.size() >= spanLimit) {
-		// we need to remove the first span and any spans on the same "line"
-		ContentList::iterator it = contents.begin();
-		Content* content = *it;
-		if (layout.find(content) == layout.end()) {
-			delete RemoveContent(content);
-			return; // no layout yet, cant possibly delete any other spans
-		}
-
-		Region rgn = layout[content].front();
-		delete RemoveContent(content);
-		it = contents.begin();
-		while (it != contents.end()) {
-			content = *it;
-			if (layout.find(content) != layout.end()) {
-				Regions::iterator rit = layout[content].begin();
-				for (; rit != layout[content].end(); ++rit) {
-					if ((*rit).y <= rgn.y + rgn.h) {
-						it--;
-						delete RemoveContent(content);
-						break;
-					}
-				}
-			} else {
-				break; // no more layout available
-			}
-			it++;
-		}
-	}
-	ContentContainer::AppendContent(newContent);
 }
 
 }
