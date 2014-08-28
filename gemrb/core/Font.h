@@ -171,7 +171,7 @@ public:
 				 Palette* hicolor, ieByte Alignment, Point* point = NULL) const;
 
 	/** Returns size of the string rendered in this font in pixels */
-	Size StringSize(const String&, const Size* = NULL) const;
+	Size StringSize(const String&, const Size* = NULL, size_t* = NULL) const;
 };
 
 }

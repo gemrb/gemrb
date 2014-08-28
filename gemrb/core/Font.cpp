@@ -528,7 +528,7 @@ size_t Font::Print(Region rgn, const String& string,
 	return ret;
 }
 
-Size Font::StringSize(const String& string, const Size* stop) const
+Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) const
 {
 	if (!string.length()) return Size();
 
@@ -536,7 +536,8 @@ Size Font::StringSize(const String& string, const Size* stop) const
 	ieWord lineW = 0, wordW = 0;
 	int spaceW = GetGlyph(L' ').dimensions.w;
 	bool newline = false, eos = false;
-	for (size_t i = 0; i < string.length(); i++) {
+	size_t i = 0, wordCharCount = 0;
+	for (; i < string.length(); i++) {
 		if (i == string.length() - 1) {
 			eos = true;
 		}
@@ -548,6 +549,7 @@ Size Font::StringSize(const String& string, const Size* stop) const
 			if (i > 0) { // kerning
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
+			wordCharCount++;
 		}
 		if (string[i] == L' ' || eos) {
 			if (stop && stop->w
@@ -564,6 +566,7 @@ Size Font::StringSize(const String& string, const Size* stop) const
 			if (newline || eos) {
 				w = (lineW > w) ? lineW : w;
 			} else {
+				wordCharCount = 0;
 				wordW = 0;
 			}
 		}
@@ -571,11 +574,18 @@ Size Font::StringSize(const String& string, const Size* stop) const
 		if (newline) {
 			newline = false;
 			if (stop && stop->h && (maxHeight * lines) + descent > stop->h ) {
+				// adjust i for numChars
+				if (wordCharCount) {
+					i -= wordCharCount + 1; // +1 for the space
+				}
 				break;
 			}
 			lines++;
 			lineW = 0;
 		}
+	}
+	if (numChars) {
+		*numChars = i;
 	}
 
 	// this can only return w > stop->w if there is a singe word wider than stop.
