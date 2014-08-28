@@ -46,19 +46,18 @@ protected:
 	Region frame; // TODO: origin currently unused
 	ContentContainer* parent;
 
-	mutable Regions layoutRegions;
-
 public:
 	Content(const Size& size);
 	virtual ~Content();
 
-	virtual Size ContentFrame() const;
+	virtual Size ContentFrame() const { return frame.Dimensions(); };
 
 	virtual void Draw(Point p) const; // public drawing interface in screen coordinates.
 
 protected:
 	// point is relative to Region. Region is a screen region.
-	virtual void DrawContents(Point p, const Region&) const=0;
+	virtual void DrawContentsInRegions(const Regions&, const Point&) const=0;
+	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
 };
 
 
@@ -82,7 +81,8 @@ public:
 	void SetPalette(Palette* pal);
 
 protected:
-	void DrawContents(Point p, const Region&) const;
+	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
+	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
 };
 
 
@@ -95,7 +95,7 @@ public:
 	ImageSpan(Sprite2D* image);
 
 protected:
-	void DrawContents(Point p, const Region&) const;
+	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
 };
 
 
@@ -107,9 +107,10 @@ public:
 protected:
 	ContentList contents;
 
-	typedef std::map<Content*, Regions> ContentLayout;
-	mutable ContentLayout layout;
-	mutable Point screenOffset;
+	Size contentBounds;
+
+	typedef std::map<const Content*, Regions> ContentLayout;
+	ContentLayout layout;
 
 public:
 	ContentContainer(const Size& frame) : Content(frame) {};
@@ -128,13 +129,16 @@ public:
 	const ContentList& Contents() { return contents; }
 
 	const Region* ContentRegionForRect(const Region& rect) const;
+	Region BoundingBoxForContent(const Content*) const;
 
+	Size ContentFrame() const;
 	void SetFrame(const Region&);
 
 protected:
-	void DrawContents(Point p, const Region&) const;
-	Content* ContentAtScreenPoint(const Point& p) const;
-
+	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
+	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	void LayoutContentsFrom(ContentList::const_iterator);
+	void LayoutContentsFrom(const Content*);
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
