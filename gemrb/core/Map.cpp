@@ -1902,6 +1902,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
 		ret=PATH_MAP_SIDEWALL;
 	}
 	return ret;
+
 }
 
 bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
@@ -3558,12 +3559,10 @@ int Map::GetCursor( const Point &p)
 	if (!IsVisible( p, true ) ) {
 		return IE_CURSOR_INVALID;
 	}
-	switch (GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL|PATH_MAP_ACTOR)) {
+	switch (SrchMap[ p.y/12*Width + p.x/16] & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
 		case 0:
 			return IE_CURSOR_BLOCKED;
 		case PATH_MAP_PASSABLE:
-		case PATH_MAP_NPC:
-		case PATH_MAP_PC:
 			return IE_CURSOR_WALK;
 		default:
 			return IE_CURSOR_TRAVEL;
