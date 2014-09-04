@@ -139,6 +139,7 @@ protected:
 	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
+	Content* RemoveContent(const Content* content, bool doLayout);
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans

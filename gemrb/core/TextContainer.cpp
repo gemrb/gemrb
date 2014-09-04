@@ -300,16 +300,21 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 
 Content* ContentContainer::RemoveContent(const Content* span)
 {
+	return RemoveContent(span, true);
+}
+
+Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
+{
 	ContentList::iterator it;
 	it = std::find(contents.begin(), contents.end(), span);
 	if (it != contents.end()) {
-		ContentList::iterator next = it;
-		next++;
-		contents.erase(it);
 		Content* content = *it;
+		it = contents.erase(it);
 		content->parent = NULL;
 		layout.erase(content);
-		LayoutContentsFrom(next);
+		if (doLayout) {
+			LayoutContentsFrom(it);
+		}
 		return content;
 	}
 	return NULL;
@@ -356,10 +361,9 @@ void ContentContainer::SetFrame(const Region& newFrame)
 {
 	if (newFrame.Dimensions() != frame.Dimensions()) {
 		frame = newFrame; // must assign new frame before calling LayoutContents
+		LayoutContentsFrom(contents.begin());
 		if (parent) {
 			parent->LayoutContentsFrom(this);
-		} else {
-			LayoutContentsFrom(contents.begin());
 		}
 	} else {
 		frame = newFrame;
@@ -409,13 +413,14 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			if (excluded) {
 				// we know that we have to move at least to the right
 				layoutPoint.x = excluded->x + excluded->w + 1;
-				if (frame.w >0 && layoutPoint.x >= frame.w) {
+				if (frame.w > 0 && layoutPoint.x >= frame.w) {
 					layoutPoint.x = 0;
 					assert(excluded->y + excluded->h >= layoutPoint.y);
 					layoutPoint.y = excluded->y + excluded->h + 1;
 				}
 			}
 			exContent = ContentAtPoint(layoutPoint);
+			assert(exContent != content);
 		}
 		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, frame);
 		layout[content] = rgns;
@@ -442,7 +447,7 @@ void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& o
 	for (; it != contents.end(); ++it) {
 		const Content* content = *it;
 
-		assert(drawPoint.x < drawOrigin.x + frame.w);
+		assert(drawPoint.x <= drawOrigin.x + frame.w);
 		content->DrawContentsInRegions(layout.at(content), offset);
 	}
 }
@@ -459,10 +464,14 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 		top = (rgn->y < top) ? rgn->y : top;
 		bottom = (rgn->y + rgn->h > bottom) ? rgn->y + rgn->h : bottom;
 		// must delete content last!
-		delete RemoveContent(content);
+		delete RemoveContent(content, false);
 	}
+
 	// TODO: we could optimize this to only layout content after exclusion.y
 	LayoutContentsFrom(contents.begin());
+	if (parent) {
+		parent->LayoutContentsFrom(this);
+	}
 }
 
 
