@@ -322,8 +322,8 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
 {
-	ContentLayout::const_iterator it = layout.begin();
-	for (; it != layout.end(); ++it) {
+	ContentLayout::const_reverse_iterator it = layout.rbegin();
+	for (; it != layout.rend(); ++it) {
 		const Regions& rgns = (*it).second;
 		Regions::const_iterator rit = rgns.begin();
 		for (; rit != rgns.end(); ++rit) {
