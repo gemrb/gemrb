@@ -89,9 +89,10 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 	if (frame.Dimensions().IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
+		int lineheight = font->maxHeight - 1;
 		Regions lineExclusions;
-		Region lineRgn(layoutPoint + drawOrigin, Size(rgn.w, font->maxHeight));
-		lineRgn.y -= font->maxHeight;
+		Region lineRgn(layoutPoint + drawOrigin, Size(rgn.w, lineheight));
+		lineRgn.y -= lineheight;
 		Region lineSegment;
 
 		const Region* excluded = NULL;
@@ -102,7 +103,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// start next line
 				newline = false;
 				lineRgn.x = drawOrigin.x;
-				lineRgn.y += font->maxHeight;
+				lineRgn.y += lineheight;
 				lineRgn.w = rgn.w;
 				layoutPoint = lineRgn.Origin();
 
@@ -142,7 +143,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 			} while (excluded);
 
 			{ // protected scope for goto
-				assert(lineSegment.h == font->maxHeight);
+				assert(lineSegment.h == lineheight);
 				size_t numOnLine = 0;
 				// must limit our operation to this single line.
 				size_t nextLine = text.find_first_of(L"\n", numPrinted);
@@ -173,8 +174,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// must claim the lineExclusions as part of the layout
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
-				//lineLayout.h--; // we want the following content to "collapse" with this rect
-				assert(lineLayout.h % font->maxHeight == 0);
+				assert(lineLayout.h % lineheight == 0);
 				layoutRegions.push_back(lineLayout);
 				lineExclusions.clear();
 			}
@@ -199,10 +199,8 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 			drawRegion.w = stringSize.w;
 		}
 		if (maxSize.h <= 0) {
-			drawRegion.h = stringSize.h;
+			drawRegion.h = stringSize.h - font->descent - 1;
 		}
-
-		//drawRegion.h--; // we want the following content to "collapse" with this rect
 		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.push_back(drawRegion);
 	}
@@ -216,10 +214,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 	for (; rit != rgns.end(); ++rit) {
 		Region drawRect = *rit;
 		drawRect.x += offset.x;
-		drawRect.y += offset.y;
-#if (DEBUG_TEXT)
-		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
-#endif
+		drawRect.y += offset.y - 2;
 		charsPrinted += font->Print(drawRect, text.substr(charsPrinted), palette, IE_FONT_ALIGN_LEFT);
 #if (DEBUG_TEXT)
 		//core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
