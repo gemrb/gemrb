@@ -382,12 +382,18 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	const Content* exContent = NULL;
 	const Region* excluded = NULL;
 	Point layoutPoint;
+	contentBounds = Size();
 
 	if (it != contents.begin()) {
 		// relaying content some place in the middle of the container
 		exContent = *--it;
 		it++;
 		assert(layout.find(exContent) != layout.end());
+	}
+	// clear the existing layout, but only for "it" and onward
+	ContentList::const_iterator clearit = it;
+	for (; clearit != contents.end(); ++clearit) {
+		layout.erase(*clearit);
 	}
 
 	while (it != contents.end()) {
