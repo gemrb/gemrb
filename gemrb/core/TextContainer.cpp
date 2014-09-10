@@ -293,9 +293,6 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 		contents.insert(++it, newContent);
 		LayoutContentsFrom(--it);
 	}
-	if (parent) {
-		parent->LayoutContentsFrom(this);
-	}
 }
 
 Content* ContentContainer::RemoveContent(const Content* span)
@@ -362,9 +359,6 @@ void ContentContainer::SetFrame(const Region& newFrame)
 	if (newFrame.Dimensions() != frame.Dimensions()) {
 		frame = newFrame; // must assign new frame before calling LayoutContents
 		LayoutContentsFrom(contents.begin());
-		if (parent) {
-			parent->LayoutContentsFrom(this);
-		}
 	} else {
 		frame = newFrame;
 	}
@@ -372,9 +366,6 @@ void ContentContainer::SetFrame(const Region& newFrame)
 
 Regions ContentContainer::LayoutForPointInRegion(Point p, const Region&) const
 {
-	if (layout.empty()) {
-		((ContentContainer*)(this))->LayoutContentsFrom(contents.begin());
-	}
 	Region layoutRgn(p, ContentFrame());
 
 	Regions rgns;
@@ -429,6 +420,10 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
 		exContent = content;
 	}
+	if (parent) {
+		// the parent needs to update to compensate for changes in this container
+		parent->LayoutContentsFrom(this);
+	}
 }
 
 void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
@@ -469,9 +464,6 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 
 	// TODO: we could optimize this to only layout content after exclusion.y
 	LayoutContentsFrom(contents.begin());
-	if (parent) {
-		parent->LayoutContentsFrom(this);
-	}
 }
 
 
