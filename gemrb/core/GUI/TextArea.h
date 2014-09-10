@@ -78,7 +78,7 @@ public:
 	/** Sets up auto scrolling (chapter text) */
 	void SetupScroll();
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender);
+	void ScrollToY(int y, Control* sender = NULL);
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;

@@ -148,7 +148,7 @@ def Exportable(pc):
 	return True
 
 def UpdateRecordsWindow ():
-	global stats_overview, alignment_help
+	global alignment_help
 
 	Window = RecordsWindow
 	if not RecordsWindow:
@@ -283,9 +283,8 @@ def UpdateRecordsWindow ():
 		Label.SetText (7199)
 
 	# help, info textarea
-	stats_overview = GetStatOverview (pc)
 	Text = Window.GetControl (45)
-	Text.SetText (stats_overview)
+	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
 	Window.SetVisible (WINDOW_VISIBLE)
 	return

@@ -309,8 +309,7 @@ int Control::SetScrollBar(Control* ptr)
 	}
 	sb = ptr;
 	Changed = true;
-	if (ptr) return 1;
-	return 0;
+	return (bool)sb;
 }
 
 }

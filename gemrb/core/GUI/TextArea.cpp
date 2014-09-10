@@ -563,7 +563,7 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 		unsigned long fauxY = TextYPos;
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
-		ScrollToY((int)fauxY, this);
+		ScrollToY((int)fauxY);
 	}
 }
 
@@ -774,7 +774,7 @@ void TextArea::ClearText()
 	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
 
 	// reset text position to top
-	ScrollToY(0, this);
+	ScrollToY(0);
 }
 
 //setting up the textarea for smooth scrolling, the first

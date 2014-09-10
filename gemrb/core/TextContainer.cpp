@@ -184,10 +184,6 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 	} else {
 		// we are limited to drawing within our frame :(
 
-		// TODO: implement absolute positioning
-		//dp.x += frame.x;
-		//dp.y += frame.y;
-
 		// FIXME: we ought to be able to set an alignment for "blocks" of text
 		// probably the way to do this is have alignment on the container
 		// then maybe another Draw method that takes an alignment argument?
@@ -262,10 +258,10 @@ ContentContainer::~ContentContainer()
 Size ContentContainer::ContentFrame() const
 {
 	Size cf = Content::ContentFrame();
-	if (frame.w <= 0) {
+	if (cf.w <= 0) {
 		cf.w = contentBounds.w;
 	}
-	if (frame.h <= 0) {
+	if (cf.h <= 0) {
 		cf.h = contentBounds.h;
 	}
 	return cf;
