@@ -331,7 +331,10 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 
 Region ContentContainer::BoundingBoxForContent(const Content* c) const
 {
-	return Region::RegionEnclosingRegions(layout.at(c));
+	if (layout.find(c) != layout.end()) {
+		return Region::RegionEnclosingRegions(layout.at(c));
+	}
+	return Region();
 }
 
 const Region* ContentContainer::ContentRegionForRect(const Region& r) const
