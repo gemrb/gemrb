@@ -365,6 +365,7 @@ void ContentContainer::SetFrame(const Region& newFrame)
 Regions ContentContainer::LayoutForPointInRegion(Point p, const Region&) const
 {
 	Region layoutRgn(p, ContentFrame());
+	parentOffset = p;
 
 	Regions rgns;
 	rgns.push_back(layoutRgn);
@@ -441,7 +442,7 @@ void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& o
 		const Content* content = *it;
 
 		assert(drawPoint.x <= drawOrigin.x + frame.w);
-		content->DrawContentsInRegions(layout.at(content), offset);
+		content->DrawContentsInRegions(layout.at(content), offset + parentOffset);
 	}
 }
 

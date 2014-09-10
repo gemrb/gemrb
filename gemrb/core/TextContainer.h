@@ -108,6 +108,7 @@ protected:
 	ContentList contents;
 
 	Size contentBounds;
+	mutable Point parentOffset;
 
 	typedef std::map<const Content*, Regions> ContentLayout;
 	ContentLayout layout;
