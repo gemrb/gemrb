@@ -217,7 +217,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		drawRect.y += offset.y - 2;
 		charsPrinted += font->Print(drawRect, text.substr(charsPrinted), palette, IE_FONT_ALIGN_LEFT);
 #if (DEBUG_TEXT)
-		//core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
+		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 #endif
 	}
 }
@@ -438,6 +438,16 @@ void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& o
 	const Point& drawOrigin = rgn.Origin();
 	Point drawPoint = drawOrigin;
 	ContentList::const_iterator it = contents.begin();
+
+#if (DEBUG_TEXT)
+	Region dr(parentOffset + offset, contentBounds);
+	core->GetVideoDriver()->DrawRect(dr, ColorRed, true);
+	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
+	dr = Region(parentOffset + offset, ContentFrame());
+	core->GetVideoDriver()->DrawRect(dr, ColorGreen, true);
+	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
+#endif
+
 	for (; it != contents.end(); ++it) {
 		const Content* content = *it;
 
