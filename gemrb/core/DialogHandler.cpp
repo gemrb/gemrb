@@ -37,29 +37,49 @@
 
 namespace GemRB {
 
-//translate section values (journal, solved, unsolved, user)
-static int sectionMap[4]={4,1,2,0};
-static const int bg2Sections[4]={4,1,2,0};
-static const int noSections[4]={0,0,0,0};
-
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
+	ds = NULL;
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
 	initialState = -1;
-	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) ) {
-		memcpy(sectionMap, bg2Sections, sizeof(sectionMap) );
-	} else {
-		memcpy(sectionMap, noSections, sizeof(sectionMap) );
-	}
 }
 
 DialogHandler::~DialogHandler(void)
 {
 	if (dlg) {
 		delete dlg;
+	}
+}
+
+void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
+{
+	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
+
+	int Section = 0;
+	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+		Section = 4;
+		if (tr->Flags&IE_DLG_UNSOLVED) {
+			Section |= 1; // quests
+		}
+		if (tr->Flags&IE_DLG_SOLVED) {
+			Section |= 2; // completed
+		}
+	}
+
+	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
+		String msg(L"[color=bcefbc]");
+		String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
+		msg += *str;
+		delete str;
+		str = core->GetString(tr->journalStrRef);
+		//cutting off the strings at the first crlf
+		str->resize(str->find_first_of(L"\n"));
+		msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][p]\n";
+		delete str;
+		displaymsg->DisplayMarkupString(msg);
 	}
 }
 
@@ -254,29 +274,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		DialogTransition* tr = ds->transitions[choose];
-
-		if (tr->Flags&IE_DLG_TR_JOURNAL) {
-			int Section = 0;
-			if (tr->Flags&IE_DLG_UNSOLVED) {
-				Section |= 1;
-			}
-			if (tr->Flags&IE_DLG_SOLVED) {
-				Section |= 2;
-			}
-			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
-				 String msg(L"[color=bcefbc]");
-				 String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
-				 msg += *str;
-				 delete str;
-				 str = core->GetString(tr->journalStrRef);
-				 //cutting off the strings at the first crlf
-				 str->resize(str->find_first_of(L"\n"));
-				 msg += L" - [/color][color=ffd4a9]" + *str + L"[/color]\n";
-				 delete str;
-				 displaymsg->DisplayMarkupString(msg);
-			}
-		}
-
+		UpdateJournalForTransition(tr);
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
 			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
