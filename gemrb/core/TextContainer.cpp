@@ -385,6 +385,10 @@ void ContentContainer::LayoutContentsFrom(const Content* c)
 
 void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 {
+	if (it == contents.end()) {
+		return; // must bail or things will get screwed up!
+	}
+
 	const Content* exContent = NULL;
 	const Region* excluded = NULL;
 	Point layoutPoint;
