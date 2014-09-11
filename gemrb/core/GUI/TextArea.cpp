@@ -76,9 +76,9 @@ void TextArea::Init()
 	textContainer = NULL;
 
 	// initialize the Text containers
+	SetScrollBar(NULL);
 	ClearText();
 	ClearSelectOptions();
-	SetScrollBar(NULL);
 }
 
 TextArea::~TextArea(void)
@@ -178,7 +178,11 @@ int TextArea::SetScrollBar(Control* ptr)
 	// we need to update the ScrollBar position based around TextYPos
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
-	ScrollToY(TextYPos);
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		bar->SetPos(bar->Value); // scroll to the bottom
+	} else {
+		ScrollToY(TextYPos);
+	}
 	return (bool)sb;
 }
 
@@ -375,10 +379,9 @@ void TextArea::AppendText(const String& text)
 
 	if (sb) {
 		UpdateScrollbar();
-		ScrollBar* bar = ( ScrollBar* ) sb;
-
 		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
+			ScrollBar* bar = ( ScrollBar* ) sb;
 			bar->SetPos(bar->Value); // scroll to the bottom
 		}
 	}
