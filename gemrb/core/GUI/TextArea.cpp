@@ -66,9 +66,7 @@ void TextArea::Init()
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
 	TextYPos = 0;
-	dialogYPos = 0;
 	ticks = starttime = 0;
-	needScrollUpdate = false;
 	strncpy(VarName, "Selected", sizeof(VarName));
 
 	ResetEventHandler( TextAreaOnChange );
@@ -101,21 +99,12 @@ bool TextArea::NeedsDraw()
 		MarkDirty();
 		return true;
 	}
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		// FIXME: hack, this shouldnt even be needed.
-		// I'm not sure why the scrollbar isn't drawing without this
-		sb->MarkDirty();
-		if (needScrollUpdate) {
-			return true;
-		}
-	}
 
 	return Control::NeedsDraw();
 }
 
 void TextArea::DrawInternal(Region& clip)
 {
-	needScrollUpdate = false;
 	// apply padding to the clip
 	if (sb) {
 		clip.w -= EDGE_PADDING;
@@ -143,23 +132,6 @@ void TextArea::DrawInternal(Region& clip)
 		}
 	}
 
-	int textHeight = contentWrapper.ContentFrame().h;
-	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
-		int heightLimit = (ftext->maxHeight * 200) + ftext->descent;
-		// start trimming content from the top until we are under the limit.
-		Size frame = textContainer->ContentFrame();
-		int currHeight = frame.h;
-		if (currHeight > heightLimit) {
-			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
-			textContainer->DeleteContentsInRect(exclusion);
-			textHeight -= frame.h - textContainer->ContentFrame().h;
-			TextYPos += frame.h - textContainer->ContentFrame().h;
-			dialogYPos -= frame.h - textContainer->ContentFrame().h;
-			needScrollUpdate = true;
-			Owner->InvalidateForControl(this); // cant use MarkDirty since we are drawing
-		}
-	}
-
 	clip.y -= TextYPos;
 	contentWrapper.Draw(clip.Origin());
 
@@ -168,48 +140,30 @@ void TextArea::DrawInternal(Region& clip)
 		// highlighted during a dialog
 		core->GetEventMgr()->FakeMouseMove();
 	}
+}
 
-	// now the text is laied out in the container so we can calculate the rows
-	int dialogNodeHeight = 0;
-	if (dialogYPos > 0) {
-		dialogNodeHeight = textHeight - dialogYPos;
-		if (dialogNodeHeight < Height) {
-			// compensate so there is enough extra scrolling space to get the "node" to the top of the TA later
-			textHeight += (Height - dialogNodeHeight);
+void TextArea::UpdateScrollbar()
+{
+	if (sb == NULL) return;
+
+	int textHeight = contentWrapper.ContentFrame().h;
+	if (dialogBeginNode) {
+		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
+		// add the height of a newline too so that there is a space
+		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
+		if (nodeBounds.h + ftext->maxHeight < Height) {
+			// if the node isnt a full page by itself we need to fake it
+			textHeight += Height - nodeBounds.h - (textHeight - nodeBounds.y);
 		}
 	}
-
-	int newRows = 0;
-	if (textHeight > 0) {
-		int rowHeight = GetRowHeight();
-		newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
-	}
-	if (newRows == rows) {
-		// we must exit now
-		// updating the scrollbar again would cause a problem for IE_GUI_TEXTAREA_AUTOSCROLL
-		return;
-	}
-	rows = newRows;
-
-	if (!sb)
-		return;
-
-	ScrollBar* bar = ( ScrollBar* ) sb;
-	ieWord visibleRows = (Height / GetRowHeight());
-	ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
-	bar->SetMax(sbMax);
-
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
-		&& bar->GetPos() != sbMax)
-	{
-		needScrollUpdate = true;
-		Owner->InvalidateForControl(this); // cant use MarkDirty since we are drawing
-		if (dialogNodeHeight > Height) {
-			// last node + select options too large for TA so we cant scroll to bottom!
-			ScrollToY(textHeight - dialogNodeHeight, this);
-		} else {
-			bar->SetPos(sbMax); // scroll to the bottom
-		}
+	int rowHeight = GetRowHeight();
+	int newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
+	if (newRows != rows) {
+		rows = newRows;
+		ScrollBar* bar = ( ScrollBar* ) sb;
+		ieWord visibleRows = (Height / GetRowHeight());
+		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
+		bar->SetMax(sbMax);
 	}
 }
 
@@ -217,16 +171,13 @@ void TextArea::DrawInternal(Region& clip)
 	to this Text Area Control. */
 int TextArea::SetScrollBar(Control* ptr)
 {
-	if (ptr) {
-		// only pad left edge
-		contentWrapper.SetFrame(Region(Point(), Size(Width - EDGE_PADDING, -1)));
-	} else {
-		// pad both edges
-		contentWrapper.SetFrame(Region(Point(), Size(Width - (EDGE_PADDING * 2), Height)));
-	}
-	rows = 0; // reset rows so that they get recalculated for the new scrollbar
-
-	return Control::SetScrollBar(ptr);
+	ScrollBar* bar = (ScrollBar*)ptr;
+	Control::SetScrollBar(bar);
+	// we need to update the ScrollBar position based around TextYPos
+	rows = 0; // force an update in UpdateScrollbar()
+	UpdateScrollbar();
+	ScrollToY(TextYPos);
+	return (bool)sb;
 }
 
 /** Sets the Actual Text */
@@ -262,9 +213,15 @@ void TextArea::AppendText(const char* text)
 
 void TextArea::AppendText(const String& text)
 {
-	if (selectOptions && Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		// set the start position for the next dialog node
-		dialogYPos += ftext->maxHeight;
+	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
+		int heightLimit = (ftext->maxHeight * 100) + ftext->descent; // 100 lines of content
+		// start trimming content from the top until we are under the limit.
+		Size frame = textContainer->ContentFrame();
+		int currHeight = frame.h;
+		if (currHeight > heightLimit) {
+			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
+			textContainer->DeleteContentsInRect(exclusion);
+		}
 	}
 
 	size_t tagPos = text.find_first_of('[');
@@ -422,6 +379,16 @@ void TextArea::AppendText(const String& text)
 			textContainer->AppendText(text);
 		}
 	}
+
+	if (sb) {
+		UpdateScrollbar();
+		ScrollBar* bar = ( ScrollBar* ) sb;
+
+		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
+		{
+			bar->SetPos(bar->Value); // scroll to the bottom
+		}
+	}
 	MarkDirty();
 }
 
@@ -575,8 +542,9 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 
 	TextSpan* span = NULL;
 	if (selectOptions) {
-		Point p = Point(x, y + TextYPos);
+		Point p = Point(x, y);
 		p.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
+		p.y -= textContainer->ContentFrame().h - TextYPos;
 		// container only has text, so...
 		span = dynamic_cast<TextSpan*>(selectOptions->ContentAtPoint(p));
 	}
@@ -670,9 +638,6 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 		return;
 	}
 
-	// set the start position for the next dialog node
-	dialogYPos = textContainer->ContentFrame().h;
-
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
 	Value = OptSpans[optIdx].first;
@@ -710,10 +675,10 @@ void TextArea::ClearSelectOptions()
 	OptSpans.clear();
 	contentWrapper.RemoveContent(selectOptions);
 	delete selectOptions;
+	dialogBeginNode = NULL;
 	selectOptions = NULL;
 	selectedSpan = NULL;
 	hoverSpan = NULL;
-	dialogYPos = 0;
 	// also set the value to "none"
 	Value = -1;
 }
@@ -726,7 +691,8 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	SetPalette(selColor, PALETTE_SELECTED);
 
 	ClearSelectOptions(); // deletes previous options
-	selectOptions = new TextContainer(Size(0, 0), ftext, palettes[PALETTE_SELECTED]);
+	dialogBeginNode = *--(textContainer->Contents().end()); // need to get the last node *before* we append anything
+	selectOptions = new TextContainer(Size(Width - EDGE_PADDING * 4, 0), ftext, palettes[PALETTE_SELECTED]);
 	wchar_t optNum[6];
 	for (size_t i = 0; i < opts.size(); i++) {
 		if (numbered) {
@@ -745,9 +711,12 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		// we want a newline between dialog chunks
 		textContainer->AppendText(L"\n");
 	}
-	dialogYPos = textContainer->ContentFrame().h;
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
-	MarkDirty();
+
+	UpdateScrollbar();
+	// now scroll dialogBeginNode to the top
+	int newYPos = textContainer->BoundingBoxForContent(dialogBeginNode).y;
+	ScrollToY(newYPos);
 }
 
 void TextArea::ClearText()
@@ -762,12 +731,10 @@ void TextArea::ClearText()
 		// if we have a scrollbar we should grow as much as needed vertically
 		// pad only on left edge
 		frame.w = Width - EDGE_PADDING;
-		frame.h = -1;
 	} else {
 		// otherwise limit the text to our frame
 		// pad on both edges
 		frame.w = Width - (EDGE_PADDING * 2);
-		frame.h = Height;
 	}
 
 	textContainer = new TextContainer(frame, ftext, palette);
@@ -775,6 +742,7 @@ void TextArea::ClearText()
 
 	// reset text position to top
 	ScrollToY(0);
+	UpdateScrollbar();
 }
 
 //setting up the textarea for smooth scrolling, the first

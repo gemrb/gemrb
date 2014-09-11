@@ -99,13 +99,13 @@ private: // Private attributes
 	typedef std::pair<int, TextSpan*> OptionSpan;
 	std::vector<OptionSpan> OptSpans;
 	TextSpan* hoverSpan, *selectedSpan;
+	const Content* dialogBeginNode;
 	// dialog options container
 	TextContainer* selectOptions;
 	// standard text display container
 	TextContainer* textContainer;
 	// wrapper containing both of the above
 	ContentContainer contentWrapper;
-	int dialogYPos;
 
 	int TextYPos;
 	/** timer for scrolling */
@@ -134,10 +134,10 @@ private: //internal functions
 	};
 	Palette* palettes[PALETTE_TYPE_COUNT];
 	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
-	bool needScrollUpdate;
 
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
+	void UpdateScrollbar();
 
 public: //Events
 	/** Key Press Event */
