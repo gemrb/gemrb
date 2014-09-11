@@ -536,13 +536,13 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	if (!selectOptions)
 		return;
 
-	TextSpan* span = NULL;
+	TextContainer* span = NULL;
 	if (selectOptions) {
 		Point p = Point(x, y);
 		p.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
 		p.y -= textContainer->ContentFrame().h - TextYPos;
 		// container only has text, so...
-		span = dynamic_cast<TextSpan*>(selectOptions->ContentAtPoint(p));
+		span = dynamic_cast<TextContainer*>(selectOptions->ContentAtPoint(p));
 	}
 
 	if (hoverSpan || span)
@@ -688,16 +688,22 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 	ClearSelectOptions(); // deletes previous options
 	dialogBeginNode = *--(textContainer->Contents().end()); // need to get the last node *before* we append anything
-	selectOptions = new TextContainer(Size(Width - EDGE_PADDING * 4, 0), ftext, palettes[PALETTE_SELECTED]);
-	wchar_t optNum[6];
+	Size optFrame(Width - EDGE_PADDING * 4, 0);
+	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
+	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
 	for (size_t i = 0; i < opts.size(); i++) {
+		TextContainer* selOption = new TextContainer(optFrame, ftext, palettes[PALETTE_OPTIONS]);
 		if (numbered) {
+			wchar_t optNum[6];
 			swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
+			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
+			// but that should probably actually be done by the dialog handler, not here.
+			selOption->AppendContent(new TextSpan(optNum, NULL, palettes[PALETTE_SELECTED]));
 		}
-		TextSpan* span = new TextSpan((numbered) ? optNum + opts[i].second : opts[i].second,
-									  ftext, palettes[PALETTE_OPTIONS]);
-		OptSpans.push_back(std::make_pair(opts[i].first, span));
-		selectOptions->AppendContent(span); // container owns the span
+		selOption->AppendContent(new TextSpan(opts[i].second, NULL, NULL, &flexFrame));
+
+		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
+		selectOptions->AppendContent(selOption); // container owns the option
 		// now add a newline for keeping the options spaced out (for touch screens)
 		// TODO: make this optional, or automaticly detected
 		selectOptions->AppendText(L"\n");

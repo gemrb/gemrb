@@ -75,10 +75,7 @@ public:
 	TextSpan(const String& string, Font* font, Palette* pal = NULL, const Size* = NULL);
 	~TextSpan();
 
-	const Font* TextFont() const { return font; }
 	const String& Text() const { return text; };
-
-	void SetPalette(Palette* pal);
 
 protected:
 	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
@@ -157,6 +154,10 @@ public:
 	void AppendText(const String& text);
 	void AppendText(const String& text, Font* fnt, Palette* pal);
 	const String& Text() const;
+
+	void SetPalette(Palette* pal);
+	Palette* TextPalette() const { return palette; }
+	const Font* TextFont() const { return font; }
 };
 
 }

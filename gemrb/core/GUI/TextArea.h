@@ -96,9 +96,9 @@ public:
 	int SetScrollBar(Control *ptr);
 private: // Private attributes
 	// dialog and listbox handling
-	typedef std::pair<int, TextSpan*> OptionSpan;
+	typedef std::pair<int, TextContainer*> OptionSpan;
 	std::vector<OptionSpan> OptSpans;
-	TextSpan* hoverSpan, *selectedSpan;
+	TextContainer* hoverSpan, *selectedSpan;
 	const Content* dialogBeginNode;
 	// dialog options container
 	TextContainer* selectOptions;

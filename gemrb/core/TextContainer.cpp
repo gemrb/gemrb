@@ -73,23 +73,31 @@ void Content::Draw(Point p) const
 TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size* frame)
 	: Content((frame) ? *frame : Size()), text(string), font(fnt)
 {
-	palette = NULL;
-	SetPalette(pal);
+	palette = pal;
+	if (palette)
+		palette->acquire();
 }
 
 TextSpan::~TextSpan()
 {
-	palette->release();
+	if (palette)
+		palette->release();
 }
 
 Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
 	Regions layoutRegions;
 	const Point& drawOrigin = rgn.Origin();
+	const Font* layoutFont = font;
+	TextContainer* container = dynamic_cast<TextContainer*>(parent);
+	if (layoutFont == NULL && container) {
+		layoutFont = container->TextFont();
+	}
+	assert(layoutFont);
 	if (frame.Dimensions().IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
-		int lineheight = font->maxHeight - 1;
+		int lineheight = layoutFont->maxHeight - 1;
 		Regions lineExclusions;
 		Region lineRgn(layoutPoint + drawOrigin, Size(rgn.w, lineheight));
 		lineRgn.y -= lineheight;
@@ -155,7 +163,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					newline = true;
 				} else {
 					Size printMax = lineSegment.Dimensions();
-					Size printSize = font->StringSize(text.substr(numPrinted, nextLine), &printMax, &numOnLine);
+					Size printSize = layoutFont->StringSize(text.substr(numPrinted, nextLine), &printMax, &numOnLine);
 					if (printMax.w == lineRgn.w && numPrinted + numOnLine < text.length()) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
@@ -196,7 +204,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				drawRegion.w = rgn.w - layoutPoint.x;
 				maxSize.w = drawRegion.w;
 			} else {
-				drawRegion.w = font->StringSize(text, &maxSize).w;
+				drawRegion.w = layoutFont->StringSize(text, &maxSize).w;
 			}
 		}
 		if (maxSize.h <= 0) {
@@ -204,7 +212,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// take remainder of parent height
 				drawRegion.h = rgn.w - layoutPoint.y;
 			} else {
-				drawRegion.h = font->StringSize(text, &maxSize).h - font->descent - 1;
+				drawRegion.h = layoutFont->StringSize(text, &maxSize).h - layoutFont->descent - 1;
 			}
 		}
 		assert(drawRegion.h && drawRegion.w);
@@ -221,23 +229,21 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		Region drawRect = *rit;
 		drawRect.x += offset.x;
 		drawRect.y += offset.y - 2;
-		charsPrinted += font->Print(drawRect, text.substr(charsPrinted), palette, IE_FONT_ALIGN_LEFT);
+		const Font* printFont = font;
+		Palette* printPalette = palette;
+		TextContainer* container = dynamic_cast<TextContainer*>(parent);
+		if (printFont == NULL && container) {
+			printFont = container->TextFont();
+		}
+		if (printPalette == NULL && container) {
+			printPalette = container->TextPalette();
+		}
+		assert(printFont && printPalette);
+		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, IE_FONT_ALIGN_LEFT);
 #if (DEBUG_TEXT)
 		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 #endif
 	}
-}
-
-void TextSpan::SetPalette(Palette* pal)
-{
-	if (!pal) {
-		pal = font->GetPalette();
-	} else {
-		pal->acquire();
-	}
-	if (palette)
-		palette->release();
-	palette = pal;
 }
 
 ImageSpan::ImageSpan(Sprite2D* im)
@@ -510,7 +516,7 @@ TextContainer::~TextContainer()
 
 void TextContainer::AppendText(const String& text)
 {
-	AppendText(text, font, palette);
+	AppendText(text, NULL, NULL);
 }
 
 void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
@@ -518,6 +524,18 @@ void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
 	if (text.length()) {
 		AppendContent(new TextSpan(text, fnt, pal));
 	}
+}
+
+void TextContainer::SetPalette(Palette* pal)
+{
+	if (!pal) {
+		pal = font->GetPalette();
+	} else {
+		pal->acquire();
+	}
+	if (palette)
+		palette->release();
+	palette = pal;
 }
 
 const String& TextContainer::Text() const
