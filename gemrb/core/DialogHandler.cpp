@@ -433,14 +433,17 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//dialogchoose should be set to x
 			//it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption",x);
-			if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER
-				&& ds->transitions[x]->condition
-				&& !ds->transitions[x]->condition->Evaluate(target))
-			{
+			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
 				gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
-			} else {
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+				break;
+			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+				if (ds->transitions[x]->condition &&
+					!ds->transitions[x]->condition->Evaluate(target)) {
+					continue;
+				}
 			}
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+			break;
 		} else {
 			String* string = core->GetString( ds->transitions[x]->textStrRef );
 			dialogOptions.push_back(std::make_pair(x, *string));
