@@ -190,12 +190,22 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 		Size maxSize = frame.Dimensions();
 		Region drawRegion = Region(layoutPoint + drawOrigin, maxSize);
-		Size stringSize = font->StringSize(text, &maxSize);
 		if (maxSize.w <= 0) {
-			drawRegion.w = stringSize.w;
+			if (maxSize.w == -1) {
+				// take remainder of parent width
+				drawRegion.w = rgn.w - layoutPoint.x;
+				maxSize.w = drawRegion.w;
+			} else {
+				drawRegion.w = font->StringSize(text, &maxSize).w;
+			}
 		}
 		if (maxSize.h <= 0) {
-			drawRegion.h = stringSize.h - font->descent - 1;
+			if (maxSize.h == -1) {
+				// take remainder of parent height
+				drawRegion.h = rgn.w - layoutPoint.y;
+			} else {
+				drawRegion.h = font->StringSize(text, &maxSize).h - font->descent - 1;
+			}
 		}
 		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.push_back(drawRegion);

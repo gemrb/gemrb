@@ -122,6 +122,8 @@ void TextArea::DrawInternal(Region& clip)
 		clip.x += offset;
 		clip.w -= offset;
 	}
+	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
+	textContainer->SetFrame(Region(Point(), Size(clip.w, 0)));
 	contentWrapper.SetFrame(Region(Point(), Size(clip.w, 0)));
 
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
@@ -250,7 +252,6 @@ void TextArea::AppendText(const String& text)
 			COLOR
 		};
 
-		TextSpan* lastSpan = NULL;
 		String token;
 		ParseState state = TEXT;
 		String::const_iterator it = text.begin() + tagPos;
@@ -270,14 +271,7 @@ void TextArea::AppendText(const String& text)
 								fnt = finit;
 								//align = IE_FONT_SINGLE_LINE;
 							} else if (token == L"p") {
-								int w = Width - EDGE_PADDING;
-								if (lastSpan) {
-									w -= lastSpan->ContentFrame().w;
-								}
-								if (AnimPicture) {
-									w -= AnimPicture->Width;
-								}
-								frame.w = w;
+								frame.w = -1;
 							}
 							state = TEXT;
 							token.clear();
@@ -310,8 +304,7 @@ void TextArea::AppendText(const String& text)
 								if (fnt == ftext && p == NULL) {
 									p = palette;
 								}
-								lastSpan = new TextSpan(token, fnt, p, &frame);
-								textContainer->AppendContent(lastSpan);
+								textContainer->AppendContent(new TextSpan(token, fnt, p, &frame));
 							}
 							token.clear();
 							if (*++it == '/')
