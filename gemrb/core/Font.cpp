@@ -33,19 +33,19 @@
 
 namespace GemRB {
 
-static void BlitGlyphToCanvas(const Glyph& glyph, int x, int y,
+static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 							 ieByte* canvas, const Size& size)
 {
 	assert(canvas);
 
 	// TODO: should handle partial glyphs
-	if (!Region(0, 0, size.w, size.h).PointInside(x, y)) {
+	if (!Region(0, 0, size.w, size.h).PointInside(p.x, p.y)) {
 		return; // off the canvas
 	}
 
 	// copy the glyph to the canvas
 	const ieByte* src = glyph.pixels;
-	ieByte* dest = canvas + (size.w * y) + x;
+	ieByte* dest = canvas + (size.w * p.y) + p.x;
 	for(int row = 0; row < glyph.dimensions.h; row++ ) {
 		//assert(dest <= canvas + (size.w * size.h));
 		if (dest + glyph.dimensions.w > canvas + (size.w * size.h)) {
@@ -70,7 +70,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		Sheet = NULL;
 	}
 
-	BlitGlyphToCanvas(g, pageXPos, 0, pageData, Size(SheetRegion.w, SheetRegion.h));
+	BlitGlyphToCanvas(g, Point(pageXPos, 0), pageData, Size(SheetRegion.w, SheetRegion.h));
 	MapSheetSegment(chr, Region(pageXPos, 0, g.dimensions.w, g.dimensions.h));
 	// make the non-temporary glyph from our own data
 	ieByte* pageLoc = pageData + pageXPos;
@@ -267,7 +267,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(), Size(lineW, maxHeight)), ColorWhite, false);
 #endif
-			linePos = RenderLine(line, lineRgn, color, linePoint, (canvas) ? canvas + (dp.x * dp.y) : NULL);
+			linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
 			dp = dp + linePoint;
 			charCount += linePos;
 			if (linePos < line.length() - 1) {
@@ -368,8 +368,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 				}
 				break; // either done, or skipping
 			}
+			Point blitPoint(dp.x + lineRgn.x, dp.y + lineRgn.y + curGlyph.descent);
 			if (canvas) {
-				BlitGlyphToCanvas(curGlyph, dp.x, dp.y + curGlyph.descent, *canvas, lineRgn.Dimensions());
+				blitPoint.y -= lineRgn.y;
+				BlitGlyphToCanvas(curGlyph, blitPoint, (*canvas) + (lineRgn.y * lineRgn.w), lineRgn.Dimensions());
 			} else {
 				assert(AtlasIndex.find(currChar) != AtlasIndex.end());
 
@@ -377,9 +379,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 				assert(pageIdx < AtlasIndex.size());
 
 				GlyphAtlasPage* page = Atlas[pageIdx];
-				Region dst = Region(dp.x + lineRgn.x, dp.y + lineRgn.y + curGlyph.descent,
-									curGlyph.dimensions.w, curGlyph.dimensions.h);
-				page->Draw(currChar, dst, color);
+				page->Draw(currChar, Region(blitPoint, curGlyph.dimensions), color);
 			}
 			dp.x += curGlyph.dimensions.w;
 		}

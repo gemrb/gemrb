@@ -37,7 +37,6 @@
 #include "GUI/GameControl.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
-#include "TextContainer.h"
 
 namespace GemRB {
 
@@ -223,7 +222,8 @@ void Scriptable::SetOverheadText(const String& text, bool display)
 	overHeadTextPos.empty();
 	if (!text.empty()) {
 		OverheadText = text;
-		// For performance reasons, render the text into a sprite.
+		// FIXME: we don't need to do this as an image anymore
+		// we can efficiently print from text now with any alignment, but we need to convert from game to screen coordinates
 		Sprite2D::FreeSprite(OverHeadTextSprite);
 		OverHeadTextSprite = core->GetTextFont()->RenderTextAsSprite(OverheadText, Size(200, 400),
 																	 IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
@@ -295,7 +295,7 @@ void Scriptable::DrawOverheadText(const Region &screen)
 	}
 
 	x += screen.x + OverHeadTextSprite->XPos - (OverHeadTextSprite->Width / 2);
-	y += screen.y - cs + OverHeadTextSprite->Height;
+	y += screen.y - cs + OverHeadTextSprite->YPos;
 	core->GetVideoDriver()->BlitSprite(OverHeadTextSprite, x, y, false, NULL, palette);
 	palette->release();
 }

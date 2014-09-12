@@ -45,7 +45,6 @@ class Selectable;
 class Spell;
 class Sprite2D;
 class SpriteCover;
-class TextSpan;
 
 #define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
