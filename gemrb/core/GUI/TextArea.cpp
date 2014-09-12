@@ -56,6 +56,8 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		// this is a hack to workaround the INITIALS font getting its palette set
 		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
 		SetPalette(&initcolor, PALETTE_INITIALS);
+	} else {
+		palettes[PALETTE_INITIALS] = finit->GetPalette();
 	}
 
 	Init();
@@ -306,8 +308,9 @@ void TextArea::AppendText(const String& text)
 								// FIXME: lazy hack.
 								// we ought to ignore all white space between markup unless it contains other text
 								Palette* p = pal;
-								if (fnt == ftext && p == NULL) {
-									p = palette;
+								if (fnt == finit && p == NULL) {
+									p = finit->GetPalette();
+									p->release();
 								}
 								textContainer->AppendContent(new TextSpan(token, fnt, p, &frame));
 							}
