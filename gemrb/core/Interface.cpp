@@ -4889,10 +4889,6 @@ void Interface::SanitizeItem(CREItem *item) const
 			}
 		}
 
-		if (!(item->Flags & IE_INV_ITEM_MOVABLE)) {
-			item->Flags |= IE_INV_ITEM_UNDROPPABLE;
-		}
-
 		// pst has no stolen flag, but "steel" in its place
 		if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
 			item->Flags |= IE_INV_ITEM_STOLEN;

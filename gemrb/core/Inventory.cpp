@@ -579,6 +579,12 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 
 		if (!Slots[slot]) {
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
+			// some items can't be dropped once they've been picked up,
+			// e.g. the portal key in BG2
+			if (!(item->Flags & IE_INV_ITEM_MOVABLE)) {
+				item->Flags |= IE_INV_ITEM_UNDROPPABLE;
+			}
+
 			SetSlotItem(item, slot);
 			EquipItem(slot);
 			return ASI_SUCCESS;
@@ -655,7 +661,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 			temp->Flags |= IE_INV_ITEM_STOLEN; // "steel" in pst
 		}
 		temp->Flags &= ~IE_INV_ITEM_SELECTED;
-
+		
 		ret = AddSlotItem( temp, SLOT_ONLYINVENTORY );
 		if (ret != ASI_SUCCESS) {
 			delete temp;
