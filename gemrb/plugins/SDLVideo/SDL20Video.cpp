@@ -148,6 +148,9 @@ doneFormat:
 		width, height, SDL_GetPixelFormatName(format));
 	backBuf = SDL_CreateRGBSurface( 0, width, height,
 									bpp, r, g, b, a );
+
+	extra = SDL_CreateRGBSurface( 0, width, height,
+									bpp, r, g, b, a );
 	this->bpp = bpp;
 
 	if (!backBuf) {
@@ -327,9 +330,11 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 
 int SDL20VideoDriver::SwapBuffers(void)
 {
+	SDL_BlitSurface(backBuf, NULL, extra, NULL);
 	int ret = SDLVideoDriver::SwapBuffers();
 
 	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
+	SDL_BlitSurface(extra, NULL, backBuf, NULL);
 	/*
 	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
 	 Don't know how universal it is yet so leaving this in commented out just in case
