@@ -720,7 +720,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 					res.append (str_None)
 				res.append ("")
 				lines = 0
-
+	# wrap the first part in a tag to prevent status icon drop cap
+	res[0] = "[p]" + res[0] + "[/p]"
 	return "\n".join (res)
 
 def GetReputation (repvalue):
