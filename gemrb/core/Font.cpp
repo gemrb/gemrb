@@ -535,15 +535,12 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0;
 	int spaceW = GetGlyph(L' ').dimensions.w;
-	bool newline = false, eos = false;
+	bool newline = false, eos = false, ws = false;
 	size_t i = 0, wordCharCount = 0;
 	for (; i < string.length(); i++) {
-		if (i == string.length() - 1) {
-			eos = true;
-		}
-		if (string[i] == L'\n') {
-			newline = true;
-		} else if (string[i] != L' ') {
+		eos = (i == string.length() - 1);
+		ws = std::isspace(string[i]);
+		if (!ws) {
 			const Glyph& curGlyph = GetGlyph(string[i]);
 			wordW += curGlyph.dimensions.w;
 			if (i > 0) { // kerning
@@ -551,41 +548,43 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 			}
 			wordCharCount++;
 		}
-		if (string[i] == L' ' || eos) {
+		if (ws || eos) {
 			if (stop && stop->w
 				&& lineW // let this overflow if the word alone is wider than stop->w
-				&& lineW + spaceW + wordW > stop->w) {
+				&& lineW + spaceW + wordW > stop->w
+			) {
 				newline = true;
 			} else {
 				if (lineW) {
 					lineW += spaceW;
 				}
 				lineW += wordW;
-			}
-
-			if (newline || eos) {
-				w = (lineW > w) ? lineW : w;
-			} else {
+				if (string[i] == L'\n') {
+					newline = true;
+				}
 				wordCharCount = 0;
 				wordW = 0;
 			}
 		}
 
-		if (newline) {
-			newline = false;
-			if (stop && stop->h && (maxHeight * lines) + descent > stop->h ) {
+		if (newline || eos) {
+			w = (lineW > w) ? lineW : w;
+			if (stop && stop->h && (maxHeight * (lines + 1)) + descent >= stop->h ) {
 				// adjust i for numChars
 				if (wordCharCount) {
 					i -= wordCharCount + 1; // +1 for the space
 				}
 				break;
 			}
-			lines++;
-			lineW = 0;
+			if (newline) {
+				newline = false;
+				lines++;
+				lineW = 0;
+			}
 		}
 	}
 	if (numChars) {
-		*numChars = i;
+		*numChars = i + 1; // +1 to convert from index to char count
 	}
 
 	// this can only return w > stop->w if there is a singe word wider than stop.
