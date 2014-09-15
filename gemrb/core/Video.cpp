@@ -52,8 +52,28 @@ Video::Video(void)
 	}
 }
 
-Video::~Video(void)
+Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 {
+	Region r = target.Intersect(screenClip);
+	if (clip) {
+		// Intersect clip with both screen and target rectangle
+		r = clip->Intersect(r);
+	}
+	// the clip must be "safe". no negative values or crashy crashy
+	if (r.Dimensions().IsEmpty()) { // logically equivalent to no intersection
+		r.h = 0;
+		r.w = 0;
+	}
+	return r;
+}
+
+void Video::SetScreenClip(const Region* clip)
+{
+	if (clip) {
+		screenClip = *clip;
+	} else {
+		screenClip = Region(0,0, width, height);
+	}
 }
 
 bool Video::ToggleFullscreenMode()

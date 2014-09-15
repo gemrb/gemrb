@@ -73,29 +73,6 @@ const unsigned int BSHIFT32 = 0;
 const Uint16 halfmask16 = ((0xFFU >> (RLOSS16+1)) << RSHIFT16) | ((0xFFU >> (GLOSS16+1)) << GSHIFT16) | ((0xFFU >> (BLOSS16+1)) << BSHIFT16);
 const Uint32 halfmask32 = ((0xFFU >> 1) << RSHIFT32) | ((0xFFU >> 1) << GSHIFT32) | ((0xFFU >> 1) << BSHIFT32);
 
-static Region computeClipRect(SDL_Surface* target, const Region* clip,
-                              int tx, int ty, int width, int height)
-{
-	Region r;
-	if (clip) {
-		r = *clip;
-	} else {
-		r.x = 0;
-		r.y = 0;
-		r.w = target->w;
-		r.h = target->h;
-	}
-
-	// Intersect with SDL clipping rect
-	SDL_Rect cliprect;
-	SDL_GetClipRect(target, &cliprect);
-	r = r.Intersect(Region(cliprect.x, cliprect.y, cliprect.w, cliprect.h));
-
-	// Intersect with actual sprite target rectangle
-	return r.Intersect(Region(tx, ty, width, height));
-}
-
-
 struct SRShadow_NOP {
 	template<typename PTYPE>
 	bool operator()(PTYPE&, Uint8, int&, unsigned int) const { return false; }

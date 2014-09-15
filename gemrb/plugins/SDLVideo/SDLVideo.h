@@ -124,12 +124,8 @@ public:
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 
-	/** Set Clip Rect */
-	void SetClipRect(const Region* clip);
-	/** Get Clip Rect */
-	void GetClipRect(Region& clip);
-	/** Convers a Screen Coordinate to a Game Coordinate */
 
+	/** Convers a Screen Coordinate to a Game Coordinate */
 	void ConvertToGame(short& x, short& y)
 	{
 		x += Viewport.x;
@@ -160,6 +156,7 @@ public:
 
 protected:
 	void DrawMovieSubtitle(ieDword strRef);
+	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);

@@ -118,13 +118,12 @@ void Control::Draw(unsigned short x, unsigned short y)
 	}
 
 	Region drawFrame = Region(x + XPos, y + YPos, Width, Height);
-	Region clip;
 	Video* video = core->GetVideoDriver();
 	// clip drawing to the control bounds, then restore after drawing
-	video->GetClipRect(clip);
-	video->SetClipRect(&drawFrame);
+	Region clip = video->GetScreenClip();
+	video->SetScreenClip(&drawFrame);
 	DrawInternal(drawFrame);
-	video->SetClipRect(&clip);
+	video->SetScreenClip(&clip);
 	Changed = false; // set *after* calling DrawInternal
 }
 

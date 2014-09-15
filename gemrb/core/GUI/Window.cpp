@@ -100,7 +100,7 @@ void Window::DrawWindow()
 	//Frame && Changed
 	if ( (Flags & (WF_FRAME|WF_CHANGED) )== (WF_FRAME|WF_CHANGED) ) {
 		Region screen( 0, 0, core->Width, core->Height );
-		video->SetClipRect( NULL );
+		video->SetScreenClip( NULL );
 		//removed this?
 		video->DrawRect( screen, ColorBlack );
 		if (core->WindowFrames[0])
@@ -124,7 +124,7 @@ void Window::DrawWindow()
 		}
 	}
 	clip_regions.clear();
-	video->SetClipRect( &clip );
+	video->SetScreenClip( &clip );
 	//Float || Changed
 	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
 		video->BlitSprite( BackGround, XPos, YPos, true );
@@ -137,7 +137,7 @@ void Window::DrawWindow()
 		Color black = { 0, 0, 0, 128 };
 		video->DrawRect(clip, black);
 	}
-	video->SetClipRect( NULL );
+	video->SetScreenClip( NULL );
 	Flags &= ~WF_CHANGED;
 }
 

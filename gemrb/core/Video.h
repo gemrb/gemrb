@@ -94,6 +94,7 @@ protected:
 	short xCorr, yCorr;
 	EventMgr* EvntManager;
 	Region Viewport;
+	Region screenClip;
 	int width,height,bpp;
 	bool fullscreen;
 	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
@@ -107,9 +108,11 @@ protected:
 	Palette *subtitlepal;
 	Region subtitleregion;
 	Color fadeColor;
+protected:
+	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
 public:
 	Video(void);
-	virtual ~Video(void);
+	virtual ~Video(void) {};
 	virtual int Init(void) = 0;
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode. */
@@ -194,9 +197,9 @@ public:
 	/** Sets the Fading to Color Percentage */
 	virtual void SetFadePercent(int percent) = 0;
 	/** Sets Clip Rectangle */
-	virtual void SetClipRect(const Region* clip) = 0;
+	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */
-	virtual void GetClipRect(Region& clip) = 0;
+	const Region& GetScreenClip() { return screenClip; }
 	/** returns the current mouse coordinates */
 	void GetMousePos(int &x, int &y);
 	/** clicks the mouse forcibly */

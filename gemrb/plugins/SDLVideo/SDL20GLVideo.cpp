@@ -251,7 +251,8 @@ void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, cons
 		return; // we already know blit fails
 
 	glViewport(dst.x, height - (dst.y + dst.h), dst.w, dst.h);
-	glScissor(dst.x, height - (dst.y + dst.h), dst.w, dst.h);
+	Region scissorRect = ClippedDrawingRect(dst);
+	glScissor(scissorRect.x, height - (scissorRect.y + scissorRect.h), scissorRect.w, scissorRect.h);
 	float hscale = 2.0f/(float)dst.w;
 	float vscale = 2.0f/(float)dst.h;
 
@@ -386,7 +387,8 @@ void GLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Reg
 void GLVideoDriver::clearRect(const Region& rgn, const Color& color)
 {
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
-	glScissor(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
+	Region scissorRect = ClippedDrawingRect(rgn);
+	glScissor(scissorRect.x, height - scissorRect.y - scissorRect.h, scissorRect.w, scissorRect.h);
 	glClearColor(color.r/255, color.g/255, color.b/255, color.a/255);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -396,7 +398,8 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
 	useProgram(programRect);
 	glViewport(0, 0, width, height);
-	glScissor(0, 0, width, height);
+	Region scissorRect = ClippedDrawingRect(Region(0, 0, width, height));
+	glScissor(scissorRect.x, height - scissorRect.y - scissorRect.h, scissorRect.w, scissorRect.h);
 	GLfloat* data = new GLfloat[count*VERTEX_SIZE];
 	for(unsigned int i=0; i<count; i++)
 	{

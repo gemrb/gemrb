@@ -3316,13 +3316,12 @@ void Interface::DrawTooltip ()
 	}
 	Region textr = Region( strx, y, strw, h );
 
-	Region oldclip;
 	// clip drawing to the control bounds, then restore after drawing
-	video->GetClipRect(oldclip);
-	video->SetClipRect(&clip);
+	Region oldclip = video->GetScreenClip();
+	video->SetScreenClip(&clip);
 	fnt->Print( textr, *tooltip_text, NULL,
 			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
-	video->SetClipRect(&oldclip);
+	video->SetScreenClip(&oldclip);
 }
 
 //interface for higher level functions, if the window was
