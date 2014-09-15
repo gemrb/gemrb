@@ -963,7 +963,7 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 	int ti, col;
 	int start = 0;
 	long Value;
-	char* colname;
+	char* colname = NULL;
 
 	if (!PyArg_ParseTuple( args, "iil|i", &ti, &col, &Value, &start )) {
 		PyErr_Clear(); //clearing the exception

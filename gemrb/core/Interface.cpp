@@ -3121,13 +3121,15 @@ void Interface::GameLoop(void)
 
 	bool do_update = GSUpdate(update_scripts);
 
-	if ( gc && game && (game->selected.size() > 0) ) {
-		gc->ChangeMap(GetFirstSelectedPC(true), false);
-	}
-	//in multi player (if we ever get to it), only the server must call this
-	if (do_update) {
-		// the game object will run the area scripts as well
-		game->UpdateScripts();
+	if (game) {
+		if ( gc && (game->selected.size() > 0) ) {
+			gc->ChangeMap(GetFirstSelectedPC(true), false);
+		}
+		//in multi player (if we ever get to it), only the server must call this
+		if (do_update) {
+			// the game object will run the area scripts as well
+			game->UpdateScripts();
+		}
 	}
 }
 

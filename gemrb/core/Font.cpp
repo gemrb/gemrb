@@ -36,7 +36,10 @@ namespace GemRB {
 static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 							 ieByte* canvas, const Size& size)
 {
-	assert(canvas);
+	const ieByte* src = glyph.pixels;
+	if (canvas == NULL || src == NULL) {
+		return; // need both a src and dst
+	}
 
 	// TODO: should handle partial glyphs
 	if (!Region(0, 0, size.w, size.h).PointInside(p.x, p.y)) {
@@ -44,7 +47,6 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 	}
 
 	// copy the glyph to the canvas
-	const ieByte* src = glyph.pixels;
 	ieByte* dest = canvas + (size.w * p.y) + p.x;
 	for(int row = 0; row < glyph.dimensions.h; row++ ) {
 		//assert(dest <= canvas + (size.w * size.h));
