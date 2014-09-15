@@ -102,16 +102,11 @@ void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
 		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
 	}
-	if (SDL_LockSurface( disp ) == 0) {
-		memset( disp->pixels, 0,
-			   disp->w * disp->h * disp->format->BytesPerPixel );
-		SDL_UnlockSurface( disp );
-		SDL_Flip( disp );
-		w = disp->w;
-		h = disp->h;
-	} else {
-		print("Couldn't lock surface: %s\n", SDL_GetError());
-	}
+	SDL_FillRect(disp, NULL, 0);
+	SDL_Flip( disp );
+	w = disp->w;
+	h = disp->h;
+
 	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;
 	subtitleregion.h = h/4;
