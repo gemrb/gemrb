@@ -148,8 +148,9 @@ void TextArea::UpdateScrollbar()
 {
 	if (sb == NULL) return;
 
-	int textHeight = contentWrapper.ContentFrame().h;
+	int textHeight = textContainer->ContentFrame().h;
 	if (dialogBeginNode) {
+		textHeight += selectOptions->ContentFrame().h;
 		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
 		// add the height of a newline too so that there is a space
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
