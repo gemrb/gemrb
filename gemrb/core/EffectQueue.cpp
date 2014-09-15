@@ -154,14 +154,6 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	return false;
 }
 
-static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
-
-static inline bool IsInstant(ieByte timingmode)
-{
-	if( timingmode>=MAX_TIMING_MODE) return false;
-	return fx_instant[timingmode];
-}
-
 static const bool fx_equipped[MAX_TIMING_MODE]={false,false,true,false,false,true,false,false,true,false,false};
 
 static inline bool IsEquipped(ieByte timingmode)
