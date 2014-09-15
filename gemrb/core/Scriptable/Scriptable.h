@@ -231,7 +231,6 @@ protected: //let Actor access this
 	bool overheadTextDisplaying;
 	unsigned long timeStartDisplaying;
 	String OverheadText;
-	Sprite2D* OverHeadTextSprite;
 public:
 	// State relating to the currently-running action.
 	int CurrentActionState;

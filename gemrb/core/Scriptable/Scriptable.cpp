@@ -59,7 +59,6 @@ Scriptable::Scriptable(ScriptableType type)
 	overHeadTextPos.empty();
 	overheadTextDisplaying = 0;
 	timeStartDisplaying = 0;
-	OverHeadTextSprite = NULL;
 
 	scriptName[0] = 0;
 	scriptlevel = 0;
@@ -142,7 +141,6 @@ Scriptable::~Scriptable(void)
 	if (locals) {
 		delete( locals );
 	}
-	Sprite2D::FreeSprite(OverHeadTextSprite);
 }
 
 void Scriptable::SetScriptName(const char* text)
@@ -222,11 +220,6 @@ void Scriptable::SetOverheadText(const String& text, bool display)
 	overHeadTextPos.empty();
 	if (!text.empty()) {
 		OverheadText = text;
-		// FIXME: we don't need to do this as an image anymore
-		// we can efficiently print from text now with any alignment, but we need to convert from game to screen coordinates
-		Sprite2D::FreeSprite(OverHeadTextSprite);
-		OverHeadTextSprite = core->GetTextFont()->RenderTextAsSprite(OverheadText, Size(200, 400),
-																	 IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP);
 		DisplayOverheadText(display);
 	} else {
 		DisplayOverheadText(false);
@@ -294,9 +287,11 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		palette->acquire();
 	}
 
-	x += screen.x + OverHeadTextSprite->XPos - (OverHeadTextSprite->Width / 2);
-	y += screen.y - cs + OverHeadTextSprite->YPos;
-	core->GetVideoDriver()->BlitSprite(OverHeadTextSprite, x, y, false, NULL, palette);
+	core->GetVideoDriver()->ConvertToScreen(x, y);
+	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
+	core->GetTextFont()->Print( rgn, OverheadText, palette?palette:core->InfoTextPalette,
+							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
+
 	palette->release();
 }
 
