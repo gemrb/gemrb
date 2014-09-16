@@ -2101,16 +2101,7 @@ static void InitActorTables()
 					numfound++;
 				}
 			}
-
-			if (classnames) {
-				for (ieDword j=0; j<tmpbits; j++) {
-					if (classnames[j]) {
-						free(classnames[j]);
-					}
-				}
-				free(classnames);
-				classnames = NULL;
-			}
+			free(classnames);
 			free(dup);
 			buffer.appendFormatted("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
 			buffer.appendFormatted("DS: %d ", dualswap[tmpindex]);
