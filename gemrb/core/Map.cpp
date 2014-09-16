@@ -420,9 +420,6 @@ Map::~Map(void)
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
 	}
-	for (i = 0; i < mapnotes.size(); i++) {
-		delete mapnotes[i];
-	}
 
 	//malloc-d in AREImp
 	free( ExploredBitmap );
@@ -3024,33 +3021,35 @@ void Map::SetupAmbients()
 //text must be a pointer we can claim ownership of
 void Map::AddMapNote(const Point &point, int color, char *text, ieStrRef strref)
 {
-	MapNote *mn = new MapNote;
-
+	MapNote* mn = (MapNote*)MapNoteAtPoint(point);
+	if (!mn) {
+		// need to create a new note
+		mapnotes.push_back(MapNote());
+		mn = &mapnotes.back();
+	}
 	mn->strref = strref;
 	mn->Pos = point;
 	mn->color = (ieWord) color;
 	mn->text = text;
-	RemoveMapNote(point); //delete previous mapnote
-	mapnotes.push_back(mn);
 }
 
 void Map::RemoveMapNote(const Point &point)
 {
-	size_t i = mapnotes.size();
-	while (i--) {
-		if (point == mapnotes[i]->Pos) {
-			delete mapnotes[i];
-			mapnotes.erase(mapnotes.begin()+i);
+	std::vector<MapNote>::iterator it = mapnotes.begin();
+	for (; it != mapnotes.end(); ++it) {
+		if ((*it).Pos == point) {
+			mapnotes.erase(it);
+			break;
 		}
 	}
 }
 
-MapNote *Map::GetMapNote(const Point &point)
+const MapNote* Map::MapNoteAtPoint(const Point &point)
 {
 	size_t i = mapnotes.size();
 	while (i--) {
-		if (Distance(point, mapnotes[i]->Pos) < 10 ) {
-			return mapnotes[i];
+		if (Distance(point, mapnotes[i].Pos) < 10 ) {
+			return &mapnotes[i];
 		}
 	}
 	return NULL;

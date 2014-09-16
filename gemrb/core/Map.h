@@ -286,7 +286,7 @@ private:
 	std::list< Particles*> particles;
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
-	std::vector< MapNote*> mapnotes;
+	std::vector<MapNote> mapnotes;
 	std::vector< Spawn*> spawns;
 	Actor** queue[QUEUE_COUNT];
 	int Qcount[QUEUE_COUNT];
@@ -470,8 +470,8 @@ public:
 	//mapnotes
 	void AddMapNote(const Point &point, int color, char *text, ieStrRef strref);
 	void RemoveMapNote(const Point &point);
-	MapNote *GetMapNote(int i) { return mapnotes[i]; }
-	MapNote *GetMapNote(const Point &point);
+	const MapNote& GetMapNote(int i) { return mapnotes[i]; }
+	const MapNote* MapNoteAtPoint(const Point &point);
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */

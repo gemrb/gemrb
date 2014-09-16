@@ -2130,17 +2130,17 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<NoteCount;i++) {
-		MapNote *mn = map->GetMapNote(i);
+		const MapNote& mn = map->GetMapNote(i);
 		int x;
 
 		if (pst) {
-			tmpDword = (ieDword) mn->Pos.x;
+			tmpDword = (ieDword) mn.Pos.x;
 			stream->WriteDword( &tmpDword );
-			tmpDword = (ieDword) mn->Pos.y;
+			tmpDword = (ieDword) mn.Pos.y;
 			stream->WriteDword( &tmpDword );
-			unsigned int len = (unsigned int) strlen(mn->text);
+			unsigned int len = (unsigned int) strlen(mn.text);
 			if (len>500) len=500;
-			stream->Write( mn->text, len);
+			stream->Write( mn.text, len);
 			x = 500-len;
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
@@ -2149,22 +2149,22 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			if (x) {
 				stream->Write( filling, x);
 			}
-			tmpDword = (ieDword) mn->color;
+			tmpDword = (ieDword) mn.color;
 			stream->WriteDword(&tmpDword);
 			for (x=0;x<5;x++) { //5 empty dwords
 				stream->Write( filling, 4);
 			}
 		} else {
-			tmpWord = (ieWord) mn->Pos.x;
+			tmpWord = (ieWord) mn.Pos.x;
 			stream->WriteWord( &tmpWord );
-			tmpWord = (ieWord) mn->Pos.y;
+			tmpWord = (ieWord) mn.Pos.y;
 			stream->WriteWord( &tmpWord );
 			//update custom strref
-			core->UpdateString( mn->strref, mn->text);
-			tmpDword = mn->strref;
+			core->UpdateString( mn.strref, mn.text);
+			tmpDword = mn.strref;
 			stream->WriteDword( &tmpDword);
 			stream->WriteWord( &tmpWord );
-			stream->WriteWord( &mn->color );
+			stream->WriteWord( &mn.color );
 			tmpDword = 1;
 			stream->WriteDword( &tmpDword );
 			for (x=0;x<9;x++) { //9 empty dwords

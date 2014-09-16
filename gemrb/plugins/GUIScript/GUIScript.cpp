@@ -7926,7 +7926,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	if (txt && txt[0]) {
 		char* newvalue = ( char* ) malloc( strlen( txt ) + 1 ); //duplicating the string
 		strcpy( newvalue, txt );
-		MapNote *old = map->GetMapNote(point);
+		const MapNote *old = map->MapNoteAtPoint(point);
 		if (old) strref = old->strref;
 		else strref = 0xffffffff;
 		map->AddMapNote(point, color, newvalue, strref);
