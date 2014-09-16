@@ -5249,17 +5249,20 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	if (tar->Type == ST_ACTOR) {
 		actor = (Actor *) tar;
 	}
-
 	int flags = parameters->int0Parameter;
-	if (!(flags & MSO_IGNORE_NULL) && !actor) {
-		return;
+	if (!actor) {
+		if (!(flags & MSO_IGNORE_NULL)) {
+			return;
+		}
+	} else {
+		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget() ) {
+			return;
+		}
+		if (!(flags & MSO_IGNORE_SEE) && !CanSee(Sender, actor, true, 0) ) {
+			return;
+		}
 	}
-	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget() ) {
-		return;
-	}
-	if (!(flags & MSO_IGNORE_SEE) && actor && !CanSee(Sender, actor, true, 0) ) {
-		return;
-	}
+
 	int len = strlen(parameters->string0Parameter);
 	//
 	if (len&3) {
@@ -5289,12 +5292,14 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		} else {
 			range = Distance(me, actor);
 		}
-		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, me, range)) {
-			goto end_mso_loop;
+		if (actor) {
+			if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, me, range)) {
+				goto end_mso_loop;
+			}
+			me->LastMarked = actor->GetGlobalID();
 		}
-		//mark spell and target
 		me->LastMarkedSpell = splnum;
-		me->LastMarked = actor->GetGlobalID();
+
 		break;
 end_mso_loop:
 		pos++;

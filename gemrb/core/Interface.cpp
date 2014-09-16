@@ -5113,7 +5113,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 {
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
-		if (res == -1 ) {
+		if (res == -1 && caster) {
 			//bounced back at a nonliving caster
 			if (caster->Type!=ST_ACTOR) {
 				return 0;

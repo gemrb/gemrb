@@ -898,7 +898,7 @@ bool Actor::ApplyKit(bool remove)
 
 void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 {
-	if (clab[0]!='*') {
+	if (clab && clab[0]!='*') {
 		if (max) {
 			//singleclass
 			ApplyClab_internal(this, clab, max, true);

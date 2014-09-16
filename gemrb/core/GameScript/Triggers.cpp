@@ -2180,26 +2180,25 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
 		actor = (Actor *) tar;
 	}
 
-	int flags = parameters->int1Parameter;
-	if (!(flags & MSO_IGNORE_NULL) && !actor) {
-		return 0;
-	}
-	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget() ) {
-		return 0;
-	}
 	int splnum = parameters->int0Parameter;
+	int flags = parameters->int1Parameter;
+	if (actor) {
+		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget() ) {
+			return 0;
+		}
+		int range = (flags & MSO_IGNORE_RANGE) ? 0 : Distance(scr, actor);
+		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, scr, range)) {
+			return 0;
+		}
+	} else {
+		if (!(flags & MSO_IGNORE_NULL)) {
+			return 0;
+		}
+	}
 	if (!(flags & MSO_IGNORE_HAVE) && !scr->spellbook.HaveSpell(splnum, 0) ) {
 		return 0;
 	}
-	int range;
-	if ((flags & MSO_IGNORE_RANGE) || !actor) {
-		range = 0;
-	} else {
-		range = Distance(scr, actor);
-	}
-	if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, scr, range)) {
-		return 0;
-	}
+
 	return 1;
 }
 
