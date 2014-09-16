@@ -391,14 +391,14 @@ void TextArea::AppendText(const String& text)
 	}
 	MarkDirty();
 }
-
+/*
 int TextArea::InsertText(const char* text, int pos)
 {
 	// TODO: actually implement this
 	AppendText(text);
 	return pos;
 }
-
+*/
 /** Key Press Event */
 bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {

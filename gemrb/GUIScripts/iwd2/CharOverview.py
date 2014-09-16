@@ -39,8 +39,7 @@ Steps = ['Gender', 'Race', 'Class', 'Alignment', 'Abilities', 'Skills', 'Appeara
 GlobalStep = 0
 
 ### Utility functions
-def AddText(strref, row = False):
-	if row: return TextAreaControl.Append(strref, row)
+def AddText(strref):
 	return TextAreaControl.Append(strref)
 ### End utility functions
 

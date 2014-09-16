@@ -1372,22 +1372,18 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,
-"TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row[, Flag]]) => int\n\n"
+"TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Flag]])\n\n"
 "Appends the Text to the TextArea Control in the Window. "
-"If Row is given then it will insert the text after that row. "
 "If Flag is given, then it will use that value as a GetString flag.");
 
 static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str;
-	PyObject* row = NULL;
 	PyObject* flag = NULL;
 	long WindowIndex, ControlIndex;
-	long StrRef, Row, Flag = 0;
-	char* string;
-	int ret;
+	long StrRef, Flag = 0;
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 5, &wi, &ci, &str, &row, &flag )) {
+	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &str, &flag )) {
 		return AttributeError( GemRB_TextArea_Append__doc );
 	}
 	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
@@ -1403,16 +1399,6 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 	if (!ta) {
 		return NULL;
 	}
-	if (row) {
-		if (!PyObject_TypeCheck( row, &PyInt_Type )) {
-			Log(ERROR, "GUIScript", "Syntax Error: AppendText row must be integer");
-			return NULL;
-		}
-		Row = PyInt_AsLong( row );
-		//if (Row > ta->GetRowCount() - 1)
-			Row = -1;
-	} else
-		Row = -1;//ta->GetRowCount() - 1;
 
 	if (flag) {
 		if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
@@ -1423,18 +1409,15 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
-		string = PyString_AsString( str );
-		if (string == NULL)
-			return RuntimeError("Null string received");
-		ret = ta->InsertText( string, Row );
+		ta->AppendText(PyString_AsString( str ));
 	} else {
 		StrRef = PyInt_AsLong( str );
 		char* str = core->GetCString( StrRef, Flag );
-		ret = ta->InsertText( str, Row );
+		ta->AppendText( str );
 		core->FreeString( str );
 	}
 
-	return PyInt_FromLong( ret );
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Clear__doc,

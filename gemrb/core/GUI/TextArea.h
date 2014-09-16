@@ -74,7 +74,7 @@ public:
 	void AppendText(const char* text);
 	void AppendText(const String& text);
 	/** Inserts a String into the current Text at pos */
-	int InsertText(const char* text, int pos);
+	// int InsertText(const char* text, int pos);
 	/** Sets up auto scrolling (chapter text) */
 	void SetupScroll();
 	/** Per Pixel scrolling */

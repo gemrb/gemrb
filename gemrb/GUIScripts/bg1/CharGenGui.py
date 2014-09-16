@@ -53,7 +53,7 @@ def getRace(area):
 	RaceID = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	RaceIndex = CommonTables.Races.FindValue(3,RaceID)
 	RaceCap = CommonTables.Races.GetValue(RaceIndex,2)
-	area.Append(1048,-1) # new line
+	area.Append(1048)
 	area.Append(": ")
 	area.Append(RaceCap)
 
@@ -68,7 +68,7 @@ def getClass(area):
 	MyChar = GemRB.GetVar ("Slot")
 	ClassTitle = GUICommon.GetActorClassTitle(MyChar)
 
-	area.Append(12136, -1)
+	area.Append(12136)
 	area.Append(": ")
 	area.Append(ClassTitle)
 	
@@ -88,7 +88,7 @@ def getAlignment(area):
 	MyChar = GemRB.GetVar ("Slot")
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
-	area.Append(1049, -1)
+	area.Append(1049)
 	area.Append(": ")
 	AllignIndex = CommonTables.Aligns.FindValue (3, AllignID)
 	AllignCap = CommonTables.Aligns.GetValue (AllignIndex, 2)
@@ -114,7 +114,7 @@ def getAbilities(area):
 	for i in range(AbilityCount):
 		v = AbilityTable.GetValue(i,2)
 		id = AbilityTable.GetValue(i,3)
-		area.Append(v, -1)
+		area.Append(v)
 		area.Append(": "+str(GemRB.GetPlayerStat(MyChar,id)))
 	area.Append("\n")
 	area.Append("\n")
