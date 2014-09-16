@@ -301,13 +301,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			target->AddAction( GenerateAction( "SetInterrupt(TRUE)" ) );
 		}
 
-		int final_dialog = tr->Flags & IE_DLG_TR_FINAL;
-
-		if (final_dialog) {
+		if (tr->Flags & IE_DLG_TR_FINAL) {
 			EndDialog();
-		}
-
-		if (final_dialog) {
 			return false;
 		}
 
