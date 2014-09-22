@@ -178,6 +178,12 @@ void Inventory::CalculateWeight() const
 			if (itm) {
 				slot->Weight = itm->Weight;
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
+
+				// some items can't be dropped once they've been picked up,
+				// e.g. the portal key in BG2
+				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
+					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
+				}
 			} else {
 				Log(ERROR, "Inventory", "Invalid item: %s!", slot->ItemResRef);
 				slot->Weight = 0;
@@ -579,12 +585,6 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 
 		if (!Slots[slot]) {
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
-			// some items can't be dropped once they've been picked up,
-			// e.g. the portal key in BG2
-			if (!(item->Flags & IE_INV_ITEM_MOVABLE)) {
-				item->Flags |= IE_INV_ITEM_UNDROPPABLE;
-			}
-
 			SetSlotItem(item, slot);
 			EquipItem(slot);
 			return ASI_SUCCESS;
