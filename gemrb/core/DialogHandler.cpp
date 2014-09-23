@@ -75,7 +75,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "GameControl", "Cannot start dialog: %s", dlgref);
+		Log(ERROR, "DialogHandler", "Cannot start dialog: %s", dlgref);
 		return false;
 	}
 

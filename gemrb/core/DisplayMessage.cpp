@@ -262,16 +262,14 @@ void DisplayMessage::DisplayStringName(const char *text, unsigned int color, con
 	if (!text) return;
 	speaker_color = GetSpeakerColor(name, speaker);
 
-	// if there is no name, use the script name to help debugging
-	if (!strcmp(name, "")) {
-		name = speaker->GetScriptName();
+	if (strcmp(name, "")) {
+		int newlen = strlen(DisplayFormatName) + strlen(name) + strlen(text) + 18;
+		char* newstr = (char *) malloc(newlen);
+		snprintf(newstr, newlen, DisplayFormatName, speaker_color, name, color, text);
+		DisplayString(newstr);
+		free(newstr);
+	} else {
+		DisplayString(text, color, NULL);
 	}
-
-	int newlen = (int)(strlen(DisplayFormatName) + strlen(name) + strlen(text) + 18);
-	char* newstr = (char *) malloc(newlen);
-	snprintf(newstr, newlen, DisplayFormatName, speaker_color, name, color, text);
-	DisplayString(newstr);
-	free(newstr);
 }
-
 }
