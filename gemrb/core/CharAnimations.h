@@ -86,6 +86,7 @@ namespace GemRB {
 #define IE_ANI_FOUR_FILES_3		18    //mostly civilians
 #define IE_ANI_TWO_FILES_4		19
 #define IE_ANI_FOUR_FRAMES_2	20    //MDEM
+#define IE_ANI_TWO_FILES_5		21 //MMEL
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		56   //full animation
@@ -246,6 +247,8 @@ private:
 	void AddMMR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddTwoFiles5Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);

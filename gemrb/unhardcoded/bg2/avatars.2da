@@ -230,7 +230,7 @@
 0x7F3A     NIRO       NIRO       NIRO       NIRO       4          2          1          *
 0x7F3B     MSOL       MSOL       MSOL       MSOL       4          2          1          *
 0x7F3C     MASL       MASL       MASL       MASL       4          2          1          *
-0x7F3D     MMEL       MMEL       MMEL       MMEL       14         2          1          *
+0x7F3D     MMEL       MMEL       MMEL       MMEL       21         2          1          *
 0x7F3E     MFIG       MFIG       MFIG       MFIG       4          3          1          *
 0x8000     MGNL       MGNL       MGNL       MGNL       2          2          0          +
 0x8100     MHOB       MHOB       MHOB       MHOB       2          2          0          +

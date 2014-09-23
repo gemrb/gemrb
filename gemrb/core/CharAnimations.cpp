@@ -810,6 +810,9 @@ IE_ANI_TWO_FILES_3B:	Animations using this type are stored using the following t
 IE_ANI_TWO_FILES_4: This type stores animations in two files (G1 and G2) which each having only
 			one cycle. And both of those seem to be identical.
 
+IE_ANI_TWO_FILES_5: Also uses G1 and G2 only but contains various cycles, including some special moves,
+			with 9 orientations each. Only used by MMEL.
+
 IE_ANI_TWO_PIECE: This is a modified IE_ANI_SIX_FILES with supporting still frames (using a
 			different palette) stored in a second set of files. Currently only used by MAKH
 
@@ -1121,6 +1124,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			case IE_ANI_PST_ANIMATION_2: //no std just stc
 			case IE_ANI_PST_ANIMATION_1:
 			case IE_ANI_FRAGMENT:
+			case IE_ANI_TWO_FILES_5:
 				if (Orient > 8) {
 					a->MirrorAnimation( );
 				}
@@ -1143,6 +1147,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_CODE_MIRROR:
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
 		case IE_ANI_ONE_FILE: //16 orientations
+		case IE_ANI_TWO_FILES_5: // 9 orientations
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
 		case IE_ANI_CODE_MIRROR_3:
 			Anims[StanceID][Orient] = anims;
@@ -1276,6 +1281,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 		case IE_ANI_TWO_FILES_4:
 			strcat( NewResRef, "g1");
 			Cycle = 0;
+			break;
+
+		case IE_ANI_TWO_FILES_5:
+			AddTwoFiles5Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWO_FILES:
@@ -2138,6 +2147,81 @@ void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
 	}
+}
+
+void CharAnimations::AddTwoFiles5Suffix( char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	const char *suffix;
+	Cycle=SixteenToNine[Orient];
+
+	switch(StanceID) {
+		case IE_ANI_WALK:
+			suffix = "g1";
+			break;
+		case IE_ANI_READY:
+			Cycle += 9;
+			suffix = "g1";
+			break;
+		case IE_ANI_HEAD_TURN:
+			Cycle += 18;
+			suffix = "g1";
+			break;
+		case IE_ANI_DAMAGE:
+			Cycle += 27;
+			suffix = "g1";
+			break;
+		case IE_ANI_DIE:
+			Cycle += 36;
+			suffix = "g1";
+			break;
+		case IE_ANI_SLEEP:
+		case IE_ANI_TWITCH:
+			Cycle += 45;
+			suffix = "g1";
+			break;
+		// dead but not quite dead...
+		//	Cycle += 54;
+		//	suffix = "g1";
+		//	break;
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			Cycle += 63;
+			suffix = "g1";
+			break;
+		case IE_ANI_ATTACK:
+			suffix = "g2";
+			break;
+		case IE_ANI_SHOOT:
+			Cycle += 9;
+			suffix = "g2";
+			break;
+		// yet another attack
+		//	Cycle += 18;
+		//	suffix = "g2";
+		//	break;
+		case IE_ANI_ATTACK_BACKSLASH:
+			Cycle += 27;
+			suffix = "g2";
+			break;
+		case IE_ANI_ATTACK_JAB:
+			Cycle += 36;
+			suffix = "g2";
+			break;
+		case IE_ANI_CONJURE:
+			Cycle += 45;
+			suffix = "g2";
+			break;
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_CAST:
+			Cycle += 54;
+			suffix = "g2";
+			break;
+		default:
+			Cycle += 18;
+			suffix = "g1";
+	}
+	strcat( ResRef, suffix );
 }
 
 void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
