@@ -88,23 +88,26 @@ bool DisplayMessage::HasStringReference(int stridx) const
 	return strref_table[stridx] != -1;
 }
 
-unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable *&speaker) const
+unsigned int DisplayMessage::GetSpeakerColor(char *&name, const Scriptable *&speaker) const
 {
 	unsigned int speaker_color;
+	char *tmp;
 
 	if(!speaker) return 0;
 	switch (speaker->Type) {
 		case ST_ACTOR:
-			name = speaker->GetName(-1);
+			name = strdup(speaker->GetName(-1));
 			core->GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			name = core->GetString( speaker->DialogName );
+			tmp = core->GetString(speaker->DialogName);
+			name = strdup(tmp);
+			core->FreeString(tmp);
 			speaker_color = 0xc0c0c0;
 			break;
 		default:
-			name = "";
+			name = strdup("");
 			speaker_color = 0x800000;
 			break;
 	}
@@ -158,7 +161,7 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, 
 void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, const Scriptable *actor) const
 {
 	unsigned int actor_color;
-	const char *name = 0;
+	char *name = 0;
 
 	if (stridx<0) return;
 	actor_color = GetSpeakerColor(name, actor);
@@ -171,6 +174,7 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int co
 	} else {
 		snprintf( newstr, newlen, DisplayFormatName, color, name, color, text );
 	}
+	free( name );
 	core->FreeString( text );
 	core->FreeString( text2 );
 	DisplayString( newstr );
@@ -210,8 +214,8 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int col
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
 {
 	unsigned int attacker_color;
-	const char *name1 = 0;
-	const char *name2 = 0;
+	char *name1 = 0;
+	char *name2 = 0;
 
 	if (stridx<0) return;
 
@@ -224,6 +228,8 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1, color,
 		text, name2);
+	free( name1 );
+	free( name2 );
 	core->FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
@@ -257,7 +263,7 @@ void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scr
 void DisplayMessage::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const
 {
 	unsigned int speaker_color;
-	const char *name = 0;
+	char *name = 0;
 
 	if (!text) return;
 	speaker_color = GetSpeakerColor(name, speaker);
@@ -271,5 +277,6 @@ void DisplayMessage::DisplayStringName(const char *text, unsigned int color, con
 	} else {
 		DisplayString(text, color, NULL);
 	}
+	free(name);
 }
 }

@@ -57,7 +57,7 @@ public:
 	/** returns true if a string reference for a string reference index constant exists */
 	bool HasStringReference(int stridx) const;
 	/** returns the speaker's color and name */
-	unsigned int GetSpeakerColor(const char *&name, const Scriptable *&speaker) const;
+	unsigned int GetSpeakerColor(char *&name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
 	void DisplayString(const char *txt, Scriptable *speaker=NULL) const;
 	/** displays a string constant in the textarea */
