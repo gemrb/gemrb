@@ -2161,7 +2161,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			tmpWord = (ieWord) mn->Pos.y;
 			stream->WriteWord( &tmpWord );
 			//update custom strref
-			core->UpdateString( mn->strref, mn->text);
+			mn->strref = core->UpdateString( mn->strref, mn->text );
 			tmpDword = mn->strref;
 			stream->WriteDword( &tmpDword);
 			stream->WriteWord( &tmpWord );

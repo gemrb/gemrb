@@ -2277,7 +2277,14 @@ void Interface::FreeString(char *&str) const
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 {
-	return strings->UpdateString( strref, text );
+	char *current = GetString(strref, 0);
+	bool changed = strcmp(text, current) != 0;
+	FreeString(current);
+	if (changed) {
+		return strings->UpdateString( strref, text );
+	} else {
+		return strref;
+	}
 }
 
 char* Interface::GetString(ieStrRef strref, ieDword options) const

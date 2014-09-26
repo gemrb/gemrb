@@ -62,15 +62,18 @@ private:
 	DataStream *toh_str;
 	ieDword AuxCount;
 	ieDword FreeOffset;
+	ieDword NextStrRef;
 
-	void UpdateFreeOffset(ieDword NewFree);
 	void CloseResources();
 	DataStream *GetAuxHdr(bool create);
 	DataStream *GetAuxTlk(bool create);
-	ieStrRef GetNewStrRef();
+	ieStrRef GetNewStrRef(ieStrRef strref);
 	ieDword LocateString(ieStrRef strref);
-	char* LocateString2(ieDword offset);
-	ieDword GetLength();
+	ieDword GetNextStrRef();
+	ieDword ClaimFreeSegment();
+	void ReleaseSegment(ieDword offset);
+	char *GetString(ieDword offset);
+	ieDword GetLength(ieDword offset);
 public:
 	CTlkOverride();
 	virtual ~CTlkOverride();

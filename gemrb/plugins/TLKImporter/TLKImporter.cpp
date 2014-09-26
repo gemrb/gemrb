@@ -406,12 +406,7 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 		return 0xffffffff;
 	}
 
-	if(strref>STRREF_START || (strref>=BIO_START && strref<=BIO_END) ) {
-		return override->UpdateString(strref, newvalue);
-	}
-
-	Log(ERROR, "TLKImporter", "Cannot set custom string.");
-	return 0xffffffff;
+	return override->UpdateString(strref, newvalue);
 }
 
 char* TLKImporter::GetString(ieStrRef strref, ieDword flags)
