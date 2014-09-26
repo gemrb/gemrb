@@ -94,6 +94,14 @@ def OnLoad():
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
+	# biography
+	Bio = GemRB.GetToken("BIO")
+	BioStrRef = 33347
+	if Bio:
+		BioStrRef = 62016
+		GemRB.CreateString (BioStrRef, Bio)
+	GemRB.SetPlayerString (MyChar, 74, BioStrRef)
+
 	if GameCheck.IsTOB():
 		# will also add the starting inventory for tob
 		GemRB.GameSetExpansion (4)

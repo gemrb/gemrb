@@ -31,6 +31,7 @@ SubSubCustomizeWindow = None
 ExportWindow = None
 NameField = ExportDoneButton = None
 ScriptsTable = None
+RevertButton = None
 
 if GameCheck.IsBG2() or GameCheck.IsBG1():
 	BioStrRefSlot = 74
@@ -444,6 +445,7 @@ def UpdateScriptSelection():
 
 def RevertBiography():
 	global BioStrRef
+	global RevertButton
 
 	if GameCheck.IsIWD2():
 		BioTable = GemRB.LoadTable ("bios")
@@ -453,11 +455,12 @@ def RevertBiography():
 	else:
 		BioStrRef = 33347
 	TextArea.SetText (BioStrRef)
-	CloseSubCustomizeWindow ()
+	RevertButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
 def OpenBiographyEditWindow ():
 	global SubCustomizeWindow
+	global RevertButton
 	global BioStrRef
 	global TextArea
 
@@ -508,20 +511,22 @@ def OpenBiographyEditWindow ():
 	return
 
 def ClearBiography():
+	global BioStrRef
+	global RevertButton
+
 	pc = GemRB.GameGetSelectedPCSingle ()
+	#pc is 1 based
 	BioStrRef = 62015+pc
-	#GemRB.CreateString (BioStrRef, "")
 	TextArea.SetText ("")
+	RevertButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
 def DoneBiographyWindow ():
 	global BioStrRef
 
-	#TODO set bio
 	pc = GemRB.GameGetSelectedPCSingle ()
-	#pc is 1 based
-	BioStrRef = 62015+pc
-	GemRB.CreateString (BioStrRef, TextArea.QueryText())
+	if BioStrRef != 33347:
+		GemRB.CreateString (BioStrRef, TextArea.QueryText())
 	GemRB.SetPlayerString (pc, BioStrRefSlot, BioStrRef)
 	CloseSubCustomizeWindow ()
 	return
