@@ -6284,16 +6284,9 @@ int fx_drain_spells (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_drain_spells(%2d): Count: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword i=fx->Parameter1;
-	if (fx->Parameter2) {
-		while(i--) {
-			if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_PRIEST)) {
-				break;
-			}
-		}
-		return FX_NOT_APPLIED;
-	}
+	int type = fx->Parameter2 ? IE_SPELL_TYPE_PRIEST : IE_SPELL_TYPE_WIZARD;
 	while(i--) {
-		if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_WIZARD)) {
+		if (!target->spellbook.DepleteSpell(type)) {
 			break;
 		}
 	}
