@@ -189,6 +189,7 @@ public: //Events
 	/* centers viewport to the points specified */
 	void Center(unsigned short x, unsigned short y);
 	void ClearMouseState();
+	void MoveViewportTo(int x, int y, bool center);
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
