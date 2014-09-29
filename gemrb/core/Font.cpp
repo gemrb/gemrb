@@ -34,26 +34,38 @@
 namespace GemRB {
 
 static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
-							 ieByte* canvas, const Size& size)
+							  ieByte* canvas, const Size& size)
 {
 	const ieByte* src = glyph.pixels;
 	if (canvas == NULL || src == NULL) {
 		return; // need both a src and dst
 	}
 
-	// TODO: should handle partial glyphs
-	if (!Region(0, 0, size.w, size.h).PointInside(p.x, p.y)) {
-		return; // off the canvas
+	// find the origin and clip to it.
+	// only worry about origin < 0.
+	Point blitPoint = p;
+	Size srcSize = glyph.dimensions;
+	if (blitPoint.y < 0) {
+		int offset = (-blitPoint.y * glyph.dimensions.w);
+		src += offset;
+		srcSize.h -= offset;
+		blitPoint.y = 0;
 	}
-
+	if (blitPoint.x < 0) {
+		int offset = -blitPoint.x;
+		src += offset;
+		srcSize.w -= offset;
+		blitPoint.x = 0;
+	}
+	ieByte* dest = canvas + (size.w * blitPoint.y) + blitPoint.x;
+	assert(src >= glyph.pixels);
+	assert(dest >= canvas);
 	// copy the glyph to the canvas
-	ieByte* dest = canvas + (size.w * p.y) + p.x;
-	for(int row = 0; row < glyph.dimensions.h; row++ ) {
-		//assert(dest <= canvas + (size.w * size.h));
-		if (dest + glyph.dimensions.w > canvas + (size.w * size.h)) {
+	for(int row = 0; row < srcSize.h; row++ ) {
+		if (dest + srcSize.w > canvas + (size.w * size.h)) {
 			break;
 		}
-		memcpy(dest, src, glyph.dimensions.w);
+		memcpy(dest, src, srcSize.w);
 		dest += size.w;
 		src += glyph.pitch;
 	}
