@@ -198,7 +198,7 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 	if ( FT_IS_SCALABLE(face) ) {
 		FT_Fixed scale;
 		/* Set the character size and use default DPI (72) */
-		error = FT_Set_Pixel_Sizes( face, 0, maxHeight );
+		error = FT_Set_Pixel_Sizes( face, 0, LineHeight );
 		if( error ) {
 			LogFTError(error);
 		} else {
@@ -206,7 +206,7 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 			scale = face->size->metrics.y_scale;
 			ascent = FT_CEIL(FT_MulFix(face->ascender, scale));
 			descent = FT_CEIL(FT_MulFix(face->descender, scale));
-			maxHeight = ascent - descent + 1;
+			LineHeight = ascent - descent + 1;
 			//font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
 			//font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
 			//font->underline_height = FT_FLOOR(FT_MulFix(face->underline_thickness, scale));
@@ -233,7 +233,7 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
 		 * */
 		ascent = face->available_sizes[ptSize].height;
 		descent = 0;
-		maxHeight = face->available_sizes[ptSize].height;
+		LineHeight = face->available_sizes[ptSize].height;
 		//font->lineskip = FT_CEIL(font->ascent);
 		//font->underline_offset = FT_FLOOR(face->underline_position);
 		//font->underline_height = FT_FLOOR(face->underline_thickness);

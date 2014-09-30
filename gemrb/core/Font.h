@@ -77,7 +77,7 @@ class GEM_EXPORT Font {
 	 Using a single sprite for each glyph is inefficient for OpenGL so we want large sprites composed of many glyphs.
 	 However, we would also like to avoid creating many unused pages (for TTF fonts, etc) so we cannot simply create a single large page.
 	 Furthermore, a single page may grow too large to be used as a texture in OpenGL (esp for mobile devices).
-	 Therefore we generate pages of glyphs (1024 x maxHeight + descent) as sprites suitable for segmented blitting to the screen.
+	 Therefore we generate pages of glyphs (1024 x LineHeight + descent) as sprites suitable for segmented blitting to the screen.
 	 The pixel data will be safely shared between the Sprite2D objects and the Glyph objects when the video driver is using software rendering
 	 so this isn't horribly wasteful useage of memory. Hardware acceleration will force the font to keep its own copy of pixel data.
 	 

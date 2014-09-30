@@ -289,7 +289,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 #if DEBUG_FONT
 			core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
-			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(), Size(lineW, maxHeight)), ColorWhite, false);
+			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(), Size(lineW, LineHeight)), ColorWhite, false);
 #endif
 			linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
 			dp = dp + linePoint;
@@ -433,7 +433,7 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 			if (!(alignment&IE_FONT_SINGLE_LINE)) {
 				// we need to resize horizontally which creates new lines
 				ieWord trimmedArea = ((canvasSize.w - size.w) * canvasSize.h);
-				// this automatically becomes multiline, therefore use maxHeight
+				// this automatically becomes multiline, therefore use LineHeight
 				ieWord lineArea = size.w * LineHeight;
 				// round up
 				ieWord numLines = 1 + ((trimmedArea - 1) / lineArea);
@@ -464,7 +464,7 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 		// else: we already fit in the designated area (horizontally). No need to resize.
 	}
 	if (canvasSize.h < LineHeight) {
-		// should be at least maxHeight
+		// should be at least LineHeight
 		canvasSize.h = LineHeight;
 	}
 	if (size.h && size.h < canvasSize.h) {
