@@ -98,7 +98,6 @@ public:
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
 
-	bool PointInside(short XPos, short YPos) const;
 	bool PointInside(const Point &p) const;
 	bool InsideRegion(const Region& rgn) const;
 	bool IntersectsRegion(const Region& rgn) const;

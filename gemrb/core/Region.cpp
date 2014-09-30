@@ -153,15 +153,10 @@ Region::Region(const Point &p, const Size& s)
 
 bool Region::PointInside(const Point &p) const
 {
-	return PointInside(p.x, p.y);
-}
-
-bool Region::PointInside(short XPos, short YPos) const
-{
-	if (( XPos < x ) || ( XPos > ( x + w ) )) {
+	if (( p.x < x ) || ( p.x > ( x + w ) )) {
 		return false;
 	}
-	if (( YPos < y ) || ( YPos > ( y + h ) )) {
+	if (( p.y < y ) || ( p.y > ( y + h ) )) {
 		return false;
 	}
 	return true;
