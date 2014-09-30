@@ -33,6 +33,7 @@ class TTFFont : public Font
 private:
 	FT_Face face;
 
+	const Glyph& AliasBlank(ieWord chr) const;
 protected:
 	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
 public:

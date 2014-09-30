@@ -32,6 +32,12 @@
 
 namespace GemRB {
 
+const Glyph& TTFFont::AliasBlank(ieWord chr) const
+{
+	((TTFFont*)this)->CreateAliasForChar(0, chr);
+	return Font::GetGlyph(chr);
+}
+
 const Glyph& TTFFont::GetGlyph(ieWord chr) const
 {
 #if HAVE_ICONV
@@ -62,10 +68,6 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		return g;
 	}
 
-	// blank for returning when there is an error
-	// TODO: ttf fonts have a "box" glyph they use for this
-	static Glyph blank(Size(0,0), Point(0,0), NULL, 0);
-
 	// attempt to generate glyph
 
 	// TODO: fix the font styles!
@@ -90,13 +92,13 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	FT_Error error = 0;
 	FT_UInt index = FT_Get_Char_Index(face, chr);
 	if (!index) {
-		return blank;
+		return AliasBlank(chr);
 	}
 
 	error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
 	if( error ) {
 		LogFTError(error);
-		return blank;
+		return AliasBlank(chr);
 	}
 
 	FT_GlyphSlot glyph = face->glyph;
@@ -134,7 +136,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	error = FT_Render_Glyph( glyph, ft_render_mode_normal );
 	if( error ) {
 		LogFTError(error);
-		return blank;
+		return AliasBlank(chr);
 	}
 
 	bitmap = &glyph->bitmap;
@@ -149,7 +151,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	}*/
 
 	if (sprSize.IsEmpty()) {
-		return blank;
+		return AliasBlank(chr);
 	}
 
 	// we need 1px empty space on each side
@@ -207,13 +209,15 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 #endif
 	// ttf fonts dont produce glyphs for whitespace
-	int SpaceWidth = core->TLKEncoding.zerospace ? 1 : (face->height * 0.25);
-	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, NULL, NULL);
-	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, NULL, NULL);
-	CreateGlyphForCharSprite(' ', space);
-	CreateGlyphForCharSprite('\t', tab);
-	space->release();
-	tab->release();
+	Sprite2D* blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, NULL);
+	// blank for returning when there is an error
+	// TODO: ttf fonts have a "box" glyph they use for this
+	CreateGlyphForCharSprite(0, blank);
+	blank->Width = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);;
+	CreateGlyphForCharSprite(' ', blank);
+	blank->Width *= 4;
+	CreateGlyphForCharSprite('\t', blank);
+	blank->release();
 }
 
 TTFFont::~TTFFont()
