@@ -201,12 +201,10 @@ def RefreshInventoryWindow ():
 	# name
 	Label = Window.GetControl (0x10000032)
 	Label.SetText (GemRB.GetPlayerName (pc, 0))
-	Label.SetAlignment (IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP | IE_FONT_SINGLE_LINE)
 	
 	# class
 	Label = Window.GetControl (0x10000042)
 	Label.SetText (GUICommon.GetActorClassTitle (pc))
-	Label.SetAlignment (IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_BOTTOM | IE_FONT_SINGLE_LINE)
 
 	# portrait
 	Button = Window.GetControl (50)
