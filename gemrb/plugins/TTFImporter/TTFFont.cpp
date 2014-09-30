@@ -30,10 +30,6 @@
 #include <errno.h>
 #endif
 
-/* Handy routines for converting from fixed point */
-#define FT_FLOOR(X)	((X & -64) / 64)
-#define FT_CEIL(X)	(((X + 63) & -64) / 64)
-
 namespace GemRB {
 
 const Glyph& TTFFont::GetGlyph(ieWord chr) const
@@ -68,18 +64,35 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
-	static Glyph blank(Size(0,0), 0, NULL, 0);
+	static Glyph blank(Size(0,0), Point(0,0), NULL, 0);
 
 	// attempt to generate glyph
 
 	// TODO: fix the font styles!
+	/*
+	// currently gemrb has exclusive styles...
+	// TODO: make styles ORable
+	style = NORMAL;
+	if ( face->style_flags & FT_STYLE_FLAG_ITALIC ) {
+		style = ITALIC;
+	}
+	if ( face->style_flags & FT_STYLE_FLAG_BOLD ) {
+		// bold overrides italic
+		// TODO: allow bold and italic together
+		style = BOLD;
+	}
+
+	glyph_overhang = face->size->metrics.y_ppem / 10;
+	// x offset = cos(((90.0-12)/360)*2*M_PI), or 12 degree angle
+	glyph_italics = 0.207f;
+	glyph_italics *= height;
+	*/
 	FT_Error error = 0;
 	FT_UInt index = FT_Get_Char_Index(face, chr);
 	if (!index) {
 		return blank;
 	}
 
-	int maxx, yoffset;
 	error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
 	if( error ) {
 		LogFTError(error);
@@ -87,27 +100,28 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	}
 
 	FT_GlyphSlot glyph = face->glyph;
-	FT_Glyph_Metrics* metrics = &glyph->metrics;
 
 	/* Get the glyph metrics if desired */
+	/*
+	//FT_Glyph_Metrics* metrics = &glyph->metrics;
+	//int maxx, yoffset;
 	if ( FT_IS_SCALABLE( face ) ) {
-		/* Get the bounding box */
+		// Get the bounding box
 		maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->width);
 		yoffset = ascent - FT_FLOOR(metrics->horiBearingY);
 	} else {
-		/* Get the bounding box for non-scalable format.
-		 * Again, freetype2 fills in many of the font metrics
-		 * with the value of 0, so some of the values we
-		 * need must be calculated differently with certain
-		 * assumptions about non-scalable formats.
-		 * */
+		// Get the bounding box for non-scalable format.
+		// Again, freetype2 fills in many of the font metrics
+		// with the value of 0, so some of the values we
+		// need must be calculated differently with certain
+		// assumptions about non-scalable formats.
+
 		maxx = FT_FLOOR(metrics->horiBearingX) + FT_CEIL(metrics->horiAdvance);
 		yoffset = 0;
 	}
 
 	// TODO: handle styles for fonts that dont do it themselves
 
-	/*
 	 FIXME: maxx is currently unused.
 	 glyph spacing is non existant right now
 	 font styles are non functional too
@@ -129,9 +143,10 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 
 	/* Ensure the width of the pixmap is correct. On some cases,
 	 * freetype may report a larger pixmap than possible.*/
+	/*
 	if (sprSize.w > maxx) {
 		sprSize.w = maxx;
-	}
+	}*/
 
 	if (sprSize.IsEmpty()) {
 		return blank;
@@ -162,8 +177,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	// TODO: do an underline if requested
 
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, NULL, true, 0);
-	// Line height in IE is 13 px
-	spr->YPos = 13 - yoffset;
+	//spr->YPos = LineHeight - yoffset;
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
 	spr->release();
@@ -185,86 +199,15 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 	return (int)(-kerning.x / 64);
 }
 
-TTFFont::TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style)
-	: Font(pal), style(style), ptSize(ptSize), face(face)
+TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
+	: Font(pal, lineheight, baseline), face(face)
 {
-// on FT < 2.4.2 the manager will difer ownership to this object
+// on FT < 2.4.2 the manager will defer ownership to this object
 #if FREETYPE_VERSION_ATLEAST(2,4,2)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 #endif
-	FT_Error error = 0;
-
-	/* Make sure that our font face is scalable (global metrics) */
-	if ( FT_IS_SCALABLE(face) ) {
-		FT_Fixed scale;
-		/* Set the character size and use default DPI (72) */
-		error = FT_Set_Pixel_Sizes( face, 0, LineHeight );
-		if( error ) {
-			LogFTError(error);
-		} else {
-			/* Get the scalable font metrics for this font */
-			scale = face->size->metrics.y_scale;
-			ascent = FT_CEIL(FT_MulFix(face->ascender, scale));
-			descent = FT_CEIL(FT_MulFix(face->descender, scale));
-			LineHeight = ascent - descent + 1;
-			//font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
-			//font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
-			//font->underline_height = FT_FLOOR(FT_MulFix(face->underline_thickness, scale));
-		}
-	} else {
-		/* Non-scalable font case.  ptsize determines which family
-		 * or series of fonts to grab from the non-scalable format.
-		 * It is not the point size of the font.
-		 * */
-		if ( ptSize >= face->num_fixed_sizes )
-			ptSize = face->num_fixed_sizes - 1;
-
-		error = FT_Set_Pixel_Sizes( face,
-								   face->available_sizes[ptSize].height,
-								   face->available_sizes[ptSize].width );
-
-		if (error) {
-			LogFTError(error);
-		}
-		/* With non-scalale fonts, Freetype2 likes to fill many of the
-		 * font metrics with the value of 0.  The size of the
-		 * non-scalable fonts must be determined differently
-		 * or sometimes cannot be determined.
-		 * */
-		ascent = face->available_sizes[ptSize].height;
-		descent = 0;
-		LineHeight = face->available_sizes[ptSize].height;
-		//font->lineskip = FT_CEIL(font->ascent);
-		//font->underline_offset = FT_FLOOR(face->underline_position);
-		//font->underline_height = FT_FLOOR(face->underline_thickness);
-	}
-
-	/*
-	 if ( font->underline_height < 1 ) {
-	 font->underline_height = 1;
-	 }
-	 */
-
-	// Initialize the font face style
-	// currently gemrb has exclusive styles...
-	// TODO: make styles ORable
-	style = NORMAL;
-	if ( face->style_flags & FT_STYLE_FLAG_ITALIC ) {
-		style = ITALIC;
-	}
-	if ( face->style_flags & FT_STYLE_FLAG_BOLD ) {
-		// bold overrides italic
-		// TODO: allow bold and italic together
-		style = BOLD;
-	}
-
-	glyph_overhang = face->size->metrics.y_ppem / 10;
-	/* x offset = cos(((90.0-12)/360)*2*M_PI), or 12 degree angle */
-	glyph_italics = 0.207f;
-	glyph_italics *= height;
-
 	// ttf fonts dont produce glyphs for whitespace
-	int SpaceWidth = core->TLKEncoding.zerospace ? 1 : (ptSize * 0.25);
+	int SpaceWidth = core->TLKEncoding.zerospace ? 1 : (face->height * 0.25);
 	Sprite2D* space = core->GetVideoDriver()->CreateSprite8(SpaceWidth, 0, NULL, NULL);
 	Sprite2D* tab = core->GetVideoDriver()->CreateSprite8((space->Width)*4, 0, NULL, NULL);
 	CreateGlyphForCharSprite(' ', space);

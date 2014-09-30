@@ -151,7 +151,7 @@ public:
 	void CreateAliasForChar(ieWord chr, ieWord alias);
 
 	//allow reading but not setting glyphs
-	const Glyph& GetGlyph(ieWord chr) const;
+	virtual const Glyph& GetGlyph(ieWord chr) const;
 
 	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);

@@ -29,6 +29,7 @@
 /* Begin PBXBuildFile section */
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A2042A7919DB4A6800011F05 /* TTFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A29504771609721300BB22AA /* TTFImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A20574F819994857007FF22C /* libGLEW.1.10.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F719994857007FF22C /* libGLEW.1.10.0.dylib */; };
 		A20574FA19994967007FF22C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
 		A20574FB19994979007FF22C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
@@ -726,6 +727,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A2042A7719DB4A4E00011F05 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A295046C1609721300BB22AA;
+			remoteInfo = TTFImporter;
+		};
 		A2375BA013AAF58E00E7EF9B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1153,6 +1161,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A2042A7919DB4A6800011F05 /* TTFImporter.so in CopyFiles */,
 				A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */,
 				A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */,
 				A2E9965314DE05590052BABE /* 2DAImporter.so in CopyFiles */,
@@ -3514,6 +3523,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A2042A7819DB4A4E00011F05 /* PBXTargetDependency */,
 				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
 				A2FE2C8316F231CB00DDC6C7 /* PBXTargetDependency */,
 				A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */,
@@ -5349,6 +5359,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		A2042A7819DB4A4E00011F05 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A295046C1609721300BB22AA /* TTFImporter */;
+			targetProxy = A2042A7719DB4A4E00011F05 /* PBXContainerItemProxy */;
+		};
 		A2375BA113AAF58E00E7EF9B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A27E830913A0358200B41410 /* 2DAImporter */;

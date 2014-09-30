@@ -27,32 +27,19 @@
 #include "Holder.h"
 
 namespace GemRB {
-class Sprite2D;
 
 class TTFFont : public Font
 {
 private:
-	FontStyle style;
-	ieWord ptSize;
-
 	FT_Face face;
-	int height;
-	int ascent;
-	int descent;
-	
-	int glyph_overhang;
-	float glyph_italics;
 
 protected:
 	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
 public:
-	TTFFont(Palette* pal, FT_Face face, ieWord ptSize, FontStyle style);
+	TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline);
 	~TTFFont(void);
 
 	const Glyph& GetGlyph(ieWord chr) const;
-
-	ieWord GetPointSize() const {return ptSize;};
-	FontStyle GetStyle() const {return style;};
 };
 
 }

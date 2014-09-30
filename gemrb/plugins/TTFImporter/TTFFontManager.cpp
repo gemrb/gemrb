@@ -43,14 +43,14 @@ static void destroyFT()
 	}
 }
 
-unsigned long TTFFontManager::read(FT_Stream		  stream,
-								   unsigned long   offset,
-								   unsigned char*  buffer,
-								   unsigned long   count )
+unsigned long TTFFontManager::read(FT_Stream		stream,
+								   unsigned long	offset,
+								   unsigned char*	buffer,
+								   unsigned long	count )
 {
 	DataStream* dstream = (DataStream*)stream->descriptor.pointer;
-	dstream->Seek(offset, GEM_STREAM_START);
-	return dstream->Read(buffer, count);
+	dstream->Seek((int)offset, GEM_STREAM_START);
+	return dstream->Read(buffer, (int)count);
 }
 
 void TTFFontManager::close( FT_Stream stream )
@@ -115,14 +115,61 @@ void TTFFontManager::Close()
 	close(ftStream);
 }
 
-Font* TTFFontManager::GetFont(unsigned short ptSize,
-							  FontStyle style, Palette* pal)
+Font* TTFFontManager::GetFont(unsigned short pxSize,
+							  FontStyle /*style*/, Palette* pal)
 {
 	if (!pal) {
 		pal = new Palette( ColorWhite, ColorBlack );
 		pal->CreateShadedAlphaChannel();
 	}
-	return new TTFFont(pal, face, ptSize, style);
+
+	FT_Error error = 0;
+	int lineHeight = 0;
+	/* Make sure that our font face is scalable (global metrics) */
+	if ( FT_IS_SCALABLE(face) ) {
+		FT_Fixed scale;
+		/* Set the character size and use default DPI (72) */
+		error = FT_Set_Pixel_Sizes( face, 0, pxSize );
+		if( error ) {
+			LogFTError(error);
+		} else {
+			/* Get the scalable font metrics for this font */
+			scale = face->size->metrics.y_scale;
+			int ascent = FT_CEIL(FT_MulFix(face->ascender, scale));
+			int descent = FT_CEIL(FT_MulFix(face->descender, scale));
+			lineHeight = ascent - descent;
+			//font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
+			//font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
+			//font->underline_height = FT_FLOOR(FT_MulFix(face->underline_thickness, scale));
+		}
+	} else {
+		/* Non-scalable font case.  ptsize determines which family
+		 * or series of fonts to grab from the non-scalable format.
+		 * It is not the point size of the font.
+		 * */
+		if ( pxSize >= face->num_fixed_sizes )
+			pxSize = face->num_fixed_sizes - 1;
+
+		error = FT_Set_Pixel_Sizes( face,
+								   face->available_sizes[pxSize].height,
+								   face->available_sizes[pxSize].width );
+
+		if (error) {
+			LogFTError(error);
+		}
+		/* With non-scalale fonts, Freetype2 likes to fill many of the
+		 * font metrics with the value of 0.  The size of the
+		 * non-scalable fonts must be determined differently
+		 * or sometimes cannot be determined.
+		 * */
+
+		lineHeight = face->available_sizes[pxSize].height;
+		//font->lineskip = FT_CEIL(font->ascent);
+		//font->underline_offset = FT_FLOOR(face->underline_position);
+		//font->underline_height = FT_FLOOR(face->underline_thickness);
+	}
+
+	return new TTFFont(pal, face, lineHeight, 0);
 }
 
 #include "plugindef.h"
