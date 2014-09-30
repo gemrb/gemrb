@@ -124,7 +124,7 @@ Font* TTFFontManager::GetFont(unsigned short pxSize,
 	}
 
 	FT_Error error = 0;
-	int lineHeight = 0;
+	int lineHeight = 0, baseline = 0;
 	/* Make sure that our font face is scalable (global metrics) */
 	if ( FT_IS_SCALABLE(face) ) {
 		FT_Fixed scale;
@@ -135,9 +135,9 @@ Font* TTFFontManager::GetFont(unsigned short pxSize,
 		} else {
 			/* Get the scalable font metrics for this font */
 			scale = face->size->metrics.y_scale;
-			int ascent = FT_CEIL(FT_MulFix(face->ascender, scale));
+			baseline = FT_CEIL(FT_MulFix(face->ascender, scale));
 			int descent = FT_CEIL(FT_MulFix(face->descender, scale));
-			lineHeight = ascent - descent;
+			lineHeight = baseline - descent;
 			//font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
 			//font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
 			//font->underline_height = FT_FLOOR(FT_MulFix(face->underline_thickness, scale));
@@ -169,7 +169,7 @@ Font* TTFFontManager::GetFont(unsigned short pxSize,
 		//font->underline_height = FT_FLOOR(face->underline_thickness);
 	}
 
-	return new TTFFont(pal, face, lineHeight, 0);
+	return new TTFFont(pal, face, lineHeight, baseline);
 }
 
 #include "plugindef.h"

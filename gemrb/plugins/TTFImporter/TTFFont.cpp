@@ -102,10 +102,8 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	}
 
 	FT_GlyphSlot glyph = face->glyph;
-
-	/* Get the glyph metrics if desired */
+	FT_Glyph_Metrics* metrics = &glyph->metrics;
 	/*
-	//FT_Glyph_Metrics* metrics = &glyph->metrics;
 	//int maxx, yoffset;
 	if ( FT_IS_SCALABLE( face ) ) {
 		// Get the bounding box
@@ -179,7 +177,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	// TODO: do an underline if requested
 
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, NULL, true, 0);
-	//spr->YPos = LineHeight - yoffset;
+	spr->YPos = FT_FLOOR(metrics->horiBearingY);
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
 	spr->release();
