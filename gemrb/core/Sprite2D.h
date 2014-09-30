@@ -128,8 +128,9 @@ public:
 	}
 
 	void Draw(KeyType key, const Region& dest) const {
-		assert(RegionMap.find(key) != RegionMap.end());
-		core->GetVideoDriver()->BlitSprite(Sheet, RegionMap.at(key), dest);
+		if (RegionMap.find(key) != RegionMap.end()) {
+			core->GetVideoDriver()->BlitSprite(Sheet, RegionMap.at(key), dest);
+		}
 	}
 };
 
