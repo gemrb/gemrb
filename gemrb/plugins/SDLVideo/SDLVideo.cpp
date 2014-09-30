@@ -1471,11 +1471,13 @@ void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, co
 
 void SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors)
 {
+	if (pal) {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+		SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
 #else
-	SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
+		SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
 #endif
+	}
 }
 
 void SDLVideoDriver::SetSurfacePixel(SDL_Surface* surface, short x, short y, const Color& color)
