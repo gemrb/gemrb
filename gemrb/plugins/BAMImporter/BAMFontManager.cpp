@@ -54,31 +54,28 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
 	bool isNumeric = (af->GetCycleCount() <= 1);
 
-	Sprite2D* first = NULL;
+	Sprite2D* spr = NULL;
 	if (isStateFont) {
-		// Hack to work around original data where some status icons have inverted x and y positions (ie level up icon)
+		// Hack to work around original data where the "top row icons" have inverted x and y positions (ie level up icon)
 		// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
-
 		// since state icons should all be the same size/position we can just take the position of the first one
-		// broken cycles:
-		// 254 - level up icon
-		// 153 - dialog icon
-		// 154 - store icon
-		first = af->GetFrameWithoutCycle(0);
+		static const ieWord topIconCycles[] = {254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */};
+		for (size_t i = 0; i < 3; i++) {
+			spr = af->GetFrame(0, topIconCycles[i]);
+			spr->YPos = spr->XPos;
+		}
 	}
 
 	// Cycles 0 and 1 of a BAM appear to be "magic" glyphs
-	// I think cycle 1 is for determining line height (maxHeight)
-	// this is important because iterating the initials font would give an incorrect maxHeight
+	// I think cycle 1 is for determining line height (it appears to be a cursor)
+	// this is important because iterating the initials font would give an incorrect LineHeight
 	// initials should still have 13 for the line height because they have a descent that covers
-	// multiple lines (3 in BG2). numeric and state fonts don't posess these magic glyphs,
+	// multiple lines (2 in BG2). numeric and state fonts don't posess these magic glyphs,
 	// but it is harmless to use them the same way
 	int baseLine = (isNumeric) ? 0 : af->GetFrame(0, 0)->Height;
 	int lineHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
-	if (!first)
-		first = af->GetFrameWithoutCycle(0);
-	assert(first);
 
+	spr = af->GetFrameWithoutCycle(0);
 	Font* fnt = NULL;
 	if (!pal) {
 		pal = spr->GetPalette();
@@ -87,11 +84,9 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	} else {
 		fnt = new Font(pal, lineHeight, baseLine);
 	}
-	first->release();
-
+	spr->release();
 
 	std::map<Sprite2D*, ieWord> tmp;
-	Sprite2D* spr = NULL;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
 		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
 			spr = af->GetFrame(frame, cycle);
@@ -107,7 +102,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 			if (tmp.find(spr) != tmp.end()) {
 				// opimization for when glyphs are shared between cycles
 				// just alias the existing character
-				// this is very useful for choping out huge chunks fo unused character ranges
+				// this is very useful for chopping out huge chunks of unused character ranges
 				fnt->CreateAliasForChar(tmp.at(spr), chr);
 			} else {
 				fnt->CreateGlyphForCharSprite(chr, spr);
