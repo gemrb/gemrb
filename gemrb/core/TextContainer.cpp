@@ -97,7 +97,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 	if (frame.Dimensions().IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
-		int lineheight = layoutFont->maxHeight - 1;
+		int lineheight = layoutFont->LineHeight;
 		Regions lineExclusions;
 		Region lineRgn(layoutPoint + drawOrigin, Size(rgn.w, lineheight));
 		lineRgn.y -= lineheight;
@@ -183,6 +183,10 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
+				if (layoutPoint.y != 0) {
+					// if we arent the first line, then collapse with the above line
+					lineLayout.y--;
+				}
 				layoutRegions.push_back(lineLayout);
 				lineExclusions.clear();
 			}
@@ -212,10 +216,14 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// take remainder of parent height
 				drawRegion.h = rgn.w - layoutPoint.y;
 			} else {
-				drawRegion.h = layoutFont->StringSize(text, &maxSize).h - layoutFont->descent - 1;
+				drawRegion.h = layoutFont->StringSize(text, &maxSize).h;
 			}
 		}
 		assert(drawRegion.h && drawRegion.w);
+		if (layoutPoint.y != 0) {
+			// if we arent the first line, then collapse with the above line
+			drawRegion.y--;
+		}
 		layoutRegions.push_back(drawRegion);
 	}
 	return layoutRegions;
@@ -228,7 +236,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 	for (; rit != rgns.end(); ++rit) {
 		Region drawRect = *rit;
 		drawRect.x += offset.x;
-		drawRect.y += offset.y - 2;
+		drawRect.y += offset.y;
 		const Font* printFont = font;
 		Palette* printPalette = palette;
 		TextContainer* container = dynamic_cast<TextContainer*>(parent);
@@ -239,6 +247,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 			printPalette = container->TextPalette();
 		}
 		assert(printFont && printPalette);
+		assert(charsPrinted < text.length());
 		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, IE_FONT_ALIGN_LEFT);
 #if (DEBUG_TEXT)
 		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);

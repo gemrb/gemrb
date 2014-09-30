@@ -3259,7 +3259,7 @@ void Interface::DrawTooltip ()
 	int w2 = 0;
 	int strw = fnt->StringSize( *tooltip_text ).w + 8;
 	int w = strw;
-	int h = fnt->maxHeight;
+	int h = fnt->LineHeight;
 
 	if (TooltipBack) {
 		// animate BG tooltips

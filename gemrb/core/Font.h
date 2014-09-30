@@ -55,14 +55,14 @@ class Palette;
 #define IE_FONT_SINGLE_LINE  0x40
 
 struct Glyph {
-	const Size dimensions;
-	const int descent;
+	const Size size;
+	const Point pos;
 
 	const ieWord pitch;
 	const ieByte* pixels;
 
-	Glyph(const Size& size, int descent, ieByte* pixels, ieWord pitch)
-	: dimensions(size), descent(descent), pitch(pitch), pixels(pixels) {};
+	Glyph(const Size& size, Point pos, ieByte* pixels, ieWord pitch)
+	: size(size), pos(pos), pitch(pitch), pixels(pixels) {};
 };
 
 /**
@@ -133,8 +133,8 @@ private:
 
 	Palette* palette;
 public:
-	int maxHeight;
-	int descent;
+	const int LineHeight;
+	const int Baseline;
 private:
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
@@ -144,7 +144,7 @@ private:
 					  Point& dp, ieByte** canvas = NULL) const;
 
 public:
-	Font(Palette*);
+	Font(Palette*, ieWord lineheight, ieWord baseline);
 	virtual ~Font();
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);

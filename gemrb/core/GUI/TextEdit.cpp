@@ -84,7 +84,7 @@ void TextEdit::DrawInternal(Region& rgn)
 		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
 		if (w > rgn.w) {
 			int rows = (w / rgn.w);
-			vcenter += rows * font->maxHeight;
+			vcenter += rows * font->LineHeight;
 			w = w - (rgn.w * rows);
 		}
 		video->BlitSprite(Cursor, w + rgn.x + FontPosX,

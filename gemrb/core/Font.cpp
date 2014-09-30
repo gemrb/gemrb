@@ -43,10 +43,10 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 
 	// find the origin and clip to it.
 	// only worry about origin < 0.
-	Point blitPoint = p;
-	Size srcSize = glyph.dimensions;
+	Point blitPoint = p + glyph.pos;
+	Size srcSize = glyph.size;
 	if (blitPoint.y < 0) {
-		int offset = (-blitPoint.y * glyph.dimensions.w);
+		int offset = (-blitPoint.y * glyph.size.w);
 		src += offset;
 		srcSize.h -= offset;
 		blitPoint.y = 0;
@@ -75,7 +75,8 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 {
 	assert(glyphs.find(chr) == glyphs.end());
-	if (pageXPos + g.dimensions.w > SheetRegion.w) {
+	int newX = pageXPos + g.size.w;
+	if (newX > SheetRegion.w) {
 		return false;
 	}
 	// if we already have a sheet we need to destroy it before we can add more glyphs
@@ -83,14 +84,22 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		Sheet->release();
 		Sheet = NULL;
 	}
+	int glyphH = g.size.h + g.pos.y;
+	if (glyphH > SheetRegion.h) {
+		// must grow to accommodate this glyph
+		pageData = (ieByte*)realloc(pageData, SheetRegion.w * glyphH);
+		assert(pageData);
+		SheetRegion.h = glyphH;
+	}
 
-	BlitGlyphToCanvas(g, Point(pageXPos, 0), pageData, Size(SheetRegion.w, SheetRegion.h));
-	MapSheetSegment(chr, Region(pageXPos, 0, g.dimensions.w, g.dimensions.h));
+	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
+	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, 0), pageData, Size(SheetRegion.w, SheetRegion.h));
+	MapSheetSegment(chr, Region(pageXPos, g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	ieByte* pageLoc = pageData + pageXPos;
-	glyphs.insert(std::make_pair(chr, Glyph(g.dimensions, g.descent, pageLoc, SheetRegion.w)));
+	glyphs.insert(std::make_pair(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w)));
 
-	pageXPos += g.dimensions.w;
+	pageXPos = newX;
 	return true;
 }
 
@@ -99,7 +108,7 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	if (glyphs.find(chr) != glyphs.end()) {
 		return glyphs.at(chr);
 	}
-	static Glyph blank(Size(0,0), 0, NULL, 0);
+	static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
 	return blank;
 }
 
@@ -130,8 +139,8 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 }
 
 
-Font::Font(Palette* pal)
-: palette(NULL), maxHeight(0)
+Font::Font(Palette* pal, ieWord lineheight, ieWord baseline)
+: palette(NULL), LineHeight(lineheight), Baseline(baseline)
 {
 	CurrentAtlasPage = NULL;
 	SetPalette(pal);
@@ -155,15 +164,16 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 	assert(spr);
 	
 	Size size(spr->Width, spr->Height);
-	int des = maxHeight - spr->YPos;
-	Glyph tmp = Glyph(size, des, (ieByte*)spr->pixels, spr->Width);
 	// FIXME: should we adjust for spr->XPos too?
+	Point pos(0, Baseline - spr->YPos);
+
+	Glyph tmp = Glyph(size, pos, (ieByte*)spr->pixels, spr->Width);
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
 		// page is full, make a new one
-		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, maxHeight + descent), this);
+		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, LineHeight), this);
 		Atlas.push_back(CurrentAtlasPage);
-		CurrentAtlasPage->AddGlyph(chr, tmp);
+		assert(CurrentAtlasPage->AddGlyph(chr, tmp));
 	}
 	assert(CurrentAtlasPage);
 	AtlasIndex[chr] = Atlas.size() - 1;
@@ -224,12 +234,12 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			pos -= line.length();
 			Size textSize = StringSize(string.substr(pos));
 			ieWord numNewPixels = textSize.Area();
-			ieWord lineArea = rgn.w * maxHeight;
+			ieWord lineArea = rgn.w * LineHeight;
 			// round up
 			ieWord numLines = 1 + ((numNewPixels - 1) / lineArea);
 			// extend the region and canvas both
 			size_t curpos = rgn.h * rgn.w;
-			int vGrow = (numLines * maxHeight) + descent;
+			int vGrow = (numLines * LineHeight);
 			rgn.h += vGrow;
 
 #if DEBUG_FONT
@@ -244,7 +254,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		}
 
 		dp.x = 0;
-		const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, maxHeight + descent));
+		const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
 		const Size s = lineRgn.Dimensions();
 		ieWord lineW = StringSize(line, &s).w;
 
@@ -297,7 +307,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		}
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
-		dp.y += maxHeight;
+		dp.y += LineHeight;
 
 		if (singleLine || dp.y >= rgn.h) {
 			break;
@@ -306,7 +316,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 	// free the unused canvas area (if any)
 	if (canvas) {
-		int usedh = dp.y + descent;
+		int usedh = dp.y;
 		if (usedh < rgn.h) {
 			// this is more than just saving memory
 			// vertical alignment will be off if we have extra space
@@ -318,9 +328,9 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	if (point) {
 		// deal with possible trailing newline
 		if (string[charCount - 1] == L'\n') {
-			dp.y += maxHeight;
+			dp.y += LineHeight;
 		}
-		*point = Point(dp.x, dp.y - maxHeight);
+		*point = Point(dp.x, dp.y - LineHeight);
 	}
 
 	assert(charCount <= string.length());
@@ -331,6 +341,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 						Point& dp, ieByte** canvas) const
 {
 	assert(color); // must have a palette
+	assert(lineRgn.h == LineHeight);
 
 	// NOTE: alignment is not handled here.
 	// it should have been calculated previously and passed in via the "point" parameter
@@ -343,7 +354,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of
-	int spaceW = GetGlyph(L' ').dimensions.w;
+	int spaceW = GetGlyph(L' ').size.w;
 	bool done = false;
 	while ((wordBreak = line.find_first_of(L' ', linePos))) {
 		String word = line.substr(linePos, wordBreak - linePos);
@@ -367,8 +378,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 			}
 
 			const Glyph& curGlyph = GetGlyph(currChar);
+			Point blitPoint = dp + lineRgn.Origin() + curGlyph.pos;
 			// should probably use rect intersection, but new lines shouldnt be to the left ever.
-			if (!lineRgn.PointInside(dp.x + lineRgn.x, dp.y + lineRgn.y + curGlyph.descent)) {
+			if (!lineRgn.PointInside(blitPoint)) {
 				if (wordW < lineRgn.w) {
 					// this probably doest cover every situation 100%
 					// we consider printing done if the blitter is outside the region
@@ -382,10 +394,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 				}
 				break; // either done, or skipping
 			}
-			Point blitPoint(dp.x + lineRgn.x, dp.y + lineRgn.y + curGlyph.descent);
+
 			if (canvas) {
-				blitPoint.y -= lineRgn.y;
-				BlitGlyphToCanvas(curGlyph, blitPoint, (*canvas) + (lineRgn.y * lineRgn.w), lineRgn.Dimensions());
+				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.Dimensions());
 			} else {
 				assert(AtlasIndex.find(currChar) != AtlasIndex.end());
 
@@ -393,9 +404,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 				assert(pageIdx < AtlasIndex.size());
 
 				GlyphAtlasPage* page = Atlas[pageIdx];
-				page->Draw(currChar, Region(blitPoint, curGlyph.dimensions), color);
+				page->Draw(currChar, Region(blitPoint, curGlyph.size), color);
 			}
-			dp.x += curGlyph.dimensions.w;
+			dp.x += curGlyph.size.w;
 		}
 		if (done) break;
 		linePos += i + 1;
@@ -423,12 +434,12 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 				// we need to resize horizontally which creates new lines
 				ieWord trimmedArea = ((canvasSize.w - size.w) * canvasSize.h);
 				// this automatically becomes multiline, therefore use maxHeight
-				ieWord lineArea = size.w * maxHeight;
+				ieWord lineArea = size.w * LineHeight;
 				// round up
 				ieWord numLines = 1 + ((trimmedArea - 1) / lineArea);
 				if (!size.h) {
 					// grow as much as needed vertically.
-					canvasSize.h += (numLines * maxHeight) + descent;
+					canvasSize.h += (numLines * LineHeight);
 					// there is a chance we didn't grow enough vertically...
 					// we can't possibly know how lines will break ahead of time,
 					// over a long enough paragraph we can overflow the canvas
@@ -437,11 +448,11 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 				} else if (size.h > canvasSize.h) {
 					// grow by line increments until we hit the limit
 					// round up, because even a partial line should be blitted (and clipped)
-					ieWord maxLines = 1 + (((size.h - canvasSize.h) - 1) / maxHeight);
+					ieWord maxLines = 1 + (((size.h - canvasSize.h) - 1) / LineHeight);
 					if (maxLines < numLines) {
 						numLines = maxLines;
 					}
-					canvasSize.h += (numLines * maxHeight) + descent;
+					canvasSize.h += (numLines * LineHeight);
 					// if the new canvas size is taller than size.h it will be dealt with later
 				}
 			}
@@ -452,18 +463,15 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 		}
 		// else: we already fit in the designated area (horizontally). No need to resize.
 	}
-	if (!(alignment&IE_FONT_SINGLE_LINE)) {
-		if (canvasSize.h < maxHeight) {
-			// should be at least maxHeight (+ decender added later then trimmed if too large for size)
-			canvasSize.h = maxHeight;
-		}
-		canvasSize.h += descent; // compensate for last line descenders
+	if (canvasSize.h < LineHeight) {
+		// should be at least maxHeight
+		canvasSize.h = LineHeight;
 	}
 	if (size.h && size.h < canvasSize.h) {
 		// we can't unbreak lines ("\n") so at best we can clip the text.
 		canvasSize.h = size.h;
 	}
-	assert(size.h || canvasSize.h >= maxHeight + descent);
+	assert(size.h || canvasSize.h >= LineHeight);
 
 	// we must calloc because not all glyphs are equal height. set remainder to the color key
 	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
@@ -516,23 +524,19 @@ size_t Font::Print(Region rgn, const String& string,
 		Size stringSize;
 		if (alignment&IE_FONT_SINGLE_LINE) {
 			// we can optimize single lines without StringSize()
-			stringSize.h = maxHeight;
-			if (alignment&IE_FONT_ALIGN_MIDDLE) {
-				// FIXME: should this be something that IE_FONT_ALIGN_BOTTOM subtracts instead (for more than IE_FONT_SINGLE_LINE)?
-				stringSize.h += descent;
-			}
+			stringSize.h = LineHeight;
 		} else {
 			stringSize = rgn.Dimensions();
 			stringSize = StringSize(string, &stringSize);
 		}
-		if (alignment&IE_FONT_ALIGN_MIDDLE) {
-			p.y += (rgn.h - stringSize.h) / 2;
-		} else { // bottom alignment
-			p.y += rgn.h - stringSize.h;
+		if (stringSize.h < rgn.h) {
+			// if the rgn is smaller dont even bother (there are actually a few labels this affects)
+			if (alignment&IE_FONT_ALIGN_MIDDLE) {
+				p.y += (rgn.h - stringSize.h) / 2;
+			} else { // bottom alignment
+				p.y += rgn.h - stringSize.h;
+			}
 		}
-	} else if (alignment&IE_FONT_SINGLE_LINE) {
-		// FIXME: I dont remember why this is needed (it is tho... for now)
-		p.y -= descent;
 	}
 
 	size_t ret = RenderText(string, rgn, pal, alignment, &p);
@@ -548,7 +552,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0;
-	int spaceW = GetGlyph(L' ').dimensions.w;
+	int spaceW = GetGlyph(L' ').size.w;
 	bool newline = false, eos = false, ws = false;
 	size_t i = 0, wordCharCount = 0;
 	for (; i < string.length(); i++) {
@@ -556,7 +560,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 		ws = std::isspace(string[i]);
 		if (!ws) {
 			const Glyph& curGlyph = GetGlyph(string[i]);
-			wordW += curGlyph.dimensions.w;
+			wordW += curGlyph.size.w;
 			if (i > 0) { // kerning
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
@@ -583,7 +587,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 
 		if (newline || eos) {
 			w = (lineW > w) ? lineW : w;
-			if (stop && stop->h && (maxHeight * (lines + 1)) + descent >= stop->h ) {
+			if (stop && stop->h && (LineHeight * (lines + 1)) >= stop->h ) {
 				// adjust i for numChars
 				if (wordCharCount) {
 					i -= wordCharCount + 1; // +1 for the space
@@ -602,7 +606,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 	}
 
 	// this can only return w > stop->w if there is a singe word wider than stop.
-	return Size(w, (maxHeight * lines) + descent);
+	return Size(w, (LineHeight * lines));
 }
 
 Palette* Font::GetPalette() const

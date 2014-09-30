@@ -51,7 +51,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps != ftext) ? caps : ftext;
 
-	if (finit->descent <= ftext->descent) {
+	if (finit->Baseline < ftext->LineHeight) {
 		// FIXME: initcolor is only used for *some* initial fonts
 		// this is a hack to workaround the INITIALS font getting its palette set
 		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
@@ -156,7 +156,7 @@ void TextArea::UpdateScrollbar()
 		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
 		// add the height of a newline too so that there is a space
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
-		if (nodeBounds.h + ftext->maxHeight < Height) {
+		if (nodeBounds.h + ftext->LineHeight < Height) {
 			// if the node isnt a full page by itself we need to fake it
 			textHeight += Height - nodeBounds.h - (textHeight - nodeBounds.y);
 		}
@@ -223,7 +223,7 @@ void TextArea::AppendText(const char* text)
 void TextArea::AppendText(const String& text)
 {
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
-		int heightLimit = (ftext->maxHeight * 100) + ftext->descent; // 100 lines of content
+		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
 		// start trimming content from the top until we are under the limit.
 		Size frame = textContainer->ContentFrame();
 		int currHeight = frame.h;
@@ -358,8 +358,8 @@ void TextArea::AppendText(const String& text)
 				// we must create and append this span here (instead of using AppendText),
 				// because the original data files for the DC font specifies a line height of 13
 				// that would cause overlap when the lines wrap beneath the DC if we didnt specify the correct size
-				Size s = finit->GetGlyph(text[textpos]).dimensions;
-				if (s.h > ftext->maxHeight) {
+				Size s = finit->GetGlyph(text[textpos]).size;
+				if (s.h > ftext->LineHeight) {
 					// pad this only if it is "real" (it is higher than the other text).
 					// some text areas have a "cap" font assigned in the CHU that differs from ftext, but isnt meant to be a cap
 					// see BG2 chargen
@@ -492,7 +492,7 @@ bool TextArea::OnSpecialKeyPress(unsigned char Key)
 
 int TextArea::GetRowHeight() const
 {
-	return ftext->maxHeight;
+	return ftext->LineHeight;
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
@@ -500,7 +500,7 @@ void TextArea::ScrollToY(int y, Control* sender)
 {
 	if (sb && sender != sb) {
 		// we must "scale" the pixels
-		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep() / (double)ftext->maxHeight));
+		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep() / (double)ftext->LineHeight));
 		// sb->SetPosForY will recall this method so we dont need to do more... yet.
 	} else if (sb) {
 		// our scrollbar has set position for us
@@ -509,7 +509,7 @@ void TextArea::ScrollToY(int y, Control* sender)
 	} else {
 		// no scrollbar. need to call SetRow myself.
 		// SetRow will set TextYPos.
-		SetRow( y / ftext->maxHeight );
+		SetRow( y / ftext->LineHeight );
 	}
 }
 
@@ -756,7 +756,7 @@ void TextArea::ClearText()
 void TextArea::SetupScroll()
 {
 	// ticks is the number of ticks it takes to scroll this font 1 px
-	ticks = 2400 / ftext->maxHeight;
+	ticks = 2400 / ftext->LineHeight;
 	ClearText();
 	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;

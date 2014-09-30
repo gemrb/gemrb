@@ -73,43 +73,22 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	// initials should still have 13 for the line height because they have a descent that covers
 	// multiple lines (3 in BG2). numeric and state fonts don't posess these magic glyphs,
 	// but it is harmless to use them the same way
-	int maxHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
-	int descent = 0;
-
-	Sprite2D* curGlyph = NULL;
-	for (size_t i = 0; i < af->GetFrameCount(); i++) {
-		curGlyph = af->GetFrameWithoutCycle(i);
-		if (curGlyph) {
-			if (first)
-				curGlyph->YPos = first->YPos;
-			else if (af->GetCycleCount() <= 1) // numeric font
-				curGlyph->YPos = curGlyph->Height; // numeric fonts have no descent
-			curGlyph->XPos = 0;
-
-			if (!isNumeric) {
-				int curDescent = curGlyph->Height - curGlyph->YPos;
-				descent = (curDescent > descent) ? curDescent : descent;
-			}
-
-			curGlyph->release();
-		}
-	}
+	int baseLine = (isNumeric) ? 0 : af->GetFrame(0, 0)->Height;
+	int lineHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
 	if (!first)
 		first = af->GetFrameWithoutCycle(0);
 	assert(first);
 
 	Font* fnt = NULL;
 	if (!pal) {
-		pal = first->GetPalette();
-		fnt = new Font(pal);
+		pal = spr->GetPalette();
+		fnt = new Font(pal, lineHeight, baseLine);
 		pal->release();
 	} else {
-		fnt = new Font(pal);
+		fnt = new Font(pal, lineHeight, baseLine);
 	}
 	first->release();
 
-	fnt->maxHeight = maxHeight;
-	fnt->descent = descent;
 
 	std::map<Sprite2D*, ieWord> tmp;
 	Sprite2D* spr = NULL;
