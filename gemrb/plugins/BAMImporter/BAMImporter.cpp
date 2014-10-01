@@ -227,15 +227,15 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 
 ieWord * BAMImporter::CacheFLT(unsigned int &count)
 {
-	int i;
-
 	count = 0;
-	for (i = 0; i < CyclesCount; i++) {
+	for (int i = 0; i < CyclesCount; i++) {
 		unsigned int tmp = cycles[i].FirstFrame + cycles[i].FramesCount;
 		if (tmp > count) {
 			count = tmp;
 		}
 	}
+	if (count == 0) return NULL;
+
 	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read( FLT, count * sizeof(ieWord) );

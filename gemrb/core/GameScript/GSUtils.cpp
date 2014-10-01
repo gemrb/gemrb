@@ -441,13 +441,13 @@ static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieR
 
 void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 {
-	char Sound[_MAX_PATH];
-	ieResRef soundRef;
-
 	//no one hears you when you are in the Limbo!
 	if (!Sender->GetCurrentArea()) {
 		return;
 	}
+
+	char Sound[_MAX_PATH] = "";
+	ieResRef soundRef = {};
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
