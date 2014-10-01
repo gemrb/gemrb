@@ -529,13 +529,13 @@ size_t Font::Print(Region rgn, const String& string,
 			stringSize = rgn.Dimensions();
 			stringSize = StringSize(string, &stringSize);
 		}
-		if (stringSize.h < rgn.h) {
-			// if the rgn is smaller dont even bother (there are actually a few labels this affects)
-			if (alignment&IE_FONT_ALIGN_MIDDLE) {
-				p.y += (rgn.h - stringSize.h) / 2;
-			} else { // bottom alignment
-				p.y += rgn.h - stringSize.h;
-			}
+
+		// important: we must do this adjustment even if it leads to -p.y!
+		// some labels depend on this behavior :/
+		if (alignment&IE_FONT_ALIGN_MIDDLE) {
+			p.y += (rgn.h - stringSize.h) / 2;
+		} else { // bottom alignment
+			p.y += rgn.h - stringSize.h;
 		}
 	}
 
