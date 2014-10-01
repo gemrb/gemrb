@@ -29,7 +29,6 @@
 #include "GUI/Window.h"
 
 #define EDGE_PADDING 3
-#define WHITESPACE_STRING L"\n\t\r "
 
 namespace GemRB {
 

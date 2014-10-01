@@ -142,6 +142,12 @@ void StringToUpper(String& string)
 	}
 }
 
+void TrimString(String& string)
+{
+	string.erase(0, string.find_first_not_of(WHITESPACE_STRING));
+	string.erase(string.find_last_not_of(WHITESPACE_STRING) + 1);
+}
+
 // these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 {

@@ -151,6 +151,7 @@ int Control::SetTooltip(const char* string)
 		Tooltip = NULL;
 	} else {
 		Tooltip = StringFromCString(string);
+		TrimString(*Tooltip); // for proper vertical alaignment
 	}
 	Changed = true;
 	return 0;

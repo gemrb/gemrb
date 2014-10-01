@@ -34,6 +34,8 @@
 # define strnicmp strncasecmp
 #endif
 
+#define WHITESPACE_STRING L"\n\t\r "
+
 namespace GemRB {
 
 //typedef std::basic_string<ieWord> String;
@@ -45,6 +47,7 @@ GEM_EXPORT char* MBCStringFromString(const String& string);
 // String manipulators
 GEM_EXPORT void StringToLower(String& string);
 GEM_EXPORT void StringToUpper(String& string);
+GEM_EXPORT void TrimString(String& string);
 
 /* this function will work with pl/cz special characters */
 
