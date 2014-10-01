@@ -163,8 +163,12 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					newline = true;
 				} else {
 					Size printMax = lineSegment.Dimensions();
-					Size printSize = layoutFont->StringSize(text.substr(numPrinted, nextLine), &printMax, &numOnLine);
-					if (printMax.w == lineRgn.w && numPrinted + numOnLine < text.length()) {
+					size_t subLen = nextLine;
+					if (nextLine != String::npos) {
+						subLen = nextLine - numPrinted + 1; // +1 for the \n
+					}
+					Size printSize = layoutFont->StringSize(text.substr(numPrinted, subLen), &printMax, &numOnLine);
+					if (subLen != String::npos || (printMax.w == lineRgn.w && numPrinted + numOnLine < text.length())) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
 						newline = true;
