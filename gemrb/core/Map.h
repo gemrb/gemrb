@@ -142,11 +142,22 @@ struct Entrance {
 class MapNote {
 public:
 	ieStrRef strref;
-	Point Pos;
 	ieWord color;
 	char *text;
-	MapNote() { text=NULL; strref=0; Pos.empty(); color=0; }
-	~MapNote() { if(text) free(text); }
+	Point Pos;
+
+	MapNote& operator=( const MapNote& mn ) {
+		strref = mn.strref;
+		color = mn.color;
+		text = strdup(mn.text);
+		Pos = mn.Pos;
+		return *this;
+	}
+	MapNote( const MapNote& mn )
+	: strref(mn.strref), color(mn.color), text(strdup(mn.text)) {}
+	MapNote(char* text, ieStrRef ref, ieWord color)
+	: strref(ref), color(color), text(text) {}
+	~MapNote() { free((char*)text); }
 };
 
 class Spawn {
