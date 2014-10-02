@@ -719,9 +719,9 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 
 	UpdateScrollbar();
-	// now scroll dialogBeginNode to the top (minus newline)
-	int newYPos = textContainer->BoundingBoxForContent(dialogBeginNode).y - ftext->LineHeight;
-	ScrollToY(newYPos);
+	// now scroll dialogBeginNode to the top
+	ScrollBar* bar = (ScrollBar*)sb;
+	bar->SetPos(bar->Value); // scroll to the bottom
 }
 
 void TextArea::ClearText()
