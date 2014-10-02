@@ -156,7 +156,8 @@ void TextArea::UpdateScrollbar()
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 		if (nodeBounds.h + ftext->LineHeight < Height) {
 			// if the node isnt a full page by itself we need to fake it
-			textHeight += Height - nodeBounds.h - (textHeight - nodeBounds.y);
+			// so page height (Height) minus what already exists (the blank line + the node + another blank line + select options)
+			textHeight += Height - (nodeBounds.h + (ftext->LineHeight * 3) + selectOptions->ContentFrame().h);
 		}
 	}
 	int rowHeight = GetRowHeight();
@@ -718,8 +719,8 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 
 	UpdateScrollbar();
-	// now scroll dialogBeginNode to the top
-	int newYPos = textContainer->BoundingBoxForContent(dialogBeginNode).y;
+	// now scroll dialogBeginNode to the top (minus newline)
+	int newYPos = textContainer->BoundingBoxForContent(dialogBeginNode).y - ftext->LineHeight;
 	ScrollToY(newYPos);
 }
 
