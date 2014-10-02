@@ -94,6 +94,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 		layoutFont = container->TextFont();
 	}
 	assert(layoutFont);
+
 	if (frame.Dimensions().IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
@@ -103,6 +104,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 		lineRgn.y -= lineheight;
 		Region lineSegment;
 
+#define LINE_REMAINDER lineRgn.w - lineSegment.x;
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
 		bool newline = true;
@@ -144,6 +146,9 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 					// its possible that the resulting segment is 0 in width
 					if (lineSegment.w <= 0) {
+						lineSegment.x = intersect.x + intersect.w;
+						lineSegment.w = LINE_REMAINDER;
+						lineExclusions.push_back(lineSegment);
 						newline = true;
 						goto newline;
 					}
@@ -158,7 +163,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				if (nextLine == numPrinted) {
 					// this is a new line, we dont have to actually size that
 					// simply occupy the entire area and advance.
-					lineSegment.w = lineRgn.w;
+					lineSegment.w = LINE_REMAINDER;
 					numOnLine = 1;
 					newline = true;
 				} else {
@@ -172,7 +177,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
 						newline = true;
-						lineSegment.w = lineRgn.w;
+						lineSegment.w = LINE_REMAINDER;
 					} else {
 						lineSegment.w = printSize.w;
 					}
@@ -196,6 +201,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 			}
 			// FIXME: infinite loop possibility.
 		} while (numPrinted < text.length());
+#undef LINE_REMAINDER
 		assert(numPrinted == text.length());
 	} else {
 		// we are limited to drawing within our frame :(
@@ -252,6 +258,9 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		}
 		assert(printFont && printPalette);
 		assert(charsPrinted < text.length());
+#if (DEBUG_TEXT)
+		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
+#endif
 		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, IE_FONT_ALIGN_LEFT);
 #if (DEBUG_TEXT)
 		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
