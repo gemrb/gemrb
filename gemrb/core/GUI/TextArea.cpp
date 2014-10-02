@@ -33,7 +33,7 @@
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
+	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
 {
 	palette = text->GetPalette();
 	finit = ftext;
@@ -42,7 +42,7 @@ TextArea::TextArea(const Region& frame, Font* text)
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 				   Color textcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), contentWrapper(frame.Dimensions()), ftext(text), palettes()
+	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
 {
 	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
 	palette = palettes[PALETTE_NORMAL];
@@ -149,9 +149,8 @@ void TextArea::UpdateScrollbar()
 {
 	if (sb == NULL) return;
 
-	int textHeight = textContainer->ContentFrame().h;
+	int textHeight = contentWrapper.ContentFrame().h;
 	if (dialogBeginNode) {
-		textHeight += selectOptions->ContentFrame().h;
 		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
 		// add the height of a newline too so that there is a space
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
