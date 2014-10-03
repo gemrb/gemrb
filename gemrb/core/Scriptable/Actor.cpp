@@ -6516,15 +6516,18 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	// log the roll
-	// FIXME: Im sure there are string constants we should be using!
-	// FEXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
-	wchar_t* rollLog = (wchar_t*)malloc(40 * sizeof(wchar_t));
-	const wchar_t* fmt = L"Attack Roll %d %ls %d = %d : %ls";
-	swprintf( rollLog, 40, fmt, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, (success) ? L"Hit" : L"Miss" );
-	displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
-	free(rollLog);
-
+	ieDword log = 0;
+	core->GetDictionary()->Lookup("Rolls", log);
+	if (log) {
+		// log the roll
+		// FIXME: Im sure there are string constants we should be using!
+		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
+		wchar_t* rollLog = (wchar_t*)malloc(40 * sizeof(wchar_t));//Rolls
+		const wchar_t* fmt = L"Attack Roll %d %ls %d = %d : %ls";
+		swprintf( rollLog, 40, fmt, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, (success) ? L"Hit" : L"Miss" );
+		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
+		free(rollLog);
+	}
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
