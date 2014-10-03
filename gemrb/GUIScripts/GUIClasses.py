@@ -135,7 +135,6 @@ class GControl:
 class GLabel(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetAlignment': _GemRB.Label_SetAlignment,
     'SetFont': _GemRB.Label_SetFont,
     'SetTextColor': _GemRB.Label_SetTextColor,
     'SetUseRGB': _GemRB.Label_SetUseRGB

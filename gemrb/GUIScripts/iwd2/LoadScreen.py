@@ -55,7 +55,6 @@ def StartLoadScreen ():
 	HintStr = Table.GetValue (tmp, 0)
 	
 	Label = LoadScreen.GetControl (2)
-	Label.SetAlignment(IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE)
 	Label.SetText(HintStr)
 		
 	Picture = LoadScreen.GetControl (4)
