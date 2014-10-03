@@ -29,7 +29,7 @@ const TypeID Sprite2D::ID = { "Sprite2D" };
 Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
 	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
 {
-	freePixels = (bool)(pixels);
+	freePixels = (pixels != NULL);
 	BAM = false;
 	RLE = false;
 	XPos = 0;

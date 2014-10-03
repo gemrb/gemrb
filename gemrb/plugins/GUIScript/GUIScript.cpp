@@ -2409,7 +2409,6 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		int thisarea = wmap->GetEntryCount();
 		wmap->AddAreaEntry(entry);
 		for (unsigned int j=0;j<total;j++) {
-			WMPAreaLink *link = new WMPAreaLink();
 			const char *larea = newlinks->QueryField(j,0);
 			int lflags        = atoi(newlinks->QueryField(j,1));
 			const char *ename = newlinks->QueryField(j,2);
@@ -2426,6 +2425,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				//blabla
 				return RuntimeError("cannot establish area link!");
 			}
+			WMPAreaLink *link = new WMPAreaLink();
 			strnuprcpy(link->DestEntryPoint, ename, 32);
 			link->DistanceScale = distance;
 			link->DirectionFlags = lflags;

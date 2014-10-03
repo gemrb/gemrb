@@ -520,7 +520,7 @@ empty:
 	str->ReadWord( &type );
 	ieResRef soundRef;
 	str->ReadResRef( soundRef );
-	return StringBlock(*GetString( strref, flags ), soundRef);
+	return StringBlock(GetString( strref, flags ), soundRef);
 }
 
 #include "plugindef.h"

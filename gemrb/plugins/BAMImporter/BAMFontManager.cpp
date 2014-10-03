@@ -70,8 +70,21 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	// initials should still have 13 for the line height because they have a descent that covers
 	// multiple lines (2 in BG2). numeric and state fonts don't posess these magic glyphs,
 	// but it is harmless to use them the same way
-	ieWord baseLine = (isNumeric) ? 0 : af->GetFrame(0, 0)->Height;
-	ieWord lineHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
+	ieWord baseLine = 0;
+	ieWord lineHeight = 0;
+	if (isNumeric) {
+		spr = af->GetFrame(0);
+		baseLine = 0;
+		lineHeight = spr->Height;
+		spr->release();
+	} else {
+		spr = af->GetFrame(0, 0);
+		baseLine = spr->Height;
+		spr->release();
+		spr = af->GetFrame(0, 1);
+		lineHeight = spr->Height;
+		spr->release();
+	}
 
 	spr = af->GetFrameWithoutCycle(0);
 	Font* fnt = NULL;

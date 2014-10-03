@@ -485,18 +485,18 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	if ((Strref != -1) && !soundRef[0]) {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
 		memcpy(Sound, sb.Sound, sizeof(ieResRef) );
-		if (sb.text.length()) {
+		if (sb.text->length()) {
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
 				//and for that, we have to know how long the text takes
 				if(flags&DS_NONAME) {
-					displaymsg->DisplayMarkupString( sb.text );
+					displaymsg->DisplayMarkupString( *sb.text );
 				} else {
 					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {
-				Sender->SetOverheadText( sb.text );
+				Sender->SetOverheadText( *sb.text );
 				//don't free sb.text, it is residing in Sender
 				if (flags & DS_AREA) {
 					Sender->FixHeadTextPos();
