@@ -317,10 +317,7 @@ private:
 	std::string VideoDriverName;
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
-	Image * pal256;
-	Image * pal32;
-	Image * pal16;
-	std::map<IeResRef, Font*> fonts;
+
 	EventMgr * evntmgr;
 	Holder<WindowMgr> windowmgr;
 	Window* ModalWindow;
@@ -344,23 +341,29 @@ private:
 	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures[(GF_COUNT+31)/32];
-	ieResRef CursorBam;
-	ieResRef ScrollCursorBam;
+	IeResRef CursorBam;
+	IeResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
 
+	std::map<IeResRef, Font*> fonts;
 	IeResRef ButtonFontResRef;
 	IeResRef MovieFontResRef;
 	IeResRef TextFontResRef;
 	IeResRef TooltipFontResRef;
 
-	ieResRef TooltipBackResRef;
+	IeResRef TooltipBackResRef;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
 	int TooltipMargin;
-	ieResRef Palette16;
-	ieResRef Palette32;
-	ieResRef Palette256;
+
+	Image * pal256;
+	Image * pal32;
+	Image * pal16;
+	IeResRef Palette16;
+	IeResRef Palette32;
+	IeResRef Palette256;
+
 	ieDword* slotmatrix; //itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	SlotType* slottypes;

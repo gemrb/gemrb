@@ -42,12 +42,23 @@ struct IeResRef {
 private:
 	char ref[9];
 public:
+	IeResRef() {
+		memset(ref, 0, sizeof(ref));
+	}
+
 	IeResRef(const char* str) {
-		strncpy(ref, str, sizeof(ref)-1 );
-		ref[sizeof(ref)-1] = '\0';
+		operator=(str);
 	};
 
 	const char* CString() const { return ref; }
+	operator const char*() const {
+		return (ref[0] == '\0') ? NULL : ref;
+	}
+
+	void operator=(const char* str) {
+		strncpy(ref, str, sizeof(ref)-1 );
+		ref[sizeof(ref)-1] = '\0';
+	}
 
 	bool operator<(const IeResRef& rhs) const {
 		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;

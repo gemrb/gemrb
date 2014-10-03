@@ -30,17 +30,15 @@ BAMFontManager::~BAMFontManager(void)
 }
 
 BAMFontManager::BAMFontManager(void)
+	: resRef("")
 {
 	isStateFont = false;
 	bamImp = new BAMImporter();
-	memset(resRef, 0, sizeof(ieResRef));
 }
 
 bool BAMFontManager::Open(DataStream* stream)
 {
-	ieWord len = strlench(stream->filename, '.');
-	len = (len <= sizeof(ieResRef)-1) ? len : sizeof(ieResRef)-1;
-	strncpy(resRef, stream->filename, len);
+	resRef = stream->filename;
 	// compare only first 6 chars so we can match states2 or others
 	if (strnicmp(resRef, "STATES", 6) == 0) {
 		isStateFont = true;

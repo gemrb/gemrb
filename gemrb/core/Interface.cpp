@@ -122,8 +122,7 @@ static ieWord IDT_SKILLPENALTY = 3;
 static int MagicBit = 0;
 
 Interface::Interface()
-	: ButtonFontResRef("STONESML"), MovieFontResRef("STONESML"), TextFontResRef("FLOATTXT"), TooltipFontResRef("STONESML"),
-	TLKEncoding()
+	: TLKEncoding()
 {
 	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 
@@ -225,14 +224,10 @@ Interface::Interface()
 
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 
-	CopyResRef( ScrollCursorBam, "CURSARW" );
 	CopyResRef( GlobalScript, "BALDUR" );
 	CopyResRef( WorldMapName[0], "WORLDMAP" );
 	CopyResRef( WorldMapName[1], "" );
-	CopyResRef( Palette16, "MPALETTE" );
-	CopyResRef( Palette32, "PAL32" );
-	CopyResRef( Palette256, "MPAL256" );
-	strcpy( TooltipBackResRef, "\0" );
+
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		CopyResRef(GroundCircleBam[size], "");
 		GroundCircleScale[size] = 0;
@@ -2369,31 +2364,23 @@ bool Interface::LoadGemRBINI()
 	ini->Open(inifile);
 
 	const char *s;
-
 	// Resrefs are already initialized in Interface::Interface()
-	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
-	if (s)
-		strnlwrcpy( CursorBam, s, 8 ); //console cursor
+#define ASSIGN_RESREF(resref, name) \
+	s = ini->GetKeyAsString( "resources", name, NULL ); \
+	resref = s; s = NULL;
 
-	s = ini->GetKeyAsString( "resources", "ScrollCursorBAM", NULL );
-	if (s)
-		strnlwrcpy( ScrollCursorBam, s, 8 );
+	ASSIGN_RESREF(CursorBam, "CursorBAM"); //console cursor
+	ASSIGN_RESREF(ScrollCursorBam, "ScrollCursorBAM");
+	ASSIGN_RESREF(ButtonFontResRef, "ButtonFont");
+	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
+	ASSIGN_RESREF(MovieFontResRef, "MovieFont");
+	ASSIGN_RESREF(TooltipBackResRef, "TooltipBack");
+	ASSIGN_RESREF(Palette16, "Palette16");
+	ASSIGN_RESREF(Palette32, "Palette32");
+	ASSIGN_RESREF(Palette256, "Palette256");
 
-	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
-	if (s)
-		ButtonFontResRef = s;
-
-	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
-	if (s)
-		TooltipFontResRef = s;
-
-	s = ini->GetKeyAsString( "resources", "MovieFont", NULL );
-	if (s)
-		MovieFontResRef = s;
-
-	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
-	if (s)
-		strnlwrcpy( TooltipBackResRef, s, 8 );
+#undef ASSIGN_RESREF
+	TextFontResRef = "FLOATTXT";
 
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));
@@ -2421,18 +2408,6 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strcpy( INIConfig, s );
-
-	s = ini->GetKeyAsString( "resources", "Palette16", NULL );
-	if (s)
-		strcpy( Palette16, s );
-
-	s = ini->GetKeyAsString( "resources", "Palette32", NULL );
-	if (s)
-		strcpy( Palette32, s );
-
-	s = ini->GetKeyAsString( "resources", "Palette256", NULL );
-	if (s)
-		strcpy( Palette256, s );
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
