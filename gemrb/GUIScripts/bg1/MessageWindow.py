@@ -65,16 +65,6 @@ def OnLoad():
 
 	UpdateControlStatus()
 
-def ScrollUp ():
-	TMessageWindow = GemRB.GetVar("MessageWindow")
-	TMessageTA = GUIClasses.GTextArea(TMessageWindow,GemRB.GetVar("MessageTextArea"))
-	TMessageTA.Scroll(-1)
-
-def ScrollDown ():
-	TMessageWindow = GemRB.GetVar("MessageWindow")
-	TMessageTA = GUIClasses.GTextArea(TMessageWindow,GemRB.GetVar("MessageTextArea"))
-	TMessageTA.Scroll(1)
-
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton, TMessageTA
 
@@ -110,12 +100,11 @@ def UpdateControlStatus():
 		TMessageTA = TMessageWindow.GetControl(3)		
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
-		#up button (instead of scrollbar)
-		Button = TMessageWindow.GetControl(0)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ScrollUp)
-		#down button (instead of scrollbar)
-		Button = TMessageWindow.GetControl(1)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ScrollDown)
+		# replace the up/down buttons with a scrollbar
+		TMessageWindow.DeleteControl(0);
+		TMessageWindow.DeleteControl(1);
+		ScrollBar = TMessageWindow.CreateScrollBar (1000, 467,10, 11,29)
+		ScrollBar.SetDefaultScrollBar()
 
 	hideflag = GemRB.HideGUI()
 	MessageWindow = GemRB.GetVar("MessageWindow")
