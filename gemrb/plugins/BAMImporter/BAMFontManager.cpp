@@ -30,7 +30,6 @@ BAMFontManager::~BAMFontManager(void)
 }
 
 BAMFontManager::BAMFontManager(void)
-	: resRef("")
 {
 	isStateFont = false;
 	bamImp = new BAMImporter();
@@ -61,6 +60,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		for (size_t i = 0; i < 3; i++) {
 			spr = af->GetFrame(0, topIconCycles[i]);
 			spr->YPos = spr->XPos;
+			spr->release();
 		}
 	}
 
@@ -70,8 +70,8 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	// initials should still have 13 for the line height because they have a descent that covers
 	// multiple lines (2 in BG2). numeric and state fonts don't posess these magic glyphs,
 	// but it is harmless to use them the same way
-	int baseLine = (isNumeric) ? 0 : af->GetFrame(0, 0)->Height;
-	int lineHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
+	ieWord baseLine = (isNumeric) ? 0 : af->GetFrame(0, 0)->Height;
+	ieWord lineHeight = (isNumeric) ? af->GetFrame(0)->Height : af->GetFrame(0, 1)->Height;
 
 	spr = af->GetFrameWithoutCycle(0);
 	Font* fnt = NULL;

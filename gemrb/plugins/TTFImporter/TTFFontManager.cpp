@@ -124,7 +124,7 @@ Font* TTFFontManager::GetFont(unsigned short pxSize,
 	}
 
 	FT_Error error = 0;
-	int lineHeight = 0, baseline = 0;
+	ieWord lineHeight = 0, baseline = 0;
 	/* Make sure that our font face is scalable (global metrics) */
 	if ( FT_IS_SCALABLE(face) ) {
 		FT_Fixed scale;

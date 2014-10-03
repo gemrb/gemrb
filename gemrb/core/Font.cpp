@@ -81,8 +81,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	}
 	// if we already have a sheet we need to destroy it before we can add more glyphs
 	if (Sheet) {
-		Sheet->release();
-		Sheet = NULL;
+		Sprite2D::FreeSprite(Sheet);
 	}
 	int glyphH = g.size.h + g.pos.y;
 	if (glyphH > SheetRegion.h) {
