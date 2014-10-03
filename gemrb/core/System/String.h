@@ -57,10 +57,6 @@ extern unsigned char pl_lowercase[256];
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
-/** Convert string to uppercase in-place using selected IE encoding */
-GEM_EXPORT char* strtoupper(char* string);
-/** Convert string to uppercase in-place using selected IE encoding */
-GEM_EXPORT char* strtolower(char* string);
 GEM_EXPORT int strlench(const char* string, char ch);
 
 }
@@ -68,15 +64,11 @@ GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNLEN
 GEM_EXPORT int strnlen(const char* string, int maxlen);
 #endif
-#ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, size_t l);
-#endif
 #ifndef HAVE_STRLCPY
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 #endif
 
 #ifndef WIN32
-GEM_EXPORT char* strupr(char* string);
 GEM_EXPORT char* strlwr(char* string);
 #endif
 

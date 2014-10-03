@@ -194,28 +194,6 @@ void strnspccpy(char* dest, const char *source, int count, bool upper)
 	}
 }
 
-/** Convert string to uppercase in-place using selected IE encoding */
-char* strtoupper(char* string)
-{
-	char* s;
-	if (string) {
-		for (s = string; *s; ++s)
-			*s = pl_uppercase[(unsigned char)*s];
-	}
-	return string;
-}
-
-/** Convert string to lowercase in-place using selected IE encoding */
-char* strtolower(char* string)
-{
-	char* s;
-	if (string) {
-		for (s = string; *s; ++s)
-			*s = pl_lowercase[(unsigned char)*s];
-	}
-	return string;
-}
-
 /** Returns the length of string (up to a delimiter) */
 GEM_EXPORT int strlench(const char* string, char ch)
 {
@@ -244,19 +222,6 @@ int strnlen(const char* string, int maxlen)
 #endif // ! HAVE_STRNLEN
 
 //// Compatibility functions
-#ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, size_t l)
-{
-	size_t len = strlen( s );
-	if (len < l) {
-		l = len;
-	}
-	char* string = ( char* ) malloc( l + 1 );
-	strlcpy( string, s, l + 1 );
-	return string;
-}
-#endif
-
 #ifndef HAVE_STRLCPY
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 {
@@ -281,16 +246,6 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 #ifdef WIN32
 
 #else
-
-char* strupr(char* string)
-{
-	char* s;
-	if (string) {
-		for (s = string; *s; ++s)
-			*s = toupper( *s );
-	}
-	return string;
-}
 
 char* strlwr(char* string)
 {
