@@ -394,7 +394,7 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 					break;
 			}
 		} else if (( *m )->ControlType == IE_GUI_TEXTAREA) {
-			if (( *m )->ControlID == TAID) {
+			if (( *m )->ControlID == TAID || TAID == (ieWord)-1) {
 				ta = ( TextArea * ) ( *m );
 				if (sb != NULL)
 					break;

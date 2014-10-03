@@ -2062,6 +2062,8 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 	if (ret<0) {
 		return NULL;
 	}
+	win->Link(sb->ControlID, -1);
+
 	return PyInt_FromLong( ret );
 }
 
