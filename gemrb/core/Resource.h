@@ -41,9 +41,13 @@ class DataStream;
 struct IeResRef {
 private:
 	char ref[9];
+private:
+	void Clear() {
+		memset(ref, 0, sizeof(ref));
+	}
 public:
 	IeResRef() {
-		memset(ref, 0, sizeof(ref));
+		Clear();
 	}
 
 	IeResRef(const char* str) {
@@ -56,8 +60,12 @@ public:
 	}
 
 	void operator=(const char* str) {
-		strncpy(ref, str, sizeof(ref)-1 );
-		ref[sizeof(ref)-1] = '\0';
+		if (str == NULL) {
+			Clear();
+		} else {
+			strncpy(ref, str, sizeof(ref)-1 );
+			ref[sizeof(ref)-1] = '\0';
+		}
 	}
 
 	bool operator<(const IeResRef& rhs) const {
