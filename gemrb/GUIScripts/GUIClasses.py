@@ -147,7 +147,6 @@ class GTextArea(GControl):
     'Rewind': _GemRB.TextArea_Rewind,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
-    'Scroll': _GemRB.TextArea_Scroll,
     'SetFlags': _GemRB.Control_TextArea_SetFlags,
     'SetOptions': _GemRB.TextArea_SetOptions,
     'GetCharSounds': _GemRB.TextArea_GetCharSounds,

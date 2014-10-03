@@ -45,16 +45,6 @@ def OnLoad():
 
 	UpdateControlStatus()
 
-def ScrollUp ():
-	TMessageWindow = GemRB.GetVar("MessageWindow")
-	TMessageTA = GUIClasses.GTextArea(TMessageWindow,GemRB.GetVar("MessageTextArea"))
-	TMessageTA.Scroll(-1)
-
-def ScrollDown ():
-	TMessageWindow = GemRB.GetVar("MessageWindow")
-	TMessageTA = GUIClasses.GTextArea(TMessageWindow,GemRB.GetVar("MessageTextArea"))
-	TMessageTA.Scroll(1)
-
 def UpdateControlStatus():
 	global MessageWindow, TMessageTA
 

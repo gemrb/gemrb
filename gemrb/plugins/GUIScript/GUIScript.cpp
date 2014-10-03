@@ -1447,32 +1447,6 @@ static PyObject* GemRB_TextArea_Clear(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_TextArea_Scroll__doc,
-"TextAreaScroll(WindowIndex, ControlIndex, offset)\n\n"
-"Scrolls the textarea up or down by offset." );
-
-static PyObject* GemRB_TextArea_Scroll(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, offset;
-
-	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &offset)) {
-			return AttributeError( GemRB_TextArea_Scroll__doc );
-	}
-	TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
-	if (!ta) {
-		return NULL;
-	}
-	/*
-	int row = ta->GetTopIndex()+offset;
-	if (row<0) {
-		row = 0;
-	}
-	ta->SetRow( row );
-	*/
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
 "SetTooltip(WindowIndex, ControlIndex, String|Strref[, Function]) => int\n\n"
 "Sets control's tooltip. The optional function number will set the function key linkage as well." );
@@ -2375,10 +2349,9 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
-	if (CtrlIndex == -1) {
-		return RuntimeError( "Control is not found" );
+	if (CtrlIndex != -1) {
+		delete win->RemoveControl(CtrlIndex);
 	}
-	delete win->RemoveControl(CtrlIndex);
 
 	Py_RETURN_NONE;
 }
@@ -10791,7 +10764,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_GetPortraits, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_Rewind, METH_VARARGS),
-	METHOD(TextArea_Scroll, METH_VARARGS),
 	METHOD(TextEdit_SetBackground, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(Window_CreateButton, METH_VARARGS),
