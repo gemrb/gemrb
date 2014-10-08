@@ -256,23 +256,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	return CanSee( Sender, target, false, GA_NO_DEAD|GA_NO_UNSCHEDULED );
 }
 
-int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
-{
-	int ret = InPartyAllowDead(Sender, parameters);
-
-	if (!ret || core->HasFeature(GF_IN_PARTY_ALLOWS_DEAD)) {
-		return ret;
-	}
-
-	Actor *tar = (Actor *) Sender;
-	//don't allow dead, don't allow maze and similar effects
-	if (tar->ValidTarget(GA_NO_DEAD) && tar->GetStat(IE_AVATARREMOVAL) == 0) {
-		return 1;
-	}
-	return 0;
-}
-
-int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
+int GameScript::InParty(Scriptable* Sender, Trigger* parameters, bool allowdead)
 {
 	Scriptable* scr;
 
@@ -281,10 +265,28 @@ int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 	} else {
 		scr = Sender;
 	}
+
 	if (!scr || scr->Type != ST_ACTOR) {
 		return 0;
 	}
-	return core->GetGame()->InParty( ( Actor * ) scr ) >= 0 ? 1 : 0;
+	
+	Actor *act = (Actor *) scr;
+	//don't allow dead, don't allow maze and similar effects
+	if (!allowdead && (!act->ValidTarget(GA_NO_DEAD) || act->GetStat(IE_AVATARREMOVAL) != 0)) {
+		return 0;
+	}
+	
+	return core->GetGame()->InParty(act) >= 0 ? 1 : 0;
+}
+
+int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
+{
+	return InParty(Sender, parameters, core->HasFeature(GF_IN_PARTY_ALLOWS_DEAD));
+}
+
+int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
+{
+	return InParty(Sender, parameters, true);
 }
 
 int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
