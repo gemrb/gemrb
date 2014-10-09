@@ -1309,7 +1309,7 @@ int Interface::LoadSprites()
 
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 
-	if (TooltipBackResRef[0]) {
+	if (!TooltipBackResRef.IsEmpty()) {
 		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (!anim) {

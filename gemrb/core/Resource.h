@@ -54,6 +54,9 @@ public:
 		operator=(str);
 	};
 
+	bool IsEmpty() {
+		return (ref[0] == '\0');
+	}
 	const char* CString() const { return ref; }
 	operator const char*() const {
 		return (ref[0] == '\0') ? NULL : ref;
