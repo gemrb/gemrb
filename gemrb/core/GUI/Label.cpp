@@ -38,7 +38,11 @@ Label::Label(const Region& frame, Font* font, const char* string)
 	useRGB = false;
 	ResetEventHandler( LabelOnPress );
 
-	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE|IE_FONT_SINGLE_LINE;
+	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
+	if (frame.h < (font->LineHeight * 2)) {
+		// FIXME: is this a poor way of determinine if we are single line?
+		Alignment |= IE_FONT_SINGLE_LINE;
+	}
 	palette = NULL;
 	Control::SetText(string);
 }

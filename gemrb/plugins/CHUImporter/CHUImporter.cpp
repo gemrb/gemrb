@@ -432,7 +432,7 @@ endvertical:
 					align |= IE_FONT_ALIGN_MIDDLE;
 				}
 endalign:
-				lab->SetAlignment( align | IE_FONT_SINGLE_LINE );
+				lab->SetAlignment( align );
 				win->AddControl( lab );
 			}
 			break;
