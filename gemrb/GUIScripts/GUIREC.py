@@ -895,7 +895,7 @@ def OpenKitInfoWindow ():
 			else:
 				text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 
-	TextArea.SetText ("[p]" + text + "[/p]")
+	TextArea.SetText (text)
 
 	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
