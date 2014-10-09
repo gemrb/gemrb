@@ -206,7 +206,7 @@ def PopulateQuestsList ():
 	j = 0
 	for q in quests[selected_quest_class]:
 		title = GemRB.GetINIQuestsKey (str (q[0]), 'title', '0')
-		opts.append('- ' + GemRB.GetString(int(title))
+		opts.append('- ' + GemRB.GetString(int(title)))
 		j = j + 1
 	QuestsList.SetOptions(opts)
 	
