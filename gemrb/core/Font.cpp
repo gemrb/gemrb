@@ -83,7 +83,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	if (Sheet) {
 		Sprite2D::FreeSprite(Sheet);
 	}
-	int glyphH = g.size.h + g.pos.y;
+	int glyphH = g.size.h + abs(g.pos.y);
 	if (glyphH > SheetRegion.h) {
 		// must grow to accommodate this glyph
 		pageData = (ieByte*)realloc(pageData, SheetRegion.w * glyphH);
@@ -91,9 +91,13 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		SheetRegion.h = glyphH;
 	}
 
+	Point gpos = g.pos;
+	if (gpos.y < 0) {
+		gpos.y = 0;
+	}
 	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
-	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, 0), pageData, Size(SheetRegion.w, SheetRegion.h));
-	MapSheetSegment(chr, Region(pageXPos, g.pos.y, g.size.w, g.size.h));
+	BlitGlyphToCanvas(g, Point(pageXPos - gpos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.Dimensions());
+	MapSheetSegment(chr, Region(pageXPos, gpos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	ieByte* pageLoc = pageData + pageXPos;
 	glyphs.insert(std::make_pair(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w)));
