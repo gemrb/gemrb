@@ -91,13 +91,9 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		SheetRegion.h = glyphH;
 	}
 
-	Point gpos = g.pos;
-	if (gpos.y < 0) {
-		gpos.y = 0;
-	}
 	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
-	BlitGlyphToCanvas(g, Point(pageXPos - gpos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.Dimensions());
-	MapSheetSegment(chr, Region(pageXPos, gpos.y, g.size.w, g.size.h));
+	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.Dimensions());
+	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	ieByte* pageLoc = pageData + pageXPos;
 	glyphs.insert(std::make_pair(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w)));
@@ -572,7 +568,6 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
 			wordCharCount++;
-			spaceW = 0;
 		}
 		if (ws || eos) {
 			if (stop && stop->w
@@ -582,7 +577,9 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 				newline = true;
 			} else {
 				if (lineW) {
+					// spaceW is the *cumulative* whitespace between the 2 words
 					lineW += spaceW;
+					spaceW = 0;
 				}
 				lineW += wordW;
 				if (string[i] == L'\n') {
