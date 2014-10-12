@@ -309,7 +309,8 @@ void Button::DrawInternal(Region& rgn)
 		Region r = rgn;
 		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
-			r = Region(picXPos, picYPos, Picture->Width, Picture->Height);
+			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
+			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
 		} else if ((IE_GUI_BUTTON_ALIGN_LEFT |
 				   IE_GUI_BUTTON_ALIGN_RIGHT |
 				   IE_GUI_BUTTON_ALIGN_TOP   |

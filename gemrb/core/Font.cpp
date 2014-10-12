@@ -288,9 +288,18 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 #if DEBUG_FONT
 			core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
-			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(), Size(lineW, LineHeight)), ColorWhite, false);
+			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
+											 Size(lineW, LineHeight)), ColorWhite, false);
 #endif
 			linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
+#if DEBUG_FONT
+			if (linePos == 0) {
+				// FIXME: we have no good way of handling when a single word is longer than the line
+				// we don't have enough context to deal with that inside RenderLine.
+				// not sure what the best way to handle this case is.
+				Log(WARNING, "Font", "Line (%d width) > %d; for text \"%ls\"!", lineW, lineRgn.w, line.c_str());
+			}
+#endif
 			dp = dp + linePoint;
 			charCount += linePos;
 			if (linePos < line.length() - 1) {
@@ -359,7 +368,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 		String word = line.substr(linePos, wordBreak - linePos);
 
 		int wordW = StringSize(word).w;
-		if (dp.x + wordW > lineRgn.w && dp.x > 0) {
+		if (dp.x + wordW > lineRgn.w) {
 			break;
 		}
 
@@ -384,18 +393,8 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 #if DEBUG_FONT
 				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, true);
 #endif
-				if (wordW < lineRgn.w) {
-					// this probably doest cover every situation 100%
-					// we consider printing done if the blitter is outside the region
-					// *and* the word isnt wider then the line
-					done = true;
-				} else {
-#if DEBUG_FONT
-					Log(WARNING, "Font", "The word '%ls' (width=%d) overruns available width of %d",
-						word.c_str(), wordW, lineRgn.w);
-#endif
-				}
-				break; // either done, or skipping
+				done = true;
+				break;
 			}
 
 			blitPoint = blitPoint + curGlyph.pos;
