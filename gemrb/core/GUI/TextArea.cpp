@@ -157,7 +157,7 @@ void TextArea::UpdateScrollbar()
 		if (nodeBounds.h + ftext->LineHeight < Height) {
 			// if the node isnt a full page by itself we need to fake it
 			// so page height (Height) minus what already exists (the blank line + the node + another blank line + select options)
-			textHeight += Height - (nodeBounds.h + (ftext->LineHeight * 3) + selectOptions->ContentFrame().h);
+			textHeight += Height - (nodeBounds.h + (ftext->LineHeight * 2) + selectOptions->ContentFrame().h);
 		}
 	}
 	int rowHeight = GetRowHeight();
@@ -680,6 +680,7 @@ void TextArea::ClearSelectOptions()
 	hoverSpan = NULL;
 	// also set the value to "none"
 	Value = -1;
+	UpdateScrollbar();
 }
 
 void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
@@ -690,7 +691,10 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	SetPalette(selColor, PALETTE_SELECTED);
 
 	ClearSelectOptions(); // deletes previous options
-	dialogBeginNode = *--(textContainer->Contents().end()); // need to get the last node *before* we append anything
+	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
+	if (it != textContainer->Contents().rend()) {
+		dialogBeginNode = *it; // need to get the last node *before* we append anything
+	}
 	Size optFrame(Width - EDGE_PADDING * 4, 0);
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
@@ -706,22 +710,21 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		selOption->AppendContent(new TextSpan(opts[i].second, NULL, NULL, &flexFrame));
 
 		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
-		selectOptions->AppendContent(selOption); // container owns the option
 		// now add a newline for keeping the options spaced out (for touch screens)
 		// TODO: make this optional, or automaticly detected
 		selectOptions->AppendText(L"\n");
+		selectOptions->AppendContent(selOption); // container owns the option
 	}
 	assert(textContainer);
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		// we want a newline between dialog chunks
-		textContainer->AppendText(L"\n");
-	}
-	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 
+	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	UpdateScrollbar();
-	// now scroll dialogBeginNode to the top
-	ScrollBar* bar = (ScrollBar*)sb;
-	bar->SetPos(bar->Value); // scroll to the bottom
+
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		// now scroll dialogBeginNode to the top
+		ScrollBar* bar = (ScrollBar*)sb;
+		bar->SetPos(bar->Value); // scroll to the bottom
+	}
 }
 
 void TextArea::ClearText()
