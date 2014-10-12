@@ -167,13 +167,13 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					numOnLine = 1;
 					newline = true;
 				} else {
-					Size printMax = lineSegment.Dimensions();
 					size_t subLen = nextLine;
 					if (nextLine != String::npos) {
 						subLen = nextLine - numPrinted + 1; // +1 for the \n
 					}
+					Size printMax = lineSegment.Dimensions();
 					Size printSize = layoutFont->StringSize(text.substr(numPrinted, subLen), &printMax, &numOnLine);
-					if (subLen != String::npos || (printMax.w == lineRgn.w && numPrinted + numOnLine < text.length())) {
+					if (subLen != String::npos || (lineSegment.x + lineSegment.w == lineRgn.w && numPrinted + numOnLine < text.length())) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
 						newline = true;
@@ -567,7 +567,6 @@ const String& TextContainer::Text() const
 	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
 		if (const TextSpan* textSpan = dynamic_cast<TextSpan*>(*it)) {
-			// FIXME: this will produce odd results since adjacent spans wont be separated by any whitespace
 			text.append(textSpan->Text());
 		}
 	}
