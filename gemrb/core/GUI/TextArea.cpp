@@ -695,7 +695,8 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	if (it != textContainer->Contents().rend()) {
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
 	}
-	Size optFrame(Width - EDGE_PADDING * 4, 0);
+	Size optFrame(Width - (EDGE_PADDING * 2), 0);
+	optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
 	for (size_t i = 0; i < opts.size(); i++) {
