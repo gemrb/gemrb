@@ -75,9 +75,16 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 		msg += *str;
 		delete str;
 		str = core->GetString(tr->journalStrRef);
-		//cutting off the strings at the first crlf
-		str->resize(str->find_first_of(L"\n"));
-		msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][p]\n";
+		if (str && str->length()) {
+			//cutting off the strings at the first crlf
+			size_t newlinePos = str->find_first_of(L"\n");
+			if (newlinePos != String::npos) {
+				str->resize( newlinePos );
+			}
+			msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][p]";
+		} else {
+			msg += L"[/color]";
+		}
 		delete str;
 		displaymsg->DisplayMarkupString(msg);
 	}
