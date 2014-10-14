@@ -133,7 +133,12 @@ void TextArea::DrawInternal(Region& clip)
 
 void TextArea::SetAnimPicture(Sprite2D* pic)
 {
-	if (pic == AnimPicture) return;
+	// FIXME: this behavior really needs to also happen when the TA dimensions change
+	// we currntly do that by setting *public* ivars in Control, instead of having a SetSize type method
+
+	// FIXME: we always have to accept NULL because sometimes the control size gets changed after this is called
+	// dialog is the only thing that uses an actual picture, so we can safely bail out in that case
+	if (pic == AnimPicture && pic != NULL) return;
 
 	Size frame(Width, 0);
 	// apply padding to the clip
@@ -148,11 +153,6 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 	textContainer->SetFrame(Region(Point(), frame));
 	contentWrapper.SetFrame(Region(Point(), frame));
 
-	if (contentWrapper.ContentFrame().w != frame.w) {
-		// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
-		textContainer->SetFrame(Region(Point(), frame));
-		contentWrapper.SetFrame(Region(Point(), frame));
-	}
 	Control::SetAnimPicture(pic);
 }
 
