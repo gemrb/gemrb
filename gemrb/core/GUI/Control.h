@@ -163,7 +163,7 @@ public: //Events
 	}
 	virtual const String& QueryText() const { static String s; return s; }
 	/** Sets the animation picture ref */
-	void SetAnimPicture(Sprite2D* Picture);
+	virtual void SetAnimPicture(Sprite2D* Picture);
 	/** Sets the Scroll Bar Pointer */
 	int SetScrollBar(Control* ptr);
 

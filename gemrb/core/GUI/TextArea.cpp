@@ -106,26 +106,12 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
-	// apply padding to the clip
-	if (sb) {
-		clip.w -= EDGE_PADDING;
-	} else {
-		clip.w -= EDGE_PADDING * 2;
-	}
-	clip.x += EDGE_PADDING;
-
 	if (AnimPicture) {
 		// speaker portrait
 		// dont clip the portrait, the original draws slightly outside the TA bounds
-		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x - EDGE_PADDING, clip.y + EDGE_PADDING, true);
-		int offset = AnimPicture->Width + EDGE_PADDING;
-		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
-		clip.x += offset;
-		clip.w -= offset;
+		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
+		clip.x += AnimPicture->Width + (EDGE_PADDING * 2);
 	}
-	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
-	textContainer->SetFrame(Region(Point(), Size(clip.w, 0)));
-	contentWrapper.SetFrame(Region(Point(), Size(clip.w, 0)));
 
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
 		unsigned long thisTime = GetTickCount();
@@ -143,6 +129,31 @@ void TextArea::DrawInternal(Region& clip)
 		// highlighted during a dialog
 		core->GetEventMgr()->FakeMouseMove();
 	}
+}
+
+void TextArea::SetAnimPicture(Sprite2D* pic)
+{
+	if (pic == AnimPicture) return;
+
+	Size frame(Width, 0);
+	// apply padding to the clip
+	frame.w -= (sb) ? EDGE_PADDING : EDGE_PADDING * 2;
+
+	if (pic) {
+		int offset = pic->Width + EDGE_PADDING;
+		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
+		frame.w -= offset;
+	}
+	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
+	textContainer->SetFrame(Region(Point(), frame));
+	contentWrapper.SetFrame(Region(Point(), frame));
+
+	if (contentWrapper.ContentFrame().w != frame.w) {
+		// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
+		textContainer->SetFrame(Region(Point(), frame));
+		contentWrapper.SetFrame(Region(Point(), frame));
+	}
+	Control::SetAnimPicture(pic);
 }
 
 void TextArea::UpdateScrollbar()

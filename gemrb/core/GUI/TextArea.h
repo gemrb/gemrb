@@ -88,6 +88,7 @@ public:
 	void SetRow(int row);
 	/** Set Selectable */
 	void SetSelectable(bool val);
+	void SetAnimPicture(Sprite2D* Picture);
 
 	/** Returns the selected text */
 	const String& QueryText() const;
