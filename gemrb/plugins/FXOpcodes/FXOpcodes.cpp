@@ -6066,10 +6066,10 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 		case WB_AWAY:
 		default:
-			dir = GetOrient(target->Pos, GetCasterObject()->Pos);
+			dir = GetOrient(target->Pos, Point(fx->SourceX, fx->SourceY));
 			break;
 		case WB_TOWARDS:
-			dir = GetOrient(GetCasterObject()->Pos, target->Pos);
+			dir = GetOrient(Point(fx->SourceX, fx->SourceY), target->Pos);
 			break;
 		case WB_FIXDIR:
 			dir = fx->Parameter3;
