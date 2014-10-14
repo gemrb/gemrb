@@ -56,10 +56,11 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		// Hack to work around original data where the "top row icons" have inverted x and y positions (ie level up icon)
 		// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
 		// since state icons should all be the same size/position we can just take the position of the first one
-		static const ieWord topIconCycles[] = {254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */};
+		static const ieWord topIconCycles[] = {254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */, 37 /* separator glyph (like '-')*/};
 		for (size_t i = 0; i < 3; i++) {
 			spr = af->GetFrame(0, topIconCycles[i]);
-			spr->YPos = spr->XPos;
+			if (spr->XPos > 0) // not all datasets are messed up here
+				spr->YPos = spr->XPos;
 			spr->release();
 		}
 	}
