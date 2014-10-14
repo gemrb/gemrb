@@ -80,6 +80,7 @@ void TextArea::Init()
 	SetScrollBar(NULL);
 	ClearText();
 	ClearSelectOptions();
+	SetAnimPicture(NULL);
 }
 
 TextArea::~TextArea(void)

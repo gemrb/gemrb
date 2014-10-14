@@ -292,7 +292,7 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	Sprite2D::FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	//apparently this is needed too, so the artifacts are not visible
-	if (Owner->Visible==WINDOW_VISIBLE) {
+	if (Owner && Owner->Visible==WINDOW_VISIBLE) {
 		Changed = true;
 		Owner->InvalidateForControl(this);
 	}
