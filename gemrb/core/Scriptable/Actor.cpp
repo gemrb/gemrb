@@ -4058,7 +4058,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
 			wchar_t tmp[64];
 			char* msg = core->GetCString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
-			swprintf(tmp, sizeof(tmp), L"%s (%d)", msg, damage);
+			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L"%s (%d)", msg, damage);
 			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
 			free(msg);
 		} else { //bg2

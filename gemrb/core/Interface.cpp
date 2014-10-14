@@ -1144,7 +1144,7 @@ void Interface::Main()
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
-				swprintf(fpsstring, sizeof(fpsstring), L"%.3f fps", frames);
+				swprintf(fpsstring, sizeof(fpsstring)/sizeof(fpsstring[0]), L"%.3f fps", frames);
 			}
 			video->DrawRect( fpsRgn, ColorBlack );
 			fps->Print( fpsRgn, String(fpsstring), palette,

@@ -715,7 +715,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		TextContainer* selOption = new TextContainer(optFrame, ftext, palettes[PALETTE_OPTIONS]);
 		if (numbered) {
 			wchar_t optNum[6];
-			swprintf(optNum, sizeof(optNum), L"%d. - ", i+1);
+			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", i+1);
 			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
 			// but that should probably actually be done by the dialog handler, not here.
 			selOption->AppendContent(new TextSpan(optNum, NULL, palettes[PALETTE_SELECTED]));

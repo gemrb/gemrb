@@ -249,7 +249,7 @@ void DisplayMessage::DisplayRollStringName(int stridx, unsigned int color, const
 		va_start(numbers, speaker);
 		// fill it out
 		String* str = core->GetString(stridx);
-		vswprintf(tmp, sizeof(tmp), str->c_str(), numbers);
+		vswprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), str->c_str(), numbers);
 		delete str;
 		displaymsg->DisplayStringName(tmp, color, speaker);
 		va_end(numbers);

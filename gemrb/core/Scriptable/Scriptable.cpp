@@ -925,10 +925,10 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 
 		if (target) {
 			String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-			swprintf(str, sizeof(str), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
 			delete msg;
 		} else {
-			swprintf(str, sizeof(str), L"%ls : %s", spell->c_str(), GetName(-1));
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell->c_str(), GetName(-1));
 		}
 		displaymsg->DisplayStringName(str, DMC_WHITE, this);
 	}
@@ -1421,8 +1421,9 @@ int Scriptable::CheckWildSurge()
 				// display feedback: Wild Surge: bla bla
 				char *s1 = core->GetCString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
 				char *s2 = core->GetCString(core->SurgeSpells[check-1].message, 0);
-				wchar_t *s3 = (wchar_t *) malloc((strlen(s1)+strlen(s2)+2) * sizeof(wchar_t));
-				swprintf(s3, sizeof(s3), L"%s %s", s1, s2);
+				size_t buflen = strlen(s1)+strlen(s2)+2;
+				wchar_t *s3 = (wchar_t *) malloc(buflen * sizeof(wchar_t));
+				swprintf(s3, buflen, L"%s %s", s1, s2);
 
 				core->FreeString(s1);
 				core->FreeString(s2);
