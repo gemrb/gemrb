@@ -4347,10 +4347,16 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 	PyObject* item = NULL;
 	for (int i = 0; i < PyList_Size(list); i++) {
 		item = PyList_GetItem(list, i);
+		String* string = NULL;
 		if(!PyString_Check(item)) {
-			return AttributeError( GemRB_TextArea_SetOptions__doc );
+			if (PyInt_Check(item)) {
+				string = core->GetString(PyInt_AsLong(item));
+			} else {
+				return AttributeError( GemRB_TextArea_SetOptions__doc );
+			}
+		} else {
+			string = StringFromCString(PyString_AsString(item));
 		}
-		String* string = StringFromCString(PyString_AsString(item));
 		TAOptions.push_back(std::make_pair(i, *string));
 		delete string;
 	}
