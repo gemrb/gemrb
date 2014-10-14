@@ -2375,12 +2375,12 @@ bool Interface::LoadGemRBINI()
 	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
 	ASSIGN_RESREF(MovieFontResRef, "MovieFont");
 	ASSIGN_RESREF(TooltipBackResRef, "TooltipBack");
+	ASSIGN_RESREF(TextFontResRef, "TextFont");
 	ASSIGN_RESREF(Palette16, "Palette16");
 	ASSIGN_RESREF(Palette32, "Palette32");
 	ASSIGN_RESREF(Palette256, "Palette256");
 
 #undef ASSIGN_RESREF
-	TextFontResRef = "FLOATTXT";
 
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));

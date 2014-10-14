@@ -80,6 +80,10 @@ ButtonFont = <resref>
 Name of bitmap resource used for button font in dialog windows
 (e.g. BG1: STONESML)
 
+TextFont = <resref>
+- - - - - - - - - - -
+Font used to display overhead or floating text
+
 MovieFont = <resref>
 - - - - - - - - - - -
 Name of bitmap resource used for the movie subtitles
