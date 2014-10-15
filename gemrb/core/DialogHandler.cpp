@@ -232,7 +232,12 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				tgt->InteractCount++;
 			}
 		}
-		//ds = dlg->GetState( si );
+		// does this belong here? we must clear actions somewhere before
+		// we start executing them (otherwise queued actions interfere)
+		// executing actions directly does not work, because dialog
+		// needs to end before final actions are executed due to
+		// actions making new dialogs!
+		target->Stop();
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
 			return;
@@ -274,12 +279,9 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		target->ProcessActions(); //run the action queue now
 
 		if (tr->actions.size()) {
-			// does this belong here? we must clear actions somewhere before
-			// we start executing them (otherwise queued actions interfere)
-			// executing actions directly does not work, because dialog
-			// needs to end before final actions are executed due to
-			// actions making new dialogs!
-			target->Stop();
+			if (!(target->GetInternalFlag() & IF_NOINT)) {
+				target->ReleaseCurrentAction();
+			}
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
 			target->AddAction( GenerateAction( "BreakInstants()" ) );
@@ -344,8 +346,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 				}
 			}
-			target = tgt;
-			if (!target) {
+			if (!tgt) {
 				Log(WARNING, "Dialog", "Can't redirect dialog");
 				ta->SetMinRow( false );
 				EndDialog();
@@ -355,6 +356,11 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			targetID = tgt->GetGlobalID();
 			tgt->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
+			if (target != tgt) {
+				// switching target; clear actions
+				target = tgt;
+				target->Stop();
+			}
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
