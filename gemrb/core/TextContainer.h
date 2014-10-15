@@ -109,6 +109,7 @@ protected:
 
 	typedef std::map<const Content*, Regions> ContentLayout;
 	ContentLayout layout;
+	Point layoutPoint;
 
 public:
 	ContentContainer(const Size& frame) : Content(frame) {};

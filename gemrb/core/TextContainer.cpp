@@ -338,6 +338,7 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		it = contents.erase(it);
 		content->parent = NULL;
 		layout.erase(content);
+		layoutPoint = Point(); // reset cached layoutPoint
 		if (doLayout) {
 			LayoutContentsFrom(it);
 		}
@@ -419,7 +420,6 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 
 	const Content* exContent = NULL;
 	const Region* excluded = NULL;
-	Point layoutPoint;
 	contentBounds = Size();
 
 	if (it != contents.begin()) {
@@ -431,7 +431,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	// clear the existing layout, but only for "it" and onward
 	ContentList::const_iterator clearit = it;
 	for (; clearit != contents.end(); ++clearit) {
-		layout.erase(*clearit);
+		ContentLayout::iterator i = layout.find(*clearit);
+		if (i != layout.end()) {
+			layoutPoint = Point(); // reset cached layoutPoint
+			layout.erase(i);
+		}
 	}
 
 	while (it != contents.end()) {
