@@ -78,8 +78,8 @@ void TextArea::Init()
 
 	// initialize the Text containers
 	SetScrollBar(NULL);
-	ClearText();
 	ClearSelectOptions();
+	ClearText();
 	SetAnimPicture(NULL);
 }
 
@@ -542,6 +542,7 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
 		ScrollToY((int)fauxY);
+		core->GetEventMgr()->FakeMouseMove();
 	}
 }
 
@@ -563,15 +564,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	if (hoverSpan || span)
 		MarkDirty();
 
-	if (hoverSpan && hoverSpan != span) {
-		if (hoverSpan == selectedSpan) {
-			hoverSpan->SetPalette(palettes[PALETTE_SELECTED]);
-		} else {
-			// reset the old hover span
-			hoverSpan->SetPalette(palettes[PALETTE_OPTIONS]);
-		}
-		hoverSpan = NULL;
-	}
+	ClearHover();
 	if (span) {
 		hoverSpan = span;
 		hoverSpan->SetPalette(palettes[PALETTE_HOVER]);
@@ -634,7 +627,7 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 
 void TextArea::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-	hoverSpan = NULL;
+	ClearHover();
 }
 
 void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
@@ -740,10 +733,22 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 }
 
+void TextArea::ClearHover()
+{
+	if (hoverSpan) {
+		if (hoverSpan == selectedSpan) {
+			hoverSpan->SetPalette(palettes[PALETTE_SELECTED]);
+		} else {
+			// reset the old hover span
+			hoverSpan->SetPalette(palettes[PALETTE_OPTIONS]);
+		}
+		hoverSpan = NULL;
+	}
+}
+
 void TextArea::ClearText()
 {
-	selectedSpan = NULL;
-	hoverSpan = NULL;
+	ClearHover();
 	contentWrapper.RemoveContent(textContainer);
 	delete textContainer;
 

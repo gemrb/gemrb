@@ -70,6 +70,7 @@ public:
 	void SetText(const String& text);
 	/** Clears the textarea */
 	void ClearText();
+	void ClearHover();
 	/** Appends a String to the current Text */
 	void AppendText(const char* text);
 	void AppendText(const String& text);
