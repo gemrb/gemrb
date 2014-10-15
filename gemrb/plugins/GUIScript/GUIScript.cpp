@@ -11159,23 +11159,25 @@ void GUIScript::ExecFile(const char* file)
 }
 
 /** Exec a single String */
-void GUIScript::ExecString(const char* string)
+void GUIScript::ExecString(const char* string, bool feedback)
 {
 	PyObject* run = PyRun_String(string, Py_file_input, pMainDic, pMainDic);
 
 	if (run) {
 		// success
-		PyObject* pyGUI = PyImport_ImportModule("GUICommon");
-		if (pyGUI) {
-			PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
-			if (catcher) {
-				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
-				String* msg = StringFromCString(PyString_AsString(output));
-				displaymsg->DisplayString(*msg, DMC_WHITE, NULL);
-				delete msg;
-				Py_DECREF(catcher);
+		if (feedback) {
+			PyObject* pyGUI = PyImport_ImportModule("GUICommon");
+			if (pyGUI) {
+				PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
+				if (catcher) {
+					PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
+					String* msg = StringFromCString(PyString_AsString(output));
+					displaymsg->DisplayString(*msg, DMC_WHITE, NULL);
+					delete msg;
+					Py_DECREF(catcher);
+				}
+				Py_DECREF(pyGUI);
 			}
-			Py_DECREF(pyGUI);
 		}
 		Py_DECREF(run);
 	} else {

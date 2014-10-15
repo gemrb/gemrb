@@ -142,7 +142,7 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 			// FIXME: depends on locale setting
 			wcstombs(cBuf, Buffer.c_str(), max);
 			// FIXME: should prepend "# coding=<encoding name>" as per http://www.python.org/dev/peps/pep-0263/
-			core->GetGUIScriptEngine()->ExecString( cBuf );
+			core->GetGUIScriptEngine()->ExecString(cBuf, true);
 			delete[] cBuf;
 			HistoryAdd();
 			Buffer.erase();

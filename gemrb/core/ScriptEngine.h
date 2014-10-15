@@ -39,7 +39,7 @@ public:
 	virtual bool RunFunction(const char *ModuleName, const char* FunctionName, bool report_error=true, int intparam=-1) = 0;
 	virtual bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error, Point) = 0;
 	/** Exec a single String */
-	virtual void ExecString(const char* string) = 0;
+	virtual void ExecString(const char* string, bool feedback) = 0;
 };
 
 }
