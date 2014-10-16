@@ -294,6 +294,11 @@ void TextArea::AppendText(const String& text)
 							state = TEXT;
 							token.clear();
 							continue;
+						case '[': // wasn't actually a tag after all
+							state = TEXT;
+							token += '[';
+							it--; // rewind so the TEXT node is created
+							continue;
 					}
 					break;
 				case CLOSE_TAG:
