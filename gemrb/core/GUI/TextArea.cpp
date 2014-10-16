@@ -297,7 +297,7 @@ void TextArea::AppendText(const String& text)
 							continue;
 						case '[': // wasn't actually a tag after all
 							state = TEXT;
-							token += '[';
+							token.insert(0, 1, L'[');
 							it--; // rewind so the TEXT node is created
 							continue;
 					}
