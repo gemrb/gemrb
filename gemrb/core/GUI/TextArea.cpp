@@ -723,8 +723,9 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
 		// now add a newline for keeping the options spaced out (for touch screens)
-		// TODO: make this optional, or automaticly detected
-		selectOptions->AppendText(L"\n");
+		if (core->GetVideoDriver()->TouchInputEnabled()) {
+			selectOptions->AppendText(L"\n");
+		}
 		selectOptions->AppendContent(selOption); // container owns the option
 	}
 	assert(textContainer);
