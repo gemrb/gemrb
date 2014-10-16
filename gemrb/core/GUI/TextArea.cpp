@@ -111,8 +111,9 @@ void TextArea::DrawInternal(Region& clip)
 		// speaker portrait
 		// dont clip the portrait, the original draws slightly outside the TA bounds
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
-		clip.x += AnimPicture->Width + (EDGE_PADDING * 2);
+		clip.x += AnimPicture->Width + EDGE_PADDING;
 	}
+	clip.x += EDGE_PADDING;
 
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
 		unsigned long thisTime = GetTickCount();
