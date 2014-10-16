@@ -1419,7 +1419,7 @@ def UpdatePortraitWindow ():
 		ratio_str, color = GUICommon.SetupDamageInfo (portid+1, Button, Window)
 
 		# character - 1 == bam cycle
-		talk = store = flag = blank = ""
+		talk = store = flag = blank = ' '
 		if GameCheck.IsBG2():
 			# as far as I can tell only BG2 has icons for talk or store
 			flag = blank = chr(238)
