@@ -336,8 +336,9 @@ def DisplayGeneral (pc):
 	#levels
 	# get special level penalty for subrace
 	adj = GetECL (pc)
-	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40308) + " - " + GemRB.GetString(40309) + ": " + str(levelsum) + "[/color]")
 	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40308) + " - " +
+                            GemRB.GetString(40309) + ": " + str(levelsum) + "[/color]")
 
 	#the class name for highest
 	highest = None
