@@ -141,7 +141,7 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 		l->SetColor( fore, ColorBlack );
 		l->SetText(text);
 	} else {
-		int newlen = (int)(wcslen( DisplayFormat) + text.length() + 12);
+		size_t newlen = wcslen( DisplayFormat) + text.length() + 12;
 		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
 		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
 		TextArea* ta = core->GetMessageTextArea();
@@ -165,7 +165,7 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, 
 		return;
 	}
 
-	int newlen = (int)(wcslen( DisplayFormatValue ) + text->length() + 10);
+	size_t newlen = wcslen( DisplayFormatValue ) + text->length() + 10;
 	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
 	swprintf( newstr, newlen, DisplayFormatValue, color, text->c_str(), value);
 
@@ -254,7 +254,7 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 		return;
 	}
 
-	int newlen = (int)(wcslen( DisplayFormatAction ) + name1.length() + name2.length() + text->length() + 18);
+	size_t newlen = wcslen( DisplayFormatAction ) + name1.length() + name2.length() + text->length() + 18;
 	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t));
 	swprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1.c_str(), color, text->c_str(), name2.c_str());
 	delete text;
@@ -303,7 +303,7 @@ void DisplayMessage::DisplayStringName(const String& text, unsigned int color, c
 		name = String(str, str + strlen(str));
 	}
 
-	int newlen = (int)(wcslen(DisplayFormatName) + name.length() + text.length() + 18);
+	size_t newlen = wcslen(DisplayFormatName) + name.length() + text.length() + 18;
 	wchar_t* newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
 	swprintf(newstr, newlen, DisplayFormatName, speaker_color, name.c_str(), color, text.c_str());
 	DisplayMarkupString(newstr);
