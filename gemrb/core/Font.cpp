@@ -503,15 +503,6 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	return canvas;
 }
 
-size_t Font::Print(Region rgn, const char* string,
-				   Palette* hicolor, ieByte Alignment) const
-{
-	String* tmp = StringFromCString(string);
-	size_t ret = Print(rgn, *tmp, hicolor, Alignment);
-	delete tmp;
-	return ret;
-}
-
 size_t Font::Print(Region rgn, const String& string,
 				   Palette* color, ieByte alignment, Point* point) const
 {

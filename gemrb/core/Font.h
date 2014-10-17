@@ -161,10 +161,7 @@ public:
 	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
 								 Palette* pal = NULL, size_t* numPrinted = NULL, Point* = NULL) const;
 
-	// Printing methods
 	// return the number of glyphs printed
-	size_t Print(Region rgn, const char* string,
-				 Palette* color, ieByte Alignment) const;
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
 	size_t Print(Region rgn, const String& string,
