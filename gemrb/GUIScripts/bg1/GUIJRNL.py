@@ -126,7 +126,7 @@ def UpdateJournalWindow ():
 		GemRB.SetToken("YEAR",year)
 		#Text.Append ("[color=FFFF00]"+GemRB.GetString(15980)+"[/color]", 3*i)
 		Text.Append (GemRB.GetString(15980) + "\n", 3*i)
-		Text.Append ("\n" + GemRB.GetString(je['Text']) + "\n", 3*i + 1)
+		Text.Append (GemRB.GetString(je['Text']) + "\n\n", 3*i + 1)
 		Text.Append ("", 3*i + 2)
 
 
