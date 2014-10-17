@@ -386,10 +386,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 			}
 
 			const Glyph& curGlyph = GetGlyph(currChar);
-			// test should not consider curGlyph.pos since it can be negative
-			Point blitPoint = dp + lineRgn.Origin();
-			// should probably use rect intersection, but new lines shouldnt be to the left ever.
-			if (!lineRgn.PointInside(blitPoint)) {
+			Point blitPoint = dp + lineRgn.Origin() + curGlyph.pos;
+			// use intersection because some rare glyphs can sometimes overlap lines
+			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
 #if DEBUG_FONT
 				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, true);
 #endif
@@ -397,7 +396,6 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 				break;
 			}
 
-			blitPoint = blitPoint + curGlyph.pos;
 			if (canvas) {
 				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.Dimensions());
 			} else {
