@@ -109,7 +109,6 @@ void TextArea::DrawInternal(Region& clip)
 {
 	if (AnimPicture) {
 		// speaker portrait
-		// dont clip the portrait, the original draws slightly outside the TA bounds
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
 		clip.x += AnimPicture->Width + EDGE_PADDING;
 	}
@@ -702,14 +701,17 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	SetPalette(selColor, PALETTE_SELECTED);
 
 	ClearSelectOptions(); // deletes previous options
-	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
-	if (it != textContainer->Contents().rend()) {
-		dialogBeginNode = *it; // need to get the last node *before* we append anything
-	}
+
 	Size optFrame(Width - (EDGE_PADDING * 2), 0);
 	optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
+
+	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
+	if (it != textContainer->Contents().rend()) {
+		dialogBeginNode = *it; // need to get the last node *before* we append anything
+		selectOptions->AppendText(L"\n"); // always want a gap between text and select options for dialog
+	}
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new TextContainer(optFrame, ftext, palettes[PALETTE_OPTIONS]);
 		if (numbered) {
@@ -722,11 +724,12 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		selOption->AppendContent(new TextSpan(opts[i].second, NULL, NULL, &flexFrame));
 
 		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
-		// now add a newline for keeping the options spaced out (for touch screens)
+
+		selectOptions->AppendContent(selOption); // container owns the option
 		if (core->GetVideoDriver()->TouchInputEnabled()) {
+			// now add a newline for keeping the options spaced out (for touch screens)
 			selectOptions->AppendText(L"\n");
 		}
-		selectOptions->AppendContent(selOption); // container owns the option
 	}
 	assert(textContainer);
 
