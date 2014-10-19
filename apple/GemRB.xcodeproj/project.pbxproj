@@ -6393,10 +6393,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
-					/usr/X11/include,
+					/opt/X11/include,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LIBRARY_SEARCH_PATHS = /usr/X11/lib;
+				LIBRARY_SEARCH_PATHS = /opt/X11/lib;
 				MACH_O_TYPE = mh_bundle;
 				OTHER_LDFLAGS = "-lpng";
 				PRODUCT_NAME = PNGImporter;
@@ -6414,10 +6414,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
-					/usr/X11/include,
+					/opt/X11/include,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LIBRARY_SEARCH_PATHS = /usr/X11/lib;
+				LIBRARY_SEARCH_PATHS = /opt/X11/lib;
 				MACH_O_TYPE = mh_bundle;
 				OTHER_LDFLAGS = "-lpng";
 				PRODUCT_NAME = PNGImporter;
