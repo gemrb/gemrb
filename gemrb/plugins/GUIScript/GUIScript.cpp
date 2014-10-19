@@ -4216,6 +4216,21 @@ static void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<Sele
 	}
 }
 
+struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
+	char lastchar;
+	LastCharFilter(char lastchar)
+	: lastchar(lastchar) {}
+
+	bool operator()(const char* fname) const {
+		const char* extpos = strrchr(fname, '.');
+		if (extpos) {
+			extpos--;
+			return *extpos == lastchar;
+		}
+		return false;
+	}
+};
+
 PyDoc_STRVAR( GemRB_TextArea_GetPortraits__doc,
 "GetPortraits(WindowIndex, ControlIndex, SmallOrLarge) => int\n\n"
 "Reads in the contents of the portraits subfolder." );
@@ -4233,23 +4248,8 @@ static PyObject* GemRB_TextArea_GetPortraits(PyObject * /*self*/, PyObject* args
 		return NULL;
 	}
 
-	struct PortraitSizeFilter : DirectoryIterator::FileFilterPredicate {
-		char size;
-		PortraitSizeFilter(char size)
-		: size(size) {}
-
-		bool operator()(const char* fname) const {
-			const char* extpos = strrchr(fname, '.');
-			if (extpos) {
-				extpos--;
-				return *extpos == size;
-			}
-			return false;
-		}
-	};
-
 	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_PORTRAITS);
-	dir.SetFilterPredicate(new PortraitSizeFilter((suffix) ? 'S' : 'M'));
+	dir.SetFilterPredicate(new LastCharFilter((suffix) ? 'S' : 'M'));
 
 	std::vector<SelectOption> TAOptions;
 	ProcessDirectoryForTAOptions(dir, TAOptions);
@@ -4275,8 +4275,14 @@ static PyObject* GemRB_TextArea_GetCharSounds(PyObject * /*self*/, PyObject* arg
 	}
 
 	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_SOUNDS);
+	dir.SetFilterPredicate(new LastCharFilter('_'));
+
 	std::vector<SelectOption> TAOptions;
 	ProcessDirectoryForTAOptions(dir, TAOptions);
+	for (size_t i = 0; i < TAOptions.size(); i++) {
+		String& s = TAOptions[i].second;
+		s.erase(--s.end());
+	}
 	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
 
 	// now select the sound being used by the Selected PC
