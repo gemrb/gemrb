@@ -333,7 +333,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 	if (point) {
 		// deal with possible trailing newline
-		assert(charCount >= 0);
+		assert(charCount > 0);
 		if (string[charCount - 1] == L'\n') {
 			dp.y += LineHeight;
 		}
