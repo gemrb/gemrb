@@ -258,13 +258,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		ieWord lineW = StringSize(line, &s).w;
 
 		size_t lineLen = line.length();
-		size_t linePos = line.find_first_not_of(L' ');
-		if (lineLen && linePos != String::npos) {
-			// skip spaces at the beginning of a line
-			// FIXME: under what conditions does this not apply? single line? what about console?
-			line.erase(0, linePos);
-			charCount += linePos;
-
+		if (lineLen) {
+			size_t linePos = 0;
 			Point linePoint;
 			if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
 				linePoint.x += (rgn.w - lineW); // this is right aligned, but we can adjust for center later on
@@ -301,17 +296,20 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 #endif
 			dp = dp + linePoint;
-			charCount += linePos;
 			if (linePos < line.length() - 1) {
-				lineBreak = true;
-				if (!singleLine) {
-					// dont bother getting the next line if we arent going to print it
-					line = line.substr(linePos);
+				// ignore whitespace between current pos and next word, if any (we are wrapping... maybe)
+				linePos = line.find_first_not_of(WHITESPACE_STRING, linePos);
+				if (linePos == String::npos) {
+					linePos = line.length() - 1; // newline char accounted for later
+				} else {
+					lineBreak = true;
+					if (!singleLine) {
+						// dont bother getting the next line if we arent going to print it
+						line = line.substr(linePos);
+					}
 				}
 			}
-		} else if (linePos == String::npos) {
-			// string is only spaces... just skip it
-			charCount += line.length();
+			charCount += linePos;
 		}
 		if (!lineBreak && !stream.eof())
 			charCount++; // for the newline
@@ -335,6 +333,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 	if (point) {
 		// deal with possible trailing newline
+		assert(charCount >= 0);
 		if (string[charCount - 1] == L'\n') {
 			dp.y += LineHeight;
 		}
@@ -362,10 +361,15 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of
-	int spaceW = GetGlyph(L' ').size.w;
 	bool done = false;
-	while ((wordBreak = line.find_first_of(L' ', linePos))) {
-		String word = line.substr(linePos, wordBreak - linePos);
+	do {
+		wordBreak = line.find_first_of(L' ', linePos);
+		String word;
+		if (wordBreak == linePos) {
+			word = L' ';
+		} else {
+			word = line.substr(linePos, wordBreak - linePos);
+		}
 
 		int wordW = StringSize(word).w;
 		if (dp.x + wordW > lineRgn.w) {
@@ -409,15 +413,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 			}
 			dp.x += curGlyph.size.w;
 		}
+		linePos += i;
 		if (done) break;
-		linePos += i + 1;
-
-		if (wordBreak == String::npos) {
-			linePos--; // we previously counted a non-existant space
-			break;
-		}
-		dp.x += spaceW;
-	}
+	} while (linePos < line.length());
 	assert(linePos <= line.length());
 	return linePos;
 }
@@ -600,6 +598,9 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 		*numChars = i + 1; // +1 to convert from index to char count
 	}
 
+	if (string.find_first_not_of(WHITESPACE_STRING) == String::npos) {
+		w += spaceW;
+	}
 	// this can only return w > stop->w if there is a singe word wider than stop.
 	return Size(w, (LineHeight * lines));
 }
