@@ -542,7 +542,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0, spaceW = 0;
 	bool newline = false, eos = false, ws = false;
-	size_t i = 0, wordCharCount = 0, wscount = 0;
+	size_t i = 0, rewindCount = 0;
 	for (; i < string.length(); i++) {
 		eos = (i == string.length() - 1);
 		ws = std::isspace(string[i]);
@@ -552,8 +552,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 			if (i > 0) { // kerning
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
-			wordCharCount++;
-			wscount = 0;
+			rewindCount++;
 		}
 		if (ws || eos) {
 			if (stop && stop->w
@@ -573,7 +572,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 				} else if (string[i] != L'\r' && ws) {
 					spaceW += GetGlyph(string[i]).size.w;
 				}
-				wordCharCount = 0;
+				rewindCount = 0;
 				wordW = 0;
 			}
 		}
@@ -582,11 +581,11 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 			w = (lineW > w) ? lineW : w;
 			if (stop && stop->h && (LineHeight * (lines + 1)) >= stop->h ) {
 				// adjust i for numChars
-				if (numChars && wordCharCount) {
+				if (numChars) {
 					// rewinding to the last word that fit
-					i -= wordCharCount + wscount;
+					i -= rewindCount;
+					i++; // +1 to convert from index to char count
 				}
-				i++; // +1 to convert from index to char count
 				break;
 			}
 			if (newline) {
