@@ -39,8 +39,6 @@
 
 namespace GemRB {
 
-#define YESNO(x) ( (x)?"Yes":"No")
-
 // we start this at a non-zero value to make debugging easier
 static ieDword globalActorCounter = 10000;
 static bool startActive = false;
@@ -133,16 +131,12 @@ Scriptable::~Scriptable(void)
 	}
 	ClearActions();
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
-		if (Scripts[i]) {
-			delete( Scripts[i] );
-		}
+		delete Scripts[i];
 	}
 	if (overHeadText) {
 		core->FreeString( overHeadText );
 	}
-	if (locals) {
-		delete( locals );
-	}
+	delete locals;
 }
 
 void Scriptable::SetScriptName(const char* text)
@@ -161,10 +155,10 @@ const char* Scriptable::GetScriptName(void) const
 }
 
 void Scriptable::SetDialog(const char *resref) {
-		if (gamedata->Exists(resref, IE_DLG_CLASS_ID) ) {
-			strnuprcpy(Dialog, resref, 8);
-		}
+	if (gamedata->Exists(resref, IE_DLG_CLASS_ID) ) {
+		strnuprcpy(Dialog, resref, 8);
 	}
+}
 
 Map* Scriptable::GetCurrentArea() const
 {
@@ -189,9 +183,7 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
 	}
-	if (Scripts[idx]) {
-		delete Scripts[idx];
-	}
+	delete Scripts[idx];
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
@@ -207,9 +199,7 @@ void Scriptable::SetScript(int index, GameScript* script)
 		Log(ERROR, "Scriptable", "Invalid script index!");
 		return;
 	}
-	if (Scripts[index] ) {
-		delete Scripts[index];
-	}
+	delete Scripts[index];
 	Scripts[index] = script;
 }
 
@@ -305,16 +295,11 @@ void Scriptable::Update()
 	AdjustedTicks++;
 	AuraTicks++;
 
-	Actor *act = NULL;
-	if (Type == ST_ACTOR) {
-		act = (Actor *) this;
-	}
-
 	if (UnselectableTimer) {
 		UnselectableTimer--;
 		if (!UnselectableTimer) {
-			if (act) {
-				act->SetCircleSize();
+			if (Type == ST_ACTOR) {
+				((Actor *) this)->SetCircleSize();
 			}
 		}
 	}
@@ -395,13 +380,18 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	bool changed = false;
 
-	// if party AI is disabled, don't run non-override scripts
-	if (Type == ST_ACTOR && ((Actor *) this)->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
-		scriptCount = 1;
-	// TODO: hardcoded action hacks
+	Actor *act = NULL;
 	if (Type == ST_ACTOR) {
+		act = (Actor *) this;
+	}
+
+	if (act) {
+		// if party AI is disabled, don't run non-override scripts
+		if (act->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
+			scriptCount = 1;
+		// TODO: hardcoded action hacks
 		//TODO: add stuff here that overrides actions (like Panic, etc)
-		changed |= ((Actor *) this)->OverrideActions();
+		changed |= act->OverrideActions();
 	}
 
 	bool continuing = false, done = false;
@@ -418,16 +408,16 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (changed)
 		InitTriggers();
 
-	if (Type == ST_ACTOR) {
+	if (act) {
 		//TODO: add stuff here about idle actions
-		((Actor *) this)->IdleActions(CurrentAction!=NULL);
+		act->IdleActions(CurrentAction!=NULL);
 	}
 }
 
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		print("[GameScript]: NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "NULL action encountered for %s!", scriptName);
 		return;
 	}
 
@@ -457,7 +447,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		print("[GameScript]: NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "NULL action encountered for %s!", scriptName);
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
@@ -535,7 +525,7 @@ void Scriptable::ProcessActions()
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
 			if (! (CurrentActionTicks == 0 && CurrentActionState == 0)) {
-				print("Last action: %d", lastAction);
+				Log(ERROR, "Scriptable", "Last action: %d", lastAction);
 			}
 			assert(CurrentActionTicks == 0 && CurrentActionState == 0);
 			CurrentAction = PopNextAction();
@@ -1173,7 +1163,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 	return 1;
 }
 
-// checks if a party-friendly actor is nearby and if so, if it reckognizes the spell
+// checks if a party-friendly actor is nearby and if so, if it recognizes the spell
 // this enemy just started casting
 void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef)
 {
@@ -1204,9 +1194,12 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			char tmpstr[100];
-			memset(tmpstr, 0, sizeof(tmpstr));
 			// eg. .:Casts Word of Recall:.
-			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", core->GetString(displaymsg->GetStringReference(STR_CASTS)), core->GetString(spl->SpellName));
+			char *castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
+			char *spellname = core->GetString(spl->SpellName);
+			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", castmsg, spellname);
+			core->FreeString(castmsg);
+			core->FreeString(spellname);
 			DisplayHeadText(tmpstr);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
@@ -1780,9 +1773,7 @@ Highlightable::Highlightable(ScriptableType type)
 
 Highlightable::~Highlightable(void)
 {
-	if (outline) {
-		delete( outline );
-	}
+	delete( outline );
 }
 
 bool Highlightable::IsOver(const Point &Pos) const
@@ -1854,9 +1845,7 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
 		CREItem *item = NULL;
 		haskey->inventory.RemoveItem(Key,0,&item);
 		//the item should always be existing!!!
-		if (item) {
-			delete item;
-		}
+		delete item;
 	}
 
 	return true;
@@ -1998,8 +1987,8 @@ void Movable::SetStance(unsigned int arg)
 		}
 
 	} else {
-		StanceID=IE_ANI_AWAKE; //
-		print("Tried to set invalid stance id(%u)", arg);
+		StanceID=IE_ANI_AWAKE;
+		Log(ERROR, "Movable", "Tried to set invalid stance id(%u)", arg);
 	}
 }
 
