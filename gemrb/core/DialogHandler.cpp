@@ -37,7 +37,7 @@
 namespace GemRB {
 
 //translate section values (journal, solved, unsolved, user)
-static int sectionMap[4]={4,1,2,0};
+static const int *sectionMap;
 static const int bg2Sections[4]={4,1,2,0};
 static const int noSections[4]={0,0,0,0};
 
@@ -49,26 +49,22 @@ DialogHandler::DialogHandler(void)
 	speakerID = 0;
 	initialState = -1;
 	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) ) {
-		memcpy(sectionMap, bg2Sections, sizeof(sectionMap) );
+		sectionMap = bg2Sections;
 	} else {
-		memcpy(sectionMap, noSections, sizeof(sectionMap) );
+		sectionMap = noSections;
 	}
 }
 
 DialogHandler::~DialogHandler(void)
 {
-	if (dlg) {
-		delete dlg;
-	}
+	delete dlg;
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
 bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
 {
-	if (dlg) {
-		delete dlg;
-		dlg = NULL;
-	}
+	delete dlg;
+	dlg = NULL;
 
 	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
@@ -152,27 +148,23 @@ void DialogHandler::EndDialog(bool try_to_break)
 	}
 
 	Actor *tmp = GetSpeaker();
-	if (tmp) {
-		tmp->LeaveDialog();
-	}
 	speakerID = 0;
 	Scriptable *tmp2 = GetTarget();
-	if (tmp2 && tmp2->Type == ST_ACTOR) {
-		tmp = (Actor *)tmp2;
-	} else {
-		tmp = NULL;
-	}
+	targetID = 0;
+	originalTargetID = 0;
+
 	if (tmp) {
 		tmp->LeaveDialog();
 	}
-	targetID = 0;
-	if (tmp) tmp->SetCircleSize();
-	originalTargetID = 0;
-	ds = NULL;
-	if (dlg) {
-		delete dlg;
-		dlg = NULL;
+	if (tmp2 && tmp2->Type == ST_ACTOR) {
+		tmp = (Actor *)tmp2;
+		tmp->LeaveDialog();
+		tmp->SetCircleSize();
 	}
+	ds = NULL;
+	delete dlg;
+	dlg = NULL;
+
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
@@ -185,26 +177,25 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
-
 void DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
-		Log(ERROR, "GameControl", "Dialog aborted???");
+		Log(ERROR, "DialogHandler", "Dialog aborted???");
 		EndDialog();
 		return;
 	}
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
-		Log(ERROR, "GameControl", "Speaker gone???");
+		Log(ERROR, "DialogHandler", "Speaker gone???");
 		EndDialog();
 		return;
 	}
 
 	Scriptable *target = GetTarget();
 	if (!target) {
-		Log(ERROR, "GameControl", "Target gone???");
+		Log(ERROR, "DialogHandler", "Target gone???");
 		EndDialog();
 		return;
 	}
@@ -270,7 +261,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
-			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
+			displaymsg->DisplayStringName( tr->textStrRef, DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 				ta->AppendText( "", -1 );
 			}
@@ -292,14 +283,9 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			target->AddAction( GenerateAction( "SetInterrupt(TRUE)" ) );
 		}
 
-		int final_dialog = tr->Flags & IE_DLG_TR_FINAL;
-
-		if (final_dialog) {
+		if (tr->Flags & IE_DLG_TR_FINAL) {
 			ta->SetMinRow( false );
 			EndDialog();
-		}
-
-		if (final_dialog) {
 			return;
 		}
 
@@ -347,7 +333,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				}
 			}
 			if (!tgt) {
-				Log(WARNING, "Dialog", "Can't redirect dialog");
+				Log(WARNING, "DialogHandler", "Can't redirect dialog");
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
@@ -383,7 +369,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 
 	ds = dlg->GetState( si );
 	if (!ds) {
-		Log(WARNING, "Dialog", "Can't find next dialog");
+		Log(WARNING, "DialogHandler", "Can't find next dialog");
 		ta->SetMinRow( false );
 		EndDialog();
 		return;
@@ -441,7 +427,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	}
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
-		Log(WARNING, "Dialog", "There were no valid dialog options!");
+		Log(WARNING, "DialogHandler", "There were no valid dialog options!");
 		core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 	}
 end_of_choose:
@@ -484,6 +470,5 @@ Actor *DialogHandler::GetSpeaker()
 {
 	return GetActorByGlobalID(speakerID);
 }
-
 
 }
