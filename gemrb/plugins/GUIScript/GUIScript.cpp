@@ -4876,7 +4876,7 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerSound__doc,
-"SetPlayerSound(Slot)\n\n"
+"GetPlayerSound(Slot[, flags])\n\n"
 "Gets the player character's sound set." );
 
 static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)

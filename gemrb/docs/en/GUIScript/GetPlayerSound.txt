@@ -1,12 +1,13 @@
 
-Prototype: GemRB.SetPlayerSound(Slot)
+Prototype: GemRB.GetPlayerSound(Slot[, flags])
 
 Metaclass Prototype:
 
 Description:  Gets the player character's sound set.
 
 Parameters: 
-Slot - 
+Slot - party slot
+flags - if set, the whole subpath will be returned for games with sound subfolders
 
 Return value:
 
