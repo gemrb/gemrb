@@ -338,7 +338,7 @@ def DisplayGeneral (pc):
 	adj = GetECL (pc)
 	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
 	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40308) + " - " +
-                            GemRB.GetString(40309) + ": " + str(levelsum) + "\n[/color]")
+                            GemRB.GetString(40309) + ": " + str(levelsum) + "[/color]\n")
 
 	#the class name for highest
 	highest = None
