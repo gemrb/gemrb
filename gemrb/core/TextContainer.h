@@ -23,8 +23,8 @@
 #include "Region.h"
 #include "System/String.h"
 
+#include <deque>
 #include <list>
-#include <map>
 #include <vector>
 
 namespace GemRB {
@@ -107,7 +107,34 @@ protected:
 	Size contentBounds;
 	mutable Point parentOffset;
 
-	typedef std::map<const Content*, Regions> ContentLayout;
+	struct Layout {
+		const Content* content;
+		Regions regions;
+
+		Layout(const Content* c, const Regions r)
+		: content(c), regions(r) {}
+
+		bool operator==(const Content* c) const {
+			return c == content;
+		}
+
+		bool operator<(const Point& p) const {
+			const Region& r = regions.back();
+			return r.y < p.y || (r.x < p.x && r.y == p.y);
+		}
+
+		bool PointInside(const Point& p) const {
+			Regions::const_iterator rit = regions.begin();
+			for (; rit != regions.end(); ++rit) {
+				if ((*rit).PointInside(p)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	};
+
+	typedef std::deque<Layout> ContentLayout;
 	ContentLayout layout;
 	Point layoutPoint;
 
@@ -139,6 +166,7 @@ protected:
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
+	const Layout& LayoutForContent(const Content*) const;
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans

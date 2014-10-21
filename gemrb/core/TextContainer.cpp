@@ -337,7 +337,8 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		Content* content = *it;
 		it = contents.erase(it);
 		content->parent = NULL;
-		layout.erase(content);
+		layout.erase(std::find(layout.begin(), layout.end(), content));
+
 		layoutPoint = Point(); // reset cached layoutPoint
 		if (doLayout) {
 			LayoutContentsFrom(it);
@@ -349,16 +350,27 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
 {
-	ContentLayout::const_reverse_iterator it = layout.rbegin();
-	for (; it != layout.rend(); ++it) {
-		const Regions& rgns = (*it).second;
-		Regions::const_iterator rit = rgns.begin();
-		for (; rit != rgns.end(); ++rit) {
-			if ((*rit).PointInside(p)) {
-				// i know we are casting away const.
-				// we could return sdt::find(contents.begin(), contents.end(), *it) instead, but whats the point?
-				return (Content*)(*it).first;
-			}
+	// attempting to optimize the search by assuming content is evenly distributed vertically
+	// we are also assuming that layout regions are always contiguous and ordered ltr-ttb
+	// we do know by definition that the content itself is ordered ltr-ttb
+	// based on the above a simple binary search should suffice
+
+	ContentLayout::const_iterator it = layout.begin();
+	size_t count = layout.size();
+	while (count > 0) {
+		size_t step = count / 2;
+		std::advance(it, step);
+		if ((*it).PointInside(p)) {
+			// i know we are casting away const.
+			// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
+			return (Content*)(*it).content;
+		}
+		if (*it < p) {
+			it++;
+			count -= step + 1;
+		} else {
+			std::advance(it, -step);
+			count = step;
 		}
 	}
 	return NULL;
@@ -366,17 +378,24 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 
 Region ContentContainer::BoundingBoxForContent(const Content* c) const
 {
-	if (layout.find(c) != layout.end()) {
-		return Region::RegionEnclosingRegions(layout.at(c));
+	return Region::RegionEnclosingRegions(LayoutForContent(c).regions);
+}
+
+const ContentContainer::Layout& ContentContainer::LayoutForContent(const Content* c) const
+{
+	ContentLayout::const_iterator it = std::find(layout.begin(), layout.end(), c);
+	if (it != layout.end()) {
+		return *it;
 	}
-	return Region();
+	static Layout NullLayout(NULL, Regions());
+	return NullLayout;
 }
 
 const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 {
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
-		const Regions& rgns = (*it).second;
+		const Regions& rgns = (*it).regions;
 		Regions::const_iterator rit = rgns.begin();
 		for (; rit != rgns.end(); ++rit) {
 			if ((*rit).IntersectsRegion(r)) {
@@ -426,12 +445,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		// relaying content some place in the middle of the container
 		exContent = *--it;
 		it++;
-		assert(layout.find(exContent) != layout.end());
 	}
 	// clear the existing layout, but only for "it" and onward
 	ContentList::const_iterator clearit = it;
 	for (; clearit != contents.end(); ++clearit) {
-		ContentLayout::iterator i = layout.find(*clearit);
+		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
 			layoutPoint = Point(); // reset cached layoutPoint
 			layout.erase(i);
@@ -441,8 +459,9 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
-			Regions::const_iterator rit = layout[exContent].begin();
-			for (; rit != layout[exContent].end(); ++rit) {
+			const Regions& rgns = LayoutForContent(exContent).regions;
+			Regions::const_iterator rit = rgns.begin();
+			for (; rit != rgns.end(); ++rit) {
 				if ((*rit).PointInside(layoutPoint)) {
 					excluded = &(*rit);
 					break;
@@ -461,8 +480,8 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			assert(exContent != content);
 		}
 		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, frame);
-		layout[content] = rgns;
-		Region bounds = Region::RegionEnclosingRegions(rgns);
+		layout.push_back(Layout(content, rgns));
+		const Region& bounds = Region::RegionEnclosingRegions(rgns);
 		contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
 		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
 		exContent = content;
@@ -485,7 +504,7 @@ void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& o
 
 	const Point& drawOrigin = rgn.Origin();
 	Point drawPoint = drawOrigin;
-	ContentList::const_iterator it = contents.begin();
+	ContentLayout::const_iterator it = layout.begin();
 
 #if (DEBUG_TEXT)
 	Region dr(parentOffset + offset, contentBounds);
@@ -496,11 +515,10 @@ void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& o
 	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
 #endif
 
-	for (; it != contents.end(); ++it) {
-		const Content* content = *it;
-
+	for (; it != layout.end(); ++it) {
+		const Layout& l = *it;
 		assert(drawPoint.x <= drawOrigin.x + frame.w);
-		content->DrawContentsInRegions(layout.at(content), offset + parentOffset);
+		l.content->DrawContentsInRegions(l.regions, offset + parentOffset);
 	}
 }
 
