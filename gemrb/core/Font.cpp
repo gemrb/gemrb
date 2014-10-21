@@ -104,8 +104,9 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 
 const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 {
-	if (glyphs.find(chr) != glyphs.end()) {
-		return glyphs.at(chr);
+	std::map<ieWord, Glyph>::const_iterator it = glyphs.find(chr);
+	if (it != glyphs.end()) {
+		return (*it).second;
 	}
 	static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
 	return blank;
@@ -203,11 +204,13 @@ const Glyph& Font::GetGlyph(ieWord chr) const
 
 	// Aliases are 2 glyphs that share identical BAM frames such as 'ā' and 'a'
 	// we can save a few bytes of memory this way :)
-	if (AliasMap.find(chr) != AliasMap.end()) {
-		chr = AliasMap.at(chr);
+	std::map<ieWord, ieWord>::const_iterator ait = AliasMap.find(chr);
+	if (ait != AliasMap.end()) {
+		chr = (*ait).second;
 	}
 	size_t idx = 0;
-	if (AtlasIndex.find(chr) != AtlasIndex.end()) idx = AtlasIndex.at(chr);
+	GlyphIndex::const_iterator it = AtlasIndex.find(chr);
+	if (it != AtlasIndex.end()) idx = (*it).second;
 	return Atlas[idx]->GlyphForChr(chr);
 }
 
@@ -416,8 +419,6 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* colo
 			if (canvas) {
 				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.Dimensions());
 			} else {
-				assert(AtlasIndex.find(currChar) != AtlasIndex.end());
-
 				size_t pageIdx = AtlasIndex.at(currChar);
 				assert(pageIdx < AtlasIndex.size());
 
