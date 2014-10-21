@@ -198,6 +198,9 @@ void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 
 const Glyph& Font::GetGlyph(ieWord chr) const
 {
+	// FIXME: this method is unfortunately slow.
+	// a better storage scheme (in the atlas) would probably be to allocate a vector/array for each page and have the char as an index
+
 	// Aliases are 2 glyphs that share identical BAM frames such as 'ā' and 'a'
 	// we can save a few bytes of memory this way :)
 	if (AliasMap.find(chr) != AliasMap.end()) {
@@ -222,6 +225,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	// is this horribly inefficient?
 	std::wistringstream stream(string);
 	bool lineBreak = false;
+
+	const Region& sclip = core->GetVideoDriver()->GetScreenClip();
 
 	String line;
 	while (lineBreak || getline(stream, line)) {
@@ -253,40 +258,49 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		}
 
 		dp.x = 0;
-		const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
-		const Size s = lineRgn.Dimensions();
-		ieWord lineW = StringSize(line, &s).w;
-
 		size_t lineLen = line.length();
 		if (lineLen) {
 			size_t linePos = 0;
 			Point linePoint;
-			if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
-				linePoint.x += (rgn.w - lineW); // this is right aligned, but we can adjust for center later on
-				if (linePoint.x < 0) {
-					linePos = String::npos;
-					size_t prevPos = linePos;
-					String word;
-					while (linePoint.x < 0) {
-						// yuck, this is not optimal. not sure of a better way.
-						// we have to rewind, word by word, until X >= 0
-						linePos = line.find_last_of(L' ', prevPos);
-						// word should be the space + word for calculation purposes
-						word = line.substr(linePos, (prevPos - linePos) + 1);
-						linePoint.x += StringSize(word).w;
-						prevPos = linePos - 1;
+
+			const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
+			const Size lineMaxSize = lineRgn.Dimensions();
+			Size lineSize = StringSize(line, &lineMaxSize, &linePos);
+			ieWord lineW = lineSize.w;
+
+			// check to see if the line is even on screen
+			if (!sclip.IntersectsRegion(lineRgn)) {
+				// offscreen, optimize by bypassing RenderLine, we pre-calculated linePos above
+				linePoint.x += lineSize.w;
+			} else {
+				// on screen
+				if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
+					linePoint.x += (rgn.w - lineW); // this is right aligned, but we can adjust for center later on
+					if (linePoint.x < 0) {
+						linePos = String::npos;
+						size_t prevPos = linePos;
+						String word;
+						while (linePoint.x < 0) {
+							// yuck, this is not optimal. not sure of a better way.
+							// we have to rewind, word by word, until X >= 0
+							linePos = line.find_last_of(L' ', prevPos);
+							// word should be the space + word for calculation purposes
+							word = line.substr(linePos, (prevPos - linePos) + 1);
+							linePoint.x += StringSize(word).w;
+							prevPos = linePos - 1;
+						}
+					}
+					if (alignment&IE_FONT_ALIGN_CENTER) {
+						linePoint.x /= 2;
 					}
 				}
-				if (alignment&IE_FONT_ALIGN_CENTER) {
-					linePoint.x /= 2;
-				}
-			}
 #if DEBUG_FONT
-			core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
-			core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
-											 Size(lineW, LineHeight)), ColorWhite, false);
+				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
+				core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
+												 Size(lineW, LineHeight)), ColorWhite, false);
 #endif
-			linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
+				linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
+			}
 #if DEBUG_FONT
 			if (linePos == 0) {
 				// FIXME: we have no good way of handling when a single word is longer than the line
