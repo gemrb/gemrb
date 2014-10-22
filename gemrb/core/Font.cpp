@@ -27,8 +27,6 @@
 #include "Palette.h"
 #include "Video.h"
 
-#include <sstream>
-
 #define DEBUG_FONT 0
 
 namespace GemRB {
@@ -223,21 +221,27 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
 	Point dp((point) ? point->x : 0, (point) ? point->y : 0);
-
-	size_t charCount = 0;
-	// is this horribly inefficient?
-	std::wistringstream stream(string);
-	bool lineBreak = false;
-
 	const Region& sclip = core->GetVideoDriver()->GetScreenClip();
 
+	size_t charCount = 0;
+	bool lineBreak = false;
+	size_t stringPos = 0;
 	String line;
-	while (lineBreak || getline(stream, line)) {
-		lineBreak = false;
+	while (lineBreak || stringPos < string.length()) {
+		if (lineBreak) {
+			lineBreak = false;
+		} else {
+			size_t pos = stringPos;
+			stringPos = string.find_first_of(L"\n", stringPos);
+			line = string.substr(pos, stringPos - pos);
+			if (stringPos != String::npos) {
+				stringPos++; // skip \n
+			}
+		}
 
 		// check if we need to extend the canvas
 		if (canvas && grow && rgn.h < dp.y) {
-			size_t pos = stream.tellg();
+			size_t pos = (stringPos < string.length()) ? stringPos : string.length() - 1;
 			pos -= line.length();
 			Size textSize = StringSize(string.substr(pos));
 			ieWord numNewPixels = textSize.Area();
@@ -328,7 +332,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 			charCount += linePos;
 		}
-		if (!lineBreak && !stream.eof())
+		if (!lineBreak && stringPos != String::npos)
 			charCount++; // for the newline
 		dp.y += LineHeight;
 
@@ -601,6 +605,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 					i -= rewindCount;
 					i++; // +1 to convert from index to char count
 				}
+				// TODO: check the rest of the line, if all that remains is WS + \n then set w to max.
 				break;
 			}
 			if (newline) {
