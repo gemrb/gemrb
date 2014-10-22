@@ -186,7 +186,7 @@ void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 	assert(AliasMap.find(alias) == AliasMap.end());
 	// we cannot create an alias of an alias...
 	assert(AliasMap.find(chr) == AliasMap.end());
-	// we cannot create an alias for a chaaracter that doesnt exist
+	// we cannot create an alias for a character that doesnt exist
 	assert(AtlasIndex.find(chr) != AtlasIndex.end());
 
 	AliasMap[alias] = chr;
@@ -269,16 +269,16 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
 			const Size lineMaxSize = lineRgn.Dimensions();
 			Size lineSize = StringSize(line, &lineMaxSize, &linePos);
-			ieWord lineW = lineSize.w;
 
-			// check to see if the line is even on screen
+			// check to see if the line is on screen
 			if (!sclip.IntersectsRegion(lineRgn)) {
 				// offscreen, optimize by bypassing RenderLine, we pre-calculated linePos above
-				linePoint.x += lineSize.w;
+				// alignment is completely irrelevant here since the width is the same for all alignments
+				linePoint.x = lineSize.w;
 			} else {
 				// on screen
 				if (alignment&(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_RIGHT)) {
-					linePoint.x += (rgn.w - lineW); // this is right aligned, but we can adjust for center later on
+					linePoint.x += (rgn.w - lineSize.w); // this is right aligned, but we can adjust for center later on
 					if (linePoint.x < 0) {
 						linePos = String::npos;
 						size_t prevPos = linePos;
