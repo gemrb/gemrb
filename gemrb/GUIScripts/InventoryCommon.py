@@ -827,11 +827,13 @@ def IdentifyUseScroll ():
 	return
 
 def CloseIdentifyItemWindow ():
-	global ItemIdentifyWindow
+	global ItemIdentifyWindow, ItemInfoWindow
 
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
 		ItemIdentifyWindow = None
+	if ItemInfoWindow:
+		ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def IdentifyItemWindow ():
