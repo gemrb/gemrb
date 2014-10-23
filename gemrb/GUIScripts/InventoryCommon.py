@@ -882,11 +882,13 @@ def DoneAbilitiesItemWindow ():
 	return
 
 def CloseAbilitiesItemWindow ():
-	global ItemAbilitiesWindow
+	global ItemAbilitiesWindow, ItemInfoWindow
 
 	if ItemAbilitiesWindow:
 		ItemAbilitiesWindow.Unload ()
 		ItemAbilitiesWindow = None
+	if ItemInfoWindow:
+		ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def AbilitiesItemWindow ():
