@@ -287,10 +287,13 @@ size_t Font::RenderText(const String& string, Region& rgn,
 						linePos = String::npos;
 						size_t prevPos = linePos;
 						String word;
-						while (linePoint.x < 0) {
+						while (linePoint.x < 0 && linePos > 0) {
 							// yuck, this is not optimal. not sure of a better way.
 							// we have to rewind, word by word, until X >= 0
 							linePos = line.find_last_of(L' ', prevPos);
+							if (linePos == String::npos) {
+								linePos = 0;
+							}
 							// word should be the space + word for calculation purposes
 							word = line.substr(linePos, (prevPos - linePos) + 1);
 							linePoint.x += StringSize(word).w;
