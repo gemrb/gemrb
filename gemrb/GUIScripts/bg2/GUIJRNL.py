@@ -191,9 +191,8 @@ def UpdateLogWindow ():
 		JournalTitle = "\n[color=d00000]" + je2[0] + "[/color]\n"
 		JournalText = "\n" + je2[1] + "\n"
 
-		Text.Append (JournalTitle + GemRB.GetString(15980), 3*i)
-		Text.Append (JournalText, 3*i+1)
-		Text.Append ("", 3*i + 2)
+		Text.Append (JournalTitle + GemRB.GetString(15980))
+		Text.Append (JournalText)
 
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
