@@ -287,12 +287,16 @@ size_t Font::RenderText(const String& string, Region& rgn,
 						linePos = String::npos;
 						size_t prevPos = linePos;
 						String word;
-						while (linePoint.x < 0 && linePos > 0) {
+						while (linePoint.x < 0) {
 							// yuck, this is not optimal. not sure of a better way.
 							// we have to rewind, word by word, until X >= 0
 							linePos = line.find_last_of(L' ', prevPos);
 							if (linePos == String::npos) {
-								linePos = 0;
+#if DEBUG_FONT
+								Log(MESSAGE, "Font", "Horizontal alignment invalidated for '%ls' due to insufficient width %d", line, lineSize.w);
+#endif
+								linePoint.x = 0;
+								break;
 							}
 							// word should be the space + word for calculation purposes
 							word = line.substr(linePos, (prevPos - linePos) + 1);
