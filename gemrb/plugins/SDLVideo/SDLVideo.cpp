@@ -1462,7 +1462,27 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, const Region& dst)
 {
 	SDL_Rect srect = RectFromRegion(src); // FIXME: this may not be clipped
-	SDL_Rect drect = RectFromRegion(ClippedDrawingRect(dst));
+	Region dclipped = ClippedDrawingRect(dst);
+	int trim = dst.h - dclipped.h;
+	if (trim) {
+		srect.h -= trim;
+		if (dclipped.y > dst.y) { // top clipped
+			srect.y += trim;
+		} else { // bottom clipped
+			srect.y -= trim;
+		}
+	}
+	trim = dst.w - dclipped.w;
+	if (trim) {
+		srect.w -= trim;
+		if (dclipped.x > dst.x) { // left
+			srect.x += trim;
+		} else { // right
+			srect.x -= trim;
+		}
+	}
+
+	SDL_Rect drect = RectFromRegion(dclipped);
 	// since we should already be clipped we can call SDL_LowerBlit directly
 	SDL_LowerBlit(surf, &srect, backBuf, &drect);
 }
