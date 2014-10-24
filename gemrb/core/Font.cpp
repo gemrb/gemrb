@@ -293,7 +293,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 							linePos = line.find_last_of(L' ', prevPos);
 							if (linePos == String::npos) {
 #if DEBUG_FONT
-								Log(MESSAGE, "Font", "Horizontal alignment invalidated for '%ls' due to insufficient width %d", line, lineSize.w);
+								Log(MESSAGE, "Font", "Horizontal alignment invalidated for '%ls' due to insufficient width %d", line.c_str(), lineSize.w);
 #endif
 								linePoint.x = 0;
 								break;
