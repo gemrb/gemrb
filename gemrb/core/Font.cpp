@@ -580,17 +580,19 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 			) {
 				newline = true;
 			} else {
-				if (lineW) {
+				assert(newline == false);
+				if (string[i] == L'\n') {
+					newline = true;
+				} else if (ws && string[i] != L'\r') {
+					spaceW += GetGlyph(string[i]).size.w;
+				}
+				if (lineW || newline) {
+					// always append *everything* if there is \n
 					// spaceW is the *cumulative* whitespace between the 2 words
 					lineW += spaceW;
 					spaceW = 0;
 				}
 				lineW += wordW;
-				if (string[i] == L'\n') {
-					newline = true;
-				} else if (string[i] != L'\r' && ws) {
-					spaceW += GetGlyph(string[i]).size.w;
-				}
 				rewindCount = 0;
 				wordW = 0;
 			}
@@ -599,13 +601,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 		if (newline || eos) {
 			w = (lineW > w) ? lineW : w;
 			if (stop && stop->h && (LineHeight * (lines + 1)) >= stop->h ) {
-				// adjust i for numChars
-				if (numChars) {
-					// rewinding to the last word that fit
-					i -= rewindCount;
-					i++; // +1 to convert from index to char count
-				}
-				// TODO: check the rest of the line, if all that remains is WS + \n then set w to max.
+				if (eos || string[i] == L'\n') i++; // +1 to convert from index to char count, not applicable for wrap
 				break;
 			}
 			if (newline) {
@@ -615,14 +611,15 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 			}
 		}
 	}
+
+	w = (w == 0 && wordW == 0) ? spaceW : w; // if the line is all whitespace
+
 	if (numChars) {
-		*numChars = i;
+		// rewinding to the last word that fit
+		*numChars = i - rewindCount;
 		assert(*numChars <= string.length());
 	}
 
-	if (string.find_first_not_of(WHITESPACE_STRING) == String::npos) {
-		w += spaceW;
-	}
 	// this can only return w > stop->w if there is a singe word wider than stop.
 	return Size(w, (LineHeight * lines));
 }
