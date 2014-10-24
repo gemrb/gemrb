@@ -131,7 +131,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 	}
 	Palette* oldPal = Sheet->GetPalette();
 	Sheet->SetPalette(pal);
-	SpriteSheet::Draw(chr, dest);
+	SpriteSheet<ieWord>::Draw(chr, dest);
 	Sheet->SetPalette(oldPal);
 	oldPal->release();
 }

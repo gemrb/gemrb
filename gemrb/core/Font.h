@@ -115,7 +115,7 @@ private:
 		const Glyph& GlyphForChr(ieWord chr) const;
 
 		// we need a non-const version of Draw here that will call the base const version
-		using SpriteSheet::Draw;
+		using SpriteSheet<ieWord>::Draw;
 		void Draw(ieWord chr, const Region& dest, Palette* pal = NULL);
 	};
 
