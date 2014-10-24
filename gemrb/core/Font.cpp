@@ -27,7 +27,7 @@
 #include "Palette.h"
 #include "Video.h"
 
-#define DEBUG_FONT 0
+#define DEBUG_FONT 1
 
 namespace GemRB {
 
@@ -309,7 +309,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 					}
 				}
 #if DEBUG_FONT
-				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
+				core->GetVideoDriver()->DrawRect(lineRgn, ColorGreen, false);
 				core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
 #endif
@@ -421,7 +421,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			// use intersection because some rare glyphs can sometimes overlap lines
 			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
 #if DEBUG_FONT
-				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, true);
+				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 #endif
 				done = true;
 				break;
