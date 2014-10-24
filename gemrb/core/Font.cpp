@@ -232,7 +232,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			lineBreak = false;
 		} else {
 			size_t pos = stringPos;
-			stringPos = string.find_first_of(L"\n", stringPos);
+			stringPos = string.find_first_of(L'\n', stringPos);
 			line = string.substr(pos, stringPos - pos);
 			if (stringPos != String::npos) {
 				stringPos++; // skip \n
@@ -364,8 +364,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 	return charCount;
 }
 
-size_t Font::RenderLine(const String& line, const Region& lineRgn, Palette* color,
-						Point& dp, ieByte** canvas) const
+size_t Font::RenderLine(const String& line, const Region& lineRgn,
+						Palette* color, Point& dp, ieByte** canvas) const
 {
 	assert(color); // must have a palette
 	assert(lineRgn.h == LineHeight);

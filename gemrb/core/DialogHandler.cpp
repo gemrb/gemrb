@@ -77,7 +77,7 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 		str = core->GetString(tr->journalStrRef);
 		if (str && str->length()) {
 			//cutting off the strings at the first crlf
-			size_t newlinePos = str->find_first_of(L"\n");
+			size_t newlinePos = str->find_first_of(L'\n');
 			if (newlinePos != String::npos) {
 				str->resize( newlinePos );
 			}

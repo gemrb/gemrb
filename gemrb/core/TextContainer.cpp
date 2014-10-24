@@ -159,7 +159,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				assert(lineSegment.h == lineheight);
 				size_t numOnLine = 0;
 				// must limit our operation to this single line.
-				size_t nextLine = text.find_first_of(L"\n", numPrinted);
+				size_t nextLine = text.find_first_of(L'\n', numPrinted);
 				if (nextLine == numPrinted) {
 					// this is a new line, we dont have to actually size that
 					// simply occupy the entire area and advance.
