@@ -304,7 +304,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 #if DEBUG_FONT
 				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 				core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
-												 Size(lineW, LineHeight)), ColorWhite, false);
+												 Size(lineSize.w, LineHeight)), ColorWhite, false);
 #endif
 				linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
 			}
@@ -313,7 +313,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				// FIXME: we have no good way of handling when a single word is longer than the line
 				// we don't have enough context to deal with that inside RenderLine.
 				// not sure what the best way to handle this case is.
-				Log(WARNING, "Font", "Line (%d width) > %d; for text \"%ls\"!", lineW, lineRgn.w, line.c_str());
+				Log(WARNING, "Font", "Line (%d width) > %d; for text \"%ls\"!", lineSize.w, lineRgn.w, line.c_str());
 			}
 #endif
 			dp = dp + linePoint;
