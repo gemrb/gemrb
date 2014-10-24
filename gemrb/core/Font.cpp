@@ -275,7 +275,9 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			Size lineSize = StringSize(line, &lineMaxSize, &linePos);
 
 			// check to see if the line is on screen
-			if (!sclip.IntersectsRegion(lineRgn)) {
+			// FIXME: technically we could be *even more* optimized by passing lineRgn, but this breaks dropcaps
+			// this isn't a big deal ATM, because the big text containers do line-by-line layout
+			if (!sclip.IntersectsRegion(rgn)) {
 				// offscreen, optimize by bypassing RenderLine, we pre-calculated linePos above
 				// alignment is completely irrelevant here since the width is the same for all alignments
 				linePoint.x = lineSize.w;
