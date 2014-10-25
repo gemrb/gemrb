@@ -185,7 +185,7 @@ def FixAnomen( idx):
 
 #do all the stuff not done yet
 def FixProtagonist( idx):
-	
+	# FIXME: the bottom two can't always be correct	
 	ClassName = GUICommon.GetClassRowName (idx)
 	KitIndex = GUICommon.GetKitIndex (idx)
 	# only give a few items for transitions from soa
@@ -207,14 +207,14 @@ def FixProtagonist( idx):
 			GemRB.SetPlayerStat(idx, IE_XP, xp2)
 			GemRB.SetGlobal("XPGIVEN","GLOBAL", xp2-xp)
 
-		FixFamiliar()
-		FixInnates()
+		FixFamiliar (idx)
+		FixInnates (idx)
 	else:
 		GiveEquipment(idx, ClassName, KitIndex)
 	return
 
 # TODO: replace the familiar with the improved version
-def FixFamiliar():
+def FixFamiliar(pc):
 	# famcat->famcat25
 	# famdust->famdus25
 	# famfair->famfai25
@@ -227,11 +227,13 @@ def FixFamiliar():
 	pass
 
 # TODO: replace bhaal powers with the improved versions (cross-check with chargen; powers are removed during soa)
-def FixInnates():
+def FixInnates(pc):
 	# removes the spells: SPIN101, SPIN102, SPIN103, SPIN104, SPIN105, SPIN106, SPIN822
-	# adds the spell: SPIN822 (slayer change), check if this is needed (two uses), since we add it during chargen
 	#adds the spell: SPIN200, SPIN201, SPIN103, SPIN202, SPIN203, SPIN106
-	pass
+	import Spellbook
+	# adds the spell: SPIN822 (slayer change) if needed
+	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 1, "SPIN822") == -1:
+		GemRB.LearnSpell (pc, "SPIN822", LS_MEMO)
 
 #upgrade savegame to next version
 def GameExpansion():
