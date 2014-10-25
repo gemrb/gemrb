@@ -8144,7 +8144,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	bool invisible = Modified[IE_STATE_ID] & state_invisible;
 	int sneakAttackDamage = 0;
 
-	// TODO: should probably be rate limited to once per round
+	// TODO: should be rate limited (web says to once per 4 rounds?)
 	// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
 	// or one of the stat overrides is set (unconfirmed for iwd2!)
 	if (invisible || always || target->Immobile() || IsBehind(target)) {
@@ -8155,6 +8155,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			if (wi.backstabbing) {
 				// first check for feats that change the sneak dice
 				// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
+				// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
 				if (BackstabResRef[0]!='*') {
 					if (stricmp(BackstabResRef, resref_arterial)) {
 						// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
