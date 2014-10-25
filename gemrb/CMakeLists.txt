@@ -84,18 +84,17 @@ ELSE(WIN32)
 
 	if (STATIC_LINK)
 		TARGET_LINK_LIBRARIES(gemrb
-			  ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
+			  ${COCOA_LIBRARY_PATH}
 			 gemrb_core ${plugins}  -Wl,-all_load)
 	else (STATIC_LINK)
 		TARGET_LINK_LIBRARIES(gemrb gemrb_core
-			  ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+			  ${COCOA_LIBRARY_PATH})
 	endif (STATIC_LINK)
  ELSE(APPLE)
   if (STATIC_LINK)
-	  TARGET_LINK_LIBRARIES(gemrb ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
-		  -Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
+	  TARGET_LINK_LIBRARIES(gemrb -Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
   else (STATIC_LINK)
-	  TARGET_LINK_LIBRARIES(gemrb gemrb_core ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+	  TARGET_LINK_LIBRARIES(gemrb gemrb_core)
   endif (STATIC_LINK)
  ENDIF(APPLE)
 ENDIF(WIN32)
