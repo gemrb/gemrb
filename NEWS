@@ -1,9 +1,13 @@
-GemRB git (a990de9):
+GemRB git (ff89c4b02):
   New features:
     - 
+    - 3ed sneak attack, concentration/disruption
+    - statistically fairer random number generator
 
   Improved features:
     - 
+    - custom map notes and biographies now save properly
+    - effects
     - bugfixes
 
 GemRB v0.8.1 (2014-05-03):
