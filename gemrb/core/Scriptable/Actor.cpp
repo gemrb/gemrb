@@ -8083,7 +8083,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	int multiplier = BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
 	int extraDamage = 0; // damage unaffected by the critical multiplier
 	// check 3ed sneak attack
-	if (third) {
+	if (multiplier > 0 && third) {
 		// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
 		// or one of the stat overrides is set (unconfirmed for iwd2!)
 		ieDword always = Modified[IE_ALWAYSBACKSTAB];
