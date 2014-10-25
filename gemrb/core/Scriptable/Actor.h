@@ -408,6 +408,8 @@ private:
 	bool HasBodyHeat() const;
 	void SetupFistData();
 	void UpdateFatigue();
+	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
+	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 public:
 	Actor(void);
 	~Actor(void);
