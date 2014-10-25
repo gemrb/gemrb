@@ -581,25 +581,22 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 				wordW -= KerningOffset(string[i-1], string[i]);
 			}
 			rewindCount++;
+			// spaceW is the *cumulative* whitespace between the 2 words
+			wordW += spaceW;
+			spaceW = 0;
 		}
 		if (ws || eos) {
 			if (stop && stop->w
-				&& lineW // let this overflow if the word alone is wider than stop->w
 				&& lineW + spaceW + wordW > stop->w
 			) {
 				newline = true;
 			} else {
-				assert(newline == false);
 				if (string[i] == L'\n') {
+					// always append *everything* if there is \n
+					lineW += spaceW;
 					newline = true;
 				} else if (ws && string[i] != L'\r') {
 					spaceW += GetGlyph(string[i]).size.w;
-				}
-				if (lineW || newline) {
-					// always append *everything* if there is \n
-					// spaceW is the *cumulative* whitespace between the 2 words
-					lineW += spaceW;
-					spaceW = 0;
 				}
 				lineW += wordW;
 				rewindCount = 0;
@@ -617,6 +614,7 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 				newline = false;
 				lines++;
 				lineW = 0;
+				spaceW = 0;
 			}
 		}
 	}
@@ -628,8 +626,9 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 		*numChars = i - rewindCount;
 		assert(*numChars <= string.length());
 	}
-
-	// this can only return w > stop->w if there is a singe word wider than stop.
+#if DEBUG_FONT
+	if (stop) assert(w <= stop->w);
+#endif
 	return Size(w, (LineHeight * lines));
 }
 
