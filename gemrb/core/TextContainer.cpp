@@ -586,6 +586,7 @@ const String& TextContainer::Text() const
 {
 	// iterate all the content and pick out the TextSpans and concatonate them into a single string
 	static String text;
+	text = L"";
 	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
 		if (const TextSpan* textSpan = dynamic_cast<TextSpan*>(*it)) {

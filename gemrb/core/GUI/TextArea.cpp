@@ -657,6 +657,9 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 
 const String& TextArea::QueryText() const
 {
+	if (selectedSpan) {
+		return selectedSpan->Text();
+	}
 	return textContainer->Text();
 }
 
