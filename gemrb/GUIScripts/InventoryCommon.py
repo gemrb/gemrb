@@ -777,9 +777,6 @@ def OpenItemWindow ():
 def DialogItemWindow ():
 	"""Converse with an item."""
 
-	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
-	GUIINV.OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if GameCheck.IsPST():
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
@@ -789,6 +786,9 @@ def DialogItemWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
+	if ItemInfoWindow:
+		ItemInfoWindow.Unload ()
+	GUIINV.OpenInventoryWindow ()
 	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
 
