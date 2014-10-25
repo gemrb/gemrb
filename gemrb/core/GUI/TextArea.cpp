@@ -607,26 +607,16 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
 		return;
 
-	if (selectedSpan) {
-		// reset the previous selection
-		selectedSpan->SetPalette(palettes[PALETTE_OPTIONS]);
-		Value = -1;
-	}
-	selectedSpan = hoverSpan; // select the item under the mouse
-	if (selectedSpan) {
-		selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
-
-		if (selectOptions) {
-			int optIdx = 0;
-			std::vector<OptionSpan>::const_iterator it;
-			for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
-				if( (*it).second == selectedSpan ) {
-					break;
-				}
-				optIdx++;
+	if (hoverSpan) { // select the item under the mouse
+		int optIdx = 0;
+		std::vector<OptionSpan>::const_iterator it;
+		for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
+			if( (*it).second == hoverSpan ) {
+				break;
 			}
-			UpdateState(VarName, optIdx);
+			optIdx++;
 		}
+		UpdateState(VarName, optIdx);
 	}
 }
 
@@ -652,7 +642,14 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 	Value = OptSpans[optIdx].first;
 
 	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
-	selectedSpan = OptSpans[optIdx].second;
+	TextContainer* optspan = OptSpans[optIdx].second;
+	if (selectedSpan && selectedSpan != optspan) {
+		// reset the previous selection
+		selectedSpan->SetPalette(palettes[PALETTE_OPTIONS]);
+		MarkDirty();
+	}
+	selectedSpan = optspan;
+	selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
 
 	core->GetDictionary()->SetAt( VarName, Value );
 	RunEventHandler(TextAreaOnSelect);
