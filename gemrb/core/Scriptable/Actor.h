@@ -170,6 +170,7 @@ namespace GemRB {
 #define UI_MISS      2       //ranged miss (projectile has no effects)
 #define UI_CRITICAL  4       //a critical hit happened
 #define UI_FAKE      8       //deplete the item but don't actually apply its effects
+#define UI_NOAURA    16      //ignore spellcasting aura checks
 
 //used to mask off current profs
 #define PROFS_MASK  0x07

@@ -6482,7 +6482,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		VerbalConstant(VB_CRITMISS, 1);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
@@ -6526,7 +6526,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
 		}
 		ResetState();
 		buffer.append("[Missed]");
@@ -6547,7 +6547,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Hit]");
 		Log(COMBAT, "Attack", buffer);
 	}
-	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, critical?UI_CRITICAL:0, damage);
+	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, (critical?UI_CRITICAL:0)|UI_NOAURA, damage);
 	ResetState();
 }
 
@@ -8046,8 +8046,8 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
-	// only one potion per round
-	if (AuraPolluted()) {
+	// only one potion/wand per round
+	if (!(flags&UI_NOAURA) && AuraPolluted()) {
 		return false;
 	}
 
@@ -8233,8 +8233,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false;
 	}
 
-	// only one potion per round
-	if (AuraPolluted()) {
+	// only one potion per round; skip for our internal attack projectile
+	if (!(flags&UI_NOAURA) && AuraPolluted()) {
 		return false;
 	}
 
