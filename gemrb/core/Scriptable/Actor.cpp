@@ -8046,6 +8046,11 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
+	// only one potion per round
+	if (AuraPolluted()) {
+		return false;
+	}
+
 	ieResRef tmpresref;
 	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
 
@@ -8206,6 +8211,11 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	}
 	// HACK: disable use when stunned (remove if stunned/petrified/etc actors stop running scripts)
 	if (Immobile()) {
+		return false;
+	}
+
+	// only one potion per round
+	if (AuraPolluted()) {
 		return false;
 	}
 
