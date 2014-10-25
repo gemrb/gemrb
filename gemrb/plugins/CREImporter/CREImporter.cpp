@@ -2268,20 +2268,10 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 		MemorizedSpellsCount = actor->spellbook.GetTotalMemorizedSpellsCount();
 		headersize += MemorizedSpellsCount * 12;
 	}
-	EffectsOffset = headersize;
+	ItemSlotsOffset = headersize;
 
-	//adding effects
-	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
-	VariablesCount = actor->locals->GetCount();
-	if (VariablesCount) {
-		TotSCEFF=1;
-	}
-	if (TotSCEFF) {
-		headersize += (VariablesCount + EffectsCount) * 264;
-	} else {
-		//if there are variables, then TotSCEFF is set
-		headersize += EffectsCount * 48;
-	}
+	//adding itemslot table size and equipped slot fields
+	headersize += (Inventory_Size) * sizeof(ieWord) + sizeof(ieWord) * 2;
 	ItemsOffset = headersize;
 
 	//counting items (calculating item storage)
@@ -2294,10 +2284,22 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 		}
 	}
 	headersize += ItemsCount * 20;
-	ItemSlotsOffset = headersize;
 
-	//adding itemslot table size and equipped slot fields
-	return headersize + (Inventory_Size)*sizeof(ieWord)+sizeof(ieWord)*2;
+	EffectsOffset = headersize;
+	//adding effects
+	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
+	VariablesCount = actor->locals->GetCount();
+	if (VariablesCount) {
+		TotSCEFF=1;
+	}
+	if (TotSCEFF) {
+		headersize += (VariablesCount + EffectsCount) * 264;
+	} else {
+		//if there are variables, then TotSCEFF is set
+		headersize += EffectsCount * 48;
+	}
+
+	return headersize;
 }
 
 int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
@@ -2311,6 +2313,21 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	for (i=0;i<size;i++) {
 		indices[i]=(ieWord) -1;
 	}
+
+	for (i=0;i<size;i++) {
+		//ignore first element, getinventorysize makes space for fist
+		unsigned int j = core->QuerySlot(i+1);
+		CREItem *it = actor->inventory.GetSlotItem( j );
+		if (it) {
+			indices[i] = ItemCount++;
+		}
+		stream->WriteWord( indices+i);
+	}
+	free(indices);
+	tmpWord = (ieWord) actor->inventory.GetEquipped();
+	stream->WriteWord( &tmpWord);
+	tmpWord = (ieWord) actor->inventory.GetEquippedHeader();
+	stream->WriteWord( &tmpWord);
 
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
@@ -2334,16 +2351,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 			}
 		}
 		stream->WriteDword( &tmpDword);
-		indices[i] = ItemCount++;
 	}
-	for (i=0;i<size;i++) {
-		stream->WriteWord( indices+i);
-	}
-	tmpWord = (ieWord) actor->inventory.GetEquipped();
-	stream->WriteWord( &tmpWord);
-	tmpWord = (ieWord) actor->inventory.GetEquippedHeader();
-	stream->WriteWord( &tmpWord);
-	free(indices);
 	return 0;
 }
 
@@ -3213,6 +3221,13 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 		}
 	}
 
+	//items and inventory slots
+	assert(stream->GetPos() == CREOffset+ItemSlotsOffset);
+	ret = PutInventory( stream, actor, Inventory_Size);
+	if (ret) {
+		return ret;
+	}
+
 	assert(stream->GetPos() == CREOffset+EffectsOffset);
 	ret = PutEffects(stream, actor);
 	if (ret) {
@@ -3224,12 +3239,6 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 		return ret;
 	}
 
-	//items and inventory slots
-	assert(stream->GetPos() == CREOffset+ItemsOffset);
-	ret = PutInventory( stream, actor, Inventory_Size);
-	if (ret) {
-		return ret;
-	}
 	return 0;
 }
 
