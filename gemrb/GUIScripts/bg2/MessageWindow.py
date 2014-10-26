@@ -185,7 +185,6 @@ def FixAnomen( idx):
 
 #do all the stuff not done yet
 def FixProtagonist( idx):
-	# FIXME: the bottom two can't always be correct	
 	ClassName = GUICommon.GetClassRowName (idx)
 	KitIndex = GUICommon.GetKitIndex (idx)
 	# only give a few items for transitions from soa
