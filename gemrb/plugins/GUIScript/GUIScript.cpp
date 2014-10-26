@@ -7322,6 +7322,30 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	return tuple;
 }
 
+PyDoc_STRVAR( GemRB_FindItem__doc,
+			  "FindItem(globalID, itemname)=>int\n\n"
+			  "Returns the slot number or -1 if the actor does not have the item." );
+
+static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
+{
+	int globalID;
+	const char *ItemName;
+
+	if (!PyArg_ParseTuple(args, "is", &globalID, &ItemName)) {
+		return AttributeError( GemRB_FindItem__doc );
+	}
+	if (!ItemName[0]) {
+		return PyInt_FromLong(-1);
+	}
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	int slot = -1;
+	slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
+	return PyInt_FromLong(slot);
+}
+
 PyDoc_STRVAR( GemRB_GetItem__doc,
 "GetItem(ResRef)=>dict\n\n"
 "Returns dict with specified item." );
@@ -10669,6 +10693,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ExecuteString, METH_VARARGS),
 	METHOD(ExploreArea, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),
+	METHOD(FindItem, METH_VARARGS),
 	METHOD(FindStoreItem, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
 	METHOD(GameControlToggleAlwaysRun, METH_NOARGS),
