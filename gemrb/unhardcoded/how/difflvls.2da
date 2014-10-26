@@ -3,3 +3,4 @@
          DEFAULT   EASY    NORMAL      CORE    HARD       NIGHTMARE
 DMG      0         -50     -25         0       50         100
 XP       0         0       0           0       50         100
+LUCK     0         0       0           0       0          0

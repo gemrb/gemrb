@@ -108,6 +108,7 @@ static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal,
 //XP adjustments on easy setting (need research on the amount)
 //Seems like bg1 halves xp, bg2 doesn't have any impact
 static int xpadjustments[6]={0, 0, 0, 0, 0, 0};
+static int luckadjustments[6]={0, 0, 0, 0, 0, 0};
 
 static int FistRows = -1;
 static int *wmlevels[20];
@@ -2357,9 +2358,11 @@ static void InitActorTables()
 	if (tm) {
 		memset(xpadjustments, 0, sizeof(xpadjustments) );
 		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
+		memset(luckadjustments, 0, sizeof(luckadjustments) );
 		for (i=0; i<6; i++) {
 			dmgadjustments[i] = atoi(tm->QueryField(0, i) );
 			xpadjustments[i] = atoi(tm->QueryField(1, i) );
+			luckadjustments[i] = atoi(tm->QueryField(2, i) );
 		}
 	}
 
@@ -3145,6 +3148,9 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
 
 	UpdateFatigue();
+
+	// add luck bonus from difficulty
+	Modified[IE_LUCK] += luckadjustments[GameDifficulty];
 
 	// regenerate actors with high enough constitution
 	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
