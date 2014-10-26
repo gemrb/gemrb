@@ -239,11 +239,12 @@ def FixFamiliar(pc):
 		#GemRB.CreateItem(pc, "fam" + f[:3] + "25", freeSlot, 1, 0, 0)
 		break
 
-# TODO: replace bhaal powers with the improved versions (cross-check with chargen; powers are removed during soa)
+# replace bhaal powers with the improved versions
+# or add the new ones, since soa transitioners lost them in hell
+# abstart.2da was not updated for tob
 def FixInnates(pc):
-	# removes the spells: SPIN101, SPIN102, SPIN103, SPIN104, SPIN105, SPIN106, SPIN822
-	#adds the spell: SPIN200, SPIN201, SPIN103, SPIN202, SPIN203, SPIN106
 	import Spellbook
+	from ie_spells import LS_MEMO
 	from ie_stats import IE_ALIGNMENT
 	# adds the spell: SPIN822 (slayer change) if needed
 	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 1, "SPIN822") == -1:
@@ -253,6 +254,17 @@ def FixInnates(pc):
 	# pc, table, new level, level diff, alignment
 	AlignmentAbbrev = CommonTables.Aligns.FindValue ("VALUE", GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
 	GUICommon.AddClassAbilities (pc, "abstart", 6,6, AlignmentAbbrev)
+
+	# some old/new pairs are the same, so we can skip them
+	# all the innates are doubled
+	old = [ "SPIN101", "SPIN102", "SPIN104", "SPIN105" ]
+	new = [ "SPIN200", "SPIN201", "SPIN202", "SPIN203" ]
+	for i in range(len(old)):
+		if GemRB.RemoveSpell (pc, old[i]):
+			GemRB.LearnSpell (pc, new[i], LS_MEMO)
+			# ehh, acrobatics for a second memorization
+			SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 3, new[i])
+			GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 3, SpellIndex)
 
 #upgrade savegame to next version
 def GameExpansion():
