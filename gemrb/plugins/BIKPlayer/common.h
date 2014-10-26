@@ -64,6 +64,9 @@
 #define M_SQRT1_2      0.70710678118654752440  /* 1/sqrt(2) */
 #endif
 
+void *av_malloc(unsigned int size);
+void av_freep(void **ptr);
+
 /**
  * data needed to decode 4-bit Huffman-coded value 
  */

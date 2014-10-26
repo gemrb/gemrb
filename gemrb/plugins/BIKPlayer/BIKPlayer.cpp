@@ -75,7 +75,7 @@ BIKPlayer::BIKPlayer(void)
 
 BIKPlayer::~BIKPlayer(void)
 {
-	free((void **) &inbuff);
+	av_freep((void **) &inbuff);
 }
 
 void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den)
@@ -180,7 +180,7 @@ int BIKPlayer::ReadHeader()
 	frames.push_back(frame);
 
 	}
-	inbuff = (ieByte *) malloc(header.maxframesize);
+	inbuff = (ieByte *) av_malloc(header.maxframesize);
 	if (!inbuff) {
 		return -2;
 	}
@@ -223,7 +223,7 @@ int BIKPlayer::Play()
 	if (s_stream > -1)
 		EndAudio();
 	EndVideo();
-	free((void **) &inbuff);
+	av_freep((void **) &inbuff);
 	return ret;
 }
 
@@ -450,7 +450,7 @@ int BIKPlayer::sound_init(bool need_init)
 		}
 	}
 
-	s_bands = (unsigned int *) malloc((s_num_bands + 1) * sizeof(*s_bands));
+	s_bands = (unsigned int *) av_malloc((s_num_bands + 1) * sizeof(*s_bands));
 	if (!s_bands) {
 		return -2;
 	}
@@ -523,7 +523,7 @@ int BIKPlayer::video_init(int w, int h)
 	blocks = bw * bh;
 
 	for (i = 0; i < BINK_NB_SRC; i++) {
-		c_bundle[i].data = (uint8_t *) malloc(blocks * 64);
+		c_bundle[i].data = (uint8_t *) av_malloc(blocks * 64);
 		//not enough memory
 		if(!c_bundle[i].data) {
 			return 2;
@@ -537,7 +537,7 @@ int BIKPlayer::video_init(int w, int h)
 int BIKPlayer::EndAudio()
 {
 	freeAudioStream(s_stream);
-	free((void **) &s_bands);
+	av_freep((void **) &s_bands);
 	if (header.audioflag&BINK_AUD_USEDCT)
 		ff_dct_end(&s_trans.dct);
 	else
@@ -550,7 +550,7 @@ static inline void release_buffer(AVFrame *p)
 	int i;
 
 	for(i=0;i<3;i++) {
-		free((void **) &p->data[i]);
+		av_freep((void **) &p->data[i]);
 	}
 }
 
@@ -567,7 +567,7 @@ static inline void get_buffer(AVFrame *p, int width, int height)
 {
 	ff_fill_linesize(p, width);
 	for(int plane=0;plane<3;plane++) {
-		p->data[plane] = (uint8_t *) malloc(p->linesize[plane]*height);
+		p->data[plane] = (uint8_t *) av_malloc(p->linesize[plane]*height);
 	}
 }
 
@@ -578,7 +578,7 @@ int BIKPlayer::EndVideo()
 	release_buffer(&c_pic);
 	release_buffer(&c_last);
 	for (i = 0; i < BINK_NB_SRC; i++) {
-		free((void **) &c_bundle[i].data);
+		av_freep((void **) &c_bundle[i].data);
 	}
 	video->DrawMovieSubtitle(0);
 	return 0;
