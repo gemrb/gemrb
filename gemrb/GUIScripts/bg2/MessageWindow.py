@@ -244,9 +244,15 @@ def FixInnates(pc):
 	# removes the spells: SPIN101, SPIN102, SPIN103, SPIN104, SPIN105, SPIN106, SPIN822
 	#adds the spell: SPIN200, SPIN201, SPIN103, SPIN202, SPIN203, SPIN106
 	import Spellbook
+	from ie_stats import IE_ALIGNMENT
 	# adds the spell: SPIN822 (slayer change) if needed
 	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 1, "SPIN822") == -1:
 		GemRB.LearnSpell (pc, "SPIN822", LS_MEMO)
+
+	# apply starting (alignment dictated) abilities (just to be replaced later)
+	# pc, table, new level, level diff, alignment
+	AlignmentAbbrev = CommonTables.Aligns.FindValue ("VALUE", GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
+	GUICommon.AddClassAbilities (pc, "abstart", 6,6, AlignmentAbbrev)
 
 #upgrade savegame to next version
 def GameExpansion():
