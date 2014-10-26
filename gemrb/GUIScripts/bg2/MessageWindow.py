@@ -213,8 +213,12 @@ def FixProtagonist( idx):
 		GiveEquipment(idx, ClassName, KitIndex)
 	return
 
-# TODO: replace the familiar with the improved version
+# replace the familiar with the improved version
+# NOTE: fx_familiar_marker destroys the old one and creates a new one (as proper actors)
 def FixFamiliar(pc):
+	# if the critter is packed in your inventory, we just need to remove it
+	# the new one is already summoned
+
 	# famcat->famcat25
 	# famdust->famdus25
 	# famfair->famfai25
@@ -223,8 +227,16 @@ def FixFamiliar(pc):
 	# fampsd->fampsd25
 	# famquas->famqua25
 	# famrab->famrab25
-	# resummon the familiar? Make sure the marker effect is there, so death would incur the constitution penalty
-	pass
+	familiars = [ "cat", "dust", "fair", "fer", "imp", "psd", "quas", "rab" ]
+	for f in familiars:
+		slot = GemRB.FindItem ("fam" + f, pc)
+		if slot == -1:
+			continue
+
+		GemRB.RemoveItem (pc, slot)
+		#freeSlot = GemRB.GetSlots (pc, -1, -1)[0]
+		#GemRB.CreateItem(pc, "fam" + f[:3] + "25", freeSlot, 1, 0, 0)
+		break
 
 # TODO: replace bhaal powers with the improved versions (cross-check with chargen; powers are removed during soa)
 def FixInnates(pc):
