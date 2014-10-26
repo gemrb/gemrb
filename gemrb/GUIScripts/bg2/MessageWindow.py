@@ -211,6 +211,7 @@ def FixProtagonist( idx):
 		FixInnates (idx)
 	else:
 		GiveEquipment(idx, ClassName, KitIndex)
+		FixInnates (idx)
 	return
 
 # replace the familiar with the improved version

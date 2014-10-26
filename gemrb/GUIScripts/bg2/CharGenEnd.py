@@ -204,8 +204,4 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
  			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 			inventory_exclusion |= item['Exclusion']
 
-		# grant the slayer change ability to the protagonist
-		if MyChar == 1:
-			GemRB.LearnSpell (MyChar, "SPIN822", LS_MEMO)
 		return
-		
