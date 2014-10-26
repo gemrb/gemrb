@@ -76,13 +76,26 @@ def CheckCountsMismatch(mode):
     sys.exit(rc)
 
 
-#TODO: be fancy and align the columns correctly
 def appendRow(f):
   global data
 
+  # get a line with real content for measurement
+  line = lines[3]
+  vals = line.split()
+
   f.seek(0, 2) # seek to the end
+  i = 0
   for cell in data:
-    f.write(("%s  " % cell).encode('ascii'))
+    # width of cell (content + padding) from first line
+    cw = len(line)-len(line.lstrip(vals[i]).lstrip())
+    line = line[cw:]
+    padding = cw - len(cell)
+    if padding < 1:
+      # ideally we would reformat the whole table, but meh
+      padding = 2
+    padding = " " * padding
+    f.write((("%s"+padding) % cell).encode('ascii'))
+    i += 1
   # remove the extraneus ending padding
   f.seek(f.tell()-2)
   f.truncate()
