@@ -684,11 +684,9 @@ void Map::UpdateScripts()
 		//The default area script is in the last slot anyway
 		//ExecuteScript( MAX_SCRIPTS );
 		Update();
+	} else {
+		ProcessActions();
 	}
-
-	//Execute Pending Actions
-	//if it is only here, then the drawing will fail
-	ProcessActions();
 
 	// If scripts frozen, return.
 	// This fixes starting a new IWD game. The above ProcessActions pauses the
