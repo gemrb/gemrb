@@ -217,27 +217,10 @@ def FixProtagonist( idx):
 # replace the familiar with the improved version
 # NOTE: fx_familiar_marker destroys the old one and creates a new one (as proper actors)
 def FixFamiliar(pc):
-	# if the critter is packed in your inventory, we just need to remove it
-	# the new one is already summoned
-
-	# famcat->famcat25
-	# famdust->famdus25
-	# famfair->famfai25
-	# famfer->famfer25
-	# famimp->famimp25
-	# fampsd->fampsd25
-	# famquas->famqua25
-	# famrab->famrab25
-	familiars = [ "cat", "dust", "fair", "fer", "imp", "psd", "quas", "rab" ]
-	for f in familiars:
-		slot = GemRB.FindItem ("fam" + f, pc)
-		if slot == -1:
-			continue
-
-		GemRB.RemoveItem (pc, slot)
-		#freeSlot = GemRB.GetSlots (pc, -1, -1)[0]
-		#GemRB.CreateItem(pc, "fam" + f[:3] + "25", freeSlot, 1, 0, 0)
-		break
+	# if the critter is outside, summoned, the effect will upgrade it (fx_familiar_marker runs on it)
+	# if the critter is packed in your inventory, it will be upgraded as soon as it gets released
+	# after picking it up again, also the inventory item will be new
+	pass
 
 # replace bhaal powers with the improved versions
 # or add the new ones, since soa transitioners lost them in hell
