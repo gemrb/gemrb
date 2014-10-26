@@ -65,6 +65,7 @@
 #endif
 
 void *av_malloc(unsigned int size);
+void av_free(void *ptr);
 void av_freep(void **ptr);
 
 /**
