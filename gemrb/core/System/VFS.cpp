@@ -507,7 +507,7 @@ DirectoryIterator::~DirectoryIterator()
 
 void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
 {
-	if (chain) {
+	if (chain && predicate) {
 		predicate = new AndPredicate<const char*>(predicate, p);
 	} else {
 		delete predicate;
@@ -551,7 +551,7 @@ void DirectoryIterator::Rewind()
 	if (Directory == NULL)
 		Entry = NULL;
 	else
-		(*this).operator++();
+		this->operator++();
 }
 
 
