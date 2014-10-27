@@ -318,6 +318,7 @@ void Highlightable::SetTrapDetected(int x)
 		return;
 	TrapDetected = x;
 	if(TrapDetected) {
+		core->PlaySound(DS_FOUNDSECRET);
 		core->Autopause(AP_TRAP, this);
 	}
 }
