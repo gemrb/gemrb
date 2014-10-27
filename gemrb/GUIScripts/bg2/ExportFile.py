@@ -33,7 +33,7 @@ def OnLoad():
 	TextAreaControl.SetText (10962)
 
 	TextAreaControl = ImportWindow.GetControl (2)
-	TextAreaControl.GetCharacters ()
+	TextAreaControl.GetCharacters (CHR_EXPORTS)
  
 	DoneButton = ImportWindow.GetControl (0)
 	DoneButton.SetText (2610)

@@ -210,6 +210,12 @@ WINDOW_VISIBLE = 1
 WINDOW_GRAYED = 2
 WINDOW_FRONT = 3
 
+# character resource directories
+# !!! Keep these synchronized with Interface.h !!!
+CHR_PORTRAITS = 0
+CHR_SOUNDS = 1
+CHR_EXPORTS = 2
+
 # Flags for GameSelectPC()
 # !!! Keep these synchronized with Game.h !!!
 SELECT_NORMAL  = 0x00

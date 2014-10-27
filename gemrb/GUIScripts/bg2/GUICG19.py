@@ -42,7 +42,7 @@ def OnLoad():
 		GemRB.SetVar ("Selected", 0)
 
 	VoiceList.SetVarAssoc ("Selected", 0)
-	RowCount=VoiceList.GetCharSounds()
+	RowCount=VoiceList.ListResources(CHR_SOUNDS)
 
 	PlayButton = CharSoundWindow.GetControl (47)
 	PlayButton.SetState (IE_GUI_BUTTON_ENABLED)

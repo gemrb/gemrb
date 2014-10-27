@@ -4192,144 +4192,87 @@ static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args
 static const Color Hover = {255, 180, 0, 0};
 static const Color Selected = {255, 100, 0, 0};
 
-static void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<SelectOption>& opts, bool dirs = false)
+PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
+			 "ListResources(WindowIndex, ControlIndex, ResourceType [, flags]) => int\n\n"
+			 "Lists the available resources of ResourceType as selectable options." );
+
+static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* args)
 {
-	std::vector<String> strings;
-	do {
-		const char *name = it.GetName();
-		if (name[0] == '.' || it.IsDirectory() != dirs)
-			continue;
+	int wi, ci;
+	RESOURCE_DIRECTORY type;
+	int flags = 0;
 
-		String* string = StringFromCString(name);
-		if (dirs == false) {
-			size_t pos = string->find_last_of(L'.');
-			if (pos != String::npos) {
-				string->resize(pos);
+	if (!PyArg_ParseTuple( args, "iii|i", &wi, &ci, &type, &flags )) {
+		return AttributeError( GemRB_TextArea_ListResources__doc );
+	}
+	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
+	if (!ta) {
+		return NULL;
+	}
+
+	struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
+		char lastchar;
+		LastCharFilter(char lastchar)
+		: lastchar(lastchar) {}
+
+		bool operator()(const char* fname) const {
+			const char* extpos = strrchr(fname, '.');
+			if (extpos) {
+				extpos--;
+				return *extpos == lastchar;
 			}
+			return false;
 		}
-		StringToUpper(*string);
-		strings.push_back(*string);
-		delete string;
-	} while (++it);
+	};
 
+	DirectoryIterator dirit = core->GetResourceDirectory(type);
+	bool dirs = false;
+	switch (type) {
+		case DIRECTORY_CHR_PORTRAITS:
+			dirit.SetFilterPredicate(new LastCharFilter((flags) ? 'S' : 'M'), true);
+			break;
+		case DIRECTORY_CHR_SOUNDS:
+			if (core->HasFeature( GF_SOUNDFOLDERS )) {
+				dirs = true;
+			} else {
+				dirit.SetFilterPredicate(new LastCharFilter('_'), true);
+			}
+			break;
+		case DIRECTORY_CHR_EXPORTS:
+		default:
+			break;
+	}
+
+	std::vector<String> strings;
+	if (dirit) {
+		do {
+			const char *name = dirit.GetName();
+			if (name[0] == '.' || dirit.IsDirectory() != dirs)
+				continue;
+
+			String* string = StringFromCString(name);
+			if (dirs == false) {
+				size_t pos = string->find_last_of(L'.');
+				if (pos != String::npos) {
+					string->resize(pos);
+				}
+			}
+			StringToUpper(*string);
+			strings.push_back(*string);
+			delete string;
+		} while (++dirit);
+	}
+
+	std::vector<SelectOption> TAOptions;
 	std::sort(strings.begin(), strings.end());
 	for (size_t i =0; i < strings.size(); i++) {
-		opts.push_back(std::make_pair(i, strings[i]));
+		TAOptions.push_back(std::make_pair(i, strings[i]));
 	}
-}
-
-struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
-	char lastchar;
-	LastCharFilter(char lastchar)
-	: lastchar(lastchar) {}
-
-	bool operator()(const char* fname) const {
-		const char* extpos = strrchr(fname, '.');
-		if (extpos) {
-			extpos--;
-			return *extpos == lastchar;
-		}
-		return false;
-	}
-};
-
-PyDoc_STRVAR( GemRB_TextArea_GetPortraits__doc,
-"GetPortraits(WindowIndex, ControlIndex, SmallOrLarge) => int\n\n"
-"Reads in the contents of the portraits subfolder." );
-
-static PyObject* GemRB_TextArea_GetPortraits(PyObject * /*self*/, PyObject* args)
-{
-	int wi, ci;
-	int suffix;
-
-	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &suffix )) {
-		return AttributeError( GemRB_TextArea_GetPortraits__doc );
-	}
-	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
-	if (!ta) {
-		return NULL;
-	}
-
-	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_PORTRAITS);
-	dir.SetFilterPredicate(new LastCharFilter((suffix) ? 'S' : 'M'), true);
-
-	std::vector<SelectOption> TAOptions;
-	ProcessDirectoryForTAOptions(dir, TAOptions);
 	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
 
 	return PyInt_FromLong( TAOptions.size() );
 }
 
-PyDoc_STRVAR( GemRB_TextArea_GetCharSounds__doc,
-"GetCharSounds(WindowIndex, ControlIndex) => int\n\n"
-"Reads in the contents of the sounds subfolder." );
-
-static PyObject* GemRB_TextArea_GetCharSounds(PyObject * /*self*/, PyObject* args)
-{
-	int wi, ci;
-
-	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
-		return AttributeError( GemRB_TextArea_GetCharSounds__doc );
-	}
-	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
-	if (!ta) {
-		return NULL;
-	}
-
-	bool dirs = core->HasFeature( GF_SOUNDFOLDERS );
-	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_SOUNDS);
-	if (!dirs) {
-		dir.SetFilterPredicate(new LastCharFilter('_'), true);
-	}
-
-	std::vector<SelectOption> TAOptions;
-	ProcessDirectoryForTAOptions(dir, TAOptions, dirs);
-	for (size_t i = 0; i < TAOptions.size(); i++) {
-		String& s = TAOptions[i].second;
-		s.erase(--s.end());
-	}
-	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
-
-	// now select the sound being used by the Selected PC
-	GET_GAME();
-	Actor* actor = game->FindPC(game->GetSelectedPCSingle());
-	char sound[42];
-	actor->GetSoundFolder(sound, 0);
-	if (sound[0]) {
-		for (size_t i = 0; i < TAOptions.size(); i++) {
-			if (TAOptions[i].second == String(sound, sound+strlen(sound))) {
-				ta->UpdateState("Selected", i);
-				break;
-			}
-		}
-	}
-
-	return PyInt_FromLong( TAOptions.size() );
-}
-
-PyDoc_STRVAR( GemRB_TextArea_GetCharacters__doc,
-"GetCharacters(WindowIndex, ControlIndex) => int\n\n"
-"Reads in the contents of the characters subfolder." );
-
-static PyObject* GemRB_TextArea_GetCharacters(PyObject * /*self*/, PyObject* args)
-{
-	int wi, ci;
-
-	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
-		return AttributeError( GemRB_TextArea_GetCharacters__doc );
-	}
-	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
-	if (!ta) {
-		return NULL;
-	}
-
-	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_EXPORTS);
-	std::vector<SelectOption> TAOptions;
-	ProcessDirectoryForTAOptions(dir, TAOptions);
-	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
-
-	return PyInt_FromLong( TAOptions.size() );
-}
 
 PyDoc_STRVAR( GemRB_TextArea_SetOptions__doc,
 			 "SetOptions(WindowIndex, ControlIndex, Options)\n\n"
@@ -4341,7 +4284,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 	PyObject* list;
 
 	if (!PyArg_ParseTuple( args, "iiO", &wi, &ci, &list )) {
-		return AttributeError( GemRB_TextArea_GetCharacters__doc );
+		return AttributeError( GemRB_TextArea_SetOptions__doc );
 	}
 
 	if (!PyList_Check(list)) {
@@ -10757,9 +10700,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Table_Unload, METH_VARARGS),
 	METHOD(TextArea_Append, METH_VARARGS),
 	METHOD(TextArea_Clear, METH_VARARGS),
-	METHOD(TextArea_GetCharSounds, METH_VARARGS),
-	METHOD(TextArea_GetCharacters, METH_VARARGS),
-	METHOD(TextArea_GetPortraits, METH_VARARGS),
+	METHOD(TextArea_ListResources, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_Rewind, METH_VARARGS),
 	METHOD(TextEdit_SetBackground, METH_VARARGS),

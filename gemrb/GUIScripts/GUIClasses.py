@@ -148,9 +148,7 @@ class GTextArea(GControl):
     'Clear': _GemRB.TextArea_Clear,
     'SetFlags': _GemRB.Control_TextArea_SetFlags,
     'SetOptions': _GemRB.TextArea_SetOptions,
-    'GetCharSounds': _GemRB.TextArea_GetCharSounds,
-    'GetCharacters': _GemRB.TextArea_GetCharacters,
-    'GetPortraits': _GemRB.TextArea_GetPortraits
+    'ListResources': _GemRB.TextArea_ListResources
   }
 
 class GTextEdit(GControl):

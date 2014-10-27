@@ -232,14 +232,14 @@ def OpenCustomPortraitWindow ():
 
 	# Portrait List Large
 	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
-	RowCount1 = PortraitList1.GetPortraits (0)
+	RowCount1 = PortraitList1.ListResources (CHR_PORTRAITS, 0)
 	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, LargeCustomPortrait)
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
 	PortraitList2 = SubSubCustomizeWindow.GetControl (3)
-	RowCount2 = PortraitList2.GetPortraits (1)
+	RowCount2 = PortraitList2.ListResources (CHR_PORTRAITS, 1)
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, SmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
@@ -311,7 +311,7 @@ def OpenSoundWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
-	VoiceList.GetCharSounds()
+	VoiceList.ListResources(CHR_SOUNDS)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
@@ -563,7 +563,7 @@ def OpenExportWindow ():
 	TextArea.SetText (10962)
 
 	TextArea = ExportWindow.GetControl (0)
-	TextArea.GetCharacters ()
+	TextArea.GetCharacters (CHR_EXPORTS)
 
 	ExportDoneButton = ExportWindow.GetControl (4)
 	ExportDoneButton.SetText (11973)

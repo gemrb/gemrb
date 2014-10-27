@@ -1,0 +1,20 @@
+
+Prototype: GemRB.ListResources(WindowIndex, ControlIndex, type [,flags])
+
+Metaclass Prototype: ListResources(flags)
+
+Description: Lists the resources of “type” as selectable options in the TextArea.
+
+Parameters:
+WindowIndex, ControlIndex  - the control's reference
+type - one of CHR_PORTRAITS, CHR_SOUNDS, or CHR_EXPORTS
+flags -  currently only used for CHR_PORTRAITS: 0 means the portraits with 'M' as the suffix, anything else 'S'
+
+
+Return value: numeric, the number of options added to the TextArea control.
+Example:
+ TextAreaControl = GemRB.GetControl(SoundWindow, 45)
+ RowCount=GemRB.ListResources(SoundWindow, TextAreaControl, CHR_SOUNDS)
+
+See also: QueryText
+

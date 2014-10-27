@@ -46,7 +46,7 @@ def OnLoad():
 
 	TextAreaControl = SoundWindow.GetControl(45)
 	TextAreaControl.SetVarAssoc("Sound", 0)
-	RowCount=TextAreaControl.GetCharSounds()
+	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
 
 	DefaultButton = SoundWindow.GetControl(47)
 	DefaultButton.SetText(33479)
