@@ -1468,19 +1468,15 @@ void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, co
 		srect.h -= trim;
 		if (dclipped.y > dst.y) { // top clipped
 			srect.y += trim;
-		} else { // bottom clipped
-			srect.y -= trim;
-		}
+		} // already have appropriate y for bottom clip
 	}
 	trim = dst.w - dclipped.w;
 	if (trim) {
 		srect.w -= trim;
-		if (dclipped.x > dst.x) { // left
+		if (dclipped.x > dst.x) { // left clipped
 			srect.x += trim;
-		} else { // right
-			srect.x -= trim;
 		}
-	}
+	} // already have appropriate y for right clip
 
 	SDL_Rect drect = RectFromRegion(dclipped);
 	// since we should already be clipped we can call SDL_LowerBlit directly
