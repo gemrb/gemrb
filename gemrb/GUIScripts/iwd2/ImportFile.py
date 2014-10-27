@@ -44,7 +44,7 @@ def OnLoad():
 	TextAreaControl.SetText(10963)
 
 	TextAreaControl = ImportWindow.GetControl(2)
-	TextAreaControl.GetCharacters(CHR_EXPORTS)
+	TextAreaControl.ListResources(CHR_EXPORTS)
 
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(36789)

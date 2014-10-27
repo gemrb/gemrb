@@ -563,7 +563,7 @@ def OpenExportWindow ():
 	TextArea.SetText (10962)
 
 	TextArea = ExportWindow.GetControl (0)
-	TextArea.GetCharacters (CHR_EXPORTS)
+	TextArea.ListResources (CHR_EXPORTS)
 
 	ExportDoneButton = ExportWindow.GetControl (4)
 	ExportDoneButton.SetText (11973)

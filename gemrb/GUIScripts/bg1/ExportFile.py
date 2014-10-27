@@ -38,7 +38,7 @@ def OnLoad():
 	TextAreaControl.SetText (10962)
 
 	TextAreaControl = ExportWindow.GetControl (2)
-	TextAreaControl.GetCharacters (CHR_EXPORTS)
+	TextAreaControl.ListResources (CHR_EXPORTS)
 
 	FileNameEditBox = ExportWindow.GetControl (7)
 	FileNameEditBox.SetEvent (IE_GUI_EDIT_ON_CHANGE, FileNameChange)

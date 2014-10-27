@@ -2687,7 +2687,7 @@ def ImportPress():
 	CharImportList = ImportWindow.GetControl(2)
 	CharImportList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	CharImportList.SetVarAssoc ("Selected",0)
-	CharImportList.GetCharacters(CHR_EXPORTS)
+	CharImportList.ListResources(CHR_EXPORTS)
 
 	ImportDoneButton = ImportWindow.GetControl (0)
 	ImportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
