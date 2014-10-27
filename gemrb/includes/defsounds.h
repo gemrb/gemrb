@@ -43,6 +43,7 @@ namespace GemRB {
 #define DS_FOUNDSECRET       10
 #define DS_PICKLOCK          11
 #define DS_PICKFAIL          12
+#define DS_DISARMED          13
 
 #define DS_RAIN              20
 #define DS_SNOW              21

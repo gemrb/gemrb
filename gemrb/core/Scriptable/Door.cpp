@@ -358,6 +358,7 @@ void Highlightable::TryDisarm(Actor *actor)
 		Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
+		core->PlaySound(DS_DISARMED);
 	} else {
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
