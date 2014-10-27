@@ -3628,7 +3628,8 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			resourcePath = GameSoundsPath;
-			filter = new ExtFilter("WAV");
+			if (!HasFeature( GF_SOUNDFOLDERS ))
+				filter = new ExtFilter("WAV");
 			break;
 		case DIRECTORY_CHR_EXPORTS:
 			resourcePath = GameCharactersPath;

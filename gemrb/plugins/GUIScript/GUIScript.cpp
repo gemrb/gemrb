@@ -4192,18 +4192,20 @@ static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args
 static const Color Hover = {255, 180, 0, 0};
 static const Color Selected = {255, 100, 0, 0};
 
-static void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<SelectOption>& opts)
+static void ProcessDirectoryForTAOptions(DirectoryIterator& it, std::vector<SelectOption>& opts, bool dirs = false)
 {
 	std::vector<String> strings;
 	do {
 		const char *name = it.GetName();
-		if (it.IsDirectory())
+		if (name[0] == '.' || it.IsDirectory() != dirs)
 			continue;
 
 		String* string = StringFromCString(name);
-		size_t pos = string->find_last_of(L'.');
-		if (pos != String::npos) {
-			string->resize(pos);
+		if (dirs == false) {
+			size_t pos = string->find_last_of(L'.');
+			if (pos != String::npos) {
+				string->resize(pos);
+			}
 		}
 		StringToUpper(*string);
 		strings.push_back(*string);
@@ -4274,11 +4276,14 @@ static PyObject* GemRB_TextArea_GetCharSounds(PyObject * /*self*/, PyObject* arg
 		return NULL;
 	}
 
+	bool dirs = core->HasFeature( GF_SOUNDFOLDERS );
 	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_SOUNDS);
-	dir.SetFilterPredicate(new LastCharFilter('_'));
+	if (!dirs) {
+		dir.SetFilterPredicate(new LastCharFilter('_'), true);
+	}
 
 	std::vector<SelectOption> TAOptions;
-	ProcessDirectoryForTAOptions(dir, TAOptions);
+	ProcessDirectoryForTAOptions(dir, TAOptions, dirs);
 	for (size_t i = 0; i < TAOptions.size(); i++) {
 		String& s = TAOptions[i].second;
 		s.erase(--s.end());
