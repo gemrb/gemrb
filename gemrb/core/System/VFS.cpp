@@ -493,8 +493,9 @@ GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
 
 
 DirectoryIterator::DirectoryIterator(const char *path)
-	: predicate(NULL), Directory(NULL), Entry(NULL), Path(path)
+	: predicate(NULL), Directory(NULL), Entry(NULL)
 {
+	Path = strdup(path);
 	Rewind();
 }
 
@@ -502,6 +503,7 @@ DirectoryIterator::~DirectoryIterator()
 {
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
+	free(Path);
 	delete predicate;
 }
 

@@ -160,7 +160,7 @@ private:
 	FileFilterPredicate* predicate;
 	void* Directory;
 	void* Entry;
-	const char *Path;
+	char *Path;
 };
 
 }
