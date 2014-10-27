@@ -6200,7 +6200,7 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 void Actor::GetTHAbilityBonus(ieDword Flags)
 {
 	int dexbonus = 0, strbonus = 0;
-	//add strength bonus if we need
+	// add strength bonus (discarded for ranged weapons later)
 	if (Flags&WEAPON_USESTRENGTH) {
 		if (third) {
 			strbonus = GetAbilityBonus(IE_STR );
@@ -6233,8 +6233,8 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 			} else {
 				dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			}
-			//TODO: check what to do with weapons with WEAPON_USESTRENGTH (there's a sling in bg2 with it)
-			// do these stack or are handled like finesse or are really only damage boni or there is no game with both?
+			// WEAPON_USESTRENGTH only affects weapon damage
+			strbonus = 0;
 			break;
 		// no ability tohit bonus for WEAPON_FIST
 	}
