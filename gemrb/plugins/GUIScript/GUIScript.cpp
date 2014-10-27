@@ -4251,7 +4251,7 @@ static PyObject* GemRB_TextArea_GetPortraits(PyObject * /*self*/, PyObject* args
 	}
 
 	DirectoryIterator dir = core->GetResourceDirectory(DIRECTORY_CHR_PORTRAITS);
-	dir.SetFilterPredicate(new LastCharFilter((suffix) ? 'S' : 'M'));
+	dir.SetFilterPredicate(new LastCharFilter((suffix) ? 'S' : 'M'), true);
 
 	std::vector<SelectOption> TAOptions;
 	ProcessDirectoryForTAOptions(dir, TAOptions);
