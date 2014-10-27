@@ -161,7 +161,7 @@ public: //Events
 	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
 		return false;
 	}
-	virtual const String& QueryText() const { static String s; return s; }
+	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
 	virtual void SetAnimPicture(Sprite2D* Picture);
 	/** Sets the Scroll Bar Pointer */

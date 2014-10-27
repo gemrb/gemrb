@@ -64,7 +64,7 @@ public:
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char Alignment);
 	/** Simply returns the pointer to the text, don't modify it! */
-	const String& QueryText() const;
+	String QueryText() const;
 
 	/** Mouse Button Down */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,

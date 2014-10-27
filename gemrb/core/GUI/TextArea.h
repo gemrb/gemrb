@@ -92,7 +92,7 @@ public:
 	void SetAnimPicture(Sprite2D* Picture);
 
 	/** Returns the selected text */
-	const String& QueryText() const;
+	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(const char* VariableName, unsigned int optIdx);
 	int SetScrollBar(Control *ptr);
