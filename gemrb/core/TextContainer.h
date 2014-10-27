@@ -182,7 +182,7 @@ public:
 
 	void AppendText(const String& text);
 	void AppendText(const String& text, Font* fnt, Palette* pal);
-	const String& Text() const;
+	String Text() const;
 
 	void SetPalette(Palette* pal);
 	Palette* TextPalette() const { return palette; }

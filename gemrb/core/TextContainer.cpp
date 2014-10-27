@@ -582,11 +582,10 @@ void TextContainer::SetPalette(Palette* pal)
 	palette = pal;
 }
 
-const String& TextContainer::Text() const
+String TextContainer::Text() const
 {
 	// iterate all the content and pick out the TextSpans and concatonate them into a single string
-	static String text;
-	text = L"";
+	String text;
 	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
 		if (const TextSpan* textSpan = dynamic_cast<TextSpan*>(*it)) {
