@@ -1115,12 +1115,25 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	//don't clear target's actions, because a sequence like this will be broken:
 	//StartDialog([PC]); SetGlobal("Talked","LOCALS",1);
+	// Update orientation and potentially stance
+	// sarevok's resurrection cutscene shows a need for this (cut206a)
+	// however we do not want to affect lying actors (eg. Malla from tob)
 	if (scr!=tar) {
 		if (scr->Type==ST_ACTOR) {
-			((Actor *) scr)->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
+			// might not be equal to speaker anymore due to swapping
+			Actor *talker = (Actor *) scr;
+			talker->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
+			if (talker->InParty) {
+				talker->SetStance(IE_ANI_READY);
+			}
 		}
 		if (tar->Type==ST_ACTOR) {
-			((Actor *) tar)->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
+			// might not be equal to target anymore due to swapping
+			Actor *talkee = (Actor *) tar;
+			talkee->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
+			if (talkee->InParty) {
+				talkee->SetStance(IE_ANI_READY);
+			}
 		}
 	}
 
