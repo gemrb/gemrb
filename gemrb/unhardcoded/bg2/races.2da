@@ -1,15 +1,15 @@
 2DA V1.0
 -1
-           NAME_REF   DESC_REF   CAP_REF    ID         USABILITY  SAVE
-HUMAN      7193       9550       1096       1          0x08000000 *
-ELF        7194       9552       1097       2          0x00800000 *
-HALF_ELF   7197       9555       1098       3          0x02000000 *
-GNOME      7196       9553       1099       6          0x10000000 SAVECNG
-HALFLING   7195       9554       1101       5          0x04000000 SAVECNDH
-DWARF      7182       9551       1100       4          0x01000000 SAVECNDH
-HALFORC    53186      53191      53212      7          0x80000000 *
-TIEFLING   8332       -1         8330       153        0          *
-ILLITHID   54775      54776      2796       124        0          *
+           NAME_REF   DESC_REF   CAP_REF    ID         USABILITY  SAVE      CANDUAL
+HUMAN      7193       9550       1096       1          0x08000000 *         1
+ELF        7194       9552       1097       2          0x00800000 *         0
+HALF_ELF   7197       9555       1098       3          0x02000000 *         0
+GNOME      7196       9553       1099       6          0x10000000 SAVECNG   0
+HALFLING   7195       9554       1101       5          0x04000000 SAVECNDH  0
+DWARF      7182       9551       1100       4          0x01000000 SAVECNDH  0
+HALFORC    53186      53191      53212      7          0x80000000 *         0
+TIEFLING   8332       -1         8330       153        0          *         0
+ILLITHID   54775      54776      2796       124        0          *         0
 # look at tobex' complete map if any mod will require extending this table
 # it contains CAP_REF values only
 # https://github.com/Ascension64/TobEx/blob/master/WeiDU/TobEx/TobEx_redist/override/racetext.2da
