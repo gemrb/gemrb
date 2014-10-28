@@ -66,7 +66,7 @@ def OnLoad():
 	CloseButton= MessageWindow.GetControl (0)
 	CloseButton.SetText(28082)
 	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
-	CloseButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CloseButton.SetFlags (IE_GUI_BUTTON_DEFAULT | IE_GUI_BUTTON_MULTILINE, OP_OR)
 	
 	OpenButton = OptionsWindow.GetControl (10)
 	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
