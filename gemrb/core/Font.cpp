@@ -102,11 +102,11 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 
 const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 {
-	std::map<ieWord, Glyph>::const_iterator it = glyphs.find(chr);
+	GlyphMap::const_iterator it = glyphs.find(chr);
 	if (it != glyphs.end()) {
 		return (*it).second;
 	}
-	static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
+	const static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
 	return blank;
 }
 
@@ -154,11 +154,20 @@ Font::~Font(void)
 	SetPalette(NULL);
 }
 
+void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
+{
+	if (chr >= AtlasIndex.size()) {
+		// potentially wasteful I guess, but much faster than a map.
+		AtlasIndex.resize(chr+1);
+	} else {
+		assert(AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
+	}
+	AtlasIndex[chr] = GlyphIndexEntry(chr, pageIdx, g);
+}
+
 const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 {
-	assert(AtlasIndex.find(chr) == AtlasIndex.end());
-	// if this character is already an alias then we have a problem...
-	assert(AliasMap.find(chr) == AliasMap.end());
+	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);
 	
 	Size size(spr->Width, spr->Height);
@@ -174,42 +183,31 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 		assert(CurrentAtlasPage->AddGlyph(chr, tmp));
 	}
 	assert(CurrentAtlasPage);
-	AtlasIndex[chr] = Atlas.size() - 1;
-
-	return CurrentAtlasPage->GlyphForChr(chr);
+	const Glyph& g = CurrentAtlasPage->GlyphForChr(chr);
+	CreateGlyphIndex(chr, Atlas.size() - 1, &g);
+	return g;
 }
 
 void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 {
-	assert(AliasMap.find(alias) == AliasMap.end());
-	// we cannot create an alias of an alias...
-	assert(AliasMap.find(chr) == AliasMap.end());
 	// we cannot create an alias for a character that doesnt exist
-	assert(AtlasIndex.find(chr) != AtlasIndex.end());
-
-	AliasMap[alias] = chr;
+	assert(AtlasIndex.size() > chr && AtlasIndex[chr].pageIdx != static_cast<ieWord>(-1));
 
 	// we need to now find the page for the existing character and add this new one to that page
-	size_t pageIdx = AtlasIndex.at(chr);
-	AtlasIndex[alias] = pageIdx;
-	Atlas[pageIdx]->MapSheetSegment(alias, (*Atlas[pageIdx])[chr]);
+	const GlyphIndexEntry& idx = AtlasIndex[chr];
+	CreateGlyphIndex(alias, idx.pageIdx, idx.glyph);
+	Region r = Atlas[idx.pageIdx]->MapSheetSegment(alias, (*Atlas[idx.pageIdx])[chr]);
+	assert(r.h || r.w || r.x >= 0 || r.y >= 0);
 }
 
 const Glyph& Font::GetGlyph(ieWord chr) const
 {
-	// FIXME: this method is unfortunately slow.
-	// a better storage scheme (in the atlas) would probably be to allocate a vector/array for each page and have the char as an index
-
-	// Aliases are 2 glyphs that share identical BAM frames such as 'ā' and 'a'
-	// we can save a few bytes of memory this way :)
-	std::map<ieWord, ieWord>::const_iterator ait = AliasMap.find(chr);
-	if (ait != AliasMap.end()) {
-		chr = (*ait).second;
+	const Glyph* g = AtlasIndex[chr].glyph;
+	if (g) {
+		return *g;
 	}
-	size_t idx = 0;
-	GlyphIndex::const_iterator it = AtlasIndex.find(chr);
-	if (it != AtlasIndex.end()) idx = (*it).second;
-	return Atlas[idx]->GlyphForChr(chr);
+	const static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
+	return blank;
 }
 
 size_t Font::RenderText(const String& string, Region& rgn,
@@ -275,7 +273,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			Size lineSize = StringSize(line, &lineMaxSize, &linePos);
 
 			// check to see if the line is on screen
-			// FIXME: technically we could be *even more* optimized by passing lineRgn, but this breaks dropcaps
+			// TODO: technically we could be *even more* optimized by passing lineRgn, but this breaks dropcaps
 			// this isn't a big deal ATM, because the big text containers do line-by-line layout
 			if (!sclip.IntersectsRegion(rgn)) {
 				// offscreen, optimize by bypassing RenderLine, we pre-calculated linePos above
@@ -432,9 +430,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			if (canvas) {
 				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.Dimensions());
 			} else {
-				size_t pageIdx = AtlasIndex.at(currChar);
-				assert(pageIdx < AtlasIndex.size());
-
+				size_t pageIdx = AtlasIndex[currChar].pageIdx;
 				GlyphAtlasPage* page = Atlas[pageIdx];
 				page->Draw(currChar, Region(blitPoint, curGlyph.size), color);
 			}

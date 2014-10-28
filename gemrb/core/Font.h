@@ -88,7 +88,8 @@ class GEM_EXPORT Font {
 private:
 	class GlyphAtlasPage : public SpriteSheet<ieWord> {
 		private:
-			std::map<ieWord, Glyph> glyphs;
+			typedef std::map<ieWord, Glyph> GlyphMap;
+			GlyphMap glyphs;
 			ieByte* pageData; // current raw page being built
 			int pageXPos; // current position on building page
 			Font* font;
@@ -119,23 +120,30 @@ private:
 		void Draw(ieWord chr, const Region& dest, Palette* pal = NULL);
 	};
 
+	struct GlyphIndexEntry {
+		ieWord chr;
+		ieWord pageIdx;
+		const Glyph* glyph;
+
+		GlyphIndexEntry() : chr(0), pageIdx(-1), glyph(NULL) {}
+		GlyphIndexEntry(ieWord c, ieWord p, const Glyph* g) : chr(c), pageIdx(p), glyph(g) {}
+	};
+
+	typedef std::vector<GlyphIndexEntry> GlyphIndex;
 	// TODO: Unfortunately, we have no smart pointer suitable for an STL container...
 	// if we ever transition to C++11 we can use one here
 	typedef std::deque<GlyphAtlasPage*> GlyphAtlas;
-	typedef std::map< ieWord, size_t > GlyphIndex;
 
 	GlyphAtlasPage* CurrentAtlasPage;
 	GlyphIndex AtlasIndex;
 	GlyphAtlas Atlas;
-
-	// BAM fonts use alisases a lot so this saves quite a bit of space
-	std::map<ieWord, ieWord> AliasMap; // Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 
 	Palette* palette;
 public:
 	const int LineHeight;
 	const int Baseline;
 private:
+	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
 					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
@@ -148,6 +156,8 @@ public:
 	virtual ~Font();
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
+	// BAM fonts use alisases a lot so this saves quite a bit of space
+	// Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 	void CreateAliasForChar(ieWord chr, ieWord alias);
 
 	//allow reading but not setting glyphs
