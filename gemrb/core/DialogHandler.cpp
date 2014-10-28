@@ -70,7 +70,7 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 	}
 
 	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
-		String msg(L"[color=bcefbc]");
+		String msg(L"\n[color=bcefbc]");
 		String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
 		msg += *str;
 		delete str;
@@ -81,9 +81,9 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 			if (newlinePos != String::npos) {
 				str->resize( newlinePos );
 			}
-			msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][p]";
+			msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][/p]";
 		} else {
-			msg += L"[/color]";
+			msg += L"[/color]\n";
 		}
 		delete str;
 		displaymsg->DisplayMarkupString(msg);
@@ -284,6 +284,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		UpdateJournalForTransition(tr);
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
+			ta->AppendText(L"\n");
 			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 			}
@@ -310,6 +311,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
 			EndDialog();
+			ta->AppendText(L"\n");
 			return false;
 		}
 
