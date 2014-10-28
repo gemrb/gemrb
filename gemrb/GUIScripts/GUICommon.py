@@ -619,8 +619,11 @@ def IsMultiClassed (actor, verbose):
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
 def CanDualClass(actor):
-	# human
-	if GemRB.GetPlayerStat (actor, IE_RACE) != 1:
+	# race restriction (human)
+	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))
+	RaceName = CommonTables.Races.GetRowName (RaceName)
+	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL")
+	if int(RaceDual) != 1:
 		return 1
 
 	# already dualclassed
