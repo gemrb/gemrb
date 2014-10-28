@@ -8773,6 +8773,36 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	return Py_None;
 }
 
+static bool CanUseActionButton(Actor *pcc, int type)
+{
+	int capability = -1;
+	if (core->HasFeature(GF_3ED_RULES)) {
+		switch (type) {
+		case ACT_STEALTH:
+			capability = pcc->GetStat(IE_STEALTH) + pcc->GetStat(IE_HIDEINSHADOWS);
+			break;
+		case ACT_THIEVING:
+			capability = pcc->GetStat(IE_LOCKPICKING) + pcc->GetStat(IE_PICKPOCKET);
+			break;
+		default:
+			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+		}
+	} else {
+		// use levels instead, so inactive dualclasses work as expected
+		switch (type) {
+		case ACT_STEALTH:
+			capability = pcc->GetThiefLevel() + pcc->GetMonkLevel() + pcc->GetRangerLevel();
+			break;
+		case ACT_THIEVING:
+			capability = pcc->GetThiefLevel() + pcc->GetBardLevel();
+			break;
+		default:
+			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+		}
+	}
+	return capability > 0;
+}
+
 PyDoc_STRVAR( GemRB_Window_SetupControls__doc,
 "SetupControls(WindowIndex, dict, slot[, Startl])\n\n"
 "Automagically sets up the controls of the action window for a PC indexed by slot.\n");
@@ -8952,8 +8982,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_STEALTH:
-			//don't use level control for this, iwd2 allows everyone to sneak
-			if ((actor->GetStat(IE_STEALTH)+actor->GetStat(IE_HIDEINSHADOWS) )<=0 ) {
+			if (!CanUseActionButton(actor, action)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			} else {
 				if (modalstate==MS_STEALTH) {
@@ -8970,7 +8999,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_THIEVING:
-			if ((actor->GetStat(IE_LOCKPICKING)+actor->GetStat(IE_PICKPOCKET) )<=0 ) {
+			if (!CanUseActionButton(actor, action)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
