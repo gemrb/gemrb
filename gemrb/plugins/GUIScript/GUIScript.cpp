@@ -8779,10 +8779,10 @@ static bool CanUseActionButton(Actor *pcc, int type)
 	if (core->HasFeature(GF_3ED_RULES)) {
 		switch (type) {
 		case ACT_STEALTH:
-			capability = pcc->GetStat(IE_STEALTH) + pcc->GetStat(IE_HIDEINSHADOWS);
+			capability = pcc->GetSkill(IE_STEALTH) + pcc->GetSkill(IE_HIDEINSHADOWS);
 			break;
 		case ACT_THIEVING:
-			capability = pcc->GetStat(IE_LOCKPICKING) + pcc->GetStat(IE_PICKPOCKET);
+			capability = pcc->GetSkill(IE_LOCKPICKING) + pcc->GetSkill(IE_PICKPOCKET);
 			break;
 		default:
 			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
