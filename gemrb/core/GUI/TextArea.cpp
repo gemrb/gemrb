@@ -162,14 +162,17 @@ void TextArea::UpdateScrollbar()
 	if (sb == NULL) return;
 
 	int textHeight = contentWrapper.ContentFrame().h;
+	Region nodeBounds;
 	if (dialogBeginNode) {
 		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
 		// add the height of a newline too so that there is a space
-		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
-		if (nodeBounds.h + ftext->LineHeight < Height) {
+		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
+		Size selectFrame = selectOptions->ContentFrame();
+		// page = blank line + dialog node + blank line + select options
+		int pageH = ftext->LineHeight*2 + nodeBounds.h + selectFrame.h;
+		if (pageH < Height) {
 			// if the node isnt a full page by itself we need to fake it
-			// so page height (Height) minus what already exists (the blank line + the node + another blank line + select options)
-			textHeight += Height - (nodeBounds.h + (ftext->LineHeight * 2) + selectOptions->ContentFrame().h);
+			textHeight += Height - pageH;
 		}
 	}
 	int rowHeight = GetRowHeight();
@@ -180,6 +183,11 @@ void TextArea::UpdateScrollbar()
 		ieWord visibleRows = (Height / GetRowHeight());
 		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
 		bar->SetMax(sbMax);
+	}
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
+		&& dialogBeginNode) {
+		// now scroll dialogBeginNode to the top less a blank line
+		ScrollToY(nodeBounds.y - ftext->LineHeight);
 	}
 }
 
@@ -737,12 +745,6 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	UpdateScrollbar();
-
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		// now scroll dialogBeginNode to the top
-		ScrollBar* bar = (ScrollBar*)sb;
-		bar->SetPos(bar->Value); // scroll to the bottom
-	}
 }
 
 void TextArea::ClearHover()
