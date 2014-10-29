@@ -69,10 +69,9 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 
 void Video::SetScreenClip(const Region* clip)
 {
+	screenClip = Region(0,0, width, height);
 	if (clip) {
-		screenClip = *clip;
-	} else {
-		screenClip = Region(0,0, width, height);
+		screenClip = screenClip.Intersect(*clip);
 	}
 }
 
