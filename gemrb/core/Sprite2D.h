@@ -110,21 +110,22 @@ public:
 		if (Sheet) Sheet->release();
 	}
 
-	Region operator[](KeyType key) {
+	const Region& operator[](KeyType key) {
 		return RegionMap[key];
 	}
 
 	// return the passed in region, clipped to the sprite dimensions or a region with -1 w/h if outside the sprite bounds
-	Region MapSheetSegment(KeyType key, Region rgn) {
+	const Region& MapSheetSegment(KeyType key, Region rgn) {
 		Region intersection = rgn.Intersect(SheetRegion);
 		if (!intersection.Dimensions().IsEmpty()) {
 			if (RegionMap.insert(std::make_pair(key, intersection)).second) {
-				return intersection;
+				return RegionMap[key];
 			}
 			// FIXME: should we return something like Region(0,0,0,0) here?
 			// maybe we should just use Atlas[key] = intersection too.
 		}
-		return Region(0,0, -1,-1);
+		const static Region nullRgn(0,0, -1,-1);
+		return nullRgn;
 	}
 
 	void Draw(KeyType key, const Region& dest) const {
