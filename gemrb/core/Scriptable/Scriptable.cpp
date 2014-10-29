@@ -1100,7 +1100,6 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 	// check for area dead magic
 	// tob AR3004 is a dead magic area, but using a script with personal dead magic
 	if (area->GetInternalFlag()&AF_DEADMAGIC) {
-		// TODO: display fizzling animation
 		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 		return 0;
 	}
