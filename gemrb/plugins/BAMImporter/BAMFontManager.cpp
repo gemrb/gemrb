@@ -49,9 +49,19 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 							  FontStyle /*style*/, Palette* pal)
 {
 	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
+	// FIXME: this test only exists to let the minimal test pass
+	// we should maybe instead use a *valid* font for such a "test"
+	Sprite2D* spr = af->GetFrame(0);
+	if (spr == NULL) {
+		return NULL;
+	}
+	spr->release();
+	spr = NULL;
+
+	if (af->GetFrameCount() == 0) return NULL; // the minimal test will explode without this...
 	bool isNumeric = (af->GetCycleCount() <= 1);
 
-	Sprite2D* spr = NULL;
+
 	if (isStateFont) {
 		// Hack to work around original data where the "top row icons" have inverted x and y positions (ie level up icon)
 		// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
