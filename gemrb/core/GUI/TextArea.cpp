@@ -344,6 +344,8 @@ void TextArea::AppendText(const String& text)
 					switch (*it) {
 						case L']':
 							swscanf(token.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
+							// TODO: we shouldnt be making a new palette here. we end up with dozens of identical palettes.
+							// something needs to cache these
 							pal = new Palette(palCol, palette->back);
 							state = TEXT;
 							token.clear();
