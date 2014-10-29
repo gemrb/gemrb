@@ -207,8 +207,7 @@ void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 	// we need to now find the page for the existing character and add this new one to that page
 	const GlyphIndexEntry& idx = AtlasIndex[chr];
 	CreateGlyphIndex(alias, idx.pageIdx, idx.glyph);
-	Region r = Atlas[idx.pageIdx]->MapSheetSegment(alias, (*Atlas[idx.pageIdx])[chr]);
-	assert(r.h || r.w || r.x >= 0 || r.y >= 0);
+	Atlas[idx.pageIdx]->MapSheetSegment(alias, (*Atlas[idx.pageIdx])[chr]);
 }
 
 const Glyph& Font::GetGlyph(ieWord chr) const
