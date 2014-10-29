@@ -241,10 +241,9 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		} else {
 			size_t pos = stringPos;
 			stringPos = string.find_first_of(L'\n', stringPos);
-			line = string.substr(pos, stringPos - pos);
-			if (stringPos != String::npos) {
-				stringPos++; // skip \n
-			}
+			// be sure to nab the \n if there is one, so StringSize can return what we expect (sometimes we get: 'text \n')
+			size_t len = stringPos - pos + ((stringPos != String::npos) ? 1 : 0 );
+			line = string.substr(pos, len);
 		}
 
 		// check if we need to extend the canvas
@@ -349,8 +348,6 @@ size_t Font::RenderText(const String& string, Region& rgn,
 			}
 			charCount += linePos;
 		}
-		if (!lineBreak && stringPos != String::npos)
-			charCount++; // for the newline
 		dp.y += LineHeight;
 
 		if (singleLine || dp.y >= rgn.h) {
