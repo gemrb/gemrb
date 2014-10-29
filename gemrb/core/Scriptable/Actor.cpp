@@ -6489,7 +6489,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		VerbalConstant(VB_CRITMISS, 1);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
@@ -6540,7 +6540,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
 		}
 		ResetState();
 		buffer.append("[Missed]");
@@ -6561,7 +6561,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Hit]");
 		Log(COMBAT, "Attack", buffer);
 	}
-	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, critical?UI_CRITICAL:0, damage);
+	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, (critical?UI_CRITICAL:0)|UI_NOAURA, damage);
 	ResetState();
 }
 
@@ -8060,6 +8060,11 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
+	// only one potion/wand per round
+	if (!(flags&UI_NOAURA) && AuraPolluted()) {
+		return false;
+	}
+
 	ieResRef tmpresref;
 	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
 
@@ -8091,82 +8096,17 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
 	int multiplier = BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
 	int extraDamage = 0; // damage unaffected by the critical multiplier
-	// check 3ed sneak attack
+
 	if (third) {
-		// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
-		// or one of the stat overrides is set (unconfirmed for iwd2!)
-		ieDword always = Modified[IE_ALWAYSBACKSTAB];
-		bool invisible = Modified[IE_STATE_ID] & state_invisible;
-		// TODO: should probably be rate limited to once per round
-		if (invisible || always || target->Immobile() || IsBehind(target)) {
-			if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity) {
-				displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-				wi.backstabbing = false;
-			} else {
-				if (wi.backstabbing) {
-					// first check for feats that change the sneak dice
-					// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
-					if (BackstabResRef[0]!='*') {
-						if (stricmp(BackstabResRef, resref_arterial)) {
-							// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
-							multiplier -= 2;
-							extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-							displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, extraDamage);
-						} else {
-							// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
-							multiplier--;
-							extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-							displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, extraDamage);
-						}
-						core->ApplySpell(BackstabResRef, target, this, multiplier);
-						//do we need this?
-						BackstabResRef[0]='*';
-						if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-							core->ApplySpell(resref_cripstr, target, this, multiplier);
-						}
-					}
-					if (!extraDamage) {
-						extraDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-						// ~Sneak Attack for %d~
-						//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
-						displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, extraDamage);
-					}
-				} else {
-					// weapon is unsuitable for sneak attack
-					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-					wi.backstabbing = false;
-				}
-			}
+		// 3ed sneak attack
+		if (multiplier > 0) {
+			extraDamage = GetSneakAttackDamage(target, wi, multiplier, weaponImmunity);
 		}
+	} else if (multiplier > 1) {
+		// aDnD backstabbing
+		damage = GetBackstabDamage(target, wi, multiplier, damage);
 	}
 
-	//ToBEx compatibility in the ALWAYSBACKSTAB field:
-	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
-	//1 Ignore invisible requirement and positioning requirement
-	//2 Ignore invisible requirement only
-	//4 Ignore positioning requirement only
-	if (multiplier > 1 && !third) {
-		ieDword always = Modified[IE_ALWAYSBACKSTAB];
-		if ((Modified[IE_STATE_ID] & state_invisible) || (always&0x3) ) {
-			if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
-				if (target->Modified[IE_DISABLEBACKSTAB]) {
-					// The backstab seems to have failed
-					displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-					wi.backstabbing = false;
-				} else {
-					if (wi.backstabbing) {
-						damage *= multiplier;
-						// display a simple message instead of hardcoding multiplier names
-						displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
-					} else {
-						// weapon is unsuitable for backstab
-						displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-						wi.backstabbing = false;
-					}
-				}
-			}
-		}
-	}
 	damage += WeaponDamageBonus(wi);
 
 	if (weaponImmunity) {
@@ -8213,6 +8153,90 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	damage += extraDamage;
 }
 
+int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity) {
+	ieDword always = Modified[IE_ALWAYSBACKSTAB];
+	bool invisible = Modified[IE_STATE_ID] & state_invisible;
+	int sneakAttackDamage = 0;
+
+	// TODO: should be rate limited (web says to once per 4 rounds?)
+	// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
+	// or one of the stat overrides is set (unconfirmed for iwd2!)
+	if (invisible || always || target->Immobile() || IsBehind(target)) {
+		if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity) {
+			displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+			wi.backstabbing = false;
+		} else {
+			if (wi.backstabbing) {
+				// first check for feats that change the sneak dice
+				// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
+				// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
+				if (BackstabResRef[0]!='*') {
+					if (stricmp(BackstabResRef, resref_arterial)) {
+						// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
+						multiplier -= 2;
+						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+						displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, sneakAttackDamage);
+					} else {
+						// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
+						multiplier--;
+						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+						displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, sneakAttackDamage);
+					}
+					core->ApplySpell(BackstabResRef, target, this, multiplier);
+					//do we need this?
+					BackstabResRef[0]='*';
+					if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
+						core->ApplySpell(resref_cripstr, target, this, multiplier);
+					}
+				}
+				if (!sneakAttackDamage) {
+					sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+					// ~Sneak Attack for %d~
+					//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
+					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
+				}
+			} else {
+				// weapon is unsuitable for sneak attack
+				displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+				wi.backstabbing = false;
+			}
+		}
+	}
+	return sneakAttackDamage;
+}
+
+int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const {
+	ieDword always = Modified[IE_ALWAYSBACKSTAB];
+	bool invisible = Modified[IE_STATE_ID] & state_invisible;
+	int backstabDamage = damage;
+
+	//ToBEx compatibility in the ALWAYSBACKSTAB field:
+	//0 Normal conditions (attacker must be invisible, attacker must be in 90-degree arc behind victim)
+	//1 Ignore invisible requirement and positioning requirement
+	//2 Ignore invisible requirement only
+	//4 Ignore positioning requirement only
+	if (invisible || (always&0x3) ) {
+		if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
+			if (target->Modified[IE_DISABLEBACKSTAB]) {
+				// The backstab seems to have failed
+				displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+				wi.backstabbing = false;
+			} else {
+				if (wi.backstabbing) {
+					backstabDamage = multiplier * damage;
+					// display a simple message instead of hardcoding multiplier names
+					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
+				} else {
+					// weapon is unsuitable for backstab
+					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+					wi.backstabbing = false;
+				}
+			}
+		}
+	}
+	return backstabDamage;
+}
+
 bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
 {
 	if (target->Type!=ST_ACTOR) {
@@ -8220,6 +8244,11 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	}
 	// HACK: disable use when stunned (remove if stunned/petrified/etc actors stop running scripts)
 	if (Immobile()) {
+		return false;
+	}
+
+	// only one potion per round; skip for our internal attack projectile
+	if (!(flags&UI_NOAURA) && AuraPolluted()) {
 		return false;
 	}
 

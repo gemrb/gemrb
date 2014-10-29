@@ -1784,7 +1784,6 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damage = 0;
 		tmp = 1;
 		break;
-		break;
 	default:
 		tmp = 1;
 		damage = 1;
@@ -4659,6 +4658,7 @@ int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 		fx->Parameter1 = 1;
 	}
 	STAT_MOD( IE_CASTERHOLD );
+	core->GetGame()->SelectActor(target, false, SELECT_NORMAL);
 	return FX_PERMANENT;
 }
 
@@ -5863,6 +5863,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	bool per_round = true; // 4xxx trigger?
 	const TriggerEntry *entry = NULL;
 	ieDword timeOfDay;
+	Actor *near;
 
 	// check the condition
 	switch (fx->Parameter2) {
@@ -5874,8 +5875,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case COND_NEAR:
 		// See(NearestEnemyOf())
-		// FIXME
-		condition = PersonalDistance(actor, target) < 30;
+		condition = GetNearestEnemyOf(map, target, ORIGIN_SEES_ENEMY) != NULL;
 		break;
 	case COND_HP_HALF:
 		// HPPercentLT(Myself, 50)
@@ -5904,13 +5904,13 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case COND_NEAR4:
 		// PersonalSpaceDistance([ANYONE], 4)
-		// FIXME
-		condition = PersonalDistance(actor, target) < 4;
+		near = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
+		condition = near && PersonalDistance(near, target) < 4;
 		break;
 	case COND_NEAR10:
 		// PersonalSpaceDistance([ANYONE], 10)
-		// FIXME
-		condition = PersonalDistance(target, actor) < 10;
+		near = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
+		condition = near && PersonalDistance(near, target) < 10;
 		break;
 	case COND_EVERYROUND:
 		condition = true;
@@ -6066,10 +6066,10 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 		case WB_AWAY:
 		default:
-			dir = GetOrient(target->Pos, GetCasterObject()->Pos);
+			dir = GetOrient(target->Pos, Point(fx->SourceX, fx->SourceY));
 			break;
 		case WB_TOWARDS:
-			dir = GetOrient(GetCasterObject()->Pos, target->Pos);
+			dir = GetOrient(Point(fx->SourceX, fx->SourceY), target->Pos);
 			break;
 		case WB_FIXDIR:
 			dir = fx->Parameter3;
@@ -6284,16 +6284,9 @@ int fx_drain_spells (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_drain_spells(%2d): Count: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword i=fx->Parameter1;
-	if (fx->Parameter2) {
-		while(i--) {
-			if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_PRIEST)) {
-				break;
-			}
-		}
-		return FX_NOT_APPLIED;
-	}
+	int type = fx->Parameter2 ? IE_SPELL_TYPE_PRIEST : IE_SPELL_TYPE_WIZARD;
 	while(i--) {
-		if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_WIZARD)) {
+		if (!target->spellbook.DepleteSpell(type)) {
 			break;
 		}
 	}

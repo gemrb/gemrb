@@ -206,8 +206,7 @@ void GameControl::Center(unsigned short x, unsigned short y)
 	Region Viewport = video->GetViewport();
 	Viewport.x += x - Viewport.w / 2;
 	Viewport.y += y - Viewport.h / 2;
-	core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
-	video->MoveViewportTo( Viewport.x, Viewport.y );
+	MoveViewportTo(Viewport.x, Viewport.y, false);
 }
 
 void GameControl::ClearMouseState()
@@ -392,21 +391,7 @@ void GameControl::DrawInternal(Region& screen)
 	if (moveX || moveY) {
 		viewport.x += moveX;
 		viewport.y += moveY;
-		Point mapsize = area->TMap->GetMapSize();
-		if ( viewport.x < 0 )//if we are at the left of the map
-			viewport.x = 0;
-		else if ( (viewport.x + viewport.w) >= mapsize.x) //if we are at the right
-			viewport.x = mapsize.x - viewport.w - 1;
-
-		if ( viewport.y < 0 ) //if we are at the top of the map
-			viewport.y = 0;
-		else if ( (viewport.y + viewport.h ) >= mapsize.y ) //if we are at the bottom
-			viewport.y = mapsize.y - viewport.h - 1;
-
-		// override any existing viewport moves which may be in progress
-		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
-		// move it directly ourselves, since we might be paused
-		video->MoveViewportTo( viewport.x, viewport.y );
+		MoveViewportTo( viewport.x, viewport.y, false );
 	}
 	video->DrawRect( screen, ColorBlack, true );
 
@@ -1312,7 +1297,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		// let us target party members even if they are invisible
 		lastActor = area->GetActor(p, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
-			if (!lastActor->ValidTarget(target_types)) {
+			if (!lastActor->ValidTarget(target_types) || !area->IsVisible(p, false)) {
 				lastActor = NULL;
 			}
 		}
@@ -1467,6 +1452,36 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 	SetScrolling(moveX != 0 || moveY != 0);
 }
 #endif
+
+void GameControl::MoveViewportTo(int x, int y, bool center) {
+	Map *area = core->GetGame()->GetCurrentArea();
+
+	if (!area) return;
+
+	Video *video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
+	Point mapsize = area->TMap->GetMapSize();
+
+	if (center) {
+		x -= vp.w/2;
+		y -= vp.h/2;
+	}
+	if (x < 0) {
+		x = 0;
+	} else if (x + vp.w >= mapsize.x) {
+		x = mapsize.x - vp.w - 1;
+	}
+	if (y < 0) {
+		y = 0;
+	} else if (y + vp.h >= mapsize.y) {
+		y = mapsize.y - vp.h - 1;
+	}
+
+	// override any existing viewport moves which may be in progress
+	core->timer->SetMoveViewPort(x, y, 0, false);
+	// move it directly ourselves, since we might be paused
+	video->MoveViewportTo(x, y);
+}
 
 void GameControl::UpdateScrolling() {
 	// mouse scroll speed is checked because scrolling is not always done by the mouse (ie cutscenes/keyboard/etc)
@@ -1958,7 +1973,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 	}
 
-	if (doMove) {
+	if (doMove && game->selected.size() > 0) {
 		// construct a sorted party
 		// TODO: this is still ugly, help?
 		std::vector<Actor *> party;
@@ -2021,34 +2036,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 void GameControl::OnMouseWheelScroll(short x, short y)
 {
 	Region Viewport = core->GetVideoDriver()->GetViewport();
-	Game* game = core->GetGame();
-	Map *map = game->GetCurrentArea();
-	if (!map) return;
-	
-	Point mapsize = map->TMap->GetMapSize();
-	
 	Viewport.x += x;
-	if (Viewport.x <= 0) {
-		Viewport.x = 0;
-	} else if (Viewport.x + Viewport.w >= mapsize.x) {
-		Viewport.x = mapsize.x - Viewport.w - 1;
-	}
-
 	Viewport.y += y;
-	if (Viewport.y <= 0) {
-		Viewport.y = 0;
-	} else if (Viewport.y + Viewport.h >= mapsize.y) {
-		Viewport.y = mapsize.y - Viewport.h - 1;
-	}
 
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
 	} else {
-		// override any existing viewport moves which may be in progress
-		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
-		// move it directly ourselves, since we might be paused
-		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
+		MoveViewportTo( Viewport.x, Viewport.y, false);
 	}
 	//update cursor
 	core->GetEventMgr()->FakeMouseMove();
@@ -2461,11 +2456,8 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		ScreenFlags|=SF_CENTERONACTOR;
 	}
 	//center on first selected actor
-	Video *video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
-		core->timer->SetMoveViewPort( pc->Pos.x, pc->Pos.y, 0, true );
-		video->MoveViewportTo( pc->Pos.x-vp.w/2, pc->Pos.y-vp.h/2 );
+		MoveViewportTo( pc->Pos.x, pc->Pos.y, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }

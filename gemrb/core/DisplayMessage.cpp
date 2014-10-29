@@ -309,5 +309,4 @@ void DisplayMessage::DisplayStringName(const String& text, unsigned int color, c
 	DisplayMarkupString(newstr);
 	free(newstr);
 }
-
 }

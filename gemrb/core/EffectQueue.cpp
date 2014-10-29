@@ -529,8 +529,10 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	if (self) {
 		fx->CasterID = self->GetGlobalID();
-	} else {
-		if (Owner) fx->CasterID = Owner->GetGlobalID();
+		fx->SetSourcePosition(self->Pos);
+	} else if (Owner) {
+		fx->CasterID = Owner->GetGlobalID();
+		fx->SetSourcePosition(Owner->Pos);
 	}
 
 	switch (fx->Target) {
@@ -1139,10 +1141,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	if (first_apply) {
 		fx->FirstApply = 1;
-		if( (fx->PosX==0xffffffff) && (fx->PosY==0xffffffff)) {
-			fx->PosX = target->Pos.x;
-			fx->PosY = target->Pos.y;
-		}
+		fx->SetPosition(target->Pos);
 
 		//gemrb specific, stat based chance
 		if ((fx->ProbabilityRangeMin == 100) && Owner && (Owner->Type==ST_ACTOR) ) {

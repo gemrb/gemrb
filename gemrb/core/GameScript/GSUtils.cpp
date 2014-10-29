@@ -2302,7 +2302,7 @@ int GetGroup(Actor *actor)
 	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 		type = 1; //PC
 	}
-	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+	else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 		type = 0;
 	}
 	return type;
@@ -2326,7 +2326,6 @@ Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 		ac=map->GetActor(i,true);
 		if (ac == origin) continue;
 
-		int distance = Distance(ac, origin);
 		if (whoseeswho&ENEMY_SEES_ORIGIN) {
 			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				continue;
@@ -2338,6 +2337,7 @@ Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 			}
 		}
 
+		int distance = Distance(ac, origin);
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
@@ -2364,7 +2364,6 @@ Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho)
 		ac=map->GetActor(i,true);
 		if (ac == origin) continue;
 
-		int distance = Distance(ac, origin);
 		if (whoseeswho&ENEMY_SEES_ORIGIN) {
 			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				continue;
@@ -2376,6 +2375,7 @@ Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho)
 			}
 		}
 
+		int distance = Distance(ac, origin);
 		tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	}
 	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
@@ -2412,13 +2412,13 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 		return 0;
 	}
 	dist = spl->GetCastingDistance(Sender);
+	gamedata->FreeSpell(spl, spellres, false);
+
 	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
 	//this is used with special targeting mode (3)
 	if (dist>0xff000000) {
 		return dist;
 	}
-
-	gamedata->FreeSpell(spl, spellres, false);
 	return dist*9; //FIXME: empirical constant to convert from points to (feet)
 }
 
@@ -2434,13 +2434,13 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 		return 0;
 	}
 	dist=itm->GetCastingDistance(header);
+	gamedata->FreeItem(itm, itemres, false);
+
 	//make possible special return values (like 0xffffffff means the item doesn't need distance)
 	//this is used with special targeting mode (3)
 	if (dist>0xff000000) {
 		return dist;
 	}
-
-	gamedata->FreeItem(itm, itemres, false);
 	return dist*15;
 }
 
@@ -2596,15 +2596,15 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 					Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 					if (!spl) return false;
 					SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
-					if (seh && seh->Target != TARGET_DEAD) {
-						gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+					bool invalidTarget = seh && seh->Target != TARGET_DEAD;
+					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+					if (invalidTarget) {
 						if (caster->InParty) {
 							core->Autopause(AP_NOTARGET, caster);
 						}
 						caster->SetStance(IE_ANI_READY);
 						return true;
 					}
-					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				}
 			}
 		}

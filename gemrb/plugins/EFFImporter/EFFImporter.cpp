@@ -120,6 +120,8 @@ Effect* EFFImporter::GetEffectV1(Effect *fx)
 
 	fx->PosX=0xffffffff;
 	fx->PosY=0xffffffff;
+	fx->SourceX=0xffffffff;
+	fx->SourceY=0xffffffff;
 	return fx;
 }
 
@@ -156,10 +158,9 @@ Effect* EFFImporter::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->Parameter5 );
 	str->ReadDword( &fx->Parameter6 );
 	str->ReadResRef( fx->Resource2 );
-	str->ReadResRef( fx->Resource3 );	
-	str->ReadDword( &fx->PosX);
-	str->ReadDword( &fx->PosY);
-	//FIXME: these two points are actually different
+	str->ReadResRef( fx->Resource3 );
+	str->ReadDword( &fx->SourceX);
+	str->ReadDword( &fx->SourceY);
 	str->ReadDword( &fx->PosX);
 	str->ReadDword( &fx->PosY);
 	str->ReadDword( &fx->SourceType );
@@ -225,11 +226,12 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 		stream->WriteResRef(fx->Resource2);
 		stream->WriteResRef(fx->Resource3);
 	}
-	tmpDword1 = (ieDword) fx->PosX;
-	tmpDword2 = (ieDword) fx->PosY;
+	tmpDword1 = (ieDword) fx->SourceX;
+	tmpDword2 = (ieDword) fx->SourceY;
 	stream->WriteDword( &tmpDword1 );
 	stream->WriteDword( &tmpDword2 );
-	//FIXME: these two points are actually different
+	tmpDword1 = (ieDword) fx->PosX;
+	tmpDword2 = (ieDword) fx->PosY;
 	stream->WriteDword( &tmpDword1 );
 	stream->WriteDword( &tmpDword2 );
 	stream->WriteDword( &fx->SourceType );

@@ -2227,7 +2227,14 @@ void Interface::FreeString(char *&str) const
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 {
-	return strings->UpdateString( strref, text );
+	char *current = GetCString(strref, 0);
+	bool changed = strcmp(text, current) != 0;
+	FreeString(current);
+	if (changed) {
+		return strings->UpdateString( strref, text );
+	} else {
+		return strref;
+	}
 }
 
 char* Interface::GetCString(ieStrRef strref, ieDword options) const
@@ -4752,10 +4759,6 @@ void Interface::SanitizeItem(CREItem *item) const
 				item->Flags|=IE_INV_ITEM_MAGICAL;
 				item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
 			}
-		}
-
-		if (!(item->Flags & IE_INV_ITEM_MOVABLE)) {
-			item->Flags |= IE_INV_ITEM_UNDROPPABLE;
 		}
 
 		// pst has no stolen flag, but "steel" in its place

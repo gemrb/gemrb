@@ -536,6 +536,7 @@ private: //Internal Functions
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
 	Trigger* ReadTrigger(DataStream* stream);
+	static int InParty(Scriptable* Sender, Trigger* parameters, bool allowdead);
 private: //Internal variables
 	Scriptable* const MySelf;
 	ieResRef Name;

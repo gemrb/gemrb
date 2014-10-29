@@ -43,10 +43,10 @@ bool CTlkOverride::Init()
 	CloseResources();
 	//Creation of the headers should be game specific, some games don't have these
 	toh_str = GetAuxHdr(true);
-	tot_str = GetAuxTlk(true);
 	if (toh_str == NULL) {
 		return false;
 	}
+	tot_str = GetAuxTlk(true);
 	if (tot_str == NULL) {
 		return false;
 	}
@@ -62,20 +62,12 @@ bool CTlkOverride::Init()
 	toh_str->Seek( 8, GEM_CURRENT_POS );
 	toh_str->ReadDword( &AuxCount );
 
-	tot_str->ReadDword( &FreeOffset );
+	if (tot_str->ReadDword( &FreeOffset ) != 4) {
+		FreeOffset = 0xffffffff;
+	}
+	NextStrRef = 0xffffffff;
 
 	return true;
-}
-
-void CTlkOverride::UpdateFreeOffset(ieDword NewFree)
-{
-	if (NewFree!=0xffffffff) {
-		tot_str->Seek(NewFree,GEM_STREAM_START);
-		tot_str->WriteDword( &FreeOffset);
-	}
-	FreeOffset=NewFree;
-	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteDword( &FreeOffset );
 }
 
 void CTlkOverride::CloseResources()
@@ -94,45 +86,51 @@ void CTlkOverride::CloseResources()
 }
 
 //gets the length of a stored string which might span more than one segment
-ieDword CTlkOverride::GetLength()
+ieDword CTlkOverride::GetLength(ieDword offset)
 {
-	ieDword tmp;
+	ieDword tmp = offset;
 	char buffer[SEGMENT_SIZE];
+
+	if (tot_str->Seek(offset+8, GEM_STREAM_START) != GEM_OK) {
+		return 0;
+	}
 
 	ieDword length = 0;
 	do
 	{
+		if (tot_str->Seek(tmp+8, GEM_STREAM_START) != GEM_OK) {
+			return 0;
+		}
 		memset(buffer,0,sizeof(buffer));
 		tot_str->Read(buffer, SEGMENT_SIZE);
 		tot_str->ReadDword(&tmp);
-		if (tmp!=0xffffffff) {
-			tot_str->Seek(tmp+8,GEM_STREAM_START);
-			length+=SEGMENT_SIZE;
+		if (tmp != 0xffffffff) {
+			length += SEGMENT_SIZE;
 		}
-	}
-	while(tmp!=0xffffffff);
+	} while (tmp != 0xffffffff);
 	length += strlen(buffer);
 	return length;
 }
 
 //returns a string stored at a given offset of the .tot file
-char* CTlkOverride::LocateString2(ieDword offset)
+char* CTlkOverride::GetString(ieDword offset)
 {
 	if (!tot_str) {
 		return NULL;
 	}
 
-	if (tot_str->Seek(offset+8, GEM_STREAM_START)!=GEM_OK) {
+	ieDword length = GetLength(offset);
+	if (length == 0) {
 		return NULL;
 	}
-	ieDword length = GetLength();
+
 	//assuming char is one byte
 	char *ret = (char *) malloc(length+1);
 	char *pos = ret;
 	ret[length]=0;
 	while(length) {
 		tot_str->Seek(offset+8, GEM_STREAM_START);
-		ieDword tmp = length>SEGMENT_SIZE?SEGMENT_SIZE:length;
+		ieDword tmp = MIN(length, SEGMENT_SIZE);
 		tot_str->Read(pos, tmp);
 		tot_str->Seek(SEGMENT_SIZE-tmp, GEM_CURRENT_POS);
 		tot_str->ReadDword(&offset);
@@ -145,12 +143,11 @@ char* CTlkOverride::LocateString2(ieDword offset)
 ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 {
 	ieDword memoffset = 0;
-	bool tookfree = false;
 	ieDword offset = LocateString(strref);
 
-	if (offset==0xffffffff) {
-		strref=GetNewStrRef();
-		offset=LocateString(strref);
+	if (offset == 0xffffffff) {
+		strref = GetNewStrRef(strref);
+		offset = LocateString(strref);
 		assert(strref!=0xffffffff);
 	}
 
@@ -164,71 +161,126 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 	do
 	{
 		//fill the backpointer
-		tot_str->Seek(offset+4, GEM_STREAM_START);
+		tot_str->Seek(offset + 4, GEM_STREAM_START);
 		tot_str->WriteDword(&backp);
+		ieDword seglen = MIN(SEGMENT_SIZE, length);
+		tot_str->Write(newvalue + memoffset, seglen);
+		length -= seglen;
+		memoffset += seglen;
 		backp = offset;
-		ieDword tmp = length>SEGMENT_SIZE?SEGMENT_SIZE:length;
-		tot_str->Write(newvalue+memoffset, tmp);
-		length-=tmp;
-		memoffset+=tmp;
-		tot_str->Seek(backp+SEGMENT_SIZE+8, GEM_STREAM_START);
+		tot_str->Seek(SEGMENT_SIZE - seglen, GEM_CURRENT_POS);
 		tot_str->ReadDword(&offset);
 
 		//end of string
-		if(!length) {
-			if(offset!=0xffffffff) {
-				tookfree = true;
+		if (!length) {
+			if (offset != 0xffffffff) {
+				ieDword freep = offset;
+				offset = 0xffffffff;
+				tot_str->Seek(-4,GEM_CURRENT_POS);
+				tot_str->WriteDword(&offset);
+				ReleaseSegment(freep);
 			}
-			tot_str->Seek(-4,GEM_CURRENT_POS);
-			backp = offset+4;
-			offset = 0xffffffff;
-			tot_str->WriteDword(&offset);
 			break;
 		}
 
 		if (offset==0xffffffff) {
 			//no more space, but we need some
-			offset = FreeOffset;
-			tookfree = true;
-			if (offset == 0xffffffff) {
-				//to the end of file
-				offset = tot_str->Size();
-			}
+			offset = ClaimFreeSegment();
+			tot_str->Seek(-4,GEM_CURRENT_POS);
+			tot_str->WriteDword(&offset);
 		}
-		tot_str->Seek(-4,GEM_CURRENT_POS);
-		tot_str->WriteDword(&offset);
-	}
-	while(length);
+	} while(length);
 
-	//adjust the free list
-	if (tookfree) {
-		UpdateFreeOffset(backp);
-	}
 	return strref;
 }
 
-ieStrRef CTlkOverride::GetNewStrRef()
+ieDword CTlkOverride::ClaimFreeSegment()
+{
+	ieDword offset = FreeOffset;
+	unsigned long pos = tot_str->GetPos();
+	
+	if (offset == 0xffffffff) {
+		offset = tot_str->Size();
+	} else {
+		tot_str->Seek(offset, GEM_STREAM_START);
+		if (tot_str->ReadDword(&FreeOffset) != 4) {
+			FreeOffset = 0xffffffff;
+		}
+	}
+	ieDword tmp = 0;
+	char buffer[SEGMENT_SIZE];
+	memset(buffer, 0, sizeof(buffer));
+	tot_str->Seek(offset, GEM_STREAM_START);
+	tot_str->WriteDword(&tmp);
+	tmp = 0xffffffff;
+	tot_str->WriteDword(&tmp);
+	tot_str->Write(buffer, SEGMENT_SIZE);
+	tot_str->WriteDword(&tmp);
+
+	//update free segment pointer
+	tot_str->Seek(0, GEM_STREAM_START);
+	tot_str->WriteDword(&FreeOffset);
+	tot_str->Seek(pos, GEM_STREAM_START);
+	return offset;
+}
+
+void CTlkOverride::ReleaseSegment(ieDword offset)
+{
+	// also release linked segments, if any
+	do {
+		tot_str->Seek(offset, GEM_STREAM_START);
+		tot_str->WriteDword(&FreeOffset);
+		FreeOffset = offset;
+		tot_str->Seek(SEGMENT_SIZE + 4, GEM_CURRENT_POS);
+		tot_str->ReadDword(&offset);
+	} while (offset != 0xffffffff);
+	tot_str->Seek(0, GEM_STREAM_START);
+	tot_str->WriteDword(&FreeOffset);
+}
+
+ieStrRef CTlkOverride::GetNextStrRef()
+{
+	ieStrRef ref;
+	
+	if (NextStrRef == 0xffffffff) {
+		// find the largest entry; should be the last - unless we
+		// overwrote internal strings, or biographies
+		ieDword last = 0;
+		int cnt = AuxCount;
+
+		while (--cnt >= 0 && last < STRREF_START) {
+			if (toh_str->Seek(TOH_HEADER_SIZE + sizeof(EntryType) * cnt, GEM_STREAM_START) != GEM_OK) {
+				// looks like the file is damaged
+				AuxCount--;
+				continue;
+			}
+			toh_str->ReadDword(&last);
+		}
+		NextStrRef = MAX(STRREF_START, ++last);
+	}
+	ref = NextStrRef++;
+	return ref;
+}
+
+ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 {
 	EntryType entry;
 
 	memset(&entry,0,sizeof(entry));
 
-	if (!AuxCount) {
-		entry.strref = STRREF_START;
-		entry.offset = 8;
+	if (strref >= BIO_START && strref <= BIO_END) {
+		entry.strref = strref;
 	} else {
-		toh_str->Seek(sizeof(entry), GEM_STREAM_END );
-		toh_str->ReadDword(&entry.strref);
-		toh_str->Read(entry.dummy, 20);
-		entry.strref++;
-		entry.offset = tot_str->Size();
+		entry.strref = GetNextStrRef();
 	}
-	toh_str->Seek(0,GEM_STREAM_END);
+	entry.offset = ClaimFreeSegment();
+
+	toh_str->Seek(TOH_HEADER_SIZE + AuxCount * sizeof(EntryType), GEM_STREAM_START);
 	toh_str->WriteDword(&entry.strref);
 	toh_str->Write(entry.dummy, 20);
 	toh_str->WriteDword(&entry.offset);
 	AuxCount++;
-	toh_str->Seek(8,GEM_STREAM_START);
+	toh_str->Seek(12,GEM_STREAM_START);
 	toh_str->WriteDword(&AuxCount);
 	return entry.strref;
 }
@@ -272,9 +324,12 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
 	}
 #endif
 
+	string = NULL;
 	ieDword offset = LocateString(strref);
 	if (offset!=0xffffffff) {
-		string = LocateString2(offset);
+		string = GetString(offset);
+	}
+	if (string != NULL) {
 		Length = strlen(string);
 	} else {
 		Length = 0;
@@ -317,7 +372,17 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {
-		return fs;
+		if (fs->Size() % (SEGMENT_SIZE + 12)) {
+			Log(ERROR, "TLKImporter", "Defective default.tot detected. Discarding.");
+			// if this happens we also need to account for the TOH file
+			AuxCount = 0;
+			if (toh_str->Seek(12, GEM_STREAM_START) == GEM_OK) {
+				toh_str->WriteDword(&AuxCount);
+			}
+			toh_str->Rewind();
+		} else {
+			return fs;
+		}
 	}
 	if (create) {
 		fs->Create( "default", IE_TOT_CLASS_ID);

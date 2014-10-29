@@ -5,7 +5,7 @@ IF(SDL2_FOUND)
 	IF(USE_OPENGL)
 		ADD_GEMRB_PLUGIN( SDLVideo ${COMMON_FILES} SDL20Video.cpp SDL20GLVideo.cpp GLSLProgram.cpp Matrix.cpp GLTextureSprite2D.cpp GLPaletteManager.cpp)
 		TARGET_LINK_LIBRARIES( SDLVideo ${SDL_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${COCOA_LIBRARY_PATH})
-		INSTALL(DIRECTORY Shaders DESTINATION ${DATA_DIR})
+		# Shaders are installed in gemrb/CMakeLists.txt for better mac compatibility
 		# also copy to the build dir for no-install runs
 		FILE(COPY Shaders DESTINATION ${CMAKE_BINARY_DIR})
 	ELSE()

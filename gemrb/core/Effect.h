@@ -116,6 +116,7 @@ struct Effect {
 	ieDword Parameter4;
 	ieDword Parameter5;
 	ieDword Parameter6;
+	ieDword SourceX, SourceY;
 	ieDword PosX, PosY;
 	ieDword SourceType; //1-item, 2-spell
 	ieResRef Source;
@@ -138,6 +139,12 @@ public:
 		if(PosX==0xffffffff && PosY==0xffffffff) {
 			PosX=p.x;
 			PosY=p.y;
+		}
+	}
+	void SetSourcePosition(const Point &p) {
+		if(SourceX==0xffffffff && SourceY==0xffffffff) {
+			SourceX=p.x;
+			SourceY=p.y;
 		}
 	}
 };
