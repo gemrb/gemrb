@@ -27,8 +27,6 @@
 #include "Palette.h"
 #include "Video.h"
 
-#define DEBUG_FONT 1
-
 namespace GemRB {
 
 static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
@@ -135,6 +133,19 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 	Sheet->SetPalette(oldPal);
 	oldPal->release();
 }
+
+#if DEBUG_FONT
+void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
+{
+	Video* video = core->GetVideoDriver();
+	video->SetScreenClip(NULL);
+	Region drawRgn = Region(0, 0, 1024, Sheet->Height);
+	video->DrawRect(drawRgn, ColorBlack, true);
+	Region sheetSize = Region(0,0, Sheet->Width, Sheet->Height);
+	video->DrawRect(sheetSize.Intersect(r), ColorWhite, false);
+	video->BlitSprite(Sheet, sheetSize.Intersect(r), drawRgn);
+}
+#endif
 
 
 Font::Font(Palette* pal, ieWord lineheight, ieWord baseline)

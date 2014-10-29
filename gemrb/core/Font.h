@@ -70,6 +70,8 @@ struct Glyph {
  * Class for using and manipulating images serving as fonts
  */
 
+#define DEBUG_FONT 1
+
 class GEM_EXPORT Font {
 	/*
 	 we cannot assume direct pixel access to a Sprite2D (opengl, BAM, etc), but we need raw pixels for rendering text
@@ -118,6 +120,9 @@ private:
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet<ieWord>::Draw;
 		void Draw(ieWord chr, const Region& dest, Palette* pal = NULL);
+#if DEBUG_FONT
+		void DumpToScreen(const Region&);
+#endif
 	};
 
 	struct GlyphIndexEntry {
