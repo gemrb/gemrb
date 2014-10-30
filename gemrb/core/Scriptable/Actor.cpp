@@ -3667,6 +3667,22 @@ void Actor::IdleActions(bool nonidle)
 bool Actor::OverrideActions()
 {
 	//TODO:: implement forced actions that mess with scripting (panic, confusion, etc)
+	// domination and dire charm: force the actors to be useful (trivial ai)
+	Action *action;
+	if (fxqueue.HasEffect(fx_set_charmed_state_ref)) {
+		if (fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 3) ||
+			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1003) ||
+			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 5) ||
+			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1005)) {
+			action = GenerateAction("AttackReevaluate(NearestEnemyOf(Myself))");
+			if (action) {
+				AddActionInFront(action);
+				return true;
+			} else {
+				Log(ERROR, "Actor", "Cannot generate override action");
+			}
+		}
+	}
 	return false;
 }
 
