@@ -280,6 +280,12 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
+	elif GameCheck.IsIWD2():
+		Class = [0]*len(Levels)
+		for c in range(len(Levels)):
+			if Levels[c] > 0:
+				# level stats are implicitly keyed by class id
+				Class[c] = c + 1
 	if NumClasses>len(Levels):
 		return
 
@@ -299,7 +305,14 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	OldHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	CurrentHP = 0
 	Divisor = float (NumClasses)
+	if GameCheck.IsIWD2():
+		# hack around so we can reuse more of the main loop
+		NumClasses = len(Levels)
+		Divisor = 1.0
 	for i in range (NumClasses):
+		if GameCheck.IsIWD2() and not Class[i]:
+			continue
+
 		#check this classes hp table for any gain
 		if not ClassName or NumClasses > 1:
 			ClassName = GUICommon.GetClassRowName (Class[i], "class")
