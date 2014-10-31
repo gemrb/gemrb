@@ -990,6 +990,10 @@ def DisplayMisc (pc):
 	else:
 		time = GemRB.GetString (10697)
 	time += " " + GemRB.GetString (10699) + " "
+	if days == 0:
+		# only display hours
+		time = ""
+
 	if hours == 1:
 		time += GemRB.GetString (10701)
 	else:
