@@ -6014,6 +6014,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//or i just got lost a negation somewhere
 		prof += -4;
 	} else {
+		// iwd2 adds a -4 penalty nonprof penalty (others below)
 		// everyone is proficient with fists
 		if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
 			prof += wspecial[stars][0];
