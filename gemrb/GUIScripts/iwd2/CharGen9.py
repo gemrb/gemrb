@@ -165,6 +165,10 @@ def NextPress():
 		clssname = CommonTables.Classes.GetRowName (kitrow)
 	LUCommon.SetClassResistances( MyChar, clssname )
 
+	# 10 is a weapon slot (see slottype.2da row 10)
+	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
+	GemRB.SetEquippedQuickSlot (MyChar, 0)
+
 	# reset hitpoints
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
