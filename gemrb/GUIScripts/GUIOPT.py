@@ -679,9 +679,6 @@ def OpenQuitMsgWindow ():
 def CancelQuitMsgWindow ():
 	CloseQuitMsgWindow()
 
-	if not GameOptionsWindow:
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-
 	RestoreWinVisibility ()
 
 	return
