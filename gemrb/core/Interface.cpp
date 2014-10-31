@@ -561,6 +561,7 @@ void Interface::HandleEvents()
 		if (tmp != (ieDword) ~0) {
 			EventFlag&=~EF_PORTRAIT;
 			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
+			guiscript->RunFunction( "GUIINV", "RefreshInventoryWindow" );
 		}
 	}
 
