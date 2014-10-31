@@ -19,6 +19,7 @@
 #################### Interchapter text screen functions #################
 
 import GemRB
+from ie_restype import RES_2DA
 from GUIDefines import *
 import GUICommon
 import GameCheck
@@ -64,13 +65,14 @@ def StartTextScreen ():
 		EndTextScreen ()
 		return
 
-	TextTable = GemRB.LoadTable ("textscrn", 1)
-	if TextTable != None:
-		TxtRow = TextTable.GetRowIndex (TableName)
-		if TxtRow >= 0:
-			ID = TextTable.GetValue (TxtRow, 0)
-			MusicName = TextTable.GetValue (TxtRow, 1)
-			Message = TextTable.GetValue (TxtRow, 2)
+	if GemRB.HasResource ("textscrn", RES_2DA, 1):
+		TextTable = GemRB.LoadTable ("textscrn", 1)
+		if TextTable != None:
+			TxtRow = TextTable.GetRowIndex (TableName)
+			if TxtRow >= 0:
+				ID = TextTable.GetValue (TxtRow, 0)
+				MusicName = TextTable.GetValue (TxtRow, 1)
+				Message = TextTable.GetValue (TxtRow, 2)
 
 	if Message != "*":
 		GemRB.DisplayString (Message, 0xff0000)
