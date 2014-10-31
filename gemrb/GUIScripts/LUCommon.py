@@ -77,9 +77,12 @@ def CanLevelUp(actor):
 def _SetupLevels (pc, Level, offset=0, noclass=0):
 	#storing levels as an array makes them easier to deal with
 	if not Level:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)+offset, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2)+offset, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)+offset]
+		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
+		if GameCheck.IsIWD2():
+			Levels = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
+				IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
+				IE_LEVELSORCERER, IE_LEVEL2]
+		Levels = [ GemRB.GetPlayerStat (pc, l)+offset for l in Levels ]
 	else:
 		Levels = []
 		for level in Level:
