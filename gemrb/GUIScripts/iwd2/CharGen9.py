@@ -165,6 +165,11 @@ def NextPress():
 		clssname = CommonTables.Classes.GetRowName (kitrow)
 	LUCommon.SetClassResistances( MyChar, clssname )
 
+	# reset hitpoints
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
+	LUCommon.SetupHP (MyChar)
+
 	t=GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, CommonTables.Aligns.GetValue (t, 3))
 	TmpTable=GemRB.LoadTable ("repstart")
