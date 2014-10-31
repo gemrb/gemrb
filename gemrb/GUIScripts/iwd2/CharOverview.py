@@ -214,7 +214,9 @@ def UpdateOverview(CurrentStep):
 			if value:
 				strref = Tables[7].GetValue(i, 1)
 				AddText(strref, -1)
-				if value > 1: AddText(': ' + str(value))
+				multiple = Tables[6].GetValue(i, 0)
+				if multiple != 0:
+					AddText(': ' + str(value))
 
 	# Handle StartOverWindow
 	StartOverWindow = GemRB.LoadWindow(53)
