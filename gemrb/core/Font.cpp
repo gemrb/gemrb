@@ -239,11 +239,14 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		if (lineBreak) {
 			lineBreak = false;
 		} else {
-			size_t pos = stringPos;
-			stringPos = string.find_first_of(L'\n', stringPos);
-			// be sure to nab the \n if there is one, so StringSize can return what we expect (sometimes we get: 'text \n')
-			size_t len = stringPos - pos + ((stringPos != String::npos) ? 1 : 0 );
-			line = string.substr(pos, len);
+			size_t eolpos = string.find_first_of(L'\n', stringPos);
+			if (eolpos == String::npos) {
+				eolpos = string.length();
+			} else {
+				eolpos++; // convert from index
+			}
+			line = string.substr(stringPos, eolpos - stringPos);
+			stringPos = eolpos;
 		}
 
 		// check if we need to extend the canvas
