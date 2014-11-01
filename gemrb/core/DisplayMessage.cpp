@@ -297,16 +297,14 @@ void DisplayMessage::DisplayStringName(const String& text, unsigned int color, c
 	String name;
 	speaker_color = GetSpeakerColor(name, speaker);
 
-	// if there is no name, use the script name to help debugging
 	if (name.length() == 0) {
-		const char* str = speaker->GetScriptName();
-		name = String(str, str + strlen(str));
+		DisplayString(text, color, NULL);
+	} else {
+		size_t newlen = wcslen(DisplayFormatName) + name.length() + text.length() + 18;
+		wchar_t* newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
+		swprintf(newstr, newlen, DisplayFormatName, speaker_color, name.c_str(), color, text.c_str());
+		DisplayMarkupString(newstr);
+		free(newstr);
 	}
-
-	size_t newlen = wcslen(DisplayFormatName) + name.length() + text.length() + 18;
-	wchar_t* newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
-	swprintf(newstr, newlen, DisplayFormatName, speaker_color, name.c_str(), color, text.c_str());
-	DisplayMarkupString(newstr);
-	free(newstr);
 }
 }
