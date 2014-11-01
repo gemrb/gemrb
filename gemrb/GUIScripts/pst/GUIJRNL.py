@@ -161,7 +161,7 @@ def OpenQuestsWindow ():
 
 	QuestsList = List = Window.GetControl (1)
 	List.SetVarAssoc ('SelectedQuest', -1)
-	List.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, OnJournalQuestSelect)
+	List.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, OnJournalQuestSelect)
 
 	QuestDesc = Window.GetControl (3)
 
@@ -331,7 +331,7 @@ def OpenBeastsWindow ():
 
 	BeastsList = List = Window.GetControl (0)
 	List.SetVarAssoc ('SelectedBeast', -1)
-	List.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, OnJournalBeastSelect)
+	List.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, OnJournalBeastSelect)
 
 	Window.CreateButton (8, 19, 19, 281, 441)
 	BeastImage = Window.GetControl (8)
