@@ -282,7 +282,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 
 			const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
 			const Size lineMaxSize = lineRgn.Dimensions();
-			Size lineSize = StringSize(line, &lineMaxSize, &linePos);
+			const Size lineSize = StringSize(line, &lineMaxSize, &linePos);
 
 			// check to see if the line is on screen
 			// TODO: technically we could be *even more* optimized by passing lineRgn, but this breaks dropcaps
@@ -332,7 +332,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				// FIXME: we have no good way of handling when a single word is longer than the line
 				// we don't have enough context to deal with that inside RenderLine.
 				// not sure what the best way to handle this case is.
-				Log(WARNING, "Font", "Line (%d width) > %d; for text \"%ls\"!", lineSize.w, lineRgn.w, line.c_str());
+				Log(WARNING, "Font", "First word of line: \"%ls\" exceeded available width of %d", line.c_str(), lineRgn.w);
 			}
 #endif
 			dp = dp + linePoint;
