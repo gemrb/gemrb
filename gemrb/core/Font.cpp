@@ -416,7 +416,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 		for (; i < word.length(); i++) {
 			// process glyphs in word
 			currChar = word[i];
-			if (currChar == '\r') {
+			if (currChar == '\r' || currChar == '\n') {
 				continue;
 			}
 			if (i > 0) { // kerning
