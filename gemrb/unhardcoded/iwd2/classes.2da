@@ -2,7 +2,7 @@
 *
                  NAME_REF   DESC_REF   ID         CLASS      CLAB       SAVE       HP     USABILITY       HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC  TOHIT
 BARBARIAN        34         37         1          0          CLABFI05   SAVEWAR    HPBARB        1        1          1          1          1          1          1          1        BAATFGT
-BARD             1083       9562       2          0          CLABBA01   SAVEBRD    HPBRD         2        1          1          1          1          1          1          1        BAATNFG
+BARD             1083       9562       2          0          CLABBA01   SAVEBRD    HPROG         2        1          1          1          1          1          1          1        BAATNFG
 CLERIC           1079       9559       3          0          CLABPR01   SAVEPRS    HPPRS         4        1          1          1          1          1          1          1        BAATNFG
 DRUID            1080       9560       4          0          CLABDR01   SAVEPRS    HPPRS         8        1          1          1          1          1          1          1        BAATNFG
 FIGHTER          10174      9556       5          0          CLABFI01   SAVEWAR    HPWAR        16        1          1          1          1          1          1          1        BAATFGT
