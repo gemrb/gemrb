@@ -49,8 +49,17 @@ def SetRaceAbilities(MyChar, racetitle):
 	for i in range(rows):
 		resource = ability.GetValue (i, 0)
 		count = ability.GetValue (i,1)
-		for j in range(count):
-			GemRB.LearnSpell (MyChar, resource)
+		GemRB.LearnSpell (MyChar, resource) # LS_MEMO is on by default for innates
+		if count > 1:
+			# luckily they're all level 1
+			import Spellbook
+			SpellIndex = Spellbook.HasSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, resource)
+			if SpellIndex == -1:
+				#raise RuntimeError, "Failed learning racial innate: %s" %(resource)
+				print "Failed learning racial innate: %s" %(resource)
+				continue
+			for j in range(count-1):
+				GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 	return
 
 def SetRaceResistances(MyChar, racetitle):
