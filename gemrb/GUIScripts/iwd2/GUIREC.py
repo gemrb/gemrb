@@ -903,6 +903,9 @@ def DisplaySkills (pc):
 
 		# only show (modified) skills that either don't require training or had it already
 		if (value and untrained) or (not untrained and base):
+			modStat = SkillTable.GetValue (i, 1, 2)
+			if modStat != IE_DEX: # already handled in core
+				value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 			skill = SkillName.GetValue (i, 1)
 			skills.append (GemRB.GetString(skill) + ": " + str(value) + " (" + str(base) + ")\n")
 
