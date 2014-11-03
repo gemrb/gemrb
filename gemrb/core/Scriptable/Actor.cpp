@@ -3163,11 +3163,14 @@ void Actor::RefreshPCStats() {
 	// PICK_POCKETS  OPEN_LOCKS  FIND_TRAPS  MOVE_SILENTLY  HIDE_IN_SHADOWS  DETECT_ILLUSION  SET_TRAPS
 	Modified[IE_PICKPOCKET] += GetSkillBonus(1);
 	Modified[IE_LOCKPICKING] += GetSkillBonus(2);
-	Modified[IE_TRAPS] += GetSkillBonus(3);
+	// these are governed by other stats in iwd2 (int) or don't exist (set traps)
+	if (!third) {
+		Modified[IE_TRAPS] += GetSkillBonus(3);
+		Modified[IE_DETECTILLUSIONS] += GetSkillBonus(6);
+		Modified[IE_SETTRAPS] += GetSkillBonus(7);
+	}
 	Modified[IE_STEALTH] += GetSkillBonus(4);
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
-	Modified[IE_DETECTILLUSIONS] += GetSkillBonus(6);
-	Modified[IE_SETTRAPS] += GetSkillBonus(7);
 }
 
 // add fatigue every 4 hours since resting and check if the actor is penalised for it
