@@ -471,16 +471,13 @@ def AddPlayerStat(MyChar, stat, value):
 
 def SetClassResistances(MyChar, clsstitle):
 	resistances = GemRB.LoadTable ("clssrsmd")
-	AddPlayerStat (MyChar, IE_RESISTFIRE, resistances.GetValue ( clsstitle, "FIRE") )
-	AddPlayerStat (MyChar, IE_RESISTCOLD, resistances.GetValue ( clsstitle, "COLD") )
-	AddPlayerStat (MyChar, IE_RESISTELECTRICITY, resistances.GetValue ( clsstitle, "ELEC") )
-	AddPlayerStat (MyChar, IE_RESISTACID, resistances.GetValue ( clsstitle, "ACID") )
-	AddPlayerStat (MyChar, IE_RESISTMAGIC, resistances.GetValue ( clsstitle, "SPELL") )
-	AddPlayerStat (MyChar, IE_RESISTMAGICFIRE, resistances.GetValue ( clsstitle, "MAGIC_FIRE") )
-	AddPlayerStat (MyChar, IE_RESISTMAGICCOLD, resistances.GetValue ( clsstitle, "MAGIC_COLD") )
-	AddPlayerStat (MyChar, IE_RESISTSLASHING, resistances.GetValue ( clsstitle, "SLASHING") )
-	AddPlayerStat (MyChar, IE_RESISTCRUSHING, resistances.GetValue ( clsstitle, "BLUDGEONING") )
-	AddPlayerStat (MyChar, IE_RESISTPIERCING, resistances.GetValue ( clsstitle, "PIERCING") )
-	AddPlayerStat (MyChar, IE_RESISTMISSILE, resistances.GetValue ( clsstitle, "MISSILE") )
+	# add it to dmgtypes.2da if we ever need it elsewhere
+	titles = { IE_RESISTFIRE:"FIRE", IE_RESISTCOLD:"COLD", IE_RESISTELECTRICITY:"ELEC", \
+		IE_RESISTACID:"ACID", IE_RESISTMAGIC:"SPELL", IE_RESISTMAGICFIRE:"MAGIC_FIRE", \
+		IE_RESISTMAGICCOLD:"MAGIC_COLD", IE_RESISTSLASHING:"SLASHING", \
+		IE_RESISTCRUSHING:"BLUDGEONING", IE_RESISTPIERCING:"PIERCING", IE_RESISTMISSILE:"MISSILE" }
+
+	for resistance in titles:
+		AddPlayerStat (MyChar, resistance, resistances.GetValue (clsstitle, titles[resistance]))
 	return
 
