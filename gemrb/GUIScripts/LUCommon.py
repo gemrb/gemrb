@@ -463,12 +463,6 @@ def SetSpell(pc, SpellName, Feat):
 		GemRB.RemoveSpell(pc, SpellName)
 	return
 
-def AddPlayerStat(MyChar, stat, value):
-	value += GemRB.GetPlayerStat (MyChar, stat, 0)
-	#print "Set: ", stat," to ", value
-	GemRB.SetPlayerStat (MyChar, stat, value)
-	return
-
 def SetClassResistances(MyChar, clsstitle):
 	resistances = GemRB.LoadTable ("clssrsmd")
 	# add it to dmgtypes.2da if we ever need it elsewhere
@@ -478,6 +472,8 @@ def SetClassResistances(MyChar, clsstitle):
 		IE_RESISTCRUSHING:"BLUDGEONING", IE_RESISTPIERCING:"PIERCING", IE_RESISTMISSILE:"MISSILE" }
 
 	for resistance in titles:
-		AddPlayerStat (MyChar, resistance, resistances.GetValue (clsstitle, titles[resistance]))
+		base = GemRB.GetPlayerStat (MyChar, resistance, 0)
+		extra = resistances.GetValue (clsstitle, titles[resistance])
+		GemRB.SetPlayerStat (MyChar, resistance, base+extra)
 	return
 
