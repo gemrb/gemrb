@@ -115,6 +115,8 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
+	elif GameCheck.IsIWD2():
+		Class = GetAllClasses (Levels)
 
 	return Levels, NumClasses, Class
 
