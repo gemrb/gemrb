@@ -1176,13 +1176,9 @@ def UpdateAnimation ():
 
 # NOTE: the following 4 functions are only used in iwd2
 def GetActorRaceTitle (actor):
-	RaceID = GemRB.GetPlayerStat (actor, IE_SUBRACE)
-	if RaceID:
-		RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
-	else:
-		RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
-	row = CommonTables.Races.FindValue (3, RaceID )
-	RaceTitle = CommonTables.Races.GetValue (row, 2)
+	import IDLUCommon
+	RaceIndex = IDLUCommon.GetRace (actor)
+	RaceTitle = CommonTables.Races.GetValue (RaceIndex, 2)
 	return RaceTitle
 
 # NOTE: this function is called with the primary classes
