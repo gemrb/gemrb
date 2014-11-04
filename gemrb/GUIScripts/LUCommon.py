@@ -464,23 +464,23 @@ def SetSpell(pc, SpellName, Feat):
 	return
 
 def AddPlayerStat(MyChar, stat, value):
-        value += GemRB.GetPlayerStat (MyChar, stat, 0)
+	value += GemRB.GetPlayerStat (MyChar, stat, 0)
 	#print "Set: ", stat," to ", value
-        GemRB.SetPlayerStat (MyChar, stat, value)
-        return
+	GemRB.SetPlayerStat (MyChar, stat, value)
+	return
 
 def SetClassResistances(MyChar, clsstitle):
-        resistances = GemRB.LoadTable ("clssrsmd")
-        AddPlayerStat (MyChar, IE_RESISTFIRE, resistances.GetValue ( clsstitle, "FIRE") )
-        AddPlayerStat (MyChar, IE_RESISTCOLD, resistances.GetValue ( clsstitle, "COLD") )
-        AddPlayerStat (MyChar, IE_RESISTELECTRICITY, resistances.GetValue ( clsstitle, "ELEC") )
-        AddPlayerStat (MyChar, IE_RESISTACID, resistances.GetValue ( clsstitle, "ACID") )
-        AddPlayerStat (MyChar, IE_RESISTMAGIC, resistances.GetValue ( clsstitle, "SPELL") )
-        AddPlayerStat (MyChar, IE_RESISTMAGICFIRE, resistances.GetValue ( clsstitle, "MAGIC_FIRE") )
-        AddPlayerStat (MyChar, IE_RESISTMAGICCOLD, resistances.GetValue ( clsstitle, "MAGIC_COLD") )
-        AddPlayerStat (MyChar, IE_RESISTSLASHING, resistances.GetValue ( clsstitle, "SLASHING") )
-        AddPlayerStat (MyChar, IE_RESISTCRUSHING, resistances.GetValue ( clsstitle, "BLUDGEONING") )
-        AddPlayerStat (MyChar, IE_RESISTPIERCING, resistances.GetValue ( clsstitle, "PIERCING") )
-        AddPlayerStat (MyChar, IE_RESISTMISSILE, resistances.GetValue ( clsstitle, "MISSILE") )
-        return
+	resistances = GemRB.LoadTable ("clssrsmd")
+	AddPlayerStat (MyChar, IE_RESISTFIRE, resistances.GetValue ( clsstitle, "FIRE") )
+	AddPlayerStat (MyChar, IE_RESISTCOLD, resistances.GetValue ( clsstitle, "COLD") )
+	AddPlayerStat (MyChar, IE_RESISTELECTRICITY, resistances.GetValue ( clsstitle, "ELEC") )
+	AddPlayerStat (MyChar, IE_RESISTACID, resistances.GetValue ( clsstitle, "ACID") )
+	AddPlayerStat (MyChar, IE_RESISTMAGIC, resistances.GetValue ( clsstitle, "SPELL") )
+	AddPlayerStat (MyChar, IE_RESISTMAGICFIRE, resistances.GetValue ( clsstitle, "MAGIC_FIRE") )
+	AddPlayerStat (MyChar, IE_RESISTMAGICCOLD, resistances.GetValue ( clsstitle, "MAGIC_COLD") )
+	AddPlayerStat (MyChar, IE_RESISTSLASHING, resistances.GetValue ( clsstitle, "SLASHING") )
+	AddPlayerStat (MyChar, IE_RESISTCRUSHING, resistances.GetValue ( clsstitle, "BLUDGEONING") )
+	AddPlayerStat (MyChar, IE_RESISTPIERCING, resistances.GetValue ( clsstitle, "PIERCING") )
+	AddPlayerStat (MyChar, IE_RESISTMISSILE, resistances.GetValue ( clsstitle, "MISSILE") )
+	return
 
