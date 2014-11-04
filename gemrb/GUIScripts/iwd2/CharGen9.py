@@ -64,19 +64,6 @@ def SetRaceAbilities(MyChar, racetitle):
 	return
 
 def SetRaceResistances(MyChar, racetitle):
-	resistances = GemRB.LoadTable ("racersmd")
-	GemRB.SetPlayerStat (MyChar, IE_RESISTFIRE, resistances.GetValue ( racetitle, "FIRE") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTCOLD, resistances.GetValue ( racetitle, "COLD") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTELECTRICITY, resistances.GetValue ( racetitle, "ELEC") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTACID, resistances.GetValue ( racetitle, "ACID") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTMAGIC, resistances.GetValue ( racetitle, "SPELL") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTMAGICFIRE, resistances.GetValue ( racetitle, "MAGIC_FIRE") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTMAGICCOLD, resistances.GetValue ( racetitle, "MAGIC_COLD") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTSLASHING, resistances.GetValue ( racetitle, "SLASHING") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTCRUSHING, resistances.GetValue ( racetitle, "BLUDGEONING") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTPIERCING, resistances.GetValue ( racetitle, "PIERCING") )
-	GemRB.SetPlayerStat (MyChar, IE_RESISTMISSILE, resistances.GetValue ( racetitle, "MISSILE") )
-
 	resistances = GemRB.LoadTable ("raceflag")
 
 	#set infravision and nondetection
@@ -177,7 +164,8 @@ def NextPress():
 	IDLUCommon.AddResistances (MyChar, clssname, "clssrsmd")
 
 	if racename != -1:
-		SetRaceResistances (MyChar, racename)
+		IDLUCommon.AddResistances (MyChar, racename, "racersmd")
+		SetRaceResistances(MyChar, racename)
 		SetRaceAbilities (MyChar, racename)
 
 	# 10 is a weapon slot (see slottype.2da row 10)
