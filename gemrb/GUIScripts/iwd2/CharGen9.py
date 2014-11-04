@@ -147,6 +147,8 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
 	row = CommonTables.Races.FindValue (3, race )
 	racename = CommonTables.Races.GetRowName (row)
+	if racename == -1:
+		raise RuntimeError, "Could not find race: %d" %(race)
 
 	#base class
 	Class=GemRB.GetVar ("BaseClass")
@@ -163,10 +165,9 @@ def NextPress():
 		clssname = CommonTables.Classes.GetRowName (kitrow)
 	IDLUCommon.AddResistances (MyChar, clssname, "clssrsmd")
 
-	if racename != -1:
-		IDLUCommon.AddResistances (MyChar, racename, "racersmd")
-		SetRaceResistances(MyChar, racename)
-		SetRaceAbilities (MyChar, racename)
+	IDLUCommon.AddResistances (MyChar, racename, "racersmd")
+	SetRaceResistances(MyChar, racename)
+	SetRaceAbilities (MyChar, racename)
 
 	# 10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
