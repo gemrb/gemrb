@@ -174,7 +174,7 @@ def NextPress():
 	else:
 		#kit
 		clssname = CommonTables.Classes.GetRowName (kitrow)
-	IDLUCommon.SetClassResistances (MyChar, clssname)
+	IDLUCommon.AddResistances (MyChar, clssname, "clssrsmd")
 
 	if racename != -1:
 		SetRaceResistances (MyChar, racename)

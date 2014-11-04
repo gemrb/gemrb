@@ -23,8 +23,8 @@
 import GemRB
 from ie_stats import *
 
-def SetClassResistances(MyChar, clsstitle):
-	resistances = GemRB.LoadTable ("clssrsmd")
+def AddResistances(MyChar, rowname, table):
+	resistances = GemRB.LoadTable (table)
 	# add it to dmgtypes.2da if we ever need it elsewhere
 	titles = { IE_RESISTFIRE:"FIRE", IE_RESISTCOLD:"COLD", IE_RESISTELECTRICITY:"ELEC", \
 		IE_RESISTACID:"ACID", IE_RESISTMAGIC:"SPELL", IE_RESISTMAGICFIRE:"MAGIC_FIRE", \
@@ -33,7 +33,7 @@ def SetClassResistances(MyChar, clsstitle):
 
 	for resistance in titles:
 		base = GemRB.GetPlayerStat (MyChar, resistance, 0)
-		extra = resistances.GetValue (clsstitle, titles[resistance])
+		extra = resistances.GetValue (rowname, titles[resistance])
 		GemRB.SetPlayerStat (MyChar, resistance, base+extra)
 	return
 
