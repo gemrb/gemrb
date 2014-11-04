@@ -27,6 +27,7 @@ import GUICommon
 import CommonTables
 import GUICommonWindows
 import GUIRECCommon
+import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
@@ -264,17 +265,9 @@ def GetFavoredClass (pc, code):
 
 	return code-1
 
-# returns the race or subrace
-def GetRace (pc):
-	Race = GemRB.GetPlayerStat (pc, IE_RACE)
-	Subrace = GemRB.GetPlayerStat (pc, IE_SUBRACE)
-	if Subrace:
-		Race = Race<<16 | Subrace
-	return CommonTables.Races.FindValue (3, Race)
-
 # returns the effective character level modifier
 def GetECL (pc):
-	RaceIndex = GetRace (pc)
+	RaceIndex = IDLUCommon.GetRace (pc)
 	RaceRowName = CommonTables.Races.GetRowName (RaceIndex)
 	return CommonTables.Races.GetValue (RaceRowName, "ECL")
 
@@ -369,7 +362,7 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (40310,-1)
 
 	#get the subrace value
-	RaceIndex = GetRace (pc)
+	RaceIndex = IDLUCommon.GetRace (pc)
 	Race = CommonTables.Races.GetValue (RaceIndex, 2)
 	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
 

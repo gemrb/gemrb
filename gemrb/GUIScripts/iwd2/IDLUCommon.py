@@ -21,6 +21,7 @@
 #                 that are incompatible with the other games
 
 import GemRB
+import CommonTables
 from ie_stats import *
 
 def AddResistances(MyChar, rowname, table):
@@ -36,4 +37,12 @@ def AddResistances(MyChar, rowname, table):
 		extra = resistances.GetValue (rowname, titles[resistance])
 		GemRB.SetPlayerStat (MyChar, resistance, base+extra)
 	return
+
+# returns the race or subrace
+def GetRace (pc):
+	Race = GemRB.GetPlayerStat (pc, IE_RACE)
+	Subrace = GemRB.GetPlayerStat (pc, IE_SUBRACE)
+	if Subrace:
+		Race = Race<<16 | Subrace
+	return CommonTables.Races.FindValue (3, Race)
 
