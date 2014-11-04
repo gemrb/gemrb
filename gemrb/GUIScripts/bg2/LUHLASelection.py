@@ -67,10 +67,13 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 
 	# create the done button
 	HLADoneButton = HLAWindow.GetControl (28)
-	HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	HLADoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HLADonePress)
 	HLADoneButton.SetText(11973)
 	HLADoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	if HLACount:
+		HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	else:
+		HLADoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	# setup our text area
 	HLATextArea = HLAWindow.GetControl(26)
