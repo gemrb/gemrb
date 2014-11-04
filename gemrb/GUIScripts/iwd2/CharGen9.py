@@ -24,6 +24,7 @@ import GUICommon
 import CommonTables
 import CharOverview
 import LUCommon
+import IDLUCommon
 
 BioWindow = 0
 BioData = 0
@@ -173,7 +174,7 @@ def NextPress():
 	else:
 		#kit
 		clssname = CommonTables.Classes.GetRowName (kitrow)
-	LUCommon.SetClassResistances( MyChar, clssname )
+	IDLUCommon.SetClassResistances (MyChar, clssname)
 
 	if racename != -1:
 		SetRaceResistances (MyChar, racename)
