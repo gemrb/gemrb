@@ -173,6 +173,9 @@ def NextPress():
 	SetRaceResistances(MyChar, racename)
 	SetRaceAbilities (MyChar, racename)
 
+	# setup saving throws
+	IDLUCommon.SetupSavingThrows (MyChar, None, True)
+
 	# 10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)

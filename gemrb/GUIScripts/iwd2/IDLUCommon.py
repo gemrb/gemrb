@@ -46,3 +46,21 @@ def GetRace (pc):
 		Race = Race<<16 | Subrace
 	return CommonTables.Races.FindValue (3, Race)
 
+def SetupSavingThrows (pc, Level=None, Chargen=False):
+	"""Updates an actors saving throws based upon level.
+
+	Level should contain the actors current level.
+	If Level is None, it is filled with the actors current level.
+	If Chargen is true, it will also add any racial boni."""
+
+	# check if there are any racial bonuses to saves
+	# they are constant in iwd2, regardless of level
+	if Chargen:
+		RaceSaveTable = GemRB.LoadTable ("SAVERACE")
+		RaceName = CommonTables.Races.GetRowName (GetRace (pc))
+		Race = RaceSaveTable.GetRowIndex (RaceName)
+		# fortitude, reflex, will: colnames match stat order
+		for i in range(3):
+			RacialBonus = RaceSaveTable.GetValue (Race, i)
+			GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, RacialBonus)
+
