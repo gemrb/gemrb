@@ -73,6 +73,16 @@ def CanLevelUp(actor):
 	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
 	return (tmpNext != 0 and tmpNext <= xp)
 
+# expects a list of character levels of all classes
+# returns sparse list of class ids (of same length)
+def GetAllClasses (Levels):
+	Class = [0]*len(Levels)
+	for c in range(len(Levels)):
+		if Levels[c] > 0:
+			# level stats are implicitly keyed by class id
+			Class[c] = c + 1
+	return Class
+
 # internal shared function for the various Setup* stat updaters
 def _SetupLevels (pc, Level, offset=0, noclass=0):
 	#storing levels as an array makes them easier to deal with
@@ -281,11 +291,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
 	elif GameCheck.IsIWD2():
-		Class = [0]*len(Levels)
-		for c in range(len(Levels)):
-			if Levels[c] > 0:
-				# level stats are implicitly keyed by class id
-				Class[c] = c + 1
+		Class = GetAllClasses (Levels)
 	if NumClasses>len(Levels):
 		return
 
