@@ -1141,7 +1141,7 @@ def GetActorPortrait (actor, which):
 
 
 def UpdateAnimation ():
-	if not GemRB.HasResource ("ANIMS", RES_2DA):
+	if not GemRB.HasResource ("ANIMS", RES_2DA, 1):
 		# FIXME: make a simpler version for non-pst too
 		# this is a callback from the core on EF_UPDATEANIM!
 		return
