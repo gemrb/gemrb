@@ -8420,7 +8420,7 @@ static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-	actor->SetFeatValue(featindex, value);
+	actor->SetFeatValue(featindex, value, false);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
