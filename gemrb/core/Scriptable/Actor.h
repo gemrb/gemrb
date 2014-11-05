@@ -762,7 +762,7 @@ public:
 	int GetSkill(unsigned int skill) const;
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
-	void SetFeatValue(unsigned int feat, int value);
+	void SetFeatValue(unsigned int feat, int value, bool init = true);
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char *AnimationType, int WeaponType=-1);

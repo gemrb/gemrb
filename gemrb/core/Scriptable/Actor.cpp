@@ -8418,7 +8418,7 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	}
 }
 
-void Actor::SetFeatValue(unsigned int feat, int value)
+void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 {
 	if (feat>=MAX_FEATS) {
 		return;
@@ -8435,7 +8435,10 @@ void Actor::SetFeatValue(unsigned int feat, int value)
 		SetFeat(feat, BM_NAND);
 		if (featstats[feat]) SetBase(featstats[feat], 0);
 	}
-	ApplyFeats();
+
+	if (init) {
+		 ApplyFeats();
+	}
 }
 
 void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int wt)
