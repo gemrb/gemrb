@@ -396,6 +396,8 @@ def EvaluateAllBeasts ():
 		beasts[klass].append (i)
 		
 		j = j + 1
+	beasts[0].sort()
+	beasts[1].sort()
 
 
 ###################################################
