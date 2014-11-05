@@ -239,5 +239,6 @@ def NextPress():
 		NewRef = GemRB.CreateString (62015+MyChar, BioData)
 	GemRB.SetPlayerString (MyChar, 63, NewRef)
 
-	LUCommon.ApplyFeats(MyChar)
+	# core will call this for us on area load, so no need to repeat
+	#LUCommon.ApplyFeats(MyChar)
 	return
