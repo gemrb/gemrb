@@ -829,51 +829,44 @@ def DisplayWeapons (pc):
 
 def DisplaySkills (pc):
 	Window = RecordsWindow
+	
+	def PrintStatTable (title, tabname):
+		feats = True if tabname == "feats" else False
+		lookup = "featreq" if feats else "skillsta"
 
-	SkillTable = GemRB.LoadTable ("skillsta")
-	SkillName = GemRB.LoadTable ("skills")
-	rows = SkillTable.GetRowCount ()
+		nameTab = GemRB.LoadTable (tabname)
+		itemTab = GemRB.LoadTable (lookup)
+		rows = itemTab.GetRowCount ()
+		
+		RecordsTextArea.Append ("\n[color=ffff00]" + title + "[/color]\n")
+		
+		items = []
+		for i in range(rows):
+			item = itemTab.GetValue (i, 0, 2)
+			name = nameTab.GetValue (i, 1)
 
-	#skills
-	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(11983) + "[/color]\n")
-
-	skills = []
-	for i in range(rows):
-		stat = SkillTable.GetValue (i, 0, 2)
-		value = GemRB.GetPlayerStat (pc, stat)
-		base = GemRB.GetPlayerStat (pc, stat, 1)
-		untrained = SkillName.GetValue (i, 3)
-
-		# only show (modified) skills that either don't require training or had it already
-		if (value and untrained) or (not untrained and base):
-			skill = SkillName.GetValue (i, 1)
-			skills.append (GemRB.GetString(skill) + ": " + str(value) + " (" + str(base) + ")\n")
-
-	skills.sort()
-	for i in skills:
-		RecordsTextArea.Append (i)
-
-	FeatTable = GemRB.LoadTable ("featreq")
-	FeatName = GemRB.LoadTable ("feats")
-	rows = FeatTable.GetRowCount ()
-	#feats
-	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(36361) + "[/color]\n")
-
-	feats = []
-	for i in range(rows):
-		if GemRB.HasFeat(pc, i):
-			feat = FeatName.GetValue (i, 1)
-			stat = FeatTable.GetValue (i, 0, 2)
-			if stat:
-				multi = GemRB.GetPlayerStat (pc, stat)
-				feats.append (GemRB.GetString(feat) + ": " + str(multi) + "\n")
+			if feats and GemRB.HasFeat(pc, i):
+				value = (name,) if not item else (name, GemRB.GetPlayerStat (pc, item),)
+				items.append (value)
+			elif not feats:
+				value = GemRB.GetPlayerStat (pc, item)
+				base = GemRB.GetPlayerStat (pc, item, 1)
+				untrained = nameTab.GetValue (i, 3)
+				
+				# only show (modified) skills that either don't require training or had it already
+				if (value and untrained) or (not untrained and base):
+					items.append((name, str(value) + " (" + str(base) + ")",))
+			
+		items.sort()
+		for item in items:
+			if len(item) > 1:
+				RecordsTextArea.Append (DelimitedText(item[0], item[1]))
 			else:
-				feats.append (GemRB.GetString(feat) + "\n")
+				RecordsTextArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
+		return
 
-	feats.sort()
-	for i in feats:
-		RecordsTextArea.Append (i)
-
+	PrintStatTable (GemRB.GetString(11983), "skills")
+	PrintStatTable (GemRB.GetString(36361), "feats")
 	return
 
 def DelimitedStrRefs(strref1, strref2, newlines=1, delimiter=": "):
