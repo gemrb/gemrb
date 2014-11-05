@@ -20,12 +20,11 @@
 import GemRB
 from ie_stats import *
 import CharOverview
+import IDLUCommon
 
 #this is the same list as in GUIREC
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
-Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCERER, IE_LEVEL2]
+Classes = IDLUCommon.Levels
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")

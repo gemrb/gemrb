@@ -50,10 +50,8 @@ OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
 
-#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
-Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCERER, IE_LEVEL2]
+# class level stats
+Classes = IDLUCommon.Levels
 
 #don't allow exporting polymorphed or dead characters
 def Exportable(pc):

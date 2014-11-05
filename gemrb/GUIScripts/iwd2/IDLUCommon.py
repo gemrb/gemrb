@@ -24,6 +24,12 @@ import GemRB
 import CommonTables
 from ie_stats import *
 
+# barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
+# same order as in classes.2da / class IDs
+Levels = [ IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
+	IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
+	IE_LEVELSORCERER, IE_LEVEL2 ]
+
 def AddResistances(MyChar, rowname, table):
 	resistances = GemRB.LoadTable (table)
 	# add it to dmgtypes.2da if we ever need it elsewhere

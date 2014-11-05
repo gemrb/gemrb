@@ -89,9 +89,8 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 	if not Level:
 		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
 		if GameCheck.IsIWD2():
-			Levels = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-				IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-				IE_LEVELSORCERER, IE_LEVEL2]
+			import IDLUCommon
+			Levels = IDLUCommon.Levels
 		Levels = [ GemRB.GetPlayerStat (pc, l)+offset for l in Levels ]
 	else:
 		Levels = []
