@@ -138,9 +138,6 @@ def NextPress():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
-	# reset saving throws, charbase starts with fortitude +2
-	GemRB.SetPlayerStat (MyChar, IE_SAVEFORTITUDE, 0)
-
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	BaseRace = GemRB.GetVar ("BaseRace")
 	GemRB.SetPlayerStat (MyChar, IE_RACE, BaseRace)
