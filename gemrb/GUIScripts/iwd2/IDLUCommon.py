@@ -22,6 +22,7 @@
 
 import GemRB
 import CommonTables
+import GUICommon
 from ie_stats import *
 
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
@@ -52,11 +53,10 @@ def GetRace (pc):
 		Race = Race<<16 | Subrace
 	return CommonTables.Races.FindValue (3, Race)
 
-def SetupSavingThrows (pc, Level=None, Chargen=False):
+def SetupSavingThrows (pc, Class, Chargen=False):
 	"""Updates an actors saving throws based upon level.
 
-	Level should contain the actors current level.
-	If Level is None, it is filled with the actors current level.
+	Class should contain the class to consider for saving throw level-up.
 	If Chargen is true, it will also add any racial boni."""
 
 	# check if there are any racial bonuses to saves
@@ -69,4 +69,25 @@ def SetupSavingThrows (pc, Level=None, Chargen=False):
 		for i in range(3):
 			RacialBonus = RaceSaveTable.GetValue (Race, i)
 			GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, RacialBonus)
+
+	# class-based saving throw progression
+	# get the actual xp level of the passed class
+	Level = GemRB.GetPlayerStat(pc, Levels[Class-1])
+
+	RowName = GUICommon.GetClassRowName (Class, "class")
+	SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", 0)
+	ClassSaveTable = GemRB.LoadTable (SaveName)
+	if Level > ClassSaveTable.GetRowCount():
+		print "SetupSavingThrows: too high level, ignoring!"
+		return
+
+	# save the saves
+	# fortitude, reflex, will: colnames match stat order
+	# the tables contain absolute values, so there's no need to compute a diff
+	# HOWEVER, permanent effects' effects would get obliterated if we didn't
+	for i in range(3):
+		Base = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE+i, 1)
+		OldClassBonus = ClassSaveTable.GetValue (Level-2, i) # default is 0 if we underflow
+		ClassBonus = ClassSaveTable.GetValue (Level-1, i)
+		GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, Base + ClassBonus-OldClassBonus)
 
