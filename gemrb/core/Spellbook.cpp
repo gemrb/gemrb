@@ -525,15 +525,15 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 	if (IWD2Style) {
 		PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
 		spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
-		return spell->SpellLevel;
-	}
-
-	//not IWD2
-	if (spell->SpellType<6) {
-		spl->Type = spelltypes[spell->SpellType];
 		spl->Level = spell->SpellLevel-1;
 	} else {
-		spl->Type = IE_SPELL_TYPE_INNATE;
+		//not IWD2
+		if (spell->SpellType<6) {
+			spl->Type = spelltypes[spell->SpellType];
+			spl->Level = spell->SpellLevel-1;
+		} else {
+			spl->Type = IE_SPELL_TYPE_INNATE;
+		}
 	}
 
 	bool ret=AddKnownSpell(spl, memo);
