@@ -404,7 +404,6 @@ private:
 	void RefreshPCStats();
 	void RefreshHP();
 	bool ShouldHibernate();
-	void ApplyClassClab(int cls, bool remove);
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData();
