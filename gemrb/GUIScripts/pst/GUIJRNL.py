@@ -450,8 +450,8 @@ def OpenLogWindow ():
 		date = str (1 + dt)
 		#time = str (gt - dt*86400)
 		
-		Text.Append ("[color=FFFF00]"+GemRB.GetString(19310)+" "+date+"[/color]\n")
-		Text.Append (GemRB.GetString (je['Text']) + "")
+		Text.Append ("[color=FFFF00]" + GemRB.GetString(19310)+" "+date+":[/color]")
+		Text.Append (" " + GemRB.GetString (je['Text']) + "\n\n")
 			
 	Window.SetVisible (WINDOW_VISIBLE)
 	
