@@ -63,7 +63,7 @@ def SetRaceAbilities(MyChar, racetitle):
 				GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 	return
 
-def SetRaceResistances(MyChar, racetitle):
+def SetRaceBonuses(MyChar, racetitle):
 	resistances = GemRB.LoadTable ("raceflag")
 
 	#set infravision and nondetection
@@ -167,7 +167,7 @@ def NextPress():
 	IDLUCommon.AddResistances (MyChar, clssname, "clssrsmd")
 
 	IDLUCommon.AddResistances (MyChar, racename, "racersmd")
-	SetRaceResistances(MyChar, racename)
+	SetRaceBonuses(MyChar, racename)
 	SetRaceAbilities (MyChar, racename)
 
 	# setup saving throws
