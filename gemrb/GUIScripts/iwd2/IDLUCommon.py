@@ -33,7 +33,7 @@ def AddResistances(MyChar, rowname, table):
 		IE_RESISTCRUSHING:"BLUDGEONING", IE_RESISTPIERCING:"PIERCING", IE_RESISTMISSILE:"MISSILE" }
 
 	for resistance in titles:
-		base = GemRB.GetPlayerStat (MyChar, resistance, 0)
+		base = GemRB.GetPlayerStat (MyChar, resistance, 1)
 		extra = resistances.GetValue (rowname, titles[resistance])
 		GemRB.SetPlayerStat (MyChar, resistance, base+extra)
 	return
