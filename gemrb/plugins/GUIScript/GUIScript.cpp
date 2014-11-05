@@ -4296,7 +4296,8 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	PyList_Sort(list);
+	// FIXME: should we have an option to sort the list?
+	// PyList_Sort(list);
 	std::vector<SelectOption> TAOptions;
 	PyObject* item = NULL;
 	for (int i = 0; i < PyList_Size(list); i++) {
