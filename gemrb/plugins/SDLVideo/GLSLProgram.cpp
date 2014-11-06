@@ -42,7 +42,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 		ResolveFilePath(bundleShaderPath);
 		fileStream.open(bundleShaderPath);
 	}
-#elif DATA_DIR
+#elif defined DATA_DIR
 	if (!fileStream.is_open()) {
 		vertexSourceFileName.insert(0, 1, PathDelimiter);
 		vertexSourceFileName.insert(0, DATA_DIR);
@@ -76,7 +76,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 		ResolveFilePath(bundleShaderPath);
 		fileStream2.open(bundleShaderPath);
 	}
-#elif DATA_DIR
+#elif defined DATA_DIR
 	if (!fileStream2.is_open()) {
 		fragmentSourceFileName.insert(0, 1, PathDelimiter);
 		fragmentSourceFileName.insert(0, DATA_DIR);
