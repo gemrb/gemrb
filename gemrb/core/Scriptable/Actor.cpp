@@ -835,8 +835,10 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 	return (ieDword)kitindex;
 }
 
+// iwd2 kit usability matches kit ids, so this should never be used
 static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 {
+	if (third) error("Actor", "Tried to look up iwd2 kit usability the bg2 way!\n");
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
 		int kitindex = kit&0xfff;
 		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
