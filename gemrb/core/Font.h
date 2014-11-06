@@ -70,7 +70,7 @@ struct Glyph {
  * Class for using and manipulating images serving as fonts
  */
 
-#define DEBUG_FONT 1
+#define DEBUG_FONT 0
 
 class GEM_EXPORT Font {
 	/*
