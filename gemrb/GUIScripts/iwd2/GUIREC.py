@@ -860,7 +860,7 @@ def DisplaySkills (pc):
 		items.sort()
 		for item in items:
 			if len(item) > 1:
-				RecordsTextArea.Append (DelimitedText(item[0], item[1]))
+				RecordsTextArea.Append (DelimitedText(item[0], item[1], 0))
 			else:
 				RecordsTextArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
 		return
