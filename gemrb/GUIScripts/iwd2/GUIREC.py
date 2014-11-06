@@ -838,7 +838,7 @@ def DisplaySkills (pc):
 		itemTab = GemRB.LoadTable (lookup)
 		rows = itemTab.GetRowCount ()
 		
-		RecordsTextArea.Append ("\n[color=ffff00]" + title + "[/color]\n")
+		RecordsTextArea.Append ("[color=ffff00]" + title + "[/color]\n")
 		
 		items = []
 		for i in range(rows):
@@ -866,6 +866,7 @@ def DisplaySkills (pc):
 		return
 
 	PrintStatTable (GemRB.GetString(11983), "skills")
+	RecordsTextArea.Append ("\n")
 	PrintStatTable (GemRB.GetString(36361), "feats")
 	return
 
@@ -890,7 +891,7 @@ def DisplayMisc (pc):
 	stat = GemRB.GetPCStats (pc)
 
 	#favourites
-	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40320) + "[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40320) + "[/color]\n")
 
 	#favourite spell and weapon
 	RecordsTextArea.Append (DelimitedStrRefs (11949, stat['FavouriteSpell']))
