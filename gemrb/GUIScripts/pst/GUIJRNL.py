@@ -201,13 +201,9 @@ def OnJournalCompletedPress ():
 def PopulateQuestsList ():
 	GemRB.SetVar ('SelectedQuest', -1)
 	QuestDesc.Clear ()
-
-	opts = []
-	j = 0
-	for q in quests[selected_quest_class]:
-		title = GemRB.GetINIQuestsKey (str (q[0]), 'title', '0')
-		opts.append('- ' + GemRB.GetString(int(title)))
-		j = j + 1
+	
+	lookup = lambda quest: int(GemRB.GetINIQuestsKey (str (quest[0]), 'title', '0'))
+	opts = ['- ' + GemRB.GetString(lookup(q)) for q in quests[selected_quest_class]]
 	QuestsList.SetOptions(opts)
 	
 def EvaluateCondition (var, value, condition):
@@ -373,12 +369,8 @@ def PopulateBeastsList ():
 	BeastDesc.Clear ()
 	BeastImage.SetPicture ('default')
 
-	opts = []
-	j = 0
-	for b in beasts[selected_beast_class]:
-		name = GemRB.GetINIBeastsKey (str (b), 'name', '0')
-		opts.append(GemRB.GetString(int (name)))
-		j = j + 1
+	lookup = lambda beast: int(GemRB.GetINIBeastsKey (str (beast), 'name', '0'))
+	opts = [GemRB.GetString(lookup(b)) for b in beasts[selected_beast_class]]
 	BeastsList.SetOptions(opts)
 
 def EvaluateAllBeasts ():
@@ -387,7 +379,6 @@ def EvaluateAllBeasts ():
 
 	count = int (GemRB.GetINIBeastsKey ('init', 'beastcount', '0'))
 	
-	j = 0
 	for i in range (count):
 		if not GemRB.GameIsBeastKnown (i):
 			continue
@@ -395,7 +386,6 @@ def EvaluateAllBeasts ():
 		klass = int (GemRB.GetINIBeastsKey (str (i), 'class', '0'))
 		beasts[klass].append (i)
 		
-		j = j + 1
 	beasts[0].sort()
 	beasts[1].sort()
 
