@@ -326,7 +326,7 @@ def DisplaySavingThrows (pc):
 def GNZS(pc, s1, st, force=False):
 	value = GemRB.GetPlayerStat (pc, st)
 	if value or force:
-		RecordsTextArea.Append (DelimitedText(s1, value))
+		RecordsTextArea.Append (DelimitedText(s1, value, 0))
 	return
 
 def DisplayGeneral (pc):
