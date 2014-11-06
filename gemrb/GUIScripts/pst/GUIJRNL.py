@@ -425,7 +425,10 @@ def OpenLogWindow ():
 	# text area
 	Text = Window.GetControl (2)
 
-	for i in range (GemRB.GetJournalSize (0)):
+	# limit the log to the last entries (original did something similar)
+	js = GemRB.GetJournalSize (0)
+	frame = 250
+	for i in range (js-frame, js):
 		je = GemRB.GetJournalEntry (0, i)
 
 		if je == None:
