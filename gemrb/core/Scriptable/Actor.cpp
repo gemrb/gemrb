@@ -972,7 +972,8 @@ static void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 }
 
 //this is a good place to recalculate level up stuff
-static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
+// iwd2 has separate stats and requires more data for clab application
+static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword baseClass=0)
 {
 	ieDword sum =
 		actor->GetFighterLevel()+
@@ -989,9 +990,64 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
 	if (newValue!=oldValue) {
-		actor->ApplyKit(false);
+		actor->ApplyKit(false, baseClass);
 	}
 	actor->GotLUFeedback = false;
+}
+
+static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISFIGHTER]);
+}
+
+static void pcf_level_mage (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISMAGE]);
+}
+
+static void pcf_level_thief (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISTHIEF]);
+}
+
+static void pcf_level_barbarian (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARBARIAN]);
+}
+
+static void pcf_level_bard (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARD]);
+}
+
+static void pcf_level_cleric (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISCLERIC]);
+}
+
+static void pcf_level_druid (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISDRUID]);
+}
+
+static void pcf_level_monk (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISMONK]);
+}
+
+static void pcf_level_paladin (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISPALADIN]);
+}
+
+static void pcf_level_ranger (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISRANGER]);
+}
+
+static void pcf_level_sorcerer (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISSORCERER]);
 }
 
 static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -1350,11 +1406,11 @@ pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, pcf_intoxication, //1f
-NULL,NULL,pcf_level,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
+NULL,NULL,pcf_level_fighter,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
 pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
-pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level, pcf_level, NULL, NULL,
+pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
 NULL,NULL,NULL,pcf_minhitpoint, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
@@ -1376,7 +1432,7 @@ pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,pcf_dbutton,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
-pcf_level,pcf_level,pcf_level,pcf_level, pcf_level, pcf_level, pcf_level, pcf_level,
+pcf_level_barbarian,pcf_level_bard,pcf_level_cleric,pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
 
