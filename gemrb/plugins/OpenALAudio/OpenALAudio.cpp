@@ -963,8 +963,9 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 	// queueing always implies playing for us
 	if (state != AL_PLAYING ) {
 		alSourcePlay(source);
-		checkALError("Unable to play source", ERROR);
-		return GEM_ERROR;
+		if (checkALError("Unable to play source", ERROR)) {
+			return GEM_ERROR;
+		}
 	}
 	return GEM_OK;
 }
