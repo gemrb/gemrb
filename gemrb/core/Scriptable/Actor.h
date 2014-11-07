@@ -583,7 +583,7 @@ public:
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
-	bool ApplyKit(bool remove);
+	bool ApplyKit(bool remove, ieDword baseclass=0);
 	/* applies the class abilities*/
 	void ApplyClab(const char *clab, ieDword max, bool remove);
 	/* calls InitQuickSlot in PCStatStruct */

@@ -876,12 +876,13 @@ static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 	return kit;
 }
 
-//applies a kit on the character (only bg2)
-bool Actor::ApplyKit(bool remove)
+//applies a kit on the character
+// iwd2 has support for multikit characters, so we have more work
+bool Actor::ApplyKit(bool remove, ieDword baseclass)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
-	ieDword row = GetKitIndex(kit);
+	ieDword row = GetKitIndex(kit, "kitlist", baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
 
