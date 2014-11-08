@@ -18,10 +18,10 @@
 #
 #character generation, skills (GUICG6)
 import GemRB
-from GUIDefines import *
-from ie_stats import *
 import GUICommon
 import CommonTables
+from GUIDefines import *
+from ie_stats import *
 
 FeatWindow = 0
 TextAreaControl = 0
