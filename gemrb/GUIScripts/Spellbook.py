@@ -300,9 +300,14 @@ def GetMageSpells (Kit, Alignment, Level):
 	SpellType = 99
 	v = CommonTables.Aligns.FindValue (3, Alignment)
 	Usability = Kit | CommonTables.Aligns.GetValue(v, 5)
+	HokeyPokey = "MAGE"
+	WildMages = True
+	if GameCheck.IsIWD2():
+		HokeyPokey = "WIZARD"
+		WildMages = False
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("MAGE", str(Level), 1) ):
+	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), 1) ):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:
@@ -318,7 +323,7 @@ def GetMageSpells (Kit, Alignment, Level):
 			# separately. Generalists can learn any spell but the wild ones, so
 			# we check if the mage is wild and if a generalist wouldn't be able
 			# to learn the spell.
-			if Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
+			if WildMages and Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
 				SpellType = 2
 		MageSpells.append ([SpellName, SpellType])
 
@@ -338,9 +343,12 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 	v = CommonTables.Aligns.FindValue(3, Alignment)
 	#usability is the bitset we look for
 	Usability = CommonTables.Aligns.GetValue(v, 5)
+	HolyMoly = "PRIEST"
+	if GameCheck.IsIWD2():
+		HolyMoly = "CLERIC"
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), 1) ):
+	for i in range(SpellsTable.GetValue (HolyMoly, str (Level), 1) ):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell(SpellName, 1)
 		if ms == None:
