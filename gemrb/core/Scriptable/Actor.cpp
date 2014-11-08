@@ -8958,6 +8958,13 @@ void Actor::CreateDerivedStatsIWD2()
 {
 	int i;
 	int turnundeadlevel = 0;
+	int classid = BaseStats[IE_CLASS];
+
+	// this works only for PC classes
+	if (classid>=CLASS_PCCUTOFF) return;
+
+	// recalculate all level based changes
+	pcf_level(this, 0, 0, classid);
 
 	// iwd2 does have backstab.2da but it is both unused and with bad data
 	ieDword backstabdamagemultiplier = 0;
