@@ -53,9 +53,8 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
 	RaceWindow = GemRB.LoadWindow(15)
 	Class = GemRB.GetVar("BaseClass")
-	ClassName = GUICommon.GetClassRowName (Class, "index")
-	print "TODO: check if class %s really has an ID of %d" %(ClassName, Class)
-	TableName = CommonTables.ClassSkills.GetValue(ClassName, "RANGERSKILL")
+	ClassName = GUICommon.GetClassRowName (Class, "class")
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return
