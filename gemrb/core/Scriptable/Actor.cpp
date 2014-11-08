@@ -885,10 +885,21 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 	ieDword row = GetKitIndex(kit, "kitlist", baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
-
-	if (row) {
+	ieDword cls = GetStat(IE_CLASS);
+	Holder<TableMgr> tm;
+	if (iwd2class) {
+		if ((signed)row == -1) { // our caller didn't care to pass a baseclass
+			return false;
+		}
+		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
+		if (tm) {
+			//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
+			clab = tm->QueryField(row, 4);
+		}
+		cls = baseclass;
+	} else if (row) {
 		//kit abilities
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+		tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
 		if (tm) {
 			kitclass = (ieDword) atoi(tm->QueryField(row, 7));
 			clab = tm->QueryField(row, 4);
@@ -913,12 +924,12 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 		return true;
 	}
 	//single class
-	ieDword cls = GetStat(IE_CLASS);
 	if (cls>=(ieDword) classcount) {
 		return false;
 	}
 	max = GetLevelInClass(cls);
-	if (kitclass==cls) {
+	// iwd2 has clabs for kits and classes in the same table
+	if (kitclass==cls || iwd2class) {
 		ApplyClab(clab, max, remove);
 	} else {
 		ApplyClab(classabilities[cls], max, remove);
