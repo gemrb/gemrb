@@ -35,7 +35,7 @@ StartOverWindow = 0
 PortraitButton = 0
 StepButtons = {}
 PersistButtons = {}
-Steps = ['Gender', 'Race', 'Class', 'Alignment', 'Abilities', 'Skills', 'Appearance', 'Name']
+Steps = ['Gender', 'Race', 'Class', 'Alignment', 'Abilities', 'Enemy', 'Appearance', 'Name']
 GlobalStep = 0
 
 ### Utility functions
