@@ -50,6 +50,14 @@ EnhanceGUI = 0			# << scrollbars and extra spell slot for sorcs on LU
 SpellsPickButton = 0		# << button to select random spells
 SpellsCancelButton = 0		# << cancel chargen
 
+IWD2 = False
+if GameCheck.IsIWD2():
+	WIDTH = 800
+	HEIGHT = 600
+	IWD2 = True
+else:
+	WIDTH = 640
+	HEIGHT = 480
 
 def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	"""Opens the spells selection window.
@@ -94,7 +102,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 
 	# load our window
 	if chargen:
-		GemRB.LoadWindowPack("GUICG", 640, 480)
+		GemRB.LoadWindowPack("GUICG", WIDTH, HEIGHT)
 		SpellsWindow = GemRB.LoadWindow (7)
 		if not recommend:
 			GUICommon.CloseOtherWindow (SpellsWindow.Unload)
@@ -286,6 +294,8 @@ def SpellsDonePress ():
 			# HACK
 			from CharGenCommon import next
 			next()
+		elif IWD2:
+			GemRB.SetNextScript("CharGen7")
 
 	return
 
@@ -524,6 +534,8 @@ def SpellsCancelPress ():
 	elif GameCheck.IsBG1():
 		import CharGenCommon
 		CharGenCommon.BackPress()
+	elif IWD2:
+		GemRB.SetNextScript("Feats")
 	else:
 		print "Uh-oh in SpellsCancelPress in", GemRB.GameType
 	return
