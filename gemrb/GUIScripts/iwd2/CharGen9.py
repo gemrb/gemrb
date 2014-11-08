@@ -226,9 +226,15 @@ def NextPress():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 	GemRB.SetNextScript ("SPPartyFormation")
 
-	TmpTable = GemRB.LoadTable ("strtxp")
+	# apply class/kit abilities
+	# reset levels, so pcf_level can apply any clabs
+	# this way we don't need to port GUICommon.ResolveClassAbilities, as core does everything
+	Levels = IDLUCommon.Levels
+	GemRB.SetPlayerStat (MyChar, Levels[Class-1], 0, 0)
+	GemRB.SetPlayerStat (MyChar, Levels[Class-1], 1)
 
 	#starting xp is race dependent
+	TmpTable = GemRB.LoadTable ("strtxp")
 	xp = TmpTable.GetValue (racename, "VALUE")
 	GemRB.SetPlayerStat (MyChar, IE_XP, xp )
 
