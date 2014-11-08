@@ -144,6 +144,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	# setup our variables
 	GemRB.SetVar ("SpellTopIndex", 0)
 	Memorization = 0
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 
 	# the done button also doubles as a next button
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -162,13 +163,13 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		SpellsSelectPointsLeft[i] = SpellsKnownTable.GetValue (str(level), str(i+1), 1) - SecondPoints
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
-		elif chargen and KitMask != 0x4000:
+		elif chargen and KitMask != 0x4000 and (not IWD2 or Class == 11):
 			# specialists get an extra spell per level
 			SpellsSelectPointsLeft[i] += 1
 
 		# chargen character seem to get more spells per level (this is kinda dirty hack)
 		# except sorcerers
-		if chargen and GemRB.GetPlayerStat (pc, IE_CLASS) != 19:
+		if chargen and Class != 19 and not IWD2:
 			SpellsSelectPointsLeft[i] += 1
 
 		# get all the spells of the given level
