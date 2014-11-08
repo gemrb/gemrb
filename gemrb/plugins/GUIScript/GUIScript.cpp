@@ -1030,12 +1030,17 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 	int start = 0;
 	long Value;
 	char* colname;
+	char* strvalue;
 
 	if (!PyArg_ParseTuple( args, "iil|i", &ti, &col, &Value, &start )) {
 		PyErr_Clear(); //clearing the exception
 		col = -1;
 		if (!PyArg_ParseTuple( args, "isl|i", &ti, &colname, &Value, &start )) {
-			return AttributeError( GemRB_Table_FindValue__doc );
+			PyErr_Clear(); //clearing the exception
+			col = -2;
+			if (!PyArg_ParseTuple( args, "iss|i", &ti, &colname, &strvalue, &start )) {
+				return AttributeError( GemRB_Table_FindValue__doc );
+			}
 		}
 	}
 
@@ -1045,6 +1050,8 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 	}
 	if (col == -1) {
 		return PyInt_FromLong(tm->FindTableValue(colname, Value, start));
+	} else if (col == -2) {
+		return PyInt_FromLong(tm->FindTableValue(colname, strvalue, start));
 	} else {
 		return PyInt_FromLong(tm->FindTableValue(col, Value, start));
 	}
