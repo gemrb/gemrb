@@ -223,7 +223,6 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
 	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
 	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
-	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
 // there is no gui page for specialists spells, so let's skip them here
 // otherwise their overlap causes bards and sorcerers to have their spells
 // on the wizard page
@@ -242,6 +241,8 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 			}
 		}
 	}
+	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
+
 	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name, clsmsk, kit);
 	// pseudorandom fallback
 	return IE_IWD2_SPELL_WIZARD;
