@@ -229,14 +229,19 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	// try harder for the rest
 	for (int i = 0;i<splcount;i++) {
 		if (spllist[i].Equals(name) ) {
-			for(int type=0;type<7;type++) {
+			// iterate over table columns ("kits" - book types)
+			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 				if (clsmsk & i) {
 					level = spllist[i].FindSpell(type);
+					// FIXME: returning the first will misplace spells for multiclasses
+					return type;
 				}
 			}
 		}
 	}
-	return 0;
+	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name, clsmsk, kit);
+	// pseudorandom fallback
+	return IE_IWD2_SPELL_WIZARD;
 }
 
 //int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
