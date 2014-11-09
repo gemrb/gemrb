@@ -1,15 +1,15 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL STARTXP BARDSKILL THIEFSKILL LAYHANDS TURNLEVEL  BOOKTYPE  CASTING
-UNUSED   *          *          *           *         0       *         *          *        0          0         *
-BARBARIAN           *          *           *         0       *         SKILLS     *        0          0         *
-BARD                *          *           MXSPLBRD  0       SKILLBRD  SKILLS     *        0          2         42
-CLERIC              *          MXSPLCLR    *         0       *         SKILLS     *        1          1         39
-DRUID               *          MXSPLDRD    *         0       *         SKILLS     *        0          5         39
-FIGHTER             *          *           *         0       *         SKILLS     *        0          0         *
-MONK                *          *           *         0       *         SKILLS     *        0          0         *
-PALADIN             *          MXSPLPAL    *         0       *         SKILLS     LAYHANDS 5          1         39
-RANGER              HATERACE   MXSPLRGR    *         0       *         SKILLS     *        0          1         39
-ROGUE               *          *           *         0       *         SKILLS     *        0          0         *
-SORCERER            *          *           MXSPLSOR  0       *         SKILLS     *        0          2         42
-WIZARD              *          *           MXSPLWIZ  0       *         SKILLS     *        0          1         38
+                    HATERACE   CLERICSPELL MAGESPELL STARTXP BARDSKILL THIEFSKILL LAYHANDS TURNLEVEL  BOOKTYPE  CASTING  SPLTYPE
+UNUSED   *          *          *           *         0       *         *          *        0          0         *        *
+BARBARIAN           *          *           *         0       *         SKILLS     *        0          0         *        *
+BARD                *          *           MXSPLBRD  0       SKILLBRD  SKILLS     *        0          2         42       0
+CLERIC              *          MXSPLCLR    *         0       *         SKILLS     *        1          1         39       1
+DRUID               *          MXSPLDRD    *         0       *         SKILLS     *        0          5         39       2
+FIGHTER             *          *           *         0       *         SKILLS     *        0          0         *        *
+MONK                *          *           *         0       *         SKILLS     *        0          0         *        *
+PALADIN             *          MXSPLPAL    *         0       *         SKILLS     LAYHANDS 5          1         39       3
+RANGER              HATERACE   MXSPLRGR    *         0       *         SKILLS     *        0          1         39       4
+ROGUE               *          *           *         0       *         SKILLS     *        0          0         *        *
+SORCERER            *          *           MXSPLSOR  0       *         SKILLS     *        0          2         42       5
+WIZARD              *          *           MXSPLWIZ  0       *         SKILLS     *        0          1         38       6
