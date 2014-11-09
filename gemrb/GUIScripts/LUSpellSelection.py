@@ -19,6 +19,7 @@
 
 import GemRB
 import GameCheck
+import CommonTables
 import GUICommon
 import Spellbook
 from GUIDefines import *
@@ -51,6 +52,7 @@ SpellsPickButton = 0		# << button to select random spells
 SpellsCancelButton = 0		# << cancel chargen
 
 IWD2 = False
+SpellBookType = IE_SPELL_TYPE_WIZARD
 if GameCheck.IsIWD2():
 	WIDTH = 800
 	HEIGHT = 600
@@ -71,7 +73,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
-	global KitMask, EnhanceGUI, Memorization
+	global KitMask, EnhanceGUI, Memorization, SpellBookType
 
 	#enhance GUI?
 	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS):
@@ -146,6 +148,12 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	Memorization = 0
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 
+	if IWD2:
+		# find the spellbook type (class) that corresponds to the mx table
+		SpellBookType = CommonTables.ClassSkills.FindValue ("MAGESPELL", table)
+		SpellBookType = CommonTables.ClassSkills.GetRowName (SpellBookType)
+		SpellBookType = CommonTables.ClassSkills.GetValue (SpellBookType, "SPLTYPE", 1)
+
 	# the done button also doubles as a next button
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsDonePress)
@@ -179,7 +187,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		NumDeleted = 0
 		for j in range (len (Spells[i])):
 			CurrentIndex = j - NumDeleted # this ensure we don't go out of range
-			if Spellbook.HasSpell (pc, IE_SPELL_TYPE_WIZARD, i, Spells[i][CurrentIndex][0]) >= 0:
+			if Spellbook.HasSpell (pc, SpellBookType, i, Spells[i][CurrentIndex][0]) >= 0:
 				del Spells[i][CurrentIndex]
 				NumDeleted += 1
 
@@ -233,7 +241,7 @@ def SpellsDonePress ():
 	if sum(MemoBook) > 0:
 		for i in MemoBook:
 			if i:
-				GemRB.MemorizeSpell(pc, IE_SPELL_TYPE_WIZARD, SpellLevel, i-1, 1)
+				GemRB.MemorizeSpell(pc, SpellBookType, SpellLevel, i-1, 1)
 		SpellBook = []
 		MemoBook = [0]*24
 
@@ -373,7 +381,7 @@ def MemorizePress ():
 
 		# select the spell and change the done state if need be
 		SpellsSelectPointsLeft[SpellLevel] = SpellsSelectPointsLeft[SpellLevel] - 1
-		MemoBook[i] = Spellbook.HasSpell(pc, IE_SPELL_TYPE_WIZARD, SpellLevel, Spells[SpellLevel][i][0]) + 1 # so all values are above 0 
+		MemoBook[i] = Spellbook.HasSpell(pc, SpellBookType, SpellLevel, Spells[SpellLevel][i][0]) + 1 # so all values are above 0
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
 			DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 
@@ -527,7 +535,7 @@ def SpellsCancelPress ():
 	This is only callable within character generation."""
 
 	# remove all learned spells
-	Spellbook.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1, 9, 1)
+	Spellbook.RemoveKnownSpells (pc, SpellBookType, 1, 9, 1)
 
 	if GameCheck.IsBG2():
 		# unload teh window and go back
