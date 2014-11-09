@@ -233,7 +233,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 		if (spllist[i].Equals(name) ) {
 			// iterate over table columns ("kits" - book types)
 			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
-				if (clsmsk & i) {
+				if (clsmsk & (1<<type)) {
 					level = spllist[i].FindSpell(type);
 					// FIXME: returning the first will misplace spells for multiclasses
 					return type;
