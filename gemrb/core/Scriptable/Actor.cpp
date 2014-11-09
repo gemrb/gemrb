@@ -9660,7 +9660,7 @@ int Actor::GetBookMask() const
 	int bookmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {
 		if (Modified[levelslotsiwd2[i]] > 0) {
-			bookmask |= 1<<((1<<booksiwd2[i])-1);
+			bookmask |= 1 << booksiwd2[i];
 		}
 	}
 
