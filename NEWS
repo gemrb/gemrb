@@ -1,4 +1,4 @@
-GemRB git (ff89c4b02):
+GemRB git (ebe00f6):
   New features:
     - 
     - 3ed sneak attack, concentration/disruption
@@ -6,8 +6,9 @@ GemRB git (ff89c4b02):
 
   Improved features:
     - 
+    - iwd2 chargen
     - custom map notes and biographies now save properly
-    - effects
+    - effects, tob ending
     - bugfixes
 
 GemRB v0.8.1 (2014-05-03):
