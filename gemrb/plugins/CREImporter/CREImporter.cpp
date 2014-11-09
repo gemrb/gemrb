@@ -206,7 +206,7 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }
 
-static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
+/*static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
 {
 	for(int i=0;i<magcount;i++) {
 		if (maglist[i].Equals(name) ) {
@@ -215,7 +215,7 @@ static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
 		}
 	}
 	return -1;
-}
+}*/
 
 int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
@@ -224,7 +224,10 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
 	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
 	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
-	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
+// there is no gui page for specialists spells, so let's skip them here
+// otherwise their overlap causes bards and sorcerers to have their spells
+// on the wizard page
+//	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
 
 	// try harder for the rest
 	for (int i = 0;i<splcount;i++) {
