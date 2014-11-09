@@ -220,6 +220,8 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 		if (anims[p_release])
 			anims[p_release]->Flags |= S_ANI_PLAYONCE;
 	}
+	SequenceFlags = IE_VVC_BAM|IE_VVC_LOOP;
+
 	//we are getting a twin, no need of going further,
 	//if there is any more common initialisation, it should
 	//go above this point
