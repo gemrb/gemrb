@@ -379,13 +379,15 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 		return
 
 	Table = GemRB.LoadTable (TableName)
+	kit = GemRB.GetPlayerStat (pc, IE_KIT)
 	for i in range(Table.GetColumnCount ()):
 		# do a string lookup since some tables don't have entries for all levels
 		value = Table.GetValue (str(Level), str(i+1), 1)
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
 		school = GemRB.GetVar("MAGESCHOOL")
-		if Type == IE_SPELL_TYPE_WIZARD and school != 0:
+		if (Type == IE_SPELL_TYPE_WIZARD and school != 0) or \
+			(GameCheck.IsIWD2() and Type == IE_IWD2_SPELL_WIZARD and not (kit&0x4000)):
 			if value > 0:
 				value += 1
 		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
