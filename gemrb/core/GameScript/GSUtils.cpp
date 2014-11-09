@@ -788,7 +788,7 @@ static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 			Log(ERROR, "GameScript", "Failed to create effect.");
 			return NULL;
 		}
-		if (iterations) {
+		if (iterations > 1) {
 			vvc->SetDefaultDuration( vvc->GetSequenceDuration(AI_UPDATE_TIME * iterations));
 		} else {
 			vvc->PlayOnce();
@@ -831,7 +831,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		// can't SetPosition while the old actor is taking the spot
 		tar->SetPosition(pos, 1);
 		if (effect) {
-			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect",1);
+			CreateVisualEffectCore(tar, tar->Pos, "spsmpuff", 1);
 		}
 	}
 }
