@@ -217,8 +217,16 @@ static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }
 
-static int SpellType(ieResRef name, unsigned short &level, unsigned int clsmsk)
+int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
+	level = 0;
+	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
+	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
+	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
+	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
+	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
+
+	// try harder for the rest
 	for (int i = 0;i<splcount;i++) {
 		if (spllist[i].Equals(name) ) {
 			for(int type=0;type<7;type++) {
@@ -229,17 +237,6 @@ static int SpellType(ieResRef name, unsigned short &level, unsigned int clsmsk)
 		}
 	}
 	return 0;
-}
-
-int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
-{
-	level = 0;
-	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
-	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
-	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
-	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
-	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
-	return SpellType(name, level, clsmsk);
 }
 
 //int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
