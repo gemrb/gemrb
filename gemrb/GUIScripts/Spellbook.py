@@ -452,8 +452,15 @@ def LearnPriestSpells (pc, level, mask):
 	"""Learns all the priest spells through the given spell level.
 
 	Mask distinguishes clerical and druidic spells."""
-	if level > 7: # make sure we don't have too high a level
-		level = 7
+
+	# make sure we don't have too high a level
+	booktype = IE_SPELL_TYPE_PRIEST
+	if GameCheck.IsIWD2():
+		level = min(9, level)
+		booktype = mask
+		mask = 0 # no classflags restrictions like in others (differentiating cleric/rangers)
+	else:
+		level = min(7, level)
 
 	# go through each level
 	alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
@@ -462,7 +469,7 @@ def LearnPriestSpells (pc, level, mask):
 
 		for spell in learnable:
 			# if the spell isn't learned, learn it
-			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
+			if HasSpell (pc, booktype, i, spell) < 0:
 				GemRB.LearnSpell (pc, spell)
 	return
 
