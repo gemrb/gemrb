@@ -363,6 +363,9 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 # there is no separate druid spell table in the originals
 #FIXME: try to do this in a non-hard way?
 def GetPriestSpellTable(tablename):
+	if GameCheck.IsIWD2():
+		return tablename # no need for this folly
+
 	if not GemRB.HasResource (tablename, RES_2DA):
 		if tablename == "MXSPLDRU":
 			return "MXSPLPRS"
