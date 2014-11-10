@@ -23,7 +23,9 @@
 import GemRB
 import CommonTables
 import GUICommon
+import Spellbook
 from ie_stats import *
+from GUIDefines import *
 
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
 # same order as in classes.2da / class IDs
@@ -91,3 +93,34 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 		ClassBonus = ClassSaveTable.GetValue (Level-1, i)
 		GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, Base + ClassBonus-OldClassBonus)
 
+def LearnAnySpells (pc, BaseClassName):
+	MageTable = CommonTables.ClassSkills.GetValue (BaseClassName, "MAGESPELL", 0)
+	ClericTable = CommonTables.ClassSkills.GetValue (BaseClassName, "CLERICSPELL", 0)
+
+	for table in MageTable, ClericTable:
+		if table == "*":
+			continue
+
+		booktype = CommonTables.ClassSkills.GetValue (BaseClassName, "SPLTYPE")
+		level = 1
+		# set our memorizable counts
+		Spellbook.SetupSpellLevels (pc, table, booktype, level)
+
+		if table == MageTable:
+			continue
+
+		# learn all our priest spells up to the level we can learn
+		for i in 1, 2:
+			# also take care of domain spells
+#fixme: needs more work inside LearnPristSpells and co
+			if i == 2 and booktype == IE_IWD2_SPELL_CLERIC:
+				booktype = IE_IWD2_SPELL_DOMAIN
+				Spellbook.SetupSpellLevels (pc, table, booktype, level)
+			elif i == 2:
+				continue
+			for level in range (9):
+				print 111, level, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, level, 0)
+				if GemRB.GetMemorizableSpellsCount (pc, booktype, level, 0) <= 0:
+					# actually checks level+1 (runs if level-1 has memorizations)
+					Spellbook.LearnPriestSpells (pc, level, booktype)
+					break

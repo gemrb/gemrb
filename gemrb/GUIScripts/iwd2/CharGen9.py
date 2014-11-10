@@ -154,13 +154,14 @@ def NextPress():
 	#base class
 	Class=GemRB.GetVar ("BaseClass")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	BaseClassName = CommonTables.Classes.GetRowName (Class-1)
 	#kit
 	kitrow = GemRB.GetVar ("Class")-1
 	kit = CommonTables.Classes.GetValue(kitrow, 2)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, kit )
 	if (CommonTables.Classes.GetValue(kitrow, 3) == 0):
 		#baseclass
-		clssname = CommonTables.Classes.GetRowName (Class-1)
+		clssname = BaseClassName
 	else:
 		#kit
 		clssname = CommonTables.Classes.GetRowName (kitrow)
@@ -244,6 +245,9 @@ def NextPress():
 	else:
 		NewRef = GemRB.CreateString (62015+MyChar, BioData)
 	GemRB.SetPlayerString (MyChar, 63, NewRef)
+
+	# set up spellbooks
+	IDLUCommon.LearnAnySpells (MyChar, BaseClassName)
 
 	# core will call this for us on area load, so no need to repeat
 	#LUCommon.ApplyFeats(MyChar)
