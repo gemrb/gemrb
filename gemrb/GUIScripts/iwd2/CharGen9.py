@@ -248,6 +248,7 @@ def NextPress():
 
 	# set up spellbooks
 	IDLUCommon.LearnAnySpells (MyChar, BaseClassName)
+	GemRB.ChargeSpells (MyChar)
 
 	# core will call this for us on area load, so no need to repeat
 	#LUCommon.ApplyFeats(MyChar)
