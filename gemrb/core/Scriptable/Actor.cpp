@@ -90,6 +90,7 @@ static int *booktypes = NULL;
 static int *xpbonus = NULL;
 static int *defaultprof = NULL;
 static int *castingstat = NULL;
+static int *iwd2spltypes = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
@@ -1073,11 +1074,7 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 		case 2:
 			// arcane sorcerer-style
 			if (third) {
-				if (classesiwd2[newValue] == ISBARD) {
-					sorcerer = 1<<IE_IWD2_SPELL_BARD;
-				} else {
-					sorcerer = 1<<IE_IWD2_SPELL_SORCERER;
-				}
+				sorcerer = 1 << iwd2spltypes[newValue];
 			} else {
 				sorcerer = 1<<IE_SPELL_TYPE_WIZARD;
 			}
@@ -1085,8 +1082,7 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 		case 3:
 			// divine caster with sorc. style spells
 			if (third) {
-				// our choice, since there's nobody like that in the original
-				sorcerer = 1<<IE_IWD2_SPELL_CLERIC;
+				sorcerer = 1 << iwd2spltypes[newValue];
 			} else {
 				sorcerer = 1<<IE_SPELL_TYPE_PRIEST;
 			}
@@ -1529,6 +1525,11 @@ void Actor::ReleaseMemory()
 			castingstat=NULL;
 		}
 
+		if (iwd2spltypes) {
+			free(iwd2spltypes);
+			iwd2spltypes = NULL;
+		}
+
 		if (xpbonus) {
 			free(xpbonus);
 			xpbonus=NULL;
@@ -1770,6 +1771,7 @@ static void InitActorTables()
 		classabilities = (char **) calloc(classcount, sizeof(char*));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
 		castingstat = (int *) calloc(classcount, sizeof(int));
+		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
 
@@ -1831,6 +1833,9 @@ static void InitActorTables()
 			if (third) {
 				field = tm->QueryField(rowname, "CASTING"); // COL_HATERACE but different name
 				castingstat[i] = atoi(field);
+
+				field = tm->QueryField(rowname, "SPLTYPE");
+				iwd2spltypes[i] = atoi(field);
 			}
 
 			field = tm->QueryField(rowname, "HATERACE");
