@@ -1527,6 +1527,32 @@ void Map::DeleteActor(int i)
 	actors.erase( actors.begin()+i );
 }
 
+Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)
+{
+	if (!objectID) return NULL;
+	
+	Scriptable *scr = GetActorByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	scr = GetInfoPointByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	scr = GetContainerByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	scr = GetDoorByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	if (GetGlobalID() == objectID)
+		scr = this;
+
+	return scr;
+}
+
 Door *Map::GetDoorByGlobalID(ieDword objectID)
 {
 	if (!objectID) return NULL;
