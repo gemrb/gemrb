@@ -1070,8 +1070,27 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	int sorcerer=0;
 	if (newValue<(ieDword) classcount) {
 		switch(booktypes[newValue]) {
-		case 2: sorcerer = 1<<IE_SPELL_TYPE_WIZARD; break; //sorcerer
-		case 3: sorcerer = 1<<IE_SPELL_TYPE_PRIEST; break; //divine caster with sorc. style spells
+		case 2:
+			// arcane sorcerer-style
+			if (third) {
+				if (classesiwd2[newValue] == ISBARD) {
+					sorcerer = 1<<IE_IWD2_SPELL_BARD;
+				} else {
+					sorcerer = 1<<IE_IWD2_SPELL_SORCERER;
+				}
+			} else {
+				sorcerer = 1<<IE_SPELL_TYPE_WIZARD;
+			}
+			break;
+		case 3:
+			// divine caster with sorc. style spells
+			if (third) {
+				// our choice, since there's nobody like that in the original
+				sorcerer = 1<<IE_IWD2_SPELL_CLERIC;
+			} else {
+				sorcerer = 1<<IE_SPELL_TYPE_PRIEST;
+			}
+			break;
 		case 5: sorcerer = 1<<IE_IWD2_SPELL_SHAPE; break;  //divine caster with sorc style shapes (iwd2 druid)
 		default: break;
 		}
