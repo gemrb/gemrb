@@ -574,19 +574,9 @@ void Projectile::Payload()
 			target = area->GetActorByGlobalID(Caster);			
 		}
 	}
-	Actor *source = area->GetActorByGlobalID(Caster);
-	InfoPoint *source2 = area->GetInfoPointByGlobalID(Caster);
-	Container *source3 = area->GetContainerByGlobalID(Caster);
-	Door *source4 = area->GetDoorByGlobalID(Caster);
-	if (source) {
-		Owner = source;
-	} else if (source2) {
-		Owner = (Scriptable *) source2;
-	} else if (source3) {
-		Owner = (Scriptable *) source3;
-	} else if (source4) {
-		Owner = (Scriptable *) source4;
-	} else {
+	
+	Owner = area->GetScriptableByGlobalID(Caster);
+	if (!Owner) {
 		Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
 		Owner = target;
 	}

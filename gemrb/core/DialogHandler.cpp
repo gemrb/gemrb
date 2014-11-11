@@ -465,27 +465,13 @@ Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
 
 Scriptable *DialogHandler::GetTarget()
 {
-	// TODO: area GetScriptableByGlobalID?
-
-	if (!targetID) return NULL;
-
 	Game *game = core->GetGame();
 	if (!game) return NULL;
 
 	Map *area = game->GetCurrentArea();
 	if (!area) return NULL;
 
-	Actor *actor = area->GetActorByGlobalID(targetID);
-	if (actor) return actor;
-
-	Door *door = area->GetDoorByGlobalID(targetID);
-	if (door) return (Scriptable *)door;
-	Container *container = area->GetContainerByGlobalID(targetID);
-	if (container) return (Scriptable *)container;
-	InfoPoint *ip = area->GetInfoPointByGlobalID(targetID);
-	if (ip) return (Scriptable *)ip;
-
-	return NULL;
+	return area->GetScriptableByGlobalID(targetID);
 }
 
 Actor *DialogHandler::GetSpeaker()
