@@ -244,7 +244,10 @@ def UpdateSpellBookWindow ():
 	# and they display just the current and total number of memorizations per level
 	Label = Window.GetControl (0x10000004)
 	if sorcerer_style:
-		Label.SetText (str(true_mem_cnt)+"/"+str(max_mem_cnt))
+		available = "0"
+		if known_cnt:
+			available = str(true_mem_cnt / known_cnt)
+		Label.SetText (available+"/"+str(max_mem_cnt))
 	else:
 		# reset mem_cnt to take into account stacks
 		mem_cnt = GetMemorizedSpellsCount (True)
