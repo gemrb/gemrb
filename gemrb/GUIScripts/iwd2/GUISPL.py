@@ -193,7 +193,7 @@ def UpdateSpellBookWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Label = Window.GetControl (0x1000003f+i)
 		# actually, it doesn't display any memorized spells for sorcerer-style spellbooks
-		if i < mem_cnt and not sorcerer_style:
+		if i < len(MemorizedSpellList) and not sorcerer_style:
 			ms = MemorizedSpellList[i]
 			spell = ms['SpellResRef']
 			Button.SetSpellIcon (spell)
