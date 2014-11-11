@@ -745,6 +745,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 	contentWrapper.InsertContentAfter(selectOptions, textContainer);
 	UpdateScrollbar();
+	MarkDirty();
 }
 
 void TextArea::ClearHover()
