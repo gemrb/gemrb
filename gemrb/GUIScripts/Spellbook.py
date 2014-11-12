@@ -337,15 +337,17 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 			Learnable.append (Spell[0])
 	return Learnable
 
-def GetLearnablePriestSpells (Class, Alignment, Level):
+def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	Learnable =[]
 
 	v = CommonTables.Aligns.FindValue(3, Alignment)
 	#usability is the bitset we look for
 	Usability = CommonTables.Aligns.GetValue(v, 5)
 	HolyMoly = "PRIEST"
+	SpellListTable = None
 	if GameCheck.IsIWD2():
 		HolyMoly = "CLERIC"
+		SpellListTable = GemRB.LoadTable ("listspll")
 
 	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue (HolyMoly, str (Level), 1) ):
@@ -357,6 +359,11 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 			continue
 		if Usability & ms['SpellExclusion']:
 			continue
+		if SpellListTable:
+			idx = SpellListTable.FindValue ("SPELL_RES_REF", SpellName)
+			# columns are in the same order as booktypes
+			if SpellListTable.GetValue (idx, booktype) <= 0:
+				continue
 		Learnable.append (SpellName)
 	return Learnable
 
@@ -465,8 +472,8 @@ def LearnPriestSpells (pc, level, mask):
 	# go through each level
 	alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
 	for i in range (level):
-		learnable = GetLearnablePriestSpells (mask, alignment, i+1)
 
+		learnable = GetLearnablePriestSpells (mask, alignment, i+1, booktype)
 		for spell in learnable:
 			# if the spell isn't learned, learn it
 			if HasSpell (pc, booktype, i, spell) < 0:
