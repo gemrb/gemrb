@@ -3499,14 +3499,14 @@ void Actor::VerbalConstant(int start, int count) const
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
-		ResolveStringConstant(soundref, start+count-1);
-		while (count > 0 && !gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
+		do {
 			count--;
-			ResolveStringConstant(soundref, start+count-1);
-		}
-		if (count > 0){
-			DisplayStringCore((Scriptable *const) this, start + RAND(0, count-1), DS_CONSOLE|DS_CONST|DS_SPEECH);
-		}
+			ResolveStringConstant(soundref, start+count);
+			if (gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
+				DisplayStringCore((Scriptable *const) this, start + RAND(0, count), DS_CONSOLE|DS_CONST|DS_SPEECH);
+				break;
+			}
+		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
