@@ -424,6 +424,9 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 			(GameCheck.IsIWD2() and Type == IE_IWD2_SPELL_WIZARD and not (kit&0x4000)):
 			if value > 0:
 				value += 1
+		elif Type == IE_IWD2_SPELL_DOMAIN:
+			if value > 0:
+				value = 1 # since we're reusing the main cleric table
 		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
 	return
 
