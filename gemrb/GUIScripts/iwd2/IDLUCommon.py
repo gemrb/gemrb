@@ -112,7 +112,6 @@ def LearnAnySpells (pc, BaseClassName):
 		# learn all our priest spells up to the level we can learn
 		for i in 1, 2:
 			# also take care of domain spells
-#fixme: needs more work inside LearnPristSpells and co
 			if i == 2 and booktype == IE_IWD2_SPELL_CLERIC:
 				booktype = IE_IWD2_SPELL_DOMAIN
 				Spellbook.SetupSpellLevels (pc, table, booktype, level)
