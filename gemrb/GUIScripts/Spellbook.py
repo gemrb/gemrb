@@ -503,10 +503,16 @@ def LearnPriestSpells (pc, level, mask):
 			learnable = GetLearnableDomainSpells (pc, i+1)
 		else:
 			learnable = GetLearnablePriestSpells (mask, alignment, i+1, booktype)
+
 		for spell in learnable:
 			# if the spell isn't learned, learn it
 			if HasSpell (pc, booktype, i, spell) < 0:
-				GemRB.LearnSpell (pc, spell)
+				if GameCheck.IsIWD2() and booktype == IE_IWD2_SPELL_DOMAIN:
+					GemRB.LearnSpell (pc, spell, 1<<booktype, i)
+				else:
+					# perhaps forcing would be fine here too, but it's untested in other games
+					# and iwd2 cleric schools grant certain spells at different levels
+					GemRB.LearnSpell (pc, spell)
 	return
 
 
