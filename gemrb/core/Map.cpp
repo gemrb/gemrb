@@ -786,11 +786,6 @@ void Map::UpdateScripts()
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
 
-			// try to exclude actors which only just died
-			// (shouldn't we not be stepping actors which don't have a path anyway?)
-			// following fails on Immobile creatures, don't think it's a problem, but replace with next line if it is
-			if (!actor->ValidTarget(GA_NO_DEAD)) continue;
-			//if (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag() & IF_JUSTDIED) continue;
 
 			if (!DoStepForActor(actor, actor->speed, time)) more_steps = true;
 		}
@@ -889,7 +884,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
-	if (actor->Immobile()) {
+	if (actor->Immobile() || !actor->ValidTarget(GA_NO_DEAD)) {
 		return true;
 	}
 
