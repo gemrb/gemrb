@@ -517,15 +517,19 @@ void Spellbook::SetBookType(int bt)
 //in the right group
 //the rest are stored as innate
 
-int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit)
+int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit, int level)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
 	CopyResRef(spl->SpellResRef, spell->Name);
 	spl->Level = 0;
 	if (IWD2Style) {
 		PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
+		// is there an override (domain spells)?
+		if (level == -1) {
+			level = spell->SpellLevel-1;
+		}
+		spl->Level = level;
 		spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
-		spl->Level = spell->SpellLevel-1;
 	} else {
 		//not IWD2
 		if (spell->SpellType<6) {
