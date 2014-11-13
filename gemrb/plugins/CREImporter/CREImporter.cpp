@@ -197,7 +197,7 @@ static int magcount=-1;
 
 static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 {
-	for(int i=0;i<domcount;i++) {
+	for(int i=0;i<splcount;i++) {
 		if (domlist[i].Equals(name) ) {
 			level = domlist[i].FindSpell(kit);
 				return i;
