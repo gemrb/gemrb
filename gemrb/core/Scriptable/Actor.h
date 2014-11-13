@@ -605,7 +605,7 @@ public:
 	/* debug function */
 	void GetNextStance();
 	/* learns the given spell, possibly receive XP */
-	int LearnSpell(const ieResRef resref, ieDword flags);
+	int LearnSpell(const ieResRef resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
 	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header

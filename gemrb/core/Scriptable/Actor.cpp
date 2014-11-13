@@ -5626,7 +5626,7 @@ void Actor::GetNextStance()
 	SetStance( Stance );
 }
 
-int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
+int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int level)
 {
 	//don't fail if the spell is also memorized (for innates)
 	if (! (flags&LS_MEMO)) {
@@ -5664,8 +5664,11 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		}
 	}
 
-	int bookmask = GetBookMask();
-	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit);
+	// only look it up if none was passed
+	if (bookmask == -1) {
+		bookmask = GetBookMask();
+	}
+	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
 	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
