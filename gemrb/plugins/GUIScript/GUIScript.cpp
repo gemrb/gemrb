@@ -6986,22 +6986,26 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_LearnSpell__doc,
-"LearnSpell(PartyID, SpellResRef[, Flags])=>int\n\n"
-"Learns specified spell. Returns 0 on success." );
+"LearnSpell(PartyID, SpellResRef[, Flags, Booktype, Level])=>int\n\n"
+"Learns specified spell. Returns 0 on success.\n"
+"Flags control xp granting, stat checks and feedback.\n"
+"Booktype and level overrides can be passed (iwd2)." );
 
 static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	const char *Spell;
 	int Flags=0;
+	int Booktype = -1;
+	int Level = -1;
 
-	if (!PyArg_ParseTuple( args, "is|i", &globalID, &Spell, &Flags )) {
+	if (!PyArg_ParseTuple(args, "is|iii", &globalID, &Spell, &Flags, &Booktype, &Level)) {
 		return AttributeError( GemRB_LearnSpell__doc );
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int ret = actor->LearnSpell( Spell, Flags ); // returns 0 on success
+	int ret = actor->LearnSpell(Spell, Flags, Booktype, Level); // returns 0 on success
 	if (!ret) core->SetEventFlag( EF_ACTION );
 	return PyInt_FromLong( ret );
 }
