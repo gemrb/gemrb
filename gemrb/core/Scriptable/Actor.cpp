@@ -5664,8 +5664,8 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		}
 	}
 
-	int clsmsk = GetBookMask();
-	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, clsmsk, kit );
+	int bookmask = GetBookMask();
+	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit);
 	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
