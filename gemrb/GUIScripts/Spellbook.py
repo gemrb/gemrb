@@ -457,10 +457,12 @@ def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# disqualify sorcerers immediately
+	booktype = IE_SPELL_TYPE_WIZARD
 	if GameCheck.IsIWD2():
 		# TODO: use book style checks instead, if possible (bards??)
 		if GemRB.GetPlayerStat (pc, IE_CLASS) == 10:
 			return LSR_STAT
+		booktype = IE_IWD2_SPELL_WIZARD
 	else:
 		if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 			return LSR_STAT
@@ -476,7 +478,7 @@ def CannotLearnSlotSpell ():
 	level = spell['SpellLevel']
 
 	# maybe she already knows this spell
-	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, level-1, spell_ref) != -1:
+	if HasSpell (pc, booktype, level-1, spell_ref) != -1:
 		return LSR_KNOWN
 
 	# level check (needs enough intelligence for this level of spell)
@@ -484,7 +486,7 @@ def CannotLearnSlotSpell ():
 	if level > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
 		return LSR_LEVEL
 
-	spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, level-1)
+	spell_count = GemRB.GetKnownSpellsCount (pc, booktype, level-1)
 	if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, dumbness):
 		return LSR_FULL
 
