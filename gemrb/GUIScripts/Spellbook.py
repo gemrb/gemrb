@@ -457,8 +457,13 @@ def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# disqualify sorcerers immediately
-	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
-		return LSR_STAT
+	if GameCheck.IsIWD2():
+		# TODO: use book style checks instead, if possible (bards??)
+		if GemRB.GetPlayerStat (pc, IE_CLASS) == 10:
+			return LSR_STAT
+	else:
+		if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+			return LSR_STAT
 
 	import GUICommon
 	if GameCheck.IsPST():
