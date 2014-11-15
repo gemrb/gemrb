@@ -70,7 +70,7 @@ void Content::Draw(Point p) const
 }
 
 
-TextSpan::TextSpan(const String& string, Font* fnt, Palette* pal, const Size* frame)
+TextSpan::TextSpan(const String& string, const Font* fnt, Palette* pal, const Size* frame)
 	: Content((frame) ? *frame : Size()), text(string), font(fnt)
 {
 	palette = pal;

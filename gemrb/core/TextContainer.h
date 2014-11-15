@@ -66,13 +66,13 @@ class TextSpan : public Content
 {
 private:
 	String text;
-	Font* font;
+	const Font* font;
 	Palette* palette;
 
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
 	// TODO: we should probably be able to align the text in the frame
-	TextSpan(const String& string, Font* font, Palette* pal = NULL, const Size* = NULL);
+	TextSpan(const String& string, const Font* font, Palette* pal = NULL, const Size* = NULL);
 	~TextSpan();
 
 	const String& Text() const { return text; };
