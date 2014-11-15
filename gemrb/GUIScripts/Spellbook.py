@@ -302,9 +302,15 @@ def GetMageSpells (Kit, Alignment, Level):
 	Usability = Kit | CommonTables.Aligns.GetValue(v, 5)
 	HokeyPokey = "MAGE"
 	WildMages = True
+	BadSchools = 0
 	if GameCheck.IsIWD2():
 		HokeyPokey = "WIZARD"
 		WildMages = False
+		# iwd2 has only per-kit exclusion, spells can't override it
+		ExclusionTable = GemRB.LoadTable ("magesch")
+		KitRow = ExclusionTable.FindValue ("KIT", Kit)
+		KitRow = ExclusionTable.GetRowName (KitRow)
+		BadSchools = ExclusionTable.GetValue (KitRow, "EXCLUSION")
 
 	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), 1) ):
@@ -314,6 +320,8 @@ def GetMageSpells (Kit, Alignment, Level):
 			continue
 
 		if Usability & ms['SpellExclusion']:
+			SpellType = 0
+		elif BadSchools & (1<<ms['SpellSchool']+5):
 			SpellType = 0
 		else:
 			SpellType = 1
