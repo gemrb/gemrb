@@ -337,7 +337,7 @@ def NextPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
-	GemRB.SetNextScript("CharGen7")
+	GemRB.SetNextScript("Spells")
 	return
 
 #Custom feat check functions
