@@ -101,7 +101,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 				from CharGenCommon import next
 				next()
 			elif IWD2:
-				raise RuntimeError, "LUSS: No known spells of this level!"
+				GemRB.SetNextScript ("CharGen7")
 		return
 
 	# load our window
