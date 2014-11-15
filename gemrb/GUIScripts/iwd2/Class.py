@@ -177,6 +177,7 @@ def BackPress():
 	GemRB.SetVar("Class",0)  #scrapping the class value
 	MyChar = GemRB.GetVar("Slot")
 	GemRB.SetPlayerStat (IE_CLASS, 0)
+	GemRB.SetPlayerStat (IE_KIT, 0)
 	return
 
 def NextPress():
