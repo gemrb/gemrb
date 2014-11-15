@@ -292,7 +292,7 @@ def SpellsDonePress ():
 			return
 
 	# close our window and update our records
-	if SpellsWindow and (not chargen or GameCheck.IsBG2()):
+	if SpellsWindow and (not chargen or GameCheck.IsBG2() or IWD2):
 		SpellsWindow.Unload ()
 		SpellsWindow = None
 
@@ -546,6 +546,8 @@ def SpellsCancelPress ():
 		import CharGenCommon
 		CharGenCommon.BackPress()
 	elif IWD2:
+		if SpellsWindow:
+			SpellsWindow.Unload()
 		GemRB.SetNextScript("Feats")
 	else:
 		print "Uh-oh in SpellsCancelPress in", GemRB.GameType
