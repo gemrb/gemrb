@@ -107,7 +107,6 @@ def UpdateOverview(CurrentStep):
 				PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 		
 		if Key == 'Next' and CurrentStep == 9:
-			Text = 11962
 			State = 1
 			Event = NextPress
 		
