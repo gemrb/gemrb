@@ -789,6 +789,10 @@ void Map::UpdateScripts()
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
 
+			if (actor->GetCurrentArea() != this) {
+				continue;
+			}
+
 			// try to exclude actors which only just died
 			// (shouldn't we not be stepping actors which don't have a path anyway?)
 			// following fails on Immobile creatures, don't think it's a problem, but replace with next line if it is
