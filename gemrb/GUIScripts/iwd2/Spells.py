@@ -22,6 +22,7 @@ import CommonTables
 import GUICommon
 import GUICommonWindows
 import LUSpellSelection
+import IDLUCommon
 from ie_stats import IE_CLASS
 
 def OnLoad ():
@@ -30,6 +31,9 @@ def OnLoad ():
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
+
+	# learn priest spells if any and setup spell levels
+	IDLUCommon.LearnAnySpells (MyChar, ClassName)
 
 	# make sure we have a correct table
 	if SpellTableName == "*":

@@ -243,8 +243,7 @@ def NextPress():
 		NewRef = GemRB.CreateString (62015+MyChar, BioData)
 	GemRB.SetPlayerString (MyChar, 63, NewRef)
 
-	# set up spellbooks
-	IDLUCommon.LearnAnySpells (MyChar, BaseClassName)
+	# set memorized spells as non-depleted - ready to use
 	GemRB.ChargeSpells (MyChar)
 
 	# core will call this for us on area load, so no need to repeat
