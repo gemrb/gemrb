@@ -430,9 +430,9 @@ def ShowSpells ():
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
 			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
-		else: # specialist (shouldn't get here)
+		else: # specialist (for iwd2 which has no green frames)
 			# use the green border state for matching specialist spells
-			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+			SpellButton.SetBorder (0, 0,0, 0,0, 0,200,0,100, 1,0)
 			SpellButton.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
 	# show which spells are selected
