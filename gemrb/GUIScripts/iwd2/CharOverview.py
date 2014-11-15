@@ -109,6 +109,7 @@ def UpdateOverview(CurrentStep):
 		if Key == 'Next' and CurrentStep == 9:
 			State = 1
 			Event = NextPress
+			PersistButtons[Key].SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 		
 		if Key == 'Start' and CurrentStep == 1:
 			Text = 13727
