@@ -20,7 +20,6 @@
 import GemRB
 import CommonTables
 import GUICommon
-import GUICommonWindows
 import LUSpellSelection
 import IDLUCommon
 from ie_stats import IE_CLASS
@@ -42,9 +41,6 @@ def OnLoad ():
 
 	Level = 1
 	# NOTE: this way will only work for chargen, where there aren't any multikits
-#	KitIndex = GUICommonWindows.GetKitIndex (MyChar, Class)
-#	KitName = CommonTables.Classes.GetRowName (KitIndex)
-#	KitValue = CommonTables.Classes.GetValue (KitName, "ID")
 	KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 
 	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, Level, KitValue, 1)
