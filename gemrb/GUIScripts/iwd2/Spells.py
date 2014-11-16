@@ -22,7 +22,9 @@ import CommonTables
 import GUICommon
 import LUSpellSelection
 import IDLUCommon
+import Spellbook
 from ie_stats import IE_CLASS
+from GUIDefines import IE_IWD2_SPELL_DOMAIN
 
 def OnLoad ():
 	MyChar = GemRB.GetVar ("Slot")
@@ -32,6 +34,13 @@ def OnLoad ():
 	# mxsplbon.2da is handled in core and does not affect learning
 
 	# learn priest spells if any and setup spell levels
+	# but first nullify any previous spells
+	for row in range(CommonTables.ClassSkills.GetRowCount()):
+		rowname = CommonTables.ClassSkills.GetRowName (row)
+		SpellBookType = CommonTables.ClassSkills.GetValue (rowname, "SPLTYPE")
+		if SpellBookType != "*":
+			Spellbook.RemoveKnownSpells (MyChar, SpellBookType, 1,9, 0)
+	Spellbook.RemoveKnownSpells (MyChar, IE_IWD2_SPELL_DOMAIN, 1,9, 0)
 	IDLUCommon.LearnAnySpells (MyChar, ClassName)
 
 	# make sure we have a correct table
