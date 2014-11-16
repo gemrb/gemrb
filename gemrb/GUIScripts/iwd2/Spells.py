@@ -58,5 +58,6 @@ def OnLoad ():
 	Level = 1
 	# NOTE: this way will only work for chargen, where there aren't any multikits
 	KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
+	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "SPLTYPE")
 
-	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, Level, KitValue, 1)
+	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, Level, KitValue, 1, True, SpellBookType)

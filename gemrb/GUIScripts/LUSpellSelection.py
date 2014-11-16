@@ -61,7 +61,7 @@ else:
 	WIDTH = 640
 	HEIGHT = 480
 
-def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
+def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, booktype=0):
 	"""Opens the spells selection window.
 
 	table should refer to the name of the classes MXSPLxxx.2da.
@@ -88,6 +88,10 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		KitMask = 0x4000
 	else: # need to implement this if converted to CharGen
 		KitMask = kit 
+
+	if IWD2:
+		# save the spellbook type (class) that corresponds to our table
+		SpellBookType = booktype
 
 	# make sure there is an entry at the given level (bard)
 	SpellsKnownTable = GemRB.LoadTable (table)
@@ -147,12 +151,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	GemRB.SetVar ("SpellTopIndex", 0)
 	Memorization = 0
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-
-	if IWD2:
-		# find the spellbook type (class) that corresponds to the mx table
-		SpellBookType = CommonTables.ClassSkills.FindValue ("MAGESPELL", table)
-		SpellBookType = CommonTables.ClassSkills.GetRowName (SpellBookType)
-		SpellBookType = CommonTables.ClassSkills.GetValue (SpellBookType, "SPLTYPE", 1)
 
 	# the done button also doubles as a next button
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
