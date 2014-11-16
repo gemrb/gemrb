@@ -311,6 +311,8 @@ def GetMageSpells (Kit, Alignment, Level):
 		KitRow = ExclusionTable.FindValue ("KIT", Kit)
 		KitRow = ExclusionTable.GetRowName (KitRow)
 		BadSchools = ExclusionTable.GetValue (KitRow, "EXCLUSION")
+		if BadSchools == -1:
+			BadSchools = 0
 
 	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), 1) ):
