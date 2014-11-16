@@ -73,7 +73,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
-	global KitMask, EnhanceGUI, Memorization, SpellBookType
+	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton
 
 	#enhance GUI?
 	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS):
@@ -352,6 +352,11 @@ def ShowKnownSpells ():
 
 	GemRB.SetToken("number", str(SpellsSelectPointsLeft[SpellLevel]))
 	SpellsTextArea.SetText(17253)
+
+	if Memorization == 1:
+		SpellsPickButton.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
+		SpellsPickButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	return
 
