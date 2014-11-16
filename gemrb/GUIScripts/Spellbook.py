@@ -544,7 +544,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 	this is only used when removing spells in a dualclass."""
 
 	# choose the correct limit based upon class type
-	if type == IE_SPELL_TYPE_WIZARD:
+	if type == IE_SPELL_TYPE_WIZARD or GameCheck.IsIWD2():
 		limit = 9
 	elif type == IE_SPELL_TYPE_PRIEST:
 		limit = 7
@@ -575,6 +575,9 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 		limit = 1
 	else: # can't do anything if an improper spell type is sent
 		return 0
+
+	if GameCheck.IsIWD2():
+		kit = 0 # just skip the dualclass logic
 
 	# make sure we're within parameters
 	if level1 < 1 or level2 > limit or level1 > level2:
