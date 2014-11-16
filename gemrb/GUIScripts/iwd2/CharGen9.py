@@ -54,13 +54,13 @@ def SetRaceAbilities(MyChar, racetitle):
 		if count > 1:
 			# luckily they're all level 1
 			import Spellbook
-			SpellIndex = Spellbook.HasSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, resource)
+			SpellIndex = Spellbook.HasSpell (MyChar, IE_IWD2_SPELL_INNATE, 0, resource)
 			if SpellIndex == -1:
 				#raise RuntimeError, "Failed learning racial innate: %s" %(resource)
 				print "Failed learning racial innate: %s" %(resource)
 				continue
 			for j in range(count-1):
-				GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+				GemRB.MemorizeSpell (MyChar, IE_IWD2_SPELL_INNATE, 0, SpellIndex)
 	return
 
 def SetRaceBonuses(MyChar, racetitle):
