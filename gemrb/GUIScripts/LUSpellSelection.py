@@ -279,8 +279,8 @@ def SpellsDonePress ():
 				return
 
 		# bg1 lets you memorize spells too (iwd too, but it does it by itself)
-		# TODO: check iwd2, which is currently lacking all spell handling
-		if chargen and GameCheck.IsBG1() and sum(MemoBook) == 0:
+		if chargen and sum(MemoBook) == 0 and \
+		(GameCheck.IsBG1() or (IWD2 and SpellBookType != IE_IWD2_SPELL_SORCERER)):
 			SpellLevel = 0
 			SpellsSelectPointsLeft[SpellLevel] = 1
 			if KitMask != 0x4000:
