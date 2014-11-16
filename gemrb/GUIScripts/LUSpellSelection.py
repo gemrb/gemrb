@@ -328,6 +328,7 @@ def ShowKnownSpells ():
 		if i + j >= len (SpellBook) or not SpellBook[i+j]:
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None)
 			continue
 		else:
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
