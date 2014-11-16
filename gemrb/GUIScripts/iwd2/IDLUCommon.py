@@ -97,6 +97,13 @@ def LearnAnySpells (pc, BaseClassName):
 	MageTable = CommonTables.ClassSkills.GetValue (BaseClassName, "MAGESPELL", 0)
 	ClericTable = CommonTables.ClassSkills.GetValue (BaseClassName, "CLERICSPELL", 0)
 
+	# sorcerer types need this hack to not get too many spells
+	# for them the castable and known count progress differently
+	if MageTable == "MXSPLSOR":
+		MageTable = "SPLSRCKN"
+	elif MageTable == "MXSPLBRD":
+		MageTable = "SPLBRDKN"
+
 	for table in MageTable, ClericTable:
 		if table == "*":
 			continue

@@ -33,6 +33,13 @@ def OnLoad ():
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
 
+	# sorcerer types need this hack to not get too many spells
+	# for them the castable and known count progress differently
+	if SpellTableName == "MXSPLSOR":
+		SpellTableName = "SPLSRCKN"
+	elif SpellTableName == "MXSPLBRD":
+		SpellTableName = "SPLBRDKN"
+
 	# learn priest spells if any and setup spell levels
 	# but first nullify any previous spells
 	for row in range(CommonTables.ClassSkills.GetRowCount()):
