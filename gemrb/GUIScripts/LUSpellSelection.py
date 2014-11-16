@@ -33,7 +33,7 @@ KitMask = 0
 
 # basic spell selection
 SpellsWindow = 0		# << spell selection window
-SpellKnownTable = 0		# << known spells per level (table)
+#SpellKnownTable = 0		# << known spells per level (table)
 DoneButton = 0			# << done/next button
 SpellsTextArea = 0		# << spell description area
 SpellsSelectPointsLeft = [0]*9	# << spell selections left per level
