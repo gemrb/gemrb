@@ -218,6 +218,28 @@ def UpdateOverview(CurrentStep):
 				if multiple != 0:
 					AddText(': ' + str(value))
 
+		AddText('\n')
+		import CommonTables
+		import Spellbook
+		MyChar = GemRB.GetVar ("Slot")
+		BookTypes = { IE_IWD2_SPELL_BARD:39341, IE_IWD2_SPELL_CLERIC:11028, \
+			IE_IWD2_SPELL_DRUID:39342, IE_IWD2_SPELL_PALADIN:39343, IE_IWD2_SPELL_RANGER:39344, \
+			IE_IWD2_SPELL_SORCERER:39345, IE_IWD2_SPELL_WIZARD:11027, IE_IWD2_SPELL_DOMAIN:0 }
+		for bt in BookTypes:
+			KnownSpells = Spellbook.GetKnownSpells(MyChar, bt)
+			if len(KnownSpells):
+				BTName = BookTypes[bt]
+				# individual domains, luckily in kit order
+				if BTName == 0:
+					KitIndex = GemRB.GetVar ("Class") - 1
+					KitIndex -= CommonTables.Classes.FindValue ("CLASS", GemRB.GetVar ("BaseClass"))
+					BTName = 39346 + KitIndex
+				AddText ('\n[color=FFFF00]')
+				AddText (BTName)
+				AddText ('[/color]\n')
+				for ks in KnownSpells:
+					AddText (GemRB.GetString(ks['SpellName'])+"\n")
+
 	# Handle StartOverWindow
 	StartOverWindow = GemRB.LoadWindow(53)
 	
