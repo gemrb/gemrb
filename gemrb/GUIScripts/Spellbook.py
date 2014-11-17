@@ -468,13 +468,13 @@ def CannotLearnSlotSpell ():
 
 	# disqualify sorcerers immediately
 	booktype = IE_SPELL_TYPE_WIZARD
+	class_id = GemRB.GetPlayerStat (pc, IE_CLASS)
 	if GameCheck.IsIWD2():
-		# TODO: use book style checks instead, if possible (bards??)
-		if GemRB.GetPlayerStat (pc, IE_CLASS) == 10:
+		if class_id == 10 or class_id == 2:
 			return LSR_STAT
 		booktype = IE_IWD2_SPELL_WIZARD
 	else:
-		if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+		if class_id == 19:
 			return LSR_STAT
 
 	import GUICommon
