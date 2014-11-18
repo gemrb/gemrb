@@ -285,14 +285,8 @@ def GetNextLevelExp (Level, Adjustment, string=0):
 def DisplayCommon (pc):
 	Window = RecordsWindow
 
-	Value = GemRB.GetPlayerStat(pc,IE_RACE)
-	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
-	if Value2:
-		Value = Value<<16 | Value2
-	tmp = CommonTables.Races.FindValue (3, Value)
-	Race = CommonTables.Races.GetValue (tmp, 2)
 	Label = Window.GetControl (0x1000000f)
-	Label.SetText (Race)
+	Label.SetText (GUICommonWindows.GetActorRaceTitle (pc))
 
 	Button = Window.GetControl (36)
 	if Exportable (pc):
