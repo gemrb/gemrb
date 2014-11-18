@@ -3642,7 +3642,7 @@ int Interface::PlayMovie(const char* ResRef)
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
 	AutoTable mvesnd;
-	if (mvesnd.load("mvesnd")) {
+	if (mvesnd.load("mvesnd", true)) {
 		int row = mvesnd->GetRowIndex(ResRef);
 		if (row != -1) {
 			int mvecol = mvesnd->GetColumnIndex("override");
