@@ -867,8 +867,12 @@ def DisplayWeapons (pc):
 
 	return
 
-def DisplaySkills (pc):
-	Window = RecordsWindow
+def DisplaySkills (pc, TAOverride=None):
+	global RecordsTextArea
+	# HACK: trying to avoid merge conflicts, sanitize later
+	if TAOverride:
+		tmp = RecordsTextArea
+		RecordsTextArea = TAOverride
 
 	SkillTable = GemRB.LoadTable ("skillsta")
 	SkillName = GemRB.LoadTable ("skills")
@@ -921,6 +925,8 @@ def DisplaySkills (pc):
 	for i in feats:
 		RecordsTextArea.Append (i)
 
+	if TAOverride:
+		RecordsTextArea = tmp
 	return
 
 def delimited_str(strref, delimiter, strref2, newline=1):
