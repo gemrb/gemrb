@@ -225,6 +225,6 @@ def NextPress ():
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")
-	#GemRB.SetVar ("PortraitIndex",LastPortrait)
+	GemRB.SetVar ("PortraitIndex", LastPortrait)
 	GemRB.SetNextScript ("CharGen2") #Before race
 	return
