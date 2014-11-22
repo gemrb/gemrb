@@ -222,11 +222,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 				if ab[:3] == "AP_":
 					GemRB.ApplySpell (pc, ab[3:])
 				elif ab[:3] == "GA_":
-					SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
-					if SpellIndex == -1:
-						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
-					else:
-						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+					Spellbook.LearnSpell (pc, ab[3:], IE_SPELL_TYPE_INNATE, 0, 1, LS_MEMO)
 				elif ab[:3] == "FS_":
 					Gain(26320, ab[3:])
 				elif ab[:3] == "FA_":

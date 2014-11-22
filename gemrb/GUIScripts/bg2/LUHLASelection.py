@@ -127,12 +127,8 @@ def HLADonePress ():
 		if HLARef[:2] == "AP":
 			GemRB.ApplySpell(pc, HLARef[3:])
 		elif HLARef[:2] == "GA":
-			# make sure it isn't already learned
-			SpellIndex = Spellbook.HasSpell (pc, HLAType, HLALevel, HLARef[3:])
-			if SpellIndex < 0: # gotta learn it
-				GemRB.LearnSpell (pc, HLARef[3:], LS_MEMO)
-			else: # memorize it again
-				GemRB.MemorizeSpell (pc, HLAType, HLALevel, SpellIndex)
+			# learn it or memorize another one
+			Spellbook.LearnSpell (pc, HLARef[3:], HLAType, HLALevel, 1, LS_MEMO)
 
 		#save the number of this HLA memorized
 		#TODO: check param2 (0 seems to work ok)

@@ -24,7 +24,7 @@ import GameCheck
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_LEFT, ACT_RIGHT
-from ie_spells import SP_IDENTIFY, SP_SURGE, LSR_KNOWN, LSR_LEVEL, LSR_STAT, LSR_FULL
+from ie_spells import SP_IDENTIFY, SP_SURGE, LSR_KNOWN, LSR_LEVEL, LSR_STAT, LSR_FULL, LSR_OK
 from ie_restype import RES_2DA
 
 #################################################################
@@ -611,4 +611,27 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 
 	# return success
 	return 1
+
+# learning/memorization wrapper for when you want to give more than 1 instance
+# learn a spell if we don't know it yet, otherwise just increase the memo count
+def LearnSpell(pc, spellref, booktype, level, count, flags=0):
+	SpellIndex = HasSpell (pc, booktype, level, spellref)
+	if SpellIndex < 0:
+		ret = GemRB.LearnSpell (pc, spellref, flags)
+		if ret != LSR_OK and ret != LSR_KNOWN:
+			raise RuntimeError, "Failed learning spell: %s !" %(spellref)
+			return
+		SpellIndex = HasSpell (pc, booktype, level, spellref)
+		count -= 1
+
+	if count <= 0:
+		return
+
+	if SpellIndex == -1:
+		# should never happen
+		raise RuntimeError, "LearnSpell: Severe spellbook problems: %s !" %(spellref)
+		return
+
+	for j in range(count):
+		GemRB.MemorizeSpell (pc, booktype, level, SpellIndex)
 

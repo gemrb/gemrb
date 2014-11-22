@@ -243,10 +243,7 @@ def FixInnates(pc):
 	new = [ "SPIN200", "SPIN201", "SPIN202", "SPIN203" ]
 	for i in range(len(old)):
 		if GemRB.RemoveSpell (pc, old[i]):
-			GemRB.LearnSpell (pc, new[i], LS_MEMO)
-			# ehh, acrobatics for a second memorization
-			SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 3, new[i])
-			GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 3, SpellIndex)
+			Spellbook.LearnSpell (pc, new[i], IE_SPELL_TYPE_INNATE, 3, 2, LS_MEMO)
 
 #upgrade savegame to next version
 def GameExpansion():
