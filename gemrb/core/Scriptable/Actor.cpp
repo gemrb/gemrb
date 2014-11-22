@@ -2445,9 +2445,14 @@ static void InitActorTables()
 	tm.load("skillrac");
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
+	int subracetable = core->LoadSymbol("subrace");
 	Holder<SymbolMgr> race = NULL;
+	Holder<SymbolMgr> subrace = NULL;
 	if (racetable != -1) {
 		race = core->GetSymbol(racetable);
+	}
+	if (subracetable != -1) {
+		subrace = core->GetSymbol(subracetable);
 	}
 	if (tm) {
 		int cols = tm->GetColumnCount();
@@ -2463,7 +2468,11 @@ static void InitActorTables()
 					if (racetable == -1) {
 						value = 0;
 					} else {
-						value = race->GetValue(tm->GetRowName(i));
+						if (subracetable == -1) {
+							value = race->GetValue(tm->GetRowName(i));
+						} else {
+							value = subrace->GetValue(tm->GetRowName(i));
+						}
 					}
 					skillrac[i].push_back (value);
 				} else {
@@ -9702,6 +9711,11 @@ int Actor::GetSkillBonus(unsigned int col) const
 
 	// race
 	int lookup = Modified[IE_RACE];
+	if (third) {
+		// lookup by subrace
+		int subrace = Modified[IE_SUBRACE];
+		if (subrace) lookup = lookup<<16 | subrace;
+	}
 	int bonus = 0;
 	std::vector<std::vector<int> >::iterator it = skillrac.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
