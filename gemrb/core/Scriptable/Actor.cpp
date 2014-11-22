@@ -5606,6 +5606,10 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 		} else {
 			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
 		}
+		if (third) {
+			// iwd2 doesn't set the usability mask
+			wi.backstabbing = true;
+		}
 	}
 
 	if (which && (which->RechargeFlags&IE_ITEM_KEEN)) {
