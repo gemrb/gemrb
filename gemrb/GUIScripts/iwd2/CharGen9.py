@@ -131,11 +131,7 @@ def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
 
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
-	race = GemRB.GetVar ("Race") # subrace
-	row = CommonTables.Races.FindValue (3, race )
-	racename = CommonTables.Races.GetRowName (row)
-	if racename == -1:
-		raise RuntimeError, "Could not find race: %d" %(race)
+	racename = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
 
 	#base class
 	Class=GemRB.GetVar ("BaseClass")
