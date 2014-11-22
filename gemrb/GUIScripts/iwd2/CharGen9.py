@@ -130,7 +130,6 @@ def NextPress():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
-	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	racename = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
 
 	#base class
