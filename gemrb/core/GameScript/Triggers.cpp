@@ -2051,7 +2051,7 @@ int GameScript::CheckSkill(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	int sk = actor->GetSkill( parameters->int1Parameter );
+	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if ( sk == parameters->int0Parameter) {
 		return 1;
@@ -2081,7 +2081,7 @@ int GameScript::CheckSkillGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	int sk = actor->GetSkill( parameters->int1Parameter );
+	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if ( sk > parameters->int0Parameter) {
 		return 1;
@@ -2109,7 +2109,7 @@ int GameScript::CheckSkillLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	int sk = actor->GetSkill( parameters->int1Parameter );
+	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if ( sk < parameters->int0Parameter) {
 		return 1;

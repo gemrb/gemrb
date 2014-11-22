@@ -8864,8 +8864,20 @@ int Actor::GetSkillStat(unsigned int skill) const
 	return skillstats[skill];
 }
 
-int Actor::GetSkill(unsigned int skill) const
+int Actor::GetSkill(unsigned int skill, bool ids) const
 {
+	if (!ids) {
+		// FIXME: inefficient
+		bool found = false;
+		for (int i=0; i<skillcount; i++) {
+			if ((signed)skill == skillstats[i]) {
+				found = true;
+				skill = i;
+				break;
+			}
+		}
+		if (!found) return -1;
+	}
 	if (skill>=(unsigned int) skillcount) return -1;
 	int ret = GetStat(skillstats[skill]);
 	int base = GetBase(skillstats[skill]);
