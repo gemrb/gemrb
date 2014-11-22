@@ -29,11 +29,10 @@
 #define BUTTON_H
 
 #include "GUI/Control.h"
+#include "GUI/TextSystem/Font.h"
+#include "Sprite2D.h"
 
 #include "exports.h"
-
-#include "Font.h"
-#include "Sprite2D.h"
 
 #include <list>
 

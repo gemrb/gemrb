@@ -23,12 +23,11 @@
 
 #include "GUI/Control.h"
 #include "GUI/ScrollBar.h"
+#include "GUI/TextSystem/Font.h"
+#include "GUI/TextSystem/TextContainer.h"
 
 #include "RGBAColor.h"
 #include "exports.h"
-
-#include "Font.h"
-#include "TextContainer.h"
 
 #include <vector>
 

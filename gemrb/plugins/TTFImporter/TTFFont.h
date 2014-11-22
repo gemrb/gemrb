@@ -21,8 +21,9 @@
 #ifndef __GemRB__TTFFont__
 #define __GemRB__TTFFont__
 
-#include "Font.h"
 #include "Freetype.h"
+
+#include "GUI/TextSystem/Font.h"
 #include "HashMap.h"
 #include "Holder.h"
 

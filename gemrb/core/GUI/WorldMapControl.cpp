@@ -22,12 +22,12 @@
 #include "win32def.h"
 #include "ie_cursors.h"
 
-#include "Font.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "WorldMap.h"
 #include "GUI/EventMgr.h"
+#include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
 
 namespace GemRB {

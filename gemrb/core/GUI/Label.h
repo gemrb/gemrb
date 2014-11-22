@@ -28,11 +28,10 @@
 #define LABEL_H
 
 #include "GUI/Control.h"
+#include "GUI/TextSystem/Font.h"
 
 #include "RGBAColor.h"
 #include "exports.h"
-
-#include "Font.h"
 
 namespace GemRB {
 

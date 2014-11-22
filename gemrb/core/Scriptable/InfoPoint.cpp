@@ -28,8 +28,8 @@
 #include "TileMap.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "GUI/TextSystem/TextContainer.h"
 #include "System/StringBuffer.h"
-#include "TextContainer.h"
 
 namespace GemRB {
 

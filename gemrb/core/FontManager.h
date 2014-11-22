@@ -24,7 +24,7 @@
 #include "TypeID.h"
 #include "Resource.h"
 #include "exports.h"
-#include "Font.h"
+#include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
 

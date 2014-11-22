@@ -26,7 +26,6 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "Font.h"
 #include "Projectile.h"
 #include "Spell.h"
 #include "Sprite2D.h"
@@ -35,6 +34,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
+#include "GUI/TextSystem/Font.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
 

@@ -2403,8 +2403,12 @@
 		A232B0FA1A15B6E600E5342E /* TextSystem */ = {
 			isa = PBXGroup;
 			children = (
+				A2BF9FC21395FF61006ADC12 /* Font.cpp */,
+				A2BF9FC31395FF61006ADC12 /* Font.h */,
 				A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */,
 				A232B0FC1A15B6E600E5342E /* GemMarkup.h */,
+				A28062821878D1BC009E577D /* TextContainer.cpp */,
+				A28062831878D1BC009E577D /* TextContainer.h */,
 			);
 			path = TextSystem;
 			sourceTree = "<group>";
@@ -3023,8 +3027,6 @@
 				A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */,
 				A2BF9FC11395FF61006ADC12 /* FactoryObject.h */,
 				A20E4ACF197344BD00A6BC96 /* FileCache.h */,
-				A2BF9FC21395FF61006ADC12 /* Font.cpp */,
-				A2BF9FC31395FF61006ADC12 /* Font.h */,
 				A28D2498143BEA4200A27897 /* FontManager.cpp */,
 				A28D249B143BEA5800A27897 /* FontManager.h */,
 				A2BF9FC41395FF61006ADC12 /* Game.cpp */,
@@ -3133,8 +3135,6 @@
 				A2BFA0571395FF62006ADC12 /* System */,
 				A2BFA0681395FF62006ADC12 /* TableMgr.cpp */,
 				A2BFA0691395FF62006ADC12 /* TableMgr.h */,
-				A28062821878D1BC009E577D /* TextContainer.cpp */,
-				A28062831878D1BC009E577D /* TextContainer.h */,
 				A2BFA06A1395FF62006ADC12 /* Tile.cpp */,
 				A2BFA06B1395FF62006ADC12 /* Tile.h */,
 				A2BFA06C1395FF62006ADC12 /* TileMap.cpp */,
