@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 import CommonTables
+import IDLUCommon
 
 SkillWindow = 0
 TextAreaControl = 0
@@ -247,12 +248,20 @@ def BackPress():
 
 def NextPress():
 	MyChar = GemRB.GetVar("Slot")
+
+	# deal with racial boni too (skillrac.2da is ignored)
+	RaceIndex = IDLUCommon.GetRace (MyChar)
+	RaceName = CommonTables.Races.GetRowName (RaceIndex)
+	# the column holds the index into feats.2da, which has one less intro column
+	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
+
 	#setting skills
 	TmpTable = GemRB.LoadTable ("skillsta")
 	SkillCount = TmpTable.GetRowCount ()
 	for i in range (SkillCount):
 		StatID=TmpTable.GetValue (i, 0, 2)
-		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
+		RacialBonus = SkillTable.GetValue (i, RaceColumn)
+		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i)) + RacialBonus)
 	if SkillWindow:
 		SkillWindow.Unload()
 	GemRB.SetNextScript("Feats") #feats
