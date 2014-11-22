@@ -117,6 +117,9 @@
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */; };
+		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
+		A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
+		A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */ = {isa = PBXBuildFile; fileRef = A232B0FC1A15B6E600E5342E /* GemMarkup.h */; };
 		A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */ = {isa = PBXBuildFile; fileRef = A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
@@ -1242,6 +1245,8 @@
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
 		A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageWindowLogger.cpp; sourceTree = "<group>"; };
 		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
+		A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GemMarkup.cpp; sourceTree = "<group>"; };
+		A232B0FC1A15B6E600E5342E /* GemMarkup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GemMarkup.h; sourceTree = "<group>"; };
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A23A9EB418CD4C4B0047420C /* Predicates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Predicates.h; sourceTree = "<group>"; };
@@ -2395,6 +2400,15 @@
 			path = sfmt;
 			sourceTree = "<group>";
 		};
+		A232B0FA1A15B6E600E5342E /* TextSystem */ = {
+			isa = PBXGroup;
+			children = (
+				A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */,
+				A232B0FC1A15B6E600E5342E /* GemMarkup.h */,
+			);
+			path = TextSystem;
+			sourceTree = "<group>";
+		};
 		A27979A913ABA4F7009A6FEF /* SAVImporter */ = {
 			isa = PBXGroup;
 			children = (
@@ -3169,6 +3183,7 @@
 		A2BF9FD41395FF62006ADC12 /* GUI */ = {
 			isa = PBXGroup;
 			children = (
+				A232B0FA1A15B6E600E5342E /* TextSystem */,
 				A2BF9FD51395FF62006ADC12 /* Button.cpp */,
 				A2BF9FD61395FF62006ADC12 /* Button.h */,
 				A2BF9FD71395FF62006ADC12 /* Console.cpp */,
@@ -3453,6 +3468,7 @@
 				A2E663E3139E884B00310FC8 /* TableMgr.h in Headers */,
 				A2E663E5139E884B00310FC8 /* Tile.h in Headers */,
 				A2E663E7139E884B00310FC8 /* TileMap.h in Headers */,
+				A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */,
 				A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */,
 				A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */,
 				A2E663ED139E884B00310FC8 /* TileSetMgr.h in Headers */,
@@ -5054,6 +5070,7 @@
 				A29BF8FB13A04A6F00C812DD /* Actor.cpp in Sources */,
 				A29BF8FC13A04A6F00C812DD /* Container.cpp in Sources */,
 				A29BF8FD13A04A6F00C812DD /* Door.cpp in Sources */,
+				A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */,
 				A29BF8FE13A04A6F00C812DD /* InfoPoint.cpp in Sources */,
 				A29BF8FF13A04A6F00C812DD /* PCStatStruct.cpp in Sources */,
 				A29BF90013A04A6F00C812DD /* Scriptable.cpp in Sources */,
@@ -5238,6 +5255,7 @@
 				A2E66395139E883E00310FC8 /* Interface.cpp in Sources */,
 				A2E66397139E883E00310FC8 /* Inventory.cpp in Sources */,
 				A2E66399139E883E00310FC8 /* Item.cpp in Sources */,
+				A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */,
 				A20E4ADD197344BD00A6BC96 /* RNG_SFMT.cpp in Sources */,
 				A2E6639B139E883E00310FC8 /* ItemMgr.cpp in Sources */,
 				A2E6639D139E883E00310FC8 /* LRUCache.cpp in Sources */,

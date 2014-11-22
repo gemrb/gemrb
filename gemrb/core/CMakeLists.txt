@@ -116,6 +116,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/Slider.cpp
 	GUI/TextArea.cpp
 	GUI/TextEdit.cpp
+	GUI/TextSystem/GemMarkup.cpp
 	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
 	RNG/RNG_SFMT.cpp
