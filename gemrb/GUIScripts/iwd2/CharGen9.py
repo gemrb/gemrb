@@ -131,13 +131,7 @@ def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
 
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
-	BaseRace = GemRB.GetVar ("BaseRace")
-	GemRB.SetPlayerStat (MyChar, IE_RACE, BaseRace)
-	race = GemRB.GetVar ("Race")
-	if race == BaseRace:
-		# no subrace, just leftover values from previous windows
-		race = 0
-	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
+	race = GemRB.GetVar ("Race") # subrace
 	row = CommonTables.Races.FindValue (3, race )
 	racename = CommonTables.Races.GetRowName (row)
 	if racename == -1:
