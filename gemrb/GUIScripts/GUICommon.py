@@ -234,8 +234,9 @@ def MakeSpellCount (pc, spell, count):
 	have = GemRB.CountSpells (pc, spell, 1)
 	if count<=have:
 		return
-	for i in range (count-have):
-		GemRB.LearnSpell (pc, spell, LS_MEMO)
+	# only used for innates, which are all level 1
+	import Spellbook
+	Spellbook.LearnSpell (pc, spell, IE_IWD2_TYPE_INNATE, 0, count-have, LS_MEMO)
 	return
 	
 # remove all class abilities up to the given level
