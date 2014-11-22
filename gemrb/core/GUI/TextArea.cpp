@@ -230,16 +230,6 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 	}
 }
 
-/** Appends a String to the current Text */
-void TextArea::AppendText(const char* text)
-{
-	if (text) {
-		String* string = StringFromCString(text);
-		AppendText(*string);
-		delete string;
-	}
-}
-
 void TextArea::AppendText(const String& text)
 {
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {

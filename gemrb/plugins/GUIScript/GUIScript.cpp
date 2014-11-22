@@ -1381,18 +1381,17 @@ PyDoc_STRVAR( GemRB_TextArea_Append__doc,
 
 static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 {
-	PyObject* wi, * ci, * str;
+	PyObject* wi, * ci, * pystr;
 	PyObject* flag = NULL;
 	long WindowIndex, ControlIndex;
-	long StrRef, Flag = 0;
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &str, &flag )) {
+	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &pystr, &flag )) {
 		return AttributeError( GemRB_TextArea_Append__doc );
 	}
 	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
 		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
-		( !PyObject_TypeCheck( str, &PyString_Type ) &&
-		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
+		( !PyObject_TypeCheck( pystr, &PyString_Type ) &&
+		!PyObject_TypeCheck( pystr, &PyInt_Type ) )) {
 		return AttributeError( GemRB_TextArea_Append__doc );
 	}
 	WindowIndex = PyInt_AsLong( wi );
@@ -1403,21 +1402,23 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	if (flag) {
-		if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
-			Log(ERROR, "GUIScript", "Syntax Error: GetString flag must be integer");
-			return NULL;
-		}
-		Flag = PyInt_AsLong( flag );
-	}
-
-	if (PyObject_TypeCheck( str, &PyString_Type )) {
-		ta->AppendText(PyString_AsString( str ));
+	String* str = NULL;
+	if (PyObject_TypeCheck( pystr, &PyString_Type )) {
+		str = StringFromCString(PyString_AsString( pystr ));
 	} else {
-		StrRef = PyInt_AsLong( str );
-		char* str = core->GetCString( StrRef, Flag );
-		ta->AppendText( str );
-		core->FreeString( str );
+		ieDword flags = 0;
+		if (flag) {
+			if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
+				Log(ERROR, "GUIScript", "Syntax Error: GetString flag must be integer");
+				return NULL;
+			}
+			flags = (ieDword)PyInt_AsLong( flag );
+		}
+		str = core->GetString( (ieStrRef)PyInt_AsLong( pystr ), flags );
+	}
+	if (str) {
+		ta->AppendText( *str );
+		delete str;
 	}
 
 	Py_RETURN_NONE;
