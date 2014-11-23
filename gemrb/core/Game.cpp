@@ -1156,19 +1156,25 @@ void Game::LoadCRTable()
 	}
 }
 
+// FIXME: figure out the real mechanism
 int Game::GetXPFromCR(int cr)
 {
 	if (!crtable) LoadCRTable();
 	if (crtable) {
 		int size = GetPartySize(true);
 		if (!size) return 0; // everyone just died anyway
+		// NOTE: this is an average of averages; if it turns out to be wrong,
+		// compute the party average directly
 		int level = GetPartyLevel(true) / size;
-		if (cr+1>=MAX_CRLEVEL) {
-			cr=MAX_CRLEVEL-2;
+		if (cr >= MAX_CRLEVEL) {
+			cr = MAX_CRLEVEL+1;
+		} else if (cr-2 < 0) {
+			cr = 2;
 		}
 		Log(MESSAGE, "Game", "Challenge Rating: %d, party level: %d", cr, level);
-		// it also has a column for cr 0.25 and 0.5
-		return crtable[level-1][cr+1];
+		// it also has a column for cr 0.25 and 0.5, so let's treat cr as a 1-based index
+		// but testing shows something else affects it further, so we divide by 2 to match
+		return crtable[level-1][cr-2]/2;
 	}
 	Log(ERROR, "Game", "Cannot find moncrate.2da!");
 	return 0;
