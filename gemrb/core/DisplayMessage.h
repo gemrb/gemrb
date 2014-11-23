@@ -29,9 +29,10 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "strrefs.h"
 #include "System/String.h"
 
-#include <cstdlib>
+#include <string>
 
 namespace GemRB {
 
@@ -48,15 +49,22 @@ class Scriptable;
 class GEM_EXPORT DisplayMessage
 {
 private:
-	bool ReadStrrefs();
+	struct StrRefs {
+		std::string loadedTable;
+		ieStrRef table[STRREF_COUNT];
+
+		StrRefs();
+		bool LoadTable(const std::string& name);
+		ieStrRef operator[](size_t) const;
+	};
+	static StrRefs SRefs;
+	static void LoadStringRefs();
+public:
+	static ieStrRef GetStringReference(size_t);
+	static bool HasStringReference(size_t);
 
 public:
-	DisplayMessage(void);
-
-	/** returns a string reference from a string reference index constant */
-	ieStrRef GetStringReference(int stridx) const;
-	/** returns true if a string reference for a string reference index constant exists */
-	bool HasStringReference(int stridx) const;
+	DisplayMessage();
 	/** returns the speaker's color and name */
 	unsigned int GetSpeakerColor(String& name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */

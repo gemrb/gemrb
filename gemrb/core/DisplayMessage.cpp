@@ -20,8 +20,6 @@
 
 #include "DisplayMessage.h"
 
-#include "strrefs.h"
-
 #include "Interface.h"
 #include "TableMgr.h"
 #include "GUI/Label.h"
@@ -34,8 +32,6 @@ namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
 
-static int strref_table[STRREF_COUNT];
-
 #define PALSIZE 8
 static Color ActorColor[PALSIZE];
 static const wchar_t* DisplayFormatName = L"[color=%06X]%ls - [/color][p][color=%06X]%ls[/color][/p]";
@@ -44,22 +40,58 @@ static const wchar_t* DisplayFormat = L"[p][color=%06X]%ls[/color][/p]";
 static const wchar_t* DisplayFormatValue = L"[p][color=%06X]%ls: %d[/color][/p]";
 static const wchar_t* DisplayFormatNameString = L"[color=%06X]%ls - [/color][p][color=%06X]%ls: %ls[/color][/p]";
 
-DisplayMessage::DisplayMessage(void) {
-	ReadStrrefs();
+DisplayMessage::StrRefs DisplayMessage::SRefs;
+
+DisplayMessage::StrRefs::StrRefs()
+{
+	memset(table, -1, sizeof(table) );
 }
 
-bool DisplayMessage::ReadStrrefs()
+bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 {
-	int i;
-	memset(strref_table,-1,sizeof(strref_table) );
-	AutoTable tab("strings");
-	if (!tab) {
-		return false;
+	AutoTable tab(name.c_str());
+	if (tab) {
+		for(int i=0;i<STRREF_COUNT;i++) {
+			table[i]=atoi(tab->QueryField(i,0));
+		}
+		return true;
+	} else {
+		Log(ERROR, "DisplayMessage", "Unable to initialize DisplayMessage::StrRefs");
 	}
-	for(i=0;i<STRREF_COUNT;i++) {
-		strref_table[i]=atoi(tab->QueryField(i,0));
+	return false;
+}
+
+ieStrRef DisplayMessage::StrRefs::operator[](size_t idx) const
+{
+	if (idx < STRREF_COUNT) {
+		return table[idx];
 	}
-	return true;
+	return -1;
+}
+
+void DisplayMessage::LoadStringRefs()
+{
+	// "strings" is the dafault table. we could, in theory, load other tables
+	static const std::string stringTableName = "strings";
+	if (SRefs.loadedTable != stringTableName) {
+		SRefs.LoadTable(stringTableName);
+	}
+}
+
+ieStrRef DisplayMessage::GetStringReference(size_t idx)
+{
+	return DisplayMessage::SRefs[idx];
+}
+
+bool DisplayMessage::HasStringReference(size_t idx)
+{
+	return DisplayMessage::SRefs[idx] != (ieStrRef)-1;
+}
+
+
+DisplayMessage::DisplayMessage()
+{
+	LoadStringRefs();
 }
 
 void DisplayMessage::DisplayMarkupString(const String& Text) const
@@ -67,16 +99,6 @@ void DisplayMessage::DisplayMarkupString(const String& Text) const
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta)
 		ta->AppendText( Text );
-}
-
-ieStrRef DisplayMessage::GetStringReference(int stridx) const
-{
-	return strref_table[stridx];
-}
-
-bool DisplayMessage::HasStringReference(int stridx) const
-{
-	return strref_table[stridx] != -1;
 }
 
 unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) const
@@ -112,12 +134,11 @@ unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&sp
 	return speaker_color;
 }
 
-
 //simply displaying a constant string
 void DisplayMessage::DisplayConstantString(int stridx, unsigned int color, Scriptable *target) const
 {
 	if (stridx<0) return;
-	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
+	String* text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND );
 	DisplayString(*text, color, target);
 	delete text;
 }
@@ -159,7 +180,7 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const
 {
 	if (stridx<0) return;
-	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
+	String* text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND );
 	if (!text) {
 		Log(WARNING, "DisplayMessage", "Unable to display message for stridx %d", stridx);
 		return;
@@ -182,12 +203,12 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int co
 
 	String name;
 	unsigned int actor_color = GetSpeakerColor(name, actor);
-	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
+	String* text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND );
 	if (!text) {
 		Log(WARNING, "DisplayMessage", "Unable to display message for stridx %d", stridx);
 		return;
 	}
-	String* text2 = core->GetString( strref_table[stridx2], IE_STR_SOUND );
+	String* text2 = core->GetString( DisplayMessage::SRefs[stridx2], IE_STR_SOUND );
 
 	size_t newlen = text->length() + name.length();
 	if (text2) {
@@ -215,7 +236,7 @@ void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, c
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	String* text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	DisplayStringName(*text, color, speaker);
 	delete text;
 }
@@ -226,7 +247,7 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, unsigned int col
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	String* text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	//allow for a number
 	size_t bufflen = text->length() + 6;
 	wchar_t* newtext = ( wchar_t* ) malloc( bufflen * sizeof(wchar_t));
@@ -248,7 +269,7 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 	attacker_color = GetSpeakerColor(name1, attacker);
 	GetSpeakerColor(name2, target);
 
-	String* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	String* text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	if (!text) {
 		Log(WARNING, "DisplayMessage", "Unable to display message for stridx %d", stridx);
 		return;
