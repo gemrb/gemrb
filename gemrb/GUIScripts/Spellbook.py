@@ -24,7 +24,7 @@ import GameCheck
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_LEFT, ACT_RIGHT
-from ie_spells import SP_IDENTIFY, SP_SURGE, LSR_KNOWN, LSR_LEVEL, LSR_STAT, LSR_FULL, LSR_OK
+from ie_spells import *
 from ie_restype import RES_2DA
 
 #################################################################
@@ -633,5 +633,5 @@ def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 		return
 
 	for j in range(count):
-		GemRB.MemorizeSpell (pc, booktype, level, SpellIndex)
+		GemRB.MemorizeSpell (pc, booktype, level, SpellIndex, flags&LS_MEMO)
 
