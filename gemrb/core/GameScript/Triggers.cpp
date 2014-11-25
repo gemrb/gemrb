@@ -1696,7 +1696,7 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			Actor *actor = (Actor *) tt->actor;
-			if (trap->IsOver(actor->Pos)) {
+			if (trap->IsOver(actor->Pos) && (actor->GetInternalFlag()&IF_VISIBLE)) {
 				ret = 1;
 				break;
 			}
