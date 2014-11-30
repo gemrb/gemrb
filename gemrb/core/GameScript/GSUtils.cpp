@@ -923,21 +923,24 @@ static ieResRef PlayerDialogRes = "PLAYERx\0";
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
-	int seeflag = GA_NO_DEAD;
 
 	if (InDebug&ID_VARIABLES) {
 		Log(MESSAGE, "GSUtils", "BeginDialog core");
 	}
+	tar = GetStoredActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
 	if (Flags & BD_OWN) {
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = tar;
 	} else {
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = Sender;
 	}
 	if (!scr) {
 		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.",
 			Sender->GetScriptName(), Sender->Type, Flags);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	// do not allow disabled actors to start dialog
+	if (!(scr->GetInternalFlag() & IF_VISIBLE)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
