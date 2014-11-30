@@ -1689,14 +1689,14 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 	}
 	Highlightable *trap = (Highlightable *)Sender;
 
-	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD);
+	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	int ret = 0;
 	if (tgts) {
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			Actor *actor = (Actor *) tt->actor;
-			if (trap->IsOver(actor->Pos) && (actor->GetInternalFlag()&IF_VISIBLE)) {
+			if (trap->IsOver(actor->Pos)) {
 				ret = 1;
 				break;
 			}
