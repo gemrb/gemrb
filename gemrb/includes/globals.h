@@ -194,7 +194,7 @@ GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
-GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
+GEM_EXPORT bool Schedule(ieDword schedule, ieDword time, int offset = 150);
 GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
 
 

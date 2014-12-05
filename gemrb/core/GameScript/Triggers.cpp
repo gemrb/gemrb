@@ -3815,14 +3815,15 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 	return (Sender->ScriptTicks % delay) <= Sender->IdleTicks;
 }
 
+// Schedules for the TimeOfDay trigger: Day (7-21), Dusk (21-22), Night (22-6), Morning (6-7)
+static const ieDword time_of_day_schedules[4] = { 0x1FFFC0, 0x200000, 0xC0001F, 0x20 };
+
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	ieDword timeofday = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/1800;
-
-	if (timeofday==(ieDword) parameters->int0Parameter) {
-		return 1;
+	if ((ieDword) parameters->int0Parameter > 3) {
+		return 0;
 	}
-	return 0;
+	return Schedule(time_of_day_schedules[parameters->int0Parameter], core->GetGame()->GameTime, 0);
 }
 
 //this is a PST action, it's using delta, not diffmode
