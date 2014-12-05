@@ -7145,11 +7145,7 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 	}
 
 	//check for schedule
-	ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
-	if (appearance & bit) {
-		return true;
-	}
-	return false;
+	return GemRB::Schedule(appearance, gametime);
 }
 
 void Actor::NewPath()

@@ -3877,11 +3877,7 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 	}
 
 	//check for schedule
-	ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
-	if (appearance & bit) {
-		return true;
-	}
-	return false;
+	return GemRB::Schedule(appearance, gametime);
 }
 
 int AreaAnimation::GetHeight() const

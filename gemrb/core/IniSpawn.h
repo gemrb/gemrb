@@ -170,7 +170,6 @@ private:
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
-	bool Schedule(ieDword appearance, ieDword gametime) const;
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ieResRef area, Point &pos, ieDword state);

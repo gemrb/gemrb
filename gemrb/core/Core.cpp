@@ -213,6 +213,13 @@ int EARelation(Scriptable* Owner, Actor* target)
 	return EAR_NEUTRAL;
 }
 
+// check whether the game time matches a given schedule
+bool Schedule(ieDword schedule, ieDword time)
+{
+	ieDword hour = 1 << ((time/AI_UPDATE_TIME)%7200/300);
+	return (schedule & hour) != 0;
+}
+
 // safely copies a ResRef (ie. nulls out the unused buffer size)
 void CopyResRef(ieResRef d, const ieResRef s)
 {
