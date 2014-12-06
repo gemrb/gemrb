@@ -5863,7 +5863,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	bool per_round = true; // 4xxx trigger?
 	const TriggerEntry *entry = NULL;
 	ieDword timeOfDay;
-	Actor *near = NULL;
+	Actor *nearest = NULL;
 
 	// check the condition
 	switch (fx->Parameter2) {
@@ -5904,13 +5904,13 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case COND_NEAR4:
 		// PersonalSpaceDistance([ANYONE], 4)
-		near = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
-		condition = near && PersonalDistance(near, target) < 4;
+		nearest = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
+		condition = nearest && PersonalDistance(nearest, target) < 4;
 		break;
 	case COND_NEAR10:
 		// PersonalSpaceDistance([ANYONE], 10)
-		near = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
-		condition = near && PersonalDistance(near, target) < 10;
+		nearest = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
+		condition = nearest && PersonalDistance(nearest, target) < 10;
 		break;
 	case COND_EVERYROUND:
 		condition = true;
