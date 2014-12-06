@@ -366,6 +366,7 @@ public:
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
 	unsigned int GetBlocked(unsigned int x, unsigned int y);
 	unsigned int GetBlocked(const Point &p);
+	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
 	InfoPoint *GetInfoPointByGlobalID(ieDword objectID);

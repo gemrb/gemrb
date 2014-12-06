@@ -544,6 +544,7 @@ void Interface::HandleEvents()
 		if (tmp != (ieDword) ~0) {
 			EventFlag&=~EF_PORTRAIT;
 			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
+			guiscript->RunFunction( "GUIINV", "RefreshInventoryWindow" );
 		}
 	}
 
@@ -3509,11 +3510,7 @@ bool Interface::DelSymbol(unsigned int index)
 /** Plays a Movie */
 int Interface::PlayMovie(const char* ResRef)
 {
-	ResourceHolder<MoviePlayer> mp(ResRef);
-	if (!mp) {
-		return -1;
-	}
-
+	const char *realResRef = ResRef;
 	ieDword subtitles = 0;
 	Font *SubtitleFont = NULL;
 	Palette *palette = NULL;
@@ -3559,6 +3556,28 @@ int Interface::PlayMovie(const char* ResRef)
 			}
 		}
 	}
+	
+	//check whether there is an override for this movie
+	const char *sound_resref = NULL;
+	AutoTable mvesnd;
+	if (mvesnd.load("mvesnd", true)) {
+		int row = mvesnd->GetRowIndex(ResRef);
+		if (row != -1) {
+			int mvecol = mvesnd->GetColumnIndex("override");
+			if (mvecol != -1) {
+				realResRef = mvesnd->QueryField(row, mvecol);
+			}
+			int sndcol = mvesnd->GetColumnIndex("sound_override");
+			if (sndcol != -1) {
+				sound_resref = mvesnd->QueryField(row, sndcol);
+			}
+		}
+	}
+
+	ResourceHolder<MoviePlayer> mp(realResRef);
+	if (!mp) {
+		return -1;
+	}
 
 	//shutting down music and ambients before movie
 	if (music)
@@ -3567,7 +3586,16 @@ int Interface::PlayMovie(const char* ResRef)
 	if (ambim) ambim->deactivate();
 	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
+
+	Holder<SoundHandle> sound_override;
+	if (sound_resref) {
+		sound_override = AudioDriver->Play(sound_resref);
+	}
 	mp->Play();
+	if (sound_override) {
+		sound_override->Stop();
+		sound_override.release();
+	}
 	gamedata->FreePalette( palette );
 	if (frames)
 		free(frames);

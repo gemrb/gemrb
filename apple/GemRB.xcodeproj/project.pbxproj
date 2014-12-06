@@ -137,6 +137,8 @@
 		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
 		A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46D13A28A5000D41A8A /* PNGImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A27368D11A338E7800A8EEB8 /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27368CF1A338E7200A8EEB8 /* mem.cpp */; };
+		A27368D21A338E7A00A8EEB8 /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27368CF1A338E7200A8EEB8 /* mem.cpp */; };
 		A273DC7C14856756000DA299 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A273DC7B14856755000DA299 /* libz.dylib */; };
 		A276B4C513A28B0000D41A8A /* BIFImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86B2139F0A7D0002DC13 /* BIFImporter.cpp */; };
 		A276B4C613A28B0D00D41A8A /* BIKPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86B7139F0A7D0002DC13 /* BIKPlayer.cpp */; };
@@ -1262,6 +1264,7 @@
 		A265ECEA13A8669700C6DF12 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = ../gemrb/core/System/Logging.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlicedStream.cpp; path = ../gemrb/core/System/SlicedStream.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEC13A8669700C6DF12 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../gemrb/core/System/String.cpp; sourceTree = SOURCE_ROOT; };
+		A27368CF1A338E7200A8EEB8 /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		A273DC7B14856755000DA299 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		A276B3CA13A2867900D41A8A /* BIFImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BIFImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A276B3D113A286A800D41A8A /* BIKPlayer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BIKPlayer.so; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2532,6 +2535,7 @@
 		A27B86B6139F0A7D0002DC13 /* BIKPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				A27368CF1A338E7200A8EEB8 /* mem.cpp */,
 				A27B86B7139F0A7D0002DC13 /* BIKPlayer.cpp */,
 				A27B86B8139F0A7D0002DC13 /* BIKPlayer.h */,
 				A27B86B9139F0A7D0002DC13 /* binkdata.h */,
@@ -4633,6 +4637,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27368D21A338E7A00A8EEB8 /* mem.cpp in Sources */,
 				A276B4C613A28B0D00D41A8A /* BIKPlayer.cpp in Sources */,
 				A276B4C713A28B0D00D41A8A /* dct.cpp in Sources */,
 				A276B4C813A28B0D00D41A8A /* fft.cpp in Sources */,
@@ -5134,6 +5139,7 @@
 				A226F43613A11A66009CE75E /* MVEPlayer.cpp in Sources */,
 				A226F43713A11A66009CE75E /* mvevideodec16.cpp in Sources */,
 				A226F43813A11A66009CE75E /* mvevideodec8.cpp in Sources */,
+				A27368D11A338E7800A8EEB8 /* mem.cpp in Sources */,
 				A226F43E13A11A7E009CE75E /* PLTImporter.cpp in Sources */,
 				A226F44013A11A8D009CE75E /* PROImporter.cpp in Sources */,
 				A226F44113A11A94009CE75E /* PSTOpcodes.cpp in Sources */,

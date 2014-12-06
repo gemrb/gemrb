@@ -222,11 +222,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 				if ab[:3] == "AP_":
 					GemRB.ApplySpell (pc, ab[3:])
 				elif ab[:3] == "GA_":
-					SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
-					if SpellIndex == -1:
-						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
-					else:
-						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+					Spellbook.LearnSpell (pc, ab[3:], IE_SPELL_TYPE_INNATE, 0, 1, LS_MEMO)
 				elif ab[:3] == "FS_":
 					Gain(26320, ab[3:])
 				elif ab[:3] == "FA_":
@@ -238,8 +234,9 @@ def MakeSpellCount (pc, spell, count):
 	have = GemRB.CountSpells (pc, spell, 1)
 	if count<=have:
 		return
-	for i in range (count-have):
-		GemRB.LearnSpell (pc, spell, LS_MEMO)
+	# only used for innates, which are all level 1
+	import Spellbook
+	Spellbook.LearnSpell (pc, spell, IE_IWD2_TYPE_INNATE, 0, count-have, LS_MEMO)
 	return
 	
 # remove all class abilities up to the given level
@@ -621,8 +618,11 @@ def IsMultiClassed (actor, verbose):
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
 def CanDualClass(actor):
-	# human
-	if GemRB.GetPlayerStat (actor, IE_RACE) != 1:
+	# race restriction (human)
+	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))
+	RaceName = CommonTables.Races.GetRowName (RaceName)
+	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL")
+	if int(RaceDual) != 1:
 		return 1
 
 	# already dualclassed

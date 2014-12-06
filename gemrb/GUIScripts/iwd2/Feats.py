@@ -18,10 +18,10 @@
 #
 #character generation, skills (GUICG6)
 import GemRB
-from GUIDefines import *
-from ie_stats import *
 import GUICommon
 import CommonTables
+from GUIDefines import *
+from ie_stats import *
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -337,7 +337,7 @@ def NextPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
-	GemRB.SetNextScript("CharGen7")
+	GemRB.SetNextScript("Spells")
 	return
 
 #Custom feat check functions

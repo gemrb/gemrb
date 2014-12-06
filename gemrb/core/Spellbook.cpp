@@ -517,23 +517,27 @@ void Spellbook::SetBookType(int bt)
 //in the right group
 //the rest are stored as innate
 
-int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit)
+int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit, int level)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
 	CopyResRef(spl->SpellResRef, spell->Name);
 	spl->Level = 0;
 	if (IWD2Style) {
 		PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
+		// is there an override (domain spells)?
+		if (level == -1) {
+			level = spell->SpellLevel-1;
+		}
+		spl->Level = level;
 		spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
-		return spell->SpellLevel;
-	}
-
-	//not IWD2
-	if (spell->SpellType<6) {
-		spl->Type = spelltypes[spell->SpellType];
-		spl->Level = spell->SpellLevel-1;
 	} else {
-		spl->Type = IE_SPELL_TYPE_INNATE;
+		//not IWD2
+		if (spell->SpellType<6) {
+			spl->Type = spelltypes[spell->SpellType];
+			spl->Level = spell->SpellLevel-1;
+		} else {
+			spl->Type = IE_SPELL_TYPE_INNATE;
+		}
 	}
 
 	bool ret=AddKnownSpell(spl, memo);
@@ -564,7 +568,7 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 	}
 
 	spells[type][level]->known_spells.push_back(spl);
-	if (type==IE_SPELL_TYPE_INNATE) {
+	if (1<<type == innate) {
 		spells[type][level]->SlotCount++;
 		spells[type][level]->SlotCountWithBonus++;
 	}

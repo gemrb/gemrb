@@ -3167,6 +3167,7 @@ int fx_blink (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	fx->Parameter4=Trans;
 	STAT_SET( IE_TRANSLUCENT, Trans);
+	STAT_ADD(IE_SPELLFAILUREMAGE, 20);
 
 	if(fx->Parameter2) {
 		target->AddPortraitIcon(PI_EMPTYBODY);

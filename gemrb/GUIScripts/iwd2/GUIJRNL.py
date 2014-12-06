@@ -104,7 +104,7 @@ def UpdateJournalWindow ():
 
 	# Title
 	Title = Window.GetControl (5)
-	Title.SetText (16202 + Chapter)
+	Title.SetText ("[color=FFFF00]" + GemRB.GetString(16202+Chapter) + "[/color]")
 
 	# text area
 	Text = Window.GetControl (1)

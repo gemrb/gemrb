@@ -49,9 +49,7 @@ DialogHandler::DialogHandler(void)
 
 DialogHandler::~DialogHandler(void)
 {
-	if (dlg) {
-		delete dlg;
-	}
+	delete dlg;
 }
 
 void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
@@ -93,10 +91,8 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 //Try to start dialogue between two actors (one of them could be inanimate)
 bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
 {
-	if (dlg) {
-		delete dlg;
-		dlg = NULL;
-	}
+	delete dlg;
+	dlg = NULL;
 
 	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
@@ -187,27 +183,23 @@ void DialogHandler::EndDialog(bool try_to_break)
 	}
 
 	Actor *tmp = GetSpeaker();
-	if (tmp) {
-		tmp->LeaveDialog();
-	}
 	speakerID = 0;
 	Scriptable *tmp2 = GetTarget();
-	if (tmp2 && tmp2->Type == ST_ACTOR) {
-		tmp = (Actor *)tmp2;
-	} else {
-		tmp = NULL;
-	}
+	targetID = 0;
+	originalTargetID = 0;
+
 	if (tmp) {
 		tmp->LeaveDialog();
 	}
-	targetID = 0;
-	if (tmp) tmp->SetCircleSize();
-	originalTargetID = 0;
-	ds = NULL;
-	if (dlg) {
-		delete dlg;
-		dlg = NULL;
+	if (tmp2 && tmp2->Type == ST_ACTOR) {
+		tmp = (Actor *)tmp2;
+		tmp->LeaveDialog();
+		tmp->SetCircleSize();
 	}
+	ds = NULL;
+	delete dlg;
+	dlg = NULL;
+
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
@@ -229,21 +221,21 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
-		Log(ERROR, "GameControl", "Dialog aborted???");
+		Log(ERROR, "DialogHandler", "Dialog aborted???");
 		EndDialog();
 		return false;
 	}
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
-		Log(ERROR, "GameControl", "Speaker gone???");
+		Log(ERROR, "DialogHandler", "Speaker gone???");
 		EndDialog();
 		return false;
 	}
 
 	Scriptable *target = GetTarget();
 	if (!target) {
-		Log(ERROR, "GameControl", "Target gone???");
+		Log(ERROR, "DialogHandler", "Target gone???");
 		EndDialog();
 		return false;
 	}
@@ -272,7 +264,12 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				tgt->InteractCount++;
 			}
 		}
-		//ds = dlg->GetState( si );
+		// does this belong here? we must clear actions somewhere before
+		// we start executing them (otherwise queued actions interfere)
+		// executing actions directly does not work, because dialog
+		// needs to end before final actions are executed due to
+		// actions making new dialogs!
+		target->Stop();
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
 			return false;
@@ -283,7 +280,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
 			ta->AppendText(L"\n");
-			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
+			displaymsg->DisplayStringName( tr->textStrRef, DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 			}
 		}
@@ -291,12 +288,9 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		target->ProcessActions(); //run the action queue now
 
 		if (tr->actions.size()) {
-			// does this belong here? we must clear actions somewhere before
-			// we start executing them (otherwise queued actions interfere)
-			// executing actions directly does not work, because dialog
-			// needs to end before final actions are executed due to
-			// actions making new dialogs!
-			target->Stop();
+			if (!(target->GetInternalFlag() & IF_NOINT)) {
+				target->ReleaseCurrentAction();
+			}
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
 			target->AddAction( GenerateAction( "BreakInstants()" ) );
@@ -356,9 +350,9 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 				}
 			}
-			target = tgt;
-			if (!target) {
-				Log(WARNING, "Dialog", "Can't redirect dialog");
+
+			if (!tgt) {
+				Log(WARNING, "DialogHandler", "Can't redirect dialog");
 				EndDialog();
 				return false;
 			}
@@ -366,6 +360,11 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			targetID = tgt->GetGlobalID();
 			tgt->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
+			if (target != tgt) {
+				// switching target; clear actions
+				target = tgt;
+				target->Stop();
+			}
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
@@ -387,7 +386,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	ds = dlg->GetState( si );
 	if (!ds) {
-		Log(WARNING, "Dialog", "Can't find next dialog");
+		Log(WARNING, "DialogHandler", "Can't find next dialog");
 		EndDialog();
 		return false;
 	}
@@ -457,7 +456,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
-		Log(WARNING, "Dialog", "There were no valid dialog options!");
+		Log(WARNING, "DialogHandler", "There were no valid dialog options!");
 		gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 	}
 
@@ -481,33 +480,18 @@ Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
 
 Scriptable *DialogHandler::GetTarget()
 {
-	// TODO: area GetScriptableByGlobalID?
-
-	if (!targetID) return NULL;
-
 	Game *game = core->GetGame();
 	if (!game) return NULL;
 
 	Map *area = game->GetCurrentArea();
 	if (!area) return NULL;
 
-	Actor *actor = area->GetActorByGlobalID(targetID);
-	if (actor) return actor;
-
-	Door *door = area->GetDoorByGlobalID(targetID);
-	if (door) return (Scriptable *)door;
-	Container *container = area->GetContainerByGlobalID(targetID);
-	if (container) return (Scriptable *)container;
-	InfoPoint *ip = area->GetInfoPointByGlobalID(targetID);
-	if (ip) return (Scriptable *)ip;
-
-	return NULL;
+	return area->GetScriptableByGlobalID(targetID);
 }
 
 Actor *DialogHandler::GetSpeaker()
 {
 	return GetActorByGlobalID(speakerID);
 }
-
 
 }

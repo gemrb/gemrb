@@ -786,7 +786,7 @@ static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 			Log(ERROR, "GameScript", "Failed to create effect.");
 			return NULL;
 		}
-		if (iterations) {
+		if (iterations > 1) {
 			vvc->SetDefaultDuration( vvc->GetSequenceDuration(AI_UPDATE_TIME * iterations));
 		} else {
 			vvc->PlayOnce();
@@ -829,7 +829,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		// can't SetPosition while the old actor is taking the spot
 		tar->SetPosition(pos, 1);
 		if (effect) {
-			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect",1);
+			CreateVisualEffectCore(tar, tar->Pos, "spsmpuff", 1);
 		}
 	}
 }
@@ -921,22 +921,25 @@ static ieResRef PlayerDialogRes = "PLAYERx\0";
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar = NULL, *scr = NULL;
-	int seeflag = GA_NO_DEAD;
 
 	if (InDebug&ID_VARIABLES) {
 		Log(MESSAGE, "GSUtils", "BeginDialog core");
 	}
+	tar = GetStoredActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
 	if (Flags & BD_OWN) {
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = tar;
 	} else {
-		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = Sender;
 	}
 	if (!scr) {
 		assert(Sender);
 		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.",
 			Sender->GetScriptName(), Sender->Type, Flags);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	// do not allow disabled actors to start dialog
+	if (!(scr->GetInternalFlag() & IF_VISIBLE)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1114,12 +1117,25 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	//don't clear target's actions, because a sequence like this will be broken:
 	//StartDialog([PC]); SetGlobal("Talked","LOCALS",1);
+	// Update orientation and potentially stance
+	// sarevok's resurrection cutscene shows a need for this (cut206a)
+	// however we do not want to affect lying actors (eg. Malla from tob)
 	if (scr!=tar) {
 		if (scr->Type==ST_ACTOR) {
-			((Actor *) scr)->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
+			// might not be equal to speaker anymore due to swapping
+			Actor *talker = (Actor *) scr;
+			talker->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
+			if (talker->InParty) {
+				talker->SetStance(IE_ANI_READY);
+			}
 		}
 		if (tar->Type==ST_ACTOR) {
-			((Actor *) tar)->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
+			// might not be equal to target anymore due to swapping
+			Actor *talkee = (Actor *) tar;
+			talkee->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
+			if (talkee->InParty) {
+				talkee->SetStance(IE_ANI_READY);
+			}
 		}
 	}
 

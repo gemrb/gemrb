@@ -66,10 +66,7 @@ def OnLoad():
 	# apply class/kit abilities
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
 
-	# apply starting (alignment dictated) abilities
-	# pc, table, new level, level diff, alignment
-	AlignmentAbbrev = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
-	GUICommon.AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
+	# alignment based bhaal powers are added in FixInnates later
 
 	# setup starting gold (uses a roll dictated by class
 	TmpTable = GemRB.LoadTable ("strtgold")
@@ -204,8 +201,4 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
  			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 			inventory_exclusion |= item['Exclusion']
 
-		# grant the slayer change ability to the protagonist
-		if MyChar == 1:
-			GemRB.LearnSpell (MyChar, "SPIN822", LS_MEMO)
 		return
-		

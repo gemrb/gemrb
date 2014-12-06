@@ -27,6 +27,7 @@ import GUICommon
 import CommonTables
 import GUICommonWindows
 import GUIRECCommon
+import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
@@ -49,10 +50,8 @@ OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
 
-#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
-Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCERER, IE_LEVEL2]
+# class level stats
+Classes = IDLUCommon.Levels
 
 #don't allow exporting polymorphed or dead characters
 def Exportable(pc):
@@ -264,17 +263,9 @@ def GetFavoredClass (pc, code):
 
 	return code-1
 
-# returns the race or subrace
-def GetRace (pc):
-	Race = GemRB.GetPlayerStat (pc, IE_RACE)
-	Subrace = GemRB.GetPlayerStat (pc, IE_SUBRACE)
-	if Subrace:
-		Race = Race<<16 | Subrace
-	return CommonTables.Races.FindValue (3, Race)
-
 # returns the effective character level modifier
 def GetECL (pc):
-	RaceIndex = GetRace (pc)
+	RaceIndex = IDLUCommon.GetRace (pc)
 	RaceRowName = CommonTables.Races.GetRowName (RaceIndex)
 	return CommonTables.Races.GetValue (RaceRowName, "ECL")
 
@@ -294,14 +285,8 @@ def GetNextLevelExp (Level, Adjustment, string=0):
 def DisplayCommon (pc):
 	Window = RecordsWindow
 
-	Value = GemRB.GetPlayerStat(pc,IE_RACE)
-	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
-	if Value2:
-		Value = Value<<16 | Value2
-	tmp = CommonTables.Races.FindValue (3, Value)
-	Race = CommonTables.Races.GetValue (tmp, 2)
 	Label = Window.GetControl (0x1000000f)
-	Label.SetText (Race)
+	Label.SetText (GUICommonWindows.GetActorRaceTitle (pc))
 
 	Button = Window.GetControl (36)
 	if Exportable (pc):
@@ -358,7 +343,7 @@ def DisplayGeneral (pc):
 
 	#favoured class
 	#get the subrace value
-	RaceIndex = GetRace (pc)
+	RaceIndex = IDLUCommon.GetRace (pc)
 	Race = CommonTables.Races.GetValue (RaceIndex, 2)
 	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
 
@@ -827,8 +812,12 @@ def DisplayWeapons (pc):
 
 	return
 
-def DisplaySkills (pc):
-	Window = RecordsWindow
+def DisplaySkills (pc, TAOverride=None):
+	global RecordsTextArea
+	# HACK: trying to avoid merge conflicts, sanitize later
+	if TAOverride:
+		tmp = RecordsTextArea
+		RecordsTextArea = TAOverride
 	
 	def PrintStatTable (title, tabname):
 		feats = True if tabname == "feats" else False
@@ -850,6 +839,9 @@ def DisplaySkills (pc):
 				items.append (value)
 			elif not feats:
 				value = GemRB.GetPlayerStat (pc, item)
+				modStat = SkillTable.GetValue (i, 1, 2)
+				if modStat != IE_DEX: # already handled in core
+					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 				base = GemRB.GetPlayerStat (pc, item, 1)
 				untrained = nameTab.GetValue (i, 3)
 				
@@ -868,6 +860,10 @@ def DisplaySkills (pc):
 	PrintStatTable (GemRB.GetString(11983), "skills")
 	RecordsTextArea.Append ("\n")
 	PrintStatTable (GemRB.GetString(36361), "feats")
+
+	if TAOverride:
+		RecordsTextArea = tmp
+
 	return
 
 def DelimitedStrRefs(strref1, strref2, newlines=1, delimiter=": "):
@@ -911,6 +907,10 @@ def DisplayMisc (pc):
 	else:
 		time = GemRB.GetString (10697)
 	time += " " + GemRB.GetString (10699) + " "
+	if days == 0:
+		# only display hours
+		time = ""
+
 	if hours == 1:
 		time += GemRB.GetString (10701)
 	else:
@@ -936,7 +936,7 @@ def DisplayMisc (pc):
 		val = stat['KillsTotalCount']*100/TotalCount
 	else:
 		val = 0
-	RecordsTextArea.Append (DelimitedText (11954, str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%"))
 
 	return
 

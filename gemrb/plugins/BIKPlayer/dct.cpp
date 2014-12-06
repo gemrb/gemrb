@@ -36,7 +36,7 @@ av_cold int ff_dct_init(DCTContext *s, int nbits, int inverse)
     s->nbits    = nbits;
     s->inverse  = inverse;
 
-    s->data = (struct FFTComplex *) malloc(sizeof(FFTComplex) * 2 * n);
+    s->data = (struct FFTComplex *) av_malloc(sizeof(FFTComplex) * 2 * n);
     if (!s->data)
         return -1;
 
@@ -93,5 +93,5 @@ void ff_dct_calc(DCTContext *s, FFTSample *data)
 av_cold void ff_dct_end(DCTContext *s)
 {
     ff_fft_end(&s->fft);
-    free((void **) &s->data);
+    av_freep((void **) &s->data);
 }

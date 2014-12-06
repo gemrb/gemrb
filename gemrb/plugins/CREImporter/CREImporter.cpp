@@ -197,7 +197,7 @@ static int magcount=-1;
 
 static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 {
-	for(int i=0;i<domcount;i++) {
+	for(int i=0;i<splcount;i++) {
 		if (domlist[i].Equals(name) ) {
 			level = domlist[i].FindSpell(kit);
 				return i;
@@ -206,7 +206,7 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }
 
-static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
+/*static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
 {
 	for(int i=0;i<magcount;i++) {
 		if (maglist[i].Equals(name) ) {
@@ -215,21 +215,7 @@ static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
 		}
 	}
 	return -1;
-}
-
-static int SpellType(ieResRef name, unsigned short &level, unsigned int clsmsk)
-{
-	for (int i = 0;i<splcount;i++) {
-		if (spllist[i].Equals(name) ) {
-			for(int type=0;type<7;type++) {
-				if (clsmsk & i) {
-					level = spllist[i].FindSpell(type);
-				}
-			}
-		}
-	}
-	return 0;
-}
+}*/
 
 int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
@@ -237,9 +223,29 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
 	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
 	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
+// there is no gui page for specialists spells, so let's skip them here
+// otherwise their overlap causes bards and sorcerers to have their spells
+// on the wizard page
+//	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
+
+	// try harder for the rest
+	for (int i = 0;i<splcount;i++) {
+		if (spllist[i].Equals(name) ) {
+			// iterate over table columns ("kits" - book types)
+			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+				if (clsmsk & (1<<type)) {
+					level = spllist[i].FindSpell(type);
+					// FIXME: returning the first will misplace spells for multiclasses
+					return type;
+				}
+			}
+		}
+	}
 	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
-	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
-	return SpellType(name, level, clsmsk);
+
+	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name, clsmsk, kit);
+	// pseudorandom fallback
+	return IE_IWD2_SPELL_WIZARD;
 }
 
 //int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const

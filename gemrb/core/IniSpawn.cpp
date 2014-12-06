@@ -810,15 +810,6 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 	}
 }
 
-bool IniSpawn::Schedule(ieDword appearance, ieDword gametime) const
-{
-	ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
-	if (appearance & bit) {
-		return true;
-	}
-	return false;
-}
-
 void IniSpawn::SpawnGroup(SpawnEntry &event)
 {
 	if (!event.critters) {

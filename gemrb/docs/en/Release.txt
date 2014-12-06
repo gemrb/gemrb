@@ -1,6 +1,18 @@
 How to make a release
 *********************
 
+Cleanup and pre-testing
+=======================
+Check if there are any open patches, pull requests or important stashes
+laying around. Engage, triage and finalize/delay. It sucks to be waiting
+for feedback too long, especially if you're an outsider.
+
+Ideally make a speed run through one of the games to find any regressions.
+BG2 intro area and TOB up to Saradush will test a lot of subsystems in a
+short time.
+
+Fix, revert or delay the release as needed.
+
 Preparing and testing GIT
 =========================
 
@@ -13,6 +25,7 @@ Preparing and testing GIT
 
 * Make sure that GemRB GIT is in compilable and runnable state
   - download a clean GIT tree and test it.
+  - the minimal test should not fail
   - Make distribution .tar.gz (see Source release below) and test it as well -
     especially make sure all needed files are included.
 
@@ -49,7 +62,7 @@ Linux binary release
 Windows binary release
 ======================
 
-If gembot is around on IRC, ask it to make a build for the tagged revision:
+If gembot is around on IRC, ask tomprince to make a build for the tagged revision:
   gembot: force build --revision=701453842c7cb5783 nmake-msvc++10 release build
   gembot: watch nmake-msvc++10
 

@@ -1689,7 +1689,7 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 	}
 	Highlightable *trap = (Highlightable *)Sender;
 
-	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD);
+	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	int ret = 0;
 	if (tgts) {
 		targetlist::iterator m;
@@ -2051,7 +2051,7 @@ int GameScript::CheckSkill(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	int sk = actor->GetSkill( parameters->int1Parameter );
+	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if ( sk == parameters->int0Parameter) {
 		return 1;
@@ -2081,7 +2081,7 @@ int GameScript::CheckSkillGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	int sk = actor->GetSkill( parameters->int1Parameter );
+	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if ( sk > parameters->int0Parameter) {
 		return 1;
@@ -2109,7 +2109,7 @@ int GameScript::CheckSkillLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	int sk = actor->GetSkill( parameters->int1Parameter );
+	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if ( sk < parameters->int0Parameter) {
 		return 1;
@@ -3200,19 +3200,19 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 //this trigger uses hours
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300 == (ieDword) parameters->int0Parameter;
+	return Schedule(1 << parameters->int0Parameter, core->GetGame()->GameTime);
 }
 
 //this trigger uses hours
 int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300 > (ieDword) parameters->int0Parameter;
+	return Schedule(0xFFFFFFu << (parameters->int0Parameter + 1), core->GetGame()->GameTime);
 }
 
 //this trigger uses hours
 int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300 < (ieDword) parameters->int0Parameter;
+	return Schedule(0xFFFFFFu >> (24 - parameters->int0Parameter - 1), core->GetGame()->GameTime);
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
@@ -3814,11 +3814,19 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 	return (Sender->ScriptTicks % delay) <= Sender->IdleTicks;
 }
 
+#define TIMEOFDAY_DAY		0	/* 7-21 */
+#define TIMEOFDAY_DUSK		1	/* 21-22 */
+#define TIMEOFDAY_NIGHT		2	/* 22-6 */
+#define TIMEOFDAY_MORNING	3	/* 6-7 */
+
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	ieDword timeofday = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/1800;
+	int hour = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300;
 
-	if (timeofday==(ieDword) parameters->int0Parameter) {
+	if ((parameters->int0Parameter == TIMEOFDAY_DAY && hour >= 7 && hour < 21)
+		|| (parameters->int0Parameter == TIMEOFDAY_DUSK && hour == 21)
+		|| (parameters->int0Parameter == TIMEOFDAY_NIGHT && (hour >= 22 || hour < 6))
+		|| (parameters->int0Parameter == TIMEOFDAY_MORNING && hour == 6)) {
 		return 1;
 	}
 	return 0;

@@ -136,6 +136,9 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index)
 		Log(ERROR, "WMPImporter", "Worldmap image not found.");
 	} else {
 		m->SetMapMOS(mos->GetSprite2D());
+		if (!m->GetMapMOS()) {
+			Log(ERROR, "WMPImporter", "Worldmap image malformed!");
+		}
 	}
 
 	// Load location icon bam

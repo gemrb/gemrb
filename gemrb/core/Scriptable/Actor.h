@@ -404,7 +404,6 @@ private:
 	void RefreshPCStats();
 	void RefreshHP();
 	bool ShouldHibernate();
-	void ApplyClassClab(int cls, bool remove);
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData();
@@ -584,7 +583,7 @@ public:
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
-	bool ApplyKit(bool remove);
+	bool ApplyKit(bool remove, ieDword baseclass=0);
 	/* applies the class abilities*/
 	void ApplyClab(const char *clab, ieDword max, bool remove);
 	/* calls InitQuickSlot in PCStatStruct */
@@ -606,7 +605,7 @@ public:
 	/* debug function */
 	void GetNextStance();
 	/* learns the given spell, possibly receive XP */
-	int LearnSpell(const ieResRef resref, ieDword flags);
+	int LearnSpell(const ieResRef resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
 	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
@@ -759,10 +758,10 @@ public:
 	int GetMaxEncumbrance() const;
 	int GetAbilityBonus(unsigned int ability, int value = -1) const;
 	int GetSkillStat(unsigned int skill) const;
-	int GetSkill(unsigned int skill) const;
+	int GetSkill(unsigned int skill, bool ids=false) const;
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
-	void SetFeatValue(unsigned int feat, int value);
+	void SetFeatValue(unsigned int feat, int value, bool init = true);
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char *AnimationType, int WeaponType=-1);

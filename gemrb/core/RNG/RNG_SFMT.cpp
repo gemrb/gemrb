@@ -2,6 +2,10 @@
 #include <climits>
 #include "System/Logging.h"
 
+#ifdef WIN32
+#include <ctime>
+#endif
+
 // This is from gcc sources, namely from fixincludes/inclhack.def
 // On C++11 systems, <cstdint> could be included instead.
 #ifndef UINT64_MAX

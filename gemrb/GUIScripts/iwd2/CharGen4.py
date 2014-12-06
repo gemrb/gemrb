@@ -18,14 +18,14 @@
 #
 #character generation (GUICG 0)
 import GemRB
-from ie_stats import *
 import CharOverview
+import IDLUCommon
+import CommonTables
+from ie_stats import *
 
 #this is the same list as in GUIREC
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
-Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
-IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
-IE_LEVELSORCERER, IE_LEVEL2]
+Classes = IDLUCommon.Levels
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -33,7 +33,8 @@ def OnLoad():
 	Class=GemRB.GetVar ("BaseClass")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	#kit
-	GemRB.SetPlayerStat (MyChar, IE_KIT, GemRB.GetVar ("Class") )
+	Kit = CommonTables.Classes.GetValue (GemRB.GetVar ("Class")-1, 2)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 
 	#works only for the first level character generation
 	#if this code ever needs to be more versatile, consider saving the

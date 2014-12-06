@@ -90,6 +90,7 @@ static int *booktypes = NULL;
 static int *xpbonus = NULL;
 static int *defaultprof = NULL;
 static int *castingstat = NULL;
+static int *iwd2spltypes = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
@@ -108,6 +109,7 @@ static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal,
 //XP adjustments on easy setting (need research on the amount)
 //Seems like bg1 halves xp, bg2 doesn't have any impact
 static int xpadjustments[6]={0, 0, 0, 0, 0, 0};
+static int luckadjustments[6]={0, 0, 0, 0, 0, 0};
 
 static int FistRows = -1;
 static int *wmlevels[20];
@@ -812,10 +814,36 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 #define KIT_SWASHBUCKLER 0x100000
 #define KIT_BARBARIAN 0x40000000
 
+// iwd2 supports multiple kits, but sanely only one kit per class
+static int GetIWD2KitIndex (ieDword kit, const char *resref="classes", ieDword baseclass=0)
+{
+	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref));
+	int idx = -1;
+	if (tm) {
+		int offset = tm->FindTableValue("CLASS", baseclass);
+		int i = 0;
+		const char *classname = tm->GetRowName(offset+i);
+		while (atoi(tm->QueryField(classname, "CLASS")) == (signed)baseclass) {
+			ieDword akit = strtol(tm->QueryField(classname, "ID"), NULL, 16);
+			if (kit & akit) {
+				idx = offset+i;
+				break;
+			}
+			i++;
+			classname = tm->GetRowName(offset+i);
+		}
+	}
+	return idx;
+}
+
 //TODO: make kitlist column 6 stored internally
-static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
+static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword baseclass=0)
 {
 	int kitindex = 0;
+
+	if (iwd2class) {
+		return GetIWD2KitIndex(kit, "classes", baseclass);
+	}
 
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
 		kitindex = kit&0xfff;
@@ -834,8 +862,10 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 	return (ieDword)kitindex;
 }
 
+// iwd2 kit usability matches kit ids, so this should never be used
 static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 {
+	if (third) error("Actor", "Tried to look up iwd2 kit usability the bg2 way!\n");
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
 		int kitindex = kit&0xfff;
 		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
@@ -847,18 +877,30 @@ static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 	return kit;
 }
 
-//applies a kit on the character (only bg2)
-bool Actor::ApplyKit(bool remove)
+//applies a kit on the character
+// iwd2 has support for multikit characters, so we have more work
+bool Actor::ApplyKit(bool remove, ieDword baseclass)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
-	ieDword row = GetKitIndex(kit);
+	ieDword row = GetKitIndex(kit, "kitlist", baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
-
-	if (row) {
+	ieDword cls = GetStat(IE_CLASS);
+	Holder<TableMgr> tm;
+	if (iwd2class) {
+		if ((signed)row == -1) { // our caller didn't care to pass a baseclass
+			return false;
+		}
+		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
+		if (tm) {
+			//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
+			clab = tm->QueryField(row, 4);
+		}
+		cls = baseclass;
+	} else if (row) {
 		//kit abilities
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+		tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
 		if (tm) {
 			kitclass = (ieDword) atoi(tm->QueryField(row, 7));
 			clab = tm->QueryField(row, 4);
@@ -883,12 +925,12 @@ bool Actor::ApplyKit(bool remove)
 		return true;
 	}
 	//single class
-	ieDword cls = GetStat(IE_CLASS);
 	if (cls>=(ieDword) classcount) {
 		return false;
 	}
 	max = GetLevelInClass(cls);
-	if (kitclass==cls) {
+	// iwd2 has clabs for kits and classes in the same table
+	if (kitclass==cls || iwd2class) {
 		ApplyClab(clab, max, remove);
 	} else {
 		ApplyClab(classabilities[cls], max, remove);
@@ -942,7 +984,8 @@ static void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 }
 
 //this is a good place to recalculate level up stuff
-static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
+// iwd2 has separate stats and requires more data for clab application
+static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword baseClass=0)
 {
 	ieDword sum =
 		actor->GetFighterLevel()+
@@ -959,9 +1002,64 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
 	if (newValue!=oldValue) {
-		actor->ApplyKit(false);
+		actor->ApplyKit(false, baseClass);
 	}
 	actor->GotLUFeedback = false;
+}
+
+static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISFIGHTER]);
+}
+
+static void pcf_level_mage (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISMAGE]);
+}
+
+static void pcf_level_thief (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISTHIEF]);
+}
+
+static void pcf_level_barbarian (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARBARIAN]);
+}
+
+static void pcf_level_bard (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARD]);
+}
+
+static void pcf_level_cleric (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISCLERIC]);
+}
+
+static void pcf_level_druid (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISDRUID]);
+}
+
+static void pcf_level_monk (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISMONK]);
+}
+
+static void pcf_level_paladin (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISPALADIN]);
+}
+
+static void pcf_level_ranger (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISRANGER]);
+}
+
+static void pcf_level_sorcerer (Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	pcf_level(actor, oldValue, newValue, classesiwd2[ISSORCERER]);
 }
 
 static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -973,8 +1071,22 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	int sorcerer=0;
 	if (newValue<(ieDword) classcount) {
 		switch(booktypes[newValue]) {
-		case 2: sorcerer = 1<<IE_SPELL_TYPE_WIZARD; break; //sorcerer
-		case 3: sorcerer = 1<<IE_SPELL_TYPE_PRIEST; break; //divine caster with sorc. style spells
+		case 2:
+			// arcane sorcerer-style
+			if (third) {
+				sorcerer = 1 << iwd2spltypes[newValue];
+			} else {
+				sorcerer = 1<<IE_SPELL_TYPE_WIZARD;
+			}
+			break;
+		case 3:
+			// divine caster with sorc. style spells
+			if (third) {
+				sorcerer = 1 << iwd2spltypes[newValue];
+			} else {
+				sorcerer = 1<<IE_SPELL_TYPE_PRIEST;
+			}
+			break;
 		case 5: sorcerer = 1<<IE_IWD2_SPELL_SHAPE; break;  //divine caster with sorc style shapes (iwd2 druid)
 		default: break;
 		}
@@ -1320,11 +1432,11 @@ pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, pcf_intoxication, //1f
-NULL,NULL,pcf_level,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
+NULL,NULL,pcf_level_fighter,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
 pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
-pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level, pcf_level, NULL, NULL,
+pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
 NULL,NULL,NULL,pcf_minhitpoint, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
@@ -1346,7 +1458,7 @@ pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,pcf_dbutton,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
-pcf_level,pcf_level,pcf_level,pcf_level, pcf_level, pcf_level, pcf_level, pcf_level,
+pcf_level_barbarian,pcf_level_bard,pcf_level_cleric,pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
 
@@ -1411,6 +1523,11 @@ void Actor::ReleaseMemory()
 		if (castingstat) {
 			free(castingstat);
 			castingstat=NULL;
+		}
+
+		if (iwd2spltypes) {
+			free(iwd2spltypes);
+			iwd2spltypes = NULL;
 		}
 
 		if (xpbonus) {
@@ -1654,6 +1771,7 @@ static void InitActorTables()
 		classabilities = (char **) calloc(classcount, sizeof(char*));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
 		castingstat = (int *) calloc(classcount, sizeof(int));
+		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
 
@@ -1715,6 +1833,9 @@ static void InitActorTables()
 			if (third) {
 				field = tm->QueryField(rowname, "CASTING"); // COL_HATERACE but different name
 				castingstat[i] = atoi(field);
+
+				field = tm->QueryField(rowname, "SPLTYPE");
+				iwd2spltypes[i] = atoi(field);
 			}
 
 			field = tm->QueryField(rowname, "HATERACE");
@@ -2325,9 +2446,14 @@ static void InitActorTables()
 	tm.load("skillrac");
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
+	int subracetable = core->LoadSymbol("subrace");
 	Holder<SymbolMgr> race = NULL;
+	Holder<SymbolMgr> subrace = NULL;
 	if (racetable != -1) {
 		race = core->GetSymbol(racetable);
+	}
+	if (subracetable != -1) {
+		subrace = core->GetSymbol(subracetable);
 	}
 	if (tm) {
 		int cols = tm->GetColumnCount();
@@ -2343,7 +2469,11 @@ static void InitActorTables()
 					if (racetable == -1) {
 						value = 0;
 					} else {
-						value = race->GetValue(tm->GetRowName(i));
+						if (subracetable == -1) {
+							value = race->GetValue(tm->GetRowName(i));
+						} else {
+							value = subrace->GetValue(tm->GetRowName(i));
+						}
 					}
 					skillrac[i].push_back (value);
 				} else {
@@ -2358,9 +2488,11 @@ static void InitActorTables()
 	if (tm) {
 		memset(xpadjustments, 0, sizeof(xpadjustments) );
 		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
+		memset(luckadjustments, 0, sizeof(luckadjustments) );
 		for (i=0; i<6; i++) {
 			dmgadjustments[i] = atoi(tm->QueryField(0, i) );
 			xpadjustments[i] = atoi(tm->QueryField(1, i) );
+			luckadjustments[i] = atoi(tm->QueryField(2, i) );
 		}
 	}
 
@@ -3147,6 +3279,9 @@ void Actor::RefreshPCStats() {
 
 	UpdateFatigue();
 
+	// add luck bonus from difficulty
+	Modified[IE_LUCK] += luckadjustments[GameDifficulty];
+
 	// regenerate actors with high enough constitution
 	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
 	if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
@@ -3158,11 +3293,14 @@ void Actor::RefreshPCStats() {
 	// PICK_POCKETS  OPEN_LOCKS  FIND_TRAPS  MOVE_SILENTLY  HIDE_IN_SHADOWS  DETECT_ILLUSION  SET_TRAPS
 	Modified[IE_PICKPOCKET] += GetSkillBonus(1);
 	Modified[IE_LOCKPICKING] += GetSkillBonus(2);
-	Modified[IE_TRAPS] += GetSkillBonus(3);
+	// these are governed by other stats in iwd2 (int) or don't exist (set traps)
+	if (!third) {
+		Modified[IE_TRAPS] += GetSkillBonus(3);
+		Modified[IE_DETECTILLUSIONS] += GetSkillBonus(6);
+		Modified[IE_SETTRAPS] += GetSkillBonus(7);
+	}
 	Modified[IE_STEALTH] += GetSkillBonus(4);
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
-	Modified[IE_DETECTILLUSIONS] += GetSkillBonus(6);
-	Modified[IE_SETTRAPS] += GetSkillBonus(7);
 }
 
 // add fatigue every 4 hours since resting and check if the actor is penalised for it
@@ -3371,22 +3509,26 @@ void Actor::VerbalConstant(int start, int count) const
 	ieDword subtitles = 0;
 	core->GetDictionary()->Lookup("Subtitles", subtitles);
 
+	if (!subtitles || count < 0) {
+		return;
+	}
+
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
-	if (PCStats && PCStats->SoundSet[0]) {
+	if (subtitles && PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
-		ResolveStringConstant(soundref, start+count-1);
-		while (count > 0 && !gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
+		do {
 			count--;
-			ResolveStringConstant(soundref, start+count-1);
-		}
-		if (count > 0 && subtitles){
-			DisplayStringCore((Scriptable *const) this, start + RAND(0, count-1), DS_CONSOLE|DS_CONST|DS_SPEECH);
-		}
+			ResolveStringConstant(soundref, start+count);
+			if (gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
+				DisplayStringCore((Scriptable *const) this, start + RAND(0, count), DS_CONSOLE|DS_CONST|DS_SPEECH);
+				break;
+			}
+		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
-		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
+		while (count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
 		}
-		if(count > 0 && subtitles) {
+		if (count > 0) {
 			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+RAND(0, count-1)), DS_CONSOLE|DS_SPEECH);
 		}
 	}
@@ -3667,6 +3809,22 @@ void Actor::IdleActions(bool nonidle)
 bool Actor::OverrideActions()
 {
 	//TODO:: implement forced actions that mess with scripting (panic, confusion, etc)
+	// domination and dire charm: force the actors to be useful (trivial ai)
+	Action *action;
+	if (fxqueue.HasEffect(fx_set_charmed_state_ref)) {
+		if (fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 3) ||
+			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1003) ||
+			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 5) ||
+			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1005)) {
+			action = GenerateAction("AttackReevaluate(NearestEnemyOf(Myself))");
+			if (action) {
+				AddActionInFront(action);
+				return true;
+			} else {
+				Log(ERROR, "Actor", "Cannot generate override action");
+			}
+		}
+	}
 	return false;
 }
 
@@ -4220,7 +4378,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("MC Flags: 0x%x    ", Modified[IE_MC_FLAGS]);
 	buffer.appendFormatted("TalkCount:  %d   \n", TalkCount );
 	buffer.appendFormatted("Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
-	buffer.appendFormatted("Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
+	buffer.appendFormatted("Class:      %d   current class:%d    Kit: %d (base: %d)\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT] );
 	buffer.appendFormatted("Race:       %d   current race:%d\n", BaseStats[IE_RACE], Modified[IE_RACE] );
 	buffer.appendFormatted("Gender:     %d   current gender:%d\n", BaseStats[IE_SEX], Modified[IE_SEX] );
 	buffer.appendFormatted("Specifics:  %d   current specifics:%d\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC] );
@@ -5459,6 +5617,10 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 		} else {
 			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
 		}
+		if (third) {
+			// iwd2 doesn't set the usability mask
+			wi.backstabbing = true;
+		}
 	}
 
 	if (which && (which->RechargeFlags&IE_ITEM_KEEN)) {
@@ -5488,7 +5650,7 @@ void Actor::GetNextStance()
 	SetStance( Stance );
 }
 
-int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
+int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int level)
 {
 	//don't fail if the spell is also memorized (for innates)
 	if (! (flags&LS_MEMO)) {
@@ -5526,8 +5688,11 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		}
 	}
 
-	int clsmsk = GetBookMask();
-	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, clsmsk, kit );
+	// only look it up if none was passed
+	if (bookmask == -1) {
+		bookmask = GetBookMask();
+	}
+	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
 	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
@@ -5999,6 +6164,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//or i just got lost a negation somewhere
 		prof += -4;
 	} else {
+		// iwd2 adds a -4 penalty nonprof penalty (others below)
 		// everyone is proficient with fists
 		if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
 			prof += wspecial[stars][0];
@@ -6201,7 +6367,7 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 void Actor::GetTHAbilityBonus(ieDword Flags)
 {
 	int dexbonus = 0, strbonus = 0;
-	//add strength bonus if we need
+	// add strength bonus (discarded for ranged weapons later)
 	if (Flags&WEAPON_USESTRENGTH) {
 		if (third) {
 			strbonus = GetAbilityBonus(IE_STR );
@@ -6234,8 +6400,8 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 			} else {
 				dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			}
-			//TODO: check what to do with weapons with WEAPON_USESTRENGTH (there's a sling in bg2 with it)
-			// do these stack or are handled like finesse or are really only damage boni or there is no game with both?
+			// WEAPON_USESTRENGTH only affects weapon damage
+			strbonus = 0;
 			break;
 		// no ability tohit bonus for WEAPON_FIST
 	}
@@ -6967,7 +7133,7 @@ void Actor::AddExperience(int exp, int combat)
 	if (core->HasFeature(GF_WISDOM_BONUS)) {
 		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
 	}
-	int adjustmentPercent = dmgadjustments[GameDifficulty];
+	int adjustmentPercent = xpadjustments[GameDifficulty];
 	// the "Suppress Extra Difficulty Damage" also switches off the XP bonus
 	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
 		exp += exp * adjustmentPercent/100;
@@ -6997,11 +7163,7 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 	}
 
 	//check for schedule
-	ieDword bit = 1<<((gametime/6)%7200/300);
-	if (appearance & bit) {
-		return true;
-	}
-	return false;
+	return GemRB::Schedule(appearance, gametime);
 }
 
 void Actor::NewPath()
@@ -8406,7 +8568,7 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	}
 }
 
-void Actor::SetFeatValue(unsigned int feat, int value)
+void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 {
 	if (feat>=MAX_FEATS) {
 		return;
@@ -8423,7 +8585,10 @@ void Actor::SetFeatValue(unsigned int feat, int value)
 		SetFeat(feat, BM_NAND);
 		if (featstats[feat]) SetBase(featstats[feat], 0);
 	}
-	ApplyFeats();
+
+	if (init) {
+		 ApplyFeats();
+	}
 }
 
 void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int wt)
@@ -8713,8 +8878,20 @@ int Actor::GetSkillStat(unsigned int skill) const
 	return skillstats[skill];
 }
 
-int Actor::GetSkill(unsigned int skill) const
+int Actor::GetSkill(unsigned int skill, bool ids) const
 {
+	if (!ids) {
+		// FIXME: inefficient
+		bool found = false;
+		for (int i=0; i<skillcount; i++) {
+			if ((signed)skill == skillstats[i]) {
+				found = true;
+				skill = i;
+				break;
+			}
+		}
+		if (!found) return -1;
+	}
 	if (skill>=(unsigned int) skillcount) return -1;
 	int ret = GetStat(skillstats[skill]);
 	int base = GetBase(skillstats[skill]);
@@ -8847,6 +9024,13 @@ void Actor::CreateDerivedStatsIWD2()
 {
 	int i;
 	int turnundeadlevel = 0;
+	int classid = BaseStats[IE_CLASS];
+
+	// this works only for PC classes
+	if (classid>=CLASS_PCCUTOFF) return;
+
+	// recalculate all level based changes
+	pcf_level(this, 0, 0, classid);
 
 	// iwd2 does have backstab.2da but it is both unused and with bad data
 	ieDword backstabdamagemultiplier = 0;
@@ -9542,7 +9726,7 @@ int Actor::GetBookMask() const
 	int bookmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {
 		if (Modified[levelslotsiwd2[i]] > 0) {
-			bookmask |= 1<<((1<<booksiwd2[i])-1);
+			bookmask |= 1 << booksiwd2[i];
 		}
 	}
 
@@ -9557,6 +9741,11 @@ int Actor::GetSkillBonus(unsigned int col) const
 
 	// race
 	int lookup = Modified[IE_RACE];
+	if (third) {
+		// lookup by subrace
+		int subrace = Modified[IE_SUBRACE];
+		if (subrace) lookup = lookup<<16 | subrace;
+	}
 	int bonus = 0;
 	std::vector<std::vector<int> >::iterator it = skillrac.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills

@@ -681,11 +681,9 @@ void Map::UpdateScripts()
 		//The default area script is in the last slot anyway
 		//ExecuteScript( MAX_SCRIPTS );
 		Update();
+	} else {
+		ProcessActions();
 	}
-
-	//Execute Pending Actions
-	//if it is only here, then the drawing will fail
-	ProcessActions();
 
 	// If scripts frozen, return.
 	// This fixes starting a new IWD game. The above ProcessActions pauses the
@@ -785,9 +783,7 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
-
-
-			if (!DoStepForActor(actor, actor->speed, time)) more_steps = true;
+			more_steps = !DoStepForActor(actor, actor->speed, time);
 		}
 	}
 
@@ -884,7 +880,9 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
-	if (actor->Immobile() || !actor->ValidTarget(GA_NO_DEAD)) {
+	// Impbile, dead, or actors in another map cant walk here
+	if (actor->Immobile() || actor->GetCurrentArea() != this
+		|| !actor->ValidTarget(GA_NO_DEAD)) {
 		return true;
 	}
 
@@ -1518,6 +1516,32 @@ void Map::DeleteActor(int i)
 	}
 	//remove the actor from the area's actor list
 	actors.erase( actors.begin()+i );
+}
+
+Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)
+{
+	if (!objectID) return NULL;
+	
+	Scriptable *scr = GetActorByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	scr = GetInfoPointByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	scr = GetContainerByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	scr = GetDoorByGlobalID(objectID);
+	if (scr)
+		return scr;
+
+	if (GetGlobalID() == objectID)
+		scr = this;
+
+	return scr;
 }
 
 Door *Map::GetDoorByGlobalID(ieDword objectID)
@@ -3835,11 +3859,7 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 	}
 
 	//check for schedule
-	ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
-	if (appearance & bit) {
-		return true;
-	}
-	return false;
+	return GemRB::Schedule(appearance, gametime);
 }
 
 int AreaAnimation::GetHeight() const

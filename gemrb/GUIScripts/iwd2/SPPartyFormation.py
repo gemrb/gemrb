@@ -24,6 +24,7 @@ from GUIDefines import *
 
 PartyFormationWindow = 0
 ExitWindow = 0
+ReviewWindow = 0
 
 def OnLoad ():
 	global PartyFormationWindow
@@ -55,22 +56,23 @@ def OnLoad ():
 		ResRef = GemRB.GetPlayerPortrait (i-17, 1)
 		if ResRef == "":
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
 		else:
 			Button.SetPicture (ResRef)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewPress)
 
 		Button.SetVarAssoc ("Slot",i-17)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
 
 		Button = PartyFormationWindow.GetControl (i)
 		Button.SetVarAssoc ("Slot",i-17)
 		if ResRef == "":
 			Button.SetText (10264)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
 		else:
 			Button.SetText (GemRB.GetPlayerName (i-17,0) )
-
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewPress)
 
 	if Portraits == 0:
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -121,10 +123,6 @@ def ExitCancelPress ():
 
 def GeneratePress ():
 	global PartyFormationWindow
-	slot = GemRB.GetVar ("Slot")
-	ResRef = GemRB.GetPlayerPortrait (slot, 0)
-	if ResRef:
-		print "Already existing slot, we should drop it"
 	if PartyFormationWindow:
 		PartyFormationWindow.Unload ()
 	GemRB.SetNextScript ("CharGen")
@@ -133,5 +131,37 @@ def GeneratePress ():
 def EnterGamePress ():
 	GemRB.SetVar ("SaveDir",1) #iwd2 is always using 'mpsave'
 	GemRB.EnterGame ()
+	return
+
+def ReviewPress ():
+	global PartyFormationWindow, ReviewWindow
+
+	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
+	ReviewWindow = GemRB.LoadWindow (8)
+
+	DoneButton = ReviewWindow.GetControl (1)
+	DoneButton.SetText (11973)
+	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewDonePress)
+
+	LeftTextArea = ReviewWindow.GetControl (2)
+	RightTextArea = ReviewWindow.GetControl (3)
+
+	MyChar = GemRB.GetVar ("Slot")
+	LeftTextArea.SetText (GemRB.GetPlayerName (MyChar))
+	# TODO: mimic original; reuse GUIREC/CharOverview to reduce duplication
+	import GUIREC
+	GUIREC.DisplaySkills (MyChar, RightTextArea)
+
+	ReviewWindow.SetVisible (WINDOW_VISIBLE)
+	return
+
+def ReviewDonePress ():
+	global PartyFormationWindow, ReviewWindow
+
+	if ReviewWindow:
+		ReviewWindow.Unload ()
+	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
 	return
 

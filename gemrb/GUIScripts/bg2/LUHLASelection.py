@@ -67,10 +67,13 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 
 	# create the done button
 	HLADoneButton = HLAWindow.GetControl (28)
-	HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	HLADoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HLADonePress)
 	HLADoneButton.SetText(11973)
 	HLADoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	if HLACount:
+		HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	else:
+		HLADoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	# setup our text area
 	HLATextArea = HLAWindow.GetControl(26)
@@ -124,12 +127,8 @@ def HLADonePress ():
 		if HLARef[:2] == "AP":
 			GemRB.ApplySpell(pc, HLARef[3:])
 		elif HLARef[:2] == "GA":
-			# make sure it isn't already learned
-			SpellIndex = Spellbook.HasSpell (pc, HLAType, HLALevel, HLARef[3:])
-			if SpellIndex < 0: # gotta learn it
-				GemRB.LearnSpell (pc, HLARef[3:], LS_MEMO)
-			else: # memorize it again
-				GemRB.MemorizeSpell (pc, HLAType, HLALevel, SpellIndex)
+			# learn it or memorize another one
+			Spellbook.LearnSpell (pc, HLARef[3:], HLAType, HLALevel, 1, LS_MEMO)
 
 		#save the number of this HLA memorized
 		#TODO: check param2 (0 seems to work ok)

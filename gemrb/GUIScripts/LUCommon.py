@@ -73,13 +73,25 @@ def CanLevelUp(actor):
 	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
 	return (tmpNext != 0 and tmpNext <= xp)
 
+# expects a list of character levels of all classes
+# returns sparse list of class ids (of same length)
+def GetAllClasses (Levels):
+	Class = [0]*len(Levels)
+	for c in range(len(Levels)):
+		if Levels[c] > 0:
+			# level stats are implicitly keyed by class id
+			Class[c] = c + 1
+	return Class
+
 # internal shared function for the various Setup* stat updaters
 def _SetupLevels (pc, Level, offset=0, noclass=0):
 	#storing levels as an array makes them easier to deal with
 	if not Level:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)+offset, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2)+offset, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)+offset]
+		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
+		if GameCheck.IsIWD2():
+			import IDLUCommon
+			Levels = IDLUCommon.Levels
+		Levels = [ GemRB.GetPlayerStat (pc, l)+offset for l in Levels ]
 	else:
 		Levels = []
 		for level in Level:
@@ -102,6 +114,8 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
+	elif GameCheck.IsIWD2():
+		Class = GetAllClasses (Levels)
 
 	return Levels, NumClasses, Class
 
@@ -277,6 +291,8 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
+	elif GameCheck.IsIWD2():
+		Class = GetAllClasses (Levels)
 	if NumClasses>len(Levels):
 		return
 
@@ -296,7 +312,14 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	OldHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	CurrentHP = 0
 	Divisor = float (NumClasses)
+	if GameCheck.IsIWD2():
+		# hack around so we can reuse more of the main loop
+		NumClasses = len(Levels)
+		Divisor = 1.0
 	for i in range (NumClasses):
+		if GameCheck.IsIWD2() and not Class[i]:
+			continue
+
 		#check this classes hp table for any gain
 		if not ClassName or NumClasses > 1:
 			ClassName = GUICommon.GetClassRowName (Class[i], "class")
@@ -438,25 +461,4 @@ def SetSpell(pc, SpellName, Feat):
 	else:
 		GemRB.RemoveSpell(pc, SpellName)
 	return
-
-def AddPlayerStat(MyChar, stat, value):
-        value += GemRB.GetPlayerStat (MyChar, stat, 0)
-	#print "Set: ", stat," to ", value
-        GemRB.SetPlayerStat (MyChar, stat, value)
-        return
-
-def SetClassResistances(MyChar, clsstitle):
-        resistances = GemRB.LoadTable ("clssrsmd")
-        AddPlayerStat (MyChar, IE_RESISTFIRE, resistances.GetValue ( clsstitle, "FIRE") )
-        AddPlayerStat (MyChar, IE_RESISTCOLD, resistances.GetValue ( clsstitle, "COLD") )
-        AddPlayerStat (MyChar, IE_RESISTELECTRICITY, resistances.GetValue ( clsstitle, "ELEC") )
-        AddPlayerStat (MyChar, IE_RESISTACID, resistances.GetValue ( clsstitle, "ACID") )
-        AddPlayerStat (MyChar, IE_RESISTMAGIC, resistances.GetValue ( clsstitle, "SPELL") )
-        AddPlayerStat (MyChar, IE_RESISTMAGICFIRE, resistances.GetValue ( clsstitle, "MAGIC_FIRE") )
-        AddPlayerStat (MyChar, IE_RESISTMAGICCOLD, resistances.GetValue ( clsstitle, "MAGIC_COLD") )
-        AddPlayerStat (MyChar, IE_RESISTSLASHING, resistances.GetValue ( clsstitle, "SLASHING") )
-        AddPlayerStat (MyChar, IE_RESISTCRUSHING, resistances.GetValue ( clsstitle, "BLUDGEONING") )
-        AddPlayerStat (MyChar, IE_RESISTPIERCING, resistances.GetValue ( clsstitle, "PIERCING") )
-        AddPlayerStat (MyChar, IE_RESISTMISSILE, resistances.GetValue ( clsstitle, "MISSILE") )
-        return
 

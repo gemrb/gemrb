@@ -183,7 +183,6 @@ def FixAnomen( idx):
 
 #do all the stuff not done yet
 def FixProtagonist( idx):
-	
 	ClassName = GUICommon.GetClassRowName (idx)
 	KitIndex = GUICommon.GetKitIndex (idx)
 	# only give a few items for transitions from soa
@@ -205,31 +204,44 @@ def FixProtagonist( idx):
 			GemRB.SetPlayerStat(idx, IE_XP, xp2)
 			GemRB.SetGlobal("XPGIVEN","GLOBAL", xp2-xp)
 
-		FixFamiliar()
-		FixInnates()
+		FixFamiliar (idx)
+		FixInnates (idx)
 	else:
 		GiveEquipment(idx, ClassName, KitIndex)
+		FixInnates (idx)
 	return
 
-# TODO: replace the familiar with the improved version
-def FixFamiliar():
-	# famcat->famcat25
-	# famdust->famdus25
-	# famfair->famfai25
-	# famfer->famfer25
-	# famimp->famimp25
-	# fampsd->fampsd25
-	# famquas->famqua25
-	# famrab->famrab25
-	# resummon the familiar? Make sure the marker effect is there, so death would incur the constitution penalty
+# replace the familiar with the improved version
+# NOTE: fx_familiar_marker destroys the old one and creates a new one (as proper actors)
+def FixFamiliar(pc):
+	# if the critter is outside, summoned, the effect will upgrade it (fx_familiar_marker runs on it)
+	# if the critter is packed in your inventory, it will be upgraded as soon as it gets released
+	# after picking it up again, also the inventory item will be new
 	pass
 
-# TODO: replace bhaal powers with the improved versions (cross-check with chargen; powers are removed during soa)
-def FixInnates():
-	# removes the spells: SPIN101, SPIN102, SPIN103, SPIN104, SPIN105, SPIN106, SPIN822
-	# adds the spell: SPIN822 (slayer change), check if this is needed (two uses), since we add it during chargen
-	#adds the spell: SPIN200, SPIN201, SPIN103, SPIN202, SPIN203, SPIN106
-	pass
+# replace bhaal powers with the improved versions
+# or add the new ones, since soa transitioners lost them in hell
+# abstart.2da was not updated for tob
+def FixInnates(pc):
+	import Spellbook
+	from ie_spells import LS_MEMO
+	from ie_stats import IE_ALIGNMENT
+	# adds the spell: SPIN822 (slayer change) if needed
+	if Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 1, "SPIN822") == -1:
+		GemRB.LearnSpell (pc, "SPIN822", LS_MEMO)
+
+	# apply starting (alignment dictated) abilities (just to be replaced later)
+	# pc, table, new level, level diff, alignment
+	AlignmentAbbrev = CommonTables.Aligns.FindValue ("VALUE", GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
+	GUICommon.AddClassAbilities (pc, "abstart", 6,6, AlignmentAbbrev)
+
+	# some old/new pairs are the same, so we can skip them
+	# all the innates are doubled
+	old = [ "SPIN101", "SPIN102", "SPIN104", "SPIN105" ]
+	new = [ "SPIN200", "SPIN201", "SPIN202", "SPIN203" ]
+	for i in range(len(old)):
+		if GemRB.RemoveSpell (pc, old[i]):
+			Spellbook.LearnSpell (pc, new[i], IE_SPELL_TYPE_INNATE, 3, 2, LS_MEMO)
 
 #upgrade savegame to next version
 def GameExpansion():
