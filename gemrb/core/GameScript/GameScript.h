@@ -31,6 +31,13 @@
 #include <cstdio>
 #include <vector>
 
+// absent from msvc6
+#ifdef _MSC_VER
+#ifndef __FUNCTION
+#define __FUNCTION__ "no message"
+#endif
+#endif
+
 namespace GemRB {
 
 class Action;
