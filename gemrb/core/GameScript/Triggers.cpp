@@ -3815,11 +3815,19 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 	return (Sender->ScriptTicks % delay) <= Sender->IdleTicks;
 }
 
+#define TIMEOFDAY_DAY		0	/* 7-21 */
+#define TIMEOFDAY_DUSK		1	/* 21-22 */
+#define TIMEOFDAY_NIGHT		2	/* 22-6 */
+#define TIMEOFDAY_MORNING	3	/* 6-7 */
+
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	ieDword timeofday = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/1800;
+	int hour = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300;
 
-	if (timeofday==(ieDword) parameters->int0Parameter) {
+	if ((parameters->int0Parameter == TIMEOFDAY_DAY && hour >= 7 && hour < 21)
+		|| (parameters->int0Parameter == TIMEOFDAY_DUSK && hour == 21)
+		|| (parameters->int0Parameter == TIMEOFDAY_NIGHT && (hour >= 22 || hour < 6))
+		|| (parameters->int0Parameter == TIMEOFDAY_MORNING && hour == 6)) {
 		return 1;
 	}
 	return 0;
