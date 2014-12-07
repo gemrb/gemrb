@@ -441,7 +441,7 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	// flags: no deplete, instant, no interrupt
-	Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, 1, false, true, true);
+	Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;

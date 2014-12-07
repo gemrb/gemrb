@@ -1211,7 +1211,8 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 }
 
 // shortcut for internal use when there is no wait
-void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+// if any user needs casting time support, they should use Spell* actions directly
+void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete)
 {
 	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
 	Point TmpPos = LastTargetPos;
@@ -1219,7 +1220,7 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, 
 	int TmpHeader = SpellHeader;
 
 	SetSpellResRef(spellref);
-	CastSpellPoint(target, deplete, instant, nointerrupt);
+	CastSpellPoint(target, deplete, true, true);
 	CastSpellPointEnd(level, no_stance);
 
 	LastTargetPos = TmpPos;
@@ -1228,7 +1229,8 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, 
 }
 
 // shortcut for internal use
-void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+// if any user needs casting time support, they should use Spell* actions directly
+void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete)
 {
 	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
 	Point TmpPos = LastTargetPos;
@@ -1236,7 +1238,7 @@ void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int le
 	int TmpHeader = SpellHeader;
 
 	SetSpellResRef(spellref);
-	CastSpell(target, deplete, instant, nointerrupt);
+	CastSpell(target, deplete, true, true);
 	CastSpellEnd(level, no_stance);
 
 	LastTargetPos = TmpPos;
