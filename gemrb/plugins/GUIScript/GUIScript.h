@@ -38,6 +38,7 @@ namespace GemRB {
 #define SV_BPP 0
 #define SV_WIDTH 1
 #define SV_HEIGHT 2
+#define SV_GAMEPATH 3
 
 class GUIScript : public ScriptEngine {
 public:

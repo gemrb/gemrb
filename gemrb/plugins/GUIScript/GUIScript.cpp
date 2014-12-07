@@ -7902,6 +7902,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
 static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 {
 	int Variable, value;
+	char path[_MAX_PATH] = { '\0' };
 
 	if (!PyArg_ParseTuple( args, "i", &Variable)) {
 		return AttributeError( GemRB_GetSystemVariable__doc );
@@ -7910,9 +7911,14 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_BPP: value = core->Bpp; break;
 		case SV_WIDTH: value = core->Width; break;
 		case SV_HEIGHT: value = core->Height; break;
+		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
 		default: value = -1; break;
 	}
-	return PyInt_FromLong( value );
+	if (path[0]) {
+		return PyString_FromString(path);
+	} else {
+		return PyInt_FromLong( value );
+	}
 }
 
 PyDoc_STRVAR( GemRB_CreateItem__doc,
@@ -11136,13 +11142,6 @@ bool GUIScript::Init(void)
 
 	sprintf( string, "import GemRB\n");
 	if (PyRun_SimpleString( "import GemRB" ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string);
-		return false;
-	}
-
-	// FIXME: better would be to add GemRB.GetGamePath() or some such
-	sprintf( string, "GemRB.GamePath = \"%s\"", QuotePath( quoted, core->GamePath ));
-	if (PyRun_SimpleString( string ) == -1) {
 		Log(ERROR, "GUIScript", "Error running: %s", string);
 		return false;
 	}

@@ -20,15 +20,16 @@
 
 import os
 import GemRB
-
+from GUIDefines import SV_GAMEPATH
 
 fdict = {}
 
 # Create dict of files in GamePath and GamePath/data
-for file in os.listdir (GemRB.GamePath):
+GamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
+for file in os.listdir (GamePath):
     ufile = file.upper()
     if ufile == 'DATA':
-        for file2 in os.listdir (os.path.join(GemRB.GamePath, file)):
+        for file2 in os.listdir (os.path.join(GamePath, file)):
             fdict[file2.upper()] = 1
     else:
         fdict[ufile] = 1
