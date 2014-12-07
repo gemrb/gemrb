@@ -4335,7 +4335,7 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Point p(fx->PosX, fx->PosY);
-	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, fx->Parameter2, false);
+	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, true, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
