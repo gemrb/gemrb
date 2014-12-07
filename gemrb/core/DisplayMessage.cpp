@@ -54,6 +54,7 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 		for(int i=0;i<STRREF_COUNT;i++) {
 			table[i]=atoi(tab->QueryField(i,0));
 		}
+		loadedTable = name;
 		return true;
 	} else {
 		Log(ERROR, "DisplayMessage", "Unable to initialize DisplayMessage::StrRefs");
