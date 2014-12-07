@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-Label::Label(const Region& frame, Font* font, const char* string)
+Label::Label(const Region& frame, Font* font, const String& string)
 	: Control(frame)
 {
 	ControlType = IE_GUI_LABEL;
@@ -44,7 +44,7 @@ Label::Label(const Region& frame, Font* font, const char* string)
 		Alignment |= IE_FONT_SINGLE_LINE;
 	}
 	palette = NULL;
-	Control::SetText(string);
+	SetText(string);
 }
 
 Label::~Label()

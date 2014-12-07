@@ -391,9 +391,9 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &fore, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &alignment );
-				char* str = core->GetCString( StrRef );
-				Label* lab = new Label( ctrlFrame, fnt, str );
-				core->FreeString( str );
+				String* str = core->GetString( StrRef );
+				Label* lab = new Label( ctrlFrame, fnt, *str );
+				delete str;
 				lab->ControlID = ControlID;
 
 				if (alignment & 1) {

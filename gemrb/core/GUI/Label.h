@@ -51,7 +51,7 @@ protected:
 	void DrawInternal(Region& drawFrame);
 	bool HasBackground() { return false; }
 public: 
-	Label(const Region& frame, Font* font, const char* string);
+	Label(const Region& frame, Font* font, const String& string);
 	~Label();
 	/** This function sets the actual Label Text */
 	using Control::SetText;

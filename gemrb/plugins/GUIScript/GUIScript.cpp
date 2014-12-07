@@ -1854,7 +1854,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	Region frame = btn->ControlFrame();
 	frame.y += 5;
 	frame.h -= 10;
-	Label* lbl = new Label(frame, core->GetFont( font ), "" );
+	Label* lbl = new Label(frame, core->GetFont( font ), L"" );
 	lbl->ControlID = ControlID;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
@@ -1886,13 +1886,15 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	Label* lbl = new Label(rgn, core->GetFont( font ), text );
+	String* string = StringFromCString(text);
+	Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"" );
+	delete string;
+
 	lbl->ControlID = ControlID;
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
-
 	if (ret<0) {
 		return NULL;
 	}
