@@ -1213,17 +1213,35 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 // shortcut for internal use when there is no wait
 void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
 {
+	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
+	Point TmpPos = LastTargetPos;
+	ieDword TmpTarget = LastSpellTarget;
+	int TmpHeader = SpellHeader;
+
 	SetSpellResRef(spellref);
 	CastSpellPoint(target, deplete, instant, nointerrupt);
 	CastSpellPointEnd(level, no_stance);
+
+	LastTargetPos = TmpPos;
+	LastSpellTarget = TmpTarget;
+	SpellHeader = TmpHeader;
 }
 
 // shortcut for internal use
 void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
 {
+	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
+	Point TmpPos = LastTargetPos;
+	ieDword TmpTarget = LastSpellTarget;
+	int TmpHeader = SpellHeader;
+
 	SetSpellResRef(spellref);
 	CastSpell(target, deplete, instant, nointerrupt);
 	CastSpellEnd(level, no_stance);
+
+	LastTargetPos = TmpPos;
+	LastSpellTarget = TmpTarget;
+	SpellHeader = TmpHeader;
 }
 
 //set target as point
