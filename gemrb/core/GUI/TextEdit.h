@@ -66,6 +66,7 @@ public:
 	/** Set BackGround */
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
+	using Control::SetText;
 	void SetText(const char* string);
 	/** Gets the Text of the current control */
 	String QueryText() const;

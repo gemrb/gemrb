@@ -1355,14 +1355,13 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 	if (PyObject_TypeCheck( str, &PyInt_Type )) { // strref
 		ieStrRef StrRef = (ieStrRef)PyInt_AsLong( str );
 		String* string = core->GetString( StrRef );
-		if (string) {
-			ctrl->SetText(*string);
-			delete string;
-		}
+		ctrl->SetText(string);
+		delete string;
 	} else { // string value of the object
 		// PyNone will result in NULL string (clears the text)
-		const char* string = PyString_AsString( str );
+		const String* string = StringFromCString( PyString_AsString( str ) );
 		ctrl->SetText(string);
+		delete string;
 	}
 
 	Py_RETURN_NONE;
@@ -7531,7 +7530,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	Label* l = core->GetMessageLabel();
 	if (l) {
 		// this is how BG2 behaves, not sure about others
-		l->SetText(""); // clear previous message
+		l->SetText(L""); // clear previous message
 	}
 
 	GET_GAME();

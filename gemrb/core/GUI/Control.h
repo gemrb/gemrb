@@ -83,7 +83,7 @@ public:
 	void Draw(unsigned short x, unsigned short y);
 	void MarkDirty();
 	/** Sets the Text of the current control */
-	virtual void SetText(const char* string);
+	void SetText(const String*);
 	virtual void SetText(const String&) {};
 	/** Sets the Tooltip text of the current control */
 	int SetTooltip(const char* string);
