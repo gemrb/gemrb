@@ -2631,59 +2631,36 @@ int fx_sex_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_ids_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_ids_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	bool permanent = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
+	ieDword stat = 0;
 	switch (fx->Parameter2) {
 	case 0:
-		if (permanent) {
-			BASE_SET(IE_EA, fx->Parameter1);
-		} else {
-			STAT_SET(IE_EA, fx->Parameter1);
-		}
+		stat = IE_EA;
 		break;
 	case 1:
-		if (permanent) {
-			BASE_SET(IE_GENERAL, fx->Parameter1);
-		} else {
-			STAT_SET(IE_GENERAL, fx->Parameter1);
-		}
+		stat = IE_GENERAL;
 		break;
 	case 2:
-		if (permanent) {
-			BASE_SET(IE_RACE, fx->Parameter1);
-		} else {
-			STAT_SET(IE_RACE, fx->Parameter1);
-		}
+		stat = IE_RACE;
 		break;
 	case 3:
-		if (permanent) {
-			BASE_SET(IE_CLASS, fx->Parameter1);
-		} else {
-			STAT_SET(IE_CLASS, fx->Parameter1);
-		}
+		stat = IE_CLASS;
 		break;
 	case 4:
-		if (permanent) {
-			BASE_SET(IE_SPECIFIC, fx->Parameter1);
-		} else {
-			STAT_SET(IE_SPECIFIC, fx->Parameter1);
-		}
+		stat = IE_SPECIFIC;
 		break;
 	case 5:
-		if (permanent) {
-			BASE_SET(IE_SEX, fx->Parameter1);
-		} else {
-			STAT_SET(IE_SPECIFIC, fx->Parameter1);
-		}
+		stat = IE_SEX;
 		break;
 	case 6:
-		if (permanent) {
-			BASE_SET(IE_ALIGNMENT, fx->Parameter1);
-		} else {
-			STAT_SET(IE_ALIGNMENT, fx->Parameter1);
-		}
+		stat = IE_ALIGNMENT;
 		break;
 	default:
 		return FX_NOT_APPLIED;
+	}
+	if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+		BASE_SET(stat, fx->Parameter1);
+	} else {
+		STAT_SET(stat, fx->Parameter1);
 	}
 	return FX_PERMANENT;
 }
