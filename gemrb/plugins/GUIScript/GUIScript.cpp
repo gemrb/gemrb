@@ -1340,44 +1340,31 @@ PyDoc_STRVAR( GemRB_Control_SetText__doc,
 
 static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 {
-	PyObject* wi, * ci, * str;
-	long WindowIndex, ControlIndex, StrRef;
-	char* string;
+	int WindowIndex, ControlIndex;
+	PyObject* str;
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
-		return AttributeError( GemRB_Control_SetText__doc );
+	if (!PyArg_ParseTuple( args, "iiO", &WindowIndex, &ControlIndex, &str)) {
+		return AttributeError( GemRB_TextEdit_SetBufferLength__doc );
 	}
 
-	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
-		( !PyObject_TypeCheck( str, &PyString_Type ) &&
-		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
-		return AttributeError( GemRB_Control_SetText__doc );
-	}
-
-	WindowIndex = PyInt_AsLong( wi );
-	ControlIndex = PyInt_AsLong( ci );
 	Control *ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
 		return RuntimeError("Invalid Control");
 	}
 
-	if (PyObject_TypeCheck( str, &PyString_Type )) {
-		string = PyString_AsString( str );
-		if (string == NULL) {
-			return RuntimeError("Null string received");
+	if (PyObject_TypeCheck( str, &PyInt_Type )) { // strref
+		ieStrRef StrRef = (ieStrRef)PyInt_AsLong( str );
+		String* string = core->GetString( StrRef );
+		if (string) {
+			ctrl->SetText(*string);
+			delete string;
 		}
+	} else { // string value of the object
+		// PyNone will result in NULL string (clears the text)
+		const char* string = PyString_AsString( str );
 		ctrl->SetText(string);
-	} else {
-		StrRef = PyInt_AsLong( str );
-		if (StrRef == -1) {
-			ctrl->SetText(GEMRB_STRING);
-		} else {
-			char *tmpstr = core->GetCString( StrRef );
-			ctrl->SetText(tmpstr);
-			core->FreeString( tmpstr );
-		}
 	}
+
 	Py_RETURN_NONE;
 }
 
