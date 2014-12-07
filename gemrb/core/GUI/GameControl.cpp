@@ -1099,7 +1099,6 @@ void GameControl::DisplayTooltip() {
 					} else {
 						// non-neutral, not in party: display injured string
 						int strindex;
-						char *injuredstring = NULL;
 						// these boundaries are just a guess
 						if (hp == maxhp) {
 							strindex = STR_UNINJURED;
@@ -1113,16 +1112,14 @@ void GameControl::DisplayTooltip() {
 							strindex = STR_INJURED4;
 						}
 						strindex = displaymsg->GetStringReference(strindex);
-						if (strindex != -1) {
-							injuredstring = core->GetCString(strindex, 0);
-						}
+						String* injuredstring = core->GetString(strindex, 0);
 
 						if (!injuredstring) {
 							// eek, where did the string go?
 							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
 						} else {
-							snprintf(buffer, 100, "%s\n%s", name, injuredstring);
-							free(injuredstring);
+							snprintf(buffer, 100, "%s\n%ls", name, injuredstring->c_str());
+							delete injuredstring;
 						}
 					}
 				}

@@ -1204,18 +1204,15 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 		int IntMod = detective->GetAbilityBonus(IE_INT);
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
-			char tmpstr[100];
+			wchar_t tmpstr[100];
 			// eg. .:Casts Word of Recall:.
-			char *castmsg = core->GetCString(displaymsg->GetStringReference(STR_CASTS));
-			char *spellname = core->GetCString(spl->SpellName);
-			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", castmsg, spellname);
-			core->FreeString(castmsg);
-			core->FreeString(spellname);
+			String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
+			String* spellname = core->GetString(spl->SpellName);
+			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg->c_str(), spellname->c_str());
+			delete castmsg;
+			delete spellname;
 
-			String* str = StringFromCString(tmpstr);
-			SetOverheadText(*str);
-			delete str;
-
+			SetOverheadText(tmpstr);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
@@ -1413,16 +1410,11 @@ int Scriptable::CheckWildSurge()
 			// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
 			if ((check > 0) && (check < 100) ) {
 				// display feedback: Wild Surge: bla bla
-				char *s1 = core->GetCString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-				char *s2 = core->GetCString(core->SurgeSpells[check-1].message, 0);
-				size_t buflen = strlen(s1)+strlen(s2)+2;
-				wchar_t *s3 = (wchar_t *) malloc(buflen * sizeof(wchar_t));
-				swprintf(s3, buflen, L"%s %s", s1, s2);
-
-				core->FreeString(s1);
-				core->FreeString(s2);
-				displaymsg->DisplayStringName(s3, DMC_WHITE, this);
-				free(s3);
+				String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+				String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+				displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
+				delete s1;
+				delete s2;
 
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;

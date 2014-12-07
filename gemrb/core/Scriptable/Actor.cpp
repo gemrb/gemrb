@@ -4214,11 +4214,11 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			wchar_t tmp[64];
-			char* msg = core->GetCString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
-			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L"%s (%d)", msg, damage);
-			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
-			free(msg);
+			String* msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
+			wchar_t dmg[10];
+			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L" (%d)", damage);
+			displaymsg->DisplayStringName(*msg + dmg, DMC_WHITE, this);
+			delete msg;
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );

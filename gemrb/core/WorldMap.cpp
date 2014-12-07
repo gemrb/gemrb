@@ -64,9 +64,7 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 const String* WMPAreaEntry::GetCaption()
 {
 	if (!StrCaption) {
-		char* tmp = core->GetCString(LocCaptionName);
-		StrCaption = StringFromCString(tmp);
-		free(tmp);
+		StrCaption = core->GetString(LocCaptionName);
 	}
 	return StrCaption;
 }
