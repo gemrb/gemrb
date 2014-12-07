@@ -5426,20 +5426,17 @@ static Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 	return gamedata->GetBAMSprite(item->ItemIcon, -1, which, true);
 }
 
-static void SetItemText(int wi, int ci, int charges, bool oneisnone)
+static void SetItemText(Button* btn, int charges, bool oneisnone)
 {
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return;
-	}
-	char tmp[10];
+	if (!btn) return;
 
+	wchar_t usagestr[10];
 	if (charges && (charges>1 || !oneisnone) ) {
-		sprintf(tmp,"%d",charges);
+		swprintf(usagestr, sizeof(usagestr)/usagestr[0], L"%d", charges);
 	} else {
-		tmp[0]=0;
+		usagestr[0] = 0;
 	}
-	btn->SetText(tmp);
+	btn->SetText(usagestr);
 }
 
 PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
@@ -8575,13 +8572,10 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 			} else {
 				btn->SetTooltip(NULL);
 			}
-			char usagestr[10];
 
 			if (item->Charges && (item->Charges!=0xffff) ) {
-				sprintf(usagestr,"%d", item->Charges);
-				btn->SetText( usagestr );
-			}
-			if (!item->Charges && (item->ChargeDepletion==CHG_NONE) ) {
+				SetItemText(btn, item->Charges, false);
+			} else if (!item->Charges && (item->ChargeDepletion==CHG_NONE) ) {
 				btn->SetState(IE_GUI_BUTTON_DISABLED);
 			}
 		}
@@ -8709,7 +8703,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
-		SetItemText(wi, ci, 0, false);
+		SetItemText(btn, 0, false);
 		PyObject *ret = SetActionIcon(wi,ci,dict, action,i+1);
 
 		if (action!=-1) {
@@ -8867,7 +8861,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 						}
 					}
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, Item2ResRef);
-					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
+					SetItemText(btn, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
 						if (gc->GetTargetMode() == TARGET_MODE_ATTACK) {
@@ -8920,7 +8914,7 @@ jump_label2:
 				if (!mem) {
 					state = IE_GUI_BUTTON_FAKEDISABLED;
 				}
-				SetItemText(wi, ci, mem, true);
+				SetItemText(btn, mem, true);
 			}
 		}
 		break;
@@ -8960,7 +8954,7 @@ jump_label:
 					{
 						//SetItemIcon parameter needs header+6 to display extended header icons
 						SetItemIcon(wi, ci, item->ItemResRef,header+6,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, NULL);
-						SetItemText(wi, ci, usages, false);
+						SetItemText(btn, usages, false);
 					}
 				} else {
 					if (action == ACT_IWDQITEM) {
