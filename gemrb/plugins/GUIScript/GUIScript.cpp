@@ -1934,10 +1934,10 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 {
 	int WindowIndex, ControlID;
 	Region rgn;
-	char *font, *text;
+	char *font, *cstr;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &rgn.x,
-			&rgn.y, &rgn.w, &rgn.h, &font, &text )) {
+			&rgn.y, &rgn.w, &rgn.h, &font, &cstr )) {
 		return AttributeError( GemRB_Window_CreateTextEdit__doc );
 	}
 
@@ -1949,7 +1949,9 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
 	edit->SetFont( core->GetFont( font ) );
 	edit->ControlID = ControlID;
-	edit->SetText( text );
+	String* text = StringFromCString(cstr);
+	edit->Control::SetText( text );
+	delete text;
 	win->AddControl( edit );
 
 	Sprite2D* spr = core->GetCursorSprite();

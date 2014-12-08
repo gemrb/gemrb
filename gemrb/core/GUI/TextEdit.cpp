@@ -189,13 +189,9 @@ void TextEdit::SetFocus(bool focus)
 }
 
 /** Sets the Text of the current control */
-void TextEdit::SetText(const char* string)
+void TextEdit::SetText(const String& string)
 {
-	if (string) {
-		String* text = StringFromCString(string);
-		Text = *text;
-		delete text;
-	}
+	Text = string;
 	if (Text.length() > max) CurPos = max + 1;
 	else CurPos = Text.length();
 	MarkDirty();
