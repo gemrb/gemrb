@@ -61,17 +61,13 @@ bool MUSImporter::Init()
 /** Loads a PlayList for playing */
 bool MUSImporter::OpenPlaylist(const char* name)
 {
-	if (PLName[0] != '\0') {
-		int len = ( int ) strlen( PLName );
-		if (strnicmp( name, PLName, len ) == 0)
-			return true;
-	}
-	if (Playing) {
-		return false;
+	if (Playing || CurrentPlayList(name)) {
+		return true;
 	}
 	core->GetAudioDrv()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
+	PLName[0] = '\0';
 	if (name[0] == '*') {
 		return false;
 	}
@@ -233,8 +229,7 @@ int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 	if (Playing) {
 		//don't do anything if the requested song is already playing
 		//this fixed PST's infinite song start
-		int len = ( int ) strlen( PLName );
-		if (strnicmp( name, PLName, len ) == 0)
+		if (CurrentPlayList(name))
 			return 0;
 		if (Hard) {
 			HardEnd();
@@ -323,15 +318,12 @@ void MUSImporter::PlayMusic(char* name)
 	} else {
 		core->GetAudioDrv()->Stop();
 	}
-	print("Playing: %s", FName);
+	Log(MESSAGE, "MUSImporter", "Playing %s...", FName);
 }
 
 bool MUSImporter::CurrentPlayList(const char* name) {
-	int len = ( int ) strlen( PLName );
-	if (strnicmp( name, PLName, len ) == 0) return true;
-	return false;
+	return stricmp(name, PLName) == 0;
 }
-
 
 #include "plugindef.h"
 
