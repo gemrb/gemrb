@@ -5929,9 +5929,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		unsigned int i, dist;
 		ieResRef refs[4];
 		CopyResRef(refs[0], fx->Resource);
-		CopyResRef(refs[1], fx->Resource);
-		CopyResRef(refs[2], fx->Resource);
-		CopyResRef(refs[3], fx->Resource);
+		CopyResRef(refs[1], fx->Resource2);
+		CopyResRef(refs[2], fx->Resource3);
+		CopyResRef(refs[3], fx->Resource4);
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
 		ieResRef OldSpellResRef;
 		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
