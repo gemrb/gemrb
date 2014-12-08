@@ -536,6 +536,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 				if (fx->Parameter3!=0xffffffff) {
 					fx->Parameter3--;
 				}
+				delete newfx;
 			}
 		}
 	}
@@ -577,27 +578,34 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 3, 16);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_breath_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_death_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_poly_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_spell_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			break;
 		case 2: //black barbed shield
 			ConvertTiming (fx, core->Roll(10,3,0));
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			fx->Parameter3=0xffffffff;
 			break;
 		case 3: //pain mirror
@@ -606,6 +614,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorpulse_ref, 0xFAFF7000, 0x30000C);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			break;
 		case 4: //guardian mantle
 			ConvertTiming (fx, 50 + 5 * fx->CasterLevel);
@@ -619,9 +628,11 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		case 7: //armor
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x825A2800, -1);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 6, 16);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			break;
 		case 8: //antimagic shell
 			{
@@ -630,21 +641,26 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
 				newfx->Power = 10;
 				core->ApplyEffect(newfx, target, Owner);
+				delete newfx;
 
 				for (i=0;i<2;i++) {
 					newfx = EffectQueue::CreateEffectCopy(fx, fx_miscast_ref, 100, i);
 					core->ApplyEffect(newfx, target, Owner);
+					delete newfx;
 				}
 
 				for (i=1;i<10;i++) {
 					newfx = EffectQueue::CreateEffectCopy(fx, fx_protection_ref, i, 0);
 					core->ApplyEffect(newfx, target, Owner);
+					delete newfx;
 				}
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_magicdamage_ref, 100, 0);
 				core->ApplyEffect(newfx, target, Owner);
+				delete newfx;
 
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_set_state_ref, 1, STATE_ANTIMAGIC);
 				core->ApplyEffect(newfx, target, Owner);
+				delete newfx;
 			}
 			break;
 		case 9: case 10: //unused
@@ -655,38 +671,48 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_single_color_pulse_ref, 0xFF00, 0x400040);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x64FA00, 0x50005);
 			//wtf is this
 			newfx->IsVariable = 0x23;
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistfire_ref, 50, 1);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistmfire_ref, 50, 1);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			break;
 		case 12: //protection from evil
 			ConvertTiming (fx, 10 * fx->CasterLevel);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_breath_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_death_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_poly_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_spell_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 2, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			//terminate = FX_NOT_APPLIED;
 			break;
 		case 13: //conflagration
@@ -699,9 +725,11 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistfire_ref, 150, 1);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistmfire_ref, 150, 1);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			break;
 		case 15: //submerge the will
 			tint = 0x538D90;
@@ -709,21 +737,27 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 16);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_breath_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_death_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_poly_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_spell_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 1, 0);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			break;
 		case 16: //balance in all things
 			tint = 0x615AB4;
@@ -732,6 +766,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorpulse_ref, 0x615AB400, 0x30000C);
 			core->ApplyEffect(newfx, target, Owner);
+			delete newfx;
 			playonce = true;
 			break;
 		}
