@@ -3900,6 +3900,7 @@ void Actor::GetHit(int damage, int spellLevel)
 		}
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
+		delete fx;
 	}
 	if (CheckSpellDisruption(damage, spellLevel)) {
 		InterruptCasting = true;

@@ -2658,6 +2658,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			WMPAreaEntry *oarea = wmap->GetArea(larea, areaindex);
 			if (!oarea) {
 				//blabla
+				delete link;
 				return RuntimeError("cannot establish area link!");
 			}
 			strnuprcpy(link->DestEntryPoint, ename, 32);
@@ -2682,7 +2683,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				link->AreaIndex = areaindex;
 				wmap->AddAreaLink(link);
 			}
-
+			delete link;
 		}
 	}
 
