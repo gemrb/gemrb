@@ -113,6 +113,11 @@ char* MBCStringFromString(const String& string)
 	// FIXME: depends on locale setting
 	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
 	size_t newlen = wcstombs(cStr, string.c_str(), string.length());
+	if (newlen == static_cast<size_t>(-1)) {
+		// invalid multibyte sequence
+		free(cStr);
+		return NULL;
+	}
 	cStr = (char*)realloc(cStr, newlen);
 	return cStr;
 }
