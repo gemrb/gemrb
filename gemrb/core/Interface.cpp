@@ -1287,12 +1287,13 @@ int Interface::LoadSprites()
 
 	// Load ground circle bitmaps (PST only)
 	//block required due to msvc6.0 incompatibility
+	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
-				Log(ERROR, "Core", "Loading Ground circle bitmaps...");
+				Log(ERROR, "Core", "Failed Loading Ground circle bitmaps...");
 				return GEM_ERROR;
 			}
 
@@ -1307,8 +1308,6 @@ int Interface::LoadSprites()
 			}
 		}
 	}
-
-	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 
 	if (!TooltipBackResRef.IsEmpty()) {
 		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
