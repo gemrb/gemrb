@@ -118,7 +118,9 @@ char* MBCStringFromString(const String& string)
 		free(cStr);
 		return NULL;
 	}
-	cStr = (char*)realloc(cStr, newlen);
+	// FIXME: assuming compatibility with NTMBS
+	cStr = (char*)realloc(cStr, newlen+1);
+	cStr[newlen] = '\0';
 	return cStr;
 }
 
