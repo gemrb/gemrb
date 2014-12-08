@@ -53,7 +53,7 @@ class VEFObject;
 
 struct Table {
 	Holder<TableMgr> tm;
-	char ResRef[8];
+	ieResRef ResRef;
 	unsigned int refcount;
 };
 
