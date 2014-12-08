@@ -179,7 +179,7 @@ int GameData::LoadTable(const ieResRef ResRef, bool silent)
 	}
 	Table t;
 	t.refcount = 1;
-	strncpy( t.ResRef, ResRef, 8 );
+	CopyResRef(t.ResRef, ResRef);
 	t.tm = tm;
 	ind = -1;
 	for (size_t i = 0; i < tables.size(); i++) {

@@ -646,7 +646,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 	stream->Write( Signature, 8);
 	memset( Signature,0,sizeof(Signature));
 	memset( name,0,sizeof(name));
-	strncpy( name, act->GetName(0), sizeof(name) );
+	strlcpy(name, act->GetName(0), sizeof(name));
 	stream->Write( name, 32);
 
 	stream->WriteDword( &tmpDword); //cre offset (chr header size)

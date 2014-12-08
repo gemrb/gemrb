@@ -1099,7 +1099,7 @@ bool Interface::ReadModalStates()
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
 		CopyResRef(ms.spell, table->QueryField(i, 0));
-		strncpy(ms.action, table->QueryField(i, 1), 16);
+		strlcpy(ms.action, table->QueryField(i, 1), 16);
 		ms.entering_str = atoi(table->QueryField(i, 2));
 		ms.leaving_str = atoi(table->QueryField(i, 3));
 		ms.failed_str = atoi(table->QueryField(i, 4));
