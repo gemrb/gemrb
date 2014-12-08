@@ -1357,8 +1357,10 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 		String* string = core->GetString( StrRef );
 		ctrl->SetText(string);
 		delete string;
+	} else if (str == Py_None) {
+		// clear the text
+		ctrl->SetText(NULL);
 	} else { // string value of the object
-		// PyNone will result in NULL string (clears the text)
 		const String* string = StringFromCString( PyString_AsString( str ) );
 		ctrl->SetText(string);
 		delete string;
