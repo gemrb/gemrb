@@ -3658,6 +3658,9 @@ int Interface::PlayMovie(const char* ResRef)
 
 	ResourceHolder<MoviePlayer> mp(realResRef);
 	if (!mp) {
+		gamedata->FreePalette(palette);
+		free(frames);
+		free(strrefs);
 		return -1;
 	}
 
