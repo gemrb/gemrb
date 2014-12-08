@@ -893,10 +893,9 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 			return false;
 		}
 		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
-		if (tm) {
-			//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
-			clab = tm->QueryField(row, 4);
-		}
+		assert (tm);
+		//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
+		clab = tm->QueryField(row, 4);
 		cls = baseclass;
 	} else if (row) {
 		//kit abilities
