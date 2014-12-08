@@ -152,6 +152,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		assert(strref!=0xffffffff);
 	}
 
+	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
 	ieDword length = strlen(newvalue);
 	if(length>65535) length=65535;
 	length++;

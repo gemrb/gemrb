@@ -318,9 +318,7 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 			const MapNote& mn = MyMap -> GetMapNote(i);
 			if (Distance(mp, mn.Pos)<dist) {
 				if (LinkedLabel) {
-					String* str = StringFromCString(mn.text);
-					LinkedLabel->SetText( str );
-					delete str;
+					LinkedLabel->SetText( mn.text );
 				}
 				NotePosX = mn.Pos.x;
 				NotePosY = mn.Pos.y;

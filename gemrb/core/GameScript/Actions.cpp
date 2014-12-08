@@ -4849,8 +4849,9 @@ void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	char *str = core->GetCString( parameters->int0Parameter, 0);
+	String* str = core->GetString( parameters->int0Parameter, 0);
 	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str, parameters->int0Parameter);
+	delete str;
 }
 
 void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)

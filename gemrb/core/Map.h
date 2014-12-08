@@ -143,21 +143,20 @@ class MapNote {
 public:
 	ieStrRef strref;
 	ieWord color;
-	char *text;
+	String text;
 	Point Pos;
 
 	MapNote& operator=( const MapNote& mn ) {
 		strref = mn.strref;
 		color = mn.color;
-		text = strdup(mn.text);
+		text = mn.text;
 		Pos = mn.Pos;
 		return *this;
 	}
 	MapNote( const MapNote& mn )
-	: strref(mn.strref), color(mn.color), text(strdup(mn.text)) {}
-	MapNote(char* text, ieStrRef ref, ieWord color)
+	: strref(mn.strref), color(mn.color), text(mn.text) {}
+	MapNote(const String& text, ieStrRef ref, ieWord color)
 	: strref(ref), color(color), text(text) {}
-	~MapNote() { free((char*)text); }
 };
 
 class Spawn {
@@ -480,7 +479,7 @@ public:
 	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
 
 	//mapnotes
-	void AddMapNote(const Point &point, int color, char *text, ieStrRef strref);
+	void AddMapNote(const Point &point, int color, const String* text, ieStrRef strref);
 	void RemoveMapNote(const Point &point);
 	const MapNote& GetMapNote(int i) { return mapnotes[i]; }
 	const MapNote* MapNoteAtPoint(const Point &point);

@@ -3038,10 +3038,10 @@ void Map::SetupAmbients()
 }
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(const Point &point, int color, char *text, ieStrRef strref)
+void Map::AddMapNote(const Point &point, int color, const String* text, ieStrRef strref)
 {
 	RemoveMapNote(point);
-	mapnotes.push_back(MapNote(text, strref, color));
+	mapnotes.push_back(MapNote((text) ? *text : L"", strref, color));
 	mapnotes.back().Pos = point;
 }
 
