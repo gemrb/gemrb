@@ -1799,20 +1799,23 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		Point p(fx->PosX, fx->PosY);
 		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 		core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+		delete newfx;
 
 		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
 		if (Owner->Type == ST_ACTOR) {
 			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			delete newfx;
 			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			delete newfx;
 			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			delete newfx;
 		}
-		delete newfx;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2114,13 +2117,13 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx->Target=FX_TARGET_PRESET;
 	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
+	delete newfx;
 
 	newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
 			8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target=FX_TARGET_PRESET;
 	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
-
 	delete newfx;
 
 	return FX_NOT_APPLIED;
