@@ -1241,7 +1241,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			char bytes[501]; // 500 + null
 			str->Read(bytes, 500 );
 			bytes[500] = '\0';
-			//+1 for the terminating zero!!!
 			text = StringFromCString(bytes);
 
 			str->ReadDword(&color); //readonly == 1
