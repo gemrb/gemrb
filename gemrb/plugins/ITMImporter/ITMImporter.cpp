@@ -179,8 +179,8 @@ Item* ITMImporter::GetItem(Item *s)
 	if (version == ITM_VER_IWD2) {
 		str->Read( s->unknown, 16 );
 	}
-	//pst data
 	if (version == ITM_VER_PST) {
+		//pst data
 		str->ReadResRef( s->Dialog );
 		str->ReadDword( &s->DialogName );
 		ieWord WieldColor;
@@ -189,12 +189,17 @@ Item* ITMImporter::GetItem(Item *s)
 			s->WieldColor = WieldColor;
 		}
 		str->Read( s->unknown, 26 );
-	} else {
-	//all non pst
-		s->DialogName = core->GetItemDialStr(s->Name);
-		core->GetItemDialRes(s->Name, s->Dialog);
+	} else if (dialogTable) {
+		//all non pst
+		int row = dialogTable->GetRowIndex(s->Name);
+		s->DialogName = atoi(dialogTable->QueryField(row, 0));
+		CopyResRef(s->Dialog, dialogTable->QueryField(row, 1));
 	}
-	s->ItemExcl=core->GetItemExcl(s->Name);
+
+	if (exclusionTable) {
+		int row = exclusionTable->GetRowIndex(s->Name);
+		s->ItemExcl = (bool)atoi(exclusionTable->QueryField(row, 0));
+	}
 
 	s->ext_headers = core->GetITMExt( s->ExtHeaderCount );
 

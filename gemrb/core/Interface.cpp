@@ -247,9 +247,6 @@ Interface::Interface()
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
 	AreaAliasTable = NULL;
-	ItemExclTable = NULL;
-	ItemDialTable = NULL;
-	ItemDial2Table = NULL;
 	update_scripts = false;
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
@@ -447,18 +444,6 @@ Interface::~Interface(void)
 	if (RtRows) {
 		RtRows->RemoveAll(ReleaseItemList);
 		delete RtRows;
-	}
-	if (ItemExclTable) {
-		ItemExclTable->RemoveAll(NULL);
-		delete ItemExclTable;
-	}
-	if (ItemDialTable) {
-		ItemDialTable->RemoveAll(NULL);
-		delete ItemDialTable;
-	}
-	if (ItemDial2Table) {
-		ItemDial2Table->RemoveAll(NULL);
-		delete ItemDial2Table;
 	}
 
 	Map::ReleaseMemory();
@@ -849,94 +834,10 @@ int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
 	return 0;
 }
 
-bool Interface::ReadAuxItemTables()
-{
-	int idx;
-	bool flag = true;
-
-	if (ItemExclTable) {
-		ItemExclTable->RemoveAll(NULL);
-	} else {
-		ItemExclTable = new Variables();
-		ItemExclTable->SetType(GEM_VARIABLES_INT);
-	}
-
-	AutoTable aa;
-
-	//don't report error when the file doesn't exist
-	if (aa.load("itemexcl")) {
-		idx = aa->GetRowCount();
-		while (idx--) {
-			ieResRef key;
-
-			strnlwrcpy(key,aa->GetRowName(idx),8);
-			ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
-			ItemExclTable->SetAt(key, value);
-		}
-	}
-	if (ItemDialTable) {
-		ItemDialTable->RemoveAll(NULL);
-	} else {
-		ItemDialTable = new Variables();
-		ItemDialTable->SetType(GEM_VARIABLES_INT);
-	}
-	if (ItemDial2Table) {
-		ItemDial2Table->RemoveAll(NULL);
-	} else {
-		ItemDial2Table = new Variables();
-		ItemDial2Table->SetType(GEM_VARIABLES_STRING);
-	}
-
-	//don't report error when the file doesn't exist
-	if (aa.load("itemdial")) {
-		idx = aa->GetRowCount();
-		while (idx--) {
-			ieResRef key, dlgres;
-
-			strnlwrcpy(key,aa->GetRowName(idx),8);
-			ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
-			ItemDialTable->SetAt(key, value);
-			strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
-			ItemDial2Table->SetAtCopy(key, dlgres);
-		}
-	}
-
-	return flag;
-}
-
 //Static
 const char *Interface::GetDeathVarFormat()
 {
 	return DeathVarFormat;
-}
-
-int Interface::GetItemExcl(const ieResRef itemname) const
-{
-	ieDword value;
-
-	if (ItemExclTable && ItemExclTable->Lookup(itemname, value)) {
-		return (int) value;
-	}
-	return 0;
-}
-
-int Interface::GetItemDialStr(const ieResRef itemname) const
-{
-	ieDword value;
-
-	if (ItemDialTable && ItemDialTable->Lookup(itemname, value)) {
-		return (int) value;
-	}
-	return -1;
-}
-
-//second value is the item dialog resource returned by this method
-int Interface::GetItemDialRes(const ieResRef itemname, ieResRef retval) const
-{
-	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval, sizeof(ieResRef))) {
-		return 1;
-	}
-	return 0;
 }
 
 bool Interface::ReadAreaAliasTable(const ieResRef tablename)
@@ -1965,13 +1866,6 @@ int Interface::Init(InterfaceConfig* config)
 	ret = ReadSpecialSpells();
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to load special spells.");
-	}
-
-	Log(MESSAGE, "Core", "Reading item tables...");
-	ret = ReadAuxItemTables();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to read item tables...");
-		return GEM_ERROR;
 	}
 
 	ret = ReadDamageTypeTable();

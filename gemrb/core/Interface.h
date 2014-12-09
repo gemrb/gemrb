@@ -407,8 +407,6 @@ public:
 	ieResRef GlobalScript;
 	ieResRef WorldMapName[2];
 	Variables * AreaAliasTable;
-	Variables * ItemExclTable;
-	Variables * ItemDialTable, *ItemDial2Table;
 	Sprite2D **Cursors;
 	int CursorCount;
 	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
@@ -709,12 +707,6 @@ public:
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
-	/** Returns the item exclusion value */
-	int GetItemExcl(const ieResRef itemname) const;
-	/** Returns the strref for the item dialog */
-	int GetItemDialStr(const ieResRef itemname) const;
-	/** Returns the strref for the item dialog */
-	int GetItemDialRes(const ieResRef itemname, ieResRef dialog) const;
 	/** Returns the virtual worldmap entry of a sub-area */
 	int GetAreaAlias(const ieResRef areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
@@ -761,8 +753,6 @@ private:
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
-	/** Reads itemexcl, itemdial */
-	bool ReadAuxItemTables();
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** handles the EventFlag bits (conditional events) */

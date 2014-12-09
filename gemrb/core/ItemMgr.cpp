@@ -24,8 +24,10 @@ namespace GemRB {
 
 ItemMgr::ItemMgr(void)
 {
-	// FIXME: could make this table static...
+	// FIXME: could make these tables static...
 	tooltipTable.load("tooltip", true);
+	exclusionTable.load("itemexcl", true);
+	dialogTable.load("itemdial", true);
 }
 
 ItemMgr::~ItemMgr(void)

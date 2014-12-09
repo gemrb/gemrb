@@ -42,7 +42,9 @@ namespace GemRB {
 
 class GEM_EXPORT ItemMgr : public Plugin {
 protected:
-	AutoTable tooltipTable;
+	AutoTable tooltipTable; // tooltips (duh)
+	AutoTable exclusionTable; // a table of items that are mutually exclusive
+	AutoTable dialogTable; // dialogs attached to items (conversables such as Lilarcor)
 public:
 	ItemMgr(void);
 	virtual ~ItemMgr(void);
