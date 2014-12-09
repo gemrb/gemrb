@@ -24,6 +24,8 @@ namespace GemRB {
 
 ItemMgr::ItemMgr(void)
 {
+	// FIXME: could make this table static...
+	tooltipTable.load("tooltip", true);
 }
 
 ItemMgr::~ItemMgr(void)

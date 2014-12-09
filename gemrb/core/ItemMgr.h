@@ -30,6 +30,7 @@
 
 #include "Item.h"
 #include "Plugin.h"
+#include "TableMgr.h"
 #include "System/DataStream.h"
 
 namespace GemRB {
@@ -40,6 +41,8 @@ namespace GemRB {
  */
 
 class GEM_EXPORT ItemMgr : public Plugin {
+protected:
+	AutoTable tooltipTable;
 public:
 	ItemMgr(void);
 	virtual ~ItemMgr(void);

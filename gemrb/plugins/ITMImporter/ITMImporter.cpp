@@ -200,7 +200,13 @@ Item* ITMImporter::GetItem(Item *s)
 
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
-		GetExtHeader( s, s->ext_headers + i );
+		ITMExtHeader* eh = &s->ext_headers[i];
+		GetExtHeader( s, eh );
+		// set the tooltip
+		if (tooltipTable) {
+			int row = tooltipTable->GetRowIndex(s->Name);
+			eh->Tooltip = atoi(tooltipTable->QueryField(row, i));
+		}
 	}
 
 	//48 is the size of the feature block

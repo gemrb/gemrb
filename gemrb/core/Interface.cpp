@@ -250,7 +250,6 @@ Interface::Interface()
 	ItemExclTable = NULL;
 	ItemDialTable = NULL;
 	ItemDial2Table = NULL;
-	ItemTooltipTable = NULL;
 	update_scripts = false;
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
@@ -314,11 +313,6 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 		free( table );
 		count = -1;
 	}
-}
-
-static void ReleaseItemTooltip(void *poi)
-{
-	free(poi);
 }
 
 Interface::~Interface(void)
@@ -465,10 +459,6 @@ Interface::~Interface(void)
 	if (ItemDial2Table) {
 		ItemDial2Table->RemoveAll(NULL);
 		delete ItemDial2Table;
-	}
-	if (ItemTooltipTable) {
-		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
-		delete ItemTooltipTable;
 	}
 
 	Map::ReleaseMemory();
@@ -911,27 +901,6 @@ bool Interface::ReadAuxItemTables()
 		}
 	}
 
-	if (ItemTooltipTable) {
-		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
-	} else {
-		ItemTooltipTable = new Variables();
-		ItemTooltipTable->SetType(GEM_VARIABLES_POINTER);
-	}
-
-	//don't report error when the file doesn't exist
-	if (aa.load("tooltip")) {
-		idx = aa->GetRowCount();
-		while (idx--) {
-			ieResRef key;
-			int *tmppoi = (int *) malloc(sizeof(int)*3);
-
-			strnlwrcpy(key,aa->GetRowName(idx),8);
-			for (int i=0;i<3;i++) {
-				tmppoi[i] = atoi(aa->QueryField(idx,i));
-			}
-			ItemTooltipTable->SetAt(key, (void*)tmppoi);
-		}
-	}
 	return flag;
 }
 
@@ -949,27 +918,6 @@ int Interface::GetItemExcl(const ieResRef itemname) const
 		return (int) value;
 	}
 	return 0;
-}
-
-int Interface::GetItemTooltip(const ieResRef itemname, int header, int identified)
-{
-	int *value = NULL;
-
-	if (ItemTooltipTable) {
-		void* lookup = NULL;
-		ItemTooltipTable->Lookup(itemname, lookup);
-		value = (int*)lookup;
-	}
-	if (value && (value[header]>=0)) {
-		return value[header];
-	}
-	Item *item = gamedata->GetItem(itemname, true);
-	if (!item) {
-		return -1;
-	}
-	int ret = identified?item->ItemNameIdentified:item->ItemName;
-	gamedata->FreeItem(item, itemname, 0);
-	return ret;
 }
 
 int Interface::GetItemDialStr(const ieResRef itemname) const

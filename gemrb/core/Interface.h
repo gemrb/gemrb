@@ -409,7 +409,6 @@ public:
 	Variables * AreaAliasTable;
 	Variables * ItemExclTable;
 	Variables * ItemDialTable, *ItemDial2Table;
-	Variables * ItemTooltipTable;
 	Sprite2D **Cursors;
 	int CursorCount;
 	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
@@ -710,8 +709,6 @@ public:
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
-	/** Returns the item tooltip value for the xth extension header */
-	int GetItemTooltip(const ieResRef itemname, int idx, int identified);
 	/** Returns the item exclusion value */
 	int GetItemExcl(const ieResRef itemname) const;
 	/** Returns the strref for the item dialog */
@@ -764,7 +761,7 @@ private:
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
-	/** Reads itemexcl, itemdial, tooltip */
+	/** Reads itemexcl, itemdial */
 	bool ReadAuxItemTables();
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();

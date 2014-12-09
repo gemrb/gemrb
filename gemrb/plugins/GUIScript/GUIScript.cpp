@@ -7233,9 +7233,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 	PyObject* tooltiptuple = PyTuple_New(ehc);
 	for(int i=0;i<ehc;i++) {
-		int tip = core->GetItemTooltip(ResRef, i, 1);
-		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(tip));
 		ITMExtHeader *eh = item->ext_headers+i;
+		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
 		PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(eh->Charges) );
 	}
 
@@ -8564,17 +8563,9 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
-
-			const CREItem *item_slot = actor->inventory.GetSlotItem(item->slot);
-			int tip = core->GetItemTooltip(item->itemname, item->headerindex, item_slot->Flags&IE_INV_ITEM_IDENTIFIED);
-			if (tip>0) {
-				//cannot make this const, because it will be freed
-				char *tmp = core->GetCString((ieStrRef) tip,0);
-				btn->SetTooltip(tmp);
-				core->FreeString(tmp);
-			} else {
-				btn->SetTooltip(NULL);
-			}
+			char* tip = core->GetCString(item->Tooltip, 0);
+			btn->SetTooltip(tip);
+			delete tip;
 
 			if (item->Charges && (item->Charges!=0xffff) ) {
 				SetItemText(btn, item->Charges, false);
