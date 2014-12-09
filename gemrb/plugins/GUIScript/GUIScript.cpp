@@ -5435,7 +5435,7 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 
 	wchar_t usagestr[10];
 	if (charges && (charges>1 || !oneisnone) ) {
-		swprintf(usagestr, sizeof(usagestr)/usagestr[0], L"%d", charges);
+		swprintf(usagestr, sizeof(usagestr)/sizeof(usagestr[0]), L"%d", charges);
 	} else {
 		usagestr[0] = 0;
 	}
