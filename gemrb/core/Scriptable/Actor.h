@@ -884,6 +884,7 @@ public:
 	ieDword GetDisarmingTrap() const { return disarmTrap; }
 	void ReleaseCurrentAction();
 	bool ConcentrationCheck() const;
+	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 };
 }
 

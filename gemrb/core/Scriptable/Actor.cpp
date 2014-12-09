@@ -10005,5 +10005,17 @@ bool Actor::ConcentrationCheck() const
 	return true;
 }
 
+// shorthand wrapper for throw-away effects
+void Actor::ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2)
+{
+	Effect *newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
+	if (newfx) {
+		core->ApplyEffect(newfx, this, Owner);
+		delete newfx;
+	} else {
+		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %s, Owner: %s", newref.Name, GetName(1), Owner->GetName(1));
+	}
+}
+
 }
 

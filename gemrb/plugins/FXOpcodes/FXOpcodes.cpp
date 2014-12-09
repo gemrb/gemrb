@@ -1989,12 +1989,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->FirstApply) {
-		Effect *newfx;
-
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_animation_stance_ref, 0, IE_ANI_SLEEP);
-		core->ApplyEffect(newfx, target, Owner);
-
-		delete newfx;
+		target->ApplyEffectCopy(fx, fx_animation_stance_ref, Owner, 0, IE_ANI_SLEEP);
 	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
@@ -4120,12 +4115,7 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		map->AddVVCell(new VEFObject(sca));
 	} else {
 		//simulate sparkle casting glows
-		Effect *newfx;
-
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_sparkle_ref, fx->Parameter2, 3);
-		core->ApplyEffect(newfx, target, Owner);
-
-		delete newfx;
+		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);
 	}
 
 	return FX_NOT_APPLIED;
@@ -6131,11 +6121,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->ApplySpell(resref,copy,copy,0);
 	}
 
-	newfx = EffectQueue::CreateEffectCopy(fx, fx_puppetmarker_ref, fx->CasterID, fx->Parameter2);
-	if (newfx) {
-		core->ApplyEffect(newfx, copy, copy);
-		delete newfx;
-	}
+	copy->ApplyEffectCopy(fx, fx_puppetmarker_ref, copy, fx->CasterID, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
