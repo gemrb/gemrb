@@ -6665,6 +6665,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (hittingheader->DiceThrown<256) {
 		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
+		if (damage < 0) damage = 0; // bad luck, effects and/or profs on lowlevel chars
 	} else {
 		damage = 0;
 	}
