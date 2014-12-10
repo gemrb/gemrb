@@ -170,8 +170,6 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadWord( &s->EquippingFeatureOffset );
 	str->ReadWord( &s->EquippingFeatureCount );
 
-	s->Dialog[0] = 0;
-	s->DialogName = 0;
 	s->WieldColor = 0xffff;
 	memset( s->unknown, 0, 26 );
 
@@ -194,11 +192,16 @@ Item* ITMImporter::GetItem(Item *s)
 		int row = dialogTable->GetRowIndex(s->Name);
 		s->DialogName = atoi(dialogTable->QueryField(row, 0));
 		CopyResRef(s->Dialog, dialogTable->QueryField(row, 1));
+	} else {
+		s->DialogName = -1;
+		s->Dialog[0] = '\0';
 	}
 
 	if (exclusionTable) {
 		int row = exclusionTable->GetRowIndex(s->Name);
 		s->ItemExcl = (bool)atoi(exclusionTable->QueryField(row, 0));
+	} else {
+		s->ItemExcl = false;
 	}
 
 	s->ext_headers = core->GetITMExt( s->ExtHeaderCount );
