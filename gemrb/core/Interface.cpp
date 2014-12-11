@@ -4706,19 +4706,6 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 	return false;
 }
 
-//now that we store spell name in spl, i guess, we shouldn't pass 'ieResRef name'
-//these functions are needed because Win32 doesn't allow freeing memory from
-//another dll. So we allocate all commonly used memories from core
-ITMExtHeader *Interface::GetITMExt(int count)
-{
-	return new ITMExtHeader[count];
-}
-
-SPLExtHeader *Interface::GetSPLExt(int count)
-{
-	return new SPLExtHeader[count];
-}
-
 Effect *Interface::GetEffect(ieDword opcode)
 {
 	if (opcode==0xffffffff) {
@@ -4731,16 +4718,6 @@ Effect *Interface::GetEffect(ieDword opcode)
 	memset(fx,0,sizeof(Effect));
 	fx->Opcode=opcode;
 	return fx;
-}
-
-Effect *Interface::GetFeatures(int count)
-{
-	return new Effect[count];
-}
-
-WorldMapArray *Interface::NewWorldMapArray(int count)
-{
-	return new WorldMapArray(count);
 }
 
 Container *Interface::GetCurrentContainer()

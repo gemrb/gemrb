@@ -650,16 +650,9 @@ public:
 	Store *SetCurrentStore(const ieResRef resname, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed();
-	// FIXME: due to Win32 we have to allocate/release all common
-	// memory from Interface. Yes, it is ugly.
-	ITMExtHeader *GetITMExt(int count);
-	SPLExtHeader *GetSPLExt(int count);
+
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
-	Effect *GetFeatures(int count);
-	void FreeITMExt(ITMExtHeader *p, Effect *e);
-	void FreeSPLExt(SPLExtHeader *p, Effect *e);
-	WorldMapArray *NewWorldMapArray(int count);
 	/** plays stock gui sound referenced by index */
 	void PlaySound(int idx);
 	/** returns the first selected PC, if forced is set, then it returns

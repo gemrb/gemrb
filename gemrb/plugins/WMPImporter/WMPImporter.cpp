@@ -90,7 +90,7 @@ WorldMapArray* WMPImporter::GetWorldMapArray()
 
 	assert(WorldMapsCount == WorldMapsCount1 + WorldMapsCount2);
 
-	WorldMapArray* ma = core->NewWorldMapArray(WorldMapsCount);
+	WorldMapArray* ma = new WorldMapArray(WorldMapsCount);
 	for (i=0;i<WorldMapsCount1; i++) {
 		WorldMap *m = ma->NewWorldMap( i );
 		GetWorldMap( str1, m, i );

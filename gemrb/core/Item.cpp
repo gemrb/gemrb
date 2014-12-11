@@ -49,7 +49,6 @@ Item::Item(void)
 
 Item::~Item(void)
 {
-	//core->FreeITMExt( ext_headers, equipping_features );
 	delete [] ext_headers;
 	delete [] equipping_features;
 }

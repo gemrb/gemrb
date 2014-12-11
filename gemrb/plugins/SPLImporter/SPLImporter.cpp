@@ -174,14 +174,14 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		}
 	}
 
-	s->ext_headers = core->GetSPLExt(s->ExtHeaderCount);
+	s->ext_headers = new SPLExtHeader[s->ExtHeaderCount];
 
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
 		GetExtHeader( s, s->ext_headers+i );
 	}
 
-	s->casting_features = core->GetFeatures(s->CastingFeatureCount);
+	s->casting_features = new Effect[s->CastingFeatureCount];
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (i = 0; i < s->CastingFeatureCount; i++) {
@@ -231,7 +231,7 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	if (eh->ProjectileAnimation) {
 		eh->ProjectileAnimation--;
 	}
-	eh->features = core->GetFeatures( eh->FeatureCount );
+	eh->features = new Effect[eh->FeatureCount];
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
 		GetFeature(s, eh->features+i);
