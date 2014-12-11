@@ -195,7 +195,6 @@ Interface::Interface()
 #endif
 	SkipIntroVideos = false;
 	DrawFPS = false;
-	TouchScrollAreas = false;
 	UseSoftKeyboard = false;
 	KeepCache = false;
 	NumFingInfo = 2;
@@ -1293,7 +1292,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("FullScreen", FullScreen = );
 	vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite
 	CONFIG_INT("GUIEnhancements", GUIEnhancements = );
-	CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
@@ -1722,7 +1720,6 @@ int Interface::Init(InterfaceConfig* config)
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
-	vars->SetAt( "TouchScrollAreas", (unsigned long)TouchScrollAreas );
 
 	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
 	tokens = new Variables();

@@ -795,7 +795,7 @@ public:
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
 	bool CaseSensitive, SkipIntroVideos, DrawFPS;
-	bool TouchScrollAreas, UseSoftKeyboard;
+	bool UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
 	int GUIEnhancements;
