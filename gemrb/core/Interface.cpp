@@ -175,8 +175,6 @@ Interface::Interface()
 	pal32 = NULL;
 	pal256 = NULL;
 
-	GUIEnhancements = 0;
-
 	CursorCount = 0;
 	Cursors = NULL;
 
@@ -193,7 +191,6 @@ Interface::Interface()
 #else
 	CaseSensitive = false;
 #endif
-	SkipIntroVideos = false;
 	DrawFPS = false;
 	UseSoftKeyboard = false;
 	KeepCache = false;
@@ -1281,24 +1278,18 @@ int Interface::Init(InterfaceConfig* config)
 		value = NULL;
 
 	CONFIG_INT("Bpp", Bpp =);
-	vars->SetAt("BitsPerPixel", Bpp); //put into vars so that reading from game.ini wont overwrite
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
 	CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
 	CONFIG_INT("DrawFPS", DrawFPS = );
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 	CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
 	CONFIG_INT("FogOfWar", FogOfWar = );
-	ieDword FullScreen = 0;
-	CONFIG_INT("FullScreen", FullScreen = );
-	vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite
-	CONFIG_INT("GUIEnhancements", GUIEnhancements = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
-	CONFIG_INT("SkipIntroVideos", SkipIntroVideos = );
 	CONFIG_INT("TooltipDelay", TooltipDelay = );
 	CONFIG_INT("Width", Width = );
 	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
@@ -1309,6 +1300,28 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
 
 #undef CONFIG_INT
+
+// first param is the preference name, second is the key from gemrb.cfg.
+#define CONFIG_VARS_MAP(var, key) \
+		value = config->GetValueForKey(key); \
+		if (value) \
+			vars->SetAt(var, atoi(value)); \
+		value = NULL;
+
+#define CONFIG_VARS(key) \
+		CONFIG_VARS_MAP(key, key);
+
+	// using vars because my hope is to expose (some of) these in a customized GUIOPT
+	// map gemrb.cfg value to the value used by the options (usually an option from game.ini)
+	CONFIG_VARS("GUIEnhancements");
+	CONFIG_VARS("SkipIntroVideos");
+
+	//put into vars so that reading from game.ini wont overwrite
+	CONFIG_VARS_MAP("Bpp", "BitsPerPixel");
+	CONFIG_VARS_MAP("FullScreen", "Full Screen");
+
+#undef CONFIG_VARS
+#undef CONFIG_VARS_MAP
 
 #define CONFIG_STRING(key, var, default) \
 		value = config->GetValueForKey(key); \
@@ -1470,8 +1483,9 @@ int Interface::Init(InterfaceConfig* config)
 
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format
-	vars->Lookup("Full Screen", FullScreen);
-	if (video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName) == GEM_ERROR) {
+	ieDword fullscreen = 0;
+	vars->Lookup("Full Screen", fullscreen);
+	if (video->CreateDisplay( Width, Height, Bpp, fullscreen, GameName) == GEM_ERROR) {
 		Log(FATAL, "Core", "Cannot initialize shaders.");
 		return GEM_ERROR;
 	}
@@ -1716,10 +1730,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Failed to allocate SaveGameIterator.");
 		return GEM_ERROR;
 	}
-
-	//no need of strdup, variables do copy the key!
-	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
-	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
 
 	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
 	tokens = new Variables();

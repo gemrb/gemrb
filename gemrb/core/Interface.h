@@ -794,11 +794,10 @@ public:
 	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
-	bool CaseSensitive, SkipIntroVideos, DrawFPS;
+	bool CaseSensitive, DrawFPS;
 	bool UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
-	int GUIEnhancements;
 	bool KeepCache;
 	bool MultipleQuickSaves;
 
