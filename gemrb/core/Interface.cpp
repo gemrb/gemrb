@@ -2467,26 +2467,26 @@ bool Interface::LoadGemRBINI()
 				GroundCircleScale[size] = atoi( pos+1 );
 				strlcpy( GroundCircleBam[size], s, pos - s + 1 );
 			} else {
-				strcpy( GroundCircleBam[size], s );
+				CopyResRef(GroundCircleBam[size], s);
 			}
 		}
 	}
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
-		strcpy( INIConfig, s );
+		strlcpy(INIConfig, s, sizeof(INIConfig));
 
 	s = ini->GetKeyAsString( "resources", "Palette16", NULL );
 	if (s)
-		strcpy( Palette16, s );
+		CopyResRef(Palette16, s);
 
 	s = ini->GetKeyAsString( "resources", "Palette32", NULL );
 	if (s)
-		strcpy( Palette32, s );
+		CopyResRef(Palette32, s);
 
 	s = ini->GetKeyAsString( "resources", "Palette256", NULL );
 	if (s)
-		strcpy( Palette256, s );
+		CopyResRef(Palette256, s);
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
