@@ -6264,7 +6264,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 int Actor::MeleePenalty() const
 {
 	if (GetMonkLevel()) return 0;
-	if (inventory.GetEquippedSlot()!=IW_NO_EQUIPPED) return 4;
+	if (inventory.FistsEquipped()) return -4;
 	return 0;
 }
 
