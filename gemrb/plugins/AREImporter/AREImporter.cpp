@@ -366,6 +366,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		print("[AREImporter]: No Tile Map Manager Available.");
+		delete map;
 		return NULL;
 	}
 	ieResRef TmpResRef;
@@ -384,6 +385,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
 		print("[AREImporter]: No Tile Map Available.");
+		delete map;
 		return NULL;
 	}
 
