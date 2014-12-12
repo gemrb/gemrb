@@ -9157,7 +9157,7 @@ ieDword Actor::GetLevelInClass(ieDword classid) const
 		return 0;
 	}
 
-	if (classid>BGCLASSCNT) {
+	if (classid >= BGCLASSCNT) {
 		classid=0;
 	}
 	//other, levelslotsbg starts at 0 classid
