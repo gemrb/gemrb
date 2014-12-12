@@ -335,6 +335,7 @@ public:
 	bool ProvidesCriticalAversion();
 	/** tries to merge the passed item with the on in the passed slot */
 	int MergeItems(int slot, CREItem *item);
+	bool FistsEquipped() const;
 	//setting important constants
 	static void Init();
 	static void SetArmorSlot(int arg);

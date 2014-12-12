@@ -5888,7 +5888,7 @@ ieDword Actor::GetNumberOfAttacks()
 		bonus = 2 * IsDualWielding();
 		return base + bonus;
 	} else {
-		if (monkbon != NULL && inventory.GetEquipped() == IW_NO_EQUIPPED) {
+		if (monkbon != NULL && inventory.FistsEquipped()) {
 			unsigned int level = GetMonkLevel();
 			if (level>=monkbon_cols) level=monkbon_cols-1;
 			if (level>0) {
@@ -5955,7 +5955,7 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 		// act as a rogue unless barefisted and without armor
 		// multiclassed monks only use their monk levels when determining barefisted bab
 		// check the spell failure instead of the skill penalty, since otherwise leather armor would also be treated as none
-		if (inventory.GetEquipped() != IW_NO_EQUIPPED || GetTotalArmorFailure()) {
+		if (!inventory.FistsEquipped() || GetTotalArmorFailure()) {
 			pBAB += SetLevelBAB(MonkLevel, ISTHIEF);
 		} else {
 			pBABDecrement = 3;
@@ -6157,7 +6157,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		// iwd2 adds a -4 nonprof penalty (others below)
 		// everyone is proficient with fists
 		// TODO: figure out if this should be cheesily limited to party only (10gob hits it)
-		if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
+		if (!inventory.FistsEquipped()) {
 			prof += wspecial[stars][0];
 		}
 	}
@@ -6171,7 +6171,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
-			if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
+			if (!inventory.FistsEquipped()) {
 				prof += defaultprof[clss];
 			}
 		} else {
