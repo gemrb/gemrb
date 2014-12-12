@@ -6153,14 +6153,15 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//FIXME:this type of weapon ignores all armor, -4 is for balance?
 		//or i just got lost a negation somewhere
 		prof += -4;
-	} else {
-		// iwd2 adds a -4 nonprof penalty (others below)
-		// everyone is proficient with fists
-		// TODO: figure out if this should be cheesily limited to party only (10gob hits it)
-		if (!inventory.FistsEquipped()) {
-			prof += wspecial[stars][0];
-		}
 	}
+
+	// iwd2 adds a -4 nonprof penalty (others below, since their table is bad and actual values differ by class)
+	// but everyone is proficient with fists
+	// TODO: figure out if this should be cheesily limited to party only (10gob hits it)
+	if (!inventory.FistsEquipped()) {
+		prof += wspecial[stars][0];
+	}
+
 	wi.profdmgbon = wspecial[stars][1];
 	DamageBonus += wi.profdmgbon;
 	speed += wspecial[stars][2];
