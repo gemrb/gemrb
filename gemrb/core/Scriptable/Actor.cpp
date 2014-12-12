@@ -7873,6 +7873,8 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 				tmp = 70+tmp%10;
 			} else if (tmp>ACT_BARD) {//spellbooks
 				tmp = 50+tmp%10;
+			} else if (tmp>=32) { // here be dragons
+				Log(ERROR, "Actor", "Bad slot index passed to SetActionButtonRow!");
 			} else {
 				tmp=gemrb2iwd[tmp];
 			}
@@ -7908,6 +7910,8 @@ int Actor::IWD2GemrbQslot (int slotindex)
 			tmp = ACT_IWDQSPELL + tmp%10;
 		} else if (tmp>=50) { //spellbooks
 			tmp = ACT_BARD + tmp%10;
+		} else if (tmp>=32) { // here be dragons
+			Log(ERROR, "Actor", "Bad slot index passed to IWD2GemrbQslot!");
 		} else {
 			tmp = iwd2gemrb[tmp];
 		}
