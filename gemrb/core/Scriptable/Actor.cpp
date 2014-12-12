@@ -1273,6 +1273,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	// always draw it for party members; the rest must not be invisible to have it;
 	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
 	if (hc_flags[idx] & HC_INVISIBLE && (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible)) {
+		delete sca;
 		return;
 	}
 
