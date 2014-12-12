@@ -49,9 +49,9 @@ namespace GemRB {
 #define DL_BLOOD  1
 #define DL_FIRE   4
 #define DL_ELECTRICITY  7
-#define DL_COLD   11
-#define DL_ACID   14
-#define DL_DISINTEGRATE 17
+#define DL_COLD   10
+#define DL_ACID   13
+#define DL_DISINTEGRATE 16
 
 }
 
