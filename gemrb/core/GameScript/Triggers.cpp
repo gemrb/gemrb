@@ -435,9 +435,6 @@ int GameScript::General(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor == NULL) {
-		return 0;
-	}
 	return ID_General(actor, parameters->int0Parameter);
 }
 
@@ -451,9 +448,6 @@ int GameScript::Specifics(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor == NULL) {
-		return 0;
-	}
 	return ID_Specific(actor, parameters->int0Parameter);
 }
 
