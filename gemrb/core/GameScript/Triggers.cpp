@@ -2171,6 +2171,9 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
 	Actor *scr = (Actor *) Sender;
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
 	Actor *actor = NULL;
 	if (tar->Type == ST_ACTOR) {
 		actor = (Actor *) tar;
@@ -3764,7 +3767,7 @@ int GameScript::ModalState( Scriptable* Sender, Trigger* parameters)
 	} else {
 		scr = Sender;
 	}
-	if (scr->Type!=ST_ACTOR) {
+	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;

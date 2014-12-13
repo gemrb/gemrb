@@ -3982,6 +3982,9 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
 	MoveItemCore(tar, Sender, parameters->string0Parameter,0,0);
 }
 
@@ -6157,6 +6160,10 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	Door *door = NULL;
 	Container *container = NULL;
 	Point *pos;
+	if (!target) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	if (target->Type == ST_DOOR) {
 		door = (Door *) target;
 		pos = door->toOpen;
