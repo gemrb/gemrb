@@ -5299,7 +5299,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		}
 		//mark spell and target
 		me->LastMarkedSpell = splnum;
-		me->LastMarked = actor->GetGlobalID();
+		me->LastMarked = tar->GetGlobalID();
 		break;
 end_mso_loop:
 		pos++;
