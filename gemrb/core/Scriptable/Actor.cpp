@@ -5409,7 +5409,7 @@ void Actor::ApplyExtraSettings()
 {
 	if (!PCStats) return;
 	for (int i=0;i<ES_COUNT;i++) {
-		if (featspells[i] && featspells[i][0]!='*') {
+		if (featspells[i][0] && featspells[i][0] != '*') {
 			if (PCStats->ExtraSettings[i]) {
 				core->ApplySpell(featspells[i], this, this, PCStats->ExtraSettings[i]);
 			}
