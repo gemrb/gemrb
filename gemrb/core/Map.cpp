@@ -1173,6 +1173,7 @@ void Map::DrawMap(Region screen)
 	while (actor || a || sca || spark || pro || pile) {
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
+			assert(actor != NULL);
 			actor->Draw( screen );
 			actor->UpdateAnimations();
 			actor = GetNextActor(q, index);

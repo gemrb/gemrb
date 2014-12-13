@@ -2193,7 +2193,7 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
 	} else {
 		range = Distance(scr, actor);
 	}
-	if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, scr, range)) {
+	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget(splnum, scr, range)) {
 		return 0;
 	}
 	return 1;

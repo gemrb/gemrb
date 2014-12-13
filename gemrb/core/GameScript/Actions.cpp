@@ -5294,7 +5294,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		} else {
 			range = Distance(me, actor);
 		}
-		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, me, range)) {
+		if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget(splnum, me, range)) {
 			goto end_mso_loop;
 		}
 		//mark spell and target
