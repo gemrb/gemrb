@@ -7902,7 +7902,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
 
 static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 {
-	int Variable, value;
+	int Variable, value = 0;
 	char path[_MAX_PATH] = { '\0' };
 
 	if (!PyArg_ParseTuple( args, "i", &Variable)) {
