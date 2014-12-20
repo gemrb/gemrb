@@ -364,6 +364,7 @@ def setAccept():
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+	GemRB.SetPlayerString (MyChar, 74, 11863)
 	#10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
