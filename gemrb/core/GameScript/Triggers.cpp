@@ -2463,10 +2463,7 @@ int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RandomNum(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (parameters->int0Parameter<0) {
-		return 0;
-	}
-	if (parameters->int1Parameter<0) {
+	if (parameters->int0Parameter <= 0 || parameters->int1Parameter <= 0) {
 		return 0;
 	}
 	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
@@ -2474,10 +2471,7 @@ int GameScript::RandomNum(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::RandomNumGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (parameters->int0Parameter<0) {
-		return 0;
-	}
-	if (parameters->int1Parameter<0) {
+	if (parameters->int0Parameter <= 0 || parameters->int1Parameter <= 0) {
 		return 0;
 	}
 	return parameters->int1Parameter-1 < RandomNumValue%parameters->int0Parameter;
@@ -2485,10 +2479,7 @@ int GameScript::RandomNumGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::RandomNumLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (parameters->int0Parameter<0) {
-		return 0;
-	}
-	if (parameters->int1Parameter<0) {
+	if (parameters->int0Parameter <= 0 || parameters->int1Parameter <= 0) {
 		return 0;
 	}
 	return parameters->int1Parameter-1 > RandomNumValue%parameters->int0Parameter;
