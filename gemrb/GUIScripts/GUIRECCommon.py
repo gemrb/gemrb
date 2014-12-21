@@ -21,7 +21,7 @@ import GemRB
 import GameCheck
 import Portrait
 from GUIDefines import *
-from ie_stats import IE_SEX, IE_CLASS, IE_MC_FLAGS, MC_EXPORTABLE
+from ie_stats import IE_SEX, IE_CLASS, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
 
 BiographyWindow = None
@@ -542,7 +542,10 @@ def OpenBiographyWindow ():
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	TextArea.SetText (GemRB.GetPlayerString (pc, BioStrRefSlot) )
+	if GameCheck.IsBG1 () and GemRB.GetPlayerName (pc, 2) == 'none':
+		TextArea.SetText (GetProtagonistBiography (pc))
+	else:
+		TextArea.SetText (GemRB.GetPlayerString (pc, BioStrRefSlot))
 
 	# Done
 	Button = Window.GetControl (2)
@@ -566,6 +569,19 @@ def CloseBiographyWindow ():
 		else:
 			GUIREC.InformationWindow.SetVisible (WINDOW_VISIBLE)
 	return
+
+def GetProtagonistBiography (pc):
+	classstrings = [ 15882, 15881, 15884, 15883, 15886, 15887, 15889, 15889, 15889, 15889,
+		15885, 15888, 15889, 15889, 15889, 15889, 15889, 15889 ]
+	racestrings = [ 15895, 15891, 15892, 15890, 15893, 15894 ]
+	clss = GemRB.GetPlayerStat (pc, IE_CLASS)
+	if clss > 18:
+		clss = 18
+	bio = GemRB.GetString (classstrings[clss-1])
+	race = GemRB.GetPlayerStat (pc, IE_RACE)
+	if race <= 6:
+		bio += "\n\n" + GemRB.GetString (racestrings[race-1])
+	return bio
 
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton
