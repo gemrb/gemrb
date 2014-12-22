@@ -87,11 +87,6 @@ def GetWindowPack():
 	# fallback to the smallest resolution
 	return default
 
-def LocationPressed ():
-	AreaInfo = GemRB.GetAreaInfo()
-	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
-	return
-
 def SelectFormation ():
 	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))
 	return
