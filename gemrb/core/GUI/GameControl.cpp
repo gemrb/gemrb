@@ -157,7 +157,7 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 }
 
 //WARNING: don't pass p as a reference because it gets modified
-Point GameControl::GetFormationPoint(Map *map, unsigned int pos, Point src, Point p)
+Point GameControl::GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p)
 {
 	int formation=core->GetGame()->GetFormation();
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
@@ -525,8 +525,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	// draw reticles
 	if (FormationRotation) {
-		FormationApplicationPoint = gameMousePos;
-
 		Actor *actor;
 		int max = game->GetPartySize(false);
 		// we only care about PCs and not summons for this. the summons will be included in
@@ -536,7 +534,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 			actor = game->FindPC(idx);
 			if (actor && actor->IsSelected()) {
 				// transform the formation point
-				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, ClickPoint);
+				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, gameMousePos, ClickPoint);
 				DrawTargetReticle(p, 4, false);
 			}
 		}
@@ -1980,7 +1978,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 		Point src;
 		if (FormationRotation) {
 			p = ClickPoint;
-			src = FormationApplicationPoint;
+			src = gameMousePos;
 		} else {
 			src = party[0]->Pos;
 		}

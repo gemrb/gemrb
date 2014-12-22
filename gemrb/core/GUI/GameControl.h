@@ -116,7 +116,6 @@ private:
 	bool MouseIsDown;
 	bool DoubleClick;
 	Region SelectionRect;
-	Point FormationApplicationPoint;
 	Point ClickPoint;
 	// mouse coordinates represented in game coordinates
 	Point gameMousePos;
@@ -242,7 +241,7 @@ public:
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
 	Point GetFormationOffset(ieDword formation, ieDword pos);
-	Point GetFormationPoint(Map *map, unsigned int pos, Point src, Point p);
+	Point GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p);
 	/** Displays a string over an object */
