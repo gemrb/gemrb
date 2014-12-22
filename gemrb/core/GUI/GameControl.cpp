@@ -96,7 +96,6 @@ GameControl::GameControl(const Region& frame)
 	drawPath = NULL;
 	pfs.null();
 	lastCursor = IE_CURSOR_NORMAL;
-	lastMouseX = lastMouseY = 0;
 	moveX = moveY = 0;
 	scrolling = false;
 	numScrollCursor = 0;
@@ -517,20 +516,16 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
-	Point p(lastMouseX, lastMouseY);
-	video->ConvertToGame( p.x, p.y );
 
 	// Draw selection rect
 	if (DrawSelectionRect) {
-		CalculateSelection( p );
+		CalculateSelection( gameMousePos );
 		video->DrawRect( SelectionRect, ColorGreen, false, true );
 	}
 
 	// draw reticles
 	if (FormationRotation) {
-		FormationApplicationPoint.x = lastMouseX;
-		FormationApplicationPoint.y = lastMouseY;
-		core->GetVideoDriver()->ConvertToGame( FormationApplicationPoint.x, FormationApplicationPoint.y );
+		FormationApplicationPoint = gameMousePos;
 
 		Actor *actor;
 		int max = game->GetPartySize(false);
@@ -541,7 +536,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 			actor = game->FindPC(idx);
 			if (actor && actor->IsSelected()) {
 				// transform the formation point
-				p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, ClickPoint);
+				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, FormationApplicationPoint, ClickPoint);
 				DrawTargetReticle(p, 4, false);
 			}
 		}
@@ -593,7 +588,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		Sprite2D* spr = area->LightMap->GetSprite2D();
 		video->BlitSprite( spr, 0, 0, true );
 		Sprite2D::FreeSprite( spr );
-		Region point( p.x / 16, p.y / 12, 2, 2 );
+		Region point( gameMousePos.x / 16, gameMousePos.y / 12, 2, 2 );
 		video->DrawRect( point, ColorRed );
 	}
 
@@ -755,8 +750,6 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		if (!area)
 			return false;
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-		Point p(lastMouseX, lastMouseY);
-		core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 		switch (Key) {
 			case 'a': //switches through the avatar animations
 				if (lastActor) {
@@ -776,7 +769,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						nextNode = thisNode->Next;
 					}
 				}
-				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p, lastActor?lastActor->size:1 );
+				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, gameMousePos, lastActor?lastActor->size:1 );
 				break;
 			case 'c': //force cast a hardcoded spell
 				//caster is the last selected actor
@@ -817,7 +810,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			// h
 			case 'i'://interact trigger (from the original game)
 				if (!lastActor) {
-					lastActor = area->GetActor( p, GA_DEFAULT);
+					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
 				}
 				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
 					Actor *target;
@@ -842,7 +835,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				for (i = 0; i < game->selected.size(); i++) {
 					Actor* actor = game->selected[i];
 					actor->ClearActions();
-					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
+					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, gameMousePos, -1, true);
 				}
 				break;
 			case 'k': //kicks out actor
@@ -859,7 +852,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'M':
 				if (!lastActor) {
-					lastActor = area->GetActor( p, GA_DEFAULT);
+					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
 				}
 				if (!lastActor) {
 					// ValidTarget never returns immobile targets, making debugging a nightmare
@@ -867,7 +860,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					unsigned int count = area->GetActorCount(true);
 					while (count--) {
 						Actor *actor = area->GetActor(count, true);
-						if (actor->IsOver(p)) {
+						if (actor->IsOver(gameMousePos)) {
 							actor->GetAnims()->DebugDump();
 						}
 					}
@@ -879,7 +872,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'm': //prints a debug dump (ctrl-m in the original game too)
 				if (!lastActor) {
-					lastActor = area->GetActor( p, GA_DEFAULT);
+					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
 				}
 				if (!lastActor) {
 					// ValidTarget never returns immobile targets, making debugging a nightmare
@@ -887,7 +880,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					unsigned int count = area->GetActorCount(true);
 					while (count--) {
 						Actor *actor = area->GetActor(count, true);
-						if (actor->IsOver(p)) {
+						if (actor->IsOver(gameMousePos)) {
 							actor->dump();
 						}
 					}
@@ -915,9 +908,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'o': //set up the origin for the pathfinder
 				// origin
-				pfs.x = lastMouseX;
-				pfs.y = lastMouseY;
-				core->GetVideoDriver()->ConvertToGame( pfs.x, pfs.y );
+				pfs = gameMousePos;
 				break;
 			case 'p': //center on actor
 				ScreenFlags|=SF_CENTERONACTOR;
@@ -931,7 +922,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'r'://resurrects actor
 				if (!lastActor) {
-					lastActor = area->GetActor( p, GA_DEFAULT);
+					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
 				}
 				if (lastActor) {
 					Effect *fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetStat(IE_MAXHITPOINTS), 0x30001, FX_DURATION_INSTANT_PERMANENT);
@@ -956,13 +947,13 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->GetDictionary()->DebugDump();
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
-				area->ExploreMapChunk( p, RAND(0,29), 1 );
+				area->ExploreMapChunk( gameMousePos, RAND(0,29), 1 );
 				break;
 			case 'w': // consolidates found ground piles under the pointed pc
-				area->MoveVisibleGroundPiles(p);
+				area->MoveVisibleGroundPiles(gameMousePos);
 				break;
 			case 'x': // shows coordinates on the map
-				Log(MESSAGE, "GameControl", "Position: %s [%d.%d]", area->GetScriptName(), p.x, p.y );
+				Log(MESSAGE, "GameControl", "Position: %s [%d.%d]", area->GetScriptName(), gameMousePos.x, gameMousePos.y );
 				break;
 			case 'Y': // damages all enemies by 300 (resistances apply)
 				// mwahaha!
@@ -1235,14 +1226,12 @@ void GameControl::OnMouseOver(const Point& mp)
 		return;
 	}
 
+	gameMousePos = mp;
 	Video *video = core->GetVideoDriver();
+	video->ConvertToGame( gameMousePos.x, gameMousePos.y );
 
-	lastMouseX = mp.x;
-	lastMouseY = mp.y;
-	Point p = mp;
-	video->ConvertToGame( p.x, p.y );
 	if (MouseIsDown && ( !DrawSelectionRect )) {
-		if (( abs( p.x - ClickPoint.x ) > 5 ) || ( abs( p.y - ClickPoint.y ) > 5 )) {
+		if (( abs( gameMousePos.x - ClickPoint.x ) > 5 ) || ( abs( gameMousePos.y - ClickPoint.y ) > 5 )) {
 			DrawSelectionRect = true;
 		}
 	}
@@ -1253,7 +1242,7 @@ void GameControl::OnMouseOver(const Point& mp)
 	if (!game) return;
 	Map* area = game->GetCurrentArea( );
 	if (!area) return;
-	int nextCursor = area->GetCursor( p );
+	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
 		Owner->Cursor = IE_CURSOR_BLOCKED;
@@ -1261,7 +1250,7 @@ void GameControl::OnMouseOver(const Point& mp)
 		return;
 	}
 
-	overInfoPoint = area->TMap->GetInfoPoint( p, true );
+	overInfoPoint = area->TMap->GetInfoPoint( gameMousePos, true );
 	if (overInfoPoint) {
 		//nextCursor = overInfoPoint->Cursor;
 		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
@@ -1278,8 +1267,8 @@ void GameControl::OnMouseOver(const Point& mp)
 		lastActor->SetOver( false );
 	}
 
-	overDoor = area->TMap->GetDoor( p );
-	overContainer = area->TMap->GetContainer( p );
+	overDoor = area->TMap->GetDoor( gameMousePos );
+	overContainer = area->TMap->GetContainer( gameMousePos );
 
 	if (!DrawSelectionRect) {
 		if (overDoor) {
@@ -1292,9 +1281,9 @@ void GameControl::OnMouseOver(const Point& mp)
 
 		Actor *prevActor = lastActor;
 		// let us target party members even if they are invisible
-		lastActor = area->GetActor(p, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+		lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
-			if (!lastActor->ValidTarget(target_types) || !area->IsVisible(p, false)) {
+			if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
 				lastActor = NULL;
 			}
 		}
