@@ -138,9 +138,9 @@ public:
 
 	// allow targeting allies, enemies and/or neutrals (bitmask)
 	int target_types;
+private:
 	// mouse coordinates represented in game coordinates
 	Point gameMousePos;
-private:
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
 	int target_mode;
