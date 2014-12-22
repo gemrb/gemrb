@@ -105,19 +105,6 @@ class GEM_EXPORT GameControl : public Control {
 		WINDOW_EXPAND = -1,
 		WINDOW_CONTRACT = 1
 	};
-public:
-	GameControl(const Region& frame);
-	~GameControl(void);
-protected:
-	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
-public:
-	/** Draws the target reticle for Actor movement. */
-	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
-	bool IsAnimated() const { return true; }
-	/** Sets multiple quicksaves flag*/
-	//static void MultipleQuickSaves(int arg);
-	void SetTracker(Actor *actor, ieDword dist);
 private:
 	int windowGroupCounts[WINDOW_GROUP_COUNT];
 	ieDword lastActorID;
@@ -131,16 +118,9 @@ private:
 	Region SelectionRect;
 	Point FormationApplicationPoint;
 	Point ClickPoint;
-public:
-	Door* overDoor;
-	Container* overContainer;
-	InfoPoint* overInfoPoint;
-
-	// allow targeting allies, enemies and/or neutrals (bitmask)
-	int target_types;
-private:
 	// mouse coordinates represented in game coordinates
 	Point gameMousePos;
+
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
 	int target_mode;
@@ -157,7 +137,51 @@ private:
 	String* DisplayText;
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
-public: //Events
+	Actor *user; //the user of item or spell
+
+public:
+	Door* overDoor;
+	Container* overContainer;
+	InfoPoint* overInfoPoint;
+	DialogHandler *dialoghandler;
+	//the name of the spell to cast
+	ieResRef spellName;
+	//using spell or item
+	int spellOrItem; // -1 = item, otherwise the spell type
+	//the user of spell or item
+	Actor *spellUser;
+	int spellSlot, spellIndex; //or inventorySlot/itemHeader
+	int spellCount; //multiple targeting
+	// allow targeting allies, enemies and/or neutrals (bitmask)
+	int target_types;
+
+private:
+	/** this function safely retrieves an Actor by ID */
+	Actor *GetActorByGlobalID(ieDword ID);
+	void CalculateSelection(const Point &p);
+	void ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION);
+	void ReadFormations();
+	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
+	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
+
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip);
+	// GameControl always needs to redraw
+	bool NeedsDraw() { return true; };
+
+public:
+	GameControl(const Region& frame);
+	~GameControl(void);
+
+	bool IsAnimated() const { return true; }
+	/** Draws the target reticle for Actor movement. */
+	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
+	/** Sets multiple quicksaves flag*/
+	//static void MultipleQuickSaves(int arg);
+	void SetTracker(Actor *actor, ieDword dist);
+
+	//Events
 	/** Key Press Event */
 	bool OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Key Release Event */
@@ -188,28 +212,7 @@ public: //Events
 	void Center(unsigned short x, unsigned short y);
 	void ClearMouseState();
 	void MoveViewportTo(int x, int y, bool center);
-private:
-	/** this function safely retrieves an Actor by ID */
-	Actor *GetActorByGlobalID(ieDword ID);
-	void CalculateSelection(const Point &p);
-	void ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION);
-	void ReadFormations();
-	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
-	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
 
-private:
-	Actor *user;     //the user of item or spell
-public:
-	DialogHandler *dialoghandler;
-	//the name of the spell to cast
-	ieResRef spellName;
-	//using spell or item
-	int spellOrItem; // -1 = item, otherwise the spell type
-	//the user of spell or item
-	Actor *spellUser;
-	int spellSlot, spellIndex; //or inventorySlot/itemHeader
-	int spellCount; //multiple targeting
-public:
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);
 	void SetLastActor(Actor *actor, Actor *prevActor);
