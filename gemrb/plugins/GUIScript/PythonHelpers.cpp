@@ -56,12 +56,12 @@ PythonCallback::~PythonCallback()
 	}
 }
 
-bool PythonCallback::operator() ()
+void PythonCallback::operator() () const
 {
 	if (!Function || !Py_IsInitialized()) {
-		return false;
+		return;
 	}
-	return CallPython(Function);
+	CallPython(Function);
 }
 
 
@@ -82,15 +82,15 @@ PythonControlCallback::~PythonControlCallback()
 	}
 }
 
-bool PythonControlCallback::operator() ()
+void PythonControlCallback::operator() () const
 {
-	return (*this)(NULL);
+	(*this)(NULL);
 }
 
-bool PythonControlCallback::operator() (Control* ctrl)
+void PythonControlCallback::operator() (Control* ctrl) const
 {
 	if (!Function || !Py_IsInitialized()) {
-		return false;
+		return;
 	}
 
 	PyObject *args = NULL;
@@ -131,5 +131,5 @@ bool PythonControlCallback::operator() (Control* ctrl)
 	}
 	Py_DECREF(func_code);
 	Py_DECREF(co_argcount);
-	return CallPython(Function, args);
+	CallPython(Function, args);
 }

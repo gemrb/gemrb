@@ -39,7 +39,7 @@ struct PythonCallback : public VoidCallback {
 public:
 	PythonCallback(PyObject *Function);
 	~PythonCallback();
-	bool operator()();
+	void operator()() const;
 private:
 	PyObject *Function;
 };
@@ -50,8 +50,8 @@ public:
 	PythonControlCallback(PyObject *Function);
 	~PythonControlCallback();
 
-	bool operator()();
-	bool operator()(Control*);
+	void operator()() const;
+	void operator()(Control*) const;
 private:
 	PyObject *Function;
 };

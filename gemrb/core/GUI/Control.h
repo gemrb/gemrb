@@ -132,12 +132,13 @@ public: //Events
 	int GetFunctionNumber() { return FunctionNumber; }
 };
 
+
 class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*> > {
 public:
 	ControlEventHandler(Callback<Control*>* ptr = NULL)
-	: Holder< Callback<Control*> >(ptr) {}
+	: Holder< Callback<Control*, void> >(ptr) {}
 
-	bool operator()(Control* ctrl) {
+	void operator()(Control* ctrl) {
 		return (*ptr)(ctrl);
 	}
 };

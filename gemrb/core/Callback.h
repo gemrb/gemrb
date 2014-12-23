@@ -25,43 +25,48 @@
 
 namespace GemRB {
 
-class GEM_EXPORT VoidCallback : public Held<VoidCallback> {
-public:
-	virtual ~VoidCallback() {};
-	virtual bool operator()()=0;
+class GEM_EXPORT CallbackBase : public Held<CallbackBase> {
+	public:
+	virtual ~CallbackBase() {};
 };
 
-template<class T>
-class GEM_EXPORT Callback : public VoidCallback {
+template<typename P=void, typename R=void>
+class GEM_EXPORT Callback : public CallbackBase {
 public:
-	virtual bool operator()(T target)=0;
+	virtual R operator()(P) const {};
 };
 
-template<class L, typename T>
-class GEM_EXPORT MethodCallback : public Callback<T> {
-	typedef bool (L::*CallbackMethod)(T);
+// specialization for no argument
+template<typename R>
+class GEM_EXPORT Callback<void, R> : public Held< Callback<void, R> > {
+public:
+	virtual ~Callback() {}
+	virtual R operator()() const=0;
+};
+
+template<class C, typename P=void, typename R=void>
+class GEM_EXPORT MethodCallback : public Callback<P,R> {
+	typedef R (C::*CallbackMethod)(P);
 private:
-	L* listener;
+	C* listener;
 	CallbackMethod callback;
 public:
-	MethodCallback(L* l, CallbackMethod cb)
+	MethodCallback(C* l, CallbackMethod cb)
 	: listener(l), callback(cb) {}
 
-	bool operator()(T target) {
+	R operator()(P target) const {
 		return (listener->*callback)(target);
 	}
-
-	bool operator()() {
-		return true;
-	}
 };
+
+typedef Callback<void, void> VoidCallback;
 
 class GEM_EXPORT EventHandler : public Holder<VoidCallback> {
 public:
 	EventHandler(VoidCallback* ptr = NULL)
 	: Holder<VoidCallback>(ptr) {}
 
-	bool operator()() {
+	void operator()() const {
 		return (*ptr)();
 	}
 };

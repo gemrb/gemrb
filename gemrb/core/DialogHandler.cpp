@@ -212,9 +212,9 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
-bool DialogHandler::DialogChoose(Control* ctl)
+void DialogHandler::DialogChoose(Control* ctl)
 {
-	return DialogChoose(ctl->Value);
+	DialogChoose(ctl->Value);
 }
 
 bool DialogHandler::DialogChoose(unsigned int choose)

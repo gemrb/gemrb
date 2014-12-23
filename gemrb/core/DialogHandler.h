@@ -52,7 +52,7 @@ public:
 	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	bool DialogChoose(unsigned int choose);
-	bool DialogChoose(Control*);
+	void DialogChoose(Control*);
 };
 
 }
