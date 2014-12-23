@@ -47,6 +47,8 @@ protected:
 	unsigned long Pos;
 	unsigned long size;
 	bool Encrypted;
+
+	static bool IsBigEndian;
 public:
 	char filename[16]; //8+1+3+1 padded to dword
 	char originalfile[_MAX_PATH];
@@ -72,8 +74,8 @@ public:
 	void ReadDecrypted(void* buf, unsigned int size);
 	int ReadLine(void* buf, unsigned int maxlen);
 	/** Endian Switch setup */
-	static void SetEndianSwitch(int par);
-	static bool IsEndianSwitch();
+	static void SetBigEndian(bool be);
+	static bool BigEndian();
 	/** Create a copy of this stream.
 	 *
 	 *  Returns NULL on failure.

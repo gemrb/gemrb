@@ -98,7 +98,7 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	}
 	if(is16bit) {
 		res >>= 1;
-		if (str->IsEndianSwitch()) {
+		if (str->BigEndian()) {
 			for (size_t i = 0; i < (size_t)count; i++) {
 				fix_endian(((ieWord *)buffer)[i]);
 			}
@@ -148,7 +148,7 @@ bool WavPCMReader::Open(DataStream* stream)
 	//hmm, we should swap fmt bytes if we are on a mac
 	//but we don't know exactly how much of the structure we'll read
 	//so we have to swap the bytes after reading them
-	if (str->IsEndianSwitch()) {
+	if (str->BigEndian()) {
 		fix_endian(fmt.wFormatTag);
 		fix_endian(fmt.nChannels);
 		fix_endian(fmt.nSamplesPerSec);

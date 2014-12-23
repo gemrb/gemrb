@@ -124,15 +124,6 @@ static int MagicBit = 0;
 Interface::Interface()
 	: TLKEncoding()
 {
-	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
-
-	// default to the correct endianswitch
-	ieWord endiantest = 1;
-	if (((char *)&endiantest)[1] == 1) {
-		// big-endian
-		DataStream::SetEndianSwitch(true);
-	}
-
 	unsigned int i;
 	for(i=0;i<256;i++) {
 		pl_uppercase[i]=(ieByte) toupper(i);
@@ -1241,6 +1232,7 @@ int Interface::LoadFonts()
 
 int Interface::Init(InterfaceConfig* config)
 {
+	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 	if (!config) {
 		Log(FATAL, "Core", "No Configuration context.");
 		return GEM_ERROR;
@@ -1282,7 +1274,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
 	CONFIG_INT("DrawFPS", DrawFPS = );
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
-	CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
+	CONFIG_INT("EndianSwitch", DataStream::SetBigEndian);
 	CONFIG_INT("FogOfWar", FogOfWar = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );

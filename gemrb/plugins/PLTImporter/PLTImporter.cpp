@@ -37,7 +37,7 @@ static ieDword blue_mask = 0x000000ff;
 PLTImporter::PLTImporter(void)
 {
 	pixels = NULL;
-	if (DataStream::IsEndianSwitch()) {
+	if (DataStream::BigEndian()) {
 		red_mask = 0x0000ff00;
 		green_mask = 0x00ff0000;
 		blue_mask = 0xff000000;

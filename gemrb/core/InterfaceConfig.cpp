@@ -38,13 +38,6 @@ InterfaceConfig::InterfaceConfig(int /*argc*/, char** /**argv[]*/)
 	// currently the base class has no CLI options.
 	configVars = new StringMap();
 	configVars->init(50, 10);
-
-	// default to the correct endianswitch
-	ieWord endiantest = 1;
-	if (((char *)&endiantest)[1] == 1) {
-		// big-endian
-		DataStream::SetEndianSwitch(true);
-	}
 }
 
 InterfaceConfig::~InterfaceConfig()

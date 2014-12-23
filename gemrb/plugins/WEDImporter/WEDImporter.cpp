@@ -147,7 +147,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 				GEM_STREAM_START );
 			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
 			str->Read( indices, count * sizeof(ieWord) );
-			if( DataStream::IsEndianSwitch()) {
+			if( DataStream::BigEndian()) {
 				swab( (char*) indices, (char*) indices, count * sizeof(ieWord) );
 			}
 			Tile* tile;
@@ -275,7 +275,7 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
 	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
 	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
-	if( DataStream::IsEndianSwitch()) {
+	if( DataStream::BigEndian()) {
 		swab( (char*) DoorTiles, (char*) DoorTiles, DoorTileCount * sizeof( ieWord) );
 	}
 	*count = DoorTileCount;
@@ -331,7 +331,7 @@ Wall_Polygon **WEDImporter::GetWallGroups()
 		}
 		Point *points = new Point[count];
 		str->Read (points, count * sizeof (Point) );
-		if( DataStream::IsEndianSwitch()) {
+		if( DataStream::BigEndian()) {
 			swab( (char*) points, (char*) points, count * sizeof (Point) );
 		}
 

@@ -28,7 +28,8 @@ namespace GemRB {
 
 static const char* GEM_ENCRYPTION_KEY = "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca";
 
-static bool EndianSwitch = false;
+const static ieWord endiantest = 1;
+bool DataStream::IsBigEndian = ((char *)&endiantest)[1] == 1;
 
 DataStream::DataStream(void)
 {
@@ -40,14 +41,14 @@ DataStream::~DataStream(void)
 {
 }
 
-void DataStream::SetEndianSwitch(int tmp)
+void DataStream::SetBigEndian(bool be)
 {
-	EndianSwitch = !! tmp;
+	DataStream::IsBigEndian = be;
 }
 
-bool DataStream::IsEndianSwitch()
+bool DataStream::BigEndian()
 {
-	return EndianSwitch;
+	return DataStream::IsBigEndian;
 }
 
 /** Returns true if the stream is encrypted */
@@ -97,7 +98,7 @@ unsigned long DataStream::Remains() const
 int DataStream::ReadWord(ieWord *dest)
 {
 	int len = Read(dest, 2);
-	if (EndianSwitch) {
+	if (IsBigEndian) {
 		unsigned char tmp;
 		tmp=((unsigned char *) dest)[0];
 		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
@@ -109,7 +110,7 @@ int DataStream::ReadWord(ieWord *dest)
 int DataStream::ReadWordSigned(ieWordSigned *dest)
 {
 	int len = Read(dest, 2);
-	if (EndianSwitch) {
+	if (IsBigEndian) {
 		unsigned char tmp;
 		tmp=((unsigned char *) dest)[0];
 		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
@@ -121,7 +122,7 @@ int DataStream::ReadWordSigned(ieWordSigned *dest)
 int DataStream::WriteWord(const ieWord *src)
 {
 	int len;
-	if (EndianSwitch) {
+	if (IsBigEndian) {
 		char tmp[2];
 		tmp[0]=((unsigned char *) src)[1];
 		tmp[1]=((unsigned char *) src)[0];
@@ -136,7 +137,7 @@ int DataStream::WriteWord(const ieWord *src)
 int DataStream::ReadDword(ieDword *dest)
 {
 	int len = Read(dest, 4);
-	if (EndianSwitch) {
+	if (IsBigEndian) {
 		unsigned char tmp;
 		tmp=((unsigned char *) dest)[0];
 		((unsigned char *) dest)[0]=((unsigned char *) dest)[3];
@@ -151,7 +152,7 @@ int DataStream::ReadDword(ieDword *dest)
 int DataStream::WriteDword(const ieDword *src)
 {
 	int len;
-	if (EndianSwitch) {
+	if (IsBigEndian) {
 		char tmp[4];
 		tmp[0]=((unsigned char *) src)[3];
 		tmp[1]=((unsigned char *) src)[2];

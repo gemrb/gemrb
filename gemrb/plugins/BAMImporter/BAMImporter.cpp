@@ -239,7 +239,7 @@ ieWord * BAMImporter::CacheFLT(unsigned int &count)
 	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read( FLT, count * sizeof(ieWord) );
-	if( DataStream::IsEndianSwitch() ) {
+	if( DataStream::BigEndian() ) {
 		//msvc likes it as char *
 		swab( (char*) FLT, (char*) FLT, count * sizeof(ieWord) );
 	}
