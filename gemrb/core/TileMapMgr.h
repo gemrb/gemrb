@@ -37,6 +37,7 @@ public:
 		bool& BaseClosed) = 0;
 	virtual void SetupOpenDoor(unsigned int &index, unsigned int &count) = 0;
 	virtual void SetupClosedDoor(unsigned int &index, unsigned int &count) = 0;
+	virtual void SetExtendedNight(bool night) = 0;
 
 	virtual Wall_Polygon** GetWallGroups() = 0;
 	//returns only the wall polygon counts
