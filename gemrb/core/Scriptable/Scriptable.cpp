@@ -2233,7 +2233,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		return;
 	}
 	//if not continous random walk, then stops for a while
-	if (can_stop && RAND(0,3)) {
+	if (can_stop && !RAND(0,3)) {
 		SetWait(RAND(7,14));
 		return;
 	}
