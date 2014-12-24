@@ -133,9 +133,6 @@ Interface::Interface()
 	projserv = NULL;
 	VideoDriverName = "sdl";
 	AudioDriverName = "openal";
-	vars = NULL;
-	tokens = NULL;
-	lists = NULL;
 	RtRows = NULL;
 	sgiterator = NULL;
 	game = NULL;
@@ -160,7 +157,6 @@ Interface::Interface()
 	tooltip_y = 0;
 	tooltip_currtextw = 0;
 	tooltip_ctrl = NULL;
-	plugin_flags = NULL;
 
 	pal16 = NULL;
 	pal32 = NULL;
@@ -242,6 +238,19 @@ Interface::Interface()
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
+
+	//once GemRB own format is working well, this might be set to 0
+	SaveAsOriginal = 1;
+
+	plugin_flags = new Variables();
+	plugin_flags->SetType( GEM_VARIABLES_INT );
+
+	lists = new Variables();
+	lists->SetType( GEM_VARIABLES_POINTER );
+
+	vars = new Variables();
+	vars->SetType( GEM_VARIABLES_INT );
+	vars->ParseKey(true);
 }
 
 //2da lists are ieDword lists allocated by malloc
@@ -1238,29 +1247,9 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
-	//once GemRB own format is working well, this might be set to 0
-	SaveAsOriginal = 1;
-
-	plugin_flags = new Variables();
-	plugin_flags->SetType( GEM_VARIABLES_INT );
-
 	Log(MESSAGE, "Core", "Initializing the Event Manager...");
 	evntmgr = new EventMgr();
 
-	lists = new Variables();
-	if (!lists) {
-		Log(FATAL, "Core", "Failed to allocate Lists dictionary.");
-		return GEM_ERROR;
-	}
-	lists->SetType( GEM_VARIABLES_POINTER );
-
-	vars = new Variables();
-	if (!vars) {
-		Log(FATAL, "Core", "Failed to allocate Variables dictionary");
-		return GEM_ERROR;
-	}
-	vars->SetType( GEM_VARIABLES_INT );
-	vars->ParseKey(true);
 
 	const char* value = NULL;
 #define CONFIG_INT(key, var) \
