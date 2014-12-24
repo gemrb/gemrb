@@ -6911,10 +6911,9 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			BaseStats[IE_CHECKFORBERSERK]--;
 		}
 		if ((state&STATE_CONFUSED)) {
-
-		const char* actionString = NULL;
-		int tmp = core->Roll(1,3,0);
-		switch(tmp) {
+			const char* actionString = NULL;
+			int tmp = core->Roll(1,3,0);
+			switch (tmp) {
 			case 2:
 				actionString = "RandomWalk()";
 				break;
