@@ -6533,7 +6533,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}
 
-	print("Performattack for %s, target is: %s", ShortName, target->ShortName);
+	Log(DEBUG, "Actor", "Performattack for %s, target is: %s", ShortName, target->ShortName);
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
