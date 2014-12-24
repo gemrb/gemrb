@@ -6918,7 +6918,12 @@ void Actor::UpdateActorState(ieDword gameTime) {
 				actionString = "RandomWalk()";
 				break;
 			case 1:
-				actionString = "Attack([0])";
+				// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
+				if (RAND(0,1)) {
+					actionString = "Attack(NearestEnemyOf(Myself))";
+				} else {
+					actionString = "Attack([PC])";
+				}
 				break;
 			default:
 				actionString = "NoAction()";
@@ -6928,7 +6933,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);
-				print("Confusion: added %s", actionString);
+				print("Confusion: added %s at %d (%d)", actionString, gameTime-roundTime, roundTime);
 			}
 			return;
 		}
