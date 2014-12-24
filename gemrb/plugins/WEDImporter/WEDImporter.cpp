@@ -122,14 +122,13 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 			res[len] = '\0';
 		}
 	}
-	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
 	DataStream* tisfile = gamedata->GetResource(res, IE_TIS_CLASS_ID);
 	if (!tisfile) {
-		delete over;
 		return -1;
 	}
 	PluginHolder<TileSetMgr> tis(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
+	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
 	for (int y = 0; y < overlays->Height; y++) {
 		for (int x = 0; x < overlays->Width; x++) {
 			str->Seek( overlays->TilemapOffset +
@@ -139,9 +138,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 			ieByte overlaymask;
 			str->ReadWord( &startindex );
 			str->ReadWord( &count );
-			//should be always 0xffff
 			str->ReadWord( &secondary );
-			//should be always 0
 			str->Read( &overlaymask, 1 );
 			str->Seek( overlays->TILOffset + ( startindex * 2 ),
 				GEM_STREAM_START );
@@ -194,8 +191,6 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm)
 		return NULL;
 	}
 	// rain_overlays[0] is never used
-	// XXX: should fix AddOverlay not to load an overlay twice if there's no rain version!!
-	//AddOverlay(tm, &overlays.at(0), true);
 	tm->AddRainOverlay( NULL );
 
 	//reading additional overlays
@@ -205,13 +200,12 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm)
 		if (!(mask&usedoverlays)) {
 			tm->AddOverlay( NULL );
 			tm->AddRainOverlay( NULL );
-			mask<<=1;
-			continue;
+		} else {
+			// XXX: should fix AddOverlay not to load an overlay twice if there's no rain version!!
+			AddOverlay(tm, &overlays.at(i), false);
+			AddOverlay(tm, &overlays.at(i), true);
 		}
 		mask<<=1;
-
-		AddOverlay(tm, &overlays.at(i), false);
-		AddOverlay(tm, &overlays.at(i), true);
 	}
 	return tm;
 }
@@ -279,11 +273,7 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 		swab( (char*) DoorTiles, (char*) DoorTiles, DoorTileCount * sizeof( ieWord) );
 	}
 	*count = DoorTileCount;
-	if (DoorClosed) {
-		BaseClosed = true;
-	} else {
-		BaseClosed = false;
-	}
+	BaseClosed = DoorClosed != 0;
 	return DoorTiles;
 }
 
