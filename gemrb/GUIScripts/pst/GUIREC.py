@@ -422,8 +422,6 @@ def OnRecordsHelpCharisma ():
 def GetCharacterHeader (pc):
 	global avatar_header
 
-	BioTable = GemRB.LoadTable ("bios")
-
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GUICommon.HasMultiClassBits (pc)
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
@@ -831,8 +829,8 @@ def OpenBiographyWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	BioTable = GemRB.LoadTable ("bios")
-	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	BioText = int (BioTable.GetValue (Specific, 'BIO'))
+	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	BioText = int (BioTable.GetValue (BioTable.GetRowName (Specific+1), 'BIO'))
 
 	TextArea = Window.GetControl (0)
 	TextArea.SetText (BioText)
@@ -907,8 +905,8 @@ def OpenLevelUpWindow ():
 
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")
-	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	AvatarName = BioTable.GetValue (Specific, "PC")
+	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	AvatarName = BioTable.GetRowName (Specific+1)
 
 	# These will be used for saving throws
 	SavThrUpdated = False

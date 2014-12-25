@@ -6812,13 +6812,14 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameter
 	}
 }
 
+// pst spawning
 void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 {
 	AutoTable pcs("bios");
 	if (!pcs) {
 		return;
 	}
-	const char* string = pcs->QueryField( parameters->int0Parameter, 0 );
+	const char* string = pcs->GetRowName(parameters->int0Parameter);
 	int pos = gamedata->LoadCreature(string,0,false);
 	if (pos<0) {
 		return;
