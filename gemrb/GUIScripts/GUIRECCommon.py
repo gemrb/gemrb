@@ -450,8 +450,8 @@ def RevertBiography():
 	if GameCheck.IsIWD2():
 		BioTable = GemRB.LoadTable ("bios")
 		pc = GemRB.GameGetSelectedPCSingle ()
-		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-		BioStrRef = BioTable.GetValue (Class-1, 1)
+		ClassName = GUICommon.GetClassRowName (pc)
+		BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	else:
 		BioStrRef = 33347
 	TextArea.SetText (BioStrRef)
