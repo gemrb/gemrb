@@ -1,24 +1,24 @@
 2DA V1.0
 15889
-           CLASS               BIO        
-0          *                   *          
-1          MAGE                15882      
-2          FIGHTER             15881      
-3          PRIEST              15884      
-4          THIEF               15883      
-5          BARD                15886      
-6          PALADIN             15887      
-7          FIGHTER_MAGE        15889      
-8          FIGHTER_CLERIC      15889      
-9          FIGHTER_THIEF       15889      
-10         FIGHTER_MAGE_THIEF  15889      
-11         DRUID               15885      
-12         RANGER              15888      
-13         MAGE_THIEF          15889      
-14         CLERIC_MAGE         15889      
-15         CLERIC_THIEF        15889      
-16         FIGHTER_DRUID       15889      
-17         FIGHTER_MAGE_CLERIC 15889      
-18         CLERIC_RANGER       15889      
-19         SORCERER            *          
-20         MONK                *          
+                    BIO
+*                   *
+MAGE                15882
+FIGHTER             15881
+PRIEST              15884
+THIEF               15883
+BARD                15886
+PALADIN             15887
+FIGHTER_MAGE        15889
+FIGHTER_CLERIC      15889
+FIGHTER_THIEF       15889
+FIGHTER_MAGE_THIEF  15889
+DRUID               15885
+RANGER              15888
+MAGE_THIEF          15889
+CLERIC_MAGE         15889
+CLERIC_THIEF        15889
+FIGHTER_DRUID       15889
+FIGHTER_MAGE_CLERIC 15889
+CLERIC_RANGER       15889
+SORCERER            *
+MONK                *
