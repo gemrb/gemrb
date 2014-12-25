@@ -19,6 +19,7 @@
 # code shared between the common GUIREC and that of iwd2 (pst)
 import GemRB
 import GameCheck
+import GUICommon
 import Portrait
 from GUIDefines import *
 from ie_stats import IE_SEX, IE_CLASS, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
@@ -571,13 +572,11 @@ def CloseBiographyWindow ():
 	return
 
 def GetProtagonistBiography (pc):
-	classstrings = [ 15882, 15881, 15884, 15883, 15886, 15887, 15889, 15889, 15889, 15889,
-		15885, 15888, 15889, 15889, 15889, 15889, 15889, 15889 ]
+	BioTable = GemRB.LoadTable ("bios")
 	racestrings = [ 15895, 15891, 15892, 15890, 15893, 15894 ]
-	clss = GemRB.GetPlayerStat (pc, IE_CLASS)
-	if clss > 18:
-		clss = 18
-	bio = GemRB.GetString (classstrings[clss-1])
+
+	ClassName = GUICommon.GetClassRowName (pc)
+	bio = GemRB.GetString (BioTable.GetValue (ClassName, "BIO"))
 	race = GemRB.GetPlayerStat (pc, IE_RACE)
 	if race <= 6:
 		bio += "\n\n" + GemRB.GetString (racestrings[race-1])
