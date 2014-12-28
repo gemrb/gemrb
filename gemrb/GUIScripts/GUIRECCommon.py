@@ -500,6 +500,7 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = SubCustomizeWindow.GetControl (4)
+	TextArea.SetBackground ("") # disable win95 background in bg2's editbox
 	TextArea.SetBufferLength (65535)
 	TextArea.SetText (BioStrRef)
 
