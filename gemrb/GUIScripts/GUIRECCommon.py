@@ -471,7 +471,7 @@ def OpenBiographyEditWindow ():
 	if BioStrRef != 33347:
 		Changed = 1
 
-	# TODO: check if this is really needed
+	# 23 and 24 were deleted and replaced in iwd
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		SubCustomizeWindow = GemRB.LoadWindow (51)
 	else:
@@ -487,8 +487,10 @@ def OpenBiographyEditWindow ():
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
+	ScrollbarID = 6
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		RevertButton = SubCustomizeWindow.GetControl (6)
+		ScrollbarID = 3
 	else:
 		RevertButton = SubCustomizeWindow.GetControl (3)
 	RevertButton.SetText (2240)
@@ -500,8 +502,8 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = SubCustomizeWindow.GetControl (4)
-	TextArea.SetBackground ("") # disable win95 background in bg2's editbox
-	TextArea.SetBufferLength (65535)
+	TextArea = TextArea.ConvertEdit (ScrollbarID)
+	TextArea.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	TextArea.SetText (BioStrRef)
 
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
