@@ -92,6 +92,7 @@ def BioCancelPress():
 	return
 
 def BioDonePress():
+	GemRB.SetToken ("BIO", EditControl.QueryText())
 	if BioWindow:
 		BioWindow.Unload ()
 	return
@@ -124,6 +125,7 @@ def BioPress():
 	else:
 		EditControl.SetText (BioData )
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	EditControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
 def NextPress():
