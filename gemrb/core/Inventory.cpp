@@ -1489,7 +1489,7 @@ void Inventory::dump(StringBuffer& buffer) const
 		buffer.appendFormatted( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
 	}
 
-	buffer.appendFormatted( "Equipped: %d\n", Equipped );
+	buffer.appendFormatted("Equipped: %d       EquippedHeader: %d\n", Equipped, EquippedHeader);
 	Changed = true;
 	CalculateWeight();
 	buffer.appendFormatted( "Total weight: %d\n", Weight );
