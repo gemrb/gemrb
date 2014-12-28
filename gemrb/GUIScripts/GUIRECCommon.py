@@ -503,7 +503,6 @@ def OpenBiographyEditWindow ():
 
 	TextArea = SubCustomizeWindow.GetControl (4)
 	TextArea = TextArea.ConvertEdit (ScrollbarID)
-	TextArea.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	TextArea.SetText (BioStrRef)
 
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
@@ -512,6 +511,7 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	TextArea.SetStatus (IE_GUI_CONTROL_FOCUSED) # DO NOT MOVE near the rest of TextArea handling
 	return
 
 def ClearBiography():
