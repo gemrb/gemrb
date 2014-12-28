@@ -4910,8 +4910,8 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateString__doc,
-"CreateString( Text )->StrRef\n\n"
-"Creates a custom string." );
+"CreateString(Strref, Text)->StrRef\n\n"
+"Creates or updates a custom string." );
 
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
