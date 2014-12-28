@@ -2604,7 +2604,18 @@ def BiographyCancelPress():
 def BiographyDonePress():
 	global CharGenWindow, BiographyWindow, BiographyField
 
-	GemRB.SetToken ("Biography", BiographyField.QueryText () )
+	BIO = BiographyField.QueryText ()
+	GemRB.SetToken ("Biography", BIO) # just for any window reopens
+	BioStrRefSlot = 63
+	DefaultBIO = 19423
+	if BIO == GemRB.GetString (DefaultBIO):
+		GemRB.SetPlayerString (MyChar, BioStrRefSlot, DefaultBIO)
+	else:
+		# unlike tob, iwd has no marked placeholders (or strings) at 62015; but we have special magic in place ...
+		# still, use the returned strref in case anything unexpected happened
+		ref = GemRB.CreateString (62015+MyChar, BIO)
+		GemRB.SetPlayerString (MyChar, BioStrRefSlot, ref)
+
 	if BiographyWindow:
 		BiographyWindow.Unload ()
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
