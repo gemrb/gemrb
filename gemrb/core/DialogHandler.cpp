@@ -332,7 +332,8 @@ void DialogHandler::DialogChoose(unsigned int choose)
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 				}
 			}
-			if (!tgt) {
+			target = tgt;
+			if (!target) {
 				Log(WARNING, "DialogHandler", "Can't redirect dialog");
 				ta->SetMinRow( false );
 				EndDialog();
@@ -342,11 +343,11 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			targetID = tgt->GetGlobalID();
 			tgt->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
-			if (target != tgt) {
+/*			if (target != tgt) {
 				// switching target; clear actions
 				target = tgt;
 				target->Stop();
-			}
+			}*/
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
