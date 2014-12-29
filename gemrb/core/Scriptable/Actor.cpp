@@ -2171,7 +2171,7 @@ static void InitActorTables()
 			}
 			numfound = 0;
 			bool foundwarrior = false;
-			for (int j=0; j<classcount; j++) {
+			for (j=0; j<classcount; j++) {
 				//no sense continuing if we've found all to be found
 				if (numfound==tmpbits)
 					break;
@@ -2222,7 +2222,7 @@ static void InitActorTables()
 				}
 			}
 
-			for (ieDword j=0; j<tmpbits; j++) {
+			for (j=0; j<(signed)tmpbits; j++) {
 				if (classnames[j]) {
 					free(classnames[j]);
 				}
