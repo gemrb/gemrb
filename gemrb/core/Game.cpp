@@ -1857,19 +1857,25 @@ bool Game::IsDay()
 void Game::ChangeSong(bool always, bool force)
 {
 	int Song;
+	static int BattleSong = 0;
 
 	if (CombatCounter) {
 		//battlesong
 		Song = SONG_BATTLE;
+		BattleSong++;
 	} else {
 		//will select SONG_DAY or SONG_NIGHT
 		Song = (GameTime/AI_UPDATE_TIME)%7200/3600;
+		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)
 	//always transition gracefully with ChangeSong
 	//force just means, we schedule the song for later, if currently
 	//is playing
-	area->PlayAreaSong( Song, always, force );
+	// make sure we only start one battle song at a time, since we're called once per party member
+	if (BattleSong < 2) {
+		area->PlayAreaSong( Song, always, force );
+	}
 }
 
 /* this method redraws weather. If update is false,
