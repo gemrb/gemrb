@@ -251,6 +251,9 @@ Interface::Interface()
 	vars = new Variables();
 	vars->SetType( GEM_VARIABLES_INT );
 	vars->ParseKey(true);
+
+	tokens = new Variables();
+	tokens->SetType( GEM_VARIABLES_STRING );
 }
 
 //2da lists are ieDword lists allocated by malloc
@@ -1711,14 +1714,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Failed to allocate SaveGameIterator.");
 		return GEM_ERROR;
 	}
-
-	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
-	tokens = new Variables();
-	if (!tokens) {
-		Log(FATAL, "Core", "Failed to allocate Token dictionary.");
-		return GEM_ERROR;
-	}
-	tokens->SetType( GEM_VARIABLES_STRING );
 
 	Log(MESSAGE, "Core", "Initializing Music Manager...");
 	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
