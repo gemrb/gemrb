@@ -29,11 +29,13 @@
 #                                                   #
 #  bg1       Baldur's Gate                          #
 #  bg2       Baldur's Gate 2 : SoA or ToB           #
-#  tob       Baldur's Gate 2 : ToB (obsolete)       #
-#  iwd       IceWind Dale (no How or ToTL installed)#
-#  how       IceWind Dale : HoW or ToTL             #
-#  iwd2      IceWind Dale 2                         #
+#  how       Icewind Dale : HoW or ToTL             #
+#  (iwd)     Icewind Dale (no How or ToTL installed)#
+#  iwd2      Icewind Dale 2                         #
 #  pst       Planescape Torment                     #
+#                                                   #
+#  demo      Game demo stub                         #
+#  test      Minimal test mode                      #
 #  (More will come)                                 #
 #                                                   #
 #####################################################
