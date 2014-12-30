@@ -63,17 +63,25 @@ class metaControl(type):
     def __init__(self, WinID, ID):
       self.WinID = WinID
       self.ID = ID
-    newdict = { '__slots__':['WinID', 'ID'], '__init__':__init__, }
+   
     if len(bases) == 1:
       def __subinit__(self, WinID, ID):
         bases[0].__init__(self, WinID, ID)
-      newdict['__init__'] = __subinit__
-      newdict['__slots__'] = []
-    methods = classdict['methods']
+      init = __subinit__
+      slots = []
+    else:
+      slots = ['WinID', 'ID']
+      init = __init__
+ 
+    slots.extend(classdict.pop('assignableAttributes', []))
+    newdict = { '__slots__' : slots, '__init__' : init, }
+
+    methods = classdict.pop('methods', {})
     for key in methods:
       newdict[key] = make_caller_lambda_Control(methods[key])
-    for key in classdict:
-      if key != 'methods':
-        newdict[key] = classdict[key]
+    
+    # we've poped everything we dont want, just insert the rest of classdict
+    # FIXME?: we are still able to overwrite things like the "__slots__" entry
+    newdict.update(classdict)
     return type.__new__(cls, classname, bases, newdict)
 
