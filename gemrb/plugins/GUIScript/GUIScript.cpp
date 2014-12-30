@@ -1746,10 +1746,10 @@ PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
 static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	ieDword Value;
+	PyObject* Value;
 	char* VarName;
 
-	if (!PyArg_ParseTuple( args, "iisi", &WindowIndex, &ControlIndex,
+	if (!PyArg_ParseTuple( args, "iisO", &WindowIndex, &ControlIndex,
 			&VarName, &Value )) {
 		return AttributeError( GemRB_Control_SetVarAssoc__doc );
 	}
@@ -1761,13 +1761,13 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 
 	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
 	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
-	ctrl->Value = Value;
+	ctrl->Value = (ieDword)PyInt_AsUnsignedLongMask(Value);
+
 	/** setting the correct state for this control */
 	/** it is possible to set up a default value, if Lookup returns false, use it */
-	Value = 0;
-	core->GetDictionary()->Lookup( VarName, Value );
-	Window* win = core->GetWindow( WindowIndex );
-	win->RedrawControls(VarName, Value);
+	ieDword curVal = 0;
+	core->GetDictionary()->Lookup( VarName, curVal );
+	ctrl->Owner->RedrawControls(VarName, curVal);
 
 	Py_RETURN_NONE;
 }
