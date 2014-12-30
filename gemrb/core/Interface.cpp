@@ -269,38 +269,18 @@ static void ReleaseItemList(void *poi)
 
 static void FreeAbilityTables()
 {
-	if (strmod) {
-		free(strmod);
-	}
-	strmod = NULL;
-	if (strmodex) {
-		free(strmodex);
-	}
-	strmodex = NULL;
-	if (intmod) {
-		free(intmod);
-	}
-	intmod = NULL;
-	if (dexmod) {
-		free(dexmod);
-	}
-	dexmod = NULL;
-	if (conmod) {
-		free(conmod);
-	}
-	conmod = NULL;
-	if (chrmod) {
-		free(chrmod);
-	}
-	chrmod = NULL;
-	if (lorebon) {
-		free(lorebon);
-	}
-	lorebon = NULL;
-	if (wisbon) {
-		free(wisbon);
-	}
-	wisbon = NULL;
+#define NULL_FREE(ptr)\
+	free(ptr); ptr = NULL;
+
+	NULL_FREE(strmod);
+	NULL_FREE(strmodex);
+	NULL_FREE(intmod);
+	NULL_FREE(dexmod);
+	NULL_FREE(conmod);
+	NULL_FREE(chrmod);
+	NULL_FREE(lorebon);
+	NULL_FREE(wisbon);
+#undef NULL_FREE
 }
 
 void Interface::FreeResRefTable(ieResRef *&table, int &count)
