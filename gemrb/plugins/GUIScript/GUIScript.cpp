@@ -2679,11 +2679,11 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				link->AreaIndex = thisarea;
 				//linktodir may need translation
 				wmap->InsertAreaLink(areaindex, linktodir, link);
+				delete link;
 			} else {
 				link->AreaIndex = areaindex;
 				wmap->AddAreaLink(link);
 			}
-			delete link;
 		}
 	}
 
