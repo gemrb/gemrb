@@ -256,12 +256,6 @@ Interface::Interface()
 	tokens->SetType( GEM_VARIABLES_STRING );
 }
 
-//2da lists are ieDword lists allocated by malloc
-static void Release2daList(void *poi)
-{
-	free( (ieDword *) poi);
-}
-
 static void ReleaseItemList(void *poi)
 {
 	delete ((ItemList *) poi);
@@ -416,7 +410,7 @@ Interface::~Interface(void)
 	delete vars;
 	delete tokens;
 	if (lists) {
-		lists->RemoveAll(Release2daList);
+		lists->RemoveAll(free);
 		delete lists;
 	}
 
