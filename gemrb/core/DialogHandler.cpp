@@ -214,7 +214,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 
 void DialogHandler::DialogChoose(Control* ctl)
 {
-	DialogChoose(ctl->Value);
+	DialogChoose(ctl->GetValue());
 }
 
 bool DialogHandler::DialogChoose(unsigned int choose)

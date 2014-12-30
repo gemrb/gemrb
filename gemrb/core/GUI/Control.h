@@ -67,6 +67,9 @@ class GEM_EXPORT Control : public View {
 protected:
 	/** Focused Control */
 	bool hasFocus;
+	/** the value of the control to add to the variable */
+	ieDword Value;
+
 public:
 	Control(const Region& frame);
 	virtual ~Control();
@@ -85,8 +88,6 @@ public:
 	virtual void UpdateState(const char*, unsigned int) {}
 	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
-	/** the value of the control to add to the variable */
-	ieDword Value;
 	/** various flags based on the control type */
 	ieDword Flags;
 	ControlAnimation* animation;
@@ -130,6 +131,9 @@ public: //Events
 	/** Assigned function key */
 	void SetFunctionNumber(int x) { FunctionNumber = x; }
 	int GetFunctionNumber() { return FunctionNumber; }
+
+	ieDword GetValue() const { return Value; }
+	void SetValue(ieDword val) { Value = val; }
 };
 
 

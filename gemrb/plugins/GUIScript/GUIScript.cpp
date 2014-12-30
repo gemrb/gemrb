@@ -1761,7 +1761,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 
 	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
 	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
-	ctrl->Value = (ieDword)PyInt_AsUnsignedLongMask(Value);
+	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
 
 	/** setting the correct state for this control */
 	/** it is possible to set up a default value, if Lookup returns false, use it */
@@ -8553,7 +8553,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
 		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(Function));
 		strcpy(btn->VarName,"Equipment");
-		btn->Value = Start+i;
+		btn->SetValue( Start+i );
 
 		ItemExtHeader *item = ItemArray+i;
 		Sprite2D *Picture = NULL;
