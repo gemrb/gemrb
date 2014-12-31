@@ -40,15 +40,6 @@ Button::Button(Region& frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
-	ResetEventHandler( ButtonOnPress );
-	ResetEventHandler( ButtonOnDoublePress );
-	ResetEventHandler( ButtonOnShiftPress );
-	ResetEventHandler( ButtonOnRightPress );
-	ResetEventHandler( ButtonOnDragDrop );
-	ResetEventHandler( ButtonOnDrag );
-	ResetEventHandler( MouseEnterButton );
-	ResetEventHandler( MouseLeaveButton );
-	ResetEventHandler( MouseOverButton );
 
 	hasText = false;
 	font = core->GetButtonFont();
@@ -63,6 +54,7 @@ Button::Button(Region& frame)
 	ToggleState = false;
 	Picture = NULL;
 	Clipping = 1.0;
+	memset(eventHandlers, 0, sizeof(eventHandlers));
 	memset(&SourceRGB,0,sizeof(SourceRGB));
 	memset(&DestRGB,0,sizeof(DestRGB));
 	memset( borders, 0, sizeof( borders ));
@@ -371,7 +363,7 @@ void Button::SetFont(Font* newfont)
 
 bool Button::WantsDragOperation()
 {
-	return (State != IE_GUI_BUTTON_DISABLED && MouseLeaveButton !=0 && VarName[0] != 0);
+	return (State != IE_GUI_BUTTON_DISABLED && eventHandlers[IE_GUI_MOUSE_LEAVE_BUTTON] !=0 && VarName[0] != 0);
 }
 
 /** Handling The default button (enter) */
@@ -380,13 +372,13 @@ bool Button::OnSpecialKeyPress(unsigned char Key)
 	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
 		if (Key == GEM_RETURN) {
 			if (Flags & IE_GUI_BUTTON_DEFAULT ) {
-				RunEventHandler( ButtonOnPress );
+				RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
 				return true;
 			}
 		}
 		else if (Key == GEM_ESCAPE) {
 			if (Flags & IE_GUI_BUTTON_CANCEL ) {
-				RunEventHandler( ButtonOnPress );
+				RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
 				return true;
 			}
 		}
@@ -401,7 +393,7 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 		return;
 	}
 
-	if (core->GetDraggedItem () && !ButtonOnDragDrop) {
+	if (core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP]) {
 		View::OnMouseDown(p, Button, Mod);
 		return;
 	}
@@ -421,12 +413,13 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
-		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress) {
-			RunEventHandler( ButtonOnDoublePress );
+		if ((Button & GEM_MB_DOUBLECLICK)) {
+			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DOUBLE_PRESS] );
 		}
 		break;
 	}
 }
+
 /** Mouse Button Up */
 void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
@@ -440,7 +433,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 	if (core->GetDraggedPortrait ()) dragtype=2;
 
 	//if something was dropped, but it isn't handled here: it didn't happen
-	if (dragtype && !ButtonOnDragDrop)
+	if (dragtype && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])
 		return;
 
 	switch (State) {
@@ -491,21 +484,20 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 
 	switch (dragtype) {
 		case 1:
-			RunEventHandler( ButtonOnDragDrop );
+			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP] );
 			return;
 		case 2:
-			RunEventHandler( ButtonOnDragDropPortrait );
+			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT] );
 			return;
 	}
 
 	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
-		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress)
-			RunEventHandler( ButtonOnShiftPress );
+		if ((Mod & GEM_MOD_SHIFT) && eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS])
+			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS] );
 		else
-			RunEventHandler( ButtonOnPress );
-	} else {
-		if (Button == GEM_MB_MENU && ButtonOnRightPress)
-			RunEventHandler( ButtonOnRightPress );
+			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
+	} else if (Button == GEM_MB_MENU) {
+		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_RIGHT_PRESS] );
 	}
 }
 
@@ -516,7 +508,7 @@ void Button::OnMouseOver(const Point& p)
 		return;
 	}
 
-	if ( RunEventHandler( MouseOverButton )<0) {
+	if ( RunEventHandler( eventHandlers[IE_GUI_MOUSE_OVER_BUTTON] )<0) {
 		//event handler destructed this object
 		return;
 	}
@@ -544,7 +536,7 @@ void Button::OnMouseOver(const Point& p)
 		core->GetDictionary()->SetAt( "DragY", sp.y );
 		drag_start = drag_start + sp;
 
-		RunEventHandler( ButtonOnDrag );
+		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG] );
 	}
 }
 
@@ -554,11 +546,11 @@ void Button::OnMouseEnter(const Point&)
 		return;
 	}
 
-	if (MouseEnterButton !=0 && VarName[0] != 0) {
+	if (eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] !=0 && VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
 
-	RunEventHandler( MouseEnterButton );
+	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
 }
 
 void Button::OnMouseLeave(const Point&)
@@ -569,7 +561,7 @@ void Button::OnMouseLeave(const Point&)
 	if (WantsDragOperation()) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
-	RunEventHandler( MouseLeaveButton );
+	RunEventHandler( eventHandlers[IE_GUI_MOUSE_LEAVE_BUTTON] );
 }
 
 /** Sets the Text of the current control */
@@ -591,41 +583,11 @@ void Button::SetText(const String& string)
 /** Set Event Handler */
 bool Button::SetEvent(int eventType, ControlEventHandler handler)
 {
-	switch (eventType) {
-		case IE_GUI_BUTTON_ON_PRESS:
-			ButtonOnPress = handler;
-			break;
-		case IE_GUI_MOUSE_OVER_BUTTON:
-			MouseOverButton = handler;
-			break;
-		case IE_GUI_MOUSE_ENTER_BUTTON:
-			MouseEnterButton = handler;
-			break;
-		case IE_GUI_MOUSE_LEAVE_BUTTON:
-			MouseLeaveButton = handler;
-			break;
-		case IE_GUI_BUTTON_ON_SHIFT_PRESS:
-			ButtonOnShiftPress = handler;
-			break;
-		case IE_GUI_BUTTON_ON_RIGHT_PRESS:
-			ButtonOnRightPress = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DRAG_DROP:
-			ButtonOnDragDrop = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT:
-			ButtonOnDragDropPortrait = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DRAG:
-			ButtonOnDrag = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DOUBLE_PRESS:
-			ButtonOnDoublePress = handler;
-			break;
-	default:
-		return false;
+	if ( eventType >= 0 && eventType < IE_GUI_BUTTON_EVENTS_COUNT ) {
+		eventHandlers[eventType] = handler;
+		return true;
 	}
-	return true;
+	return false;
 }
 
 /** Refresh a button from a given radio button group */

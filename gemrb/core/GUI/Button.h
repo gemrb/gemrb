@@ -88,17 +88,21 @@ class Palette;
 #define IE_GUI_BUTTON_PORTRAIT     0x0000c002   // portrait
 #define IE_GUI_BUTTON_DISABLED_P   0x0000c003   // disabled portrait
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_BUTTON_ON_PRESS       0x00000000
-#define IE_GUI_MOUSE_OVER_BUTTON     0x00000001
-#define IE_GUI_MOUSE_ENTER_BUTTON    0x00000002
-#define IE_GUI_MOUSE_LEAVE_BUTTON    0x00000003
-#define IE_GUI_BUTTON_ON_SHIFT_PRESS 0x00000004
-#define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
-#define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
-#define IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT   0x00000007
-#define IE_GUI_BUTTON_ON_DRAG        0x00000008
-#define IE_GUI_BUTTON_ON_DOUBLE_PRESS 0x00000009
+enum IE_GUI_BUTTON_EVENTS {
+	// !!! Keep these synchronized with GUIDefines.py !!!
+	IE_GUI_BUTTON_ON_PRESS,
+	IE_GUI_MOUSE_OVER_BUTTON,
+	IE_GUI_MOUSE_ENTER_BUTTON,
+	IE_GUI_MOUSE_LEAVE_BUTTON,
+	IE_GUI_BUTTON_ON_SHIFT_PRESS,
+	IE_GUI_BUTTON_ON_RIGHT_PRESS,
+	IE_GUI_BUTTON_ON_DRAG_DROP,
+	IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT,
+	IE_GUI_BUTTON_ON_DRAG,
+	IE_GUI_BUTTON_ON_DOUBLE_PRESS,
+
+	IE_GUI_BUTTON_EVENTS_COUNT
+};
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
@@ -175,17 +179,7 @@ public: // Public Events
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
-	/** Button Pressed Event Script Function Name */
-	ControlEventHandler ButtonOnPress;
-	ControlEventHandler ButtonOnShiftPress;
-	ControlEventHandler ButtonOnRightPress;
-	ControlEventHandler ButtonOnDoublePress;
-	ControlEventHandler ButtonOnDragDrop;
-	ControlEventHandler ButtonOnDragDropPortrait;
-	ControlEventHandler ButtonOnDrag;
-	ControlEventHandler MouseEnterButton;
-	ControlEventHandler MouseLeaveButton;
-	ControlEventHandler MouseOverButton;
+
 	/** Refreshes the button from a radio group */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */
@@ -204,6 +198,7 @@ private: // Private attributes
 	Palette* normal_palette;
 	Palette* disabled_palette;
 	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];
+	ControlEventHandler eventHandlers[IE_GUI_BUTTON_EVENTS_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
