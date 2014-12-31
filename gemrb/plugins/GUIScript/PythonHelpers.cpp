@@ -18,6 +18,7 @@
  *
  */
 
+#include "GUI/Window.h"
 #include "PythonHelpers.h"
 
 using namespace GemRB;
@@ -96,8 +97,8 @@ void PythonControlCallback::operator() (Control* ctrl) const
 	PyObject *args = NULL;
 	PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
 	PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
-	const int count = PyInt_AsLong(co_argcount);
-	if (/*count*/ false) { // FIXME: this code is incomplete and would break things without being finished
+	const long count = PyInt_AsLong(co_argcount);
+	if (count) {
 		assert(count == 1);
 		const char* type = "Control";
 		switch(ctrl->ControlType) {
@@ -122,12 +123,11 @@ void PythonControlCallback::operator() (Control* ctrl) const
 			default:
 				break;
 		}
-		// FIXME: how do you get the window and control index?
-		// I really loathe that we use an index for this :/
-		PyObject* ctrltuple = Py_BuildValue("(ii)", 0, 0);
+		// FIXME: Is this right? I cant tell if these should be built by ID or index. Guess I'll find out...
+		PyObject* ctrltuple = Py_BuildValue("(ii)", ctrl->Owner->WindowID, ctrl->ControlID);
 		PyObject* obj = gs->ConstructObject(type, ctrltuple);
 		Py_DECREF(ctrltuple);
-		args = Py_BuildValue("(i)", obj);
+		args = Py_BuildValue("(N)", obj);
 	}
 	Py_DECREF(func_code);
 	Py_DECREF(co_argcount);
