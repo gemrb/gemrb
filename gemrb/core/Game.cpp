@@ -1334,7 +1334,7 @@ void Game::AddGold(ieDword add)
 }
 
 //later this could be more complicated
-void Game::AdvanceTime(ieDword add)
+void Game::AdvanceTime(ieDword add, bool fatigue)
 {
 	ieDword h = GameTime/(300*AI_UPDATE_TIME);
 	GameTime+=add;
@@ -1345,6 +1345,14 @@ void Game::AdvanceTime(ieDword add)
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
 	}
 	Ticks+=add*interval;
+	if (!fatigue) {
+		// update everyone in party, so they think no time has passed
+		// nobody else, including familiars, gets luck penalties from fatigue
+		for (unsigned int i=0; i<PCs.size(); i++) {
+			PCs[i]->IncreaseLastRested(add);
+		}
+	}
+
 	//change the tileset if needed
 	Map *map = GetCurrentArea();
 	if (map && map->ChangeMap(IsDay())) {

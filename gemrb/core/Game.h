@@ -464,7 +464,7 @@ public:
 	/** Adds or removes gold */
 	void AddGold(ieDword add);
 	/** Adds ticks to game time */
-	void AdvanceTime(ieDword add);
+	void AdvanceTime(ieDword add, bool fatigue=true);
 	/** Runs the script engine on the global script and the area scripts
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
