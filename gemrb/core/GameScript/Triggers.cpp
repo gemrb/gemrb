@@ -1156,7 +1156,9 @@ int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED) ) {
+	// HACK: temporarily look at all items, since we now set the bit only for weapons
+	// bg2/ddguard7.baf is the only user with something else - the strohm mask helmet
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED*0) ) {
 		return 1;
 	}
 	return 0;
