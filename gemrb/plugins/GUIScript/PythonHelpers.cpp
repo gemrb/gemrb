@@ -99,7 +99,7 @@ void PythonControlCallback::operator() (Control* ctrl) const
 	PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
 	const long count = PyInt_AsLong(co_argcount);
 	if (count) {
-		assert(count == 1);
+		assert(count <= 2);
 		const char* type = "Control";
 		switch(ctrl->ControlType) {
 			case IE_GUI_LABEL:
@@ -123,11 +123,15 @@ void PythonControlCallback::operator() (Control* ctrl) const
 			default:
 				break;
 		}
-		// FIXME: Is this right? I cant tell if these should be built by ID or index. Guess I'll find out...
+		// FIXME: Is this right? I can't tell if these should be built by ID or index. Guess I'll find out...
 		PyObject* ctrltuple = Py_BuildValue("(ii)", ctrl->Owner->WindowID, ctrl->ControlID);
 		PyObject* obj = gs->ConstructObject(type, ctrltuple);
 		Py_DECREF(ctrltuple);
-		args = Py_BuildValue("(N)", obj);
+		if (count > 1) {
+			args = Py_BuildValue("(Ni)", obj, ctrl->GetValue());
+		} else {
+			args = Py_BuildValue("(N)", obj);
+		}
 	}
 	Py_DECREF(func_code);
 	Py_DECREF(co_argcount);
