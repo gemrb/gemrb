@@ -1101,7 +1101,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (caster->Type==ST_ACTOR) {
 			casterenemy = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
 		} else {
-			casterenemy = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+			casterenemy = true; //target->GetStat(IE_EA)>EA_GOODCUTOFF;
 		}
 		fx->DiceThrown=casterenemy;
 
