@@ -153,6 +153,11 @@ bool KeyMap::ResolveKey(int key, int group)
 		return false;
 	}
 
+	// disable hotkeys in stores
+	if (core->GetCurrentStore()) {
+		return false;
+	}
+
 	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->module, fun->function);
 	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
 	return true;
