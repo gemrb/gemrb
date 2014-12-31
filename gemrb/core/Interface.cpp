@@ -2818,48 +2818,6 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	return 0;
 }
 
-
-/** Set the Status of a Control in a Window */
-int Interface::SetControlStatus(unsigned short WindowIndex,
-		unsigned short ControlIndex, unsigned long Status)
-{
-	//don't set the status of an already invalidated window
-	Window* win = GetWindow(WindowIndex);
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControlAtIndex( ControlIndex );
-	if (ctrl == NULL) {
-		return -1;
-	}
-	if (Status&IE_GUI_CONTROL_FOCUSED) {
-		evntmgr->SetFocused( win, ctrl);
-	}
-
-	//check if the status parameter was intended to use with this control
-	//Focus will sadly break this at the moment, because it is common for all control types
-	int check = (Status >> 24) & 0xff;
-	if ( (check!=0x7f) && (ctrl->ControlType != check) ) {
-		return -2;
-	}
-
-	switch (ctrl->ControlType) {
-		case IE_GUI_BUTTON:
-			//Button
-			{
-				Button* btn = ( Button* ) ctrl;
-				btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
-			}
-			break;
-		case IE_GUI_WORLDMAP:
-			break;
-		default:
-			ctrl->SetValue(Status & 0x7f);
-			break;
-	}
-	return 0;
-}
-
 /** Show a Window in Modal Mode */
 int Interface::ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow)
 {
