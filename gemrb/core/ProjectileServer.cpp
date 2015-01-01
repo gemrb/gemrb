@@ -296,7 +296,7 @@ int ProjectileServer::GetExplosionFlags(unsigned int idx)
 {
 	if (explosioncount==-1) {
 		if (InitExplosion()<0) {
-			Log(ERROR, "ProjectileServer", "Problem with explosions");
+			Log(ERROR, "ProjectileServer", "Problem with explosions!");
 			explosioncount=0;
 		}
 	}
