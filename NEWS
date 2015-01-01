@@ -1,16 +1,14 @@
-GemRB git (1432f39):
+GemRB v0.8.2 (2015-01-01):
   New features:
-    - 
     - iwd2 spell learning
     - movie overrides (tob outro)
     - 3ed sneak attack, concentration/disruption
     - statistically fairer random number generator
 
   Improved features:
-    - 
-    - iwd2 chargen, clabs
+    - iwd2 chargen, clabs, combat, music
     - custom map notes and biographies now save properly
-    - effects, tob ending, animation, actions
+    - effects, tob ending, animation, actions, bg1 nights
     - bugfixes
 
 GemRB v0.8.1 (2014-05-03):
