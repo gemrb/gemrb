@@ -4874,7 +4874,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	//this is to fix buggy saves so TakeItemNum works
 	//the equipped bit is also reset
 	item->Flags &= ~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
-	if (GF_NO_UNDROPPABLE) {
+	if (core->HasFeature(GF_NO_UNDROPPABLE)) {
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 
