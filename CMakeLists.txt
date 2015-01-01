@@ -28,16 +28,15 @@ ENDIF(DEFINED CMAKE_BUILD_TYPE)
 
 PROJECT(gemrb)
 # try to extract the version from the source
-execute_process(
-	COMMAND sed -n "s/\#define VERSION_GEMRB .\\([^\"]*\\).$/\\1/p" ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h
-	OUTPUT_VARIABLE GEMRB_VERSION
-	RESULT_VARIABLE RC
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if(${RC} GREATER 0) # lookup failed
+FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h GLOBALS)
+SET(GEMRB_VERSION "")
+STRING(REGEX MATCH "define VERSION_GEMRB .([^\"]*)" GEMRB_VERSION "${GLOBALS}")
+STRING(REGEX REPLACE "define VERSION_GEMRB .([^\"]*)$" "\\1" GEMRB_VERSION "${GEMRB_VERSION}")
+if(GEMRB_VERSION STREQUAL "") # lookup failed
 	set(GEMRB_VERSION "unknown")
-endif(${RC} GREATER 0)
+endif()
 message("Detected version: ${GEMRB_VERSION}")
+unset(GLOBALS)
 
 IF(PREFIX)
 	SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
