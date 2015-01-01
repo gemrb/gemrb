@@ -119,17 +119,14 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 endif (${LAYOUT} MATCHES "home")
 
 # check if this is a release version
-execute_process(
-	COMMAND echo ${GEMRB_VERSION}
-	COMMAND grep -q git # cmake creates a pipe by itself
-	RESULT_VARIABLE RC
-	OUTPUT_QUIET
-)
-if(${RC} GREATER 0) # no match or error
+SET(RC "")
+STRING(REGEX MATCH "-git$" RC ${GEMRB_VERSION})
+if(RC STREQUAL "")
 	set (GIT_VERSION 0)
 else()
 	set (GIT_VERSION 1)
 endif()
+MESSAGE("Git version bool: ${GIT_VERSION}")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
