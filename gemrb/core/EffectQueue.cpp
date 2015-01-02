@@ -535,7 +535,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
 	Effect* new_fx;
 	// HACK: 00p2229.baf in ar1006 does this silly thing, crashing later
-	if (!st && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
+	if (!st && self && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
 		fx->Target = FX_TARGET_PRESET;
 	}
 
