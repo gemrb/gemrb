@@ -946,7 +946,8 @@ static PyObject* GemRB_Table_Unload(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
 "GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString, type) => value\n\n"
 "Returns a field of a 2DA Table. If Type is omitted the return type is the autodetected, "
-"otherwise 0 means string, 1 means integer, 2 means stat symbol translation." );
+"otherwise 0 means string, 1 means integer, 2 means stat symbol translation and "
+"3 means strref resolution.");
 
 static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 {
@@ -1008,9 +1009,14 @@ static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 	if (!which) {
 		return PyString_FromString( ret );
 	}
+	//if which = 3 then return resolved string
+	bool valid = valid_number(ret, val);
+	if (which == 3) {
+		return PyString_FromString(core->GetString(val));
+	}
 	//if which = 1 then return number
 	//if which = -1 (omitted) then return the best format
-	if (valid_number( ret, val ) || (which==1) ) {
+	if (valid || (which == 1)) {
 		return PyInt_FromLong( val );
 	}
 	if (which==2) {
