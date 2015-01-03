@@ -27,6 +27,8 @@
 #include "Palette.h"
 #include "Video.h"
 
+#include <cctype>
+
 namespace GemRB {
 
 static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
