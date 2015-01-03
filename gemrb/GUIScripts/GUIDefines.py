@@ -326,3 +326,9 @@ LOG_WARNING = 2
 LOG_MESSAGE = 3
 LOG_COMBAT = 4
 LOG_DEBUG = 5
+
+# GetTableValue return modes
+GTV_STR = 0
+GTV_INT = 1
+GTV_STAT = 2
+GTV_REF = 3
