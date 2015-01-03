@@ -101,7 +101,7 @@ class Actor:
 				else:
 					self.__classtitle = CommonTables.Classes.GetValue (self.__classnames[1], "CAP_REF")
 				self.__classtitle = GemRB.GetString (self.__classtitle) + " / " + \
-					GemRB.GetString (CommonTables.Classes.GetValue (self.__classnames[0], "CAP_REF") )
+					CommonTables.Classes.GetValue (self.__classnames[0], "CAP_REF", GTV_REF)
 			else: # ordinary class or kit
 				if self.KitIndex():
 					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2)

@@ -136,7 +136,7 @@ def getHatedRace(TextAreaControl):
 	if Race:
 		HateRaceTable = GemRB.LoadTable ("HATERACE")
 		Row = HateRaceTable.FindValue (1, Race)
-		info = GemRB.GetString (HateRaceTable.GetValue(Row, 0))
+		info = HateRaceTable.GetValue (Row, 0, GTV_REF)
 		if info != "":
 			#TextAreaControl.Append("\n")
 			info = ": " + info + "\n"
@@ -210,7 +210,7 @@ def getSkills(TextAreaControl):
 		
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
-			name = GemRB.GetString (SkillTable.GetValue (skill+2, 1))
+			name = SkillTable.GetValue (skill+2, 1, GTV_REF)
 			id = SkillTable.GetValue (skill+2, 2)
 			available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
 			value = GemRB.GetPlayerStat(MyChar,id)
@@ -240,7 +240,7 @@ def getProfi(TextAreaControl):
 	for i in range(ProfCount):
 		# 4294967296 overflows to -1 on some arches, so we use a smaller invalid strref
 		id = TmpTable.GetValue (i, 0)+IE_PROFICIENCYBASTARDSWORD
-		Weapon = GemRB.GetString (TmpTable.GetValue (i, 1))
+		Weapon = TmpTable.GetValue (i, 1, GTV_REF)
 		Value = GemRB.GetPlayerStat (MyChar,id)
 		if Value:
 			pluses = " "

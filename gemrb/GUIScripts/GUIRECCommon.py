@@ -579,7 +579,7 @@ def GetProtagonistBiography (pc):
 	racestrings = [ 15895, 15891, 15892, 15890, 15893, 15894 ]
 
 	ClassName = GUICommon.GetClassRowName (pc)
-	bio = GemRB.GetString (BioTable.GetValue (ClassName, "BIO"))
+	bio = BioTable.GetValue (ClassName, "BIO", GTV_REF)
 	race = GemRB.GetPlayerStat (pc, IE_RACE)
 	if race <= 6:
 		bio += "\n\n" + GemRB.GetString (racestrings[race-1])

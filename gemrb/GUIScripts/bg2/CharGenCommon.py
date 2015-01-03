@@ -193,7 +193,7 @@ def DisplayOverview(step):
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):
-					name = GemRB.GetString (SkillTable.GetValue (skill+2, 1))
+					name = SkillTable.GetValue (skill+2, 1, GTV_REF)
 					available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
 					statID = SkillTable.GetValue (skill+2, 2)
 					value = GemRB.GetPlayerStat (MyChar, statID, 1)
@@ -201,7 +201,7 @@ def DisplayOverview(step):
 						info += name + ": " + str(value) + "\n"
 			elif BardSkills != "*" or RangerSkills != "*":
 				for skill in range(SkillTable.GetRowCount () - 2):
-					name = GemRB.GetString (SkillTable.GetValue (skill+2, 1))
+					name = SkillTable.GetValue (skill+2, 1, GTV_REF)
 					StatID = SkillTable.GetValue (skill+2, 2)
 					value = GemRB.GetPlayerStat (MyChar, StatID, 1)
 					if value > 0:
@@ -241,7 +241,7 @@ def DisplayOverview(step):
 			if Race:
 				HateRaceTable = GemRB.LoadTable ("HATERACE")
 				Row = HateRaceTable.FindValue (1, Race)
-				info = GemRB.GetString (HateRaceTable.GetValue(Row, 0))
+				info = HateRaceTable.GetValue (Row, 0, GTV_REF)
 				if info != "":
 					info = "\n" + info + "\n\n"
 					TextAreaControl.Append (15982)

@@ -407,7 +407,7 @@ def GetActorClassTitle (actor):
 				elif Dual[0] == 2:
 					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
 				ClassTitle = GemRB.GetString (ClassTitle) + " / "
-				ClassTitle += GemRB.GetString (CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF"))
+				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
 			else: # ordinary class or kit
 				if KitIndex:
 					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)

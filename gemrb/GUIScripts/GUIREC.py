@@ -356,7 +356,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append (None)
 		for i in range (Multi[0]):
 			Class = GUICommon.GetClassRowName (Multi[i+1], "class")
-			ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (Class, "CAP_REF"))
+			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 			GemRB.SetToken ("CLASS", ClassTitle)
 			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
@@ -384,7 +384,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		Levels[0] += LevelDiff[0]
 
 		Class = CommonTables.Classes.GetRowName (Dual[2])
-		ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (Class, "CAP_REF"))
+		ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
@@ -399,10 +399,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 		# the first class (shown second)
 		if Dual[0] == 1:
-			ClassTitle = GemRB.GetString (CommonTables.KitList.GetValue (Dual[1], 2))
+			ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2, GTV_REF)
 		elif Dual[0] == 2:
 			ClassTitle = GUICommon.GetClassRowName(Dual[1], "index")
-			ClassTitle = GemRB.GetString (CommonTables.Classes.GetValue (ClassTitle, "CAP_REF"))
+			ClassTitle = CommonTables.Classes.GetValue (ClassTitle, "CAP_REF", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
@@ -728,7 +728,7 @@ def GetReputation (repvalue):
 	table = GemRB.LoadTable ("reptxt")
 	if repvalue>20:
 		repvalue=20
-	txt = GemRB.GetString (table.GetValue (repvalue, 0) )
+	txt = table.GetValue (repvalue, 0, GTV_REF)
 	return txt+" ("+str (repvalue)+")"
 
 def OpenInformationWindow ():
