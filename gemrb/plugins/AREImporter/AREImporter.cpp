@@ -2144,7 +2144,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			int len = 0;
 			if (mbstring) {
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				len = std::min(mblen(mbstring, mn.text.length()), 500);
+				len = (std::min)(mblen(mbstring, mn.text.length()), 500);
 				stream->Write( mbstring, len);
 				free(mbstring);
 			}
