@@ -348,7 +348,7 @@ Interface::~Interface(void)
 	}
 	SurgeSpells.clear();
 
-	std::map<IeResRef, Font*>::iterator fit = fonts.begin();
+	std::map<ResRef, Font*>::iterator fit = fonts.begin();
 	for (; fit != fonts.end(); ++fit)
 		delete (*fit).second;
 	// fonts need to be destroyed before TTF plugin
@@ -1195,7 +1195,7 @@ int Interface::LoadFonts()
 	for (int row = 0; row < count; row++) {
 		rowName = tab->GetRowName(row);
 
-		IeResRef resref = tab->QueryField(rowName, "RESREF");
+		ResRef resref = tab->QueryField(rowName, "RESREF");
 		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
 		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
@@ -2370,7 +2370,7 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 	return pal;
 }
 /** Returns a preloaded Font */
-Font* Interface::GetFont(const IeResRef& ResRef) const
+Font* Interface::GetFont(const ResRef& ResRef) const
 {
 	if (fonts.find(ResRef) != fonts.end()) {
 		return fonts.at(ResRef);

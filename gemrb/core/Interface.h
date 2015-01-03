@@ -341,18 +341,18 @@ private:
 	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures[(GF_COUNT+31)/32];
-	IeResRef CursorBam;
-	IeResRef ScrollCursorBam;
+	ResRef CursorBam;
+	ResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
 
-	std::map<IeResRef, Font*> fonts;
-	IeResRef ButtonFontResRef;
-	IeResRef MovieFontResRef;
-	IeResRef TextFontResRef;
-	IeResRef TooltipFontResRef;
+	std::map<ResRef, Font*> fonts;
+	ResRef ButtonFontResRef;
+	ResRef MovieFontResRef;
+	ResRef TextFontResRef;
+	ResRef TooltipFontResRef;
 
-	IeResRef TooltipBackResRef;
+	ResRef TooltipBackResRef;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
 	int TooltipMargin;
@@ -360,9 +360,9 @@ private:
 	Image * pal256;
 	Image * pal32;
 	Image * pal16;
-	IeResRef Palette16;
-	IeResRef Palette32;
-	IeResRef Palette256;
+	ResRef Palette16;
+	ResRef Palette32;
+	ResRef Palette256;
 
 	ieDword* slotmatrix; //itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
@@ -444,7 +444,7 @@ public:
 	/** returns a gradient set */
 	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
 	/** Returns a preloaded Font */
-	Font* GetFont(const IeResRef&) const;
+	Font* GetFont(const ResRef&) const;
 	Font* GetTextFont() const;
 	/** Returns the button font */
 	Font * GetButtonFont() const;

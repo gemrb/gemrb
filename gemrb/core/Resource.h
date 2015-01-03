@@ -38,7 +38,7 @@ typedef char ieResRef[9];
 class DataStream;
 
 /* Hopefully we can slowly replace the char array version with this struct... */
-struct IeResRef {
+struct ResRef {
 private:
 	char ref[9];
 private:
@@ -46,11 +46,11 @@ private:
 		memset(ref, 0, sizeof(ref));
 	}
 public:
-	IeResRef() {
+	ResRef() {
 		Clear();
 	}
 
-	IeResRef(const char* str) {
+	ResRef(const char* str) {
 		operator=(str);
 	};
 
@@ -71,11 +71,11 @@ public:
 		}
 	}
 
-	bool operator<(const IeResRef& rhs) const {
+	bool operator<(const ResRef& rhs) const {
 		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;
 	};
 
-	bool operator==(const IeResRef& rhs) const {
+	bool operator==(const ResRef& rhs) const {
 		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) == 0;
 	};
 };
