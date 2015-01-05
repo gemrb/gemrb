@@ -880,7 +880,8 @@ static PyObject* GemRB_Table_Unload(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
 "GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString, type) => value\n\n"
 "Returns a field of a 2DA Table. If Type is omitted the return type is the autodetected, "
-"otherwise 0 means string, 1 means integer, 2 means stat symbol translation." );
+"otherwise 0 means string, 1 means integer, 2 means stat symbol translation and "
+"3 means strref resolution.");
 
 static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 {
@@ -942,9 +943,14 @@ static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 	if (!which) {
 		return PyString_FromString( ret );
 	}
+	//if which = 3 then return resolved string
+	bool valid = valid_number(ret, val);
+	if (which == 3) {
+		return PyString_FromString(core->GetCString(val));
+	}
 	//if which = 1 then return number
 	//if which = -1 (omitted) then return the best format
-	if (valid_number( ret, val ) || (which==1) ) {
+	if (valid || (which == 1)) {
 		return PyInt_FromLong( val );
 	}
 	if (which==2) {
@@ -2452,7 +2458,6 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				link->AreaIndex = areaindex;
 				wmap->AddAreaLink(link);
 			}
-
 		}
 	}
 
@@ -4765,8 +4770,8 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateString__doc,
-"CreateString( Text )->StrRef\n\n"
-"Creates a custom string." );
+"CreateString(Strref, Text)->StrRef\n\n"
+"Creates or updates a custom string." );
 
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
@@ -7725,7 +7730,8 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
 
 static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 {
-	int Variable, value;
+	int Variable, value = 0;
+	char path[_MAX_PATH] = { '\0' };
 
 	if (!PyArg_ParseTuple( args, "i", &Variable)) {
 		return AttributeError( GemRB_GetSystemVariable__doc );
@@ -7734,9 +7740,14 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_BPP: value = core->Bpp; break;
 		case SV_WIDTH: value = core->Width; break;
 		case SV_HEIGHT: value = core->Height; break;
+		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
 		default: value = -1; break;
 	}
-	return PyInt_FromLong( value );
+	if (path[0]) {
+		return PyString_FromString(path);
+	} else {
+		return PyInt_FromLong( value );
+	}
 }
 
 PyDoc_STRVAR( GemRB_CreateItem__doc,
@@ -10909,13 +10920,6 @@ bool GUIScript::Init(void)
 
 	sprintf( string, "import GemRB\n");
 	if (PyRun_SimpleString( "import GemRB" ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string);
-		return false;
-	}
-
-	// FIXME: better would be to add GemRB.GetGamePath() or some such
-	sprintf( string, "GemRB.GamePath = \"%s\"", QuotePath( quoted, core->GamePath ));
-	if (PyRun_SimpleString( string ) == -1) {
 		Log(ERROR, "GUIScript", "Error running: %s", string);
 		return false;
 	}

@@ -28,16 +28,15 @@ ENDIF(DEFINED CMAKE_BUILD_TYPE)
 
 PROJECT(gemrb)
 # try to extract the version from the source
-execute_process(
-	COMMAND sed -n "s/\#define VERSION_GEMRB .\\([^\"]*\\).$/\\1/p" ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h
-	OUTPUT_VARIABLE GEMRB_VERSION
-	RESULT_VARIABLE RC
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if(${RC} GREATER 0) # lookup failed
+FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h GLOBALS)
+SET(GEMRB_VERSION "")
+STRING(REGEX MATCH "define VERSION_GEMRB .([^\"]*)" GEMRB_VERSION "${GLOBALS}")
+STRING(REGEX REPLACE "define VERSION_GEMRB .([^\"]*)$" "\\1" GEMRB_VERSION "${GEMRB_VERSION}")
+if(GEMRB_VERSION STREQUAL "") # lookup failed
 	set(GEMRB_VERSION "unknown")
-endif(${RC} GREATER 0)
+endif()
 message("Detected version: ${GEMRB_VERSION}")
+unset(GLOBALS)
 
 IF(PREFIX)
 	SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
@@ -119,17 +118,14 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 endif (${LAYOUT} MATCHES "home")
 
 # check if this is a release version
-execute_process(
-	COMMAND echo ${GEMRB_VERSION}
-	COMMAND grep -q git # cmake creates a pipe by itself
-	RESULT_VARIABLE RC
-	OUTPUT_QUIET
-)
-if(${RC} GREATER 0) # no match or error
+SET(RC "")
+STRING(REGEX MATCH "-git$" RC ${GEMRB_VERSION})
+if(RC STREQUAL "")
 	set (GIT_VERSION 0)
 else()
 	set (GIT_VERSION 1)
 endif()
+MESSAGE("Git version bool: ${GIT_VERSION}")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
@@ -373,6 +369,8 @@ MACRO(ADD_GEMRB_PLUGIN plugin_name)
 			TARGET_LINK_LIBRARIES(${plugin_name} -shared-libgcc)
 		elseif (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
 			TARGET_LINK_LIBRARIES(${plugin_name} -lc)
+		elseif (CMAKE_SYSTEM_NAME STREQUAL "Haiku")
+			TARGET_LINK_LIBRARIES(${plugin_name} -lbsd)
 		endif (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
 		INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
 	endif (STATIC_LINK)

@@ -1000,6 +1000,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	CreateProjectile(SpellResRef, 0, level, false);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
+	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
 	switch (nSpellType) {
 	case 1:
@@ -1066,6 +1067,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	CreateProjectile(SpellResRef, LastSpellTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
+	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
 	switch (nSpellType) {
 	case 1:
@@ -1223,19 +1225,39 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 }
 
 // shortcut for internal use when there is no wait
-void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+// if any user needs casting time support, they should use Spell* actions directly
+void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete)
 {
+	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
+	Point TmpPos = LastTargetPos;
+	ieDword TmpTarget = LastSpellTarget;
+	int TmpHeader = SpellHeader;
+
 	SetSpellResRef(spellref);
-	CastSpellPoint(target, deplete, instant, nointerrupt);
+	CastSpellPoint(target, deplete, true, true);
 	CastSpellPointEnd(level, no_stance);
+
+	LastTargetPos = TmpPos;
+	LastSpellTarget = TmpTarget;
+	SpellHeader = TmpHeader;
 }
 
 // shortcut for internal use
-void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete, bool instant, bool nointerrupt)
+// if any user needs casting time support, they should use Spell* actions directly
+void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete)
 {
+	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
+	Point TmpPos = LastTargetPos;
+	ieDword TmpTarget = LastSpellTarget;
+	int TmpHeader = SpellHeader;
+
 	SetSpellResRef(spellref);
-	CastSpell(target, deplete, instant, nointerrupt);
+	CastSpell(target, deplete, true, true);
 	CastSpellEnd(level, no_stance);
+
+	LastTargetPos = TmpPos;
+	LastSpellTarget = TmpTarget;
+	SpellHeader = TmpHeader;
 }
 
 //set target as point
@@ -2220,7 +2242,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		return;
 	}
 	//if not continous random walk, then stops for a while
-	if (can_stop && RAND(0,3)) {
+	if (can_stop && !RAND(0,3)) {
 		SetWait(RAND(7,14));
 		return;
 	}

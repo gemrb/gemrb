@@ -63,9 +63,9 @@ bool p2DAImporter::Open(DataStream* str)
 	str->ReadLine( Signature, sizeof(Signature) );
 	char* token = strtok( Signature, " " );
 	if (token) {
-		strncpy(defVal, token, sizeof(defVal) );
+		strlcpy(defVal, token, sizeof(defVal));
 	} else { // no whitespace
-		strncpy(defVal, Signature, sizeof(defVal) );
+		strlcpy(defVal, Signature, sizeof(defVal));
 	}
 	bool colHead = true;
 	int row = 0;

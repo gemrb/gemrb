@@ -273,7 +273,7 @@ def UpdateRecordsWindow ():
 	sym = ss.GetValue (align)
 
 	AlignmentTable = GemRB.LoadTable ("ALIGNS")
-	alignment_help = GemRB.GetString (AlignmentTable.GetValue (sym, 'DESC_REF'))
+	alignment_help = AlignmentTable.GetValue (sym, 'DESC_REF', GTV_REF)
 	frame = (3 * int (align / 16) + align % 16) - 4
 	
 	Button = Window.GetControl (5)
@@ -286,7 +286,7 @@ def UpdateRecordsWindow ():
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
 	FactionTable = GemRB.LoadTable ("FACTIONS")
-	faction_help = GemRB.GetString (FactionTable.GetValue (faction, 0))
+	faction_help = FactionTable.GetValue (faction, 0, GTV_REF)
 	frame = FactionTable.GetValue (faction, 1)
 	
 	Button = Window.GetControl (6)
@@ -422,8 +422,6 @@ def OnRecordsHelpCharisma ():
 def GetCharacterHeader (pc):
 	global avatar_header
 
-	BioTable = GemRB.LoadTable ("bios")
-
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GUICommon.HasMultiClassBits (pc)
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
@@ -471,7 +469,7 @@ def GetCharacterHeader (pc):
 			avatar_header['SecoNextLevXP'] = GetNextLevelExp (avatar_header['SecoLevel'], avatar_header['SecoClass'])
 
 			# Converting to the displayable format
-			avatar_header['SecoClass'] = GemRB.GetString (CommonTables.Classes.GetValue (avatar_header['SecoClass'], "NAME_REF"))
+			avatar_header['SecoClass'] = CommonTables.Classes.GetValue (avatar_header['SecoClass'], "NAME_REF", GTV_REF)
 		else:
 			avatar_header['SecoLevel'] = 0
 			avatar_header['PrimClass'] = CommonTables.Classes.GetRowName (Class)
@@ -480,7 +478,7 @@ def GetCharacterHeader (pc):
 			avatar_header['SecoNextLevXP'] = 0
 
 	# Converting to the displayable format
-	avatar_header['PrimClass'] = GemRB.GetString (CommonTables.Classes.GetValue (avatar_header['PrimClass'], "NAME_REF"))
+	avatar_header['PrimClass'] = CommonTables.Classes.GetValue (avatar_header['PrimClass'], "NAME_REF", GTV_REF)
 
 
 
@@ -529,7 +527,7 @@ def GetStatOverview (pc):
 	stats.append (None)
 	StatesTable = GemRB.LoadTable ("states")
 	StateID = GS (IE_STATE_ID)
-	State = GemRB.GetString (StatesTable.GetValue (str (StateID), "NAME_REF"))
+	State = StatesTable.GetValue (str (StateID), "NAME_REF", GTV_REF)
 	stats.append ((won + GemRB.GetString (59856) + woff, "", 'd'))
 	stats.append ((State, "", 'd'))
 	stats.append (None)
@@ -831,8 +829,8 @@ def OpenBiographyWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	BioTable = GemRB.LoadTable ("bios")
-	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	BioText = int (BioTable.GetValue (Specific, 'BIO'))
+	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	BioText = int (BioTable.GetValue (BioTable.GetRowName (Specific+1), 'BIO'))
 
 	TextArea = Window.GetControl (0)
 	TextArea.SetText (BioText)
@@ -907,8 +905,8 @@ def OpenLevelUpWindow ():
 
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")
-	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	AvatarName = BioTable.GetValue (Specific, "PC")
+	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	AvatarName = BioTable.GetRowName (Specific+1)
 
 	# These will be used for saving throws
 	SavThrUpdated = False

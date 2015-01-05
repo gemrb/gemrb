@@ -1297,6 +1297,11 @@ void Inventory::SetEquipped(ieWordSigned slot, ieWord header)
 	EquippedHeader = header;
 }
 
+bool Inventory::FistsEquipped() const
+{
+	return Equipped == IW_NO_EQUIPPED;
+}
+
 //returns the fist weapon if there is nothing else
 //This will return the actual weapon, I mean the bow in the case of bow+arrow combination
 CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
@@ -1484,7 +1489,7 @@ void Inventory::dump(StringBuffer& buffer) const
 		buffer.appendFormatted( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
 	}
 
-	buffer.appendFormatted( "Equipped: %d\n", Equipped );
+	buffer.appendFormatted("Equipped: %d       EquippedHeader: %d\n", Equipped, EquippedHeader);
 	Changed = true;
 	CalculateWeight();
 	buffer.appendFormatted( "Total weight: %d\n", Weight );

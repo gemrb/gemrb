@@ -95,6 +95,7 @@ bool WEDImporter::Open(DataStream* stream)
 	str->ReadDword( &VerticesOffset );
 	str->ReadDword( &WallGroupsOffset );
 	str->ReadDword( &PILTOffset );
+	ExtendedNight = false;
 	return true;
 }
 
@@ -103,13 +104,22 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	ieResRef res;
 	int usedoverlays = 0;
 
-	memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
-	if (rain) {
-		if (strlen(res) < 8)
-			strcat(res,"R");
+	memcpy(res, overlays->TilesetResRef, sizeof(ieResRef));
+	int len = strlen(res);
+	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
+	if (ExtendedNight && len == 6) {
+		strcat(res, "N");
+		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {
+			res[len] = '\0';
+		} else {
+			len++;
+		}
+	}
+	if (rain && len < 8) {
+		strcat(res, "R");
 		//no rain tileset available, rolling back
-		if (!gamedata->Exists(res,IE_TIS_CLASS_ID)) {
-			memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
+		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {
+			res[len] = '\0';
 		}
 	}
 	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );

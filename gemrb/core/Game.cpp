@@ -1334,7 +1334,7 @@ void Game::AddGold(ieDword add)
 }
 
 //later this could be more complicated
-void Game::AdvanceTime(ieDword add)
+void Game::AdvanceTime(ieDword add, bool fatigue)
 {
 	ieDword h = GameTime/(300*AI_UPDATE_TIME);
 	GameTime+=add;
@@ -1345,6 +1345,14 @@ void Game::AdvanceTime(ieDword add)
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
 	}
 	Ticks+=add*interval;
+	if (!fatigue) {
+		// update everyone in party, so they think no time has passed
+		// nobody else, including familiars, gets luck penalties from fatigue
+		for (unsigned int i=0; i<PCs.size(); i++) {
+			PCs[i]->IncreaseLastRested(add);
+		}
+	}
+
 	//change the tileset if needed
 	Map *map = GetCurrentArea();
 	if (map && map->ChangeMap(IsDay())) {
@@ -1751,7 +1759,7 @@ void Game::CastOnRest()
 						// we have the spell, so cast it on most injured
 						// NOTE: no distinction is made about the potency of spells
 						Actor *injuree = injurees[0];
-						tar->DirectlyCastSpell(injuree, special_spells[specialCount].resref, 0, 1, true, true, true);
+						tar->DirectlyCastSpell(injuree, special_spells[specialCount].resref, 0, 1, true);
 						if (injuree->GetStat(IE_HITPOINTS) == injuree->GetStat(IE_MAXHITPOINTS)) {
 							if (!injurees.empty()) {
 								injurees.erase(injurees.begin());
@@ -1857,19 +1865,25 @@ bool Game::IsDay()
 void Game::ChangeSong(bool always, bool force)
 {
 	int Song;
+	static int BattleSong = 0;
 
 	if (CombatCounter) {
 		//battlesong
 		Song = SONG_BATTLE;
+		BattleSong++;
 	} else {
 		//will select SONG_DAY or SONG_NIGHT
 		Song = (GameTime/AI_UPDATE_TIME)%7200/3600;
+		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)
 	//always transition gracefully with ChangeSong
 	//force just means, we schedule the song for later, if currently
 	//is playing
-	area->PlayAreaSong( Song, always, force );
+	// make sure we only start one battle song at a time, since we're called once per party member
+	if (BattleSong < 2) {
+		area->PlayAreaSong( Song, always, force );
+	}
 }
 
 /* this method redraws weather. If update is false,

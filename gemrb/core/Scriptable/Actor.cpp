@@ -893,10 +893,9 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 			return false;
 		}
 		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
-		if (tm) {
-			//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
-			clab = tm->QueryField(row, 4);
-		}
+		assert (tm);
+		//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
+		clab = tm->QueryField(row, 4);
 		cls = baseclass;
 	} else if (row) {
 		//kit abilities
@@ -1274,6 +1273,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	// always draw it for party members; the rest must not be invisible to have it;
 	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
 	if (hc_flags[idx] & HC_INVISIBLE && (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible)) {
+		delete sca;
 		return;
 	}
 
@@ -2172,7 +2172,7 @@ static void InitActorTables()
 			}
 			numfound = 0;
 			bool foundwarrior = false;
-			for (int j=0; j<classcount; j++) {
+			for (j=0; j<classcount; j++) {
 				//no sense continuing if we've found all to be found
 				if (numfound==tmpbits)
 					break;
@@ -2223,16 +2223,13 @@ static void InitActorTables()
 				}
 			}
 
-			if (classnames) {
-				for (ieDword j=1; j<tmpbits; j++) {
-					if (classnames[j]) {
-						free(classnames[j]);
-					}
+			for (j=0; j<(signed)tmpbits; j++) {
+				if (classnames[j]) {
+					free(classnames[j]);
 				}
-				free(classnames);
-				classnames = NULL;
 			}
-			free(dup);
+			free(classnames);
+
 			buffer.appendFormatted("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
 			buffer.appendFormatted("DS: %d ", dualswap[tmpindex]);
 			buffer.appendFormatted("MULTI: %d", multi[tmpindex]);
@@ -3911,6 +3908,7 @@ void Actor::GetHit(int damage, int spellLevel)
 		}
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
+		delete fx;
 	}
 	if (CheckSpellDisruption(damage, spellLevel)) {
 		InterruptCasting = true;
@@ -4386,6 +4384,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	buffer.appendFormatted("Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	buffer.appendFormatted("Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
+	buffer.appendFormatted("Fatigue: %d   Luck: %d\n\n", Modified[IE_FATIGUE], Modified[IE_LUCK]);
 
 	//this works for both level slot style
 	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
@@ -5420,7 +5419,7 @@ void Actor::ApplyExtraSettings()
 {
 	if (!PCStats) return;
 	for (int i=0;i<ES_COUNT;i++) {
-		if (featspells[i] && featspells[i][0]!='*') {
+		if (featspells[i][0] && featspells[i][0] != '*') {
 			if (PCStats->ExtraSettings[i]) {
 				core->ApplySpell(featspells[i], this, this, PCStats->ExtraSettings[i]);
 			}
@@ -5898,7 +5897,7 @@ ieDword Actor::GetNumberOfAttacks()
 		bonus = 2 * IsDualWielding();
 		return base + bonus;
 	} else {
-		if (monkbon != NULL && inventory.GetEquipped() == IW_NO_EQUIPPED) {
+		if (monkbon != NULL && inventory.FistsEquipped()) {
 			unsigned int level = GetMonkLevel();
 			if (level>=monkbon_cols) level=monkbon_cols-1;
 			if (level>0) {
@@ -5965,7 +5964,7 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 		// act as a rogue unless barefisted and without armor
 		// multiclassed monks only use their monk levels when determining barefisted bab
 		// check the spell failure instead of the skill penalty, since otherwise leather armor would also be treated as none
-		if (inventory.GetEquipped() != IW_NO_EQUIPPED || GetTotalArmorFailure()) {
+		if (!inventory.FistsEquipped() || GetTotalArmorFailure()) {
 			pBAB += SetLevelBAB(MonkLevel, ISTHIEF);
 		} else {
 			pBABDecrement = 3;
@@ -6163,13 +6162,15 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//FIXME:this type of weapon ignores all armor, -4 is for balance?
 		//or i just got lost a negation somewhere
 		prof += -4;
-	} else {
-		// iwd2 adds a -4 penalty nonprof penalty (others below)
-		// everyone is proficient with fists
-		if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
-			prof += wspecial[stars][0];
-		}
 	}
+
+	// iwd2 adds a -4 nonprof penalty (others below, since their table is bad and actual values differ by class)
+	// but everyone is proficient with fists
+	// TODO: figure out if this should be cheesily limited to party only (10gob hits it)
+	if (!inventory.FistsEquipped()) {
+		prof += wspecial[stars][0];
+	}
+
 	wi.profdmgbon = wspecial[stars][1];
 	DamageBonus += wi.profdmgbon;
 	speed += wspecial[stars][2];
@@ -6180,7 +6181,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
-			if (inventory.GetEquipped() != IW_NO_EQUIPPED) {
+			if (!inventory.FistsEquipped()) {
 				prof += defaultprof[clss];
 			}
 		} else {
@@ -6272,7 +6273,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 int Actor::MeleePenalty() const
 {
 	if (GetMonkLevel()) return 0;
-	if (inventory.GetEquippedSlot()!=IW_NO_EQUIPPED) return 4;
+	if (inventory.FistsEquipped()) return -4;
 	return 0;
 }
 
@@ -6465,13 +6466,13 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
 	if (wflags&WEAPON_BYPASS) {
 		if (ReverseToHit) {
 			// deflection is used to store the armor value in adnd
-			defense = AC.GetTotal() - AC.GetDeflectionBonus() - defense;
+			defense = AC.GetTotal() - AC.GetDeflectionBonus() + defense;
 		} else {
 			defense += AC.GetTotal() - AC.GetArmorBonus() - AC.GetShieldBonus();
 		}
 	} else {
 		if (ReverseToHit) {
-			defense = AC.GetTotal()-defense;
+			defense = AC.GetTotal() + defense;
 		} else {
 			defense += AC.GetTotal();
 		}
@@ -6542,7 +6543,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}
 
-	print("Performattack for %s, target is: %s", ShortName, target->ShortName);
+	Log(DEBUG, "Actor", "Performattack for %s, target is: %s", ShortName, target->ShortName);
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
@@ -6674,6 +6675,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (hittingheader->DiceThrown<256) {
 		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
+		if (damage < 0) damage = 0; // bad luck, effects and/or profs on lowlevel chars
 	} else {
 		damage = 0;
 	}
@@ -6926,15 +6928,19 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			BaseStats[IE_CHECKFORBERSERK]--;
 		}
 		if ((state&STATE_CONFUSED)) {
-
-		const char* actionString = NULL;
-		int tmp = core->Roll(1,3,0);
-		switch(tmp) {
+			const char* actionString = NULL;
+			int tmp = core->Roll(1,3,0);
+			switch (tmp) {
 			case 2:
 				actionString = "RandomWalk()";
 				break;
 			case 1:
-				actionString = "Attack([0])";
+				// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
+				if (RAND(0,1)) {
+					actionString = "Attack(NearestEnemyOf(Myself))";
+				} else {
+					actionString = "Attack([PC])";
+				}
 				break;
 			default:
 				actionString = "NoAction()";
@@ -6944,7 +6950,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);
-				print("Confusion: added %s", actionString);
+				print("Confusion: added %s at %d (%d)", actionString, gameTime-roundTime, roundTime);
 			}
 			return;
 		}
@@ -7887,6 +7893,8 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 				tmp = 70+tmp%10;
 			} else if (tmp>ACT_BARD) {//spellbooks
 				tmp = 50+tmp%10;
+			} else if (tmp>=32) { // here be dragons
+				Log(ERROR, "Actor", "Bad slot index passed to SetActionButtonRow!");
 			} else {
 				tmp=gemrb2iwd[tmp];
 			}
@@ -7922,6 +7930,8 @@ int Actor::IWD2GemrbQslot (int slotindex)
 			tmp = ACT_IWDQSPELL + tmp%10;
 		} else if (tmp>=50) { //spellbooks
 			tmp = ACT_BARD + tmp%10;
+		} else if (tmp>=32) { // here be dragons
+			Log(ERROR, "Actor", "Bad slot index passed to IWD2GemrbQslot!");
 		} else {
 			tmp = iwd2gemrb[tmp];
 		}
@@ -9167,7 +9177,7 @@ ieDword Actor::GetLevelInClass(ieDword classid) const
 		return 0;
 	}
 
-	if (classid>BGCLASSCNT) {
+	if (classid >= BGCLASSCNT) {
 		classid=0;
 	}
 	//other, levelslotsbg starts at 0 classid
@@ -10020,6 +10030,18 @@ bool Actor::ConcentrationCheck() const
 		}
 	}
 	return true;
+}
+
+// shorthand wrapper for throw-away effects
+void Actor::ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2)
+{
+	Effect *newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
+	if (newfx) {
+		core->ApplyEffect(newfx, this, Owner);
+		delete newfx;
+	} else {
+		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %s, Owner: %s", newref.Name, GetName(1), Owner->GetName(1));
+	}
 }
 
 }

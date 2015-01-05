@@ -154,6 +154,14 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	return false;
 }
 
+static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
+
+static inline bool IsInstant(ieByte timingmode)
+{
+	if( timingmode>=MAX_TIMING_MODE) return false;
+	return fx_instant[timingmode];
+}
+
 static const bool fx_equipped[MAX_TIMING_MODE]={false,false,true,false,false,true,false,false,true,false,false};
 
 static inline bool IsEquipped(ieByte timingmode)
@@ -526,6 +534,10 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	ieDword spec = 0;
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
 	Effect* new_fx;
+	// HACK: 00p2229.baf in ar1006 does this silly thing, crashing later
+	if (!st && self && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
+		fx->Target = FX_TARGET_PRESET;
+	}
 
 	if (self) {
 		fx->CasterID = self->GetGlobalID();
@@ -537,7 +549,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
-		assert(self);
+		assert(self != NULL);
 		fx->SetPosition(self->Pos);
 
 		flg = ApplyEffect( st, fx, 1 );
@@ -559,8 +571,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		break;
 
 	case FX_TARGET_ALL_BUT_SELF:
+		assert(self != NULL);
 		new_fx = new Effect;
-		assert(self);
 		map=self->GetCurrentArea();
 		i= map->GetActorCount(true);
 		while(i--) {
@@ -611,7 +623,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		if( !pretarget || pretarget->InParty) {
 			goto all_party;
 		}
-		assert(self);
+		assert(self != NULL);
 		map = self->GetCurrentArea();
 		spec = pretarget->GetStat(IE_SPECIFIC);
 
@@ -668,8 +680,8 @@ all_party:
 		break;
 
 	case FX_TARGET_ALL:
+		assert(self != NULL);
 		new_fx = new Effect;
-		assert(self);
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(true);
 		while(i--) {
@@ -687,8 +699,8 @@ all_party:
 		break;
 
 	case FX_TARGET_ALL_BUT_PARTY:
+		assert(self != NULL);
 		new_fx = new Effect;
-		assert(self);
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(false);
 		while(i--) {

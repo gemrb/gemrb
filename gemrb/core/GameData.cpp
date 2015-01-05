@@ -179,7 +179,7 @@ int GameData::LoadTable(const ieResRef ResRef, bool silent)
 	}
 	Table t;
 	t.refcount = 1;
-	strncpy( t.ResRef, ResRef, 8 );
+	CopyResRef(t.ResRef, ResRef);
 	t.tm = tm;
 	ind = -1;
 	for (size_t i = 0; i < tables.size(); i++) {
@@ -310,9 +310,6 @@ Item* GameData::GetItem(const ieResRef resname, bool silent)
 	//this is required for storing the 'source'
 	strnlwrcpy(item->Name, resname, 8);
 	sm->GetItem( item );
-	if (item == NULL) {
-		return NULL;
-	}
 
 	ItemCache.SetAt(resname, (void *) item);
 	return item;
@@ -351,9 +348,6 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	//this is required for storing the 'source'
 	strnlwrcpy(spell->Name, resname, 8);
 	sm->GetSpell( spell, silent );
-	if (spell == NULL) {
-		return NULL;
-	}
 
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;

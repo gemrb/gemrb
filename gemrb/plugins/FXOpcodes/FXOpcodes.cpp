@@ -1101,7 +1101,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (caster->Type==ST_ACTOR) {
 			casterenemy = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
 		} else {
-			casterenemy = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+			casterenemy = true; //target->GetStat(IE_EA)>EA_GOODCUTOFF;
 		}
 		fx->DiceThrown=casterenemy;
 
@@ -1989,12 +1989,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->FirstApply) {
-		Effect *newfx;
-
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_animation_stance_ref, 0, IE_ANI_SLEEP);
-		core->ApplyEffect(newfx, target, Owner);
-
-		delete newfx;
+		target->ApplyEffectCopy(fx, fx_animation_stance_ref, Owner, 0, IE_ANI_SLEEP);
 	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
@@ -2631,59 +2626,36 @@ int fx_sex_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_ids_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_ids_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	bool permanent = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
+	ieDword stat = 0;
 	switch (fx->Parameter2) {
 	case 0:
-		if (permanent) {
-			BASE_SET(IE_EA, fx->Parameter1);
-		} else {
-			STAT_SET(IE_EA, fx->Parameter1);
-		}
+		stat = IE_EA;
 		break;
 	case 1:
-		if (permanent) {
-			BASE_SET(IE_GENERAL, fx->Parameter1);
-		} else {
-			STAT_SET(IE_GENERAL, fx->Parameter1);
-		}
+		stat = IE_GENERAL;
 		break;
 	case 2:
-		if (permanent) {
-			BASE_SET(IE_RACE, fx->Parameter1);
-		} else {
-			STAT_SET(IE_RACE, fx->Parameter1);
-		}
+		stat = IE_RACE;
 		break;
 	case 3:
-		if (permanent) {
-			BASE_SET(IE_CLASS, fx->Parameter1);
-		} else {
-			STAT_SET(IE_CLASS, fx->Parameter1);
-		}
+		stat = IE_CLASS;
 		break;
 	case 4:
-		if (permanent) {
-			BASE_SET(IE_SPECIFIC, fx->Parameter1);
-		} else {
-			STAT_SET(IE_SPECIFIC, fx->Parameter1);
-		}
+		stat = IE_SPECIFIC;
 		break;
 	case 5:
-		if (permanent) {
-			BASE_SET(IE_SEX, fx->Parameter1);
-		} else {
-			STAT_SET(IE_SPECIFIC, fx->Parameter1);
-		}
+		stat = IE_SEX;
 		break;
 	case 6:
-		if (permanent) {
-			BASE_SET(IE_ALIGNMENT, fx->Parameter1);
-		} else {
-			STAT_SET(IE_ALIGNMENT, fx->Parameter1);
-		}
+		stat = IE_ALIGNMENT;
 		break;
 	default:
 		return FX_NOT_APPLIED;
+	}
+	if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+		BASE_SET(stat, fx->Parameter1);
+	} else {
+		STAT_SET(stat, fx->Parameter1);
 	}
 	return FX_PERMANENT;
 }
@@ -4143,12 +4115,7 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		map->AddVVCell(new VEFObject(sca));
 	} else {
 		//simulate sparkle casting glows
-		Effect *newfx;
-
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_sparkle_ref, fx->Parameter2, 3);
-		core->ApplyEffect(newfx, target, Owner);
-
-		delete newfx;
+		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);
 	}
 
 	return FX_NOT_APPLIED;
@@ -4293,6 +4260,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x92 Spell:Cast
+// param2 was supposedly distinguishing between normal and instant casts, but uses in bg2 disagree
 int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
@@ -4306,8 +4274,8 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	// flags: no deplete, instant?, no interrupt
-	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false, fx->Parameter2==1, true);
+	// flags: no deplete, instant, no interrupt
+	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;
@@ -4334,7 +4302,7 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Point p(fx->PosX, fx->PosY);
-	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, fx->Parameter2, false);
+	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, true, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
@@ -4868,6 +4836,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
 			target->fxqueue.AddEffect(myfx);
+			delete myfx;
 			return FX_NOT_APPLIED;
 		}
 		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
@@ -5949,10 +5918,10 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		// TODO: fail remaining spells if an earlier one fails?
 		unsigned int i, dist;
 		ieResRef refs[4];
-		strncpy(refs[0], fx->Resource, sizeof(ieResRef));
-		strncpy(refs[1], fx->Resource2, sizeof(ieResRef));
-		strncpy(refs[2], fx->Resource3, sizeof(ieResRef));
-		strncpy(refs[3], fx->Resource4, sizeof(ieResRef));
+		CopyResRef(refs[0], fx->Resource);
+		CopyResRef(refs[1], fx->Resource2);
+		CopyResRef(refs[2], fx->Resource3);
+		CopyResRef(refs[3], fx->Resource4);
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
 		ieResRef OldSpellResRef;
 		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
@@ -5975,7 +5944,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			}
 			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
 			// no casting animation, no deplete, instant, no interrupt
-			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false, true, true);
+			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false);
 		}
 		Owner->SetSpellResRef(OldSpellResRef);
 
@@ -6152,11 +6121,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->ApplySpell(resref,copy,copy,0);
 	}
 
-	newfx = EffectQueue::CreateEffectCopy(fx, fx_puppetmarker_ref, fx->CasterID, fx->Parameter2);
-	if (newfx) {
-		core->ApplyEffect(newfx, copy, copy);
-		delete newfx;
-	}
+	copy->ApplyEffectCopy(fx, fx_puppetmarker_ref, copy, fx->CasterID, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -6394,7 +6359,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->DirectlyCastSpellPoint(target->Pos, fx->Resource, 0, 1, false, true, true);
+	Owner->DirectlyCastSpellPoint(target->Pos, fx->Resource, 0, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }

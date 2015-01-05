@@ -78,8 +78,8 @@ def ClearPress():
 def RevertPress():
 	global BioStrRef
 	BioTable = GemRB.LoadTable ("bios")
-	Class = GemRB.GetVar ("BaseClass") - 1
-	BioStrRef = BioTable.GetValue(Class,1)
+	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("BaseClass")-1, "index")
+	BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	GemRB.SetToken ("BIO", GemRB.GetString(BioStrRef) )
 	if type (EditControl) != type (7350): # just some int
 		EditControl.SetText (GemRB.GetToken("BIO") )
@@ -92,6 +92,7 @@ def BioCancelPress():
 	return
 
 def BioDonePress():
+	GemRB.SetToken ("BIO", EditControl.QueryText())
 	if BioWindow:
 		BioWindow.Unload ()
 	return
@@ -124,6 +125,7 @@ def BioPress():
 	else:
 		EditControl.SetText (BioData )
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	EditControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
 def NextPress():

@@ -3,3 +3,4 @@
 *.pro diff=ie
 *.spl diff=ie
 *.vvc diff=ie
+*.cre diff=ie

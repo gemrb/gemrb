@@ -519,7 +519,6 @@ void Interface::HandleEvents()
 		if (tmp != (ieDword) ~0) {
 			EventFlag&=~EF_PORTRAIT;
 			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
-			guiscript->RunFunction( "GUIINV", "RefreshInventoryWindow" );
 		}
 	}
 
@@ -933,7 +932,7 @@ bool Interface::ReadModalStates()
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
 		CopyResRef(ms.spell, table->QueryField(i, 0));
-		strncpy(ms.action, table->QueryField(i, 1), 16);
+		strlcpy(ms.action, table->QueryField(i, 1), 16);
 		ms.entering_str = atoi(table->QueryField(i, 2));
 		ms.leaving_str = atoi(table->QueryField(i, 3));
 		ms.failed_str = atoi(table->QueryField(i, 4));
@@ -2249,14 +2248,14 @@ bool Interface::LoadGemRBINI()
 				GroundCircleScale[size] = atoi( pos+1 );
 				strlcpy( GroundCircleBam[size], s, pos - s + 1 );
 			} else {
-				strcpy( GroundCircleBam[size], s );
+				CopyResRef(GroundCircleBam[size], s);
 			}
 		}
 	}
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
-		strcpy( INIConfig, s );
+		strlcpy(INIConfig, s, sizeof(INIConfig));
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
@@ -3417,6 +3416,9 @@ int Interface::PlayMovie(const char* ResRef)
 
 	ResourceHolder<MoviePlayer> mp(realResRef);
 	if (!mp) {
+		gamedata->FreePalette(palette);
+		free(frames);
+		free(strrefs);
 		return -1;
 	}
 
@@ -4578,7 +4580,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	//this is to fix buggy saves so TakeItemNum works
 	//the equipped bit is also reset
 	item->Flags &= ~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
-	if (GF_NO_UNDROPPABLE) {
+	if (core->HasFeature(GF_NO_UNDROPPABLE)) {
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 

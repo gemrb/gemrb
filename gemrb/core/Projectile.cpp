@@ -1090,6 +1090,7 @@ void Projectile::LineTarget()
 				}
 
 				eff->AddAllEffects(target, target->Pos);
+				delete eff;
 			}
 		}
 		iter = iter->Next;

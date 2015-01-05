@@ -31,7 +31,7 @@ Preparing and testing GIT
 
 * Tag current GIT to version number e.g. v0.9.0
   i.e. in the gemrb root directory do
-    ver=0.9.0
+    ver=0.8.2
     git tag -a -m "GemRB $ver" v$ver
     git push origin v$ver
 

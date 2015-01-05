@@ -406,10 +406,8 @@ def GetActorClassTitle (actor):
 					ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
 				elif Dual[0] == 2:
 					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
-				if ClassTitle != "*":
-					ClassTitle = GemRB.GetString (ClassTitle)
-				ClassTitle += " / "
-				ClassTitle += GemRB.GetString (CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF"))
+				ClassTitle = GemRB.GetString (ClassTitle) + " / "
+				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
 			else: # ordinary class or kit
 				if KitIndex:
 					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
@@ -829,22 +827,17 @@ class _stdioWrapper(object):
 	def __init__(self, log_level):
 		self.log_level = log_level
 		self.buffer = ""
-		self.lastLine = "" # hack for getting console command output
 	def write(self, message):
 		self.buffer += str(message)
 		if self.buffer.endswith("\n"):
 			out = self.buffer.rstrip("\n")
 			if out:
-				self.lastLine = out[out.rfind("\n"):]
 				GemRB.Log(self.log_level, "Python", out)
 			self.buffer = ""
 
-outputFunnel = _stdioWrapper(LOG_MESSAGE)
-
 def _wrapStdio():
-	global outputFunnel
 	import sys
-	sys.stdout = outputFunnel
+	sys.stdout = _stdioWrapper(LOG_MESSAGE)
 	sys.stderr = _stdioWrapper(LOG_ERROR)
 
 _wrapStdio()

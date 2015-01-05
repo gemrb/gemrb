@@ -67,6 +67,10 @@ def OnLoad():
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
 
 	# alignment based bhaal powers are added in FixInnates later
+	# unless we're starting with SoA
+	if GemRB.GetVar("oldgame") == 1:
+		AlignmentAbbrev = CommonTables.Aligns.FindValue ("VALUE", GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
+		GUICommon.AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
 	TmpTable = GemRB.LoadTable ("strtgold")

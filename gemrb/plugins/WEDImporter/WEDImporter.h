@@ -46,6 +46,7 @@ private:
 	//these will change as doors are being read, so get them in time!
 	ieWord OpenPolyCount, ClosedPolyCount;
 	ieDword OpenPolyOffset, ClosedPolyOffset;
+	bool ExtendedNight;
 
 private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
@@ -62,6 +63,7 @@ public:
 	ieDword GetPolygonsCount() { return WallPolygonsCount+DoorPolygonsCount; }
 	void SetupOpenDoor(unsigned int &index, unsigned int &count);
 	void SetupClosedDoor(unsigned int &index, unsigned int &count);
+	void SetExtendedNight(bool night) { ExtendedNight = night; }
 };
 
 }

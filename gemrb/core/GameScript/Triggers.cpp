@@ -435,9 +435,6 @@ int GameScript::General(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor == NULL) {
-		return 0;
-	}
 	return ID_General(actor, parameters->int0Parameter);
 }
 
@@ -451,9 +448,6 @@ int GameScript::Specifics(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor == NULL) {
-		return 0;
-	}
 	return ID_Specific(actor, parameters->int0Parameter);
 }
 
@@ -1162,7 +1156,9 @@ int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED) ) {
+	// HACK: temporarily look at all items, since we now set the bit only for weapons
+	// bg2/ddguard7.baf is the only user with something else - the strohm mask helmet
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED*0) ) {
 		return 1;
 	}
 	return 0;
@@ -2177,30 +2173,34 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
 	Actor *scr = (Actor *) Sender;
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
 	Actor *actor = NULL;
 	if (tar->Type == ST_ACTOR) {
 		actor = (Actor *) tar;
 	}
 
-	int splnum = parameters->int0Parameter;
 	int flags = parameters->int1Parameter;
-	if (actor) {
-		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget() ) {
-			return 0;
-		}
-		int range = (flags & MSO_IGNORE_RANGE) ? 0 : Distance(scr, actor);
-		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, scr, range)) {
-			return 0;
-		}
-	} else {
-		if (!(flags & MSO_IGNORE_NULL)) {
-			return 0;
-		}
+	if (!(flags & MSO_IGNORE_NULL) && !actor) {
+		return 0;
 	}
+	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget() ) {
+		return 0;
+	}
+	int splnum = parameters->int0Parameter;
 	if (!(flags & MSO_IGNORE_HAVE) && !scr->spellbook.HaveSpell(splnum, 0) ) {
 		return 0;
 	}
-
+	int range;
+	if ((flags & MSO_IGNORE_RANGE) || !actor) {
+		range = 0;
+	} else {
+		range = Distance(scr, actor);
+	}
+	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget(splnum, scr, range)) {
+		return 0;
+	}
 	return 1;
 }
 
@@ -2465,10 +2465,7 @@ int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RandomNum(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (parameters->int0Parameter<0) {
-		return 0;
-	}
-	if (parameters->int1Parameter<0) {
+	if (parameters->int0Parameter <= 0 || parameters->int1Parameter <= 0) {
 		return 0;
 	}
 	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
@@ -2476,10 +2473,7 @@ int GameScript::RandomNum(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::RandomNumGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (parameters->int0Parameter<0) {
-		return 0;
-	}
-	if (parameters->int1Parameter<0) {
+	if (parameters->int0Parameter <= 0 || parameters->int1Parameter <= 0) {
 		return 0;
 	}
 	return parameters->int1Parameter-1 < RandomNumValue%parameters->int0Parameter;
@@ -2487,10 +2481,7 @@ int GameScript::RandomNumGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::RandomNumLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (parameters->int0Parameter<0) {
-		return 0;
-	}
-	if (parameters->int1Parameter<0) {
+	if (parameters->int0Parameter <= 0 || parameters->int1Parameter <= 0) {
 		return 0;
 	}
 	return parameters->int1Parameter-1 > RandomNumValue%parameters->int0Parameter;
@@ -3769,7 +3760,7 @@ int GameScript::ModalState( Scriptable* Sender, Trigger* parameters)
 	} else {
 		scr = Sender;
 	}
-	if (scr->Type!=ST_ACTOR) {
+	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;

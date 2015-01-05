@@ -19,9 +19,10 @@
 # code shared between the common GUIREC and that of iwd2 (pst)
 import GemRB
 import GameCheck
+import GUICommon
 import Portrait
 from GUIDefines import *
-from ie_stats import IE_SEX, IE_CLASS, IE_MC_FLAGS, MC_EXPORTABLE
+from ie_stats import IE_SEX, IE_CLASS, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
 
 BiographyWindow = None
@@ -442,8 +443,8 @@ def RevertBiography():
 	if GameCheck.IsIWD2():
 		BioTable = GemRB.LoadTable ("bios")
 		pc = GemRB.GameGetSelectedPCSingle ()
-		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-		BioStrRef = BioTable.GetValue(Class,1) # TODO: check if it is really class ordered and what happens for multiclassed chars
+		ClassName = GUICommon.GetClassRowName (pc)
+		BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	else:
 		BioStrRef = 33347
 	TextArea.SetText (BioStrRef)
@@ -462,7 +463,7 @@ def OpenBiographyEditWindow ():
 	if BioStrRef != 33347:
 		Changed = 1
 
-	# TODO: check if this is really needed
+	# 23 and 24 were deleted and replaced in iwd
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		SubCustomizeWindow = GemRB.LoadWindow (51)
 	else:
@@ -478,8 +479,10 @@ def OpenBiographyEditWindow ():
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
+	ScrollbarID = 6
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		RevertButton = SubCustomizeWindow.GetControl (6)
+		ScrollbarID = 3
 	else:
 		RevertButton = SubCustomizeWindow.GetControl (3)
 	RevertButton.SetText (2240)
@@ -491,7 +494,7 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = SubCustomizeWindow.GetControl (4)
-	TextArea.SetBufferLength (65535)
+	TextArea = TextArea.ConvertEdit (ScrollbarID)
 	TextArea.SetText (BioStrRef)
 
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
@@ -500,6 +503,7 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	TextArea.SetStatus (IE_GUI_CONTROL_FOCUSED) # DO NOT MOVE near the rest of TextArea handling
 	return
 
 def ClearBiography():
@@ -534,7 +538,10 @@ def OpenBiographyWindow ():
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	TextArea.SetText (GemRB.GetPlayerString (pc, BioStrRefSlot) )
+	if GameCheck.IsBG1 () and GemRB.GetPlayerName (pc, 2) == 'none':
+		TextArea.SetText (GetProtagonistBiography (pc))
+	else:
+		TextArea.SetText (GemRB.GetPlayerString (pc, BioStrRefSlot))
 
 	# Done
 	Button = Window.GetControl (2)
@@ -558,6 +565,17 @@ def CloseBiographyWindow ():
 		else:
 			GUIREC.InformationWindow.SetVisible (WINDOW_VISIBLE)
 	return
+
+def GetProtagonistBiography (pc):
+	BioTable = GemRB.LoadTable ("bios")
+	racestrings = [ 15895, 15891, 15892, 15890, 15893, 15894 ]
+
+	ClassName = GUICommon.GetClassRowName (pc)
+	bio = BioTable.GetValue (ClassName, "BIO", GTV_REF)
+	race = GemRB.GetPlayerStat (pc, IE_RACE)
+	if race <= 6:
+		bio += "\n\n" + GemRB.GetString (racestrings[race-1])
+	return bio
 
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton

@@ -252,6 +252,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
+	tmm->SetExtendedNight( !day_or_night );
 
 	//alter the tilemap object, not all parts of that object are coming from the wed/tis
 	//this is why we have to be careful
@@ -366,6 +367,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		print("[AREImporter]: No Tile Map Manager Available.");
+		delete map;
 		return NULL;
 	}
 	ieResRef TmpResRef;
@@ -384,6 +386,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
 		print("[AREImporter]: No Tile Map Available.");
+		delete map;
 		return NULL;
 	}
 

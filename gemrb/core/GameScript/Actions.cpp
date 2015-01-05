@@ -1640,7 +1640,7 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	target->SetOverheadText(String());
+	target->DisplayOverheadText(NULL);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
@@ -3982,6 +3982,9 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
 	MoveItemCore(tar, Sender, parameters->string0Parameter,0,0);
 }
 
@@ -4805,8 +4808,9 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//according to IESDP silenced creatures cannot use shout
+	// neither do dead ones or the paladin ogres turn Garren hostile
 	Actor *actor = (Actor *) Sender;
-	if (actor->GetStat( IE_STATE_ID) & STATE_SILENCED) {
+	if (actor->GetStat(IE_STATE_ID) & (STATE_SILENCED|STATE_DEAD)) {
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
@@ -4821,7 +4825,7 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 	}
 	//according to IESDP silenced creatures cannot use shout
 	Actor *actor = (Actor *) Sender;
-	if (actor->GetStat( IE_STATE_ID) & STATE_SILENCED) {
+	if (actor->GetStat(IE_STATE_ID) & (STATE_SILENCED|STATE_DEAD)) {
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
@@ -4834,6 +4838,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
+	//TODO: add state limiting like in Shout?
 	Map *map=Sender->GetCurrentArea();
 	map->Shout((Actor *) Sender, 0, 40);
 }
@@ -4851,7 +4856,6 @@ void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 	Map *map=Sender->GetCurrentArea();
 	String* str = core->GetString( parameters->int0Parameter, 0);
 	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str, parameters->int0Parameter);
-	delete str;
 }
 
 void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)
@@ -5148,7 +5152,7 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 	// then, calculate the offset (in hours) required to take us to the desired hour.
 	padding = (24 + parameters->int0Parameter - padding) % 24;
 	// then, advance one day (7200), plus the desired number of hours.
-	core->GetGame()->AdvanceTime(AI_UPDATE_TIME*(7200 + padding*300));
+	core->GetGame()->AdvanceTime(AI_UPDATE_TIME*(7200 + padding*300), false);
 }
 
 //implement pst style parameters:
@@ -5255,20 +5259,17 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	if (tar->Type == ST_ACTOR) {
 		actor = (Actor *) tar;
 	}
-	int flags = parameters->int0Parameter;
-	if (!actor) {
-		if (!(flags & MSO_IGNORE_NULL)) {
-			return;
-		}
-	} else {
-		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget() ) {
-			return;
-		}
-		if (!(flags & MSO_IGNORE_SEE) && !CanSee(Sender, actor, true, 0) ) {
-			return;
-		}
-	}
 
+	int flags = parameters->int0Parameter;
+	if (!(flags & MSO_IGNORE_NULL) && !actor) {
+		return;
+	}
+	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget() ) {
+		return;
+	}
+	if (!(flags & MSO_IGNORE_SEE) && actor && !CanSee(Sender, actor, true, 0) ) {
+		return;
+	}
 	int len = strlen(parameters->string0Parameter);
 	//
 	if (len&3) {
@@ -5298,14 +5299,12 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		} else {
 			range = Distance(me, actor);
 		}
-		if (actor) {
-			if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, me, range)) {
-				goto end_mso_loop;
-			}
-			me->LastMarked = actor->GetGlobalID();
+		if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget(splnum, me, range)) {
+			goto end_mso_loop;
 		}
+		//mark spell and target
 		me->LastMarkedSpell = splnum;
-
+		me->LastMarked = tar->GetGlobalID();
 		break;
 end_mso_loop:
 		pos++;
@@ -6163,6 +6162,10 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	Door *door = NULL;
 	Container *container = NULL;
 	Point *pos;
+	if (!target) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	if (target->Type == ST_DOOR) {
 		door = (Door *) target;
 		pos = door->toOpen;
@@ -6811,13 +6814,14 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameter
 	}
 }
 
+// pst spawning
 void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 {
 	AutoTable pcs("bios");
 	if (!pcs) {
 		return;
 	}
-	const char* string = pcs->QueryField( parameters->int0Parameter, 0 );
+	const char* string = pcs->GetRowName(parameters->int0Parameter);
 	int pos = gamedata->LoadCreature(string,0,false);
 	if (pos<0) {
 		return;

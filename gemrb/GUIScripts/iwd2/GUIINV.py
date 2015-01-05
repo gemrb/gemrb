@@ -212,9 +212,6 @@ def UpdateInventoryWindow ():
 	return
 
 def RefreshInventoryWindow ():
-	if not InventoryWindow:
-		return
-
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()

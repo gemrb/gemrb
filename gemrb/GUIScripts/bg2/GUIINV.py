@@ -193,8 +193,6 @@ def UpdateInventoryWindow ():
 
 def RefreshInventoryWindow ():
 	"""Partial redraw without resetting TopIndex."""
-	if not InventoryWindow:
-		return
 
 	Window = InventoryWindow
 
