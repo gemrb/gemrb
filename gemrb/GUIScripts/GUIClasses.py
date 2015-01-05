@@ -129,8 +129,7 @@ class GControl:
       raise RuntimeError, "Scrollbar must be in same Window as Control"
     return _GemRB.Control_AttachScrollBar(self.WinID, self.ID, scrollbar.ID)
   def SubstituteForControl(self, target):
-    _GemRB.Control_SubstituteForControl(self.WinID, self.ID, target.WinID, target.ID)
-    return _GemRB.Window_GetControl(target.WinID, target.ID)
+	  return _GemRB.Control_SubstituteForControl(self.WinID, self.ID, target.WinID, target.ID)
 
 class GLabel(GControl):
   __metaclass__ = metaControl

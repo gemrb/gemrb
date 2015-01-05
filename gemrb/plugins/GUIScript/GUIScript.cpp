@@ -2794,12 +2794,15 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 	Window* targetWin = target->Owner;
 	substitute->SetControlFrame(target->ControlFrame());
 
-	substitute->ControlID = ControlID;
+	substitute->ControlID = target->ControlID;
 	ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
 	targetWin->AddControl( substitute ); // deletes target!
 	targetWin->Link( sbid, substitute->ControlID );
 
-	Py_RETURN_NONE;
+	PyObject* ctrltuple = Py_BuildValue("(ii)", WindowIndex, substitute->ControlID);
+	PyObject* ret = GemRB_Window_GetControl(NULL, ctrltuple);
+	Py_DECREF(ctrltuple);
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_Control_SetPos__doc,
