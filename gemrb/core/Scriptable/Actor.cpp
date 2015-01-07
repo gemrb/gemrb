@@ -2165,8 +2165,7 @@ static void InitActorTables()
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
 			char **classnames = (char **) calloc(tmpbits, sizeof(char *));
-			char* dup = strdup((char*)classname);
-			classnames[0] = (char*)strtok(dup, "_");
+			classnames[0] = (char*)strtok(strdup((char*)classname), "_");
 			while (numfound<tmpbits && (classnames[numfound] = strdup(strtok(NULL, "_")))) {
 				numfound++;
 			}
