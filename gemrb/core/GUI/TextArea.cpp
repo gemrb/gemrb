@@ -404,7 +404,7 @@ void TextArea::ScrollToY(int y, Control* sender)
 {
 	if (sb && sender != sb) {
 		// we must "scale" the pixels
-		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep() / (double)ftext->LineHeight));
+		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep()-1 / ftext->LineHeight));
 		// sb->SetPosForY will recall this method so we dont need to do more... yet.
 	} else if (sb) {
 		// our scrollbar has set position for us
