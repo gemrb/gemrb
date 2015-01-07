@@ -1263,6 +1263,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			text = core->GetString( strref,0 );
 		}
 		map->AddMapNote( point, color, text, strref );
+		delete text;
 	}
 
 	//this is a ToB feature (saves the unexploded projectiles)
