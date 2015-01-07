@@ -90,12 +90,9 @@ private: //Private attributes
 	unsigned short SliderYPos;
 	/** Item Index */
 	ieWord Pos;
-	/** slider y delta between steps */
-	double stepPx;
 	/** Scroll Bar Status */
 	unsigned short State;
-private:
-	void CalculateStep();
+
 public:
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);

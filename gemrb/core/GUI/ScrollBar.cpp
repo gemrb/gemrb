@@ -36,7 +36,7 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 	Pos = 0;
 	Value = 0;
 	State = 0;
-	stepPx = SliderYPos = 0;
+	SliderYPos = 0;
 	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
 
@@ -62,13 +62,13 @@ int ScrollBar::GetFrameHeight(int frame) const
 	return Frames[frame]->Height;
 }
 
-void ScrollBar::CalculateStep()
+double ScrollBar::GetStep()
 {
+	double stepPx = 0.0;
 	if (Value){
 		stepPx = (double)SliderRange / (double)Value;
-	} else {
-		stepPx = 0.0;
 	}
+	return stepPx;
 }
 
 /** Sets a new position, relays the change to an associated textarea and calls
@@ -110,6 +110,7 @@ void ScrollBar::SetPos(ieDword NewPos)
 /** Provides per-pixel scrolling. Top = 0px */
 void ScrollBar::SetPosForY(short y)
 {
+	double stepPx = GetStep();
 	if (y && stepPx && Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
 		// clamp the value
 		if (y < 0) y = 0;
@@ -158,12 +159,6 @@ void ScrollBar::ScrollUp()
 void ScrollBar::ScrollDown()
 {
 	SetPos( Pos + 1 );
-}
-
-double ScrollBar::GetStep()
-{
-	CalculateStep();
-	return stepPx;
 }
 
 bool ScrollBar::HasBackground()
@@ -245,7 +240,6 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		ScrollDown();
 		return;
 	}
-	CalculateStep();
 	// if we made it this far we will jump the nib to y and "grab" it
 	// this way we only need to click once to jump+scroll
 	State |= SLIDER_GRAB;
