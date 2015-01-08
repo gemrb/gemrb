@@ -397,8 +397,7 @@ def GetActorClassTitle (actor):
 		Dual = IsDualClassed (actor, 1)
 
 		if Multi and Dual[0] == 0: # true multi class
-			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
-			ClassTitle = GemRB.GetString (ClassTitle)
+			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
 		else:
 			if Dual[0]: # dual class
 				# first (previous) kit or class of the dual class

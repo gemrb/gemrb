@@ -147,27 +147,27 @@ def DisplayOverview(step):
 		elif part == 3:
 			stat = GemRB.GetPlayerStat(MyChar, IE_RACE)
 			v = CommonTables.Races.FindValue (3, stat)
-			TextAreaControl.Append (GemRB.GetString(1048) + ": " + GemRB.GetString( CommonTables.Races.GetValue (v,2)) + "\n")
+			TextAreaControl.Append (GemRB.GetString (1048) + ": " + CommonTables.Races.GetValue (v, 2, GTV_REF) + "\n")
 		elif part == 4:
 			ClassTitle = GUICommon.GetActorClassTitle (MyChar)
 			TextAreaControl.Append (GemRB.GetString(12136) + ": " + ClassTitle + "\n")
 		elif part == 5:
 			stat = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 			v = CommonTables.Aligns.FindValue (3, stat)
-			TextAreaControl.Append (GemRB.GetString(1049) + ": " + GemRB.GetString(CommonTables.Aligns.GetValue (v,2)) + "\n")
+			TextAreaControl.Append (GemRB.GetString(1049) + ": " + CommonTables.Aligns.GetValue (v, 2, GTV_REF) + "\n")
 		elif part == 6:
 			TextAreaControl.Append ("\n")
 			ClassName = GUICommon.GetClassRowName (MyChar)
 			hasextra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
-				v = AbilityTable.GetValue (i, 2)
+				v = AbilityTable.GetValue (i, 2, GTV_REF)
 				StatID = AbilityTable.GetValue (i, 3)
 				stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if (i == 0) and hasextra and (stat==18):
-					TextAreaControl.Append (GemRB.GetString(v) + ": " + str(stat) + "/" + str(strextra) + "\n")
+					TextAreaControl.Append (v + ": " + str(stat) + "/" + str(strextra) + "\n")
 				else:
-					TextAreaControl.Append (GemRB.GetString(v) + ": " + str(stat) + "\n")
+					TextAreaControl.Append (v + ": " + str(stat) + "\n")
 		elif part == 7:
 			# thieving and other skills
 			info = ""

@@ -369,8 +369,8 @@ def DisplayGeneral (pc):
 		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(32052) + "[/color]\n")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
-			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
-			RecordsTextArea.Append ("[cap]"+c+"%[/cap][p]" + GemRB.GetString (tmp) + "[/p]")
+			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION", GTV_REF)
+			RecordsTextArea.Append ("[cap]"+c+"%[/cap][p]" + tmp + "[/p]")
 
 	# TODO: Active Feats (eg. Power attack 4)
 
@@ -381,8 +381,8 @@ def DisplayGeneral (pc):
 	#alignment
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(1049) + "[/color]\n")
 	tmp = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
-	Align = CommonTables.Aligns.GetValue (tmp, 2)
-	RecordsTextArea.Append ("[p]" + GemRB.GetString(Align) + "[/p]")
+	Align = CommonTables.Aligns.GetValue (tmp, 2, GTV_REF)
+	RecordsTextArea.Append ("[p]" + Align + "[/p]")
 
 	#saving throws
 	DisplaySavingThrows (pc)

@@ -484,8 +484,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		HateTable = GemRB.LoadTable ("haterace")
 		Racist = HateTable.FindValue (1, HatedRace)
 		if Racist != -1:
-			HatedRace = HateTable.GetValue (Racist, 0)
-			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
+			HatedRace = HateTable.GetValue (Racist, 0, GTV_REF)
+			stats.append ( (15982, HatedRace, '') )
 
 	# these skills were new in bg2
 	if GameCheck.IsBG2() or GameCheck.IsIWD1():
