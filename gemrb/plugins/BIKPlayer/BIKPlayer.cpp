@@ -348,7 +348,6 @@ void BIKPlayer::showFrame(unsigned char** buf, unsigned int *strides, unsigned i
 	ieDword titleref = 0;
 
 	if (cbAtFrame && strRef) {
-		frameCount ++;
 		if ((rowCount<maxRow) && (frameCount >= cbAtFrame[rowCount]) ) {
 			rowCount++;
 		}
