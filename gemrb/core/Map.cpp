@@ -3038,9 +3038,9 @@ void Map::SetupAmbients()
 }
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(const Point &point, int color, const String* text)
+void Map::AddMapNote(const Point &point, int color, String* text)
 {
-	AddMapNote(point, MapNote((text) ? *text : L"", color));
+	AddMapNote(point, MapNote(text, color));
 }
 
 void Map::AddMapNote(const Point &point, int color, ieStrRef strref)

@@ -7879,9 +7879,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	point.x=x;
 	point.y=y;
 	if (txt && txt[0]) {
-		String* newvalue = StringFromCString(txt);
-		map->AddMapNote(point, color, newvalue);
-		delete newvalue;
+		map->AddMapNote(point, color, StringFromCString(txt));
 	} else {
 		map->RemoveMapNote(point);
 	}

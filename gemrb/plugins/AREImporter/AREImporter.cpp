@@ -1240,7 +1240,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			bytes[500] = '\0';
 			String* text = StringFromCString(bytes);
 			map->AddMapNote( point, color, text);
-			delete text;
 			str->ReadDword(&color); //readonly == 1
 			str->Seek(20, GEM_CURRENT_POS);
 		} else {
@@ -2137,12 +2136,12 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteDword( &tmpDword );
 			tmpDword = (ieDword) mn.Pos.y;
 			stream->WriteDword( &tmpDword );
-			// limited to 500 *bytes* of text, convert to a multibyte encoding.
-			char* mbstring = MBCStringFromString(mn.text);
 			int len = 0;
-			if (mbstring) {
+			if (mn.text) {
+				// limited to 500 *bytes* of text, convert to a multibyte encoding.
+				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				len = (std::min)(mblen(mbstring, mn.text.length()), 500);
+				len = (std::min)(mblen(mbstring, mn.text->length()), 500);
 				stream->Write( mbstring, len);
 				free(mbstring);
 			}
