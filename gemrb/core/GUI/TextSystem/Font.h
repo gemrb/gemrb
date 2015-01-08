@@ -21,6 +21,11 @@
 /**
  * @file Font.h
  * Declares Font, class for manipulating images serving as fonts
+ *
+ * Font uses an "Atlas" instead of individual sprites for characters.
+ * The TTF plugin will dynamically add to its atlas as characters are needed
+ * to avoid building a ton of worthless pages. Additionally, fonts (especially
+ * BAM based ones) use "alias" entries to avoid making duplicate glyphs.
  * @author The GemRB Project
  */
 
