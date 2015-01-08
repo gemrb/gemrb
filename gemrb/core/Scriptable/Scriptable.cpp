@@ -399,7 +399,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	if (act) {
 		// if party AI is disabled, don't run non-override scripts
-		if (act->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
+		if (act->InParty && !(core->GetGame()->ControlStatus & CS_PARTY_AI))
 			scriptCount = 1;
 		// TODO: hardcoded action hacks
 		//TODO: add stuff here that overrides actions (like Panic, etc)
