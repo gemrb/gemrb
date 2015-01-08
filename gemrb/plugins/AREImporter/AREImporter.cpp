@@ -1199,7 +1199,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	Point point;
-	ieDword color;
+	ieDword color = 0;
 
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
