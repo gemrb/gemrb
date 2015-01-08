@@ -341,12 +341,12 @@ def AIPress (toggle=1):
 	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 	if AI:
 		GemRB.SetVar ("AI", 0)
-		Button.SetTooltip (AITip['Deactivate'])
-		Button.SetState(IE_GUI_BUTTON_SELECTED)
-	else:
-		GemRB.SetVar ("AI", GS_PARTYAI)
 		Button.SetTooltip (AITip['Enable'])
 		Button.SetState(IE_GUI_BUTTON_NORMAL)
+	else:
+		GemRB.SetVar ("AI", GS_PARTYAI)
+		Button.SetTooltip (AITip['Deactivate'])
+		Button.SetState(IE_GUI_BUTTON_SELECTED)
 
 	#force redrawing, in case a hotkey triggered this function
 	Button.SetVarAssoc ("AI", GS_PARTYAI)
