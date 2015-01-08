@@ -23,6 +23,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import CommonTables
+from GUIDefines import *
 from ie_stats import *
 from ie_feats import *
 
@@ -134,7 +135,7 @@ def SetupSavingThrows (pc, Level=None):
 
 	#see if we can add racial bonuses to saves
 	Race = CommonTables.Races.GetRowName (CommonTables.Races.FindValue (3, Race) )
-	RaceSaveTableName = CommonTables.Races.GetValue (Race, "SAVE", 0)
+	RaceSaveTableName = CommonTables.Races.GetValue (Race, "SAVE", GTV_STR)
 	RaceSaveTable = None
 	if RaceSaveTableName != "-1" and RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON, 1)-1
@@ -147,10 +148,10 @@ def SetupSavingThrows (pc, Level=None):
 	ClassBonus = 0
 	for i in range (NumClasses):
 		RowName = GUICommon.GetClassRowName (Class[i], "class")
-		SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", 0)
+		SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", GTV_STR)
 		SaveTables.append (GemRB.LoadTable (SaveName) )
 		#use numeric value
-		ClassBonus += CommonTables.ClassSkills.GetValue (RowName, "SAVEBONUS", 1)
+		ClassBonus += CommonTables.ClassSkills.GetValue (RowName, "SAVEBONUS", GTV_INT)
 
 	if not len (SaveTables):
 		return
@@ -253,7 +254,7 @@ def SetupLore (pc, LevelDiff=None):
 			ClassName = "CLERIC"
 
 		#add the lore from this class to the total lore
-		TmpLore = LevelDiffs[i] * LoreTable.GetValue (ClassName, "RATE", 1)
+		TmpLore = LevelDiffs[i] * LoreTable.GetValue (ClassName, "RATE", GTV_INT)
 		if TmpLore:
 			CurrentLore += TmpLore
 
@@ -300,7 +301,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	Kit = GUICommon.GetKitIndex (pc)
 	ClassName = None
 	if Kit and not Dual[0] and Multi[0]<2:
-		KitName = CommonTables.KitList.GetValue (Kit, 0, 0)
+		KitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
 		if CommonTables.Classes.GetRowIndex (KitName) >= 0:
 			ClassName = KitName
 
@@ -445,7 +446,7 @@ def ApplyFeats(MyChar):
 	SPLFocusTable = GemRB.LoadTable ("splfocus")
 	for i in range(SPLFocusTable.GetRowCount()):
 		Row = SPLFocusTable.GetRowName(i)
-		Stat = SPLFocusTable.GetValue(Row, "STAT", 2)
+		Stat = SPLFocusTable.GetValue(Row, "STAT", GTV_STAT)
 		if Stat:
 			Column = GemRB.GetPlayerStat(MyChar, Stat)
 			if Column:

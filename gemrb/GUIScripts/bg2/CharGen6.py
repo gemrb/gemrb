@@ -24,7 +24,7 @@ import CommonTables
 import CharGenCommon
 import LUSkillsSelection
 import LUProfsSelection
-from GUIDefines import IE_SPELL_TYPE_PRIEST, IE_SPELL_TYPE_WIZARD
+from GUIDefines import IE_SPELL_TYPE_PRIEST, IE_SPELL_TYPE_WIZARD, GTV_STR
 from ie_stats import *
 
 def OnLoad():
@@ -57,7 +57,7 @@ def OnLoad():
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", 0) # cleric spells
 
 	if TableName == "*": # only druid spells or no spells at all
-		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0)
+		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 		ClassFlag = 0x8000
 	elif CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0) != "*": # cleric and druid spells
 		ClassFlag = 0

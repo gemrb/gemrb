@@ -152,7 +152,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	if not Kit or type == LUSKILLS_TYPE_DUALCLASS or IsDual[0] or IsMulti[0]>1:
 		SkillsKitName = ClassName
 	else:
-		SkillsKitName = CommonTables.KitList.GetValue (Kit, 0, 0)
+		SkillsKitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
 
 	#figure out the correct skills table
 	SkillIndex = -1
@@ -181,9 +181,9 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		for i in range (NumClasses):
 			LevelDiff.append (level2[i]-level1[i])
 		if level1[SkillIndex] == 0:
-			SkillPointsLeft = SkillsTable.GetValue ("FIRST_LEVEL", SkillsKitName, 1)
+			SkillPointsLeft = SkillsTable.GetValue ("FIRST_LEVEL", SkillsKitName, GTV_INT)
 			LevelDiff[SkillIndex] -= 1
-		SkillPointsLeft += LevelDiff[SkillIndex] * SkillsTable.GetValue("RATE", SkillsKitName, 1)
+		SkillPointsLeft += LevelDiff[SkillIndex] * SkillsTable.GetValue("RATE", SkillsKitName, GTV_INT)
 		TotalSkillsAssignable = 0
 
 		if SkillPointsLeft < 0:

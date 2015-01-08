@@ -831,7 +831,7 @@ def DisplaySkills (pc, TAOverride=None):
 		
 		items = []
 		for i in range(rows):
-			item = itemTab.GetValue (i, 0, 2)
+			item = itemTab.GetValue (i, 0, GTV_STAT)
 			name = nameTab.GetValue (i, 1)
 
 			if feats and GemRB.HasFeat(pc, i):
@@ -839,7 +839,7 @@ def DisplaySkills (pc, TAOverride=None):
 				items.append (value)
 			elif not feats:
 				value = GemRB.GetPlayerStat (pc, item)
-				modStat = itemTab.GetValue (i, 1, 2)
+				modStat = itemTab.GetValue (i, 1, GTV_STAT)
 				if modStat != IE_DEX: # already handled in core
 					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 				base = GemRB.GetPlayerStat (pc, item, 1)

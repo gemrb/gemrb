@@ -51,7 +51,7 @@ def OnLoad():
 	LUCommon.SetupHP (MyChar)
 
 	# mage spells
-	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if TableName != "*":
 		index = 0
 		if IsMulti[0]>1:

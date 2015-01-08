@@ -182,14 +182,14 @@ def UpdateOverview(CurrentStep):
 		Lookup = {'STR': 0, 'DEX': 1, 'CON': 2, 'INT': 3, 'WIS': 4, 'CHR': 5} # Probably a better way to do this
 		for i in range(Tables[4].GetRowCount()):
 			SkillName = Tables[5].GetRowName(i)
-			Abl = Tables[4].GetValue(i, 1, 0)
+			Abl = Tables[4].GetValue(i, 1, GTV_STR)
 			Ranks = GemRB.GetVar('Skill ' + str(i))
 			value = Ranks
 			value += (GemRB.GetVar('Ability ' + str(Lookup[Abl])) / 2 - 5)
-			value += Tables[5].GetValue(i, SkillColumn, 1)
-			value += Tables[5].GetValue(i, ClassColumn, 1)
+			value += Tables[5].GetValue(i, SkillColumn, GTV_INT)
+			value += Tables[5].GetValue(i, ClassColumn, GTV_INT)
 			
-			untrained = Tables[5].GetValue(i, 3, 1)
+			untrained = Tables[5].GetValue(i, 3, GTV_INT)
 			if not untrained and Ranks < 1:
 				value = 0
 			

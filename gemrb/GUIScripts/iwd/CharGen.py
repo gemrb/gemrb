@@ -317,7 +317,7 @@ def AcceptPress():
 	KitIndex = KitTable.FindValue (3, Kit)
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
@@ -335,10 +335,10 @@ def AcceptPress():
 			j=j<<1
 
 	#priest spells
-	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", 0)
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", GTV_STR)
 	# druids and rangers have a column of their own
 	if TableName == "*":
-		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0)
+		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 	if TableName != "*":
 		if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
 			ClassFlag = 0x8000

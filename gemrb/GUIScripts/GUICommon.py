@@ -212,7 +212,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 	for i in range(iMin, iMax):
 		# apply each spell from each new class
 		for j in range (jMin, jMax):
-			ab = TmpTable.GetValue (i, j, 0)
+			ab = TmpTable.GetValue (i, j, GTV_STR)
 			if ab and ab != "****":
 				# seems all SPINs act like GA_*
 				if ab[:4] == "SPIN":
@@ -256,7 +256,7 @@ def RemoveClassAbilities (pc, table, Level):
 
 	for i in range(TmpTable.GetRowCount ()):
 		for j in range (jMax):
-			ab = TmpTable.GetValue (i, j, 0)
+			ab = TmpTable.GetValue (i, j, GTV_STR)
 			if ab and ab != "****":
 				# get the index
 				SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])

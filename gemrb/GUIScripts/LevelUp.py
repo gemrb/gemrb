@@ -238,9 +238,9 @@ def OpenLevelUpWindow():
 
 		# save our current and next spell amounts
 		StartLevel = Level[i] - LevelDiff[i]
-		DruidTable = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", 0)
-		ClericTable = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", 0)
-		MageTable = CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", 0)
+		DruidTable = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+		ClericTable = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
+		MageTable = CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR)
 
 		# see if we have mage spells
 		if MageTable != "*":
@@ -324,7 +324,7 @@ def OpenLevelUpWindow():
 				MultiName = ClassName
 
 			# if we can't learn for this class, we can't learn at all
-			FirstLevel = HLATable.GetValue (MultiName, "FIRST_LEVEL", 1)
+			FirstLevel = HLATable.GetValue (MultiName, "FIRST_LEVEL", GTV_INT)
 			if Level[i] < FirstLevel:
 				HLACount = 0
 				break
@@ -336,7 +336,7 @@ def OpenLevelUpWindow():
 				HLACount += LevelDiff[i]
 
 		# set values required by the hla level up code
-		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
+		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", GTV_INT)
 		GemRB.SetVar ("HLACount", HLACount)
 	if GameCheck.IsBG2():
 		HLAButton = LevelUpWindow.GetControl (126)
@@ -603,8 +603,8 @@ def LevelUpDonePress():
 			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
 				for j in range(NumClasses): # loop through each class
 					TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
-					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", 0)
-					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", 0)
+					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
 					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
 						continue
 					elif IsCleric == "*": # druid spells
@@ -682,12 +682,12 @@ def ReactivateBaseClass ():
 
 	# see if this thac0 is lower than our current thac0
 	ThacoTable = GemRB.LoadTable ("THAC0")
-	TmpThaco = ThacoTable.GetValue(Classes[1]-1, Level[1]-1, 1)
+	TmpThaco = ThacoTable.GetValue(Classes[1]-1, Level[1]-1, GTV_INT)
 	if TmpThaco < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
 		GemRB.SetPlayerStat (pc, IE_TOHIT, TmpThaco)
 
 	# see if all our saves are lower than our current saves
-	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", 0)
+	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", GTV_STR)
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		# see if this save is lower than our old save
@@ -739,7 +739,7 @@ def ReactivateBaseClass ():
 	if KitIndex == 0: # no kit
 		ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
 	else: # kit
-		ABTable = CommonTables.KitList.GetValue (KitIndex, 4, 0)
+		ABTable = CommonTables.KitList.GetValue (KitIndex, 4, GTV_STR)
 	print "ABTable:",ABTable
 
 	# add the abilites if we have a table to ref

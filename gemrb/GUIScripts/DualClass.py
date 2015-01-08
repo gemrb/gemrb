@@ -130,7 +130,7 @@ def DualClassWindow ():
 	Kit = GUICommon.GetKitIndex (pc)
 	OldClassName = GUICommon.GetClassRowName (pc)
 	if Kit:
-		OldKitName = CommonTables.KitList.GetValue (Kit, 0, 0)
+		OldKitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
 	else:
 		OldKitName = OldClassName
 	DCLabel = DCMainWindow.GetControl (0x10000009)
@@ -206,7 +206,7 @@ def DCMainDonePress ():
 	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
 
 	# new saves
-	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", 0)
+	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", GTV_STR)
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))
@@ -381,7 +381,7 @@ def DCClassDonePress ():
 
 	# save the class
 	ClassName = DCClasses[DCClass]
-	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", 1)
+	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", GTV_INT)
 
 	# set our step to 2 so that the back button knows where we are
 	DCMainStep = 2
@@ -449,7 +449,7 @@ def DCOpenProfsWindow ():
 
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindow (15)
-	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", 1)
+	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", GTV_INT)
 	if GameCheck.IsBG2():
 		LUProfsSelection.SetupProfsWindow (pc, \
 			LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)

@@ -572,7 +572,7 @@ def SpellsPickPress ():
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
 			break
 
-		CurrentSpell = AutoTable.GetValue (i, SpellLevel, 0)
+		CurrentSpell = AutoTable.GetValue (i, SpellLevel, GTV_STR)
 		for j in range (len (Spells[SpellLevel])):
 			# we can learn the spell, and it's not in our book
 			if Spells[SpellLevel][j][0].upper() == CurrentSpell.upper() \
