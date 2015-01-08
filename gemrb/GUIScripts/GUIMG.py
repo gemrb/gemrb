@@ -714,7 +714,7 @@ def LoadExclusions():
 	for i in range (Columns):
 		Exclusions.append ([])
 		for j in range (Rows):
-			spell = ExclusionTable.GetValue (j,i,0)
+			spell = ExclusionTable.GetValue (j, i, GTV_STR)
 			if spell[0]=="*":
 				break
 			Exclusions[i].append (spell.lower())

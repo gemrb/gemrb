@@ -58,13 +58,13 @@ def IsFeatUsable(feat):
 	a_value = FeatReqTable.GetValue(feat, "A_VALUE")
 	if a_value<0:
 		#string
-		a_stat = FeatReqTable.GetValue(feat, "A_STAT", 0)
+		a_stat = FeatReqTable.GetValue(feat, "A_STAT", GTV_STR)
 	else:
 		#stat
-		a_stat = FeatReqTable.GetValue(feat, "A_STAT",2)
-	b_stat = FeatReqTable.GetValue(feat, "B_STAT",2)
-	c_stat = FeatReqTable.GetValue(feat, "C_STAT",2)
-	d_stat = FeatReqTable.GetValue(feat, "D_STAT",2)
+		a_stat = FeatReqTable.GetValue(feat, "A_STAT", GTV_STAT)
+	b_stat = FeatReqTable.GetValue(feat, "B_STAT", GTV_STAT)
+	c_stat = FeatReqTable.GetValue(feat, "C_STAT", GTV_STAT)
+	d_stat = FeatReqTable.GetValue(feat, "D_STAT", GTV_STAT)
 	b_value = FeatReqTable.GetValue(feat, "B_VALUE")
 	c_value = FeatReqTable.GetValue(feat, "C_VALUE")
 	d_value = FeatReqTable.GetValue(feat, "D_VALUE")

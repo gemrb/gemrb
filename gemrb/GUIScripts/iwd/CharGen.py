@@ -2377,7 +2377,7 @@ def DrawAvatar():
 	lookup = GUICommon.GetClassRowName (MyChar)
 	AvatarID = AvatarID+table.GetValue (lookup, "PREFIX")
 	table = GemRB.LoadTable ("avprefg")
-	AvatarID = AvatarID+table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX),0)
+	AvatarID = AvatarID + table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX), GTV_STR)
 
 	AvatarRef = CommonTables.Pdolls.GetValue (hex(AvatarID), "LEVEL1")
 	AppearanceAvatarButton.SetPLT(AvatarRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
