@@ -597,7 +597,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		if dualwielding and left:
 			RecordsTextArea.Append (DelimitedStrRefs (733, item["ItemNameIdentified"], 0, " - "))
 		else:
-			RecordsTextArea.Append (DelimitedStrRefs (734, ["ItemNameIdentified"], 0, " - "))
+			RecordsTextArea.Append (DelimitedStrRefs (734, item["ItemNameIdentified"], 0, " - "))
 
 	# Damage
 	# display the unresolved damage string (2d6)
