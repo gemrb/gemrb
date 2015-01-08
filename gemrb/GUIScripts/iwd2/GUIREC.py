@@ -839,7 +839,7 @@ def DisplaySkills (pc, TAOverride=None):
 				items.append (value)
 			elif not feats:
 				value = GemRB.GetPlayerStat (pc, item)
-				modStat = SkillTable.GetValue (i, 1, 2)
+				modStat = itemTab.GetValue (i, 1, 2)
 				if modStat != IE_DEX: # already handled in core
 					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 				base = GemRB.GetPlayerStat (pc, item, 1)
