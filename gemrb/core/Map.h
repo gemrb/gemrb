@@ -155,7 +155,7 @@ public:
 		return *this;
 	}
 	MapNote( const MapNote& mn )
-	: strref(mn.strref), color(mn.color), text(mn.text) {}
+	: strref(mn.strref), color(mn.color), text(mn.text), Pos(mn.Pos) {}
 	MapNote(const String& text, ieWord color)
 	: strref(0xffffffff), color(color), text(text)
 	{
