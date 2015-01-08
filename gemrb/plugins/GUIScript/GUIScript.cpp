@@ -4955,7 +4955,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 		gamedata->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
-		PyDict_SetItemString(dict, "FavouriteSpell", PyString_FromString (""));
+		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (-1));
 	}
 
 
@@ -4979,7 +4979,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
-		PyDict_SetItemString(dict, "FavouriteWeapon", PyString_FromString (""));
+		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (-1));
 	}
 
 	return dict;
