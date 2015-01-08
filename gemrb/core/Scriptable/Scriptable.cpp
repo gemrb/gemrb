@@ -280,7 +280,7 @@ void Scriptable::DrawOverheadText(const Region &screen)
 
 	core->GetVideoDriver()->ConvertToScreen(x, y);
 	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
-	core->GetTextFont()->Print( rgn, OverheadText, palette?palette:core->InfoTextPalette,
+	core->GetTextFont()->Print( rgn, OverheadText, palette,
 							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
 
 	palette->release();
