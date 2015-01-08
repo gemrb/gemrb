@@ -54,12 +54,12 @@ def OnLoad():
 
 	# learn divine spells if appropriate
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", 0) # cleric spells
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", GTV_STR) # cleric spells
 
 	if TableName == "*": # only druid spells or no spells at all
 		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 		ClassFlag = 0x8000
-	elif CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0) != "*": # cleric and druid spells
+	elif CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR) != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
 		ClassFlag = 0x4000

@@ -180,7 +180,7 @@ def UpdateInventoryWindow ():
 
 	# get a list which maps slot number to slot type/icon/tooltip
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	slot_list = map (int, AvSlotsTable.GetValue (row, 1, 0).split( ','))
+	slot_list = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
 
 	# populate inventory slot controls
 	for i in range (46):

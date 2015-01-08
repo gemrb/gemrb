@@ -339,8 +339,8 @@ def GetHLAs ():
 				HLARef,\
 				0,\
 				GemRB.CountEffects (pc, "HLA", -1, -1, HLARef[3:]),\
-				HLAClassTable.GetValue (j, 6, 0),\
-				HLAClassTable.GetValue (j, 7, 0)]
+				HLAClassTable.GetValue (j, 6, GTV_STR),\
+				HLAClassTable.GetValue (j, 7, GTV_STR)]
 
 			# make sure we fall within the min and max paramaters
 			if HLAClassTable.GetValue (j, 3) > CurrentLevel or HLAClassTable.GetValue (j, 4) < CurrentLevel:

@@ -161,7 +161,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		if NumClasses > 1:
 			TmpClass = IsMulti[i+1]
 		TmpClass = GUICommon.GetClassRowName (TmpClass, "class")
-		if (CommonTables.ClassSkills.GetValue (TmpClass, "THIEFSKILL", 0) != "*"):
+		if (CommonTables.ClassSkills.GetValue (TmpClass, "THIEFSKILL", GTV_STR) != "*"):
 			SkillIndex = i
 			break
 

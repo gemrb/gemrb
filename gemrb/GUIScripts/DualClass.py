@@ -191,7 +191,7 @@ def DCMainDonePress ():
 	MultClassId = CommonTables.Classes.GetRowName (MultClassId)
 	MultClassId = CommonTables.Classes.GetValue (MultClassId, "ID")
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
-	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", 1))
+	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT))
 
 	# update our levels and xp
 	if GUICommon.IsDualSwap (pc):
@@ -203,7 +203,7 @@ def DCMainDonePress ():
 
 	# new thac0
 	ThacoTable = GemRB.LoadTable ("THAC0")
-	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
+	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, GTV_INT))
 
 	# new saves
 	SavesTable = CommonTables.Classes.GetValue (ClassName, "SAVE", GTV_STR)
@@ -291,7 +291,7 @@ def DCMainClassPress ():
 	# string refs for the given classes
 	DCClassStrings = []
 	for classname in DCClasses:
-		DCClassStrings.append(CommonTables.Classes.GetValue (classname, "NAME_REF", 1))
+		DCClassStrings.append(CommonTables.Classes.GetValue (classname, "NAME_REF", GTV_INT))
 
 	# setup the class buttons
 	for i in range (6):
@@ -358,7 +358,7 @@ def DCClassSelect ():
 	# all the possible strrefs for the different classes
 	DCClassStrings = []
 	for classname in DCClasses:
-		DCClassStrings.append (CommonTables.Classes.GetValue (classname, "DESC_REF", 1))
+		DCClassStrings.append (CommonTables.Classes.GetValue (classname, "DESC_REF", GTV_INT))
 
 	# update the text are with the new string
 	DCClassTextArea = DCClassWindow.GetControl (9)
@@ -398,7 +398,7 @@ def CanDualInto (index):
 		return 0
 
 	# return 0 if we can't dual into the class
-	if not DualClassTable.GetValue (OldKitName, DCClasses[index], 1):
+	if not DualClassTable.GetValue (OldKitName, DCClasses[index], GTV_INT):
 		return 0
 
 	# make sure we aren't restricted by alignment
@@ -406,7 +406,7 @@ def CanDualInto (index):
 	Alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT) # our alignment
 	Alignment = CommonTables.Aligns.FindValue (3, Alignment)
 	Alignment = CommonTables.Aligns.GetValue (Alignment, 4) # convert the alignment
-	if not AlignmentTable.GetValue (DCClasses[index], Alignment, 1): # check it
+	if not AlignmentTable.GetValue (DCClasses[index], Alignment, GTV_INT): # check it
 		return 0
 
 	# make sure we have the minimum stats required for the next class

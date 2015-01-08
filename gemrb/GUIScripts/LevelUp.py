@@ -251,8 +251,8 @@ def OpenLevelUpWindow():
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
 			for j in range (MageTable.GetColumnCount ()):
-				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), 1)
-				OldWSpells[j] = MageTable.GetValue (str(StartLevel), str(j+1), 1)
+				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+				OldWSpells[j] = MageTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
 				if NewWSpells[j] > 0: # don't want specialist to get 1 in levels they should have 0
 					NewWSpells[j] += Specialist
 				if OldWSpells[j] > 0:
@@ -266,8 +266,8 @@ def OpenLevelUpWindow():
 			HaveCleric = 1
 			# same as above
 			for j in range (ClericTable.GetColumnCount ()):
-				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), 1)
-				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), 1)
+				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
 			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
 		elif DruidTable != "*":
 			# clerics have precedence in multis (ranger/cleric)
@@ -280,8 +280,8 @@ def OpenLevelUpWindow():
 				DruidTable = GemRB.LoadTable (DruidTable)
 				# same as above
 				for j in range (DruidTable.GetColumnCount ()):
-					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), 1)
-					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), 1)
+					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
 				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
 
 		# setup class bonuses for this class
@@ -696,7 +696,7 @@ def ReactivateBaseClass ():
 			GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, TmpSave)
 
 	# see if we're a caster
-	SpellTables = [CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", 0), CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", 0), CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0)]
+	SpellTables = [CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR), CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", GTV_STR), CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)]
 	if SpellTables[2] != "*": # casts mage spells
 		# set up our memorizations
 		SpellTable = GemRB.LoadTable (SpellTables[2])
@@ -719,7 +719,7 @@ def ReactivateBaseClass ():
 		# loop through each spell level
 		for i in range (7):
 			# update if we can cast more spells at this level
-			NumSpells = SpellTable.GetValue (str(Level[1]), str(i+1), 1)
+			NumSpells = SpellTable.GetValue (str(Level[1]), str(i+1), GTV_INT)
 			if not NumSpells:
 				continue
 			if NumSpells > GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1):

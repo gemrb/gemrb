@@ -315,7 +315,7 @@ def GetMageSpells (Kit, Alignment, Level):
 			BadSchools = 0
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), 1) ):
+	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), GTV_INT)):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:
@@ -387,7 +387,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 		SpellListTable = GemRB.LoadTable ("listspll")
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue (HolyMoly, str (Level), 1) ):
+	for i in range(SpellsTable.GetValue (HolyMoly, str (Level), GTV_INT)):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell(SpellName, 1)
 		if ms == None:
@@ -426,7 +426,7 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 	kit = GemRB.GetPlayerStat (pc, IE_KIT)
 	for i in range(Table.GetColumnCount ()):
 		# do a string lookup since some tables don't have entries for all levels
-		value = Table.GetValue (str(Level), str(i+1), 1)
+		value = Table.GetValue (str(Level), str(i+1), GTV_INT)
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
 		school = GemRB.GetVar("MAGESCHOOL")
@@ -561,9 +561,9 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 
 			# this is is specifically for dual-classes and will not work to remove only one
 			# spell type from a ranger/cleric multi-class
-			if CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", 0) != "*": # knows druid spells
+			if CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", GTV_STR) != "*": # knows druid spells
 				originalkit = 0x8000
-			elif CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", 0) != "*": # knows cleric spells
+			elif CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", GTV_STR) != "*": # knows cleric spells
 				originalkit = 0x4000
 			else: # don't know any other spells
 				originalkit = 0

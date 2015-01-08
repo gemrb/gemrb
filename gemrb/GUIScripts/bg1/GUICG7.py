@@ -47,7 +47,7 @@ def OnLoad():
 	if IsMulti[0]>1:
 		for i in range (1, IsMulti[0]):
 			ClassName = GUICommon.GetClassRowName (IsMulti[i], "class")
-			if CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", 0) != "*":
+			if CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
 	Spellbook.SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)

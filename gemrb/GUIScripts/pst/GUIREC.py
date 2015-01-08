@@ -255,7 +255,7 @@ def UpdateRecordsWindow ():
 
 	# sex
 	GenderTable = GemRB.LoadTable ("GENDERS")
-	text = GenderTable.GetValue (GemRB.GetPlayerStat (pc, IE_SEX) - 1, 0)
+	text = GenderTable.GetValue (GemRB.GetPlayerStat (pc, IE_SEX) - 1, GTV_STR)
 	
 	Label = Window.GetControl (0x10000015)
 	Label.SetText (text)

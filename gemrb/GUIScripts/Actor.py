@@ -69,7 +69,7 @@ class Actor:
 
 		if self.__classes == None:
 			#already reversed in ClassNames
-			self.__classes = [CommonTables.Classes.GetValue (name, "ID", 1) for name in self.ClassNames()]
+			self.__classes = [CommonTables.Classes.GetValue (name, "ID", GTV_INT) for name in self.ClassNames()]
 		return self.__classes
 
 	def ClassNames (self):
