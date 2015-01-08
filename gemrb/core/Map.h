@@ -24,6 +24,7 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "Interface.h"
 #include "Scriptable/Scriptable.h"
 
 #include <queue>
@@ -155,8 +156,19 @@ public:
 	}
 	MapNote( const MapNote& mn )
 	: strref(mn.strref), color(mn.color), text(mn.text) {}
-	MapNote(const String& text, ieStrRef ref, ieWord color)
-	: strref(ref), color(color), text(text) {}
+	MapNote(const String& text, ieWord color)
+	: strref(0xffffffff), color(color), text(text)
+	{
+		//update custom strref
+		char* mbstring = MBCStringFromString(text);
+		strref = core->UpdateString( strref, mbstring);
+		free(mbstring);
+	}
+	MapNote(const ieStrRef ref, ieWord color)
+	: strref(ref), color(color)
+	{
+		text = *core->GetString(ref);
+	}
 };
 
 class Spawn {
@@ -479,7 +491,9 @@ public:
 	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
 
 	//mapnotes
-	void AddMapNote(const Point &point, int color, const String* text, ieStrRef strref);
+	void AddMapNote(const Point &point, int color, const String* text);
+	void AddMapNote(const Point &point, int color, ieStrRef strref);
+	void AddMapNote(const Point &point, const MapNote& note);
 	void RemoveMapNote(const Point &point);
 	const MapNote& GetMapNote(int i) { return mapnotes[i]; }
 	const MapNote* MapNoteAtPoint(const Point &point);

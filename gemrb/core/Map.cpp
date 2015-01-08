@@ -31,7 +31,6 @@
 #include "Game.h"
 #include "GameData.h"
 #include "IniSpawn.h"
-#include "Interface.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "ImageMgr.h"
@@ -3039,10 +3038,20 @@ void Map::SetupAmbients()
 }
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(const Point &point, int color, const String* text, ieStrRef strref)
+void Map::AddMapNote(const Point &point, int color, const String* text)
+{
+	AddMapNote(point, MapNote((text) ? *text : L"", color));
+}
+
+void Map::AddMapNote(const Point &point, int color, ieStrRef strref)
+{
+	AddMapNote(point, MapNote(strref, color));
+}
+
+void Map::AddMapNote(const Point &point, const MapNote& note)
 {
 	RemoveMapNote(point);
-	mapnotes.push_back(MapNote((text) ? *text : L"", strref, color));
+	mapnotes.push_back(note);
 	mapnotes.back().Pos = point;
 }
 

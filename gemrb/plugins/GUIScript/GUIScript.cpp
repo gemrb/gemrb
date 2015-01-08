@@ -7875,16 +7875,12 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 
 	GET_MAP();
 
-	ieStrRef strref;
 	Point point;
 	point.x=x;
 	point.y=y;
 	if (txt && txt[0]) {
 		String* newvalue = StringFromCString(txt);
-		const MapNote *old = map->MapNoteAtPoint(point);
-		if (old) strref = old->strref;
-		else strref = 0xffffffff;
-		map->AddMapNote(point, color, newvalue, strref);
+		map->AddMapNote(point, color, newvalue);
 		delete newvalue;
 	} else {
 		map->RemoveMapNote(point);

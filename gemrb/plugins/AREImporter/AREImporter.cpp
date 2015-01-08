@@ -1200,7 +1200,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	Point point;
 	ieDword color;
-	String* text = NULL;
 
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1215,25 +1214,20 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			while (count) {
 				char key[32];
 				int value;
-				sprintf(key, "text%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
-				text = core->GetString(value);
 				sprintf(key, "xPos%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
 				point.x = value;
 				sprintf(key, "yPos%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
 				point.y = value;
-				map->AddMapNote( point, color, text, 0);
-				delete text;
-				text = NULL;
+				sprintf(key, "text%d",count);
+				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				map->AddMapNote( point, color, value);
 				count--;
 			}
 		}
 	}
 	for (i = 0; i < NoteCount; i++) {
-		ieStrRef strref = 0;
-
 		if (pst) {
 			ieDword px,py;
 			str->ReadDword(&px);
@@ -1244,8 +1238,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			char bytes[501]; // 500 + null
 			str->Read(bytes, 500 );
 			bytes[500] = '\0';
-			text = StringFromCString(bytes);
-
+			String* text = StringFromCString(bytes);
+			map->AddMapNote( point, color, text);
+			delete text;
 			str->ReadDword(&color); //readonly == 1
 			str->Seek(20, GEM_CURRENT_POS);
 		} else {
@@ -1255,15 +1250,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &py );
 			point.x=px;
 			point.y=py;
+			ieStrRef strref = 0;
 			str->ReadDword( &strref );
 			str->ReadWord( &px );
 			str->ReadWord( &py );
 			color=py;
 			str->Seek( 40, GEM_CURRENT_POS );
-			text = core->GetString( strref,0 );
+			map->AddMapNote( point, color, strref );
 		}
-		map->AddMapNote( point, color, text, strref );
-		delete text;
 	}
 
 	//this is a ToB feature (saves the unexploded projectiles)
@@ -2172,11 +2166,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteWord( &tmpWord );
 			tmpWord = (ieWord) mn.Pos.y;
 			stream->WriteWord( &tmpWord );
-			//update custom strref
-			char* mbstring = MBCStringFromString(mn.text);
-			tmpDword = core->UpdateString( mn.strref, mbstring);
-			free(mbstring);
-			stream->WriteDword( &tmpDword);
+			stream->WriteDword( &mn.strref);
 			stream->WriteWord( &tmpWord );
 			stream->WriteWord( &mn.color );
 			tmpDword = 1;

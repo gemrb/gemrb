@@ -6372,9 +6372,7 @@ int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
 	Point p(fx->PosX, fx->PosY);
-	String* text = core->GetString(fx->Parameter1, 0);
-	map->AddMapNote(p, fx->Parameter2, text, fx->Parameter1);
-	delete text;
+	map->AddMapNote(p, fx->Parameter2, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 
