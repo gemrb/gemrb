@@ -2636,6 +2636,12 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {
 	ieResRef spellres;
 	int level = 0;
+	static bool third = core->HasFeature(GF_3ED_RULES);
+
+	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
+	if (third && parameters->int0Parameter == 0) {
+		parameters->int0Parameter = Sender->LastMarkedSpell;
+	}
 
 	//resolve spellname
 	if (!ResolveSpellName( spellres, parameters) ) {
