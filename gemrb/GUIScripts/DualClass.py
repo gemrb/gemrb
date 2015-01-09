@@ -191,7 +191,9 @@ def DCMainDonePress ():
 	MultClassId = CommonTables.Classes.GetRowName (MultClassId)
 	MultClassId = CommonTables.Classes.GetValue (MultClassId, "ID")
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
-	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT))
+	OldMCFlags = GemRB.GetPlayerStat (pc, IE_MC_FLAGS, 1)
+	NewMCBit = CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT)
+	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, OldMCFlags|NewMCBit)
 
 	# update our levels and xp
 	if GUICommon.IsDualSwap (pc):
