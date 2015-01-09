@@ -2343,14 +2343,14 @@ bool GameControl::SetGUIHidden(bool hide)
 	WINDOW_RESIZE_OPERATION op = hide ? WINDOW_EXPAND : WINDOW_CONTRACT;
 	for (;i >= 0 && i <= 5; i+=inc) {
 		const char** val = keys[i];
-		Log(MESSAGE, "GameControl", "window: %s", *val);
+		//Log(MESSAGE, "GameControl", "window: %s", *val);
 		if (dict->Lookup( *val, index )) {
 			if (index != (ieDword) -1) {
 				Window* w = core->GetWindow(index);
 				if (w) {
 					core->SetVisible(index, !hide);
 					if (dict->Lookup( *++val, index )) {
-						Log(MESSAGE, "GameControl", "position: %s", *val);
+						//Log(MESSAGE, "GameControl", "position: %s", *val);
 						ResizeParentWindowFor( w, index, op );
 						continue;
 					}
