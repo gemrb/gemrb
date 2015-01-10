@@ -2637,10 +2637,12 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	ieResRef spellres;
 	int level = 0;
 	static bool third = core->HasFeature(GF_3ED_RULES);
+	Scriptable *pretarget = NULL;
 
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
 	if (third && parameters->int0Parameter == 0) {
 		parameters->int0Parameter = Sender->LastMarkedSpell;
+		pretarget = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastMarked);
 	}
 
 	//resolve spellname
@@ -2685,7 +2687,9 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
-	if (!tar) {
+	if (pretarget) {
+		tar = pretarget;
+	} else if (!tar) {
 		Sender->ReleaseCurrentAction();
 		if (act) {
 			act->SetStance(IE_ANI_READY);
