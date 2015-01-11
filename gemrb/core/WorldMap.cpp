@@ -38,6 +38,12 @@ WMPAreaEntry::WMPAreaEntry()
 	StrCaption = NULL;
 	StrTooltip = NULL;
 	SingleFrame = false;
+	AreaName[0] = AreaLongName[0] = AreaResRef[0] = 0;
+	LoadScreenResRef[0] = 0;
+	LocCaptionName = LocTooltipName = 0;
+	AreaLinksCount[0] = AreaLinksIndex[0] = 0;
+	X = Y = 0;
+	IconSeq = AreaStatus = 0;
 }
 
 WMPAreaEntry::~WMPAreaEntry()
