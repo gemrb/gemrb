@@ -44,6 +44,12 @@
 #include <iterator>
 
 namespace GemRB {
+	
+	
+struct HealingResource {
+	ieResRef resref;
+	Actor* caster;
+};
 
 
 #define MAX_MAPS_LOADED 1
@@ -1753,36 +1759,80 @@ void Game::CastOnRest()
 		}
 
 		SpecialSpellType *special_spells = core->GetSpecialSpells();
-		while (specialCount--) {
-<<<<<<< HEAD
-			if (special_spells[specialCount].value & SP_REST) {
-=======
-			if (special_spells[specialCount].flags & SP_REST) {
-				if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
->>>>>>> 344021abfd09b43cc8faaed13863f7ae5b965540
-				// check each party member for the spell
-				while (ps--) {
-					Actor *tar = GetPC(ps, true);
-					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0) && !injurees.empty()) {
-						std::multimap<ieWord,Actor *>::iterator injuree=injurees.end();
-						injuree--;
-						// we have the spell, so cast it on most injured
-						// NOTE: no distinction is made about the potency of spells
-						// expected healing is considered 8 for all spells = cure light wounds
-						// TODO: differentiated expected healing values
-						ieWord expectedhealing=8;
-						tar->DirectlyCastSpell(injuree->second, special_spells[specialCount].resref, 0, 1, true);
-						if (injuree->first-8 > 0) {
+		// First heal all spells out of the way
+		while (specialCount-- && !injurees.empty()) {
+			if (special_spells[specialCount].flags & SP_HEAL_ALL) {
+				ieWord expectedhealing = special_spells[specialCount].amount;
+				Actor *tar = GetPC(ps, true);
+				// Targetting self is for this?
+				tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
+				for (std::multimap<ieWord,Actor *>::iterator injuree=injurees.begin();
+						injuree != injurees.end() ; ++injuree) {
+					if (injuree->first-expectedhealing > 0) {
 							injurees.insert(std::pair<ieWord,Actor *>(injuree->first-expectedhealing,injuree->second));
-						}
-						if (!injurees.empty()) {
-							injurees.erase(injuree);
+					}
+					injurees.erase(injuree);
+				}
+			}
+		}
+		// Rest of the healing
+		if (!injurees.empty() && specialCount != -1) {
+			specialCount = core->GetSpecialSpellsCount();
+			std::multimap<ieWord,HealingResource> healingspells;
+			// Gather the spells
+			while (specialCount--) {
+				if (special_spells[specialCount].flags & SP_REST) {
+					while (ps--) {
+						Actor *tar = GetPC(ps, true);
+						if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+							HealingResource resource;
+							resource.caster=tar;
+							strncpy(resource.resref,special_spells[specialCount].resref,8);
+							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
 						}
 					}
 				}
-				ps = ps2;
+				ps=ps2;
 			}
+					// check each party member for the spell
+					// tutki ensin loitsut, onko kaikkia parantavia, heitä ensin ne
+					// sitten kerää kaikki loput loitsut voimakkuusjärjestykseen
+					// loitsi aina eniten sattuvaan
+					// Ylilyönneillä ei ole väliä, koska loitsut palautuvat
+			// Heal everyone
+			while (!injurees.empty() && !healingspells.empty()) {
+				std::multimap<ieWord,Actor *>::iterator injuree=injurees.end();
+				injuree--;
+				std::multimap<ieWord,HealingResource>::iterator spell=healingspells.end();
+				spell--;
+				spell->second.caster->DirectlyCastSpell(injuree->second, spell->second.resref, 0, 1, true);
+				if (injuree->first-spell->first > 0) {
+					injurees.insert(std::pair<ieWord,Actor *>(injuree->first-spell->first,injuree->second));
+				}
+				injurees.erase(injuree);
+				healingspells.erase(spell);
+			}
+			/*
+				while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0) && !injurees.empty()) {
+					std::multimap<ieWord,Actor *>::iterator injuree=injurees.end();
+					injuree--;
+					// we have the spell, so cast it on most injured
+					// NOTE: no distinction is made about the potency of spells
+					// expected healing is considered 8 for all spells = cure light wounds
+					// TODO: differentiated expected healing values
+					ieWord expectedhealing=8;
+					tar->DirectlyCastSpell(injuree->second, special_spells[specialCount].resref, 0, 1, true);
+					if (injuree->first-8 > 0) {
+						injurees.insert(std::pair<ieWord,Actor *>(injuree->first-expectedhealing,injuree->second));
+					}
+					if (!injurees.empty()) {
+						injurees.erase(injuree);
+					}
+				}
+			}
+			}*/
 		}
+		// Possible non-healing spells in their own loop
 	}
 }
 
