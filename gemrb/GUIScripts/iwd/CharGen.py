@@ -2486,7 +2486,6 @@ def CharSoundSelect():
 
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 	CharSoundVoiceList = CharSoundWindow.GetControl (45)
-	CharSoundVoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	RowCount=CharSoundVoiceList.ListResources(CHR_SOUNDS)
 
 	CharSoundPlayButton = CharSoundWindow.GetControl (47)
@@ -2696,7 +2695,6 @@ def ImportPress():
 
 	GemRB.SetVar ("Selected", 0)
 	CharImportList = ImportWindow.GetControl(2)
-	CharImportList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	CharImportList.SetVarAssoc ("Selected",0)
 	CharImportList.ListResources(CHR_EXPORTS)
 
