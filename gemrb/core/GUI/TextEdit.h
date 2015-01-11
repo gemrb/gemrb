@@ -28,11 +28,10 @@
 #define TEXTEDIT_H
 
 #include "GUI/Control.h"
+#include "GUI/TextSystem/Font.h"
 
 #include "RGBAColor.h"
 #include "exports.h"
-
-#include "Font.h"
 
 namespace GemRB {
 
@@ -67,9 +66,9 @@ public:
 	/** Set BackGround */
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
-	void SetText(const char* string);
+	void SetText(const String& string);
 	/** Gets the Text of the current control */
-	const char* QueryText() const;
+	String QueryText() const;
 	/** Sets the buffer length */
 	void SetBufferLength(ieWord buflen);
 	/** Sets the alignment */
@@ -87,7 +86,7 @@ private:
 	/** Client area position */
 	unsigned short FontPosX, FontPosY;
 	/** Text Buffer */
-	unsigned char* Buffer;
+	String Text;
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** Color Palette */
@@ -98,12 +97,12 @@ public: //Events
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
 	/** OnChange Scripted Event Function Name */
-	EventHandler EditOnChange;
-	EventHandler EditOnDone;
-	EventHandler EditOnCancel;
+	ControlEventHandler EditOnChange;
+	ControlEventHandler EditOnDone;
+	ControlEventHandler EditOnCancel;
 };
 
 }

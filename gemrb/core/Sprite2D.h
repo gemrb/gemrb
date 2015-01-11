@@ -30,11 +30,13 @@
 #include "RGBAColor.h"
 #include "exports.h"
 
+#include "Interface.h"
 #include "Palette.h"
+#include "Region.h"
 #include "TypeID.h"
+#include "Video.h"
 
-#define RENDER_FLIP_HORIZONTAL	0x00000001
-#define RENDER_FLIP_VERTICAL	0x00000002
+#include <map>
 
 namespace GemRB {
 
@@ -77,9 +79,60 @@ public:
 	virtual void SetColorKey(ieDword) = 0;
 	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
 							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
-	virtual void MakeUnused() {}
 	void acquire() { ++RefCount; }
 	void release();
+
+public:
+	static void FreeSprite(Sprite2D*& spr) {
+		if (spr) {
+			spr->release();
+			spr = NULL;
+		}
+	}
+};
+
+template <typename KeyType>
+class SpriteSheet {
+protected:
+	Sprite2D* Sheet;
+	Region SheetRegion;
+	std::map<KeyType, Region> RegionMap;
+
+	SpriteSheet() {
+		Sheet = NULL;
+	}
+public:
+	SpriteSheet(Sprite2D* sheet) : Sheet(sheet) {
+		Sheet->acquire();
+		SheetRegion = Region(0,0, Sheet->Width, Sheet->Height);
+	};
+	virtual ~SpriteSheet() {
+		if (Sheet) Sheet->release();
+	}
+
+	const Region& operator[](KeyType key) {
+		return RegionMap[key];
+	}
+
+	// return the passed in region, clipped to the sprite dimensions or a region with -1 w/h if outside the sprite bounds
+	const Region& MapSheetSegment(KeyType key, Region rgn) {
+		Region intersection = rgn.Intersect(SheetRegion);
+		if (!intersection.Dimensions().IsEmpty()) {
+			if (RegionMap.insert(std::make_pair(key, intersection)).second) {
+				return RegionMap[key];
+			}
+			// FIXME: should we return something like Region(0,0,0,0) here?
+			// maybe we should just use Atlas[key] = intersection too.
+		}
+		const static Region nullRgn(0,0, -1,-1);
+		return nullRgn;
+	}
+
+	void Draw(KeyType key, const Region& dest) const {
+		if (RegionMap.find(key) != RegionMap.end()) {
+			core->GetVideoDriver()->BlitSprite(Sheet, RegionMap.at(key), dest);
+		}
+	}
 };
 
 }

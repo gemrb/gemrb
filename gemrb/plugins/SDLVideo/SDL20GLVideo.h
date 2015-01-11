@@ -44,7 +44,7 @@ namespace GemRB
 
 		void useProgram(GLSLProgram* program); // use this instead program->Use()
 		bool createPrograms();
-		void blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, Palette* attachedPal = NULL, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
+		void GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, Palette* attachedPal = NULL, unsigned int flags = 0, const Color* tint = NULL, GLTextureSprite2D* mask = NULL);
 		void clearRect(const Region& rgn, const Color& color);
 		void drawEllipse(int cx, int cy, unsigned short xr, unsigned short yr, float thickness, const Color& color);
 		void drawPolygon(Point* points, unsigned int count, const Color& color, PointDrawingMode mode);
@@ -54,7 +54,7 @@ namespace GemRB
 		int SwapBuffers();
 		int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 		bool SupportsBAMSprites() { return false; }
-		void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,	const Region* clip = NULL, Palette* palette = NULL);
+		void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette);
 		void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint, SpriteCover* cover, Palette *palette = NULL,	const Region* clip = NULL, bool anchor = false);
 		void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
 		Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,	bool cK = false, int index = 0);

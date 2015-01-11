@@ -28,6 +28,7 @@
 #include "TileMap.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "GUI/TextSystem/TextContainer.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -154,7 +155,11 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 	if (!Trapped) {
 		// we have to set Entered somewhere, here seems best..
 		// FIXME: likely not best :)
-		AddTrigger(TriggerEntry(trigger_harmlessentered, ID));
+		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+			AddTrigger(TriggerEntry(trigger_harmlessentered, ID));
+		} else {
+			AddTrigger(TriggerEntry(trigger_entered, ID));
+		}
 		return true;
 	} else if (Highlightable::TriggerTrap(skill, ID)) {
 		return true;
@@ -248,7 +253,7 @@ void InfoPoint::dump() const
 			TrapRemovalDiff );
 		break;
 	case ST_TRIGGER:
-		buffer.appendFormatted ( "InfoString: %s\n", overHeadText );
+		buffer.appendFormatted ( "InfoString: %ls\n", OverheadText.c_str() );
 		break;
 	default:;
 	}

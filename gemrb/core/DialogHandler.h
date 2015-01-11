@@ -27,6 +27,8 @@
 
 namespace GemRB {
 
+class Control;
+
 class GEM_EXPORT DialogHandler {
 public:
 	DialogHandler();
@@ -34,6 +36,7 @@ public:
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
+	void UpdateJournalForTransition(DialogTransition*);
 private:
 	DialogState* ds;
 	Dialog* dlg;
@@ -48,7 +51,8 @@ public:
 
 	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
-	void DialogChoose(unsigned int choose);
+	bool DialogChoose(unsigned int choose);
+	bool DialogChoose(Control*);
 };
 
 }

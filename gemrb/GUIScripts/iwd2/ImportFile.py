@@ -44,8 +44,7 @@ def OnLoad():
 	TextAreaControl.SetText(10963)
 
 	TextAreaControl = ImportWindow.GetControl(2)
-	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-	TextAreaControl.GetCharacters()
+	TextAreaControl.ListResources(CHR_EXPORTS)
 
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(36789)

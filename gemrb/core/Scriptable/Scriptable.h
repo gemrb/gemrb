@@ -225,6 +225,12 @@ protected: //let Actor access this
 	ieResRef Dialog;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
+
+	// Variables for overhead text.
+	Point overHeadTextPos;
+	bool overheadTextDisplaying;
+	unsigned long timeStartDisplaying;
+	String OverheadText;
 public:
 	// State relating to the currently-running action.
 	int CurrentActionState;
@@ -253,12 +259,6 @@ public:
 
 	GameScript* Scripts[MAX_SCRIPTS];
 	int scriptlevel;
-
-	// Variables for overhead text.
-	char* overHeadText;
-	Point overHeadTextPos;
-	unsigned char textDisplaying;
-	unsigned long timeStartDisplaying;
 
 	ieDword UnselectableTimer;
 
@@ -295,6 +295,7 @@ public:
 		return Dialog;
 	}
 	void SetDialog(const char *resref);
+	void SetFloatingText(char*);
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
 	void SetSpellResRef(ieResRef resref);
 	void SetWait(unsigned long time);
@@ -313,7 +314,10 @@ public:
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
 	void SetScript(int index, GameScript* script);
-	void DisplayHeadText(const char* text);
+	void SetOverheadText(const String& text, bool display = true);
+	const String& GetOverheadText() { return OverheadText; };
+	bool DisplayOverheadText(bool);
+	bool OverheadTextIsDisplaying() { return overheadTextDisplaying; }
 	void FixHeadTextPos();
 	void SetScriptName(const char* text);
 	//call this to enable script running as soon as possible

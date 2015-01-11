@@ -160,9 +160,8 @@ def OpenQuestsWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
 
 	QuestsList = List = Window.GetControl (1)
-	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedQuest', -1)
-	List.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, OnJournalQuestSelect)
+	List.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, OnJournalQuestSelect)
 
 	QuestDesc = Window.GetControl (3)
 
@@ -201,15 +200,11 @@ def OnJournalCompletedPress ():
 
 def PopulateQuestsList ():
 	GemRB.SetVar ('SelectedQuest', -1)
-	QuestsList.Clear ()
 	QuestDesc.Clear ()
-
-	j = 0
-	for q in quests[selected_quest_class]:
-		title = GemRB.GetINIQuestsKey (str (q[0]), 'title', '0')
-		QuestsList.Append ('- ', j)
-		QuestsList.Append (int (title), j)
-		j = j + 1
+	
+	lookup = lambda quest: int(GemRB.GetINIQuestsKey (str (quest[0]), 'title', '0'))
+	opts = ['- ' + GemRB.GetString(lookup(q)) for q in quests[selected_quest_class]]
+	QuestsList.SetOptions(opts)
 	
 def EvaluateCondition (var, value, condition):
 	cur_value = int (GemRB.GetGameVar (var))
@@ -331,9 +326,8 @@ def OpenBeastsWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
 
 	BeastsList = List = Window.GetControl (0)
-	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedBeast', -1)
-	List.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, OnJournalBeastSelect)
+	List.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, OnJournalBeastSelect)
 
 	Window.CreateButton (8, 19, 19, 281, 441)
 	BeastImage = Window.GetControl (8)
@@ -372,15 +366,12 @@ def OnJournalNPCPress ():
 
 def PopulateBeastsList ():
 	GemRB.SetVar ('SelectedBeast', -1)
-	BeastsList.Clear ()
 	BeastDesc.Clear ()
 	BeastImage.SetPicture ('default')
 
-	j = 0
-	for b in beasts[selected_beast_class]:
-		name = GemRB.GetINIBeastsKey (str (b), 'name', '0')
-		BeastsList.Append (int (name), j)
-		j = j + 1
+	lookup = lambda beast: int(GemRB.GetINIBeastsKey (str (beast), 'name', '0'))
+	opts = [GemRB.GetString(lookup(b)) for b in beasts[selected_beast_class]]
+	BeastsList.SetOptions(opts)
 
 def EvaluateAllBeasts ():
 	del beasts[0][:]
@@ -388,7 +379,6 @@ def EvaluateAllBeasts ():
 
 	count = int (GemRB.GetINIBeastsKey ('init', 'beastcount', '0'))
 	
-	j = 0
 	for i in range (count):
 		if not GemRB.GameIsBeastKnown (i):
 			continue
@@ -396,7 +386,8 @@ def EvaluateAllBeasts ():
 		klass = int (GemRB.GetINIBeastsKey (str (i), 'class', '0'))
 		beasts[klass].append (i)
 		
-		j = j + 1
+	beasts[0].sort()
+	beasts[1].sort()
 
 
 ###################################################
@@ -434,7 +425,10 @@ def OpenLogWindow ():
 	# text area
 	Text = Window.GetControl (2)
 
-	for i in range (GemRB.GetJournalSize (0)):
+	# limit the log to the last entries (original did something similar)
+	js = GemRB.GetJournalSize (0)
+	frame = 250
+	for i in range (js-frame, js):
 		je = GemRB.GetJournalEntry (0, i)
 
 		if je == None:
@@ -451,9 +445,8 @@ def OpenLogWindow ():
 		date = str (1 + dt)
 		#time = str (gt - dt*86400)
 		
-		Text.Append ("[color=FFFF00]"+GemRB.GetString(19310)+" "+date+"[/color]", 3*i)
-		Text.Append (je['Text'], 3*i + 1)
-		Text.Append ("", 3*i + 2)
+		Text.Append ("[color=FFFF00]" + GemRB.GetString(19310)+" "+date+":[/color]")
+		Text.Append (" " + GemRB.GetString (je['Text']) + "\n\n")
 			
 	Window.SetVisible (WINDOW_VISIBLE)
 	

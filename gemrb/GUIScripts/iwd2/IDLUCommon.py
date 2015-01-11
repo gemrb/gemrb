@@ -77,7 +77,7 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 	Level = GemRB.GetPlayerStat(pc, Levels[Class-1])
 
 	RowName = GUICommon.GetClassRowName (Class, "class")
-	SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", 0)
+	SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", GTV_STR)
 	ClassSaveTable = GemRB.LoadTable (SaveName)
 	if Level > ClassSaveTable.GetRowCount():
 		print "SetupSavingThrows: too high level, ignoring!"
@@ -94,8 +94,8 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 		GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, Base + ClassBonus-OldClassBonus)
 
 def LearnAnySpells (pc, BaseClassName):
-	MageTable = CommonTables.ClassSkills.GetValue (BaseClassName, "MAGESPELL", 0)
-	ClericTable = CommonTables.ClassSkills.GetValue (BaseClassName, "CLERICSPELL", 0)
+	MageTable = CommonTables.ClassSkills.GetValue (BaseClassName, "MAGESPELL", GTV_STR)
+	ClericTable = CommonTables.ClassSkills.GetValue (BaseClassName, "CLERICSPELL", GTV_STR)
 
 	# sorcerer types need this hack to not get too many spells
 	# for them the castable and known count progress differently

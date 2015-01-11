@@ -46,7 +46,8 @@ public:
 	/** construct a new custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
 	/** resolve a string reference */
-	char* GetString(ieStrRef strref, ieDword flags = 0);
+	String* GetString(ieStrRef strref, ieDword flags = 0);
+	char* GetCString(ieStrRef strref, ieDword flags = 0);
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0);
 	void FreeString(char *str);
 private:

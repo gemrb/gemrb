@@ -253,7 +253,7 @@ int main (int __unused argc, char ** __unused argv)
 {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-    /* Ensure the application object is initialised */
+    /* Ensure the application object is initialized */
     NSApplication* app = [NSApplication sharedApplication];
 
     /* Set up the menubar */

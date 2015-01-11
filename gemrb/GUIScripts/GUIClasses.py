@@ -99,6 +99,10 @@ class GWindow:
     _GemRB.Window_CreateScrollBar(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
   @CreateControlDecorator
+  def CreateTextArea(self, control, *args):
+    _GemRB.Window_CreateTextArea(self.ID, control, *args)
+    return _GemRB.Window_GetControl(self.ID, control)    
+  @CreateControlDecorator
   def CreateTextEdit(self, control, *args):
     _GemRB.Window_CreateTextEdit(self.ID, control, *args)
     return _GemRB.Window_GetControl(self.ID, control)
@@ -124,6 +128,8 @@ class GControl:
     if self.WinID != scrollbar.WinID:
       raise RuntimeError, "Scrollbar must be in same Window as Control"
     return _GemRB.Control_AttachScrollBar(self.WinID, self.ID, scrollbar.ID)
+  def SubstituteForControl(self, target):
+	  return _GemRB.Control_SubstituteForControl(self.WinID, self.ID, target.WinID, target.ID)
 
 class GLabel(GControl):
   __metaclass__ = metaControl
@@ -137,18 +143,12 @@ class GTextArea(GControl):
   __metaclass__ = metaControl
   methods = {
     'Rewind': _GemRB.TextArea_Rewind,
-    'SetHistory': _GemRB.TextArea_SetHistory,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
-    'Scroll': _GemRB.TextArea_Scroll,
-    'SelectText': _GemRB.TextArea_SelectText,
     'SetFlags': _GemRB.Control_TextArea_SetFlags,
-    'GetCharSounds': _GemRB.TextArea_GetCharSounds,
-    'GetCharacters': _GemRB.TextArea_GetCharacters,
-    'GetPortraits': _GemRB.TextArea_GetPortraits
+    'SetOptions': _GemRB.TextArea_SetOptions,
+    'ListResources': _GemRB.TextArea_ListResources
   }
-  def MoveText(self, other):
-    _GemRB.TextArea_MoveText(self.WinID, self.ID, other.WinID, other.ID)
 
 class GTextEdit(GControl):
   __metaclass__ = metaControl
@@ -156,9 +156,6 @@ class GTextEdit(GControl):
     'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
     'SetBackground': _GemRB.TextEdit_SetBackground
   }
-  def ConvertEdit(self, ScrollBarID):
-    newID = _GemRB.TextEdit_ConvertEdit(self.WinID, self.ID, ScrollBarID)
-    return GTextArea(self.WinID, self.ID)
 
 class GScrollBar(GControl):
   __metaclass__ = metaControl

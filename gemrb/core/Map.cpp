@@ -31,7 +31,6 @@
 #include "Game.h"
 #include "GameData.h"
 #include "IniSpawn.h"
-#include "Interface.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "ImageMgr.h"
@@ -393,7 +392,7 @@ Map::~Map(void)
 	}
 	delete LightMap;
 	delete HeightMap;
-	core->GetVideoDriver()->FreeSprite( SmallMap );
+	Sprite2D::FreeSprite( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
 		queue[i] = NULL;
@@ -420,9 +419,6 @@ Map::~Map(void)
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
 	}
-	for (i = 0; i < mapnotes.size(); i++) {
-		delete mapnotes[i];
-	}
 
 	//malloc-d in AREImp
 	free( ExploredBitmap );
@@ -439,7 +435,7 @@ Map::~Map(void)
 void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
 {
 	delete LightMap;
-	core->GetVideoDriver()->FreeSprite(SmallMap);
+	Sprite2D::FreeSprite(SmallMap);
 
 	LightMap = lm;
 	SmallMap = sm;
@@ -786,18 +782,7 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
-
-			if (actor->GetCurrentArea() != this) {
-				continue;
-			}
-
-			// try to exclude actors which only just died
-			// (shouldn't we not be stepping actors which don't have a path anyway?)
-			// following fails on Immobile creatures, don't think it's a problem, but replace with next line if it is
-			if (!actor->ValidTarget(GA_NO_DEAD)) continue;
-			//if (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag() & IF_JUSTDIED) continue;
-
-			if (!DoStepForActor(actor, actor->speed, time)) more_steps = true;
+			more_steps = !DoStepForActor(actor, actor->speed, time);
 		}
 	}
 
@@ -894,7 +879,9 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
-	if (actor->Immobile()) {
+	// Impbile, dead, or actors in another map cant walk here
+	if (actor->Immobile() || actor->GetCurrentArea() != this
+		|| !actor->ValidTarget(GA_NO_DEAD)) {
 		return true;
 	}
 
@@ -975,7 +962,7 @@ void Map::DrawPile(Region screen, int pileidx)
 	if (c->Highlight) {
 		c->DrawPile(true, screen, tint);
 	} else {
-		if (c->outline->BBox.InsideRegion(vp)) {
+		if (c->outline->BBox.IntersectsRegion(vp)) {
 			c->DrawPile(false, screen, tint);
 		}
 	}
@@ -1110,7 +1097,7 @@ void Map::DrawMap(Region screen)
 
 	if (Background) {
 		if (BgDuration<gametime) {
-			video->FreeSprite(Background);
+			Sprite2D::FreeSprite(Background);
 		} else {
 			video->BlitSprite(Background,0,0,true);
 			bgoverride = true;
@@ -1258,6 +1245,7 @@ void Map::DrawMap(Region screen)
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
+		assert(TMap);
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
@@ -3050,36 +3038,40 @@ void Map::SetupAmbients()
 }
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(const Point &point, int color, char *text, ieStrRef strref)
+void Map::AddMapNote(const Point &point, int color, String* text)
 {
-	MapNote *mn = new MapNote;
+	AddMapNote(point, MapNote(text, color));
+}
 
-	mn->strref = strref;
-	mn->Pos = point;
-	mn->color = (ieWord) color;
-	mn->text = text;
-	RemoveMapNote(point); //delete previous mapnote
-	mapnotes.push_back(mn);
+void Map::AddMapNote(const Point &point, int color, ieStrRef strref)
+{
+	AddMapNote(point, MapNote(strref, color));
+}
+
+void Map::AddMapNote(const Point &point, const MapNote& note)
+{
+	RemoveMapNote(point);
+	mapnotes.push_back(note);
+	mapnotes.back().Pos = point;
 }
 
 void Map::RemoveMapNote(const Point &point)
 {
-	size_t i = mapnotes.size();
-	while (i--) {
-		if ((point.x==mapnotes[i]->Pos.x) &&
-			(point.y==mapnotes[i]->Pos.y)) {
-			delete mapnotes[i];
-			mapnotes.erase(mapnotes.begin()+i);
+	std::vector<MapNote>::iterator it = mapnotes.begin();
+	for (; it != mapnotes.end(); ++it) {
+		if ((*it).Pos == point) {
+			mapnotes.erase(it);
+			break;
 		}
 	}
 }
 
-MapNote *Map::GetMapNote(const Point &point)
+const MapNote* Map::MapNoteAtPoint(const Point &point)
 {
 	size_t i = mapnotes.size();
 	while (i--) {
-		if (Distance(point, mapnotes[i]->Pos) < 10 ) {
-			return mapnotes[i];
+		if (Distance(point, mapnotes[i].Pos) < 10 ) {
+			return &mapnotes[i];
 		}
 	}
 	return NULL;
@@ -3733,7 +3725,7 @@ bool Map::DisplayTrackString(Actor *target)
 		return true;
 	}
 	if (trackFlag) {
-			char * str = core->GetString( trackString);
+			char * str = core->GetCString( trackString);
 			core->GetTokenDictionary()->SetAt( "CREATURE", str);
 			displaymsg->DisplayConstantStringName(STR_TRACKING, DMC_LIGHTGREY, target);
 			return false;
@@ -3823,9 +3815,8 @@ void AreaAnimation::InitAnimation()
 	}
 	free(animation);
 
-	if (Flags & A_ANI_ALLCYCLES) {
-		animcount = (int) af->GetCycleCount();
-
+	animcount = (int) af->GetCycleCount();
+	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
 		animation = (Animation **) malloc(animcount * sizeof(Animation *) );
 		for(int j=0;j<animcount;j++) {
 			animation[j]=GetAnimationPiece(af, j);
@@ -3997,12 +3988,10 @@ void Map::SetInternalSearchMap(int x, int y, int value)
 
 void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 {
-	Video* video = core->GetVideoDriver();
-
 	ResourceHolder<ImageMgr> bmp(bgResRef);
 
 	if (Background) {
-		video->FreeSprite(Background);
+		Sprite2D::FreeSprite(Background);
 	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;

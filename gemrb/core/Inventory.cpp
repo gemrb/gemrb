@@ -1625,6 +1625,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
 				array[pos].slot = idx;
 				array[pos].headerindex = ehc;
+				array[pos].Tooltip = ext_header->Tooltip;
 				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
 				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
 				if (ext_header->Charges) {
@@ -1716,6 +1717,7 @@ void Inventory::UpdateWeaponAnimation()
 			}
 			if (si) {
 				Item* it = gamedata->GetItem(si->ItemResRef, true);
+				assert(it);
 				if (core->CanUseItemType(SLOT_WEAPON, it))
 					twoweapon = true;
 				gamedata->FreeItem(it, si->ItemResRef, false);

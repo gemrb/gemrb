@@ -65,7 +65,7 @@ void Calendar::GetMonthName(int dayandmonth) const
 
 			core->GetTokenDictionary()->SetAtCopy("DAY", dayandmonth+1);
 
-			tmp = core->GetString( monthnames[i] );
+			tmp = core->GetCString( monthnames[i] );
 			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
 			//must not free tmp, SetAt doesn't copy the pointer!
 

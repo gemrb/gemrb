@@ -1,3 +1,5 @@
+#extension GL_OES_standard_derivatives : enable
+
 precision highp float;
 uniform float u_radiusX;
 uniform float u_radiusY;

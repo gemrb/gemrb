@@ -26,6 +26,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
+#include "ImageMgr.h"
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"
@@ -36,28 +37,55 @@
 
 namespace GemRB {
 
-//translate section values (journal, solved, unsolved, user)
-static const int *sectionMap;
-static const int bg2Sections[4]={4,1,2,0};
-static const int noSections[4]={0,0,0,0};
-
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
+	ds = NULL;
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
 	initialState = -1;
-	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) ) {
-		sectionMap = bg2Sections;
-	} else {
-		sectionMap = noSections;
-	}
 }
 
 DialogHandler::~DialogHandler(void)
 {
 	delete dlg;
+}
+
+void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
+{
+	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
+
+	int Section = 0;
+	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+		Section = 4;
+		if (tr->Flags&IE_DLG_UNSOLVED) {
+			Section |= 1; // quests
+		}
+		if (tr->Flags&IE_DLG_SOLVED) {
+			Section |= 2; // completed
+		}
+	}
+
+	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
+		String msg(L"\n[color=bcefbc]");
+		String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
+		msg += *str;
+		delete str;
+		str = core->GetString(tr->journalStrRef);
+		if (str && str->length()) {
+			//cutting off the strings at the first crlf
+			size_t newlinePos = str->find_first_of(L'\n');
+			if (newlinePos != String::npos) {
+				str->resize( newlinePos );
+			}
+			msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][/p]";
+		} else {
+			msg += L"[/color]\n";
+		}
+		delete str;
+		displaymsg->DisplayMarkupString(msg);
+	}
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
@@ -143,6 +171,13 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	TextArea* ta = core->GetMessageTextArea();
+	if (ta) {
+		// reset the TA
+		ta->SetAnimPicture(NULL);
+		ta->ClearSelectOptions();
+	}
+
 	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
 		return;
 	}
@@ -177,27 +212,32 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
-void DialogHandler::DialogChoose(unsigned int choose)
+bool DialogHandler::DialogChoose(Control* ctl)
+{
+	return DialogChoose(ctl->Value);
+}
+
+bool DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
 		Log(ERROR, "DialogHandler", "Dialog aborted???");
 		EndDialog();
-		return;
+		return false;
 	}
 
 	Actor *speaker = GetSpeaker();
 	if (!speaker) {
 		Log(ERROR, "DialogHandler", "Speaker gone???");
 		EndDialog();
-		return;
+		return false;
 	}
 
 	Scriptable *target = GetTarget();
 	if (!target) {
 		Log(ERROR, "DialogHandler", "Target gone???");
 		EndDialog();
-		return;
+		return false;
 	}
 	Actor *tgt = NULL;
 	if (target->Type == ST_ACTOR) {
@@ -205,21 +245,22 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	}
 
 	int si;
+	GameControl* gc = core->GetGameControl();
 	if (choose == (unsigned int) -1) {
 		//increasing talkcount after top level condition was determined
 
 		si = initialState;
 		if (si<0) {
 			EndDialog();
-			return;
+			return false;
 		}
 
 		if (tgt) {
-			if (core->GetGameControl()->GetDialogueFlags()&DF_TALKCOUNT) {
-				core->GetGameControl()->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
+			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
+				gc->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
 				tgt->TalkCount++;
-			} else if (core->GetGameControl()->GetDialogueFlags()&DF_INTERACT) {
-				core->GetGameControl()->SetDialogueFlags(DF_INTERACT, BM_NAND);
+			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
+				gc->SetDialogueFlags(DF_INTERACT, BM_NAND);
 				tgt->InteractCount++;
 			}
 		}
@@ -231,39 +272,16 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		target->Stop();
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
-			return;
+			return false;
 		}
 
 		DialogTransition* tr = ds->transitions[choose];
-
-		ta->PopMinRow();
-
-		if (tr->Flags&IE_DLG_TR_JOURNAL) {
-			int Section = 0;
-			if (tr->Flags&IE_DLG_UNSOLVED) {
-				Section |= 1;
-			}
-			if (tr->Flags&IE_DLG_SOLVED) {
-				Section |= 2;
-			}
-			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
-				displaymsg->DisplayConstantString(STR_JOURNALCHANGE, DMC_BG2XPGREEN);
-				char *string = core->GetString( tr->journalStrRef );
-				//cutting off the strings at the first crlf
-				char *poi = strchr(string,'\n');
-				if (poi) {
-					*poi='\0';
-				}
-				displaymsg->DisplayString( string );
-				free( string );
-			}
-		}
-
+		UpdateJournalForTransition(tr);
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
+			ta->AppendText(L"\n");
 			displaymsg->DisplayStringName( tr->textStrRef, DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
-				ta->AppendText( "", -1 );
 			}
 		}
 		target->ImmediateEvent();
@@ -284,9 +302,9 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
-			ta->SetMinRow( false );
 			EndDialog();
-			return;
+			ta->AppendText(L"\n");
+			return false;
 		}
 
 		// avoid problems when dhjollde.dlg tries starting a cutscene in the middle of a dialog
@@ -332,22 +350,21 @@ void DialogHandler::DialogChoose(unsigned int choose)
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 				}
 			}
-			target = tgt;
-			if (!target) {
+
+			if (!tgt) {
 				Log(WARNING, "DialogHandler", "Can't redirect dialog");
-				ta->SetMinRow( false );
 				EndDialog();
-				return;
+				return false;
 			}
 			Actor *oldTarget = GetActorByGlobalID(targetID);
 			targetID = tgt->GetGlobalID();
 			tgt->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
-/*			if (target != tgt) {
+			if (target != tgt) {
 				// switching target; clear actions
 				target = tgt;
 				target->Stop();
-			}*/
+			}
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
@@ -361,9 +378,8 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			}*/
 			if (!InitDialog( speaker, target, tmpresref)) {
 				// error was displayed by InitDialog
-				ta->SetMinRow( false );
 				EndDialog();
-				return;
+				return false;
 			}
 		}
 	}
@@ -371,38 +387,40 @@ void DialogHandler::DialogChoose(unsigned int choose)
 	ds = dlg->GetState( si );
 	if (!ds) {
 		Log(WARNING, "DialogHandler", "Can't find next dialog");
-		ta->SetMinRow( false );
 		EndDialog();
-		return;
+		return false;
 	}
 
-	//displaying npc text
-	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
-	//adding a gap between options and npc text
-	ta->AppendText("",-1);
-	int i;
-	int idx = 0;
-	ta->SetMinRow( true );
-	//first looking for a 'continue' opportunity, the order is descending (a la IE)
-	unsigned int x = ds->transitionsCount;
-	while(x--) {
-		if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-			continue;
-		}
-		if (ds->transitions[x]->textStrRef != 0xffffffff) {
-			continue;
-		}
-		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (ds->transitions[x]->condition &&
-				!ds->transitions[x]->condition->Evaluate(target)) {
-				continue;
-			}
-		}
-		core->GetDictionary()->SetAt("DialogOption",x);
-		core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
-		goto end_of_choose;
+	// displaying npc text and portrait
+	const char *portrait = NULL;
+	if (tgt) {
+		portrait = tgt->GetPortrait(1);
 	}
-	for (x = 0; x < ds->transitionsCount; x++) {
+	if (portrait) {
+		// dialog speaker pic
+		ieResRef PortraitResRef;
+		strnlwrcpy(PortraitResRef, portrait, 8);
+		ResourceHolder<ImageMgr> im(PortraitResRef, true);
+		if (im) {
+			// we set the anim picture for the speaker to always be on the side during dialogue,
+			// but also append the image to the TA so that it remains in the backlog.
+			Sprite2D* image = im->GetSprite2D();
+			ta->SetAnimPicture(image);
+
+			// TODO: I would like to actually append the image as content to the TA
+			// the TA supports this, but unfortunately we destroy the TA at the end of dialog
+			// the TA that replaces it is created via ta->QueryText() on the old one so images are lost!
+			//ta->AppendContent(new ImageSpan(image));
+		}
+	}
+	ta->AppendText(L"\n");
+	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
+
+	int idx = 0;
+	std::vector<SelectOption> dialogOptions;
+	ControlEventHandler handler = NULL;
+	//first looking for a 'continue' opportunity, the order is descending (a la IE)
+	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 			if (ds->transitions[x]->condition &&
 				!ds->transitions[x]->condition->Evaluate(target)) {
@@ -414,31 +432,35 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			//dialogchoose should be set to x
 			//it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption",x);
-			core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
+				gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+				break;
+			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+				if (ds->transitions[x]->condition &&
+					!ds->transitions[x]->condition->Evaluate(target)) {
+					continue;
+				}
+			}
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+			break;
 		} else {
-			char *string = ( char * ) malloc( 40 );
-			sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
-			i = ta->AppendText( string, -1 );
-			free( string );
-			string = core->GetString( ds->transitions[x]->textStrRef );
-			ta->AppendText( string, i );
-			free( string );
-			ta->AppendText( "[/p][/s]", i );
+			String* string = core->GetString( ds->transitions[x]->textStrRef );
+			dialogOptions.push_back(std::make_pair(x, *string));
+			delete string;
 		}
 	}
+
+	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
+	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
+	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);
+
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "DialogHandler", "There were no valid dialog options!");
-		core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+		gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
 	}
-end_of_choose:
-	//padding the rows so our text will be at the top
-	if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
-		ta->AppendText( "", -1 );
-	}
-	else {
-		ta->PadMinRow();
-	}
+
+	return true;
 }
 
 // TODO: duplicate of the one in GameControl

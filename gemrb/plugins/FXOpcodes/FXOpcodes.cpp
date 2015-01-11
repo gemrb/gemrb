@@ -54,6 +54,7 @@ using namespace GemRB;
 #define PI_CONFUSED  3
 #define PI_BERSERK   4
 #define PI_POISONED  6
+#define PI_DISEASED  7
 #define PI_BLIND     8
 #define PI_HELD     13
 #define PI_SLEEP    14
@@ -2849,6 +2850,8 @@ int fx_cure_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_cure_diseased_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	//STATE_CURE( STATE_DISEASED ); //the bit flagged as disease is actually the active state. so this is even more unlikely to be used as advertised
 	target->fxqueue.RemoveAllEffects( fx_diseased_state_ref ); //this is what actually happens in bg2
+	// iwd also does this, as its mummies have permanent timing diseases
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_DISEASED);
 	return FX_NOT_APPLIED;
 }
 
@@ -6372,8 +6375,7 @@ int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
 	Point p(fx->PosX, fx->PosY);
-	char *text = core->GetString(fx->Parameter1, 0);
-	map->AddMapNote(p, fx->Parameter2, text, fx->Parameter1);
+	map->AddMapNote(p, fx->Parameter2, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 

@@ -18,633 +18,402 @@
  *
  */
 
-#include <list>
-
 #include "TextArea.h"
 
 #include "win32def.h"
 
-#include "DialogHandler.h"
 #include "GameData.h"
-#include "ImageMgr.h"
-#include "Video.h"
+#include "Interface.h"
+#include "Variables.h"
 #include "GUI/EventMgr.h"
-#include "GUI/GameControl.h"
+#include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/Window.h"
-#include "Scriptable/Actor.h"
+
+#define EDGE_PADDING 3
 
 namespace GemRB {
 
-TextArea::TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame)
+TextArea::TextArea(const Region& frame, Font* text)
+	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
+{
+	palette = text->GetPalette();
+	finit = ftext;
+	Init();
+}
+
+TextArea::TextArea(const Region& frame, Font* text, Font* caps,
+				   Color textcolor, Color initcolor, Color lowtextcolor)
+	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
+{
+	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
+	palette = palettes[PALETTE_NORMAL];
+
+	// quick font optimization (prevents creating unnecessary cap spans)
+	finit = (caps != ftext) ? caps : ftext;
+
+	if (finit->Baseline < ftext->LineHeight) {
+		// FIXME: initcolor is only used for *some* initial fonts
+		// this is a hack to workaround the INITIALS font getting its palette set
+		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
+		SetPalette(&initcolor, PALETTE_INITIALS);
+	} else {
+		palettes[PALETTE_INITIALS] = finit->GetPalette();
+	}
+
+	Init();
+}
+
+void TextArea::Init()
 {
 	ControlType = IE_GUI_TEXTAREA;
-	keeplines = 100;
 	rows = 0;
 	TextYPos = 0;
 	ticks = starttime = 0;
-	startrow = 0;
-	minrow = 0;
-	Cursor = NULL;
-	CurPos = 0;
-	CurLine = 0;
-	seltext = -1;
-	Value = 0xffffffff;
+	strncpy(VarName, "Selected", sizeof(VarName));
+
 	ResetEventHandler( TextAreaOnChange );
-	PortraitResRef[0]=0;
-	palette = core->CreatePalette( hitextcolor, lowtextcolor );
-	initpalette = core->CreatePalette( initcolor, lowtextcolor );
-	Color tmp = {
-		hitextcolor.b, hitextcolor.g, hitextcolor.r, 0
-	};
-	selected = core->CreatePalette( tmp, lowtextcolor );
-	tmp.r = 255;
-	tmp.g = 152;
-	tmp.b = 102;
-	lineselpal = core->CreatePalette( tmp, lowtextcolor );
-	ftext = finit = NULL;
+	ResetEventHandler( TextAreaOnSelect );
+
+	selectOptions = NULL;
+	textContainer = NULL;
+
+	// initialize the Text containers
+	SetScrollBar(NULL);
+	ClearSelectOptions();
+	ClearText();
+	SetAnimPicture(NULL);
 }
 
 TextArea::~TextArea(void)
 {
-	gamedata->FreePalette( palette );
-	gamedata->FreePalette( initpalette );
-	gamedata->FreePalette( selected );
-	gamedata->FreePalette( lineselpal );
-	core->GetVideoDriver()->FreeSprite( Cursor );
-	for (size_t i = 0; i < lines.size(); i++) {
-		free( lines[i] );
+	for (int i=0; i < PALETTE_TYPE_COUNT; i++) {
+		gamedata->FreePalette( palettes[i] );
 	}
-}
-
-void TextArea::RefreshSprite(const char *portrait)
-{
-	if (AnimPicture) {
-		if (!strnicmp(PortraitResRef, portrait, 8) ) {
-			return;
-		}
-		SetAnimPicture(NULL);
-	}
-	strnlwrcpy(PortraitResRef, portrait, 8);
-	ResourceHolder<ImageMgr> im(PortraitResRef, true);
-	if (im == NULL) {
-		return;
-	}
-
-	SetAnimPicture ( im->GetSprite2D() );
 }
 
 bool TextArea::NeedsDraw()
 {
 	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		if (startrow == rows) { // the text is offscreen
+		if (TextYPos > textContainer->ContentFrame().h) {
+			 // the text is offscreen
 			return false;
 		}
+		// must mark dirty to invalidate the window BG
 		MarkDirty();
 		return true;
 	}
+
 	return Control::NeedsDraw();
 }
 
 void TextArea::DrawInternal(Region& clip)
 {
-	if (lines.size() == 0) {
-		return;
+	if (AnimPicture) {
+		// speaker portrait
+		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
+		clip.x += AnimPicture->Width + EDGE_PADDING;
 	}
+	clip.x += EDGE_PADDING;
 
-	Video *video = core->GetVideoDriver();
-	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
-		if (AnimPicture) {
-			video->BlitSprite(AnimPicture, clip.x, clip.y, true, &clip);
-			clip.x+=AnimPicture->Width;
-			clip.w-=AnimPicture->Width;
-		}
-	}
-
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL)
-	{
+	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
 		unsigned long thisTime = GetTickCount();
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
 			TextYPos++;// can't use ScrollToY
-			if (TextYPos % ftext->maxHeight == 0) SetRow(startrow + 1);
 		}
 	}
 
-	//if textarea is 'selectable' it actually means, it is a listbox
-	//in this case the selected value equals the line number
-	//if it is 'not selectable' it can still have selectable lines
-	//but then it is like the dialog window in the main game screen:
-	//the selected value is encoded into the line
-	size_t linesize = lines.size() - 1; // -1 because 0 counts
-	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
-		char* Buffer = (char *) malloc( 1 );
-		Buffer[0] = 0;
-		int len = 0;
-		int lastlen = 0;
-		for (size_t i = 0; i <= linesize; i++) {
-			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
-				int tlen;
-				unsigned long acolor, bcolor;
-				char* rest = strchr( lines[i] + 3, ',' );
-				if (*rest != ',')
-					goto notmatched;
-				acolor = strtoul( rest + 1, &rest, 16 );
-				if (*rest != ',')
-					goto notmatched;
-				bcolor = strtoul( rest + 1, &rest, 16 );
-				if (*rest != ']')
-					goto notmatched;
-				tlen = (int)(strstr( rest + 1, "[/s]" ) - rest - 1);
-				if (tlen < 0)
-					goto notmatched;
-				len += tlen + 23;
-				Buffer = (char *) realloc( Buffer, len + 2 );
-				if (seltext == (int) i) {
-					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
-						acolor, tlen, rest + 1 );
-				} else {
-					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
-						bcolor, tlen, rest + 1 );
-				}
-			} else {
-				notmatched:
-				len += ( int ) strlen( lines[i] ) + 1;
-				Buffer = (char *) realloc( Buffer, len + 2 );
-				memcpy( &Buffer[lastlen], lines[i], len - lastlen );
-			}
-			lastlen = len;
-			if (i != linesize) {
-				Buffer[lastlen - 1] = '\n';
-				Buffer[lastlen] = 0;
-			}
-		}
+	clip.y -= TextYPos;
+	contentWrapper.Draw(clip.Origin());
 
-		int pos;
-
-		if (startrow==CurLine) {
-			pos = CurPos;
-		} else {
-			pos = -1;
-		}
-
-		/* lets fake scrolling the text by simply offsetting the textClip by between 0 and maxHeight pixels.
-			don't forget to increase the clipping height by the same amount */
-		short LineOffset = (short)(TextYPos % ftext->maxHeight);
-		Region textClip(clip.x, clip.y - LineOffset, clip.w, clip.h + LineOffset);
-
-		ftext->PrintFromLine( startrow, textClip,
-							 ( unsigned char * ) Buffer, palette,
-							 IE_FONT_ALIGN_LEFT, finit, Cursor, pos );
-		free( Buffer );
-		return;
-	}
-	// normal scrolling textarea
-	int rc = 0;
-	int sr = startrow;
-	unsigned int i;
-	int yl;
-	for (i = 0; i <= linesize; i++) {
-		if (rc + lrows[i] <= sr) {
-			rc += lrows[i];
-			continue;
-		}
-		sr -= rc;
-		Palette* pal = NULL;
-		if (seltext == (int) i)
-			pal = selected;
-		else if (Value == i)
-			pal = lineselpal;
-		else
-			pal = palette;
-		ftext->PrintFromLine( sr, clip,
-			( unsigned char * ) lines[i], pal,
-			IE_FONT_ALIGN_LEFT, finit, NULL );
-		yl = ftext->maxHeight * (lrows[i]-sr);
-		clip.y+=yl;
-		clip.h-=yl;
-		break;
-	}
-	for (i++; i <= linesize; i++) {
-		Palette* pal = NULL;
-		if (seltext == (int) i)
-			pal = selected;
-		else if (Value == i)
-			pal = lineselpal;
-		else
-			pal = palette;
-		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
-			IE_FONT_ALIGN_LEFT, true );
-		yl = ftext->maxHeight * lrows[i];
-		clip.y+=yl;
-		clip.h-=yl;
-
+	if (selectOptions) {
+		// This hack is to refresh the mouse cursor so that option below cursor gets
+		// highlighted during a dialog
+		core->GetEventMgr()->FakeMouseMove();
 	}
 }
+
+void TextArea::SetAnimPicture(Sprite2D* pic)
+{
+	// FIXME: this behavior really needs to also happen when the TA dimensions change
+	// we currntly do that by setting *public* ivars in Control, instead of having a SetSize type method
+
+	// FIXME: we always have to accept NULL because sometimes the control size gets changed after this is called
+	// dialog is the only thing that uses an actual picture, so we can safely bail out in that case
+	if (pic == AnimPicture && pic != NULL) return;
+
+	Size frame(Width, 0);
+	// apply padding to the clip
+	frame.w -= (sb) ? EDGE_PADDING : EDGE_PADDING * 2;
+
+	if (pic) {
+		int offset = pic->Width + EDGE_PADDING;
+		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
+		frame.w -= offset;
+	}
+	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
+	textContainer->SetFrame(Region(Point(), frame));
+	contentWrapper.SetFrame(Region(Point(), frame));
+
+	Control::SetAnimPicture(pic);
+}
+
+void TextArea::UpdateScrollbar()
+{
+	if (sb == NULL) return;
+
+	int textHeight = contentWrapper.ContentFrame().h;
+	Region nodeBounds;
+	if (dialogBeginNode) {
+		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
+		// add the height of a newline too so that there is a space
+		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
+		Size selectFrame = selectOptions->ContentFrame();
+		// page = blank line + dialog node + blank line + select options
+		int pageH = ftext->LineHeight*2 + nodeBounds.h + selectFrame.h;
+		if (pageH < Height) {
+			// if the node isnt a full page by itself we need to fake it
+			textHeight += Height - pageH;
+		}
+	}
+	int rowHeight = GetRowHeight();
+	int newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
+	if (newRows != rows) {
+		rows = newRows;
+		ScrollBar* bar = ( ScrollBar* ) sb;
+		ieWord visibleRows = (Height / GetRowHeight());
+		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
+		bar->SetMax(sbMax);
+	}
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
+		&& dialogBeginNode) {
+		// now scroll dialogBeginNode to the top less a blank line
+		ScrollToY(nodeBounds.y - ftext->LineHeight);
+	}
+}
+
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
 	to this Text Area Control. */
 int TextArea::SetScrollBar(Control* ptr)
 {
-	int ret = Control::SetScrollBar(ptr);
-	CalcRowCount();
-	return ret;
+	ScrollBar* bar = (ScrollBar*)ptr;
+	Control::SetScrollBar(bar);
+	// we need to update the ScrollBar position based around TextYPos
+	rows = 0; // force an update in UpdateScrollbar()
+	UpdateScrollbar();
+	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+		bar->SetPos(bar->Value); // scroll to the bottom
+	} else {
+		ScrollToY(TextYPos);
+	}
+	return (bool)sb;
 }
 
 /** Sets the Actual Text */
-void TextArea::SetText(const char* text)
+void TextArea::SetText(const String& text)
 {
-	if (!text[0]) {
-		Clear();
-	}
-
-	int newlen = ( int ) strlen( text );
-
-	if (lines.size() == 0) {
-		char* str = (char *) malloc( newlen + 1 );
-		memcpy( str, text, newlen + 1 );
-		lines.push_back( str );
-		lrows.push_back( 0 );
-	} else {
-		lines[0] = (char *) realloc( lines[0], newlen + 1 );
-		memcpy( lines[0], text, newlen + 1 );
-	}
-	CurPos = newlen;
-	CurLine = lines.size()-1;
-	UpdateControls();
+	ClearText();
+	AppendText(text);
 }
 
-void TextArea::SetMinRow(bool enable)
+void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 {
-	if (enable) {
-		minrow = (int) lines.size();
-	} else {
-		minrow = 0;
+	assert(idx < PALETTE_TYPE_COUNT);
+	if (color) {
+		gamedata->FreePalette(palettes[idx]);
+		palettes[idx] = new Palette( *color, ColorBlack );
+	} else if (idx > PALETTE_NORMAL) {
+		// default to normal
+		gamedata->FreePalette(palettes[idx]);
+		palettes[idx] = palettes[PALETTE_NORMAL];
+		palettes[idx]->acquire();
 	}
 }
 
-//drop lines scrolled out at the top.
-//keeplines is the number of lines that should still be
-//preserved (for scrollback history)
-void TextArea::DiscardLines()
+void TextArea::AppendText(const String& text)
 {
-	if (rows<=keeplines) {
-		return;
-	}
-	int drop = rows-keeplines;
-	PopLines(drop, true);
-}
-
-static char *note_const = NULL;
-static const char inserted_crap[]="[/color][color=ffffff]";
-#define CRAPLENGTH sizeof(inserted_crap)-1
-
-void TextArea::SetNoteString(const char *s)
-{
-	free(note_const);
-	if (s) {
-		note_const = (char *) malloc(strlen(s)+5);
-		sprintf(note_const, "\r\n\r\n%s", s);
-	}
-}
-
-/** Appends a String to the current Text */
-int TextArea::AppendText(const char* text, int pos)
-{
-	int ret = 0;
-	if (pos >= ( int ) lines.size()) {
-		return -1;
-	}
-	int newlen = ( int ) strlen( text );
-
-	if (pos == -1) {
-		const char *note = NULL;
-		if (note_const) {
-			note = strstr(text,note_const);
-		}
-		char *str;
-		if (NULL == note) {
-			str = (char *) malloc( newlen +1 );
-			memcpy(str, text, newlen+1);
-		}
-		else {
-			unsigned int notepos = (unsigned int) (note - text);
-			str = (char *) malloc( newlen + CRAPLENGTH+1 );
-			memcpy(str,text,notepos);
-			memcpy(str+notepos,inserted_crap,CRAPLENGTH);
-			memcpy(str+notepos+CRAPLENGTH, text+notepos, newlen-notepos+1);
-		}
-		lines.push_back( str );
-		lrows.push_back( 0 );
-		ret =(int) (lines.size() - 1);
-	} else {
-		int mylen = ( int ) strlen( lines[pos] );
-
-		lines[pos] = (char *) realloc( lines[pos], mylen + newlen + 1 );
-		memcpy( lines[pos]+mylen, text, newlen + 1 );
-		ret = pos;
-	}
-
-	//if the textarea is not a listbox, then discard scrolled out
-	//lines
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
-		DiscardLines();
+		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
+		// start trimming content from the top until we are under the limit.
+		Size frame = textContainer->ContentFrame();
+		int currHeight = frame.h;
+		if (currHeight > heightLimit) {
+			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
+			textContainer->DeleteContentsInRect(exclusion);
+		}
 	}
 
-	UpdateControls();
-	return ret;
-}
+	size_t tagPos = text.find_first_of('[');
+	if (tagPos != String::npos) {
+		// share a single parser for all TextAreas
+		static GemMarkupParser parser;
+		parser.SetTextDefaults(ftext, finit, palette);
+		parser.ParseMarkupStringIntoContainer(text, *textContainer);
+	} else if (text.length()) {
+		if (finit != ftext) {
+			// append cap spans
+			size_t textpos = text.find_first_not_of(WHITESPACE_STRING);
+			// FIXME: ? maybe we actually want the newlines etc?
+			// I think maybe if we clean up the GUIScripts this isn't needed.
+			if (textpos != String::npos) {
+				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
+				// need to figure out how to handle this because it breaks drop caps
 
-/** Deletes last or first `count' lines */
-/** Probably not too optimal for many lines, but it isn't used */
-/** for many lines */
-void TextArea::PopLines(unsigned int count, bool top)
-{
-	if (count > lines.size()) {
-		count = (unsigned int) lines.size();
-	}
-
-	while (count > 0 ) {
-		if (top) {
-			int tmp = lrows.front();
-			if (minrow || (startrow<tmp) )
-				break;
-			startrow -= tmp;
-			free(lines.front() );
-			lines.erase(lines.begin());
-			lrows.erase(lrows.begin());
+				// we must create and append this span here (instead of using AppendText),
+				// because the original data files for the DC font specifies a line height of 13
+				// that would cause overlap when the lines wrap beneath the DC if we didnt specify the correct size
+				Size s = finit->GetGlyph(text[textpos]).size;
+				if (s.h > ftext->LineHeight) {
+					// pad this only if it is "real" (it is higher than the other text).
+					// some text areas have a "cap" font assigned in the CHU that differs from ftext, but isnt meant to be a cap
+					// see BG2 chargen
+					s.w += EDGE_PADDING;
+				}
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS], &s);
+				textContainer->AppendContent(dc);
+				textpos++;
+				// FIXME: assuming we have more text!
+				// FIXME: as this is currently implemented, the cap is *not* considered part of the word,
+				// there is potential wrapping errors (BG2 char gen).
+				// we could solve this by wrapping the cap and the letters remaining letters of the word into their own TextContainer
+			} else {
+				textpos = 0;
+			}
+			textContainer->AppendText(text.substr(textpos));
 		} else {
-			free(lines.back() );
-			lines.pop_back();
-			lrows.pop_back();
+			textContainer->AppendText(text);
 		}
-		count--;
 	}
-	UpdateControls();
-}
 
-void TextArea::UpdateControls()
-{
-	int pos;
-
-	CalcRowCount();
 	if (sb) {
-		ScrollBar* bar = ( ScrollBar* ) sb;
-		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
-			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
-		else
-			pos = 0;
-		if (pos < 0)
-			pos = 0;
-		bar->SetPos( pos );
-	} else {
-		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL) {
-			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
-			SetRow(pos);
+		UpdateScrollbar();
+		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
+		{
+			ScrollBar* bar = ( ScrollBar* ) sb;
+			bar->SetPos(bar->Value); // scroll to the bottom
 		}
 	}
-
-	GameControl* gc = core->GetGameControl();
-	if (gc && gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		// This hack is to refresh the mouse cursor so that reply below cursor gets
-		// highlighted during a dialog
-		// FIXME: we check DF_IN_DIALOG here to avoid recurssion in the MessageWindowLogger, but what happens when an error happens during dialog?
-		// I'm not super sure about how to avoid that. for now the logger will not log anything in dialog mode.
-		int x,y;
-		core->GetVideoDriver()->GetMousePos(x,y);
-		core->GetEventMgr()->MouseMove(x,y);
-	}
-
-	core->RedrawAll();
-}
-
-/** Sets the Fonts */
-void TextArea::SetFonts(Font* init, Font* text)
-{
-	finit = init;
-	ftext = text;
 	MarkDirty();
 }
-
+/*
+int TextArea::InsertText(const char* text, int pos)
+{
+	// TODO: actually implement this
+	AppendText(text);
+	return pos;
+}
+*/
 /** Key Press Event */
 bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
 			MarkDirty();
-			int len = GetRowLength(CurLine);
-			//print("len: %d Before: %s", len, lines[CurLine]);
-			lines[CurLine] = (char *) realloc( lines[CurLine], len + 2 );
-			for (int i = len; i > CurPos; i--) {
-				lines[CurLine][i] = lines[CurLine][i - 1];
-			}
-			lines[CurLine][CurPos] = Key;
-			lines[CurLine][len + 1] = 0;
-			CurPos++;
-			//print("pos: %d After: %s", CurPos, lines[CurLine]);
-			CalcRowCount();
+
+			// TODO: implement this! currently does nothing
+
 			RunEventHandler( TextAreaOnChange );
 		}
 		return true;
 	}
 
-	//Selectable=false for dialogs, rather unintuitive, but fact
-	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' ))
+	if (( Key < '1' ) || ( Key > '9' ))
 		return false;
-	GameControl *gc = core->GetGameControl();
-	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-		MarkDirty();
-		seltext=minrow-1;
-		if ((unsigned int) seltext>=lines.size()) {
-			return true;
-		}
-		for(int i=0;i<Key-'0';i++) {
-			do {
-				seltext++;
-				if ((unsigned int) seltext>=lines.size()) {
-					return true;
-				}
-			}
-			while (strnicmp( lines[seltext], "[s=", 3 ) != 0 );
-		}
-		int idx=-1;
-		sscanf( lines[seltext], "[s=%d,", &idx);
-		if (idx==-1) {
-			//this kills this object, don't use any more data!
-			gc->dialoghandler->EndDialog();
-			return true;
-		}
-		gc->dialoghandler->DialogChoose( idx );
-		return true;
+
+	MarkDirty();
+
+	unsigned int lookupIdx = Key - '1';
+	if (lookupIdx < OptSpans.size()) {
+		UpdateState(VarName, lookupIdx);
 	}
-	return false;
+	return true;
 }
 
 /** Special Key Press */
 bool TextArea::OnSpecialKeyPress(unsigned char Key)
 {
-	int len;
-	int i;
+	size_t len = 0;
+	size_t CurPos = 0;
 
 	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
 		return false;
 	}
 	MarkDirty();
+	// TODO: implement text editing. (going to be tricky...)
 	switch (Key) {
 		case GEM_HOME:
 			CurPos = 0;
-			CurLine = 0;
 			break;
 		case GEM_UP:
-			if (CurLine) {
-				CurLine--;
-			}
 			break;
 		case GEM_DOWN:
-			if (CurLine<lines.size()) {
-				CurLine++;
-			}
 			break;
 		case GEM_END:
-			CurLine=lines.size()-1;
-			CurPos = GetRowLength((unsigned int) CurLine);
 			break;
 		case GEM_LEFT:
 			if (CurPos > 0) {
 				CurPos--;
 			} else {
-				if (CurLine) {
-					CurLine--;
-					CurPos = GetRowLength(CurLine);
-				}
+
 			}
 			break;
 		case GEM_RIGHT:
-			len = GetRowLength(CurLine);
 			if (CurPos < len) {
 				CurPos++;
 			} else {
-				if(CurLine<lines.size()) {
-					CurPos=0;
-					CurLine++;
-				}
+
 			}
 			break;
 		case GEM_DELETE:
-			len = GetRowLength(CurLine);
-			//print("len: %d Before: %s", len, lines[CurLine]);
 			if (CurPos>=len) {
-				//TODO: merge next line
 				break;
 			}
-			lines[CurLine] = (char *) realloc( lines[CurLine], len );
-			for (i = CurPos; i < len; i++) {
-				lines[CurLine][i] = lines[CurLine][i + 1];
-			}
-			//print("pos: %d After: %s", CurPos, lines[CurLine]);
 			break;
 		case GEM_BACKSP:
-			len = GetRowLength(CurLine);
 			if (CurPos != 0) {
-				//print("len: %d Before: %s", len, lines[CurLine]);
 				if (len<1) {
 					break;
 				}
-				lines[CurLine] = (char *) realloc( lines[CurLine], len );
-				for (i = CurPos; i < len; i++) {
-					lines[CurLine][i - 1] = lines[CurLine][i];
-				}
-				lines[CurLine][len - 1] = 0;
 				CurPos--;
-				//print("pos: %d After: %s", CurPos, lines[CurLine]);
 			} else {
-				if (CurLine) {
-					//TODO: merge lines
-					int oldline = CurLine;
-					CurLine--;
-					int old = GetRowLength(CurLine);
-					//print("len: %d Before: %s", old, lines[CurLine]);
-					//print("len: %d Before: %s", len, lines[oldline]);
-					lines[CurLine] = (char *) realloc (lines[CurLine], len+old);
-					memcpy(lines[CurLine]+old, lines[oldline],len);
-					free(lines[oldline]);
-					lines[CurLine][old+len]=0;
-					lines.erase(lines.begin()+oldline);
-					lrows.erase(lrows.begin()+oldline);
-					CurPos = old;
-					//print("pos: %d len: %d After: %s", CurPos, GetRowLength(CurLine), lines[CurLine]);
-				}
+
 			}
 			break;
 		 case GEM_RETURN:
 			//add an empty line after CurLine
-			//print("pos: %d Before: %s", CurPos, lines[CurLine]);
-			lrows.insert(lrows.begin()+CurLine, 0);
-			len = GetRowLength(CurLine);
+			// TODO: implement this
 			//copy the text after the cursor into the new line
-			char *str = (char *) malloc(len-CurPos+2);
-			memcpy(str, lines[CurLine]+CurPos, len-CurPos+1);
-			str[len-CurPos+1] = 0;
-			lines.insert(lines.begin()+CurLine+1, str);
+
 			//truncate the current line
-			lines[CurLine] = (char *) realloc (lines[CurLine], CurPos+1);
-			lines[CurLine][CurPos]=0;
+
 			//move cursor to next line beginning
-			CurLine++;
 			CurPos=0;
-			//print("len: %d After: %s", GetRowLength(CurLine-1), lines[CurLine-1]);
-			//print("len: %d After: %s", GetRowLength(CurLine), lines[CurLine]);
 			break;
 	}
-	CalcRowCount();
 	RunEventHandler( TextAreaOnChange );
 	return true;
 }
 
-/** Returns Row count */
-int TextArea::GetRowCount()
+int TextArea::GetRowHeight() const
 {
-	return ( int ) lines.size();
-}
-
-int TextArea::GetRowLength(unsigned int row)
-{
-	if (lines.size()<=row) {
-		return 0;
-	}
-	//this is just roughly the line size, escape sequences need to be removed
-	return strlen( lines[row] );
-}
-
-int TextArea::GetVisibleRowCount()
-{
-	return (Height-5) / ftext->maxHeight;
-}
-
-/** Returns top index */
-int TextArea::GetTopIndex()
-{
-	return startrow;
-}
-
-int TextArea::GetRowHeight()
-{
-	return ftext->maxHeight;
+	return ftext->LineHeight;
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(unsigned long y, Control* sender)
+void TextArea::ScrollToY(int y, Control* sender)
 {
 	if (sb && sender != sb) {
 		// we must "scale" the pixels
-		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep() / (double)ftext->maxHeight));
+		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep()-1 / ftext->LineHeight));
 		// sb->SetPosForY will recall this method so we dont need to do more... yet.
-	}else if(sb){
+	} else if (sb) {
 		// our scrollbar has set position for us
 		TextYPos = y;
-	}else{
+		MarkDirty();
+	} else {
 		// no scrollbar. need to call SetRow myself.
 		// SetRow will set TextYPos.
-		SetRow( y / ftext->maxHeight );
+		SetRow( y / ftext->LineHeight );
 	}
 }
 
@@ -652,97 +421,9 @@ void TextArea::ScrollToY(unsigned long y, Control* sender)
 void TextArea::SetRow(int row)
 {
 	if (row <= rows) {
-		startrow = row;
-		TextYPos = row * ftext->maxHeight;
+		TextYPos = row * GetRowHeight();
+		MarkDirty();
 	}
-	MarkDirty();
-}
-
-void TextArea::CalcRowCount()
-{
-	int tr;
-	size_t w = Width;
-
-	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
-		const char *portrait = NULL;
-		Actor *actor = NULL;
-		GameControl *gc = core->GetGameControl();
-		if (gc) {
-			Scriptable *target = gc->dialoghandler->GetTarget();
-			if (target && target->Type == ST_ACTOR) {
-				actor = (Actor *)target;
-			}
-		}
-		if (actor) {
-			portrait = actor->GetPortrait(1);
-		}
-		if (portrait) {
-			RefreshSprite(portrait);
-		}
-		if (AnimPicture) {
-			w-=AnimPicture->Width;
-		}
-	}
-
-	rows = 0;
-	if (lines.size() != 0) {
-		for (size_t i = 0; i < lines.size(); i++) {
-//			rows++;
-			tr = 0;
-			ieWord* tmp = NULL;
-			size_t len = ftext->GetDoubleByteString((unsigned char*)lines[i], tmp);
-			ftext->SetupString( tmp, w );
-			for (size_t p = 0; p <= len; p++) {
-				if (( tmp[p] ) == '[') {
-					p++;
-					//char tag[256];
-					int k = 0;
-					for (k = 0; k < 256; k++) {
-						if (tmp[p] == ']') {
-							//tag[k] = 0;
-							break;
-						}
-						p++;
-						//tag[k] = tmp[p++];
-					}
-
-					continue;
-				}
-				if (tmp[p] == 0) {
-//					if (p != len)
-//						rows++;
-					tr++;
-				}
-			}
-			lrows[i] = tr;
-			rows += tr;
-			free( tmp );
-		}
-	}
-
-	if (lines.size())
-	{
-		if (CurLine>=lines.size()) {
-			CurLine=lines.size()-1;
-		}
-		w = strlen(lines[CurLine]);
-		if (CurPos>w) {
-			CurPos = w;
-		}
-	} else {
-		CurLine=0;
-		CurPos=0;
-	}
-
-	if (!sb) {
-		return;
-	}
-	ScrollBar* bar = ( ScrollBar* ) sb;
-	tr = rows - Height/ftext->maxHeight + 1;
-	if (tr<0) {
-		tr = 0;
-	}
-	bar->SetMax( (ieWord) tr );
 }
 
 /** Mousewheel scroll */
@@ -753,199 +434,42 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 		unsigned long fauxY = TextYPos;
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
-		ScrollToY(fauxY, this);
+		ScrollToY((int)fauxY);
+		core->GetEventMgr()->FakeMouseMove();
 	}
 }
 
 /** Mouse Over Event */
-void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
+void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
-	int height = ftext->maxHeight;
-	int r = y / height;
-	int row = 0;
-
-	for (size_t i = 0; i < lines.size(); i++) {
-		row += lrows[i];
-		if (r < ( row - startrow )) {
-			if (seltext != (int) i)
-				MarkDirty();
-			seltext = ( int ) i;
-			//print("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d", ControlID, i, rows, row, r);
-			return;
-		}
-	}
-	if (seltext != -1) {
-		MarkDirty();
-	}
-	seltext = -1;
-	//print("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d", ControlID, seltext, rows, row, r);
-}
-
-/** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
-{
-	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)))
+	if (!selectOptions)
 		return;
 
-	if ((x < Width) && (y < Height - 5) && (seltext != -1)) {
-		Value = (unsigned int) seltext;
+	TextContainer* span = NULL;
+	if (selectOptions) {
+		Point p = Point(x, y);
+		p.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
+		p.y -= textContainer->ContentFrame().h - TextYPos;
+		// container only has text, so...
+		span = dynamic_cast<TextContainer*>(selectOptions->ContentAtPoint(p));
+	}
+
+	if (hoverSpan || span)
 		MarkDirty();
-		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
-			if (minrow > seltext)
-				return;
-			int idx;
-			sscanf( lines[seltext], "[s=%d,", &idx );
-			GameControl* gc = core->GetGameControl();
-			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-				if (idx==-1) {
-					//this kills this object, don't use any more data!
-					gc->dialoghandler->EndDialog();
-					return;
-				}
-				gc->dialoghandler->DialogChoose( idx );
-				return;
-			}
-		}
+
+	ClearHover();
+	if (span) {
+		hoverSpan = span;
+		hoverSpan->SetPalette(palettes[PALETTE_HOVER]);
 	}
-
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Value );
-	}
-	RunEventHandler( TextAreaOnChange );
-}
-
-void TextArea::SetText(const std::vector<char*>& text)
-{
-	Clear();
-	for (size_t i = 0; i < text.size(); i++) {
-		int newlen = strlen(text[i]);
-		char* str = (char *) malloc(newlen + 1);
-		memcpy(str, text[i], newlen + 1);
-		lines.push_back(str);
-		lrows.push_back(0);
-		CurPos = newlen;
-	}
-	CurLine = lines.size() - 1;
-	UpdateControls();
-}
-
-/** Copies the current TextArea content to another TextArea control */
-void TextArea::CopyTo(TextArea *ta)
-{
-	ta->SetText(lines);
-}
-
-void TextArea::UpdateState(const char* VariableName, unsigned int Sum)
-{
-	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-		return;
-	}
-	Value = Sum;
-	MarkDirty();
-}
-
-void TextArea::SelectText(const char *select)
-{
-	int i = lines.size();
-	while(i--) {
-		if (!stricmp(lines[i], select) ) {
-			CurLine = i;
-			if (sb) {
-				ScrollBar* bar = ( ScrollBar* ) sb;
-				bar->SetPos( i );
-			} else {
-				SetRow( i );
-			}
-			UpdateState(VarName, i);
-			CalcRowCount();
-			core->RedrawAll();
-			break;
-		}
-	}
-}
-
-const char* TextArea::QueryText() const
-{
-	if ( Value<lines.size() ) {
-		return ( const char * ) lines[Value];
-	}
-	return "";
-}
-
-bool TextArea::SetEvent(int eventType, EventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_TEXTAREA_ON_CHANGE:
-		TextAreaOnChange = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
-}
-
-void TextArea::PadMinRow()
-{
-	int row = 0;
-	int i=(int) (lines.size()-1);
-	//minrow -1 ->gap
-	//minrow -2 ->npc text
-	while (i>=minrow-2 && i>=0) {
-		row+=lrows[i];
-		i--;
-	}
-	row = GetVisibleRowCount()-row;
-	while (row>0) {
-		AppendText("",-1);
-		row--;
-	}
-}
-
-void TextArea::SetPreservedRow(int arg)
-{
-	keeplines=arg;
-	Flags |= IE_GUI_TEXTAREA_HISTORY;
-}
-
-void TextArea::Clear()
-{
-	for (size_t i = 0; i < lines.size(); i++) {
-		free( lines[i] );
-	}
-	lines.clear();
-	lrows.clear();
-	rows = 0;
-}
-
-//setting up the textarea for smooth scrolling, the first
-//TEXTAREA_OUTOFTEXT callback is called automatically
-void TextArea::SetupScroll()
-{
-	SetPreservedRow(0);
-	startrow = 0;
-	// ticks is the number of ticks it takes to scroll this font 1 px
-	ticks = 2400 / ftext->maxHeight;
-	//clearing the textarea
-	Clear();
-	unsigned int i = (unsigned int) (1 + ((Height - 1) / ftext->maxHeight)); // ceiling
-	while (i--) { //push empty lines so that the text starts out of view.
-		char *str = (char *) malloc(1);
-		str[0]=0;
-		lines.push_back(str);
-		lrows.push_back(0);
-	}
-	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
-	starttime = GetTickCount();
 }
 
 void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
-	unsigned short /*Mod*/)
+						   unsigned short /*Mod*/)
 {
 
 	ScrollBar* scrlbr = (ScrollBar*) sb;
-	
+
 	if (!scrlbr) {
 		Control *ctrl = Owner->GetScrollControl();
 		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
@@ -954,14 +478,202 @@ void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned 
 	}
 	if (scrlbr) {
 		switch(Button) {
-		case GEM_MB_SCRLUP:
-			scrlbr->ScrollUp();
-			break;
-		case GEM_MB_SCRLDOWN:
-			scrlbr->ScrollDown();
-			break;
+			case GEM_MB_SCRLUP:
+				scrlbr->ScrollUp();
+				break;
+			case GEM_MB_SCRLDOWN:
+				scrlbr->ScrollDown();
+				break;
 		}
 	}
+}
+
+/** Mouse Button Up */
+void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+						 unsigned short Button, unsigned short /*Mod*/)
+{
+	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
+		return;
+
+	if (hoverSpan) { // select the item under the mouse
+		int optIdx = 0;
+		std::vector<OptionSpan>::const_iterator it;
+		for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
+			if( (*it).second == hoverSpan ) {
+				break;
+			}
+			optIdx++;
+		}
+		UpdateState(VarName, optIdx);
+	}
+}
+
+void TextArea::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+{
+	ClearHover();
+}
+
+void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
+{
+	if (!VariableName[0] || optIdx >= OptSpans.size()) {
+		return;
+	}
+	if (!selectOptions) {
+		// no selectable options present
+		// set state to safe and return
+		ClearSelectOptions();
+		return;
+	}
+
+	// always run the TextAreaOnSelect handler even if the value hasnt changed
+	// the *context* of the value can change (dialog) and the handler will want to know 
+	Value = OptSpans[optIdx].first;
+
+	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
+	TextContainer* optspan = OptSpans[optIdx].second;
+	if (selectedSpan && selectedSpan != optspan) {
+		// reset the previous selection
+		selectedSpan->SetPalette(palettes[PALETTE_OPTIONS]);
+		MarkDirty();
+	}
+	selectedSpan = optspan;
+	selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
+
+	core->GetDictionary()->SetAt( VarName, Value );
+	RunEventHandler(TextAreaOnSelect);
+}
+
+String TextArea::QueryText() const
+{
+	if (selectedSpan) {
+		return selectedSpan->Text();
+	}
+	return textContainer->Text();
+}
+
+bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
+{
+	switch (eventType) {
+	case IE_GUI_TEXTAREA_ON_CHANGE:
+		TextAreaOnChange = handler;
+		break;
+	case IE_GUI_TEXTAREA_ON_SELECT:
+		TextAreaOnSelect = handler;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+void TextArea::ClearSelectOptions()
+{
+	OptSpans.clear();
+	contentWrapper.RemoveContent(selectOptions);
+	delete selectOptions;
+	dialogBeginNode = NULL;
+	selectOptions = NULL;
+	selectedSpan = NULL;
+	hoverSpan = NULL;
+	// also set the value to "none"
+	Value = -1;
+	UpdateScrollbar();
+}
+
+void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
+								const Color* color, const Color* hiColor, const Color* selColor)
+{
+	SetPalette(color, PALETTE_OPTIONS);
+	SetPalette(hiColor, PALETTE_HOVER);
+	SetPalette(selColor, PALETTE_SELECTED);
+
+	ClearSelectOptions(); // deletes previous options
+
+	Size optFrame(Width - (EDGE_PADDING * 2), 0);
+	optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
+	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
+	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
+
+	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
+	if (it != textContainer->Contents().rend()) {
+		dialogBeginNode = *it; // need to get the last node *before* we append anything
+		selectOptions->AppendText(L"\n"); // always want a gap between text and select options for dialog
+	}
+	for (size_t i = 0; i < opts.size(); i++) {
+		TextContainer* selOption = new TextContainer(optFrame, ftext, palettes[PALETTE_OPTIONS]);
+		if (numbered) {
+			wchar_t optNum[6];
+			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", i+1);
+			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
+			// but that should probably actually be done by the dialog handler, not here.
+			selOption->AppendContent(new TextSpan(optNum, NULL, palettes[PALETTE_SELECTED]));
+		}
+		selOption->AppendContent(new TextSpan(opts[i].second, NULL, NULL, &flexFrame));
+
+		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
+
+		selectOptions->AppendContent(selOption); // container owns the option
+		if (core->GetVideoDriver()->TouchInputEnabled()) {
+			// now add a newline for keeping the options spaced out (for touch screens)
+			selectOptions->AppendText(L"\n");
+		}
+	}
+	assert(textContainer);
+
+	contentWrapper.InsertContentAfter(selectOptions, textContainer);
+	UpdateScrollbar();
+	MarkDirty();
+}
+
+void TextArea::ClearHover()
+{
+	if (hoverSpan) {
+		if (hoverSpan == selectedSpan) {
+			hoverSpan->SetPalette(palettes[PALETTE_SELECTED]);
+		} else {
+			// reset the old hover span
+			hoverSpan->SetPalette(palettes[PALETTE_OPTIONS]);
+		}
+		hoverSpan = NULL;
+	}
+}
+
+void TextArea::ClearText()
+{
+	ClearHover();
+	contentWrapper.RemoveContent(textContainer);
+	delete textContainer;
+
+	Size frame;
+	if (sb) {
+		// if we have a scrollbar we should grow as much as needed vertically
+		// pad only on left edge
+		frame.w = Width - EDGE_PADDING;
+	} else {
+		// otherwise limit the text to our frame
+		// pad on both edges
+		frame.w = Width - (EDGE_PADDING * 2);
+	}
+
+	textContainer = new TextContainer(frame, ftext, palette);
+	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
+
+	// reset text position to top
+	ScrollToY(0);
+	UpdateScrollbar();
+}
+
+//setting up the textarea for smooth scrolling, the first
+//TEXTAREA_OUTOFTEXT callback is called automatically
+void TextArea::SetupScroll()
+{
+	// ticks is the number of ticks it takes to scroll this font 1 px
+	ticks = 2400 / ftext->LineHeight;
+	ClearText();
+	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
+	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
+	starttime = GetTickCount();
 }
 
 void TextArea::SetFocus(bool focus)
@@ -970,18 +682,6 @@ void TextArea::SetFocus(bool focus)
 	if (hasFocus && Flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
-}
-
-static bool charSorter(const char *a, const char *b) {
-	return stricmp(a, b) < 0;
-}
-
-void TextArea::SortText()
-{
-	std::list<char*> sorter(lines.begin(), lines.end());
-	sorter.sort(charSorter);
-	lines.assign(sorter.begin(), sorter.end());
-	CalcRowCount();
 }
 
 }

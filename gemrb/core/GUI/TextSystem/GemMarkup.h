@@ -1,46 +1,46 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2011 The GemRB Project
+ * Copyright (C) 2014 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
-//This class represents game fonts. Fonts are special .bam files.
-//Each cycle stands for a letter. except for numerical or "multibyte" fonts
+#ifndef GEMMARKUP_H
+#define GEMMARKUP_H
 
-#ifndef __GemRB__BAMFont__
-#define __GemRB__BAMFont__
-
-#include "AnimationFactory.h"
-#include "Font.h"
+#include "GameData.h"
+#include "TextContainer.h"
 
 namespace GemRB {
 
-class BAMFont : public Font
-{
+class GemMarkupParser {
 private:
-	AnimationFactory* factory;
+	const Font* ftext;
+	const Font* finit;
+	Palette* palette;
 
 public:
-	BAMFont(AnimationFactory* af, int* baseline = NULL);
-	~BAMFont(void);
+	GemMarkupParser() : ftext(NULL), finit(NULL), palette(NULL) {};
+	~GemMarkupParser() {
+		gamedata->FreePalette(palette);
+	};
 
-	const Sprite2D* GetCharSprite(ieWord chr) const;
+	void SetTextDefaults(const Font* ftext, const Font* finit, Palette* textCol);
+	TextSpan* ParseMarkupTag(const String&) const;
+	void ParseMarkupStringIntoContainer(const String&, TextContainer&) const;
 };
 
 }
 
-#endif /* defined(__GemRB__BAMFont__) */
+#endif

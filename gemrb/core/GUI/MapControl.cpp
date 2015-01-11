@@ -26,7 +26,6 @@
 #include "GlobalTimer.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 #include "Scriptable/Actor.h"
@@ -111,14 +110,12 @@ MapControl::MapControl(const Region& frame)
 
 MapControl::~MapControl(void)
 {
-	Video *video = core->GetVideoDriver();
-
 	if (MapMOS) {
-		video->FreeSprite(MapMOS);
+		Sprite2D::FreeSprite(MapMOS);
 	}
 	for(int i=0;i<8;i++) {
 		if (Flag[i]) {
-			video->FreeSprite(Flag[i]);
+			Sprite2D::FreeSprite(Flag[i]);
 		}
 	}
 }
@@ -242,15 +239,15 @@ void MapControl::DrawInternal(Region& rgn)
 	if (Value!=MAP_NO_NOTES) {
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
-			MapNote * mn = MyMap -> GetMapNote(i);
-			Sprite2D *anim = Flag[mn->color&7];
-			Point pos = mn->Pos;
+			const MapNote& mn = MyMap -> GetMapNote(i);
+			Sprite2D *anim = Flag[mn.color&7];
+			Point pos = mn.Pos;
 			if (convertToGame) {
-				vp.x = GAME_TO_SCREENX(mn->Pos.x);
-				vp.y = GAME_TO_SCREENY(mn->Pos.y);
+				vp.x = GAME_TO_SCREENX(mn.Pos.x);
+				vp.y = GAME_TO_SCREENY(mn.Pos.y);
 			} else { //pst style
-				vp.x = MAP_TO_SCREENX(mn->Pos.x);
-				vp.y = MAP_TO_SCREENY(mn->Pos.y);
+				vp.x = MAP_TO_SCREENX(mn.Pos.x);
+				vp.y = MAP_TO_SCREENY(mn.Pos.y);
 				pos.x = pos.x * MAP_MULT / MAP_DIV;
 				pos.y = pos.y * MAP_MULT / MAP_DIV;
 			}
@@ -263,7 +260,7 @@ void MapControl::DrawInternal(Region& rgn)
 			if (anim) {
 				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &rgn );
 			} else {
-				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn->color&7], false );
+				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn.color&7], false );
 			}
 		}
 	}
@@ -318,13 +315,13 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 		int i = MyMap -> GetMapNoteCount();
 		while (i--) {
-			MapNote * mn = MyMap -> GetMapNote(i);
-			if (Distance(mp, mn->Pos)<dist) {
+			const MapNote& mn = MyMap -> GetMapNote(i);
+			if (Distance(mp, mn.Pos)<dist) {
 				if (LinkedLabel) {
-					LinkedLabel->SetText( mn->text );
+					LinkedLabel->SetText( mn.text );
 				}
-				NotePosX = mn->Pos.x;
-				NotePosY = mn->Pos.y;
+				NotePosX = mn.Pos.x;
+				NotePosY = mn.Pos.y;
 				return;
 			}
 		}
@@ -332,7 +329,7 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		NotePosY = mp.y;
 	}
 	if (LinkedLabel) {
-		LinkedLabel->SetText( "" );
+		LinkedLabel->SetText( L"" );
 	}
 }
 
@@ -475,7 +472,7 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 	return true;
 }
 
-bool MapControl::SetEvent(int eventType, EventHandler handler)
+bool MapControl::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 		case IE_GUI_MAP_ON_PRESS:

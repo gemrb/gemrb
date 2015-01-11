@@ -15,8 +15,7 @@ DAMAGE_MAGICFIRE       137        RESISTMAGICFIRE       0x200      -1      0
 DAMAGE_PIERCINGMISSILE 133        RESISTMISSILE         0x80       -1      1
 DAMAGE_MAGICCOLD       139        RESISTMAGICCOLD       0x400      -1      0
 DAMAGE_CRUSHINGMISSILE 133        RESISTMISSILE         0x80       -1      1
-DAMAGE_STUNNING        141        0                     0x800      -1      0
+DAMAGE_STUNNING        136        0                     0x800      -1      0
 DAMAGE_SOULEATER       132        0                     0x1000     -1      0
 DAMAGE_DISEASE         141        0                     0x4000     -1      0
 DAMAGE_CHUNKING        141        0                     0x8000     -1      0
-                                                                           0

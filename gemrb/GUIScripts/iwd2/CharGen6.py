@@ -18,6 +18,7 @@
 #
 #character generation (GUICG 0)
 import GemRB
+from GUIDefines import *
 from ie_stats import *
 import CharOverview
 
@@ -27,7 +28,7 @@ def OnLoad():
 	TmpTable = GemRB.LoadTable ("ability")
 	AbilityCount = TmpTable.GetRowCount ()
 	for i in range (AbilityCount):
-		StatID=TmpTable.GetValue (i,3,2)
+		StatID = TmpTable.GetValue (i, 3, GTV_STAT)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
 
 	CharOverview.UpdateOverview(6)

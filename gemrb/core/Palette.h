@@ -43,7 +43,11 @@ struct RGBModifier {
 
 
 class GEM_EXPORT Palette {
+private:
+	~Palette() {}
 public:
+	Palette(const Color &color, const Color &back);
+
 	Palette(const Color* colours, bool alpha_=false) {
 		for (int i = 0; i < 256; ++i) {
 			col[i] = colours[i];
@@ -57,7 +61,6 @@ public:
 		refcount = 1;
 		named = false;
 	}
-	~Palette() { }
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
 	bool alpha; //< true if this is a RGBA palette

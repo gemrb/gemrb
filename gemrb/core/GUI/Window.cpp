@@ -26,8 +26,6 @@
 
 #include "win32def.h"
 
-#include "Video.h"
-
 #include "ie_cursors.h"
 
 namespace GemRB {
@@ -63,7 +61,7 @@ Window::~Window()
 		Controls.erase( m );
 		m = Controls.begin();
 	}
-	core->GetVideoDriver()->FreeSprite( BackGround );
+	Sprite2D::FreeSprite( BackGround );
 	BackGround = NULL;
 }
 /** Add a Control in the Window */
@@ -88,7 +86,7 @@ void Window::AddControl(Control* ctrl)
 void Window::SetBackGround(Sprite2D* img, bool clean)
 {
 	if (clean && BackGround) {
-		core->GetVideoDriver()->FreeSprite( this->BackGround );
+		Sprite2D::FreeSprite( this->BackGround );
 	}
 	BackGround = img;
 	Invalidate();
@@ -102,7 +100,7 @@ void Window::DrawWindow()
 	//Frame && Changed
 	if ( (Flags & (WF_FRAME|WF_CHANGED) )== (WF_FRAME|WF_CHANGED) ) {
 		Region screen( 0, 0, core->Width, core->Height );
-		video->SetClipRect( NULL );
+		video->SetScreenClip( NULL );
 		//removed this?
 		video->DrawRect( screen, ColorBlack );
 		if (core->WindowFrames[0])
@@ -116,17 +114,17 @@ void Window::DrawWindow()
 	} else if (clip_regions.size()) {
 		// clip drawing (we only do Background right now) for InvalidateForControl
 		for (unsigned int i = 0; i < clip_regions.size(); i++) {
-			Region to_clip = clip_regions[i];
-			to_clip.x += XPos;
-			to_clip.y += YPos;
-			video->SetClipRect(&to_clip);
+			Region fromClip = clip_regions[i];
+			Region toClip = fromClip;
+			toClip.x += XPos;
+			toClip.y += YPos;
 			if (BackGround) {
-				video->BlitSprite( BackGround, XPos, YPos, true );
+				video->BlitSprite( BackGround, fromClip, toClip);
 			}
 		}
 	}
 	clip_regions.clear();
-	video->SetClipRect( &clip );
+	video->SetScreenClip( &clip );
 	//Float || Changed
 	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
 		video->BlitSprite( BackGround, XPos, YPos, true );
@@ -139,7 +137,7 @@ void Window::DrawWindow()
 		Color black = { 0, 0, 0, 128 };
 		video->DrawRect(clip, black);
 	}
-	video->SetClipRect( NULL );
+	video->SetScreenClip( NULL );
 	Flags &= ~WF_CHANGED;
 }
 
@@ -264,10 +262,11 @@ bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
 	return false;
 }
 
-void Window::DelControl(unsigned short i)
+Control* Window::RemoveControl(unsigned short i)
 {
 	if (i < Controls.size() ) {
 		Control *ctrl = Controls[i];
+		InvalidateForControl(ctrl);
 		if (ctrl==lastC) {
 			lastC=NULL;
 		}
@@ -280,10 +279,10 @@ void Window::DelControl(unsigned short i)
 		if (ctrl==lastMouseFocus) {
 			lastMouseFocus=NULL;
 		}
-		delete ctrl;
 		Controls.erase(Controls.begin()+i);
+		return ctrl;
 	}
-	Invalidate();
+	return NULL;
 }
 
 Control* Window::GetDefaultControl(unsigned int ctrltype) const
@@ -395,7 +394,7 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 					break;
 			}
 		} else if (( *m )->ControlType == IE_GUI_TEXTAREA) {
-			if (( *m )->ControlID == TAID) {
+			if (( *m )->ControlID == TAID || TAID == (ieWord)-1) {
 				ta = ( TextArea * ) ( *m );
 				if (sb != NULL)
 					break;

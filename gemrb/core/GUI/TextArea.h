@@ -18,38 +18,34 @@
  *
  */
 
-/**
- * @file TextArea.h
- * Declares TextArea widget for displaying long paragraphs of text
- * @author The GemRB Project
- */
-
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
 #include "GUI/Control.h"
 #include "GUI/ScrollBar.h"
+#include "GUI/TextSystem/Font.h"
+#include "GUI/TextSystem/TextContainer.h"
 
 #include "RGBAColor.h"
 #include "exports.h"
 
-#include "Font.h"
+#include <vector>
 
 namespace GemRB {
 
 // Keep these synchronized with GUIDefines.py
 // 0x05 is the control type of TextArea
-#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000
+#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000 // text change event (keyboard, etc)
+#define IE_GUI_TEXTAREA_ON_SELECT	0x05000001 // selection event such as dialog or a listbox
 
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
-#define IE_GUI_TEXTAREA_SELECTABLE   1
-#define IE_GUI_TEXTAREA_AUTOSCROLL   2
-#define IE_GUI_TEXTAREA_SMOOTHSCROLL 4
-#define IE_GUI_TEXTAREA_HISTORY      8
-#define IE_GUI_TEXTAREA_SPEAKER      16
-#define IE_GUI_TEXTAREA_ALT_FONT     32   //this one disables drop capitals
-#define IE_GUI_TEXTAREA_EDITABLE     64
+#define IE_GUI_TEXTAREA_AUTOSCROLL   1
+#define IE_GUI_TEXTAREA_SMOOTHSCROLL 2	// chapter text
+#define IE_GUI_TEXTAREA_HISTORY      4	// message window
+#define IE_GUI_TEXTAREA_EDITABLE     8
+
+typedef std::pair<int, String> SelectOption;
 
 /**
  * @class TextArea
@@ -64,99 +60,84 @@ protected:
 	bool NeedsDraw();
 	bool HasBackground() { return false; }
 public:
-	TextArea(const Region& frame, Color hitextcolor, Color initcolor, Color lowtextcolor);
+	TextArea(const Region& frame, Font* text);
+	TextArea(const Region& frame, Font* text, Font* caps,
+			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
-	/** global configuration */
-	static void SetNoteString(const char *s);
-	/** Set the TextArea value to the line number containing the string parameter */
-	void SelectText(const char *select);
+
 	/** Sets the Actual Text */
-	void SetText(const char* text);
-	/** Sets text */
-	void SetText(const std::vector<char*>& text);
+	void SetText(const String& text);
 	/** Clears the textarea */
-	void Clear();
-	/** Discards scrolled out lines from the textarea */
-	/** preserving 'keeplines' lines for scroll back history */
-	void DiscardLines();
+	void ClearText();
+	void ClearHover();
 	/** Appends a String to the current Text */
-	int AppendText(const char* text, int pos = 0);
-	/** Deletes `count' lines (either last or top lines)*/
-	void PopLines(unsigned int count, bool top = false);
-	/** Deletes last lines up to current 'minrow' */
-	void PopMinRow()
-	{
-		PopLines((unsigned int) (lines.size()-minrow));
-	}
-	/** adds empty lines so minrow will be the uppermost visible row */
-	void PadMinRow();
+	void AppendText(const String& text);
+	/** Inserts a String into the current Text at pos */
+	// int InsertText(const char* text, int pos);
 	/** Sets up auto scrolling (chapter text) */
 	void SetupScroll();
 	/** Per Pixel scrolling */
-	void ScrollToY(unsigned long y, Control* sender);
-	/** Sets the Fonts */
-	void SetFonts(Font* init, Font* text);
-	/** Returns Number of Rows */
-	int GetRowCount();
-	/** Returns the length of a Row */
-	int GetRowLength(unsigned int row);
-	/** Returns Number of Visible Rows */
-	int GetVisibleRowCount();
-	/** Returns Starting Row */
-	int GetTopIndex();
+	void ScrollToY(int y, Control* sender = NULL);
+
 	/** Returns total height of the text */
-	int GetRowHeight();
+	int GetRowHeight() const;
+	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
+						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Starting Row */
 	void SetRow(int row);
-	/** Sets preserved lines */
-	void SetPreservedRow(int arg);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	/** Set Minimum Selectable Row (to the current ceiling) */
-	void SetMinRow(bool enable);
-	/** Copies the current TextArea content to another TextArea control */
-	void CopyTo(TextArea* ta);
+	void SetAnimPicture(Sprite2D* Picture);
+
 	/** Returns the selected text */
-	const char* QueryText() const;
+	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(const char* VariableName, unsigned int Sum);
+	void UpdateState(const char* VariableName, unsigned int optIdx);
 	int SetScrollBar(Control *ptr);
-	void SortText();
 private: // Private attributes
-	std::vector< char*> lines;
-	std::vector< int> lrows;
-	int seltext;
-	/** minimum selectable row */
-	int minrow;
-	/** lines to be kept even if scrolled out */
-	int keeplines;
-	unsigned long TextYPos;
+	// dialog and listbox handling
+	typedef std::pair<int, TextContainer*> OptionSpan;
+	std::vector<OptionSpan> OptSpans;
+	TextContainer* hoverSpan, *selectedSpan;
+	const Content* dialogBeginNode;
+	// dialog options container
+	TextContainer* selectOptions;
+	// standard text display container
+	TextContainer* textContainer;
+	// wrapper containing both of the above
+	ContentContainer contentWrapper;
+
+	int TextYPos;
 	/** timer for scrolling */
 	unsigned long starttime;
 	/** timer ticks for scrolling (speed) */
 	unsigned long ticks;
 	/** Number of Text Rows */
 	int rows;
-	/** Starting Row */
-	int startrow;
-	/** Text Colors */
-	Palette* palette;
-	Palette* initpalette;
-	Palette* selected;
-	Palette* lineselpal;
 
 	/** Fonts */
 	Font* finit, * ftext;
-	ieResRef PortraitResRef;
 
-	/** Text Editing Cursor Sprite */
-	Sprite2D* Cursor;
-	unsigned short CurPos, CurLine;
+	/** OnChange Scripted Event Function Name */
+	ControlEventHandler TextAreaOnChange;
+	ControlEventHandler TextAreaOnSelect;
 
 private: //internal functions
-	void CalcRowCount();
-	void UpdateControls();
-	void RefreshSprite(const char *portrait);
+	enum PALETTE_TYPE {
+		PALETTE_NORMAL = 0,	// standard text color
+		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
+		PALETTE_HOVER,		// palette for hovering options (dialog/listbox)
+		PALETTE_SELECTED,	// selected list box/dialog option.
+		PALETTE_INITIALS,	// palette for finit. used only is some cases.
+
+		PALETTE_TYPE_COUNT
+	};
+	Palette* palettes[PALETTE_TYPE_COUNT];
+	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
+
+	void Init();
+	void SetPalette(const Color*, PALETTE_TYPE);
+	void UpdateScrollbar();
 
 public: //Events
 	/** Key Press Event */
@@ -168,16 +149,17 @@ public: //Events
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseUp(unsigned short x, unsigned short y,
+				   unsigned short Button, unsigned short Mod);
 	/** Mouse button down*/
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseDown(unsigned short x, unsigned short y,
+					 unsigned short Button, unsigned short Mod);
+	void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
-	/** OnChange Scripted Event Function Name */
-	EventHandler TextAreaOnChange;
+
+	void ClearSelectOptions();
 };
 
 }

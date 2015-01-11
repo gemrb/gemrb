@@ -15,7 +15,6 @@ Return value:
 The tooltip's visual properties must be set in the gemrb.ini file:
   TooltipFont - Font used to display tooltips
   TooltipBack - Sprite displayed behind the tooltip text, if any
-  TooltipColor - Tooltip text color (RGBA)
   TooltipMargin - Space between tooltip text and sides of TooltipBack (x2)
 
 

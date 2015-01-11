@@ -48,6 +48,10 @@ FREETYPE_VERSIONNUM(FREETYPE_MAJOR, FREETYPE_MINOR, FREETYPE_PATCH)
 #define FREETYPE_VERSION_ATLEAST(X, Y, Z) \
 (FREETYPE_COMPILEDVERSION >= FREETYPE_VERSIONNUM(X, Y, Z))
 
+/* Handy routines for converting from fixed point */
+#define FT_FLOOR(X)	((X & -64) / 64)
+#define FT_CEIL(X)	(((X + 63) & -64) / 64)
+
 namespace GemRB {
 	void LogFTError(FT_Error errCode);
 }

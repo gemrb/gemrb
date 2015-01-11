@@ -75,12 +75,12 @@ public:
 	Sprite2D *GetMapIcon(AnimationFactory *bam, bool overridePalette);
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
-	const char* GetCaption();
+	const String* GetCaption();
 	const char* GetTooltip();
 private:
 	ieDword AreaStatus;
 	Sprite2D *MapIcon;
-	char *StrCaption;
+	String* StrCaption;
 	char *StrTooltip;
 	bool SingleFrame;
 

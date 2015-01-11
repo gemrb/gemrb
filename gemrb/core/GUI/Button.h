@@ -29,11 +29,10 @@
 #define BUTTON_H
 
 #include "GUI/Control.h"
+#include "GUI/TextSystem/Font.h"
+#include "Sprite2D.h"
 
 #include "exports.h"
-
-#include "Font.h"
-#include "Sprite2D.h"
 
 #include <list>
 
@@ -143,7 +142,8 @@ public:
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
-	void SetText(const char* string);
+	using Control::SetText;
+	void SetText(const String& string);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
 	/** Clears the list of Pictures */
@@ -177,18 +177,18 @@ public: // Public Events
 	/** A special key has been pressed */
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** Button Pressed Event Script Function Name */
-	EventHandler ButtonOnPress;
-	EventHandler ButtonOnShiftPress;
-	EventHandler ButtonOnRightPress;
-	EventHandler ButtonOnDoublePress;
-	EventHandler ButtonOnDragDrop;
-	EventHandler ButtonOnDragDropPortrait;
-	EventHandler ButtonOnDrag;
-	EventHandler MouseEnterButton;
-	EventHandler MouseLeaveButton;
-	EventHandler MouseOverButton;
+	ControlEventHandler ButtonOnPress;
+	ControlEventHandler ButtonOnShiftPress;
+	ControlEventHandler ButtonOnRightPress;
+	ControlEventHandler ButtonOnDoublePress;
+	ControlEventHandler ButtonOnDragDrop;
+	ControlEventHandler ButtonOnDragDropPortrait;
+	ControlEventHandler ButtonOnDrag;
+	ControlEventHandler MouseEnterButton;
+	ControlEventHandler MouseLeaveButton;
+	ControlEventHandler MouseOverButton;
 	/** Refreshes the button from a radio group */
 	void UpdateState(const char* VariableName, unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */
@@ -200,7 +200,7 @@ public: // Public Events
 	/** Set offset pictures and label move when button is pressed */
 	void SetPushOffset(ieWord x, ieWord y);
 private: // Private attributes
-	char* Text;
+	String Text;
 	bool hasText;
 	Font* font;
 	bool ToggleState;

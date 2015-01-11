@@ -65,16 +65,6 @@ def OnLoad():
 
 	UpdateControlStatus()
 
-def ScrollUp ():
-	TMessageWindow = GemRB.GetVar("MessageWindow")
-	TMessageTA = GUIClasses.GTextArea(TMessageWindow,GemRB.GetVar("MessageTextArea"))
-	TMessageTA.Scroll(-1)
-
-def ScrollDown ():
-	TMessageWindow = GemRB.GetVar("MessageWindow")
-	TMessageTA = GUIClasses.GTextArea(TMessageWindow,GemRB.GetVar("MessageTextArea"))
-	TMessageTA.Scroll(1)
-
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton, TMessageTA
 
@@ -88,8 +78,6 @@ def UpdateControlStatus():
 	#a dialogue is running, setting messagewindow size to maximum
 	if Override:
 		Expand = GS_LARGEDIALOG
-
-	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
@@ -112,22 +100,20 @@ def UpdateControlStatus():
 		TMessageTA = TMessageWindow.GetControl(3)		
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
-		#up button (instead of scrollbar)
-		Button = TMessageWindow.GetControl(0)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ScrollUp)
-		#down button (instead of scrollbar)
-		Button = TMessageWindow.GetControl(1)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ScrollDown)
-
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL)
-	TMessageTA.SetHistory(100)
+		# replace the up/down buttons with a scrollbar
+		TMessageWindow.DeleteControl(0);
+		TMessageWindow.DeleteControl(1);
+		ScrollBar = TMessageWindow.CreateScrollBar (1000, 467,10, 11,29)
+		ScrollBar.SetDefaultScrollBar()
 
 	hideflag = GemRB.HideGUI()
+	MessageWindow = GemRB.GetVar("MessageWindow")
 	MessageTA = GUIClasses.GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
-	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
-		MessageTA.MoveText(TMessageTA)
+	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
+		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
 
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
 	if Override:

@@ -154,7 +154,7 @@ private:
 	unsigned long AIUpdateCounter;
 	int ScreenFlags;
 	int DialogueFlags;
-	char *DisplayText;
+	String* DisplayText;
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
 public: //Events
@@ -184,7 +184,7 @@ public: //Events
 	void SetDialogueFlags(int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
-	void SetDisplayText(char *text, unsigned int time);
+	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	/* centers viewport to the points specified */
 	void Center(unsigned short x, unsigned short y);
@@ -261,7 +261,7 @@ public:
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
 	void SetupCasting(ieResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	void ToggleAlwaysRun();
 };
 

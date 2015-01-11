@@ -36,16 +36,12 @@ def OnLoad ():
 	MovieWindow = GemRB.LoadWindow (0)
 	MovieWindow.SetFrame ()
 	TextAreaControl = MovieWindow.GetControl (0)
-	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	PlayButton = MovieWindow.GetControl (2)
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)
 	MoviesTable = GemRB.LoadTable ("MOVIDESC")
-	for i in range (0, MoviesTable.GetRowCount () ):
-		t = MoviesTable.GetRowName (i)
-		if GemRB.GetVar(t)==1:
-			s = MoviesTable.GetValue (i, 0)
-			TextAreaControl.Append (s,-1)
+	opts = [MoviesTable.GetValue (i, 0) for i in range (0, MoviesTable.GetRowCount () ) if GemRB.GetVar(MoviesTable.GetRowName (i))==1]
+	TextAreaControl.SetOptions(opts)
 	TextAreaControl.SetVarAssoc ("MovieIndex",0)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)

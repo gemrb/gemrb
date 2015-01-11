@@ -132,54 +132,43 @@ def DisplayOverview(step):
 		if part == 1:
 			TextAreaControl= CharGenWindow.GetControl (9)
 			if step == 1:
-				TextAreaControl.SetText ("[capital=0]" + GemRB.GetString(16575))
+				TextAreaControl.SetText (GemRB.GetString(16575))
 			elif step == 9:
-				TextAreaControl.SetText ("[capital=0]" + GemRB.GetString(1047))
-			else:
-				TextAreaControl.SetText ("[capital=0]" + GemRB.GetString(12135))
+				TextAreaControl.SetText ("")
 		elif part == 2:
-			TextAreaControl.Append (": ")
 			if step == 9:
-				TextAreaControl.Append (GemRB.GetToken ("CHARNAME") )
-				TextAreaControl.Append (12135, -1)
-				TextAreaControl.Append (": ")
+				TextAreaControl.Append (GemRB.GetString(1047) + ": " + GemRB.GetToken ("CHARNAME") + "\n")
+				
 			if GemRB.GetPlayerStat (MyChar, IE_SEX) == 1:
-				TextAreaControl.Append (1050)
+				gender = GemRB.GetString (1050)
 			else:
-				TextAreaControl.Append (1051)
+				gender = GemRB.GetString (1051)
+			TextAreaControl.Append (GemRB.GetString(12135) + ": " + gender + "\n")
 		elif part == 3:
-			TextAreaControl.Append (1048, -1) # new line
-			TextAreaControl.Append (": ")
 			stat = GemRB.GetPlayerStat(MyChar, IE_RACE)
 			v = CommonTables.Races.FindValue (3, stat)
-			TextAreaControl.Append (CommonTables.Races.GetValue (v,2) )
+			TextAreaControl.Append (GemRB.GetString (1048) + ": " + CommonTables.Races.GetValue (v, 2, GTV_REF) + "\n")
 		elif part == 4:
-			TextAreaControl.Append (12136, -1)
-			TextAreaControl.Append (": ")
 			ClassTitle = GUICommon.GetActorClassTitle (MyChar)
-			TextAreaControl.Append (ClassTitle)
+			TextAreaControl.Append (GemRB.GetString(12136) + ": " + ClassTitle + "\n")
 		elif part == 5:
-			TextAreaControl.Append (1049, -1)
-			TextAreaControl.Append (": ")
 			stat = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 			v = CommonTables.Aligns.FindValue (3, stat)
-			TextAreaControl.Append (CommonTables.Aligns.GetValue (v,2))
+			TextAreaControl.Append (GemRB.GetString(1049) + ": " + CommonTables.Aligns.GetValue (v, 2, GTV_REF) + "\n")
 		elif part == 6:
 			TextAreaControl.Append ("\n")
 			ClassName = GUICommon.GetClassRowName (MyChar)
 			hasextra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
-				v = AbilityTable.GetValue (i, 2)
-				TextAreaControl.Append (v, -1)
+				v = AbilityTable.GetValue (i, 2, GTV_REF)
 				StatID = AbilityTable.GetValue (i, 3)
 				stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if (i == 0) and hasextra and (stat==18):
-					TextAreaControl.Append (": " + str(stat) +"/"+str(strextra) )
+					TextAreaControl.Append (v + ": " + str(stat) + "/" + str(strextra) + "\n")
 				else:
-					TextAreaControl.Append (": " + str(stat) )
+					TextAreaControl.Append (v + ": " + str(stat) + "\n")
 		elif part == 7:
-			TextAreaControl.Append ("\n\n")
 			# thieving and other skills
 			info = ""
 			SkillTable = GemRB.LoadTable ("skills")
@@ -207,9 +196,7 @@ def DisplayOverview(step):
 					if value > 0:
 						info += name + ": " + str(value) + "\n"
 			if info != "":
-				info = "\n" + info + "\n"
-				TextAreaControl.Append (8442)
-				TextAreaControl.Append (info)
+				TextAreaControl.Append (GemRB.GetString(8442) + info)
 
 			# arcane spells
 			info = ""
@@ -219,9 +206,7 @@ def DisplayOverview(step):
 					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
-				info = "\n" + info + "\n"
-				TextAreaControl.Append (11027)
-				TextAreaControl.Append (info)
+				TextAreaControl.Append ( GemRB.GetString(11027) + info)
 
 			# divine spells
 			info = ""
@@ -231,9 +216,7 @@ def DisplayOverview(step):
 					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
-				info = "\n" + info + "\n"
-				TextAreaControl.Append (11028)
-				TextAreaControl.Append (info)
+				TextAreaControl.Append (GemRB.GetString(11028) + info)
 
 			# racial enemy
 			info = ""
@@ -243,9 +226,7 @@ def DisplayOverview(step):
 				Row = HateRaceTable.FindValue (1, Race)
 				info = HateRaceTable.GetValue (Row, 0, GTV_REF)
 				if info != "":
-					info = "\n" + info + "\n\n"
-					TextAreaControl.Append (15982)
-					TextAreaControl.Append (info)
+					TextAreaControl.Append (GemRB.GetString(15982) + info)
 
 			# weapon proficiencies
 			TextAreaControl.Append (9466)

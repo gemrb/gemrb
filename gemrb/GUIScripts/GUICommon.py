@@ -212,7 +212,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 	for i in range(iMin, iMax):
 		# apply each spell from each new class
 		for j in range (jMin, jMax):
-			ab = TmpTable.GetValue (i, j, 0)
+			ab = TmpTable.GetValue (i, j, GTV_STR)
 			if ab and ab != "****":
 				# seems all SPINs act like GA_*
 				if ab[:4] == "SPIN":
@@ -236,7 +236,7 @@ def MakeSpellCount (pc, spell, count):
 		return
 	# only used for innates, which are all level 1
 	import Spellbook
-	Spellbook.LearnSpell (pc, spell, IE_IWD2_TYPE_INNATE, 0, count-have, LS_MEMO)
+	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count-have, LS_MEMO)
 	return
 	
 # remove all class abilities up to the given level
@@ -256,7 +256,7 @@ def RemoveClassAbilities (pc, table, Level):
 
 	for i in range(TmpTable.GetRowCount ()):
 		for j in range (jMax):
-			ab = TmpTable.GetValue (i, j, 0)
+			ab = TmpTable.GetValue (i, j, GTV_STR)
 			if ab and ab != "****":
 				# get the index
 				SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
@@ -397,8 +397,7 @@ def GetActorClassTitle (actor):
 		Dual = IsDualClassed (actor, 1)
 
 		if Multi and Dual[0] == 0: # true multi class
-			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
-			ClassTitle = GemRB.GetString (ClassTitle)
+			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
 		else:
 			if Dual[0]: # dual class
 				# first (previous) kit or class of the dual class
@@ -406,7 +405,9 @@ def GetActorClassTitle (actor):
 					ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
 				elif Dual[0] == 2:
 					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
-				ClassTitle = GemRB.GetString (ClassTitle) + " / "
+				if ClassTitle != "*":
+					ClassTitle = GemRB.GetString (ClassTitle)
+				ClassTitle += " / "
 				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
 			else: # ordinary class or kit
 				if KitIndex:

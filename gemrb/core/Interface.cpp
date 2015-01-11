@@ -56,6 +56,7 @@
 #include "Palette.h"
 #include "PluginLoader.h"
 #include "PluginMgr.h"
+#include "Predicates.h"
 #include "ProjectileServer.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
@@ -222,25 +223,16 @@ Interface::Interface()
 	GameDataPath[0] = 0;
 
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
-	CopyResRef( ButtonFont, "STONESML" );
-	CopyResRef( TooltipFont, "STONESML" );
-	CopyResRef( MovieFont, "STONESML" );
-	CopyResRef( ScrollCursorBam, "CURSARW" );
+
 	CopyResRef( GlobalScript, "BALDUR" );
 	CopyResRef( WorldMapName[0], "WORLDMAP" );
 	CopyResRef( WorldMapName[1], "" );
-	CopyResRef( Palette16, "MPALETTE" );
-	CopyResRef( Palette32, "PAL32" );
-	CopyResRef( Palette256, "MPAL256" );
-	strcpy( TooltipBackResRef, "\0" );
+
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		CopyResRef(GroundCircleBam[size], "");
 		GroundCircleScale[size] = 0;
 	}
-	TooltipColor.r = 0;
-	TooltipColor.g = 255;
-	TooltipColor.b = 0;
-	TooltipColor.a = 255;
+
 	TooltipMargin = 10;
 
 	TooltipBack = NULL;
@@ -255,30 +247,14 @@ Interface::Interface()
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
 	AreaAliasTable = NULL;
-	ItemExclTable = NULL;
-	ItemDialTable = NULL;
-	ItemDial2Table = NULL;
-	ItemTooltipTable = NULL;
 	update_scripts = false;
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
-	TLKEncoding.multibyte = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
-}
-
-#define FreeResourceVector(type, variable) \
-{ \
-	size_t i=variable.size(); \
-	while(i--) { \
-		if (variable[i]) { \
-		delete variable[i]; \
-		} \
-	} \
-	variable.clear(); \
 }
 
 //2da lists are ieDword lists allocated by malloc
@@ -336,11 +312,6 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 	}
 }
 
-static void ReleaseItemTooltip(void *poi)
-{
-	free(poi);
-}
-
 Interface::~Interface(void)
 {
 	DragItem(NULL,NULL);
@@ -377,7 +348,9 @@ Interface::~Interface(void)
 	}
 	SurgeSpells.clear();
 
-	FreeResourceVector( Font, fonts );
+	std::map<ResRef, Font*>::iterator fit = fonts.begin();
+	for (; fit != fonts.end(); ++fit)
+		delete (*fit).second;
 	// fonts need to be destroyed before TTF plugin
 	PluginMgr::Get()->RunCleanup();
 
@@ -396,12 +369,14 @@ Interface::~Interface(void)
 
 	if (Cursors) {
 		for (int i = 0; i < CursorCount; i++) {
-			video->FreeSprite( Cursors[i] );
+			Sprite2D::FreeSprite( Cursors[i] );
 		}
 		delete[] Cursors;
 	}
 
-	FreeResourceVector( Window, windows );
+	std::vector<Window*>::iterator wit = windows.begin();
+	for (; wit != windows.end(); ++wit) \
+		delete *wit;
 
 	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
@@ -428,23 +403,23 @@ Interface::~Interface(void)
 	if (video) {
 
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			video->FreeSprite(FogSprites[i]);
+			Sprite2D::FreeSprite(FogSprites[i]);
 		}
 
 		for(i=0;i<4;i++) {
-			video->FreeSprite(WindowFrames[i]);
+			Sprite2D::FreeSprite(WindowFrames[i]);
 		}
 
 		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 			for(i=0;i<6;i++) {
-				video->FreeSprite(GroundCircles[size][i]);
+				Sprite2D::FreeSprite(GroundCircles[size][i]);
 			}
 		}
 
 		if (TooltipBack) {
 			for(i=0;i<3;i++) {
 				//freesprite checks for null pointer
-				video->FreeSprite(TooltipBack[i]);
+				Sprite2D::FreeSprite(TooltipBack[i]);
 			}
 			delete[] TooltipBack;
 		}
@@ -470,22 +445,6 @@ Interface::~Interface(void)
 		RtRows->RemoveAll(ReleaseItemList);
 		delete RtRows;
 	}
-	if (ItemExclTable) {
-		ItemExclTable->RemoveAll(NULL);
-		delete ItemExclTable;
-	}
-	if (ItemDialTable) {
-		ItemDialTable->RemoveAll(NULL);
-		delete ItemDialTable;
-	}
-	if (ItemDial2Table) {
-		ItemDial2Table->RemoveAll(NULL);
-		delete ItemDial2Table;
-	}
-	if (ItemTooltipTable) {
-		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
-		delete ItemTooltipTable;
-	}
 
 	Map::ReleaseMemory();
 	Actor::ReleaseMemory();
@@ -503,7 +462,7 @@ Interface::~Interface(void)
 
 void Interface::SetWindowFrame(int i, Sprite2D *Picture)
 {
-	video->FreeSprite(WindowFrames[i]);
+	Sprite2D::FreeSprite(WindowFrames[i]);
 	WindowFrames[i]=Picture;
 }
 
@@ -518,7 +477,6 @@ GameControl* Interface::StartGameControl()
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(Region(0, 0, Width, Height));
-	gc->Owner = gamewin;
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
 	gamewin->AddControl( gc );
@@ -669,14 +627,16 @@ void Interface::HandleFlags()
 			EventFlag|=EF_EXPANSION;
 			timer->Init();
 
-			//rearrange party slots
-			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
+
 			//switch map to protagonist
 			Actor* actor = GetFirstSelectedPC(true);
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}
+
+			//rearrange party slots
+			game->ConsolidateParty();
 		} else {
 			Log(ERROR, "Core", "No game to enter...");
 			QuitFlag = QF_QUITGAME;
@@ -812,11 +772,13 @@ bool Interface::ReadSpecialSpells()
 	AutoTable table("splspec");
 	if (table) {
 		SpecialSpellsCount = table->GetRowCount();
-		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
+		SpecialSpells = (SpecialSpellType *) malloc( sizeof(SpecialSpellType) * SpecialSpellsCount);
 		for (i=0;i<SpecialSpellsCount;i++) {
 			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
-			SpecialSpells[i].value = atoi(table->QueryField(i,0) );
+			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
+			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
+			SpecialSpells[i].bonus_limit = atoi(table->QueryField(i, 2));
 		}
 	} else {
 		result = false;
@@ -842,7 +804,7 @@ int Interface::GetSpecialSpell(const ieResRef resref)
 {
 	for (int i=0;i<SpecialSpellsCount;i++) {
 		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
-			return SpecialSpells[i].value;
+			return SpecialSpells[i].flags;
 		}
 	}
 	return 0;
@@ -873,136 +835,10 @@ int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
 	return 0;
 }
 
-bool Interface::ReadAuxItemTables()
-{
-	int idx;
-	bool flag = true;
-
-	if (ItemExclTable) {
-		ItemExclTable->RemoveAll(NULL);
-	} else {
-		ItemExclTable = new Variables();
-		ItemExclTable->SetType(GEM_VARIABLES_INT);
-	}
-
-	AutoTable aa;
-
-	//don't report error when the file doesn't exist
-	if (aa.load("itemexcl")) {
-		idx = aa->GetRowCount();
-		while (idx--) {
-			ieResRef key;
-
-			strnlwrcpy(key,aa->GetRowName(idx),8);
-			ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
-			ItemExclTable->SetAt(key, value);
-		}
-	}
-	if (ItemDialTable) {
-		ItemDialTable->RemoveAll(NULL);
-	} else {
-		ItemDialTable = new Variables();
-		ItemDialTable->SetType(GEM_VARIABLES_INT);
-	}
-	if (ItemDial2Table) {
-		ItemDial2Table->RemoveAll(NULL);
-	} else {
-		ItemDial2Table = new Variables();
-		ItemDial2Table->SetType(GEM_VARIABLES_STRING);
-	}
-
-	//don't report error when the file doesn't exist
-	if (aa.load("itemdial")) {
-		idx = aa->GetRowCount();
-		while (idx--) {
-			ieResRef key, dlgres;
-
-			strnlwrcpy(key,aa->GetRowName(idx),8);
-			ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
-			ItemDialTable->SetAt(key, value);
-			strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
-			ItemDial2Table->SetAtCopy(key, dlgres);
-		}
-	}
-
-	if (ItemTooltipTable) {
-		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
-	} else {
-		ItemTooltipTable = new Variables();
-		ItemTooltipTable->SetType(GEM_VARIABLES_POINTER);
-	}
-
-	//don't report error when the file doesn't exist
-	if (aa.load("tooltip")) {
-		idx = aa->GetRowCount();
-		while (idx--) {
-			ieResRef key;
-			int *tmppoi = (int *) malloc(sizeof(int)*3);
-
-			strnlwrcpy(key,aa->GetRowName(idx),8);
-			for (int i=0;i<3;i++) {
-				tmppoi[i] = atoi(aa->QueryField(idx,i));
-			}
-			ItemTooltipTable->SetAt(key, (void*)tmppoi);
-		}
-	}
-	return flag;
-}
-
 //Static
 const char *Interface::GetDeathVarFormat()
 {
 	return DeathVarFormat;
-}
-
-int Interface::GetItemExcl(const ieResRef itemname) const
-{
-	ieDword value;
-
-	if (ItemExclTable && ItemExclTable->Lookup(itemname, value)) {
-		return (int) value;
-	}
-	return 0;
-}
-
-int Interface::GetItemTooltip(const ieResRef itemname, int header, int identified)
-{
-	int *value = NULL;
-
-	if (ItemTooltipTable) {
-		void* lookup = NULL;
-		ItemTooltipTable->Lookup(itemname, lookup);
-		value = (int*)lookup;
-	}
-	if (value && (value[header]>=0)) {
-		return value[header];
-	}
-	Item *item = gamedata->GetItem(itemname, true);
-	if (!item) {
-		return -1;
-	}
-	int ret = identified?item->ItemNameIdentified:item->ItemName;
-	gamedata->FreeItem(item, itemname, 0);
-	return ret;
-}
-
-int Interface::GetItemDialStr(const ieResRef itemname) const
-{
-	ieDword value;
-
-	if (ItemDialTable && ItemDialTable->Lookup(itemname, value)) {
-		return (int) value;
-	}
-	return -1;
-}
-
-//second value is the item dialog resource returned by this method
-int Interface::GetItemDialRes(const ieResRef itemname, ieResRef retval) const
-{
-	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval, sizeof(ieResRef))) {
-		return 1;
-	}
-	return 0;
 }
 
 bool Interface::ReadAreaAliasTable(const ieResRef tablename)
@@ -1129,14 +965,15 @@ void Interface::Main()
 		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
 	}
 
-	Font* fps = GetFont( ( unsigned int ) 0 );
+	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	const Region fpsRgn( 0, Height - 30, 100, 30 );
-	char fpsstring[40]={"???.??? fps"};
+	wchar_t fpsstring[20] = {L"???.??? fps"};
+
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
 	double frames = 0.0;
-	Palette* palette = CreatePalette( ColorWhite, ColorBlack );
+	Palette* palette = new Palette( ColorWhite, ColorBlack );
 	do {
 		//don't change script when quitting is pending
 
@@ -1158,15 +995,14 @@ void Interface::Main()
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
-				sprintf( fpsstring, "%.3f fps", frames );
+				swprintf(fpsstring, sizeof(fpsstring)/sizeof(fpsstring[0]), L"%.3f fps", frames);
 			}
 			video->DrawRect( fpsRgn, ColorBlack );
-			fps->Print( fpsRgn,
-				( unsigned char * ) fpsstring, palette,
-				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
+			fps->Print( fpsRgn, String(fpsstring), palette,
+					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
 		}
 		if (TickHook)
-			TickHook->call();
+			TickHook();
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 	gamedata->FreePalette( palette );
 }
@@ -1275,7 +1111,7 @@ int Interface::LoadSprites()
 	{
 		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
 		FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		video->FreeSprite( tmpsprite );
+		Sprite2D::FreeSprite( tmpsprite );
 	}
 
 	FogSprites[26] = NULL;
@@ -1284,7 +1120,7 @@ int Interface::LoadSprites()
 	{
 		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
 		FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		video->FreeSprite( tmpsprite );
+		Sprite2D::FreeSprite( tmpsprite );
 	}
 
 	i = 0;
@@ -1293,7 +1129,7 @@ int Interface::LoadSprites()
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 			if (FogSprites[i]) {
 				Sprite2D* alphasprite = video->CreateAlpha( FogSprites[i] );
-				video->FreeSprite ( FogSprites[i] );
+				Sprite2D::FreeSprite ( FogSprites[i] );
 				FogSprites[i] = alphasprite;
 			}
 		}
@@ -1301,12 +1137,13 @@ int Interface::LoadSprites()
 
 	// Load ground circle bitmaps (PST only)
 	//block required due to msvc6.0 incompatibility
+	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
-				Log(ERROR, "Core", "Loading Ground circle bitmaps...");
+				Log(ERROR, "Core", "Failed Loading Ground circle bitmaps...");
 				return GEM_ERROR;
 			}
 
@@ -1314,7 +1151,7 @@ int Interface::LoadSprites()
 				Sprite2D* sprite = anim->GetFrame( 0, (ieByte) i );
 				if (GroundCircleScale[size]) {
 					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
-					video->FreeSprite( sprite );
+					Sprite2D::FreeSprite( sprite );
 				} else {
 					GroundCircles[size][i] = sprite;
 				}
@@ -1322,111 +1159,7 @@ int Interface::LoadSprites()
 		}
 	}
 
-	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
-
-	Log(MESSAGE, "Core", "Loading Fonts...");
-	AutoTable tab("fonts");
-	if (!tab) {
-		Log(ERROR, "Core", "Cannot find fonts.2da.");
-		return GEM_ERROR;
-	}
-
-	int count = tab->GetRowCount();
-	const char* rowName = NULL;
-	for (int row = 0; row < count; row++) {
-		rowName = tab->GetRowName(row);
-		const char* ResRef = tab->QueryField(rowName, "RESREF");
-		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
-
-		const char* font_name;
-		unsigned short font_size = 0;
-		FontStyle font_style = NORMAL;
-
-		if (CustomFontPath[0]) {
-			font_name = tab->QueryField( rowName, "FONT_NAME" );// map a font alternative to the BAM ResRef since CHUs contain hardcoded refrences.
-			font_size = atoi( tab->QueryField( rowName, "PT_SIZE" ) );// not available in BAM fonts.
-			font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) );// not available in BAM fonts.
-		}else{
-			font_name = ResRef;
-		}
-
-		// Do search for existing font here
-		Font* fnt = NULL;
-		for (size_t fntIdx = 0; fntIdx < fonts.size(); fntIdx++) {
-			if (stricmp(fonts[fntIdx]->GetName(), font_name) == 0
-				&& fonts[fntIdx]->GetStyle() == font_style
-				&& fonts[fntIdx]->GetPointSize() == font_size) {
-				fnt = fonts[fntIdx];
-				fnt->AddResRef(ResRef);
-				break;
-			}
-		}
-
-		if (fnt) {
-			Log(MESSAGE, "Core", "Found existing font for %s.", ResRef);
-			// what about palette etc?
-			continue;
-		} else {
-			Palette* pal = NULL;
-			if (needpalette || (CustomFontPath[0] && strnicmp( font_name, ResRef, sizeof(ieResRef)-1) != 0 )) {//non-BAM fonts
-				Color fore = {0xff, 0xff, 0xff, 0};
-				Color back = {0x00, 0x00, 0x00, 0};
-				if (CustomFontPath[0]) {
-					const char* colorString = tab->QueryField( rowName, "COLOR" );
-					unsigned long combinedColor = strtoul(colorString, NULL, 16);
-					ieByte* color = (ieByte*)&combinedColor;
-					fore.r = *color++;
-					fore.g = *color++;
-					fore.b = *color++;
-					fore.a = *color++;
-				}
-				if (!strnicmp(TooltipFont, ResRef, sizeof(ieResRef)-1)) {
-					if (TooltipColor.a==0xff) {
-						fore = TooltipColor;
-					} else {
-						fore = back;
-						back = TooltipColor;
-					}
-				}
-				pal = CreatePalette(fore, back);
-			}
-			ResourceHolder<FontManager> fntMgr(font_name);
-			if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
-			gamedata->FreePalette(pal);
-		}
-
-		if (!fnt) {
-			Log(WARNING, "Core", "Unable to load font resource: %s", ResRef);
-			continue;
-		}
-
-		fnt->AddResRef(ResRef);
-		fnt->SetName(font_name);
-
-		fonts.push_back(fnt);
-	}
-
-	if (fonts.size() == 0) {
-		Log(ERROR, "Core", "No default font loaded!");
-		return GEM_ERROR;
-	}
-
-	if (GetFont( ButtonFont ) == NULL) {
-		Log(WARNING, "Core", "ButtonFont not loaded: %s",
-					 ButtonFont);
-	}
-	if (GetFont( MovieFont ) == NULL) {
-		Log(WARNING, "Core", "MovieFont not loaded: %s",
-					 MovieFont);
-	}
-	if (GetFont( TooltipFont ) == NULL) {
-		Log(WARNING, "Core", "TooltipFont not loaded: %s",
-					 TooltipFont);
-	}
-
-	Log(MESSAGE, "Core", "Fonts Loaded...");
-
-	if (TooltipBackResRef[0]) {
+	if (!TooltipBackResRef.IsEmpty()) {
 		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (!anim) {
@@ -1441,6 +1174,71 @@ int Interface::LoadSprites()
 		}
 	}
 
+	return GEM_OK;
+}
+
+int Interface::LoadFonts()
+{
+	Log(MESSAGE, "Core", "Loading Fonts...");
+	AutoTable tab("fonts");
+	if (!tab) {
+		Log(ERROR, "Core", "Cannot find fonts.2da.");
+		return GEM_ERROR;
+	}
+
+	// FIXME: we used to try and share like fonts
+	// this only ever had a benefit when using non-bam fonts
+	// it could potentially save a a few megs of space (nice for handhelds)
+	// but we should re-enable this by simply letting Font instances share their atlas data
+
+	int count = tab->GetRowCount();
+	const char* rowName = NULL;
+	for (int row = 0; row < count; row++) {
+		rowName = tab->GetRowName(row);
+
+		ResRef resref = tab->QueryField(rowName, "RESREF");
+		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
+		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
+		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
+		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
+
+		Palette* pal = NULL;
+		if (needpalette) {
+			Color fore = ColorWhite;
+			Color back = ColorBlack;
+			const char* colorString = tab->QueryField( rowName, "COLOR" );
+			if (colorString) {
+				ieDword c;
+				sscanf(colorString, "0x%x", &c);
+				fore.r = (ieByte)((c >> 24) & 0xFF);
+				fore.g = (ieByte)((c >> 16) & 0xFF);
+				fore.b = (ieByte)((c >> 8) & 0xFF);
+				fore.a = (ieByte)(c & 0xFF);
+			}
+			if (TooltipFontResRef == resref) {
+				if (fore.a != 0xff) {
+					// FIXME: should have an explaination
+					back = fore;
+					fore = ColorBlack;
+				}
+			}
+			pal = new Palette(fore, back);
+		}
+
+		Font* fnt = NULL;
+		ResourceHolder<FontManager> fntMgr(font_name);
+		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
+		gamedata->FreePalette(pal);
+
+		if (!fnt) {
+			Log(WARNING, "Core", "Unable to load font resource: %s for ResRef %s", font_name, resref.CString());
+		} else {
+			fonts[resref] = fnt;
+			Log(MESSAGE, "Core", "Loaded Font: %s for ResRef %s", font_name, resref.CString());
+		}
+	}
+
+	Log(MESSAGE, "Core", "Fonts Loaded...");
 	return GEM_OK;
 }
 
@@ -1897,6 +1695,9 @@ int Interface::Init(InterfaceConfig* config)
 	int ret = LoadSprites();
 	if (ret) return ret;
 
+	ret = LoadFonts();
+	if (ret) return ret;
+
 	QuitFlag = QF_CHANGESCRIPT;
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
@@ -2068,13 +1869,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(WARNING, "Core", "Failed to load special spells.");
 	}
 
-	Log(MESSAGE, "Core", "Reading item tables...");
-	ret = ReadAuxItemTables();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to read item tables...");
-		return GEM_ERROR;
-	}
-
 	ret = ReadDamageTypeTable();
 	Log(MESSAGE, "Core", "Reading damage type table...");
 	if (!ret) {
@@ -2099,7 +1893,6 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
 	console = new Console(Region(0, 0, Width, 25));
-	console->SetFont( fonts[0] );
 	Sprite2D* cursor = GetCursorSprite();
 	if (!cursor) {
 		Log(ERROR, "Core", "Failed to load cursor sprite.");
@@ -2270,14 +2063,14 @@ const char* Interface::TypeExt(SClass_ID type) const
 void Interface::FreeString(char *&str) const
 {
 	if (str) {
-		strings->FreeString(str);
+		free(str);
 	}
 	str = NULL;
 }
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 {
-	char *current = GetString(strref, 0);
+	char *current = GetCString(strref, 0);
 	bool changed = strcmp(text, current) != 0;
 	FreeString(current);
 	if (changed) {
@@ -2287,7 +2080,17 @@ ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 	}
 }
 
-char* Interface::GetString(ieStrRef strref, ieDword options) const
+char* Interface::GetCString(ieStrRef strref, ieDword options) const
+{
+	ieDword flags = 0;
+
+	if (!(options & IE_STR_STRREFOFF)) {
+		vars->Lookup( "Strref On", flags );
+	}
+	return strings->GetCString( strref, flags | options );
+}
+
+String* Interface::GetString(ieStrRef strref, ieDword options) const
 {
 	ieDword flags = 0;
 
@@ -2411,43 +2214,23 @@ bool Interface::LoadGemRBINI()
 	ini->Open(inifile);
 
 	const char *s;
-
 	// Resrefs are already initialized in Interface::Interface()
-	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
-	if (s)
-		strnlwrcpy( CursorBam, s, 8 ); //console cursor
+#define ASSIGN_RESREF(resref, name) \
+	s = ini->GetKeyAsString( "resources", name, NULL ); \
+	resref = s; s = NULL;
 
-	s = ini->GetKeyAsString( "resources", "ScrollCursorBAM", NULL );
-	if (s)
-		strnlwrcpy( ScrollCursorBam, s, 8 );
+	ASSIGN_RESREF(CursorBam, "CursorBAM"); //console cursor
+	ASSIGN_RESREF(ScrollCursorBam, "ScrollCursorBAM");
+	ASSIGN_RESREF(ButtonFontResRef, "ButtonFont");
+	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
+	ASSIGN_RESREF(MovieFontResRef, "MovieFont");
+	ASSIGN_RESREF(TooltipBackResRef, "TooltipBack");
+	ASSIGN_RESREF(TextFontResRef, "TextFont");
+	ASSIGN_RESREF(Palette16, "Palette16");
+	ASSIGN_RESREF(Palette32, "Palette32");
+	ASSIGN_RESREF(Palette256, "Palette256");
 
-	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
-	if (s)
-		strnlwrcpy( ButtonFont, s, 8 );
-
-	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
-	if (s)
-		strnlwrcpy( TooltipFont, s, 8 );
-
-	s = ini->GetKeyAsString( "resources", "MovieFont", NULL );
-	if (s)
-		strnlwrcpy( MovieFont, s, 8 );
-
-	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
-	if (s)
-		strnlwrcpy( TooltipBackResRef, s, 8 );
-
-	s = ini->GetKeyAsString( "resources", "TooltipColor", NULL );
-	if (s) {
-		if (s[0] == '#') {
-			unsigned long c = strtoul (s + 1, NULL, 16);
-			// FIXME: check errno
-			TooltipColor.r = (unsigned char) (c >> 24);
-			TooltipColor.g = (unsigned char) (c >> 16);
-			TooltipColor.b = (unsigned char) (c >> 8);
-			TooltipColor.a = (unsigned char) (c);
-		}
-	}
+#undef ASSIGN_RESREF
 
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));
@@ -2475,18 +2258,6 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strlcpy(INIConfig, s, sizeof(INIConfig));
-
-	s = ini->GetKeyAsString( "resources", "Palette16", NULL );
-	if (s)
-		CopyResRef(Palette16, s);
-
-	s = ini->GetKeyAsString( "resources", "Palette32", NULL );
-	if (s)
-		CopyResRef(Palette32, s);
-
-	s = ini->GetKeyAsString( "resources", "Palette256", NULL );
-	if (s)
-		CopyResRef(Palette256, s);
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
@@ -2523,25 +2294,35 @@ bool Interface::LoadEncoding()
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
 
-	TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
+	//TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 
-	// TODO: list incomplete
+	// TODO: lists are incomplete
 	// maybe want to externalize this
 	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
-	const char* multibyteEncodings[] = {
+	const char* wideEncodings[] = {
 		// Chinese
 		"GBK", "BIG5",
 		// Korean
 		"EUCKR",
 		// Japanese
 		"SJIS",
-		// UTF8
-		"UTF-8",
 	};
-	const size_t listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+	size_t listSize = sizeof(wideEncodings) / sizeof(wideEncodings[0]);
 
 	for (size_t i = 0; i < listSize; i++) {
-		if (stricmp(TLKEncoding.encoding.c_str(), multibyteEncodings[i]) == 0) {
+		if (TLKEncoding.encoding == wideEncodings[i]) {
+			TLKEncoding.widechar = true;
+			break;
+		}
+	}
+
+	const char* multibyteEncodings[] = {
+		"UTF-8",
+	};
+	listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
+
+	for (size_t i = 0; i < listSize; i++) {
+		if (TLKEncoding.encoding == multibyteEncodings[i]) {
 			TLKEncoding.multibyte = true;
 			break;
 		}
@@ -2568,28 +2349,6 @@ bool Interface::LoadEncoding()
 	return true;
 }
 
-Palette* Interface::CreatePalette(const Color &color, const Color &back)
-{
-	Palette* pal = new Palette();
-	pal->front = color;
-	pal->back = back;
-	pal->col[0].r = 0;
-	pal->col[0].g = 0xff;
-	pal->col[0].b = 0;
-	pal->col[0].a = 0;
-	for (int i = 1; i < 256; i++) {
-		pal->col[i].r = back.r +
-			( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255 );
-		pal->col[i].g = back.g +
-			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
-		pal->col[i].b = back.b +
-			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
-		pal->col[i].a = back.a +
-			( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255 );
-	}
-	return pal;
-}
-
 /** No descriptions */
 Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 {
@@ -2612,27 +2371,22 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 	return pal;
 }
 /** Returns a preloaded Font */
-Font* Interface::GetFont(const char *ResRef) const
+Font* Interface::GetFont(const ResRef& ResRef) const
 {
-	for (unsigned int i = 0; i < fonts.size(); i++) {
-		if (fonts[i]->MatchesResRef(ResRef)) {
-			return fonts[i];
-		}
+	if (fonts.find(ResRef) != fonts.end()) {
+		return fonts.at(ResRef);
 	}
 	return NULL;
 }
 
-Font* Interface::GetFont(unsigned int index) const
+Font* Interface::GetTextFont() const
 {
-	if (index >= fonts.size()) {
-		return NULL;
-	}
-	return fonts[index];
+	return GetFont( TextFontResRef );
 }
 
 Font* Interface::GetButtonFont() const
 {
-	return GetFont( ButtonFont );
+	return GetFont( ButtonFontResRef );
 }
 
 /** Returns the Event Manager */
@@ -3192,13 +2946,15 @@ void Interface::GameLoop(void)
 
 	bool do_update = GSUpdate(update_scripts);
 
-	if ( gc && game && (game->selected.size() > 0) ) {
-		gc->ChangeMap(GetFirstSelectedPC(true), false);
-	}
-	//in multi player (if we ever get to it), only the server must call this
-	if (do_update) {
-		// the game object will run the area scripts as well
-		game->UpdateScripts();
+	if (game) {
+		if ( gc && (game->selected.size() > 0) ) {
+			gc->ChangeMap(GetFirstSelectedPC(true), false);
+		}
+		//in multi player (if we ever get to it), only the server must call this
+		if (do_update) {
+			// the game object will run the area scripts as well
+			game->UpdateScripts();
+		}
 	}
 }
 
@@ -3318,17 +3074,17 @@ void Interface::DrawTooltip ()
 	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip)
 		return;
 
-	Font* fnt = GetFont( TooltipFont );
+	Font* fnt = GetFont( TooltipFontResRef );
 	if (!fnt) {
 		return;
 	}
-	char *tooltip_text = tooltip_ctrl->Tooltip;
+	String* tooltip_text = tooltip_ctrl->Tooltip;
 
 	int w1 = 0;
 	int w2 = 0;
-	int strw = fnt->CalcStringWidth( (unsigned char*)tooltip_text ) + 8;
+	int strw = fnt->StringSize( *tooltip_text ).w + 8;
 	int w = strw;
-	int h = fnt->maxHeight;
+	int h = fnt->LineHeight;
 
 	if (TooltipBack) {
 		// animate BG tooltips
@@ -3373,21 +3129,26 @@ void Interface::DrawTooltip ()
 
 	int x = strx + ((strw - w) / 2);
 
-	Region r2 = Region( x, y, w, h );
+	Region clip = Region( x, y, w, h );
 	if (TooltipBack) {
-		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &r2 );
+		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &clip );
 		video->BlitSprite( TooltipBack[1], x, y, true );
 		video->BlitSprite( TooltipBack[2], x + w, y, true );
 	}
 
 	if (TooltipBack) {
-		r2.x += TooltipBack[1]->Width;
-		r2.w -= TooltipBack[2]->Width;
+		clip.x += TooltipBack[1]->Width;
+		clip.w -= TooltipBack[2]->Width;
 		strx += TooltipMargin;
 	}
 	Region textr = Region( strx, y, strw, h );
-	fnt->Print( r2, textr, (ieByte *) tooltip_text, NULL,
-		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
+
+	// clip drawing to the control bounds, then restore after drawing
+	Region oldclip = video->GetScreenClip();
+	video->SetScreenClip(&clip);
+	fnt->Print( textr, *tooltip_text, NULL,
+			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
+	video->SetScreenClip(&oldclip);
 }
 
 //interface for higher level functions, if the window was
@@ -3628,12 +3389,12 @@ int Interface::PlayMovie(const char* ResRef)
 		int r = atoi(sttable->QueryField("red", "frame"));
 		int g = atoi(sttable->QueryField("green", "frame"));
 		int b = atoi(sttable->QueryField("blue", "frame"));
-		SubtitleFont = GetFont (MovieFont); //will change
+		SubtitleFont = GetFont (MovieFontResRef); //will change
 		if (r || g || b) {
 			if (SubtitleFont) {
 				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
-				palette = CreatePalette( fore, back );
+				palette = new Palette( fore, back );
 			}
 		}
 	}
@@ -3715,105 +3476,51 @@ int Interface::Roll(int dice, int size, int add) const
 	return add;
 }
 
-static char bmp_suffix[6]="M.BMP";
-static char png_suffix[6]="M.PNG";
-
-int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
+DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 {
-	int count = 0;
-	char Path[_MAX_PATH];
-
-	if (smallorlarge) {
-		bmp_suffix[0]='S';
-		png_suffix[0]='S';
-	} else {
-		bmp_suffix[0]='M';
-		png_suffix[0]='M';
-	}
-	PathJoin( Path, GamePath, GamePortraitsPath, NULL );
-	DirectoryIterator dir(Path);
-	if (!dir) {
-		return -1;
-	}
-	print("Looking in %s", Path);
-	do {
-		char *name = dir.GetName();
-		if (name[0] == '.')
-			continue;
-		if (dir.IsDirectory())
-			continue;
-		strupr(name);
-		char *pos = strstr(name,bmp_suffix);
-		if (!pos && IsAvailable(IE_PNG_CLASS_ID) ) {
-			pos = strstr(name,png_suffix);
+	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
+		char extension[9];
+		ExtFilter(const char* ext) {
+			memcpy(extension, ext, sizeof(extension));
 		}
-		if (!pos) continue;
-		pos[1]=0;
-		count++;
-		ta->AppendText( name, -1 );
-	} while (++dir);
-	ta->SortText();
-	return count;
-}
 
-int Interface::GetCharSounds(TextArea* ta)
-{
-	bool hasfolders;
-	int count = 0;
-	char Path[_MAX_PATH];
-
-	PathJoin( Path, GamePath, GameSoundsPath, NULL );
-	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
-	DirectoryIterator dir(Path);
-	if (!dir) {
-		return -1;
-	}
-	print("Looking in %s", Path);
-	do {
-		char *name = dir.GetName();
-		if (name[0] == '.')
-			continue;
-		if (hasfolders == !dir.IsDirectory())
-			continue;
-		if (!hasfolders) {
-			strupr(name);
-			char *pos = strstr(name,"A.WAV");
-			if (!pos) continue;
-			*pos=0;
+		bool operator()(const char* fname) const {
+			const char* extpos = strrchr(fname, '.');
+			if (extpos) {
+				extpos++;
+				return stricmp(extpos, extension) == 0;
+			}
+			return false;
 		}
-		count++;
-		ta->AppendText( name, -1 );
-	} while (++dir);
-	ta->SortText();
-	return count;
-}
+	};
 
-int Interface::GetCharacters(TextArea* ta)
-{
-	int count = 0;
 	char Path[_MAX_PATH];
-
-	PathJoin( Path, GamePath, GameCharactersPath, NULL );
-	DirectoryIterator dir(Path);
-	if (!dir) {
-		return -1;
+	const char* resourcePath = NULL;
+	DirectoryIterator::FileFilterPredicate* filter = NULL;
+	switch (dir) {
+		case DIRECTORY_CHR_PORTRAITS:
+			resourcePath = GamePortraitsPath;
+			filter = new ExtFilter("BMP");
+			if (IsAvailable(IE_PNG_CLASS_ID)) {
+				// chain an ORed filter for png
+				filter = new OrPredicate<const char*>(filter, new ExtFilter("PNG"));
+			}
+			break;
+		case DIRECTORY_CHR_SOUNDS:
+			resourcePath = GameSoundsPath;
+			if (!HasFeature( GF_SOUNDFOLDERS ))
+				filter = new ExtFilter("WAV");
+			break;
+		case DIRECTORY_CHR_EXPORTS:
+			resourcePath = GameCharactersPath;
+			filter = new ExtFilter("CHR");
+			break;
 	}
-	print("Looking in %s", Path);
-	do {
-		char *name = dir.GetName();
-		if (name[0] == '.')
-			continue;
-		if (dir.IsDirectory())
-			continue;
-		strupr(name);
-		char *pos = strstr(name,".CHR");
-		if (!pos) continue;
-		*pos=0;
-		count++;
-		ta->AppendText( name, -1 );
-	} while (++dir);
-	ta->SortText();
-	return count;
+
+	PathJoin( Path, GamePath, resourcePath, NULL );
+	DirectoryIterator dirIt(Path);
+	dirIt.SetFilterPredicate(filter);
+	return dirIt;
 }
 
 bool Interface::InitializeVarsWithINI(const char* iniFileName)
@@ -3831,6 +3538,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
 	} else {
 		overrides = ini.get();
+		iniStream->Close();
 	}
 
 	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
@@ -4702,9 +4410,10 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 		return;
 	}
 	do {
-		char *name = dir.GetName();
+		const char *name = dir.GetName();
 		if (dir.IsDirectory())
 			continue;
+		// FIXME: we need a more universal isHidden type method on DirectoryIterator
 		if (name[0] == '.')
 			continue;
 		if (!onlysave || SavedExtension(name) ) {
@@ -5257,7 +4966,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 {
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
-		if (res == -1 ) {
+		if (res == -1 && caster) {
 			//bounced back at a nonliving caster
 			if (caster->Type!=ST_ACTOR) {
 				return 0;
@@ -5356,7 +5065,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 		str.Create( Path, name, IE_BIO_CLASS_ID );
 		//never write the string reference into this string
-		char *tmp = GetString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);
+		char *tmp = GetCString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);
 		str.Write (tmp, strlen(tmp));
 		free(tmp);
 	}
@@ -5455,7 +5164,9 @@ int Interface::CompressSave(const char *folder)
 				char dtmp[_MAX_PATH];
 				dir.GetFullPath(dtmp);
 				FileStream fs;
-				fs.Open(dtmp);
+				if (!fs.Open(dtmp)) {
+					Log(ERROR, "Interface", "Failed to open \"%s\".", dtmp);
+				}
 				ai->AddToSaveGame(&str, &fs);
 			}
 		} while (++dir);
@@ -5656,7 +5367,7 @@ void Interface::SetInfoTextColor(const Color &color)
 	if (InfoTextPalette) {
 		gamedata->FreePalette(InfoTextPalette);
 	}
-	InfoTextPalette = CreatePalette(color, ColorBlack);
+	InfoTextPalette = new Palette(color, ColorBlack);
 }
 
 //todo row?

@@ -27,7 +27,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "Font.h"
+#include "CircularBuffer.h"
 #include "GUI/Control.h"
 
 namespace GemRB {
@@ -43,21 +43,16 @@ class Palette;
  * from GUIScripts can be used.
  */
 
-/** the number of remembered lines in the cheat console*/
-#define HISTORY_SIZE 5
-
 class Console : public Control {
 public:
 	Console(const Region& frame);
 	~Console(void);
-	/** Set Font */
-	void SetFont(Font* f);
 	/** Set Cursor */
 	void SetCursor(Sprite2D* cur);
 	/** Set BackGround */
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
-	void SetText(const char* string);
+	void SetText(const String& string);
 protected:
 	/** Draws the Console on the Output Display */
 	void DrawInternal(Region& drawFrame);
@@ -66,20 +61,18 @@ protected:
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
-	/** Text Font */
-	Font* font;
 	/** Background */
 	Sprite2D* Back;
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Text Buffer */
-	unsigned char* Buffer;
+	String Buffer;
 	/** History Buffer */
-	unsigned char* History[HISTORY_SIZE];
+	CircularBuffer<String> History;
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** History Position and size */
-	unsigned short HistPos, HistMax;
+	int HistPos;
 	/** Color Palette */
 	Palette* palette;
 
@@ -89,11 +82,11 @@ public: //Events
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
 	void SetFocus(bool focus);
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	void HistoryBack();
 	void HistoryForward();
-	void HistoryAdd(bool force);
+	void HistoryAdd(bool force = false);
 };
 
 }

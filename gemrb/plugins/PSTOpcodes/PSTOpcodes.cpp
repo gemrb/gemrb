@@ -210,6 +210,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		sca->YPos+=fx->PosY;
 		area->AddVVCell( new VEFObject(sca));
 	} else {
+		assert(target);
 		ScriptedAnimation *twin = sca->DetachTwin();
 		if (twin) {
 			target->AddVVCell(twin);
@@ -345,7 +346,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 
 	Actor *owner = GetCasterObject();
 
-	if (owner==target) {
+	if (owner == target || !owner || !target) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -981,9 +982,9 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//gemrb lets you specify the strref in P#1
 		ieStrRef tmp = fx->Parameter1;
 		if (!tmp) tmp = 46633;
-		char *tmpstr = core->GetString(tmp, IE_STR_SPEECH|IE_STR_SOUND);
-		target->DisplayHeadText(tmpstr);
-		//tmpstr shouldn't be freed, it is taken care by Actor
+		String* tmpstr = core->GetString(tmp, IE_STR_SPEECH|IE_STR_SOUND);
+		target->SetOverheadText(*tmpstr);
+		delete tmpstr;
 		target->GetHit();
 	}
 	fx->Parameter4=fx->Parameter3;

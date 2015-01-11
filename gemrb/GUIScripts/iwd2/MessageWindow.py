@@ -70,8 +70,6 @@ def UpdateControlStatus():
 	if Override:
 		Expand = GS_LARGEDIALOG
 
-	MessageWindow = GemRB.GetVar ("MessageWindow")
-
 	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 	hideflag = GemRB.HideGUI()
 	if Expand == GS_LARGEDIALOG:
@@ -84,14 +82,13 @@ def UpdateControlStatus():
 		TMessageTA = TMessageWindow.GetControl (1)
 		GUICommonWindows.SetupMenuWindowControls (TMessageWindow, 1, None)
 
-
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL)
-	TMessageTA.SetHistory(100)
-
+	MessageWindow = GemRB.GetVar ("MessageWindow")
 	MessageTA = GUIClasses.GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
-	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
-		MessageTA.MoveText (TMessageTA)
+	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
+		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
+		
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 

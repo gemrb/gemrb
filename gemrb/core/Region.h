@@ -43,8 +43,11 @@ public:
 	Point(void);
 	Point(short x, short y);
 
-	bool operator==(const Point &pnt);
-	bool operator!=(const Point &pnt);
+	bool operator==(const Point &pnt) const;
+	bool operator!=(const Point &pnt) const;
+
+	Point operator+(const Point& p) const;
+	Point operator-(const Point& p) const;
 
 	/** if it is [-1.-1] */
 	bool isempty() const;
@@ -66,6 +69,18 @@ public:
 	short x,y;
 };
 
+class GEM_EXPORT Size {
+public:
+	int w, h;
+	Size();
+	Size(int, int);
+
+	bool operator==(const Size& size);
+	bool operator!=(const Size& size);
+	int Area() const { return w * h; }
+	bool IsZero() const { return w == 0 && h == 0; }
+	bool IsEmpty() const { return w <= 0 || h <= 0; }
+};
 
 /**
  * @class Region
@@ -74,17 +89,40 @@ public:
 
 class GEM_EXPORT Region {
 public:
-	Region(void);
 	int x, y;
 	int w, h;
-	Region(const Point& p, int w, int h);
+	Region(void);
+	Region(int x, int y, int w, int h);
+	Region(const Point& p, const Size& s);
+
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
-	Region(int x, int y, int w, int h);
-	bool PointInside(unsigned short XPos, unsigned short YPos) const;
+
 	bool PointInside(const Point &p) const;
 	bool InsideRegion(const Region& rgn) const;
+	bool IntersectsRegion(const Region& rgn) const;
+	Region Intersect(const Region& rgn) const;
+
 	void Normalize();
+	Point Origin() const { return Point(x, y); }
+	Size Dimensions() const { return Size(w, h); }
+
+	template<typename T>
+	static Region RegionEnclosingRegions(T regions) {
+		if (regions.empty()) return Region();
+		typename T::const_iterator it = regions.begin();
+		// start with the complete first rect
+		Region bounds = *it++;
+		for (; it != regions.end(); ++it) {
+			// now expand it as needed
+			const Region& r = *it;
+			bounds.x = (r.x < bounds.x) ? r.x : bounds.x;
+			bounds.y = (r.y < bounds.y) ? r.y : bounds.y;
+			bounds.w = (r.x + r.w > bounds.x + bounds.w) ? (r.x + r.w) - bounds.x : bounds.w;
+			bounds.h = (r.y + r.h > bounds.y + bounds.h) ? (r.y + r.h) - bounds.y : bounds.h;
+		}
+		return bounds;
+	}
 };
 
 }

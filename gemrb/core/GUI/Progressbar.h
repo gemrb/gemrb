@@ -67,7 +67,7 @@ public:
 	/** Refreshes a progressbar which is associated with VariableName */
 	void UpdateState(const char *VariableName, unsigned int Sum);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 
 private: // Private attributes
 	/** BackGround Images. If smaller than the Control Size, the image will be tiled. */
@@ -85,7 +85,7 @@ private: // Private attributes
 	Sprite2D *PBarCap;
 public:
 	/** EndReached Scripted Event Function Name */
-	EventHandler EndReached;
+	ControlEventHandler EndReached;
 };
 
 }

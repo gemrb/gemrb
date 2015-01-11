@@ -26,24 +26,29 @@ namespace GemRB {
 Point::Point(void)
 {
 	x = y = 0;
-	//memset(this, 0, sizeof(*this));
 }
 
-bool Point::operator==(const Point& pnt)
+bool Point::operator==(const Point& pnt) const
 {
 	if (( x == pnt.x ) && ( y == pnt.y )) {
 		return true;
 	}
 	return false;
-	//return !memcmp( this, &pnt, sizeof(*this));
 }
 
-bool Point::operator!=(const Point& pnt)
+bool Point::operator!=(const Point& pnt) const
 {
-	if (( x == pnt.x ) && ( y == pnt.y )) {
-		return false;
-	}
-	return true;
+	return !(*this == pnt);
+}
+
+Point Point::operator+(const Point& p) const
+{
+	return Point(x + p.x, y + p.y);
+}
+
+Point Point::operator-(const Point& p) const
+{
+	return Point(x - p.x, y - p.y);
 }
 
 Point::Point(short x, short y)
@@ -90,6 +95,27 @@ bool Point::PointInside(const Point &p) const
 	return true;
 }
 
+Size::Size()
+{
+	w = h = 0;
+}
+
+Size::Size(int w, int h)
+{
+	this->w = w;
+	this->h = h;
+}
+
+bool Size::operator==(const Size& size)
+{
+	return (w == size.w &&  h == size.h);
+}
+
+bool Size::operator!=(const Size& size)
+{
+	return !(*this == size);
+}
+
 /*************** region ****************************/
 Region::Region(void)
 {
@@ -106,10 +132,7 @@ bool Region::operator==(const Region& rgn)
 
 bool Region::operator!=(const Region& rgn)
 {
-	if (( x != rgn.x ) || ( y != rgn.y ) || ( w != rgn.w ) || ( h != rgn.h )) {
-		return true;
-	}
-	return false;
+	return !(*this == rgn);
 }
 
 Region::Region(int x, int y, int w, int h)
@@ -120,12 +143,12 @@ Region::Region(int x, int y, int w, int h)
 	this->h = h;
 }
 
-Region::Region(const Point &p, int w, int h)
+Region::Region(const Point &p, const Size& s)
 {
 	this->x = p.x;
 	this->y = p.y;
-	this->w = w;
-	this->h = h;
+	this->w = s.w;
+	this->h = s.h;
 }
 
 bool Region::PointInside(const Point &p) const
@@ -139,32 +162,44 @@ bool Region::PointInside(const Point &p) const
 	return true;
 }
 
-bool Region::PointInside(unsigned short XPos, unsigned short YPos) const
+// true if this is completely contained inside rgn
+bool Region::InsideRegion(const Region& rgn) const
 {
-	if (( XPos < x ) || ( XPos > ( x + w ) )) {
-		return false;
+	if (x >= rgn.x && (x + w) <= (rgn.x + rgn.w)) {
+		// horizontal plane is contained
+		if (y >= rgn.y && (y + h) <= (rgn.y + rgn.h)) {
+			// vertical plane is contained
+			return true;
+		}
 	}
-	if (( YPos < y ) || ( YPos > ( y + h ) )) {
-		return false;
+	return false;
+}
+
+bool Region::IntersectsRegion(const Region& rgn) const
+{
+	if (x >= ( rgn.x + rgn.w )) {
+		return false; // entirely to the right of rgn
+	}
+	if (( x + w ) <= rgn.x) {
+		return false; // entirely to the left of rgn
+	}
+	if (y >= ( rgn.y + rgn.h )) {
+		return false; // entirely below rgn
+	}
+	if (( y + h ) <= rgn.y) {
+		return false; // entirely above rgn
 	}
 	return true;
 }
 
-bool Region::InsideRegion(const Region& rgn) const
+Region Region::Intersect(const Region& rgn) const
 {
-	if (x > ( rgn.x + rgn.w )) {
-		return false;
-	}
-	if (( x + w ) < rgn.x) {
-		return false;
-	}
-	if (y > ( rgn.y + rgn.h )) {
-		return false;
-	}
-	if (( y + h ) < rgn.y) {
-		return false;
-	}
-	return true;
+	int ix1 = (x >= rgn.x) ? x : rgn.x;
+	int ix2 = (x + w <= rgn.x + rgn.w) ? x + w : rgn.x + rgn.w;
+	int iy1 = (y >= rgn.y) ? y : rgn.y;
+	int iy2 = (y + h <= rgn.y + rgn.h) ? y + h : rgn.y + rgn.h;
+
+	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
 
 void Region::Normalize()

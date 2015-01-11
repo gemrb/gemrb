@@ -45,9 +45,8 @@ def OnLoad():
 	TextAreaControl.SetText(17236)
 
 	TextAreaControl = SoundWindow.GetControl(45)
-	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)
 	TextAreaControl.SetVarAssoc("Sound", 0)
-	RowCount=TextAreaControl.GetCharSounds()
+	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
 
 	DefaultButton = SoundWindow.GetControl(47)
 	DefaultButton.SetText(33479)

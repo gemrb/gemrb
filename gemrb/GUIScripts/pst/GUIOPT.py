@@ -602,15 +602,10 @@ def OpenMoviesWindow ():
 
 	# movie list
 	List = Window.GetControl (0)
-	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedMovie', -1)
 
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
-
-	for i in range (MovieTable.GetRowCount ()):
-		#key = MovieTable.GetRowName (i)
-		desc = MovieTable.GetValue (i, 0)
-		List.Append (desc, i)
+	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())])
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_BLACK)

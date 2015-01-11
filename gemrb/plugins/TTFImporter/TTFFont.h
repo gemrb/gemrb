@@ -21,40 +21,27 @@
 #ifndef __GemRB__TTFFont__
 #define __GemRB__TTFFont__
 
-#include "Font.h"
 #include "Freetype.h"
+
+#include "GUI/TextSystem/Font.h"
 #include "HashMap.h"
 #include "Holder.h"
 
 namespace GemRB {
-class Sprite2D;
 
 class TTFFont : public Font
 {
 private:
-	HashMap<ieWord, Holder<Sprite2D> >* glyphCache;
-
-	FontStyle style;
-	ieWord ptSize;
-
 	FT_Face face;
-	int height;
-	int ascent;
-	int descent;
-	
-	int glyph_overhang;
-	float glyph_italics;
 
+	const Glyph& AliasBlank(ieWord chr) const;
 protected:
 	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
 public:
-	TTFFont(FT_Face face, ieWord ptSize, FontStyle style, Palette* pal);
+	TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline);
 	~TTFFont(void);
 
-	const Sprite2D* GetCharSprite(ieWord chr) const;
-
-	ieWord GetPointSize() const {return ptSize;};
-	FontStyle GetStyle() const {return style;};
+	const Glyph& GetGlyph(ieWord chr) const;
 };
 
 }

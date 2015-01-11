@@ -71,14 +71,14 @@ static void ParseGameDate(DataStream *ds, char *Date)
 
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
 	if (days) {
-		if (days==1) a=core->GetString(10698);
-		else a=core->GetString(10697);
+		if (days==1) a=core->GetCString(10698);
+		else a=core->GetCString(10697);
 	}
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 	if (hours || !a) {
-		if (a) b=core->GetString(10699);
-		if (hours==1) c=core->GetString(10701);
-		else c=core->GetString(10700);
+		if (a) b=core->GetCString(10699);
+		if (hours==1) c=core->GetCString(10701);
+		else c=core->GetCString(10700);
 	}
 	if (b) {
 		strcat(Date, a);
@@ -110,8 +110,13 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	struct stat my_stat;
 	PathJoinExt(nPath, Path, Prefix, "bmp");
 	memset(&my_stat,0,sizeof(my_stat));
-	stat( nPath, &my_stat );
-	strftime( Date, _MAX_PATH, "%c", localtime( (time_t*)&my_stat.st_mtime ) );
+	int errno = stat(nPath, &my_stat);
+	if (errno) {
+		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
+		strlcpy(Date, "Sun 31 Feb 00:00:01 2099", _MAX_PATH);
+	} else {
+		strftime(Date, _MAX_PATH, "%c", localtime((time_t*)&my_stat.st_mtime));
+	}
 	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
 	GameDate[0] = '\0';
 }
@@ -393,7 +398,10 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	for(i=size;i--;) {
 		FormatQuickSavePath(from, myslots[i]);
 		FormatQuickSavePath(to, myslots[i]+1);
-		rename(from,to);
+		int errno = rename(from, to);
+		if (errno) {
+			error("SaveGameIterator", "Rename error %d when pruning quicksaves!\n", errno);
+		}
 	}
 }
 

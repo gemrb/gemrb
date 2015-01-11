@@ -95,7 +95,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 	# make sure there is an entry at the given level (bard)
 	SpellsKnownTable = GemRB.LoadTable (table)
-	if not SpellsKnownTable.GetValue (str(level), str(1), 1):
+	if not SpellsKnownTable.GetValue (str(level), str(1), GTV_INT):
 		if chargen:
 			if GameCheck.IsBG2():
 				# HACK
@@ -161,12 +161,12 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	AlreadyShown = 0
 	for i in range (9):
 		# make sure we always have a value to minus (bards)
-		SecondPoints = SpellsKnownTable.GetValue (str(level-diff), str(i+1), 1)
+		SecondPoints = SpellsKnownTable.GetValue (str(level-diff), str(i+1), GTV_INT)
 		if not SecondPoints:
 			SecondPoints = 0
 
 		# make sure we get more spells of each class before continuing
-		SpellsSelectPointsLeft[i] = SpellsKnownTable.GetValue (str(level), str(i+1), 1) - SecondPoints
+		SpellsSelectPointsLeft[i] = SpellsKnownTable.GetValue (str(level), str(i+1), GTV_INT) - SecondPoints
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
 		elif chargen and KitMask != 0x4000 and (not IWD2 or Class == 11):
@@ -572,7 +572,7 @@ def SpellsPickPress ():
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
 			break
 
-		CurrentSpell = AutoTable.GetValue (i, SpellLevel, 0)
+		CurrentSpell = AutoTable.GetValue (i, SpellLevel, GTV_STR)
 		for j in range (len (Spells[SpellLevel])):
 			# we can learn the spell, and it's not in our book
 			if Spells[SpellLevel][j][0].upper() == CurrentSpell.upper() \

@@ -24,7 +24,6 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
@@ -38,27 +37,24 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short
 	FontPosX = px;
 	FontPosY = py;
 	Alignment = IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT;
-	Buffer = ( unsigned char * ) malloc( max + 1 );
 	font = NULL;
 	Cursor = NULL;
 	Back = NULL;
 	CurPos = 0;
-	Buffer[0] = 0;
+	Text.reserve(max);
 	ResetEventHandler( EditOnChange );
 	ResetEventHandler( EditOnDone );
 	ResetEventHandler( EditOnCancel );
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
-	palette = core->CreatePalette( ColorWhite, ColorBlack );
+	palette = new Palette( ColorWhite, ColorBlack );
 }
 
 TextEdit::~TextEdit(void)
 {
-	Video *video = core->GetVideoDriver();
 	gamedata->FreePalette( palette );
-	free( Buffer );
-	video->FreeSprite( Back );
-	video->FreeSprite( Cursor );
+	Sprite2D::FreeSprite( Back );
+	Sprite2D::FreeSprite( Cursor );
 }
 
 void TextEdit::SetAlignment(unsigned char Alignment)
@@ -71,8 +67,9 @@ void TextEdit::SetAlignment(unsigned char Alignment)
 void TextEdit::DrawInternal(Region& rgn)
 {
 	ieWord yOff = FontPosY;
+	Video* video = core->GetVideoDriver();
 	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, rgn.x, rgn.y, true );
+		video->BlitSprite( Back, rgn.x, rgn.y, true );
 		if (yOff) yOff += Back->Height;
 	}
 	if (!font)
@@ -81,12 +78,20 @@ void TextEdit::DrawInternal(Region& rgn)
 	// FIXME: we should clip text to the background right?
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
-		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Buffer,
-				palette, Alignment,
-				true, NULL, Cursor, CurPos );
+		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ),
+					Text, palette, Alignment );
+		int w = font->StringSize(Text.substr(0, CurPos)).w;
+		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
+		if (w > rgn.w) {
+			int rows = (w / rgn.w);
+			vcenter += rows * font->LineHeight;
+			w = w - (rgn.w * rows);
+		}
+		video->BlitSprite(Cursor, w + rgn.x + FontPosX,
+						  FontPosY + vcenter + rgn.y, true);
 	} else {
-		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Buffer,
-				palette, Alignment, true );
+		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,
+				palette, Alignment );
 	}
 }
 
@@ -106,7 +111,7 @@ Font *TextEdit::GetFont() { return font; }
 /** Set Cursor */
 void TextEdit::SetCursor(Sprite2D* cur)
 {
-	core->GetVideoDriver()->FreeSprite( Cursor );
+	Sprite2D::FreeSprite( Cursor );
 	if (cur != NULL) {
 		Cursor = cur;
 	}
@@ -118,7 +123,7 @@ void TextEdit::SetBackGround(Sprite2D* back)
 {
 	//if 'back' is NULL then no BackGround will be drawn
 	if (Back)
-		core->GetVideoDriver()->FreeSprite(Back);
+		Sprite2D::FreeSprite(Back);
 	Back = back;
 	MarkDirty();
 }
@@ -130,14 +135,8 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		if (Value && ( (Key<'0') || (Key>'9') ) )
 			return false;
 		MarkDirty();
-		int len = ( int ) strlen( ( char* ) Buffer );
-		if (len + 1 < max) {
-			for (int i = len; i > CurPos; i--) {
-				Buffer[i] = Buffer[i - 1];
-			}
-			Buffer[CurPos] = Key;
-			Buffer[len + 1] = 0;
-			CurPos++;
+		if (Text.length() < max) {
+			Text.insert(CurPos++, 1, Key);
 		}
 		RunEventHandler( EditOnChange );
 		return true;
@@ -147,42 +146,31 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 /** Special Key Press */
 bool TextEdit::OnSpecialKeyPress(unsigned char Key)
 {
-	int len;
-
 	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:
 			CurPos = 0;
 			break;
 		case GEM_END:
-			CurPos = (ieWord) strlen( (char * ) Buffer);
+			CurPos = Text.length();
 			break;
 		case GEM_LEFT:
 			if (CurPos > 0)
 				CurPos--;
 			break;
 		case GEM_RIGHT:
-			len = ( int ) strlen( ( char * ) Buffer );
-			if (CurPos < len) {
+			if (CurPos < Text.length()) {
 				CurPos++;
 			}
 			break;
 		case GEM_DELETE:
-			len = ( int ) strlen( ( char * ) Buffer );
-			if (CurPos < len) {
-				for (int i = CurPos; i < len; i++) {
-					Buffer[i] = Buffer[i + 1];
-				}
+			if (CurPos < Text.length()) {
+				Text.erase(CurPos, 1);
 			}
 			break;		
 		case GEM_BACKSP:
 			if (CurPos != 0) {
-				int len = ( int ) strlen( ( char* ) Buffer );
-				for (int i = CurPos; i < len; i++) {
-					Buffer[i - 1] = Buffer[i];
-				}
-				Buffer[len - 1] = 0;
-				CurPos--;
+				Text.erase(--CurPos, 1);
 			}
 			break;
 		case GEM_RETURN:
@@ -201,11 +189,11 @@ void TextEdit::SetFocus(bool focus)
 }
 
 /** Sets the Text of the current control */
-void TextEdit::SetText(const char* string)
+void TextEdit::SetText(const String& string)
 {
-	int len = strlcpy( ( char * ) Buffer, string, max + 1 );
-	if (len > max) CurPos = max + 1;
-	else CurPos = len;
+	Text = string;
+	if (Text.length() > max) CurPos = max + 1;
+	else CurPos = Text.length();
 	MarkDirty();
 }
 
@@ -213,19 +201,18 @@ void TextEdit::SetBufferLength(ieWord buflen)
 {
 	if(buflen<1) return;
 	if(buflen!=max) {
-		Buffer = (unsigned char *) realloc(Buffer, buflen+1);
-		max=(ieWord) buflen;
-		Buffer[max]=0;
+		Text.resize(buflen);
+		max = buflen;
 	}
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
-const char* TextEdit::QueryText() const
+String TextEdit::QueryText() const
 {
-	return ( const char * ) Buffer;
+	return Text;
 }
 
-bool TextEdit::SetEvent(int eventType, EventHandler handler)
+bool TextEdit::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_EDIT_ON_CHANGE:

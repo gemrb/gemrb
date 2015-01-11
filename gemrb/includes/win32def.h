@@ -35,6 +35,8 @@
 #ifdef WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
+# define swprintf  _snwprintf
+# define vswprintf _vsnwprintf
 
 #else //WIN32
 # ifdef HAVE_CONFIG_H

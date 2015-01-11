@@ -1,3 +1,4 @@
+precision highp float;
 uniform vec4 u_color;
 void main()
 {

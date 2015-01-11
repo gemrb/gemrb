@@ -326,7 +326,7 @@ def GetHLAs ():
 
 		# save all our HLAs from this class
 		for j in range (HLAClassTable.GetRowCount ()):
-			HLARef = HLAClassTable.GetValue (j, 0, 0)
+			HLARef = HLAClassTable.GetValue (j, 0, GTV_STR)
 			print "\tHLA",j,":",HLARef
 
 			# make sure we have an ability here
@@ -339,8 +339,8 @@ def GetHLAs ():
 				HLARef,\
 				0,\
 				GemRB.CountEffects (pc, "HLA", -1, -1, HLARef[3:]),\
-				HLAClassTable.GetValue (j, 6, 0),\
-				HLAClassTable.GetValue (j, 7, 0)]
+				HLAClassTable.GetValue (j, 6, GTV_STR),\
+				HLAClassTable.GetValue (j, 7, GTV_STR)]
 
 			# make sure we fall within the min and max paramaters
 			if HLAClassTable.GetValue (j, 3) > CurrentLevel or HLAClassTable.GetValue (j, 4) < CurrentLevel:
@@ -349,7 +349,7 @@ def GetHLAs ():
 				continue
 		
 			# see if we're alignment restricted (we never get them)
-			HLAAlign = HLAClassTable.GetValue (j, 8, 0)
+			HLAAlign = HLAClassTable.GetValue (j, 8, GTV_STR)
 			if HLAAlign == "ALL_EVIL" and GemRB.GetPlayerStat (pc, IE_ALIGNMENT) < 6:
 				# don't even save this one because we can never get it
 				print "\t\tNeeds ALL_EVIL"

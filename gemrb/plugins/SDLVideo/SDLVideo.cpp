@@ -65,11 +65,12 @@ SDLVideoDriver::SDLVideoDriver(void)
 	lastMouseDownTime = lastMouseMoveTime = GetTickCount();
 	subtitlestrref = 0;
 	subtitletext = NULL;
+	disp = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
-	core->FreeString(subtitletext); //may be NULL
+	delete subtitletext;
 
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
@@ -398,34 +399,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	x -= Viewport.x;
 	y -= Viewport.y;
 
-	int clipx, clipy, clipw, cliph;
-	if (clip) {
-		clipx = clip->x;
-		clipy = clip->y;
-		clipw = clip->w;
-		cliph = clip->h;
-	} else {
-		clipx = 0;
-		clipy = 0;
-		clipw = backBuf->w;
-		cliph = backBuf->h;
-	}
-
-	int rx = 0,ry = 0;
-	int w = 64,h = 64;
-
-	if (x < clipx) {
-		rx += (clipx - x);
-		w -= (clipx - x);
-	}
-	if (y < clipy) {
-		ry += (clipy - y);
-		h -= (clipy - y);
-	}
-	if (x + w > clipx + clipw)
-		w -= (x + w - clipx - clipw);
-	if (y + h > clipy + cliph)
-		h -= (y + h - clipy - cliph);
+	Region fClip = ClippedDrawingRect(Region(x, y, 64, 64), clip);
 
 	const Uint8* data = (const Uint8*)spr->pixels;
 	const SDL_Color* pal = reinterpret_cast<const SDL_Color*>(spr->GetPaletteColors());
@@ -450,9 +424,9 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 #define DO_BLIT \
 		if (backBuf->format->BytesPerPixel == 4) \
-			BlitTile_internal<Uint32>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
+			BlitTile_internal<Uint32>(backBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
 		else \
-			BlitTile_internal<Uint16>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
+			BlitTile_internal<Uint16>(backBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
 
 	if (flags & TILE_GREY) {
 
@@ -512,77 +486,53 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 }
 
-
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
-	const Region* clip, Palette* palette)
+								const Region* clip, Palette* palette)
 {
-	int tx = x - spr->XPos;
-	int ty = y - spr->YPos;
+	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
+
 	if (!anchor) {
-		tx -= Viewport.x;
-		ty -= Viewport.y;
+		dst.x -= Viewport.x;
+		dst.y -= Viewport.y;
 	}
 
+	Region fClip = ClippedDrawingRect(dst, clip);
+
+	if (fClip.Dimensions().IsEmpty()) {
+		return; // already know blit fails
+	}
+
+	Region src(0, 0, spr->Width, spr->Height);
+
+	// adjust the src region to account for the clipping
+	src.x += fClip.x - dst.x; // the left edge
+	src.w -= dst.w - fClip.w; // the right edge
+	src.y += fClip.y - dst.y; // the top edge
+	src.h -= dst.h - fClip.h; // the bottom edge
+
+	assert(src.w == fClip.w && src.h == fClip.h);
+
+	// just pass fclip as dst
+	BlitSprite(spr, src, fClip, palette);
+}
+
+void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
+{
+	if (dst.w <= 0 || dst.h <= 0)
+		return; // we already know blit fails
+
 	if (!spr->BAM) {
-		//TODO: Add the destination surface and rect to the Blit Pipeline
-		SDL_Rect drect;
-		SDL_Rect t;
-		SDL_Rect* srect = NULL;
-		drect.x = tx;
-		drect.y = ty;
-
-		if (clip) {
-			if (drect.x + spr->Width <= clip->x)
-				return;
-			if (drect.x >= clip->x + clip->w)
-				return;
-
-			if (drect.y + spr->Height <= clip->y)
-				return;
-			if (drect.y >= clip->y + clip->h)
-				return;
-
-			// determine srect/drect to clip to 'clip'
-			t.x = 0;
-			t.w = spr->Width;
-			if (drect.x < clip->x) {
-				t.x += clip->x - drect.x;
-				t.w -= clip->x - drect.x;
-				drect.x = clip->x;
-			}
-			if (drect.x + t.w > clip->x + clip->w) {
-				t.w = clip->x + clip->w - drect.x;
-			}
-
-			t.y = 0;
-			t.h = spr->Height;
-			if (drect.y < clip->y) {
-				t.y += clip->y - drect.y;
-				t.h -= clip->y - drect.y;
-				drect.y = clip->y;
-			}
-			if (drect.y + t.h > clip->y + clip->h) {
-				t.h = clip->y + clip->h - drect.y;
-			}
-			srect = &t;
-
-		}
 		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		if (palette) {
 			SDL_Color* palColors = (SDL_Color*)spr->GetPaletteColors();
 			SetSurfacePalette(surf, (SDL_Color*)palette->col);
-			SDL_BlitSurface( surf, srect, backBuf, &drect );
+			BlitSurfaceClipped(surf, src, dst);
 			SetSurfacePalette(surf, palColors);
 		} else {
-			SDL_BlitSurface( surf, srect, backBuf, &drect );
+			BlitSurfaceClipped(surf, src, dst);
 		}
 	} else {
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
-
-		Region finalclip = computeClipRect(backBuf, clip, tx, ty, spr->Width, spr->Height);
-
-		if (finalclip.w <= 0 || finalclip.h <= 0)
-			return;
 
 		SDL_LockSurface(backBuf);
 
@@ -593,20 +543,33 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 		}
 		SRShadow_Regular shadow;
 
+		// FIXME: our BAM blitters dont let us start at an arbitrary point in the source
+		// We will compensate by tricking them by manipulating the location and size of the blit
+		// then using dst as a clipping rect to achieve the effect of a partial src copy
+
+		int x = dst.x - src.x;
+		int y = dst.y - src.y;
+		int w = spr->Width;
+		int h = spr->Height;
+
 		if (pal->alpha) {
 			SRTinter_NoTint<true> tinter;
 			SRBlender_Alpha blender;
 
-			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
-			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, (spr->renderFlags&RENDER_FLIP_VERTICAL), finalclip, (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
+			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
+								   backBuf, srcdata, pal->col, x, y, w, h,
+								   (spr->renderFlags&BLIT_MIRRORY), dst,
+								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		} else {
 			SRTinter_NoTint<false> tinter;
 			SRBlender_NoAlpha blender;
 
-			BlitSpritePAL_dispatch(false, (spr->renderFlags&RENDER_FLIP_HORIZONTAL),
-			    backBuf, srcdata, pal->col, tx, ty, spr->Width, spr->Height, (spr->renderFlags&RENDER_FLIP_VERTICAL), finalclip, (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
+			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
+								   backBuf, srcdata, pal->col, x, y, w, h,
+								   (spr->renderFlags&BLIT_MIRRORY), dst,
+								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
-
+		
 		SDL_UnlockSurface(backBuf);
 	}
 }
@@ -689,15 +652,14 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		ty -= Viewport.y;
 	}
 
-	Region finalclip = computeClipRect(backBuf, clip, tx, ty, spr->Width, spr->Height);
-
+	Region finalclip = ClippedDrawingRect(Region(tx, ty, spr->Width, spr->Height), clip);
 	if (finalclip.w <= 0 || finalclip.h <= 0)
 		return;
 
 	SDL_LockSurface(backBuf);
 
-	bool hflip = spr->BAM ? (spr->renderFlags&RENDER_FLIP_HORIZONTAL) : false;
-	bool vflip = spr->BAM ? (spr->renderFlags&RENDER_FLIP_VERTICAL) : false;
+	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
+	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 
@@ -898,12 +860,12 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
 {
-	SDL_Rect drect = RectFromRegion(rgn);
 	if (fill) {
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
 		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
 			long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
+			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( backBuf, &drect, val );
 		} else {
 			SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
@@ -913,7 +875,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 			c.g = color.g;
 			SetSurfacePalette(rectsurf, &c, 1);
 			SetSurfaceAlpha(rectsurf, color.a);
-			SDL_BlitSurface( rectsurf, NULL, backBuf, &drect );
+			BlitSurfaceClipped(rectsurf, Region(0, 0, rgn.w, rgn.h), rgn);
 			SDL_FreeSurface( rectsurf );
 		}
 	} else {
@@ -1415,26 +1377,6 @@ void SDLVideoDriver::SetFadePercent(int percent)
 	fadeColor.a = (255 * percent ) / 100;
 }
 
-void SDLVideoDriver::SetClipRect(const Region* clip)
-{
-	if (clip) {
-		SDL_Rect tmp = RectFromRegion(*clip);
-		SDL_SetClipRect( backBuf, &tmp );
-	} else {
-		SDL_SetClipRect( backBuf, NULL );
-	}
-}
-
-void SDLVideoDriver::GetClipRect(Region& clip)
-{
-	SDL_Rect tmp;
-	SDL_GetClipRect( backBuf, &tmp );
-	clip.x = tmp.x;
-	clip.y = tmp.y;
-	clip.w = tmp.w;
-	clip.h = tmp.h;
-}
-
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
 	lastMouseMoveTime = GetTickCount();
@@ -1501,7 +1443,7 @@ int SDLVideoDriver::PollMovieEvents()
 void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 {
 	if (strRef!=subtitlestrref) {
-		core->FreeString(subtitletext);
+		delete subtitletext;
 		if (!strRef)
 			return;
 		subtitletext = core->GetString(strRef);
@@ -1513,20 +1455,46 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		backBuf = disp;
 
 		//FYI: that 0 is pitch black
-		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
+		subtitlefont->Print(subtitleregion, *subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
 		backBuf = temp;
 	}
+}
+
+void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, const Region& dst)
+{
+	SDL_Rect srect = RectFromRegion(src); // FIXME: this may not be clipped
+	Region dclipped = ClippedDrawingRect(dst);
+	int trim = dst.h - dclipped.h;
+	if (trim) {
+		srect.h -= trim;
+		if (dclipped.y > dst.y) { // top clipped
+			srect.y += trim;
+		} // already have appropriate y for bottom clip
+	}
+	trim = dst.w - dclipped.w;
+	if (trim) {
+		srect.w -= trim;
+		if (dclipped.x > dst.x) { // left clipped
+			srect.x += trim;
+		}
+	} // already have appropriate y for right clip
+
+	SDL_Rect drect = RectFromRegion(dclipped);
+	// since we should already be clipped we can call SDL_LowerBlit directly
+	SDL_LowerBlit(surf, &srect, backBuf, &drect);
 }
 
 // static class methods
 
 void SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors)
 {
+	if (pal) {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+		SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
 #else
-	SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
+		SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
 #endif
+	}
 }
 
 void SDLVideoDriver::SetSurfacePixel(SDL_Surface* surface, short x, short y, const Color& color)

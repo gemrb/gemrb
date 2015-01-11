@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import MessageWindow
 from GUIDefines import *
 
 LoadScreen = None
@@ -46,27 +47,31 @@ def StartLoadScreen ():
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
 	LoadScreen.SetPicture(LoadPic)
-	Progress = 0
-	GemRB.SetVar ("Progress", Progress)
+	Progress = GemRB.GetVar ("Progress")
 
 	Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
 	HintStr = Table.GetValue (tmp, 0)
-	TextArea = LoadScreen.GetControl (2)
-	TextArea.SetText (HintStr)
-
+	
+	Label = LoadScreen.GetControl (2)
+	Label.SetText(HintStr)
+		
 	Picture = LoadScreen.GetControl (4)
+	
+	def EndLoadScreen ():
+		GemRB.SetVar ("Progress", 0)
+		MessageWindow.UpdateControlStatus()
+		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
+
+		Skull = LoadScreen.GetControl (3)
+		Skull.SetMOS ("GTRBPSK2")
+		LoadScreen.SetVisible (WINDOW_VISIBLE)
+		LoadScreen.Unload()
+		return
 
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	return
-
-def EndLoadScreen ():
-	Skull = LoadScreen.GetControl (3)
-	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	LoadScreen.Unload()
 	return

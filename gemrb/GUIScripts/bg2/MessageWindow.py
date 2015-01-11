@@ -107,8 +107,6 @@ def UpdateControlStatus():
 	#a dialogue is running, setting messagewindow size to maximum
 	if Override:
 		Expand = GS_LARGEDIALOG
-	
-	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
@@ -131,14 +129,14 @@ def UpdateControlStatus():
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_SPEAKER)
-	TMessageTA.SetHistory(100)
 	hideflag = GemRB.HideGUI()
+	MessageWindow = GemRB.GetVar("MessageWindow")
 	MessageTA = GUIClasses.GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
-	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
-		MessageTA.MoveText(TMessageTA)
+	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
+		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
 
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
 	if Override:

@@ -68,10 +68,11 @@ protected:
 public:
 	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
 	~ScrollBar(void);
-	/** safe method to get the height of a frame */
-	int GetFrameHeight(int frame) const;
+
 	/**sets position, updates associated stuff */
 	void SetPos(ieDword NewPos);
+	ieWord GetPos() const { return Pos; };
+
 	void SetPosForY(short y);
 	void ScrollUp();
 	void ScrollDown();
@@ -79,6 +80,8 @@ public:
 	/** refreshes scrollbar if associated with VarName */
 	void UpdateState(const char* VarName, unsigned int Sum);
 private: //Private attributes
+	/** safe method to get the height of a frame */
+	int GetFrameHeight(int frame) const;
 	/** Images for drawing the Scroll Bar */
 	Sprite2D* Frames[IE_SCROLLBAR_IMAGE_COUNT];
 	/** Range of the slider in pixels. The height - buttons - slider */
@@ -86,13 +89,10 @@ private: //Private attributes
 	/** a pixel position between 0 and SliderRange*/
 	unsigned short SliderYPos;
 	/** Item Index */
-	unsigned short Pos;
-	/** slider y delta between steps */
-	double stepPx;
+	ieWord Pos;
 	/** Scroll Bar Status */
 	unsigned short State;
-private:
-	void CalculateStep();
+
 public:
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);
@@ -110,9 +110,9 @@ public: // Public Events
 	/** Mouse Wheel Scroll Event */
 	void OnMouseWheelScroll(short x, short y);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** OnChange Scripted Event Function Name */
-	EventHandler ScrollBarOnChange;
+	ControlEventHandler ScrollBarOnChange;
 };
 
 }

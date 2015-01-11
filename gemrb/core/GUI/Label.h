@@ -28,11 +28,10 @@
 #define LABEL_H
 
 #include "GUI/Control.h"
+#include "GUI/TextSystem/Font.h"
 
 #include "RGBAColor.h"
 #include "exports.h"
-
-#include "Font.h"
 
 namespace GemRB {
 
@@ -52,10 +51,11 @@ protected:
 	void DrawInternal(Region& drawFrame);
 	bool HasBackground() { return false; }
 public: 
-	Label(const Region& frame, Font* font, const char* string);
+	Label(const Region& frame, Font* font, const String& string);
 	~Label();
 	/** This function sets the actual Label Text */
-	void SetText(const char* string);
+	using Control::SetText;
+	void SetText(const String& string);
 	/** Sets the Foreground Font Color */
 	void SetColor(Color col, Color bac);
 	/** Set the font being used */
@@ -63,20 +63,20 @@ public:
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char Alignment);
 	/** Simply returns the pointer to the text, don't modify it! */
-	const char* QueryText() const;
+	String QueryText() const;
 
 	/** Mouse Button Down */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** Use the RGB Color for the Font */
 	bool useRGB;
 	/** OnPress Scripted Event Function Name */
-	EventHandler LabelOnPress;
+	ControlEventHandler LabelOnPress;
 private: // Private attributes
 	/** Text String Buffer */
-	char* Buffer;
+	String Text;
 	/** Font for Text Writing */
 	Font* font;
 	/** Foreground & Background Colors */

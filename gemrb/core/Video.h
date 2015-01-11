@@ -94,11 +94,12 @@ protected:
 	short xCorr, yCorr;
 	EventMgr* EvntManager;
 	Region Viewport;
+	Region screenClip;
 	int width,height,bpp;
 	bool fullscreen;
 	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
 	CursorType CursorIndex;
-	Region CursorPos;
+	Point CursorPos;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
@@ -107,9 +108,11 @@ protected:
 	Palette *subtitlepal;
 	Region subtitleregion;
 	Color fadeColor;
+protected:
+	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
 public:
 	Video(void);
-	virtual ~Video(void);
+	virtual ~Video(void) {};
 	virtual int Init(void) = 0;
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode. */
@@ -137,10 +140,13 @@ public:
 	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
-	void FreeSprite(Sprite2D* &spr);
-	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags) = 0;
+
+	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
+						  const Region* clip, unsigned int flags) = 0;
 	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
-		const Region* clip = NULL, Palette* palette = NULL) = 0;
+							const Region* clip = NULL, Palette* palette = NULL) = 0;
+	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst,
+							Palette* pal = NULL) = 0;
 
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)
@@ -191,9 +197,9 @@ public:
 	/** Sets the Fading to Color Percentage */
 	virtual void SetFadePercent(int percent) = 0;
 	/** Sets Clip Rectangle */
-	virtual void SetClipRect(const Region* clip) = 0;
+	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */
-	virtual void GetClipRect(Region& clip) = 0;
+	const Region& GetScreenClip() { return screenClip; }
 	/** returns the current mouse coordinates */
 	void GetMousePos(int &x, int &y);
 	/** clicks the mouse forcibly */

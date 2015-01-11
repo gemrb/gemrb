@@ -69,7 +69,7 @@ class Actor:
 
 		if self.__classes == None:
 			#already reversed in ClassNames
-			self.__classes = [CommonTables.Classes.GetValue (name, "ID", 1) for name in self.ClassNames()]
+			self.__classes = [CommonTables.Classes.GetValue (name, "ID", GTV_INT) for name in self.ClassNames()]
 		return self.__classes
 
 	def ClassNames (self):
@@ -91,23 +91,21 @@ class Actor:
 		self.ClassNames()
 		if self.__classtitle == 0:
 			if self.multiclass and self.isdual == 0:
-				self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF")
-				self.__classtitle = GemRB.GetString (self.__classtitle)
+				self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF", GTV_REF)
 			elif self.isdual:
 				# first (previous) kit or class of the dual class
 				self.Classes()
 				if self.KitIndex():
-					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2)
+					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2, GTV_REF)
 				else:
-					self.__classtitle = CommonTables.Classes.GetValue (self.__classnames[1], "CAP_REF")
-				self.__classtitle = GemRB.GetString (self.__classtitle) + " / " + \
+					self.__classtitle = CommonTables.Classes.GetValue (self.__classnames[1], "CAP_REF", GTV_REF)
+				self.__classtitle = self.__classtitle + " / " + \
 					CommonTables.Classes.GetValue (self.__classnames[0], "CAP_REF", GTV_REF)
 			else: # ordinary class or kit
 				if self.KitIndex():
-					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2)
+					self.__classtitle = CommonTables.KitList.GetValue (self.__kitindex, 2, GTV_REF)
 				else:
-					self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF")
-				self.__classtitle = GemRB.GetString (self.__classtitle)
+					self.__classtitle = CommonTables.Classes.GetValue ("_".join(self.__classnames), "CAP_REF", GTV_REF)
 
 		if self.__classtitle == "*":
 			self.__classtitle = 0

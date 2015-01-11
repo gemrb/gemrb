@@ -1,5 +1,6 @@
-GemRB git (a86cf3d):
+GemRB git (e473b392):
   New features:
+    - text system rewrite for better fidelity, perfomance and maintainability
     - 
 
   Improved features:

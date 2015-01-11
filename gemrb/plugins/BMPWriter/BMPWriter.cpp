@@ -69,7 +69,7 @@ void BMPWriter::PutImage(DataStream *output, Sprite2D *spr)
 		output->Write( filling, stuff);
 	}
 
-	core->GetVideoDriver()->FreeSprite(spr);
+	Sprite2D::FreeSprite(spr);
 }
 
 #include "plugindef.h"

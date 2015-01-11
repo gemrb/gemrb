@@ -1640,7 +1640,7 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	target->DisplayHeadText(NULL);
+	target->DisplayOverheadText(NULL);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
@@ -2650,10 +2650,6 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
-	// handle the SpellWait iwd2 special case (other games don't use int0, so it is harmless)
-	if (parameters->int0Parameter == 0) {
-		parameters->int0Parameter = Sender->LastMarkedSpell;
-	}
 	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_DEPLETE|SC_AURA_CHECK);
 }
 
@@ -3148,7 +3144,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
-	char * str = core->GetString( parameters->int0Parameter);
+	char * str = core->GetCString( parameters->int0Parameter);
 	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, str);
 }
 
@@ -4167,7 +4163,10 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 		if (slot != slot2) {
 			// swap them first, so we equip to the desired slot
 			CREItem *si = actor->inventory.RemoveItem(slot);
-			actor->inventory.AddSlotItem(si, slot2);
+			if (actor->inventory.AddSlotItem(si, slot2) != ASI_SUCCESS) {
+				// should never happen, since we just made room
+				error("Actions", "XEquip: suddenly no slots left!\n");
+			}
 		}
 		actor->inventory.EquipItem(slot2);
 	} else {
@@ -4854,8 +4853,7 @@ void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	char *str = core->GetString( parameters->int0Parameter, 0);
-	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str, parameters->int0Parameter);
+	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, parameters->int0Parameter);
 }
 
 void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)
@@ -5470,10 +5468,10 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		actor->SetModal(MS_NONE);
-		if (container->Trapped) {
-			container->AddTrigger(TriggerEntry(trigger_opened, actor->GetGlobalID()));
-		} else {
+		if (!container->Trapped && core->HasFeature(GF_PST_STATE_FLAGS)) {
 			container->AddTrigger(TriggerEntry(trigger_harmlessopened, actor->GetGlobalID()));
+		} else {
+			container->AddTrigger(TriggerEntry(trigger_opened, actor->GetGlobalID()));
 		}
 		container->TriggerTrap(0, actor->GetGlobalID());
 		core->SetCurrentContainer(actor, container, true);
@@ -5747,7 +5745,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
-		char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
+		char * str = core->GetCString( parameters->int0Parameter, IE_STR_STRREFOFF);
 		char FolderName[_MAX_PATH];
 		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
 		core->FreeString( str );

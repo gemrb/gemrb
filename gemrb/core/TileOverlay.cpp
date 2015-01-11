@@ -98,6 +98,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, in
 			if (!anim && tile->tileIndex) {
 				anim = tile->anim[0];
 			}
+			assert(anim);
 			vid->BlitTile( anim->NextFrame(), 0, viewport.x + ( x * 64 ),
 				viewport.y + ( y * 64 ), &viewport, flags );
 			if (!tile->om || tile->tileIndex) {

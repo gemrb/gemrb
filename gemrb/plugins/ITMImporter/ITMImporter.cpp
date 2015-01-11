@@ -170,8 +170,6 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadWord( &s->EquippingFeatureOffset );
 	str->ReadWord( &s->EquippingFeatureCount );
 
-	s->Dialog[0] = 0;
-	s->DialogName = 0;
 	s->WieldColor = 0xffff;
 	memset( s->unknown, 0, 26 );
 
@@ -179,8 +177,8 @@ Item* ITMImporter::GetItem(Item *s)
 	if (version == ITM_VER_IWD2) {
 		str->Read( s->unknown, 16 );
 	}
-	//pst data
 	if (version == ITM_VER_PST) {
+		//pst data
 		str->ReadResRef( s->Dialog );
 		str->ReadDword( &s->DialogName );
 		ieWord WieldColor;
@@ -189,18 +187,34 @@ Item* ITMImporter::GetItem(Item *s)
 			s->WieldColor = WieldColor;
 		}
 		str->Read( s->unknown, 26 );
+	} else if (dialogTable) {
+		//all non pst
+		int row = dialogTable->GetRowIndex(s->Name);
+		s->DialogName = atoi(dialogTable->QueryField(row, 0));
+		CopyResRef(s->Dialog, dialogTable->QueryField(row, 1));
 	} else {
-	//all non pst
-		s->DialogName = core->GetItemDialStr(s->Name);
-		core->GetItemDialRes(s->Name, s->Dialog);
+		s->DialogName = -1;
+		s->Dialog[0] = '\0';
 	}
-	s->ItemExcl=core->GetItemExcl(s->Name);
+
+	if (exclusionTable) {
+		int row = exclusionTable->GetRowIndex(s->Name);
+		s->ItemExcl = (bool)atoi(exclusionTable->QueryField(row, 0));
+	} else {
+		s->ItemExcl = false;
+	}
 
 	s->ext_headers = core->GetITMExt( s->ExtHeaderCount );
 
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
-		GetExtHeader( s, s->ext_headers + i );
+		ITMExtHeader* eh = &s->ext_headers[i];
+		GetExtHeader( s, eh );
+		// set the tooltip
+		if (tooltipTable) {
+			int row = tooltipTable->GetRowIndex(s->Name);
+			eh->Tooltip = atoi(tooltipTable->QueryField(row, i));
+		}
 	}
 
 	//48 is the size of the feature block

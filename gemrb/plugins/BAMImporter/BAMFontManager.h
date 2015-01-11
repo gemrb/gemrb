@@ -32,20 +32,15 @@ private:
 	/** private data members */
 	BAMImporter* bamImp;
 	bool isStateFont;
-	ieResRef resRef;
-public:
-	/** public data members */
-private:
-	void AddChar(unsigned char* spr, int w, int h, short xPos, short yPos);
+	ResRef resRef;
 public:
 	/** public methods */
 	~BAMFontManager(void);
-	BAMFontManager(void);
+	BAMFontManager();
 
 	bool Open(DataStream* stream);
 
-	Font* GetFont(unsigned short ptSize,
-				  FontStyle style, Palette* pal = NULL);
+	Font* GetFont(ieWord pxSize, FontStyle style, Palette* pal = NULL);
 };
 
 }

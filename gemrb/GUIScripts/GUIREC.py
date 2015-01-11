@@ -148,7 +148,7 @@ def Exportable(pc):
 	return True
 
 def UpdateRecordsWindow ():
-	global stats_overview, alignment_help
+	global alignment_help
 
 	Window = RecordsWindow
 	if not RecordsWindow:
@@ -283,9 +283,8 @@ def UpdateRecordsWindow ():
 		Label.SetText (7199)
 
 	# help, info textarea
-	stats_overview = GetStatOverview (pc)
 	Text = Window.GetControl (45)
-	Text.SetText (stats_overview)
+	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -447,7 +446,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			for c in effects:
 				tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
 				stats.append ( (tmp,c,'a') )
-			stats.append (None)
 
 	#proficiencies
 	stats.append ( (8442,1,'c') )
@@ -486,8 +484,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		HateTable = GemRB.LoadTable ("haterace")
 		Racist = HateTable.FindValue (1, HatedRace)
 		if Racist != -1:
-			HatedRace = HateTable.GetValue (Racist, 0)
-			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
+			HatedRace = HateTable.GetValue (Racist, 0, GTV_REF)
+			stats.append ( (15982, HatedRace, '') )
 
 	# these skills were new in bg2
 	if GameCheck.IsBG2() or GameCheck.IsIWD1():
@@ -678,50 +676,52 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			if val == 0 and type != '0':
 				continue
 			if type == '+': #pluses
-				res.append ("[capital=0]"+GemRB.GetString (strref) + ' '+ '+' * val)
+				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
 			elif type == 'p': #a plus prefix if positive
 				if val > 0:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ' +' + str (val) )
+					res.append (GemRB.GetString (strref) + ' +' + str (val) )
 				else:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
+					res.append (GemRB.GetString (strref) + ' ' + str (val) )
 			elif type == 'r': #a plus prefix if positive, strref is an already resolved string
 				if val > 0:
-					res.append ("[capital=0]" + strref + ' +' + str (val) )
+					res.append (strref + ' +' + str (val) )
 				else:
-					res.append ("[capital=0]" + strref + ' ' + str (val) )
+					res.append (strref + ' ' + str (val) )
 			elif type == 's': #both base and (modified) stat, but only if they differ
 				base = GB (val)
 				stat = GS (val)
-				base_str = "[capital=0]" + GemRB.GetString (strref) + ': ' + str(stat)
+				base_str = GemRB.GetString (strref) + ': ' + str(stat)
 				if base == stat:
 					res.append (base_str)
 				else:
 					res.append (base_str + " (" + str(stat-base) + ")")
 			elif type == 'x': #x character before value
-				res.append ("[capital=0]"+GemRB.GetString (strref) +': x' + str (val) )
+				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
-				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
+				# '%' is the separator glyph in the states font
+				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 			elif type == 'b': #strref is an already resolved string
-				res.append ("[capital=0]"+strref+": "+str (val))
+				res.append (strref+": "+str (val))
 			elif type == 'c': #normal string
-				res.append ("[capital=0]"+GemRB.GetString (strref))
+				res.append (GemRB.GetString (strref))
 			elif type == 'd': #strref is an already resolved string
-				res.append ("[capital=0]"+strref)
+				res.append (strref)
 			elif type == '0': #normal value
 				res.append (GemRB.GetString (strref) + ': ' + str (val))
 			else: #normal value + type character, for example percent sign
-				res.append ("[capital=0]"+GemRB.GetString (strref) + ': ' + str (val) + type)
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
 		except:
 			if s != None:
-				res.append ("[capital=0]"+ GemRB.GetString (s) )
+				res.append (GemRB.GetString (s) )
 				lines = 0
 			else:
 				if not lines and str_None != -1:
 					res.append (str_None)
 				res.append ("")
 				lines = 0
-
+	# wrap the first part in a tag to prevent status icon drop cap
+	res[0] = "[p]" + res[0] + "[/p]"
 	return "\n".join (res)
 
 def GetReputation (repvalue):
@@ -873,35 +873,29 @@ def OpenKitInfoWindow ():
 	ClassName = GUICommon.GetClassRowName (pc)
 	Multi = GUICommon.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
-
+	text = ""
 	if Multi and Dual[0] == 0: # true multi class
 		text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
-		TextArea.SetText (text)
-		KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
-		return
+	else:
+		KitIndex = GUICommon.GetKitIndex (pc)
 
-	KitIndex = GUICommon.GetKitIndex (pc)
+		if Dual[0]: # dual class
+			# first (previous) kit or class of the dual class
+			if Dual[0] == 1:
+				text = CommonTables.KitList.GetValue (Dual[1], 3)
+			elif Dual[0] == 2:
+				text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[1], "index"), "DESC_REF")
+	
+			text += "\n"
+			text += CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[2], "index"), "DESC_REF")
+	
+		else: # ordinary class or kit
+			if KitIndex:
+				text = CommonTables.KitList.GetValue (KitIndex, 3)
+			else:
+				text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 
-	if Dual[0]: # dual class
-		# first (previous) kit or class of the dual class
-		if Dual[0] == 1:
-			text = CommonTables.KitList.GetValue (Dual[1], 3)
-		elif Dual[0] == 2:
-			text = GUICommon.GetClassRowName(Dual[1], "index")
-			text = CommonTables.Classes.GetValue (text, "DESC_REF")
-
-		TextArea.SetText (text)
-		TextArea.Append ("\n\n")
-		text = GUICommon.GetClassRowName(Dual[2], "index")
-		text = CommonTables.Classes.GetValue (text, "DESC_REF")
-
-	else: # ordinary class or kit
-		if KitIndex:
-			text = CommonTables.KitList.GetValue (KitIndex, 3)
-		else:
-			text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
-
-	TextArea.Append (text)
+	TextArea.SetText (text)
 
 	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

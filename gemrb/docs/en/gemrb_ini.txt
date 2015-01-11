@@ -80,6 +80,10 @@ ButtonFont = <resref>
 Name of bitmap resource used for button font in dialog windows
 (e.g. BG1: STONESML)
 
+TextFont = <resref>
+- - - - - - - - - - -
+Font used to display overhead or floating text
+
 MovieFont = <resref>
 - - - - - - - - - - -
 Name of bitmap resource used for the movie subtitles
@@ -95,11 +99,6 @@ TooltipBack = <resref>
 Sprite displayed behind the tooltip text, if any. Leave undefined when
 tooltips don't use background bitmap.
 (e.g. BG1: TOOLTIP)
-
-
-TooltipColor = <rgba_color>
-- - - - - - - - - - - - - -
-Tooltip text color. Default is #ffffffff, i.e. opaque white.
 
 
 TooltipMargin = <number>

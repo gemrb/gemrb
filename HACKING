@@ -14,3 +14,14 @@ and TODOs spread throughout the code, the more detailed todo on our wiki at
 http://gemrb.org/wiki/doku.php?id=todo or ask either on the forums or IRC.
 Alternatively, just start playing one of the games and see what annoys you, 
 then start fixing it.
+
+Useful tools
+- gdb
+  You can use the following to automatically run gemrb and already start with a
+  breakpoint in abort():
+    gdb -q -iex "set breakpoint pending on" -iex "b abort" -ex run --args path/to/gemrb -c agame.cfg
+- valgrind
+  We bundle a suppression file for upstream problems at testing/python.supp
+  You can use it for example this way (if running from the build dir):
+    valgrind --track-origins=yes --suppressions=../testing/python.supp \
+      gemrb/gemrb -c agame.cfg &> valgrind.log

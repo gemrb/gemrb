@@ -20,8 +20,10 @@
 #define STRING_H
 
 #include "exports.h"
+#include "ie_types.h"
 
 #include <cstring>
+#include <string>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -32,7 +34,21 @@
 # define strnicmp strncasecmp
 #endif
 
+#define WHITESPACE_STRING L"\n\t\r "
+
 namespace GemRB {
+
+//typedef std::basic_string<ieWord> String;
+typedef std::wstring String;
+// String creators
+GEM_EXPORT String* StringFromCString(const char* string);
+GEM_EXPORT char* MBCStringFromString(const String& string);
+
+// String manipulators
+GEM_EXPORT void StringToLower(String& string);
+GEM_EXPORT void StringToUpper(String& string);
+GEM_EXPORT void TrimString(String& string);
+
 /* this function will work with pl/cz special characters */
 
 extern unsigned char pl_uppercase[256];
@@ -41,10 +57,6 @@ extern unsigned char pl_lowercase[256];
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
-/** Convert string to uppercase in-place using selected IE encoding */
-GEM_EXPORT char* strtoupper(char* string);
-/** Convert string to uppercase in-place using selected IE encoding */
-GEM_EXPORT char* strtolower(char* string);
 GEM_EXPORT int strlench(const char* string, char ch);
 
 }
@@ -52,15 +64,11 @@ GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNLEN
 GEM_EXPORT int strnlen(const char* string, int maxlen);
 #endif
-#ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, size_t l);
-#endif
 #ifndef HAVE_STRLCPY
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 #endif
 
 #ifndef WIN32
-GEM_EXPORT char* strupr(char* string);
 GEM_EXPORT char* strlwr(char* string);
 #endif
 

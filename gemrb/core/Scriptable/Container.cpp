@@ -56,11 +56,9 @@ Container::Container(void)
 
 void Container::FreeGroundIcons()
 {
-	Video* video = core->GetVideoDriver();
-
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
-			video->FreeSprite( groundicons[i] );
+			Sprite2D::FreeSprite( groundicons[i] );
 			groundicons[i]=NULL;
 		}
 	}
@@ -121,7 +119,7 @@ void Container::CreateGroundIconCover()
 		!groundiconcover->Covers(Pos.x, Pos.y, xpos, ypos, width, height))
 	{
 		delete groundiconcover;
-		groundiconcover = 0;
+		groundiconcover = NULL;
 		if (width*height > 0) {
 			groundiconcover = GetCurrentArea()->BuildSpriteCover
 				(Pos.x, Pos.y, xpos, ypos, width, height, WantDither());

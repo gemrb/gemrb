@@ -38,17 +38,21 @@ WMPAreaEntry::WMPAreaEntry()
 	StrCaption = NULL;
 	StrTooltip = NULL;
 	SingleFrame = false;
+	AreaName[0] = AreaLongName[0] = AreaResRef[0] = 0;
+	LoadScreenResRef[0] = 0;
+	LocCaptionName = LocTooltipName = 0;
+	AreaLinksCount[0] = AreaLinksIndex[0] = 0;
+	X = Y = 0;
+	IconSeq = AreaStatus = 0;
 }
 
 WMPAreaEntry::~WMPAreaEntry()
 {
-	if (StrCaption) {
-		core->FreeString(StrCaption);
-	}
+	delete StrCaption;
 	if (StrTooltip) {
 		core->FreeString(StrTooltip);
 	}
-	core->GetVideoDriver()->FreeSprite(MapIcon);
+	Sprite2D::FreeSprite(MapIcon);
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
@@ -60,10 +64,10 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 	case BM_XOR: AreaStatus ^= arg; break;
 	case BM_AND: AreaStatus &= arg; break;
 	}
-	core->GetVideoDriver()->FreeSprite(MapIcon);
+	Sprite2D::FreeSprite(MapIcon);
 }
 
-const char* WMPAreaEntry::GetCaption()
+const String* WMPAreaEntry::GetCaption()
 {
 	if (!StrCaption) {
 		StrCaption = core->GetString(LocCaptionName);
@@ -74,7 +78,7 @@ const char* WMPAreaEntry::GetCaption()
 const char* WMPAreaEntry::GetTooltip()
 {
 	if (!StrTooltip) {
-		StrTooltip = core->GetString(LocTooltipName);
+		StrTooltip = core->GetCString(LocTooltipName);
 	}
 	return StrTooltip;
 }
@@ -242,7 +246,7 @@ WorldMap::~WorldMap(void)
 		delete( area_links[i] );
 	}
 	if (MapMOS) {
-		core->GetVideoDriver()->FreeSprite(MapMOS);
+		Sprite2D::FreeSprite(MapMOS);
 	}
 	if (Distances) {
 		free(Distances);
@@ -257,10 +261,11 @@ void WorldMap::SetMapIcons(AnimationFactory *newicons)
 {
 	bam = newicons;
 }
+
 void WorldMap::SetMapMOS(Sprite2D *newmos)
 {
 	if (MapMOS) {
-		core->GetVideoDriver()->FreeSprite(MapMOS);
+		Sprite2D::FreeSprite(MapMOS);
 	}
 	MapMOS = newmos;
 }

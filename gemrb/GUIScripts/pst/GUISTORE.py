@@ -1148,12 +1148,12 @@ def DonateGold ():
 	donation = int("0"+Field.QueryText ())
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
 	if GemRB.IncreaseReputation (donation):
-		TextArea.Append (26914, -1)
+		TextArea.Append (26914)
 		GemRB.PlaySound ("act_03")
 		UpdateStoreDonateWindow ()
 		return
 
-	TextArea.Append (26914, -1)
+	TextArea.Append (26914)
 	GemRB.PlaySound ("act_03e")
 	UpdateStoreDonateWindow ()
 	return
@@ -1271,7 +1271,7 @@ def GulpDrink ():
 	intox = GemRB.GetPlayerStat (pc, IE_INTOXICATION)
 	intox = 0
 	if intox > 80:
-		TextArea.Append (0, -1)
+		TextArea.Append (0)
 		return
 
 	gold = GemRB.GameGetPartyGold ()
@@ -1284,7 +1284,7 @@ def GulpDrink ():
 	GemRB.GameSetPartyGold (gold-Drink['Price'])
 	GemRB.SetPlayerStat (pc, IE_INTOXICATION, intox+Drink['Strength'])
 	text = GemRB.GetRumour (Drink['Strength'], Store['TavernRumour'])
-	TextArea.Append (text, -1)
+	TextArea.Append (text)
 	GemRB.PlaySound ("gam_07")
 	UpdateStoreRumourWindow ()
 	return

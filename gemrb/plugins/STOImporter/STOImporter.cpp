@@ -139,7 +139,7 @@ Store* STOImporter::GetStore(Store *s)
 		GetItem(item, s);
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
-			char *TriggerCode = core->GetString( (ieStrRef) item->InfiniteSupply );
+			char *TriggerCode = core->GetCString( (ieStrRef) item->InfiniteSupply );
 			item->trigger = GenerateTrigger(TriggerCode);
 			core->FreeString(TriggerCode);
 

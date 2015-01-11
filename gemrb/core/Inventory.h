@@ -135,6 +135,7 @@ struct ItemExtHeader {
 	ieByte Location;
 	ieByte unknown1;
 	ieResRef UseIcon;
+	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;

@@ -53,6 +53,7 @@
 namespace GemRB {
 
 class ControlAnimation;
+class ControlEventHandler;
 class Sprite2D;
 class Window;
 
@@ -76,12 +77,14 @@ protected:
 public:
 	Control(const Region& frame);
 	virtual ~Control();
-	Region ControlFrame();
+	Region ControlFrame() const;
+	void SetControlFrame(const Region&);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	void MarkDirty();
 	/** Sets the Text of the current control */
-	virtual void SetText(const char* string);
+	void SetText(const String*);
+	virtual void SetText(const String&) {};
 	/** Sets the Tooltip text of the current control */
 	int SetTooltip(const char* string);
 	/** Displays the tooltip text, Worldmap handles this differently */
@@ -112,7 +115,7 @@ public: // Public attributes
 	ieByte ControlType;
 	/** Text to display as a tooltip when the mouse cursor hovers
 	 * for some time over the control */
-	char* Tooltip;
+	String* Tooltip;
 	/** True if we are currently in an event handler */
 	bool InHandler;
 	/** Owner Window */
@@ -123,7 +126,7 @@ public: // Public attributes
 	ieDword FunctionNumber;
 public: //Events
 	/** Reset/init event handler */
-	void ResetEventHandler(EventHandler &handler);
+	void ResetEventHandler(ControlEventHandler &handler);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
@@ -132,9 +135,9 @@ public: //Events
 	bool isFocused();
 	virtual bool WantsDragOperation() { return false; };
 	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, EventHandler handler) = 0;
+	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
 	/** Run specified handler, it may return error code */
-	int RunEventHandler(EventHandler handler);
+	int RunEventHandler(ControlEventHandler handler);
 	/** Key Press Event */
 	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	/** Key Release Event */
@@ -158,15 +161,25 @@ public: //Events
 	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
 		return false;
 	}
-	virtual const char* QueryText() const { return ""; }
+	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
-	void SetAnimPicture(Sprite2D* Picture);
+	virtual void SetAnimPicture(Sprite2D* Picture);
 	/** Sets the Scroll Bar Pointer */
 	int SetScrollBar(Control* ptr);
 
 	/** Assigned function key */
 	void SetFunctionNumber(int x) { FunctionNumber = x; }
 	int GetFunctionNumber() { return FunctionNumber; }
+};
+
+class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*> > {
+public:
+	ControlEventHandler(Callback<Control*>* ptr = NULL)
+	: Holder< Callback<Control*> >(ptr) {}
+
+	bool operator()(Control* ctrl) {
+		return (*ptr)(ctrl);
+	}
 };
 
 }

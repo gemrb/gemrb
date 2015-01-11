@@ -34,6 +34,7 @@
 #include "Callback.h"
 #include "Holder.h"
 #include "InterfaceConfig.h"
+#include "Resource.h"
 
 #include <map>
 #include <string>
@@ -139,9 +140,10 @@ struct TimeStruct {
 	unsigned int attack_round_size;
 };
 
-struct TLKEncodingStruct
+struct EncodingStruct
 {
 	std::string encoding;
+	bool widechar;
 	bool multibyte;
 	bool zerospace;
 };
@@ -150,10 +152,18 @@ struct SpellDescType {
 	ieResRef resref;
 	ieStrRef value;
 };
+
+struct SpecialSpellType {
+	ieResRef resref;
+	int flags;
+	int amount;
+	int bonus_limit;
+};
 #define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
 #define SP_SILENCE   2      //any spell that can be cast in silence
 #define SP_SURGE     4      //any spell that cannot be cast during a wild surge
 #define SP_REST      8      //any spell that is cast upon rest if memorized
+#define SP_HEAL_ALL  16     //any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 
 struct SurgeSpell {
 	ieResRef spell;
@@ -296,6 +306,12 @@ enum PauseSetting {
 	PAUSE_ON = 1
 };
 
+enum RESOURCE_DIRECTORY {
+	DIRECTORY_CHR_PORTRAITS,
+	DIRECTORY_CHR_SOUNDS,
+	DIRECTORY_CHR_EXPORTS
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -309,10 +325,7 @@ private:
 	std::string VideoDriverName;
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
-	Image * pal256;
-	Image * pal32;
-	Image * pal16;
-	std::vector<Font*> fonts;
+
 	EventMgr * evntmgr;
 	Holder<WindowMgr> windowmgr;
 	Window* ModalWindow;
@@ -336,21 +349,29 @@ private:
 	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures[(GF_COUNT+31)/32];
-	ieResRef ButtonFont;
-	ieResRef CursorBam;
-	ieResRef ScrollCursorBam;
+	ResRef CursorBam;
+	ResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
-	ieResRef TooltipFont;
-	ieResRef TooltipBackResRef;
-	ieResRef MovieFont;
+
+	std::map<ResRef, Font*> fonts;
+	ResRef ButtonFontResRef;
+	ResRef MovieFontResRef;
+	ResRef TextFontResRef;
+	ResRef TooltipFontResRef;
+
+	ResRef TooltipBackResRef;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
-	Color TooltipColor;
 	int TooltipMargin;
-	ieResRef Palette16;
-	ieResRef Palette32;
-	ieResRef Palette256;
+
+	Image * pal256;
+	Image * pal32;
+	Image * pal16;
+	ResRef Palette16;
+	ResRef Palette32;
+	ResRef Palette256;
+
 	ieDword* slotmatrix; //itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	SlotType* slottypes;
@@ -377,11 +398,11 @@ private:
 	/** Function to call every main loop iteration */
 	EventHandler TickHook;
 	int SpecialSpellsCount;
-	SpellDescType *SpecialSpells;
+	SpecialSpellType *SpecialSpells;
 	KeyMap *keymap;
 	std::string Encoding;
 public:
-	TLKEncodingStruct TLKEncoding;
+	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
@@ -394,9 +415,6 @@ public:
 	ieResRef GlobalScript;
 	ieResRef WorldMapName[2];
 	Variables * AreaAliasTable;
-	Variables * ItemExclTable;
-	Variables * ItemDialTable, *ItemDial2Table;
-	Variables * ItemTooltipTable;
 	Sprite2D **Cursors;
 	int CursorCount;
 	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
@@ -423,8 +441,10 @@ public:
 	Video * GetVideoDriver() const;
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
+	/* returns a newly created c string */
+	char* GetCString(ieStrRef strref, ieDword options = 0) const;
 	/* returns a newly created string */
-	char * GetString(ieStrRef strref, ieDword options = 0) const;
+	String* GetString(ieStrRef strref, ieDword options = 0) const;
 	/* makes sure the string is freed in TLKImp */
 	void FreeString(char *&str) const;
 	/* sets the floattext color */
@@ -432,8 +452,8 @@ public:
 	/** returns a gradient set */
 	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
 	/** Returns a preloaded Font */
-	Font * GetFont(const char *) const;
-	Font * GetFont(unsigned int index) const;
+	Font* GetFont(const ResRef&) const;
+	Font* GetTextFont() const;
 	/** Returns the button font */
 	Font * GetButtonFont() const;
 	/** Returns the Event Manager */
@@ -578,12 +598,9 @@ public:
 	void UpdateWorldMap(ieResRef wmResRef);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
-	/*reads the filenames of the portraits folder into a list */
-	int GetPortraits(TextArea* ta, bool smallorlarge);
-	/*reads the filenames of the sounds folder into a list */
-	int GetCharSounds(TextArea *ta);
-	/*reads the filenames of the characters folder into a list */
-	int GetCharacters(TextArea *ta);
+
+	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY);
+
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
 	ieDword QuerySlot(unsigned int idx) const;
@@ -613,8 +630,6 @@ public:
 	bool StupidityDetector(const char* Pt);
 	/*handles the load screen*/
 	void LoadProgress(int percent);
-
-	Palette* CreatePalette(const Color &color, const Color &back);
 
 	void DragItem(CREItem* item, const ieResRef Picture);
 	CREItem* GetDraggedItem() const { return DraggedItem; }
@@ -700,14 +715,6 @@ public:
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
-	/** Returns the item tooltip value for the xth extension header */
-	int GetItemTooltip(const ieResRef itemname, int idx, int identified);
-	/** Returns the item exclusion value */
-	int GetItemExcl(const ieResRef itemname) const;
-	/** Returns the strref for the item dialog */
-	int GetItemDialStr(const ieResRef itemname) const;
-	/** Returns the strref for the item dialog */
-	int GetItemDialRes(const ieResRef itemname, ieResRef dialog) const;
 	/** Returns the virtual worldmap entry of a sub-area */
 	int GetAreaAlias(const ieResRef areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
@@ -731,11 +738,12 @@ public:
 	int CheckSpecialSpell(const ieResRef resref, Actor *actor);
 	int GetSpecialSpell(const ieResRef resref);
 	int GetSpecialSpellsCount() { return SpecialSpellsCount; }
-	SpellDescType *GetSpecialSpells() { return SpecialSpells; }
+	SpecialSpellType *GetSpecialSpells() { return SpecialSpells; }
 	/** Saves config variables to a file */
 	bool SaveConfig();
 private:
 	int LoadSprites();
+	int LoadFonts();
 	bool LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
@@ -753,8 +761,6 @@ private:
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
-	/** Reads itemexcl, itemdial, tooltip */
-	bool ReadAuxItemTables();
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** handles the EventFlag bits (conditional events) */

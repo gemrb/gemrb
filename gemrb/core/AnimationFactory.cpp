@@ -100,7 +100,7 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) 
 	if (cycle >= cycles.size()) {
 		return NULL;
 	}
-	int ff = cycles[cycle]. FirstFrame, fc = cycles[cycle].FramesCount;
+	int ff = cycles[cycle].FirstFrame, fc = cycles[cycle].FramesCount;
 	if(index >= fc) {
 		return NULL;
 	}

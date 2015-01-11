@@ -22,13 +22,12 @@
 #include "win32def.h"
 #include "ie_cursors.h"
 
-#include "Font.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "Video.h"
 #include "WorldMap.h"
 #include "GUI/EventMgr.h"
+#include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
 
 namespace GemRB {
@@ -84,9 +83,9 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
 	Color black = { 0x00, 0x00, 0x00, 0x00 };
 
-	pal_normal = core->CreatePalette ( normal, black );
-	pal_selected = core->CreatePalette ( selected, black );
-	pal_notvisited = core->CreatePalette ( notvisited, black );
+	pal_normal = new Palette ( normal, black );
+	pal_selected = new Palette ( selected, black );
+	pal_notvisited = new Palette ( notvisited, black );
 
 
 	ResetEventHandler( WorldMapControlOnPress );
@@ -131,7 +130,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			} else {
 				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
 			}
-			video->FreeSprite( icon );
+			Sprite2D::FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
@@ -154,16 +153,13 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			w=icon->Width;
 			xpos=icon->XPos;
 			ypos=icon->YPos;
-			video->FreeSprite( icon );
+			Sprite2D::FreeSprite( icon );
 		}
 
 		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
 		if (!m->GetCaption())
 			continue;
 
-		int tw = ftext->CalcStringWidth( (unsigned char*)m->GetCaption() ) + 5;
-		int th = ftext->maxHeight;
-		
 		Palette* text_pal = pal_normal;
 		
 		if (Area == m) {
@@ -174,8 +170,10 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			}
 		}
 
-		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
-				( const unsigned char * ) m->GetCaption(), text_pal, 0, true );
+		Size ts = ftext->StringSize(*m->GetCaption());
+		ts.w += 10;
+		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
+					 *m->GetCaption(), text_pal, 0 );
 	}
 }
 
@@ -244,15 +242,15 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				w=icon->Width;
 				iconx = icon->XPos;
 				icony = icon->YPos;
-				core->GetVideoDriver()->FreeSprite( icon );
+				Sprite2D::FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
-				int tw = ftext->CalcStringWidth( (unsigned char*)ae->GetCaption() ) + 5;
-				int th = ftext->maxHeight;
-				if(h<th)
-					h=th;
-				if(w<tw)
-					w=tw;
+				Size ts = ftext->StringSize(*ae->GetCaption());
+				ts.w += 10;
+				if(h < ts.h)
+					h = ts.h;
+				if(w < ts.w)
+					w = ts.w;
 			}
 			if (ae->X - iconx > x) continue;
 			if (ae->X - iconx + w < x) continue;
@@ -362,7 +360,7 @@ bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 	return true;
 }
 
-bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
+bool WorldMapControl::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_WORLDMAP_ON_PRESS:
@@ -385,28 +383,28 @@ void WorldMapControl::SetColor(int which, Color color)
 	//   because setting background color creates all palettes anew.
 	switch (which) {
 	case IE_GUI_WMAP_COLOR_BACKGROUND:
-		pal = core->CreatePalette( pal_normal->front, color );
+		pal = new Palette( pal_normal->front, color );
 		gamedata->FreePalette( pal_normal );
 		pal_normal = pal;
-		pal = core->CreatePalette( pal_selected->front, color );
+		pal = new Palette( pal_selected->front, color );
 		gamedata->FreePalette( pal_selected );
 		pal_selected = pal;
-		pal = core->CreatePalette( pal_notvisited->front, color );
+		pal = new Palette( pal_notvisited->front, color );
 		gamedata->FreePalette( pal_notvisited );
 		pal_notvisited = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		pal = core->CreatePalette( color, pal_normal->back );
+		pal = new Palette( color, pal_normal->back );
 		gamedata->FreePalette( pal_normal );
 		pal_normal = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		pal = core->CreatePalette( color, pal_selected->back );
+		pal = new Palette( color, pal_selected->back );
 		gamedata->FreePalette( pal_selected );
 		pal_selected = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		pal = core->CreatePalette( color, pal_notvisited->back );
+		pal = new Palette( color, pal_notvisited->back );
 		gamedata->FreePalette( pal_notvisited );
 		pal_notvisited = pal;
 		break;

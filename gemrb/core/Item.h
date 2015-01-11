@@ -30,6 +30,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "Resource.h"
 
 #include "EffectQueue.h"
 
@@ -130,6 +131,7 @@ public:
 	ieByte Location;
 	ieByte unknown1;
 	ieResRef UseIcon;
+	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
@@ -210,15 +212,17 @@ public:
 	ieWord EquippingFeatureOffset;
 	ieWord EquippingFeatureCount;
 
-	// PST only
+	// PST and BG2 only
 	ieResRef Dialog;
 	ieStrRef DialogName;
+
+	// PST only
 	ieWord WieldColor;
 
 	// PST and IWD2 only
 	char unknown[26];
 	// flag items to mutually exclusive to equip
-	ieDword ItemExcl;
+	bool ItemExcl;
 public:
 	ieStrRef GetItemName(bool identified) const
 	{

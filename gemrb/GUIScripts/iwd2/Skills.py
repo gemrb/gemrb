@@ -239,7 +239,7 @@ def BackPress():
 	TmpTable = GemRB.LoadTable ("skillsta")
 	for i in range(TmpTable.GetRowCount()):
 		GemRB.SetVar("Skill "+str(i),0)
-		StatID=TmpTable.GetValue (i, 0, 2)
+		StatID=TmpTable.GetValue (i, 0, GTV_STAT)
 		GemRB.SetPlayerStat (MyChar, StatID, 0)
 	if SkillWindow:
 		SkillWindow.Unload()
@@ -259,7 +259,7 @@ def NextPress():
 	TmpTable = GemRB.LoadTable ("skillsta")
 	SkillCount = TmpTable.GetRowCount ()
 	for i in range (SkillCount):
-		StatID=TmpTable.GetValue (i, 0, 2)
+		StatID=TmpTable.GetValue (i, 0, GTV_STAT)
 		RacialBonus = SkillTable.GetValue (i, RaceColumn)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i)) + RacialBonus)
 	if SkillWindow:

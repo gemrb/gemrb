@@ -178,6 +178,6 @@ def ReplayTextScreen ():
 	for i in range(1, Count):
 		TextArea.Append ("\n")
 		# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
-		TextArea.Append (Table.GetValue (Row, i), -1, 14)
+		TextArea.Append (Table.GetValue (Row, i), 14)
 
 	return

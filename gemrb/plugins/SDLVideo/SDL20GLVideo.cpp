@@ -1,16 +1,15 @@
-#ifdef USE_GL
-#include <GL/glew.h>
-#ifdef _MSC_VER
-	#pragma comment(lib, "glew32")
-	#pragma comment(lib, "opengl32")
+
+#include "OpenGLEnv.h"
+
+#if _MSC_VER
+	#if USE_GL
+		#pragma comment(lib, "glew32")
+		#pragma comment(lib, "opengl32")
+	#else
+		#pragma comment(lib, "libGLESv2")
+	#endif
 #endif
-#else
-#include <GLES2/GL2.h>
-#include <GLES2/GL2ext.h>
-#ifdef _MSC_VER
-	#pragma comment(lib, "libGLESv2")
-#endif
-#endif
+
 #include <algorithm>
 #include "SDL20GLVideo.h"
 #include "Interface.h"
@@ -244,39 +243,18 @@ Sprite2D* GLVideoDriver::CreateSprite8(int w, int h, void* pixels, Palette* pale
 	return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
 }
 
-void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Region* clip, Palette* attachedPal, unsigned int flags, const Color* tint, GLTextureSprite2D* mask)
+void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, Palette* attachedPal,
+								 unsigned int flags, const Color* tint, GLTextureSprite2D* mask)
 {
-	float hscale, vscale;
-	SDL_Rect spriteRect;
-	spriteRect.w = spr->Width;
-	spriteRect.h = spr->Height;
-	if(clip)
-	{
-		// test region
-		if(clip->x > x) { spriteRect.x = x; spriteRect.w -= (clip->x - x); }
-		if(clip->y > y) { spriteRect.y = y; spriteRect.h -= (clip->y - y); }
-		if (x + spriteRect.w > clip->x + clip -> w) { spriteRect.w = clip->x + clip->w - x; }
-		if (y + spriteRect.h > clip->y + clip -> h) { spriteRect.h = clip->y + clip->h - y; }
-		if (spriteRect.w <= 0 || spriteRect.h <= 0) return;
+	// TODO: clip dst to the screen?
+	if (dst.w <= 0 || dst.h <= 0 || src.w <= 0 || src.h <= 0)
+		return; // we already know blit fails
 
-		glViewport(clip->x, height - (clip->y + clip->h), clip->w, clip->h);
-		glScissor(clip->x, height - (clip->y + clip->h), clip->w, clip->h);
-		spriteRect.x = x - clip->x;
-		spriteRect.y = y - clip->y;
-		spriteRect.w = spr->Width;
-		spriteRect.h = spr->Height;
-		hscale = 2.0f/(float)clip->w;
-		vscale = 2.0f/(float)clip->h;
-	}
-	else
-	{
-		glViewport(0, 0, width, height);
-		glScissor(0, 0, width, height);
-		spriteRect.x = x; 
-		spriteRect.y = y;
-		hscale = 2.0f/(float)width;
-		vscale = 2.0f/(float)height;
-	}
+	glViewport(dst.x, height - (dst.y + dst.h), dst.w, dst.h);
+	Region scissorRect = ClippedDrawingRect(dst);
+	glScissor(scissorRect.x, height - (scissorRect.y + scissorRect.h), scissorRect.w, scissorRect.h);
+	float hscale = 2.0f/(float)dst.w;
+	float vscale = 2.0f/(float)dst.h;
 
 	// color tint
 	Color colorTint;
@@ -284,21 +262,40 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 		colorTint = *tint;
 	else
 		colorTint.r = colorTint.b = colorTint.g = colorTint.a = 255;
-	
-	// we do flipping here
-	bool hflip = spr->renderFlags & RENDER_FLIP_HORIZONTAL;
-	bool vflip = spr->renderFlags & RENDER_FLIP_VERTICAL;
-	if (flags & BLIT_MIRRORX) hflip = !hflip;
-	if (flags & BLIT_MIRRORY) vflip = !vflip;
-	GLfloat* textureCoords;
-	GLfloat coordsHV[] = { 1.0f,1.0f, 0.0f,1.0f, 1.0f,0.0f, 0.0f,0.0f };
-	GLfloat coordsH[] = { 1.0f,0.0f, 0.0f,0.0f, 1.0f,1.0f, 0.0f,1.0f };
-	GLfloat coordsV[] = { 0.0f,1.0f, 1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f };
-	GLfloat coordsN[] = { 0.0f,0.0f, 1.0f,0.0f, 0.0f,1.0f, 1.0f,1.0f };
-	if (hflip && vflip) textureCoords = coordsHV;
-	else if (hflip) textureCoords = coordsH;
-	else if (vflip) textureCoords = coordsV;
-	else textureCoords = coordsN;
+
+	// FIXME: how should we combine flags? previously we would cancel sprite flags with the flags param.
+	// I think this way makes more sense, but I need to examine the behavior of the the functions passing flag parameters
+	flags |= spr->renderFlags;
+
+	GLfloat x = (GLfloat)src.x/(GLfloat)spr->Width;
+	GLfloat y = (GLfloat)src.y/(GLfloat)spr->Height;
+	GLfloat w = (GLfloat)src.w/(GLfloat)spr->Width;
+	GLfloat h = (GLfloat)src.h/(GLfloat)spr->Height;
+	GLfloat textureCoords[] = { /* lower left */ x, y, /* lower right */x + w, y,
+								/* top left */ x, y + h, /* top right */ x + w, y + h };
+
+	// FIXME: are there constants for accessing these coordinate indices?
+	GLfloat tmp;
+	if (flags&BLIT_MIRRORX) {
+		// swap lower left X with lower right X
+		tmp = textureCoords[0];
+		textureCoords[0] = textureCoords[2];
+		textureCoords[2] = tmp;
+		// swap top left X with top right X
+		tmp = textureCoords[4];
+		textureCoords[4] = textureCoords[6];
+		textureCoords[6] = tmp;
+	}
+	if (flags&BLIT_MIRRORY) {
+		// swap lower left Y with top left Y
+		tmp = textureCoords[1];
+		textureCoords[1] = textureCoords[5];
+		textureCoords[5] = tmp;
+		// swap lower right Y with top right Y
+		tmp = textureCoords[3];
+		textureCoords[3] = textureCoords[7];
+		textureCoords[7] = tmp;
+	}
 
 	// alpha modifier
 	GLfloat alphaModifier = flags & BLIT_HALFTRANS ? 0.5f : 1.0f;
@@ -306,10 +303,10 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	// data
 	GLfloat data[] = 
 	{	    
-		-1.0f + spriteRect.x*hscale, 1.0f - spriteRect.y*vscale, textureCoords[0], textureCoords[1],
-		-1.0f + (spriteRect.x + spriteRect.w)*hscale, 1.0f - spriteRect.y*vscale, textureCoords[2], textureCoords[3],
-		-1.0f + spriteRect.x*hscale, 1.0f - (spriteRect.y + spriteRect.h)*vscale, textureCoords[4], textureCoords[5],
-		-1.0f + (spriteRect.x + spriteRect.w)*hscale, 1.0f - (spriteRect.y + spriteRect.h)*vscale, textureCoords[6], textureCoords[7]
+		-1.0f, 1.0f, textureCoords[0], textureCoords[1],
+		-1.0f + dst.w*hscale, 1.0f, textureCoords[2], textureCoords[3],
+		-1.0f, 1.0f - dst.h*vscale, textureCoords[4], textureCoords[5],
+		-1.0f + dst.w*hscale, 1.0f - dst.h*vscale, textureCoords[6], textureCoords[7]
 	};
 
 	// shader program selection
@@ -382,10 +379,16 @@ void GLVideoDriver::blitSprite(GLTextureSprite2D* spr, int x, int y, const Regio
 	spritesPerFrame++;
 }
 
+void GLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
+{
+	GLBlitSprite((GLTextureSprite2D*)spr, src, dst, palette);
+}
+
 void GLVideoDriver::clearRect(const Region& rgn, const Color& color)
 {
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
-	glScissor(rgn.x, height - rgn.y - rgn.h, rgn.w, rgn.h);
+	Region scissorRect = ClippedDrawingRect(rgn);
+	glScissor(scissorRect.x, height - scissorRect.y - scissorRect.h, scissorRect.w, scissorRect.h);
 	glClearColor(color.r/255, color.g/255, color.b/255, color.a/255);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -395,7 +398,8 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
 	useProgram(programRect);
 	glViewport(0, 0, width, height);
-	glScissor(0, 0, width, height);
+	Region scissorRect = ClippedDrawingRect(Region(0, 0, width, height));
+	glScissor(scissorRect.x, height - scissorRect.y - scissorRect.h, scissorRect.w, scissorRect.h);
 	GLfloat* data = new GLfloat[count*VERTEX_SIZE];
 	for(unsigned int i=0; i<count; i++)
 	{
@@ -479,28 +483,23 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	if (flags & TILE_GREY) blitFlags |= BLIT_GREY;
 	if (flags & TILE_SEPIA) blitFlags |= BLIT_SEPIA;
 
+	Region dst(tx, ty, spr->Width, spr->Height);
+	if(clip)
+	{
+		dst = dst.Intersect(*clip);
+	}
+
+	const Color* totint = NULL;
 	if (core->GetGame()) 
 	{
-		const Color* totint = core->GetGame()->GetGlobalTint();
-		return blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, NULL, blitFlags, totint, (GLTextureSprite2D*)mask);
+		totint = core->GetGame()->GetGlobalTint();
 	}
-	return blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, NULL, blitFlags, NULL, (GLTextureSprite2D*)mask);
+	return GLBlitSprite((GLTextureSprite2D*)spr, Region(0, 0, spr->Width, spr->Height), dst,
+						NULL, blitFlags, totint, (GLTextureSprite2D*)mask);
 }
 
-void GLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor, const Region* clip, Palette* palette)
-{
-	// x, y is a position on screen (if anchor) or viewport (if !anchor)
-	int tx = x - spr->XPos;
-	int ty = y - spr->YPos;
-	if (!anchor) 
-	{
-		tx -= Viewport.x;
-		ty -= Viewport.y;
-	}
-	return blitSprite((GLTextureSprite2D*)spr, tx, ty, clip, palette);
-}
-
-void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint, SpriteCover* cover, Palette *palette,	const Region* clip, bool anchor)
+void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
+								   SpriteCover* cover, Palette *palette, const Region* clip, bool anchor)
 {
 	int tx = x - spr->XPos;
 	int ty = y - spr->YPos;
@@ -569,10 +568,15 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		}
 	}
 
+	Region src(0, 0, glSprite->Width, glSprite->Height);
+	Region dst(tx, ty, glSprite->Width, glSprite->Height);
+	if (clip) {
+		dst = dst.Intersect(*clip);
+	}
 	if (tint.r == 0 && tint.g == 0 && tint.b == 0)
-		blitSprite(glSprite, tx, ty, clip, palette, flags);
+		GLBlitSprite(glSprite, src, dst, palette, flags);
 	else
-		blitSprite(glSprite, tx, ty, clip, palette, flags, &tint);
+		GLBlitSprite(glSprite, src, dst, palette, flags, &tint);
 	if (coverTexture != 0)
 	{
 		glActiveTexture(GL_TEXTURE2);

@@ -49,8 +49,8 @@ def OnLoad():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)
 
 	MessageTA = MessageWindow.GetControl (1)
-	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
-	MessageTA.SetHistory (100)
+	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+
 	GemRB.SetVar ("MessageTextArea", MessageTA.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
@@ -66,7 +66,7 @@ def OnLoad():
 	CloseButton= MessageWindow.GetControl (0)
 	CloseButton.SetText(28082)
 	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
-	CloseButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CloseButton.SetFlags (IE_GUI_BUTTON_DEFAULT | IE_GUI_BUTTON_MULTILINE, OP_OR)
 	
 	OpenButton = OptionsWindow.GetControl (10)
 	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)

@@ -120,10 +120,9 @@ def UpdateJournalWindow ():
 		GemRB.SetToken("HOUR",str(hours%24 ) )
 		GemRB.SetVar("DAYANDMONTH",dayandmonth)
 		GemRB.SetToken("YEAR",year)
-		Text.Append (GemRB.GetString(15980), 3*i)
+		Text.Append (GemRB.GetString(15980) + "\n")
 
-		Text.Append (je['Text'], 3*i + 1)
-		Text.Append ("", 3*i + 2)
+		Text.Append (GemRB.GetString(je['Text']) + "\n\n")
 
 
 ###################################################

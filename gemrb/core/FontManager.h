@@ -24,33 +24,20 @@
 #include "TypeID.h"
 #include "Resource.h"
 #include "exports.h"
-#include "Font.h"
+#include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
 
 class GEM_EXPORT FontManager : public Resource {
-private:
-	/*
-	 private data members
-	 */
 public:
-	/*
-	Public data members
-	*/
+	// Public data members
 	static const TypeID ID;
-private:
-	/*
-	Private methods
-	*/
 public:
-	/*
-	Public methods
-	*/
-	FontManager(void);
+	// Public methods
+	FontManager();
 	virtual ~FontManager(void);
 
-	virtual Font* GetFont(unsigned short ptSize,
-						  FontStyle style, Palette* pal = NULL) = 0;
+	virtual Font* GetFont(ieWord pxSize, FontStyle style, Palette* = NULL)=0;
 };
 
 }

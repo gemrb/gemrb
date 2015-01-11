@@ -56,7 +56,7 @@ protected:
 	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
 
-	char *subtitletext;
+	String *subtitletext;
 	ieDword subtitlestrref;
 public:
 	SDLVideoDriver(void);
@@ -89,14 +89,17 @@ public:
 							Palette* palette, bool cK, int index);
 	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
+
 	virtual bool SupportsBAMSprites() { return true; }
-	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
+
+	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
+						  const Region* clip, unsigned int flags);
 	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
-					const Region* clip = NULL, Palette* palette = NULL);
-	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
-		unsigned int flags, Color tint,
-		SpriteCover* cover, Palette *palette = NULL,
-		const Region* clip = NULL, bool anchor = false);
+							const Region* clip = NULL, Palette* palette = NULL);
+	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* pal = NULL);
+	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
+								SpriteCover* cover, Palette *palette = NULL,
+								const Region* clip = NULL, bool anchor = false);
 
 	virtual Sprite2D* GetScreenshot( Region r );
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
@@ -121,12 +124,8 @@ public:
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 
-	/** Set Clip Rect */
-	void SetClipRect(const Region* clip);
-	/** Get Clip Rect */
-	void GetClipRect(Region& clip);
-	/** Convers a Screen Coordinate to a Game Coordinate */
 
+	/** Convers a Screen Coordinate to a Game Coordinate */
 	void ConvertToGame(short& x, short& y)
 	{
 		x += Viewport.x;
@@ -157,6 +156,7 @@ public:
 
 protected:
 	void DrawMovieSubtitle(ieDword strRef);
+	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);

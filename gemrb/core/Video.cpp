@@ -52,8 +52,27 @@ Video::Video(void)
 	}
 }
 
-Video::~Video(void)
+Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 {
+	Region r = target.Intersect(screenClip);
+	if (clip) {
+		// Intersect clip with both screen and target rectangle
+		r = clip->Intersect(r);
+	}
+	// the clip must be "safe". no negative values or crashy crashy
+	if (r.Dimensions().IsEmpty()) { // logically equivalent to no intersection
+		r.h = 0;
+		r.w = 0;
+	}
+	return r;
+}
+
+void Video::SetScreenClip(const Region* clip)
+{
+	screenClip = Region(0,0, width, height);
+	if (clip) {
+		screenClip = screenClip.Intersect(*clip);
+	}
 }
 
 bool Video::ToggleFullscreenMode()
@@ -96,7 +115,7 @@ Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 		// if the pixel buffers are the same then either there are no pixels (NULL)
 		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
 		// toggle the bit because it could be a mirror of a mirror
-		dest->renderFlags ^= RENDER_FLIP_VERTICAL;
+		dest->renderFlags ^= BLIT_MIRRORY;
 	}
 
 	dest->XPos = sprite->XPos;
@@ -133,7 +152,7 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 		// if the pixel buffers are the same then either there are no pixels (NULL)
 		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
 		// toggle the bit because it could be a mirror of a mirror
-		dest->renderFlags ^= RENDER_FLIP_HORIZONTAL;
+		dest->renderFlags ^= BLIT_MIRRORX;
 	}
 
 	if (MirrorAnchor)
@@ -160,7 +179,7 @@ void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
 	}
 	//decrease refcount of the previous cursor
 	if (Cursor[curIdx])
-		FreeSprite(Cursor[curIdx]);
+		Sprite2D::FreeSprite(Cursor[curIdx]);
 	Cursor[curIdx] = cur;
 }
 
@@ -352,14 +371,6 @@ void Video::MoveViewportTo(int x, int y)
 + height / 2 );
 		Viewport.x = x;
 		Viewport.y = y;
-	}
-}
-
-void Video::FreeSprite(Sprite2D*& spr)
-{
-	if (spr) {
-		spr->release();
-		spr = NULL;
 	}
 }
 

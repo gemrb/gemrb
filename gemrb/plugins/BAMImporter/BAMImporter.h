@@ -61,7 +61,7 @@ public:
 	bool Open(DataStream* stream);
 	int GetCycleSize(unsigned char Cycle);
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
-		unsigned char mode = IE_NORMAL);
+		unsigned char mode = IE_NORMAL, bool allowCompression = true);
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Sprite2D* GetPalette();

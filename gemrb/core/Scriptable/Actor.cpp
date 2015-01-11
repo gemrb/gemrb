@@ -599,12 +599,12 @@ void Actor::SetName(int strref, unsigned char type)
 {
 	if (type!=2) {
 		if (LongName) free(LongName);
-		LongName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
+		LongName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
 		LongStrRef = strref;
 	}
 	if (type!=1) {
 		if (ShortName) free(ShortName);
-		ShortName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
+		ShortName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
 		ShortStrRef = strref;
 	}
 }
@@ -939,7 +939,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 
 void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 {
-	if (clab[0]!='*') {
+	if (clab && clab[0]!='*') {
 		if (max) {
 			//singleclass
 			ApplyClab_internal(this, clab, max, true);
@@ -2228,7 +2228,6 @@ static void InitActorTables()
 				}
 			}
 			free(classnames);
-			classnames = NULL;
 
 			buffer.appendFormatted("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
 			buffer.appendFormatted("DS: %d ", dualswap[tmpindex]);
@@ -3503,8 +3502,15 @@ void Actor::VerbalConstant(int start, int count) const
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return;
 	}
 
+	ieDword subtitles = 0;
+	core->GetDictionary()->Lookup("Subtitles", subtitles);
+
+	if (!subtitles || count < 0) {
+		return;
+	}
+
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
-	if (PCStats && PCStats->SoundSet[0]) {
+	if (subtitles && PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
 		do {
 			count--;
@@ -3515,10 +3521,10 @@ void Actor::VerbalConstant(int start, int count) const
 			}
 		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
-		while(count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
+		while (count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
 			count--;
 		}
-		if(count > 0) {
+		if (count > 0) {
 			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+RAND(0, count-1)), DS_CONSOLE|DS_SPEECH);
 		}
 	}
@@ -3738,8 +3744,10 @@ void Actor::CommandActor(Action* action)
 			}
 		default:;
 	}
-	//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
-	VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
+	if (core->GetFirstSelectedPC(false) == this) {
+		//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
+		VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
+	}
 }
 
 //Generates an idle action (party banter, area comment, bored)
@@ -4167,7 +4175,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
-			type_name = core->GetString(it->second.strref, 0);
+			type_name = core->GetCString(it->second.strref, 0);
 		}
 		detailed = true;
 	}
@@ -4203,10 +4211,11 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			char tmp[64];
-			const char* msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
-			snprintf(tmp, sizeof(tmp), "%s (%d)", msg, damage);
-			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
+			String* msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
+			wchar_t dmg[10];
+			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L" (%d)", damage);
+			displaymsg->DisplayStringName(*msg + dmg, DMC_WHITE, this);
+			delete msg;
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
@@ -6672,22 +6681,29 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	bool critical = criticalroll>=ATTACKROLL;
 	bool success = critical;
-
+	int defense = target->GetDefense(damagetype, wi.wflags, this);
+	int rollMod = (ReverseToHit) ? defense : tohit;
 	if (!critical) {
-		//get target's defense against attack
-		int defense = target->GetDefense(damagetype, wi.wflags, this);
-
-		if(ReverseToHit) {
-			success = roll + defense > tohit;
-		} else {
-			success = tohit + roll > defense;
-		}
 		// autohit immobile enemies (true for atleast stun, sleep, timestop)
 		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
 			success = true;
+		} else {
+			success = (roll + rollMod) > ((ReverseToHit) ? tohit : defense);
 		}
 	}
 
+	ieDword log = 0;
+	core->GetDictionary()->Lookup("Rolls", log);
+	if (log) {
+		// log the roll
+		// FIXME: Im sure there are string constants we should be using!
+		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
+		wchar_t* rollLog = (wchar_t*)malloc(40 * sizeof(wchar_t));//Rolls
+		const wchar_t* fmt = L"Attack Roll %d %ls %d = %d : %ls";
+		swprintf( rollLog, 40, fmt, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, (success) ? L"Hit" : L"Miss" );
+		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
+		free(rollLog);
+	}
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
@@ -7251,7 +7267,7 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 		Sprite2D* nextFrame = 0;
 		if (anim)
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-		if (nextFrame && bbox.InsideRegion( vp ) ) {
+		if (nextFrame && bbox.IntersectsRegion( vp ) ) {
 			if (!newsc || !newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
 				// the first anim contains the animarea for
 				// the entire multi-part animation
@@ -9952,10 +9968,9 @@ void Actor::DisplayHeadHPRatio()
 	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return;
 	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return;
 
-	char tmpstr[10];
-	memset(tmpstr, 0, 10);
-	snprintf(tmpstr, 10, "%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
-	DisplayHeadText(tmpstr);
+	wchar_t tmpstr[10];
+	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
+	SetOverheadText(tmpstr);
 }
 
 void Actor::ReleaseCurrentAction()

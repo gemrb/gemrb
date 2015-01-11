@@ -20,7 +20,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Bitmap.cpp
 	Cache.cpp
 	Calendar.cpp
-	Callback.cpp
 	CharAnimations.cpp
 	Compressor.cpp
 	ControlAnimation.cpp
@@ -35,7 +34,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Factory.cpp
 	FactoryObject.cpp
 	FileCache.cpp
-	Font.cpp
 	FontManager.cpp
 	Game.cpp
 	GameData.cpp
@@ -116,6 +114,9 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/Slider.cpp
 	GUI/TextArea.cpp
 	GUI/TextEdit.cpp
+	GUI/TextSystem/Font.cpp
+	GUI/TextSystem/GemMarkup.cpp
+	GUI/TextSystem/TextContainer.cpp
 	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
 	RNG/RNG_SFMT.cpp

@@ -22,6 +22,7 @@
 
 #include "TlkOverride.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cassert>
 
@@ -130,7 +131,7 @@ char* CTlkOverride::GetString(ieDword offset)
 	ret[length]=0;
 	while(length) {
 		tot_str->Seek(offset+8, GEM_STREAM_START);
-		ieDword tmp = MIN(length, SEGMENT_SIZE);
+		ieDword tmp = std::min<ieDword>(length, SEGMENT_SIZE);
 		tot_str->Read(pos, tmp);
 		tot_str->Seek(SEGMENT_SIZE-tmp, GEM_CURRENT_POS);
 		tot_str->ReadDword(&offset);
@@ -151,6 +152,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		assert(strref!=0xffffffff);
 	}
 
+	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
 	ieDword length = strlen(newvalue);
 	if(length>65535) length=65535;
 	length++;
@@ -163,7 +165,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		//fill the backpointer
 		tot_str->Seek(offset + 4, GEM_STREAM_START);
 		tot_str->WriteDword(&backp);
-		ieDword seglen = MIN(SEGMENT_SIZE, length);
+		ieDword seglen = std::min<ieDword>(SEGMENT_SIZE, length);
 		tot_str->Write(newvalue + memoffset, seglen);
 		length -= seglen;
 		memoffset += seglen;
@@ -256,7 +258,7 @@ ieStrRef CTlkOverride::GetNextStrRef()
 			}
 			toh_str->ReadDword(&last);
 		}
-		NextStrRef = MAX(STRREF_START, ++last);
+		NextStrRef = std::max<ieDword>(STRREF_START, ++last);
 	}
 	ref = NextStrRef++;
 	return ref;

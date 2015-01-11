@@ -45,7 +45,7 @@ Public methods
 	bool Open(DataStream* stream);
 	void Close();
 
-	Font* GetFont(unsigned short ptSize,
+	Font* GetFont(unsigned short pxSize,
 				  FontStyle style, Palette* pal = NULL);
 
 	// freetype "callbacks"

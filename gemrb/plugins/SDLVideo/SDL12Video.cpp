@@ -77,6 +77,7 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	height = disp->h;
 	Viewport.w = width;
 	Viewport.h = height;
+	SetScreenClip(NULL);
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating Main Surface...");
 	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, width, height,
 						bpp, 0, 0, 0, 0 );
@@ -102,16 +103,11 @@ void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
 		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
 	}
-	if (SDL_LockSurface( disp ) == 0) {
-		memset( disp->pixels, 0,
-			   disp->w * disp->h * disp->format->BytesPerPixel );
-		SDL_UnlockSurface( disp );
-		SDL_Flip( disp );
-		w = disp->w;
-		h = disp->h;
-	} else {
-		print("Couldn't lock surface: %s\n", SDL_GetError());
-	}
+	SDL_FillRect(disp, NULL, 0);
+	SDL_Flip( disp );
+	w = disp->w;
+	h = disp->h;
+
 	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;
 	subtitleregion.h = h/4;
@@ -134,7 +130,6 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 {
 	int i;
 	SDL_Surface* sprite;
-	SDL_Rect srcRect, destRect;
 
 	assert( bufw == w && bufh == h );
 
@@ -151,18 +146,12 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 		}
 	}
 
-	srcRect.x = sx;
-	srcRect.y = sy;
-	srcRect.w = w;
-	srcRect.h = h;
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-
 	SDL_Rect rect = RectFromRegion(subtitleregion);
 	SDL_FillRect(disp, &rect, 0);
-	SDL_BlitSurface( sprite, &srcRect, disp, &destRect );
+	SDL_Surface* tmp = backBuf;
+	backBuf = disp;
+	BlitSurfaceClipped(sprite, Region(sx, sy, w, h), Region(dstx, dsty, w, h));
+	backBuf = tmp;
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
 	SDL_Flip( disp );

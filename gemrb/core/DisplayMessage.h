@@ -29,8 +29,10 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "strrefs.h"
+#include "System/String.h"
 
-#include <cstdlib>
+#include <string>
 
 namespace GemRB {
 
@@ -47,19 +49,26 @@ class Scriptable;
 class GEM_EXPORT DisplayMessage
 {
 private:
-	bool ReadStrrefs();
+	struct StrRefs {
+		std::string loadedTable;
+		ieStrRef table[STRREF_COUNT];
+
+		StrRefs();
+		bool LoadTable(const std::string& name);
+		ieStrRef operator[](size_t) const;
+	};
+	static StrRefs SRefs;
+	static void LoadStringRefs();
+public:
+	static ieStrRef GetStringReference(size_t);
+	static bool HasStringReference(size_t);
 
 public:
-	DisplayMessage(void);
-
-	/** returns a string reference from a string reference index constant */
-	ieStrRef GetStringReference(int stridx) const;
-	/** returns true if a string reference for a string reference index constant exists */
-	bool HasStringReference(int stridx) const;
+	DisplayMessage();
 	/** returns the speaker's color and name */
-	unsigned int GetSpeakerColor(char *&name, const Scriptable *&speaker) const;
+	unsigned int GetSpeakerColor(String& name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
-	void DisplayString(const char *txt, Scriptable *speaker=NULL) const;
+	void DisplayMarkupString(const String& txt) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
@@ -74,10 +83,10 @@ public:
 	void DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(int stridx, unsigned int color, ieDword flags) const;
-	void DisplayString(const char *text, unsigned int color, Scriptable *target) const;
+	void DisplayString(const String& text, unsigned int color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const;
-	void DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const;
+	void DisplayStringName(const String& text, unsigned int color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
 	void DisplayRollStringName(int stridx, unsigned int color, const Scriptable *speaker, ...) const;
 };

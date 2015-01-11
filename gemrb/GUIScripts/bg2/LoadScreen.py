@@ -23,6 +23,7 @@
 
 import GemRB
 import GameCheck
+import MessageWindow
 from GUIDefines import *
 
 LoadScreen = None
@@ -38,6 +39,7 @@ def StartLoadScreen ():
 	LoadScreen = GemRB.LoadWindow (0)
 	LoadScreen.SetFrame ()
 	Middle = LoadScreen.GetControl (3)
+	Progress = GemRB.GetVar ("Progress")
 
 	if not GameCheck.IsBG2Demo():
 		LoadPic = GemRB.GetGameString (STR_LOADMOS)
@@ -50,14 +52,11 @@ def StartLoadScreen ():
 		#   and display the "quiet" frame first and the "flaming" frame the second time.
 		#   It would be even better to display the phases inbetween as well; however,
 		#   the bg2demo does not either, even though the frames are there.
-		Progress = GemRB.GetVar ("Progress")
 		if Progress:
 			Middle.SetBAM ("COADCNTR", 1, 0)
 		else:
 			Middle.SetBAM ("COADCNTR", 0, 0)
 
-	Progress = 0
-	GemRB.SetVar ("Progress", Progress)
 	if GameCheck.HasTOB():
 		Table = GemRB.LoadTable ("loadh25")
 	else:
@@ -65,19 +64,26 @@ def StartLoadScreen ():
 	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
 	HintStr = Table.GetValue (tmp, 0)
-	TextArea = LoadScreen.GetControl (2)
-	TextArea.SetText (HintStr)
+
+	Label = LoadScreen.GetControl (2)
+	Label.SetText(HintStr)
+
+	def EndLoadScreen ():
+		GemRB.SetVar ("Progress", 0)
+		MessageWindow.UpdateControlStatus()
+		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
+		
+		if GameCheck.IsBG2Demo():
+			Middle = LoadScreen.GetControl (3)
+			Middle.SetBAM ("COADCNTR", 1, 0)
+	
+		LoadScreen.SetVisible (WINDOW_VISIBLE)
+		LoadScreen.Unload()
+		return
+
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
 
-def EndLoadScreen ():
-	if GameCheck.IsBG2Demo():
-		Middle = LoadScreen.GetControl (3)
-		Middle.SetBAM ("COADCNTR", 1, 0)
-
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	LoadScreen.Unload()
-        return
 

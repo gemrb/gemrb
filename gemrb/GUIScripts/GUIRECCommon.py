@@ -234,14 +234,14 @@ def OpenCustomPortraitWindow ():
 
 	# Portrait List Large
 	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
-	RowCount1 = PortraitList1.GetPortraits (0)
+	RowCount1 = PortraitList1.ListResources (CHR_PORTRAITS, 0)
 	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, LargeCustomPortrait)
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
 	PortraitList2 = SubSubCustomizeWindow.GetControl (3)
-	RowCount2 = PortraitList2.GetPortraits (1)
+	RowCount2 = PortraitList2.ListResources (CHR_PORTRAITS, 1)
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, SmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
@@ -313,11 +313,7 @@ def OpenSoundWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
-	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-
-	VoiceList.SetVarAssoc ("Selected", 0)
-	VoiceList.GetCharSounds()
-	VoiceList.SelectText (OldVoiceSet)
+	VoiceList.ListResources(CHR_SOUNDS)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
@@ -388,8 +384,22 @@ def OpenScriptWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
-	ScriptTextArea.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-	FillScriptList ()
+	row = ScriptsTable.GetRowCount ()
+	
+	options = []
+	for i in range (row):
+		GemRB.SetToken ("script", ScriptsTable.GetRowName (i) )
+		title = ScriptsTable.GetValue (i,0)
+		if title!=-1:
+			desc = ScriptsTable.GetValue (i,1)
+			txt = GemRB.GetString (title)
+			if (desc!=-1):
+				txt += GemRB.GetString (desc) + "\n"
+			options.append(txt) 
+		else:
+			options.append (ScriptsTable.GetRowName (i) + "\n")
+	ScriptTextArea.SetOptions (options)
+	
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
 	scriptindex = ScriptsTable.GetRowIndex (script)
@@ -409,27 +419,9 @@ def OpenScriptWindow ():
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
-	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, UpdateScriptSelection)
+	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def FillScriptList ():
-	global ScriptTextArea
-
-	ScriptTextArea.Clear ()
-	row = ScriptsTable.GetRowCount ()
-	for i in range (row):
-		GemRB.SetToken ("script", ScriptsTable.GetRowName (i) )
-		title = ScriptsTable.GetValue (i,0)
-		if title!=-1:
-			desc = ScriptsTable.GetValue (i,1)
-			txt = GemRB.GetString (title)
-			if (desc!=-1):
-				txt += GemRB.GetString (desc)
-			ScriptTextArea.Append (txt+"\n", -1)
-		else:
-			ScriptTextArea.Append (ScriptsTable.GetRowName (i)+"\n" ,-1)
 	return
 
 def DoneScriptWindow ():
@@ -594,7 +586,7 @@ def OpenExportWindow ():
 	TextArea.SetText (10962)
 
 	TextArea = ExportWindow.GetControl (0)
-	TextArea.GetCharacters ()
+	TextArea.ListResources (CHR_EXPORTS)
 
 	ExportDoneButton = ExportWindow.GetControl (4)
 	ExportDoneButton.SetText (11973)

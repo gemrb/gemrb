@@ -251,14 +251,14 @@ def DisplayFavouredEnemy (pc, RangerLevel, second=-1):
 			return
 		FavouredName = HateRaceTable.GetValue (FavouredIndex, 0)
 		if second == -1:
-			RecordsTextArea.Append (delimited_txt(FavouredName, ":", PlusMinusStat((RangerLevel+4)/5)))
+			RecordsTextArea.Append (DelimitedText(FavouredName, PlusMinusStat((RangerLevel+4)/5)))
 		else:
-			RecordsTextArea.Append (delimited_txt(FavouredName, ":", PlusMinusStat((RangerLevel+4)/5-second-1)))
+			RecordsTextArea.Append (DelimitedText(FavouredName, PlusMinusStat((RangerLevel+4)/5-second-1)))
 
 def GetFavoredClass (pc, code):
 	if GemRB.GetPlayerStat (pc, IE_SEX)==1:
 		code = code&15
-	else:
+	else:	
 		code = (code>>8)&15
 
 	return code-1
@@ -296,40 +296,34 @@ def DisplayCommon (pc):
 	return
 
 def DisplaySavingThrows (pc):
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (17379)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(17379) + "[/color]\n")
 
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
-	RecordsTextArea.Append (delimited_txt(17380, ":", PlusMinusStat(tmp)))
+	RecordsTextArea.Append (DelimitedText(17380, PlusMinusStat(tmp), 0))
 
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEREFLEX)
-	RecordsTextArea.Append (delimited_txt(17381, ":", PlusMinusStat(tmp)))
+	RecordsTextArea.Append (DelimitedText(17381, PlusMinusStat(tmp), 0))
 
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEWILL)
-	RecordsTextArea.Append (delimited_txt(17382, ":", PlusMinusStat(tmp), 0))
+	RecordsTextArea.Append (DelimitedText(17382, PlusMinusStat(tmp), 0))
 
 # screenshots at http:// lparchive.org/Icewind-Dale-2/Update%2013/
 def GNZS(pc, s1, st, force=False):
 	value = GemRB.GetPlayerStat (pc, st)
 	if value or force:
-		RecordsTextArea.Append (s1, -1)
-		RecordsTextArea.Append (": "+ str(value) )
+		RecordsTextArea.Append (DelimitedText(s1, value, 0))
 	return
 
 def DisplayGeneral (pc):
 	Window = RecordsWindow
 
 	#levels
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (40308)
-	RecordsTextArea.Append (" - ")
-	RecordsTextArea.Append (40309)
-	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
 	# get special level penalty for subrace
 	adj = GetECL (pc)
-	RecordsTextArea.Append (": "+str(levelsum) )
-	RecordsTextArea.Append ("[/color]")
+	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40308) + " - " +
+                            GemRB.GetString(40309) + ": " + str(levelsum) + "[/color]\n")
+
 	#the class name for highest
 	highest = None
 	tmp = 0
@@ -338,21 +332,16 @@ def DisplayGeneral (pc):
 
 		if level:
 			Class = GUICommonWindows.GetActorClassTitle (pc, i )
-			RecordsTextArea.Append (Class, -1)
-			RecordsTextArea.Append (": "+str(level) )
+			RecordsTextArea.Append (DelimitedText (Class, level))
 			if tmp<level:
 				highest = i
 				tmp = level
 
-	RecordsTextArea.Append ("\n")
 	#effective character level
 	if adj:
-		RecordsTextArea.Append (40311,-1)
-		RecordsTextArea.Append (": "+str(levelsum+adj) )
+		RecordsTextArea.Append (DelimitedText (40311, levelsum+adj))
 
 	#favoured class
-	RecordsTextArea.Append (40310,-1)
-
 	#get the subrace value
 	RaceIndex = IDLUCommon.GetRace (pc)
 	Race = CommonTables.Races.GetValue (RaceIndex, 2)
@@ -364,90 +353,71 @@ def DisplayGeneral (pc):
 		tmp = GetFavoredClass(pc, tmp)
 
 	tmp = CommonTables.Classes.GetValue (CommonTables.Classes.GetRowName(tmp), "NAME_REF")
-	RecordsTextArea.Append (": ")
-	RecordsTextArea.Append (tmp)
+	RecordsTextArea.Append (DelimitedStrRefs (40310, tmp, 0))
 
 	#experience
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (17089)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(17089) + "[/color]\n")
 
-	RecordsTextArea.Append (36928,-1)
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
-	RecordsTextArea.Append (str(xp))
-	RecordsTextArea.Append (17091,-1)
+	RecordsTextArea.Append (DelimitedText (36928, xp, 0, ""))
 	tmp = GetNextLevelExp (levelsum, adj, 1)
-	RecordsTextArea.Append (": "+tmp )
+	RecordsTextArea.Append (DelimitedText (17091, tmp, 0))
 
 	#current effects
 	effects = GemRB.GetPlayerStates (pc)
 	if len(effects):
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
-		RecordsTextArea.Append (32052)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(32052) + "[/color]\n")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
-			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
-			RecordsTextArea.Append ("[capital=2]"+c+" ", -1)
-			RecordsTextArea.Append (tmp)
+			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION", GTV_REF)
+			RecordsTextArea.Append ("[cap]"+c+"%[/cap][p]" + tmp + "[/p]")
 
 	# TODO: Active Feats (eg. Power attack 4)
 
 	#race
-	RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
-	RecordsTextArea.Append (1048)
-	RecordsTextArea.Append ("[/color]")
-
-	RecordsTextArea.Append (Race,-1)
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(1048) + "[/color]\n")
+	RecordsTextArea.Append ("[p]" + GemRB.GetString(Race) + "[/p]")
 
 	#alignment
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (1049)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(1049) + "[/color]\n")
 	tmp = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT))
-	Align = CommonTables.Aligns.GetValue (tmp, 2)
-	RecordsTextArea.Append (Align,-1)
+	Align = CommonTables.Aligns.GetValue (tmp, 2, GTV_REF)
+	RecordsTextArea.Append ("[p]" + Align + "[/p]")
 
 	#saving throws
 	DisplaySavingThrows (pc)
 
 	#class features
 	if HasClassFeatures(pc):
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
-		RecordsTextArea.Append (40314)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40314) + "[/color]\n")
 		tmp = GemRB.GetPlayerStat (pc, IE_TURNUNDEADLEVEL)
 		if tmp:
-			RecordsTextArea.Append (12126,-1)
-			RecordsTextArea.Append (": "+str(tmp) )
+			RecordsTextArea.Append (DelimitedText (12126, tmp, 0))
 		# 1d6 at level 1 and +1d6 every two extra rogue levels
 		tmp = GemRB.GetPlayerStat (pc, IE_LEVELTHIEF)
 		if tmp:
 			tmp = (tmp+1)//2
-			RecordsTextArea.Append (24898,-1)
-			RecordsTextArea.Append (": "+str(tmp)+"d6" )
+			RecordsTextArea.Append (DelimitedText (24898, str(tmp)+"d6", 0))
 		tmp = GemRB.GetPlayerStat (pc, IE_LAYONHANDSAMOUNT)
 		if tmp:
-			RecordsTextArea.Append (12127,-1)
-			RecordsTextArea.Append (": "+str(tmp) )
+			RecordsTextArea.Append (DelimitedText (12127, tmp, 0))
 		MonkLevel = GemRB.GetPlayerStat (pc, IE_LEVELMONK)
 		if MonkLevel:
 			AC = GemRB.GetCombatDetails(pc, 0)["AC"]
 			GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
-			RecordsTextArea.Append (39431, -1)
+			RecordsTextArea.Append (39431)
 			# wholeness of body
-			RecordsTextArea.Append (39749, -1)
-			RecordsTextArea.Append (": "+str(MonkLevel*2))
+			RecordsTextArea.Append (DelimitedText (39749, MonkLevel*2, 0))
 
 	# favoured enemies; eg Goblins: +2 & Harpies: +1
 	RangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
 	if RangerLevel:
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
+		RangerString = "\n[color=ffff00]"
 		if RangerLevel > 5:
-			RecordsTextArea.Append (15982)
+			RangerString += GemRB.GetString (15982)
 		else:
-			RecordsTextArea.Append (15897)
-		RecordsTextArea.Append ("[/color]\n")
+			RangerString += GemRB.GetString (15897)
+		RecordsTextArea.Append (RangerString + "[/color]\n")
 		DisplayFavouredEnemy (pc, RangerLevel)
 		for i in range (7):
 			DisplayFavouredEnemy (pc, RangerLevel, i)
@@ -455,31 +425,26 @@ def DisplayGeneral (pc):
 	#bonus spells
 	bonusSpells, classes = GetBonusSpells(pc)
 	if len(bonusSpells):
-		RecordsTextArea.Append ("\n\n[color=ffff00]")
-		RecordsTextArea.Append (10344)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(10344) + "[/color]\n")
 		for c in classes:
 			if not len(bonusSpells[c]):
 				continue
 			# class/kit name
-			RecordsTextArea.Append ("\n")
-			RecordsTextArea.Append (c)
+			RecordsTextArea.Append ("[p]" + GemRB.GetString (c) + "[/p]")
 			for level in range(len(bonusSpells[c])):
 				AddIndent()
 				# Level X: +Y
-				RecordsTextArea.Append (delimited_txt(7192, " " + str(level+1)+":", "+" + str(bonusSpells[c][level]), 0))
+				RecordsTextArea.Append (DelimitedText(7192, "+" + str(bonusSpells[c][level]), 0, " " + str(level+1)+": "))
 
 	#ability statistics
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (40315)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(40315) + "[/color]\n")
 
 	# Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
-	RecordsTextArea.Append (delimited_txt (10338, ":", str(tmp) + " lb."))
+	RecordsTextArea.Append (DelimitedText (10338, str(tmp) + " lb."))
 	# constitution bonus to hitpoints
 	tmp = GUICommon.GetAbilityBonus(pc, IE_CON)
-	RecordsTextArea.Append (delimited_txt (10342, ":", PlusMinusStat(tmp)))
+	RecordsTextArea.Append (DelimitedText (10342, PlusMinusStat(tmp)))
 
 	# Magic
 	GNZS(pc, 15581, IE_RESISTMAGIC, True)
@@ -529,9 +494,7 @@ def DisplayGeneral (pc):
 			if damage == -1 or damage-mod <= 0:
 				continue
 			if not DisplayedHeader:
-				RecordsTextArea.Append ("\n\n[capital=0][color=ffff00]")
-				RecordsTextArea.Append (39325)
-				RecordsTextArea.Append ("[/color]\n")
+				RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(39325) + "[/color]\n")
 				DisplayedHeader = 1
 
 			enchantment += 1 # since we were checking what is allowable, not what bypasses it
@@ -540,13 +503,13 @@ def DisplayGeneral (pc):
 			else:
 				enchantment = "-"
 			reduction = "%d/%s" %(damage-mod, enchantment)
-			RecordsTextArea.Append (delimited_txt(BaseString, ":", reduction, 1))
+			RecordsTextArea.Append (DelimitedText(BaseString, reduction))
 
 	return
 
 # some of the displayed stats are manually indented
 def AddIndent():
-	RecordsTextArea.Append ("   ", -1)
+	RecordsTextArea.Append ("   ")
 
 def PlusMinusStat(value):
 	if value >= 0:
@@ -572,7 +535,7 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 	if left:
 		apr = 1 # offhand gives just one extra attack
 		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
-		RecordsTextArea.Append (delimited_txt (733, ":", hits, 0))
+		RecordsTextArea.Append (DelimitedText (733, hits, 0))
 	else:
 		# account for the fact that the total apr contains the one for the other hand too
 		if dualwielding:
@@ -580,37 +543,37 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 		else:
 			apr = combatdet["APR"]//2
 		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
-		RecordsTextArea.Append (delimited_txt (734, ":", hits, 0))
+		RecordsTextArea.Append (DelimitedText (734, hits, 0))
 
 	# Base
 	AddIndent()
 	hits = CascadeToHit(tohit["Base"], ac, apr, combatdet["Slot"])
-	RecordsTextArea.Append (delimited_txt (31353, ":", hits, 0))
+	RecordsTextArea.Append (DelimitedText (31353, hits, 0))
 	# Weapon bonus
 	if tohit["Weapon"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (32560 , ":", PlusMinusStat(tohit["Weapon"]), 0))
+		RecordsTextArea.Append (DelimitedText (32560, PlusMinusStat(tohit["Weapon"]), 0))
 	# Proficiency bonus
 	if tohit["Proficiency"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(tohit["Proficiency"]), 0))
+		RecordsTextArea.Append (DelimitedText (32561, PlusMinusStat(tohit["Proficiency"]), 0))
 	# Armor Penalty
 	if tohit["Armor"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(tohit["Armor"]), 0))
+		RecordsTextArea.Append (DelimitedText (39816, PlusMinusStat(tohit["Armor"]), 0))
 	# Shield Penalty (if you don't have the shield proficiency feat)
 	if tohit["Shield"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (39822 , ":", PlusMinusStat(tohit["Shield"]), 0))
+		RecordsTextArea.Append (DelimitedText (39822, PlusMinusStat(tohit["Shield"]), 0))
 	# Ability  bonus
 	if tohit["Ability"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (33547, ":", PlusMinusStat(tohit["Ability"]), 0))
+		RecordsTextArea.Append (DelimitedText (33547, PlusMinusStat(tohit["Ability"]), 0))
 	# Others
 	if tohit["Generic"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(tohit["Generic"]), 0))
-	RecordsTextArea.Append ("\n\n")
+		RecordsTextArea.Append (DelimitedText (33548, PlusMinusStat(tohit["Generic"]), 0))
+	RecordsTextArea.Append ("\n")
 
 def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	slot = combatdet["Slot"]
@@ -629,12 +592,12 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	# Main Hand - weapon name
 	#  or Ranged - ammo
 	if combatdet["Flags"]&15 == 2 and ammo: # this is basically wi.wflags & WEAPON_STYLEMASK == WEAPON_RANGED
-		RecordsTextArea.Append (delimited_str (41123, " -", ammo["ItemNameIdentified"], 0))
+		RecordsTextArea.Append (DelimitedStrRefs (41123, ammo["ItemNameIdentified"], 0, " - "))
 	else:
 		if dualwielding and left:
-			RecordsTextArea.Append (delimited_str (733, " -", item["ItemNameIdentified"], 0))
+			RecordsTextArea.Append (DelimitedStrRefs (733, item["ItemNameIdentified"], 0, " - "))
 		else:
-			RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
+			RecordsTextArea.Append (DelimitedStrRefs (734, item["ItemNameIdentified"], 0, " - "))
 
 	# Damage
 	# display the unresolved damage string (2d6)
@@ -644,9 +607,9 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	wbonus = combatdet["HitHeaderDiceBonus"]
 	AddIndent()
 	if wbonus:
-		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
+		RecordsTextArea.Append (DelimitedText (39518, str (wdice)+"d"+str(wsides)+PlusMinusStat(wbonus), 0))
 	else:
-		RecordsTextArea.Append (delimited_txt (39518, ":", str (wdice)+"d"+str(wsides), 0))
+		RecordsTextArea.Append (DelimitedText (39518, str (wdice)+"d"+str(wsides), 0))
 	# any extended headers with damage, eg. Fire: +1d6, which is also computed for the total (00arow08)
 	alldos = combatdet["DamageOpcodes"]
 	dosmin = 0
@@ -676,24 +639,24 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	abonus = combatdet["WeaponStrBonus"]
 	if abonus:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (1145, ":", PlusMinusStat (abonus), 0))
+		RecordsTextArea.Append (DelimitedText (1145, PlusMinusStat (abonus), 0))
 	# Proficiency (bonus)
 	pbonus = combatdet["ProfDmgBon"]
 	if pbonus:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (32561, ":", PlusMinusStat(pbonus), 0))
+		RecordsTextArea.Append (DelimitedText (32561, PlusMinusStat(pbonus), 0))
 	# Launcher
 	lbonus = combatdet["LauncherDmgBon"]
 	if lbonus:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (41408, ":", PlusMinusStat(lbonus), 0))
+		RecordsTextArea.Append (DelimitedText (41408, PlusMinusStat(lbonus), 0))
 	#TODO: Power Attack has its own row
 	# Damage Potential (2-12)
 	# add any other bonus to the ammo damage calc
 	AddIndent()
 	wmin = wdice + wbonus + abonus + pbonus + lbonus + dosmin
 	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus + dosmax
-	RecordsTextArea.Append (delimited_txt (41120, ":", str (wmin)+"-"+str(wmax), 0))
+	RecordsTextArea.Append (DelimitedText (41120, str (wmin)+"-"+str(wmax), 0))
 	# Critical Hit (19-20 / x2)
 	crange = combatdet["CriticalRange"]
 	cmulti = combatdet["CriticalMultiplier"]
@@ -702,7 +665,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	else:
 		crange = str(crange) + "-20 / x" + str(cmulti)
 	AddIndent()
-	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
+	RecordsTextArea.Append (DelimitedText (41122, crange, 0))
 	if not left and dualwielding:
 		RecordsTextArea.Append ("\n")
 
@@ -716,9 +679,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Attack Roll Modifiers
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (9457)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(9457) + "[/color]\n")
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
 	combatdet2 = combatdet # placeholder for the potential offhand numbers
@@ -740,81 +701,70 @@ def DisplayWeapons (pc):
 	# Number of Attacks
 	if dualwielding:
 		# only one extra offhand attack and it is displayed as eg. 2+1
-		RecordsTextArea.Append (delimited_txt (9458, ":", str (combatdet["APR"]//2-1)+"+1"))
+		RecordsTextArea.Append (DelimitedText (9458, str (combatdet["APR"]//2-1)+"+1"))
 	else:
-		RecordsTextArea.Append (delimited_txt (9458, ":", str (combatdet["APR"]//2)))
-	RecordsTextArea.Append ("\n")
+		RecordsTextArea.Append (DelimitedText (9458, str (combatdet["APR"]//2)))
 
 	###################
 	# Armor Class
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (33553)
-	RecordsTextArea.Append ("[/color]\n")
-	RecordsTextArea.Append (delimited_txt (33553, ":", str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(33553) + "[/color]\n")
+	RecordsTextArea.Append (DelimitedText (33553, str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
 	AddIndent()
-	RecordsTextArea.Append (delimited_txt (31353, ":", str (ac["Natural"]), 0))
+	RecordsTextArea.Append (DelimitedText (31353, str (ac["Natural"]), 0))
 	# Armor
 	if ac["Armor"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (11997, ":", PlusMinusStat (ac["Armor"]), 0))
+		RecordsTextArea.Append (DelimitedText (11997, PlusMinusStat (ac["Armor"]), 0))
 	# Shield
 	if ac["Shield"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (6347, ":", PlusMinusStat (ac["Shield"]), 0))
+		RecordsTextArea.Append (DelimitedText (6347, PlusMinusStat (ac["Shield"]), 0))
 	# Deflection
 	if ac["Deflection"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (33551, ":", PlusMinusStat (ac["Deflection"]), 0))
+		RecordsTextArea.Append (DelimitedText (33551, PlusMinusStat (ac["Deflection"]), 0))
 	# Generic
 	if ac["Generic"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (33552, ":", PlusMinusStat (ac["Generic"]), 0))
+		RecordsTextArea.Append (DelimitedText (33552, PlusMinusStat (ac["Generic"]), 0))
 	# Dexterity
 	if ac["Dexterity"]:
 		AddIndent()
-		RecordsTextArea.Append (delimited_txt (1151, ":", PlusMinusStat (ac["Dexterity"]), 0))
+		RecordsTextArea.Append (DelimitedText (1151, PlusMinusStat (ac["Dexterity"]), 0))
 	# Monk Wisdom Bonus: <number> to AC
 	if ac["Wisdom"]:
 		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
-		RecordsTextArea.Append (39431, -1)
-
-	RecordsTextArea.Append ("\n\n")
+		RecordsTextArea.Append (394311)
 
 	###################
 	# Armor Class Modifiers
 	stat = GS (IE_ACMISSILEMOD) + GS (IE_ACSLASHINGMOD) + GS (IE_ACPIERCINGMOD) + GS (IE_ACCRUSHINGMOD)
 	if stat:
-		RecordsTextArea.Append ("[color=ffff00]")
-		RecordsTextArea.Append (11766)
-		RecordsTextArea.Append ("[/color]")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(11766) + "[/color]")
 
 		# Missile
 		if GS (IE_ACMISSILEMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11767, ":", PlusMinusStat(GS (IE_ACMISSILEMOD)), 0))
+			RecordsTextArea.Append (DelimitedText (11767, PlusMinusStat(GS (IE_ACMISSILEMOD)), 0))
 		# Slashing
 		if GS (IE_ACSLASHINGMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11768, ":", PlusMinusStat (GS (IE_ACSLASHINGMOD)), 0))
+			RecordsTextArea.Append (DelimitedText (11768, PlusMinusStat (GS (IE_ACSLASHINGMOD)), 0))
 		# Piercing
 		if GS (IE_ACPIERCINGMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11769, ":", PlusMinusStat (GS (IE_ACPIERCINGMOD)), 0))
+			RecordsTextArea.Append (DelimitedText (11769, PlusMinusStat (GS (IE_ACPIERCINGMOD)), 0))
 		# Bludgeoning
 		if GS (IE_ACCRUSHINGMOD):
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (11770, ":", PlusMinusStat (GS (IE_ACCRUSHINGMOD))))
-
-		RecordsTextArea.Append ("\n\n")
+			RecordsTextArea.Append (DelimitedText (11770, PlusMinusStat (GS (IE_ACCRUSHINGMOD))))
 
 	###################
 	# Arcane spell failure
 	if GS(IE_LEVELBARD) + GS(IE_LEVELSORCERER) + GS(IE_LEVELMAGE):
-		RecordsTextArea.Append ("[color=ffff00]")
-		RecordsTextArea.Append (41391)
-		RecordsTextArea.Append ("[/color]\n")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(41391) + "[/color]\n")
 
 		# Casting Failure
 		failure = GemRB.GetSpellFailure (pc)
@@ -830,37 +780,32 @@ def DisplayWeapons (pc):
 			verbose = 1
 		if total < 0:
 			total = 0
-		RecordsTextArea.Append (delimited_txt (41390 , ":", str (total)+"%", 0))
+		RecordsTextArea.Append (DelimitedText (41390, str (total)+"%", 0))
 		# Armor Penalty (same as for skills and everything else)
 		if verbose and failure["Armor"]:
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (39816 , ":", PlusMinusStat(5*failure["Armor"])+"%", 0))
+			RecordsTextArea.Append (DelimitedText (39816, PlusMinusStat(5*failure["Armor"])+"%", 0))
 		# Shield Penalty
 		if verbose and failure["Shield"]:
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (39822, ":", PlusMinusStat(5*failure["Shield"])+"%", 0))
+			RecordsTextArea.Append (DelimitedText (39822, PlusMinusStat(5*failure["Shield"])+"%", 0))
 		if arcana:
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (36352, ":", PlusMinusStat(arcana)+"%", 0))
+			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(arcana)+"%", 0))
 		# Other, just a guess to show the remainder
 		if other:
 			AddIndent()
-			RecordsTextArea.Append (delimited_txt (33548, ":", PlusMinusStat(other)+"%", 0))
-
-		RecordsTextArea.Append ("\n\n")
+			RecordsTextArea.Append (DelimitedText (33548, PlusMinusStat(other)+"%", 0))
 
 	###################
 	# Weapon Statistics
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (41119)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(41119) + "[/color]\n")
 
 	# Main hand
 	WeaponOfHand(pc, combatdet, dualwielding)
 
 	# Off-hand (if any)
 	if dualwielding:
-		RecordsTextArea.Append ("\n")
 		WeaponOfHand(pc, combatdet2, dualwielding, 1)
 
 	DisplaySavingThrows (pc)
@@ -873,78 +818,60 @@ def DisplaySkills (pc, TAOverride=None):
 	if TAOverride:
 		tmp = RecordsTextArea
 		RecordsTextArea = TAOverride
+	
+	def PrintStatTable (title, tabname):
+		feats = True if tabname == "feats" else False
+		lookup = "featreq" if feats else "skillsta"
 
-	SkillTable = GemRB.LoadTable ("skillsta")
-	SkillName = GemRB.LoadTable ("skills")
-	rows = SkillTable.GetRowCount ()
+		nameTab = GemRB.LoadTable (tabname)
+		itemTab = GemRB.LoadTable (lookup)
+		rows = itemTab.GetRowCount ()
+		
+		RecordsTextArea.Append ("[color=ffff00]" + title + "[/color]\n")
+		
+		items = []
+		for i in range(rows):
+			item = itemTab.GetValue (i, 0, GTV_STAT)
+			name = nameTab.GetValue (i, 1)
 
-	#skills
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (11983)
-	RecordsTextArea.Append ("[/color]\n")
-
-	skills = []
-	for i in range(rows):
-		stat = SkillTable.GetValue (i, 0, 2)
-		modStat = SkillTable.GetValue (i, 1, 2)
-		value = GemRB.GetPlayerStat (pc, stat)
-		base = GemRB.GetPlayerStat (pc, stat, 1)
-		untrained = SkillName.GetValue (i, 3)
-		if modStat != IE_DEX: # already handled in core
-			value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
-
-		# only show (modified) skills that either don't require training or had it already
-		if (value and untrained) or (not untrained and base):
-			skill = SkillName.GetValue (i, 1)
-			skills.append (GemRB.GetString(skill) + ": " + str(value) + " (" + str(base) + ")\n")
-
-	skills.sort()
-	for i in skills:
-		RecordsTextArea.Append (i)
-
-	FeatTable = GemRB.LoadTable ("featreq")
-	FeatName = GemRB.LoadTable ("feats")
-	rows = FeatTable.GetRowCount ()
-	#feats
-	RecordsTextArea.Append ("\n\n[color=ffff00]")
-	RecordsTextArea.Append (36361)
-	RecordsTextArea.Append ("[/color]\n")
-
-	feats = []
-	for i in range(rows):
-		if GemRB.HasFeat(pc, i):
-			feat = FeatName.GetValue (i, 1)
-			stat = FeatTable.GetValue (i, 0, 2)
-			if stat:
-				multi = GemRB.GetPlayerStat (pc, stat)
-				feats.append (GemRB.GetString(feat) + ": " + str(multi) + "\n")
+			if feats and GemRB.HasFeat(pc, i):
+				value = (name,) if not item else (name, GemRB.GetPlayerStat (pc, item),)
+				items.append (value)
+			elif not feats:
+				value = GemRB.GetPlayerStat (pc, item)
+				modStat = itemTab.GetValue (i, 1, GTV_STAT)
+				if modStat != IE_DEX: # already handled in core
+					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
+				base = GemRB.GetPlayerStat (pc, item, 1)
+				untrained = nameTab.GetValue (i, 3)
+				
+				# only show (modified) skills that either don't require training or had it already
+				if (value and untrained) or (not untrained and base):
+					items.append((name, str(value) + " (" + str(base) + ")",))
+			
+		items.sort()
+		for item in items:
+			if len(item) > 1:
+				RecordsTextArea.Append (DelimitedText(item[0], item[1], 0))
 			else:
-				feats.append (GemRB.GetString(feat) + "\n")
+				RecordsTextArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
+		return
 
-	feats.sort()
-	for i in feats:
-		RecordsTextArea.Append (i)
+	PrintStatTable (GemRB.GetString(11983), "skills")
+	RecordsTextArea.Append ("\n")
+	PrintStatTable (GemRB.GetString(36361), "feats")
 
 	if TAOverride:
 		RecordsTextArea = tmp
+
 	return
 
-def delimited_str(strref, delimiter, strref2, newline=1):
-	if strref2:
-		val = GemRB.GetString(strref) + delimiter + " " + GemRB.GetString(strref2)
-	else:
-		val = GemRB.GetString(strref) + delimiter
-	if newline:
-		return val + "\n"
-	else:
-		return val
+def DelimitedStrRefs(strref1, strref2, newlines=1, delimiter=": "):
+	text = GemRB.GetString(strref2) 
+	return DelimitedText(strref1, text, newlines, delimiter)
 
-def delimited_txt(strref, delimiter, text, newline=1):
-	val = GemRB.GetString(strref) + delimiter + " " + str(text)
-	if newline:
-		return val + "\n"
-	else:
-		return val
+def DelimitedText(strref, text, newlines=1, delimiter=": "):
+	return "[p]" + GemRB.GetString(strref) + delimiter + str(text) + "[/p]" + ("\n" * newlines)
 
 #character information
 def DisplayMisc (pc):
@@ -960,21 +887,17 @@ def DisplayMisc (pc):
 	stat = GemRB.GetPCStats (pc)
 
 	#favourites
-	RecordsTextArea.Append ("[color=ffff00]")
-	RecordsTextArea.Append (40320)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40320) + "[/color]\n")
 
 	#favourite spell and weapon
-	RecordsTextArea.Append (delimited_str (11949, ":", stat['FavouriteSpell']))
-	RecordsTextArea.Append (delimited_str (11950, ":", stat['FavouriteWeapon']))
+	RecordsTextArea.Append (DelimitedStrRefs (11949, stat['FavouriteSpell']))
+	RecordsTextArea.Append (DelimitedStrRefs (11950, stat['FavouriteWeapon']))
 
 	# combat details
-	RecordsTextArea.Append ("\n[color=ffff00]")
-	RecordsTextArea.Append (40322)
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40322) + "[/color]\n")
 
 	#most powerful vanquished, time spent, xp and kills
-	RecordsTextArea.Append (delimited_str (11947, ":", stat['BestKilledName']))
+	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName']))
 
 	days, hours = GUICommon.SetCurrentDateTokens (stat)
 	# iwd2 is special here
@@ -993,27 +916,27 @@ def DisplayMisc (pc):
 	else:
 		time += GemRB.GetString (10700)
 
-	RecordsTextArea.Append (delimited_txt (11948, ":", time))
+	RecordsTextArea.Append (DelimitedText (11948, time))
 
 	# Experience Value of Kills
-	RecordsTextArea.Append (delimited_txt (11953, ":", stat['KillsTotalXP']))
+	RecordsTextArea.Append (DelimitedText (11953, stat['KillsTotalXP']))
 
 	# Number of Kills
-	RecordsTextArea.Append (delimited_txt (11954, ":", stat['KillsTotalCount']))
+	RecordsTextArea.Append (DelimitedText (11954, stat['KillsTotalCount']))
 
 	# Total Experience Value in Party
 	if TotalPartyExp:
 		val = stat['KillsTotalXP']*100/TotalPartyExp
 	else:
 		val = 0
-	RecordsTextArea.Append (delimited_txt (11951, ":", str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11951, str(val) + "%"))
 
 	# Percentage of Total Kills in Party
 	if TotalPartyExp:
 		val = stat['KillsTotalCount']*100/TotalCount
 	else:
 		val = 0
-	RecordsTextArea.Append (delimited_txt (11952, ":", str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%"))
 
 	return
 
@@ -1126,7 +1049,6 @@ def UpdateRecordsWindow ():
 
 	RecordsTextArea = Window.GetControl (45)
 	RecordsTextArea.SetText ("")
-	RecordsTextArea.Append ("[capital=0]")
 
 	DisplayCommon (pc)
 

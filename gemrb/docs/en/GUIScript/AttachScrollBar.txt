@@ -8,5 +8,5 @@ ScrollBarControlIndex                  - the scrollbar's index on the same windo
 
 Return value: N/A
 
-See also: ConvertEdit, SetDefaultScrollBar
+See also: SetDefaultScrollBar
 

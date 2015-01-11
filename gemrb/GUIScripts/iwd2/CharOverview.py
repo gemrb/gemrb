@@ -39,8 +39,7 @@ Steps = ['Gender', 'Race', 'Class', 'Alignment', 'Abilities', 'Enemy', 'Appearan
 GlobalStep = 0
 
 ### Utility functions
-def AddText(strref, row = False):
-	if row: return TextAreaControl.Append(strref, row)
+def AddText(strref):
 	return TextAreaControl.Append(strref)
 ### End utility functions
 
@@ -155,9 +154,7 @@ def UpdateOverview(CurrentStep):
 		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0))
 	
 	if GemRB.GetVar('Ability 0') > 0:
-		AddText('\n[color=FFFF00]', -1)
-		AddText(17088)
-		AddText('[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]')
 		for i in range(0, 6):
 			strref = Tables[3].GetValue(i, 2)
 			AddText(strref, -1)
@@ -165,11 +162,9 @@ def UpdateOverview(CurrentStep):
 			AddText(': %d (%+d)' % (abl, abl / 2 - 5))
 	
 	if CurrentStep > 6:
-		AddText('\n[color=FFFF00]', -1)
-		AddText(11983)
-		AddText('[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(11983) + '[/color]')
 		
-		ClassColumn = Tables[1].GetValue(GemRB.GetVar('Class') - 1, 3, 1) # Finds base class row id
+		ClassColumn = Tables[1].GetValue(GemRB.GetVar('Class') - 1, 3, GTV_INT) # Finds base class row id
 		if ClassColumn < 1: ClassColumn = GemRB.GetVar('Class') - 1 # If 0 then already a base class so need actual row
 		else: ClassColumn -= 1 # 'CLASS' column in classes.2da is out by 1 for some reason
 		ClassColumn += 4 # There are 4 columns before the classes in skills.2da
@@ -183,18 +178,18 @@ def UpdateOverview(CurrentStep):
 			ClassColumn = GemRB.GetVar('Class') - 12
 		
 		RaceName = Tables[0].GetRowName(Tables[0].FindValue(3, GemRB.GetVar('Race')))
-		SkillColumn = Tables[0].GetValue(RaceName, 'SKILL_COLUMN', 1) + 1
+		SkillColumn = Tables[0].GetValue(RaceName, 'SKILL_COLUMN', GTV_INT) + 1
 		Lookup = {'STR': 0, 'DEX': 1, 'CON': 2, 'INT': 3, 'WIS': 4, 'CHR': 5} # Probably a better way to do this
 		for i in range(Tables[4].GetRowCount()):
 			SkillName = Tables[5].GetRowName(i)
-			Abl = Tables[4].GetValue(i, 1, 0)
+			Abl = Tables[4].GetValue(i, 1, GTV_STR)
 			Ranks = GemRB.GetVar('Skill ' + str(i))
 			value = Ranks
 			value += (GemRB.GetVar('Ability ' + str(Lookup[Abl])) / 2 - 5)
-			value += Tables[5].GetValue(i, SkillColumn, 1)
-			value += Tables[5].GetValue(i, ClassColumn, 1)
+			value += Tables[5].GetValue(i, SkillColumn, GTV_INT)
+			value += Tables[5].GetValue(i, ClassColumn, GTV_INT)
 			
-			untrained = Tables[5].GetValue(i, 3, 1)
+			untrained = Tables[5].GetValue(i, 3, GTV_INT)
 			if not untrained and Ranks < 1:
 				value = 0
 			
@@ -205,9 +200,7 @@ def UpdateOverview(CurrentStep):
 				if value != Ranks: strn += ' (' + str(Ranks) + ')'
 				AddText(strn)
 
-		AddText('\n[color=FFFF00]', -1)
-		AddText(36310)
-		AddText('[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(36310) + '[/color]')
 		
 		for i in range(Tables[6].GetRowCount()):
 			value = GemRB.GetVar('Feat ' + str(i))

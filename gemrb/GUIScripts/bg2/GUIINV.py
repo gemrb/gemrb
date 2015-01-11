@@ -133,9 +133,9 @@ def OpenInventoryWindow ():
 	Button = Window.GetControl (67)
 	r = Button.GetRect ()
 	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],20,
-		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-20,r["Width"],20,
-		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
+		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	# armor class
 	Label = Window.GetControl (0x10000038)
@@ -201,6 +201,10 @@ def RefreshInventoryWindow ():
 	# name
 	Label = Window.GetControl (0x10000032)
 	Label.SetText (GemRB.GetPlayerName (pc, 0))
+	
+	# class
+	Label = Window.GetControl (0x10000042)
+	Label.SetText (GUICommon.GetActorClassTitle (pc))
 
 	# portrait
 	Button = Window.GetControl (50)
@@ -269,11 +273,6 @@ def RefreshInventoryWindow ():
 	# party gold
 	Label = Window.GetControl (0x10000040)
 	Label.SetText (str (GemRB.GameGetPartyGold ()))
-
-	# class
-	ClassTitle = GUICommon.GetActorClassTitle (pc)
-	Label = Window.GetControl (0x10000042)
-	Label.SetText (ClassTitle)
 
 	Button = Window.GetControl (62)
 	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF

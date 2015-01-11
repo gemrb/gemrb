@@ -26,14 +26,15 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "Font.h"
 #include "Projectile.h"
 #include "Spell.h"
+#include "Sprite2D.h"
 #include "SpriteCover.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
+#include "GUI/TextSystem/Font.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
 
@@ -53,10 +54,10 @@ Scriptable::Scriptable(ScriptableType type)
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
-	overHeadText = NULL;
 	overHeadTextPos.empty();
-	textDisplaying = 0;
+	overheadTextDisplaying = 0;
 	timeStartDisplaying = 0;
+
 	scriptName[0] = 0;
 	scriptlevel = 0;
 
@@ -133,10 +134,8 @@ Scriptable::~Scriptable(void)
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		delete Scripts[i];
 	}
-	if (overHeadText) {
-		core->FreeString( overHeadText );
-	}
-	delete locals;
+
+	delete( locals );
 }
 
 void Scriptable::SetScriptName(const char* text)
@@ -207,21 +206,29 @@ void Scriptable::SetSpellResRef(ieResRef resref) {
 	strnuprcpy(SpellResRef, resref, 8);
 }
 
-void Scriptable::DisplayHeadText(const char* text)
+void Scriptable::SetOverheadText(const String& text, bool display)
 {
-	if (overHeadText) {
-		core->FreeString( overHeadText );
-	}
 	overHeadTextPos.empty();
-	if (text) {
-		overHeadText = strdup(text);
+	if (!text.empty()) {
+		OverheadText = text;
+		DisplayOverheadText(display);
+	} else {
+		DisplayOverheadText(false);
+	}
+}
+
+bool Scriptable::DisplayOverheadText(bool show)
+{
+	if (show && !overheadTextDisplaying) {
+		overheadTextDisplaying = true;
 		timeStartDisplaying = core->GetGame()->Ticks;
-		textDisplaying = 1;
-	}
-	else {
+		return true;
+	} else if (!show && overheadTextDisplaying) {
+		overheadTextDisplaying = false;
 		timeStartDisplaying = 0;
-		textDisplaying = 0;
+		return true;
 	}
+	return false;
 }
 
 /* 'fix' the current overhead text in the current position */
@@ -233,24 +240,22 @@ void Scriptable::FixHeadTextPos()
 #define MAX_DELAY  6000
 void Scriptable::DrawOverheadText(const Region &screen)
 {
+	if (!overheadTextDisplaying)
+		return;
+
 	unsigned long time = core->GetGame()->Ticks;
 	Palette *palette = NULL;
 
-	if (!textDisplaying)
-		return;
-
 	time -= timeStartDisplaying;
-
-	Font* font = core->GetFont( 1 );
 	if (time >= MAX_DELAY) {
-		textDisplaying = 0;
+		DisplayOverheadText(false);
 		return;
 	} else {
 		time = (MAX_DELAY-time)/10;
 		if (time<256) {
 			ieByte time2 = time; // shut up narrowing warnings
 			const Color overHeadColor = {time2,time2,time2,time2};
-			palette = core->CreatePalette(overHeadColor, ColorBlack);
+			palette = new Palette(overHeadColor, ColorBlack);
 		}
 	}
 
@@ -268,10 +273,17 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		y = overHeadTextPos.y;
 	}
 
+	if (!palette) {
+		palette = core->InfoTextPalette;
+		palette->acquire();
+	}
+
+	core->GetVideoDriver()->ConvertToScreen(x, y);
 	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
-	font->Print( rgn, ( unsigned char * ) overHeadText,
-		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
-	gamedata->FreePalette(palette);
+	core->GetTextFont()->Print( rgn, OverheadText, palette,
+							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
+
+	palette->release();
 }
 
 void Scriptable::ImmediateEvent()
@@ -387,7 +399,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	if (act) {
 		// if party AI is disabled, don't run non-override scripts
-		if (act->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
+		if (act->InParty && !(core->GetGame()->ControlStatus & CS_PARTY_AI))
 			scriptCount = 1;
 		// TODO: hardcoded action hacks
 		//TODO: add stuff here that overrides actions (like Panic, etc)
@@ -434,7 +446,11 @@ void Scriptable::AddAction(Action* aC)
 	// when added if the action queue is empty, even on actors which are Held/etc
 	// FIXME: area check hack until fuzzie fixes scripts here
 	if (!CurrentAction && !GetNextAction() && area) {
-		if (actionflags[aC->actionID] & AF_INSTANT) {
+		int instant = AF_SCR_INSTANT;
+		if (core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
+			instant = AF_DLG_INSTANT;
+		}
+		if (actionflags[aC->actionID] & instant) {
 			CurrentAction = aC;
 			GameScript::ExecuteAction( this, CurrentAction );
 			return;
@@ -897,22 +913,21 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 			target=core->GetGame()->GetActorByGlobalID(tgt);
 		}
 	}
-	char* spell = core->GetString(spl->SpellName);
-	if (stricmp(spell, "") && Type == ST_ACTOR) {
-		char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-		char *tmp;
+
+	String* spell = core->GetString(spl->SpellName);
+	if (spell->length() && Type == ST_ACTOR) {
+		wchar_t str[256];
+
 		if (target) {
-			tmp = (char *) malloc(strlen(msg)+strlen(spell)+strlen(target->GetName(-1))+5);
-			sprintf(tmp, "%s %s : %s", msg, spell, target->GetName(-1));
+			String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
+			delete msg;
 		} else {
-			tmp = (char *) malloc(strlen(spell)+strlen(GetName(-1))+4);
-			sprintf(tmp, "%s : %s", spell, GetName(-1));
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell->c_str(), GetName(-1));
 		}
-		displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
-		core->FreeString(msg);
-		free(tmp);
+		displaymsg->DisplayStringName(str, DMC_WHITE, this);
 	}
-	core->FreeString(spell);
+	delete spell;
 }
 
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
@@ -1195,14 +1210,15 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 		int IntMod = detective->GetAbilityBonus(IE_INT);
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
-			char tmpstr[100];
+			wchar_t tmpstr[100];
 			// eg. .:Casts Word of Recall:.
-			char *castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
-			char *spellname = core->GetString(spl->SpellName);
-			snprintf(tmpstr, sizeof(tmpstr), ".:%s %s:.", castmsg, spellname);
-			core->FreeString(castmsg);
-			core->FreeString(spellname);
-			DisplayHeadText(tmpstr);
+			String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
+			String* spellname = core->GetString(spl->SpellName);
+			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg->c_str(), spellname->c_str());
+			delete castmsg;
+			delete spellname;
+
+			SetOverheadText(tmpstr);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
@@ -1420,14 +1436,11 @@ int Scriptable::CheckWildSurge()
 			// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
 			if ((check > 0) && (check < 100) ) {
 				// display feedback: Wild Surge: bla bla
-				char *s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-				char *s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
-				char *s3 = (char *) malloc(strlen(s1)+strlen(s2)+2);
-				sprintf(s3, "%s %s", s1, s2);
-				core->FreeString(s1);
-				core->FreeString(s2);
-				displaymsg->DisplayStringName(s3, DMC_WHITE, this);
-				free(s3);
+				String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+				String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+				displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
+				delete s1;
+				delete s2;
 
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;

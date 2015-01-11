@@ -16,12 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "System/Logging.h"
 #include "System/String.h"
 
 #include "exports.h"
+#include "Interface.h"
 
 #include <stdlib.h>
 #include <ctype.h>
+#include <cwctype>
 #ifdef WIN32
 #include "win32def.h"
 #ifdef _DEBUG
@@ -31,8 +34,126 @@
 
 namespace GemRB {
 
+static String* StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
+{
+	if (!string) return NULL;
+
+	bool convert = encoded.widechar || encoded.multibyte;
+	// assert that its something we know how to handle
+	// TODO: add support for other encodings?
+	assert(!convert || (encoded.widechar || encoded.encoding == "UTF-8"));
+
+	size_t len = strlen((char*)string);
+	String* dbString = new String();
+	dbString->reserve(len);
+	size_t dbLen = 0;
+	for(size_t i=0; i<len; ++i) {
+		ieWord currentChr = string[i];
+		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
+		if(convert && (i+1 < len) && (currentChr >= 128 || currentChr < 32)) {
+			// this is a double byte char, or a multibyte sequence
+			ieWord ch = 0;
+			if (encoded.encoding == "UTF-8") {
+				size_t nb = 0;
+				if (currentChr >= 0xC0 && currentChr <= 0xDF) {
+					/* c0-df are first byte of two-byte sequences (5+6=11 bits) */
+					/* c0-c1 are noncanonical */
+					nb = 2;
+				} else if (currentChr >= 0xE0 && currentChr <= 0XEF) {
+					/* e0-ef are first byte of three-byte (4+6+6=16 bits) */
+					/* e0 80-9f are noncanonical */
+					nb = 3;
+				} else if (currentChr >= 0xF0 && currentChr <= 0XF7) {
+					/* f0-f7 are first byte of four-byte (3+6+6+6=21 bits) */
+					/* f0 80-8f are noncanonical */
+					nb = 4;
+				} else if (currentChr >= 0xF8 && currentChr <= 0XFB) {
+					/* f8-fb are first byte of five-byte (2+6+6+6+6=26 bits) */
+					/* f8 80-87 are noncanonical */
+					nb = 5;
+				} else if (currentChr >= 0xFC && currentChr <= 0XFD) {
+					/* fc-fd are first byte of six-byte (1+6+6+6+6+6=31 bits) */
+					/* fc 80-83 are noncanonical */
+					nb = 6;
+				} else {
+					Log(WARNING, "String", "Invalid UTF-8 character: %x", currentChr);
+					continue;
+				}
+
+				ch = currentChr & ((1 << (7 - nb)) - 1);
+				while (--nb)
+					ch <<= 6, ch |= string[++i] & 0x3f;
+			} else {
+				ch = (string[++i] << 8) + currentChr;
+			}
+			dbString->push_back(ch);
+		} else {
+			dbString->push_back(currentChr);
+		}
+		++dbLen;
+	}
+
+	// we dont always use everything we allocated.
+	// realloc in this case to avoid static anylizer warnings about "garbage values"
+	// since this realloc always truncates it *should* be quick
+	dbString->resize(dbLen);
+	return dbString;
+}
+
+String* StringFromCString(const char* string)
+{
+	// if multibyte is false this is basic expansion of cstring to wchar_t
+	// the only reason this is special, is because it allows characters 128-256.
+	return StringFromEncodedData((ieByte*)string, core->TLKEncoding);
+}
+
+char* MBCStringFromString(const String& string)
+{
+	char* cStr = (char*)malloc(string.length()+1);
+	// FIXME: depends on locale setting
+	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
+	size_t newlen = wcstombs(cStr, string.c_str(), string.length());
+	if (newlen == static_cast<size_t>(-1)) {
+		// invalid multibyte sequence
+		free(cStr);
+		return NULL;
+	}
+	// FIXME: assuming compatibility with NTMBS
+	cStr = (char*)realloc(cStr, newlen+1);
+	cStr[newlen] = '\0';
+	return cStr;
+}
+
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
+
+void StringToLower(String& string)
+{
+	for (size_t i = 0; i < string.length(); i++) {
+		if (string[i] < 256) {
+			string[i] = pl_lowercase[string[i]];
+		} else {
+			string[i] = ::towlower(string[i]);
+		}
+	}
+}
+
+void StringToUpper(String& string)
+{
+	for (size_t i = 0; i < string.length(); i++) {
+		if (string[i] < 256) {
+			string[i] = pl_uppercase[string[i]];
+		} else {
+			string[i] = ::towupper(string[i]);
+		}
+	}
+}
+
+void TrimString(String& string)
+{
+	string.erase(0, string.find_first_not_of(WHITESPACE_STRING));
+	string.erase(string.find_last_not_of(WHITESPACE_STRING) + 1);
+}
 
 // these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count, bool pad)
@@ -80,28 +201,6 @@ void strnspccpy(char* dest, const char *source, int count, bool upper)
 	}
 }
 
-/** Convert string to uppercase in-place using selected IE encoding */
-char* strtoupper(char* string)
-{
-	char* s;
-	if (string) {
-		for (s = string; *s; ++s)
-			*s = pl_uppercase[(unsigned char)*s];
-	}
-	return string;
-}
-
-/** Convert string to lowercase in-place using selected IE encoding */
-char* strtolower(char* string)
-{
-	char* s;
-	if (string) {
-		for (s = string; *s; ++s)
-			*s = pl_lowercase[(unsigned char)*s];
-	}
-	return string;
-}
-
 /** Returns the length of string (up to a delimiter) */
 GEM_EXPORT int strlench(const char* string, char ch)
 {
@@ -130,19 +229,6 @@ int strnlen(const char* string, int maxlen)
 #endif // ! HAVE_STRNLEN
 
 //// Compatibility functions
-#ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, size_t l)
-{
-	size_t len = strlen( s );
-	if (len < l) {
-		l = len;
-	}
-	char* string = ( char* ) malloc( l + 1 );
-	strlcpy( string, s, l + 1 );
-	return string;
-}
-#endif
-
 #ifndef HAVE_STRLCPY
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 {
@@ -167,16 +253,6 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 #ifdef WIN32
 
 #else
-
-char* strupr(char* string)
-{
-	char* s;
-	if (string) {
-		for (s = string; *s; ++s)
-			*s = toupper( *s );
-	}
-	return string;
-}
 
 char* strlwr(char* string)
 {

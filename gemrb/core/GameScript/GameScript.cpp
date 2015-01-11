@@ -531,7 +531,7 @@ static const ActionLink actionnames[] = {
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment, 0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment, 0},
 	{"destroygold", GameScript::DestroyGold, 0},
-	{"destroyitem", GameScript::DestroyItem, AF_INSTANT}, //Cespenar won't work without this hack So, do we really need instant.ids?
+	{"destroyitem", GameScript::DestroyItem, AF_DLG_INSTANT}, //Cespenar won't work without this hack So, do we really need instant.ids?
 	{"destroypartygold", GameScript::DestroyPartyGold, 0},
 	{"destroypartyitem", GameScript::DestroyPartyItem, 0},
 	{"destroyself", GameScript::DestroySelf, 0},
@@ -1680,7 +1680,7 @@ void InitializeIEScript()
 		j = *l;
 		// found later as a different name
 		int ii = objectsTable->GetValueIndex( j );
-		if (ii>=MAX_ACTIONS) {
+		if (ii>=MAX_OBJECTS) {
 			continue;
 		}
 
@@ -1701,7 +1701,12 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	LoadActionFlags("instant", AF_INSTANT, true);
+	if (gamedata->Exists("dlginst", IE_IDS_CLASS_ID, true)) {
+		LoadActionFlags("dlginst", AF_DLG_INSTANT, true);
+		LoadActionFlags("scrinst", AF_SCR_INSTANT, true);
+	} else {
+		LoadActionFlags("instant", AF_INSTANT, true);
+	}
 	LoadActionFlags("actsleep", AF_SLEEP, false);
 	LoadActionFlags("chase", AF_CHASE, false);
 
@@ -1718,7 +1723,7 @@ void InitializeIEScript()
 		while (j--) {
 			i = savedTriggersTable->GetValueIndex( j );
 			i &= 0x3fff;
-			if (i >= MAX_ACTIONS) {
+			if (i >= MAX_TRIGGERS) {
 				Log(ERROR, "GameScript", "saved trigger %d (%s) is too high, ignoring",
 					i, savedTriggersTable->GetStringIndex( j ) );
 				continue;

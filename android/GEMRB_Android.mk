@@ -46,7 +46,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/CHUImporter/CHUImporter.cpp \
 		    main/gemrb/plugins/2DAImporter/2DAImporter.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMFontManager.cpp \
-		    main/gemrb/plugins/BAMImporter/BAMFont.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMImporter.cpp \
 		    main/gemrb/plugins/BAMImporter/BAMSprite2D.cpp \
 		    main/gemrb/plugins/PSTOpcodes/PSTOpcodes.cpp \
@@ -209,13 +208,15 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/GUI/Button.cpp \
 		    main/gemrb/core/GUI/GameControl.cpp \
 		    main/gemrb/core/GUI/TextArea.cpp \
+		    main/gemrb/core/TextSystem/Font.cpp \
+		    main/gemrb/core/TextSystem/GemMarkup.cpp \
+		    main/gemrb/core/TextSystem/TextContainer.cpp \
 		    main/gemrb/core/GUI/EventMgr.cpp \
 		    main/gemrb/core/GUI/Progressbar.cpp \
 		    main/gemrb/core/GUI/Console.cpp \
 		    main/gemrb/core/GUI/Slider.cpp \
 		    main/gemrb/core/FontManager.cpp \
 		    main/gemrb/core/MoviePlayer.cpp \
-		    main/gemrb/core/Font.cpp \
 		    main/gemrb/core/MapMgr.cpp \
 		    main/gemrb/core/Compressor.cpp \
 		    main/gemrb/core/PalettedImageMgr.cpp \

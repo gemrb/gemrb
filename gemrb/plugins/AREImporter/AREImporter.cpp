@@ -531,7 +531,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
 
-		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
 		for (x = 0; x < VertexCount; x++) {
@@ -550,10 +549,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		// translate door cursor on infopoint to correct cursor
 		if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
 		ip->Cursor = Cursor;
-		ip->overHeadText = string;
+		String* str = core->GetString( StrRef );
+		ip->SetOverheadText(*str, false);
+		delete str;
 		ip->StrRef = StrRef; //we need this when saving area
-		ip->textDisplaying = 0;
-		ip->timeStartDisplaying = 0;
 		ip->SetMap(map);
 		ip->Flags = Flags;
 		ip->UsePoint.x = PosX;
@@ -1200,8 +1199,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	Point point;
-	ieDword color;
-	char *text;
+	ieDword color = 0;
 
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1216,53 +1214,49 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			while (count) {
 				char key[32];
 				int value;
-				sprintf(key, "text%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
-				text = core->GetString(value);
 				sprintf(key, "xPos%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
 				point.x = value;
 				sprintf(key, "yPos%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
 				point.y = value;
-				map->AddMapNote( point, color, text, 0);
+				sprintf(key, "text%d",count);
+				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				map->AddMapNote( point, color, value);
 				count--;
 			}
 		}
 	}
 	for (i = 0; i < NoteCount; i++) {
-		ieStrRef strref = 0;
-
 		if (pst) {
 			ieDword px,py;
-
 			str->ReadDword(&px);
 			str->ReadDword(&py);
 			point.x=px;
 			point.y=py;
-			text = (char *) malloc( 500 );
-			str->Read(text, 500 );
-			text[499] = 0;
+
+			char bytes[501]; // 500 + null
+			str->Read(bytes, 500 );
+			bytes[500] = '\0';
+			String* text = StringFromCString(bytes);
+			map->AddMapNote( point, color, text);
 			str->ReadDword(&color); //readonly == 1
 			str->Seek(20, GEM_CURRENT_POS);
-			//+1 for the terminating zero!!!
-			text = (char *) realloc( text, strlen(text)+1 );
-		}
-		else {
+		} else {
 			ieWord px,py;
 
 			str->ReadWord( &px );
 			str->ReadWord( &py );
 			point.x=px;
 			point.y=py;
+			ieStrRef strref = 0;
 			str->ReadDword( &strref );
 			str->ReadWord( &px );
 			str->ReadWord( &py );
 			color=py;
 			str->Seek( 40, GEM_CURRENT_POS );
-			text = core->GetString( strref,0 );
+			map->AddMapNote( point, color, strref );
 		}
-		map->AddMapNote( point, color, text, strref );
 	}
 
 	//this is a ToB feature (saves the unexploded projectiles)
@@ -2134,17 +2128,25 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<NoteCount;i++) {
-		MapNote *mn = map->GetMapNote(i);
+		const MapNote& mn = map->GetMapNote(i);
 		int x;
 
 		if (pst) {
-			tmpDword = (ieDword) mn->Pos.x;
+			tmpDword = (ieDword) mn.Pos.x;
 			stream->WriteDword( &tmpDword );
-			tmpDword = (ieDword) mn->Pos.y;
+			tmpDword = (ieDword) mn.Pos.y;
 			stream->WriteDword( &tmpDword );
-			unsigned int len = (unsigned int) strlen(mn->text);
-			if (len>500) len=500;
-			stream->Write( mn->text, len);
+			int len = 0;
+			if (mn.text) {
+				// limited to 500 *bytes* of text, convert to a multibyte encoding.
+				char* mbstring = MBCStringFromString(*mn.text);
+				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
+				len = (std::min)(mblen(mbstring, mn.text->length()), 500);
+				stream->Write( mbstring, len);
+				free(mbstring);
+			}
+
+			// pad the remaining space
 			x = 500-len;
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
@@ -2153,22 +2155,19 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			if (x) {
 				stream->Write( filling, x);
 			}
-			tmpDword = (ieDword) mn->color;
+			tmpDword = (ieDword) mn.color;
 			stream->WriteDword(&tmpDword);
 			for (x=0;x<5;x++) { //5 empty dwords
 				stream->Write( filling, 4);
 			}
 		} else {
-			tmpWord = (ieWord) mn->Pos.x;
+			tmpWord = (ieWord) mn.Pos.x;
 			stream->WriteWord( &tmpWord );
-			tmpWord = (ieWord) mn->Pos.y;
+			tmpWord = (ieWord) mn.Pos.y;
 			stream->WriteWord( &tmpWord );
-			//update custom strref
-			mn->strref = core->UpdateString( mn->strref, mn->text );
-			tmpDword = mn->strref;
-			stream->WriteDword( &tmpDword);
+			stream->WriteDword( &mn.strref);
 			stream->WriteWord( &tmpWord );
-			stream->WriteWord( &mn->color );
+			stream->WriteWord( &mn.color );
 			tmpDword = 1;
 			stream->WriteDword( &tmpDword );
 			for (x=0;x<9;x++) { //9 empty dwords

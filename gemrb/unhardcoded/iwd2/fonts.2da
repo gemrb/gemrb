@@ -1,6 +1,6 @@
 2DA V1.0
 NORMAL
-	RESREF		NEED_PALETTE	FONT_NAME	PT_SIZE		STYLE	COLOR
+	RESREF		NEED_PALETTE	FONT_NAME	PX_SIZE		STYLE	COLOR
 0	NORMAL		1		NORMAL		14		0	0xffffffff
 1	INFOFONT	1		INFOFONT	14		0	0xffffffff
 2	NUMBER		0		NUMBER		14		0	0xffffffff
@@ -18,5 +18,6 @@ NORMAL
 # state "fonts" are the status icons. You probably don't want to edit these.
 14	STATES  	0		STATES		14		0	0xffffffff
 15	STATES2 	0		STATES2		14		0	0xffffffff
+16	GBTNSTD	1	GBTNSTD	14	0	0xffffffff
 
 # Customization How To: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf

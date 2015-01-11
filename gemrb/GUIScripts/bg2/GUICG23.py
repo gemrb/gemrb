@@ -30,7 +30,8 @@ def OnLoad ():
 
 	EditControl = BioWindow.GetControl (3)
 	BIO = GemRB.GetToken("BIO")
-	EditControl = EditControl.ConvertEdit (5)
+	EditTextArea = BioWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
+	EditControl = EditTextArea.SubstituteForControl (EditControl)
 	EditControl.SetVarAssoc ("row", 0)
 	EditControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	if BIO:

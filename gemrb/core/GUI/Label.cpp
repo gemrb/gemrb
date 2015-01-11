@@ -26,38 +26,36 @@
 #include "Interface.h"
 #include "Sprite2D.h"
 #include "Variables.h"
-#include "Video.h"
 #include "GUI/Window.h"
 
 namespace GemRB {
 
-Label::Label(const Region& frame, Font* font, const char* string)
+Label::Label(const Region& frame, Font* font, const String& string)
 	: Control(frame)
 {
 	ControlType = IE_GUI_LABEL;
 	this->font = font;
-	Buffer = NULL;
 	useRGB = false;
 	ResetEventHandler( LabelOnPress );
 
 	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
+	if (frame.h < (font->LineHeight * 2)) {
+		// FIXME: is this a poor way of determinine if we are single line?
+		Alignment |= IE_FONT_SINGLE_LINE;
+	}
 	palette = NULL;
 	SetText(string);
 }
+
 Label::~Label()
 {
 	gamedata->FreePalette( palette );
-	if (Buffer) {
-		free( Buffer );
-	}
 }
 /** Draws the Control on the Output Display */
 void Label::DrawInternal(Region& rgn)
 {
-	if (font && Buffer) {
-		font->Print( rgn, (unsigned char*)Buffer,
-			useRGB?palette:NULL,
-					 Alignment | IE_FONT_SINGLE_LINE, true );
+	if (font && Text.length()) {
+		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);
 	}
 
 	if (AnimPicture) {
@@ -69,22 +67,12 @@ void Label::DrawInternal(Region& rgn)
 
 }
 /** This function sets the actual Label Text */
-void Label::SetText(const char* string)
+void Label::SetText(const String& string)
 {
-	if (Buffer )
-		free( Buffer );
-	if (Alignment == IE_FONT_ALIGN_CENTER) {
-		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			int len = strlen(string);
-			Buffer = (char *) malloc( len+1 );
-			strnlwrcpy( Buffer, string, len );
-		}
-		else {
-			Buffer = strdup( string );
-		}
-	}
-	else {
-		Buffer = strdup( string );
+	Text = string;
+	if (Alignment == IE_FONT_ALIGN_CENTER
+		&& core->HasFeature( GF_LOWER_LABEL_TEXT )) {
+		StringToLower(Text);
 	}
 	if (!palette) {
 		SetColor(ColorWhite, ColorBlack);
@@ -95,7 +83,7 @@ void Label::SetText(const char* string)
 void Label::SetColor(Color col, Color bac)
 {
 	gamedata->FreePalette( palette );
-	palette = core->CreatePalette( col, bac );
+	palette = new Palette( col, bac );
 	MarkDirty();
 }
 
@@ -104,7 +92,7 @@ void Label::SetAlignment(unsigned char Alignment)
 	this->Alignment = Alignment;
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			strtolower( Buffer );
+			StringToLower(Text);
 		}
 	}
 	MarkDirty();
@@ -124,7 +112,7 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 	}
 }
 
-bool Label::SetEvent(int eventType, EventHandler handler)
+bool Label::SetEvent(int eventType, ControlEventHandler handler)
 {
 	switch (eventType) {
 	case IE_GUI_LABEL_ON_PRESS:
@@ -138,9 +126,9 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
-const char* Label::QueryText() const
+String Label::QueryText() const
 {
-	return ( const char * ) Buffer;
+	return Text;
 }
 
 }
