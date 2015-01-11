@@ -3,7 +3,7 @@
         FLAGS  AMOUNT  BONUS_LIMIT
 SPWI110 1      0       0
 SPWI219 2      0       0
-SPPR103 8      0       0
-SPPR401 8      0       0
-SPPR502 8      0       0
-SPIN101 8      0       0
+SPPR103 8      4       0
+SPPR401 8      17      0
+SPPR502 8      27      0
+SPIN101 8      4       0
