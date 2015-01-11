@@ -772,11 +772,11 @@ bool Interface::ReadSpecialSpells()
 	AutoTable table("splspec");
 	if (table) {
 		SpecialSpellsCount = table->GetRowCount();
-		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
+		SpecialSpells = (SpecialSpellType *) malloc( sizeof(SpecialSpellType) * SpecialSpellsCount);
 		for (i=0;i<SpecialSpellsCount;i++) {
 			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
-			SpecialSpells[i].value = atoi(table->QueryField(i,0) );
+			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
 		}
 	} else {
 		result = false;
@@ -802,7 +802,7 @@ int Interface::GetSpecialSpell(const ieResRef resref)
 {
 	for (int i=0;i<SpecialSpellsCount;i++) {
 		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
-			return SpecialSpells[i].value;
+			return SpecialSpells[i].flags;
 		}
 	}
 	return 0;

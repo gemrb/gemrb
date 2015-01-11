@@ -1749,9 +1749,9 @@ void Game::CastOnRest()
 		}
 		if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
 
-		SpellDescType *special_spells = core->GetSpecialSpells();
+		SpecialSpellType *special_spells = core->GetSpecialSpells();
 		while (specialCount--) {
-			if (special_spells[specialCount].value & SP_REST) {
+			if (special_spells[specialCount].flags & SP_REST) {
 				if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
 				// check each party member for the spell
 				while (ps--) {

@@ -9657,9 +9657,9 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	if (i == -1) {
 		return RuntimeError( "Game has no splspec.2da table!" );
 	}
-	SpellDescType *special_spells = core->GetSpecialSpells();
+	SpecialSpellType *special_spells = core->GetSpecialSpells();
 	while(i--) {
-		if (specialtype & special_spells[i].value) {
+		if (specialtype & special_spells[i].flags) {
 			if (actor->spellbook.HaveSpell(special_spells[i].resref,useup)) {
 				if (useup) {
 					//actor->SpellCast(SpecialSpells[i].resref, actor);
