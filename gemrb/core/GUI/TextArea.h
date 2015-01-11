@@ -110,8 +110,6 @@ private: // Private attributes
 	int TextYPos;
 	/** timer for scrolling */
 	unsigned long starttime;
-	/** timer ticks for scrolling (speed) */
-	unsigned long ticks;
 	/** Number of Text Rows */
 	int rows;
 
