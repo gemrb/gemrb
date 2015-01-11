@@ -65,6 +65,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	lastMouseDownTime = lastMouseMoveTime = GetTickCount();
 	subtitlestrref = 0;
 	subtitletext = NULL;
+	disp = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
