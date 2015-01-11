@@ -5,8 +5,8 @@ SPWI105 1      0       0
 SPIN103 4      0       0
 SPIN108 4      0       0
 SPPR502 4      0       0
-SPPR102 8      0       0
-SPPR202 8      0       0
-SPPR401 8      0       0
-SPPR501 8      0       0
-SPPR601 8      0       0
+SPPR102 8      8       0
+SPPR202 8      11      0
+SPPR401 8      17      0
+SPPR501 8      27      0
+SPPR601 8      999     0
