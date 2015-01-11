@@ -777,6 +777,8 @@ bool Interface::ReadSpecialSpells()
 			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
+			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
+			SpecialSpells[i].bonus_limit = atoi(table->QueryField(i, 2));
 		}
 	} else {
 		result = false;

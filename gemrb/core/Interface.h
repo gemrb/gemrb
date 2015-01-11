@@ -156,11 +156,14 @@ struct SpellDescType {
 struct SpecialSpellType {
 	ieResRef resref;
 	int flags;
+	int amount;
+	int bonus_limit;
 };
 #define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
 #define SP_SILENCE   2      //any spell that can be cast in silence
 #define SP_SURGE     4      //any spell that cannot be cast during a wild surge
 #define SP_REST      8      //any spell that is cast upon rest if memorized
+#define SP_HEAL_ALL  16     //any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 
 struct SurgeSpell {
 	ieResRef spell;
