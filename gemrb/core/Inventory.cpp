@@ -1717,6 +1717,7 @@ void Inventory::UpdateWeaponAnimation()
 			}
 			if (si) {
 				Item* it = gamedata->GetItem(si->ItemResRef, true);
+				assert(it);
 				if (core->CanUseItemType(SLOT_WEAPON, it))
 					twoweapon = true;
 				gamedata->FreeItem(it, si->ItemResRef, false);

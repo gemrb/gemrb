@@ -2921,6 +2921,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
 			for (unsigned int k=0;k<count;k++) {
 				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
+				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);
 				stream->WriteWord( &ck->Level);
 				stream->WriteWord( &ck->Type);
@@ -2966,7 +2967,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
 			for (unsigned int k=0;k<count;k++) {
 				CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i,j,k);
-
+				assert(cm);
 				stream->WriteResRef( cm->SpellResRef);
 				stream->WriteDword( &cm->Flags);
 			}
