@@ -3536,8 +3536,8 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
 	} else {
 		overrides = ini.get();
+		iniStream->Close();
 	}
-	iniStream->Close();
 
 	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
 	DataStream* gemINIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
