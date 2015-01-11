@@ -110,8 +110,13 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	struct stat my_stat;
 	PathJoinExt(nPath, Path, Prefix, "bmp");
 	memset(&my_stat,0,sizeof(my_stat));
-	stat( nPath, &my_stat );
-	strftime( Date, _MAX_PATH, "%c", localtime( (time_t*)&my_stat.st_mtime ) );
+	int errno = stat(nPath, &my_stat);
+	if (errno) {
+		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
+		strlcpy(Date, "Sun 31 Feb 00:00:01 2099", _MAX_PATH);
+	} else {
+		strftime(Date, _MAX_PATH, "%c", localtime((time_t*)&my_stat.st_mtime));
+	}
 	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
 	GameDate[0] = '\0';
 }
@@ -393,7 +398,10 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	for(i=size;i--;) {
 		FormatQuickSavePath(from, myslots[i]);
 		FormatQuickSavePath(to, myslots[i]+1);
-		rename(from,to);
+		int errno = rename(from, to);
+		if (errno) {
+			error("SaveGameIterator", "Rename error %d when pruning quicksaves!\n", errno);
+		}
 	}
 }
 
