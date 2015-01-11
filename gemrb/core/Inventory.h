@@ -129,15 +129,13 @@ typedef enum ieCREItemFlagBits {
 struct ItemExtHeader {
 	ieDword slot;
 	ieDword headerindex;
-	ieStrRef Tooltip;
-	ieWord Charges;
-
 	//from itmextheader
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
 	ieByte unknown1;
 	ieResRef UseIcon;
+	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
@@ -151,6 +149,7 @@ struct ItemExtHeader {
 	ieWord DamageType;
 	ieWord FeatureCount;
 	ieWord FeatureOffset;
+	ieWord Charges;
 	ieWord ChargeDepletion;
 	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
