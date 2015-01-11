@@ -665,6 +665,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	GlobalColorMod.speed = 0;
 	GlobalColorMod.phase = 0;
 	GlobalColorMod.locked = false;
+	GlobalColorMod.rgb = Color();
 	lastModUpdate = 0;
 
 	AvatarsRowNum=AvatarsCount;
