@@ -446,7 +446,11 @@ void Scriptable::AddAction(Action* aC)
 	// when added if the action queue is empty, even on actors which are Held/etc
 	// FIXME: area check hack until fuzzie fixes scripts here
 	if (!CurrentAction && !GetNextAction() && area) {
-		if (actionflags[aC->actionID] & AF_INSTANT) {
+		int instant = AF_SCR_INSTANT;
+		if (core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
+			instant = AF_DLG_INSTANT;
+		}
+		if (actionflags[aC->actionID] & instant) {
 			CurrentAction = aC;
 			GameScript::ExecuteAction( this, CurrentAction );
 			return;
