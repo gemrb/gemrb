@@ -40,8 +40,11 @@
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
+#include <map>
+#include <iterator>
 
 namespace GemRB {
+
 
 #define MAX_MAPS_LOADED 1
 
@@ -1739,31 +1742,35 @@ void Game::CastOnRest()
 	if (tmp && specialCount != -1) {
 		int ps = GetPartySize(true);
 		int ps2 = ps;
-		std::vector<Actor *> injurees;
+		std::multimap<ieWord,Actor *> injurees;
 		for (int idx = 1; idx <= ps; idx++) {
 			Actor *tar = FindPC(idx);
-			if (tar && tar->GetStat(IE_HITPOINTS) < tar->GetStat(IE_MAXHITPOINTS)) {
-				injurees.push_back(tar);
+			ieWord hpneeded=tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
+			if (tar && hpneeded > 0) {
+				injurees.insert(std::pair<ieWord,Actor *>(hpneeded,tar));
 			}
 		}
-		if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
 
 		SpellDescType *special_spells = core->GetSpecialSpells();
 		while (specialCount--) {
 			if (special_spells[specialCount].value & SP_REST) {
-				if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
 				// check each party member for the spell
 				while (ps--) {
 					Actor *tar = GetPC(ps, true);
-					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0) && !injurees.empty()) {
+						std::multimap<ieWord,Actor *>::iterator injuree=injurees.end();
+						injuree--;
 						// we have the spell, so cast it on most injured
 						// NOTE: no distinction is made about the potency of spells
-						Actor *injuree = injurees[0];
-						tar->DirectlyCastSpell(injuree, special_spells[specialCount].resref, 0, 1, true);
-						if (injuree->GetStat(IE_HITPOINTS) == injuree->GetStat(IE_MAXHITPOINTS)) {
-							if (!injurees.empty()) {
-								injurees.erase(injurees.begin());
-							}
+						// expected healing is considered 8 for all spells = cure light wounds
+						// TODO: differentiated expected healing values
+						ieWord expectedhealing=8;
+						tar->DirectlyCastSpell(injuree->second, special_spells[specialCount].resref, 0, 1, true);
+						if (injuree->first-8 > 0) {
+							injurees.insert(std::pair<ieWord,Actor *>(injuree->first-expectedhealing,injuree->second));
+						}
+						if (!injurees.empty()) {
+							injurees.erase(injuree);
 						}
 					}
 				}
