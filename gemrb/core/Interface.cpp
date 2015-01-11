@@ -3537,6 +3537,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	} else {
 		overrides = ini.get();
 	}
+	iniStream->Close();
 
 	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
 	DataStream* gemINIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
