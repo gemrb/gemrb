@@ -110,8 +110,7 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	struct stat my_stat;
 	PathJoinExt(nPath, Path, Prefix, "bmp");
 	memset(&my_stat,0,sizeof(my_stat));
-	int errno = stat(nPath, &my_stat);
-	if (errno) {
+	if (stat(nPath, &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
 		strlcpy(Date, "Sun 31 Feb 00:00:01 2099", _MAX_PATH);
 	} else {
@@ -398,9 +397,9 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	for(i=size;i--;) {
 		FormatQuickSavePath(from, myslots[i]);
 		FormatQuickSavePath(to, myslots[i]+1);
-		int errno = rename(from, to);
-		if (errno) {
-			error("SaveGameIterator", "Rename error %d when pruning quicksaves!\n", errno);
+		int errnum = rename(from, to);
+		if (errnum) {
+			error("SaveGameIterator", "Rename error %d when pruning quicksaves!\n", errnum);
 		}
 	}
 }
