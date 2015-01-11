@@ -8543,6 +8543,10 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+		if (!btn) {
+			Log(ERROR, "GUIScript", "Button %d in window %d not found!", ci, wi);
+			continue;
+		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
 		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(Function));
 		strcpy(btn->VarName,"Equipment");
