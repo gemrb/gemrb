@@ -5161,7 +5161,9 @@ int Interface::CompressSave(const char *folder)
 				char dtmp[_MAX_PATH];
 				dir.GetFullPath(dtmp);
 				FileStream fs;
-				fs.Open(dtmp);
+				if (!fs.Open(dtmp)) {
+					Log(ERROR, "Interface", "Failed to open \"%s\".", dtmp);
+				}
 				ai->AddToSaveGame(&str, &fs);
 			}
 		} while (++dir);
