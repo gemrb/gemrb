@@ -1680,7 +1680,7 @@ void InitializeIEScript()
 		j = *l;
 		// found later as a different name
 		int ii = objectsTable->GetValueIndex( j );
-		if (ii>=MAX_ACTIONS) {
+		if (ii>=MAX_OBJECTS) {
 			continue;
 		}
 
@@ -1723,7 +1723,7 @@ void InitializeIEScript()
 		while (j--) {
 			i = savedTriggersTable->GetValueIndex( j );
 			i &= 0x3fff;
-			if (i >= MAX_ACTIONS) {
+			if (i >= MAX_TRIGGERS) {
 				Log(ERROR, "GameScript", "saved trigger %d (%s) is too high, ignoring",
 					i, savedTriggersTable->GetStringIndex( j ) );
 				continue;
