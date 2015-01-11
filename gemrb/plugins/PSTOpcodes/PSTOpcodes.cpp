@@ -346,7 +346,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 
 	Actor *owner = GetCasterObject();
 
-	if (owner==target) {
+	if (owner == target || !owner || !target) {
 		return FX_NOT_APPLIED;
 	}
 
