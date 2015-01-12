@@ -42,7 +42,6 @@
 #include "System/StringBuffer.h"
 #include <map>
 #include <iterator>
-#include <algorithm>
 
 namespace GemRB {
 	
@@ -1796,13 +1795,13 @@ void Game::CastOnRest()
 				}
 				ps=ps2;
 			}
+			// Heal who's still injured
 			while (!injurees.empty() && !healingspells.empty()) {
 				std::multimap<ieWord,Actor *>::iterator injuree=injurees.end();
 				injuree--;
 				std::multimap<ieWord,HealingResource>::iterator spell=healingspells.end();
 				spell--;
 				spell->second.caster->DirectlyCastSpell(injuree->second, spell->second.resref, 0, 1, true);
-				Log(DEBUG,"Game","Parannetaan %s, Tarve: %i, Parannus: %i", injuree->second->ShortName,injuree->first,spell->first );
 				if (injuree->first - spell->first > 0) {
 					injurees.insert(std::pair<ieWord,Actor *>(injuree->first-spell->first,injuree->second));
 				}
