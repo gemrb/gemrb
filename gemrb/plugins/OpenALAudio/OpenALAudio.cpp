@@ -934,7 +934,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 
 int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 {
-#ifdef _DEBUG
+#ifdef DEBUG_AUDIO
 	ALint frequency, bits, channels;
 	alGetBufferi(buffer, AL_FREQUENCY, &frequency);
 	alGetBufferi(buffer, AL_BITS, &bits);
