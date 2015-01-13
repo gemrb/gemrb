@@ -103,6 +103,34 @@ bool TextArea::NeedsDraw()
 		return true;
 	}
 
+	if (animationEnd) {
+		if (TextYPos > textContainer->ContentFrame().h) {
+			// the text is offscreen, this happens with chapter text
+			ScrollToY(TextYPos); // reset animation values
+			return false;
+		}
+		// update animation for this next draw cycle
+		unsigned long curTime = GetTickCount();
+		if (animationEnd.time > curTime) {
+			//double animProgress = curTime / animationEnd;
+			int deltaY = animationEnd.y - animationBegin.y;
+			unsigned long deltaT = animationEnd.time - animationBegin.time;
+			int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
+			TextYPos = animationBegin.y + y;
+			Owner->InvalidateForControl(this);
+		} else if (animationEnd.y != TextYPos) {
+			UpdateScrollbar();
+			int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
+			ScrollToY(animationEnd.y);
+			TextYPos = tmp;
+			// FIXME: hack due to ScrollToY invalidating window BG
+			// we need to ensure another draw cycle
+			animationEnd = AnimationPoint(TextYPos, curTime);
+		} else {
+			animationEnd = AnimationPoint();
+		}
+		return true;
+	}
 	return Control::NeedsDraw();
 }
 
@@ -206,6 +234,8 @@ int TextArea::SetScrollBar(Control* ptr)
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
 		bar->SetPos(bar->Value); // scroll to the bottom
 	} else {
+		// seems silly to call ScrollToY() with the current position,
+		// but it is to update the scrollbar so not a mistake
 		ScrollToY(TextYPos);
 	}
 	return (bool)sb;
@@ -291,8 +321,10 @@ void TextArea::AppendText(const String& text)
 		UpdateScrollbar();
 		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
-			ScrollBar* bar = ( ScrollBar* ) sb;
-			bar->SetPos(bar->Value); // scroll to the bottom
+			// scroll to the bottom
+			int bottom = contentWrapper.ContentFrame().h - Height;
+			if (bottom > 0)
+				ScrollToY(bottom, NULL, 500); // animated scroll
 		}
 	}
 	MarkDirty();
@@ -402,8 +434,22 @@ int TextArea::GetRowHeight() const
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(int y, Control* sender)
+void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
 {
+	// set up animation if required
+	if  (duration) {
+		// HACK: notice the values arent clamped here.
+		// this is sort of a hack we allow for chapter text so it can begin and end out of sight
+		unsigned long startTime = GetTickCount();
+		animationBegin = AnimationPoint(TextYPos, startTime);
+		animationEnd = AnimationPoint(y, startTime + duration);
+		return;
+	} else if (animationEnd) {
+		// cancel the existing animation (if any)
+		animationBegin = AnimationPoint();
+		animationEnd = AnimationPoint();
+	}
+
 	if (sb && sender != sb) {
 		// we must "scale" the pixels
 		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep()-1 / ftext->LineHeight));

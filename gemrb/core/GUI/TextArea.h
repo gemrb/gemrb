@@ -77,7 +77,7 @@ public:
 	/** Sets up auto scrolling (chapter text) */
 	void SetupScroll();
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender = NULL);
+	void ScrollToY(int y, Control* sender = NULL, ieWord duration = 0);
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;
@@ -106,6 +106,21 @@ private: // Private attributes
 	TextContainer* textContainer;
 	// wrapper containing both of the above
 	ContentContainer contentWrapper;
+
+	struct AnimationPoint {
+		// TODO: we cant currently scroll the x axis
+		// if that happens we should upgrade this to Point
+		int y;
+		unsigned long time;
+
+		AnimationPoint() : y(0), time(0) {}
+		AnimationPoint(int y, unsigned long t) : y(y), time(t) {}
+
+		operator const bool() const {
+			return (time > 0);
+		}
+	};
+	AnimationPoint animationBegin, animationEnd;
 
 	int TextYPos;
 	/** timer for scrolling */
