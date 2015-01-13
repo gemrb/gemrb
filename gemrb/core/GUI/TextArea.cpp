@@ -68,7 +68,6 @@ void TextArea::Init()
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
 	TextYPos = 0;
-	starttime = 0;
 	strncpy(VarName, "Selected", sizeof(VarName));
 
 	ResetEventHandler( TextAreaOnChange );
@@ -93,16 +92,6 @@ TextArea::~TextArea(void)
 
 bool TextArea::NeedsDraw()
 {
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		if (TextYPos > textContainer->ContentFrame().h) {
-			 // the text is offscreen
-			return false;
-		}
-		// must mark dirty to invalidate the window BG
-		MarkDirty();
-		return true;
-	}
-
 	if (animationEnd) {
 		if (TextYPos > textContainer->ContentFrame().h) {
 			// the text is offscreen, this happens with chapter text
@@ -131,6 +120,7 @@ bool TextArea::NeedsDraw()
 		}
 		return true;
 	}
+
 	return Control::NeedsDraw();
 }
 
@@ -141,18 +131,8 @@ void TextArea::DrawInternal(Region& clip)
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
 		clip.x += AnimPicture->Width + EDGE_PADDING;
 	}
+
 	clip.x += EDGE_PADDING;
-
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		unsigned long thisTime = GetTickCount();
-		if (thisTime>starttime) {
-			// ticks is the number of ticks it takes to scroll this font 1 px
-			unsigned long ticks = 2400 / ftext->LineHeight;
-			starttime = thisTime+ticks;
-			TextYPos++;// can't use ScrollToY
-		}
-	}
-
 	clip.y -= TextYPos;
 	contentWrapper.Draw(clip.Origin());
 
@@ -478,7 +458,9 @@ void TextArea::SetRow(int row)
 /** This method is key to touchscreen scrolling */
 void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 {
-	if (!(IE_GUI_TEXTAREA_SMOOTHSCROLL & Flags)){
+	// we allow scrolling to cancel the animation only if there is a scrollbar
+	// otherwise it is "Chapter Text" behavior
+	if (!animationEnd || sb){
 		unsigned long fauxY = TextYPos;
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
@@ -710,16 +692,6 @@ void TextArea::ClearText()
 	// reset text position to top
 	ScrollToY(0);
 	UpdateScrollbar();
-}
-
-//setting up the textarea for smooth scrolling, the first
-//TEXTAREA_OUTOFTEXT callback is called automatically
-void TextArea::SetupScroll()
-{
-	ClearText();
-	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
-	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
-	starttime = GetTickCount();
 }
 
 void TextArea::SetFocus(bool focus)

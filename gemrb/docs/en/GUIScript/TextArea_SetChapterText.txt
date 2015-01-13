@@ -1,0 +1,16 @@
+
+Prototype: GemRB.SetChapterText(Win, Ctrl, Text)
+
+Metaclass Prototype:
+
+Description:  Sets up a TextArea for scrolling the chapter text from below the TA to beyond the top.
+
+Parameters: 
+Win - 
+Ctrl - 
+Text - The text to set in the TA
+
+Return value:
+
+See also:
+

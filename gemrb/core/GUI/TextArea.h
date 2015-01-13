@@ -41,9 +41,8 @@ namespace GemRB {
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
 #define IE_GUI_TEXTAREA_AUTOSCROLL   1
-#define IE_GUI_TEXTAREA_SMOOTHSCROLL 2	// chapter text
-#define IE_GUI_TEXTAREA_HISTORY      4	// message window
-#define IE_GUI_TEXTAREA_EDITABLE     8
+#define IE_GUI_TEXTAREA_HISTORY      2	// message window
+#define IE_GUI_TEXTAREA_EDITABLE     4
 
 typedef std::pair<int, String> SelectOption;
 
@@ -74,8 +73,7 @@ public:
 	void AppendText(const String& text);
 	/** Inserts a String into the current Text at pos */
 	// int InsertText(const char* text, int pos);
-	/** Sets up auto scrolling (chapter text) */
-	void SetupScroll();
+
 	/** Per Pixel scrolling */
 	void ScrollToY(int y, Control* sender = NULL, ieWord duration = 0);
 
@@ -123,9 +121,6 @@ private: // Private attributes
 	AnimationPoint animationBegin, animationEnd;
 
 	int TextYPos;
-	/** timer for scrolling */
-	unsigned long starttime;
-	/** Number of Text Rows */
 	int rows;
 
 	/** Fonts */
