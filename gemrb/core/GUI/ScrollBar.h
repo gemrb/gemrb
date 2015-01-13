@@ -65,6 +65,7 @@ class GEM_EXPORT ScrollBar : public Control {
 protected:
 	void DrawInternal(Region& drawFrame);
 	bool HasBackground();
+	bool NeedsDraw();
 public:
 	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
 	~ScrollBar(void);
