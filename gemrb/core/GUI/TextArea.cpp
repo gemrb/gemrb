@@ -90,34 +90,9 @@ TextArea::~TextArea(void)
 	}
 }
 
-bool TextArea::NeedsDraw()
+bool TextArea::NeedsDraw() const
 {
 	if (animationEnd) {
-		if (TextYPos > textContainer->ContentFrame().h) {
-			// the text is offscreen, this happens with chapter text
-			ScrollToY(TextYPos); // reset animation values
-			return false;
-		}
-		// update animation for this next draw cycle
-		unsigned long curTime = GetTickCount();
-		if (animationEnd.time > curTime) {
-			//double animProgress = curTime / animationEnd;
-			int deltaY = animationEnd.y - animationBegin.y;
-			unsigned long deltaT = animationEnd.time - animationBegin.time;
-			int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
-			TextYPos = animationBegin.y + y;
-			Owner->InvalidateForControl(this);
-		} else if (animationEnd.y != TextYPos) {
-			UpdateScrollbar();
-			int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
-			ScrollToY(animationEnd.y);
-			TextYPos = tmp;
-			// FIXME: hack due to ScrollToY invalidating window BG
-			// we need to ensure another draw cycle
-			animationEnd = AnimationPoint(TextYPos, curTime);
-		} else {
-			animationEnd = AnimationPoint();
-		}
 		return true;
 	}
 
@@ -126,6 +101,33 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
+	if (animationEnd) {
+		if (TextYPos > textContainer->ContentFrame().h) {
+			// the text is offscreen, this happens with chapter text
+			ScrollToY(TextYPos); // reset animation values
+		} else {
+			// update animation for this next draw cycle
+			unsigned long curTime = GetTickCount();
+			if (animationEnd.time > curTime) {
+				//double animProgress = curTime / animationEnd;
+				int deltaY = animationEnd.y - animationBegin.y;
+				unsigned long deltaT = animationEnd.time - animationBegin.time;
+				int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
+				TextYPos = animationBegin.y + y;
+			} else if (animationEnd.y != TextYPos) {
+				UpdateScrollbar();
+				int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
+				ScrollToY(animationEnd.y);
+				TextYPos = tmp;
+				// FIXME: hack due to ScrollToY invalidating window BG
+				// we need to ensure another draw cycle
+				animationEnd = AnimationPoint(TextYPos, curTime);
+			} else {
+				animationEnd = AnimationPoint();
+			}
+		}
+	}
+
 	if (AnimPicture) {
 		// speaker portrait
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);

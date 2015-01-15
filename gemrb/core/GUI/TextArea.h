@@ -56,7 +56,6 @@ class GEM_EXPORT TextArea : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
-	bool NeedsDraw();
 
 public:
 	TextArea(const Region& frame, Font* text);
@@ -64,6 +63,7 @@ public:
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
 
+	bool NeedsDraw() const;
 	bool IsOpaque() const { return false; }
 
 	/** Sets the Actual Text */
