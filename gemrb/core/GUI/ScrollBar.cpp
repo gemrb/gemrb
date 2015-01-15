@@ -161,11 +161,6 @@ void ScrollBar::ScrollDown()
 	SetPos( Pos + 1 );
 }
 
-bool ScrollBar::NeedsDraw()
-{
-	return true;
-}
-
 bool ScrollBar::IsOpaque() const
 {
 	/*
