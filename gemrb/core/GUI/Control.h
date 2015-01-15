@@ -79,7 +79,7 @@ public:
 	void SetControlFrame(const Region&);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
-	void MarkDirty();
+	void MarkDirty() { Changed = true; }
 	virtual bool NeedsDraw() const { return Changed; }
 	virtual bool IsOpaque() const { return true; }
 	/** Sets the Text of the current control */

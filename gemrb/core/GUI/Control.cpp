@@ -88,21 +88,6 @@ void Control::SetControlFrame(const Region& r)
 	Height = r.h;
 }
 
-void Control::MarkDirty() {
-	if (!Changed) {
-		Changed = true;
-		if (Owner && !HasBackground()) {
-			// the window is our background so we must redraw the entire thing :(
-			Owner->InvalidateForControl(this);
-		}
-	}
-}
-
-bool Control::NeedsDraw()
-{
-	return (Changed || (Owner->Flags&WF_FLOAT));
-}
-
 void Control::Draw(unsigned short x, unsigned short y)
 {
 	// FIXME: Draw shouldnt be getting called on controls that are offscreen...
