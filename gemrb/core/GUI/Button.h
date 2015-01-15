@@ -136,7 +136,7 @@ public:
 	Button(Region& frame);
 	~Button();
 
-	virtual bool IsOpaque() const;
+	bool IsOpaque() const { return Picture || AnimPicture; };
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
 	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);

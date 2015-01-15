@@ -154,12 +154,6 @@ void Button::CloseUpColor()
 	starttime = newtime + 40;
 }
 
-bool Button::IsOpaque() const
-{
-	if (Flags&IE_GUI_BUTTON_PICTURE && !Picture) return false;
-	return Control::IsOpaque();
-}
-
 /** Draws the Control on the Output Display */
 void Button::DrawInternal(Region& rgn)
 {

@@ -53,7 +53,7 @@ public:
 	Label(const Region& frame, Font* font, const String& string);
 	~Label();
 
-	bool IsOpaque() const { return false; }
+	bool IsOpaque() const { return AnimPicture; } // FIXME: this isnt really true, but the clock breaks with out this.
 	/** This function sets the actual Label Text */
 	using Control::SetText;
 	void SetText(const String& string);
