@@ -116,7 +116,7 @@ private: // Private attributes
 		AnimationPoint() : y(0), time(0) {}
 		AnimationPoint(int y, unsigned long t) : y(y), time(t) {}
 
-		operator const bool() const {
+		operator bool() const {
 			return (time > 0);
 		}
 	};
