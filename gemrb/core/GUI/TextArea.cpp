@@ -114,16 +114,11 @@ void TextArea::DrawInternal(Region& clip)
 				unsigned long deltaT = animationEnd.time - animationBegin.time;
 				int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
 				TextYPos = animationBegin.y + y;
-			} else if (animationEnd.y != TextYPos) {
+			} else {
 				UpdateScrollbar();
 				int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
 				ScrollToY(animationEnd.y);
 				TextYPos = tmp;
-				// FIXME: hack due to ScrollToY invalidating window BG
-				// we need to ensure another draw cycle
-				animationEnd = AnimationPoint(TextYPos, curTime);
-			} else {
-				animationEnd = AnimationPoint();
 			}
 		}
 	}
