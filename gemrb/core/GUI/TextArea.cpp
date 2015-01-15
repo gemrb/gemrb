@@ -209,7 +209,9 @@ int TextArea::SetScrollBar(Control* ptr)
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		bar->SetPos(bar->Value); // scroll to the bottom
+		int bottom = contentWrapper.ContentFrame().h - Height;
+		if (bottom > 0)
+			ScrollToY(bottom); // no animation for this one
 	} else {
 		// seems silly to call ScrollToY() with the current position,
 		// but it is to update the scrollbar so not a mistake
