@@ -132,10 +132,11 @@ class GEM_EXPORT Button : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawRegion);
-	virtual bool HasBackground();
 public: 
 	Button(Region& frame);
 	~Button();
+
+	virtual bool IsOpaque() const;
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
 	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);

@@ -54,10 +54,12 @@ class GEM_EXPORT TextEdit : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
-	bool HasBackground() { return Back; }
+
 public:
 	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
+
+	bool IsOpaque() const { return Back; }
 	/** Set Font */
 	void SetFont(Font* f);
 	Font *GetFont();

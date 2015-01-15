@@ -166,7 +166,7 @@ bool ScrollBar::NeedsDraw()
 	return true;
 }
 
-bool ScrollBar::HasBackground()
+bool ScrollBar::IsOpaque() const
 {
 	/*
 	 IWD2 scrollbars have a transparent trough and we dont have a good way to know about such things.

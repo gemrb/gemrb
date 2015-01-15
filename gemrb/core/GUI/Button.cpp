@@ -154,10 +154,10 @@ void Button::CloseUpColor()
 	starttime = newtime + 40;
 }
 
-bool Button::HasBackground()
+bool Button::IsOpaque() const
 {
 	if (Flags&IE_GUI_BUTTON_PICTURE && !Picture) return false;
-	return Control::HasBackground();
+	return Control::IsOpaque();
 }
 
 /** Draws the Control on the Output Display */

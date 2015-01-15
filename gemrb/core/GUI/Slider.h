@@ -54,10 +54,12 @@ class GEM_EXPORT Slider : public Control  {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
-	bool HasBackground() {return BackGround;}
+
 public:
 	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
+
+	bool IsOpaque() const {return BackGround;}
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();
 	/** Sets the actual Slider Position trimming to the Max and Min Values */

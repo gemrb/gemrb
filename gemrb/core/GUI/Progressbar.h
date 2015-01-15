@@ -48,10 +48,12 @@ class GEM_EXPORT Progressbar : public Control  {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
-	bool HasBackground() { return BackGround; }
+
 public: 
 	Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear = false);
 	~Progressbar();
+
+	bool IsOpaque() { return BackGround; }
 	/** Returns the actual Progressbar Position */
 	unsigned int GetPosition();
 	/** Sets the actual Progressbar Position trimming to the Max and Min Values */

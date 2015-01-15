@@ -57,12 +57,14 @@ protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
 	bool NeedsDraw();
-	bool HasBackground() { return false; }
+
 public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
+
+	bool IsOpaque() const { return false; }
 
 	/** Sets the Actual Text */
 	void SetText(const String& text);
