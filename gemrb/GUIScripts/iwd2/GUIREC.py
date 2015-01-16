@@ -437,7 +437,7 @@ def DisplayGeneral (pc):
 				RecordsTextArea.Append (DelimitedText(7192, "+" + str(bonusSpells[c][level]), 0, " " + str(level+1)+": "))
 
 	#ability statistics
-	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(40315) + "[/color]\n")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40315) + "[/color]\n")
 
 	# Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
@@ -494,7 +494,7 @@ def DisplayGeneral (pc):
 			if damage == -1 or damage-mod <= 0:
 				continue
 			if not DisplayedHeader:
-				RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(39325) + "[/color]\n")
+				RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(39325) + "[/color]\n")
 				DisplayedHeader = 1
 
 			enchantment += 1 # since we were checking what is allowable, not what bypasses it
