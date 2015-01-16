@@ -890,14 +890,14 @@ def DisplayMisc (pc):
 	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40320) + "[/color]\n")
 
 	#favourite spell and weapon
-	RecordsTextArea.Append (DelimitedStrRefs (11949, stat['FavouriteSpell']))
-	RecordsTextArea.Append (DelimitedStrRefs (11950, stat['FavouriteWeapon']))
+	RecordsTextArea.Append (DelimitedStrRefs (11949, stat['FavouriteSpell'], 0))
+	RecordsTextArea.Append (DelimitedStrRefs (11950, stat['FavouriteWeapon'], 0))
 
 	# combat details
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40322) + "[/color]\n")
 
 	#most powerful vanquished, time spent, xp and kills
-	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName']))
+	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName'], 0))
 
 	days, hours = GUICommon.SetCurrentDateTokens (stat)
 	# iwd2 is special here
@@ -916,27 +916,27 @@ def DisplayMisc (pc):
 	else:
 		time += GemRB.GetString (10700)
 
-	RecordsTextArea.Append (DelimitedText (11948, time))
+	RecordsTextArea.Append (DelimitedText (11948, time, 0))
 
 	# Experience Value of Kills
-	RecordsTextArea.Append (DelimitedText (11953, stat['KillsTotalXP']))
+	RecordsTextArea.Append (DelimitedText (11953, stat['KillsTotalXP'], 0))
 
 	# Number of Kills
-	RecordsTextArea.Append (DelimitedText (11954, stat['KillsTotalCount']))
+	RecordsTextArea.Append (DelimitedText (11954, stat['KillsTotalCount'], 0))
 
 	# Total Experience Value in Party
 	if TotalPartyExp:
 		val = stat['KillsTotalXP']*100/TotalPartyExp
 	else:
 		val = 0
-	RecordsTextArea.Append (DelimitedText (11951, str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11951, str(val) + "%", 0))
 
 	# Percentage of Total Kills in Party
 	if TotalPartyExp:
 		val = stat['KillsTotalCount']*100/TotalCount
 	else:
 		val = 0
-	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%", 0))
 
 	return
 
