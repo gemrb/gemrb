@@ -742,7 +742,7 @@ def DisplayWeapons (pc):
 	# Armor Class Modifiers
 	stat = GS (IE_ACMISSILEMOD) + GS (IE_ACSLASHINGMOD) + GS (IE_ACPIERCINGMOD) + GS (IE_ACCRUSHINGMOD)
 	if stat:
-		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(11766) + "[/color]")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(11766) + "[/color]\n")
 
 		# Missile
 		if GS (IE_ACMISSILEMOD):
