@@ -707,7 +707,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Armor Class
-	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(33553) + "[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(33553) + "[/color]\n")
 	RecordsTextArea.Append (DelimitedText (33553, str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
