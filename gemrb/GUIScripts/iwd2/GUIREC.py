@@ -405,7 +405,7 @@ def DisplayGeneral (pc):
 		if MonkLevel:
 			AC = GemRB.GetCombatDetails(pc, 0)["AC"]
 			GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
-			RecordsTextArea.Append (39431)
+			RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
 			# wholeness of body
 			RecordsTextArea.Append (DelimitedText (39749, MonkLevel*2, 0))
 
