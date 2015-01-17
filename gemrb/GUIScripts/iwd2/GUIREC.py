@@ -630,7 +630,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		if ddice:
 			dicestr = "+%dd%d" %(ddice, dsides)
 
-		dicestr = dos["TypeName"] + ": " + dicestr
+		dicestr = dos["TypeName"].title() + ": " + dicestr
 		if dbonus:
 			dicestr += PlusMinusStat(dbonus) + dchance
 		else:
