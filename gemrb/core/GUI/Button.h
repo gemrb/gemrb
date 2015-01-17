@@ -143,7 +143,6 @@ public:
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
-	using Control::SetText;
 	void SetText(const String& string);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
