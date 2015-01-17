@@ -131,6 +131,10 @@ void Window::DrawWindow()
 			const Region& fromClip = c->ControlFrame();
 			DrawBackground(&fromClip);
 		}
+		if (Flags & (WF_FLOAT)) {
+			// FIXME: this is a total hack. Required for anything drawing over GameControl (nothing really at all to do with floating)
+			c->MarkDirty();
+		}
 		c->Draw( XPos, YPos );
 	}
 	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
