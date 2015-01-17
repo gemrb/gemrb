@@ -629,10 +629,14 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		dicestr = ""
 		if ddice:
 			dicestr = "+%dd%d" %(ddice, dsides)
+
+		dicestr = dos["TypeName"] + ": " + dicestr
 		if dbonus:
-			RecordsTextArea.Append (dos["TypeName"] + ": " + dicestr + PlusMinusStat(dbonus)+dchance)
+			dicestr += PlusMinusStat(dbonus) + dchance
 		else:
-			RecordsTextArea.Append (dos["TypeName"] + ": " + dicestr + dchance)
+			dicestr += dchance
+		RecordsTextArea.Append ("[p]" + dicestr + "[/p]")
+
 		dosmax += ddice*dsides + dbonus
 
 	# Strength
