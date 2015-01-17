@@ -240,6 +240,7 @@ void Button::DrawInternal(Region& rgn)
 
 			// do NOT uncomment this, you can't change Changed or invalidate things from
 			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
+			// ^ We can now... should this be uncommented then?
 			//CloseUpColor();
 		}
 		else {
