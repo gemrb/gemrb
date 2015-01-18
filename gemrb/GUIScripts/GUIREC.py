@@ -439,7 +439,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append (None)
 		print "\t\tClass (Level):",Class,"(",Level,")"
 
-	# check to see if we have a level diff anywhere
+	# effect icons
+	# but don't display them in levelup stat view
 	if sum (LevelDiff) == 0:
 		effects = GemRB.GetPlayerStates (pc)
 		if len (effects):
