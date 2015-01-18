@@ -3549,9 +3549,9 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		defaults = ini.get();
 	} else {
 		defaults = gemINI.get();
-		if (!overrides) {
-			overrides = defaults;
-		}
+	}
+	if (!overrides) {
+		overrides = defaults;
 	}
 
 	for (int i = 0; i < defaults->GetTagsCount(); i++) {
