@@ -215,9 +215,11 @@ void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 
 const Glyph& Font::GetGlyph(ieWord chr) const
 {
-	const Glyph* g = AtlasIndex[chr].glyph;
-	if (g) {
-		return *g;
+	if (chr < AtlasIndex.size()) {
+		const Glyph* g = AtlasIndex[chr].glyph;
+		if (g) {
+			return *g;
+		}
 	}
 	const static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
 	return blank;
