@@ -440,7 +440,9 @@ empty:
 	} else {
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
-		str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
+		if (str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START ) == GEM_ERROR) {
+			return strdup("");
+		}
 		str->ReadWord( &type );
 		str->ReadResRef( SoundResRef );
 		str->ReadDword( &Volume );
