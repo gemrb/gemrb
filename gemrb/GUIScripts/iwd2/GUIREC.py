@@ -816,12 +816,7 @@ def DisplayWeapons (pc):
 
 	return
 
-def DisplaySkills (pc, TAOverride=None):
-	global RecordsTextArea
-	# HACK: trying to avoid merge conflicts, sanitize later
-	if TAOverride:
-		tmp = RecordsTextArea
-		RecordsTextArea = TAOverride
+def DisplaySkills (pc, SkillsArea):
 	
 	def PrintStatTable (title, tabname):
 		feats = True if tabname == "feats" else False
@@ -831,7 +826,7 @@ def DisplaySkills (pc, TAOverride=None):
 		itemTab = GemRB.LoadTable (lookup)
 		rows = itemTab.GetRowCount ()
 		
-		RecordsTextArea.Append ("[color=ffff00]" + title + "[/color]\n")
+		SkillsArea.Append ("[color=ffff00]" + title + "[/color]\n")
 		
 		items = []
 		for i in range(rows):
@@ -856,17 +851,14 @@ def DisplaySkills (pc, TAOverride=None):
 		items.sort()
 		for item in items:
 			if len(item) > 1:
-				RecordsTextArea.Append (DelimitedText(item[0], item[1], 0))
+				SkillsArea.Append (DelimitedText(item[0], item[1], 0))
 			else:
-				RecordsTextArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
+				SkillsArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
 		return
 
 	PrintStatTable (GemRB.GetString(11983), "skills")
-	RecordsTextArea.Append ("\n")
+	SkillsArea.Append ("\n")
 	PrintStatTable (GemRB.GetString(36361), "feats")
-
-	if TAOverride:
-		RecordsTextArea = tmp
 
 	return
 
@@ -1062,7 +1054,7 @@ def UpdateRecordsWindow ():
 	elif SelectWindow == 2:
 		DisplayWeapons (pc)
 	elif SelectWindow == 3:
-		DisplaySkills (pc)
+		DisplaySkills (pc, RecordsTextArea)
 	elif SelectWindow == 4:
 		DisplayMisc (pc)
 
