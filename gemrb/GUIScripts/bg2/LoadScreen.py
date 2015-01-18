@@ -62,7 +62,7 @@ def StartLoadScreen ():
 	else:
 		Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
-	tmp = GemRB.Roll (1,tmp,0)
+	tmp = GemRB.Roll (1, tmp-1, 0)
 	HintStr = Table.GetValue (tmp, 0)
 
 	Label = LoadScreen.GetControl (2)
