@@ -352,7 +352,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
 
 		stats.append ( (19721,1,'c') )
-		stats.append (None)
 		for i in range (Multi[0]):
 			Class = GUICommon.GetClassRowName (Multi[i+1], "class")
 			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
@@ -371,7 +370,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	elif Dual[0] > 0: # dual classed; first show the new class
 		print "\tDual classed"
 		stats.append ( (19722,1,'c') )
-		stats.append (None)
 
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
 
