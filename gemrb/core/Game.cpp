@@ -1795,7 +1795,6 @@ void Game::CastOnRest()
 							resource.caster=tar;
 							CopyResRef(resource.resref,special_spells[specialCount].resref);
 							resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,0);
-							Log(DEBUG,"Game","Loitsujen lukumärä %i kpl",resource.amount);
 							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
 						}
 					}
