@@ -1758,30 +1758,22 @@ void Game::CastOnRest()
 			}
 		}
 
+		// Following algorithm works thus:
+		// - If at any point there are no more injured party members, stop
+		// (amount of healing done is an estimation)
+		// - cast party members' all heal-all spells
+		// - repeat:
+		//       cast the most potent healing spell on the most injured member
 		SpecialSpellType *special_spells = core->GetSpecialSpells();
 		if (!injurees.empty() && specialCount != -1) {
 			specialCount = core->GetSpecialSpellsCount();
 			std::multimap<ieWord,HealingResource> healingspells;
-			// Gather the spells
 			while (specialCount--) {
-				if (special_spells[specialCount].flags & SP_REST) {
-					while (ps--) {
-						Actor *tar = GetPC(ps, true);
-						if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-							HealingResource resource;
-							resource.caster=tar;
-							strncpy(resource.resref,special_spells[specialCount].resref,8);
-							resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,SP_REST);
-							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
-						}
-					}
-				}
-				ps=ps2;
 				// Cast multi-target healing spells
 				if (special_spells[specialCount].flags & SP_HEAL_ALL) {
 					while (ps--) {
 						Actor *tar = GetPC(ps, true);
-						if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+						while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
 							tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
 							for (std::multimap<ieWord,Actor *>::iterator injuree=injurees.begin();
 									injuree != injurees.end() ; ++injuree) {
@@ -1792,8 +1784,23 @@ void Game::CastOnRest()
 							}
 						}
 					}
+					ps=ps2;
 				}
-				ps=ps2;
+				// Gather the regular healing spells
+				else if (special_spells[specialCount].flags & SP_REST) {
+					while (ps--) {
+						Actor *tar = GetPC(ps, true);
+						if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+							HealingResource resource;
+							resource.caster=tar;
+							CopyResRef(resource.resref,special_spells[specialCount].resref);
+							resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,0);
+							Log(DEBUG,"Game","Loitsujen lukumärä %i kpl",resource.amount);
+							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
+						}
+					}
+					ps=ps2;
+				}
 			}
 			// Heal who's still injured
 			while (!injurees.empty() && !healingspells.empty()) {
