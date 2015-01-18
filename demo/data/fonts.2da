@@ -1,6 +1,6 @@
 2DA V1.0
 NORMAL
-	RESREF		NEED_PALETTE	FONT_NAME	PT_SIZE		STYLE	COLOR
+	RESREF		NEED_PALETTE	FONT_NAME	PX_SIZE		STYLE	COLOR
 0	NORMAL		1				DejaVuSans	14			0		0xffffffff
 1	FLOATTXT	1				DejaVuSans	12			0		0xffffffff
 #these are the same font so list the larger one first and gemrb only needs to create one font
