@@ -668,7 +668,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append (None)
 
 	res = []
-	lines = 0
 	for s in stats:
 		try:
 			strref, val, type = s
@@ -709,16 +708,12 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				res.append (GemRB.GetString (strref) + ': ' + str (val))
 			else: #normal value + type character, for example percent sign
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
-			lines = 1
 		except:
 			if s != None:
 				res.append (GemRB.GetString (s) )
-				lines = 0
 			else:
-				if not lines and str_None != -1:
-					res.append (str_None)
-				res.append ("")
-				lines = 0
+				res[-1] += "\n"
+
 	# wrap the first part in a tag to prevent status icon drop cap
 	res[0] = "[p]" + res[0] + "[/p]"
 	return "\n".join (res)
