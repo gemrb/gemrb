@@ -282,12 +282,11 @@ size_t Font::RenderText(const String& string, Region& rgn,
 		dp.x = 0;
 		size_t lineLen = line.length();
 		if (lineLen) {
-			size_t linePos = 0;
-			Point linePoint;
-
 			const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
-			const Size lineMaxSize = lineRgn.Dimensions();
-			const Size lineSize = StringSize(line, &lineMaxSize, &linePos);
+			StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, true};
+			const Size lineSize = StringSize(line, &metrics);
+			size_t linePos = metrics.numChars;
+			Point linePoint;
 
 			// check to see if the line is on screen
 			// TODO: technically we could be *even more* optimized by passing lineRgn, but this breaks dropcaps
@@ -332,14 +331,10 @@ size_t Font::RenderText(const String& string, Region& rgn,
 #endif
 				linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
 			}
-#if DEBUG_FONT
 			if (linePos == 0) {
-				// FIXME: we have no good way of handling when a single word is longer than the line
-				// we don't have enough context to deal with that inside RenderLine.
-				// not sure what the best way to handle this case is.
-				Log(WARNING, "Font", "First word of line: \"%ls\" exceeded available width of %d", line.c_str(), lineRgn.w);
+				break; // if linePos == 0 then we would loop till we are out of bounds so just stop here
 			}
-#endif
+
 			dp = dp + linePoint;
 			if (linePos < line.length() - 1) {
 				// ignore whitespace between current pos and next word, if any (we are wrapping... maybe)
@@ -401,6 +396,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 	// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
 	// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
 	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
+
 	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of
 	bool done = false;
@@ -413,8 +409,13 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			word = line.substr(linePos, wordBreak - linePos);
 		}
 
-		int wordW = StringSize(word).w;
-		if (dp.x + wordW > lineRgn.w) {
+		StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, true};
+		int wordW = StringSize(word, &metrics).w;
+		if (metrics.forceBreak) {
+			done = true;
+			word.resize(metrics.numChars);
+		} else if (dp.x + wordW > lineRgn.w) {
+			// overflow with no wrap allowed; abort.
 			break;
 		}
 
@@ -555,7 +556,8 @@ size_t Font::Print(Region rgn, const String& string,
 			stringSize.h = LineHeight;
 		} else {
 			stringSize = rgn.Dimensions();
-			stringSize = StringSize(string, &stringSize);
+			StringSizeMetrics metrics = {stringSize, 0, true};
+			stringSize = StringSize(string, &metrics);
 		}
 
 		// important: we must do this adjustment even if it leads to -p.y!
@@ -574,44 +576,53 @@ size_t Font::Print(Region rgn, const String& string,
 	return ret;
 }
 
-Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) const
+Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 {
 	if (!string.length()) return Size();
+#define WILL_WRAP(val) \
+	(stop && stop->w && lineW + val > stop->w)
+
+#define APPEND_TO_LINE(val) \
+	lineW += val; rewindCount = 0; val = 0;
 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0, spaceW = 0;
-	bool newline = false, eos = false, ws = false;
+	bool newline = false, eos = false, ws = false, forceBreak = false;
 	size_t i = 0, rewindCount = 0;
+	const Size* stop = (metrics) ? &metrics->size : NULL;
 	for (; i < string.length(); i++) {
+		const Glyph& curGlyph = GetGlyph(string[i]);
 		eos = (i == string.length() - 1);
 		ws = std::isspace(string[i]);
 		if (!ws) {
-			const Glyph& curGlyph = GetGlyph(string[i]);
-			wordW += curGlyph.size.w;
-			if (i > 0) { // kerning
-				wordW -= KerningOffset(string[i-1], string[i]);
+			ieWord chrW = curGlyph.size.w;
+			if (lineW > 0) { // kerning
+				chrW -= KerningOffset(string[i-1], string[i]);
 			}
+			if (lineW == 0 && wordW > 0 && metrics->forceBreak && WILL_WRAP(wordW + chrW) && wordW <= stop->w) {
+				// the word is longer than the line allows, but we allow a break mid-word
+				forceBreak = true;
+				newline = true;
+				APPEND_TO_LINE(wordW);
+			}
+			wordW += chrW;
 			rewindCount++;
 			// spaceW is the *cumulative* whitespace between the 2 words
 			wordW += spaceW;
 			spaceW = 0;
-		}
+		} // no else
 		if (ws || eos) {
-			if (stop && stop->w
-				&& lineW + spaceW + wordW > stop->w
-			) {
+			if (WILL_WRAP(spaceW + wordW)) {
 				newline = true;
 			} else {
 				if (string[i] == L'\n') {
 					// always append *everything* if there is \n
-					lineW += spaceW;
+					lineW += spaceW; // everything else appended later
 					newline = true;
 				} else if (ws && string[i] != L'\r') {
-					spaceW += GetGlyph(string[i]).size.w;
+					spaceW += curGlyph.size.w;
 				}
-				lineW += wordW;
-				rewindCount = 0;
-				wordW = 0;
+				APPEND_TO_LINE(wordW);
 			}
 		}
 
@@ -629,17 +640,23 @@ Size Font::StringSize(const String& string, const Size* stop, size_t* numChars) 
 			}
 		}
 	}
+#undef WILL_WRAP
+#undef APPEND_TO_LINE
 
 	w = (w == 0 && wordW == 0) ? spaceW : w; // if the line is all whitespace
 
-	if (numChars) {
+	if (metrics) {
 		// rewinding to the last word that fit
-		*numChars = i - rewindCount;
-		assert(*numChars <= string.length());
-	}
+		metrics->numChars = i - rewindCount;
+		metrics->size = Size(w, (LineHeight * lines));
+		metrics->forceBreak = forceBreak;
 #if DEBUG_FONT
-	if (stop) assert(w <= stop->w);
+		assert(metrics->numChars <= string.length());
+		assert(w <= stop->w);
 #endif
+		return metrics->size;
+	}
+
 	return Size(w, (LineHeight * lines));
 }
 

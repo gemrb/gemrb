@@ -188,7 +188,14 @@ public:
 				 Palette* hicolor, ieByte Alignment, Point* point = NULL) const;
 
 	/** Returns size of the string rendered in this font in pixels */
-	Size StringSize(const String&, const Size* = NULL, size_t* = NULL) const;
+	struct StringSizeMetrics {
+		// specifiy behavior of StringSize based on values of struct
+		// StringSize will modify the struct with the results
+		Size size;		// maximum size allowed; updated with actual size <= initial value
+		size_t numChars;// maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
+		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
+	};
+	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;
 };
 
 }

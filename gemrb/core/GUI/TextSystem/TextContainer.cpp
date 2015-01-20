@@ -171,8 +171,12 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					if (nextLine != String::npos) {
 						subLen = nextLine - numPrinted + 1; // +1 for the \n
 					}
-					Size printMax = lineSegment.Dimensions();
-					Size printSize = layoutFont->StringSize(text.substr(numPrinted, subLen), &printMax, &numOnLine);
+					const String& substr = text.substr(numPrinted, subLen);
+					Font::StringSizeMetrics metrics = {lineSegment.Dimensions(), 0, lineSegment.w == lineRgn.w};
+					Size printSize = layoutFont->StringSize(substr, &metrics);
+					numOnLine = metrics.numChars;
+					assert(numOnLine || !metrics.forceBreak);
+
 					if (subLen != String::npos || (lineSegment.x + lineSegment.w == lineRgn.w && numPrinted + numOnLine < text.length())) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
@@ -211,6 +215,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 		// then maybe another Draw method that takes an alignment argument?
 
 		Size maxSize = frame.Dimensions();
+		Font::StringSizeMetrics metrics = {maxSize, 0, true};
 		Region drawRegion = Region(layoutPoint + drawOrigin, maxSize);
 		if (maxSize.w <= 0) {
 			if (maxSize.w == -1) {
@@ -218,7 +223,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				drawRegion.w = rgn.w - layoutPoint.x;
 				maxSize.w = drawRegion.w;
 			} else {
-				drawRegion.w = layoutFont->StringSize(text, &maxSize).w;
+				drawRegion.w = layoutFont->StringSize(text, &metrics).w;
 			}
 		}
 		if (maxSize.h <= 0) {
@@ -226,7 +231,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// take remainder of parent height
 				drawRegion.h = rgn.w - layoutPoint.y;
 			} else {
-				drawRegion.h = layoutFont->StringSize(text, &maxSize).h;
+				drawRegion.h = layoutFont->StringSize(text, &metrics).h;
 			}
 		}
 		assert(drawRegion.h && drawRegion.w);
