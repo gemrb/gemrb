@@ -215,7 +215,6 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 		// then maybe another Draw method that takes an alignment argument?
 
 		Size maxSize = frame.Dimensions();
-		Font::StringSizeMetrics metrics = {maxSize, 0, true};
 		Region drawRegion = Region(layoutPoint + drawOrigin, maxSize);
 		if (maxSize.w <= 0) {
 			if (maxSize.w == -1) {
@@ -223,6 +222,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				drawRegion.w = rgn.w - layoutPoint.x;
 				maxSize.w = drawRegion.w;
 			} else {
+				Font::StringSizeMetrics metrics = {maxSize, 0, true};
 				drawRegion.w = layoutFont->StringSize(text, &metrics).w;
 			}
 		}
@@ -231,6 +231,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// take remainder of parent height
 				drawRegion.h = rgn.w - layoutPoint.y;
 			} else {
+				Font::StringSizeMetrics metrics = {maxSize, 0, true};
 				drawRegion.h = layoutFont->StringSize(text, &metrics).h;
 			}
 		}
