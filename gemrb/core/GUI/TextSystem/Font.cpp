@@ -583,12 +583,12 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	(stop && stop->w && lineW + val > stop->w)
 
 #define APPEND_TO_LINE(val) \
-	lineW += val; rewindCount = 0; val = 0;
+	lineW += val; charCount = i + 1; val = 0;
 
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0, spaceW = 0;
 	bool newline = false, eos = false, ws = false, forceBreak = false;
-	size_t i = 0, rewindCount = 0;
+	size_t i = 0, charCount = 0;
 	const Size* stop = (metrics) ? &metrics->size : NULL;
 	for (; i < string.length(); i++) {
 		const Glyph& curGlyph = GetGlyph(string[i]);
@@ -606,7 +606,6 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 				APPEND_TO_LINE(wordW);
 			}
 			wordW += chrW;
-			rewindCount++;
 			// spaceW is the *cumulative* whitespace between the 2 words
 			wordW += spaceW;
 			spaceW = 0;
@@ -629,7 +628,6 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		if (newline || eos) {
 			w = (lineW > w) ? lineW : w;
 			if (stop && stop->h && (LineHeight * (lines + 1)) >= stop->h ) {
-				if (eos || string[i] == L'\n') i++; // +1 to convert from index to char count, not applicable for wrap
 				break;
 			}
 			if (newline) {
@@ -646,8 +644,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	w = (w == 0 && wordW == 0) ? spaceW : w; // if the line is all whitespace
 
 	if (metrics) {
-		// rewinding to the last word that fit
-		metrics->numChars = i - rewindCount;
+		metrics->numChars = charCount;
 		metrics->size = Size(w, (LineHeight * lines));
 		metrics->forceBreak = forceBreak;
 #if DEBUG_FONT
