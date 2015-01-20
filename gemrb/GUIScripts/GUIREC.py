@@ -315,16 +315,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
-	# everyone but bg1 has it somewhere
-	if GameCheck.IsBG2():
-		str_None = GemRB.GetString (61560)
-	elif GameCheck.IsBG1():
-		str_None = -1
-	elif GameCheck.IsPST():
-		str_None = GemRB.GetString (41275)
-	else:
-		str_None = GemRB.GetString (17093)
-
 	stats = []
 	cdet = GemRB.GetCombatDetails(pc, 0)
 	tohit = cdet["ToHitStats"]
@@ -345,7 +335,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	if GS (IE_STATE_ID) & STATE_DEAD:
 		stats.append ( (11829,1,'c') ) # DEAD
-		stats.append (None)
+		stats.append ("\n")
 
 	if Multi[0] > 1: # we're multiclassed
 		print "\tMulticlassed"
@@ -364,7 +354,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			else:
 				GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
 				stats.append ( (GemRB.GetString (16480),"",'d') )
-			stats.append (None)
+			stats.append ("\n")
 			print "\t\tClass (Level):",Class,"(",Levels[i],")"
 
 	elif Dual[0] > 0: # dual classed; first show the new class
@@ -392,7 +382,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		else:
 			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[0], Class) )
 			stats.append ( (GemRB.GetString (16480),"",'d') )
-		stats.append (None)
+		stats.append ("\n")
 
 		# the first class (shown second)
 		if Dual[0] == 1:
@@ -422,7 +412,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			stats.append ( (19719,1,'c') )
 		else:
 			stats.append ( (19720,1,'c') )
-		stats.append (None)
+		stats.append ("\n")
 	else: # single classed
 		print "\tSingle classed"
 		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff[0]
@@ -434,7 +424,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		else:
 			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Level, Class) )
 			stats.append ( (16480,1,'c') )
-		stats.append (None)
+		stats.append ("\n")
 		print "\t\tClass (Level):",Class,"(",Level,")"
 
 	# effect icons
@@ -502,7 +492,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	#script
 	aiscript = GemRB.GetPlayerScript (pc )
 	stats.append ( (2078, aiscript, '') )
-	stats.append (None)
+	stats.append ("\n")
 
 	# 17379 Saving throws
 	stats.append (17379)
@@ -516,7 +506,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (17383, IE_SAVEVSBREATH, 's') )
 	# 17384 Spells
 	stats.append ( (17384, IE_SAVEVSSPELL, 's') )
-	stats.append (None)
+	stats.append ("\n")
 
 	# 9466 Weapon proficiencies
 	stats.append (9466)
@@ -539,7 +529,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
 		if text < 0x20000:
 			stats.append ( (text, GS (stat)&0x07, '+') )
-	stats.append (None)
+	stats.append ("\n")
 
 	# 11766 AC Bonuses
 	stats.append (11766)
@@ -551,7 +541,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ((11769, GS (IE_ACPIERCINGMOD), 'p'))
 	# 11768 AC vs. Slashing
 	stats.append ((11768, GS (IE_ACSLASHINGMOD), 'p'))
-	stats.append (None)
+	stats.append ("\n")
 
 	# 10315 Ability bonuses
 	stats.append (10315)
@@ -584,7 +574,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (10343, GA (IE_INT,0), '%' ) )
 	# 10347 Reaction
 	stats.append ( (10347, GA (IE_REPUTATION,0), '0') )
-	stats.append (None)
+	stats.append ("\n")
 
 	# 10344 Bonus Priest spells
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
@@ -596,7 +586,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			if base:
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
 				stats.append ( (GemRB.GetString (10345), count-base, 'r') )
-		stats.append (None)
+		stats.append ("\n")
 
 	# only bg2 displayed all the resistances, but it is useful information
 	# Resistances
@@ -651,7 +641,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
 	# Poison
 	stats.append ((14017, GS (IE_RESISTPOISON), '%'))
-	stats.append (None)
+	stats.append ("\n")
 
 	if GameCheck.IsBG2():
 		# Weapon Style bonuses
@@ -665,7 +655,17 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			for col in range(WStyleTable.GetColumnCount()):
 				value = WStyleTable.GetValue (profcount, col)
 				stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
-		stats.append (None)
+		stats.append ("\n")
+
+	# everyone but bg1 has it somewhere
+	if GameCheck.IsBG2():
+		str_None = GemRB.GetString (61560)
+	elif GameCheck.IsBG1():
+		str_None = -1
+	elif GameCheck.IsPST():
+		str_None = GemRB.GetString (41275)
+	else:
+		str_None = GemRB.GetString (17093)
 
 	res = []
 	for s in stats:
@@ -673,6 +673,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			strref, val, type = s
 			if val == 0 and type != '0':
 				continue
+			if val == None:
+				val = str_None
 			if type == '+': #pluses
 				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
 			elif type == 'p': #a plus prefix if positive
@@ -709,10 +711,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			else: #normal value + type character, for example percent sign
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 		except:
-			if s != None:
-				res.append (GemRB.GetString (s) )
+			if isinstance(s, basestring):
+				if s == len(s) * "\n": # check if the string is all newlines
+					# avoid "double" newlines (we use join later so we would get one more newline than is in s!)
+					res[-1] += s
+				else:
+					res.append (s);
 			else:
-				res[-1] += "\n"
+				res.append (GemRB.GetString (s) )				
 
 	# wrap the first part in a tag to prevent status icon drop cap
 	res[0] = "[p]" + res[0] + "[/p]"
