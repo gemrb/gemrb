@@ -402,6 +402,8 @@ def OpenScriptWindow ():
 	
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
+	if script == None:
+		script = "None"
 	scriptindex = ScriptsTable.GetRowIndex (script)
 	GemRB.SetVar ("Selected", scriptindex)
 	ScriptTextArea.SetVarAssoc ("Selected", scriptindex)

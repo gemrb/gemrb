@@ -5273,7 +5273,7 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 
 	const char *scr = actor->GetScript(Index);
 	if (scr[0]==0) {
-		scr="None";
+		Py_RETURN_NONE;
 	}
 	return PyString_FromString( scr );
 }
