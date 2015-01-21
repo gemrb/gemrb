@@ -84,15 +84,49 @@ TextSpan::~TextSpan()
 		palette->release();
 }
 
+inline const Font* TextSpan::LayoutFont() const
+{
+	if (font) return font;
+
+	TextContainer* container = dynamic_cast<TextContainer*>(parent);
+	if (container) {
+		return container->TextFont();
+	}
+	return NULL;
+}
+
+inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) const
+{
+	const Font* layoutFont = LayoutFont();
+	Size maxSize = frame.Dimensions();
+	Region drawRegion = Region(p + rgn.Origin(), maxSize);
+	if (maxSize.w <= 0) {
+		if (maxSize.w == -1) {
+			// take remainder of parent width
+			drawRegion.w = rgn.w - p.x;
+			maxSize.w = drawRegion.w;
+		} else {
+			Font::StringSizeMetrics metrics = {maxSize, 0, true};
+			drawRegion.w = layoutFont->StringSize(text, &metrics).w;
+		}
+	}
+	if (maxSize.h <= 0) {
+		if (maxSize.h == -1) {
+			// take remainder of parent height
+			drawRegion.h = rgn.w - p.y;
+		} else {
+			Font::StringSizeMetrics metrics = {maxSize, 0, true};
+			drawRegion.h = layoutFont->StringSize(text, &metrics).h;
+		}
+	}
+	return drawRegion;
+}
+
 Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
 	Regions layoutRegions;
 	const Point& drawOrigin = rgn.Origin();
-	const Font* layoutFont = font;
-	TextContainer* container = dynamic_cast<TextContainer*>(parent);
-	if (layoutFont == NULL && container) {
-		layoutFont = container->TextFont();
-	}
+	const Font* layoutFont = LayoutFont();
 	assert(layoutFont);
 
 	if (frame.Dimensions().IsZero()) {
@@ -214,27 +248,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 		// probably the way to do this is have alignment on the container
 		// then maybe another Draw method that takes an alignment argument?
 
-		Size maxSize = frame.Dimensions();
-		Region drawRegion = Region(layoutPoint + drawOrigin, maxSize);
-		if (maxSize.w <= 0) {
-			if (maxSize.w == -1) {
-				// take remainder of parent width
-				drawRegion.w = rgn.w - layoutPoint.x;
-				maxSize.w = drawRegion.w;
-			} else {
-				Font::StringSizeMetrics metrics = {maxSize, 0, true};
-				drawRegion.w = layoutFont->StringSize(text, &metrics).w;
-			}
-		}
-		if (maxSize.h <= 0) {
-			if (maxSize.h == -1) {
-				// take remainder of parent height
-				drawRegion.h = rgn.w - layoutPoint.y;
-			} else {
-				Font::StringSizeMetrics metrics = {maxSize, 0, true};
-				drawRegion.h = layoutFont->StringSize(text, &metrics).h;
-			}
-		}
+		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
 		assert(drawRegion.h && drawRegion.w);
 		if (layoutPoint.y != 0) {
 			// if we arent the first line, then collapse with the above line

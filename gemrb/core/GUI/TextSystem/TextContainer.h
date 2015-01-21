@@ -80,6 +80,10 @@ public:
 protected:
 	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
 	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+
+private:
+	inline const Font* LayoutFont() const;
+	inline Region LayoutInFrameAtPoint(const Point&, const Region&) const;
 };
 
 
