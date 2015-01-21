@@ -599,7 +599,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 			if (lineW > 0) { // kerning
 				chrW -= KerningOffset(string[i-1], string[i]);
 			}
-			if (lineW == 0 && wordW > 0 && metrics->forceBreak && WILL_WRAP(wordW + chrW) && wordW <= stop->w) {
+			if (lineW == 0 && wordW > 0 && WILL_WRAP(wordW + chrW) && metrics->forceBreak && wordW <= stop->w) {
 				// the word is longer than the line allows, but we allow a break mid-word
 				forceBreak = true;
 				newline = true;
