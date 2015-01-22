@@ -250,7 +250,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					AnimationFactory *af = (AnimationFactory *)
 						gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID );
 					/* Getting the Cycle of the bam */
+					if (af) {
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
+					} else {
+						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: %s", BAMFile);
+					}
 				}
 				else {
 					ResourceHolder<ImageMgr> mos(BAMFile);
