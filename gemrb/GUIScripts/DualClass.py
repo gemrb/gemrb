@@ -376,6 +376,7 @@ def DCClassDonePress ():
 	# unload our class selection window
 	if DCClassWindow:
 		DCClassWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# enable the skills button and disable the class selection button
 	DCMainClassButton.SetState (IE_GUI_BUTTON_DISABLED)
