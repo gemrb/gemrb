@@ -6766,6 +6766,10 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Object oC;
 		oC.objectFields[0]=EA_ENEMY;
 		Targets *tgts = GetAllObjects(map, target, &oC, GA_NO_DEAD);
+		if (!tgts) {
+			// no enemy to jump to
+			return FX_NOT_APPLIED;
+		}
 		int rnd = core->Roll(1,tgts->Count(),-1);
 		Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
 		delete tgts;
