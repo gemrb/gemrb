@@ -3364,7 +3364,6 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 	unsigned int ppx = Pos.x/16;
 	unsigned int ppy = Pos.y/12;
 	unsigned int r=(size-1)*(size-1)+1;
-	if (size == 1) r = 0;
 	for (unsigned int i=0; i<size; i++) {
 		for (unsigned int j=0; j<size; j++) {
 			if (i*i+j*j <= r) {
