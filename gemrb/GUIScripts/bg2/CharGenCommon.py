@@ -206,7 +206,7 @@ def DisplayOverview(step):
 					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
-				TextAreaControl.Append ( GemRB.GetString(11027) + info)
+				TextAreaControl.Append ( "\n"*10 + GemRB.GetString(11027) + "\n" + info)
 
 			# divine spells
 			info = ""
