@@ -295,9 +295,9 @@
 0xE138     MGFR       MGFR       MGFR       MGFR       9          4          1          *
 0xE148     MGVE       MGVE       MGVE       MGVE       9          4          1          *
 0xE15A     MGFO       MGFO       MGFO       MGFO       9          4          1          *
-0xE218     MELE       MELE       MELE       MELE       9          4          1          *
-0xE228     MELF       MELF       MELF       MELF       9          4          1          *
-0xE238     MELW       MELW       MELW       MELW       9          4          1          *
+0xE218     MELE       MELE       MELE       MELE       9          3          1          *
+0xE228     MELF       MELF       MELF       MELF       9          3          1          *
+0xE238     MELW       MELW       MELW       MELW       9          3          1          *
 0xE249     MHAR       MHAR       MHAR       MHAR       9          2          1          *
 0xE252     MWWE       MWWE       MWWE       MWWE       9          2          1          *
 0xE269     MFEY       MFEY       MFEY       MFEY       9          2          1          *
