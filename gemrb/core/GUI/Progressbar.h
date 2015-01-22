@@ -53,7 +53,7 @@ public:
 	Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear = false);
 	~Progressbar();
 
-	bool IsOpaque() { return BackGround; }
+	bool IsOpaque() const { return BackGround; }
 	/** Returns the actual Progressbar Position */
 	unsigned int GetPosition();
 	/** Sets the actual Progressbar Position trimming to the Max and Min Values */
