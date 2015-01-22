@@ -63,6 +63,7 @@ ReturnToGame = None
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
+AITip = {"Deactivate" : 15918, "Enable" : 15917}
 if GameCheck.IsPST(): #Torment
 	import GUIClasses
 	TimeWindow = None
@@ -88,12 +89,11 @@ elif GameCheck.IsIWD2(): #Icewind Dale 2
 	}
 	OptionControl = {
 	'Inventory' : 5, 'Map' : 7, 'Mage': 5, 'Priest': 6, 'Stats': 8, 'Journal': 6,
-	'Options' : 9, 'Rest': 12, 'Follow': 0, 'Expand': 10, 'AI': 6,
+	'Options' : 9, 'Rest': 12, 'Follow': 0, 'Expand': 10, 'AI': 14,
 	'Game': 0, 'Party' : 13,  'Time': 10, #not in pst
 	'SpellBook': 4, 'SelectAll': 11
 	}
 else: # Baldurs Gate, Icewind Dale
-	AITip = {"Deactivate" : 15918, "Enable" : 15917}
 	OptionTip = {
 	'Inventory' : 16307, 'Map': 16310, 'Mage': 16309, 'Priest': 14930, 'Stats': 16306, 'Journal': 16308,
 	'Options' : 16311, 'Rest': 11942, 'Follow': 41647,  'Expand': 41660, 'AI' : 1, 'Game' : 16313, 'Party' : 16312
@@ -139,8 +139,13 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
-		# Spellbook
+
 		Button = InitOptionButton(Window, 'SpellBook', GUISPL.OpenSpellBookWindow)
+
+		# AI
+		Button = InitOptionButton(Window, 'AI', AIPress)
+		AIPress (0) #this initialises the state and tooltip
+
 		if Gears: # todo: don't know if it needs this if or if it's if'fing around
 			# Select All
 			Button = InitOptionButton(Window, 'SelectAll', GUICommon.SelectAllOnPress)
@@ -329,7 +334,7 @@ def PortraitPress (): #not used in pst. TODO:make an enhancement option?
 def AIPress (toggle=1):
 	"""Toggles the party AI or refreshes the button state if toggle = 0"""
 
-	if GameCheck.IsPST():
+	if GameCheck.IsPST() or GameCheck.IsIWD2():
 		Button = OptionsWindow.GetControl (OptionControl['AI'])
 	else:
 		Button = PortraitWindow.GetControl (OptionControl['AI'])
