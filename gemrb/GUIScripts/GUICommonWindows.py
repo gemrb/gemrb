@@ -146,10 +146,8 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button = InitOptionButton(Window, 'AI', AIPress)
 		AIPress (0) #this initialises the state and tooltip
 
-		if Gears: # todo: don't know if it needs this if or if it's if'fing around
-			# Select All
-			Button = InitOptionButton(Window, 'SelectAll', GUICommon.SelectAllOnPress)
-
+		# Select All
+		Button = InitOptionButton(Window, 'SelectAll', GUICommon.SelectAllOnPress)
 	elif pst: #pst has these three controls here instead of portrait pane
 		# (Un)Lock view on character
 		Button = InitOptionButton(Window, 'Follow', OnLockViewPress)  # or 41648 Unlock ...
