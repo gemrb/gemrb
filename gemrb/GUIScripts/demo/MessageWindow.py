@@ -1,4 +1,5 @@
 import GemRB
+import Tests
 import GUICommon
 import GUICommonWindows
 import CommonWindow
@@ -47,7 +48,7 @@ def OnLoad():
 
 	# set up some *initial* text (UpdateControlStatus will get called several times)
 	TMessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	TMessageTA.SetText ("DEMO "*150)
+	TMessageTA.SetText ("DEMO "*30 + "\n" + Tests.RunTests ())
 
 def UpdateControlStatus():
 	global MessageWindow, TMessageTA
