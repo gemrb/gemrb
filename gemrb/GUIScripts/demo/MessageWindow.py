@@ -45,6 +45,10 @@ def OnLoad():
 
 	UpdateControlStatus()
 
+	# set up some *initial* text (UpdateControlStatus will get called several times)
+	TMessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	TMessageTA.SetText ("DEMO "*150)
+
 def UpdateControlStatus():
 	global MessageWindow, TMessageTA
 
@@ -65,9 +69,6 @@ def UpdateControlStatus():
 	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
 		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
-
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	TMessageTA.SetText("DEMO "*150)
 
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
