@@ -264,9 +264,9 @@ void TextArea::AppendText(const String& text)
 		if (finit != ftext) {
 			// append cap spans
 			size_t textpos = text.find_first_not_of(WHITESPACE_STRING);
-			// FIXME: ? maybe we actually want the newlines etc?
-			// I think maybe if we clean up the GUIScripts this isn't needed.
 			if (textpos != String::npos) {
+				// first append the white space as its own span
+				textContainer->AppendText(text.substr(0, textpos));
 
 				// we must create and append this span here (instead of using AppendText),
 				// because the original data files for the DC font specifies a line height of 13
