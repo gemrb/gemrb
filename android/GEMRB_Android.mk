@@ -211,6 +211,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/TextSystem/Font.cpp \
 		    main/gemrb/core/TextSystem/GemMarkup.cpp \
 		    main/gemrb/core/TextSystem/TextContainer.cpp \
+		    main/gemrb/core/GUI/View.cpp \
 		    main/gemrb/core/GUI/EventMgr.cpp \
 		    main/gemrb/core/GUI/Progressbar.cpp \
 		    main/gemrb/core/GUI/Console.cpp \

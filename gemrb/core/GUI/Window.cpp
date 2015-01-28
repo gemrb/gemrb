@@ -32,6 +32,7 @@ namespace GemRB {
 
 Window::Window(unsigned short WindowID, unsigned short XPos,
 	unsigned short YPos, unsigned short Width, unsigned short Height)
+		: View(Region(XPos, YPos, Width, Height))
 {
 	this->WindowID = WindowID;
 	this->XPos = XPos;

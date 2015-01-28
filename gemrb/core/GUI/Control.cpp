@@ -40,6 +40,7 @@
 namespace GemRB {
 
 Control::Control(const Region& frame)
+	: View(frame)
 {
 	hasFocus = false;
 	Changed = false; // no window to draw to yet.

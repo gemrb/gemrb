@@ -30,8 +30,6 @@
 
 #include "GUI/Control.h"
 
-#include "exports.h"
-
 #include <vector>
 
 namespace GemRB {
@@ -59,7 +57,7 @@ class Sprite2D;
  * and displaying windows in GUI.
  */
 
-class GEM_EXPORT Window {
+class GEM_EXPORT Window : public View {
 private:
 	void DrawBackground(const Region* rgn) const;
 

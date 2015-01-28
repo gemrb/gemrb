@@ -45,10 +45,10 @@
 
 #include "RGBAColor.h"
 #include "exports.h"
-#include "ie_types.h"
 #include "win32def.h"
 
 #include "Callback.h"
+#include "GUI/View.h"
 
 namespace GemRB {
 
@@ -63,7 +63,7 @@ class Window;
  * Every GUI element except of a Window is a descendant of this class.
  */
 
-class GEM_EXPORT Control {
+class GEM_EXPORT Control : public View {
 private:
 	/** If true, control is redrawn during next call to gc->DrawWindows.
 	 * Then it's set back to false. */
