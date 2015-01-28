@@ -267,8 +267,6 @@ void TextArea::AppendText(const String& text)
 			// FIXME: ? maybe we actually want the newlines etc?
 			// I think maybe if we clean up the GUIScripts this isn't needed.
 			if (textpos != String::npos) {
-				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
-				// need to figure out how to handle this because it breaks drop caps
 
 				// we must create and append this span here (instead of using AppendText),
 				// because the original data files for the DC font specifies a line height of 13
