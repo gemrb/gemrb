@@ -110,7 +110,7 @@ public:
 	~GameControl(void);
 protected:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip);
 public:
 	// GameControl always needs to redraw
 	bool NeedsDraw() const { return true; };

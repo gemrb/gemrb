@@ -60,6 +60,8 @@ class Sprite2D;
 class GEM_EXPORT Window : public View {
 private:
 	void DrawBackground(const Region* rgn) const;
+protected:
+	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 
 public: 
 	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,

@@ -54,9 +54,10 @@ public:
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	/** Draws the Console on the Output Display */
-	void DrawInternal(Region& drawFrame);
 	// console always needs to redraw
 	bool NeedsDraw() const { return true; };
+	void DrawSelf(Region drawFrame, const Region& clip);
+
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;

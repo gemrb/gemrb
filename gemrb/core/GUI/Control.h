@@ -71,7 +71,6 @@ private:
 protected:
 	/** Focused Control */
 	bool hasFocus;
-	virtual void DrawInternal(Region& drawFrame)=0;
 public:
 	Control(const Region& frame);
 	virtual ~Control();

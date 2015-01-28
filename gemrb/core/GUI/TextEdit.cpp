@@ -64,7 +64,7 @@ void TextEdit::SetAlignment(unsigned char Alignment)
 }
 
 /** Draws the Control on the Output Display */
-void TextEdit::DrawInternal(Region& rgn)
+void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	ieWord yOff = FontPosY;
 	Video* video = core->GetVideoDriver();

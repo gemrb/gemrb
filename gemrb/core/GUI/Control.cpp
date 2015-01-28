@@ -108,7 +108,7 @@ void Control::Draw(unsigned short x, unsigned short y)
 	// clip drawing to the control bounds, then restore after drawing
 	Region clip = video->GetScreenClip();
 	video->SetScreenClip(&drawFrame);
-	DrawInternal(drawFrame);
+	DrawSelf(drawFrame, drawFrame); // FIXME: drawframe isnt the real clip. this should be drawframe intersected with screen
 	video->SetScreenClip(&clip);
 	Changed = false; // set *after* calling DrawInternal
 }

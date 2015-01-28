@@ -53,7 +53,7 @@ namespace GemRB {
 class GEM_EXPORT Slider : public Control  {
 protected:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:
 	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);

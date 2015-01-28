@@ -35,6 +35,8 @@ protected:
 	Region frame;
 	std::list<View*> subViews;
 
+protected:
+	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
 public:
 	View(const Region& frame);
 	virtual ~View();

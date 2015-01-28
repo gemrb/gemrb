@@ -52,7 +52,7 @@ Label::~Label()
 	gamedata->FreePalette( palette );
 }
 /** Draws the Control on the Output Display */
-void Label::DrawInternal(Region& rgn)
+void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	if (font && Text.length()) {
 		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);

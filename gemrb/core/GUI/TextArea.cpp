@@ -99,7 +99,7 @@ bool TextArea::NeedsDraw() const
 	return Control::NeedsDraw();
 }
 
-void TextArea::DrawInternal(Region& clip)
+void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (animationEnd) {
 		if (TextYPos > textContainer->ContentFrame().h) {
@@ -125,13 +125,13 @@ void TextArea::DrawInternal(Region& clip)
 
 	if (AnimPicture) {
 		// speaker portrait
-		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
-		clip.x += AnimPicture->Width + EDGE_PADDING;
+		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.x, drawFrame.y + EDGE_PADDING, true);
+		drawFrame.x += AnimPicture->Width + EDGE_PADDING;
 	}
 
-	clip.x += EDGE_PADDING;
-	clip.y -= TextYPos;
-	contentWrapper.Draw(clip.Origin());
+	drawFrame.x += EDGE_PADDING;
+	drawFrame.y -= TextYPos;
+	contentWrapper.Draw(drawFrame.Origin());
 
 	if (selectOptions) {
 		// This hack is to refresh the mouse cursor so that option below cursor gets

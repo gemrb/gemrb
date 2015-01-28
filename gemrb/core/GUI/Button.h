@@ -131,7 +131,7 @@ enum BUTTON_IMAGE_TYPE {
 class GEM_EXPORT Button : public Control {
 protected:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawRegion);
+	void DrawSelf(Region drawFrame, const Region& clip);
 public: 
 	Button(Region& frame);
 	~Button();

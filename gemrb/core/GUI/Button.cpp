@@ -155,7 +155,7 @@ void Button::CloseUpColor()
 }
 
 /** Draws the Control on the Output Display */
-void Button::DrawInternal(Region& rgn)
+void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	Video * video = core->GetVideoDriver();
 

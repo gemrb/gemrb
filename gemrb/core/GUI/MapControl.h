@@ -48,7 +48,7 @@ namespace GemRB {
 class GEM_EXPORT MapControl : public Control {
 protected:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip);
 	void DrawFog(const Region& rgn);
 public:
 	int ScrollX, ScrollY;

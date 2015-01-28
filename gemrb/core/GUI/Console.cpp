@@ -51,7 +51,7 @@ Console::~Console(void)
 }
 
 /** Draws the Console on the Output Display */
-void Console::DrawInternal(Region& drawFrame)
+void Console::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (Back) {
 		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );

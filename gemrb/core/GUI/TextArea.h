@@ -55,7 +55,7 @@ typedef std::pair<int, String> SelectOption;
 class GEM_EXPORT TextArea : public Control {
 protected:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:
 	TextArea(const Region& frame, Font* text);

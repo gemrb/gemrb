@@ -66,7 +66,7 @@ Slider::~Slider()
 }
 
 /** Draws the Control on the Output Display */
-void Slider::DrawInternal(Region& rgn)
+void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	if (BackGround) {
 		if (( BackGround->Width < Width ) || ( BackGround->Height < Height )) {

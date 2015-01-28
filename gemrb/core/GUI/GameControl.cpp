@@ -365,7 +365,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 }
 
 /** Draws the Control on the Output Display */
-void GameControl::DrawInternal(Region& screen)
+void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 {
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 

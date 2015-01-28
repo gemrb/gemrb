@@ -56,7 +56,7 @@ Progressbar::~Progressbar()
 }
 
 /** Draws the Control on the Output Display */
-void Progressbar::DrawInternal(Region& rgn)
+void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	Sprite2D *bcksprite;
 

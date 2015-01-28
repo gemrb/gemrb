@@ -60,7 +60,7 @@ class WorldMapControl;
 class GEM_EXPORT WorldMapControl : public Control {
 protected:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region&);
 public:
 	WorldMapControl(const Region& frame, const char *fontname, int direction);
 	~WorldMapControl(void);

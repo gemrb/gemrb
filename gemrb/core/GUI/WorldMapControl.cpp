@@ -102,7 +102,7 @@ WorldMapControl::~WorldMapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::DrawInternal(Region& rgn)
+void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	ieWord XWin = rgn.x;
 	ieWord YWin = rgn.y;

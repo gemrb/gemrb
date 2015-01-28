@@ -180,7 +180,7 @@ void MapControl::UpdateState(const char *VariableName, unsigned int Sum)
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::DrawInternal(Region& rgn)
+void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	ieWord XWin = rgn.x;
 	ieWord YWin = rgn.y;

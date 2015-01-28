@@ -63,7 +63,7 @@ enum IE_SCROLLBAR_IMAGE_TYPE {
  */
 class GEM_EXPORT ScrollBar : public Control {
 protected:
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:
 	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
