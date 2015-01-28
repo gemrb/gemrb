@@ -90,15 +90,6 @@ TextArea::~TextArea(void)
 	}
 }
 
-bool TextArea::NeedsDraw() const
-{
-	if (animationEnd) {
-		return true;
-	}
-
-	return Control::NeedsDraw();
-}
-
 void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (animationEnd) {

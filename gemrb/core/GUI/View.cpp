@@ -40,26 +40,76 @@ View::~View()
 	}
 }
 
+void View::MarkDirty()
+{
+	dirty = true;
+}
+
+bool View::NeedsDraw() const
+{
+	return (!frame.Dimensions().IsEmpty() && (dirty || IsAnimated()));
+}
+
+void View::DrawSubviews()
+{
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* v = *it;
+		v->Draw();
+	}
+}
+
 void View::Draw()
 {
+	Video* video = core->GetVideoDriver();
 
+	const Region& clip = video->GetScreenClip();
+	const Region& drawFrame = Region(ConvertPointToSuper(Point(0,0)), Dimensions());
+	const Region& intersect = clip.Intersect(drawFrame);
+	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
+
+	if (NeedsDraw()) {
+		// clip drawing to the control bounds, then restore after drawing
+		video->SetScreenClip(&drawFrame);
+		DrawSelf(drawFrame, intersect);
+		video->SetScreenClip(&clip);
+		dirty = false;
+	}
+
+	// always call draw on subviews because they can be dirty without us
+	DrawSubviews();
+}
+
+Point View::ConvertPointToSuper(const Point& p) const
+{
+	Point newP = p + Origin();
+	return newP;
+}
+
+Point View::ConvertPointFromSuper(const Point& p) const
+{
+	Point newP = p - Origin();
+	return newP;
 }
 
 void View::SetFrame(const Region& r)
 {
 	frame = r;
+	MarkDirty();
 }
 
 void View::SetFrameOrigin(const Point& p)
 {
 	frame.x = p.x;
 	frame.y = p.y;
+	MarkDirty();
 }
 
 void View::SetFrameSize(const Size& s)
 {
 	frame.w = s.w;
 	frame.h = s.h;
+	MarkDirty();
 }
 
 }

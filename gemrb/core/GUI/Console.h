@@ -54,8 +54,6 @@ public:
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	/** Draws the Console on the Output Display */
-	// console always needs to redraw
-	bool NeedsDraw() const { return true; };
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 private:

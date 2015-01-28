@@ -35,13 +35,24 @@ protected:
 	Region frame;
 	std::list<View*> subViews;
 
+private:
+	void DrawSubviews();
+
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
+	inline Point ConvertPointToSuper(const Point&) const;
+	inline Point ConvertPointFromSuper(const Point&) const;
+
 public:
 	View(const Region& frame);
 	virtual ~View();
 
 	void Draw();
+
+	void MarkDirty();
+	bool NeedsDraw() const;
+
+	virtual bool IsAnimated() const { return false; }
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }

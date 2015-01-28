@@ -43,7 +43,6 @@ Control::Control(const Region& frame)
 	: View(frame)
 {
 	hasFocus = false;
-	Changed = false; // no window to draw to yet.
 	InHandler = false;
 	VarName[0] = 0;
 	ControlID = 0;
@@ -110,7 +109,6 @@ void Control::Draw(unsigned short x, unsigned short y)
 	video->SetScreenClip(&drawFrame);
 	DrawSelf(drawFrame, drawFrame); // FIXME: drawframe isnt the real clip. this should be drawframe intersected with screen
 	video->SetScreenClip(&clip);
-	Changed = false; // set *after* calling DrawInternal
 }
 
 void Control::SetText(const String* string)
@@ -128,7 +126,7 @@ int Control::SetTooltip(const char* string)
 		Tooltip = StringFromCString(string);
 		TrimString(*Tooltip); // for proper vertical alaignment
 	}
-	Changed = true;
+	MarkDirty();
 	return 0;
 }
 
@@ -221,7 +219,7 @@ bool Control::OnSpecialKeyPress(unsigned char Key)
 void Control::SetFocus(bool focus)
 {
 	hasFocus = focus;
-	Changed = true;
+	MarkDirty();
 }
 
 bool Control::isFocused()
@@ -257,8 +255,8 @@ int Control::SetFlags(int arg_flags, int opcode)
 			return -1;
 	}
 	Flags = newFlags;
-	Changed = true;
 	Owner->Invalidate();
+	MarkDirty();
 	return 0;
 }
 
@@ -282,7 +280,6 @@ int Control::SetScrollBar(Control* ptr)
 		return -1;
 	}
 	sb = ptr;
-	Changed = true;
 	return (bool)sb;
 }
 

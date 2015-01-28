@@ -64,10 +64,6 @@ class Window;
  */
 
 class GEM_EXPORT Control : public View {
-private:
-	/** If true, control is redrawn during next call to gc->DrawWindows.
-	 * Then it's set back to false. */
-	bool Changed;
 protected:
 	/** Focused Control */
 	bool hasFocus;
@@ -78,9 +74,9 @@ public:
 	void SetControlFrame(const Region&);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
-	void MarkDirty() { Changed = true; }
-	virtual bool NeedsDraw() const { return Changed || animation; }
+	virtual bool IsAnimated() const { return animation; }
 	virtual bool IsOpaque() const { return true; }
+
 	/** Sets the Text of the current control */
 	void SetText(const String*);
 	virtual void SetText(const String&) {};

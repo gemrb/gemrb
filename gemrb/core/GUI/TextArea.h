@@ -63,7 +63,7 @@ public:
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
 
-	bool NeedsDraw() const;
+	bool IsAnimated() const { return animationEnd; }
 	bool IsOpaque() const { return false; }
 
 	/** Sets the Actual Text */
