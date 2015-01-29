@@ -31,7 +31,6 @@ View::View(const Region& frame)
 	background = NULL;
 	superView = NULL;
 
-	bgDrawn = false;
 	dirty = true;
 }
 
@@ -58,9 +57,6 @@ void View::SetBackground(Sprite2D* bg)
 
 void View::MarkDirty()
 {
-	// we only use a separate flag for bg because
-	// subview drawing might call MarkDirty() on superview
-	bgDrawn = false;
 	dirty = true;
 }
 
@@ -69,12 +65,13 @@ bool View::NeedsDraw() const
 	return (!frame.Dimensions().IsEmpty() && (dirty || IsAnimated()));
 }
 
-void View::DrawSubviews()
+void View::DrawSubviews(bool drawBg)
 {
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		View* v = *it;
-		if (background && !bgDrawn && !v->IsOpaque() && v->NeedsDraw()) {
+		if (drawBg && !v->IsOpaque() && v->NeedsDraw()) {
+			assert(background); // shouldnt get called with drawBg = true if this isnt set
 			const Region& fromClip = v->Frame();
 			DrawBackground(&fromClip);
 		}
@@ -86,14 +83,11 @@ void View::DrawBackground(const Region* rgn) const
 {
 	Video* video = core->GetVideoDriver();
 	if (rgn) {
-		Region toClip(ConvertPointToSuper(rgn->Origin()), rgn->Dimensions());
-		toClip.x += frame.x;
-		toClip.y += frame.y;
+		Region toClip(ConvertPointToScreen(rgn->Origin()), rgn->Dimensions());
 		video->BlitSprite( background, *rgn, toClip);
 	} else {
-		Point dp = ConvertPointToSuper(Point(0,0));
+		Point dp = ConvertPointToScreen(Point(0,0));
 		video->BlitSprite( background, dp.x, dp.y, true );
-		bgDrawn = true;
 	}
 }
 
@@ -106,11 +100,13 @@ void View::Draw()
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
+	bool drawBg = (background != NULL);
 	if (NeedsDraw()) {
 		// clip drawing to the control bounds, then restore after drawing
 		video->SetScreenClip(&drawFrame);
 		if (background) {
 			DrawBackground(NULL);
+			drawBg = false;
 		}
 		DrawSelf(drawFrame, intersect);
 		video->SetScreenClip(&clip);
@@ -118,7 +114,7 @@ void View::Draw()
 	}
 
 	// always call draw on subviews because they can be dirty without us
-	DrawSubviews();
+	DrawSubviews(drawBg);
 }
 
 Point View::ConvertPointToSuper(const Point& p) const

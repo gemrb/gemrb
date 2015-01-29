@@ -34,7 +34,6 @@ private:
 	Sprite2D* background;
 	View* superView;
 
-	mutable bool bgDrawn;
 	mutable bool dirty;
 protected:
 	Region frame;
@@ -42,7 +41,7 @@ protected:
 
 private:
 	void DrawBackground(const Region*) const;
-	void DrawSubviews();
+	void DrawSubviews(bool drawBg);
 
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
