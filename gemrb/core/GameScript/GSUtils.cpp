@@ -333,8 +333,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 	video->ConvertToScreen(point.x, point.y);
 	GameControl *win = core->GetGameControl();
 
-	point.x+=win->XPos;
-	point.y+=win->YPos;
+	point = win->Frame().Origin();
 	video->MoveMouse(point.x, point.y);
 	video->ClickMouse(type);
 	Sender->ReleaseCurrentAction();

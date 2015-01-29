@@ -140,18 +140,18 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 	// dialog is the only thing that uses an actual picture, so we can safely bail out in that case
 	if (pic == AnimPicture && pic != NULL) return;
 
-	Size frame(Width, 0);
+	Size s(frame.w, 0);
 	// apply padding to the clip
-	frame.w -= (sb) ? EDGE_PADDING : EDGE_PADDING * 2;
+	s.w -= (sb) ? EDGE_PADDING : EDGE_PADDING * 2;
 
 	if (pic) {
 		int offset = pic->Width + EDGE_PADDING;
 		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
-		frame.w -= offset;
+		s.w -= offset;
 	}
 	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
-	textContainer->SetFrame(Region(Point(), frame));
-	contentWrapper.SetFrame(Region(Point(), frame));
+	textContainer->SetFrame(Region(Point(), s));
+	contentWrapper.SetFrame(Region(Point(), s));
 
 	Control::SetAnimPicture(pic);
 }
@@ -169,9 +169,9 @@ void TextArea::UpdateScrollbar()
 		Size selectFrame = selectOptions->ContentFrame();
 		// page = blank line + dialog node + blank line + select options
 		int pageH = ftext->LineHeight*2 + nodeBounds.h + selectFrame.h;
-		if (pageH < Height) {
+		if (pageH < frame.h) {
 			// if the node isnt a full page by itself we need to fake it
-			textHeight += Height - pageH;
+			textHeight += frame.h - pageH;
 		}
 	}
 	int rowHeight = GetRowHeight();
@@ -179,7 +179,7 @@ void TextArea::UpdateScrollbar()
 	if (newRows != rows) {
 		rows = newRows;
 		ScrollBar* bar = ( ScrollBar* ) sb;
-		ieWord visibleRows = (Height / GetRowHeight());
+		ieWord visibleRows = (frame.h / GetRowHeight());
 		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
 		bar->SetMax(sbMax);
 	}
@@ -200,7 +200,7 @@ int TextArea::SetScrollBar(Control* ptr)
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		int bottom = contentWrapper.ContentFrame().h - Height;
+		int bottom = contentWrapper.ContentFrame().h - frame.h;
 		if (bottom > 0)
 			ScrollToY(bottom); // no animation for this one
 	} else {
@@ -290,7 +290,7 @@ void TextArea::AppendText(const String& text)
 		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
 			// scroll to the bottom
-			int bottom = contentWrapper.ContentFrame().h - Height;
+			int bottom = contentWrapper.ContentFrame().h - frame.h;
 			if (bottom > 0)
 				ScrollToY(bottom, NULL, 500); // animated scroll
 		}
@@ -608,7 +608,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 	ClearSelectOptions(); // deletes previous options
 
-	Size optFrame(Width - (EDGE_PADDING * 2), 0);
+	Size optFrame(frame.w - (EDGE_PADDING * 2), 0);
 	optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
@@ -663,18 +663,18 @@ void TextArea::ClearText()
 	contentWrapper.RemoveContent(textContainer);
 	delete textContainer;
 
-	Size frame;
+	Size s;
 	if (sb) {
 		// if we have a scrollbar we should grow as much as needed vertically
 		// pad only on left edge
-		frame.w = Width - EDGE_PADDING;
+		s.w = frame.w - EDGE_PADDING;
 	} else {
 		// otherwise limit the text to our frame
 		// pad on both edges
-		frame.w = Width - (EDGE_PADDING * 2);
+		s.w = frame.w - (EDGE_PADDING * 2);
 	}
 
-	textContainer = new TextContainer(frame, ftext, palette);
+	textContainer = new TextContainer(s, ftext, palette);
 	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
 
 	// reset text position to top

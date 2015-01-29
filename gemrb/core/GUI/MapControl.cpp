@@ -164,8 +164,8 @@ void MapControl::Realize()
 	ViewWidth = (short) (core->Width * MAP_DIV / MAP_MULT);
 	ViewHeight = (short) (core->Height * MAP_DIV / MAP_MULT);
 
-	XCenter = (short) (Width - MapWidth ) / 2;
-	YCenter = (short) (Height - MapHeight ) / 2;
+	XCenter = (short) (frame.w - MapWidth ) / 2;
+	YCenter = (short) (frame.h - MapHeight ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
 }
@@ -217,10 +217,10 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	vp.w = ViewWidth;
 	vp.h = ViewHeight;
 
-	if ((vp.x + vp.w) >= MAP_TO_SCREENX( Width ))
-		vp.w = MAP_TO_SCREENX( Width ) - vp.x;
-	if ((vp.y + vp.h) >= MAP_TO_SCREENY( Height ))
-		vp.h = MAP_TO_SCREENY( Height ) - vp.y;
+	if ((vp.x + vp.w) >= MAP_TO_SCREENX( frame.w ))
+		vp.w = MAP_TO_SCREENX( frame.w ) - vp.x;
+	if ((vp.y + vp.h) >= MAP_TO_SCREENY( frame.h ))
+		vp.h = MAP_TO_SCREENY( frame.h ) - vp.y;
 
 	video->DrawRect( vp, colors[green], false, false );
 
@@ -274,10 +274,10 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		ScrollX -= x - lastMouseX;
 		ScrollY -= y - lastMouseY;
 
-		if (ScrollX > MapWidth - Width)
-			ScrollX = MapWidth - Width;
-		if (ScrollY > MapHeight - Height)
-			ScrollY = MapHeight - Height;
+		if (ScrollX > MapWidth - frame.w)
+			ScrollX = MapWidth - frame.w;
+		if (ScrollY > MapHeight - frame.h)
+			ScrollY = MapHeight - frame.h;
 		if (ScrollX < 0)
 			ScrollX = 0;
 		if (ScrollY < 0)
@@ -460,10 +460,10 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 			return false;
 	}
 
-	if (ScrollX > MapWidth - Width)
-		ScrollX = MapWidth - Width;
-	if (ScrollY > MapHeight - Height)
-		ScrollY = MapHeight - Height;
+	if (ScrollX > MapWidth - frame.w)
+		ScrollX = MapWidth - frame.w;
+	if (ScrollY > MapHeight - frame.h)
+		ScrollY = MapHeight - frame.h;
 	if (ScrollX < 0)
 		ScrollX = 0;
 	if (ScrollY < 0)

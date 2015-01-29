@@ -476,7 +476,7 @@ public:
 #undef CreateWindow
 #endif
 #endif
-	int CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background);
+	int CreateWindow(unsigned short WindowID, const Region&, char* Background);
 	/** Sets a Window on the Top */
 	void SetOnTop(int Index);
 	/** Add a window to the Window List */

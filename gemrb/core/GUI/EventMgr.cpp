@@ -196,10 +196,11 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			continue;
 		if (!win->Visible)
 			continue;
-		if (( win->XPos <= x ) && ( win->YPos <= y )) {
+		Region winFrame = (*m)->Frame();
+		if (( winFrame.x <= x ) && ( winFrame.y <= y )) {
 			//Maybe we are on the window, let's check
-			if (( win->XPos + win->Width >= x ) &&
-				( win->YPos + win->Height >= y )) {
+			if (( winFrame.x + winFrame.w >= x ) &&
+				( winFrame.y + winFrame.h >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				Control* ctrl = win->GetControl( x, y, true );
@@ -281,10 +282,11 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			continue;
 		if (!( *m )->Visible)
 			continue;
-		if (( ( *m )->XPos <= x ) && ( ( *m )->YPos <= y )) {
+		Region winFrame = (*m)->Frame();
+		if (( winFrame.x <= x ) && ( winFrame.y <= y )) {
 			//Maybe we are on the window, let's check
-			if (( ( *m )->XPos + ( *m )->Width >= x ) &&
-				( ( *m )->YPos + ( *m )->Height >= y )) {
+			if (( winFrame.x + winFrame.w >= x ) &&
+				( winFrame.y + winFrame.h >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				ctrl = ( *m )->GetControl( x, y, true );
@@ -294,7 +296,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 				last_win_mousefocused = *m;
 				if (ctrl != NULL) {
 					last_win_mousefocused->SetMouseFocused( ctrl );
-					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos,
+					ctrl->OnMouseDown( x - last_win_mousefocused->Origin().x - ctrl->Origin().x, y - last_win_mousefocused->Origin().y - ctrl->Origin().y,
 									  Button, Mod );
 					if (!ctrl->WantsDragOperation()) {
 						focusLock = ctrl;
@@ -313,7 +315,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 	if ((Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) && last_win_mousefocused) {
 		ctrl = last_win_mousefocused->GetScrollControl();
 		if (ctrl) {
-			ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
+			ctrl->OnMouseDown( x - last_win_mousefocused->Origin().x - ctrl->Origin().x, y - last_win_mousefocused->Origin().y - ctrl->Origin().y, Button, Mod );
 		}
 	}
 
@@ -330,8 +332,8 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 	MButtons &= ~Button;
 	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
 	if (last_ctrl_mousefocused == NULL) return;
-	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->XPos - last_ctrl_mousefocused->XPos,
-		y - last_win_mousefocused->YPos - last_ctrl_mousefocused->YPos, Button, Mod );
+	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->Origin().x - last_ctrl_mousefocused->Origin().y,
+		y - last_win_mousefocused->Origin().y - last_ctrl_mousefocused->Origin().y, Button, Mod );
 }
 
 /** BroadCast Mouse ScrollWheel Event */

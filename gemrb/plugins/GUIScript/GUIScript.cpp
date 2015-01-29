@@ -500,7 +500,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 	ta->ClearText();
 	// insert enough newlines to push the text offscreen
 	int rowHeight = ta->GetRowHeight();
-	size_t lines = ta->Height / rowHeight;
+	size_t lines = ta->Dimensions().h / rowHeight;
 	ta->AppendText(String(lines, L'\n'));
 	String* chapText = StringFromCString(text);
 	lines *= 2; // double the "amount" of newlines since we also scroll to be out of sight
@@ -621,11 +621,13 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	// If the current winpack windows are placed for screen resolution
 	// other than the current one, reposition them
 	Window* win = core->GetWindow( ret );
+	Region winFrame = win->Frame();
 	if (CHUWidth && CHUWidth != core->Width)
-		win->XPos += (core->Width - CHUWidth) / 2;
+		winFrame.x += (core->Width - CHUWidth) / 2;
 	if (CHUHeight && CHUHeight != core->Height)
-		win->YPos += (core->Height - CHUHeight) / 2;
+		winFrame.y += (core->Height - CHUHeight) / 2;
 
+	win->View::SetFrame(winFrame);
 	return gs->ConstructObject("Window", ret);
 }
 
@@ -645,10 +647,7 @@ static PyObject* GemRB_Window_SetSize(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!\n");
 	}
-
-	win->Width = Width;
-	win->Height = Height;
-	win->Invalidate();
+	win->SetFrameSize(Size(Width, Height));
 
 	Py_RETURN_NONE;
 }
@@ -782,21 +781,23 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
+	Region winFrame = win->Frame();
+
 	if (Flags & WINDOW_CENTER) {
-		X -= win->Width / 2;
-		Y -= win->Height / 2;
+		X -= winFrame.w / 2;
+		Y -= winFrame.h / 2;
 	}
 	else if (Flags & WINDOW_ABSCENTER) {
-		X += (core->Width - win->Width) / 2;
-		Y += (core->Height - win->Height) / 2;
+		X += (core->Width - winFrame.w) / 2;
+		Y += (core->Height - winFrame.h) / 2;
 	}
 	else if (Flags & WINDOW_RELATIVE) {
-		X += win->XPos;
-		Y += win->YPos;
+		X += winFrame.x;
+		Y += winFrame.y;
 	}
 	else if (Flags & WINDOW_SCALE) {
-		X = win->XPos + (core->Width - X) / 2;
-		Y = win->YPos + (core->Height - Y) / 2;
+		X = winFrame.x + (core->Width - X) / 2;
+		Y = winFrame.y + (core->Height - Y) / 2;
 	}
 
 	// Keep window within screen
@@ -807,14 +808,15 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 		if ((ieWordSigned) Y < 0)
 			Y = 0;
 
-		if (X + win->Width >= core->Width)
-			X = core->Width - win->Width;
-		if (Y + win->Height >= core->Height)
-			Y = core->Height - win->Height;
+		if (X + winFrame.w >= core->Width)
+			X = core->Width - winFrame.w;
+		if (Y + winFrame.h >= core->Height)
+			Y = core->Height - winFrame.h;
 	}
 
-	win->XPos = X;
-	win->YPos = Y;
+	winFrame.x = X;
+	winFrame.y = Y;
+	win->View::SetFrame(winFrame);
 	core->RedrawAll();
 
 	Py_RETURN_NONE;
@@ -837,11 +839,12 @@ static PyObject* GemRB_Window_GetRect(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
+	const Region& winFrame = win->Frame();
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "X", PyInt_FromLong( win->XPos ));
-	PyDict_SetItemString(dict, "Y", PyInt_FromLong( win->YPos ));
-	PyDict_SetItemString(dict, "Width", PyInt_FromLong( win->Width ));
-	PyDict_SetItemString(dict, "Height", PyInt_FromLong( win->Height ));
+	PyDict_SetItemString(dict, "X", PyInt_FromLong( winFrame.x ));
+	PyDict_SetItemString(dict, "Y", PyInt_FromLong( winFrame.y ));
+	PyDict_SetItemString(dict, "Width", PyInt_FromLong( winFrame.w ));
+	PyDict_SetItemString(dict, "Height", PyInt_FromLong( winFrame.h ));
 	return dict;
 }
 
@@ -1840,7 +1843,7 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 			&w, &h, &Background )) {
 		return AttributeError( GemRB_CreateWindow__doc );
 	}
-	int WindowIndex = core->CreateWindow( WindowID, x, y, w, h, Background );
+	int WindowIndex = core->CreateWindow( WindowID, Region(x, y, w, h), Background );
 	if (WindowIndex == -1) {
 		return RuntimeError( "Can't create window" );
 	}
@@ -1870,7 +1873,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	if (!btn) {
 		return NULL;
 	}
-	Region frame = btn->ControlFrame();
+	Region frame = btn->Frame();
 	frame.y += 5;
 	frame.h -= 10;
 	Label* lbl = new Label(frame, core->GetFont( font ), L"" );
@@ -2658,7 +2661,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
-		rgn = ctrl->ControlFrame();
+		rgn = ctrl->Frame();
 		//flags = ctrl->Value;
 		delete win->RemoveControl( CtrlIndex );
 	}
@@ -2733,7 +2736,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
-		rgn = ctrl->ControlFrame();
+		rgn = ctrl->Frame();
 		// do *not* delete the existing control, we want to replace
 		// it in the sort order!
 		//win->DelControl( CtrlIndex );
@@ -2804,7 +2807,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 	}
 	substitute->Owner->RemoveControl(subIdx);
 	Window* targetWin = target->Owner;
-	substitute->SetControlFrame(target->ControlFrame());
+	substitute->SetFrame(target->Frame());
 
 	substitute->ControlID = target->ControlID;
 	ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
@@ -2834,8 +2837,7 @@ static PyObject* GemRB_Control_SetPos(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	ctrl->XPos = X;
-	ctrl->YPos = Y;
+	ctrl->SetFrameOrigin(Point(X, Y));
 
 	Py_RETURN_NONE;
 }
@@ -2857,11 +2859,12 @@ static PyObject* GemRB_Control_GetRect(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
+	const Region& ctrlFrame = ctrl->Frame();
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "X", PyInt_FromLong( ctrl->XPos ));
-	PyDict_SetItemString(dict, "Y", PyInt_FromLong( ctrl->YPos ));
-	PyDict_SetItemString(dict, "Width", PyInt_FromLong( ctrl->Width ));
-	PyDict_SetItemString(dict, "Height", PyInt_FromLong( ctrl->Height ));
+	PyDict_SetItemString(dict, "X", PyInt_FromLong( ctrlFrame.x ));
+	PyDict_SetItemString(dict, "Y", PyInt_FromLong( ctrlFrame.y ));
+	PyDict_SetItemString(dict, "Width", PyInt_FromLong( ctrlFrame.w ));
+	PyDict_SetItemString(dict, "Height", PyInt_FromLong( ctrlFrame.h ));
 	return dict;
 }
 
@@ -2883,8 +2886,7 @@ static PyObject* GemRB_Control_SetSize(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	ctrl->Width = Width;
-	ctrl->Height = Height;
+	ctrl->SetFrameSize(Size(Width, Height));
 
 	Py_RETURN_NONE;
 }

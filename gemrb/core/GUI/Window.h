@@ -64,8 +64,7 @@ protected:
 	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 
 public: 
-	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
-		unsigned short Width, unsigned short Height);
+	Window(unsigned short WindowID, const Region& frame);
 	~Window();
 	/** Set the Window's BackGround Image. 
 	 * If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
@@ -121,14 +120,7 @@ public: //Public attributes
 	char WindowPack[10];
 	/** Window ID */
 	unsigned short WindowID;
-	/** X Position */
-	unsigned short XPos;
-	/** Y Position */
-	unsigned short YPos;
-	/** Width */
-	unsigned short Width;
-	/** Height */
-	unsigned short Height;
+
 	/** Visible value: deleted, invisible, visible, grayed */
 	signed char Visible;  //-1,0,1,2
 	/** Window flags: Changed, Floating, Framed, Child */

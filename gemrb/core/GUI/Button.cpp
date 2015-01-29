@@ -186,8 +186,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
-			int xOffs = ( Width / 2 ) - ( Image->Width / 2 );
-			int yOffs = ( Height / 2 ) - ( Image->Height / 2 );
+			int xOffs = ( frame.w / 2 ) - ( Image->Width / 2 );
+			int yOffs = ( frame.h / 2 ) - ( Image->Height / 2 );
 
 			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs, true );
 		}
@@ -201,8 +201,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Button picture
 	if (AnimPicture) {
-		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
+		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Width / 2 );
+		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Height / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
 
 		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
@@ -255,16 +255,16 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		int xOffs = 0, yOffs = 0;
 		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
-			xOffs = Width/2;
-			yOffs = Height/2;
+			xOffs = frame.w / 2;
+			yOffs = frame.h / 2;
 		} else if (Flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
 			// Display as-is
 			xOffs = 0;
 			yOffs = 0;
 		} else {
 			// Center the first picture, and align the rest to that
-			xOffs = Width/2 - (*iter)->Width/2 + (*iter)->XPos;
-			yOffs = Height/2 - (*iter)->Height/2 + (*iter)->YPos;
+			xOffs = frame.w / 2 - (*iter)->Width/2 + (*iter)->XPos;
+			yOffs = frame.h / 2 - (*iter)->Height/2 + (*iter)->YPos;
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
@@ -420,8 +420,9 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	case GEM_MB_ACTION:
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		drag_start.x = Owner->XPos + XPos + x;
-		drag_start.y = Owner->YPos + YPos + y;
+		int x,y;
+		core->GetVideoDriver()->GetMousePos(x, y);
+		drag_start = Point(x, y);
 
 		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
@@ -480,7 +481,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	//in case of dragged/dropped portraits, allow the event to happen even
 	//when we are out of bound
 	if (dragtype!=2) {
-		if (( x >= Width ) || ( y >= Height )) {
+		if (( x >= frame.w ) || ( y >= frame.h )) {
 			return;
 		}
 	}
@@ -575,8 +576,9 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		int dx = Owner->XPos + XPos + x - drag_start.x;
-		int dy = Owner->YPos + YPos + y - drag_start.y;
+		int dx, dy;
+		core->GetVideoDriver()->GetMousePos(dx, dy);
+
 		core->GetDictionary()->SetAt( "DragX", dx );
 		core->GetDictionary()->SetAt( "DragY", dy );
 		drag_start.x = (ieWord) (drag_start.x + dx);
@@ -723,8 +725,8 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 	Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
 	if (Picture || PictureList.size() || ! Unpressed) return false;
-	int xOffs = ( Width / 2 ) - ( Unpressed->Width / 2 );
-	int yOffs = ( Height / 2 ) - ( Unpressed->Height / 2 );
+	int xOffs = ( frame.w / 2 ) - ( Unpressed->Width / 2 );
+	int yOffs = ( frame.h / 2 ) - ( Unpressed->Height / 2 );
 	return Unpressed->IsPixelTransparent(x - xOffs, y - yOffs);
 }
 

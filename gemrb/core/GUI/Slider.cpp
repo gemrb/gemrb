@@ -69,7 +69,7 @@ Slider::~Slider()
 void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	if (BackGround) {
-		if (( BackGround->Width < Width ) || ( BackGround->Height < Height )) {
+		if (( BackGround->Width < frame.w ) || ( BackGround->Height < frame.h )) {
 			core->GetVideoDriver()->BlitTiled( rgn, BackGround, true );
 		} else {
 			core->GetVideoDriver()->BlitSprite( BackGround, rgn.x, rgn.y, true, &rgn );

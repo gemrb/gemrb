@@ -59,8 +59,8 @@ void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (AnimPicture) {
-		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
+		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Width / 2 );
+		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Height / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
 		core->GetVideoDriver()->BlitSprite( AnimPicture, r.x + xOffs, r.y + yOffs, true, &r );
 	}
@@ -102,7 +102,7 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	//print("Label::OnMouseUp");
-	if (( x <= Width ) && ( y <= Height )) {
+	if (( x <= frame.w ) && ( y <= frame.h )) {
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
 		}

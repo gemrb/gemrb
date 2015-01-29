@@ -189,15 +189,15 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 
 		WMPAreaEntry *m = worldmap->GetArea(currentArea,entry);
 		if (m) {
-			ScrollX = m->X - Width/2;
-			ScrollY = m->Y - Height/2;
+			ScrollX = m->X - frame.w / 2;
+			ScrollY = m->Y - frame.h / 2;
 		}
 	}
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
-	if (ScrollX > MapMOS->Width - Width)
-		ScrollX = MapMOS->Width - Width;
-	if (ScrollY > MapMOS->Height - Height)
-		ScrollY = MapMOS->Height - Height;
+	if (ScrollX > MapMOS->Width - frame.w)
+		ScrollX = MapMOS->Width - frame.w;
+	if (ScrollY > MapMOS->Height - frame.h)
+		ScrollY = MapMOS->Height - frame.h;
 	if (ScrollX < 0)
 		ScrollX = 0;
 	if (ScrollY < 0)
@@ -272,8 +272,8 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 void WorldMapControl::DisplayTooltip()
 {
 	if (Area) {
-		int x = Owner->XPos+XPos+lastMouseX;
-		int y = Owner->YPos+YPos+lastMouseY-50;
+		int x = Owner->Frame().x + frame.x + lastMouseX;
+		int y = Owner->Frame().y + frame.y + lastMouseY - 50;
 		core->DisplayTooltip( x, y, this );
 	} else {
 		core->DisplayTooltip( 0, 0, NULL );
@@ -326,10 +326,10 @@ void WorldMapControl::OnMouseWheelScroll(short x, short y)
 	
 	WorldMap* worldmap = core->GetWorldMap();
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
-	if (ScrollX > MapMOS->Width - Width)
-		ScrollX = MapMOS->Width - Width;
-	if (ScrollY > MapMOS->Height - Height)
-		ScrollY = MapMOS->Height - Height;
+	if (ScrollX > MapMOS->Width - frame.w)
+		ScrollX = MapMOS->Width - frame.w;
+	if (ScrollY > MapMOS->Height - frame.h)
+		ScrollY = MapMOS->Height - frame.h;
 	if (ScrollX < 0)
 		ScrollX = 0;
 	if (ScrollY < 0)

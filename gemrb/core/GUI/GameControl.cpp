@@ -1126,8 +1126,8 @@ void GameControl::DisplayTooltip() {
 
 				Point p = actor->Pos;
 				core->GetVideoDriver()->ConvertToScreen( p.x, p.y );
-				p.x += Owner->XPos + XPos;
-				p.y += Owner->YPos + YPos;
+				p.x += Owner->Frame().x + frame.x;
+				p.y += Owner->Frame().y + frame.y;
 
 				// hack to position text above PS:T actors
 				if (!core->TooltipBack) p.y -= actor->size*50;
@@ -2373,7 +2373,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			}
 		}
 	}
-	core->GetVideoDriver()->SetViewport( Owner->XPos, Owner->YPos, Width, Height );
+	core->GetVideoDriver()->SetViewport( Owner->Origin().x, Owner->Origin().y, Dimensions().w, Dimensions().h );
 	return true;
 }
 
@@ -2381,40 +2381,45 @@ void GameControl::ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPE
 {
 	// when GameControl contracts it adds to windowGroupCounts
 	// WINDOW_CONTRACT is a positive operation and WINDOW_EXPAND is negative
+	const Region& winFrame = win->Frame();
+	Region ownerFrame = Owner->Frame();
 	if (type < WINDOW_GROUP_COUNT) {
 		windowGroupCounts[type] += op;
 		if ((op == WINDOW_CONTRACT && windowGroupCounts[type] == 1)
 			|| (op == WINDOW_EXPAND && !windowGroupCounts[type])) {
+
 			switch (type) {
 				case WINDOW_GROUP_LEFT:
-					Owner->XPos += win->Width * op;
+					ownerFrame.x += winFrame.w * op;
 					// fallthrough
 				case WINDOW_GROUP_RIGHT:
-					Owner->Width -= win->Width * op;
+					ownerFrame.w -= winFrame.w * op;
 					break;
 				case WINDOW_GROUP_TOP:
-					Owner->YPos += win->Height * op;
+					ownerFrame.y += winFrame.h * op;
 					// fallthrough
 				case WINDOW_GROUP_BOTTOM:
-					Owner->Height -= win->Height * op;
+					ownerFrame.h -= winFrame.h * op;
 					break;
 			}
 		}
-		Width = Owner->Width;
-		Height = Owner->Height;
+
+		frame.w = ownerFrame.w;
+		frame.h = ownerFrame.h;
 	}
 	// 4 == BottomAdded; 5 == Inactivating
 	else if (type <= 5) {
 		windowGroupCounts[WINDOW_GROUP_BOTTOM] += op;
-		Owner->Height -= win->Height * op;
+		ownerFrame.h -= winFrame.h * op;
 		if (op == WINDOW_CONTRACT && type == 5) {
-			Height = 0;
+			frame.h = 0;
 		} else {
-			Height = Owner->Height;
+			frame.h = ownerFrame.h;
 		}
 	} else {
 		Log(ERROR, "GameControl", "Unknown resize type: %d", type);
 	}
+	Owner->View::SetFrame(ownerFrame);
 }
 
 //Create an overhead text over a scriptable target
@@ -2489,7 +2494,7 @@ Sprite2D* GameControl::GetScreenshot(const Region& rgn, bool show_gui)
 		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
 	} else {
 		int hf = SetGUIHidden(true);
-		Draw (0, 0);
+		Draw (Point(0, 0));
 		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
 		if (hf) {
 			SetGUIHidden(false);

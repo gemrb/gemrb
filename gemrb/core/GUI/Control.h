@@ -70,10 +70,7 @@ protected:
 public:
 	Control(const Region& frame);
 	virtual ~Control();
-	Region ControlFrame() const;
-	void SetControlFrame(const Region&);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
+	void Draw(Point p);
 	virtual bool IsAnimated() const { return animation; }
 	virtual bool IsOpaque() const { return true; }
 
@@ -98,14 +95,7 @@ public:
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
-	/** X position of control relative to containing window */
-	ieWord XPos;
-	/** Y position of control relative to containing window */
-	ieWord YPos;
-	/** Width of control */
-	ieWord Width;
-	/** Height of control */
-	ieWord Height;
+
 	/** Type of control */
 	ieByte ControlType;
 	/** Text to display as a tooltip when the mouse cursor hovers

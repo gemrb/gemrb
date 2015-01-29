@@ -103,7 +103,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	str->ReadResRef( MosFile );
 	str->ReadWord( &FirstControl );
 
-	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
+	Window* win = new Window( WindowID, Region(XPos, YPos, Width, Height) );
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {

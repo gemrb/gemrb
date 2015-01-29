@@ -30,15 +30,10 @@
 
 namespace GemRB {
 
-Window::Window(unsigned short WindowID, unsigned short XPos,
-	unsigned short YPos, unsigned short Width, unsigned short Height)
-		: View(Region(XPos, YPos, Width, Height))
+Window::Window(unsigned short WindowID, const Region& frame)
+	: View(frame)
 {
 	this->WindowID = WindowID;
-	this->XPos = XPos;
-	this->YPos = YPos;
-	this->Width = Width;
-	this->Height = Height;
 	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
@@ -97,7 +92,7 @@ void Window::DrawWindow()
 {
 	if (!Visible) return; // no point in drawing invisible windows
 	Video* video = core->GetVideoDriver();
-	Region clip( XPos, YPos, Width, Height );
+	Region clip = frame;
 	//Frame && Changed
 	if ( (Flags & (WF_FRAME|WF_CHANGED) ) == (WF_FRAME|WF_CHANGED) ) {
 		Region screen( 0, 0, core->Width, core->Height );
@@ -129,14 +124,14 @@ void Window::DrawWindow()
 		// furthermore, overlapping controls are still a problem when NeedsDraw() returns false for the top control, but true for the bottom (see the level up icon on char portraits)
 		// we will fix both issues later by refactoring with the concept of views and subviews
 		if (BackGround && !bgRefreshed && !c->IsOpaque() && c->NeedsDraw()) {
-			const Region& fromClip = c->ControlFrame();
+			const Region& fromClip = c->Frame();
 			DrawBackground(&fromClip);
 		}
 		if (Flags & (WF_FLOAT)) {
 			// FIXME: this is a total hack. Required for anything drawing over GameControl (nothing really at all to do with floating)
 			c->MarkDirty();
 		}
-		c->Draw( XPos, YPos );
+		c->Draw( Origin() );
 	}
 	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
 		Color black = { 0, 0, 0, 128 };
@@ -150,19 +145,17 @@ void Window::DrawBackground(const Region* rgn) const
 {
 	Video* video = core->GetVideoDriver();
 	if (rgn) {
-		Region toClip = *rgn;
-		toClip.x += XPos;
-		toClip.y += YPos;
+		Region toClip = Region(Origin() + rgn->Origin(), rgn->Dimensions());
 		video->BlitSprite( BackGround, *rgn, toClip);
 	} else {
-		video->BlitSprite( BackGround, XPos, YPos, true );
+		video->BlitSprite( BackGround, frame.x, frame.y, true );
 	}
 }
 
 /** Set window frame used to fill screen on higher resolutions*/
 void Window::SetFrame()
 {
-	if ( (Width < core->Width) || (Height < core->Height) ) {
+	if ( (frame.w < core->Width) || (frame.h < core->Height) ) {
 		Flags|=WF_FRAME;
 	}
 	Invalidate();
@@ -190,11 +183,11 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 
 	//Check if we are still on the last control
 	if (( lastC != NULL )) {
-		if (( XPos + lastC->XPos <= x ) 
-			&& ( YPos + lastC->YPos <= y )
-			&& ( XPos + lastC->XPos + lastC->Width >= x )
-			&& ( YPos + lastC->YPos + lastC->Height >= y )
-			&& ! lastC->IsPixelTransparent (x - XPos - lastC->XPos, y - YPos - lastC->YPos)) {
+		if (( frame.x + lastC->Origin().x <= x )
+			&& ( frame.y + lastC->Origin().y <= y )
+			&& ( frame.x + lastC->Origin().x + lastC->Dimensions().w >= x )
+			&& ( frame.y + lastC->Origin().y + lastC->Dimensions().h >= y )
+			&& ! lastC->IsPixelTransparent (x - frame.x - lastC->Origin().x, y - frame.y - lastC->Origin().y)) {
 			//Yes, we are on the last returned Control
 			return lastC;
 		}
@@ -204,11 +197,11 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 		if (ignore && (*m)->ControlID&IGNORE_CONTROL) {
 			continue;
 		}
-		if (( XPos + ( *m )->XPos <= x ) 
-			&& ( YPos + ( *m )->YPos <= y )
-			&& ( XPos + ( *m )->XPos + ( *m )->Width >= x ) 
-			&& ( YPos + ( *m )->YPos + ( *m )->Height >= y )
-			&& ! ( *m )->IsPixelTransparent (x - XPos - ( *m )->XPos, y - YPos - ( *m )->YPos)) {
+		if (( frame.x + ( *m )->Origin().x <= x )
+			&& ( frame.y + ( *m )->Origin().y <= y )
+			&& ( frame.x + ( *m )->Origin().x + ( *m )->Dimensions().w >= x )
+			&& ( frame.y + ( *m )->Origin().y + ( *m )->Dimensions().h >= y )
+			&& ! ( *m )->IsPixelTransparent (x - frame.x - ( *m )->Origin().x, y - frame.y - ( *m )->Origin().y)) {
 			ctrl = *m;
 			break;
 		}
@@ -284,7 +277,7 @@ Control* Window::RemoveControl(unsigned short i)
 {
 	if (i < Controls.size() ) {
 		Control *ctrl = Controls[i];
-		const Region& frame = ctrl->ControlFrame();
+		const Region& frame = ctrl->Frame();
 		DrawBackground(&frame); // paint over the spot the control occupied
 
 		if (ctrl==lastC) {
@@ -410,7 +403,7 @@ void Window::OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl)
 	if (!lastOver) {
 		return;
 	}
-	lastOver->OnMouseEnter( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	lastOver->OnMouseEnter( x - frame.x - lastOver->Origin().x, y - frame.y - lastOver->Origin().y );
 }
 
 void Window::OnMouseLeave(unsigned short x, unsigned short y)
@@ -418,7 +411,7 @@ void Window::OnMouseLeave(unsigned short x, unsigned short y)
 	if (!lastOver) {
 		return;
 	}
-	lastOver->OnMouseLeave( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	lastOver->OnMouseLeave( x - frame.x - lastOver->Origin().x, y - frame.y - lastOver->Origin().y );
 	lastOver = NULL;
 }
 
@@ -427,8 +420,8 @@ void Window::OnMouseOver(unsigned short x, unsigned short y)
 	if (!lastOver) {
 		return;
 	}
-	short cx = x - XPos - lastOver->XPos;
-	short cy = y - YPos - lastOver->YPos;
+	short cx = x - frame.x - lastOver->Origin().x;
+	short cy = y - frame.y - lastOver->Origin().y;
 	if (cx < 0) {
 		cx = 0;
 	}

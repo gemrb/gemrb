@@ -50,10 +50,6 @@ Control::Control(const Region& frame)
 	Flags = 0;
 	Tooltip = NULL;
 	Owner = NULL;
-	XPos = frame.x;
-	YPos = frame.y;
-	Width = frame.w;
-	Height = frame.h;
 
 	sb = NULL;
 	animation = NULL;
@@ -74,35 +70,17 @@ Control::~Control()
 	Sprite2D::FreeSprite(AnimPicture);
 }
 
-Region Control::ControlFrame() const
+void Control::Draw(Point p)
 {
-	return Region(XPos, YPos, Width, Height);
-}
-
-void Control::SetControlFrame(const Region& r)
-{
-	// TODO: we should actually represent these with a private Region
-	XPos = r.x;
-	YPos = r.y;
-	Width = r.w;
-	Height = r.h;
-}
-
-void Control::Draw(unsigned short x, unsigned short y)
-{
-	// FIXME: Draw shouldnt be getting called on controls that are offscreen...
-	if (XPos == 65535) {
-		return;
-	}
 	// no point in drawing something with a 0 w/h
-	if (!Width || !Height) {
+	if (frame.Dimensions().IsEmpty()) {
 		return;
 	}
 	if (!NeedsDraw()) {
 		return;
 	}
 
-	Region drawFrame = Region(x + XPos, y + YPos, Width, Height);
+	Region drawFrame = Region(Origin() + p, Dimensions());
 	Video* video = core->GetVideoDriver();
 	// clip drawing to the control bounds, then restore after drawing
 	Region clip = video->GetScreenClip();
@@ -133,9 +111,10 @@ int Control::SetTooltip(const char* string)
 /** Sets the tooltip to be displayed on the screen now */
 void Control::DisplayTooltip()
 {
-	if (Tooltip)
-		core->DisplayTooltip( Owner->XPos + XPos + Width / 2, Owner->YPos + YPos + Height / 2, this );
-	else
+	if (Tooltip) {
+		const Region& winFrame = Owner->Frame();
+		core->DisplayTooltip( winFrame.x + frame.x + frame.w / 2, winFrame.y + frame.y + frame.h / 2, this );
+	} else
 		core->DisplayTooltip( 0, 0, NULL );
 }
 

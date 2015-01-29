@@ -474,9 +474,10 @@ GameControl* Interface::StartGameControl()
 	}
 	DelAllWindows();//deleting ALL windows
 	gamedata->DelTable(0xffffu); //dropping ALL tables
-	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
+	Region screen(0,0, Width, Height);
+	Window* gamewin = new Window( 0xffff, screen );
 	gamewin->WindowPack[0]=0;
-	GameControl* gc = new GameControl(Region(0, 0, Width, Height));
+	GameControl* gc = new GameControl(screen);
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
 	gamewin->AddControl( gc );
@@ -2643,7 +2644,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 }
 // FIXME: it's a clone of LoadWindow
 /** Creates a Window in the Window Manager */
-int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background)
+int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
 {
 	unsigned int i;
 
@@ -2658,7 +2659,7 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 		}
 	}
 
-	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
+	Window* win = new Window( WindowID, frame );
 	if (Background[0]) {
 		ResourceHolder<ImageMgr> mos(Background);
 		if (mos != NULL) {
@@ -2847,7 +2848,8 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 
 		case WINDOW_VISIBLE:
 			if (win->WindowID==65535) {
-				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
+				Region winFrame = win->Frame();
+				video->SetViewport( winFrame.x, winFrame.y, winFrame.w, winFrame.h );
 			}
 			//here is a fallthrough
 		case WINDOW_FRONT:
@@ -3065,7 +3067,7 @@ void Interface::DrawWindows(bool allow_delete)
 
 	// draw the console
 	if (ConsolePopped) {
-		console->Draw(0, 0);
+		console->Draw(Point(0,0));
 	}
 }
 
