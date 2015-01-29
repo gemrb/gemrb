@@ -34,13 +34,11 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	: View(frame)
 {
 	this->WindowID = WindowID;
-	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
 	lastMouseFocus = NULL;
 	lastOver = NULL;
 	Visible = WINDOW_INVISIBLE;
-	Flags = WF_CHANGED;
 	Cursor = IE_CURSOR_NORMAL;
 	DefaultControl[0] = -1;
 	DefaultControl[1] = -1;
@@ -50,9 +48,9 @@ Window::Window(unsigned short WindowID, const Region& frame)
 
 Window::~Window()
 {
-	Sprite2D::FreeSprite( BackGround );
-	BackGround = NULL;
+
 }
+
 /** Add a Control in the Window */
 void Window::SubviewAdded(View* view)
 {
@@ -78,27 +76,17 @@ void Window::SubviewRemoved(View* subview)
 		Controls.erase(std::find(Controls.begin(), Controls.end(), ctrl));
 	}
 }
-/** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
-void Window::SetBackGround(Sprite2D* img, bool clean)
-{
-	if (clean && BackGround) {
-		Sprite2D::FreeSprite( this->BackGround );
-	}
-	BackGround = img;
-	Invalidate();
-}
+
 /** This function Draws the Window on the Output Screen */
-void Window::DrawWindow()
+void Window::DrawSelf(Region /*drawFrame*/, const Region& clip)
 {
 	if (!Visible) return; // no point in drawing invisible windows
 	Video* video = core->GetVideoDriver();
-	Region clip = frame;
-	//Frame && Changed
-	if ( (Flags & (WF_FRAME|WF_CHANGED) ) == (WF_FRAME|WF_CHANGED) ) {
+
+	if ( Flags & WF_FRAME) {
 		Region screen( 0, 0, core->Width, core->Height );
 		video->SetScreenClip( NULL );
-		//removed this?
-		video->DrawRect( screen, ColorBlack );
+
 		if (core->WindowFrames[0])
 			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
 		if (core->WindowFrames[1])
@@ -109,46 +97,9 @@ void Window::DrawWindow()
 			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
 	}
 
-	video->SetScreenClip( &clip );
-	//Float || Changed
-	bool bgRefreshed = false;
-	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
-		DrawBackground(NULL);
-		bgRefreshed = true;
-	}
-
-	std::vector< Control*>::iterator m;
-	for (m = Controls.begin(); m != Controls.end(); ++m) {
-		Control* c = *m;
-		// FIXME: drawing BG in the same loop as controls can produce incorrect results with overlapping controls. the only case I know of this occuring it is ok due to no BG drawing
-		// furthermore, overlapping controls are still a problem when NeedsDraw() returns false for the top control, but true for the bottom (see the level up icon on char portraits)
-		// we will fix both issues later by refactoring with the concept of views and subviews
-		if (BackGround && !bgRefreshed && !c->IsOpaque() && c->NeedsDraw()) {
-			const Region& fromClip = c->Frame();
-			DrawBackground(&fromClip);
-		}
-		if (Flags & (WF_FLOAT)) {
-			// FIXME: this is a total hack. Required for anything drawing over GameControl (nothing really at all to do with floating)
-			c->MarkDirty();
-		}
-		c->Draw();
-	}
-	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
+	if ( Visible == WINDOW_GRAYED ) {
 		Color black = { 0, 0, 0, 128 };
 		video->DrawRect(clip, black);
-	}
-	video->SetScreenClip( NULL );
-	Flags &= ~WF_CHANGED;
-}
-
-void Window::DrawBackground(const Region* rgn) const
-{
-	Video* video = core->GetVideoDriver();
-	if (rgn) {
-		Region toClip = Region(Origin() + rgn->Origin(), rgn->Dimensions());
-		video->BlitSprite( BackGround, *rgn, toClip);
-	} else {
-		video->BlitSprite( BackGround, frame.x, frame.y, true );
 	}
 }
 
@@ -333,7 +284,7 @@ void Window::Invalidate()
 			default: ;
 		}
 	}
-	Flags |= WF_CHANGED;
+	MarkDirty();
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)

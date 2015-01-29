@@ -107,7 +107,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {
-			win->SetBackGround( mos->GetSprite2D(), true );
+			win->SetBackground( mos->GetSprite2D() );
 		}
 	}
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {

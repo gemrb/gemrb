@@ -748,7 +748,7 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 
 	ResourceHolder<ImageMgr> mos(MosResRef);
 	if (mos != NULL) {
-		win->SetBackGround( mos->GetSprite2D(), true );
+		win->SetBackground( mos->GetSprite2D() );
 	}
 	win->Invalidate();
 

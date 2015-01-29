@@ -37,10 +37,9 @@ namespace GemRB {
 class Sprite2D;
 
 // Window Flags
-#define WF_CHANGED  1     //window changed
-#define WF_FRAME    2     //window has frame
-#define WF_FLOAT    4     //floating window
-#define WF_CHILD    8     //if invalidated, it invalidates all windows on top of it
+#define WF_FRAME    1     //window has frame
+#define WF_FLOAT    2     //floating window
+#define WF_CHILD    4     //if invalidated, it invalidates all windows on top of it
 
 // Window position anchors (actually flags for WindowSetPos())
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -58,21 +57,15 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Window : public View {
-private:
-	void DrawBackground(const Region* rgn) const;
 protected:
-	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 	void SubviewAdded(View* view);
 	void SubviewRemoved(View* view);
+
+	void DrawSelf(Region drawFrame, const Region& clip);
 
 public: 
 	Window(unsigned short WindowID, const Region& frame);
 	~Window();
-	/** Set the Window's BackGround Image. 
-	 * If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
-	void SetBackGround(Sprite2D* img, bool clean = false);
-	/** This function Draws the Window on the Output Screen */
-	void DrawWindow();
 	/** Set window frame used to fill screen on higher resolutions*/
 	void SetFrame();
 	/** Returns the Control associated with the function key index, valid indices are 0-11 */
@@ -128,8 +121,6 @@ public: //Public attributes
 	int ScrollControl;
 	bool FunctionBar;
 private: // Private attributes
-	/** BackGround Image. No BackGround if this variable is NULL. */
-	Sprite2D* BackGround;
 	/** Controls Array */
 	std::vector< Control*> Controls;
 	/** Last Control returned by GetControl */

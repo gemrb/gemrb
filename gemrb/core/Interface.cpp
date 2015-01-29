@@ -2663,7 +2663,7 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	if (Background[0]) {
 		ResourceHolder<ImageMgr> mos(Background);
 		if (mos != NULL) {
-			win->SetBackGround( mos->GetSprite2D(), true );
+			win->SetBackground( mos->GetSprite2D() );
 		}
 	}
 
@@ -2836,7 +2836,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	switch (visible) {
 		case WINDOW_GRAYED:
 			win->Invalidate();
-			win->DrawWindow();
+			win->Draw();
 			//here is a fallthrough
 		case WINDOW_INVISIBLE:
 			//hiding the viewport if the gamecontrol window was made invisible
@@ -3037,7 +3037,7 @@ void Interface::DrawWindows(bool allow_delete)
 			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
 			modalShield = true;
 		}
-		ModalWindow->DrawWindow();
+		ModalWindow->Draw();
 		return;
 	}
 	modalShield = false;
@@ -3060,7 +3060,7 @@ void Interface::DrawWindows(bool allow_delete)
 					windows[t]=NULL;
 				}
 			} else if (win->Visible) {
-				win->DrawWindow();
+				win->Draw();
 			}
 		}
 	}
