@@ -39,7 +39,6 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short
 	Alignment = IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT;
 	font = NULL;
 	Cursor = NULL;
-	Back = NULL;
 	CurPos = 0;
 	Text.reserve(max);
 	ResetEventHandler( EditOnChange );
@@ -53,7 +52,6 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short
 TextEdit::~TextEdit(void)
 {
 	gamedata->FreePalette( palette );
-	Sprite2D::FreeSprite( Back );
 	Sprite2D::FreeSprite( Cursor );
 }
 
@@ -68,14 +66,10 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	ieWord yOff = FontPosY;
 	Video* video = core->GetVideoDriver();
-	if (Back) {
-		video->BlitSprite( Back, rgn.x, rgn.y, true );
-		if (yOff) yOff += Back->Height;
-	}
+
 	if (!font)
 		return;
 
-	// FIXME: we should clip text to the background right?
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
 		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, frame.w, frame.h ),
@@ -115,16 +109,6 @@ void TextEdit::SetCursor(Sprite2D* cur)
 	if (cur != NULL) {
 		Cursor = cur;
 	}
-	MarkDirty();
-}
-
-/** Set BackGround */
-void TextEdit::SetBackGround(Sprite2D* back)
-{
-	//if 'back' is NULL then no BackGround will be drawn
-	if (Back)
-		Sprite2D::FreeSprite(Back);
-	Back = back;
 	MarkDirty();
 }
 

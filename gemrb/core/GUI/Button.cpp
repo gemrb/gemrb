@@ -719,15 +719,16 @@ void Button::StackPicture(Sprite2D* Picture)
 	Flags |= IE_GUI_BUTTON_PICTURE;
 }
 
-bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
+bool Button::IsPixelTransparent(const Point& p) const
 {
 	// some buttons have hollow Image frame filled w/ Picture
 	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 	Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
-	if (Picture || PictureList.size() || ! Unpressed) return false;
+	if (Picture || PictureList.size() || !Unpressed) return false;
+
 	int xOffs = ( frame.w / 2 ) - ( Unpressed->Width / 2 );
 	int yOffs = ( frame.h / 2 ) - ( Unpressed->Height / 2 );
-	return Unpressed->IsPixelTransparent(x - xOffs, y - yOffs);
+	return Unpressed->IsPixelTransparent(p.x - xOffs, p.y - yOffs);
 }
 
 // Set palette used for drawing button label in normal state

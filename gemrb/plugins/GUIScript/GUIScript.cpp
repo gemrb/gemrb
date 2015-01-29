@@ -2102,9 +2102,9 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 		if (Picture == NULL) {
 			return RuntimeError("Failed to acquire the picture!\n");
 		}
-		te->SetBackGround(Picture);
+		te->SetBackground(Picture);
 	} else {
-		te->SetBackGround(NULL);
+		te->SetBackground(NULL);
 	}
 
 	Py_RETURN_NONE;

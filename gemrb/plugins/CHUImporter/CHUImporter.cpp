@@ -353,7 +353,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				te->ControlID = ControlID;
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
-				te->SetBackGround( img );
+				te->SetBackground( img );
 				//The original engine always seems to ignore this textfield
 				//te->SetText (Initial );
 				win->AddSubviewInFrontOfView( te );

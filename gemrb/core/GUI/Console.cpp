@@ -36,7 +36,6 @@ Console::Console(const Region& frame)
 	: Control(frame), History(5)
 {
 	Cursor = NULL;
-	Back = NULL;
 	max = 128;
 	Buffer.reserve(max);
 	CurPos = 0;
@@ -51,15 +50,13 @@ Console::~Console(void)
 }
 
 /** Draws the Console on the Output Display */
-void Console::DrawSelf(Region drawFrame, const Region& /*clip*/)
+void Console::DrawSelf(Region drawFrame, const Region& clip)
 {
-	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );
-	}
 	Font* font = core->GetTextFont();
 
 	Video* video = core->GetVideoDriver();
-	video->DrawRect( drawFrame, ColorBlack );
+	video->DrawRect( clip, ColorBlack );
+
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
 	if (w + Cursor->Width > drawFrame.w) {
 		// shift left so the cursor remains visible
@@ -80,12 +77,7 @@ void Console::SetCursor(Sprite2D* cur)
 		Cursor = cur;
 	}
 }
-/** Set BackGround */
-void Console::SetBackGround(Sprite2D* back)
-{
-	//if 'back' is NULL then no BackGround will be drawn
-	Back = back;
-}
+
 /** Sets the Text of the current control */
 void Console::SetText(const String& string)
 {

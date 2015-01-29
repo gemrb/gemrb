@@ -21,6 +21,7 @@
 #define __GemRB__View__
 
 #include "Region.h"
+#include "Sprite2D.h"
 
 #include <list>
 
@@ -30,13 +31,17 @@ class ScrollBar;
 
 class View {
 private:
+	Sprite2D* background;
 	View* superView;
+
+	mutable bool bgDrawn;
 	mutable bool dirty;
 protected:
 	Region frame;
 	std::list<View*> subViews;
 
 private:
+	void DrawBackground(const Region*) const;
 	void DrawSubviews();
 
 protected:
@@ -60,6 +65,8 @@ public:
 	bool NeedsDraw() const;
 
 	virtual bool IsAnimated() const { return false; }
+	virtual bool IsOpaque() const { return background != NULL; }
+	virtual bool IsPixelTransparent(const Point& p) const;
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }
@@ -68,6 +75,8 @@ public:
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
 
+	void SetBackground(Sprite2D*);
+	void SetScrollBar(ScrollBar*);
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
 	View* SubviewAt(const Point&, bool ignoreTransparency = false);

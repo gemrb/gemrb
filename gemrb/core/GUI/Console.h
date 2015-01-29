@@ -49,8 +49,7 @@ public:
 	~Console(void);
 	/** Set Cursor */
 	void SetCursor(Sprite2D* cur);
-	/** Set BackGround */
-	void SetBackGround(Sprite2D* back);
+
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	/** Draws the Console on the Output Display */
@@ -59,8 +58,7 @@ public:
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
-	/** Background */
-	Sprite2D* Back;
+
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Text Buffer */

@@ -59,7 +59,6 @@ public:
 	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
 
-	bool IsOpaque() const {return BackGround;}
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();
 	/** Sets the actual Slider Position trimming to the Max and Min Values */
@@ -72,8 +71,6 @@ public:
 	void UpdateState(const char *VariableName, unsigned int Sum);
 
 private: // Private attributes
-	/** BackGround Image. If smaller than the Control Size, the image will be tiled. */
-	Sprite2D * BackGround;
 	/** Knob Image */
 	Sprite2D * Knob;
 	/** Grabbed Knob Image */

@@ -41,7 +41,6 @@ Slider::Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobSt
 	this->KnobStepsCount = KnobStepsCount;
 	Knob = NULL;
 	GrabbedKnob = NULL;
-	BackGround = NULL;
 	this->Clear = Clear;
 	ResetEventHandler( SliderOnChange );
 	State = IE_GUI_SLIDER_KNOB;
@@ -60,21 +59,11 @@ Slider::~Slider()
 	if (GrabbedKnob) {
 		Sprite2D::FreeSprite( GrabbedKnob );
 	}
-	if (BackGround) {
-		Sprite2D::FreeSprite( BackGround );
-	}
 }
 
 /** Draws the Control on the Output Display */
 void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	if (BackGround) {
-		if (( BackGround->Width < frame.w ) || ( BackGround->Height < frame.h )) {
-			core->GetVideoDriver()->BlitTiled( rgn, BackGround, true );
-		} else {
-			core->GetVideoDriver()->BlitSprite( BackGround, rgn.x, rgn.y, true, &rgn );
-		}
-	}
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
 			core->GetVideoDriver()->BlitSprite( Knob,
@@ -143,9 +132,7 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 			break;
 
 		case IE_GUI_SLIDER_BACKGROUND:
-			if (BackGround && Clear)
-				Sprite2D::FreeSprite( BackGround );
-			BackGround = img;
+			SetBackground(img);
 			break;
 	}
 	MarkDirty();

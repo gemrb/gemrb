@@ -28,8 +28,10 @@ namespace GemRB {
 View::View(const Region& frame)
 	: frame(frame)
 {
+	background = NULL;
 	superView = NULL;
 
+	bgDrawn = false;
 	dirty = true;
 }
 
@@ -42,10 +44,23 @@ View::~View()
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		delete *it;
 	}
+	if (background) background->release();
+}
+
+void View::SetBackground(Sprite2D* bg)
+{
+	bg->acquire();
+	if (background) background->release();
+	background = bg;
+
+	MarkDirty();
 }
 
 void View::MarkDirty()
 {
+	// we only use a separate flag for bg because
+	// subview drawing might call MarkDirty() on superview
+	bgDrawn = false;
 	dirty = true;
 }
 
@@ -59,7 +74,26 @@ void View::DrawSubviews()
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		View* v = *it;
+		if (background && !bgDrawn && !v->IsOpaque() && v->NeedsDraw()) {
+			const Region& fromClip = v->Frame();
+			DrawBackground(&fromClip);
+		}
 		v->Draw();
+	}
+}
+
+void View::DrawBackground(const Region* rgn) const
+{
+	Video* video = core->GetVideoDriver();
+	if (rgn) {
+		Region toClip(ConvertPointToSuper(rgn->Origin()), rgn->Dimensions());
+		toClip.x += frame.x;
+		toClip.y += frame.y;
+		video->BlitSprite( background, *rgn, toClip);
+	} else {
+		Point dp = ConvertPointToSuper(Point(0,0));
+		video->BlitSprite( background, dp.x, dp.y, true );
+		bgDrawn = true;
 	}
 }
 
@@ -75,6 +109,9 @@ void View::Draw()
 	if (NeedsDraw()) {
 		// clip drawing to the control bounds, then restore after drawing
 		video->SetScreenClip(&drawFrame);
+		if (background) {
+			DrawBackground(NULL);
+		}
 		DrawSelf(drawFrame, intersect);
 		video->SetScreenClip(&clip);
 		dirty = false;
@@ -153,9 +190,18 @@ View* View::RemoveSubview(const View* view)
 	View* subView = *it;
 	subViews.erase(it);
 	const Region& viewFrame = subView->Frame();
+	DrawBackground(&viewFrame);
 	SubviewRemoved(subView);
 	subView->superView = NULL;
 	return subView;
+}
+
+bool View::IsPixelTransparent(const Point& p) const
+{
+	if (background) {
+		background->IsPixelTransparent(p.x, p.y);
+	}
+	return true;
 }
 
 void View::SetFrame(const Region& r)

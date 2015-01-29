@@ -59,14 +59,12 @@ public:
 	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
 
-	bool IsOpaque() const { return Back; }
 	/** Set Font */
 	void SetFont(Font* f);
 	Font *GetFont();
 	/** Set Cursor */
 	void SetCursor(Sprite2D* cur);
-	/** Set BackGround */
-	void SetBackGround(Sprite2D* back);
+
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	/** Gets the Text of the current control */
@@ -81,8 +79,7 @@ private:
 	/** Text Font */
 	Font* font;
 	unsigned char Alignment;
-	/** Background */
-	Sprite2D* Back;
+
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Client area position */
