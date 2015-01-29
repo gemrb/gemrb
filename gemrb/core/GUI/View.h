@@ -30,6 +30,7 @@ class ScrollBar;
 
 class View {
 private:
+	View* superView;
 	mutable bool dirty;
 protected:
 	Region frame;
@@ -40,6 +41,12 @@ private:
 
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
+
+	virtual void AddedToView(View*) {}
+	virtual void RemovedFromView(View*) {}
+	virtual void SubviewAdded(View*) {}
+	virtual void SubviewRemoved(View*) {}
+
 	inline Point ConvertPointToSuper(const Point&) const;
 	inline Point ConvertPointFromSuper(const Point&) const;
 
@@ -60,6 +67,10 @@ public:
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
+
+	void AddSubviewInFrontOfView(View*, const View* = NULL);
+	View* RemoveSubview(const View*);
+	View* SubviewAt(const Point&, bool ignoreTransparency = false);
 
 };
 

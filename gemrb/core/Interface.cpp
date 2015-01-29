@@ -480,7 +480,7 @@ GameControl* Interface::StartGameControl()
 	GameControl* gc = new GameControl(screen);
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
-	gamewin->AddControl( gc );
+	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );
 	SetVisible( 0, WINDOW_VISIBLE );
 	//setting the focus to the game control

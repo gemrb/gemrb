@@ -62,6 +62,8 @@ private:
 	void DrawBackground(const Region* rgn) const;
 protected:
 	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
+	void SubviewAdded(View* view);
+	void SubviewRemoved(View* view);
 
 public: 
 	Window(unsigned short WindowID, const Region& frame);
@@ -69,8 +71,6 @@ public:
 	/** Set the Window's BackGround Image. 
 	 * If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
 	void SetBackGround(Sprite2D* img, bool clean = false);
-	/** Add a Control in the Window */
-	void AddControl(Control* ctrl);
 	/** This function Draws the Window on the Output Screen */
 	void DrawWindow();
 	/** Set window frame used to fill screen on higher resolutions*/
@@ -85,8 +85,6 @@ public:
 	unsigned int GetControlCount() const;
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
 	bool IsValidControl(unsigned short ID, Control *ctrl) const;
-	/** Deletes the xth. Control */
-	Control* RemoveControl(unsigned short i);
 	/** Returns the Default Control which may be a button/gamecontrol atm */
 	Control* GetDefaultControl(unsigned int ctrltype) const;
 	/** Returns the Control which should get mouse scroll events */

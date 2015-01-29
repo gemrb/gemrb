@@ -50,33 +50,33 @@ Window::Window(unsigned short WindowID, const Region& frame)
 
 Window::~Window()
 {
-	std::vector< Control*>::iterator m = Controls.begin();
-	while (Controls.size() != 0) {
-		Control* ctrl = ( *m );
-		delete ctrl;
-		Controls.erase( m );
-		m = Controls.begin();
-	}
 	Sprite2D::FreeSprite( BackGround );
 	BackGround = NULL;
 }
 /** Add a Control in the Window */
-void Window::AddControl(Control* ctrl)
+void Window::SubviewAdded(View* view)
 {
-	if (ctrl == NULL) {
-		return;
-	}
-	ctrl->Owner = this;
-	for (size_t i = 0; i < Controls.size(); i++) {
-		if (Controls[i]->ControlID == ctrl->ControlID) {
-			delete( Controls[i] );
-			Controls[i] = ctrl;
-			Invalidate();
-			return;
+	Control* ctrl = dynamic_cast<Control*>(view);
+	if (ctrl) {
+		ctrl->Owner = this;
+		for (size_t i = 0; i < Controls.size(); i++) {
+			Control* target = Controls[i];
+			if (target->ControlID == ctrl->ControlID) {
+				Controls[i] = ctrl;
+				delete RemoveSubview(target);
+				return;
+			}
 		}
+		Controls.push_back( ctrl );
 	}
-	Controls.push_back( ctrl );
-	Invalidate();
+}
+
+void Window::SubviewRemoved(View* subview)
+{
+	Control* ctrl = dynamic_cast<Control*>(subview);
+	if (ctrl) {
+		Controls.erase(std::find(Controls.begin(), Controls.end(), ctrl));
+	}
 }
 /** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
 void Window::SetBackGround(Sprite2D* img, bool clean)
@@ -271,31 +271,6 @@ bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
 		}
 	}
 	return false;
-}
-
-Control* Window::RemoveControl(unsigned short i)
-{
-	if (i < Controls.size() ) {
-		Control *ctrl = Controls[i];
-		const Region& frame = ctrl->Frame();
-		DrawBackground(&frame); // paint over the spot the control occupied
-
-		if (ctrl==lastC) {
-			lastC=NULL;
-		}
-		if (ctrl==lastOver) {
-			lastOver=NULL;
-		}
-		if (ctrl==lastFocus) {
-			lastFocus=NULL;
-		}
-		if (ctrl==lastMouseFocus) {
-			lastMouseFocus=NULL;
-		}
-		Controls.erase(Controls.begin()+i);
-		return ctrl;
-	}
-	return NULL;
 }
 
 Control* Window::GetDefaultControl(unsigned int ctrltype) const

@@ -28,12 +28,16 @@ namespace GemRB {
 View::View(const Region& frame)
 	: frame(frame)
 {
+	superView = NULL;
 
 	dirty = true;
 }
 
 View::~View()
 {
+	if (superView) {
+		superView->RemoveSubview(this);
+	}
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		delete *it;
@@ -90,6 +94,48 @@ Point View::ConvertPointFromSuper(const Point& p) const
 {
 	Point newP = p - Origin();
 	return newP;
+}
+
+void View::AddSubviewInFrontOfView(View* front, const View* back)
+{
+	if (front == NULL) return;
+
+	std::list<View*>::iterator it;
+	it = std::find(subViews.begin(), subViews.end(), back);
+
+	View* super = front->superView;
+	if (super == this) {
+		// already here, but may need to move the view
+		std::list<View*>::iterator cur;
+		cur = std::find(subViews.begin(), subViews.end(), front);
+		subViews.splice(it, subViews, cur);
+	} else {
+		if (super != NULL) {
+			front->superView->RemoveSubview(front);
+		}
+		subViews.insert(it, front);
+	}
+
+	front->superView = this;
+	SubviewAdded(front);
+}
+
+View* View::RemoveSubview(const View* view)
+{
+	if (!view || view->superView != this) {
+		return NULL;
+	}
+
+	std::list<View*>::iterator it;
+	it = std::find(subViews.begin(), subViews.end(), view);
+	assert(it != subViews.end());
+
+	View* subView = *it;
+	subViews.erase(it);
+	const Region& viewFrame = subView->Frame();
+	SubviewRemoved(subView);
+	subView->superView = NULL;
+	return subView;
 }
 
 void View::SetFrame(const Region& r)

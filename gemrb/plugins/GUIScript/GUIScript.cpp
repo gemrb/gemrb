@@ -1879,7 +1879,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	Label* lbl = new Label(frame, core->GetFont( font ), L"" );
 	lbl->ControlID = ControlID;
 	lbl->SetAlignment( align );
-	win->AddControl( lbl );
+	win->AddSubviewInFrontOfView( lbl );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
@@ -1914,7 +1914,7 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 
 	lbl->ControlID = ControlID;
 	lbl->SetAlignment( align );
-	win->AddControl( lbl );
+	win->AddSubviewInFrontOfView( lbl );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 	if (ret<0) {
@@ -1973,7 +1973,7 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	String* text = StringFromCString(cstr);
 	edit->Control::SetText( text );
 	delete text;
-	win->AddControl( edit );
+	win->AddSubviewInFrontOfView( edit );
 
 	Sprite2D* spr = core->GetCursorSprite();
 	if (spr)
@@ -2031,7 +2031,7 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 
 	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;
-	win->AddControl( sb );
+	win->AddSubviewInFrontOfView( sb );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
@@ -2065,7 +2065,7 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 
 	Button* btn = new Button(rgn);
 	btn->ControlID = ControlID;
-	win->AddControl( btn );
+	win->AddSubviewInFrontOfView( btn );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
@@ -2350,9 +2350,9 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
-	if (CtrlIndex != -1) {
-		delete win->RemoveControl(CtrlIndex);
+	Control* ctrl = win->GetControl(ControlID);
+	if (ctrl) {
+		delete win->RemoveSubview(ctrl);
 	}
 
 	Py_RETURN_NONE;
@@ -2663,13 +2663,13 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 		Control *ctrl = win->GetControl( CtrlIndex );
 		rgn = ctrl->Frame();
 		//flags = ctrl->Value;
-		delete win->RemoveControl( CtrlIndex );
+		delete win->RemoveSubview( ctrl );
 	}
 
 	WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
 	wmap->ControlID = ControlID;
 	wmap->SetOverrideIconPalette(recolor);
-	win->AddControl( wmap );
+	win->AddSubviewInFrontOfView( wmap );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
@@ -2774,7 +2774,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		}
 	}
 setup_done:
-	win->AddControl( map );
+	win->AddSubviewInFrontOfView( map );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
@@ -2805,14 +2805,15 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 	if (!substitute || !target) {
 		return RuntimeError("Cannot find control!");
 	}
-	substitute->Owner->RemoveControl(subIdx);
+	Window* subWin = substitute->Owner;
+	subWin->RemoveSubview(subWin->GetControl(subIdx));
 	Window* targetWin = target->Owner;
 	substitute->SetFrame(target->Frame());
 
 	substitute->ControlID = target->ControlID;
 	ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
-	targetWin->AddControl( substitute ); // deletes target!
 	targetWin->Link( sbid, substitute->ControlID );
+	targetWin->AddSubviewInFrontOfView( substitute ); // deletes target!
 
 	PyObject* ctrltuple = Py_BuildValue("(ii)", WindowIndex, substitute->ControlID);
 	PyObject* ret = GemRB_Window_GetControl(NULL, ctrltuple);
@@ -4200,7 +4201,7 @@ static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args
 	}
 	TextArea* ta = new TextArea(rgn, core->GetFont( font ));
 	ta->ControlID = ControlID;
-	win->AddControl( ta );
+	win->AddSubviewInFrontOfView( ta );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 

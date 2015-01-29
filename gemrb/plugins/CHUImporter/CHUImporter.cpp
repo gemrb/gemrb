@@ -160,7 +160,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &DisabledIndex, 1 );
 				str->Read( &y2, 1 );
 
-				win->AddControl( btn );
+				win->AddSubviewInFrontOfView( btn );
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
 					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
@@ -261,7 +261,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					Sprite2D* img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
 				}
-				win->AddControl( pbar );
+				win->AddSubviewInFrontOfView( pbar );
 			}
 			break;
 			case IE_GUI_SLIDER:
@@ -297,7 +297,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				else {
 					sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
 				}
-				win->AddControl( sldr );
+				win->AddSubviewInFrontOfView( sldr );
 			}
 			break;
 
@@ -356,7 +356,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				te->SetBackGround( img );
 				//The original engine always seems to ignore this textfield
 				//te->SetText (Initial );
-				win->AddControl( te );
+				win->AddSubviewInFrontOfView( te );
 			}
 			break;
 
@@ -376,7 +376,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &SBID );
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 				ta->ControlID = ControlID;
-				win->AddControl( ta );
+				win->AddSubviewInFrontOfView( ta );
 				if (SBID != 0xffff)
 					win->Link( SBID, ( unsigned short ) ControlID );
 			}
@@ -437,7 +437,7 @@ endvertical:
 				}
 endalign:
 				lab->SetAlignment( align );
-				win->AddControl( lab );
+				win->AddSubviewInFrontOfView( lab );
 			}
 			break;
 
@@ -466,7 +466,7 @@ endalign:
 				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
 				sbar->ControlID = ControlID;
 
-				win->AddControl( sbar );
+				win->AddSubviewInFrontOfView( sbar );
 				if (TAID != 0xffff)
 					win->Link( ( unsigned short ) ControlID, TAID );
 			}
