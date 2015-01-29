@@ -114,6 +114,7 @@ protected:
 public:
 	/** Draws the target reticle for Actor movement. */
 	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
+	bool IsAnimated() const { return true; }
 	/** Sets multiple quicksaves flag*/
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);

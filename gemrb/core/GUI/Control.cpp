@@ -70,25 +70,6 @@ Control::~Control()
 	Sprite2D::FreeSprite(AnimPicture);
 }
 
-void Control::Draw(Point p)
-{
-	// no point in drawing something with a 0 w/h
-	if (frame.Dimensions().IsEmpty()) {
-		return;
-	}
-	if (!NeedsDraw()) {
-		return;
-	}
-
-	Region drawFrame = Region(Origin() + p, Dimensions());
-	Video* video = core->GetVideoDriver();
-	// clip drawing to the control bounds, then restore after drawing
-	Region clip = video->GetScreenClip();
-	video->SetScreenClip(&drawFrame);
-	DrawSelf(drawFrame, drawFrame); // FIXME: drawframe isnt the real clip. this should be drawframe intersected with screen
-	video->SetScreenClip(&clip);
-}
-
 void Control::SetText(const String* string)
 {
 	SetText((string) ? *string : L"");

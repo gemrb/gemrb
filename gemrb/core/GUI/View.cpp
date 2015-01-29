@@ -68,7 +68,7 @@ void View::Draw()
 	Video* video = core->GetVideoDriver();
 
 	const Region& clip = video->GetScreenClip();
-	const Region& drawFrame = Region(ConvertPointToSuper(Point(0,0)), Dimensions());
+	const Region& drawFrame = Region(ConvertPointToScreen(Point(0,0)), Dimensions());
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
@@ -93,6 +93,26 @@ Point View::ConvertPointToSuper(const Point& p) const
 Point View::ConvertPointFromSuper(const Point& p) const
 {
 	Point newP = p - Origin();
+	return newP;
+}
+
+Point View::ConvertPointToScreen(const Point& p) const
+{
+	// NULL superview is screen
+	Point newP = ConvertPointToSuper(p);
+	if (superView) {
+		newP = superView->ConvertPointToSuper(newP);
+	}
+	return newP;
+}
+
+Point View::ConvertPointFromScreen(const Point& p) const
+{
+	// NULL superview is screen
+	Point newP = ConvertPointFromSuper(p);
+	if (superView) {
+		newP = superView->ConvertPointFromSuper(newP);
+	}
 	return newP;
 }
 

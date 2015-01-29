@@ -70,7 +70,7 @@ protected:
 public:
 	Control(const Region& frame);
 	virtual ~Control();
-	void Draw(Point p);
+
 	virtual bool IsAnimated() const { return animation; }
 	virtual bool IsOpaque() const { return true; }
 

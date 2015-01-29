@@ -2494,7 +2494,7 @@ Sprite2D* GameControl::GetScreenshot(const Region& rgn, bool show_gui)
 		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
 	} else {
 		int hf = SetGUIHidden(true);
-		Draw (Point(0, 0));
+		Draw ();
 		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
 		if (hf) {
 			SetGUIHidden(false);

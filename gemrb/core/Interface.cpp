@@ -3067,7 +3067,7 @@ void Interface::DrawWindows(bool allow_delete)
 
 	// draw the console
 	if (ConsolePopped) {
-		console->Draw(Point(0,0));
+		console->Draw();
 	}
 }
 

@@ -72,6 +72,9 @@ public:
 	View* RemoveSubview(const View*);
 	View* SubviewAt(const Point&, bool ignoreTransparency = false);
 
+	Point ConvertPointToScreen(const Point&) const;
+	Point ConvertPointFromScreen(const Point&) const;
+
 };
 
 }

@@ -131,7 +131,7 @@ void Window::DrawWindow()
 			// FIXME: this is a total hack. Required for anything drawing over GameControl (nothing really at all to do with floating)
 			c->MarkDirty();
 		}
-		c->Draw( Origin() );
+		c->Draw();
 	}
 	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
 		Color black = { 0, 0, 0, 128 };
