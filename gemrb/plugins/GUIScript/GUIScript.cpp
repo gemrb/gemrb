@@ -750,7 +750,6 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 	if (mos != NULL) {
 		win->SetBackground( mos->GetSprite2D() );
 	}
-	win->Invalidate();
 
 	Py_RETURN_NONE;
 }
