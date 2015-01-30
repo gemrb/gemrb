@@ -166,15 +166,26 @@ void Window::SetMouseFocused(Control* ctrl)
 	}
 }
 
-unsigned int Window::GetControlCount() const
+size_t Window::GetControlCount() const
 {
 	return Controls.size();
 }
 
-Control* Window::GetControl(unsigned short i) const
+Control* Window::GetControl(size_t i) const
 {
 	if (i < Controls.size()) {
 		return Controls[i];
+	}
+	return NULL;
+}
+
+Control* Window::GetControlById(ieDword id) const
+{
+	size_t i = Controls.size();
+	while (i--) {
+		if (Controls[i]->ControlID == id) {
+			return Controls[i];
+		}
 	}
 	return NULL;
 }

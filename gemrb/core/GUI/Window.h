@@ -73,9 +73,10 @@ public:
 	/** Returns the Control at X,Y Coordinates */
 	Control* GetControlAtPoint(const Point&, bool ignore=0);
 	/** Returns the Control by Index */
-	Control* GetControl(unsigned short i) const;
+	Control* GetControl(size_t i) const;
+	Control* GetControlById(ieDword id) const;
 	/** Returns the number of Controls */
-	unsigned int GetControlCount() const;
+	size_t GetControlCount() const;
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
 	bool IsValidControl(unsigned short ID, Control *ctrl) const;
 	/** Returns the Default Control which may be a button/gamecontrol atm */
