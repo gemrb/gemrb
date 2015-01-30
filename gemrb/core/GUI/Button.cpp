@@ -407,7 +407,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		return;
 	}
 
-	ScrollBar* scrlbr = (ScrollBar*) sb;
+	ScrollBar* scrlbr = scrollbar;
 	if (!scrlbr) {
 		Control *ctrl = Owner->GetScrollControl();
 		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
@@ -533,7 +533,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 
 void Button::OnMouseWheelScroll(short x, short y)
 {
-	ScrollBar* scrlbr = (ScrollBar*) sb;
+	ScrollBar* scrlbr = scrollbar;
 	if (!scrlbr) {
 		Control *ctrl = Owner->GetScrollControl();
 		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {

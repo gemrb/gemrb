@@ -142,7 +142,7 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 
 	Size s(frame.w, 0);
 	// apply padding to the clip
-	s.w -= (sb) ? EDGE_PADDING : EDGE_PADDING * 2;
+	s.w -= (scrollbar) ? EDGE_PADDING : EDGE_PADDING * 2;
 
 	if (pic) {
 		int offset = pic->Width + EDGE_PADDING;
@@ -158,7 +158,7 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 
 void TextArea::UpdateScrollbar()
 {
-	if (sb == NULL) return;
+	if (scrollbar == NULL) return;
 
 	int textHeight = contentWrapper.ContentFrame().h;
 	Region nodeBounds;
@@ -178,10 +178,9 @@ void TextArea::UpdateScrollbar()
 	int newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
 	if (newRows != rows) {
 		rows = newRows;
-		ScrollBar* bar = ( ScrollBar* ) sb;
 		ieWord visibleRows = (frame.h / GetRowHeight());
 		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
-		bar->SetMax(sbMax);
+		scrollbar->SetMax(sbMax);
 	}
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
 		&& dialogBeginNode) {
@@ -190,12 +189,10 @@ void TextArea::UpdateScrollbar()
 	}
 }
 
-/** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
-	to this Text Area Control. */
-int TextArea::SetScrollBar(Control* ptr)
+void TextArea::SetScrollBar(ScrollBar* bar)
 {
-	ScrollBar* bar = (ScrollBar*)ptr;
-	Control::SetScrollBar(bar);
+	View::SetScrollBar(bar);
+	if (bar) bar->ta = this;
 	// we need to update the ScrollBar position based around TextYPos
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
@@ -208,7 +205,6 @@ int TextArea::SetScrollBar(Control* ptr)
 		// but it is to update the scrollbar so not a mistake
 		ScrollToY(TextYPos);
 	}
-	return (bool)sb;
 }
 
 /** Sets the Actual Text */
@@ -285,7 +281,7 @@ void TextArea::AppendText(const String& text)
 		}
 	}
 
-	if (sb) {
+	if (scrollbar) {
 		UpdateScrollbar();
 		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
@@ -418,11 +414,11 @@ void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
 		animationEnd = AnimationPoint();
 	}
 
-	if (sb && sender != sb) {
+	if (scrollbar && sender != scrollbar) {
 		// we must "scale" the pixels
-		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep()-1 / ftext->LineHeight));
+		scrollbar->SetPosForY(y * (scrollbar->GetStep()-1 / ftext->LineHeight));
 		// sb->SetPosForY will recall this method so we dont need to do more... yet.
-	} else if (sb) {
+	} else if (scrollbar) {
 		// our scrollbar has set position for us
 		TextYPos = y;
 		MarkDirty();
@@ -448,7 +444,7 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 {
 	// we allow scrolling to cancel the animation only if there is a scrollbar
 	// otherwise it is "Chapter Text" behavior
-	if (!animationEnd || sb){
+	if (!animationEnd || scrollbar){
 		unsigned long fauxY = TextYPos;
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
@@ -486,7 +482,7 @@ void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned 
 						   unsigned short /*Mod*/)
 {
 
-	ScrollBar* scrlbr = (ScrollBar*) sb;
+	ScrollBar* scrlbr = scrollbar;
 
 	if (!scrlbr) {
 		Control *ctrl = Owner->GetScrollControl();
@@ -664,7 +660,7 @@ void TextArea::ClearText()
 	delete textContainer;
 
 	Size s;
-	if (sb) {
+	if (scrollbar) {
 		// if we have a scrollbar we should grow as much as needed vertically
 		// pad only on left edge
 		s.w = frame.w - EDGE_PADDING;

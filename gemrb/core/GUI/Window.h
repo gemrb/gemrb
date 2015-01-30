@@ -99,8 +99,6 @@ public:
 	void Invalidate();
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
-	/** Links a scrollbar to a text area */
-	void Link(unsigned short SBID, unsigned short TAID);
 	/** Mouse entered a new control's rectangle */
 	void OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl);
 	/** Mouse left the current control */
@@ -119,7 +117,6 @@ public: //Public attributes
 	int Flags;
 	int Cursor;
 	int DefaultControl[2]; //default enter and cancel
-	int ScrollControl;
 	bool FunctionBar;
 private: // Private attributes
 	/** Controls Array */

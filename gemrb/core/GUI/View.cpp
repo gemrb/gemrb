@@ -28,6 +28,7 @@ namespace GemRB {
 View::View(const Region& frame)
 	: frame(frame)
 {
+	scrollbar = NULL;
 	background = NULL;
 	superView = NULL;
 
@@ -169,6 +170,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 
 	front->superView = this;
 	SubviewAdded(front);
+	// FIXME: we probably shouldnt allow things in front of the scrollbar
 }
 
 View* View::RemoveSubview(const View* view)
@@ -182,6 +184,9 @@ View* View::RemoveSubview(const View* view)
 	assert(it != subViews.end());
 
 	View* subView = *it;
+	if (subView == scrollbar) {
+		scrollbar = NULL;
+	}
 	subViews.erase(it);
 	const Region& viewFrame = subView->Frame();
 	DrawBackground(&viewFrame);
@@ -231,6 +236,13 @@ void View::SetFrameSize(const Size& s)
 	frame.w = s.w;
 	frame.h = s.h;
 	MarkDirty();
+}
+
+void View::SetScrollBar(ScrollBar* sb)
+{
+	delete RemoveSubview(scrollbar);
+	AddSubviewInFrontOfView(sb);
+	scrollbar = sb;
 }
 
 }

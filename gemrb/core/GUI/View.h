@@ -35,8 +35,10 @@ private:
 	View* superView;
 
 	mutable bool dirty;
+
 protected:
 	Region frame;
+	ScrollBar* scrollbar;
 	std::list<View*> subViews;
 
 private:
@@ -76,6 +78,8 @@ public:
 
 	void SetBackground(Sprite2D*);
 	void SetScrollBar(ScrollBar*);
+	const ScrollBar* Scrollbar() { return scrollbar; }
+
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
 	View* SubviewAt(const Point&, bool ignoreTransparency = false);

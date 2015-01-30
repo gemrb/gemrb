@@ -1729,19 +1729,12 @@ static PyObject* GemRB_Control_AttachScrollBar(PyObject * /*self*/, PyObject* ar
 		return NULL;
 	}
 
-	Control *scb = NULL;
-
-	if (ScbControlIndex != -1) {
-		scb = GetControl(WindowIndex, ScbControlIndex, IE_GUI_SCROLLBAR);
-		if (!scb) {
-			return NULL;
-		}
-	}
-
-	int ret = ctrl->SetScrollBar( scb );
-	if (ret == -1) {
+	ScrollBar* scb = (ScrollBar*)GetControl(WindowIndex, ScbControlIndex, IE_GUI_SCROLLBAR);
+	if (!scb) {
 		return NULL;
 	}
+
+	ctrl->SetScrollBar( scb );
 
 	Py_RETURN_NONE;
 }
@@ -2030,16 +2023,9 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 
 	ScrollBar* sb = new ScrollBar(rgn, images);
 	sb->ControlID = ControlID;
-	win->AddSubviewInFrontOfView( sb );
+	win->SetScrollBar(sb);
 
-	int ret = core->GetControl( WindowIndex, ControlID );
-
-	if (ret<0) {
-		return NULL;
-	}
-	win->Link(sb->ControlID, -1);
-
-	return PyInt_FromLong( ret );
+	Py_RETURN_NONE;
 }
 
 
@@ -2810,8 +2796,11 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 	substitute->SetFrame(target->Frame());
 
 	substitute->ControlID = target->ControlID;
-	ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
-	targetWin->Link( sbid, substitute->ControlID );
+	//ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
+	const ScrollBar* sb = target->Scrollbar();
+	if (sb != NULL) {
+		substitute->SetScrollBar((ScrollBar*)target->RemoveSubview(sb));
+	}
 	targetWin->AddSubviewInFrontOfView( substitute ); // deletes target!
 
 	PyObject* ctrltuple = Py_BuildValue("(ii)", WindowIndex, substitute->ControlID);

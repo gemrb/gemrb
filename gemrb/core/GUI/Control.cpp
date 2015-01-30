@@ -51,7 +51,6 @@ Control::Control(const Region& frame)
 	Tooltip = NULL;
 	Owner = NULL;
 
-	sb = NULL;
 	animation = NULL;
 	AnimPicture = NULL;
 	ControlType = IE_GUI_INVALID;
@@ -228,19 +227,6 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	if (Owner && Owner->Visible==WINDOW_VISIBLE) {
 		MarkDirty();
 	}
-}
-
-/** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
-	to this Control. */
-int Control::SetScrollBar(Control* ptr)
-{
-	if (ptr && (ptr->ControlType!=IE_GUI_SCROLLBAR)) {
-		ptr = NULL;
-		Log(WARNING, "Control", "Attached control is not a ScrollBar!");
-		return -1;
-	}
-	sb = ptr;
-	return (bool)sb;
 }
 
 }

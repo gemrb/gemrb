@@ -42,7 +42,6 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	Cursor = IE_CURSOR_NORMAL;
 	DefaultControl[0] = -1;
 	DefaultControl[1] = -1;
-	ScrollControl = -1;
 	FunctionBar = false;
 }
 
@@ -224,10 +223,7 @@ Control* Window::GetDefaultControl(unsigned int ctrltype) const
 
 Control* Window::GetScrollControl() const
 {
-	if (!Controls.size()) {
-		return NULL;
-	}
-	return GetControl( (ieWord) ScrollControl );
+	return scrollbar;
 }
 
 void Window::release(void)
@@ -244,17 +240,12 @@ void Window::Invalidate()
 {
 	DefaultControl[0] = -1;
 	DefaultControl[1] = -1;
-	ScrollControl = -1;
 	for (unsigned int i = 0; i < Controls.size(); i++) {
 		if (!Controls[i]) {
 			continue;
 		}
 		Controls[i]->MarkDirty();
 		switch (Controls[i]->ControlType) {
-			case IE_GUI_SCROLLBAR:
-				if ((ScrollControl == -1) || (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT))
-					ScrollControl = i;
-				break;
 			case IE_GUI_BUTTON:
 				if (( Controls[i]->Flags & IE_GUI_BUTTON_DEFAULT )) {
 					DefaultControl[0] = i;
@@ -278,35 +269,6 @@ void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		(*c)->UpdateState( VarName, Sum);
-	}
-}
-
-/** Searches for a ScrollBar and a TextArea to link them */
-void Window::Link(unsigned short SBID, unsigned short TAID)
-{
-	ScrollBar* sb = NULL;
-	TextArea* ta = NULL;
-	std::vector< Control*>::iterator m;
-	for (m = Controls.begin(); m != Controls.end(); m++) {
-		if (( *m )->Owner != this)
-			continue;
-		if (( *m )->ControlType == IE_GUI_SCROLLBAR) {
-			if (( *m )->ControlID == SBID) {
-				sb = ( ScrollBar * ) ( *m );
-				if (ta != NULL)
-					break;
-			}
-		} else if (( *m )->ControlType == IE_GUI_TEXTAREA) {
-			if (( *m )->ControlID == TAID || TAID == (ieWord)-1) {
-				ta = ( TextArea * ) ( *m );
-				if (sb != NULL)
-					break;
-			}
-		}
-	}
-	if (sb && ta) {
-		sb->ta = ta;
-		ta->SetScrollBar( sb );
 	}
 }
 

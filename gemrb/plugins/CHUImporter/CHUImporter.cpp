@@ -377,8 +377,15 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 				ta->ControlID = ControlID;
 				win->AddSubviewInFrontOfView( ta );
-				if (SBID != 0xffff)
-					win->Link( SBID, ( unsigned short ) ControlID );
+
+				if (SBID != 0xffff) {
+					ScrollBar* sb = dynamic_cast<ScrollBar*>(win->GetControlById(SBID));
+					if (sb) {
+						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
+					}
+				} else {
+					win->AddSubviewInFrontOfView( ta );
+				}
 			}
 			break;
 
@@ -466,9 +473,13 @@ endalign:
 				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
 				sbar->ControlID = ControlID;
 
-				win->AddSubviewInFrontOfView( sbar );
-				if (TAID != 0xffff)
-					win->Link( ( unsigned short ) ControlID, TAID );
+				if (TAID != 0xffff) {
+					TextArea* ta = dynamic_cast<TextArea*>(win->GetControlById(TAID));
+					assert(ta);
+					ta->SetScrollBar(sbar);
+				} else {
+					win->SetScrollBar( sbar );
+				}
 			}
 			break;
 
