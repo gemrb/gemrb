@@ -192,10 +192,10 @@ View* View::RemoveSubview(const View* view)
 
 bool View::IsPixelTransparent(const Point& p) const
 {
-	if (background) {
-		background->IsPixelTransparent(p.x, p.y);
+	if (!IsOpaque() && background) {
+		return background->IsPixelTransparent(p.x, p.y);
 	}
-	return true;
+	return false;
 }
 
 View* View::SubviewAt(const Point& p, bool ignoreTransparency)
@@ -206,7 +206,6 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency)
 		View* v = *it;
 		const Region& viewFrame = v->Frame();
 		Point subP = v->ConvertPointFromSuper(p);
-		//ignoreTransparency = true;
 		if (viewFrame.PointInside(p) && (ignoreTransparency || !v->IsPixelTransparent(subP))) {
 			return v;
 		}

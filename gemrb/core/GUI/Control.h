@@ -143,9 +143,7 @@ public: //Events
 	virtual void OnMouseWheelScroll( short x, short y);
 	/** Special Key Press */
 	virtual bool OnSpecialKeyPress(unsigned char Key);
-	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
-		return false;
-	}
+
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
 	virtual void SetAnimPicture(Sprite2D* Picture);
