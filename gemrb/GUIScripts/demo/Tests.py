@@ -38,14 +38,14 @@ def RunTests():
 		msg += results[2] + "\n"
 
 	total = successes + failures
-	msg += "TOTAL tests: %d\tsuccess: %d\tfailure:%d\n" %(total, successes, failures)
+	msg += "TOTAL tests: %d\tsuccess: %d\tfailure: %d\n" %(total, successes, failures)
 	return DisplayTestResult (failures == 0, "TESTS", msg)[1]
 
 def DisplayTestResult (status, name, intro=""):
 	if status:
-		msg = "%s: passed\n" %(name)
+		msg = "%s:\t\t[color=00ff00]passed[/color]\n" %(name)
 	else:
-		msg = "%s: FAILURE!\n" %(name)
+		msg = "%s:\t\t[color=ff0000]FAILURE![/color]\n" %(name)
 	return (status, intro+msg)
 
 # returns function name
