@@ -119,14 +119,12 @@ void View::Draw()
 
 Point View::ConvertPointToSuper(const Point& p) const
 {
-	Point newP = p + Origin();
-	return newP;
+	return p + Origin();
 }
 
 Point View::ConvertPointFromSuper(const Point& p) const
 {
-	Point newP = p - Origin();
-	return newP;
+	return p - Origin();
 }
 
 Point View::ConvertPointToScreen(const Point& p) const
@@ -134,7 +132,7 @@ Point View::ConvertPointToScreen(const Point& p) const
 	// NULL superview is screen
 	Point newP = ConvertPointToSuper(p);
 	if (superView) {
-		newP = superView->ConvertPointToSuper(newP);
+		newP = superView->ConvertPointToScreen(newP);
 	}
 	return newP;
 }
@@ -144,7 +142,7 @@ Point View::ConvertPointFromScreen(const Point& p) const
 	// NULL superview is screen
 	Point newP = ConvertPointFromSuper(p);
 	if (superView) {
-		newP = superView->ConvertPointFromSuper(newP);
+		newP = superView->ConvertPointFromScreen(newP);
 	}
 	return newP;
 }
