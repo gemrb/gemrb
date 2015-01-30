@@ -66,6 +66,8 @@ def RunTextAreaTests():
 
 	tests = [ TA_AppendEmpty, TA_AppendSpace, TA_AppendNewline, TA_AppendNewlines, \
 		TA_AppendNewlinesAtStart ]
+	tests += [ TA_PrependEmpty, TA_PrependSpace, TA_PrependNewline, TA_PrependNewlines, \
+		TA_PrependTabs, TA_PrependTabsTag, TA_PrependTabsIncompleteTag ]
 	msg = "Testing TextAreas\n"
 	successes = 0
 	failures = 0
@@ -104,6 +106,40 @@ def TA_AppendText(TA, name, text):
 	status = (new == (old+text))
 	if not status:
 		print "Expected:+", repr(old+text), "+"
+		print "Actual:+", repr(new), "+"
+	return DisplayTestResult (status, name)
+
+def TA_PrependEmpty(TA):
+	return TA_PrependText (TA, Me(), "")
+
+def TA_PrependSpace(TA):
+	return TA_PrependText (TA, Me(), " ")
+
+def TA_PrependNewline(TA):
+	return TA_PrependText (TA, Me(), "\n")
+
+def TA_PrependNewlines(TA):
+	return TA_PrependText (TA, Me(), "\n\n\n")
+
+def TA_PrependTabs(TA):
+	return TA_PrependText (TA, Me(), "\t\t")
+
+def TA_PrependTabsIncompleteTag(TA):
+	return TA_PrependText (TA, Me(), "\t\t", "[color=0000ff]")
+
+def TA_PrependTabsTag(TA):
+	return TA_PrependText (TA, Me(), "\t\t", "[color=0000ff]asd[/color]")
+
+def TA_PrependText(TA, name, text, old=-1):
+	if old == -1:
+		old = TA.QueryText ()
+
+	TA.SetText (text+old)
+	new = TA.QueryText ()
+
+	status = (new == (text+old))
+	if not status:
+		print "Expected:+", repr(text+old), "+"
 		print "Actual:+", repr(new), "+"
 	return DisplayTestResult (status, name)
 
