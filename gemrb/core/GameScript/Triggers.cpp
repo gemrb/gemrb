@@ -4162,4 +4162,451 @@ int GameScript::BeenInParty(Scriptable* Sender, Trigger* /*parameters*/)
 	return actor->GetStat(IE_MC_FLAGS) & MC_BEENINPARTY;
 }
 
+/*
+ * TobEx triggers
+ */
+
+/* Defines the object that the next trigger will be evaluated in reference to. This trigger
+ * does not evaluate and does not count as a trigger in an OR() block. This trigger ignores
+ * the Eval() trigger when finding the next trigger to evaluate the object for. If the object
+ * cannot be found, the next trigger will evaluate to false.
+ */
+int GameScript::NextTriggerObject(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	// TODO: implement
+	return 0;
+}
+
+/* Compares the animation movement rate of the target creature specified by Object to Value.
+ * This is not affected by slow or haste, but is affected if the Object is entangled, webbed, etc.
+ */
+int GameScript::MovementRate(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int rate = actor->GetBase(IE_MOVEMENTRATE);
+	if (actor->Immobile()) {
+		rate = 0;
+	}
+	return rate == parameters->int0Parameter;
+}
+
+int GameScript::MovementRateGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int rate = actor->GetBase(IE_MOVEMENTRATE);
+	if (actor->Immobile()) {
+		rate = 0;
+	}
+	return rate > parameters->int0Parameter;
+}
+
+int GameScript::MovementRateLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int rate = actor->GetBase(IE_MOVEMENTRATE);
+	if (actor->Immobile()) {
+		rate = 0;
+	}
+	return rate < parameters->int0Parameter;
+}
+
+// Compares the number of mirror images present on the target creature specified by Object to Value.
+int GameScript::NumMirrorImages(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	return (signed)actor->GetStat(IE_MIRRORIMAGES) == parameters->int0Parameter;
+}
+
+int GameScript::NumMirrorImagesGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	return (signed)actor->GetStat(IE_MIRRORIMAGES) > parameters->int0Parameter;
+}
+
+int GameScript::NumMirrorImagesLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	return (signed)actor->GetStat(IE_MIRRORIMAGES) < parameters->int0Parameter;
+}
+
+/* Returns true if the target creature specified by Object is bouncing spells of power Level.
+ * This returns true for both Bounce Spell Level (199) and Decrementing Bounce Spells (200) effects.
+ * (fx_bounce_spelllevel and fx_bounce_spelllevel_dec respectively)
+ */
+static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
+static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
+int GameScript::BouncingSpellLevel(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	return actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter) ||
+		actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+}
+
+/* Compares the number of spell bounces remaining on the target creature specified by Object
+ * at the power Level to Amount. If Object has the Bounce Spell Level (199) opcode, then the
+ * number of spell bounces is unsigned 0xFFFFFFFF.
+ * NOTE: does not check for multiple bounce effects (if that's even possible)
+ */
+int GameScript::NumBouncingSpellLevel(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
+		// FIXME: cheating, probably doesn't matter
+		bounceCount = 0xFFFF;
+	} else {
+		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount == parameters->int1Parameter;
+}
+
+int GameScript::NumBouncingSpellLevelGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
+		// FIXME: cheating, probably doesn't matter
+		bounceCount = 0xFFFF;
+	} else {
+		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount > parameters->int1Parameter;
+}
+
+int GameScript::NumBouncingSpellLevelLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
+		// FIXME: cheating, probably doesn't matter
+		bounceCount = 0xFFFF;
+	} else {
+		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount < parameters->int1Parameter;
+}
+
+/* Returns true if the target creature specified by Object is protected from spells of power Level.
+ * This returns true for both Protection from Spell Levels (102) and Decrementing Spell Immunity (201) effects.
+ */
+static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
+static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
+int GameScript::ImmuneToSpellLevel(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	return actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter) ||
+	actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+}
+
+/* Compares the number of spell protections remaining on the target creature specified by Object
+ * at the power Level to Amount. If Object has the Protection from Spell Levels (102) opcode,
+ * then the number of spell protections is unsigned 0xFFFFFFFF.
+ */
+int GameScript::NumImmuneToSpellLevel(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
+		// FIXME: cheating, probably doesn't matter
+		bounceCount = 0xFFFF;
+	} else {
+		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount == parameters->int1Parameter;
+}
+
+int GameScript::NumImmuneToSpellLevelGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
+		// FIXME: cheating, probably doesn't matter
+		bounceCount = 0xFFFF;
+	} else {
+		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount > parameters->int1Parameter;
+}
+
+int GameScript::NumImmuneToSpellLevelLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
+		// FIXME: cheating, probably doesn't matter
+		bounceCount = 0xFFFF;
+	} else {
+		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount < parameters->int1Parameter;
+}
+
+// Compares the number of ticks left of time stop to Number.
+int GameScript::TimeStopCounter(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return core->GetGame()->RemainingTimestop() == parameters->int0Parameter;
+}
+
+int GameScript::TimeStopCounterGT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return core->GetGame()->RemainingTimestop() > parameters->int0Parameter;
+}
+
+int GameScript::TimeStopCounterLT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return core->GetGame()->RemainingTimestop() < parameters->int0Parameter;
+}
+
+// Returns true if the the target sprite specified by Object is the caster of time stop
+int GameScript::TimeStopObject(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+
+	return tar == core->GetGame()->GetTimestopOwner();
+}
+
+// Compares the number of spell traps remaining on the target creature specified
+// by Object at the power Level to Amount.
+static EffectRef fx_spelltrap = { "SpellTrap", -1 };
+int GameScript::NumTrappingSpellLevel(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	Effect *fx = actor->fxqueue.HasEffectWithPower(fx_spelltrap, parameters->int0Parameter);
+	if (fx) {
+		bounceCount = fx->Parameter1;
+	}
+
+	return bounceCount == parameters->int1Parameter;
+}
+
+int GameScript::NumTrappingSpellLevelGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	Effect *fx = actor->fxqueue.HasEffectWithPower(fx_spelltrap, parameters->int0Parameter);
+	if (fx) {
+		bounceCount = fx->Parameter1;
+	}
+
+	return bounceCount > parameters->int1Parameter;
+}
+
+int GameScript::NumTrappingSpellLevelLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int bounceCount = 0;
+	Effect *fx = actor->fxqueue.HasEffectWithPower(fx_spelltrap, parameters->int0Parameter);
+	if (fx) {
+		bounceCount = fx->Parameter1;
+	}
+
+	return bounceCount < parameters->int1Parameter;
+}
+
+// Returns true if the target creature specified by Object is dual-classed and
+// the original class matches Class.
+int GameScript::OriginalClass(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	// we need to look up the bit mapping again
+	return actor->WasClass(parameters->int0Parameter);
+}
+
+// NOTE: HPLost, HPLostGT, HPLostLT are implemented above
+
+/* ASSIGN
+ * Assigns a value determined by Statement of the type Type from ARGTYPE.IDS (INT integer, or STR string)
+ * to a local trigger block variable. The general form of Statement is "prefix[params]". This trigger
+ * does not evaluate and does not count as a trigger in an OR() block.
+ *
+ * "prefix" can be:                                                                                                                                                                                                                                                                                                          *
+ * prefix	| description |	params | type	| examples
+ * c	| assigns a constant value	| integer or string	| c[1], c[FOO]
+ * e	| assigns the value of an expression	| expression (see trigger 0x411B Eval() for format)	| e[6 + 7]
+ * id	| assigns the index of a IDS file value	| file.value	| id[EA.CHARMED]
+ * s	| assigns the value of the stat specified of the current object	| STATS.IDS name	| s[LEVEL]
+ * sp	| assigns the value of the special value specified (of the current object, if applicable)	| ASGNSPEC.IDS name	| sp[SPRITE_PT_X]
+ * tn	| assigns the value of a 2DA file value by coordinates	| file.x.y	| tn[IMPORT01.0.0]
+ * ts	| assigns the value of a 2DA file value by column and row name	| file.column.row	| tn[IMPORT01.ITEMS.1]
+ * v	| assigns the value of a variable	| name.scope	| v[foo.GLOBAL]
+ *
+ * "params" values containing #<num> and @<num> are replaced by the integer and string values,
+ * respectively, stored in local trigger block variables of index "num". Avoid using integer
+ * variables in expressions of string type. Avoid using string variables in expressions of integer
+ * type. The range of "num" is 0 to 24.
+ */
+int GameScript::Assign(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	// TODO: implement
+	return 0;
+}
+
+/* EVAL
+ * Overwrites the (Loc)th argument of type Type from ARGTYPE.IDS (INT integer, or STR string)
+ * in the next trigger with the value returned by Expression. This trigger does not evaluate
+ * and does not count as a trigger in an OR() block. This trigger does not overwrite values of
+ * the Assign(), NextTriggerObject() and OR() triggers. The NextTriggerObject() trigger ignores
+ * this trigger.
+ *
+ * Expression is a math expression that can use the following symbols:                                                                                                                                                                                                                                                          *   = + - * / % ^ ( )
+ *   min(x, y), max(x, y), avg(x, y)
+ *   ceil(x), floor(x), round(x)
+ *   abs(x)
+ *   reciprocal(x)
+ *   sqrt(x), pow(x, y)
+ *   log(x), log10(x)
+ *   sin(x), cos(x), tan(x), sinh(x), cosh(x), tanh(x), asin(x), acos(x), atan(x), atan2(x)
+ *   Custom: and(x, y), or(x, y), band(x, y), bor(x, y)
+ *
+ * Any text in Expression of form #<num> and @<num> is replaced by the integer and string values,
+ * respectively, stored in local trigger block variables of index "num". Avoid using integer
+ * variables in expressions of string type. Avoid using string variables in expressions of integer
+ * type. The range of "num" is 0 to 24.
+ */
+int GameScript::Eval(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	// TODO: implement
+	return 0;
+}
+
+/* Compares "Num1" to "Num2", where E is equals, GT is greater than, and LT is less than.
+ * To make use of these triggers, the 0x411B Eval() trigger should be used prior to this trigger.
+ */
+int GameScript::E(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return parameters->int0Parameter == parameters->int1Parameter;
+}
+
+int GameScript::GT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return parameters->int0Parameter > parameters->int1Parameter;
+}
+
+int GameScript::LT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return parameters->int0Parameter < parameters->int1Parameter;
+}
+
+/*
+ * End TobEx triggers
+ */
+
 }

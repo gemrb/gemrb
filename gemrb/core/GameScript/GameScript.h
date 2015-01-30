@@ -582,6 +582,7 @@ public: //Script Functions
 	static int AreaRestDisabled(Scriptable* Sender, Trigger* parameter);
 	static int AreaStartsWith(Scriptable* Sender, Trigger* parameter); //InWatchersKeep
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
+	static int Assign(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int AtLocation(Scriptable* Sender, Trigger* parameter);
 	static int AttackedBy(Scriptable* Sender, Trigger* parameters);
 	static int BecameVisible(Scriptable* Sender, Trigger* parameters);
@@ -589,6 +590,7 @@ public: //Script Functions
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int BouncingSpellLevel(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CalendarDay(Scriptable* Sender, Trigger* parameters);
 	static int CalendarDayGT(Scriptable* Sender, Trigger* parameters);
@@ -633,6 +635,7 @@ public: //Script Functions
 	static int DifficultyLT(Scriptable* Sender, Trigger* parameters);
 	static int Disarmed(Scriptable* Sender, Trigger* parameters);
 	static int DisarmFailed(Scriptable* Sender, Trigger* parameters);
+	static int E(Scriptable* /*Sender*/, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
 	static int EntirePartyOnMap(Scriptable* Sender, Trigger* parameters);
 	static int Exists(Scriptable* Sender, Trigger* parameters);
@@ -640,6 +643,7 @@ public: //Script Functions
 	static int ExtraProficiency(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters);
+	static int Eval(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int Faction(Scriptable* Sender, Trigger* parameters);
 	static int FallenPaladin(Scriptable* Sender, Trigger* parameters);
 	static int FallenRanger(Scriptable* Sender, Trigger* parameters);
@@ -668,6 +672,7 @@ public: //Script Functions
 	static int GlobalTimerStarted(Scriptable* Sender, Trigger* parameters);
 	static int GGT_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GLT_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int GT(Scriptable* /*Sender*/, Trigger* parameters);
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
@@ -701,6 +706,7 @@ public: //Script Functions
 	static int HPPercent(Scriptable* Sender, Trigger* parameters);
 	static int HPPercentGT(Scriptable* Sender, Trigger* parameters);
 	static int HPPercentLT(Scriptable* Sender, Trigger* parameters);
+	static int ImmuneToSpellLevel(Scriptable* Sender, Trigger* parameters);
 	static int InActiveArea(Scriptable* Sender, Trigger* parameter);
 	static int InCutSceneMode(Scriptable *Sender, Trigger* parameter);
 	static int InLine(Scriptable* Sender, Trigger* parameter);
@@ -758,17 +764,25 @@ public: //Script Functions
 	static int LocalsGT(Scriptable* Sender, Trigger* parameters);
 	static int LocalsLT(Scriptable* Sender, Trigger* parameters);
 	static int LOS(Scriptable* Sender, Trigger* parameters);
+	static int LT(Scriptable* /*Sender*/, Trigger* parameters);
 	static int ModalState(Scriptable* Sender, Trigger* parameters);
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
+	static int MovementRate(Scriptable* Sender, Trigger* parameters);
+	static int MovementRateGT(Scriptable* Sender, Trigger* parameters);
+	static int MovementRateLT(Scriptable* Sender, Trigger* parameters);
 	static int NamelessBitTheDust(Scriptable* Sender, Trigger* parameters);
 	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NearSavedLocation(Scriptable* Sender, Trigger* parameters);
+	static int NextTriggerObject(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int NightmareModeOn(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);
+	static int NumBouncingSpellLevel(Scriptable* Sender, Trigger* parameters);
+	static int NumBouncingSpellLevelGT(Scriptable* Sender, Trigger* parameters);
+	static int NumBouncingSpellLevelLT(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesAtMyLevel(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
@@ -781,12 +795,18 @@ public: //Script Functions
 	static int NumDead(Scriptable* Sender, Trigger* parameters);
 	static int NumDeadGT(Scriptable* Sender, Trigger* parameters);
 	static int NumDeadLT(Scriptable* Sender, Trigger* parameters);
+	static int NumImmuneToSpellLevel(Scriptable* Sender, Trigger* parameters);
+	static int NumImmuneToSpellLevelGT(Scriptable* Sender, Trigger* parameters);
+	static int NumImmuneToSpellLevelLT(Scriptable* Sender, Trigger* parameters);
 	static int NumItems(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsGT(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsLT(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsParty(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsPartyGT(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsPartyLT(Scriptable* Sender, Trigger* parameters);
+	static int NumMirrorImages(Scriptable* Sender, Trigger* parameters);
+	static int NumMirrorImagesGT(Scriptable* Sender, Trigger* parameters);
+	static int NumMirrorImagesLT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesInteracted(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesInteractedGT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesInteractedLT(Scriptable* Sender, Trigger* parameters);
@@ -796,6 +816,9 @@ public: //Script Functions
 	static int NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);
+	static int NumTrappingSpellLevel(Scriptable* Sender, Trigger* parameters);
+	static int NumTrappingSpellLevelGT(Scriptable* Sender, Trigger* parameters);
+	static int NumTrappingSpellLevelLT(Scriptable* Sender, Trigger* parameters);
 	static int ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
 	static int OnIsland(Scriptable* Sender, Trigger* parameters);
@@ -804,6 +827,7 @@ public: //Script Functions
 	static int OpenFailed(Scriptable* Sender, Trigger* parameters);
 	static int OpenState(Scriptable* Sender, Trigger* parameters);
 	static int Or(Scriptable* Sender, Trigger* parameters);
+	static int OriginalClass(Scriptable* Sender, Trigger* parameters);
 	static int OutOfAmmo(Scriptable* Sender, Trigger* parameters);
 	static int OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters);
 	static int PartyCountEQ(Scriptable* Sender, Trigger* parameters);
@@ -871,6 +895,10 @@ public: //Script Functions
 	static int TimeOfDay(Scriptable* Sender, Trigger* parameters);
 	static int TimerActive(Scriptable* Sender, Trigger* parameters);
 	static int TimerExpired(Scriptable* Sender, Trigger* parameters);
+	static int TimeStopCounter(Scriptable* /*Sender*/, Trigger* parameters);
+	static int TimeStopCounterGT(Scriptable* /*Sender*/, Trigger* parameters);
+	static int TimeStopCounterLT(Scriptable* /*Sender*/, Trigger* parameters);
+	static int TimeStopObject(Scriptable* Sender, Trigger* parameters);
 	static int TookDamage(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCnt(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntExclude(Scriptable* Sender, Trigger* parameters);
