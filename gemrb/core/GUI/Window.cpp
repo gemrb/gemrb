@@ -127,40 +127,6 @@ Control* Window::GetFunctionControl(int x)
 	return NULL;
 }
 
-/** Returns the Control at X,Y Coordinates */
-Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
-{
-	Control* ctrl = NULL;
-
-	//Check if we are still on the last control
-	if (( lastC != NULL )) {
-		if (( frame.x + lastC->Origin().x <= x )
-			&& ( frame.y + lastC->Origin().y <= y )
-			&& ( frame.x + lastC->Origin().x + lastC->Dimensions().w >= x )
-			&& ( frame.y + lastC->Origin().y + lastC->Dimensions().h >= y )
-			&& ! lastC->IsPixelTransparent (x - frame.x - lastC->Origin().x, y - frame.y - lastC->Origin().y)) {
-			//Yes, we are on the last returned Control
-			return lastC;
-		}
-	}
-	std::vector< Control*>::const_iterator m;
-	for (m = Controls.begin(); m != Controls.end(); m++) {
-		if (ignore && (*m)->ControlID&IGNORE_CONTROL) {
-			continue;
-		}
-		if (( frame.x + ( *m )->Origin().x <= x )
-			&& ( frame.y + ( *m )->Origin().y <= y )
-			&& ( frame.x + ( *m )->Origin().x + ( *m )->Dimensions().w >= x )
-			&& ( frame.y + ( *m )->Origin().y + ( *m )->Dimensions().h >= y )
-			&& ! ( *m )->IsPixelTransparent (x - frame.x - ( *m )->Origin().x, y - frame.y - ( *m )->Origin().y)) {
-			ctrl = *m;
-			break;
-		}
-	}
-	lastC = ctrl;
-	return ctrl;
-}
-
 Control* Window::GetOver() const
 {
 	return lastOver;
@@ -209,6 +175,16 @@ Control* Window::GetControl(unsigned short i) const
 {
 	if (i < Controls.size()) {
 		return Controls[i];
+	}
+	return NULL;
+}
+
+/** Returns the Control at X,Y Coordinates */
+Control* Window::GetControlAtPoint(const Point& p, bool ignore)
+{
+	Control* ctrl = dynamic_cast<Control*>(SubviewAt(p));
+	if (ctrl) {
+		return (ignore && ctrl->ControlID&IGNORE_CONTROL) ? NULL : ctrl;
 	}
 	return NULL;
 }

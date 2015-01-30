@@ -203,10 +203,11 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				( winFrame.y + winFrame.h >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				Control* ctrl = win->GetControl( x, y, true );
+				Point p(win->ConvertPointFromScreen(Point(x, y)));
+				Control* ctrl = win->GetControlAtPoint( p, true );
 				//look for the low priority flagged controls (mostly static labels)
 				if (ctrl == NULL) {
-					ctrl = win->GetControl( x, y, false );
+					ctrl = win->GetControlAtPoint( p, false );
 				}
 				if (win != last_win_over || ctrl != win->GetOver()) {
 					// Remove tooltip if mouse moved to different control
@@ -289,9 +290,10 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 				( winFrame.y + winFrame.h >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				ctrl = ( *m )->GetControl( x, y, true );
+				Point p((*m)->ConvertPointFromScreen(Point(x, y)));
+				ctrl = ( *m )->GetControlAtPoint( p, true );
 				if (!ctrl) {
-					ctrl = ( *m )->GetControl( x, y, false);
+					ctrl = ( *m )->GetControlAtPoint( p, false);
 				}
 				last_win_mousefocused = *m;
 				if (ctrl != NULL) {

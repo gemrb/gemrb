@@ -198,6 +198,22 @@ bool View::IsPixelTransparent(const Point& p) const
 	return true;
 }
 
+View* View::SubviewAt(const Point& p, bool ignoreTransparency)
+{
+	// iterate backwards because the backmost control would be drawn on top
+	std::list<View*>::reverse_iterator it;
+	for (it = subViews.rbegin(); it != subViews.rend(); ++it) {
+		View* v = *it;
+		const Region& viewFrame = v->Frame();
+		Point subP = v->ConvertPointFromSuper(p);
+		//ignoreTransparency = true;
+		if (viewFrame.PointInside(p) && (ignoreTransparency || !v->IsPixelTransparent(subP))) {
+			return v;
+		}
+	}
+	return NULL;
+}
+
 void View::SetFrame(const Region& r)
 {
 	frame = r;
