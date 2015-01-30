@@ -251,8 +251,15 @@ void View::SetFrameSize(const Size& s)
 void View::SetScrollBar(ScrollBar* sb)
 {
 	delete RemoveSubview(scrollbar);
-	AddSubviewInFrontOfView(sb);
-	scrollbar = sb;
+	if (sb) {
+		// force the scrollbar to the view's top right
+		Size sbSize = sb->Dimensions();
+		Point origin(Dimensions().w - sbSize.w, 0);
+		Region r = Region(origin, sbSize);
+		sb->SetFrame(r);
+		AddSubviewInFrontOfView(sb);
+		scrollbar = sb;
+	}
 }
 
 }
