@@ -2031,6 +2031,12 @@ ieByte *Game::AllocateMazeData()
 	return mazedata;
 }
 
+int Game::RemainingTimestop() const
+{
+	int remaining = timestop_end - GameTime;
+	return remaining > 0 ? remaining : 0;
+}
+
 bool Game::IsTimestopActive() const
 {
 	return timestop_end > GameTime;

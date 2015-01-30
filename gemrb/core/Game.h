@@ -495,6 +495,7 @@ public:
 	ieByte *AllocateMazeData();
 	/** Checks if any timestop effects are active */
 	bool IsTimestopActive() const;
+	int RemainingTimestop() const;
 	Actor *GetTimestopOwner() const { return timestop_owner; };
 	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
 	/** Checks the bounty encounters (used in bg1) */
