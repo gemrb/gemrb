@@ -72,7 +72,6 @@ void View::DrawSubviews(bool drawBg)
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		View* v = *it;
 		if (drawBg && !v->IsOpaque() && v->NeedsDraw()) {
-			assert(background); // shouldnt get called with drawBg = true if this isnt set
 			const Region& fromClip = v->Frame();
 			DrawBackground(&fromClip);
 		}
@@ -82,13 +81,24 @@ void View::DrawSubviews(bool drawBg)
 
 void View::DrawBackground(const Region* rgn) const
 {
-	Video* video = core->GetVideoDriver();
-	if (rgn) {
-		Region toClip(ConvertPointToScreen(rgn->Origin()), rgn->Dimensions());
-		video->BlitSprite( background, *rgn, toClip);
-	} else {
-		Point dp = ConvertPointToScreen(Point(0,0));
-		video->BlitSprite( background, dp.x, dp.y, true );
+	if (superView && !IsOpaque()) {
+		if (rgn) {
+			Region r(ConvertPointToSuper(rgn->Origin()), rgn->Dimensions());
+			superView->DrawBackground(&r);
+		} else {
+			// already in super coordinates
+			superView->DrawBackground(&frame);
+		}
+	}
+	if (background) {
+		Video* video = core->GetVideoDriver();
+		if (rgn) {
+			Region toClip(ConvertPointToScreen(rgn->Origin()), rgn->Dimensions());
+			video->BlitSprite( background, *rgn, toClip);
+		} else {
+			Point dp = ConvertPointToScreen(Point(0,0));
+			video->BlitSprite( background, dp.x, dp.y, true );
+		}
 	}
 }
 
@@ -101,7 +111,7 @@ void View::Draw()
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
-	bool drawBg = (background != NULL);
+	bool drawBg = (background != NULL) || !IsOpaque();
 	if (NeedsDraw()) {
 		// clip drawing to the control bounds, then restore after drawing
 		video->SetScreenClip(&drawFrame);
