@@ -10043,5 +10043,21 @@ void Actor::ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner,
 	}
 }
 
+// check if we were the passed class at some point
+// NOTE: does not ignore disabled dual classes!
+bool Actor::WasClass(ieDword oldClassID) const
+{
+	if (oldClassID >= BGCLASSCNT) return false;
+
+	int mcWas = BaseStats[IE_MC_FLAGS] & MC_WAS_ANY;
+	if (!mcWas) {
+		// not dualclassed
+		return false;
+	}
+
+	int OldIsClassID = levelslotsbg[oldClassID];
+	return mcwasflags[OldIsClassID] == mcWas;
+}
+
 }
 
