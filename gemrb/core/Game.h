@@ -299,8 +299,6 @@ public:
 	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
 	ieResRef LoadMos;
 	ieResRef TextScreen;
-	Actor *timestop_owner;
-	ieDword timestop_end;
 	Particles *weather;
 	int event_timer;
 	EventHandler event_handler;
@@ -310,6 +308,8 @@ public:
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
+	Actor *timestop_owner;
+	ieDword timestop_end;
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
@@ -495,6 +495,8 @@ public:
 	ieByte *AllocateMazeData();
 	/** Checks if any timestop effects are active */
 	bool IsTimestopActive() const;
+	Actor *GetTimestopOwner() const { return timestop_owner; };
+	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
 	/** Checks the bounty encounters (used in bg1) */
 	bool RandomEncounter(ieResRef &BaseArea);
 	/** Resets the area and bored comment timers of the whole party */

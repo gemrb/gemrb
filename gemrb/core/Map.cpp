@@ -696,7 +696,7 @@ void Map::UpdateScripts()
 	Game *game = core->GetGame();
 	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
-		game->timestop_owner = NULL;
+		game->SetTimestopOwner(NULL);
 	}
 
 	while (q--) {
