@@ -243,7 +243,7 @@ public:
 
 	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 	Region GetViewport(void) const;
-	void SetViewport(int x, int y, unsigned int w, unsigned int h);
+	void SetViewport(const Region&);
 	void MoveViewportTo(int x, int y);
 };
 

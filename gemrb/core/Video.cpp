@@ -348,20 +348,12 @@ void Video::SetMovieFont(Font *stfont, Palette *pal)
 	subtitlepal = pal;
 }
 
-void Video::SetViewport(int x, int y, unsigned int w, unsigned int h)
+void Video::SetViewport(const Region& vp)
 {
-	if (x>width)
-		x=width;
-	xCorr = x;
-	if (y>height)
-		y=height;
-	yCorr = y;
-	if (w>(unsigned int) width)
-		w=0;
-	Viewport.w = w;
-	if (h>(unsigned int) height)
-		h=0;
-	Viewport.h = h;
+	xCorr = (vp.x > width) ? width : vp.x;
+	yCorr = (vp.y > height) ? height : vp.y;
+	Viewport.w = (vp.w > width) ? 0 : vp.w;
+	Viewport.h = (vp.h > height) ? 0 : vp.h;
 }
 
 void Video::MoveViewportTo(int x, int y)

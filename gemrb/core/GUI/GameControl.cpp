@@ -247,7 +247,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 GameControl::~GameControl(void)
 {
 	//releasing the viewport of GameControl
-	core->GetVideoDriver()->SetViewport( 0,0,0,0 );
+	core->GetVideoDriver()->SetViewport( Region() );
 	if (formations)	{
 		free( formations );
 		formations = NULL;
@@ -2373,7 +2373,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			}
 		}
 	}
-	core->GetVideoDriver()->SetViewport( Owner->Origin().x, Owner->Origin().y, Dimensions().w, Dimensions().h );
+	core->GetVideoDriver()->SetViewport( Region(Owner->Frame().Origin(), frame.Dimensions()) );
 	return true;
 }
 

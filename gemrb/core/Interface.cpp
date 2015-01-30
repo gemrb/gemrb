@@ -2841,15 +2841,13 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 		case WINDOW_INVISIBLE:
 			//hiding the viewport if the gamecontrol window was made invisible
 			if (win->WindowID==65535) {
-				video->SetViewport( 0,0,0,0 );
+				video->SetViewport( Region() );
 			}
 			evntmgr->DelWindow( win );
 			break;
-
 		case WINDOW_VISIBLE:
 			if (win->WindowID==65535) {
-				Region winFrame = win->Frame();
-				video->SetViewport( winFrame.x, winFrame.y, winFrame.w, winFrame.h );
+				video->SetViewport( win->Frame() );
 			}
 			//here is a fallthrough
 		case WINDOW_FRONT:
