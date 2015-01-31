@@ -2590,9 +2590,11 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2) {
 		if (target->SetSpellState( SS_ICESHIELD)) return FX_APPLIED;
 		target->AddPortraitIcon(PI_ICESHIELD);
+		target->SetOverlay(OV_ICESHIELD1);
 	} else {
 		if (target->SetSpellState( SS_FIRESHIELD)) return FX_APPLIED;
 		target->AddPortraitIcon(PI_FIRESHIELD);
+		target->SetOverlay(OV_FIRESHIELD1);
 	}
 	memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
 	return FX_APPLIED;
