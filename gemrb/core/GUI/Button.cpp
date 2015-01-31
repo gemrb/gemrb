@@ -406,14 +406,6 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 		return;
 	}
 
-	ScrollBar* scrlbr = scrollbar;
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-
 	//Button == 1 means Left Mouse Button
 	switch(Button&GEM_MB_NORMAL) {
 	case GEM_MB_ACTION:
@@ -433,16 +425,6 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 		}
 		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress) {
 			RunEventHandler( ButtonOnDoublePress );
-		}
-		break;
-	case GEM_MB_SCRLUP:
-		if (scrlbr) {
-			scrlbr->ScrollUp();
-		}
-		break; 
-	case GEM_MB_SCRLDOWN:
-		if (scrlbr) {
-			scrlbr->ScrollDown();
 		}
 		break;
 	}
