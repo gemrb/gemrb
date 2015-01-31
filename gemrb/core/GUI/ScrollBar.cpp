@@ -38,7 +38,7 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 	State = 0;
 	SliderYPos = 0;
 	ResetEventHandler( ScrollBarOnChange );
-	ta = NULL;
+	textarea = NULL;
 
 	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
 		Frames[i] = images[i];
@@ -91,9 +91,9 @@ void ScrollBar::SetPos(ieDword NewPos)
 	}
 
 	Pos = (ieWord) NewPos;
-	if (ta) {
+	if (textarea) {
 		MarkDirty(); // if the FIXME below is ever fixed move this up.
-		(( TextArea* )ta)->SetRow( Pos );
+		textarea->SetRow( Pos );
 	} else {
 		// FIXME: hack (I think), this is needed because scrolling the loot windows
 		// will cause the bottom window to draw over the sidebar windows.
@@ -123,11 +123,10 @@ void ScrollBar::SetPosForY(short y)
 			MarkDirty();
 		}
 
-		if (ta) {
+		if (textarea) {
 			// we must "scale" the pixels the slider moves
-			TextArea* t = (TextArea*) ta;
-			unsigned int taY = y * (t->GetRowHeight() / stepPx);
-			t->ScrollToY(taY, this);
+			unsigned int taY = y * (textarea->GetRowHeight() / stepPx);
+			textarea->ScrollToY(taY, this);
 			SliderYPos = y;
 		} else {
 			// other controls don't support per-pixel scrolling

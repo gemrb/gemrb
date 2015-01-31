@@ -97,8 +97,8 @@ private: //Private attributes
 public:
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);
-	/** TextArea Associated Control */
-	Control* ta;
+	TextArea* textarea;
+
 public: // Public Events
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);

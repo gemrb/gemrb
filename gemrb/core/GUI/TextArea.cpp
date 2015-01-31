@@ -192,7 +192,7 @@ void TextArea::UpdateScrollbar()
 void TextArea::SetScrollBar(ScrollBar* bar)
 {
 	View::SetScrollBar(bar);
-	if (bar) bar->ta = this;
+	if (bar) bar->textarea = this;
 	// we need to update the ScrollBar position based around TextYPos
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
