@@ -3195,7 +3195,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		ModalWindow = NULL;
 	}
 	evntmgr->DelWindow( win );
-	win->release();
+	win->Visible = WINDOW_INVALID;
 	//re-capturing new (old) modal window if any
 	size_t tw = topwin.size();
 	for(size_t i=0;i<tw;i++) {

@@ -230,11 +230,6 @@ Control* Window::GetScrollControl() const
 	return scrollbar;
 }
 
-void Window::release(void)
-{
-	Visible = WINDOW_INVALID;
-}
-
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {

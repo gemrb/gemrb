@@ -111,9 +111,6 @@ public: //Public attributes
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;
-
-public:
-	void release(void);
 };
 
 }
