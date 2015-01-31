@@ -8851,7 +8851,8 @@ void Actor::SetGradient(ieDword gradient)
 void Actor::SetOverlay(unsigned int overlay)
 {
 	if (overlay>=32) return;
-	Modified[IE_SANCTUARY]|=1<<overlay;
+	// need to run the pcf, so the vvcs get loaded
+	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 1);
 }
 
 //returns true if spell state is already set or illegal
