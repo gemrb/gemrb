@@ -187,7 +187,7 @@ size_t Window::GetControlCount() const
 	return Controls.size();
 }
 
-Control* Window::GetControl(size_t i) const
+Control* Window::GetControlAtIndex(size_t i) const
 {
 	if (i < Controls.size()) {
 		return Controls[i];
@@ -235,7 +235,7 @@ Control* Window::GetDefaultControl(unsigned int ctrltype) const
 	if (ctrltype>=2) {
 		return NULL;
 	}
-	return GetControl( (ieWord) DefaultControl[ctrltype] );
+	return GetControlAtIndex( DefaultControl[ctrltype] );
 }
 
 Control* Window::GetScrollControl() const

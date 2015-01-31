@@ -66,6 +66,7 @@ protected:
 public: 
 	Window(unsigned short WindowID, const Region& frame);
 	~Window();
+
 	/** Set window frame used to fill screen on higher resolutions*/
 	void SetFrame();
 
@@ -76,7 +77,7 @@ public:
 	/** Returns the Control at X,Y Coordinates */
 	Control* GetControlAtPoint(const Point&, bool ignore=0);
 	/** Returns the Control by Index */
-	Control* GetControl(size_t i) const;
+	Control* GetControlAtIndex(size_t) const;
 	Control* GetControlById(ieDword id) const;
 	/** Returns the number of Controls */
 	size_t GetControlCount() const;

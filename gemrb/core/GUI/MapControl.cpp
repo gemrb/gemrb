@@ -191,7 +191,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	bool seen_this = false;
 	unsigned int i;
 	for (i = 0; i < Owner->GetControlCount(); i++) {
-		Control *ctrl = Owner->GetControl(i);
+		Control *ctrl = Owner->GetControlAtIndex(i);
 		if (!ctrl) continue;
 
 		// we could try working out which controls overlap,

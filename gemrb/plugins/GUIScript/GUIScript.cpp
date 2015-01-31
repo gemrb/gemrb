@@ -227,7 +227,7 @@ static Control *GetControl( int wi, int ci, int ct)
 		RuntimeError(errorbuffer);
 		return NULL;
 	}
-	Control* ctrl = win->GetControl( ci );
+	Control* ctrl = win->GetControlAtIndex( ci );
 	if (!ctrl) {
 		snprintf(errorbuffer, sizeof(errorbuffer), "Cannot find control #%d", ci);
 		RuntimeError(errorbuffer);
@@ -2646,7 +2646,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
-		Control *ctrl = win->GetControl( CtrlIndex );
+		Control *ctrl = win->GetControlAtIndex( CtrlIndex );
 		rgn = ctrl->Frame();
 		//flags = ctrl->Value;
 		delete win->RemoveSubview( ctrl );
@@ -2721,7 +2721,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
-		Control *ctrl = win->GetControl( CtrlIndex );
+		Control *ctrl = win->GetControlAtIndex( CtrlIndex );
 		rgn = ctrl->Frame();
 		// do *not* delete the existing control, we want to replace
 		// it in the sort order!
@@ -2733,7 +2733,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
-		Control *lc = win->GetControl( CtrlIndex );
+		Control *lc = win->GetControlAtIndex( CtrlIndex );
 		map->LinkedLabel = lc;
 		ResourceHolder<ImageMgr> anim(Flag);
 		if (anim) {
@@ -2747,7 +2747,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	}
 	if (Flag) {
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
-		Control *lc = win->GetControl( CtrlIndex );
+		Control *lc = win->GetControlAtIndex( CtrlIndex );
 		map->LinkedLabel = lc;
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( Flag,
@@ -2792,7 +2792,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 		return RuntimeError("Cannot find control!");
 	}
 	Window* subWin = substitute->Owner;
-	subWin->RemoveSubview(subWin->GetControl(subIdx));
+	subWin->RemoveSubview(subWin->GetControlAtIndex(subIdx));
 	Window* targetWin = target->Owner;
 	substitute->SetFrame(target->Frame());
 

@@ -2733,7 +2733,7 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID) c
 	}
 	int i = 0;
 	while (true) {
-		Control* ctrl = win->GetControl( (unsigned short) i );
+		Control* ctrl = win->GetControlAtIndex(i);
 		if (ctrl == NULL)
 			return -1;
 		if (ctrl->ControlID == ControlID)
@@ -2752,7 +2752,7 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 	if (win == NULL) {
 		return -1;
 	}
-	Control* ctrl = win->GetControl( ControlIndex );
+	Control* ctrl = win->GetControlAtIndex(ControlIndex);
 	if (ctrl == NULL) {
 		return -1;
 	}
@@ -2777,7 +2777,7 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 	if (win == NULL) {
 		return -1;
 	}
-	Control* ctrl = win->GetControl( ControlIndex );
+	Control* ctrl = win->GetControlAtIndex( ControlIndex );
 	if (ctrl == NULL) {
 		return -1;
 	}
@@ -2874,7 +2874,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 	if (win == NULL) {
 		return -1;
 	}
-	Control* ctrl = win->GetControl( ControlIndex );
+	Control* ctrl = win->GetControlAtIndex( ControlIndex );
 	if (ctrl == NULL) {
 		return -1;
 	}
@@ -3911,7 +3911,7 @@ bool Interface::HideGCWindow()
 	if (! window)
 		return false;
 
-	Control* gc = window->GetControl(0);
+	Control* gc = window->GetControlAtIndex(0);
 	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return false;
 	}
@@ -3924,7 +3924,7 @@ void Interface::UnhideGCWindow()
 	Window *window = GetWindow( 0 );
 	if (!window)
 		return;
-	Control* gc = window->GetControl(0);
+	Control* gc = window->GetControlAtIndex(0);
 	if (gc->ControlType!=IE_GUI_GAMECONTROL)
 		return;
 	SetVisible(0, WINDOW_VISIBLE);
@@ -3937,7 +3937,7 @@ GameControl *Interface::GetGameControl() const
 	if (! window)
 		return NULL;
 
-	Control* gc = window->GetControl(0);
+	Control* gc = window->GetControlAtIndex(0);
 	if (gc == NULL) {
 		return NULL;
 	}
@@ -4293,7 +4293,7 @@ Label *Interface::GetMessageLabel() const
 		( vars->Lookup( "MessageLabel", TAIndex ) )) {
 		Window* win = GetWindow( (unsigned short) WinIndex );
 		if (win) {
-			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
+			Control *ctrl = win->GetControlAtIndex(TAIndex);
 			if (ctrl && ctrl->ControlType==IE_GUI_LABEL)
 				return (Label *) ctrl;
 		}
@@ -4311,7 +4311,7 @@ TextArea *Interface::GetMessageTextArea() const
 		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
 		Window* win = GetWindow( (unsigned short) WinIndex );
 		if (win) {
-			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
+			Control *ctrl = win->GetControlAtIndex(TAIndex);
 			if (ctrl && ctrl->ControlType==IE_GUI_TEXTAREA)
 				return (TextArea *) ctrl;
 		}
