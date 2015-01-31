@@ -29,6 +29,7 @@
 #define EVENTMGR_H
 
 #include "exports.h"
+#include "Region.h"
 
 #include <vector>
 
@@ -86,7 +87,7 @@ private:
 	std::vector< Window*> windows;
 	std::vector< int> topwin;
 
-	unsigned short dc_x, dc_y;
+	Point dc;
 	unsigned long dc_time, dc_delay;
 	unsigned long rk_delay, rk_flags;
 
@@ -147,7 +148,7 @@ public:
 private:
 	void SetDefaultFocus(Window *win);
 	void SetOnTop(int Index);
-	bool ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime);
+	bool ClickMatch(const Point& p, unsigned long thisTime);
 };
 
 }

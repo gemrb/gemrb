@@ -44,8 +44,7 @@ EventMgr::EventMgr(void)
 	// Last window we were over. Used to determine MouseEnter and MouseLeave events
 	last_win_over = NULL;
 	MButtons = 0;
-	dc_x = 0;
-	dc_y = 0;
+
 	dc_time = 0;
 	dc_delay = 250;
 	rk_delay = 250;
@@ -112,6 +111,7 @@ ok:
 	}
 	SetDefaultFocus(win);
 }
+
 /** Frees and Removes all the Windows in the Array */
 void EventMgr::Clear()
 {
@@ -245,34 +245,30 @@ void EventMgr::RefreshCursor(int idx)
 	video->SetCursor( core->Cursors[idx ^ 1], VID_CUR_DOWN );
 }
 
-bool EventMgr::ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime)
+bool EventMgr::ClickMatch(const Point& p, unsigned long thisTime)
 {
-	if (dc_x+10<x) return false;
-	if (dc_x>x+10) return false;
-	if (dc_y+10<y) return false;
-	if (dc_y>y+10) return false;
 	if (dc_time<thisTime) return false;
-	return true;
+
+	return Region(dc, Size(10, 10)).PointInside(p);
 }
 
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
+	Point p(x, y);
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
 	Control *ctrl;
 	unsigned long thisTime;
 
 	thisTime = GetTickCount();
-	if (ClickMatch(x, y, thisTime)) {
+	if (ClickMatch(p, thisTime)) {
 		Button |= GEM_MB_DOUBLECLICK;
-		dc_x = 0;
-		dc_y = 0;
+		dc = Point(0, 0);
 		dc_time = 0;
 	} else {
-		dc_x = x;
-		dc_y = y;
+		dc = p;
 		dc_time = thisTime+dc_delay;
 	}
 	MButtons |= Button;
