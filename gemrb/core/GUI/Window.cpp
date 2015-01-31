@@ -37,8 +37,6 @@ Window::Window(unsigned short WindowID, const Region& frame)
 
 	Visible = WINDOW_INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
-	DefaultControl[0] = -1;
-	DefaultControl[1] = -1;
 	FunctionBar = false;
 }
 
@@ -110,7 +108,7 @@ void Window::SetFrame()
 	if ( (frame.w < core->Width) || (frame.h < core->Height) ) {
 		Flags|=WF_FRAME;
 	}
-	Invalidate();
+	MarkDirty();
 }
 
 bool Window::OnSpecialKeyPress(unsigned char key)
@@ -118,11 +116,11 @@ bool Window::OnSpecialKeyPress(unsigned char key)
 	Control* ctrl = NULL;
 	//the default control will get only GEM_RETURN
 	if (key == GEM_RETURN) {
-		ctrl = GetDefaultControl(0);
+		//ctrl = GetDefaultControl(0);
 	}
 	//the default cancel control will get only GEM_ESCAPE
 	else if (key == GEM_ESCAPE) {
-		ctrl = GetDefaultControl(1);
+		//ctrl = GetDefaultControl(1);
 	} else if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
 		ctrl = GetFunctionControl(key - GEM_FUNCTION1);
 	} else {
@@ -227,17 +225,6 @@ bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
 	return false;
 }
 
-Control* Window::GetDefaultControl(unsigned int ctrltype) const
-{
-	if (!Controls.size()) {
-		return NULL;
-	}
-	if (ctrltype>=2) {
-		return NULL;
-	}
-	return GetControlAtIndex( DefaultControl[ctrltype] );
-}
-
 Control* Window::GetScrollControl() const
 {
 	return scrollbar;
@@ -246,36 +233,6 @@ Control* Window::GetScrollControl() const
 void Window::release(void)
 {
 	Visible = WINDOW_INVALID;
-}
-
-/** Redraw all the Window */
-void Window::Invalidate()
-{
-	DefaultControl[0] = -1;
-	DefaultControl[1] = -1;
-	for (unsigned int i = 0; i < Controls.size(); i++) {
-		if (!Controls[i]) {
-			continue;
-		}
-		Controls[i]->MarkDirty();
-		switch (Controls[i]->ControlType) {
-			case IE_GUI_BUTTON:
-				if (( Controls[i]->Flags & IE_GUI_BUTTON_DEFAULT )) {
-					DefaultControl[0] = i;
-				}
-				if (( Controls[i]->Flags & IE_GUI_BUTTON_CANCEL )) {
-					DefaultControl[1] = i;
-				}
-				break;
-				//falling through
-			case IE_GUI_GAMECONTROL:
-				DefaultControl[0] = i;
-				DefaultControl[1] = i;
-				break;
-			default: ;
-		}
-	}
-	MarkDirty();
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)

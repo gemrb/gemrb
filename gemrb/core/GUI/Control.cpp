@@ -173,7 +173,6 @@ int Control::SetFlags(int arg_flags, int opcode)
 			return -1;
 	}
 	Flags = newFlags;
-	Owner->Invalidate();
 	MarkDirty();
 	return 0;
 }

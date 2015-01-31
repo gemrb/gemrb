@@ -1817,7 +1817,7 @@ static PyObject* GemRB_Window_Invalidate(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	win->Invalidate();
+	win->MarkDirty();
 
 	Py_RETURN_NONE;
 }

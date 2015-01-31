@@ -2574,7 +2574,7 @@ void Interface::RedrawAll()
 	for (unsigned int i = 0; i < windows.size(); i++) {
 		Window *win = windows[i];
 		if (win != NULL && win->Visible!=WINDOW_INVALID) {
-			win->Invalidate();
+			win->MarkDirty();
 		}
 	}
 }
@@ -2612,7 +2612,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		if (win->WindowID == WindowID &&
 			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
 			SetOnTop( i );
-			win->Invalidate();
+			win->MarkDirty();
 			if (gc)
 				gc->SetScrolling( false );
 			return i;
@@ -2637,7 +2637,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 	} else {
 		windows[slot] = win;
 	}
-	win->Invalidate();
+	win->MarkDirty();
 	if (gc)
 		gc->SetScrolling( false );
 	return slot;
@@ -2654,7 +2654,7 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
 			windows[i]->WindowPack )) {
 			SetOnTop( i );
-			windows[i]->Invalidate();
+			windows[i]->MarkDirty();
 			return i;
 		}
 	}
@@ -2682,7 +2682,7 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	} else {
 		windows[slot] = win;
 	}
-	win->Invalidate();
+	win->MarkDirty();
 	return slot;
 }
 
@@ -2718,7 +2718,7 @@ void Interface::AddWindow(Window * win)
 	}
 	else
 		windows[slot] = win;
-	win->Invalidate();
+	win->MarkDirty();
 }
 
 /** Get a Control on a Window */
@@ -2835,7 +2835,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	}
 	switch (visible) {
 		case WINDOW_GRAYED:
-			win->Invalidate();
+			win->MarkDirty();
 			win->Draw();
 			//here is a fallthrough
 		case WINDOW_INVISIBLE:
@@ -2857,7 +2857,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 					evntmgr->SetFunctionBar( win );
 				}
 			}
-			win->Invalidate();
+			win->MarkDirty();
 			SetOnTop( WindowIndex );
 			break;
 	}
@@ -2924,7 +2924,7 @@ int Interface::ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow)
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
 	evntmgr->SetFocused( win, NULL );
-	win->Invalidate();
+	win->MarkDirty();
 
 	modalShadow = Shadow;
 	ModalWindow = win;

@@ -83,8 +83,6 @@ public:
 	size_t GetControlCount() const;
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
 	bool IsValidControl(unsigned short ID, Control *ctrl) const;
-	/** Returns the Default Control which may be a button/gamecontrol atm */
-	Control* GetDefaultControl(unsigned int ctrltype) const;
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
 
@@ -94,8 +92,7 @@ public:
 	Control* GetFocus() const;
 	/** Returns last mouse event focused control */
 	Control* GetMouseFocus() const;
-	/** Redraw all the Window */
-	void Invalidate();
+
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
@@ -110,7 +107,6 @@ public: //Public attributes
 	/** Window flags: Changed, Floating, Framed, Child */
 	int Flags;
 	int Cursor;
-	int DefaultControl[2]; //default enter and cancel
 	bool FunctionBar;
 private: // Private attributes
 	/** Controls Array */
