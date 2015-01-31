@@ -34,10 +34,7 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	: View(frame)
 {
 	this->WindowID = WindowID;
-	lastC = NULL;
-	lastFocus = NULL;
-	lastMouseFocus = NULL;
-	lastOver = NULL;
+
 	Visible = WINDOW_INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
 	DefaultControl[0] = -1;
@@ -76,6 +73,11 @@ void Window::SubviewRemoved(View* subview)
 	}
 }
 
+void Window::SetFocused(Control* ctrl)
+{
+	TrySetFocus(ctrl);
+}
+
 /** This function Draws the Window on the Output Screen */
 void Window::DrawSelf(Region /*drawFrame*/, const Region& clip)
 {
@@ -111,6 +113,50 @@ void Window::SetFrame()
 	Invalidate();
 }
 
+bool Window::OnSpecialKeyPress(unsigned char key)
+{
+	Control* ctrl = NULL;
+	//the default control will get only GEM_RETURN
+	if (key == GEM_RETURN) {
+		ctrl = GetDefaultControl(0);
+	}
+	//the default cancel control will get only GEM_ESCAPE
+	else if (key == GEM_ESCAPE) {
+		ctrl = GetDefaultControl(1);
+	} else if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
+		ctrl = GetFunctionControl(key - GEM_FUNCTION1);
+	} else {
+		ctrl = dynamic_cast<Control*>(FocusedView());
+	}
+
+	if (ctrl) {
+		switch (ctrl->ControlType) {
+				//scrollbars will receive only mousewheel events
+			case IE_GUI_SCROLLBAR:
+				if (key != GEM_UP && key != GEM_DOWN) {
+					return false;
+				}
+				break;
+				//buttons will receive only GEM_RETURN
+			case IE_GUI_BUTTON:
+				if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
+					//fake mouse button
+					ctrl->OnMouseDown(Point(), GEM_MB_ACTION, 0);
+					ctrl->OnMouseUp(Point(), GEM_MB_ACTION, 0);
+					return false;
+				}
+				if (key != GEM_RETURN && key!=GEM_ESCAPE) {
+					return false;
+				}
+				break;
+				// shouldnt be any harm in sending these events to any control
+		}
+		ctrl->OnSpecialKeyPress( key );
+		return true;
+	}
+	return false;
+}
+
 Control* Window::GetFunctionControl(int x)
 {
 	if (!FunctionBar) {
@@ -126,43 +172,14 @@ Control* Window::GetFunctionControl(int x)
 	return NULL;
 }
 
-Control* Window::GetOver() const
-{
-	return lastOver;
-}
-
 Control* Window::GetFocus() const
 {
-	return lastFocus;
+	return dynamic_cast<Control*>(FocusedView());
 }
 
 Control* Window::GetMouseFocus() const
 {
-	return lastMouseFocus;
-}
-
-/** Sets 'ctrl' as Focused */
-void Window::SetFocused(Control* ctrl)
-{
-	if (lastFocus != NULL) {
-		lastFocus->SetFocus(false);
-	}
-	lastFocus = ctrl;
-	if (ctrl != NULL) {
-		lastFocus->SetFocus(true);
-	}
-}
-
-/** Sets 'ctrl' as Mouse Focused */
-void Window::SetMouseFocused(Control* ctrl)
-{
-	if (lastMouseFocus != NULL) {
-		lastMouseFocus->MarkDirty();
-	}
-	lastMouseFocus = ctrl;
-	if (ctrl != NULL) {
-		lastMouseFocus->MarkDirty();
-	}
+	return dynamic_cast<Control*>(FocusedView());
 }
 
 size_t Window::GetControlCount() const
@@ -229,10 +246,6 @@ Control* Window::GetScrollControl() const
 void Window::release(void)
 {
 	Visible = WINDOW_INVALID;
-	lastC = NULL;
-	lastFocus = NULL;
-	lastMouseFocus = NULL;
-	lastOver = NULL;
 }
 
 /** Redraw all the Window */
@@ -270,40 +283,6 @@ void Window::RedrawControls(const char* VarName, unsigned int Sum)
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		(*c)->UpdateState( VarName, Sum);
 	}
-}
-
-void Window::OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl)
-{
-	lastOver = ctrl;
-	if (!lastOver) {
-		return;
-	}
-	lastOver->OnMouseEnter( x - frame.x - lastOver->Origin().x, y - frame.y - lastOver->Origin().y );
-}
-
-void Window::OnMouseLeave(unsigned short x, unsigned short y)
-{
-	if (!lastOver) {
-		return;
-	}
-	lastOver->OnMouseLeave( x - frame.x - lastOver->Origin().x, y - frame.y - lastOver->Origin().y );
-	lastOver = NULL;
-}
-
-void Window::OnMouseOver(unsigned short x, unsigned short y)
-{
-	if (!lastOver) {
-		return;
-	}
-	short cx = x - frame.x - lastOver->Origin().x;
-	short cy = y - frame.y - lastOver->Origin().y;
-	if (cx < 0) {
-		cx = 0;
-	}
-	if (cy < 0) {
-		cy = 0;
-	}
-	lastOver->OnMouseOver(cx, cy);
 }
 
 }

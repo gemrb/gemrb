@@ -267,12 +267,12 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 }
 
 /** Mouse Over Event */
-void MapControl::OnMouseOver(unsigned short x, unsigned short y)
+void MapControl::OnMouseOver(const Point& p)
 {
 	if (mouseIsDown) {
 		MarkDirty();
-		ScrollX -= x - lastMouseX;
-		ScrollY -= y - lastMouseY;
+		ScrollX -= p.x - lastMouseX;
+		ScrollY -= p.y - lastMouseY;
 
 		if (ScrollX > MapWidth - frame.w)
 			ScrollX = MapWidth - frame.w;
@@ -282,11 +282,11 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 			ScrollX = 0;
 		if (ScrollY < 0)
 			ScrollY = 0;
-		ViewHandle(x,y);
+		ViewHandle(p.x, p.y);
 	}
 
-	lastMouseX = x;
-	lastMouseY = y;
+	lastMouseX = p.x;
+	lastMouseY = p.y;
 
 	switch (Value) {
 		case MAP_REVEAL: //for farsee effect
@@ -305,12 +305,12 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		unsigned int dist;
 
 		if (convertToGame) {
-			mp.x = (short) SCREEN_TO_GAMEX(x);
-			mp.y = (short) SCREEN_TO_GAMEY(y);
+			mp.x = (short) SCREEN_TO_GAMEX(p.x);
+			mp.y = (short) SCREEN_TO_GAMEY(p.y);
 			dist = 100;
 		} else {
-			mp.x = (short) SCREEN_TO_MAPX(x);
-			mp.y = (short) SCREEN_TO_MAPY(y);
+			mp.x = (short) SCREEN_TO_MAPX(p.x);
+			mp.y = (short) SCREEN_TO_MAPY(p.y);
 			dist = 16;
 		}
 		int i = MyMap -> GetMapNoteCount();
@@ -334,7 +334,7 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 }
 
 /** Mouse Leave Event */
-void MapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+void MapControl::OnMouseLeave(const Point&)
 {
 	Owner->Cursor = IE_CURSOR_NORMAL;
 }
@@ -377,8 +377,7 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	switch((unsigned char) Button & GEM_MB_NORMAL) {
 		case GEM_MB_SCRLUP:
@@ -400,14 +399,13 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short 
 	Region vp = core->GetVideoDriver()->GetViewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
 	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
-	ViewHandle(x,y);
-	lastMouseX = x;
-	lastMouseY = y;
+	ViewHandle(p.x, p.y);
+	lastMouseX = p.x;
+	lastMouseY = p.y;
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	if (!mouseIsDown) {
 		return;
@@ -417,18 +415,18 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 	mouseIsDown = false;
 	switch(Value) {
 		case MAP_REVEAL:
-			ViewHandle(x,y);
-			NotePosX = (short) SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV;
-			NotePosY = (short) SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV;
+			ViewHandle(p.x, p.y);
+			NotePosX = (short) SCREEN_TO_MAPX(p.x) * MAP_MULT / MAP_DIV;
+			NotePosY = (short) SCREEN_TO_MAPY(p.y) * MAP_MULT / MAP_DIV;
 			ClickHandle(Button);
 			return;
 		case MAP_NO_NOTES:
-			ViewHandle(x,y);
+			ViewHandle(p.x, p.y);
 			return;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
 			if (Button == GEM_MB_ACTION) {
-				ViewHandle(x,y);
+				ViewHandle(p.x, p.y);
 			}
 			ClickHandle(Button);
 			return;

@@ -19,8 +19,6 @@
  */
 
 #include "GUI/Control.h"
-
-#include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
 #include "win32def.h"
@@ -136,45 +134,6 @@ int Control::RunEventHandler(ControlEventHandler handler)
 	return 1;
 }
 
-/** Mouse Button Down */
-void Control::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short Mod)
-{
-	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl!=this)) {
-			ctrl->OnMouseDown(x,y,Button,Mod);
-		}
-	}
-}
-
-/** Mouse Button Up */
-void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned short /*Button*/, unsigned short /*Mod*/)
-{
-	//print("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd",(unsigned int) ControlID, x, y, Button, Mod);
-}
-
-/** Mouse scroll wheel */
-void Control::OnMouseWheelScroll( short x, short y)
-{
-	Control *ctrl = Owner->GetScrollControl();
-	if (ctrl && (ctrl!=this)) {
-		ctrl->OnMouseWheelScroll( x, y );
-	}	
-}
-
-/** Special Key Press */
-bool Control::OnSpecialKeyPress(unsigned char Key)
-{
-	if (Key == GEM_UP || Key == GEM_DOWN) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl!=this)) {
-			return ctrl->OnSpecialKeyPress(Key);
-		}
-	}
-	return false;
-}
 void Control::SetFocus(bool focus)
 {
 	hasFocus = focus;

@@ -20,6 +20,7 @@
 #ifndef __GemRB__View__
 #define __GemRB__View__
 
+#include "GUI/EventMgr.h"
 #include "Region.h"
 #include "Sprite2D.h"
 
@@ -32,6 +33,7 @@ class ScrollBar;
 class View {
 private:
 	Sprite2D* background;
+	View* focusView;
 	View* superView;
 
 	mutable bool dirty;
@@ -53,8 +55,13 @@ protected:
 	virtual void SubviewAdded(View*) {}
 	virtual void SubviewRemoved(View*) {}
 
+	virtual bool LockFocus() { return true; };
+	virtual bool UnlockFocus() { return true; };
+
 	inline Point ConvertPointToSuper(const Point&) const;
 	inline Point ConvertPointFromSuper(const Point&) const;
+
+	bool TrySetFocus(View*);
 
 public:
 	View(const Region& frame);
@@ -68,6 +75,8 @@ public:
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool IsPixelTransparent(const Point& p) const;
+
+	View* FocusedView() const { return focusView; }
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }
@@ -87,6 +96,15 @@ public:
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
 
+	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
+	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
+	virtual void OnMouseEnter(const Point&) {};
+	virtual void OnMouseLeave(const Point&) {};
+	virtual void OnMouseOver(const Point&) {};
+	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	virtual void OnMouseWheelScroll(short x, short y);
+	virtual bool OnSpecialKeyPress(unsigned char Key);
 };
 
 }

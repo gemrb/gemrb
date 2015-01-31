@@ -169,6 +169,7 @@ void EventMgr::DelWindow(Window *win)
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseMove(unsigned short x, unsigned short y)
 {
+	Point p(x, y);
 	if (windows.size() == 0) {
 		return;
 	}
@@ -179,10 +180,10 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	GameControl *gc = core->GetGameControl();
 	if (gc && (!focusLock || focusLock == gc)) {
 		// for scrolling
-		gc->OnGlobalMouseMove(x, y);
+		gc->OnGlobalMouseMove(p);
 	}
 	if (last_win_mousefocused && focusLock) {
-		last_win_mousefocused->OnMouseOver(x, y);
+		last_win_mousefocused->OnMouseOver(p);
 		RefreshCursor(last_win_mousefocused->Cursor);
 		return;
 	}
@@ -196,39 +197,27 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			continue;
 		if (!win->Visible)
 			continue;
-		Region winFrame = (*m)->Frame();
-		if (( winFrame.x <= x ) && ( winFrame.y <= y )) {
-			//Maybe we are on the window, let's check
-			if (( winFrame.x + winFrame.w >= x ) &&
-				( winFrame.y + winFrame.h >= y )) {
-				//Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				Point p(win->ConvertPointFromScreen(Point(x, y)));
-				Control* ctrl = win->GetControlAtPoint( p, true );
-				//look for the low priority flagged controls (mostly static labels)
-				if (ctrl == NULL) {
-					ctrl = win->GetControlAtPoint( p, false );
+
+		if (win->Frame().PointInside(p)) {
+			if (win != last_win_over) {
+				// Remove tooltip if mouse moved to different control
+				core->DisplayTooltip( 0, 0, NULL );
+				if (last_win_over) {
+					last_win_over->OnMouseLeave(last_win_over->ConvertPointFromScreen(p));
 				}
-				if (win != last_win_over || ctrl != win->GetOver()) {
-					// Remove tooltip if mouse moved to different control
-					core->DisplayTooltip( 0, 0, NULL );
-					if (last_win_over) {
-						last_win_over->OnMouseLeave( x, y );
-					}
-					last_win_over = win;
-					win->OnMouseEnter( x, y, ctrl );
-				}
-				if (ctrl != NULL) {
-					win->OnMouseOver( x, y );
-				}
-				RefreshCursor(win->Cursor);
-				return;
+				last_win_over = win;
+				win->OnMouseEnter(win->ConvertPointFromScreen(p));
 			}
+
+			win->OnMouseOver(win->ConvertPointFromScreen(p));
+
+			if (last_win_mousefocused) {
+				RefreshCursor(last_win_mousefocused->Cursor);
+			}
+			return;
 		}
-		//stop going further
-		if (( *m )->Visible == WINDOW_FRONT)
-			break;
 	}
+
 	core->DisplayTooltip( 0, 0, NULL );
 }
 
@@ -253,13 +242,11 @@ bool EventMgr::ClickMatch(const Point& p, unsigned long thisTime)
 }
 
 /** BroadCast Mouse Move Event */
-void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short Mod)
+void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button, unsigned short Mod)
 {
 	Point p(x, y);
-	std::vector< int>::iterator t;
+
 	std::vector< Window*>::iterator m;
-	Control *ctrl;
 	unsigned long thisTime;
 
 	thisTime = GetTickCount();
@@ -272,53 +259,27 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 		dc_time = thisTime+dc_delay;
 	}
 	MButtons |= Button;
+
+	std::vector<int>::iterator t;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
 		m = windows.begin();
 		m += ( *t );
-		if (( *m ) == NULL)
-			continue;
-		if (!( *m )->Visible)
-			continue;
-		Region winFrame = (*m)->Frame();
-		if (( winFrame.x <= x ) && ( winFrame.y <= y )) {
-			//Maybe we are on the window, let's check
-			if (( winFrame.x + winFrame.w >= x ) &&
-				( winFrame.y + winFrame.h >= y )) {
-				//Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				Point p((*m)->ConvertPointFromScreen(Point(x, y)));
-				ctrl = ( *m )->GetControlAtPoint( p, true );
-				if (!ctrl) {
-					ctrl = ( *m )->GetControlAtPoint( p, false);
-				}
-				last_win_mousefocused = *m;
-				if (ctrl != NULL) {
-					last_win_mousefocused->SetMouseFocused( ctrl );
-					ctrl->OnMouseDown( x - last_win_mousefocused->Origin().x - ctrl->Origin().x, y - last_win_mousefocused->Origin().y - ctrl->Origin().y,
-									  Button, Mod );
-					if (!ctrl->WantsDragOperation()) {
-						focusLock = ctrl;
-					}
-					if (last_win_mousefocused) {
-						RefreshCursor(last_win_mousefocused->Cursor);
-					}
-					return;
-				}
-			}
-		}
-		if (( *m )->Visible == WINDOW_FRONT) //stop looking further
-			break;
-	}
-	
-	if ((Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) && last_win_mousefocused) {
-		ctrl = last_win_mousefocused->GetScrollControl();
-		if (ctrl) {
-			ctrl->OnMouseDown( x - last_win_mousefocused->Origin().x - ctrl->Origin().x, y - last_win_mousefocused->Origin().y - ctrl->Origin().y, Button, Mod );
-		}
-	}
+		Window* win = *m;
 
-	if (last_win_mousefocused) {
-		last_win_mousefocused->SetMouseFocused(NULL);
+		if (win == NULL)
+			continue;
+		if (!win->Visible)
+			continue;
+
+		if (win->Frame().PointInside(p)) {
+			last_win_mousefocused = win;
+			win->OnMouseDown(win->ConvertPointFromScreen(p), Button, Mod);
+			RefreshCursor(last_win_mousefocused->Cursor);
+		}
+
+		// FIXME: why isnt this checked above like visibility? Doesnt this result in possible multiple dispatch?
+		if (win->Visible == WINDOW_FRONT) //stop looking further
+			break;
 	}
 }
 
@@ -326,12 +287,13 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
+	if (last_win_mousefocused == NULL) return;
+
+	Point p = last_win_mousefocused->ConvertPointFromScreen(Point(x, y));
 	focusLock = NULL;
 	MButtons &= ~Button;
-	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
-	if (last_ctrl_mousefocused == NULL) return;
-	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->Origin().x - last_ctrl_mousefocused->Origin().y,
-		y - last_win_mousefocused->Origin().y - last_ctrl_mousefocused->Origin().y, Button, Mod );
+
+	last_win_mousefocused->OnMouseUp(p, Button, Mod);
 }
 
 /** BroadCast Mouse ScrollWheel Event */
@@ -347,7 +309,10 @@ void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 void EventMgr::MouseIdle(unsigned long /*time*/)
 {
 	if (last_win_over == NULL) return;
-	Control *ctrl = last_win_over->GetOver();
+
+	int x, y;
+	core->GetVideoDriver()->GetMousePos(x, y);
+	Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(Point(x, y)));
 	if (ctrl == NULL) return;
 	ctrl->DisplayTooltip();
 }
@@ -386,71 +351,25 @@ void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
 /** Special Key Press Event */
 void EventMgr::OnSpecialKeyPress(unsigned char Key)
 {
-	if (!last_win_focused) {
+	if (!last_win_focused)
 		return;
-	}
-	Control *ctrl = NULL;
 
 	// tab shows tooltips
-	if (Key == GEM_TAB) {
-		if (last_win_over != NULL) {
-			Control *ctrl = last_win_over->GetOver();
-			if (ctrl != NULL) {
-				ctrl->DisplayTooltip();
-			}
+	if (last_win_over != NULL && Key == GEM_TAB) {
+		int x, y;
+		core->GetVideoDriver()->GetMousePos(x, y);
+		Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(Point(x, y)));
+		if (ctrl != NULL) {
+			ctrl->DisplayTooltip();
+			return;
 		}
-	}
-	//the default control will get only GEM_RETURN
-	else if (Key == GEM_RETURN) {
-		ctrl = last_win_focused->GetDefaultControl(0);
-	}
-	//the default cancel control will get only GEM_ESCAPE
-	else if (Key == GEM_ESCAPE) {
-		ctrl = last_win_focused->GetDefaultControl(1);
-	} else if (Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
-		if (function_bar) {
-			ctrl = function_bar->GetFunctionControl(Key-GEM_FUNCTION1);
-		} else {
-			ctrl = last_win_focused->GetFunctionControl(Key-GEM_FUNCTION1);
-		}
+	} else if (function_bar && Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
+		Control *ctrl = function_bar->GetFunctionControl(Key - GEM_FUNCTION1);
+		ctrl->OnSpecialKeyPress(Key);
+		return;
 	}
 
-	//if there was no default button set, then the current focus will get it (except function keys)
-	if (!ctrl) {
-		if (Key<GEM_FUNCTION1 || Key > GEM_FUNCTION16) {
-			ctrl = last_win_focused->GetFocus();
-		}
-	}
-	//if one is under focus, use the default scroll focus
-	if (!ctrl) {
-		if (Key == GEM_UP || Key == GEM_DOWN) {
-			ctrl = last_win_focused->GetScrollControl();
-		}
-	}
-	if (ctrl) {
-		switch (ctrl->ControlType) {
-			//scrollbars will receive only mousewheel events
-			case IE_GUI_SCROLLBAR:
-				if (Key != GEM_UP && Key != GEM_DOWN) {
-					return;
-				}
-				break;
-			//buttons will receive only GEM_RETURN
-			case IE_GUI_BUTTON:
-				if (Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
-					//fake mouse button
-					ctrl->OnMouseDown(0,0,GEM_MB_ACTION,0);
-					ctrl->OnMouseUp(0,0,GEM_MB_ACTION,0);
-					return;
-				}
-				if (Key != GEM_RETURN && Key!=GEM_ESCAPE) {
-					return;
-				}
-				break;
-				// shouldnt be any harm in sending these events to any control
-		}
-		ctrl->OnSpecialKeyPress( Key );
-	}
+	last_win_focused->OnSpecialKeyPress(Key);
 }
 
 /** Trigger a fake MouseMove event with current coordinates (typically used to

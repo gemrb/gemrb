@@ -216,8 +216,7 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 }
 
 /** Mouse Button Down */
-void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
-							unsigned short Button, unsigned short /*Mod*/)
+void ScrollBar::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	//removing the double click flag, use a more sophisticated method
 	//if it is needed later
@@ -230,12 +229,12 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 		ScrollDown();
 		return;
 	}
-	if (y <= GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED) ) {
+	if (p.y <= GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED) ) {
 		State |= UP_PRESS;
 		ScrollUp();
 		return;
 	}
-	if (y >= frame.h - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)) {
+	if (p.y >= frame.h - GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)) {
 		State |= DOWN_PRESS;
 		ScrollDown();
 		return;
@@ -244,17 +243,16 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 	// this way we only need to click once to jump+scroll
 	State |= SLIDER_GRAB;
 	ieWord sliderPos = SliderYPos + GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
-	if (y >= sliderPos && y <= sliderPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
+	if (p.y >= sliderPos && p.y <= sliderPos + GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)) {
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
-		Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = y - sliderPos - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)/2;
+		Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = p.y - sliderPos - GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)/2;
 		return;
 	}
-	SetPosForY(y - (frame.h - SliderRange)/2);
+	SetPosForY(p.y - (frame.h - SliderRange)/2);
 }
 
 /** Mouse Button Up */
-void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-			unsigned short /*Button*/, unsigned short /*Mod*/)
+void ScrollBar::OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	State = 0;
@@ -275,10 +273,10 @@ void ScrollBar::OnMouseWheelScroll(short /*x*/, short y)
 }
 
 /** Mouse Over Event */
-void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
+void ScrollBar::OnMouseOver(const Point& p)
 {
 	if (State&SLIDER_GRAB) {
-		SetPosForY(y - (frame.h - SliderRange)/2 - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
+		SetPosForY(p.y - (frame.h - SliderRange)/2 - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
 	}
 }
 

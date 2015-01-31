@@ -162,15 +162,13 @@ public: //Events
 	/** Key Release Event */
 	bool OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
+	void OnMouseOver(const Point&);
 	/** Global Mouse Move Event */
-	void OnGlobalMouseMove(unsigned short x, unsigned short y);
+	void OnGlobalMouseMove(const Point&);
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
 	void OnMouseWheelScroll(short x, short y);
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);

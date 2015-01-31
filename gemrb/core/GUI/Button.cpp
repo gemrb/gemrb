@@ -395,15 +395,14 @@ bool Button::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short Mod)
+void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
 
 	if (core->GetDraggedItem () && !ButtonOnDragDrop) {
-		Control::OnMouseDown(x,y,Button,Mod);
+		View::OnMouseDown(p, Button, Mod);
 		return;
 	}
 
@@ -449,8 +448,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	}
 }
 /** Mouse Button Up */
-void Button::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short Mod)
+void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -481,7 +479,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	//in case of dragged/dropped portraits, allow the event to happen even
 	//when we are out of bound
 	if (dragtype!=2) {
-		if (( x >= frame.w ) || ( y >= frame.h )) {
+		if (( p.x >= frame.w ) || ( p.y >= frame.h )) {
 			return;
 		}
 	}
@@ -531,22 +529,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	}
 }
 
-void Button::OnMouseWheelScroll(short x, short y)
-{
-	ScrollBar* scrlbr = scrollbar;
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-	
-	if (scrlbr) {
-		scrlbr->OnMouseWheelScroll(x, y);
-	}
-}
-
-void Button::OnMouseOver(unsigned short x, unsigned short y)
+void Button::OnMouseOver(const Point& p)
 {
 	Owner->Cursor = IE_CURSOR_NORMAL;
 	if (State == IE_GUI_BUTTON_DISABLED) {
@@ -587,7 +570,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
-void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
+void Button::OnMouseEnter(const Point&)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -600,7 +583,7 @@ void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 	RunEventHandler( MouseEnterButton );
 }
 
-void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+void Button::OnMouseLeave(const Point&)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;

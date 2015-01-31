@@ -122,26 +122,6 @@ public: //Events
 	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
 	/** Run specified handler, it may return error code */
 	int RunEventHandler(ControlEventHandler handler);
-	/** Key Press Event */
-	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
-	/** Key Release Event */
-	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
-	/** Mouse Enter Event */
-	virtual void OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/) {};
-	/** Mouse Leave Event */
-	virtual void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/) {};
-	/** Mouse Over Event */
-	virtual void OnMouseOver(unsigned short /*x*/, unsigned short /*y*/) {};
-	/** Mouse Button Down */
-	virtual void OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
-							 unsigned short /*Button*/, unsigned short /*Mod*/);
-	/** Mouse Button Up */
-	virtual void OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-						   unsigned short /*Button*/, unsigned short /*Mod*/);
-	/** Mouse wheel scroll */
-	virtual void OnMouseWheelScroll( short x, short y);
-	/** Special Key Press */
-	virtual bool OnSpecialKeyPress(unsigned char Key);
 
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */

@@ -30,6 +30,7 @@ View::View(const Region& frame)
 {
 	scrollbar = NULL;
 	background = NULL;
+	focusView = NULL;
 	superView = NULL;
 
 	dirty = true;
@@ -267,4 +268,69 @@ void View::SetScrollBar(ScrollBar* sb)
 	}
 }
 
+bool View::TrySetFocus(View* target)
+{
+	if (target && !target->LockFocus()) {
+		// target wont accept focus so dont bother unfocusing current
+		return false;
+	}
+	if (focusView && !focusView->UnlockFocus()) {
+		// current focus unwilling to reliquish
+		return false;
+	}
+	focusView = target;
+	return true;
+}
+
+void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
+{
+	View* target = SubviewAt(p);
+	if (target && TrySetFocus(target)) {
+		target->OnMouseDown(target->ConvertPointFromSuper(p), button, mod);
+		return;
+	}
+
+	if (scrollbar && (button == GEM_MB_SCRLUP || button == GEM_MB_SCRLDOWN)) {
+		// forward to scrollbar
+		scrollbar->OnMouseDown(target->ConvertPointFromSuper(p), button, mod);
+	}
+}
+
+void View::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
+{
+	View* target = focusView;
+	if (!target && scrollbar && (button == GEM_MB_SCRLUP || button == GEM_MB_SCRLDOWN)) {
+		// forward to scrollbar
+		target = scrollbar;
+	}
+	if (target) {
+		focusView->OnMouseUp(target->ConvertPointFromSuper(p), button, mod);
+	}
+}
+
+void View::OnMouseWheelScroll(short x, short y)
+{
+	if (focusView) {
+		focusView->OnMouseWheelScroll(x, y);
+		return;
+	}
+
+	if (scrollbar) {
+		scrollbar->OnMouseWheelScroll( x, y );
+	}
+}
+
+bool View::OnSpecialKeyPress(unsigned char key)
+{
+	bool handled = false;
+	if (focusView) {
+		handled = focusView->OnSpecialKeyPress(key);
+	}
+	
+	if (!handled && scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
+		return scrollbar->OnSpecialKeyPress(key);
+	}
+	return handled;
+}
+	
 }

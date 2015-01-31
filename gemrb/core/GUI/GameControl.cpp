@@ -1229,7 +1229,7 @@ int GameControl::GetDefaultCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(unsigned short x, unsigned short y)
+void GameControl::OnMouseOver(const Point& mp)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
@@ -1237,9 +1237,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	Video *video = core->GetVideoDriver();
 
-	lastMouseX = x;
-	lastMouseY = y;
-	Point p( x,y );
+	lastMouseX = mp.x;
+	lastMouseY = mp.y;
+	Point p = mp;
 	video->ConvertToGame( p.x, p.y );
 	if (MouseIsDown && ( !DrawSelectionRect )) {
 		if (( abs( p.x - ClickPoint.x ) > 5 ) || ( abs( p.y - ClickPoint.y ) > 5 )) {
@@ -1415,7 +1415,7 @@ end_function:
 // iOS will never have a mouse.
 void GameControl::OnGlobalMouseMove(unsigned short /*x*/, unsigned short /*y*/) {}
 #else
-void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
+void GameControl::OnGlobalMouseMove(const Point& p)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
@@ -1428,18 +1428,18 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 	int mousescrollspd = core->GetMouseScrollSpeed();
 
 #define SCROLL_AREA_WIDTH 5
-	if (x <= SCROLL_AREA_WIDTH)
+	if (p.x <= SCROLL_AREA_WIDTH)
 		moveX = -mousescrollspd;
 	else {
-		if (x >= ( core->Width - SCROLL_AREA_WIDTH ))
+		if (p.x >= ( core->Width - SCROLL_AREA_WIDTH ))
 			moveX = mousescrollspd;
 		else
 			moveX = 0;
 	}
-	if (y <= SCROLL_AREA_WIDTH)
+	if (p.y <= SCROLL_AREA_WIDTH)
 		moveY = -mousescrollspd;
 	else {
-		if (y >= ( core->Height - 5 ))
+		if (p.y >= ( core->Height - 5 ))
 			moveY = mousescrollspd;
 		else
 			moveY = 0;
@@ -1810,14 +1810,12 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	return false;
 }
 /** Mouse Button Down */
-void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short Mod)
+void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
 
-	ClickPoint.x = x;
-	ClickPoint.y = y;
+	ClickPoint = p;
 	core->GetVideoDriver()->ConvertToGame( ClickPoint.x, ClickPoint.y );
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
@@ -1830,7 +1828,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		break;
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
-			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, Point (x, y));
+			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
 		} else {
 			FormationRotation = true;
 		}
@@ -1862,8 +1860,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 }
 
 /** Mouse Button Up */
-void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned short /*Mod*/)
 {
 	unsigned int i;
 	char Tmp[256];
@@ -1875,7 +1872,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	core->CloseCurrentContainer();
 
 	MouseIsDown = false;
-	Point p(x,y);
+	Point p = mp;
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
 	if (!game) return;
@@ -2010,7 +2007,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			}
 			CreateMovement(actor, move);
 		}
-		if (DoubleClick) Center(x,y);
+		if (DoubleClick) Center(mp.x, mp.y);
 
 		//p is a searchmap travel region
 		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {

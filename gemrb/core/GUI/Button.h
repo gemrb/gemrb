@@ -161,19 +161,16 @@ public:
 public: // Public Events
 	bool WantsDragOperation();
 	/** Mouse Enter */
-	void OnMouseEnter(unsigned short x, unsigned short y);
+	void OnMouseEnter(const Point&);
 	/** Mouse Leave */
-	void OnMouseLeave(unsigned short x, unsigned short y);
+	void OnMouseLeave(const Point&);
 	/** Mouse Over */
-	void OnMouseOver(unsigned short x, unsigned short y);
+	void OnMouseOver(const Point&);
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-				   unsigned short Mod);  
-	/** Mouse wheel scroll */
-	void OnMouseWheelScroll(short x, short y);
+	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
+
 	/** A special key has been pressed */
 	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */

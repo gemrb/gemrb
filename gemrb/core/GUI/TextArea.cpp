@@ -478,30 +478,6 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
-void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
-						   unsigned short /*Mod*/)
-{
-
-	ScrollBar* scrlbr = scrollbar;
-
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-	if (scrlbr) {
-		switch(Button) {
-			case GEM_MB_SCRLUP:
-				scrlbr->ScrollUp();
-				break;
-			case GEM_MB_SCRLDOWN:
-				scrlbr->ScrollDown();
-				break;
-		}
-	}
-}
-
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 						 unsigned short Button, unsigned short /*Mod*/)

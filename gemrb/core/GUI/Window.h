@@ -68,6 +68,9 @@ public:
 	~Window();
 	/** Set window frame used to fill screen on higher resolutions*/
 	void SetFrame();
+
+	bool OnSpecialKeyPress(unsigned char key);
+
 	/** Returns the Control associated with the function key index, valid indices are 0-11 */
 	Control* GetFunctionControl(int x);
 	/** Returns the Control at X,Y Coordinates */
@@ -83,14 +86,9 @@ public:
 	Control* GetDefaultControl(unsigned int ctrltype) const;
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
-	/** Sets 'ctrl' as currently under mouse */
-	void SetOver(Control* ctrl);
-	/** Returns last control under mouse */
-	Control* GetOver() const;
+
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
-	/** Sets 'ctrl' as mouse event Focused */
-	void SetMouseFocused(Control* ctrl);
 	/** Returns last focused control */
 	Control* GetFocus() const;
 	/** Returns last mouse event focused control */
@@ -99,12 +97,7 @@ public:
 	void Invalidate();
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
-	/** Mouse entered a new control's rectangle */
-	void OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl);
-	/** Mouse left the current control */
-	void OnMouseLeave(unsigned short x, unsigned short y);
-	/** Mouse is over the current control */
-	void OnMouseOver(unsigned short x, unsigned short y);
+
 public: //Public attributes
 	/** WinPack */
 	char WindowPack[10];
@@ -121,14 +114,6 @@ public: //Public attributes
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;
-	/** Last Control returned by GetControl */
-	Control* lastC;
-	/** Last Focused Control */
-	Control* lastFocus;
-	/** Last mouse event Focused Control */
-	Control* lastMouseFocus;
-	/** Last Control under mouse */
-	Control* lastOver;
 
 public:
 	void release(void);
