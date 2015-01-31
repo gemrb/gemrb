@@ -2335,7 +2335,8 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	Control* ctrl = win->GetControl(ControlID);
+
+	Control* ctrl = win->GetControlById(ControlID);
 	if (ctrl) {
 		delete win->RemoveSubview(ctrl);
 	}
