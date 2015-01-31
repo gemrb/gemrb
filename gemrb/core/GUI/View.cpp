@@ -282,6 +282,23 @@ bool View::TrySetFocus(View* target)
 	return true;
 }
 
+void View::OnMouseOver(const Point& p)
+{
+	if (focusView) {
+		if (focusView->Frame().PointInside(p)) {
+			focusView->OnMouseOver(focusView->ConvertPointFromSuper(p));
+			return;
+		} else {
+			focusView->OnMouseLeave(focusView->ConvertPointFromSuper(p));
+			// no return. can also be an OnMouseEnter event for another control
+		}
+	}
+	View* target = SubviewAt(p);
+	if (target && target->Frame().PointInside(p)) {
+		target->OnMouseEnter(target->ConvertPointFromSuper(p));
+	}
+}
+
 void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
 	View* target = SubviewAt(p);

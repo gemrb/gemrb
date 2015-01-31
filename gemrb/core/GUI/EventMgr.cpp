@@ -199,16 +199,6 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			continue;
 
 		if (win->Frame().PointInside(p)) {
-			if (win != last_win_over) {
-				// Remove tooltip if mouse moved to different control
-				core->DisplayTooltip( 0, 0, NULL );
-				if (last_win_over) {
-					last_win_over->OnMouseLeave(last_win_over->ConvertPointFromScreen(p));
-				}
-				last_win_over = win;
-				win->OnMouseEnter(win->ConvertPointFromScreen(p));
-			}
-
 			win->OnMouseOver(win->ConvertPointFromScreen(p));
 
 			if (last_win_mousefocused) {

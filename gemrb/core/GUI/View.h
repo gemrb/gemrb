@@ -100,7 +100,7 @@ public:
 	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual void OnMouseEnter(const Point&) {};
 	virtual void OnMouseLeave(const Point&) {};
-	virtual void OnMouseOver(const Point&) {};
+	virtual void OnMouseOver(const Point&);
 	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseWheelScroll(short x, short y);
