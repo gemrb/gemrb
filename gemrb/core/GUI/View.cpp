@@ -309,7 +309,7 @@ void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod
 
 	if (scrollbar && (button == GEM_MB_SCRLUP || button == GEM_MB_SCRLDOWN)) {
 		// forward to scrollbar
-		scrollbar->OnMouseDown(target->ConvertPointFromSuper(p), button, mod);
+		scrollbar->OnMouseDown(scrollbar->ConvertPointFromSuper(p), button, mod);
 	}
 }
 
