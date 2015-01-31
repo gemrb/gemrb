@@ -183,6 +183,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	}
 
 	front->superView = this;
+	front->MarkDirty(); // must redraw the control now
 	SubviewAdded(front);
 	// FIXME: we probably shouldnt allow things in front of the scrollbar
 }
