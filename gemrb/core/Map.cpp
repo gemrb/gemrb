@@ -2309,7 +2309,7 @@ void Map::dump(bool show_actors) const
 		i = actors.size();
 		while (i--) {
 			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
-				buffer.appendFormatted("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
+				buffer.appendFormatted("Actor: %s (%d) at %d.%d\n", actors[i]->GetName(1), actors[i]->GetGlobalID(), actors[i]->Pos.x, actors[i]->Pos.y);
 			}
 		}
 	}
