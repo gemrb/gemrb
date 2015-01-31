@@ -50,7 +50,6 @@ void GlobalTimer::Init()
 	fadeFromCounter = 0;
 	fadeFromMax = 0;
 	fadeToMax = 0;
-	waitCounter = 0;
 	shakeCounter = 0;
 	startTime = 0; //forcing an update
 	speed = 0;
@@ -262,11 +261,6 @@ void GlobalTimer::SetFadeFromColor(unsigned long Count)
 	}
 	fadeFromCounter = 0;
 	fadeFromMax = Count;
-}
-
-void GlobalTimer::SetWait(unsigned long Count)
-{
-	waitCounter = Count;
 }
 
 void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
