@@ -5818,14 +5818,25 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 	}
 }
 
-//this is just a stub function for now, attackstyle could be melee/ranged
 //even spells got this attack style
 int Actor::GetAttackStyle() const
 {
 	WeaponInfo wi;
-	//Non NULL if the equipped slot is a projectile or a throwing weapon
-	//TODO some weapons have both melee and ranged capability
-	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED;
+	// Some weapons have both melee and ranged capability, eg. bg2's rifthorne (ax1h09)
+	// so we check the equipped header's attack type: 2-projectile and 4-launcher
+	// It is more complicated than it seems because the equipped header is the one of the projectile for launchers
+	ITMExtHeader *rangedheader = GetRangedWeapon(wi);
+	if (!PCStats) {
+		// fall back to simpler logic that works most of the time
+		//Non NULL if the equipped slot is a projectile or a throwing weapon
+		if (rangedheader) return WEAPON_RANGED;
+		return WEAPON_MELEE;
+	}
+
+	int qh = PCStats->GetHeaderForSlot(inventory.GetEquippedSlot());
+	ITMExtHeader *eh = inventory.GetEquippedExtHeader(qh);
+	if (!eh) return WEAPON_MELEE; // default to melee
+	if (eh->AttackType && eh->AttackType%2 == 0) return WEAPON_RANGED;
 	return WEAPON_MELEE;
 }
 
