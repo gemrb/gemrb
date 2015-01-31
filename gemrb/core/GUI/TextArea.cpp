@@ -454,16 +454,16 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 }
 
 /** Mouse Over Event */
-void TextArea::OnMouseOver(unsigned short x, unsigned short y)
+void TextArea::OnMouseOver(const Point& p)
 {
 	if (!selectOptions)
 		return;
 
 	TextContainer* span = NULL;
 	if (selectOptions) {
-		Point p = Point(x, y);
-		p.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
-		p.y -= textContainer->ContentFrame().h - TextYPos;
+		Point subp = p;
+		subp.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
+		subp.y -= textContainer->ContentFrame().h - TextYPos;
 		// container only has text, so...
 		span = dynamic_cast<TextContainer*>(selectOptions->ContentAtPoint(p));
 	}
@@ -479,8 +479,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-						 unsigned short Button, unsigned short /*Mod*/)
+void TextArea::OnMouseUp(const Point&, unsigned short Button, unsigned short /*Mod*/)
 {
 	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
 		return;
@@ -498,7 +497,7 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	}
 }
 
-void TextArea::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+void TextArea::OnMouseLeave(const Point&)
 {
 	ClearHover();
 }

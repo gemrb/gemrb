@@ -157,12 +157,10 @@ public: //Events
 	/** Mousewheel scroll */
 	void OnMouseWheelScroll(short x, short y);
 	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
+	void OnMouseOver(const Point&);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y,
-				   unsigned short Button, unsigned short Mod);
-
-	void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/);
+	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
+	void OnMouseLeave(const Point&);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetFocus(bool focus);
