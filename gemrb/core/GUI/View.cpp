@@ -59,6 +59,10 @@ void View::SetBackground(Sprite2D* bg)
 void View::MarkDirty()
 {
 	dirty = true;
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		(*it)->MarkDirty();
+	}
 }
 
 bool View::NeedsDraw() const
