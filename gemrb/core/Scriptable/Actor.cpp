@@ -1302,7 +1302,7 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
 	ieDword mask = 1;
-	for (int i=0;i<32;i++) {
+	for (int i=0; i<OVERLAY_COUNT; i++) {
 		if (changed&mask) {
 			if (newValue&mask) {
 				handle_overlay(actor, i);
@@ -8075,7 +8075,7 @@ ScriptedAnimation *Actor::FindOverlay(int index) const
 {
 	const vvcVector *vvcCells;
 
-	if (index>31) return NULL;
+	if (index >= OVERLAY_COUNT) return NULL;
 
 	if (hc_locations&(1<<index)) vvcCells=&vvcShields;
 	else vvcCells=&vvcOverlays;
@@ -8850,7 +8850,7 @@ void Actor::SetGradient(ieDword gradient)
 //sets one bit of the sanctuary stat (used for overlays)
 void Actor::SetOverlay(unsigned int overlay)
 {
-	if (overlay>=32) return;
+	if (overlay >= OVERLAY_COUNT) return;
 	// need to run the pcf, so the vvcs get loaded
 	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 1);
 }
