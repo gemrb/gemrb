@@ -3487,18 +3487,11 @@ void GameScript::GlobalShRGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 {
-	Actor *except = NULL;
-	if (Sender->Type==ST_ACTOR) {
-		except = (Actor *) Sender;
-	}
 	Map *map = Sender->GetCurrentArea();
 	int i = map->GetActorCount(true);
 	while(i--) {
 		Actor* act = map->GetActor(i,true);
-		if (act && act!=except) {
-			if (!act->ValidTarget(GA_NO_DEAD) ) {
-				continue;
-			}
+		if (act && act != Sender && act->ValidTarget(GA_NO_DEAD)) {
 			act->Stop();
 			act->SetModal(MS_NONE);
 		}
