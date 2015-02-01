@@ -8858,7 +8858,7 @@ void Actor::SetOverlay(unsigned int overlay)
 //returns true if spell state is already set or illegal
 bool Actor::SetSpellState(unsigned int spellstate)
 {
-	if (spellstate>=192) return true;
+	if (spellstate >= SS_MAX) return true;
 	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
@@ -8869,7 +8869,7 @@ bool Actor::SetSpellState(unsigned int spellstate)
 //returns true if spell state is already set
 bool Actor::HasSpellState(unsigned int spellstate) const
 {
-	if (spellstate>=192) return false;
+	if (spellstate >= SS_MAX) return false;
 	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
