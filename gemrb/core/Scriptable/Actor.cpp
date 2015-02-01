@@ -1306,8 +1306,8 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 		if (changed&mask) {
 			if (newValue&mask) {
 				handle_overlay(actor, i);
-			} else {
-				actor->RemoveVVCell(hc_overlays[i], true);
+//			} else if (oldValue&mask) {
+//				actor->RemoveVVCell(hc_overlays[i], true);
 			}
 		}
 		mask<<=1;
