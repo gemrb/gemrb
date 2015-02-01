@@ -6884,7 +6884,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
 				} else {
-					resisted = (signed)GetSafeStat(it->second.resist_stat);
+					resisted += (signed)GetSafeStat(it->second.resist_stat);
 				}
 				damage -= resisted;
 			} else {
@@ -6894,7 +6894,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 					resistance = 0;
 					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value (%d).", resistance);
 				}
-				resisted = (int) (damage * resistance/100.0);
+				resisted += (int) (damage * resistance/100.0);
 				damage -= resisted;
 			}
 			Log(COMBAT, "ModifyDamage", "Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
