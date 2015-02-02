@@ -1171,7 +1171,7 @@ int Game::GetXPFromCR(int cr)
 	// compute the party average directly
 	int level = GetPartyLevel(true) / size;
 	if (cr >= MAX_CRLEVEL) {
-		cr = MAX_CRLEVEL+1;
+		cr = MAX_CRLEVEL;
 	} else if (cr-1 < 0) {
 		cr = 1;
 	}
