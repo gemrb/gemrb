@@ -41,6 +41,8 @@
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 #include <iterator>
+#include <vector>
+#include <algorithm>
 
 namespace GemRB {
 	
@@ -1754,7 +1756,7 @@ void Game::CastOnRest()
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
 	int specialCount = core->GetSpecialSpellsCount();
-	std::vector<Injuree> the_injured;
+	std::vector<Injuree> wholeparty;
 	if (tmp && specialCount != -1) {
 		int ps = GetPartySize(true);
 		int ps2 = ps;
@@ -1762,9 +1764,9 @@ void Game::CastOnRest()
 			Actor *tar = FindPC(idx);
 			ieWord hpneeded=tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
 			if (tar && hpneeded > 0) {
-				the_injured.push_back(Injuree(hpneeded,tar));
+				wholeparty.push_back(Injuree(hpneeded,tar));
 			} else {
-				the_injured.push_back(Injuree(0,tar));
+				wholeparty.push_back(Injuree(0,tar));
 			}
 			
 		}
@@ -1776,7 +1778,7 @@ void Game::CastOnRest()
 		//       cast the most potent healing spell on the most injured member
 		SpecialSpellType *special_spells = core->GetSpecialSpells();
 		if (specialCount != -1 ) {
-			std::sort(the_injured.begin(),the_injured.end());
+			std::sort(wholeparty.begin(),wholeparty.end());
 			specialCount = core->GetSpecialSpellsCount();
 			std::multimap<ieWord,HealingResource> healingspells;
 			while (specialCount--) {
@@ -1786,7 +1788,7 @@ void Game::CastOnRest()
 						Actor *tar = GetPC(ps, true);
 						while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
 							tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
-							for (std::vector<Injuree>::iterator injuree=the_injured.begin();injuree != the_injured.end() ; ++injuree) {
+							for (std::vector<Injuree>::iterator injuree=wholeparty.begin();injuree != wholeparty.end() ; ++injuree) {
 									injuree->hpneeded-=special_spells[specialCount].amount;
 							}
 						}
@@ -1808,14 +1810,14 @@ void Game::CastOnRest()
 					ps=ps2;
 				}
 			}
-			std::sort(the_injured.begin(),the_injured.end());
+			std::sort(wholeparty.begin(),wholeparty.end());
 			// Heal who's still injured
-			while (!healingspells.empty() && the_injured.back().hpneeded > 0) {
+			while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
 				std::multimap<ieWord,HealingResource>::iterator spell=healingspells.end();
 				spell--;
-				spell->second.caster->DirectlyCastSpell(the_injured.back().character, spell->second.resref, 0, 1, true);
-				the_injured.back().hpneeded-=spell->first;
-				std::sort(the_injured.begin(),the_injured.end());
+				spell->second.caster->DirectlyCastSpell(wholeparty.back().character, spell->second.resref, 0, 1, true);
+				wholeparty.back().hpneeded-=spell->first;
+				std::sort(wholeparty.begin(),wholeparty.end());
 				spell->second.amount--;
 				if (spell->second.amount == 0) {
 					healingspells.erase(spell);
