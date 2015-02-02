@@ -339,7 +339,7 @@ def DisplayGeneral (pc):
 
 	#effective character level
 	if adj:
-		RecordsTextArea.Append (DelimitedText (40311, levelsum+adj))
+		RecordsTextArea.Append (DelimitedText (40311, levelsum+adj, 0))
 
 	#favoured class
 	#get the subrace value
