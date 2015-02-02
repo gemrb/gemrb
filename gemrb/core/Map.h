@@ -165,6 +165,8 @@ public:
 	: strref(mn.strref), color(mn.color), Pos(mn.Pos) {
 		if (mn.text) {
 			text = new String(*mn.text);
+		} else {
+			text = NULL;
 		}
 	}
 	MapNote(String* text, ieWord color)
