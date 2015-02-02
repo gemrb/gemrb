@@ -53,11 +53,10 @@ public:
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
-protected:
 	/** Draws the Console on the Output Display */
 	void DrawInternal(Region& drawFrame);
 	// console always needs to redraw
-	bool NeedsDraw() { return true; };
+	bool NeedsDraw() const { return true; };
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;

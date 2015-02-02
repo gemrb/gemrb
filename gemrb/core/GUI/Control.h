@@ -72,8 +72,6 @@ protected:
 	/** Focused Control */
 	bool hasFocus;
 	virtual void DrawInternal(Region& drawFrame)=0;
-	virtual bool NeedsDraw();
-	virtual bool HasBackground() { return true; }
 public:
 	Control(const Region& frame);
 	virtual ~Control();
@@ -81,7 +79,9 @@ public:
 	void SetControlFrame(const Region&);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
-	void MarkDirty();
+	void MarkDirty() { Changed = true; }
+	virtual bool NeedsDraw() const { return Changed || animation; }
+	virtual bool IsOpaque() const { return true; }
 	/** Sets the Text of the current control */
 	void SetText(const String*);
 	virtual void SetText(const String&) {};

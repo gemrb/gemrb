@@ -161,7 +161,7 @@ void ScrollBar::ScrollDown()
 	SetPos( Pos + 1 );
 }
 
-bool ScrollBar::HasBackground()
+bool ScrollBar::IsOpaque() const
 {
 	/*
 	 IWD2 scrollbars have a transparent trough and we dont have a good way to know about such things.

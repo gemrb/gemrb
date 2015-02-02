@@ -60,6 +60,9 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Window {
+private:
+	void DrawBackground(const Region* rgn) const;
+
 public: 
 	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
 		unsigned short Width, unsigned short Height);
@@ -103,8 +106,6 @@ public:
 	Control* GetMouseFocus() const;
 	/** Redraw all the Window */
 	void Invalidate();
-	/** Redraw enough to update the specified Control */
-	void InvalidateForControl(Control *ctrl);
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
 	/** Links a scrollbar to a text area */
@@ -149,8 +150,6 @@ private: // Private attributes
 	Control* lastMouseFocus;
 	/** Last Control under mouse */
 	Control* lastOver;
-	/** Regions which need to be redrawn */
-	std::vector< Region> clip_regions;
 
 public:
 	void release(void);

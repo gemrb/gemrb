@@ -227,7 +227,9 @@ def DCMainDonePress ():
 				# move it to a free inventory slot by mimicking dragging
 				Item = GemRB.GetItem (CREItem["ItemResRef"])
 				GemRB.DragItem (pc, slot, Item["ItemIcon"])
-				GemRB.DropDraggedItem (pc, -3)
+				if not GemRB.DropDraggedItem (pc, -3): # ASI_FAILED
+					# inventory was probably too full, drop to ground
+					GemRB.DropDraggedItem (pc, -2)
 
 	# close our window
 	if DCMainWindow:
@@ -376,6 +378,7 @@ def DCClassDonePress ():
 	# unload our class selection window
 	if DCClassWindow:
 		DCClassWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# enable the skills button and disable the class selection button
 	DCMainClassButton.SetState (IE_GUI_BUTTON_DISABLED)

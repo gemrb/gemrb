@@ -154,12 +154,6 @@ void Button::CloseUpColor()
 	starttime = newtime + 40;
 }
 
-bool Button::HasBackground()
-{
-	if (Flags&IE_GUI_BUTTON_PICTURE && !Picture) return false;
-	return Control::HasBackground();
-}
-
 /** Draws the Control on the Output Display */
 void Button::DrawInternal(Region& rgn)
 {
@@ -246,6 +240,7 @@ void Button::DrawInternal(Region& rgn)
 
 			// do NOT uncomment this, you can't change Changed or invalidate things from
 			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
+			// ^ We can now... should this be uncommented then?
 			//CloseUpColor();
 		}
 		else {

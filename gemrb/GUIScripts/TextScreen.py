@@ -104,7 +104,6 @@ def StartTextScreen ():
 	TextScreen.SetFrame ()
 
 	TextArea = TextScreen.GetControl (2)
-	TextArea.SetFlags (IE_GUI_TEXTAREA_SMOOTHSCROLL)
 
 	if GameCheck.IsBG1():
 		#these suckers couldn't use a fix row
@@ -165,8 +164,6 @@ def EndTextScreen ():
 def ReplayTextScreen ():
 	global TextArea, TableName, Row
 
-	TextArea.Rewind ()
-
 	Table = GemRB.LoadTable (TableName)
 	Count = Table.GetColumnCount (Row)
 
@@ -175,9 +172,11 @@ def ReplayTextScreen ():
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		Count = 2
 
+	text = ""
 	for i in range(1, Count):
-		TextArea.Append ("\n")
 		# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
-		TextArea.Append (Table.GetValue (Row, i), 14)
+		text += "\n" + GemRB.GetString(Table.GetValue (Row, i), 14)
+		
+	TextArea.ChapterText (text)
 
 	return

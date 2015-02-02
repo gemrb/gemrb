@@ -1022,7 +1022,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		if (!af) {
 			if (part < actorPartCount) {
 				Log(ERROR, "CharAnimations", "Couldn't create animationfactory: %s (%04x)",
-						NewResRef, GetAnimationID());;
+						NewResRef, GetAnimationID());
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;

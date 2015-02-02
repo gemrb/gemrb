@@ -142,7 +142,7 @@ class GLabel(GControl):
 class GTextArea(GControl):
   __metaclass__ = metaControl
   methods = {
-    'Rewind': _GemRB.TextArea_Rewind,
+    'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
     'SetFlags': _GemRB.Control_TextArea_SetFlags,

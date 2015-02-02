@@ -98,7 +98,7 @@ void Window::DrawWindow()
 	Video* video = core->GetVideoDriver();
 	Region clip( XPos, YPos, Width, Height );
 	//Frame && Changed
-	if ( (Flags & (WF_FRAME|WF_CHANGED) )== (WF_FRAME|WF_CHANGED) ) {
+	if ( (Flags & (WF_FRAME|WF_CHANGED) ) == (WF_FRAME|WF_CHANGED) ) {
 		Region screen( 0, 0, core->Width, core->Height );
 		video->SetScreenClip( NULL );
 		//removed this?
@@ -111,27 +111,31 @@ void Window::DrawWindow()
 			video->BlitSprite( core->WindowFrames[2], (core->Width - core->WindowFrames[2]->Width) / 2, 0, true );
 		if (core->WindowFrames[3])
 			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
-	} else if (clip_regions.size()) {
-		// clip drawing (we only do Background right now) for InvalidateForControl
-		for (unsigned int i = 0; i < clip_regions.size(); i++) {
-			Region fromClip = clip_regions[i];
-			Region toClip = fromClip;
-			toClip.x += XPos;
-			toClip.y += YPos;
-			if (BackGround) {
-				video->BlitSprite( BackGround, fromClip, toClip);
-			}
-		}
 	}
-	clip_regions.clear();
+
 	video->SetScreenClip( &clip );
 	//Float || Changed
+	bool bgRefreshed = false;
 	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
-		video->BlitSprite( BackGround, XPos, YPos, true );
+		DrawBackground(NULL);
+		bgRefreshed = true;
 	}
+
 	std::vector< Control*>::iterator m;
 	for (m = Controls.begin(); m != Controls.end(); ++m) {
-		( *m )->Draw( XPos, YPos );
+		Control* c = *m;
+		// FIXME: drawing BG in the same loop as controls can produce incorrect results with overlapping controls. the only case I know of this occuring it is ok due to no BG drawing
+		// furthermore, overlapping controls are still a problem when NeedsDraw() returns false for the top control, but true for the bottom (see the level up icon on char portraits)
+		// we will fix both issues later by refactoring with the concept of views and subviews
+		if (BackGround && !bgRefreshed && !c->IsOpaque() && c->NeedsDraw()) {
+			const Region& fromClip = c->ControlFrame();
+			DrawBackground(&fromClip);
+		}
+		if (Flags & (WF_FLOAT)) {
+			// FIXME: this is a total hack. Required for anything drawing over GameControl (nothing really at all to do with floating)
+			c->MarkDirty();
+		}
+		c->Draw( XPos, YPos );
 	}
 	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
 		Color black = { 0, 0, 0, 128 };
@@ -139,6 +143,19 @@ void Window::DrawWindow()
 	}
 	video->SetScreenClip( NULL );
 	Flags &= ~WF_CHANGED;
+}
+
+void Window::DrawBackground(const Region* rgn) const
+{
+	Video* video = core->GetVideoDriver();
+	if (rgn) {
+		Region toClip = *rgn;
+		toClip.x += XPos;
+		toClip.y += YPos;
+		video->BlitSprite( BackGround, *rgn, toClip);
+	} else {
+		video->BlitSprite( BackGround, XPos, YPos, true );
+	}
 }
 
 /** Set window frame used to fill screen on higher resolutions*/
@@ -266,7 +283,9 @@ Control* Window::RemoveControl(unsigned short i)
 {
 	if (i < Controls.size() ) {
 		Control *ctrl = Controls[i];
-		InvalidateForControl(ctrl);
+		const Region& frame = ctrl->ControlFrame();
+		DrawBackground(&frame); // paint over the spot the control occupied
+
 		if (ctrl==lastC) {
 			lastC=NULL;
 		}
@@ -346,29 +365,6 @@ void Window::Invalidate()
 		}
 	}
 	Flags |= WF_CHANGED;
-}
-
-/** Redraw enough to update the specified Control */
-void Window::InvalidateForControl(Control *ctrl) {
-	// TODO: for this to be general-purpose, we should mark anything inside this
-	// region with Changed, and also do mass Invalidate() if we overlap with
-	// another window, but for now this just clips the *background*, see DrawWindow()
-	Region ctrlFrame = ctrl->ControlFrame();
-	std::vector<Region>::iterator it;
-	for (it = clip_regions.begin(); it != clip_regions.end(); ++it) {
-		Region& r = *it;
-		if (r.InsideRegion(ctrlFrame)) {
-			*it = ctrlFrame;
-			break;
-		} else if (ctrlFrame.InsideRegion(r)) {
-			// already have a rect larger
-			break;
-		}
-	}
-	if (it == clip_regions.end()) {
-		// made it to the end of the list, so we didnt find a match.
-		clip_regions.push_back(ctrlFrame);
-	}
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)

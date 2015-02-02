@@ -272,6 +272,7 @@ public:
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;
 	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const;
 	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource) const;
+	Effect *HasEffectWithPower(EffectRef &effect_reference, ieDword power) const;
 	Effect *HasSource(const ieResRef source) const;
 	Effect *HasEffectWithSource(EffectRef &effect_reference, const ieResRef source) const;
 	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const;
@@ -318,6 +319,7 @@ private:
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
 	Effect *HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const;
+	Effect *HasOpcodeWithPower(ieDword opcode, ieDword power) const;
 	Effect *HasOpcodeWithSource(ieDword opcode, const ieResRef source) const;
 	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const;
 	int DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const;

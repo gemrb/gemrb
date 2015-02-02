@@ -68,7 +68,6 @@ void TextArea::Init()
 	ControlType = IE_GUI_TEXTAREA;
 	rows = 0;
 	TextYPos = 0;
-	ticks = starttime = 0;
 	strncpy(VarName, "Selected", sizeof(VarName));
 
 	ResetEventHandler( TextAreaOnChange );
@@ -91,15 +90,9 @@ TextArea::~TextArea(void)
 	}
 }
 
-bool TextArea::NeedsDraw()
+bool TextArea::NeedsDraw() const
 {
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		if (TextYPos > textContainer->ContentFrame().h) {
-			 // the text is offscreen
-			return false;
-		}
-		// must mark dirty to invalidate the window BG
-		MarkDirty();
+	if (animationEnd) {
 		return true;
 	}
 
@@ -108,21 +101,35 @@ bool TextArea::NeedsDraw()
 
 void TextArea::DrawInternal(Region& clip)
 {
+	if (animationEnd) {
+		if (TextYPos > textContainer->ContentFrame().h) {
+			// the text is offscreen, this happens with chapter text
+			ScrollToY(TextYPos); // reset animation values
+		} else {
+			// update animation for this next draw cycle
+			unsigned long curTime = GetTickCount();
+			if (animationEnd.time > curTime) {
+				//double animProgress = curTime / animationEnd;
+				int deltaY = animationEnd.y - animationBegin.y;
+				unsigned long deltaT = animationEnd.time - animationBegin.time;
+				int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
+				TextYPos = animationBegin.y + y;
+			} else {
+				UpdateScrollbar();
+				int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
+				ScrollToY(animationEnd.y);
+				TextYPos = tmp;
+			}
+		}
+	}
+
 	if (AnimPicture) {
 		// speaker portrait
 		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
 		clip.x += AnimPicture->Width + EDGE_PADDING;
 	}
+
 	clip.x += EDGE_PADDING;
-
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		unsigned long thisTime = GetTickCount();
-		if (thisTime>starttime) {
-			starttime = thisTime+ticks;
-			TextYPos++;// can't use ScrollToY
-		}
-	}
-
 	clip.y -= TextYPos;
 	contentWrapper.Draw(clip.Origin());
 
@@ -202,8 +209,12 @@ int TextArea::SetScrollBar(Control* ptr)
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		bar->SetPos(bar->Value); // scroll to the bottom
+		int bottom = contentWrapper.ContentFrame().h - Height;
+		if (bottom > 0)
+			ScrollToY(bottom); // no animation for this one
 	} else {
+		// seems silly to call ScrollToY() with the current position,
+		// but it is to update the scrollbar so not a mistake
 		ScrollToY(TextYPos);
 	}
 	return (bool)sb;
@@ -253,11 +264,9 @@ void TextArea::AppendText(const String& text)
 		if (finit != ftext) {
 			// append cap spans
 			size_t textpos = text.find_first_not_of(WHITESPACE_STRING);
-			// FIXME: ? maybe we actually want the newlines etc?
-			// I think maybe if we clean up the GUIScripts this isn't needed.
 			if (textpos != String::npos) {
-				// FIXME: initpalette should *not* be used for drop cap font or state fonts!
-				// need to figure out how to handle this because it breaks drop caps
+				// first append the white space as its own span
+				textContainer->AppendText(text.substr(0, textpos));
 
 				// we must create and append this span here (instead of using AppendText),
 				// because the original data files for the DC font specifies a line height of 13
@@ -289,8 +298,10 @@ void TextArea::AppendText(const String& text)
 		UpdateScrollbar();
 		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
-			ScrollBar* bar = ( ScrollBar* ) sb;
-			bar->SetPos(bar->Value); // scroll to the bottom
+			// scroll to the bottom
+			int bottom = contentWrapper.ContentFrame().h - Height;
+			if (bottom > 0)
+				ScrollToY(bottom, NULL, 500); // animated scroll
 		}
 	}
 	MarkDirty();
@@ -400,8 +411,22 @@ int TextArea::GetRowHeight() const
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(int y, Control* sender)
+void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
 {
+	// set up animation if required
+	if  (duration) {
+		// HACK: notice the values arent clamped here.
+		// this is sort of a hack we allow for chapter text so it can begin and end out of sight
+		unsigned long startTime = GetTickCount();
+		animationBegin = AnimationPoint(TextYPos, startTime);
+		animationEnd = AnimationPoint(y, startTime + duration);
+		return;
+	} else if (animationEnd) {
+		// cancel the existing animation (if any)
+		animationBegin = AnimationPoint();
+		animationEnd = AnimationPoint();
+	}
+
 	if (sb && sender != sb) {
 		// we must "scale" the pixels
 		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep()-1 / ftext->LineHeight));
@@ -430,7 +455,9 @@ void TextArea::SetRow(int row)
 /** This method is key to touchscreen scrolling */
 void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 {
-	if (!(IE_GUI_TEXTAREA_SMOOTHSCROLL & Flags)){
+	// we allow scrolling to cancel the animation only if there is a scrollbar
+	// otherwise it is "Chapter Text" behavior
+	if (!animationEnd || sb){
 		unsigned long fauxY = TextYPos;
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
@@ -662,18 +689,6 @@ void TextArea::ClearText()
 	// reset text position to top
 	ScrollToY(0);
 	UpdateScrollbar();
-}
-
-//setting up the textarea for smooth scrolling, the first
-//TEXTAREA_OUTOFTEXT callback is called automatically
-void TextArea::SetupScroll()
-{
-	// ticks is the number of ticks it takes to scroll this font 1 px
-	ticks = 2400 / ftext->LineHeight;
-	ClearText();
-	TextYPos = -Height; // FIXME: this is somewhat fragile (it is reset by SetRow etc)
-	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
-	starttime = GetTickCount();
 }
 
 void TextArea::SetFocus(bool focus)

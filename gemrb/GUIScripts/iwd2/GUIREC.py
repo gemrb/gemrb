@@ -405,7 +405,7 @@ def DisplayGeneral (pc):
 		if MonkLevel:
 			AC = GemRB.GetCombatDetails(pc, 0)["AC"]
 			GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
-			RecordsTextArea.Append (39431)
+			RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
 			# wholeness of body
 			RecordsTextArea.Append (DelimitedText (39749, MonkLevel*2, 0))
 
@@ -437,7 +437,7 @@ def DisplayGeneral (pc):
 				RecordsTextArea.Append (DelimitedText(7192, "+" + str(bonusSpells[c][level]), 0, " " + str(level+1)+": "))
 
 	#ability statistics
-	RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(40315) + "[/color]\n")
+	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40315) + "[/color]\n")
 
 	# Weight Allowance
 	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
@@ -494,7 +494,7 @@ def DisplayGeneral (pc):
 			if damage == -1 or damage-mod <= 0:
 				continue
 			if not DisplayedHeader:
-				RecordsTextArea.Append ("\n\n[color=ffff00]" + GemRB.GetString(39325) + "[/color]\n")
+				RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(39325) + "[/color]\n")
 				DisplayedHeader = 1
 
 			enchantment += 1 # since we were checking what is allowable, not what bypasses it
@@ -629,10 +629,14 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		dicestr = ""
 		if ddice:
 			dicestr = "+%dd%d" %(ddice, dsides)
+
+		dicestr = dos["TypeName"].title() + ": " + dicestr
 		if dbonus:
-			RecordsTextArea.Append (dos["TypeName"] + ": " + dicestr + PlusMinusStat(dbonus)+dchance)
+			dicestr += PlusMinusStat(dbonus) + dchance
 		else:
-			RecordsTextArea.Append (dos["TypeName"] + ": " + dicestr + dchance)
+			dicestr += dchance
+		RecordsTextArea.Append ("[p]" + dicestr + "[/p]")
+
 		dosmax += ddice*dsides + dbonus
 
 	# Strength
@@ -707,7 +711,7 @@ def DisplayWeapons (pc):
 
 	###################
 	# Armor Class
-	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(33553) + "[/color]\n")
+	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(33553) + "[/color]\n")
 	RecordsTextArea.Append (DelimitedText (33553, str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
@@ -742,7 +746,7 @@ def DisplayWeapons (pc):
 	# Armor Class Modifiers
 	stat = GS (IE_ACMISSILEMOD) + GS (IE_ACSLASHINGMOD) + GS (IE_ACPIERCINGMOD) + GS (IE_ACCRUSHINGMOD)
 	if stat:
-		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(11766) + "[/color]")
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(11766) + "[/color]\n")
 
 		# Missile
 		if GS (IE_ACMISSILEMOD):
@@ -812,12 +816,7 @@ def DisplayWeapons (pc):
 
 	return
 
-def DisplaySkills (pc, TAOverride=None):
-	global RecordsTextArea
-	# HACK: trying to avoid merge conflicts, sanitize later
-	if TAOverride:
-		tmp = RecordsTextArea
-		RecordsTextArea = TAOverride
+def DisplaySkills (pc, SkillsArea):
 	
 	def PrintStatTable (title, tabname):
 		feats = True if tabname == "feats" else False
@@ -827,7 +826,7 @@ def DisplaySkills (pc, TAOverride=None):
 		itemTab = GemRB.LoadTable (lookup)
 		rows = itemTab.GetRowCount ()
 		
-		RecordsTextArea.Append ("[color=ffff00]" + title + "[/color]\n")
+		SkillsArea.Append ("[color=ffff00]" + title + "[/color]\n")
 		
 		items = []
 		for i in range(rows):
@@ -852,17 +851,14 @@ def DisplaySkills (pc, TAOverride=None):
 		items.sort()
 		for item in items:
 			if len(item) > 1:
-				RecordsTextArea.Append (DelimitedText(item[0], item[1], 0))
+				SkillsArea.Append (DelimitedText(item[0], item[1], 0))
 			else:
-				RecordsTextArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
+				SkillsArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
 		return
 
 	PrintStatTable (GemRB.GetString(11983), "skills")
-	RecordsTextArea.Append ("\n")
+	SkillsArea.Append ("\n")
 	PrintStatTable (GemRB.GetString(36361), "feats")
-
-	if TAOverride:
-		RecordsTextArea = tmp
 
 	return
 
@@ -890,14 +886,14 @@ def DisplayMisc (pc):
 	RecordsTextArea.Append ("[color=ffff00]" + GemRB.GetString(40320) + "[/color]\n")
 
 	#favourite spell and weapon
-	RecordsTextArea.Append (DelimitedStrRefs (11949, stat['FavouriteSpell']))
-	RecordsTextArea.Append (DelimitedStrRefs (11950, stat['FavouriteWeapon']))
+	RecordsTextArea.Append (DelimitedStrRefs (11949, stat['FavouriteSpell'], 0))
+	RecordsTextArea.Append (DelimitedStrRefs (11950, stat['FavouriteWeapon'], 0))
 
 	# combat details
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40322) + "[/color]\n")
 
 	#most powerful vanquished, time spent, xp and kills
-	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName']))
+	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName'], 0))
 
 	days, hours = GUICommon.SetCurrentDateTokens (stat)
 	# iwd2 is special here
@@ -916,27 +912,27 @@ def DisplayMisc (pc):
 	else:
 		time += GemRB.GetString (10700)
 
-	RecordsTextArea.Append (DelimitedText (11948, time))
+	RecordsTextArea.Append (DelimitedText (11948, time, 0))
 
 	# Experience Value of Kills
-	RecordsTextArea.Append (DelimitedText (11953, stat['KillsTotalXP']))
+	RecordsTextArea.Append (DelimitedText (11953, stat['KillsTotalXP'], 0))
 
 	# Number of Kills
-	RecordsTextArea.Append (DelimitedText (11954, stat['KillsTotalCount']))
+	RecordsTextArea.Append (DelimitedText (11954, stat['KillsTotalCount'], 0))
 
 	# Total Experience Value in Party
 	if TotalPartyExp:
 		val = stat['KillsTotalXP']*100/TotalPartyExp
 	else:
 		val = 0
-	RecordsTextArea.Append (DelimitedText (11951, str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11951, str(val) + "%", 0))
 
 	# Percentage of Total Kills in Party
 	if TotalPartyExp:
 		val = stat['KillsTotalCount']*100/TotalCount
 	else:
 		val = 0
-	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%"))
+	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%", 0))
 
 	return
 
@@ -1058,7 +1054,7 @@ def UpdateRecordsWindow ():
 	elif SelectWindow == 2:
 		DisplayWeapons (pc)
 	elif SelectWindow == 3:
-		DisplaySkills (pc)
+		DisplaySkills (pc, RecordsTextArea)
 	elif SelectWindow == 4:
 		DisplayMisc (pc)
 

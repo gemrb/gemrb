@@ -478,25 +478,37 @@ static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_TextArea_Rewind__doc,
-"RewindTA(Win, Ctrl)\n\n"
-"Sets up a TextArea for scrolling.");
+PyDoc_STRVAR( GemRB_TextArea_SetChapterText__doc,
+"SetChapterText(Win, Ctrl, Text)\n\n"
+"Sets up a TextArea with chapter text.");
 
-static PyObject* GemRB_TextArea_Rewind(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* args)
 {
 	int Win, Ctrl;
+	char* text;
 
-	if (!PyArg_ParseTuple( args, "ii", &Win, &Ctrl)) {
-		return AttributeError( GemRB_TextArea_Rewind__doc );
+	if (!PyArg_ParseTuple( args, "iis", &Win, &Ctrl, &text)) {
+		return AttributeError( GemRB_TextArea_SetChapterText__doc );
 	}
 
-	TextArea* ctrl = ( TextArea* ) GetControl( Win, Ctrl, IE_GUI_TEXTAREA);
-	if (!ctrl) {
+	TextArea* ta = ( TextArea* ) GetControl( Win, Ctrl, IE_GUI_TEXTAREA);
+	if (!ta) {
 		return NULL;
 	}
 
 	core->GetAudioDrv()->Play( NULL, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
-	ctrl->SetupScroll();
+	ta->ClearText();
+	// insert enough newlines to push the text offscreen
+	int rowHeight = ta->GetRowHeight();
+	size_t lines = ta->Height / rowHeight;
+	ta->AppendText(String(lines, L'\n'));
+	String* chapText = StringFromCString(text);
+	lines *= 2; // double the "amount" of newlines since we also scroll to be out of sight
+	lines += std::count(chapText->begin(), chapText->end(), L'\n');
+	ta->AppendText(*chapText);
+	delete chapText;
+	// animate the scroll: duration = 2400 * lines of text
+	ta->ScrollToY((int)(rowHeight * lines), NULL, lines * 2400);
 	Py_RETURN_NONE;
 }
 
@@ -5261,7 +5273,7 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 
 	const char *scr = actor->GetScript(Index);
 	if (scr[0]==0) {
-		scr="None";
+		Py_RETURN_NONE;
 	}
 	return PyString_FromString( scr );
 }
@@ -10758,7 +10770,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_Clear, METH_VARARGS),
 	METHOD(TextArea_ListResources, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
-	METHOD(TextArea_Rewind, METH_VARARGS),
+	METHOD(TextArea_SetChapterText, METH_VARARGS),
 	METHOD(TextEdit_SetBackground, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(Window_CreateButton, METH_VARARGS),

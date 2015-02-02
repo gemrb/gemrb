@@ -456,7 +456,11 @@ Actor *Projectile::GetTarget()
 			return NULL;
 		}
 		if (res==-1) {
-			Target = original->GetGlobalID();
+			if (original) {
+				Target = original->GetGlobalID();
+			} else {
+				Log(DEBUG, "Projectile", "GetTarget: caster not found, bailing out!");
+			}
 			return NULL;
 		}
 		effects->SetOwner(original);

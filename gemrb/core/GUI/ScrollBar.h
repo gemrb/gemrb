@@ -64,11 +64,12 @@ enum IE_SCROLLBAR_IMAGE_TYPE {
 class GEM_EXPORT ScrollBar : public Control {
 protected:
 	void DrawInternal(Region& drawFrame);
-	bool HasBackground();
+
 public:
 	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
 	~ScrollBar(void);
 
+	bool IsOpaque() const;
 	/**sets position, updates associated stuff */
 	void SetPos(ieDword NewPos);
 	ieWord GetPos() const { return Pos; };

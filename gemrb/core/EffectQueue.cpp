@@ -1869,6 +1869,27 @@ Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ie
 	return HasOpcodeWithResource(effect_reference.opcode, resource);
 }
 
+// for tobex bounce triggers
+Effect *EffectQueue::HasEffectWithPower(EffectRef &effect_reference, ieDword power) const
+{
+	ResolveEffectRef(effect_reference);
+	return HasOpcodeWithPower(effect_reference.opcode, power);
+}
+
+Effect *EffectQueue::HasOpcodeWithPower(ieDword opcode, ieDword power) const
+{
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		// NOTE: matching greater or equals!
+		if ((*f)->Power < power) { continue; }
+
+		return (*f);
+	}
+	return NULL;
+}
+
 //returns the first effect with source 'Removed'
 Effect *EffectQueue::HasSource(const ieResRef Removed) const
 {

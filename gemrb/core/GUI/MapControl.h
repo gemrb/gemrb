@@ -50,7 +50,6 @@ protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
 	void DrawFog(const Region& rgn);
-	bool NeedsDraw() {return true;}
 public:
 	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;
@@ -76,6 +75,8 @@ public:
 
 	MapControl(const Region& frame);
 	~MapControl(void);
+
+	bool NeedsDraw() const {return true;}
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(const char *VariableName, unsigned int Sum);
 	/** Compute parameters after changes in control's or screen geometry */

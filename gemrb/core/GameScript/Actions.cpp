@@ -3635,6 +3635,9 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetBase(IE_VISUALRANGE,parameters->int0Parameter);
+	if (actor->GetStat(IE_EA) < EA_EVILCUTOFF) {
+		actor->SetBase(IE_EXPLORE, 1);
+	}
 }
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)

@@ -696,7 +696,7 @@ void Map::UpdateScripts()
 	Game *game = core->GetGame();
 	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
-		game->timestop_owner = NULL;
+		game->SetTimestopOwner(NULL);
 	}
 
 	while (q--) {
@@ -2309,7 +2309,7 @@ void Map::dump(bool show_actors) const
 		i = actors.size();
 		while (i--) {
 			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
-				buffer.appendFormatted("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
+				buffer.appendFormatted("Actor: %s (%d) at %d.%d\n", actors[i]->GetName(1), actors[i]->GetGlobalID(), actors[i]->Pos.x, actors[i]->Pos.y);
 			}
 		}
 	}
@@ -3364,7 +3364,6 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 	unsigned int ppx = Pos.x/16;
 	unsigned int ppy = Pos.y/12;
 	unsigned int r=(size-1)*(size-1)+1;
-	if (size == 1) r = 0;
 	for (unsigned int i=0; i<size; i++) {
 		for (unsigned int j=0; j<size; j++) {
 			if (i*i+j*j <= r) {

@@ -1,10 +1,11 @@
-GemRB git (e473b392):
+GemRB git (a98cfdba1c):
   New features:
     - text system rewrite for better fidelity, perfomance and maintainability
     - 
 
   Improved features:
     - 
+    - iwd2 scripting
     - bugfixes
 
 GemRB v0.8.2 (2015-01-01):

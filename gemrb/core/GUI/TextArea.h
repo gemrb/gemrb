@@ -41,9 +41,8 @@ namespace GemRB {
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
 #define IE_GUI_TEXTAREA_AUTOSCROLL   1
-#define IE_GUI_TEXTAREA_SMOOTHSCROLL 2	// chapter text
-#define IE_GUI_TEXTAREA_HISTORY      4	// message window
-#define IE_GUI_TEXTAREA_EDITABLE     8
+#define IE_GUI_TEXTAREA_HISTORY      2	// message window
+#define IE_GUI_TEXTAREA_EDITABLE     4
 
 typedef std::pair<int, String> SelectOption;
 
@@ -57,13 +56,15 @@ class GEM_EXPORT TextArea : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
-	bool NeedsDraw();
-	bool HasBackground() { return false; }
+
 public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
+
+	bool NeedsDraw() const;
+	bool IsOpaque() const { return false; }
 
 	/** Sets the Actual Text */
 	void SetText(const String& text);
@@ -74,10 +75,9 @@ public:
 	void AppendText(const String& text);
 	/** Inserts a String into the current Text at pos */
 	// int InsertText(const char* text, int pos);
-	/** Sets up auto scrolling (chapter text) */
-	void SetupScroll();
+
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender = NULL);
+	void ScrollToY(int y, Control* sender = NULL, ieWord duration = 0);
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;
@@ -107,12 +107,22 @@ private: // Private attributes
 	// wrapper containing both of the above
 	ContentContainer contentWrapper;
 
+	struct AnimationPoint {
+		// TODO: we cant currently scroll the x axis
+		// if that happens we should upgrade this to Point
+		int y;
+		unsigned long time;
+
+		AnimationPoint() : y(0), time(0) {}
+		AnimationPoint(int y, unsigned long t) : y(y), time(t) {}
+
+		operator bool() const {
+			return (time > 0);
+		}
+	};
+	AnimationPoint animationBegin, animationEnd;
+
 	int TextYPos;
-	/** timer for scrolling */
-	unsigned long starttime;
-	/** timer ticks for scrolling (speed) */
-	unsigned long ticks;
-	/** Number of Text Rows */
 	int rows;
 
 	/** Fonts */

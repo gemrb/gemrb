@@ -196,7 +196,7 @@ def DisplayOverview(step):
 					if value > 0:
 						info += name + ": " + str(value) + "\n"
 			if info != "":
-				TextAreaControl.Append (GemRB.GetString(8442) + info)
+				TextAreaControl.Append ("\n" + GemRB.GetString(8442) + "\n" + info)
 
 			# arcane spells
 			info = ""
@@ -206,7 +206,7 @@ def DisplayOverview(step):
 					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
-				TextAreaControl.Append ( GemRB.GetString(11027) + info)
+				TextAreaControl.Append ("\n" + GemRB.GetString(11027) + "\n" + info)
 
 			# divine spells
 			info = ""
@@ -216,7 +216,7 @@ def DisplayOverview(step):
 					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
-				TextAreaControl.Append (GemRB.GetString(11028) + info)
+				TextAreaControl.Append ("\n" + GemRB.GetString(11028) + "\n" + info)
 
 			# racial enemy
 			info = ""
@@ -224,11 +224,12 @@ def DisplayOverview(step):
 			if Race:
 				HateRaceTable = GemRB.LoadTable ("HATERACE")
 				Row = HateRaceTable.FindValue (1, Race)
-				info = HateRaceTable.GetValue (Row, 0, GTV_REF)
+				info = HateRaceTable.GetValue (Row, 0, GTV_REF) + "\n"
 				if info != "":
-					TextAreaControl.Append (GemRB.GetString(15982) + info)
+					TextAreaControl.Append ("\n" + GemRB.GetString(15982) + "\n" + info)
 
 			# weapon proficiencies
+			TextAreaControl.Append ("\n")
 			TextAreaControl.Append (9466)
 			TextAreaControl.Append ("\n")
 			TmpTable=GemRB.LoadTable ("weapprof")
