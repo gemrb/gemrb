@@ -32,7 +32,7 @@ WMPImporter::WMPImporter(void)
 {
 	str1 = NULL;
 	str2 = NULL;
-	WorldMapsCount = WorldMapsCount1, WorldMapsCount2 = 0;
+	WorldMapsCount = WorldMapsCount1 = WorldMapsCount2 = 0;
 	WorldMapsOffset1 = WorldMapsOffset2 = 0;
 }
 
