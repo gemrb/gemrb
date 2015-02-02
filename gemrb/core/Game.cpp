@@ -1753,6 +1753,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 // heal on rest and similar
 void Game::CastOnRest()
 {
+	
+
 	typedef std::multimap<ieWord,HealingResource> RestSpells;
 	typedef std::vector<Injured> RestTargets;
 
@@ -1766,12 +1768,13 @@ void Game::CastOnRest()
 		for (int idx = 1; idx <= ps; idx++) {
 			Actor *tar = FindPC(idx);
 			ieWord hpneeded=tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
-			if (tar && hpneeded > 0) {
-				wholeparty.push_back(Injured(hpneeded,tar));
-			} else {
-				wholeparty.push_back(Injured(0,tar));
+			if (tar) {
+				if (hpneeded > 0) {
+					wholeparty.push_back(Injured(hpneeded,tar));
+				} else {
+					wholeparty.push_back(Injured(0,tar));
+				}
 			}
-			
 		}
 		// Following algorithm works thus:
 		// - If at any point there are no more injured party members, stop
@@ -1783,9 +1786,10 @@ void Game::CastOnRest()
 		std::sort(wholeparty.begin(),wholeparty.end());
 		specialCount = core->GetSpecialSpellsCount();
 		RestSpells healingspells;
+		RestSpells nonhealingspells;
 		while (specialCount--) {
 			// Cast multi-target healing spells
-			if (special_spells[specialCount].flags & SP_HEAL_ALL) {
+			if ((special_spells[specialCount].flags & (SP_REST | SP_HEAL_ALL)) == (SP_REST | SP_HEAL_ALL)) {
 				while (ps--) {
 					Actor *tar = GetPC(ps, true);
 					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
@@ -1797,7 +1801,7 @@ void Game::CastOnRest()
 				}
 				ps=ps2;
 			}
-			// Gather the regular healing spells
+			// Gather rest of the spells
 			else if (special_spells[specialCount].flags & SP_REST) {
 				while (ps--) {
 					Actor *tar = GetPC(ps, true);
@@ -1806,10 +1810,14 @@ void Game::CastOnRest()
 						resource.caster=tar;
 						CopyResRef(resource.resref,special_spells[specialCount].resref);
 						resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,0);
-						healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
+						if (resource.amount > 0 ) {
+							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
+						} else {
+							nonhealingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
+						}
 					}
 				}
-				ps=ps2;
+				ps = ps2;
 			}
 		}
 		std::sort(wholeparty.begin(),wholeparty.end());
@@ -1825,6 +1833,7 @@ void Game::CastOnRest()
 				healingspells.erase(spell);
 			}
 		// Here is the place to write the loop for non hp healing spells.
+		// these spells are in the variable nonhealingspells
 		}
 	}
 }
