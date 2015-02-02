@@ -40,7 +40,6 @@
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
-#include <map>
 #include <iterator>
 
 namespace GemRB {
@@ -50,6 +49,15 @@ struct HealingResource {
 	ieResRef resref;
 	Actor* caster;
 	ieWord amount;
+};
+
+struct Injuree {
+	int hpneeded;
+	Actor* character;
+	Injuree(int hps,Actor * cha):hpneeded(hps),character(cha) {}
+	bool operator < (const Injuree& str) const {
+		return (hpneeded < str.hpneeded);
+	}
 };
 
 #define MAX_MAPS_LOADED 1
@@ -1745,19 +1753,20 @@ void Game::CastOnRest()
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
 	int specialCount = core->GetSpecialSpellsCount();
-
+	std::vector<Injuree> the_injured;
 	if (tmp && specialCount != -1) {
 		int ps = GetPartySize(true);
 		int ps2 = ps;
-		std::multimap<ieWord,Actor *> injurees;
 		for (int idx = 1; idx <= ps; idx++) {
 			Actor *tar = FindPC(idx);
 			ieWord hpneeded=tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
 			if (tar && hpneeded > 0) {
-				injurees.insert(std::pair<ieWord,Actor *>(hpneeded,tar));
+				the_injured.push_back(Injuree(hpneeded,tar));
+			} else {
+				the_injured.push_back(Injuree(0,tar));
 			}
+			
 		}
-
 		// Following algorithm works thus:
 		// - If at any point there are no more injured party members, stop
 		// (amount of healing done is an estimation)
@@ -1765,7 +1774,8 @@ void Game::CastOnRest()
 		// - repeat:
 		//       cast the most potent healing spell on the most injured member
 		SpecialSpellType *special_spells = core->GetSpecialSpells();
-		if (!injurees.empty() && specialCount != -1) {
+		if (specialCount != -1 ) {
+			std::sort(the_injured.begin(),the_injured.end());
 			specialCount = core->GetSpecialSpellsCount();
 			std::multimap<ieWord,HealingResource> healingspells;
 			while (specialCount--) {
@@ -1775,12 +1785,8 @@ void Game::CastOnRest()
 						Actor *tar = GetPC(ps, true);
 						while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
 							tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
-							for (std::multimap<ieWord,Actor *>::iterator injuree=injurees.begin();
-									injuree != injurees.end() ; ++injuree) {
-								if (injuree->first-special_spells[specialCount].amount > 0) {
-									injurees.insert(std::pair<ieWord,Actor *>(injuree->first-special_spells[specialCount].amount,injuree->second));
-								}
-								injurees.erase(injuree);
+							for (std::vector<Injuree>::iterator injuree=the_injured.begin();injuree != the_injured.end() ; ++injuree) {
+									injuree->hpneeded-=special_spells[specialCount].amount;
 							}
 						}
 					}
@@ -1801,26 +1807,45 @@ void Game::CastOnRest()
 					ps=ps2;
 				}
 			}
+			std::sort(the_injured.begin(),the_injured.end());
 			// Heal who's still injured
-			while (!injurees.empty() && !healingspells.empty()) {
-				std::multimap<ieWord,Actor *>::iterator injuree=injurees.end();
-				injuree--;
+			while (!healingspells.empty() && the_injured.back().hpneeded > 0) {
 				std::multimap<ieWord,HealingResource>::iterator spell=healingspells.end();
 				spell--;
-				spell->second.caster->DirectlyCastSpell(injuree->second, spell->second.resref, 0, 1, true);
-				if (injuree->first - spell->first > 0) {
-					injurees.insert(std::pair<ieWord,Actor *>(injuree->first-spell->first,injuree->second));
-				}
-				injurees.erase(injuree);
+				spell->second.caster->DirectlyCastSpell(the_injured.back().character, spell->second.resref, 0, 1, true);
+				the_injured.back().hpneeded-=spell->first;
+				std::sort(the_injured.begin(),the_injured.end());
 				spell->second.amount--;
 				if (spell->second.amount == 0) {
 					healingspells.erase(spell);
 				}
+			// Here is the place to write the loop for non hp healing spells.
 			}
 		}
-		// Possible non-healing spells in their own loop
 	}
 }
+
+//returns a vector of character with requested state. Container will be empty if none
+bool Game::FindPCs(std::vector<Actor*>& characters, ieDword state)
+{
+	characters.clear();
+	int partysize=GetPartySize(true);
+	if (state & CH_INJURED) {
+		for (int idx = 1; idx <= partysize; idx++) {
+			Actor *tar = FindPC(idx);
+				if (tar && tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS)) {
+					characters.push_back(tar);
+				}
+		}
+	}
+	if (characters.empty()) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
 
 //timestop effect
 void Game::TimeStop(Actor* owner, ieDword end)
