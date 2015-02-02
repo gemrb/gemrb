@@ -6039,20 +6039,9 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
 		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
 	} else {
-		//no idea about this one
-/*
-		Actor *owner;
-
-		if (Sender->Type==ST_ACTOR) {
-			owner = (Actor *) Sender;
-		} else {
-			owner = NULL;
-		}
-*/
 		//apply spell on point
 		Point d;
 		GetPositionFromScriptable(tar, d, false);
-		//core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, owner, parameters->int1Parameter);
 		core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, Sender, parameters->int1Parameter);
 	}
 }
@@ -6060,18 +6049,12 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
-	Actor *owner;
 
 	if (!ResolveSpellName( spellres, parameters) ) {
 		return;
 	}
 
-	if (Sender->Type==ST_ACTOR) {
-		owner = (Actor *) Sender;
-	} else {
-		owner = NULL;
-	}
-	core->ApplySpellPoint(spellres, Sender->GetCurrentArea(), parameters->pointParameter, owner, parameters->int1Parameter);
+	core->ApplySpellPoint(spellres, Sender->GetCurrentArea(), parameters->pointParameter, Sender, parameters->int1Parameter);
 }
 
 //this is a gemrb extension
