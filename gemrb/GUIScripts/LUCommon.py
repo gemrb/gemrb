@@ -53,6 +53,12 @@ def CanLevelUp(actor):
 	if GemRB.GetPlayerStat(actor, IE_LEVELDRAIN)>0:
 		return 0
 
+	if GameCheck.IsIWD2():
+		import GUIREC
+		levelsum = GemRB.GetPlayerStat (actor, IE_CLASSLEVELSUM)
+		next = GUIREC.GetNextLevelExp(levelsum, GUIREC.GetECL(actor))
+		return next <= xp
+
 	if Multi[0] > 1: # multiclassed
 		xp = xp/Multi[0] # divide the xp evenly between the classes
 		for i in range (Multi[0]):
