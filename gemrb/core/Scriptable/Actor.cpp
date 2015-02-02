@@ -1269,6 +1269,8 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	if (!sca) {
 		return;
 	}
+	// many are stored as bams and can't be translucent by default
+	sca->SetBlend();
 
 	// always draw it for party members; the rest must not be invisible to have it;
 	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
