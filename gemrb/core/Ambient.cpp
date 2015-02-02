@@ -24,6 +24,10 @@ namespace GemRB {
 
 Ambient::Ambient()
 {
+	name[0] = 0;
+	radius = height = 0;
+	gain = interval = 0;
+	perset = appearance = flags = 0;
 }
 
 Ambient::~Ambient()

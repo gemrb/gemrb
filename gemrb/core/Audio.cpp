@@ -26,6 +26,7 @@ const TypeID Audio::ID = { "Audio" };
 
 Audio::Audio(void)
 {
+	ambim = NULL;
 }
 
 Audio::~Audio(void)
