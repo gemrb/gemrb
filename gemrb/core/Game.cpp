@@ -53,11 +53,11 @@ struct HealingResource {
 	ieWord amount;
 };
 
-struct Injuree {
+struct Injured {
 	int hpneeded;
 	Actor* character;
-	Injuree(int hps,Actor * cha):hpneeded(hps),character(cha) {}
-	bool operator < (const Injuree& str) const {
+	Injured(int hps,Actor * cha):hpneeded(hps),character(cha) {}
+	bool operator < (const Injured& str) const {
 		return (hpneeded < str.hpneeded);
 	}
 };
@@ -1753,10 +1753,13 @@ bool Game::RestParty(int checks, int dream, int hp)
 // heal on rest and similar
 void Game::CastOnRest()
 {
+	typedef std::multimap<ieWord,HealingResource> RestSpells;
+	typedef std::vector<Injured> RestTargets;
+
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
 	int specialCount = core->GetSpecialSpellsCount();
-	std::vector<Injuree> wholeparty;
+	RestTargets wholeparty;
 	if (tmp && specialCount != -1) {
 		int ps = GetPartySize(true);
 		int ps2 = ps;
@@ -1764,9 +1767,9 @@ void Game::CastOnRest()
 			Actor *tar = FindPC(idx);
 			ieWord hpneeded=tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
 			if (tar && hpneeded > 0) {
-				wholeparty.push_back(Injuree(hpneeded,tar));
+				wholeparty.push_back(Injured(hpneeded,tar));
 			} else {
-				wholeparty.push_back(Injuree(0,tar));
+				wholeparty.push_back(Injured(0,tar));
 			}
 			
 		}
@@ -1777,78 +1780,54 @@ void Game::CastOnRest()
 		// - repeat:
 		//       cast the most potent healing spell on the most injured member
 		SpecialSpellType *special_spells = core->GetSpecialSpells();
-		if (specialCount != -1 ) {
-			std::sort(wholeparty.begin(),wholeparty.end());
-			specialCount = core->GetSpecialSpellsCount();
-			std::multimap<ieWord,HealingResource> healingspells;
-			while (specialCount--) {
-				// Cast multi-target healing spells
-				if (special_spells[specialCount].flags & SP_HEAL_ALL) {
-					while (ps--) {
-						Actor *tar = GetPC(ps, true);
-						while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-							tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
-							for (std::vector<Injuree>::iterator injuree=wholeparty.begin();injuree != wholeparty.end() ; ++injuree) {
-									injuree->hpneeded-=special_spells[specialCount].amount;
-							}
+		std::sort(wholeparty.begin(),wholeparty.end());
+		specialCount = core->GetSpecialSpellsCount();
+		RestSpells healingspells;
+		while (specialCount--) {
+			// Cast multi-target healing spells
+			if (special_spells[specialCount].flags & SP_HEAL_ALL) {
+				while (ps--) {
+					Actor *tar = GetPC(ps, true);
+					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+						tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
+						for (RestTargets::iterator injuree=wholeparty.begin();injuree != wholeparty.end() ; ++injuree) {
+								injuree->hpneeded-=special_spells[specialCount].amount;
 						}
 					}
-					ps=ps2;
 				}
-				// Gather the regular healing spells
-				else if (special_spells[specialCount].flags & SP_REST) {
-					while (ps--) {
-						Actor *tar = GetPC(ps, true);
-						if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-							HealingResource resource;
-							resource.caster=tar;
-							CopyResRef(resource.resref,special_spells[specialCount].resref);
-							resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,0);
-							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
-						}
+				ps=ps2;
+			}
+			// Gather the regular healing spells
+			else if (special_spells[specialCount].flags & SP_REST) {
+				while (ps--) {
+					Actor *tar = GetPC(ps, true);
+					if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+						HealingResource resource;
+						resource.caster=tar;
+						CopyResRef(resource.resref,special_spells[specialCount].resref);
+						resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,0);
+						healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
 					}
-					ps=ps2;
 				}
+				ps=ps2;
 			}
+		}
+		std::sort(wholeparty.begin(),wholeparty.end());
+		// Heal who's still injured
+		while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
+			RestSpells::iterator spell=healingspells.end();
+			spell--;
+			spell->second.caster->DirectlyCastSpell(wholeparty.back().character, spell->second.resref, 0, 1, true);
+			wholeparty.back().hpneeded-=spell->first;
 			std::sort(wholeparty.begin(),wholeparty.end());
-			// Heal who's still injured
-			while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
-				std::multimap<ieWord,HealingResource>::iterator spell=healingspells.end();
-				spell--;
-				spell->second.caster->DirectlyCastSpell(wholeparty.back().character, spell->second.resref, 0, 1, true);
-				wholeparty.back().hpneeded-=spell->first;
-				std::sort(wholeparty.begin(),wholeparty.end());
-				spell->second.amount--;
-				if (spell->second.amount == 0) {
-					healingspells.erase(spell);
-				}
-			// Here is the place to write the loop for non hp healing spells.
+			spell->second.amount--;
+			if (spell->second.amount == 0) {
+				healingspells.erase(spell);
 			}
+		// Here is the place to write the loop for non hp healing spells.
 		}
 	}
 }
-
-//returns a vector of character with requested state. Container will be empty if none
-bool Game::FindPCs(std::vector<Actor*>& characters, ieDword state)
-{
-	characters.clear();
-	int partysize=GetPartySize(true);
-	if (state & CH_INJURED) {
-		for (int idx = 1; idx <= partysize; idx++) {
-			Actor *tar = FindPC(idx);
-				if (tar && tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS)) {
-					characters.push_back(tar);
-				}
-		}
-	}
-	if (characters.empty()) {
-		return false;
-	} else {
-		return true;
-	}
-}
-
-
 
 //timestop effect
 void Game::TimeStop(Actor* owner, ieDword end)

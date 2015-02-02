@@ -118,11 +118,6 @@ class TableMgr;
 #define SONG_NIGHT      1
 #define SONG_BATTLE     3
 
-//Character states
-//Possible additional states: petrified, poisoned, dead
-#define CH_OK           0
-#define CH_INJURED      1
-
 /**
  * @struct PCStruct
  * Information about party member.
@@ -323,8 +318,6 @@ public:
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
-	/** finds PCs with a desired state, returns false if there is none */
-	bool FindPCs(std::vector<Actor*>& characters, ieDword state);
 	/** Finds a global actor by global ID */
 	Actor* GetGlobalActorByGlobalID(ieDword globalID);
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
