@@ -100,6 +100,12 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 
 	if (!dlg) {
 		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dlgref, spk->GetName(1), tgt->GetName(1));
+		// display the greeting VB instead
+		if (tgt->Type == ST_ACTOR) {
+			Actor *tar = (Actor *) tgt;
+			//tar->DialogInterrupt();
+			tar->VerbalConstant(VB_INITIALMEET, 1, true);
+		}
 		return false;
 	}
 
