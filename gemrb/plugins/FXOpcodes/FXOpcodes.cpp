@@ -3201,8 +3201,6 @@ int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_experience_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_experience_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	//FIXME: this has mode too
-	//target->AddExperience (fx->Parameter1);
 	STAT_MOD( IE_XP );
 	return FX_NOT_APPLIED;
 }
