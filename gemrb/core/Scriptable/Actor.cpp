@@ -3497,7 +3497,7 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 	return StrRefs[idx];
 }
 
-void Actor::VerbalConstant(int start, int count) const
+void Actor::VerbalConstant(int start, int count, bool force) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
@@ -3507,7 +3507,7 @@ void Actor::VerbalConstant(int start, int count) const
 	ieDword subtitles = 0;
 	core->GetDictionary()->Lookup("Subtitles", subtitles);
 
-	if (!subtitles || count < 0) {
+	if ((!subtitles && !force) || count < 0) {
 		return;
 	}
 
