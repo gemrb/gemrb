@@ -50,13 +50,21 @@ namespace GemRB {
 struct HealingResource {
 	ieResRef resref;
 	Actor* caster;
+	ieWord amounthealed;
 	ieWord amount;
+	HealingResource(ieResRef ref, Actor* cha, ieWord ah, ieWord a): caster(cha),amounthealed(ah),amount(a) {
+		CopyResRef(resref,ref);
+	}
+	HealingResource(): resref(),caster(NULL),amounthealed(0),amount(0) {}
+	bool operator < (const HealingResource& str) const {
+		return (amounthealed < str.amounthealed);
+	}
 };
 
 struct Injured {
 	int hpneeded;
 	Actor* character;
-	Injured(int hps,Actor * cha):hpneeded(hps),character(cha) {}
+	Injured(int hps,Actor* cha):hpneeded(hps),character(cha) {}
 	bool operator < (const Injured& str) const {
 		return (hpneeded < str.hpneeded);
 	}
@@ -1755,7 +1763,7 @@ void Game::CastOnRest()
 {
 	
 
-	typedef std::multimap<ieWord,HealingResource> RestSpells;
+	typedef std::vector<HealingResource> RestSpells;
 	typedef std::vector<Injured> RestTargets;
 
 	ieDword tmp = 0;
@@ -1809,11 +1817,12 @@ void Game::CastOnRest()
 						HealingResource resource;
 						resource.caster=tar;
 						CopyResRef(resource.resref,special_spells[specialCount].resref);
+						resource.amounthealed=special_spells[specialCount].amount;
 						resource.amount=tar->spellbook.CountSpells(special_spells[specialCount].resref,0,0);
-						if (resource.amount > 0 ) {
-							healingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
+						if (resource.amounthealed > 0 ) {
+							healingspells.push_back(resource);
 						} else {
-							nonhealingspells.insert(std::pair<ieWord,HealingResource>(special_spells[specialCount].amount,resource));
+							nonhealingspells.push_back(resource);
 						}
 					}
 				}
@@ -1821,16 +1830,15 @@ void Game::CastOnRest()
 			}
 		}
 		std::sort(wholeparty.begin(),wholeparty.end());
+		std::sort(healingspells.begin(),healingspells.end());
 		// Heal who's still injured
 		while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
-			RestSpells::iterator spell=healingspells.end();
-			spell--;
-			spell->second.caster->DirectlyCastSpell(wholeparty.back().character, spell->second.resref, 0, 1, true);
-			wholeparty.back().hpneeded-=spell->first;
+			healingspells.back().caster->DirectlyCastSpell(wholeparty.back().character, healingspells.back().resref, 0, 1, true);
+			wholeparty.back().hpneeded-=healingspells.back().amounthealed;
 			std::sort(wholeparty.begin(),wholeparty.end());
-			spell->second.amount--;
-			if (spell->second.amount == 0) {
-				healingspells.erase(spell);
+			healingspells.back().amount--;
+			if (healingspells.back().amount == 0) {
+				healingspells.pop_back();
 			}
 		// Here is the place to write the loop for non hp healing spells.
 		// these spells are in the variable nonhealingspells
