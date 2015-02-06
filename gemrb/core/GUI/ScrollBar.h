@@ -100,6 +100,7 @@ public:
 	TextArea* textarea;
 
 public: // Public Events
+	bool TracksMouseDown() const { return true; }
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
