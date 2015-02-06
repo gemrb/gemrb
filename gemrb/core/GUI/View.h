@@ -58,9 +58,6 @@ protected:
 	virtual bool LockFocus() { return true; };
 	virtual bool UnlockFocus() { return true; };
 
-	inline Point ConvertPointToSuper(const Point&) const;
-	inline Point ConvertPointFromSuper(const Point&) const;
-
 	bool TrySetFocus(View*);
 
 public:
@@ -93,6 +90,8 @@ public:
 	View* RemoveSubview(const View*);
 	View* SubviewAt(const Point&, bool ignoreTransparency = false);
 
+	Point ConvertPointToSuper(const Point&) const;
+	Point ConvertPointFromSuper(const Point&) const;
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
 
