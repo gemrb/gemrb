@@ -88,7 +88,7 @@ public:
 
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
-	View* SubviewAt(const Point&, bool ignoreTransparency = false);
+	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 
 	Point ConvertPointToSuper(const Point&) const;
 	Point ConvertPointFromSuper(const Point&) const;
