@@ -3492,8 +3492,10 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 	while(i--) {
 		Actor* act = map->GetActor(i,true);
 		if (act && act != Sender && act->ValidTarget(GA_NO_DEAD)) {
-			act->Stop();
-			act->SetModal(MS_NONE);
+			if (!(act->GetInternalFlag() & IF_NOINT)) {
+				act->Stop();
+				act->SetModal(MS_NONE);
+			}
 		}
 	}
 }
@@ -3509,7 +3511,9 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 			return;
 		}
 	}
-	tar->Stop();
+	if (!(tar->GetInternalFlag() & IF_NOINT)) {
+		tar->Stop();
+	}
 }
 
 void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
