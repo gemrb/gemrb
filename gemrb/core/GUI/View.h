@@ -33,7 +33,6 @@ class ScrollBar;
 class View {
 private:
 	Sprite2D* background;
-	View* focusView;
 	View* superView;
 
 	mutable bool dirty;
@@ -55,11 +54,6 @@ protected:
 	virtual void SubviewAdded(View*) {}
 	virtual void SubviewRemoved(View*) {}
 
-	virtual bool LockFocus() { return true; };
-	virtual bool UnlockFocus() { return true; };
-
-	bool TrySetFocus(View*);
-
 public:
 	View(const Region& frame);
 	virtual ~View();
@@ -72,8 +66,6 @@ public:
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool IsPixelTransparent(const Point& p) const;
-
-	View* FocusedView() const { return focusView; }
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }
@@ -94,6 +86,10 @@ public:
 	Point ConvertPointFromSuper(const Point&) const;
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
+
+	virtual bool CanLockFocus() { return true; };
+	virtual bool CanUnlockFocus() { return true; };
+	virtual bool TracksMouseDown() const { return false; }
 
 	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };

@@ -63,6 +63,8 @@ protected:
 
 	void DrawSelf(Region drawFrame, const Region& clip);
 
+	bool TrySetFocus(View*);
+
 public: 
 	Window(unsigned short WindowID, const Region& frame);
 	~Window();
@@ -93,8 +95,15 @@ public:
 	/** Returns last mouse event focused control */
 	Control* GetMouseFocus() const;
 
+	View* FocusedView() const { return focusView; }
+
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
+
+	void OnMouseOver(const Point&);
+	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	void OnMouseWheelScroll(short x, short y);
 
 public: //Public attributes
 	/** WinPack */
@@ -111,6 +120,9 @@ public: //Public attributes
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;
+	View* focusView; // keyboard focus
+	View* trackingView; // out of bounds mouse tracking
+	View* hoverView; // view the mouse was last over
 };
 
 }

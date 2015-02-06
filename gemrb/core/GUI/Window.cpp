@@ -38,6 +38,10 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	Visible = WINDOW_INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
 	FunctionBar = false;
+
+	focusView = NULL;
+	trackingView = NULL;
+	hoverView = NULL;
 }
 
 Window::~Window()
@@ -109,50 +113,6 @@ void Window::SetFrame()
 		Flags|=WF_FRAME;
 	}
 	MarkDirty();
-}
-
-bool Window::OnSpecialKeyPress(unsigned char key)
-{
-	Control* ctrl = NULL;
-	//the default control will get only GEM_RETURN
-	if (key == GEM_RETURN) {
-		//ctrl = GetDefaultControl(0);
-	}
-	//the default cancel control will get only GEM_ESCAPE
-	else if (key == GEM_ESCAPE) {
-		//ctrl = GetDefaultControl(1);
-	} else if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
-		ctrl = GetFunctionControl(key - GEM_FUNCTION1);
-	} else {
-		ctrl = dynamic_cast<Control*>(FocusedView());
-	}
-
-	if (ctrl) {
-		switch (ctrl->ControlType) {
-				//scrollbars will receive only mousewheel events
-			case IE_GUI_SCROLLBAR:
-				if (key != GEM_UP && key != GEM_DOWN) {
-					return false;
-				}
-				break;
-				//buttons will receive only GEM_RETURN
-			case IE_GUI_BUTTON:
-				if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
-					//fake mouse button
-					ctrl->OnMouseDown(Point(), GEM_MB_ACTION, 0);
-					ctrl->OnMouseUp(Point(), GEM_MB_ACTION, 0);
-					return false;
-				}
-				if (key != GEM_RETURN && key!=GEM_ESCAPE) {
-					return false;
-				}
-				break;
-				// shouldnt be any harm in sending these events to any control
-		}
-		ctrl->OnSpecialKeyPress( key );
-		return true;
-	}
-	return false;
 }
 
 Control* Window::GetFunctionControl(int x)
@@ -235,6 +195,140 @@ void Window::RedrawControls(const char* VarName, unsigned int Sum)
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		(*c)->UpdateState( VarName, Sum);
 	}
+}
+
+bool Window::TrySetFocus(View* target)
+{
+	if (target && !target->CanLockFocus()) {
+		// target wont accept focus so dont bother unfocusing current
+		return false;
+	}
+	if (focusView && !focusView->CanUnlockFocus()) {
+		// current focus unwilling to reliquish
+		return false;
+	}
+	focusView = target;
+	return true;
+}
+
+void Window::OnMouseOver(const Point& p)
+{
+	// need screen coordinates because the target may not be a direct subview
+	Point screenP = ConvertPointToScreen(p);
+	View* target = SubviewAt(p, false, true);
+	bool left = false;
+	if (target) {
+		// TODO: make mouse enter/leave suitable for drag & drop events
+		if (target != hoverView) {
+			if (hoverView) {
+				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP));
+				left = true;
+			}
+			target->OnMouseEnter(target->ConvertPointFromScreen(screenP));
+		}
+	} else if (hoverView) {
+		hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP));
+		left = true;
+	}
+	if (left) {
+		if (hoverView && hoverView->TracksMouseDown()) {
+			trackingView = hoverView;
+		} else {
+			trackingView = NULL;
+		}
+	}
+	if (trackingView) {
+		// tracking will eat this event
+		trackingView->OnMouseOver(trackingView->ConvertPointFromScreen(screenP));
+	} else if (target) {
+		target->OnMouseOver(target->ConvertPointFromScreen(screenP));
+	}
+	hoverView = target;
+}
+
+void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
+{
+	View* target = SubviewAt(p, false, true);
+	if (target) {
+		TrySetFocus(target);
+		Point subP = target->ConvertPointFromScreen(ConvertPointToScreen(p));
+		target->OnMouseDown(subP, button, mod);
+		trackingView = target; // all views track the mouse within their bounds
+		return;
+	}
+	// handle scrollbar events
+	View::OnMouseDown(p, button, mod);
+}
+
+void Window::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
+{
+	if (trackingView) {
+		Point subP = trackingView->ConvertPointFromScreen(ConvertPointToScreen(p));
+		trackingView->OnMouseUp(subP, button, mod);
+	}
+	trackingView = NULL;
+}
+
+void Window::OnMouseWheelScroll(short x, short y)
+{
+	Point mp = core->GetVideoDriver()->GetMousePos();
+	View* target = SubviewAt(ConvertPointFromScreen(mp), false, true);
+	if (target) {
+		target->OnMouseWheelScroll( x, y );
+		return;
+	}
+	// handle scrollbar events
+	View::OnMouseWheelScroll(x, y);
+}
+
+bool Window::OnSpecialKeyPress(unsigned char key)
+{
+	bool handled = false;
+	if (focusView) {
+		handled = focusView->OnSpecialKeyPress(key);
+	}
+
+	Control* ctrl = NULL;
+	//the default control will get only GEM_RETURN
+	if (key == GEM_RETURN) {
+		//ctrl = GetDefaultControl(0);
+	}
+	//the default cancel control will get only GEM_ESCAPE
+	else if (key == GEM_ESCAPE) {
+		//ctrl = GetDefaultControl(1);
+	} else if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
+		ctrl = GetFunctionControl(key - GEM_FUNCTION1);
+	} else {
+		ctrl = dynamic_cast<Control*>(FocusedView());
+	}
+
+	if (ctrl) {
+		switch (ctrl->ControlType) {
+				//scrollbars will receive only mousewheel events
+			case IE_GUI_SCROLLBAR:
+				if (key != GEM_UP && key != GEM_DOWN) {
+					return false;
+				}
+				break;
+				//buttons will receive only GEM_RETURN
+			case IE_GUI_BUTTON:
+				if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
+					//fake mouse button
+					ctrl->OnMouseDown(Point(), GEM_MB_ACTION, 0);
+					ctrl->OnMouseUp(Point(), GEM_MB_ACTION, 0);
+					return false;
+				}
+				if (key != GEM_RETURN && key!=GEM_ESCAPE) {
+					return false;
+				}
+				break;
+				// shouldnt be any harm in sending these events to any control
+		}
+		ctrl->OnSpecialKeyPress( key );
+		return true;
+	}
+	// handle scrollbar events
+	return View::OnSpecialKeyPress(key);
 }
 
 }

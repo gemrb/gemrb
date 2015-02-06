@@ -30,7 +30,6 @@ View::View(const Region& frame)
 {
 	scrollbar = NULL;
 	background = NULL;
-	focusView = NULL;
 	superView = NULL;
 
 	dirty = true;
@@ -272,41 +271,19 @@ void View::SetScrollBar(ScrollBar* sb)
 	}
 }
 
-bool View::TrySetFocus(View* target)
-{
-	if (target && !target->LockFocus()) {
-		// target wont accept focus so dont bother unfocusing current
-		return false;
-	}
-	if (focusView && !focusView->UnlockFocus()) {
-		// current focus unwilling to reliquish
-		return false;
-	}
-	focusView = target;
-	return true;
-}
-
+// View simpler either forwards events to concrete subclasses, or to its attached scrollbar
 void View::OnMouseOver(const Point& p)
 {
-	if (focusView) {
-		if (focusView->Frame().PointInside(p)) {
-			focusView->OnMouseOver(focusView->ConvertPointFromSuper(p));
-			return;
-		} else {
-			focusView->OnMouseLeave(focusView->ConvertPointFromSuper(p));
-			// no return. can also be an OnMouseEnter event for another control
-		}
-	}
 	View* target = SubviewAt(p);
-	if (target && target->Frame().PointInside(p)) {
-		target->OnMouseEnter(target->ConvertPointFromSuper(p));
+	if (target) {
+		target->OnMouseOver(target->ConvertPointFromSuper(p));
 	}
 }
 
 void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
 	View* target = SubviewAt(p);
-	if (target && TrySetFocus(target)) {
+	if (target) {
 		target->OnMouseDown(target->ConvertPointFromSuper(p), button, mod);
 		return;
 	}
@@ -319,23 +296,14 @@ void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod
 
 void View::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
 {
-	View* target = focusView;
-	if (!target && scrollbar && (button == GEM_MB_SCRLUP || button == GEM_MB_SCRLDOWN)) {
-		// forward to scrollbar
-		target = scrollbar;
-	}
+	View* target = SubviewAt(p);
 	if (target) {
-		focusView->OnMouseUp(target->ConvertPointFromSuper(p), button, mod);
+		target->OnMouseUp(p, button, mod);
 	}
 }
 
 void View::OnMouseWheelScroll(short x, short y)
 {
-	if (focusView) {
-		focusView->OnMouseWheelScroll(x, y);
-		return;
-	}
-
 	if (scrollbar) {
 		scrollbar->OnMouseWheelScroll( x, y );
 	}
@@ -343,15 +311,10 @@ void View::OnMouseWheelScroll(short x, short y)
 
 bool View::OnSpecialKeyPress(unsigned char key)
 {
-	bool handled = false;
-	if (focusView) {
-		handled = focusView->OnSpecialKeyPress(key);
-	}
-	
-	if (!handled && scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
+	if (scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
 		return scrollbar->OnSpecialKeyPress(key);
 	}
-	return handled;
+	return false;
 }
 	
 }
