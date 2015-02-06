@@ -300,9 +300,7 @@ void EventMgr::MouseIdle(unsigned long /*time*/)
 {
 	if (last_win_over == NULL) return;
 
-	int x, y;
-	core->GetVideoDriver()->GetMousePos(x, y);
-	Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(Point(x, y)));
+	Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(core->GetVideoDriver()->GetMousePos()));
 	if (ctrl == NULL) return;
 	ctrl->DisplayTooltip();
 }
@@ -346,9 +344,7 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 
 	// tab shows tooltips
 	if (last_win_over != NULL && Key == GEM_TAB) {
-		int x, y;
-		core->GetVideoDriver()->GetMousePos(x, y);
-		Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(Point(x, y)));
+		Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(core->GetVideoDriver()->GetMousePos()));
 		if (ctrl != NULL) {
 			ctrl->DisplayTooltip();
 			return;
@@ -366,9 +362,8 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
  *  refresh the cursor without actual user input) */
 void EventMgr::FakeMouseMove()
 {
-	int x, y;
-	core->GetVideoDriver()->GetMousePos(x, y);
-	MouseMove((unsigned short) x, (unsigned short) y);
+	Point p = core->GetVideoDriver()->GetMousePos();
+	MouseMove(p.x, p.y);
 }
 
 void EventMgr::SetFocused(Window *win, Control *ctrl)

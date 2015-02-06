@@ -411,9 +411,7 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 	case GEM_MB_ACTION:
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		int x,y;
-		core->GetVideoDriver()->GetMousePos(x, y);
-		drag_start = Point(x, y);
+		drag_start = core->GetVideoDriver()->GetMousePos();
 
 		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
@@ -541,13 +539,11 @@ void Button::OnMouseOver(const Point& p)
 			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		int dx, dy;
-		core->GetVideoDriver()->GetMousePos(dx, dy);
+		Point p = core->GetVideoDriver()->GetMousePos();
+		core->GetDictionary()->SetAt( "DragX", p.x );
+		core->GetDictionary()->SetAt( "DragY", p.y );
+		drag_start = drag_start + p;
 
-		core->GetDictionary()->SetAt( "DragX", dx );
-		core->GetDictionary()->SetAt( "DragY", dy );
-		drag_start.x = (ieWord) (drag_start.x + dx);
-		drag_start.y = (ieWord) (drag_start.y + dy);
 		RunEventHandler( ButtonOnDrag );
 	}
 }

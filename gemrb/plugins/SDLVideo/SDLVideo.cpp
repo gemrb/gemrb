@@ -151,11 +151,10 @@ int SDLVideoDriver::PollEvents()
 	{
 		// get our internal mouse coordinates instead of system coordinates
 		// this is important for SDL2 (Android, iOS currently)
-		int x, y;
-		GetMousePos(x, y);
+		Point p = GetMousePos();
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		if (!core->ConsolePopped) {
-			EvntManager->MouseUp( x, y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );
+			EvntManager->MouseUp( p.x, p.y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );
 			Control* ctl = EvntManager->GetMouseFocusedControl();
 			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
 				// these are repeat events so the control should stay pressed

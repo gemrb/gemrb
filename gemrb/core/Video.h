@@ -201,7 +201,7 @@ public:
 	/** Gets Clip Rectangle */
 	const Region& GetScreenClip() { return screenClip; }
 	/** returns the current mouse coordinates */
-	void GetMousePos(int &x, int &y);
+	Point GetMousePos() { return CursorPos; }
 	/** clicks the mouse forcibly */
 	virtual void ClickMouse(unsigned int button) = 0;
 	/** moves the mouse forcibly */

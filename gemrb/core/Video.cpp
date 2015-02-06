@@ -453,10 +453,4 @@ void Video::DestroySpriteCover(SpriteCover* sc)
 	sc->pixels = NULL;
 }
 
-void Video::GetMousePos(int &x, int &y)
-{
-	x = CursorPos.x;
-	y = CursorPos.y;
-}
-
 }
