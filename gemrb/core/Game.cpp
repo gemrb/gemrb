@@ -1840,8 +1840,21 @@ void Game::CastOnRest()
 			if (healingspells.back().amount == 0) {
 				healingspells.pop_back();
 			}
-		// Here is the place to write the loop for non hp healing spells.
-		// these spells are in the variable nonhealingspells
+		}
+		// Other rest-time spells
+		// Everybody gets something while stocks last!
+		// In other words a better priorization of targets is needed
+		ieWord spelltarget = 0;
+		while (!nonhealingspells.empty()) {
+			nonhealingspells.back().caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, nonhealingspells.back().resref,0,1,true);
+			nonhealingspells.back().amount--;
+			if (nonhealingspells.back().amount == 0) {
+				nonhealingspells.pop_back();
+			}
+			spelltarget++;
+			if (spelltarget == wholeparty.size()) {
+				spelltarget=0;
+			}
 		}
 	}
 }
