@@ -106,7 +106,7 @@ def TA_AppendText(TA, name, text):
 	status = (new == (old+text))
 	if not status:
 		print "Expected:+", repr(old+text), "+"
-		print "Actual:+", repr(new), "+"
+		print "Actual  :+", repr(new), "+"
 	return DisplayTestResult (status, name)
 
 def TA_PrependEmpty(TA):
