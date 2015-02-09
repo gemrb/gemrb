@@ -441,7 +441,7 @@ def SetCharacterDescription():
 		TextArea.Append (1047)
 		TextArea.Append (": ")
 		TextArea.Append (GemRB.GetToken ("CHARNAME"))
-		TextArea.Append ("")
+		TextArea.Append ("\n")
 	if CharGenState > 0:
 		TextArea.Append (12135)
 		TextArea.Append (": ")
@@ -449,6 +449,7 @@ def SetCharacterDescription():
 			TextArea.Append (1050)
 		else:
 			TextArea.Append (1051)
+		TextArea.Append ("\n")
 	if CharGenState > 2:
 		ClassName = GUICommon.GetClassRowName (MyChar)
 		TextArea.Append (12136)
@@ -461,6 +462,7 @@ def SetCharacterDescription():
 		else:
 			ClassTitle = KitTable.GetValue (KitIndex, 2)
 		TextArea.Append (ClassTitle)
+		TextArea.Append ("\n")
 
 	if CharGenState > 1:
 		TextArea.Append (1048)
@@ -468,14 +470,16 @@ def SetCharacterDescription():
 		Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
 		Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 		TextArea.Append (CommonTables.Races.GetValue (Race, 2) )
+		TextArea.Append ("\n")
 	if CharGenState > 3:
 		TextArea.Append (1049)
 		TextArea.Append (": ")
 		Alignment = CommonTables.Aligns.FindValue (3, GemRB.GetPlayerStat(MyChar, IE_ALIGNMENT))
 		TextArea.Append (CommonTables.Aligns.GetValue (Alignment, 2))
+		TextArea.Append ("\n")
 	if CharGenState > 4:
 		strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
-		TextArea.Append ("")
+		TextArea.Append ("\n")
 		for i in range (6):
 			TextArea.Append (AbilitiesTable.GetValue (i, 2))
 			TextArea.Append (": " )
@@ -485,6 +489,7 @@ def SetCharacterDescription():
 				TextArea.Append (str(stat) + "/" + str(strextra) )
 			else:
 				TextArea.Append (str(stat) )
+			TextArea.Append ("\n")
 	if CharGenState > 5:
 		DruidSpell = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 		PriestSpell = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
@@ -493,17 +498,19 @@ def SetCharacterDescription():
 		IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
 
 		if IsThief!="*":
-			TextArea.Append ("")
+			TextArea.Append ("\n")
 			TextArea.Append (8442)
+			TextArea.Append ("\n")
 			for i in range (4):
 				TextArea.Append (SkillsTable.GetValue (i+2, 2))
 				StatID = SkillsTable.GetValue (i+2, 3)
 				TextArea.Append (": " )
 				TextArea.Append (str(GemRB.GetPlayerStat (MyChar, StatID)) )
-				TextArea.Append ("%" )
+				TextArea.Append ("%\n")
 		elif DruidSpell!="*":
-			TextArea.Append ("")
+			TextArea.Append ("\n")
 			TextArea.Append (8442)
+			TextArea.Append ("\n")
 			for i in range (4):
 				StatID = SkillsTable.GetValue (i+2, 3)
 				Stat = GemRB.GetPlayerStat (MyChar, StatID)
@@ -511,15 +518,17 @@ def SetCharacterDescription():
 					TextArea.Append (SkillsTable.GetValue (i+2, 2))
 					TextArea.Append (": " )
 					TextArea.Append (str(Stat) )
-					TextArea.Append ("%" )
-			TextArea.Append ("")
+					TextArea.Append ("%\n")
+			TextArea.Append ("\n")
 			TextArea.Append (15982)
 			TextArea.Append (": " )
 			RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
 			TextArea.Append (RacialEnemyTable.GetValue (RacialEnemy, 3) )
+			TextArea.Append ("\n")
 		elif IsBard!="*":
-			TextArea.Append ("")
+			TextArea.Append ("\n")
 			TextArea.Append (8442)
+			TextArea.Append ("\n")
 			for i in range (4):
 				StatID = SkillsTable.GetValue (i+2, 3)
 				Stat = GemRB.GetPlayerStat (MyChar, StatID)
@@ -527,10 +536,11 @@ def SetCharacterDescription():
 					TextArea.Append (SkillsTable.GetValue (i+2, 2))
 					TextArea.Append (": " )
 					TextArea.Append (str(Stat) )
-					TextArea.Append ("%" )
+					TextArea.Append ("%\n")
 
-		TextArea.Append ("")
+		TextArea.Append ("\n")
 		TextArea.Append (9466)
+		TextArea.Append ("\n")
 		for i in range (15):
 			StatID = ProficienciesTable.GetValue (i, 0)
 			ProficiencyValue = GemRB.GetPlayerStat (MyChar, StatID )
@@ -541,11 +551,12 @@ def SetCharacterDescription():
 				while j < ProficiencyValue:
 					TextArea.Append ("+")
 					j = j + 1
+				TextArea.Append ("\n")
 
 		if MageSpell !="*":
-			TextArea.Append ("")
+			TextArea.Append ("\n")
 			TextArea.Append (11027)
-			TextArea.Append (": " )
+			TextArea.Append (":\n")
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 			Learnable = Spellbook.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), t,1)
 			MageSpellBook = GemRB.GetVar ("MageSpellBook")
@@ -556,14 +567,14 @@ def SetCharacterDescription():
 					TextArea.Append (Spell["SpellName"])
 					if (1 << i) & MageMemorized:
 						TextArea.Append (" +")
-					TextArea.Append (" ")
+					TextArea.Append ("\n")
 
 		if PriestSpell == "*":
 			PriestSpell = DruidSpell
 		if PriestSpell!="*":
-			TextArea.Append ("")
+			TextArea.Append ("\n")
 			TextArea.Append (11028)
-			TextArea.Append (": " )
+			TextArea.Append (":\n")
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 			if PriestSpell == "MXSPLPRS" or PriestSpell == "MXSPLPAL":
 				ClassFlag = 0x4000
@@ -578,7 +589,7 @@ def SetCharacterDescription():
 				if (1 << i) & PriestMemorized:
 					Spell = GemRB.GetSpell (Learnable[i])
 					TextArea.Append (Spell["SpellName"])
-					TextArea.Append (" +")
+					TextArea.Append (" +\n")
 	return
 
 
