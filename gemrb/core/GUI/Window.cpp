@@ -54,13 +54,10 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 
 Window::~Window()
 {
-	std::vector< Control*>::iterator m = Controls.begin();
-	while (Controls.size() != 0) {
-		Control* ctrl = ( *m );
-		delete ctrl;
-		Controls.erase( m );
-		m = Controls.begin();
+	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m) {
+		delete *m;
 	}
+	Controls.clear();
 	Sprite2D::FreeSprite( BackGround );
 	BackGround = NULL;
 }
@@ -71,10 +68,10 @@ void Window::AddControl(Control* ctrl)
 		return;
 	}
 	ctrl->Owner = this;
-	for (size_t i = 0; i < Controls.size(); i++) {
-		if (Controls[i]->ControlID == ctrl->ControlID) {
-			delete( Controls[i] );
-			Controls[i] = ctrl;
+	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m) {
+		if ((*m)->ControlID == ctrl->ControlID) {
+			delete *m;
+			*m = ctrl;
 			Invalidate();
 			return;
 		}
@@ -338,28 +335,25 @@ void Window::Invalidate()
 	DefaultControl[0] = -1;
 	DefaultControl[1] = -1;
 	ScrollControl = -1;
-	for (unsigned int i = 0; i < Controls.size(); i++) {
-		if (!Controls[i]) {
-			continue;
-		}
-		Controls[i]->MarkDirty();
-		switch (Controls[i]->ControlType) {
+	unsigned int i = 0;
+	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m, ++i) {
+		Control *ctrl = *m;
+		ctrl->MarkDirty();
+		switch (ctrl->ControlType) {
 			case IE_GUI_SCROLLBAR:
-				if ((ScrollControl == -1) || (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT))
+				if ((ScrollControl == -1) || (ctrl->Flags & IE_GUI_SCROLLBAR_DEFAULT))
 					ScrollControl = i;
 				break;
 			case IE_GUI_BUTTON:
-				if (( Controls[i]->Flags & IE_GUI_BUTTON_DEFAULT )) {
+				if (ctrl->Flags & IE_GUI_BUTTON_DEFAULT) {
 					DefaultControl[0] = i;
 				}
-				if (( Controls[i]->Flags & IE_GUI_BUTTON_CANCEL )) {
+				if (ctrl->Flags & IE_GUI_BUTTON_CANCEL) {
 					DefaultControl[1] = i;
 				}
 				break;
-				//falling through
 			case IE_GUI_GAMECONTROL:
-				DefaultControl[0] = i;
-				DefaultControl[1] = i;
+				DefaultControl[0] = DefaultControl[1] = i;
 				break;
 			default: ;
 		}
