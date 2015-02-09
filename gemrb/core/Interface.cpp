@@ -2720,26 +2720,6 @@ void Interface::AddWindow(Window * win)
 	win->Invalidate();
 }
 
-/** Get a Control on a Window */
-int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID) const
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	int i = 0;
-	while (true) {
-		Control* ctrl = win->GetControl( (unsigned short) i );
-		if (ctrl == NULL)
-			return -1;
-		if (ctrl->ControlID == ControlID)
-			return i;
-		i++;
-	}
-}
 /** Adjust the Scrolling factor of a control (worldmap atm) */
 int Interface::AdjustScrolling(unsigned short WindowIndex,
 		unsigned short ControlIndex, short x, short y)

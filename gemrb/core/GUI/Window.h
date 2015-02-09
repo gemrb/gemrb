@@ -82,6 +82,8 @@ public:
 	Control* GetControl(unsigned short x, unsigned short y, bool ignore=0);
 	/** Returns the Control by Index */
 	Control* GetControl(unsigned short i) const;
+	/** Returns the Control by Index */
+	int GetControlIndex(ieDword id) const;
 	/** Returns the number of Controls */
 	unsigned int GetControlCount() const;
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */

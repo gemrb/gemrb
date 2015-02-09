@@ -241,6 +241,15 @@ static Control *GetControl( int wi, int ci, int ct)
 	return ctrl;
 }
 
+static int GetControlIndex(unsigned short wi, unsigned long ControlID)
+{
+	Window* win = core->GetWindow(wi);
+	if (win == NULL) {
+		return -1;
+	}
+	return win->GetControlIndex(ControlID);
+}
+
 //sets tooltip with Fx key prepended
 static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
 {
@@ -1229,7 +1238,7 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Window_GetControl__doc );
 	}
 
-	int ctrlindex = core->GetControl(WindowIndex, ControlID);
+	int ctrlindex = GetControlIndex(WindowIndex, ControlID);
 	if (ctrlindex == -1) {
 		char tmp[40];
 		snprintf(tmp, sizeof(tmp), "Control (ID: %d) was not found!", ControlID);
@@ -1288,7 +1297,7 @@ static PyObject* GemRB_Window_HasControl(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &Type )) {
 		return AttributeError( GemRB_Window_HasControl__doc );
 	}
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 	if (ret == -1) {
 		return PyInt_FromLong( 0 );
 	}
@@ -1878,7 +1887,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -1913,7 +1922,7 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 	if (ret<0) {
 		return NULL;
 	}
@@ -1978,7 +1987,7 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	else
 		return RuntimeError( "Cursor BAM not found" );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2030,7 +2039,7 @@ static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* arg
 	sb->ControlID = ControlID;
 	win->AddControl( sb );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2064,7 +2073,7 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 	btn->ControlID = ControlID;
 	win->AddControl( btn );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2347,7 +2356,7 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+	int CtrlIndex = GetControlIndex( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		delete win->RemoveControl(CtrlIndex);
 	}
@@ -2655,7 +2664,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+	int CtrlIndex = GetControlIndex( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
 		rgn = ctrl->ControlFrame();
@@ -2668,7 +2677,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	wmap->SetOverrideIconPalette(recolor);
 	win->AddControl( wmap );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2730,7 +2739,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+	int CtrlIndex = GetControlIndex( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
 		rgn = ctrl->ControlFrame();
@@ -2743,7 +2752,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	map->ControlID = ControlID;
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
-		CtrlIndex = core->GetControl( WindowIndex, LabelID );
+		CtrlIndex = GetControlIndex( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
 		ResourceHolder<ImageMgr> anim(Flag);
@@ -2757,7 +2766,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		goto setup_done;
 	}
 	if (Flag) {
-		CtrlIndex = core->GetControl( WindowIndex, LabelID );
+		CtrlIndex = GetControlIndex( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
 		AnimationFactory* af = ( AnimationFactory* )
@@ -2773,7 +2782,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 setup_done:
 	win->AddControl( map );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2795,8 +2804,8 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 		return AttributeError( GemRB_Control_SubstituteForControl__doc );
 	}
 
-	int subIdx = SubControlID;//core->GetControl(SubWindowIndex, SubControlID);
-	int targetIdx = ControlID;//core->GetControl(WindowIndex, ControlID);
+	int subIdx = SubControlID;//GetControlIndex(SubWindowIndex, SubControlID);
+	int targetIdx = ControlID;//GetControlIndex(WindowIndex, ControlID);
 	Control* substitute = GetControl(SubWindowIndex, subIdx, -1);
 	Control* target = GetControl(WindowIndex, targetIdx, -1);
 	if (!substitute || !target) {
@@ -4200,7 +4209,7 @@ static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args
 	ta->ControlID = ControlID;
 	win->AddControl( ta );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -8539,7 +8548,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start||more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, Offset),dict, ACT_LEFT,0);
+		PyObject *ret = SetActionIcon(wi,GetControlIndex(wi, Offset),dict, ACT_LEFT,0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -8553,7 +8562,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
-		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
+		int ci = GetControlIndex(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		if (!btn) {
 			Log(ERROR, "GUIScript", "Button %d in window %d not found!", ci, wi);
@@ -8600,7 +8609,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	}
 
 	if (more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+Offset+1),dict,ACT_RIGHT,i+1);
+		PyObject *ret = SetActionIcon(wi,GetControlIndex(wi, i+Offset+1),dict,ACT_RIGHT,i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -8703,7 +8712,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
-		int ci = core->GetControl(wi, i+Start);
+		int ci = GetControlIndex(wi, i+Start);
 		if (ci<0) {
 			print("Couldn't find button #%d on Window #%d", i+Start, wi);
 			return RuntimeError ("No such control!\n");
