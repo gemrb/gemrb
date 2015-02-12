@@ -24,6 +24,7 @@
 #include "GUI/Control.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/TextSystem/Font.h"
+#include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/TextSystem/TextContainer.h"
 
 #include "RGBAColor.h"
@@ -127,12 +128,12 @@ private: // Private attributes
 
 	/** Fonts */
 	Font* finit, * ftext;
+	GemMarkupParser parser;
 
 	/** OnChange Scripted Event Function Name */
 	ControlEventHandler TextAreaOnChange;
 	ControlEventHandler TextAreaOnSelect;
 
-private: //internal functions
 	enum PALETTE_TYPE {
 		PALETTE_NORMAL = 0,	// standard text color
 		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
@@ -145,6 +146,7 @@ private: //internal functions
 	Palette* palettes[PALETTE_TYPE_COUNT];
 	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
 
+private: //internal functions
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
 	void UpdateScrollbar();

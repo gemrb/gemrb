@@ -22,15 +22,25 @@
 
 namespace GemRB {
 
-void GemMarkupParser::SetTextDefaults(const Font* ftext, const Font* finit, Palette* textCol)
+GemMarkupParser::GemMarkupParser()
 {
-	this->ftext = ftext;
-	this->finit = finit;
-	this->palette = textCol;
-	textCol->acquire();
+	state = TEXT;
 }
 
-void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContainer& container) const
+GemMarkupParser::GemMarkupParser(const Font* ftext, const Font* finit, Palette* textCol)
+{
+	state = TEXT;
+	context.push(TextAttributes(ftext, finit, textCol));
+}
+
+void GemMarkupParser::ResetAttributes(const Font* ftext, const Font* finit, Palette* textCol)
+{
+	while(context.size()) context.pop();
+	context.push(TextAttributes(ftext, finit, textCol));
+}
+
+GemMarkupParser::ParseState
+GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContainer& container)
 {
 	size_t tagPos = text.find_first_of('[');
 	if (tagPos != 0) {
@@ -43,25 +53,15 @@ void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextCon
 	// [p] encloses a span of text to be rendered as an inline block:
 	//     it will grow vertically as needed, but be confined to the remaining width of the line
 
-	// span properties
-	Color palCol;
-	Palette* pal = NULL;
-	const Font* fnt = ftext;
-	Size frame;
-	//ieByte align = 0;
-
-	enum ParseState {
-		TEXT = 0,
-		OPEN_TAG,
-		CLOSE_TAG,
-		COLOR
-	};
-
 	// TODO: implement escaping [] ('\')
+	Size frame;
 	String token;
-	ParseState state = TEXT;
+
 	String::const_iterator it = text.begin() + tagPos;
 	for (; it != text.end(); it++) {
+		assert(context.size());
+		TextAttributes& attributes = context.top();
+
 		switch (state) {
 			case OPEN_TAG:
 				switch (*it) {
@@ -74,7 +74,7 @@ void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextCon
 						continue;
 					case ']':
 						if (token == L"cap") {
-							fnt = finit;
+							attributes.SwapFonts();
 							//align = IE_FONT_SINGLE_LINE;
 						} else if (token == L"p") {
 							frame.w = -1;
@@ -93,9 +93,9 @@ void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextCon
 				switch (*it) {
 					case ']':
 						if (token == L"color") {
-							gamedata->FreePalette(pal);
+							context.pop();
 						} else if (token == L"cap") {
-							fnt = ftext;
+							attributes.SwapFonts();
 							//align = 0;
 						} else if (token == L"p") {
 							frame.w = 0;
@@ -111,12 +111,7 @@ void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextCon
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
-							Palette* p = pal;
-							if (fnt == finit && p == NULL) {
-								p = finit->GetPalette();
-								p->release();
-							}
-							container.AppendContent(new TextSpan(token, fnt, p, &frame));
+							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextPalette(), &frame));
 						}
 						token.clear();
 						if (*++it == '/')
@@ -131,10 +126,15 @@ void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextCon
 			case COLOR:
 				switch (*it) {
 					case L']':
+						Color palCol;
 						swscanf(token.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
 						// TODO: we shouldnt be making a new palette here. we end up with dozens of identical palettes.
 						// something needs to cache these
-						pal = new Palette(palCol, palette->back);
+						Palette* pal = new Palette(palCol, attributes.TextPalette()->back);
+						TextAttributes newAtts = attributes;
+						context.push(TextAttributes(attributes.TextFont, attributes.SwapFont, pal));
+						pal->release();
+
 						state = TEXT;
 						token.clear();
 						continue;
@@ -146,12 +146,12 @@ void GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextCon
 		}
 		token += *it;
 	}
-	// FIXME: should handle errors gracefully
-	assert(pal == NULL && state == TEXT);
+
 	if (token.length()) {
 		// there was some text at the end without markup
 		container.AppendText(token);
 	}
+	return state;
 }
 
 }

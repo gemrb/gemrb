@@ -26,7 +26,6 @@
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/EventMgr.h"
-#include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/Window.h"
 
 #define EDGE_PADDING 3
@@ -34,7 +33,7 @@
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
+	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), parser(text, text, NULL), palettes()
 {
 	palette = text->GetPalette();
 	finit = ftext;
@@ -60,6 +59,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		palettes[PALETTE_INITIALS] = finit->GetPalette();
 	}
 
+	parser.ResetAttributes(text, finit, palette);
 	Init();
 }
 
@@ -256,9 +256,6 @@ void TextArea::AppendText(const String& text)
 
 	size_t tagPos = text.find_first_of('[');
 	if (tagPos != String::npos) {
-		// share a single parser for all TextAreas
-		static GemMarkupParser parser;
-		parser.SetTextDefaults(ftext, finit, palette);
 		parser.ParseMarkupStringIntoContainer(text, *textContainer);
 	} else if (text.length()) {
 		if (finit != ftext) {

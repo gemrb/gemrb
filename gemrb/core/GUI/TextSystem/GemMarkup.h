@@ -19,26 +19,85 @@
 #ifndef GEMMARKUP_H
 #define GEMMARKUP_H
 
-#include "GameData.h"
 #include "TextContainer.h"
+
+#include <stack>
 
 namespace GemRB {
 
 class GemMarkupParser {
-private:
-	const Font* ftext;
-	const Font* finit;
-	Palette* palette;
-
 public:
-	GemMarkupParser() : ftext(NULL), finit(NULL), palette(NULL) {};
-	~GemMarkupParser() {
-		gamedata->FreePalette(palette);
+	enum ParseState {
+		TEXT = 0,
+		OPEN_TAG,
+		CLOSE_TAG,
+		COLOR
 	};
 
-	void SetTextDefaults(const Font* ftext, const Font* finit, Palette* textCol);
+	GemMarkupParser();
+	GemMarkupParser(const Font* ftext, const Font* finit, Palette* textCol);
+	~GemMarkupParser() {};
+
+	void ResetAttributes(const Font* ftext, const Font* finit, Palette* textCol);
+
 	TextSpan* ParseMarkupTag(const String&) const;
-	void ParseMarkupStringIntoContainer(const String&, TextContainer&) const;
+	ParseState ParseMarkupStringIntoContainer(const String&, TextContainer&);
+
+private:
+	class TextAttributes {
+		private:
+		Palette* palette;
+
+		public:
+		const Font* TextFont;
+		const Font* SwapFont;
+
+		public:
+		TextAttributes(const Font* text, const Font* init, Palette* pal) {
+			TextFont = text;
+			SwapFont = (init) ? init : TextFont;
+			assert(TextFont);
+			if (pal == NULL) {
+				pal = TextFont->GetPalette();
+			} else {
+				pal->acquire();
+			}
+			assert(pal);
+			palette = pal;
+		}
+
+		TextAttributes(const TextAttributes& ta) {
+			this->operator=(ta);
+		}
+
+		TextAttributes& operator=(const TextAttributes& ta) { // copy/move constructor is called to construct arg
+			TextFont = ta.TextFont;
+			SwapFont = ta.SwapFont;
+			palette = ta.palette;
+			palette->acquire();
+			return *this;
+		}
+
+		~TextAttributes() {
+			palette->release();
+		}
+
+		void SwapFonts() {
+			std::swap(TextFont, SwapFont);
+		}
+
+		Palette* TextPalette() const {
+			if (palette) {
+				return palette;
+			}
+			Palette* pal = TextFont->GetPalette();
+			pal->release();
+			return pal;
+		}
+	};
+
+	std::stack<TextAttributes> context;
+	ParseState state;
 };
 
 }
