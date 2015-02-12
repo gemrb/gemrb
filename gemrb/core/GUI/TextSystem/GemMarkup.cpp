@@ -22,6 +22,23 @@
 
 namespace GemRB {
 
+GemMarkupParser::PaletteCache GemMarkupParser::PalCache;
+
+Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
+{
+	PaletteCache::const_iterator it = PalCache.find(colorString);
+	if (it != PalCache.end()) {
+		return ((*it).second).get();
+	}
+
+	Color palCol;
+	swscanf(colorString.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
+	Palette* pal = new Palette(palCol, ColorBlack);
+	PalCache.insert(std::make_pair(colorString, pal));
+	pal->release();
+	return pal;
+}
+
 GemMarkupParser::GemMarkupParser()
 {
 	state = TEXT;
@@ -126,13 +143,8 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case COLOR:
 				switch (*it) {
 					case L']':
-						Color palCol;
-						swscanf(token.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
-						// TODO: we shouldnt be making a new palette here. we end up with dozens of identical palettes.
-						// something needs to cache these
-						Palette* pal = new Palette(palCol, attributes.TextPalette()->back);
+						Palette* pal = GetSharedPalette(token);
 						context.push(TextAttributes(attributes.TextFont, attributes.SwapFont, pal));
-						pal->release();
 
 						state = TEXT;
 						token.clear();

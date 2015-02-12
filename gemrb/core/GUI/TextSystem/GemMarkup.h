@@ -20,7 +20,9 @@
 #define GEMMARKUP_H
 
 #include "TextContainer.h"
+#include "System/String.h"
 
+#include <map>
 #include <stack>
 
 namespace GemRB {
@@ -96,6 +98,10 @@ private:
 		}
 	};
 
+	static Palette* GetSharedPalette(const String& colorString);
+
+	typedef std::map<String, Holder<Palette> > PaletteCache;
+	static PaletteCache PalCache;
 	std::stack<TextAttributes> context;
 	ParseState state;
 };
