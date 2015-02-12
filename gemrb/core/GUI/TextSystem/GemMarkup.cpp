@@ -131,7 +131,6 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						// TODO: we shouldnt be making a new palette here. we end up with dozens of identical palettes.
 						// something needs to cache these
 						Palette* pal = new Palette(palCol, attributes.TextPalette()->back);
-						TextAttributes newAtts = attributes;
 						context.push(TextAttributes(attributes.TextFont, attributes.SwapFont, pal));
 						pal->release();
 
