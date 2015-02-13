@@ -1865,13 +1865,12 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	if (!btn) {
 		return NULL;
 	}
-	Region frame = btn->Frame();
-	frame.y += 5;
+	Region frame = Region(Point(0, 5), btn->Dimensions());
 	frame.h -= 10;
 	Label* lbl = new Label(frame, core->GetFont( font ), L"" );
 	lbl->ControlID = ControlID;
 	lbl->SetAlignment( align );
-	win->AddSubviewInFrontOfView( lbl );
+	btn->AddSubviewInFrontOfView( lbl );
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 
