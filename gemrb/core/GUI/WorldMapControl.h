@@ -73,7 +73,7 @@ public:
 	void SetColor(int which, Color color);
 	void SetOverrideIconPalette(bool override) { OverrideIconPalette = override; };
 	int ScrollX, ScrollY;
-	unsigned short lastMouseX, lastMouseY;
+	Point LastMousePos;
 	bool MouseIsDown;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
@@ -100,14 +100,14 @@ private:
 	ControlEventHandler WorldMapControlOnEnter;
 
 	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
+	void OnMouseOver(const Point& p);
 	/** Mouse Leave Event */
-	void OnMouseLeave(unsigned short x, unsigned short y);
+	void OnMouseLeave(const Point& p);
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
+	void OnMouseDown(const Point& p, unsigned short Button,
 		unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
+	void OnMouseUp(const Point& p, unsigned short Button,
 		unsigned short Mod);
 	/** Mouse Wheel Event */
 	void OnMouseWheelScroll(short x, short y);

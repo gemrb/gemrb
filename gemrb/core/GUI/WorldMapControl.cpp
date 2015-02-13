@@ -42,7 +42,6 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
-	lastMouseX = lastMouseY = 0;
 	lastCursor = 0;
 	Area = NULL;
 	Value = direction;
@@ -207,21 +206,19 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 }
 
 /** Mouse Over Event */
-void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
+void WorldMapControl::OnMouseOver(const Point& p)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	lastCursor = IE_CURSOR_GRAB;
 
 	if (MouseIsDown) {
-		AdjustScrolling(lastMouseX-x, lastMouseY-y);
+		AdjustScrolling(LastMousePos.x - p.x, LastMousePos.y - p.y);
 	}
 
-	lastMouseX = x;
-	lastMouseY = y;
+	LastMousePos = p;
 
 	if (Value!=(ieDword) -1) {
-		x =(ieWord) (x + ScrollX);
-		y =(ieWord) (y + ScrollY);
+		Point mapOff = p + Point(ScrollX, ScrollY);
 
 		WMPAreaEntry *oldArea = Area;
 		Area = NULL;
@@ -236,26 +233,24 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 
 			Sprite2D *icon=ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
-			int h=0, w=0, iconx=0, icony=0;
+			Region rgn(ae->X, ae->Y, 0, 0);
 			if (icon) {
-				h=icon->Height;
-				w=icon->Width;
-				iconx = icon->XPos;
-				icony = icon->YPos;
+				rgn.x -= icon->XPos;
+				rgn.y -= icon->YPos;
+				rgn.w = icon->Width;
+				rgn.h = icon->Height;
 				Sprite2D::FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
 				Size ts = ftext->StringSize(*ae->GetCaption());
 				ts.w += 10;
-				if(h < ts.h)
-					h = ts.h;
-				if(w < ts.w)
-					w = ts.w;
+				if(rgn.h < ts.h)
+					rgn.h = ts.h;
+				if(rgn.w < ts.w)
+					rgn.w = ts.w;
 			}
-			if (ae->X - iconx > x) continue;
-			if (ae->X - iconx + w < x) continue;
-			if (ae->Y - icony > y) continue;
-			if (ae->Y - icony + h < y) continue;
+			if (!rgn.PointInside(mapOff)) continue;
+
 			lastCursor = IE_CURSOR_NORMAL;
 			Area=ae;
 			if(oldArea!=ae) {
@@ -272,30 +267,28 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 void WorldMapControl::DisplayTooltip()
 {
 	if (Area) {
-		int x = Owner->Frame().x + frame.x + lastMouseX;
-		int y = Owner->Frame().y + frame.y + lastMouseY - 50;
-		core->DisplayTooltip( x, y, this );
+		Point p = ConvertPointToScreen(LastMousePos);
+		p.y -= 50;
+		core->DisplayTooltip( p.x, p.y, this );
 	} else {
 		core->DisplayTooltip( 0, 0, NULL );
 	}
 }
 
 /** Mouse Leave Event */
-void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+void WorldMapControl::OnMouseLeave(const Point& /*p*/)
 {
 	Owner->Cursor = IE_CURSOR_NORMAL;
 	Area = NULL;
 }
 
 /** Mouse Button Down */
-void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short /*Mod*/)
+void WorldMapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	switch(Button) {
 	case GEM_MB_ACTION:
 		MouseIsDown = true;
-		lastMouseX = x;
-		lastMouseY = y;
+		LastMousePos = p;
 		break;
 	case GEM_MB_SCRLUP:
 		OnSpecialKeyPress(GEM_UP);
@@ -306,8 +299,7 @@ void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 	}
 }
 /** Mouse Button Up */
-void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned short Button, unsigned short /*Mod*/)
+void WorldMapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	if (Button != GEM_MB_ACTION) {
 		return;
