@@ -288,31 +288,25 @@ void View::SetScrollBar(ScrollBar* sb)
 // View simpler either forwards events to concrete subclasses, or to its attached scrollbar
 void View::OnMouseOver(const Point& p)
 {
-	View* target = SubviewAt(p);
-	if (target) {
-		target->OnMouseOver(target->ConvertPointFromSuper(p));
+	if (superView) {
+		superView->OnMouseOver(ConvertPointToSuper(p));
 	}
 }
 
 void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
-	View* target = SubviewAt(p);
-	if (target) {
-		target->OnMouseDown(target->ConvertPointFromSuper(p), button, mod);
-		return;
-	}
-
 	if (scrollbar && (button == GEM_MB_SCRLUP || button == GEM_MB_SCRLDOWN)) {
 		// forward to scrollbar
 		scrollbar->OnMouseDown(scrollbar->ConvertPointFromSuper(p), button, mod);
+	} else if (superView) {
+		superView->OnMouseDown(ConvertPointToSuper(p), button, mod);
 	}
 }
 
 void View::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
 {
-	View* target = SubviewAt(p);
-	if (target) {
-		target->OnMouseUp(p, button, mod);
+	if (superView) {
+		superView->OnMouseUp(ConvertPointToSuper(p), button, mod);
 	}
 }
 
@@ -320,6 +314,9 @@ void View::OnMouseWheelScroll(short x, short y)
 {
 	if (scrollbar) {
 		scrollbar->OnMouseWheelScroll( x, y );
+	}
+	if (superView) {
+		superView->OnMouseWheelScroll( x, y );
 	}
 }
 
