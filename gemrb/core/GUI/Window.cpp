@@ -211,7 +211,7 @@ bool Window::TrySetFocus(View* target)
 	return true;
 }
 
-void Window::OnMouseOver(const Point& p)
+void Window::DispatchMouseOver(const Point& p)
 {
 	// need screen coordinates because the target may not be a direct subview
 	Point screenP = ConvertPointToScreen(p);
@@ -246,7 +246,7 @@ void Window::OnMouseOver(const Point& p)
 	hoverView = target;
 }
 
-void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
+void Window::DispatchMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
 	View* target = SubviewAt(p, false, true);
 	if (target) {
@@ -260,7 +260,7 @@ void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short m
 	View::OnMouseDown(p, button, mod);
 }
 
-void Window::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
+void Window::DispatchMouseUp(const Point& p, unsigned short button, unsigned short mod)
 {
 	if (trackingView) {
 		Point subP = trackingView->ConvertPointFromScreen(ConvertPointToScreen(p));
@@ -269,7 +269,7 @@ void Window::OnMouseUp(const Point& p, unsigned short button, unsigned short mod
 	trackingView = NULL;
 }
 
-void Window::OnMouseWheelScroll(short x, short y)
+void Window::DispatchMouseWheelScroll(short x, short y)
 {
 	Point mp = core->GetVideoDriver()->GetMousePos();
 	View* target = SubviewAt(ConvertPointFromScreen(mp), false, true);

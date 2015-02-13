@@ -100,10 +100,10 @@ public:
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
-	void OnMouseOver(const Point&);
-	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void OnMouseWheelScroll(short x, short y);
+	void DispatchMouseOver(const Point&);
+	void DispatchMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	void DispatchMouseWheelScroll(short x, short y);
 
 public: //Public attributes
 	/** WinPack */

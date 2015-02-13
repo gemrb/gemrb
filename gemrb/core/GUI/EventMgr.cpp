@@ -183,7 +183,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		gc->OnGlobalMouseMove(p);
 	}
 	if (last_win_mousefocused && focusLock) {
-		last_win_mousefocused->OnMouseOver(p);
+		last_win_mousefocused->DispatchMouseOver(p);
 		RefreshCursor(last_win_mousefocused->Cursor);
 		return;
 	}
@@ -199,7 +199,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			continue;
 
 		if (win->Frame().PointInside(p)) {
-			win->OnMouseOver(win->ConvertPointFromScreen(p));
+			win->DispatchMouseOver(win->ConvertPointFromScreen(p));
 
 			if (last_win_mousefocused) {
 				RefreshCursor(last_win_mousefocused->Cursor);
@@ -263,7 +263,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 
 		if (win->Frame().PointInside(p)) {
 			last_win_mousefocused = win;
-			win->OnMouseDown(win->ConvertPointFromScreen(p), Button, Mod);
+			win->DispatchMouseDown(win->ConvertPointFromScreen(p), Button, Mod);
 			RefreshCursor(last_win_mousefocused->Cursor);
 		}
 
@@ -283,7 +283,7 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 	focusLock = NULL;
 	MButtons &= ~Button;
 
-	last_win_mousefocused->OnMouseUp(p, Button, Mod);
+	last_win_mousefocused->DispatchMouseUp(p, Button, Mod);
 }
 
 /** BroadCast Mouse ScrollWheel Event */
@@ -291,7 +291,7 @@ void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 {
 	Control *ctrl = GetMouseFocusedControl();
 	if (ctrl) {
-		ctrl->OnMouseWheelScroll( x, y);
+		ctrl->OnMouseWheelScroll(x, y);
 	}
 }
 
