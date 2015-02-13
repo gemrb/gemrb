@@ -32,9 +32,6 @@
 
 namespace GemRB {
 
-#define MAP_TO_SCREENX(x) XWin - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YWin - ScrollY + (y)
-
 WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
 	: Control(frame)
 {
@@ -103,6 +100,8 @@ WorldMapControl::~WorldMapControl(void)
 /** Draws the Control on the Output Display */
 void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
+#define MAP_TO_SCREENX(x) XWin - ScrollX + (x)
+#define MAP_TO_SCREENY(y) YWin - ScrollY + (y)
 	ieWord XWin = rgn.x;
 	ieWord YWin = rgn.y;
 	WorldMap* worldmap = core->GetWorldMap();
@@ -174,6 +173,8 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
 					 *m->GetCaption(), text_pal, 0 );
 	}
+#undef MAP_TO_SCREENX
+#undef MAP_TO_SCREENY
 }
 
 void WorldMapControl::AdjustScrolling(short x, short y)
