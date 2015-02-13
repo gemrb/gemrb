@@ -42,7 +42,9 @@ View::~View()
 	}
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		delete *it;
+		View* view = *it;
+		view->superView = NULL;
+		delete view;
 	}
 	if (background) background->release();
 }
