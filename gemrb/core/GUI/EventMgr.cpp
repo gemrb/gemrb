@@ -290,9 +290,8 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 /** BroadCast Mouse ScrollWheel Event */
 void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 {
-	Control *ctrl = GetMouseFocusedControl();
-	if (ctrl) {
-		ctrl->OnMouseWheelScroll(x, y);
+	if (last_win_over) {
+		last_win_over->DispatchMouseWheelScroll(x, y);
 	}
 }
 
