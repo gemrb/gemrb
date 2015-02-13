@@ -98,18 +98,15 @@ void Label::SetAlignment(unsigned char Alignment)
 	MarkDirty();
 }
 
-void Label::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned short /*Button*/, unsigned short /*Mod*/)
+void Label::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
-	//print("Label::OnMouseUp");
-	if (( x <= frame.w ) && ( y <= frame.h )) {
-		if (VarName[0] != 0) {
-			core->GetDictionary()->SetAt( VarName, Value );
-		}
-		if (LabelOnPress) {
-			RunEventHandler( LabelOnPress );
-		}
+	if (VarName[0] != 0) {
+		core->GetDictionary()->SetAt( VarName, Value );
 	}
+	if (LabelOnPress) {
+		RunEventHandler( LabelOnPress );
+	}
+	View::OnMouseUp(p, Button, Mod);
 }
 
 bool Label::SetEvent(int eventType, ControlEventHandler handler)

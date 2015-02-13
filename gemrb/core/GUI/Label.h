@@ -67,8 +67,7 @@ public:
 	String QueryText() const;
 
 	/** Mouse Button Down */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	void OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** Use the RGB Color for the Font */
