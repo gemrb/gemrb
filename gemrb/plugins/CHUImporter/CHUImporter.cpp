@@ -383,8 +383,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					if (sb) {
 						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
 					}
-				} else {
-					win->AddSubviewInFrontOfView( ta );
 				}
 			}
 			break;
