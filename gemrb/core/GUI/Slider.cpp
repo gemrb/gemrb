@@ -139,8 +139,7 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 }
 
 /** Mouse Button Down */
-void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Button*/,
-	unsigned short /*Mod*/)
+void Slider::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	unsigned int oldPos = Pos;
@@ -149,13 +148,13 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Bu
 	int Mx = (mx + Knob->Width);
 	int My = (my + Knob->Height);
 
-	if (( x >= mx ) && ( y >= my )) {
-		if (( x <= Mx ) && ( y <= My )) {
+	if (( p.x >= mx ) && ( p.y >= my )) {
+		if (( p.x <= Mx ) && ( p.y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
 		} else {
 			int mx = KnobXPos;
-			int xmx = x - mx;
-			if (x < mx) {
+			int xmx = p.x - mx;
+			if (p.x < mx) {
 				SetPosition( 0 );
 				if (oldPos != Pos) {
 					RunEventHandler( SliderOnChange );
@@ -183,8 +182,8 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Bu
 		}
 	} else {
 		int mx = KnobXPos;
-		int xmx = x - mx;
-		if (x < mx) {
+		int xmx = p.x - mx;
+		if (p.x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
 				RunEventHandler( SliderOnChange );
@@ -212,8 +211,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Bu
 }
 
 /** Mouse Button Up */
-void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned short /*Button*/,
-	unsigned short /*Mod*/)
+void Slider::OnMouseUp(const Point& /*p*/, unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
 		MarkDirty();
@@ -222,14 +220,14 @@ void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned shor
 }
 
 /** Mouse Over Event */
-void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
+void Slider::OnMouseOver(const Point& p)
 {
 	MarkDirty();
 	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
 		int mx = KnobXPos;
-		int xmx = x - mx;
-		if (x < mx) {
+		int xmx = p.x - mx;
+		if (p.x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
 				RunEventHandler( SliderOnChange );
