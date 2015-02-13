@@ -50,7 +50,7 @@ Window::~Window()
 }
 
 /** Add a Control in the Window */
-void Window::SubviewAdded(View* view)
+void Window::SubviewAdded(View* view, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(view);
 	if (ctrl) {

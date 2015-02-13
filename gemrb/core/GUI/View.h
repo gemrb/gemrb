@@ -51,8 +51,8 @@ protected:
 
 	virtual void AddedToView(View*) {}
 	virtual void RemovedFromView(View*) {}
-	virtual void SubviewAdded(View*) {}
-	virtual void SubviewRemoved(View*) {}
+	virtual void SubviewAdded(View* view, View* parent);
+	virtual void SubviewRemoved(View*);
 
 public:
 	View(const Region& frame);

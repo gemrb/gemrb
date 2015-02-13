@@ -186,7 +186,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 
 	front->superView = this;
 	front->MarkDirty(); // must redraw the control now
-	SubviewAdded(front);
+	SubviewAdded(front, this);
 	// FIXME: we probably shouldnt allow things in front of the scrollbar
 }
 
@@ -210,6 +210,18 @@ View* View::RemoveSubview(const View* view)
 	SubviewRemoved(subView);
 	subView->superView = NULL;
 	return subView;
+}
+
+void View::SubviewAdded(View* view, View* parent)
+{
+	if (superView) {
+		superView->SubviewAdded(view, parent);
+	}
+}
+
+void View::SubviewRemoved(View*)
+{
+
 }
 
 bool View::IsPixelTransparent(const Point& p) const
