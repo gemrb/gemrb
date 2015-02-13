@@ -2716,18 +2716,15 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID) c
 		return -1;
 	}
 	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
+
 	int i = 0;
-	while (true) {
-		Control* ctrl = win->GetControlAtIndex(i);
-		if (ctrl == NULL)
-			return -1;
+	Control* ctrl = NULL;
+	while ((ctrl = win->GetControlAtIndex(i))) {
 		if (ctrl->ControlID == ControlID)
 			return i;
 		i++;
 	}
+	return -1;
 }
 /** Adjust the Scrolling factor of a control (worldmap atm) */
 int Interface::AdjustScrolling(unsigned short WindowIndex,
