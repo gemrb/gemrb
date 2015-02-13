@@ -199,6 +199,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			continue;
 
 		if (win->Frame().PointInside(p)) {
+			last_win_over = win;
 			win->DispatchMouseOver(win->ConvertPointFromScreen(p));
 
 			if (last_win_mousefocused) {
