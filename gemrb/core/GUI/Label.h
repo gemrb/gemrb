@@ -53,6 +53,7 @@ public:
 	Label(const Region& frame, Font* font, const String& string);
 	~Label();
 
+	bool EventHit(const Point& /*p*/) const { return superView == (View*)Owner; } // FIXME: maybe not the best way
 	bool IsOpaque() const { return AnimPicture; } // FIXME: this isnt really true, but the clock breaks with out this.
 	/** This function sets the actual Label Text */
 	using Control::SetText;

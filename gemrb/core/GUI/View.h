@@ -33,11 +33,11 @@ class ScrollBar;
 class View {
 private:
 	Sprite2D* background;
-	View* superView;
 
 	mutable bool dirty;
 
 protected:
+	View* superView;
 	Region frame;
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
