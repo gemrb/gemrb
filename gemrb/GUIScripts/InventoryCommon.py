@@ -75,9 +75,6 @@ def OnAutoEquip ():
 def OnDragItem ():
 	"""Updates dragging."""
 
-	if GemRB.IsDraggingItem()==2:
-		return
-
 	#don't call when splitting items
 	if ItemAmountWindow != None:
 		return

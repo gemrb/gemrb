@@ -220,7 +220,6 @@ Interface::Interface()
 
 	TooltipBack = NULL;
 	DraggedItem = NULL;
-	DraggedPortrait = 0;
 	DefSound = NULL;
 	DSCount = -1;
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
@@ -4372,17 +4371,6 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 		}
 		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
 		if (DraggedCursor) DraggedCursor->release();
-	}
-}
-
-void Interface::SetDraggedPortrait(int dp, int idx)
-{
-	if (idx<0) idx=14;
-	DraggedPortrait = dp;
-	if (dp) {
-		video->SetCursor(Cursors[idx], VID_CUR_DRAG);
-	} else {
-		video->SetCursor(NULL, VID_CUR_DRAG);
 	}
 }
 

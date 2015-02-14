@@ -7446,7 +7446,7 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 
 PyDoc_STRVAR( GemRB_DragItem__doc,
 "DragItem(globalID, Slot, ResRef, [Count=0, Type])\n\n"
-"Start dragging specified item, if Slot is negative, drag the globalID party portrait instead." );
+"Start dragging specified item" );
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7477,13 +7477,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	//allow -1,-1
 	if (!actor && ( globalID || ResRef[0]) ) {
 		return RuntimeError( "Actor not found!\n" );
-	}
-
-	//dragging a portrait
-	if (!ResRef[0]) {
-		core->SetDraggedPortrait(globalID, Slot);
-		Py_INCREF( Py_None );
-		return Py_None;
 	}
 
 	if ((unsigned int) Slot>core->GetInventorySize()) {
@@ -7740,16 +7733,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
-"IsDraggingItem()=>int\n\n"
-"Returns 1 if we are dragging some item.\n"
-"Returns 2 if we are dragging a portrait." );
+"IsDraggingItem()=>bool\n\n"
+"Returns true if we are dragging some item." );
 
 static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 {
-	if (core->GetDraggedPortrait()) {
-		return PyInt_FromLong(2);
-	}
-	return PyInt_FromLong( core->GetDraggedItem() != NULL );
+	return PyBool_FromLong(core->GetDraggedItem() != NULL);
 }
 
 PyDoc_STRVAR( GemRB_GetSystemVariable__doc,

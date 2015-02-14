@@ -472,13 +472,10 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 		return;
 	}
 
-	//what was just dropped?
-	int dragtype = 0;
-	if (core->GetDraggedItem ()) dragtype=1;
-	if (core->GetDraggedPortrait ()) dragtype=2;
+	bool drag = core->GetDraggedItem () != NULL;
 
 	//if something was dropped, but it isn't handled here: it didn't happen
-	if (dragtype && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])
+	if (drag && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])
 		return;
 
 	switch (State) {
@@ -494,13 +491,6 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 		break;
 	}
 
-	//in case of dragged/dropped portraits, allow the event to happen even
-	//when we are out of bound
-	if (dragtype!=2) {
-		if (( p.x >= frame.w ) || ( p.y >= frame.h )) {
-			return;
-		}
-	}
 	if (Flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox
 		ToggleState = !ToggleState;
@@ -527,13 +517,8 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 		}
 	}
 
-	switch (dragtype) {
-		case 1:
-			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP] );
-			return;
-		case 2:
-			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT] );
-			return;
+	if (drag) {
+		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP] );
 	}
 
 	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
@@ -589,10 +574,6 @@ void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
-	}
-
-	if (eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] !=0 && VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Value );
 	}
 	pulseBorder = true;
 
