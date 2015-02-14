@@ -7466,6 +7466,10 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
+	if (!ResRef[0]) {
+		return AttributeError( "Invalid ResRef" );
+	}
+
 	GET_GAME();
 	Actor* actor;
 	if (globalID > 1000) {
@@ -7474,8 +7478,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		actor = game->FindPC( globalID );
 	}
 
-	//allow -1,-1
-	if (!actor && ( globalID || ResRef[0]) ) {
+	if (!actor && globalID) {
 		return RuntimeError( "Actor not found!\n" );
 	}
 
