@@ -69,7 +69,12 @@ void View::MarkDirty()
 
 bool View::NeedsDraw() const
 {
-	return (!frame.Dimensions().IsEmpty() && (dirty || IsAnimated()));
+	if (frame.Dimensions().IsEmpty()) return false;
+
+	// subviews are drawn over when the superview is drawn, so always redraw when super needs it.
+	if (superView && superView->NeedsDraw()) return true;
+
+	return (dirty || IsAnimated());
 }
 
 void View::DrawSubviews(bool drawBg)
