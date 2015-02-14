@@ -466,7 +466,7 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 }
 
 /** Mouse Button Up */
-void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
+void Button::OnMouseUp(const Point& /*p*/, unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
