@@ -284,9 +284,8 @@ void View::SetScrollBar(ScrollBar* sb)
 	if (sb) {
 		// force the scrollbar to the view's top right
 		Size sbSize = sb->Dimensions();
-		Point origin(Dimensions().w - sbSize.w, 0);
-		Region r = Region(origin, sbSize);
-		sb->SetFrame(r);
+		Point origin = ConvertPointFromSuper(sb->Origin());
+		sb->SetFrame(Region(origin, sbSize));
 		AddSubviewInFrontOfView(sb);
 		scrollbar = sb;
 	}
