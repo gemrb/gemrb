@@ -334,7 +334,7 @@ void MapControl::OnMouseOver(const Point& p)
 }
 
 /** Mouse Leave Event */
-void MapControl::OnMouseLeave(const Point&)
+void MapControl::OnMouseLeave(const Point&, const DragOp*)
 {
 	Owner->Cursor = IE_CURSOR_NORMAL;
 }

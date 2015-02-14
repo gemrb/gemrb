@@ -277,7 +277,7 @@ void WorldMapControl::DisplayTooltip()
 }
 
 /** Mouse Leave Event */
-void WorldMapControl::OnMouseLeave(const Point& /*p*/)
+void WorldMapControl::OnMouseLeave(const Point& /*p*/, const DragOp*)
 {
 	Owner->Cursor = IE_CURSOR_NORMAL;
 	Area = NULL;

@@ -55,6 +55,21 @@ protected:
 	virtual void SubviewRemoved(View* view, View* parent);
 
 public:
+	// using Held so we can have polymorphic drag operations
+	struct DragOp : public Held<DragOp> {
+		View* dragView;
+
+		DragOp(View* v, Sprite2D* c) : dragView(v)
+		{
+			core->GetVideoDriver()->SetCursor(c, VID_CUR_DRAG);
+		}
+
+		virtual ~DragOp() {
+			dragView->CompleteDragOperation(*this);
+			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
+		}
+	};
+
 	View(const Region& frame);
 	virtual ~View();
 
@@ -91,10 +106,14 @@ public:
 	virtual bool CanUnlockFocus() { return true; };
 	virtual bool TracksMouseDown() const { return false; }
 
+	virtual Holder<DragOp> DragOperation() { return Holder<DragOp>(NULL); }
+	virtual bool AcceptsDragOperation(const DragOp&) { return false; }
+	virtual void CompleteDragOperation(const DragOp&) {}
+
 	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
-	virtual void OnMouseEnter(const Point&) {};
-	virtual void OnMouseLeave(const Point&) {};
+	virtual void OnMouseEnter(const Point&, const DragOp*) {};
+	virtual void OnMouseLeave(const Point&, const DragOp*) {};
 	virtual void OnMouseOver(const Point&);
 	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);

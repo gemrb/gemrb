@@ -102,7 +102,7 @@ private:
 	/** Mouse Over Event */
 	void OnMouseOver(const Point& p);
 	/** Mouse Leave Event */
-	void OnMouseLeave(const Point& p);
+	void OnMouseLeave(const Point& p, const DragOp*);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point& p, unsigned short Button,
 		unsigned short Mod);

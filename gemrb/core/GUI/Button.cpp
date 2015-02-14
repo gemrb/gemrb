@@ -560,7 +560,7 @@ void Button::OnMouseOver(const Point& p)
 	}
 }
 
-void Button::OnMouseEnter(const Point&)
+void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -574,7 +574,7 @@ void Button::OnMouseEnter(const Point&)
 	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
 }
 
-void Button::OnMouseLeave(const Point&)
+void Button::OnMouseLeave(const Point&, const DragOp* /*dop*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;

@@ -497,7 +497,7 @@ void TextArea::OnMouseUp(const Point&, unsigned short Button, unsigned short /*M
 	}
 }
 
-void TextArea::OnMouseLeave(const Point&)
+void TextArea::OnMouseLeave(const Point&, const DragOp*)
 {
 	ClearHover();
 }

@@ -166,9 +166,9 @@ public:
 public: // Public Events
 	bool WantsDragOperation();
 	/** Mouse Enter */
-	void OnMouseEnter(const Point&);
+	void OnMouseEnter(const Point&, const DragOp*);
 	/** Mouse Leave */
-	void OnMouseLeave(const Point&);
+	void OnMouseLeave(const Point&, const DragOp*);
 	/** Mouse Over */
 	void OnMouseOver(const Point&);
 	/** Mouse Button Down */

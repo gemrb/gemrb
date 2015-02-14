@@ -221,17 +221,21 @@ void Window::DispatchMouseOver(const Point& p)
 		// TODO: make mouse enter/leave suitable for drag & drop events
 		if (target != hoverView) {
 			if (hoverView) {
-				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP));
+				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP), drag.get());
 				left = true;
 			}
-			target->OnMouseEnter(target->ConvertPointFromScreen(screenP));
+			target->OnMouseEnter(target->ConvertPointFromScreen(screenP), drag.get());
 		}
 	} else if (hoverView) {
-		hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP));
+		hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP), drag.get());
 		left = true;
 	}
 	if (left) {
-		if (hoverView && hoverView->TracksMouseDown()) {
+		if (trackingView && !drag) {
+			drag = trackingView->DragOperation();
+		}
+		assert(hoverView);
+		if (hoverView->TracksMouseDown()) {
 			trackingView = hoverView;
 		} else {
 			trackingView = NULL;
@@ -265,7 +269,13 @@ void Window::DispatchMouseUp(const Point& p, unsigned short button, unsigned sho
 	if (trackingView) {
 		Point subP = trackingView->ConvertPointFromScreen(ConvertPointToScreen(p));
 		trackingView->OnMouseUp(subP, button, mod);
+	} else if (drag) {
+		View* target = SubviewAt(p, false, true);
+		if (target && target->AcceptsDragOperation(*drag)) {
+			target->CompleteDragOperation(*drag);
+		}
 	}
+	drag = NULL;
 	trackingView = NULL;
 }
 
