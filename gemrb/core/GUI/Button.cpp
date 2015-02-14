@@ -19,7 +19,6 @@
  */
 
 #include "GUI/Button.h"
-
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
@@ -29,6 +28,7 @@
 #include "defsounds.h"
 #include "ie_cursors.h"
 
+#include "Game.h"
 #include "GameData.h"
 #include "Palette.h"
 
@@ -381,9 +381,34 @@ void Button::SetFont(Font* newfont)
 	font = newfont;
 }
 
-bool Button::WantsDragOperation()
+Holder<Button::DragOp> Button::DragOperation()
 {
-	return (State != IE_GUI_BUTTON_DISABLED && eventHandlers[IE_GUI_MOUSE_LEAVE_BUTTON] !=0 && VarName[0] != 0);
+	if (State != IE_GUI_BUTTON_DISABLED && Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+		EnableBorder(1, true);
+		return Holder<Button::DragOp>(new PortraitDragOp(this, core->Cursors[14]));
+	}
+	return View::DragOperation();
+}
+
+bool Button::AcceptsDragOperation(const DragOp& dop)
+{
+	if (dop.dragView != this && dynamic_cast<const PortraitDragOp*>(&dop)) {
+		return (State != IE_GUI_BUTTON_DISABLED && Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);
+	}
+	return View::AcceptsDragOperation(dop);
+}
+
+void Button::CompleteDragOperation(const DragOp& dop)
+{
+	if (dop.dragView == this) {
+		// this was the dragged view
+		EnableBorder(1, false);
+	} else {
+		// this was the receiver
+		const PortraitDragOp* pdop = dynamic_cast<const PortraitDragOp*>(&dop);
+		assert(pdop); // CompleteDragOperation shouldnt be called if we dont accept...
+		core->GetGame()->SwapPCs(pdop->PC, ControlID + 1);
+	}
 }
 
 /** Handling The default button (enter) */
@@ -578,9 +603,6 @@ void Button::OnMouseLeave(const Point&, const DragOp* /*dop*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
-	}
-	if (WantsDragOperation()) {
-		core->GetDictionary()->SetAt( VarName, Value );
 	}
 	SetState( IE_GUI_BUTTON_UNPRESSED );
 	if (pulseBorder) {

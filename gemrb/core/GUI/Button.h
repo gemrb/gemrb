@@ -164,7 +164,16 @@ public:
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
 public: // Public Events
-	bool WantsDragOperation();
+	struct PortraitDragOp : public DragOp {
+		const ieDword PC;
+
+		PortraitDragOp(Button* b, Sprite2D* c)
+		: DragOp(b, c), PC(b->ControlID + 1) {}
+	};
+
+	Holder<DragOp> DragOperation();
+	bool AcceptsDragOperation(const DragOp&);
+	void CompleteDragOperation(const DragOp&);
 	/** Mouse Enter */
 	void OnMouseEnter(const Point&, const DragOp*);
 	/** Mouse Leave */
