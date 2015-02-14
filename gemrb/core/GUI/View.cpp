@@ -72,7 +72,7 @@ bool View::NeedsDraw() const
 	if (frame.Dimensions().IsEmpty()) return false;
 
 	// subviews are drawn over when the superview is drawn, so always redraw when super needs it.
-	if (superView && superView->NeedsDraw()) return true;
+	if (superView && superView->IsAnimated()) return true;
 
 	return (dirty || IsAnimated());
 }
