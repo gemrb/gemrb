@@ -9835,29 +9835,6 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_SwapPCs__doc,
-"SwapPCs(idx1, idx2)\n\n"
-"Swaps the party order for two player characters.");
-
-static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
-{
-	int idx1, idx2;
-
-	if (!PyArg_ParseTuple( args, "ii", &idx1, &idx2)) {
-		return AttributeError( GemRB_SwapPCs__doc );
-	}
-
-	GET_GAME();
-
-	game->SwapPCs(game->FindPlayer(idx1), game->FindPlayer(idx2));
-	//leader changed
-	if (idx1==1 || idx2==1) {
-		DisplayStringCore( game->FindPC(1), VB_LEADER, DS_CONST);
-	}
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
 "SetRepeatClickFlags(value, op)\n\n"
 "Sets the mode repeat clicks are handled.");
@@ -10679,7 +10656,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(StatComment, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
-	METHOD(SwapPCs, METH_VARARGS),
 	METHOD(UnhideGUI, METH_NOARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
