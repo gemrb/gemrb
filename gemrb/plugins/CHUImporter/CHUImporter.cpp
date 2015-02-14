@@ -476,7 +476,7 @@ endalign:
 					assert(ta);
 					ta->SetScrollBar(sbar);
 				} else {
-					win->SetScrollBar( sbar );
+					win->AddSubviewInFrontOfView(sbar);
 				}
 			}
 			break;
