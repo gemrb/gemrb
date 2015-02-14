@@ -1357,7 +1357,6 @@ def OpenPortraitWindow (needcontrols=0):
 			Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 			ButtonHP = Window.GetControl (6 + i)
-			ButtonHP.SetVarAssoc ('PressedPortraitHP', i+1)
 			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
 		else:
 			Button.SetBorder (FRAME_PC_SELECTED, 4, 3, 4, 3, 0, 255, 0, 255)
@@ -1558,7 +1557,7 @@ def PortraitButtonOnShiftPress (btn):
 def PortraitButtonHPOnPress (): ##pst hitpoint display
 	Window = PortraitWindow
 
-	i = GemRB.GetVar ('PressedPortraitHP')
+	i = btn.ID + 1;
 
 	portrait_hp_numeric[i-1] = not portrait_hp_numeric[i-1]
 	ButtonHP = Window.GetControl (5 + i)

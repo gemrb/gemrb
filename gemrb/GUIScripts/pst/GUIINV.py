@@ -36,9 +36,8 @@ InventoryWindow = None
 ItemAmountWindow = None
 OverSlot = None
 
-def OpenInventoryWindowClick ():
-	tmp = GemRB.GetVar ("PressedPortrait")
-	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
+def OpenInventoryWindowClick (btn):
+	GemRB.GameSelectPC (btn.ID + 1, True, SELECT_REPLACE)
 	OpenInventoryWindow ()
 	return
 
