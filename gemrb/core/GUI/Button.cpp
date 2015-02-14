@@ -346,7 +346,7 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
-	return (pulseBorder) ? true : View::IsAnimated();
+	return (pulseBorder) ? true : Control::IsAnimated();
 }
 
 void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled, bool filled)
