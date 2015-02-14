@@ -218,7 +218,6 @@ void Window::DispatchMouseOver(const Point& p)
 	View* target = SubviewAt(p, false, true);
 	bool left = false;
 	if (target) {
-		// TODO: make mouse enter/leave suitable for drag & drop events
 		if (target != hoverView) {
 			if (hoverView) {
 				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP), drag.get());
