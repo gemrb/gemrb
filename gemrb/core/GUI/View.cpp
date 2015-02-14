@@ -207,7 +207,7 @@ View* View::RemoveSubview(const View* view)
 	subViews.erase(it);
 	const Region& viewFrame = subView->Frame();
 	DrawBackground(&viewFrame);
-	SubviewRemoved(subView);
+	SubviewRemoved(subView, this);
 	subView->superView = NULL;
 	return subView;
 }
@@ -219,9 +219,11 @@ void View::SubviewAdded(View* view, View* parent)
 	}
 }
 
-void View::SubviewRemoved(View*)
+void View::SubviewRemoved(View* view, View* parent)
 {
-
+	if (superView) {
+		superView->SubviewRemoved(view, parent);
+	}
 }
 
 bool View::IsPixelTransparent(const Point& p) const
