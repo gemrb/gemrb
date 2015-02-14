@@ -140,6 +140,7 @@ public:
 	Button(Region& frame);
 	~Button();
 
+	bool IsAnimated() const;
 	bool IsOpaque() const { return Picture; };
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
@@ -195,6 +196,7 @@ private: // Private attributes
 	bool hasText;
 	Font* font;
 	bool ToggleState;
+	bool pulseBorder;
 	Palette* normal_palette;
 	Palette* disabled_palette;
 	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];

@@ -52,6 +52,7 @@ Button::Button(Region& frame)
 	}
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
+	pulseBorder = false;
 	Picture = NULL;
 	Clipping = 1.0;
 	memset(eventHandlers, 0, sizeof(eventHandlers));
@@ -314,7 +315,20 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			if (! fr->enabled) continue;
 
 			Region r = Region( rgn.x + fr->dx1, rgn.y + fr->dy1, rgn.w - (fr->dx1 + fr->dx2 + 1), rgn.h - (fr->dy1 + fr->dy2 + 1) );
-			video->DrawRect( r, fr->color, fr->filled );
+			if (pulseBorder) {
+				Color mix;
+				unsigned long step = GetTickCount();
+				step = tp_steps[(step >> 7) & 7] * 2;
+
+				mix.a = ColorWhite.a;
+				mix.r = (ColorWhite.r * step + fr->color.r * (8-step))/8;
+				mix.g = (ColorWhite.g * step + fr->color.g * (8-step))/8;
+				mix.b = (ColorWhite.b * step + fr->color.b * (8-step))/8;
+
+				video->DrawRect( r, mix, fr->filled );
+			} else {
+				video->DrawRect( r, fr->color, fr->filled );
+			}
 		}
 	}
 }
@@ -329,6 +343,12 @@ void Button::SetState(unsigned char state)
 		State = state;
 	}
 }
+
+bool Button::IsAnimated() const
+{
+	return (pulseBorder) ? true : View::IsAnimated();
+}
+
 void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled, bool filled)
 {
 	if (index >= MAX_NUM_BORDERS)
@@ -549,6 +569,7 @@ void Button::OnMouseEnter(const Point&)
 	if (eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] !=0 && VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
+	pulseBorder = true;
 
 	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
 }
@@ -561,6 +582,12 @@ void Button::OnMouseLeave(const Point&)
 	if (WantsDragOperation()) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
+	SetState( IE_GUI_BUTTON_UNPRESSED );
+	if (pulseBorder) {
+		pulseBorder = false;
+		MarkDirty();
+	}
+
 	RunEventHandler( eventHandlers[IE_GUI_MOUSE_LEAVE_BUTTON] );
 }
 
