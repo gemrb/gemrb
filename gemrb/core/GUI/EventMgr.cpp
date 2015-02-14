@@ -266,9 +266,9 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			last_win_mousefocused = win;
 			win->DispatchMouseDown(win->ConvertPointFromScreen(p), Button, Mod);
 			RefreshCursor(last_win_mousefocused->Cursor);
+			return;
 		}
 
-		// FIXME: why isnt this checked above like visibility? Doesnt this result in possible multiple dispatch?
 		if (win->Visible == WINDOW_FRONT) //stop looking further
 			break;
 	}
