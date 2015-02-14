@@ -48,7 +48,7 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 		- GetFrameHeight(IE_GUI_SCROLLBAR_SLIDER)
 		- GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED)
 		- GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
-	if (SliderRange < 0) {
+	if (SliderRange <= 0) {
 		// must have a positive value, or we wont be able to scroll anywhere but the top
 		SliderRange = 1;
 	}
