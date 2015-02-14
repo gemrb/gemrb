@@ -37,6 +37,7 @@
 #include "ScriptEngine.h"
 #include "TableMgr.h"
 #include "GameScript/GameScript.h"
+#include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
@@ -963,20 +964,24 @@ Actor* Game::GetNPC(unsigned int Index)
 	return NPCs[Index];
 }
 
-void Game::SwapPCs(unsigned int Index1, unsigned int Index2)
+void Game::SwapPCs(unsigned int pc1, unsigned int pc2)
 {
-	if (Index1 >= PCs.size()) {
+	int idx1 = FindPlayer(pc1);
+	int idx2 = FindPlayer(pc2);
+	if (idx1 < 0 || idx2 < 0) {
 		return;
 	}
 
-	if (Index2 >= PCs.size()) {
-		return;
-	}
-	int tmp = PCs[Index1]->InParty;
-	PCs[Index1]->InParty = PCs[Index2]->InParty;
-	PCs[Index2]->InParty = tmp;
+	int tmp = PCs[idx1]->InParty;
+	PCs[idx1]->InParty = PCs[idx2]->InParty;
+	PCs[idx2]->InParty = tmp;
 	//signal a change of the portrait window
 	core->SetEventFlag(EF_PORTRAIT | EF_SELECTION);
+
+	if (idx1==0 || idx2==0) {
+		//leader changed
+		DisplayStringCore( FindPC(1), VB_LEADER, DS_CONST);
+	}
 }
 
 void Game::DeleteJournalEntry(ieStrRef strref)

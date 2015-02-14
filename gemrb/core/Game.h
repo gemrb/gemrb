@@ -375,7 +375,7 @@ public:
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
-	void SwapPCs(unsigned int Index1, unsigned int Index2);
+	void SwapPCs(unsigned int pc1, unsigned int pc2);
 	bool IsDay();
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
 	bool CheckForReplacementActor(int i);
