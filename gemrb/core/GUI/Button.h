@@ -216,7 +216,7 @@ private: // Private attributes
 	Point PushOffset;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
-	bool IsPixelTransparent (const Point&) const;
+	bool EventHit (const Point&) const;
 	void CloseUpColor();
 };
 

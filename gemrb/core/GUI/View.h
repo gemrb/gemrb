@@ -65,7 +65,7 @@ public:
 
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }
-	virtual bool IsPixelTransparent(const Point& p) const;
+	virtual bool EventHit(const Point& p) const;
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }
