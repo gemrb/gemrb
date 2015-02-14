@@ -67,7 +67,7 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 	}
 }
 
-void Window::SubviewRemoved(View* subview)
+void Window::SubviewRemoved(View* subview, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
@@ -193,7 +193,8 @@ Control* Window::GetScrollControl() const
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		(*c)->UpdateState( VarName, Sum);
+		Control* ctrl = *c;
+		ctrl->UpdateState( VarName, Sum);
 	}
 }
 

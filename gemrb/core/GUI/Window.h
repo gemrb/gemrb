@@ -59,7 +59,7 @@ class Sprite2D;
 class GEM_EXPORT Window : public View {
 protected:
 	void SubviewAdded(View* view, View* parent);
-	void SubviewRemoved(View* view);
+	void SubviewRemoved(View* view, View* parent);
 
 	void DrawSelf(Region drawFrame, const Region& clip);
 
