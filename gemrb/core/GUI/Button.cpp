@@ -519,6 +519,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 
 	if (drag) {
 		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP] );
+		return;
 	}
 
 	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
