@@ -560,11 +560,12 @@ void Button::OnMouseOver(const Point& p)
 	//portrait buttons are draggable and locked
 	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
 			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
-		// We use absolute screen position here, so drag_start
-		//   remains valid even after window/control is moved
-		Point sp = ConvertPointToScreen(p);
+
+		Point sp = ConvertPointToScreen(p) - drag_start;
 		core->GetDictionary()->SetAt( "DragX", sp.x );
 		core->GetDictionary()->SetAt( "DragY", sp.y );
+		// We use absolute screen position here, so drag_start
+		//   remains valid even after window/control is moved
 		drag_start = drag_start + sp;
 
 		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG] );
