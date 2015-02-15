@@ -82,10 +82,11 @@ public:
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;
-	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
-						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Starting Row */
 	void SetRow(int row);
+	int RowCount() { return rows; }
+	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
+						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Selectable */
 	void SetSelectable(bool val);
 	void SetAnimPicture(Sprite2D* Picture);
@@ -150,6 +151,7 @@ private: //internal functions
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
 	void UpdateScrollbar();
+	void UpdateRowCount(int h);
 
 public: //Events
 	/** Key Press Event */

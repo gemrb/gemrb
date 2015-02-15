@@ -165,6 +165,12 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 	Control::SetAnimPicture(pic);
 }
 
+void TextArea::UpdateRowCount(int h)
+{
+	int rowHeight = GetRowHeight();
+	rows = (h + rowHeight - 1) / rowHeight; // round up
+}
+
 void TextArea::UpdateScrollbar()
 {
 	if (sb == NULL) return;
@@ -183,10 +189,9 @@ void TextArea::UpdateScrollbar()
 			textHeight += Height - pageH;
 		}
 	}
-	int rowHeight = GetRowHeight();
-	int newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
-	if (newRows != rows) {
-		rows = newRows;
+	int oldRows = rows;
+	UpdateRowCount(textHeight);
+	if (oldRows != rows) {
 		ScrollBar* bar = ( ScrollBar* ) sb;
 		ieWord visibleRows = (Height / GetRowHeight());
 		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
@@ -300,6 +305,8 @@ void TextArea::AppendText(const String& text)
 			if (bottom > 0)
 				ScrollToY(bottom, NULL, 500); // animated scroll
 		}
+	} else {
+		UpdateRowCount(contentWrapper.ContentFrame().h);
 	}
 	MarkDirty();
 }
