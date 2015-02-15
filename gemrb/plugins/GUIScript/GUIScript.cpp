@@ -505,7 +505,6 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 		return NULL;
 	}
 
-	core->GetAudioDrv()->Play( NULL, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	ta->ClearText();
 	// insert enough newlines to push the text offscreen
 	int rowHeight = ta->GetRowHeight();
