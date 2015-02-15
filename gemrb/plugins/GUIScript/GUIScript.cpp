@@ -511,9 +511,9 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 	size_t lines = ta->Height / rowHeight;
 	ta->AppendText(String(lines, L'\n'));
 	String* chapText = StringFromCString(text);
-	lines *= 2; // double the "amount" of newlines since we also scroll to be out of sight
-	lines += std::count(chapText->begin(), chapText->end(), L'\n');
 	ta->AppendText(*chapText);
+	// add instead of set, because we also scroll to be out of sight so keep the newline count
+	lines += ta->RowCount();
 	delete chapText;
 	// animate the scroll: duration = 2500 * lines of text
 	ta->ScrollToY((int)(rowHeight * lines), NULL, lines * 2500);
