@@ -154,6 +154,16 @@ void Button::CloseUpColor()
 	starttime = newtime + 40;
 }
 
+bool Button::IsOpaque() const
+{
+	if (AnimPicture || (Picture && (Flags & IE_GUI_BUTTON_PICTURE))) {
+		// no good way of knowing if a button has transparancy :(
+		// TODO: maybe add something to Sprite2D for determining alpha status
+		return false;
+	}
+	return Control::IsOpaque();
+}
+
 /** Draws the Control on the Output Display */
 void Button::DrawInternal(Region& rgn)
 {
