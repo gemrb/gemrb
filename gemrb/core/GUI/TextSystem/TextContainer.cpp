@@ -124,6 +124,15 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 
 Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
+	// collapse with neighboring content
+	if (layoutPoint.y != 0) {
+		// if we arent the first line, then collapse with the above line
+		layoutPoint.y--;
+	}
+	if (layoutPoint.x != 0) {
+		layoutPoint.x--;
+	}
+
 	Regions layoutRegions;
 	const Point& drawOrigin = rgn.Origin();
 	const Font* layoutFont = LayoutFont();
@@ -235,10 +244,6 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
-				if (layoutPoint.y != 0) {
-					// if we arent the first line, then collapse with the above line
-					lineLayout.y--;
-				}
 				layoutRegions.push_back(lineLayout);
 				lineExclusions.clear();
 			}
@@ -255,10 +260,6 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
 		assert(drawRegion.h && drawRegion.w);
-		if (layoutPoint.y != 0) {
-			// if we arent the first line, then collapse with the above line
-			drawRegion.y--;
-		}
 		layoutRegions.push_back(drawRegion);
 	}
 	return layoutRegions;
