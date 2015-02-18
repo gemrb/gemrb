@@ -133,23 +133,23 @@ def UpdateOverview(CurrentStep):
 		else:
 			TextAreaControl.SetText(1047)
 			AddText(': ' + GemRB.GetToken('CHARNAME'))
-			AddText(12135, -1)
+			AddText(12135)
 		AddText(': ')
 		strref = 1049 + GemRB.GetVar('Gender')
 		AddText(strref)
 	
 	if GemRB.GetVar('Race') > 0:
-		AddText(1048, -1)
+		AddText(1048)
 		AddText(': ')
 		AddText(Tables[0].GetValue(Tables[0].FindValue(3, GemRB.GetVar('Race')), 2))
 	
 	if GemRB.GetVar('Class') > 0:
-		AddText(11959, -1)
+		AddText(11959)
 		AddText(': ')
 		AddText(Tables[1].GetValue(GemRB.GetVar('Class') - 1, 0))
 	
 	if GemRB.GetVar('Alignment') > 0:
-		AddText(11958, -1)
+		AddText(11958)
 		AddText(': ')
 		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0))
 	
@@ -157,7 +157,7 @@ def UpdateOverview(CurrentStep):
 		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]')
 		for i in range(0, 6):
 			strref = Tables[3].GetValue(i, 2)
-			AddText(strref, -1)
+			AddText(strref)
 			abl = GemRB.GetVar('Ability ' + str(i))
 			AddText(': %d (%+d)' % (abl, abl / 2 - 5))
 	
@@ -195,7 +195,7 @@ def UpdateOverview(CurrentStep):
 			
 			if value:
 				strref = Tables[5].GetValue(i, 1)
-				AddText(strref, -1)
+				AddText(strref)
 				strn = ': ' + str(value)
 				if value != Ranks: strn += ' (' + str(Ranks) + ')'
 				AddText(strn)
@@ -206,7 +206,7 @@ def UpdateOverview(CurrentStep):
 			value = GemRB.GetVar('Feat ' + str(i))
 			if value:
 				strref = Tables[7].GetValue(i, 1)
-				AddText(strref, -1)
+				AddText(strref)
 				multiple = Tables[6].GetValue(i, 0)
 				if multiple != 0:
 					AddText(': ' + str(value))
