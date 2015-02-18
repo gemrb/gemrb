@@ -397,7 +397,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 	// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
 	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 
-	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
+	// TODO: word breaks should probably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of
 	bool done = false;
 	do {
@@ -440,6 +440,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 #if DEBUG_FONT
 				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 #endif
+				assert(metrics.forceBreak == false || dp.x > 0);
 				done = true;
 				break;
 			}

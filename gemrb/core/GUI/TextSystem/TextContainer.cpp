@@ -211,17 +211,22 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
 
-					if (subLen != String::npos || (lineSegment.x + lineSegment.w == lineRgn.w && numPrinted + numOnLine < text.length())) {
+					bool noFit = !metrics.forceBreak && numOnLine == 0;
+					bool lineFilled = lineSegment.x + lineSegment.w == lineRgn.w;
+					bool moreChars = numPrinted + numOnLine < text.length();
+					if (subLen != String::npos || noFit || (lineFilled && moreChars)) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
 						newline = true;
 						lineSegment.w = LINE_REMAINDER;
 					} else {
+						assert(printSize.w);
 						lineSegment.w = printSize.w;
 					}
 				}
 				numPrinted += numOnLine;
 			}
+			assert(!lineSegment.Dimensions().IsEmpty());
 			lineExclusions.push_back(lineSegment);
 
 		newline:
