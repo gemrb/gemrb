@@ -411,9 +411,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 
 		StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, true};
 		int wordW = StringSize(word, &metrics).w;
-		if (metrics.forceBreak) {
+		if (dp.x == 0 && metrics.forceBreak) {
 			done = true;
 			word.resize(metrics.numChars);
+			assert(metrics.size.w <= lineRgn.w);
 		} else if (dp.x + wordW > lineRgn.w) {
 			// overflow with no wrap allowed; abort.
 			break;
