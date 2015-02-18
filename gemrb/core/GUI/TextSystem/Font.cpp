@@ -644,9 +644,10 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	w = (w == 0 && wordW == 0) ? spaceW : w; // if the line is all whitespace
 
 	if (metrics) {
+		if (forceBreak) charCount--;
+		metrics->forceBreak = forceBreak;
 		metrics->numChars = charCount;
 		metrics->size = Size(w, (LineHeight * lines));
-		metrics->forceBreak = forceBreak;
 #if DEBUG_FONT
 		assert(metrics->numChars <= string.length());
 		assert(w <= stop->w);
