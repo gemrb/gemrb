@@ -74,15 +74,18 @@ public:
 	void SetPos(ieDword NewPos);
 	ieWord GetPos() const { return Pos; };
 
-	void SetPosForY(short y);
 	void ScrollUp();
 	void ScrollDown();
 	double GetStep();
 	/** refreshes scrollbar if associated with VarName */
 	void UpdateState(const char* VarName, unsigned int Sum);
+	/** Sets the Maximum Value of the ScrollBar */
+	void SetMax(unsigned short Max);
+	void SetScrollAmount(unsigned short amount) { ScrollDelta = amount; }
 private: //Private attributes
 	/** safe method to get the height of a frame */
 	int GetFrameHeight(int frame) const;
+	void SetPosForY(short y);
 	/** Images for drawing the Scroll Bar */
 	Sprite2D* Frames[IE_SCROLLBAR_IMAGE_COUNT];
 	/** Range of the slider in pixels. The height - buttons - slider */
@@ -93,13 +96,12 @@ private: //Private attributes
 	ieWord Pos;
 	/** Scroll Bar Status */
 	unsigned short State;
+	/** amount by which value should change on scrolling */
+	unsigned short ScrollDelta;
 
-public:
-	/** Sets the Maximum Value of the ScrollBar */
-	void SetMax(unsigned short Max);
+public: // Public Events
 	/** TextArea Associated Control */
 	Control* ta;
-public: // Public Events
 	/** Mouse Button Down */
 	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);

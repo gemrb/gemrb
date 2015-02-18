@@ -189,14 +189,12 @@ void TextArea::UpdateScrollbar()
 			textHeight += Height - pageH;
 		}
 	}
-	int oldRows = rows;
+	
 	UpdateRowCount(textHeight);
-	if (oldRows != rows) {
-		ScrollBar* bar = ( ScrollBar* ) sb;
-		ieWord visibleRows = (Height / GetRowHeight());
-		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
-		bar->SetMax(sbMax);
-	}
+	ScrollBar* bar = ( ScrollBar* ) sb;
+	ieWord visibleRows = Height;
+	ieWord sbMax = (textHeight > visibleRows) ? (textHeight - visibleRows) : 0;
+	bar->SetMax(sbMax);
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
 		&& dialogBeginNode) {
 		// now scroll dialogBeginNode to the top less a blank line
@@ -210,8 +208,8 @@ int TextArea::SetScrollBar(Control* ptr)
 {
 	ScrollBar* bar = (ScrollBar*)ptr;
 	Control::SetScrollBar(bar);
+	if (bar) bar->SetScrollAmount(GetRowHeight());
 	// we need to update the ScrollBar position based around TextYPos
-	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
 		int bottom = contentWrapper.ContentFrame().h - Height;
@@ -432,9 +430,8 @@ void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
 	}
 
 	if (sb && sender != sb) {
-		// we must "scale" the pixels
-		((ScrollBar*)sb)->SetPosForY(y * (((ScrollBar*)sb)->GetStep()-1 / ftext->LineHeight));
-		// sb->SetPosForY will recall this method so we dont need to do more... yet.
+		((ScrollBar*)sb)->SetPos(y);
+		// sb->SetPos will recall this method so we dont need to do more... yet.
 	} else if (sb) {
 		// our scrollbar has set position for us
 		TextYPos = y;
