@@ -366,18 +366,10 @@ def DisplayItem (itemresref, type):
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
-def OpenItemInfoWindow (slot = None):
+def OpenItemInfoWindow (btn, slot):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	if slot == None:
-		if GameCheck.IsPST():
-			slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-		else:
-			slot = GemRB.GetVar ("ItemButton")
-			slot_item = GemRB.GetSlotItem (pc, slot)
-	else:
-		slot_item = GemRB.GetSlotItem (pc, slot)
-
+	slot_item = GemRB.GetSlotItem (pc, slot)
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 
 	if TryAutoIdentification(pc, item, slot, slot_item, True):
@@ -803,7 +795,7 @@ def IdentifyUseSpell ():
 		ItemInfoWindow.Unload ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	GemRB.PlaySound(DEF_IDENTIFY)
-	OpenItemInfoWindow(slot)
+	OpenItemInfoWindow(slot=slot)
 	return
 
 def IdentifyUseScroll ():
@@ -820,7 +812,7 @@ def IdentifyUseScroll ():
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	GemRB.PlaySound(DEF_IDENTIFY)
-	OpenItemInfoWindow(slot)
+	OpenItemInfoWindow(slot=slot)
 	return
 
 def CloseIdentifyItemWindow ():
