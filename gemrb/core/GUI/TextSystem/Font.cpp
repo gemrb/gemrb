@@ -27,7 +27,6 @@
 #include "Palette.h"
 #include "Video.h"
 
-#include <cctype>
 #include <cwctype>
 
 namespace GemRB {
