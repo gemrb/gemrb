@@ -278,11 +278,11 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
+	MButtons &= ~Button;
 	if (last_win_mousefocused == NULL) return;
 
 	Point p = last_win_mousefocused->ConvertPointFromScreen(Point(x, y));
 	focusLock = NULL;
-	MButtons &= ~Button;
 
 	last_win_mousefocused->DispatchMouseUp(p, Button, Mod);
 }
