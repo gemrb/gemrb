@@ -479,10 +479,10 @@ void TextArea::OnMouseOver(const Point& p)
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(const Point&, unsigned short Button, unsigned short /*Mod*/)
+void TextArea::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
-		return;
+		return View::OnMouseUp(p, Button, Mod);
 
 	if (hoverSpan) { // select the item under the mouse
 		int optIdx = 0;

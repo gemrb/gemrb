@@ -434,13 +434,8 @@ bool Button::OnSpecialKeyPress(unsigned char Key)
 /** Mouse Button Down */
 void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-
-	if (core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP]) {
-		View::OnMouseDown(p, Button, Mod);
-		return;
+	if (State == IE_GUI_BUTTON_DISABLED || (core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])) {
+		return Control::OnMouseDown(p, Button, Mod);
 	}
 
 	//Button == 1 means Left Mouse Button
@@ -462,21 +457,23 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DOUBLE_PRESS] );
 		}
 		break;
+		default:
+			return Control::OnMouseDown(p, Button, Mod);
 	}
 }
 
 /** Mouse Button Up */
-void Button::OnMouseUp(const Point& /*p*/, unsigned short Button, unsigned short Mod)
+void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
+		return Control::OnMouseUp(p, Button, Mod);
 	}
 
 	bool drag = core->GetDraggedItem () != NULL;
 
 	//if something was dropped, but it isn't handled here: it didn't happen
 	if (drag && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])
-		return;
+		return Control::OnMouseUp(p, Button, Mod);
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:

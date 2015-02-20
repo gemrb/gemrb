@@ -377,15 +377,15 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
+void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	switch((unsigned char) Button & GEM_MB_NORMAL) {
 		case GEM_MB_SCRLUP:
 			OnSpecialKeyPress(GEM_UP);
-			return;
+			return Control::OnMouseDown(p, Button, Mod);
 		case GEM_MB_SCRLDOWN:
 			OnSpecialKeyPress(GEM_DOWN);
-			return;
+			return Control::OnMouseDown(p, Button, Mod);
 		case GEM_MB_ACTION:
 			if (Button & GEM_MB_DOUBLECLICK) {
 				ClickHandle(Button);
@@ -405,7 +405,7 @@ void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sho
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short /*Mod*/)
+void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	if (!mouseIsDown) {
 		return;
@@ -431,8 +431,7 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 			ClickHandle(Button);
 			return;
 		default:
-			ClickHandle(Button);
-			return;
+			return Control::OnMouseUp(p, Button, Mod);
 	}
 }
 
