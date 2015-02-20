@@ -50,11 +50,15 @@ Window::~Window()
 }
 
 /** Add a Control in the Window */
-void Window::SubviewAdded(View* view, View* /*parent*/)
+void Window::SubviewAdded(View* view, View* parent)
 {
 	Control* ctrl = dynamic_cast<Control*>(view);
 	if (ctrl) {
+		if (ctrl->Owner == this) return; // already added!
 		ctrl->Owner = this;
+		if (ctrl->ControlType == IE_GUI_SCROLLBAR && parent == this) {
+			scrollbar = static_cast<ScrollBar*>(ctrl);
+		}
 		for (size_t i = 0; i < Controls.size(); i++) {
 			Control* target = Controls[i];
 			if (target->ControlID == ctrl->ControlID) {
