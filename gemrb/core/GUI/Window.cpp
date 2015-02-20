@@ -239,13 +239,13 @@ void Window::DispatchMouseOver(const Point& p)
 		left = true;
 	}
 	if (left) {
+		assert(hoverView);
 		if (trackingView && !drag) {
 			drag = trackingView->DragOperation();
 		}
-		assert(hoverView);
-		if (hoverView->TracksMouseDown()) {
-			trackingView = hoverView;
-		} else {
+		if (trackingView == hoverView
+			&& !trackingView->TracksMouseDown())
+		{
 			trackingView = NULL;
 		}
 	}
