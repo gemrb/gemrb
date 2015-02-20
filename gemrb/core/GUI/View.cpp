@@ -208,6 +208,9 @@ View* View::RemoveSubview(const View* view)
 	View* subView = *it;
 	if (subView == scrollbar) {
 		scrollbar = NULL;
+		Size s = Dimensions();
+		s.w -= scrollbar->Dimensions().w;
+		SetFrameSize(s);
 	}
 	subViews.erase(it);
 	const Region& viewFrame = subView->Frame();
@@ -282,12 +285,14 @@ void View::SetScrollBar(ScrollBar* sb)
 {
 	delete RemoveSubview(scrollbar);
 	if (sb) {
-		// force the scrollbar to the view's top right
 		Size sbSize = sb->Dimensions();
 		Point origin = ConvertPointFromSuper(sb->Origin());
 		sb->SetFrame(Region(origin, sbSize));
 		AddSubviewInFrontOfView(sb);
 		scrollbar = sb;
+		Size s = Dimensions();
+		s.w += sbSize.w;
+		SetFrameSize(s);
 	}
 }
 
