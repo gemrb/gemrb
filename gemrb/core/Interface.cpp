@@ -122,7 +122,6 @@ static ieWord IDT_SKILLPENALTY = 3;
 static int MagicBit = 0;
 
 Interface::Interface()
-	: TLKEncoding()
 {
 	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
 
@@ -252,6 +251,9 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
+	TLKEncoding.widechar = false;
+	TLKEncoding.multibyte = false;
+	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
