@@ -28,6 +28,7 @@
 #include "Video.h"
 
 #include <cctype>
+#include <cwctype>
 
 namespace GemRB {
 
@@ -596,7 +597,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	for (; i < string.length(); i++) {
 		const Glyph& curGlyph = GetGlyph(string[i]);
 		eos = (i == string.length() - 1);
-		ws = std::isspace(string[i]);
+		ws = std::iswspace(string[i]);
 		if (!ws) {
 			ieWord chrW = curGlyph.size.w;
 			if (lineW > 0) { // kerning
