@@ -333,7 +333,10 @@ Size ContentContainer::ContentFrame() const
 
 void ContentContainer::AppendContent(Content* content)
 {
-	InsertContentAfter(content, *(--contents.end()));
+	if (contents.empty())
+		InsertContentAfter(content, 0);
+	else
+		InsertContentAfter(content, *(--contents.end()));
 }
 
 void ContentContainer::InsertContentAfter(Content* newContent, const Content* existing)
