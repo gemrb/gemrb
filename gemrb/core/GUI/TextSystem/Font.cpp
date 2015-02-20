@@ -193,7 +193,8 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 		// page is full, make a new one
 		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, LineHeight), this);
 		Atlas.push_back(CurrentAtlasPage);
-		assert(CurrentAtlasPage->AddGlyph(chr, tmp));
+		bool ok = CurrentAtlasPage->AddGlyph(chr, tmp);
+		assert(ok);
 	}
 	assert(CurrentAtlasPage);
 	const Glyph& g = CurrentAtlasPage->GlyphForChr(chr);
