@@ -86,7 +86,6 @@ class Palette;
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 #define IE_GUI_BUTTON_PORTRAIT     0x0000c002   // portrait
-#define IE_GUI_BUTTON_DISABLED_P   0x0000c003   // disabled portrait
 
 enum IE_GUI_BUTTON_EVENTS {
 	// !!! Keep these synchronized with GUIDefines.py !!!

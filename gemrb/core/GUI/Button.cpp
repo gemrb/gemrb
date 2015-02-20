@@ -541,20 +541,10 @@ void Button::OnMouseOver(const Point& p)
 		return;
 	}
 
-	//well, no more flags for buttons, and the portraits we can perform action on
-	//are in fact 'draggable multiline pictures' (with image)
-	if ((Flags & IE_GUI_BUTTON_DISABLED_P) == IE_GUI_BUTTON_PORTRAIT) {
-		GameControl *gc = core->GetGameControl();
-		if (gc) {
-			Owner->Cursor = gc->GetDefaultCursor();
-		}
-	}
-
 	if (State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
 
-	//portrait buttons are draggable and locked
 	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
 			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 
