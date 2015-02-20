@@ -83,7 +83,6 @@ class Window;
 
 class GEM_EXPORT EventMgr {
 private:
-	Control* focusLock;
 	std::vector< Window*> windows;
 	std::vector< int> topwin;
 
@@ -96,7 +95,7 @@ private:
 	/** Last Window focused */
 	Window* last_win_focused;
 	/** Last Window mouse event focused */
-	Window* last_win_mousefocused;
+	Window* mouseTrackingWin;
 	/** Last Window under Mouse Pointer*/
 	Window* last_win_over;
 	/** Sets a Window on the Top of the Window Queue */

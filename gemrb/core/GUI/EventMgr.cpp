@@ -40,7 +40,7 @@ EventMgr::EventMgr(void)
 	// Last window focused for keyboard events
 	last_win_focused = NULL;	
 	// Last window focused for mouse events (eg, with a click). Used to determine MouseUp events
-	last_win_mousefocused = NULL;
+	mouseTrackingWin = NULL;
 	// Last window we were over. Used to determine MouseEnter and MouseLeave events
 	last_win_over = NULL;
 	MButtons = 0;
@@ -49,7 +49,6 @@ EventMgr::EventMgr(void)
 	dc_delay = 250;
 	rk_delay = 250;
 	rk_flags = GEM_RK_DISABLE;
-	focusLock = NULL;
 }
 
 EventMgr::~EventMgr(void)
@@ -118,7 +117,7 @@ void EventMgr::Clear()
 	topwin.clear();
 	windows.clear();
 	last_win_focused = NULL;
-	last_win_mousefocused = NULL;
+	mouseTrackingWin = NULL;
 	last_win_over = NULL;
 	function_bar = NULL;
 }
@@ -130,8 +129,8 @@ void EventMgr::DelWindow(Window *win)
 	if (focused) {
 		last_win_focused = NULL;
 	}
-	if (last_win_mousefocused == win) {
-		last_win_mousefocused = NULL;
+	if (mouseTrackingWin == win) {
+		mouseTrackingWin = NULL;
 	}
 	if (last_win_over == win) {
 		last_win_over = NULL;
@@ -178,15 +177,15 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	}
 
 	GameControl *gc = core->GetGameControl();
-	if (gc && (!focusLock || focusLock == gc)) {
-		// for scrolling
+	if (gc && (!mouseTrackingWin || mouseTrackingWin == gc->Owner)) {
 		gc->OnGlobalMouseMove(p);
 	}
-	if (last_win_mousefocused && focusLock) {
-		last_win_mousefocused->DispatchMouseOver(p);
-		RefreshCursor(last_win_mousefocused->Cursor);
+	if (mouseTrackingWin) {
+		mouseTrackingWin->DispatchMouseOver(mouseTrackingWin->ConvertPointFromScreen(p));
+		RefreshCursor(mouseTrackingWin->Cursor);
 		return;
 	}
+
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
@@ -201,10 +200,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		if (win->Frame().PointInside(p)) {
 			last_win_over = win;
 			win->DispatchMouseOver(win->ConvertPointFromScreen(p));
-
-			if (last_win_mousefocused) {
-				RefreshCursor(last_win_mousefocused->Cursor);
-			}
+			RefreshCursor(win->Cursor);
 			return;
 		}
 	}
@@ -263,9 +259,9 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			continue;
 
 		if (win->Frame().PointInside(p)) {
-			last_win_mousefocused = win;
+			mouseTrackingWin = win;
 			win->DispatchMouseDown(win->ConvertPointFromScreen(p), Button, Mod);
-			RefreshCursor(last_win_mousefocused->Cursor);
+			RefreshCursor(mouseTrackingWin->Cursor);
 			return;
 		}
 
@@ -279,12 +275,11 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 	unsigned short Mod)
 {
 	MButtons &= ~Button;
-	if (last_win_mousefocused == NULL) return;
+	if (mouseTrackingWin == NULL) return;
 
-	Point p = last_win_mousefocused->ConvertPointFromScreen(Point(x, y));
-	focusLock = NULL;
-
-	last_win_mousefocused->DispatchMouseUp(p, Button, Mod);
+	Point p = mouseTrackingWin->ConvertPointFromScreen(Point(x, y));
+	mouseTrackingWin->DispatchMouseUp(p, Button, Mod);
+	mouseTrackingWin = NULL;
 }
 
 /** BroadCast Mouse ScrollWheel Event */
@@ -409,8 +404,8 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 
 Control* EventMgr::GetMouseFocusedControl()
 {
-	if (last_win_mousefocused) {
-		return last_win_mousefocused->GetMouseFocus();
+	if (mouseTrackingWin) {
+		return mouseTrackingWin->GetMouseFocus();
 	}
 	return NULL;
 }
