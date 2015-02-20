@@ -1849,16 +1849,13 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 /** Mouse Button Up */
 void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned short /*Mod*/)
 {
-	unsigned int i;
-	char Tmp[256];
-
+	MouseIsDown = false;
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
-	MouseIsDown = false;
 	Point p = mp;
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
@@ -1866,6 +1863,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 	Map* area = game->GetCurrentArea( );
 	if (!area) return;
 
+	unsigned int i = 0;
 	if (DrawSelectionRect) {
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
@@ -1913,7 +1911,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 					}
 					if (overInfoPoint) {
 						if (overInfoPoint->Type==ST_TRAVEL) {
-							int i = game->selected.size();
+							size_t i = game->selected.size();
 							ieDword exitID = overInfoPoint->GetGlobalID();
 							while(i--) {
 								game->selected[i]->UseExit(exitID);
@@ -1966,6 +1964,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 				party.push_back(act);
 			}
 		}
+
 		//summons etc
 		for (i = 0; i < game->selected.size(); i++) {
 			Actor *act = game->selected[i];
@@ -1998,6 +1997,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 
 		//p is a searchmap travel region
 		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+			char Tmp[256];
 			sprintf( Tmp, "NIDSpecial2()" );
 			party[0]->AddAction( GenerateAction( Tmp) );
 		}
