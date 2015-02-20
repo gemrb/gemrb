@@ -107,11 +107,6 @@ void Window::DrawSelf(Region /*drawFrame*/, const Region& clip)
 		if (core->WindowFrames[3])
 			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
 	}
-
-	if ( Visible == WINDOW_GRAYED ) {
-		Color black = { 0, 0, 0, 128 };
-		video->DrawRect(clip, black);
-	}
 }
 
 /** Set window frame used to fill screen on higher resolutions*/

@@ -2787,15 +2787,13 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 		win->Visible = (char) visible;
 	}
 	switch (visible) {
-		case WINDOW_GRAYED:
-			win->MarkDirty();
-			win->Draw();
-			//here is a fallthrough
 		case WINDOW_INVISIBLE:
 			//hiding the viewport if the gamecontrol window was made invisible
 			if (win->WindowID==65535) {
 				video->SetViewport( Region() );
 			}
+			//here is a fallthrough
+		case WINDOW_GRAYED:
 			evntmgr->DelWindow( win );
 			break;
 		case WINDOW_VISIBLE:
@@ -2967,6 +2965,14 @@ void Interface::DrawWindows(bool allow_delete)
 					evntmgr->DelWindow( win );
 					delete win;
 					windows[t]=NULL;
+				}
+			} else if (win->Visible == WINDOW_GRAYED) {
+				if (win->NeedsDraw()) {
+					// Important to only draw if the window itself is dirty
+					// controls on greyed out windows shouldnt be updating anyway
+					win->Draw();
+					Color fill = { 0, 0, 0, 128 };
+					video->DrawRect(win->Frame(), fill);
 				}
 			} else if (win->Visible) {
 				win->Draw();
