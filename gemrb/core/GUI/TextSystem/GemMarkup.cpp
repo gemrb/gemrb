@@ -32,7 +32,11 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 	}
 
 	Color palCol;
-	swscanf(colorString.c_str(), L"%02X%02X%02X", &palCol.r, &palCol.g, &palCol.b);
+	unsigned int r, g, b;
+	swscanf(colorString.c_str(), L"%02X%02X%02X", &r, &g, &b);
+	palCol.r = r;
+	palCol.g = g;
+	palCol.b = b;
 	Palette* pal = new Palette(palCol, ColorBlack);
 	PalCache.insert(std::make_pair(colorString, pal));
 	pal->release();
