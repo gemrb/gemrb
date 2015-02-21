@@ -89,7 +89,7 @@ void Window::SetFocused(Control* ctrl)
 }
 
 /** This function Draws the Window on the Output Screen */
-void Window::DrawSelf(Region /*drawFrame*/, const Region& clip)
+void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
 	if (!Visible) return; // no point in drawing invisible windows
 	Video* video = core->GetVideoDriver();

@@ -51,7 +51,6 @@ protected:
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
-	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
 	unsigned long lastTime;
 	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
