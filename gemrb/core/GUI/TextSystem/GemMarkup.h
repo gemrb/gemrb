@@ -83,14 +83,19 @@ private:
 			TextFont = ta.TextFont;
 			SwapFont = ta.SwapFont;
 			palette = ta.palette;
+			swapPalette = ta.swapPalette;
 			if (palette)
 				palette->acquire();
+			if (swapPalette)
+				swapPalette->acquire();
 			return *this;
 		}
 
 		~TextAttributes() {
 			if (palette)
 				palette->release();
+			if (swapPalette)
+				swapPalette->release();
 		}
 
 		void SwapFonts() {
