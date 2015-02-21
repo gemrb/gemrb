@@ -33,7 +33,7 @@
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), parser(text, text, NULL), palettes()
+	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), parser(text), palettes()
 {
 	palette = text->GetPalette();
 	finit = ftext;
@@ -59,7 +59,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		palettes[PALETTE_INITIALS] = finit->GetPalette();
 	}
 
-	parser.ResetAttributes(text, finit, palette);
+	parser.ResetAttributes(text, palette, finit, palettes[PALETTE_INITIALS]);
 	Init();
 }
 

@@ -48,16 +48,16 @@ GemMarkupParser::GemMarkupParser()
 	state = TEXT;
 }
 
-GemMarkupParser::GemMarkupParser(const Font* ftext, const Font* finit, Palette* textCol)
+GemMarkupParser::GemMarkupParser(const Font* ftext, Palette* textPal, const Font* finit, Palette* initPal)
 {
 	state = TEXT;
-	context.push(TextAttributes(ftext, finit, textCol));
+	context.push(TextAttributes(ftext, textPal, finit, initPal));
 }
 
-void GemMarkupParser::ResetAttributes(const Font* ftext, const Font* finit, Palette* textCol)
+void GemMarkupParser::ResetAttributes(const Font* ftext, Palette* textPal, const Font* finit, Palette* initPal)
 {
 	while(context.size()) context.pop();
-	context.push(TextAttributes(ftext, finit, textCol));
+	context.push(TextAttributes(ftext, textPal, finit, initPal));
 }
 
 GemMarkupParser::ParseState
@@ -148,8 +148,8 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				switch (*it) {
 					case L']':
 						Palette* pal = GetSharedPalette(token);
-						context.push(TextAttributes(attributes.TextFont, attributes.SwapFont, pal));
-
+						context.push(TextAttributes(attributes));
+						context.top().SetTextPalette(pal);
 						state = TEXT;
 						token.clear();
 						continue;

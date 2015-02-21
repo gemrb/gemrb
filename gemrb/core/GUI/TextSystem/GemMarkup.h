@@ -37,10 +37,12 @@ public:
 	};
 
 	GemMarkupParser();
-	GemMarkupParser(const Font* ftext, const Font* finit, Palette* textCol);
+	GemMarkupParser(const Font* ftext, Palette* textPal = NULL,
+					const Font* finit = NULL, Palette* initPal = NULL);
 	~GemMarkupParser() {};
 
-	void ResetAttributes(const Font* ftext, const Font* finit, Palette* textCol);
+	void ResetAttributes(const Font* ftext = NULL, Palette* textPal = NULL,
+						 const Font* finit = NULL, Palette* initPal = NULL);
 
 	TextSpan* ParseMarkupTag(const String&) const;
 	ParseState ParseMarkupStringIntoContainer(const String&, TextContainer&);
@@ -49,43 +51,57 @@ private:
 	class TextAttributes {
 		private:
 		Palette* palette;
+		Palette* swapPalette;
 
 		public:
 		const Font* TextFont;
 		const Font* SwapFont;
 
 		public:
-		TextAttributes(const Font* text, const Font* init, Palette* pal) {
+		TextAttributes(const Font* text, Palette* textPal = NULL,
+					   const Font* init = NULL, Palette* initPal = NULL)
+		{
 			TextFont = text;
 			SwapFont = (init) ? init : TextFont;
 			assert(TextFont);
-			if (pal == NULL) {
-				pal = TextFont->GetPalette();
-			} else {
-				pal->acquire();
+			if (textPal) {
+				textPal->acquire();
 			}
-			assert(pal);
-			palette = pal;
+			if (initPal) {
+				initPal->acquire();
+			}
+
+			palette = textPal;
+			swapPalette = initPal;
 		}
 
 		TextAttributes(const TextAttributes& ta) {
 			this->operator=(ta);
 		}
 
-		TextAttributes& operator=(const TextAttributes& ta) { // copy/move constructor is called to construct arg
+		TextAttributes& operator=(const TextAttributes& ta) {
 			TextFont = ta.TextFont;
 			SwapFont = ta.SwapFont;
 			palette = ta.palette;
-			palette->acquire();
+			if (palette)
+				palette->acquire();
 			return *this;
 		}
 
 		~TextAttributes() {
-			palette->release();
+			if (palette)
+				palette->release();
 		}
 
 		void SwapFonts() {
 			std::swap(TextFont, SwapFont);
+			std::swap(palette, swapPalette);
+		}
+
+		void SetTextPalette(Palette* pal) {
+			if (pal) pal->acquire();
+			if (palette) palette->release();
+			palette = pal;
 		}
 
 		Palette* TextPalette() const {
