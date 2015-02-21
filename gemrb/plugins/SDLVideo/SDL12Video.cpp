@@ -79,16 +79,15 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	Viewport.h = height;
 	SetScreenClip(NULL);
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating Main Surface...");
-	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, width, height,
-						bpp, 0, 0, 0, 0 );
+	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating Back Buffer...");
 	backBuf = SDL_DisplayFormat( tmp );
+	disposableBuf = SDL_DisplayFormat(tmp);
+	SDL_SetColorKey(disposableBuf, SDL_SRCCOLORKEY, 0x00ff0000);
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating Extra Buffer...");
 	extra = SDL_DisplayFormat( tmp );
-	SDL_LockSurface( extra );
 	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
 	SDL_FillRect( extra, NULL, val );
-	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
 
 	return GEM_OK;
@@ -146,14 +145,14 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 		}
 	}
 
+	SetBufferedDrawing(false);
 	SDL_Rect rect = RectFromRegion(subtitleregion);
-	SDL_FillRect(disp, &rect, 0);
-	SDL_Surface* tmp = backBuf;
-	backBuf = disp;
+	SDL_FillRect(currentBuf, &rect, 0);
 	BlitSurfaceClipped(sprite, Region(sx, sy, w, h), Region(dstx, dsty, w, h));
-	backBuf = tmp;
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
+	SetBufferedDrawing(true);
+
 	SDL_Flip( disp );
 	SDL_FreeSurface( sprite );
 }
@@ -184,6 +183,9 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 int SDL12VideoDriver::SwapBuffers(void)
 {
 	SDL_BlitSurface( backBuf, NULL, disp, NULL );
+	SDL_BlitSurface( disposableBuf, NULL, disp, NULL);
+	SDL_FillRect(disposableBuf, NULL, SDL_MapRGBA(disposableBuf->format, 0, 0xff, 0, 0));
+
 	if (fadeColor.a) {
 		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
 		SDL_Rect src = {
@@ -196,10 +198,9 @@ int SDL12VideoDriver::SwapBuffers(void)
 	}
 
 	/** This causes the tooltips/cursors to be rendered directly to display */
-	SDL_Surface* tmp = backBuf;
-	backBuf = disp; // FIXME: UGLY HACK!
+	SetBufferedDrawing(false);
 	int ret = SDLVideoDriver::SwapBuffers();
-	backBuf = tmp;
+	SetBufferedDrawing(true);
 
 	SDL_Flip( disp );
 	return ret;
@@ -254,10 +255,13 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	destRect.w = w;
 	destRect.h = h;
 	SDL_Rect rect = RectFromRegion(subtitleregion);
-	SDL_FillRect(disp, &rect, 0);
+
+	SetBufferedDrawing(false);
+	SDL_FillRect(currentBuf, &rect, 0);
 	SDL_DisplayYUVOverlay(overlay, &destRect);
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
+	SetBufferedDrawing(true);
 }
 
 int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)

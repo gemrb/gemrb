@@ -48,9 +48,12 @@ inline int GetModState(int modstate)
 
 class SDLVideoDriver : public Video {
 protected:
+	SDL_Surface* currentBuf; // points to either standard backBuf, or the disposable surface
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
+	SDL_Surface* disposableBuf;
 	SDL_Surface* extra;
+
 	unsigned long lastTime;
 	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
@@ -66,6 +69,7 @@ public:
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
 	virtual bool SetFullscreenMode(bool set)=0;
 	virtual int SwapBuffers(void);
+	virtual void SetBufferedDrawing(bool);
 
 	virtual bool ToggleGrabInput()=0;
 	short GetWidth() { return width; }

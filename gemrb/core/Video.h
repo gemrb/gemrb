@@ -120,6 +120,7 @@ public:
 	virtual bool SetFullscreenMode(bool set) = 0;
 	/** Swaps displayed and back buffers */
 	virtual int SwapBuffers(void) = 0;
+	virtual void SetBufferedDrawing(bool) = 0;
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	virtual short GetWidth() = 0;

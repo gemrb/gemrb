@@ -116,6 +116,7 @@ void View::DrawBackground(const Region* rgn) const
 void View::Draw()
 {
 	Video* video = core->GetVideoDriver();
+	video->SetBufferedDrawing(true);
 
 	const Region& clip = video->GetScreenClip();
 	const Region& drawFrame = Region(ConvertPointToScreen(Point(0,0)), Dimensions());

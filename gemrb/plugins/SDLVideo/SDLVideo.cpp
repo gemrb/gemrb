@@ -60,12 +60,15 @@ SDLVideoDriver::SDLVideoDriver(void)
 	xCorr = 0;
 	yCorr = 0;
 	lastTime = 0;
-	backBuf=NULL;
-	extra=NULL;
+
+	currentBuf = NULL;
+	backBuf = NULL;
+	disp = NULL;
+	extra = NULL;
+
 	lastMouseDownTime = lastMouseMoveTime = GetTickCount();
 	subtitlestrref = 0;
 	subtitletext = NULL;
-	disp = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -96,6 +99,15 @@ int SDLVideoDriver::Init(void)
 	return GEM_OK;
 }
 
+void SDLVideoDriver::SetBufferedDrawing(bool buffered)
+{
+	if (buffered) {
+		currentBuf = backBuf;
+	} else {
+		currentBuf = disposableBuf;
+	}
+}
+
 int SDLVideoDriver::SwapBuffers(void)
 {
 	unsigned long time;
@@ -108,6 +120,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
+	SetBufferedDrawing(false);
 	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		
 		if (MouseFlags&MOUSE_GRAYED) {
@@ -133,6 +146,7 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 	}
 
+	SetBufferedDrawing(true);
 	return PollEvents();
 }
 
@@ -422,20 +436,20 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	}
 
 #define DO_BLIT \
-		if (backBuf->format->BytesPerPixel == 4) \
-			BlitTile_internal<Uint32>(backBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
+		if (currentBuf->format->BytesPerPixel == 4) \
+			BlitTile_internal<Uint32>(currentBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
 		else \
-			BlitTile_internal<Uint16>(backBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
+			BlitTile_internal<Uint16>(currentBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
 
 	if (flags & TILE_GREY) {
 
 		if (flags & TILE_HALFTRANS) {
-			TRBlender_HalfTrans B(backBuf->format);
+			TRBlender_HalfTrans B(currentBuf->format);
 
 			TRTinter_Grey T(tintcol);
 			DO_BLIT
 		} else {
-			TRBlender_Opaque B(backBuf->format);
+			TRBlender_Opaque B(currentBuf->format);
 
 			TRTinter_Grey T(tintcol);
 			DO_BLIT
@@ -444,12 +458,12 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	} else if (flags & TILE_SEPIA) {
 
 		if (flags & TILE_HALFTRANS) {
-			TRBlender_HalfTrans B(backBuf->format);
+			TRBlender_HalfTrans B(currentBuf->format);
 
 			TRTinter_Sepia T(tintcol);
 			DO_BLIT
 		} else {
-			TRBlender_Opaque B(backBuf->format);
+			TRBlender_Opaque B(currentBuf->format);
 
 			TRTinter_Sepia T(tintcol);
 			DO_BLIT
@@ -458,7 +472,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	} else {
 
 		if (flags & TILE_HALFTRANS) {
-			TRBlender_HalfTrans B(backBuf->format);
+			TRBlender_HalfTrans B(currentBuf->format);
 
 			if (tint) {
 				TRTinter_Tint T(tintcol);
@@ -468,7 +482,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 				DO_BLIT
 			}
 		} else {
-			TRBlender_Opaque B(backBuf->format);
+			TRBlender_Opaque B(currentBuf->format);
 
 			if (tint) {
 				TRTinter_Tint T(tintcol);
@@ -533,7 +547,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 	} else {
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
 
-		SDL_LockSurface(backBuf);
+		SDL_LockSurface(currentBuf);
 
 		Palette* pal = palette;
 		if (!pal) {
@@ -556,7 +570,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 			SRBlender_Alpha blender;
 
 			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
-								   backBuf, srcdata, pal->col, x, y, w, h,
+								   currentBuf, srcdata, pal->col, x, y, w, h,
 								   (spr->renderFlags&BLIT_MIRRORY), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		} else {
@@ -564,12 +578,12 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 			SRBlender_NoAlpha blender;
 
 			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
-								   backBuf, srcdata, pal->col, x, y, w, h,
+								   currentBuf, srcdata, pal->col, x, y, w, h,
 								   (spr->renderFlags&BLIT_MIRRORY), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
 		
-		SDL_UnlockSurface(backBuf);
+		SDL_UnlockSurface(currentBuf);
 	}
 }
 
@@ -674,15 +688,15 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_Tint<false, false> tinter(tint);
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_TRANSSHADOW)) {
 
-		SRShadow_HalfTrans shadow(backBuf->format, palette->col[1]);
+		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
 		SRTinter_Tint<false, false> tinter(tint);
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_NOSHADOW)) {
 
@@ -690,15 +704,15 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_Tint<false, false> tinter(tint);
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == BLIT_HALFTRANS) {
 
-		SRShadow_HalfTrans shadow(backBuf->format, palette->col[1]);
+		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
 		SRTinter_NoTint<false> tinter;
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM && remflags == 0) {
 
@@ -706,7 +720,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		SRTinter_NoTint<false> tinter;
 		SRBlender_NoAlpha blender;
 
-		BlitSpritePAL_dispatch(cover, hflip, backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 
 	} else if (spr->BAM) {
 		// handling the following effects with conditionals:
@@ -734,24 +748,24 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 				SRTinter_Flags<true> tinter(tint);
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<true> tinter;
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			}
 		} else {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<false> tinter(tint);
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<false> tinter;
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
+				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), cover, spr, remflags, shadow, tinter, blender);
 			}
 
 		}
@@ -809,12 +823,12 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 				SRTinter_Flags<false> tinter(tint);
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, data, col, tx, ty, spr->Width, spr->Height, vflip, finalclip, -1, cover, spr, remflags, shadow, tinter, blender);
+				    currentBuf, data, col, tx, ty, spr->Width, spr->Height, vflip, finalclip, -1, cover, spr, remflags, shadow, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<false> tinter;
 
 				BlitSpritePAL_dispatch(cover, hflip,
-				    backBuf, data, col, tx, ty, spr->Width, spr->Height, vflip, finalclip, -1, cover, spr, remflags, shadow, tinter, blender);
+				    currentBuf, data, col, tx, ty, spr->Width, spr->Height, vflip, finalclip, -1, cover, spr, remflags, shadow, tinter, blender);
 			}
 
 		} else {
@@ -826,19 +840,19 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 				SRTinter_Flags<true> tinter(tint);
 
 				BlitSpriteRGB_dispatch(cover, hflip,
-				    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+				    currentBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<true> tinter;
 
 				BlitSpriteRGB_dispatch(cover, hflip,
-				    backBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
+				    currentBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, cover, spr, remflags, tinter, blender);
 			}
 
 		}
 
 	}
 
-	SDL_UnlockSurface(backBuf);
+	SDL_UnlockSurface(currentBuf);
 
 }
 
@@ -863,9 +877,9 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
 		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
-			long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
+			long val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
-			SDL_FillRect( backBuf, &drect, val );
+			SDL_FillRect( currentBuf, &drect, val );
 		} else {
 			SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
 			SDL_Color c;
@@ -1272,17 +1286,17 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 	if (poly->BBox.y + poly->BBox.h < Viewport.y) return;
 
 	if (fill) {
-		Uint32 alphacol32 = SDL_MapRGBA(backBuf->format, color.r/2, color.g/2, color.b/2, 0);
+		Uint32 alphacol32 = SDL_MapRGBA(currentBuf->format, color.r/2, color.g/2, color.b/2, 0);
 		Uint16 alphacol16 = (Uint16)alphacol32;
 
 		// color mask for doing a 50/50 alpha blit
-		Uint32 mask32 = (backBuf->format->Rmask >> 1) & backBuf->format->Rmask;
-		mask32 |= (backBuf->format->Gmask >> 1) & backBuf->format->Gmask;
-		mask32 |= (backBuf->format->Bmask >> 1) & backBuf->format->Bmask;
+		Uint32 mask32 = (currentBuf->format->Rmask >> 1) & currentBuf->format->Rmask;
+		mask32 |= (currentBuf->format->Gmask >> 1) & currentBuf->format->Gmask;
+		mask32 |= (currentBuf->format->Bmask >> 1) & currentBuf->format->Bmask;
 
 		Uint16 mask16 = (Uint16)mask32;
 
-		SDL_LockSurface(backBuf);
+		SDL_LockSurface(currentBuf);
 		std::list<Trapezoid>::iterator iter;
 		for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
 			++iter)
@@ -1301,7 +1315,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			Point& c = poly->points[redge];
 			Point& d = poly->points[(redge+1)%(poly->count)];
 
-			Pixel* line = (Pixel*)(backBuf->pixels) + (y_top+yCorr)*backBuf->pitch;
+			Pixel* line = (Pixel*)(currentBuf->pixels) + (y_top+yCorr) * currentBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
 				int py = y + Viewport.y;
@@ -1317,17 +1331,17 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 
 				if (lt < 0) lt = 0;
 				if (rt > Viewport.w) rt = Viewport.w;
-				if (lt >= rt) { line += backBuf->pitch; continue; } // clipped
+				if (lt >= rt) { line += currentBuf->pitch; continue; } // clipped
 
 
 				// Draw a 50% alpha line from (y,lt) to (y,rt)
 
-				if (backBuf->format->BytesPerPixel == 2) {
+				if (currentBuf->format->BytesPerPixel == 2) {
 					Uint16* pix = (Uint16*)line + lt + xCorr;
 					Uint16* end = pix + (rt - lt);
 					for (; pix < end; pix++)
 						*pix = ((*pix >> 1)&mask16) + alphacol16;
-				} else if (backBuf->format->BytesPerPixel == 4) {
+				} else if (currentBuf->format->BytesPerPixel == 4) {
 					Uint32* pix = (Uint32*)line + lt + xCorr;
 					Uint32* end = pix + (rt - lt);
 					for (; pix < end; pix++)
@@ -1335,10 +1349,10 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 				} else {
 					assert(false);
 				}
-				line += backBuf->pitch;
+				line += currentBuf->pitch;
 			}
 		}
-		SDL_UnlockSurface(backBuf);
+		SDL_UnlockSurface(currentBuf);
 	}
 
 	short lastX = poly->points[0]. x, lastY = poly->points[0].y;
@@ -1449,13 +1463,8 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		subtitlestrref = strRef;
 	}
 	if (subtitlefont && subtitletext) {
-		// FIXME: ugly hack!
-		SDL_Surface* temp = backBuf;
-		backBuf = disp;
-
 		//FYI: that 0 is pitch black
 		subtitlefont->Print(subtitleregion, *subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
-		backBuf = temp;
 	}
 }
 
@@ -1480,7 +1489,7 @@ void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, co
 
 	SDL_Rect drect = RectFromRegion(dclipped);
 	// since we should already be clipped we can call SDL_LowerBlit directly
-	SDL_LowerBlit(surf, &srect, backBuf, &drect);
+	SDL_LowerBlit(surf, &srect, currentBuf, &drect);
 }
 
 // static class methods
