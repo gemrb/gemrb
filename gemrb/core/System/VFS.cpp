@@ -515,6 +515,7 @@ void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
 		delete predicate;
 		predicate = p;
 	}
+	Rewind();
 }
 
 bool DirectoryIterator::IsDirectory()
