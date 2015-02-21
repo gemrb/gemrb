@@ -4240,14 +4240,15 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 
 	struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
 		char lastchar;
-		LastCharFilter(char lastchar)
-		: lastchar(lastchar) {}
+		LastCharFilter(char lastchar) {
+			this->lastchar = tolower(lastchar);
+		}
 
 		bool operator()(const char* fname) const {
 			const char* extpos = strrchr(fname, '.');
 			if (extpos) {
 				extpos--;
-				return *extpos == lastchar;
+				return tolower(*extpos) == lastchar;
 			}
 			return false;
 		}
@@ -4263,7 +4264,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 			if (core->HasFeature( GF_SOUNDFOLDERS )) {
 				dirs = true;
 			} else {
-				dirit.SetFilterPredicate(new LastCharFilter('_'), true);
+				dirit.SetFilterPredicate(new LastCharFilter('A'), true);
 			}
 			break;
 		case DIRECTORY_CHR_EXPORTS:
@@ -4281,9 +4282,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 			String* string = StringFromCString(name);
 			if (dirs == false) {
 				size_t pos = string->find_last_of(L'.');
-				if (pos != String::npos) {
-					string->resize(pos);
+				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
+					delete string;
+					continue;
 				}
+				string->resize(pos);
 			}
 			StringToUpper(*string);
 			strings.push_back(*string);
