@@ -413,7 +413,7 @@ int TextArea::GetRowHeight() const
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
+void TextArea::ScrollToY(int y, Control* sender, ieDword duration)
 {
 	// set up animation if required
 	if  (duration) {

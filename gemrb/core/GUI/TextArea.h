@@ -78,7 +78,7 @@ public:
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender = NULL, ieWord duration = 0);
+	void ScrollToY(int y, Control* sender = NULL, ieDword duration = 0);
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;
