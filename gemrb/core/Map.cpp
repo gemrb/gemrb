@@ -89,6 +89,14 @@ static void ReleaseSpawnGroup(void *poi)
 	delete (SpawnGroup *) poi;
 }
 
+Spawn::Spawn() {
+	Creatures = NULL;
+	NextSpawn = Method = sduration = Count = Maximum = Difficulty = 0;
+	DayChance = NightChance = Enabled = Frequency = 0;
+	rwdist = owdist = appearance = 0;
+	Name[0] = 0;
+}
+
 void Map::ReleaseMemory()
 {
 	if (VisibilityMasks) {

@@ -207,7 +207,7 @@ public:
 	ieWord DayChance;
 	ieWord NightChance;
 	ieDword NextSpawn;
-	Spawn() { Creatures=NULL; NextSpawn = 0; }
+	Spawn();
 	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }
 };
