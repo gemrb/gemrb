@@ -1802,14 +1802,15 @@ void Game::CastOnRest()
 		SpecialSpellType &specialSpell = special_spells[specialCount];
 		// Cast multi-target healing spells
 		if ((specialSpell.flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
-			while (ps--) {
+			while (ps-- && wholeparty.back().hpneeded > 0) {
 				Actor *tar = GetPC(ps, true);
-				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0)) {
+				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0) && wholeparty.back().hpneeded > 0) {
 					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, 1, true);
 					for (RestTargets::iterator injuree=wholeparty.begin(); injuree != wholeparty.end(); ++injuree) {
 							injuree->hpneeded -= specialSpell.amount;
 					}
 				}
+				std::sort(wholeparty.begin(), wholeparty.end());
 			}
 			ps = ps2;
 		// Gather rest of the spells
