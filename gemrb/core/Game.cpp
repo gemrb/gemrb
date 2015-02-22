@@ -1765,6 +1765,19 @@ bool Game::RestParty(int checks, int dream, int hp)
 	return cutscene;
 }
 
+// calculate an estimate of spell's healing power
+inline static int CastOnRestHealingAmount(Actor *caster, SpecialSpellType &specialSpell)
+{
+	int healing = specialSpell.amount;
+	if (specialSpell.bonus_limit > 0) {
+		// cheating a bit, but the whole function is a heuristic anyway
+		int bonusLevel = caster->GetAnyActiveCasterLevel();
+		if (bonusLevel > specialSpell.bonus_limit) bonusLevel = specialSpell.bonus_limit;
+		healing += bonusLevel; // 1 HP per level, usually corresponding to the die bonus
+	}
+	return healing;
+}
+
 // heal on rest and similar
 void Game::CastOnRest()
 {
@@ -1807,7 +1820,7 @@ void Game::CastOnRest()
 				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0) && wholeparty.back().hpneeded > 0) {
 					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, 1, true);
 					for (RestTargets::iterator injuree=wholeparty.begin(); injuree != wholeparty.end(); ++injuree) {
-							injuree->hpneeded -= specialSpell.amount;
+						injuree->hpneeded -= CastOnRestHealingAmount(tar, specialSpell);
 					}
 				}
 				std::sort(wholeparty.begin(), wholeparty.end());
@@ -1822,7 +1835,7 @@ void Game::CastOnRest()
 					resource.caster = tar;
 					CopyResRef(resource.resref, specialSpell.resref);
 					resource.amount = 0;
-					resource.amounthealed = specialSpell.amount;
+					resource.amounthealed = CastOnRestHealingAmount(tar, specialSpell);
 					// guess the booktype; one will definitely match due to HaveSpell above
 					int booktype = 0;
 					while (resource.amount == 0 && booktype < tar->spellbook.GetTypes()) {
