@@ -1774,86 +1774,88 @@ void Game::CastOnRest()
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
 	int specialCount = core->GetSpecialSpellsCount();
+	if (!tmp || specialCount == -1) {
+		return;
+	}
+
 	RestTargets wholeparty;
-	if (tmp && specialCount != -1) {
-		int ps = GetPartySize(true);
-		int ps2 = ps;
-		for (int idx = 1; idx <= ps; idx++) {
-			Actor *tar = FindPC(idx);
-			ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
-			if (tar) {
-				wholeparty.push_back(Injured(hpneeded, tar));
-			}
+	int ps = GetPartySize(true);
+	int ps2 = ps;
+	for (int idx = 1; idx <= ps; idx++) {
+		Actor *tar = FindPC(idx);
+		ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
+		if (tar) {
+			wholeparty.push_back(Injured(hpneeded, tar));
 		}
-		// Following algorithm works thus:
-		// - If at any point there are no more injured party members, stop
-		// (amount of healing done is an estimation)
-		// - cast party members' all heal-all spells
-		// - repeat:
-		//       cast the most potent healing spell on the most injured member
-		SpecialSpellType *special_spells = core->GetSpecialSpells();
-		std::sort(wholeparty.begin(), wholeparty.end());
-		RestSpells healingspells;
-		RestSpells nonhealingspells;
-		while (specialCount--) {
-			// Cast multi-target healing spells
-			if ((special_spells[specialCount].flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
-				while (ps--) {
-					Actor *tar = GetPC(ps, true);
-					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-						tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
-						for (RestTargets::iterator injuree=wholeparty.begin(); injuree != wholeparty.end(); ++injuree) {
-								injuree->hpneeded -= special_spells[specialCount].amount;
-						}
+	}
+	// Following algorithm works thus:
+	// - If at any point there are no more injured party members, stop
+	// (amount of healing done is an estimation)
+	// - cast party members' all heal-all spells
+	// - repeat:
+	//       cast the most potent healing spell on the most injured member
+	SpecialSpellType *special_spells = core->GetSpecialSpells();
+	std::sort(wholeparty.begin(), wholeparty.end());
+	RestSpells healingspells;
+	RestSpells nonhealingspells;
+	while (specialCount--) {
+		// Cast multi-target healing spells
+		if ((special_spells[specialCount].flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
+			while (ps--) {
+				Actor *tar = GetPC(ps, true);
+				while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+					tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
+					for (RestTargets::iterator injuree=wholeparty.begin(); injuree != wholeparty.end(); ++injuree) {
+							injuree->hpneeded -= special_spells[specialCount].amount;
 					}
 				}
-				ps = ps2;
-			// Gather rest of the spells
-			} else if (special_spells[specialCount].flags & SP_REST) {
-				while (ps--) {
-					Actor *tar = GetPC(ps, true);
-					if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-						HealingResource resource;
-						resource.caster = tar;
-						CopyResRef(resource.resref, special_spells[specialCount].resref);
-						resource.amounthealed = special_spells[specialCount].amount;
-						resource.amount = tar->spellbook.CountSpells(special_spells[specialCount].resref, 0, 0);
-						if (resource.amounthealed > 0 ) {
-							healingspells.push_back(resource);
-						} else {
-							nonhealingspells.push_back(resource);
-						}
+			}
+			ps = ps2;
+		// Gather rest of the spells
+		} else if (special_spells[specialCount].flags & SP_REST) {
+			while (ps--) {
+				Actor *tar = GetPC(ps, true);
+				if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+					HealingResource resource;
+					resource.caster = tar;
+					CopyResRef(resource.resref, special_spells[specialCount].resref);
+					resource.amounthealed = special_spells[specialCount].amount;
+					resource.amount = tar->spellbook.CountSpells(special_spells[specialCount].resref, 0, 0);
+					if (resource.amounthealed > 0 ) {
+						healingspells.push_back(resource);
+					} else {
+						nonhealingspells.push_back(resource);
 					}
 				}
-				ps = ps2;
 			}
+			ps = ps2;
 		}
+	}
+	std::sort(wholeparty.begin(), wholeparty.end());
+	std::sort(healingspells.begin(), healingspells.end());
+	// Heal who's still injured
+	while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
+		healingspells.back().caster->DirectlyCastSpell(wholeparty.back().character, healingspells.back().resref, 0, 1, true);
+		healingspells.back().amount--;
+		wholeparty.back().hpneeded -= healingspells.back().amounthealed;
 		std::sort(wholeparty.begin(), wholeparty.end());
-		std::sort(healingspells.begin(), healingspells.end());
-		// Heal who's still injured
-		while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
-			healingspells.back().caster->DirectlyCastSpell(wholeparty.back().character, healingspells.back().resref, 0, 1, true);
-			healingspells.back().amount--;
-			wholeparty.back().hpneeded -= healingspells.back().amounthealed;
-			std::sort(wholeparty.begin(), wholeparty.end());
-			if (healingspells.back().amount == 0) {
-				healingspells.pop_back();
-			}
+		if (healingspells.back().amount == 0) {
+			healingspells.pop_back();
 		}
-		// Other rest-time spells
-		// Everybody gets something while stocks last!
-		// In other words a better priorization of targets is needed
-		ieWord spelltarget = 0;
-		while (!nonhealingspells.empty()) {
-			nonhealingspells.back().caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, nonhealingspells.back().resref, 0, 1, true);
-			nonhealingspells.back().amount--;
-			if (nonhealingspells.back().amount == 0) {
-				nonhealingspells.pop_back();
-			}
-			spelltarget++;
-			if (spelltarget == wholeparty.size()) {
-				spelltarget = 0;
-			}
+	}
+	// Other rest-time spells
+	// Everybody gets something while stocks last!
+	// In other words a better priorization of targets is needed
+	ieWord spelltarget = 0;
+	while (!nonhealingspells.empty()) {
+		nonhealingspells.back().caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, nonhealingspells.back().resref, 0, 1, true);
+		nonhealingspells.back().amount--;
+		if (nonhealingspells.back().amount == 0) {
+			nonhealingspells.pop_back();
+		}
+		spelltarget++;
+		if (spelltarget == wholeparty.size()) {
+			spelltarget = 0;
 		}
 	}
 }
