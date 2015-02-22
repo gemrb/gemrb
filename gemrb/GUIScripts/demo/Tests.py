@@ -82,6 +82,7 @@ def RunTextAreaTests():
 		else:
 			failures += 1
 		msg += results[1]
+		MessageTA.SetText("") # reset
 
 	return (successes, failures, msg)
 
