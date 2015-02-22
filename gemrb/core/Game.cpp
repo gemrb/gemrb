@@ -1820,8 +1820,15 @@ void Game::CastOnRest()
 					HealingResource resource;
 					resource.caster = tar;
 					CopyResRef(resource.resref, specialSpell.resref);
+					resource.amount = 0;
 					resource.amounthealed = specialSpell.amount;
-					resource.amount = tar->spellbook.CountSpells(specialSpell.resref, booktype, 0);
+					// guess the booktype; one will definitely match due to HaveSpell above
+					int booktype = 0;
+					while (resource.amount == 0 && booktype < tar->spellbook.GetTypes()) {
+						resource.amount = tar->spellbook.CountSpells(specialSpell.resref, booktype, 0);
+						booktype++;
+					}
+					if (resource.amount == 0) continue;
 					if (resource.amounthealed > 0 ) {
 						healingspells.push_back(resource);
 					} else {
