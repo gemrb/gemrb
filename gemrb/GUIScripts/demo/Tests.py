@@ -59,12 +59,16 @@ def Me():
 # actual tests follow
 #
 
+# fits perfectly
+fmline = "supercalifragilisticexpialidociousnessOFantidisestablishmentarianSesquipedalianists"
+
 # TextArea family of tests
 def RunTextAreaTests():
 	MessageWindow = GemRB.GetVar ("MessageWindow")
 	MessageTA = GUIClasses.GTextArea (MessageWindow, GemRB.GetVar ("MessageTextArea"))
 
-	tests = [ TA_AppendEmpty, TA_AppendSpace, TA_AppendNewline, TA_AppendNewlines, \
+	tests = [ TA_SetEmpty, TA_SetNone, TA_SetSpaces, TA_SetSupercali, TA_SetSupercali2 ]
+	tests += [ TA_AppendEmpty, TA_AppendSpace, TA_AppendNewline, TA_AppendNewlines, \
 		TA_AppendNewlinesAtStart ]
 	tests += [ TA_PrependEmpty, TA_PrependSpace, TA_PrependNewline, TA_PrependNewlines, \
 		TA_PrependTabs, TA_PrependTabsTag, TA_PrependTabsIncompleteTag ]
@@ -106,6 +110,34 @@ def TA_AppendText(TA, name, text):
 	status = (new == (old+text))
 	if not status:
 		print "Expected:+", repr(old+text), "+"
+		print "Actual  :+", repr(new), "+"
+	return DisplayTestResult (status, name)
+
+def TA_SetEmpty(TA):
+	return TA_SetText (TA, Me(), "")
+
+def TA_SetNone(TA):
+	return TA_SetText (TA, Me(), None, "")
+
+def TA_SetSpaces(TA):
+	return TA_SetText (TA, Me(), "  \t\t  ")
+
+def TA_SetSupercali(TA):
+	return TA_SetText (TA, Me(), fmline)
+
+def TA_SetSupercali2(TA):
+	line = "[color=7b7a4e]" + fmline * 3 + "[/color]"
+	return TA_SetText (TA, Me(), line)
+
+def TA_SetText(TA, name, text, expected=-1):
+	TA.SetText (text)
+	new = TA.QueryText ()
+	if expected == -1:
+		expected = text
+
+	status = (expected == new)
+	if not status:
+		print "Expected:+", repr(expected), "+"
 		print "Actual  :+", repr(new), "+"
 	return DisplayTestResult (status, name)
 
