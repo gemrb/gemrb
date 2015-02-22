@@ -1782,11 +1782,7 @@ void Game::CastOnRest()
 			Actor *tar = FindPC(idx);
 			ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
 			if (tar) {
-				if (hpneeded > 0) {
-					wholeparty.push_back(Injured(hpneeded, tar));
-				} else {
-					wholeparty.push_back(Injured(0, tar));
-				}
+				wholeparty.push_back(Injured(hpneeded, tar));
 			}
 		}
 		// Following algorithm works thus:
@@ -1797,7 +1793,6 @@ void Game::CastOnRest()
 		//       cast the most potent healing spell on the most injured member
 		SpecialSpellType *special_spells = core->GetSpecialSpells();
 		std::sort(wholeparty.begin(), wholeparty.end());
-		specialCount = core->GetSpecialSpellsCount();
 		RestSpells healingspells;
 		RestSpells nonhealingspells;
 		while (specialCount--) {
