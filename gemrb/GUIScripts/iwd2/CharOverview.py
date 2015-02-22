@@ -39,8 +39,9 @@ Steps = ['Gender', 'Race', 'Class', 'Alignment', 'Abilities', 'Enemy', 'Appearan
 GlobalStep = 0
 
 ### Utility functions
-def AddText(strref):
-	return TextAreaControl.Append(strref)
+def AddText(strref, newlines=0):
+	TextAreaControl.Append (strref)
+	TextAreaControl.Append ("\n" * newlines)
 ### End utility functions
 
 def UpdateOverview(CurrentStep):
@@ -132,37 +133,37 @@ def UpdateOverview(CurrentStep):
 			TextAreaControl.SetText(12135)
 		else:
 			TextAreaControl.SetText(1047)
-			AddText(': ' + GemRB.GetToken('CHARNAME'))
+			AddText(': ' + GemRB.GetToken('CHARNAME'), 1)
 			AddText(12135)
 		AddText(': ')
 		strref = 1049 + GemRB.GetVar('Gender')
-		AddText(strref)
+		AddText(strref, 1)
 	
 	if GemRB.GetVar('Race') > 0:
 		AddText(1048)
 		AddText(': ')
-		AddText(Tables[0].GetValue(Tables[0].FindValue(3, GemRB.GetVar('Race')), 2))
+		AddText(Tables[0].GetValue(Tables[0].FindValue(3, GemRB.GetVar('Race')), 2), 1)
 	
 	if GemRB.GetVar('Class') > 0:
 		AddText(11959)
 		AddText(': ')
-		AddText(Tables[1].GetValue(GemRB.GetVar('Class') - 1, 0))
+		AddText(Tables[1].GetValue(GemRB.GetVar('Class') - 1, 0), 1)
 	
 	if GemRB.GetVar('Alignment') > 0:
 		AddText(11958)
 		AddText(': ')
-		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0))
+		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0), 1)
 	
 	if GemRB.GetVar('Ability 0') > 0:
-		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]', 1)
 		for i in range(0, 6):
 			strref = Tables[3].GetValue(i, 2)
 			AddText(strref)
 			abl = GemRB.GetVar('Ability ' + str(i))
-			AddText(': %d (%+d)' % (abl, abl / 2 - 5))
+			AddText(': %d (%+d)' % (abl, abl / 2 - 5), 1)
 	
 	if CurrentStep > 6:
-		AddText('\n[color=FFFF00]' + GemRB.GetString(11983) + '[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(11983) + '[/color]', 1)
 		
 		ClassColumn = Tables[1].GetValue(GemRB.GetVar('Class') - 1, 3, GTV_INT) # Finds base class row id
 		if ClassColumn < 1: ClassColumn = GemRB.GetVar('Class') - 1 # If 0 then already a base class so need actual row
@@ -198,9 +199,9 @@ def UpdateOverview(CurrentStep):
 				AddText(strref)
 				strn = ': ' + str(value)
 				if value != Ranks: strn += ' (' + str(Ranks) + ')'
-				AddText(strn)
+				AddText(strn, 1)
 
-		AddText('\n[color=FFFF00]' + GemRB.GetString(36310) + '[/color]')
+		AddText('\n[color=FFFF00]' + GemRB.GetString(36310) + '[/color]', 1)
 		
 		for i in range(Tables[6].GetRowCount()):
 			value = GemRB.GetVar('Feat ' + str(i))
@@ -210,6 +211,7 @@ def UpdateOverview(CurrentStep):
 				multiple = Tables[6].GetValue(i, 0)
 				if multiple != 0:
 					AddText(': ' + str(value))
+				AddText('\n')
 
 		AddText('\n')
 		import CommonTables
