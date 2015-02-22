@@ -73,7 +73,8 @@ def RunTextAreaTests():
 
 	tests = [ TA_SetEmpty, TA_SetNone, TA_SetSpaces, TA_SetSupercali, TA_SetSupercali2 ]
 	tests += [ TA_AppendEmpty, TA_AppendSpace, TA_AppendNewline, TA_AppendNewlines, \
-		TA_AppendNewlinesAtStart, TA_AppendSupercali, TA_AppendSupercali2 ]
+		TA_AppendNewlinesAtStart, TA_AppendSupercali, TA_AppendSupercali2, \
+		TA_AppendRef, TA_AppendRef2, TA_AppendRef3 ]
 	tests += [ TA_PrependEmpty, TA_PrependSpace, TA_PrependNewline, TA_PrependNewlines, \
 		TA_PrependTabs, TA_PrependTabsTag, TA_PrependTabsIncompleteTag ]
 	msg = "Testing TextAreas\n"
@@ -113,13 +114,28 @@ def TA_AppendSupercali2(TA):
 	TA.SetText (fmline[:-10])
 	return TA_AppendText (TA, Me(), fmline * 3)
 
-def TA_AppendText(TA, name, text):
+str1 = GemRB.GetString (1)
+def TA_AppendRef(TA):
+	return TA_AppendText (TA, Me(), 1, str1)
+
+def TA_AppendRef2(TA):
+	TA.SetText ("lalala")
+	return TA_AppendText (TA, Me(), 1, "lalala"+str1)
+
+def TA_AppendRef3(TA):
+	TA.Append (1)
+	TA.Append (': ')
+	return TA_AppendText (TA, Me(), 1, str1+": "+str1)
+
+def TA_AppendText(TA, name, text, expected=-1):
 	old = TA.QueryText ()
+	if expected == -1:
+		expected = old+text
 
 	TA.Append (text)
 	new = TA.QueryText ()
 
-	return DisplayTestResult (name, new, old+text)
+	return DisplayTestResult (name, new, expected)
 
 def TA_SetEmpty(TA):
 	return TA_SetText (TA, Me(), "")
