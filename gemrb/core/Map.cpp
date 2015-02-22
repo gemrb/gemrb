@@ -3763,6 +3763,12 @@ AreaAnimation::AreaAnimation()
 	animcount=0;
 	palette=NULL;
 	covers=NULL;
+	appearance = sequence = frame = transparency = height = 0;
+	Flags = startFrameRange = skipcycle = startchance = 0;
+	unknown48 = 0;
+	Name[0] = 0;
+	BAM[0] = 0;
+	PaletteRef[0] = 0;
 }
 
 AreaAnimation::~AreaAnimation()
