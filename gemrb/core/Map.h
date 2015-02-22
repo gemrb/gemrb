@@ -227,6 +227,7 @@ public:
 	SpawnGroup(unsigned int size) {
 		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
 		Count = size;
+		Level = 0;
 	}
 	~SpawnGroup() {
 		if (ResRefs) {
