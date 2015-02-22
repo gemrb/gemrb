@@ -1799,28 +1799,29 @@ void Game::CastOnRest()
 	RestSpells healingspells;
 	RestSpells nonhealingspells;
 	while (specialCount--) {
+		SpecialSpellType &specialSpell = special_spells[specialCount];
 		// Cast multi-target healing spells
-		if ((special_spells[specialCount].flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
+		if ((specialSpell.flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
 			while (ps--) {
 				Actor *tar = GetPC(ps, true);
-				while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-					tar->DirectlyCastSpell(tar, special_spells[specialCount].resref, 0, 1, true);
+				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0)) {
+					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, 1, true);
 					for (RestTargets::iterator injuree=wholeparty.begin(); injuree != wholeparty.end(); ++injuree) {
-							injuree->hpneeded -= special_spells[specialCount].amount;
+							injuree->hpneeded -= specialSpell.amount;
 					}
 				}
 			}
 			ps = ps2;
 		// Gather rest of the spells
-		} else if (special_spells[specialCount].flags & SP_REST) {
+		} else if (specialSpell.flags & SP_REST) {
 			while (ps--) {
 				Actor *tar = GetPC(ps, true);
-				if (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
+				if (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0)) {
 					HealingResource resource;
 					resource.caster = tar;
-					CopyResRef(resource.resref, special_spells[specialCount].resref);
-					resource.amounthealed = special_spells[specialCount].amount;
-					resource.amount = tar->spellbook.CountSpells(special_spells[specialCount].resref, 0, 0);
+					CopyResRef(resource.resref, specialSpell.resref);
+					resource.amounthealed = specialSpell.amount;
+					resource.amount = tar->spellbook.CountSpells(specialSpell.resref, booktype, 0);
 					if (resource.amounthealed > 0 ) {
 						healingspells.push_back(resource);
 					} else {
@@ -1835,11 +1836,13 @@ void Game::CastOnRest()
 	std::sort(healingspells.begin(), healingspells.end());
 	// Heal who's still injured
 	while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
-		healingspells.back().caster->DirectlyCastSpell(wholeparty.back().character, healingspells.back().resref, 0, 1, true);
-		healingspells.back().amount--;
-		wholeparty.back().hpneeded -= healingspells.back().amounthealed;
+		Injured &mostInjured = wholeparty.back();
+		HealingResource &mostHealing = healingspells.back();
+		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resref, 0, 1, true);
+		mostHealing.amount--;
+		mostInjured.hpneeded -= mostHealing.amounthealed;
 		std::sort(wholeparty.begin(), wholeparty.end());
-		if (healingspells.back().amount == 0) {
+		if (mostHealing.amount == 0) {
 			healingspells.pop_back();
 		}
 	}
@@ -1848,9 +1851,10 @@ void Game::CastOnRest()
 	// In other words a better priorization of targets is needed
 	ieWord spelltarget = 0;
 	while (!nonhealingspells.empty()) {
-		nonhealingspells.back().caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, nonhealingspells.back().resref, 0, 1, true);
-		nonhealingspells.back().amount--;
-		if (nonhealingspells.back().amount == 0) {
+		HealingResource &restingSpell = nonhealingspells.back();
+		restingSpell.caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, restingSpell.resref, 0, 1, true);
+		restingSpell.amount--;
+		if (restingSpell.amount == 0) {
 			nonhealingspells.pop_back();
 		}
 		spelltarget++;
