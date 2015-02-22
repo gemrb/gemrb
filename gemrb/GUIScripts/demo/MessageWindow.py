@@ -49,7 +49,7 @@ def OnLoad():
 	# set up some *initial* text (UpdateControlStatus will get called several times)
 	TMessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	results = Tests.RunTests ()
-	TMessageTA.SetText ("DEMO "*30 + "\n" + results)
+	TMessageTA.SetText ("[cap]D[/cap]emo " + "DEMO "*40 + "\n" + results)
 	print results
 
 def UpdateControlStatus():
