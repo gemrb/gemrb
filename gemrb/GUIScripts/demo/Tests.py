@@ -69,7 +69,7 @@ def RunTextAreaTests():
 
 	tests = [ TA_SetEmpty, TA_SetNone, TA_SetSpaces, TA_SetSupercali, TA_SetSupercali2 ]
 	tests += [ TA_AppendEmpty, TA_AppendSpace, TA_AppendNewline, TA_AppendNewlines, \
-		TA_AppendNewlinesAtStart ]
+		TA_AppendNewlinesAtStart, TA_AppendSupercali, TA_AppendSupercali2 ]
 	tests += [ TA_PrependEmpty, TA_PrependSpace, TA_PrependNewline, TA_PrependNewlines, \
 		TA_PrependTabs, TA_PrependTabsTag, TA_PrependTabsIncompleteTag ]
 	msg = "Testing TextAreas\n"
@@ -100,6 +100,13 @@ def TA_AppendNewlines(TA):
 def TA_AppendNewlinesAtStart(TA):
 	TA.Append ("---")
 	return TA_AppendText (TA, Me(), "\n\nTEST")
+
+def TA_AppendSupercali(TA):
+	return TA_AppendText (TA, Me(), fmline)
+
+def TA_AppendSupercali2(TA):
+	TA.SetText (fmline[:-10])
+	return TA_AppendText (TA, Me(), fmline * 3)
 
 def TA_AppendText(TA, name, text):
 	old = TA.QueryText ()
