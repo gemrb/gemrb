@@ -39,13 +39,17 @@ def RunTests():
 
 	total = successes + failures
 	msg += "TOTAL tests: %d\tsuccess: %d\tfailure: %d\n" %(total, successes, failures)
-	return DisplayTestResult (failures == 0, "TESTS", msg)[1]
+	return DisplayTestResult ("TESTS", failures, 0, msg)[1]
 
-def DisplayTestResult (status, name, intro=""):
+def DisplayTestResult (name, actual, expected, intro=""):
+	status = (actual == expected)
 	if status:
 		msg = "%s:\t\t[color=00ff00]passed[/color]\n" %(name)
 	else:
 		msg = "%s:\t\t[color=ff0000]FAILURE![/color]\n" %(name)
+		print "Expected:+", repr(expected), "+"
+		print "Actual  :+", repr(actual), "+"
+
 	return (status, intro+msg)
 
 # returns function name
@@ -115,11 +119,7 @@ def TA_AppendText(TA, name, text):
 	TA.Append (text)
 	new = TA.QueryText ()
 
-	status = (new == (old+text))
-	if not status:
-		print "Expected:+", repr(old+text), "+"
-		print "Actual  :+", repr(new), "+"
-	return DisplayTestResult (status, name)
+	return DisplayTestResult (name, new, old+text)
 
 def TA_SetEmpty(TA):
 	return TA_SetText (TA, Me(), "")
@@ -143,11 +143,7 @@ def TA_SetText(TA, name, text, expected=-1):
 	if expected == -1:
 		expected = text
 
-	status = (expected == new)
-	if not status:
-		print "Expected:+", repr(expected), "+"
-		print "Actual  :+", repr(new), "+"
-	return DisplayTestResult (status, name)
+	return DisplayTestResult (name, new, expected)
 
 def TA_PrependEmpty(TA):
 	return TA_PrependText (TA, Me(), "")
@@ -177,11 +173,7 @@ def TA_PrependText(TA, name, text, old=-1):
 	TA.SetText (text+old)
 	new = TA.QueryText ()
 
-	status = (new == (text+old))
-	if not status:
-		print "Expected:+", repr(text+old), "+"
-		print "Actual:+", repr(new), "+"
-	return DisplayTestResult (status, name)
+	return DisplayTestResult (name, new, text+old)
 
 ###################################################
 # x family of tests
