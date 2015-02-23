@@ -182,8 +182,8 @@ void TextArea::UpdateScrollbar()
 		// add the height of a newline too so that there is a space
 		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 		Size selectFrame = selectOptions->ContentFrame();
-		// page = blank line + dialog node + blank line + select options
-		int pageH = ftext->LineHeight*2 + nodeBounds.h + selectFrame.h;
+		// page = blank line + dialog node + blank line + select options, but the second blank line is part of selectFrame
+		int pageH = ftext->LineHeight + nodeBounds.h + selectFrame.h;
 		if (pageH < Height) {
 			// if the node isnt a full page by itself we need to fake it
 			textHeight += Height - pageH;
