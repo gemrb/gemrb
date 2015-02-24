@@ -78,7 +78,9 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
 		ctrl->Owner = NULL;
-		Controls.erase(std::find(Controls.begin(), Controls.end(), ctrl));
+		std::vector< Control*>::iterator it = std::find(Controls.begin(), Controls.end(), ctrl);
+		if (it != Controls.end())
+			Controls.erase(it);
 	}
 	if (focusView == ctrl) {
 		focusView = NULL;
