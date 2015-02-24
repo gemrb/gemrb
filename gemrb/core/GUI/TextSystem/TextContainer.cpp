@@ -124,15 +124,6 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 
 Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
-	// collapse with neighboring content
-	if (layoutPoint.y != 0) {
-		// if we arent the first line, then collapse with the above line
-		layoutPoint.y--;
-	}
-	if (layoutPoint.x != 0) {
-		layoutPoint.x--;
-	}
-
 	Regions layoutRegions;
 	const Point& drawOrigin = rgn.Origin();
 	const Font* layoutFont = LayoutFont();
@@ -498,11 +489,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			}
 			if (excluded) {
 				// we know that we have to move at least to the right
-				layoutPoint.x = excluded->x + excluded->w + 1;
+				layoutPoint.x = excluded->x + excluded->w;
 				if (frame.w > 0 && layoutPoint.x >= frame.w) {
 					layoutPoint.x = 0;
 					assert(excluded->y + excluded->h >= layoutPoint.y);
-					layoutPoint.y = excluded->y + excluded->h + 1;
+					layoutPoint.y = excluded->y + excluded->h;
 				}
 			}
 			exContent = ContentAtPoint(layoutPoint);
