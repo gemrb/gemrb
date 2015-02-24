@@ -844,8 +844,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 {
-	unsigned int Width = r.w ? r.w : disp->w;
-	unsigned int Height = r.h ? r.h : disp->h;
+	unsigned int Width = r.w ? r.w : width;
+	unsigned int Height = r.h ? r.h : height;
 
 	void* pixels = malloc( Width * Height * 3 );
 	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
@@ -926,7 +926,7 @@ void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped
 			return;
 		}
 	} else {
-		if (( x >= disp->w ) || ( y >= disp->h )) {
+		if (( x >= width ) || ( y >= height )) {
 			return;
 		}
 		if (( x < 0 ) || ( y < 0 )) {

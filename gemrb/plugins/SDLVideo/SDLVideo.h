@@ -68,8 +68,8 @@ public:
 	virtual int SwapBuffers(void);
 
 	virtual bool ToggleGrabInput()=0;
-	short GetWidth() { return ( disp ? disp->w : 0 ); }
-	short GetHeight() { return ( disp ? disp->h : 0 ); }
+	short GetWidth() { return width; }
+	short GetHeight() { return height; }
 
 	virtual void ShowSoftKeyboard()=0;
 	virtual void HideSoftKeyboard()=0;

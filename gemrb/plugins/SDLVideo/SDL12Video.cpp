@@ -73,8 +73,8 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
 
-	width = disp->w;
-	height = disp->h;
+	width = w;
+	height = h;
 	Viewport.w = width;
 	Viewport.h = height;
 	SetScreenClip(NULL);
@@ -105,8 +105,8 @@ void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	}
 	SDL_FillRect(disp, NULL, 0);
 	SDL_Flip( disp );
-	w = disp->w;
-	h = disp->h;
+	w = width;
+	h = height;
 
 	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;

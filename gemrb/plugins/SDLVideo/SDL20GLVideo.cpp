@@ -703,7 +703,7 @@ void GLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned 
 	} 
 	else 
 	{
-		if ((cx >= disp->w || cy >= disp->h) || (cx < 0 || cy < 0))
+		if ((cx >= width || cy >= height) || (cx < 0 || cy < 0))
 			return;
 	}
 	return drawEllipse(cx, cy, xr, yr, 3, color);
