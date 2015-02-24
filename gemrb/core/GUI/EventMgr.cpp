@@ -201,11 +201,9 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			last_win_over = win;
 			win->DispatchMouseOver(win->ConvertPointFromScreen(p));
 			RefreshCursor(win->Cursor);
-			return;
+			break;
 		}
 	}
-
-	core->DisplayTooltip( 0, 0, NULL );
 }
 
 void EventMgr::RefreshCursor(int idx)
@@ -290,16 +288,6 @@ void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 	}
 }
 
-/** BroadCast Mouse Idle Event */
-void EventMgr::MouseIdle(unsigned long /*time*/)
-{
-	if (last_win_over == NULL) return;
-
-	Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(core->GetVideoDriver()->GetMousePos()));
-	if (ctrl == NULL) return;
-	ctrl->DisplayTooltip();
-}
-
 /** BroadCast Key Press Event */
 void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 {
@@ -336,19 +324,6 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 {
 	if (!last_win_focused)
 		return;
-
-	// tab shows tooltips
-	if (last_win_over != NULL && Key == GEM_TAB) {
-		Control *ctrl = dynamic_cast<Control*>(last_win_over->SubviewAt(core->GetVideoDriver()->GetMousePos()));
-		if (ctrl != NULL) {
-			ctrl->DisplayTooltip();
-			return;
-		}
-	} else if (function_bar && Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
-		Control *ctrl = function_bar->GetFunctionControl(Key - GEM_FUNCTION1);
-		ctrl->OnSpecialKeyPress(Key);
-		return;
-	}
 
 	last_win_focused->OnSpecialKeyPress(Key);
 }

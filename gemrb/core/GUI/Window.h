@@ -124,6 +124,7 @@ private: // Private attributes
 	View* trackingView; // out of bounds mouse tracking
 	View* hoverView; // view the mouse was last over
 	Holder<DragOp> drag;
+	unsigned long lastMouseMoveTime;
 };
 
 }

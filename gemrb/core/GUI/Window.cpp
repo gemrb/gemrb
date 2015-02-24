@@ -42,6 +42,8 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
+
+	lastMouseMoveTime = GetTickCount();
 }
 
 Window::~Window()
@@ -217,6 +219,8 @@ bool Window::TrySetFocus(View* target)
 
 void Window::DispatchMouseOver(const Point& p)
 {
+	TooltipTime = GetTickCount() + ToolTipDelay;
+
 	// need screen coordinates because the target may not be a direct subview
 	Point screenP = ConvertPointToScreen(p);
 	View* target = SubviewAt(p, false, true);
@@ -251,6 +255,7 @@ void Window::DispatchMouseOver(const Point& p)
 		target->OnMouseOver(target->ConvertPointFromScreen(screenP));
 	}
 	hoverView = target;
+	TooltipView = hoverView;
 }
 
 void Window::DispatchMouseDown(const Point& p, unsigned short button, unsigned short mod)

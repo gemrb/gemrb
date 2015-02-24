@@ -55,7 +55,6 @@ protected:
 	SDL_Surface* extra;
 
 	unsigned long lastTime;
-	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
 
 	String *subtitletext;

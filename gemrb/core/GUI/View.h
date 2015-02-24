@@ -42,9 +42,15 @@ protected:
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
 
+	static int ToolTipDelay;
+	static unsigned long TooltipTime;
+	static View* TooltipView;
+
 private:
 	void DrawBackground(const Region*) const;
 	void DrawSubviews(bool drawBg);
+
+	static void DrawTooltip();
 
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
@@ -122,6 +128,8 @@ public:
 	virtual bool OnSpecialKeyPress(unsigned char Key);
 
 	void SetTooltip(const String& string);
+
+	static void SetTooltipDelay(int);
 };
 
 }
