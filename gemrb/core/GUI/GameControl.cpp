@@ -1128,7 +1128,7 @@ void GameControl::DisplayTooltip() {
 		}
 	}
 
-	SetTooltip(NULL);
+	SetTooltip(L"");
 	return;
 }
 
@@ -1286,7 +1286,7 @@ void GameControl::OnMouseOver(const Point& mp)
 		if (lastActor != prevActor) {
 			// we store prevActor so we can remove the tooltip on actor change
 			// (maybe we should be checking this and actor movements every frame?)
-			SetTooltip(NULL);
+			SetTooltip(L"");
 		}
 
 		if ((target_types & GA_NO_SELF) && lastActor ) {

@@ -8567,7 +8567,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 		if (!Picture) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
-			btn->SetTooltip(NULL);
+			btn->SetTooltip(L"");
 		} else {
 			SetButtonCycle(bam, btn, 0, IE_GUI_BUTTON_UNPRESSED);
 			SetButtonCycle(bam, btn, 1, IE_GUI_BUTTON_PRESSED);
