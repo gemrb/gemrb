@@ -644,7 +644,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 #undef WILL_WRAP
 #undef APPEND_TO_LINE
 
-	w = (w == 0 && wordW == 0) ? spaceW : w; // if the line is all whitespace
+	w += ((w == 0 && wordW == 0) || !newline) ? spaceW : 0;
 
 	if (metrics) {
 		if (forceBreak) charCount--;
