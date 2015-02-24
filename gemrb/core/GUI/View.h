@@ -50,8 +50,6 @@ private:
 	void DrawBackground(const Region*) const;
 	void DrawSubviews(bool drawBg);
 
-	static void DrawTooltip();
-
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
 

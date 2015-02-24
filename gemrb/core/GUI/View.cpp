@@ -28,17 +28,6 @@ namespace GemRB {
 int View::ToolTipDelay = 500;
 unsigned long View::TooltipTime = 0;
 View* View::TooltipView = NULL;
-	
-void View::DrawTooltip()
-{
-	if (TooltipView && TooltipView->tooltip.length()) {
-		Video* video = core->GetVideoDriver();
-		video->SetBufferedDrawing(false);
-
-		Point mp = video->GetMousePos();
-		core->DrawTooltip(TooltipView->tooltip, mp);
-	}
-}
 
 View::View(const Region& frame)
 	: frame(frame)
@@ -154,9 +143,15 @@ void View::Draw()
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews(drawBg);
 
+	// draw tooltip if needed
 	unsigned long time = GetTickCount();
-	if (TooltipTime && time >= TooltipTime) {
-		DrawTooltip();
+	if (TooltipView == this && tooltip.length()
+		&& TooltipTime && time >= TooltipTime
+	) {
+		video->SetBufferedDrawing(false);
+		Point mp = video->GetMousePos();
+		core->DrawTooltip(tooltip, mp);
+		video->SetBufferedDrawing(true);
 	}
 }
 
