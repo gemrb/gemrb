@@ -36,8 +36,7 @@ void View::DrawTooltip()
 		video->SetBufferedDrawing(false);
 
 		Point mp = video->GetMousePos();
-		core->DisplayTooltip(mp.x, mp.y, (Control*)TooltipView);
-		core->DrawTooltip();
+		core->DrawTooltip(TooltipView->tooltip, mp);
 	}
 }
 

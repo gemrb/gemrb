@@ -153,11 +153,6 @@ Interface::Interface()
 	ModalWindow = NULL;
 	modalShadow = MODAL_SHADOW_NONE;
 
-	tooltip_x = 0;
-	tooltip_y = 0;
-	tooltip_currtextw = 0;
-	tooltip_ctrl = NULL;
-
 	pal16 = NULL;
 	pal32 = NULL;
 	pal256 = NULL;
@@ -2738,25 +2733,6 @@ void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
 	}
 }
 
-void Interface::DisplayTooltip(int x, int y, Control *ctrl)
-{
-	if (tooltip_ctrl && tooltip_ctrl == ctrl && tooltip_x == x && tooltip_y == y)
-		return;
-	tooltip_x = x;
-	tooltip_y = y;
-	tooltip_currtextw = 0;
-	if (x && y && tooltip_ctrl != ctrl) {
-		// use a sound handle so we can stop previous unroll sounds
-		if (tooltip_sound) {
-			tooltip_sound->Stop();
-			tooltip_sound.release();
-		}
-		// exactly like PlaySound(DS_TOOLTIP) but storing the handle
-		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP]);
-	}
-	tooltip_ctrl = ctrl;
-}
-
 int Interface::GetVisible(unsigned short WindowIndex) const
 {
 	if (WindowIndex >= windows.size()) {
@@ -2981,20 +2957,34 @@ void Interface::DrawWindows(bool allow_delete)
 	}
 }
 
-void Interface::DrawTooltip ()
+void Interface::DrawTooltip (const String& string, Point p)
 {
-	if (!tooltip_ctrl || tooltip_ctrl->tooltip.empty())
+	if (string.empty())
 		return;
 
 	Font* fnt = GetFont( TooltipFontResRef );
 	if (!fnt) {
 		return;
 	}
-	const String& tooltip_text = tooltip_ctrl->tooltip;
+
+	static int tooltip_currtextw = 0;
+	static Point oldP;
+	if (oldP != p) {
+		static Holder<SoundHandle> tooltip_sound = NULL;
+		// use a sound handle so we can stop previous unroll sounds
+		if (tooltip_sound) {
+			tooltip_sound->Stop();
+			tooltip_sound.release();
+		}
+		// exactly like PlaySound(DS_TOOLTIP) but storing the handle
+		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP]);
+		oldP = p;
+		tooltip_currtextw = 0;
+	}
 
 	int w1 = 0;
 	int w2 = 0;
-	int strw = fnt->StringSize( tooltip_text ).w + 8;
+	int strw = fnt->StringSize( string ).w + 8;
 	int w = strw;
 	int h = fnt->LineHeight;
 
@@ -3029,8 +3019,8 @@ void Interface::DrawTooltip ()
 			strw = strwmax;
 	}
 
-	int strx = tooltip_x - strw / 2;
-	int y = tooltip_y - h / 2;
+	int strx = p.x - strw / 2;
+	int y = p.y - h / 2;
 	// Ensure placement within the screen
 	if (strx < 0) strx = 0;
 	else if (strx + strw + w1 + w2 > Width)
@@ -3058,7 +3048,7 @@ void Interface::DrawTooltip ()
 	// clip drawing to the control bounds, then restore after drawing
 	Region oldclip = video->GetScreenClip();
 	video->SetScreenClip(&clip);
-	fnt->Print( textr, tooltip_text, NULL,
+	fnt->Print( textr, string, NULL,
 			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
 	video->SetScreenClip(&oldclip);
 }

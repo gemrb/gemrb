@@ -113,8 +113,6 @@ private:
 	void OnMouseWheelScroll(short x, short y);
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
-	/** DisplayTooltip */
-	void DisplayTooltip();
 };
 
 }

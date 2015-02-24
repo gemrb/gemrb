@@ -80,8 +80,6 @@ public:
 	/** Sets the Text of the current control */
 	void SetText(const String*);
 	virtual void SetText(const String&) {};
-	/** Displays the tooltip text, Worldmap handles this differently */
-	virtual void DisplayTooltip();
 
 	/** Update the control if it's tied to a GUI variable */
 	virtual void UpdateState(const char*, unsigned int) {}

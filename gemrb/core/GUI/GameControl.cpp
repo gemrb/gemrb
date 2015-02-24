@@ -1123,14 +1123,12 @@ void GameControl::DisplayTooltip() {
 
 				// we should probably cope better with moving actors
 				SetTooltip(buffer);
-				core->DisplayTooltip(p.x, p.y, this);
 				return;
 			}
 		}
 	}
 
 	SetTooltip(NULL);
-	core->DisplayTooltip(0, 0, NULL);
 	return;
 }
 
@@ -1289,7 +1287,6 @@ void GameControl::OnMouseOver(const Point& mp)
 			// we store prevActor so we can remove the tooltip on actor change
 			// (maybe we should be checking this and actor movements every frame?)
 			SetTooltip(NULL);
-			core->DisplayTooltip(0, 0, this);
 		}
 
 		if ((target_types & GA_NO_SELF) && lastActor ) {

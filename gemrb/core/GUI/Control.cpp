@@ -69,16 +69,6 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-/** Sets the tooltip to be displayed on the screen now */
-void Control::DisplayTooltip()
-{
-	if (tooltip.length() > 0) {
-		const Region& winFrame = Owner->Frame();
-		core->DisplayTooltip( winFrame.x + frame.x + frame.w / 2, winFrame.y + frame.y + frame.h / 2, this );
-	} else
-		core->DisplayTooltip( 0, 0, NULL );
-}
-
 void Control::ResetEventHandler(ControlEventHandler &handler)
 {
 	handler = NULL;

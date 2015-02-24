@@ -376,12 +376,7 @@ private:
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	SlotType* slottypes;
 	int ItemTypes;
-	int tooltip_x;
-	int tooltip_y;
-	int tooltip_currtextw;
-	Holder<SoundHandle> tooltip_sound;
-	// the control owning the tooltip
-	Control* tooltip_ctrl;
+
 	// Currently dragged item or NULL
 	CREItem* DraggedItem;
 	// Current Store
@@ -485,11 +480,9 @@ public:
 	/** Adjust the scrolling of the control (if applicable) */
 	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
 	/** Set the Tooltip text of a Control */
-	/** sets tooltip to be displayed */
-	void DisplayTooltip(int x, int y, Control* ctrl);
-	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
-	void DrawTooltip();
 	void SetTooltip(Control*, const char * string, int Function = 0);
+	/** Actually draws tooltip on the screen. */
+	void DrawTooltip(const String&, Point p);
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */

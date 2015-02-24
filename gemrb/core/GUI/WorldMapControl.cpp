@@ -264,18 +264,6 @@ void WorldMapControl::OnMouseOver(const Point& p)
 	Owner->Cursor = lastCursor;
 }
 
-/** Sets the tooltip to be displayed on the screen now */
-void WorldMapControl::DisplayTooltip()
-{
-	if (Area) {
-		Point p = ConvertPointToScreen(LastMousePos);
-		p.y -= 50;
-		core->DisplayTooltip( p.x, p.y, this );
-	} else {
-		core->DisplayTooltip( 0, 0, NULL );
-	}
-}
-
 /** Mouse Leave Event */
 void WorldMapControl::OnMouseLeave(const Point& /*p*/, const DragOp*)
 {
