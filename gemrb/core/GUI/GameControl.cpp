@@ -1061,13 +1061,13 @@ void GameControl::DisplayTooltip() {
 				int hp = actor->GetStat(IE_HITPOINTS);
 				int maxhp = actor->GetStat(IE_MAXHITPOINTS);
 
-				char buffer[100];
+				wchar_t buffer[100];
 				if (!core->TooltipBack) {
 					// single-line tooltips without background (PS:T)
 					if (actor->InParty) {
-						snprintf(buffer, 100, "%s: %d/%d", name, hp, maxhp);
+						swprintf(buffer, 100, L"%s: %d/%d", name, hp, maxhp);
 					} else {
-						snprintf(buffer, 100, "%s", name);
+						swprintf(buffer, 100, L"%s", name);
 					}
 				} else {
 					// a guess at a neutral check
@@ -1077,14 +1077,14 @@ void GameControl::DisplayTooltip() {
 					// normal tooltips
 					if (actor->InParty) {
 						// in party: display hp
-						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						swprintf(buffer, 100, L"%s\n%d/%d", name, hp, maxhp);
 					} else if (neutral) {
 						// neutral: display name only
-						snprintf(buffer, 100, "%s", name);
+						swprintf(buffer, 100, L"%s", name);
 					} else if (strindex == -1) {
 						// non-neutral, not in party, no injured strings: display name
 						// this case is mostly hit in bg1
-						snprintf(buffer, 100, "%s", name);
+						swprintf(buffer, 100, L"%s", name);
 					} else {
 						// non-neutral, not in party: display injured string
 						int strindex;
@@ -1105,9 +1105,9 @@ void GameControl::DisplayTooltip() {
 
 						if (!injuredstring) {
 							// eek, where did the string go?
-							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+							swprintf(buffer, 100, L"%s\n%d/%d", name, hp, maxhp);
 						} else {
-							snprintf(buffer, 100, "%s\n%ls", name, injuredstring->c_str());
+							swprintf(buffer, 100, L"%s\n%ls", name, injuredstring->c_str());
 							delete injuredstring;
 						}
 					}

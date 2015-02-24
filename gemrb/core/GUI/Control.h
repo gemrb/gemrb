@@ -80,10 +80,9 @@ public:
 	/** Sets the Text of the current control */
 	void SetText(const String*);
 	virtual void SetText(const String&) {};
-	/** Sets the Tooltip text of the current control */
-	int SetTooltip(const char* string);
 	/** Displays the tooltip text, Worldmap handles this differently */
 	virtual void DisplayTooltip();
+
 	/** Update the control if it's tied to a GUI variable */
 	virtual void UpdateState(const char*, unsigned int) {}
 	/** Variable length is 40-1 (zero terminator) */
@@ -96,12 +95,9 @@ public:
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
-
 	/** Type of control */
 	ieByte ControlType;
-	/** Text to display as a tooltip when the mouse cursor hovers
-	 * for some time over the control */
-	String* Tooltip;
+
 	/** True if we are currently in an event handler */
 	bool InHandler;
 	/** Owner Window */

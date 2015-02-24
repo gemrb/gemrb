@@ -8592,9 +8592,11 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
-			char* tip = core->GetCString(item->Tooltip, 0);
-			btn->SetTooltip(tip);
+			String* tip = core->GetString(item->Tooltip, 0);
+			if (tip) {
+				btn->SetTooltip(*tip);
 			delete tip;
+			}
 
 			if (item->Charges && (item->Charges!=0xffff) ) {
 				SetItemText(btn, item->Charges, false);

@@ -297,6 +297,12 @@ void View::SetScrollBar(ScrollBar* sb)
 	}
 }
 
+void View::SetTooltip(const String& string)
+{
+	tooltip = string;
+	TrimString(tooltip); // for proper vertical alaignment
+}
+
 // View simpler either forwards events to concrete subclasses, or to its attached scrollbar
 void View::OnMouseOver(const Point& p)
 {

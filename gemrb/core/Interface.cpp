@@ -2721,7 +2721,7 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 
 /** Set the Tooltip text of a Control */
 int Interface::SetTooltip(unsigned short WindowIndex,
-		unsigned short ControlIndex, const char* string, int Function)
+		unsigned short ControlIndex, const char* cstring, int Function)
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -2740,7 +2740,14 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 		evntmgr->SetFunctionBar(win);
 		ctrl->SetFunctionNumber(Function-1);
 	}
-	return ctrl->SetTooltip( string );
+
+	String* string = StringFromCString(cstring);
+	if (string) {
+		ctrl->SetTooltip( *string );
+		delete string;
+	}
+
+	return 0;
 }
 
 void Interface::DisplayTooltip(int x, int y, Control *ctrl)
@@ -2988,18 +2995,18 @@ void Interface::DrawWindows(bool allow_delete)
 
 void Interface::DrawTooltip ()
 {
-	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip)
+	if (!tooltip_ctrl || tooltip_ctrl->tooltip.empty())
 		return;
 
 	Font* fnt = GetFont( TooltipFontResRef );
 	if (!fnt) {
 		return;
 	}
-	String* tooltip_text = tooltip_ctrl->Tooltip;
+	const String& tooltip_text = tooltip_ctrl->tooltip;
 
 	int w1 = 0;
 	int w2 = 0;
-	int strw = fnt->StringSize( *tooltip_text ).w + 8;
+	int strw = fnt->StringSize( tooltip_text ).w + 8;
 	int w = strw;
 	int h = fnt->LineHeight;
 
@@ -3063,7 +3070,7 @@ void Interface::DrawTooltip ()
 	// clip drawing to the control bounds, then restore after drawing
 	Region oldclip = video->GetScreenClip();
 	video->SetScreenClip(&clip);
-	fnt->Print( textr, *tooltip_text, NULL,
+	fnt->Print( textr, tooltip_text, NULL,
 			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
 	video->SetScreenClip(&oldclip);
 }

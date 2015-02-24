@@ -55,6 +55,7 @@ protected:
 	virtual void SubviewRemoved(View* view, View* parent);
 
 public:
+	String tooltip;
 	// using Held so we can have polymorphic drag operations
 	struct DragOp : public Held<DragOp> {
 		View* dragView;
@@ -119,6 +120,8 @@ public:
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseWheelScroll(short x, short y);
 	virtual bool OnSpecialKeyPress(unsigned char Key);
+
+	void SetTooltip(const String& string);
 };
 
 }

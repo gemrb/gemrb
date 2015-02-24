@@ -46,7 +46,6 @@ Control::Control(const Region& frame)
 	ControlID = 0;
 	Value = 0;
 	Flags = 0;
-	Tooltip = NULL;
 	Owner = NULL;
 
 	animation = NULL;
@@ -60,8 +59,6 @@ Control::~Control()
 	if (InHandler) {
 		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
 	}
-	core->DisplayTooltip( 0, 0, NULL );
-	delete Tooltip;
 	delete animation;
 
 	Sprite2D::FreeSprite(AnimPicture);
@@ -72,24 +69,10 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-/** Sets the Tooltip text of the current control */
-int Control::SetTooltip(const char* string)
-{
-	delete Tooltip;
-	if ((string == NULL) || (string[0] == 0)) {
-		Tooltip = NULL;
-	} else {
-		Tooltip = StringFromCString(string);
-		TrimString(*Tooltip); // for proper vertical alaignment
-	}
-	MarkDirty();
-	return 0;
-}
-
 /** Sets the tooltip to be displayed on the screen now */
 void Control::DisplayTooltip()
 {
-	if (Tooltip) {
+	if (tooltip.length() > 0) {
 		const Region& winFrame = Owner->Frame();
 		core->DisplayTooltip( winFrame.x + frame.x + frame.w / 2, winFrame.y + frame.y + frame.h / 2, this );
 	} else
