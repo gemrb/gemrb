@@ -485,11 +485,11 @@ public:
 	/** Adjust the scrolling of the control (if applicable) */
 	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
 	/** Set the Tooltip text of a Control */
-	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string, int Function = 0);
 	/** sets tooltip to be displayed */
 	void DisplayTooltip(int x, int y, Control* ctrl);
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
 	void DrawTooltip();
+	void SetTooltip(Control*, const char * string, int Function = 0);
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */

@@ -242,8 +242,11 @@ static Control *GetControl( int wi, int ci, int ct)
 }
 
 //sets tooltip with Fx key prepended
-static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
+static void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
 {
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl) return;
+
 	if (txt) {
 		if (txt[0]) {
 			char *txt2 = (char *) malloc(strlen(txt)+10);
@@ -252,13 +255,13 @@ static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int 
 			}
 			sprintf(txt2,"F%d - %s",Function,txt);
 			core->FreeString(txt);
-			int ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2, Function);
+			core->SetTooltip(ctrl, txt2, Function);
 			free (txt2);
-			return ret;
+			return;
 		}
 		core->FreeString(txt);
 	}
-	return core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "", -1);
+	core->SetTooltip(ctrl, "", -1);
 }
 
 static void ReadItemSounds()
@@ -1472,64 +1475,45 @@ PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
 
 static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 {
-	PyObject* wi, * ci, * str;
-	PyObject* function = NULL;
-	long WindowIndex, ControlIndex, StrRef;
+	PyObject* str;
+	int WindowIndex, ControlIndex;
 	char* string;
-	int ret;
-	int Function = 0;
+	int function = 0;
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &str, &function)) {
-		return AttributeError( GemRB_Control_SetTooltip__doc );
-	}
-	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
-		( !PyObject_TypeCheck( str, &PyString_Type ) &&
-		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
+	if (!PyArg_ParseTuple( args, "iiO|i", &WindowIndex, &ControlIndex, &str, &function)) {
 		return AttributeError( GemRB_Control_SetTooltip__doc );
 	}
 
-	WindowIndex = PyInt_AsLong( wi );
-	ControlIndex = PyInt_AsLong( ci );
-	if (function) {
-		if (!PyObject_TypeCheck(function, &PyInt_Type) ) {
-			return AttributeError( GemRB_Control_SetTooltip__doc );
-		}
-		Function = PyInt_AsLong( function);
+	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1);
+	if (!ctrl) {
+		return RuntimeError("Cannot find control!");
 	}
+
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
 		string = PyString_AsString( str );
 		if (string == NULL) {
 			return RuntimeError("Null string received");
 		}
-		if (Function) {
-			ret = SetFunctionTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string, Function);
+		if (function) {
+			SetFunctionTooltip(WindowIndex, ControlIndex, string, function);
 		} else {
-			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string );
-		}
-		if (ret == -1) {
-			return RuntimeError("Cannot set tooltip");
+			core->SetTooltip(ctrl, string );
 		}
 	} else {
-		StrRef = PyInt_AsLong( str );
-		if (StrRef == -1) {
-			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
-		} else {
+		ieStrRef StrRef = (ieStrRef)PyInt_AsLong( str );
+		if (StrRef != static_cast<ieStrRef>(-1)) {
 			char* str = core->GetCString( StrRef );
 
-			if (Function) {
-				ret = SetFunctionTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str, Function );
+			if (function) {
+				SetFunctionTooltip(WindowIndex, ControlIndex, str, function );
 			} else {
-				ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str );
+				core->SetTooltip( ctrl, str );
 				core->FreeString( str );
 			}
 		}
-		if (ret == -1) {
-			return RuntimeError("Cannot set tooltip");
-		}
 	}
 
-	return PyInt_FromLong( ret );
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Window_SetVisible__doc,
@@ -8431,7 +8415,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
 		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, NULL );
 		btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, NULL );
-		core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, "" );
+		btn->SetTooltip(L"");
 		//no incref
 		return Py_None;
 	}
@@ -8595,7 +8579,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 			String* tip = core->GetString(item->Tooltip, 0);
 			if (tip) {
 				btn->SetTooltip(*tip);
-			delete tip;
+				delete tip;
 			}
 
 			if (item->Charges && (item->Charges!=0xffff) ) {

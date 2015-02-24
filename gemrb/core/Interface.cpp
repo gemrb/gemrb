@@ -2720,21 +2720,11 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 }
 
 /** Set the Tooltip text of a Control */
-int Interface::SetTooltip(unsigned short WindowIndex,
-		unsigned short ControlIndex, const char* cstring, int Function)
+void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
 {
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControlAtIndex( ControlIndex );
-	if (ctrl == NULL) {
-		return -1;
-	}
+	if (!ctrl) return;
 
+	Window* win = ctrl->Owner;
 	if (Function) {
 		win->FunctionBar = true;
 		evntmgr->SetFunctionBar(win);
@@ -2746,8 +2736,6 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 		ctrl->SetTooltip( *string );
 		delete string;
 	}
-
-	return 0;
 }
 
 void Interface::DisplayTooltip(int x, int y, Control *ctrl)
