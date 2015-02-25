@@ -377,19 +377,6 @@ def MoveToNewArea ():
 		GemRB.DisplayString (10689, 0xffffff)
 	return
 
-def ChangeTooltip ():
-	global WorldMapWindow, WorldMapControl
-
-	tt = ""
-	area = WorldMapControl.GetDestinationArea ()
-	if area and area["Distance"] >= 0:
-		str = GemRB.GetString(23084)
-		if (str):
-			tt = "%s: %d"%(str,area["Distance"])
-
-	WorldMapControl.SetTooltip (tt)
-	return
-
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 	global OldPortraitWindow, OldOptionsWindow
@@ -455,7 +442,6 @@ def WorldMapWindowCommon (Travel):
 	WorldMapControl = Window.GetControl (4)
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
-	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
 	# center on current area
 	MapC()
 

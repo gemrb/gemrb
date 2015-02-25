@@ -55,7 +55,6 @@ class WorldMapControl;
  */
 
 #define IE_GUI_WORLDMAP_ON_PRESS   0x08000000
-#define IE_GUI_MOUSE_ENTER_WORLDMAP  0x08000002
 
 class GEM_EXPORT WorldMapControl : public Control {
 protected:
@@ -96,8 +95,6 @@ private:
 	Palette *pal_notvisited;
 	/** guiscript Event when button pressed */
 	ControlEventHandler WorldMapControlOnPress;
-	/** guiscript Event when mouse is over a reachable area */
-	ControlEventHandler WorldMapControlOnEnter;
 
 	/** Mouse Over Event */
 	void OnMouseOver(const Point& p);

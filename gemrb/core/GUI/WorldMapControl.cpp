@@ -85,7 +85,6 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 
 
 	ResetEventHandler( WorldMapControlOnPress );
-	ResetEventHandler( WorldMapControlOnEnter );
 }
 
 WorldMapControl::~WorldMapControl(void)
