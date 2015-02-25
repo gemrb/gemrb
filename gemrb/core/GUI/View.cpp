@@ -94,6 +94,11 @@ void View::DrawSubviews(bool drawBg)
 	}
 }
 
+void View::DrawTooltip(const Point& p) const
+{
+	core->DrawTooltip(TooltipText(), p);
+}
+
 void View::DrawBackground(const Region* rgn) const
 {
 	if (superView && !IsOpaque()) {
@@ -144,13 +149,12 @@ void View::Draw()
 	DrawSubviews(drawBg);
 
 	// draw tooltip if needed
-	unsigned long time = GetTickCount();
-	if (TooltipView == this && tooltip.length()
-		&& TooltipTime && time >= TooltipTime
+	if (TooltipView == this && TooltipText().length()
+		&& TooltipTime && GetTickCount() >= TooltipTime
 	) {
 		video->SetBufferedDrawing(false);
-		Point mp = video->GetMousePos();
-		core->DrawTooltip(tooltip, mp);
+		Point mp = core->GetVideoDriver()->GetMousePos();
+		DrawTooltip(mp);
 		video->SetBufferedDrawing(true);
 	}
 }

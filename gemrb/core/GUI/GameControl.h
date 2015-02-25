@@ -196,7 +196,10 @@ public:
 	void OnMouseWheelScroll(short x, short y);
 	/** Special Key Press */
 	bool OnSpecialKeyPress(unsigned char Key);
-	void DisplayTooltip();
+
+	void DrawTooltip(const Point& p) const;
+	const String& TooltipText() const;
+
 	void UpdateScrolling();
 	void SetScrolling(bool scroll);
 	void SetTargetMode(int mode);

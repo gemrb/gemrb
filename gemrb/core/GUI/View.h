@@ -52,6 +52,7 @@ private:
 
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
+	virtual void DrawTooltip(const Point&) const;
 
 	virtual void AddedToView(View*) {}
 	virtual void RemovedFromView(View*) {}
@@ -126,6 +127,7 @@ public:
 	virtual bool OnSpecialKeyPress(unsigned char Key);
 
 	void SetTooltip(const String& string);
+	virtual const String& TooltipText() const { return tooltip; }
 
 	static void SetTooltipDelay(int);
 };

@@ -1043,51 +1043,50 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	return true;
 }
 
-void GameControl::DisplayTooltip() {
-	Game* game = core->GetGame();
-	if (game && !(ScreenFlags & SF_DISABLEMOUSE)) {
-		Map* area = game->GetCurrentArea( );
-		if (area) {
-			Actor *actor = area->GetActorByGlobalID(lastActorID);
-			if (actor && (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag()&IF_REALLYDIED)) {
-				// no tooltips for dead actors!
-				actor->SetOver( false );
-				lastActorID = 0;
-				actor = NULL;
+void GameControl::DrawTooltip(const Point& p) const
+{
+	if (ScreenFlags & SF_DISABLEMOUSE) {
+		return;
+	}
+	Control::DrawTooltip(p);
+}
+
+const String& GameControl::TooltipText() const {
+	// not bothering checking if game or area is null. If we are somehow entering this method when either is false,
+	// then something is horribly broken elsewhere. by definition we cant have a GameControl without these things.
+	Map* area = core->GetGame()->GetCurrentArea();
+	Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+	if (actor == NULL) {
+		return Control::TooltipText();
+	}
+
+	static String tip; // only one game control and we return a const& so cant be temporary.
+	const char *name = actor->GetName(-1);
+	// FIME: make the actor name a String instead
+	String* wname = StringFromCString(name);
+	if (wname) {
+		tip = *wname;
 			}
 
-			if (actor) {
-				char *name = actor->GetName(-1);
 				int hp = actor->GetStat(IE_HITPOINTS);
 				int maxhp = actor->GetStat(IE_MAXHITPOINTS);
 
-				wchar_t buffer[100];
-				if (!core->TooltipBack) {
-					// single-line tooltips without background (PS:T)
 					if (actor->InParty) {
-						swprintf(buffer, 100, L"%s: %d/%d", name, hp, maxhp);
+		wchar_t hpstring[10];
+		swprintf(hpstring, 10, L"%d/%d", hp, maxhp);
+		if (/* DISABLES CODE */ (false)) { // FIXME: this should be for PST (how to check?)
+			tip += L": ";
 					} else {
-						swprintf(buffer, 100, L"%s", name);
+			tip += L"\n";
 					}
+		tip += hpstring;
 				} else {
 					// a guess at a neutral check
-					bool neutral = actor->GetStat(IE_EA) == EA_NEUTRAL;
+		bool enemy = actor->GetStat(IE_EA) != EA_NEUTRAL;
 					// test for an injured string being present for this game
 					int strindex = displaymsg->GetStringReference(STR_UNINJURED);
-					// normal tooltips
-					if (actor->InParty) {
-						// in party: display hp
-						swprintf(buffer, 100, L"%s\n%d/%d", name, hp, maxhp);
-					} else if (neutral) {
-						// neutral: display name only
-						swprintf(buffer, 100, L"%s", name);
-					} else if (strindex == -1) {
-						// non-neutral, not in party, no injured strings: display name
-						// this case is mostly hit in bg1
-						swprintf(buffer, 100, L"%s", name);
-					} else {
+		if (enemy && strindex != -1) {
 						// non-neutral, not in party: display injured string
-						int strindex;
 						// these boundaries are just a guess
 						if (hp == maxhp) {
 							strindex = STR_UNINJURED;
@@ -1102,34 +1101,13 @@ void GameControl::DisplayTooltip() {
 						}
 						strindex = displaymsg->GetStringReference(strindex);
 						String* injuredstring = core->GetString(strindex, 0);
-
-						if (!injuredstring) {
-							// eek, where did the string go?
-							swprintf(buffer, 100, L"%s\n%d/%d", name, hp, maxhp);
-						} else {
-							swprintf(buffer, 100, L"%s\n%ls", name, injuredstring->c_str());
+			assert(injuredstring); // we just "checked" for these (by checking for STR_UNINJURED)
+			tip += *injuredstring;
 							delete injuredstring;
 						}
 					}
-				}
 
-				Point p = actor->Pos;
-				core->GetVideoDriver()->ConvertToScreen( p.x, p.y );
-				p.x += Owner->Frame().x + frame.x;
-				p.y += Owner->Frame().y + frame.y;
-
-				// hack to position text above PS:T actors
-				if (!core->TooltipBack) p.y -= actor->size*50;
-
-				// we should probably cope better with moving actors
-				SetTooltip(buffer);
-				return;
-			}
-		}
-	}
-
-	SetTooltip(L"");
-	return;
+	return tip;
 }
 
 //returns the appropriate cursor over an active region (trap, infopoint, travel region)
