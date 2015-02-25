@@ -304,7 +304,10 @@ void Window::DispatchMouseWheelScroll(short x, short y)
 bool Window::OnSpecialKeyPress(unsigned char key)
 {
 	bool handled = false;
-	if (focusView) {
+	if (key == GEM_TAB && hoverView) {
+		// tooltip maybe
+		handled = hoverView->View::OnSpecialKeyPress(key);
+	} else if (focusView) {
 		handled = focusView->OnSpecialKeyPress(key);
 	}
 

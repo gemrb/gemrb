@@ -140,7 +140,7 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 			HistPos = 0;
 			break;
 	}
-	return true;
+	return Control::OnSpecialKeyPress(Key);
 }
 
 void Console::HistoryBack()

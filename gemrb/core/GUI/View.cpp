@@ -362,6 +362,13 @@ bool View::OnSpecialKeyPress(unsigned char key)
 	if (scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
 		return scrollbar->OnSpecialKeyPress(key);
 	}
+
+	// tooltip maybe
+	if (key == GEM_TAB && tooltip.length()) {
+		TooltipView = this;
+		return true;
+	}
+
 	return false;
 }
 	

@@ -2133,7 +2133,9 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 				core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "CloseContinueWindow");
 				break;
 		}
-		return false; //don't accept keys in dialog
+		// don't accept keys in dialog
+		// dont forward the even either
+		return false;
 	}
 	Game *game = core->GetGame();
 	if (!game) return false;
@@ -2181,7 +2183,7 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnDecreaseSize");
 			break;
 		default:
-			return false;
+			return Control::OnSpecialKeyPress(Key);
 	}
 	return true;
 }

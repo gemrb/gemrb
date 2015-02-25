@@ -454,7 +454,7 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 			ScrollY += keyScrollSpd;
 			break;
 		default:
-			return false;
+			return Control::OnSpecialKeyPress(Key);
 	}
 
 	if (ScrollX > MapWidth - frame.w)

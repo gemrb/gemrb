@@ -295,14 +295,13 @@ void WorldMapControl::OnMouseDown(const Point& p, unsigned short Button, unsigne
 	}
 }
 /** Mouse Button Up */
-void WorldMapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short /*Mod*/)
+void WorldMapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
-	if (Button != GEM_MB_ACTION) {
-		return;
-	}
 	MouseIsDown = false;
-	if (lastCursor==IE_CURSOR_NORMAL) {
+	if (Button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
 		RunEventHandler( WorldMapControlOnPress );
+	} else {
+		Control::OnMouseUp(p, Button, Mod);
 	}
 }
 
