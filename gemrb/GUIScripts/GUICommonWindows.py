@@ -60,6 +60,7 @@ CurrentWindow = None
 DraggedPortrait = None
 ActionBarControlOffset = 0
 ReturnToGame = None
+ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -235,7 +236,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		if how: # how doesn't have this in the right place
-			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
+			pos = ScreenHeight - 71
 			Window.CreateButton (OptionControl['Time'], 6, pos, 64, 71)
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:
@@ -1288,7 +1289,7 @@ def OpenPortraitWindow (needcontrols=0):
 		else:
 			if GameCheck.HasHOW():
 				# Rest (how)
-				pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
+				pos = ScreenHeight - 37
 				Window.CreateButton (8, 6, pos, 55, 37)
 				Button = Window.GetControl (8)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
