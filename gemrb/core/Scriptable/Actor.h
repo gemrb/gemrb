@@ -473,7 +473,7 @@ public:
 	void SetSoundFolder(const char *soundset);
 	void GetSoundFolder(char *soundset, int flag) const;
 	/** Gets the Character Long Name/Short Name */
-	char* GetName(int which) const
+	const char* GetName(int which) const
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
