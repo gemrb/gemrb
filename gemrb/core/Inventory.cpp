@@ -1625,9 +1625,11 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
 				array[pos].slot = idx;
 				array[pos].headerindex = ehc;
-				array[pos].Tooltip = ext_header->Tooltip;
-				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
-				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
+				if (idreq1) { // item is identified
+					array[pos].Tooltip = (ext_header->Tooltip != static_cast<ieStrRef>(-1)) ? ext_header->Tooltip : itm->ItemNameIdentified;
+				} else {
+					array[pos].Tooltip = itm->ItemName; // generic name (like "Ring")
+				}
 				if (ext_header->Charges) {
 					//don't modify ehc, it is a counter
 					if (ehc>=CHARGE_COUNTERS) {
@@ -1638,6 +1640,9 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				} else {
 					array[pos].Charges=0xffff;
 				}
+				// FIXME: this is a horrible way to copy an item!
+				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
+				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
 				pos++;
 			}
 		}
