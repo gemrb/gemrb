@@ -1066,46 +1066,46 @@ const String& GameControl::TooltipText() const {
 	String* wname = StringFromCString(name);
 	if (wname) {
 		tip = *wname;
-			}
+	}
 
-				int hp = actor->GetStat(IE_HITPOINTS);
-				int maxhp = actor->GetStat(IE_MAXHITPOINTS);
+	int hp = actor->GetStat(IE_HITPOINTS);
+	int maxhp = actor->GetStat(IE_MAXHITPOINTS);
 
-					if (actor->InParty) {
+	if (actor->InParty) {
 		wchar_t hpstring[10];
 		swprintf(hpstring, 10, L"%d/%d", hp, maxhp);
 		if (/* DISABLES CODE */ (false)) { // FIXME: this should be for PST (how to check?)
 			tip += L": ";
-					} else {
+		} else {
 			tip += L"\n";
-					}
+		}
 		tip += hpstring;
-				} else {
-					// a guess at a neutral check
+	} else {
+		// a guess at a neutral check
 		bool enemy = actor->GetStat(IE_EA) != EA_NEUTRAL;
-					// test for an injured string being present for this game
-					int strindex = displaymsg->GetStringReference(STR_UNINJURED);
+		// test for an injured string being present for this game
+		int strindex = displaymsg->GetStringReference(STR_UNINJURED);
 		if (enemy && strindex != -1) {
-						// non-neutral, not in party: display injured string
-						// these boundaries are just a guess
-						if (hp == maxhp) {
-							strindex = STR_UNINJURED;
-						} else if (hp > (maxhp*3)/4) {
-							strindex = STR_INJURED1;
-						} else if (hp > maxhp/2) {
-							strindex = STR_INJURED2;
-						} else if (hp > maxhp/3) {
-							strindex = STR_INJURED3;
-						} else {
-							strindex = STR_INJURED4;
-						}
-						strindex = displaymsg->GetStringReference(strindex);
-						String* injuredstring = core->GetString(strindex, 0);
+			// non-neutral, not in party: display injured string
+			// these boundaries are just a guess
+			if (hp == maxhp) {
+				strindex = STR_UNINJURED;
+			} else if (hp > (maxhp*3)/4) {
+				strindex = STR_INJURED1;
+			} else if (hp > maxhp/2) {
+				strindex = STR_INJURED2;
+			} else if (hp > maxhp/3) {
+				strindex = STR_INJURED3;
+			} else {
+				strindex = STR_INJURED4;
+			}
+			strindex = displaymsg->GetStringReference(strindex);
+			String* injuredstring = core->GetString(strindex, 0);
 			assert(injuredstring); // we just "checked" for these (by checking for STR_UNINJURED)
 			tip += *injuredstring;
-							delete injuredstring;
-						}
-					}
+			delete injuredstring;
+		}
+	}
 
 	return tip;
 }
@@ -1253,18 +1253,12 @@ void GameControl::OnMouseOver(const Point& mp)
 			nextCursor = GetCursorOverContainer(overContainer);
 		}
 
-		Actor *prevActor = lastActor;
 		// let us target party members even if they are invisible
 		lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
 			if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
 				lastActor = NULL;
 			}
-		}
-		if (lastActor != prevActor) {
-			// we store prevActor so we can remove the tooltip on actor change
-			// (maybe we should be checking this and actor movements every frame?)
-			SetTooltip(L"");
 		}
 
 		if ((target_types & GA_NO_SELF) && lastActor ) {
