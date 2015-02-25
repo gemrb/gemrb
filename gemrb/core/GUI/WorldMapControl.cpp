@@ -255,9 +255,17 @@ void WorldMapControl::OnMouseOver(const Point& p)
 			lastCursor = IE_CURSOR_NORMAL;
 			Area=ae;
 			if(oldArea!=ae) {
-				RunEventHandler(WorldMapControlOnEnter);
+				String* str = core->GetString(23084);
+				if (str) {
+					wchar_t dist[10];
+					swprintf(dist, 10, L": %d", worldmap->GetDistance(Area->AreaName));
+					SetTooltip(*str + dist);
+				}
 			}
 			break;
+		}
+		if (Area == NULL) {
+			SetTooltip(L"");
 		}
 	}
 
@@ -346,15 +354,10 @@ bool WorldMapControl::SetEvent(int eventType, ControlEventHandler handler)
 	switch (eventType) {
 	case IE_GUI_WORLDMAP_ON_PRESS:
 		WorldMapControlOnPress = handler;
-		break;
-	case IE_GUI_MOUSE_ENTER_WORLDMAP:
-		WorldMapControlOnEnter = handler;
-		break;
-	default:
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void WorldMapControl::SetColor(int which, Color color)
