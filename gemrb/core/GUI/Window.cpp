@@ -70,10 +70,8 @@ void Window::AddControl(Control* ctrl)
 	ctrl->Owner = this;
 	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m) {
 		if ((*m)->ControlID == ctrl->ControlID) {
-			delete *m;
-			*m = ctrl;
-			Invalidate();
-			return;
+			delete RemoveControl((*m)->ControlID);
+			break;
 		}
 	}
 	Controls.push_back( ctrl );
