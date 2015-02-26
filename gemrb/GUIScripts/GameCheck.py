@@ -22,7 +22,7 @@
 import GemRB
 from ie_restype import RES_WMP, RES_ARE
 
-PARTY_SIZE = 6
+PARTY_SIZE = GemRB.GetVar ("MaxPartySize")
 
 def IsPST ():
 	return GemRB.GameType == "pst"

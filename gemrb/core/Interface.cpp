@@ -1297,6 +1297,9 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
+	int MaxPartySize = 6;
+	CONFIG_INT("MaxPartySize", MaxPartySize = );
+	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
