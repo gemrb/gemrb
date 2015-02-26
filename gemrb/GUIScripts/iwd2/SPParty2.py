@@ -18,6 +18,7 @@
 #
 #Single Player Party Select
 import GemRB
+from GameCheck import PARTY_SIZE
 
 def OnLoad():
 	LoadPartyCharacters()

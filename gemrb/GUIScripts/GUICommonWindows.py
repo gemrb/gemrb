@@ -29,6 +29,7 @@ from ie_modal import *
 from ie_action import *
 from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
+from GameCheck import PARTY_SIZE
 import GameCheck
 import GUICommon
 import CommonTables

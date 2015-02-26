@@ -25,6 +25,7 @@
 import GemRB
 import LoadScreen
 import GameCheck
+from GameCheck import PARTY_SIZE
 
 LoadWindow = 0
 TextAreaControl = 0

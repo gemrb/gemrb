@@ -297,7 +297,6 @@ SHOP_SELECT = 0x40
 SHOP_FULL   = 0x8000
 
 #game constants
-PARTY_SIZE = 6
 
 # !!! Keep this synchronized with Video.h !!!
 TOOLTIP_DELAY_FACTOR = 250

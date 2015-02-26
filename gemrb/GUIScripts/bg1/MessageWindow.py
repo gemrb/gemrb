@@ -22,6 +22,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 from ie_restype import RES_2DA
 

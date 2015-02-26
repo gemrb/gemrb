@@ -27,6 +27,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 from ie_stats import *
 import MessageWindow

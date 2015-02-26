@@ -21,6 +21,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 MessageWindow = 0

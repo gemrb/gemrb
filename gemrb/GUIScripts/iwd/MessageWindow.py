@@ -26,6 +26,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import CommonWindow
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 import GUIClasses
 

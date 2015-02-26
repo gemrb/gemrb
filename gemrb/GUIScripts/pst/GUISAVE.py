@@ -26,6 +26,7 @@ import GemRB
 import GUIClasses
 import LoadScreen
 import GUIOPT
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 SaveWindow = None

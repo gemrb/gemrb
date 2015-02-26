@@ -22,6 +22,8 @@
 import GemRB
 from ie_restype import RES_WMP, RES_ARE
 
+PARTY_SIZE = 6
+
 def IsPST ():
 	return GemRB.GameType == "pst"
 
