@@ -1263,6 +1263,56 @@ def RunSelectionChangeHandler ():
 		SelectionChangeHandler ()
 	return
 
+# returns buttons and a numerical index
+# does nothing new in pst, iwd2 due to layout
+# in the rest, it will enable extra button generation for higher resolutions
+def GetPortraitButtonPairs (Window):
+	pairs = {}
+
+	for i in range(min(6, PARTY_SIZE)):  # the default chu/game limit or less
+		pairs[i] = Window.GetControl (i)
+
+	# nothing left to do
+	if PARTY_SIZE <= 6:
+		return pairs
+
+	if GameCheck.IsIWD2() or GameCheck.IsPST():
+		print "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ..."
+		return pairs
+
+	# generate new buttons by copying from existing ones
+	firstButton = pairs[0]
+	firstRect = firstButton.GetRect ()
+	buttonHeight = firstRect["Height"]
+	buttonWidth = firstRect["Width"]
+	xOffset = firstRect["X"]
+	yOffset = firstRect["Y"]
+	windowHeight = Window.GetRect()["Height"]
+	# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
+	# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
+	maxHeight = windowHeight - buttonHeight*7
+	#print "GetPortraitButtonPairs:", ScreenHeight, windowHeight, maxHeight
+	if windowHeight != ScreenHeight:
+		maxHeight += buttonHeight
+	# TODO: until scrolling is added, we semi-fixate the count for the framed views, since they're limited to 6
+	if maxHeight < buttonHeight:
+		return pairs
+	for i in range(len(pairs), PARTY_SIZE):
+		if maxHeight < buttonHeight:
+			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d" %(maxHeight)
+		nextID = 1000 + i
+		if Window.HasControl (nextID):
+			pairs[i] = Window.GetControl (nextID)
+			continue
+		Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset, buttonWidth, buttonHeight)
+		button = Window.GetControl (nextID)
+		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
+
+		pairs[i] = button
+		maxHeight -= buttonHeight
+
+	return pairs
+
 #NOTE: this is for pst's hp buttons, but it could be optionally exported to other games
 portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 
@@ -1322,8 +1372,9 @@ def OpenPortraitWindow (needcontrols=0):
 			Button.SetTooltip (11942)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
-	for i in range (PARTY_SIZE):
-		Button = Window.GetControl (i)
+	PortraitButtons = GetPortraitButtonPairs (Window)
+	for i in PortraitButtons:
+		Button = PortraitButtons[i]
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetFont ("STATES")
 			# label for status flags (dialog, store, level up)
@@ -1383,12 +1434,13 @@ def UpdatePortraitWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
 
-	for portid in range (PARTY_SIZE):
+	PortraitButtons = GetPortraitButtonPairs (Window)
+	for portid in PortraitButtons:
 		if GameCheck.IsPST():
 			UpdateAnimatedPortrait(Window,portid)
 			continue
 
-		Button = Window.GetControl (portid)
+		Button = PortraitButtons[portid]
 		pic = GemRB.GetPlayerPortrait (portid+1, 1)
 		if Inventory and pc != portid+1:
 			pic = None
@@ -1607,8 +1659,9 @@ def SelectionChanged ():
 	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
-		for i in range (PARTY_SIZE):
-			Button = PortraitWindow.GetControl (i)
+		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
+		for i in PortraitButtons:
+			Button = PortraitButtons[i]
 			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 		if SelectionChangeMultiHandler:
 			SelectionChangeMultiHandler ()
@@ -1622,8 +1675,9 @@ def SelectionChanged ():
 			MageTable = GemRB.LoadTable ("magesch")
 			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
 
-		for i in range (PARTY_SIZE):
-			Button = PortraitWindow.GetControl (i)
+		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
+		for i in PortraitButtons:
+			Button = PortraitButtons[i]
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
