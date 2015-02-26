@@ -158,6 +158,8 @@ def UpdateReformWindow ():
 			continue
 
 	for i in removable_pcs:
+		if i not in PortraitButtons:
+			continue # for saved games with higher party count than the current setup supports
 		Button = PortraitButtons[removable_pcs.index(i)]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i )
 		pic = GemRB.GetPlayerPortrait (i, 1)
