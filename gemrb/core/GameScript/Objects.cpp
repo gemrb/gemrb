@@ -551,6 +551,34 @@ Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters, in
 	return parameters;
 }
 
+Targets *GameScript::Player9(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(8,false), 0, ga_flags);
+	return parameters;
+}
+
+Targets *GameScript::Player9Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(9), 0, ga_flags);
+	return parameters;
+}
+
+Targets *GameScript::Player10(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(9,false), 0, ga_flags);
+	return parameters;
+}
+
+Targets *GameScript::Player10Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(10), 0, ga_flags);
+	return parameters;
+}
+
 //This filter works only on the Party - silly restriction, but the dataset expects this
 Targets *GameScript::StrongestOfMale(Scriptable* Sender, Targets *parameters, int ga_flags)
 {

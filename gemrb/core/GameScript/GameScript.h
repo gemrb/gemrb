@@ -1523,6 +1523,10 @@ public:
 	static Targets *Player7Fill(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *Player8(Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *Player8Fill(Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets *Player9(Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets *Player9Fill(Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets *Player10(Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets *Player10Fill(Scriptable *Sender, Targets *parameters, int ga_flags);
 };
 
 GEM_EXPORT Action* GenerateAction(const char* String);
