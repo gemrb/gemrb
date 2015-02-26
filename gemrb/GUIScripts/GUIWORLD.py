@@ -149,15 +149,16 @@ def UpdateReformWindow ():
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	for i in range (PARTY_SIZE+1):
-		Button = Window.GetControl (i)
+	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
+	for i in PortraitButtons:
+		Button = PortraitButtons[i]
 		if i+1 not in removable_pcs:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			continue
 
 	for i in removable_pcs:
-		Button = Window.GetControl (removable_pcs.index(i))
+		Button = PortraitButtons[removable_pcs.index(i)]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i )
 		pic = GemRB.GetPlayerPortrait (i, 1)
 		if not pic:
@@ -256,8 +257,9 @@ def OpenReformPartyWindow ():
 			removable_pcs.append(i)
 
 	#PC portraits
-	for j in range (PARTY_SIZE+1):
-		Button = Window.GetControl (j)
+	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
+	for j in PortraitButtons:
+		Button = PortraitButtons[j]
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)

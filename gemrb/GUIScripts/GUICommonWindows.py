@@ -1266,14 +1266,16 @@ def RunSelectionChangeHandler ():
 # returns buttons and a numerical index
 # does nothing new in pst, iwd2 due to layout
 # in the rest, it will enable extra button generation for higher resolutions
-def GetPortraitButtonPairs (Window):
+# Mode determines arrangment direction, horizontal being for party reform and potentially save/load
+def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	pairs = {}
+	oldSlotCount = 6 + ExtraSlots
 
-	for i in range(min(6, PARTY_SIZE)):  # the default chu/game limit or less
+	for i in range(min(oldSlotCount, PARTY_SIZE)): # the default chu/game limit or less
 		pairs[i] = Window.GetControl (i)
 
 	# nothing left to do
-	if PARTY_SIZE <= 6:
+	if PARTY_SIZE <= oldSlotCount:
 		return pairs
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
@@ -1287,29 +1289,44 @@ def GetPortraitButtonPairs (Window):
 	buttonWidth = firstRect["Width"]
 	xOffset = firstRect["X"]
 	yOffset = firstRect["Y"]
-	windowHeight = Window.GetRect()["Height"]
-	# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
-	# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
-	maxHeight = windowHeight - buttonHeight*7
-	#print "GetPortraitButtonPairs:", ScreenHeight, windowHeight, maxHeight
-	if windowHeight != ScreenHeight:
-		maxHeight += buttonHeight
-	# TODO: until scrolling is added, we semi-fixate the count for the framed views, since they're limited to 6
-	if maxHeight < buttonHeight:
-		return pairs
-	for i in range(len(pairs), PARTY_SIZE):
+	windowRect = Window.GetRect()
+	windowHeight = windowRect["Height"]
+	windowWidth = windowRect["Width"]
+	limit = limitStep = 0
+	if Mode ==  "horizontal":
+		xOffset += 3*buttonWidth  # width of other controls in party reform; we'll draw on the other side (atleast in guiw8, guiw10 has no need for this)
+		maxWidth = windowWidth - xOffset
+		limit = maxWidth
+		limitStep = buttonWidth
+	else:
+		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
+		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
+		maxHeight = windowHeight - buttonHeight*7
+		#print "GetPortraitButtonPairs:", ScreenHeight, windowHeight, maxHeight
+		if windowHeight != ScreenHeight:
+			maxHeight += buttonHeight
+		# TODO: until scrolling is added, we semi-fixate the count for the framed views, since they're limited to 6
 		if maxHeight < buttonHeight:
-			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d" %(maxHeight)
+			return pairs
+		limit = maxHeight
+		limitStep = buttonHeight
+	for i in range(len(pairs), PARTY_SIZE):
+		if limitStep > limit:
+			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d" %(limit)
 		nextID = 1000 + i
 		if Window.HasControl (nextID):
 			pairs[i] = Window.GetControl (nextID)
 			continue
-		Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset, buttonWidth, buttonHeight)
+		if Mode ==  "horizontal":
+			Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
+		else:
+			# vertical
+			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset, buttonWidth, buttonHeight)
 		button = Window.GetControl (nextID)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 
 		pairs[i] = button
-		maxHeight -= buttonHeight
+		limit -= limitStep
 
 	return pairs
 
