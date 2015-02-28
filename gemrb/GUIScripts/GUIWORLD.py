@@ -182,7 +182,10 @@ def RemovePlayer ():
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
-	ReformPartyWindow = Window = GemRB.LoadWindow (25)
+	wid = 25
+	if GameCheck.IsHOW ():
+		wid = 0 # at least in guiw08, this is the correct window
+	ReformPartyWindow = Window = GemRB.LoadWindow (wid)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#are you sure
