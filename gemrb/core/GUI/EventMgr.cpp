@@ -169,13 +169,6 @@ void EventMgr::DelWindow(Window *win)
 void EventMgr::MouseMove(unsigned short x, unsigned short y)
 {
 	Point p(x, y);
-	if (windows.size() == 0) {
-		return;
-	}
-	if (!last_win_focused) {
-		return;
-	}
-
 	GameControl *gc = core->GetGameControl();
 	if (gc && (!mouseTrackingWin || mouseTrackingWin == gc->Owner)) {
 		gc->OnGlobalMouseMove(p);
@@ -198,8 +191,12 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			continue;
 
 		if (win->Frame().PointInside(p)) {
+			Point winPoint = win->ConvertPointFromScreen(p);
+			if (last_win_over && win != last_win_over) {
+				last_win_over->OnMouseLeave(winPoint, NULL);
+			}
 			last_win_over = win;
-			win->DispatchMouseOver(win->ConvertPointFromScreen(p));
+			win->DispatchMouseOver(winPoint);
 			RefreshCursor(win->Cursor);
 			break;
 		}
