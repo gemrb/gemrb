@@ -71,7 +71,7 @@ def RunTextAreaTests():
 	MessageWindow = GemRB.GetVar ("MessageWindow")
 	MessageTA = GUIClasses.GTextArea (MessageWindow, GemRB.GetVar ("MessageTextArea"))
 
-	tests = [ TA_SetEmpty, TA_SetNone, TA_SetSpaces, TA_SetSupercali, TA_SetSupercali2 ]
+	tests = [ TA_SetEmpty, TA_SetNone, TA_SetSpaces, TA_SetSupercali, TA_SetSupercali2, TA_SetMonk ]
 	tests += [ TA_AppendEmpty, TA_AppendSpace, TA_AppendNewline, TA_AppendNewlines, \
 		TA_AppendNewlinesAtStart, TA_AppendSupercali, TA_AppendSupercali2, \
 		TA_AppendRef, TA_AppendRef2, TA_AppendRef3 ]
@@ -152,6 +152,10 @@ def TA_SetSupercali(TA):
 def TA_SetSupercali2(TA):
 	line = "[color=7b7a4e]" + fmline * 3 + "[/color]"
 	return TA_SetText (TA, Me(), line)
+
+str2 = GemRB.GetString (2)
+def TA_SetMonk(TA):
+	return TA_SetText (TA, Me(), 2, str2)
 
 def TA_SetText(TA, name, text, expected=-1):
 	TA.SetText (text)
