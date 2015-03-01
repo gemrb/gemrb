@@ -37,6 +37,11 @@
 
 namespace GemRB {
 
+//translate section values (journal, solved, unsolved, user)
+static const int *sectionMap;
+static const int bg2Sections[4] = {4,1,2,0};
+static const int noSections[4] = {0,0,0,0};
+
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
@@ -45,6 +50,11 @@ DialogHandler::DialogHandler(void)
 	originalTargetID = 0;
 	speakerID = 0;
 	initialState = -1;
+	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+		sectionMap = bg2Sections;
+	} else {
+		sectionMap = noSections;
+	}
 }
 
 DialogHandler::~DialogHandler(void)
@@ -57,17 +67,14 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
 
 	int Section = 0;
-	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
-		Section = 4;
-		if (tr->Flags&IE_DLG_UNSOLVED) {
-			Section |= 1; // quests
-		}
-		if (tr->Flags&IE_DLG_SOLVED) {
-			Section |= 2; // completed
-		}
+	if (tr->Flags&IE_DLG_UNSOLVED) {
+		Section |= 1; // quests
+	}
+	if (tr->Flags&IE_DLG_SOLVED) {
+		Section |= 2; // completed
 	}
 
-	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
+	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 		String msg(L"\n[color=bcefbc]");
 		String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
 		msg += *str;
