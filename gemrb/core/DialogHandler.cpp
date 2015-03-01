@@ -37,7 +37,7 @@
 
 namespace GemRB {
 
-//translate section values (journal, solved, unsolved, user)
+//translate section values (journal, quests, solved, user)
 static const int *sectionMap;
 static const int bg2Sections[4] = {4,1,2,0};
 static const int noSections[4] = {0,0,0,0};
