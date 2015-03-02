@@ -64,6 +64,7 @@ Control::Control(const Region& frame)
 
 Control::~Control()
 {
+	SetScrollBar(NULL);
 	if (InHandler) {
 		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
 	}

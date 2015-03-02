@@ -57,6 +57,9 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 
 ScrollBar::~ScrollBar(void)
 {
+	if (ta) {
+		ta->SetScrollBar(NULL);
+	}
 	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
 		Sprite2D::FreeSprite(Frames[i]);
 	}
