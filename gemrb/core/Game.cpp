@@ -235,6 +235,14 @@ static bool IsAlive(Actor *pc)
 	return true;
 }
 
+void Game::ReversePCs()
+{
+	for (unsigned int slot=0; slot<PCs.size(); slot++) {
+		PCs[slot]->InParty = PCs.size() - PCs[slot]->InParty + 1;
+	}
+	core->SetEventFlag(EF_PORTRAIT|EF_SELECTION);
+}
+
 int Game::FindPlayer(unsigned int partyID)
 {
 	for (unsigned int slot=0; slot<PCs.size(); slot++) {

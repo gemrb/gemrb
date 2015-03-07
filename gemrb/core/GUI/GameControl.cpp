@@ -810,7 +810,10 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					overDoor->DetectTrap(256, lastActorID);
 				}
 				break;
-			// e, f
+			case 'e':// reverses pc order (useful for parties bigger than 6)
+				game->ReversePCs();
+				break;
+			// f
 			case 'g'://shows loaded areas and other game information
 				game->dump();
 				break;

@@ -502,6 +502,7 @@ public:
 	bool RandomEncounter(ieResRef &BaseArea);
 	/** Resets the area and bored comment timers of the whole party */
 	void ResetPartyCommentTimes();
+	void ReversePCs();
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
