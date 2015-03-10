@@ -64,7 +64,9 @@ Control::Control(const Region& frame)
 
 Control::~Control()
 {
-	SetScrollBar(NULL);
+	if (ControlType != IE_GUI_SCROLLBAR) {
+		SetScrollBar(NULL);
+	}
 	if (InHandler) {
 		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
 	}
