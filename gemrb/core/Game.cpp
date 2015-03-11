@@ -57,8 +57,10 @@ struct HealingResource {
 		CopyResRef(resref, ref);
 	}
 	HealingResource() {
-		ieResRef blank = "";
-		HealingResource(blank, NULL, 0, 0);
+		CopyResRef(resref, "");
+		amount = 0;
+		amounthealed = 0;
+		caster = NULL;
 	}
 	bool operator < (const HealingResource &str) const {
 		return (amounthealed < str.amounthealed);
