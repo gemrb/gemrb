@@ -43,6 +43,11 @@ using namespace GemRB;
 GAMImporter::GAMImporter(void)
 {
 	str = NULL;
+	version = PCSize = PCOffset = PCCount = 0;
+	MazeOffset = NPCOffset = NPCCount = GlobalOffset = GlobalCount = 0;
+	JournalOffset = JournalCount = KillVarsOffset = KillVarsCount = 0;
+	FamiliarsOffset = SavedLocOffset = SavedLocCount = 0;
+	PPLocOffset = PPLocCount = 0;
 }
 
 GAMImporter::~GAMImporter(void)
