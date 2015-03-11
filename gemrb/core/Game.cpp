@@ -1806,8 +1806,8 @@ void Game::CastOnRest()
 	int ps2 = ps;
 	for (int idx = 1; idx <= ps; idx++) {
 		Actor *tar = FindPC(idx);
-		ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
 		if (tar) {
+			ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
 			wholeparty.push_back(Injured(hpneeded, tar));
 		}
 	}
