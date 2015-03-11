@@ -74,6 +74,7 @@ static int GetProficiency(ieDword ItemType)
 ITMImporter::ITMImporter(void)
 {
 	str = NULL;
+	version = 0;
 }
 
 ITMImporter::~ITMImporter(void)
