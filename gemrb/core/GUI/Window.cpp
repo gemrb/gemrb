@@ -70,6 +70,7 @@ void Window::AddControl(Control* ctrl)
 	ctrl->Owner = this;
 	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m) {
 		if ((*m)->ControlID == ctrl->ControlID) {
+			ControlRemoved(*m);
 			delete *m;
 			*m = ctrl;
 			Invalidate();
@@ -292,23 +293,27 @@ Control* Window::RemoveControl(unsigned short i)
 		Control *ctrl = Controls[i];
 		const Region& frame = ctrl->ControlFrame();
 		DrawBackground(&frame); // paint over the spot the control occupied
-
-		if (ctrl==lastC) {
-			lastC=NULL;
-		}
-		if (ctrl==lastOver) {
-			lastOver=NULL;
-		}
-		if (ctrl==lastFocus) {
-			lastFocus=NULL;
-		}
-		if (ctrl==lastMouseFocus) {
-			lastMouseFocus=NULL;
-		}
 		Controls.erase(Controls.begin()+i);
+		ControlRemoved(ctrl);
 		return ctrl;
 	}
 	return NULL;
+}
+
+void Window::ControlRemoved(const Control *ctrl)
+{
+	if (ctrl == lastC) {
+		lastC = NULL;
+	}
+	if (ctrl == lastOver) {
+		lastOver = NULL;
+	}
+	if (ctrl == lastFocus) {
+		lastFocus = NULL;
+	}
+	if (ctrl == lastMouseFocus) {
+		lastMouseFocus = NULL;
+	}
 }
 
 Control* Window::GetDefaultControl(unsigned int ctrltype) const

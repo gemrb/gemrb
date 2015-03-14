@@ -62,6 +62,7 @@ class Sprite2D;
 class GEM_EXPORT Window {
 private:
 	void DrawBackground(const Region* rgn) const;
+	void ControlRemoved(const Control *ctrl);
 
 public: 
 	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
