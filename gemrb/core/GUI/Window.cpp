@@ -401,8 +401,10 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 			}
 		}
 	}
-	if (sb && ta) {
+	if (sb) {
 		sb->ta = ta;
+	}
+	if (ta) {
 		ta->SetScrollBar( sb );
 	}
 }

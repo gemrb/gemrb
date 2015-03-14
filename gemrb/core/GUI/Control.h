@@ -165,7 +165,7 @@ public: //Events
 	/** Sets the animation picture ref */
 	virtual void SetAnimPicture(Sprite2D* Picture);
 	/** Sets the Scroll Bar Pointer */
-	int SetScrollBar(Control* ptr);
+	virtual int SetScrollBar(Control* ptr);
 
 	/** Assigned function key */
 	void SetFunctionNumber(int x) { FunctionNumber = x; }

@@ -64,9 +64,6 @@ Control::Control(const Region& frame)
 
 Control::~Control()
 {
-	if (ControlType != IE_GUI_SCROLLBAR) {
-		SetScrollBar(NULL);
-	}
 	if (InHandler) {
 		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
 	}
@@ -276,7 +273,6 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 int Control::SetScrollBar(Control* ptr)
 {
 	if (ptr && (ptr->ControlType!=IE_GUI_SCROLLBAR)) {
-		ptr = NULL;
 		Log(WARNING, "Control", "Attached control is not a ScrollBar!");
 		return -1;
 	}

@@ -206,9 +206,8 @@ void TextArea::UpdateScrollbar()
 	to this Text Area Control. */
 int TextArea::SetScrollBar(Control* ptr)
 {
-	ScrollBar* bar = (ScrollBar*)ptr;
-	Control::SetScrollBar(bar);
-	if (bar) bar->SetScrollAmount(GetRowHeight());
+	Control::SetScrollBar(ptr);
+	if (ptr) ((ScrollBar *)ptr)->SetScrollAmount(GetRowHeight());
 	// we need to update the ScrollBar position based around TextYPos
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
