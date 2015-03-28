@@ -39,6 +39,7 @@ static const wchar_t* DisplayFormatAction = L"[color=%06X]%ls - [/color][p][colo
 static const wchar_t* DisplayFormat = L"[p][color=%06X]%ls[/color][/p]";
 static const wchar_t* DisplayFormatValue = L"[p][color=%06X]%ls: %d[/color][/p]";
 static const wchar_t* DisplayFormatNameString = L"[color=%06X]%ls - [/color][p][color=%06X]%ls: %ls[/color][/p]";
+static const wchar_t* DisplayFormatSimple = L"[p]%ls[/p]";
 
 DisplayMessage::StrRefs DisplayMessage::SRefs;
 
@@ -100,6 +101,15 @@ void DisplayMessage::DisplayMarkupString(const String& Text) const
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta)
 		ta->AppendText( Text );
+}
+
+void DisplayMessage::DisplayString(const String& text) const
+{
+	size_t newlen = wcslen(DisplayFormatSimple) + text.length() + 1;
+	wchar_t *newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
+	swprintf(newstr, newlen, DisplayFormatSimple, text.c_str());
+	DisplayMarkupString(newstr);
+	free(newstr);
 }
 
 unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) const
