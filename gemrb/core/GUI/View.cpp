@@ -283,8 +283,8 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 
 void View::SetFrame(const Region& r)
 {
-	frame = r;
-	MarkDirty();
+	SetFrameOrigin(r.Origin());
+	SetFrameSize(r.Dimensions());
 }
 
 void View::SetFrameOrigin(const Point& p)
@@ -296,8 +296,11 @@ void View::SetFrameOrigin(const Point& p)
 
 void View::SetFrameSize(const Size& s)
 {
+	Size oldSize = frame.Dimensions();
 	frame.w = s.w;
 	frame.h = s.h;
+
+	SizeChanged(oldSize);
 	MarkDirty();
 }
 

@@ -95,6 +95,8 @@ public:
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
 
+	void SizeChanged(const Size& /*oldSize*/) {}
+
 	void SetBackground(Sprite2D*);
 	void SetScrollBar(ScrollBar*);
 	const ScrollBar* Scrollbar() { return scrollbar; }
