@@ -226,11 +226,11 @@ View* View::RemoveSubview(const View* view)
 	assert(it != subViews.end());
 
 	View* subView = *it;
-	if (subView == scrollbar) {
-		scrollbar = NULL;
+	if (scrollbar && subView == scrollbar) {
 		Size s = Dimensions();
 		s.w -= scrollbar->Dimensions().w;
 		SetFrameSize(s);
+		scrollbar = NULL;
 	}
 	subViews.erase(it);
 	const Region& viewFrame = subView->Frame();
