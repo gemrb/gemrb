@@ -34,7 +34,7 @@
 namespace GemRB {
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
+	: Control(frame), ftext(text), palettes()
 {
 	palette = text->GetPalette();
 	finit = ftext;
@@ -43,7 +43,7 @@ TextArea::TextArea(const Region& frame, Font* text)
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 				   Color textcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
+	: Control(frame), ftext(text), palettes()
 {
 	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
 	palette = palettes[PALETTE_NORMAL];
@@ -93,7 +93,7 @@ TextArea::~TextArea(void)
 void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (animationEnd) {
-		if (TextYPos > textContainer->ContentFrame().h) {
+		if (TextYPos > textContainer->Dimensions().h) {
 			// the text is offscreen, this happens with chapter text
 			ScrollToY(TextYPos); // reset animation values
 		} else {
@@ -120,10 +120,6 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		drawFrame.x += AnimPicture->Width + EDGE_PADDING;
 	}
 
-	drawFrame.x += EDGE_PADDING;
-	drawFrame.y -= TextYPos;
-	contentWrapper.Draw(drawFrame.Origin());
-
 	if (selectOptions) {
 		// This hack is to refresh the mouse cursor so that option below cursor gets
 		// highlighted during a dialog
@@ -133,6 +129,15 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 void TextArea::SetAnimPicture(Sprite2D* pic)
 {
+	if (AnimPicture) {
+		// shrink and shift the container to accommodate the image
+		//Region newFrame = contentWrapper.Frame();
+		//newFrame.x = AnimPicture->Width + EDGE_PADDING;
+		//newFrame.w -= newFrame.x;
+		//contentWrapper.SetFrame(newFrame);
+	} else {
+
+	}
 	// FIXME: this behavior really needs to also happen when the TA dimensions change
 	// we currntly do that by setting *public* ivars in Control, instead of having a SetSize type method
 
@@ -151,7 +156,6 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 	}
 	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
 	textContainer->SetFrame(Region(Point(), s));
-	contentWrapper.SetFrame(Region(Point(), s));
 
 	Control::SetAnimPicture(pic);
 }
@@ -160,13 +164,13 @@ void TextArea::UpdateScrollbar()
 {
 	if (scrollbar == NULL) return;
 
-	int textHeight = contentWrapper.ContentFrame().h;
+	int textHeight = ContentHeight();
 	Region nodeBounds;
 	if (dialogBeginNode) {
 		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
 		// add the height of a newline too so that there is a space
 		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
-		Size selectFrame = selectOptions->ContentFrame();
+		Size selectFrame = selectOptions->Dimensions();
 		// page = blank line + dialog node + blank line + select options
 		int pageH = ftext->LineHeight*2 + nodeBounds.h + selectFrame.h;
 		if (pageH < frame.h) {
@@ -197,7 +201,7 @@ void TextArea::SetScrollBar(ScrollBar* bar)
 	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		int bottom = contentWrapper.ContentFrame().h - frame.h;
+		int bottom = ContentHeight() - frame.h;
 		if (bottom > 0)
 			ScrollToY(bottom); // no animation for this one
 	} else {
@@ -233,7 +237,7 @@ void TextArea::AppendText(const String& text)
 	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
 		// start trimming content from the top until we are under the limit.
-		Size frame = textContainer->ContentFrame();
+		Size frame = textContainer->Dimensions();
 		int currHeight = frame.h;
 		if (currHeight > heightLimit) {
 			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
@@ -286,7 +290,7 @@ void TextArea::AppendText(const String& text)
 		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
 			// scroll to the bottom
-			int bottom = contentWrapper.ContentFrame().h - frame.h;
+			int bottom = ContentHeight() - frame.h;
 			if (bottom > 0)
 				ScrollToY(bottom, NULL, 500); // animated scroll
 		}
@@ -463,7 +467,7 @@ void TextArea::OnMouseOver(const Point& p)
 	if (selectOptions) {
 		Point subp = p;
 		subp.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
-		subp.y -= textContainer->ContentFrame().h - TextYPos;
+		subp.y -= textContainer->Frame().h - TextYPos;
 		// container only has text, so...
 		span = dynamic_cast<TextContainer*>(selectOptions->ContentAtPoint(p));
 	}
@@ -532,6 +536,14 @@ void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
 	RunEventHandler(TextAreaOnSelect);
 }
 
+int TextArea::ContentHeight() const
+{
+	int cHeight = 0;
+	cHeight += (textContainer) ? textContainer->Dimensions().h : 0;
+	cHeight += (selectOptions) ? selectOptions->Dimensions().h : 0;
+	return cHeight;
+}
+
 String TextArea::QueryText() const
 {
 	if (selectedSpan) {
@@ -559,8 +571,7 @@ bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
 void TextArea::ClearSelectOptions()
 {
 	OptSpans.clear();
-	contentWrapper.RemoveContent(selectOptions);
-	delete selectOptions;
+	delete RemoveSubview(selectOptions);
 	dialogBeginNode = NULL;
 	selectOptions = NULL;
 	selectedSpan = NULL;
@@ -579,11 +590,14 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 	ClearSelectOptions(); // deletes previous options
 
-	Size optFrame(frame.w - (EDGE_PADDING * 2), 0);
-	optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
-	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
+	Region optFrame = textContainer->Frame();
+	//optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
+	optFrame.y += optFrame.h;
+	optFrame.h = 0; // will dynamically size itself
+
 	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
 
+	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
 	if (it != textContainer->Contents().rend()) {
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
@@ -602,7 +616,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 
 		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
 
-		selectOptions->AppendContent(selOption); // container owns the option
+		//selectOptions->AppendContent(selOption); // container owns the option
 		if (core->GetVideoDriver()->TouchInputEnabled()) {
 			// now add a newline for keeping the options spaced out (for touch screens)
 			selectOptions->AppendText(L"\n");
@@ -610,7 +624,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 	assert(textContainer);
 
-	contentWrapper.InsertContentAfter(selectOptions, textContainer);
+	AddSubviewInFrontOfView(selectOptions);
 	UpdateScrollbar();
 	MarkDirty();
 }
@@ -631,8 +645,7 @@ void TextArea::ClearHover()
 void TextArea::ClearText()
 {
 	ClearHover();
-	contentWrapper.RemoveContent(textContainer);
-	delete textContainer;
+	delete RemoveSubview(textContainer);
 
 	Size s;
 	if (scrollbar) {
@@ -645,8 +658,9 @@ void TextArea::ClearText()
 		s.w = frame.w - (EDGE_PADDING * 2);
 	}
 
-	textContainer = new TextContainer(s, ftext, palette);
-	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
+	// only the frame origin matters. TextContainer dynamicaly resizes itself based on its contents.
+	textContainer = new TextContainer(Region(), ftext, palette);
+	AddSubviewInFrontOfView(textContainer);
 
 	// reset text position to top
 	ScrollToY(0);

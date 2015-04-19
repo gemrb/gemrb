@@ -27,8 +27,7 @@
 #include <algorithm>
 #include <climits>
 
-#define CONTENT_MAX_SIZE (SHRT_MAX / 2) // just something larger than any screen height and small enough to not overflow
-#define DEBUG_TEXT 0
+#define DEBUG_TEXT 1
 
 namespace GemRB {
 
@@ -49,26 +48,6 @@ Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 	rgns.push_back(layoutRgn);
 	return rgns;
 }
-
-void Content::Draw(Point p) const
-{
-	Size s(frame.Dimensions());
-	s.h = (s.h <= 0) ? CONTENT_MAX_SIZE: s.h;
-	s.w = (s.w <= 0) ? CONTENT_MAX_SIZE: s.w;
-
-#if DEBUG_TEXT
-	Region drawRgn(p, s);
-	core->GetVideoDriver()->DrawRect(drawRgn, ColorGreen, true);
-#endif
-	// FIXME: passing around a screen offset is clumsy.
-	// there should be a way to have the video dirver draw relative to a given rect
-	// we *almost* have this functionality, but it is tied to the gamecontrol viewport at the moment
-
-	// this is the root of the drawing so region and point are both at 0,0
-	Point origin;
-	DrawContentsInRegions(LayoutForPointInRegion(origin, Region(origin, s)), p);
-}
-
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Palette* pal, const Size* frame)
 	: Content((frame) ? *frame : Size()), text(string), font(fnt)
@@ -313,16 +292,21 @@ ContentContainer::~ContentContainer()
 	}
 }
 
-Size ContentContainer::ContentFrame() const
+void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 {
-	Size cf = Content::ContentFrame();
-	if (cf.w <= 0) {
-		cf.w = contentBounds.w;
+#if DEBUG_TEXT
+	core->GetVideoDriver()->DrawRect(clip, ColorGreen, true);
+#endif
+
+	// layout shouldn't be empty unless there is no content anyway...
+	if (layout.empty()) return;
+
+	ContentLayout::const_iterator it = layout.begin();
+	for (; it != layout.end(); ++it) {
+		const Layout& l = *it;
+		// TODO: pass the clip rect so we can skip non-intersecting regions
+		l.content->DrawContentsInRegions(l.regions, drawFrame.Origin());
 	}
-	if (cf.h <= 0) {
-		cf.h = contentBounds.h;
-	}
-	return cf;
 }
 
 void ContentContainer::AppendContent(Content* content)
@@ -341,6 +325,20 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 		it = std::find(contents.begin(), contents.end(), existing);
 		contents.insert(++it, newContent);
 		LayoutContentsFrom(--it);
+	}
+}
+
+void ContentContainer::SubviewAdded(View* view, View* parent)
+{
+	if (parent == this) {
+		// ContentContainer should grow to the size of its (immidiate) subviews automatically
+		const Region& subViewFrame = view->Frame();
+		Size s;
+		s.h = subViewFrame.y + subViewFrame.h;
+		s.h = (s.h > frame.h) ? s.h : frame.h;
+		s.w = subViewFrame.x + subViewFrame.w;
+		s.w = (s.w > frame.w) ? s.w : frame.w;
+		SetFrameSize(s);
 	}
 }
 
@@ -426,26 +424,6 @@ const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 	return NULL;
 }
 
-void ContentContainer::SetFrame(const Region& newFrame)
-{
-	if (newFrame.Dimensions() != frame.Dimensions()) {
-		frame = newFrame; // must assign new frame before calling LayoutContents
-		LayoutContentsFrom(contents.begin());
-	} else {
-		frame = newFrame;
-	}
-}
-
-Regions ContentContainer::LayoutForPointInRegion(Point p, const Region&) const
-{
-	Region layoutRgn(p, ContentFrame());
-	parentOffset = p;
-
-	Regions rgns;
-	rgns.push_back(layoutRgn);
-	return rgns;
-}
-
 void ContentContainer::LayoutContentsFrom(const Content* c)
 {
 	LayoutContentsFrom(std::find(contents.begin(), contents.end(), c));
@@ -459,7 +437,8 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 
 	const Content* exContent = NULL;
 	const Region* excluded = NULL;
-	contentBounds = Size();
+	//SetFrame(Region());
+	Size contentBounds;
 
 	if (it != contents.begin()) {
 		// relaying content some place in the middle of the container
@@ -476,6 +455,13 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		}
 	}
 
+	Region layoutFrame = frame;
+	if (frame.w == 0) {
+		layoutFrame.w = superView->Frame().w;
+	}
+	if (frame.h == 0) {
+		layoutFrame.h = superView->Frame().h;
+	}
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
@@ -499,47 +485,14 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			exContent = ContentAtPoint(layoutPoint);
 			assert(exContent != content);
 		}
-		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, frame);
+		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
 		layout.push_back(Layout(content, rgns));
 		const Region& bounds = Region::RegionEnclosingRegions(rgns);
 		contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
 		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
 		exContent = content;
 	}
-	if (parent) {
-		// the parent needs to update to compensate for changes in this container
-		parent->LayoutContentsFrom(this);
-	}
-}
-
-void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
-{
-	// layout shouldn't be empty unless there is no content anyway...
-	if (layout.empty()) return;
-
-	// should only have 1 region
-	const Region& rgn = rgns.front();
-
-	// TODO: intersect with the screen clip so we can bail out even earlier
-
-	const Point& drawOrigin = rgn.Origin();
-	Point drawPoint = drawOrigin;
-	ContentLayout::const_iterator it = layout.begin();
-
-#if (DEBUG_TEXT)
-	Region dr(parentOffset + offset, contentBounds);
-	core->GetVideoDriver()->DrawRect(dr, ColorRed, true);
-	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
-	dr = Region(parentOffset + offset, ContentFrame());
-	core->GetVideoDriver()->DrawRect(dr, ColorGreen, true);
-	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
-#endif
-
-	for (; it != layout.end(); ++it) {
-		const Layout& l = *it;
-		assert(drawPoint.x <= drawOrigin.x + frame.w);
-		l.content->DrawContentsInRegions(l.regions, offset + parentOffset);
-	}
+	SetFrameSize(contentBounds);
 }
 
 void ContentContainer::DeleteContentsInRect(Region exclusion)
@@ -562,7 +515,7 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 }
 
 
-TextContainer::TextContainer(const Size& frame, Font* fnt, Palette* pal)
+TextContainer::TextContainer(const Region& frame, Font* fnt, Palette* pal)
 	: ContentContainer(frame), font(fnt)
 {
 	if (!pal) {

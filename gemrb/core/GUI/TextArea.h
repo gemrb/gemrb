@@ -104,8 +104,6 @@ private: // Private attributes
 	TextContainer* selectOptions;
 	// standard text display container
 	TextContainer* textContainer;
-	// wrapper containing both of the above
-	ContentContainer contentWrapper;
 
 	struct AnimationPoint {
 		// TODO: we cant currently scroll the x axis
@@ -148,6 +146,7 @@ private: //internal functions
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
 	void UpdateScrollbar();
+	int ContentHeight() const;
 
 public: //Events
 	/** Key Press Event */

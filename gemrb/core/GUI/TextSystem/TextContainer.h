@@ -20,6 +20,7 @@
 #define TEXTCONTAINER_H
 
 #include "Font.h"
+#include "GUI/View.h"
 #include "Region.h"
 #include "System/String.h"
 
@@ -51,8 +52,6 @@ public:
 	virtual ~Content();
 
 	virtual Size ContentFrame() const { return frame.Dimensions(); };
-
-	virtual void Draw(Point p) const; // public drawing interface in screen coordinates.
 
 protected:
 	// point is relative to Region. Region is a screen region.
@@ -101,15 +100,12 @@ protected:
 
 
 // Content container classes
-class ContentContainer : public Content
+class ContentContainer : public View
 {
 public:
 	typedef std::list<Content*> ContentList;
 protected:
 	ContentList contents;
-
-	Size contentBounds;
-	mutable Point parentOffset;
 
 	struct Layout {
 		const Content* content;
@@ -143,7 +139,7 @@ protected:
 	Point layoutPoint;
 
 public:
-	ContentContainer(const Size& frame) : Content(frame) {};
+	ContentContainer(const Region& frame) : View(frame) {};
 	virtual ~ContentContainer();
 
 	// append a container to the end of the container. The container takes ownership of the span.
@@ -161,12 +157,10 @@ public:
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
 
-	Size ContentFrame() const;
-	void SetFrame(const Region&);
+	void DrawSelf(Region drawFrame, const Region& clip);
 
 protected:
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
-	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	void SubviewAdded(View* view, View* parent);
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
@@ -181,7 +175,7 @@ private:
 	Palette* palette;
 
 public:
-	TextContainer(const Size& frame, Font* font, Palette*);
+	TextContainer(const Region& frame, Font* font, Palette*);
 	~TextContainer();
 
 	void AppendText(const String& text);
