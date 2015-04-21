@@ -56,6 +56,7 @@ class GEM_EXPORT TextArea : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+	void SizeChanged(const Size& /*oldSize*/);
 
 public:
 	TextArea(const Region& frame, Font* text);
@@ -146,6 +147,7 @@ private: //internal functions
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
 	void UpdateScrollbar();
+	void UpdateTextLayout();
 	int ContentHeight() const;
 
 public: //Events

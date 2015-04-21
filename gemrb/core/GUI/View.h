@@ -59,6 +59,8 @@ protected:
 	virtual void SubviewAdded(View* view, View* parent);
 	virtual void SubviewRemoved(View* view, View* parent);
 
+	virtual void SizeChanged(const Size& /*oldSize*/) {}
+
 public:
 	String tooltip;
 	// using Held so we can have polymorphic drag operations
@@ -94,8 +96,6 @@ public:
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
-
-	void SizeChanged(const Size& /*oldSize*/) {}
 
 	void SetBackground(Sprite2D*);
 	void SetScrollBar(ScrollBar*);

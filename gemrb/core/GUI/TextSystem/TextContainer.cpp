@@ -328,6 +328,11 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 	}
 }
 
+void ContentContainer::SizeChanged(const Size& /*oldSize*/)
+{
+	LayoutContentsFrom(contents.begin());
+}
+
 void ContentContainer::SubviewAdded(View* view, View* parent)
 {
 	if (parent == this) {

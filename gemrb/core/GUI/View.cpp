@@ -297,6 +297,8 @@ void View::SetFrameOrigin(const Point& p)
 void View::SetFrameSize(const Size& s)
 {
 	Size oldSize = frame.Dimensions();
+	if (oldSize == s) return;
+
 	frame.w = s.w;
 	frame.h = s.h;
 

@@ -117,7 +117,6 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 	if (AnimPicture) {
 		// speaker portrait
 		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.x, drawFrame.y + EDGE_PADDING, true);
-		drawFrame.x += AnimPicture->Width + EDGE_PADDING;
 	}
 
 	if (selectOptions) {
@@ -127,37 +126,34 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 	}
 }
 
+void TextArea::SizeChanged(const Size& /*oldSize*/)
+{
+	// TODO: subview resizing should be able to be handled generically by View
+	UpdateTextLayout();
+}
+
 void TextArea::SetAnimPicture(Sprite2D* pic)
 {
+	Control::SetAnimPicture(pic);
+	UpdateTextLayout();
+}
+
+void TextArea::UpdateTextLayout()
+{
+	Region frame = Region(Point(), Dimensions());
+	frame.h = 0; // dynamic height
 	if (AnimPicture) {
 		// shrink and shift the container to accommodate the image
-		//Region newFrame = contentWrapper.Frame();
-		//newFrame.x = AnimPicture->Width + EDGE_PADDING;
-		//newFrame.w -= newFrame.x;
-		//contentWrapper.SetFrame(newFrame);
-	} else {
-
+		frame.x = AnimPicture->Width + EDGE_PADDING;
+		frame.w -= frame.x;
 	}
-	// FIXME: this behavior really needs to also happen when the TA dimensions change
-	// we currntly do that by setting *public* ivars in Control, instead of having a SetSize type method
-
-	// FIXME: we always have to accept NULL because sometimes the control size gets changed after this is called
-	// dialog is the only thing that uses an actual picture, so we can safely bail out in that case
-	if (pic == AnimPicture && pic != NULL) return;
-
-	Size s(frame.w, 0);
-	// apply padding to the clip
-	s.w -= (scrollbar) ? EDGE_PADDING : EDGE_PADDING * 2;
-
-	if (pic) {
-		int offset = pic->Width + EDGE_PADDING;
-		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
-		s.w -= offset;
+	if (textContainer) {
+		textContainer->SetFrame(frame);
 	}
-	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
-	textContainer->SetFrame(Region(Point(), s));
-
-	Control::SetAnimPicture(pic);
+	if (selectOptions) {
+		frame.y = textContainer->Dimensions().h;
+		selectOptions->SetFrame(frame);
+	}
 }
 
 void TextArea::UpdateScrollbar()
@@ -662,8 +658,8 @@ void TextArea::ClearText()
 	textContainer = new TextContainer(Region(), ftext, palette);
 	AddSubviewInFrontOfView(textContainer);
 
-	// reset text position to top
-	ScrollToY(0);
+	UpdateTextLayout();
+	ScrollToY(0); // reset text position to top
 	UpdateScrollbar();
 }
 

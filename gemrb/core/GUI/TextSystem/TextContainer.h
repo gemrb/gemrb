@@ -165,6 +165,7 @@ protected:
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
 	const Layout& LayoutForContent(const Content*) const;
+	void SizeChanged(const Size& oldSize);
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
