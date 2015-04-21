@@ -31,9 +31,9 @@ function get_sources {
 
 function build_vorbis {
   echo -en "Checking out libogg-vorbis.\n"
-  get_sources git://github.com/jcadam/libogg-vorbis-android.git &&
+  get_sources git://github.com/nwertzberger/libogg-vorbis-android.git &&
   echo -en "Building libogg-vorbis...\n" &&
-  pushd "$ENVROOT/libogg-vorbis-android" &&
+  pushd "$ENVROOT/libogg-vorbis-android/main" &&
   ndk-build &&
   popd &&
   echo -en "Done with libogg-vorbis.\n"
@@ -84,6 +84,7 @@ function setup_dir_struct {
   mv "$ENVROOT/build/android-project" "$ENVROOT/build/gemrb" &&
   echo -en "Done.\n" &&
   echo -en "Symlinking the GemRB-git path..." &&
+  mkdir -p "$ENVROOT/build/gemrb/jni" &&
   ln -s "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
   ln -s "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
 }
@@ -112,12 +113,12 @@ function move_libraries {
   echo -en "Copying prebuilt libraries and linking header directories...\n" &&
 
   # libogg
-  cp "$ENVROOT/libogg-vorbis-android/libs/armeabi/libogg.so" "$ENVROOT/build/gemrb/jni/libogg/" &&
-  ln -s "$ENVROOT/libogg-vorbis-android/jni/include/" "$ENVROOT/build/gemrb/jni/libogg/include" &&
+  cp "$ENVROOT/libogg-vorbis-android/main/libs/armeabi/libogg.so" "$ENVROOT/build/gemrb/jni/libogg/" &&
+  ln -s "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libogg/include" &&
 
   # vorbis
-  cp "$ENVROOT/libogg-vorbis-android/libs/armeabi/libvorbis.so" "$ENVROOT/build/gemrb/jni/libvorbis/" &&
-  ln -s "$ENVROOT/libogg-vorbis-android/jni/include/" "$ENVROOT/build/gemrb/jni/libvorbis/include" &&
+  cp "$ENVROOT/libogg-vorbis-android/main/libs/armeabi/libvorbis.so" "$ENVROOT/build/gemrb/jni/libvorbis/" &&
+  ln -s "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libvorbis/include" &&
   # those two are a little bit messy, because they both need their include directory
   # this is because they can't both be defined as prebuilt libraries in the same makefile and directory,
   # because that messes with makefile variables for some reason
