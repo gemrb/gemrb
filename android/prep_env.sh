@@ -76,7 +76,14 @@ function build_deps {
 function setup_dir_struct {
   echo -en "Checking out SDL2...\n"
   # get SDL2
-  hg clone http://hg.libsdl.org/SDL &&
+  if [[ -d SDL ]]; then
+    cd SDL
+    hg fetch; rc=$?
+    cd -
+    (exit $rc) # hack to reset the hg return value
+  else
+    hg clone http://hg.libsdl.org/SDL
+  fi &&
   # and do what it says in its README.android
   echo -en "Creating the directory structure for the project..." &&
   mkdir -p build &&
