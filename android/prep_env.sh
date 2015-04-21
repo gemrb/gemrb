@@ -8,9 +8,30 @@ ENVROOT=$PWD
 GEMRB_GIT_PATH=$1
 GEMRB_VERSION=""
 
+function get_sources {
+  local url=$1
+  local expected=$2
+
+  if [[ -z $expected ]]; then
+    # use last component of url
+    expected=${url##*/}
+    expected=${expected%.git}
+  fi
+
+  if [[ -d $expected ]]; then
+    cd $expected &&
+    git pull
+    rc=$?
+    cd -
+    return $rc
+  else
+    git clone $url $expected
+  fi
+}
+
 function build_vorbis {
   echo -en "Checking out libogg-vorbis.\n"
-  git clone git://github.com/jcadam/libogg-vorbis-android.git &&
+  get_sources git://github.com/jcadam/libogg-vorbis-android.git &&
   echo -en "Building libogg-vorbis...\n" &&
   pushd "$ENVROOT/libogg-vorbis-android" &&
   ndk-build &&
@@ -22,8 +43,7 @@ function build_openal {
   # this still only works with a copied android.h from pelya/commandergenius
   # ifdef SDLVERSION somethingsomething in OpenALAudio solves this
   echo -en "Checking out openal.\n"
-  git clone git://repo.or.cz/openal-soft/android.git &&
-  mv "$ENVROOT/android" "$ENVROOT/openal" && # why would they name it "android" :(
+  get_sources git://repo.or.cz/openal-soft/android.git openal &&
   echo -en "Building openal...\n" &&
   pushd "$ENVROOT/openal/android" &&
   ndk-build &&
@@ -33,7 +53,7 @@ function build_openal {
 
 function build_libpng {
   echo -en "Checking out libpng...\n"
-  git clone git://github.com/julienr/libpng-android.git &&
+  get_sources git://github.com/julienr/libpng-android.git &&
   echo -en "Building libpng...\n" &&
   pushd "$ENVROOT/libpng-android" &&
   ndk-build &&
@@ -43,7 +63,7 @@ function build_libpng {
 
 function get_freetype {
   # can't precompile freetype, at least not as it comes from upstream
-  git clone git://github.com/cdave1/freetype2-android.git
+  get_sources git://github.com/cdave1/freetype2-android.git
 }
 
 function build_deps {
