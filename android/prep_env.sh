@@ -79,7 +79,7 @@ function setup_dir_struct {
   hg clone http://hg.libsdl.org/SDL &&
   # and do what it says in its README.android
   echo -en "Creating the directory structure for the project..." &&
-  mkdir build &&
+  mkdir -p build &&
   cp -r "$ENVROOT/SDL/android-project" build/ &&
   mv "$ENVROOT/build/android-project" "$ENVROOT/build/gemrb" &&
   echo -en "Done.\n" &&
@@ -104,7 +104,7 @@ function move_libraries {
   cp "$ENVROOT/RECURSE_Android.mk" "$ENVROOT/build/gemrb/jni/freetype2-android/Android.mk" &&
   # im not happy with this, but it's ok for now i guess
 
-  mkdir build/gemrb/jni/{libogg,libvorbis,libpng,openal} &&
+  mkdir -p build/gemrb/jni/{libogg,libvorbis,libpng,openal} &&
   cp "$ENVROOT/OGG_Android.mk" "$ENVROOT/build/gemrb/jni/libogg/Android.mk" &&
   cp "$ENVROOT/VORBIS_Android.mk" "$ENVROOT/build/gemrb/jni/libvorbis/Android.mk" &&
   cp "$ENVROOT/OPENAL_Android.mk" "$ENVROOT/build/gemrb/jni/openal/Android.mk" &&
