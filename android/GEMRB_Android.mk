@@ -147,6 +147,8 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/Dialog.cpp \
 		    main/gemrb/core/Calendar.cpp \
 		    main/gemrb/core/DialogHandler.cpp \
+		    main/gemrb/core/RNG/RNG_SFMT.cpp \
+		    main/gemrb/core/RNG/sfmt/SFMT.c \
 		    main/gemrb/core/System/Logger.cpp \
 		    main/gemrb/core/System/Logger/MessageWindowLogger.cpp \
 		    main/gemrb/core/System/Logger/File.cpp \
