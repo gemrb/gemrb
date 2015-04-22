@@ -219,7 +219,7 @@ function move_and_edit_projectfiles {
   # change activity class and application name, as well as enable debuggable
   sed -i -e s,org.libsdl.app,net.sourceforge.gemrb, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
   sed -i -e s,SDLActivity,GemRB, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
-  sed -i -e '/GemRB.*/ a android:screenOrientation="landscape" android:configChanges="orientation"' "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
+  sed -i -e '/android:name="GemRB.*/ a android:screenOrientation="landscape"' "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
   sed -i -e s,android:versionName=.*,android:versionName=$GEMRB_VERSION, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
   sed -i -e '21 a\
                  android:debuggable="true"' "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
