@@ -31,7 +31,7 @@ function get_sources {
 
 function build_vorbis {
   echo -en "Checking out libogg-vorbis.\n"
-  get_sources git://github.com/nwertzberger/libogg-vorbis-android.git &&
+  get_sources https://github.com/nwertzberger/libogg-vorbis-android.git &&
   echo -en "Building libogg-vorbis...\n" &&
   pushd "$ENVROOT/libogg-vorbis-android/main" &&
   ndk-build &&
@@ -43,7 +43,7 @@ function build_openal {
   # this still only works with a copied android.h from pelya/commandergenius
   # ifdef SDLVERSION somethingsomething in OpenALAudio solves this
   echo -en "Checking out openal.\n"
-  get_sources git://repo.or.cz/openal-soft/android.git openal &&
+  get_sources http://repo.or.cz/openal-soft/android.git openal &&
   echo -en "Building openal...\n" &&
   pushd "$ENVROOT/openal/android" &&
   ndk-build &&
@@ -53,7 +53,7 @@ function build_openal {
 
 function build_libpng {
   echo -en "Checking out libpng...\n"
-  get_sources git://github.com/julienr/libpng-android.git &&
+  get_sources https://github.com/julienr/libpng-android.git &&
   echo -en "Building libpng...\n" &&
   pushd "$ENVROOT/libpng-android" &&
   ndk-build &&
@@ -63,7 +63,7 @@ function build_libpng {
 
 function get_freetype {
   # can't precompile freetype, at least not as it comes from upstream
-  get_sources git://github.com/cdave1/freetype2-android.git
+  get_sources https://github.com/cdave1/freetype2-android.git
 }
 
 function build_deps {
