@@ -78,7 +78,7 @@ function setup_dir_struct {
   # get SDL2
   if [[ -d SDL ]]; then
     cd SDL
-    hg fetch; rc=$?
+    hg update; rc=$?
     cd -
     (exit $rc) # hack to reset the hg return value
   else
