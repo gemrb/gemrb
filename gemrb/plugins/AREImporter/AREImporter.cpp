@@ -44,6 +44,13 @@
 #include "System/FileStream.h"
 #include "System/SlicedStream.h"
 
+#include <stdlib.h>
+#ifdef ANDROID
+// android lacks mblen
+int wctomb(char *s, wchar_t wc) { return wcrtomb(s, wc, NULL); }
+int mbtowc(wchar_t *pwc, const char *s, size_t n) { return mbrtowc(pwc, s, n, NULL); }
+#endif
+
 using namespace GemRB;
 
 #define DEF_OPEN   0
@@ -2141,7 +2148,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
 				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				len = (std::min)(mblen(mbstring, mn.text->length()), 500);
+				len = (std::min)(mbtowc(0, mbstring, mn.text->length()), 500);
 				stream->Write( mbstring, len);
 				free(mbstring);
 			}
