@@ -92,8 +92,8 @@ function setup_dir_struct {
   echo -en "Done.\n" &&
   echo -en "Symlinking the GemRB-git path..." &&
   mkdir -p "$ENVROOT/build/gemrb/jni" &&
-  ln -s "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
-  ln -s "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
+  ln -sf "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
+  ln -sf "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
 }
 
 function move_libraries {
@@ -121,22 +121,22 @@ function move_libraries {
 
   # libogg
   cp "$ENVROOT/libogg-vorbis-android/main/libs/armeabi/libogg.so" "$ENVROOT/build/gemrb/jni/libogg/" &&
-  ln -s "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libogg/include" &&
+  ln -sf "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libogg/include" &&
 
   # vorbis
   cp "$ENVROOT/libogg-vorbis-android/main/libs/armeabi/libvorbis.so" "$ENVROOT/build/gemrb/jni/libvorbis/" &&
-  ln -s "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libvorbis/include" &&
+  ln -sf "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libvorbis/include" &&
   # those two are a little bit messy, because they both need their include directory
   # this is because they can't both be defined as prebuilt libraries in the same makefile and directory,
   # because that messes with makefile variables for some reason
 
   # png
   cp "$ENVROOT/libpng-android/obj/local/armeabi/libpng.a" "$ENVROOT/build/gemrb/jni/libpng/" &&
-  ln -s "$ENVROOT/libpng-android/jni/" "$ENVROOT/build/gemrb/jni/libpng/include" &&
+  ln -sf "$ENVROOT/libpng-android/jni/" "$ENVROOT/build/gemrb/jni/libpng/include" &&
 
   # openal
   cp "$ENVROOT/openal/android/libs/armeabi/libopenal.so" "$ENVROOT/build/gemrb/jni/openal/" &&
-  ln -s "$ENVROOT/openal/include" "$ENVROOT/build/gemrb/jni/openal/include" &&
+  ln -sf "$ENVROOT/openal/include" "$ENVROOT/build/gemrb/jni/openal/include" &&
 
   # python
   wget http://sourceforge.net/projects/gemrb/files/Other%20Binaries/android/libpython-2.6.2-pelya.tar.bz2 -O "$ENVROOT/libpython.tar" &&
