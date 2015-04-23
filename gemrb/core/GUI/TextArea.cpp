@@ -140,19 +140,28 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 
 void TextArea::UpdateTextLayout()
 {
-	Region frame = Region(Point(), Dimensions());
-	frame.h = 0; // dynamic height
+	Region tf = Region(Point(EDGE_PADDING, 0), Dimensions());
 	if (AnimPicture) {
 		// shrink and shift the container to accommodate the image
-		frame.x = AnimPicture->Width + EDGE_PADDING;
-		frame.w -= frame.x;
+		tf.x += AnimPicture->Width;
+		tf.w -= frame.x;
+	}
+	if (scrollbar) {
+		// if we have a scrollbar we should grow as much as needed vertically
+		// pad only on left edge
+		tf.w -= EDGE_PADDING;
+		tf.h = 0;
+	} else {
+		// otherwise limit the text to our frame
+		// pad on both edges
+		tf.w -= EDGE_PADDING * 2;
 	}
 	if (textContainer) {
-		textContainer->SetFrame(frame);
+		textContainer->SetFrame(tf);
 	}
 	if (selectOptions) {
-		frame.y = textContainer->Dimensions().h;
-		selectOptions->SetFrame(frame);
+		tf.y = textContainer->Dimensions().h;
+		selectOptions->SetFrame(tf);
 	}
 }
 
@@ -642,17 +651,6 @@ void TextArea::ClearText()
 {
 	ClearHover();
 	delete RemoveSubview(textContainer);
-
-	Size s;
-	if (scrollbar) {
-		// if we have a scrollbar we should grow as much as needed vertically
-		// pad only on left edge
-		s.w = frame.w - EDGE_PADDING;
-	} else {
-		// otherwise limit the text to our frame
-		// pad on both edges
-		s.w = frame.w - (EDGE_PADDING * 2);
-	}
 
 	// only the frame origin matters. TextContainer dynamicaly resizes itself based on its contents.
 	textContainer = new TextContainer(Region(), ftext, palette);
