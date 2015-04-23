@@ -488,7 +488,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			if (excluded) {
 				// we know that we have to move at least to the right
 				layoutPoint.x = excluded->x + excluded->w + 1;
-				if (frame.w > 0 && layoutPoint.x >= frame.w) {
+				if (frame.w > 0 && layoutPoint.x >= layoutFrame.w) {
 					layoutPoint.x = 0;
 					assert(excluded->y + excluded->h >= layoutPoint.y);
 					layoutPoint.y = excluded->y + excluded->h + 1;
