@@ -42,11 +42,8 @@ Content::~Content()
 
 Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
-	Region layoutRgn = Region(rgn.Origin() + p, frame.Dimensions());
-
-	Regions rgns;
-	rgns.push_back(layoutRgn);
-	return rgns;
+	const Region& layoutRgn = Region(rgn.Origin() + p, frame.Dimensions());
+	return Regions(1, layoutRgn);
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Palette* pal, const Size* frame)
