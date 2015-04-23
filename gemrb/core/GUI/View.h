@@ -39,6 +39,7 @@ private:
 protected:
 	View* superView;
 	Region frame;
+	ieDword resizeFlags;
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
 
@@ -76,6 +77,13 @@ public:
 			dragView->CompleteDragOperation(*this);
 			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
 		}
+	};
+
+	enum AutoresizeFlags {
+		RESIZE_NONE = 0,
+		RESIZE_WIDTH = 1,
+		RESIZE_HEIGHT = 2,
+		RESIZE_SUBVIEWS = 4 // unimplemented
 	};
 
 	View(const Region& frame);

@@ -37,6 +37,9 @@ View::View(const Region& frame)
 	superView = NULL;
 
 	dirty = true;
+	resizeFlags = RESIZE_NONE;
+
+	SizeChanged(frame.Dimensions());
 }
 
 View::~View()

@@ -330,6 +330,12 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 
 void ContentContainer::SizeChanged(const Size& /*oldSize*/)
 {
+	if (frame.w <= 0) {
+		resizeFlags |= RESIZE_WIDTH;
+	}
+	if (frame.h <= 0) {
+		resizeFlags |= RESIZE_HEIGHT;
+	}
 	LayoutContentsFrom(contents.begin());
 }
 
@@ -442,8 +448,6 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 
 	const Content* exContent = NULL;
 	const Region* excluded = NULL;
-	//SetFrame(Region());
-	Size contentBounds;
 
 	if (it != contents.begin()) {
 		// relaying content some place in the middle of the container
@@ -461,12 +465,15 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	}
 
 	Region layoutFrame = frame;
-	if (frame.w == 0) {
-		layoutFrame.w = superView->Frame().w;
+	Size contentBounds = layoutFrame.Dimensions();
+	if (resizeFlags&RESIZE_WIDTH) {
+		layoutFrame.w = SHRT_MAX;
 	}
-	if (frame.h == 0) {
-		layoutFrame.h = superView->Frame().h;
+	if (resizeFlags&RESIZE_HEIGHT) {
+		layoutFrame.h = SHRT_MAX;
 	}
+
+	assert(!layoutFrame.Dimensions().IsEmpty());
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
@@ -492,12 +499,21 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		}
 		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
 		layout.push_back(Layout(content, rgns));
-		const Region& bounds = Region::RegionEnclosingRegions(rgns);
-		contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
-		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
 		exContent = content;
+
+		if (resizeFlags) {
+		const Region& bounds = Region::RegionEnclosingRegions(rgns);
+			if (resizeFlags&RESIZE_HEIGHT)
+		contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
+			if (resizeFlags&RESIZE_WIDTH)
+		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
 	}
-	SetFrameSize(contentBounds);
+	}
+
+	// avoid infinite layout loop by setting frame directly...
+	//SetFrameSize(contentBounds);
+	frame.w = contentBounds.w;
+	frame.h = contentBounds.h;
 }
 
 void ContentContainer::DeleteContentsInRect(Region exclusion)
