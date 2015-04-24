@@ -24,6 +24,7 @@
 #include "GUI/Control.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/TextSystem/Font.h"
+#include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/TextSystem/TextContainer.h"
 
 #include "RGBAColor.h"
@@ -78,14 +79,15 @@ public:
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender = NULL, ieWord duration = 0);
+	void ScrollToY(int y, Control* sender = NULL, ieDword duration = 0);
 
 	/** Returns total height of the text */
 	int GetRowHeight() const;
-	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
-						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Starting Row */
 	void SetRow(int row);
+	int RowCount() { return rows; }
+	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
+						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Selectable */
 	void SetSelectable(bool val);
 	void SetAnimPicture(Sprite2D* Picture);
@@ -126,12 +128,12 @@ private: // Private attributes
 
 	/** Fonts */
 	Font* finit, * ftext;
+	GemMarkupParser parser;
 
 	/** OnChange Scripted Event Function Name */
 	ControlEventHandler TextAreaOnChange;
 	ControlEventHandler TextAreaOnSelect;
 
-private: //internal functions
 	enum PALETTE_TYPE {
 		PALETTE_NORMAL = 0,	// standard text color
 		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
@@ -144,10 +146,14 @@ private: //internal functions
 	Palette* palettes[PALETTE_TYPE_COUNT];
 	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
 
+private: //internal functions
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
+
+	void UpdateRowCount(int h);
 	void UpdateScrollbar();
 	void UpdateTextLayout();
+
 	int ContentHeight() const;
 
 public: //Events

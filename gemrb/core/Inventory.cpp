@@ -1291,6 +1291,17 @@ int Inventory::GetEquippedHeader() const
 	return EquippedHeader;
 }
 
+// store this internally just like Equipped/EquippedHeader if it turns into a hot path
+ITMExtHeader *Inventory::GetEquippedExtHeader(int header) const
+{
+	int slot; // Equipped holds the projectile, not the weapon
+	CREItem *itm = GetUsedWeapon(false, slot); // check the main hand only
+	if (!itm) return NULL;
+	Item *item = gamedata->GetItem(itm->ItemResRef, true);
+	if (!item) return NULL;
+	return item->GetExtHeader(header);
+}
+
 void Inventory::SetEquipped(ieWordSigned slot, ieWord header)
 {
 	Equipped = slot;

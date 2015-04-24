@@ -1269,6 +1269,8 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	if (!sca) {
 		return;
 	}
+	// many are stored as bams and can't be translucent by default
+	sca->SetBlend();
 
 	// always draw it for party members; the rest must not be invisible to have it;
 	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
@@ -1302,12 +1304,12 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
 	ieDword mask = 1;
-	for (int i=0;i<32;i++) {
+	for (int i=0; i<OVERLAY_COUNT; i++) {
 		if (changed&mask) {
 			if (newValue&mask) {
 				handle_overlay(actor, i);
-			} else {
-				actor->RemoveVVCell(hc_overlays[i], true);
+//			} else if (oldValue&mask) {
+//				actor->RemoveVVCell(hc_overlays[i], true);
 			}
 		}
 		mask<<=1;
@@ -3495,7 +3497,7 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 	return StrRefs[idx];
 }
 
-void Actor::VerbalConstant(int start, int count) const
+void Actor::VerbalConstant(int start, int count, bool force) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
@@ -3505,7 +3507,7 @@ void Actor::VerbalConstant(int start, int count) const
 	ieDword subtitles = 0;
 	core->GetDictionary()->Lookup("Subtitles", subtitles);
 
-	if (!subtitles || count < 0) {
+	if ((!subtitles && !force) || count < 0) {
 		return;
 	}
 
@@ -5818,14 +5820,25 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 	}
 }
 
-//this is just a stub function for now, attackstyle could be melee/ranged
 //even spells got this attack style
 int Actor::GetAttackStyle() const
 {
 	WeaponInfo wi;
-	//Non NULL if the equipped slot is a projectile or a throwing weapon
-	//TODO some weapons have both melee and ranged capability
-	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED;
+	// Some weapons have both melee and ranged capability, eg. bg2's rifthorne (ax1h09)
+	// so we check the equipped header's attack type: 2-projectile and 4-launcher
+	// It is more complicated than it seems because the equipped header is the one of the projectile for launchers
+	ITMExtHeader *rangedheader = GetRangedWeapon(wi);
+	if (!PCStats) {
+		// fall back to simpler logic that works most of the time
+		//Non NULL if the equipped slot is a projectile or a throwing weapon
+		if (rangedheader) return WEAPON_RANGED;
+		return WEAPON_MELEE;
+	}
+
+	int qh = PCStats->GetHeaderForSlot(inventory.GetEquippedSlot());
+	ITMExtHeader *eh = inventory.GetEquippedExtHeader(qh);
+	if (!eh) return WEAPON_MELEE; // default to melee
+	if (eh->AttackType && eh->AttackType%2 == 0) return WEAPON_RANGED;
 	return WEAPON_MELEE;
 }
 
@@ -6873,7 +6886,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
 				} else {
-					resisted = (signed)GetSafeStat(it->second.resist_stat);
+					resisted += (signed)GetSafeStat(it->second.resist_stat);
 				}
 				damage -= resisted;
 			} else {
@@ -6883,7 +6896,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 					resistance = 0;
 					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value (%d).", resistance);
 				}
-				resisted = (int) (damage * resistance/100.0);
+				resisted += (int) (damage * resistance/100.0);
 				damage -= resisted;
 			}
 			Log(COMBAT, "ModifyDamage", "Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
@@ -8064,7 +8077,7 @@ ScriptedAnimation *Actor::FindOverlay(int index) const
 {
 	const vvcVector *vvcCells;
 
-	if (index>31) return NULL;
+	if (index >= OVERLAY_COUNT) return NULL;
 
 	if (hc_locations&(1<<index)) vvcCells=&vvcShields;
 	else vvcCells=&vvcOverlays;
@@ -8839,14 +8852,15 @@ void Actor::SetGradient(ieDword gradient)
 //sets one bit of the sanctuary stat (used for overlays)
 void Actor::SetOverlay(unsigned int overlay)
 {
-	if (overlay>=32) return;
-	Modified[IE_SANCTUARY]|=1<<overlay;
+	if (overlay >= OVERLAY_COUNT) return;
+	// need to run the pcf, so the vvcs get loaded
+	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 1);
 }
 
 //returns true if spell state is already set or illegal
 bool Actor::SetSpellState(unsigned int spellstate)
 {
-	if (spellstate>=192) return true;
+	if (spellstate >= SS_MAX) return true;
 	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
@@ -8857,7 +8871,7 @@ bool Actor::SetSpellState(unsigned int spellstate)
 //returns true if spell state is already set
 bool Actor::HasSpellState(unsigned int spellstate) const
 {
-	if (spellstate>=192) return false;
+	if (spellstate >= SS_MAX) return false;
 	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
@@ -10041,6 +10055,22 @@ void Actor::ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner,
 	} else {
 		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %s, Owner: %s", newref.Name, GetName(1), Owner->GetName(1));
 	}
+}
+
+// check if we were the passed class at some point
+// NOTE: does not ignore disabled dual classes!
+bool Actor::WasClass(ieDword oldClassID) const
+{
+	if (oldClassID >= BGCLASSCNT) return false;
+
+	int mcWas = BaseStats[IE_MC_FLAGS] & MC_WAS_ANY;
+	if (!mcWas) {
+		// not dualclassed
+		return false;
+	}
+
+	int OldIsClassID = levelslotsbg[oldClassID];
+	return mcwasflags[OldIsClassID] == mcWas;
 }
 
 }

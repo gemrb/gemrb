@@ -30,10 +30,7 @@ Point::Point(void)
 
 bool Point::operator==(const Point& pnt) const
 {
-	if (( x == pnt.x ) && ( y == pnt.y )) {
-		return true;
-	}
-	return false;
+	return (x == pnt.x) && (y == pnt.y);
 }
 
 bool Point::operator!=(const Point& pnt) const
@@ -70,18 +67,12 @@ void Point::fromDword(ieDword val)
 
 bool Point::isnull() const
 {
-	if (x==0 && y==0) {
-		return true;
-	}
-	return false;
+	return (x == 0) && (y == 0);
 }
 
 bool Point::isempty() const
 {
-	if (x==-1 && y==-1) {
-		return true;
-	}
-	return false;
+	return (x == -1) && (y == -1);
 }
 
 bool Point::PointInside(const Point &p) const
@@ -124,10 +115,7 @@ Region::Region(void)
 
 bool Region::operator==(const Region& rgn)
 {
-	if (( x == rgn.x ) && ( y == rgn.y ) && ( w == rgn.w ) && ( h == rgn.h )) {
-		return true;
-	}
-	return false;
+	return (x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h);
 }
 
 bool Region::operator!=(const Region& rgn)
@@ -153,26 +141,13 @@ Region::Region(const Point &p, const Size& s)
 
 bool Region::PointInside(const Point &p) const
 {
-	if (( p.x < x ) || ( p.x > ( x + w ) )) {
+	if ((p.x < x) || (p.x >= (x + w))) {
 		return false;
 	}
-	if (( p.y < y ) || ( p.y > ( y + h ) )) {
+	if ((p.y < y) || (p.y >= (y + h))) {
 		return false;
 	}
 	return true;
-}
-
-// true if this is completely contained inside rgn
-bool Region::InsideRegion(const Region& rgn) const
-{
-	if (x >= rgn.x && (x + w) <= (rgn.x + rgn.w)) {
-		// horizontal plane is contained
-		if (y >= rgn.y && (y + h) <= (rgn.y + rgn.h)) {
-			// vertical plane is contained
-			return true;
-		}
-	}
-	return false;
 }
 
 bool Region::IntersectsRegion(const Region& rgn) const

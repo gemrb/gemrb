@@ -241,6 +241,15 @@ static Control *GetControl( int wi, int ci, int ct)
 	return ctrl;
 }
 
+static int GetControlIndex(unsigned short wi, unsigned long ControlID)
+{
+	Window* win = core->GetWindow(wi);
+	if (win == NULL) {
+		return -1;
+	}
+	return win->GetControlIndex(ControlID);
+}
+
 //sets tooltip with Fx key prepended
 static void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
 {
@@ -499,19 +508,18 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 		return NULL;
 	}
 
-	core->GetAudioDrv()->Play( NULL, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	ta->ClearText();
 	// insert enough newlines to push the text offscreen
 	int rowHeight = ta->GetRowHeight();
 	size_t lines = ta->Dimensions().h / rowHeight;
 	ta->AppendText(String(lines, L'\n'));
 	String* chapText = StringFromCString(text);
-	lines *= 2; // double the "amount" of newlines since we also scroll to be out of sight
-	lines += std::count(chapText->begin(), chapText->end(), L'\n');
 	ta->AppendText(*chapText);
+	// add instead of set, because we also scroll to be out of sight so keep the newline count
+	lines += ta->RowCount();
 	delete chapText;
-	// animate the scroll: duration = 2400 * lines of text
-	ta->ScrollToY((int)(rowHeight * lines), NULL, lines * 2400);
+	// animate the scroll: duration = 2500 * lines of text
+	ta->ScrollToY((int)(rowHeight * lines), NULL, lines * 2500);
 	Py_RETURN_NONE;
 }
 
@@ -1234,7 +1242,7 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Window_GetControl__doc );
 	}
 
-	int ctrlindex = core->GetControl(WindowIndex, ControlID);
+	int ctrlindex = GetControlIndex(WindowIndex, ControlID);
 	if (ctrlindex == -1) {
 		char tmp[40];
 		snprintf(tmp, sizeof(tmp), "Control (ID: %d) was not found!", ControlID);
@@ -1293,7 +1301,7 @@ static PyObject* GemRB_Window_HasControl(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &Type )) {
 		return AttributeError( GemRB_Window_HasControl__doc );
 	}
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 	if (ret == -1) {
 		return PyInt_FromLong( 0 );
 	}
@@ -1878,7 +1886,7 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	lbl->SetAlignment( align );
 	btn->AddSubviewInFrontOfView( lbl );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -1913,7 +1921,7 @@ static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
 	lbl->SetAlignment( align );
 	win->AddSubviewInFrontOfView( lbl );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 	if (ret<0) {
 		return NULL;
 	}
@@ -1978,7 +1986,7 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	else
 		return RuntimeError( "Cursor BAM not found" );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2057,7 +2065,7 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 	btn->ControlID = ControlID;
 	win->AddSubviewInFrontOfView( btn );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2649,9 +2657,8 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
-	if (CtrlIndex != -1) {
-		Control *ctrl = win->GetControlAtIndex( CtrlIndex );
+	Control* ctrl = win->GetControlById( ControlID );
+	if (ctrl) {
 		rgn = ctrl->Frame();
 		//flags = ctrl->Value;
 		delete win->RemoveSubview( ctrl );
@@ -2662,7 +2669,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 	wmap->SetOverrideIconPalette(recolor);
 	win->AddSubviewInFrontOfView( wmap );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2724,9 +2731,8 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
-	if (CtrlIndex != -1) {
-		Control *ctrl = win->GetControlAtIndex( CtrlIndex );
+	Control* ctrl = win->GetControlById( ControlID );
+	if (ctrl) {
 		rgn = ctrl->Frame();
 		// do *not* delete the existing control, we want to replace
 		// it in the sort order!
@@ -2737,8 +2743,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	map->ControlID = ControlID;
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
-		CtrlIndex = core->GetControl( WindowIndex, LabelID );
-		Control *lc = win->GetControlAtIndex( CtrlIndex );
+		Control *lc = win->GetControlById(LabelID);
 		map->LinkedLabel = lc;
 		ResourceHolder<ImageMgr> anim(Flag);
 		if (anim) {
@@ -2751,8 +2756,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		goto setup_done;
 	}
 	if (Flag) {
-		CtrlIndex = core->GetControl( WindowIndex, LabelID );
-		Control *lc = win->GetControlAtIndex( CtrlIndex );
+		Control *lc = win->GetControlById(LabelID);
 		map->LinkedLabel = lc;
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( Flag,
@@ -2767,7 +2771,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 setup_done:
 	win->AddSubviewInFrontOfView( map );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -2789,8 +2793,8 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 		return AttributeError( GemRB_Control_SubstituteForControl__doc );
 	}
 
-	int subIdx = SubControlID;//core->GetControl(SubWindowIndex, SubControlID);
-	int targetIdx = ControlID;//core->GetControl(WindowIndex, ControlID);
+	int subIdx = SubControlID;//GetControlIndex(SubWindowIndex, SubControlID);
+	int targetIdx = ControlID;//GetControlIndex(WindowIndex, ControlID);
 	Control* substitute = GetControl(SubWindowIndex, subIdx, -1);
 	Control* target = GetControl(WindowIndex, targetIdx, -1);
 	if (!substitute || !target) {
@@ -4197,7 +4201,7 @@ static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args
 	ta->ControlID = ControlID;
 	win->AddSubviewInFrontOfView( ta );
 
-	int ret = core->GetControl( WindowIndex, ControlID );
+	int ret = GetControlIndex( WindowIndex, ControlID );
 
 	if (ret<0) {
 		return NULL;
@@ -4229,14 +4233,15 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 
 	struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
 		char lastchar;
-		LastCharFilter(char lastchar)
-		: lastchar(lastchar) {}
+		LastCharFilter(char lastchar) {
+			this->lastchar = tolower(lastchar);
+		}
 
 		bool operator()(const char* fname) const {
 			const char* extpos = strrchr(fname, '.');
 			if (extpos) {
 				extpos--;
-				return *extpos == lastchar;
+				return tolower(*extpos) == lastchar;
 			}
 			return false;
 		}
@@ -4252,7 +4257,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 			if (core->HasFeature( GF_SOUNDFOLDERS )) {
 				dirs = true;
 			} else {
-				dirit.SetFilterPredicate(new LastCharFilter('_'), true);
+				dirit.SetFilterPredicate(new LastCharFilter('A'), true);
 			}
 			break;
 		case DIRECTORY_CHR_EXPORTS:
@@ -4270,9 +4275,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 			String* string = StringFromCString(name);
 			if (dirs == false) {
 				size_t pos = string->find_last_of(L'.');
-				if (pos != String::npos) {
-					string->resize(pos);
+				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
+					delete string;
+					continue;
 				}
+				string->resize(pos);
 			}
 			StringToUpper(*string);
 			strings.push_back(*string);
@@ -8528,7 +8535,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start||more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, Offset),dict, ACT_LEFT,0);
+		PyObject *ret = SetActionIcon(wi,GetControlIndex(wi, Offset),dict, ACT_LEFT,0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -8542,7 +8549,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
-		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
+		int ci = GetControlIndex(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		if (!btn) {
 			Log(ERROR, "GUIScript", "Button %d in window %d not found!", ci, wi);
@@ -8591,7 +8598,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	}
 
 	if (more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+Offset+1),dict,ACT_RIGHT,i+1);
+		PyObject *ret = SetActionIcon(wi,GetControlIndex(wi, i+Offset+1),dict,ACT_RIGHT,i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -8694,7 +8701,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
-		int ci = core->GetControl(wi, i+Start);
+		int ci = GetControlIndex(wi, i+Start);
 		if (ci<0) {
 			print("Couldn't find button #%d on Window #%d", i+Start, wi);
 			return RuntimeError ("No such control!\n");

@@ -27,6 +27,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 from ie_stats import *
 import MessageWindow
@@ -149,15 +150,18 @@ def UpdateReformWindow ():
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	for i in range (PARTY_SIZE+1):
-		Button = Window.GetControl (i)
+	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
+	for i in PortraitButtons:
+		Button = PortraitButtons[i]
 		if i+1 not in removable_pcs:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			continue
 
 	for i in removable_pcs:
-		Button = Window.GetControl (removable_pcs.index(i))
+		if i not in PortraitButtons:
+			continue # for saved games with higher party count than the current setup supports
+		Button = PortraitButtons[removable_pcs.index(i)]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i )
 		pic = GemRB.GetPlayerPortrait (i, 1)
 		if not pic:
@@ -178,7 +182,10 @@ def RemovePlayer ():
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
-	ReformPartyWindow = Window = GemRB.LoadWindow (25)
+	wid = 25
+	if GameCheck.IsHOW ():
+		wid = 0 # at least in guiw08, this is the correct window
+	ReformPartyWindow = Window = GemRB.LoadWindow (wid)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#are you sure
@@ -256,8 +263,9 @@ def OpenReformPartyWindow ():
 			removable_pcs.append(i)
 
 	#PC portraits
-	for j in range (PARTY_SIZE+1):
-		Button = Window.GetControl (j)
+	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
+	for j in PortraitButtons:
+		Button = PortraitButtons[j]
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)

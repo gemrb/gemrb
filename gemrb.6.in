@@ -108,6 +108,11 @@ Set this to 1 if you are running GemRB on a big-endian machine. Disabled by defa
 .BR MultipleQuickSaves =(0|1)
 EXPERIMENTAL. Set this to 1 if you want GemRB to keep multiple quicksaves around. Disabled by default.
 
+.TP
+.BR MaxPartySize =INT
+EXPERIMENTAL: Set this to 1-10 if you want more party members or enforce fewer. 6 by default.
+.B NOTE:
+You need to choose a big enough resolution, so there will be enough room for all the party portraits! Does nothing for PST and IWD2.
 
 .\"###################################################
 .SH Video Parameters:

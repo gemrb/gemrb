@@ -26,7 +26,6 @@
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/EventMgr.h"
-#include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/Window.h"
 
 #define EDGE_PADDING 3
@@ -60,6 +59,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		palettes[PALETTE_INITIALS] = finit->GetPalette();
 	}
 
+	parser.ResetAttributes(text, palette, finit, palettes[PALETTE_INITIALS]);
 	Init();
 }
 
@@ -165,6 +165,12 @@ void TextArea::UpdateTextLayout()
 	}
 }
 
+void TextArea::UpdateRowCount(int h)
+{
+	int rowHeight = GetRowHeight();
+	rows = (h + rowHeight - 1) / rowHeight; // round up
+}
+
 void TextArea::UpdateScrollbar()
 {
 	if (scrollbar == NULL) return;
@@ -177,7 +183,7 @@ void TextArea::UpdateScrollbar()
 		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 		Size selectFrame = selectOptions->Dimensions();
 		// page = blank line + dialog node + blank line + select options
-		int pageH = ftext->LineHeight*2 + nodeBounds.h + selectFrame.h;
+		int pageH = ftext->LineHeight + nodeBounds.h + selectFrame.h;
 		if (pageH < frame.h) {
 			// if the node isnt a full page by itself we need to fake it
 			textHeight += frame.h - pageH;
@@ -186,11 +192,12 @@ void TextArea::UpdateScrollbar()
 	int rowHeight = GetRowHeight();
 	int newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
 	if (newRows != rows) {
-		rows = newRows;
+		UpdateRowCount(textHeight);
 		ieWord visibleRows = (frame.h / GetRowHeight());
 		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
 		scrollbar->SetMax(sbMax);
 	}
+
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
 		&& dialogBeginNode) {
 		// now scroll dialogBeginNode to the top less a blank line
@@ -201,9 +208,12 @@ void TextArea::UpdateScrollbar()
 void TextArea::SetScrollBar(ScrollBar* bar)
 {
 	View::SetScrollBar(bar);
-	if (bar) bar->textarea = this;
+	if (bar) {
+		bar->textarea = this;
+		bar->SetScrollAmount(GetRowHeight());
+	}
+
 	// we need to update the ScrollBar position based around TextYPos
-	rows = 0; // force an update in UpdateScrollbar()
 	UpdateScrollbar();
 	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
 		int bottom = ContentHeight() - frame.h;
@@ -252,9 +262,6 @@ void TextArea::AppendText(const String& text)
 
 	size_t tagPos = text.find_first_of('[');
 	if (tagPos != String::npos) {
-		// share a single parser for all TextAreas
-		static GemMarkupParser parser;
-		parser.SetTextDefaults(ftext, finit, palette);
 		parser.ParseMarkupStringIntoContainer(text, *textContainer);
 	} else if (text.length()) {
 		if (finit != ftext) {
@@ -299,6 +306,8 @@ void TextArea::AppendText(const String& text)
 			if (bottom > 0)
 				ScrollToY(bottom, NULL, 500); // animated scroll
 		}
+	} else {
+		UpdateRowCount(ContentHeight());
 	}
 	MarkDirty();
 }
@@ -407,7 +416,7 @@ int TextArea::GetRowHeight() const
 }
 
 /** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
+void TextArea::ScrollToY(int y, Control* sender, ieDword duration)
 {
 	// set up animation if required
 	if  (duration) {
@@ -424,9 +433,8 @@ void TextArea::ScrollToY(int y, Control* sender, ieWord duration)
 	}
 
 	if (scrollbar && sender != scrollbar) {
-		// we must "scale" the pixels
-		scrollbar->SetPosForY(y * (scrollbar->GetStep()-1 / ftext->LineHeight));
-		// sb->SetPosForY will recall this method so we dont need to do more... yet.
+		scrollbar->SetPos(y);
+		// sb->SetPos will recall this method so we dont need to do more... yet.
 	} else if (scrollbar) {
 		// our scrollbar has set position for us
 		TextYPos = y;

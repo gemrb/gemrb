@@ -8,11 +8,32 @@ ENVROOT=$PWD
 GEMRB_GIT_PATH=$1
 GEMRB_VERSION=""
 
+function get_sources {
+  local url=$1
+  local expected=$2
+
+  if [[ -z $expected ]]; then
+    # use last component of url
+    expected=${url##*/}
+    expected=${expected%.git}
+  fi
+
+  if [[ -d $expected ]]; then
+    cd $expected &&
+    git pull
+    rc=$?
+    cd -
+    return $rc
+  else
+    git clone $url $expected
+  fi
+}
+
 function build_vorbis {
   echo -en "Checking out libogg-vorbis.\n"
-  git clone git://github.com/jcadam/libogg-vorbis-android.git &&
+  get_sources https://github.com/nwertzberger/libogg-vorbis-android.git &&
   echo -en "Building libogg-vorbis...\n" &&
-  pushd "$ENVROOT/libogg-vorbis-android" &&
+  pushd "$ENVROOT/libogg-vorbis-android/main" &&
   ndk-build &&
   popd &&
   echo -en "Done with libogg-vorbis.\n"
@@ -22,8 +43,7 @@ function build_openal {
   # this still only works with a copied android.h from pelya/commandergenius
   # ifdef SDLVERSION somethingsomething in OpenALAudio solves this
   echo -en "Checking out openal.\n"
-  git clone git://repo.or.cz/openal-soft/android.git &&
-  mv "$ENVROOT/android" "$ENVROOT/openal" && # why would they name it "android" :(
+  get_sources http://repo.or.cz/openal-soft/android.git openal &&
   echo -en "Building openal...\n" &&
   pushd "$ENVROOT/openal/android" &&
   ndk-build &&
@@ -33,7 +53,7 @@ function build_openal {
 
 function build_libpng {
   echo -en "Checking out libpng...\n"
-  git clone git://github.com/julienr/libpng-android.git &&
+  get_sources https://github.com/julienr/libpng-android.git &&
   echo -en "Building libpng...\n" &&
   pushd "$ENVROOT/libpng-android" &&
   ndk-build &&
@@ -43,7 +63,7 @@ function build_libpng {
 
 function get_freetype {
   # can't precompile freetype, at least not as it comes from upstream
-  git clone git://github.com/cdave1/freetype2-android.git
+  get_sources https://github.com/cdave1/freetype2-android.git
 }
 
 function build_deps {
@@ -56,16 +76,24 @@ function build_deps {
 function setup_dir_struct {
   echo -en "Checking out SDL2...\n"
   # get SDL2
-  hg clone http://hg.libsdl.org/SDL &&
+  if [[ -d SDL ]]; then
+    cd SDL
+    hg update; rc=$?
+    cd -
+    (exit $rc) # hack to reset the hg return value
+  else
+    hg clone http://hg.libsdl.org/SDL
+  fi &&
   # and do what it says in its README.android
   echo -en "Creating the directory structure for the project..." &&
-  mkdir build &&
+  mkdir -p build &&
   cp -r "$ENVROOT/SDL/android-project" build/ &&
   mv "$ENVROOT/build/android-project" "$ENVROOT/build/gemrb" &&
   echo -en "Done.\n" &&
   echo -en "Symlinking the GemRB-git path..." &&
-  ln -s "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
-  ln -s "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
+  mkdir -p "$ENVROOT/build/gemrb/jni" &&
+  ln -sf "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
+  ln -sf "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
 }
 
 function move_libraries {
@@ -83,7 +111,7 @@ function move_libraries {
   cp "$ENVROOT/RECURSE_Android.mk" "$ENVROOT/build/gemrb/jni/freetype2-android/Android.mk" &&
   # im not happy with this, but it's ok for now i guess
 
-  mkdir build/gemrb/jni/{libogg,libvorbis,libpng,openal} &&
+  mkdir -p build/gemrb/jni/{libogg,libvorbis,libpng,openal} &&
   cp "$ENVROOT/OGG_Android.mk" "$ENVROOT/build/gemrb/jni/libogg/Android.mk" &&
   cp "$ENVROOT/VORBIS_Android.mk" "$ENVROOT/build/gemrb/jni/libvorbis/Android.mk" &&
   cp "$ENVROOT/OPENAL_Android.mk" "$ENVROOT/build/gemrb/jni/openal/Android.mk" &&
@@ -92,26 +120,26 @@ function move_libraries {
   echo -en "Copying prebuilt libraries and linking header directories...\n" &&
 
   # libogg
-  cp "$ENVROOT/libogg-vorbis-android/libs/armeabi/libogg.so" "$ENVROOT/build/gemrb/jni/libogg/" &&
-  ln -s "$ENVROOT/libogg-vorbis-android/jni/include/" "$ENVROOT/build/gemrb/jni/libogg/include" &&
+  cp "$ENVROOT/libogg-vorbis-android/main/libs/armeabi/libogg.so" "$ENVROOT/build/gemrb/jni/libogg/" &&
+  ln -sf "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libogg/include" &&
 
   # vorbis
-  cp "$ENVROOT/libogg-vorbis-android/libs/armeabi/libvorbis.so" "$ENVROOT/build/gemrb/jni/libvorbis/" &&
-  ln -s "$ENVROOT/libogg-vorbis-android/jni/include/" "$ENVROOT/build/gemrb/jni/libvorbis/include" &&
+  cp "$ENVROOT/libogg-vorbis-android/main/libs/armeabi/libvorbis.so" "$ENVROOT/build/gemrb/jni/libvorbis/" &&
+  ln -sf "$ENVROOT/libogg-vorbis-android/main/jni/include/" "$ENVROOT/build/gemrb/jni/libvorbis/include" &&
   # those two are a little bit messy, because they both need their include directory
   # this is because they can't both be defined as prebuilt libraries in the same makefile and directory,
   # because that messes with makefile variables for some reason
 
   # png
   cp "$ENVROOT/libpng-android/obj/local/armeabi/libpng.a" "$ENVROOT/build/gemrb/jni/libpng/" &&
-  ln -s "$ENVROOT/libpng-android/jni/" "$ENVROOT/build/gemrb/jni/libpng/include" &&
+  ln -sf "$ENVROOT/libpng-android/jni/" "$ENVROOT/build/gemrb/jni/libpng/include" &&
 
   # openal
   cp "$ENVROOT/openal/android/libs/armeabi/libopenal.so" "$ENVROOT/build/gemrb/jni/openal/" &&
-  ln -s "$ENVROOT/openal/include" "$ENVROOT/build/gemrb/jni/openal/include" &&
+  ln -sf "$ENVROOT/openal/include" "$ENVROOT/build/gemrb/jni/openal/include" &&
 
   # python
-  wget http://sourceforge.net/projects/gemrb/files/Other%20Binaries/android/libpython-2.6.2-pelya.tar.bz2 -O "$ENVROOT/libpython.tar" &&
+  wget -nc http://sourceforge.net/projects/gemrb/files/Other%20Binaries/android/libpython-2.6.2-pelya.tar.bz2 -O "$ENVROOT/libpython.tar" &&
   tar -xf "$ENVROOT/libpython.tar" -C "$ENVROOT/build/gemrb/jni/" &&
 
   echo -en "Done.\n"

@@ -42,7 +42,43 @@
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 
+#include <algorithm>
+#include <iterator>
+#include <vector>
+
 namespace GemRB {
+
+struct HealingResource {
+	ieResRef resref;
+	Actor *caster;
+	ieWord amounthealed;
+	ieWord amount;
+	HealingResource(ieResRef ref, Actor *cha, ieWord ah, ieWord a)
+		: caster(cha), amounthealed(ah), amount(a) {
+		CopyResRef(resref, ref);
+	}
+	HealingResource() {
+		CopyResRef(resref, "");
+		amount = 0;
+		amounthealed = 0;
+		caster = NULL;
+	}
+	bool operator < (const HealingResource &str) const {
+		return (amounthealed < str.amounthealed);
+	}
+};
+
+struct Injured {
+	int hpneeded;
+	Actor *character;
+	Injured(int hps, Actor *cha)
+		: hpneeded(hps), character(cha) {
+		// already done
+	}
+	bool operator < (const Injured &str) const {
+		return (hpneeded < str.hpneeded);
+	}
+};
 
 #define MAX_MAPS_LOADED 1
 
@@ -200,6 +236,14 @@ static bool IsAlive(Actor *pc)
 		return false;
 	}
 	return true;
+}
+
+void Game::ReversePCs()
+{
+	for (unsigned int slot=0; slot<PCs.size(); slot++) {
+		PCs[slot]->InParty = PCs.size() - PCs[slot]->InParty + 1;
+	}
+	core->SetEventFlag(EF_PORTRAIT|EF_SELECTION);
 }
 
 int Game::FindPlayer(unsigned int partyID)
@@ -1176,7 +1220,7 @@ int Game::GetXPFromCR(int cr)
 	// compute the party average directly
 	int level = GetPartyLevel(true) / size;
 	if (cr >= MAX_CRLEVEL) {
-		cr = MAX_CRLEVEL+1;
+		cr = MAX_CRLEVEL;
 	} else if (cr-1 < 0) {
 		cr = 1;
 	}
@@ -1736,46 +1780,122 @@ bool Game::RestParty(int checks, int dream, int hp)
 	return cutscene;
 }
 
+// calculate an estimate of spell's healing power
+inline static int CastOnRestHealingAmount(Actor *caster, SpecialSpellType &specialSpell)
+{
+	int healing = specialSpell.amount;
+	if (specialSpell.bonus_limit > 0) {
+		// cheating a bit, but the whole function is a heuristic anyway
+		int bonusLevel = caster->GetAnyActiveCasterLevel();
+		if (bonusLevel > specialSpell.bonus_limit) bonusLevel = specialSpell.bonus_limit;
+		healing += bonusLevel; // 1 HP per level, usually corresponding to the die bonus
+	}
+	return healing;
+}
+
 // heal on rest and similar
 void Game::CastOnRest()
 {
+	typedef std::vector<HealingResource> RestSpells;
+	typedef std::vector<Injured> RestTargets;
+
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
 	int specialCount = core->GetSpecialSpellsCount();
+	if (!tmp || specialCount == -1) {
+		return;
+	}
 
-	if (tmp && specialCount != -1) {
-		int ps = GetPartySize(true);
-		int ps2 = ps;
-		std::vector<Actor *> injurees;
-		for (int idx = 1; idx <= ps; idx++) {
-			Actor *tar = FindPC(idx);
-			if (tar && tar->GetStat(IE_HITPOINTS) < tar->GetStat(IE_MAXHITPOINTS)) {
-				injurees.push_back(tar);
-			}
+	RestTargets wholeparty;
+	int ps = GetPartySize(true);
+	int ps2 = ps;
+	for (int idx = 1; idx <= ps; idx++) {
+		Actor *tar = FindPC(idx);
+		if (tar) {
+			ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
+			wholeparty.push_back(Injured(hpneeded, tar));
 		}
-		if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
-
-		SpecialSpellType *special_spells = core->GetSpecialSpells();
-		while (specialCount--) {
-			if (special_spells[specialCount].flags & SP_REST) {
-				if (injurees.empty()) injurees = PCs; // enable some nonhealing magic too
-				// check each party member for the spell
-				while (ps--) {
-					Actor *tar = GetPC(ps, true);
-					while (tar && tar->spellbook.HaveSpell(special_spells[specialCount].resref, 0)) {
-						// we have the spell, so cast it on most injured
-						// NOTE: no distinction is made about the potency of spells
-						Actor *injuree = injurees[0];
-						tar->DirectlyCastSpell(injuree, special_spells[specialCount].resref, 0, 1, true);
-						if (injuree->GetStat(IE_HITPOINTS) == injuree->GetStat(IE_MAXHITPOINTS)) {
-							if (!injurees.empty()) {
-								injurees.erase(injurees.begin());
-							}
-						}
+	}
+	// Following algorithm works thus:
+	// - If at any point there are no more injured party members, stop
+	// (amount of healing done is an estimation)
+	// - cast party members' all heal-all spells
+	// - repeat:
+	//       cast the most potent healing spell on the most injured member
+	SpecialSpellType *special_spells = core->GetSpecialSpells();
+	std::sort(wholeparty.begin(), wholeparty.end());
+	RestSpells healingspells;
+	RestSpells nonhealingspells;
+	while (specialCount--) {
+		SpecialSpellType &specialSpell = special_spells[specialCount];
+		// Cast multi-target healing spells
+		if ((specialSpell.flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
+			while (ps-- && wholeparty.back().hpneeded > 0) {
+				Actor *tar = GetPC(ps, true);
+				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0) && wholeparty.back().hpneeded > 0) {
+					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, 1, true);
+					for (RestTargets::iterator injuree=wholeparty.begin(); injuree != wholeparty.end(); ++injuree) {
+						injuree->hpneeded -= CastOnRestHealingAmount(tar, specialSpell);
 					}
 				}
-				ps = ps2;
+				std::sort(wholeparty.begin(), wholeparty.end());
 			}
+			ps = ps2;
+		// Gather rest of the spells
+		} else if (specialSpell.flags & SP_REST) {
+			while (ps--) {
+				Actor *tar = GetPC(ps, true);
+				if (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0)) {
+					HealingResource resource;
+					resource.caster = tar;
+					CopyResRef(resource.resref, specialSpell.resref);
+					resource.amount = 0;
+					resource.amounthealed = CastOnRestHealingAmount(tar, specialSpell);
+					// guess the booktype; one will definitely match due to HaveSpell above
+					int booktype = 0;
+					while (resource.amount == 0 && booktype < tar->spellbook.GetTypes()) {
+						resource.amount = tar->spellbook.CountSpells(specialSpell.resref, booktype, 0);
+						booktype++;
+					}
+					if (resource.amount == 0) continue;
+					if (resource.amounthealed > 0 ) {
+						healingspells.push_back(resource);
+					} else {
+						nonhealingspells.push_back(resource);
+					}
+				}
+			}
+			ps = ps2;
+		}
+	}
+	std::sort(wholeparty.begin(), wholeparty.end());
+	std::sort(healingspells.begin(), healingspells.end());
+	// Heal who's still injured
+	while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
+		Injured &mostInjured = wholeparty.back();
+		HealingResource &mostHealing = healingspells.back();
+		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resref, 0, 1, true);
+		mostHealing.amount--;
+		mostInjured.hpneeded -= mostHealing.amounthealed;
+		std::sort(wholeparty.begin(), wholeparty.end());
+		if (mostHealing.amount == 0) {
+			healingspells.pop_back();
+		}
+	}
+	// Other rest-time spells
+	// Everybody gets something while stocks last!
+	// In other words a better priorization of targets is needed
+	ieWord spelltarget = 0;
+	while (!nonhealingspells.empty()) {
+		HealingResource &restingSpell = nonhealingspells.back();
+		restingSpell.caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, restingSpell.resref, 0, 1, true);
+		restingSpell.amount--;
+		if (restingSpell.amount == 0) {
+			nonhealingspells.pop_back();
+		}
+		spelltarget++;
+		if (spelltarget == wholeparty.size()) {
+			spelltarget = 0;
 		}
 	}
 }
@@ -2034,6 +2154,12 @@ ieByte *Game::AllocateMazeData()
 	}
 	mazedata = (ieByte*)malloc(MAZE_DATA_SIZE);
 	return mazedata;
+}
+
+int Game::RemainingTimestop() const
+{
+	int remaining = timestop_end - GameTime;
+	return remaining > 0 ? remaining : 0;
 }
 
 bool Game::IsTimestopActive() const

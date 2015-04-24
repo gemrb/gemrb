@@ -28,6 +28,7 @@ import GUICommonWindows
 import CommonWindow
 import GUIClasses
 import CommonTables
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
 

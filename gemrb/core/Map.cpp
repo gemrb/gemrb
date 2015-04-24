@@ -89,6 +89,14 @@ static void ReleaseSpawnGroup(void *poi)
 	delete (SpawnGroup *) poi;
 }
 
+Spawn::Spawn() {
+	Creatures = NULL;
+	NextSpawn = Method = sduration = Count = Maximum = Difficulty = 0;
+	DayChance = NightChance = Enabled = Frequency = 0;
+	rwdist = owdist = appearance = 0;
+	Name[0] = 0;
+}
+
 void Map::ReleaseMemory()
 {
 	if (VisibilityMasks) {
@@ -696,7 +704,7 @@ void Map::UpdateScripts()
 	Game *game = core->GetGame();
 	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
-		game->timestop_owner = NULL;
+		game->SetTimestopOwner(NULL);
 	}
 
 	while (q--) {
@@ -2309,7 +2317,7 @@ void Map::dump(bool show_actors) const
 		i = actors.size();
 		while (i--) {
 			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
-				buffer.appendFormatted("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
+				buffer.appendFormatted("Actor: %s (%d) at %d.%d\n", actors[i]->GetName(1), actors[i]->GetGlobalID(), actors[i]->Pos.x, actors[i]->Pos.y);
 			}
 		}
 	}
@@ -3755,6 +3763,12 @@ AreaAnimation::AreaAnimation()
 	animcount=0;
 	palette=NULL;
 	covers=NULL;
+	appearance = sequence = frame = transparency = height = 0;
+	Flags = startFrameRange = skipcycle = startchance = 0;
+	unknown48 = 0;
+	Name[0] = 0;
+	BAM[0] = 0;
+	PaletteRef[0] = 0;
 }
 
 AreaAnimation::~AreaAnimation()

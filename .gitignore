@@ -2,6 +2,7 @@
 *.[oa]
 *.l[oa]
 *.so
+*~
 cmake_install.cmake
 CMakeFiles
 Makefile
@@ -39,3 +40,4 @@ xcuserdata
 /stamp-h1
 /cmake_uninstall.cmake
 /CMakeCache.txt
+/build

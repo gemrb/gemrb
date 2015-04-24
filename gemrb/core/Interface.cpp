@@ -122,7 +122,6 @@ static ieWord IDT_SKILLPENALTY = 3;
 static int MagicBit = 0;
 
 Interface::Interface()
-	: TLKEncoding()
 {
 	unsigned int i;
 	for(i=0;i<256;i++) {
@@ -229,6 +228,9 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 	TLKEncoding.encoding = "ISO-8859-1";
+	TLKEncoding.widechar = false;
+	TLKEncoding.multibyte = false;
+	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
@@ -1238,6 +1240,9 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("FogOfWar", FogOfWar = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
+	int MaxPartySize = 6;
+	CONFIG_INT("MaxPartySize", MaxPartySize = );
+	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
@@ -2672,23 +2677,6 @@ void Interface::AddWindow(Window * win)
 	win->MarkDirty();
 }
 
-/** Get a Control on a Window */
-int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID) const
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-
-	int i = 0;
-	Control* ctrl = NULL;
-	while ((ctrl = win->GetControlAtIndex(i))) {
-		if (ctrl->ControlID == ControlID)
-			return i;
-		i++;
-	}
-	return -1;
-}
 /** Adjust the Scrolling factor of a control (worldmap atm) */
 int Interface::AdjustScrolling(unsigned short WindowIndex,
 		unsigned short ControlIndex, short x, short y)

@@ -3487,20 +3487,15 @@ void GameScript::GlobalShRGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 {
-	Actor *except = NULL;
-	if (Sender->Type==ST_ACTOR) {
-		except = (Actor *) Sender;
-	}
 	Map *map = Sender->GetCurrentArea();
 	int i = map->GetActorCount(true);
 	while(i--) {
 		Actor* act = map->GetActor(i,true);
-		if (act && act!=except) {
-			if (!act->ValidTarget(GA_NO_DEAD) ) {
-				continue;
+		if (act && act != Sender && act->ValidTarget(GA_NO_DEAD)) {
+			if (!(act->GetInternalFlag() & IF_NOINT)) {
+				act->Stop();
+				act->SetModal(MS_NONE);
 			}
-			act->Stop();
-			act->SetModal(MS_NONE);
 		}
 	}
 }
@@ -3516,7 +3511,9 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 			return;
 		}
 	}
-	tar->Stop();
+	if (!(tar->GetInternalFlag() & IF_NOINT)) {
+		tar->Stop();
+	}
 }
 
 void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
@@ -3635,6 +3632,9 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetBase(IE_VISUALRANGE,parameters->int0Parameter);
+	if (actor->GetStat(IE_EA) < EA_EVILCUTOFF) {
+		actor->SetBase(IE_EXPLORE, 1);
+	}
 }
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
@@ -6036,20 +6036,9 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
 		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
 	} else {
-		//no idea about this one
-/*
-		Actor *owner;
-
-		if (Sender->Type==ST_ACTOR) {
-			owner = (Actor *) Sender;
-		} else {
-			owner = NULL;
-		}
-*/
 		//apply spell on point
 		Point d;
 		GetPositionFromScriptable(tar, d, false);
-		//core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, owner, parameters->int1Parameter);
 		core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, Sender, parameters->int1Parameter);
 	}
 }
@@ -6057,18 +6046,12 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
-	Actor *owner;
 
 	if (!ResolveSpellName( spellres, parameters) ) {
 		return;
 	}
 
-	if (Sender->Type==ST_ACTOR) {
-		owner = (Actor *) Sender;
-	} else {
-		owner = NULL;
-	}
-	core->ApplySpellPoint(spellres, Sender->GetCurrentArea(), parameters->pointParameter, owner, parameters->int1Parameter);
+	core->ApplySpellPoint(spellres, Sender->GetCurrentArea(), parameters->pointParameter, Sender, parameters->int1Parameter);
 }
 
 //this is a gemrb extension

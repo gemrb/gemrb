@@ -19,26 +19,112 @@
 #ifndef GEMMARKUP_H
 #define GEMMARKUP_H
 
-#include "GameData.h"
 #include "TextContainer.h"
+#include "System/String.h"
+
+#include <map>
+#include <stack>
 
 namespace GemRB {
 
 class GemMarkupParser {
-private:
-	const Font* ftext;
-	const Font* finit;
-	Palette* palette;
-
 public:
-	GemMarkupParser() : ftext(NULL), finit(NULL), palette(NULL) {};
-	~GemMarkupParser() {
-		gamedata->FreePalette(palette);
+	enum ParseState {
+		TEXT = 0,
+		OPEN_TAG,
+		CLOSE_TAG,
+		COLOR
 	};
 
-	void SetTextDefaults(const Font* ftext, const Font* finit, Palette* textCol);
+	GemMarkupParser();
+	GemMarkupParser(const Font* ftext, Palette* textPal = NULL,
+					const Font* finit = NULL, Palette* initPal = NULL);
+	~GemMarkupParser() {};
+
+	void ResetAttributes(const Font* ftext = NULL, Palette* textPal = NULL,
+						 const Font* finit = NULL, Palette* initPal = NULL);
+
 	TextSpan* ParseMarkupTag(const String&) const;
-	void ParseMarkupStringIntoContainer(const String&, TextContainer&) const;
+	ParseState ParseMarkupStringIntoContainer(const String&, TextContainer&);
+
+private:
+	class TextAttributes {
+		private:
+		Palette* palette;
+		Palette* swapPalette;
+
+		public:
+		const Font* TextFont;
+		const Font* SwapFont;
+
+		public:
+		TextAttributes(const Font* text, Palette* textPal = NULL,
+					   const Font* init = NULL, Palette* initPal = NULL)
+		{
+			TextFont = text;
+			SwapFont = (init) ? init : TextFont;
+			assert(TextFont);
+			if (textPal) {
+				textPal->acquire();
+			}
+			if (initPal) {
+				initPal->acquire();
+			}
+
+			palette = textPal;
+			swapPalette = initPal;
+		}
+
+		TextAttributes(const TextAttributes& ta) {
+			this->operator=(ta);
+		}
+
+		TextAttributes& operator=(const TextAttributes& ta) {
+			TextFont = ta.TextFont;
+			SwapFont = ta.SwapFont;
+			palette = ta.palette;
+			swapPalette = ta.swapPalette;
+			if (palette)
+				palette->acquire();
+			if (swapPalette)
+				swapPalette->acquire();
+			return *this;
+		}
+
+		~TextAttributes() {
+			if (palette)
+				palette->release();
+			if (swapPalette)
+				swapPalette->release();
+		}
+
+		void SwapFonts() {
+			std::swap(TextFont, SwapFont);
+			std::swap(palette, swapPalette);
+		}
+
+		void SetTextPalette(Palette* pal) {
+			if (pal) pal->acquire();
+			if (palette) palette->release();
+			palette = pal;
+		}
+
+		Palette* TextPalette() const {
+			if (palette) {
+				return palette;
+			}
+			Palette* pal = TextFont->GetPalette();
+			pal->release();
+			return pal;
+		}
+	};
+
+	static Palette* GetSharedPalette(const String& colorString);
+
+	typedef std::map<String, Holder<Palette> > PaletteCache;
+	static PaletteCache PalCache;
+	std::stack<TextAttributes> context;
+	ParseState state;
 };
 
 }

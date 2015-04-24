@@ -165,6 +165,8 @@ public:
 	: strref(mn.strref), color(mn.color), Pos(mn.Pos) {
 		if (mn.text) {
 			text = new String(*mn.text);
+		} else {
+			text = NULL;
 		}
 	}
 	MapNote(String* text, ieWord color)
@@ -205,7 +207,7 @@ public:
 	ieWord DayChance;
 	ieWord NightChance;
 	ieDword NextSpawn;
-	Spawn() { Creatures=NULL; NextSpawn = 0; }
+	Spawn();
 	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }
 };
@@ -225,6 +227,7 @@ public:
 	SpawnGroup(unsigned int size) {
 		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
 		Count = size;
+		Level = 0;
 	}
 	~SpawnGroup() {
 		if (ResRefs) {

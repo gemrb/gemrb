@@ -22,6 +22,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 from ie_restype import RES_2DA
 
@@ -97,12 +98,12 @@ def UpdateControlStatus():
 
 	else:
 		TMessageWindow = GemRB.LoadWindow(4)
-		TMessageTA = TMessageWindow.GetControl(3)		
-		ExpandButton = TMessageWindow.GetControl(2)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 		# replace the up/down buttons with a scrollbar
 		TMessageWindow.DeleteControl(0);
 		TMessageWindow.DeleteControl(1);
+		TMessageTA = TMessageWindow.GetControl(3)		
+		ExpandButton = TMessageWindow.GetControl(2)
+		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 		ScrollBar = TMessageWindow.CreateScrollBar (1000, 467,10, 11,29)
 		ScrollBar.SetDefaultScrollBar()
 

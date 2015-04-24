@@ -152,12 +152,12 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadWord( &s->CastingFeatureOffset );
 	str->ReadWord( &s->CastingFeatureCount );
 
-	memset( s->unknown13, 0, 8 );
+	memset( s->unknown13, 0, 14 );
 	if (version == 20) {
 		//these fields are used in simplified duration
-		str->ReadDword( &s->TimePerLevel );
-		str->ReadDword( &s->TimeConstant );
-		str->Read( s->unknown13, 8 );
+		str->Read( &s->TimePerLevel, 1);
+		str->Read( &s->TimeConstant, 1 );
+		str->Read( s->unknown13, 14 );
 		//moving some bits, because bg2 uses them differently
 		//the low byte is unused, so we can keep the iwd2 bits there
 		s->Flags|=(s->Flags>>8)&0xc0;
@@ -166,8 +166,8 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		//in case of old format, use some unused fields for gemrb's simplified duration
 		//to simulate IWD2's useful feature (this is needed for some pst projectiles)
 		if (s->Flags&SF_SIMPLIFIED_DURATION) {
-			s->TimePerLevel = s->unknown2;
-			s->TimeConstant = s->unknown3;
+			s->TimePerLevel = s->unknown2 & 255;
+			s->TimeConstant = s->unknown3 & 255;
 		} else {
 			s->TimePerLevel = 0;
 			s->TimeConstant = 0;

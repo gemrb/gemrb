@@ -21,6 +21,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 MessageWindow = 0
@@ -79,6 +80,8 @@ def UpdateControlStatus():
 	else:
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 		TMessageWindow = GemRB.LoadWindow(0)
+		# cheat code editbox; only causes redraw issues if you click on the lower left
+		TMessageWindow.DeleteControl (3)
 		TMessageTA = TMessageWindow.GetControl (1)
 		GUICommonWindows.SetupMenuWindowControls (TMessageWindow, 1, None)
 

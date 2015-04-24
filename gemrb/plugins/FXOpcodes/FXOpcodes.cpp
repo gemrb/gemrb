@@ -89,13 +89,11 @@ using namespace GemRB;
 static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
 static ieResRef *spell_hits = NULL;
-static ieDword enhanced_effects = 0;
 static int shcount = -1;
 static int *spell_abilities = NULL;
 static ieDword splabcount = 0;
 static int *polymorph_stats = NULL;
 static int polystatcount = 0;
-static ieDword pstflags = false;
 
 //the original engine stores the colors in sprklclr.2da in a different order
 
@@ -843,8 +841,6 @@ static void Cleanup()
 static void RegisterCoreOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
-	enhanced_effects=core->HasFeature(GF_ENHANCED_EFFECTS);
-	pstflags=core->HasFeature(GF_PST_STATE_FLAGS);
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
 }
 
@@ -1619,7 +1615,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
 	case 0:
-		if (pstflags) {
+		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 			STATE_SET( STATE_PST_INVIS );
 		} else {
 			STATE_SET( STATE_INVISIBLE );
@@ -1716,7 +1712,7 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		STATE_SET( STATE_PANIC );
 	}
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_PANIC);
 	}
 	return FX_PERMANENT;
@@ -2180,7 +2176,7 @@ int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cure_invisible_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (!STATE_GET(STATE_NONDET)) {
-		if (pstflags) {
+		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 			BASE_STATE_CURE( STATE_PST_INVIS );
 		} else {
 			BASE_STATE_CURE( STATE_INVISIBLE | STATE_INVIS2 );
@@ -2494,7 +2490,7 @@ int fx_set_blur_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET( STATE_BLUR );
 	}
 	//iwd2 specific
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLUR);
 	}
 	return FX_PERMANENT;
@@ -2729,7 +2725,7 @@ int fx_set_feebleminded_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_set_feebleminded_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	STATE_SET( STATE_FEEBLE );
 	STAT_SET( IE_INT, 3);
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_FEEBLEMIND);
 	}
 	//This state is better off with always stored, because of the portrait icon and the int stat
@@ -2864,7 +2860,7 @@ int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
 
 	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_DEAFNESS);
 	}
 	return FX_APPLIED;
@@ -3205,8 +3201,6 @@ int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_experience_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_experience_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	//FIXME: this has mode too
-	//target->AddExperience (fx->Parameter1);
 	STAT_MOD( IE_XP );
 	return FX_NOT_APPLIED;
 }
@@ -3768,7 +3762,7 @@ int fx_set_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//for permanent confusion
 	//the portrait icon cannot be made common because rigid thinking uses a different icon
 	//in bg2/how
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_CONFUSED);
 	}
 	return FX_PERMANENT;
@@ -3799,7 +3793,7 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//bless effect too?
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_AID);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 50, 50, 50);
 	}
@@ -3822,7 +3816,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	STAT_ADD( IE_MORALEBREAK, fx->Parameter1);
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLESS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xc0, 0x80, 0);
 	}
@@ -3854,7 +3848,7 @@ int fx_set_holy_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_STR, fx->Parameter1);
 	STAT_ADD( IE_CON, fx->Parameter1);
 	STAT_ADD( IE_DEX, fx->Parameter1);
-	if (enhanced_effects) {
+	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_HOLY);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x80, 0x80);
 	}
@@ -3992,7 +3986,7 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_force_visible(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	if (pstflags) {
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 		BASE_STATE_CURE(STATE_PST_INVIS);
 	} else {
 		BASE_STATE_CURE(STATE_INVISIBLE);
@@ -4465,7 +4459,7 @@ int fx_set_sanctuary_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET_PCF( IE_SANCTUARY, fx->Parameter2);
 	//a rare event, but this effect gives more in bg2 than in iwd2
 	//so we use this flag
-	if (!enhanced_effects) {
+	if (!core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->SetLockedPalette(fullwhite);
 	}
 	return FX_APPLIED;
@@ -4554,7 +4548,7 @@ int fx_mirror_image_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
-	if (pstflags) {
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 		STATE_SET( STATE_PST_MIRROR );
 	}
 	else {

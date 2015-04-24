@@ -146,9 +146,9 @@ public:
 	ieWord CastingFeatureCount;
 
 	// IWD2 only
-	ieDword TimePerLevel;
-	ieDword TimeConstant;
-	char unknown13[8];
+	ieByte TimePerLevel;
+	ieByte TimeConstant;
+	char unknown13[14];
 	//derived values
 	int CastingSound;
 

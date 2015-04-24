@@ -57,14 +57,16 @@ static const TriggerLink triggernames[] = {
 	{"areaflag", GameScript::AreaFlag, 0},
 	{"arearestdisabled", GameScript::AreaRestDisabled, 0},
 	{"areatype", GameScript::AreaType, 0},
-	{"atlocation", GameScript::AtLocation, 0},
 	{"assaltedby", GameScript::AttackedBy, 0},//pst
+	{"assign", GameScript::Assign, 0},
+	{"atlocation", GameScript::AtLocation, 0},
 	{"attackedby", GameScript::AttackedBy, 0},
 	{"becamevisible", GameScript::BecameVisible, 0},
 	{"beeninparty", GameScript::BeenInParty, 0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
+	{"bouncingspelllevel", GameScript::BouncingSpellLevel, 0},
 	{"breakingpoint", GameScript::BreakingPoint, 0},
 	{"calanderday", GameScript::CalendarDay, 0}, //illiterate developers O_o
 	{"calendarday", GameScript::CalendarDay, 0},
@@ -114,6 +116,7 @@ static const TriggerLink triggernames[] = {
 	{"difficultylt", GameScript::DifficultyLT, 0},
 	{"disarmed", GameScript::Disarmed, 0},
 	{"disarmfailed", GameScript::DisarmFailed, 0},
+	{"e", GameScript::E, 0},
 	{"entered", GameScript::Entered, 0},
 	{"entirepartyonmap", GameScript::EntirePartyOnMap, 0},
 	{"exists", GameScript::Exists, 0},
@@ -121,6 +124,7 @@ static const TriggerLink triggernames[] = {
 	{"extraproficiency", GameScript::ExtraProficiency, 0},
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT, 0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT, 0},
+	{"eval", GameScript::Eval, 0},
 	{"faction", GameScript::Faction, 0},
 	{"failedtoopen", GameScript::OpenFailed, 0},
 	{"fallenpaladin", GameScript::FallenPaladin, 0},
@@ -152,6 +156,7 @@ static const TriggerLink triggernames[] = {
 	{"globaltimerexpired", GameScript::GlobalTimerExpired, 0},
 	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired, 0},
 	{"globaltimerstarted", GameScript::GlobalTimerStarted, 0},
+	{"gt", GameScript::GT, 0},
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
@@ -193,6 +198,7 @@ static const TriggerLink triggernames[] = {
 	{"hppercentlt", GameScript::HPPercentLT, 0},
 	{"ifvalidforpartydialog", GameScript::IsValidForPartyDialog, 0},
 	{"ifvalidforpartydialogue", GameScript::IsValidForPartyDialog, 0},
+	{"immunetospelllevel", GameScript::ImmuneToSpellLevel, 0},
 	{"inactivearea", GameScript::InActiveArea, 0},
 	{"incutscenemode", GameScript::InCutSceneMode, 0},
 	{"inline", GameScript::InLine, 0},
@@ -256,20 +262,28 @@ static const TriggerLink triggernames[] = {
 	{"localsgt", GameScript::LocalsGT, 0},
 	{"localslt", GameScript::LocalsLT, 0},
 	{"los", GameScript::LOS, 0},
+	{"lt", GameScript::LT, 0},
 	{"modalstate", GameScript::ModalState, 0},
 	{"morale", GameScript::Morale, 0},
 	{"moralegt", GameScript::MoraleGT, 0},
 	{"moralelt", GameScript::MoraleLT, 0},
+	{"movementrate", GameScript::MovementRate, 0},
+	{"movementrategt", GameScript::MovementRateGT, 0},
+	{"movementratelt", GameScript::MovementRateLT, 0},
 	{"name", GameScript::CalledByName, 0}, //this is the same too?
 	{"namelessbitthedust", GameScript::NamelessBitTheDust, 0},
 	{"nearbydialog", GameScript::NearbyDialog, 0},
 	{"nearbydialogue", GameScript::NearbyDialog, 0},
 	{"nearlocation", GameScript::NearLocation, 0},
 	{"nearsavedlocation", GameScript::NearSavedLocation, 0},
+	{"nexttriggerobject", GameScript::NextTriggerObject, 0},
 	{"nightmaremodeon", GameScript::NightmareModeOn, 0},
 	{"notstatecheck", GameScript::NotStateCheck, 0},
 	{"nulldialog", GameScript::NullDialog, 0},
 	{"nulldialogue", GameScript::NullDialog, 0},
+	{"numbouncingspelllevel", GameScript::NumBouncingSpellLevel, 0},
+	{"numbouncingspelllevelgt", GameScript::NumBouncingSpellLevelGT, 0},
+	{"numbouncingspelllevellt", GameScript::NumBouncingSpellLevelLT, 0},
 	{"numcreature", GameScript::NumCreatures, 0},
 	{"numcreaturegt", GameScript::NumCreaturesGT, 0},
 	{"numcreaturelt", GameScript::NumCreaturesLT, 0},
@@ -282,6 +296,9 @@ static const TriggerLink triggernames[] = {
 	{"numdead", GameScript::NumDead, 0},
 	{"numdeadgt", GameScript::NumDeadGT, 0},
 	{"numdeadlt", GameScript::NumDeadLT, 0},
+	{"numimmunetospelllevel", GameScript::NumImmuneToSpellLevel, 0},
+	{"numimmunetospelllevelgt", GameScript::NumImmuneToSpellLevelGT, 0},
+	{"numimmunetospelllevellt", GameScript::NumImmuneToSpellLevelLT, 0},
 	{"numinparty", GameScript::PartyCountEQ, 0},
 	{"numinpartyalive", GameScript::PartyCountAliveEQ, 0},
 	{"numinpartyalivegt", GameScript::PartyCountAliveGT, 0},
@@ -294,6 +311,9 @@ static const TriggerLink triggernames[] = {
 	{"numitemsparty", GameScript::NumItemsParty, 0},
 	{"numitemspartygt", GameScript::NumItemsPartyGT, 0},
 	{"numitemspartylt", GameScript::NumItemsPartyLT, 0},
+	{"nummirrorimages", GameScript::NumMirrorImages, 0},
+	{"nummirrorimagesgt", GameScript::NumMirrorImagesGT, 0},
+	{"nummirrorimageslt", GameScript::NumMirrorImagesLT, 0},
 	{"numtimesinteracted", GameScript::NumTimesInteracted, 0},
 	{"numtimesinteractedgt", GameScript::NumTimesInteractedGT, 0},
 	{"numtimesinteractedlt", GameScript::NumTimesInteractedLT, 0},
@@ -303,6 +323,9 @@ static const TriggerLink triggernames[] = {
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo, 0},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT, 0},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT, 0},
+	{"numtrappingspelllevel", GameScript::NumTrappingSpellLevel, 0},
+	{"numtrappingspelllevelgt", GameScript::NumTrappingSpellLevelGT, 0},
+	{"numtrappingspelllevellt", GameScript::NumTrappingSpellLevelLT, 0},
 	{"objectactionlistempty", GameScript::ObjectActionListEmpty, 0}, //same function
 	{"objitemcounteq", GameScript::NumItems, 0},
 	{"objitemcountgt", GameScript::NumItemsGT, 0},
@@ -314,6 +337,7 @@ static const TriggerLink triggernames[] = {
 	{"openfailed", GameScript::OpenFailed, 0},
 	{"openstate", GameScript::OpenState, 0},
 	{"or", GameScript::Or, 0},
+	{"originalclass", GameScript::OriginalClass, 0},
 	{"outofammo", GameScript::OutOfAmmo, 0},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage, 0},
 	{"partycounteq", GameScript::PartyCountEQ, 0},
@@ -384,6 +408,10 @@ static const TriggerLink triggernames[] = {
 	{"timeofday", GameScript::TimeOfDay, 0},
 	{"timeractive", GameScript::TimerActive, 0},
 	{"timerexpired", GameScript::TimerExpired, 0},
+	{"timestopcounter", GameScript::TimeStopCounter, 0},
+	{"timestopcountergt", GameScript::TimeStopCounterGT, 0},
+	{"timestopcounterlt", GameScript::TimeStopCounterLT, 0},
+	{"timestopobject", GameScript::TimeStopObject, 0},
 	{"tookdamage", GameScript::TookDamage, 0},
 	{"totalitemcnt", GameScript::TotalItemCnt, 0}, //iwd2
 	{"totalitemcntexclude", GameScript::TotalItemCntExclude, 0}, //iwd2
@@ -1055,6 +1083,10 @@ static const ObjectLink objectnames[] = {
 	{"player7fill", GameScript::Player7Fill},
 	{"player8", GameScript::Player8},
 	{"player8fill", GameScript::Player8Fill},
+	{"player9", GameScript::Player9},
+	{"player9fill", GameScript::Player9Fill},
+	{"player10", GameScript::Player10},
+	{"player10fill", GameScript::Player10Fill},
 	{"protectedby", GameScript::ProtectedBy},
 	{"protectorof", GameScript::ProtectorOf},
 	{"protagonist", GameScript::Protagonist},
@@ -1865,6 +1897,11 @@ static Object* DecodeObject(const char* line)
 	if (*line == '"')
 		line++; //Skip "
 	ParseString( line, oB->objectName );
+	// HACK for iwd2 AddExperiencePartyCR
+	if (!stricmp(oB->objectName, "0.0.0.0 ")) {
+		strlcpy(oB->objectName, "", sizeof(oB->objectName));
+		Log(DEBUG, "asda", "overriding: +%s+", oB->objectName);
+	}
 	if (*line == '"')
 		line++; //Skip " (the same as above)
 	//this seems to be needed too

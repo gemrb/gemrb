@@ -187,17 +187,22 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
 
-					if (subLen != String::npos || (lineSegment.x + lineSegment.w == lineRgn.w && numPrinted + numOnLine < text.length())) {
+					bool noFit = !metrics.forceBreak && numOnLine == 0;
+					bool lineFilled = lineSegment.x + lineSegment.w == lineRgn.w;
+					bool moreChars = numPrinted + numOnLine < text.length();
+					if (subLen != String::npos || noFit || (lineFilled && moreChars)) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
 						newline = true;
 						lineSegment.w = LINE_REMAINDER;
 					} else {
+						assert(printSize.w);
 						lineSegment.w = printSize.w;
 					}
 				}
 				numPrinted += numOnLine;
 			}
+			assert(!lineSegment.Dimensions().IsEmpty());
 			lineExclusions.push_back(lineSegment);
 
 		newline:
@@ -206,10 +211,6 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
-				if (layoutPoint.y != 0) {
-					// if we arent the first line, then collapse with the above line
-					lineLayout.y--;
-				}
 				layoutRegions.push_back(lineLayout);
 				lineExclusions.clear();
 			}
@@ -226,10 +227,6 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
 		assert(drawRegion.h && drawRegion.w);
-		if (layoutPoint.y != 0) {
-			// if we arent the first line, then collapse with the above line
-			drawRegion.y--;
-		}
 		layoutRegions.push_back(drawRegion);
 	}
 	return layoutRegions;
@@ -308,7 +305,10 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 
 void ContentContainer::AppendContent(Content* content)
 {
-	InsertContentAfter(content, *(--contents.end()));
+	if (contents.empty())
+		InsertContentAfter(content, 0);
+	else
+		InsertContentAfter(content, *(--contents.end()));
 }
 
 void ContentContainer::InsertContentAfter(Content* newContent, const Content* existing)
@@ -484,11 +484,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			}
 			if (excluded) {
 				// we know that we have to move at least to the right
-				layoutPoint.x = excluded->x + excluded->w + 1;
+				layoutPoint.x = excluded->x + excluded->w;
 				if (frame.w > 0 && layoutPoint.x >= layoutFrame.w) {
 					layoutPoint.x = 0;
 					assert(excluded->y + excluded->h >= layoutPoint.y);
-					layoutPoint.y = excluded->y + excluded->h + 1;
+					layoutPoint.y = excluded->y + excluded->h;
 				}
 			}
 			exContent = ContentAtPoint(layoutPoint);

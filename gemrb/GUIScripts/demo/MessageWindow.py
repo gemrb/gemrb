@@ -4,6 +4,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 MessageWindow = 0
@@ -48,7 +49,9 @@ def OnLoad():
 
 	# set up some *initial* text (UpdateControlStatus will get called several times)
 	TMessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	TMessageTA.SetText ("DEMO "*30 + "\n" + Tests.RunTests ())
+	results = Tests.RunTests ()
+	TMessageTA.SetText ("[cap]D[/cap]emo " + "DEMO "*40 + "\n" + results)
+	print results
 
 def UpdateControlStatus():
 	global MessageWindow, TMessageTA

@@ -181,6 +181,16 @@ Control* Window::GetControlAtPoint(const Point& p, bool ignore)
 	return NULL;
 }
 
+int Window::GetControlIndex(ieDword id) const
+{
+	for (std::vector<Control*>::const_iterator m = Controls.begin(); m != Controls.end(); ++m) {
+		if ((*m)->ControlID == id) {
+			return m - Controls.begin();
+		}
+	}
+	return -1;
+}
+
 bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
 {
 	size_t i = Controls.size();

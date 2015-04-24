@@ -28,6 +28,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIWORLD
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 MessageWindow = 0

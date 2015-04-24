@@ -69,7 +69,7 @@ private:
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
 	/** Array of initializer functions */
-	std::vector<void (*)(void)> intializerFunctions;
+	std::vector<void (*)(void)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
 	typedef std::map<const char*, PluginFunc, iless> driver_map;

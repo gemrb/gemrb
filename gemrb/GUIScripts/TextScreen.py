@@ -164,6 +164,9 @@ def EndTextScreen ():
 def ReplayTextScreen ():
 	global TextArea, TableName, Row
 
+	# stop any current speech, flag of 5 = GEM_SND_RELATIVE|GEM_SND_SPEECH
+	GemRB.PlaySound(None, 0, 0, 5)
+
 	Table = GemRB.LoadTable (TableName)
 	Count = Table.GetColumnCount (Row)
 
@@ -175,8 +178,8 @@ def ReplayTextScreen ():
 	text = ""
 	for i in range(1, Count):
 		# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
-		text += "\n" + GemRB.GetString(Table.GetValue (Row, i), 14)
-		
+		text += "\n\n" + GemRB.GetString(Table.GetValue (Row, i), 14)
+
 	TextArea.ChapterText (text)
 
 	return

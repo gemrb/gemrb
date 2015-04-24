@@ -801,7 +801,10 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					overDoor->DetectTrap(256, lastActorID);
 				}
 				break;
-			// e, f
+			case 'e':// reverses pc order (useful for parties bigger than 6)
+				game->ReversePCs();
+				break;
+			// f
 			case 'g'://shows loaded areas and other game information
 				game->dump();
 				break;
@@ -2390,7 +2393,7 @@ void GameControl::DisplayString(Scriptable* target)
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
 	if (tmp && !target->GetOverheadText().empty()) {
 		// pass NULL target so pst does not display multiple
-		displaymsg->DisplayMarkupString(target->GetOverheadText());
+		displaymsg->DisplayString(target->GetOverheadText());
 	}
 }
 

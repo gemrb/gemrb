@@ -538,7 +538,7 @@ public:
 	/* returns a remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int index) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count) const;
+	void VerbalConstant(int start, int count, bool force=false) const;
 	/* display string or verbal constant depending on what is available */
 	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const;
 	/* inlined dialogue response */
@@ -886,6 +886,7 @@ public:
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
+	bool WasClass(ieDword oldClassID) const;
 };
 }
 

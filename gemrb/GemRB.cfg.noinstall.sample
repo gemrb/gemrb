@@ -130,6 +130,11 @@ TooltipDelay=500
 # Enable all gui enhancements ? [Integer]
 GUIEnhancements = 15
 
+# Enable bigger parties (up to 10) or force smaller ones [Integer]
+# NOTE: You need to choose a big enough resolution, so
+#   there will be enough room for all the party portraits.
+#   THE GAME WILL CRASH OTHERWISE!
+#MaxPartySize = 6
 
 #####################################################
 #  Debug                                            #

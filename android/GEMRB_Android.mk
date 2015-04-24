@@ -147,6 +147,8 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/Dialog.cpp \
 		    main/gemrb/core/Calendar.cpp \
 		    main/gemrb/core/DialogHandler.cpp \
+		    main/gemrb/core/RNG/RNG_SFMT.cpp \
+		    main/gemrb/core/RNG/sfmt/SFMT.c \
 		    main/gemrb/core/System/Logger.cpp \
 		    main/gemrb/core/System/Logger/MessageWindowLogger.cpp \
 		    main/gemrb/core/System/Logger/File.cpp \
@@ -163,7 +165,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/ResourceDesc.cpp \
 		    main/gemrb/core/Item.cpp \
 		    main/gemrb/core/SaveGameIterator.cpp \
-		    main/gemrb/core/Callback.cpp \
 		    main/gemrb/core/ArchiveImporter.cpp \
 		    main/gemrb/core/StringMgr.cpp \
 		    main/gemrb/core/ControlAnimation.cpp \
@@ -208,9 +209,9 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/GUI/Button.cpp \
 		    main/gemrb/core/GUI/GameControl.cpp \
 		    main/gemrb/core/GUI/TextArea.cpp \
-		    main/gemrb/core/TextSystem/Font.cpp \
-		    main/gemrb/core/TextSystem/GemMarkup.cpp \
-		    main/gemrb/core/TextSystem/TextContainer.cpp \
+		    main/gemrb/core/GUI/TextSystem/Font.cpp \
+		    main/gemrb/core/GUI/TextSystem/GemMarkup.cpp \
+		    main/gemrb/core/GUI/TextSystem/TextContainer.cpp \
 		    main/gemrb/core/GUI/View.cpp \
 		    main/gemrb/core/GUI/EventMgr.cpp \
 		    main/gemrb/core/GUI/Progressbar.cpp \
@@ -245,7 +246,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 LOCAL_SHARED_LIBRARIES := SDL2 openal ogg vorbis python
 LOCAL_STATIC_LIBRARIES := freetype2-static png gnustl_static
 
-LOCAL_CPPFLAGS += -fexceptions -finline-functions -O0 -DSTATIC_LINK=Yes -DHAVE_SNPRINTF
+LOCAL_CPPFLAGS += -fexceptions -finline-functions -O0 -DSTATIC_LINK=Yes -DHAVE_SNPRINTF -DHAVE_UNISTD_H
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog -lz -ldl
 # LOCAL_LDLIBS += -L$(LOCAL_PATH)/../../../gemrb/obj/local/armeabi/ -logg -lvorbis -lSDL_mixer -lpython2.7 -l freetype2-static -lpng -lgnustl_static

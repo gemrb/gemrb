@@ -24,6 +24,7 @@
 
 import GemRB
 import LoadScreen
+from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 LoadWindow = 0

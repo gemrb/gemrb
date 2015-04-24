@@ -32,6 +32,7 @@ using namespace GemRB;
 STOImporter::STOImporter(void)
 {
 	str = NULL;
+	version = 0;
 }
 
 STOImporter::~STOImporter(void)

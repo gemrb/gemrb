@@ -37,6 +37,11 @@
 
 namespace GemRB {
 
+//translate section values (journal, quests, solved, user)
+static const int *sectionMap;
+static const int bg2Sections[4] = {4,1,2,0};
+static const int noSections[4] = {0,0,0,0};
+
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
@@ -45,6 +50,11 @@ DialogHandler::DialogHandler(void)
 	originalTargetID = 0;
 	speakerID = 0;
 	initialState = -1;
+	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+		sectionMap = bg2Sections;
+	} else {
+		sectionMap = noSections;
+	}
 }
 
 DialogHandler::~DialogHandler(void)
@@ -57,17 +67,14 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
 
 	int Section = 0;
-	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
-		Section = 4;
-		if (tr->Flags&IE_DLG_UNSOLVED) {
-			Section |= 1; // quests
-		}
-		if (tr->Flags&IE_DLG_SOLVED) {
-			Section |= 2; // completed
-		}
+	if (tr->Flags&IE_DLG_UNSOLVED) {
+		Section |= 1; // quests
+	}
+	if (tr->Flags&IE_DLG_SOLVED) {
+		Section |= 2; // completed
 	}
 
-	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
+	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 		String msg(L"\n[color=bcefbc]");
 		String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
 		msg += *str;
@@ -99,7 +106,13 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "DialogHandler", "Cannot start dialog: %s", dlgref);
+		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dlgref, spk->GetName(1), tgt->GetName(1));
+		// display the greeting VB instead
+		if (tgt->Type == ST_ACTOR) {
+			Actor *tar = (Actor *) tgt;
+			//tar->DialogInterrupt();
+			tar->VerbalConstant(VB_INITIALMEET, 1, true);
+		}
 		return false;
 	}
 
@@ -293,8 +306,9 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
-			target->AddAction( GenerateAction( "BreakInstants()" ) );
 			target->AddAction( GenerateAction( "SetInterrupt(FALSE)" ) );
+			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
+			target->AddAction( GenerateAction( "BreakInstants()" ) );
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				target->AddAction(tr->actions[i]);
 			}
@@ -420,7 +434,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	std::vector<SelectOption> dialogOptions;
 	ControlEventHandler handler = NULL;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
-	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
+	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 			if (ds->transitions[x]->condition &&
 				!ds->transitions[x]->condition->Evaluate(target)) {
@@ -450,6 +464,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 	}
 
+	std::reverse(dialogOptions.begin(), dialogOptions.end());
 	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
 	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
 	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);

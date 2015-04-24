@@ -73,7 +73,7 @@ void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const 
 
 void PluginMgr::RegisterInitializer(void (*func)(void))
 {
-	intializerFunctions.push_back(func);
+	initializerFunctions.push_back(func);
 }
 
 void PluginMgr::RegisterCleanup(void (*func)(void))
@@ -83,8 +83,8 @@ void PluginMgr::RegisterCleanup(void (*func)(void))
 
 void PluginMgr::RunInitializers() const
 {
-	for (size_t i = 0; i < intializerFunctions.size(); i++)
-		intializerFunctions[i]();
+	for (size_t i = 0; i < initializerFunctions.size(); i++)
+		initializerFunctions[i]();
 }
 
 void PluginMgr::RunCleanup() const

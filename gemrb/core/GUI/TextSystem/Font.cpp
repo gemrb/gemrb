@@ -27,7 +27,7 @@
 #include "Palette.h"
 #include "Video.h"
 
-#include <cctype>
+#include <cwctype>
 
 namespace GemRB {
 
@@ -193,7 +193,8 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 		// page is full, make a new one
 		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, LineHeight), this);
 		Atlas.push_back(CurrentAtlasPage);
-		assert(CurrentAtlasPage->AddGlyph(chr, tmp));
+		bool ok = CurrentAtlasPage->AddGlyph(chr, tmp);
+		assert(ok);
 	}
 	assert(CurrentAtlasPage);
 	const Glyph& g = CurrentAtlasPage->GlyphForChr(chr);
@@ -397,7 +398,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 	// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
 	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
 
-	// TODO: word breaks shouldprobably happen on other characters such as '-' too.
+	// TODO: word breaks should probably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of
 	bool done = false;
 	do {
@@ -411,9 +412,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 
 		StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, true};
 		int wordW = StringSize(word, &metrics).w;
-		if (metrics.forceBreak) {
+		if (dp.x == 0 && metrics.forceBreak) {
 			done = true;
 			word.resize(metrics.numChars);
+			assert(metrics.size.w <= lineRgn.w);
 		} else if (dp.x + wordW > lineRgn.w) {
 			// overflow with no wrap allowed; abort.
 			break;
@@ -439,6 +441,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 #if DEBUG_FONT
 				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 #endif
+				assert(metrics.forceBreak == false || dp.x > 0);
 				done = true;
 				break;
 			}
@@ -593,7 +596,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	for (; i < string.length(); i++) {
 		const Glyph& curGlyph = GetGlyph(string[i]);
 		eos = (i == string.length() - 1);
-		ws = std::isspace(string[i]);
+		ws = std::iswspace(string[i]);
 		if (!ws) {
 			ieWord chrW = curGlyph.size.w;
 			if (lineW > 0) { // kerning
@@ -641,12 +644,13 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 #undef WILL_WRAP
 #undef APPEND_TO_LINE
 
-	w = (w == 0 && wordW == 0) ? spaceW : w; // if the line is all whitespace
+	w += ((w == 0 && wordW == 0) || !newline) ? spaceW : 0;
 
 	if (metrics) {
+		if (forceBreak) charCount--;
+		metrics->forceBreak = forceBreak;
 		metrics->numChars = charCount;
 		metrics->size = Size(w, (LineHeight * lines));
-		metrics->forceBreak = forceBreak;
 #if DEBUG_FONT
 		assert(metrics->numChars <= string.length());
 		assert(w <= stop->w);
