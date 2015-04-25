@@ -135,16 +135,16 @@ void View::Draw()
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
+	// clip drawing to the control bounds, then restore after drawing
+	video->SetScreenClip(&intersect);
+
 	bool drawBg = (background != NULL) || !IsOpaque();
 	if (NeedsDraw()) {
-		// clip drawing to the control bounds, then restore after drawing
-		video->SetScreenClip(&drawFrame);
 		if (background) {
 			DrawBackground(NULL);
 			drawBg = false;
 		}
 		DrawSelf(drawFrame, intersect);
-		video->SetScreenClip(&clip);
 		dirty = false;
 	}
 
@@ -160,6 +160,8 @@ void View::Draw()
 		DrawTooltip(mp);
 		video->SetBufferedDrawing(true);
 	}
+	// restore the screen clip
+	video->SetScreenClip(&clip);
 }
 
 Point View::ConvertPointToSuper(const Point& p) const
