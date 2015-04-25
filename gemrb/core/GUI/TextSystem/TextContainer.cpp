@@ -461,8 +461,8 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		}
 	}
 
-	Region layoutFrame = frame;
-	Size contentBounds = layoutFrame.Dimensions();
+	Size contentBounds = Dimensions();
+	Region layoutFrame = Region(Point(), contentBounds);
 	if (resizeFlags&RESIZE_WIDTH) {
 		layoutFrame.w = SHRT_MAX;
 	}
