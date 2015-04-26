@@ -88,10 +88,11 @@ function setup_dir_struct {
   echo -en "Creating the directory structure for the project..." &&
   mkdir -p build &&
   cp -r "$ENVROOT/SDL/android-project" build/ &&
-  mv "$ENVROOT/build/android-project" "$ENVROOT/build/gemrb" &&
+  cp -r "$ENVROOT/build/android-project" "$ENVROOT/build/gemrb" &&
   echo -en "Done.\n" &&
   echo -en "Symlinking the GemRB-git path..." &&
   mkdir -p "$ENVROOT/build/gemrb/jni" &&
+  rm -fr "$ENVROOT/build/gemrb/jni/SDL" "$ENVROOT/build/gemrb/jni/src/main" &&
   ln -sf "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
   ln -sf "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
 }
@@ -105,7 +106,7 @@ function move_libraries {
   # the right one otherwise
   # the alternative would probably be to store the makefile at the root of the
   # freetype directory, but im not sure in how far that messes with library placement
-  cp -r "$ENVROOT/freetype2-android" "$ENVROOT/build/gemrb/jni/" &&
+  cp -rf "$ENVROOT/freetype2-android" "$ENVROOT/build/gemrb/jni/" &&
   cp "$ENVROOT/FREETYPEBUILD_Android.mk" "$ENVROOT/build/gemrb/jni/freetype2-android/Android/jni/Android.mk" &&
   cp "$ENVROOT/RECURSE_Android.mk" "$ENVROOT/build/gemrb/jni/freetype2-android/Android/Android.mk" &&
   cp "$ENVROOT/RECURSE_Android.mk" "$ENVROOT/build/gemrb/jni/freetype2-android/Android.mk" &&
