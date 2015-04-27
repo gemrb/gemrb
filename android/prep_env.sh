@@ -140,8 +140,11 @@ function move_libraries {
   ln -sf "$ENVROOT/openal/include" "$ENVROOT/build/gemrb/jni/openal/include" &&
 
   # python
-  wget -nc http://sourceforge.net/projects/gemrb/files/Other%20Binaries/android/libpython-2.6.2-pelya.tar.bz2 -O "$ENVROOT/libpython.tar" &&
-  tar -xf "$ENVROOT/libpython.tar" -C "$ENVROOT/build/gemrb/jni/" &&
+  libpython="libpython-py4a.tar.bz2"
+  if [[ ! -f $libpython ]]; then
+    wget "http://sourceforge.net/projects/gemrb/files/Other%20Binaries/android/$libpython" -P "$ENVROOT"
+  fi &&
+  tar -xf "$ENVROOT/$libpython" -C "$ENVROOT/build/gemrb/jni/" &&
 
   echo -en "Done.\n"
 }
