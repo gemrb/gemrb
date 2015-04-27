@@ -4,8 +4,8 @@
 #       get rid of everything pelya if possible
 #       figure out, what exactly openal needs
 
-ENVROOT=$PWD
 GEMRB_GIT_PATH=$1
+ENVROOT=${2:-$1/android}
 GEMRB_VERSION=""
 
 function get_sources {
@@ -76,6 +76,7 @@ function build_deps {
 function setup_dir_struct {
   echo -en "Checking out SDL2...\n"
   # get SDL2
+  pushd "$ENVROOT" &&
   if [[ -d SDL ]]; then
     cd SDL
     hg update; rc=$?
@@ -239,12 +240,14 @@ function move_and_edit_projectfiles {
 }
 
 function finished {
+  popd # back from $ENVROOT
+  local build_path=${ENVROOT##$PWD/}
   echo -en "That should be it, provided all the commands ran succesfully.\n\n" # TODO: Error checking beyond $1
   echo -en "To build:\n"
-  echo -en "  cd build/gemrb\n"
+  echo -en "  cd $build_path/build/gemrb\n"
   echo -en "  ndk-build && ant debug\n\n"
   echo -en "alternatively, for ndk-gdb debuggable builds: \n"
-  echo -en "  cd build/gemrb\n"
+  echo -en "  cd $build_path/build/gemrb\n"
   echo -en "  ndk-build NDK_DEBUG=1 && ant debug\n\n"
   echo -en "The finished apk will be $ENVROOT/build/gemrb/bin/SDLActivity-debug.apk\n\n"
 }
@@ -255,7 +258,7 @@ if [ -z "$1" ]
 then
   echo -en "Error: No argument supplied.\n
 Usage:
-  $0 /absolute/path/to/gemrb/git\n"
+  $0 /absolute/path/to/gemrb/git (optional path to build dir)\n"
   exit 1
 fi
 
