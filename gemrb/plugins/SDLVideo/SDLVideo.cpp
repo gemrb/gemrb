@@ -1261,14 +1261,9 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 
 void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
 {
-	if (!poly->count) {
+	if (!poly->count || !poly->BBox.IntersectsRegion(Viewport)) {
 		return;
 	}
-
-	if (poly->BBox.x > Viewport.x + Viewport.w) return;
-	if (poly->BBox.y > Viewport.y + Viewport.h) return;
-	if (poly->BBox.x + poly->BBox.w < Viewport.x) return;
-	if (poly->BBox.y + poly->BBox.h < Viewport.y) return;
 
 	if (fill) {
 		Uint32 alphacol32 = SDL_MapRGBA(currentBuf->format, color.r/2, color.g/2, color.b/2, 0);

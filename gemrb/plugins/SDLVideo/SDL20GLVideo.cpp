@@ -631,11 +631,7 @@ void GLVideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color
 
 void GLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
 {
-	if (poly->count == 0) return;
-	if (poly->BBox.x > Viewport.x + Viewport.w) return;
-	if (poly->BBox.y > Viewport.y + Viewport.h) return;
-	if (poly->BBox.x + poly->BBox.w < Viewport.x) return;
-	if (poly->BBox.y + poly->BBox.h < Viewport.y) return;
+	if (poly->count == 0 || !poly->BBox.IntersectsRegion(Viewport)) return;
 
 	Point* ajustedPoints = new Point[poly->count];
 	for (unsigned int i=0; i<poly->count; i++)
