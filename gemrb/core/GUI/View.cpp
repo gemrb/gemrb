@@ -106,7 +106,7 @@ void View::DrawBackground(const Region* rgn) const
 {
 	if (superView && !IsOpaque()) {
 		if (rgn) {
-			Region r(ConvertPointToSuper(rgn->Origin()), rgn->Dimensions());
+			Region r = frame.Intersect(Region(ConvertPointToSuper(rgn->Origin()), rgn->Dimensions()));
 			superView->DrawBackground(&r);
 		} else {
 			// already in super coordinates
@@ -116,10 +116,13 @@ void View::DrawBackground(const Region* rgn) const
 	if (background) {
 		Video* video = core->GetVideoDriver();
 		if (rgn) {
-			Region toClip(ConvertPointToScreen(rgn->Origin()), rgn->Dimensions());
-			video->BlitSprite( background, *rgn, toClip);
+			Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
+			Region intersect = rgn->Intersect(bgRgn);
+			Point screenPt = ConvertPointToScreen(intersect.Origin());
+			Region toClip(screenPt, intersect.Dimensions());
+			video->BlitSprite( background, intersect, toClip);
 		} else {
-			Point dp = ConvertPointToScreen(Point(0,0));
+			Point dp = ConvertPointToScreen(Point(background->XPos, background->YPos));
 			video->BlitSprite( background, dp.x, dp.y, true );
 		}
 	}
