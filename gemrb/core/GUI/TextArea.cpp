@@ -105,6 +105,7 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 				unsigned long deltaT = animationEnd.time - animationBegin.time;
 				int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
 				TextYPos = animationBegin.y + y;
+				UpdateTextLayout();
 			} else {
 				UpdateScrollbar();
 				int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
@@ -140,7 +141,7 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 
 void TextArea::UpdateTextLayout()
 {
-	Region tf = Region(Point(EDGE_PADDING, 0), Dimensions());
+	Region tf = Region(Point(EDGE_PADDING, -TextYPos), Dimensions());
 	if (AnimPicture) {
 		// shrink and shift the container to accommodate the image
 		tf.x += AnimPicture->Width;
@@ -438,7 +439,7 @@ void TextArea::ScrollToY(int y, Control* sender, ieDword duration)
 	} else if (scrollbar) {
 		// our scrollbar has set position for us
 		TextYPos = y;
-		MarkDirty();
+		UpdateTextLayout();
 	} else {
 		// no scrollbar. need to call SetRow myself.
 		// SetRow will set TextYPos.
@@ -451,7 +452,7 @@ void TextArea::SetRow(int row)
 {
 	if (row <= rows) {
 		TextYPos = row * GetRowHeight();
-		MarkDirty();
+		UpdateTextLayout();
 	}
 }
 
