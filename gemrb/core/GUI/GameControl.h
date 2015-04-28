@@ -211,9 +211,9 @@ public:
 	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	/* centers viewport to the points specified */
-	void Center(unsigned short x, unsigned short y);
+	void Center(const Point&) const;
 	void ClearMouseState();
-	void MoveViewportTo(int x, int y, bool center);
+	void MoveViewportTo(Point, bool center) const;
 
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);

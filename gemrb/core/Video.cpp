@@ -356,13 +356,12 @@ void Video::SetViewport(const Region& vp)
 	Viewport.h = (vp.h > height) ? 0 : vp.h;
 }
 
-void Video::MoveViewportTo(int x, int y)
+void Video::MoveViewportTo(const Point& p)
 {
-	if (x != Viewport.x || y != Viewport.y) {
-		core->GetAudioDrv()->UpdateListenerPos( (x - xCorr) + width / 2, (y - yCorr)
-+ height / 2 );
-		Viewport.x = x;
-		Viewport.y = y;
+	if (p != Viewport.Origin()) {
+		core->GetAudioDrv()->UpdateListenerPos( (p.x - xCorr) + width / 2, (p.y - yCorr) + height / 2 );
+		Viewport.x = p.x;
+		Viewport.y = p.y;
 	}
 }
 

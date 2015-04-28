@@ -321,7 +321,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 	}
 	Video *video = core->GetVideoDriver();
 	GlobalTimer *timer = core->timer;
-	timer->SetMoveViewPort( point.x, point.y, speed, true );
+	timer->SetMoveViewPort( point, speed, true );
 	timer->DoStep(0);
 	if (timer->ViewportIsMoving()) {
 		Sender->AddActionInFront( Sender->GetCurrentAction() );
@@ -330,7 +330,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 		return;
 	}
 
-	video->ConvertToScreen(point.x, point.y);
+	video->ConvertToScreen(point);
 	GameControl *win = core->GetGameControl();
 
 	point = win->Frame().Origin();

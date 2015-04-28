@@ -1056,7 +1056,7 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetMoveViewPort( parameters->pointParameter.x, parameters->pointParameter.y, parameters->int0Parameter<<1, true );
+	core->timer->SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -1068,7 +1068,7 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	core->timer->SetMoveViewPort( scr->Pos.x, scr->Pos.y, parameters->int0Parameter<<1, true );
+	core->timer->SetMoveViewPort( scr->Pos, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }

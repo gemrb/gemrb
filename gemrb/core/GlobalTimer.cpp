@@ -90,46 +90,42 @@ bool GlobalTimer::ViewportIsMoving()
 	return (goal.x!=currentVP.x) || (goal.y!=currentVP.y);
 }
 
-void GlobalTimer::SetMoveViewPort(ieDword x, ieDword y, int spd, bool center)
+void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 {
 	speed=spd;
 	currentVP=core->GetVideoDriver()->GetViewport();
 	if (center) {
-		x-=currentVP.w/2;
-		y-=currentVP.h/2;
+		p = p - currentVP.Origin();
 	}
-	goal.x=(short) x;
-	goal.y=(short) y;
+	goal = p;
 }
 
 void GlobalTimer::DoStep(int count)
 {
 	Video *video = core->GetVideoDriver();
 
-	int x = currentVP.x;
-	int y = currentVP.y;
-	if ( (x != goal.x) || (y != goal.y)) {
+	Point p = currentVP.Origin();
+	if (p != goal) {
 		if (speed) {
-			if (x<goal.x) {
-				x+=speed*count;
-				if (x>goal.x) x=goal.x;
+			if (p.x < goal.x) {
+				p.x += speed*count;
+				if (p.x > goal.x) p.x = goal.x;
 			} else {
-				x-=speed*count;
-				if (x<goal.x) x=goal.x;
+				p.x -= speed*count;
+				if (p.x < goal.x) p.x = goal.x;
 			}
-			if (y<goal.y) {
-				y+=speed*count;
-				if (y>goal.y) y=goal.y;
+			if (p.y < goal.y) {
+				p.y += speed*count;
+				if (p.y > goal.y) p.y = goal.y;
 			} else {
-				y-=speed*count;
-				if (y<goal.y) y=goal.y;
+				p.y -= speed*count;
+				if (p.y < goal.y) p.y = goal.y;
 			}
 		} else {
-			x=goal.x;
-			y=goal.y;
+			p = goal;
 		}
-		currentVP.x=x;
-		currentVP.y=y;
+		currentVP.x = p.x;
+		currentVP.y = p.y;
 	}
 
 	if (shakeCounter) {
@@ -139,14 +135,14 @@ void GlobalTimer::DoStep(int count)
 		}
 		if (shakeCounter) {
 			if (shakeX) {
-				x += RAND(0, shakeX-1);
+				p.x += RAND(0, shakeX-1);
 			}
 			if (shakeY) {
-				y += RAND(0, shakeY-1);
+				p.y += RAND(0, shakeY-1);
 			}
 		}
 	}
-	video->MoveViewportTo(x,y);
+	video->MoveViewportTo(p);
 }
 
 bool GlobalTimer::Update()

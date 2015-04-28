@@ -873,7 +873,7 @@ int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if(0) print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
-		core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
+		core->timer->SetMoveViewPort( Point(fx->PosX, fx->PosY), fx->Parameter1, true);
 	}
 	return FX_NOT_APPLIED;
 }

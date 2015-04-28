@@ -238,7 +238,7 @@ void Scriptable::FixHeadTextPos()
 }
 
 #define MAX_DELAY  6000
-void Scriptable::DrawOverheadText(const Region &screen)
+void Scriptable::DrawOverheadText(const Point& sp)
 {
 	if (!overheadTextDisplaying)
 		return;
@@ -264,22 +264,14 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		cs = ((Selectable *) this)->size*50;
 	}
 
-	short x, y;
-	if (overHeadTextPos.isempty()) {
-		x = Pos.x;
-		y = Pos.y;
-	} else {
-		x = overHeadTextPos.x;
-		y = overHeadTextPos.y;
-	}
-
 	if (!palette) {
 		palette = core->InfoTextPalette;
 		palette->acquire();
 	}
 
-	core->GetVideoDriver()->ConvertToScreen(x, y);
-	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
+	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
+	core->GetVideoDriver()->ConvertToScreen(p);
+	Region rgn( p - Point(100, cs) + sp, Size(200, 400) );
 	core->GetTextFont()->Print( rgn, OverheadText, palette,
 							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
 

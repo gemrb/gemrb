@@ -65,7 +65,7 @@ public:
 	bool Update();
 	bool ViewportIsMoving();
 	void DoStep(int count);
-	void SetMoveViewPort(ieDword x, ieDword y, int spd, bool center);
+	void SetMoveViewPort(Point p, int spd, bool center);
 	void SetFadeToColor(unsigned long Count);
 	void SetFadeFromColor(unsigned long Count);
 	void SetScreenShake(int shakeX, int shakeY, unsigned long Count);

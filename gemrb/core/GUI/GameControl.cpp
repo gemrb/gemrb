@@ -199,13 +199,13 @@ Point GameControl::GetFormationPoint(Map *map, unsigned int pos, const Point& sr
 	return p;
 }
 
-void GameControl::Center(unsigned short x, unsigned short y)
+void GameControl::Center(const Point& p) const
 {
 	Video *video = core->GetVideoDriver();
 	Region Viewport = video->GetViewport();
-	Viewport.x += x - Viewport.w / 2;
-	Viewport.y += y - Viewport.h / 2;
-	MoveViewportTo(Viewport.x, Viewport.y, false);
+	Viewport.x += p.x - Viewport.w / 2;
+	Viewport.y += p.y - Viewport.h / 2;
+	MoveViewportTo(Viewport.Origin(), false);
 }
 
 void GameControl::ClearMouseState()
@@ -390,7 +390,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	if (moveX || moveY) {
 		viewport.x += moveX;
 		viewport.y += moveY;
-		MoveViewportTo( viewport.x, viewport.y, false );
+		MoveViewportTo( viewport.Origin(), false );
 	}
 	video->DrawRect( screen, ColorBlack, true );
 
@@ -1203,9 +1203,7 @@ void GameControl::OnMouseOver(const Point& mp)
 		return;
 	}
 
-	gameMousePos = mp;
-	Video *video = core->GetVideoDriver();
-	video->ConvertToGame( gameMousePos.x, gameMousePos.y );
+	gameMousePos = core->GetVideoDriver()->ConvertToGame(mp);
 
 	if (MouseIsDown && ( !DrawSelectionRect )) {
 		if (( abs( gameMousePos.x - ClickPoint.x ) > 5 ) || ( abs( gameMousePos.y - ClickPoint.y ) > 5 )) {
@@ -1409,9 +1407,9 @@ void GameControl::OnGlobalMouseMove(const Point& p)
 }
 #endif
 
-void GameControl::MoveViewportTo(int x, int y, bool center) {
+void GameControl::MoveViewportTo(Point p, bool center) const
+{
 	Map *area = core->GetGame()->GetCurrentArea();
-
 	if (!area) return;
 
 	Video *video = core->GetVideoDriver();
@@ -1419,24 +1417,24 @@ void GameControl::MoveViewportTo(int x, int y, bool center) {
 	Point mapsize = area->TMap->GetMapSize();
 
 	if (center) {
-		x -= vp.w/2;
-		y -= vp.h/2;
+		p.x -= vp.w/2;
+		p.y -= vp.h/2;
 	}
-	if (x < 0) {
-		x = 0;
-	} else if (x + vp.w >= mapsize.x) {
-		x = mapsize.x - vp.w - 1;
+	if (p.x < 0) {
+		p.x = 0;
+	} else if (p.x + vp.w >= mapsize.x) {
+		p.x = mapsize.x - vp.w - 1;
 	}
-	if (y < 0) {
-		y = 0;
-	} else if (y + vp.h >= mapsize.y) {
-		y = mapsize.y - vp.h - 1;
+	if (p.y < 0) {
+		p.y = 0;
+	} else if (p.y + vp.h >= mapsize.y) {
+		p.y = mapsize.y - vp.h - 1;
 	}
 
 	// override any existing viewport moves which may be in progress
-	core->timer->SetMoveViewPort(x, y, 0, false);
+	core->timer->SetMoveViewPort(p, 0, false);
 	// move it directly ourselves, since we might be paused
-	video->MoveViewportTo(x, y);
+	video->MoveViewportTo(p);
 }
 
 void GameControl::UpdateScrolling() {
@@ -1775,7 +1773,7 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 		return;
 
 	ClickPoint = p;
-	core->GetVideoDriver()->ConvertToGame( ClickPoint.x, ClickPoint.y );
+	core->GetVideoDriver()->ConvertToGame( ClickPoint );
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
@@ -1828,8 +1826,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
-	Point p = mp;
-	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
+	Point p = core->GetVideoDriver()->ConvertToGame( mp );
 	Game* game = core->GetGame();
 	if (!game) return;
 	Map* area = game->GetCurrentArea( );
@@ -1965,7 +1962,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 			}
 			CreateMovement(actor, move);
 		}
-		if (DoubleClick) Center(mp.x, mp.y);
+		if (DoubleClick) Center(mp);
 
 		//p is a searchmap travel region
 		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
@@ -1996,7 +1993,7 @@ void GameControl::OnMouseWheelScroll(short x, short y)
 		moveX = 0;
 		moveY = 0;
 	} else {
-		MoveViewportTo( Viewport.x, Viewport.y, false);
+		MoveViewportTo( Viewport.Origin(), false);
 	}
 	//update cursor
 	core->GetEventMgr()->FakeMouseMove();
@@ -2417,7 +2414,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
-		MoveViewportTo( pc->Pos.x, pc->Pos.y, true );
+		MoveViewportTo( pc->Pos, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }

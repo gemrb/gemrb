@@ -72,7 +72,7 @@ void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
 		bump = true;
 	}
 	if(bump && !(core->timer->ViewportIsMoving())) {
-		core->timer->SetMoveViewPort( vp.x, vp.y, 0, false );
+		core->timer->SetMoveViewPort( vp.Origin(), 0, false );
 	}
 }
 

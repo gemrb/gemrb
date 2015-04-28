@@ -5200,9 +5200,9 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 			ieDword autopause_center = 0;
 			vars->Lookup("Auto Pause Center", autopause_center);
 			if (autopause_center && target) {
-				Point screenPos = target->Pos;
-				core->GetVideoDriver()->ConvertToScreen(screenPos.x, screenPos.y);
-				GetGameControl()->Center(screenPos.x, screenPos.y);
+				const GameControl* gc = GetGameControl();
+				gc->Center(GetVideoDriver()->ConvertToScreen(target->Pos));
+
 				if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
 					core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
 				}

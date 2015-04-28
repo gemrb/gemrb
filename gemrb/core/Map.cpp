@@ -1250,6 +1250,7 @@ void Map::DrawMap(Region screen)
 		}
 	}
 
+	Point origin = screen.Origin();
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
@@ -1257,7 +1258,7 @@ void Map::DrawMap(Region screen)
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		ip->DrawOverheadText(screen);
+		ip->DrawOverheadText(origin);
 	}
 
 	int cnCount = 0;
@@ -1266,7 +1267,7 @@ void Map::DrawMap(Region screen)
 		Container* cn = TMap->GetContainer( cnCount++ );
 		if (!cn)
 			break;
-		cn->DrawOverheadText(screen);
+		cn->DrawOverheadText(origin);
 	}
 
 	int drCount = 0;
@@ -1275,7 +1276,7 @@ void Map::DrawMap(Region screen)
 		Door* dr = TMap->GetDoor( drCount++ );
 		if (!dr)
 			break;
-		dr->DrawOverheadText(screen);
+		dr->DrawOverheadText(origin);
 	}
 
 	size_t i = actors.size();
@@ -1284,7 +1285,7 @@ void Map::DrawMap(Region screen)
 		//This must go AFTER the fog!
 		//(maybe we should be using the queue?)
 		Actor* actor = actors[i];
-		actor->DrawOverheadText(screen);
+		actor->DrawOverheadText(origin);
 	}
 
 	oldgametime=gametime;

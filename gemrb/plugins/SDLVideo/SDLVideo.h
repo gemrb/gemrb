@@ -128,16 +128,14 @@ public:
 
 
 	/** Convers a Screen Coordinate to a Game Coordinate */
-	void ConvertToGame(short& x, short& y)
+	Point ConvertToGame(const Point& p)
 	{
-		x += Viewport.x;
-		y += Viewport.y;
+		return p + Viewport.Origin();
 	}
 
-	void ConvertToScreen(short&x, short& y)
+	Point ConvertToScreen(const Point& p)
 	{
-		x -= Viewport.x;
-		y -= Viewport.y;
+		return p - Viewport.Origin();
 	}
 
 	void SetFadeColor(int r, int g, int b);

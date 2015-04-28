@@ -190,9 +190,9 @@ public:
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 
 	/** Converts a Screen Coordinate to a Game Coordinate */
-	virtual void ConvertToGame(short& x, short& y) = 0;
+	virtual Point ConvertToGame(const Point& p) = 0;
 	/** Converts a Game Coordinate to a Screen Coordinate */
-	virtual void ConvertToScreen(short& x, short& y) = 0;
+	virtual Point ConvertToScreen(const Point& p) = 0;
 	/** Sets the Fading Color */
 	virtual void SetFadeColor(int r, int g, int b) = 0;
 	/** Sets the Fading to Color Percentage */
@@ -245,7 +245,7 @@ public:
 	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 	Region GetViewport(void) const;
 	void SetViewport(const Region&);
-	void MoveViewportTo(int x, int y);
+	void MoveViewportTo(const Point&);
 };
 
 }

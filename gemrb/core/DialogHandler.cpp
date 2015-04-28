@@ -143,7 +143,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	Video *video = core->GetVideoDriver();
 	//allow mouse selection from dialog (even though screen is locked)
 	video->SetMouseEnabled(true);
-	gc->MoveViewportTo(tgt->Pos.x, tgt->Pos.y, true);
+	gc->MoveViewportTo(tgt->Pos, true);
 
 	//check if we are already in dialog
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
