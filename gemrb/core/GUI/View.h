@@ -107,7 +107,7 @@ public:
 
 	void SetBackground(Sprite2D*);
 	void SetScrollBar(ScrollBar*);
-	const ScrollBar* Scrollbar() { return scrollbar; }
+	const ScrollBar* Scrollbar() const { return scrollbar; }
 
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
@@ -118,12 +118,12 @@ public:
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
 
-	virtual bool CanLockFocus() { return true; };
-	virtual bool CanUnlockFocus() { return true; };
+	virtual bool CanLockFocus() const { return true; };
+	virtual bool CanUnlockFocus() const { return true; };
 	virtual bool TracksMouseDown() const { return false; }
 
-	virtual Holder<DragOp> DragOperation() { return Holder<DragOp>(NULL); }
-	virtual bool AcceptsDragOperation(const DragOp&) { return false; }
+	virtual Holder<DragOp> DragOperation() const { return Holder<DragOp>(NULL); }
+	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
 	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
