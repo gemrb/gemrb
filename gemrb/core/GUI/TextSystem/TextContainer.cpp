@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <climits>
 
-#define DEBUG_TEXT 1
+#define DEBUG_TEXT 0
 
 namespace GemRB {
 
