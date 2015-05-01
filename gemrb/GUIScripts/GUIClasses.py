@@ -149,7 +149,7 @@ class GTextArea(GControl):
     'SetOptions': _GemRB.TextArea_SetOptions,
     'ListResources': _GemRB.TextArea_ListResources
   }
-  assignableAttributes = ['DefaultText']
+  __slots__ = ['DefaultText']
 
 class GTextEdit(GControl):
   __metaclass__ = metaControl
