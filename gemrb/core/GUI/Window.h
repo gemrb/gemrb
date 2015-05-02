@@ -37,9 +37,8 @@ namespace GemRB {
 class Sprite2D;
 
 // Window Flags
-#define WF_FRAME    1     //window has frame
-#define WF_FLOAT    2     //floating window
-#define WF_CHILD    4     //if invalidated, it invalidates all windows on top of it
+#define WF_FLOAT		1 //floating window
+#define WF_BORDERLESS	2 //doesnt draw the window frame
 
 // Window position anchors (actually flags for WindowSetPos())
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -65,12 +64,12 @@ protected:
 
 	bool TrySetFocus(View*);
 
+	static Sprite2D* WinFrameEdge(int edge);
+
 public: 
 	Window(unsigned short WindowID, const Region& frame);
 	~Window();
 
-	/** Set window frame used to fill screen on higher resolutions*/
-	void SetFrame();
 
 	bool OnSpecialKeyPress(unsigned char key);
 

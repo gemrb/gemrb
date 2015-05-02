@@ -25,7 +25,8 @@
 #include "GUI/ScrollBar.h"
 
 #include "win32def.h"
-
+#include "GameData.h"
+#include "ImageMgr.h"
 #include "ie_cursors.h"
 
 namespace GemRB {
@@ -34,6 +35,7 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	: View(frame)
 {
 	this->WindowID = WindowID;
+	Flags = 0;
 
 	Visible = WINDOW_INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
@@ -96,31 +98,21 @@ void Window::SetFocused(Control* ctrl)
 void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
 	if (!Visible) return; // no point in drawing invisible windows
-	Video* video = core->GetVideoDriver();
 
-	if ( Flags & WF_FRAME) {
-		Region screen( 0, 0, core->Width, core->Height );
+	if (!(Flags&WF_BORDERLESS)) {
+		Video* video = core->GetVideoDriver();
 		video->SetScreenClip( NULL );
-/*
-		if (core->WindowFrames[0])
-			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
-		if (core->WindowFrames[1])
-			video->BlitSprite( core->WindowFrames[1], core->Width - core->WindowFrames[1]->Width, 0, true );
-		if (core->WindowFrames[2])
-			video->BlitSprite( core->WindowFrames[2], (core->Width - core->WindowFrames[2]->Width) / 2, 0, true );
-		if (core->WindowFrames[3])
-			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
-*/
-	}
-}
 
-/** Set window frame used to fill screen on higher resolutions*/
-void Window::SetFrame()
-{
-	if ( (frame.w < core->Width) || (frame.h < core->Height) ) {
-		Flags|=WF_FRAME;
+		Sprite2D* edge = WinFrameEdge(0); // left
+		video->BlitSprite(edge, 0, 0, true);
+		edge = WinFrameEdge(1); // right
+		int sideW = edge->Width;
+		video->BlitSprite(edge, core->Width - sideW, 0, true);
+		edge = WinFrameEdge(2); // top
+		video->BlitSprite(edge, sideW, 0, true);
+		edge = WinFrameEdge(3); // bottom
+		video->BlitSprite(edge, sideW, core->Height - edge->Height, true);
 	}
-	MarkDirty();
 }
 
 Control* Window::GetFunctionControl(int x)
@@ -186,7 +178,7 @@ int Window::GetControlIndex(ieDword id) const
 {
 	for (std::vector<Control*>::const_iterator m = Controls.begin(); m != Controls.end(); ++m) {
 		if ((*m)->ControlID == id) {
-			return m - Controls.begin();
+			return int(m - Controls.begin());
 		}
 	}
 	return -1;
@@ -363,6 +355,48 @@ bool Window::OnSpecialKeyPress(unsigned char key)
 	}
 	// handle scrollbar events
 	return View::OnSpecialKeyPress(key);
+}
+
+Sprite2D* Window::WinFrameEdge(int edge)
+{
+	std::string refstr = "STON";
+	switch (core->Width) {
+		case 800:
+			refstr += "08";
+		break;
+		case 1024:
+			refstr += "10";
+		break;
+	}
+	switch (edge) {
+		case 0:
+			refstr += "L";
+			break;
+		case 1:
+			refstr += "R";
+			break;
+		case 2:
+			refstr += "T";
+			break;
+		case 3:
+			refstr += "B";
+			break;
+	}
+
+	typedef Holder<Sprite2D> FrameImage;
+	static std::map<ResRef, FrameImage> frames;
+
+	ResRef ref = refstr.c_str();
+	Sprite2D* frame = NULL;
+	if (frames.find(ref) != frames.end()) {
+		frame = frames[ref].get();
+	} else {
+		ResourceHolder<ImageMgr> im(ref);
+		frame = im->GetSprite2D();
+		frames.insert(std::make_pair(ref, frame));
+	}
+
+	return frame;
 }
 
 }
