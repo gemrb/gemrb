@@ -168,7 +168,6 @@ def OnLoad():
 	PortraitsTable = GemRB.LoadTable ("pictures")
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
 	CharGenWindow = GemRB.LoadWindow (0)
-	CharGenWindow.SetFrame ()
 	CharGenState = 0
 	MyChar = GemRB.GetVar ("Slot")
 	ImportedChar = 0

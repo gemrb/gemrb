@@ -35,7 +35,6 @@ def DisplayOverview(step):
 
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
 	CharGenWindow = GemRB.LoadWindow (0)
-	CharGenWindow.SetFrame ()
 	GemRB.SetVar ("Step", step)
 
 	###

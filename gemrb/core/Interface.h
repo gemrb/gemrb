@@ -414,7 +414,6 @@ public:
 	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
 	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;
-	Sprite2D *WindowFrames[4];
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
@@ -569,7 +568,6 @@ public:
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
-	void SetWindowFrame(int i, Sprite2D *Picture);
 	/** hides the game control window (if it exists), and reports success */
 	bool HideGCWindow();
 	/** unhides the game control window, if it exists */

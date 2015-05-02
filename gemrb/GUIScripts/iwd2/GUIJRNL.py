@@ -81,7 +81,6 @@ def OpenJournalWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenJournalWindow)
-	Window.SetFrame ()
 	
 	Button = Window.GetControl (3)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalPrevSectionPress)

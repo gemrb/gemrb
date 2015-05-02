@@ -40,7 +40,6 @@ def OnLoad ():
 		GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
 	GemRB.LoadWindowPack ("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow (0)
-	LoadWindow.SetFrame ()
 
 	CancelButton=LoadWindow.GetControl (34)
 	CancelButton.SetText (13727)

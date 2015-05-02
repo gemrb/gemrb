@@ -59,7 +59,6 @@ class GWindow:
   methods = {
     'GetRect': _GemRB.Window_GetRect,
     'SetSize': _GemRB.Window_SetSize,
-    'SetFrame': _GemRB.Window_SetFrame,
     'SetPicture': _GemRB.Window_SetPicture,
     'SetPos': _GemRB.Window_SetPos,
     'HasControl': _GemRB.Window_HasControl,

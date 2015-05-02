@@ -33,7 +33,6 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	MainWindow = GemRB.LoadWindow(0)
-	MainWindow.SetFrame()
 
 	PortraitButton = MainWindow.GetControl (12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)

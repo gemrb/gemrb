@@ -42,7 +42,6 @@ def StartLoadScreen ():
 
 	GemRB.LoadWindowPack ("guils", 640, 480)
 	LoadScreen = GemRB.LoadWindow (0)
-	LoadScreen.SetFrame ()
 
 	SetLoadScreen()
 	Bar = LoadScreen.GetControl (0)

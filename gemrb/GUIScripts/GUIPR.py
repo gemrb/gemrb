@@ -74,7 +74,6 @@ def OpenPriestWindow ():
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenPriestWindow)
-	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 

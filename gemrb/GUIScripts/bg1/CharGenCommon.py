@@ -60,7 +60,6 @@ class CharGen:
 		else:
 			GemRB.LoadWindowPack ("GUICG", 640, 480)
 			CharGenWindow = GemRB.LoadWindow (0)
-			CharGenWindow.SetFrame ()
 	
 		step = self.step
 		

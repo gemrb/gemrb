@@ -37,7 +37,6 @@ def StartLoadScreen ():
 
 	GemRB.LoadWindowPack ("guils", 640, 480)
 	LoadScreen = GemRB.LoadWindow (0)
-	LoadScreen.SetFrame ()
 	Middle = LoadScreen.GetControl (3)
 	Progress = GemRB.GetVar ("Progress")
 

@@ -156,7 +156,6 @@ def OpenStoreWindow ():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
-	ActionWindow.SetFrame ()
 
 	MenuWindow = GemRB.LoadWindow (2)
 

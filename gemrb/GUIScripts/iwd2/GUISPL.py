@@ -79,7 +79,6 @@ def OpenSpellBookWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenSpellBookWindow)
-	Window.SetFrame ()
 
 	Button = Window.GetControl (92)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SpellBookPrevPress)

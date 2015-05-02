@@ -68,7 +68,6 @@ def OnLoad():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #main window
 	StartWindow = GemRB.LoadWindow (0)
-	StartWindow.SetFrame ()
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
 		if GameCheck.HasTOB():

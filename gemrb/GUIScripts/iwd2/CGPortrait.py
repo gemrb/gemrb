@@ -41,7 +41,6 @@ def OnLoad ():
 
 	GemRB.LoadWindowPack ("GUICG", 800, 600)
 	AppearanceWindow = GemRB.LoadWindow (11)
-	#AppearanceWindow.SetFrame ()
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTable ("PICTURES")

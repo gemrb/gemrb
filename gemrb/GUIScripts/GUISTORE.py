@@ -164,7 +164,6 @@ def OpenStoreWindow ():
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
-	ActionWindow.SetFrame ()
 
 	Store = GemRB.GetStore ()
 	BarteringPC = GemRB.GameGetFirstSelectedPC ()

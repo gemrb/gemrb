@@ -32,7 +32,6 @@ def OnLoad ():
 	
 	GemRB.LoadWindowPack("demoend", 640, 480)
 	Window = GemRB.LoadWindow(0)
-	Window.SetFrame()
 	Picture = 0
 	Table = GemRB.LoadTable ("splashsc")
 	resref = Table.GetValue (Picture,0)

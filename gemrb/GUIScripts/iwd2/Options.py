@@ -46,7 +46,6 @@ def OnLoad():
 		CharactersBarWindow.Unload()
 
 	OptionsWindow = GemRB.LoadWindow(13)
-	OptionsWindow.SetFrame ()
 
 	VersionLabel = OptionsWindow.GetControl(0x1000000B)
 	VersionLabel.SetText(GEMRB_VERSION)

@@ -55,20 +55,10 @@ def OnLoad ():
 	else:
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 
-	# Find proper window border for higher resolutions
-	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
-	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
-	if GemRB.HasResource ("STON08L", RES_MOS):
-		if screen_width == 800:
-			GemRB.LoadWindowFrame ("STON08L", "STON08R", "STON08T", "STON08B")
-		elif screen_width == 1024:
-			GemRB.LoadWindowFrame ("STON10L", "STON10R", "STON10T", "STON10B")
-
 	GemRB.LoadWindowPack("GUICONN", 640, 480)
 
 #main window
 	StartWindow = GemRB.LoadWindow (0)
-	StartWindow.SetFrame ()
 	ProtocolButton = StartWindow.GetControl (0x00)
 	CreateGameButton = StartWindow.GetControl (0x02)
 	LoadGameButton = StartWindow.GetControl (0x07)

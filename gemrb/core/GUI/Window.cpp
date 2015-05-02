@@ -101,7 +101,7 @@ void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 	if ( Flags & WF_FRAME) {
 		Region screen( 0, 0, core->Width, core->Height );
 		video->SetScreenClip( NULL );
-
+/*
 		if (core->WindowFrames[0])
 			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
 		if (core->WindowFrames[1])
@@ -110,6 +110,7 @@ void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 			video->BlitSprite( core->WindowFrames[2], (core->Width - core->WindowFrames[2]->Width) / 2, 0, true );
 		if (core->WindowFrames[3])
 			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
+*/
 	}
 }
 

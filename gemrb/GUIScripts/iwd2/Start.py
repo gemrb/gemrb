@@ -30,14 +30,9 @@ QuickLoadSlot = 0
 def OnLoad():
 	global StartWindow, QuickLoadSlot
 
-	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
-	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
-	if screen_width == 1024:
-		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 	GemRB.LoadWindowPack("GUICONN", 800, 600)
 #main window
 	StartWindow = GemRB.LoadWindow(0)
-	StartWindow.SetFrame ()
 	ProtocolButton = StartWindow.GetControl(0x00)
 	NewGameButton = StartWindow.GetControl(0x02)
 	LoadGameButton = StartWindow.GetControl(0x07)

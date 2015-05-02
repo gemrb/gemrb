@@ -121,9 +121,7 @@ def OpenOptionsWindow ():
 		OptionsWindow = GemRB.LoadWindow (0)
 		GUICommonWindows.MarkMenuButton (OptionsWindow)
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
-		OptionsWindow.SetFrame ()
 		if not GameCheck.IsBG1(): #not in PST either, but it has its own OpenOptionsWindow()
-			OptionsWindow.SetFrame ()
 			#saving the original portrait window
 			OldPortraitWindow = GUICommonWindows.PortraitWindow
 			PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
@@ -506,7 +504,6 @@ def OpenMovieWindow ():
 
 	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
 	SubOptionsWindow = Window = GemRB.LoadWindow(2)
-	Window.SetFrame ()
 	#reloading the guiopt windowpack
 	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
 	TextAreaControl = Window.GetControl(0)

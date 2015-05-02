@@ -31,7 +31,6 @@ def OnLoad ():
 	GemRB.LoadWindowPack ("GUISP", 800, 600)
 
 	PartyFormationWindow = GemRB.LoadWindow (0)
-	PartyFormationWindow.SetFrame ( )
 	ExitButton = PartyFormationWindow.GetControl (30)
 	ExitButton.SetText (13906)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)

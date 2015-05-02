@@ -101,8 +101,6 @@ def StartTextScreen ():
 		GemRB.HardEndPL ()
 
 	TextScreen = GemRB.LoadWindow (ID)
-	TextScreen.SetFrame ()
-
 	TextArea = TextScreen.GetControl (2)
 
 	if GameCheck.IsBG1():

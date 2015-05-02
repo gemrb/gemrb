@@ -41,7 +41,6 @@ def StartLoadScreen ():
 
 	GemRB.LoadWindowPack ("guils", 800, 600)
 	LoadScreen = GemRB.LoadWindow (0)
-	LoadScreen.SetFrame( )
 
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":

@@ -219,7 +219,6 @@ Interface::Interface()
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
 	//GameFeatures = 0;
 	//GameFeatures2 = 0;
-	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
 	AreaAliasTable = NULL;
@@ -375,10 +374,6 @@ Interface::~Interface(void)
 			Sprite2D::FreeSprite(FogSprites[i]);
 		}
 
-		for(i=0;i<4;i++) {
-			Sprite2D::FreeSprite(WindowFrames[i]);
-		}
-
 		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 			for(i=0;i<6;i++) {
 				Sprite2D::FreeSprite(GroundCircles[size][i]);
@@ -427,12 +422,6 @@ Interface::~Interface(void)
 
 	AudioDriver.release();
 	video.release();
-}
-
-void Interface::SetWindowFrame(int i, Sprite2D *Picture)
-{
-	Sprite2D::FreeSprite(WindowFrames[i]);
-	WindowFrames[i]=Picture;
 }
 
 GameControl* Interface::StartGameControl()

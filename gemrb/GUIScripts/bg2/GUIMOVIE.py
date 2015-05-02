@@ -29,7 +29,6 @@ def OnLoad():
 
 	GemRB.LoadWindowPack ("GUIMOVIE", 640, 480)
 	MovieWindow = GemRB.LoadWindow (0)
-	MovieWindow.SetFrame ()
 	TextAreaControl = MovieWindow.GetControl (0)
 	PlayButton = MovieWindow.GetControl (2)
 	CreditsButton = MovieWindow.GetControl (3)

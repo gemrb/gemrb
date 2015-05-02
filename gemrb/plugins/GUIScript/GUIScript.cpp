@@ -663,65 +663,6 @@ static PyObject* GemRB_Window_SetSize(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_SetFrame__doc,
-"SetWindowFrame(WindowIndex)\n\n"
-"Sets Window frame used to fill screen on higher resolutions.");
-
-static PyObject* GemRB_Window_SetFrame(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex;
-
-	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
-		return AttributeError( GemRB_Window_SetFrame__doc );
-	}
-
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!\n");
-	}
-
-	win->SetFrame();
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_LoadWindowFrame__doc,
-"LoadWindowFrame(MOSResRef_Left, MOSResRef_Right, MOSResRef_Top, MOSResRef_Bottom))\n\n"
-"Load the parts of window frame used to decorate windows on higher resolutions." );
-
-static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
-{
-	char* ResRef[4];
-
-	if (!PyArg_ParseTuple( args, "ssss", &ResRef[0], &ResRef[1], &ResRef[2], &ResRef[3] )) {
-		return AttributeError( GemRB_LoadWindowFrame__doc );
-	}
-
-
-	for (int i = 0; i < 4; i++) {
-		if (ResRef[i] == 0) {
-			return AttributeError( GemRB_LoadWindowFrame__doc );
-		}
-
-		ResourceHolder<ImageMgr> im(ResRef[i]);
-		if (im == NULL) {
-			return NULL;
-		}
-
-		Sprite2D* Picture = im->GetSprite2D();
-		if (Picture == NULL) {
-			return NULL;
-		}
-
-		// FIXME: delete previous WindowFrames
-		//core->WindowFrames[i] = Picture;
-		core->SetWindowFrame(i, Picture);
-	}
-
-	Py_RETURN_NONE;
-}
-
-
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
 "EnableCheatKeys(flag)\n\n"
 "Sets CheatFlags." );
@@ -10591,7 +10532,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
-	METHOD(LoadWindowFrame, METH_VARARGS),
 	METHOD(Log, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(ModifyEffect, METH_VARARGS),
@@ -10740,7 +10680,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_GetRect, METH_VARARGS),
 	METHOD(Window_HasControl, METH_VARARGS),
 	METHOD(Window_Invalidate, METH_VARARGS),
-	METHOD(Window_SetFrame, METH_VARARGS),
 	METHOD(Window_SetPicture, METH_VARARGS),
 	METHOD(Window_SetPos, METH_VARARGS),
 	METHOD(Window_SetSize, METH_VARARGS),

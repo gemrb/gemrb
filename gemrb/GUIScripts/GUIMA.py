@@ -114,7 +114,6 @@ def ShowMap ():
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, ShowMap)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OptionsWindow.SetFrame ()
 
 	# World Map
 	Button = Window.GetControl (1)
@@ -190,7 +189,6 @@ def OpenMapWindow ():
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
-	OptionsWindow.SetFrame ()
 
 	# World Map
 	Button = Window.GetControl (1)
@@ -421,7 +419,6 @@ def WorldMapWindowCommon (Travel):
 
 	#(fuzzie just copied this from the map window code..)
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
-	Window.SetFrame ()
 	#saving the original portrait window
 	if GameCheck.IsIWD2():
 		OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -429,7 +426,6 @@ def WorldMapWindowCommon (Travel):
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
-		OptionsWindow.SetFrame ()
 
 	if GameCheck.IsBG2():
 		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")

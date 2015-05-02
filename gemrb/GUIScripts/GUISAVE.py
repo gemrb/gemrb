@@ -61,7 +61,6 @@ def OpenSaveWindow ():
 	else:
 		GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 	Window = SaveWindow = GemRB.LoadWindow (0)
-	Window.SetFrame ()
 	if GameCheck.IsIWD2():
 		CancelButton=Window.GetControl (22)
 	else:
