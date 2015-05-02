@@ -53,14 +53,24 @@ class GSymbol:
     'GetValue': _GemRB.Symbol_GetValue,
     'Unload': _GemRB.Symbol_Unload
   }
+  
+class GView:
+	__metaclass__ = metaIDWrapper
+	methods = {
+	'GetFrame': _GemRB.View_GetFrame,
+    'SetFrame': _GemRB.View_SetFrame,
+    'SetBackground': _GemRB.View_SetBackground,
+	}
+	def SetSize(self, w, h):
+		r = self.GetFrame()
+		self.SetFrame(r['x'], r['y'], w, h);
 
-class GWindow:
-  __metaclass__ = metaIDWrapper
+	def SetPos(self, x, y):
+		r = self.GetFrame()
+		self.SetFrame(x, y, r['w'], r['h']);
+
+class GWindow(GView):
   methods = {
-    'GetRect': _GemRB.Window_GetRect,
-    'SetSize': _GemRB.Window_SetSize,
-    'SetPicture': _GemRB.Window_SetPicture,
-    'SetPos': _GemRB.Window_SetPos,
     'HasControl': _GemRB.Window_HasControl,
     'DeleteControl': _GemRB.Window_DeleteControl,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
@@ -69,6 +79,9 @@ class GWindow:
     'ShowModal': _GemRB.Window_ShowModal,
     'Invalidate': _GemRB.Window_Invalidate,
   }
+  def SetBackground(self, resref):
+	  _GemRB.View_SetBackground(self.ID, -1, resref)
+
   def __nonzero__(self):
     return self.ID != -1
   def Unload(self):
@@ -107,14 +120,11 @@ class GWindow:
     return _GemRB.Window_GetControl(self.ID, control)
  
 
-class GControl:
+class GControl(GView):
   __metaclass__ = metaControl
   methods = {
-    'GetRect': _GemRB.Control_GetRect,
     'HasAnimation': _GemRB.Control_HasAnimation,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,
-    'SetPos': _GemRB.Control_SetPos,
-    'SetSize': _GemRB.Control_SetSize,
     'SetAnimationPalette': _GemRB.Control_SetAnimationPalette,
     'SetAnimation': _GemRB.Control_SetAnimation,
     'QueryText': _GemRB.Control_QueryText,
@@ -131,7 +141,6 @@ class GControl:
 	  return _GemRB.Control_SubstituteForControl(self.WinID, self.ID, target.WinID, target.ID)
 
 class GLabel(GControl):
-  __metaclass__ = metaControl
   methods = {
     'SetFont': _GemRB.Label_SetFont,
     'SetTextColor': _GemRB.Label_SetTextColor,
@@ -139,7 +148,6 @@ class GLabel(GControl):
   }
 
 class GTextArea(GControl):
-  __metaclass__ = metaControl
   methods = {
     'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
@@ -151,20 +159,16 @@ class GTextArea(GControl):
   __slots__ = ['DefaultText']
 
 class GTextEdit(GControl):
-  __metaclass__ = metaControl
   methods = {
     'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
-    'SetBackground': _GemRB.TextEdit_SetBackground
   }
 
 class GScrollBar(GControl):
-  __metaclass__ = metaControl
   methods = {
     'SetDefaultScrollBar': _GemRB.ScrollBar_SetDefaultScrollBar
   }
 
 class GButton(GControl):
-  __metaclass__ = metaControl
   methods = {
     'SetSprites': _GemRB.Button_SetSprites,
     'SetOverlay': _GemRB.Button_SetOverlay,
@@ -191,7 +195,6 @@ class GButton(GControl):
     return _GemRB.Window_GetControl(self.WinID, control)
 
 class GWorldMap(GControl):
-  __metaclass__ = metaControl
   methods = {
     'AdjustScrolling': _GemRB.WorldMap_AdjustScrolling,
     'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea,

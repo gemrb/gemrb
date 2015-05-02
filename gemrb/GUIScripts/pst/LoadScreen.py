@@ -50,7 +50,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		else:
 			LoadPic = "GUIDS10"
 
-	Window.SetPicture (LoadPic)
+	Window.SetBackground (LoadPic)
 	
 	Bar = Window.GetControl (0)
 	Progress = 0

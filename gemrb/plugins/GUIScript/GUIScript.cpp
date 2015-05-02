@@ -642,27 +642,6 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	return gs->ConstructObject("Window", ret);
 }
 
-PyDoc_STRVAR( GemRB_Window_SetSize__doc,
-"SetWindowSize(WindowIndex, Width, Height)\n\n"
-"Resizes a Window.");
-
-static PyObject* GemRB_Window_SetSize(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, Width, Height;
-
-	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &Width, &Height )) {
-		return AttributeError( GemRB_Window_SetSize__doc );
-	}
-
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!\n");
-	}
-	win->SetFrameSize(Size(Width, Height));
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
 "EnableCheatKeys(flag)\n\n"
 "Sets CheatFlags." );
@@ -676,32 +655,6 @@ static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->EnableCheatKeys( Flag );
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Window_SetPicture__doc,
-"SetWindowPicture(WindowIndex, MosResRef)\n\n"
-"Changes the background of a Window." );
-
-static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex;
-	char* MosResRef;
-
-	if (!PyArg_ParseTuple( args, "is", &WindowIndex, &MosResRef )) {
-		return AttributeError( GemRB_Window_SetPicture__doc );
-	}
-
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!\n");
-	}
-
-	ResourceHolder<ImageMgr> mos(MosResRef);
-	if (mos != NULL) {
-		win->SetBackground( mos->GetSprite2D() );
-	}
 
 	Py_RETURN_NONE;
 }
@@ -1835,6 +1788,95 @@ static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject*
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_View_GetFrame__doc,
+			 "GetRect(WindowIndex, ControlID)\n\n"
+			 "Creates and adds a new Label to a Window." );
+
+static PyObject* GemRB_View_GetFrame(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
+		return AttributeError( GemRB_View_GetFrame__doc );
+	}
+
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl) {
+		return NULL;
+	}
+
+	const Region& ctrlFrame = ctrl->Frame();
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "x", PyInt_FromLong( ctrlFrame.x ));
+	PyDict_SetItemString(dict, "y", PyInt_FromLong( ctrlFrame.y ));
+	PyDict_SetItemString(dict, "w", PyInt_FromLong( ctrlFrame.w ));
+	PyDict_SetItemString(dict, "h", PyInt_FromLong( ctrlFrame.h ));
+	return dict;
+}
+
+PyDoc_STRVAR( GemRB_View_SetFrame__doc,
+			 "GetRect(WindowIndex, ControlID)\n\n"
+			 "Creates and adds a new Label to a Window." );
+
+static PyObject* GemRB_View_SetFrame(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	int x, y, w, h;
+
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlIndex, &x, &y, &w, &h)) {
+		return AttributeError( GemRB_View_GetFrame__doc );
+	}
+
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl) {
+		return NULL;
+	}
+
+	ctrl->SetFrame(Region(x, y, w, h));
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_View_SetBackground__doc,
+			 "GetRect(WindowIndex, ControlID)\n\n"
+			 "Creates and adds a new Label to a Window." );
+
+static PyObject* GemRB_View_SetBackground(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	char *ResRef;
+
+	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef) ) {
+		return AttributeError( GemRB_View_SetBackground__doc );
+	}
+	View* view = NULL;
+	if (ControlIndex != -1) {
+		view = GetControl(WindowIndex, ControlIndex, -1);
+	} else {
+		view = core->GetWindow( WindowIndex );
+	}
+
+	if (!view) {
+		return NULL;
+	}
+
+	if (ResRef[0]) {
+		ResourceHolder<ImageMgr> im(ResRef);
+		if (im == NULL) {
+			return RuntimeError("Picture resource not found!\n");
+		}
+
+		Sprite2D* Picture = im->GetSprite2D();
+		if (Picture == NULL) {
+			return RuntimeError("Failed to acquire the picture!\n");
+		}
+		view->SetBackground(Picture);
+	} else {
+		view->SetBackground(NULL);
+	}
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Window_CreateLabel__doc,
 "CreateLabel(WindowIndex, ControlID, x, y, w, h, font, text, align)\n\n"
 "Creates and adds a new Label to a Window." );
@@ -2012,41 +2054,6 @@ static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	return PyInt_FromLong( ret );
-}
-
-PyDoc_STRVAR( GemRB_TextEdit_SetBackground__doc,
-"SetBackground(WindowIndex, ControlIndex, ResRef)\n\n"
-"Sets the background MOS for a TextEdit control.");
-
-static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex;
-	char *ResRef;
-
-	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,&ResRef) ) {
-		return AttributeError( GemRB_TextEdit_SetBackground__doc );
-	}
-	TextEdit* te = ( TextEdit* ) GetControl(WindowIndex, ControlIndex, IE_GUI_EDIT);
-	if (!te) {
-		return NULL;
-	}
-
-	if (ResRef[0]) {
-		ResourceHolder<ImageMgr> im(ResRef);
-		if (im == NULL) {
-			return RuntimeError("Picture resource not found!\n");
-		}
-
-		Sprite2D* Picture = im->GetSprite2D();
-		if (Picture == NULL) {
-			return RuntimeError("Failed to acquire the picture!\n");
-		}
-		te->SetBackground(Picture);
-	} else {
-		te->SetBackground(NULL);
-	}
-
-	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetSprites__doc,
@@ -2758,77 +2765,6 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 	PyObject* ret = GemRB_Window_GetControl(NULL, ctrltuple);
 	Py_DECREF(ctrltuple);
 	return ret;
-}
-
-PyDoc_STRVAR( GemRB_Control_SetPos__doc,
-"SetControlPos(WindowIndex, ControlIndex, X, Y)\n\n"
-"Moves a Control." );
-
-static PyObject* GemRB_Control_SetPos(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, X, Y;
-
-	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &X, &Y )) {
-		return AttributeError( GemRB_Control_SetPos__doc );
-	}
-
-	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
-	if (!ctrl) {
-		return NULL;
-	}
-
-	ctrl->SetFrameOrigin(Point(X, Y));
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Control_GetRect__doc,
-"control.GetRect()\n\n"
-"Returns a dict with the control position and size." );
-
-static PyObject* GemRB_Control_GetRect(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex;
-
-	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
-		return AttributeError( GemRB_Control_GetRect__doc );
-	}
-
-	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
-	if (!ctrl) {
-		return NULL;
-	}
-
-	const Region& ctrlFrame = ctrl->Frame();
-	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "X", PyInt_FromLong( ctrlFrame.x ));
-	PyDict_SetItemString(dict, "Y", PyInt_FromLong( ctrlFrame.y ));
-	PyDict_SetItemString(dict, "Width", PyInt_FromLong( ctrlFrame.w ));
-	PyDict_SetItemString(dict, "Height", PyInt_FromLong( ctrlFrame.h ));
-	return dict;
-}
-
-PyDoc_STRVAR( GemRB_Control_SetSize__doc,
-"SetControlSize(WindowIndex, ControlIndex, Width, Height)\n\n"
-"Resizes a Control." );
-
-static PyObject* GemRB_Control_SetSize(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, Width, Height;
-
-	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Width,
-			&Height )) {
-		return AttributeError( GemRB_Control_SetSize__doc );
-	}
-
-	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
-	if (!ctrl) {
-		return NULL;
-	}
-
-	ctrl->SetFrameSize(Size(Width, Height));
-
-	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
@@ -10626,14 +10562,11 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
 	METHOD(Control_AttachScrollBar, METH_VARARGS),
-	METHOD(Control_GetRect, METH_VARARGS),
 	METHOD(Control_HasAnimation, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
-	METHOD(Control_SetPos, METH_VARARGS),
-	METHOD(Control_SetSize, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetTooltip, METH_VARARGS),
@@ -10666,8 +10599,10 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_ListResources, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_SetChapterText, METH_VARARGS),
-	METHOD(TextEdit_SetBackground, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
+	METHOD(View_GetFrame, METH_VARARGS),
+	METHOD(View_SetFrame, METH_VARARGS),
+	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(Window_CreateButton, METH_VARARGS),
 	METHOD(Window_CreateLabel, METH_VARARGS),
 	METHOD(Window_CreateMapControl, METH_VARARGS),
@@ -10677,12 +10612,8 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_CreateWorldMapControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
-	METHOD(Window_GetRect, METH_VARARGS),
 	METHOD(Window_HasControl, METH_VARARGS),
 	METHOD(Window_Invalidate, METH_VARARGS),
-	METHOD(Window_SetPicture, METH_VARARGS),
-	METHOD(Window_SetPos, METH_VARARGS),
-	METHOD(Window_SetSize, METH_VARARGS),
 	METHOD(Window_SetVisible, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),

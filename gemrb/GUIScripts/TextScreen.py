@@ -115,7 +115,7 @@ def StartTextScreen ():
 				PicButton.SetPicture (LoadPic)
 				PicButton.SetState (IE_GUI_BUTTON_LOCKED)
 			else:
-				TextScreen.SetPicture (LoadPic)
+				TextScreen.SetBackground (LoadPic)
 	else:
 		Row = Chapter
 

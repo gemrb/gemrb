@@ -1284,14 +1284,14 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	# generate new buttons by copying from existing ones
 	firstButton = pairs[0]
-	firstRect = firstButton.GetRect ()
-	buttonHeight = firstRect["Height"]
-	buttonWidth = firstRect["Width"]
-	xOffset = firstRect["X"]
-	yOffset = firstRect["Y"]
-	windowRect = Window.GetRect()
-	windowHeight = windowRect["Height"]
-	windowWidth = windowRect["Width"]
+	firstRect = firstButton.GetFrame ()
+	buttonHeight = firstRect["h"]
+	buttonWidth = firstRect["w"]
+	xOffset = firstRect["x"]
+	yOffset = firstRect["y"]
+	windowRect = Window.GetFrame()
+	windowHeight = windowRect["h"]
+	windowWidth = windowRect["w"]
 	limit = limitStep = 0
 	if Mode ==  "horizontal":
 		xOffset += 3*buttonWidth  # width of other controls in party reform; we'll draw on the other side (atleast in guiw8, guiw10 has no need for this)

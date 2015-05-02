@@ -45,7 +45,7 @@ def StartLoadScreen ():
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
-	LoadScreen.SetPicture(LoadPic)
+	LoadScreen.SetBackground(LoadPic)
 	Progress = GemRB.GetVar ("Progress")
 
 	Table = GemRB.LoadTable ("loadhint")

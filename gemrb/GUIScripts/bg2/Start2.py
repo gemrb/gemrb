@@ -71,7 +71,7 @@ def OnLoad():
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
 		if GameCheck.HasTOB():
-			StartWindow.SetPicture("STARTOLD")
+			StartWindow.SetBackground("STARTOLD")
 		if not skip_videos:
 			GemRB.PlayMovie ("INTRO15F", 1)
 	else:
