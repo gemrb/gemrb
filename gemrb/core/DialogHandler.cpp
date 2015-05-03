@@ -374,11 +374,6 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			targetID = tgt->GetGlobalID();
 			tgt->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
-			if (target != tgt) {
-				// switching target; clear actions
-				target = tgt;
-				target->Stop();
-			}
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
