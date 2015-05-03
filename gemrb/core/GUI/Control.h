@@ -85,8 +85,7 @@ public:
 	virtual void UpdateState(const char*, unsigned int) {}
 	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
-	/** various flags based on the control type */
-	ieDword Flags;
+
 	ControlAnimation* animation;
 	Sprite2D* AnimPicture;
 
@@ -108,8 +107,7 @@ public: //Events
 	void ResetEventHandler(ControlEventHandler &handler);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
-	/** Set the Flags */
-	int SetFlags(int arg_flags, int opcode);
+	bool SetFlags(int arg_flags, int opcode);
 	virtual void SetFocus(bool focus);
 	bool isFocused();
 	/** Set handler for specified event. Override in child classes */

@@ -113,8 +113,7 @@ public: //Public attributes
 
 	/** Visible value: deleted, invisible, visible, grayed */
 	signed char Visible;  //-1,0,1,2
-	/** Window flags: Changed, Floating, Framed, Child */
-	int Flags;
+
 	int Cursor;
 	bool FunctionBar;
 private: // Private attributes

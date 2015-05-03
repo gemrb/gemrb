@@ -2323,7 +2323,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			if (!hide) {
 				Window* fw = core->GetWindow(index);
 				assert(fw != NULL);
-				fw->Flags |=WF_FLOAT;
+				fw->flags |=WF_FLOAT;
 				core->SetOnTop(index);
 			}
 		}

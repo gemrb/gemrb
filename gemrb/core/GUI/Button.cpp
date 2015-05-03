@@ -50,7 +50,7 @@ Button::Button(Region& frame)
 		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;
 		disabled_palette->col[i].b = ( disabled_palette->col[i].b * 2 ) / 3;
 	}
-	Flags = IE_GUI_BUTTON_NORMAL;
+	flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
 	pulseBorder = false;
 	Picture = NULL;
@@ -86,7 +86,7 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 		for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
 			Sprite2D::FreeSprite(buttonImages[i]);
 		}
-		Flags &= IE_GUI_BUTTON_NO_IMAGE;
+		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
 		Sprite2D::FreeSprite(buttonImages[type]);
 		buttonImages[type] = img;
@@ -153,7 +153,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	Video * video = core->GetVideoDriver();
 
 	// Button image
-	if (!( Flags & IE_GUI_BUTTON_NO_IMAGE )) {
+	if (!( flags & IE_GUI_BUTTON_NO_IMAGE )) {
 		Sprite2D* Image = NULL;
 
 		switch (State) {
@@ -198,7 +198,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Height / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
 
-		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
 		} else {
 			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
@@ -207,11 +207,11 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Button picture
 	int picXPos = 0, picYPos = 0;
-	if (Picture && (Flags & IE_GUI_BUTTON_PICTURE) ) {
+	if (Picture && (flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
 		picXPos = ( rgn.w / 2 ) - ( Picture->Width / 2 ) + rgn.x;
 		picYPos = ( rgn.h / 2 ) - ( Picture->Height / 2 ) + rgn.y;
-		if (Flags & IE_GUI_BUTTON_HORIZONTAL) {
+		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
 			picXPos += Picture->XPos;
 			picYPos += Picture->YPos;
 
@@ -243,14 +243,14 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	// Composite pictures (paperdolls/description icons)
-	if (!PictureList.empty() && (Flags & IE_GUI_BUTTON_PICTURE) ) {
+	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE) ) {
 		std::list<Sprite2D*>::iterator iter = PictureList.begin();
 		int xOffs = 0, yOffs = 0;
-		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
 			xOffs = frame.w / 2;
 			yOffs = frame.h / 2;
-		} else if (Flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
+		} else if (flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
 			// Display as-is
 			xOffs = 0;
 			yOffs = 0;
@@ -266,7 +266,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	// Button label
-	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
+	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
 		Palette* ppoi = normal_palette;
 		int align = 0;
 
@@ -276,32 +276,32 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
 
-		if (Flags & IE_GUI_BUTTON_ALIGN_LEFT)
+		if (flags & IE_GUI_BUTTON_ALIGN_LEFT)
 			align |= IE_FONT_ALIGN_LEFT;
-		else if (Flags & IE_GUI_BUTTON_ALIGN_RIGHT)
+		else if (flags & IE_GUI_BUTTON_ALIGN_RIGHT)
 			align |= IE_FONT_ALIGN_RIGHT;
 		else
 			align |= IE_FONT_ALIGN_CENTER;
 
-		if (Flags & IE_GUI_BUTTON_ALIGN_TOP)
+		if (flags & IE_GUI_BUTTON_ALIGN_TOP)
 			align |= IE_FONT_ALIGN_TOP;
-		else if (Flags & IE_GUI_BUTTON_ALIGN_BOTTOM)
+		else if (flags & IE_GUI_BUTTON_ALIGN_BOTTOM)
 			align |= IE_FONT_ALIGN_BOTTOM;
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
-		if (! (Flags & IE_GUI_BUTTON_MULTILINE)) {
+		if (! (flags & IE_GUI_BUTTON_MULTILINE)) {
 			align |= IE_FONT_SINGLE_LINE;
 		}
 
 		Region r = rgn;
-		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+		if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
 		} else if ((IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT |
 				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM |
-					IE_GUI_BUTTON_MULTILINE) & Flags) {
+					IE_GUI_BUTTON_MULTILINE) & flags) {
 			// FIXME: I'm unsure when exactly this adjustment applies...
 			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
 		}
@@ -309,7 +309,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		font->Print( r, Text, ppoi, (ieByte) align );
 	}
 
-	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
+	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
 		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
 			ButtonBorder *fr = &borders[i];
 			if (! fr->enabled) continue;
@@ -383,7 +383,7 @@ void Button::SetFont(Font* newfont)
 
 Holder<Button::DragOp> Button::DragOperation()
 {
-	if (State != IE_GUI_BUTTON_DISABLED && Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+	if (State != IE_GUI_BUTTON_DISABLED && Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 		EnableBorder(1, true);
 		return Holder<Button::DragOp>(new PortraitDragOp(this, core->Cursors[14]));
 	}
@@ -393,7 +393,7 @@ Holder<Button::DragOp> Button::DragOperation()
 bool Button::AcceptsDragOperation(const DragOp& dop)
 {
 	if (dop.dragView != this && dynamic_cast<const PortraitDragOp*>(&dop)) {
-		return (State != IE_GUI_BUTTON_DISABLED && Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);
+		return (State != IE_GUI_BUTTON_DISABLED && Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);
 	}
 	return View::AcceptsDragOperation(dop);
 }
@@ -416,13 +416,13 @@ bool Button::OnSpecialKeyPress(unsigned char Key)
 {
 	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
 		if (Key == GEM_RETURN) {
-			if (Flags & IE_GUI_BUTTON_DEFAULT ) {
+			if (flags & IE_GUI_BUTTON_DEFAULT ) {
 				RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
 				return true;
 			}
 		}
 		else if (Key == GEM_ESCAPE) {
-			if (Flags & IE_GUI_BUTTON_CANCEL ) {
+			if (flags & IE_GUI_BUTTON_CANCEL ) {
 				RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
 				return true;
 			}
@@ -450,7 +450,7 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 			return;
 		}
 		SetState( IE_GUI_BUTTON_PRESSED );
-		if (Flags & IE_GUI_BUTTON_SOUND) {
+		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
 		if ((Button & GEM_MB_DOUBLECLICK)) {
@@ -488,7 +488,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 		break;
 	}
 
-	if (Flags & IE_GUI_BUTTON_CHECKBOX) {
+	if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox
 		ToggleState = !ToggleState;
 		if (ToggleState)
@@ -503,7 +503,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 			Owner->RedrawControls( VarName, tmp );
 		}
 	} else {
-		if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
+		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 			//radio button
 			ToggleState = true;
 			SetState( IE_GUI_BUTTON_SELECTED );
@@ -545,7 +545,7 @@ void Button::OnMouseOver(const Point& p)
 		return;
 	}
 
-	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
+	if ((flags & IE_GUI_BUTTON_DRAGGABLE) &&
 			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 
 		Point sp = ConvertPointToScreen(p) - drag_start;
@@ -588,9 +588,9 @@ void Button::SetText(const String& string)
 {
 	Text = string;
 	if (string.length()) {
-		if (Flags&IE_GUI_BUTTON_LOWERCASE)
+		if (flags&IE_GUI_BUTTON_LOWERCASE)
 			StringToLower( Text );
-		else if (Flags&IE_GUI_BUTTON_CAPS)
+		else if (flags&IE_GUI_BUTTON_CAPS)
 			StringToUpper( Text );
 		hasText = true;
 	} else {
@@ -618,10 +618,10 @@ void Button::UpdateState(const char* VariableName, unsigned int Sum)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
+	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		ToggleState = ( Sum == Value );
 	}   	//radio button, exact value
-	else if (Flags & IE_GUI_BUTTON_CHECKBOX) {
+	else if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		ToggleState = !!( Sum & Value );
 	} //checkbox, bitvalue
 	else {
@@ -640,7 +640,7 @@ void Button::SetPicture(Sprite2D* newpic)
 	ClearPictureList();
 	Picture = newpic;
 	MarkDirty();
-	Flags |= IE_GUI_BUTTON_PICTURE;
+	flags |= IE_GUI_BUTTON_PICTURE;
 }
 
 /** Clears the list of Pictures */
@@ -658,7 +658,7 @@ void Button::StackPicture(Sprite2D* Picture)
 {
 	PictureList.push_back(Picture);
 	MarkDirty();
-	Flags |= IE_GUI_BUTTON_PICTURE;
+	flags |= IE_GUI_BUTTON_PICTURE;
 }
 
 bool Button::EventHit(const Point& p) const
@@ -683,8 +683,8 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 
 void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color &dest)
 {
-	if ((Clipping>clip) || !(Flags&IE_GUI_BUTTON_HORIZONTAL) ) {
-		Flags |= IE_GUI_BUTTON_HORIZONTAL;
+	if ((Clipping>clip) || !(flags&IE_GUI_BUTTON_HORIZONTAL) ) {
+		flags |= IE_GUI_BUTTON_HORIZONTAL;
 #if 0
 		// FIXME: This doesn't work while CloseUpColor isn't being called
 		// (see Draw)

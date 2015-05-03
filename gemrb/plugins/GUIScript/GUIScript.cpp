@@ -1848,6 +1848,7 @@ static PyObject* GemRB_View_SetBackground(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef) ) {
 		return AttributeError( GemRB_View_SetBackground__doc );
 	}
+
 	View* view = NULL;
 	if (ControlIndex != -1) {
 		view = GetControl(WindowIndex, ControlIndex, -1);
@@ -1872,6 +1873,43 @@ static PyObject* GemRB_View_SetBackground(PyObject * /*self*/, PyObject* args)
 		view->SetBackground(Picture);
 	} else {
 		view->SetBackground(NULL);
+	}
+
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_View_SetFlags__doc,
+			 "SetViewFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
+			 "Sets the Display Flags of a TextArea. Flags are: IE_GUI_TA_SELECTABLE, IE_GUI_TA_AUTOSCROLL, IE_GUI_TA_SMOOTHSCROLL. Operation defaults to OP_SET." );
+
+static PyObject* GemRB_View_SetFlags(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, Flags;
+	int Operation=0;
+
+	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
+		return AttributeError( GemRB_View_SetFlags__doc );
+	}
+
+	if (Operation < BM_SET || Operation > BM_NAND) {
+		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
+		return NULL;
+	}
+
+	View* view = NULL;
+	if (ControlIndex != -1) {
+		view = GetControl(WindowIndex, ControlIndex, -1);
+	} else {
+		view = core->GetWindow( WindowIndex );
+	}
+
+	if (!view) {
+		return NULL;
+	}
+
+	if (!view->SetFlags( Flags, Operation )) {
+		Log(ERROR, "GUIScript", "Flag cannot be set!");
+		return NULL;
 	}
 
 	Py_RETURN_NONE;
@@ -2977,65 +3015,6 @@ static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject*
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Button_SetFlags__doc,
-"SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
-"Sets the Display Flags of a Button." );
-
-static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, Flags, Operation;
-
-	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
-		return AttributeError( GemRB_Button_SetFlags__doc );
-	}
-	if (Operation < BM_SET || Operation > BM_NAND) {
-		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
-		return NULL;
-	}
-
-	Control* btn = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if (!btn) {
-		return NULL;
-	}
-
-	if (btn->SetFlags( Flags, Operation ) ) {
-		Log(ERROR, "GUIScript", "Flag cannot be set!");
-		return NULL;
-	}
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Control_TextArea_SetFlags__doc,
-"SetTextAreaFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
-"Sets the Display Flags of a TextArea. Flags are: IE_GUI_TA_SELECTABLE, IE_GUI_TA_AUTOSCROLL, IE_GUI_TA_SMOOTHSCROLL. Operation defaults to OP_SET." );
-
-static PyObject* GemRB_Control_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, Flags;
-	int Operation=0;
-
-	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
-		return AttributeError( GemRB_Control_TextArea_SetFlags__doc );
-	}
-	if (Operation < BM_SET || Operation > BM_NAND) {
-		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
-		return NULL;
-	}
-
-	Control* ta = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
-	if (!ta) {
-		return NULL;
-	}
-
-	if (ta->SetFlags( Flags, Operation )) {
-		Log(ERROR, "GUIScript", "Flag cannot be set!");
-		return NULL;
-	}
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_ScrollBar_SetDefaultScrollBar__doc,
 "SetDefaultScrollBar(WindowIndex, ControlIndex)\n\n"
 "Sets the ScrollBar control as default." );
@@ -3428,7 +3407,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 		//if this control says the resource is the same
 		//we wanted to set, we don't reset it
 		//but we must reinitialize it, if it was play once
-		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->Flags&IE_GUI_BUTTON_PLAYONCE)) {
+		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->flags&IE_GUI_BUTTON_PLAYONCE)) {
 			Py_RETURN_NONE;
 		}
 		delete ctl->animation;
@@ -10546,7 +10525,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetActionIcon, METH_VARARGS),
 	METHOD(Button_SetBAM, METH_VARARGS),
 	METHOD(Button_SetBorder, METH_VARARGS),
-	METHOD(Button_SetFlags, METH_VARARGS),
 	METHOD(Button_SetFont, METH_VARARGS),
 	METHOD(Button_SetAnchor, METH_VARARGS),
 	METHOD(Button_SetPushOffset, METH_VARARGS),
@@ -10572,7 +10550,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetTooltip, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Control_SubstituteForControl, METH_VARARGS),
-	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
@@ -10602,6 +10579,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(View_GetFrame, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
+	METHOD(View_SetFlags, METH_VARARGS),
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(Window_CreateButton, METH_VARARGS),
 	METHOD(Window_CreateLabel, METH_VARARGS),

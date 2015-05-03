@@ -199,7 +199,7 @@ void TextArea::UpdateScrollbar()
 		scrollbar->SetMax(sbMax);
 	}
 
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
+	if (flags&IE_GUI_TEXTAREA_AUTOSCROLL
 		&& dialogBeginNode) {
 		// now scroll dialogBeginNode to the top less a blank line
 		ScrollToY(nodeBounds.y - ftext->LineHeight);
@@ -216,7 +216,7 @@ void TextArea::SetScrollBar(ScrollBar* bar)
 
 	// we need to update the ScrollBar position based around TextYPos
 	UpdateScrollbar();
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
+	if (flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
 		int bottom = ContentHeight() - frame.h;
 		if (bottom > 0)
 			ScrollToY(bottom); // no animation for this one
@@ -250,7 +250,7 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 
 void TextArea::AppendText(const String& text)
 {
-	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
+	if (flags&IE_GUI_TEXTAREA_HISTORY) {
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
 		// start trimming content from the top until we are under the limit.
 		Size frame = textContainer->Dimensions();
@@ -300,7 +300,7 @@ void TextArea::AppendText(const String& text)
 
 	if (scrollbar) {
 		UpdateScrollbar();
-		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
+		if (flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 		{
 			// scroll to the bottom
 			int bottom = ContentHeight() - frame.h;
@@ -323,7 +323,7 @@ int TextArea::InsertText(const char* text, int pos)
 /** Key Press Event */
 bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
+	if (flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
 			MarkDirty();
 
@@ -352,7 +352,7 @@ bool TextArea::OnSpecialKeyPress(unsigned char Key)
 	size_t len = 0;
 	size_t CurPos = 0;
 
-	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
+	if (!(flags&IE_GUI_TEXTAREA_EDITABLE)) {
 		return false;
 	}
 	MarkDirty();
@@ -673,7 +673,7 @@ void TextArea::ClearText()
 void TextArea::SetFocus(bool focus)
 {
 	Control::SetFocus(focus);
-	if (hasFocus && Flags & IE_GUI_TEXTAREA_EDITABLE) {
+	if (hasFocus && flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
 }

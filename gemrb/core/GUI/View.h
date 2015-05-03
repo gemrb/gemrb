@@ -64,6 +64,7 @@ protected:
 
 public:
 	String tooltip;
+	ieDword flags;
 	// using Held so we can have polymorphic drag operations
 	struct DragOp : public Held<DragOp> {
 		View* dragView;
@@ -97,6 +98,7 @@ public:
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
+	virtual bool SetFlags(int arg_flags, int opcode);
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }

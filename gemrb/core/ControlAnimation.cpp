@@ -66,7 +66,7 @@ bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 	if (!bam) return false;
 	if (strnicmp(ResRef, bam->ResRef, sizeof(ieResRef) )) return false;
 	int c = cycle;
-	if (control->Flags&IE_GUI_BUTTON_PLAYRANDOM) {
+	if (control->flags&IE_GUI_BUTTON_PLAYRANDOM) {
 		c&=~1;
 	}
 	if (Cycle!=c) return false;
@@ -78,13 +78,13 @@ void ControlAnimation::UpdateAnimation(bool paused)
 	unsigned long time;
 	int Cycle = cycle;
 
-	if (paused && !(control->Flags & IE_GUI_BUTTON_PLAYALWAYS)) {
+	if (paused && !(control->flags & IE_GUI_BUTTON_PLAYALWAYS)) {
 		// try again later
 		core->timer->AddAnimation( this, 1 );
 		return;
 	}
 
-	if (control->Flags & IE_GUI_BUTTON_PLAYRANDOM) {
+	if (control->flags & IE_GUI_BUTTON_PLAYRANDOM) {
 		// simple Finite-State Machine
 		if (anim_phase == 0) {
 			frame = 0;
@@ -119,7 +119,7 @@ void ControlAnimation::UpdateAnimation(bool paused)
 
 	if (pic == NULL) {
 		//stopping at end frame
-		if (control->Flags & IE_GUI_BUTTON_PLAYONCE) {
+		if (control->flags & IE_GUI_BUTTON_PLAYONCE) {
 			core->timer->RemoveAnimation( this );
 			control->SetAnimPicture( NULL );
 			return;

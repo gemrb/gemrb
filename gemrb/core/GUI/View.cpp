@@ -38,6 +38,7 @@ View::View(const Region& frame)
 
 	dirty = true;
 	resizeFlags = RESIZE_NONE;
+	flags = 0;
 
 	SizeChanged(frame.Dimensions());
 }
@@ -327,6 +328,33 @@ void View::SetScrollBar(ScrollBar* sb)
 		s.w += sbSize.w;
 		SetFrameSize(s);
 	}
+}
+
+bool View::SetFlags(int arg_flags, int opcode)
+{
+	ieDword newFlags = flags;
+	switch (opcode) {
+		case BM_SET:
+			newFlags = arg_flags;  //set
+			break;
+		case BM_AND:
+			newFlags &= arg_flags;
+			break;
+		case BM_OR:
+			newFlags |= arg_flags; //turn on
+			break;
+		case BM_XOR:
+			newFlags ^= arg_flags;
+			break;
+		case BM_NAND:
+			newFlags &= ~arg_flags;//turn off
+			break;
+		default:
+			return false;
+	}
+	flags = newFlags;
+	MarkDirty();
+	return true;
 }
 
 void View::SetTooltip(const String& string)

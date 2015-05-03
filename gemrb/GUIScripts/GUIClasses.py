@@ -60,6 +60,7 @@ class GView:
 	'GetFrame': _GemRB.View_GetFrame,
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
+    'SetFlags': _GemRB.View_SetFlags,
 	}
 	def SetSize(self, w, h):
 		r = self.GetFrame()
@@ -81,6 +82,9 @@ class GWindow(GView):
   }
   def SetBackground(self, resref):
 	  _GemRB.View_SetBackground(self.ID, -1, resref)
+	  
+  def SetFlags(self, flags, op):
+	  _GemRB.View_SetFlags(self.ID, -1, flags, op)
 
   def __nonzero__(self):
     return self.ID != -1
@@ -152,7 +156,6 @@ class GTextArea(GControl):
     'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
-    'SetFlags': _GemRB.Control_TextArea_SetFlags,
     'SetOptions': _GemRB.TextArea_SetOptions,
     'ListResources': _GemRB.TextArea_ListResources
   }
@@ -178,7 +181,6 @@ class GButton(GControl):
     'SetAnchor': _GemRB.Button_SetAnchor,
     'SetPushOffset': _GemRB.Button_SetPushOffset,
     'SetTextColor': _GemRB.Button_SetTextColor,
-    'SetFlags': _GemRB.Button_SetFlags,
     'SetState': _GemRB.Button_SetState,
     'SetPictureClipping': _GemRB.Button_SetPictureClipping,
     'SetPicture': _GemRB.Button_SetPicture,

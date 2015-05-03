@@ -35,7 +35,6 @@ Window::Window(unsigned short WindowID, const Region& frame)
 	: View(frame)
 {
 	this->WindowID = WindowID;
-	Flags = 0;
 
 	Visible = WINDOW_INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
@@ -99,7 +98,7 @@ void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
 	if (!Visible) return; // no point in drawing invisible windows
 
-	if (!(Flags&WF_BORDERLESS)) {
+	if (!(flags&WF_BORDERLESS)) {
 		Video* video = core->GetVideoDriver();
 		video->SetScreenClip( NULL );
 

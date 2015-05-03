@@ -45,7 +45,6 @@ Control::Control(const Region& frame)
 	VarName[0] = 0;
 	ControlID = 0;
 	Value = 0;
-	Flags = 0;
 	Owner = NULL;
 
 	animation = NULL;
@@ -117,37 +116,16 @@ bool Control::isFocused()
 {
 	return hasFocus;
 }
+
 /** Sets the Display Flags */
-int Control::SetFlags(int arg_flags, int opcode)
+bool Control::SetFlags(int arg_flags, int opcode)
 {
 	if ((arg_flags >>24) != ControlType) {
 		Log(WARNING, "Control", "Trying to modify invalid flag %x on control %d (opcode %d)",
 			arg_flags, ControlID, opcode);
-		return -2;
+		return false;
 	}
-	ieDword newFlags = Flags;
-	switch (opcode) {
-		case BM_SET:
-			newFlags = arg_flags;  //set
-			break;
-		case BM_AND:
-			newFlags &= arg_flags;
-			break;
-		case BM_OR:
-			newFlags |= arg_flags; //turn on
-			break;
-		case BM_XOR:
-			newFlags ^= arg_flags;
-			break;
-		case BM_NAND:
-			newFlags &= ~arg_flags;//turn off
-			break;
-		default:
-			return -1;
-	}
-	Flags = newFlags;
-	MarkDirty();
-	return 0;
+	return View::SetFlags(arg_flags, opcode);
 }
 
 void Control::SetAnimPicture(Sprite2D* newpic)
