@@ -80,7 +80,6 @@ class GWindow(GView):
     'SetupControls': _GemRB.Window_SetupControls,
     'SetVisible': _GemRB.Window_SetVisible,
     'ShowModal': _GemRB.Window_ShowModal,
-    'Invalidate': _GemRB.Window_Invalidate,
   }
   def SetBackground(self, resref):
 	  _GemRB.View_SetBackground(self.ID, -1, resref)

@@ -489,14 +489,8 @@ def MoviePlayPress():
 			if s==0:
 				s = MoviesTable.GetRowName(i)
 				GemRB.PlayMovie(s, 1)
-				SubOptionsWindow.Invalidate()
 				return
 			s = s - 1
-	return
-
-def MovieCreditsPress():
-	GemRB.PlayMovie("CREDITS")
-	SubOptionsWindow.Invalidate()
 	return
 
 def OpenMovieWindow ():
@@ -517,7 +511,7 @@ def OpenMovieWindow ():
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
-	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MovieCreditsPress)
+	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.PlayMovie("CREDITS"))
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseSubOptionsWindow)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

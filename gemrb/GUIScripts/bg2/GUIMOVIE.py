@@ -61,7 +61,6 @@ def PlayPress():
 				PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 				s = MoviesTable.GetRowName (i)
 				GemRB.PlayMovie (s, 1)
-				MovieWindow.Invalidate ()
 				return
 			s = s - 1
 	return

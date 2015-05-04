@@ -1458,7 +1458,6 @@ def AbilitiesStorePress():
 def AbilitiesRecallPress():
 	global AbilitiesWindow
 
-	AbilitiesWindow.Invalidate ()
 	e=GemRB.GetVar("StoredStrExtra")
 	GemRB.SetVar("StrExtra",e)
 	for i in range (7):
@@ -1480,7 +1479,6 @@ def AbilitiesRecallPress():
 def AbilitiesRerollPress():
 	global AbilitiesWindow, AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
 
-	AbilitiesWindow.Invalidate ()
 	GemRB.SetVar ("Ability0", 0)
 	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
 	PointsLeftLabel.SetText ("0")

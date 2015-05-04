@@ -630,11 +630,6 @@ def UpdateActionsWindow ():
 			return
 	else:
 		UpdateClock ()
-		if GemRB.GetVar ("OtherWindow") == -1:
-			if PortraitWindow:
-				PortraitWindow.Invalidate ()
-			if OptionsWindow:
-				OptionsWindow.Invalidate ()
 
 	Selected = GemRB.GetSelectedSize()
 

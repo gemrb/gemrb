@@ -69,7 +69,6 @@ def CalcLimits(Abidx):
 def RollPress():
 	global PointsLeft, Add
 
-	AbilityWindow.Invalidate()
 	GemRB.SetVar("Ability",0)
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetTextColor(255, 255, 0)
@@ -153,7 +152,6 @@ def OnLoad():
 def RightPress():
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
@@ -197,7 +195,6 @@ def LeftPress():
 	global PointsLeft
 
 	Abidx = GemRB.GetVar("Ability")
-	AbilityWindow.Invalidate()
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )

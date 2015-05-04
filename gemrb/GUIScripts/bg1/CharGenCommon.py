@@ -135,7 +135,6 @@ class CharGen:
 		
 		#show
 		CharGenWindow.SetVisible(WINDOW_VISIBLE)
-		CharGenWindow.Invalidate()
 		self.window = CharGenWindow
 	
 	def unset(self,stage):

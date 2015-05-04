@@ -1678,27 +1678,6 @@ static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_Invalidate__doc,
-"InvalidateWindow(WindowIndex)\n\n"
-"Invalidates the given Window." );
-
-static PyObject* GemRB_Window_Invalidate(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex;
-
-	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
-		return AttributeError( GemRB_Window_Invalidate__doc );
-	}
-
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!");
-	}
-	win->MarkDirty();
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_CreateWindow__doc,
 "CreateWindow(WindowID, X, Y, Width, Height, MosResRef) => WindowIndex\n\n"
 "Creates a new empty window and returns its index.");
@@ -10560,7 +10539,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
 	METHOD(Window_HasControl, METH_VARARGS),
-	METHOD(Window_Invalidate, METH_VARARGS),
 	METHOD(Window_SetVisible, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
