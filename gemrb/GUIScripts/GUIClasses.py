@@ -55,13 +55,14 @@ class GSymbol:
   }
   
 class GView:
-	__metaclass__ = metaIDWrapper
+	__metaclass__ = metaControl
 	methods = {
 	'GetFrame': _GemRB.View_GetFrame,
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
 	}
+	
 	def SetSize(self, w, h):
 		r = self.GetFrame()
 		self.SetFrame(r['x'], r['y'], w, h);
@@ -71,6 +72,7 @@ class GView:
 		self.SetFrame(x, y, r['w'], r['h']);
 
 class GWindow(GView):
+  __metaclass__ = metaIDWrapper
   methods = {
     'HasControl': _GemRB.Window_HasControl,
     'DeleteControl': _GemRB.Window_DeleteControl,

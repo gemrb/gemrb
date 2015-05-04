@@ -41,10 +41,12 @@ class metaIDWrapper(type):
 		
 	@classmethod
 	def InitMethod(cls, f = None):
-		def __init__(self, *args):
-			self.ID = args[0]
+		def __init__(self, *args, **kwargs):
+			for k,v in kwargs.iteritems():
+				setattr(self, k, v)
+			assert getattr(self, 'ID', None) is not None # cant have an id wrapper without an ID
 			if f:
-				f(*args[1:])
+				f(self, *args)
 		return __init__
 	
 	def __new__(cls, classname, bases, classdict):
@@ -66,14 +68,6 @@ class metaControl(metaIDWrapper):
 	def GUIScriptMethodHandle(cls, f):
 		return lambda self, *args: f(self.WinID, self.ID, *args)
 		
-	@classmethod
-	def InitMethod(cls, f = None):
-		def __init__(self, *args):
-			self.WinID = args[0]
-			self.ID = args[1]
-			if f:
-				f(*args[2:])
-		return __init__
 
 	def __new__(cls, classname, bases, classdict):
 		classdict['__slots__'] = classdict.get('__slots__', [])

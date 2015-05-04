@@ -100,33 +100,7 @@ void PythonControlCallback::operator() (Control* ctrl) const
 	const long count = PyInt_AsLong(co_argcount);
 	if (count) {
 		assert(count <= 2);
-		const char* type = "Control";
-		switch(ctrl->ControlType) {
-			case IE_GUI_LABEL:
-				type = "Label";
-				break;
-			case IE_GUI_EDIT:
-				type = "TextEdit";
-				break;
-			case IE_GUI_SCROLLBAR:
-				type = "ScrollBar";
-				break;
-			case IE_GUI_TEXTAREA:
-				type = "TextArea";
-				break;
-			case IE_GUI_BUTTON:
-				type = "Button";
-				break;
-			case IE_GUI_WORLDMAP:
-				type = "WorldMap";
-				break;
-			default:
-				break;
-		}
-		// FIXME: Is this right? I can't tell if these should be built by ID or index. Guess I'll find out...
-		PyObject* ctrltuple = Py_BuildValue("(ii)", ctrl->Owner->WindowID, ctrl->ControlID);
-		PyObject* obj = gs->ConstructObject(type, ctrltuple);
-		Py_DECREF(ctrltuple);
+		PyObject* obj = gs->ConstructControl(ctrl);
 		if (count > 1) {
 			args = Py_BuildValue("(Ni)", obj, ctrl->GetValue());
 		} else {

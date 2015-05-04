@@ -1143,44 +1143,13 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 		return RuntimeError(tmp);
 	}
 
-	PyObject* ret = 0;
 	Control *ctrl = GetControl(WindowIndex, ctrlindex, -1);
 	if (!ctrl) {
 		return RuntimeError( "Control is not found" );
 	}
-	const char* type = "Control";
-	switch(ctrl->ControlType) {
-	case IE_GUI_LABEL:
-		type = "Label";
-		break;
-	case IE_GUI_EDIT:
-		type = "TextEdit";
-		break;
-	case IE_GUI_SCROLLBAR:
-		type = "ScrollBar";
-		break;
-	case IE_GUI_TEXTAREA:
-		type = "TextArea";
-		break;
-	case IE_GUI_BUTTON:
-		type = "Button";
-		break;
-	case IE_GUI_WORLDMAP:
-		type = "WorldMap";
-		break;
-	default:
-		break;
-	}
-	PyObject* ctrltuple = Py_BuildValue("(ii)", WindowIndex, ctrlindex);
-	ret = gs->ConstructObject(type, ctrltuple);
-	Py_DECREF(ctrltuple);
 
-	if (!ret) {
-		char buf[256];
-		snprintf( buf, sizeof( buf ), "Couldn't construct Control object for control %d in window %d!", ControlID, WindowIndex );
-		return RuntimeError(buf);
-	}
-	return ret;
+	// FIXME: i dont understand why sometimes the python "controls" are ID pairs and other times they are index pairs...
+	return gs->ConstructControl(ctrlindex, WindowIndex, ctrl->ControlType);
 }
 
 PyDoc_STRVAR( GemRB_Window_HasControl__doc,
@@ -11013,16 +10982,56 @@ void GUIScript::ExecString(const char* string, bool feedback)
 	PyErr_Clear();
 }
 
-PyObject* GUIScript::ConstructObject(const char* type, int arg)
+PyObject* GUIScript::ConstructControl(int id, int winId, unsigned char ctype)
 {
-	PyObject* tuple = PyTuple_New(1);
-	PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(arg));
-	PyObject* ret = gs->ConstructObject(type, tuple);
-	Py_DECREF(tuple);
+	const char* type = "Control";
+	switch(ctype) {
+		case IE_GUI_LABEL:
+			type = "Label";
+			break;
+		case IE_GUI_EDIT:
+			type = "TextEdit";
+			break;
+		case IE_GUI_SCROLLBAR:
+			type = "ScrollBar";
+			break;
+		case IE_GUI_TEXTAREA:
+			type = "TextArea";
+			break;
+		case IE_GUI_BUTTON:
+			type = "Button";
+			break;
+		case IE_GUI_WORLDMAP:
+			type = "WorldMap";
+			break;
+	}
+
+	PyObject* kwargs = Py_BuildValue("{s:i,s:i}", "ID", id, "WinID", winId);
+	PyObject* ret = gs->ConstructObject(type, NULL, kwargs);
+	Py_DECREF(kwargs);
 	return ret;
 }
 
-PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
+PyObject* GUIScript::ConstructControl(Control* ctrl)
+{
+	if (!ctrl) return NULL;
+
+	int winId = -1;
+	if (ctrl->Owner) {
+		winId = ctrl->Owner->WindowID;
+	}
+	return ConstructControl(ctrl->ControlID, winId, ctrl->ControlType);
+}
+
+PyObject* GUIScript::ConstructObject(const char* type, int id)
+{
+	PyObject* kwargs = Py_BuildValue("{s:i}", "ID", id);
+	PyObject* ret = gs->ConstructObject(type, NULL, kwargs);
+	Py_DECREF(kwargs);
+	return ret;
+}
+
+PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs, PyObject* kwArgs)
 {
 	char classname[_MAX_PATH] = "G";
 	strncat(classname, type, _MAX_PATH - 2);
@@ -11038,8 +11047,16 @@ PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 		snprintf(buf, sizeof(buf), "Failed to lookup name '%s'", classname);
 		return RuntimeError(buf);
 	}
-	PyObject* ret = PyObject_Call(cobj, pArgs, NULL);
+	if (pArgs == NULL) {
+		// PyObject_Call requires pArgs not be NULL
+		pArgs = PyTuple_New(0);
+	} else {
+		Py_INCREF(pArgs);
+	}
+	PyObject* ret = PyObject_Call(cobj, pArgs, kwArgs);
+	Py_DECREF(pArgs);
 	if (!ret) {
+		PyErr_Print();
 		return RuntimeError("Failed to call constructor");
 	}
 	return ret;
