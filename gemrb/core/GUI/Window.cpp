@@ -98,7 +98,7 @@ void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
 	if (!Visible) return; // no point in drawing invisible windows
 
-	if (!(flags&WF_BORDERLESS)) {
+	if (!(flags&WF_BORDERLESS) && (frame.w < core->Width || frame.h < core->Height)) {
 		Video* video = core->GetVideoDriver();
 		video->SetScreenClip( NULL );
 
