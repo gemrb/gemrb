@@ -44,6 +44,10 @@ class metaIDWrapper(type):
 		def __init__(self, *args, **kwargs):
 			for k,v in kwargs.iteritems():
 				setattr(self, k, v)
+			if getattr(self, 'ID', None) is None:
+				self.ID = args[0]
+				args = args[1:]
+
 			assert getattr(self, 'ID', None) is not None # cant have an id wrapper without an ID
 			if f:
 				f(self, *args)
