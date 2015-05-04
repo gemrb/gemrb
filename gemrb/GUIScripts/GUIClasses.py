@@ -20,6 +20,7 @@
 import _GemRB
 import CreateControlDecorators
 
+from GUIDefines import *
 from MetaClasses import metaIDWrapper, metaControl
 
 def CreateControlDecorator(func):
@@ -84,7 +85,8 @@ class GWindow(GView):
   def SetBackground(self, resref):
 	  _GemRB.View_SetBackground(self.ID, -1, resref)
 	  
-  def SetFlags(self, flags, op):
+  def SetFlags(self, flags, op = OP_SET):
+	  print "win set flags"
 	  _GemRB.View_SetFlags(self.ID, -1, flags, op)
 
   def __nonzero__(self):

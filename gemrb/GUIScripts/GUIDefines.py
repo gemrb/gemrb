@@ -144,6 +144,9 @@ OP_NAND = 4
 
 # Window position anchors/alignments
 # !!! Keep these synchronized with Window.h !!!
+WF_FLOAT		= 0x01
+WF_BORDERLESS	= 0x02
+
 WINDOW_TOPLEFT       = 0x00
 WINDOW_CENTER        = 0x01
 WINDOW_ABSCENTER     = 0x02

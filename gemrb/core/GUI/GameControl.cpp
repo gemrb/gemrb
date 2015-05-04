@@ -2302,6 +2302,7 @@ bool GameControl::SetGUIHidden(bool hide)
 		if (dict->Lookup( *val, index )) {
 			if (index != (ieDword) -1) {
 				Window* w = core->GetWindow(index);
+				w->SetFlags(WF_BORDERLESS, BM_OR);
 				if (w) {
 					core->SetVisible(index, !hide);
 					if (dict->Lookup( *++val, index )) {
@@ -2323,7 +2324,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			if (!hide) {
 				Window* fw = core->GetWindow(index);
 				assert(fw != NULL);
-				fw->flags |=WF_FLOAT;
+				fw->SetFlags(WF_FLOAT|WF_BORDERLESS, BM_OR);
 				core->SetOnTop(index);
 			}
 		}

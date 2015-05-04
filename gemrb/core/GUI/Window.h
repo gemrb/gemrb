@@ -36,12 +36,12 @@ namespace GemRB {
 
 class Sprite2D;
 
+// !!! Keep these synchronized with GUIDefines.py !!!
 // Window Flags
 #define WF_FLOAT		1 //floating window
 #define WF_BORDERLESS	2 //doesnt draw the window frame
 
 // Window position anchors (actually flags for WindowSetPos())
-// !!! Keep these synchronized with GUIDefines.py !!!
 #define WINDOW_TOPLEFT       0x00
 #define WINDOW_CENTER        0x01
 #define WINDOW_ABSCENTER     0x02
