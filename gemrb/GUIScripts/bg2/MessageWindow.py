@@ -55,7 +55,8 @@ def OnLoad():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 
 	# 1280 and higher don't have this control
-	if OptionsWindow.HasControl (10):
+	Button = OptionsWindow.GetControl (10)
+	if Button:
 		Button = OptionsWindow.GetControl (10)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
 		Button = PortraitWindow.GetControl (8)
@@ -63,8 +64,9 @@ def OnLoad():
 
 	ActionsWindow = GemRB.LoadWindow(3)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
-	if ActionsWindow.HasControl (60):
-		Button=ActionsWindow.GetControl(60)
+	
+	Button = ActionsWindow.GetControl(60)
+	if Button:
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
 		Button=ActionsWindow.GetControl(61)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)

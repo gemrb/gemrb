@@ -75,7 +75,6 @@ class GView:
 class GWindow(GView):
   __metaclass__ = metaIDWrapper
   methods = {
-    'HasControl': _GemRB.Window_HasControl,
     'DeleteControl': _GemRB.Window_DeleteControl,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,

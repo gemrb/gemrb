@@ -465,7 +465,7 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckbox (18044, 18560, HelpTextArea2, Window, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 26311, HelpTextArea2, Window, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
 		GUIOPTControls.OptCheckbox (18044, 24888, HelpTextArea2, Window, 33, 34, 10574, 'Auto Pause Center', None, 1)
-	elif not GameCheck.IsIWD1() and Window.HasControl (26, IE_GUI_BUTTON):
+	elif not GameCheck.IsIWD1() and Window.GetControl (26, IE_GUI_BUTTON):
 		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
 	if GameCheck.IsBG2():
 		GUIOPTControls.OptCheckbox (18044, 58171, HelpTextArea2, Window, 31, 30, 31875, 'Auto Pause State', None, 512) # spell cast

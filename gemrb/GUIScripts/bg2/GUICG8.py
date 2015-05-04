@@ -39,10 +39,10 @@ def OnLoad():
 	for i in range(2,RaceCount+2):
 		#hack to stop if the race table has more entries than the gui resource
 		#this needs to be done because the race table has non-selectable entries
-		if not RaceWindow.HasControl(i):
+		Button = RaceWindow.GetControl(i)
+		if not Button:
 			RaceCount = i-2
 			break
-		Button = RaceWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	GemRB.SetVar ("Race", -1)

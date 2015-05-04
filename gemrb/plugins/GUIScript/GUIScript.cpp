@@ -1124,58 +1124,32 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_GetControl__doc,
-"GetControlObject(WindowID, ControlID) => GControl, or\n"
+"GetControlObject(WindowID, ControlID[, ControlType]) => GControl, or\n"
 "Window.GetControl(ControlID) => GControl\n\n"
 "Returns a control as an object." );
 
 static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
+	int type = -1;
 
-	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlID )) {
+	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &type )) {
 		return AttributeError( GemRB_Window_GetControl__doc );
 	}
 
 	int ctrlindex = GetControlIndex(WindowIndex, ControlID);
 	if (ctrlindex == -1) {
-		char tmp[40];
-		snprintf(tmp, sizeof(tmp), "Control (ID: %d) was not found!", ControlID);
-		return RuntimeError(tmp);
+		Py_RETURN_NONE;
 	}
 
-	Control *ctrl = GetControl(WindowIndex, ctrlindex, -1);
-	if (!ctrl) {
-		return RuntimeError( "Control is not found" );
+	Control *ctrl = GetControl(WindowIndex, ctrlindex, type);
+	assert(ctrl); // we just looked this up so it had better exist
+	if (type > -1 && ctrl->ControlType != type) {
+		Py_RETURN_NONE;
 	}
 
 	// FIXME: i dont understand why sometimes the python "controls" are ID pairs and other times they are index pairs...
 	return gs->ConstructControl(ctrlindex, WindowIndex, ctrl->ControlType);
-}
-
-PyDoc_STRVAR( GemRB_Window_HasControl__doc,
-"HasControl(WindowIndex, ControlID[, ControlType]) => bool\n\n"
-"Returns true if the control exists." );
-
-static PyObject* GemRB_Window_HasControl(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlID;
-	int Type = -1;
-
-	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &Type )) {
-		return AttributeError( GemRB_Window_HasControl__doc );
-	}
-	int ret = GetControlIndex( WindowIndex, ControlID );
-	if (ret == -1) {
-		return PyInt_FromLong( 0 );
-	}
-
-	if (Type!=-1) {
-		Control *ctrl = GetControl(WindowIndex, ControlID, -1);
-		if (ctrl->ControlType!=Type) {
-			return PyInt_FromLong( 0 );
-		}
-	}
-	return PyInt_FromLong( 1 );
 }
 
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
@@ -10538,7 +10512,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_CreateWorldMapControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
-	METHOD(Window_HasControl, METH_VARARGS),
 	METHOD(Window_SetVisible, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),

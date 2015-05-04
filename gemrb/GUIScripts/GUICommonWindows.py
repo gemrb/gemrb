@@ -108,11 +108,11 @@ else: # Baldurs Gate, Icewind Dale
 # Generic option button init. Pass it the options window. Index is a key to the dicts,
 # IsPage means whether the game should mark the button selected
 def InitOptionButton(Window, Index, Action=0,IsPage=1):
-	if not Window.HasControl(OptionControl[Index]):
+	Button = Window.GetControl (OptionControl[Index])
+	if not Button:
 		print "InitOptionButton cannot find the button: " + Index
 		return
 
-	Button = Window.GetControl (OptionControl[Index])
 	# FIXME: add "(key)" to tooltips!
 	Button.SetTooltip (OptionTip[Index])
 	if Action:
@@ -257,8 +257,8 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		rb = OptionControl['Rest']
 
 	# Rest
-	if Window.HasControl (rb):
-		Button = Window.GetControl (rb)
+	Button = Window.GetControl (rb)
+	if Button:
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
@@ -434,7 +434,7 @@ def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
 
 	ActionsWindow = Window
 	# 1280 and higher don't have this control
-	if not Window.HasControl (62):
+	if not Window.GetControl (62):
 		UpdateActionsWindow ()
 		return
 	# Gears (time) when options pane is down
@@ -1309,8 +1309,9 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		if limitStep > limit:
 			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d" %(limit)
 		nextID = 1000 + i
-		if Window.HasControl (nextID):
-			pairs[i] = Window.GetControl (nextID)
+		control = Window.GetControl (nextID)
+		if control:
+			pairs[i] = control
 			continue
 		if Mode ==  "horizontal":
 			Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
@@ -1340,8 +1341,8 @@ def OpenPortraitWindow (needcontrols=0):
 	if needcontrols and not GameCheck.IsPST(): #not in pst
 		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
 		# 1280 and higher don't have this control
-		if Window.HasControl (8):
-			Button=Window.GetControl (8)
+		Button = Window.GetControl (8)
+		if Button:
 			if GameCheck.IsIWD():
 				# Rest (iwd)
 				Button.SetTooltip (11942)
@@ -1379,10 +1380,11 @@ def OpenPortraitWindow (needcontrols=0):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 	else:
 		# Rest
-		if Window.HasControl(6) and not GameCheck.IsIWD2():
+		if not GameCheck.IsIWD2():
 			Button = Window.GetControl (6)
-			Button.SetTooltip (11942)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
+			if Button:
+				Button.SetTooltip (11942)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i in PortraitButtons:
@@ -1818,9 +1820,9 @@ def UpdateClock ():
 
 	else:
 		Clock = None
-		if OptionsWindow and OptionsWindow.HasControl (9):
+		if OptionsWindow:
 			Clock = OptionsWindow.GetControl (9)
-		elif ActionsWindow and ActionsWindow.HasControl (62):
+		if Clock is None and ActionsWindow:
 			Clock = ActionsWindow.GetControl (62)
 
 		if Clock and Clock.HasAnimation("CGEAR"):

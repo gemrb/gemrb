@@ -344,9 +344,8 @@ def DisplayItem (itemresref, type):
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
-	Label = Window.HasControl(0x1000000b)
+	Label = Window.GetControl(0x1000000b)
 	if Label:
-		Label = Window.GetControl (0x1000000b)
 		if (type&2):
 			# NOT IDENTIFIED
 			Label.SetText (strrefs[6])
@@ -354,7 +353,7 @@ def DisplayItem (itemresref, type):
 			Label.SetText ("")
 
 	# in pst one can cycle through all the items from the description window
-	if Window.HasControl (14):
+	if GameCheck.IsPST():
 		#left scroll
 		Button = Window.GetControl (13)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.LeftItemScroll)
@@ -703,7 +702,7 @@ def ReadItemWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	ret = Spellbook.CannotLearnSlotSpell()
+	ret = Spellbook.CannotLearnSlotSpell(slot)
 
 	if ret:
 		# couldn't find any strrefs for the other undhandled values (stat, level)

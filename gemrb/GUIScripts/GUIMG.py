@@ -116,8 +116,8 @@ def SetupMageWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageNextLevelPress)
 
 	#unknown usage
-	if Window.HasControl (55):
-		Button = Window.GetControl (55)
+	Button = Window.GetControl (55)
+	if Button:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#setup level buttons
@@ -280,8 +280,8 @@ def OpenMageSpellInfoWindow ():
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
-	if GameCheck.HasTOB() or Window.HasControl(6):
-		Button = Window.GetControl (6)
+	Button = Window.GetControl (6)
+	if Button:
 		if index < 100:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)

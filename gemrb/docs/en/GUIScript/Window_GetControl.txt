@@ -1,9 +1,9 @@
 
-Prototype: GemRB.GetControlObject(WindowID, ControlID)
+Prototype: GemRB.GetControlObject(WindowID, ControlID[, ControlType])
 
 Metaclass Prototype:
 
-Description:  Returns a control as an object.
+Description:  Returns a control (of type if supplied) as an object or None if the control of specified type does not exist.
 
 Parameters: 
 WindowID - 
