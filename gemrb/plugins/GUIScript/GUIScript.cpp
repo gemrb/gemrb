@@ -160,17 +160,23 @@ inline PyObject* PyString_FromAnimID(const char* AnimID)
 	return PyString_FromStringAndSize( AnimID, i );
 }
 
+static PyObject* PyError(PyObject* err, const char* msg)
+{
+	PyErr_Print();
+	PyErr_SetString( err, msg );
+	if (QuitOnError) {
+		core->ExitGemRB();
+	}
+	return NULL; // must return NULL
+}
+
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'.
  */
 static PyObject* RuntimeError(const char* msg)
 {
 	Log(ERROR, "GUIScript", "Runtime Error:");
-	PyErr_SetString( PyExc_RuntimeError, msg );
-	if (QuitOnError) {
-		core->ExitGemRB();
-	}
-	return NULL;
+	return PyError(PyExc_RuntimeError, msg);
 }
 
 /* Prints error msg for invalid function parameters and also the function's
@@ -181,11 +187,7 @@ static PyObject* RuntimeError(const char* msg)
 static PyObject* AttributeError(const char* doc_string)
 {
 	Log(ERROR, "GUIScript", "Syntax Error:");
-	PyErr_SetString(PyExc_AttributeError, doc_string);
-	if (QuitOnError) {
-		core->ExitGemRB();
-	}
-	return NULL;
+	return PyError(PyExc_AttributeError, doc_string);
 }
 
 #define GET_GAME() \
