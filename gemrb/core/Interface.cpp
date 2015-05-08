@@ -962,10 +962,7 @@ void Interface::Main()
 
 	vars->Lookup("Mouse Scroll Speed", speed);
 	SetMouseScrollSpeed((int) speed);
-	if (vars->Lookup("Tooltips", TooltipDelay)) {
-		// the games store the slider position*10, not the actual delay
-		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
-	}
+	vars->Lookup("Tooltips", TooltipDelay);
 
 	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
