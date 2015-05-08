@@ -219,6 +219,11 @@ static PyObject* AttributeError(const char* doc_string)
 		return RuntimeError( "Actor not found!\n" ); \
 	}
 
+#define PARSE_ARGS(args, errMsg, fmt, ...) \
+if (!PyArg_ParseTuple( args, fmt, __VA_ARGS__ )) { \
+	return AttributeError( errMsg ); \
+}
+
 static Control *GetControl( int wi, int ci, int ct)
 {
 	char errorbuffer[256];
