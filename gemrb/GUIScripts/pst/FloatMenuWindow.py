@@ -143,7 +143,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
 	# FIXME: keep the menu inside the viewport!!!
-	Window.SetPos (x, y, WINDOW_CENTER | WINDOW_BOUNDED)
+	Window.SetPos (x, y)
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
