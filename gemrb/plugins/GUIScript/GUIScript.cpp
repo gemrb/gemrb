@@ -4994,12 +4994,12 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* /*args*/)
 {
 	Store *store = core->GetCurrentStore();
 	if (!store) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	if (store->Type>STORETYPE_COUNT-1) {
 		store->Type=STORETYPE_COUNT-1;
 	}
+
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "StoreType", PyInt_FromLong( store->Type ));
 	PyDict_SetItemString(dict, "StoreName", PyInt_FromLong( (signed) store->StoreName ));
@@ -5315,15 +5315,13 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	if (index>=(int) store->GetRealStockSize()) {
 		Log(WARNING, "GUIScript", "Item is not available???");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	STOItem *si=store->GetItem( index, true );
 	if (!si) {
 		Log(WARNING, "GUIScript", "Item is not available???");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	PyObject* dict = PyDict_New();
@@ -5343,8 +5341,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	Item *item = gamedata->GetItem(si->ItemResRef, true);
 	if (!item) {
 		Log(WARNING, "GUIScript", "Item is not available???");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
@@ -5381,8 +5378,7 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	if (index>=(int) store->DrinksCount) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	PyObject* dict = PyDict_New();
 	STODrink *drink=store->GetDrink(index);
@@ -5494,8 +5490,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	if (index>=(int) store->CuresCount) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	PyObject* dict = PyDict_New();
 	STOCure *cure=store->GetCure(index);
@@ -5784,14 +5779,12 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, GemRB_GetSpell__doc,  "s|i", &ResRef, &silent);
 
 	if (silent && !gamedata->Exists(ResRef,IE_SPL_CLASS_ID, true)) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	Spell* spell = gamedata->GetSpell(ResRef, silent);
 	if (spell == NULL) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	PyObject* dict = PyDict_New();
@@ -6074,8 +6067,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		si = actor->inventory.GetSlotItem( Slot );
 	}
 	if (! si) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef (si->ItemResRef));
@@ -6247,8 +6239,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	Item* item = gamedata->GetItem(ResRef, true);
 	if (item == NULL) {
 		Log(MESSAGE, "GUIScript", "Cannot get item %s!", ResRef);
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	PyObject* dict = PyDict_New();
@@ -6466,8 +6457,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	// we should Drop the Dragged item in place of the current item
 	// but only if the current item is draggable, tough!
 	if (core->GetDraggedItem()) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	if (!ResRef[0]) {
@@ -6509,8 +6499,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		core->SetEventFlag(EF_SELECTION);
 	}
 	if (! si) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	Item *item = gamedata->GetItem(si->ItemResRef);
@@ -6531,8 +6520,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	if (res>0) {
 		game->AddGold(res);
 		delete si;
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	core->DragItem (si, ResRef);
@@ -6556,8 +6544,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	// FIXME
 	if (core->GetDraggedItem() == NULL) {
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	Label* l = core->GetMessageLabel();
@@ -7963,13 +7950,11 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 
 	if (actor->GetInternalFlag()&IF_NOINT) {
 		Log(MESSAGE, "GuiScript","Cannot break action!");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	actor->Stop(); //stop pending action involved walking
 	actor->SetModal(MS_NONE);//stop modal actions
@@ -8009,8 +7994,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 	if (!actor->PCStats) {
 		//no quick slots for this actor, is this an error?
 		//return RuntimeError( "Actor has no quickslots!\n" );
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	actor->spellbook.GetSpellInfo(&spelldata, type, which, 1);
@@ -8187,8 +8171,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	//don't cast anything, just reinit the spell list
 	if (type==-1) {
 		actor->spellbook.ClearSpellInfo();
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	SpellExtHeader spelldata; // = SpellArray[spell];
@@ -8198,8 +8181,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		if (!actor->PCStats) {
 			//no quick slots for this actor, is this an error?
 			//return RuntimeError( "Actor has no quickslots!\n" );
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellClass[spell]);
 	} else {
@@ -8314,8 +8296,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 			actor->GetItemSlotInfo(&itemdata, header, -1);
 			if (!itemdata.Charges) {
 				Log(MESSAGE, "GUIScript", "QuickItem has no charges.");
-				Py_INCREF( Py_None );
-				return Py_None;
+				Py_RETURN_NONE;
 			}
 			break;
 		default:
@@ -8332,8 +8313,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	//is there any better check for a non existent item?
 	if (!itemdata.itemname[0]) {
 		Log(WARNING, "GUIScript", "Empty slot used?");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	/// remove this after projectile is done
@@ -8700,14 +8680,12 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	if (!owner) owner = game->GetActorByGlobalID( store->GetOwnerID() );
 	if (!owner) {
 		Log(WARNING, "GUIScript", "No owner found!");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 	Actor* attacker = game->FindPC((int) game->GetSelectedPCSingle() );
 	if (!attacker) {
 		Log(WARNING, "GUIScript", "No thief found!");
-		Py_INCREF( Py_None );
-		return Py_None;
+		Py_RETURN_NONE;
 	}
 
 	// apply the reputation penalty
