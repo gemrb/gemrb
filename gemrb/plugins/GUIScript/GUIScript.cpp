@@ -1682,12 +1682,7 @@ static PyObject* GemRB_View_GetFrame(PyObject * /*self*/, PyObject* args)
 	}
 
 	const Region& ctrlFrame = ctrl->Frame();
-	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "x", PyInt_FromLong( ctrlFrame.x ));
-	PyDict_SetItemString(dict, "y", PyInt_FromLong( ctrlFrame.y ));
-	PyDict_SetItemString(dict, "w", PyInt_FromLong( ctrlFrame.w ));
-	PyDict_SetItemString(dict, "h", PyInt_FromLong( ctrlFrame.h ));
-	return dict;
+	return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", ctrlFrame.x, "y", ctrlFrame.y, "w", ctrlFrame.w, "h", ctrlFrame.h);
 }
 
 PyDoc_STRVAR( GemRB_View_SetFrame__doc,
@@ -2221,10 +2216,8 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 		Py_RETURN_NONE;
 	}
 	WorldMap *wm = core->GetWorldMap();
-	PyObject* dict = PyDict_New();
 	//the area the user clicked on
-	PyDict_SetItemString(dict, "Target", PyString_FromString (wmc->Area->AreaName) );
-	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
+	PyObject* dict = Py_BuildValue("{s:s,s:s}", "Target", wmc->Area->AreaName, "Destination", wmc->Area->AreaName);
 
 	if (!strnicmp(wmc->Area->AreaName, core->GetGame()->CurrentArea, 8)) {
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
@@ -3761,13 +3754,9 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 		GAMJournalEntry* je = game->GetJournalEntry( i );
 		if ((section == -1 || section == je->Section) && (chapter == je->Chapter)) {
 			if (index == count) {
-				PyObject* dict = PyDict_New();
-				PyDict_SetItemString(dict, "Text", PyInt_FromLong ((signed) je->Text));
-				PyDict_SetItemString(dict, "GameTime", PyInt_FromLong (je->GameTime));
-				PyDict_SetItemString(dict, "Section", PyInt_FromLong (je->Section));
-				PyDict_SetItemString(dict, "Chapter", PyInt_FromLong (je->Chapter));
-
-				return dict;
+				return Py_BuildValue("{s:i,s:i,s:i,s:i}", "Text", (signed)je->Text,
+									 "GameTime", je->GameTime,
+									 "Section", je->Section, "Chapter", je->Chapter);
 			}
 			count++;
 		}
@@ -4109,9 +4098,9 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	PyObject* dict = PyDict_New();
 	PCStatsStruct* ps = MyActor->PCStats;
 
+	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "BestKilledName", PyInt_FromLong ((signed) ps->BestKilledName));
 	PyDict_SetItemString(dict, "BestKilledXP", PyInt_FromLong (ps->BestKilledXP));
 	PyDict_SetItemString(dict, "AwayTime", PyInt_FromLong (ps->AwayTime));
@@ -4768,11 +4757,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current container!");
 	}
 
-	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "Type", PyInt_FromLong( container->Type ));
-	PyDict_SetItemString(dict, "ItemCount", PyInt_FromLong( container->inventory.GetSlotCount() ));
-
-	return dict;
+	return Py_BuildValue("{s:i,s:i}", "Type", container->Type, "ItemCount", container->inventory.GetSlotCount());
 }
 
 PyDoc_STRVAR( GemRB_GetContainerItem__doc,
@@ -4804,10 +4789,10 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	if (index>=(int) container->inventory.GetSlotCount()) {
 		Py_RETURN_NONE;
 	}
-	PyObject* dict = PyDict_New();
 
 	CREItem *ci=container->inventory.GetSlotItem( index );
 
+	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( ci->ItemResRef ));
 	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (ci->Usages[0]));
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (ci->Usages[1]));
@@ -5376,12 +5361,9 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 	if (index>=(int) store->DrinksCount) {
 		Py_RETURN_NONE;
 	}
-	PyObject* dict = PyDict_New();
+
 	STODrink *drink=store->GetDrink(index);
-	PyDict_SetItemString(dict, "DrinkName", PyInt_FromLong( (signed) drink->DrinkName ));
-	PyDict_SetItemString(dict, "Price", PyInt_FromLong( drink->Price ));
-	PyDict_SetItemString(dict, "Strength", PyInt_FromLong( drink->Strength ));
-	return dict;
+	return Py_BuildValue("{s:i,s:i,s:i}", "DrinkName", (signed)drink->DrinkName, "Price", drink->Price, "Strength", drink->Strength);
 }
 
 static void ReadUsedItems()
@@ -5488,12 +5470,9 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 	if (index>=(int) store->CuresCount) {
 		Py_RETURN_NONE;
 	}
-	PyObject* dict = PyDict_New();
 	STOCure *cure=store->GetCure(index);
-	PyDict_SetItemString(dict, "CureResRef", PyString_FromResRef( cure->CureResRef ));
-	PyDict_SetItemString(dict, "Price", PyInt_FromLong( cure->Price ));
-	PyDict_SetItemString(dict, "Description", PyInt_FromLong( (signed) GetSpellDesc(cure->CureResRef) ) );
-	return dict;
+	return Py_BuildValue("{s:s,s:i,s:i}", "CureResRef", cure->CureResRef, "Price",
+						 cure->Price, "Description", (signed) GetSpellDesc(cure->CureResRef));
 }
 
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
@@ -5709,11 +5688,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ks->SpellResRef));
-	//PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ms->Flags));
-
-	return dict;
+	return Py_BuildValue("{s:s}", "SpellResRef", ks->SpellResRef);
 }
 
 
@@ -5757,10 +5732,7 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ms->SpellResRef));
-	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ms->Flags));
-	return dict;
+	return Py_BuildValue("{s:s,s:i}", "SpellResRef", ms->SpellResRef, "Flags", ms->Flags);
 }
 
 
