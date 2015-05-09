@@ -98,37 +98,37 @@ class GWindow(GView):
 
   @CreateControlDecorator
   def CreateWorldMapControl(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_WORLDMAP, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_WORLDMAP, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)
 
   @CreateControlDecorator
   def CreateMapControl(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_MAP, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_MAP, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)
 
   @CreateControlDecorator
   def CreateLabel(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_LABEL, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_LABEL, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)
 
   @CreateControlDecorator
   def CreateButton(self, control, IE_GUI_BUTTON, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_BUTTON, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)
 
   @CreateControlDecorator
   def CreateScrollBar(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_SCROLLBAR, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_SCROLLBAR, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)
 
   @CreateControlDecorator
   def CreateTextArea(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_TEXTAREA, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)  
   
   @CreateControlDecorator
   def CreateTextEdit(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:])
+    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_EDIT, -1, args[0], args[1], args[2], args[3], args[4:])
     return _GemRB.Window_GetControl(self.ID, control)
  
 

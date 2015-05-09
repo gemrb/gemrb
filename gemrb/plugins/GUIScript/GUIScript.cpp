@@ -981,22 +981,30 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateControl__doc,
-			 "CreateControl(WindowID, ControlID[, ControlType]) => GControl\n\n"
+			 "CreateControl(WindowID, ControlID, ControlType, SuperviewID[, params]) => GControl\n\n"
 			 "Returns the control as an object." );
 
 static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
-	int type = -1;
+	int type = -1, superviewId = -1;
 	Region rgn;
 	PyObject* constructArgs = NULL;
-	PARSE_ARGS(args, GemRB_Window_CreateControl__doc, "iiiiiii|O",
-			   &WindowIndex, &ControlID, &type,
+	PARSE_ARGS(args, GemRB_Window_CreateControl__doc, "iiiiiiii|O",
+			   &WindowIndex, &ControlID, &type, &superviewId,
 			   &rgn.x, &rgn.y, &rgn.w, &rgn.h, &constructArgs);
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
+	}
+
+	View* superview = win;
+	if (superviewId > -1) {
+		superview = win->GetControlAtIndex(superviewId);
+		if (!superview) {
+			return RuntimeError("Cannot find superview!");
+		}
 	}
 
 	Control* ctrl = NULL;
@@ -1148,7 +1156,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 
 	assert(ctrl);
 	ctrl->ControlID = ControlID;
-	win->AddSubviewInFrontOfView( ctrl );
+	superview->AddSubviewInFrontOfView( ctrl );
 
 	// FIXME: i dont understand why sometimes the python "controls" are ID pairs and other times they are index pairs...
 	return gs->ConstructControl(win->GetControlIndex(ControlID), WindowIndex, ctrl->ControlType);
