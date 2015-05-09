@@ -5318,13 +5318,15 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	PyObject* dict = PyDict_New();
+
 	STOItem *si=store->GetItem( index, true );
 	if (!si) {
 		Log(WARNING, "GUIScript", "Item is not available???");
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
+
+	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( si->ItemResRef ));
 	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (si->Usages[0]));
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
