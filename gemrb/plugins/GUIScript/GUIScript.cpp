@@ -2341,11 +2341,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 		substitute->SetScrollBar((ScrollBar*)target->RemoveSubview(sb));
 	}
 	targetWin->AddSubviewInFrontOfView( substitute ); // deletes target!
-
-	PyObject* ctrltuple = Py_BuildValue("(ii)", WindowIndex, substitute->ControlID);
-	PyObject* ret = GemRB_Window_GetControl(NULL, ctrltuple);
-	Py_DECREF(ctrltuple);
-	return ret;
+	return gs->ConstructControl(substitute->ControlID, WindowIndex);
 }
 
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
