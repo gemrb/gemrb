@@ -181,7 +181,7 @@ def OpenContainerWindow ():
 	# Gears (time) when options pane is down
 	if GameCheck.IsBG2():
 		Button = Window.GetControl (62)
-		Label = Button.CreateLabelOnButton (0x1000003e, "NORMAL", IE_FONT_SINGLE_LINE)
+		Label = Button.CreateLabel (0x1000003e, "NORMAL", "", IE_FONT_SINGLE_LINE)
 
 		Label.SetAnimation ("CPEN")
 		Button.SetAnimation ("CGEAR")
@@ -225,8 +225,8 @@ def OpenContainerWindow ():
 		if GameCheck.IsPST():
 			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.CreateLabelOnButton (0x10000043, "NUMBER", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Button.CreateLabelOnButton (0x10000044, "NUMBER", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+		Button.CreateLabel (0x10000043, "NUMBER", "", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Button.CreateLabel (0x10000044, "NUMBER", "", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 	else:
 		Label = Window.CreateLabel (0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 		Label = Window.CreateLabel (0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)

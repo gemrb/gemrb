@@ -240,7 +240,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Window.CreateButton (OptionControl['Time'], 6, pos, 64, 71)
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:
-			Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", IE_FONT_SINGLE_LINE)
+			Label = Button.CreateLabel (0x10000009, "NORMAL", "", IE_FONT_SINGLE_LINE)
 			Label.SetAnimation ("CPEN")
 
 		Button.SetAnimation ("CGEAR")
@@ -439,7 +439,7 @@ def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
 		return
 	# Gears (time) when options pane is down
 	Button = Window.GetControl (62)
-	Label = Button.CreateLabelOnButton (0x1000003e, "NORMAL", IE_FONT_SINGLE_LINE)
+	Label = Button.CreateLabel (0x1000003e, "NORMAL", "", IE_FONT_SINGLE_LINE)
 
 	# FIXME: display all animations
 	Label.SetAnimation ("CPEN")
@@ -1392,11 +1392,11 @@ def OpenPortraitWindow (needcontrols=0):
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetFont ("STATES")
 			# label for status flags (dialog, store, level up)
-			Button.CreateLabelOnButton(200 + i, "STATES", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE) #level up icon is on the right
+			Button.CreateLabel(200 + i, "STATES", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE) #level up icon is on the right
 		elif not GameCheck.IsPST():
 			Button.SetFont ("STATES2")
 			# label for status flags (dialog, store, level up)
-			Button.CreateLabelOnButton(200 + i, "STATES2", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE) #level up icon is on the right
+			Button.CreateLabel(200 + i, "STATES2", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE) #level up icon is on the right
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
@@ -1410,7 +1410,7 @@ def OpenPortraitWindow (needcontrols=0):
 		if GameCheck.IsIWD1():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
-			Button.CreateLabelOnButton(100+i, "NUMFONT", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
+			Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetUseRGB (True)
 

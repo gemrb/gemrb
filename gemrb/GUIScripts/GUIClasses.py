@@ -200,9 +200,9 @@ class GButton(GControl):
     'SetItemIcon': _GemRB.Button_SetItemIcon,
     'SetActionIcon': _GemRB.Button_SetActionIcon
   }
-  def CreateLabelOnButton(self, control, *args):
-    _GemRB.Button_CreateLabelOnButton(self.WinID, self.ID, control, *args)
-    return _GemRB.Window_GetControl(self.WinID, control)
+  def CreateLabel(self, labelid, *args):
+    frame = self.GetFrame()
+    return _GemRB.Window_CreateControl(self.WinID, labelid, IE_GUI_LABEL, self.ID, 0, 0, frame['w'], frame['h'], args)
 
 class GWorldMap(GControl):
   methods = {

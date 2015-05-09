@@ -1667,43 +1667,6 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( WindowIndex );
 }
 
-PyDoc_STRVAR( GemRB_Button_CreateLabelOnButton__doc,
-"CreateLabelOnButton(WindowIndex, ControlIndex, NewControlID, font, align)"
-"Creates a label on top of a button, copying the button's size and position." );
-
-static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex, ControlID, align;
-	char *font;
-
-	if (!PyArg_ParseTuple( args, "iiisi", &WindowIndex, &ControlIndex,
-			&ControlID, &font, &align )) {
-		return AttributeError( GemRB_Button_CreateLabelOnButton__doc );
-	}
-
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!");
-	}
-	Control *btn = GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if (!btn) {
-		return NULL;
-	}
-	Region frame = Region(Point(0, 5), btn->Dimensions());
-	frame.h -= 10;
-	Label* lbl = new Label(frame, core->GetFont( font ), L"" );
-	lbl->ControlID = ControlID;
-	lbl->SetAlignment( align );
-	btn->AddSubviewInFrontOfView( lbl );
-
-	int ret = GetControlIndex( WindowIndex, ControlID );
-
-	if (ret<0) {
-		return NULL;
-	}
-	return PyInt_FromLong( ret );
-}
-
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
 			 "GetRect(WindowIndex, ControlID)\n\n"
 			 "Creates and adds a new Label to a Window." );
@@ -9556,7 +9519,6 @@ static PyMethodDef GemRBMethods[] = {
 };
 
 static PyMethodDef GemRBInternalMethods[] = {
-	METHOD(Button_CreateLabelOnButton, METH_VARARGS),
 	METHOD(Button_EnableBorder, METH_VARARGS),
 	METHOD(Button_SetActionIcon, METH_VARARGS),
 	METHOD(Button_SetBAM, METH_VARARGS),
