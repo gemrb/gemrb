@@ -391,7 +391,7 @@ PyDoc_STRVAR( GemRB_HideGUI__doc,
 static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
 	//it is no problem if the gamecontrol couldn't be found here?
-	GameControl* gc = GetControl<GameControl>(0, 0);
+	GameControl* gc = core->GetGameControl();
 	if (!gc) {
 		return PyInt_FromLong( 0 );
 	}
