@@ -235,24 +235,6 @@ static T* GetView(PyObject* obj) {
 	return dynamic_cast<T*>(view);
 }
 
-template <class T=Control>
-static T* GetControl(int id, int winid) {
-	Window* win = core->GetWindow( winid );
-	if (win) {
-		return dynamic_cast<T*>(win->GetControlAtIndex( id ));
-	}
-	return NULL;
-}
-
-static int GetControlIndex(unsigned short wi, unsigned long ControlID)
-{
-	Window* win = core->GetWindow(wi);
-	if (win == NULL) {
-		return -1;
-	}
-	return win->GetControlIndex(ControlID);
-}
-
 //sets tooltip with Fx key prepended
 static void SetFunctionTooltip(Control* ctrl, char *txt, int Function)
 {
