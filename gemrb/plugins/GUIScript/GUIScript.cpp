@@ -207,6 +207,9 @@ if (!PyArg_ParseTuple( args, fmt, __VA_ARGS__ )) { \
 	return NULL; \
 }
 
+#define ABORT_IF_NULL(thing) \
+if (thing == NULL) return NULL;
+
 template <class T=Control>
 static T* GetControl(int id, int winid) {
 	Window* win = core->GetWindow( winid );
@@ -470,9 +473,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 	PARSE_ARGS( args, "iis", &Win, &Ctrl, &text);
 
 	TextArea* ta = GetControl<TextArea>(Win, Ctrl);
-	if (!ta) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ta);
 
 	ta->ClearText();
 	// insert enough newlines to push the text offscreen
@@ -1166,9 +1167,7 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "ii", &wi, &ci );
 
 	Control *ctrl = GetControl(wi, ci);
-	if (!ctrl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctrl);
 	char* cStr = MBCStringFromString(ctrl->QueryText());
 	if (cStr) {
 		PyObject* pyStr = PyString_FromString(cStr);
@@ -1256,9 +1255,7 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 	ControlIndex = PyInt_AsLong( ci );
 
 	TextArea* ta = GetControl<TextArea>( WindowIndex, ControlIndex );
-	if (!ta) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ta);
 
 	String* str = NULL;
 	if (PyObject_TypeCheck( pystr, &PyString_Type )) {
@@ -1301,9 +1298,7 @@ static PyObject* GemRB_TextArea_Clear(PyObject * /*self*/, PyObject* args)
 	WindowIndex = PyInt_AsLong( wi );
 	ControlIndex = PyInt_AsLong( ci );
 	TextArea* ta = GetControl<TextArea>(WindowIndex, ControlIndex);
-	if (!ta) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ta);
 	ta->ClearText();
 
 	Py_RETURN_NONE;
@@ -1543,14 +1538,10 @@ static PyObject* GemRB_Control_AttachScrollBar(PyObject * /*self*/, PyObject* ar
 	PARSE_ARGS( args, "iii", &WindowIndex, &ControlIndex, &ScbControlIndex );
 
 	Control *ctrl = GetControl(WindowIndex, ControlIndex);
-	if (!ctrl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctrl);
 
 	ScrollBar* scb = GetControl<ScrollBar>(WindowIndex, ScbControlIndex);
-	if (!scb) {
-		return NULL;
-	}
+	ABORT_IF_NULL(scb);
 
 	ctrl->SetScrollBar( scb );
 
@@ -1570,9 +1561,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 			   &WindowIndex, &ControlIndex, &VarName, &Value );
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex );
-	if (!ctrl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctrl);
 
 	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
 	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
@@ -1641,9 +1630,7 @@ static PyObject* GemRB_View_GetFrame(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "ii", &WindowIndex, &ControlIndex);
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex);
-	if (!ctrl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctrl);
 
 	const Region& ctrlFrame = ctrl->Frame();
 	return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", ctrlFrame.x, "y", ctrlFrame.y, "w", ctrlFrame.w, "h", ctrlFrame.h);
@@ -1660,9 +1647,7 @@ static PyObject* GemRB_View_SetFrame(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iiiiii", &WindowIndex, &ControlIndex, &x, &y, &w, &h);
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex);
-	if (!ctrl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctrl);
 
 	ctrl->SetFrame(Region(x, y, w, h));
 	Py_RETURN_NONE;
@@ -1688,9 +1673,7 @@ static PyObject* GemRB_View_SetBackground(PyObject * /*self*/, PyObject* args)
 		view = core->GetWindow( WindowIndex );
 	}
 
-	if (!view) {
-		return NULL;
-	}
+	ABORT_IF_NULL(view);
 
 	if (ResRef[0]) {
 		ResourceHolder<ImageMgr> im(ResRef);
@@ -1732,9 +1715,7 @@ static PyObject* GemRB_View_SetFlags(PyObject * /*self*/, PyObject* args)
 		view = core->GetWindow( WindowIndex );
 	}
 
-	if (!view) {
-		return NULL;
-	}
+	ABORT_IF_NULL(view);
 
 	if (!view->SetFlags( Flags, Operation )) {
 		Log(ERROR, "GUIScript", "Flag cannot be set!");
@@ -1754,9 +1735,7 @@ static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "iiiii", &WindowIndex, &ControlIndex, &r, &g, &b );
 
 	Label* lab = GetControl<Label>(WindowIndex, ControlIndex);
-	if (!lab) {
-		return NULL;
-	}
+	ABORT_IF_NULL(lab);
 
 	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0};
 	lab->SetColor( fore, ColorBlack );
@@ -1776,9 +1755,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 			   &ResRef, &cycle, &unpressed, &pressed, &selected, &disabled );
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (ResRef[0] == 0) {
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
@@ -1820,9 +1797,7 @@ static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
 		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2);
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	const Color src = { (ieByte) r1, (ieByte) g1, (ieByte) b1, (ieByte) a1 };
 	const Color dest = { (ieByte) r2, (ieByte) g2, (ieByte) b2, (ieByte) a2 };
@@ -1846,9 +1821,7 @@ static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
 			   &BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled);
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a };
 	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, color, (bool)enabled, (bool)filled );
@@ -1866,9 +1839,7 @@ static PyObject* GemRB_Button_EnableBorder(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "iiii", &WindowIndex, &ControlIndex, &BorderIndex, &enabled);
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	btn->EnableBorder( BorderIndex, (bool)enabled );
 
@@ -1886,9 +1857,7 @@ static PyObject* GemRB_Button_SetFont(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "iis", &WindowIndex, &ControlIndex, &FontResRef);
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	btn->SetFont( core->GetFont( FontResRef ));
 
@@ -1905,9 +1874,7 @@ static PyObject* GemRB_Button_SetAnchor(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iiii", &WindowIndex, &ControlIndex, &x, &y);
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	btn->SetAnchor(x, y);
 
@@ -1924,9 +1891,7 @@ static PyObject* GemRB_Button_SetPushOffset(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iiii", &WindowIndex, &ControlIndex, &x, &y);
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	btn->SetPushOffset(x, y);
 
@@ -1944,9 +1909,7 @@ static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iiiii|i", &WindowIndex, &ControlIndex, &r, &g, &b, &swap );
 
 	Button* but = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!but) {
-		return NULL;
-	}
+	ABORT_IF_NULL(but);
 
 	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0}, back = {0, 0, 0, 0};
 
@@ -2111,9 +2074,7 @@ static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject * /*self*/, PyObject* a
 	PARSE_ARGS( args,  "iiii", &WindowIndex, &ControlIndex, &x, &y );
 
 	WorldMapControl* wmap = GetControl<WorldMapControl>(WindowIndex, ControlIndex);
-	if (!wmap) {
-		return NULL;
-	}
+	ABORT_IF_NULL(wmap);
 	wmap->AdjustScrolling( x, y );
 	Py_RETURN_NONE;
 }
@@ -2176,9 +2137,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	PARSE_ARGS( args, "ii|i", &WindowIndex, &ControlIndex, &eval);
 
 	WorldMapControl* wmc = GetControl<WorldMapControl>(WindowIndex, ControlIndex);
-	if (!wmc) {
-		return NULL;
-	}
+	ABORT_IF_NULL(wmc);
 	//no area was pointed on
 	if (!wmc->Area) {
 		Py_RETURN_NONE;
@@ -2263,9 +2222,7 @@ static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args
 	PARSE_ARGS( args,  "iiiiiii", &WindowIndex, &ControlIndex, &which, &r, &g, &b, &a );
 
 	WorldMapControl* wmap = GetControl<WorldMapControl>(WindowIndex, ControlIndex);
-	if (!wmap) {
-		return NULL;
-	}
+	ABORT_IF_NULL(wmap);
 
 	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a};
 	wmap->SetColor( which, color );
@@ -2317,9 +2274,7 @@ static PyObject* GemRB_Label_SetFont(PyObject * /*self*/, PyObject* args)
 			&FontResRef);
 
 	Label *lbl = GetControl<Label>(WindowIndex, ControlIndex);
-	if (!lbl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(lbl);
 
 	lbl->SetFont( core->GetFont( FontResRef ));
 
@@ -2336,9 +2291,7 @@ static PyObject* GemRB_Label_SetUseRGB(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iii", &WindowIndex, &ControlIndex, &status );
 
 	Label* lab = GetControl<Label>(WindowIndex, ControlIndex);
-	if (!lab) {
-		return NULL;
-	}
+	ABORT_IF_NULL(lab);
 
 	lab->useRGB = ( status != 0 );
 
@@ -2501,9 +2454,7 @@ static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject * /*self*/, PyObje
 	PARSE_ARGS( args,  "ii", &WindowIndex, &ControlIndex);
 
 	ScrollBar* sb = GetControl<ScrollBar>(WindowIndex, ControlIndex);
-	if (!sb) {
-		return NULL;
-	}
+	ABORT_IF_NULL(sb);
 
 	sb->SetFlags( (IE_GUI_SCROLLBAR<<24) | IE_GUI_SCROLLBAR_DEFAULT, BM_OR );
 
@@ -2520,9 +2471,7 @@ static PyObject* GemRB_Button_SetState(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iii", &WindowIndex, &ControlIndex, &state );
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	btn->SetState( state );
 
@@ -2540,9 +2489,7 @@ static PyObject* GemRB_Button_SetPictureClipping(PyObject * /*self*/, PyObject* 
 	PARSE_ARGS( args,  "iid", &WindowIndex, &ControlIndex, &Clipping );
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (Clipping<0.0) Clipping = 0.0;
 	else if (Clipping>1.0) Clipping = 1.0;
@@ -2606,9 +2553,7 @@ static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
 	PyObject *obj;
 	PARSE_ARGS( args,  "iiO", &wi, &ci, &obj );
 	Button* btn = GetControl<Button>( wi, ci );
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	CObject<Sprite2D> spr(obj);
 
@@ -2628,9 +2573,7 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iis", &WindowIndex, &ControlIndex, &ResRef );
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (ResRef[0] == 0) {
 		btn->SetPicture( NULL );
@@ -2671,9 +2614,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	//empty image
 	if (ResRef[0] == 0 || ResRef[0]=='*') {
@@ -2733,9 +2674,7 @@ PyDoc_STRVAR( GemRB_Button_SetBAM__doc,
 static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex, int FrameIndex, int col1)
 {
 	Button* btn = GetControl<Button>(wi, ci);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (ResRef[0] == 0) {
 		btn->SetPicture( NULL );
@@ -2802,9 +2741,7 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject * /*self*/, PyObject
 	}
 
 	Control* ctl = GetControl(wi, ci);
-	if (!ctl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctl);
 
 	ControlAnimation* anim = ctl->animation;
 	if (!anim) {
@@ -2847,9 +2784,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iis|ii", &wi, &ci, &ResRef, &Cycle, &Blend );
 
 	Control* ctl = GetControl(wi, ci);
-	if (!ctl) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ctl);
 
 	//who knows, there might have been an active animation lurking
 	if (ctl->animation) {
@@ -3217,9 +3152,7 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 	int globalID;
 	const char *name;
 	PARSE_ARGS( args,  "is", &globalID, &name );
-	if (!name[0]) {
-		return NULL;
-	}
+	ABORT_IF_NULL(name[0]);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -3423,9 +3356,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 	int flags = 0;
 	PARSE_ARGS( args,  "iii|i", &wi, &ci, &type, &flags );
 	TextArea* ta = GetControl<TextArea>( wi, ci );
-	if (!ta) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ta);
 
 	struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
 		char lastchar;
@@ -3509,9 +3440,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 	}
 
 	TextArea* ta = GetControl<TextArea>( wi, ci );
-	if (!ta) {
-		return NULL;
-	}
+	ABORT_IF_NULL(ta);
 
 	// FIXME: should we have an option to sort the list?
 	// PyList_Sort(list);
@@ -4453,9 +4382,7 @@ PyDoc_STRVAR( GemRB_Button_SetSpellIcon__doc,
 static PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int tooltip, int Function)
 {
 	Button* btn = GetControl<Button>( wi, ci );
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (!SpellResRef[0]) {
 		btn->SetPicture( NULL );
@@ -4556,9 +4483,7 @@ PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
 static PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
 {
 	Button* btn = GetControl<Button>( wi, ci );
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (!ItemResRef[0]) {
 		btn->SetPicture( NULL );
@@ -6348,9 +6273,7 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 	//we should use getslotitem, because
 	//getitem would remove the item from the inventory!
 	CREItem *si = actor->inventory.GetSlotItem(Slot);
-	if (!si) {
-		return NULL;
-	}
+	ABORT_IF_NULL(si);
 
 	//it is always possible to put these items into the inventory
 	// however in pst, we need to ensure immovable swappables are swappable
@@ -7297,9 +7220,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 		return NULL;
 	}
 	Button* btn = GetControl<Button>(WindowIndex, ControlIndex);
-	if (!btn) {
-		return NULL;
-	}
+	ABORT_IF_NULL(btn);
 
 	if (Index<0) {
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
@@ -7586,9 +7507,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 		}
 		Button * btn = GetControl<Button>(wi,ci);
-		if (!btn) {
-			return NULL;
-		}
+		ABORT_IF_NULL(btn);
 		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 		SetItemText(btn, 0, false);
 		PyObject *ret = SetActionIcon(wi,ci,dict, action,i+1);
