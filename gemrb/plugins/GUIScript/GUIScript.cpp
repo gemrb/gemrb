@@ -219,9 +219,9 @@ static PyObject* AttributeError(const char* doc_string)
 		return RuntimeError( "Actor not found!\n" ); \
 	}
 
-#define PARSE_ARGS(args, errMsg, fmt, ...) \
+#define PARSE_ARGS(args, fmt, ...) \
 if (!PyArg_ParseTuple( args, fmt, __VA_ARGS__ )) { \
-	return AttributeError( errMsg ); \
+	return NULL; \
 }
 
 static Control *GetControl( int wi, int ci, int ct)
@@ -389,7 +389,7 @@ PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
 	int r, g, b, a;
-	PARSE_ARGS( args, GemRB_SetInfoTextColor__doc, "iii|i", &r, &g, &b, &a);
+	PARSE_ARGS( args, "iii|i", &r, &g, &b, &a);
 
 	const Color c = {(ieByte) r,(ieByte) g,(ieByte) b,(ieByte) a};
 	core->SetInfoTextColor( c );
@@ -436,7 +436,7 @@ PyDoc_STRVAR( GemRB_GetGameString__doc,
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 {
 	int Index;
-	PARSE_ARGS( args, GemRB_GetGameString__doc, "i", &Index );
+	PARSE_ARGS( args, "i", &Index );
 
 	switch(Index&0xf0) {
 	case 0: //game strings
@@ -454,7 +454,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 		}
 	}
 
-	return AttributeError( GemRB_GetGameString__doc );
+	return NULL;
 }
 
 PyDoc_STRVAR( GemRB_LoadGame__doc,
@@ -465,7 +465,7 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 {
 	PyObject *obj;
 	int VersionOverride = 0;
-	PARSE_ARGS( args, GemRB_LoadGame__doc, "O|i", &obj, &VersionOverride );
+	PARSE_ARGS( args, "O|i", &obj, &VersionOverride );
 
 	CObject<SaveGame> save(obj);
 	core->SetupLoadGame(save, VersionOverride);
@@ -499,7 +499,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 {
 	int Win, Ctrl;
 	char* text;
-	PARSE_ARGS( args, GemRB_TextArea_SetChapterText__doc, "iis", &Win, &Ctrl, &text);
+	PARSE_ARGS( args, "iis", &Win, &Ctrl, &text);
 
 	TextArea* ta = ( TextArea* ) GetControl( Win, Ctrl, IE_GUI_TEXTAREA);
 	if (!ta) {
@@ -530,12 +530,12 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	ieStrRef Strref;
 	int X, Y;
 	PyObject* ret;
-	PARSE_ARGS( args, GemRB_StatComment__doc, "iii", &Strref, &X, &Y );
+	PARSE_ARGS( args, "iii", &Strref, &X, &Y );
 
 	char* text = core->GetCString( Strref );
 	size_t bufflen = strlen( text ) + 12;
 	if (bufflen<12) {
-		return AttributeError( GemRB_StatComment__doc );
+		return NULL;
 	}
 	char* newtext = ( char* ) malloc( bufflen );
 	//this could be DANGEROUS, not anymore (snprintf is your friend)
@@ -555,7 +555,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 	ieStrRef strref;
 	int flags = 0;
 	PyObject* ret;
-	PARSE_ARGS( args, GemRB_GetString__doc, "i|i", &strref, &flags );
+	PARSE_ARGS( args, "i|i", &strref, &flags );
 
 	char *text = core->GetCString( strref, flags );
 	ret=PyString_FromString( text );
@@ -582,7 +582,7 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
 	int width = 0, height = 0;
-	PARSE_ARGS( args, GemRB_LoadWindowPack__doc, "s|ii", &string, &width, &height );
+	PARSE_ARGS( args, "s|ii", &string, &width, &height );
 
 	if (!core->LoadWindowPack( string )) {
 		return RuntimeError("Can't find resource");
@@ -607,7 +607,7 @@ PyDoc_STRVAR( GemRB_LoadWindow__doc,
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowID;
-	PARSE_ARGS( args, GemRB_LoadWindow__doc, "i", &WindowID );
+	PARSE_ARGS( args, "i", &WindowID );
 
 	int ret = core->LoadWindow( WindowID );
 	if (ret == -1) {
@@ -636,7 +636,7 @@ PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
 static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 {
 	int Flag;
-	PARSE_ARGS( args, GemRB_EnableCheatKeys__doc, "i", &Flag );
+	PARSE_ARGS( args, "i", &Flag );
 	core->EnableCheatKeys( Flag );
 	Py_RETURN_NONE;
 }
@@ -649,7 +649,7 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 {
 	char* tablename;
 	int noerror = 0;
-	PARSE_ARGS( args, GemRB_LoadTable__doc, "s|i", &tablename, &noerror );
+	PARSE_ARGS( args, "s|i", &tablename, &noerror );
 
 	int ind = gamedata->LoadTable( tablename );
 	if (ind == -1) {
@@ -669,7 +669,7 @@ PyDoc_STRVAR( GemRB_Table_Unload__doc,
 static PyObject* GemRB_Table_Unload(PyObject * /*self*/, PyObject* args)
 {
 	int ti;
-	PARSE_ARGS( args, GemRB_Table_Unload__doc, "i", &ti );
+	PARSE_ARGS( args, "i", &ti );
 
 	int ind = gamedata->DelTable( ti );
 	if (ind == -1) {
@@ -692,26 +692,26 @@ static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 	int which = -1;
 
 	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &ti, &row, &col, &type )) {
-		return AttributeError( GemRB_Table_GetValue__doc );
+		return NULL;
 	}
 	if (type!=NULL) {
 		if (!PyObject_TypeCheck( type, &PyInt_Type )) {
-			return AttributeError( GemRB_Table_GetValue__doc );
+			return NULL;
 		}
 		which = PyInt_AsLong( type );
 	}
 
 	if (!PyObject_TypeCheck( ti, &PyInt_Type )) {
-		return AttributeError( GemRB_Table_GetValue__doc );
+		return NULL;
 	}
 	long TableIndex = PyInt_AsLong( ti );
 	if (( !PyObject_TypeCheck( row, &PyInt_Type ) ) &&
 		( !PyObject_TypeCheck( row, &PyString_Type ) )) {
-		return AttributeError( GemRB_Table_GetValue__doc );
+		return NULL;
 	}
 	if (( !PyObject_TypeCheck( col, &PyInt_Type ) ) &&
 		( !PyObject_TypeCheck( col, &PyString_Type ) )) {
-		return AttributeError( GemRB_Table_GetValue__doc );
+		return NULL;
 	}
 	if (PyObject_TypeCheck( row, &PyInt_Type ) &&
 		( !PyObject_TypeCheck( col, &PyInt_Type ) )) {
@@ -780,7 +780,7 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 		if (!PyArg_ParseTuple( args, "isl|i", &ti, &colname, &Value, &start )) {
 			PyErr_Clear(); //clearing the exception
 			col = -2;
-			PARSE_ARGS( args, GemRB_Table_FindValue__doc, "iss|i", &ti, &colname, &strvalue, &start );
+			PARSE_ARGS( args, "iss|i", &ti, &colname, &strvalue, &start );
 		}
 	}
 
@@ -805,7 +805,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject * /*self*/, PyObject* args)
 {
 	int ti;
 	char* rowname;
-	PARSE_ARGS( args, GemRB_Table_GetRowIndex__doc, "is", &ti, &rowname );
+	PARSE_ARGS( args, "is", &ti, &rowname );
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
@@ -823,7 +823,7 @@ PyDoc_STRVAR( GemRB_Table_GetRowName__doc,
 static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
 {
 	int ti, row;
-	PARSE_ARGS( args, GemRB_Table_GetRowName__doc, "ii", &ti, &row );
+	PARSE_ARGS( args, "ii", &ti, &row );
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
@@ -845,7 +845,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
 {
 	int ti;
 	char* colname;
-	PARSE_ARGS( args, GemRB_Table_GetColumnIndex__doc, "is", &ti, &colname );
+	PARSE_ARGS( args, "is", &ti, &colname );
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
@@ -863,7 +863,7 @@ PyDoc_STRVAR( GemRB_Table_GetColumnName__doc,
 static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
 {
 	int ti, col;
-	PARSE_ARGS( args, GemRB_Table_GetColumnName__doc, "ii", &ti, &col );
+	PARSE_ARGS( args, "ii", &ti, &col );
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
@@ -884,7 +884,7 @@ PyDoc_STRVAR( GemRB_Table_GetRowCount__doc,
 static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
 {
 	int ti;
-	PARSE_ARGS( args, GemRB_Table_GetRowCount__doc, "i", &ti );
+	PARSE_ARGS( args, "i", &ti );
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
@@ -902,7 +902,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
 {
 	int ti;
 	int row = 0;
-	PARSE_ARGS( args, GemRB_Table_GetColumnCount__doc, "i|i", &ti, &row );
+	PARSE_ARGS( args, "i|i", &ti, &row );
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
@@ -919,7 +919,7 @@ PyDoc_STRVAR( GemRB_LoadSymbol__doc,
 static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 {
 	const char* string;
-	PARSE_ARGS( args, GemRB_LoadSymbol__doc, "s", &string );
+	PARSE_ARGS( args, "s", &string );
 
 	int ind = core->LoadSymbol( string );
 	if (ind == -1) {
@@ -936,7 +936,7 @@ PyDoc_STRVAR( GemRB_Symbol_Unload__doc,
 static PyObject* GemRB_Symbol_Unload(PyObject * /*self*/, PyObject* args)
 {
 	int si;
-	PARSE_ARGS( args, GemRB_Symbol_Unload__doc, "i", &si );
+	PARSE_ARGS( args, "i", &si );
 
 	int ind = core->DelSymbol( si );
 	if (ind == -1) {
@@ -957,7 +957,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 
 	if (PyArg_UnpackTuple( args, "ref", 2, 2, &si, &sym )) {
 		if (!PyObject_TypeCheck( si, &PyInt_Type )) {
-			return AttributeError( GemRB_Symbol_GetValue__doc );
+			return NULL;
 		}
 		long SymbolIndex = PyInt_AsLong( si );
 		if (PyObject_TypeCheck( sym, &PyString_Type )) {
@@ -977,7 +977,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 			return PyString_FromString( str );
 		}
 	}
-	return AttributeError( GemRB_Symbol_GetValue__doc );
+	return NULL;
 }
 
 PyDoc_STRVAR( GemRB_Window_CreateControl__doc,
@@ -990,7 +990,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 	int type = -1, superviewId = -1;
 	Region rgn;
 	PyObject* constructArgs = NULL;
-	PARSE_ARGS(args, GemRB_Window_CreateControl__doc, "iiiiiiii|O",
+	PARSE_ARGS(args, "iiiiiiii|O",
 			   &WindowIndex, &ControlID, &type, &superviewId,
 			   &rgn.x, &rgn.y, &rgn.w, &rgn.h, &constructArgs);
 
@@ -1012,7 +1012,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 		case IE_GUI_EDIT:
 			{
 				char *font, *cstr;
-				PARSE_ARGS( constructArgs, "Invalid parameters for TextEdit",
+				PARSE_ARGS( constructArgs,
 						   "ss", &font, &cstr );
 
 				TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
@@ -1031,7 +1031,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 		case IE_GUI_TEXTAREA:
 			{
 				char *font;
-				PARSE_ARGS( constructArgs, "Invalid parameters for TextArea", "s", &font );
+				PARSE_ARGS( constructArgs, "s", &font );
 				ctrl = new TextArea(rgn, core->GetFont( font ));
 			}
 			break;
@@ -1039,7 +1039,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 			{
 				int align;
 				char *font, *text;
-				PARSE_ARGS( constructArgs, "Invalid parameters for Label",
+				PARSE_ARGS( constructArgs,
 						   "ssi", &font, &text, &align );
 
 				String* string = StringFromCString(text);
@@ -1056,7 +1056,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 
 				// hidden parameters from CreateScrollBar decorator
 				int cycle, up, upPr, down, downPr, trough, slider;
-				PARSE_ARGS( constructArgs, "Invalid parameters for Scrollbar", "siiiiiii",
+				PARSE_ARGS( constructArgs, "siiiiiii",
 								 &resRef, &cycle, &up, &upPr, &down, &downPr, &trough, &slider );
 
 				AnimationFactory* af = ( AnimationFactory* )
@@ -1132,7 +1132,7 @@ static PyObject* GemRB_Window_CreateControl(PyObject * /*self*/, PyObject* args)
 			{
 				int direction, recolor = 0;
 				char *font = NULL;
-				PARSE_ARGS( constructArgs, "Invalid parameters for Worldmap",
+				PARSE_ARGS( constructArgs,
 						   "i|si", &direction, &font, &recolor );
 
 				ctrl = win->GetControlById( ControlID );
@@ -1171,7 +1171,7 @@ static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
 	int type = -1;
-	PARSE_ARGS( args, GemRB_Window_GetControl__doc, "ii|i", &WindowIndex, &ControlID, &type );
+	PARSE_ARGS( args, "ii|i", &WindowIndex, &ControlID, &type );
 
 	int ctrlindex = GetControlIndex(WindowIndex, ControlID);
 	if (ctrlindex == -1) {
@@ -1195,7 +1195,7 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
 static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
-	PARSE_ARGS( args, GemRB_Control_QueryText__doc, "ii", &wi, &ci );
+	PARSE_ARGS( args, "ii", &wi, &ci );
 
 	Control *ctrl = GetControl(wi, ci, -1);
 	if (!ctrl) {
@@ -1217,14 +1217,14 @@ PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
 static PyObject* GemRB_TextEdit_SetBufferLength(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Length;
-	PARSE_ARGS( args, GemRB_TextEdit_SetBufferLength__doc, "iii", &WindowIndex, &ControlIndex, &Length);
+	PARSE_ARGS( args, "iii", &WindowIndex, &ControlIndex, &Length);
 
 	TextEdit* te = (TextEdit *) GetControl( WindowIndex, ControlIndex, IE_GUI_EDIT );
 	if (!te)
 		return NULL;
 
 	if ((ieDword) Length>0xffff) {
-		return AttributeError( GemRB_Control_QueryText__doc );
+		return NULL;
 	}
 
 	te->SetBufferLength((ieWord) Length );
@@ -1240,7 +1240,7 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	PyObject* str;
-	PARSE_ARGS( args, GemRB_TextEdit_SetBufferLength__doc, "iiO", &WindowIndex, &ControlIndex, &str);
+	PARSE_ARGS( args, "iiO", &WindowIndex, &ControlIndex, &str);
 
 	Control *ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
@@ -1276,13 +1276,13 @@ static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
 	long WindowIndex, ControlIndex;
 
 	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &pystr, &flag )) {
-		return AttributeError( GemRB_TextArea_Append__doc );
+		return NULL;
 	}
 	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
 		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
 		( !PyObject_TypeCheck( pystr, &PyString_Type ) &&
 		!PyObject_TypeCheck( pystr, &PyInt_Type ) )) {
-		return AttributeError( GemRB_TextArea_Append__doc );
+		return NULL;
 	}
 	WindowIndex = PyInt_AsLong( wi );
 	ControlIndex = PyInt_AsLong( ci );
@@ -1324,11 +1324,11 @@ static PyObject* GemRB_TextArea_Clear(PyObject * /*self*/, PyObject* args)
 	long WindowIndex, ControlIndex;
 
 	if (!PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
-		return AttributeError( GemRB_TextArea_Clear__doc );
+		return NULL;
 	}
 	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
 		!PyObject_TypeCheck( ci, &PyInt_Type )) {
-		return AttributeError( GemRB_TextArea_Clear__doc );
+		return NULL;
 	}
 	WindowIndex = PyInt_AsLong( wi );
 	ControlIndex = PyInt_AsLong( ci );
@@ -1353,7 +1353,7 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 	int function = 0;
 
 	if (!PyArg_ParseTuple( args, "iiO|i", &WindowIndex, &ControlIndex, &str, &function)) {
-		return AttributeError( GemRB_Control_SetTooltip__doc );
+		return NULL;
 	}
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1);
@@ -1396,7 +1396,7 @@ static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
 	int visible;
-	PARSE_ARGS( args, GemRB_Window_SetVisible__doc, "ii", &WindowIndex, &visible );
+	PARSE_ARGS( args, "ii", &WindowIndex, &visible );
 
 	core->SetVisible( core->GetWindow(WindowIndex), visible );
 	if (!WindowIndex) {
@@ -1416,7 +1416,7 @@ static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 	char* script;
 	char* worldmap1;
 	char* worldmap2 = NULL;
-	PARSE_ARGS( args, GemRB_SetMasterScript__doc, "ss|s", &script, &worldmap1, &worldmap2 );
+	PARSE_ARGS( args, "ss|s", &script, &worldmap1, &worldmap2 );
 
 	strnlwrcpy( core->GlobalScript, script, 8 );
 	strnlwrcpy( core->WorldMapName[0], worldmap1, 8 );
@@ -1438,7 +1438,7 @@ PyDoc_STRVAR( GemRB_Window_ShowModal__doc,
 static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, Shadow = MODAL_SHADOW_NONE;
-	PARSE_ARGS( args, GemRB_Window_ShowModal__doc, "i|i", &WindowIndex, &Shadow );
+	PARSE_ARGS( args, "i|i", &WindowIndex, &Shadow );
 
 	if (! core->ShowModal( core->GetWindow(WindowIndex), (MODAL_SHADOW)Shadow )) {
 		return NULL;
@@ -1457,7 +1457,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* function;
 	int rounds;
-	PARSE_ARGS( args, GemRB_SetTimedEvent__doc, "Oi", &function, &rounds );
+	PARSE_ARGS( args, "Oi", &function, &rounds );
 
 	EventHandler handler = NULL;
 	if (function != Py_None && PyCallable_Check(function)) {
@@ -1484,7 +1484,7 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex;
 	int event;
 	PyObject* func;
-	PARSE_ARGS(args, GemRB_Control_SetEvent__doc, "iiiO", &WindowIndex, &ControlIndex, &event, &func);
+	PARSE_ARGS(args, "iiiO", &WindowIndex, &ControlIndex, &event, &func);
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl)
@@ -1511,10 +1511,10 @@ PyDoc_STRVAR( GemRB_SetNextScript__doc,
 static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 {
 	const char* funcName;
-	PARSE_ARGS( args, GemRB_SetNextScript__doc, "s", &funcName );
+	PARSE_ARGS( args, "s", &funcName );
 
 	if (!strcmp(funcName, "")) {
-		return AttributeError( GemRB_SetNextScript__doc );
+		return NULL;
 	}
 
 	core->SetNextScript(funcName);
@@ -1530,7 +1530,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int status;
-	PARSE_ARGS( args, GemRB_Control_SetStatus__doc, "iii", &WindowIndex, &ControlIndex, &status );
+	PARSE_ARGS( args, "iii", &WindowIndex, &ControlIndex, &status );
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (ctrl == NULL) {
@@ -1572,7 +1572,7 @@ PyDoc_STRVAR( GemRB_Control_AttachScrollBar__doc,
 static PyObject* GemRB_Control_AttachScrollBar(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, ScbControlIndex;
-	PARSE_ARGS( args, GemRB_Control_AttachScrollBar__doc, "iii", &WindowIndex, &ControlIndex, &ScbControlIndex );
+	PARSE_ARGS( args, "iii", &WindowIndex, &ControlIndex, &ScbControlIndex );
 
 	Control *ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
@@ -1598,7 +1598,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex;
 	PyObject* Value;
 	char* VarName;
-	PARSE_ARGS( args, GemRB_Control_SetVarAssoc__doc, "iisO",
+	PARSE_ARGS( args, "iisO",
 			   &WindowIndex, &ControlIndex, &VarName, &Value );
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
@@ -1626,7 +1626,7 @@ PyDoc_STRVAR( GemRB_Window_Unload__doc,
 static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
-	PARSE_ARGS( args, GemRB_Window_Unload__doc, "i", &WindowIndex );
+	PARSE_ARGS( args, "i", &WindowIndex );
 
 	unsigned short arg = (unsigned short) WindowIndex;
 	if (arg == 0xffff) {
@@ -1653,7 +1653,7 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowID, x, y, w, h;
 	char* Background;
-	PARSE_ARGS( args, GemRB_CreateWindow__doc,  "iiiiis", &WindowID, &x, &y,
+	PARSE_ARGS( args,  "iiiiis", &WindowID, &x, &y,
 			&w, &h, &Background );
 	int WindowIndex = core->CreateWindow( WindowID, Region(x, y, w, h), Background );
 	if (WindowIndex == -1) {
@@ -1670,7 +1670,7 @@ PyDoc_STRVAR( GemRB_View_GetFrame__doc,
 static PyObject* GemRB_View_GetFrame(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	PARSE_ARGS( args, GemRB_View_GetFrame__doc, "ii", &WindowIndex, &ControlIndex);
+	PARSE_ARGS( args, "ii", &WindowIndex, &ControlIndex);
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
@@ -1689,7 +1689,7 @@ static PyObject* GemRB_View_SetFrame(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int x, y, w, h;
-	PARSE_ARGS( args, GemRB_View_GetFrame__doc,  "iiiiii", &WindowIndex, &ControlIndex, &x, &y, &w, &h);
+	PARSE_ARGS( args,  "iiiiii", &WindowIndex, &ControlIndex, &x, &y, &w, &h);
 
 	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
@@ -1710,7 +1710,7 @@ static PyObject* GemRB_View_SetBackground(PyObject * /*self*/, PyObject* args)
 	char *ResRef;
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef) ) {
-		return AttributeError( GemRB_View_SetBackground__doc );
+		return NULL;
 	}
 
 	View* view = NULL;
@@ -1750,7 +1750,7 @@ static PyObject* GemRB_View_SetFlags(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Flags;
 	int Operation=0;
-	PARSE_ARGS( args, GemRB_View_SetFlags__doc, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation );
+	PARSE_ARGS( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation );
 
 	if (Operation < BM_SET || Operation > BM_NAND) {
 		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
@@ -1783,7 +1783,7 @@ static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int r, g, b;
-	PARSE_ARGS( args, GemRB_Label_SetTextColor__doc, "iiiii", &WindowIndex, &ControlIndex, &r, &g, &b );
+	PARSE_ARGS( args, "iiiii", &WindowIndex, &ControlIndex, &r, &g, &b );
 
 	Label* lab = ( Label* ) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
 	if (!lab) {
@@ -1804,7 +1804,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, cycle, unpressed, pressed, selected, disabled;
 	char *ResRef;
-	PARSE_ARGS( args, GemRB_Button_SetSprites__doc, "iisiiiii", &WindowIndex, &ControlIndex,
+	PARSE_ARGS( args, "iisiiiii", &WindowIndex, &ControlIndex,
 			   &ResRef, &cycle, &unpressed, &pressed, &selected, &disabled );
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
@@ -1848,7 +1848,7 @@ static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
 	double Clipping;
 	int r1,g1,b1,a1;
 	int r2,g2,b2,a2;
-	PARSE_ARGS( args, GemRB_Button_SetOverlay__doc,  "iidiiiiiiii", &WindowIndex, &ControlIndex,
+	PARSE_ARGS( args,  "iidiiiiiiii", &WindowIndex, &ControlIndex,
 		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2);
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
@@ -1874,7 +1874,7 @@ static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, enabled = 0, filled = 0;
 	int r, g, b, a;
-	PARSE_ARGS( args, GemRB_Button_SetBorder__doc, "iiiiiiiiiii|ii", &WindowIndex, &ControlIndex,
+	PARSE_ARGS( args, "iiiiiiiiiii|ii", &WindowIndex, &ControlIndex,
 			   &BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled);
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
@@ -1895,7 +1895,7 @@ PyDoc_STRVAR( GemRB_Button_EnableBorder__doc,
 static PyObject* GemRB_Button_EnableBorder(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, BorderIndex, enabled;
-	PARSE_ARGS( args, GemRB_Button_EnableBorder__doc, "iiii", &WindowIndex, &ControlIndex, &BorderIndex, &enabled);
+	PARSE_ARGS( args, "iiii", &WindowIndex, &ControlIndex, &BorderIndex, &enabled);
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -1915,7 +1915,7 @@ static PyObject* GemRB_Button_SetFont(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	char *FontResRef;
-	PARSE_ARGS( args, GemRB_Button_SetFont__doc, "iis", &WindowIndex, &ControlIndex, &FontResRef);
+	PARSE_ARGS( args, "iis", &WindowIndex, &ControlIndex, &FontResRef);
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -1934,7 +1934,7 @@ PyDoc_STRVAR( GemRB_Button_SetAnchor__doc,
 static PyObject* GemRB_Button_SetAnchor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, x, y;
-	PARSE_ARGS( args, GemRB_Button_SetAnchor__doc,  "iiii", &WindowIndex, &ControlIndex, &x, &y);
+	PARSE_ARGS( args,  "iiii", &WindowIndex, &ControlIndex, &x, &y);
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -1953,7 +1953,7 @@ PyDoc_STRVAR( GemRB_Button_SetPushOffset__doc,
 static PyObject* GemRB_Button_SetPushOffset(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, x, y;
-	PARSE_ARGS( args, GemRB_Button_SetPushOffset__doc,  "iiii", &WindowIndex, &ControlIndex, &x, &y);
+	PARSE_ARGS( args,  "iiii", &WindowIndex, &ControlIndex, &x, &y);
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -1973,7 +1973,7 @@ static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, swap = 0;
 	int r, g, b;
-	PARSE_ARGS( args, GemRB_Button_SetTextColor__doc,  "iiiii|i", &WindowIndex, &ControlIndex, &r, &g, &b, &swap );
+	PARSE_ARGS( args,  "iiiii|i", &WindowIndex, &ControlIndex, &r, &g, &b, &swap );
 
 	Button* but = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!but) {
@@ -2000,7 +2000,7 @@ PyDoc_STRVAR( GemRB_Window_DeleteControl__doc,
 static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
-	PARSE_ARGS( args, GemRB_Window_DeleteControl__doc,  "ii", &WindowIndex, &ControlID);
+	PARSE_ARGS( args,  "ii", &WindowIndex, &ControlID);
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -2022,7 +2022,7 @@ PyDoc_STRVAR( GemRB_AddNewArea__doc,
 static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 {
 	const char *resref;
-	PARSE_ARGS( args, GemRB_AddNewArea__doc,  "s", &resref);
+	PARSE_ARGS( args,  "s", &resref);
 
 	AutoTable newarea(resref);
 	if (!newarea) {
@@ -2140,7 +2140,7 @@ PyDoc_STRVAR( GemRB_WorldMap_AdjustScrolling__doc,
 static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, x, y;
-	PARSE_ARGS( args, GemRB_WorldMap_AdjustScrolling__doc,  "iiii", &WindowIndex, &ControlIndex, &x, &y );
+	PARSE_ARGS( args,  "iiii", &WindowIndex, &ControlIndex, &x, &y );
 
 	WorldMapControl* wmap = (WorldMapControl*)GetControl(WindowIndex, ControlIndex, IE_GUI_WORLDMAP);
 	if (!wmap) {
@@ -2160,7 +2160,7 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	char *area;
 	char *entrance;
 	int direction = 0;
-	PARSE_ARGS( args, GemRB_CreateMovement__doc,  "ss|i", &area, &entrance, &direction);
+	PARSE_ARGS( args,  "ss|i", &area, &entrance, &direction);
 	if (core->HasFeature(GF_TEAM_MOVEMENT) ) {
 		everyone = CT_WHOLE;
 	} else {
@@ -2183,7 +2183,7 @@ static PyObject* GemRB_UpdateWorldMap(PyObject * /*self*/, PyObject* args)
 {
 	char *wmResRef, *areaResRef = NULL;
 	bool update = true;
-	PARSE_ARGS( args, GemRB_UpdateWorldMap__doc,  "s|s", &wmResRef, &areaResRef);
+	PARSE_ARGS( args,  "s|s", &wmResRef, &areaResRef);
 
 	if (areaResRef != NULL) {
 		unsigned int i;
@@ -2205,7 +2205,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 {
 	int WindowIndex, ControlIndex;
 	int eval = 0;
-	PARSE_ARGS( args, GemRB_WorldMap_GetDestinationArea__doc, "ii|i", &WindowIndex, &ControlIndex, &eval);
+	PARSE_ARGS( args, "ii|i", &WindowIndex, &ControlIndex, &eval);
 
 	WorldMapControl* wmc = (WorldMapControl *) GetControl(WindowIndex, ControlIndex, IE_GUI_WORLDMAP);
 	if (!wmc) {
@@ -2292,7 +2292,7 @@ static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args
 {
 	int WindowIndex, ControlIndex, which;
 	int r, g, b, a;
-	PARSE_ARGS( args, GemRB_WorldMap_SetTextColor__doc,  "iiiiiii", &WindowIndex, &ControlIndex, &which, &r, &g, &b, &a );
+	PARSE_ARGS( args,  "iiiiiii", &WindowIndex, &ControlIndex, &which, &r, &g, &b, &a );
 
 	WorldMapControl* wmap = ( WorldMapControl* ) GetControl( WindowIndex, ControlIndex, IE_GUI_WORLDMAP);
 	if (!wmap) {
@@ -2313,7 +2313,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject * /*self*/, PyObjec
 {
 	int SubWindowIndex, SubControlID;
 	int WindowIndex, ControlID;
-	PARSE_ARGS( args, GemRB_Control_SubstituteForControl__doc,  "iiii", &SubWindowIndex, &SubControlID, &WindowIndex, &ControlID);
+	PARSE_ARGS( args,  "iiii", &SubWindowIndex, &SubControlID, &WindowIndex, &ControlID);
 
 	int subIdx = SubControlID;//GetControlIndex(SubWindowIndex, SubControlID);
 	int targetIdx = ControlID;//GetControlIndex(WindowIndex, ControlID);
@@ -2345,7 +2345,7 @@ static PyObject* GemRB_Label_SetFont(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	char *FontResRef;
-	PARSE_ARGS( args, GemRB_Label_SetFont__doc,  "iis", &WindowIndex, &ControlIndex,
+	PARSE_ARGS( args,  "iis", &WindowIndex, &ControlIndex,
 			&FontResRef);
 
 	Label *lbl = (Label *) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
@@ -2365,7 +2365,7 @@ PyDoc_STRVAR( GemRB_Label_SetUseRGB__doc,
 static PyObject* GemRB_Label_SetUseRGB(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, status;
-	PARSE_ARGS( args, GemRB_Label_SetUseRGB__doc,  "iii", &WindowIndex, &ControlIndex, &status );
+	PARSE_ARGS( args,  "iii", &WindowIndex, &ControlIndex, &status );
 
 	Label* lab = (Label *) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
 	if (!lab) {
@@ -2384,7 +2384,7 @@ PyDoc_STRVAR( GemRB_GameSetPartySize__doc,
 static PyObject* GemRB_GameSetPartySize(PyObject * /*self*/, PyObject* args)
 {
 	int Flags;
-	PARSE_ARGS( args, GemRB_GameSetPartySize__doc,  "i", &Flags );
+	PARSE_ARGS( args,  "i", &Flags );
 
 	GET_GAME();
 
@@ -2400,7 +2400,7 @@ PyDoc_STRVAR( GemRB_GameSetProtagonistMode__doc,
 static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* args)
 {
 	int Flags;
-	PARSE_ARGS( args, GemRB_GameSetProtagonistMode__doc,  "i", &Flags );
+	PARSE_ARGS( args,  "i", &Flags );
 
 	GET_GAME();
 
@@ -2426,7 +2426,7 @@ PyDoc_STRVAR( GemRB_GameSetExpansion__doc,
 static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 {
 	int value;
-	PARSE_ARGS( args, GemRB_GameSetExpansion__doc,  "i", &value );
+	PARSE_ARGS( args,  "i", &value );
 
 	GET_GAME();
 
@@ -2446,7 +2446,7 @@ PyDoc_STRVAR( GemRB_GameSetScreenFlags__doc,
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
 	int Flags, Operation;
-	PARSE_ARGS( args, GemRB_GameSetScreenFlags__doc,  "ii", &Flags, &Operation );
+	PARSE_ARGS( args,  "ii", &Flags, &Operation );
 	if (Operation < BM_SET || Operation > BM_NAND) {
 		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
 		return NULL;
@@ -2466,7 +2466,7 @@ PyDoc_STRVAR( GemRB_GameControlSetScreenFlags__doc,
 static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
 	int Flags, Operation;
-	PARSE_ARGS( args, GemRB_GameControlSetScreenFlags__doc,  "ii", &Flags, &Operation );
+	PARSE_ARGS( args,  "ii", &Flags, &Operation );
 	if (Operation < BM_SET || Operation > BM_NAND) {
 		return AttributeError("Operation must be 0-4\n");
 	}
@@ -2487,7 +2487,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 {
 	int Mode;
 	int Types = GA_SELECT | GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED;
-	PARSE_ARGS( args, GemRB_GameControlSetTargetMode__doc,  "i|i", &Mode, &Types );
+	PARSE_ARGS( args,  "i|i", &Mode, &Types );
 
 	GET_GAMECONTROL();
 
@@ -2530,7 +2530,7 @@ PyDoc_STRVAR( GemRB_ScrollBar_SetDefaultScrollBar__doc,
 static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	PARSE_ARGS( args, GemRB_ScrollBar_SetDefaultScrollBar__doc,  "ii", &WindowIndex, &ControlIndex);
+	PARSE_ARGS( args,  "ii", &WindowIndex, &ControlIndex);
 
 	Control* sb = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_SCROLLBAR);
 	if (!sb) {
@@ -2549,7 +2549,7 @@ PyDoc_STRVAR( GemRB_Button_SetState__doc,
 static PyObject* GemRB_Button_SetState(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, state;
-	PARSE_ARGS( args, GemRB_Button_SetState__doc,  "iii", &WindowIndex, &ControlIndex, &state );
+	PARSE_ARGS( args,  "iii", &WindowIndex, &ControlIndex, &state );
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -2569,7 +2569,7 @@ static PyObject* GemRB_Button_SetPictureClipping(PyObject * /*self*/, PyObject* 
 {
 	int WindowIndex, ControlIndex;
 	double Clipping;
-	PARSE_ARGS( args, GemRB_Button_SetPictureClipping__doc,  "iid", &WindowIndex, &ControlIndex, &Clipping );
+	PARSE_ARGS( args,  "iid", &WindowIndex, &ControlIndex, &Clipping );
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -2592,7 +2592,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex;
 	char *ResRef;
 	char *DefResRef = NULL;
-	PARSE_ARGS( args, GemRB_Button_SetPicture__doc,  "iis|s", &WindowIndex, &ControlIndex, &ResRef, &DefResRef );
+	PARSE_ARGS( args,  "iis|s", &WindowIndex, &ControlIndex, &ResRef, &DefResRef );
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -2636,7 +2636,7 @@ static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
 	PyObject *obj;
-	PARSE_ARGS( args, GemRB_Button_SetSprite2D__doc,  "iiO", &wi, &ci, &obj );
+	PARSE_ARGS( args,  "iiO", &wi, &ci, &obj );
 	Button* btn = ( Button* ) GetControl( wi, ci, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
@@ -2657,7 +2657,7 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	char *ResRef;
-	PARSE_ARGS( args, GemRB_Button_SetMOS__doc,  "iis", &WindowIndex, &ControlIndex, &ResRef );
+	PARSE_ARGS( args,  "iis", &WindowIndex, &ControlIndex, &ResRef );
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -2699,7 +2699,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iisiiiiiiii|i", &WindowIndex, &ControlIndex,
 			&ResRef, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
 			&(col[4]), &(col[5]), &(col[6]), &(col[7]), &type) ) {
-		return AttributeError( GemRB_Button_SetPLT__doc );
+		return NULL;
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
@@ -2807,7 +2807,7 @@ static PyObject* GemRB_Button_SetBAM(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci, CycleIndex, FrameIndex, col1 = -1;
 	char *ResRef;
-	PARSE_ARGS( args, GemRB_Button_SetBAM__doc,  "iisii|i", &wi, &ci,
+	PARSE_ARGS( args,  "iisii|i", &wi, &ci,
 			&ResRef, &CycleIndex, &FrameIndex, &col1 );
 
 	PyObject *ret = SetButtonBAM(wi,ci, ResRef, CycleIndex, FrameIndex,col1);
@@ -2830,7 +2830,7 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject * /*self*/, PyObject
 	if (!PyArg_ParseTuple( args, "iiiiiiiiii", &wi, &ci,
 			&(col[0]), &(col[1]), &(col[2]), &(col[3]),
 			&(col[4]), &(col[5]), &(col[6]), &(col[7])) ) {
-		return AttributeError( GemRB_Control_SetAnimationPalette__doc );
+		return NULL;
 	}
 
 	Control* ctl = GetControl(wi, ci, -1);
@@ -2856,7 +2856,7 @@ static PyObject* GemRB_Control_HasAnimation(PyObject * /*self*/, PyObject* args)
 	int wi, ci;
 	char *ResRef;
 	int Cycle = 0;
-	PARSE_ARGS( args, GemRB_Control_HasAnimation__doc,  "iis|i", &wi, &ci, &ResRef, &Cycle );
+	PARSE_ARGS( args,  "iis|i", &wi, &ci, &ResRef, &Cycle );
 
 	Control* ctl = GetControl(wi, ci, -1);
 	if (ctl && ctl->animation) {
@@ -2876,7 +2876,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	char *ResRef;
 	int Cycle = 0;
 	int Blend = 0;
-	PARSE_ARGS( args, GemRB_Control_SetAnimation__doc,  "iis|ii", &wi, &ci, &ResRef, &Cycle, &Blend );
+	PARSE_ARGS( args,  "iis|ii", &wi, &ci, &ResRef, &Cycle, &Blend );
 
 	Control* ctl = GetControl(wi, ci, -1);
 	if (!ctl) {
@@ -2918,7 +2918,7 @@ PyDoc_STRVAR( GemRB_ValidTarget__doc,
 static PyObject* GemRB_ValidTarget(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, flags;
-	PARSE_ARGS( args, GemRB_ValidTarget__doc,  "ii", &globalID, &flags );
+	PARSE_ARGS( args,  "ii", &globalID, &flags );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -2941,7 +2941,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, str;
 	char Sound[_MAX_PATH];
-	PARSE_ARGS( args, GemRB_VerbalConstant__doc,  "ii", &globalID, &str );
+	PARSE_ARGS( args,  "ii", &globalID, &str );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -2975,7 +2975,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		core->PlaySound(index);
 	} else {
 		PyErr_Clear(); //clearing the exception
-		PARSE_ARGS( args, GemRB_PlaySound__doc,  "z|iii", &ResRef, &xpos, &ypos, &flags );
+		PARSE_ARGS( args,  "z|iii", &ResRef, &xpos, &ypos, &flags );
 
 		core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
 	}
@@ -3013,7 +3013,7 @@ static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 {
 	char *ResRef;
 	int HardEnd = 0;
-	PARSE_ARGS( args, GemRB_LoadMusicPL__doc,  "s|i", &ResRef, &HardEnd );
+	PARSE_ARGS( args,  "s|i", &ResRef, &HardEnd );
 
 	core->GetMusicMgr()->SwitchPlayList( ResRef, (bool) HardEnd );
 
@@ -3050,7 +3050,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
 	char *Variable;
 	char *value;
-	PARSE_ARGS( args, GemRB_SetToken__doc,  "ss", &Variable, &value );
+	PARSE_ARGS( args,  "ss", &Variable, &value );
 	core->GetTokenDictionary()->SetAtCopy( Variable, value );
 
 	Py_RETURN_NONE;
@@ -3065,7 +3065,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	char *Variable;
 	//this should be 32 bits, always, but i cannot tell that to Python
 	unsigned long value;
-	PARSE_ARGS( args, GemRB_SetVar__doc,  "sl", &Variable, &value );
+	PARSE_ARGS( args,  "sl", &Variable, &value );
 
 	core->GetDictionary()->SetAt( Variable, (ieDword) value );
 
@@ -3093,7 +3093,7 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 {
 	const char *Variable;
 	char *value;
-	PARSE_ARGS( args, GemRB_GetToken__doc,  "s", &Variable );
+	PARSE_ARGS( args,  "s", &Variable );
 
 	//returns only the pointer
 	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
@@ -3111,7 +3111,7 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	const char *Variable;
 	ieDword value;
-	PARSE_ARGS( args, GemRB_GetVar__doc,  "s", &Variable );
+	PARSE_ARGS( args,  "s", &Variable );
 
 	if (!core->GetDictionary()->Lookup( Variable, value )) {
 		return PyInt_FromLong( 0 );
@@ -3131,7 +3131,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {
 	char *Variable;
 	char *Context;
-	PARSE_ARGS( args, GemRB_CheckVar__doc,  "ss", &Variable, &Context );
+	PARSE_ARGS( args,  "ss", &Variable, &Context );
 	GET_GAMECONTROL();
 
 	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
@@ -3160,7 +3160,7 @@ static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 	char *Variable;
 	char *Context;
 	int Value;
-	PARSE_ARGS( args, GemRB_SetGlobal__doc,  "ssi", &Variable, &Context, &Value );
+	PARSE_ARGS( args,  "ssi", &Variable, &Context, &Value );
 
 	Scriptable *Sender = NULL;
 
@@ -3191,7 +3191,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	const char *Variable;
 	ieDword value;
-	PARSE_ARGS( args, GemRB_GetGameVar__doc,  "s", &Variable );
+	PARSE_ARGS( args,  "s", &Variable );
 
 	GET_GAME();
 
@@ -3210,7 +3210,7 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
 	const char *string;
 	int flag = 0;
-	PARSE_ARGS( args, GemRB_PlayMovie__doc,  "s|i", &string, &flag );
+	PARSE_ARGS( args,  "s|i", &string, &flag );
 
 	ieDword ind = 0;
 
@@ -3231,7 +3231,7 @@ PyDoc_STRVAR( GemRB_DumpActor__doc,
 static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_DumpActor__doc,  "i", &globalID );
+	PARSE_ARGS( args,  "i", &globalID );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -3248,9 +3248,9 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 {
 	int globalID;
 	const char *name;
-	PARSE_ARGS( args, GemRB_SaveCharacter__doc,  "is", &globalID, &name );
+	PARSE_ARGS( args,  "is", &globalID, &name );
 	if (!name[0]) {
-		return AttributeError( GemRB_SaveCharacter__doc );
+		return NULL;
 	}
 
 	GET_GAME();
@@ -3282,7 +3282,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 
 	if (!PyArg_ParseTuple( args, "Os|i", &obj, &folder, &Version )) {
 		PyErr_Clear();
-		PARSE_ARGS( args, GemRB_SaveGame__doc,  "i|i", &slot, &Version);
+		PARSE_ARGS( args,  "i|i", &slot, &Version);
 	}
 
 	GET_GAME();
@@ -3320,7 +3320,7 @@ PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
 	PyObject *Slot;
-	PARSE_ARGS( args, GemRB_DeleteSaveGame__doc,  "O", &Slot );
+	PARSE_ARGS( args,  "O", &Slot );
 
 	CObject<SaveGame> game(Slot);
 	core->GetSaveGameIterator()->DeleteSaveGame( game );
@@ -3334,7 +3334,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetName__doc,
 static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
-	PARSE_ARGS( args, GemRB_SaveGame_GetName__doc,  "O", &Slot );
+	PARSE_ARGS( args,  "O", &Slot );
 
 	CObject<SaveGame> save(Slot);
 	return PyString_FromString(save->GetName());
@@ -3347,7 +3347,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
 static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
-	PARSE_ARGS( args, GemRB_SaveGame_GetDate__doc, "O", &Slot );
+	PARSE_ARGS( args, "O", &Slot );
 
 	CObject<SaveGame> save(Slot);
 	return PyString_FromString(save->GetDate());
@@ -3360,7 +3360,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetGameDate__doc,
 static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
-	PARSE_ARGS( args, GemRB_SaveGame_GetGameDate__doc,  "O", &Slot );
+	PARSE_ARGS( args,  "O", &Slot );
 
 	CObject<SaveGame> save(Slot);
 	return PyString_FromString(save->GetGameDate());
@@ -3373,7 +3373,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetSaveID__doc,
 static PyObject* GemRB_SaveGame_GetSaveID(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
-	PARSE_ARGS( args, GemRB_SaveGame_GetSaveID__doc,  "O", &Slot );
+	PARSE_ARGS( args,  "O", &Slot );
 
 	CObject<SaveGame> save(Slot);
 	return PyInt_FromLong(save->GetSaveID());
@@ -3386,7 +3386,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetPreview__doc,
 static PyObject* GemRB_SaveGame_GetPreview(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
-	PARSE_ARGS( args, GemRB_SaveGame_GetPreview__doc,  "O", &Slot );
+	PARSE_ARGS( args,  "O", &Slot );
 
 	CObject<SaveGame> save(Slot);
 	return CObject<Sprite2D>(save->GetPreview());
@@ -3400,7 +3400,7 @@ static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
 	int index;
-	PARSE_ARGS( args, GemRB_SaveGame_GetPortrait__doc,  "Oi", &Slot, &index );
+	PARSE_ARGS( args,  "Oi", &Slot, &index );
 
 	CObject<SaveGame> save(Slot);
 	return CObject<Sprite2D>(save->GetPortrait(index));
@@ -3423,7 +3423,7 @@ PyDoc_STRVAR( GemRB_GetGamePortraitPreview__doc,
 static PyObject* GemRB_GetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
 {
 	int PCSlotCount;
-	PARSE_ARGS( args, GemRB_GetGamePreview__doc,  "i", &PCSlotCount );
+	PARSE_ARGS( args,  "i", &PCSlotCount );
 
 	GET_GAMECONTROL();
 	return CObject<Sprite2D>(gc->GetPortraitPreview(PCSlotCount));
@@ -3436,7 +3436,7 @@ PyDoc_STRVAR( GemRB_Roll__doc,
 static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 {
 	int Dice, Size, Add;
-	PARSE_ARGS( args, GemRB_Roll__doc,  "iii", &Dice, &Size, &Add );
+	PARSE_ARGS( args,  "iii", &Dice, &Size, &Add );
 	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
 }
 
@@ -3453,7 +3453,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 	int wi, ci;
 	RESOURCE_DIRECTORY type;
 	int flags = 0;
-	PARSE_ARGS( args, GemRB_TextArea_ListResources__doc,  "iii|i", &wi, &ci, &type, &flags );
+	PARSE_ARGS( args,  "iii|i", &wi, &ci, &type, &flags );
 	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
 	if (!ta) {
 		return NULL;
@@ -3534,10 +3534,10 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
 	PyObject* list;
-	PARSE_ARGS( args, GemRB_TextArea_SetOptions__doc,  "iiO", &wi, &ci, &list );
+	PARSE_ARGS( args,  "iiO", &wi, &ci, &list );
 
 	if (!PyList_Check(list)) {
-		return AttributeError( GemRB_TextArea_SetOptions__doc );
+		return NULL;
 	}
 
 	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
@@ -3556,7 +3556,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 			if (PyInt_Check(item)) {
 				string = core->GetString(PyInt_AsLong(item));
 			} else {
-				return AttributeError( GemRB_TextArea_SetOptions__doc );
+				return NULL;
 			}
 		} else {
 			string = StringFromCString(PyString_AsString(item));
@@ -3611,7 +3611,7 @@ PyDoc_STRVAR( GemRB_GameSetReputation__doc,
 static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 {
 	int Reputation;
-	PARSE_ARGS( args, GemRB_GameSetReputation__doc,  "i", &Reputation );
+	PARSE_ARGS( args,  "i", &Reputation );
 	GET_GAME();
 
 	game->SetReputation( (unsigned int) Reputation );
@@ -3627,7 +3627,7 @@ static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 {
 	int Donation;
 	int Increase = 0;
-	PARSE_ARGS( args, GemRB_IncreaseReputation__doc,  "i", &Donation );
+	PARSE_ARGS( args,  "i", &Donation );
 
 	GET_GAME();
 
@@ -3660,7 +3660,7 @@ PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
 static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 {
 	int Gold, flag = 0;
-	PARSE_ARGS( args, GemRB_GameSetPartyGold__doc,  "i|i", &Gold, &flag );
+	PARSE_ARGS( args,  "i|i", &Gold, &flag );
 	GET_GAME();
 
 	if (flag) {
@@ -3680,14 +3680,14 @@ static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 {
 	int Which = -1;
 	int Formation;
-	PARSE_ARGS( args, GemRB_GameGetFormation__doc,  "|i", &Which );
+	PARSE_ARGS( args,  "|i", &Which );
 	GET_GAME();
 
 	if (Which<0) {
 		Formation = game->WhichFormation;
 	} else {
 		if (Which>4) {
-			return AttributeError( GemRB_GameGetFormation__doc );
+			return NULL;
 		}
 		Formation = game->Formations[Which];
 	}
@@ -3701,14 +3701,14 @@ PyDoc_STRVAR( GemRB_GameSetFormation__doc,
 static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 {
 	int Formation, Which=-1;
-	PARSE_ARGS( args, GemRB_GameSetFormation__doc,  "i|i", &Formation, &Which );
+	PARSE_ARGS( args,  "i|i", &Formation, &Which );
 	GET_GAME();
 
 	if (Which<0) {
 		game->WhichFormation = Formation;
 	} else {
 		if (Which>4) {
-			return AttributeError( GemRB_GameSetFormation__doc );
+			return NULL;
 		}
 		game->Formations[Which] = Formation;
 	}
@@ -3724,7 +3724,7 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 {
 	int chapter;
 	int section = -1;
-	PARSE_ARGS( args, GemRB_GetJournalSize__doc,  "i|i", &chapter, &section );
+	PARSE_ARGS( args,  "i|i", &chapter, &section );
 
 	GET_GAME();
 
@@ -3745,7 +3745,7 @@ PyDoc_STRVAR( GemRB_GetJournalEntry__doc,
 static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
 	int section=-1, index, chapter;
-	PARSE_ARGS( args, GemRB_GetJournalEntry__doc,  "ii|i", &chapter, &index, &section );
+	PARSE_ARGS( args,  "ii|i", &chapter, &index, &section );
 
 	GET_GAME();
 
@@ -3774,7 +3774,7 @@ PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
 	int section=-1, chapter = -1, strref;
-	PARSE_ARGS( args, GemRB_SetJournalEntry__doc,  "i|ii", &strref, &section, &chapter );
+	PARSE_ARGS( args,  "i|ii", &strref, &section, &chapter );
 
 	GET_GAME();
 
@@ -3805,7 +3805,7 @@ PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
 static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 {
 	int index;
-	PARSE_ARGS( args, GemRB_GameIsBeastKnown__doc,  "i", &index );
+	PARSE_ARGS( args,  "i", &index );
 
 	GET_GAME();
 
@@ -3832,7 +3832,7 @@ PyDoc_STRVAR( GemRB_GetINIQuestsKey__doc,
 static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 {
 	char *Tag, *Key, *Default;
-	PARSE_ARGS( args, GemRB_GetINIQuestsKey__doc,  "sss", &Tag, &Key, &Default );
+	PARSE_ARGS( args,  "sss", &Tag, &Key, &Default );
 	if (!core->GetQuestsINI()) {
 		return RuntimeError( "INI resource not found!\n" );
 	}
@@ -3847,7 +3847,7 @@ PyDoc_STRVAR( GemRB_GetINIBeastsKey__doc,
 static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 {
 	char *Tag, *Key, *Default;
-	PARSE_ARGS( args, GemRB_GetINIBeastsKey__doc,  "sss", &Tag, &Key, &Default );
+	PARSE_ARGS( args,  "sss", &Tag, &Key, &Default );
 	if (!core->GetBeastsINI()) {
 		return NULL;
 	}
@@ -3862,7 +3862,7 @@ PyDoc_STRVAR( GemRB_GetINIPartyKey__doc,
 static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 {
 	const char *Tag, *Key, *Default;
-	PARSE_ARGS( args, GemRB_GetINIPartyKey__doc,  "sss", &Tag, &Key, &Default );
+	PARSE_ARGS( args,  "sss", &Tag, &Key, &Default );
 	if (!core->GetPartyINI()) {
 		return RuntimeError( "INI resource not found!\n" );
 	}
@@ -3880,7 +3880,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	int PlayerSlot, Slot;
 	int Import=0;
 	int VersionOverride = -1;
-	PARSE_ARGS( args, GemRB_CreatePlayer__doc,  "si|ii", &CreResRef, &PlayerSlot, &Import, &VersionOverride);
+	PARSE_ARGS( args,  "si|ii", &CreResRef, &PlayerSlot, &Import, &VersionOverride);
 	//PlayerSlot is zero based
 	Slot = ( PlayerSlot & 0x7fff );
 	GET_GAME();
@@ -3918,7 +3918,7 @@ PyDoc_STRVAR( GemRB_GetPlayerStates__doc,
 static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_GetPlayerStates__doc,  "i", &globalID );
+	PARSE_ARGS( args,  "i", &globalID );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -3934,7 +3934,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	int globalID, Which;
 
 	Which = 0;
-	PARSE_ARGS( args, GemRB_GetPlayerName__doc,  "i|i", &globalID, &Which );
+	PARSE_ARGS( args,  "i|i", &globalID, &Which );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -3955,7 +3955,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	int globalID, Which;
 
 	Which = 0;
-	PARSE_ARGS( args, GemRB_SetPlayerName__doc,  "is|i", &globalID, &Name, &Which );
+	PARSE_ARGS( args,  "is|i", &globalID, &Name, &Which );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -3972,7 +3972,7 @@ static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
 	const char *Text;
 	ieStrRef strref;
-	PARSE_ARGS( args, GemRB_CreateString__doc,  "is", &strref, &Text );
+	PARSE_ARGS( args,  "is", &strref, &Text );
 	GET_GAME();
 
 	strref = core->UpdateString(strref, Text);
@@ -3986,7 +3986,7 @@ PyDoc_STRVAR( GemRB_SetPlayerString__doc,
 static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, StringSlot, StrRef;
-	PARSE_ARGS( args, GemRB_SetPlayerString__doc,  "iii", &globalID, &StringSlot, &StrRef );
+	PARSE_ARGS( args,  "iii", &globalID, &StringSlot, &StrRef );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4007,7 +4007,7 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
 	const char *Sound=NULL;
 	int globalID;
-	PARSE_ARGS( args, GemRB_SetPlayerSound__doc,  "is", &globalID, &Sound );
+	PARSE_ARGS( args,  "is", &globalID, &Sound );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4024,7 +4024,7 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 	char Sound[42];
 	int globalID;
 	int flag = 0;
-	PARSE_ARGS( args, GemRB_GetPlayerSound__doc,  "i|i", &globalID, &flag );
+	PARSE_ARGS( args,  "i|i", &globalID, &flag );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4041,7 +4041,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	int idx;
 	int PartyID = 0;
 	Actor *actor = NULL;
-	PARSE_ARGS( args, GemRB_GetSlotType__doc,  "i|i", &idx, &PartyID );
+	PARSE_ARGS( args,  "i|i", &idx, &PartyID );
 
 	if (PartyID) {
 		GET_GAME();
@@ -4090,7 +4090,7 @@ PyDoc_STRVAR( GemRB_GetPCStats__doc,
 static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
-	PARSE_ARGS( args, GemRB_GetPCStats__doc,  "i", &PartyID );
+	PARSE_ARGS( args,  "i", &PartyID );
 	GET_GAME();
 
 	Actor* MyActor = game->FindPC( PartyID );
@@ -4171,7 +4171,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, Select;
 	int Flags = SELECT_NORMAL;
-	PARSE_ARGS( args, GemRB_GameSelectPC__doc,  "ii|i", &PartyID, &Select, &Flags );
+	PARSE_ARGS( args,  "ii|i", &PartyID, &Select, &Flags );
 	GET_GAME();
 
 	Actor* actor;
@@ -4199,7 +4199,7 @@ PyDoc_STRVAR( GemRB_GameIsPCSelected__doc,
 static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot;
-	PARSE_ARGS( args, GemRB_GameIsPCSelected__doc,  "i", &PlayerSlot );
+	PARSE_ARGS( args,  "i", &PlayerSlot );
 	GET_GAME();
 
 	Actor* MyActor = game->FindPC( PlayerSlot );
@@ -4218,7 +4218,7 @@ PyDoc_STRVAR( GemRB_GameSelectPCSingle__doc,
 static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 {
 	int index;
-	PARSE_ARGS( args, GemRB_GameSelectPCSingle__doc, "i", &index );
+	PARSE_ARGS( args, "i", &index );
 
 	GET_GAME();
 
@@ -4234,7 +4234,7 @@ PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
 static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
 {
 	int flag = 0;
-	PARSE_ARGS( args, GemRB_GameGetSelectedPCSingle__doc,  "|i", &flag );
+	PARSE_ARGS( args,  "|i", &flag );
 	GET_GAME();
 
 	if (flag) {
@@ -4285,7 +4285,7 @@ PyDoc_STRVAR( GemRB_GameControlSetLastActor__doc,
 static PyObject* GemRB_GameControlSetLastActor(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID = 0;
-	PARSE_ARGS( args, GemRB_GameControlSetLastActor__doc, "|i", &PartyID );
+	PARSE_ARGS( args, "|i", &PartyID );
 
 	GET_GAME();
 	GET_GAMECONTROL();
@@ -4303,7 +4303,7 @@ PyDoc_STRVAR( GemRB_ActOnPC__doc,
 static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
-	PARSE_ARGS( args, GemRB_ActOnPC__doc,  "i", &PartyID );
+	PARSE_ARGS( args,  "i", &PartyID );
 	GET_GAME();
 
 	Actor* MyActor = game->FindPC( PartyID );
@@ -4325,7 +4325,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	int PlayerSlot, Which;
 
 	Which = 0;
-	PARSE_ARGS( args, GemRB_GetPlayerPortrait__doc,  "i|i", &PlayerSlot, &Which );
+	PARSE_ARGS( args,  "i|i", &PlayerSlot, &Which );
 	GET_GAME();
 
 	Actor* MyActor = game->FindPC( PlayerSlot );
@@ -4342,7 +4342,7 @@ PyDoc_STRVAR( GemRB_GetPlayerString__doc,
 static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Index, StatValue;
-	PARSE_ARGS( args, GemRB_GetPlayerString__doc,  "ii", &globalID, &Index);
+	PARSE_ARGS( args,  "ii", &globalID, &Index);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4362,7 +4362,7 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 	int globalID, StatID, StatValue, BaseStat;
 
 	BaseStat = 0;
-	PARSE_ARGS( args, GemRB_GetPlayerStat__doc,  "ii|i", &globalID, &StatID, &BaseStat );
+	PARSE_ARGS( args,  "ii|i", &globalID, &StatID, &BaseStat );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4379,7 +4379,7 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, StatID, StatValue;
 	int pcf = 1;
-	PARSE_ARGS( args, GemRB_SetPlayerStat__doc,  "iii|i", &globalID, &StatID, &StatValue, &pcf);
+	PARSE_ARGS( args,  "iii|i", &globalID, &StatID, &StatValue, &pcf);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4397,7 +4397,7 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 {
 	//class script is the custom slot for player scripts
 	int globalID, Index = SCR_CLASS;
-	PARSE_ARGS( args, GemRB_GetPlayerScript__doc,  "i|i", &globalID, &Index );
+	PARSE_ARGS( args,  "i|i", &globalID, &Index );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4417,7 +4417,7 @@ static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 {
 	const char *ScriptName;
 	int globalID, Index = SCR_CLASS;
-	PARSE_ARGS( args, GemRB_SetPlayerScript__doc,  "is|i", &globalID, &ScriptName, &Index );
+	PARSE_ARGS( args,  "is|i", &globalID, &ScriptName, &Index );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4433,7 +4433,7 @@ static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
 {
 	const char *DialogName;
 	int globalID;
-	PARSE_ARGS( args, GemRB_SetPlayerDialog__doc,  "is", &globalID, &DialogName );
+	PARSE_ARGS( args,  "is", &globalID, &DialogName );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -4449,7 +4449,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	const char *Portrait1=NULL, *Portrait2=NULL;
-	PARSE_ARGS( args, GemRB_FillPlayerInfo__doc,  "i|ss", &globalID, &Portrait1, &Portrait2);
+	PARSE_ARGS( args,  "i|ss", &globalID, &Portrait1, &Portrait2);
 	// here comes some code to transfer icon/name to the PC sheet
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -4546,7 +4546,7 @@ static PyObject* GemRB_Button_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	int type=0;
 	int tooltip=0;
 	int Function=0;
-	PARSE_ARGS( args, GemRB_Button_SetSpellIcon__doc,  "iis|iii", &wi, &ci, &SpellResRef, &type, &tooltip, &Function );
+	PARSE_ARGS( args,  "iis|iii", &wi, &ci, &SpellResRef, &type, &tooltip, &Function );
 	PyObject *ret = SetSpellIcon(wi, ci, SpellResRef, type, tooltip, Function);
 	if (ret) {
 		Py_INCREF(ret);
@@ -4671,7 +4671,7 @@ static PyObject* GemRB_Button_SetItemIcon(PyObject * /*self*/, PyObject* args)
 	int tooltip = 0;
 	int Function = 0;
 	const char *Item2ResRef = NULL;
-	PARSE_ARGS( args, GemRB_Button_SetItemIcon__doc,  "iis|iiis", &wi, &ci, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef );
+	PARSE_ARGS( args,  "iis|iiis", &wi, &ci, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef );
 
 	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which, tooltip, Function, Item2ResRef);
 	if (ret) {
@@ -4687,7 +4687,7 @@ PyDoc_STRVAR( GemRB_EnterStore__doc,
 static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 {
 	const char* StoreResRef;
-	PARSE_ARGS( args, GemRB_EnterStore__doc,  "s", &StoreResRef );
+	PARSE_ARGS( args,  "s", &StoreResRef );
 
 	//stores are cached, bags could be opened while in shops
 	//so better just switch to the requested store silently
@@ -4728,7 +4728,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
 	int autoselect=0;
-	PARSE_ARGS( args, GemRB_GetContainer__doc,  "i|i", &PartyID, &autoselect );
+	PARSE_ARGS( args,  "i|i", &PartyID, &autoselect );
 
 	Actor *actor;
 
@@ -4768,7 +4768,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	int index;
-	PARSE_ARGS( args, GemRB_GetContainerItem__doc,  "ii", &globalID, &index );
+	PARSE_ARGS( args,  "ii", &globalID, &index );
 	Container *container;
 
 	if (globalID) {
@@ -4824,7 +4824,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot;
 	int action;
-	PARSE_ARGS( args, GemRB_ChangeContainerItem__doc,  "iii", &globalID, &Slot, &action);
+	PARSE_ARGS( args,  "iii", &globalID, &Slot, &action);
 	GET_GAME();
 
 	Container *container;
@@ -5044,7 +5044,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot, ret;
 	int type = 0;
-	PARSE_ARGS( args, GemRB_IsValidStoreItem__doc,  "ii|i", &globalID, &Slot, &type);
+	PARSE_ARGS( args,  "ii|i", &globalID, &Slot, &type);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5106,7 +5106,7 @@ PyDoc_STRVAR( GemRB_FindStoreItem__doc,
 static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	char *resref;
-	PARSE_ARGS( args, GemRB_FindStoreItem__doc,  "s", &resref);
+	PARSE_ARGS( args,  "s", &resref);
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
@@ -5139,7 +5139,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 {
 	int Slot, tmp;
 	ieDword amount;
-	PARSE_ARGS( args, GemRB_SetPurchasedAmount__doc,  "ii", &Slot, &tmp);
+	PARSE_ARGS( args,  "ii", &Slot, &tmp);
 	amount = (ieDword) tmp;
 	Store *store = core->GetCurrentStore();
 	if (!store) {
@@ -5175,7 +5175,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	int globalID, Slot;
 	int action;
 	int res = ASI_FAILED;
-	PARSE_ARGS( args, GemRB_ChangeStoreItem__doc,  "iii", &globalID, &Slot, &action);
+	PARSE_ARGS( args,  "iii", &globalID, &Slot, &action);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5289,7 +5289,7 @@ PyDoc_STRVAR( GemRB_GetStoreItem__doc,
 static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	int index;
-	PARSE_ARGS( args, GemRB_GetStoreItem__doc,  "i", &index );
+	PARSE_ARGS( args,  "i", &index );
 	Store *store = core->GetCurrentStore();
 	if (!store) {
 		return RuntimeError("No current store!");
@@ -5352,7 +5352,7 @@ PyDoc_STRVAR( GemRB_GetStoreDrink__doc,
 static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 {
 	int index;
-	PARSE_ARGS( args, GemRB_GetStoreDrink__doc, "i", &index );
+	PARSE_ARGS( args, "i", &index );
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
@@ -5462,7 +5462,7 @@ PyDoc_STRVAR( GemRB_GetStoreCure__doc,
 static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 {
 	int index;
-	PARSE_ARGS( args, GemRB_GetStoreCure__doc,  "i", &index );
+	PARSE_ARGS( args,  "i", &index );
 	Store *store = core->GetCurrentStore();
 	if (!store) {
 		return RuntimeError("No current store!");
@@ -5484,7 +5484,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
 	int actornum=0;
-	PARSE_ARGS( args, GemRB_ExecuteString__doc,  "s|i", &String, &actornum );
+	PARSE_ARGS( args,  "s|i", &String, &actornum );
 	GET_GAME();
 
 	if (actornum) {
@@ -5507,7 +5507,7 @@ PyDoc_STRVAR( GemRB_EvaluateString__doc,
 static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
-	PARSE_ARGS( args, GemRB_EvaluateString__doc,  "s", &String );
+	PARSE_ARGS( args,  "s", &String );
 	GET_GAME();
 
 	if (GameScript::EvaluateString( game->GetCurrentArea( ), String )) {
@@ -5547,7 +5547,7 @@ PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
 static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
 {
 	int logLevel;
-	PARSE_ARGS( args, GemRB_MessageWindowDebug__doc, "i", &logLevel );
+	PARSE_ARGS( args, "i", &logLevel );
 
 	if (logLevel == -1) {
 		RemoveLogger(getMessageWindowLogger());
@@ -5577,7 +5577,7 @@ PyDoc_STRVAR( GemRB_MoveToArea__doc,
 static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 {
 	const char *String;
-	PARSE_ARGS( args, GemRB_MoveToArea__doc,  "s", &String );
+	PARSE_ARGS( args,  "s", &String );
 	GET_GAME();
 
 	Map* map2 = game->GetMap(String, true);
@@ -5607,7 +5607,7 @@ PyDoc_STRVAR( GemRB_GetMemorizableSpellsCount__doc,
 static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
 	int globalID, SpellType, Level, Bonus=1;
-	PARSE_ARGS( args, GemRB_GetMemorizableSpellsCount__doc,  "iii|i", &globalID, &SpellType, &Level, &Bonus );
+	PARSE_ARGS( args,  "iii|i", &globalID, &SpellType, &Level, &Bonus );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5622,7 +5622,7 @@ PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
 static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
 	int globalID, Value, SpellType, Level;
-	PARSE_ARGS( args, GemRB_SetMemorizableSpellsCount__doc,  "iiii", &globalID, &Value, &SpellType, &Level);
+	PARSE_ARGS( args,  "iiii", &globalID, &Value, &SpellType, &Level);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5642,7 +5642,7 @@ static PyObject* GemRB_CountSpells(PyObject * /*self*/, PyObject* args)
 	int globalID, SpellType = -1;
 	char *SpellResRef;
 	int Flag = 0;
-	PARSE_ARGS( args, GemRB_CountSpells__doc,  "is|ii", &globalID, &SpellResRef, &SpellType, &Flag);
+	PARSE_ARGS( args,  "is|ii", &globalID, &SpellResRef, &SpellType, &Flag);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5657,7 +5657,7 @@ PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType, Level = -1;
-	PARSE_ARGS( args, GemRB_GetKnownSpellsCount__doc,  "ii|i", &globalID, &SpellType, &Level);
+	PARSE_ARGS( args,  "ii|i", &globalID, &SpellType, &Level);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5679,7 +5679,7 @@ PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
 static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType, Level, Index;
-	PARSE_ARGS( args, GemRB_GetKnownSpell__doc,  "iiii", &globalID, &SpellType, &Level, &Index);
+	PARSE_ARGS( args,  "iiii", &globalID, &SpellType, &Level, &Index);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5701,7 +5701,7 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 {
 	int globalID, SpellType, Level = -1;
 	int castable;
-	PARSE_ARGS( args, GemRB_GetMemorizedSpellsCount__doc,  "iiii", &globalID, &SpellType, &Level, &castable);
+	PARSE_ARGS( args,  "iiii", &globalID, &SpellType, &Level, &castable);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5723,7 +5723,7 @@ PyDoc_STRVAR( GemRB_GetMemorizedSpell__doc,
 static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType, Level, Index;
-	PARSE_ARGS( args, GemRB_GetMemorizedSpell__doc,  "iiii", &globalID, &SpellType, &Level, &Index);
+	PARSE_ARGS( args,  "iiii", &globalID, &SpellType, &Level, &Index);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5744,7 +5744,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 {
 	const char* ResRef;
 	int silent = 0;
-	PARSE_ARGS( args, GemRB_GetSpell__doc,  "s|i", &ResRef, &silent);
+	PARSE_ARGS( args,  "s|i", &ResRef, &silent);
 
 	if (silent && !gamedata->Exists(ResRef,IE_SPL_CLASS_ID, true)) {
 		Py_RETURN_NONE;
@@ -5782,7 +5782,7 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	const char *SpellResRef;
-	PARSE_ARGS( args, GemRB_CheckSpecialSpell__doc,  "is", &globalID, &SpellResRef);
+	PARSE_ARGS( args,  "is", &globalID, &SpellResRef);
 	GET_GAME();
 
 	Actor* actor = game->GetActorByGlobalID( globalID );
@@ -5804,7 +5804,7 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 	unsigned int globalID;
 	const char *spellResRef;
 	int type;
-	PARSE_ARGS( args, GemRB_GetSpelldataIndex__doc,  "isi", &globalID, &spellResRef, &type);
+	PARSE_ARGS( args,  "isi", &globalID, &spellResRef, &type);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -5823,7 +5823,7 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 {
 	unsigned int globalID;
 	int type = 255;
-	PARSE_ARGS( args, GemRB_GetSpelldata__doc,  "i|i", &globalID, &type);
+	PARSE_ARGS( args,  "i|i", &globalID, &type);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -5855,7 +5855,7 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	int Level = -1;
 
 	if (!PyArg_ParseTuple(args, "is|iii", &globalID, &Spell, &Flags, &Booktype, &Level)) {
-		return AttributeError( GemRB_LearnSpell__doc );
+		return NULL;
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -5875,7 +5875,7 @@ static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Parameter2;
 	const char *EffectName;
-	PARSE_ARGS( args, GemRB_DispelEffect__doc,  "isi", &globalID, &EffectName, &Parameter2 );
+	PARSE_ARGS( args,  "isi", &globalID, &EffectName, &Parameter2 );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5895,7 +5895,7 @@ static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	const char * SpellResRef;
-	PARSE_ARGS( args, GemRB_RemoveEffects__doc,  "is", &globalID, &SpellResRef );
+	PARSE_ARGS( args,  "is", &globalID, &SpellResRef );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5922,7 +5922,7 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong(ret);
 	}
 	PyErr_Clear(); //clear the type exception from above
-	PARSE_ARGS( args, GemRB_RemoveSpell__doc,  "iiii", &globalID, &SpellType, &Level, &Index );
+	PARSE_ARGS( args,  "iiii", &globalID, &SpellType, &Level, &Index );
 
  	GET_ACTOR_GLOBAL();
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
@@ -5941,7 +5941,7 @@ static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot;
 	int Count = 0;
-	PARSE_ARGS( args, GemRB_RemoveItem__doc,  "ii|i", &globalID, &Slot, &Count );
+	PARSE_ARGS( args,  "ii|i", &globalID, &Slot, &Count );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5966,7 +5966,7 @@ PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
 static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType, Level, Index, enabled=0;
-	PARSE_ARGS( args, GemRB_MemorizeSpell__doc,  "iiii|i", &globalID, &SpellType, &Level, &Index, &enabled );
+	PARSE_ARGS( args,  "iiii|i", &globalID, &SpellType, &Level, &Index, &enabled );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5994,7 +5994,7 @@ PyDoc_STRVAR( GemRB_UnmemorizeSpell__doc,
 static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType, Level, Index, onlydepleted=0;
-	PARSE_ARGS( args, GemRB_UnmemorizeSpell__doc,  "iiii|i", &globalID, &SpellType, &Level, &Index, &onlydepleted );
+	PARSE_ARGS( args,  "iiii|i", &globalID, &SpellType, &Level, &Index, &onlydepleted );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -6017,7 +6017,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot;
 	int translated = 0; // inventory slots are numbered differently in CRE and need to be remapped
-	PARSE_ARGS( args, GemRB_GetSlotItem__doc,  "ii|i", &globalID, &Slot, &translated);
+	PARSE_ARGS( args,  "ii|i", &globalID, &Slot, &translated);
 	CREItem *si;
 	int header = -1;
 
@@ -6055,7 +6055,7 @@ PyDoc_STRVAR( GemRB_ChangeItemFlag__doc,
 static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot, Flags, Mode;
-	PARSE_ARGS( args, GemRB_ChangeItemFlag__doc,  "iiii", &globalID, &Slot, &Flags, &Mode);
+	PARSE_ARGS( args,  "iiii", &globalID, &Slot, &Flags, &Mode);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -6076,7 +6076,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	const char *ItemName;
 
 	globalID = 0;
-	PARSE_ARGS( args, GemRB_CanUseItemType__doc,  "is|ii", &SlotType, &ItemName, &globalID, &Equipped);
+	PARSE_ARGS( args,  "is|ii", &SlotType, &ItemName, &globalID, &Equipped);
 	if (!ItemName[0]) {
 		return PyInt_FromLong(0);
 	}
@@ -6117,7 +6117,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 {
 	int SlotType, Count, MaxCount, globalID;
 	int flag = 1;
-	PARSE_ARGS( args, GemRB_GetSlots__doc, "ii|i", &globalID, &SlotType, &flag);
+	PARSE_ARGS( args, "ii|i", &globalID, &SlotType, &flag);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -6166,7 +6166,7 @@ static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 	const char *ItemName;
 
 	if (!PyArg_ParseTuple(args, "is", &globalID, &ItemName)) {
-		return AttributeError( GemRB_FindItem__doc );
+		return NULL;
 	}
 	if (!ItemName[0]) {
 		return PyInt_FromLong(-1);
@@ -6194,7 +6194,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	char* ResRef;
 	int PartyID = 0;
 	Actor *actor = NULL;
-	PARSE_ARGS( args, GemRB_GetItem__doc,  "s|i", &ResRef, &PartyID);
+	PARSE_ARGS( args,  "s|i", &ResRef, &PartyID);
 	//it isn't a problem if actor not found
 	Game *game = core->GetGame();
 	if (game) {
@@ -6419,7 +6419,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	ieResRef Sound = {};
 	int globalID, Slot, Count = 0, Type = 0;
 	const char *ResRef;
-	PARSE_ARGS( args, GemRB_DragItem__doc,  "iis|ii", &globalID, &Slot, &ResRef, &Count, &Type);
+	PARSE_ARGS( args,  "iis|ii", &globalID, &Slot, &ResRef, &Count, &Type);
 
 	// FIXME
 	// we should Drop the Dragged item in place of the current item
@@ -6508,7 +6508,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 {
 	ieResRef Sound;
 	int globalID, Slot;
-	PARSE_ARGS( args, GemRB_DropDraggedItem__doc,  "ii", &globalID, &Slot);
+	PARSE_ARGS( args,  "ii", &globalID, &Slot);
 
 	// FIXME
 	if (core->GetDraggedItem() == NULL) {
@@ -6708,7 +6708,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 {
 	int Variable, value = 0;
 	char path[_MAX_PATH] = { '\0' };
-	PARSE_ARGS( args, GemRB_GetSystemVariable__doc,  "i", &Variable);
+	PARSE_ARGS( args,  "i", &Variable);
 	switch(Variable) {
 		case SV_BPP: value = core->Bpp; break;
 		case SV_WIDTH: value = core->Width; break;
@@ -6733,7 +6733,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	int SlotID=-1;
 	int Charge0=1,Charge1=0,Charge2=0;
 	const char *ItemResRef;
-	PARSE_ARGS( args, GemRB_CreateItem__doc,  "is|iiii", &globalID, &ItemResRef, &SlotID, &Charge0, &Charge1, &Charge2);
+	PARSE_ARGS( args,  "is|iiii", &globalID, &ItemResRef, &SlotID, &Charge0, &Charge1, &Charge2);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -6776,7 +6776,7 @@ static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
 	int globalID, col;
 
 	if (!PyArg_ParseTuple(args, "ii", &globalID, &col)) {
-		return AttributeError( GemRB_GetAvatarsValue__doc );
+		return NULL;
 	}
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -6802,7 +6802,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	//the stack
 	AreaAnimation anim;
 	memset(&anim,0,sizeof(anim));
-	PARSE_ARGS( args, GemRB_SetMapAnimation__doc,  "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height);
+	PARSE_ARGS( args,  "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height);
 
 	GET_GAME();
 
@@ -6831,7 +6831,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	int x,y;
 	int color=0;
 	const char *txt=NULL;
-	PARSE_ARGS( args, GemRB_SetMapnote__doc,  "ii|is", &x, &y, &color, &txt);
+	PARSE_ARGS( args,  "ii|is", &x, &y, &color, &txt);
 	GET_GAME();
 
 	GET_MAP();
@@ -6857,7 +6857,7 @@ static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
 	int State;
 
 	if (!PyArg_ParseTuple( args, "si", &DoorName, &State) ) {
-		return AttributeError( GemRB_SetMapDoor__doc);
+		return NULL;
 	}
 
 	GET_GAME();
@@ -6883,7 +6883,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 	const char *ExitName;
 	const char *NewArea = NULL;
 	const char *NewEntrance = NULL;
-	PARSE_ARGS( args, GemRB_SetMapExit__doc,  "s|ss", &ExitName, &NewArea, &NewEntrance);
+	PARSE_ARGS( args,  "s|ss", &ExitName, &NewArea, &NewEntrance);
 
 	GET_GAME();
 
@@ -6919,7 +6919,7 @@ static PyObject* GemRB_SetMapRegion(PyObject * /*self*/, PyObject* args)
 {
 	const char *Name;
 	const char *TrapScript = NULL;
-	PARSE_ARGS( args, GemRB_SetMapRegion__doc,  "s|s", &Name, &TrapScript);
+	PARSE_ARGS( args,  "s|s", &Name, &TrapScript);
 
 	GET_GAME();
 	GET_MAP();
@@ -6948,7 +6948,7 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	int globalID;
 	const char *CreResRef;
 	int PosX = -1, PosY = -1;
-	PARSE_ARGS( args, GemRB_CreateCreature__doc,  "is|ii", &globalID, &CreResRef, &PosX, &PosY);
+	PARSE_ARGS( args,  "is|ii", &globalID, &CreResRef, &PosX, &PosY);
 
 	GET_GAME();
 	GET_MAP();
@@ -6971,7 +6971,7 @@ static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 	int x,y;
 	int radius;
 	int Value;
-	PARSE_ARGS( args, GemRB_RevealArea__doc, "iiii", &x, &y, &radius, &Value);
+	PARSE_ARGS( args, "iiii", &x, &y, &radius, &Value);
 
 	Point p(x,y);
 	GET_GAME();
@@ -6988,7 +6988,7 @@ PyDoc_STRVAR( GemRB_ExploreArea__doc,
 static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 {
 	int Value=-1;
-	PARSE_ARGS( args, GemRB_ExploreArea__doc,  "|i", &Value);
+	PARSE_ARGS( args,  "|i", &Value);
 	GET_GAME();
 
 	GET_MAP();
@@ -7007,7 +7007,7 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 {
 	int percent;
 	const char *ResRef;
-	PARSE_ARGS( args, GemRB_GetRumour__doc,  "is", &percent, &ResRef);
+	PARSE_ARGS( args,  "is", &percent, &ResRef);
 	if (rand()%100 >= percent) {
 		return PyInt_FromLong( -1 );
 	}
@@ -7024,7 +7024,7 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 {
 	int pause, quiet;
 	int ret;
-	PARSE_ARGS( args, GemRB_GamePause__doc,  "ii", &pause, &quiet);
+	PARSE_ARGS( args,  "ii", &pause, &quiet);
 
 	GET_GAMECONTROL();
 
@@ -7065,11 +7065,11 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!PyArg_UnpackTuple( args, "ref", 9, 13, &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6], &p[7], &p[8], &p[9], &p[10], &p[11], &p[12] )) {
-		return AttributeError( GemRB_CheckFeatCondition__doc );
+		return NULL;
 	}
 
 	if (!PyObject_TypeCheck( p[0], &PyInt_Type )) {
-		return AttributeError( GemRB_CheckFeatCondition__doc );
+		return NULL;
 	}
 	v[0]=PyInt_AsLong( p[0] ); //slot
 
@@ -7077,7 +7077,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		v[1]=PyInt_AsLong( p[1] ); //a_stat
 	} else {
 		if (!PyObject_TypeCheck( p[1], &PyString_Type )) {
-			return AttributeError( GemRB_CheckFeatCondition__doc );
+			return NULL;
 		}
 		callback = PyString_AsString( p[1] ); // callback
 		if (callback == NULL) {
@@ -7088,7 +7088,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 
 	for(i=2;i<9;i++) {
 		if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
-			return AttributeError( GemRB_CheckFeatCondition__doc );
+			return NULL;
 		}
 		v[i]=PyInt_AsLong( p[i] );
 	}
@@ -7096,7 +7096,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	if (p[9]) {
 		for(i=9;i<13;i++) {
 			if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
-				return AttributeError( GemRB_CheckFeatCondition__doc );
+				return NULL;
 			}
 			v[i]=PyInt_AsLong( p[i] );
 		}
@@ -7170,7 +7170,7 @@ PyDoc_STRVAR( GemRB_HasFeat__doc,
 static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, featindex;
-	PARSE_ARGS( args, GemRB_HasFeat__doc, "ii", &globalID, &featindex );
+	PARSE_ARGS( args, "ii", &globalID, &featindex );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	return PyInt_FromLong(actor->GetFeat(featindex));
@@ -7183,7 +7183,7 @@ PyDoc_STRVAR( GemRB_SetFeat__doc,
 static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, featindex, value;
-	PARSE_ARGS( args, GemRB_SetFeat__doc,  "iii", &globalID, &featindex, &value );
+	PARSE_ARGS( args,  "iii", &globalID, &featindex, &value );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	actor->SetFeatValue(featindex, value, false);
@@ -7197,7 +7197,7 @@ PyDoc_STRVAR( GemRB_GetMaxEncumbrance__doc,
 static PyObject* GemRB_GetMaxEncumbrance(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_GetMaxEncumbrance__doc,  "i", &globalID );
+	PARSE_ARGS( args,  "i", &globalID );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -7213,7 +7213,7 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 {
 	int stat, column, value, ex = 0;
 	int ret;
-	PARSE_ARGS( args, GemRB_GetAbilityBonus__doc,  "iii|i", &stat, &column, &value, &ex);
+	PARSE_ARGS( args,  "iii|i", &stat, &column, &value, &ex);
 
 	GET_GAME();
 
@@ -7260,7 +7260,7 @@ PyDoc_STRVAR( GemRB_LeaveParty__doc,
 static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, initDialog = 0;
-	PARSE_ARGS( args, GemRB_LeaveParty__doc,  "i|i", &globalID, &initDialog );
+	PARSE_ARGS( args,  "i|i", &globalID, &initDialog );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -7323,10 +7323,10 @@ PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,
 static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict, int Index, int Function)
 {
 	if (ControlIndex>99) {
-		return AttributeError( GemRB_Button_SetActionIcon__doc );
+		return NULL;
 	}
 	if (Index>=MAX_ACT_COUNT) {
-		return AttributeError( GemRB_Button_SetActionIcon__doc );
+		return NULL;
 	}
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -7389,7 +7389,7 @@ static PyObject* GemRB_Button_SetActionIcon(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex, Index;
 	int Function = 0;
 	PyObject *dict;
-	PARSE_ARGS( args, GemRB_Button_SetActionIcon__doc,  "iiOi|i", &WindowIndex, &ControlIndex, &dict, &Index, &Function );
+	PARSE_ARGS( args,  "iiOi|i", &WindowIndex, &ControlIndex, &dict, &Index, &Function );
 
 	PyObject* ret = SetActionIcon(WindowIndex, ControlIndex, dict, Index, Function);
 	if (ret) {
@@ -7407,7 +7407,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 	const char *ResRef;
 	int ResType;
 	int silent = 0;
-	PARSE_ARGS( args, GemRB_HasResource__doc,  "si|i", &ResRef, &ResType, &silent );
+	PARSE_ARGS( args,  "si|i", &ResRef, &ResType, &silent );
 	if (gamedata->Exists(ResRef, ResType, silent)) {
 		Py_INCREF( Py_True );
 		return Py_True;
@@ -7429,7 +7429,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	int Start = 0;
 	int Offset = 0; //control offset (iwd2 has the action buttons starting at 6)
 	PyObject *dict;
-	PARSE_ARGS( args, GemRB_Window_SetupEquipmentIcons__doc,  "iOi|ii", &wi, &dict, &globalID, &Start, &Offset);
+	PARSE_ARGS( args,  "iOi|ii", &wi, &dict, &globalID, &Start, &Offset);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -7553,7 +7553,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	int Start = 0;
 	PyObject *dict;
 	PyObject *Tuple = NULL;
-	PARSE_ARGS( args, GemRB_Window_SetupControls__doc,  "iOi|iO", &wi, &dict, &globalID, &Start, &Tuple);
+	PARSE_ARGS( args,  "iOi|iO", &wi, &dict, &globalID, &Start, &Tuple);
 
 	GET_GAME();
 
@@ -7580,15 +7580,15 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	ActionButtonRow myrow;
 	if (Tuple) {
 		if (!PyObject_TypeCheck( Tuple, &PyTuple_Type )) {
-			return AttributeError( GemRB_Window_SetupControls__doc );
+			return NULL;
 		}
 		if (PyTuple_Size(Tuple)!=GUIBT_COUNT) {
-			return AttributeError( GemRB_Window_SetupControls__doc );
+			return NULL;
 		}
 		for(int i=0;i<GUIBT_COUNT;i++) {
 			PyObject *x = PyTuple_GetItem(Tuple, i);
 			if (!PyObject_TypeCheck( x, &PyInt_Type )) {
-				return AttributeError( GemRB_Window_SetupControls__doc );
+				return NULL;
 			}
 			myrow[i] = PyInt_AsLong(x);
 		}
@@ -7912,7 +7912,7 @@ PyDoc_STRVAR( GemRB_ClearActions__doc,
 static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_ClearActions__doc,  "i", &globalID);
+	PARSE_ARGS( args,  "i", &globalID);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -7939,7 +7939,7 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 {
 	int qslot;
 	int slot1, slot2, slot3;
-	PARSE_ARGS( args, GemRB_SetDefaultActions__doc,  "iiii", &qslot, &slot1, &slot2, &slot3 );
+	PARSE_ARGS( args,  "iiii", &qslot, &slot1, &slot2, &slot3 );
 	Actor::SetDefaultActions((bool) qslot, (ieByte) slot1, (ieByte) slot2, (ieByte) slot3);
 	Py_RETURN_NONE;
 }
@@ -7954,7 +7954,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 {
 	SpellExtHeader spelldata;
 	int globalID, which, slot, type;
-	PARSE_ARGS( args, GemRB_SetupQuickSpell__doc,  "iiii", &globalID, &slot, &which, &type);
+	PARSE_ARGS( args,  "iiii", &globalID, &slot, &which, &type);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -7986,7 +7986,7 @@ PyDoc_STRVAR( GemRB_SetupQuickSlot__doc,
 static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, which, slot, headerindex = 0;
-	PARSE_ARGS( args, GemRB_SetupQuickSlot__doc, "iii|i", &globalID, &which, &slot, &headerindex);
+	PARSE_ARGS( args, "iii|i", &globalID, &which, &slot, &headerindex);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8007,7 +8007,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	int dummy;
 	int globalID;
 	int ability = -1;
-	PARSE_ARGS( args, GemRB_SetEquippedQuickSlot__doc,  "ii|i", &globalID, &slot, &ability);
+	PARSE_ARGS( args,  "ii|i", &globalID, &slot, &ability);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8032,7 +8032,7 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	int NoTrans = 0;
-	PARSE_ARGS( args, GemRB_GetEquippedQuickSlot__doc,  "i|i", &globalID, &NoTrans);
+	PARSE_ARGS( args,  "i|i", &globalID, &NoTrans);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8059,7 +8059,7 @@ PyDoc_STRVAR( GemRB_GetEquippedAmmunition__doc,
 static PyObject* GemRB_GetEquippedAmmunition(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_GetEquippedQuickSlot__doc, "i", &globalID);
+	PARSE_ARGS( args, "i", &globalID);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8083,7 +8083,7 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	int globalID;
 	int state;
 	const char *spell=NULL;
-	PARSE_ARGS( args, GemRB_SetModalState__doc,  "ii|s", &globalID, &state, &spell );
+	PARSE_ARGS( args,  "ii|s", &globalID, &state, &spell );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -8104,7 +8104,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	const char *spell = NULL;
 	const char *spell2 = NULL;
 	ieResRef replacementSpell;
-	PARSE_ARGS( args, GemRB_PrepareSpontaneousCast__doc,  "isiis", &globalID, &spell, &type, &level, &spell2);
+	PARSE_ARGS( args,  "isiis", &globalID, &spell, &type, &level, &spell2);
 	strnlwrcpy(replacementSpell, spell2, 8);
 
 	GET_GAME();
@@ -8131,7 +8131,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	unsigned int globalID;
 	int type;
 	unsigned int spell;
-	PARSE_ARGS( args, GemRB_SpellCast__doc,  "iii", &globalID, &type, &spell);
+	PARSE_ARGS( args,  "iii", &globalID, &type, &spell);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8216,7 +8216,7 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, casterID = 0;
 	const char *spell;
-	PARSE_ARGS( args, GemRB_ApplySpell__doc, "is|i", &globalID, &spell, &casterID );
+	PARSE_ARGS( args, "is|i", &globalID, &spell, &casterID );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8245,7 +8245,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	int slot;
 	int header;
 	int forcetarget=-1; //some crappy scrolls don't target self correctly!
-	PARSE_ARGS( args, GemRB_UseItem__doc, "iii|i", &globalID, &slot, &header, &forcetarget);
+	PARSE_ARGS( args, "iii|i", &globalID, &slot, &header, &forcetarget);
 
 	GET_GAME();
 	GET_GAMECONTROL();
@@ -8326,7 +8326,7 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 	int brightness, contrast;
 
 	if (!PyArg_ParseTuple( args, "ii", &brightness, &contrast )) {
-		return AttributeError( GemRB_SetGamma__doc );
+		return NULL;
 	}
 	if (brightness<0 || brightness>40) {
 		return RuntimeError( "Brightness must be 0-40" );
@@ -8345,13 +8345,8 @@ PyDoc_STRVAR( GemRB_SetMouseScrollSpeed__doc,
 static PyObject* GemRB_SetMouseScrollSpeed(PyObject * /*self*/, PyObject* args)
 {
 	int mouseSpeed;
-
-	if (!PyArg_ParseTuple( args, "i", &mouseSpeed)) {
-		return AttributeError( GemRB_SetMouseScrollSpeed__doc );
-	}
-
+	PARSE_ARGS(args, "i", &mouseSpeed);
 	core->SetMouseScrollSpeed(mouseSpeed);
-
 	Py_RETURN_NONE;
 }
 
@@ -8362,13 +8357,8 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 {
 	int tooltipDelay;
-
-	if (!PyArg_ParseTuple( args, "i", &tooltipDelay)) {
-		return AttributeError( GemRB_SetTooltipDelay__doc );
-	}
-
+	PARSE_ARGS(args, "i", &tooltipDelay);
 	core->TooltipDelay = tooltipDelay;
-
 	Py_RETURN_NONE;
 }
 
@@ -8379,10 +8369,7 @@ PyDoc_STRVAR( GemRB_SetFullScreen__doc,
 static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 {
 	int fullscreen;
-
-	if (!PyArg_ParseTuple( args, "i", &fullscreen )) {
-		return AttributeError( GemRB_SetFullScreen__doc );
-	}
+	PARSE_ARGS(args, "i", &fullscreen);
 	core->GetVideoDriver()->SetFullscreenMode(fullscreen);
 	Py_RETURN_NONE;
 }
@@ -8433,7 +8420,7 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 {
 	int noareacheck;
 	int dream, hp;
-	PARSE_ARGS( args, GemRB_RestParty__doc,  "iii", &noareacheck, &dream, &hp);
+	PARSE_ARGS( args,  "iii", &noareacheck, &dream, &hp);
 	GET_GAME();
 
 	return PyInt_FromLong(game->RestParty(noareacheck, dream, hp));
@@ -8445,7 +8432,7 @@ PyDoc_STRVAR( GemRB_ChargeSpells__doc,
 static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_ChargeSpells__doc, "i", &globalID);
+	PARSE_ARGS( args, "i", &globalID);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8463,7 +8450,7 @@ PyDoc_STRVAR( GemRB_HasSpecialItem__doc,
 static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, itemtype, useup;
-	PARSE_ARGS( args, GemRB_HasSpecialItem__doc,  "iii", &globalID, &itemtype, &useup);
+	PARSE_ARGS( args,  "iii", &globalID, &itemtype, &useup);
 	if (SpecialItemsCount==-1) {
 		ReadSpecialItems();
 	}
@@ -8506,7 +8493,7 @@ PyDoc_STRVAR( GemRB_HasSpecialSpell__doc,
 static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, specialtype, useup;
-	PARSE_ARGS( args, GemRB_HasSpecialSpell__doc,  "iii", &globalID, &specialtype, &useup);
+	PARSE_ARGS( args,  "iii", &globalID, &specialtype, &useup);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8549,7 +8536,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	const char *resref2 = NULL;
 	const char *resref3 = NULL;
 	const char *source = NULL;
-	PARSE_ARGS( args, GemRB_ApplyEffect__doc, "isii|ssssi",
+	PARSE_ARGS( args, "isii|ssssi",
 			   &globalID, &opcodename, &param1, &param2,
 			   &resref1, &resref2, &resref3, &source, &timing);
 
@@ -8599,7 +8586,7 @@ static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 	const char *opcodename;
 	int param1, param2;
 	const char *resref = NULL;
-	PARSE_ARGS( args, GemRB_CountEffects__doc,  "isii|s", &globalID, &opcodename, &param1, &param2, &resref);
+	PARSE_ARGS( args,  "isii|s", &globalID, &opcodename, &param1, &param2, &resref);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -8619,7 +8606,7 @@ static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 	int globalID;
 	const char *opcodename;
 	int px, py;
-	PARSE_ARGS( args, GemRB_ModifyEffect__doc,  "isii", &globalID, &opcodename, &px, &py);
+	PARSE_ARGS( args,  "isii", &globalID, &opcodename, &px, &py);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -8679,7 +8666,7 @@ static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
 {
 	int value, op;
 	unsigned long ret;
-	PARSE_ARGS( args, GemRB_SetRepeatClickFlags__doc,  "ii", &value, &op);
+	PARSE_ARGS( args,  "ii", &value, &op);
 	ret = core->GetEventMgr()->SetRKFlags( (unsigned long) value, (unsigned long) op);
 	return PyInt_FromLong( ret );
 }
@@ -8693,7 +8680,7 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 {
 	int strref, color;
 	int globalID = 0;
-	PARSE_ARGS( args, GemRB_DisplayString__doc,  "ii|i", &strref, &color, &globalID);
+	PARSE_ARGS( args,  "ii|i", &strref, &color, &globalID);
 	if (globalID) {
 		GET_GAME();
 		GET_ACTOR_GLOBAL();
@@ -8713,7 +8700,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	int leftorright;
-	PARSE_ARGS( args, GemRB_GetCombatDetails__doc, "ii", &globalID, &leftorright);
+	PARSE_ARGS( args, "ii", &globalID, &leftorright);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8823,7 +8810,7 @@ static PyObject* GemRB_GetDamageReduction(PyObject * /*self*/, PyObject* args)
 	int globalID;
 	unsigned int enchantment = 0;
 	int missile = 0;
-	PARSE_ARGS( args, GemRB_GetDamageReduction__doc,  "ii|i", &globalID, &enchantment, &missile);
+	PARSE_ARGS( args,  "ii|i", &globalID, &enchantment, &missile);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -8844,7 +8831,7 @@ static PyObject* GemRB_GetSpellFailure(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	int cleric = 0;
-	PARSE_ARGS( args, GemRB_GetSpellFailure__doc, "i|i", &globalID, &cleric);
+	PARSE_ARGS( args, "i|i", &globalID, &cleric);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8868,7 +8855,7 @@ PyDoc_STRVAR( GemRB_IsDualWielding__doc,
 static PyObject* GemRB_IsDualWielding(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	PARSE_ARGS( args, GemRB_IsDualWielding__doc, "i", &globalID);
+	PARSE_ARGS( args, "i", &globalID);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8912,7 +8899,7 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 {
 	int globalID;
 	ieResRef splname;
-	PARSE_ARGS( args, GemRB_GetSpellCastOn__doc, "i", &globalID );
+	PARSE_ARGS( args, "i", &globalID );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -8933,7 +8920,7 @@ PyDoc_STRVAR( GemRB_SetTickHook__doc,
 static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 {
 	PyObject* function;
-	PARSE_ARGS(args, GemRB_SetTickHook__doc, "O", &function);
+	PARSE_ARGS(args, "O", &function);
 
 	EventHandler handler = NULL;
 	if (function != Py_None && PyCallable_Check(function)) {
@@ -8958,10 +8945,10 @@ PyDoc_STRVAR( GemRB_SetupMaze__doc,
 static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 {
 	int xsize, ysize;
-	PARSE_ARGS( args, GemRB_SetupMaze__doc, "ii", &xsize, &ysize );
+	PARSE_ARGS( args, "ii", &xsize, &ysize );
 
 	if ((unsigned) xsize>MAZE_MAX_DIM || (unsigned) ysize>MAZE_MAX_DIM) {
-		return AttributeError( GemRB_SetupMaze__doc );
+		return NULL;
 	}
 
 	GET_GAME();
@@ -8989,10 +8976,10 @@ PyDoc_STRVAR( GemRB_SetMazeEntry__doc,
 static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 {
 	int entry, index, value;
-	PARSE_ARGS( args, GemRB_SetMazeEntry__doc, "iii", &entry, &index, &value );
+	PARSE_ARGS( args, "iii", &entry, &index, &value );
 
 	if (entry<0 || entry>63) {
-		return AttributeError( GemRB_SetMazeEntry__doc );
+		return NULL;
 	}
 
 	GET_GAME();
@@ -9010,8 +8997,7 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 		default:
 		case ME_VALID:
 		case ME_ACCESSIBLE:
-			return AttributeError( GemRB_SetMazeEntry__doc );
-			break;
+			return NULL;
 		case ME_TRAP: //trapped/traptype
 			if (value==-1) {
 				m->trapped = 0;
@@ -9069,7 +9055,7 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 {
 	int entry;
 	int value;
-	PARSE_ARGS( args, GemRB_SetMazeData__doc, "ii", &entry, &value );
+	PARSE_ARGS( args, "ii", &entry, &value );
 
 	GET_GAME();
 
@@ -9116,7 +9102,7 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 			h->unknown30 = value;
 			break;
 		default:
-			return AttributeError( GemRB_SetMazeData__doc );
+			return NULL;
 	}
 
 	Py_RETURN_NONE;
@@ -9158,10 +9144,10 @@ PyDoc_STRVAR( GemRB_GetMazeEntry__doc,
 static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 {
 	int entry;
-	PARSE_ARGS( args, GemRB_GetMazeEntry__doc, "i", &entry );
+	PARSE_ARGS( args, "i", &entry );
 
 	if (entry<0 || entry>=MAZE_ENTRY_COUNT) {
-		return AttributeError( GemRB_GetMazeEntry__doc );
+		return NULL;
 	}
 
 	GET_GAME();
@@ -9199,7 +9185,7 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 	char* type;
 	int weight;
 	int flags = 0;
-	PARSE_ARGS( args, GemRB_AddGameTypeHint__doc, "si|i", &type, &weight, &flags );
+	PARSE_ARGS( args, "si|i", &type, &weight, &flags );
 
 	if (weight > gametype_hint_weight) {
 		gametype_hint_weight = weight;

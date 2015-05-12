@@ -34,6 +34,14 @@
 # will then execute
 # GemRB.GetTableValue(5, "Row", "Col")
 
+def MethodAttributeError(f):
+	def handler(*args, **kwargs):
+		try:
+			return f(*args, **kwargs)
+		except Exception as e:
+			raise type(e)(str(e) + "\nMethod Docs:\n" + str(f.__doc__))
+	return handler
+
 class metaIDWrapper(type):
 	@classmethod
 	def GUIScriptMethodHandle(cls, f):
@@ -63,7 +71,7 @@ class metaIDWrapper(type):
 		methods = classdict.pop('methods', {})
 		for key in methods:
 			meth = methods[key]
-			classdict[key] = cls.GUIScriptMethodHandle(meth)
+			classdict[key] = MethodAttributeError(cls.GUIScriptMethodHandle(meth))
 
 		return type.__new__(cls, classname, bases, classdict)
 
