@@ -70,23 +70,6 @@ using namespace GemRB;
 
 GUIScript *GemRB::gs = NULL;
 
-//this stuff is missing from Python 2.2
-#ifndef PyDoc_VAR
-#define PyDoc_VAR(name) static char name[]
-#endif
-
-#ifndef PyDoc_STR
-# ifdef WITH_DOC_STRINGS
-# define PyDoc_STR(str) str
-# else
-# define PyDoc_STR(str) ""
-# endif
-#endif
-
-#ifndef PyDoc_STRVAR
-#define PyDoc_STRVAR(name,str) PyDoc_VAR(name) = PyDoc_STR(str)
-#endif
-
 // a shorthand for declaring methods in method table
 #define METHOD(name, args) {#name, GemRB_ ## name, args, GemRB_ ## name ## __doc}
 
