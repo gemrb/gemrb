@@ -58,6 +58,7 @@ class GSymbol:
 class GView:
 	__metaclass__ = metaControl
 	methods = {
+    'CreateControl': _GemRB.View_CreateControl,
 	'GetFrame': _GemRB.View_GetFrame,
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
@@ -80,12 +81,8 @@ class GWindow(GView):
     'SetupControls': _GemRB.Window_SetupControls,
     'SetVisible': _GemRB.Window_SetVisible,
     'ShowModal': _GemRB.Window_ShowModal,
+    'GetControl': _GemRB.Window_GetControl,
   }
-  def SetBackground(self, resref):
-	  _GemRB.View_SetBackground(self.ID, -1, resref)
-	  
-  def SetFlags(self, flags, op = OP_SET):
-	  _GemRB.View_SetFlags(self.ID, -1, flags, op)
 
   def __nonzero__(self):
     return self.ID != -1
@@ -93,48 +90,39 @@ class GWindow(GView):
     if self.ID != -1:
       _GemRB.Window_Unload(self.ID)
       self.ID = -1
-  def GetControl(self, control):
-    return _GemRB.Window_GetControl(self.ID, control)
 
   @CreateControlDecorator
   def CreateWorldMapControl(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_WORLDMAP, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)
+  	return self.CreateControl(control, IE_GUI_WORLDMAP, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator
   def CreateMapControl(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_MAP, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)
+    return self.CreateControl(control, IE_GUI_MAP, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator
   def CreateLabel(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_LABEL, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)
+  	return self.CreateControl(control, IE_GUI_LABEL, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator
   def CreateButton(self, control, IE_GUI_BUTTON, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_BUTTON, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)
+    return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator
   def CreateScrollBar(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_SCROLLBAR, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)
+    return self.CreateControl(control, IE_GUI_SCROLLBAR, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator
   def CreateTextArea(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_TEXTAREA, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)  
+    return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
   
   @CreateControlDecorator
   def CreateTextEdit(self, control, *args):
-    _GemRB.Window_CreateControl(self.ID, control, IE_GUI_EDIT, -1, args[0], args[1], args[2], args[3], args[4:])
-    return _GemRB.Window_GetControl(self.ID, control)
- 
+    return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:]) 
 
 class GControl(GView):
   __metaclass__ = metaControl
   methods = {
+	'AttachScrollBar': _GemRB.Control_AttachScrollBar,
     'HasAnimation': _GemRB.Control_HasAnimation,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,
     'SetAnimationPalette': _GemRB.Control_SetAnimationPalette,
@@ -144,13 +132,8 @@ class GControl(GView):
     'SetTooltip': _GemRB.Control_SetTooltip,
     'SetEvent': _GemRB.Control_SetEvent,
     'SetStatus': _GemRB.Control_SetStatus,
+    'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
-  def AttachScrollBar(self, scrollbar):
-    if self.WinID != scrollbar.WinID:
-      raise RuntimeError, "Scrollbar must be in same Window as Control"
-    return _GemRB.Control_AttachScrollBar(self.WinID, self.ID, scrollbar.ID)
-  def SubstituteForControl(self, target):
-	  return _GemRB.Control_SubstituteForControl(self.WinID, self.ID, target.WinID, target.ID)
 
 class GLabel(GControl):
   methods = {
@@ -200,9 +183,10 @@ class GButton(GControl):
     'SetItemIcon': _GemRB.Button_SetItemIcon,
     'SetActionIcon': _GemRB.Button_SetActionIcon
   }
+
   def CreateLabel(self, labelid, *args):
     frame = self.GetFrame()
-    return _GemRB.Window_CreateControl(self.WinID, labelid, IE_GUI_LABEL, self.ID, 0, 0, frame['w'], frame['h'], args)
+    return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
 
 class GWorldMap(GControl):
   methods = {

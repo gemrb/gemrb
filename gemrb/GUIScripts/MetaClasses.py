@@ -34,6 +34,8 @@
 # will then execute
 # GemRB.GetTableValue(5, "Row", "Col")
 
+from types import MethodType
+
 def MethodAttributeError(f):
 	def handler(*args, **kwargs):
 		try:
@@ -42,11 +44,7 @@ def MethodAttributeError(f):
 			raise type(e)(str(e) + "\nMethod Docs:\n" + str(f.__doc__))
 	return handler
 
-class metaIDWrapper(type):
-	@classmethod
-	def GUIScriptMethodHandle(cls, f):
-		return lambda self, *args: f(self.ID, *args)
-		
+class metaIDWrapper(type):		
 	@classmethod
 	def InitMethod(cls, f = None):
 		def __init__(self, *args, **kwargs):
@@ -69,21 +67,16 @@ class metaIDWrapper(type):
 		classdict['__init__'] = cls.InitMethod(classdict['__init__'])
 
 		methods = classdict.pop('methods', {})
+		c = type.__new__(cls, classname, bases, classdict)
+		# we must bind the methods after the class is created (instead of adding to classdict)
+		# otherwise the methods would be class methods instead of instance methods
 		for key in methods:
-			meth = methods[key]
-			classdict[key] = MethodAttributeError(cls.GUIScriptMethodHandle(meth))
-
-		return type.__new__(cls, classname, bases, classdict)
+			setattr(c, key, MethodType(MethodAttributeError(methods[key]), None, c))
+		return c
 
 class metaControl(metaIDWrapper):
-	@classmethod
-	def GUIScriptMethodHandle(cls, f):
-		return lambda self, *args: f(self.WinID, self.ID, *args)
-		
-
 	def __new__(cls, classname, bases, classdict):
 		classdict['__slots__'] = classdict.get('__slots__', [])
 		classdict['__slots__'].append('WinID')
 
 		return metaIDWrapper.__new__(cls, classname, bases, classdict )
-
