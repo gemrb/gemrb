@@ -2666,31 +2666,6 @@ void Interface::AddWindow(Window * win)
 	win->MarkDirty();
 }
 
-/** Adjust the Scrolling factor of a control (worldmap atm) */
-int Interface::AdjustScrolling(unsigned short WindowIndex,
-		unsigned short ControlIndex, short x, short y)
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControlAtIndex(ControlIndex);
-	if (ctrl == NULL) {
-		return -1;
-	}
-	switch(ctrl->ControlType) {
-		case IE_GUI_WORLDMAP:
-			((WorldMapControl *) ctrl)->AdjustScrolling(x,y);
-			break;
-		default: //doesn't work for these
-			return -1;
-	}
-	return 0;
-}
-
 /** Set the Tooltip text of a Control */
 void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
 {

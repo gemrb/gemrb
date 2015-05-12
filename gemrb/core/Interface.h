@@ -474,8 +474,6 @@ public:
 	void SetOnTop(int Index);
 	/** Add a window to the Window List */
 	void AddWindow(Window * win);
-	/** Adjust the scrolling of the control (if applicable) */
-	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
 	/** Set the Tooltip text of a Control */
 	void SetTooltip(Control*, const char * string, int Function = 0);
 	/** Actually draws tooltip on the screen. */

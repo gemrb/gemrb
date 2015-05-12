@@ -2146,7 +2146,11 @@ static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject * /*self*/, PyObject* a
 	int WindowIndex, ControlIndex, x, y;
 	PARSE_ARGS( args, GemRB_WorldMap_AdjustScrolling__doc,  "iiii", &WindowIndex, &ControlIndex, &x, &y );
 
-	core->AdjustScrolling( WindowIndex, ControlIndex, x, y );
+	WorldMapControl* wmap = (WorldMapControl*)GetControl(WindowIndex, ControlIndex, IE_GUI_WORLDMAP);
+	if (!wmap) {
+		return NULL;
+	}
+	wmap->AdjustScrolling( x, y );
 	Py_RETURN_NONE;
 }
 
