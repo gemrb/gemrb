@@ -2304,7 +2304,7 @@ bool GameControl::SetGUIHidden(bool hide)
 				Window* w = core->GetWindow(index);
 				w->SetFlags(WF_BORDERLESS, BM_OR);
 				if (w) {
-					core->SetVisible(index, !hide);
+					core->SetVisible(w, !hide);
 					if (dict->Lookup( *++val, index )) {
 						//Log(MESSAGE, "GameControl", "position: %s", *val);
 						ResizeParentWindowFor( w, index, op );
@@ -2320,12 +2320,12 @@ bool GameControl::SetGUIHidden(bool hide)
 	//FloatWindow doesn't affect gamecontrol, so it is special
 	if (dict->Lookup("FloatWindow", index)) {
 		if (index != (ieDword) -1) {
-			core->SetVisible(index, !hide);
+			Window* fw = core->GetWindow(index);
+			core->SetVisible(fw, !hide);
 			if (!hide) {
-				Window* fw = core->GetWindow(index);
 				assert(fw != NULL);
 				fw->SetFlags(WF_FLOAT|WF_BORDERLESS, BM_OR);
-				core->SetOnTop(index);
+				core->SetOnTop(fw);
 			}
 		}
 	}

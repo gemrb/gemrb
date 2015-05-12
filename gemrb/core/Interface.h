@@ -335,7 +335,7 @@ private:
 	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;
-	std::vector<int> topwin;
+	std::vector<size_t> topwin;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
@@ -470,8 +470,7 @@ public:
 #endif
 #endif
 	int CreateWindow(unsigned short WindowID, const Region&, char* Background);
-	/** Sets a Window on the Top */
-	void SetOnTop(int Index);
+
 	/** Add a window to the Window List */
 	void AddWindow(Window * win);
 	/** Set the Tooltip text of a Control */
@@ -482,14 +481,14 @@ public:
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea() const;
-	/** returns the Window Visible Flag */
-	int GetVisible(unsigned short WindowIndex) const;
+	/** Sets a Window on the Top */
+	void SetOnTop(Window*);
 	/** Set a Window Visible Flag */
-	int SetVisible(unsigned short WindowIndex, int visible);
+	void SetVisible(Window*, int visible);
 	/** Show a Window in Modal Mode */
-	int ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow);
+	bool ShowModal(Window*, MODAL_SHADOW Shadow);
 	/** Get a Window from the Loaded Window List */
-	Window * GetWindow(unsigned short WindowIndex) const;
+	Window * GetWindow(size_t WindowIndex) const;
 	/** Returns true if wnd is a valid window with WindowIndex */
 	bool IsValidWindow(unsigned short WindowID, Window *wnd) const;
 	/** Removes a Loaded Window */

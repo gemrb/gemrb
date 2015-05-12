@@ -1398,10 +1398,7 @@ static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
 	int visible;
 	PARSE_ARGS( args, GemRB_Window_SetVisible__doc, "ii", &WindowIndex, &visible );
 
-	int ret = core->SetVisible( WindowIndex, visible );
-	if (ret == -1) {
-		return RuntimeError("Invalid window in SetVisible");
-	}
+	core->SetVisible( core->GetWindow(WindowIndex), visible );
 	if (!WindowIndex) {
 		core->SetEventFlag(EF_CONTROL);
 	}
@@ -1443,8 +1440,7 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, Shadow = MODAL_SHADOW_NONE;
 	PARSE_ARGS( args, GemRB_Window_ShowModal__doc, "i|i", &WindowIndex, &Shadow );
 
-	int ret = core->ShowModal( WindowIndex, (MODAL_SHADOW)Shadow );
-	if (ret == -1) {
+	if (! core->ShowModal( core->GetWindow(WindowIndex), (MODAL_SHADOW)Shadow )) {
 		return NULL;
 	}
 

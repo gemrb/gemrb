@@ -2556,7 +2556,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		}
 		if (win->WindowID == WindowID &&
 			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
-			SetOnTop( i );
+			SetOnTop( win );
 			win->MarkDirty();
 			if (gc)
 				gc->SetScrolling( false );
@@ -2594,12 +2594,14 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	unsigned int i;
 
 	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL)
+		Window* win = windows[i];
+		if (win == NULL)
 			continue;
-		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
-			windows[i]->WindowPack )) {
-			SetOnTop( i );
-			windows[i]->MarkDirty();
+		if (win->WindowID == WindowID
+			&& !stricmp( WindowPack, win->WindowPack ))
+		{
+			SetOnTop( win );
+			win->MarkDirty();
 			return i;
 		}
 	}
@@ -2632,19 +2634,20 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 }
 
 /** Sets a Window on the Top */
-void Interface::SetOnTop(int Index)
+void Interface::SetOnTop(Window* win)
 {
-	std::vector<int>::iterator t;
+	size_t i = std::find(windows.begin(), windows.end(), win) - windows.begin();
+	std::vector<size_t>::iterator t;
 	for(t = topwin.begin(); t != topwin.end(); ++t) {
-		if((*t) == Index) {
+		if((*t) == i) {
 			topwin.erase(t);
 			break;
 		}
 	}
 	if(topwin.size() != 0)
-		topwin.insert(topwin.begin(), Index);
+		topwin.insert(topwin.begin(), i);
 	else
-		topwin.push_back(Index);
+		topwin.push_back(i);
 }
 /** Add a window to the Window List */
 void Interface::AddWindow(Window * win)
@@ -2685,26 +2688,11 @@ void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
 	}
 }
 
-int Interface::GetVisible(unsigned short WindowIndex) const
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	return win->Visible;
-}
 /** Set a Window Visible Flag */
-int Interface::SetVisible(unsigned short WindowIndex, int visible)
+void Interface::SetVisible(Window* win, int visible)
 {
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
 	if (win == NULL) {
-		return -1;
+		return;
 	}
 	if (visible!=WINDOW_FRONT) {
 		win->Visible = (char) visible;
@@ -2732,28 +2720,21 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 				}
 			}
 			win->MarkDirty();
-			SetOnTop( WindowIndex );
+			SetOnTop( win );
 			break;
 	}
-	return 0;
 }
 
 /** Show a Window in Modal Mode */
-int Interface::ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow)
+bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 {
-	if (WindowIndex >= windows.size()) {
-		Log(ERROR, "Core", "Window not found");
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
 	if (win == NULL) {
-		Log(ERROR, "Core", "Window already freed");
-		return -1;
+		return false;
 	}
 	win->Visible = WINDOW_FRONT;
 	//don't destroy the other window handlers
 	//evntmgr->Clear();
-	SetOnTop( WindowIndex );
+	SetOnTop( win );
 	evntmgr->AddWindow( win );
 	evntmgr->SetFocused( win, NULL );
 	win->MarkDirty();
@@ -3007,7 +2988,7 @@ void Interface::DrawTooltip (const String& string, Point p)
 
 //interface for higher level functions, if the window was
 //marked for deletion it is not returned
-Window* Interface::GetWindow(unsigned short WindowIndex) const
+Window* Interface::GetWindow(size_t WindowIndex) const
 {
 	if (WindowIndex < windows.size()) {
 		Window *win = windows[WindowIndex];
