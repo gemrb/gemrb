@@ -214,7 +214,10 @@ template <class T=View>
 static T* GetView(PyObject* obj) {
 	int id = -1;
 	PyObject* attr = PyObject_GetAttrString(obj, "ID");
-	if (!attr) return NULL;
+	if (!attr) {
+		RuntimeError("Invalid Window/Control reference, no ID attribute.");
+		return NULL;
+	}
 
 	View* view = NULL;
 	id = (int)PyInt_AsLong( attr );
