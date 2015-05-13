@@ -79,7 +79,7 @@ public:
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const char * ResRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	Holder<TableMgr> GetTable(unsigned int index) const;
+	Holder<TableMgr> GetTable(size_t index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 

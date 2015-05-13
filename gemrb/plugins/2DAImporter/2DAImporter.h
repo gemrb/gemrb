@@ -64,7 +64,7 @@ public:
 	}
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */
-	inline const char* QueryField(unsigned int row = 0, unsigned int column = 0) const
+	inline const char* QueryField(size_t row = 0, size_t column = 0) const
 	{
 		if (rows.size() <= row) {
 			return ( char * ) defVal;

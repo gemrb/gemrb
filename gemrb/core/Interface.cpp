@@ -4354,7 +4354,7 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	strnlwrcpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), 8);
+	strnlwrcpy( GoldResRef, tab->QueryField((size_t)0, (size_t)0), 8);
 	if ( GoldResRef[0]=='*' ) {
 		return false;
 	}

@@ -207,7 +207,7 @@ int GameData::GetTableIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-Holder<TableMgr> GameData::GetTable(unsigned int index) const
+Holder<TableMgr> GameData::GetTable(size_t index) const
 {
 	if (index >= tables.size()) {
 		return NULL;

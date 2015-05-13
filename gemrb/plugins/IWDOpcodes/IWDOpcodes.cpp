@@ -1495,7 +1495,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	int real = core->Roll(1,cnt,-1);
-	const char *resrefs[2]={tab->QueryField((unsigned int) 0,0), tab->QueryField((int) 0,1) };
+	const char *resrefs[2]={tab->QueryField((size_t)0,0), tab->QueryField((int) 0,1) };
 
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
