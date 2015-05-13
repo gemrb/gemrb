@@ -238,6 +238,18 @@ static T* GetView(PyObject* obj) {
 	return dynamic_cast<T*>(view);
 }
 
+static Holder<TableMgr> GetTable(PyObject* obj) {
+	Holder<TableMgr> tm;
+
+	PyObject* attr = PyObject_GetAttrString(obj, "ID");
+	if (!attr) {
+		RuntimeError("Invalid Table reference, no ID attribute.");
+	} else {
+		tm = gamedata->GetTable( PyInt_AsLong( attr ) );
+	}
+	return tm;
+}
+
 //sets tooltip with Fx key prepended
 static void SetFunctionTooltip(Control* ctrl, char *txt, int Function)
 {
@@ -659,109 +671,75 @@ PyDoc_STRVAR( GemRB_Table_GetValue__doc,
 "otherwise 0 means string, 1 means integer, 2 means stat symbol translation and "
 "3 means strref resolution.");
 
-static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 {
-	PyObject* ti, * row, * col;
-	PyObject* type = NULL;
-	int which = -1;
+	PyObject* row = NULL, *col = NULL;
+	int type = -1;
+	PARSE_ARGS(args, "OOO|i", &self, &row, &col, &type);
 
-	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &ti, &row, &col, &type )) {
-		return NULL;
-	}
-	if (type!=NULL) {
-		if (!PyObject_TypeCheck( type, &PyInt_Type )) {
-			return NULL;
-		}
-		which = PyInt_AsLong( type );
+	if (!PyObject_TypeCheck( row, Py_TYPE(col))) {
+		return AttributeError("RowIndex/RowString and ColIndex/ColString must be the same type.");
 	}
 
-	if (!PyObject_TypeCheck( ti, &PyInt_Type )) {
-		return NULL;
-	}
-	long TableIndex = PyInt_AsLong( ti );
-	if (( !PyObject_TypeCheck( row, &PyInt_Type ) ) &&
-		( !PyObject_TypeCheck( row, &PyString_Type ) )) {
-		return NULL;
-	}
-	if (( !PyObject_TypeCheck( col, &PyInt_Type ) ) &&
-		( !PyObject_TypeCheck( col, &PyString_Type ) )) {
-		return NULL;
-	}
-	if (PyObject_TypeCheck( row, &PyInt_Type ) &&
-		( !PyObject_TypeCheck( col, &PyInt_Type ) )) {
-		Log(ERROR, "GUIScript", "Type Error: RowIndex/RowString and ColIndex/ColString must be the same type");
-		return NULL;
-	}
-	if (PyObject_TypeCheck( row, &PyString_Type ) &&
-		( !PyObject_TypeCheck( col, &PyString_Type ) )) {
-		Log(ERROR, "GUIScript", "Type Error: RowIndex/RowString and ColIndex/ColString must be the same type");
-		return NULL;
-	}
-	Holder<TableMgr> tm = gamedata->GetTable( TableIndex );
-	if (!tm) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
+
 	const char* ret;
 	if (PyObject_TypeCheck( row, &PyString_Type )) {
 		char* rows = PyString_AsString( row );
 		char* cols = PyString_AsString( col );
 		ret = tm->QueryField( rows, cols );
 	} else {
-		long rowi = PyInt_AsLong( row );
-		long coli = PyInt_AsLong( col );
+		size_t rowi = PyInt_AsLong( row );
+		size_t coli = PyInt_AsLong( col );
 		ret = tm->QueryField( rowi, coli );
 	}
-	if (ret == NULL)
-		return NULL;
+	ABORT_IF_NULL(ret);
 
-	long val;
-	//if which = 0, then return string
-	if (!which) {
-		return PyString_FromString( ret );
+	switch (type) {
+		case 0: // string
+			return PyString_FromString( ret );
+		case 2:
+			return PyInt_FromLong( core->TranslateStat(ret) );
+		default:
+			long val;
+			bool valid = valid_number(ret, val);
+			if (type == 3) {
+				//if which = 3 then return resolved string
+				return PyString_FromString(core->GetCString((ieStrRef)val));
+			}
+			if (valid || type == 1) {
+				return PyInt_FromLong( val );
+			}
+			// else return string
+			return PyString_FromString( ret );
 	}
-	//if which = 3 then return resolved string
-	bool valid = valid_number(ret, val);
-	if (which == 3) {
-		return PyString_FromString(core->GetCString(val));
-	}
-	//if which = 1 then return number
-	//if which = -1 (omitted) then return the best format
-	if (valid || (which == 1)) {
-		return PyInt_FromLong( val );
-	}
-	if (which==2) {
-		val = core->TranslateStat(ret);
-		return PyInt_FromLong( val );
-	}
-	return PyString_FromString( ret );
 }
 
 PyDoc_STRVAR( GemRB_Table_FindValue__doc,
 "FindTableValue(TableIndex, ColumnIndex, Value[, StartRow]) => Row\n\n"
 "Returns the first rowcount of a field of a 2DA Table." );
 
-static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_FindValue(PyObject* self, PyObject* args)
 {
-	int ti, col;
+	int col;
 	int start = 0;
 	long Value;
 	char* colname = NULL;
 	char* strvalue = NULL;
 
-	if (!PyArg_ParseTuple( args, "iil|i", &ti, &col, &Value, &start )) {
-		PyErr_Clear(); //clearing the exception
+	if (!PyArg_ParseTuple( args, "Oil|i", &self, &col, &Value, &start )) {
 		col = -1;
-		if (!PyArg_ParseTuple( args, "isl|i", &ti, &colname, &Value, &start )) {
-			PyErr_Clear(); //clearing the exception
+		if (!PyArg_ParseTuple( args, "Osl|i", &self, &colname, &Value, &start )) {
 			col = -2;
-			PARSE_ARGS( args, "iss|i", &ti, &colname, &strvalue, &start );
+			PARSE_ARGS( args, "Oss|i", &self, &colname, &strvalue, &start );
 		}
+		PyErr_Clear(); //clearing the exception
 	}
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
+
 	if (col == -1) {
 		return PyInt_FromLong(tm->FindTableValue(colname, Value, start));
 	} else if (col == -2) {
@@ -775,16 +753,14 @@ PyDoc_STRVAR( GemRB_Table_GetRowIndex__doc,
 "GetTableRowIndex(TableIndex, RowName) => Row\n\n"
 "Returns the Index of a Row in a 2DA Table." );
 
-static PyObject* GemRB_Table_GetRowIndex(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetRowIndex(PyObject* self, PyObject* args)
 {
-	int ti;
 	char* rowname;
-	PARSE_ARGS( args, "is", &ti, &rowname );
+	PARSE_ARGS( args, "Os", &self, &rowname );
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
+
 	int row = tm->GetRowIndex( rowname );
 	//no error if the row doesn't exist
 	return PyInt_FromLong( row );
@@ -794,19 +770,16 @@ PyDoc_STRVAR( GemRB_Table_GetRowName__doc,
 "GetTableRowName(TableIndex, RowIndex) => string\n\n"
 "Returns the Name of a Row in a 2DA Table." );
 
-static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetRowName(PyObject* self, PyObject* args)
 {
-	int ti, row;
-	PARSE_ARGS( args, "ii", &ti, &row );
+	int row;
+	PARSE_ARGS( args, "Oi", &self, &row );
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
+
 	const char* str = tm->GetRowName( row );
-	if (str == NULL) {
-		return NULL;
-	}
+	ABORT_IF_NULL(str);
 
 	return PyString_FromString( str );
 }
@@ -815,16 +788,14 @@ PyDoc_STRVAR( GemRB_Table_GetColumnIndex__doc,
 "GetTableColumnIndex(TableIndex, ColumnName) => Column\n\n"
 "Returns the Index of a Column in a 2DA Table." );
 
-static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetColumnIndex(PyObject* self, PyObject* args)
 {
-	int ti;
 	char* colname;
-	PARSE_ARGS( args, "is", &ti, &colname );
+	PARSE_ARGS( args, "Os", &self, &colname );
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
+
 	int col = tm->GetColumnIndex( colname );
 	//no error if the column doesn't exist
 	return PyInt_FromLong( col );
@@ -834,19 +805,16 @@ PyDoc_STRVAR( GemRB_Table_GetColumnName__doc,
 "GetTableColumnName(TableIndex, ColumnIndex) => string\n\n"
 "Returns the Name of a Column in a 2DA Table." );
 
-static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetColumnName(PyObject* self, PyObject* args)
 {
-	int ti, col;
-	PARSE_ARGS( args, "ii", &ti, &col );
+	int col;
+	PARSE_ARGS( args, "Oi", &self, &col );
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
+
 	const char* str = tm->GetColumnName( col );
-	if (str == NULL) {
-		return NULL;
-	}
+	ABORT_IF_NULL(str);
 
 	return PyString_FromString( str );
 }
@@ -855,15 +823,12 @@ PyDoc_STRVAR( GemRB_Table_GetRowCount__doc,
 "GetTableRowCount(TableIndex) => RowCount\n\n"
 "Returns the number of rows in a 2DA Table." );
 
-static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetRowCount(PyObject* self, PyObject* args)
 {
-	int ti;
-	PARSE_ARGS( args, "i", &ti );
+	PARSE_ARGS( args, "O", &self );
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
 
 	return PyInt_FromLong( tm->GetRowCount() );
 }
@@ -872,16 +837,13 @@ PyDoc_STRVAR( GemRB_Table_GetColumnCount__doc,
 "GetTableColumnCount(TableIndex[, Row]) => ColumnCount\n\n"
 "Returns the number of columns in the given row of a 2DA Table. Row may be omitted." );
 
-static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Table_GetColumnCount(PyObject* self, PyObject* args)
 {
-	int ti;
 	int row = 0;
-	PARSE_ARGS( args, "i|i", &ti, &row );
+	PARSE_ARGS( args, "O|i", &self, &row );
 
-	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
-		return RuntimeError("Can't find resource");
-	}
+	Holder<TableMgr> tm = GetTable(self);
+	ABORT_IF_NULL(tm);
 
 	return PyInt_FromLong( tm->GetColumnCount(row) );
 }
