@@ -816,8 +816,8 @@ def ceildiv (n, d):
 def ResolveKey():
 	return
 
-GameWindow = GUIClasses.GWindow(0)
-GameControl = GUIClasses.GControl(0,0)
+GameWindow = GUIClasses.GWindow(ID=0)
+GameControl = GUIClasses.GControl(WinID=0,ID=0)
 
 class _stdioWrapper(object):
 	def __init__(self, log_level):
