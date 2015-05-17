@@ -1606,12 +1606,14 @@ int Interface::Init(InterfaceConfig* config)
 	char gemrbINI[_MAX_PATH] = { '\0' };
 	char tmp[_MAX_PATH] = { '\0' };
 	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
-	PathJoin(ini_path, GamePath, gemrbINI, NULL);
+	PathJoin(ini_path, SavePath, gemrbINI, NULL);
+	if (!file_exists(ini_path)) {
+		PathJoin(ini_path, GamePath, gemrbINI, NULL);
+	}
 	if (file_exists(ini_path)) {
 		strlcpy(tmp, INIConfig, sizeof(tmp));
 		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
-	}
-	if (!IgnoreOriginalINI) {
+	} else if (!IgnoreOriginalINI) {
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
 		Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
 	}
