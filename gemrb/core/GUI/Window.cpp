@@ -163,16 +163,6 @@ Control* Window::GetControlById(ieDword id) const
 	return NULL;
 }
 
-/** Returns the Control at X,Y Coordinates */
-Control* Window::GetControlAtPoint(const Point& p, bool ignore)
-{
-	Control* ctrl = dynamic_cast<Control*>(SubviewAt(p));
-	if (ctrl) {
-		return (ignore && ctrl->ControlID&IGNORE_CONTROL) ? NULL : ctrl;
-	}
-	return NULL;
-}
-
 int Window::GetControlIndex(ieDword id) const
 {
 	for (std::vector<Control*>::const_iterator m = Controls.begin(); m != Controls.end(); ++m) {

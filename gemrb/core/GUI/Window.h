@@ -75,8 +75,6 @@ public:
 
 	/** Returns the Control associated with the function key index, valid indices are 0-11 */
 	Control* GetFunctionControl(int x);
-	/** Returns the Control at X,Y Coordinates */
-	Control* GetControlAtPoint(const Point&, bool ignore=0);
 	/** Returns the Control by Index */
 	Control* GetControlAtIndex(size_t) const;
 	Control* GetControlById(ieDword id) const;
