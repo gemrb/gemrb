@@ -87,20 +87,10 @@ int Control::RunEventHandler(ControlEventHandler handler)
 		if (!wnd) {
 			return -1;
 		}
-		unsigned short WID = wnd->WindowID;
-		unsigned short ID = (unsigned short) ControlID;
 		InHandler = true;
 		//TODO: detect caller errors, trap them???
 		handler(this);
 		InHandler = false;
-		if (!core->IsValidWindow(WID,wnd) ) {
-			Log(ERROR, "Control", "Owner window destructed!");
-			return -1;
-		}
-		if (!wnd->IsValidControl(ID,this) ) {
-			Log(ERROR, "Control", "Control destructed!");
-			return -1;
-		}
 		return 0;
 	}
 	return 1;

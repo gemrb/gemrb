@@ -2999,19 +2999,6 @@ Window* Interface::GetWindow(size_t WindowIndex) const
 	return NULL;
 }
 
-// this function will determine if wnd is a valid window pointer
-// by checking if its WindowID is the same as the reference
-bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd) const
-{
-	size_t WindowIndex = windows.size();
-	while (WindowIndex--) {
-		if (windows[WindowIndex] == wnd) {
-			return wnd->WindowID == WindowID;
-		}
-	}
-	return false;
-}
-
 //this function won't delete the window, just mark it for deletion
 //it will be deleted in the next DrawWindows cycle
 //regardless, the window deleted is inaccessible for gui scripts and

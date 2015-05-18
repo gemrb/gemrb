@@ -489,8 +489,6 @@ public:
 	bool ShowModal(Window*, MODAL_SHADOW Shadow);
 	/** Get a Window from the Loaded Window List */
 	Window * GetWindow(size_t WindowIndex) const;
-	/** Returns true if wnd is a valid window with WindowIndex */
-	bool IsValidWindow(unsigned short WindowID, Window *wnd) const;
 	/** Removes a Loaded Window */
 	int DelWindow(Window* win);
 	/** Removes all Loaded Windows */

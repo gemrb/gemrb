@@ -183,17 +183,6 @@ int Window::GetControlIndex(ieDword id) const
 	return -1;
 }
 
-bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
-{
-	size_t i = Controls.size();
-	while (i--) {
-		if (Controls[i]==ctrl) {
-			return ctrl->ControlID==ID;
-		}
-	}
-	return false;
-}
-
 Control* Window::GetScrollControl() const
 {
 	return scrollbar;

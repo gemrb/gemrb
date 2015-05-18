@@ -83,8 +83,6 @@ public:
 	/** Returns the number of Controls */
 	size_t GetControlCount() const;
 	int GetControlIndex(ieDword id) const;
-	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
-	bool IsValidControl(unsigned short ID, Control *ctrl) const;
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
 
