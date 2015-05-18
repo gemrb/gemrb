@@ -1507,25 +1507,20 @@ PyDoc_STRVAR( GemRB_Window_Unload__doc,
 "UnloadWindow(WindowIndex)\n\n"
 "Unloads a previously Loaded Window." );
 
-static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Window_Unload(PyObject* self, PyObject* args)
 {
-	int WindowIndex;
-	PARSE_ARGS( args, "i", &WindowIndex );
+	PARSE_ARGS(args, "O", &self);
 
-	unsigned short arg = (unsigned short) WindowIndex;
-	if (arg == 0xffff) {
-		return AttributeError( "Feature unsupported! ");
+	Window* win = GetView<Window>(self);
+	if (!win || win->WindowID == 0xffff) {
+		return RuntimeError( "Attempt to delete invalid window!");
 	}
 
-	//Don't bug if the window wasn't loaded
-	if (core->GetWindow(arg) ) {
-		int ret = core->DelWindow( arg );
-		if (ret == -1) {
-			return RuntimeError( "Can't unload window!" );
-		}
-
-		core->PlaySound(DS_WINDOW_CLOSE);
+	if (core->DelWindow( win ) == -1) {
+		return RuntimeError( "Can't unload window!" );
 	}
+
+	core->PlaySound(DS_WINDOW_CLOSE);
 	Py_RETURN_NONE;
 }
 

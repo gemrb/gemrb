@@ -125,6 +125,8 @@ void EventMgr::Clear()
 /** Remove a Window from the array */
 void EventMgr::DelWindow(Window *win)
 {
+	if (!win) return;
+
 	bool focused = (last_win_focused == win);
 	if (focused) {
 		last_win_focused = NULL;
@@ -137,10 +139,6 @@ void EventMgr::DelWindow(Window *win)
 	}
 	if (function_bar == win) {
 		function_bar = NULL;
-	}
-
-	if (windows.size() == 0) {
-		return;
 	}
 
 	int pos = -1;

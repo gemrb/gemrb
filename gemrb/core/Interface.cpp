@@ -3016,12 +3016,8 @@ bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd) const
 //it will be deleted in the next DrawWindows cycle
 //regardless, the window deleted is inaccessible for gui scripts and
 //other high level functions from now
-int Interface::DelWindow(unsigned short WindowIndex)
+int Interface::DelWindow(Window* win)
 {
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
 	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
 		Log(ERROR, "Core", "Window deleted again");
 		return -1;

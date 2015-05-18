@@ -88,7 +88,7 @@ class GWindow(GView):
     return self.ID != -1
   def Unload(self):
     if self.ID != -1:
-      _GemRB.Window_Unload(self.ID)
+      _GemRB.Window_Unload(self)
       self.ID = -1
 
   @CreateControlDecorator

@@ -492,7 +492,7 @@ public:
 	/** Returns true if wnd is a valid window with WindowIndex */
 	bool IsValidWindow(unsigned short WindowID, Window *wnd) const;
 	/** Removes a Loaded Window */
-	int DelWindow(unsigned short WindowIndex);
+	int DelWindow(Window* win);
 	/** Removes all Loaded Windows */
 	void DelAllWindows();
 	/** Redraws all window */
