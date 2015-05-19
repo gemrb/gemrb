@@ -611,7 +611,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	if (CHUHeight && CHUHeight != core->Height)
 		winFrame.y += (core->Height - CHUHeight) / 2;
 
-	win->View::SetFrame(winFrame);
+	win->SetFrame(winFrame);
 	return gs->ConstructObject("Window", ret);
 }
 
