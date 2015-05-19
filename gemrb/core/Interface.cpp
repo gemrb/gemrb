@@ -2557,7 +2557,6 @@ int Interface::LoadWindow(unsigned short WindowID)
 		if (win->WindowID == WindowID &&
 			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
 			SetOnTop( win );
-			win->MarkDirty();
 			if (gc)
 				gc->SetScrolling( false );
 			return i;
@@ -2648,6 +2647,8 @@ void Interface::SetOnTop(Window* win)
 		topwin.insert(topwin.begin(), i);
 	else
 		topwin.push_back(i);
+
+	win->MarkDirty();
 }
 /** Add a window to the Window List */
 void Interface::AddWindow(Window * win)
@@ -2719,7 +2720,6 @@ void Interface::SetVisible(Window* win, int visible)
 					evntmgr->SetFunctionBar( win );
 				}
 			}
-			win->MarkDirty();
 			SetOnTop( win );
 			break;
 	}
@@ -2737,7 +2737,6 @@ bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 	SetOnTop( win );
 	evntmgr->AddWindow( win );
 	evntmgr->SetFocused( win, NULL );
-	win->MarkDirty();
 
 	modalShadow = Shadow;
 	ModalWindow = win;
