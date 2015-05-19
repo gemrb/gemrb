@@ -390,7 +390,7 @@ Holder<Button::DragOp> Button::DragOperation()
 	return View::DragOperation();
 }
 
-bool Button::AcceptsDragOperation(const DragOp& dop)
+bool Button::AcceptsDragOperation(const DragOp& dop) const
 {
 	if (dop.dragView != this && dynamic_cast<const PortraitDragOp*>(&dop)) {
 		return (State != IE_GUI_BUTTON_DISABLED && Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);

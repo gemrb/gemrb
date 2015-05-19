@@ -170,7 +170,7 @@ public: // Public Events
 	};
 
 	Holder<DragOp> DragOperation();
-	bool AcceptsDragOperation(const DragOp&);
+	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
 	/** Mouse Enter */
 	void OnMouseEnter(const Point&, const DragOp*);
