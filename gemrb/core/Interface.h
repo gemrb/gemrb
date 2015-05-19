@@ -472,7 +472,7 @@ public:
 	int CreateWindow(unsigned short WindowID, const Region&, char* Background);
 
 	/** Add a window to the Window List */
-	void AddWindow(Window * win);
+	int AddWindow(Window * win);
 	/** Set the Tooltip text of a Control */
 	void SetTooltip(Control*, const char * string, int Function = 0);
 	/** Actually draws tooltip on the screen. */

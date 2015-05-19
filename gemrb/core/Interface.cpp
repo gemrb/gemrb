@@ -2568,43 +2568,18 @@ int Interface::LoadWindow(unsigned short WindowID)
 	}
 	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
 
-	int slot = -1;
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL) {
-			slot = i;
-			break;
-		}
-	}
-	if (slot == -1) {
-		windows.push_back( win );
-		slot = ( int ) windows.size() - 1;
-	} else {
-		windows[slot] = win;
-	}
-	win->MarkDirty();
 	if (gc)
 		gc->SetScrolling( false );
-	return slot;
+
+	return AddWindow(win);
 }
-// FIXME: it's a clone of LoadWindow
+
 /** Creates a Window in the Window Manager */
 int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
 {
-	unsigned int i;
-
-	for (i = 0; i < windows.size(); i++) {
-		Window* win = windows[i];
-		if (win == NULL)
-			continue;
-		if (win->WindowID == WindowID
-			&& !stricmp( WindowPack, win->WindowPack ))
-		{
-			SetOnTop( win );
-			win->MarkDirty();
-			return i;
-		}
-	}
-
+	// check if the window already exists first
+	int slot = LoadWindow(WindowID);
+	if (slot == -1) {
 	Window* win = new Window( WindowID, frame );
 	if (Background[0]) {
 		ResourceHolder<ImageMgr> mos(Background);
@@ -2614,21 +2589,8 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	}
 
 	strcpy( win->WindowPack, WindowPack );
-
-	int slot = -1;
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL) {
-			slot = i;
-			break;
-		}
+		slot = AddWindow(win);
 	}
-	if (slot == -1) {
-		windows.push_back( win );
-		slot = ( int ) windows.size() - 1;
-	} else {
-		windows[slot] = win;
-	}
-	win->MarkDirty();
 	return slot;
 }
 
@@ -2651,7 +2613,7 @@ void Interface::SetOnTop(Window* win)
 	win->MarkDirty();
 }
 /** Add a window to the Window List */
-void Interface::AddWindow(Window * win)
+int Interface::AddWindow(Window * win)
 {
 	int slot = -1;
 	for(unsigned int i = 0; i < windows.size(); i++) {
@@ -2659,15 +2621,18 @@ void Interface::AddWindow(Window * win)
 
 		if(w==NULL) {
 			slot = i;
+			windows[slot] = win;
 			break;
 		}
 	}
 	if(slot == -1) {
+		slot = (int)windows.size();
 		windows.push_back(win);
 	}
-	else
-		windows[slot] = win;
+
 	win->MarkDirty();
+	assert(slot >= 0);
+	return slot;
 }
 
 /** Set the Tooltip text of a Control */
@@ -2854,7 +2819,7 @@ void Interface::DrawWindows(bool allow_delete)
 
 	size_t i = topwin.size();
 	while(i--) {
-		unsigned int t = topwin[i];
+		size_t t = topwin[i];
 
 		if ( t >=windows.size() )
 			continue;
