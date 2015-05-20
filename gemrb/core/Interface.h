@@ -464,11 +464,7 @@ public:
 	int LoadWindow(unsigned short WindowID);
 	/** Creates a Window in the Window Manager */
 	bool IsPresentingModalWindow() {return (bool)(ModalWindow);};
-#ifdef WIN32
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-#endif
+#undef CreateWindow // Win32 might define this, so nix it
 	int CreateWindow(unsigned short WindowID, const Region&, char* Background);
 
 	/** Add a window to the Window List */
