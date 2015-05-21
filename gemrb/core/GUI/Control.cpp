@@ -43,7 +43,6 @@ Control::Control(const Region& frame)
 	hasFocus = false;
 	InHandler = false;
 	VarName[0] = 0;
-	ControlID = 0;
 	Value = 0;
 	Owner = NULL;
 
@@ -111,8 +110,7 @@ bool Control::isFocused()
 bool Control::SetFlags(int arg_flags, int opcode)
 {
 	if ((arg_flags >>24) != ControlType) {
-		Log(WARNING, "Control", "Trying to modify invalid flag %x on control %d (opcode %d)",
-			arg_flags, ControlID, opcode);
+		Log(WARNING, "Control", "Trying to modify invalid flag %x on control (opcode %d)", arg_flags, opcode);
 		return false;
 	}
 	return View::SetFlags(arg_flags, opcode);

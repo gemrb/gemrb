@@ -31,11 +31,9 @@
 
 namespace GemRB {
 
-Window::Window(unsigned short WindowID, const Region& frame)
+Window::Window(const Region& frame)
 	: View(frame)
 {
-	this->WindowID = WindowID;
-
 	Visible = WINDOW_INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
 	FunctionBar = false;

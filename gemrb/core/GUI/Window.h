@@ -67,7 +67,7 @@ protected:
 	static Sprite2D* WinFrameEdge(int edge);
 
 public: 
-	Window(unsigned short WindowID, const Region& frame);
+	Window(const Region& frame);
 	~Window();
 
 
@@ -100,6 +100,8 @@ public:
 	void DispatchMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void DispatchMouseWheelScroll(short x, short y);
+
+	ScriptingRef* ScriptingReference(ScriptingId id) { WindowID = id; return new ScriptingObject<Window>(*this, "Window", id); }
 
 public: //Public attributes
 	/** WinPack */

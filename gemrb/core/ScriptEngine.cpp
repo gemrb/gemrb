@@ -22,6 +22,28 @@
 
 namespace GemRB {
 
+ScriptEngine::ScriptingDict ScriptEngine::GUIDict;
+
+bool ScriptEngine::RegisterScriptable(ScriptingRef* ref)
+{
+	ScriptingId id = ref->id;
+	ScriptingClassId classId = ref->ClassId();
+
+	// TODO: disallow overwriting existing entries
+	GUIDict[classId][id] = ref;
+	return true;
+}
+
+bool ScriptEngine::UnRegisterScriptable(ScriptingRef* ref)
+{
+	ScriptingId id = ref->id;
+	ScriptingClassId classId = ref->ClassId();
+
+	// TODO: error if not found
+	GUIDict[classId].erase(id);
+	return true;
+}
+
 ScriptEngine::ScriptEngine(void)
 {
 }

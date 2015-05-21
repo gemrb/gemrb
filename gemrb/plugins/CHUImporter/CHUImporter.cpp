@@ -103,7 +103,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	str->ReadResRef( MosFile );
 	str->ReadWord( &FirstControl );
 
-	Window* win = new Window( WindowID, Region(XPos, YPos, Width, Height) );
+	Window* win = new Window( Region(XPos, YPos, Width, Height) );
+	win->MakeScriptable(WindowID);
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {
@@ -139,7 +140,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 			{
 				//Button
 				Button* btn = new Button(ctrlFrame);
-				btn->ControlID = ControlID;
+				btn->MakeScriptable(ControlID);
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -230,7 +231,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, true );
-				pbar->ControlID = ControlID;
+				pbar->MakeScriptable(ControlID);
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;
@@ -280,7 +281,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
 				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
-				sldr->ControlID = ControlID;
+				sldr->MakeScriptable(ControlID);
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
@@ -350,7 +351,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				}
 
 				TextEdit* te = new TextEdit( ctrlFrame, maxInput, PosX, PosY );
-				te->ControlID = ControlID;
+				te->MakeScriptable(ControlID);
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackground( img );
@@ -375,7 +376,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
-				ta->ControlID = ControlID;
+				ta->MakeScriptable(ControlID);
 				win->AddSubviewInFrontOfView( ta );
 
 				if (SBID != 0xffff) {
@@ -403,7 +404,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				String* str = core->GetString( StrRef );
 				Label* lab = new Label( ctrlFrame, fnt, *str );
 				delete str;
-				lab->ControlID = ControlID;
+				lab->MakeScriptable(ControlID);
 
 				if (alignment & 1) {
 					lab->useRGB = true;
@@ -469,7 +470,7 @@ endalign:
 				str->ReadWord( &TAID );
 
 				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
-				sbar->ControlID = ControlID;
+				sbar->MakeScriptable(ControlID);
 
 				if (TAID != 0xffff) {
 					TextArea* ta = dynamic_cast<TextArea*>(win->GetControlById(TAID));

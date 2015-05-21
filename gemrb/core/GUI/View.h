@@ -22,6 +22,7 @@
 
 #include "GUI/EventMgr.h"
 #include "Region.h"
+#include "ScriptEngine.h"
 #include "Sprite2D.h"
 
 #include <list>
@@ -33,6 +34,7 @@ class ScrollBar;
 class View {
 private:
 	Sprite2D* background;
+	ScriptingRef* scriptRef;
 
 	mutable bool dirty;
 
@@ -142,6 +144,9 @@ public:
 	virtual const String& TooltipText() const { return tooltip; }
 
 	static void SetTooltipDelay(int);
+
+	void MakeScriptable(ScriptingId id);
+	virtual ScriptingRef* ScriptingReference(ScriptingId id) { return new ScriptingObject<View>(*this, "View", id); }
 };
 
 }

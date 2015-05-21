@@ -433,11 +433,11 @@ GameControl* Interface::StartGameControl()
 	DelAllWindows();//deleting ALL windows
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
-	Window* gamewin = new Window( 0xffff, screen );
+	Window* gamewin = new Window( screen );
+	gamewin->MakeScriptable(0xffff);
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(screen);
-	gc->ControlID = 0x00000000;
-	gc->ControlType = IE_GUI_GAMECONTROL;
+	gc->MakeScriptable(0);
 	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );
 	SetVisible( 0, WINDOW_VISIBLE );
@@ -2580,7 +2580,8 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	// check if the window already exists first
 	int slot = LoadWindow(WindowID);
 	if (slot == -1) {
-	Window* win = new Window( WindowID, frame );
+		Window* win = new Window( frame );
+		win->MakeScriptable(WindowID);
 	if (Background[0]) {
 		ResourceHolder<ImageMgr> mos(Background);
 		if (mos != NULL) {

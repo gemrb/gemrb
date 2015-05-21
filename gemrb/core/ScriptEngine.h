@@ -23,11 +23,27 @@
 
 #include "Plugin.h"
 
+#include <map>
+#include <string>
+
 namespace GemRB {
 
 class Point;
+class ScriptingRef;
+
+typedef unsigned long ScriptingId;
+typedef const std::string& ScriptingClassId;
 
 class GEM_EXPORT ScriptEngine : public Plugin {
+private:
+	typedef std::map<ScriptingId, ScriptingRef*> ScriptingDefinitions;
+	typedef std::map<std::string, ScriptingDefinitions> ScriptingDict;
+	static ScriptingDict GUIDict;
+
+public:
+	static bool RegisterScriptable(ScriptingRef* ref);
+	static bool UnRegisterScriptable(ScriptingRef* ref);
+
 public:
 	ScriptEngine(void);
 	virtual ~ScriptEngine(void);
@@ -40,6 +56,35 @@ public:
 	virtual bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error, Point) = 0;
 	/** Exec a single String */
 	virtual void ExecString(const char* string, bool feedback) = 0;
+};
+
+class ScriptingRef {
+public:
+	const ScriptingId id;
+
+	ScriptingRef(ScriptingId id)
+	: id(id)
+	{
+		ScriptEngine::RegisterScriptable(this);
+	}
+	virtual ~ScriptingRef()
+	{
+		ScriptEngine::UnRegisterScriptable(this);
+	}
+
+	virtual ScriptingClassId ClassId()=0;
+};
+
+template <class T>
+class ScriptingObject : public ScriptingRef {
+	ScriptingClassId classId;
+	T& obj;
+public:
+	ScriptingObject(T& obj, ScriptingClassId classId, ScriptingId id)
+	: ScriptingRef(id), classId(classId), obj(obj) {}
+	T& Object() { return obj; }
+
+	ScriptingClassId ClassId() { return classId; }
 };
 
 }

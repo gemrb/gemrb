@@ -45,6 +45,7 @@ View::View(const Region& frame)
 
 View::~View()
 {
+	delete scriptRef;
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
@@ -412,5 +413,14 @@ bool View::OnSpecialKeyPress(unsigned char key)
 
 	return false;
 }
-	
+
+void View::MakeScriptable(ScriptingId id)
+{
+	if (scriptRef) {
+		Log(ERROR, "View", "Attempting to assign a new ScriptingRef to a view.");
+		return;
+	}
+	scriptRef = ScriptingReference(id);
+}
+
 }

@@ -125,6 +125,8 @@ public: //Events
 
 	ieDword GetValue() const { return Value; }
 	void SetValue(ieDword val) { Value = val; }
+
+	ScriptingRef* ScriptingReference(ScriptingId id) { ControlID = id; return new ScriptingObject<Control>(*this, "Control", id); }
 };
 
 
