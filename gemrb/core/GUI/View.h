@@ -146,6 +146,7 @@ public:
 	static void SetTooltipDelay(int);
 
 	void MakeScriptable(ScriptingId id);
+	void UnmakeScriptable();
 	virtual ScriptingRef* ScriptingReference(ScriptingId id) { return new ScriptingObject<View>(*this, "View", id); }
 };
 

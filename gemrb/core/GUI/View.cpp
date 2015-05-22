@@ -45,7 +45,7 @@ View::View(const Region& frame)
 
 View::~View()
 {
-	delete scriptRef;
+	UnmakeScriptable();
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
@@ -421,6 +421,11 @@ void View::MakeScriptable(ScriptingId id)
 		return;
 	}
 	scriptRef = ScriptingReference(id);
+}
+
+void View::UnmakeScriptable()
+{
+	delete scriptRef;
 }
 
 }
