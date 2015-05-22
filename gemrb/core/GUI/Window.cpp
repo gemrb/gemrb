@@ -34,7 +34,7 @@ namespace GemRB {
 Window::Window(const Region& frame)
 	: View(frame)
 {
-	Visible = WINDOW_INVISIBLE;
+	visibility = Window::INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
 	FunctionBar = false;
 
@@ -91,10 +91,15 @@ void Window::SetFocused(Control* ctrl)
 	TrySetFocus(ctrl);
 }
 
+void Window::SetVisibility(Visibility vis)
+{
+	visibility = vis;
+}
+
 /** This function Draws the Window on the Output Screen */
 void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
-	if (!Visible) return; // no point in drawing invisible windows
+	if (visibility == INVISIBLE) return; // no point in drawing invisible windows
 
 	if (!(flags&WF_BORDERLESS) && (frame.w < core->Width || frame.h < core->Height)) {
 		Video* video = core->GetVideoDriver();
@@ -178,6 +183,8 @@ Control* Window::GetScrollControl() const
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
+	if (visibility == INVALID) return;
+
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		Control* ctrl = *c;
 		ctrl->UpdateState( VarName, Sum);

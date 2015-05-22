@@ -185,7 +185,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		Window *win = *m;
 		if (win == NULL)
 			continue;
-		if (!win->Visible)
+		if (!win->WindowVisibility())
 			continue;
 
 		if (win->Frame().PointInside(p)) {
@@ -248,7 +248,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 
 		if (win == NULL)
 			continue;
-		if (!win->Visible)
+		if (!win->WindowVisibility())
 			continue;
 
 		if (win->Frame().PointInside(p)) {
@@ -258,7 +258,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			return;
 		}
 
-		if (win->Visible == WINDOW_FRONT) //stop looking further
+		if (win->WindowVisibility() == Window::FRONT) //stop looking further
 			break;
 	}
 }

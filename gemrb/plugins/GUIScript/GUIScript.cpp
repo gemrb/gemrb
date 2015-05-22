@@ -1287,11 +1287,11 @@ PyDoc_STRVAR( GemRB_Window_SetVisible__doc,
 
 static PyObject* GemRB_Window_SetVisible(PyObject* self, PyObject* args)
 {
-	int visible;
+	Window::Visibility visible;
 	PARSE_ARGS( args, "Oi", &self, &visible );
 
 	Window* win = GetView<Window>(self);
-	core->SetVisible( win, visible );
+	win->SetVisibility(visible);
 	if (win->WindowID == 0xffff) {
 		core->SetEventFlag(EF_CONTROL);
 	}

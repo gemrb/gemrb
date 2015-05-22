@@ -440,7 +440,7 @@ GameControl* Interface::StartGameControl()
 	gc->MakeScriptable(0);
 	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );
-	SetVisible( 0, WINDOW_VISIBLE );
+	gamewin->SetVisibility(Window::VISIBLE);
 	//setting the focus to the game control
 	evntmgr->SetFocused(gamewin, gc);
 	if (guiscript->LoadScript( "MessageWindow" )) {
@@ -458,7 +458,7 @@ these events are pending until conditions are right
 void Interface::HandleEvents()
 {
 	GameControl *gc = GetGameControl();
-	if (gc && (!gc->Owner || !gc->Owner->Visible)) {
+	if (gc && (!gc->Owner || !gc->Owner->WindowVisibility())) {
 		gc=NULL;
 	}
 
@@ -2506,21 +2506,15 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 
 void Interface::RedrawControls(const char *varname, unsigned int value)
 {
-	for (unsigned int i = 0; i < windows.size(); i++) {
-		Window *win = windows[i];
-		if (win != NULL && win->Visible!=WINDOW_INVALID) {
-			win->RedrawControls(varname, value);
-		}
+	for (size_t i=0; i < windows.size(); i++) {
+		windows[i]->RedrawControls(varname, value);
 	}
 }
 
 void Interface::RedrawAll()
 {
-	for (unsigned int i = 0; i < windows.size(); i++) {
-		Window *win = windows[i];
-		if (win != NULL && win->Visible!=WINDOW_INVALID) {
-			win->MarkDirty();
-		}
+	for (size_t i=0; i < windows.size(); i++) {
+		windows[i]->MarkDirty();
 	}
 }
 
@@ -2551,7 +2545,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		Window *win = windows[i];
 		if (win == NULL)
 			continue;
-		if (win->Visible==WINDOW_INVALID) {
+		if (win->WindowVisibility() == Window::INVALID) {
 			continue;
 		}
 		if (win->WindowID == WindowID &&
@@ -2655,49 +2649,14 @@ void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
 	}
 }
 
-/** Set a Window Visible Flag */
-void Interface::SetVisible(Window* win, int visible)
-{
-	if (win == NULL) {
-		return;
-	}
-	if (visible!=WINDOW_FRONT) {
-		win->Visible = (char) visible;
-	}
-	switch (visible) {
-		case WINDOW_INVISIBLE:
-			//hiding the viewport if the gamecontrol window was made invisible
-			if (win->WindowID==65535) {
-				video->SetViewport( Region() );
-			}
-			//here is a fallthrough
-		case WINDOW_GRAYED:
-			evntmgr->DelWindow( win );
-			break;
-		case WINDOW_VISIBLE:
-			if (win->WindowID==65535) {
-				video->SetViewport( win->Frame() );
-			}
-			//here is a fallthrough
-		case WINDOW_FRONT:
-			if (win->Visible==WINDOW_VISIBLE) {
-				evntmgr->AddWindow( win );
-				if (win->FunctionBar) {
-					evntmgr->SetFunctionBar( win );
-				}
-			}
-			SetOnTop( win );
-			break;
-	}
-}
-
 /** Show a Window in Modal Mode */
 bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 {
 	if (win == NULL) {
 		return false;
 	}
-	win->Visible = WINDOW_FRONT;
+	win->SetVisibility(Window::FRONT);
+
 	//don't destroy the other window handlers
 	//evntmgr->Clear();
 	SetOnTop( win );
@@ -2828,14 +2787,14 @@ void Interface::DrawWindows(bool allow_delete)
 		//visible ==1 or 2 will be drawn
 		Window* win = windows[t];
 		if (win != NULL) {
-			if (win->Visible == WINDOW_INVALID) {
+			if (win->WindowVisibility() == Window::INVALID) {
 				if (allow_delete) {
 					topwin.erase(topwin.begin()+i);
 					evntmgr->DelWindow( win );
 					delete win;
 					windows[t]=NULL;
 				}
-			} else if (win->Visible == WINDOW_GRAYED) {
+			} else if (win->WindowVisibility() == Window::GRAYED) {
 				if (win->NeedsDraw()) {
 					// Important to only draw if the window itself is dirty
 					// controls on greyed out windows shouldnt be updating anyway
@@ -2843,7 +2802,7 @@ void Interface::DrawWindows(bool allow_delete)
 					Color fill = { 0, 0, 0, 128 };
 					video->DrawRect(win->Frame(), fill);
 				}
-			} else if (win->Visible) {
+			} else if (win->WindowVisibility()) {
 				win->Draw();
 			}
 		}
@@ -2957,7 +2916,7 @@ Window* Interface::GetWindow(size_t WindowIndex) const
 {
 	if (WindowIndex < windows.size()) {
 		Window *win = windows[WindowIndex];
-		if (win && (win->Visible!=WINDOW_INVALID) ) {
+		if (win && (win->WindowVisibility()!=Window::INVALID) ) {
 			return win;
 		}
 	}
@@ -2970,20 +2929,21 @@ Window* Interface::GetWindow(size_t WindowIndex) const
 //other high level functions from now
 void Interface::DelWindow(Window* win)
 {
-	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
+	if ((win == NULL) || (win->WindowVisibility()==Window::INVALID) ) {
 		return;
 	}
 	PlaySound(DS_WINDOW_CLOSE);
 	if (win == ModalWindow) {
 		ModalWindow = NULL;
 	}
+
+	win->SetVisibility(Window::INVALID);
 	evntmgr->DelWindow( win );
-	win->Visible = WINDOW_INVALID;
 	//re-capturing new (old) modal window if any
 	size_t tw = topwin.size();
 	for(size_t i=0;i<tw;i++) {
 		Window *tmp = windows[topwin[i]];
-		if (tmp->Visible==WINDOW_FRONT) {
+		if (tmp->WindowVisibility()==Window::FRONT) {
 			ModalWindow = tmp;
 			break;
 		}
@@ -3688,7 +3648,7 @@ void Interface::UpdateMasterScript()
 
 bool Interface::HideGCWindow()
 {
-	Window *window = GetWindow( 0 );
+	Window *window = windows[0];
 	// in the beginning, there's no window at all
 	if (! window)
 		return false;
@@ -3697,24 +3657,24 @@ bool Interface::HideGCWindow()
 	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return false;
 	}
-	SetVisible(0, WINDOW_INVISIBLE);
+	window->SetVisibility(Window::INVISIBLE);
 	return true;
 }
 
 void Interface::UnhideGCWindow()
 {
-	Window *window = GetWindow( 0 );
+	Window *window = windows[0];
 	if (!window)
 		return;
 	Control* gc = window->GetControlAtIndex(0);
 	if (gc->ControlType!=IE_GUI_GAMECONTROL)
 		return;
-	SetVisible(0, WINDOW_VISIBLE);
+	window->SetVisibility(Window::VISIBLE);
 }
 
 GameControl *Interface::GetGameControl() const
 {
-	Window *window = GetWindow( 0 );
+	Window *window = windows[0];
 	// in the beginning, there's no window at all
 	if (! window)
 		return NULL;

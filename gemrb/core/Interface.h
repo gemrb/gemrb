@@ -201,12 +201,6 @@ enum MODAL_SHADOW {
 	MODAL_SHADOW_BLACK
 };
 
-#define WINDOW_INVALID   -1
-#define WINDOW_INVISIBLE 0
-#define WINDOW_VISIBLE   1
-#define WINDOW_GRAYED    2
-#define WINDOW_FRONT     3
-
 //quitflags
 #define QF_NORMAL        0
 #define QF_QUITGAME      1
@@ -479,8 +473,6 @@ public:
 	TextArea *GetMessageTextArea() const;
 	/** Sets a Window on the Top */
 	void SetOnTop(Window*);
-	/** Set a Window Visible Flag */
-	void SetVisible(Window*, int visible);
 	/** Show a Window in Modal Mode */
 	bool ShowModal(Window*, MODAL_SHADOW Shadow);
 	/** Get a Window from the Loaded Window List */

@@ -56,6 +56,15 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Window : public View {
+public:
+	enum Visibility {
+		INVALID		= -1,
+		INVISIBLE	= 0,
+		VISIBLE		= 1,
+		GRAYED		= 2,
+		FRONT		= 3
+	};
+
 protected:
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
@@ -86,11 +95,12 @@ public:
 
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
+	void SetVisibility(Visibility);
+	Visibility WindowVisibility() { return visibility; }
 	/** Returns last focused control */
 	Control* GetFocus() const;
 	/** Returns last mouse event focused control */
 	Control* GetMouseFocus() const;
-
 	View* FocusedView() const { return focusView; }
 
 	/** Redraw controls of the same group */
@@ -109,9 +119,6 @@ public: //Public attributes
 	/** Window ID */
 	unsigned short WindowID;
 
-	/** Visible value: deleted, invisible, visible, grayed */
-	signed char Visible;  //-1,0,1,2
-
 	int Cursor;
 	bool FunctionBar;
 private: // Private attributes
@@ -122,6 +129,7 @@ private: // Private attributes
 	View* hoverView; // view the mouse was last over
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
+	Visibility visibility;
 };
 
 }
