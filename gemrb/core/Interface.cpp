@@ -3720,13 +3720,7 @@ GameControl *Interface::GetGameControl() const
 		return NULL;
 
 	Control* gc = window->GetControlAtIndex(0);
-	if (gc == NULL) {
-		return NULL;
-	}
-	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
-		return NULL;
-	}
-	return (GameControl *) gc;
+	return dynamic_cast<GameControl*>(gc);
 }
 
 bool Interface::InitItemTypes()
