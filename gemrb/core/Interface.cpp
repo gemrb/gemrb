@@ -2968,12 +2968,12 @@ Window* Interface::GetWindow(size_t WindowIndex) const
 //it will be deleted in the next DrawWindows cycle
 //regardless, the window deleted is inaccessible for gui scripts and
 //other high level functions from now
-int Interface::DelWindow(Window* win)
+void Interface::DelWindow(Window* win)
 {
 	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
-		Log(ERROR, "Core", "Window deleted again");
-		return -1;
+		return;
 	}
+	PlaySound(DS_WINDOW_CLOSE);
 	if (win == ModalWindow) {
 		ModalWindow = NULL;
 	}
@@ -2988,7 +2988,6 @@ int Interface::DelWindow(Window* win)
 			break;
 		}
 	}
-	return 0;
 }
 
 void Interface::DelAllWindows()

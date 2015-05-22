@@ -486,7 +486,7 @@ public:
 	/** Get a Window from the Loaded Window List */
 	Window * GetWindow(size_t WindowIndex) const;
 	/** Removes a Loaded Window */
-	int DelWindow(Window* win);
+	void DelWindow(Window* win);
 	/** Removes all Loaded Windows */
 	void DelAllWindows();
 	/** Redraws all window */

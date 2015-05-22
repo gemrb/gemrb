@@ -1510,17 +1510,8 @@ PyDoc_STRVAR( GemRB_Window_Unload__doc,
 static PyObject* GemRB_Window_Unload(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS(args, "O", &self);
-
 	Window* win = GetView<Window>(self);
-	if (!win || win->WindowID == 0xffff) {
-		return RuntimeError( "Attempt to delete invalid window!");
-	}
-
-	if (core->DelWindow( win ) == -1) {
-		return RuntimeError( "Can't unload window!" );
-	}
-
-	core->PlaySound(DS_WINDOW_CLOSE);
+	core->DelWindow( win );
 	Py_RETURN_NONE;
 }
 
