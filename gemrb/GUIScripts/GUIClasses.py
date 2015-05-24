@@ -41,10 +41,7 @@ class GTable:
     'GetRowCount': _GemRB.Table_GetRowCount,
     'GetColumnCount': _GemRB.Table_GetColumnCount
   }
-  def __del__(self):
-    # don't unload tables if the _GemRB module is already unloaded at exit
-    if self.ID != -1 and _GemRB:
-      pass #_GemRB.Table_Unload(self.ID)
+
   def __nonzero__(self):
     return self.ID != -1
 
