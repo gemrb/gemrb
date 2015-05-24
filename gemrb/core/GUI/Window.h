@@ -87,8 +87,6 @@ public:
 	/** Returns the Control by Index */
 	Control* GetControlAtIndex(size_t) const;
 	Control* GetControlById(ieDword id) const;
-	/** Returns the number of Controls */
-	size_t GetControlCount() const;
 	int GetControlIndex(ieDword id) const;
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;

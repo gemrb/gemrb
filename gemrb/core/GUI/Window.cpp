@@ -147,11 +147,6 @@ Control* Window::GetMouseFocus() const
 	return dynamic_cast<Control*>(FocusedView());
 }
 
-size_t Window::GetControlCount() const
-{
-	return Controls.size();
-}
-
 Control* Window::GetControlAtIndex(size_t i) const
 {
 	if (i < Controls.size()) {
