@@ -187,21 +187,6 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	Realize();
 
-	// we're going to paint over labels/etc, so they need to repaint!
-	bool seen_this = false;
-	unsigned int i;
-	for (i = 0; i < Owner->GetControlCount(); i++) {
-		Control *ctrl = Owner->GetControlAtIndex(i);
-		if (!ctrl) continue;
-
-		// we could try working out which controls overlap,
-		// but the later controls are cheap to paint..
-		if (ctrl == this) { seen_this = true; continue; }
-		if (!seen_this) continue;
-
-		ctrl->MarkDirty();
-	}
-
 	Video* video = core->GetVideoDriver();
 	if (MapMOS) {
 		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
@@ -226,7 +211,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Draw PCs' ellipses
 	Game *game = core->GetGame();
-	i = game->GetPartySize(true);
+	int i = game->GetPartySize(true);
 	while (i--) {
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
