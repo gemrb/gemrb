@@ -88,7 +88,12 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 
 void Window::SetFocused(Control* ctrl)
 {
-	TrySetFocus(ctrl);
+	if (ctrl) {
+		TrySetFocus(ctrl);
+	} else if (Controls.size()) {
+		// set a default focus, something should always be focused
+		TrySetFocus(Controls[0]);
+	}
 }
 
 void Window::SetVisibility(Visibility vis)

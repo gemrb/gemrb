@@ -75,7 +75,7 @@ void EventMgr::SetDefaultFocus(Window *win)
 {
 	if (!last_win_focused) {
 		last_win_focused = win;
-		last_win_focused->SetFocused(last_win_focused->GetControlAtIndex(0));
+		last_win_focused->SetFocused(NULL);
 	}
 	last_win_over = NULL;
 }
