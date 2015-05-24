@@ -873,24 +873,18 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 /* Loads an area */
 int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
-	unsigned int i, ret;
+	unsigned int i, ret = -1;
 	Map *newMap;
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
-
-	//this shouldn't happen
-	if (!mM) {
-		return -1;
-	}
 
 	int index = FindMap(ResRef);
 	if (index>=0) {
 		return index;
 	}
 
-	bool hide = false;
 	if (loadscreen && sE) {
-		hide = core->HideGCWindow();
+		core->SetGCWindowVisible(false);
 		sE->RunFunction("LoadScreen", "StartLoadScreen");
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
@@ -898,7 +892,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	if (!ds) {
 		goto failedload;
 	}
-	if(!mM->Open(ds)) {
+	if(!mM || !mM->Open(ds)) {
 		goto failedload;
 	}
 	newMap = mM->GetMap(ResRef, IsDay());
@@ -906,10 +900,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		goto failedload;
 	}
 
-	core->LoadProgress(100);
-
 	ret = AddMap( newMap );
-
 	//spawn creatures on a map already in the game
 	//this feature exists in all blackisle games but not in bioware games
 	if (core->HasFeature(GF_SPAWN_INI)) {
@@ -923,19 +914,12 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 
 	PlacePersistents(newMap, ResRef);
-
-	if (hide) {
-		core->UnhideGCWindow();
-	}
 	newMap->InitActors();
 
-	return ret;
 failedload:
-	if (hide) {
-		core->UnhideGCWindow();
-	}
+	core->SetGCWindowVisible(true);
 	core->LoadProgress(100);
-	return -1;
+	return ret;
 }
 
 // check if the actor is in npclevel.2da and replace accordingly

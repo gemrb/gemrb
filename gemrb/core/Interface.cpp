@@ -3646,33 +3646,15 @@ void Interface::UpdateMasterScript()
 	}
 }
 
-bool Interface::HideGCWindow()
+void Interface::SetGCWindowVisible(bool vis)
 {
-	Window *window = windows[0];
-	// in the beginning, there's no window at all
-	if (! window)
-		return false;
-
-	Control* gc = window->GetControlAtIndex(0);
-	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
-		return false;
+	Control* gc = GetGameControl();
+	if (gc) {
+		gc->Owner->SetVisibility((vis) ? Window::VISIBLE : Window::INVISIBLE);
 	}
-	window->SetVisibility(Window::INVISIBLE);
-	return true;
 }
 
-void Interface::UnhideGCWindow()
-{
-	Window *window = windows[0];
-	if (!window)
-		return;
-	Control* gc = window->GetControlAtIndex(0);
-	if (gc->ControlType!=IE_GUI_GAMECONTROL)
-		return;
-	window->SetVisibility(Window::VISIBLE);
-}
-
-GameControl *Interface::GetGameControl() const
+GameControl* Interface::GetGameControl() const
 {
 	Window *window = windows[0];
 	// in the beginning, there's no window at all
@@ -4019,7 +4001,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	return ret;
 }
 
-Label *Interface::GetMessageLabel() const
+Label* Interface::GetMessageLabel() const
 {
 	ieDword WinIndex = (ieDword) -1;
 	ieDword TAIndex = (ieDword) -1;
@@ -4037,7 +4019,7 @@ Label *Interface::GetMessageLabel() const
 	return NULL;
 }
 
-TextArea *Interface::GetMessageTextArea() const
+TextArea* Interface::GetMessageTextArea() const
 {
 	ieDword WinIndex = (ieDword) -1;
 	ieDword TAIndex = (ieDword) -1;

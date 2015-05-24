@@ -2276,8 +2276,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			return false;
 		}
 		ScreenFlags |= SF_GUIENABLED;
-		// Unhide the gamecontrol window
-		core->UnhideGCWindow();
+		core->SetGCWindowVisible(true);
 	}
 
 	static const char* keys[6][2] = {
