@@ -60,14 +60,6 @@ void Window::SubviewAdded(View* view, View* parent)
 		if (ctrl->ControlType == IE_GUI_SCROLLBAR && parent == this) {
 			scrollbar = static_cast<ScrollBar*>(ctrl);
 		}
-		for (size_t i = 0; i < Controls.size(); i++) {
-			Control* target = Controls[i];
-			if (target->ControlID == ctrl->ControlID) {
-				Controls[i] = ctrl;
-				delete RemoveSubview(target);
-				return;
-			}
-		}
 		Controls.push_back( ctrl );
 	}
 }
