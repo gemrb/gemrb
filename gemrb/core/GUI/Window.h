@@ -97,8 +97,6 @@ public:
 	Visibility WindowVisibility() { return visibility; }
 	/** Returns last focused control */
 	Control* GetFocus() const;
-	/** Returns last mouse event focused control */
-	Control* GetMouseFocus() const;
 	View* FocusedView() const { return focusView; }
 
 	/** Redraw controls of the same group */

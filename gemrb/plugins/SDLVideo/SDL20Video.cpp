@@ -378,7 +378,7 @@ int SDL20VideoDriver::PollEvents()
 		ProcessFirstTouch(GEM_MB_MENU);
 
 		if (currentGesture.type == GESTURE_NONE) {
-			Control* focusCtrl = EvntManager->GetMouseFocusedControl();
+			Control* focusCtrl = EvntManager->GetFocusedControl();
 			if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
 				&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE) {
 
@@ -475,7 +475,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	// need 2 separate tests.
 	// sometimes finger0 will become null while we are still processig its touches
 	if (numFingers) {
-		focusCtrl = EvntManager->GetMouseFocusedControl();
+		focusCtrl = EvntManager->GetFocusedControl();
 	}
 
 	bool ConsolePopped = core->ConsolePopped;
@@ -509,7 +509,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					EvntManager->MouseDown(ScaleCoordinateHorizontal(event.tfinger.x),
 										   ScaleCoordinateVertical(event.tfinger.y),
 										   GEM_MB_ACTION, 0);
-					focusCtrl = EvntManager->GetMouseFocusedControl();
+					focusCtrl = EvntManager->GetFocusedControl();
 					if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
 						((GameControl*)focusCtrl)->ClearMouseState();
 					}
@@ -613,7 +613,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 											 ScaleCoordinateVertical(event.tfinger.y),
 											 mouseButton, GetModState(SDL_GetModState()) );
 					} else {
-						focusCtrl = EvntManager->GetMouseFocusedControl();
+						focusCtrl = EvntManager->GetFocusedControl();
 						if (focusCtrl && focusCtrl->ControlType == IE_GUI_BUTTON)
 							// these are repeat events so the control should stay pressed
 							((Button*)focusCtrl)->SetState(IE_GUI_BUTTON_UNPRESSED);

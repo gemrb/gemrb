@@ -131,15 +131,13 @@ public:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Sets focus to the control of the window */
 	void SetFocused(Window *win, Control *ctrl);
-	/** Sets mouse event focus to the control of the window */
-	void SetMouseFocused(Window *win, Control *ctrl);
 	/** Sets the maximum accepted doubleclick delay */
 	void SetDCDelay(unsigned long t);
 	void SetRKDelay(unsigned long t);
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 	void inline SetFunctionBar(Window *win) { function_bar = win; }
-	Control* GetMouseFocusedControl();
+	Control* GetFocusedControl();
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;
 private:

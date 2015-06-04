@@ -154,7 +154,7 @@ int SDLVideoDriver::PollEvents()
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		if (!core->ConsolePopped) {
 			EvntManager->MouseUp( p.x, p.y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );
-			Control* ctl = EvntManager->GetMouseFocusedControl();
+			Control* ctl = EvntManager->GetFocusedControl();
 			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
 				// these are repeat events so the control should stay pressed
 				((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);

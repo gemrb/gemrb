@@ -372,11 +372,12 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 	return rk_flags;
 }
 
-Control* EventMgr::GetMouseFocusedControl()
+Control* EventMgr::GetFocusedControl()
 {
 	if (mouseTrackingWin) {
-		return mouseTrackingWin->GetMouseFocus();
+		return mouseTrackingWin->GetFocus();
 	}
 	return NULL;
 }
+
 }
