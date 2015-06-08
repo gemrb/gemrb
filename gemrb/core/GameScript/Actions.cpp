@@ -5468,10 +5468,10 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		actor->SetModal(MS_NONE);
-		if (!container->Trapped && core->HasFeature(GF_PST_STATE_FLAGS)) {
-			container->AddTrigger(TriggerEntry(trigger_harmlessopened, actor->GetGlobalID()));
-		} else {
+		if (container->Trapped) {
 			container->AddTrigger(TriggerEntry(trigger_opened, actor->GetGlobalID()));
+		} else {
+			container->AddTrigger(TriggerEntry(trigger_harmlessopened, actor->GetGlobalID()));
 		}
 		container->TriggerTrap(0, actor->GetGlobalID());
 		core->SetCurrentContainer(actor, container, true);
