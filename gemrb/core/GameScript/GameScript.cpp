@@ -1749,7 +1749,7 @@ void InitializeIEScript()
 	} else {
 		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
-			error("GameScript", "Couldn't laod saved trigger symbols!\n");
+			error("GameScript", "Couldn't load saved trigger symbols!\n");
 		}
 		j = savedTriggersTable->GetSize();
 		while (j--) {
