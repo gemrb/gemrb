@@ -151,7 +151,7 @@ def TA_SetSupercali(TA):
 
 def TA_SetSupercali2(TA):
 	line = "[color=7b7a4e]" + fmline * 3 + "[/color]"
-	return TA_SetText (TA, Me(), line)
+	return TA_SetText (TA, Me(), fmline*3)
 
 str2 = GemRB.GetString (2)
 def TA_SetMonk(TA):
@@ -181,19 +181,21 @@ def TA_PrependTabs(TA):
 	return TA_PrependText (TA, Me(), "\t\t")
 
 def TA_PrependTabsIncompleteTag(TA):
-	return TA_PrependText (TA, Me(), "\t\t", "[color=0000ff]")
+	return TA_PrependText (TA, Me(), "\t\t", "[color=0000ff]", "\t\t")
 
 def TA_PrependTabsTag(TA):
-	return TA_PrependText (TA, Me(), "\t\t", "[color=0000ff]asd[/color]")
+	return TA_PrependText (TA, Me(), "\t\t", "[color=0000ff]asd[/color]", "\t\tasd")
 
-def TA_PrependText(TA, name, text, old=-1):
+def TA_PrependText(TA, name, text, old=-1, expected=-1):
 	if old == -1:
 		old = TA.QueryText ()
+	if expected == -1:
+		expected = text+old
 
 	TA.SetText (text+old)
 	new = TA.QueryText ()
 
-	return DisplayTestResult (name, new, text+old)
+	return DisplayTestResult (name, new, expected)
 
 ###################################################
 # x family of tests
