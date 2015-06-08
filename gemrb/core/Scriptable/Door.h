@@ -90,6 +90,7 @@ public:
 	void ToggleTiles(int State, int playsound = false);
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
+	bool CanDetectTrap() const;
 	void SetDoorLocked(int Locked, int playsound);
 	void SetDoorOpen(int Open, int playsound, ieDword ID);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
