@@ -475,8 +475,6 @@ public:
 	void SetOnTop(Window*);
 	/** Show a Window in Modal Mode */
 	bool ShowModal(Window*, MODAL_SHADOW Shadow);
-	/** Get a Window from the Loaded Window List */
-	Window * GetWindow(size_t WindowIndex) const;
 	/** Removes a Loaded Window */
 	void DelWindow(Window* win);
 	/** Removes all Loaded Windows */

@@ -2911,19 +2911,6 @@ void Interface::DrawTooltip (const String& string, Point p)
 	video->SetScreenClip(&oldclip);
 }
 
-//interface for higher level functions, if the window was
-//marked for deletion it is not returned
-Window* Interface::GetWindow(size_t WindowIndex) const
-{
-	if (WindowIndex < windows.size()) {
-		Window *win = windows[WindowIndex];
-		if (win && (win->WindowVisibility()!=Window::INVALID) ) {
-			return win;
-		}
-	}
-	return NULL;
-}
-
 //this function won't delete the window, just mark it for deletion
 //it will be deleted in the next DrawWindows cycle
 //regardless, the window deleted is inaccessible for gui scripts and
