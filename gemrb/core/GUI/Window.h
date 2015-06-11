@@ -77,7 +77,7 @@ protected:
 
 	static Sprite2D* WinFrameEdge(int edge);
 
-public: 
+public:
 	Window(const Region& frame);
 	~Window();
 
@@ -86,10 +86,7 @@ public:
 
 	/** Returns the Control associated with the function key index, valid indices are 0-11 */
 	Control* GetFunctionControl(int x);
-	/** Returns the Control by Index */
-	Control* GetControlAtIndex(size_t) const;
-	Control* GetControlById(ieDword id) const;
-	int GetControlIndex(ieDword id) const;
+
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
 

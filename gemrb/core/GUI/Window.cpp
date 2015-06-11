@@ -138,35 +138,6 @@ Control* Window::GetFocus() const
 	return dynamic_cast<Control*>(FocusedView());
 }
 
-Control* Window::GetControlAtIndex(size_t i) const
-{
-	if (i < Controls.size()) {
-		return Controls[i];
-	}
-	return NULL;
-}
-
-Control* Window::GetControlById(ieDword id) const
-{
-	size_t i = Controls.size();
-	while (i--) {
-		if (Controls[i]->ControlID == id) {
-			return Controls[i];
-		}
-	}
-	return NULL;
-}
-
-int Window::GetControlIndex(ieDword id) const
-{
-	for (std::vector<Control*>::const_iterator m = Controls.begin(); m != Controls.end(); ++m) {
-		if ((*m)->ControlID == id) {
-			return int(m - Controls.begin());
-		}
-	}
-	return -1;
-}
-
 Control* Window::GetScrollControl() const
 {
 	return scrollbar;
