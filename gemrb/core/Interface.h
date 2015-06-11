@@ -475,6 +475,7 @@ public:
 	/** Show a Window in Modal Mode */
 	bool ShowModal(Window*, MODAL_SHADOW Shadow);
 	bool IsPresentingModalWindow();
+	bool IsValidWindow(Window*);
 	/** Removes a Loaded Window */
 	void DelWindow(Window* win);
 	/** Removes all Loaded Windows */

@@ -53,6 +53,8 @@ EventMgr::EventMgr(void)
 
 void EventMgr::SetOnTop(Window* win)
 {
+	if (!core->IsValidWindow(win)) return;
+
 	WindowList::iterator it;
 	it = std::find(windows.begin(), windows.end(), win);
 

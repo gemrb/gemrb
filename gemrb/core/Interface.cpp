@@ -2591,6 +2591,8 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 /** Sets a Window on the Top */
 void Interface::SetOnTop(Window* win)
 {
+	if (!IsValidWindow(win)) return;
+
 	WindowList::iterator it = std::find(windows.begin(), windows.end(), win);
 	if (it != windows.end()) {
 		windows.erase(it);
@@ -2645,9 +2647,8 @@ void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
 /** Show a Window in Modal Mode */
 bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 {
-	if (win == NULL) {
-		return false;
-	}
+	if (!IsValidWindow(win)) return false;
+
 	win->SetVisibility(Window::FRONT);
 
 	//don't destroy the other window handlers
@@ -2663,6 +2664,11 @@ bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 bool Interface::IsPresentingModalWindow()
 {
 	return (windows.front() && windows.front()->WindowVisibility() == Window::FRONT);
+}
+
+bool Interface::IsValidWindow(Window* win)
+{
+	return (win && win->WindowVisibility() != Window::INVALID);
 }
 
 bool Interface::IsFreezed()
@@ -2913,7 +2919,7 @@ void Interface::DrawTooltip (const String& string, Point p)
 //other high level functions from now
 void Interface::DelWindow(Window* win)
 {
-	if (win == NULL) return;
+	if (!IsValidWindow(win)) return;
 
 	WindowList::iterator it = windows.begin();
 	it = std::find(it, windows.end(), win);
