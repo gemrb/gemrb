@@ -22,7 +22,6 @@
 #define SCRIPTENGINE_H
 
 #include "Plugin.h"
-#include "System/Logging.h"
 
 #include <map>
 #include <string>

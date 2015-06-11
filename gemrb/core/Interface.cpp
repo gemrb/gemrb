@@ -61,7 +61,6 @@
 #include "ProjectileServer.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
-#include "ScriptEngine.h"
 #include "ScriptedAnimation.h"
 #include "SoundMgr.h"
 #include "SpellMgr.h"
