@@ -1088,27 +1088,20 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef(ControlID) );
 }
 
-PyDoc_STRVAR( GemRB_Window_GetControl__doc,
-"GetControl(WindowID, ControlID[, ControlType]) => GControl, or\n"
-"Window.GetControl(ControlID) => GControl\n\n"
-"Returns a control as an object." );
+PyDoc_STRVAR( GemRB_GetControl__doc,
+			 "GetControl(ControlID) => GControl\n\n"
+			 "Returns a control as an object." );
 
-static PyObject* GemRB_Window_GetControl(PyObject* self, PyObject* args)
+static PyObject* GemRB_GetControl(PyObject* /*self*/, PyObject* args)
 {
-	int type = -1, ControlID = -1;
-	PARSE_ARGS( args, "O|i", &self, &ControlID, &type );
+	ScriptingId controlId = ScriptEngine::InvalidId;
+	PARSE_ARGS( args, "l", &controlId );
 
-	Window* win = GetView<Window>(self);
-	if (!win) {
-		Py_RETURN_NONE;
+	ScriptingRefBase* ref = ScriptEngine::GetScripingRef("Control", controlId);
+	if (ref) {
+		return gs->ConstructObjectForScriptable(ref);
 	}
-
-	Control* ctrl = GetControl(ControlID);
-	if (!ctrl || (type > -1 && ctrl->ControlType != type)) {
-		Py_RETURN_NONE;
-	}
-
-	return gs->ConstructObjectForScriptable(ctrl->GetScriptingRef());
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
@@ -9063,6 +9056,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
+	METHOD(GetControl, METH_VARARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetDamageReduction, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
@@ -9273,7 +9267,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_CreateControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
-	METHOD(Window_GetControl, METH_VARARGS),
 	METHOD(Window_SetVisible, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
