@@ -1505,14 +1505,12 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowID, x, y, w, h;
 	char* Background;
-	PARSE_ARGS( args,  "iiiiis", &WindowID, &x, &y,
-			&w, &h, &Background );
-	int WindowIndex = core->CreateWindow( WindowID, Region(x, y, w, h), Background );
-	if (WindowIndex == -1) {
-		return RuntimeError( "Can't create window" );
-	}
+	PARSE_ARGS( args,  "iiiiis", &WindowID, &x, &y, &w, &h, &Background );
 
-	return PyInt_FromLong( WindowIndex );
+	core->CreateWindow( WindowID, Region(x, y, w, h), Background );
+	ScriptingRefBase* ref = ScriptEngine::GetScripingRef("Window", WindowID);
+
+	return gs->ConstructObjectForScriptable(ref);
 }
 
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
