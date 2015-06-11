@@ -2534,7 +2534,7 @@ bool Interface::LoadWindowPack(const char* name)
 }
 
 /** Loads a Window in the Window Manager */
-int Interface::LoadWindow(unsigned short WindowID)
+Window* Interface::LoadWindow(unsigned short WindowID)
 {
 	unsigned int i;
 	GameControl *gc = GetGameControl ();
@@ -2551,12 +2551,12 @@ int Interface::LoadWindow(unsigned short WindowID)
 			SetOnTop( win );
 			if (gc)
 				gc->SetScrolling( false );
-			return i;
+			return win;
 		}
 	}
 	Window* win = windowmgr->GetWindow( WindowID );
 	if (win == NULL) {
-		return -1;
+		return NULL;
 	}
 	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
 	win->GetScriptingRef(WindowID);
@@ -2564,16 +2564,17 @@ int Interface::LoadWindow(unsigned short WindowID)
 	if (gc)
 		gc->SetScrolling( false );
 
-	return AddWindow(win);
+	AddWindow(win);
+	return win;
 }
 
 /** Creates a Window in the Window Manager */
-int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
+Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
 {
 	// check if the window already exists first
-	int slot = LoadWindow(WindowID);
-	if (slot == -1) {
-		Window* win = new Window( frame );
+	Window* win = LoadWindow(WindowID);
+	if (win == NULL) {
+		win = new Window( frame );
 		win->GetScriptingRef(WindowID);
 		if (Background[0]) {
 			ResourceHolder<ImageMgr> mos(Background);
@@ -2583,9 +2584,9 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 		}
 
 		strcpy( win->WindowPack, WindowPack );
-		slot = AddWindow(win);
+		AddWindow(win);
 	}
-	return slot;
+	return win;
 }
 
 /** Sets a Window on the Top */

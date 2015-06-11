@@ -455,10 +455,10 @@ public:
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */
-	int LoadWindow(unsigned short WindowID);
+	Window* LoadWindow(unsigned short WindowID);
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
-	int CreateWindow(unsigned short WindowID, const Region&, char* Background);
+	Window* CreateWindow(unsigned short WindowID, const Region&, char* Background);
 
 	/** Add a window to the Window List */
 	int AddWindow(Window * win);

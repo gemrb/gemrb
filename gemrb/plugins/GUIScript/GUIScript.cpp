@@ -590,8 +590,8 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	int WindowID;
 	PARSE_ARGS( args, "i", &WindowID );
 
-	int ret = core->LoadWindow( WindowID );
-	if (ret == -1) {
+	Window* win = core->LoadWindow( WindowID );
+	if (!win) {
 		char buf[256];
 		snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );
 		return RuntimeError(buf);
@@ -599,8 +599,6 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 
 	// If the current winpack windows are placed for screen resolution
 	// other than the current one, reposition them
-	Window* win = GetWindow(WindowID);
-	assert(win);
 	Region winFrame = win->Frame();
 	if (CHUWidth && CHUWidth != core->Width)
 		winFrame.x += (core->Width - CHUWidth) / 2;
@@ -608,7 +606,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 		winFrame.y += (core->Height - CHUHeight) / 2;
 
 	win->SetFrame(winFrame);
-	return gs->ConstructObjectForScriptable( win->GetScriptingRef(WindowID) );
+	return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
 }
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
@@ -1507,10 +1505,10 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 	char* Background;
 	PARSE_ARGS( args,  "iiiiis", &WindowID, &x, &y, &w, &h, &Background );
 
-	core->CreateWindow( WindowID, Region(x, y, w, h), Background );
-	ScriptingRefBase* ref = ScriptEngine::GetScripingRef("Window", WindowID);
+	Window* win = core->CreateWindow( WindowID, Region(x, y, w, h), Background );
+	assert(win);
 
-	return gs->ConstructObjectForScriptable(ref);
+	return gs->ConstructObjectForScriptable(win->GetScriptingRef());
 }
 
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
