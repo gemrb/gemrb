@@ -2603,27 +2603,18 @@ void Interface::SetOnTop(Window* win)
 }
 
 /** Add a window to the Window List */
-int Interface::AddWindow(Window * win)
+void Interface::AddWindow(Window* win)
 {
-	int slot = -1;
-	for(unsigned int i = 0; i < windows.size(); i++) {
-		Window *w = windows[i];
+	if (!IsValidWindow(win)) return;
 
-		if(w==NULL) {
-			slot = i;
-			windows[slot] = win;
-			break;
-		}
-	}
-	if(slot == -1) {
-		slot = (int)windows.size();
+	WindowList::iterator it;
+	it = std::find(windows.begin(), windows.end(), win);
+	if (it == windows.end()) {
 		windows.push_back(win);
 	}
 
 	evntmgr->AddWindow(win);
 	win->MarkDirty();
-	assert(slot >= 0);
-	return slot;
 }
 
 /** Set the Tooltip text of a Control */
