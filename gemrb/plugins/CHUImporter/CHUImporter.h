@@ -42,7 +42,7 @@ public:
 	/** Returns the number of available windows */
 	unsigned int GetWindowsCount();
 	/** Returns the i-th window in the Previously Loaded Stream */
-	Window* GetWindow(unsigned int i);
+	Window* GetWindow(ScriptingId);
 	/** This function loads all available windows from the 'stream' parameter. */
 	bool Open(DataStream* stream);
 };

@@ -69,7 +69,7 @@ bool CHUImporter::Open(DataStream* stream)
 }
 
 /** Returns the i-th window in the Previously Loaded Stream */
-Window* CHUImporter::GetWindow(unsigned int wid)
+Window* CHUImporter::GetWindow(ScriptingId wid)
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;

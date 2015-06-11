@@ -27,6 +27,7 @@
 #ifndef WINDOWMGR_H
 #define WINDOWMGR_H
 
+#include "GUI/GUIScriptInterface.h"
 #include "Plugin.h"
 
 namespace GemRB {
@@ -47,7 +48,7 @@ public:
 	/** This function loads all available windows from the 'stream' parameter. */
 	virtual bool Open(DataStream* stream) = 0;
 	/** Returns the i-th window in the Previously Loaded Stream */
-	virtual Window* GetWindow(unsigned int i) = 0;
+	virtual Window* GetWindow(ScriptingId id) = 0;
 	/** Returns the number of available windows */
 	virtual unsigned int GetWindowsCount() = 0;
 };
