@@ -43,10 +43,11 @@ class Control;
 #define SV_GAMEPATH 3
 
 class GUIScript : public ScriptEngine {
-public:
+private:
 	PyObject* pModule, * pDict;
 	PyObject* pMainDic;
 	PyObject* pGUIClasses;
+
 public:
 	GUIScript(void);
 	~GUIScript(void);
