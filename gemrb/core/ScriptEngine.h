@@ -22,6 +22,7 @@
 #define SCRIPTENGINE_H
 
 #include "Plugin.h"
+#include "System/Logging.h"
 
 #include <map>
 #include <string>
@@ -29,24 +30,60 @@
 namespace GemRB {
 
 class Point;
-class ScriptingRef;
 
 typedef unsigned long ScriptingId;
-typedef const std::string& ScriptingClassId;
+typedef std::string ScriptingClassId;
+
+class ScriptingRefBase {
+public:
+	const ScriptingId Id; // unique id for each object in a ScriptingGroup
+
+	ScriptingRefBase(ScriptingId id)
+	: Id(id) {}
+
+	virtual ~ScriptingRefBase() {}
+
+	// key to separate groups of objects for faster searching and id collision prevention
+	virtual const std::string& ScriptingGroup()=0;
+	// class to instantiate on the script side (Python)
+	virtual const ScriptingClassId ScriptingClass()=0;
+};
+
+template <class T>
+class ScriptingRef : public ScriptingRefBase {
+private:
+	T* ref;
+public:
+	ScriptingRef(T* ref, ScriptingId id)
+	: ScriptingRefBase(id), ref(ref) {}
+
+	T* GetObject() { return ref; }
+};
+
 
 class GEM_EXPORT ScriptEngine : public Plugin {
 private:
-	typedef std::map<ScriptingId, ScriptingRef*> ScriptingDefinitions;
+	typedef std::map<ScriptingId, ScriptingRefBase*> ScriptingDefinitions;
 	typedef std::map<std::string, ScriptingDefinitions> ScriptingDict;
 	static ScriptingDict GUIDict;
 
 public:
-	static bool RegisterScriptable(ScriptingRef* ref);
-	static bool UnRegisterScriptable(ScriptingRef* ref);
+	static bool RegisterScriptingRef(ScriptingRefBase* ref);
+	static bool UnregisterScriptingRef(ScriptingRefBase* ref);
+
+	static ScriptingRefBase* GetScripingRef(ScriptingClassId classId, ScriptingId id)
+	{
+		ScriptingRefBase* ref = NULL;
+		ScriptingDefinitions::iterator it = GUIDict[classId].find(id);
+		if (it != GUIDict[classId].end()) {
+			ref = (*it).second;
+		}
+		return ref;
+	}
 
 public:
-	ScriptEngine(void);
-	virtual ~ScriptEngine(void);
+	ScriptEngine(void) {};
+	virtual ~ScriptEngine(void) {};
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */
@@ -56,35 +93,6 @@ public:
 	virtual bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error, Point) = 0;
 	/** Exec a single String */
 	virtual void ExecString(const char* string, bool feedback) = 0;
-};
-
-class ScriptingRef {
-public:
-	const ScriptingId id;
-
-	ScriptingRef(ScriptingId id)
-	: id(id)
-	{
-		ScriptEngine::RegisterScriptable(this);
-	}
-	virtual ~ScriptingRef()
-	{
-		ScriptEngine::UnRegisterScriptable(this);
-	}
-
-	virtual ScriptingClassId ClassId()=0;
-};
-
-template <class T>
-class ScriptingObject : public ScriptingRef {
-	ScriptingClassId classId;
-	T& obj;
-public:
-	ScriptingObject(T& obj, ScriptingClassId classId, ScriptingId id)
-	: ScriptingRef(id), classId(classId), obj(obj) {}
-	T& Object() { return obj; }
-
-	ScriptingClassId ClassId() { return classId; }
 };
 
 }

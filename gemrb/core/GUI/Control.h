@@ -70,6 +70,9 @@ protected:
 	/** the value of the control to add to the variable */
 	ieDword Value;
 
+private:
+	ViewScriptingRef* MakeNewScriptingRef(ScriptingId id);
+
 public:
 	Control(const Region& frame);
 	virtual ~Control();
@@ -125,8 +128,6 @@ public: //Events
 
 	ieDword GetValue() const { return Value; }
 	void SetValue(ieDword val) { Value = val; }
-
-	ScriptingRef* ScriptingReference(ScriptingId id) { ControlID = id; return new ScriptingObject<Control>(*this, "Control", id); }
 };
 
 
@@ -138,6 +139,40 @@ public:
 	void operator()(Control* ctrl) {
 		return (*ptr)(ctrl);
 	}
+};
+
+
+class ControlScriptingRef : public ViewScriptingRef {
+public:
+	ControlScriptingRef(Control* ctrl, ScriptingId id)
+	: ViewScriptingRef(ctrl, id) {}
+
+	// key to separate groups of objects for faster searching and id collision prevention
+	virtual const std::string& ScriptingGroup() {
+		static std::string gid("Control");
+		return gid;
+	}
+	// class to instantiate on the script side (Python)
+	virtual const ScriptingClassId ScriptingClass() {
+		Control* ctrl = static_cast<Control*>(GetObject());
+		assert(ctrl); // shouldnt be able to have a control ref without this
+
+		// would just use type_info here, but its implementation specific...
+		switch (ctrl->ControlType) {
+			case IE_GUI_BUTTON:
+				return "Button";
+			case IE_GUI_LABEL:
+				return "Label";
+			case IE_GUI_TEXTAREA:
+				return "TextArea";
+			case IE_GUI_SCROLLBAR:
+				return "Scrollbar";
+			default:
+				return ScriptingGroup();
+		}
+	};
+
+	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
 
 }

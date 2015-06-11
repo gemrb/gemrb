@@ -39,8 +39,8 @@
 #include "opcode_params.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/EventMgr.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
-#include "GUI/Window.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
@@ -2289,7 +2289,7 @@ bool GameControl::SetGUIHidden(bool hide)
 	};
 
 	Variables* dict = core->GetDictionary();
-	ieDword index;
+	ieDword id;
 
 	// iterate the list forwards for hiding, and in reverse for unhiding
 	int i = hide ? 0 : 5;
@@ -2298,28 +2298,28 @@ bool GameControl::SetGUIHidden(bool hide)
 	for (;i >= 0 && i <= 5; i+=inc) {
 		const char** val = keys[i];
 		//Log(MESSAGE, "GameControl", "window: %s", *val);
-		if (dict->Lookup( *val, index )) {
-			if (index != (ieDword) -1) {
-				Window* w = core->GetWindow(index);
-				w->SetFlags(WF_BORDERLESS, BM_OR);
+		if (dict->Lookup( *val, id )) {
+			if (id != (ieDword) -1) {
+				Window* w = GetWindow(id);
 				if (w) {
+					w->SetFlags(WF_BORDERLESS, BM_OR);
 					w->SetVisibility((Window::Visibility)!hide);
-					if (dict->Lookup( *++val, index )) {
+					if (dict->Lookup( *++val, id )) {
 						//Log(MESSAGE, "GameControl", "position: %s", *val);
-						ResizeParentWindowFor( w, index, op );
+						ResizeParentWindowFor( w, id, op );
 						continue;
 					}
 				}
 				Log(ERROR, "GameControl", "Invalid window or position: %s:%u",
-					*val, index);
+					*val, id);
 			}
 		}
 	}
 
 	//FloatWindow doesn't affect gamecontrol, so it is special
-	if (dict->Lookup("FloatWindow", index)) {
-		if (index != (ieDword) -1) {
-			Window* fw = core->GetWindow(index);
+	if (dict->Lookup("FloatWindow", id)) {
+		if (id != (ieDword) -1) {
+			Window* fw = GetWindow(id);
 			fw->SetVisibility((Window::Visibility)!hide);
 			if (!hide) {
 				assert(fw != NULL);

@@ -28,13 +28,13 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "GUI/Button.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
 #include "GUI/Progressbar.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Slider.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
-#include "GUI/Window.h"
 
 using namespace GemRB;
 
@@ -104,7 +104,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	str->ReadWord( &FirstControl );
 
 	Window* win = new Window( Region(XPos, YPos, Width, Height) );
-	win->MakeScriptable(WindowID);
+	win->GetScriptingRef(WindowID);
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {
@@ -140,7 +140,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 			{
 				//Button
 				Button* btn = new Button(ctrlFrame);
-				btn->MakeScriptable(ControlID);
+				btn->GetScriptingRef(ControlID);
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -231,7 +231,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, true );
-				pbar->MakeScriptable(ControlID);
+				pbar->GetScriptingRef(ControlID);
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;
@@ -281,7 +281,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
 				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
-				sldr->MakeScriptable(ControlID);
+				sldr->GetScriptingRef(ControlID);
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
@@ -351,7 +351,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				}
 
 				TextEdit* te = new TextEdit( ctrlFrame, maxInput, PosX, PosY );
-				te->MakeScriptable(ControlID);
+				te->GetScriptingRef(ControlID);
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackground( img );
@@ -376,11 +376,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
-				ta->MakeScriptable(ControlID);
+				ta->GetScriptingRef(ControlID);
 				win->AddSubviewInFrontOfView( ta );
 
 				if (SBID != 0xffff) {
-					ScrollBar* sb = dynamic_cast<ScrollBar*>(win->GetControlById(SBID));
+					ScrollBar* sb = GetControl<ScrollBar>(SBID);
 					if (sb) {
 						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
 					}
@@ -404,7 +404,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				String* str = core->GetString( StrRef );
 				Label* lab = new Label( ctrlFrame, fnt, *str );
 				delete str;
-				lab->MakeScriptable(ControlID);
+				lab->GetScriptingRef(ControlID);
 
 				if (alignment & 1) {
 					lab->useRGB = true;
@@ -470,10 +470,10 @@ endalign:
 				str->ReadWord( &TAID );
 
 				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
-				sbar->MakeScriptable(ControlID);
+				sbar->GetScriptingRef(ControlID);
 
 				if (TAID != 0xffff) {
-					TextArea* ta = dynamic_cast<TextArea*>(win->GetControlById(TAID));
+					TextArea* ta = GetControl<TextArea>(TAID);
 					assert(ta);
 					ta->SetScrollBar(sbar);
 				} else {

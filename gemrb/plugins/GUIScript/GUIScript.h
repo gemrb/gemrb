@@ -66,10 +66,9 @@ public:
 	/** lets hope this one can be here without screwing up the general interface */
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
-	PyObject* ConstructControl(int id, int winId, unsigned char type = -1);
-	PyObject* ConstructControl(Control* ctrl);
-	PyObject* ConstructObject(const char* classname, int id);
-	PyObject* ConstructObject(const char* classname, PyObject* pArgs, PyObject* kwArgs = NULL);
+	PyObject* ConstructObjectForScriptable(ScriptingRefBase*);
+	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
+	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
 };
 
 extern GUIScript *gs;

@@ -46,6 +46,7 @@
 #include "FontManager.h"
 #include "Game.h"
 #include "GameData.h"
+#include "GameScript/GameScript.h"
 #include "GlobalTimer.h"
 #include "ImageMgr.h"
 #include "ItemMgr.h"
@@ -72,15 +73,14 @@
 #include "Video.h"
 #include "WindowMgr.h"
 #include "WorldMapMgr.h"
-#include "GameScript/GameScript.h"
 #include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/EventMgr.h"
 #include "GUI/GameControl.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/TextArea.h"
-#include "GUI/Window.h"
 #include "GUI/WorldMapControl.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
@@ -434,10 +434,10 @@ GameControl* Interface::StartGameControl()
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
 	Window* gamewin = new Window( screen );
-	gamewin->MakeScriptable(0xffff);
+	gamewin->GetScriptingRef(0xffff);
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(screen);
-	gc->MakeScriptable(0);
+	gc->GetScriptingRef(~0);
 	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );
 	gamewin->SetVisibility(Window::VISIBLE);
@@ -2561,6 +2561,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		return -1;
 	}
 	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
+	win->GetScriptingRef(WindowID);
 
 	if (gc)
 		gc->SetScrolling( false );
@@ -2575,7 +2576,7 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	int slot = LoadWindow(WindowID);
 	if (slot == -1) {
 		Window* win = new Window( frame );
-		win->MakeScriptable(WindowID);
+		win->GetScriptingRef(WindowID);
 	if (Background[0]) {
 		ResourceHolder<ImageMgr> mos(Background);
 		if (mos != NULL) {

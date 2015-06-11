@@ -64,6 +64,8 @@ public:
 		GRAYED		= 2,
 		FRONT		= 3
 	};
+private:
+	ViewScriptingRef* MakeNewScriptingRef(ScriptingId id);
 
 protected:
 	void SubviewAdded(View* view, View* parent);
@@ -107,8 +109,6 @@ public:
 	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void DispatchMouseWheelScroll(short x, short y);
 
-	ScriptingRef* ScriptingReference(ScriptingId id) { WindowID = id; return new ScriptingObject<Window>(*this, "Window", id); }
-
 public: //Public attributes
 	/** WinPack */
 	char WindowPack[10];
@@ -126,6 +126,20 @@ private: // Private attributes
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
 	Visibility visibility;
+};
+
+class WindowScriptingRef : public ViewScriptingRef {
+public:
+	WindowScriptingRef(Window* win, ScriptingId id)
+	: ViewScriptingRef(win, id) {}
+
+	// key to separate groups of objects for faster searching and id collision prevention
+	virtual const std::string& ScriptingGroup() {
+		static std::string gid("Window");
+		return gid;
+	}
+
+	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
 
 }

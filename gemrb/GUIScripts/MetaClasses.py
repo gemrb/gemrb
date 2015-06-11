@@ -50,11 +50,10 @@ class metaIDWrapper(type):
 		def __init__(self, *args, **kwargs):
 			for k,v in kwargs.iteritems():
 				setattr(self, k, v)
-			if getattr(self, 'ID', None) is None:
-				self.ID = args[0]
-				args = args[1:]
 
-			assert getattr(self, 'ID', None) is not None # cant have an id wrapper without an ID
+			#required attributes for bridging to C++
+			assert getattr(self, 'ID', None) is not None
+
 			if f:
 				f(self, *args)
 		return __init__
@@ -73,10 +72,3 @@ class metaIDWrapper(type):
 		for key in methods:
 			setattr(c, key, MethodType(MethodAttributeError(methods[key]), None, c))
 		return c
-
-class metaControl(metaIDWrapper):
-	def __new__(cls, classname, bases, classdict):
-		classdict['__slots__'] = classdict.get('__slots__', [])
-		classdict['__slots__'].append('WinID')
-
-		return metaIDWrapper.__new__(cls, classname, bases, classdict )

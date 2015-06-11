@@ -199,6 +199,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/GameScript/Actions.cpp \
 		    main/gemrb/core/GameScript/Objects.cpp \
 		    main/gemrb/core/Polygon.cpp \
+		    main/gemrb/core/GUI/GUIScriptInterface.cpp \
 		    main/gemrb/core/GUI/MapControl.cpp \
 		    main/gemrb/core/GUI/Label.cpp \
 		    main/gemrb/core/GUI/ScrollBar.cpp \

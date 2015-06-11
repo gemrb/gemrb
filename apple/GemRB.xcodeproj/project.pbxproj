@@ -129,6 +129,9 @@
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
 		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
 		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
+		A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */; };
+		A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
+		A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
 		A265ECDC13A8661600C6DF12 /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD813A8661600C6DF12 /* FileCache.cpp */; };
 		A265ECDD13A8661600C6DF12 /* IndexedArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */; };
 		A265ECDE13A8661600C6DF12 /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
@@ -1262,6 +1265,8 @@
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
 		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
+		A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScriptInterface.h; sourceTree = "<group>"; };
+		A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIScriptInterface.cpp; sourceTree = "<group>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IndexedArchive.cpp; path = ../gemrb/core/IndexedArchive.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECDA13A8661600C6DF12 /* KeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KeyMap.cpp; path = ../gemrb/core/KeyMap.cpp; sourceTree = SOURCE_ROOT; };
@@ -3228,6 +3233,8 @@
 				A2BF9FF01395FF62006ADC12 /* WorldMapControl.h */,
 				A20A27891A71E3200077077C /* View.cpp */,
 				A20A278A1A71E3200077077C /* View.h */,
+				A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */,
+				A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */,
 			);
 			path = GUI;
 			sourceTree = "<group>";
@@ -3418,6 +3425,7 @@
 				A2E66379139E883100310FC8 /* Effect.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,
 				A2E6637B139E883100310FC8 /* EffectMgr.h in Headers */,
+				A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */,
 				A2E6637D139E883100310FC8 /* EffectQueue.h in Headers */,
 				A2E6637F139E883100310FC8 /* Factory.h in Headers */,
 				A2E66381139E883100310FC8 /* FactoryObject.h in Headers */,
@@ -5047,6 +5055,7 @@
 				A29BF8D513A04A6F00C812DD /* ProjectileServer.cpp in Sources */,
 				A29BF8D613A04A6F00C812DD /* Region.cpp in Sources */,
 				A29BF8D713A04A6F00C812DD /* Resource.cpp in Sources */,
+				A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */,
 				A29BF8D813A04A6F00C812DD /* ResourceDesc.cpp in Sources */,
 				A29BF8D913A04A6F00C812DD /* ResourceManager.cpp in Sources */,
 				A29BF8DA13A04A6F00C812DD /* ResourceSource.cpp in Sources */,
@@ -5285,6 +5294,7 @@
 				A2E663AE139E883E00310FC8 /* Plugin.cpp in Sources */,
 				A2E663B0139E883E00310FC8 /* PluginMgr.cpp in Sources */,
 				A2E663B2139E883E00310FC8 /* Polygon.cpp in Sources */,
+				A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */,
 				A2E663B5139E883E00310FC8 /* Projectile.cpp in Sources */,
 				A2E663B7139E883E00310FC8 /* ProjectileMgr.cpp in Sources */,
 				A2E663B9139E883E00310FC8 /* ProjectileServer.cpp in Sources */,

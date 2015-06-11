@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2015 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,33 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
+#ifndef GemRB_GUIScriptInterface_h
+#define GemRB_GUIScriptInterface_h
+
+#include "Control.h"
 #include "ScriptEngine.h"
+#include "Window.h"
 
 namespace GemRB {
 
-ScriptEngine::ScriptingDict ScriptEngine::GUIDict;
+View* GetView(ScriptingRefBase* base);
+Window* GetWindow(ScriptingId id);
+Control* GetControl(ScriptingId id);
 
-bool ScriptEngine::RegisterScriptingRef(ScriptingRefBase* ref)
-{
-	if (ref == NULL) return false;
-
-	// TODO: disallow overwriting existing entries
-	//assert(GUIDict[classId].find(id) == GUIDict[classId].end());
-	GUIDict[ref->ScriptingGroup()][ref->Id] = ref;
-	return true;
-}
-
-bool ScriptEngine::UnregisterScriptingRef(ScriptingRefBase* ref)
-{
-	if (ref == NULL) return false;
-
-	// TODO: error if not found
-	GUIDict[ref->ScriptingGroup()].erase(ref->Id);
-	return true;
+template <class T>
+T* GetControl(ScriptingId id) {
+	return dynamic_cast<T*>(GetControl(id));
 }
 
 }
+
+#endif

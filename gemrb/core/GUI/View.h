@@ -30,11 +30,12 @@
 namespace GemRB {
 
 class ScrollBar;
+class ViewScriptingRef;
 
 class View {
 private:
 	Sprite2D* background;
-	ScriptingRef* scriptRef;
+	ViewScriptingRef* scriptingRef;
 
 	mutable bool dirty;
 
@@ -52,6 +53,8 @@ protected:
 private:
 	void DrawBackground(const Region*) const;
 	void DrawSubviews(bool drawBg);
+
+	virtual ViewScriptingRef* MakeNewScriptingRef(ScriptingId) { return NULL; }
 
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
@@ -143,11 +146,25 @@ public:
 	void SetTooltip(const String& string);
 	virtual const String& TooltipText() const { return tooltip; }
 
-	static void SetTooltipDelay(int);
+	// GUIScripting
+	ViewScriptingRef* GetScriptingRef(ScriptingId id = 0);
+	void DeleteScriptingRef();
 
-	void MakeScriptable(ScriptingId id);
-	void UnmakeScriptable();
-	virtual ScriptingRef* ScriptingReference(ScriptingId id) { return new ScriptingObject<View>(*this, "View", id); }
+	// static methods
+	static void SetTooltipDelay(int);
+};
+
+class ViewScriptingRef : public ScriptingRef<View> {
+public:
+	ViewScriptingRef(View* view, ScriptingId id)
+	: ScriptingRef(view, id) {}
+
+	// class to instantiate on the script side (Python)
+	virtual const ScriptingClassId ScriptingClass() {
+		return ScriptingGroup();
+	};
+
+	// TODO: perhapps in the future the GUI script implementation for view methods should be moved here
 };
 
 }

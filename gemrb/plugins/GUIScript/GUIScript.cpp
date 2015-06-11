@@ -50,11 +50,11 @@
 #include "GUI/Button.h"
 #include "GUI/EventMgr.h"
 #include "GUI/GameControl.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
-#include "GUI/Window.h"
 #include "GUI/WorldMapControl.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
@@ -210,32 +210,27 @@ if (!PyArg_ParseTuple( args, fmt, __VA_ARGS__ )) { \
 #define ABORT_IF_NULL(thing) \
 if (thing == NULL) return NULL;
 
-template <class T=View>
-static T* GetView(PyObject* obj) {
-	int id = -1;
+static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 	PyObject* attr = PyObject_GetAttrString(obj, "ID");
 	if (!attr) {
-		RuntimeError("Invalid Window/Control reference, no ID attribute.");
+		RuntimeError("Invalid Scripting reference, must have ID attribute.");
 		return NULL;
 	}
+	ScriptingId id = (ScriptingId)PyInt_AsLong( attr );
 
-	View* view = NULL;
-	id = (int)PyInt_AsLong( attr );
-	attr = PyObject_GetAttrString(obj, "WinID");
-	if (attr) {
-		// control
-		Window* win = core->GetWindow( PyInt_AsLong( attr ) );
-		if (win) {
-			view = win->GetControlAtIndex( id );
-		}
-	} else { // window
-		// must clear the "error" or somthing might fail unexpectadly
-		// if you want an error for a NULL view, then check this return and throw your own
-		PyErr_Clear();
-
-		view = core->GetWindow( id );
+	attr = PyObject_GetAttrString(obj, "SCRIPT_GROUP");
+	if (!attr) {
+		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
+		return NULL;
 	}
-	return dynamic_cast<T*>(view);
+	ScriptingClassId classId = PyString_AsString(attr);
+
+	return gs->GetScripingRef(classId, id);
+}
+
+template <class RETURN=View>
+static RETURN* GetView(PyObject* obj) {
+	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
 }
 
 static Holder<TableMgr> GetTable(PyObject* obj) {
@@ -604,7 +599,8 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 
 	// If the current winpack windows are placed for screen resolution
 	// other than the current one, reposition them
-	Window* win = core->GetWindow( ret );
+	Window* win = GetWindow(WindowID);
+	assert(win);
 	Region winFrame = win->Frame();
 	if (CHUWidth && CHUWidth != core->Width)
 		winFrame.x += (core->Width - CHUWidth) / 2;
@@ -612,7 +608,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 		winFrame.y += (core->Height - CHUHeight) / 2;
 
 	win->SetFrame(winFrame);
-	return gs->ConstructObject("Window", ret);
+	return gs->ConstructObjectForScriptable( win->GetScriptingRef(WindowID) );
 }
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
@@ -946,8 +942,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 		case IE_GUI_EDIT:
 			{
 				char *font, *cstr;
-				PARSE_ARGS( constructArgs,
-						   "ss", &font, &cstr );
+				PARSE_ARGS( constructArgs, "ss", &font, &cstr );
 
 				TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
 				edit->SetFont( core->GetFont( font ) );
@@ -1026,7 +1021,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 					PyErr_Clear(); //clearing the exception
 				}
 
-				Control* ctrl = win->GetControlById( ControlID );
+				Control* ctrl = GetControl(ControlID);
 				if (ctrl) {
 					rgn = ctrl->Frame();
 					// do *not* delete the existing control, we want to replace
@@ -1037,7 +1032,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 				MapControl* map = new MapControl(rgn);
 				if (Flag2) { //pst flavour
 					map->convertToGame = false;
-					Control *lc = win->GetControlById(LabelID);
+					Control *lc = GetControl(LabelID);
 					map->LinkedLabel = lc;
 					ResourceHolder<ImageMgr> anim(Flag);
 					if (anim) {
@@ -1048,7 +1043,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 						map->Flag[1] = anim2->GetSprite2D();
 					}
 				} else if (Flag) {
-					Control *lc = win->GetControlById(LabelID);
+					Control *lc = GetControl(LabelID);
 					map->LinkedLabel = lc;
 					AnimationFactory* af = ( AnimationFactory* )
 					gamedata->GetFactoryResource( Flag, IE_BAM_CLASS_ID, IE_NORMAL );
@@ -1069,7 +1064,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 				PARSE_ARGS( constructArgs,
 						   "i|si", &direction, &font, &recolor );
 
-				ctrl = win->GetControlById( ControlID );
+				ctrl = GetControl(ControlID);
 				if (ctrl) {
 					rgn = ctrl->Frame();
 					//flags = ctrl->Value;
@@ -1089,11 +1084,8 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 	}
 
 	assert(ctrl);
-	ctrl->ControlID = ControlID;
 	superview->AddSubviewInFrontOfView( ctrl );
-
-	// FIXME: i dont understand why sometimes the python "controls" are ID pairs and other times they are index pairs...
-	return gs->ConstructControl(win->GetControlIndex(ControlID), WindowIndex, ctrl->ControlType);
+	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef(ControlID) );
 }
 
 PyDoc_STRVAR( GemRB_Window_GetControl__doc,
@@ -1107,19 +1099,16 @@ static PyObject* GemRB_Window_GetControl(PyObject* self, PyObject* args)
 	PARSE_ARGS( args, "O|i", &self, &ControlID, &type );
 
 	Window* win = GetView<Window>(self);
-	int ctrlindex = win->GetControlIndex(ControlID);
-	if (ctrlindex == -1) {
+	if (!win) {
 		Py_RETURN_NONE;
 	}
 
-	Control *ctrl = win->GetControlAtIndex(ctrlindex);
-	if (type > -1 && ctrl->ControlType != type) {
+	Control* ctrl = GetControl(ControlID);
+	if (!ctrl || (type > -1 && ctrl->ControlType != type)) {
 		Py_RETURN_NONE;
 	}
 
-	// FIXME: i dont understand why sometimes the python "controls" are ID pairs and other times they are index pairs...
-	int WindowIndex = (int)PyInt_AsLong( PyObject_GetAttrString(self, "ID") );
-	return gs->ConstructControl(ctrlindex, WindowIndex, ctrl->ControlType);
+	return gs->ConstructObjectForScriptable(ctrl->GetScriptingRef());
 }
 
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
@@ -1463,13 +1452,13 @@ PyDoc_STRVAR( GemRB_Control_AttachScrollBar__doc,
 
 static PyObject* GemRB_Control_AttachScrollBar(PyObject* self, PyObject* args)
 {
-	int ScbControlIndex;
-	PARSE_ARGS( args, "Oi", &self, &ScbControlIndex );
+	int ScbControlId;
+	PARSE_ARGS( args, "Oi", &self, &ScbControlId );
 
 	Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
-	ScrollBar* scb = dynamic_cast<ScrollBar*>(ctrl->Owner->GetControlAtIndex(ScbControlIndex));
+	ScrollBar* scb = GetControl<ScrollBar>(ScbControlId);
 	ABORT_IF_NULL(scb);
 
 	ctrl->SetScrollBar( scb );
@@ -1832,7 +1821,7 @@ static PyObject* GemRB_Window_DeleteControl(PyObject* self, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 
-	Control* ctrl = win->GetControlById(ControlID);
+	Control* ctrl = GetControl(ControlID);
 	if (ctrl) {
 		delete win->RemoveSubview(ctrl);
 	}
@@ -2138,7 +2127,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject* self, PyObject* ar
 		return RuntimeError("Cannot find control!");
 	}
 	Window* subWin = substitute->Owner;
-	subWin->RemoveSubview(subWin->GetControlById(substitute->ControlID));
+	subWin->RemoveSubview(GetControl(substitute->ControlID));
 	Window* targetWin = target->Owner;
 	substitute->SetFrame(target->Frame());
 
@@ -2150,8 +2139,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject* self, PyObject* ar
 	}
 	targetWin->AddSubviewInFrontOfView( substitute ); // deletes target!
 
-	int WindowIndex = (int)PyInt_AsLong( PyObject_GetAttrString(pytarget, "ID") );
-	return gs->ConstructControl(substitute->ControlID, WindowIndex);
+	return gs->ConstructObjectForScriptable( substitute->GetScriptingRef() );
 }
 
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
@@ -7207,7 +7195,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start||more) {
-		Button* btn = (Button*)win->GetControlById(Offset);
+		Button* btn = GetControl<Button>(Offset);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7225,7 +7213,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
-		Button* btn = (Button*)win->GetControlById( i+Offset+(Start?1:0) );
+		Button* btn = GetControl<Button>(i+Offset+(Start?1:0));
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			Log(ERROR, "GUIScript", "Button %d not found!", i+Offset+(Start?1:0));
 			continue;
@@ -7273,7 +7261,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	}
 
 	if (more) {
-		Button* btn = (Button*)win->GetControlById(i+Offset+1);
+		Button* btn = GetControl<Button>(i+Offset+1);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7377,7 +7365,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
-		Button* btn = (Button*)win->GetControlById(i+Start);
+		Button* btn = GetControl<Button>(i+Start);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			return NULL;
 		}
@@ -9707,59 +9695,24 @@ void GUIScript::ExecString(const char* string, bool feedback)
 	PyErr_Clear();
 }
 
-PyObject* GUIScript::ConstructControl(int id, int winId, unsigned char ctype)
+PyObject* GUIScript::ConstructObjectForScriptable(ScriptingRefBase* ref)
 {
-	const char* type = "Control";
-	switch(ctype) {
-		case IE_GUI_LABEL:
-			type = "Label";
-			break;
-		case IE_GUI_EDIT:
-			type = "TextEdit";
-			break;
-		case IE_GUI_SCROLLBAR:
-			type = "ScrollBar";
-			break;
-		case IE_GUI_TEXTAREA:
-			type = "TextArea";
-			break;
-		case IE_GUI_BUTTON:
-			type = "Button";
-			break;
-		case IE_GUI_WORLDMAP:
-			type = "WorldMap";
-			break;
-	}
-
-	PyObject* kwargs = Py_BuildValue("{s:i,s:i}", "ID", id, "WinID", winId);
-	PyObject* ret = gs->ConstructObject(type, NULL, kwargs);
-	Py_DECREF(kwargs);
-	return ret;
+	if (!ref) return NULL;
+	return ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
 }
 
-PyObject* GUIScript::ConstructControl(Control* ctrl)
-{
-	if (!ctrl) return NULL;
-
-	int winId = -1;
-	if (ctrl->Owner) {
-		winId = ctrl->Owner->WindowID;
-	}
-	return ConstructControl(ctrl->ControlID, winId, ctrl->ControlType);
-}
-
-PyObject* GUIScript::ConstructObject(const char* type, int id)
+PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
 {
 	PyObject* kwargs = Py_BuildValue("{s:i}", "ID", id);
-	PyObject* ret = gs->ConstructObject(type, NULL, kwargs);
+	PyObject* ret = gs->ConstructObject(pyclassname, NULL, kwargs);
 	Py_DECREF(kwargs);
 	return ret;
 }
 
-PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs, PyObject* kwArgs)
+PyObject* GUIScript::ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs)
 {
 	char classname[_MAX_PATH] = "G";
-	strncat(classname, type, _MAX_PATH - 2);
+	strncat(classname, pyclassname, _MAX_PATH - 2);
 	if (!pGUIClasses) {
 		char buf[256];
 		snprintf(buf, sizeof(buf), "Tried to use an object (%s) before script compiled!", classname);

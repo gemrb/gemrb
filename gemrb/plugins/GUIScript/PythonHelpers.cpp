@@ -100,7 +100,7 @@ void PythonControlCallback::operator() (Control* ctrl) const
 	const long count = PyInt_AsLong(co_argcount);
 	if (count) {
 		assert(count <= 2);
-		PyObject* obj = gs->ConstructControl(ctrl);
+		PyObject* obj = gs->ConstructObjectForScriptable(ctrl->GetScriptingRef());
 		if (count > 1) {
 			args = Py_BuildValue("(Ni)", obj, ctrl->GetValue());
 		} else {

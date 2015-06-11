@@ -102,6 +102,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GameScript/Matching.cpp
 	GameScript/Objects.cpp
 	GameScript/Triggers.cpp
+	GUI/GUIScriptInterface.cpp
 	GUI/Button.cpp
 	GUI/Console.cpp
 	GUI/Control.cpp

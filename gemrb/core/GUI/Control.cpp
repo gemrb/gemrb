@@ -123,4 +123,10 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	MarkDirty();
 }
 
+ViewScriptingRef* Control::MakeNewScriptingRef(ScriptingId id)
+{
+	ControlID = id;
+	return new ControlScriptingRef(this, id);
+}
+
 }

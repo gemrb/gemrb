@@ -21,7 +21,7 @@ import _GemRB
 import CreateControlDecorators
 
 from GUIDefines import *
-from MetaClasses import metaIDWrapper, metaControl
+from MetaClasses import metaIDWrapper
 
 def CreateControlDecorator(func):
 	wrapper = getattr(CreateControlDecorators, func.__name__, None)
@@ -53,7 +53,7 @@ class GSymbol:
   }
   
 class GView:
-	__metaclass__ = metaControl
+	__metaclass__ = metaIDWrapper
 	methods = {
     'CreateControl': _GemRB.View_CreateControl,
 	'GetFrame': _GemRB.View_GetFrame,
@@ -71,7 +71,6 @@ class GView:
 		self.SetFrame(x, y, r['w'], r['h']);
 
 class GWindow(GView):
-  __metaclass__ = metaIDWrapper
   methods = {
     'DeleteControl': _GemRB.Window_DeleteControl,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
@@ -80,9 +79,11 @@ class GWindow(GView):
     'ShowModal': _GemRB.Window_ShowModal,
     'GetControl': _GemRB.Window_GetControl,
   }
+  SCRIPT_GROUP = "Window"
 
   def __nonzero__(self):
     return self.ID != -1
+ 
   def Unload(self):
     if self.ID != -1:
       _GemRB.Window_Unload(self)
@@ -117,7 +118,6 @@ class GWindow(GView):
     return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:]) 
 
 class GControl(GView):
-  __metaclass__ = metaControl
   methods = {
 	'AttachScrollBar': _GemRB.Control_AttachScrollBar,
     'HasAnimation': _GemRB.Control_HasAnimation,
@@ -131,6 +131,7 @@ class GControl(GView):
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
+  SCRIPT_GROUP = "Control"
 
 class GLabel(GControl):
   methods = {

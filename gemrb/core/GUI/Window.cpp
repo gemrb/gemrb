@@ -91,6 +91,10 @@ void Window::SetFocused(Control* ctrl)
 void Window::SetVisibility(Visibility vis)
 {
 	visibility = vis;
+	if (visibility == INVALID) {
+		// FIXME: if we undo WINDOW_INVALID then someone needs to call GetScriptingRef again...
+		DeleteScriptingRef();
+	}
 }
 
 /** This function Draws the Window on the Output Screen */
@@ -367,6 +371,12 @@ Sprite2D* Window::WinFrameEdge(int edge)
 	}
 
 	return frame;
+}
+
+ViewScriptingRef* Window::MakeNewScriptingRef(ScriptingId id)
+{
+	WindowID = id;
+	return new WindowScriptingRef(this, id);
 }
 
 }

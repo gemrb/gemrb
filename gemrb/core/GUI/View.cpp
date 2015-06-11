@@ -32,6 +32,7 @@ View* View::TooltipView = NULL;
 View::View(const Region& frame)
 	: frame(frame)
 {
+	scriptingRef = NULL;
 	scrollbar = NULL;
 	background = NULL;
 	superView = NULL;
@@ -45,7 +46,7 @@ View::View(const Region& frame)
 
 View::~View()
 {
-	UnmakeScriptable();
+	DeleteScriptingRef();
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
@@ -414,18 +415,26 @@ bool View::OnSpecialKeyPress(unsigned char key)
 	return false;
 }
 
-void View::MakeScriptable(ScriptingId id)
+void View::DeleteScriptingRef()
 {
-	if (scriptRef) {
-		Log(ERROR, "View", "Attempting to assign a new ScriptingRef to a view.");
-		return;
-	}
-	scriptRef = ScriptingReference(id);
+	ScriptEngine::UnregisterScriptingRef(scriptingRef);
+	delete scriptingRef;
+	scriptingRef = NULL;
 }
 
-void View::UnmakeScriptable()
+ViewScriptingRef* View::GetScriptingRef(ScriptingId id)
 {
-	delete scriptRef;
+	if (scriptingRef) {
+		if (id > 0 && id != scriptingRef->Id) {
+			Log(MESSAGE, "GUI Scripting", "Reassigning a Scriptable control from %lu to %lu.", scriptingRef->Id, id);
+			DeleteScriptingRef();
+		}
+	}
+	if (!scriptingRef && id > 0) {
+		scriptingRef = MakeNewScriptingRef(id);
+		ScriptEngine::RegisterScriptingRef(scriptingRef);
+	}
+	return scriptingRef;
 }
 
 }
