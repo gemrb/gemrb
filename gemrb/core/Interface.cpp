@@ -2576,14 +2576,14 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 	if (slot == -1) {
 		Window* win = new Window( frame );
 		win->GetScriptingRef(WindowID);
-	if (Background[0]) {
-		ResourceHolder<ImageMgr> mos(Background);
-		if (mos != NULL) {
-			win->SetBackground( mos->GetSprite2D() );
+		if (Background[0]) {
+			ResourceHolder<ImageMgr> mos(Background);
+			if (mos != NULL) {
+				win->SetBackground( mos->GetSprite2D() );
+			}
 		}
-	}
 
-	strcpy( win->WindowPack, WindowPack );
+		strcpy( win->WindowPack, WindowPack );
 		slot = AddWindow(win);
 	}
 	return slot;
@@ -2618,6 +2618,7 @@ int Interface::AddWindow(Window * win)
 		windows.push_back(win);
 	}
 
+	evntmgr->AddWindow(win);
 	win->MarkDirty();
 	assert(slot >= 0);
 	return slot;
@@ -2922,7 +2923,7 @@ void Interface::DelWindow(Window* win)
 		// just in case it is undeleted later
 		it = windows.erase(it);
 		windows.push_back(win);
-	PlaySound(DS_WINDOW_CLOSE);
+		PlaySound(DS_WINDOW_CLOSE);
 	}
 
 	win->SetVisibility(Window::INVALID);

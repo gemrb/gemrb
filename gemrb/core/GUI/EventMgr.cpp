@@ -51,24 +51,16 @@ EventMgr::EventMgr(void)
 	rk_flags = GEM_RK_DISABLE;
 }
 
-EventMgr::~EventMgr(void)
+void EventMgr::SetOnTop(Window* win)
 {
-}
+	WindowList::iterator it;
+	it = std::find(windows.begin(), windows.end(), win);
 
-void EventMgr::SetOnTop(int Index)
-{
-	std::vector< int>::iterator t;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		if (( *t ) == Index) {
-			topwin.erase( t );
-			break;
-		}
+	if (it != windows.end()) {
+		windows.erase(it);
+		windows.push_front(win);
 	}
-	if (topwin.size() != 0) {
-			topwin.insert( topwin.begin(), Index );
-	} else {
-		topwin.push_back( Index );
-	}
+	SetDefaultFocus(win);
 }
 
 void EventMgr::SetDefaultFocus(Window *win)
@@ -83,38 +75,22 @@ void EventMgr::SetDefaultFocus(Window *win)
 /** Adds a Window to the Event Manager */
 void EventMgr::AddWindow(Window* win)
 {
-	unsigned int i;
+	if (!win) return;
 
-	if (win == NULL) {
-		return;
+	WindowList::iterator it;
+	it = std::find(windows.begin(), windows.end(), win);
+
+	if (it != windows.end()) {
+		SetOnTop(win);
+	} else {
+		windows.push_front(win);
+		SetDefaultFocus(win);
 	}
-	bool found = false;
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == win) {
-			goto ok;
-		}
-		if(windows[i]==NULL) {
-			windows[i] = win;
-ok:
-			SetOnTop( i );
-			found = true;
-			break;
-		}
-	}
-	if (!found) {
-		windows.push_back( win );
-		if (windows.size() == 1)
-			topwin.push_back( 0 );
-		else
-			SetOnTop( ( int ) windows.size() - 1 );
-	}
-	SetDefaultFocus(win);
 }
 
 /** Frees and Removes all the Windows in the Array */
 void EventMgr::Clear()
 {
-	topwin.clear();
 	windows.clear();
 	last_win_focused = NULL;
 	mouseTrackingWin = NULL;
@@ -125,11 +101,21 @@ void EventMgr::Clear()
 /** Remove a Window from the array */
 void EventMgr::DelWindow(Window *win)
 {
-	if (!win) return;
+	WindowList::iterator it;
+	it = std::find(windows.begin(), windows.end(), win);
 
-	bool focused = (last_win_focused == win);
-	if (focused) {
-		last_win_focused = NULL;
+	if (it == windows.end()) {
+		return;
+	}
+
+	windows.erase(it);
+
+	if (last_win_focused == win) {
+		if (windows.size()) {
+			SetFocused(windows.front(), NULL);
+		} else {
+			last_win_focused = NULL;
+		}
 	}
 	if (mouseTrackingWin == win) {
 		mouseTrackingWin = NULL;
@@ -139,27 +125,6 @@ void EventMgr::DelWindow(Window *win)
 	}
 	if (function_bar == win) {
 		function_bar = NULL;
-	}
-
-	int pos = -1;
-	std::vector< Window*>::iterator m;
-	for (m = windows.begin(); m != windows.end(); ++m) {
-		pos++;
-		if ( (*m) == win) {
-			(*m) = NULL;
-			std::vector< int>::iterator t;
-			for (t = topwin.begin(); t != topwin.end(); ++t) {
-				if ( (*t) == pos) {
-					topwin.erase( t );
-					if (focused && topwin.size() > 0) {
-						//revert focus to new top window
-						SetFocused(windows[topwin[0]], NULL);
-					}
-					return;
-				}
-			}
-			Log(WARNING, "EventManager", "Couldn't delete window!");
-		}
 	}
 }
 
@@ -177,14 +142,10 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		return;
 	}
 
-	std::vector< int>::iterator t;
-	std::vector< Window*>::iterator m;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		m = windows.begin();
-		m += ( *t );
-		Window *win = *m;
-		if (win == NULL)
-			continue;
+	WindowList::iterator it;
+	for (it = windows.begin(); it != windows.end(); ++it) {
+		Window* win = *it;
+
 		if (!win->WindowVisibility())
 			continue;
 
@@ -240,14 +201,10 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 	}
 	MButtons |= Button;
 
-	std::vector<int>::iterator t;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		m = windows.begin();
-		m += ( *t );
-		Window* win = *m;
+	WindowList::iterator it;
+	for (it = windows.begin(); it != windows.end(); ++it) {
+		Window* win = *it;
 
-		if (win == NULL)
-			continue;
 		if (!win->WindowVisibility())
 			continue;
 
@@ -331,9 +288,11 @@ void EventMgr::FakeMouseMove()
 	MouseMove(p.x, p.y);
 }
 
-void EventMgr::SetFocused(Window *win, Control *ctrl)
+void EventMgr::SetFocused(Window* win, Control* ctrl)
 {
-	last_win_focused = win;
+	if (!win) return;
+
+	AddWindow(win);
 	last_win_focused->SetFocused(ctrl);
 	//this is to refresh changing mouse cursors should the focus change)
 	FakeMouseMove();

@@ -31,7 +31,7 @@
 #include "exports.h"
 #include "Region.h"
 
-#include <vector>
+#include <deque>
 
 namespace GemRB {
 
@@ -83,8 +83,8 @@ class Window;
 
 class GEM_EXPORT EventMgr {
 private:
-	std::vector< Window*> windows;
-	std::vector< int> topwin;
+	typedef std::deque<Window*> WindowList;
+	WindowList windows;
 
 	Point dc;
 	unsigned long dc_time, dc_delay;
@@ -101,7 +101,7 @@ private:
 	/** Sets a Window on the Top of the Window Queue */
 public:
 	EventMgr(void);
-	~EventMgr(void);
+	~EventMgr(void) {};
 	/** Adds a Window to the Event Manager */
 	void AddWindow(Window* win);
 	/** Removes a Window from the Event chain */
@@ -142,7 +142,7 @@ public:
 	unsigned char MButtons;
 private:
 	void SetDefaultFocus(Window *win);
-	void SetOnTop(int Index);
+	void SetOnTop(Window*);
 	bool ClickMatch(const Point& p, unsigned long thisTime);
 };
 
