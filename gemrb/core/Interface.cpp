@@ -3657,13 +3657,7 @@ void Interface::SetGCWindowVisible(bool vis)
 
 GameControl* Interface::GetGameControl() const
 {
-	Window *window = windows[0];
-	// in the beginning, there's no window at all
-	if (! window)
-		return NULL;
-
-	Control* gc = window->GetControlAtIndex(0);
-	return dynamic_cast<GameControl*>(gc);
+	return GetControl<GameControl>(0);
 }
 
 bool Interface::InitItemTypes()
@@ -4004,36 +3998,18 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 Label* Interface::GetMessageLabel() const
 {
-	ieDword WinIndex = (ieDword) -1;
-	ieDword TAIndex = (ieDword) -1;
-
-	vars->Lookup( "OtherWindow", WinIndex );
-	if (( WinIndex != (ieDword) -1 ) &&
-		( vars->Lookup( "MessageLabel", TAIndex ) )) {
-		Window* win = GetWindow( (unsigned short) WinIndex );
-		if (win) {
-			Control *ctrl = win->GetControlAtIndex(TAIndex);
-			if (ctrl && ctrl->ControlType==IE_GUI_LABEL)
-				return (Label *) ctrl;
-		}
+	ieDword id = (ieDword) -1;
+	if (vars->Lookup( "MessageLabel", id )) {
+		return GetControl<Label>(id);
 	}
 	return NULL;
 }
 
 TextArea* Interface::GetMessageTextArea() const
 {
-	ieDword WinIndex = (ieDword) -1;
-	ieDword TAIndex = (ieDword) -1;
-
-	vars->Lookup( "MessageWindow", WinIndex );
-	if (( WinIndex != (ieDword) -1 ) &&
-		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
-		Window* win = GetWindow( (unsigned short) WinIndex );
-		if (win) {
-			Control *ctrl = win->GetControlAtIndex(TAIndex);
-			if (ctrl && ctrl->ControlType==IE_GUI_TEXTAREA)
-				return (TextArea *) ctrl;
-		}
+	ieDword id = (ieDword) -1;
+	if (vars->Lookup( "MessageTextArea", id )) {
+		return GetControl<TextArea>(id);
 	}
 	return NULL;
 }
