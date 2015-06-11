@@ -437,7 +437,7 @@ GameControl* Interface::StartGameControl()
 	gamewin->GetScriptingRef(0xffff);
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(screen);
-	gc->GetScriptingRef(~0);
+	gc->GetScriptingRef(0);
 	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );
 	gamewin->SetVisibility(Window::VISIBLE);

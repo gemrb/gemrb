@@ -81,6 +81,8 @@ public:
 		return ref;
 	}
 
+	static const ScriptingId InvalidId = static_cast<ScriptingId>(-1);
+
 public:
 	ScriptEngine(void) {};
 	virtual ~ScriptEngine(void) {};

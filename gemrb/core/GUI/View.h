@@ -147,7 +147,7 @@ public:
 	virtual const String& TooltipText() const { return tooltip; }
 
 	// GUIScripting
-	ViewScriptingRef* GetScriptingRef(ScriptingId id = 0);
+	ViewScriptingRef* GetScriptingRef(ScriptingId id = ScriptEngine::InvalidId);
 	void DeleteScriptingRef();
 
 	// static methods
