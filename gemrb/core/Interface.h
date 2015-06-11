@@ -36,6 +36,7 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 
+#include <deque>
 #include <map>
 #include <string>
 #include <vector>
@@ -314,6 +315,8 @@ enum RESOURCE_DIRECTORY {
 class GEM_EXPORT Interface
 {
 private:
+	typedef std::deque<Window*> WindowList;
+
 	Holder<Video> video;
 	Holder<Audio> AudioDriver;
 	std::string VideoDriverName;
@@ -322,14 +325,11 @@ private:
 
 	EventMgr * evntmgr;
 	Holder<WindowMgr> windowmgr;
-	Window* ModalWindow;
 	MODAL_SHADOW modalShadow;
 	char WindowPack[10];
 	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
-	/** Windows Array */
-	std::vector<Window*> windows;
-	std::vector<size_t> topwin;
+	WindowList windows;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
@@ -457,7 +457,6 @@ public:
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Creates a Window in the Window Manager */
-	bool IsPresentingModalWindow() {return (bool)(ModalWindow);};
 #undef CreateWindow // Win32 might define this, so nix it
 	int CreateWindow(unsigned short WindowID, const Region&, char* Background);
 
@@ -475,6 +474,7 @@ public:
 	void SetOnTop(Window*);
 	/** Show a Window in Modal Mode */
 	bool ShowModal(Window*, MODAL_SHADOW Shadow);
+	bool IsPresentingModalWindow();
 	/** Removes a Loaded Window */
 	void DelWindow(Window* win);
 	/** Removes all Loaded Windows */

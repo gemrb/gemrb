@@ -149,7 +149,6 @@ Interface::Interface()
 	slottypes = NULL;
 	slotmatrix = NULL;
 
-	ModalWindow = NULL;
 	modalShadow = MODAL_SHADOW_NONE;
 
 	pal16 = NULL;
@@ -342,7 +341,7 @@ Interface::~Interface(void)
 		delete[] Cursors;
 	}
 
-	std::vector<Window*>::iterator wit = windows.begin();
+	std::deque<Window*>::iterator wit = windows.begin();
 	for (; wit != windows.end(); ++wit) \
 		delete *wit;
 
@@ -2593,21 +2592,14 @@ int Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* 
 /** Sets a Window on the Top */
 void Interface::SetOnTop(Window* win)
 {
-	size_t i = std::find(windows.begin(), windows.end(), win) - windows.begin();
-	std::vector<size_t>::iterator t;
-	for(t = topwin.begin(); t != topwin.end(); ++t) {
-		if((*t) == i) {
-			topwin.erase(t);
-			break;
-		}
+	WindowList::iterator it = std::find(windows.begin(), windows.end(), win);
+	if (it != windows.end()) {
+		windows.erase(it);
 	}
-	if(topwin.size() != 0)
-		topwin.insert(topwin.begin(), i);
-	else
-		topwin.push_back(i);
-
+	windows.push_front(win);
 	win->MarkDirty();
 }
+
 /** Add a window to the Window List */
 int Interface::AddWindow(Window * win)
 {
@@ -2665,8 +2657,12 @@ bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 	evntmgr->SetFocused( win, NULL );
 
 	modalShadow = Shadow;
-	ModalWindow = win;
 	return 0;
+}
+
+bool Interface::IsPresentingModalWindow()
+{
+	return (windows.front() && windows.front()->WindowVisibility() == Window::FRONT);
 }
 
 bool Interface::IsFreezed()
@@ -2758,9 +2754,12 @@ void Interface::HandleGUIBehaviour(void)
 
 void Interface::DrawWindows(bool allow_delete)
 {
-	//here comes the REAL drawing of windows
 	static bool modalShield = false;
-	if (ModalWindow) {
+
+	WindowList::iterator it = windows.begin();
+	Window* win = *it;
+	if (win && win->WindowVisibility() == Window::FRONT) {
+		//here comes the REAL drawing of windows
 		if (!modalShield) {
 			// only draw the shield layer once
 			Color shieldColor = Color(); // clear
@@ -2773,29 +2772,25 @@ void Interface::DrawWindows(bool allow_delete)
 			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
 			modalShield = true;
 		}
-		ModalWindow->Draw();
+		win->Draw();
 		return;
 	}
 	modalShield = false;
 
-	size_t i = topwin.size();
-	while(i--) {
-		size_t t = topwin[i];
-
-		if ( t >=windows.size() )
-			continue;
-
+	for (; it != windows.end(); ++it) {
 		//visible ==1 or 2 will be drawn
-		Window* win = windows[t];
-		if (win != NULL) {
-			if (win->WindowVisibility() == Window::INVALID) {
+		win = *it;
+		assert(win);
+
+		switch (win->WindowVisibility()) {
+			case Window::INVALID:
 				if (allow_delete) {
-					topwin.erase(topwin.begin()+i);
 					evntmgr->DelWindow( win );
+					it = windows.erase(it);
 					delete win;
-					windows[t]=NULL;
 				}
-			} else if (win->WindowVisibility() == Window::GRAYED) {
+				break;
+			case Window::GRAYED:
 				if (win->NeedsDraw()) {
 					// Important to only draw if the window itself is dirty
 					// controls on greyed out windows shouldnt be updating anyway
@@ -2803,9 +2798,10 @@ void Interface::DrawWindows(bool allow_delete)
 					Color fill = { 0, 0, 0, 128 };
 					video->DrawRect(win->Frame(), fill);
 				}
-			} else if (win->WindowVisibility()) {
+				break;
+			default:
 				win->Draw();
-			}
+				break;
 		}
 	}
 
@@ -2917,25 +2913,20 @@ void Interface::DrawTooltip (const String& string, Point p)
 //other high level functions from now
 void Interface::DelWindow(Window* win)
 {
-	if ((win == NULL) || (win->WindowVisibility()==Window::INVALID) ) {
-		return;
-	}
+	if (win == NULL) return;
+
+	WindowList::iterator it = windows.begin();
+	it = std::find(it, windows.end(), win);
+	if (it != windows.end()) {
+		// since the window is "deleted" it should be sent to the back
+		// just in case it is undeleted later
+		it = windows.erase(it);
+		windows.push_back(win);
 	PlaySound(DS_WINDOW_CLOSE);
-	if (win == ModalWindow) {
-		ModalWindow = NULL;
 	}
 
 	win->SetVisibility(Window::INVALID);
 	evntmgr->DelWindow( win );
-	//re-capturing new (old) modal window if any
-	size_t tw = topwin.size();
-	for(size_t i=0;i<tw;i++) {
-		Window *tmp = windows[topwin[i]];
-		if (tmp->WindowVisibility()==Window::FRONT) {
-			ModalWindow = tmp;
-			break;
-		}
-	}
 }
 
 void Interface::DelAllWindows()
@@ -2952,9 +2943,7 @@ void Interface::DelAllWindows()
 		delete win;
 	}
 	windows.clear();
-	topwin.clear();
 	evntmgr->Clear();
-	ModalWindow = NULL;
 }
 
 /** Popup the Console */
