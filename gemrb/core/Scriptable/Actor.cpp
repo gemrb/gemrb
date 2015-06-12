@@ -447,8 +447,8 @@ Actor::Actor()
 	for (i = 0; i < EXTRA_ACTORCOVERS; ++i)
 		extraCovers[i] = NULL;
 
-	LongName = NULL;
-	ShortName = NULL;
+	memset(ShortName, 0, sizeof(ShortName));
+	memset(LongName, 0, sizeof(LongName));
 	LongStrRef = (ieStrRef) -1;
 	ShortStrRef = (ieStrRef) -1;
 
@@ -536,10 +536,6 @@ Actor::~Actor(void)
 	unsigned int i;
 
 	delete anims;
-
-	core->FreeString( LongName );
-	core->FreeString( ShortName );
-
 	delete PCStats;
 
 	for (i = 0; i < vvcOverlays.size(); i++) {
@@ -578,35 +574,31 @@ void Actor::SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot
 
 void Actor::SetName(const char* ptr, unsigned char type)
 {
-	size_t len = strlen( ptr ) + 1;
-	//32 is the maximum possible length of the actor name in the original games
-	if (len>32) len=33;
-	if (type!=2) {
-		LongName = ( char * ) realloc( LongName, len );
-		memcpy( LongName, ptr, len );
-		LongName[len-1]=0;
-		core->StripLine( LongName, len );
+	char* name = NULL;
+	if (type == 1) {
+		name = LongName;
+	} else {
+		name = ShortName;
 	}
-	if (type!=1) {
-		ShortName = ( char * ) realloc( ShortName, len );
-		memcpy( ShortName, ptr, len );
-		ShortName[len-1]=0;
-		core->StripLine( ShortName, len );
-	}
+	// both LongName and ShortName are the same size...
+	strncpy(name, ptr, sizeof(LongName) - 1);
+	char* end = name + strlen(name) - 1;
+	while (end > name && isspace(*end)) end--;
+	*(end+1) = '\0'; // trim whitespace from the end
 }
 
 void Actor::SetName(int strref, unsigned char type)
 {
-	if (type!=2) {
-		if (LongName) free(LongName);
-		LongName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
+	char* name = NULL;
+	if (type == 1) {
+		name = core->GetCString( strref );
 		LongStrRef = strref;
-	}
-	if (type!=1) {
-		if (ShortName) free(ShortName);
-		ShortName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
+	} else {
+		name = core->GetCString( strref );
 		ShortStrRef = strref;
 	}
+	SetName(name, type);
+	free(name);
 }
 
 void Actor::SetAnimationID(unsigned int AnimID)

@@ -76,7 +76,6 @@ namespace GemRB {
 #define IE_STR_SPEECH     4
 #define IE_STR_ALLOW_ZERO 8     //0 strref is allowed
 #define IE_STR_STRREFOFF  256
-#define IE_STR_REMOVE_NEWLINE  0x1000 // gemrb extension: remove extraneus ending newline
 
 // bitflag operations
 // !!! Keep these synchronized with GUIDefines.py !!!

@@ -291,7 +291,8 @@ public:
 	ieResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
 	ieByte InParty;
-	char* LongName, * ShortName;
+	//32 is the maximum possible length of the actor name in the original games
+	char LongName[33], ShortName[33];
 	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[VCONST_COUNT];
 

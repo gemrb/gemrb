@@ -5150,16 +5150,6 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	} while (video->SwapBuffers() == GEM_OK);
 }
 
-// remove the extraneus EOL newline and carriage return
-void Interface::StripLine(char * string, size_t size) {
-	if (size >= 2 && string[size-2] == '\n') {
-		string[size-2] = '\0';
-	}
-	if (size >= 3 && string[size-3] == '\r') {
-		string[size-3] = '\0'; // remove the carriage return too
-	}
-}
-
 void Interface::SetTickHook(EventHandler hook)
 {
 	TickHook = hook;
