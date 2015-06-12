@@ -90,11 +90,14 @@ void Window::SetFocused(Control* ctrl)
 
 void Window::SetVisibility(Visibility vis)
 {
+	if (vis == visibility) return;
+
 	visibility = vis;
 	if (visibility == INVALID) {
 		// FIXME: if we undo WINDOW_INVALID then someone needs to call GetScriptingRef again...
 		DeleteScriptingRef();
 	}
+	MarkDirty();
 }
 
 /** This function Draws the Window on the Output Screen */
