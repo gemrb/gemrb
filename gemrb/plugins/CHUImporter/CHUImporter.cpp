@@ -116,6 +116,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 		return win;
 	}
 	for (i = 0; i < ControlsCount; i++) {
+		Control* ctrl = NULL;
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
 		Region ctrlFrame;
@@ -140,7 +141,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 			{
 				//Button
 				Button* btn = new Button(ctrlFrame);
-				btn->GetScriptingRef(ControlID);
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -161,7 +161,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				str->Read( &DisabledIndex, 1 );
 				str->Read( &y2, 1 );
 
-				win->AddSubviewInFrontOfView( btn );
+
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
 					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
@@ -208,6 +208,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				}
 				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
+				ctrl = btn;
 			}
 			break;
 
@@ -231,7 +232,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, true );
-				pbar->GetScriptingRef(ControlID);
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;
@@ -262,7 +262,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 					Sprite2D* img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
 				}
-				win->AddSubviewInFrontOfView( pbar );
+				ctrl = pbar;
 			}
 			break;
 			case IE_GUI_SLIDER:
@@ -281,7 +281,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
 				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
-				sldr->GetScriptingRef(ControlID);
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
@@ -298,7 +297,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				else {
 					sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
 				}
-				win->AddSubviewInFrontOfView( sldr );
+				ctrl = sldr;
 			}
 			break;
 
@@ -351,13 +350,12 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				}
 
 				TextEdit* te = new TextEdit( ctrlFrame, maxInput, PosX, PosY );
-				te->GetScriptingRef(ControlID);
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackground( img );
 				//The original engine always seems to ignore this textfield
 				//te->SetText (Initial );
-				win->AddSubviewInFrontOfView( te );
+				ctrl = te;
 			}
 			break;
 
@@ -376,8 +374,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
-				ta->GetScriptingRef(ControlID);
-				win->AddSubviewInFrontOfView( ta );
 
 				if (SBID != 0xffff) {
 					ScrollBar* sb = GetControl<ScrollBar>(SBID);
@@ -385,6 +381,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
 					}
 				}
+				ctrl = ta;
 			}
 			break;
 
@@ -404,7 +401,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				String* str = core->GetString( StrRef );
 				Label* lab = new Label( ctrlFrame, fnt, *str );
 				delete str;
-				lab->GetScriptingRef(ControlID);
 
 				if (alignment & 1) {
 					lab->useRGB = true;
@@ -443,7 +439,7 @@ endvertical:
 				}
 endalign:
 				lab->SetAlignment( align );
-				win->AddSubviewInFrontOfView( lab );
+				ctrl = lab;
 			}
 			break;
 
@@ -470,8 +466,7 @@ endalign:
 				str->ReadWord( &TAID );
 
 				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
-				sbar->GetScriptingRef(ControlID);
-
+				/*
 				if (TAID != 0xffff) {
 					TextArea* ta = GetControl<TextArea>(TAID);
 					assert(ta);
@@ -479,12 +474,16 @@ endalign:
 				} else {
 					win->AddSubviewInFrontOfView(sbar);
 				}
+				*/
+				ctrl = sbar;
 			}
 			break;
 
 			default:
 				Log(ERROR, "CHUImporter", "Control Not Supported");
 		}
+		win->AddSubviewInFrontOfView( ctrl );
+		ctrl->GetScriptingRef( ControlID );
 	}
 	return win;
 }
