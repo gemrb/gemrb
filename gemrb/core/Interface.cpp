@@ -2757,8 +2757,7 @@ void Interface::DrawWindows(bool allow_delete)
 {
 	static bool modalShield = false;
 
-	WindowList::iterator it = windows.begin();
-	Window* win = *it;
+	Window* win = (windows.size()) ? windows.front() : NULL;
 	if (win && win->WindowVisibility() == Window::FRONT) {
 		//here comes the REAL drawing of windows
 		if (!modalShield) {
@@ -2778,19 +2777,25 @@ void Interface::DrawWindows(bool allow_delete)
 	}
 	modalShield = false;
 
-	for (; it != windows.end(); ++it) {
-		//visible ==1 or 2 will be drawn
-		win = *it;
+	win = NULL;
+	// we have to draw windows from the bottom up so the front window is drawn last
+	WindowList::reverse_iterator rit = windows.rbegin();
+	for (; rit != windows.rend(); ++rit) {
+		win = *rit;
 		assert(win);
 
 		switch (win->WindowVisibility()) {
 			case Window::INVALID:
 				if (allow_delete) {
 					evntmgr->DelWindow( win );
-					it = windows.erase(it);
+					windows.erase( (++rit).base() );
+					// invalid windows are stored at the end, so we simply reset to rbegin
+					rit = windows.rbegin();
 					delete win;
 				}
-				break;
+			// fallthrough
+			case Window::FRONT: // already handled the modal window
+				continue; // window is invalid, deleted, or modal so force continue
 			case Window::GRAYED:
 				if (win->NeedsDraw()) {
 					// Important to only draw if the window itself is dirty
