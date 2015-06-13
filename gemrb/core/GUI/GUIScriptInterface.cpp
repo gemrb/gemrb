@@ -29,9 +29,19 @@ View* GetView(ScriptingRefBase* base)
 	return NULL;
 }
 
-Control* GetControl(ScriptingId id)
+ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 {
-	View* view = GetView( ScriptEngine::GetScripingRef("Control", id) );
+	char group[8] = "Control";
+	if (win) {
+		snprintf(group, sizeof(group), "Win%02d", win->WindowID);
+	}
+	ScriptingRefBase* base = ScriptEngine::GetScripingRef(group, id);
+	return dynamic_cast<ControlScriptingRef*>(base);
+}
+
+Control* GetControl(ScriptingId id, Window* win)
+{
+	View* view = GetView( GetControlRef(id, win) );
 	return static_cast<Control*>(view);
 }
 

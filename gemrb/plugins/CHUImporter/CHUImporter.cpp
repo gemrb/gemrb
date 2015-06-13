@@ -376,7 +376,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 
 				if (SBID != 0xffff) {
-					ScrollBar* sb = GetControl<ScrollBar>(SBID);
+					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
 						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
 					}

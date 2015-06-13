@@ -27,11 +27,13 @@ namespace GemRB {
 
 View* GetView(ScriptingRefBase* base);
 Window* GetWindow(ScriptingId id);
-Control* GetControl(ScriptingId id);
+Control* GetControl(ScriptingId id, Window* win);
+
+ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
 
 template <class T>
-T* GetControl(ScriptingId id) {
-	return dynamic_cast<T*>(GetControl(id));
+T* GetControl(ScriptingId id, Window* win) {
+	return dynamic_cast<T*>(GetControl(id, win));
 }
 
 }

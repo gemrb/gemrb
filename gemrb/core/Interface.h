@@ -728,6 +728,8 @@ private:
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
 	ieDword *GetListFrom2DAInternal(const ieResRef resref);
+
+	Window* GetMessageWindow() const;
 public:
 	char GameDataPath[_MAX_PATH];
 	char GameOverridePath[_MAX_PATH];

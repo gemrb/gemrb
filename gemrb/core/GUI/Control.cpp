@@ -125,8 +125,9 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 
 ViewScriptingRef* Control::MakeNewScriptingRef(ScriptingId id)
 {
+	assert(Owner);
 	ControlID = id;
-	return new ControlScriptingRef(this, id);
+	return new ControlScriptingRef(this, id, Owner->WindowID);
 }
 
 }

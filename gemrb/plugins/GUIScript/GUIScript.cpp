@@ -1019,7 +1019,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 					PyErr_Clear(); //clearing the exception
 				}
 
-				Control* ctrl = GetControl(ControlID);
+				Control* ctrl = GetControl(ControlID, win);
 				if (ctrl) {
 					rgn = ctrl->Frame();
 					// do *not* delete the existing control, we want to replace
@@ -1030,7 +1030,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 				MapControl* map = new MapControl(rgn);
 				if (Flag2) { //pst flavour
 					map->convertToGame = false;
-					Control *lc = GetControl(LabelID);
+					Control *lc = GetControl(LabelID, win);
 					map->LinkedLabel = lc;
 					ResourceHolder<ImageMgr> anim(Flag);
 					if (anim) {
@@ -1041,7 +1041,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 						map->Flag[1] = anim2->GetSprite2D();
 					}
 				} else if (Flag) {
-					Control *lc = GetControl(LabelID);
+					Control *lc = GetControl(LabelID, win);
 					map->LinkedLabel = lc;
 					AnimationFactory* af = ( AnimationFactory* )
 					gamedata->GetFactoryResource( Flag, IE_BAM_CLASS_ID, IE_NORMAL );
@@ -1062,7 +1062,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 				PARSE_ARGS( constructArgs,
 						   "i|si", &direction, &font, &recolor );
 
-				ctrl = GetControl(ControlID);
+				ctrl = GetControl(ControlID, win);
 				if (ctrl) {
 					rgn = ctrl->Frame();
 					//flags = ctrl->Value;
@@ -1086,16 +1086,19 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef(ControlID) );
 }
 
-PyDoc_STRVAR( GemRB_GetControl__doc,
-			 "GetControl(ControlID) => GControl\n\n"
+PyDoc_STRVAR( GemRB_Window_GetControl__doc,
+			 "GetControl(Window, ControlID) => GControl\n\n"
 			 "Returns a control as an object." );
 
-static PyObject* GemRB_GetControl(PyObject* /*self*/, PyObject* args)
+static PyObject* GemRB_Window_GetControl(PyObject* self, PyObject* args)
 {
 	ScriptingId controlId = ScriptEngine::InvalidId;
-	PARSE_ARGS( args, "l", &controlId );
+	PARSE_ARGS( args, "Ol", &self, &controlId );
 
-	ScriptingRefBase* ref = ScriptEngine::GetScripingRef("Control", controlId);
+	Window* win = GetView<Window>(self);
+	assert(win);
+
+	ScriptingRefBase* ref = GetControlRef(controlId, win);
 	if (ref) {
 		return gs->ConstructObjectForScriptable(ref);
 	}
@@ -1449,7 +1452,7 @@ static PyObject* GemRB_Control_AttachScrollBar(PyObject* self, PyObject* args)
 	Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
-	ScrollBar* scb = GetControl<ScrollBar>(ScbControlId);
+	ScrollBar* scb = GetControl<ScrollBar>(ScbControlId, ctrl->Owner);
 	ABORT_IF_NULL(scb);
 
 	ctrl->SetScrollBar( scb );
@@ -1806,11 +1809,9 @@ static PyObject* GemRB_Window_DeleteControl(PyObject* self, PyObject* args)
 	PARSE_ARGS(args, "Oi", &self, &ControlID);
 
 	Window* win = GetView<Window>(self);
-	if (win == NULL) {
-		return RuntimeError("Cannot find window!");
-	}
+	assert(win);
 
-	Control* ctrl = GetControl(ControlID);
+	Control* ctrl = GetControl(ControlID, win);
 	if (ctrl) {
 		delete win->RemoveSubview(ctrl);
 	}
@@ -2116,7 +2117,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject* self, PyObject* ar
 		return RuntimeError("Cannot find control!");
 	}
 	Window* subWin = substitute->Owner;
-	subWin->RemoveSubview(GetControl(substitute->ControlID));
+	subWin->RemoveSubview(substitute);
 	Window* targetWin = target->Owner;
 	substitute->SetFrame(target->Frame());
 
@@ -7184,7 +7185,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start||more) {
-		Button* btn = GetControl<Button>(Offset);
+		Button* btn = GetControl<Button>(Offset, win);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7202,7 +7203,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
-		Button* btn = GetControl<Button>(i+Offset+(Start?1:0));
+		Button* btn = GetControl<Button>(i+Offset+(Start?1:0), win);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			Log(ERROR, "GUIScript", "Button %d not found!", i+Offset+(Start?1:0));
 			continue;
@@ -7250,7 +7251,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	}
 
 	if (more) {
-		Button* btn = GetControl<Button>(i+Offset+1);
+		Button* btn = GetControl<Button>(i+Offset+1, win);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7354,7 +7355,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
-		Button* btn = GetControl<Button>(i+Start);
+		Button* btn = GetControl<Button>(i+Start, win);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
 			return NULL;
 		}
@@ -9052,7 +9053,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
-	METHOD(GetControl, METH_VARARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetDamageReduction, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
@@ -9263,6 +9263,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_CreateControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
+	METHOD(Window_GetControl, METH_VARARGS),
 	METHOD(Window_SetVisible, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
@@ -9687,7 +9688,11 @@ void GUIScript::ExecString(const char* string, bool feedback)
 PyObject* GUIScript::ConstructObjectForScriptable(ScriptingRefBase* ref)
 {
 	if (!ref) return NULL;
-	return ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
+
+	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
+	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup().c_str()));
+	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
+	return obj;
 }
 
 PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)

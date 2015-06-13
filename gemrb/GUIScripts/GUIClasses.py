@@ -20,7 +20,6 @@
 import _GemRB
 import CreateControlDecorators
 
-from GemRB import GetControl
 from GUIDefines import *
 from MetaClasses import metaIDWrapper
 
@@ -78,6 +77,7 @@ class GWindow(GView):
     'SetupControls': _GemRB.Window_SetupControls,
     'SetVisible': _GemRB.Window_SetVisible,
     'ShowModal': _GemRB.Window_ShowModal,
+    'GetControl': _GemRB.Window_GetControl
   }
   SCRIPT_GROUP = "Window"
 
@@ -88,11 +88,6 @@ class GWindow(GView):
     if self.ID != -1:
       _GemRB.Window_Unload(self)
       self.ID = -1
-      
-  def GetControl(self, id):
-	  # this is only for compatibility with existing scripts
-	  return GetControl(id)
-  
 
   @CreateControlDecorator
   def CreateWorldMapControl(self, control, *args):
@@ -136,7 +131,7 @@ class GControl(GView):
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
-  SCRIPT_GROUP = "Control"
+  __slots__ = ['SCRIPT_GROUP']
 
 class GLabel(GControl):
   methods = {

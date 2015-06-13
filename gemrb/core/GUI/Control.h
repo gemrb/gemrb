@@ -143,14 +143,19 @@ public:
 
 
 class ControlScriptingRef : public ViewScriptingRef {
+	std::string group;
 public:
-	ControlScriptingRef(Control* ctrl, ScriptingId id)
-	: ViewScriptingRef(ctrl, id) {}
+	ControlScriptingRef(Control* ctrl, ScriptingId id, ScriptingId winId)
+	: ViewScriptingRef(ctrl, id)
+	{
+		char wid[6];
+		snprintf(wid, sizeof(wid), "Win%02d", winId);
+		group = wid;
+	}
 
 	// key to separate groups of objects for faster searching and id collision prevention
 	virtual const std::string& ScriptingGroup() {
-		static std::string gid("Control");
-		return gid;
+		return group;
 	}
 	// class to instantiate on the script side (Python)
 	virtual const ScriptingClassId ScriptingClass() {

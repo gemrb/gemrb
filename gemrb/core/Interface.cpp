@@ -3631,7 +3631,7 @@ void Interface::SetGCWindowVisible(bool vis)
 
 GameControl* Interface::GetGameControl() const
 {
-	return GetControl<GameControl>(0);
+	return GetControl<GameControl>(0, GetWindow(0xffff));
 }
 
 bool Interface::InitItemTypes()
@@ -3970,11 +3970,20 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	return ret;
 }
 
+Window* Interface::GetMessageWindow() const
+{
+	ieDword id = (ieDword) -1;
+	if (vars->Lookup( "MessageWindow", id )) {
+		return GetWindow(id);
+	}
+	return NULL;
+}
+
 Label* Interface::GetMessageLabel() const
 {
 	ieDword id = (ieDword) -1;
 	if (vars->Lookup( "MessageLabel", id )) {
-		return GetControl<Label>(id);
+		return GetControl<Label>(id, GetMessageWindow());
 	}
 	return NULL;
 }
@@ -3983,7 +3992,7 @@ TextArea* Interface::GetMessageTextArea() const
 {
 	ieDword id = (ieDword) -1;
 	if (vars->Lookup( "MessageTextArea", id )) {
-		return GetControl<TextArea>(id);
+		return GetControl<TextArea>(id, GetMessageWindow());
 	}
 	return NULL;
 }

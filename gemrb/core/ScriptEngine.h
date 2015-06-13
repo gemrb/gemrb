@@ -30,7 +30,7 @@ namespace GemRB {
 
 class Point;
 
-typedef unsigned long ScriptingId;
+typedef unsigned int ScriptingId;
 typedef std::string ScriptingClassId;
 
 class ScriptingRefBase {
