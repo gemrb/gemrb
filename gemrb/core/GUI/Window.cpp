@@ -103,7 +103,7 @@ void Window::SetVisibility(Visibility vis)
 /** This function Draws the Window on the Output Screen */
 void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
-	if (visibility == INVISIBLE) return; // no point in drawing invisible windows
+	if (visibility <= INVISIBLE) return; // no point in drawing invisible windows
 
 	if (!(flags&WF_BORDERLESS) && (frame.w < core->Width || frame.h < core->Height)) {
 		Video* video = core->GetVideoDriver();

@@ -2795,9 +2795,10 @@ void Interface::DrawWindows(bool allow_delete)
 					video->DrawRect(win->Frame(), fill);
 				}
 				break;
-			default:
+			case Window::VISIBLE:
 				win->Draw();
 				break;
+			default: break; // prevent compiler warning about not handling invisible case
 		}
 	}
 
