@@ -562,6 +562,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->StrRef = StrRef; //we need this when saving area
 		ip->SetMap(map);
 		ip->Flags = Flags;
+		// ensure repeating traps are armed, fix for bg2 ar1404 mirror trap to fire
+		if (ip->TrapResets()) {
+			ip->Trapped = true;
+		}
 		ip->UsePoint.x = PosX;
 		ip->UsePoint.y = PosY;
 		//FIXME: PST doesn't use this field
