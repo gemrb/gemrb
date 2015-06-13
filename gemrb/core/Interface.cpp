@@ -2537,32 +2537,30 @@ Window* Interface::LoadWindow(unsigned short WindowID)
 	unsigned int i;
 	GameControl *gc = GetGameControl ();
 
+	Window* win = NULL;
 	for (i = 0; i < windows.size(); i++) {
-		Window *win = windows[i];
-		if (win == NULL)
-			continue;
-		if (win->WindowVisibility() == Window::INVALID) {
-			continue;
-		}
+		win = windows[i];
+
 		if (win->WindowID == WindowID &&
 			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
-			SetOnTop( win );
-			if (gc)
-				gc->SetScrolling( false );
-			return win;
+			win->SetVisibility(Window::VISIBLE);
+			break;
 		}
+		win = NULL;
 	}
-	Window* win = windowmgr->GetWindow( WindowID );
-	if (win == NULL) {
-		return NULL;
+	if (!win) {
+		win = windowmgr->GetWindow( WindowID );
+		memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
 	}
-	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
-	win->GetScriptingRef(WindowID);
+	if (win) {
+		win->GetScriptingRef(WindowID);
+		SetOnTop( win );
 
-	if (gc)
-		gc->SetScrolling( false );
+		if (gc)
+			gc->SetScrolling( false );
 
-	AddWindow(win);
+		AddWindow(win);
+	}
 	return win;
 }
 
@@ -2593,11 +2591,18 @@ void Interface::SetOnTop(Window* win)
 	if (!IsValidWindow(win)) return;
 
 	WindowList::iterator it = std::find(windows.begin(), windows.end(), win);
-	if (it != windows.end()) {
-		windows.erase(it);
+	if (it != windows.begin()) {
+		if (it != windows.end()) {
+			windows.erase(it);
+		}
+		windows.push_front(win);
 	}
-	windows.push_front(win);
-	win->MarkDirty();
+
+	if (win->WindowVisibility() == 0) {
+		win->SetVisibility(Window::VISIBLE);
+	} else {
+		win->MarkDirty();
+	}
 }
 
 /** Add a window to the Window List */
@@ -2921,8 +2926,8 @@ void Interface::DelWindow(Window* win)
 		if (it != windows.end()) {
 			// the window beneath this must get redrawn
 			(*it)->MarkDirty();
-		PlaySound(DS_WINDOW_CLOSE);
-	}
+			PlaySound(DS_WINDOW_CLOSE);
+		}
 		windows.push_back(win);
 	}
 
