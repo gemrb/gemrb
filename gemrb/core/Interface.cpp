@@ -340,9 +340,7 @@ Interface::~Interface(void)
 		delete[] Cursors;
 	}
 
-	std::deque<Window*>::iterator wit = windows.begin();
-	for (; wit != windows.end(); ++wit) \
-		delete *wit;
+	DelAllWindows();
 
 	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
