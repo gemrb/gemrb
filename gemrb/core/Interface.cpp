@@ -2918,8 +2918,12 @@ void Interface::DelWindow(Window* win)
 		// since the window is "deleted" it should be sent to the back
 		// just in case it is undeleted later
 		it = windows.erase(it);
-		windows.push_back(win);
+		if (it != windows.end()) {
+			// the window beneath this must get redrawn
+			(*it)->MarkDirty();
 		PlaySound(DS_WINDOW_CLOSE);
+	}
+		windows.push_back(win);
 	}
 
 	win->SetVisibility(Window::INVALID);
