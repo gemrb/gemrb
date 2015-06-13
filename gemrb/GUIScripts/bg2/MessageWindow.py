@@ -134,7 +134,7 @@ def UpdateControlStatus():
 
 	hideflag = GemRB.HideGUI()
 	MessageWindow = GemRB.GetVar("MessageWindow")
-	MessageTA = GUIClasses.GTextArea( WinID=MessageWindow, ID=GemRB.GetVar("MessageTextArea"))
+	MessageTA = GUIClasses.GTextArea(ID=GemRB.GetVar("MessageTextArea"))
 	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
 		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()

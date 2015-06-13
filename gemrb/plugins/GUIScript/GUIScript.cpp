@@ -925,14 +925,10 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 
 	View* superview = GetView(self);
 	Window* win = dynamic_cast<Window*>(superview);
-	int WindowIndex = -1;
 	if (!win) { // control view
 		Control* ctrl = dynamic_cast<Control*>(superview);
 		assert(ctrl);
 		win = ctrl->Owner;
-		WindowIndex = (int)PyInt_AsLong( PyObject_GetAttrString(self, "WinID") );
-	} else { // window view
-		WindowIndex = (int)PyInt_AsLong( PyObject_GetAttrString(self, "ID") );
 	}
 
 	Control* ctrl = NULL;

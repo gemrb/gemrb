@@ -817,7 +817,7 @@ def ResolveKey():
 	return
 
 GameWindow = GUIClasses.GWindow(ID=0)
-GameControl = GUIClasses.GControl(WinID=0,ID=0)
+GameControl = GUIClasses.GControl(ID=0)
 
 class _stdioWrapper(object):
 	def __init__(self, log_level):
