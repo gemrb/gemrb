@@ -2658,7 +2658,7 @@ bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
 
 bool Interface::IsPresentingModalWindow()
 {
-	return (windows.front() && windows.front()->WindowVisibility() == Window::FRONT);
+	return (windows.size() && windows.front() && windows.front()->WindowVisibility() == Window::FRONT);
 }
 
 bool Interface::IsValidWindow(Window* win)
