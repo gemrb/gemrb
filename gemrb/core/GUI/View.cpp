@@ -426,7 +426,7 @@ ViewScriptingRef* View::GetScriptingRef(ScriptingId id)
 {
 	if (scriptingRef) {
 		if (id != ScriptEngine::InvalidId && id != scriptingRef->Id) {
-			Log(MESSAGE, "GUI Scripting", "Reassigning a Scriptable control from %lu to %lu.", scriptingRef->Id, id);
+			Log(MESSAGE, "GUI Scripting", "Reassigning a Scriptable control from %d to %d.", scriptingRef->Id, id);
 			DeleteScriptingRef();
 		}
 	}
