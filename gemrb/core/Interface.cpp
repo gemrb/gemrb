@@ -2755,9 +2755,13 @@ void Interface::HandleGUIBehaviour(void)
 
 void Interface::DrawWindows(bool allow_delete)
 {
+	if (!windows.size()) {
+		return;
+	}
+
 	static bool modalShield = false;
 
-	Window* win = (windows.size()) ? windows.front() : NULL;
+	Window* win = windows.front();
 	if (win && win->WindowVisibility() == Window::FRONT) {
 		//here comes the REAL drawing of windows
 		if (!modalShield) {
@@ -2777,14 +2781,26 @@ void Interface::DrawWindows(bool allow_delete)
 	}
 	modalShield = false;
 
+	const Region& frontWinFrame = win->Frame();
 	win = NULL;
 	// we have to draw windows from the bottom up so the front window is drawn last
 	WindowList::reverse_iterator rit = windows.rbegin();
 	for (; rit != windows.rend(); ++rit) {
 		win = *rit;
 		assert(win);
+		Window::Visibility vis = win->WindowVisibility();
 
-		switch (win->WindowVisibility()) {
+		if (win != windows.front() && vis > Window::INVISIBLE) {
+			const Region& frame = win->Frame();
+			Region intersect = frontWinFrame.Intersect(frame);
+			if (intersect == frame) {
+				// this window is completely obscured by the front window
+				// we dont have to bother drawing it because IE has no concept of translucent windows
+				continue;
+			}
+		}
+
+		switch (vis) {
 			case Window::INVALID:
 				if (allow_delete) {
 					evntmgr->DelWindow( win );
