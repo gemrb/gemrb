@@ -145,14 +145,13 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 		}
 	}
 
-	SetBufferedDrawing(false);
-	SDL_Rect rect = RectFromRegion(subtitleregion);
-	SDL_FillRect(currentBuf, &rect, 0);
+	currentBuf = disp;
 	BlitSurfaceClipped(sprite, Region(sx, sy, w, h), Region(dstx, dsty, w, h));
-	if (titleref>0)
+	if (titleref>0) {
+		SDL_Rect rect = RectFromRegion(subtitleregion);
+		SDL_FillRect(currentBuf, &rect, 0xff);
 		DrawMovieSubtitle( titleref );
-	SetBufferedDrawing(true);
-
+	}
 	SDL_Flip( disp );
 	SDL_FreeSurface( sprite );
 }
