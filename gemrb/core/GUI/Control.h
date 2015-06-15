@@ -171,9 +171,9 @@ public:
 			case IE_GUI_TEXTAREA:
 				return "TextArea";
 			case IE_GUI_SCROLLBAR:
-				return "Scrollbar";
+				return "ScrollBar";
 			default:
-				return ScriptingGroup();
+				return "Control";
 		}
 	};
 
