@@ -900,7 +900,7 @@ static int check_type(Actor* actor, Effect* fx)
 	//decrementing immunity checks
 	//decrementing level immunity
 	if (fx->Power) {
-		efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, 0, fx->Power);
+		efx = actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx->Power);
 		if( efx ) {
 			if (DecreaseEffect(efx))
 				Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
