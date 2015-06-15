@@ -141,6 +141,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 			{
 				//Button
 				Button* btn = new Button(ctrlFrame);
+				ctrl = btn;
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -208,7 +209,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 				}
 				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
-				ctrl = btn;
 			}
 			break;
 
@@ -482,8 +482,10 @@ endalign:
 			default:
 				Log(ERROR, "CHUImporter", "Control Not Supported");
 		}
-		win->AddSubviewInFrontOfView( ctrl );
-		ctrl->GetScriptingRef( ControlID );
+		if (ctrl) {
+			win->AddSubviewInFrontOfView( ctrl );
+			ctrl->GetScriptingRef( ControlID );
+		}
 	}
 	return win;
 }
