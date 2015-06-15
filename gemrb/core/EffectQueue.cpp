@@ -859,7 +859,7 @@ static int check_type(Actor* actor, Effect* fx)
 	}
 */
 	//spell level immunity
-	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, 0, fx->Power) ) {
+	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
 		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
 		return 0;
 	}
