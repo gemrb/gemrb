@@ -66,10 +66,9 @@ public:
 			Holder<T>::ptr->acquire();
 			GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 			PyObject *obj = PyCObject_FromVoidPtrAndDesc(Holder<T>::ptr,const_cast<TypeID*>(&T::ID),PyRelease);
-			PyObject *tuple = PyTuple_New(1);
-			PyTuple_SET_ITEM(tuple, 0, obj);
-			PyObject *ret = gs->ConstructObject(T::ID.description, tuple);
-			Py_DECREF(tuple);
+			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
+			PyObject *ret = gs->ConstructObject(T::ID.description, NULL, kwargs);
+			Py_DECREF(kwargs);
 			return ret;
 		} else {
 			Py_INCREF( Py_None );
