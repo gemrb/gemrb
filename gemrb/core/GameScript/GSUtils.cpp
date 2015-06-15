@@ -1123,17 +1123,21 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (scr->Type==ST_ACTOR) {
 			// might not be equal to speaker anymore due to swapping
 			Actor *talker = (Actor *) scr;
-			talker->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
-			if (talker->InParty) {
-				talker->SetStance(IE_ANI_READY);
+			if (!talker->Immobile()) {
+				talker->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
+				if (talker->InParty) {
+					talker->SetStance(IE_ANI_READY);
+				}
 			}
 		}
 		if (tar->Type==ST_ACTOR) {
 			// might not be equal to target anymore due to swapping
 			Actor *talkee = (Actor *) tar;
-			talkee->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
-			if (talkee->InParty) {
-				talkee->SetStance(IE_ANI_READY);
+			if (!talkee->Immobile()) {
+				talkee->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
+				if (talkee->InParty) {
+					talkee->SetStance(IE_ANI_READY);
+				}
 			}
 		}
 	}
