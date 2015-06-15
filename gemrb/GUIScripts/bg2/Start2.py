@@ -31,42 +31,16 @@ MoviesButton = 0
 BackButton = 0
 
 def OnLoad():
-	global StartWindow, TutorialWindow, QuitWindow
+	global StartWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton, BackButton
 	global SinglePlayerButton
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 
 	GemRB.LoadWindowPack("START", 640, 480)
-#tutorial subwindow
-	if not GameCheck.IsBG2Demo():
-		TutorialWindow = GemRB.LoadWindow (5)
-		TextAreaControl = TutorialWindow.GetControl (1)
-		CancelButton = TutorialWindow.GetControl (11)
-		PlayButton = TutorialWindow.GetControl (10)
-		TextAreaControl.SetText (44200)
-		CancelButton.SetText (13727)
-		PlayButton.SetText (33093)
-		PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
-		PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	else:
+	if GameCheck.IsBG2Demo():
 		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
-
-#quit subwindow
-	QuitWindow = GemRB.LoadWindow (3)
-	QuitTextArea = QuitWindow.GetControl (0)
-	CancelButton = QuitWindow.GetControl (2)
-	ConfirmButton = QuitWindow.GetControl (1)
-	QuitTextArea.SetText (19532)
-	CancelButton.SetText (13727)
-	ConfirmButton.SetText (15417)
-	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
-	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-#main window
+	
 	StartWindow = GemRB.LoadWindow (0)
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
@@ -116,9 +90,6 @@ def OnLoad():
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	if not GameCheck.IsBG2Demo():
-		TutorialWindow.SetVisible (WINDOW_INVISIBLE)
 	StartWindow.SetVisible (WINDOW_VISIBLE)
 	MusicTable = GemRB.LoadTable ("songlist")
 	# the table has useless rownames, so we can't search for BG2Theme
@@ -236,8 +207,22 @@ def ImportGame():
 	return
 	
 def Tutorial():
+	global TutorialWindow
+
 	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	TutorialWindow.SetVisible (WINDOW_VISIBLE)
+	#tutorial subwindow
+	TutorialWindow = GemRB.LoadWindow (5)
+	TextAreaControl = TutorialWindow.GetControl (1)
+	CancelButton = TutorialWindow.GetControl (11)
+	PlayButton = TutorialWindow.GetControl (10)
+	TextAreaControl.SetText (44200)
+	CancelButton.SetText (13727)
+	PlayButton.SetText (33093)
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
+	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)		
+
 	return
 
 def PlayPress():
@@ -260,8 +245,21 @@ def CancelTut():
 	return
 
 def ExitPress():
+	global QuitWindow
+
 	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	QuitWindow.SetVisible (WINDOW_VISIBLE)
+	#quit subwindow
+	QuitWindow = GemRB.LoadWindow (3)
+	QuitTextArea = QuitWindow.GetControl (0)
+	CancelButton = QuitWindow.GetControl (2)
+	ConfirmButton = QuitWindow.GetControl (1)
+	QuitTextArea.SetText (19532)
+	CancelButton.SetText (13727)
+	ConfirmButton.SetText (15417)
+	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
+	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	return
 
 def ExitConfirmed():
