@@ -860,6 +860,7 @@ static int check_type(Actor* actor, Effect* fx)
 */
 	//spell level immunity
 	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, 0, fx->Power) ) {
+		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
 		return 0;
 	}
 
@@ -867,12 +868,15 @@ static int check_type(Actor* actor, Effect* fx)
 	//if source is unspecified, don't resist it
 	if( fx->Source[0]) {
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity");
 			return 0;
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity2");
 			return 0;
 		}
 		if (actor->fxqueue.HasEffectWithResource(fx_store_spell_sequencer_ref, fx->Source) ) {
+			Log(DEBUG, "EffectQueue", "Contingency/sequencer already active!");
 			return 0;
 		}
 	}
@@ -880,6 +884,7 @@ static int check_type(Actor* actor, Effect* fx)
 	//primary type immunity (school)
 	if( fx->PrimaryType) {
 		if( actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx->PrimaryType)) {
+			Log(DEBUG, "EffectQueue", "Resisted by school/primary type");
 			return 0;
 		}
 	}
@@ -887,6 +892,7 @@ static int check_type(Actor* actor, Effect* fx)
 	//secondary type immunity (usage)
 	if( fx->SecondaryType) {
 		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx->SecondaryType) ) {
+			Log(DEBUG, "EffectQueue", "Resisted by usage/secondary type");
 			return 0;
 		}
 	}
@@ -897,6 +903,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, 0, fx->Power);
 		if( efx ) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
 				return 0;
 		}
 	}
@@ -906,6 +913,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
 		if( efx) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
 				return 0;
 		}
 	}
@@ -914,6 +922,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx = actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx->PrimaryType);
 		if( efx) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
 				return 0;
 		}
 	}
@@ -923,6 +932,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx = actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx->SecondaryType);
 		if( efx) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
 				return 0;
 		}
 	}
@@ -942,6 +952,7 @@ static int check_type(Actor* actor, Effect* fx)
 			//if decrease needs the spell level, use fx->Power here
 			actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
 			//efx->Parameter1--;
+			Log(DEBUG, "EffectQueue", "Absorbed by spelltrap");
 			return 0;
 		}
 	}
@@ -949,22 +960,26 @@ static int check_type(Actor* actor, Effect* fx)
 	//bounce checks
 	if (fx->Power) {
 		if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx->Power) ) {
+			Log(DEBUG, "EffectQueue", "Bounced by level");
 			return 0;
 		}
 	}
 
 	if( fx->Source[0] && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
+		Log(DEBUG, "EffectQueue", "Bounced by resource");
 		return -1;
 	}
 
 	if( fx->PrimaryType && (bounce&BNC_SCHOOL) ) {
 		if( actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx->PrimaryType)) {
+			Log(DEBUG, "EffectQueue", "Bounced by school");
 			return -1;
 		}
 	}
 
 	if( fx->SecondaryType && (bounce&BNC_SECTYPE) ) {
 		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_ref, fx->SecondaryType)) {
+			Log(DEBUG, "EffectQueue", "Bounced by usage/sectype");
 			return -1;
 		}
 	}
@@ -976,6 +991,7 @@ static int check_type(Actor* actor, Effect* fx)
 			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
 			if( efx) {
 				if (DecreaseEffect(efx))
+					Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
 					return -1;
 			}
 		}
@@ -985,6 +1001,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
 		if( efx) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
 				return -1;
 		}
 	}
@@ -993,6 +1010,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx=actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx->PrimaryType);
 		if( efx) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
 				return -1;
 		}
 	}
@@ -1001,6 +1019,7 @@ static int check_type(Actor* actor, Effect* fx)
 		efx=actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx->SecondaryType);
 		if( efx) {
 			if (DecreaseEffect(efx))
+				Log(DEBUG, "EffectQueue", "Bounced by usage (decrementing)");
 				return -1;
 		}
 	}
