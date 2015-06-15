@@ -2761,9 +2761,17 @@ void Interface::DrawWindows(bool allow_delete)
 
 	static bool modalShield = false;
 
-	Window* win = windows.front();
-	if (win && win->WindowVisibility() == Window::FRONT) {
-		//here comes the REAL drawing of windows
+	Window* win = NULL;
+	Window::Visibility vis = Window::INVALID;
+	WindowList::iterator it = windows.begin();
+	for (; it != windows.end(); ++it) {
+		win = *it;
+		vis = win->WindowVisibility();
+		if (vis > Window::INVISIBLE)
+			break; // found the frontmost visible win
+	}
+
+	if (vis == Window::FRONT) {
 		if (!modalShield) {
 			// only draw the shield layer once
 			Color shieldColor = Color(); // clear
@@ -2788,7 +2796,7 @@ void Interface::DrawWindows(bool allow_delete)
 	for (; rit != windows.rend(); ++rit) {
 		win = *rit;
 		assert(win);
-		Window::Visibility vis = win->WindowVisibility();
+		vis = win->WindowVisibility();
 
 		if (win != windows.front() && vis > Window::INVISIBLE) {
 			const Region& frame = win->Frame();
