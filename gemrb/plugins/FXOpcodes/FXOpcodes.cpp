@@ -3180,7 +3180,7 @@ int fx_protection_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_protection_spelllevel(%2d) Level: %d", fx->Opcode, fx->Parameter1);
 
 	int value = fx->Parameter1;
-	if (value<9) {
+	if (value <= 9) {
 		STAT_BIT_OR(IE_MINORGLOBE, 1<<value);
 		STAT_BIT_OR(IE_IMMUNITY, IMM_LEVEL);
 		return FX_APPLIED;
