@@ -27,7 +27,7 @@ Window* WindowMgr::CreateWindow(ScriptingId winId, const Region& frame, Sprite2D
 	Window* win = new Window( frame );
 	win->GetScriptingRef(winId);
 	win->SetBackground(bg);
-	strcpy( win->WindowPack, winPack );
+	//strcpy( win->WindowPack, winPack );
 	return win;
 }
 

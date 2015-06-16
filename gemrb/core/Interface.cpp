@@ -431,7 +431,6 @@ GameControl* Interface::StartGameControl()
 	Region screen(0,0, Width, Height);
 	Window* gamewin = new Window( screen );
 	gamewin->GetScriptingRef(99);
-	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(screen);
 	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );

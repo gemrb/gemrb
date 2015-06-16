@@ -107,8 +107,6 @@ public:
 	void DispatchMouseWheelScroll(short x, short y);
 
 public: //Public attributes
-	/** WinPack */
-	char WindowPack[10];
 	/** Window ID */
 	unsigned short WindowID;
 

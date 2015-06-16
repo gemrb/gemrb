@@ -111,7 +111,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		}
 	}
 	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height), bg);
-	memcpy( win->WindowPack, winPack, sizeof(win->WindowPack) );
 
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
