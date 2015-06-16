@@ -69,7 +69,7 @@ bool CHUImporter::Open(DataStream* stream)
 }
 
 /** Returns the i-th window in the Previously Loaded Stream */
-Window* CHUImporter::GetWindow(ScriptingId wid)
+Window* CHUImporter::GetWindow(ScriptingId wid) const
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
@@ -103,14 +103,16 @@ Window* CHUImporter::GetWindow(ScriptingId wid)
 	str->ReadResRef( MosFile );
 	str->ReadWord( &FirstControl );
 
-	Window* win = new Window( Region(XPos, YPos, Width, Height) );
-	win->GetScriptingRef(WindowID);
+	Sprite2D* bg = NULL;
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {
-			win->SetBackground( mos->GetSprite2D() );
+			bg = mos->GetSprite2D();
 		}
 	}
+	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height), bg);
+	memcpy( win->WindowPack, winPack, sizeof(win->WindowPack) );
+
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
 		return win;
@@ -493,6 +495,23 @@ endalign:
 unsigned int CHUImporter::GetWindowsCount()
 {
 	return WindowCount;
+}
+
+/** Loads a WindowPack (CHUI file) in the Window Manager */
+bool CHUImporter::LoadWindowPack(const ResRef& ref)
+{
+	DataStream* stream = gamedata->GetResource( ref, IE_CHU_CLASS_ID );
+	if (stream == NULL) {
+		Log(ERROR, "CHUImporter", "Error: Cannot find %s.chu", ref.CString() );
+		return false;
+	}
+	if (!Open(stream)) {
+		Log(ERROR, "CHUImporter", "Error: Cannot Load %s.chu", ref.CString() );
+		return false;
+	}
+
+	winPack = ref;
+	return true;
 }
 
 #include "plugindef.h"

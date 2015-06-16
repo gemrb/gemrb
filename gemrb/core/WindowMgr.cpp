@@ -22,11 +22,13 @@
 
 namespace GemRB {
 
-WindowMgr::WindowMgr()
+Window* WindowMgr::CreateWindow(ScriptingId winId, const Region& frame, Sprite2D* bg) const
 {
-}
-WindowMgr::~WindowMgr()
-{
+	Window* win = new Window( frame );
+	win->GetScriptingRef(winId);
+	win->SetBackground(bg);
+	strcpy( win->WindowPack, winPack );
+	return win;
 }
 
 }

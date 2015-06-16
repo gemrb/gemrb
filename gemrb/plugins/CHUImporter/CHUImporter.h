@@ -41,8 +41,9 @@ public:
 	~CHUImporter();
 	/** Returns the number of available windows */
 	unsigned int GetWindowsCount();
+	bool LoadWindowPack(const ResRef&);
 	/** Returns the i-th window in the Previously Loaded Stream */
-	Window* GetWindow(ScriptingId);
+	Window* GetWindow(ScriptingId) const;
 	/** This function loads all available windows from the 'stream' parameter. */
 	bool Open(DataStream* stream);
 };

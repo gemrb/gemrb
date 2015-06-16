@@ -42,15 +42,23 @@ class Window;
  */
 
 class GEM_EXPORT WindowMgr : public Plugin {
+protected:
+	ResRef winPack;
 public: 
-	WindowMgr();
-	virtual ~WindowMgr();
+	WindowMgr() {};
+	virtual ~WindowMgr() {};
+
 	/** This function loads all available windows from the 'stream' parameter. */
 	virtual bool Open(DataStream* stream) = 0;
 	/** Returns the i-th window in the Previously Loaded Stream */
-	virtual Window* GetWindow(ScriptingId id) = 0;
+	virtual Window* GetWindow(ScriptingId id) const = 0;
 	/** Returns the number of available windows */
 	virtual unsigned int GetWindowsCount() = 0;
+	/** Loads a WindowPack (CHUI file) in the Window Manager */
+	virtual bool LoadWindowPack(const ResRef&) = 0;
+	/** Creates a Window in the Window Manager */
+	Window* CreateWindow(ScriptingId winId, const Region& rgn, Sprite2D* bg) const;
+
 };
 
 }

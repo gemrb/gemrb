@@ -2516,18 +2516,7 @@ void Interface::RedrawAll()
 /** Loads a WindowPack (CHUI file) in the Window Manager */
 bool Interface::LoadWindowPack(const char* name)
 {
-	DataStream* stream = gamedata->GetResource( name, IE_CHU_CLASS_ID );
-	if (stream == NULL) {
-		Log(ERROR, "Interface", "Error: Cannot find %s.chu", name );
-		return false;
-	}
-	if (!GetWindowMgr()->Open(stream)) {
-		Log(ERROR, "Interface", "Error: Cannot Load %s.chu", name );
-		return false;
-	}
-
-	CopyResRef( WindowPack, name );
-	return true;
+	return windowmgr->LoadWindowPack(name);
 }
 
 /** Loads a Window in the Window Manager */
@@ -2540,8 +2529,7 @@ Window* Interface::LoadWindow(unsigned short WindowID)
 	for (i = 0; i < windows.size(); i++) {
 		win = windows[i];
 
-		if (win->WindowID == WindowID &&
-			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
+		if (win->WindowID == WindowID) {
 			win->SetVisibility(Window::VISIBLE);
 			break;
 		}
@@ -2549,7 +2537,6 @@ Window* Interface::LoadWindow(unsigned short WindowID)
 	}
 	if (!win) {
 		win = windowmgr->GetWindow( WindowID );
-		memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
 	}
 	if (win) {
 		win->GetScriptingRef(WindowID);
@@ -2566,21 +2553,15 @@ Window* Interface::LoadWindow(unsigned short WindowID)
 /** Creates a Window in the Window Manager */
 Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
 {
-	// check if the window already exists first
-	Window* win = LoadWindow(WindowID);
-	if (win == NULL) {
-		win = new Window( frame );
-		win->GetScriptingRef(WindowID);
+	Sprite2D* bg = NULL;
 		if (Background[0]) {
 			ResourceHolder<ImageMgr> mos(Background);
 			if (mos != NULL) {
-				win->SetBackground( mos->GetSprite2D() );
+			bg = mos->GetSprite2D();
 			}
 		}
-
-		strcpy( win->WindowPack, WindowPack );
+	Window* win = windowmgr->CreateWindow(WindowID, frame, bg);
 		AddWindow(win);
-	}
 	return win;
 }
 

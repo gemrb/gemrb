@@ -326,7 +326,6 @@ private:
 	EventMgr * evntmgr;
 	Holder<WindowMgr> windowmgr;
 	MODAL_SHADOW modalShadow;
-	char WindowPack[10];
 	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
 	WindowList windows;
@@ -459,7 +458,6 @@ public:
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&, char* Background);
-
 	/** Add a window to the Window List */
 	void AddWindow(Window * win);
 	/** Set the Tooltip text of a Control */
