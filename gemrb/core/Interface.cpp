@@ -430,10 +430,9 @@ GameControl* Interface::StartGameControl()
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
 	Window* gamewin = new Window( screen );
-	gamewin->GetScriptingRef(0xffff);
+	gamewin->GetScriptingRef(99);
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl(screen);
-	gc->GetScriptingRef(0);
 	gamewin->AddSubviewInFrontOfView(gc);
 	AddWindow( gamewin );
 	gamewin->SetVisibility(Window::VISIBLE);
@@ -3668,7 +3667,7 @@ void Interface::SetGCWindowVisible(bool vis)
 
 GameControl* Interface::GetGameControl() const
 {
-	return GetControl<GameControl>(0, GetWindow(0xffff));
+	return GetControl<GameControl>(0, GetWindow(99));
 }
 
 bool Interface::InitItemTypes()
