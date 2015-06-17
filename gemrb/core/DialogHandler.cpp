@@ -412,17 +412,18 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		ieResRef PortraitResRef;
 		strnlwrcpy(PortraitResRef, portrait, 8);
 		ResourceHolder<ImageMgr> im(PortraitResRef, true);
+		Sprite2D* image = NULL;
 		if (im) {
 			// we set the anim picture for the speaker to always be on the side during dialogue,
 			// but also append the image to the TA so that it remains in the backlog.
-			Sprite2D* image = im->GetSprite2D();
-			ta->SetAnimPicture(image);
+			image = im->GetSprite2D();
 
 			// TODO: I would like to actually append the image as content to the TA
 			// the TA supports this, but unfortunately we destroy the TA at the end of dialog
 			// the TA that replaces it is created via ta->QueryText() on the old one so images are lost!
 			//ta->AppendContent(new ImageSpan(image));
 		}
+		ta->SetAnimPicture(image);
 	}
 	ta->AppendText(L"\n");
 	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
