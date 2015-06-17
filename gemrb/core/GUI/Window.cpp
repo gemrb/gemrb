@@ -125,11 +125,6 @@ Control* Window::GetFocus() const
 	return dynamic_cast<Control*>(FocusedView());
 }
 
-Control* Window::GetScrollControl() const
-{
-	return scrollbar;
-}
-
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
 	if (visibility == INVALID) return;

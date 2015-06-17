@@ -85,9 +85,6 @@ public:
 
 	bool OnSpecialKeyPress(unsigned char key);
 
-	/** Returns the Control which should get mouse scroll events */
-	Control* GetScrollControl() const;
-
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
 	void SetVisibility(Visibility);
