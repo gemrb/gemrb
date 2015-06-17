@@ -902,9 +902,10 @@ static int check_type(Actor* actor, Effect* fx)
 	if (fx->Power) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx->Power);
 		if( efx ) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
 				return 0;
+			}
 		}
 	}
 
@@ -912,18 +913,20 @@ static int check_type(Actor* actor, Effect* fx)
 	if( fx->Source[0]) {
 		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
 		if( efx) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
 				return 0;
+			}
 		}
 	}
 	//decrementing primary type immunity (school)
 	if( fx->PrimaryType) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx->PrimaryType);
 		if( efx) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
 				return 0;
+			}
 		}
 	}
 
@@ -931,9 +934,10 @@ static int check_type(Actor* actor, Effect* fx)
 	if( fx->SecondaryType) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx->SecondaryType);
 		if( efx) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
 				return 0;
+			}
 		}
 	}
 
@@ -990,9 +994,10 @@ static int check_type(Actor* actor, Effect* fx)
 		if( (bounce&BNC_LEVEL_DEC)) {
 			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
 			if( efx) {
-				if (DecreaseEffect(efx))
+				if (DecreaseEffect(efx)) {
 					Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
 					return -1;
+				}
 			}
 		}
 	}
@@ -1000,27 +1005,30 @@ static int check_type(Actor* actor, Effect* fx)
 	if( fx->Source[0] && (bounce&BNC_RESOURCE_DEC)) {
 		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
 		if( efx) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
 				return -1;
+			}
 		}
 	}
 
 	if( fx->PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
 		efx=actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx->PrimaryType);
 		if( efx) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
 				return -1;
+			}
 		}
 	}
 
 	if( fx->SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
 		efx=actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx->SecondaryType);
 		if( efx) {
-			if (DecreaseEffect(efx))
+			if (DecreaseEffect(efx)) {
 				Log(DEBUG, "EffectQueue", "Bounced by usage (decrementing)");
 				return -1;
+			}
 		}
 	}
 
