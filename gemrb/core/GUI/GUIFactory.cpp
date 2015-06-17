@@ -18,11 +18,11 @@
  *
  */
 
-#include "WindowMgr.h"
+#include "GUIFactory.h"
 
 namespace GemRB {
 
-Window* WindowMgr::CreateWindow(ScriptingId winId, const Region& frame, Sprite2D* bg) const
+Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame, Sprite2D* bg) const
 {
 	Window* win = new Window( frame );
 	win->GetScriptingRef(winId);

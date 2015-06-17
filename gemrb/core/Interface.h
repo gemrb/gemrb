@@ -49,7 +49,6 @@
 #include "StringMgr.h"
 #include "SymbolMgr.h"
 #include "Video.h"
-#include "WindowMgr.h"
 #endif
 
 namespace GemRB {
@@ -71,6 +70,7 @@ class Font;
 class Game;
 class GameControl;
 class GlobalTimer;
+class GUIFactory;
 class ITMExtHeader;
 class Image;
 class Item;
@@ -96,7 +96,6 @@ class TextArea;
 class Variables;
 class Video;
 class Window;
-class WindowMgr;
 class WorldMap;
 class WorldMapArray;
 
@@ -324,7 +323,7 @@ private:
 	ProjectileServer * projserv;
 
 	EventMgr * evntmgr;
-	Holder<WindowMgr> windowmgr;
+	Holder<GUIFactory> guifact;
 	MODAL_SHADOW modalShadow;
 	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
@@ -444,8 +443,6 @@ public:
 	Font * GetButtonFont() const;
 	/** Returns the Event Manager */
 	EventMgr * GetEventMgr() const;
-	/** Returns the Window Manager */
-	WindowMgr * GetWindowMgr() const;
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor

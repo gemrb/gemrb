@@ -93,7 +93,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Variables.cpp
 	VEFObject.cpp
 	Video.cpp
-	WindowMgr.cpp
 	WorldMap.cpp
 	WorldMapMgr.cpp
 	GameScript/Actions.cpp
@@ -107,6 +106,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/Console.cpp
 	GUI/Control.cpp
 	GUI/EventMgr.cpp
+	GUI/GUIFactory.cpp
 	GUI/GameControl.cpp
 	GUI/Label.cpp
 	GUI/MapControl.cpp

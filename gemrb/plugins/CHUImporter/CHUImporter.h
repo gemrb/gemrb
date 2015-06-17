@@ -21,7 +21,7 @@
 #ifndef CHUIMPORTER_H
 #define CHUIMPORTER_H
 
-#include "WindowMgr.h"
+#include "GUI/GUIFactory.h"
 
 #include "System/DataStream.h"
 
@@ -31,7 +31,7 @@ namespace GemRB {
   *@author GemRB Developement Team
   */
 
-class CHUImporter : public WindowMgr {
+class CHUImporter : public GUIFactory {
 private:
 	DataStream* str;
 //	bool autoFree;

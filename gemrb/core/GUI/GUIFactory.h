@@ -19,13 +19,12 @@
  */
 
 /**
- * @file WindowMgr.h
- * Declares WindowMgr class, abstract loader for GUI windows and controls
+ * Declares GUIFactory class, abstract loader for GUI windows and controls
  * @author The GemRB Project
  */
 
-#ifndef WINDOWMGR_H
-#define WINDOWMGR_H
+#ifndef GUIFACTORY_H
+#define GUIFACTORY_H
 
 #include "GUI/GUIScriptInterface.h"
 #include "Plugin.h"
@@ -35,18 +34,13 @@ namespace GemRB {
 class DataStream;
 class Window;
 
-/**
- * @class WindowMgr
- * Abstract loader for GUI windows (and controls with them).
- * Contrary to its name, it does not work as a window manager
- */
-
-class GEM_EXPORT WindowMgr : public Plugin {
+// Abstract loader for GUI windows (and controls with them).
+class GEM_EXPORT GUIFactory : public Plugin {
 protected:
 	ResRef winPack;
 public: 
-	WindowMgr() {};
-	virtual ~WindowMgr() {};
+	GUIFactory() {};
+	virtual ~GUIFactory() {};
 
 	/** This function loads all available windows from the 'stream' parameter. */
 	virtual bool Open(DataStream* stream) = 0;

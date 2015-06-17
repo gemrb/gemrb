@@ -70,11 +70,11 @@
 #include "TileMap.h"
 #include "VEFObject.h"
 #include "Video.h"
-#include "WindowMgr.h"
 #include "WorldMapMgr.h"
 #include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/EventMgr.h"
+#include "GUI/GUIFactory.h"
 #include "GUI/GameControl.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
@@ -1639,8 +1639,8 @@ int Interface::Init(InterfaceConfig* config)
 	Log(MESSAGE, "Core", "Broadcasting Event Manager...");
 	video->SetEventMgr( evntmgr );
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
-	if (windowmgr == NULL) {
+	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
+	if (guifact == NULL) {
 		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
@@ -2335,12 +2335,6 @@ EventMgr* Interface::GetEventMgr() const
 	return evntmgr;
 }
 
-/** Returns the Window Manager */
-WindowMgr* Interface::GetWindowMgr() const
-{
-	return windowmgr.get();
-}
-
 /** Get GUI Script Manager */
 ScriptEngine* Interface::GetGUIScriptEngine() const
 {
@@ -2515,7 +2509,7 @@ void Interface::RedrawAll()
 /** Loads a WindowPack (CHUI file) in the Window Manager */
 bool Interface::LoadWindowPack(const char* name)
 {
-	return windowmgr->LoadWindowPack(name);
+	return guifact->LoadWindowPack(name);
 }
 
 /** Loads a Window in the Window Manager */
@@ -2535,7 +2529,7 @@ Window* Interface::LoadWindow(unsigned short WindowID)
 		win = NULL;
 	}
 	if (!win) {
-		win = windowmgr->GetWindow( WindowID );
+		win = guifact->GetWindow( WindowID );
 	}
 	if (win) {
 		win->GetScriptingRef(WindowID);
@@ -2559,7 +2553,7 @@ Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, ch
 			bg = mos->GetSprite2D();
 			}
 		}
-	Window* win = windowmgr->CreateWindow(WindowID, frame, bg);
+	Window* win = guifact->CreateWindow(WindowID, frame, bg);
 		AddWindow(win);
 	return win;
 }
