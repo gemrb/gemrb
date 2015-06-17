@@ -80,7 +80,7 @@ class CharGen:
 				if i == step:
 					button.SetState(IE_GUI_BUTTON_ENABLED)
 					button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.next)
 				else:
 					button.SetState(IE_GUI_BUTTON_DISABLED)
 			i = i + 1
@@ -92,7 +92,7 @@ class CharGen:
 			BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			BackButton.SetState(IE_GUI_BUTTON_DISABLED)
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
+		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.back)
 		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 		AcceptButton = CharGenWindow.GetControl (8)
@@ -110,7 +110,7 @@ class CharGen:
 		ImportButton = CharGenWindow.GetControl (13)
 		ImportButton.SetText (13955)
 		ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportPress)
+		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.imprt)
 
 		#set cancel and start over
 		CancelButton = CharGenWindow.GetControl (15)
@@ -119,7 +119,7 @@ class CharGen:
 		else:
 			CancelButton.SetText (8159) # Start over
 		CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
+		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.cancel)
 
 		#set and fill overview
 		TextAreaControl = CharGenWindow.GetControl (9)
@@ -236,27 +236,6 @@ class CharGen:
 			self.step = self.step + 1
 					 	
 CharGenMaster = None
-
-def CancelPress():
-	"""Revert back to the first step; if there, free the actor."""
-	global CharGenMaster
-	CharGenMaster.cancel()
-
-def ImportPress():
-	"""Opens the character import window."""
-	global CharGenMaster
-	CharGenMaster.imprt()
-
-def BackPress():
-	"""Moves to the previous step."""
-	global CharGenMaster
-	print "back"
-	CharGenMaster.back()
-	
-def NextPress():
-	"""Moves to the next step."""
-	global CharGenMaster
-	CharGenMaster.next()
 
 def back():
 	"""Moves to the previous step."""
