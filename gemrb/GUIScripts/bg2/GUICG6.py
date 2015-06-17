@@ -62,7 +62,6 @@ def OnLoad():
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 
 	RedrawSkills ()
 	SkillWindow.SetVisible(WINDOW_VISIBLE)
@@ -72,7 +71,6 @@ def BackPress():
 	if SkillWindow:
 		SkillWindow.Unload()
 	GemRB.SetNextScript("CharGen6")
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return
 
 def NextPress():
@@ -82,6 +80,5 @@ def NextPress():
 
 	LUSkillsSelection.SkillsSave (MyChar)
 
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	GemRB.SetNextScript("GUICG9") #weapon proficiencies
 	return

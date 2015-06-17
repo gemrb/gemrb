@@ -589,7 +589,6 @@ def OpenSkillsWindow ():
 
 	DCSkillsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	DCSkillsRedraw ()
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 def DCSkillsRedraw ():
@@ -618,5 +617,4 @@ def DCSkillsDonePress ():
 
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return

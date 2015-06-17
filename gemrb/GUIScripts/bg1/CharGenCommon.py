@@ -251,7 +251,6 @@ def BackPress():
 	"""Moves to the previous step."""
 	global CharGenMaster
 	print "back"
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenMaster.back()
 	
 def NextPress():

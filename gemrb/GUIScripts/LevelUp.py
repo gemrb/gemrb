@@ -373,7 +373,6 @@ def OpenLevelUpWindow():
 		TextAreaControl.SetText(GUIREC.GetStatOverview(pc, LevelDiff))
 
 	RedrawSkills()
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
@@ -631,8 +630,6 @@ def LevelUpDonePress():
 		LevelUpWindow.Unload()
 	GUICommonWindows.UpdatePortraitWindow ()
 	GUIREC.UpdateRecordsWindow()
-
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return
 
 def LevelUpHLAPress ():

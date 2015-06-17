@@ -416,7 +416,6 @@ def OpenItemAmountWindow ():
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
-		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 		UsedSlot = None
 		OverSlot = None
 		GUIINV.UpdateInventoryWindow()
@@ -481,7 +480,6 @@ def OpenItemAmountWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#GemRB.UnhideGUI ()
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

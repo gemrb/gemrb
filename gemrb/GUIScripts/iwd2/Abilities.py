@@ -101,8 +101,6 @@ def OnLoad():
 	global AbilityTable
 	global KitIndex, Minimum, Maximum
 	
-	#enable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	Kit = GemRB.GetVar("Class Kit")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
@@ -227,8 +225,6 @@ def LeftPress():
 	return
 
 def BackPress():
-	#disable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	if AbilityWindow:
 		AbilityWindow.Unload()
 	GemRB.SetNextScript("CharGen5")

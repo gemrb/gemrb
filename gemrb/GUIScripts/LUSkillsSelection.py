@@ -311,13 +311,10 @@ def SkillsRedraw (direction=0):
 	#setup doublespeed
 	if SkillsOldDirection == direction:
 		SkillsClickCount = SkillsClickCount + 1
-		if SkillsClickCount>10:
-			GemRB.SetRepeatClickFlags(GEM_RK_QUADRUPLESPEED, OP_OR)
 		return
 
 	SkillsOldDirection = direction
 	SkillsClickCount = 0
-	GemRB.SetRepeatClickFlags(GEM_RK_QUADRUPLESPEED, OP_NAND)
 	return
 
 def SkillJustPress():

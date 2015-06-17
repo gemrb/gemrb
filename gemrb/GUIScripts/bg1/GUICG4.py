@@ -183,7 +183,6 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 def RightPress():
@@ -274,12 +273,9 @@ def RecallPress():
 	return
 
 def BackPress():
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenCommon.back()
 
-def NextPress():
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	
+def NextPress():	
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	
@@ -293,8 +289,6 @@ def NextPress():
 
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
-
-        GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 
 	CharGenCommon.next()
 

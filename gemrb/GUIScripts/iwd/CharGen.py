@@ -1292,7 +1292,6 @@ def AbilitiesPress():
 	global AbilitiesRaceAddTable, AbilitiesRaceReqTable, AbilitiesClassReqTable
 	global HasStrExtra
 
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AbilitiesWindow = GemRB.LoadWindow (4)
 	AbilitiesRaceAddTable = GemRB.LoadTable ("ABRACEAD")
@@ -1535,7 +1534,6 @@ def AbilitiesDonePress():
 	CharGenState = 5
 	SkillsState = 0
 	SetCharacterDescription()
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -1544,7 +1542,6 @@ def AbilitiesCancelPress():
 
 	if AbilitiesWindow:
 		AbilitiesWindow.Unload ()
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -1654,7 +1651,6 @@ def SkillsSelect():
 	SkillsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsCancelPress)
 	SkillsCancelButton.SetText (13727)
 	SkillsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 
 	RedrawSkills()
 	SkillsWindow.SetVisible (WINDOW_VISIBLE)
