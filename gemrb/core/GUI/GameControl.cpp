@@ -1269,6 +1269,12 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		//nextCursor = overInfoPoint->Cursor;
 		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 	}
+	// recheck in case the positioon was different, resulting in a new isVisible check
+	if (nextCursor == IE_CURSOR_INVALID) {
+		Owner->Cursor = IE_CURSOR_BLOCKED;
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
 
 	if (overDoor) {
 		overDoor->Highlight = false;
@@ -1291,6 +1297,13 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 		if (overContainer) {
 			nextCursor = GetCursorOverContainer(overContainer);
+		}
+		// recheck in case the positioon was different, resulting in a new isVisible check
+		// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
+		if (nextCursor == IE_CURSOR_INVALID) {
+			Owner->Cursor = IE_CURSOR_BLOCKED;
+			lastCursor = IE_CURSOR_BLOCKED;
+			return;
 		}
 
 		Actor *prevActor = lastActor;
