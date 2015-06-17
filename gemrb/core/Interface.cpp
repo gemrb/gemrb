@@ -2492,13 +2492,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	return ab;
 }
 
-void Interface::RedrawControls(const char *varname, unsigned int value)
-{
-	for (size_t i=0; i < windows.size(); i++) {
-		windows[i]->RedrawControls(varname, value);
-	}
-}
-
 void Interface::RedrawAll()
 {
 	for (size_t i=0; i < windows.size(); i++) {
@@ -4111,7 +4104,6 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
-	RedrawControls("Progress", percent);
 	RedrawAll();
 	DrawWindows();
 	video->SwapBuffers();

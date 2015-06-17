@@ -475,8 +475,6 @@ public:
 	void DelAllWindows();
 	/** Redraws all window */
 	void RedrawAll();
-	/** Refreshes any control associated with the variable name with value*/
-	void RedrawControls(const char *varname, unsigned int value);
 	/** Popup the Console */
 	void PopupConsole();
 	/** Get the SaveGameIterator */
