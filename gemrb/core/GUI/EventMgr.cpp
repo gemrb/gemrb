@@ -232,6 +232,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 
 void EventMgr::RefreshCursor(int idx)
 {
+	assert(idx != IE_CURSOR_INVALID);
 	Video *video = core->GetVideoDriver();
 	if (idx&IE_CURSOR_GRAY) {
 		video->SetMouseGrayed(true);
