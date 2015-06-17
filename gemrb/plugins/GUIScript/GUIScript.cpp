@@ -123,10 +123,6 @@ static ieResRef GUIResRef[MAX_ACT_COUNT];
 static EventNameType GUIEvent[MAX_ACT_COUNT];
 static bool QuitOnError = false;
 
-// Natural screen size of currently loaded winpack
-static int CHUWidth = 0;
-static int CHUHeight = 0;
-
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 
 // Like PyString_FromString(), but for ResRef
@@ -554,58 +550,23 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_LoadWindowPack__doc,
-"LoadWindowPack(CHUIResRef, [Width=0, Height=0])\n\n"
-"Loads a WindowPack into the Window Manager Module. "
-"Width and Height set winpack's natural screen size if nonzero." );
-
-static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
-{
-	char* string;
-	int width = 0, height = 0;
-	PARSE_ARGS( args, "s|ii", &string, &width, &height );
-
-	if (!core->LoadWindowPack( string )) {
-		return RuntimeError("Can't find resource");
-	}
-
-	CHUWidth = width;
-	CHUHeight = height;
-
-	if ( (width && (width>core->Width)) ||
-			(height && (height>core->Height)) ) {
-		Log(ERROR, "GUIScript", "Screen is too small! This window requires %d x %d resolution.",
-			width, height);
-		return RuntimeError("Please change your settings.");
-	}
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
-"LoadWindow(WindowID) => WindowIndex\n\n"
+"LoadWindow(WindowID[, WinPack]) => GWindow\n\n"
 "Returns a Window." );
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowID;
-	PARSE_ARGS( args, "i", &WindowID );
+	char* ref = NULL;
+	PARSE_ARGS( args, "i|s", &WindowID, &ref );
 
-	Window* win = core->LoadWindow( WindowID );
+	Window* win = core->LoadWindow( WindowID, ref );
 	if (!win) {
 		char buf[256];
 		snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );
 		return RuntimeError(buf);
 	}
 
-	// If the current winpack windows are placed for screen resolution
-	// other than the current one, reposition them
-	Region winFrame = win->Frame();
-	if (CHUWidth && CHUWidth != core->Width)
-		winFrame.x += (core->Width - CHUWidth) / 2;
-	if (CHUHeight && CHUHeight != core->Height)
-		winFrame.y += (core->Height - CHUHeight) / 2;
-
-	win->SetFrame(winFrame);
 	return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
 }
 
@@ -9122,7 +9083,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadMusicPL, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
-	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
 	METHOD(Log, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),

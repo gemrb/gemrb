@@ -2506,18 +2506,13 @@ void Interface::RedrawAll()
 	}
 }
 
-/** Loads a WindowPack (CHUI file) in the Window Manager */
-bool Interface::LoadWindowPack(const char* name)
-{
-	return guifact->LoadWindowPack(name);
-}
-
 /** Loads a Window in the Window Manager */
-Window* Interface::LoadWindow(unsigned short WindowID)
+Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
 {
-	unsigned int i;
-	GameControl *gc = GetGameControl ();
+	if (ref) // is the winpack changing?
+		guifact->LoadWindowPack(ref);
 
+	unsigned int i;
 	Window* win = NULL;
 	for (i = 0; i < windows.size(); i++) {
 		win = windows[i];
@@ -2535,6 +2530,7 @@ Window* Interface::LoadWindow(unsigned short WindowID)
 		win->GetScriptingRef(WindowID);
 		SetOnTop( win );
 
+		GameControl *gc = GetGameControl ();
 		if (gc)
 			gc->SetScrolling( false );
 
@@ -2979,7 +2975,7 @@ void Interface::AskAndExit()
 		SetPause(PAUSE_ON);
 		vars->SetAt("AskAndExit", 1);
 
-		LoadWindowPack("GUIOPT");
+		guifact->LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
 		Log(MESSAGE, "Info", "Press ctrl-c (or close the window) again to quit GemRB.\n");
 	} else {

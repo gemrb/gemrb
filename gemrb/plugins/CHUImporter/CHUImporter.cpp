@@ -499,6 +499,10 @@ unsigned int CHUImporter::GetWindowsCount()
 /** Loads a WindowPack (CHUI file) in the Window Manager */
 bool CHUImporter::LoadWindowPack(const ResRef& ref)
 {
+	if (ref == winPack) {
+		return true; // already loaded
+	}
+
 	DataStream* stream = gamedata->GetResource( ref, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
 		Log(ERROR, "CHUImporter", "Error: Cannot find %s.chu", ref.CString() );
