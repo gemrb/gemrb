@@ -2702,17 +2702,6 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_DrawWindows__doc,
-"DrawWindows()\n\n"
-"Refreshes the User Interface." );
-
-static PyObject* GemRB_DrawWindows(PyObject * /*self*/, PyObject * /*args*/)
-{
-	core->DrawWindows();
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Quit__doc,
 "Quit()\n\n"
 "Quits GemRB." );
@@ -8968,7 +8957,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DispelEffect, METH_VARARGS),
 	METHOD(DisplayString, METH_VARARGS),
 	METHOD(DragItem, METH_VARARGS),
-	METHOD(DrawWindows, METH_NOARGS),
 	METHOD(DropDraggedItem, METH_VARARGS),
 	METHOD(DumpActor, METH_VARARGS),
 	METHOD(EnableCheatKeys, METH_VARARGS),

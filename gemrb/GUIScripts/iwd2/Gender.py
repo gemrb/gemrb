@@ -45,7 +45,6 @@ def OnLoad():
 	BiographyButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	GenderWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.DrawWindows()
 	if GenderWindow:
 		GenderWindow.Unload()
 	GenderWindow = GemRB.LoadWindow(1)

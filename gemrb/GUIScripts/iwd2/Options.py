@@ -35,8 +35,6 @@ def OnLoad():
 	CharactersBarWindow = GemRB.LoadWindow(1)
 	CharactersBarWindow.SetVisible(WINDOW_VISIBLE)
 
-	GemRB.DrawWindows()
-
 	MessageBarWindow.SetVisible(WINDOW_INVISIBLE)
 	CharactersBarWindow.SetVisible(WINDOW_INVISIBLE)
 
