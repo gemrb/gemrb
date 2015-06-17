@@ -3523,9 +3523,11 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	// if filename is not set we assume we are creating defaults without an INI
 	if (iniFileName[0] && !ini->Open(iniStream)) {
 		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
-		delete iniStream;
 	} else {
 		overrides = ini.get();
+	}
+	if (ini->GetTagsCount() == 0) {
+		delete iniStream; // Open deletes it itself on success
 	}
 
 	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
