@@ -30,6 +30,7 @@
 namespace GemRB {
 
 class ScrollBar;
+class Sprite2D;
 class ViewScriptingRef;
 
 class View {
@@ -74,15 +75,8 @@ public:
 	struct DragOp : public Held<DragOp> {
 		View* dragView;
 
-		DragOp(View* v, Sprite2D* c) : dragView(v)
-		{
-			core->GetVideoDriver()->SetCursor(c, VID_CUR_DRAG);
-		}
-
-		virtual ~DragOp() {
-			dragView->CompleteDragOperation(*this);
-			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
-		}
+		DragOp(View* v, Sprite2D* c);
+		virtual ~DragOp();
 	};
 
 	enum AutoresizeFlags {

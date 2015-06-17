@@ -28,12 +28,13 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "GUI/Control.h"
+#include "View.h"
 
 #include <vector>
 
 namespace GemRB {
 
+class Control;
 class Sprite2D;
 
 // !!! Keep these synchronized with GUIDefines.py !!!

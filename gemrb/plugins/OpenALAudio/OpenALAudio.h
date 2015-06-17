@@ -28,7 +28,6 @@
 
 #include "ie_types.h"
 
-#include "Interface.h"
 #include "LRUCache.h"
 #include "MusicMgr.h"
 #include "SoundMgr.h"

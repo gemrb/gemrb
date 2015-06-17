@@ -26,9 +26,9 @@
 #include "globals.h"
 #include "win32def.h"
 
-#include "Interface.h"
-
 namespace GemRB {
+
+class Video;
 
 class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;

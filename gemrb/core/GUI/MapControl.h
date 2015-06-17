@@ -29,7 +29,6 @@
 #include "GUI/Control.h"
 
 #include "exports.h"
-#include "Interface.h"
 
 namespace GemRB {
 

@@ -25,6 +25,16 @@
 
 namespace GemRB {
 
+View::DragOp::DragOp(View* v, Sprite2D* c) : dragView(v)
+{
+	core->GetVideoDriver()->SetCursor(c, VID_CUR_DRAG);
+}
+
+View::DragOp::~DragOp() {
+	dragView->CompleteDragOperation(*this);
+	core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
+}
+
 int View::ToolTipDelay = 500;
 unsigned long View::TooltipTime = 0;
 View* View::TooltipView = NULL;

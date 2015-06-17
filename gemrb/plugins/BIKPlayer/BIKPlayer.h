@@ -26,14 +26,14 @@
 #include "globals.h"
 #include "win32def.h"
 
-#include "Interface.h"
-
 // FIXME: This has to be included last, since it defines int*_t, which causes
 // mingw g++ 4.5.0 to choke.
 #include "GetBitContext.h"
 #include "common.h"
 #include "dsputil.h"
 #include "rational.h"
+
+#include <vector>
 
 namespace GemRB {
 
@@ -152,6 +152,8 @@ typedef struct Bundle {
 	  uint8_t *cur_dec;  ///< pointer to the not yet decoded part of the buffer
 	  uint8_t *cur_ptr;  ///< pointer to the data that is not read from buffer yet
 } Bundle;
+
+class Video;
 
 class BIKPlayer : public MoviePlayer {
 private:

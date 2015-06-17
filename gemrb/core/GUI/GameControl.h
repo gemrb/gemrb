@@ -32,7 +32,6 @@
 #include "exports.h"
 
 #include "Dialog.h"
-#include "Interface.h"
 #include "Map.h"
 
 namespace GemRB {
