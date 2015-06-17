@@ -2583,16 +2583,9 @@ void Interface::AddWindow(Window* win)
 }
 
 /** Set the Tooltip text of a Control */
-void Interface::SetTooltip(Control* ctrl, const char* cstring, int Function)
+void Interface::SetTooltip(Control* ctrl, const char* cstring)
 {
 	if (!ctrl) return;
-
-	Window* win = ctrl->Owner;
-	if (Function) {
-		win->FunctionBar = true;
-		evntmgr->SetFunctionBar(win);
-		ctrl->SetFunctionNumber(Function-1);
-	}
 
 	String* string = StringFromCString(cstring);
 	if (string) {

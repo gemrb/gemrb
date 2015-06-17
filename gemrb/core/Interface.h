@@ -456,7 +456,7 @@ public:
 	/** Add a window to the Window List */
 	void AddWindow(Window * win);
 	/** Set the Tooltip text of a Control */
-	void SetTooltip(Control*, const char * string, int Function = 0);
+	void SetTooltip(Control*, const char * string);
 	/** Actually draws tooltip on the screen. */
 	void DrawTooltip(const String&, Point p);
 	/** returns the label which should receive game messages (overrides messagetextarea) */

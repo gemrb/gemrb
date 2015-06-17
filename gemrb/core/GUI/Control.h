@@ -103,8 +103,6 @@ public: // Public attributes
 	/** Owner Window */
 	Window* Owner;
 
-	/** Associated function key index, 0 based, -1 is unassigned */
-	ieDword FunctionNumber;
 public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(ControlEventHandler &handler);
@@ -121,10 +119,6 @@ public: //Events
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
 	virtual void SetAnimPicture(Sprite2D* Picture);
-
-	/** Assigned function key */
-	void SetFunctionNumber(int x) { FunctionNumber = x; }
-	int GetFunctionNumber() { return FunctionNumber; }
 
 	ieDword GetValue() const { return Value; }
 	void SetValue(ieDword val) { Value = val; }

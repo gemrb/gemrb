@@ -251,13 +251,13 @@ static void SetFunctionTooltip(Control* ctrl, char *txt, int Function)
 			char *txt2 = (char *) malloc(strlen(txt)+10);
 			sprintf(txt2,"F%d - %s",Function,txt);
 			core->FreeString(txt);
-			core->SetTooltip(ctrl, txt2, Function);
+			core->SetTooltip(ctrl, txt2);
 			free (txt2);
 			return;
 		}
 		core->FreeString(txt);
 	}
-	core->SetTooltip(ctrl, "", -1);
+	core->SetTooltip(ctrl, "");
 }
 
 static void ReadItemSounds()

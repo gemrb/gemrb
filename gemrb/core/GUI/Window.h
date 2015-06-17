@@ -85,9 +85,6 @@ public:
 
 	bool OnSpecialKeyPress(unsigned char key);
 
-	/** Returns the Control associated with the function key index, valid indices are 0-11 */
-	Control* GetFunctionControl(int x);
-
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
 
@@ -112,7 +109,6 @@ public: //Public attributes
 	unsigned short WindowID;
 
 	int Cursor;
-	bool FunctionBar;
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;

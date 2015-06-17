@@ -36,7 +36,6 @@ Window::Window(const Region& frame)
 {
 	visibility = Window::INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
-	FunctionBar = false;
 
 	focusView = NULL;
 	trackingView = NULL;
@@ -119,21 +118,6 @@ void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 		edge = WinFrameEdge(3); // bottom
 		video->BlitSprite(edge, sideW, core->Height - edge->Height, true);
 	}
-}
-
-Control* Window::GetFunctionControl(int x)
-{
-	if (!FunctionBar) {
-		return NULL;
-	}
-
-	std::vector< Control*>::const_iterator m;
-
-	for (m = Controls.begin(); m != Controls.end(); m++) {
-		Control *ctrl = *m;
-		if ( ctrl->GetFunctionNumber() == x ) return ctrl;
-	}
-	return NULL;
 }
 
 Control* Window::GetFocus() const
@@ -271,7 +255,7 @@ bool Window::OnSpecialKeyPress(unsigned char key)
 	else if (key == GEM_ESCAPE) {
 		//ctrl = GetDefaultControl(1);
 	} else if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
-		ctrl = GetFunctionControl(key - GEM_FUNCTION1);
+		// TODO: implement hotkeys
 	} else {
 		ctrl = dynamic_cast<Control*>(FocusedView());
 	}
