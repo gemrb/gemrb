@@ -173,14 +173,18 @@ class GButton(GControl):
     'SetState': _GemRB.Button_SetState,
     'SetPictureClipping': _GemRB.Button_SetPictureClipping,
     'SetPicture': _GemRB.Button_SetPicture,
-    'SetSprite2D': _GemRB.Button_SetSprite2D,
-    'SetMOS': _GemRB.Button_SetMOS,
     'SetPLT': _GemRB.Button_SetPLT,
     'SetBAM': _GemRB.Button_SetBAM,
     'SetSpellIcon': _GemRB.Button_SetSpellIcon,
     'SetItemIcon': _GemRB.Button_SetItemIcon,
     'SetActionIcon': _GemRB.Button_SetActionIcon
   }
+
+  def SetMOS(self, mos):
+	  self.SetPicture(mos) # backwards compatibility
+  
+  def SetSprite2D(self, spr):
+	  self.SetPicture(spr) # backwards compatibility
 
   def CreateLabel(self, labelid, *args):
     frame = self.GetFrame()

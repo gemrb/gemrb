@@ -2322,96 +2322,48 @@ static PyObject* GemRB_Button_SetPictureClipping(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
-"SetButtonPicture(WindowIndex, ControlIndex, PictureResRef, DefaultResRef)\n\n"
-"Sets the Picture of a Button Control from a BMP file. You can also supply a default picture." );
+"SetButtonPicture(Button, PictureResRef|Sprite2D, DefaultResRef|Sprite2D)\n\n"
+"Sets the Picture of a Button Control from a MOS/BMP file. You can also supply a default picture." );
 
 static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 {
-	char *ResRef;
-	char *DefResRef = NULL;
-	PARSE_ARGS( args,  "Os|s", &self, &ResRef, &DefResRef );
+	PyObject* pypic, *pydefaultPic;
+	PARSE_ARGS( args,  "OO|O", &self, &pypic, &pydefaultPic );
 
 	Button* btn = GetView<Button>(self);
 	if (!btn) {
 		return RuntimeError("Cannot find the button!\n");
 	}
 
-	if (ResRef[0] == 0) {
-		btn->SetPicture( NULL );
-		Py_RETURN_NONE;
+	Holder<Sprite2D> pic = NULL;
+	if (PyObject_TypeCheck( pypic, &PyString_Type )) {
+		ResourceHolder<ImageMgr> im(PyString_AsString(pypic));
+		if (im) {
+			pic = im->GetSprite2D();
+			pic->release(); // prevent leak
+		} else {
+			return RuntimeError("Picture resource not found!\n");
+		}
+	} else {
+		pic = CObject<Sprite2D>(pypic);
 	}
 
-	ImageFactory* fact = ( ImageFactory* )
-		gamedata->GetFactoryResource(ResRef, IE_BMP_CLASS_ID, IE_NORMAL, true);
-
-	//if the resource doesn't exist, but we have a default resource
-	//use this resource
-	if (!fact && DefResRef) {
-		fact = ( ImageFactory* )
-			gamedata->GetFactoryResource( DefResRef, IE_BMP_CLASS_ID, IE_NORMAL );
+	if (!pic) {
+		// use default pic
+		if (PyObject_TypeCheck( pydefaultPic, &PyString_Type )) {
+			ResourceHolder<ImageMgr> im(PyString_AsString(pydefaultPic));
+			if (im) {
+				pic = im->GetSprite2D();
+				pic->release(); // prevent leak
+			} else {
+				return RuntimeError("Picture resource not found!\n");
+			}
+		} else {
+			pic = CObject<Sprite2D>(pydefaultPic);
+		}
 	}
 
-	if (!fact) {
-		return RuntimeError("Picture resource not found!\n");
-	}
-
-	Sprite2D* Picture = fact->GetSprite2D();
-	if (Picture == NULL) {
-		return RuntimeError("Failed to acquire the picture!\n");
-	}
-
-	btn->SetPicture( Picture );
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Button_SetSprite2D__doc,
-"Button.SetSprite2D(WindowIndex, ControlIndex, Sprite2D)\n\n"
-"Sets a Sprite2D onto a button as picture." );
-
-static PyObject* GemRB_Button_SetSprite2D(PyObject* self, PyObject* args)
-{
-	PyObject *obj;
-	PARSE_ARGS( args,  "OO", &self, &obj );
-	Button* btn = GetView<Button>(self);
-	ABORT_IF_NULL(btn);
-
-	CObject<Sprite2D> spr(obj);
-
-	btn->SetPicture( spr.get() );
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Button_SetMOS__doc,
-"SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)\n\n"
-"Sets the Picture of a Button Control from a MOS file." );
-
-static PyObject* GemRB_Button_SetMOS(PyObject* self, PyObject* args)
-{
-	char *ResRef;
-	PARSE_ARGS( args,  "Os", &self, &ResRef );
-
-	Button* btn = GetView<Button>(self);
-	ABORT_IF_NULL(btn);
-
-	if (ResRef[0] == 0) {
-		btn->SetPicture( NULL );
-		Py_RETURN_NONE;
-	}
-
-	ResourceHolder<ImageMgr> im(ResRef);
-	if (im == NULL) {
-		return RuntimeError("Picture resource not found!\n");
-	}
-
-	Sprite2D* Picture = im->GetSprite2D();
-	if (Picture == NULL) {
-		return RuntimeError("Failed to acquire the picture!\n");
-	}
-
-	btn->SetPicture( Picture );
-
+	btn->SetPicture(pic.get());
 	Py_RETURN_NONE;
 }
 
@@ -3120,27 +3072,6 @@ static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* /*args*/)
 {
 	GET_GAMECONTROL();
 	return CObject<Sprite2D>(gc->GetPreview());
-}
-
-PyDoc_STRVAR( GemRB_GetPCPortrait__doc,
-"GemRB_GetPCPortrait(PCSlotCount)\n\n"
-"Gets a current game PC portrait." );
-
-static PyObject* GemRB_GetPCPortrait(PyObject * /*self*/, PyObject* args)
-{
-	int PCSlotCount;
-	PARSE_ARGS( args,  "i", &PCSlotCount );
-
-	GET_GAME();
-	Actor* actor = game->GetPC( PCSlotCount, false );
-	if (actor) {
-		Sprite2D* portrait = actor->CopyPortrait(1);
-		CObject<Sprite2D> obj(portrait);
-		portrait->release();
-		return obj;
-	} else {
-		Py_RETURN_NONE;
-	}
 }
 
 PyDoc_STRVAR( GemRB_Roll__doc,
@@ -4030,17 +3961,19 @@ PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
 
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, Which;
+	int slot, which = 0;
+	PARSE_ARGS( args,  "i|i", &slot, &which );
 
-	Which = 0;
-	PARSE_ARGS( args,  "i|i", &PlayerSlot, &Which );
 	GET_GAME();
-
-	Actor* MyActor = game->FindPC( PlayerSlot );
-	if (!MyActor) {
-		return PyString_FromString( "");
+	Actor* actor = game->GetPC( slot, false );
+	if (actor) {
+		Sprite2D* portrait = actor->CopyPortrait(which);
+		CObject<Sprite2D> obj(portrait);
+		portrait->release();
+		return obj;
+	} else {
+		Py_RETURN_NONE;
 	}
-	return PyString_FromString( Which ? MyActor->SmallPortrait : MyActor->LargePortrait );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerString__doc,
@@ -8997,7 +8930,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetDamageReduction, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
-	METHOD(GetPCPortrait, METH_VARARGS),
 	METHOD(GetGamePreview, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
 	METHOD(GetGameTime, METH_NOARGS),
@@ -9147,13 +9079,11 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetAnchor, METH_VARARGS),
 	METHOD(Button_SetPushOffset, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
-	METHOD(Button_SetMOS, METH_VARARGS),
 	METHOD(Button_SetOverlay, METH_VARARGS),
 	METHOD(Button_SetPLT, METH_VARARGS),
 	METHOD(Button_SetPicture, METH_VARARGS),
 	METHOD(Button_SetPictureClipping, METH_VARARGS),
 	METHOD(Button_SetSpellIcon, METH_VARARGS),
-	METHOD(Button_SetSprite2D, METH_VARARGS),
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
