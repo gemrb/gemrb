@@ -214,8 +214,6 @@ void GameControl::ClearMouseState()
 	DrawSelectionRect = false;
 	FormationRotation = false;
 	DoubleClick = false;
-	//refresh the mouse cursor
-	core->GetEventMgr()->FakeMouseMove();
 }
 
 // generate an action to do the actual movement
@@ -1980,7 +1978,6 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 		PerformActionOn(actor);
 	}
 	FormationRotation = false;
-	core->GetEventMgr()->FakeMouseMove();
 }
 
 void GameControl::OnMouseWheelScroll(short x, short y)
@@ -1995,8 +1992,6 @@ void GameControl::OnMouseWheelScroll(short x, short y)
 	} else {
 		MoveViewportTo( Viewport.Origin(), false);
 	}
-	//update cursor
-	core->GetEventMgr()->FakeMouseMove();
 }
 
 void GameControl::PerformActionOn(Actor *actor)
@@ -2110,8 +2105,6 @@ void GameControl::PerformActionOn(Actor *actor)
 //sets target mode, and resets the cursor
 void GameControl::SetTargetMode(int mode) {
 	target_mode = mode;
-	//refresh the mouse cursor
-	core->GetEventMgr()->FakeMouseMove();
 }
 
 void GameControl::ResetTargetMode() {

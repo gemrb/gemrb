@@ -119,12 +119,6 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		// speaker portrait
 		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.x, drawFrame.y + EDGE_PADDING, true);
 	}
-
-	if (selectOptions) {
-		// This hack is to refresh the mouse cursor so that option below cursor gets
-		// highlighted during a dialog
-		core->GetEventMgr()->FakeMouseMove();
-	}
 }
 
 void TextArea::SizeChanged(const Size& /*oldSize*/)
@@ -467,7 +461,6 @@ void TextArea::OnMouseWheelScroll(short /*x*/, short y)
 		if ((long)fauxY + y <= 0) fauxY = 0;
 		else fauxY += y;
 		ScrollToY((int)fauxY);
-		core->GetEventMgr()->FakeMouseMove();
 	}
 }
 

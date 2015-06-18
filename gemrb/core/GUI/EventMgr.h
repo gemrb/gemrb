@@ -115,8 +115,6 @@ public:
 	void Clear();
 	/** Call this to change the cursor (moving over windows will change it back) */
 	void RefreshCursor(int idx);
-	/** Trigger a fake MouseMove event with current coordinates (typically used to refresh cursor) */
-	void FakeMouseMove();
 	/** BroadCast Mouse Move Event */
 	void MouseMove(unsigned short x, unsigned short y);
 	/** BroadCast Mouse Move Event */
