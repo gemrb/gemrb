@@ -38,6 +38,7 @@
 #include "DisplayMessage.h"
 #include "GameData.h"
 #include "Image.h"
+#include "ImageMgr.h"
 #include "Item.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack
 #include "Projectile.h"
@@ -5718,6 +5719,12 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int
 void Actor::SetDialog(const ieResRef resref)
 {
 	CopyResRef(Dialog, resref);
+}
+
+Sprite2D* Actor::CopyPortrait(int which) const
+{
+	ResourceHolder<ImageMgr> im( which ? SmallPortrait : LargePortrait );
+	return im->GetSprite2D();
 }
 
 const char *Actor::GetDialog(int flags) const

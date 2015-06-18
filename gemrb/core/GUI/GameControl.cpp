@@ -2512,12 +2512,8 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	if (! actor) {
 		return NULL;
 	}
-	ResourceHolder<ImageMgr> im(actor->GetPortrait(true));
-	if (! im) {
-		return NULL;
-	}
 
-	Sprite2D* img = im->GetSprite2D();
+	Sprite2D* img = actor->CopyPortrait(true);
 
 	if (ratio == 1)
 		return img;

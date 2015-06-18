@@ -4032,7 +4032,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return PyString_FromString( "");
 	}
-	return PyString_FromString( MyActor->GetPortrait(Which) );
+	return PyString_FromString( Which ? MyActor->SmallPortrait : MyActor->LargePortrait );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerString__doc,

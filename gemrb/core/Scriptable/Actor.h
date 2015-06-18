@@ -503,11 +503,8 @@ public:
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(int flags=GD_NORMAL) const;
 	void SetDialog(const ieResRef resref);
-	/** Gets the Portrait ResRef */
-	const char* GetPortrait(int which) const
-	{
-		return which ? SmallPortrait : LargePortrait;
-	}
+	/** Gets the Portrait */
+	Sprite2D* CopyPortrait(int which) const;
 
 	/** Gets the attack projectile */
 	Projectile* GetAttackProjectile()
