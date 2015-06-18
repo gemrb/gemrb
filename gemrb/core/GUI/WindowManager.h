@@ -41,16 +41,6 @@ public:
 		ShadowBlack
 	};
 
-	enum WindowPosition {
-		PosTop = 1,
-		PosBottom = 2,
-		PosVmid = 3,
-		PosLeft = 4,
-		PosRight = 8,
-		PosHmid = 12,
-		PosCentered = 15
-	};
-
 private:
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened

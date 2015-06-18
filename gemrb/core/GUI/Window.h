@@ -66,6 +66,17 @@ public:
 		GRAYED		= 2,
 		FRONT		= 3
 	};
+
+	enum WindowPosition {
+		PosTop = 1,
+		PosBottom = 2,
+		PosVmid = 3,
+		PosLeft = 4,
+		PosRight = 8,
+		PosHmid = 12,
+		PosCentered = 15
+	};
+
 private:
 	ViewScriptingRef* MakeNewScriptingRef(ScriptingId id);
 
@@ -91,6 +102,7 @@ public:
 
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
+	void SetPosition(WindowPosition);
 	void SetVisibility(Visibility);
 	Visibility WindowVisibility() { return visibility; }
 	/** Returns last focused control */

@@ -102,6 +102,28 @@ void Window::SetFocused(Control* ctrl)
 	}
 }
 
+void Window::SetPosition(WindowPosition pos)
+{
+	// start at top left
+	Region newFrame(Point(), frame.Dimensions());
+	Size screen = manager.ScreenSize();
+
+	// adjust horizontal
+	if (pos&PosHmid) {
+		newFrame.x = (screen.w / 2) - (newFrame.w) / 2;
+	} else if (pos&PosRight) {
+		newFrame.x = screen.w - newFrame.w;
+	}
+
+	// adjust vertical
+	if (pos&PosVmid) {
+		newFrame.y = (screen.h / 2) - (newFrame.h) / 2;
+	} else if (pos&PosBottom) {
+		newFrame.y = screen.h - newFrame.h;
+	}
+	SetFrame(newFrame);
+}
+
 void Window::SetVisibility(Visibility vis)
 {
 	if (vis == visibility) return;

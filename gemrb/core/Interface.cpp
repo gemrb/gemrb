@@ -2488,6 +2488,7 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
 	}
 	if (win) {
 		win->GetScriptingRef(WindowID);
+		win->SetPosition(Window::PosCentered);
 		winmgr.FocusWindow( win );
 
 		GameControl *gc = GetGameControl ();
@@ -2501,12 +2502,12 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
 Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
 {
 	Sprite2D* bg = NULL;
-		if (Background[0]) {
-			ResourceHolder<ImageMgr> mos(Background);
-			if (mos != NULL) {
+	if (Background[0]) {
+		ResourceHolder<ImageMgr> mos(Background);
+		if (mos != NULL) {
 			bg = mos->GetSprite2D();
-			}
 		}
+	}
 	Window* win = guifact->CreateWindow(WindowID, frame, bg);
 	return win;
 }
