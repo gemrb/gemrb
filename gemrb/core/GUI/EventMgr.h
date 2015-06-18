@@ -100,6 +100,10 @@ private:
 	Window* last_win_over;
 	/** Sets a Window on the Top of the Window Queue */
 public:
+	static unsigned long DCDelay;
+	static unsigned long RCDelay;
+
+public:
 	EventMgr(void);
 	~EventMgr(void) {};
 	/** Adds a Window to the Event Manager */
@@ -131,9 +135,6 @@ public:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Sets focus to the control of the window */
 	void SetFocused(Window *win, Control *ctrl);
-	/** Sets the maximum accepted doubleclick delay */
-	void SetDCDelay(unsigned long t);
-	void SetRKDelay(unsigned long t);
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 	void inline SetFunctionBar(Window *win) { function_bar = win; }

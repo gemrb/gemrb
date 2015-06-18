@@ -1216,7 +1216,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
-	CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
+	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
 	CONFIG_INT("DrawFPS", DrawFPS = );
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 	CONFIG_INT("EndianSwitch", DataStream::SetBigEndian);
@@ -1227,7 +1227,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
-	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
+	CONFIG_INT("RepeatKeyDelay", EventMgr::RCDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
 	CONFIG_INT("TooltipDelay", TooltipDelay = );

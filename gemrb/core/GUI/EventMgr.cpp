@@ -33,6 +33,9 @@
 
 namespace GemRB {
 
+unsigned long EventMgr::DCDelay;
+unsigned long EventMgr::RCDelay;
+
 EventMgr::EventMgr(void)
 {
 	// Function bar window (for function keys)
@@ -298,16 +301,6 @@ void EventMgr::SetFocused(Window* win, Control* ctrl)
 	last_win_focused->SetFocused(ctrl);
 	//this is to refresh changing mouse cursors should the focus change)
 	FakeMouseMove();
-}
-
-void EventMgr::SetDCDelay(unsigned long t)
-{
-	dc_delay = t;
-}
-
-void EventMgr::SetRKDelay(unsigned long t)
-{
-	rk_delay = t;
 }
 
 unsigned long EventMgr::GetRKDelay()
