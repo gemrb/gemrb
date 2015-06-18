@@ -63,8 +63,7 @@ public:
 		INVALID		= -1,
 		INVISIBLE	= 0,
 		VISIBLE		= 1,
-		GRAYED		= 2,
-		FRONT		= 3
+		GRAYED		= 2
 	};
 
 	enum WindowPosition {

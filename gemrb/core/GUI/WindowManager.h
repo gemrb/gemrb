@@ -47,6 +47,7 @@ private:
 
 	Video* video;
 	Size screen;
+	Window* modalWin;
 	ModalShadow modalShadow;
 
 	EventMgr eventMgr;

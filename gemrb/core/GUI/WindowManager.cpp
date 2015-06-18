@@ -40,11 +40,12 @@ bool WindowManager::IsOpenWindow(Window* win) const
 
 bool WindowManager::IsPresentingModalWindow() const
 {
-	return (windows.size() && windows.front() && windows.front()->WindowVisibility() == Window::FRONT);
+	return modalWin != NULL;
 }
 
 WindowManager::WindowManager(Video* vid)
 {
+	modalWin = NULL;
 	modalShadow = ShadowNone;
 	SetVideoDriver(vid);
 }
@@ -54,8 +55,8 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 {
 	if (!IsOpenWindow(win) || IsPresentingModalWindow()) return false;
 
-	win->SetVisibility(Window::FRONT);
 	FocusWindow( win );
+	modalWin = win;
 
 	core->PlaySound(DS_WINDOW_OPEN);
 	modalShadow = Shadow;
@@ -100,6 +101,10 @@ void WindowManager::CloseWindow(Window* win)
 {
 	if (!IsOpenWindow(win)) return;
 
+	if (win == modalWin) {
+		modalWin = NULL;
+	}
+
 	WindowList::iterator it = windows.begin();
 	it = std::find(it, windows.end(), win);
 	if (it != windows.end()) {
@@ -125,18 +130,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	static bool modalShield = false;
-
-	Window* win = NULL;
-	Window::Visibility vis = Window::INVALID;
-	WindowList::const_iterator it = windows.begin();
-	for (; it != windows.end(); ++it) {
-		win = *it;
-		vis = win->WindowVisibility();
-		if (vis > Window::INVISIBLE)
-			break; // found the frontmost visible win
-	}
-
-	if (vis == Window::FRONT) {
+	if (modalWin) {
 		if (!modalShield) {
 			// only draw the shield layer once
 			Color shieldColor = Color(); // clear
@@ -149,11 +143,21 @@ void WindowManager::DrawWindows() const
 			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
 			modalShield = true;
 		}
-		win->Draw();
+		modalWin->Draw();
 		return;
 	}
 	modalShield = false;
 
+	Window* win = NULL;
+	Window::Visibility vis = Window::INVALID;
+	WindowList::const_iterator it = windows.begin();
+	for (; it != windows.end(); ++it) {
+		win = *it;
+		vis = win->WindowVisibility();
+		if (vis > Window::INVISIBLE)
+			break; // found the frontmost visible win
+	}
+	assert(win);
 	const Region& frontWinFrame = win->Frame();
 	win = NULL;
 	// we have to draw windows from the bottom up so the front window is drawn last
@@ -185,8 +189,6 @@ void WindowManager::DrawWindows() const
 				}
 				// fallthrough
 				 */
-			case Window::FRONT: // already handled the modal window
-				continue; // window is invalid, deleted, or modal so force continue
 			case Window::GRAYED:
 				if (win->NeedsDraw()) {
 					// Important to only draw if the window itself is dirty

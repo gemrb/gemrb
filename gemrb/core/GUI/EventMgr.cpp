@@ -217,9 +217,6 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			RefreshCursor(mouseTrackingWin->Cursor);
 			return;
 		}
-
-		if (win->WindowVisibility() == Window::FRONT) //stop looking further
-			break;
 	}
 }
 
