@@ -121,6 +121,7 @@ static ieWord IDT_SKILLPENALTY = 3;
 static int MagicBit = 0;
 
 Interface::Interface()
+: winmgr(NULL)
 {
 	unsigned int i;
 	for(i=0;i<256;i++) {
@@ -143,12 +144,9 @@ Interface::Interface()
 	InfoTextPalette = NULL;
 	timer = NULL;
 	displaymsg = NULL;
-	evntmgr = NULL;
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
-
-	modalShadow = MODAL_SHADOW_NONE;
 
 	pal16 = NULL;
 	pal32 = NULL;
@@ -340,8 +338,6 @@ Interface::~Interface(void)
 		delete[] Cursors;
 	}
 
-	DelAllWindows();
-
 	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
@@ -392,8 +388,6 @@ Interface::~Interface(void)
 		video->SetCursor(NULL, VID_CUR_DOWN);
 	}
 
-	delete evntmgr;
-
 	delete vars;
 	delete tokens;
 	if (lists) {
@@ -426,17 +420,15 @@ GameControl* Interface::StartGameControl()
 	if (ConsolePopped) {
 		PopupConsole();
 	}
-	DelAllWindows();//deleting ALL windows
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
-	Window* gamewin = new Window( screen );
+	Window* gamewin = winmgr.MakeWindow(screen);
 	gamewin->GetScriptingRef(99);
 	GameControl* gc = new GameControl(screen);
 	gamewin->AddSubviewInFrontOfView(gc);
-	AddWindow( gamewin );
 	gamewin->SetVisibility(Window::VISIBLE);
 	//setting the focus to the game control
-	evntmgr->SetFocused(gamewin, gc);
+	winmgr.FocusWindow(gamewin);
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
 		gc->SetGUIHidden(false);
@@ -940,7 +932,10 @@ void Interface::Main()
 		HandleGUIBehaviour();
 
 		GameLoop();
-		DrawWindows(true);
+		winmgr.DrawWindows();
+		if (ConsolePopped) {
+			console->Draw();
+		}
 		if (DrawFPS) {
 			frame++;
 			time = GetTickCount();
@@ -1203,10 +1198,6 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
-	Log(MESSAGE, "Core", "Initializing the Event Manager...");
-	evntmgr = new EventMgr();
-
-
 	const char* value = NULL;
 #define CONFIG_INT(key, var) \
 		value = config->GetValueForKey(key); \
@@ -1429,6 +1420,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot initialize shaders.");
 		return GEM_ERROR;
 	}
+	winmgr.SetVideoDriver(video.get());
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);
@@ -1636,14 +1628,13 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
-	Log(MESSAGE, "Core", "Broadcasting Event Manager...");
-	video->SetEventMgr( evntmgr );
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
 	if (guifact == NULL) {
-		Log(FATAL, "Core", "Failed to load Window Manager.");
+		Log(FATAL, "Core", "Failed to load GUIFactory.");
 		return GEM_ERROR;
 	}
+	guifact->SetWindowManager(winmgr);
 
 	int ret = LoadSprites();
 	if (ret) return ret;
@@ -2329,12 +2320,6 @@ Font* Interface::GetButtonFont() const
 	return GetFont( ButtonFontResRef );
 }
 
-/** Returns the Event Manager */
-EventMgr* Interface::GetEventMgr() const
-{
-	return evntmgr;
-}
-
 /** Get GUI Script Manager */
 ScriptEngine* Interface::GetGUIScriptEngine() const
 {
@@ -2492,42 +2477,22 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	return ab;
 }
 
-void Interface::RedrawAll()
-{
-	for (size_t i=0; i < windows.size(); i++) {
-		windows[i]->MarkDirty();
-	}
-}
-
 /** Loads a Window in the Window Manager */
 Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
 {
 	if (ref) // is the winpack changing?
 		guifact->LoadWindowPack(ref);
-
-	unsigned int i;
-	Window* win = NULL;
-	for (i = 0; i < windows.size(); i++) {
-		win = windows[i];
-
-		if (win->WindowID == WindowID) {
-			win->SetVisibility(Window::VISIBLE);
-			break;
-		}
-		win = NULL;
-	}
+		Window* win = GetWindow(WindowID);
 	if (!win) {
 		win = guifact->GetWindow( WindowID );
 	}
 	if (win) {
 		win->GetScriptingRef(WindowID);
-		SetOnTop( win );
+		winmgr.FocusWindow( win );
 
 		GameControl *gc = GetGameControl ();
 		if (gc)
 			gc->SetScrolling( false );
-
-		AddWindow(win);
 	}
 	return win;
 }
@@ -2543,43 +2508,7 @@ Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, ch
 			}
 		}
 	Window* win = guifact->CreateWindow(WindowID, frame, bg);
-		AddWindow(win);
 	return win;
-}
-
-/** Sets a Window on the Top */
-void Interface::SetOnTop(Window* win)
-{
-	if (!IsValidWindow(win)) return;
-
-	WindowList::iterator it = std::find(windows.begin(), windows.end(), win);
-	if (it != windows.begin()) {
-		if (it != windows.end()) {
-			windows.erase(it);
-		}
-		windows.push_front(win);
-	}
-
-	if (win->WindowVisibility() == 0) {
-		win->SetVisibility(Window::VISIBLE);
-	} else {
-		win->MarkDirty();
-	}
-}
-
-/** Add a window to the Window List */
-void Interface::AddWindow(Window* win)
-{
-	if (!IsValidWindow(win)) return;
-
-	WindowList::iterator it;
-	it = std::find(windows.begin(), windows.end(), win);
-	if (it == windows.end()) {
-		windows.push_back(win);
-	}
-
-	evntmgr->AddWindow(win);
-	win->MarkDirty();
 }
 
 /** Set the Tooltip text of a Control */
@@ -2592,33 +2521,6 @@ void Interface::SetTooltip(Control* ctrl, const char* cstring)
 		ctrl->SetTooltip( *string );
 		delete string;
 	}
-}
-
-/** Show a Window in Modal Mode */
-bool Interface::ShowModal(Window* win, MODAL_SHADOW Shadow)
-{
-	if (!IsValidWindow(win)) return false;
-
-	win->SetVisibility(Window::FRONT);
-
-	//don't destroy the other window handlers
-	//evntmgr->Clear();
-	SetOnTop( win );
-	evntmgr->AddWindow( win );
-	evntmgr->SetFocused( win, NULL );
-
-	modalShadow = Shadow;
-	return 0;
-}
-
-bool Interface::IsPresentingModalWindow()
-{
-	return (windows.size() && windows.front() && windows.front()->WindowVisibility() == Window::FRONT);
-}
-
-bool Interface::IsValidWindow(Window* win)
-{
-	return (win && win->WindowVisibility() != Window::INVALID);
 }
 
 bool Interface::IsFreezed()
@@ -2705,95 +2607,6 @@ void Interface::HandleGUIBehaviour(void)
 			}
 		}
 		//end of gui hacks
-	}
-}
-
-void Interface::DrawWindows(bool allow_delete)
-{
-	if (!windows.size()) {
-		return;
-	}
-
-	static bool modalShield = false;
-
-	Window* win = NULL;
-	Window::Visibility vis = Window::INVALID;
-	WindowList::iterator it = windows.begin();
-	for (; it != windows.end(); ++it) {
-		win = *it;
-		vis = win->WindowVisibility();
-		if (vis > Window::INVISIBLE)
-			break; // found the frontmost visible win
-	}
-
-	if (vis == Window::FRONT) {
-		if (!modalShield) {
-			// only draw the shield layer once
-			Color shieldColor = Color(); // clear
-			if (modalShadow == MODAL_SHADOW_GRAY) {
-				shieldColor.a = 128;
-			} else if (modalShadow == MODAL_SHADOW_BLACK) {
-				shieldColor.a = 0xff;
-			}
-			video->DrawRect( Region( 0, 0, Width, Height ), shieldColor );
-			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
-			modalShield = true;
-		}
-		win->Draw();
-		return;
-	}
-	modalShield = false;
-
-	const Region& frontWinFrame = win->Frame();
-	win = NULL;
-	// we have to draw windows from the bottom up so the front window is drawn last
-	WindowList::reverse_iterator rit = windows.rbegin();
-	for (; rit != windows.rend(); ++rit) {
-		win = *rit;
-		assert(win);
-		vis = win->WindowVisibility();
-
-		if (win != windows.front() && vis > Window::INVISIBLE) {
-			const Region& frame = win->Frame();
-			Region intersect = frontWinFrame.Intersect(frame);
-			if (intersect == frame) {
-				// this window is completely obscured by the front window
-				// we dont have to bother drawing it because IE has no concept of translucent windows
-				continue;
-			}
-		}
-
-		switch (vis) {
-			case Window::INVALID:
-				if (allow_delete) {
-					evntmgr->DelWindow( win );
-					windows.erase( (++rit).base() );
-					// invalid windows are stored at the end, so we simply reset to rbegin
-					rit = windows.rbegin();
-					delete win;
-				}
-			// fallthrough
-			case Window::FRONT: // already handled the modal window
-				continue; // window is invalid, deleted, or modal so force continue
-			case Window::GRAYED:
-				if (win->NeedsDraw()) {
-					// Important to only draw if the window itself is dirty
-					// controls on greyed out windows shouldnt be updating anyway
-					win->Draw();
-					Color fill = { 0, 0, 0, 128 };
-					video->DrawRect(win->Frame(), fill);
-				}
-				break;
-			case Window::VISIBLE:
-				win->Draw();
-				break;
-			default: break; // prevent compiler warning about not handling invisible case
-		}
-	}
-
-	// draw the console
-	if (ConsolePopped) {
-		console->Draw();
 	}
 }
 
@@ -2893,54 +2706,11 @@ void Interface::DrawTooltip (const String& string, Point p)
 	video->SetScreenClip(&oldclip);
 }
 
-//this function won't delete the window, just mark it for deletion
-//it will be deleted in the next DrawWindows cycle
-//regardless, the window deleted is inaccessible for gui scripts and
-//other high level functions from now
-void Interface::DelWindow(Window* win)
-{
-	if (!IsValidWindow(win)) return;
-
-	WindowList::iterator it = windows.begin();
-	it = std::find(it, windows.end(), win);
-	if (it != windows.end()) {
-		// since the window is "deleted" it should be sent to the back
-		// just in case it is undeleted later
-		it = windows.erase(it);
-		if (it != windows.end()) {
-			// the window beneath this must get redrawn
-			(*it)->MarkDirty();
-			PlaySound(DS_WINDOW_CLOSE);
-		}
-		windows.push_back(win);
-	}
-
-	win->SetVisibility(Window::INVALID);
-	evntmgr->DelWindow( win );
-}
-
-void Interface::DelAllWindows()
-{
-	vars->SetAt("MessageWindow", (ieDword) ~0);
-	vars->SetAt("OptionsWindow", (ieDword) ~0);
-	vars->SetAt("PortraitWindow", (ieDword) ~0);
-	vars->SetAt("ActionsWindow", (ieDword) ~0);
-	vars->SetAt("TopWindow", (ieDword) ~0);
-	vars->SetAt("OtherWindow", (ieDword) ~0);
-	vars->SetAt("FloatWindow", (ieDword) ~0);
-	for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
-		Window* win = windows[WindowIndex];
-		delete win;
-	}
-	windows.clear();
-	evntmgr->Clear();
-}
-
 /** Popup the Console */
 void Interface::PopupConsole()
 {
 	ConsolePopped = !ConsolePopped;
-	RedrawAll();
+	winmgr.RedrawAll();
 }
 
 /** Get the Sound Manager */
@@ -3161,7 +2931,7 @@ int Interface::PlayMovie(const char* ResRef)
 	if (ambim) ambim->activate();
 	//this will fix redraw all windows as they looked like
 	//before the movie
-	RedrawAll();
+	winmgr.RedrawAll();
 
 	//Setting the movie name to 1
 	vars->SetAt( ResRef, 1 );
@@ -3402,8 +3172,6 @@ void Interface::QuitGame(int BackToMain)
 		timer->Init();
 		timer->SetFadeFromColor(0);
 	}
-
-	DelAllWindows(); //delete all windows, including GameControl
 
 	//shutting down ingame music
 	//(do it before deleting the game)
@@ -4097,8 +3865,7 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
-	RedrawAll();
-	DrawWindows();
+	winmgr.DrawWindows();
 	video->SwapBuffers();
 }
 
@@ -5136,7 +4903,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
-		DrawWindows();
+		winmgr.DrawWindows();
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 

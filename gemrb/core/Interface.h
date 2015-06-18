@@ -32,11 +32,11 @@
 #include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
 #include "Cache.h"
 #include "Callback.h"
+#include "GUI/WindowManager.h"
 #include "Holder.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
 
-#include <deque>
 #include <map>
 #include <string>
 #include <vector>
@@ -64,7 +64,6 @@ class DataFileMgr;
 struct Effect;
 class EffectQueue;
 struct EffectDesc;
-class EventMgr;
 class Factory;
 class Font;
 class Game;
@@ -193,14 +192,6 @@ public:
 	}
 };
 
-// Colors of modal window shadow
-// !!! Keep these synchronized with GUIDefines.py !!!
-enum MODAL_SHADOW {
-	MODAL_SHADOW_NONE = 0,
-	MODAL_SHADOW_GRAY,
-	MODAL_SHADOW_BLACK
-};
-
 //quitflags
 #define QF_NORMAL        0
 #define QF_QUITGAME      1
@@ -314,20 +305,16 @@ enum RESOURCE_DIRECTORY {
 class GEM_EXPORT Interface
 {
 private:
-	typedef std::deque<Window*> WindowList;
-
 	Holder<Video> video;
 	Holder<Audio> AudioDriver;
 	std::string VideoDriverName;
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
 
-	EventMgr * evntmgr;
+	WindowManager winmgr;
 	Holder<GUIFactory> guifact;
-	MODAL_SHADOW modalShadow;
 	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
-	WindowList windows;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
@@ -441,8 +428,6 @@ public:
 	Font* GetTextFont() const;
 	/** Returns the button font */
 	Font * GetButtonFont() const;
-	/** Returns the Event Manager */
-	EventMgr * GetEventMgr() const;
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
@@ -453,8 +438,7 @@ public:
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&, char* Background);
-	/** Add a window to the Window List */
-	void AddWindow(Window * win);
+
 	/** Set the Tooltip text of a Control */
 	void SetTooltip(Control*, const char * string);
 	/** Actually draws tooltip on the screen. */
@@ -463,18 +447,6 @@ public:
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea() const;
-	/** Sets a Window on the Top */
-	void SetOnTop(Window*);
-	/** Show a Window in Modal Mode */
-	bool ShowModal(Window*, MODAL_SHADOW Shadow);
-	bool IsPresentingModalWindow();
-	bool IsValidWindow(Window*);
-	/** Removes a Loaded Window */
-	void DelWindow(Window* win);
-	/** Removes all Loaded Windows */
-	void DelAllWindows();
-	/** Redraws all window */
-	void RedrawAll();
 	/** Popup the Console */
 	void PopupConsole();
 	/** Get the SaveGameIterator */
@@ -762,8 +734,6 @@ public:
 	void Main(void);
 	/** returns true if the game is paused */
 	bool IsFreezed();
-	/** Draws the Visible windows in the Windows Array */
-	void DrawWindows(bool allow_delete = false);
 	void AskAndExit();
 	void ExitGemRB(void);
 	/** CheatKey support */

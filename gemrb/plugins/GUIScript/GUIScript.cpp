@@ -1270,15 +1270,14 @@ PyDoc_STRVAR( GemRB_Window_ShowModal__doc,
 
 static PyObject* GemRB_Window_ShowModal(PyObject* self, PyObject* args)
 {
-	int Shadow = MODAL_SHADOW_NONE;
+	WindowManager::ModalShadow Shadow = WindowManager::ShadowNone;
 	PARSE_ARGS( args, "O|i", &self, &Shadow );
 
 	Window* win = GetView<Window>(self);
-	if (!core->ShowModal( win, (MODAL_SHADOW)Shadow )) {
+	if (!win || !win->DisplayModal(Shadow)) {
 		return NULL;
 	}
 
-	core->PlaySound(DS_WINDOW_OPEN);
 	Py_RETURN_NONE;
 }
 
@@ -1369,7 +1368,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 		return RuntimeError( "Control is not found." );
 	}
 	if (status&IE_GUI_CONTROL_FOCUSED) {
-		core->GetEventMgr()->SetFocused(ctrl->Owner, ctrl);
+		ctrl->Owner->Focus();
 	}
 
 	//check if the status parameter was intended to use with this control
@@ -1451,13 +1450,13 @@ static PyObject* GemRB_Window_Unload(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS(args, "O", &self);
 	Window* win = GetView<Window>(self);
-	core->DelWindow( win );
+	win->Close();
 	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_CreateWindow__doc,
-"CreateWindow(WindowID, X, Y, Width, Height, MosResRef) => WindowIndex\n\n"
-"Creates a new empty window and returns its index.");
+"CreateWindow(WindowID, X, Y, Width, Height, MosResRef) => GWindow\n\n"
+"Creates a new empty window and returns it.");
 
 static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 {

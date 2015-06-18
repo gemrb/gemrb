@@ -2317,7 +2317,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			if (!hide) {
 				assert(fw != NULL);
 				fw->SetFlags(WF_FLOAT|WF_BORDERLESS, BM_OR);
-				core->SetOnTop(fw);
+				fw->Focus();
 			}
 		}
 	}

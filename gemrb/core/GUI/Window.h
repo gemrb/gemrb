@@ -29,6 +29,7 @@
 #define WINDOW_H
 
 #include "View.h"
+#include "WindowManager.h"
 
 #include <vector>
 
@@ -79,9 +80,12 @@ protected:
 	static Sprite2D* WinFrameEdge(int edge);
 
 public:
-	Window(const Region& frame);
+	Window(const Region& frame, WindowManager& mgr);
 	~Window();
 
+	void Close();
+	void Focus();
+	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
 
 	bool OnSpecialKeyPress(unsigned char key);
 
@@ -115,6 +119,7 @@ private: // Private attributes
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
 	Visibility visibility;
+	WindowManager& manager;
 };
 
 class WindowScriptingRef : public ViewScriptingRef {

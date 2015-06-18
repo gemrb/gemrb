@@ -27,6 +27,8 @@
 #define GUIFACTORY_H
 
 #include "GUI/GUIScriptInterface.h"
+#include "GUI/WindowManager.h"
+
 #include "Plugin.h"
 
 namespace GemRB {
@@ -38,9 +40,14 @@ class Window;
 class GEM_EXPORT GUIFactory : public Plugin {
 protected:
 	ResRef winPack;
+	WindowManager* winmgr;
+
 public: 
-	GUIFactory() {};
+	GUIFactory()
+	: winmgr(NULL) {};
 	virtual ~GUIFactory() {};
+
+	void SetWindowManager(WindowManager& mgr) { winmgr = &mgr; }
 
 	/** This function loads all available windows from the 'stream' parameter. */
 	virtual bool Open(DataStream* stream) = 0;

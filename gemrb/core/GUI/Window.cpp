@@ -31,8 +31,8 @@
 
 namespace GemRB {
 
-Window::Window(const Region& frame)
-	: View(frame)
+Window::Window(const Region& frame, WindowManager& mgr)
+	: View(frame), manager(mgr)
 {
 	visibility = Window::INVISIBLE;
 	Cursor = IE_CURSOR_NORMAL;
@@ -47,6 +47,16 @@ Window::Window(const Region& frame)
 Window::~Window()
 {
 
+}
+
+void Window::Close()
+{
+	manager.CloseWindow(this);
+}
+
+bool Window::DisplayModal(WindowManager::ModalShadow shadow)
+{
+	return manager.MakeModal(this, shadow);
 }
 
 /** Add a Control in the Window */
@@ -75,6 +85,11 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 	if (focusView == ctrl) {
 		focusView = NULL;
 	}
+}
+
+void Window::Focus()
+{
+	manager.FocusWindow(this);
 }
 
 void Window::SetFocused(Control* ctrl)

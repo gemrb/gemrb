@@ -426,6 +426,9 @@
 		A2D0505414D0C17500D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DB1B30F24400264D16 /* GUIFactory.cpp */; };
 		A2D672DE1B30F24400264D16 /* GUIFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D672DC1B30F24400264D16 /* GUIFactory.h */; };
+		A2D672E11B30F40C00264D16 /* WindowManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DF1B30F40C00264D16 /* WindowManager.cpp */; };
+		A2D672E21B30F40C00264D16 /* WindowManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DF1B30F40C00264D16 /* WindowManager.cpp */; };
+		A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D672E01B30F40C00264D16 /* WindowManager.h */; };
 		A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
@@ -1742,6 +1745,8 @@
 		A2D4C53013A978110086BCC4 /* win32def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32def.h; sourceTree = "<group>"; };
 		A2D672DB1B30F24400264D16 /* GUIFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIFactory.cpp; sourceTree = "<group>"; };
 		A2D672DC1B30F24400264D16 /* GUIFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIFactory.h; sourceTree = "<group>"; };
+		A2D672DF1B30F40C00264D16 /* WindowManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WindowManager.cpp; sourceTree = "<group>"; };
+		A2D672E01B30F40C00264D16 /* WindowManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowManager.h; sourceTree = "<group>"; };
 		A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = SpriteRenderer.inl; sourceTree = "<group>"; };
 		A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = TileRenderer.inl; sourceTree = "<group>"; };
 		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
@@ -3234,6 +3239,8 @@
 				A20A278A1A71E3200077077C /* View.h */,
 				A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */,
 				A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */,
+				A2D672DF1B30F40C00264D16 /* WindowManager.cpp */,
+				A2D672E01B30F40C00264D16 /* WindowManager.h */,
 			);
 			path = GUI;
 			sourceTree = "<group>";
@@ -3491,6 +3498,7 @@
 				A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */,
 				A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */,
 				A2E663ED139E884B00310FC8 /* TileSetMgr.h in Headers */,
+				A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */,
 				A2E663EE139E884B00310FC8 /* TypeID.h in Headers */,
 				A2E663F0139E884B00310FC8 /* Variables.h in Headers */,
 				A2E663F2139E884B00310FC8 /* Video.h in Headers */,
@@ -5040,6 +5048,7 @@
 				A29BF8C813A04A6F00C812DD /* LRUCache.cpp in Sources */,
 				A29BF8C913A04A6F00C812DD /* Map.cpp in Sources */,
 				A276FAFF199E8C7F00BD6CEF /* SDL20GLVideo.cpp in Sources */,
+				A2D672E21B30F40C00264D16 /* WindowManager.cpp in Sources */,
 				A29BF8CA13A04A6F00C812DD /* MapMgr.cpp in Sources */,
 				A29BF8CB13A04A6F00C812DD /* MoviePlayer.cpp in Sources */,
 				A29BF8CC13A04A6F00C812DD /* MusicMgr.cpp in Sources */,
@@ -5239,6 +5248,7 @@
 				A208210D1419712F002CD244 /* String.cpp in Sources */,
 				A208210E1419712F002CD244 /* IndexedArchive.cpp in Sources */,
 				A20821101419712F002CD244 /* PluginLoader.cpp in Sources */,
+				A2D672E11B30F40C00264D16 /* WindowManager.cpp in Sources */,
 				A20821111419712F002CD244 /* MemoryStream.cpp in Sources */,
 				A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */,
 				A2E66350139E882900310FC8 /* Ambient.cpp in Sources */,

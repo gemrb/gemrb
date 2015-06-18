@@ -24,7 +24,8 @@ namespace GemRB {
 
 Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame, Sprite2D* bg) const
 {
-	Window* win = new Window( frame );
+	assert(winmgr);
+	Window* win = winmgr->MakeWindow(frame);
 	win->GetScriptingRef(winId);
 	win->SetBackground(bg);
 	//strcpy( win->WindowPack, winPack );
