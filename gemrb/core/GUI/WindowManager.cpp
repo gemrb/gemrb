@@ -90,13 +90,26 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 {
 	Window* win = new Window(rgn, *this);
 	windows.push_back(win);
+
+	if (closedWindows.size() > 0) { // change this to 1 when we can reopen closed windows
+		// delete all but the most recent closed window
+		// FIXME: this is intended for caching (in case the last window is reopened)
+		// but currently there is no way to reopen a window (other than recreating it)
+		WindowList::iterator it = closedWindows.begin();
+		for (; it != --closedWindows.end(); ++it) {
+			delete (*it);
+			it = closedWindows.erase(it);
+		}
+	}
+
 	return win;
 }
 
-//this function won't delete the window, just mark it for deletion
-//it will be deleted in the next DrawWindows cycle
+//this function won't delete the window, just queue it for deletion
+//it will be deleted when another window is opened
 //regardless, the window deleted is inaccessible for gui scripts and
 //other high level functions from now
+// this is a caching mechanisim in case the window is reopened
 void WindowManager::CloseWindow(Window* win)
 {
 	if (!IsOpenWindow(win)) return;
@@ -116,10 +129,10 @@ void WindowManager::CloseWindow(Window* win)
 			(*it)->MarkDirty();
 			core->PlaySound(DS_WINDOW_CLOSE);
 		}
-		windows.push_back(win);
+		closedWindows.push_back(win);
 	}
 
-	win->SetVisibility(Window::INVALID);
+	win->SetVisibility(Window::INVISIBLE);
 	eventMgr.DelWindow(win);
 }
 
@@ -149,7 +162,7 @@ void WindowManager::DrawWindows() const
 	modalShield = false;
 
 	Window* win = NULL;
-	Window::Visibility vis = Window::INVALID;
+	Window::Visibility vis = Window::INVISIBLE;
 	WindowList::const_iterator it = windows.begin();
 	for (; it != windows.end(); ++it) {
 		win = *it;
@@ -178,17 +191,6 @@ void WindowManager::DrawWindows() const
 		}
 
 		switch (vis) {
-				/*
-			case Window::INVALID:
-				if (allow_delete) {
-					eventMgr.DelWindow( win );
-					windows.erase( (++rit).base() );
-					// invalid windows are stored at the end, so we simply reset to rbegin
-					rit = windows.rbegin();
-					delete win;
-				}
-				// fallthrough
-				 */
 			case Window::GRAYED:
 				if (win->NeedsDraw()) {
 					// Important to only draw if the window itself is dirty

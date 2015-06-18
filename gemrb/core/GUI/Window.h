@@ -60,7 +60,6 @@ class Sprite2D;
 class GEM_EXPORT Window : public View {
 public:
 	enum Visibility {
-		INVALID		= -1,
 		INVISIBLE	= 0,
 		VISIBLE		= 1,
 		GRAYED		= 2

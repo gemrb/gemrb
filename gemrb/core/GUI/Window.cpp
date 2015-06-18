@@ -129,10 +129,6 @@ void Window::SetVisibility(Visibility vis)
 	if (vis == visibility) return;
 
 	visibility = vis;
-	if (visibility == INVALID) {
-		// FIXME: if we undo WINDOW_INVALID then someone needs to call GetScriptingRef again...
-		DeleteScriptingRef();
-	}
 	MarkDirty();
 }
 
@@ -164,8 +160,6 @@ Control* Window::GetFocus() const
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
-	if (visibility == INVALID) return;
-
 	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		Control* ctrl = *c;
 		ctrl->UpdateState( VarName, Sum);
