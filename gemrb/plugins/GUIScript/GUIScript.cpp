@@ -3070,8 +3070,10 @@ PyDoc_STRVAR( GemRB_GetGamePreview__doc,
 
 static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* /*args*/)
 {
-	GET_GAMECONTROL();
-	return CObject<Sprite2D>(gc->GetPreview());
+	// FIXME: this method should be removed
+	// A SaveGame object should be created prior to this (not the *actual* save files)
+	// from that SaveGame we have methods for SaveGame_GetPortrait and SaveGame_GetPreview
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Roll__doc,

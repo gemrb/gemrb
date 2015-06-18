@@ -460,10 +460,13 @@ static bool DoSaveGame(const char *Path)
 	}
 
 	// Create area preview
-	Sprite2D* preview = core->GetGameControl()->GetPreview();
+	// FIXME: the preview shoudl be passed in by the caller!
+	/*
+	Sprite2D* preview = NULL;
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
+	*/
 
 	return true;
 }

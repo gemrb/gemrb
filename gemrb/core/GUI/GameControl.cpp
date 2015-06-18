@@ -2441,60 +2441,6 @@ void GameControl::SetDialogueFlags(int value, int mode)
 	}
 }
 
-//copies a screenshot into a sprite
-Sprite2D* GameControl::GetScreenshot(const Region& rgn, bool show_gui)
-{
-	Sprite2D* screenshot;
-	if (show_gui) {
-		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
-	} else {
-		int hf = SetGUIHidden(true);
-		Draw ();
-		screenshot = core->GetVideoDriver()->GetScreenshot( rgn );
-		if (hf) {
-			SetGUIHidden(false);
-		}
-		core->DrawWindows ();
-	}
-
-	return screenshot;
-}
-
-//copies a downscaled screenshot into a sprite for save game preview
-Sprite2D* GameControl::GetPreview()
-{
-	// We get preview by first taking a screenshot of quintuple size of the preview control size (a few pixels bigger only in pst),
-	// centered in the display. This is to get a decent picture for
-	// higher screen resolutions.
-	// FIXME: how do orig games solve that?
-	Video* video = core->GetVideoDriver();
-	int w = video->GetWidth();
-	int h = video->GetHeight();
-	int x = (w - 640) / 2;
-	int y = (h - 405) / 2;
-
-	if (x < 0) {
-		x = 0;
-	} else {
-		w = 515;
-	}
-
-	if (y < 0) {
-		y = 0;
-	} else {
-		h = 385;
-	}
-
-	if (!x)
-		y = 0;
-
-	Sprite2D *screenshot = GetScreenshot( Region(x, y, w, h) );
-
-	Sprite2D* preview = video->SpriteScaleDown ( screenshot, 5 );
-	Sprite2D::FreeSprite( screenshot );
-	return preview;
-}
-
 Actor *GameControl::GetActorByGlobalID(ieDword globalID)
 {
 	if (!globalID)
