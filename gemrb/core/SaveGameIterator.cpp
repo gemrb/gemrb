@@ -443,13 +443,19 @@ static bool DoSaveGame(const char *Path)
 
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		Sprite2D* portrait = core->GetGameControl()->GetPortraitPreview( i );
+		Actor *actor = game->GetPC( i, false );
+		Sprite2D* portrait = actor->CopyPortrait(true);
+
 		if (portrait) {
 			char FName[_MAX_PATH];
 			snprintf( FName, sizeof(FName), "PORTRT%d", i );
 			FileStream outfile;
 			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
+			// NOTE: we save the true portrait size, even tho the preview buttons arent (always) the same
+			// we do this because: 1. the GUI should be able to use whatever size it wants
+			// and 2. its more appropriate to have a flag on the buttons to do the scaling/cropping
 			im->PutImage( &outfile, portrait );
+			Sprite2D::FreeSprite(portrait);
 		}
 	}
 

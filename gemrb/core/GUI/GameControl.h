@@ -257,8 +257,6 @@ public:
 	Sprite2D* GetScreenshot(const Region& rgn, bool show_gui = false );
 	/** Returns current area preview for saving a game */
 	Sprite2D* GetPreview();
-	/** Returns PC portrait for a currently running game */
-	Sprite2D* GetPortraitPreview(int pcslot);
 	/** Sets up targeting with spells or items */
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */

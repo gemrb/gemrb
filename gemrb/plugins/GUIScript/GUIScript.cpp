@@ -3122,17 +3122,25 @@ static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* /*args*/)
 	return CObject<Sprite2D>(gc->GetPreview());
 }
 
-PyDoc_STRVAR( GemRB_GetGamePortraitPreview__doc,
-"GetGamePortraitPreview(PCSlotCount)\n\n"
+PyDoc_STRVAR( GemRB_GetPCPortrait__doc,
+"GemRB_GetPCPortrait(PCSlotCount)\n\n"
 "Gets a current game PC portrait." );
 
-static PyObject* GemRB_GetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetPCPortrait(PyObject * /*self*/, PyObject* args)
 {
 	int PCSlotCount;
 	PARSE_ARGS( args,  "i", &PCSlotCount );
 
-	GET_GAMECONTROL();
-	return CObject<Sprite2D>(gc->GetPortraitPreview(PCSlotCount));
+	GET_GAME();
+	Actor* actor = game->GetPC( PCSlotCount, false );
+	if (actor) {
+		Sprite2D* portrait = actor->CopyPortrait(1);
+		CObject<Sprite2D> obj(portrait);
+		portrait->release();
+		return obj;
+	} else {
+		Py_RETURN_NONE;
+	}
 }
 
 PyDoc_STRVAR( GemRB_Roll__doc,
@@ -8989,7 +8997,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetDamageReduction, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
-	METHOD(GetGamePortraitPreview, METH_VARARGS),
+	METHOD(GetPCPortrait, METH_VARARGS),
 	METHOD(GetGamePreview, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
 	METHOD(GetGameTime, METH_NOARGS),

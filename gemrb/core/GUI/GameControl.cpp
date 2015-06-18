@@ -2495,35 +2495,6 @@ Sprite2D* GameControl::GetPreview()
 	return preview;
 }
 
-
-/**
- * Returns PC portrait for a currently running game
- */
-Sprite2D* GameControl::GetPortraitPreview(int pcslot)
-{
-	/** Portrait shrink ratio */
-	// FIXME: this is just a random PST specific trait
-	// you can make it less random with a new feature bit
-	int ratio = (core->HasFeature( GF_ONE_BYTE_ANIMID )) ? 1 : 2;
-
-	Video *video = core->GetVideoDriver();
-
-	Actor *actor = core->GetGame()->GetPC( pcslot, false );
-	if (! actor) {
-		return NULL;
-	}
-
-	Sprite2D* img = actor->CopyPortrait(true);
-
-	if (ratio == 1)
-		return img;
-
-	Sprite2D* img_scaled = video->SpriteScaleDown( img, ratio );
-	Sprite2D::FreeSprite( img );
-
-	return img_scaled;
-}
-
 Actor *GameControl::GetActorByGlobalID(ieDword globalID)
 {
 	if (!globalID)
