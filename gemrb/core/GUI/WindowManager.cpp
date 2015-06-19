@@ -23,6 +23,9 @@
 
 #include "defsounds.h"
 
+#define WIN_IT(w) \
+std::find(windows.begin(), windows.end(), w)
+
 namespace GemRB {
 
 void WindowManager::RedrawAll() const
@@ -34,7 +37,7 @@ void WindowManager::RedrawAll() const
 
 bool WindowManager::IsOpenWindow(Window* win) const
 {
-	WindowList::const_iterator it = std::find(windows.begin(), windows.end(), win);
+	WindowList::const_iterator it = WIN_IT(win);
 	return it != windows.end();
 }
 
@@ -66,9 +69,9 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 /** Sets a Window on the Top */
 bool WindowManager::FocusWindow(Window* win)
 {
-	if (!IsOpenWindow(win)) return false;
+	WindowList::iterator it = WIN_IT(win);
+	if (it == windows.end()) return false;
 
-	WindowList::iterator it = std::find(windows.begin(), windows.end(), win);
 	if (it != windows.begin()) {
 		if (it != windows.end()) {
 			windows.erase(it);
@@ -110,14 +113,13 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 // this is a caching mechanisim in case the window is reopened
 void WindowManager::CloseWindow(Window* win)
 {
-	if (!IsOpenWindow(win)) return;
+	WindowList::iterator it = WIN_IT(win);
+	if (it == windows.end()) return;
 
 	if (win == modalWin) {
 		modalWin = NULL;
 	}
 
-	WindowList::iterator it = windows.begin();
-	it = std::find(it, windows.end(), win);
 	bool isFront = it == windows.begin();
 	it = windows.erase(it);
 	if (it != windows.end()) {
@@ -209,7 +211,7 @@ void WindowManager::SetVideoDriver(Video* vid)
 Sprite2D* WindowManager::GetScreenshot(Window* win) const
 {
 	Sprite2D* screenshot = NULL;
-	if (win && IsOpenWindow(win)) {
+	if (IsOpenWindow(win)) {
 		// only a screen shot of passed win
 		win->MarkDirty();
 		win->Draw();
@@ -221,5 +223,7 @@ Sprite2D* WindowManager::GetScreenshot(Window* win) const
 	}
 	return screenshot;
 }
+
+#undef WIN_IT
 
 }
