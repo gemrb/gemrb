@@ -87,13 +87,15 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 	Window* win = new Window(rgn, *this);
 	windows.push_back(win);
 
-	if (closedWindows.size() > 0) { // change this to 1 when we can reopen closed windows
+	if (closedWindows.size() > 0) { // TODO: change this to 1 when we can reopen closed windows
 		// delete all but the most recent closed window
 		// FIXME: this is intended for caching (in case the last window is reopened)
 		// but currently there is no way to reopen a window (other than recreating it)
 		WindowList::iterator it = closedWindows.begin();
-		for (; it != --closedWindows.end(); ++it) {
-			delete (*it);
+		// TODO: change to --closedWindows.end() when caching is implemented
+		for (; it != closedWindows.end();) {
+			Window* win = *it;
+			delete win;
 			it = closedWindows.erase(it);
 		}
 	}
@@ -117,8 +119,6 @@ void WindowManager::CloseWindow(Window* win)
 	WindowList::iterator it = windows.begin();
 	it = std::find(it, windows.end(), win);
 	bool isFront = it == windows.begin();
-	// since the window is "deleted" it should be sent to the back
-	// just in case it is undeleted later
 	it = windows.erase(it);
 	if (it != windows.end()) {
 		// the window beneath this must get redrawn
@@ -129,6 +129,7 @@ void WindowManager::CloseWindow(Window* win)
 	}
 	closedWindows.push_back(win);
 
+	win->DeleteScriptingRef();
 	win->SetDisabled(true);
 	eventMgr.DelWindow(win);
 }
