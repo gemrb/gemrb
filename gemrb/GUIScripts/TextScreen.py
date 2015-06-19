@@ -140,8 +140,7 @@ def StartTextScreen ():
 	#if this was opened from somewhere other than game control close that window
 	GUICommon.CloseOtherWindow(None)
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
-	TextScreen.SetVisible (WINDOW_VISIBLE)
+	TextScreen.Focus()
 
 	ReplayTextScreen()
 	return
@@ -150,11 +149,10 @@ def EndTextScreen ():
 	global TextScreen
 
 	if TextScreen:
-		TextScreen.SetVisible (WINDOW_INVISIBLE)
 		TextScreen.Unload ()
 		GemRB.PlaySound(None, 0, 0, 4)
 
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
+	GUICommon.GameWindow.Focus() # enable the gamecontrol screen
 	GemRB.UnhideGUI ()
 	GemRB.GamePause (0, 3)
 	return

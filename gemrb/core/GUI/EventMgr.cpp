@@ -149,7 +149,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	for (it = windows.begin(); it != windows.end(); ++it) {
 		Window* win = *it;
 
-		if (!win->WindowVisibility())
+		if (win->IsDisabled())
 			continue;
 
 		if (win->Frame().PointInside(p)) {
@@ -208,7 +208,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 	for (it = windows.begin(); it != windows.end(); ++it) {
 		Window* win = *it;
 
-		if (!win->WindowVisibility())
+		if (win->IsDisabled())
 			continue;
 
 		if (win->Frame().PointInside(p)) {

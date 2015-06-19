@@ -89,7 +89,7 @@ def OnLoad():
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
+	StartWindow.Focus ()
 	MusicTable = GemRB.LoadTable ("songlist")
 	# the table has useless rownames, so we can't search for BG2Theme
 	theme = MusicTable.GetValue ("33", "RESOURCE")
@@ -208,7 +208,6 @@ def ImportGame():
 def Tutorial():
 	global TutorialWindow
 
-	StartWindow.SetVisible (WINDOW_INVISIBLE)
 	#tutorial subwindow
 	TutorialWindow = GemRB.LoadWindow (5)
 	TextAreaControl = TutorialWindow.GetControl (1)
@@ -218,7 +217,7 @@ def Tutorial():
 	CancelButton.SetText (13727)
 	PlayButton.SetText (33093)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
 	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)		
 
@@ -238,15 +237,9 @@ def PlayPress():
 	GemRB.SetNextScript ("CharGen")
 	return
 
-def CancelTut():
-	TutorialWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
 def ExitPress():
 	global QuitWindow
 
-	StartWindow.SetVisible (WINDOW_INVISIBLE)
 	#quit subwindow
 	QuitWindow = GemRB.LoadWindow (3)
 	QuitTextArea = QuitWindow.GetControl (0)
@@ -256,7 +249,7 @@ def ExitPress():
 	CancelButton.SetText (13727)
 	ConfirmButton.SetText (15417)
 	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
 	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	return
@@ -287,11 +280,6 @@ def MoviesPress():
 	GemRB.SetNextScript ("GUIMOVIE")
 	return
 
-def ExitCancelled():
-	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
 def BackToMain():
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -318,13 +306,13 @@ def BackToMain():
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
+	StartWindow.Focus()
 	return
 
 def Restart():
 	StartWindow.Unload()
-	QuitWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
 	GemRB.SetNextScript ("Start")
 	return
 

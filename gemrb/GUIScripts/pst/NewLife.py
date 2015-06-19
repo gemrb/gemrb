@@ -333,8 +333,8 @@ def CancelPress():
 	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
 
-	NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
+	NewLifeWindow.SetDisabled(True) #go dark
+	QuitWindow.Focus()
 	return
 
 def YesButton():

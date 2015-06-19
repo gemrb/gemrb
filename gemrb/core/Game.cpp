@@ -884,7 +884,6 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 
 	if (loadscreen && sE) {
-		core->SetGCWindowVisible(false);
 		sE->RunFunction("LoadScreen", "StartLoadScreen");
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
@@ -917,7 +916,6 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	newMap->InitActors();
 
 failedload:
-	core->SetGCWindowVisible(true);
 	core->LoadProgress(100);
 	return ret;
 }

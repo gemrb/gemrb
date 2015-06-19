@@ -1375,8 +1375,7 @@ void GameControl::OnGlobalMouseMove(const Point& p)
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
-
-	if (Owner->WindowVisibility() != Window::VISIBLE) {
+	if (Owner->IsDisabled()) {
 		return;
 	}
 
@@ -2259,8 +2258,7 @@ bool GameControl::SetGUIHidden(bool hide)
 {
 	if (hide) {
 		//no gamecontrol visible
-		if (!(ScreenFlags&SF_GUIENABLED)
-			|| Owner->WindowVisibility() == Window::INVISIBLE ) {
+		if (!(ScreenFlags&SF_GUIENABLED)) {
 			return false;
 		}
 		ScreenFlags &=~SF_GUIENABLED;
@@ -2269,7 +2267,6 @@ bool GameControl::SetGUIHidden(bool hide)
 			return false;
 		}
 		ScreenFlags |= SF_GUIENABLED;
-		core->SetGCWindowVisible(true);
 	}
 
 	static const char* keys[6][2] = {
@@ -2296,7 +2293,6 @@ bool GameControl::SetGUIHidden(bool hide)
 				Window* w = GetWindow(id);
 				if (w) {
 					w->SetFlags(WF_BORDERLESS, BM_OR);
-					w->SetVisibility((Window::Visibility)!hide);
 					if (dict->Lookup( *++val, id )) {
 						//Log(MESSAGE, "GameControl", "position: %s", *val);
 						ResizeParentWindowFor( w, id, op );
@@ -2313,7 +2309,6 @@ bool GameControl::SetGUIHidden(bool hide)
 	if (dict->Lookup("FloatWindow", id)) {
 		if (id != (ieDword) -1) {
 			Window* fw = GetWindow(id);
-			fw->SetVisibility((Window::Visibility)!hide);
 			if (!hide) {
 				assert(fw != NULL);
 				fw->SetFlags(WF_FLOAT|WF_BORDERLESS, BM_OR);

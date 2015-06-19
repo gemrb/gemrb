@@ -183,6 +183,5 @@ def BackToMain():
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	StartWindow.Focus()
 	return

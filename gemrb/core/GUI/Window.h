@@ -59,12 +59,6 @@ class Sprite2D;
 
 class GEM_EXPORT Window : public View {
 public:
-	enum Visibility {
-		INVISIBLE	= 0,
-		VISIBLE		= 1,
-		GRAYED		= 2
-	};
-
 	enum WindowPosition {
 		PosTop = 1,
 		PosBottom = 2,
@@ -101,8 +95,8 @@ public:
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
 	void SetPosition(WindowPosition);
-	void SetVisibility(Visibility);
-	Visibility WindowVisibility() { return visibility; }
+	void SetDisabled(bool);
+	bool IsDisabled() { return disabled; }
 	/** Returns last focused control */
 	Control* GetFocus() const;
 	View* FocusedView() const { return focusView; }
@@ -128,7 +122,7 @@ private: // Private attributes
 	View* hoverView; // view the mouse was last over
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
-	Visibility visibility;
+	bool disabled;
 	WindowManager& manager;
 };
 

@@ -76,11 +76,7 @@ bool WindowManager::FocusWindow(Window* win)
 		windows.push_front(win);
 	}
 
-	if (win->WindowVisibility() == 0) {
-		win->SetVisibility(Window::VISIBLE);
-	} else {
-		win->MarkDirty();
-	}
+	win->SetDisabled(false);
 	eventMgr.AddWindow( win );
 	eventMgr.SetFocused( win, NULL );
 	return true;
@@ -120,19 +116,20 @@ void WindowManager::CloseWindow(Window* win)
 
 	WindowList::iterator it = windows.begin();
 	it = std::find(it, windows.end(), win);
+	bool isFront = it == windows.begin();
+	// since the window is "deleted" it should be sent to the back
+	// just in case it is undeleted later
+	it = windows.erase(it);
 	if (it != windows.end()) {
-		// since the window is "deleted" it should be sent to the back
-		// just in case it is undeleted later
-		it = windows.erase(it);
-		if (it != windows.end()) {
-			// the window beneath this must get redrawn
-			(*it)->MarkDirty();
-			core->PlaySound(DS_WINDOW_CLOSE);
-		}
-		closedWindows.push_back(win);
+		// the window beneath this must get redrawn
+		(*it)->MarkDirty();
+		core->PlaySound(DS_WINDOW_CLOSE);
+		if (isFront)
+			(*it)->Focus();
 	}
+	closedWindows.push_back(win);
 
-	win->SetVisibility(Window::INVISIBLE);
+	win->SetDisabled(true);
 	eventMgr.DelWindow(win);
 }
 
@@ -161,26 +158,13 @@ void WindowManager::DrawWindows() const
 	}
 	modalShield = false;
 
-	Window* win = NULL;
-	Window::Visibility vis = Window::INVISIBLE;
-	WindowList::const_iterator it = windows.begin();
-	for (; it != windows.end(); ++it) {
-		win = *it;
-		vis = win->WindowVisibility();
-		if (vis > Window::INVISIBLE)
-			break; // found the frontmost visible win
-	}
-	assert(win);
-	const Region& frontWinFrame = win->Frame();
-	win = NULL;
+	const Region& frontWinFrame = windows.front()->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
 	WindowList::const_reverse_iterator rit = windows.rbegin();
 	for (; rit != windows.rend(); ++rit) {
-		win = *rit;
-		assert(win);
-		vis = win->WindowVisibility();
+		Window* win = *rit;
 
-		if (win != windows.front() && vis > Window::INVISIBLE) {
+		if (win != windows.front()) {
 			const Region& frame = win->Frame();
 			Region intersect = frontWinFrame.Intersect(frame);
 			if (intersect == frame) {
@@ -190,20 +174,16 @@ void WindowManager::DrawWindows() const
 			}
 		}
 
-		switch (vis) {
-			case Window::GRAYED:
-				if (win->NeedsDraw()) {
-					// Important to only draw if the window itself is dirty
-					// controls on greyed out windows shouldnt be updating anyway
-					win->Draw();
-					Color fill = { 0, 0, 0, 128 };
-					video->DrawRect(win->Frame(), fill);
-				}
-				break;
-			case Window::VISIBLE:
+		if (win->IsDisabled()) {
+			if (win->NeedsDraw()) {
+				// Important to only draw if the window itself is dirty
+				// controls on greyed out windows shouldnt be updating anyway
 				win->Draw();
-				break;
-			default: break; // prevent compiler warning about not handling invisible case
+				Color fill = { 0, 0, 0, 128 };
+				video->DrawRect(win->Frame(), fill);
+			}
+		} else {
+			win->Draw();
 		}
 	}
 }

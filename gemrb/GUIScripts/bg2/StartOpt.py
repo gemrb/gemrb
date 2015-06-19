@@ -42,7 +42,7 @@ def OnLoad():
 	GraphicButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenVideoOptionsWindow)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	OptionsWindow.SetVisible(WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 	return
 	
 def BackPress():

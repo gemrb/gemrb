@@ -426,7 +426,6 @@ GameControl* Interface::StartGameControl()
 	gamewin->GetScriptingRef(99);
 	GameControl* gc = new GameControl(screen);
 	gamewin->AddSubviewInFrontOfView(gc);
-	gamewin->SetVisibility(Window::VISIBLE);
 	//setting the focus to the game control
 	winmgr.FocusWindow(gamewin);
 	if (guiscript->LoadScript( "MessageWindow" )) {
@@ -444,9 +443,6 @@ these events are pending until conditions are right
 void Interface::HandleEvents()
 {
 	GameControl *gc = GetGameControl();
-	if (gc && (!gc->Owner || !gc->Owner->WindowVisibility())) {
-		gc=NULL;
-	}
 
 	if (EventFlag&EF_SELECTION) {
 		EventFlag&=~EF_SELECTION;
@@ -3379,14 +3375,6 @@ void Interface::UpdateMasterScript()
 
 		delete worldmap;
 		worldmap = wmp_mgr->GetWorldMapArray();
-	}
-}
-
-void Interface::SetGCWindowVisible(bool vis)
-{
-	Control* gc = GetGameControl();
-	if (gc) {
-		gc->Owner->SetVisibility((vis) ? Window::VISIBLE : Window::INVISIBLE);
 	}
 }
 

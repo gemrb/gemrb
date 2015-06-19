@@ -75,7 +75,7 @@ class GWindow(GView):
     'DeleteControl': _GemRB.Window_DeleteControl,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
-    'SetVisible': _GemRB.Window_SetVisible,
+    'Focus': _GemRB.Window_Focus,
     'ShowModal': _GemRB.Window_ShowModal,
     'GetControl': _GemRB.Window_GetControl
   }

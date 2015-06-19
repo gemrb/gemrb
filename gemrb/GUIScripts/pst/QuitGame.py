@@ -68,5 +68,5 @@ def DeathWindowEnd ():
 	GemRB.SetVar ("PortraitWindow", Window.ID)
 	GemRB.UnhideGUI ()
 	#making the playing field gray
-	GUICommon.GameWindow.SetVisible(WINDOW_GRAYED)
+	GUICommon.GameWindow.SetDisabled(True)
 	return

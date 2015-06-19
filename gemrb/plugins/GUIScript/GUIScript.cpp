@@ -1221,18 +1221,17 @@ static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_SetVisible__doc,
-"SetVisible(WindowIndex, Visible)=>bool\n\n"
-"Sets the Visibility Flag of a Window." );
+PyDoc_STRVAR( GemRB_Window_Focus__doc,
+"Focus(GWindow)\n\n"
+"Brings window to front." );
 
-static PyObject* GemRB_Window_SetVisible(PyObject* self, PyObject* args)
+static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 {
-	Window::Visibility visible;
-	PARSE_ARGS( args, "Oi", &self, &visible );
+	PARSE_ARGS( args, "O", &self );
 
 	Window* win = GetView<Window>(self);
-	win->SetVisibility(visible);
-	if (win->WindowID == 0xffff) {
+	win->Focus();
+	if (win->WindowID == 99) {
 		core->SetEventFlag(EF_CONTROL);
 	}
 
@@ -9133,7 +9132,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_CreateControl, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
-	METHOD(Window_SetVisible, METH_VARARGS),
+	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
