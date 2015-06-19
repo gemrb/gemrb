@@ -167,13 +167,19 @@ void WindowManager::DrawWindows() const
 	for (; rit != windows.rend(); ++rit) {
 		Window* win = *rit;
 
-		if (win != windows.front()) {
+		if (win != windows.front() && win->NeedsDraw()) {
 			const Region& frame = win->Frame();
 			Region intersect = frontWinFrame.Intersect(frame);
+			if (!intersect.Dimensions().IsEmpty()) {
 			if (intersect == frame) {
 				// this window is completely obscured by the front window
 				// we dont have to bother drawing it because IE has no concept of translucent windows
 				continue;
+				} else {
+					// only partialy obscured
+					// must mark front win as dirty to redraw over the intersection
+					windows.front()->MarkDirty();
+				}
 			}
 		}
 
