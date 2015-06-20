@@ -49,8 +49,7 @@ def DonePress ():
 def DeathWindowEnd ():
 	GemRB.GamePause (1,3)
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (25)
+	Window = GemRB.LoadWindow (25, GUICommon.GetWindowPack())
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)

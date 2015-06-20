@@ -50,8 +50,7 @@ def UpdateOverview(CurrentStep):
 	
 	GlobalStep = CurrentStep
 	
-	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	CharGenWindow = GemRB.LoadWindow(0)
+	CharGenWindow = GemRB.LoadWindow(0, "GUICG")
 	PortraitButton = CharGenWindow.GetControl(12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	

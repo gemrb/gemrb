@@ -44,13 +44,12 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
 	GUICommonWindows.OptionsWindow = None
 
-	OptionsWindow = GemRB.LoadWindow(0)
+	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 

@@ -55,10 +55,8 @@ def OnLoad ():
 	else:
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 
-	GemRB.LoadWindowPack("GUICONN", 640, 480)
-
 #main window
-	StartWindow = GemRB.LoadWindow (0)
+	StartWindow = GemRB.LoadWindow (0, "GUICONN")
 	ProtocolButton = StartWindow.GetControl (0x00)
 	CreateGameButton = StartWindow.GetControl (0x02)
 	LoadGameButton = StartWindow.GetControl (0x07)

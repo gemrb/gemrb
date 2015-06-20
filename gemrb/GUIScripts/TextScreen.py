@@ -77,11 +77,6 @@ def StartTextScreen ():
 	if Message != "*":
 		GemRB.DisplayString (Message, 0xff0000)
 
-	if GameCheck.IsIWD2():
-		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
-	else:
-		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
-
 	Table = GemRB.LoadTable (TableName)
 	if GameCheck.IsBG2():
 		LoadPic = Table.GetValue (-1, -1)
@@ -100,7 +95,7 @@ def StartTextScreen ():
 	else:
 		GemRB.HardEndPL ()
 
-	TextScreen = GemRB.LoadWindow (ID)
+	TextScreen = GemRB.LoadWindow (ID, "GUICHAP")
 	TextArea = TextScreen.GetControl (2)
 
 	if GameCheck.IsBG1():

@@ -53,9 +53,7 @@ def OpenSaveWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
-	SaveWindow = Window = GemRB.LoadWindow (0)
+	SaveWindow = Window = GemRB.LoadWindow (0, "GUISAVE")
 	OptionsWindow = GUIClasses.GWindow ( GemRB.GetVar ("OtherWindow") )
 	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
@@ -96,9 +94,6 @@ def OpenSaveWindow ():
 	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress ()
-
-	GemRB.UnhideGUI ()
-
 
 def ScrollBarPress():
 	Window = SaveWindow

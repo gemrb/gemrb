@@ -1768,8 +1768,7 @@ def OpenWaitForDiscWindow ():
 	except:
 		pass
 
-	GemRB.LoadWindowPack ("GUIID")
-	DiscWindow = Window = GemRB.LoadWindow (0)
+	DiscWindow = Window = GemRB.LoadWindow (0, "GUIID")
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	label = DiscWindow.GetControl (0)
 

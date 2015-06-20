@@ -35,8 +35,7 @@ def SetLoadScreen ():
 def StartLoadScreen ():
 	global LoadScreen
 
-	GemRB.LoadWindowPack ("guils", 640, 480)
-	LoadScreen = GemRB.LoadWindow (0)
+	LoadScreen = GemRB.LoadWindow (0, "guils")
 	Middle = LoadScreen.GetControl (3)
 	Progress = GemRB.GetVar ("Progress")
 
@@ -83,6 +82,6 @@ def StartLoadScreen ():
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
+	LoadScreen.Focus()
 
 

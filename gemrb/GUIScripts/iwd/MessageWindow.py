@@ -42,7 +42,6 @@ def OnLoad():
 
 	GemRB.GameSetPartySize (PARTY_SIZE)
 	GemRB.GameSetProtagonistMode (2)
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
@@ -50,9 +49,10 @@ def OnLoad():
 
 	#this is different in IWD (0) and HoW (25)
 	if GameCheck.HasHOW():
-		OptionsWindow = GemRB.LoadWindow (25)
+		OptionsWindow = GemRB.LoadWindow (25, GUICommon.GetWindowPack())
 	else:
-		OptionsWindow = GemRB.LoadWindow (0)
+		OptionsWindow = GemRB.LoadWindow (0, GUICommon.GetWindowPack())
+
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)
 
@@ -86,11 +86,9 @@ def UpdateControlStatus ():
 	
 	if Override:
 		Expand = GS_LARGEDIALOG
-
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	
 	if Expand == GS_MEDIUMDIALOG:
-		TMessageWindow = GemRB.LoadWindow (12)
+		TMessageWindow = GemRB.LoadWindow (12, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl (1)
 		ExpandButton = TMessageWindow.GetControl (0)
 		ExpandButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
@@ -98,12 +96,12 @@ def UpdateControlStatus ():
 		ContractButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 	elif Expand == GS_LARGEDIALOG:
-		TMessageWindow = GemRB.LoadWindow (7)
+		TMessageWindow = GemRB.LoadWindow (7, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl (1)
 		ContractButton = TMessageWindow.GetControl (0)
 		ContractButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 	else:
-		TMessageWindow = GemRB.LoadWindow (4)
+		TMessageWindow = GemRB.LoadWindow (4, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl (3)
 		ExpandButton = TMessageWindow.GetControl (2)
 		ExpandButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)

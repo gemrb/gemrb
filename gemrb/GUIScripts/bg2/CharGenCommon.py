@@ -33,8 +33,7 @@ def DisplayOverview(step):
 
 	global CharGenWindow, TextAreaControl, PortraitName
 
-	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	CharGenWindow = GemRB.LoadWindow (0)
+	CharGenWindow = GemRB.LoadWindow (0, "GUICG")
 	GemRB.SetVar ("Step", step)
 
 	###

@@ -30,9 +30,8 @@ QuickLoadSlot = 0
 def OnLoad():
 	global StartWindow, QuickLoadSlot
 
-	GemRB.LoadWindowPack("GUICONN", 800, 600)
 #main window
-	StartWindow = GemRB.LoadWindow(0)
+	StartWindow = GemRB.LoadWindow(0, "GUICONN")
 	ProtocolButton = StartWindow.GetControl(0x00)
 	NewGameButton = StartWindow.GetControl(0x02)
 	LoadGameButton = StartWindow.GetControl(0x07)

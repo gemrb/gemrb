@@ -17,7 +17,6 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
 #	GUICommonWindows.PortraitWindow = None
 #	GUICommonWindows.ActionsWindow = None
@@ -62,9 +61,7 @@ def UpdateControlStatus():
 	GSFlags = GSFlags - GS_LARGEDIALOG
 	Override = GSFlags&GS_DIALOG
 
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-
-	TMessageWindow = GemRB.LoadWindow(0)
+	TMessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	TMessageTA = TMessageWindow.GetControl(0)
 
 	hideflag = GemRB.HideGUI()

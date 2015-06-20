@@ -38,8 +38,7 @@ def OnLoad ():
 	if GameCheck.IsIWD1():
 		GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
 		GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
-	GemRB.LoadWindowPack ("GUILOAD", 640, 480)
-	LoadWindow = GemRB.LoadWindow (0)
+	LoadWindow = GemRB.LoadWindow (0, "GUILOAD")
 
 	CancelButton=LoadWindow.GetControl (34)
 	CancelButton.SetText (13727)
@@ -78,7 +77,7 @@ def OnLoad ():
 	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
 	ScrollBarPress ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	LoadWindow.Focus()
 	return
 
 def ScrollBarPress ():

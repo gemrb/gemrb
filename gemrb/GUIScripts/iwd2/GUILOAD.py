@@ -36,8 +36,7 @@ def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
 	GemRB.SetVar ("SaveDir",1) #iwd2 is always using 'mpsave'
-	GemRB.LoadWindowPack ("GUILOAD", 800 ,600)
-	LoadWindow = GemRB.LoadWindow (0)
+	LoadWindow = GemRB.LoadWindow (0, "GUILOAD")
 
 	CancelButton=LoadWindow.GetControl (22)
 	CancelButton.SetText (13727)

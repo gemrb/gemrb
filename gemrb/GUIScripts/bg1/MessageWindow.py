@@ -38,13 +38,12 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
 	GUICommonWindows.OptionsWindow = None
  
-	ActionsWindow = GemRB.LoadWindow(3)
+	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack())
 	OptionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 
@@ -80,10 +79,8 @@ def UpdateControlStatus():
 	if Override:
 		Expand = GS_LARGEDIALOG
 
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-
 	if Expand == GS_MEDIUMDIALOG:
-		TMessageWindow = GemRB.LoadWindow(12)
+		TMessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl(1)
 		ExpandButton = TMessageWindow.GetControl(0)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
@@ -91,13 +88,13 @@ def UpdateControlStatus():
 		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 	elif Expand == GS_LARGEDIALOG:
-		TMessageWindow = GemRB.LoadWindow(7)
+		TMessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl(1)
 		ContractButton = TMessageWindow.GetControl(0)
 		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 	else:
-		TMessageWindow = GemRB.LoadWindow(4)
+		TMessageWindow = GemRB.LoadWindow(4, GUICommon.GetWindowPack())
 		# replace the up/down buttons with a scrollbar
 		TMessageWindow.DeleteControl(0);
 		TMessageWindow.DeleteControl(1);

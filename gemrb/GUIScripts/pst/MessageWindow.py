@@ -42,9 +42,8 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(0)
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	GemRB.SetInfoTextColor(0,255,0,255)
-	ActionsWindow = GemRB.LoadWindow(0)
+	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	OptionsWindow = GemRB.LoadWindow(2)
 	MessageWindow = GemRB.LoadWindow(7)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)

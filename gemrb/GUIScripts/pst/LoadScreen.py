@@ -37,8 +37,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	if screen_type == LS_TYPE_SAVING:
 		GemRB.HideGUI ()
 		
-	GemRB.LoadWindowPack ("guils")
-	LoadScreen = Window = GemRB.LoadWindow (0)
+	LoadScreen = Window = GemRB.LoadWindow (0, "guils")
 
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 

@@ -40,9 +40,8 @@ def OnLoad():
 
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	GemRB.LoadWindowPack("START")
 #quit subwindow
-	QuitWindow = GemRB.LoadWindow(3)
+	QuitWindow = GemRB.LoadWindow(3, "START")
 	QuitTextArea = QuitWindow.GetControl(0)
 	QuitTextArea.SetText(20582)
 	ConfirmButton = QuitWindow.GetControl(1)
