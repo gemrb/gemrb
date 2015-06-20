@@ -1543,16 +1543,14 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 	PARSE_ARGS( args, "Oi|i", &self, &Flags, &Operation );
 
 	if (Operation < BM_SET || Operation > BM_NAND) {
-		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
-		return NULL;
+		return RuntimeError("Syntax Error: operation must be 0-4\n");
 	}
 
 	View* view = GetView(self);
 	ABORT_IF_NULL(view);
 
 	if (!view->SetFlags( Flags, Operation )) {
-		Log(ERROR, "GUIScript", "Flag cannot be set!");
-		return NULL;
+		return RuntimeError("Flag cannot be set!\n");
 	}
 
 	Py_RETURN_NONE;
