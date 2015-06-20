@@ -2325,7 +2325,7 @@ PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
 
 static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 {
-	PyObject* pypic, *pydefaultPic;
+	PyObject* pypic, *pydefaultPic = NULL;
 	PARSE_ARGS( args,  "OO|O", &self, &pypic, &pydefaultPic );
 
 	Button* btn = GetView<Button>(self);
@@ -2339,26 +2339,30 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 		if (im) {
 			pic = im->GetSprite2D();
 			pic->release(); // prevent leak
-		} else {
-			return RuntimeError("Picture resource not found!\n");
 		}
+	} else if (pypic == Py_None) {
+		// clear the picture by passing None
+		btn->SetPicture(NULL);
+		Py_RETURN_NONE;
 	} else {
 		pic = CObject<Sprite2D>(pypic);
 	}
 
-	if (!pic) {
+	if (!pic && pydefaultPic) {
 		// use default pic
 		if (PyObject_TypeCheck( pydefaultPic, &PyString_Type )) {
 			ResourceHolder<ImageMgr> im(PyString_AsString(pydefaultPic));
 			if (im) {
 				pic = im->GetSprite2D();
 				pic->release(); // prevent leak
-			} else {
-				return RuntimeError("Picture resource not found!\n");
 			}
 		} else {
 			pic = CObject<Sprite2D>(pydefaultPic);
 		}
+	}
+
+	if (!pic) {
+		return RuntimeError("Picture resource not found!\n");
 	}
 
 	btn->SetPicture(pic.get());
