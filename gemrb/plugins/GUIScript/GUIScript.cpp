@@ -1449,7 +1449,10 @@ static PyObject* GemRB_Window_Close(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS(args, "O", &self);
 	Window* win = GetView<Window>(self);
-	win->Close();
+	if (win) {
+		win->Close();
+	}
+	// dont bother erroring out if the window didnt exist; makes GUIScripts simpler
 	Py_RETURN_NONE;
 }
 
