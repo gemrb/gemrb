@@ -639,8 +639,13 @@ void Button::SetPicture(Sprite2D* newpic)
 	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 	Picture = newpic;
+	if (Picture) {
+		Picture->acquire();
+		flags |= IE_GUI_BUTTON_PICTURE;
+	} else {
+		flags &= ~IE_GUI_BUTTON_PICTURE;
+	}
 	MarkDirty();
-	flags |= IE_GUI_BUTTON_PICTURE;
 }
 
 /** Clears the list of Pictures */
