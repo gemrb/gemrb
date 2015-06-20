@@ -1044,7 +1044,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_GetControl__doc,
-			 "GetControl(Window, ControlID) => GControl\n\n"
+			 "GetControl(GWindow, ControlID) => GControl\n\n"
 			 "Returns a control as an object." );
 
 static PyObject* GemRB_Window_GetControl(PyObject* self, PyObject* args)
@@ -1063,7 +1063,7 @@ static PyObject* GemRB_Window_GetControl(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
-"QueryText(WindowIndex, ControlIndex) => string\n\n"
+"QueryText(GControl) => string\n\n"
 "Returns the Text of a control." );
 
 static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
@@ -1081,7 +1081,7 @@ static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
-"SetBufferLength(WindowIndex, ControlIndex, Length)\n\n"
+"SetBufferLength(GTextEdit, Length)\n\n"
 "Sets the maximum text length of a TextEdit Control. It cannot be more than 65535." );
 
 static PyObject* GemRB_TextEdit_SetBufferLength(PyObject* self, PyObject* args)
@@ -1103,7 +1103,7 @@ static PyObject* GemRB_TextEdit_SetBufferLength(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_SetText__doc,
-"SetText(WindowIndex, ControlIndex, String|Strref) => int\n\n"
+"SetText(GControl, String|Strref) => int\n\n"
 "Sets the Text of a control in a Window." );
 
 static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
@@ -1134,7 +1134,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,
-"TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Flag]])\n\n"
+"TextAreaAppend(GTextArea, String|Strref [, Flag]])\n\n"
 "Appends the Text to the TextArea Control in the Window. "
 "If Flag is given, then it will use that value as a GetString flag.");
 
@@ -1164,7 +1164,7 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Clear__doc,
-"TextAreaClear(WindowIndex, ControlIndex)\n\n"
+"TextAreaClear(GTextArea\n\n"
 "Clears the Text from the TextArea Control in the Window." );
 
 static PyObject* GemRB_TextArea_Clear(PyObject* self, PyObject* args)
@@ -1179,7 +1179,7 @@ static PyObject* GemRB_TextArea_Clear(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
-			 "SetTooltip(WindowIndex, ControlIndex, String|Strref[, Function]) => int\n\n"
+			 "SetTooltip(GControl, String|Strref[, Function]) => int\n\n"
 			 "Sets control's tooltip. The optional function number will set the function key linkage as well." );
 
 static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
@@ -1262,7 +1262,7 @@ static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_ShowModal__doc,
-"ShowModal(WindowIndex, [Shadow=MODAL_SHADOW_NONE])\n\n"
+"ShowModal(GWindow, [Shadow=MODAL_SHADOW_NONE])\n\n"
 "Show a Window on Screen setting the Modal Status. "
 "If Shadow is MODAL_SHADOW_GRAY, other windows are grayed. "
 "If Shadow is MODAL_SHADOW_BLACK, they are blacked out." );
@@ -1354,7 +1354,7 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_SetStatus__doc,
-"SetControlStatus(WindowIndex, ControlIndex, Status)\n\n"
+"SetControlStatus(GControl, Status)\n\n"
 "Sets the status of a Control." );
 
 static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
@@ -1396,7 +1396,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_AttachScrollBar__doc,
-"AttachScrollBar(WindowIndex, ControlIndex, ScrollBarControlIndex)\n\n"
+"AttachScrollBar(GControl, ScrollBarControlIndex)\n\n"
 "Attaches a ScrollBar to another control." );
 
 static PyObject* GemRB_Control_AttachScrollBar(PyObject* self, PyObject* args)
@@ -1416,7 +1416,7 @@ static PyObject* GemRB_Control_AttachScrollBar(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
-"SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)\n\n"
+"SetVarAssoc(GWindow, VariableName, LongValue)\n\n"
 "Sets the name of the Variable associated with a control." );
 
 static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
@@ -1536,8 +1536,8 @@ static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetFlags__doc,
-			 "SetViewFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
-			 "Sets the Display Flags of a TextArea. Flags are: IE_GUI_TA_SELECTABLE, IE_GUI_TA_AUTOSCROLL, IE_GUI_TA_SMOOTHSCROLL. Operation defaults to OP_SET." );
+			 "SetViewFlags(GView, Flags, Operation)\n\n"
+			 "Sets the Display Flags of a View. Operation defaults to OP_SET." );
 
 static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 {
