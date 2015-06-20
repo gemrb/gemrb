@@ -89,13 +89,13 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 	Window* win = new Window(rgn, *this);
 	windows.push_back(win);
 
-	if (closedWindows.size() > 0) { // TODO: change this to 1 when we can reopen closed windows
+	if (closedWindows.size() > 1) {
 		// delete all but the most recent closed window
 		// FIXME: this is intended for caching (in case the last window is reopened)
 		// but currently there is no way to reopen a window (other than recreating it)
+		// IMPORTANT: aside from caching, the last window probably is in a callback that resulted in this new window...
 		WindowList::iterator it = closedWindows.begin();
-		// TODO: change to --closedWindows.end() when caching is implemented
-		for (; it != closedWindows.end();) {
+		for (; it != --closedWindows.end();) {
 			Window* win = *it;
 			delete win;
 			it = closedWindows.erase(it);
