@@ -162,6 +162,9 @@ bool WindowManager::DispatchEvent(const Event& event)
 		switch (event.type) {
 			case Event::MouseDown:
 				target->DispatchMouseDown(winPos, event.mouse.button, event.mod);
+				if (target != windows.front()) {
+					FocusWindow(target);
+				}
 				break;
 			case Event::MouseUp:
 				target->DispatchMouseUp(winPos, event.mouse.button, event.mod);
