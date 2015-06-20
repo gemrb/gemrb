@@ -47,7 +47,6 @@ def OnLoad():
 
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
-	GUICommonWindows.OptionsWindow = None
 
 	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)

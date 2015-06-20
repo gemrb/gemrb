@@ -243,20 +243,17 @@ def ExitPress():
 
 	#quit subwindow
 	QuitWindow = GemRB.LoadWindow (3)
+	QuitWindow.ShowModal()
 	QuitTextArea = QuitWindow.GetControl (0)
 	CancelButton = QuitWindow.GetControl (2)
 	ConfirmButton = QuitWindow.GetControl (1)
 	QuitTextArea.SetText (19532)
 	CancelButton.SetText (13727)
 	ConfirmButton.SetText (15417)
-	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
+	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	return
-
-def ExitConfirmed():
-	GemRB.Quit()
 	return
 
 def OptionsPress():

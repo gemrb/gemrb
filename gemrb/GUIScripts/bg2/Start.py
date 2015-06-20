@@ -58,7 +58,7 @@ def OnLoad():
 	ExitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	SoAButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoAPress)
 	ToBButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ToBPress)
-	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
 	StartWindow.Focus()
 	GemRB.LoadMusicPL("Cred.mus")
 	return
@@ -77,8 +77,4 @@ def ToBPress():
 	if StartWindow:
 		StartWindow.Unload()
 	GemRB.SetNextScript("Start2")
-	return
-
-def ExitPress():
-	GemRB.Quit()
 	return
